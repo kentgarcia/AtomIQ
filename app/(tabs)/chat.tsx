@@ -1,8 +1,11 @@
-import { StyleSheet, View, Text, ScrollView, TouchableOpacity } from 'react-native';
+import { StyleSheet, View, Text, ScrollView, TouchableOpacity, Image, Dimensions } from 'react-native';
 import { Icon } from '@/components/ui/icon';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
+const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 // Orange Theme matching the new design
 const THEME = {
@@ -18,25 +21,31 @@ const THEME = {
 
 export default function ChatLandingScreen() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
+  // Tab bar height: 70px + bottom padding (max 20px) + safe area bottom
+  const TAB_BAR_HEIGHT = 70 + Math.max(insets.bottom, 20) + 20; // Extra 20px for spacing
 
   return (
-    <View style={{ flex: 1, backgroundColor: THEME.bg }}>
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+    <View style={{ flex: 1, backgroundColor: '#FFF' }}>
+      <View style={[styles.content, { paddingTop: insets.top + 20, paddingBottom: TAB_BAR_HEIGHT }]}>
         
-        {/* Hero Section with Enhanced Design */}
-        <View style={styles.heroSection}>
+        {/* Scrollable Content */}
+        <ScrollView 
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+          bounces={false}
+        >
+          {/* Hero Section with Enhanced Design */}
+          <View style={styles.heroSection}>
           <Animated.View 
             entering={FadeInDown.delay(100).springify()}
             style={styles.mascotContainer}
           >
-            <LinearGradient
-               colors={[THEME.primary, THEME.primaryLight]}
-               style={styles.mascotCircle}
-            >
-              <Icon name="Message" size={64} color="#FFF" variant="Bold" />
-            </LinearGradient>
-            {/* Duolingo-style 3D effect */}
-            <View style={styles.mascotShadow} />
+            <Image 
+              source={require('@/assets/images/mascot/explain.png')} 
+              style={styles.mascotImage}
+              resizeMode="contain"
+            />
           </Animated.View>
           
           <Animated.View entering={FadeInDown.delay(200).springify()}>
@@ -62,7 +71,7 @@ export default function ChatLandingScreen() {
               colors={[THEME.primary + '20', THEME.primary + '10']}
               style={styles.iconBox}
             >
-               <Icon name="Book1" size={24} color={THEME.primary} variant="Bold" />
+               <Icon name="Book1" size={20} color={THEME.primary} variant="Bold" />
             </LinearGradient>
             <View style={{ flex: 1 }}>
               <Text style={styles.featureText}>Explain Complex Topics</Text>
@@ -75,7 +84,7 @@ export default function ChatLandingScreen() {
               colors={['#2ECC7120', '#2ECC7110']}
               style={styles.iconBox}
             >
-               <Icon name="SearchNormal" size={24} color="#2ECC71" variant="Bold" />
+               <Icon name="SearchNormal" size={20} color="#2ECC71" variant="Bold" />
             </LinearGradient>
             <View style={{ flex: 1 }}>
               <Text style={styles.featureText}>Fact-Check Myths</Text>
@@ -88,7 +97,7 @@ export default function ChatLandingScreen() {
               colors={['#1CB0F620', '#1CB0F610']}
               style={styles.iconBox}
             >
-               <Icon name="DocumentText" size={24} color="#1CB0F6" variant="Bold" />
+               <Icon name="DocumentText" size={20} color="#1CB0F6" variant="Bold" />
             </LinearGradient>
             <View style={{ flex: 1 }}>
               <Text style={styles.featureText}>Cite Reliable Sources</Text>
@@ -97,21 +106,22 @@ export default function ChatLandingScreen() {
           </View>
         </Animated.View>
 
-        {/* Example Questions */}
-        <Animated.View entering={FadeInDown.delay(500).springify()} style={styles.examplesSection}>
-          <Text style={styles.examplesTitle}>Try asking...</Text>
-          <View style={styles.exampleChips}>
-            {['How do reactors work?', 'Is radiation dangerous?', 'What is half-life?'].map((q, i) => (
-              <View key={i} style={styles.exampleChip}>
-                <Icon name="MessageQuestion" size={14} color={THEME.textMuted} />
-                <Text style={styles.exampleText}>{q}</Text>
-              </View>
-            ))}
-          </View>
-        </Animated.View>
+          {/* Example Questions */}
+          <Animated.View entering={FadeInDown.delay(500).springify()} style={styles.examplesSection}>
+            <Text style={styles.examplesTitle}>Try asking...</Text>
+            <View style={styles.exampleChips}>
+              {['How do reactors work?', 'Is radiation dangerous?', 'What is half-life?'].map((q, i) => (
+                <View key={i} style={styles.exampleChip}>
+                  <Icon name="MessageQuestion" size={14} color={THEME.textMuted} />
+                  <Text style={styles.exampleText}>{q}</Text>
+                </View>
+              ))}
+            </View>
+          </Animated.View>
+        </ScrollView>
 
-        {/* Enhanced Start Button */}
-        <Animated.View entering={FadeInDown.delay(600).springify()}>
+        {/* Fixed Start Button - Always visible above tab bar */}
+        <Animated.View entering={FadeInDown.delay(600).springify()} style={styles.buttonContainer}>
           <TouchableOpacity 
             style={styles.startButton}
             activeOpacity={0.8}
@@ -123,66 +133,46 @@ export default function ChatLandingScreen() {
               end={{ x: 1, y: 0 }}
               style={styles.startButtonGradient}
             >
-              <Icon name="Message" size={24} color="#FFF" variant="Bold" />
+              <Icon name="Message" size={20} color="#FFF" variant="Bold" />
               <Text style={styles.startButtonText}>START CONVERSATION</Text>
-              <Icon name="ArrowRight2" size={20} color="#FFF" variant="Bold" />
+              <Icon name="ArrowRight2" size={18} color="#FFF" variant="Bold" />
             </LinearGradient>
             <View style={styles.startButtonShadow} />
           </TouchableOpacity>
         </Animated.View>
 
-      </ScrollView>
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   content: {
+    flex: 1,
+    paddingHorizontal: 20,
+  },
+  scrollContent: {
     flexGrow: 1,
-    padding: 24,
-    paddingTop: 80,
-    paddingBottom: 120,
+    paddingBottom: 16,
   },
   heroSection: {
     alignItems: 'center',
-    marginBottom: 40,
+    marginBottom: 20,
   },
   mascotContainer: {
     alignItems: 'center',
-    marginBottom: 24,
+    marginBottom: 12,
     position: 'relative',
   },
-  mascotCircle: {
-    width: 140,
-    height: 140,
-    borderRadius: 70,
-    alignItems: 'center',
-    justifyContent: 'center',
-    zIndex: 10,
-    borderWidth: 6,
-    borderColor: '#FFF',
-    shadowColor: THEME.primary,
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.3,
-    shadowRadius: 16,
-    elevation: 10,
-  },
-  mascotShadow: {
-    position: 'absolute',
-    top: 8,
-    left: 8,
-    right: -8,
-    bottom: -8,
-    borderRadius: 70,
-    backgroundColor: THEME.primaryDark,
-    opacity: 0.2,
-    zIndex: 0,
+  mascotImage: {
+    width: 120,
+    height: 120,
   },
   heroTitle: {
-    fontSize: 36,
+    fontSize: 28,
     fontWeight: '800',
     color: THEME.text,
-    marginBottom: 8,
+    marginBottom: 6,
     textAlign: 'center',
   },
   statusBadge: {
@@ -190,10 +180,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 6,
     backgroundColor: '#2ECC7120',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 12,
-    marginBottom: 16,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 10,
+    marginBottom: 10,
     borderWidth: 1,
     borderColor: '#2ECC7140',
   },
@@ -209,81 +199,88 @@ const styles = StyleSheet.create({
     color: '#2ECC71',
   },
   heroSubtitle: {
-    fontSize: 15,
+    fontSize: 13,
     color: THEME.textMuted,
     textAlign: 'center',
-    lineHeight: 24,
-    paddingHorizontal: 20,
+    lineHeight: 18,
+    paddingHorizontal: 10,
   },
   featuresList: {
-    gap: 12,
-    marginBottom: 32,
+    gap: 8,
+    marginBottom: 16,
+    flexShrink: 1,
   },
   featureRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 16,
+    gap: 12,
     backgroundColor: '#FFFFFF',
-    padding: 16,
-    borderRadius: 16,
+    padding: 12,
+    borderRadius: 12,
     borderWidth: 2,
     borderColor: THEME.border,
   },
   iconBox: {
-    width: 48,
-    height: 48,
-    borderRadius: 12,
+    width: 40,
+    height: 40,
+    borderRadius: 10,
     alignItems: 'center',
     justifyContent: 'center',
   },
   featureText: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: '800',
     color: THEME.text,
     marginBottom: 2,
   },
   featureSubtext: {
-    fontSize: 13,
+    fontSize: 11,
     color: THEME.textMuted,
     fontWeight: '500',
   },
   examplesSection: {
-    marginBottom: 32,
+    marginBottom: 16,
+  },
+  buttonContainer: {
+    paddingTop: 16,
+    paddingBottom: 8,
+    backgroundColor: '#FFF',
   },
   examplesTitle: {
-    fontSize: 14,
+    fontSize: 12,
     fontWeight: '700',
     color: THEME.textMuted,
-    marginBottom: 12,
+    marginBottom: 8,
     textAlign: 'center',
   },
   exampleChips: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 8,
+    gap: 6,
     justifyContent: 'center',
   },
   exampleChip: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
+    gap: 4,
     backgroundColor: THEME.card,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 12,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 10,
     borderWidth: 2,
     borderColor: THEME.border,
   },
   exampleText: {
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '600',
     color: THEME.textMuted,
   },
   startButton: {
     position: 'relative',
-    height: 64,
-    borderRadius: 20,
+    height: 56,
+    borderRadius: 16,
     overflow: 'hidden',
+    flexShrink: 0,
   },
   startButtonGradient: {
     flex: 1,
@@ -306,7 +303,7 @@ const styles = StyleSheet.create({
   },
   startButtonText: {
     color: '#FFF',
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: '800',
     letterSpacing: 0.5,
   },

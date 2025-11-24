@@ -2,10 +2,10 @@ import { Post } from '../types';
 
 const nuclearMedicine: Post = {
   id: 'nuclear-medicine',
-  type: 'fact-highlight',
+  type: 'did-you-know',
   category: 'health',
-  title: 'Nuclear Medicine Saves Lives Daily',
-  content: 'Over 40 million nuclear medicine procedures are performed globally each year. From cancer treatment to heart disease diagnosis, radioactive isotopes are essential medical tools. PET scans detect cancer early, radioactive iodine treats thyroid conditions, and targeted radiation therapy destroys tumors while sparing healthy tissue. Nuclear technology isn\'t just about power - it\'s saving lives every day.',
+  title: 'Did you know? Nuclear medicine saves millions',
+  content: 'Over 40 million nuclear medicine procedures are performed globally each year. PET scans detect cancer early, radioactive iodine treats thyroid conditions, and targeted radiation therapy destroys tumors. Nuclear technology isn\'t just about power - it\'s saving lives every day.',
   author: {
     name: 'Medical Insider',
     avatar: 'https://images.pexels.com/photos/1181686/pexels-photo-1181686.jpeg'

@@ -1,11 +1,10 @@
 import { Icon } from '@/components/ui/icon';
-import { getAllMyths } from '@/content/myths';
-import { getAllFacts } from '@/content/facts';
 import { getAllArticles, getAllPosts } from '@/content/articles';
 import React, { useState, useMemo } from 'react';
-import { Dimensions, FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Dimensions, FlatList, Image, Linking, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useRouter } from 'expo-router';
 
 const { width } = Dimensions.get('window');
 
@@ -25,10 +24,8 @@ const THEME = {
 // Storage keys
 const BOOKMARKS_KEY = '@atomiq_bookmarks';
 
-// Helper to generate feed items from all content types
+// Helper to generate feed items from articles and posts only
 const generateFeedItems = () => {
-  const myths = getAllMyths();
-  const facts = getAllFacts();
   const articles = getAllArticles();
   const posts = getAllPosts();
   
@@ -48,6 +45,7 @@ const generateFeedItems = () => {
       publishedDate: article.publishedDate,
       readTime: article.readTime,
       source: article.source,
+      sourceUrl: article.sourceUrl,
       category: article.category,
       tags: article.tags,
       image: article.image,
@@ -73,50 +71,19 @@ const generateFeedItems = () => {
     });
   });
   
-  // Add myths as feed items
-  myths.forEach((myth) => {
-    feedItems.push({
-      id: `myth-${myth.id}`,
-      type: 'myth',
-      title: myth.mythStatement,
-      content: myth.reality,
-      explanation: myth.explanation,
-      source: myth.source,
-      category: myth.category,
-      tags: myth.tags,
-      image: myth.visualAid,
-      difficulty: myth.difficulty,
-    });
-  });
-  
-  // Add facts as feed items
-  facts.forEach((fact) => {
-    feedItems.push({
-      id: `fact-${fact.id}`,
-      type: 'fact',
-      title: fact.title,
-      content: fact.description,
-      statistic: fact.statistic,
-      source: fact.source,
-      category: fact.category,
-      tags: fact.tags,
-      image: fact.visualAid,
-      importance: fact.importance,
-    });
-  });
-  
-  // Sort by published date (newest first) for articles/posts, then shuffle others
+  // Sort by published date (newest first)
   return feedItems.sort((a, b) => {
     if (a.publishedDate && b.publishedDate) {
       return new Date(b.publishedDate).getTime() - new Date(a.publishedDate).getTime();
     }
     if (a.publishedDate) return -1;
     if (b.publishedDate) return 1;
-    return Math.random() - 0.5;
+    return 0;
   });
 };
 
 export default function WikiScreen() {
+  const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedFilter, setSelectedFilter] = useState('All');
   const [bookmarkedIds, setBookmarkedIds] = useState<string[]>([]);
@@ -134,10 +101,6 @@ export default function WikiScreen() {
         items = items.filter(item => item.type === 'article');
       } else if (selectedFilter === 'Posts') {
         items = items.filter(item => item.type === 'post');
-      } else if (selectedFilter === 'Myths') {
-        items = items.filter(item => item.type === 'myth');
-      } else if (selectedFilter === 'Facts') {
-        items = items.filter(item => item.type === 'fact');
       } else if (selectedFilter === 'Bookmarked') {
         items = items.filter(item => bookmarkedIds.includes(item.id));
       } else {
@@ -189,6 +152,22 @@ export default function WikiScreen() {
     }
   };
   
+  const handleArticlePress = async (item: any) => {
+    // If it's an article with sourceUrl, open external link
+    if (item.type === 'article' && item.sourceUrl) {
+      try {
+        await Linking.openURL(item.sourceUrl);
+      } catch (error) {
+        console.error('Error opening URL:', error);
+      }
+    } 
+    // Otherwise, navigate to article detail screen
+    else if (item.type === 'article') {
+      router.push(`/article-detail?id=${item.id}`);
+    }
+    // Posts are not clickable (they're short and self-contained)
+  };
+  
   const renderFeedItem = ({ item, index }: { item: any; index: number }) => {
     const isBookmarked = bookmarkedIds.includes(item.id);
     
@@ -198,11 +177,7 @@ export default function WikiScreen() {
         case 'article':
           return { color: '#1CB0F6', icon: 'DocumentText', label: 'ARTICLE' };
         case 'post':
-          return { color: '#8B5CF6', icon: 'Message', label: 'POST' };
-        case 'myth':
-          return { color: '#EF4444', icon: 'Danger', label: 'MYTH' };
-        case 'fact':
-          return { color: THEME.success, icon: 'TickCircle', label: 'FACT' };
+          return { color: '#8B5CF6', icon: 'Message', label: 'DID YOU KNOW' };
         default:
           return { color: THEME.primary, icon: 'InfoCircle', label: 'INFO' };
       }
@@ -250,24 +225,17 @@ export default function WikiScreen() {
         {/* Title */}
         <Text style={styles.postTitle}>{item.title}</Text>
         
+        {/* Image */}
+        {item.image && (
+          <Image 
+            source={{ uri: item.image }} 
+            style={styles.postImage}
+            resizeMode="cover"
+          />
+        )}
+        
         {/* Content */}
         <Text style={styles.postContent}>{item.content}</Text>
-        
-        {/* Statistic (for facts) */}
-        {item.statistic && (
-          <View style={styles.statisticBox}>
-            <Icon name="Chart" size={20} color={THEME.primary} variant="Bold" />
-            <Text style={styles.statisticText}>{item.statistic}</Text>
-          </View>
-        )}
-        
-        {/* Explanation (for myths) */}
-        {item.explanation && (
-          <View style={styles.explanationBox}>
-            <Text style={styles.explanationLabel}>REALITY CHECK</Text>
-            <Text style={styles.explanationText}>{item.explanation}</Text>
-          </View>
-        )}
         
         {/* Source */}
         {item.source && (
@@ -292,7 +260,10 @@ export default function WikiScreen() {
         <View style={styles.actionRow}>
           <TouchableOpacity 
             style={[styles.bookmarkBtn, isBookmarked && styles.bookmarkBtnActive]}
-            onPress={() => toggleBookmark(item.id)}
+            onPress={(e) => {
+              e.stopPropagation();
+              toggleBookmark(item.id);
+            }}
           >
             <Icon 
               name={isBookmarked ? 'Archive' : 'ArchiveAdd'} 
@@ -305,23 +276,38 @@ export default function WikiScreen() {
             </Text>
           </TouchableOpacity>
         </View>
+        
+        {/* Read More Button for Articles */}
+        {item.type === 'article' && (
+          <View style={styles.readMoreContainer}>
+            <TouchableOpacity 
+              style={styles.readMoreButton}
+              onPress={() => handleArticlePress(item)}
+            >
+              <Text style={styles.readMoreText}>
+                {item.sourceUrl ? 'Read on Source Website' : 'Read Full Article'}
+              </Text>
+              <Icon name="ArrowRight" size={16} color={THEME.primary} />
+            </TouchableOpacity>
+          </View>
+        )}
       </Animated.View>
     );
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: THEME.bg }}>
+    <View style={{ flex: 1, backgroundColor: '#FFF' }}>
       {/* Fixed Header */}
       <View style={styles.headerContainer}>
         <Text style={styles.headerTitle}>Learn & Explore</Text>
-        <Text style={styles.headerSubtitle}>Scroll through nuclear myths & facts</Text>
+        <Text style={styles.headerSubtitle}>Discover articles and interesting facts about nuclear energy</Text>
         
         {/* Search */}
         <View style={styles.searchContainer}>
           <Icon name="SearchNormal" size={20} color={THEME.textMuted} />
           <TextInput 
             style={styles.searchInput}
-            placeholder="Search myths and facts..."
+            placeholder="Search articles and posts..."
             placeholderTextColor={THEME.textMuted}
             value={searchQuery}
             onChangeText={setSearchQuery}
@@ -333,7 +319,7 @@ export default function WikiScreen() {
           <FlatList
             horizontal
             showsHorizontalScrollIndicator={false}
-            data={['All', 'Articles', 'Posts', 'Myths', 'Facts', 'Bookmarked']}
+            data={['All', 'Articles', 'Posts', 'Bookmarked']}
             keyExtractor={(item) => item}
             contentContainerStyle={styles.filtersContent}
             renderItem={({ item }) => (
@@ -363,7 +349,11 @@ export default function WikiScreen() {
         showsVerticalScrollIndicator={false}
         ListEmptyComponent={
           <View style={styles.emptyState}>
-            <Icon name="SearchStatus" size={64} color={THEME.textMuted} />
+            <Image 
+              source={require('@/assets/images/mascot/blink.png')} 
+              style={styles.emptyMascot}
+              resizeMode="contain"
+            />
             <Text style={styles.emptyText}>No items found</Text>
             <Text style={styles.emptySubtext}>Try adjusting your filters or search</Text>
           </View>
@@ -516,6 +506,13 @@ const styles = StyleSheet.create({
     lineHeight: 26,
     marginBottom: 12,
   },
+  postImage: {
+    width: '100%',
+    height: 200,
+    borderRadius: 12,
+    marginBottom: 16,
+    backgroundColor: THEME.bg,
+  },
   postContent: {
     fontSize: 15,
     color: THEME.text,
@@ -623,10 +620,37 @@ const styles = StyleSheet.create({
   bookmarkTextActive: {
     color: '#FFFFFF',
   },
+  readMoreContainer: {
+    marginTop: 12,
+    paddingTop: 16,
+    borderTopWidth: 1,
+    borderTopColor: THEME.bg,
+  },
+  readMoreButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    backgroundColor: THEME.primary + '10',
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: THEME.primary,
+  },
+  readMoreText: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: THEME.primary,
+  },
   emptyState: {
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 60,
+  },
+  emptyMascot: {
+    width: 150,
+    height: 150,
   },
   emptyText: {
     fontSize: 18,

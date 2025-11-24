@@ -1,15 +1,24 @@
 import { Icon } from '@/components/ui/icon';
 import { Background } from '@/components/ui/background';
+import { MarkdownText } from '@/components/markdown-text';
 import { useRouter } from 'expo-router';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   StyleSheet, View, Text, ScrollView, TextInput, TouchableOpacity, 
-  KeyboardAvoidingView, Platform, Dimensions 
+  KeyboardAvoidingView, Platform, Dimensions, Image, Alert
 } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import Animated, { 
   FadeInDown, FadeInUp, useSharedValue, useAnimatedStyle, withRepeat, withTiming, Easing 
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { sendMessageToGemini, convertMessagesToGeminiFormat } from '@/services/gemini';
+import {
+  createConversation, saveConversation, loadConversation, getAllConversations,
+  deleteConversation, renameConversation, pinConversation,
+  saveNote, getCurrentConversationId, setCurrentConversationId,
+  type ChatMessage, type ChatConversation
+} from '@/services/chat-history';
 
 // Orange Theme matching the app
 const CHAT_THEME = {
@@ -27,7 +36,7 @@ const CHAT_THEME = {
   accent: '#1CB0F6',
 };
 
-const SUGGESTIONS = [
+const INITIAL_SUGGESTIONS = [
   "Is X-Ray safe?",
   "How do reactors work?",
   "Define Half-life",
@@ -40,22 +49,35 @@ const INITIAL_MESSAGES = [
     id: 1, 
     role: 'bot', 
     text: "Greetings, Scientist. I am Schrödi. Accessing the database...",
-    citations: [] 
+    citations: [],
+    followUpSuggestions: []
   },
   { 
     id: 2, 
     role: 'bot', 
-    text: "I am ready. Ask me anything about nuclear physics, safety protocols, or historical events.",
-    citations: ['UNSCEAR', 'IAEA'] 
+    text: "I am ready. Ask me anything about nuclear physics, safety protocols, or historical events. I'll provide accurate information with reliable sources.",
+    citations: ['UNSCEAR', 'IAEA'],
+    followUpSuggestions: INITIAL_SUGGESTIONS.slice(0, 4)
   }
 ];
+
+interface Message {
+  id: number;
+  role: 'user' | 'bot';
+  text: string;
+  citations: string[];
+  followUpSuggestions?: string[];
+}
 
 export default function AiChatScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const [messages, setMessages] = useState(INITIAL_MESSAGES);
+  const scrollViewRef = useRef<ScrollView>(null);
+  const [messages, setMessages] = useState<Message[]>(INITIAL_MESSAGES);
   const [inputText, setInputText] = useState('');
   const [isThinking, setIsThinking] = useState(false);
+  const [suggestions, setSuggestions] = useState<string[]>(INITIAL_SUGGESTIONS);
+  const [error, setError] = useState<string | null>(null);
 
   // Thinking Animation (Spinning Atom / Dot)
   const spin = useSharedValue(0);
@@ -74,26 +96,99 @@ export default function AiChatScreen() {
     transform: [{ rotate: `${spin.value}deg` }],
   }));
 
-  const handleSend = () => {
-    if (!inputText.trim()) return;
 
-    const userMsg = { id: Date.now(), role: 'user', text: inputText };
+  // Scroll to bottom when new messages arrive
+  useEffect(() => {
+    if (messages.length > 0) {
+      setTimeout(() => {
+        scrollViewRef.current?.scrollToEnd({ animated: true });
+      }, 100);
+    }
+  }, [messages.length]);
+
+  const handleSend = async () => {
+    if (!inputText.trim() || isThinking) return;
+
+    const userMessage = inputText.trim();
+    const userMsg: Message = { 
+      id: Date.now(), 
+      role: 'user', 
+      text: userMessage,
+      citations: [],
+      followUpSuggestions: []
+    };
+    
     setMessages(prev => [...prev, userMsg]);
     setInputText('');
     setIsThinking(true);
+    setError(null);
 
-    // Simulate AI response
-    setTimeout(() => {
-      setIsThinking(false);
-      const botMsg = { 
-        id: Date.now() + 1, 
-        role: 'bot', 
-        text: "That is an excellent question. Let me analyze the data...",
-        citations: ['IAEA Safety Standards']
+    try {
+      // Convert messages to Gemini format (excluding the current user message)
+      const conversationHistory = convertMessagesToGeminiFormat(
+        messages.filter(m => m.id !== userMsg.id)
+      );
+
+      // Call Gemini API
+      const response = await sendMessageToGemini(userMessage, conversationHistory);
+
+      const botMsg: Message = {
+        id: Date.now() + 1,
+        role: 'bot',
+        text: response.text,
+        citations: response.citations,
+        followUpSuggestions: response.followUpSuggestions
       };
+
       setMessages(prev => [...prev, botMsg]);
-    }, 2000);
+      
+      // Update suggestions with follow-ups from the response
+      if (response.followUpSuggestions && response.followUpSuggestions.length > 0) {
+        setSuggestions(response.followUpSuggestions);
+      }
+
+    } catch (err) {
+      console.error('Error calling Gemini:', err);
+      const errorMessage = err instanceof Error ? err.message : 'Failed to get response from AI';
+      setError(errorMessage);
+      
+      const errorMsg: Message = {
+        id: Date.now() + 1,
+        role: 'bot',
+        text: `I apologize, but I encountered an error: ${errorMessage}. Please check your internet connection and try again.`,
+        citations: [],
+        followUpSuggestions: []
+      };
+      
+      setMessages(prev => [...prev, errorMsg]);
+      
+      // Show alert for API key errors
+      if (errorMessage.includes('API key')) {
+        Alert.alert(
+          'Configuration Required',
+          'Please add your Gemini API key to the .env file:\n\nEXPO_PUBLIC_GEMINI_API_KEY=your_api_key_here',
+          [{ text: 'OK' }]
+        );
+      }
+    } finally {
+      setIsThinking(false);
+    }
   };
+
+  const handleSuggestionPress = (suggestion: string) => {
+    setInputText(suggestion);
+    // Optionally auto-send
+    // handleSend();
+  };
+
+  const handleFollowUpPress = (followUp: string) => {
+    setInputText(followUp);
+    // Auto-scroll to input
+    setTimeout(() => {
+      handleSend();
+    }, 100);
+  };
+
 
   return (
     <View style={styles.container}>
@@ -109,9 +204,11 @@ export default function AiChatScreen() {
         </TouchableOpacity>
         <View style={styles.headerTitleContainer}>
           <View style={styles.headerAvatarWrapper}>
-            <View style={styles.headerAvatar}>
-              <Icon name="Message" size={20} color={CHAT_THEME.primary} variant="Bold" />
-            </View>
+            <Image 
+              source={require('@/assets/images/mascot/explain.png')} 
+              style={styles.headerAvatarImage}
+              resizeMode="contain"
+            />
             <View style={styles.onlineDot} />
           </View>
           <View>
@@ -119,15 +216,24 @@ export default function AiChatScreen() {
             <Text style={styles.headerSubtitle}>AI Assistant • Online</Text>
           </View>
         </View>
-        <TouchableOpacity onPress={() => setMessages(INITIAL_MESSAGES)} style={styles.clearButton}>
+        <TouchableOpacity 
+          onPress={() => {
+            setMessages(INITIAL_MESSAGES);
+            setSuggestions(INITIAL_SUGGESTIONS);
+            setError(null);
+          }} 
+          style={styles.clearButton}
+        >
           <Icon name="Refresh" size={20} color="#FFF" variant="Bold" />
         </TouchableOpacity>
       </LinearGradient>
 
       {/* Chat Body */}
       <ScrollView 
+        ref={scrollViewRef}
         contentContainerStyle={[styles.chatContent, { paddingBottom: 120 }]}
         showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
       >
         {messages.map((msg, index) => (
           <Animated.View 
@@ -140,12 +246,11 @@ export default function AiChatScreen() {
           >
             {msg.role === 'bot' && (
               <View style={styles.botAvatar}>
-                <LinearGradient
-                  colors={[CHAT_THEME.primary, CHAT_THEME.primaryLight]}
-                  style={styles.botAvatarGradient}
-                >
-                  <Icon name="Message" size={16} color="#FFF" variant="Bold" />
-                </LinearGradient>
+                <Image 
+                  source={require('@/assets/images/mascot/explain.png')} 
+                  style={styles.botAvatarImage}
+                  resizeMode="contain"
+                />
               </View>
             )}
             
@@ -153,22 +258,51 @@ export default function AiChatScreen() {
               styles.bubble,
               msg.role === 'user' ? styles.userBubble : styles.botBubble
             ]}>
-              <Text style={[
-                styles.messageText,
-                msg.role === 'user' ? styles.userMessageText : styles.botMessageText
-              ]}>
-                {msg.text}
-              </Text>
+              {msg.role === 'bot' ? (
+                <MarkdownText 
+                  text={msg.text}
+                  textColor={CHAT_THEME.text}
+                  style={styles.messageText}
+                />
+              ) : (
+                <Text style={[
+                  styles.messageText,
+                  styles.userMessageText
+                ]}>
+                  {msg.text}
+                </Text>
+              )}
               
               {/* Citations */}
               {msg.role === 'bot' && msg.citations && msg.citations.length > 0 && (
                 <View style={styles.citationsContainer}>
+                  <Text style={styles.citationsTitle}>Sources:</Text>
                   {msg.citations.map((cite, i) => (
                     <View key={i} style={styles.citationBadge}>
                       <Icon name="Link" size={10} color={CHAT_THEME.primary} />
                       <Text style={styles.citationText}>{cite}</Text>
                     </View>
                   ))}
+                </View>
+              )}
+
+              {/* Follow-up Suggestions */}
+              {msg.role === 'bot' && msg.followUpSuggestions && msg.followUpSuggestions.length > 0 && (
+                <View style={styles.followUpContainer}>
+                  <Text style={styles.followUpTitle}>You might also ask:</Text>
+                  <View style={styles.followUpChips}>
+                    {msg.followUpSuggestions.map((followUp, i) => (
+                      <TouchableOpacity
+                        key={i}
+                        style={styles.followUpChip}
+                        onPress={() => handleFollowUpPress(followUp)}
+                        activeOpacity={0.7}
+                      >
+                        <Icon name="MessageQuestion" size={12} color={CHAT_THEME.primary} />
+                        <Text style={styles.followUpText}>{followUp}</Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
                 </View>
               )}
             </View>
@@ -179,20 +313,24 @@ export default function AiChatScreen() {
         {isThinking && (
           <Animated.View entering={FadeInUp} style={styles.thinkingWrapper}>
              <View style={styles.botAvatar}>
-                <LinearGradient
-                  colors={[CHAT_THEME.primary, CHAT_THEME.primaryLight]}
-                  style={styles.botAvatarGradient}
-                >
-                  <Icon name="Message" size={16} color="#FFF" variant="Bold" />
-                </LinearGradient>
+                <Image 
+                  source={require('@/assets/images/mascot/thinking.png')} 
+                  style={styles.botAvatarImage}
+                  resizeMode="contain"
+                />
               </View>
               <View style={styles.thinkingBubble}>
-                <Animated.View style={[styles.thinkingSpinner, spinStyle]}>
-                   <Icon name="Atom" size={20} color={CHAT_THEME.primary} variant="Bold" />
-                </Animated.View>
                 <Text style={styles.thinkingText}>Analyzing your question...</Text>
               </View>
           </Animated.View>
+        )}
+
+        {/* Error Message */}
+        {error && (
+          <View style={styles.errorContainer}>
+            <Icon name="InfoCircle" size={16} color="#EF4444" />
+            <Text style={styles.errorText}>{error}</Text>
+          </View>
         )}
       </ScrollView>
 
@@ -202,22 +340,26 @@ export default function AiChatScreen() {
         style={styles.inputWrapper}
       >
         {/* Suggestion Chips */}
-        <ScrollView 
-          horizontal 
-          showsHorizontalScrollIndicator={false} 
-          contentContainerStyle={styles.suggestionsScroll}
-          style={styles.suggestionsContainer}
-        >
-          {SUGGESTIONS.map((s, i) => (
-            <TouchableOpacity 
-              key={i} 
-              style={styles.suggestionChip}
-              onPress={() => setInputText(s)}
-            >
-              <Text style={styles.suggestionText}>{s}</Text>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
+        {suggestions.length > 0 && (
+          <ScrollView 
+            horizontal 
+            showsHorizontalScrollIndicator={false} 
+            contentContainerStyle={styles.suggestionsScroll}
+            style={styles.suggestionsContainer}
+          >
+            {suggestions.map((s, i) => (
+              <TouchableOpacity 
+                key={i} 
+                style={styles.suggestionChip}
+                onPress={() => handleSuggestionPress(s)}
+                activeOpacity={0.7}
+              >
+                <Icon name="MessageQuestion" size={12} color={CHAT_THEME.primary} />
+                <Text style={styles.suggestionText}>{s}</Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        )}
 
         <View style={[styles.inputContainer, { paddingBottom: insets.bottom + 12 }]}>
           <View style={styles.inputFieldWrapper}>
@@ -232,10 +374,10 @@ export default function AiChatScreen() {
             <TouchableOpacity 
               style={[
                 styles.sendButton,
-                !inputText.trim() && styles.sendButtonDisabled
+                (!inputText.trim() || isThinking) && styles.sendButtonDisabled
               ]}
               onPress={handleSend}
-              disabled={!inputText.trim()}
+              disabled={!inputText.trim() || isThinking}
             >
               {inputText.trim() ? (
                 <LinearGradient
@@ -258,7 +400,7 @@ export default function AiChatScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: CHAT_THEME.bg,
+    backgroundColor: '#FFF',
   },
   header: {
     flexDirection: 'row',
@@ -336,17 +478,17 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   botAvatar: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    overflow: 'hidden',
+    width: 40,
+    height: 40,
     marginBottom: 4,
   },
-  botAvatarGradient: {
+  botAvatarImage: {
     width: '100%',
     height: '100%',
-    alignItems: 'center',
-    justifyContent: 'center',
+  },
+  headerAvatarImage: {
+    width: 40,
+    height: 40,
   },
   bubble: {
     padding: 16,
@@ -394,10 +536,66 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: CHAT_THEME.primary + '30',
   },
+  citationsTitle: {
+    fontSize: 11,
+    color: CHAT_THEME.textMuted,
+    fontWeight: '700',
+    marginBottom: 6,
+  },
   citationText: {
     fontSize: 10,
     color: CHAT_THEME.primary,
     fontWeight: '700',
+  },
+  followUpContainer: {
+    marginTop: 12,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: CHAT_THEME.border,
+  },
+  followUpTitle: {
+    fontSize: 11,
+    color: CHAT_THEME.textMuted,
+    fontWeight: '700',
+    marginBottom: 8,
+  },
+  followUpChips: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 6,
+  },
+  followUpChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: CHAT_THEME.primary + '10',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: CHAT_THEME.primary + '30',
+  },
+  followUpText: {
+    fontSize: 11,
+    color: CHAT_THEME.primary,
+    fontWeight: '600',
+  },
+  errorContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    backgroundColor: '#FEE2E2',
+    padding: 12,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#FECACA',
+    marginBottom: 16,
+  },
+  errorText: {
+    flex: 1,
+    fontSize: 12,
+    color: '#DC2626',
+    fontWeight: '600',
   },
   thinkingWrapper: {
     flexDirection: 'row',
@@ -439,8 +637,11 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   suggestionChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
     backgroundColor: CHAT_THEME.card,
-    paddingHorizontal: 16,
+    paddingHorizontal: 14,
     paddingVertical: 10,
     borderRadius: 20,
     borderWidth: 2,

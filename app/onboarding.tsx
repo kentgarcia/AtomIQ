@@ -2,8 +2,8 @@ import { Icon } from '@/components/ui/icon';
 import { useStorage } from '@/services/StorageContext';
 import { setOnboardingCompleted } from '@/services/storage';
 import { useRouter } from 'expo-router';
-import React, { useEffect, useRef, useState } from 'react';
-import { Dimensions, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Dimensions, Image, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import Animated, {
   Easing,
   FadeIn,
@@ -35,59 +35,77 @@ const DUO_THEME = {
   warningDark: '#FFA000',
 };
 
-// Baseline Assessment Questions
-const ASSESSMENT_QUESTIONS = [
+// Feature Showcase Data
+const FEATURE_SHOWCASE = [
   {
-    id: 1,
-    question: 'What is the primary fuel used in most nuclear power plants?',
-    options: ['Coal', 'Uranium', 'Natural Gas', 'Solar Energy'],
-    correctAnswer: 1,
-    explanation: 'Uranium-235 is the primary fuel used in nuclear reactors. When its atoms split (fission), they release enormous amounts of energy in the form of heat.',
+    id: 'mythbuster',
+    title: 'MythBuster',
+    subtitle: 'Swipe to Learn',
+    description: 'Swipe through myths and facts in this addictive game. Build streaks, earn XP, and master nuclear science one swipe at a time.',
+    icon: 'Danger',
+    gradient: ['#FF6B00', '#FF9E40'],
+    mascot: require('@/assets/images/mascot/experiment.png'),
+    highlights: ['Swipe left for MYTH', 'Swipe right for TRUTH', 'Build streaks', 'Earn XP'],
   },
   {
-    id: 2,
-    question: 'How much of the world\'s electricity comes from nuclear power?',
-    options: ['Less than 5%', 'About 10%', 'About 25%', 'More than 50%'],
-    correctAnswer: 1,
-    explanation: 'Nuclear power provides about 10% of the world\'s electricity. Countries like France get over 70% of their electricity from nuclear power.',
+    id: 'explorer',
+    title: 'AtomIQ Explorer',
+    subtitle: 'Journey Through Knowledge',
+    description: 'Embark on guided learning journeys, explore the encyclopedia, and navigate quiz mazes. Your Encarta-style knowledge adventure awaits.',
+    icon: 'SearchNormal',
+    gradient: ['#9B59B6', '#8E44AD'],
+    mascot: require('@/assets/images/mascot/explain.png'),
+    highlights: ['Guided Journeys', 'Searchable Encyclopedia', 'AtomMaze Quizzes', 'Interactive Learning'],
   },
   {
-    id: 3,
-    question: 'Nuclear power plants produce what type of emissions during operation?',
-    options: ['High carbon emissions', 'Low carbon emissions', 'Zero carbon emissions', 'Only water vapor'],
-    correctAnswer: 2,
-    explanation: 'Nuclear power plants produce zero carbon emissions during operation! The only "emission" is water vapor from the cooling towers.',
+    id: 'community',
+    title: 'Community Feed',
+    subtitle: 'Scroll to Discover',
+    description: 'Endless scrollable feed of myths and facts. Learn while you scroll, bookmark favorites, and discover new insights every day.',
+    icon: 'Document',
+    gradient: ['#1CB0F6', '#64B5F6'],
+    mascot: require('@/assets/images/mascot/happy.png'),
+    highlights: ['Endless Feed', 'Bookmark Posts', 'Search & Filter', 'Daily Discoveries'],
+  },
+  {
+    id: 'ai-chat',
+    title: 'AI Assistant',
+    subtitle: 'Your Learning Companion',
+    description: 'Chat with your AI tutor anytime. Get instant answers, explanations, and personalized guidance on your nuclear science journey.',
+    icon: 'Message',
+    gradient: ['#FF4B4B', '#FF6B6B'],
+    mascot: require('@/assets/images/mascot/thinking.png'),
+    highlights: ['Instant Answers', 'Personalized Help', '24/7 Available', 'Smart Explanations'],
   },
 ];
 
-// User Categories
-const USER_CATEGORIES = [
-  { id: 'student', label: 'Student', icon: 'Book', description: 'Learning nuclear science in school', color: '#CE82FF' },
-  { id: 'general', label: 'General Learner', icon: 'Lamp', description: 'Curious about nuclear energy', color: '#FF9600' },
-  { id: 'professional', label: 'Professional', icon: 'Profile', description: 'Working in related fields', color: '#1CB0F6' },
-  { id: 'enthusiast', label: 'Enthusiast', icon: 'Flash', description: 'Passionate about nuclear science', color: '#FF4B4B' },
-];
-
-type OnboardingStep = 'splash' | 'assessment' | 'profile' | 'category';
+type OnboardingStep = 'splash' | 'features' | 'profile';
 
 export default function Onboarding() {
   const router = useRouter();
   const { updateUserProfile } = useStorage();
   const [step, setStep] = useState<OnboardingStep>('splash');
-  const [assessmentAnswers, setAssessmentAnswers] = useState<number[]>([]);
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [currentFeatureIndex, setCurrentFeatureIndex] = useState(0);
   const [username, setUsername] = useState('');
   
   const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity);
 
   // Rotating Atom Animation
   const atomRotation = useSharedValue(0);
+  const featureScale = useSharedValue(1);
+  const featureOpacity = useSharedValue(1);
+  const mascotScale = useSharedValue(1);
 
   useEffect(() => {
     atomRotation.value = withRepeat(
       withTiming(360, { duration: 10000, easing: Easing.linear }),
       -1
+    );
+    // Gentle bounce animation for mascot
+    mascotScale.value = withRepeat(
+      withTiming(1.05, { duration: 2000, easing: Easing.inOut(Easing.ease) }),
+      -1,
+      true
     );
   }, []);
 
@@ -97,9 +115,22 @@ export default function Onboarding() {
     };
   });
 
-  // Assessment progress
+  const featureAnimatedStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{ scale: featureScale.value }],
+      opacity: featureOpacity.value,
+    };
+  });
+
+  const mascotAnimatedStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{ scale: mascotScale.value }],
+    };
+  });
+
+  // Feature progress
   const progressPercent =
-    ((currentQuestionIndex + 1) / ASSESSMENT_QUESTIONS.length) * 100;
+    ((currentFeatureIndex + 1) / FEATURE_SHOWCASE.length) * 100;
 
   // Button Component with 3D Effect
   const Button = ({ onPress, style, children, disabled, variant = 'primary', color = DUO_THEME.primary, darkColor = DUO_THEME.primaryDark }: any) => {
@@ -136,56 +167,37 @@ export default function Onboarding() {
     );
   };
 
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [inputFocused, setInputFocused] = useState(false);
-  const [showFeedback, setShowFeedback] = useState(false);
-  const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
-  const scrollViewRef = useRef<ScrollView>(null);
 
   const handleGetStarted = () => {
-    setStep('assessment');
+    setStep('features');
   };
 
-  const handleAnswerSelect = (answerIndex: number) => {
-    if (showFeedback) return;
-    
-    setSelectedAnswer(answerIndex);
-    const newAnswers = [...assessmentAnswers];
-    newAnswers[currentQuestionIndex] = answerIndex;
-    setAssessmentAnswers(newAnswers);
-    setShowFeedback(true);
-    
-    setTimeout(() => {
-      scrollViewRef.current?.scrollToEnd({ animated: true });
-    }, 100);
-  };
-
-  const handleNextQuestion = () => {
-    if (currentQuestionIndex < ASSESSMENT_QUESTIONS.length - 1) {
-      setIsTransitioning(true);
+  const handleNextFeature = () => {
+    if (currentFeatureIndex < FEATURE_SHOWCASE.length - 1) {
+      // Animate out
+      featureOpacity.value = withTiming(0, { duration: 200 });
+      featureScale.value = withTiming(0.9, { duration: 200 });
+      
       setTimeout(() => {
-        setCurrentQuestionIndex(currentQuestionIndex + 1);
-        setShowFeedback(false);
-        setSelectedAnswer(null);
-        setIsTransitioning(false);
-        scrollViewRef.current?.scrollTo({ y: 0, animated: false });
-      }, 300);
+        setCurrentFeatureIndex(currentFeatureIndex + 1);
+        // Animate in
+        featureOpacity.value = withTiming(1, { duration: 300 });
+        featureScale.value = withSpring(1, { damping: 15 });
+      }, 200);
     } else {
       setStep('profile');
     }
   };
 
-  const handleProfileNext = () => {
-    if (username.trim()) {
-      setStep('category');
-    }
+  const handleSkipFeatures = () => {
+    setStep('profile');
   };
 
-  const handleCategorySelect = async (categoryId: string) => {
-    setSelectedCategory(categoryId);
-    setTimeout(async () => {
+  const handleProfileNext = async () => {
+    if (username.trim()) {
       await handleFinish();
-    }, 500);
+    }
   };
 
   const handleFinish = async () => {
@@ -242,14 +254,10 @@ export default function Onboarding() {
     );
   }
 
-  // Assessment
-  if (step === 'assessment') {
-    const currentQuestion = ASSESSMENT_QUESTIONS[currentQuestionIndex];
-    const isCorrect =
-      selectedAnswer !== null &&
-      selectedAnswer === currentQuestion.correctAnswer;
-    const correctAnswerIndex = currentQuestion.correctAnswer;
-
+  // Feature Showcase
+  if (step === 'features') {
+    const currentFeature = FEATURE_SHOWCASE[currentFeatureIndex];
+    
     return (
       <View style={styles.container}>
         <View style={styles.progressBarContainer}>
@@ -262,95 +270,78 @@ export default function Onboarding() {
         </View>
 
         <ScrollView
-          ref={scrollViewRef}
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
           <Animated.View entering={FadeInDown.duration(600)} style={styles.header}>
             <View style={styles.badge}>
-              <Icon name="Verify" size={16} color={DUO_THEME.accent} variant="Bold" />
-              <Text style={styles.badgeText}>GEIGER CHECK</Text>
+              <Icon name="Flash" size={16} color={DUO_THEME.accent} variant="Bold" />
+              <Text style={styles.badgeText}>FEATURE TOUR</Text>
             </View>
           </Animated.View>
 
-          {!isTransitioning && (
-            <Animated.View 
-              entering={FadeIn.duration(400)}
-              exiting={SlideOutLeft.duration(200)}
-              key={currentQuestionIndex}
-            >
-              <View style={styles.questionCard}>
-                <Text style={styles.questionText}>{currentQuestion.question}</Text>
-              </View>
+          <Animated.View style={[styles.featureCard, featureAnimatedStyle]} key={currentFeatureIndex}>
+            <Animated.View entering={FadeInDown.delay(200)} style={styles.featureMascotContainer}>
+              <Animated.View style={[styles.featureMascotWrapper, mascotAnimatedStyle]}>
+                <Image 
+                  source={currentFeature.mascot}
+                  style={styles.featureMascotImage}
+                  resizeMode="contain"
+                />
+              </Animated.View>
+            </Animated.View>
 
-              <View style={styles.optionsContainer}>
-                {currentQuestion.options.map((option, index) => {
-                  const isSelected = selectedAnswer === index;
-                  const isCorrectAnswer = index === correctAnswerIndex;
+            <Animated.View entering={FadeInDown.delay(300)} style={styles.featureContent}>
+              <Text style={styles.featureTitle}>{currentFeature.title}</Text>
+              <Text style={styles.featureSubtitle}>{currentFeature.subtitle}</Text>
+              <Text style={styles.featureDescription}>{currentFeature.description}</Text>
 
-                  let btnColor = '#FFFFFF'; // Default white bg
-                  let btnBorder = DUO_THEME.border;
-                  let textColor = DUO_THEME.text;
-                  let shadowColor = DUO_THEME.border; // darker grey for shadow
-
-                  if (showFeedback) {
-                    if (isCorrectAnswer) {
-                      btnColor = DUO_THEME.primary; // Green
-                      btnBorder = DUO_THEME.primaryDark;
-                      shadowColor = DUO_THEME.primaryDark;
-                      textColor = '#FFF';
-                    } else if (isSelected && !isCorrectAnswer) {
-                      btnColor = DUO_THEME.secondary; // Red
-                      btnBorder = DUO_THEME.secondaryDark;
-                      shadowColor = DUO_THEME.secondaryDark;
-                      textColor = '#FFF';
-                    }
-                  } else if (isSelected) {
-                    btnColor = '#E5F4FF'; // Light blue
-                    btnBorder = DUO_THEME.accent;
-                    shadowColor = DUO_THEME.accentDark;
-                    textColor = DUO_THEME.accent;
-                  }
-
-                  return (
-                    <TouchableOpacity
-                      key={index}
-                      activeOpacity={0.9}
-                      onPress={() => handleAnswerSelect(index)}
-                      disabled={showFeedback}
-                      style={styles.optionWrapper}
-                    >
-                      <View style={[styles.optionShadow, { backgroundColor: shadowColor }]} />
-                      <View style={[styles.optionFront, { backgroundColor: btnColor, borderColor: btnBorder }]}>
-                        <Text style={[styles.optionText, { color: textColor }]}>{option}</Text>
-                      </View>
-                    </TouchableOpacity>
-                  );
-                })}
-              </View>
-
-              {showFeedback && (
-                <Animated.View entering={FadeInDown.springify()} style={styles.feedbackContainer}>
-                  <View style={[styles.feedbackCard, isCorrect ? styles.feedbackCorrect : styles.feedbackWrong]}>
-                    <Text style={[styles.feedbackTitle, { color: isCorrect ? DUO_THEME.primaryDark : DUO_THEME.secondaryDark }]}>
-                      {isCorrect ? 'Excellent! ⚛️' : 'Correction Needed 🔭'}
-                    </Text>
-                    <Text style={styles.feedbackText}>{currentQuestion.explanation}</Text>
-                  </View>
-                  
-                  <Button 
-                    onPress={handleNextQuestion} 
-                    color={isCorrect ? DUO_THEME.primary : DUO_THEME.secondary}
-                    darkColor={isCorrect ? DUO_THEME.primaryDark : DUO_THEME.secondaryDark}
+              <View style={styles.featureHighlights}>
+                {currentFeature.highlights.map((highlight, index) => (
+                  <Animated.View 
+                    key={index}
+                    entering={FadeInDown.delay(400 + index * 100)}
+                    style={styles.highlightItem}
                   >
-                    <Text style={styles.buttonText}>
-                      {currentQuestionIndex < ASSESSMENT_QUESTIONS.length - 1 ? 'NEXT PHASE' : 'COMPLETE'}
-                    </Text>
-                  </Button>
-                </Animated.View>
+                    <View style={[styles.highlightDot, { backgroundColor: currentFeature.gradient[0] }]} />
+                    <Text style={styles.highlightText}>{highlight}</Text>
+                  </Animated.View>
+                ))}
+              </View>
+            </Animated.View>
+
+            <Animated.View entering={FadeInDown.delay(600)} style={styles.featureActions}>
+              <Button 
+                onPress={handleNextFeature} 
+                color={currentFeature.gradient[0]}
+                darkColor={currentFeature.gradient[1]}
+              >
+                <Text style={styles.buttonText}>
+                  {currentFeatureIndex < FEATURE_SHOWCASE.length - 1 ? 'NEXT FEATURE' : 'GET STARTED'}
+                </Text>
+              </Button>
+              
+              {currentFeatureIndex < FEATURE_SHOWCASE.length - 1 && (
+                <TouchableOpacity onPress={handleSkipFeatures} style={styles.skipButton}>
+                  <Text style={styles.skipButtonText}>Skip Tour</Text>
+                </TouchableOpacity>
               )}
             </Animated.View>
-          )}
+          </Animated.View>
+
+          {/* Feature Indicators */}
+          <Animated.View entering={FadeInDown.delay(500)} style={styles.featureIndicators}>
+            {FEATURE_SHOWCASE.map((_, index) => (
+              <View
+                key={index}
+                style={[
+                  styles.indicator,
+                  index === currentFeatureIndex && styles.indicatorActive,
+                  { backgroundColor: index === currentFeatureIndex ? currentFeature.gradient[0] : DUO_THEME.border }
+                ]}
+              />
+            ))}
+          </Animated.View>
         </ScrollView>
       </View>
     );
@@ -389,10 +380,10 @@ export default function Onboarding() {
                 onPress={handleProfileNext} 
                 disabled={!username.trim()}
                 style={!username.trim() && { opacity: 0.5 }}
-                color={DUO_THEME.accent}
-                darkColor={DUO_THEME.accentDark}
+                color={DUO_THEME.primary}
+                darkColor={DUO_THEME.primaryDark}
               >
-                <Text style={styles.buttonText}>ACCESS TERMINAL</Text>
+                <Text style={styles.buttonText}>START JOURNEY</Text>
               </Button>
             </Animated.View>
           </ScrollView>
@@ -401,63 +392,6 @@ export default function Onboarding() {
     );
   }
 
-  // Category
-  if (step === 'category') {
-    return (
-      <View style={styles.container}>
-        <ScrollView contentContainerStyle={styles.scrollContent}>
-          <Animated.View entering={FadeInDown.delay(200)}>
-            <Text style={styles.titleLarge}>Specialization</Text>
-            <Text style={[styles.subtitle, { marginBottom: 32 }]}>Select your operating role.</Text>
-
-            <View style={styles.grid}>
-              {USER_CATEGORIES.map((category, index) => {
-                const isSelected = selectedCategory === category.id;
-                return (
-                  <Animated.View 
-                    key={category.id} 
-                    entering={FadeInDown.delay(300 + index * 100)}
-                    style={{ width: '100%', marginBottom: 16 }}
-                  >
-                    <TouchableOpacity
-                      activeOpacity={0.9}
-                      onPress={() => handleCategorySelect(category.id)}
-                      style={styles.optionWrapper}
-                    >
-                      <View style={[styles.optionShadow, { backgroundColor: isSelected ? DUO_THEME.primaryDark : DUO_THEME.border }]} />
-                      <View style={[
-                        styles.categoryCard, 
-                        { 
-                          backgroundColor: isSelected ? '#E5F4FF' : '#FFFFFF',
-                          borderColor: isSelected ? DUO_THEME.accent : DUO_THEME.border 
-                        }
-                      ]}>
-                        <View style={[styles.categoryIcon, { backgroundColor: category.color + '20' }]}>
-                          <Icon 
-                            name={category.icon as any} 
-                            size={24} 
-                            color={category.color} 
-                            variant="Bold"
-                          />
-                        </View>
-                        <View style={styles.categoryContent}>
-                          <Text style={styles.categoryTitle}>{category.label}</Text>
-                          <Text style={styles.categoryDesc}>{category.description}</Text>
-                        </View>
-                        {isSelected && (
-                          <Icon name="TickCircle" size={24} color={DUO_THEME.primary} variant="Bold" />
-                        )}
-                      </View>
-                    </TouchableOpacity>
-                  </Animated.View>
-                );
-              })}
-            </View>
-          </Animated.View>
-        </ScrollView>
-      </View>
-    );
-  }
 
   return null;
 }
@@ -575,7 +509,7 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
     letterSpacing: 1.5,
   },
-  // Assessment
+  // Feature Showcase
   progressBarContainer: {
     height: 16,
     backgroundColor: '#E5E5E5',
@@ -610,77 +544,104 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
     letterSpacing: 1,
   },
-  questionCard: {
+  featureCard: {
+    alignItems: 'center',
     marginBottom: 32,
   },
-  questionText: {
-    color: DUO_THEME.text,
-    fontSize: 24,
-    fontWeight: '700',
-    lineHeight: 34,
-    textAlign: 'center',
-  },
-  optionsContainer: {
-    gap: 16,
-  },
-  optionWrapper: {
-    height: 64,
+  featureMascotContainer: {
+    alignItems: 'center',
+    marginBottom: 32,
     width: '100%',
   },
-  optionFront: {
-    height: 64,
-    borderRadius: 16,
-    flexDirection: 'row',
-    alignItems: 'center',
+  featureMascotWrapper: {
     justifyContent: 'center',
-    paddingHorizontal: 20,
-    borderWidth: 2,
-    borderColor: DUO_THEME.border,
-    backgroundColor: '#FFFFFF',
+    alignItems: 'center',
   },
-  optionShadow: {
-    position: 'absolute',
-    top: 4,
-    left: 0,
-    right: 0,
-    height: 64,
-    borderRadius: 16,
-    backgroundColor: DUO_THEME.border,
+  featureMascotImage: {
+    width: 200,
+    height: 200,
   },
-  optionText: {
+  featureContent: {
+    width: '100%',
+    alignItems: 'center',
+    marginBottom: 32,
+  },
+  featureTitle: {
+    fontSize: 32,
+    fontWeight: '800',
+    color: DUO_THEME.text,
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  featureSubtitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: DUO_THEME.text,
-  },
-  feedbackContainer: {
-    marginTop: 32,
-  },
-  feedbackCard: {
-    padding: 20,
-    borderRadius: 20,
-    borderWidth: 2,
-    borderColor: DUO_THEME.border,
-    marginBottom: 20,
-    backgroundColor: '#F9FAFB',
-  },
-  feedbackCorrect: {
-    backgroundColor: '#F0FDF4',
-    borderColor: '#BBF7D0',
-  },
-  feedbackWrong: {
-    backgroundColor: '#FEF2F2',
-    borderColor: '#FECACA',
-  },
-  feedbackTitle: {
-    fontSize: 18,
-    fontWeight: '800',
-    marginBottom: 8,
-  },
-  feedbackText: {
     color: DUO_THEME.textMuted,
-    fontSize: 15,
-    lineHeight: 22,
+    marginBottom: 16,
+    textAlign: 'center',
+  },
+  featureDescription: {
+    fontSize: 16,
+    color: DUO_THEME.text,
+    lineHeight: 24,
+    textAlign: 'center',
+    marginBottom: 24,
+    paddingHorizontal: 8,
     fontWeight: '500',
+  },
+  featureHighlights: {
+    width: '100%',
+    gap: 12,
+  },
+  highlightItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    backgroundColor: '#F9FAFB',
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: '#E5E5E5',
+  },
+  highlightDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    marginRight: 12,
+  },
+  highlightText: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: DUO_THEME.text,
+    flex: 1,
+  },
+  featureActions: {
+    width: '100%',
+    marginTop: 8,
+  },
+  skipButton: {
+    marginTop: 16,
+    alignItems: 'center',
+    paddingVertical: 12,
+  },
+  skipButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: DUO_THEME.textMuted,
+  },
+  featureIndicators: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 8,
+    marginTop: 24,
+  },
+  indicator: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+  },
+  indicatorActive: {
+    width: 24,
   },
   // Profile & Category
   centerContent: {
@@ -733,40 +694,6 @@ const styles = StyleSheet.create({
   inputFocused: {
     borderColor: DUO_THEME.accent,
     backgroundColor: '#FFFFFF',
-  },
-  grid: {
-    width: '100%',
-  },
-  categoryCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 16,
-    borderRadius: 16,
-    borderWidth: 2,
-    height: 80,
-    width: '100%',
-  },
-  categoryIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 16,
-  },
-  categoryContent: {
-    flex: 1,
-  },
-  categoryTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: DUO_THEME.text,
-    marginBottom: 2,
-  },
-  categoryDesc: {
-    fontSize: 12,
-    color: DUO_THEME.textMuted,
-    fontWeight: '500',
   },
   getStartedButton: {
     // Handled by Button component style

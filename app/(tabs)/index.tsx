@@ -90,16 +90,16 @@ export default function HomeScreen() {
   // Calculate leaderboard data (same logic as leaderboard screen)
   const leaderboardPreview = useMemo(() => {
     const NPC_CHARACTERS = [
-      { name: 'Dr. Marie Curie', title: 'Radiation Pioneer', baseXP: 2000, avatar: 'https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg', isNPC: true },
-      { name: 'Prof. Albert Einstein', title: 'Physics Legend', baseXP: 1800, avatar: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg', isNPC: true },
-      { name: 'Dr. Enrico Fermi', title: 'Reactor Architect', baseXP: 1600, avatar: 'https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg', isNPC: true },
-      { name: 'Dr. Niels Bohr', title: 'Quantum Master', baseXP: 1400, avatar: 'https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg', isNPC: true },
-      { name: 'Dr. Lisa Meitner', title: 'Fission Expert', baseXP: 1200, avatar: 'https://images.pexels.com/photos/733872/pexels-photo-733872.jpeg', isNPC: true },
-      { name: 'Dr. Ernest Rutherford', title: 'Atom Splitter', baseXP: 1000, avatar: 'https://images.pexels.com/photos/614810/pexels-photo-614810.jpeg', isNPC: true },
-      { name: 'Dr. Chien-Shiung Wu', title: 'Beta Decay Pro', baseXP: 800, avatar: 'https://images.pexels.com/photos/774095/pexels-photo-774095.jpeg', isNPC: true },
-      { name: 'Dr. Glenn Seaborg', title: 'Element Hunter', baseXP: 600, avatar: 'https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg', isNPC: true },
-      { name: 'Dr. Lise Meitner', title: 'Nuclear Theorist', baseXP: 400, avatar: 'https://images.pexels.com/photos/1043474/pexels-photo-1043474.jpeg', isNPC: true },
-      { name: 'Dr. Otto Hahn', title: 'Chemistry Wizard', baseXP: 200, avatar: 'https://images.pexels.com/photos/1681010/pexels-photo-1681010.jpeg', isNPC: true },
+      { name: 'AtomMaster99', title: 'Radiation Pioneer', baseXP: 2000, avatarColor: '#FF6B00', isNPC: true },
+      { name: 'NuclearNinja', title: 'Physics Legend', baseXP: 1800, avatarColor: '#2ECC71', isNPC: true },
+      { name: 'ReactorRex', title: 'Reactor Architect', baseXP: 1600, avatarColor: '#3498DB', isNPC: true },
+      { name: 'QuantumQuinn', title: 'Quantum Master', baseXP: 1400, avatarColor: '#9B59B6', isNPC: true },
+      { name: 'FissionFiona', title: 'Fission Expert', baseXP: 1200, avatarColor: '#E91E63', isNPC: true },
+      { name: 'AtomSmasher', title: 'Atom Splitter', baseXP: 1000, avatarColor: '#F39C12', isNPC: true },
+      { name: 'BetaBeast', title: 'Beta Decay Pro', baseXP: 800, avatarColor: '#1ABC9C', isNPC: true },
+      { name: 'ElementElla', title: 'Element Hunter', baseXP: 600, avatarColor: '#E74C3C', isNPC: true },
+      { name: 'NuclearNora', title: 'Nuclear Theorist', baseXP: 400, avatarColor: '#16A085', isNPC: true },
+      { name: 'ChemWizard', title: 'Chemistry Wizard', baseXP: 200, avatarColor: '#D35400', isNPC: true },
     ];
 
     const userXP = userProfile?.total_xp || 0;
@@ -107,7 +107,7 @@ export default function HomeScreen() {
       name: userProfile?.username || 'You',
       title: 'Nuclear Learner',
       xp: userXP,
-      avatar: userProfile?.avatar_url || 'https://images.pexels.com/photos/1181695/pexels-photo-1181695.jpeg',
+      avatar: 'profile',
       isUser: true,
       isNPC: false
     };
@@ -116,7 +116,7 @@ export default function HomeScreen() {
       name: npc.name,
       title: npc.title,
       xp: npc.baseXP,
-      avatar: npc.avatar,
+      avatarColor: npc.avatarColor,
       isUser: false,
       isNPC: true
     }));
@@ -144,8 +144,9 @@ export default function HomeScreen() {
         {/* Profile Section */}
         <View style={styles.profileSection}>
           <Image 
-            source={{ uri: userProfile?.avatar_url || 'https://images.pexels.com/photos/1181695/pexels-photo-1181695.jpeg?auto=compress&cs=tinysrgb&w=200' }} 
+            source={require('@/assets/images/mascot/profile.png')} 
             style={styles.profileAvatar} 
+            resizeMode="contain"
           />
           <Text style={styles.profileName}>{userProfile?.username || 'Scientist'}</Text>
         </View>
@@ -246,14 +247,11 @@ export default function HomeScreen() {
               </LinearGradient>
             </TouchableOpacity>
 
-            {/* Lab Mode */}
+            {/* Encyclopedia */}
             <TouchableOpacity 
               style={styles.quickActionCard}
               activeOpacity={0.8}
-              onPress={() => {
-                // TODO: Create /lab route
-                console.log('Lab mode coming soon!');
-              }}
+              onPress={() => router.push('/encyclopedia')}
             >
               <LinearGradient
                 colors={['#64B5F6', '#90CAF9']}
@@ -262,22 +260,59 @@ export default function HomeScreen() {
                 style={styles.quickActionGradient}
               >
                 <View style={styles.quickActionIcon}>
-                  <Icon name="Chart" size={32} color="#FFF" variant="Bold" />
+                  <Icon name="SearchNormal" size={32} color="#FFF" variant="Bold" />
                 </View>
                 <View style={styles.quickActionContent}>
-                  <Text style={styles.quickActionTitle}>Simulation Lab</Text>
-                  <Text style={styles.quickActionDesc}>Explore interactive charts</Text>
+                  <Text style={styles.quickActionTitle}>Encyclopedia</Text>
+                  <Text style={styles.quickActionDesc}>Searchable knowledge vault</Text>
                   <View style={styles.quickActionMeta}>
-                    <Icon name="Eye" size={14} color="rgba(255,255,255,0.8)" />
-                    <Text style={styles.quickActionMetaText}>Reference</Text>
+                    <Icon name="SearchNormal" size={14} color="rgba(255,255,255,0.8)" />
+                    <Text style={styles.quickActionMetaText}>Search</Text>
                     <Text style={styles.quickActionDot}>•</Text>
-                    <Icon name="Share" size={14} color="rgba(255,255,255,0.8)" />
-                    <Text style={styles.quickActionMetaText}>Shareable</Text>
+                    <Icon name="Book" size={14} color="rgba(255,255,255,0.8)" />
+                    <Text style={styles.quickActionMetaText}>Terms</Text>
+                    <Text style={styles.quickActionDot}>•</Text>
+                    <Icon name="Flash" size={14} color="#FFD700" variant="Bold" />
+                    <Text style={styles.quickActionMetaText}>+5 XP</Text>
                   </View>
                 </View>
                 <Icon name="ArrowRight2" size={24} color="rgba(255,255,255,0.6)" />
               </LinearGradient>
             </TouchableOpacity>
+
+            {/* AtomMaze */}
+            <TouchableOpacity 
+              style={styles.quickActionCard}
+              activeOpacity={0.8}
+              onPress={() => router.push('/atom-maze')}
+            >
+              <LinearGradient
+                colors={['#9B59B6', '#8E44AD']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.quickActionGradient}
+              >
+                <View style={styles.quickActionIcon}>
+                  <Icon name="Game" size={32} color="#FFF" variant="Bold" />
+                </View>
+                <View style={styles.quickActionContent}>
+                  <Text style={styles.quickActionTitle}>AtomMaze</Text>
+                  <Text style={styles.quickActionDesc}>Navigate quiz challenges</Text>
+                  <View style={styles.quickActionMeta}>
+                    <Icon name="Game" size={14} color="rgba(255,255,255,0.8)" />
+                    <Text style={styles.quickActionMetaText}>Adventure</Text>
+                    <Text style={styles.quickActionDot}>•</Text>
+                    <Icon name="Timer" size={14} color="rgba(255,255,255,0.8)" />
+                    <Text style={styles.quickActionMetaText}>~10 min</Text>
+                    <Text style={styles.quickActionDot}>•</Text>
+                    <Icon name="Flash" size={14} color="#FFD700" variant="Bold" />
+                    <Text style={styles.quickActionMetaText}>+250 XP</Text>
+                  </View>
+                </View>
+                <Icon name="ArrowRight2" size={24} color="rgba(255,255,255,0.6)" />
+              </LinearGradient>
+            </TouchableOpacity>
+
           </View>
         </Animated.View>
 
@@ -389,7 +424,13 @@ export default function HomeScreen() {
                   <View style={[styles.rankBadge, { backgroundColor: rankColor.bg }]}>
                     <Text style={[styles.rankText, { color: rankColor.text }]}>{leader.rank}</Text>
                   </View>
-                  <Image source={{ uri: leader.avatar }} style={styles.avatarSmall} />
+                  {leader.isUser ? (
+                    <Image source={require('@/assets/images/mascot/profile.png')} style={styles.avatarSmall} resizeMode="contain" />
+                  ) : (
+                    <View style={[styles.avatarSmall, { backgroundColor: leader.avatarColor || '#E5E7EB', borderRadius: 18, alignItems: 'center', justifyContent: 'center' }]}>
+                      <Icon name="Profile" size={20} color="#FFF" variant="Bold" />
+                    </View>
+                  )}
                   <View style={{ flex: 1 }}>
                     <Text style={[styles.leaderName, isUser && styles.leaderNameUser]}>
                       {leader.name} {isUser && '(You)'}
@@ -420,7 +461,7 @@ export default function HomeScreen() {
                   <View style={[styles.rankBadge, { backgroundColor: THEME.primary }]}>
                     <Text style={[styles.rankText, { color: '#FFF' }]}>{leaderboardPreview.userRank.rank}</Text>
                   </View>
-                  <Image source={{ uri: leaderboardPreview.userRank.avatar }} style={styles.avatarSmall} />
+                  <Image source={require('@/assets/images/mascot/profile.png')} style={styles.avatarSmall} resizeMode="contain" />
                   <View style={{ flex: 1 }}>
                     <Text style={styles.leaderNameUser}>
                       {leaderboardPreview.userRank.name} (You)

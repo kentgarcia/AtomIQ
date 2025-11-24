@@ -5,7 +5,7 @@ import { getLevelProgress, logDailyActivity, updateLevelProgress } from '@/servi
 import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { Dimensions, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Dimensions, Image, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Gesture, GestureDetector, GestureHandlerRootView } from 'react-native-gesture-handler';
 import Animated, {
   FadeInDown,
@@ -54,23 +54,11 @@ const BriefingView = ({ data, onComplete }: { data: any; onComplete: () => void 
   return (
     <View style={styles.fullScreenCenter}>
       <Animated.View entering={FadeInDown.springify()} style={[styles.mascotLarge, animatedStyle]}>
-        <LinearGradient
-          colors={[THEME.primary, THEME.primaryLight]}
-          style={{
-            width: 120,
-            height: 120,
-            borderRadius: 60,
-            alignItems: 'center',
-            justifyContent: 'center',
-            shadowColor: THEME.primary,
-            shadowOffset: { width: 0, height: 10 },
-            shadowOpacity: 0.3,
-            shadowRadius: 20,
-            elevation: 10,
-          }}
-        >
-          <Icon name={data.icon || 'Message'} size={64} color="#FFF" variant="Bold" />
-        </LinearGradient>
+        <Image 
+          source={require('@/assets/images/mascot/explain.png')} 
+          style={styles.mascotImage}
+          resizeMode="contain"
+        />
       </Animated.View>
       <Text style={styles.briefingTitle}>Topic: {data.topic}</Text>
       <Text style={styles.briefingSubtitle}>{data.mission}</Text>
@@ -207,16 +195,13 @@ const MicroLearnView = ({ data, onComplete }: { data: any; onComplete: () => voi
         </Animated.View>
 
         <Animated.View entering={FadeInDown.delay(200)} style={styles.conceptCard}>
-          {data.image && (
-            <Animated.View entering={FadeInDown.delay(300)} style={styles.conceptImageContainer}>
-              <LinearGradient
-                colors={[THEME.primaryLight + '20', THEME.primary + '10']}
-                style={styles.conceptImageGradient}
-              >
-                <Icon name="Atom" size={64} color={THEME.primary} variant="Bold" />
-              </LinearGradient>
-            </Animated.View>
-          )}
+          <Animated.View entering={FadeInDown.delay(300)} style={styles.conceptImageContainer}>
+            <Image 
+              source={require('@/assets/images/mascot/idea.png')} 
+              style={styles.conceptMascot}
+              resizeMode="contain"
+            />
+          </Animated.View>
           
           <Text style={styles.conceptTitle}>{data.title}</Text>
           <Text style={styles.conceptText}>{data.content}</Text>
@@ -280,7 +265,11 @@ const LabView = ({ data, onComplete }: { data: any; onComplete: () => void }) =>
         
         <Animated.View entering={FadeInDown.delay(200)} style={styles.labCard}>
           <View style={styles.labIconWrapper}>
-            <Icon name="Atom" size={32} color="#8B5CF6" variant="Bold" />
+            <Image 
+              source={require('@/assets/images/mascot/experiment.png')} 
+              style={styles.labMascot}
+              resizeMode="contain"
+            />
           </View>
           <Text style={styles.conceptText}>{data.description}</Text>
           <View style={styles.taskBox}>
@@ -326,7 +315,19 @@ const LabView = ({ data, onComplete }: { data: any; onComplete: () => void }) =>
         {showFeedback && (
           <Animated.View entering={FadeInDown} style={[styles.feedbackBox, { backgroundColor: isCorrect ? THEME.success + '15' : THEME.error + '15', borderColor: isCorrect ? THEME.success : THEME.error }]}>
             <View style={styles.feedbackHeader}>
-              <Icon name={isCorrect ? "TickCircle" : "InfoCircle"} size={24} color={isCorrect ? THEME.success : THEME.error} variant="Bold" />
+              {isCorrect ? (
+                <Image 
+                  source={require('@/assets/images/mascot/happy.png')} 
+                  style={styles.feedbackMascot}
+                  resizeMode="contain"
+                />
+              ) : (
+                <Image 
+                  source={require('@/assets/images/mascot/fix.png')} 
+                  style={styles.feedbackMascot}
+                  resizeMode="contain"
+                />
+              )}
               <Text style={[styles.feedbackHeaderText, { color: isCorrect ? THEME.success : THEME.error }]}>
                 {isCorrect ? "Perfect!" : "Not quite!"}
               </Text>
@@ -437,7 +438,19 @@ const AssessmentView = ({ data, onComplete }: { data: any; onComplete: () => voi
         {confirmed && (
           <Animated.View entering={FadeInDown} style={[styles.feedbackBox, { backgroundColor: selected === correctIndex ? THEME.success + '15' : THEME.error + '15', borderColor: selected === correctIndex ? THEME.success : THEME.error }]}>
             <View style={styles.feedbackHeader}>
-              <Icon name="InfoCircle" size={24} color={selected === correctIndex ? THEME.success : THEME.error} variant="Bold" />
+              {selected === correctIndex ? (
+                <Image 
+                  source={require('@/assets/images/mascot/happy.png')} 
+                  style={styles.feedbackMascot}
+                  resizeMode="contain"
+                />
+              ) : (
+                <Image 
+                  source={require('@/assets/images/mascot/fix.png')} 
+                  style={styles.feedbackMascot}
+                  resizeMode="contain"
+                />
+              )}
               <Text style={[styles.feedbackHeaderText, { color: selected === correctIndex ? THEME.success : THEME.error }]}>
                 {selected === correctIndex ? "Excellent!" : "Explanation"}
               </Text>
@@ -552,23 +565,11 @@ const DebriefView = ({ data, levelId }: { data: any; levelId: string }) => {
       <Animated.View style={[styles.decorativeRing, rotationStyle]} />
       
       <Animated.View entering={FadeInDown.springify()} style={[styles.mascotLarge, animatedStyle]}>
-        <LinearGradient
-           colors={[THEME.gold, '#FFA000']}
-           style={{
-             width: 140,
-             height: 140,
-             borderRadius: 70,
-             alignItems: 'center',
-             justifyContent: 'center',
-             shadowColor: THEME.gold,
-             shadowOffset: { width: 0, height: 10 },
-             shadowOpacity: 0.4,
-             shadowRadius: 25,
-             elevation: 15,
-           }}
-        >
-          <Icon name="Cup" size={72} color="#FFF" variant="Bold" />
-        </LinearGradient>
+        <Image 
+          source={require('@/assets/images/mascot/happy.png')} 
+          style={styles.mascotImageSuccess}
+          resizeMode="contain"
+        />
       </Animated.View>
       
       <Animated.View entering={FadeInDown.delay(200)}>
@@ -640,7 +641,7 @@ export default function LessonScreen() {
   // If lesson not found, show error
   if (!lesson) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: THEME.bg }}>
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#FFF' }}>
         <Icon name="Danger" size={64} color={THEME.error} />
         <Text style={{ fontSize: 18, fontWeight: '700', color: THEME.text, marginTop: 16 }}>
           Lesson not found
@@ -692,7 +693,7 @@ export default function LessonScreen() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <View style={{ flex: 1, backgroundColor: THEME.bg }}>
+      <View style={{ flex: 1, backgroundColor: '#FFF' }}>
         <SafeAreaView style={{ flex: 1 }}>
           {/* Progress Header - Show for all steps except first (briefing) and last (debrief) */}
           {!isFirstStep && !isLastStep && (
@@ -756,10 +757,16 @@ const styles = StyleSheet.create({
   // Briefing
   mascotLarge: {
     marginBottom: 32,
-    shadowColor: THEME.primary,
-    shadowOpacity: 0.3,
-    shadowRadius: 20,
-    elevation: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  mascotImage: {
+    width: 200,
+    height: 200,
+  },
+  mascotImageSuccess: {
+    width: 220,
+    height: 220,
   },
   briefingTitle: {
     fontSize: 24,
@@ -947,12 +954,16 @@ const styles = StyleSheet.create({
     height: 150,
     marginBottom: 20,
     borderRadius: 16,
-    overflow: 'hidden',
-  },
-  conceptImageGradient: {
-    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  conceptMascot: {
+    width: 120,
+    height: 120,
+  },
+  labMascot: {
+    width: 56,
+    height: 56,
   },
   conceptTitle: { 
     fontSize: 22, 
@@ -1084,6 +1095,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 10,
     marginBottom: 12,
+  },
+  feedbackMascot: {
+    width: 40,
+    height: 40,
   },
   feedbackHeaderText: {
     fontSize: 18,
