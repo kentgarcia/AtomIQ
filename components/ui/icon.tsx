@@ -13,6 +13,9 @@ const iconNameMap: Record<string, string> = {
   Fire: 'Flashy',
   Book: 'Book1',
   Target: 'Target',
+  Info: 'Information',
+  TickSquare: 'TickSquare',
+  Sun: 'Sun1',
 };
 
 interface IconProps {

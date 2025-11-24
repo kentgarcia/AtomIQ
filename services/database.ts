@@ -1,5 +1,6 @@
 import * as SQLite from 'expo-sqlite';
 import { UNITS } from '@/content/units';
+import { initExplorerStorage } from './explorer-storage';
 
 // Database instance
 let db: SQLite.SQLiteDatabase | null = null;
@@ -98,6 +99,13 @@ export const initDatabase = async () => {
     
     // Initialize levels from syllabus if database is empty
     await initializeLevelsFromSyllabus();
+    
+    // Initialize chat history tables
+    const { initChatHistoryDB } = await import('./chat-history');
+    await initChatHistoryDB();
+    
+    // Initialize explorer storage
+    await initExplorerStorage();
     
     console.log('Database initialized successfully');
     return db;

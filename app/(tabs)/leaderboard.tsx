@@ -24,19 +24,41 @@ const THEME = {
 
 // NPC Characters - Personal Goals for the User
 const NPC_CHARACTERS = [
-  { name: 'Dr. Marie Curie', title: 'Radiation Pioneer', baseXP: 2000, avatar: 'https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg', isNPC: true },
-  { name: 'Prof. Albert Einstein', title: 'Physics Legend', baseXP: 1800, avatar: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg', isNPC: true },
-  { name: 'Dr. Enrico Fermi', title: 'Reactor Architect', baseXP: 1600, avatar: 'https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg', isNPC: true },
-  { name: 'Dr. Niels Bohr', title: 'Quantum Master', baseXP: 1400, avatar: 'https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg', isNPC: true },
-  { name: 'Dr. Lisa Meitner', title: 'Fission Expert', baseXP: 1200, avatar: 'https://images.pexels.com/photos/733872/pexels-photo-733872.jpeg', isNPC: true },
-  { name: 'Dr. Ernest Rutherford', title: 'Atom Splitter', baseXP: 1000, avatar: 'https://images.pexels.com/photos/614810/pexels-photo-614810.jpeg', isNPC: true },
-  { name: 'Dr. Chien-Shiung Wu', title: 'Beta Decay Pro', baseXP: 800, avatar: 'https://images.pexels.com/photos/774095/pexels-photo-774095.jpeg', isNPC: true },
-  { name: 'Dr. Glenn Seaborg', title: 'Element Hunter', baseXP: 600, avatar: 'https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg', isNPC: true },
-  { name: 'Dr. Lise Meitner', title: 'Nuclear Theorist', baseXP: 400, avatar: 'https://images.pexels.com/photos/1043474/pexels-photo-1043474.jpeg', isNPC: true },
-  { name: 'Dr. Otto Hahn', title: 'Chemistry Wizard', baseXP: 200, avatar: 'https://images.pexels.com/photos/1681010/pexels-photo-1681010.jpeg', isNPC: true },
+  { name: 'AtomMaster99', title: 'Radiation Pioneer', baseXP: 2000, avatarColor: '#FF6B00', isNPC: true },
+  { name: 'NuclearNinja', title: 'Physics Legend', baseXP: 1800, avatarColor: '#2ECC71', isNPC: true },
+  { name: 'ReactorRex', title: 'Reactor Architect', baseXP: 1600, avatarColor: '#3498DB', isNPC: true },
+  { name: 'QuantumQuinn', title: 'Quantum Master', baseXP: 1400, avatarColor: '#9B59B6', isNPC: true },
+  { name: 'FissionFiona', title: 'Fission Expert', baseXP: 1200, avatarColor: '#E91E63', isNPC: true },
+  { name: 'AtomSmasher', title: 'Atom Splitter', baseXP: 1000, avatarColor: '#F39C12', isNPC: true },
+  { name: 'BetaBeast', title: 'Beta Decay Pro', baseXP: 800, avatarColor: '#1ABC9C', isNPC: true },
+  { name: 'ElementElla', title: 'Element Hunter', baseXP: 600, avatarColor: '#E74C3C', isNPC: true },
+  { name: 'NuclearNora', title: 'Nuclear Theorist', baseXP: 400, avatarColor: '#16A085', isNPC: true },
+  { name: 'ChemWizard', title: 'Chemistry Wizard', baseXP: 200, avatarColor: '#D35400', isNPC: true },
 ];
 
-const CircleAvatar = ({ uri, size, borderColor, borderWidth = 3 }: { uri: string, size: number, borderColor: string, borderWidth?: number }) => {
+const CircleAvatar = ({ uri, size, borderColor, borderWidth = 3, avatarColor, isUser }: { uri?: string, size: number, borderColor: string, borderWidth?: number, avatarColor?: string, isUser?: boolean }) => {
+  // User avatar - use profile mascot
+  if (isUser || uri === 'profile') {
+    return (
+      <View style={{ 
+        width: size, 
+        height: size, 
+        borderRadius: size / 2, 
+        borderWidth, 
+        borderColor,
+        overflow: 'hidden',
+        backgroundColor: '#FFF'
+      }}>
+        <Image 
+          source={require('@/assets/images/mascot/profile.png')} 
+          style={{ width: '100%', height: '100%' }} 
+          resizeMode="contain"
+        />
+      </View>
+    );
+  }
+  
+  // NPC avatar with colored icon
   return (
     <View style={{ 
       width: size, 
@@ -44,14 +66,11 @@ const CircleAvatar = ({ uri, size, borderColor, borderWidth = 3 }: { uri: string
       borderRadius: size / 2, 
       borderWidth, 
       borderColor,
-      overflow: 'hidden',
-      backgroundColor: '#FFF'
+      backgroundColor: avatarColor || '#E5E7EB',
+      alignItems: 'center',
+      justifyContent: 'center'
     }}>
-      <Image 
-        source={{ uri }} 
-        style={{ width: '100%', height: '100%' }} 
-        resizeMode="cover"
-      />
+      <Icon name="Profile" size={size * 0.6} color="#FFF" variant="Bold" />
     </View>
   );
 };
@@ -75,7 +94,7 @@ export default function LeaderboardScreen() {
       name: userProfile?.username || 'You',
       title: 'Nuclear Learner',
       xp: userXP,
-      avatar: userProfile?.avatar_url || 'https://images.pexels.com/photos/1181695/pexels-photo-1181695.jpeg',
+      avatar: 'profile', // Use profile mascot
       isUser: true,
       isNPC: false
     };
@@ -85,7 +104,7 @@ export default function LeaderboardScreen() {
       name: npc.name,
       title: npc.title,
       xp: npc.baseXP,
-      avatar: npc.avatar,
+      avatarColor: npc.avatarColor,
       isUser: false,
       isNPC: true
     }));
@@ -129,7 +148,7 @@ export default function LeaderboardScreen() {
             {/* Rank 2 */}
             <View style={[styles.podiumColumn, styles.podiumSide]}>
               <View style={styles.podiumAvatarWrapper}>
-                <CircleAvatar uri={topThree[1].avatar} size={80} borderColor="rgba(255,255,255,0.8)" />
+                <CircleAvatar uri={topThree[1].avatar} avatarColor={topThree[1].avatarColor} isUser={topThree[1].isUser} size={80} borderColor="rgba(255,255,255,0.8)" />
                 <View style={[styles.rankBadge, { backgroundColor: THEME.silver }]}>
                   <Text style={styles.rankText}>2</Text>
                 </View>
@@ -144,7 +163,7 @@ export default function LeaderboardScreen() {
                 <View style={styles.crownWrapper}>
                    <Icon name="Crown1" size={24} color="#FFD700" variant="Bold" />
                 </View>
-                <CircleAvatar uri={topThree[0].avatar} size={96} borderColor="#FFD700" borderWidth={4} />
+                <CircleAvatar uri={topThree[0].avatar} avatarColor={topThree[0].avatarColor} isUser={topThree[0].isUser} size={96} borderColor="#FFD700" borderWidth={4} />
                 <View style={[styles.rankBadge, { backgroundColor: THEME.gold, width: 28, height: 28, bottom: -12 }]}>
                   <Text style={styles.rankText}>1</Text>
                 </View>
@@ -159,7 +178,7 @@ export default function LeaderboardScreen() {
             {/* Rank 3 */}
             <View style={[styles.podiumColumn, styles.podiumSide]}>
               <View style={styles.podiumAvatarWrapper}>
-                <CircleAvatar uri={topThree[2].avatar} size={80} borderColor="rgba(255,255,255,0.8)" />
+                <CircleAvatar uri={topThree[2].avatar} avatarColor={topThree[2].avatarColor} isUser={topThree[2].isUser} size={80} borderColor="rgba(255,255,255,0.8)" />
                 <View style={[styles.rankBadge, { backgroundColor: THEME.bronze }]}>
                   <Text style={styles.rankText}>3</Text>
                 </View>
@@ -191,7 +210,13 @@ export default function LeaderboardScreen() {
               </View>
               
               <View style={styles.listAvatarWrapper}>
-                <Image source={{ uri: user.avatar }} style={styles.listAvatar} />
+                {user.isUser ? (
+                  <Image source={require('@/assets/images/mascot/profile.png')} style={styles.listAvatar} resizeMode="contain" />
+                ) : (
+                  <View style={[styles.listAvatar, { backgroundColor: user.avatarColor || '#E5E7EB', borderRadius: 18, alignItems: 'center', justifyContent: 'center' }]}>
+                    <Icon name="Profile" size={24} color="#FFF" variant="Bold" />
+                  </View>
+                )}
                 {user.isNPC && (
                   <View style={styles.npcBadge}>
                     <Icon name="Star" size={10} color="#FFD700" variant="Bold" />
@@ -224,7 +249,7 @@ export default function LeaderboardScreen() {
             <Text style={[styles.listRankText, { color: THEME.primary }]}>{userRank.rank}</Text>
           </View>
           <View style={styles.listAvatarWrapper}>
-            <Image source={{ uri: userRank.avatar }} style={styles.listAvatar} />
+            <Image source={require('@/assets/images/mascot/profile.png')} style={styles.listAvatar} resizeMode="contain" />
           </View>
           <View style={styles.listInfo}>
             <Text style={styles.listName}>{userRank.name}</Text>

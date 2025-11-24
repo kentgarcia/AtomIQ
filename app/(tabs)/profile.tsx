@@ -1,11 +1,9 @@
 import { Icon } from '@/components/ui/icon';
-import { useWeeklyActivity } from '@/hooks/use-storage';
 import { useStorage } from '@/services/StorageContext';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useMemo } from 'react';
-import { Dimensions, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { LineChart } from 'react-native-chart-kit';
+import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Animated, { FadeInDown, interpolate, useAnimatedStyle, useSharedValue, withRepeat, withTiming } from 'react-native-reanimated';
 
 // Orange theme to match the app
@@ -35,7 +33,6 @@ const ACHIEVEMENTS = [
 
 export default function ProfileScreen() {
   const { userProfile } = useStorage();
-  const { activity: weeklyActivity, totalXP } = useWeeklyActivity();
 
   // Calculate stats
   const stats = useMemo(() => {
@@ -55,7 +52,7 @@ export default function ProfileScreen() {
 
   // Calculate achievements
   const achievements = useMemo(() => {
-    if (!userProfile) return ACHIEVEMENTS.map(a => ({ ...a, locked: true, progress: 0 }));
+    if (!userProfile) return ACHIEVEMENTS.map(a => ({ ...a, locked: true, progress: 0, currentValue: 0 }));
     
     return ACHIEVEMENTS.map((achievement) => {
       const currentValue = (userProfile as any)[achievement.field] || 0;
@@ -70,31 +67,6 @@ export default function ProfileScreen() {
       };
     });
   }, [userProfile]);
-
-  // Chart data from weekly activity
-  const chartData = useMemo(() => {
-    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-    const today = new Date().getDay();
-    const labels = [];
-    const data = [];
-    
-    for (let i = 6; i >= 0; i--) {
-      const dayIndex = (today - i + 7) % 7;
-      labels.push(days[dayIndex].charAt(0));
-      
-      const activity = weeklyActivity.find(a => {
-        const activityDay = new Date(a.date).getDay();
-        return activityDay === dayIndex;
-      });
-      
-      data.push(activity?.xp_earned || 0);
-    }
-    
-    return {
-      labels,
-      datasets: [{ data: data.length > 0 ? data : [0, 0, 0, 0, 0, 0, 0], strokeWidth: 3 }],
-    };
-  }, [weeklyActivity]);
 
   // Calculate user level
   const userLevel = useMemo(() => {
@@ -166,8 +138,9 @@ export default function ProfileScreen() {
               <View style={styles.avatarGlow}>
                 <View style={styles.avatarWrapper}>
                   <Image 
-                    source={{ uri: userProfile.avatar_url }} 
+                    source={require('@/assets/images/mascot/profile.png')} 
                     style={styles.avatarImage} 
+                    resizeMode="contain"
                   />
                 </View>
               </View>
@@ -204,30 +177,6 @@ export default function ProfileScreen() {
         {/* Vitals Section */}
         <Text style={styles.sectionTitle}>Vitals</Text>
         
-        {/* Chart */}
-        <View style={styles.chartContainer}>
-          <Text style={styles.chartTitle}>XP History (7 Days)</Text>
-          <LineChart
-            data={chartData}
-            width={Dimensions.get('window').width - 48} // container width
-            height={180}
-            chartConfig={{
-              backgroundColor: THEME.chartBg,
-              backgroundGradientFrom: THEME.chartBg,
-              backgroundGradientTo: THEME.chartBg,
-              decimalPlaces: 0,
-              color: (opacity = 1) => `rgba(255, 107, 0, ${opacity})`,
-              labelColor: (opacity = 1) => `rgba(45, 52, 54, ${opacity})`,
-              style: { borderRadius: 16 },
-              propsForDots: { r: '4', strokeWidth: '2', stroke: THEME.primary },
-            }}
-            bezier
-            style={styles.chart}
-            withInnerLines={false}
-            withOuterLines={false}
-          />
-        </View>
-
         {/* Enhanced Stats Grid */}
         <View style={styles.statsGrid}>
           {stats.map((stat, index) => (
@@ -258,51 +207,94 @@ export default function ProfileScreen() {
 
         {/* Achievements Section */}
         <Text style={[styles.sectionTitle, { marginTop: 32 }]}>Achievements</Text>
-        <ScrollView 
-          horizontal 
-          showsHorizontalScrollIndicator={false} 
-          contentContainerStyle={styles.medalsScroll}
-        >
+        <View style={styles.achievementsGrid}>
           {achievements.map((achievement, index) => (
-            <Animated.View 
-              key={achievement.id} 
-              entering={FadeInDown.delay(400 + index * 50).springify()}
-              style={styles.medalWrapper}
+            <TouchableOpacity
+              key={achievement.id}
+              onPress={() => router.push(`/achievement-detail?achievementId=${achievement.id}`)}
+              activeOpacity={0.7}
             >
-              <View style={[styles.medalCircle, achievement.locked && styles.medalLocked]}>
-                {achievement.locked ? (
-                  <Icon 
-                    name="Lock1" 
-                    size={28} 
-                    color="#999" 
-                    variant="Bold" 
-                  />
-                ) : (
-                  <Icon 
-                    name={achievement.icon as any} 
-                    size={32} 
-                    color={achievement.color} 
-                    variant="Bold" 
-                  />
-                )}
-              </View>
-              {!achievement.locked && (
-                <View style={styles.achievementCheckmark}>
-                  <Icon name="TickCircle" size={20} color={THEME.green} variant="Bold" />
-                </View>
-              )}
-              <Text style={[styles.medalTitle, !achievement.locked && { color: THEME.text }]}>
-                {achievement.title}
-              </Text>
-              <Text style={styles.achievementRequirement}>{achievement.requirement}</Text>
-              {achievement.locked && (
-                <View style={styles.progressBarSmall}>
-                  <View style={[styles.progressFillSmall, { width: `${achievement.progress}%`, backgroundColor: achievement.color }]} />
-                </View>
-              )}
-            </Animated.View>
+              <Animated.View 
+                entering={FadeInDown.delay(400 + index * 50).springify()}
+                style={[styles.achievementCard, achievement.locked && styles.achievementCardLocked]}
+              >
+                <LinearGradient
+                  colors={achievement.locked 
+                    ? ['#F5F5F5', '#E8E8E8'] 
+                    : [achievement.color + '20', achievement.color + '10']
+                  }
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={styles.achievementCardGradient}
+                >
+                  {/* Icon Section */}
+                  <View style={styles.achievementIconSection}>
+                    <View style={[
+                      styles.achievementIconCircle,
+                      achievement.locked && styles.achievementIconCircleLocked,
+                      { borderColor: achievement.color }
+                    ]}>
+                      {achievement.locked ? (
+                        <Icon 
+                          name="Lock1" 
+                          size={32} 
+                          color="#999" 
+                          variant="Bold" 
+                        />
+                      ) : (
+                        <Icon 
+                          name={achievement.icon as any} 
+                          size={36} 
+                          color={achievement.color} 
+                          variant="Bold" 
+                        />
+                      )}
+                    </View>
+                    {!achievement.locked && (
+                      <View style={styles.achievementBadge}>
+                        <Icon name="TickCircle" size={18} color={THEME.green} variant="Bold" />
+                      </View>
+                    )}
+                  </View>
+
+                  {/* Content Section */}
+                  <View style={styles.achievementContent}>
+                    <Text style={[
+                      styles.achievementCardTitle,
+                      achievement.locked && styles.achievementCardTitleLocked
+                    ]}>
+                      {achievement.title}
+                    </Text>
+                    <Text style={styles.achievementCardDescription}>
+                      {achievement.requirement}
+                    </Text>
+                    
+                    {/* Progress Section */}
+                    <View style={styles.achievementProgressSection}>
+                      <View style={styles.achievementProgressBar}>
+                        <LinearGradient
+                          colors={achievement.locked 
+                            ? ['#E0E0E0', '#D0D0D0'] 
+                            : [achievement.color, achievement.color + 'CC']
+                          }
+                          start={{ x: 0, y: 0 }}
+                          end={{ x: 1, y: 0 }}
+                          style={[
+                            styles.achievementProgressFill,
+                            { width: `${achievement.progress}%` }
+                          ]}
+                        />
+                      </View>
+                      <Text style={styles.achievementProgressText}>
+                        {achievement.currentValue} / {achievement.threshold}
+                      </Text>
+                    </View>
+                  </View>
+                </LinearGradient>
+              </Animated.View>
+            </TouchableOpacity>
           ))}
-        </ScrollView>
+        </View>
         
         <View style={{ height: 100 }} />
       </ScrollView>
@@ -477,27 +469,6 @@ const styles = StyleSheet.create({
     color: THEME.text,
     marginBottom: 16,
   },
-  chartContainer: {
-    backgroundColor: THEME.chartBg,
-    borderRadius: 20,
-    padding: 16,
-    borderWidth: 2,
-    borderColor: THEME.border,
-    marginBottom: 24,
-    alignItems: 'center',
-  },
-  chartTitle: {
-    fontSize: 14,
-    color: THEME.textMuted,
-    fontWeight: '700',
-    alignSelf: 'flex-start',
-    marginBottom: 12,
-  },
-  chart: {
-    borderRadius: 16,
-    paddingRight: 0,
-    paddingLeft: 0,
-  },
   statsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -549,60 +520,91 @@ const styles = StyleSheet.create({
     color: THEME.textMuted,
     marginTop: 2,
   },
-  medalsScroll: {
-    paddingRight: 24,
-    gap: 20,
+  achievementsGrid: {
+    gap: 16,
   },
-  medalWrapper: {
-    alignItems: 'center',
-    width: 80,
-  },
-  medalCircle: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    backgroundColor: '#FFF8E1', // Light gold bg
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 8,
+  achievementCard: {
+    borderRadius: 20,
+    overflow: 'hidden',
     borderWidth: 2,
-    borderColor: '#FFC800',
+    borderColor: THEME.border,
   },
-  medalLocked: {
-    backgroundColor: '#F0F0F0',
+  achievementCardLocked: {
     borderColor: '#E0E0E0',
   },
-  medalTitle: {
-    fontSize: 11,
-    color: THEME.textMuted,
-    textAlign: 'center',
-    fontWeight: '600',
+  achievementCardGradient: {
+    padding: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
   },
-  achievementCheckmark: {
+  achievementIconSection: {
+    marginRight: 16,
+    position: 'relative',
+  },
+  achievementIconCircle: {
+    width: 70,
+    height: 70,
+    borderRadius: 35,
+    backgroundColor: '#FFFFFF',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  achievementIconCircleLocked: {
+    backgroundColor: '#F5F5F5',
+    borderColor: '#D0D0D0',
+  },
+  achievementBadge: {
     position: 'absolute',
     top: -4,
     right: -4,
-    backgroundColor: '#FFF',
+    backgroundColor: '#FFFFFF',
     borderRadius: 12,
     borderWidth: 2,
     borderColor: THEME.green,
+    padding: 2,
   },
-  achievementRequirement: {
-    fontSize: 9,
+  achievementContent: {
+    flex: 1,
+  },
+  achievementCardTitle: {
+    fontSize: 18,
+    fontWeight: '800',
+    color: THEME.text,
+    marginBottom: 4,
+  },
+  achievementCardTitleLocked: {
     color: THEME.textMuted,
-    textAlign: 'center',
+  },
+  achievementCardDescription: {
+    fontSize: 13,
+    color: THEME.textMuted,
+    marginBottom: 12,
+    fontWeight: '500',
+  },
+  achievementProgressSection: {
     marginTop: 4,
   },
-  progressBarSmall: {
+  achievementProgressBar: {
     width: '100%',
-    height: 4,
-    backgroundColor: '#E0E0E0',
-    borderRadius: 2,
-    marginTop: 6,
+    height: 8,
+    backgroundColor: '#E8E8E8',
+    borderRadius: 4,
     overflow: 'hidden',
+    marginBottom: 6,
   },
-  progressFillSmall: {
+  achievementProgressFill: {
     height: '100%',
-    borderRadius: 2,
+    borderRadius: 4,
+  },
+  achievementProgressText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: THEME.textMuted,
   },
 });

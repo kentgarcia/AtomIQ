@@ -4,8 +4,8 @@ const chernobylWildlife: Post = {
   id: 'chernobyl-wildlife',
   type: 'did-you-know',
   category: 'environment',
-  title: 'Wildlife Thrives in Chernobyl Exclusion Zone',
-  content: 'Despite the 1986 disaster, the Chernobyl Exclusion Zone has become an unexpected wildlife haven. With humans gone, populations of wolves, bears, lynx, and rare birds have flourished. Studies show animal populations are now higher than before the accident - proving that human activity can be more harmful to wildlife than radiation.',
+  title: 'Did you know? Wildlife thrives in Chernobyl',
+  content: 'Despite the 1986 disaster, the Chernobyl Exclusion Zone has become a wildlife haven. With humans gone, populations of wolves, bears, and rare birds have flourished - proving that human activity can be more harmful to wildlife than radiation.',
   author: {
     name: 'Nature Observer',
     avatar: 'https://images.pexels.com/photos/1181695/pexels-photo-1181695.jpeg'

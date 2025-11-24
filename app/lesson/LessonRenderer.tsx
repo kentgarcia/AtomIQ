@@ -49,12 +49,11 @@ export const BriefingRenderer = ({ data, onComplete }: { data: any; onComplete: 
   return (
     <View style={styles.fullScreenCenter}>
       <Animated.View entering={FadeInDown.springify()} style={styles.mascotLarge}>
-        <LinearGradient
-          colors={[THEME.primary, THEME.primaryLight]}
-          style={styles.mascotCircle}
-        >
-          <Icon name={data.icon || 'Book'} size={80} color="#FFF" variant="Bold" />
-        </LinearGradient>
+        <Image 
+          source={require('@/assets/images/mascot/explain.png')} 
+          style={styles.mascotImage}
+          resizeMode="contain"
+        />
       </Animated.View>
       <Text style={styles.briefingTitle}>Topic: {data.topic}</Text>
       <Text style={styles.briefingSubtitle}>Mission: {data.mission}</Text>
@@ -326,12 +325,11 @@ export const DebriefRenderer = ({ data, levelId, onComplete }: { data: any; leve
   return (
     <View style={styles.fullScreenCenter}>
       <Animated.View entering={FadeInDown.springify()} style={styles.mascotLarge}>
-        <LinearGradient
-          colors={[THEME.primary, THEME.primaryLight]}
-          style={styles.mascotCircle}
-        >
-          <Icon name="Cup" size={64} color="#FFF" variant="Bold" />
-        </LinearGradient>
+        <Image 
+          source={require('@/assets/images/mascot/happy.png')} 
+          style={styles.mascotImageSuccess}
+          resizeMode="contain"
+        />
       </Animated.View>
       
       <Text style={styles.successTitle}>{data.title}</Text>
@@ -384,13 +382,16 @@ const styles = StyleSheet.create({
   },
   mascotLarge: {
     marginBottom: 32,
-  },
-  mascotCircle: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  mascotImage: {
+    width: 200,
+    height: 200,
+  },
+  mascotImageSuccess: {
+    width: 220,
+    height: 220,
   },
   briefingTitle: {
     fontSize: 28,

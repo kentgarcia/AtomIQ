@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Dimensions, SafeAreaView, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Dimensions, SafeAreaView, ScrollView, Image } from 'react-native';
 import { useRouter } from 'expo-router';
 import Animated, {
   useSharedValue,
@@ -269,7 +269,7 @@ export default function MythBusterScreen() {
   if (gameState === 'mode-select') {
     return (
       <GestureHandlerRootView style={{ flex: 1 }}>
-        <View style={{ flex: 1, backgroundColor: THEME.bg }}>
+        <View style={{ flex: 1, backgroundColor: '#FFF' }}>
           <SafeAreaView style={{ flex: 1 }}>
             <View style={styles.modeHeader}>
               <TouchableOpacity onPress={() => router.back()}>
@@ -457,24 +457,28 @@ export default function MythBusterScreen() {
               contentContainerStyle={styles.resultsContainer}
               showsVerticalScrollIndicator={false}
             >
-              <Animated.View 
-                entering={FadeInDown.delay(100).springify()}
-                style={styles.resultsIcon}
-              >
-                <Icon name="Cup" size={80} color="#FFF" variant="Bold" />
-              </Animated.View>
-
               <Animated.Text 
-                entering={FadeInDown.delay(200).springify()}
+                entering={FadeInDown.delay(100).springify()}
                 style={styles.resultsTitle}
               >
                 Mission Complete!
               </Animated.Text>
 
               <Animated.View 
-                entering={FadeInDown.delay(300).springify()}
+                entering={FadeInDown.delay(200).springify()}
                 style={styles.scoreCard}
               >
+                <Animated.View 
+                  entering={FadeInDown.delay(300).springify()}
+                  style={styles.mascotInCard}
+                >
+                  <Image 
+                    source={require('@/assets/images/mascot/happy.png')} 
+                    style={styles.resultsMascot}
+                    resizeMode="contain"
+                  />
+                </Animated.View>
+                
                 <View style={styles.scoreRow}>
                   <Text style={styles.scoreLabel}>Score</Text>
                   <Text style={styles.scoreValue}>{score} XP</Text>
@@ -536,9 +540,17 @@ export default function MythBusterScreen() {
                               </Text>
                             </View>
                             {isCorrect ? (
-                              <Icon name="TickCircle" size={20} color={THEME.success} variant="Bold" />
+                              <Image 
+                                source={require('@/assets/images/mascot/happy.png')} 
+                                style={styles.reviewMascot}
+                                resizeMode="contain"
+                              />
                             ) : (
-                              <Icon name="CloseCircle" size={20} color={THEME.error} variant="Bold" />
+                              <Image 
+                                source={require('@/assets/images/mascot/fix.png')} 
+                                style={styles.reviewMascot}
+                                resizeMode="contain"
+                              />
                             )}
                           </View>
                         </View>
@@ -1040,6 +1052,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginBottom: 24,
   },
+  resultsMascot: {
+    width: 150,
+    height: 150,
+  },
+  reviewMascot: {
+    width: 24,
+    height: 24,
+  },
   resultsTitle: {
     fontSize: 32,
     fontWeight: '900',
@@ -1056,6 +1076,12 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: '#E5E7EB',
     borderBottomWidth: 4,
+    alignItems: 'center',
+  },
+  mascotInCard: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 16,
   },
   scoreRow: {
     flexDirection: 'row',

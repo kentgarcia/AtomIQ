@@ -9,17 +9,26 @@ import { Article, Post } from './types';
 import radiationInDailyLife from './safety/radiation-in-daily-life';
 import howReactorsWork from './technology/how-reactors-work';
 import nuclearVsRenewables from './environment/nuclear-vs-renewables';
+import nuclearHistory from './history/nuclear-history';
+import nuclearWasteManagement from './energy/nuclear-waste-management';
 
 // Import Posts
 import chernobylWildlife from './posts/chernobyl-wildlife';
 import marieCurieLegacy from './posts/marie-curie-legacy';
 import nuclearMedicine from './posts/nuclear-medicine';
+import bananaRadiation from './posts/banana-radiation';
+import spaceNuclear from './posts/space-nuclear';
+import franceNuclear from './posts/france-nuclear';
+import nuclearSubmarines from './posts/nuclear-submarines';
+import carbonFree from './posts/carbon-free';
 
 // Articles Registry
 export const articles: Record<string, Article> = {
   'radiation-in-daily-life': radiationInDailyLife,
   'how-reactors-work': howReactorsWork,
   'nuclear-vs-renewables': nuclearVsRenewables,
+  'nuclear-history': nuclearHistory,
+  'nuclear-waste-management': nuclearWasteManagement,
 };
 
 // Posts Registry
@@ -27,6 +36,11 @@ export const posts: Record<string, Post> = {
   'chernobyl-wildlife': chernobylWildlife,
   'marie-curie-legacy': marieCurieLegacy,
   'nuclear-medicine': nuclearMedicine,
+  'banana-radiation': bananaRadiation,
+  'space-nuclear': spaceNuclear,
+  'france-nuclear': franceNuclear,
+  'nuclear-submarines': nuclearSubmarines,
+  'carbon-free': carbonFree,
 };
 
 // Helper Functions
