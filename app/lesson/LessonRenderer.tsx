@@ -12,12 +12,14 @@ import Animated, {
   withTiming, 
   runOnJS,
   interpolate,
-  FadeInDown
+  FadeInDown,
+  ZoomIn
 } from 'react-native-reanimated';
 import { GestureDetector, Gesture } from 'react-native-gesture-handler';
 import { Icon } from '@/components/ui/icon';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Lesson, LessonStep } from '@/content/types';
+import * as Speech from 'expo-speech';
 
 const { width, height } = Dimensions.get('window');
 
@@ -26,9 +28,9 @@ const THEME = {
   card: '#FFFFFF',
   text: '#1F2937',
   textMuted: '#9CA3AF',
-  primary: '#FF6B00',
-  primaryDark: '#E65100',
-  primaryLight: '#FF9E40',
+  primary: '#EA580C',
+  primaryDark: '#C2410C',
+  primaryLight: '#FB923C',
   success: '#2ECC71',
   error: '#EF4444',
   gold: '#FFC107',
@@ -67,82 +69,251 @@ export const BriefingRenderer = ({ data, onComplete }: { data: any; onComplete: 
   );
 };
 
-// 2. Myth Buster
+// 2. Myth Buster - Creative Flashcard Design
 export const MythBusterRenderer = ({ data, onComplete }: { data: any; onComplete: () => void }) => {
   const translateX = useSharedValue(0);
+  const translateY = useSharedValue(0);
   const cardRotate = useSharedValue(0);
+  const cardScale = useSharedValue(1);
   const [showFeedback, setShowFeedback] = useState<null | 'correct' | 'incorrect'>(null);
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [leftIndicator, setLeftIndicator] = useState(0);
+  const [rightIndicator, setRightIndicator] = useState(0);
+
+  // Stop speech when component unmounts or feedback shows
+  useEffect(() => {
+    return () => {
+      Speech.stop();
+    };
+  }, []);
+
+  const speakMyth = async () => {
+    if (isSpeaking) {
+      Speech.stop();
+      setIsSpeaking(false);
+    } else {
+      setIsSpeaking(true);
+      Speech.speak(data.myth, {
+        language: 'en',
+        pitch: 1.0,
+        rate: 0.9,
+        onDone: () => setIsSpeaking(false),
+        onStopped: () => setIsSpeaking(false),
+      });
+    }
+  };
+
+  const speakFeedback = (text: string) => {
+    Speech.speak(text, {
+      language: 'en',
+      pitch: 1.0,
+      rate: 0.9,
+    });
+  };
 
   const pan = Gesture.Pan()
     .onUpdate((event) => {
       if (showFeedback) return;
       translateX.value = event.translationX;
-      cardRotate.value = interpolate(event.translationX, [-width, width], [-15, 15]);
+      translateY.value = event.translationY * 0.3;
+      cardRotate.value = interpolate(event.translationX, [-width, width], [-20, 20]);
+      cardScale.value = interpolate(Math.abs(event.translationX), [0, 150], [1, 0.95]);
+      
+      runOnJS(setLeftIndicator)(Math.max(0, -event.translationX / 150));
+      runOnJS(setRightIndicator)(Math.max(0, event.translationX / 150));
     })
     .onEnd((event) => {
       if (showFeedback) return;
-      if (Math.abs(event.translationX) > 100) {
+      runOnJS(setLeftIndicator)(0);
+      runOnJS(setRightIndicator)(0);
+      
+      if (Math.abs(event.translationX) > 120) {
         const isLeft = event.translationX < 0;
-        translateX.value = withSpring(isLeft ? -width * 1.5 : width * 1.5);
+        translateX.value = withSpring(isLeft ? -width * 1.5 : width * 1.5, { damping: 15 });
+        translateY.value = withSpring(isLeft ? -50 : -50);
+        cardScale.value = withSpring(0.8);
+        runOnJS(Speech.stop)();
+        runOnJS(setIsSpeaking)(false);
         runOnJS(setShowFeedback)(isLeft ? 'correct' : 'incorrect');
       } else {
-        translateX.value = withSpring(0);
+        translateX.value = withSpring(0, { damping: 15 });
+        translateY.value = withSpring(0);
         cardRotate.value = withSpring(0);
+        cardScale.value = withSpring(1);
       }
     });
 
   const cardStyle = useAnimatedStyle(() => ({
     transform: [
       { translateX: translateX.value },
-      { rotate: `${cardRotate.value}deg` }
+      { translateY: translateY.value },
+      { rotate: `${cardRotate.value}deg` },
+      { scale: cardScale.value }
     ]
   }));
 
   return (
     <View style={styles.stepContainer}>
-      <Text style={styles.stepHeader}>MYTH BUSTER</Text>
-      <Text style={styles.stepSubHeader}>Swipe LEFT for Myth, RIGHT for Fact</Text>
+      {/* Header */}
+      <View style={mythStyles.header}>
+        <View style={mythStyles.headerBadge}>
+          <Icon name="Danger" size={20} color="#FFF" variant="Bold" />
+          <Text style={mythStyles.headerText}>MYTH BUSTER</Text>
+        </View>
+        <Text style={mythStyles.headerSubtext}>Is this a myth or fact?</Text>
+      </View>
+
+      {/* Swipe Indicators */}
+      <View style={mythStyles.indicatorContainer}>
+        <Animated.View style={[mythStyles.indicatorLeft, { opacity: leftIndicator }]}>
+          <LinearGradient
+            colors={['rgba(239,68,68,0.3)', 'transparent']}
+            start={{ x: 0, y: 0.5 }}
+            end={{ x: 1, y: 0.5 }}
+            style={StyleSheet.absoluteFill}
+          />
+          <Icon name="Forbidden2" size={40} color={THEME.error} />
+          <Text style={mythStyles.indicatorTextLeft}>MYTH</Text>
+        </Animated.View>
+        
+        <Animated.View style={[mythStyles.indicatorRight, { opacity: rightIndicator }]}>
+          <LinearGradient
+            colors={['transparent', 'rgba(46,204,113,0.3)']}
+            start={{ x: 0, y: 0.5 }}
+            end={{ x: 1, y: 0.5 }}
+            style={StyleSheet.absoluteFill}
+          />
+          <Icon name="TickCircle" size={40} color={THEME.success} variant="Bold" />
+          <Text style={mythStyles.indicatorTextRight}>FACT</Text>
+        </Animated.View>
+      </View>
 
       <View style={styles.cardContainer}>
         {showFeedback ? (
-          <Animated.View entering={FadeInDown} style={[styles.feedbackCard, showFeedback === 'correct' ? styles.feedbackCorrect : styles.feedbackIncorrect]}>
-            <Icon 
-              name={showFeedback === 'correct' ? 'TickCircle' : 'CloseCircle'} 
-              size={64} 
-              color="#FFF" 
-              variant="Bold" 
-            />
-            <Text style={styles.feedbackTitle}>
-              {showFeedback === 'correct' ? 'Correct!' : 'Oops!'}
-            </Text>
-            <Text style={styles.feedbackText}>{data.explanation}</Text>
-            <View style={styles.realityBox}>
-              <Text style={styles.realityLabel}>REALITY:</Text>
-              <Text style={styles.realityText}>{data.reality}</Text>
+          <Animated.View 
+            entering={ZoomIn.springify().damping(15)} 
+            style={[
+              mythStyles.feedbackCard, 
+              showFeedback === 'correct' ? mythStyles.feedbackCorrect : mythStyles.feedbackIncorrect
+            ]}
+          >
+            {/* Result Icon with Glow */}
+            <View style={mythStyles.resultIconContainer}>
+              <View style={[
+                mythStyles.resultIconGlow, 
+                { backgroundColor: showFeedback === 'correct' ? 'rgba(46,204,113,0.3)' : 'rgba(239,68,68,0.3)' }
+              ]} />
+              <Icon 
+                name={showFeedback === 'correct' ? 'TickCircle' : 'Forbidden2'} 
+                size={80} 
+                color="#FFF" 
+                variant="Bold" 
+              />
             </View>
-            <TouchableOpacity style={styles.continueBtn} onPress={onComplete}>
-              <Text style={styles.continueBtnText}>CONTINUE</Text>
+            
+            <Text style={mythStyles.feedbackTitle}>
+              {showFeedback === 'correct' ? '🎉 Correct!' : '😅 Not Quite!'}
+            </Text>
+            
+            <Text style={mythStyles.feedbackSubtitle}>
+              {showFeedback === 'correct' ? 'That was indeed a myth!' : 'That was actually a myth!'}
+            </Text>
+
+            {/* Explanation Card */}
+            <View style={mythStyles.explanationCard}>
+              <View style={mythStyles.explanationHeader}>
+                <Icon name="InfoCircle" size={20} color={showFeedback === 'correct' ? THEME.success : THEME.error} />
+                <Text style={mythStyles.explanationLabel}>THE TRUTH</Text>
+                <TouchableOpacity 
+                  onPress={() => speakFeedback(`${data.explanation}. The reality is: ${data.reality}`)}
+                  style={mythStyles.speakBtnSmall}
+                >
+                  <Icon name="VolumeHigh" size={18} color={showFeedback === 'correct' ? THEME.success : THEME.error} />
+                </TouchableOpacity>
+              </View>
+              <Text style={mythStyles.explanationText}>{data.explanation}</Text>
+              
+              <View style={mythStyles.realitySection}>
+                <Text style={mythStyles.realityLabel}>💡 REALITY:</Text>
+                <Text style={mythStyles.realityText}>{data.reality}</Text>
+              </View>
+            </View>
+
+            <TouchableOpacity style={mythStyles.continueBtn} onPress={onComplete}>
+              <LinearGradient
+                colors={['#FFF', '#F0F0F0']}
+                style={mythStyles.continueBtnGradient}
+              >
+                <Text style={[
+                  mythStyles.continueBtnText, 
+                  { color: showFeedback === 'correct' ? THEME.success : THEME.error }
+                ]}>CONTINUE</Text>
+                <Icon 
+                  name="ArrowRight2" 
+                  size={20} 
+                  color={showFeedback === 'correct' ? THEME.success : THEME.error} 
+                />
+              </LinearGradient>
             </TouchableOpacity>
           </Animated.View>
         ) : (
           <GestureDetector gesture={pan}>
-            <Animated.View style={[styles.swipeCard, cardStyle]}>
-              <View style={styles.mythBadge}>
-                <Icon name="Danger" size={24} color="#FFF" />
-                <Text style={styles.mythBadgeText}>MYTH?</Text>
+            <Animated.View style={[mythStyles.flashCard, cardStyle]}>
+              {/* Card Decorations */}
+              <View style={mythStyles.cardCornerTL}>
+                <Icon name="Danger" size={16} color="rgba(239,68,68,0.3)" />
               </View>
-              <Text style={styles.mythText}>"{data.myth}"</Text>
+              <View style={mythStyles.cardCornerTR}>
+                <Icon name="Danger" size={16} color="rgba(239,68,68,0.3)" />
+              </View>
+              <View style={mythStyles.cardCornerBL}>
+                <Icon name="Danger" size={16} color="rgba(239,68,68,0.3)" />
+              </View>
+              <View style={mythStyles.cardCornerBR}>
+                <Icon name="Danger" size={16} color="rgba(239,68,68,0.3)" />
+              </View>
+
+              {/* Question Mark Badge */}
+              <View style={mythStyles.questionBadge}>
+                <Text style={mythStyles.questionMark}>?</Text>
+              </View>
+
+              {/* Myth Content */}
+              <View style={mythStyles.mythContent}>
+                <Text style={mythStyles.quoteOpen}>"</Text>
+                <Text style={mythStyles.mythText}>{data.myth}</Text>
+                <Text style={mythStyles.quoteClose}>"</Text>
+              </View>
+
               {data.image && (
-                <Image source={{ uri: data.image }} style={styles.mythImage} />
+                <Image source={{ uri: data.image }} style={mythStyles.mythImage} />
               )}
-              <View style={styles.swipeInstructions}>
-                <View style={styles.swipeLeft}>
-                  <Icon name="ArrowLeft2" size={20} color={THEME.error} />
-                  <Text style={{color: THEME.error, fontWeight:'700'}}>MYTH</Text>
+
+              {/* Read Aloud Button */}
+              <TouchableOpacity 
+                style={[mythStyles.speakBtn, isSpeaking && mythStyles.speakBtnActive]} 
+                onPress={speakMyth}
+              >
+                <Icon 
+                  name={isSpeaking ? "VolumeSlash" : "VolumeHigh"} 
+                  size={24} 
+                  color={isSpeaking ? "#FFF" : THEME.primary} 
+                />
+                <Text style={[mythStyles.speakBtnText, isSpeaking && { color: '#FFF' }]}>
+                  {isSpeaking ? 'Stop' : 'Read Aloud'}
+                </Text>
+              </TouchableOpacity>
+
+              {/* Swipe Instructions */}
+              <View style={mythStyles.swipeHint}>
+                <View style={mythStyles.swipeHintLeft}>
+                  <Icon name="ArrowLeft2" size={18} color={THEME.error} />
+                  <Text style={[mythStyles.swipeHintText, { color: THEME.error }]}>MYTH</Text>
                 </View>
-                <View style={styles.swipeRight}>
-                  <Text style={{color: THEME.success, fontWeight:'700'}}>FACT</Text>
-                  <Icon name="ArrowRight2" size={20} color={THEME.success} />
+                <Text style={mythStyles.swipeDivider}>Swipe to answer</Text>
+                <View style={mythStyles.swipeHintRight}>
+                  <Text style={[mythStyles.swipeHintText, { color: THEME.success }]}>FACT</Text>
+                  <Icon name="ArrowRight2" size={18} color={THEME.success} />
                 </View>
               </View>
             </Animated.View>
@@ -152,6 +323,317 @@ export const MythBusterRenderer = ({ data, onComplete }: { data: any; onComplete
     </View>
   );
 };
+
+// Myth Buster specific styles
+const mythStyles = StyleSheet.create({
+  header: {
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  headerBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: THEME.error,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 25,
+    gap: 8,
+    shadowColor: THEME.error,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
+  },
+  headerText: {
+    color: '#FFF',
+    fontSize: 16,
+    fontWeight: '800',
+    letterSpacing: 1,
+  },
+  headerSubtext: {
+    color: THEME.textMuted,
+    fontSize: 14,
+    marginTop: 12,
+  },
+  indicatorContainer: {
+    position: 'absolute',
+    top: 150,
+    left: 0,
+    right: 0,
+    bottom: 100,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    pointerEvents: 'none',
+    zIndex: 10,
+  },
+  indicatorLeft: {
+    width: 100,
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 8,
+  },
+  indicatorRight: {
+    width: 100,
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 8,
+  },
+  indicatorTextLeft: {
+    color: THEME.error,
+    fontWeight: '800',
+    fontSize: 14,
+  },
+  indicatorTextRight: {
+    color: THEME.success,
+    fontWeight: '800',
+    fontSize: 14,
+  },
+  flashCard: {
+    width: width - 48,
+    backgroundColor: '#FFF',
+    borderRadius: 28,
+    padding: 28,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.15,
+    shadowRadius: 24,
+    elevation: 12,
+    borderWidth: 3,
+    borderColor: 'rgba(239,68,68,0.15)',
+    position: 'relative',
+    overflow: 'hidden',
+  },
+  cardCornerTL: {
+    position: 'absolute',
+    top: 12,
+    left: 12,
+  },
+  cardCornerTR: {
+    position: 'absolute',
+    top: 12,
+    right: 12,
+  },
+  cardCornerBL: {
+    position: 'absolute',
+    bottom: 12,
+    left: 12,
+  },
+  cardCornerBR: {
+    position: 'absolute',
+    bottom: 12,
+    right: 12,
+  },
+  questionBadge: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: '#FFF3E0',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 20,
+    borderWidth: 3,
+    borderColor: THEME.primary,
+  },
+  questionMark: {
+    fontSize: 32,
+    fontWeight: '900',
+    color: THEME.primary,
+  },
+  mythContent: {
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  quoteOpen: {
+    fontSize: 48,
+    color: 'rgba(239,68,68,0.2)',
+    fontWeight: '900',
+    lineHeight: 48,
+    marginBottom: -10,
+  },
+  mythText: {
+    fontSize: 22,
+    fontWeight: '700',
+    color: THEME.text,
+    textAlign: 'center',
+    lineHeight: 32,
+    paddingHorizontal: 8,
+  },
+  quoteClose: {
+    fontSize: 48,
+    color: 'rgba(239,68,68,0.2)',
+    fontWeight: '900',
+    lineHeight: 48,
+    marginTop: -10,
+    alignSelf: 'flex-end',
+  },
+  mythImage: {
+    width: '100%',
+    height: 140,
+    borderRadius: 16,
+    marginBottom: 20,
+  },
+  speakBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFF3E0',
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    borderRadius: 25,
+    gap: 10,
+    marginBottom: 24,
+    borderWidth: 2,
+    borderColor: THEME.primary,
+  },
+  speakBtnActive: {
+    backgroundColor: THEME.primary,
+    borderColor: THEME.primaryDark,
+  },
+  speakBtnText: {
+    color: THEME.primary,
+    fontWeight: '700',
+    fontSize: 14,
+  },
+  swipeHint: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '100%',
+    paddingTop: 16,
+    borderTopWidth: 1,
+    borderTopColor: THEME.border,
+  },
+  swipeHintLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  swipeHintRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  swipeHintText: {
+    fontWeight: '700',
+    fontSize: 12,
+  },
+  swipeDivider: {
+    color: THEME.textMuted,
+    fontSize: 11,
+  },
+  feedbackCard: {
+    width: width - 32,
+    padding: 28,
+    borderRadius: 28,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.2,
+    shadowRadius: 24,
+    elevation: 12,
+  },
+  feedbackCorrect: {
+    backgroundColor: THEME.success,
+  },
+  feedbackIncorrect: {
+    backgroundColor: THEME.error,
+  },
+  resultIconContainer: {
+    marginBottom: 16,
+    position: 'relative',
+  },
+  resultIconGlow: {
+    position: 'absolute',
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    top: -20,
+    left: -20,
+  },
+  feedbackTitle: {
+    fontSize: 32,
+    fontWeight: '900',
+    color: '#FFF',
+    marginBottom: 8,
+  },
+  feedbackSubtitle: {
+    fontSize: 16,
+    color: 'rgba(255,255,255,0.9)',
+    marginBottom: 20,
+  },
+  explanationCard: {
+    backgroundColor: '#FFF',
+    borderRadius: 20,
+    padding: 20,
+    width: '100%',
+    marginBottom: 20,
+  },
+  explanationHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 12,
+  },
+  explanationLabel: {
+    fontSize: 12,
+    fontWeight: '800',
+    color: THEME.text,
+    flex: 1,
+  },
+  speakBtnSmall: {
+    padding: 6,
+    backgroundColor: 'rgba(0,0,0,0.05)',
+    borderRadius: 12,
+  },
+  explanationText: {
+    fontSize: 15,
+    color: THEME.text,
+    lineHeight: 22,
+    marginBottom: 16,
+  },
+  realitySection: {
+    backgroundColor: '#FFF9E6',
+    borderRadius: 12,
+    padding: 14,
+    borderLeftWidth: 4,
+    borderLeftColor: THEME.gold,
+  },
+  realityLabel: {
+    fontSize: 12,
+    fontWeight: '800',
+    color: THEME.text,
+    marginBottom: 6,
+  },
+  realityText: {
+    fontSize: 14,
+    color: THEME.text,
+    lineHeight: 20,
+    fontWeight: '600',
+  },
+  continueBtn: {
+    width: '100%',
+    borderRadius: 16,
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  continueBtnGradient: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 16,
+    gap: 8,
+  },
+  continueBtnText: {
+    fontSize: 16,
+    fontWeight: '800',
+  },
+});
 
 // 3. Micro Learn
 export const MicroLearnRenderer = ({ data, onComplete }: { data: any; onComplete: () => void }) => {
@@ -274,18 +756,18 @@ export const AssessmentRenderer = ({ data, onComplete }: { data: any; onComplete
         
         <View style={styles.quizOptions}>
           {data.options.map((opt: string, index: number) => {
-            let btnStyle = styles.quizOption;
+            let extraStyle = {};
             if (confirmed) {
-              if (index === data.correctIndex) btnStyle = styles.quizOptionCorrect;
-              else if (index === selected) btnStyle = styles.quizOptionWrong;
+              if (index === data.correctIndex) extraStyle = styles.quizOptionCorrect;
+              else if (index === selected) extraStyle = styles.quizOptionWrong;
             } else if (selected === index) {
-              btnStyle = styles.quizOptionSelected;
+              extraStyle = styles.quizOptionSelected;
             }
 
             return (
               <TouchableOpacity 
                 key={opt} 
-                style={btnStyle}
+                style={[styles.quizOption, extraStyle]}
                 onPress={() => !confirmed && setSelected(index)}
                 activeOpacity={0.8}
               >

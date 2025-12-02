@@ -16,8 +16,8 @@ const THEME = {
   card: '#FFFFFF',
   text: '#1F2937',
   textMuted: '#9CA3AF',
-  primary: '#FF6B00',
-  primaryDark: '#E65100',
+  primary: '#EA580C',
+  primaryDark: '#C2410C',
   success: '#2ECC71',
   border: '#E5E7EB',
 };

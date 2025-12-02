@@ -9,9 +9,9 @@ const { width } = Dimensions.get('window');
 
 // Orange Theme
 const THEME = {
-  primary: '#FF6B00', // Vibrant Orange
-  primaryLight: '#FF8533',
-  primaryDark: '#E65100',
+  primary: '#EA580C', // Vibrant Orange
+  primaryLight: '#F97316',
+  primaryDark: '#C2410C',
   bg: '#F4F5F7', // Light Grey Background
   card: '#FFFFFF',
   text: '#2D3436',
@@ -24,7 +24,7 @@ const THEME = {
 
 // NPC Characters - Personal Goals for the User
 const NPC_CHARACTERS = [
-  { name: 'AtomMaster99', title: 'Radiation Pioneer', baseXP: 2000, avatarColor: '#FF6B00', isNPC: true },
+  { name: 'AtomMaster99', title: 'Radiation Pioneer', baseXP: 2000, avatarColor: '#EA580C', isNPC: true },
   { name: 'NuclearNinja', title: 'Physics Legend', baseXP: 1800, avatarColor: '#2ECC71', isNPC: true },
   { name: 'ReactorRex', title: 'Reactor Architect', baseXP: 1600, avatarColor: '#3498DB', isNPC: true },
   { name: 'QuantumQuinn', title: 'Quantum Master', baseXP: 1400, avatarColor: '#9B59B6', isNPC: true },
@@ -232,7 +232,7 @@ export default function LeaderboardScreen() {
               </View>
 
               <View style={styles.listXP}>
-                <Icon name="Flash" size={16} color="#FF6B00" variant="Bold" />
+                <Icon name="Flash" size={16} color="#EA580C" variant="Bold" />
                 <Text style={styles.xpText}>{user.xp.toLocaleString()} XP</Text>
               </View>
             </View>
@@ -256,7 +256,7 @@ export default function LeaderboardScreen() {
             <Text style={styles.listTitle}>{userRank.title}</Text>
           </View>
           <View style={styles.listXP}>
-            <Icon name="Flash" size={16} color="#FF6B00" variant="Bold" />
+            <Icon name="Flash" size={16} color="#EA580C" variant="Bold" />
             <Text style={styles.xpText}>{userRank.xp.toLocaleString()} XP</Text>
           </View>
         </View>

@@ -3,17 +3,17 @@
  * Central hub for all Explorer journeys, mazes, and encyclopedia entries
  */
 
-import { Journey, AtomMazeChallenge, EncyclopediaEntry } from './types';
+import { AtomMazeChallenge, EncyclopediaEntry, Journey } from './types';
 
 // Import journeys
-import radiationRealityJourney from './journeys/radiation-reality-journey';
 import nuclearSafetyJourney from './journeys/nuclear-safety-journey';
+import radiationRealityJourney from './journeys/radiation-reality-journey';
 
 // Import mazes
-import safetyMaze from './mazes/safety-maze';
-import radiationBasicsMaze from './mazes/radiation-basics-maze';
 import nuclearHistoryMaze from './mazes/nuclear-history-maze';
+import radiationBasicsMaze from './mazes/radiation-basics-maze';
 import reactorTechMaze from './mazes/reactor-tech-maze';
+import safetyMaze from './mazes/safety-maze';
 
 // Import encyclopedia entries
 import { encyclopediaDatabase } from './encyclopedia/database';
@@ -88,5 +88,10 @@ export const getEncyclopediaByDifficulty = (difficulty: 'beginner' | 'intermedia
 };
 
 // Export types
-export type { Journey, AtomMazeChallenge, EncyclopediaEntry, JourneyNode, MythNodeContent, MultimediaPopUp, AtomMazeRoom } from './types';
+export type {
+  AtomMazeChallenge, AtomMazeRoom, BattleQuestion, EncyclopediaEntry, Journey, JourneyNode, Monster,
+  MonsterElement, MultimediaPopUp, MythNodeContent, QuestionType,
+  QuizQuestion,
+  ScrambleQuestion
+} from './types';
 

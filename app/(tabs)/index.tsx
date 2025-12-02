@@ -16,9 +16,9 @@ const THEME = {
   card: '#FFFFFF',
   text: '#1F2937',
   textMuted: '#9CA3AF',
-  primary: '#FF6B00', // Orange
-  primaryDark: '#E65100',
-  primaryLight: '#FF9E40',
+  primary: '#EA580C', // Orange
+  primaryDark: '#C2410C',
+  primaryLight: '#FB923C',
   success: '#2ECC71', // Green for completed
   gold: '#FFC107',
   border: '#E5E7EB',
@@ -90,7 +90,7 @@ export default function HomeScreen() {
   // Calculate leaderboard data (same logic as leaderboard screen)
   const leaderboardPreview = useMemo(() => {
     const NPC_CHARACTERS = [
-      { name: 'AtomMaster99', title: 'Radiation Pioneer', baseXP: 2000, avatarColor: '#FF6B00', isNPC: true },
+      { name: 'AtomMaster99', title: 'Radiation Pioneer', baseXP: 2000, avatarColor: '#EA580C', isNPC: true },
       { name: 'NuclearNinja', title: 'Physics Legend', baseXP: 1800, avatarColor: '#2ECC71', isNPC: true },
       { name: 'ReactorRex', title: 'Reactor Architect', baseXP: 1600, avatarColor: '#3498DB', isNPC: true },
       { name: 'QuantumQuinn', title: 'Quantum Master', baseXP: 1400, avatarColor: '#9B59B6', isNPC: true },
@@ -224,7 +224,7 @@ export default function HomeScreen() {
               onPress={() => router.push('/mythbuster')}
             >
               <LinearGradient
-                colors={['#FF6B00', '#FF9E40']}
+                colors={['#EA580C', '#FB923C']}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
                 style={styles.quickActionGradient}

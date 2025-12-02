@@ -26,10 +26,10 @@ const CHAT_THEME = {
   card: '#FFFFFF',
   text: '#2D3436',
   textMuted: '#636E72',
-  primary: '#FF6B00',
-  primaryDark: '#E65100',
-  primaryLight: '#FF8533',
-  userBubble: '#FF6B00', // Orange for user messages
+  primary: '#EA580C',
+  primaryDark: '#C2410C',
+  primaryLight: '#F97316',
+  userBubble: '#EA580C', // Orange for user messages
   botBubble: '#FFFFFF',
   border: '#E5E7EB',
   green: '#2ECC71',

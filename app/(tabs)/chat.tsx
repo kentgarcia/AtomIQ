@@ -13,9 +13,9 @@ const THEME = {
   card: '#FFFFFF',
   text: '#1F2937',
   textMuted: '#9CA3AF',
-  primary: '#FF6B00', // Orange
-  primaryDark: '#E65100',
-  primaryLight: '#FF9E40',
+  primary: '#EA580C', // Orange
+  primaryDark: '#C2410C',
+  primaryLight: '#FB923C',
   border: '#E5E7EB',
 };
 

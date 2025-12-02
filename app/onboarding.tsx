@@ -25,12 +25,12 @@ const DUO_THEME = {
   border: '#E5E5E5',
   text: '#3C3C3C',
   textMuted: '#777777',
-  primary: '#FF6B00', // Orange
-  primaryDark: '#E65100',
+  primary: '#EA580C', // Orange
+  primaryDark: '#C2410C',
   secondary: '#FF4B4B', // Red
   secondaryDark: '#D32F2F',
-  accent: '#FF9E40', // Light Orange
-  accentDark: '#FF6B00',
+  accent: '#FB923C', // Light Orange
+  accentDark: '#EA580C',
   warning: '#FFC107', // Gold
   warningDark: '#FFA000',
 };
@@ -43,7 +43,7 @@ const FEATURE_SHOWCASE = [
     subtitle: 'Swipe to Learn',
     description: 'Swipe through myths and facts in this addictive game. Build streaks, earn XP, and master nuclear science one swipe at a time.',
     icon: 'Danger',
-    gradient: ['#FF6B00', '#FF9E40'],
+    gradient: ['#EA580C', '#FB923C'],
     mascot: require('@/assets/images/mascot/experiment.png'),
     highlights: ['Swipe left for MYTH', 'Swipe right for TRUTH', 'Build streaks', 'Earn XP'],
   },
