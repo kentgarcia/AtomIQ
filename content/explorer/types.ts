@@ -3,7 +3,6 @@
  * Encarta-style interactive knowledge journey system
  */
 
-import { Myth, Article, Post, Quiz } from '../types';
 
 // ============================================
 // JOURNEY TYPES
@@ -102,8 +101,40 @@ export interface MultimediaPopUp {
 }
 
 // ============================================
-// ATOMMAZE QUIZ TYPES
+// ATOMMAZE BATTLE TYPES (Pokemon-Style)
 // ============================================
+
+export type MonsterElement = 'radiation' | 'nuclear' | 'atomic' | 'fusion' | 'fission' | 'plasma';
+
+export interface Monster {
+  id: string;
+  name: string;
+  element: MonsterElement;
+  maxHp: number;
+  attackPower: number; // Damage dealt to player on wrong answer
+  sprite: string; // Emoji or icon name for now
+  color: string; // Theme color for the monster
+  defeatMessage: string;
+  isBoss?: boolean;
+}
+
+export type QuestionType = 'quiz' | 'scramble';
+
+export interface QuizQuestion {
+  type: 'quiz';
+  question: string;
+  options: string[];
+  correctAnswer: number; // Index of correct option
+}
+
+export interface ScrambleQuestion {
+  type: 'scramble';
+  question: string;
+  answer: string; // The correct word to form
+  hint?: string;
+}
+
+export type BattleQuestion = QuizQuestion | ScrambleQuestion;
 
 export interface AtomMazeChallenge {
   id: string;
@@ -113,20 +144,18 @@ export interface AtomMazeChallenge {
   rooms: AtomMazeRoom[];
   xpReward: number;
   timeLimit?: number; // seconds
+  playerMaxHp: number; // Player's maximum HP for this maze
+  boss: Monster; // Final boss monster
 }
 
 export interface AtomMazeRoom {
   id: string;
   title: string;
   description: string;
-  question: {
-    id: string;
-    question: string;
-    options: string[];
-    correctAnswer: number;
-    explanation: string;
-    points: number;
-  };
+  monster: Monster; // Monster to fight in this room
+  questions: BattleQuestion[]; // Multiple questions to defeat the monster
+  damagePerCorrect: number; // Damage dealt to monster per correct answer
+  explanation: string; // Shown after defeating the monster
   nextRoomId?: string; // Path through the maze
   alternativePathId?: string; // Branching paths
   unlockCondition?: {

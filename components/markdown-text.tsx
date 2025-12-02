@@ -222,7 +222,7 @@ function processInlineMarkdown(text: string, textColor: string): React.ReactNode
         elements.push(
           <Text
             key={`link-${keyCounter++}`}
-            style={[styles.link, { color: '#FF6B00' }]}
+            style={[styles.link, { color: '#EA580C' }]}
             onPress={() => {
               if (pattern.url) {
                 Linking.openURL(pattern.url).catch(console.error);
@@ -292,7 +292,7 @@ const styles = StyleSheet.create({
     padding: 12,
     marginVertical: 8,
     borderLeftWidth: 3,
-    borderLeftColor: '#FF6B00',
+    borderLeftColor: '#EA580C',
   },
   codeBlock: {
     fontFamily: 'monospace',
@@ -300,7 +300,7 @@ const styles = StyleSheet.create({
     lineHeight: 18,
   },
   link: {
-    color: '#FF6B00',
+    color: '#EA580C',
     textDecorationLine: 'underline',
     fontWeight: '600',
   },

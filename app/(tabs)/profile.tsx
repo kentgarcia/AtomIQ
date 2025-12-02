@@ -13,8 +13,8 @@ const THEME = {
   border: '#E5E5E5',
   text: '#2D3436',
   textMuted: '#636E72',
-  primary: '#FF6B00',
-  primaryLight: '#FF8533',
+  primary: '#EA580C',
+  primaryLight: '#F97316',
   accent: '#1CB0F6',
   warning: '#FFC800',
   secondary: '#FF4B4B',
@@ -26,7 +26,7 @@ const THEME = {
 const ACHIEVEMENTS = [
   { id: 1, title: 'First Steps', requirement: 'Complete 1 lesson', threshold: 1, field: 'lessons_completed', icon: 'Award', color: '#FFC800' },
   { id: 2, title: 'Myth Buster', requirement: 'Bust 10 myths', threshold: 10, field: 'myths_busted', icon: 'TickCircle', color: THEME.green },
-  { id: 3, title: 'On Fire', requirement: '7 day streak', threshold: 7, field: 'current_streak', icon: 'Flash', color: '#FF6B00' },
+  { id: 3, title: 'On Fire', requirement: '7 day streak', threshold: 7, field: 'current_streak', icon: 'Flash', color: '#EA580C' },
   { id: 4, title: 'XP Master', requirement: 'Earn 1000 XP', threshold: 1000, field: 'total_xp', icon: 'Star', color: '#1CB0F6' },
   { id: 5, title: 'Dedicated', requirement: '30 day streak', threshold: 30, field: 'longest_streak', icon: 'Crown', color: '#FFD700' },
 ];

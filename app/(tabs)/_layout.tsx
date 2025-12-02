@@ -1,91 +1,98 @@
 import { Icon } from '@/components/ui/icon';
+import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { Tabs } from 'expo-router';
 import React from 'react';
-import { View, TouchableOpacity, StyleSheet } from 'react-native';
-import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 
-function FloatingTabBar({ state, navigation }: BottomTabBarProps) {
+function DuolingoTabBar({ state, navigation }: BottomTabBarProps) {
   const insets = useSafeAreaInsets();
-  const colorScheme = useColorScheme();
   
-  // Orange Theme
   const THEME = {
-    bg: '#1a1a1a',
-    active: '#FF6B00', // Vibrant Orange
-    inactive: '#666666',
+    bg: '#FFFFFF',
+    border: '#E5E5E5',
+    active: '#EA580C',
+    inactive: '#AFAFAF',
   };
 
   const tabs = [
-    { name: 'index', icon: 'Home' },
-    { name: 'wiki', icon: 'Book' },
-    { name: 'chat', icon: 'Message' },
-    { name: 'leaderboard', icon: 'Ranking' },
-    { name: 'profile', icon: 'Profile' },
+    { name: 'index', icon: 'Home', label: 'Home' },
+    { name: 'community', icon: 'People', label: 'Feed' },
+    { name: 'chat', icon: 'Message', label: 'AI' },
+    { name: 'leaderboard', icon: 'Ranking', label: 'Rank' },
+    { name: 'profile', icon: 'Profile', label: 'Profile' },
   ] as const;
 
   return (
     <View
       style={[
-        styles.tabBarOuter,
+        styles.tabBar,
         {
-          paddingBottom: Math.max(insets.bottom, 20),
+          paddingBottom: Math.max(insets.bottom, 8),
+          backgroundColor: THEME.bg,
+          borderTopColor: THEME.border,
         },
       ]}
     >
-      <View style={styles.tabBarRow}>
-        {/* Floating pill tab group */}
-        <View style={styles.pillContainer}>
-          {tabs.map((tab) => {
-            const routeIndex = state.routes.findIndex((r) => r.name === tab.name);
-            if (routeIndex === -1) return null;
+      {tabs.map((tab) => {
+        const routeIndex = state.routes.findIndex((r) => r.name === tab.name);
+        if (routeIndex === -1) return null;
 
-            const isFocused = state.index === routeIndex;
-            const iconColor = isFocused ? '#FFFFFF' : THEME.inactive;
+        const isFocused = state.index === routeIndex;
+        const color = isFocused ? THEME.active : THEME.inactive;
 
-            const onPress = () => {
-              const event = navigation.emit({
-                type: 'tabPress',
-                target: state.routes[routeIndex].key,
-                canPreventDefault: true,
-              });
+        const onPress = () => {
+          const event = navigation.emit({
+            type: 'tabPress',
+            target: state.routes[routeIndex].key,
+            canPreventDefault: true,
+          });
 
-              if (!isFocused && !event.defaultPrevented) {
-                navigation.navigate(state.routes[routeIndex].name);
-              }
-            };
+          if (!isFocused && !event.defaultPrevented) {
+            navigation.navigate(state.routes[routeIndex].name);
+          }
+        };
 
-            return (
-              <TouchableOpacity
-                key={tab.name}
-                onPress={onPress}
-                activeOpacity={0.8}
-                style={styles.tabButton}
-              >
-                <View
-                  style={[
-                    styles.iconWrapper,
-                    isFocused && {
-                      backgroundColor: THEME.active,
-                      transform: [{ scale: 1.1 }],
-                    },
-                  ]}
-                >
+        return (
+          <TouchableOpacity
+            key={tab.name}
+            onPress={onPress}
+            activeOpacity={0.7}
+            style={styles.tabButton}
+          >
+            {isFocused ? (
+              <View style={styles.activeTabWrapper}>
+                <View style={styles.activeTabShadow} />
+                <View style={[styles.activeTabContent, { backgroundColor: THEME.active }]}>
                   <Icon 
                     name={tab.icon as any} 
-                    size={24} 
-                    color={iconColor} 
-                    variant={isFocused ? 'Bold' : 'Linear'}
+                    size={26} 
+                    color="#FFFFFF" 
+                    variant="Bold"
                   />
+                  <Text style={[styles.tabLabel, { color: '#FFFFFF' }]}>
+                    {tab.label}
+                  </Text>
                 </View>
-              </TouchableOpacity>
-            );
-          })}
-        </View>
-      </View>
+              </View>
+            ) : (
+              <View style={styles.tabContent}>
+                <Icon 
+                  name={tab.icon as any} 
+                  size={26} 
+                  color={color} 
+                  variant="Linear"
+                />
+                <Text style={[styles.tabLabel, { color }]}>
+                  {tab.label}
+                </Text>
+              </View>
+            )}
+          </TouchableOpacity>
+        );
+      })}
     </View>
   );
 }
@@ -98,13 +105,10 @@ export default function TabLayout() {
       screenOptions={{
         headerShown: false,
         tabBarStyle: {
-          position: 'absolute',
-          backgroundColor: 'transparent',
-          borderTopWidth: 0,
-          elevation: 0,
+          display: 'none',
         },
       }}
-      tabBar={(props) => <FloatingTabBar {...props} />}
+      tabBar={(props) => <DuolingoTabBar {...props} />}
     >
       <Tabs.Screen
         name="index"
@@ -113,9 +117,9 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="wiki"
+        name="community"
         options={{
-          title: 'Wiki',
+          title: 'Community',
         }}
       />
       <Tabs.Screen
@@ -141,51 +145,49 @@ export default function TabLayout() {
 }
 
 const styles = StyleSheet.create({
-  tabBarOuter: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    bottom: 0,
-    paddingHorizontal: 24, // More padding for floating look
-    backgroundColor: 'transparent',
-    zIndex: 20,
-    alignItems: 'center',
-    pointerEvents: 'box-none',
-  },
-  tabBarRow: {
-    width: '100%',
-    maxWidth: 360, // Limit width for pill shape
-  },
-  pillContainer: {
+  tabBar: {
     flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: '#1a1a1a', // Dark background
-    borderRadius: 35, // Full pill shape
-    height: 70,
-    width: '100%',
-    paddingHorizontal: 8,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 10,
-    },
-    shadowOpacity: 0.3,
-    shadowRadius: 20,
-    elevation: 10,
+    borderTopWidth: 1,
+    paddingTop: 8,
   },
   tabButton: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    height: '100%',
+    paddingVertical: 4,
   },
-  iconWrapper: {
-    width: 48,
-    height: 48,
-    borderRadius: 24, // Circle
+  tabContent: {
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'transparent',
+    gap: 2,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+  },
+  activeTabWrapper: {
+    position: 'relative',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  activeTabShadow: {
+    position: 'absolute',
+    top: 4,
+    left: 0,
+    right: 0,
+    bottom: -4,
+    backgroundColor: '#CC5500',
+    borderRadius: 16,
+  },
+  activeTabContent: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 2,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 16,
+  },
+  tabLabel: {
+    fontSize: 11,
+    fontWeight: '700',
+    letterSpacing: 0.3,
   },
 });

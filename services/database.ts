@@ -1,6 +1,7 @@
-import * as SQLite from 'expo-sqlite';
 import { UNITS } from '@/content/units';
+import * as SQLite from 'expo-sqlite';
 import { initExplorerStorage } from './explorer-storage';
+import { LOCAL_FIRST_SCHEMA } from './local-first/schema';
 
 // Database instance
 let db: SQLite.SQLiteDatabase | null = null;
@@ -96,6 +97,9 @@ export const initDatabase = async () => {
         cached_at DATETIME DEFAULT CURRENT_TIMESTAMP
       );
     `);
+    
+    // Initialize local-first database schema (for social features and sync)
+    await db.execAsync(LOCAL_FIRST_SCHEMA);
     
     // Initialize levels from syllabus if database is empty
     await initializeLevelsFromSyllabus();

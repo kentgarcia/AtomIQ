@@ -12,9 +12,9 @@ const THEME = {
   border: '#E5E5E5',
   text: '#2D3436',
   textMuted: '#636E72',
-  primary: '#FF6B00',
-  primaryDark: '#E65100',
-  primaryLight: '#FF8533',
+  primary: '#EA580C',
+  primaryDark: '#C2410C',
+  primaryLight: '#F97316',
   green: '#2ECC71',
   red: '#EF4444',
 };

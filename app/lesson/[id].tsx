@@ -4,11 +4,13 @@ import { useStorage } from '@/services/StorageContext';
 import { getLevelProgress, logDailyActivity, updateLevelProgress } from '@/services/database';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import * as Speech from 'expo-speech';
+import React, { useEffect, useRef, useState } from 'react';
 import { Dimensions, Image, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Gesture, GestureDetector, GestureHandlerRootView } from 'react-native-gesture-handler';
 import Animated, {
   FadeInDown,
+  ZoomIn,
   interpolate,
   runOnJS,
   useAnimatedStyle,
@@ -26,9 +28,9 @@ const THEME = {
   card: '#FFFFFF',
   text: '#1F2937',
   textMuted: '#9CA3AF',
-  primary: '#FF6B00',
-  primaryDark: '#E65100',
-  primaryLight: '#FF9E40',
+  primary: '#EA580C',
+  primaryDark: '#C2410C',
+  primaryLight: '#FB923C',
   success: '#2ECC71',
   error: '#EF4444',
   gold: '#FFC107',
@@ -74,33 +76,60 @@ const BriefingView = ({ data, onComplete }: { data: any; onComplete: () => void 
   );
 };
 
-// 2. MythBuster View (Swipe)
+// 2. MythBuster View (Creative Flashcard with Read Aloud)
 const MythBusterView = ({ data, onComplete }: { data: any; onComplete: () => void }) => {
   const translateX = useSharedValue(0);
   const cardRotate = useSharedValue(0);
   const [showFeedback, setShowFeedback] = useState<null | 'correct' | 'incorrect'>(null);
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [leftIndicator, setLeftIndicator] = useState(0);
+  const [rightIndicator, setRightIndicator] = useState(0);
+
+  // Stop speech when component unmounts
+  useEffect(() => {
+    return () => {
+      Speech.stop();
+    };
+  }, []);
+
+  const speakMyth = async () => {
+    if (isSpeaking) {
+      Speech.stop();
+      setIsSpeaking(false);
+    } else {
+      setIsSpeaking(true);
+      Speech.speak(data.myth, {
+        language: 'en',
+        pitch: 1.0,
+        rate: 0.9,
+        onDone: () => setIsSpeaking(false),
+        onStopped: () => setIsSpeaking(false),
+      });
+    }
+  };
 
   const pan = Gesture.Pan()
     .onUpdate((event) => {
       if (showFeedback) return;
       translateX.value = event.translationX;
-      cardRotate.value = interpolate(event.translationX, [-width, width], [-15, 15]);
+      cardRotate.value = interpolate(event.translationX, [-width, width], [-5, 5]); // Very subtle rotation
+      
+      runOnJS(setLeftIndicator)(Math.max(0, Math.min(1, -event.translationX / 100)));
+      runOnJS(setRightIndicator)(Math.max(0, Math.min(1, event.translationX / 100)));
     })
     .onEnd((event) => {
       if (showFeedback) return;
-      if (Math.abs(event.translationX) > 100) {
-        // Swiped
+      runOnJS(setLeftIndicator)(0);
+      runOnJS(setRightIndicator)(0);
+      
+      if (Math.abs(event.translationX) > 120) {
         const isLeft = event.translationX < 0;
-        translateX.value = withSpring(isLeft ? -width * 1.5 : width * 1.5);
-        
-        // Logic: Myth is "False", so swiping Left (False) is Correct
-        if (isLeft) {
-           runOnJS(setShowFeedback)('correct');
-        } else {
-           runOnJS(setShowFeedback)('incorrect');
-        }
+        translateX.value = withTiming(isLeft ? -width * 1.5 : width * 1.5, { duration: 200 });
+        runOnJS(Speech.stop)();
+        runOnJS(setIsSpeaking)(false);
+        runOnJS(setShowFeedback)(isLeft ? 'correct' : 'incorrect');
       } else {
-        translateX.value = withSpring(0);
+        translateX.value = withSpring(0, { damping: 20 });
         cardRotate.value = withSpring(0);
       }
     });
@@ -108,67 +137,113 @@ const MythBusterView = ({ data, onComplete }: { data: any; onComplete: () => voi
   const cardStyle = useAnimatedStyle(() => ({
     transform: [
       { translateX: translateX.value },
-      { rotate: `${cardRotate.value}deg` }
+      { rotate: `${cardRotate.value}deg` },
     ]
-  }));
-
-  const leftOpacity = useAnimatedStyle(() => ({
-    opacity: interpolate(translateX.value, [-100, 0], [1, 0])
-  }));
-
-  const rightOpacity = useAnimatedStyle(() => ({
-    opacity: interpolate(translateX.value, [0, 100], [0, 1])
   }));
 
   return (
     <View style={styles.stepContainer}>
+      {/* Full Height Swipe Indicators */}
+      <View style={mythStyles.fullHeightIndicators}>
+        <Animated.View style={[mythStyles.indicatorLeftFull, { opacity: leftIndicator }]}>
+          <LinearGradient
+            colors={['rgba(239,68,68,0.5)', 'rgba(239,68,68,0.2)', 'transparent']}
+            start={{ x: 0, y: 0.5 }}
+            end={{ x: 1, y: 0.5 }}
+            style={StyleSheet.absoluteFill}
+          />
+          <View style={mythStyles.indicatorContent}>
+            <Icon name="Forbidden2" size={48} color={THEME.error} />
+            <Text style={mythStyles.indicatorTextLeft}>MYTH</Text>
+          </View>
+        </Animated.View>
+        
+        <Animated.View style={[mythStyles.indicatorRightFull, { opacity: rightIndicator }]}>
+          <LinearGradient
+            colors={['transparent', 'rgba(46,204,113,0.2)', 'rgba(46,204,113,0.5)']}
+            start={{ x: 0, y: 0.5 }}
+            end={{ x: 1, y: 0.5 }}
+            style={StyleSheet.absoluteFill}
+          />
+          <View style={mythStyles.indicatorContent}>
+            <Icon name="TickCircle" size={48} color={THEME.success} variant="Bold" />
+            <Text style={mythStyles.indicatorTextRight}>FACT</Text>
+          </View>
+        </Animated.View>
+      </View>
+
       <Text style={styles.stepHeader}>MYTH BUSTER</Text>
       <Text style={styles.stepSubHeader}>Swipe LEFT for Myth, RIGHT for Fact</Text>
 
       <View style={styles.cardContainer}>
         {showFeedback ? (
-          <Animated.View entering={FadeInDown} style={[styles.feedbackCard, showFeedback === 'correct' ? styles.feedbackCorrect : styles.feedbackIncorrect]}>
-            <View style={{marginBottom: 16, backgroundColor: 'rgba(255,255,255,0.2)', padding: 16, borderRadius: 50}}>
+          <Animated.View entering={FadeInDown.duration(300)} style={[mythStyles.resultCard, showFeedback === 'correct' ? mythStyles.resultCorrect : mythStyles.resultIncorrect]}>
+            {/* Speaker Button - Top Right */}
+            <TouchableOpacity 
+              style={mythStyles.speakerBtn}
+              onPress={() => Speech.speak(`${data.explanation}. The reality is: ${data.reality}`, { language: 'en', rate: 0.9 })}
+            >
+              <Icon name="VolumeHigh" size={22} color={showFeedback === 'correct' ? THEME.success : THEME.error} />
+            </TouchableOpacity>
+
+            {/* Result Icon */}
+            <View style={[mythStyles.resultIconCircle, { backgroundColor: showFeedback === 'correct' ? THEME.success : THEME.error }]}>
               <Icon 
                 name={showFeedback === 'correct' ? 'TickCircle' : 'CloseCircle'} 
-                size={48} 
+                size={36} 
                 color="#FFF" 
                 variant="Bold" 
               />
             </View>
-            <Text style={styles.feedbackTitle}>
+            
+            <Text style={mythStyles.resultTitle}>
               {showFeedback === 'correct' ? 'Correct!' : 'Oops!'}
             </Text>
-            <Text style={styles.feedbackText}>
-              {data.explanation}
-            </Text>
-            <View style={{backgroundColor: 'rgba(255,255,255,0.15)', padding: 16, borderRadius: 16, width: '100%', marginTop: 16, marginBottom: 24, borderWidth: 1, borderColor: 'rgba(255,255,255,0.3)'}}>
-              <Text style={{fontSize: 12, fontWeight: '800', color: 'rgba(255,255,255,0.8)', marginBottom: 8, letterSpacing: 1}}>REALITY</Text>
-              <Text style={{fontSize: 16, color: '#FFF', fontWeight: '600', lineHeight: 24}}>{data.reality}</Text>
+
+            {/* Explanation */}
+            <Text style={mythStyles.resultExplanation}>{data.explanation}</Text>
+
+            {/* Reality Box */}
+            <View style={mythStyles.realityBox}>
+              <Text style={mythStyles.realityLabel}>THE REALITY</Text>
+              <Text style={mythStyles.realityText}>{data.reality}</Text>
             </View>
-            <TouchableOpacity style={styles.continueBtn} onPress={onComplete}>
-              <Text style={[styles.continueBtnText, { color: showFeedback === 'correct' ? THEME.success : THEME.error }]}>CONTINUE</Text>
+
+            {/* Continue Button */}
+            <TouchableOpacity 
+              style={[mythStyles.resultContinueBtn, { backgroundColor: showFeedback === 'correct' ? THEME.success : THEME.error, borderBottomColor: showFeedback === 'correct' ? '#1F9D55' : '#C53030' }]} 
+              onPress={onComplete}
+            >
+              <Text style={mythStyles.resultContinueBtnText}>CONTINUE</Text>
             </TouchableOpacity>
           </Animated.View>
         ) : (
           <GestureDetector gesture={pan}>
             <Animated.View style={[styles.swipeCard, cardStyle]}>
-              {/* Overlay Indications */}
-              <Animated.View style={[styles.overlayIndicator, { right: 20, backgroundColor: THEME.success }, rightOpacity]}>
-                <Text style={styles.overlayText}>TRUE</Text>
-              </Animated.View>
-              <Animated.View style={[styles.overlayIndicator, { left: 20, backgroundColor: THEME.error }, leftOpacity]}>
-                <Text style={styles.overlayText}>FALSE</Text>
-              </Animated.View>
-
               <View style={styles.mythBadge}>
                 <Icon name="Danger" size={24} color="#FFF" />
                 <Text style={styles.mythBadgeText}>MYTH?</Text>
               </View>
               <Text style={styles.mythText}>"{data.myth}"</Text>
+              
+              {/* Read Aloud Button */}
+              <TouchableOpacity 
+                style={[mythStyles.speakBtn, isSpeaking && mythStyles.speakBtnActive]} 
+                onPress={speakMyth}
+              >
+                <Icon 
+                  name={isSpeaking ? "VolumeSlash" : "VolumeHigh"} 
+                  size={24} 
+                  color={isSpeaking ? "#FFF" : THEME.primary} 
+                />
+                <Text style={[mythStyles.speakBtnText, isSpeaking && { color: '#FFF' }]}>
+                  {isSpeaking ? 'Stop' : 'Read Aloud'}
+                </Text>
+              </TouchableOpacity>
+
               <View style={styles.swipeInstructions}>
-                <View style={styles.swipeLeft}><Icon name="ArrowLeft2" size={24} color={THEME.error} variant="Bold" /><Text style={{color: THEME.error, fontWeight:'800', fontSize: 14}}>FALSE</Text></View>
-                <View style={styles.swipeRight}><Text style={{color: THEME.success, fontWeight:'800', fontSize: 14}}>TRUE</Text><Icon name="ArrowRight2" size={24} color={THEME.success} variant="Bold" /></View>
+                <View style={styles.swipeLeft}><Icon name="ArrowLeft2" size={24} color={THEME.error} variant="Bold" /><Text style={{color: THEME.error, fontWeight:'800', fontSize: 14}}>MYTH</Text></View>
+                <View style={styles.swipeRight}><Text style={{color: THEME.success, fontWeight:'800', fontSize: 14}}>FACT</Text><Icon name="ArrowRight2" size={24} color={THEME.success} variant="Bold" /></View>
               </View>
             </Animated.View>
           </GestureDetector>
@@ -178,314 +253,533 @@ const MythBusterView = ({ data, onComplete }: { data: any; onComplete: () => voi
   );
 };
 
-// 3. MicroLearn View
+// 3. MicroLearn View - Duolingo Style
 const MicroLearnView = ({ data, onComplete }: { data: any; onComplete: () => void }) => {
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  
+  // Simplified slides: intro, main content, all key points together, summary
+  const slides = [
+    { type: 'intro', title: data.title },
+    { type: 'content', content: data.content },
+    ...(data.keyPoints && data.keyPoints.length > 0 ? [{ type: 'keypoints', points: data.keyPoints }] : []),
+    { type: 'summary', title: data.title, content: data.content },
+  ];
+  
+  const isLastSlide = currentSlide === slides.length - 1;
+  const isFirstSlide = currentSlide === 0;
+  const currentContent = slides[currentSlide];
+  
+  const speakContent = () => {
+    if (isSpeaking) {
+      Speech.stop();
+      setIsSpeaking(false);
+    } else {
+      let text = '';
+      if (currentContent.type === 'intro') text = data.title;
+      else if (currentContent.type === 'content') text = currentContent.content;
+      else if (currentContent.type === 'keypoints') text = currentContent.points.join('. ');
+      else if (currentContent.type === 'summary') text = `Summary: ${data.title}. ${data.content}`;
+      
+      setIsSpeaking(true);
+      Speech.speak(text, { 
+        language: 'en', 
+        rate: 0.9,
+        onDone: () => setIsSpeaking(false),
+        onStopped: () => setIsSpeaking(false),
+      });
+    }
+  };
+
+  const handleNext = () => {
+    Speech.stop();
+    setIsSpeaking(false);
+    if (isLastSlide) {
+      onComplete();
+    } else {
+      setCurrentSlide(prev => prev + 1);
+    }
+  };
+
+  const handleBack = () => {
+    Speech.stop();
+    setIsSpeaking(false);
+    if (!isFirstSlide) {
+      setCurrentSlide(prev => prev - 1);
+    }
+  };
+
   return (
     <View style={styles.stepContainer}>
-      <ScrollView 
-        style={{ flex: 1 }} 
-        contentContainerStyle={{ paddingBottom: 20 }}
-        showsVerticalScrollIndicator={false}
-      >
-        <Animated.View entering={FadeInDown.delay(100)} style={{ alignItems: 'center', marginBottom: 24 }}>
-          <View style={styles.conceptBadge}>
-            <Icon name="Book" size={20} color="#FFF" variant="Bold" />
-            <Text style={styles.conceptBadgeText}>LEARN</Text>
-          </View>
-        </Animated.View>
+      {/* Progress Dots */}
+      <View style={learnStyles.progressDots}>
+        {slides.map((_, i) => (
+          <View 
+            key={i} 
+            style={[
+              learnStyles.dot, 
+              i === currentSlide && learnStyles.dotActive,
+              i < currentSlide && learnStyles.dotCompleted
+            ]} 
+          />
+        ))}
+      </View>
 
-        <Animated.View entering={FadeInDown.delay(200)} style={styles.conceptCard}>
-          <Animated.View entering={FadeInDown.delay(300)} style={styles.conceptImageContainer}>
-            <Image 
-              source={require('@/assets/images/mascot/idea.png')} 
-              style={styles.conceptMascot}
-              resizeMode="contain"
+      <View style={{ flex: 1, justifyContent: 'center' }}>
+        {/* Content Card */}
+        <Animated.View 
+          key={currentSlide}
+          entering={FadeInDown.duration(300)} 
+          style={learnStyles.slideCard}
+        >
+          {/* Speaker Button */}
+          <TouchableOpacity 
+            style={learnStyles.speakerBtn}
+            onPress={speakContent}
+          >
+            <Icon 
+              name={isSpeaking ? "VolumeSlash" : "VolumeHigh"} 
+              size={22} 
+              color={isSpeaking ? '#FFF' : THEME.primary} 
             />
-          </Animated.View>
-          
-          <Text style={styles.conceptTitle}>{data.title}</Text>
-          <Text style={styles.conceptText}>{data.content}</Text>
-          
-          {data.keyPoints && data.keyPoints.length > 0 && (
-            <View style={styles.keyPointsWrapper}>
-              {data.keyPoints.map((point: string, index: number) => (
-                <Animated.View 
-                  key={index} 
-                  entering={FadeInDown.delay(400 + index * 100)}
-                  style={styles.keyPointRow}
-                >
-                  <View style={styles.keyPointDot}>
-                    <Icon name="TickCircle" size={18} color={THEME.primary} variant="Bold" />
+          </TouchableOpacity>
+
+          {currentContent.type === 'intro' && (
+            <>
+              <View style={learnStyles.badgeRow}>
+                <View style={learnStyles.learnBadge}>
+                  <Icon name="Book" size={18} color="#FFF" variant="Bold" />
+                  <Text style={learnStyles.badgeText}>LEARN</Text>
+                </View>
+              </View>
+              <Image 
+                source={require('@/assets/images/mascot/idea.png')} 
+                style={learnStyles.mascotImg}
+                resizeMode="contain"
+              />
+              <Text style={learnStyles.titleText}>{data.title}</Text>
+              <Text style={learnStyles.subtitleText}>Let's learn something new!</Text>
+            </>
+          )}
+
+          {currentContent.type === 'content' && (
+            <>
+              <Image 
+                source={require('@/assets/images/mascot/explain.png')} 
+                style={learnStyles.mascotSmall}
+                resizeMode="contain"
+              />
+              <Text style={learnStyles.contentText}>{currentContent.content}</Text>
+            </>
+          )}
+
+          {currentContent.type === 'keypoints' && (
+            <ScrollView 
+              style={{ width: '100%' }} 
+              contentContainerStyle={{ paddingVertical: 8 }}
+              showsVerticalScrollIndicator={false}
+            >
+              <View style={learnStyles.keypointsHeader}>
+                <Icon name="TickCircle" size={24} color={THEME.success} variant="Bold" />
+                <Text style={learnStyles.keypointsTitle}>KEY POINTS</Text>
+              </View>
+              {currentContent.points.map((point: string, i: number) => (
+                <View key={i} style={learnStyles.keypointItem}>
+                  <View style={learnStyles.keypointBullet}>
+                    <Text style={learnStyles.keypointNumber}>{i + 1}</Text>
                   </View>
-                  <Text style={styles.keyPointText}>{point}</Text>
-                </Animated.View>
+                  <Text style={learnStyles.keypointItemText}>{point}</Text>
+                </View>
               ))}
-            </View>
+            </ScrollView>
+          )}
+
+          {currentContent.type === 'summary' && (
+            <>
+              <View style={learnStyles.summaryBadge}>
+                <Icon name="DocumentText" size={20} color="#FFF" variant="Bold" />
+              </View>
+              <Text style={learnStyles.summaryLabel}>SUMMARY</Text>
+              <Text style={learnStyles.summaryTitle}>{data.title}</Text>
+              <View style={learnStyles.summaryDivider} />
+              <Text style={learnStyles.summaryText}>{data.content}</Text>
+              <Image 
+                source={require('@/assets/images/mascot/happy.png')} 
+                style={learnStyles.summaryMascot}
+                resizeMode="contain"
+              />
+            </>
           )}
         </Animated.View>
-      </ScrollView>
+      </View>
 
-      <Animated.View entering={FadeInDown.delay(600)} style={{ width: '100%', paddingTop: 16 }}>
-        <TouchableOpacity style={styles.mainBtn} onPress={onComplete}>
-          <Text style={styles.mainBtnText}>GOT IT</Text>
+      {/* Navigation Buttons */}
+      <View style={learnStyles.navRow}>
+        {!isFirstSlide && (
+          <TouchableOpacity style={learnStyles.backBtn} onPress={handleBack}>
+            <Icon name="ArrowLeft2" size={20} color={THEME.text} variant="Bold" />
+          </TouchableOpacity>
+        )}
+        
+        <TouchableOpacity 
+          style={[learnStyles.continueBtn, isLastSlide && { backgroundColor: THEME.success, borderColor: '#1F9D55' }]} 
+          onPress={handleNext}
+        >
+          <Text style={learnStyles.continueBtnText}>{isLastSlide ? 'GOT IT!' : 'CONTINUE'}</Text>
           <Icon name="ArrowRight2" size={20} color="#FFF" variant="Bold" />
         </TouchableOpacity>
-      </Animated.View>
+      </View>
     </View>
   );
 };
 
-// 4. Lab View (Mini Sim)
-const LabView = ({ data, onComplete }: { data: any; onComplete: () => void }) => {
+// 4. Lab View (Mini Sim) - Duolingo Style
+const LabView = ({ data, onComplete, onBack }: { data: any; onComplete: () => void; onBack?: () => void }) => {
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [showFeedback, setShowFeedback] = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const scrollViewRef = useRef<ScrollView>(null);
 
   const handleSelect = (optionId: string) => {
+    if (showFeedback) return;
     setSelectedOption(optionId);
+  };
+
+  const handleCheck = () => {
+    if (!selectedOption) return;
     setShowFeedback(true);
+    // Auto-scroll to feedback after a short delay
+    setTimeout(() => {
+      scrollViewRef.current?.scrollToEnd({ animated: true });
+    }, 100);
   };
 
   const isCorrect = selectedOption === data.correctAnswer;
 
-  return (
-    <View style={styles.stepContainer}>
-      <ScrollView 
-        style={{ flex: 1 }} 
-        contentContainerStyle={{ paddingBottom: 20 }}
-        showsVerticalScrollIndicator={false}
-      >
-        <Animated.View entering={FadeInDown.delay(100)} style={{ alignItems: 'center', marginBottom: 24 }}>
-          <View style={[styles.conceptBadge, { backgroundColor: '#8B5CF6' }]}>
-            <Icon name="Microscope" size={20} color="#FFF" variant="Bold" />
-            <Text style={styles.conceptBadgeText}>LAB</Text>
-          </View>
-        </Animated.View>
-
-        <Text style={styles.stepSubHeader}>{data.title}</Text>
-        
-        <Animated.View entering={FadeInDown.delay(200)} style={styles.labCard}>
-          <View style={styles.labIconWrapper}>
-            <Image 
-              source={require('@/assets/images/mascot/experiment.png')} 
-              style={styles.labMascot}
-              resizeMode="contain"
-            />
-          </View>
-          <Text style={styles.conceptText}>{data.description}</Text>
-          <View style={styles.taskBox}>
-            <Text style={styles.taskLabel}>YOUR TASK</Text>
-            <Text style={styles.taskText}>{data.task}</Text>
-          </View>
-        </Animated.View>
-
-        {/* Options */}
-        <View style={styles.optionsRow}>
-        {data.options.map((option: any, index: number) => {
-          const isSelected = selectedOption === option.id;
-          const showCorrect = showFeedback && option.id === data.correctAnswer;
-          const showWrong = showFeedback && isSelected && !isCorrect;
-
-          let buttonStyle: any = styles.optionBtn;
-          
-          if (isSelected && !showFeedback) {
-            buttonStyle = [styles.optionBtn, styles.optionBtnActive];
-          } else if (showCorrect) {
-            buttonStyle = [styles.optionBtn, { borderColor: THEME.success, backgroundColor: THEME.success + '20' }];
-          } else if (showWrong) {
-            buttonStyle = [styles.optionBtn, { borderColor: THEME.error, backgroundColor: THEME.error + '20' }];
-          }
-
-          return (
-            <Animated.View key={option.id} entering={FadeInDown.delay(300 + index * 100)} style={{ flex: 1 }}>
-              <TouchableOpacity 
-                style={buttonStyle}
-                onPress={() => !showFeedback && handleSelect(option.id)}
-                disabled={showFeedback}
-              >
-                <Icon name={option.icon as any} size={32} color={showCorrect ? THEME.success : showWrong ? THEME.error : THEME.primary} variant="Bold" />
-                <Text style={[styles.optionText, { textAlign: 'center', marginTop: 8, fontSize: 13 }]}>{option.label}</Text>
-                {showCorrect && <View style={styles.correctBadge}><Icon name="TickCircle" size={18} color={THEME.success} variant="Bold" /></View>}
-                {showWrong && <View style={styles.wrongBadge}><Icon name="CloseCircle" size={18} color={THEME.error} variant="Bold" /></View>}
-              </TouchableOpacity>
-            </Animated.View>
-          );
-        })}
-      </View>
-
-        {showFeedback && (
-          <Animated.View entering={FadeInDown} style={[styles.feedbackBox, { backgroundColor: isCorrect ? THEME.success + '15' : THEME.error + '15', borderColor: isCorrect ? THEME.success : THEME.error }]}>
-            <View style={styles.feedbackHeader}>
-              {isCorrect ? (
-                <Image 
-                  source={require('@/assets/images/mascot/happy.png')} 
-                  style={styles.feedbackMascot}
-                  resizeMode="contain"
-                />
-              ) : (
-                <Image 
-                  source={require('@/assets/images/mascot/fix.png')} 
-                  style={styles.feedbackMascot}
-                  resizeMode="contain"
-                />
-              )}
-              <Text style={[styles.feedbackHeaderText, { color: isCorrect ? THEME.success : THEME.error }]}>
-                {isCorrect ? "Perfect!" : "Not quite!"}
-              </Text>
-            </View>
-            <Text style={styles.conceptText}>{data.explanation}</Text>
-          </Animated.View>
-        )}
-      </ScrollView>
-
-      {showFeedback && (
-        <Animated.View entering={FadeInDown.delay(200)} style={{ width: '100%', paddingTop: 16 }}>
-          <TouchableOpacity 
-            style={[styles.mainBtn, isCorrect ? { backgroundColor: THEME.success, borderColor: '#25A25A' } : {}]} 
-            onPress={onComplete}
-          >
-            <Text style={styles.mainBtnText}>CONTINUE</Text>
-            <Icon name="ArrowRight2" size={20} color="#FFF" variant="Bold" />
-          </TouchableOpacity>
-        </Animated.View>
-      )}
-    </View>
-  );
-};
-
-// 5. Assessment (Quiz)
-const AssessmentView = ({ data, onComplete }: { data: any; onComplete: () => void }) => {
-  const [selected, setSelected] = useState<number | null>(null);
-  const [confirmed, setConfirmed] = useState(false);
-  const correctIndex = data.correctIndex;
-
-  const handleCheck = () => {
-    if (selected === null) return;
-    if (!confirmed) {
-      setConfirmed(true);
+  const speakTask = () => {
+    if (isSpeaking) {
+      Speech.stop();
+      setIsSpeaking(false);
     } else {
-      // User clicked continue after seeing feedback
-      onComplete();
+      setIsSpeaking(true);
+      Speech.speak(data.task, { 
+        language: 'en', 
+        rate: 0.9,
+        onDone: () => setIsSpeaking(false),
+        onStopped: () => setIsSpeaking(false),
+      });
     }
   };
 
   return (
     <View style={styles.stepContainer}>
       <ScrollView 
+        ref={scrollViewRef}
         style={{ flex: 1 }} 
-        contentContainerStyle={{ paddingBottom: 20 }}
+        contentContainerStyle={{ paddingBottom: 16 }}
         showsVerticalScrollIndicator={false}
       >
-        <Animated.View entering={FadeInDown.delay(100)} style={{ alignItems: 'center', marginBottom: 24 }}>
-          <View style={[styles.conceptBadge, { backgroundColor: THEME.gold }]}>
-            <Icon name="DocumentText" size={20} color="#FFF" variant="Bold" />
-            <Text style={styles.conceptBadgeText}>QUIZ</Text>
+      {/* Header Card */}
+      <Animated.View entering={FadeInDown.duration(300)} style={labStyles.headerCard}>
+        <View style={labStyles.badgeRow}>
+          <View style={labStyles.labBadge}>
+            <Icon name="Microscope" size={18} color="#FFF" variant="Bold" />
+            <Text style={labStyles.badgeText}>LAB</Text>
           </View>
-        </Animated.View>
-        
-        <Animated.View entering={FadeInDown.delay(200)} style={styles.quizCard}>
-        <View style={styles.questionIconWrapper}>
-          <Icon name="MessageQuestion" size={28} color={THEME.primary} variant="Bold" />
+          <TouchableOpacity style={labStyles.speakerBtn} onPress={speakTask}>
+            <Icon name={isSpeaking ? "VolumeSlash" : "VolumeHigh"} size={20} color={isSpeaking ? '#FFF' : '#8B5CF6'} />
+          </TouchableOpacity>
         </View>
-        <Text style={styles.questionText}>{data.question}</Text>
         
-        <View style={styles.quizOptions}>
-          {data.options.map((opt: string, index: number) => {
-            const btnStyle = [styles.quizOption];
-            
-            if (confirmed) {
-              if (index === correctIndex) {
-                btnStyle.push(styles.quizOptionCorrect);
-              } else if (index === selected) {
-                btnStyle.push(styles.quizOptionWrong);
-              }
-            } else if (selected === index) {
-              btnStyle.push(styles.quizOptionSelected);
-            }
+        <Image 
+          source={require('@/assets/images/mascot/experiment.png')} 
+          style={labStyles.mascot}
+          resizeMode="contain"
+        />
+        
+        <Text style={labStyles.taskText}>{data.task}</Text>
+      </Animated.View>
 
-            const optionLetter = String.fromCharCode(65 + index); // A, B, C, D
+      {/* Options Grid */}
+      <View style={labStyles.optionsGrid}>
+        {data.options.map((option: any, index: number) => {
+          const isSelected = selectedOption === option.id;
+          const showCorrectMark = showFeedback && option.id === data.correctAnswer;
+          const showWrongMark = showFeedback && isSelected && !isCorrect;
+
+          return (
+            <Animated.View 
+              key={option.id} 
+              entering={FadeInDown.delay(100 + index * 80)} 
+              style={labStyles.optionWrapper}
+            >
+              <TouchableOpacity 
+                style={[
+                  labStyles.optionCard,
+                  isSelected && !showFeedback && labStyles.optionSelected,
+                  showCorrectMark && labStyles.optionCorrect,
+                  showWrongMark && labStyles.optionWrong,
+                ]}
+                onPress={() => handleSelect(option.id)}
+                disabled={showFeedback}
+                activeOpacity={0.8}
+              >
+                <View style={[
+                  labStyles.optionIconCircle,
+                  isSelected && !showFeedback && { backgroundColor: THEME.primary + '20' },
+                  showCorrectMark && { backgroundColor: THEME.success + '20' },
+                  showWrongMark && { backgroundColor: THEME.error + '20' },
+                ]}>
+                  <Icon 
+                    name={option.icon as any} 
+                    size={28} 
+                    color={showCorrectMark ? THEME.success : showWrongMark ? THEME.error : isSelected ? THEME.primary : THEME.textMuted} 
+                    variant="Bold" 
+                  />
+                </View>
+                <Text style={[
+                  labStyles.optionLabel,
+                  isSelected && !showFeedback && { color: THEME.primary, fontWeight: '700' },
+                  showCorrectMark && { color: THEME.success, fontWeight: '700' },
+                  showWrongMark && { color: THEME.error, fontWeight: '700' },
+                ]}>
+                  {option.label}
+                </Text>
+                
+                {/* Selection/Result indicator */}
+                {(isSelected || showCorrectMark) && (
+                  <View style={[
+                    labStyles.checkCircle,
+                    showCorrectMark && { backgroundColor: THEME.success, borderColor: THEME.success },
+                    showWrongMark && { backgroundColor: THEME.error, borderColor: THEME.error },
+                    isSelected && !showFeedback && { backgroundColor: THEME.primary, borderColor: THEME.primary },
+                  ]}>
+                    <Icon 
+                      name={showWrongMark ? "CloseCircle" : "TickCircle"} 
+                      size={16} 
+                      color="#FFF" 
+                      variant="Bold"
+                    />
+                  </View>
+                )}
+              </TouchableOpacity>
+            </Animated.View>
+          );
+        })}
+      </View>
+
+      {/* Feedback Card */}
+      {showFeedback && (
+        <Animated.View 
+          entering={FadeInDown.duration(300)} 
+          style={[labStyles.feedbackCard, isCorrect ? labStyles.feedbackCorrect : labStyles.feedbackWrong]}
+        >
+          <View style={labStyles.feedbackHeader}>
+            <Icon 
+              name={isCorrect ? "TickCircle" : "CloseCircle"} 
+              size={24} 
+              color={isCorrect ? THEME.success : THEME.error} 
+              variant="Bold"
+            />
+            <Text style={[labStyles.feedbackTitle, { color: isCorrect ? THEME.success : THEME.error }]}>
+              {isCorrect ? "Excellent!" : "Not quite!"}
+            </Text>
+          </View>
+          <Text style={labStyles.feedbackText}>{data.explanation}</Text>
+        </Animated.View>
+      )}
+      </ScrollView>
+
+      {/* Bottom Buttons */}
+      <View style={labStyles.navRow}>
+        {onBack && !showFeedback && (
+          <TouchableOpacity style={labStyles.backBtn} onPress={onBack}>
+            <Icon name="ArrowLeft2" size={20} color={THEME.text} variant="Bold" />
+          </TouchableOpacity>
+        )}
+        
+        {!showFeedback ? (
+          <TouchableOpacity 
+            style={[labStyles.checkBtn, !selectedOption && labStyles.checkBtnDisabled, !onBack && { flex: 1 }]} 
+            onPress={handleCheck}
+            disabled={!selectedOption}
+          >
+            <Text style={labStyles.checkBtnText}>CHECK</Text>
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity 
+            style={[labStyles.continueBtn, isCorrect && { backgroundColor: THEME.success, borderColor: '#1F9D55' }]} 
+            onPress={onComplete}
+          >
+            <Text style={labStyles.continueBtnText}>CONTINUE</Text>
+            <Icon name="ArrowRight2" size={20} color="#FFF" variant="Bold" />
+          </TouchableOpacity>
+        )}
+      </View>
+    </View>
+  );
+};
+
+// 5. Assessment (Quiz) - Duolingo Style
+const AssessmentView = ({ data, onComplete }: { data: any; onComplete: () => void }) => {
+  const [selected, setSelected] = useState<number | null>(null);
+  const [confirmed, setConfirmed] = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const scrollViewRef = useRef<ScrollView>(null);
+  const correctIndex = data.correctIndex;
+  const isCorrect = selected === correctIndex;
+
+  const speakQuestion = () => {
+    if (isSpeaking) {
+      Speech.stop();
+      setIsSpeaking(false);
+    } else {
+      setIsSpeaking(true);
+      Speech.speak(data.question, { 
+        language: 'en', 
+        rate: 0.9,
+        onDone: () => setIsSpeaking(false),
+        onStopped: () => setIsSpeaking(false),
+      });
+    }
+  };
+
+  const handleCheck = () => {
+    if (selected === null) return;
+    setConfirmed(true);
+    // Auto-scroll to feedback after a short delay
+    setTimeout(() => {
+      scrollViewRef.current?.scrollToEnd({ animated: true });
+    }, 100);
+  };
+
+  return (
+    <View style={styles.stepContainer}>
+      <ScrollView 
+        ref={scrollViewRef}
+        style={{ flex: 1 }} 
+        contentContainerStyle={{ paddingBottom: 16 }}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Question Card */}
+        <Animated.View entering={FadeInDown.duration(300)} style={quizStyles.questionCard}>
+          <View style={quizStyles.questionHeader}>
+            <View style={quizStyles.quizBadge}>
+              <Icon name="Cup" size={18} color="#FFF" variant="Bold" />
+              <Text style={quizStyles.badgeText}>QUIZ</Text>
+            </View>
+            <TouchableOpacity style={quizStyles.speakerBtn} onPress={speakQuestion}>
+              <Icon name={isSpeaking ? "VolumeSlash" : "VolumeHigh"} size={20} color={isSpeaking ? '#FFF' : THEME.gold} />
+            </TouchableOpacity>
+          </View>
+          
+          <Text style={quizStyles.questionText}>{data.question}</Text>
+        </Animated.View>
+
+        {/* Options */}
+        <View style={quizStyles.optionsContainer}>
+          {data.options.map((opt: string, index: number) => {
+            const isSelected = selected === index;
+            const showCorrectMark = confirmed && index === correctIndex;
+            const showWrongMark = confirmed && isSelected && !isCorrect;
+            const optionLetter = String.fromCharCode(65 + index);
 
             return (
-              <Animated.View key={opt} entering={FadeInDown.delay(300 + index * 100)}>
+              <Animated.View key={opt} entering={FadeInDown.delay(100 + index * 80)}>
                 <TouchableOpacity 
-                  style={btnStyle}
+                  style={[
+                    quizStyles.optionCard,
+                    isSelected && !confirmed && quizStyles.optionSelected,
+                    showCorrectMark && quizStyles.optionCorrect,
+                    showWrongMark && quizStyles.optionWrong,
+                  ]}
                   onPress={() => !confirmed && setSelected(index)}
                   activeOpacity={0.8}
                   disabled={confirmed}
                 >
-                  <View style={styles.quizOptionContent}>
-                    <View style={[
-                      styles.optionLetter,
-                      selected === index && !confirmed && { backgroundColor: THEME.primary },
-                      confirmed && index === correctIndex && { backgroundColor: THEME.success },
-                      confirmed && index === selected && index !== correctIndex && { backgroundColor: THEME.error }
-                    ]}>
-                      <Text style={[
-                        styles.optionLetterText,
-                        (selected === index || (confirmed && index === correctIndex)) && { color: '#FFF' }
-                      ]}>{optionLetter}</Text>
-                    </View>
-                    <Text style={[styles.quizOptionText, (confirmed || selected === index) && { fontWeight: '700' }]}>{opt}</Text>
+                  <View style={[
+                    quizStyles.optionLetter,
+                    isSelected && !confirmed && quizStyles.optionLetterSelected,
+                    showCorrectMark && quizStyles.optionLetterCorrect,
+                    showWrongMark && quizStyles.optionLetterWrong,
+                  ]}>
+                    <Text style={[
+                      quizStyles.optionLetterText,
+                      (isSelected || showCorrectMark || showWrongMark) && { color: '#FFF' }
+                    ]}>{optionLetter}</Text>
                   </View>
-                  {confirmed && index === correctIndex && <Icon name="TickCircle" size={24} color={THEME.success} variant="Bold" />}
-                  {confirmed && index === selected && index !== correctIndex && <Icon name="CloseCircle" size={24} color={THEME.error} variant="Bold" />}
+                  
+                  <Text style={[
+                    quizStyles.optionText,
+                    isSelected && !confirmed && { color: THEME.primary, fontWeight: '700' },
+                    showCorrectMark && { color: THEME.success, fontWeight: '700' },
+                    showWrongMark && { color: THEME.error, fontWeight: '700' },
+                  ]}>{opt}</Text>
+
+                  {showCorrectMark && (
+                    <Icon name="TickCircle" size={24} color={THEME.success} variant="Bold" />
+                  )}
+                  {showWrongMark && (
+                    <Icon name="CloseCircle" size={24} color={THEME.error} variant="Bold" />
+                  )}
                 </TouchableOpacity>
               </Animated.View>
             );
           })}
         </View>
-      </Animated.View>
 
+        {/* Feedback */}
         {confirmed && (
-          <Animated.View entering={FadeInDown} style={[styles.feedbackBox, { backgroundColor: selected === correctIndex ? THEME.success + '15' : THEME.error + '15', borderColor: selected === correctIndex ? THEME.success : THEME.error }]}>
-            <View style={styles.feedbackHeader}>
-              {selected === correctIndex ? (
-                <Image 
-                  source={require('@/assets/images/mascot/happy.png')} 
-                  style={styles.feedbackMascot}
-                  resizeMode="contain"
-                />
-              ) : (
-                <Image 
-                  source={require('@/assets/images/mascot/fix.png')} 
-                  style={styles.feedbackMascot}
-                  resizeMode="contain"
-                />
-              )}
-              <Text style={[styles.feedbackHeaderText, { color: selected === correctIndex ? THEME.success : THEME.error }]}>
-                {selected === correctIndex ? "Excellent!" : "Explanation"}
+          <Animated.View 
+            entering={FadeInDown.duration(300)} 
+            style={[quizStyles.feedbackCard, isCorrect ? quizStyles.feedbackCorrect : quizStyles.feedbackWrong]}
+          >
+            <View style={quizStyles.feedbackHeader}>
+              <Icon 
+                name={isCorrect ? "TickCircle" : "CloseCircle"} 
+                size={24} 
+                color={isCorrect ? THEME.success : THEME.error} 
+                variant="Bold"
+              />
+              <Text style={[quizStyles.feedbackTitle, { color: isCorrect ? THEME.success : THEME.error }]}>
+                {isCorrect ? "Correct!" : "Not quite!"}
               </Text>
             </View>
-            <Text style={styles.conceptText}>{data.explanation}</Text>
+            <Text style={quizStyles.feedbackText}>{data.explanation}</Text>
           </Animated.View>
         )}
       </ScrollView>
 
-      <Animated.View entering={FadeInDown.delay(confirmed ? 0 : 400)} style={{ width: '100%', paddingTop: 16 }}>
-        <TouchableOpacity 
-          style={[
-            styles.mainBtn, 
-            selected === null && styles.mainBtnDisabled,
-            confirmed && selected === correctIndex && { backgroundColor: THEME.success, borderColor: '#25A25A' }
-          ]} 
-          onPress={handleCheck}
-          disabled={selected === null}
-        >
-          {!confirmed && <Icon name="TickSquare" size={20} color="#FFF" variant="Bold" />}
-          {confirmed && <Icon name="ArrowRight2" size={20} color="#FFF" variant="Bold" />}
-          <Text style={styles.mainBtnText}>
-            {confirmed ? 'CONTINUE' : 'CHECK ANSWER'}
-          </Text>
-        </TouchableOpacity>
-      </Animated.View>
+      {/* Bottom Button */}
+      <View style={{ paddingTop: 16 }}>
+        {!confirmed ? (
+          <TouchableOpacity 
+            style={[quizStyles.checkBtn, selected === null && quizStyles.checkBtnDisabled]} 
+            onPress={handleCheck}
+            disabled={selected === null}
+          >
+            <Text style={quizStyles.checkBtnText}>CHECK</Text>
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity 
+            style={[quizStyles.continueBtn, isCorrect && { backgroundColor: THEME.success, borderColor: '#1F9D55' }]} 
+            onPress={onComplete}
+          >
+            <Text style={quizStyles.continueBtnText}>CONTINUE</Text>
+            <Icon name="ArrowRight2" size={20} color="#FFF" variant="Bold" />
+          </TouchableOpacity>
+        )}
+      </View>
     </View>
   );
 };
 
 // 6. Debrief (Success)
-const DebriefView = ({ data, levelId }: { data: any; levelId: string }) => {
+const DebriefView = ({ data, levelId, isReplay = false }: { data: any; levelId: string; isReplay?: boolean }) => {
   const router = useRouter();
   const { addXP, updateUserProfile, userProfile } = useStorage();
   const [saved, setSaved] = useState(false);
+  const [rewardsAwarded, setRewardsAwarded] = useState(false);
   const scale = useSharedValue(0);
   const rotation = useSharedValue(0);
 
@@ -500,7 +794,7 @@ const DebriefView = ({ data, levelId }: { data: any; levelId: string }) => {
       
       try {
         // Check if lesson is already completed
-        const existingProgress = await getLevelProgress(levelId);
+        const existingProgress = await getLevelProgress(levelId) as { status?: string; completed_at?: string } | null;
         const isAlreadyCompleted = existingProgress?.status === 'completed';
         
         const xpEarned = data.rewards?.xp || 50;
@@ -514,8 +808,8 @@ const DebriefView = ({ data, levelId }: { data: any; levelId: string }) => {
           completed_at: existingProgress?.completed_at || new Date().toISOString()
         });
         
-        // Only award rewards if this is the first completion
-        if (!isAlreadyCompleted) {
+        // Only award rewards if this is the first completion (not a replay)
+        if (!isAlreadyCompleted && !isReplay) {
           // Add XP to user
           await addXP(xpEarned);
           
@@ -534,9 +828,10 @@ const DebriefView = ({ data, levelId }: { data: any; levelId: string }) => {
             time_spent_minutes: 5
           });
           
+          setRewardsAwarded(true);
           console.log('Lesson completed for the first time! Rewards awarded.');
         } else {
-          console.log('Lesson already completed. No rewards awarded.');
+          console.log('Lesson replay. No rewards awarded.');
         }
         
         setSaved(true);
@@ -559,6 +854,12 @@ const DebriefView = ({ data, levelId }: { data: any; levelId: string }) => {
   const xpReward = data.rewards?.xp || 50;
   const starsReward = data.rewards?.stars || 3;
 
+  // Different titles/messages for replay vs first completion
+  const title = isReplay ? 'Practice Complete!' : (data.title || 'Mission Complete!');
+  const message = isReplay 
+    ? 'Great review! You\'ve already mastered this lesson.'
+    : (data.message || 'Great job! You\'ve completed this lesson.');
+
   return (
     <View style={styles.fullScreenCenter}>
       {/* Decorative rotating rings */}
@@ -573,36 +874,51 @@ const DebriefView = ({ data, levelId }: { data: any; levelId: string }) => {
       </Animated.View>
       
       <Animated.View entering={FadeInDown.delay(200)}>
-        <Text style={styles.successTitle}>{data.title || 'Mission Complete!'}</Text>
-        <Text style={styles.successText}>{data.message || 'Great job! You\'ve completed this lesson.'}</Text>
+        <Text style={styles.successTitle}>{title}</Text>
+        <Text style={styles.successText}>{message}</Text>
       </Animated.View>
 
-      <Animated.View entering={FadeInDown.delay(400)} style={styles.rewardRow}>
-        <View style={styles.rewardPill}>
-          <LinearGradient
-            colors={[THEME.primary, THEME.primaryLight]}
-            style={styles.rewardIconWrapper}
-          >
-            <Icon name="Flash" size={20} color="#FFF" variant="Bold" />
-          </LinearGradient>
-          <View>
-            <Text style={styles.rewardLabel}>XP Earned</Text>
-            <Text style={styles.rewardText}>+{xpReward}</Text>
+      {/* Show rewards only if not a replay */}
+      {rewardsAwarded ? (
+        <Animated.View entering={FadeInDown.delay(400)} style={styles.rewardRow}>
+          <View style={styles.rewardPill}>
+            <LinearGradient
+              colors={[THEME.primary, THEME.primaryLight]}
+              style={styles.rewardIconWrapper}
+            >
+              <Icon name="Flash" size={20} color="#FFF" variant="Bold" />
+            </LinearGradient>
+            <View>
+              <Text style={styles.rewardLabel}>XP Earned</Text>
+              <Text style={styles.rewardText}>+{xpReward}</Text>
+            </View>
           </View>
-        </View>
-        <View style={styles.rewardPill}>
-          <LinearGradient
-            colors={[THEME.gold, '#FFA000']}
-            style={styles.rewardIconWrapper}
-          >
-            <Icon name="Star1" size={20} color="#FFF" variant="Bold" />
-          </LinearGradient>
-          <View>
-            <Text style={styles.rewardLabel}>Stars</Text>
-            <Text style={styles.rewardText}>{starsReward}</Text>
+          <View style={styles.rewardPill}>
+            <LinearGradient
+              colors={[THEME.gold, '#FFA000']}
+              style={styles.rewardIconWrapper}
+            >
+              <Icon name="Star1" size={20} color="#FFF" variant="Bold" />
+            </LinearGradient>
+            <View>
+              <Text style={styles.rewardLabel}>Stars</Text>
+              <Text style={styles.rewardText}>{starsReward}</Text>
+            </View>
           </View>
-        </View>
-      </Animated.View>
+        </Animated.View>
+      ) : (
+        <Animated.View entering={FadeInDown.delay(400)} style={styles.rewardRow}>
+          <View style={[styles.rewardPill, { opacity: 0.6 }]}>
+            <View style={[styles.rewardIconWrapper, { backgroundColor: THEME.textMuted }]}>
+              <Icon name="TickCircle" size={20} color="#FFF" variant="Bold" />
+            </View>
+            <View>
+              <Text style={styles.rewardLabel}>Already Earned</Text>
+              <Text style={[styles.rewardText, { color: THEME.textMuted }]}>{xpReward} XP</Text>
+            </View>
+          </View>
+        </Animated.View>
+      )}
 
       <Animated.View entering={FadeInDown.delay(600)} style={{ width: '100%' }}>
         <TouchableOpacity style={[styles.mainBtn, { backgroundColor: THEME.success, borderColor: '#25A25A' }]} onPress={() => router.back()}>
@@ -617,25 +933,34 @@ const DebriefView = ({ data, levelId }: { data: any; levelId: string }) => {
 export default function LessonScreen() {
   const { id } = useLocalSearchParams();
   const [step, setStep] = useState(0);
+  const [isReplay, setIsReplay] = useState(false);
   const router = useRouter();
   const levelId = typeof id === 'string' ? id : 'radiation-shielding';
   
   // Load lesson from content system
   const lesson = getLessonById(levelId);
 
-  // Mark level as in progress when starting
+  // Check if this is a replay and only mark in_progress for new lessons
   useEffect(() => {
-    const markInProgress = async () => {
+    const checkAndMarkProgress = async () => {
       try {
-        await updateLevelProgress(levelId, {
-          status: 'in_progress'
-        });
+        const existingProgress = await getLevelProgress(levelId) as { status?: string } | null;
+        const isAlreadyCompleted = existingProgress?.status === 'completed';
+        
+        setIsReplay(isAlreadyCompleted);
+        
+        // Only mark as in_progress if not already completed
+        if (!isAlreadyCompleted) {
+          await updateLevelProgress(levelId, {
+            status: 'in_progress'
+          });
+        }
       } catch (error) {
-        console.error('Error marking level in progress:', error);
+        console.error('Error checking/marking level progress:', error);
       }
     };
     
-    markInProgress();
+    checkAndMarkProgress();
   }, [levelId]);
 
   // If lesson not found, show error
@@ -677,11 +1002,11 @@ export default function LessonScreen() {
       case 'micro_learn':
         return <MicroLearnView data={currentStep.data} onComplete={nextStep} />;
       case 'lab':
-        return <LabView data={currentStep.data} onComplete={nextStep} />;
+        return <LabView data={currentStep.data} onComplete={nextStep} onBack={step > 0 ? () => setStep(s => s - 1) : undefined} />;
       case 'assessment':
         return <AssessmentView data={currentStep.data} onComplete={nextStep} />;
       case 'debrief':
-        return <DebriefView data={currentStep.data} levelId={levelId} />;
+        return <DebriefView data={currentStep.data} levelId={levelId} isReplay={isReplay} />;
       default:
         return <BriefingView data={currentStep.data} onComplete={nextStep} />;
     }
@@ -1248,3 +1573,742 @@ const styles = StyleSheet.create({
   },
 });
 
+// Myth Buster specific styles
+const mythStyles = StyleSheet.create({
+  fullHeightIndicators: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    pointerEvents: 'none',
+    zIndex: 10,
+  },
+  indicatorLeftFull: {
+    width: 120,
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  indicatorRightFull: {
+    width: 120,
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  indicatorContent: {
+    alignItems: 'center',
+    gap: 8,
+  },
+  indicatorTextLeft: {
+    color: THEME.error,
+    fontWeight: '800',
+    fontSize: 16,
+    letterSpacing: 1,
+  },
+  indicatorTextRight: {
+    color: THEME.success,
+    fontWeight: '800',
+    fontSize: 16,
+    letterSpacing: 1,
+  },
+  speakBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFF3E0',
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    borderRadius: 25,
+    gap: 10,
+    marginBottom: 24,
+    borderWidth: 2,
+    borderColor: THEME.primary,
+  },
+  speakBtnActive: {
+    backgroundColor: THEME.primary,
+    borderColor: THEME.primaryDark,
+  },
+  speakBtnText: {
+    color: THEME.primary,
+    fontWeight: '700',
+    fontSize: 14,
+  },
+  // Enhanced Result Card Styles
+  resultCard: {
+    width: width - 40,
+    backgroundColor: '#FFF',
+    borderRadius: 28,
+    padding: 24,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 12 },
+    shadowOpacity: 0.15,
+    shadowRadius: 24,
+    elevation: 12,
+    overflow: 'hidden',
+  },
+  resultCorrect: {
+    borderWidth: 2,
+    borderColor: THEME.success,
+    borderBottomWidth: 6,
+  },
+  resultIncorrect: {
+    borderWidth: 2,
+    borderColor: THEME.error,
+    borderBottomWidth: 6,
+  },
+  speakerBtn: {
+    position: 'absolute',
+    top: 16,
+    right: 16,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: '#F3F4F6',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 10,
+  },
+  resultIconCircle: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 12,
+    marginTop: 8,
+  },
+  resultTitle: {
+    fontSize: 26,
+    fontWeight: '800',
+    color: THEME.text,
+    marginBottom: 12,
+  },
+  resultExplanation: {
+    fontSize: 15,
+    color: THEME.text,
+    textAlign: 'center',
+    lineHeight: 22,
+    paddingHorizontal: 8,
+    marginBottom: 16,
+  },
+  realityBox: {
+    width: '100%',
+    backgroundColor: '#F9FAFB',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 20,
+  },
+  realityLabel: {
+    fontSize: 11,
+    fontWeight: '800',
+    color: THEME.gold,
+    letterSpacing: 1,
+    marginBottom: 6,
+  },
+  realityText: {
+    fontSize: 15,
+    color: THEME.text,
+    lineHeight: 22,
+  },
+  resultContinueBtn: {
+    width: '100%',
+    borderRadius: 14,
+    paddingVertical: 15,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderBottomWidth: 4,
+  },
+  resultContinueBtnText: {
+    color: '#FFF',
+    fontSize: 15,
+    fontWeight: '800',
+    letterSpacing: 0.5,
+  },
+});
+
+// Duolingo-style Learn Styles
+const learnStyles = StyleSheet.create({
+  progressDots: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 8,
+    marginBottom: 24,
+  },
+  dot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: '#E5E7EB',
+  },
+  dotActive: {
+    backgroundColor: THEME.primary,
+    width: 24,
+  },
+  dotCompleted: {
+    backgroundColor: THEME.success,
+  },
+  slideCard: {
+    backgroundColor: '#FFF',
+    borderRadius: 24,
+    padding: 24,
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: THEME.border,
+    borderBottomWidth: 6,
+    minHeight: 340,
+    maxHeight: 420,
+    justifyContent: 'center',
+  },
+  speakerBtn: {
+    position: 'absolute',
+    top: 16,
+    right: 16,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: '#F3F4F6',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 10,
+  },
+  badgeRow: {
+    marginBottom: 16,
+  },
+  learnBadge: {
+    backgroundColor: THEME.primary,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    borderBottomWidth: 3,
+    borderColor: THEME.primaryDark,
+  },
+  badgeText: {
+    color: '#FFF',
+    fontWeight: '800',
+    fontSize: 12,
+    letterSpacing: 1,
+  },
+  mascotImg: {
+    width: 120,
+    height: 120,
+    marginBottom: 16,
+  },
+  mascotSmall: {
+    width: 70,
+    height: 70,
+    marginBottom: 16,
+  },
+  titleText: {
+    fontSize: 24,
+    fontWeight: '800',
+    color: THEME.text,
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  subtitleText: {
+    fontSize: 15,
+    color: THEME.textMuted,
+    textAlign: 'center',
+  },
+  contentText: {
+    fontSize: 17,
+    color: THEME.text,
+    textAlign: 'center',
+    lineHeight: 26,
+    fontWeight: '500',
+  },
+  // Key Points - all in one slide
+  keypointsHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 16,
+    alignSelf: 'center',
+  },
+  keypointsTitle: {
+    fontSize: 14,
+    fontWeight: '800',
+    color: THEME.success,
+    letterSpacing: 1,
+  },
+  keypointItem: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 12,
+    marginBottom: 14,
+  },
+  keypointBullet: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: THEME.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  keypointNumber: {
+    color: '#FFF',
+    fontWeight: '800',
+    fontSize: 14,
+  },
+  keypointItemText: {
+    flex: 1,
+    fontSize: 15,
+    color: THEME.text,
+    lineHeight: 22,
+    fontWeight: '500',
+  },
+  // Summary slide
+  summaryBadge: {
+    width: 52,
+    height: 52,
+    borderRadius: 26,
+    backgroundColor: THEME.gold,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 12,
+  },
+  summaryLabel: {
+    fontSize: 12,
+    fontWeight: '800',
+    color: THEME.gold,
+    letterSpacing: 1,
+    marginBottom: 8,
+  },
+  summaryTitle: {
+    fontSize: 20,
+    fontWeight: '800',
+    color: THEME.text,
+    textAlign: 'center',
+    marginBottom: 12,
+  },
+  summaryDivider: {
+    width: 60,
+    height: 3,
+    backgroundColor: THEME.border,
+    borderRadius: 2,
+    marginBottom: 12,
+  },
+  summaryText: {
+    fontSize: 14,
+    color: THEME.textMuted,
+    textAlign: 'center',
+    lineHeight: 22,
+  },
+  summaryMascot: {
+    width: 60,
+    height: 60,
+    marginTop: 16,
+  },
+  // Navigation
+  navRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    marginTop: 16,
+  },
+  backBtn: {
+    width: 56,
+    height: 56,
+    borderRadius: 16,
+    backgroundColor: '#FFF',
+    borderWidth: 2,
+    borderColor: THEME.border,
+    borderBottomWidth: 4,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  continueBtn: {
+    flex: 1,
+    height: 56,
+    borderRadius: 16,
+    backgroundColor: THEME.primary,
+    borderBottomWidth: 4,
+    borderColor: THEME.primaryDark,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+  },
+  continueBtnText: {
+    color: '#FFF',
+    fontWeight: '800',
+    fontSize: 16,
+    letterSpacing: 0.5,
+  },
+});
+
+// Duolingo-style Lab Styles
+const labStyles = StyleSheet.create({
+  headerCard: {
+    backgroundColor: '#FFF',
+    borderRadius: 20,
+    padding: 20,
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: THEME.border,
+    borderBottomWidth: 5,
+    marginBottom: 20,
+  },
+  badgeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '100%',
+    marginBottom: 12,
+  },
+  labBadge: {
+    backgroundColor: '#8B5CF6',
+    paddingHorizontal: 14,
+    paddingVertical: 6,
+    borderRadius: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    borderBottomWidth: 2,
+    borderColor: '#7C3AED',
+  },
+  badgeText: {
+    color: '#FFF',
+    fontWeight: '800',
+    fontSize: 11,
+    letterSpacing: 1,
+  },
+  speakerBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#F3F4F6',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  mascot: {
+    width: 80,
+    height: 80,
+    marginBottom: 12,
+  },
+  taskText: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: THEME.text,
+    textAlign: 'center',
+    lineHeight: 26,
+  },
+  optionsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+  },
+  optionWrapper: {
+    width: '48%',
+  },
+  optionCard: {
+    backgroundColor: '#FFF',
+    borderRadius: 16,
+    padding: 16,
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: THEME.border,
+    borderBottomWidth: 4,
+    minHeight: 100,
+    position: 'relative',
+  },
+  optionSelected: {
+    borderColor: THEME.primary,
+    backgroundColor: THEME.primary + '08',
+  },
+  optionCorrect: {
+    borderColor: THEME.success,
+    backgroundColor: THEME.success + '10',
+  },
+  optionWrong: {
+    borderColor: THEME.error,
+    backgroundColor: THEME.error + '10',
+  },
+  optionIconCircle: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: '#F3F4F6',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 8,
+  },
+  optionLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: THEME.text,
+    textAlign: 'center',
+  },
+  checkCircle: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: THEME.primary,
+    borderWidth: 2,
+    borderColor: THEME.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  feedbackCard: {
+    borderRadius: 16,
+    padding: 16,
+    marginTop: 16,
+  },
+  feedbackCorrect: {
+    backgroundColor: THEME.success + '15',
+  },
+  feedbackWrong: {
+    backgroundColor: THEME.error + '15',
+  },
+  feedbackHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 8,
+  },
+  feedbackTitle: {
+    fontSize: 18,
+    fontWeight: '800',
+  },
+  feedbackText: {
+    fontSize: 15,
+    color: THEME.text,
+    lineHeight: 22,
+  },
+  checkBtn: {
+    flex: 1,
+    height: 56,
+    borderRadius: 16,
+    backgroundColor: '#8B5CF6',
+    borderBottomWidth: 4,
+    borderColor: '#7C3AED',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  checkBtnDisabled: {
+    backgroundColor: '#E5E7EB',
+    borderColor: '#D1D5DB',
+  },
+  checkBtnText: {
+    color: '#FFF',
+    fontWeight: '800',
+    fontSize: 16,
+    letterSpacing: 0.5,
+  },
+  continueBtn: {
+    flex: 1,
+    height: 56,
+    borderRadius: 16,
+    backgroundColor: THEME.primary,
+    borderBottomWidth: 4,
+    borderColor: THEME.primaryDark,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+  },
+  continueBtnText: {
+    color: '#FFF',
+    fontWeight: '800',
+    fontSize: 16,
+    letterSpacing: 0.5,
+  },
+  navRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    paddingTop: 16,
+  },
+  backBtn: {
+    width: 56,
+    height: 56,
+    borderRadius: 16,
+    backgroundColor: '#FFF',
+    borderWidth: 2,
+    borderColor: THEME.border,
+    borderBottomWidth: 4,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+});
+
+// Duolingo-style Quiz Styles
+const quizStyles = StyleSheet.create({
+  questionCard: {
+    backgroundColor: '#FFF',
+    borderRadius: 20,
+    padding: 20,
+    borderWidth: 2,
+    borderColor: THEME.border,
+    borderBottomWidth: 5,
+    marginBottom: 20,
+  },
+  questionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 16,
+  },
+  quizBadge: {
+    backgroundColor: THEME.gold,
+    paddingHorizontal: 14,
+    paddingVertical: 6,
+    borderRadius: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    borderBottomWidth: 2,
+    borderColor: '#D97706',
+  },
+  badgeText: {
+    color: '#FFF',
+    fontWeight: '800',
+    fontSize: 11,
+    letterSpacing: 1,
+  },
+  speakerBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#FEF3C7',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  questionText: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: THEME.text,
+    lineHeight: 28,
+    textAlign: 'center',
+  },
+  optionsContainer: {
+    gap: 12,
+  },
+  optionCard: {
+    backgroundColor: '#FFF',
+    borderRadius: 16,
+    padding: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: THEME.border,
+    borderBottomWidth: 4,
+    gap: 14,
+  },
+  optionSelected: {
+    borderColor: THEME.primary,
+    backgroundColor: THEME.primary + '08',
+  },
+  optionCorrect: {
+    borderColor: THEME.success,
+    backgroundColor: THEME.success + '10',
+  },
+  optionWrong: {
+    borderColor: THEME.error,
+    backgroundColor: THEME.error + '10',
+  },
+  optionLetter: {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    backgroundColor: '#F3F4F6',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: '#E5E7EB',
+  },
+  optionLetterSelected: {
+    backgroundColor: THEME.primary,
+    borderColor: THEME.primary,
+  },
+  optionLetterCorrect: {
+    backgroundColor: THEME.success,
+    borderColor: THEME.success,
+  },
+  optionLetterWrong: {
+    backgroundColor: THEME.error,
+    borderColor: THEME.error,
+  },
+  optionLetterText: {
+    fontSize: 16,
+    fontWeight: '800',
+    color: THEME.textMuted,
+  },
+  optionText: {
+    flex: 1,
+    fontSize: 16,
+    color: THEME.text,
+    fontWeight: '500',
+  },
+  feedbackCard: {
+    borderRadius: 16,
+    padding: 16,
+    marginTop: 16,
+  },
+  feedbackCorrect: {
+    backgroundColor: THEME.success + '15',
+  },
+  feedbackWrong: {
+    backgroundColor: THEME.error + '15',
+  },
+  feedbackHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 8,
+  },
+  feedbackTitle: {
+    fontSize: 18,
+    fontWeight: '800',
+  },
+  feedbackText: {
+    fontSize: 15,
+    color: THEME.text,
+    lineHeight: 22,
+  },
+  checkBtn: {
+    height: 56,
+    borderRadius: 16,
+    backgroundColor: THEME.gold,
+    borderBottomWidth: 4,
+    borderColor: '#D97706',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  checkBtnDisabled: {
+    backgroundColor: '#E5E7EB',
+    borderColor: '#D1D5DB',
+  },
+  checkBtnText: {
+    color: '#FFF',
+    fontWeight: '800',
+    fontSize: 16,
+    letterSpacing: 0.5,
+  },
+  continueBtn: {
+    height: 56,
+    borderRadius: 16,
+    backgroundColor: THEME.primary,
+    borderBottomWidth: 4,
+    borderColor: THEME.primaryDark,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+  },
+  continueBtnText: {
+    color: '#FFF',
+    fontWeight: '800',
+    fontSize: 16,
+    letterSpacing: 0.5,
+  },
+});

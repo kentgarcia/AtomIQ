@@ -14,8 +14,8 @@ const THEME = {
   card: '#FFFFFF',
   text: '#1F2937',
   textMuted: '#9CA3AF',
-  primary: '#FF6B00', // Orange
-  primaryDark: '#E65100',
+  primary: '#EA580C', // Orange
+  primaryDark: '#C2410C',
   border: '#E5E7EB',
   success: '#2ECC71',
   gold: '#FFC107',
@@ -82,11 +82,12 @@ const generateFeedItems = () => {
   });
 };
 
-export default function WikiScreen() {
+export default function CommunityScreen() {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedFilter, setSelectedFilter] = useState('All');
   const [bookmarkedIds, setBookmarkedIds] = useState<string[]>([]);
+  const [showSearch, setShowSearch] = useState(false);
   
   // Generate feed items
   const allFeedItems = useMemo(() => generateFeedItems(), []);
@@ -299,20 +300,33 @@ export default function WikiScreen() {
     <View style={{ flex: 1, backgroundColor: '#FFF' }}>
       {/* Fixed Header */}
       <View style={styles.headerContainer}>
-        <Text style={styles.headerTitle}>Learn & Explore</Text>
-        <Text style={styles.headerSubtitle}>Discover articles and interesting facts about nuclear energy</Text>
+        <View style={styles.headerRow}>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.headerTitle}>Learn & Explore</Text>
+            <Text style={styles.headerSubtitle}>Discover articles and interesting facts about nuclear energy</Text>
+          </View>
+          <TouchableOpacity 
+            style={styles.searchIconButton}
+            onPress={() => setShowSearch(!showSearch)}
+          >
+            <Icon name={showSearch ? "CloseCircle" : "SearchNormal"} size={24} color={THEME.primary} variant="Bold" />
+          </TouchableOpacity>
+        </View>
         
         {/* Search */}
-        <View style={styles.searchContainer}>
-          <Icon name="SearchNormal" size={20} color={THEME.textMuted} />
-          <TextInput 
-            style={styles.searchInput}
-            placeholder="Search articles and posts..."
-            placeholderTextColor={THEME.textMuted}
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-          />
-        </View>
+        {showSearch && (
+          <View style={styles.searchContainer}>
+            <Icon name="SearchNormal" size={20} color={THEME.textMuted} />
+            <TextInput 
+              style={styles.searchInput}
+              placeholder="Search articles and posts..."
+              placeholderTextColor={THEME.textMuted}
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+              autoFocus
+            />
+          </View>
+        )}
         
         {/* Filter Pills */}
         <View style={styles.filtersRow}>
@@ -372,6 +386,11 @@ const styles = StyleSheet.create({
     borderBottomWidth: 2,
     borderBottomColor: THEME.border,
   },
+  headerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
   headerTitle: {
     fontSize: 28,
     fontWeight: '800',
@@ -381,7 +400,14 @@ const styles = StyleSheet.create({
   headerSubtitle: {
     fontSize: 14,
     color: THEME.textMuted,
-    marginBottom: 16,
+  },
+  searchIconButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: THEME.primary + '15',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   searchContainer: {
     flexDirection: 'row',

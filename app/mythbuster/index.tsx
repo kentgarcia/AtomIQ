@@ -1,15 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Dimensions, SafeAreaView, ScrollView, Image } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Dimensions, SafeAreaView, ScrollView, Image, Pressable } from 'react-native';
 import { useRouter } from 'expo-router';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withSpring,
   withTiming,
+  withRepeat,
+  withSequence,
+  withDelay,
   runOnJS,
   interpolate,
   FadeInDown,
-  FadeOutUp
+  FadeInUp,
+  FadeOutUp,
+  ZoomIn,
+  BounceIn,
+  SlideInRight,
 } from 'react-native-reanimated';
 import { GestureDetector, Gesture, GestureHandlerRootView } from 'react-native-gesture-handler';
 import { Icon } from '@/components/ui/icon';
@@ -27,9 +34,9 @@ const THEME = {
   card: '#FFFFFF',
   text: '#1F2937',
   textMuted: '#9CA3AF',
-  primary: '#FF6B00',
-  primaryDark: '#E65100',
-  primaryLight: '#FF9E40',
+  primary: '#EA580C',
+  primaryDark: '#C2410C',
+  primaryLight: '#FB923C',
   success: '#2ECC71',
   error: '#E74C3C',
   gold: '#FFC107',
@@ -45,39 +52,55 @@ interface ModeConfig {
   description: string;
   icon: string;
   color: string;
+  colorSecondary: string;
   rounds: number;
   timeLimit?: number;
   xpMultiplier: number;
+  difficulty: number; // 1-3 stars
+  tagline: string;
+  mascotMood: 'happy' | 'excited' | 'determined';
 }
 
 const GAME_MODES: ModeConfig[] = [
   {
     id: 'quick',
     title: 'Quick Play',
-    description: '5 myths, casual pace',
+    description: '5 myths at your own pace',
     icon: 'Flash',
-    color: '#FF6B00',
+    color: '#FF9500',
+    colorSecondary: '#FFB84D',
     rounds: 5,
     xpMultiplier: 1,
+    difficulty: 1,
+    tagline: 'Perfect for beginners!',
+    mascotMood: 'happy',
   },
   {
     id: 'challenge',
-    title: 'Challenge Mode',
-    description: '10 myths, timed rounds',
+    title: 'Challenge',
+    description: '10 myths with time pressure',
     icon: 'Timer',
-    color: '#E74C3C',
+    color: '#FF3B5C',
+    colorSecondary: '#FF6B88',
     rounds: 10,
     timeLimit: 10,
     xpMultiplier: 1.5,
+    difficulty: 2,
+    tagline: 'Race against the clock!',
+    mascotMood: 'excited',
   },
   {
     id: 'endless',
-    title: 'Endless Mode',
-    description: 'Keep going until you fail',
-    icon: 'Infinite',
-    color: '#9B59B6',
+    title: 'Endless',
+    description: 'Survive as long as you can',
+    icon: 'Unlimited',
+    color: '#8B5CF6',
+    colorSecondary: '#A78BFA',
     rounds: 999,
     xpMultiplier: 2,
+    difficulty: 3,
+    tagline: 'For true MythBusters!',
+    mascotMood: 'determined',
   },
 ];
 
@@ -94,6 +117,8 @@ export default function MythBusterScreen() {
   const [myths, setMyths] = useState<any[]>([]);
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
   const [lives, setLives] = useState(3); // For endless mode
+  const [reviewTab, setReviewTab] = useState<'all' | 'wrong'>('all');
+  const [expandedCard, setExpandedCard] = useState<number | null>(null);
 
   const translateX = useSharedValue(0);
   const translateY = useSharedValue(0);
@@ -210,6 +235,8 @@ export default function MythBusterScreen() {
     setMyths([]);
     setTimeLeft(null);
     setLives(3);
+    setReviewTab('all');
+    setExpandedCard(null);
   };
 
   const gesture = Gesture.Pan()
@@ -269,14 +296,50 @@ export default function MythBusterScreen() {
   if (gameState === 'mode-select') {
     return (
       <GestureHandlerRootView style={{ flex: 1 }}>
-        <View style={{ flex: 1, backgroundColor: '#FFF' }}>
+        <LinearGradient
+          colors={['#FFF5EB', '#FFE4CC', '#FFDAB3']}
+          style={{ flex: 1 }}
+        >
           <SafeAreaView style={{ flex: 1 }}>
+            {/* Floating Decorations */}
+            <View style={styles.decorationsContainer}>
+              {[...Array(8)].map((_, i) => (
+                <View
+                  key={i}
+                  style={[
+                    styles.floatingDecor,
+                    {
+                      left: `${10 + (i * 12) % 80}%`,
+                      top: `${5 + (i * 7) % 15}%`,
+                      transform: [{ rotate: `${i * 45}deg` }],
+                    },
+                  ]}
+                >
+                  <View style={[styles.triangle, { borderBottomColor: ['#FF6B6B', '#4ECDC4', '#FFE66D', '#95E1D3', '#F38181', '#AA96DA', '#FCBAD3', '#A8D8EA'][i] }]} />
+                </View>
+              ))}
+            </View>
+
+            {/* Banner/Bunting */}
+            <View style={styles.buntingContainer}>
+              {['#FF6B6B', '#FFE66D', '#4ECDC4', '#FF6B6B', '#FFE66D', '#4ECDC4', '#FF6B6B'].map((color, i) => (
+                <View key={i} style={[styles.buntingFlag, { backgroundColor: color, transform: [{ rotate: `${i % 2 === 0 ? -10 : 10}deg` }] }]} />
+              ))}
+            </View>
+
+            {/* Header */}
             <View style={styles.modeHeader}>
-              <TouchableOpacity onPress={() => router.back()}>
-                <Icon name="ArrowLeft2" size={24} color={THEME.text} />
+              <TouchableOpacity 
+                onPress={() => router.back()}
+                style={styles.backButtonCircle}
+              >
+                <Icon name="ArrowLeft2" size={20} color={THEME.text} />
               </TouchableOpacity>
-              <Text style={styles.modeHeaderTitle}>Choose Mode</Text>
-              <View style={{ width: 24 }} />
+              <View style={styles.headerBadge}>
+                <Icon name="Danger" size={18} color="#FFF" variant="Bold" />
+                <Text style={styles.headerBadgeText}>MythBuster</Text>
+              </View>
+              <View style={{ width: 44 }} />
             </View>
 
             <ScrollView 
@@ -284,148 +347,210 @@ export default function MythBusterScreen() {
               contentContainerStyle={styles.modeContainer}
               showsVerticalScrollIndicator={false}
             >
-              <Animated.Text 
-                entering={FadeInDown.delay(100).springify()}
-                style={styles.modeTitle}
-              >
-                Select Your Challenge
-              </Animated.Text>
-              <Animated.Text 
-                entering={FadeInDown.delay(200).springify()}
-                style={styles.modeSubtitle}
-              >
-                Pick a game mode that fits your style
-              </Animated.Text>
-
-              <View style={styles.modesGrid}>
+              {/* Mode Cards */}
+              <View style={styles.modesGridNew}>
                 {GAME_MODES.map((mode, index) => (
-                  <Animated.View
+                  <Pressable
                     key={mode.id}
-                    entering={FadeInDown.delay(300 + index * 100).springify()}
-                  >
-                    <TouchableOpacity
-                      style={styles.modeCard}
-                      activeOpacity={0.8}
                       onPress={() => startMode(mode)}
+                      style={({ pressed }) => [
+                        styles.modeCardNew,
+                        pressed && styles.modeCardPressed,
+                      ]}
                     >
+                      {/* 3D Card Bottom Layer (Shadow/Depth) */}
+                      <View style={[styles.card3DBottom, { backgroundColor: mode.color + 'AA' }]} />
+                      
+                      {/* 3D Card Middle Layer */}
+                      <View style={[styles.card3DMiddle, { backgroundColor: mode.color }]} />
+                      
+                      {/* Card Background Gradient - Top Layer */}
                       <LinearGradient
-                        colors={[mode.color, mode.color + 'CC']}
-                        style={styles.modeCardGradient}
+                        colors={[mode.colorSecondary, mode.color]}
+                        start={{ x: 0, y: 0 }}
+                        end={{ x: 0.3, y: 1 }}
+                        style={styles.modeCardGradientNew}
                       >
-                        <View style={styles.modeIconCircle}>
-                          <Icon name={mode.icon as any} size={32} color="#FFF" variant="Bold" />
-                        </View>
-                        <Text style={styles.modeCardTitle}>{mode.title}</Text>
-                        <Text style={styles.modeCardDesc}>{mode.description}</Text>
+                        {/* Shine Effect */}
+                        <View style={styles.cardShine} />
                         
-                        <View style={styles.modeStats}>
-                          <View style={styles.modeStatItem}>
-                            <Icon name="Layer" size={14} color="rgba(255,255,255,0.8)" />
-                            <Text style={styles.modeStatText}>
-                              {mode.rounds === 999 ? '∞' : mode.rounds} rounds
-                            </Text>
+                        {/* Decorative Circles */}
+                        <View style={[styles.cardCircle, styles.cardCircle1]} />
+                        <View style={[styles.cardCircle, styles.cardCircle2]} />
+                        
+                        {/* Icon Badge */}
+                        <View style={styles.modeIconBadge}>
+                          <View style={styles.modeIconInner}>
+                            <Icon name={mode.icon as any} size={28} color={mode.color} variant="Bold" />
                           </View>
-                          <View style={styles.modeStatItem}>
-                            <Icon name="Flash" size={14} color="#FFD700" variant="Bold" />
-                            <Text style={styles.modeStatText}>
-                              {mode.xpMultiplier}x XP
+                          {/* Icon Badge Shine */}
+                          <View style={styles.iconBadgeShine} />
+                        </View>
+
+                        {/* Content */}
+                        <View style={styles.modeCardContent}>
+                          <Text style={styles.modeCardTitleNew}>{mode.title}</Text>
+                          <Text style={styles.modeCardDescNew}>{mode.description}</Text>
+                          
+                          {/* Tagline Banner */}
+                          <View style={styles.taglineBanner}>
+                            <Text style={styles.taglineText}>{mode.tagline}</Text>
+                          </View>
+                        </View>
+
+                        {/* Stats Row */}
+                        <View style={styles.modeStatsRow}>
+                          {/* Difficulty Stars */}
+                          <View style={styles.difficultyStars}>
+                            {[1, 2, 3].map((star) => (
+                              <Icon 
+                                key={star}
+                                name="Star1" 
+                                size={14} 
+                                color={star <= mode.difficulty ? '#FFD700' : 'rgba(255,255,255,0.3)'} 
+                                variant="Bold" 
+                              />
+                            ))}
+                          </View>
+
+                          {/* XP Multiplier */}
+                          <View style={styles.xpBadge}>
+                            <Icon name="Flash" size={12} color="#FFD700" variant="Bold" />
+                            <Text style={styles.xpBadgeText}>{mode.xpMultiplier}x</Text>
+                          </View>
+
+                          {/* Rounds */}
+                          <View style={styles.roundsBadge}>
+                            <Icon name="Layer" size={12} color="rgba(255,255,255,0.9)" />
+                            <Text style={styles.roundsBadgeText}>
+                              {mode.rounds === 999 ? '∞' : mode.rounds}
                             </Text>
                           </View>
                         </View>
 
-                        <View style={styles.modePlayButton}>
-                          <Text style={styles.modePlayText}>PLAY</Text>
-                          <Icon name="ArrowRight2" size={16} color={mode.color} />
+                        {/* Play Arrow */}
+                        <View style={styles.playArrowCircle}>
+                          <Icon name="Play" size={20} color={mode.color} variant="Bold" />
                         </View>
                       </LinearGradient>
-                    </TouchableOpacity>
-                  </Animated.View>
+                    </Pressable>
                 ))}
               </View>
-              <View style={{ height: 40 }} />
+
+              {/* Info Card */}
+              <View style={styles.infoCard}>
+                <View style={styles.infoIconWrap}>
+                  <Icon name="InfoCircle" size={20} color={THEME.primary} />
+                </View>
+                <Text style={styles.infoText}>
+                  Swipe left for <Text style={{ color: THEME.error, fontWeight: '800' }}>MYTH</Text> and right for <Text style={{ color: THEME.success, fontWeight: '800' }}>TRUTH</Text>!
+                </Text>
+              </View>
+
+              <View style={{ height: 60 }} />
             </ScrollView>
           </SafeAreaView>
-        </View>
+        </LinearGradient>
       </GestureHandlerRootView>
     );
   }
 
   if (gameState === 'intro') {
+    // Mode-specific instructions
+    const getModeInstruction = () => {
+      switch (selectedMode.id) {
+        case 'quick':
+          return 'Take your time and learn at your own pace';
+        case 'challenge':
+          return `You have ${selectedMode.timeLimit} seconds per statement!`;
+        case 'endless':
+          return 'You have 3 lives — how far can you go?';
+        default:
+          return 'Swipe to judge each statement';
+      }
+    };
+
     return (
       <GestureHandlerRootView style={{ flex: 1 }}>
         <LinearGradient
-          colors={[selectedMode.color, selectedMode.color + 'CC']}
+          colors={[selectedMode.colorSecondary, selectedMode.color]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 0, y: 1 }}
           style={styles.fullScreen}
         >
           <SafeAreaView style={styles.fullScreen}>
-            <TouchableOpacity 
-              onPress={() => setGameState('mode-select')} 
-              style={styles.closeBtn}
-            >
-              <Icon name="ArrowLeft2" size={24} color="#FFF" />
-            </TouchableOpacity>
-
-            <View style={styles.introContainer}>
-              <Animated.View 
-                entering={FadeInDown.delay(100).springify()}
-                style={styles.introIcon}
+            {/* Header */}
+            <View style={styles.introHeader}>
+              <TouchableOpacity 
+                onPress={() => setGameState('mode-select')} 
+                style={styles.introBackBtn}
               >
-                <Icon name="Danger" size={80} color="#FFF" variant="Bold" />
-              </Animated.View>
+                <Icon name="ArrowLeft2" size={20} color="#FFF" />
+              </TouchableOpacity>
+              <View style={styles.introModePillLight}>
+                <Icon name={selectedMode.icon as any} size={14} color="#FFF" variant="Bold" />
+                <Text style={styles.introModePillText}>{selectedMode.title}</Text>
+              </View>
+              <View style={{ width: 44 }} />
+            </View>
 
-              <Animated.Text 
-                entering={FadeInDown.delay(200).springify()}
-                style={styles.introTitle}
-              >
-                MythBuster Mode
-              </Animated.Text>
+            <View style={styles.introContent}>
+              {/* Single white card with all instructions */}
+              <View style={styles.introWhiteCard}>
+                <Text style={styles.introCardTitle}>How to Play</Text>
 
-              <Animated.Text 
-                entering={FadeInDown.delay(300).springify()}
-                style={styles.introSubtitle}
-              >
-                Swipe to separate facts from fiction!
-              </Animated.Text>
-
-              <Animated.View 
-                entering={FadeInDown.delay(400).springify()}
-                style={styles.instructionsCard}
-              >
-                <View style={styles.instructionRow}>
-                  <View style={[styles.swipeDemo, { backgroundColor: THEME.error }]}>
-                    <Icon name="ArrowLeft" size={24} color="#FFF" variant="Bold" />
+                {/* Swipe instructions */}
+                <View style={styles.introSwipeRow}>
+                  <View style={[styles.introSwipeItem, { backgroundColor: THEME.error + '10' }]}>
+                    <Icon name="ArrowLeft" size={20} color={THEME.error} variant="Bold" />
+                    <Text style={[styles.introSwipeLabel, { color: THEME.error }]}>MYTH</Text>
                   </View>
-                  <Text style={styles.instructionText}>Swipe left for MYTH</Text>
-                </View>
-
-                <View style={styles.instructionRow}>
-                  <View style={[styles.swipeDemo, { backgroundColor: THEME.success }]}>
-                    <Icon name="ArrowRight" size={24} color="#FFF" variant="Bold" />
+                  <View style={[styles.introSwipeItem, { backgroundColor: THEME.success + '10' }]}>
+                    <Text style={[styles.introSwipeLabel, { color: THEME.success }]}>TRUTH</Text>
+                    <Icon name="ArrowRight" size={20} color={THEME.success} variant="Bold" />
                   </View>
-                  <Text style={styles.instructionText}>Swipe right for TRUTH</Text>
                 </View>
 
-                <View style={styles.bonusInfo}>
-                  <Icon name="Flash" size={16} color={THEME.gold} variant="Bold" />
-                  <Text style={styles.bonusText}>
-                    Build streaks for bonus XP!
-                  </Text>
-                </View>
-              </Animated.View>
+                {/* Divider */}
+                <View style={styles.introCardDivider} />
 
-              <Animated.View 
-                entering={FadeInDown.delay(500).springify()}
-                style={{ width: '100%' }}
+                {/* Mode info */}
+                <View style={styles.introModeInfo}>
+                  <Icon 
+                    name={selectedMode.id === 'endless' ? 'Heart' : selectedMode.icon as any} 
+                    size={18} 
+                    color={selectedMode.color} 
+                    variant="Bold" 
+                  />
+                  <Text style={styles.introModeInfoText}>{getModeInstruction()}</Text>
+                </View>
+
+                {/* Stats row */}
+                <View style={styles.introStatsRow}>
+                  <View style={styles.introStatItem}>
+                    <Icon name="Layer" size={16} color={THEME.textMuted} />
+                    <Text style={styles.introStatText}>
+                      {selectedMode.rounds === 999 ? '∞' : selectedMode.rounds} rounds
+                    </Text>
+                  </View>
+                  <View style={styles.introStatItem}>
+                    <Icon name="Flash" size={16} color={THEME.gold} variant="Bold" />
+                    <Text style={styles.introStatText}>{selectedMode.xpMultiplier}x XP</Text>
+                  </View>
+                </View>
+              </View>
+            </View>
+
+            {/* Bottom Start Button */}
+            <View style={styles.introBottom}>
+              <TouchableOpacity
+                onPress={() => setGameState('playing')}
+                activeOpacity={0.9}
+                style={styles.introStartBtnWhite}
               >
-                <TouchableOpacity
-                  style={styles.startButton}
-                  onPress={() => setGameState('playing')}
-                  activeOpacity={0.8}
-                >
-                  <Text style={styles.startButtonText}>START GAME</Text>
-                  <Icon name="Play" size={20} color={THEME.primary} variant="Bold" />
-                </TouchableOpacity>
-              </Animated.View>
+                <Text style={[styles.introStartTextColored, { color: selectedMode.color }]}>Start Game</Text>
+                <Icon name="ArrowRight2" size={20} color={selectedMode.color} variant="Bold" />
+              </TouchableOpacity>
             </View>
           </SafeAreaView>
         </LinearGradient>
@@ -436,162 +561,232 @@ export default function MythBusterScreen() {
   if (gameState === 'results') {
     const correctAnswers = answers.filter(a => a).length;
     const accuracy = Math.round((correctAnswers / myths.length) * 100);
-    const maxStreak = Math.max(...answers.reduce((acc, curr, idx) => {
-      if (curr) {
-        acc[acc.length - 1] = (acc[acc.length - 1] || 0) + 1;
-      } else {
-        acc.push(0);
-      }
-      return acc;
-    }, [0]));
+    const wrongAnswers = myths.length - correctAnswers;
+    
+    // Get performance message based on accuracy
+    const getPerformanceMessage = () => {
+      if (accuracy >= 90) return { text: "Outstanding!", emoji: "🏆" };
+      if (accuracy >= 70) return { text: "Great Job!", emoji: "⭐" };
+      if (accuracy >= 50) return { text: "Good Effort!", emoji: "👍" };
+      return { text: "Keep Learning!", emoji: "📚" };
+    };
+    const performance = getPerformanceMessage();
+    
+    const filteredMyths = reviewTab === 'wrong' 
+      ? myths.map((m, i) => ({ ...m, originalIndex: i })).filter((_, i) => !answers[i])
+      : myths.map((m, i) => ({ ...m, originalIndex: i }));
 
     return (
       <GestureHandlerRootView style={{ flex: 1 }}>
         <LinearGradient
-          colors={[THEME.success, '#27AE60']}
+          colors={['#FFF9E6', '#FFF5D6', '#FFFBF0']}
           style={styles.fullScreen}
         >
           <SafeAreaView style={styles.fullScreen}>
+            {/* Header */}
+            <View style={styles.resultsHeader}>
+              <TouchableOpacity 
+                onPress={() => router.back()}
+                style={styles.resultsBackBtn}
+              >
+                <Icon name="ArrowLeft2" size={20} color={THEME.text} />
+              </TouchableOpacity>
+              <View style={styles.resultsHeaderBadge}>
+                <Icon name="Danger" size={16} color="#FFF" variant="Bold" />
+                <Text style={styles.resultsHeaderBadgeText}>MythBuster</Text>
+              </View>
+              <View style={{ width: 44 }} />
+            </View>
+
             <ScrollView 
               style={{ flex: 1 }}
-              contentContainerStyle={styles.resultsContainer}
+              contentContainerStyle={styles.resultsContent}
               showsVerticalScrollIndicator={false}
             >
-              <Animated.Text 
-                entering={FadeInDown.delay(100).springify()}
-                style={styles.resultsTitle}
-              >
-                Mission Complete!
-              </Animated.Text>
-
-              <Animated.View 
-                entering={FadeInDown.delay(200).springify()}
-                style={styles.scoreCard}
-              >
-                <Animated.View 
-                  entering={FadeInDown.delay(300).springify()}
-                  style={styles.mascotInCard}
-                >
-                  <Image 
-                    source={require('@/assets/images/mascot/happy.png')} 
-                    style={styles.resultsMascot}
-                    resizeMode="contain"
-                  />
-                </Animated.View>
-                
-                <View style={styles.scoreRow}>
-                  <Text style={styles.scoreLabel}>Score</Text>
-                  <Text style={styles.scoreValue}>{score} XP</Text>
+              {/* Score Card with Mascot */}
+              <View style={styles.resultsScoreCard}>
+                <Image 
+                  source={accuracy >= 50 
+                    ? require('@/assets/images/mascot/happy.png')
+                    : require('@/assets/images/mascot/fix.png')
+                  } 
+                  style={styles.resultsScoreMascot}
+                  resizeMode="contain"
+                />
+                <Text style={styles.resultsScoreEmoji}>{performance.emoji}</Text>
+                <Text style={styles.resultsScoreTitle}>{performance.text}</Text>
+                <View style={styles.resultsXPBadge}>
+                  <Icon name="Flash" size={18} color={THEME.gold} variant="Bold" />
+                  <Text style={styles.resultsXPText}>{score} XP</Text>
                 </View>
+              </View>
 
-                <View style={styles.divider} />
-
-                <View style={styles.statsGrid}>
-                  <View style={styles.statBox}>
-                    <Icon name="TickCircle" size={24} color={THEME.success} variant="Bold" />
-                    <Text style={styles.statValue}>{correctAnswers}/{myths.length}</Text>
-                    <Text style={styles.statLabel}>Correct</Text>
+              {/* Stats Row */}
+              <View style={styles.resultsStatsRow}>
+                <View style={styles.resultsStatCard}>
+                  <View style={[styles.resultsStatIcon, { backgroundColor: THEME.success + '20' }]}>
+                    <Icon name="TickCircle" size={20} color={THEME.success} variant="Bold" />
                   </View>
-
-                  <View style={styles.statBox}>
-                    <Icon name="Percentage" size={24} color={THEME.primary} variant="Bold" />
-                    <Text style={styles.statValue}>{accuracy}%</Text>
-                    <Text style={styles.statLabel}>Accuracy</Text>
-                  </View>
-
-                  <View style={styles.statBox}>
-                    <Icon name="Flash" size={24} color={THEME.gold} variant="Bold" />
-                    <Text style={styles.statValue}>{maxStreak}</Text>
-                    <Text style={styles.statLabel}>Best Streak</Text>
-                  </View>
+                  <Text style={styles.resultsStatValue}>{correctAnswers}</Text>
+                  <Text style={styles.resultsStatLabel}>Correct</Text>
                 </View>
-              </Animated.View>
+                <View style={styles.resultsStatCard}>
+                  <View style={[styles.resultsStatIcon, { backgroundColor: THEME.error + '20' }]}>
+                    <Icon name="CloseCircle" size={20} color={THEME.error} variant="Bold" />
+                  </View>
+                  <Text style={styles.resultsStatValue}>{wrongAnswers}</Text>
+                  <Text style={styles.resultsStatLabel}>Wrong</Text>
+                </View>
+                <View style={styles.resultsStatCard}>
+                  <View style={[styles.resultsStatIcon, { backgroundColor: selectedMode.color + '20' }]}>
+                    <Icon name="Chart" size={20} color={selectedMode.color} variant="Bold" />
+                  </View>
+                  <Text style={styles.resultsStatValue}>{accuracy}%</Text>
+                  <Text style={styles.resultsStatLabel}>Accuracy</Text>
+                </View>
+              </View>
 
               {/* Review Section */}
-              <Animated.View 
-                entering={FadeInDown.delay(400).springify()}
-                style={styles.reviewSection}
-              >
-                <Text style={styles.reviewTitle}>Review Your Answers</Text>
-                <Text style={styles.reviewSubtitle}>See how you did on each statement</Text>
+              <View style={styles.resultsReviewSection}>
+                <View style={styles.resultsReviewHeader}>
+                  <Text style={styles.resultsReviewTitle}>Review Answers</Text>
+                  <Text style={styles.resultsReviewSubtitle}>Tap cards to see explanations</Text>
+                </View>
                 
-                {myths.map((myth, index) => {
-                  const isCorrect = answers[index];
-                  return (
-                    <View key={index} style={styles.reviewCard}>
-                      <View style={styles.reviewHeader}>
-                        <View style={[
-                          styles.reviewNumber,
-                          { backgroundColor: isCorrect ? THEME.success : THEME.error }
-                        ]}>
-                          <Text style={styles.reviewNumberText}>{index + 1}</Text>
-                        </View>
-                        <View style={{ flex: 1 }}>
-                          <View style={styles.reviewBadgeRow}>
-                            <View style={[
-                              styles.reviewBadge,
-                              { backgroundColor: myth.isTrue ? THEME.success + '20' : THEME.error + '20' }
-                            ]}>
-                              <Text style={[
-                                styles.reviewBadgeText,
-                                { color: myth.isTrue ? THEME.success : THEME.error }
-                              ]}>
-                                {myth.isTrue ? 'TRUE' : 'MYTH'}
-                              </Text>
-                            </View>
-                            {isCorrect ? (
-                              <Image 
-                                source={require('@/assets/images/mascot/happy.png')} 
-                                style={styles.reviewMascot}
-                                resizeMode="contain"
-                              />
-                            ) : (
-                              <Image 
-                                source={require('@/assets/images/mascot/fix.png')} 
-                                style={styles.reviewMascot}
-                                resizeMode="contain"
-                              />
-                            )}
-                          </View>
-                        </View>
-                      </View>
-                      
-                      <Text style={styles.reviewStatement}>{myth.statement}</Text>
-                      
-                      {!isCorrect && (
-                        <View style={styles.reviewExplanation}>
-                          <Icon name="InfoCircle" size={16} color={THEME.textMuted} />
-                          <Text style={styles.reviewExplanationText}>
-                            {myth.explanation}
-                          </Text>
-                        </View>
-                      )}
-                    </View>
-                  );
-                })}
-              </Animated.View>
+                {/* Tab Buttons */}
+                <View style={styles.resultsTabRow}>
+                  <TouchableOpacity 
+                    style={[styles.resultsTab, reviewTab === 'all' && [styles.resultsTabActive, { backgroundColor: selectedMode.color }]]}
+                    onPress={() => setReviewTab('all')}
+                  >
+                    <Text style={[styles.resultsTabText, reviewTab === 'all' && styles.resultsTabTextActive]}>
+                      All ({myths.length})
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity 
+                    style={[styles.resultsTab, reviewTab === 'wrong' && [styles.resultsTabActive, { backgroundColor: THEME.error }]]}
+                    onPress={() => setReviewTab('wrong')}
+                  >
+                    <Text style={[styles.resultsTabText, reviewTab === 'wrong' && styles.resultsTabTextActive]}>
+                      Missed ({wrongAnswers})
+                    </Text>
+                  </TouchableOpacity>
+                </View>
 
-              <Animated.View 
-                entering={FadeInDown.delay(500).springify()}
-                style={styles.resultsActions}
-              >
+                {/* Review Cards */}
+                {filteredMyths.length === 0 ? (
+                  <View style={styles.resultsEmptyState}>
+                    <View style={styles.resultsEmptyIcon}>
+                      <Icon name="TickCircle" size={40} color={THEME.success} variant="Bold" />
+                    </View>
+                    <Text style={styles.resultsEmptyTitle}>Perfect Score!</Text>
+                    <Text style={styles.resultsEmptyText}>You got all answers correct!</Text>
+                  </View>
+                ) : (
+                  <View style={styles.resultsCardList}>
+                    {filteredMyths.map((myth) => {
+                      const isCorrect = answers[myth.originalIndex];
+                      const isExpanded = expandedCard === myth.originalIndex;
+                      
+                      return (
+                        <TouchableOpacity 
+                          key={myth.originalIndex}
+                          style={styles.resultsReviewCard}
+                          onPress={() => setExpandedCard(isExpanded ? null : myth.originalIndex)}
+                          activeOpacity={0.7}
+                        >
+                          {/* Colored side indicator */}
+                          <View style={[
+                            styles.resultsCardIndicator,
+                            { backgroundColor: isCorrect ? THEME.success : THEME.error }
+                          ]} />
+                          
+                          <View style={styles.resultsCardInner}>
+                            {/* Card Header */}
+                            <View style={styles.resultsCardHeader}>
+                              <View style={[
+                                styles.resultsCardNumber,
+                                { backgroundColor: isCorrect ? THEME.success : THEME.error }
+                              ]}>
+                                <Text style={styles.resultsCardNumberText}>{myth.originalIndex + 1}</Text>
+                              </View>
+                              <View style={[
+                                styles.resultsCardBadge,
+                                { backgroundColor: myth.isTrue ? THEME.success + '15' : THEME.error + '15' }
+                              ]}>
+                                <Text style={[
+                                  styles.resultsCardBadgeText,
+                                  { color: myth.isTrue ? THEME.success : THEME.error }
+                                ]}>
+                                  {myth.isTrue ? 'TRUTH' : 'MYTH'}
+                                </Text>
+                              </View>
+                              <View style={{ flex: 1 }} />
+                              <Icon 
+                                name={isCorrect ? "TickCircle" : "CloseCircle"} 
+                                size={22} 
+                                color={isCorrect ? THEME.success : THEME.error} 
+                                variant="Bold" 
+                              />
+                            </View>
+                            
+                            {/* Statement */}
+                            <Text 
+                              style={styles.resultsCardStatement}
+                              numberOfLines={isExpanded ? undefined : 2}
+                            >
+                              {myth.statement}
+                            </Text>
+                            
+                            {/* Expanded Content */}
+                            {isExpanded && (
+                              <View style={styles.resultsCardExpanded}>
+                                <View style={styles.resultsCardDivider} />
+                                <View style={styles.resultsCardExplanation}>
+                                  <Icon name="Lamp" size={16} color={selectedMode.color} variant="Bold" />
+                                  <Text style={styles.resultsCardExplanationText}>
+                                    {myth.explanation}
+                                  </Text>
+                                </View>
+                              </View>
+                            )}
+                            
+                            {/* Expand hint */}
+                            <View style={styles.resultsCardFooter}>
+                              <Icon 
+                                name={isExpanded ? "ArrowUp2" : "ArrowDown2"} 
+                                size={16} 
+                                color={THEME.textMuted} 
+                              />
+                            </View>
+                          </View>
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </View>
+                )}
+              </View>
+
+              {/* Action Buttons */}
+              <View style={styles.resultsActions}>
                 <TouchableOpacity
-                  style={styles.playAgainButton}
+                  style={[styles.resultsPlayAgainBtn, { backgroundColor: selectedMode.color }]}
                   onPress={resetGame}
                   activeOpacity={0.8}
                 >
-                  <Icon name="Refresh" size={20} color={THEME.primary} variant="Bold" />
-                  <Text style={styles.playAgainText}>PLAY AGAIN</Text>
+                  <Icon name="Refresh" size={20} color="#FFF" variant="Bold" />
+                  <Text style={styles.resultsPlayAgainText}>Play Again</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                  style={styles.homeButton}
+                  style={styles.resultsHomeBtn}
                   onPress={() => router.back()}
                   activeOpacity={0.8}
                 >
-                  <Text style={styles.homeButtonText}>BACK TO HOME</Text>
+                  <Icon name="Home2" size={20} color={THEME.text} />
+                  <Text style={styles.resultsHomeText}>Back to Home</Text>
                 </TouchableOpacity>
-              </Animated.View>
+              </View>
               
               <View style={{ height: 40 }} />
             </ScrollView>
@@ -784,6 +979,129 @@ const styles = StyleSheet.create({
     marginBottom: 40,
     textAlign: 'center',
   },
+  // Intro Screen with colored background
+  introHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingTop: 16,
+  },
+  introBackBtn: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  introModePillLight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 20,
+  },
+  introModePillText: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#FFF',
+  },
+  introContent: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 24,
+  },
+  // Single white card
+  introWhiteCard: {
+    backgroundColor: '#FFF',
+    borderRadius: 24,
+    padding: 24,
+    width: '100%',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 6,
+  },
+  introCardTitle: {
+    fontSize: 22,
+    fontWeight: '900',
+    color: THEME.text,
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  introSwipeRow: {
+    flexDirection: 'row',
+    gap: 12,
+    marginBottom: 20,
+  },
+  introSwipeItem: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    paddingVertical: 14,
+    borderRadius: 12,
+  },
+  introSwipeLabel: {
+    fontSize: 15,
+    fontWeight: '800',
+  },
+  introCardDivider: {
+    height: 1,
+    backgroundColor: THEME.border,
+    marginBottom: 16,
+  },
+  introModeInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginBottom: 16,
+  },
+  introModeInfoText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: THEME.text,
+    flex: 1,
+  },
+  introStatsRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 20,
+  },
+  introStatItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  introStatText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: THEME.textMuted,
+  },
+  introBottom: {
+    paddingHorizontal: 24,
+    paddingBottom: 32,
+  },
+  introStartBtnWhite: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
+    backgroundColor: '#FFF',
+    paddingVertical: 18,
+    borderRadius: 28,
+  },
+  introStartTextColored: {
+    fontSize: 17,
+    fontWeight: '800',
+  },
+  // Legacy styles
   instructionsCard: {
     backgroundColor: '#FFF',
     borderRadius: 24,
@@ -1043,6 +1361,351 @@ const styles = StyleSheet.create({
     paddingHorizontal: 30,
     paddingTop: 40,
   },
+  // New Results Screen Styles
+  resultsScreen: {
+    flex: 1,
+    backgroundColor: THEME.bg,
+  },
+  resultsHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+  },
+  resultsBackBtn: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: '#FFF',
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  resultsHeaderBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: THEME.primary,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 20,
+  },
+  resultsHeaderBadgeText: {
+    fontSize: 14,
+    fontWeight: '800',
+    color: '#FFF',
+  },
+  resultsHeaderTitle: {
+    fontSize: 18,
+    fontWeight: '800',
+    color: THEME.text,
+  },
+  resultsContent: {
+    padding: 20,
+  },
+  // Score Card
+  resultsScoreCard: {
+    backgroundColor: '#FFF',
+    borderRadius: 24,
+    padding: 24,
+    alignItems: 'center',
+    marginBottom: 16,
+    borderWidth: 2,
+    borderColor: THEME.border,
+    borderBottomWidth: 4,
+  },
+  resultsScoreMascot: {
+    width: 80,
+    height: 80,
+    marginBottom: 8,
+  },
+  resultsScoreEmoji: {
+    fontSize: 28,
+    marginBottom: 4,
+  },
+  resultsScoreTitle: {
+    fontSize: 24,
+    fontWeight: '900',
+    color: THEME.text,
+    marginBottom: 12,
+  },
+  resultsXPBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: THEME.gold + '20',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+  },
+  resultsXPText: {
+    fontSize: 18,
+    fontWeight: '800',
+    color: THEME.text,
+  },
+  // Legacy hero styles
+  resultsHeroCard: {
+    borderRadius: 24,
+    overflow: 'hidden',
+    marginBottom: 20,
+  },
+  resultsHeroGradient: {
+    alignItems: 'center',
+    paddingVertical: 32,
+    paddingHorizontal: 24,
+  },
+  resultsHeroMascot: {
+    width: 100,
+    height: 100,
+    marginBottom: 8,
+  },
+  resultsHeroEmoji: {
+    fontSize: 32,
+    marginBottom: 8,
+  },
+  resultsHeroTitle: {
+    fontSize: 28,
+    fontWeight: '900',
+    color: '#FFF',
+    marginBottom: 4,
+  },
+  resultsHeroScore: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: 'rgba(255,255,255,0.9)',
+  },
+  resultsStatsRow: {
+    flexDirection: 'row',
+    gap: 10,
+    marginBottom: 24,
+  },
+  resultsStatCard: {
+    flex: 1,
+    backgroundColor: '#FFF',
+    borderRadius: 16,
+    padding: 14,
+    alignItems: 'center',
+    gap: 6,
+    borderWidth: 2,
+    borderColor: THEME.border,
+    borderBottomWidth: 4,
+  },
+  resultsStatIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  resultsStatValue: {
+    fontSize: 20,
+    fontWeight: '900',
+    color: THEME.text,
+  },
+  resultsStatLabel: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: THEME.textMuted,
+  },
+  resultsReviewSection: {
+    marginBottom: 24,
+  },
+  resultsReviewHeader: {
+    marginBottom: 12,
+  },
+  resultsReviewTitle: {
+    fontSize: 18,
+    fontWeight: '800',
+    color: THEME.text,
+    marginBottom: 4,
+  },
+  resultsReviewSubtitle: {
+    fontSize: 13,
+    color: THEME.textMuted,
+  },
+  resultsTabRow: {
+    flexDirection: 'row',
+    backgroundColor: '#FFF',
+    borderRadius: 14,
+    padding: 4,
+    marginBottom: 16,
+    borderWidth: 2,
+    borderColor: THEME.border,
+  },
+  resultsTab: {
+    flex: 1,
+    paddingVertical: 10,
+    alignItems: 'center',
+    borderRadius: 10,
+  },
+  resultsTabActive: {
+    backgroundColor: THEME.primary,
+  },
+  resultsTabText: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: THEME.textMuted,
+  },
+  resultsTabTextActive: {
+    color: '#FFF',
+  },
+  resultsEmptyState: {
+    backgroundColor: '#FFF',
+    borderRadius: 20,
+    padding: 32,
+    alignItems: 'center',
+    gap: 12,
+    borderWidth: 2,
+    borderColor: THEME.border,
+    borderBottomWidth: 4,
+  },
+  resultsEmptyIcon: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: THEME.success + '15',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 4,
+  },
+  resultsEmptyTitle: {
+    fontSize: 18,
+    fontWeight: '800',
+    color: THEME.success,
+  },
+  resultsEmptyText: {
+    fontSize: 14,
+    color: THEME.textMuted,
+  },
+  resultsCardList: {
+    gap: 12,
+  },
+  resultsReviewCard: {
+    backgroundColor: '#FFF',
+    borderRadius: 16,
+    flexDirection: 'row',
+    overflow: 'hidden',
+    borderWidth: 2,
+    borderColor: THEME.border,
+    borderBottomWidth: 4,
+  },
+  resultsCardIndicator: {
+    width: 5,
+  },
+  resultsCardInner: {
+    flex: 1,
+    padding: 14,
+  },
+  resultsReviewCardCorrect: {
+    borderLeftWidth: 4,
+    borderLeftColor: THEME.success,
+  },
+  resultsReviewCardWrong: {
+    borderLeftWidth: 4,
+    borderLeftColor: THEME.error,
+  },
+  resultsCardHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginBottom: 10,
+  },
+  resultsCardNumber: {
+    width: 26,
+    height: 26,
+    borderRadius: 13,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  resultsCardNumberText: {
+    fontSize: 12,
+    fontWeight: '800',
+    color: '#FFF',
+  },
+  resultsCardBadge: {
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 8,
+  },
+  resultsCardBadgeText: {
+    fontSize: 10,
+    fontWeight: '800',
+  },
+  resultsCardStatement: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: THEME.text,
+    lineHeight: 20,
+  },
+  resultsCardExpanded: {
+    marginTop: 12,
+  },
+  resultsCardDivider: {
+    height: 1,
+    backgroundColor: THEME.border,
+    marginBottom: 12,
+  },
+  resultsCardExplanation: {
+    flexDirection: 'row',
+    gap: 10,
+    backgroundColor: THEME.bg,
+    padding: 12,
+    borderRadius: 12,
+  },
+  resultsCardExplanationText: {
+    flex: 1,
+    fontSize: 13,
+    color: THEME.text,
+    lineHeight: 19,
+  },
+  resultsCardFooter: {
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  resultsCardHint: {
+    fontSize: 12,
+    color: THEME.textMuted,
+  },
+  resultsPlayAgainBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    backgroundColor: THEME.primary,
+    paddingVertical: 16,
+    borderRadius: 16,
+    marginBottom: 12,
+    borderBottomWidth: 4,
+    borderBottomColor: 'rgba(0,0,0,0.15)',
+  },
+  resultsPlayAgainText: {
+    fontSize: 16,
+    fontWeight: '800',
+    color: '#FFF',
+  },
+  resultsHomeBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    backgroundColor: '#FFF',
+    paddingVertical: 16,
+    borderRadius: 16,
+    borderWidth: 2,
+    borderColor: THEME.border,
+    borderBottomWidth: 4,
+  },
+  resultsHomeText: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: THEME.text,
+  },
+  // Legacy Results Styles
   resultsIcon: {
     width: 120,
     height: 120,
@@ -1168,21 +1831,369 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 20,
-    paddingTop: 20,
-    paddingBottom: 16,
+    paddingTop: 16,
+    paddingBottom: 8,
+    zIndex: 10,
   },
   modeHeaderTitle: {
     fontSize: 18,
     fontWeight: '800',
     color: THEME.text,
   },
+  backButtonCircle: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: '#FFF',
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  headerBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: THEME.primary,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 20,
+  },
+  headerBadgeText: {
+    fontSize: 14,
+    fontWeight: '800',
+    color: '#FFF',
+  },
   modeScrollView: {
     flex: 1,
   },
   modeContainer: {
     paddingHorizontal: 20,
-    paddingTop: 20,
+    paddingTop: 8,
   },
+  // Decorations
+  decorationsContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 150,
+    overflow: 'hidden',
+    zIndex: 0,
+  },
+  floatingDecor: {
+    position: 'absolute',
+  },
+  triangle: {
+    width: 0,
+    height: 0,
+    backgroundColor: 'transparent',
+    borderStyle: 'solid',
+    borderLeftWidth: 8,
+    borderRightWidth: 8,
+    borderBottomWidth: 16,
+    borderLeftColor: 'transparent',
+    borderRightColor: 'transparent',
+  },
+  buntingContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 8,
+    marginTop: -8,
+    paddingHorizontal: 20,
+  },
+  buntingFlag: {
+    width: 20,
+    height: 28,
+    borderRadius: 2,
+    borderBottomLeftRadius: 10,
+    borderBottomRightRadius: 10,
+  },
+  // Title Section
+  titleSection: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    marginBottom: 28,
+    marginTop: 8,
+  },
+  titleMascot: {
+    width: 90,
+    height: 90,
+  },
+  titleBubble: {
+    flex: 1,
+    backgroundColor: '#FFF',
+    borderRadius: 24,
+    padding: 18,
+    // 3D effect
+    borderWidth: 3,
+    borderColor: 'rgba(255,255,255,0.9)',
+    borderTopColor: 'rgba(255,255,255,1)',
+    borderBottomColor: '#E5E7EB',
+    borderBottomWidth: 5,
+    position: 'relative',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  modeTitleNew: {
+    fontSize: 24,
+    fontWeight: '900',
+    color: THEME.text,
+    marginBottom: 4,
+  },
+  modeSubtitleNew: {
+    fontSize: 14,
+    color: THEME.textMuted,
+    fontWeight: '600',
+  },
+  // New Mode Cards - 3D Style
+  modesGridNew: {
+    gap: 22,
+  },
+  modeCardNew: {
+    borderRadius: 24,
+    position: 'relative',
+    height: 160,
+  },
+  modeCardPressed: {
+    transform: [{ scale: 0.97 }, { translateY: 2 }],
+  },
+  // 3D Layers
+  card3DBottom: {
+    position: 'absolute',
+    top: 8,
+    left: 4,
+    right: -4,
+    bottom: -8,
+    borderRadius: 24,
+    opacity: 0.4,
+  },
+  card3DMiddle: {
+    position: 'absolute',
+    top: 4,
+    left: 2,
+    right: -2,
+    bottom: -4,
+    borderRadius: 24,
+    opacity: 0.6,
+  },
+  modeCardGradientNew: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    borderRadius: 24,
+    padding: 20,
+    paddingRight: 60,
+    overflow: 'hidden',
+    borderWidth: 3,
+    borderColor: 'rgba(255,255,255,0.3)',
+    borderTopColor: 'rgba(255,255,255,0.5)',
+    borderLeftColor: 'rgba(255,255,255,0.4)',
+  },
+  // Shine Effect
+  cardShine: {
+    position: 'absolute',
+    top: -50,
+    left: -50,
+    width: 100,
+    height: 200,
+    backgroundColor: 'rgba(255,255,255,0.15)',
+    transform: [{ rotate: '45deg' }],
+  },
+  cardCircle: {
+    position: 'absolute',
+    borderRadius: 100,
+    backgroundColor: 'rgba(255,255,255,0.12)',
+  },
+  cardCircle1: {
+    width: 140,
+    height: 140,
+    top: -40,
+    right: -40,
+  },
+  cardCircle2: {
+    width: 100,
+    height: 100,
+    bottom: -30,
+    left: -30,
+  },
+  modeIconBadge: {
+    position: 'absolute',
+    top: 16,
+    left: 16,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: 'rgba(255,255,255,0.3)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    // 3D effect for badge
+    borderWidth: 2,
+    borderColor: 'rgba(255,255,255,0.4)',
+    borderTopColor: 'rgba(255,255,255,0.6)',
+  },
+  modeIconInner: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: '#FFF',
+    alignItems: 'center',
+    justifyContent: 'center',
+    // Inner shadow effect
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 2,
+  },
+  iconBadgeShine: {
+    position: 'absolute',
+    top: 4,
+    left: 8,
+    width: 16,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: 'rgba(255,255,255,0.6)',
+    transform: [{ rotate: '-20deg' }],
+  },
+  modeCardContent: {
+    marginLeft: 60,
+    flex: 1,
+  },
+  modeCardTitleNew: {
+    fontSize: 20,
+    fontWeight: '900',
+    color: '#FFF',
+    marginBottom: 4,
+  },
+  modeCardDescNew: {
+    fontSize: 13,
+    color: 'rgba(255,255,255,0.9)',
+    fontWeight: '500',
+    marginBottom: 8,
+  },
+  taglineBanner: {
+    alignSelf: 'flex-start',
+    backgroundColor: 'rgba(255,255,255,0.25)',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 10,
+  },
+  taglineText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#FFF',
+  },
+  modeStatsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginTop: 14,
+    marginLeft: 64,
+  },
+  difficultyStars: {
+    flexDirection: 'row',
+    gap: 3,
+    backgroundColor: 'rgba(0,0,0,0.12)',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 10,
+  },
+  xpBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: 'rgba(255,215,0,0.25)',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(255,215,0,0.3)',
+  },
+  xpBadgeText: {
+    fontSize: 12,
+    fontWeight: '800',
+    color: '#FFF',
+    textShadowColor: 'rgba(0,0,0,0.2)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
+  },
+  roundsBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.3)',
+  },
+  roundsBadgeText: {
+    fontSize: 12,
+    fontWeight: '800',
+    color: '#FFF',
+  },
+  playArrowCircle: {
+    position: 'absolute',
+    right: 16,
+    top: '50%',
+    marginTop: -26,
+    width: 52,
+    height: 52,
+    borderRadius: 26,
+    backgroundColor: '#FFF',
+    alignItems: 'center',
+    justifyContent: 'center',
+    // 3D effect
+    borderWidth: 3,
+    borderColor: 'rgba(255,255,255,0.9)',
+    borderBottomColor: 'rgba(0,0,0,0.1)',
+    borderRightColor: 'rgba(0,0,0,0.05)',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 6,
+    elevation: 5,
+  },
+  // Info Card
+  infoCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    backgroundColor: '#FFF',
+    borderRadius: 16,
+    padding: 16,
+    marginTop: 24,
+    borderWidth: 2,
+    borderColor: '#E5E7EB',
+    borderBottomWidth: 4,
+  },
+  infoIconWrap: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: THEME.primary + '15',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  infoText: {
+    flex: 1,
+    fontSize: 13,
+    color: THEME.textMuted,
+    fontWeight: '500',
+    lineHeight: 18,
+  },
+  // Legacy styles kept for compatibility
   modeTitle: {
     fontSize: 28,
     fontWeight: '900',
