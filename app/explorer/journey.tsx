@@ -1,7 +1,7 @@
 import { Icon } from '@/components/ui/icon';
+import { getArticleById } from '@/content/articles';
 import { getJourneyById } from '@/content/explorer';
 import { getMythById } from '@/content/myths';
-import { getArticleById } from '@/content/articles';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useMemo } from 'react';
@@ -66,7 +66,7 @@ export default function JourneyScreen() {
         {/* Journey Overview */}
         <Animated.View entering={FadeInDown.delay(100)} style={styles.overviewCard}>
           <LinearGradient
-            colors={[THEME.primary, THEME.primaryDark]}
+            colors={[THEME.primary, THEME.primaryDark] as const}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={styles.overviewGradient}

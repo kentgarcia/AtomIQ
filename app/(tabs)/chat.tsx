@@ -1,42 +1,65 @@
-import { StyleSheet, View, Text, ScrollView, TouchableOpacity, Image, Dimensions } from 'react-native';
 import { Icon } from '@/components/ui/icon';
-import Animated, { FadeInDown } from 'react-native-reanimated';
-import { useRouter } from 'expo-router';
+import { useThemeColor } from '@/hooks/use-theme-color';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useRouter } from 'expo-router';
+import { Dimensions, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-const { height: SCREEN_HEIGHT } = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 
-// Orange Theme matching the new design
-const THEME = {
-  bg: '#F7F7F7',
-  card: '#FFFFFF',
-  text: '#1F2937',
-  textMuted: '#9CA3AF',
-  primary: '#EA580C', // Orange
-  primaryDark: '#C2410C',
-  primaryLight: '#FB923C',
-  border: '#E5E7EB',
+const GRADIENTS = {
+  Purple: ['#B8A5FE', '#9E87F5'] as const,
+  Green: ['#4FD1C5', '#2DCECC'] as const,
+  Orange: ['#FF9F65', '#FF6B6B'] as const,
+  Yellow: ['#FFD66E', '#FFA043'] as const,
+  Blue: ['#6A82FB', '#FC5C7D'] as const,
+  BlueSolid: ['#5E72E4', '#825EE4'] as const,
 };
 
 export default function ChatLandingScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  // Tab bar height: 70px + bottom padding (max 20px) + safe area bottom
-  const TAB_BAR_HEIGHT = 70 + Math.max(insets.bottom, 20) + 20; // Extra 20px for spacing
+  const backgroundColor = useThemeColor({}, 'background');
+  const textColor = useThemeColor({}, 'text');
+  const cardColor = useThemeColor({}, 'card');
+
+  const features = [
+    {
+      icon: 'Book1',
+      title: 'Explain Concepts',
+      description: 'Break down complex topics into simple terms',
+      color: '#9E87F5'
+    },
+    {
+      icon: 'SearchNormal',
+      title: 'Fact Check',
+      description: 'Verify myths and misconceptions instantly',
+      color: '#4FD1C5'
+    },
+    {
+      icon: 'Teacher',
+      title: 'Study Partner',
+      description: 'Quiz you on what you\'ve learned so far',
+      color: '#FF9F65'
+    }
+  ];
+
+  const suggestions = [
+    "How does a nuclear reactor work?",
+    "Is radiation always dangerous?",
+    "What is half-life?",
+    "Explain fusion vs fission"
+  ];
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#FFF' }}>
-      <View style={[styles.content, { paddingTop: insets.top + 20, paddingBottom: TAB_BAR_HEIGHT }]}>
-        
-        {/* Scrollable Content */}
-        <ScrollView 
-          contentContainerStyle={styles.scrollContent}
-          showsVerticalScrollIndicator={false}
-          bounces={false}
-        >
-          {/* Hero Section with Enhanced Design */}
-          <View style={styles.heroSection}>
+    <View style={[styles.container, { backgroundColor }]}>
+      <ScrollView 
+        contentContainerStyle={[styles.content, { paddingBottom: 100 + insets.bottom, paddingTop: insets.top + 20 }]} 
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Hero Section */}
+        <View style={styles.heroSection}>
           <Animated.View 
             entering={FadeInDown.delay(100).springify()}
             style={styles.mascotContainer}
@@ -48,263 +71,268 @@ export default function ChatLandingScreen() {
             />
           </Animated.View>
           
-          <Animated.View entering={FadeInDown.delay(200).springify()}>
-            <Text style={styles.heroTitle}>Meet Schrödi</Text>
-            <View style={styles.statusBadge}>
-              <View style={styles.onlineIndicator} />
-              <Text style={styles.statusText}>AI Assistant • Always Available</Text>
-            </View>
-          </Animated.View>
-          
           <Animated.Text 
-            entering={FadeInDown.delay(300).springify()}
-            style={styles.heroSubtitle}
+            entering={FadeInDown.delay(200).springify()}
+            style={[styles.heroDescription, { color: textColor }]}
           >
-            Your personal AI research assistant. Expert in nuclear physics, safety protocols, and debunking myths with science.
+            Hi! I'm Schrödi. I can explain complex nuclear concepts, debunk myths, and help you learn faster.
           </Animated.Text>
         </View>
 
-        {/* Features with Enhanced Cards */}
-        <Animated.View entering={FadeInDown.delay(400).springify()} style={styles.featuresList}>
-          <View style={styles.featureRow}>
-            <LinearGradient
-              colors={[THEME.primary + '20', THEME.primary + '10']}
-              style={styles.iconBox}
+        {/* Features */}
+        <Animated.View entering={FadeInDown.delay(300).springify()} style={styles.featuresContainer}>
+          {features.map((feature, index) => (
+            <View 
+              key={index} 
+              style={[styles.featureCard, { backgroundColor: cardColor }]}
             >
-               <Icon name="Book1" size={20} color={THEME.primary} variant="Bold" />
-            </LinearGradient>
-            <View style={{ flex: 1 }}>
-              <Text style={styles.featureText}>Explain Complex Topics</Text>
-              <Text style={styles.featureSubtext}>Break down nuclear physics simply</Text>
+              <View style={[styles.featureIcon, { backgroundColor: feature.color + '20' }]}>
+                <Icon name={feature.icon as any} size={24} color={feature.color} variant="Bold" />
+              </View>
+              <View style={styles.featureContent}>
+                <Text style={[styles.featureTitle, { color: textColor }]}>{feature.title}</Text>
+                <Text style={styles.featureDescription}>{feature.description}</Text>
+              </View>
             </View>
-          </View>
-          
-          <View style={styles.featureRow}>
-            <LinearGradient
-              colors={['#2ECC7120', '#2ECC7110']}
-              style={styles.iconBox}
-            >
-               <Icon name="SearchNormal" size={20} color="#2ECC71" variant="Bold" />
-            </LinearGradient>
-            <View style={{ flex: 1 }}>
-              <Text style={styles.featureText}>Fact-Check Myths</Text>
-              <Text style={styles.featureSubtext}>Verify information instantly</Text>
-            </View>
-          </View>
-          
-          <View style={styles.featureRow}>
-            <LinearGradient
-              colors={['#1CB0F620', '#1CB0F610']}
-              style={styles.iconBox}
-            >
-               <Icon name="DocumentText" size={20} color="#1CB0F6" variant="Bold" />
-            </LinearGradient>
-            <View style={{ flex: 1 }}>
-              <Text style={styles.featureText}>Cite Reliable Sources</Text>
-              <Text style={styles.featureSubtext}>References from IAEA & UNSCEAR</Text>
-            </View>
-          </View>
+          ))}
         </Animated.View>
 
-          {/* Example Questions */}
-          <Animated.View entering={FadeInDown.delay(500).springify()} style={styles.examplesSection}>
-            <Text style={styles.examplesTitle}>Try asking...</Text>
-            <View style={styles.exampleChips}>
-              {['How do reactors work?', 'Is radiation dangerous?', 'What is half-life?'].map((q, i) => (
-                <View key={i} style={styles.exampleChip}>
-                  <Icon name="MessageQuestion" size={14} color={THEME.textMuted} />
-                  <Text style={styles.exampleText}>{q}</Text>
-                </View>
-              ))}
-            </View>
-          </Animated.View>
-        </ScrollView>
 
-        {/* Fixed Start Button - Always visible above tab bar */}
-        <Animated.View entering={FadeInDown.delay(600).springify()} style={styles.buttonContainer}>
+
+        {/* Start Button */}
+        <Animated.View entering={FadeInUp.delay(500).springify()} style={styles.actionContainer}>
           <TouchableOpacity 
             style={styles.startButton}
-            activeOpacity={0.8}
+            activeOpacity={0.9}
             onPress={() => router.push('/ai-chat')}
           >
             <LinearGradient
-              colors={[THEME.primary, THEME.primaryLight]}
+              colors={GRADIENTS.Purple}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
               style={styles.startButtonGradient}
             >
-              <Icon name="Message" size={20} color="#FFF" variant="Bold" />
-              <Text style={styles.startButtonText}>START CONVERSATION</Text>
-              <Icon name="ArrowRight2" size={18} color="#FFF" variant="Bold" />
+              <Icon name="Message" size={24} color="#FFF" variant="Bold" />
+              <Text style={styles.startButtonText}>Start Conversation</Text>
+              <Icon name="ArrowRight" size={24} color="#FFF" variant="Bold" />
             </LinearGradient>
-            <View style={styles.startButtonShadow} />
           </TouchableOpacity>
         </Animated.View>
 
-      </View>
+      </ScrollView>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  content: {
+  container: {
     flex: 1,
-    paddingHorizontal: 20,
   },
-  scrollContent: {
-    flexGrow: 1,
+  content: {
+    paddingBottom: 40,
+  },
+  // Header
+  headerContainer: {
+    borderBottomLeftRadius: 32,
+    borderBottomRightRadius: 32,
+    overflow: 'hidden',
+    elevation: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    zIndex: 100,
+    marginBottom: 16,
+  },
+  headerGradient: {
+    paddingHorizontal: 24,
     paddingBottom: 16,
   },
-  heroSection: {
+  headerPattern: {
+    ...StyleSheet.absoluteFillObject,
+    opacity: 0.4,
+  },
+  headerContent: {
+    zIndex: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 20,
   },
-  mascotContainer: {
-    alignItems: 'center',
-    marginBottom: 12,
-    position: 'relative',
+  headerTextContainer: {
+    flex: 1,
+    paddingRight: 12,
   },
-  mascotImage: {
-    width: 120,
-    height: 120,
-  },
-  heroTitle: {
-    fontSize: 28,
+  headerTitle: {
+    fontSize: 24,
     fontWeight: '800',
-    color: THEME.text,
-    marginBottom: 6,
-    textAlign: 'center',
+    color: '#FFFFFF',
+    marginBottom: 2,
+  },
+  headerSubtitle: {
+    fontSize: 14,
+    color: 'rgba(255,255,255,0.9)',
+    marginBottom: 0,
   },
   statusBadge: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: '#2ECC7120',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 10,
-    marginBottom: 10,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
     borderWidth: 1,
-    borderColor: '#2ECC7140',
+    borderColor: 'rgba(255,255,255,0.3)',
   },
-  onlineIndicator: {
+  statusDot: {
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: '#2ECC71',
+    backgroundColor: '#4FD1C5',
+    shadowColor: '#4FD1C5',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 1,
+    shadowRadius: 4,
+    elevation: 4,
   },
   statusText: {
     fontSize: 12,
     fontWeight: '700',
-    color: '#2ECC71',
+    color: '#FFFFFF',
   },
-  heroSubtitle: {
-    fontSize: 13,
-    color: THEME.textMuted,
-    textAlign: 'center',
-    lineHeight: 18,
-    paddingHorizontal: 10,
-  },
-  featuresList: {
-    gap: 8,
-    marginBottom: 16,
-    flexShrink: 1,
-  },
-  featureRow: {
-    flexDirection: 'row',
+
+  // Hero
+  heroSection: {
     alignItems: 'center',
-    gap: 12,
-    backgroundColor: '#FFFFFF',
-    padding: 12,
-    borderRadius: 12,
-    borderWidth: 2,
-    borderColor: THEME.border,
+    paddingHorizontal: 24,
+    marginBottom: 32,
+    marginTop: 16,
   },
-  iconBox: {
-    width: 40,
-    height: 40,
-    borderRadius: 10,
+  mascotContainer: {
+    position: 'relative',
     alignItems: 'center',
     justifyContent: 'center',
+    marginBottom: 24,
   },
-  featureText: {
-    fontSize: 14,
-    fontWeight: '800',
-    color: THEME.text,
-    marginBottom: 2,
+  mascotGlow: {
+    position: 'absolute',
+    width: 140,
+    height: 140,
+    borderRadius: 70,
+    backgroundColor: '#9E87F5',
+    opacity: 0.2,
+    transform: [{ scale: 1.2 }],
   },
-  featureSubtext: {
-    fontSize: 11,
-    color: THEME.textMuted,
-    fontWeight: '500',
+  mascotImage: {
+    width: 160,
+    height: 160,
   },
-  examplesSection: {
-    marginBottom: 16,
-  },
-  buttonContainer: {
-    paddingTop: 16,
-    paddingBottom: 8,
-    backgroundColor: '#FFF',
-  },
-  examplesTitle: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: THEME.textMuted,
-    marginBottom: 8,
+  heroDescription: {
+    fontSize: 16,
     textAlign: 'center',
+    lineHeight: 24,
+    fontWeight: '500',
+    opacity: 0.8,
   },
-  exampleChips: {
+
+  // Features
+  featuresContainer: {
+    paddingHorizontal: 20,
+    gap: 12,
+    marginBottom: 32,
+  },
+  featureCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    borderRadius: 20,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+  },
+  featureIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 16,
+  },
+  featureContent: {
+    flex: 1,
+  },
+  featureTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    marginBottom: 4,
+  },
+  featureDescription: {
+    fontSize: 13,
+    color: '#999',
+    lineHeight: 18,
+  },
+
+  // Suggestions
+  suggestionsContainer: {
+    paddingHorizontal: 20,
+    marginBottom: 32,
+  },
+  sectionTitle: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#999',
+    marginBottom: 12,
+    textTransform: 'uppercase',
+    letterSpacing: 1,
+  },
+  chipsContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 6,
-    justifyContent: 'center',
+    gap: 10,
   },
-  exampleChip: {
+  suggestionChip: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
-    backgroundColor: THEME.card,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 10,
-    borderWidth: 2,
-    borderColor: THEME.border,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 16,
+    gap: 8,
+    elevation: 1,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
   },
-  exampleText: {
-    fontSize: 11,
+  suggestionText: {
+    fontSize: 14,
     fontWeight: '600',
-    color: THEME.textMuted,
+  },
+
+  // Action
+  actionContainer: {
+    paddingHorizontal: 20,
   },
   startButton: {
-    position: 'relative',
-    height: 56,
-    borderRadius: 16,
+    borderRadius: 20,
     overflow: 'hidden',
-    flexShrink: 0,
+    elevation: 4,
+    shadowColor: '#9E87F5',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 12,
   },
   startButtonGradient: {
-    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
+    paddingVertical: 18,
     gap: 12,
-    paddingHorizontal: 24,
-  },
-  startButtonShadow: {
-    position: 'absolute',
-    bottom: -6,
-    left: 0,
-    right: 0,
-    height: 6,
-    backgroundColor: THEME.primaryDark,
-    borderBottomLeftRadius: 20,
-    borderBottomRightRadius: 20,
-    zIndex: -1,
   },
   startButtonText: {
-    color: '#FFF',
-    fontSize: 14,
+    fontSize: 18,
     fontWeight: '800',
-    letterSpacing: 0.5,
+    color: '#FFFFFF',
   },
 });

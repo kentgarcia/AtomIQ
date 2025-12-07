@@ -1,58 +1,60 @@
 import { Icon } from '@/components/ui/icon';
+import { useThemeColor } from '@/hooks/use-theme-color';
 import { useStorage } from '@/services/StorageContext';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
-import React, { useMemo, useState } from 'react';
-import { Alert, Dimensions, Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useMemo, useState } from 'react';
+import { Dimensions, Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Svg, { Circle } from 'react-native-svg';
 
 const { width } = Dimensions.get('window');
 
-// Orange theme to match the app
-const THEME = {
-  bg: '#F4F5F7',
-  card: '#FFFFFF',
-  border: '#E5E5E5',
-  text: '#2D3436',
-  textMuted: '#636E72',
-  primary: '#EA580C',
-  primaryLight: '#F97316',
-  accent: '#1CB0F6',
-  warning: '#FFC800',
-  secondary: '#FF4B4B',
-  green: '#2ECC71',
-  gold: '#FFD700',
-  silver: '#C0C0C0',
-  bronze: '#CD7F32',
+const GRADIENTS = {
+  Purple: ['#B8A5FE', '#9E87F5'] as const,
+  Green: ['#4FD1C5', '#2DCECC'] as const,
+  Orange: ['#FF9F65', '#FF6B6B'] as const,
+  Yellow: ['#FFD66E', '#FFA043'] as const,
+  Blue: ['#6A82FB', '#FC5C7D'] as const,
+  BlueSolid: ['#5E72E4', '#825EE4'] as const,
 };
 
-// Achievement thresholds
+// Achievement thresholds with mapped gradients
 const ACHIEVEMENTS = [
-  { id: 1, title: 'First Steps', requirement: 'Complete 1 lesson', threshold: 1, field: 'lessons_completed', icon: 'Award', color: '#FFC800' },
-  { id: 2, title: 'Myth Buster', requirement: 'Bust 10 myths', threshold: 10, field: 'myths_busted', icon: 'TickCircle', color: THEME.green },
-  { id: 3, title: 'On Fire', requirement: '7 day streak', threshold: 7, field: 'current_streak', icon: 'Flash', color: '#EA580C' },
-  { id: 4, title: 'XP Master', requirement: 'Earn 1000 XP', threshold: 1000, field: 'total_xp', icon: 'Star', color: '#1CB0F6' },
-  { id: 5, title: 'Dedicated', requirement: '30 day streak', threshold: 30, field: 'longest_streak', icon: 'Crown', color: '#FFD700' },
-  { id: 6, title: 'Scholar', requirement: 'Complete 10 lessons', threshold: 10, field: 'lessons_completed', icon: 'Book', color: '#9B59B6' },
-  { id: 7, title: 'Nuclear Expert', requirement: 'Earn 5000 XP', threshold: 5000, field: 'total_xp', icon: 'Medal', color: '#E91E63' },
-  { id: 8, title: 'Truth Seeker', requirement: 'Bust 25 myths', threshold: 25, field: 'myths_busted', icon: 'SearchNormal1', color: '#00BCD4' },
+  { id: 1, title: 'First Steps', requirement: 'Complete 1 lesson', threshold: 1, field: 'lessons_completed', icon: 'Award', gradient: GRADIENTS.Yellow },
+  { id: 2, title: 'Myth Buster', requirement: 'Bust 10 myths', threshold: 10, field: 'myths_busted', icon: 'TickCircle', gradient: GRADIENTS.Green },
+  { id: 3, title: 'On Fire', requirement: '7 day streak', threshold: 7, field: 'current_streak', icon: 'Flash', gradient: GRADIENTS.Orange },
+  { id: 4, title: 'XP Master', requirement: 'Earn 1000 XP', threshold: 1000, field: 'total_xp', icon: 'Star', gradient: GRADIENTS.Blue },
+  { id: 5, title: 'Dedicated', requirement: '30 day streak', threshold: 30, field: 'longest_streak', icon: 'Crown', gradient: GRADIENTS.Yellow },
+  { id: 6, title: 'Scholar', requirement: 'Complete 10 lessons', threshold: 10, field: 'lessons_completed', icon: 'Book', gradient: GRADIENTS.Purple },
+  { id: 7, title: 'Nuclear Expert', requirement: 'Earn 5000 XP', threshold: 5000, field: 'total_xp', icon: 'Medal', gradient: GRADIENTS.BlueSolid },
+  { id: 8, title: 'Truth Seeker', requirement: 'Bust 25 myths', threshold: 25, field: 'myths_busted', icon: 'SearchNormal1', gradient: GRADIENTS.Green },
 ];
 
-// Certificates
+// Certificates with mapped gradients
 const CERTIFICATES = [
-  { id: 1, title: 'Nuclear Basics', description: 'Fundamentals of Nuclear Science', color: '#EA580C', unlockField: 'lessons_completed', threshold: 5 },
-  { id: 2, title: 'Radiation Safety', description: 'Understanding Radiation & Protection', color: '#2ECC71', unlockField: 'lessons_completed', threshold: 10 },
-  { id: 3, title: 'Myth Buster Pro', description: 'Debunking Nuclear Misconceptions', color: '#3498DB', unlockField: 'myths_busted', threshold: 15 },
-  { id: 4, title: 'Nuclear Energy Expert', description: 'Advanced Nuclear Concepts', color: '#9B59B6', unlockField: 'lessons_completed', threshold: 20 },
+  { id: 1, title: 'Nuclear Basics', description: 'Fundamentals of Nuclear Science', gradient: GRADIENTS.Orange, unlockField: 'lessons_completed', threshold: 5 },
+  { id: 2, title: 'Radiation Safety', description: 'Understanding Radiation & Protection', gradient: GRADIENTS.Green, unlockField: 'lessons_completed', threshold: 10 },
+  { id: 3, title: 'Myth Buster Pro', description: 'Debunking Nuclear Misconceptions', gradient: GRADIENTS.Blue, unlockField: 'myths_busted', threshold: 15 },
+  { id: 4, title: 'Nuclear Energy Expert', description: 'Advanced Nuclear Concepts', gradient: GRADIENTS.Purple, unlockField: 'lessons_completed', threshold: 20 },
 ];
 
 export default function AwardsScreen() {
   const { userProfile } = useStorage();
   const router = useRouter();
+  const insets = useSafeAreaInsets();
+  const backgroundColor = useThemeColor({}, 'background');
+  const textColor = useThemeColor({}, 'text');
+  const cardColor = useThemeColor({}, 'card');
   
   // State for certificate preview
   const [selectedCertificate, setSelectedCertificate] = useState<typeof CERTIFICATES[0] & { unlocked: boolean } | null>(null);
   const [showCertificateModal, setShowCertificateModal] = useState(false);
+  
+  // State for achievement details
+  const [selectedAchievement, setSelectedAchievement] = useState<typeof achievements[0] | null>(null);
+  const [showAchievementModal, setShowAchievementModal] = useState(false);
 
   // Calculate achievements
   const achievements = useMemo(() => {
@@ -97,47 +99,86 @@ export default function AwardsScreen() {
   
   // Handle save certificate
   const handleSaveCertificate = () => {
-    Alert.alert(
-      'Save Certificate',
-      'Certificate saved to your gallery!',
-      [{ text: 'OK' }]
-    );
+    // In a real app, this would save to camera roll
+    setShowCertificateModal(false);
+  };
+  
+  // Handle achievement click
+  const openAchievementDetails = (achievement: typeof achievements[0]) => {
+    setSelectedAchievement(achievement);
+    setShowAchievementModal(true);
   };
 
-  if (!userProfile) {
-    return (
-      <View style={{ flex: 1, backgroundColor: THEME.bg, alignItems: 'center', justifyContent: 'center' }}>
-        <Text style={{ color: THEME.textMuted }}>Loading awards...</Text>
-      </View>
-    );
-  }
-
   return (
-    <View style={{ flex: 1, backgroundColor: THEME.bg }}>
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        {/* Header */}
-        <Animated.View entering={FadeInDown.delay(100).springify()} style={styles.headerRow}>
-          <Text style={styles.headerTitle}>Awards</Text>
-          <View style={styles.statsRow}>
-            <View style={styles.statBadge}>
-              <Icon name="Medal" size={16} color={THEME.gold} variant="Bold" />
-              <Text style={styles.statBadgeText}>{unlockedAchievements}</Text>
+    <View style={[styles.container, { backgroundColor }]}>
+      {/* Header */}
+      <View style={[styles.header, { paddingTop: insets.top + 16, backgroundColor: cardColor }]}>
+        <View style={styles.headerContent}>
+          <View style={styles.headerTextContainer}>
+            <Text style={[styles.headerTitle, { color: textColor }]}>Hall of Fame</Text>
+            <Text style={styles.headerSubtitle}>Your achievements</Text>
+          </View>
+          
+          <View style={styles.headerStats}>
+            <View style={[styles.compactStat, { backgroundColor }]}>
+              <Icon name="Medal" size={18} color={textColor} variant="Bold" />
+              <Text style={[styles.compactStatText, { color: textColor }]}>{unlockedAchievements}</Text>
             </View>
-            <View style={styles.statBadge}>
-              <Icon name="Document" size={16} color={THEME.accent} variant="Bold" />
-              <Text style={styles.statBadgeText}>{unlockedCertificates}</Text>
+            <View style={[styles.compactStat, { backgroundColor }]}>
+              <Icon name="Document" size={18} color={textColor} variant="Bold" />
+              <Text style={[styles.compactStatText, { color: textColor }]}>{unlockedCertificates}</Text>
             </View>
           </View>
+        </View>
+      </View>
+
+      <ScrollView 
+        contentContainerStyle={[styles.content, { paddingBottom: 100 + insets.bottom }]} 
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Leaderboard Teaser */}
+        <Animated.View entering={FadeInDown.delay(100).springify()} style={styles.sectionContainer}>
+          <TouchableOpacity 
+            style={[styles.leaderboardCard, { backgroundColor: cardColor }]}
+            onPress={() => router.push('/(tabs)/leaderboard')}
+            activeOpacity={0.9}
+          >
+            <LinearGradient
+              colors={GRADIENTS.BlueSolid}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.leaderboardGradient}
+            >
+              <View style={styles.leaderboardContent}>
+                <View style={styles.leaderboardIconContainer}>
+                  <Icon name="Cup" size={32} color="#FFFFFF" variant="Bold" />
+                </View>
+                <View style={styles.leaderboardTextContainer}>
+                  <Text style={styles.leaderboardTitle}>Global Leaderboard</Text>
+                  <Text style={styles.leaderboardDesc}>Compete with learners worldwide!</Text>
+                </View>
+                <View style={styles.leaderboardArrow}>
+                  <Icon name="ArrowRight" size={24} color="#FFFFFF" variant="Bold" />
+                </View>
+              </View>
+            </LinearGradient>
+          </TouchableOpacity>
         </Animated.View>
 
         {/* Certificates Section */}
-        <Animated.View entering={FadeInDown.delay(200).springify()}>
+        <Animated.View entering={FadeInDown.delay(200).springify()} style={styles.sectionContainer}>
           <View style={styles.sectionHeader}>
-            <Icon name="Document" size={24} color={THEME.accent} variant="Bold" />
-            <Text style={styles.sectionTitle}>Certificates</Text>
+            <Icon name="Document" size={24} color={textColor} variant="Bold" />
+            <Text style={[styles.sectionTitle, { color: textColor }]}>Certificates</Text>
             <Text style={styles.sectionCount}>{unlockedCertificates}/{CERTIFICATES.length}</Text>
           </View>
-          <View style={styles.certificatesGrid}>
+          <ScrollView 
+            horizontal 
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.certificatesScrollContent}
+            decelerationRate="fast"
+            snapToInterval={320}
+          >
             {certificates.map((cert, index) => (
               <TouchableOpacity 
                 key={cert.id}
@@ -147,33 +188,136 @@ export default function AwardsScreen() {
               >
                 <Animated.View 
                   entering={FadeInDown.delay(250 + index * 50).springify()}
-                  style={[styles.certificate, !cert.unlocked && styles.certificateLocked]}
+                  style={[
+                    styles.certificate, 
+                    { backgroundColor: cardColor },
+                    !cert.unlocked && styles.certificateLocked
+                  ]}
                 >
                   {cert.unlocked ? (
                     <LinearGradient
-                      colors={[cert.color, cert.color + 'CC']}
+                      colors={cert.gradient}
                       start={{ x: 0, y: 0 }}
                       end={{ x: 1, y: 1 }}
                       style={styles.certificateGradient}
                     >
-                      {/* Certificate Design */}
-                      <View style={styles.certificateBorder}>
-                        <View style={styles.certificateInner}>
-                          <Icon name="Award" size={32} color="#FFF" variant="Bold" />
-                          <Text style={styles.certificateLabel}>CERTIFICATE OF</Text>
-                          <Text style={styles.certificateTitle}>{cert.title}</Text>
-                          <Text style={styles.certificateDesc}>{cert.description}</Text>
-                          <View style={styles.certificateTapHint}>
-                            <Text style={styles.certificateTapText}>Tap to preview</Text>
+                      <View style={styles.certDecoration1} />
+                      <View style={styles.certDecoration2} />
+                      
+                      <View style={styles.certificateContent}>
+                        <View style={styles.certificateLeft}>
+                          <View style={styles.certificateIconBadge}>
+                            <Icon name="Award" size={28} color={cert.gradient[1]} variant="Bold" />
+                          </View>
+                        </View>
+                        <View style={styles.certificateRight}>
+                          <Text style={styles.certificateLabel}>CERTIFICATE</Text>
+                          <Text style={styles.certificateTitle} numberOfLines={2}>{cert.title}</Text>
+                          <View style={styles.certificateButton}>
+                            <Text style={[styles.certificateButtonText, { color: cert.gradient[1] }]}>VIEW</Text>
                           </View>
                         </View>
                       </View>
                     </LinearGradient>
                   ) : (
                     <View style={styles.certificateLockedContent}>
-                      <Icon name="Lock1" size={32} color="#AAA" variant="Bold" />
-                      <Text style={styles.certificateTitleLocked}>{cert.title}</Text>
-                      <Text style={styles.certificateDescLocked}>{cert.description}</Text>
+                      <View style={styles.certificateIconBadgeLocked}>
+                        <Icon name="Lock1" size={24} color="#999" variant="Bold" />
+                      </View>
+                      <View style={styles.certificateRight}>
+                        <Text style={[styles.certificateTitleLocked, { color: textColor }]}>{cert.title}</Text>
+                        <Text style={styles.certificateDescLocked}>Complete requirements to unlock</Text>
+                      </View>
+                    </View>
+                  )}
+                </Animated.View>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        </Animated.View>
+
+        {/* Achievements Section */}
+        <Animated.View entering={FadeInDown.delay(300).springify()} style={styles.sectionContainer}>
+          <View style={styles.sectionHeader}>
+            <Icon name="Medal" size={24} color={textColor} variant="Bold" />
+            <Text style={[styles.sectionTitle, { color: textColor }]}>Achievements</Text>
+            <Text style={styles.sectionCount}>{unlockedAchievements}/{ACHIEVEMENTS.length}</Text>
+          </View>
+          <View style={styles.achievementsGrid}>
+            {achievements.map((achievement, index) => (
+              <TouchableOpacity
+                key={achievement.id}
+                activeOpacity={0.7}
+                style={styles.achievementWrapper}
+                onPress={() => openAchievementDetails(achievement)}
+              >
+                <Animated.View 
+                  entering={FadeInDown.delay(450 + index * 50).springify()}
+                  style={[
+                    styles.achievementCard, 
+                    { backgroundColor: cardColor },
+                    achievement.locked && styles.achievementCardLocked
+                  ]}
+                >
+                  <View style={styles.circularProgressContainer}>
+                    <Svg width={80} height={80}>
+                      {/* Track */}
+                      <Circle
+                        cx={40}
+                        cy={40}
+                        r={36}
+                        stroke={achievement.locked ? '#E0E0E0' : achievement.gradient[0] + '30'}
+                        strokeWidth={6}
+                        fill="transparent"
+                      />
+                      {/* Progress */}
+                      {!achievement.locked && (
+                        <Circle
+                          cx={40}
+                          cy={40}
+                          r={36}
+                          stroke={achievement.gradient[0]}
+                          strokeWidth={6}
+                          strokeDasharray={2 * Math.PI * 36}
+                          strokeDashoffset={2 * Math.PI * 36 * (1 - achievement.progress / 100)}
+                          strokeLinecap="round"
+                          fill="transparent"
+                          rotation="-90"
+                          origin="40, 40"
+                        />
+                      )}
+                    </Svg>
+                    <View style={styles.achievementIconContainer}>
+                      {achievement.locked ? (
+                        <Icon name="Lock1" size={24} color="#999" variant="Bold" />
+                      ) : (
+                        <Icon name={achievement.icon as any} size={28} color={achievement.gradient[0]} variant="Bold" />
+                      )}
+                    </View>
+                  </View>
+
+                  <View style={styles.achievementTextContent}>
+                    <Text style={[
+                      styles.achievementCardTitle,
+                      { color: textColor },
+                      achievement.locked && styles.achievementCardTitleLocked
+                    ]} numberOfLines={1}>
+                      {achievement.title}
+                    </Text>
+                    <Text style={styles.achievementCardDescription} numberOfLines={2}>
+                      {achievement.requirement}
+                    </Text>
+                  </View>
+
+                  {/* Status Badge */}
+                  {!achievement.locked && achievement.progress >= 100 && (
+                    <View style={[styles.achievementStatusBadge, { backgroundColor: achievement.gradient[0] + '20' }]}>
+                      <Text style={[styles.achievementStatusText, { color: achievement.gradient[0] }]}>Completed</Text>
+                    </View>
+                  )}
+                  {!achievement.locked && achievement.progress < 100 && (
+                    <View style={[styles.achievementStatusBadge, { backgroundColor: '#F0F0F0' }]}>
+                      <Text style={[styles.achievementStatusText, { color: '#666' }]}>{Math.round(achievement.progress)}%</Text>
                     </View>
                   )}
                 </Animated.View>
@@ -181,106 +325,99 @@ export default function AwardsScreen() {
             ))}
           </View>
         </Animated.View>
-
-        {/* Achievements Section */}
-        <Animated.View entering={FadeInDown.delay(300).springify()}>
-          <View style={styles.sectionHeader}>
-            <Icon name="Medal" size={24} color={THEME.gold} variant="Bold" />
-            <Text style={styles.sectionTitle}>Achievements</Text>
-            <Text style={styles.sectionCount}>{unlockedAchievements}/{ACHIEVEMENTS.length}</Text>
-          </View>
-          <View style={styles.achievementsGrid}>
-            {achievements.map((achievement, index) => (
-              <TouchableOpacity
-                key={achievement.id}
-                onPress={() => router.push(`/achievement-detail?achievementId=${achievement.id}`)}
-                activeOpacity={0.7}
-              >
-                <Animated.View 
-                  entering={FadeInDown.delay(450 + index * 50).springify()}
-                  style={[styles.achievementCard, achievement.locked && styles.achievementCardLocked]}
-                >
-                  <LinearGradient
-                    colors={achievement.locked 
-                      ? ['#F5F5F5', '#E8E8E8'] 
-                      : [achievement.color + '20', achievement.color + '10']
-                    }
-                    start={{ x: 0, y: 0 }}
-                    end={{ x: 1, y: 1 }}
-                    style={styles.achievementCardGradient}
-                  >
-                    {/* Icon Section */}
-                    <View style={styles.achievementIconSection}>
-                      <View style={[
-                        styles.achievementIconCircle,
-                        achievement.locked && styles.achievementIconCircleLocked,
-                        { borderColor: achievement.color }
-                      ]}>
-                        {achievement.locked ? (
-                          <Icon 
-                            name="Lock1" 
-                            size={32} 
-                            color="#999" 
-                            variant="Bold" 
-                          />
-                        ) : (
-                          <Icon 
-                            name={achievement.icon as any} 
-                            size={36} 
-                            color={achievement.color} 
-                            variant="Bold" 
-                          />
-                        )}
-                      </View>
-                      {!achievement.locked && (
-                        <View style={styles.achievementBadge}>
-                          <Icon name="TickCircle" size={18} color={THEME.green} variant="Bold" />
-                        </View>
-                      )}
-                    </View>
-
-                    {/* Content Section */}
-                    <View style={styles.achievementContent}>
-                      <Text style={[
-                        styles.achievementCardTitle,
-                        achievement.locked && styles.achievementCardTitleLocked
-                      ]}>
-                        {achievement.title}
-                      </Text>
-                      <Text style={styles.achievementCardDescription}>
-                        {achievement.requirement}
-                      </Text>
-                      
-                      {/* Progress Section */}
-                      <View style={styles.achievementProgressSection}>
-                        <View style={styles.achievementProgressBar}>
-                          <LinearGradient
-                            colors={achievement.locked 
-                              ? ['#E0E0E0', '#D0D0D0'] 
-                              : [achievement.color, achievement.color + 'CC']
-                            }
-                            start={{ x: 0, y: 0 }}
-                            end={{ x: 1, y: 0 }}
-                            style={[
-                              styles.achievementProgressFill,
-                              { width: `${achievement.progress}%` }
-                            ]}
-                          />
-                        </View>
-                        <Text style={styles.achievementProgressText}>
-                          {achievement.currentValue} / {achievement.threshold}
-                        </Text>
-                      </View>
-                    </View>
-                  </LinearGradient>
-                </Animated.View>
-              </TouchableOpacity>
-            ))}
-          </View>
-        </Animated.View>
-
-        <View style={{ height: 100 }} />
       </ScrollView>
+      
+      {/* Achievement Details Modal */}
+      <Modal
+        visible={showAchievementModal}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setShowAchievementModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          {selectedAchievement && (
+            <Animated.View 
+              entering={FadeInDown.springify()}
+              style={[styles.achievementModalContainer, { backgroundColor: cardColor }]}
+            >
+              {/* Header with Icon */}
+              <View style={styles.achievementModalHeader}>
+                <LinearGradient
+                  colors={selectedAchievement.gradient}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={styles.achievementModalIconContainer}
+                >
+                  {selectedAchievement.locked ? (
+                    <Icon name="Lock1" size={40} color="#FFF" variant="Bold" />
+                  ) : (
+                    <Icon name={selectedAchievement.icon as any} size={40} color="#FFF" variant="Bold" />
+                  )}
+                </LinearGradient>
+                
+                <TouchableOpacity 
+                  style={styles.achievementModalClose}
+                  onPress={() => setShowAchievementModal(false)}
+                >
+                  <Icon name="CloseCircle" size={28} color={textColor} />
+                </TouchableOpacity>
+              </View>
+              
+              {/* Title & Description */}
+              <View style={styles.achievementModalContent}>
+                <Text style={[styles.achievementModalTitle, { color: textColor }]}>
+                  {selectedAchievement.title}
+                </Text>
+                <Text style={styles.achievementModalRequirement}>
+                  {selectedAchievement.requirement}
+                </Text>
+                
+                {/* Progress Section */}
+                <View style={styles.progressSection}>
+                  <View style={styles.progressHeader}>
+                    <Text style={[styles.progressLabel, { color: textColor }]}>Progress</Text>
+                    <Text style={[styles.progressValue, { color: selectedAchievement.gradient[0] }]}>
+                      {selectedAchievement.currentValue} / {selectedAchievement.threshold}
+                    </Text>
+                  </View>
+                  
+                  {/* Progress Bar */}
+                  <View style={styles.progressBarContainer}>
+                    <View style={[styles.progressBarTrack, { backgroundColor: backgroundColor }]}>
+                      <LinearGradient
+                        colors={selectedAchievement.gradient}
+                        start={{ x: 0, y: 0 }}
+                        end={{ x: 1, y: 0 }}
+                        style={[styles.progressBarFill, { width: `${selectedAchievement.progress}%` }]}
+                      />
+                    </View>
+                    <Text style={[styles.progressPercentage, { color: selectedAchievement.gradient[0] }]}>
+                      {Math.round(selectedAchievement.progress)}%
+                    </Text>
+                  </View>
+                  
+                  {/* Status */}
+                  {selectedAchievement.locked ? (
+                    <View style={styles.statusContainer}>
+                      <Icon name="InfoCircle" size={18} color="#999" />
+                      <Text style={styles.statusText}>
+                        Keep going! You're {selectedAchievement.threshold - selectedAchievement.currentValue} away from unlocking this achievement.
+                      </Text>
+                    </View>
+                  ) : (
+                    <View style={[styles.statusContainer, styles.statusContainerUnlocked]}>
+                      <Icon name="TickCircle" size={18} color={selectedAchievement.gradient[0]} variant="Bold" />
+                      <Text style={[styles.statusTextUnlocked, { color: selectedAchievement.gradient[0] }]}>
+                        Achievement Unlocked!
+                      </Text>
+                    </View>
+                  )}
+                </View>
+              </View>
+            </Animated.View>
+          )}
+        </View>
+      </Modal>
       
       {/* Certificate Preview Modal */}
       <Modal
@@ -299,20 +436,25 @@ export default function AwardsScreen() {
               <View style={styles.certificatePreview}>
                 <View style={styles.certificatePaper}>
                   {/* Decorative Border */}
-                  <View style={[styles.certificateOuterBorder, { borderColor: selectedCertificate.color }]}>
-                    <View style={[styles.certificateInnerBorder, { borderColor: selectedCertificate.color + '50' }]}>
+                  <View style={[styles.certificateOuterBorder, { borderColor: selectedCertificate.gradient[0] }]}>
+                    <View style={[styles.certificateInnerBorder, { borderColor: selectedCertificate.gradient[0] + '50' }]}>
                       
                       {/* Certificate Content */}
-                      <View style={styles.certificateContent}>
+                      <View style={styles.previewCertificateContent}>
                         {/* Header */}
                         <View style={styles.certHeaderSection}>
-                          <Text style={[styles.certHeaderText, { color: selectedCertificate.color }]}>CERTIFICATE</Text>
+                          <Text style={[styles.certHeaderText, { color: selectedCertificate.gradient[0] }]}>CERTIFICATE</Text>
                           <Text style={styles.certOfText}>of</Text>
-                          <Text style={[styles.certAchievementText, { color: selectedCertificate.color }]}>ACHIEVEMENT</Text>
+                          <Text style={[styles.certAchievementText, { color: selectedCertificate.gradient[1] }]}>ACHIEVEMENT</Text>
                         </View>
                         
                         {/* Decorative Line */}
-                        <View style={[styles.decorativeLine, { backgroundColor: selectedCertificate.color }]} />
+                        <LinearGradient
+                          colors={selectedCertificate.gradient}
+                          start={{ x: 0, y: 0 }}
+                          end={{ x: 1, y: 0 }}
+                          style={styles.decorativeLine}
+                        />
                         
                         {/* Body */}
                         <View style={styles.certBodySection}>
@@ -326,7 +468,7 @@ export default function AwardsScreen() {
                             has successfully completed the course
                           </Text>
                           
-                          <Text style={[styles.courseTitle, { color: selectedCertificate.color }]}>
+                          <Text style={[styles.courseTitle, { color: selectedCertificate.gradient[0] }]}>
                             {selectedCertificate.title}
                           </Text>
                           
@@ -336,14 +478,19 @@ export default function AwardsScreen() {
                         </View>
                         
                         {/* Decorative Line */}
-                        <View style={[styles.decorativeLine, { backgroundColor: selectedCertificate.color }]} />
+                        <LinearGradient
+                          colors={selectedCertificate.gradient}
+                          start={{ x: 0, y: 0 }}
+                          end={{ x: 1, y: 0 }}
+                          style={styles.decorativeLine}
+                        />
                         
                         {/* Footer */}
                         <View style={styles.certFooterSection}>
                           <Text style={styles.issueDateText}>
                             Issued on {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
                           </Text>
-                          <Text style={[styles.issuerName, { color: selectedCertificate.color }]}>AtomIQ</Text>
+                          <Text style={[styles.issuerName, { color: selectedCertificate.gradient[0] }]}>AtomIQ</Text>
                           <Text style={styles.issuerTagline}>Nuclear Science Education Platform</Text>
                         </View>
                       </View>
@@ -356,18 +503,25 @@ export default function AwardsScreen() {
               {/* Action Buttons */}
               <View style={styles.buttonContainer}>
                 <TouchableOpacity 
-                  style={[styles.actionButton, styles.saveButton, { backgroundColor: selectedCertificate.color }]}
+                  style={styles.actionButton}
                   onPress={handleSaveCertificate}
                 >
-                  <Icon name="DocumentDownload" size={20} color="#FFF" variant="Bold" />
-                  <Text style={styles.saveButtonText}>Save</Text>
+                  <LinearGradient
+                    colors={selectedCertificate.gradient}
+                    style={styles.actionButtonGradient}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}
+                  >
+                    <Icon name="DocumentDownload" size={20} color="#FFF" variant="Bold" />
+                    <Text style={styles.saveButtonText}>Save</Text>
+                  </LinearGradient>
                 </TouchableOpacity>
                 
                 <TouchableOpacity 
                   style={[styles.actionButton, styles.closeButtonNew]}
                   onPress={() => setShowCertificateModal(false)}
                 >
-                  <Icon name="CloseCircle" size={20} color={THEME.text} variant="Bold" />
+                  <Icon name="CloseCircle" size={20} color="#333" variant="Bold" />
                   <Text style={styles.closeButtonText}>Close</Text>
                 </TouchableOpacity>
               </View>
@@ -380,241 +534,335 @@ export default function AwardsScreen() {
 }
 
 const styles = StyleSheet.create({
-  content: {
-    padding: 24,
-    paddingTop: 60,
-    paddingBottom: 100,
+  container: {
+    flex: 1,
   },
-  headerRow: {
+  content: {
+    paddingBottom: 40,
+  },
+  // Header
+  header: {
+    paddingHorizontal: 20,
+    paddingBottom: 16,
+  },
+  headerContent: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 24,
+  },
+  headerTextContainer: {
+    flex: 1,
+    paddingRight: 12,
   },
   headerTitle: {
     fontSize: 28,
     fontWeight: '800',
-    color: THEME.text,
+    marginBottom: 4,
   },
-  statsRow: {
+  headerSubtitle: {
+    fontSize: 14,
+    color: '#8898AA',
+    fontWeight: '500',
+  },
+  headerStats: {
     flexDirection: 'row',
     gap: 8,
   },
-  statBadge: {
+  compactStat: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
-    backgroundColor: THEME.card,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: THEME.border,
+    gap: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 16,
   },
-  statBadgeText: {
+  compactStatText: {
     fontSize: 14,
     fontWeight: '700',
-    color: THEME.text,
   },
+  
+  // Section Container
+  sectionContainer: {
+    marginTop: 24,
+  },
+
+  // Leaderboard Card
+  leaderboardCard: {
+    marginHorizontal: 20,
+    borderRadius: 24,
+    overflow: 'hidden',
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+  },
+  leaderboardGradient: {
+    padding: 20,
+  },
+  leaderboardContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 16,
+  },
+  leaderboardIconContainer: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.3)',
+  },
+  leaderboardTextContainer: {
+    flex: 1,
+  },
+  leaderboardTitle: {
+    fontSize: 18,
+    fontWeight: '800',
+    color: '#FFFFFF',
+    marginBottom: 4,
+  },
+  leaderboardDesc: {
+    fontSize: 14,
+    color: 'rgba(255,255,255,0.9)',
+    fontWeight: '600',
+  },
+  leaderboardArrow: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  // Section Headers
   sectionHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
     marginBottom: 16,
-    marginTop: 8,
+    paddingHorizontal: 20,
   },
   sectionTitle: {
     fontSize: 20,
     fontWeight: '800',
-    color: THEME.text,
     flex: 1,
   },
   sectionCount: {
     fontSize: 14,
     fontWeight: '700',
-    color: THEME.textMuted,
+    color: '#999',
   },
-  // Certificate Styles
-  certificatesGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 12,
-    marginBottom: 24,
+
+  // Certificates
+  certificatesScrollContent: {
+    paddingHorizontal: 20,
+    gap: 16,
+    paddingBottom: 20, // Space for shadow
   },
   certificateWrapper: {
-    width: (width - 60) / 2,
+    width: 300,
   },
   certificate: {
-    aspectRatio: 0.75,
-    borderRadius: 12,
+    height: 170,
+    borderRadius: 24,
     overflow: 'hidden',
-    borderWidth: 2,
-    borderColor: THEME.border,
-  },
-  certificateLocked: {
-    backgroundColor: '#F5F5F5',
-    borderColor: '#DDD',
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
   },
   certificateGradient: {
     flex: 1,
-    padding: 3,
-  },
-  certificateBorder: {
-    flex: 1,
-    borderWidth: 2,
-    borderColor: 'rgba(255, 255, 255, 0.4)',
-    borderRadius: 8,
-    borderStyle: 'dashed',
-  },
-  certificateInner: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 12,
-  },
-  certificateLabel: {
-    fontSize: 8,
-    fontWeight: '700',
-    color: 'rgba(255, 255, 255, 0.8)',
-    letterSpacing: 2,
-    marginTop: 8,
-  },
-  certificateTitle: {
-    fontSize: 14,
-    fontWeight: '800',
-    color: '#FFF',
-    textAlign: 'center',
-    marginTop: 4,
-  },
-  certificateDesc: {
-    fontSize: 9,
-    color: 'rgba(255, 255, 255, 0.8)',
-    textAlign: 'center',
-    marginTop: 4,
-  },
-  certificateTapHint: {
-    position: 'absolute',
-    bottom: 8,
-    left: 0,
-    right: 0,
-    alignItems: 'center',
-  },
-  certificateTapText: {
-    fontSize: 8,
-    color: 'rgba(255, 255, 255, 0.7)',
-    fontWeight: '600',
-  },
-  certificateLockedContent: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 16,
-  },
-  certificateTitleLocked: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: '#999',
-    textAlign: 'center',
-    marginTop: 8,
-  },
-  certificateDescLocked: {
-    fontSize: 10,
-    color: '#AAA',
-    textAlign: 'center',
-    marginTop: 4,
-  },
-  // Achievement Styles
-  achievementsGrid: {
-    gap: 16,
-  },
-  achievementCard: {
-    borderRadius: 20,
-    overflow: 'hidden',
-    borderWidth: 2,
-    borderColor: THEME.border,
-  },
-  achievementCardLocked: {
-    borderColor: '#E0E0E0',
-  },
-  achievementCardGradient: {
-    padding: 20,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  achievementIconSection: {
-    marginRight: 16,
     position: 'relative',
   },
-  achievementIconCircle: {
-    width: 70,
-    height: 70,
-    borderRadius: 35,
+  certificateLocked: {
+    backgroundColor: '#F5F5F5',
+    borderWidth: 1,
+    borderColor: '#E5E5E5',
+  },
+  certificateContent: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    padding: 20,
+    zIndex: 10,
+  },
+  certificateLeft: {
+    marginRight: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  certificateRight: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'flex-start',
+  },
+  certificateIconBadge: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
     backgroundColor: '#FFFFFF',
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 3,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
-    elevation: 3,
+    elevation: 2,
   },
-  achievementIconCircleLocked: {
-    backgroundColor: '#F5F5F5',
-    borderColor: '#D0D0D0',
+  certificateLabel: {
+    fontSize: 10,
+    fontWeight: '800',
+    color: 'rgba(255,255,255,0.8)',
+    letterSpacing: 1,
+    marginBottom: 4,
   },
-  achievementBadge: {
-    position: 'absolute',
-    top: -4,
-    right: -4,
+  certificateTitle: {
+    fontSize: 18,
+    fontWeight: '800',
+    color: '#FFFFFF',
+    marginBottom: 12,
+    lineHeight: 22,
+  },
+  certificateButton: {
     backgroundColor: '#FFFFFF',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
     borderRadius: 12,
-    borderWidth: 2,
-    borderColor: THEME.green,
-    padding: 2,
+    alignSelf: 'flex-start',
   },
-  achievementContent: {
+  certificateButtonText: {
+    fontSize: 12,
+    fontWeight: '800',
+  },
+  certDecoration1: {
+    position: 'absolute',
+    top: -20,
+    right: -20,
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: 'rgba(255,255,255,0.1)',
+  },
+  certDecoration2: {
+    position: 'absolute',
+    bottom: -30,
+    left: 40,
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: 'rgba(255,255,255,0.05)',
+  },
+  certificateLockedContent: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 20,
+  },
+  certificateIconBadgeLocked: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: '#E0E0E0',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 16,
+  },
+  certificateTitleLocked: {
+    fontSize: 16,
+    fontWeight: '700',
+    marginBottom: 4,
+  },
+  certificateDescLocked: {
+    fontSize: 13,
+    color: '#999',
+    fontWeight: '500',
+  },
+
+  // Achievements
+  achievementsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+    paddingHorizontal: 20,
+    paddingBottom: 20,
+  },
+  achievementWrapper: {
+    width: (width - 52) / 2,
+  },
+  achievementCard: {
+    borderRadius: 24,
+    padding: 16,
+    alignItems: 'center',
+    height: 200,
+    justifyContent: 'space-between',
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+  },
+  achievementCardLocked: {
+    opacity: 0.7,
+    backgroundColor: '#F9F9F9',
+  },
+  circularProgressContainer: {
+    position: 'relative',
+    width: 80,
+    height: 80,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 12,
+  },
+  achievementIconContainer: {
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  achievementTextContent: {
+    alignItems: 'center',
+    width: '100%',
     flex: 1,
   },
   achievementCardTitle: {
-    fontSize: 18,
+    fontSize: 15,
     fontWeight: '800',
-    color: THEME.text,
     marginBottom: 4,
+    textAlign: 'center',
   },
   achievementCardTitleLocked: {
-    color: THEME.textMuted,
+    color: '#999',
   },
   achievementCardDescription: {
-    fontSize: 13,
-    color: THEME.textMuted,
-    marginBottom: 12,
-    fontWeight: '500',
-  },
-  achievementProgressSection: {
-    marginTop: 4,
-  },
-  achievementProgressBar: {
-    width: '100%',
-    height: 8,
-    backgroundColor: '#E8E8E8',
-    borderRadius: 4,
-    overflow: 'hidden',
-    marginBottom: 6,
-  },
-  achievementProgressFill: {
-    height: '100%',
-    borderRadius: 4,
-  },
-  achievementProgressText: {
     fontSize: 12,
-    fontWeight: '700',
-    color: THEME.textMuted,
+    color: '#999',
+    textAlign: 'center',
+    fontWeight: '500',
+    lineHeight: 16,
   },
-  // Certificate Preview Modal Styles
+  achievementStatusBadge: {
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+    marginTop: 8,
+  },
+  achievementStatusText: {
+    fontSize: 10,
+    fontWeight: '700',
+  },
+
+  // Modal
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.9)',
+    backgroundColor: 'rgba(0, 0, 0, 0.8)',
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
@@ -649,14 +897,13 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderStyle: 'dashed',
   },
-  certificateContent: {
+  previewCertificateContent: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 24,
     paddingHorizontal: 20,
   },
-  // Header Section
   certHeaderSection: {
     alignItems: 'center',
     marginBottom: 24,
@@ -682,7 +929,6 @@ const styles = StyleSheet.create({
     height: 2,
     marginVertical: 20,
   },
-  // Body Section
   certBodySection: {
     alignItems: 'center',
     width: '100%',
@@ -719,7 +965,6 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
     paddingHorizontal: 20,
   },
-  // Footer Section
   certFooterSection: {
     alignItems: 'center',
     marginTop: 24,
@@ -740,24 +985,23 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
     marginTop: 4,
   },
-  // Action Buttons
   buttonContainer: {
     flexDirection: 'row',
     gap: 16,
     marginTop: 24,
   },
   actionButton: {
+    borderRadius: 12,
+    overflow: 'hidden',
+    minWidth: 130,
+  },
+  actionButtonGradient: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
     paddingVertical: 14,
     paddingHorizontal: 32,
-    borderRadius: 12,
-    minWidth: 130,
-  },
-  saveButton: {
-    backgroundColor: THEME.primary,
   },
   saveButtonText: {
     color: '#FFF',
@@ -766,10 +1010,127 @@ const styles = StyleSheet.create({
   },
   closeButtonNew: {
     backgroundColor: '#FFF',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    paddingVertical: 14,
+    paddingHorizontal: 32,
   },
   closeButtonText: {
-    color: THEME.text,
+    color: '#333',
     fontSize: 16,
     fontWeight: '700',
+  },
+  
+  // Achievement Details Modal
+  achievementModalContainer: {
+    width: width - 40,
+    borderRadius: 24,
+    overflow: 'hidden',
+    elevation: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.3,
+    shadowRadius: 20,
+  },
+  achievementModalHeader: {
+    alignItems: 'center',
+    paddingTop: 40,
+    paddingBottom: 20,
+    position: 'relative',
+  },
+  achievementModalIconContainer: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    alignItems: 'center',
+    justifyContent: 'center',
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+  },
+  achievementModalClose: {
+    position: 'absolute',
+    top: 16,
+    right: 16,
+    padding: 4,
+  },
+  achievementModalContent: {
+    padding: 24,
+    paddingTop: 12,
+  },
+  achievementModalTitle: {
+    fontSize: 24,
+    fontWeight: '800',
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  achievementModalRequirement: {
+    fontSize: 15,
+    color: '#999',
+    textAlign: 'center',
+    fontWeight: '500',
+    marginBottom: 32,
+  },
+  progressSection: {
+    gap: 16,
+  },
+  progressHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  progressLabel: {
+    fontSize: 16,
+    fontWeight: '700',
+  },
+  progressValue: {
+    fontSize: 18,
+    fontWeight: '800',
+  },
+  progressBarContainer: {
+    gap: 12,
+  },
+  progressBarTrack: {
+    height: 12,
+    borderRadius: 6,
+    overflow: 'hidden',
+  },
+  progressBarFill: {
+    height: '100%',
+    borderRadius: 6,
+  },
+  progressPercentage: {
+    fontSize: 14,
+    fontWeight: '700',
+    textAlign: 'right',
+  },
+  statusContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    padding: 16,
+    backgroundColor: '#F5F5F5',
+    borderRadius: 12,
+    marginTop: 8,
+  },
+  statusContainerUnlocked: {
+    backgroundColor: '#F0FDF4',
+  },
+  statusText: {
+    flex: 1,
+    fontSize: 14,
+    color: '#666',
+    fontWeight: '500',
+    lineHeight: 20,
+  },
+  statusTextUnlocked: {
+    flex: 1,
+    fontSize: 14,
+    fontWeight: '700',
+    lineHeight: 20,
   },
 });

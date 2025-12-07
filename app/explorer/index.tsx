@@ -1,5 +1,5 @@
 import { Icon } from '@/components/ui/icon';
-import { journeys, getAllJourneys } from '@/content/explorer';
+import { getAllJourneys } from '@/content/explorer';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import React from 'react';
@@ -62,7 +62,7 @@ export default function ExplorerScreen() {
                         resizeMode="cover"
                       />
                       <LinearGradient
-                        colors={['transparent', 'rgba(0,0,0,0.7)']}
+                        colors={['transparent', 'rgba(0,0,0,0.7)'] as const}
                         style={styles.journeyImageOverlay}
                       />
                     </View>

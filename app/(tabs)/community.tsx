@@ -1,12 +1,24 @@
 import { Icon } from '@/components/ui/icon';
 import { getAllArticles, getAllPosts } from '@/content/articles';
+import { useThemeColor } from '@/hooks/use-theme-color';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Haptics from 'expo-haptics';
 import { useRouter } from 'expo-router';
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Alert, Dimensions, FlatList, Image, Keyboard, KeyboardAvoidingView, Linking, Modal, Platform, Pressable, ScrollView, Share, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import Animated, { FadeIn, FadeInDown, FadeInUp, FadeOut, ZoomIn } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
+const { width } = Dimensions.get('window');
+
+const GRADIENTS = {
+  Purple: ['#B8A5FE', '#9E87F5'] as const,
+  Green: ['#4FD1C5', '#2DCECC'] as const,
+  Orange: ['#FF9F65', '#FF6B6B'] as const,
+  Yellow: ['#FFD66E', '#FFA043'] as const,
+  Blue: ['#6A82FB', '#FC5C7D'] as const,
+  BlueSolid: ['#5E72E4', '#825EE4'] as const,
+};
 
 // Types
 type ReactionType = 'like' | 'love' | 'haha' | 'wow' | 'sad' | 'angry' | null;
@@ -35,11 +47,13 @@ const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 const ExpandableText = ({ 
   text, 
   maxLength = 150,
-  style 
+  style,
+  textColor
 }: { 
   text: string; 
   maxLength?: number;
   style?: any;
+  textColor: string;
 }) => {
   const [expanded, setExpanded] = useState(false);
   const needsTruncation = text.length > maxLength;
@@ -49,10 +63,10 @@ const ExpandableText = ({
 
   return (
     <View>
-      <Text style={style}>{displayText}</Text>
+      <Text style={[style, { color: textColor }]}>{displayText}</Text>
       {needsTruncation && (
         <TouchableOpacity onPress={() => setExpanded(!expanded)}>
-          <Text style={expandableStyles.seeMore}>
+          <Text style={styles.seeMore}>
             {expanded ? 'See less' : 'See more'}
           </Text>
         </TouchableOpacity>
@@ -61,17 +75,6 @@ const ExpandableText = ({
   );
 };
 
-const expandableStyles = StyleSheet.create({
-  seeMore: {
-    fontSize: 15,
-    color: '#65676B',
-    fontWeight: '600',
-    paddingHorizontal: 16,
-    marginTop: 4,
-    marginBottom: 8,
-  },
-});
-
 // Reaction Button Component with animations
 const ReactionButton = ({ 
   itemId,
@@ -79,34 +82,38 @@ const ReactionButton = ({
   onReaction,
   showPicker,
   onTogglePicker,
+  textColor,
+  cardColor
 }: {
   itemId: string;
   currentReaction: ReactionType;
   onReaction: (itemId: string, reaction: ReactionType) => void;
   showPicker: boolean;
   onTogglePicker: (itemId: string) => void;
+  textColor: string;
+  cardColor: string;
 }) => {
   const reactionConfig = currentReaction 
     ? REACTIONS.find(r => r.type === currentReaction) 
     : null;
 
   return (
-    <View style={reactionStyles.container}>
+    <View style={styles.reactionContainer}>
       {/* Reaction Picker Popup */}
       {showPicker && (
         <Animated.View 
           entering={FadeIn.duration(200)}
           exiting={FadeOut.duration(150)}
-          style={reactionStyles.picker}
+          style={[styles.picker, { backgroundColor: cardColor }]}
         >
           {REACTIONS.map((reaction, index) => (
             <AnimatedPressable
               key={reaction.type}
               entering={ZoomIn.delay(index * 50).springify()}
               onPress={() => onReaction(itemId, reaction.type)}
-              style={reactionStyles.reactionOption}
+              style={styles.reactionOption}
             >
-              <Text style={reactionStyles.reactionEmoji}>{reaction.emoji}</Text>
+              <Text style={styles.reactionEmoji}>{reaction.emoji}</Text>
             </AnimatedPressable>
           ))}
         </Animated.View>
@@ -114,87 +121,27 @@ const ReactionButton = ({
       
       {/* Main Button */}
       <TouchableOpacity 
-        style={reactionStyles.button}
+        style={styles.reactionButton}
         onPress={() => onReaction(itemId, 'like')}
         onLongPress={() => onTogglePicker(itemId)}
         delayLongPress={300}
       >
         {reactionConfig ? (
           <>
-            <Text style={reactionStyles.buttonEmoji}>{reactionConfig.emoji}</Text>
-            <Text style={[reactionStyles.buttonText, { color: reactionConfig.color }]}>
+            <Text style={styles.buttonEmoji}>{reactionConfig.emoji}</Text>
+            <Text style={[styles.buttonText, { color: reactionConfig.color }]}>
               {reactionConfig.label}
             </Text>
           </>
         ) : (
           <>
-            <Icon name="Like" size={20} color="#65676B" variant="Linear" />
-            <Text style={reactionStyles.buttonText}>Like</Text>
+            <Icon name="Like" size={20} color={textColor} variant="Linear" />
+            <Text style={[styles.buttonText, { color: textColor }]}>Like</Text>
           </>
         )}
       </TouchableOpacity>
     </View>
   );
-};
-
-const reactionStyles = StyleSheet.create({
-  container: {
-    position: 'relative',
-    flex: 1,
-  },
-  picker: {
-    position: 'absolute',
-    bottom: '100%',
-    left: 0,
-    flexDirection: 'row',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 30,
-    paddingHorizontal: 8,
-    paddingVertical: 6,
-    marginBottom: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 10,
-    elevation: 8,
-    gap: 2,
-  },
-  reactionOption: {
-    padding: 6,
-  },
-  reactionEmoji: {
-    fontSize: 28,
-  },
-  button: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 10,
-    gap: 6,
-  },
-  buttonEmoji: {
-    fontSize: 18,
-  },
-  buttonText: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: '#65676B',
-  },
-});
-
-const { width } = Dimensions.get('window');
-
-// Facebook-inspired Theme
-const THEME = {
-  bg: '#F0F2F5',
-  card: '#FFFFFF',
-  text: '#050505',
-  textSecondary: '#65676B',
-  primary: '#EA580C',
-  primaryLight: '#FFF7ED',
-  border: '#E4E6EB',
-  divider: '#CED0D4',
-  link: '#EA580C',
 };
 
 // Storage keys
@@ -209,6 +156,9 @@ const CommentPanel = ({
   postTitle,
   comments,
   onAddComment,
+  textColor,
+  cardColor,
+  backgroundColor
 }: {
   visible: boolean;
   onClose: () => void;
@@ -216,6 +166,9 @@ const CommentPanel = ({
   postTitle: string;
   comments: Comment[];
   onAddComment: (postId: string, text: string) => void;
+  textColor: string;
+  cardColor: string;
+  backgroundColor: string;
 }) => {
   const insets = useSafeAreaInsets();
   const [newComment, setNewComment] = useState('');
@@ -246,19 +199,19 @@ const CommentPanel = ({
       presentationStyle="pageSheet"
       onRequestClose={onClose}
     >
-      <View style={[commentStyles.container, { paddingTop: insets.top }]}>
+      <View style={[styles.modalContainer, { backgroundColor, paddingTop: insets.top }]}>
         {/* Header */}
-        <View style={commentStyles.header}>
-          <TouchableOpacity onPress={onClose} style={commentStyles.closeButton}>
-            <Icon name="CloseCircle" size={28} color={THEME.textSecondary} />
+        <View style={styles.modalHeader}>
+          <TouchableOpacity onPress={onClose} style={styles.closeButton}>
+            <Icon name="CloseCircle" size={28} color={textColor} />
           </TouchableOpacity>
-          <Text style={commentStyles.headerTitle}>Comments</Text>
+          <Text style={[styles.modalTitle, { color: textColor }]}>Comments</Text>
           <View style={{ width: 28 }} />
         </View>
 
         {/* Post Title Preview */}
-        <View style={commentStyles.postPreview}>
-          <Text style={commentStyles.postPreviewText} numberOfLines={2}>
+        <View style={[styles.postPreview, { backgroundColor: cardColor }]}>
+          <Text style={styles.postPreviewText} numberOfLines={2}>
             {postTitle || 'Post'}
           </Text>
         </View>
@@ -267,28 +220,28 @@ const CommentPanel = ({
         <FlatList
           data={postComments}
           keyExtractor={(item) => item.id}
-          contentContainerStyle={commentStyles.commentsList}
+          contentContainerStyle={styles.commentsList}
           ListEmptyComponent={
-            <View style={commentStyles.emptyComments}>
-              <Icon name="Message" size={48} color={THEME.border} />
-              <Text style={commentStyles.emptyText}>No comments yet</Text>
-              <Text style={commentStyles.emptySubtext}>Be the first to comment!</Text>
+            <View style={styles.emptyComments}>
+              <Icon name="Message" size={48} color="#CCC" />
+              <Text style={[styles.emptyText, { color: textColor }]}>No comments yet</Text>
+              <Text style={styles.emptySubtext}>Be the first to comment!</Text>
             </View>
           }
           renderItem={({ item, index }) => (
             <Animated.View 
               entering={FadeInUp.delay(index * 50)}
-              style={commentStyles.commentItem}
+              style={styles.commentItem}
             >
-              <View style={commentStyles.commentAvatar}>
+              <View style={styles.commentAvatar}>
                 <Icon name="Profile" size={18} color="#FFF" variant="Bold" />
               </View>
-              <View style={commentStyles.commentContent}>
-                <View style={commentStyles.commentBubble}>
-                  <Text style={commentStyles.commentAuthor}>{item.author}</Text>
-                  <Text style={commentStyles.commentText}>{item.text}</Text>
+              <View style={styles.commentContent}>
+                <View style={[styles.commentBubble, { backgroundColor: cardColor }]}>
+                  <Text style={[styles.commentAuthor, { color: textColor }]}>{item.author}</Text>
+                  <Text style={[styles.commentText, { color: textColor }]}>{item.text}</Text>
                 </View>
-                <Text style={commentStyles.commentTime}>
+                <Text style={styles.commentTime}>
                   {formatCommentTime(item.timestamp)}
                 </Text>
               </View>
@@ -301,12 +254,12 @@ const CommentPanel = ({
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
           keyboardVerticalOffset={0}
         >
-          <View style={[commentStyles.inputContainer, { paddingBottom: Math.max(insets.bottom, 16) }]}>
-            <View style={commentStyles.inputWrapper}>
+          <View style={[styles.inputContainer, { backgroundColor, paddingBottom: Math.max(insets.bottom, 16) }]}>
+            <View style={[styles.inputWrapper, { backgroundColor: cardColor }]}>
               <TextInput
-                style={commentStyles.input}
+                style={[styles.input, { color: textColor }]}
                 placeholder="Write a comment..."
-                placeholderTextColor={THEME.textSecondary}
+                placeholderTextColor="#999"
                 value={newComment}
                 onChangeText={setNewComment}
                 multiline
@@ -314,8 +267,8 @@ const CommentPanel = ({
               />
               <TouchableOpacity 
                 style={[
-                  commentStyles.sendButton,
-                  !newComment.trim() && commentStyles.sendButtonDisabled
+                  styles.sendButton,
+                  !newComment.trim() && styles.sendButtonDisabled
                 ]}
                 onPress={handleSubmit}
                 disabled={!newComment.trim()}
@@ -323,7 +276,7 @@ const CommentPanel = ({
                 <Icon 
                   name="Send" 
                   size={20} 
-                  color={newComment.trim() ? '#FFF' : THEME.textSecondary} 
+                  color={newComment.trim() ? '#FFF' : '#999'} 
                   variant="Bold"
                 />
               </TouchableOpacity>
@@ -335,134 +288,6 @@ const CommentPanel = ({
   );
 };
 
-const commentStyles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#FFFFFF',
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: THEME.border,
-  },
-  closeButton: {
-    padding: 4,
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: THEME.text,
-  },
-  postPreview: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: THEME.border,
-    backgroundColor: THEME.bg,
-  },
-  postPreviewText: {
-    fontSize: 14,
-    color: THEME.textSecondary,
-    fontWeight: '500',
-  },
-  commentsList: {
-    padding: 16,
-    flexGrow: 1,
-  },
-  emptyComments: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 60,
-  },
-  emptyText: {
-    fontSize: 17,
-    fontWeight: '600',
-    color: THEME.text,
-    marginTop: 16,
-  },
-  emptySubtext: {
-    fontSize: 14,
-    color: THEME.textSecondary,
-    marginTop: 4,
-  },
-  commentItem: {
-    flexDirection: 'row',
-    marginBottom: 16,
-  },
-  commentAvatar: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: THEME.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 10,
-  },
-  commentContent: {
-    flex: 1,
-  },
-  commentBubble: {
-    backgroundColor: THEME.bg,
-    borderRadius: 18,
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-  },
-  commentAuthor: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: THEME.text,
-    marginBottom: 2,
-  },
-  commentText: {
-    fontSize: 15,
-    color: THEME.text,
-    lineHeight: 20,
-  },
-  commentTime: {
-    fontSize: 12,
-    color: THEME.textSecondary,
-    marginTop: 4,
-    marginLeft: 14,
-  },
-  inputContainer: {
-    borderTopWidth: 1,
-    borderTopColor: THEME.border,
-    paddingHorizontal: 16,
-    paddingTop: 12,
-    backgroundColor: '#FFFFFF',
-  },
-  inputWrapper: {
-    flexDirection: 'row',
-    alignItems: 'flex-end',
-    gap: 10,
-  },
-  input: {
-    flex: 1,
-    backgroundColor: THEME.bg,
-    borderRadius: 20,
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    fontSize: 15,
-    maxHeight: 100,
-    color: THEME.text,
-  },
-  sendButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: THEME.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  sendButtonDisabled: {
-    backgroundColor: THEME.bg,
-  },
-});
-
 // Saved Collection Panel Component
 const SavedCollectionPanel = ({
   visible,
@@ -470,12 +295,18 @@ const SavedCollectionPanel = ({
   savedItems,
   onItemPress,
   onRemoveItem,
+  textColor,
+  cardColor,
+  backgroundColor
 }: {
   visible: boolean;
   onClose: () => void;
   savedItems: any[];
   onItemPress: (item: any) => void;
   onRemoveItem: (itemId: string) => void;
+  textColor: string;
+  cardColor: string;
+  backgroundColor: string;
 }) => {
   const insets = useSafeAreaInsets();
 
@@ -486,13 +317,13 @@ const SavedCollectionPanel = ({
       presentationStyle="pageSheet"
       onRequestClose={onClose}
     >
-      <View style={[savedStyles.container, { paddingTop: insets.top }]}>
+      <View style={[styles.modalContainer, { backgroundColor, paddingTop: insets.top }]}>
         {/* Header */}
-        <View style={savedStyles.header}>
-          <TouchableOpacity onPress={onClose} style={savedStyles.closeButton}>
-            <Icon name="ArrowLeft" size={24} color={THEME.text} />
+        <View style={styles.modalHeader}>
+          <TouchableOpacity onPress={onClose} style={styles.closeButton}>
+            <Icon name="ArrowLeft" size={24} color={textColor} />
           </TouchableOpacity>
-          <Text style={savedStyles.headerTitle}>Saved Posts</Text>
+          <Text style={[styles.modalTitle, { color: textColor }]}>Saved Posts</Text>
           <View style={{ width: 24 }} />
         </View>
 
@@ -500,12 +331,12 @@ const SavedCollectionPanel = ({
         <FlatList
           data={savedItems}
           keyExtractor={(item) => item.id}
-          contentContainerStyle={savedStyles.list}
+          contentContainerStyle={styles.list}
           ListEmptyComponent={
-            <View style={savedStyles.emptyState}>
-              <Icon name="Archive" size={60} color={THEME.border} />
-              <Text style={savedStyles.emptyText}>No saved posts</Text>
-              <Text style={savedStyles.emptySubtext}>
+            <View style={styles.emptyState}>
+              <Icon name="Archive" size={60} color="#CCC" />
+              <Text style={[styles.emptyText, { color: textColor }]}>No saved posts</Text>
+              <Text style={styles.emptySubtext}>
                 Posts you save will appear here
               </Text>
             </View>
@@ -513,29 +344,29 @@ const SavedCollectionPanel = ({
           renderItem={({ item, index }) => (
             <Animated.View entering={FadeInUp.delay(index * 50)}>
               <TouchableOpacity 
-                style={savedStyles.savedItem}
+                style={[styles.savedItem, { backgroundColor: cardColor }]}
                 onPress={() => onItemPress(item)}
                 activeOpacity={0.7}
               >
                 {item.image && (
                   <Image 
                     source={{ uri: item.image }} 
-                    style={savedStyles.thumbnail}
+                    style={styles.thumbnail}
                   />
                 )}
-                <View style={savedStyles.itemContent}>
-                  <Text style={savedStyles.itemTitle} numberOfLines={2}>
+                <View style={styles.itemContent}>
+                  <Text style={[styles.itemTitle, { color: textColor }]} numberOfLines={2}>
                     {item.title || 'Untitled Post'}
                   </Text>
-                  <Text style={savedStyles.itemMeta}>
+                  <Text style={styles.itemMeta}>
                     {item.author?.name || 'AtomIQ'} · {item.type === 'article' ? 'Article' : 'Post'}
                   </Text>
                 </View>
                 <TouchableOpacity 
-                  style={savedStyles.removeButton}
+                  style={styles.removeButton}
                   onPress={() => onRemoveItem(item.id)}
                 >
-                  <Icon name="CloseCircle" size={22} color={THEME.textSecondary} />
+                  <Icon name="CloseCircle" size={22} color="#999" />
                 </TouchableOpacity>
               </TouchableOpacity>
             </Animated.View>
@@ -562,11 +393,17 @@ const ReportModal = ({
   onClose,
   onSubmit,
   itemId,
+  textColor,
+  cardColor,
+  backgroundColor
 }: {
   visible: boolean;
   onClose: () => void;
   onSubmit: (itemId: string, reason: string) => void;
   itemId: string | null;
+  textColor: string;
+  cardColor: string;
+  backgroundColor: string;
 }) => {
   const insets = useSafeAreaInsets();
   const [selectedReason, setSelectedReason] = useState<string | null>(null);
@@ -595,59 +432,61 @@ const ReportModal = ({
       onRequestClose={handleClose}
     >
       <KeyboardAvoidingView 
-        style={[reportStyles.container, { paddingTop: insets.top }]}
+        style={[styles.modalContainer, { backgroundColor, paddingTop: insets.top }]}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
         {/* Header */}
-        <View style={reportStyles.header}>
-          <TouchableOpacity onPress={handleClose} style={reportStyles.closeButton}>
-            <Icon name="CloseCircle" size={28} color={THEME.textSecondary} />
+        <View style={styles.modalHeader}>
+          <TouchableOpacity onPress={handleClose} style={styles.closeButton}>
+            <Icon name="CloseCircle" size={28} color={textColor} />
           </TouchableOpacity>
-          <Text style={reportStyles.headerTitle}>Report Post</Text>
+          <Text style={[styles.modalTitle, { color: textColor }]}>Report Post</Text>
           <View style={{ width: 28 }} />
         </View>
 
         {/* Description */}
-        <View style={reportStyles.descriptionContainer}>
-          <Icon name="Flag" size={40} color={THEME.primary} />
-          <Text style={reportStyles.description}>
+        <View style={styles.descriptionContainer}>
+          <Icon name="Flag" size={40} color="#FF6B6B" />
+          <Text style={styles.description}>
             Help us understand what's wrong with this post. Your report is anonymous.
           </Text>
         </View>
 
         {/* Report Reasons */}
         <ScrollView 
-          style={reportStyles.reasonsList}
+          style={styles.reasonsList}
           showsVerticalScrollIndicator={false}
         >
-          <Text style={reportStyles.sectionTitle}>Why are you reporting this?</Text>
+          <Text style={styles.sectionTitle}>Why are you reporting this?</Text>
           
           {REPORT_REASONS.map((reason) => (
             <TouchableOpacity
               key={reason.id}
               style={[
-                reportStyles.reasonItem,
-                selectedReason === reason.id && reportStyles.reasonItemSelected
+                styles.reasonItem,
+                { backgroundColor: cardColor },
+                selectedReason === reason.id && styles.reasonItemSelected
               ]}
               onPress={() => setSelectedReason(reason.id)}
             >
               <Icon 
                 name={reason.icon as any} 
                 size={22} 
-                color={selectedReason === reason.id ? THEME.primary : THEME.text} 
+                color={selectedReason === reason.id ? '#FF6B6B' : textColor} 
               />
               <Text style={[
-                reportStyles.reasonText,
-                selectedReason === reason.id && reportStyles.reasonTextSelected
+                styles.reasonText,
+                { color: textColor },
+                selectedReason === reason.id && styles.reasonTextSelected
               ]}>
                 {reason.label}
               </Text>
               <View style={[
-                reportStyles.radioButton,
-                selectedReason === reason.id && reportStyles.radioButtonSelected
+                styles.radioButton,
+                selectedReason === reason.id && styles.radioButtonSelected
               ]}>
                 {selectedReason === reason.id && (
-                  <View style={reportStyles.radioButtonInner} />
+                  <View style={styles.radioButtonInner} />
                 )}
               </View>
             </TouchableOpacity>
@@ -656,11 +495,11 @@ const ReportModal = ({
           {/* Additional Info (shown when 'other' is selected) */}
           {selectedReason === 'other' && (
             <Animated.View entering={FadeInDown.duration(200)}>
-              <Text style={reportStyles.additionalLabel}>Please describe the issue:</Text>
+              <Text style={[styles.additionalLabel, { color: textColor }]}>Please describe the issue:</Text>
               <TextInput
-                style={reportStyles.additionalInput}
+                style={[styles.additionalInput, { backgroundColor: cardColor, color: textColor }]}
                 placeholder="Tell us more about why you're reporting this post..."
-                placeholderTextColor={THEME.textSecondary}
+                placeholderTextColor="#999"
                 value={additionalInfo}
                 onChangeText={setAdditionalInfo}
                 multiline
@@ -674,18 +513,18 @@ const ReportModal = ({
         </ScrollView>
 
         {/* Submit Button */}
-        <View style={[reportStyles.footer, { paddingBottom: insets.bottom + 16 }]}>
+        <View style={[styles.footer, { backgroundColor, paddingBottom: insets.bottom + 16 }]}>
           <TouchableOpacity
             style={[
-              reportStyles.submitButton,
-              !selectedReason && reportStyles.submitButtonDisabled
+              styles.submitButton,
+              !selectedReason && styles.submitButtonDisabled
             ]}
             onPress={handleSubmit}
             disabled={!selectedReason}
           >
             <Text style={[
-              reportStyles.submitButtonText,
-              !selectedReason && reportStyles.submitButtonTextDisabled
+              styles.submitButtonText,
+              !selectedReason && styles.submitButtonTextDisabled
             ]}>
               Submit Report
             </Text>
@@ -695,213 +534,6 @@ const ReportModal = ({
     </Modal>
   );
 };
-
-const reportStyles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#FFFFFF',
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: THEME.border,
-  },
-  closeButton: {
-    padding: 4,
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: THEME.text,
-  },
-  descriptionContainer: {
-    alignItems: 'center',
-    paddingVertical: 24,
-    paddingHorizontal: 32,
-  },
-  description: {
-    fontSize: 15,
-    color: THEME.textSecondary,
-    textAlign: 'center',
-    marginTop: 12,
-    lineHeight: 22,
-  },
-  reasonsList: {
-    flex: 1,
-    paddingHorizontal: 16,
-  },
-  sectionTitle: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: THEME.textSecondary,
-    marginBottom: 12,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-  },
-  reasonItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 16,
-    paddingHorizontal: 16,
-    backgroundColor: THEME.bg,
-    borderRadius: 12,
-    marginBottom: 8,
-    gap: 12,
-  },
-  reasonItemSelected: {
-    backgroundColor: `${THEME.primary}15`,
-    borderWidth: 1,
-    borderColor: THEME.primary,
-  },
-  reasonText: {
-    flex: 1,
-    fontSize: 15,
-    color: THEME.text,
-    fontWeight: '500',
-  },
-  reasonTextSelected: {
-    color: THEME.primary,
-  },
-  radioButton: {
-    width: 22,
-    height: 22,
-    borderRadius: 11,
-    borderWidth: 2,
-    borderColor: THEME.border,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  radioButtonSelected: {
-    borderColor: THEME.primary,
-  },
-  radioButtonInner: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    backgroundColor: THEME.primary,
-  },
-  additionalLabel: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: THEME.text,
-    marginTop: 16,
-    marginBottom: 8,
-  },
-  additionalInput: {
-    backgroundColor: THEME.bg,
-    borderRadius: 12,
-    padding: 16,
-    fontSize: 15,
-    color: THEME.text,
-    minHeight: 100,
-    borderWidth: 1,
-    borderColor: THEME.border,
-  },
-  footer: {
-    paddingHorizontal: 16,
-    paddingTop: 16,
-    borderTopWidth: 1,
-    borderTopColor: THEME.border,
-    backgroundColor: '#FFFFFF',
-  },
-  submitButton: {
-    backgroundColor: '#E53935',
-    borderRadius: 12,
-    paddingVertical: 16,
-    alignItems: 'center',
-  },
-  submitButtonDisabled: {
-    backgroundColor: THEME.bg,
-  },
-  submitButtonText: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#FFFFFF',
-  },
-  submitButtonTextDisabled: {
-    color: THEME.textSecondary,
-  },
-});
-
-const savedStyles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#FFFFFF',
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: THEME.border,
-  },
-  closeButton: {
-    padding: 4,
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: THEME.text,
-  },
-  list: {
-    padding: 16,
-    flexGrow: 1,
-  },
-  emptyState: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 80,
-  },
-  emptyText: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: THEME.text,
-    marginTop: 16,
-  },
-  emptySubtext: {
-    fontSize: 14,
-    color: THEME.textSecondary,
-    marginTop: 4,
-    textAlign: 'center',
-  },
-  savedItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: THEME.bg,
-    borderRadius: 12,
-    padding: 12,
-    marginBottom: 10,
-  },
-  thumbnail: {
-    width: 60,
-    height: 60,
-    borderRadius: 8,
-    backgroundColor: THEME.border,
-    marginRight: 12,
-  },
-  itemContent: {
-    flex: 1,
-  },
-  itemTitle: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: THEME.text,
-    marginBottom: 4,
-  },
-  itemMeta: {
-    fontSize: 13,
-    color: THEME.textSecondary,
-  },
-  removeButton: {
-    padding: 8,
-  },
-});
 
 // Helper to generate feed items from articles and posts only
 const generateFeedItems = () => {
@@ -977,6 +609,10 @@ const formatTimeAgo = (dateString: string) => {
 export default function CommunityScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const backgroundColor = useThemeColor({}, 'background');
+  const textColor = useThemeColor({}, 'text');
+  const cardColor = useThemeColor({}, 'card');
+  
   const [searchQuery, setSearchQuery] = useState('');
   const [bookmarkedIds, setBookmarkedIds] = useState<string[]>([]);
   const [showSearch, setShowSearch] = useState(false);
@@ -999,7 +635,7 @@ export default function CommunityScreen() {
   // Undo hide snackbar state
   const [showUndoSnackbar, setShowUndoSnackbar] = useState(false);
   const [lastHiddenItem, setLastHiddenItem] = useState<string | null>(null);
-  const undoTimeoutRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+  const undoTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   
   // Report modal state
   const [showReportModal, setShowReportModal] = useState(false);
@@ -1034,7 +670,7 @@ export default function CommunityScreen() {
   }, [allFeedItems, searchQuery, hiddenItems]);
   
   // Load bookmarks on mount
-  React.useEffect(() => {
+  useEffect(() => {
     loadBookmarks();
     loadComments();
   }, []);
@@ -1240,7 +876,7 @@ export default function CommunityScreen() {
     return (
       <Animated.View 
         entering={FadeInDown.delay(50 + (index % 10) * 50).springify()}
-        style={styles.postCard}
+        style={[styles.postCard, { backgroundColor: cardColor }]}
       >
         {/* Post Header - Author Info */}
         <View style={styles.postHeader}>
@@ -1253,7 +889,7 @@ export default function CommunityScreen() {
           </View>
           <View style={styles.authorInfo}>
             <View style={styles.authorNameRow}>
-              <Text style={styles.authorName}>{item.author?.name || 'AtomIQ'}</Text>
+              <Text style={[styles.authorName, { color: textColor }]}>{item.author?.name || 'AtomIQ'}</Text>
               {item.source && (
                 <>
                   <Text style={styles.dotSeparator}>·</Text>
@@ -1278,7 +914,7 @@ export default function CommunityScreen() {
               style={styles.moreButton}
               onPress={() => toggleMoreMenu(item.id)}
             >
-              <Icon name="More" size={20} color={THEME.textSecondary} />
+              <Icon name="More" size={20} color="#999" />
             </TouchableOpacity>
             
             {/* More Menu Dropdown */}
@@ -1286,7 +922,7 @@ export default function CommunityScreen() {
               <Animated.View 
                 entering={FadeIn.duration(150)}
                 exiting={FadeOut.duration(100)}
-                style={styles.moreMenuDropdown}
+                style={[styles.moreMenuDropdown, { backgroundColor: cardColor }]}
               >
                 <TouchableOpacity 
                   style={styles.moreMenuItem}
@@ -1295,9 +931,9 @@ export default function CommunityScreen() {
                   <Icon 
                     name={isBookmarked ? "ArchiveMinus" : "ArchiveAdd"} 
                     size={20} 
-                    color={THEME.text} 
+                    color={textColor} 
                   />
-                  <Text style={styles.moreMenuText}>
+                  <Text style={[styles.moreMenuText, { color: textColor }]}>
                     {isBookmarked ? 'Unsave post' : 'Save post'}
                   </Text>
                 </TouchableOpacity>
@@ -1306,8 +942,8 @@ export default function CommunityScreen() {
                   style={styles.moreMenuItem}
                   onPress={() => handleCopyLink(item)}
                 >
-                  <Icon name="Link" size={20} color={THEME.text} />
-                  <Text style={styles.moreMenuText}>Copy link</Text>
+                  <Icon name="Link" size={20} color={textColor} />
+                  <Text style={[styles.moreMenuText, { color: textColor }]}>Copy link</Text>
                 </TouchableOpacity>
                 
                 <View style={styles.moreMenuDivider} />
@@ -1316,8 +952,8 @@ export default function CommunityScreen() {
                   style={styles.moreMenuItem}
                   onPress={() => handleHidePost(item.id)}
                 >
-                  <Icon name="EyeSlash" size={20} color={THEME.text} />
-                  <Text style={styles.moreMenuText}>Hide post</Text>
+                  <Icon name="EyeSlash" size={20} color={textColor} />
+                  <Text style={[styles.moreMenuText, { color: textColor }]}>Hide post</Text>
                 </TouchableOpacity>
                 
                 <TouchableOpacity 
@@ -1325,7 +961,7 @@ export default function CommunityScreen() {
                   onPress={() => openReportModal(item.id)}
                   disabled={isReported}
                 >
-                  <Icon name="Flag" size={20} color={isReported ? THEME.textSecondary : "#E53935"} />
+                  <Icon name="Flag" size={20} color={isReported ? "#999" : "#E53935"} />
                   <Text style={[styles.moreMenuText, isReported ? styles.moreMenuTextDisabled : styles.moreMenuTextDanger]}>
                     {isReported ? 'Already reported' : 'Report post'}
                   </Text>
@@ -1347,7 +983,7 @@ export default function CommunityScreen() {
         <View>
           {/* Title */}
           {item.title && (
-            <Text style={styles.postTitle}>{item.title}</Text>
+            <Text style={[styles.postTitle, { color: textColor }]}>{item.title}</Text>
           )}
           
           {/* Content/Excerpt with See More/Less - Using ExpandableText Component */}
@@ -1355,6 +991,7 @@ export default function CommunityScreen() {
             text={item.content || ''} 
             maxLength={150}
             style={styles.postContent}
+            textColor={textColor}
           />
           
           {/* Image */}
@@ -1408,14 +1045,16 @@ export default function CommunityScreen() {
             onReaction={handleReaction}
             showPicker={showPicker}
             onTogglePicker={toggleReactionPicker}
+            textColor={textColor}
+            cardColor={cardColor}
           />
           
           <TouchableOpacity 
             style={styles.actionButton}
             onPress={() => openCommentPanel(item)}
           >
-            <Icon name="Message" size={20} color={THEME.textSecondary} variant="Linear" />
-            <Text style={styles.actionText}>Comment</Text>
+            <Icon name="Message" size={20} color={textColor} variant="Linear" />
+            <Text style={[styles.actionText, { color: textColor }]}>Comment</Text>
             {comments.filter(c => c.postId === item.id).length > 0 && (
               <View style={styles.commentBadge}>
                 <Text style={styles.commentBadgeText}>
@@ -1429,8 +1068,8 @@ export default function CommunityScreen() {
             style={styles.actionButton}
             onPress={() => handleShare(item)}
           >
-            <Icon name="Send" size={20} color={THEME.textSecondary} variant="Linear" />
-            <Text style={styles.actionText}>Share</Text>
+            <Icon name="Send" size={20} color={textColor} variant="Linear" />
+            <Text style={[styles.actionText, { color: textColor }]}>Share</Text>
           </TouchableOpacity>
           
           <TouchableOpacity 
@@ -1440,10 +1079,10 @@ export default function CommunityScreen() {
             <Icon 
               name={isBookmarked ? 'Archive' : 'ArchiveAdd'} 
               size={20} 
-              color={isBookmarked ? THEME.primary : THEME.textSecondary} 
+              color={isBookmarked ? '#6A82FB' : textColor} 
               variant={isBookmarked ? 'Bold' : 'Linear'}
             />
-            <Text style={[styles.actionText, isBookmarked && styles.actionTextSaved]}>Save</Text>
+            <Text style={[styles.actionText, { color: isBookmarked ? '#6A82FB' : textColor }]}>Save</Text>
           </TouchableOpacity>
         </View>
       </Animated.View>
@@ -1451,49 +1090,55 @@ export default function CommunityScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      {/* Facebook-style Header */}
-      <View style={[styles.headerContainer, { paddingTop: insets.top + 10 }]}>
-        <Text style={styles.headerTitle}>Feed</Text>
-        <View style={styles.headerActions}>
-          <TouchableOpacity 
-            style={styles.headerIconButton}
-            onPress={() => setShowSavedPanel(true)}
-          >
-            <Icon name="Archive" size={22} color={THEME.text} variant="Bold" />
-            {bookmarkedIds.length > 0 && (
-              <View style={styles.savedBadge}>
-                <Text style={styles.savedBadgeText}>{bookmarkedIds.length}</Text>
-              </View>
-            )}
-          </TouchableOpacity>
-          <TouchableOpacity 
-            style={styles.headerIconButton}
-            onPress={() => setShowSearch(!showSearch)}
-          >
-            <Icon name={showSearch ? "CloseCircle" : "SearchNormal"} size={22} color={THEME.text} />
-          </TouchableOpacity>
+    <View style={[styles.container, { backgroundColor }]}>
+      {/* Header */}
+      <View style={[styles.header, { paddingTop: insets.top + 16, backgroundColor: cardColor }]}>
+        <View style={styles.headerContent}>
+          <View style={styles.headerTextContainer}>
+            <Text style={[styles.headerTitle, { color: textColor }]}>Community Feed</Text>
+            <Text style={styles.headerSubtitle}>Discover news, articles, and updates</Text>
+          </View>
+          
+          <View style={styles.headerActions}>
+            <TouchableOpacity 
+              style={[styles.headerIconButton, { backgroundColor }]}
+              onPress={() => setShowSavedPanel(true)}
+            >
+              <Icon name="Archive" size={20} color={textColor} variant="Bold" />
+              {bookmarkedIds.length > 0 && (
+                <View style={styles.savedBadge}>
+                  <Text style={styles.savedBadgeText}>{bookmarkedIds.length}</Text>
+                </View>
+              )}
+            </TouchableOpacity>
+            <TouchableOpacity 
+              style={[styles.headerIconButton, { backgroundColor }]}
+              onPress={() => setShowSearch(!showSearch)}
+            >
+              <Icon name={showSearch ? "CloseCircle" : "SearchNormal"} size={20} color={textColor} />
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
       
       {/* Search Bar */}
       {showSearch && (
-        <View style={styles.searchContainer}>
-          <Icon name="SearchNormal" size={18} color={THEME.textSecondary} />
+        <Animated.View entering={FadeInDown.duration(200)} style={[styles.searchContainer, { backgroundColor: cardColor }]}>
+          <Icon name="SearchNormal" size={18} color="#999" />
           <TextInput 
-            style={styles.searchInput}
+            style={[styles.searchInput, { color: textColor }]}
             placeholder="Search posts..."
-            placeholderTextColor={THEME.textSecondary}
+            placeholderTextColor="#999"
             value={searchQuery}
             onChangeText={setSearchQuery}
             autoFocus
           />
           {searchQuery.length > 0 && (
             <TouchableOpacity onPress={() => setSearchQuery('')}>
-              <Icon name="CloseCircle" size={18} color={THEME.textSecondary} />
+              <Icon name="CloseCircle" size={18} color="#999" />
             </TouchableOpacity>
           )}
-        </View>
+        </Animated.View>
       )}
       
       {/* Feed */}
@@ -1511,7 +1156,7 @@ export default function CommunityScreen() {
               style={styles.emptyMascot}
               resizeMode="contain"
             />
-            <Text style={styles.emptyText}>No posts found</Text>
+            <Text style={[styles.emptyText, { color: textColor }]}>No posts found</Text>
             <Text style={styles.emptySubtext}>Try a different search term</Text>
           </View>
         }
@@ -1528,6 +1173,9 @@ export default function CommunityScreen() {
         postTitle={activeCommentPost?.title || 'Post'}
         comments={comments}
         onAddComment={handleAddComment}
+        textColor={textColor}
+        cardColor={cardColor}
+        backgroundColor={backgroundColor}
       />
       
       {/* Saved Panel Modal */}
@@ -1542,6 +1190,9 @@ export default function CommunityScreen() {
             handleArticlePress(item);
           }
         }}
+        textColor={textColor}
+        cardColor={cardColor}
+        backgroundColor={backgroundColor}
       />
       
       {/* Report Modal */}
@@ -1553,6 +1204,9 @@ export default function CommunityScreen() {
         }}
         onSubmit={handleReportPost}
         itemId={reportingItemId}
+        textColor={textColor}
+        cardColor={cardColor}
+        backgroundColor={backgroundColor}
       />
       
       {/* Undo Hide Snackbar */}
@@ -1581,23 +1235,30 @@ export default function CommunityScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: THEME.bg,
   },
-  headerContainer: {
-    backgroundColor: '#FFFFFF',
+  // Header
+  header: {
+    paddingHorizontal: 20,
+    paddingBottom: 16,
+  },
+  headerContent: {
     flexDirection: 'row',
-    alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingBottom: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: THEME.border,
+    alignItems: 'center',
+  },
+  headerTextContainer: {
+    flex: 1,
+    paddingRight: 16,
   },
   headerTitle: {
-    fontSize: 26,
-    fontWeight: '700',
-    color: THEME.primary,
-    letterSpacing: -0.5,
+    fontSize: 28,
+    fontWeight: '800',
+    marginBottom: 4,
+  },
+  headerSubtitle: {
+    fontSize: 14,
+    color: '#8898AA',
+    fontWeight: '500',
   },
   headerActions: {
     flexDirection: 'row',
@@ -1608,81 +1269,82 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: THEME.bg,
     alignItems: 'center',
     justifyContent: 'center',
     position: 'relative',
   },
   savedBadge: {
     position: 'absolute',
-    top: 2,
-    right: 2,
-    backgroundColor: THEME.primary,
+    top: -4,
+    right: -4,
+    backgroundColor: '#5E72E4',
     borderRadius: 10,
     minWidth: 18,
     height: 18,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 4,
+    borderWidth: 2,
+    borderColor: '#FFFFFF',
   },
   savedBadgeText: {
     color: '#FFFFFF',
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: '700',
   },
-  searchIconButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: THEME.bg,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
+  
+  // Search
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
+    marginHorizontal: 16,
+    marginBottom: 16,
     paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: THEME.border,
+    paddingVertical: 12,
+    borderRadius: 16,
     gap: 12,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
   },
   searchInput: {
     flex: 1,
     fontSize: 16,
-    color: THEME.text,
+    fontWeight: '600',
   },
+  
+  // Feed
   feedContent: {
     paddingBottom: 100,
   },
   feedSeparator: {
     height: 8,
-    backgroundColor: THEME.bg,
+    backgroundColor: 'transparent',
   },
   postCard: {
-    backgroundColor: '#FFFFFF',
-    paddingVertical: 12,
+    paddingVertical: 16,
   },
   postHeader: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    paddingHorizontal: 16,
+    paddingHorizontal: 20,
     marginBottom: 12,
   },
   authorAvatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: THEME.primary,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: '#6A82FB',
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 10,
+    marginRight: 12,
   },
   avatarImage: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
   },
   authorInfo: {
     flex: 1,
@@ -1693,19 +1355,18 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
   },
   authorName: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: THEME.text,
+    fontSize: 16,
+    fontWeight: '700',
   },
   dotSeparator: {
     marginHorizontal: 4,
-    color: THEME.textSecondary,
+    color: '#999',
     fontSize: 12,
   },
   sourceLabel: {
     fontSize: 13,
-    color: THEME.link,
-    fontWeight: '500',
+    color: '#6A82FB',
+    fontWeight: '700',
   },
   postMeta: {
     flexDirection: 'row',
@@ -1714,15 +1375,18 @@ const styles = StyleSheet.create({
   },
   timeAgo: {
     fontSize: 13,
-    color: THEME.textSecondary,
+    color: '#999',
+    fontWeight: '500',
   },
   categoryLabel: {
     fontSize: 13,
-    color: THEME.textSecondary,
+    color: '#999',
+    fontWeight: '500',
   },
   readTimeLabel: {
     fontSize: 13,
-    color: THEME.textSecondary,
+    color: '#999',
+    fontWeight: '500',
   },
   moreButtonContainer: {
     position: 'relative',
@@ -1736,15 +1400,14 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 35,
     right: 0,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
+    borderRadius: 16,
     paddingVertical: 8,
     minWidth: 180,
+    elevation: 8,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.15,
     shadowRadius: 12,
-    elevation: 8,
     zIndex: 1000,
   },
   moreMenuItem: {
@@ -1759,51 +1422,57 @@ const styles = StyleSheet.create({
   },
   moreMenuText: {
     fontSize: 15,
-    color: THEME.text,
-    fontWeight: '500',
+    fontWeight: '600',
   },
   moreMenuTextDanger: {
     color: '#E53935',
   },
   moreMenuTextDisabled: {
-    color: THEME.textSecondary,
+    color: '#999',
   },
   moreMenuDivider: {
     height: 1,
-    backgroundColor: THEME.border,
+    backgroundColor: '#EEE',
     marginVertical: 4,
     marginHorizontal: 16,
   },
   postTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: THEME.text,
-    lineHeight: 22,
-    paddingHorizontal: 16,
+    fontSize: 18,
+    fontWeight: '700',
+    lineHeight: 24,
+    paddingHorizontal: 20,
     marginBottom: 8,
   },
   postContent: {
+    fontSize: 16,
+    lineHeight: 24,
+    paddingHorizontal: 20,
+  },
+  seeMore: {
     fontSize: 15,
-    color: THEME.text,
-    lineHeight: 22,
-    paddingHorizontal: 16,
+    color: '#999',
+    fontWeight: '700',
+    paddingHorizontal: 20,
+    marginTop: 4,
+    marginBottom: 8,
   },
   postImage: {
     width: '100%',
     height: 250,
-    backgroundColor: THEME.bg,
+    backgroundColor: '#EEE',
     marginTop: 12,
+    marginBottom: 8,
   },
   readMoreLink: {
     fontSize: 15,
-    color: THEME.link,
-    fontWeight: '500',
-    paddingHorizontal: 16,
+    color: '#6A82FB',
+    fontWeight: '700',
+    paddingHorizontal: 20,
     marginTop: 8,
     marginBottom: 8,
   },
   engagementStats: {
-    paddingHorizontal: 16,
+    paddingHorizontal: 20,
     paddingVertical: 8,
     minHeight: 8,
   },
@@ -1817,12 +1486,12 @@ const styles = StyleSheet.create({
   },
   reactionLabel: {
     fontSize: 14,
-    fontWeight: '500',
+    fontWeight: '600',
   },
   divider: {
     height: 1,
-    backgroundColor: THEME.border,
-    marginHorizontal: 16,
+    backgroundColor: '#EEE',
+    marginHorizontal: 20,
   },
   actionRow: {
     flexDirection: 'row',
@@ -1834,23 +1503,19 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 10,
+    paddingVertical: 12,
     gap: 6,
     position: 'relative',
   },
   actionText: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: THEME.textSecondary,
-  },
-  actionTextSaved: {
-    color: THEME.primary,
+    fontSize: 14,
+    fontWeight: '700',
   },
   commentBadge: {
-    backgroundColor: THEME.primary,
+    backgroundColor: '#6A82FB',
     borderRadius: 10,
-    minWidth: 16,
-    height: 16,
+    minWidth: 18,
+    height: 18,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 4,
@@ -1858,14 +1523,55 @@ const styles = StyleSheet.create({
   },
   commentBadgeText: {
     color: '#FFFFFF',
-    fontSize: 10,
+    fontSize: 11,
     fontWeight: '700',
   },
+  
+  // Reaction Button
+  reactionContainer: {
+    flex: 1,
+    position: 'relative',
+  },
+  reactionButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 12,
+    gap: 6,
+  },
+  picker: {
+    position: 'absolute',
+    bottom: '100%',
+    left: 0,
+    flexDirection: 'row',
+    borderRadius: 20,
+    paddingHorizontal: 8,
+    paddingVertical: 6,
+    marginBottom: 8,
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    gap: 2,
+  },
+  reactionOption: {
+    padding: 6,
+  },
+  buttonEmoji: {
+    fontSize: 18,
+  },
+  buttonText: {
+    fontSize: 13,
+    fontWeight: '700',
+  },
+  
+  // Empty State
   emptyState: {
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 80,
-    backgroundColor: '#FFFFFF',
   },
   emptyMascot: {
     width: 120,
@@ -1873,32 +1579,34 @@ const styles = StyleSheet.create({
     opacity: 0.8,
   },
   emptyText: {
-    fontSize: 17,
-    fontWeight: '600',
-    color: THEME.text,
+    fontSize: 18,
+    fontWeight: '700',
     marginTop: 16,
   },
   emptySubtext: {
-    fontSize: 14,
-    color: THEME.textSecondary,
+    fontSize: 15,
+    color: '#999',
     marginTop: 4,
+    fontWeight: '500',
   },
+  
+  // Undo Snackbar
   undoSnackbar: {
     position: 'absolute',
     left: 16,
     right: 16,
     backgroundColor: '#323232',
-    borderRadius: 12,
+    borderRadius: 16,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingVertical: 14,
     paddingHorizontal: 16,
+    elevation: 6,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
-    elevation: 8,
   },
   undoSnackbarContent: {
     flexDirection: 'row',
@@ -1907,7 +1615,7 @@ const styles = StyleSheet.create({
   },
   undoSnackbarText: {
     fontSize: 15,
-    fontWeight: '500',
+    fontWeight: '600',
     color: '#FFFFFF',
   },
   undoButton: {
@@ -1916,8 +1624,263 @@ const styles = StyleSheet.create({
   },
   undoButtonText: {
     fontSize: 14,
-    fontWeight: '700',
-    color: THEME.primary,
+    fontWeight: '800',
+    color: '#6A82FB',
     letterSpacing: 0.5,
+  },
+  
+  // Modals
+  modalContainer: {
+    flex: 1,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#EEE',
+  },
+  closeButton: {
+    padding: 4,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: '800',
+    letterSpacing: -0.5,
+  },
+  postPreview: {
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#EEE',
+  },
+  postPreviewText: {
+    fontSize: 14,
+    color: '#999',
+    fontWeight: '600',
+  },
+  commentsList: {
+    padding: 16,
+    flexGrow: 1,
+  },
+  emptyComments: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 60,
+  },
+  commentItem: {
+    flexDirection: 'row',
+    marginBottom: 16,
+  },
+  commentAvatar: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#6A82FB',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 10,
+  },
+  commentContent: {
+    flex: 1,
+  },
+  commentBubble: {
+    padding: 12,
+    borderRadius: 16,
+    borderTopLeftRadius: 4,
+  },
+  commentAuthor: {
+    fontSize: 14,
+    fontWeight: '700',
+    marginBottom: 2,
+  },
+  commentText: {
+    fontSize: 15,
+    lineHeight: 20,
+  },
+  commentTime: {
+    fontSize: 12,
+    color: '#999',
+    marginTop: 4,
+    marginLeft: 4,
+    fontWeight: '600',
+  },
+  inputContainer: {
+    borderTopWidth: 1,
+    borderTopColor: '#EEE',
+    padding: 12,
+  },
+  inputWrapper: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    borderRadius: 24,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+  },
+  input: {
+    flex: 1,
+    fontSize: 16,
+    maxHeight: 100,
+    paddingTop: 8,
+    paddingBottom: 8,
+    fontWeight: '500',
+  },
+  sendButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#6A82FB',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: 8,
+    marginBottom: 2,
+  },
+  sendButtonDisabled: {
+    backgroundColor: '#EEE',
+  },
+  
+  // Saved List
+  list: {
+    padding: 16,
+    flexGrow: 1,
+  },
+  savedItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderRadius: 16,
+    padding: 12,
+    marginBottom: 12,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+  },
+  thumbnail: {
+    width: 60,
+    height: 60,
+    borderRadius: 8,
+    backgroundColor: '#EEE',
+    marginRight: 12,
+  },
+  itemContent: {
+    flex: 1,
+  },
+  itemTitle: {
+    fontSize: 15,
+    fontWeight: '600',
+    marginBottom: 4,
+  },
+  itemMeta: {
+    fontSize: 13,
+    color: '#999',
+  },
+  removeButton: {
+    padding: 8,
+  },
+  
+  // Report Modal
+  descriptionContainer: {
+    alignItems: 'center',
+    paddingVertical: 24,
+    paddingHorizontal: 32,
+  },
+  description: {
+    fontSize: 15,
+    color: '#999',
+    textAlign: 'center',
+    marginTop: 12,
+    lineHeight: 22,
+  },
+  reasonsList: {
+    flex: 1,
+    paddingHorizontal: 16,
+  },
+  sectionTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#999',
+    marginBottom: 12,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  reasonItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 16,
+    paddingHorizontal: 16,
+    borderRadius: 16,
+    marginBottom: 12,
+    gap: 12,
+  },
+  reasonItemSelected: {
+    backgroundColor: 'rgba(255, 107, 107, 0.1)',
+    borderWidth: 1,
+    borderColor: '#FF6B6B',
+  },
+  reasonText: {
+    flex: 1,
+    fontSize: 15,
+    fontWeight: '500',
+  },
+  reasonTextSelected: {
+    color: '#FF6B6B',
+  },
+  radioButton: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    borderWidth: 2,
+    borderColor: '#DDD',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  radioButtonSelected: {
+    borderColor: '#FF6B6B',
+  },
+  radioButtonInner: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: '#FF6B6B',
+  },
+  additionalLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    marginTop: 16,
+    marginBottom: 8,
+  },
+  additionalInput: {
+    borderRadius: 12,
+    padding: 16,
+    fontSize: 15,
+    minHeight: 100,
+    borderWidth: 1,
+    borderColor: '#EEE',
+  },
+  footer: {
+    paddingHorizontal: 16,
+    paddingTop: 16,
+    borderTopWidth: 1,
+    borderTopColor: '#EEE',
+  },
+  submitButton: {
+    backgroundColor: '#E53935',
+    borderRadius: 12,
+    paddingVertical: 16,
+    alignItems: 'center',
+  },
+  submitButtonDisabled: {
+    backgroundColor: '#EEE',
+  },
+  submitButtonText: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#FFFFFF',
+  },
+  submitButtonTextDisabled: {
+    color: '#999',
   },
 });

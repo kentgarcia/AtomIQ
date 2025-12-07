@@ -1,13 +1,13 @@
+import MarkdownText from '@/components/markdown-text';
 import { Icon } from '@/components/ui/icon';
+import { getArticleById } from '@/content/articles';
 import { getJourneyById } from '@/content/explorer';
 import { getMythById } from '@/content/myths';
-import { getArticleById } from '@/content/articles';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useMemo } from 'react';
 import { Dimensions, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
-import MarkdownText from '@/components/markdown-text';
 
 const { width } = Dimensions.get('window');
 
@@ -79,7 +79,7 @@ export default function JourneyNodeScreen() {
             {/* What People Think Section */}
             <Animated.View entering={FadeInDown.delay(100)} style={styles.sectionCard}>
               <LinearGradient
-                colors={['#E74C3C', '#C0392B']}
+                colors={['#E74C3C', '#C0392B'] as const}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
                 style={styles.sectionGradient}
@@ -112,7 +112,7 @@ export default function JourneyNodeScreen() {
             {/* What Science Says Section */}
             <Animated.View entering={FadeInDown.delay(200)} style={styles.sectionCard}>
               <LinearGradient
-                colors={[THEME.success, '#27AE60']}
+                colors={[THEME.success, '#27AE60'] as const}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
                 style={styles.sectionGradient}

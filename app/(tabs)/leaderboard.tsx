@@ -1,25 +1,41 @@
 import { Icon } from '@/components/ui/icon';
+import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useStorage } from '@/services/StorageContext';
-import React, { useMemo } from 'react';
-import { StyleSheet, View, Text, ScrollView, TouchableOpacity, Image, Dimensions } from 'react-native';
-import Animated, { FadeInDown, useSharedValue, useAnimatedStyle, withRepeat, withTiming } from 'react-native-reanimated';
 import { LinearGradient } from 'expo-linear-gradient';
+import React, { useMemo } from 'react';
+import { Dimensions, Image, ScrollView, StyleSheet, Text, View } from 'react-native';
+import Animated, { FadeInDown, useAnimatedStyle, useSharedValue, withRepeat, withTiming } from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const { width } = Dimensions.get('window');
 
-// Orange Theme
-const THEME = {
-  primary: '#EA580C', // Vibrant Orange
-  primaryLight: '#F97316',
-  primaryDark: '#C2410C',
-  bg: '#F4F5F7', // Light Grey Background
+// Theme Constants
+const LightTHEME = {
+  bg: '#F8F9FE',
   card: '#FFFFFF',
-  text: '#2D3436',
-  textMuted: '#636E72',
-  gold: '#FFD700',
-  silver: '#C0C0C0',
-  bronze: '#CD7F32',
-  green: '#2ECC71', // For rank increase / positive stats
+  text: '#32325D',
+  textMuted: '#8898AA',
+  primary: '#5E72E4',
+  border: '#E9ECEF',
+};
+
+const DarkTHEME = {
+  bg: '#172B4D',
+  card: '#213356',
+  text: '#F6F9FC',
+  textMuted: '#8898AA',
+  primary: '#5E72E4',
+  border: '#2D3A56',
+};
+
+// Gradient Colors
+const GRADIENTS = {
+  purple: ['#B8A5FE', '#9E87F5'] as const,
+  green: ['#4FD1C5', '#2DCECC'] as const,
+  orange: ['#FF9F65', '#FF6B6B'] as const,
+  yellow: ['#FFD66E', '#FFA043'] as const,
+  blue: ['#6A82FB', '#FC5C7D'] as const,
+  blueSolid: ['#5E72E4', '#825EE4'] as const,
 };
 
 // NPC Characters - Personal Goals for the User
@@ -77,6 +93,9 @@ const CircleAvatar = ({ uri, size, borderColor, borderWidth = 3, avatarColor, is
 
 export default function LeaderboardScreen() {
   const { userProfile } = useStorage();
+  const colorScheme = useColorScheme();
+  const THEME = colorScheme === 'dark' ? DarkTHEME : LightTHEME;
+  const styles = useMemo(() => createStyles(THEME), [THEME]);
   const pulse = useSharedValue(1);
   
   React.useEffect(() => {
@@ -95,6 +114,7 @@ export default function LeaderboardScreen() {
       title: 'Nuclear Learner',
       xp: userXP,
       avatar: 'profile', // Use profile mascot
+      avatarColor: undefined,
       isUser: true,
       isNPC: false
     };
@@ -104,6 +124,7 @@ export default function LeaderboardScreen() {
       name: npc.name,
       title: npc.title,
       xp: npc.baseXP,
+      avatar: undefined,
       avatarColor: npc.avatarColor,
       isUser: false,
       isNPC: true
@@ -125,22 +146,18 @@ export default function LeaderboardScreen() {
   const topThree = leaderboardData.slice(0, 3);
   const restList = leaderboardData.slice(3);
   const userRank = leaderboardData.find(item => item.isUser);
+  const insets = useSafeAreaInsets();
 
   return (
-    <View style={{ flex: 1, backgroundColor: THEME.bg }}>
+    <View style={styles.container}>
       {/* Fixed Header */}
       <View style={styles.headerContainer}>
         <LinearGradient
-          colors={[THEME.primary, THEME.primaryLight]}
+          colors={GRADIENTS.blueSolid}
           style={styles.headerGradient}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
         >
-          {/* Decorative Shapes */}
-          <View style={[styles.decoCircle, { top: -20, left: -20, width: 100, height: 100, opacity: 0.1 }]} />
-          <View style={[styles.decoCircle, { bottom: 40, right: -10, width: 80, height: 80, opacity: 0.1 }]} />
-          <View style={[styles.decoCircle, { top: 40, right: 40, width: 40, height: 40, opacity: 0.1 }]} />
-          
           <Text style={styles.headerTitle}>Leaderboard</Text>
           
           {/* Podium */}
@@ -148,9 +165,9 @@ export default function LeaderboardScreen() {
             {/* Rank 2 */}
             <View style={[styles.podiumColumn, styles.podiumSide]}>
               <View style={styles.podiumAvatarWrapper}>
-                <CircleAvatar uri={topThree[1].avatar} avatarColor={topThree[1].avatarColor} isUser={topThree[1].isUser} size={80} borderColor="rgba(255,255,255,0.8)" />
-                <View style={[styles.rankBadge, { backgroundColor: THEME.silver }]}>
-                  <Text style={styles.rankText}>2</Text>
+                <CircleAvatar uri={topThree[1].avatar} avatarColor={topThree[1].avatarColor} isUser={topThree[1].isUser} size={70} borderColor="rgba(255,255,255,0.8)" />
+                <View style={[styles.rankBadge, { backgroundColor: '#C0C0C0' }]}>
+                  <Text style={[styles.rankText, { color: '#FFF' }]}>2</Text>
                 </View>
               </View>
               <Text style={styles.podiumName}>{topThree[1].name}</Text>
@@ -161,11 +178,11 @@ export default function LeaderboardScreen() {
             <View style={[styles.podiumColumn, styles.podiumCenter]}>
               <Animated.View style={[styles.podiumAvatarWrapper, pulseStyle]}>
                 <View style={styles.crownWrapper}>
-                   <Icon name="Crown1" size={24} color="#FFD700" variant="Bold" />
+                   <Icon name="Crown1" size={32} color="#FFD700" variant="Bold" />
                 </View>
-                <CircleAvatar uri={topThree[0].avatar} avatarColor={topThree[0].avatarColor} isUser={topThree[0].isUser} size={96} borderColor="#FFD700" borderWidth={4} />
-                <View style={[styles.rankBadge, { backgroundColor: THEME.gold, width: 28, height: 28, bottom: -12 }]}>
-                  <Text style={styles.rankText}>1</Text>
+                <CircleAvatar uri={topThree[0].avatar} avatarColor={topThree[0].avatarColor} isUser={topThree[0].isUser} size={90} borderColor="#FFD700" borderWidth={4} />
+                <View style={[styles.rankBadge, { backgroundColor: '#FFD700', width: 32, height: 32, bottom: -14 }]}>
+                  <Text style={[styles.rankText, { fontSize: 16, color: '#FFF' }]}>1</Text>
                 </View>
               </Animated.View>
               <Text style={[styles.podiumName, styles.podiumNameLarge]}>{topThree[0].name}</Text>
@@ -178,8 +195,8 @@ export default function LeaderboardScreen() {
             {/* Rank 3 */}
             <View style={[styles.podiumColumn, styles.podiumSide]}>
               <View style={styles.podiumAvatarWrapper}>
-                <CircleAvatar uri={topThree[2].avatar} avatarColor={topThree[2].avatarColor} isUser={topThree[2].isUser} size={80} borderColor="rgba(255,255,255,0.8)" />
-                <View style={[styles.rankBadge, { backgroundColor: THEME.bronze }]}>
+                <CircleAvatar uri={topThree[2].avatar} avatarColor={topThree[2].avatarColor} isUser={topThree[2].isUser} size={70} borderColor="rgba(255,255,255,0.8)" />
+                <View style={[styles.rankBadge, { backgroundColor: '#CD7F32' }]}>
                   <Text style={styles.rankText}>3</Text>
                 </View>
               </View>
@@ -193,27 +210,26 @@ export default function LeaderboardScreen() {
       {/* Scrollable List */}
       <ScrollView 
         style={{ flex: 1 }}
-        contentContainerStyle={styles.scrollContent} 
+        contentContainerStyle={[styles.scrollContent, { paddingBottom: 120 + insets.bottom }]} 
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.listContainer}>
-          {restList.map((user) => (
-            <View 
+          {restList.map((user, index) => (
+            <Animated.View 
               key={user.rank} 
+              entering={FadeInDown.delay(index * 50)}
               style={[
                 styles.listItem, 
-                user.isUser && { backgroundColor: '#FFF5ED', borderColor: THEME.primary }
+                user.isUser && styles.listItemActive
               ]}
             >
-              <View style={styles.rankCircle}>
-                <Text style={styles.listRankText}>{user.rank}</Text>
-              </View>
+              <Text style={[styles.listRankText, user.isUser && { color: THEME.primary }]}>{user.rank}</Text>
               
               <View style={styles.listAvatarWrapper}>
                 {user.isUser ? (
                   <Image source={require('@/assets/images/mascot/profile.png')} style={styles.listAvatar} resizeMode="contain" />
                 ) : (
-                  <View style={[styles.listAvatar, { backgroundColor: user.avatarColor || '#E5E7EB', borderRadius: 18, alignItems: 'center', justifyContent: 'center' }]}>
+                  <View style={[styles.listAvatar, { backgroundColor: user.avatarColor || '#E5E7EB', borderRadius: 20, alignItems: 'center', justifyContent: 'center' }]}>
                     <Icon name="Profile" size={24} color="#FFF" variant="Bold" />
                   </View>
                 )}
@@ -225,47 +241,55 @@ export default function LeaderboardScreen() {
               </View>
 
               <View style={styles.listInfo}>
-                <Text style={styles.listName}>
+                <Text style={[styles.listName, user.isUser && { color: THEME.primary }]}>
                   {user.name} {user.isUser && '(You)'}
                 </Text>
                 <Text style={styles.listTitle}>{user.title}</Text>
               </View>
 
               <View style={styles.listXP}>
-                <Icon name="Flash" size={16} color="#EA580C" variant="Bold" />
-                <Text style={styles.xpText}>{user.xp.toLocaleString()} XP</Text>
+                <Text style={[styles.xpText, user.isUser && { color: THEME.primary }]}>{user.xp.toLocaleString()} XP</Text>
               </View>
-            </View>
+            </Animated.View>
           ))}
         </View>
-        
-        <View style={{ height: 180 }} />
       </ScrollView>
 
       {/* Sticky User Bar */}
-      {userRank && (
-        <View style={styles.stickyBar}>
-          <View style={[styles.rankCircle, { backgroundColor: '#FFF', borderWidth: 2, borderColor: THEME.primary }]}>
-            <Text style={[styles.listRankText, { color: THEME.primary }]}>{userRank.rank}</Text>
-          </View>
-          <View style={styles.listAvatarWrapper}>
-            <Image source={require('@/assets/images/mascot/profile.png')} style={styles.listAvatar} resizeMode="contain" />
-          </View>
-          <View style={styles.listInfo}>
-            <Text style={styles.listName}>{userRank.name}</Text>
-            <Text style={styles.listTitle}>{userRank.title}</Text>
-          </View>
-          <View style={styles.listXP}>
-            <Icon name="Flash" size={16} color="#EA580C" variant="Bold" />
-            <Text style={styles.xpText}>{userRank.xp.toLocaleString()} XP</Text>
-          </View>
+      {userRank && userRank.rank > 3 && (
+        <View style={[styles.stickyBar, { bottom: 20 }]}>
+          <LinearGradient
+            colors={GRADIENTS.blueSolid}
+            style={styles.stickyBarGradient}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+          >
+            <Text style={[styles.listRankText, { color: '#FFF', width: 30, textAlign: 'center' }]}>{userRank.rank}</Text>
+            <View style={styles.listAvatarWrapper}>
+              <View style={[styles.listAvatar, { backgroundColor: '#FFF', padding: 2, overflow: 'hidden' }]}>
+                <Image source={require('@/assets/images/mascot/profile.png')} style={{ width: '100%', height: '100%' }} resizeMode="contain" />
+              </View>
+            </View>
+            <View style={styles.listInfo}>
+              <Text style={[styles.listName, { color: '#FFF' }]}>{userRank.name}</Text>
+              <Text style={[styles.listTitle, { color: 'rgba(255,255,255,0.8)' }]}>{userRank.title}</Text>
+            </View>
+            <View style={styles.listXP}>
+              <Icon name="Flash" size={16} color="#FFD700" variant="Bold" />
+              <Text style={[styles.xpText, { color: '#FFF' }]}>{userRank.xp.toLocaleString()} XP</Text>
+            </View>
+          </LinearGradient>
         </View>
       )}
     </View>
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (theme: typeof LightTHEME) => StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: theme.bg,
+  },
   scrollContent: {
     paddingTop: 20,
     paddingBottom: 100,
@@ -275,8 +299,13 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 30,
     overflow: 'hidden',
     marginBottom: 0,
-    backgroundColor: '#fff',
+    backgroundColor: theme.card,
     zIndex: 10,
+    elevation: 4,
+    shadowColor: '#5E72E4',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
   },
   headerGradient: {
     paddingTop: 50, 
@@ -289,11 +318,6 @@ const styles = StyleSheet.create({
     fontSize: 20, 
     fontWeight: '700',
     marginBottom: 10,
-  },
-  decoCircle: {
-    position: 'absolute',
-    backgroundColor: '#FFF',
-    borderRadius: 100,
   },
   podiumContainer: {
     flexDirection: 'row',
@@ -365,56 +389,58 @@ const styles = StyleSheet.create({
   listItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFF',
-    padding: 12,
-    borderRadius: 16,
-    borderWidth: 2,
-    borderColor: '#E5E5E5', // Duolingo-style outline
+    backgroundColor: theme.card,
+    padding: 16,
+    borderRadius: 20,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
   },
-  rankCircle: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
+  listItemActive: {
+    backgroundColor: theme.card,
     borderWidth: 1,
-    borderColor: '#EEE',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 12,
+    borderColor: theme.primary,
   },
   listRankText: {
-    color: THEME.textMuted,
-    fontWeight: '700',
-    fontSize: 12,
+    color: theme.textMuted,
+    fontWeight: '800',
+    fontSize: 16,
+    width: 30,
+    textAlign: 'center',
+    marginRight: 8,
   },
   listAvatarWrapper: {
     marginRight: 12,
     position: 'relative',
   },
   listAvatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
   },
   listInfo: {
     flex: 1,
   },
   listName: {
-    color: THEME.text,
-    fontWeight: '700',
-    fontSize: 15,
+    color: theme.text,
+    fontWeight: '800',
+    fontSize: 16,
   },
   listTitle: {
-    color: THEME.textMuted,
-    fontSize: 12,
+    color: theme.textMuted,
+    fontSize: 13,
+    fontWeight: '600',
     marginTop: 2,
   },
   npcBadge: {
     position: 'absolute',
     bottom: -2,
     right: -2,
-    width: 16,
-    height: 16,
-    borderRadius: 8,
+    width: 18,
+    height: 18,
+    borderRadius: 9,
     backgroundColor: '#FFF',
     alignItems: 'center',
     justifyContent: 'center',
@@ -427,21 +453,25 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   xpText: {
-    color: THEME.primary,
-    fontWeight: '700',
+    color: theme.textMuted,
+    fontWeight: '800',
     fontSize: 14,
   },
   stickyBar: {
     position: 'absolute',
-    bottom: 110, 
     left: 20,
     right: 20,
-    backgroundColor: '#FFF',
-    padding: 16,
     borderRadius: 20,
+    overflow: 'hidden',
+    elevation: 8,
+    shadowColor: '#5E72E4',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+  },
+  stickyBarGradient: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderWidth: 2,
-    borderColor: THEME.primary, // Highlighted outline for user
+    padding: 16,
   },
 });

@@ -1,20 +1,77 @@
 import { Icon } from '@/components/ui/icon';
+import { useColorScheme } from '@/hooks/use-color-scheme';
 import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { Tabs } from 'expo-router';
 import React from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { useColorScheme } from '@/hooks/use-color-scheme';
+const TabButton = ({ 
+  tab, 
+  isFocused, 
+  onPress, 
+  theme 
+}: { 
+  tab: any; 
+  isFocused: boolean; 
+  onPress: () => void; 
+  theme: any; 
+}) => {
+  const scale = useSharedValue(1);
 
-function DuolingoTabBar({ state, navigation }: BottomTabBarProps) {
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{ scale: scale.value }],
+    };
+  });
+
+  const handlePress = () => {
+    scale.value = withSpring(0.9, { damping: 10 }, () => {
+      scale.value = withSpring(1, { damping: 10 });
+    });
+    onPress();
+  };
+
+  return (
+    <TouchableOpacity
+      onPress={handlePress}
+      activeOpacity={1}
+      style={styles.tabButton}
+    >
+      <Animated.View style={[styles.tabContent, animatedStyle]}>
+        <View style={[
+          styles.iconContainer, 
+          isFocused && { backgroundColor: theme.active + '15' }
+        ]}>
+          <Icon 
+            name={tab.icon} 
+            size={24} 
+            color={isFocused ? theme.active : theme.inactive} 
+            variant={isFocused ? 'Bold' : 'Linear'}
+          />
+        </View>
+        <Text style={[
+          styles.tabLabel, 
+          { color: isFocused ? theme.active : theme.inactive, fontWeight: isFocused ? '700' : '500' }
+        ]}>
+          {tab.label}
+        </Text>
+      </Animated.View>
+    </TouchableOpacity>
+  );
+};
+
+function ModernTabBar({ state, navigation }: BottomTabBarProps) {
   const insets = useSafeAreaInsets();
+  const colorScheme = useColorScheme();
+  const isDark = colorScheme === 'dark';
   
   const THEME = {
-    bg: '#FFFFFF',
-    border: '#E5E5E5',
-    active: '#EA580C',
-    inactive: '#AFAFAF',
+    bg: isDark ? '#1A1A1A' : '#FFFFFF',
+    border: isDark ? '#2D3A56' : '#F0F0F0',
+    active: '#5E72E4', // Matching Home Screen Primary
+    inactive: isDark ? '#666666' : '#9CA3AF',
   };
 
   const tabs = [
@@ -30,7 +87,7 @@ function DuolingoTabBar({ state, navigation }: BottomTabBarProps) {
       style={[
         styles.tabBar,
         {
-          paddingBottom: Math.max(insets.bottom, 8),
+          paddingBottom: insets.bottom + Platform.select({ ios: 0, android: 8 }),
           backgroundColor: THEME.bg,
           borderTopColor: THEME.border,
         },
@@ -41,7 +98,6 @@ function DuolingoTabBar({ state, navigation }: BottomTabBarProps) {
         if (routeIndex === -1) return null;
 
         const isFocused = state.index === routeIndex;
-        const color = isFocused ? THEME.active : THEME.inactive;
 
         const onPress = () => {
           const event = navigation.emit({
@@ -56,41 +112,13 @@ function DuolingoTabBar({ state, navigation }: BottomTabBarProps) {
         };
 
         return (
-          <TouchableOpacity
+          <TabButton
             key={tab.name}
+            tab={tab}
+            isFocused={isFocused}
             onPress={onPress}
-            activeOpacity={0.7}
-            style={styles.tabButton}
-          >
-            {isFocused ? (
-              <View style={styles.activeTabWrapper}>
-                <View style={styles.activeTabShadow} />
-                <View style={[styles.activeTabContent, { backgroundColor: THEME.active }]}>
-                  <Icon 
-                    name={tab.icon as any} 
-                    size={26} 
-                    color="#FFFFFF" 
-                    variant="Bold"
-                  />
-                  <Text style={[styles.tabLabel, { color: '#FFFFFF' }]}>
-                    {tab.label}
-                  </Text>
-                </View>
-              </View>
-            ) : (
-              <View style={styles.tabContent}>
-                <Icon 
-                  name={tab.icon as any} 
-                  size={26} 
-                  color={color} 
-                  variant="Linear"
-                />
-                <Text style={[styles.tabLabel, { color }]}>
-                  {tab.label}
-                </Text>
-              </View>
-            )}
-          </TouchableOpacity>
+            theme={THEME}
+          />
         );
       })}
     </View>
@@ -98,8 +126,6 @@ function DuolingoTabBar({ state, navigation }: BottomTabBarProps) {
 }
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
-
   return (
     <Tabs
       screenOptions={{
@@ -108,7 +134,7 @@ export default function TabLayout() {
           display: 'none',
         },
       }}
-      tabBar={(props) => <DuolingoTabBar {...props} />}
+      tabBar={(props) => <ModernTabBar {...props} />}
     >
       <Tabs.Screen
         name="index"
@@ -148,46 +174,32 @@ const styles = StyleSheet.create({
   tabBar: {
     flexDirection: 'row',
     borderTopWidth: 1,
-    paddingTop: 8,
+    paddingTop: 12,
+    paddingHorizontal: 8,
+    elevation: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
   },
   tabButton: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 4,
   },
   tabContent: {
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 2,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
+    gap: 4,
   },
-  activeTabWrapper: {
-    position: 'relative',
+  iconContainer: {
+    padding: 8,
+    borderRadius: 16,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  activeTabShadow: {
-    position: 'absolute',
-    top: 4,
-    left: 0,
-    right: 0,
-    bottom: -4,
-    backgroundColor: '#CC5500',
-    borderRadius: 16,
-  },
-  activeTabContent: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 2,
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 16,
   },
   tabLabel: {
-    fontSize: 11,
-    fontWeight: '700',
-    letterSpacing: 0.3,
+    fontSize: 10,
+    letterSpacing: 0.2,
   },
 });

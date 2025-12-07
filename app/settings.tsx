@@ -8,9 +8,11 @@ import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { Alert, ScrollView, StyleSheet, Switch, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function SettingsScreen() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const { userProfile, updateUserProfile, clearStorage } = useStorage();
   const { isDark, toggleTheme } = useTheme();
   const colors = useThemeColors();
@@ -118,7 +120,7 @@ export default function SettingsScreen() {
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
       {/* Header */}
-      <View style={styles.header}>
+      <View style={[styles.header, { paddingTop: insets.top + 12 }]}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
           <Icon name="ArrowLeft2" size={24} color={colors.text} />
         </TouchableOpacity>
@@ -194,8 +196,8 @@ export default function SettingsScreen() {
               <Switch
                 value={isDark}
                 onValueChange={toggleTheme}
-                trackColor={{ false: '#E5E5E5', true: '#F97316' }}
-                thumbColor={isDark ? colors.primary : colors.textSecondary}
+                trackColor={{ false: '#E5E5E5', true: colors.primary }}
+                thumbColor={isDark ? '#FFFFFF' : '#FFFFFF'}
               />
             </View>
 
@@ -210,8 +212,8 @@ export default function SettingsScreen() {
               <Switch
                 value={notifications}
                 onValueChange={setNotifications}
-                trackColor={{ false: '#E5E5E5', true: '#F97316' }}
-                thumbColor={notifications ? colors.primary : colors.textSecondary}
+                trackColor={{ false: '#E5E5E5', true: colors.primary }}
+                thumbColor={notifications ? '#FFFFFF' : '#FFFFFF'}
               />
             </View>
 
@@ -226,8 +228,8 @@ export default function SettingsScreen() {
               <Switch
                 value={soundEffects}
                 onValueChange={setSoundEffects}
-                trackColor={{ false: '#E5E5E5', true: '#F97316' }}
-                thumbColor={soundEffects ? colors.primary : colors.textSecondary}
+                trackColor={{ false: '#E5E5E5', true: colors.primary }}
+                thumbColor={soundEffects ? '#FFFFFF' : '#FFFFFF'}
               />
             </View>
 
@@ -242,8 +244,8 @@ export default function SettingsScreen() {
               <Switch
                 value={dailyReminder}
                 onValueChange={setDailyReminder}
-                trackColor={{ false: '#E5E5E5', true: '#F97316' }}
-                thumbColor={dailyReminder ? colors.primary : colors.textSecondary}
+                trackColor={{ false: '#E5E5E5', true: colors.primary }}
+                thumbColor={dailyReminder ? '#FFFFFF' : '#FFFFFF'}
               />
             </View>
           </View>
@@ -316,77 +318,90 @@ const createStyles = (colors: any) => StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 20,
-    paddingTop: 60,
-    paddingBottom: 20,
+    paddingBottom: 16,
     backgroundColor: colors.card,
-    borderBottomWidth: 2,
-    borderBottomColor: colors.card === '#FFFFFF' ? '#E5E5E5' : '#2A2A2A',
+    borderBottomWidth: 1,
+    borderBottomColor: colors.card === '#FFFFFF' ? '#F0F0F0' : '#2A2A2A',
   },
   backBtn: {
     width: 40,
     height: 40,
     alignItems: 'center',
     justifyContent: 'center',
+    borderRadius: 20,
   },
   headerTitle: {
-    fontSize: 20,
-    fontWeight: '800',
+    fontSize: 18,
+    fontWeight: '700',
     color: colors.text,
   },
   content: {
     padding: 20,
   },
   sectionTitle: {
-    fontSize: 16,
-    fontWeight: '800',
-    color: colors.text,
+    fontSize: 14,
+    fontWeight: '700',
+    color: colors.textSecondary,
     marginBottom: 12,
     marginTop: 8,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
   },
   settingsCard: {
     backgroundColor: colors.card,
     borderRadius: 16,
-    borderWidth: 2,
-    borderColor: colors.card === '#FFFFFF' ? '#E5E5E5' : '#2A2A2A',
     marginBottom: 24,
     overflow: 'hidden',
+    // Modern shadow
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.05,
+    shadowRadius: 10,
+    elevation: 2,
+    borderWidth: 1,
+    borderColor: colors.card === '#FFFFFF' ? '#F0F0F0' : '#2A2A2A',
   },
   settingRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     padding: 16,
+    minHeight: 60,
   },
   settingRowBorder: {
     borderTopWidth: 1,
-    borderTopColor: colors.card === '#FFFFFF' ? '#E5E5E5' : '#2A2A2A',
+    borderTopColor: colors.card === '#FFFFFF' ? '#F0F0F0' : '#2A2A2A',
   },
   settingInfo: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    gap: 16,
     flex: 1,
   },
   settingLabel: {
-    fontSize: 15,
-    fontWeight: '700',
+    fontSize: 16,
+    fontWeight: '600',
     color: colors.text,
   },
   settingDescription: {
-    fontSize: 12,
+    fontSize: 13,
     color: colors.textSecondary,
     marginTop: 2,
   },
   settingValue: {
-    fontSize: 14,
-    fontWeight: '600',
+    fontSize: 15,
+    fontWeight: '500',
     color: colors.textSecondary,
     marginRight: 8,
   },
   userIdText: {
     fontFamily: 'monospace',
-    fontSize: 11,
+    fontSize: 12,
     maxWidth: 180,
+    color: colors.textSecondary,
   },
   valueRow: {
     flexDirection: 'row',
@@ -403,20 +418,21 @@ const createStyles = (colors: any) => StyleSheet.create({
   input: {
     flex: 1,
     backgroundColor: colors.background,
-    borderWidth: 2,
-    borderColor: colors.card === '#FFFFFF' ? '#E5E5E5' : '#2A2A2A',
+    borderWidth: 1,
+    borderColor: colors.card === '#FFFFFF' ? '#E0E0E0' : '#2A2A2A',
     borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 8,
-    fontSize: 14,
-    fontWeight: '600',
+    fontSize: 15,
     color: colors.text,
   },
   saveBtn: {
-    padding: 4,
+    padding: 8,
+    backgroundColor: colors.primary + '10',
+    borderRadius: 8,
   },
   cancelBtn: {
-    padding: 4,
+    padding: 8,
   },
 });
 
