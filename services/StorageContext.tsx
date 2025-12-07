@@ -1,9 +1,10 @@
-import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { initDatabase, getUserProfile, createOrUpdateUserProfile } from './database';
+import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react';
+import { createOrUpdateUserProfile, getUserProfile, initDatabase } from './database';
 import { getOnboardingCompleted, setLastActiveDate } from './storage';
 
 interface UserProfile {
   id?: number;
+  user_id: string; // Unique identifier for Supabase sync
   username: string;
   avatar_url: string;
   total_xp: number;
@@ -51,8 +52,9 @@ export const StorageProvider = ({ children }: { children: ReactNode }) => {
       if (profile) {
         setUserProfile(profile as UserProfile);
       } else {
-        // Create default profile
+        // Create default profile with unique user_id
         const defaultProfile: UserProfile = {
+          user_id: `user_${Date.now()}_${Math.random().toString(36).substring(2, 15)}`,
           username: 'Scientist',
           avatar_url: 'https://images.pexels.com/photos/1181695/pexels-photo-1181695.jpeg?auto=compress&cs=tinysrgb&w=200',
           total_xp: 0,

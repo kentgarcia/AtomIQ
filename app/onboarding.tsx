@@ -5,15 +5,14 @@ import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { Dimensions, Image, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import Animated, {
-  Easing,
-  FadeIn,
-  FadeInDown,
-  SlideOutLeft,
-  useAnimatedStyle,
-  useSharedValue,
-  withRepeat,
-  withSpring,
-  withTiming
+    Easing,
+    FadeIn,
+    FadeInDown,
+    useAnimatedStyle,
+    useSharedValue,
+    withRepeat,
+    withSpring,
+    withTiming
 } from 'react-native-reanimated';
 
 const { width } = Dimensions.get('window');
@@ -202,8 +201,12 @@ export default function Onboarding() {
 
   const handleFinish = async () => {
     try {
+      // Generate unique user ID for Supabase sync
+      const userId = `user_${Date.now()}_${Math.random().toString(36).substring(2, 15)}`;
+      
       // Update user profile with onboarding data
       await updateUserProfile({
+        user_id: userId,
         username: username.trim() || 'Scientist',
       });
       

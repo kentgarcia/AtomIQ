@@ -103,6 +103,15 @@ export const getSoundEnabled = async (): Promise<boolean> => {
   return value ?? true;
 };
 
+export const setTheme = async (theme: 'light' | 'dark'): Promise<void> => {
+  await setItem(STORAGE_KEYS.THEME, theme);
+};
+
+export const getTheme = async (): Promise<'light' | 'dark'> => {
+  const value = await getItem<'light' | 'dark'>(STORAGE_KEYS.THEME);
+  return value ?? 'light';
+};
+
 export const setHapticsEnabled = async (enabled: boolean): Promise<void> => {
   await setItem(STORAGE_KEYS.HAPTICS_ENABLED, enabled);
 };

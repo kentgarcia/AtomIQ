@@ -21,7 +21,7 @@ function DuolingoTabBar({ state, navigation }: BottomTabBarProps) {
     { name: 'index', icon: 'Home', label: 'Home' },
     { name: 'community', icon: 'People', label: 'Feed' },
     { name: 'chat', icon: 'Message', label: 'AI' },
-    { name: 'leaderboard', icon: 'Ranking', label: 'Rank' },
+    { name: 'awards', icon: 'Cup', label: 'Awards' },
     { name: 'profile', icon: 'Profile', label: 'Profile' },
   ] as const;
 
@@ -129,9 +129,9 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="leaderboard"
+        name="awards"
         options={{
-          title: 'Rank',
+          title: 'Awards',
         }}
       />
       <Tabs.Screen
