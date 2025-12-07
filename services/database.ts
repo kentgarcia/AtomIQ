@@ -18,6 +18,7 @@ export const initDatabase = async () => {
       -- User Profile
       CREATE TABLE IF NOT EXISTS user_profile (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id TEXT UNIQUE,
         username TEXT,
         avatar_url TEXT,
         total_xp INTEGER DEFAULT 0,
@@ -97,6 +98,24 @@ export const initDatabase = async () => {
         cached_at DATETIME DEFAULT CURRENT_TIMESTAMP
       );
     `);
+    
+    // Migrate existing databases - add user_id column if it doesn't exist
+    try {
+      await db.execAsync(`
+        ALTER TABLE user_profile ADD COLUMN user_id TEXT;
+      `);
+      console.log('Migration: Added user_id column to user_profile');
+    } catch (error) {
+      // Column already exists or table doesn't exist yet, ignore
+    }
+    
+    // Generate user_id for existing users without one
+    const existingUser = await db.getFirstAsync('SELECT * FROM user_profile WHERE user_id IS NULL LIMIT 1');
+    if (existingUser) {
+      const userId = `user_${Date.now()}_${Math.random().toString(36).substring(2, 15)}`;
+      await db.runAsync('UPDATE user_profile SET user_id = ? WHERE user_id IS NULL', [userId]);
+      console.log('Migration: Generated user_id for existing user');
+    }
     
     // Initialize local-first database schema (for social features and sync)
     await db.execAsync(LOCAL_FIRST_SCHEMA);
@@ -180,6 +199,7 @@ export const getUserProfile = async () => {
 };
 
 export const createOrUpdateUserProfile = async (profile: {
+  user_id?: string;
   username?: string;
   avatar_url?: string;
   total_xp?: number;
@@ -195,6 +215,7 @@ export const createOrUpdateUserProfile = async (profile: {
     // Update
     await database.runAsync(
       `UPDATE user_profile SET 
+        user_id = COALESCE(?, user_id),
         username = COALESCE(?, username),
         avatar_url = COALESCE(?, avatar_url),
         total_xp = COALESCE(?, total_xp),
@@ -205,6 +226,7 @@ export const createOrUpdateUserProfile = async (profile: {
         updated_at = CURRENT_TIMESTAMP
       WHERE id = ?`,
       [
+        profile.user_id,
         profile.username,
         profile.avatar_url,
         profile.total_xp,
@@ -216,11 +238,13 @@ export const createOrUpdateUserProfile = async (profile: {
       ]
     );
   } else {
-    // Create
+    // Create - generate user_id if not provided
+    const userId = profile.user_id || `user_${Date.now()}_${Math.random().toString(36).substring(2, 15)}`;
     await database.runAsync(
-      `INSERT INTO user_profile (username, avatar_url, total_xp, current_streak, longest_streak, myths_busted, lessons_completed)
-       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO user_profile (user_id, username, avatar_url, total_xp, current_streak, longest_streak, myths_busted, lessons_completed)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
       [
+        userId,
         profile.username || 'Scientist',
         profile.avatar_url || '',
         profile.total_xp || 0,

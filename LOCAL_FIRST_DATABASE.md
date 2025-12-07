@@ -31,9 +31,11 @@ services/local-first/
 ## Data Models
 
 ### User Profile
-- Username, display name, email, avatar, bio
+- **User ID**: Unique identifier (`user_id`) generated during onboarding for Supabase sync
+- Username (editable), display name, email, avatar, bio
 - XP, streaks, level, lessons completed, myths busted
 - Premium status and notification preferences
+- **Note**: Username can be changed anytime, but `user_id` remains constant for authentication
 
 ### Social Features
 - **Friendships**: Send/accept/decline requests, block users, mutual friends
