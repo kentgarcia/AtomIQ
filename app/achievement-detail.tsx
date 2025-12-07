@@ -3,7 +3,7 @@ import { useStorage } from '@/services/StorageContext';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useMemo } from 'react';
-import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 
 // Orange theme to match the app
@@ -139,9 +139,9 @@ export default function AchievementDetailScreen() {
           style={styles.iconCard}
         >
           <LinearGradient
-            colors={achievement.locked 
+            colors={(achievement.locked 
               ? ['#F5F5F5', '#E8E8E8'] 
-              : [achievement.color + '30', achievement.color + '15']
+              : [achievement.color + '30', achievement.color + '15']) as readonly [string, string]
             }
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
@@ -209,9 +209,9 @@ export default function AchievementDetailScreen() {
           
           <View style={styles.progressBarLarge}>
             <LinearGradient
-              colors={achievement.locked 
+              colors={(achievement.locked 
                 ? ['#E0E0E0', '#D0D0D0'] 
-                : [achievement.color, achievement.color + 'CC']
+                : [achievement.color, achievement.color + 'CC']) as readonly [string, string]
               }
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}

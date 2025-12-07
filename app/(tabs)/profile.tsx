@@ -1,6 +1,5 @@
 import { Icon } from '@/components/ui/icon';
 import { useColorScheme } from '@/hooks/use-color-scheme';
-import { useThemeColors } from '@/hooks/use-theme-colors';
 import { useStorage } from '@/services/StorageContext';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
@@ -20,18 +19,46 @@ import {
   View
 } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
-import Svg, { Circle, Defs, Pattern, Rect } from 'react-native-svg';
 
 const { width } = Dimensions.get('window');
+
+// Theme Constants
+const LightTHEME = {
+  bg: '#F8F9FE',
+  card: '#FFFFFF',
+  text: '#32325D',
+  textMuted: '#8898AA',
+  primary: '#5E72E4',
+  border: '#E9ECEF',
+};
+
+const DarkTHEME = {
+  bg: '#172B4D',
+  card: '#213356',
+  text: '#F6F9FC',
+  textMuted: '#8898AA',
+  primary: '#5E72E4',
+  border: '#2D3A56',
+};
+
+// Gradient Colors
+const GRADIENTS = {
+  purple: ['#B8A5FE', '#9E87F5'] as const,
+  green: ['#4FD1C5', '#2DCECC'] as const,
+  orange: ['#FF9F65', '#FF6B6B'] as const,
+  yellow: ['#FFD66E', '#FFA043'] as const,
+  blue: ['#6A82FB', '#FC5C7D'] as const,
+  blueSolid: ['#5E72E4', '#825EE4'] as const,
+};
 
 export default function ProfileScreen() {
   const router = useRouter();
   const { userProfile } = useStorage();
-  const colors = useThemeColors();
   const colorScheme = useColorScheme();
-  const isDark = colorScheme === 'dark';
+  const THEME = colorScheme === 'dark' ? DarkTHEME : LightTHEME;
+  const styles = useMemo(() => createStyles(THEME), [THEME]);
+  
   const [searchModalVisible, setSearchModalVisible] = useState(false);
-  const [editModalVisible, setEditModalVisible] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState('overview');
@@ -58,10 +85,10 @@ export default function ProfileScreen() {
     const mythsBusted = userProfile.myths_busted || 0;
     
     return [
-      { id: 1, label: 'Streak', value: userProfile.current_streak.toString(), icon: 'Flash', color: '#FF9600' },
-      { id: 2, label: 'Best', value: (userProfile.longest_streak || 0).toString(), icon: 'Trophy', color: '#FFD700' },
-      { id: 3, label: 'Myths', value: mythsBusted.toString(), icon: 'TickCircle', color: '#2ECC71' },
-      { id: 4, label: 'Lessons', value: lessonsCompleted.toString(), icon: 'Book', color: '#EA580C' },
+      { id: 1, label: 'Streak', value: userProfile.current_streak.toString(), icon: 'Flash', gradient: GRADIENTS.orange },
+      { id: 2, label: 'Best', value: (userProfile.longest_streak || 0).toString(), icon: 'Trophy', gradient: GRADIENTS.yellow },
+      { id: 3, label: 'Myths', value: mythsBusted.toString(), icon: 'TickCircle', gradient: GRADIENTS.green },
+      { id: 4, label: 'Lessons', value: lessonsCompleted.toString(), icon: 'Book', gradient: GRADIENTS.blue },
     ];
   }, [userProfile]);
 
@@ -84,161 +111,132 @@ export default function ProfileScreen() {
 
   if (!userProfile) {
     return (
-      <View style={{ flex: 1, backgroundColor: colors.background, alignItems: 'center', justifyContent: 'center' }}>
-        <Text style={{ color: colors.textSecondary }}>Loading profile...</Text>
+      <View style={{ flex: 1, backgroundColor: THEME.bg, alignItems: 'center', justifyContent: 'center' }}>
+        <Text style={{ color: THEME.textMuted }}>Loading profile...</Text>
       </View>
     );
   }
 
-  const styles = createStyles(colors, isDark);
-
   return (
     <View style={styles.container}>
-      {/* Fixed Top Section */}
-      <View style={{ zIndex: 1 }}>
-        {/* Cover Photo / Banner */}
-        <View style={styles.bannerContainer}>
-          <LinearGradient
-            colors={['#EA580C', '#F97316']}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={styles.banner}
-          />
-          
-          {/* Pattern Overlay */}
-          <View style={[StyleSheet.absoluteFill, { opacity: 0.3 }]}>
-            <Svg height="100%" width="100%">
-              <Defs>
-                <Pattern id="dots" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
-                  <Circle cx="2" cy="2" r="2" fill="#FFFFFF" opacity="0.5" />
-                </Pattern>
-              </Defs>
-              <Rect x="0" y="0" width="100%" height="100%" fill="url(#dots)" />
-            </Svg>
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
+        
+        {/* Header Section */}
+        <View style={styles.header}>
+          <View style={styles.headerTopRow}>
+            <TouchableOpacity 
+              style={styles.iconButton}
+              onPress={() => router.push('/settings')}
+            >
+              <Icon name="Setting" size={24} color={THEME.text} />
+            </TouchableOpacity>
           </View>
 
-          {/* Fade to Background Gradient */}
-          <LinearGradient
-            colors={[isDark ? 'rgba(13,13,13,0)' : 'rgba(255,255,255,0)', colors.background]}
-            style={[StyleSheet.absoluteFill, { top: '30%' }]} 
-            start={{ x: 0, y: 0 }}
-            end={{ x: 0, y: 1 }}
-          />
-
-          <TouchableOpacity 
-            style={styles.settingsButton} 
-            onPress={() => router.push('/settings')}
-            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-          >
-            <View style={styles.settingsIconBlur}>
-              <Icon name="Setting" size={24} color="#FFFFFF" variant="Bold" />
-            </View>
-          </TouchableOpacity>
-        </View>
-
-        {/* Profile Header Info */}
-        <View style={styles.profileHeader}>
-          <View style={styles.headerTopRow}>
+          <View style={styles.profileInfo}>
             <View style={styles.avatarContainer}>
               <Image 
                 source={require('@/assets/images/mascot/profile.png')} 
                 style={styles.avatar} 
                 resizeMode="contain"
               />
-              <View style={styles.onlineIndicator} />
+              <View style={styles.levelBadge}>
+                <Text style={styles.levelText}>{userLevel}</Text>
+              </View>
             </View>
-            <TouchableOpacity style={styles.editProfileButton} onPress={() => setEditModalVisible(true)}>
-              <Text style={styles.editProfileText}>Edit Profile</Text>
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.userInfo}>
             <Text style={styles.name}>{userProfile.username}</Text>
-            <Text style={styles.handle}>@{userProfile.username.toLowerCase()} • {userTitle}</Text>
+            <Text style={styles.title}>{userTitle}</Text>
           </View>
         </View>
 
         {/* Tabs */}
         <View style={styles.tabsContainer}>
-          <TouchableOpacity 
-            style={[styles.tab, activeTab === 'overview' && styles.activeTab]} 
-            onPress={() => setActiveTab('overview')}
-          >
-            <Text style={[styles.tabText, activeTab === 'overview' && styles.activeTabText]}>Overview</Text>
-          </TouchableOpacity>
-          <TouchableOpacity 
-            style={[styles.tab, activeTab === 'stats' && styles.activeTab]} 
-            onPress={() => setActiveTab('stats')}
-          >
-            <Text style={[styles.tabText, activeTab === 'stats' && styles.activeTabText]}>Stats</Text>
-          </TouchableOpacity>
-          <TouchableOpacity 
-            style={[styles.tab, activeTab === 'friends' && styles.activeTab]} 
-            onPress={() => setActiveTab('friends')}
-          >
-            <Text style={[styles.tabText, activeTab === 'friends' && styles.activeTabText]}>Friends</Text>
-          </TouchableOpacity>
+          {['overview', 'stats', 'friends'].map((tab) => (
+            <TouchableOpacity 
+              key={tab}
+              style={[styles.tab, activeTab === tab && styles.activeTab]} 
+              onPress={() => setActiveTab(tab)}
+            >
+              <Text style={[styles.tabText, activeTab === tab && styles.activeTabText]}>
+                {tab.charAt(0).toUpperCase() + tab.slice(1)}
+              </Text>
+            </TouchableOpacity>
+          ))}
         </View>
-      </View>
 
-      {/* Scrollable Content */}
-      <ScrollView showsVerticalScrollIndicator={false} style={styles.scrollContent}>
         {/* Content Area */}
         <View style={styles.contentArea}>
           {activeTab === 'overview' && (
             <Animated.View entering={FadeInDown.duration(400)}>
-              {/* Level Progress */}
-              <View style={styles.card}>
-                <View style={styles.cardHeader}>
-                  <Text style={styles.cardTitle}>Level Progress</Text>
-                  <Text style={styles.xpText}>{userProfile.total_xp.toLocaleString()} XP</Text>
-                </View>
-                <View style={styles.progressBarBg}>
-                  <View style={[styles.progressBarFill, { width: `${(userProfile.total_xp % 100)}%` }]} />
-                </View>
-                <Text style={styles.nextLevelText}>
-                  {100 - (userProfile.total_xp % 100)} XP until Level {userLevel + 1}
-                </Text>
+              
+              {/* Level Progress Card */}
+              <View style={styles.progressCard}>
+                <LinearGradient
+                  colors={GRADIENTS.blueSolid}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={styles.progressGradient}
+                >
+                  <View style={styles.progressHeader}>
+                    <Text style={styles.progressTitle}>Level Progress</Text>
+                    <Text style={styles.xpText}>{userProfile.total_xp.toLocaleString()} XP</Text>
+                  </View>
+                  <View style={styles.progressBarBg}>
+                    <View style={[styles.progressBarFill, { width: `${(userProfile.total_xp % 100)}%` }]} />
+                  </View>
+                  <Text style={styles.nextLevelText}>
+                    {100 - (userProfile.total_xp % 100)} XP until Level {userLevel + 1}
+                  </Text>
+                </LinearGradient>
               </View>
 
-              {/* Quick Stats Grid */}
+              {/* Stats Grid */}
               <View style={styles.statsGrid}>
-                {stats.map((stat) => (
-                  <View key={stat.id} style={styles.statItem}>
-                    <View style={[styles.statIconContainer, { backgroundColor: stat.color + '15' }]}>
-                      <Icon name={stat.icon as any} size={20} color={stat.color} variant="Bold" />
-                    </View>
-                    <Text style={styles.statValue}>{stat.value}</Text>
-                    <Text style={styles.statLabel}>{stat.label}</Text>
-                  </View>
+                {stats.map((stat, index) => (
+                  <Animated.View 
+                    key={stat.id} 
+                    entering={FadeInDown.delay(100 + (index * 50))}
+                    style={styles.statItemContainer}
+                  >
+                    <LinearGradient
+                      colors={stat.gradient}
+                      style={styles.statGradient}
+                    >
+                      <View style={styles.statIconCircle}>
+                        <Icon name={stat.icon as any} size={20} color={stat.gradient[1]} variant="Bold" />
+                      </View>
+                      <Text style={styles.statValue}>{stat.value}</Text>
+                      <Text style={styles.statLabel}>{stat.label}</Text>
+                    </LinearGradient>
+                  </Animated.View>
                 ))}
               </View>
             </Animated.View>
           )}
 
           {activeTab === 'stats' && (
-             <Animated.View entering={FadeInDown.duration(400)}>
-               <View style={styles.emptyTabState}>
-                 <Icon name="Chart" size={48} color={colors.textSecondary} variant="Bulk" />
-                 <Text style={styles.emptyTabTitle}>Detailed Stats</Text>
-                 <Text style={styles.emptyTabDesc}>More detailed statistics and charts coming soon!</Text>
-               </View>
+             <Animated.View entering={FadeInDown.duration(400)} style={styles.emptyStateContainer}>
+               <Icon name="Chart" size={64} color={THEME.textMuted} variant="Bulk" />
+               <Text style={styles.emptyStateTitle}>Detailed Stats</Text>
+               <Text style={styles.emptyStateDesc}>More detailed statistics and charts coming soon!</Text>
              </Animated.View>
           )}
 
           {activeTab === 'friends' && (
             <Animated.View entering={FadeInDown.duration(400)}>
-              <TouchableOpacity style={styles.addFriendBar} onPress={handleSearchFriends}>
-                <View style={styles.addFriendIcon}>
-                  <Icon name="Add" size={20} color="#FFF" />
-                </View>
-                <Text style={styles.addFriendText}>Find and add friends</Text>
+              <TouchableOpacity style={styles.addFriendButton} onPress={handleSearchFriends}>
+                <LinearGradient
+                  colors={GRADIENTS.purple}
+                  style={styles.addFriendGradient}
+                >
+                  <Icon name="Add" size={24} color="#FFF" />
+                  <Text style={styles.addFriendText}>Find Friends</Text>
+                </LinearGradient>
               </TouchableOpacity>
               
-              <View style={styles.emptyTabState}>
-                 <Icon name="Profile2User" size={48} color={colors.textSecondary} variant="Bulk" />
-                 <Text style={styles.emptyTabTitle}>No Friends Yet</Text>
-                 <Text style={styles.emptyTabDesc}>Connect with other learners to compete and share progress.</Text>
+              <View style={styles.emptyStateContainer}>
+                 <Icon name="Profile2User" size={64} color={THEME.textMuted} variant="Bulk" />
+                 <Text style={styles.emptyStateTitle}>No Friends Yet</Text>
+                 <Text style={styles.emptyStateDesc}>Connect with other learners to compete and share progress.</Text>
                </View>
             </Animated.View>
           )}
@@ -246,39 +244,6 @@ export default function ProfileScreen() {
         
         <View style={{ height: 40 }} />
       </ScrollView>
-
-      {/* Edit Profile Modal */}
-      <Modal
-        visible={editModalVisible}
-        animationType="slide"
-        transparent={true}
-        onRequestClose={() => setEditModalVisible(false)}
-      >
-        <KeyboardAvoidingView 
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-          style={styles.modalOverlay}
-        >
-          <View style={styles.modalContent}>
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Edit Profile</Text>
-              <TouchableOpacity onPress={() => setEditModalVisible(false)} style={styles.closeButton}>
-                <Icon name="CloseCircle" size={24} color={colors.textSecondary} variant="Bold" />
-              </TouchableOpacity>
-            </View>
-            
-            <View style={{ padding: 20, alignItems: 'center' }}>
-               <Image 
-                source={require('@/assets/images/mascot/profile.png')} 
-                style={{ width: 100, height: 100, marginBottom: 20 }} 
-                resizeMode="contain"
-              />
-              <Text style={{ color: colors.textSecondary, textAlign: 'center' }}>
-                Profile editing functionality coming soon!
-              </Text>
-            </View>
-          </View>
-        </KeyboardAvoidingView>
-      </Modal>
 
       {/* Search Friends Modal */}
       <Modal
@@ -295,16 +260,16 @@ export default function ProfileScreen() {
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>Search Friends</Text>
               <TouchableOpacity onPress={() => setSearchModalVisible(false)} style={styles.closeButton}>
-                <Icon name="CloseCircle" size={24} color={colors.textSecondary} variant="Bold" />
+                <Icon name="CloseCircle" size={24} color={THEME.textMuted} variant="Bold" />
               </TouchableOpacity>
             </View>
 
             <View style={styles.modalSearchBar}>
-              <Icon name="SearchNormal" size={20} color={colors.textSecondary} />
+              <Icon name="SearchNormal" size={20} color={THEME.textMuted} />
               <TextInput
                 style={styles.modalSearchInput}
                 placeholder="Enter username..."
-                placeholderTextColor={colors.textSecondary}
+                placeholderTextColor={THEME.textMuted}
                 value={searchQuery}
                 onChangeText={setSearchQuery}
                 autoFocus
@@ -321,7 +286,7 @@ export default function ProfileScreen() {
             >
               {searchResults.length === 0 ? (
                 <View style={styles.modalEmptyState}>
-                  <Icon name="Profile2User" size={48} color={colors.textSecondary} variant="Bulk" />
+                  <Icon name="Profile2User" size={48} color={THEME.textMuted} variant="Bulk" />
                   <Text style={styles.modalEmptyText}>
                     {searchQuery ? 'No users found' : 'Search for friends by username'}
                   </Text>
@@ -330,7 +295,7 @@ export default function ProfileScreen() {
                 searchResults.map((user, index) => (
                   <View key={index} style={styles.searchResultItem}>
                     <View style={styles.searchResultAvatar}>
-                      <Icon name="Profile" size={24} color={colors.primary} variant="Bold" />
+                      <Icon name="Profile" size={24} color={THEME.primary} variant="Bold" />
                     </View>
                     <View style={styles.searchResultInfo}>
                       <Text style={styles.searchResultName}>{user.username}</Text>
@@ -353,263 +318,231 @@ export default function ProfileScreen() {
   );
 }
 
-const createStyles = (colors: any, isDark: boolean) => {
-  const borderColor = isDark ? '#333333' : '#E5E5E5';
-  const cardBorderColor = isDark ? '#333333' : '#E0E0E0';
-  
-  return StyleSheet.create({
+const createStyles = (theme: typeof LightTHEME) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: theme.bg,
   },
   scrollContent: {
-    flex: 1,
+    paddingBottom: 40,
   },
-    // Banner
-  bannerContainer: {
-    height: 140,
+  header: {
+    alignItems: 'center',
+    paddingTop: 60,
+    paddingBottom: 24,
+    backgroundColor: theme.bg,
+  },
+  headerTopRow: {
     width: '100%',
-    position: 'relative',
-  },
-  banner: {
-    width: '100%',
-    height: '100%',
-  },
-  settingsButton: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    paddingHorizontal: 20,
     position: 'absolute',
-    top: 40,
-    right: 20,
+    top: 60,
     zIndex: 10,
   },
-  settingsIconBlur: {
+  iconButton: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: 'rgba(0,0,0,0.3)',
+    backgroundColor: theme.card,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  // Profile Header
-  profileHeader: {
-    paddingHorizontal: 20,
-    marginBottom: 20,
-  },
-  headerTopRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-end',
-    marginTop: -40,
-    marginBottom: 12,
+  profileInfo: {
+    alignItems: 'center',
+    marginTop: 20,
   },
   avatarContainer: {
     position: 'relative',
+    marginBottom: 16,
   },
   avatar: {
-    width: 88,
-    height: 88,
-    borderRadius: 44,
-    borderWidth: 4,
-    borderColor: colors.background,
-    backgroundColor: colors.card,
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: theme.card,
   },
-  onlineIndicator: {
+  levelBadge: {
     position: 'absolute',
-    bottom: 4,
-    right: 4,
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    backgroundColor: '#2ECC71',
-    borderWidth: 3,
-    borderColor: colors.background,
-  },
-  editProfileButton: {
-    paddingHorizontal: 16,
-    paddingVertical: 10,
+    bottom: 0,
+    right: 0,
+    backgroundColor: '#5E72E4',
+    width: 32,
+    height: 32,
     borderRadius: 16,
-    borderWidth: 2,
-    borderBottomWidth: 4,
-    borderColor: borderColor,
-    backgroundColor: colors.card,
-    marginBottom: 0,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 3,
+    borderColor: theme.bg,
   },
-  editProfileText: {
+  levelText: {
+    color: '#FFF',
+    fontWeight: '800',
     fontSize: 14,
-    fontWeight: '700',
-    color: colors.text,
-  },
-  userInfo: {
-    marginTop: 4,
   },
   name: {
     fontSize: 24,
     fontWeight: '800',
-    color: colors.text,
-    marginBottom: 2,
+    color: theme.text,
+    marginBottom: 4,
   },
-  handle: {
-    fontSize: 15,
-    color: colors.textSecondary,
-    marginBottom: 12,
-    fontWeight: '500',
+  title: {
+    fontSize: 14,
+    color: theme.textMuted,
+    fontWeight: '600',
   },
-  // Tabs
   tabsContainer: {
     flexDirection: 'row',
-    borderBottomWidth: 2,
-    borderBottomColor: borderColor,
-    paddingHorizontal: 20,
+    marginHorizontal: 20,
+    backgroundColor: theme.card,
+    padding: 4,
+    borderRadius: 16,
+    marginBottom: 24,
   },
   tab: {
-    paddingVertical: 14,
-    marginRight: 24,
-    borderBottomWidth: 3,
-    borderBottomColor: 'transparent',
-    marginBottom: -2, // Overlap the container border
+    flex: 1,
+    paddingVertical: 10,
+    alignItems: 'center',
+    borderRadius: 12,
   },
   activeTab: {
-    borderBottomColor: colors.primary,
+    backgroundColor: theme.bg,
   },
   tabText: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: colors.textSecondary,
+    fontSize: 14,
+    fontWeight: '600',
+    color: theme.textMuted,
   },
   activeTabText: {
-    color: colors.primary,
+    color: theme.primary,
+    fontWeight: '700',
   },
-  // Content Area
   contentArea: {
+    paddingHorizontal: 20,
+  },
+  progressCard: {
+    borderRadius: 24,
+    overflow: 'hidden',
+    marginBottom: 24,
+  },
+  progressGradient: {
     padding: 20,
   },
-  card: {
-    backgroundColor: colors.card,
-    borderRadius: 20,
-    padding: 20,
-    marginBottom: 20,
-    borderWidth: 2,
-    borderBottomWidth: 4,
-    borderColor: cardBorderColor,
-  },
-  cardHeader: {
+  progressHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: 12,
   },
-  cardTitle: {
+  progressTitle: {
     fontSize: 18,
     fontWeight: '800',
-    color: colors.text,
+    color: '#FFF',
   },
   xpText: {
-    fontSize: 15,
+    fontSize: 14,
     fontWeight: '700',
-    color: colors.primary,
+    color: 'rgba(255,255,255,0.9)',
   },
   progressBarBg: {
-    height: 16,
-    backgroundColor: isDark ? '#333' : '#F0F0F0',
-    borderRadius: 8,
+    height: 8,
+    backgroundColor: 'rgba(0,0,0,0.2)',
+    borderRadius: 4,
     overflow: 'hidden',
-    marginBottom: 10,
+    marginBottom: 8,
   },
   progressBarFill: {
     height: '100%',
-    backgroundColor: colors.primary,
-    borderRadius: 8,
+    backgroundColor: '#FFF',
+    borderRadius: 4,
   },
   nextLevelText: {
-    fontSize: 13,
-    color: colors.textSecondary,
+    fontSize: 12,
+    color: 'rgba(255,255,255,0.8)',
     fontWeight: '600',
   },
-  // Stats Grid
   statsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 12,
+    gap: 16,
   },
-  statItem: {
-    width: (width - 52) / 2, // 20px padding * 2 + 12px gap = 52
-    backgroundColor: colors.card,
-    borderRadius: 16,
+  statItemContainer: {
+    width: (width - 56) / 2,
+    height: 120,
+    borderRadius: 20,
+    overflow: 'hidden',
+  },
+  statGradient: {
+    flex: 1,
     padding: 16,
-    borderWidth: 2,
-    borderBottomWidth: 4,
-    borderColor: cardBorderColor,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  statIconContainer: {
+  statIconCircle: {
     width: 40,
     height: 40,
     borderRadius: 20,
+    backgroundColor: 'rgba(255,255,255,0.9)',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 12,
   },
   statValue: {
-    fontSize: 22,
+    fontSize: 24,
     fontWeight: '800',
-    color: colors.text,
+    color: '#FFF',
     marginBottom: 4,
   },
   statLabel: {
-    fontSize: 13,
-    color: colors.textSecondary,
+    fontSize: 12,
+    color: 'rgba(255,255,255,0.9)',
     fontWeight: '600',
   },
-  // Friends Tab
-  addFriendBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.primary,
-    padding: 16,
-    borderRadius: 16,
-    marginBottom: 20,
-    borderWidth: 2,
-    borderBottomWidth: 4,
-    borderColor: colors.primaryDark || '#4A148C', // Fallback if primaryDark missing
-  },
-  addFriendIcon: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 12,
-  },
-  addFriendText: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#FFF',
-  },
-  emptyTabState: {
+  emptyStateContainer: {
     alignItems: 'center',
     paddingVertical: 40,
+    backgroundColor: theme.card,
+    borderRadius: 24,
+    padding: 24,
   },
-  emptyTabTitle: {
-    fontSize: 20,
+  emptyStateTitle: {
+    fontSize: 18,
     fontWeight: '800',
-    color: colors.text,
+    color: theme.text,
     marginTop: 16,
     marginBottom: 8,
   },
-  emptyTabDesc: {
-    fontSize: 15,
-    color: colors.textSecondary,
+  emptyStateDesc: {
+    fontSize: 14,
+    color: theme.textMuted,
     textAlign: 'center',
-    maxWidth: 260,
-    lineHeight: 22,
+    lineHeight: 20,
   },
-  // Modal
+  addFriendButton: {
+    borderRadius: 20,
+    overflow: 'hidden',
+    marginBottom: 24,
+  },
+  addFriendGradient: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 16,
+    gap: 8,
+  },
+  addFriendText: {
+    color: '#FFF',
+    fontSize: 16,
+    fontWeight: '700',
+  },
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'flex-end',
   },
   modalContent: {
-    backgroundColor: colors.background,
+    backgroundColor: theme.bg,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     height: '80%',
@@ -625,7 +558,7 @@ const createStyles = (colors: any, isDark: boolean) => {
   modalTitle: {
     fontSize: 20,
     fontWeight: '700',
-    color: colors.text,
+    color: theme.text,
   },
   closeButton: {
     padding: 4,
@@ -634,23 +567,21 @@ const createStyles = (colors: any, isDark: boolean) => {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
-    backgroundColor: colors.card,
+    backgroundColor: theme.card,
     borderRadius: 16,
     paddingHorizontal: 16,
     paddingVertical: 12,
     marginHorizontal: 20,
     marginBottom: 20,
-    borderWidth: 2,
-    borderColor: borderColor,
   },
   modalSearchInput: {
     flex: 1,
     fontSize: 16,
-    color: colors.text,
+    color: theme.text,
     fontWeight: '600',
   },
   searchButton: {
-    backgroundColor: colors.primary,
+    backgroundColor: theme.primary,
     paddingHorizontal: 16,
     paddingVertical: 10,
     borderRadius: 12,
@@ -671,26 +602,23 @@ const createStyles = (colors: any, isDark: boolean) => {
   },
   modalEmptyText: {
     fontSize: 14,
-    color: colors.textSecondary,
+    color: theme.textMuted,
     marginTop: 12,
     textAlign: 'center',
   },
   searchResultItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.card,
+    backgroundColor: theme.card,
     borderRadius: 16,
     padding: 12,
     marginBottom: 12,
-    borderWidth: 2,
-    borderBottomWidth: 4,
-    borderColor: cardBorderColor,
   },
   searchResultAvatar: {
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: colors.primary + '20',
+    backgroundColor: theme.bg,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
@@ -701,16 +629,16 @@ const createStyles = (colors: any, isDark: boolean) => {
   searchResultName: {
     fontSize: 16,
     fontWeight: '700',
-    color: colors.text,
+    color: theme.text,
     marginBottom: 4,
   },
   searchResultStats: {
     fontSize: 12,
-    color: colors.textSecondary,
+    color: theme.textMuted,
     fontWeight: '600',
   },
   addButton: {
-    backgroundColor: colors.primary,
+    backgroundColor: theme.primary,
     width: 36,
     height: 36,
     borderRadius: 18,
@@ -718,5 +646,5 @@ const createStyles = (colors: any, isDark: boolean) => {
     justifyContent: 'center',
   },
 });
-};
+
 

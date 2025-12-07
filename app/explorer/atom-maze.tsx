@@ -5,24 +5,24 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
-  Dimensions,
-  Platform,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  Vibration,
-  View,
+    Dimensions,
+    Platform,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    Vibration,
+    View,
 } from 'react-native';
 import Animated, {
-  FadeIn,
-  FadeInDown,
-  FadeOut,
-  runOnJS,
-  useAnimatedStyle,
-  useSharedValue,
-  withSequence,
-  withTiming
+    FadeIn,
+    FadeInDown,
+    FadeOut,
+    runOnJS,
+    useAnimatedStyle,
+    useSharedValue,
+    withSequence,
+    withTiming
 } from 'react-native-reanimated';
 import Svg, { Circle, Path, Rect } from 'react-native-svg';
 
@@ -604,7 +604,7 @@ export default function AtomMazeBattleScreen() {
   // Render intro screen
   if (gameState.phase === 'intro') {
     return (
-      <LinearGradient colors={['#FFFDE7', '#FFF9C4', '#FFEE58']} style={styles.container}>
+      <LinearGradient colors={['#FFFDE7', '#FFF9C4', '#FFEE58'] as const} style={styles.container}>
         <View style={styles.introHeader}>
           <TouchableOpacity onPress={handleExit} style={styles.introBackBtn}>
             <Icon name="ArrowLeft2" size={20} color={THEME.text} />
@@ -662,7 +662,7 @@ export default function AtomMazeBattleScreen() {
           <TouchableOpacity style={styles.startButton} onPress={handleStartGame} activeOpacity={0.9}>
             <View style={styles.startButton3DBottom} />
             <LinearGradient
-              colors={['#FFB300', '#FFA000']}
+              colors={['#FFB300', '#FFA000'] as const}
               style={styles.startButtonGradient}
             >
               <Icon name="Play" size={28} color="#FFF" variant="Bold" />
@@ -677,7 +677,7 @@ export default function AtomMazeBattleScreen() {
   // Render defeat screen
   if (gameState.phase === 'defeat') {
     return (
-      <LinearGradient colors={['#FFFDE7', '#FFF9C4', '#FEE2E2']} style={styles.container}>
+      <LinearGradient colors={['#FFFDE7', '#FFF9C4', '#FEE2E2'] as const} style={styles.container}>
         <Animated.View entering={FadeIn} style={styles.resultContainer}>
           <View style={styles.resultCard}>
             <Text style={styles.defeatEmoji}>💀</Text>
@@ -711,7 +711,7 @@ export default function AtomMazeBattleScreen() {
   // Render victory screen (between rooms)
   if (gameState.phase === 'victory') {
     return (
-      <LinearGradient colors={['#FFFDE7', '#FFF9C4', '#DCFCE7']} style={styles.container}>
+      <LinearGradient colors={['#FFFDE7', '#FFF9C4', '#DCFCE7'] as const} style={styles.container}>
         <Animated.View entering={FadeIn} style={styles.resultContainer}>
           <View style={styles.resultCard}>
             <Text style={styles.victoryEmoji}>⚔️</Text>
@@ -747,7 +747,7 @@ export default function AtomMazeBattleScreen() {
   // Render boss intro screen
   if (gameState.phase === 'boss_intro') {
     return (
-      <LinearGradient colors={['#FFFDE7', '#FFF9C4', '#FFE4E6']} style={styles.container}>
+      <LinearGradient colors={['#FFFDE7', '#FFF9C4', '#FFE4E6'] as const} style={styles.container}>
         <Animated.View entering={FadeIn} style={styles.resultContainer}>
           <View style={styles.resultCard}>
             <Text style={styles.bossIntroEmoji}>
@@ -788,7 +788,7 @@ export default function AtomMazeBattleScreen() {
   // Render completion screen
   if (gameState.phase === 'complete') {
     return (
-      <LinearGradient colors={['#FFFDE7', '#FFF9C4', '#FEF9C3']} style={styles.container}>
+      <LinearGradient colors={['#FFFDE7', '#FFF9C4', '#FEF9C3'] as const} style={styles.container}>
         <Animated.View entering={FadeIn} style={styles.resultContainer}>
           <View style={styles.resultCard}>
             <Text style={styles.completeEmoji}>🏆</Text>
@@ -832,7 +832,7 @@ export default function AtomMazeBattleScreen() {
 
   // Main battle screen
   return (
-    <LinearGradient colors={['#FFFDE7', '#FFF9C4']} style={styles.container}>
+    <LinearGradient colors={['#FFFDE7', '#FFF9C4'] as const} style={styles.container}>
       {/* Battle Arena */}
       <GameBoyFrame 
         title={isBossBattle ? '⚔️ BOSS' : `Room ${gameState.currentRoomIndex + 1}/${maze.rooms.length}`}

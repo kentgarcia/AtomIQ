@@ -3,7 +3,7 @@ import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import 'react-native-reanimated';
 
-import { ThemeProvider, useColorScheme } from '@/hooks/use-color-scheme.tsx';
+import { ThemeProvider, useColorScheme } from '@/hooks/use-color-scheme';
 import { useGoogleSansFlex } from '@/hooks/use-google-sans-flex';
 import { usePoppins } from '@/hooks/use-poppins';
 import { StorageProvider } from '@/services/StorageContext';

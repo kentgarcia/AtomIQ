@@ -1,35 +1,38 @@
-import { Icon } from '@/components/ui/icon';
-import { Background } from '@/components/ui/background';
 import { MarkdownText } from '@/components/markdown-text';
-import { useRouter } from 'expo-router';
-import React, { useState, useEffect, useRef } from 'react';
-import { 
-  StyleSheet, View, Text, ScrollView, TextInput, TouchableOpacity, 
-  KeyboardAvoidingView, Platform, Dimensions, Image, Alert
-} from 'react-native';
+import { Icon } from '@/components/ui/icon';
+import { convertMessagesToGeminiFormat, sendMessageToGemini } from '@/services/gemini';
 import { LinearGradient } from 'expo-linear-gradient';
-import Animated, { 
-  FadeInDown, FadeInUp, useSharedValue, useAnimatedStyle, withRepeat, withTiming, Easing 
+import { useRouter } from 'expo-router';
+import React, { useEffect, useRef, useState } from 'react';
+import {
+    Alert,
+    Image,
+    KeyboardAvoidingView, Platform,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TextInput, TouchableOpacity,
+    View
+} from 'react-native';
+import Animated, {
+    Easing,
+    FadeInUp,
+    useAnimatedStyle,
+    useSharedValue,
+    withRepeat, withTiming
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { sendMessageToGemini, convertMessagesToGeminiFormat } from '@/services/gemini';
-import {
-  createConversation, saveConversation, loadConversation, getAllConversations,
-  deleteConversation, renameConversation, pinConversation,
-  saveNote, getCurrentConversationId, setCurrentConversationId,
-  type ChatMessage, type ChatConversation
-} from '@/services/chat-history';
 
-// Orange Theme matching the app
+// Purple Theme matching the app design
 const CHAT_THEME = {
   bg: '#F4F5F7',
   card: '#FFFFFF',
   text: '#2D3436',
   textMuted: '#636E72',
-  primary: '#EA580C',
-  primaryDark: '#C2410C',
-  primaryLight: '#F97316',
-  userBubble: '#EA580C', // Orange for user messages
+  primary: '#9E87F5',
+  primaryDark: '#7C3AED',
+  primaryLight: '#B8A5FE',
+  userBubble: '#9E87F5', // Purple for user messages
   botBubble: '#FFFFFF',
   border: '#E5E7EB',
   green: '#2ECC71',
@@ -192,15 +195,10 @@ export default function AiChatScreen() {
 
   return (
     <View style={styles.container}>
-      {/* Enhanced Header with Gradient */}
-      <LinearGradient
-        colors={[CHAT_THEME.primary, CHAT_THEME.primaryLight]}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 0 }}
-        style={[styles.header, { paddingTop: insets.top + 12 }]}
-      >
+      {/* Header - Home Style */}
+      <View style={[styles.header, { paddingTop: insets.top + 12 }]}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-           <Icon name="ArrowLeft2" size={24} color="#FFF" />
+           <Icon name="ArrowLeft2" size={24} color={CHAT_THEME.text} />
         </TouchableOpacity>
         <View style={styles.headerTitleContainer}>
           <View style={styles.headerAvatarWrapper}>
@@ -224,9 +222,9 @@ export default function AiChatScreen() {
           }} 
           style={styles.clearButton}
         >
-          <Icon name="Refresh" size={20} color="#FFF" variant="Bold" />
+          <Icon name="Refresh" size={20} color={CHAT_THEME.text} variant="Bold" />
         </TouchableOpacity>
-      </LinearGradient>
+      </View>
 
       {/* Chat Body */}
       <ScrollView 
@@ -381,7 +379,7 @@ export default function AiChatScreen() {
             >
               {inputText.trim() ? (
                 <LinearGradient
-                  colors={[CHAT_THEME.primary, CHAT_THEME.primaryLight]}
+                  colors={[CHAT_THEME.primary, CHAT_THEME.primaryLight] as const}
                   style={styles.sendButtonGradient}
                 >
                   <Icon name="Send2" size={20} color="#FFF" variant="Bold" />
@@ -408,11 +406,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingBottom: 16,
     zIndex: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 5,
+    backgroundColor: '#FFF',
+    borderBottomWidth: 1,
+    borderBottomColor: '#F0F0F0',
   },
   backButton: {
     padding: 8,
@@ -434,8 +430,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFF',
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 2,
-    borderColor: 'rgba(255, 255, 255, 0.5)',
+    borderWidth: 1,
+    borderColor: CHAT_THEME.border,
   },
   onlineDot: {
     position: 'absolute',
@@ -451,11 +447,11 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 18,
     fontWeight: '800',
-    color: '#FFF',
+    color: CHAT_THEME.text,
   },
   headerSubtitle: {
     fontSize: 11,
-    color: 'rgba(255, 255, 255, 0.9)',
+    color: CHAT_THEME.textMuted,
     fontWeight: '600',
   },
   clearButton: {

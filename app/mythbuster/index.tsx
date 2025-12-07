@@ -1,29 +1,24 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Dimensions, SafeAreaView, ScrollView, Image, Pressable } from 'react-native';
-import { useRouter } from 'expo-router';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withSpring,
-  withTiming,
-  withRepeat,
-  withSequence,
-  withDelay,
-  runOnJS,
-  interpolate,
-  FadeInDown,
-  FadeInUp,
-  FadeOutUp,
-  ZoomIn,
-  BounceIn,
-  SlideInRight,
-} from 'react-native-reanimated';
-import { GestureDetector, Gesture, GestureHandlerRootView } from 'react-native-gesture-handler';
 import { Icon } from '@/components/ui/icon';
-import { LinearGradient } from 'expo-linear-gradient';
+import { getAllMyths } from '@/content/myths';
+import { useColorScheme } from '@/hooks/use-color-scheme';
+import { useThemeColor } from '@/hooks/use-theme-color';
 import { useStorage } from '@/services/StorageContext';
 import { logDailyActivity } from '@/services/database';
-import { getAllMyths } from '@/content/myths';
+import { LinearGradient } from 'expo-linear-gradient';
+import { useRouter } from 'expo-router';
+import React, { useEffect, useState } from 'react';
+import { Dimensions, Image, Pressable, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Gesture, GestureDetector, GestureHandlerRootView } from 'react-native-gesture-handler';
+import Animated, {
+  FadeInDown,
+  interpolate,
+  runOnJS,
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+  withTiming
+} from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const { width, height } = Dimensions.get('window');
 const SWIPE_THRESHOLD = width * 0.3;
@@ -83,7 +78,7 @@ const GAME_MODES: ModeConfig[] = [
     color: '#FF3B5C',
     colorSecondary: '#FF6B88',
     rounds: 10,
-    timeLimit: 10,
+    timeLimit: 5,
     xpMultiplier: 1.5,
     difficulty: 2,
     tagline: 'Race against the clock!',
@@ -107,11 +102,17 @@ const GAME_MODES: ModeConfig[] = [
 export default function MythBusterScreen() {
   const router = useRouter();
   const { addXP } = useStorage();
+  const insets = useSafeAreaInsets();
+  const colorScheme = useColorScheme();
+  const backgroundColor = colorScheme === 'dark' ? '#1A1A2E' : useThemeColor({}, 'background');
+  const textColor = colorScheme === 'dark' ? '#EAEAEA' : useThemeColor({}, 'text');
+  const cardColor = colorScheme === 'dark' ? '#16213E' : useThemeColor({}, 'card');
   
   const [gameState, setGameState] = useState<GameState>('mode-select');
   const [selectedMode, setSelectedMode] = useState<ModeConfig>(GAME_MODES[0]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [score, setScore] = useState(0);
+  const [isAnimating, setIsAnimating] = useState(false);
   const [streak, setStreak] = useState(0);
   const [answers, setAnswers] = useState<boolean[]>([]);
   const [myths, setMyths] = useState<any[]>([]);
@@ -119,6 +120,8 @@ export default function MythBusterScreen() {
   const [lives, setLives] = useState(3); // For endless mode
   const [reviewTab, setReviewTab] = useState<'all' | 'wrong'>('all');
   const [expandedCard, setExpandedCard] = useState<number | null>(null);
+  const [shownMythIds, setShownMythIds] = useState<Set<string>>(new Set()); // Track shown myths in endless
+  const [allGameStatements, setAllGameStatements] = useState<any[]>([]); // All possible myths for endless
 
   const translateX = useSharedValue(0);
   const translateY = useSharedValue(0);
@@ -126,6 +129,68 @@ export default function MythBusterScreen() {
   const opacity = useSharedValue(1);
 
   const currentMyth = myths[currentIndex];
+
+  // Timer countdown effect for challenge mode
+  useEffect(() => {
+    if (gameState !== 'playing' || !selectedMode.timeLimit || timeLeft === null) return;
+
+    if (timeLeft <= 0) {
+      // Time's up - automatically mark as wrong and move to next
+      handleTimeUp();
+      return;
+    }
+
+    const timer = setInterval(() => {
+      setTimeLeft(prev => {
+        if (prev === null || prev <= 0) return 0;
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [timeLeft, gameState, currentIndex]);
+
+  const handleTimeUp = () => {
+    if (isAnimating) return;
+    setIsAnimating(true);
+
+    // Mark as wrong (no correct answer)
+    setStreak(0);
+    
+    // Endless mode: lose a life
+    if (selectedMode.id === 'endless') {
+      const newLives = lives - 1;
+      setLives(newLives);
+      if (newLives <= 0) {
+        setTimeout(() => {
+          finishGame();
+          setIsAnimating(false);
+        }, 300);
+        return;
+      }
+    }
+
+    // Add to history as wrong
+    setAnswers([...answers, false]);
+
+    // Move to next question or end game
+    if (currentIndex >= myths.length - 1) {
+      setTimeout(() => {
+        setIsAnimating(false);
+        finishGame();
+      }, 300);
+    } else {
+      setCurrentIndex(currentIndex + 1);
+      // Reset card animation
+      translateX.value = 0;
+      opacity.value = 1;
+      // Reset timer for challenge mode
+      if (selectedMode.timeLimit) {
+        setTimeLeft(selectedMode.timeLimit);
+      }
+      setTimeout(() => setIsAnimating(false), 300);
+    }
+  };
 
   const startMode = (mode: ModeConfig) => {
     setSelectedMode(mode);
@@ -153,11 +218,19 @@ export default function MythBusterScreen() {
       }
     ]);
     
-    // Shuffle and select
-    const shuffled = gameStatements.sort(() => Math.random() - 0.5);
-    const selected = shuffled.slice(0, Math.min(mode.rounds, shuffled.length));
+    if (mode.id === 'endless') {
+      // For endless mode, store all statements and start with shuffled subset
+      const shuffled = [...gameStatements].sort(() => Math.random() - 0.5);
+      setAllGameStatements(gameStatements);
+      setMyths(shuffled);
+      setShownMythIds(new Set());
+    } else {
+      // For other modes, shuffle and select
+      const shuffled = gameStatements.sort(() => Math.random() - 0.5);
+      const selected = shuffled.slice(0, Math.min(mode.rounds, shuffled.length));
+      setMyths(selected);
+    }
     
-    setMyths(selected);
     setGameState('intro');
     if (mode.timeLimit) {
       setTimeLeft(mode.timeLimit);
@@ -165,19 +238,27 @@ export default function MythBusterScreen() {
   };
 
   const handleSwipe = (direction: 'truth' | 'myth') => {
-    if (!currentMyth) return;
+    if (!currentMyth || isAnimating) return;
+    
+    setIsAnimating(true);
     
     const isCorrect = 
       (direction === 'myth' && !currentMyth.isTrue) || 
       (direction === 'truth' && currentMyth.isTrue);
 
+    // Check if this myth has been shown before (for endless mode)
+    const isFirstAppearance = selectedMode.id === 'endless' && !shownMythIds.has(currentMyth.id);
+    
     const baseXP = 10;
     const streakBonus = streak * 2;
     const modeMultiplier = selectedMode.xpMultiplier;
     const earnedXP = Math.round((baseXP + streakBonus) * modeMultiplier);
 
     if (isCorrect) {
-      setScore(s => s + earnedXP);
+      // Only add points on first appearance in endless mode
+      if (selectedMode.id !== 'endless' || isFirstAppearance) {
+        setScore(s => s + earnedXP);
+      }
       setStreak(s => s + 1);
     } else {
       setStreak(0);
@@ -188,32 +269,69 @@ export default function MythBusterScreen() {
         if (newLives <= 0) {
           setTimeout(() => {
             finishGame();
+            setIsAnimating(false);
           }, 300);
           return;
         }
       }
     }
 
+    // Mark myth as shown in endless mode
+    if (selectedMode.id === 'endless') {
+      setShownMythIds(prev => new Set([...prev, currentMyth.id]));
+    }
+
     setAnswers(prev => [...prev, isCorrect]);
 
-    // Move to next card or finish
-    if (currentIndex < myths.length - 1) {
+    // Move to next card
+    if (selectedMode.id === 'endless') {
+      // For endless mode, always load next myth
+      loadNextEndlessMythAndAdvance();
+    } else if (currentIndex < myths.length - 1) {
+      // For other modes, check if more cards exist
+      // Reset timer for challenge mode immediately before animation
+      if (selectedMode.timeLimit) {
+        setTimeLeft(selectedMode.timeLimit);
+      }
       setTimeout(() => {
         setCurrentIndex(i => i + 1);
         translateX.value = 0;
         translateY.value = 0;
         rotate.value = 0;
         opacity.value = 1;
-        // Reset timer for challenge mode
-        if (selectedMode.timeLimit) {
-          setTimeLeft(selectedMode.timeLimit);
-        }
+        setIsAnimating(false); // Re-enable buttons
       }, 300);
     } else {
       setTimeout(() => {
+        setIsAnimating(false); // Re-enable buttons
         finishGame();
       }, 300);
     }
+  };
+
+  const loadNextEndlessMythAndAdvance = () => {
+    setTimeout(() => {
+      // Find unshown myths first
+      const unshownMyths = allGameStatements.filter(m => !shownMythIds.has(m.id));
+      
+      let nextMyth;
+      if (unshownMyths.length > 0) {
+        // Pick random unshown myth
+        nextMyth = unshownMyths[Math.floor(Math.random() * unshownMyths.length)];
+      } else {
+        // All myths shown, pick any random myth (repeating)
+        nextMyth = allGameStatements[Math.floor(Math.random() * allGameStatements.length)];
+      }
+      
+      // Update myths array with next myth
+      setMyths(prev => [...prev, nextMyth]);
+      setCurrentIndex(i => i + 1);
+      translateX.value = 0;
+      translateY.value = 0;
+      rotate.value = 0;
+      opacity.value = 1;
+      setIsAnimating(false);
+    }, 300);
   };
 
   const finishGame = () => {
@@ -237,6 +355,8 @@ export default function MythBusterScreen() {
     setLives(3);
     setReviewTab('all');
     setExpandedCard(null);
+    setShownMythIds(new Set());
+    setAllGameStatements([]);
   };
 
   const gesture = Gesture.Pan()
@@ -296,50 +416,20 @@ export default function MythBusterScreen() {
   if (gameState === 'mode-select') {
     return (
       <GestureHandlerRootView style={{ flex: 1 }}>
-        <LinearGradient
-          colors={['#FFF5EB', '#FFE4CC', '#FFDAB3']}
-          style={{ flex: 1 }}
-        >
-          <SafeAreaView style={{ flex: 1 }}>
-            {/* Floating Decorations */}
-            <View style={styles.decorationsContainer}>
-              {[...Array(8)].map((_, i) => (
-                <View
-                  key={i}
-                  style={[
-                    styles.floatingDecor,
-                    {
-                      left: `${10 + (i * 12) % 80}%`,
-                      top: `${5 + (i * 7) % 15}%`,
-                      transform: [{ rotate: `${i * 45}deg` }],
-                    },
-                  ]}
-                >
-                  <View style={[styles.triangle, { borderBottomColor: ['#FF6B6B', '#4ECDC4', '#FFE66D', '#95E1D3', '#F38181', '#AA96DA', '#FCBAD3', '#A8D8EA'][i] }]} />
-                </View>
-              ))}
-            </View>
-
-            {/* Banner/Bunting */}
-            <View style={styles.buntingContainer}>
-              {['#FF6B6B', '#FFE66D', '#4ECDC4', '#FF6B6B', '#FFE66D', '#4ECDC4', '#FF6B6B'].map((color, i) => (
-                <View key={i} style={[styles.buntingFlag, { backgroundColor: color, transform: [{ rotate: `${i % 2 === 0 ? -10 : 10}deg` }] }]} />
-              ))}
-            </View>
-
-            {/* Header */}
-            <View style={styles.modeHeader}>
+        <View style={[styles.fullScreen, { backgroundColor }]}>
+          {/* Header */}
+          <View style={[styles.modeHeader, { paddingTop: insets.top + 16, backgroundColor: cardColor }]}>
               <TouchableOpacity 
                 onPress={() => router.back()}
-                style={styles.backButtonCircle}
+                style={[styles.backButtonCircle, { backgroundColor }]}
               >
-                <Icon name="ArrowLeft2" size={20} color={THEME.text} />
+                <Icon name="ArrowLeft2" size={20} color={textColor} />
               </TouchableOpacity>
-              <View style={styles.headerBadge}>
-                <Icon name="Danger" size={18} color="#FFF" variant="Bold" />
-                <Text style={styles.headerBadgeText}>MythBuster</Text>
+              <View style={styles.headerTextContainer}>
+                <Text style={[styles.modeHeaderTitle, { color: textColor }]}>MythBuster</Text>
+                <Text style={styles.modeHeaderSubtitle}>Choose your challenge</Text>
               </View>
-              <View style={{ width: 44 }} />
+              <View style={{ width: 40 }} />
             </View>
 
             <ScrollView 
@@ -438,19 +528,18 @@ export default function MythBusterScreen() {
               </View>
 
               {/* Info Card */}
-              <View style={styles.infoCard}>
+              <View style={[styles.infoCard, { backgroundColor: cardColor }]}>
                 <View style={styles.infoIconWrap}>
                   <Icon name="InfoCircle" size={20} color={THEME.primary} />
                 </View>
-                <Text style={styles.infoText}>
+                <Text style={[styles.infoText, { color: textColor }]}>
                   Swipe left for <Text style={{ color: THEME.error, fontWeight: '800' }}>MYTH</Text> and right for <Text style={{ color: THEME.success, fontWeight: '800' }}>TRUTH</Text>!
                 </Text>
               </View>
 
               <View style={{ height: 60 }} />
             </ScrollView>
-          </SafeAreaView>
-        </LinearGradient>
+        </View>
       </GestureHandlerRootView>
     );
   }
@@ -579,23 +668,26 @@ export default function MythBusterScreen() {
     return (
       <GestureHandlerRootView style={{ flex: 1 }}>
         <LinearGradient
-          colors={['#FFF9E6', '#FFF5D6', '#FFFBF0']}
+          colors={colorScheme === 'dark' ? ['#1A1A2E', '#1A1A2E'] : ['#FFF9E6', '#FFF5D6', '#FFFBF0']}
           style={styles.fullScreen}
         >
           <SafeAreaView style={styles.fullScreen}>
             {/* Header */}
-            <View style={styles.resultsHeader}>
-              <TouchableOpacity 
-                onPress={() => router.back()}
-                style={styles.resultsBackBtn}
-              >
-                <Icon name="ArrowLeft2" size={20} color={THEME.text} />
-              </TouchableOpacity>
-              <View style={styles.resultsHeaderBadge}>
-                <Icon name="Danger" size={16} color="#FFF" variant="Bold" />
-                <Text style={styles.resultsHeaderBadgeText}>MythBuster</Text>
+            <View style={[styles.resultsHeader, { paddingTop: insets.top }]}>
+              <View style={styles.resultsHeaderContent}>
+                <TouchableOpacity 
+                  onPress={() => setGameState('mode-select')}
+                  style={[styles.resultsBackBtn, { backgroundColor: colorScheme === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.2)' }]}
+                  activeOpacity={0.7}
+                >
+                  <Icon name="ArrowLeft2" size={20} color={textColor} />
+                </TouchableOpacity>
+                <View style={styles.resultsHeaderCenter}>
+                  <Text style={[styles.resultsHeaderTitle, { color: textColor }]}>Game Results</Text>
+                  <Text style={[styles.resultsHeaderSubtitle, { color: textColor, opacity: 0.6 }]}>{selectedMode.title} Mode</Text>
+                </View>
+                <View style={{ width: 44 }} />
               </View>
-              <View style={{ width: 44 }} />
             </View>
 
             <ScrollView 
@@ -605,43 +697,50 @@ export default function MythBusterScreen() {
             >
               {/* Score Card with Mascot */}
               <View style={styles.resultsScoreCard}>
-                <Image 
-                  source={accuracy >= 50 
-                    ? require('@/assets/images/mascot/happy.png')
-                    : require('@/assets/images/mascot/fix.png')
-                  } 
-                  style={styles.resultsScoreMascot}
-                  resizeMode="contain"
-                />
-                <Text style={styles.resultsScoreEmoji}>{performance.emoji}</Text>
-                <Text style={styles.resultsScoreTitle}>{performance.text}</Text>
-                <View style={styles.resultsXPBadge}>
-                  <Icon name="Flash" size={18} color={THEME.gold} variant="Bold" />
-                  <Text style={styles.resultsXPText}>{score} XP</Text>
-                </View>
+                <LinearGradient
+                  colors={[selectedMode.color, selectedMode.color + 'DD']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={styles.resultsScoreGradient}
+                >
+                  <Image 
+                    source={accuracy >= 50 
+                      ? require('@/assets/images/mascot/happy.png')
+                      : require('@/assets/images/mascot/fix.png')
+                    } 
+                    style={styles.resultsScoreMascot}
+                    resizeMode="contain"
+                  />
+                  <Text style={styles.resultsScoreEmoji}>{performance.emoji}</Text>
+                  <Text style={styles.resultsScoreTitle}>{performance.text}</Text>
+                  <View style={styles.resultsXPBadge}>
+                    <Icon name="Flash" size={20} color="#FFF" variant="Bold" />
+                    <Text style={styles.resultsXPText}>{score} XP</Text>
+                  </View>
+                </LinearGradient>
               </View>
 
               {/* Stats Row */}
               <View style={styles.resultsStatsRow}>
-                <View style={styles.resultsStatCard}>
+                <View style={[styles.resultsStatCard, { backgroundColor: cardColor }]}>
                   <View style={[styles.resultsStatIcon, { backgroundColor: THEME.success + '20' }]}>
                     <Icon name="TickCircle" size={20} color={THEME.success} variant="Bold" />
                   </View>
-                  <Text style={styles.resultsStatValue}>{correctAnswers}</Text>
+                  <Text style={[styles.resultsStatValue, { color: textColor }]}>{correctAnswers}</Text>
                   <Text style={styles.resultsStatLabel}>Correct</Text>
                 </View>
-                <View style={styles.resultsStatCard}>
+                <View style={[styles.resultsStatCard, { backgroundColor: cardColor }]}>
                   <View style={[styles.resultsStatIcon, { backgroundColor: THEME.error + '20' }]}>
                     <Icon name="CloseCircle" size={20} color={THEME.error} variant="Bold" />
                   </View>
-                  <Text style={styles.resultsStatValue}>{wrongAnswers}</Text>
+                  <Text style={[styles.resultsStatValue, { color: textColor }]}>{wrongAnswers}</Text>
                   <Text style={styles.resultsStatLabel}>Wrong</Text>
                 </View>
-                <View style={styles.resultsStatCard}>
+                <View style={[styles.resultsStatCard, { backgroundColor: cardColor }]}>
                   <View style={[styles.resultsStatIcon, { backgroundColor: selectedMode.color + '20' }]}>
                     <Icon name="Chart" size={20} color={selectedMode.color} variant="Bold" />
                   </View>
-                  <Text style={styles.resultsStatValue}>{accuracy}%</Text>
+                  <Text style={[styles.resultsStatValue, { color: textColor }]}>{accuracy}%</Text>
                   <Text style={styles.resultsStatLabel}>Accuracy</Text>
                 </View>
               </View>
@@ -649,12 +748,12 @@ export default function MythBusterScreen() {
               {/* Review Section */}
               <View style={styles.resultsReviewSection}>
                 <View style={styles.resultsReviewHeader}>
-                  <Text style={styles.resultsReviewTitle}>Review Answers</Text>
+                  <Text style={[styles.resultsReviewTitle, { color: textColor }]}>Review Answers</Text>
                   <Text style={styles.resultsReviewSubtitle}>Tap cards to see explanations</Text>
                 </View>
                 
                 {/* Tab Buttons */}
-                <View style={styles.resultsTabRow}>
+                <View style={[styles.resultsTabRow, { backgroundColor: cardColor }]}>
                   <TouchableOpacity 
                     style={[styles.resultsTab, reviewTab === 'all' && [styles.resultsTabActive, { backgroundColor: selectedMode.color }]]}
                     onPress={() => setReviewTab('all')}
@@ -675,11 +774,11 @@ export default function MythBusterScreen() {
 
                 {/* Review Cards */}
                 {filteredMyths.length === 0 ? (
-                  <View style={styles.resultsEmptyState}>
+                  <View style={[styles.resultsEmptyState, { backgroundColor: cardColor }]}>
                     <View style={styles.resultsEmptyIcon}>
                       <Icon name="TickCircle" size={40} color={THEME.success} variant="Bold" />
                     </View>
-                    <Text style={styles.resultsEmptyTitle}>Perfect Score!</Text>
+                    <Text style={[styles.resultsEmptyTitle, { color: THEME.success }]}>Perfect Score!</Text>
                     <Text style={styles.resultsEmptyText}>You got all answers correct!</Text>
                   </View>
                 ) : (
@@ -691,7 +790,7 @@ export default function MythBusterScreen() {
                       return (
                         <TouchableOpacity 
                           key={myth.originalIndex}
-                          style={styles.resultsReviewCard}
+                          style={[styles.resultsReviewCard, { backgroundColor: cardColor }]}
                           onPress={() => setExpandedCard(isExpanded ? null : myth.originalIndex)}
                           activeOpacity={0.7}
                         >
@@ -732,7 +831,7 @@ export default function MythBusterScreen() {
                             
                             {/* Statement */}
                             <Text 
-                              style={styles.resultsCardStatement}
+                              style={[styles.resultsCardStatement, { color: textColor }]}
                               numberOfLines={isExpanded ? undefined : 2}
                             >
                               {myth.statement}
@@ -742,9 +841,9 @@ export default function MythBusterScreen() {
                             {isExpanded && (
                               <View style={styles.resultsCardExpanded}>
                                 <View style={styles.resultsCardDivider} />
-                                <View style={styles.resultsCardExplanation}>
+                                <View style={[styles.resultsCardExplanation, { backgroundColor: backgroundColor }]}>
                                   <Icon name="Lamp" size={16} color={selectedMode.color} variant="Bold" />
-                                  <Text style={styles.resultsCardExplanationText}>
+                                  <Text style={[styles.resultsCardExplanationText, { color: textColor }]}>
                                     {myth.explanation}
                                   </Text>
                                 </View>
@@ -779,12 +878,12 @@ export default function MythBusterScreen() {
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                  style={styles.resultsHomeBtn}
+                  style={[styles.resultsHomeBtn, { backgroundColor: cardColor, borderColor: colorScheme === 'dark' ? '#2D3748' : THEME.border }]}
                   onPress={() => router.back()}
                   activeOpacity={0.8}
                 >
-                  <Icon name="Home2" size={20} color={THEME.text} />
-                  <Text style={styles.resultsHomeText}>Back to Home</Text>
+                  <Icon name="Home2" size={20} color={textColor} />
+                  <Text style={[styles.resultsHomeText, { color: textColor }]}>Back to Home</Text>
                 </TouchableOpacity>
               </View>
               
@@ -799,46 +898,88 @@ export default function MythBusterScreen() {
   // Playing state
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <View style={{ flex: 1, backgroundColor: selectedMode.color + '10' }}>
-        <SafeAreaView style={{ flex: 1 }}>
+      <LinearGradient
+        colors={[backgroundColor, backgroundColor]}
+        style={{ flex: 1 }}
+      >
+        <View style={[styles.gameHeaderContainer, { paddingTop: insets.top + 16 }]}>
           {/* Header */}
           <View style={styles.gameHeader}>
-            <TouchableOpacity onPress={() => router.back()}>
-              <Icon name="Close" size={24} color={THEME.textMuted} />
+            <TouchableOpacity 
+              onPress={() => resetGame()}
+              style={[styles.gameCloseButton, { backgroundColor: cardColor }]}
+            >
+              <Icon name="Close" size={20} color={textColor} />
             </TouchableOpacity>
 
             <View style={styles.progressContainer}>
-              <Text style={styles.progressText}>
-                {currentIndex + 1} / {myths.length}
-              </Text>
-              <View style={styles.progressBar}>
-                <View 
-                  style={[
-                    styles.progressFill, 
-                    { 
-                      width: `${((currentIndex + 1) / myths.length) * 100}%`,
-                      backgroundColor: selectedMode.color
-                    }
-                  ]} 
-                />
+              <View style={styles.progressInfo}>
+                <Text style={[styles.progressText, { color: textColor }]}>
+                  {selectedMode.id === 'endless' ? `${currentIndex + 1} / ∞` : `${currentIndex + 1} / ${myths.length}`}
+                </Text>
+                {selectedMode.timeLimit && timeLeft !== null && (
+                  <View style={[styles.timerBadge, { backgroundColor: timeLeft <= 3 ? THEME.error : selectedMode.color }]}>
+                    <Icon name="Timer" size={14} color="#FFF" variant="Bold" />
+                    <Text style={styles.timerText}>{timeLeft}s</Text>
+                  </View>
+                )}
+              </View>
+              <View style={[styles.progressBar, { backgroundColor: cardColor }]}>
+                {selectedMode.id !== 'endless' && (
+                  <Animated.View 
+                    entering={FadeInDown.duration(300)}
+                    style={[
+                      styles.progressFill, 
+                      { 
+                        width: `${((currentIndex + 1) / myths.length) * 100}%`,
+                        backgroundColor: selectedMode.color
+                      }
+                    ]} 
+                  />
+                )}
               </View>
             </View>
 
-            <View style={styles.scoreContainer}>
+            <View style={[styles.scoreContainer, { backgroundColor: cardColor }]}>
               <Icon name="Flash" size={16} color={THEME.gold} variant="Bold" />
-              <Text style={styles.scoreText}>{score}</Text>
+              <Text style={[styles.scoreText, { color: textColor }]}>{score}</Text>
             </View>
+
+            {selectedMode.id === 'endless' && (
+              <TouchableOpacity 
+                onPress={() => {
+                  if (!isAnimating) finishGame();
+                }}
+                style={[styles.endGameButton, { backgroundColor: selectedMode.color }]}
+                activeOpacity={0.8}
+              >
+                <Icon name="Flag" size={16} color="#FFF" variant="Bold" />
+                <Text style={styles.endGameButtonText}>End</Text>
+              </TouchableOpacity>
+            )}
           </View>
+        </View>
 
           {/* Streak Indicator */}
           {streak > 1 && (
             <Animated.View 
               entering={FadeInDown.springify()}
-              style={[styles.streakBanner, { backgroundColor: selectedMode.color + '20' }]}
+              style={styles.streakBannerContainer}
             >
-              <Icon name="Fire" size={20} color={selectedMode.color} variant="Bold" />
-              <Text style={[styles.streakText, { color: selectedMode.color }]}>{streak}x STREAK!</Text>
-              <Text style={styles.streakBonus}>+{streak * 2} XP Bonus</Text>
+              <LinearGradient
+                colors={[selectedMode.color, selectedMode.colorSecondary]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={styles.streakBanner}
+              >
+                <View style={styles.streakIconContainer}>
+                  <Icon name="Fire" size={24} color="#FFF" variant="Bold" />
+                </View>
+                <View style={styles.streakTextContainer}>
+                  <Text style={styles.streakText}>{streak}x STREAK!</Text>
+                  <Text style={styles.streakBonus}>+{streak * 2} XP Bonus</Text>
+                </View>
+              </LinearGradient>
             </Animated.View>
           )}
 
@@ -868,32 +1009,57 @@ export default function MythBusterScreen() {
             {currentMyth && (
               <GestureDetector gesture={gesture}>
                 <Animated.View style={[styles.card, animatedStyle]}>
-                  <LinearGradient
-                    colors={['#FFFFFF', '#F9FAFB']}
-                    style={styles.cardGradient}
-                  >
+                  <View style={[styles.cardInner, { backgroundColor: cardColor }]}>
+                    {/* Decorative corner accents */}
+                    <View style={[styles.cardCornerAccent, styles.cardCornerTopLeft, { backgroundColor: selectedMode.color }]} />
+                    <View style={[styles.cardCornerAccent, styles.cardCornerBottomRight, { backgroundColor: selectedMode.color }]} />
+                    
                     <View style={styles.cardHeader}>
-                      <View style={styles.difficultyBadge}>
-                        <Text style={styles.difficultyText}>
+                      <View style={[styles.difficultyBadge, { backgroundColor: selectedMode.color + '20' }]}>
+                        <Icon name="Layer" size={14} color={selectedMode.color} variant="Bold" />
+                        <Text style={[styles.difficultyText, { color: selectedMode.color }]}>
                           {currentMyth.difficulty.toUpperCase()}
                         </Text>
                       </View>
+                      {selectedMode.id === 'endless' && (
+                        <View style={styles.livesContainer}>
+                          {[...Array(3)].map((_, i) => (
+                            <Icon 
+                              key={i}
+                              name="Heart" 
+                              size={18} 
+                              color={i < lives ? THEME.error : '#E5E7EB'} 
+                              variant={i < lives ? 'Bold' : 'Linear'}
+                            />
+                          ))}
+                        </View>
+                      )}
                     </View>
 
                     <View style={styles.cardContent}>
-                      <Text style={styles.cardStatement}>{currentMyth.statement}</Text>
+                      <View style={styles.quoteContainer}>
+                        <Text style={[styles.quoteMarkTop, { color: selectedMode.color }]}>"</Text>
+                        <Text style={[styles.cardStatement, { color: textColor }]}>{currentMyth.statement}</Text>
+                        <Text style={[styles.quoteMarkBottom, { color: selectedMode.color }]}>"</Text>
+                      </View>
                     </View>
 
-                  <View style={styles.cardFooter}>
-                    <View style={styles.swipeHint}>
-                      <Icon name="ArrowLeft" size={16} color={THEME.textMuted} />
-                      <Text style={styles.hintText}>Swipe to answer</Text>
-                      <Icon name="ArrowRight" size={16} color={THEME.textMuted} />
+                    <View style={styles.cardFooter}>
+                      <View style={[styles.swipeHint, { backgroundColor: backgroundColor }]}>
+                        <View style={[styles.swipeHintItem, { backgroundColor: THEME.error + '15' }]}>
+                          <Icon name="ArrowLeft" size={14} color={THEME.error} variant="Bold" />
+                          <Text style={[styles.hintText, { color: THEME.error }]}>MYTH</Text>
+                        </View>
+                        <View style={styles.swipeHintDivider} />
+                        <View style={[styles.swipeHintItem, { backgroundColor: THEME.success + '15' }]}>
+                          <Text style={[styles.hintText, { color: THEME.success }]}>TRUTH</Text>
+                          <Icon name="ArrowRight" size={14} color={THEME.success} variant="Bold" />
+                        </View>
+                      </View>
                     </View>
                   </View>
-                </LinearGradient>
-              </Animated.View>
-            </GestureDetector>
+                </Animated.View>
+              </GestureDetector>
             )}
           </View>
 
@@ -903,32 +1069,53 @@ export default function MythBusterScreen() {
               <TouchableOpacity
                 style={[styles.actionButton, styles.mythButton]}
                 onPress={() => {
+                  if (isAnimating || currentIndex >= myths.length) return;
                   translateX.value = withSpring(-width);
                   opacity.value = withTiming(0, { duration: 200 });
                   handleSwipe('myth');
                 }}
-                activeOpacity={0.8}
+                activeOpacity={isAnimating ? 1 : 0.8}
+                disabled={isAnimating}
               >
-                <Icon name="CloseCircle" size={32} color="#FFF" variant="Bold" />
-                <Text style={styles.actionButtonText}>MYTH</Text>
+                <LinearGradient
+                  colors={[THEME.error, '#C0392B']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={styles.actionButtonGradient}
+                >
+                  <View style={styles.actionButtonIcon}>
+                    <Icon name="CloseCircle" size={28} color="#FFF" variant="Bold" />
+                  </View>
+                  <Text style={styles.actionButtonText}>MYTH</Text>
+                </LinearGradient>
               </TouchableOpacity>
 
               <TouchableOpacity
                 style={[styles.actionButton, styles.truthButton]}
                 onPress={() => {
+                  if (isAnimating || currentIndex >= myths.length) return;
                   translateX.value = withSpring(width);
                   opacity.value = withTiming(0, { duration: 200 });
                   handleSwipe('truth');
                 }}
-                activeOpacity={0.8}
+                activeOpacity={isAnimating ? 1 : 0.8}
+                disabled={isAnimating}
               >
-                <Icon name="TickCircle" size={32} color="#FFF" variant="Bold" />
-                <Text style={styles.actionButtonText}>TRUTH</Text>
+                <LinearGradient
+                  colors={[THEME.success, '#27AE60']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={styles.actionButtonGradient}
+                >
+                  <View style={styles.actionButtonIcon}>
+                    <Icon name="TickCircle" size={28} color="#FFF" variant="Bold" />
+                  </View>
+                  <Text style={styles.actionButtonText}>TRUTH</Text>
+                </LinearGradient>
               </TouchableOpacity>
             </View>
           )}
-        </SafeAreaView>
-      </View>
+      </LinearGradient>
     </GestureHandlerRootView>
   );
 }
@@ -1165,66 +1352,142 @@ const styles = StyleSheet.create({
   },
 
   // Game Screen
+  gameHeaderContainer: {
+    paddingHorizontal: 20,
+    paddingBottom: 12,
+  },
   gameHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingTop: 20,
-    paddingBottom: 16,
     gap: 16,
+  },
+  gameCloseButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
   },
   progressContainer: {
     flex: 1,
   },
+  progressInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+  },
   progressText: {
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: '700',
-    color: THEME.textMuted,
-    marginBottom: 6,
+  },
+  timerBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  timerText: {
+    fontSize: 12,
+    fontWeight: '800',
+    color: '#FFF',
   },
   progressBar: {
-    height: 6,
-    backgroundColor: '#E5E7EB',
-    borderRadius: 3,
+    height: 8,
+    borderRadius: 4,
     overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 1,
   },
   progressFill: {
     height: '100%',
-    borderRadius: 3,
+    borderRadius: 4,
   },
   scoreContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
-    backgroundColor: THEME.gold + '20',
+    gap: 6,
     paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
   },
   scoreText: {
+    fontSize: 16,
+    fontWeight: '800',
+  },
+  endGameButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 20,
+    marginLeft: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  endGameButtonText: {
     fontSize: 14,
     fontWeight: '800',
-    color: THEME.text,
+    color: '#FFF',
+  },
+  streakBannerContainer: {
+    marginHorizontal: 20,
+    marginBottom: 16,
+    marginTop: 8,
   },
   streakBanner: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
     paddingVertical: 12,
-    marginHorizontal: 20,
-    borderRadius: 16,
-    marginBottom: 16,
+    paddingHorizontal: 16,
+    borderRadius: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  streakIconContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+  },
+  streakTextContainer: {
+    flex: 1,
   },
   streakText: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: '800',
-    color: THEME.primary,
+    color: '#FFF',
+    marginBottom: 2,
   },
   streakBonus: {
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: '600',
-    color: THEME.textMuted,
+    color: 'rgba(255,255,255,0.9)',
   },
   cardContainer: {
     flex: 1,
@@ -1236,75 +1499,119 @@ const styles = StyleSheet.create({
     width: width - 40,
     height: height * 0.55,
     position: 'absolute',
-    borderRadius: 24,
-    overflow: 'hidden',
-    borderWidth: 2,
-    borderColor: '#E5E7EB',
-    borderBottomWidth: 6,
   },
   cardBehind: {
     transform: [{ scale: 0.95 }],
     opacity: 0.5,
   },
-  cardGradient: {
+  cardInner: {
     flex: 1,
-    padding: 24,
+    borderRadius: 32,
+    padding: 28,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.15,
+    shadowRadius: 16,
+    elevation: 8,
+    position: 'relative',
+  },
+  cardCornerAccent: {
+    position: 'absolute',
+    width: 40,
+    height: 40,
+    opacity: 0.15,
+  },
+  cardCornerTopLeft: {
+    top: 0,
+    left: 0,
+    borderTopLeftRadius: 32,
+    borderBottomRightRadius: 32,
+  },
+  cardCornerBottomRight: {
+    bottom: 0,
+    right: 0,
+    borderTopLeftRadius: 32,
+    borderBottomRightRadius: 32,
   },
   cardHeader: {
     flexDirection: 'row',
-    justifyContent: 'flex-end',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     marginBottom: 24,
   },
-  categoryBadge: {
+  difficultyBadge: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: THEME.primary + '20',
     paddingHorizontal: 12,
     paddingVertical: 6,
-    borderRadius: 12,
-  },
-  categoryText: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: THEME.primary,
-  },
-  difficultyBadge: {
-    backgroundColor: THEME.textMuted + '20',
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 12,
+    borderRadius: 16,
   },
   difficultyText: {
-    fontSize: 10,
+    fontSize: 11,
     fontWeight: '800',
-    color: THEME.textMuted,
+  },
+  livesContainer: {
+    flexDirection: 'row',
+    gap: 4,
   },
   cardContent: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  quoteContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
     paddingHorizontal: 20,
+  },
+  quoteMarkTop: {
+    fontSize: 48,
+    fontWeight: '900' as '900',
+    opacity: 0.3,
+    marginBottom: 16,
+    lineHeight: 48,
+  },
+  quoteMarkBottom: {
+    fontSize: 48,
+    fontWeight: '900' as '900',
+    opacity: 0.3,
+    marginTop: 16,
+    lineHeight: 48,
   },
   cardStatement: {
     fontSize: 24,
     fontWeight: '700',
-    color: THEME.text,
-    lineHeight: 34,
+    lineHeight: 36,
     textAlign: 'center',
   },
   cardFooter: {
     alignItems: 'center',
+    marginTop: 16,
   },
   swipeHint: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    borderRadius: 20,
+    padding: 4,
+    gap: 4,
+  },
+  swipeHintItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 16,
+  },
+  swipeHintDivider: {
+    width: 2,
+    height: 20,
+    backgroundColor: '#E5E7EB',
   },
   hintText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: THEME.textMuted,
+    fontSize: 12,
+    fontWeight: '800',
   },
   swipeLabel: {
     position: 'absolute',
@@ -1332,25 +1639,37 @@ const styles = StyleSheet.create({
   },
   actionButton: {
     flex: 1,
+    borderRadius: 24,
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  actionButtonGradient: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 8,
-    paddingVertical: 16,
-    borderRadius: 24,
-    borderWidth: 2,
-    borderBottomWidth: 4,
+    paddingVertical: 18,
+    gap: 10,
+  },
+  actionButtonIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   mythButton: {
-    backgroundColor: THEME.error,
-    borderColor: 'rgba(0,0,0,0.1)',
+    // Styles applied via gradient
   },
   truthButton: {
-    backgroundColor: THEME.success,
-    borderColor: 'rgba(0,0,0,0.1)',
+    // Styles applied via gradient
   },
   actionButtonText: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: '800',
     color: '#FFF',
   },
@@ -1367,86 +1686,82 @@ const styles = StyleSheet.create({
     backgroundColor: THEME.bg,
   },
   resultsHeader: {
+    paddingHorizontal: 20,
+    paddingBottom: 16,
+  },
+  resultsHeaderContent: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingVertical: 12,
+  },
+  resultsHeaderCenter: {
+    flex: 1,
+    alignItems: 'center',
+    paddingHorizontal: 12,
   },
   resultsBackBtn: {
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: '#FFF',
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  resultsHeaderBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    backgroundColor: THEME.primary,
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderRadius: 20,
-  },
-  resultsHeaderBadgeText: {
-    fontSize: 14,
-    fontWeight: '800',
-    color: '#FFF',
   },
   resultsHeaderTitle: {
-    fontSize: 18,
+    fontSize: 28,
     fontWeight: '800',
-    color: THEME.text,
+  },
+  resultsHeaderSubtitle: {
+    fontSize: 14,
+    fontWeight: '500',
+    marginTop: 2,
   },
   resultsContent: {
     padding: 20,
   },
   // Score Card
   resultsScoreCard: {
-    backgroundColor: '#FFF',
     borderRadius: 24,
+    marginBottom: 16,
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 6,
+  },
+  resultsScoreGradient: {
     padding: 24,
     alignItems: 'center',
-    marginBottom: 16,
-    borderWidth: 2,
-    borderColor: THEME.border,
-    borderBottomWidth: 4,
   },
   resultsScoreMascot: {
-    width: 80,
-    height: 80,
-    marginBottom: 8,
+    width: 60,
+    height: 60,
+    marginBottom: 6,
   },
   resultsScoreEmoji: {
-    fontSize: 28,
-    marginBottom: 4,
+    fontSize: 36,
+    marginBottom: 6,
   },
   resultsScoreTitle: {
-    fontSize: 24,
+    fontSize: 22,
     fontWeight: '900',
-    color: THEME.text,
+    color: '#FFF',
     marginBottom: 12,
+    textAlign: 'center',
   },
   resultsXPBadge: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: THEME.gold + '20',
+    backgroundColor: 'rgba(255,255,255,0.25)',
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
   },
   resultsXPText: {
-    fontSize: 18,
-    fontWeight: '800',
-    color: THEME.text,
+    fontSize: 16,
+    fontWeight: '900',
+    color: '#FFF',
   },
   // Legacy hero styles
   resultsHeroCard: {
@@ -1486,14 +1801,15 @@ const styles = StyleSheet.create({
   },
   resultsStatCard: {
     flex: 1,
-    backgroundColor: '#FFF',
-    borderRadius: 16,
-    padding: 14,
+    borderRadius: 18,
+    padding: 16,
     alignItems: 'center',
-    gap: 6,
-    borderWidth: 2,
-    borderColor: THEME.border,
-    borderBottomWidth: 4,
+    gap: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   resultsStatIcon: {
     width: 36,
@@ -1530,12 +1846,14 @@ const styles = StyleSheet.create({
   },
   resultsTabRow: {
     flexDirection: 'row',
-    backgroundColor: '#FFF',
-    borderRadius: 14,
-    padding: 4,
+    borderRadius: 16,
+    padding: 6,
     marginBottom: 16,
-    borderWidth: 2,
-    borderColor: THEME.border,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
   },
   resultsTab: {
     flex: 1,
@@ -1555,14 +1873,15 @@ const styles = StyleSheet.create({
     color: '#FFF',
   },
   resultsEmptyState: {
-    backgroundColor: '#FFF',
     borderRadius: 20,
     padding: 32,
     alignItems: 'center',
     gap: 12,
-    borderWidth: 2,
-    borderColor: THEME.border,
-    borderBottomWidth: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   resultsEmptyIcon: {
     width: 64,
@@ -1586,13 +1905,14 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   resultsReviewCard: {
-    backgroundColor: '#FFF',
-    borderRadius: 16,
+    borderRadius: 18,
     flexDirection: 'row',
     overflow: 'hidden',
-    borderWidth: 2,
-    borderColor: THEME.border,
-    borderBottomWidth: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   resultsCardIndicator: {
     width: 5,
@@ -1653,7 +1973,6 @@ const styles = StyleSheet.create({
   resultsCardExplanation: {
     flexDirection: 'row',
     gap: 10,
-    backgroundColor: THEME.bg,
     padding: 12,
     borderRadius: 12,
   },
@@ -1693,11 +2012,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
-    backgroundColor: '#FFF',
     paddingVertical: 16,
     borderRadius: 16,
     borderWidth: 2,
-    borderColor: THEME.border,
     borderBottomWidth: 4,
   },
   resultsHomeText: {
@@ -1831,41 +2148,29 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 20,
-    paddingTop: 16,
-    paddingBottom: 8,
-    zIndex: 10,
+    paddingBottom: 16,
+  },
+  headerTextContainer: {
+    flex: 1,
+    alignItems: 'center',
+    paddingHorizontal: 12,
   },
   modeHeaderTitle: {
-    fontSize: 18,
+    fontSize: 28,
     fontWeight: '800',
-    color: THEME.text,
+    marginBottom: 4,
+  },
+  modeHeaderSubtitle: {
+    fontSize: 14,
+    color: '#8898AA',
+    fontWeight: '500',
   },
   backButtonCircle: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: '#FFF',
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  headerBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    backgroundColor: THEME.primary,
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderRadius: 20,
-  },
-  headerBadgeText: {
-    fontSize: 14,
-    fontWeight: '800',
-    color: '#FFF',
   },
   modeScrollView: {
     flex: 1,
@@ -2170,7 +2475,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
-    backgroundColor: '#FFF',
     borderRadius: 16,
     padding: 16,
     marginTop: 24,
@@ -2189,7 +2493,6 @@ const styles = StyleSheet.create({
   infoText: {
     flex: 1,
     fontSize: 13,
-    color: THEME.textMuted,
     fontWeight: '500',
     lineHeight: 18,
   },

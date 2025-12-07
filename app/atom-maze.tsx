@@ -48,7 +48,7 @@ export default function AtomMazeSelectionScreen() {
 
   return (
     <LinearGradient
-      colors={['#FFFDE7', '#FFF9C4', '#FFEE58']}
+      colors={['#FFFDE7', '#FFF9C4', '#FFEE58'] as const}
       style={{ flex: 1 }}
     >
       <SafeAreaView style={{ flex: 1 }}>
@@ -93,7 +93,7 @@ export default function AtomMazeSelectionScreen() {
                     
                     {/* Card Background Gradient - Top Layer */}
                     <LinearGradient
-                      colors={[colors.colorSecondary, colors.color]}
+                      colors={[colors.colorSecondary, colors.color] as const}
                       start={{ x: 0, y: 0 }}
                       end={{ x: 0.3, y: 1 }}
                       style={styles.modeCardGradientNew}
