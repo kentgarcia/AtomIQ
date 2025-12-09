@@ -1,8 +1,9 @@
 import { Icon } from '@/components/ui/icon';
 import { getAllEncyclopediaEntries, searchEncyclopedia } from '@/content/explorer';
+import { getEncyclopediaImage } from '@/content/explorer/encyclopedia/images';
 import { useRouter } from 'expo-router';
 import React, { useState, useMemo } from 'react';
-import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 
 const THEME = {
@@ -84,6 +85,13 @@ export default function EncyclopediaScreen() {
                 activeOpacity={0.7}
                 onPress={() => router.push(`/explorer/encyclopedia-entry?id=${entry.id}`)}
               >
+                {entry.image && getEncyclopediaImage(entry.id) && (
+                  <Image 
+                    source={getEncyclopediaImage(entry.id)} 
+                    style={styles.entryThumbnail}
+                    resizeMode="cover"
+                  />
+                )}
                 <View style={styles.entryContent}>
                   <Text style={styles.entryTerm}>{entry.term}</Text>
                   <Text style={styles.entryDefinition} numberOfLines={2}>
@@ -167,6 +175,12 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: THEME.border,
     gap: 12,
+  },
+  entryThumbnail: {
+    width: 60,
+    height: 60,
+    borderRadius: 12,
+    backgroundColor: THEME.border,
   },
   entryContent: {
     flex: 1,
