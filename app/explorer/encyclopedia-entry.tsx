@@ -1,5 +1,6 @@
 import { Icon } from '@/components/ui/icon';
 import { getEncyclopediaEntryById } from '@/content/explorer';
+import { getEncyclopediaImage } from '@/content/explorer/encyclopedia/images';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import * as Haptics from 'expo-haptics';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -218,10 +219,10 @@ export default function EncyclopediaEntryScreen() {
         </Animated.View>
 
         {/* Entry Image */}
-        {entry.image && (
+        {entry.image && getEncyclopediaImage(entry.id) && (
           <Animated.View entering={FadeInDown.delay(150).springify()} style={styles.imageCard}>
             <Image 
-              source={{ uri: entry.image }} 
+              source={getEncyclopediaImage(entry.id)} 
               style={styles.entryImage}
               resizeMode="cover"
             />
@@ -492,6 +493,21 @@ const createStyles = (theme: typeof LightTHEME) => StyleSheet.create({
     shadowOpacity: 0.05,
     shadowRadius: 4,
     elevation: 2,
+  },
+  imageCard: {
+    backgroundColor: theme.card,
+    borderRadius: 24,
+    marginBottom: 16,
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  entryImage: {
+    width: '100%',
+    height: 220,
   },
   termHeader: {
     flexDirection: 'row',
