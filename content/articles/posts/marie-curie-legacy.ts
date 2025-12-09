@@ -19,3 +19,4 @@ const marieCurieLegacy: Post = {
 
 export default marieCurieLegacy;
 
+

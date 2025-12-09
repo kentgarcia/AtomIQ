@@ -175,6 +175,7 @@ export interface EncyclopediaEntry {
   category: string;
   relatedTerms: string[]; // Cross-references
   quickFacts: string[];
+  image?: string; // Optional image path for the entry
   debunkingSnippet?: string; // If it debunks a myth
   sources: Array<{
     organization: 'UNSCEAR' | 'IAEA' | 'NEA' | 'other';

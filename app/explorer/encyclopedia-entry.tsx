@@ -6,7 +6,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import * as Speech from 'expo-speech';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Dimensions, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Dimensions, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Animated, { FadeInDown, ZoomIn } from 'react-native-reanimated';
 
 const { width } = Dimensions.get('window');
@@ -216,6 +216,17 @@ export default function EncyclopediaEntryScreen() {
             </View>
           </View>
         </Animated.View>
+
+        {/* Entry Image */}
+        {entry.image && (
+          <Animated.View entering={FadeInDown.delay(150).springify()} style={styles.imageCard}>
+            <Image 
+              source={{ uri: entry.image }} 
+              style={styles.entryImage}
+              resizeMode="cover"
+            />
+          </Animated.View>
+        )}
 
         {/* Definition */}
         <Animated.View entering={FadeInDown.delay(200).springify()} style={styles.sectionCard}>

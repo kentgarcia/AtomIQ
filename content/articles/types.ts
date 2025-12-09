@@ -56,3 +56,4 @@ export interface Post {
   relatedContent?: string[]; // IDs of related articles/myths/facts
 }
 
+

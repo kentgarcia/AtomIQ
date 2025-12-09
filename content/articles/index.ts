@@ -110,3 +110,4 @@ export const searchPosts = (query: string): Post[] => {
 // Export types
 export type { Article, Post } from './types';
 
+

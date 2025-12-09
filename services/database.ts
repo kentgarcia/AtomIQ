@@ -153,7 +153,23 @@ const initializeLevelsFromSyllabus = async () => {
 
     console.log('Initializing levels from syllabus...');
 
-    // Insert all lessons and quizzes from the syllabus
+    // First, insert all units into the units table
+    for (const unit of UNITS) {
+      await database.runAsync(
+        `INSERT OR IGNORE INTO units (id, title, description, color, order_index, is_locked) 
+         VALUES (?, ?, ?, ?, ?, ?)`,
+        [
+          unit.id, 
+          unit.title, 
+          unit.description, 
+          unit.color, 
+          unit.order,
+          unit.order === 1 ? 0 : 1 // First unit is unlocked
+        ]
+      );
+    }
+
+    // Then, insert all lessons and quizzes from the syllabus
     for (const unit of UNITS) {
       // Insert lessons
       for (let i = 0; i < unit.lessonIds.length; i++) {
@@ -284,10 +300,45 @@ export const updateLevelProgress = async (levelId: string, data: {
       [data.status, data.xp_earned, data.stars, data.completed_at, levelId]
     );
   } else {
+    // Find which unit this level belongs to
+    let unitId = 'atomic-playground'; // Default to first unit
+    let unitData = UNITS[0];
+    
+    for (const unit of UNITS) {
+      if (unit.lessonIds.includes(levelId) || unit.quizIds.includes(levelId)) {
+        unitId = unit.id;
+        unitData = unit;
+        break;
+      }
+    }
+    
+    // Ensure the unit exists in the units table first
     await database.runAsync(
-      `INSERT INTO levels (id, unit_id, status, xp_earned, stars, completed_at, attempts)
-       VALUES (?, ?, ?, ?, ?, ?, 1)`,
-      [levelId, levelId.split('-')[0], data.status || 'locked', data.xp_earned || 0, data.stars || 0, data.completed_at || null]
+      `INSERT OR IGNORE INTO units (id, title, description, color, order_index, is_locked) 
+       VALUES (?, ?, ?, ?, ?, ?)`,
+      [
+        unitData.id,
+        unitData.title,
+        unitData.description,
+        unitData.color,
+        unitData.order,
+        unitData.order === 1 ? 0 : 1
+      ]
+    );
+    
+    // Now insert the level
+    await database.runAsync(
+      `INSERT INTO levels (id, unit_id, type, status, xp_earned, stars, completed_at, attempts)
+       VALUES (?, ?, ?, ?, ?, ?, ?, 1)`,
+      [
+        levelId, 
+        unitId, 
+        levelId.includes('quiz') ? 'quiz' : 'lesson',
+        data.status || 'locked', 
+        data.xp_earned || 0, 
+        data.stars || 0, 
+        data.completed_at || null
+      ]
     );
   }
 };
@@ -295,6 +346,122 @@ export const updateLevelProgress = async (levelId: string, data: {
 export const getAllLevels = async () => {
   const database = getDatabase();
   return await database.getAllAsync('SELECT * FROM levels ORDER BY id');
+};
+
+// Unlock next lesson/quiz/unit after completing a level
+export const unlockNextLevel = async (completedLevelId: string) => {
+  const database = getDatabase();
+  
+  try {
+    // Find which unit this level belongs to
+    let currentUnit = null;
+    let levelIndexInUnit = -1;
+    let isQuiz = false;
+    
+    for (const unit of UNITS) {
+      const lessonIndex = unit.lessonIds.indexOf(completedLevelId);
+      if (lessonIndex !== -1) {
+        currentUnit = unit;
+        levelIndexInUnit = lessonIndex;
+        break;
+      }
+      const quizIndex = unit.quizIds.indexOf(completedLevelId);
+      if (quizIndex !== -1) {
+        currentUnit = unit;
+        levelIndexInUnit = quizIndex;
+        isQuiz = true;
+        break;
+      }
+    }
+    
+    if (!currentUnit) {
+      console.log('Could not find unit for level:', completedLevelId);
+      return;
+    }
+    
+    // If this was a quiz (last item in unit), unlock the first lesson of the next unit
+    if (isQuiz) {
+      const nextUnitIndex = UNITS.findIndex(u => u.id === currentUnit.id) + 1;
+      if (nextUnitIndex < UNITS.length) {
+        const nextUnit = UNITS[nextUnitIndex];
+        if (nextUnit.lessonIds.length > 0) {
+          const nextLevelId = nextUnit.lessonIds[0];
+          console.log('Unlocking first lesson of next unit:', nextLevelId);
+          
+          // Check if level exists, if not insert it
+          const existingLevel = await getLevelProgress(nextLevelId);
+          if (existingLevel) {
+            await database.runAsync(
+              'UPDATE levels SET status = ? WHERE id = ? AND status = ?',
+              ['current', nextLevelId, 'locked']
+            );
+          } else {
+            // Ensure unit exists
+            await database.runAsync(
+              `INSERT OR IGNORE INTO units (id, title, description, color, order_index, is_locked) 
+               VALUES (?, ?, ?, ?, ?, ?)`,
+              [nextUnit.id, nextUnit.title, nextUnit.description, nextUnit.color, nextUnit.order, 0]
+            );
+            
+            // Insert the level as current
+            await database.runAsync(
+              `INSERT INTO levels (id, unit_id, type, status, xp_earned, stars, attempts)
+               VALUES (?, ?, ?, ?, ?, ?, 0)`,
+              [nextLevelId, nextUnit.id, 'lesson', 'current', 0, 0]
+            );
+          }
+          
+          // Unlock the next unit
+          await database.runAsync(
+            'UPDATE units SET is_locked = 0 WHERE id = ?',
+            [nextUnit.id]
+          );
+        }
+      }
+    } else {
+      // If this was a lesson, unlock the next lesson or quiz in the same unit
+      const nextIndex = levelIndexInUnit + 1;
+      if (nextIndex < currentUnit.lessonIds.length) {
+        // Unlock next lesson
+        const nextLevelId = currentUnit.lessonIds[nextIndex];
+        console.log('Unlocking next lesson:', nextLevelId);
+        
+        const existingLevel = await getLevelProgress(nextLevelId);
+        if (existingLevel) {
+          await database.runAsync(
+            'UPDATE levels SET status = ? WHERE id = ? AND status = ?',
+            ['current', nextLevelId, 'locked']
+          );
+        } else {
+          await database.runAsync(
+            `INSERT INTO levels (id, unit_id, type, status, xp_earned, stars, attempts)
+             VALUES (?, ?, ?, ?, ?, ?, 0)`,
+            [nextLevelId, currentUnit.id, 'lesson', 'current', 0, 0]
+          );
+        }
+      } else if (currentUnit.quizIds.length > 0) {
+        // All lessons done, unlock the quiz
+        const quizId = currentUnit.quizIds[0];
+        console.log('All lessons completed, unlocking quiz:', quizId);
+        
+        const existingQuiz = await getLevelProgress(quizId);
+        if (existingQuiz) {
+          await database.runAsync(
+            'UPDATE levels SET status = ? WHERE id = ? AND status = ?',
+            ['current', quizId, 'locked']
+          );
+        } else {
+          await database.runAsync(
+            `INSERT INTO levels (id, unit_id, type, status, xp_earned, stars, attempts)
+             VALUES (?, ?, ?, ?, ?, ?, 0)`,
+            [quizId, currentUnit.id, 'quiz', 'current', 0, 0]
+          );
+        }
+      }
+    }
+  } catch (error) {
+    console.error('Error unlocking next level:', error);
+  }
 };
 
 // Daily Activity
@@ -353,6 +520,7 @@ export default {
   getLevelProgress,
   updateLevelProgress,
   getAllLevels,
+  unlockNextLevel,
   logDailyActivity,
   getDailyActivity,
   clearAllData,
