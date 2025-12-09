@@ -1,0 +1,793 @@
+{
+  "henri-becquerel": {
+    "id": "henri-becquerel",
+    "term": "Henri Becquerel",
+    "definition": "French physicist who discovered radioactivity in 1896 while studying phosphorescence in uranium salts. Shared the 1903 Nobel Prize in Physics with Marie and Pierre Curie.",
+    "category": "people",
+    "relatedTerms": [
+      "radioactivity",
+      "becquerel",
+      "marie-curie"
+    ],
+    "quickFacts": [
+      "Discovered radioactivity in 1896",
+      "Nobel Prize in Physics (1903)",
+      "Unit of radioactivity named after him",
+      "First to observe spontaneous radiation"
+    ],
+    "sources": [
+      {
+        "organization": "Nobel Prize",
+        "title": "Henri Becquerel Biography",
+        "url": "https://www.nobelprize.org/prizes/physics/1903/becquerel/biographical/"
+      }
+    ],
+    "difficulty": "beginner",
+    "image": "/assets/images/people/becquerel, henri.webp"
+  },
+  "niels-bohr": {
+    "id": "niels-bohr",
+    "term": "Niels Bohr",
+    "definition": "Danish physicist who made foundational contributions to understanding atomic structure and quantum theory. Developed the Bohr model of the atom in 1913.",
+    "category": "people",
+    "relatedTerms": [
+      "atom",
+      "atomic-structure",
+      "quantum-theory"
+    ],
+    "quickFacts": [
+      "Created Bohr model of atom (1913)",
+      "Nobel Prize in Physics (1922)",
+      "Founded Institute for Theoretical Physics",
+      "Contributed to Manhattan Project"
+    ],
+    "sources": [
+      {
+        "organization": "Nobel Prize",
+        "title": "Niels Bohr Biography",
+        "url": "https://www.nobelprize.org/prizes/physics/1922/bohr/biographical/"
+      }
+    ],
+    "difficulty": "intermediate",
+    "image": "/assets/images/people/bohr, niels.webp"
+  },
+  "marie-curie": {
+    "id": "marie-curie",
+    "term": "Marie Curie",
+    "definition": "Polish-French physicist and chemist who conducted pioneering research on radioactivity. First woman to win a Nobel Prize and only person to win Nobel Prizes in two sciences.",
+    "category": "people",
+    "relatedTerms": [
+      "radioactivity",
+      "radium",
+      "polonium"
+    ],
+    "quickFacts": [
+      "Discovered radium and polonium",
+      "Nobel Prize in Physics (1903) and Chemistry (1911)",
+      "First woman to win Nobel Prize",
+      "Coined the term 'radioactivity'"
+    ],
+    "sources": [
+      {
+        "organization": "Nobel Prize",
+        "title": "Marie Curie Biography",
+        "url": "https://www.nobelprize.org/prizes/physics/1903/marie-curie/biographical/"
+      }
+    ],
+    "difficulty": "beginner",
+    "image": "/assets/images/people/curie, marie.webp"
+  },
+  "pierre-curie": {
+    "id": "pierre-curie",
+    "term": "Pierre Curie",
+    "definition": "French physicist who shared the 1903 Nobel Prize in Physics with his wife Marie Curie and Henri Becquerel for their pioneering work on radioactivity.",
+    "category": "people",
+    "relatedTerms": [
+      "radioactivity",
+      "marie-curie",
+      "radium"
+    ],
+    "quickFacts": [
+      "Shared Nobel Prize with Marie Curie (1903)",
+      "Discovered piezoelectricity",
+      "Studied radioactive materials",
+      "Curie temperature named after him"
+    ],
+    "sources": [
+      {
+        "organization": "Nobel Prize",
+        "title": "Pierre Curie Biography",
+        "url": "https://www.nobelprize.org/prizes/physics/1903/pierre-curie/biographical/"
+      }
+    ],
+    "difficulty": "beginner",
+    "image": "/assets/images/people/curie, pierre.webp"
+  },
+  "james-chadwick": {
+    "id": "james-chadwick",
+    "term": "James Chadwick",
+    "definition": "British physicist who discovered the neutron in 1932, a discovery that was fundamental to nuclear physics and earned him the 1935 Nobel Prize in Physics.",
+    "category": "people",
+    "relatedTerms": [
+      "neutron",
+      "atomic-nucleus",
+      "nuclear-physics"
+    ],
+    "quickFacts": [
+      "Discovered the neutron (1932)",
+      "Nobel Prize in Physics (1935)",
+      "Worked on Manhattan Project",
+      "Studied under Ernest Rutherford"
+    ],
+    "sources": [
+      {
+        "organization": "Nobel Prize",
+        "title": "James Chadwick Biography",
+        "url": "https://www.nobelprize.org/prizes/physics/1935/chadwick/biographical/"
+      }
+    ],
+    "difficulty": "intermediate",
+    "image": "/assets/images/people/chadwick.webp"
+  },
+  "enrico-fermi": {
+    "id": "enrico-fermi",
+    "term": "Enrico Fermi",
+    "definition": "Italian-American physicist who created the first nuclear reactor (Chicago Pile-1) in 1942. Known for contributions to quantum theory, nuclear physics, and particle physics.",
+    "category": "people",
+    "relatedTerms": [
+      "nuclear-reactor",
+      "chain-reaction",
+      "nuclear-fission"
+    ],
+    "quickFacts": [
+      "Built first nuclear reactor (1942)",
+      "Nobel Prize in Physics (1938)",
+      "Key figure in Manhattan Project",
+      "Element fermium named after him"
+    ],
+    "sources": [
+      {
+        "organization": "DOE",
+        "title": "Enrico Fermi",
+        "url": "https://www.energy.gov/science/doe-explainsscientists/enrico-fermi"
+      }
+    ],
+    "difficulty": "intermediate",
+    "image": "/assets/images/people/fermi.webp"
+  },
+  "otto-hahn": {
+    "id": "otto-hahn",
+    "term": "Otto Hahn",
+    "definition": "German chemist who discovered nuclear fission in 1938 with Fritz Strassmann. Received the 1944 Nobel Prize in Chemistry for this groundbreaking discovery.",
+    "category": "people",
+    "relatedTerms": [
+      "nuclear-fission",
+      "uranium",
+      "radioactivity"
+    ],
+    "quickFacts": [
+      "Discovered nuclear fission (1938)",
+      "Nobel Prize in Chemistry (1944)",
+      "Discovered several isotopes",
+      "Father of nuclear chemistry"
+    ],
+    "sources": [
+      {
+        "organization": "Nobel Prize",
+        "title": "Otto Hahn Biography",
+        "url": "https://www.nobelprize.org/prizes/chemistry/1944/hahn/biographical/"
+      }
+    ],
+    "difficulty": "intermediate",
+    "image": "/assets/images/people/Otto_Hahn.webp"
+  },
+  "lise-meitner": {
+    "id": "lise-meitner",
+    "term": "Lise Meitner",
+    "definition": "Austrian-Swedish physicist who provided the theoretical explanation for nuclear fission. Despite her crucial role, she did not share the 1944 Nobel Prize with Otto Hahn.",
+    "category": "people",
+    "relatedTerms": [
+      "nuclear-fission",
+      "otto-hahn",
+      "uranium"
+    ],
+    "quickFacts": [
+      "Explained nuclear fission theoretically",
+      "Worked with Otto Hahn for 30 years",
+      "Element meitnerium named after her",
+      "Overlooked for Nobel Prize"
+    ],
+    "sources": [
+      {
+        "organization": "APS",
+        "title": "Lise Meitner",
+        "url": "https://www.aps.org/programs/outreach/history/historicsites/meitner.cfm"
+      }
+    ],
+    "difficulty": "advanced",
+    "image": "/assets/images/people/Lise_Meitner.webp"
+  },
+  "ernest-rutherford": {
+    "id": "ernest-rutherford",
+    "term": "Ernest Rutherford",
+    "definition": "New Zealand-born British physicist known as the father of nuclear physics. Discovered the atomic nucleus and named alpha and beta radiation.",
+    "category": "people",
+    "relatedTerms": [
+      "atomic-nucleus",
+      "alpha-particle",
+      "beta-particle"
+    ],
+    "quickFacts": [
+      "Discovered the atomic nucleus (1911)",
+      "Nobel Prize in Chemistry (1908)",
+      "Named alpha and beta radiation",
+      "First to split the atom artificially"
+    ],
+    "sources": [
+      {
+        "organization": "Nobel Prize",
+        "title": "Ernest Rutherford Biography",
+        "url": "https://www.nobelprize.org/prizes/chemistry/1908/rutherford/biographical/"
+      }
+    ],
+    "difficulty": "beginner",
+    "image": "/assets/images/people/ernest rutherford.webp"
+  },
+  "glenn-seaborg": {
+    "id": "glenn-seaborg",
+    "term": "Glenn Seaborg",
+    "definition": "American chemist who discovered plutonium and nine other transuranium elements. Won the 1951 Nobel Prize in Chemistry. Element seaborgium named in his honor.",
+    "category": "people",
+    "relatedTerms": [
+      "plutonium",
+      "transuranium-elements",
+      "periodic-table"
+    ],
+    "quickFacts": [
+      "Discovered plutonium (1941)",
+      "Nobel Prize in Chemistry (1951)",
+      "Discovered 10 elements total",
+      "Element seaborgium named after him"
+    ],
+    "sources": [
+      {
+        "organization": "Nobel Prize",
+        "title": "Glenn Seaborg Biography",
+        "url": "https://www.nobelprize.org/prizes/chemistry/1951/seaborg/biographical/"
+      }
+    ],
+    "difficulty": "advanced",
+    "image": "/assets/images/people/Glenn Seaborg.webp"
+  },
+  "leo-szilard": {
+    "id": "leo-szilard",
+    "term": "Leo Szilard",
+    "definition": "Hungarian-American physicist who conceived the nuclear chain reaction in 1933 and patented the idea of a nuclear reactor. Key figure in the Manhattan Project.",
+    "category": "people",
+    "relatedTerms": [
+      "chain-reaction",
+      "nuclear-reactor",
+      "manhattan-project"
+    ],
+    "quickFacts": [
+      "Conceived nuclear chain reaction (1933)",
+      "Co-invented nuclear reactor with Fermi",
+      "Drafted Einstein-Szilard letter",
+      "Later opposed nuclear weapons"
+    ],
+    "sources": [
+      {
+        "organization": "APS",
+        "title": "Leo Szilard",
+        "url": "https://www.aps.org/programs/outreach/history/historicsites/szilard.cfm"
+      }
+    ],
+    "difficulty": "advanced",
+    "image": "/assets/images/people/leo szilard.webp"
+  },
+  "edward-teller": {
+    "id": "edward-teller",
+    "term": "Edward Teller",
+    "definition": "Hungarian-American physicist known as 'father of the hydrogen bomb' for his role in developing thermonuclear weapons during the Cold War.",
+    "category": "people",
+    "relatedTerms": [
+      "nuclear-fusion",
+      "thermonuclear",
+      "manhattan-project"
+    ],
+    "quickFacts": [
+      "Father of the hydrogen bomb",
+      "Worked on Manhattan Project",
+      "Advocated for nuclear weapons development",
+      "Co-founded Lawrence Livermore Lab"
+    ],
+    "sources": [
+      {
+        "organization": "Britannica",
+        "title": "Edward Teller",
+        "url": "https://www.britannica.com/biography/Edward-Teller"
+      }
+    ],
+    "difficulty": "advanced",
+    "image": "/assets/images/people/Edward Teller.webp"
+  },
+  "j-robert-oppenheimer": {
+    "id": "j-robert-oppenheimer",
+    "term": "J. Robert Oppenheimer",
+    "definition": "American theoretical physicist who served as director of the Los Alamos Laboratory during the Manhattan Project, often called the 'father of the atomic bomb'.",
+    "category": "people",
+    "relatedTerms": [
+      "manhattan-project",
+      "nuclear-weapons",
+      "los-alamos"
+    ],
+    "quickFacts": [
+      "Director of Manhattan Project",
+      "Father of the atomic bomb",
+      "Led Los Alamos Laboratory",
+      "Later opposed hydrogen bomb development"
+    ],
+    "sources": [
+      {
+        "organization": "DOE",
+        "title": "J. Robert Oppenheimer",
+        "url": "https://www.energy.gov/management/office-management/operational-management/history/j-robert-oppenheimer"
+      }
+    ],
+    "difficulty": "intermediate",
+    "image": "/assets/images/people/Oppenheimer.webp"
+  },
+  "ernest-lawrence": {
+    "id": "ernest-lawrence",
+    "term": "Ernest Lawrence",
+    "definition": "American physicist who invented the cyclotron, a type of particle accelerator. Won the 1939 Nobel Prize in Physics. Element lawrencium named after him.",
+    "category": "people",
+    "relatedTerms": [
+      "cyclotron",
+      "particle-accelerator",
+      "isotopes"
+    ],
+    "quickFacts": [
+      "Invented the cyclotron (1929)",
+      "Nobel Prize in Physics (1939)",
+      "Founded two national laboratories",
+      "Element lawrencium named after him"
+    ],
+    "sources": [
+      {
+        "organization": "Nobel Prize",
+        "title": "Ernest Lawrence Biography",
+        "url": "https://www.nobelprize.org/prizes/physics/1939/lawrence/biographical/"
+      }
+    ],
+    "difficulty": "advanced",
+    "image": "/assets/images/people/ernest o lawrence.webp"
+  },
+  "igor-kurchatov": {
+    "id": "igor-kurchatov",
+    "term": "Igor Kurchatov",
+    "definition": "Soviet nuclear physicist who led the Soviet atomic bomb project and developed the first nuclear power plant in Obninsk in 1954.",
+    "category": "people",
+    "relatedTerms": [
+      "nuclear-reactor",
+      "nuclear-weapons",
+      "nuclear-power"
+    ],
+    "quickFacts": [
+      "Led Soviet atomic bomb project",
+      "Built first civilian nuclear power plant",
+      "Father of Soviet atomic energy",
+      "Kurchatov Institute named after him"
+    ],
+    "sources": [
+      {
+        "organization": "Kurchatov Institute",
+        "title": "Igor Kurchatov",
+        "url": "http://www.nrcki.ru/en/"
+      }
+    ],
+    "difficulty": "advanced"
+  },
+  "hyman-rickover": {
+    "id": "hyman-rickover",
+    "term": "Hyman Rickover",
+    "definition": "U.S. Navy admiral known as the 'Father of the Nuclear Navy' for his role in developing nuclear marine propulsion and the first nuclear submarine.",
+    "category": "people",
+    "relatedTerms": [
+      "nuclear-reactor",
+      "nuclear-propulsion",
+      "naval-reactors"
+    ],
+    "quickFacts": [
+      "Father of the Nuclear Navy",
+      "Developed nuclear submarine propulsion",
+      "Longest-serving naval officer",
+      "Built first nuclear submarine USS Nautilus"
+    ],
+    "sources": [
+      {
+        "organization": "Naval History",
+        "title": "Hyman Rickover",
+        "url": "https://www.history.navy.mil/content/history/nhhc/research/library/online-reading-room/title-list-alphabetically/a/admiral-rickover.html"
+      }
+    ],
+    "difficulty": "advanced"
+  },
+  "alvin-weinberg": {
+    "id": "alvin-weinberg",
+    "term": "Alvin Weinberg",
+    "definition": "American nuclear physicist who pioneered pressurized water reactors and molten salt reactors. Served as director of Oak Ridge National Laboratory.",
+    "category": "people",
+    "relatedTerms": [
+      "nuclear-reactor",
+      "reactor-design",
+      "molten-salt"
+    ],
+    "quickFacts": [
+      "Developed pressurized water reactors",
+      "Pioneered molten salt reactors",
+      "Director of Oak Ridge (1955-1973)",
+      "Advocated for nuclear safety"
+    ],
+    "sources": [
+      {
+        "organization": "ORNL",
+        "title": "Alvin Weinberg",
+        "url": "https://www.ornl.gov/history"
+      }
+    ],
+    "difficulty": "advanced"
+  },
+  "ernest-walton": {
+    "id": "ernest-walton",
+    "term": "Ernest Walton",
+    "definition": "Irish physicist who, with John Cockcroft, first split the atom artificially in 1932. Shared the 1951 Nobel Prize in Physics.",
+    "category": "people",
+    "relatedTerms": [
+      "particle-accelerator",
+      "nuclear-physics",
+      "atom-splitting"
+    ],
+    "quickFacts": [
+      "First to split atom artificially (1932)",
+      "Nobel Prize in Physics (1951)",
+      "Built Cockcroft-Walton generator",
+      "Pioneered particle acceleration"
+    ],
+    "sources": [
+      {
+        "organization": "Nobel Prize",
+        "title": "Ernest Walton Biography",
+        "url": "https://www.nobelprize.org/prizes/physics/1951/walton/biographical/"
+      }
+    ],
+    "difficulty": "advanced"
+  },
+  "john-cockcroft": {
+    "id": "john-cockcroft",
+    "term": "John Cockcroft",
+    "definition": "British physicist who, with Ernest Walton, achieved the first artificial nuclear transmutation in 1932. Shared the 1951 Nobel Prize in Physics.",
+    "category": "people",
+    "relatedTerms": [
+      "particle-accelerator",
+      "transmutation",
+      "nuclear-physics"
+    ],
+    "quickFacts": [
+      "First artificial transmutation (1932)",
+      "Nobel Prize in Physics (1951)",
+      "Built Cockcroft-Walton generator",
+      "Worked on British atomic bomb"
+    ],
+    "sources": [
+      {
+        "organization": "Nobel Prize",
+        "title": "John Cockcroft Biography",
+        "url": "https://www.nobelprize.org/prizes/physics/1951/cockcroft/biographical/"
+      }
+    ],
+    "difficulty": "advanced"
+  },
+  "eugene-wigner": {
+    "id": "eugene-wigner",
+    "term": "Eugene Wigner",
+    "definition": "Hungarian-American physicist who contributed to nuclear reactor theory and quantum mechanics. Won the 1963 Nobel Prize in Physics.",
+    "category": "people",
+    "relatedTerms": [
+      "nuclear-reactor",
+      "quantum-mechanics",
+      "symmetry"
+    ],
+    "quickFacts": [
+      "Nobel Prize in Physics (1963)",
+      "Contributed to Manhattan Project",
+      "Developed Wigner effect theory",
+      "Pioneered nuclear reactor design"
+    ],
+    "sources": [
+      {
+        "organization": "Nobel Prize",
+        "title": "Eugene Wigner Biography",
+        "url": "https://www.nobelprize.org/prizes/physics/1963/wigner/biographical/"
+      }
+    ],
+    "difficulty": "advanced",
+    "image": "/assets/images/people/wigner.webp"
+  },
+  "otto-frisch": {
+    "id": "otto-frisch",
+    "term": "Otto Frisch",
+    "definition": "Austrian-British physicist who, with Lise Meitner, first explained nuclear fission theoretically. Coined the term 'nuclear fission'.",
+    "category": "people",
+    "relatedTerms": [
+      "nuclear-fission",
+      "lise-meitner",
+      "uranium"
+    ],
+    "quickFacts": [
+      "Explained nuclear fission with Meitner",
+      "Coined term 'nuclear fission'",
+      "Worked on Manhattan Project",
+      "Nephew of Lise Meitner"
+    ],
+    "sources": [
+      {
+        "organization": "APS",
+        "title": "Otto Frisch",
+        "url": "https://www.aps.org/programs/outreach/history/"
+      }
+    ],
+    "difficulty": "advanced"
+  },
+  "frederick-joliot-curie": {
+    "id": "frederick-joliot-curie",
+    "term": "Frédéric Joliot-Curie",
+    "definition": "French physicist who, with his wife Irène Joliot-Curie, discovered artificial radioactivity. Shared the 1935 Nobel Prize in Chemistry.",
+    "category": "people",
+    "relatedTerms": [
+      "artificial-radioactivity",
+      "radioactivity",
+      "nuclear-physics"
+    ],
+    "quickFacts": [
+      "Discovered artificial radioactivity (1934)",
+      "Nobel Prize in Chemistry (1935)",
+      "Married Marie Curie's daughter",
+      "Worked on French atomic program"
+    ],
+    "sources": [
+      {
+        "organization": "Nobel Prize",
+        "title": "Frédéric Joliot-Curie Biography",
+        "url": "https://www.nobelprize.org/prizes/chemistry/1935/joliot-fred/biographical/"
+      }
+    ],
+    "difficulty": "advanced"
+  },
+  "irene-joliot-curie": {
+    "id": "irene-joliot-curie",
+    "term": "Irène Joliot-Curie",
+    "definition": "French scientist and daughter of Marie and Pierre Curie. Shared the 1935 Nobel Prize in Chemistry with her husband for discovering artificial radioactivity.",
+    "category": "people",
+    "relatedTerms": [
+      "artificial-radioactivity",
+      "marie-curie",
+      "radioactivity"
+    ],
+    "quickFacts": [
+      "Daughter of Marie and Pierre Curie",
+      "Nobel Prize in Chemistry (1935)",
+      "Discovered artificial radioactivity",
+      "Second woman to win Nobel in Chemistry"
+    ],
+    "sources": [
+      {
+        "organization": "Nobel Prize",
+        "title": "Irène Joliot-Curie Biography",
+        "url": "https://www.nobelprize.org/prizes/chemistry/1935/joliot-curie/biographical/"
+      }
+    ],
+    "difficulty": "intermediate"
+  },
+  "hans-bethe": {
+    "id": "hans-bethe",
+    "term": "Hans Bethe",
+    "definition": "German-American physicist who explained how stars produce energy through nuclear fusion. Won the 1967 Nobel Prize in Physics.",
+    "category": "people",
+    "relatedTerms": [
+      "nuclear-fusion",
+      "stellar-nucleosynthesis",
+      "stars"
+    ],
+    "quickFacts": [
+      "Explained stellar energy production",
+      "Nobel Prize in Physics (1967)",
+      "Worked on Manhattan Project",
+      "Developed CNO cycle theory"
+    ],
+    "sources": [
+      {
+        "organization": "Nobel Prize",
+        "title": "Hans Bethe Biography",
+        "url": "https://www.nobelprize.org/prizes/physics/1967/bethe/biographical/"
+      }
+    ],
+    "difficulty": "advanced"
+  },
+  "andrei-sakharov": {
+    "id": "andrei-sakharov",
+    "term": "Andrei Sakharov",
+    "definition": "Soviet nuclear physicist who helped develop the Soviet hydrogen bomb but later became a prominent dissident and human rights activist. Won the 1975 Nobel Peace Prize.",
+    "category": "people",
+    "relatedTerms": [
+      "thermonuclear",
+      "nuclear-fusion",
+      "disarmament"
+    ],
+    "quickFacts": [
+      "Developed Soviet hydrogen bomb",
+      "Nobel Peace Prize (1975)",
+      "Became human rights activist",
+      "Opposed nuclear proliferation"
+    ],
+    "sources": [
+      {
+        "organization": "Nobel Prize",
+        "title": "Andrei Sakharov Biography",
+        "url": "https://www.nobelprize.org/prizes/peace/1975/sakharov/biographical/"
+      }
+    ],
+    "difficulty": "intermediate",
+    "image": "/assets/images/people/Andrei Sakhariv.webp"
+  },
+  "arthur-compton": {
+    "id": "arthur-compton",
+    "term": "Arthur Compton",
+    "definition": "American physicist who discovered the Compton effect, demonstrating the particle nature of electromagnetic radiation. Won the 1927 Nobel Prize in Physics.",
+    "category": "people",
+    "relatedTerms": [
+      "gamma-ray",
+      "x-ray",
+      "quantum-physics"
+    ],
+    "quickFacts": [
+      "Discovered Compton effect (1923)",
+      "Nobel Prize in Physics (1927)",
+      "Led Manhattan Project metallurgy lab",
+      "Proved light has particle properties"
+    ],
+    "sources": [
+      {
+        "organization": "Nobel Prize",
+        "title": "Arthur Compton Biography",
+        "url": "https://www.nobelprize.org/prizes/physics/1927/compton/biographical/"
+      }
+    ],
+    "difficulty": "advanced"
+  },
+  "klaus-fuchs": {
+    "id": "klaus-fuchs",
+    "term": "Klaus Fuchs",
+    "definition": "German theoretical physicist who worked on the Manhattan Project but was later convicted of passing atomic secrets to the Soviet Union.",
+    "category": "people",
+    "relatedTerms": [
+      "manhattan-project",
+      "nuclear-espionage",
+      "cold-war"
+    ],
+    "quickFacts": [
+      "Worked on Manhattan Project",
+      "Convicted spy for Soviet Union",
+      "Provided atomic bomb secrets",
+      "Arrested in 1950"
+    ],
+    "sources": [
+      {
+        "organization": "Atomic Heritage",
+        "title": "Klaus Fuchs",
+        "url": "https://www.atomicheritage.org/profile/klaus-fuchs"
+      }
+    ],
+    "difficulty": "advanced"
+  },
+  "stanislaw-ulam": {
+    "id": "stanislaw-ulam",
+    "term": "Stanislaw Ulam",
+    "definition": "Polish-American mathematician who, with Edward Teller, developed the Teller-Ulam design for thermonuclear weapons. Also invented the Monte Carlo method.",
+    "category": "people",
+    "relatedTerms": [
+      "thermonuclear",
+      "hydrogen-bomb",
+      "manhattan-project"
+    ],
+    "quickFacts": [
+      "Co-designed hydrogen bomb",
+      "Invented Monte Carlo method",
+      "Worked on Manhattan Project",
+      "Contributed to nuclear pulse propulsion"
+    ],
+    "sources": [
+      {
+        "organization": "LANL",
+        "title": "Stanislaw Ulam",
+        "url": "https://www.lanl.gov/museum/news/newsletter/2014/2014-01/ulam.php"
+      }
+    ],
+    "difficulty": "advanced"
+  },
+  "chien-shiung-wu": {
+    "id": "chien-shiung-wu",
+    "term": "Chien-Shiung Wu",
+    "definition": "Chinese-American experimental physicist who made significant contributions to nuclear physics. Known as the 'First Lady of Physics' and the 'Chinese Madame Curie'.",
+    "category": "people",
+    "relatedTerms": [
+      "beta-decay",
+      "parity-violation",
+      "nuclear-physics"
+    ],
+    "quickFacts": [
+      "Proved parity violation (1956)",
+      "Worked on Manhattan Project",
+      "Known as First Lady of Physics",
+      "Refined uranium enrichment process"
+    ],
+    "sources": [
+      {
+        "organization": "APS",
+        "title": "Chien-Shiung Wu",
+        "url": "https://www.aps.org/programs/outreach/history/historicsites/wu.cfm"
+      }
+    ],
+    "difficulty": "advanced"
+  },
+  "murray-gell-mann": {
+    "id": "murray-gell-mann",
+    "term": "Murray Gell-Mann",
+    "definition": "American physicist who proposed the quark model of particle physics. Won the 1969 Nobel Prize in Physics for his work on elementary particles.",
+    "category": "people",
+    "relatedTerms": [
+      "quarks",
+      "particle-physics",
+      "nuclear-force"
+    ],
+    "quickFacts": [
+      "Proposed quark model (1964)",
+      "Nobel Prize in Physics (1969)",
+      "Introduced the term 'quark'",
+      "Advanced understanding of strong force"
+    ],
+    "sources": [
+      {
+        "organization": "Nobel Prize",
+        "title": "Murray Gell-Mann Biography",
+        "url": "https://www.nobelprize.org/prizes/physics/1969/gell-mann/biographical/"
+      }
+    ],
+    "difficulty": "advanced"
+  },
+  "glenn-seaborg-transuranium": {
+    "id": "glenn-seaborg-transuranium",
+    "term": "Transuranium Elements",
+    "definition": "Chemical elements with atomic numbers greater than uranium (92). Glenn Seaborg discovered or co-discovered 10 transuranium elements including plutonium, americium, and curium.",
+    "category": "people",
+    "relatedTerms": [
+      "glenn-seaborg",
+      "plutonium",
+      "periodic-table"
+    ],
+    "quickFacts": [
+      "Elements beyond uranium in periodic table",
+      "All are radioactive",
+      "Created artificially in labs",
+      "Named after scientists and places"
+    ],
+    "sources": [
+      {
+        "organization": "IUPAC",
+        "title": "Transuranium Elements",
+        "url": "https://iupac.org/"
+      }
+    ],
+    "difficulty": "advanced"
+  }
+}

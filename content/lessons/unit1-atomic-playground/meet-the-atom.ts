@@ -2,21 +2,22 @@ import { Lesson } from '@/content/types';
 
 export const meetTheAtomLesson: Lesson = {
   id: 'meet-the-atom',
-  title: 'Meet the Atom',
-  description: 'Discover the building blocks of matter: protons, neutrons, and electrons.',
+  title: 'The Atom: Building Blocks of Matter',
+  description: 'Introduce what atoms are, their internal structure, and explain why atoms are considered the fundamental units of all matter.',
   unitId: 'atomic-playground',
   difficulty: 'beginner',
-  estimatedMinutes: 6,
+  estimatedMinutes: 8,
   xpReward: 50,
-  tags: ['basics', 'atom', 'protons', 'neutrons', 'electrons'],
+  tags: ['basics', 'atom', 'protons', 'neutrons', 'electrons', 'nucleus', 'atomic-structure'],
+  prerequisites: [],
   
   steps: [
     {
       id: 'briefing',
       type: 'briefing',
       data: {
-        topic: 'Meet the Atom',
-        mission: 'Discover the Building Blocks of Matter!',
+        topic: 'The Atom: Building Blocks of Matter',
+        mission: 'Agent, welcome to the tiniest world in the universe. Everything you see, touch, or feel is made of invisible building blocks called atoms. Your mission: explore the parts of an atom and understand why they are the foundation of all matter.',
         icon: 'Atom'
       }
     },
@@ -25,9 +26,9 @@ export const meetTheAtomLesson: Lesson = {
       id: 'myth-buster',
       type: 'myth_buster',
       data: {
-        myth: 'Atoms are the smallest things that exist',
-        reality: 'Atoms are made of even smaller particles: protons, neutrons, and electrons',
-        explanation: 'While atoms were once thought to be indivisible (the word "atom" means "uncuttable" in Greek), we now know they contain three main subatomic particles, each with unique properties.',
+        myth: 'Atoms are solid, indivisible spheres',
+        reality: 'Atoms are made up of a nucleus (containing protons and neutrons) and electrons that orbit the nucleus',
+        explanation: 'Atoms are mostly empty space, and their structure allows for chemical reactions, electricity, and nuclear energy. The word "atom" comes from Greek "atomos" meaning "uncuttable," but we now know atoms contain even smaller particles.',
         image: 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=400'
       }
     },
@@ -36,14 +37,18 @@ export const meetTheAtomLesson: Lesson = {
       id: 'micro-learn',
       type: 'micro_learn',
       data: {
-        title: 'The Three Musketeers of the Atom',
-        content: 'Every atom consists of three types of particles. The nucleus (center) contains protons (positive charge) and neutrons (no charge). Electrons (negative charge) orbit around the nucleus in shells.',
+        title: 'What is an Atom?',
+        content: 'The smallest unit of matter that retains the properties of an element. All matter, from air to water to metals, is made of atoms. An atom consists of a dense central nucleus containing protons (positively charged) and neutrons (neutral), surrounded by electrons (negatively charged) orbiting in shells or energy levels.',
         keyPoints: [
-          'Protons: Positive charge (+1), define the element',
-          'Neutrons: No charge (0), add mass and stability',
-          'Electrons: Negative charge (-1), orbit the nucleus',
-          'Nucleus: Dense center with protons + neutrons',
-          'Atomic number = number of protons'
+          'Nucleus: Dense central core with protons and neutrons',
+          'Protons: Positively charged particles in the nucleus',
+          'Neutrons: Neutral particles with similar mass to protons',
+          'Electrons: Negatively charged particles orbiting the nucleus',
+          'Atomic number: Number of protons (defines the element)',
+          'Mass number: Total protons + neutrons',
+          'Isotopes: Same element, different number of neutrons',
+          'Analogy: Nucleus = Sun, electrons = orbiting planets',
+          'Most of an atom is empty space'
         ],
         image: 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=400'
       }
@@ -53,17 +58,17 @@ export const meetTheAtomLesson: Lesson = {
       id: 'lab',
       type: 'lab',
       data: {
-        title: 'Build an Atom',
-        description: 'Let\'s build a carbon atom! Carbon has 6 protons, 6 neutrons, and 6 electrons.',
-        task: 'Which particle determines what element an atom is?',
+        title: 'Atomic History Timeline',
+        description: 'The understanding of atoms evolved over thousands of years. Match the scientist to their discovery!',
+        task: 'Who discovered the nucleus of the atom?',
         options: [
-          { id: 'protons', label: 'Protons', icon: 'Add' },
-          { id: 'neutrons', label: 'Neutrons', icon: 'Minus' },
-          { id: 'electrons', label: 'Electrons', icon: 'Flash' },
-          { id: 'all', label: 'All of them', icon: 'Category' }
+          { id: 'democritus', label: 'Democritus (400 BCE)', icon: 'People' },
+          { id: 'dalton', label: 'Dalton (1803)', icon: 'Category' },
+          { id: 'thomson', label: 'Thomson (1897)', icon: 'Flash' },
+          { id: 'rutherford', label: 'Rutherford (1911)', icon: 'Discover' }
         ],
-        correctAnswer: 'protons',
-        explanation: 'The number of protons (atomic number) determines the element. Carbon always has 6 protons. Change that number, and you have a different element! Neutrons can vary (isotopes), and electrons can be gained or lost (ions).'
+        correctAnswer: 'rutherford',
+        explanation: 'Rutherford discovered the nucleus in 1911 through his famous gold foil experiment! He found that atoms have a dense, positive center (nucleus) with electrons orbiting around it. Democritus coined "atomos," Dalton proposed the solid sphere model, and Thomson discovered electrons with his "plum pudding" model.'
       }
     },
     
@@ -71,11 +76,23 @@ export const meetTheAtomLesson: Lesson = {
       id: 'assessment',
       type: 'assessment',
       data: {
-        question: 'If an atom has 8 protons, 8 neutrons, and 8 electrons, what element is it?',
-        options: ['Carbon (6)', 'Nitrogen (7)', 'Oxygen (8)', 'Fluorine (9)'],
-        correctIndex: 2,
-        explanation: 'It\'s Oxygen! The atomic number (number of protons) is 8, which defines oxygen. The numbers in parentheses are the atomic numbers of each element.',
+        question: 'Which particle in an atom has a positive charge?',
+        options: ['Electron', 'Proton', 'Neutron', 'Nucleus'],
+        correctIndex: 1,
+        explanation: 'Protons have a positive charge (+1). Electrons have a negative charge (-1), and neutrons have no charge (neutral). The nucleus contains protons and neutrons, so it has an overall positive charge.',
         image: 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=400'
+      }
+    },
+    
+    {
+      id: 'assessment-2',
+      type: 'assessment',
+      data: {
+        question: 'What defines an element?',
+        options: ['Number of neutrons', 'Number of electrons', 'Number of protons', 'Atomic mass'],
+        correctIndex: 2,
+        explanation: 'The number of protons (atomic number) defines an element. All carbon atoms have 6 protons, all oxygen atoms have 8 protons, and so on. Neutrons can vary (creating isotopes), and electrons can be gained or lost (creating ions).',
+        image: 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=400'
       }
     },
     
@@ -83,8 +100,8 @@ export const meetTheAtomLesson: Lesson = {
       id: 'debrief',
       type: 'debrief',
       data: {
-        title: 'Atomic Master!',
-        message: 'You now understand the fundamental structure of atoms!',
+        title: 'Mission Complete!',
+        message: 'You now understand the fundamental structure of atoms and their historical discovery!',
         rewards: {
           xp: 50,
           stars: 3

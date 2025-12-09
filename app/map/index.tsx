@@ -2,8 +2,8 @@ import { Icon } from '@/components/ui/icon';
 import { UNITS as SYLLABUS_UNITS } from '@/content/units';
 import { useAllLevels } from '@/hooks/use-storage';
 import { useFocusEffect, useRouter } from 'expo-router';
-import React, { useCallback, useEffect, useRef } from 'react';
-import { Dimensions, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { Alert, Dimensions, Image, Linking, Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Animated, { FadeInDown, useAnimatedStyle, useSharedValue, withRepeat, withTiming } from 'react-native-reanimated';
 import Svg, { Circle, Defs, G, LinearGradient, Path, Rect, Stop } from 'react-native-svg';
 
@@ -117,7 +117,11 @@ const convertSyllabusToMapUnits = (completedLessonIds: string[]) => {
   return SYLLABUS_UNITS.map((unit, unitIndex) => {
     const isPreviousUnitCompleted = unitIndex === 0 || (() => {
       const previousUnit = SYLLABUS_UNITS[unitIndex - 1];
-      return previousUnit.lessonIds.every(id => completedLessonIds.includes(id));
+      // Check if all lessons AND quizzes of previous unit are completed
+      const allLessonsCompleted = previousUnit.lessonIds.every(id => completedLessonIds.includes(id));
+      const allQuizzesCompleted = previousUnit.quizIds.length === 0 || 
+                                   previousUnit.quizIds.every(id => completedLessonIds.includes(id));
+      return allLessonsCompleted && allQuizzesCompleted;
     })();
     
     const isUnitLocked = !isPreviousUnitCompleted;
@@ -147,11 +151,23 @@ const convertSyllabusToMapUnits = (completedLessonIds: string[]) => {
     });
     
     if (unit.quizIds && unit.quizIds.length > 0) {
+      const quizId = unit.quizIds[0];
+      const isQuizCompleted = completedLessonIds.includes(quizId);
       const allLessonsCompleted = unit.lessonIds.every(id => completedLessonIds.includes(id));
+      
+      let quizStatus = 'locked';
+      if (isUnitLocked) {
+        quizStatus = 'locked';
+      } else if (isQuizCompleted) {
+        quizStatus = 'completed';
+      } else if (allLessonsCompleted) {
+        quizStatus = 'current';
+      }
+      
       levels.push({
-        id: unit.quizIds[0],
+        id: quizId,
         type: 'trophy',
-        status: isUnitLocked ? 'locked' : (allLessonsCompleted ? 'current' : 'locked')
+        status: quizStatus
       });
     }
     
@@ -535,11 +551,85 @@ const LevelNode = ({ level, index, globalIndex, unitColor, onPress, showStart = 
   );
 };
 
+// Unit info data with references
+const UNIT_INFO_DATA: { [key: string]: { info: string, references: string[] } } = {
+  'atomic-playground': {
+    info: 'Explore the basics of nuclear science, including atoms, isotopes, and the energy contained within nuclei. You\'ll understand atomic structure, nuclear energy fundamentals, and recognize common misconceptions.',
+    references: [
+      'https://www.britannica.com/science/atom',
+      'https://openstax.org/books/anatomy-and-physiology/pages/2-1-elements-and-atoms-the-building-blocks-of-matter',
+      'https://www.iaea.org/newscenter/news/what-is-nuclear-energy-the-science-of-nuclear-power',
+      'https://www.khanacademy.org/science/physics/quantum-physics'
+    ]
+  },
+  'nuclear-reactions': {
+    info: 'Explore the fundamental nuclear reactions that power stars, fuel nuclear power plants, and enable essential technologies. You\'ll gain foundational knowledge about how nuclear reactions work, how energy is released, and how these processes are safely controlled.',
+    references: [
+      'https://www.iaea.org/topics/nuclear-fission',
+      'https://www.britannica.com/science/nuclear-fusion',
+      'https://www.world-nuclear.org/information-library/nuclear-fuel-cycle/introduction/physics-of-nuclear-energy.aspx'
+    ]
+  },
+  'radiation-effects': {
+    info: 'Learn about different types of radiation, how radiation interacts with matter, and the real science behind radiation effects on human health and the environment. This unit provides factual, science-based understanding of radiation.',
+    references: [
+      'https://www.iaea.org/topics/radiation-protection',
+      'https://www.epa.gov/radiation/radiation-basics',
+      'https://www.nrc.gov/about-nrc/radiation/health-effects.html'
+    ]
+  },
+  'nuclear-everyday-life': {
+    info: 'Discover the many peaceful applications of nuclear technology in medicine, agriculture, industry, and environmental protection. Learn how nuclear science improves lives every day.',
+    references: [
+      'https://www.iaea.org/topics/nuclear-applications',
+      'https://www.world-nuclear.org/information-library/non-power-nuclear-applications.aspx',
+      'https://www.who.int/health-topics/ionizing-radiation'
+    ]
+  },
+  'nuclear-safety-security': {
+    info: 'Focuses on how countries, scientists, and international organizations work together to ensure nuclear technology is used safely, securely, and responsibly. Learn about safety frameworks, regulations, and global cooperation.',
+    references: [
+      'https://www.iaea.org/topics/nuclear-safety-and-security',
+      'https://www.nrc.gov/about-nrc/regulatory/enforcement/safety-culture.html',
+      'https://www.world-nuclear.org/information-library/safety-and-security.aspx'
+    ]
+  },
+  'invisible-rays': {
+    info: 'Learn about different types of radiation and how to protect against them. Demystify "Radiation" by breaking it down into manageable types.',
+    references: [
+      'https://www.epa.gov/radiation/radiation-protection',
+      'https://www.nrc.gov/about-nrc/radiation/protects-you.html'
+    ]
+  },
+  'dose-poison': {
+    info: 'Understand radiation doses, measurements, and health effects. Contextualize safety using radiation comparison and dose visualization.',
+    references: [
+      'https://www.iaea.org/topics/radiation-dosimetry',
+      'https://xkcd.com/radiation/'
+    ]
+  },
+  'engine-room': {
+    info: 'Discover how nuclear reactors generate clean, reliable energy. Explain the mechanics to debunk the "Explosion" myth.',
+    references: [
+      'https://www.world-nuclear.org/information-library/nuclear-fuel-cycle/nuclear-power-reactors.aspx',
+      'https://www.ucs.org/resources/how-nuclear-power-works'
+    ]
+  },
+  'green-horizon': {
+    info: 'Explore nuclear energy\'s environmental benefits and waste management. Address environmental concerns using energy statistics visualizations.',
+    references: [
+      'https://www.world-nuclear.org/information-library/energy-and-the-environment.aspx',
+      'https://www.iaea.org/topics/waste-management'
+    ]
+  }
+};
+
 export default function MapScreen() {
   const router = useRouter();
   const scrollViewRef = useRef<ScrollView>(null);
   const isFirstRender = useRef(true);
   const { levels, loading, refresh } = useAllLevels();
+  const [selectedUnit, setSelectedUnit] = useState<{ id: string, title: string, subtitle: string } | null>(null);
 
   useFocusEffect(
     useCallback(() => {
@@ -628,10 +718,73 @@ export default function MapScreen() {
     }
   };
 
+  // Animated loading dots
+  const LoadingDot = ({ delay, color }: { delay: number, color: string }) => {
+    const scale = useSharedValue(1);
+    const opacity = useSharedValue(1);
+    
+    React.useEffect(() => {
+      scale.value = withRepeat(
+        withTiming(1.3, { duration: 600 }),
+        -1,
+        true
+      );
+      opacity.value = withRepeat(
+        withTiming(0.4, { duration: 600 }),
+        -1,
+        true
+      );
+    }, []);
+
+    const animatedStyle = useAnimatedStyle(() => ({
+      transform: [{ scale: scale.value }],
+      opacity: opacity.value,
+    }));
+
+    return (
+      <Animated.View 
+        entering={FadeInDown.delay(delay).springify()} 
+        style={[styles.loadingDot, { backgroundColor: color }, animatedStyle]} 
+      />
+    );
+  };
+
   if (loading) {
     return (
-      <View style={{ flex: 1, backgroundColor: THEME.bg, justifyContent: 'center', alignItems: 'center' }}>
-        <Text style={{ color: THEME.textMuted }}>Loading...</Text>
+      <View style={{ flex: 1, backgroundColor: THEME.bg }}>
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
+             <Icon name="ArrowLeft2" size={24} color={THEME.textMuted} />
+          </TouchableOpacity>
+          <View style={styles.headerTitleContainer}>
+            <Text style={styles.headerTitle}>Learning Path</Text>
+          </View>
+          <View style={{ width: 40 }} /> 
+        </View>
+        
+        <View style={styles.loadingContainer}>
+          {/* Animated Mascot */}
+          <Animated.View entering={FadeInDown.springify().damping(10)}>
+            <Image 
+              source={require('@/assets/images/mascot/explain.png')} 
+              style={styles.loadingMascot}
+              resizeMode="contain"
+            />
+          </Animated.View>
+          
+          {/* Loading Text */}
+          <Animated.View entering={FadeInDown.delay(200)}>
+            <Text style={styles.loadingTitle}>Preparing Your Journey</Text>
+            <Text style={styles.loadingSubtitle}>Loading learning path...</Text>
+          </Animated.View>
+          
+          {/* Loading Dots Animation */}
+          <View style={styles.loadingDotsContainer}>
+            <LoadingDot delay={300} color="#FFB74D" />
+            <LoadingDot delay={400} color="#64B5F6" />
+            <LoadingDot delay={500} color="#81C784" />
+          </View>
+        </View>
       </View>
     );
   }
@@ -713,7 +866,11 @@ export default function MapScreen() {
                   </View>
                   <Text style={styles.unitTitle}>{unit.title}</Text>
                 </View>
-                <TouchableOpacity style={styles.guideBtn} disabled={unit.isLocked}>
+                <TouchableOpacity 
+                  style={styles.guideBtn} 
+                  disabled={unit.isLocked}
+                  onPress={() => !unit.isLocked && setSelectedUnit({ id: unit.id, title: unit.title, subtitle: unit.subtitle })}
+                >
                   <Icon name={unit.isLocked ? "Lock" : "InfoCircle"} size={20} color={unit.color} />
                 </TouchableOpacity>
               </View>
@@ -722,6 +879,80 @@ export default function MapScreen() {
         })}
         
       </ScrollView>
+
+      {/* Unit Info Modal */}
+      <Modal
+        visible={selectedUnit !== null}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setSelectedUnit(null)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <ScrollView showsVerticalScrollIndicator={false}>
+              {/* Header */}
+              <View style={styles.modalHeader}>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.modalSubtitle}>{selectedUnit?.subtitle}</Text>
+                  <Text style={styles.modalTitle}>{selectedUnit?.title}</Text>
+                </View>
+                <TouchableOpacity 
+                  onPress={() => setSelectedUnit(null)}
+                  style={styles.modalCloseBtn}
+                >
+                  <Icon name="CloseCircle" size={28} color={THEME.textMuted} variant="Bold" />
+                </TouchableOpacity>
+              </View>
+
+              {/* Unit Information */}
+              <View style={styles.modalSection}>
+                <View style={styles.sectionHeader}>
+                  <Icon name="InfoCircle" size={20} color={THEME.primary} variant="Bold" />
+                  <Text style={styles.sectionTitle}>About This Unit</Text>
+                </View>
+                <Text style={styles.infoText}>
+                  {selectedUnit && UNIT_INFO_DATA[selectedUnit.id]?.info}
+                </Text>
+              </View>
+
+              {/* References */}
+              {selectedUnit && UNIT_INFO_DATA[selectedUnit.id]?.references && (
+                <View style={styles.modalSection}>
+                  <View style={styles.sectionHeader}>
+                    <Icon name="Book1" size={20} color={THEME.primary} variant="Bold" />
+                    <Text style={styles.sectionTitle}>References & Resources</Text>
+                  </View>
+                  {UNIT_INFO_DATA[selectedUnit.id].references.map((ref, index) => (
+                    <TouchableOpacity
+                      key={index}
+                      style={styles.referenceItem}
+                      onPress={() => {
+                        Linking.openURL(ref).catch(() => {
+                          Alert.alert('Error', 'Could not open link');
+                        });
+                      }}
+                    >
+                      <Icon name="Link" size={16} color={THEME.primary} variant="Bold" />
+                      <Text style={styles.referenceText} numberOfLines={1}>
+                        {ref.replace('https://', '').replace('http://', '')}
+                      </Text>
+                      <Icon name="ArrowRight2" size={16} color={THEME.textMuted} />
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              )}
+
+              {/* Close Button */}
+              <TouchableOpacity 
+                style={styles.modalActionBtn}
+                onPress={() => setSelectedUnit(null)}
+              >
+                <Text style={styles.modalActionText}>Got it!</Text>
+              </TouchableOpacity>
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -910,5 +1141,139 @@ const styles = StyleSheet.create({
     borderRightWidth: 2,
     borderColor: '#E5E7EB',
     transform: [{ rotate: '45deg' }],
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  modalContent: {
+    backgroundColor: '#FFF',
+    borderRadius: 24,
+    width: '100%',
+    maxWidth: 500,
+    maxHeight: '80%',
+    padding: 24,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.3,
+    shadowRadius: 16,
+    elevation: 10,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: 24,
+    gap: 12,
+  },
+  modalSubtitle: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: THEME.textMuted,
+    textTransform: 'uppercase',
+    letterSpacing: 1,
+    marginBottom: 4,
+  },
+  modalTitle: {
+    fontSize: 24,
+    fontWeight: '800',
+    color: THEME.text,
+    lineHeight: 30,
+  },
+  modalCloseBtn: {
+    padding: 4,
+  },
+  modalSection: {
+    marginBottom: 24,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 12,
+  },
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: THEME.text,
+  },
+  infoText: {
+    fontSize: 15,
+    lineHeight: 24,
+    color: THEME.text,
+    opacity: 0.8,
+  },
+  referenceItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    backgroundColor: '#F9FAFB',
+    borderRadius: 12,
+    marginBottom: 8,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+  },
+  referenceText: {
+    flex: 1,
+    fontSize: 13,
+    color: THEME.primary,
+    fontWeight: '500',
+  },
+  modalActionBtn: {
+    backgroundColor: THEME.primary,
+    paddingVertical: 16,
+    borderRadius: 16,
+    alignItems: 'center',
+    marginTop: 8,
+    borderBottomWidth: 4,
+    borderBottomColor: darkenColor(THEME.primary, 0.2),
+  },
+  modalActionText: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#FFF',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 40,
+  },
+  loadingMascot: {
+    width: 180,
+    height: 180,
+    marginBottom: 24,
+  },
+  loadingTitle: {
+    fontSize: 24,
+    fontWeight: '800',
+    color: THEME.text,
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  loadingSubtitle: {
+    fontSize: 16,
+    color: THEME.textMuted,
+    textAlign: 'center',
+    marginBottom: 32,
+  },
+  loadingDotsContainer: {
+    flexDirection: 'row',
+    gap: 12,
+    alignItems: 'center',
+  },
+  loadingDot: {
+    width: 16,
+    height: 16,
+    borderRadius: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
   },
 });

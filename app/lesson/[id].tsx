@@ -1,7 +1,7 @@
 import { Icon } from '@/components/ui/icon';
 import { getLessonById } from '@/content/lessons';
 import { useStorage } from '@/services/StorageContext';
-import { getLevelProgress, logDailyActivity, updateLevelProgress } from '@/services/database';
+import { getLevelProgress, logDailyActivity, unlockNextLevel, updateLevelProgress } from '@/services/database';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import * as Speech from 'expo-speech';
@@ -9,15 +9,14 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Dimensions, Image, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Gesture, GestureDetector, GestureHandlerRootView } from 'react-native-gesture-handler';
 import Animated, {
-  FadeInDown,
-  ZoomIn,
-  interpolate,
-  runOnJS,
-  useAnimatedStyle,
-  useSharedValue,
-  withRepeat,
-  withSpring,
-  withTiming
+    FadeInDown,
+    interpolate,
+    runOnJS,
+    useAnimatedStyle,
+    useSharedValue,
+    withRepeat,
+    withSpring,
+    withTiming
 } from 'react-native-reanimated';
 
 const { width, height } = Dimensions.get('window');
@@ -808,6 +807,11 @@ const DebriefView = ({ data, levelId, isReplay = false }: { data: any; levelId: 
           completed_at: existingProgress?.completed_at || new Date().toISOString()
         });
         
+        // Unlock next lesson/unit when completing for the first time
+        if (!isAlreadyCompleted) {
+          await unlockNextLevel(levelId);
+        }
+        
         // Only award rewards if this is the first completion (not a replay)
         if (!isAlreadyCompleted && !isReplay) {
           // Add XP to user
@@ -996,19 +1000,19 @@ export default function LessonScreen() {
   const renderStep = () => {
     switch(currentStep.type) {
       case 'briefing':
-        return <BriefingView data={currentStep.data} onComplete={nextStep} />;
+        return <BriefingView key={step} data={currentStep.data} onComplete={nextStep} />;
       case 'myth_buster':
-        return <MythBusterView data={currentStep.data} onComplete={nextStep} />;
+        return <MythBusterView key={step} data={currentStep.data} onComplete={nextStep} />;
       case 'micro_learn':
-        return <MicroLearnView data={currentStep.data} onComplete={nextStep} />;
+        return <MicroLearnView key={step} data={currentStep.data} onComplete={nextStep} />;
       case 'lab':
-        return <LabView data={currentStep.data} onComplete={nextStep} onBack={step > 0 ? () => setStep(s => s - 1) : undefined} />;
+        return <LabView key={step} data={currentStep.data} onComplete={nextStep} onBack={step > 0 ? () => setStep(s => s - 1) : undefined} />;
       case 'assessment':
-        return <AssessmentView data={currentStep.data} onComplete={nextStep} />;
+        return <AssessmentView key={step} data={currentStep.data} onComplete={nextStep} />;
       case 'debrief':
-        return <DebriefView data={currentStep.data} levelId={levelId} isReplay={isReplay} />;
+        return <DebriefView key={step} data={currentStep.data} levelId={levelId} isReplay={isReplay} />;
       default:
-        return <BriefingView data={currentStep.data} onComplete={nextStep} />;
+        return <BriefingView key={step} data={currentStep.data} onComplete={nextStep} />;
     }
   };
 

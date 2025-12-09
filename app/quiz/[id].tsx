@@ -1,13 +1,12 @@
-import React, { useState, useRef } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, ScrollView, Image, Dimensions } from 'react-native';
-import { useLocalSearchParams, useRouter } from 'expo-router';
-import Animated, { FadeInDown, ZoomIn } from 'react-native-reanimated';
 import { Icon } from '@/components/ui/icon';
-import { LinearGradient } from 'expo-linear-gradient';
-import { useStorage } from '@/services/StorageContext';
-import { logDailyActivity } from '@/services/database';
 import { getQuizById } from '@/content/quizzes';
+import { useStorage } from '@/services/StorageContext';
+import { logDailyActivity, unlockNextLevel, updateLevelProgress } from '@/services/database';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import * as Speech from 'expo-speech';
+import React, { useRef, useState } from 'react';
+import { Dimensions, Image, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import Animated, { FadeInDown, ZoomIn } from 'react-native-reanimated';
 
 const { width } = Dimensions.get('window');
 
@@ -99,7 +98,7 @@ export default function QuizScreen() {
     }, 100);
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (currentQuestionIndex < totalQuestions - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
       setSelectedAnswer(null);
@@ -110,11 +109,27 @@ export default function QuizScreen() {
       const passed = score >= quiz.passingScore;
       
       if (passed) {
-        addXP(quiz.xpReward);
-        logDailyActivity(new Date().toISOString().split('T')[0], {
-          xp_earned: quiz.xpReward,
-          quizzes_completed: 1
-        });
+        try {
+          // Mark quiz as completed in database
+          await updateLevelProgress(id as string, {
+            status: 'completed',
+            xp_earned: quiz.xpReward,
+            stars: 3,
+            completed_at: new Date().toISOString()
+          });
+          
+          // Unlock next unit/lesson
+          await unlockNextLevel(id as string);
+          
+          // Award XP and log activity
+          addXP(quiz.xpReward);
+          logDailyActivity(new Date().toISOString().split('T')[0], {
+            xp_earned: quiz.xpReward,
+            quizzes_completed: 1
+          });
+        } catch (error) {
+          console.error('Error saving quiz progress:', error);
+        }
       }
       
       setQuizComplete(true);
@@ -681,4 +696,5 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
 });
+
 

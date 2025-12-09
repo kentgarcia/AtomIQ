@@ -19,3 +19,4 @@ const nuclearMedicine: Post = {
 
 export default nuclearMedicine;
 
+
