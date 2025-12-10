@@ -68,10 +68,10 @@ function ModernTabBar({ state, navigation }: BottomTabBarProps) {
   const isDark = colorScheme === 'dark';
   
   const THEME = {
-    bg: isDark ? '#1A1A1A' : '#FFFFFF',
-    border: isDark ? '#2D3A56' : '#F0F0F0',
-    active: '#5E72E4', // Matching Home Screen Primary
-    inactive: isDark ? '#666666' : '#9CA3AF',
+    bg: isDark ? '#172B4D' : '#F8F9FE',
+    border: isDark ? '#2D3A56' : '#E5E7EB',
+    active: '#EA580C', // Matching other pages
+    inactive: isDark ? '#8898AA' : '#8898AA',
   };
 
   const tabs = [
@@ -87,7 +87,7 @@ function ModernTabBar({ state, navigation }: BottomTabBarProps) {
       style={[
         styles.tabBar,
         {
-          paddingBottom: insets.bottom + Platform.select({ ios: 0, android: 8 }),
+          paddingBottom: (insets.bottom || 0) + (Platform.select({ ios: 0, android: 8 }) || 8),
           backgroundColor: THEME.bg,
           borderTopColor: THEME.border,
         },

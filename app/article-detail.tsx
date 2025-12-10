@@ -5,14 +5,14 @@ import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React from 'react';
 import {
-    Dimensions,
-    Image,
-    Linking,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View
+  Dimensions,
+  Image,
+  Linking,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
 } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -39,11 +39,14 @@ const DarkTHEME = {
   border: '#2D3A56',
 };
 
+let THEME = LightTHEME;
+
 export default function ArticleDetailScreen() {
   const { id } = useLocalSearchParams();
   const router = useRouter();
   const colorScheme = useColorScheme();
   const THEME = colorScheme === 'dark' ? DarkTHEME : LightTHEME;
+  const styles = React.useMemo(() => createStyles(THEME), [THEME]);
   const articleId = typeof id === 'string' ? id.replace('article-', '') : '';
   
   const article = getArticleById(articleId);
@@ -220,7 +223,7 @@ export default function ArticleDetailScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (theme: typeof LightTHEME) => StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#FFFFFF',
@@ -234,7 +237,7 @@ const styles = StyleSheet.create({
   errorText: {
     fontSize: 18,
     fontWeight: '700',
-    color: THEME.text,
+    color: theme.text,
     marginTop: 16,
     marginBottom: 24,
   },
@@ -245,10 +248,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: THEME.border,
+    borderBottomColor: theme.border,
   },
   backButton: {
     padding: 8,
+  },
+  backButtonText: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: theme.primary,
   },
   externalLinkButton: {
     flexDirection: 'row',
@@ -256,13 +264,13 @@ const styles = StyleSheet.create({
     gap: 6,
     paddingHorizontal: 12,
     paddingVertical: 6,
-    backgroundColor: THEME.bg,
+    backgroundColor: theme.bg,
     borderRadius: 8,
   },
   externalLinkText: {
     fontSize: 13,
     fontWeight: '700',
-    color: THEME.primary,
+    color: theme.primary,
   },
   scrollView: {
     flex: 1,
@@ -273,14 +281,14 @@ const styles = StyleSheet.create({
   heroImage: {
     width: width,
     height: 250,
-    backgroundColor: THEME.bg,
+    backgroundColor: theme.bg,
   },
   articleHeader: {
     padding: 20,
   },
   categoryBadge: {
     alignSelf: 'flex-start',
-    backgroundColor: THEME.primary + '15',
+    backgroundColor: theme.primary + '15',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 8,
@@ -289,20 +297,20 @@ const styles = StyleSheet.create({
   categoryText: {
     fontSize: 11,
     fontWeight: '800',
-    color: THEME.primary,
+    color: theme.primary,
     letterSpacing: 0.5,
   },
   title: {
     fontSize: 28,
     fontWeight: '800',
-    color: THEME.text,
+    color: theme.text,
     lineHeight: 36,
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: THEME.textMuted,
+    color: theme.textMuted,
     lineHeight: 26,
     marginBottom: 20,
   },
@@ -313,13 +321,13 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     paddingBottom: 16,
     borderBottomWidth: 1,
-    borderBottomColor: THEME.border,
+    borderBottomColor: theme.border,
   },
   authorAvatar: {
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: THEME.bg,
+    backgroundColor: theme.bg,
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'hidden',
@@ -334,12 +342,12 @@ const styles = StyleSheet.create({
   authorName: {
     fontSize: 16,
     fontWeight: '700',
-    color: THEME.text,
+    color: theme.text,
     marginBottom: 2,
   },
   authorTitle: {
     fontSize: 13,
-    color: THEME.textMuted,
+    color: theme.textMuted,
   },
   metaInfo: {
     gap: 8,
@@ -351,12 +359,12 @@ const styles = StyleSheet.create({
   },
   metaText: {
     fontSize: 12,
-    color: THEME.textMuted,
+    color: theme.textMuted,
     fontWeight: '600',
   },
   publishedDate: {
     fontSize: 13,
-    color: THEME.textMuted,
+    color: theme.textMuted,
     fontWeight: '600',
   },
   contentContainer: {
@@ -370,7 +378,7 @@ const styles = StyleSheet.create({
   tagsTitle: {
     fontSize: 14,
     fontWeight: '800',
-    color: THEME.text,
+    color: theme.text,
     marginBottom: 12,
   },
   tagsRow: {
@@ -379,7 +387,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   tagChip: {
-    backgroundColor: THEME.bg,
+    backgroundColor: theme.bg,
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 8,
@@ -387,16 +395,16 @@ const styles = StyleSheet.create({
   tagText: {
     fontSize: 13,
     fontWeight: '600',
-    color: THEME.textMuted,
+    color: theme.textMuted,
   },
   sourceSection: {
     marginTop: 24,
     marginHorizontal: 20,
     padding: 16,
-    backgroundColor: THEME.bg,
+    backgroundColor: theme.bg,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: THEME.border,
+    borderColor: theme.border,
   },
   sourceHeader: {
     flexDirection: 'row',
@@ -407,11 +415,11 @@ const styles = StyleSheet.create({
   sourceTitle: {
     fontSize: 13,
     fontWeight: '800',
-    color: THEME.text,
+    color: theme.text,
   },
   sourceText: {
     fontSize: 14,
-    color: THEME.text,
+    color: theme.text,
     marginBottom: 12,
   },
   sourceLinkButton: {
@@ -423,7 +431,7 @@ const styles = StyleSheet.create({
   sourceLinkText: {
     fontSize: 14,
     fontWeight: '700',
-    color: THEME.primary,
+    color: theme.primary,
   },
   bottomSpacing: {
     height: 40,

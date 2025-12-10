@@ -1,18 +1,19 @@
 import { Icon } from '@/components/ui/icon';
+import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useStorage } from '@/services/StorageContext';
 import { setOnboardingCompleted } from '@/services/storage';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { Dimensions, Image, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import Animated, {
-    Easing,
-    FadeIn,
-    FadeInDown,
-    useAnimatedStyle,
-    useSharedValue,
-    withRepeat,
-    withSpring,
-    withTiming
+  Easing,
+  FadeIn,
+  FadeInDown,
+  useAnimatedStyle,
+  useSharedValue,
+  withRepeat,
+  withSpring,
+  withTiming
 } from 'react-native-reanimated';
 
 const { width } = Dimensions.get('window');
@@ -105,6 +106,7 @@ export default function Onboarding() {
   const [currentFeatureIndex, setCurrentFeatureIndex] = useState(0);
   const [username, setUsername] = useState('');
   
+  const styles = React.useMemo(() => createStyles(DUO_THEME), [DUO_THEME]);
   const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity);
 
   // Rotating Atom Animation
@@ -417,10 +419,10 @@ export default function Onboarding() {
   return null;
 }
 
-const styles = StyleSheet.create({
+const createStyles = (theme: typeof LightDUO_THEME) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: DUO_THEME.bg,
+    backgroundColor: theme.bg,
   },
   scrollContent: {
     flexGrow: 1,
@@ -470,12 +472,12 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: DUO_THEME.primary,
+    backgroundColor: theme.primary,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 4,
     borderColor: '#FFF',
-    shadowColor: DUO_THEME.primary,
+    shadowColor: theme.primary,
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.3,
     shadowRadius: 12,
@@ -487,12 +489,12 @@ const styles = StyleSheet.create({
   splashTitle: {
     fontSize: 48,
     fontWeight: '800',
-    color: DUO_THEME.text,
+    color: theme.text,
     letterSpacing: 2,
   },
   splashSubtitle: {
     fontSize: 16,
-    color: DUO_THEME.textMuted,
+    color: theme.textMuted,
     letterSpacing: 1,
     textTransform: 'uppercase',
     marginTop: 8,
@@ -539,7 +541,7 @@ const styles = StyleSheet.create({
   },
   progressBarFill: {
     height: '100%',
-    backgroundColor: DUO_THEME.primary,
+    backgroundColor: theme.primary,
     borderTopRightRadius: 8,
     borderBottomRightRadius: 8,
   },
@@ -555,11 +557,11 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     borderRadius: 20,
     borderWidth: 2,
-    borderColor: DUO_THEME.border,
+    borderColor: theme.border,
     gap: 8,
   },
   badgeText: {
-    color: DUO_THEME.accent,
+    color: theme.accent,
     fontSize: 12,
     fontWeight: '800',
     textTransform: 'uppercase',
@@ -590,20 +592,20 @@ const styles = StyleSheet.create({
   featureTitle: {
     fontSize: 32,
     fontWeight: '800',
-    color: DUO_THEME.text,
+    color: theme.text,
     marginBottom: 8,
     textAlign: 'center',
   },
   featureSubtitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: DUO_THEME.textMuted,
+    color: theme.textMuted,
     marginBottom: 16,
     textAlign: 'center',
   },
   featureDescription: {
     fontSize: 16,
-    color: DUO_THEME.text,
+    color: theme.text,
     lineHeight: 24,
     textAlign: 'center',
     marginBottom: 24,
@@ -633,7 +635,7 @@ const styles = StyleSheet.create({
   highlightText: {
     fontSize: 15,
     fontWeight: '600',
-    color: DUO_THEME.text,
+    color: theme.text,
     flex: 1,
   },
   featureActions: {
@@ -648,7 +650,7 @@ const styles = StyleSheet.create({
   skipButtonText: {
     fontSize: 14,
     fontWeight: '600',
-    color: DUO_THEME.textMuted,
+    color: theme.textMuted,
   },
   featureIndicators: {
     flexDirection: 'row',
@@ -685,13 +687,13 @@ const styles = StyleSheet.create({
   titleLarge: {
     fontSize: 32,
     fontWeight: '800',
-    color: DUO_THEME.text,
+    color: theme.text,
     marginBottom: 8,
     textAlign: 'center',
   },
   subtitle: {
     fontSize: 16,
-    color: DUO_THEME.textMuted,
+    color: theme.textMuted,
     marginBottom: 48,
     textAlign: 'center',
     fontWeight: '500',
@@ -704,16 +706,16 @@ const styles = StyleSheet.create({
     width: '100%',
     backgroundColor: '#F9FAFB',
     borderWidth: 2,
-    borderColor: DUO_THEME.border,
+    borderColor: theme.border,
     borderRadius: 16,
     padding: 20,
     fontSize: 18,
-    color: DUO_THEME.text,
+    color: theme.text,
     fontWeight: '600',
     textAlign: 'center',
   },
   inputFocused: {
-    borderColor: DUO_THEME.accent,
+    borderColor: theme.accent,
     backgroundColor: '#FFFFFF',
   },
   getStartedButton: {
