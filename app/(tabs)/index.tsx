@@ -3,9 +3,11 @@ import { UNITS } from '@/content/units';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useAllLevels } from '@/hooks/use-storage';
 import { useStorage } from '@/services/StorageContext';
+import { isSupabaseConfigured, supabase } from '@/services/supabase';
+import { Tables } from '@/services/supabase.types';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
-import React, { useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Dimensions, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 
@@ -41,11 +43,24 @@ const GRADIENTS = {
   cyan: ['#11CDEF', '#1171EF'] as const,
 };
 
+type LeaderEntry = {
+  userId?: string;
+  name: string;
+  title: string;
+  xp: number;
+  avatar?: string;
+  isUser?: boolean;
+  isNPC?: boolean;
+  rank?: number;
+};
+
 export default function HomeScreen() {
   const router = useRouter();
   const { userProfile } = useStorage();
   const { levels } = useAllLevels();
   const colorScheme = useColorScheme();
+  const [leaderboardPreview, setLeaderboardPreview] = useState<{ topThree: LeaderEntry[]; userRank?: LeaderEntry | undefined }>({ topThree: [] });
+  const [leaderboardError, setLeaderboardError] = useState<string | null>(null);
   
   const THEME = colorScheme === 'dark' ? DarkTHEME : LightTHEME;
   const styles = useMemo(() => createStyles(THEME), [THEME]);
@@ -107,55 +122,99 @@ export default function HomeScreen() {
     };
   }, [userProfile]);
 
-  // Calculate leaderboard data (same logic as leaderboard screen)
-  const leaderboardPreview = useMemo(() => {
-    const NPC_CHARACTERS = [
-      { name: 'AtomMaster99', title: 'Radiation Pioneer', baseXP: 2000, avatarColor: '#EA580C', isNPC: true },
-      { name: 'NuclearNinja', title: 'Physics Legend', baseXP: 1800, avatarColor: '#2ECC71', isNPC: true },
-      { name: 'ReactorRex', title: 'Reactor Architect', baseXP: 1600, avatarColor: '#3498DB', isNPC: true },
-      { name: 'QuantumQuinn', title: 'Quantum Master', baseXP: 1400, avatarColor: '#9B59B6', isNPC: true },
-      { name: 'FissionFiona', title: 'Fission Expert', baseXP: 1200, avatarColor: '#E91E63', isNPC: true },
-      { name: 'AtomSmasher', title: 'Atom Splitter', baseXP: 1000, avatarColor: '#F39C12', isNPC: true },
-      { name: 'BetaBeast', title: 'Beta Decay Pro', baseXP: 800, avatarColor: '#1ABC9C', isNPC: true },
-      { name: 'ElementElla', title: 'Element Hunter', baseXP: 600, avatarColor: '#E74C3C', isNPC: true },
-      { name: 'NuclearNora', title: 'Nuclear Theorist', baseXP: 400, avatarColor: '#16A085', isNPC: true },
-      { name: 'ChemWizard', title: 'Chemistry Wizard', baseXP: 200, avatarColor: '#D35400', isNPC: true },
-    ];
+  const buildLeaderboard = useCallback(
+    (users: Tables<'users'>[] = []) => {
+      const NPC_CHARACTERS = [
+        { name: 'AtomMaster99', title: 'Radiation Pioneer', baseXP: 2000, isNPC: true },
+        { name: 'NuclearNinja', title: 'Physics Legend', baseXP: 1800, isNPC: true },
+        { name: 'ReactorRex', title: 'Reactor Architect', baseXP: 1600, isNPC: true },
+        { name: 'QuantumQuinn', title: 'Quantum Master', baseXP: 1400, isNPC: true },
+        { name: 'FissionFiona', title: 'Fission Expert', baseXP: 1200, isNPC: true },
+        { name: 'AtomSmasher', title: 'Atom Splitter', baseXP: 1000, isNPC: true },
+        { name: 'BetaBeast', title: 'Beta Decay Pro', baseXP: 800, isNPC: true },
+        { name: 'ElementElla', title: 'Element Hunter', baseXP: 600, isNPC: true },
+        { name: 'NuclearNora', title: 'Nuclear Theorist', baseXP: 400, isNPC: true },
+        { name: 'ChemWizard', title: 'Chemistry Wizard', baseXP: 200, isNPC: true },
+      ];
 
-    const userXP = userProfile?.total_xp || 0;
-    const userData = {
-      name: userProfile?.username || 'You',
-      title: 'Nuclear Learner',
-      xp: userXP,
-      avatar: 'profile',
-      isUser: true,
-      isNPC: false
-    };
+      const entries: LeaderEntry[] = users.map((user) => ({
+        userId: user.user_id,
+        name: user.username,
+        title: user.is_npc ? 'NPC Challenger' : 'Nuclear Learner',
+        xp: user.total_xp ?? 0,
+        avatar: user.avatar_url ?? undefined,
+        isUser: user.user_id === userProfile?.user_id,
+        isNPC: Boolean(user.is_npc),
+      }));
 
-    const npcs = NPC_CHARACTERS.map(npc => ({
-      name: npc.name,
-      title: npc.title,
-      xp: npc.baseXP,
-      avatarColor: npc.avatarColor,
-      isUser: false,
-      isNPC: true
-    }));
+      if (userProfile && !entries.some((entry) => entry.userId === userProfile.user_id)) {
+        entries.push({
+          userId: userProfile.user_id,
+          name: userProfile.username || 'You',
+          title: 'Nuclear Learner',
+          xp: userProfile.total_xp || 0,
+          avatar: 'profile',
+          isUser: true,
+          isNPC: false,
+        });
+      }
 
-    const allCharacters = [userData, ...npcs];
-    const sorted = allCharacters.sort((a, b) => b.xp - a.xp);
-    const ranked = sorted.map((char, index) => ({
-      ...char,
-      rank: index + 1
-    }));
+      let entriesWithFallback = entries;
+      if (entriesWithFallback.length < 3) {
+        const needed = 3 - entriesWithFallback.length;
+        const fallback = NPC_CHARACTERS.slice(0, needed).map((npc): LeaderEntry => ({
+          name: npc.name,
+          title: npc.title,
+          xp: npc.baseXP,
+          isNPC: true,
+        }));
+        entriesWithFallback = [...entriesWithFallback, ...fallback];
+      }
 
-    const topThree = ranked.slice(0, 3);
-    const userRank = ranked.find(item => item.isUser);
+      const ranked = entriesWithFallback
+        .sort((a, b) => (b.xp ?? 0) - (a.xp ?? 0))
+        .map((entry, index) => ({ ...entry, rank: index + 1 }));
 
-    return {
-      topThree,
-      userRank
-    };
-  }, [userProfile]);
+      return {
+        topThree: ranked.slice(0, 3),
+        userRank: ranked.find((entry) => entry.isUser),
+      };
+    },
+    [userProfile]
+  );
+
+  const loadLeaderboard = useCallback(async () => {
+    if (!isSupabaseConfigured()) {
+      setLeaderboardPreview(buildLeaderboard([]));
+      setLeaderboardError(null);
+      return;
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('users')
+        .select('user_id, username, avatar_url, total_xp, is_npc')
+        .order('total_xp', { ascending: false })
+        .limit(10);
+
+      if (error) throw error;
+
+      setLeaderboardPreview(buildLeaderboard(data || []));
+      setLeaderboardError(null);
+    } catch (err) {
+      console.error('Error loading leaderboard preview:', err);
+      setLeaderboardError('Showing offline leaderboard');
+      setLeaderboardPreview(buildLeaderboard([]));
+    }
+  }, [buildLeaderboard]);
+
+  useEffect(() => {
+    setLeaderboardPreview(buildLeaderboard([]));
+    loadLeaderboard();
+  }, [buildLeaderboard, loadLeaderboard]);
+
+  const topThree = leaderboardPreview.topThree;
+  const userRank = leaderboardPreview.userRank;
 
   return (
     <View style={styles.container}>
@@ -172,7 +231,7 @@ export default function HomeScreen() {
             />
             <View>
               <Text style={styles.greeting}>Good Afternoon!</Text>
-              <Text style={styles.username}>{userProfile?.name || 'Atom Explorer'}</Text>
+              <Text style={styles.username}>{userProfile?.username || 'Atom Explorer'}</Text>
             </View>
           </View>
           
@@ -278,29 +337,40 @@ export default function HomeScreen() {
         </Animated.View>
 
         <Animated.View entering={FadeInDown.delay(500)} style={styles.leaderboardContainer}>
-          {leaderboardPreview.topThree.map((leader, index) => {
-            const isUser = leader.isUser;
-            const rankColors = ['#FFD700', '#C0C0C0', '#CD7F32'];
-            
-            return (
-              <View key={leader.rank} style={styles.leaderboardRow}>
-                <View style={styles.rankInfo}>
-                  <View style={[styles.rankBadge, { backgroundColor: rankColors[index] || '#E9ECEF' }]}>
-                    <Text style={styles.rankText}>{leader.rank}</Text>
+          {leaderboardError && (
+            <Text style={{ color: THEME.textMuted, marginBottom: 8 }}>{leaderboardError}</Text>
+          )}
+          {topThree.length === 0 ? (
+            <Text style={{ color: THEME.textMuted }}>Loading leaderboard...</Text>
+          ) : (
+            topThree.map((leader, index) => {
+              const isUser = leader.isUser;
+              const rankColors = ['#FFD700', '#C0C0C0', '#CD7F32'];
+              const isFirst = index === 0;
+              const avatarSource = isUser || !leader.avatar
+                ? require('@/assets/images/mascot/profile.png')
+                : { uri: leader.avatar };
+              
+              return (
+                <View key={leader.rank} style={styles.leaderboardRow}>
+                  <View style={styles.rankInfo}>
+                    <View style={[styles.rankBadge, { backgroundColor: rankColors[index] || '#E9ECEF' }]}>
+                      <Text style={styles.rankText}>{leader.rank}</Text>
+                    </View>
+                    <Image 
+                      source={avatarSource}
+                      style={styles.leaderAvatar} 
+                    />
+                    <View>
+                      <Text style={styles.leaderName}>{leader.name} {isUser && '(You)'}</Text>
+                      <Text style={styles.leaderScore}>{leader.xp} XP</Text>
+                    </View>
                   </View>
-                  <Image 
-                    source={isUser ? require('@/assets/images/mascot/profile.png') : { uri: 'https://api.dicebear.com/7.x/avataaars/png?seed=' + leader.name }} 
-                    style={styles.leaderAvatar} 
-                  />
-                  <View>
-                    <Text style={styles.leaderName}>{leader.name} {isUser && '(You)'}</Text>
-                    <Text style={styles.leaderScore}>{leader.xp} XP</Text>
-                  </View>
+                  {isFirst && <Icon name="Crown" size={24} color="#FFD700" variant="Bold" />}
                 </View>
-                {index === 0 && <Icon name="Crown" size={24} color="#FFD700" variant="Bold" />}
-              </View>
-            );
-          })}
+              );
+            })
+          )}
           
           <TouchableOpacity 
             style={styles.viewAllLink}

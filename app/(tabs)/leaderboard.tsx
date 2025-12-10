@@ -1,9 +1,11 @@
 import { Icon } from '@/components/ui/icon';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useStorage } from '@/services/StorageContext';
+import { isSupabaseConfigured, supabase } from '@/services/supabase';
+import { Tables } from '@/services/supabase.types';
 import { LinearGradient } from 'expo-linear-gradient';
-import React, { useMemo } from 'react';
-import { Dimensions, Image, ScrollView, StyleSheet, Text, View } from 'react-native';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { Dimensions, Image, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 import Animated, { FadeInDown, useAnimatedStyle, useSharedValue, withRepeat, withTiming } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -52,6 +54,18 @@ const NPC_CHARACTERS = [
   { name: 'ChemWizard', title: 'Chemistry Wizard', baseXP: 200, avatarColor: '#D35400', isNPC: true },
 ];
 
+type LeaderboardEntry = {
+  userId?: string;
+  name: string;
+  title: string;
+  xp: number;
+  avatar?: string;
+  avatarColor?: string;
+  isUser?: boolean;
+  isNPC?: boolean;
+  rank?: number;
+};
+
 const CircleAvatar = ({ uri, size, borderColor, borderWidth = 3, avatarColor, isUser }: { uri?: string, size: number, borderColor: string, borderWidth?: number, avatarColor?: string, isUser?: boolean }) => {
   // User avatar - use profile mascot
   if (isUser || uri === 'profile') {
@@ -73,8 +87,27 @@ const CircleAvatar = ({ uri, size, borderColor, borderWidth = 3, avatarColor, is
       </View>
     );
   }
-  
-  // NPC avatar with colored icon
+
+  // Remote avatar
+  if (uri) {
+    return (
+      <View style={{ 
+        width: size, 
+        height: size, 
+        borderRadius: size / 2, 
+        borderWidth, 
+        borderColor,
+        overflow: 'hidden',
+      }}>
+        <Image 
+          source={{ uri }} 
+          style={{ width: '100%', height: '100%' }}
+          resizeMode="cover"
+        />
+      </View>
+    );
+  }
+  // Default avatar fallback (NPCs and users without uploaded avatar)
   return (
     <View style={{ 
       width: size, 
@@ -82,11 +115,14 @@ const CircleAvatar = ({ uri, size, borderColor, borderWidth = 3, avatarColor, is
       borderRadius: size / 2, 
       borderWidth, 
       borderColor,
-      backgroundColor: avatarColor || '#E5E7EB',
-      alignItems: 'center',
-      justifyContent: 'center'
+      overflow: 'hidden',
+      backgroundColor: '#FFF'
     }}>
-      <Icon name="Profile" size={size * 0.6} color="#FFF" variant="Bold" />
+      <Image 
+        source={require('@/assets/images/mascot/profile.png')}
+        style={{ width: '100%', height: '100%' }}
+        resizeMode="contain"
+      />
     </View>
   );
 };
@@ -97,6 +133,10 @@ export default function LeaderboardScreen() {
   const THEME = colorScheme === 'dark' ? DarkTHEME : LightTHEME;
   const styles = useMemo(() => createStyles(THEME), [THEME]);
   const pulse = useSharedValue(1);
+  const [leaderboardData, setLeaderboardData] = useState<LeaderboardEntry[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   
   React.useEffect(() => {
     pulse.value = withRepeat(withTiming(1.02, { duration: 1000 }), -1, true);
@@ -106,47 +146,109 @@ export default function LeaderboardScreen() {
     transform: [{ scale: pulse.value }],
   }));
 
-  // Generate leaderboard with user and NPCs
-  const leaderboardData = useMemo(() => {
-    const userXP = userProfile?.total_xp || 0;
-    const userData = {
-      name: userProfile?.username || 'You',
-      title: 'Nuclear Learner',
-      xp: userXP,
-      avatar: 'profile', // Use profile mascot
-      avatarColor: undefined,
-      isUser: true,
-      isNPC: false
-    };
+  const buildLeaderboard = useCallback(
+    (users: Tables<'users'>[] = []) => {
+      const entries: LeaderboardEntry[] = users.map((user) => ({
+        userId: user.user_id,
+        name: user.username,
+        title: user.is_npc ? 'NPC Challenger' : 'Nuclear Learner',
+        xp: user.total_xp ?? 0,
+        avatar: user.avatar_url ?? undefined,
+        avatarColor: undefined,
+        isUser: user.user_id === userProfile?.user_id,
+        isNPC: Boolean(user.is_npc),
+      }));
 
-    // Transform NPCs to have xp field
-    const npcs = NPC_CHARACTERS.map(npc => ({
-      name: npc.name,
-      title: npc.title,
-      xp: npc.baseXP,
-      avatar: undefined,
-      avatarColor: npc.avatarColor,
-      isUser: false,
-      isNPC: true
-    }));
+      if (userProfile && !entries.some((entry) => entry.userId === userProfile.user_id)) {
+        entries.push({
+          userId: userProfile.user_id,
+          name: userProfile.username || 'You',
+          title: 'Nuclear Learner',
+          xp: userProfile.total_xp || 0,
+          avatar: 'profile',
+          avatarColor: undefined,
+          isUser: true,
+          isNPC: false,
+        });
+      }
 
-    // Combine user with NPCs
-    const allCharacters = [userData, ...npcs];
-    
-    // Sort by XP descending
-    const sorted = allCharacters.sort((a, b) => b.xp - a.xp);
-    
-    // Add ranks
-    return sorted.map((char, index) => ({
-      ...char,
-      rank: index + 1
-    }));
-  }, [userProfile]);
+      let entriesWithFallback = entries;
+      if (entriesWithFallback.length < 3) {
+        const needed = 3 - entriesWithFallback.length;
+        const fallback = NPC_CHARACTERS.slice(0, needed).map(
+          (npc): LeaderboardEntry => ({
+            name: npc.name,
+            title: npc.title,
+            xp: npc.baseXP,
+            avatarColor: npc.avatarColor,
+            isNPC: true,
+          })
+        );
+        entriesWithFallback = [...entriesWithFallback, ...fallback];
+      }
+
+      return entriesWithFallback
+        .sort((a, b) => (b.xp ?? 0) - (a.xp ?? 0))
+        .map((entry, index) => ({ ...entry, rank: index + 1 }));
+    },
+    [userProfile]
+  );
+
+  const loadLeaderboard = useCallback(async () => {
+    if (!isSupabaseConfigured()) {
+      setLeaderboardData(buildLeaderboard([]));
+      setError(null);
+      setLoading(false);
+      setRefreshing(false);
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const { data, error: supabaseError } = await supabase
+        .from('users')
+        .select('user_id, username, avatar_url, total_xp, current_streak, is_npc')
+        .order('total_xp', { ascending: false })
+        .limit(100);
+
+      if (supabaseError) throw supabaseError;
+
+      setLeaderboardData(buildLeaderboard(data || []));
+      setError(null);
+    } catch (err) {
+      console.error('Error loading leaderboard:', err);
+      setError('Could not load leaderboard. Showing defaults.');
+      setLeaderboardData(buildLeaderboard([]));
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  }, [buildLeaderboard]);
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    loadLeaderboard();
+  }, [loadLeaderboard]);
+
+  useEffect(() => {
+    setLeaderboardData(buildLeaderboard([]));
+    loadLeaderboard();
+  }, [buildLeaderboard, loadLeaderboard]);
 
   const topThree = leaderboardData.slice(0, 3);
   const restList = leaderboardData.slice(3);
   const userRank = leaderboardData.find(item => item.isUser);
   const insets = useSafeAreaInsets();
+
+  if (leaderboardData.length < 3) {
+    return (
+      <View style={[styles.container, { alignItems: 'center', justifyContent: 'center' }]}>
+        <Text style={{ color: THEME.textMuted }}>
+          {loading ? 'Loading leaderboard...' : 'Preparing leaderboard...'}
+        </Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -212,7 +314,19 @@ export default function LeaderboardScreen() {
         style={{ flex: 1 }}
         contentContainerStyle={[styles.scrollContent, { paddingBottom: 120 + insets.bottom }]} 
         showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor={THEME.primary}
+          />
+        }
       >
+        {error && (
+          <View style={{ paddingHorizontal: 20, marginBottom: 12 }}>
+            <Text style={{ color: THEME.textMuted }}>{error}</Text>
+          </View>
+        )}
         <View style={styles.listContainer}>
           {restList.map((user, index) => (
             <Animated.View 
@@ -228,10 +342,10 @@ export default function LeaderboardScreen() {
               <View style={styles.listAvatarWrapper}>
                 {user.isUser ? (
                   <Image source={require('@/assets/images/mascot/profile.png')} style={styles.listAvatar} resizeMode="contain" />
+                ) : user.avatar ? (
+                  <Image source={{ uri: user.avatar }} style={styles.listAvatar} resizeMode="cover" />
                 ) : (
-                  <View style={[styles.listAvatar, { backgroundColor: user.avatarColor || '#E5E7EB', borderRadius: 20, alignItems: 'center', justifyContent: 'center' }]}>
-                    <Icon name="Profile" size={24} color="#FFF" variant="Bold" />
-                  </View>
+                  <Image source={require('@/assets/images/mascot/profile.png')} style={styles.listAvatar} resizeMode="contain" />
                 )}
                 {user.isNPC && (
                   <View style={styles.npcBadge}>

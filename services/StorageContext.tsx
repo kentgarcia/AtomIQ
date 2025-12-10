@@ -1,5 +1,6 @@
 import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 import { createOrUpdateUserProfile, getUserProfile, initDatabase } from './database';
+import { syncProfileToSupabase } from './profile-sync';
 import { getOnboardingCompleted, setLastActiveDate } from './storage';
 import { checkDailyStreak } from './utils';
 
@@ -24,6 +25,8 @@ interface StorageContextType {
   addXP: (amount: number) => Promise<void>;
   incrementStreak: () => Promise<void>;
   onboardingCompleted: boolean;
+  syncProfileToSupabase: () => Promise<boolean>;
+  isOnline: boolean;
 }
 
 const StorageContext = createContext<StorageContextType | undefined>(undefined);
@@ -34,6 +37,7 @@ export const StorageProvider = ({ children }: { children: ReactNode }) => {
   const [isDatabaseReady, setIsDatabaseReady] = useState(false);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [onboardingCompleted, setOnboardingCompletedState] = useState(false);
+  const [isOnline, setIsOnline] = useState(true);
 
   useEffect(() => {
     initializeStorage();
@@ -119,6 +123,30 @@ export const StorageProvider = ({ children }: { children: ReactNode }) => {
     });
   };
 
+  const syncProfileToSupabaseLocal = async (): Promise<boolean> => {
+    if (!userProfile || !isOnline) {
+      console.log('Offline or no profile to sync');
+      return false;
+    }
+
+    try {
+      const success = await syncProfileToSupabase({
+        user_id: userProfile.user_id,
+        username: userProfile.username,
+        avatar_url: userProfile.avatar_url,
+        total_xp: userProfile.total_xp,
+        current_streak: userProfile.current_streak,
+        longest_streak: userProfile.longest_streak,
+        myths_busted: userProfile.myths_busted,
+        lessons_completed: userProfile.lessons_completed,
+      });
+      return success;
+    } catch (error) {
+      console.error('Error syncing profile:', error);
+      return false;
+    }
+  };
+
   return (
     <StorageContext.Provider
       value={{
@@ -130,6 +158,8 @@ export const StorageProvider = ({ children }: { children: ReactNode }) => {
         addXP,
         incrementStreak,
         onboardingCompleted,
+        syncProfileToSupabase: syncProfileToSupabaseLocal,
+        isOnline,
       }}
     >
       {children}

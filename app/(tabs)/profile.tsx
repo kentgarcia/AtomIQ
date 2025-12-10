@@ -1,9 +1,11 @@
 import { Icon } from '@/components/ui/icon';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import useFriendsSync from '@/hooks/use-friends-sync';
+import { syncProfileToSupabase } from '@/services/profile-sync';
 import { useStorage } from '@/services/StorageContext';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   Alert,
   Dimensions,
@@ -53,15 +55,36 @@ const GRADIENTS = {
 
 export default function ProfileScreen() {
   const router = useRouter();
-  const { userProfile } = useStorage();
+  const { userProfile, isOnline } = useStorage();
+  const {
+    friends,
+    friendRequests,
+    searchResults,
+    isLoading,
+    handleSearchUsers,
+    handleSendFriendRequest,
+    loadFriends,
+    loadFriendRequests,
+    handleAcceptFriendRequest,
+  } = useFriendsSync();
   const colorScheme = useColorScheme();
   const THEME = colorScheme === 'dark' ? DarkTHEME : LightTHEME;
   const styles = useMemo(() => createStyles(THEME), [THEME]);
   
   const [searchModalVisible, setSearchModalVisible] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [searchResults, setSearchResults] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState('overview');
+  const [isSyncing, setIsSyncing] = useState(false);
+
+  // Load data per tab when online
+  useEffect(() => {
+    if (!isOnline) return;
+    if (activeTab === 'friends') {
+      loadFriends();
+    } else if (activeTab === 'requests') {
+      loadFriendRequests();
+    }
+  }, [activeTab, isOnline, loadFriends, loadFriendRequests]);
 
   // Calculate user level
   const userLevel = useMemo(() => {
@@ -100,20 +123,57 @@ export default function ProfileScreen() {
   const levelProgress = Math.min((userProfile?.total_xp || 0) % 100 / 100, 1);
 
   const handleSearchFriends = () => {
+    if (!isOnline) {
+      Alert.alert('Offline', 'You need to be online to search for friends');
+      return;
+    }
     setSearchModalVisible(true);
   };
 
-  const handleSearch = () => {
-    if (!searchQuery.trim()) {
-      Alert.alert('Empty Search', 'Please enter a username to search');
-      return;
-    }
-    Alert.alert('Coming Soon', 'Friend search will be connected to Supabase');
-    setSearchResults([]);
+  const handleSearch = async () => {
+    await handleSearchUsers(searchQuery);
+    setSearchQuery('');
   };
 
-  const handleAddFriend = (userId: string) => {
-    Alert.alert('Friend Request Sent', 'Your friend request has been sent!');
+  const handleAddFriend = async (userId: string) => {
+    await handleSendFriendRequest(userId);
+  };
+
+  const handleSyncProfile = async () => {
+    if (!isOnline) {
+      Alert.alert('Offline', 'You need to be online to sync your profile');
+      return;
+    }
+
+    if (!userProfile) {
+      Alert.alert('Error', 'User profile not found');
+      return;
+    }
+
+    try {
+      setIsSyncing(true);
+      const success = await syncProfileToSupabase({
+        user_id: userProfile.user_id,
+        username: userProfile.username,
+        avatar_url: userProfile.avatar_url,
+        total_xp: userProfile.total_xp,
+        current_streak: userProfile.current_streak,
+        longest_streak: userProfile.longest_streak,
+        myths_busted: userProfile.myths_busted,
+        lessons_completed: userProfile.lessons_completed,
+      });
+
+      if (success) {
+        Alert.alert('Success', 'Profile synced to Supabase!');
+      } else {
+        Alert.alert('Error', 'Failed to sync profile');
+      }
+    } catch (error) {
+      console.error('Sync error:', error);
+      Alert.alert('Error', 'An error occurred while syncing');
+    } finally {
+      setIsSyncing(false);
+    }
   };
 
   if (!userProfile) {
@@ -131,6 +191,13 @@ export default function ProfileScreen() {
         {/* Header Section */}
         <View style={styles.header}>
           <View style={styles.headerTopRow}>
+            <TouchableOpacity 
+              style={[styles.iconButton, !isOnline && { opacity: 0.5 }]}
+              onPress={handleSyncProfile}
+              disabled={isSyncing || !isOnline}
+            >
+              <Icon name="Refresh" size={24} color={isSyncing ? THEME.primary : THEME.text} />
+            </TouchableOpacity>
             <TouchableOpacity 
               style={styles.iconButton}
               onPress={() => router.push('/settings')}
@@ -152,19 +219,25 @@ export default function ProfileScreen() {
             </View>
             <Text style={styles.name}>{userProfile.username}</Text>
             <Text style={styles.title}>{userTitle}</Text>
+            {isOnline && (
+              <Text style={styles.syncStatus}>🟢 Online & Synced</Text>
+            )}
+            {!isOnline && (
+              <Text style={styles.syncStatus}>🔴 Offline Mode</Text>
+            )}
           </View>
         </View>
 
         {/* Tabs */}
         <View style={styles.tabsContainer}>
-          {['overview', 'friends'].map((tab) => (
+          {['overview', 'friends', 'requests'].map((tab) => (
             <TouchableOpacity 
               key={tab}
               style={[styles.tab, activeTab === tab && styles.activeTab]} 
               onPress={() => setActiveTab(tab)}
             >
               <Text style={[styles.tabText, activeTab === tab && styles.activeTabText]}>
-                {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                {tab === 'requests' ? `Requests (${friendRequests.length})` : tab.charAt(0).toUpperCase() + tab.slice(1)}
               </Text>
             </TouchableOpacity>
           ))}
@@ -224,6 +297,18 @@ export default function ProfileScreen() {
 
           {activeTab === 'friends' && (
             <Animated.View entering={FadeInDown.duration(400)}>
+              <View style={styles.requestHeader}>
+                <Text style={styles.sectionTitle}>Friends</Text>
+                <TouchableOpacity
+                  style={[styles.refreshButton, isLoading && { opacity: 0.6 }]}
+                  onPress={loadFriends}
+                  disabled={isLoading}
+                >
+                  <Icon name="Refresh" size={18} color={THEME.primary} />
+                  <Text style={styles.refreshButtonText}>{isLoading ? 'Refreshing...' : 'Refresh'}</Text>
+                </TouchableOpacity>
+              </View>
+
               <TouchableOpacity style={styles.addFriendButton} onPress={handleSearchFriends}>
                 <LinearGradient
                   colors={GRADIENTS.purple}
@@ -234,11 +319,90 @@ export default function ProfileScreen() {
                 </LinearGradient>
               </TouchableOpacity>
               
-              <View style={styles.emptyStateContainer}>
-                 <Icon name="Profile2User" size={64} color={THEME.textMuted} variant="Bulk" />
-                 <Text style={styles.emptyStateTitle}>No Friends Yet</Text>
-                 <Text style={styles.emptyStateDesc}>Connect with other learners to compete and share progress.</Text>
-               </View>
+              {friends.length === 0 ? (
+                <View style={styles.emptyStateContainer}>
+                  <Icon name="Profile2User" size={64} color={THEME.textMuted} variant="Bulk" />
+                  <Text style={styles.emptyStateTitle}>No Friends Yet</Text>
+                  <Text style={styles.emptyStateDesc}>Connect with other learners to compete and share progress.</Text>
+                </View>
+              ) : (
+                <ScrollView showsVerticalScrollIndicator={false} style={{ marginTop: 20 }}>
+                  {friends.map((friend) => (
+                    <View key={friend.friend_id} style={styles.friendCard}>
+                      <View style={styles.friendAvatar}>
+                        <Icon name="Profile" size={24} color={THEME.primary} variant="Bold" />
+                      </View>
+                      <View style={styles.friendInfo}>
+                        <Text style={styles.friendName}>{friend.username}</Text>
+                        <Text style={styles.friendStats}>{friend.total_xp} XP • Streak: {friend.current_streak}</Text>
+                      </View>
+                    </View>
+                  ))}
+                </ScrollView>
+              )}
+            </Animated.View>
+          )}
+
+          {activeTab === 'requests' && (
+            <Animated.View entering={FadeInDown.duration(400)}>
+              <View style={styles.requestHeader}>
+                <Text style={styles.sectionTitle}>Friend Requests</Text>
+                <TouchableOpacity
+                  style={[styles.refreshButton, isLoading && { opacity: 0.6 }]}
+                  onPress={loadFriendRequests}
+                  disabled={isLoading}
+                >
+                  <Icon name="Refresh" size={18} color={THEME.primary} />
+                  <Text style={styles.refreshButtonText}>{isLoading ? 'Refreshing...' : 'Refresh'}</Text>
+                </TouchableOpacity>
+              </View>
+
+              {friendRequests.length === 0 ? (
+                <View style={styles.emptyStateContainer}>
+                  <Icon name="Profile2User" size={64} color={THEME.textMuted} variant="Bulk" />
+                  <Text style={styles.emptyStateTitle}>No Requests</Text>
+                  <Text style={styles.emptyStateDesc}>When someone sends you a friend request, it will appear here.</Text>
+                </View>
+              ) : (
+                <ScrollView showsVerticalScrollIndicator={false} style={{ marginTop: 20 }}>
+                  {friendRequests.map((request) => (
+                    <View key={request.id} style={styles.requestCard}>
+                      <View style={styles.requestContent}>
+                        <View style={styles.friendAvatar}>
+                          <Icon name="Profile" size={24} color={THEME.primary} variant="Bold" />
+                        </View>
+                        <View style={styles.friendInfo}>
+                          <Text style={styles.friendName}>{request.from_username}</Text>
+                          <Text style={styles.friendStats}>Wants to be friends</Text>
+                        </View>
+                      </View>
+                      <View style={styles.requestActions}>
+                        <TouchableOpacity 
+                          style={styles.acceptButton}
+                          onPress={() => handleAcceptFriendRequest(
+                            request.id,
+                            request.from_user_id,
+                            request.from_username,
+                            request.from_avatar_url,
+                            0,
+                            0
+                          )}
+                          disabled={isLoading}
+                        >
+                          <Icon name="TickCircle" size={20} color="#FFF" variant="Bold" />
+                        </TouchableOpacity>
+                        <TouchableOpacity 
+                          style={styles.rejectButton}
+                          onPress={() => Alert.alert('Reject', 'This feature coming soon')}
+                          disabled={isLoading}
+                        >
+                          <Icon name="Close" size={20} color={THEME.text} variant="Bold" />
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+                  ))}
+                </ScrollView>
+              )}
             </Animated.View>
           )}
         </View>
@@ -274,9 +438,14 @@ export default function ProfileScreen() {
                 value={searchQuery}
                 onChangeText={setSearchQuery}
                 autoFocus
+                editable={!isLoading}
               />
-              <TouchableOpacity onPress={handleSearch} style={styles.searchButton}>
-                <Text style={styles.searchButtonText}>Search</Text>
+              <TouchableOpacity 
+                onPress={handleSearch} 
+                style={[styles.searchButton, isLoading && { opacity: 0.6 }]}
+                disabled={isLoading}
+              >
+                <Text style={styles.searchButtonText}>{isLoading ? 'Searching...' : 'Search'}</Text>
               </TouchableOpacity>
             </View>
 
@@ -285,7 +454,11 @@ export default function ProfileScreen() {
               showsVerticalScrollIndicator={false}
               keyboardShouldPersistTaps="handled"
             >
-              {searchResults.length === 0 ? (
+              {isLoading ? (
+                <View style={styles.modalEmptyState}>
+                  <Text style={styles.modalEmptyText}>Searching users...</Text>
+                </View>
+              ) : searchResults.length === 0 ? (
                 <View style={styles.modalEmptyState}>
                   <Icon name="Profile2User" size={48} color={THEME.textMuted} variant="Bulk" />
                   <Text style={styles.modalEmptyText}>
@@ -297,16 +470,24 @@ export default function ProfileScreen() {
                   <View key={index} style={styles.searchResultItem}>
                     <View style={styles.searchResultAvatar}>
                       <Icon name="Profile" size={24} color={THEME.primary} variant="Bold" />
+                      {user.is_npc && (
+                        <View style={styles.npcBadge}>
+                          <Icon name="Star" size={12} color="#FFF" variant="Bold" />
+                        </View>
+                      )}
                     </View>
                     <View style={styles.searchResultInfo}>
-                      <Text style={styles.searchResultName}>{user.username}</Text>
-                      <Text style={styles.searchResultStats}>{user.xp} XP • Level {user.level}</Text>
+                      <View style={styles.usernameBadgeRow}>
+                        <Text style={styles.searchResultName}>{user.username}</Text>
+                        {user.is_npc && <Text style={styles.npcLabel}>NPC</Text>}
+                      </View>
+                      <Text style={styles.searchResultStats}>{user.total_xp} XP • Streak: {user.current_streak}</Text>
                     </View>
                     <TouchableOpacity 
                       style={styles.addButton}
-                      onPress={() => handleAddFriend(user.id)}
+                      onPress={() => handleAddFriend(user.user_id)}
                     >
-                      <Icon name="AddUser" size={18} color="#FFF" variant="Bold" />
+                      <Icon name="Add" size={18} color="#FFF" variant="Bold" />
                     </TouchableOpacity>
                   </View>
                 ))
@@ -337,6 +518,8 @@ const createStyles = (theme: typeof LightTHEME) => StyleSheet.create({
     width: '100%',
     flexDirection: 'row',
     justifyContent: 'flex-end',
+    alignItems: 'center',
+    gap: 12,
     paddingHorizontal: 20,
     position: 'absolute',
     top: 60,
@@ -392,6 +575,12 @@ const createStyles = (theme: typeof LightTHEME) => StyleSheet.create({
     fontSize: 14,
     color: theme.textMuted,
     fontWeight: '600',
+  },
+  syncStatus: {
+    fontSize: 12,
+    color: theme.textMuted,
+    fontWeight: '600',
+    marginTop: 4,
   },
   tabsContainer: {
     flexDirection: 'row',
@@ -638,6 +827,33 @@ const createStyles = (theme: typeof LightTHEME) => StyleSheet.create({
     color: theme.textMuted,
     fontWeight: '600',
   },
+  npcBadge: {
+    position: 'absolute',
+    bottom: 0,
+    right: 0,
+    backgroundColor: '#FFD66E',
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: theme.card,
+  },
+  usernameBadgeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  npcLabel: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#FFD66E',
+    backgroundColor: 'rgba(255, 214, 110, 0.1)',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+  },
   addButton: {
     backgroundColor: theme.primary,
     width: 36,
@@ -716,6 +932,111 @@ const createStyles = (theme: typeof LightTHEME) => StyleSheet.create({
     shadowRadius: 6,
     elevation: 2,
   },
+  friendCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: theme.card,
+    borderRadius: 16,
+    padding: 14,
+    marginBottom: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 6,
+    elevation: 2,
+  },
+  friendAvatar: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: 'rgba(94,114,228,0.1)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+  },
+  friendInfo: {
+    flex: 1,
+  },
+  friendName: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: theme.text,
+    marginBottom: 2,
+  },
+  friendStats: {
+    fontSize: 12,
+    color: theme.textMuted,
+    fontWeight: '500',
+  },
+  requestHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: 4,
+    marginBottom: 12,
+  },
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: theme.text,
+  },
+  refreshButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 12,
+    backgroundColor: theme.card,
+    borderWidth: 1,
+    borderColor: theme.border,
+  },
+  refreshButtonText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: theme.primary,
+  },
+  requestCard: {
+    backgroundColor: theme.card,
+    borderRadius: 16,
+    padding: 14,
+    marginBottom: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 6,
+    elevation: 2,
+  },
+  requestContent: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  requestActions: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  acceptButton: {
+    backgroundColor: '#4FD1C5',
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  rejectButton: {
+    backgroundColor: theme.border,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
 });
+
+
 
 
