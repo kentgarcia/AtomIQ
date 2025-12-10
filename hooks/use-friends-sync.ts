@@ -146,7 +146,7 @@ export const useFriendsSync = () => {
    * Accept a friend request
    */
   const handleAcceptFriendRequest = useCallback(
-    async (requestId: string, fromUserId: string, fromUsername: string, fromAvatarUrl: string, fromXp: number, fromStreak: number) => {
+    async (requestId: string, fromUserId: string, fromUsername: string, fromAvatarUrl: string | null, fromXp: number, fromStreak: number) => {
       if (!userProfile || !isOnline) {
         Alert.alert('Offline', 'Action requires internet connection');
         return;

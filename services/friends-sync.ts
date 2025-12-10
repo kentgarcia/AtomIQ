@@ -59,7 +59,7 @@ export const sendFriendRequest = async (
   fromUserId: string,
   toUserId: string,
   fromUsername: string,
-  fromAvatarUrl: string
+  fromAvatarUrl: string | null
 ): Promise<boolean> => {
   if (!isSupabaseConfigured()) {
     console.warn('Supabase not configured, friend request unavailable');

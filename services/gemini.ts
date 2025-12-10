@@ -1,9 +1,16 @@
 import Constants from 'expo-constants';
 
-// Gemini API Configuration
-const GEMINI_API_KEY = Constants.expoConfig?.extra?.geminiApiKey || process.env.EXPO_PUBLIC_GEMINI_API_KEY;
+// Gemini API Configuration for Chat
+const GEMINI_API_KEYS = [
+  Constants.expoConfig?.extra?.geminiChatApiKey1 || process.env.EXPO_PUBLIC_GEMINI_CHAT_API_KEY_1,
+  Constants.expoConfig?.extra?.geminiChatApiKey2 || process.env.EXPO_PUBLIC_GEMINI_CHAT_API_KEY_2,
+].filter(Boolean); // Remove undefined keys
+
 const GEMINI_MODEL = 'gemini-2.5-flash-lite';
 const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
+
+// Track current API key index
+let currentChatKeyIndex = 0;
 
 export interface GeminiMessage {
   role: 'user' | 'model';
@@ -151,107 +158,132 @@ function parseGeminiResponse(text: string, userQuestion: string): GeminiResponse
 }
 
 /**
- * Send message to Gemini API
+ * Send message to Gemini API with automatic key rotation on rate limit
  */
 export async function sendMessageToGemini(
   userMessage: string,
   conversationHistory: GeminiMessage[] = []
 ): Promise<GeminiResponse> {
-  if (!GEMINI_API_KEY) {
-    throw new Error('Gemini API key not configured. Please set EXPO_PUBLIC_GEMINI_API_KEY in your .env file');
+  if (!GEMINI_API_KEYS || GEMINI_API_KEYS.length === 0) {
+    throw new Error('Gemini API keys not configured. Please set EXPO_PUBLIC_GEMINI_CHAT_API_KEY_1 and EXPO_PUBLIC_GEMINI_CHAT_API_KEY_2 in your .env file');
   }
 
-  try {
-    // Build conversation context
-    const contents = [
-      {
-        role: 'user',
-        parts: [{ text: SYSTEM_PROMPT }]
-      },
-      {
-        role: 'model',
-        parts: [{ text: 'Understood. I am Schrödi, ready to assist with nuclear physics questions and debunk myths with scientific facts.' }]
-      },
-      ...conversationHistory,
-      {
-        role: 'user',
-        parts: [{ text: userMessage }]
-      }
-    ];
+  const maxRetries = GEMINI_API_KEYS.length;
+  let lastError: Error | null = null;
 
-    const response = await fetch(
-      `${GEMINI_API_URL}?key=${GEMINI_API_KEY}`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+  for (let attempt = 0; attempt < maxRetries; attempt++) {
+    const apiKey = GEMINI_API_KEYS[currentChatKeyIndex];
+    
+    try {
+      // Build conversation context
+      const contents = [
+        {
+          role: 'user',
+          parts: [{ text: SYSTEM_PROMPT }]
         },
-        body: JSON.stringify({
-          contents: contents,
-          generationConfig: {
-            temperature: 0.7,
-            topK: 40,
-            topP: 0.95,
-            maxOutputTokens: 1024,
+        {
+          role: 'model',
+          parts: [{ text: 'Understood. I am Schrödi, ready to assist with nuclear physics questions and debunk myths with scientific facts.' }]
+        },
+        ...conversationHistory,
+        {
+          role: 'user',
+          parts: [{ text: userMessage }]
+        }
+      ];
+
+      const response = await fetch(
+        `${GEMINI_API_URL}?key=${apiKey}`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
           },
-          safetySettings: [
-            {
-              category: 'HARM_CATEGORY_HARASSMENT',
-              threshold: 'BLOCK_MEDIUM_AND_ABOVE'
+          body: JSON.stringify({
+            contents: contents,
+            generationConfig: {
+              temperature: 0.7,
+              topK: 40,
+              topP: 0.95,
+              maxOutputTokens: 1024,
             },
-            {
-              category: 'HARM_CATEGORY_HATE_SPEECH',
-              threshold: 'BLOCK_MEDIUM_AND_ABOVE'
-            },
-            {
-              category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT',
-              threshold: 'BLOCK_MEDIUM_AND_ABOVE'
-            },
-            {
-              category: 'HARM_CATEGORY_DANGEROUS_CONTENT',
-              threshold: 'BLOCK_MEDIUM_AND_ABOVE'
-            }
-          ]
-        })
-      }
-    );
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(
-        errorData.error?.message || 
-        `Gemini API error: ${response.status} ${response.statusText}`
+            safetySettings: [
+              {
+                category: 'HARM_CATEGORY_HARASSMENT',
+                threshold: 'BLOCK_MEDIUM_AND_ABOVE'
+              },
+              {
+                category: 'HARM_CATEGORY_HATE_SPEECH',
+                threshold: 'BLOCK_MEDIUM_AND_ABOVE'
+              },
+              {
+                category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT',
+                threshold: 'BLOCK_MEDIUM_AND_ABOVE'
+              },
+              {
+                category: 'HARM_CATEGORY_DANGEROUS_CONTENT',
+                threshold: 'BLOCK_MEDIUM_AND_ABOVE'
+              }
+            ]
+          })
+        }
       );
-    }
 
-    const data = await response.json();
-    
-    // Check for blocked content
-    if (data.candidates?.[0]?.finishReason === 'SAFETY') {
-      throw new Error('Response was blocked by safety filters. Please rephrase your question.');
-    }
-    
-    if (!data.candidates || !data.candidates[0]?.content?.parts?.[0]?.text) {
-      const errorMsg = data.error?.message || 'Invalid response format from Gemini API';
-      throw new Error(errorMsg);
-    }
-
-    const responseText = data.candidates[0].content.parts[0].text;
-    return parseGeminiResponse(responseText, userMessage);
-
-  } catch (error) {
-    console.error('Gemini API Error:', error);
-    
-    // Return a helpful error message
-    if (error instanceof Error) {
-      if (error.message.includes('API key')) {
-        throw new Error('Gemini API key not configured. Please add EXPO_PUBLIC_GEMINI_API_KEY to your .env file');
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        
+        // Check for rate limit errors
+        if (response.status === 429 || errorData.error?.message?.includes('quota') || errorData.error?.message?.includes('rate limit')) {
+          console.log(`Chat API key ${currentChatKeyIndex + 1} hit rate limit, switching to next key...`);
+          currentChatKeyIndex = (currentChatKeyIndex + 1) % GEMINI_API_KEYS.length;
+          lastError = new Error('Rate limit reached');
+          continue; // Try next key
+        }
+        
+        throw new Error(
+          errorData.error?.message || 
+          `Gemini API error: ${response.status} ${response.statusText}`
+        );
       }
-      throw error;
+
+      const data = await response.json();
+      
+      // Check for blocked content
+      if (data.candidates?.[0]?.finishReason === 'SAFETY') {
+        throw new Error('Response was blocked by safety filters. Please rephrase your question.');
+      }
+      
+      if (!data.candidates || !data.candidates[0]?.content?.parts?.[0]?.text) {
+        const errorMsg = data.error?.message || 'Invalid response format from Gemini API';
+        throw new Error(errorMsg);
+      }
+
+      const responseText = data.candidates[0].content.parts[0].text;
+      return parseGeminiResponse(responseText, userMessage);
+
+    } catch (error) {
+      // If it's a rate limit error, we already logged it and will retry
+      if (error instanceof Error && error.message === 'Rate limit reached') {
+        lastError = error;
+        continue;
+      }
+      
+      console.error('Gemini API Error:', error);
+      
+      // Return a helpful error message
+      if (error instanceof Error) {
+        if (error.message.includes('API key')) {
+          throw new Error('Gemini API key not configured. Please add EXPO_PUBLIC_GEMINI_CHAT_API_KEY_1 and EXPO_PUBLIC_GEMINI_CHAT_API_KEY_2 to your .env file');
+        }
+        throw error;
+      }
+      
+      throw new Error('Failed to communicate with Gemini API. Please check your internet connection.');
     }
-    
-    throw new Error('Failed to communicate with Gemini API. Please check your internet connection.');
   }
+  
+  // All keys failed
+  throw new Error('All Gemini chat API keys have reached their rate limit. Please try again later.');
 }
 
 /**
