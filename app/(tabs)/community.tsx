@@ -1,6 +1,9 @@
 import { Icon } from '@/components/ui/icon';
 import { getAllArticles, getAllPosts } from '@/content/articles';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { moderateComment, ModerationResult } from '@/services/comment-moderation';
+import { fetchComments, isOnline, postAIReply, postComment } from '@/services/comments-sync';
+import { useStorage } from '@/services/StorageContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Haptics from 'expo-haptics';
 import { useRouter } from 'expo-router';
@@ -75,6 +78,8 @@ interface Comment {
   text: string;
   author: string;
   timestamp: Date;
+  moderation?: ModerationResult;
+  isAIReply?: boolean;
 }
 
 const REACTIONS = [
@@ -205,8 +210,11 @@ const CommentPanel = ({
   postTitle,
   comments,
   onAddComment,
+  moderating,
   theme,
-  styles
+  styles,
+  cooldownRemaining,
+  loadingComments
 }: {
   visible: boolean;
   onClose: () => void;
@@ -214,8 +222,11 @@ const CommentPanel = ({
   postTitle: string;
   comments: Comment[];
   onAddComment: (postId: string, text: string) => void;
+  moderating: boolean;
   theme: typeof LightTHEME;
   styles: any;
+  cooldownRemaining: number;
+  loadingComments: boolean;
 }) => {
   const insets = useSafeAreaInsets();
   const [newComment, setNewComment] = useState('');
@@ -251,11 +262,10 @@ const CommentPanel = ({
   };
 
   const handleSubmit = () => {
-    if (newComment.trim()) {
+    if (newComment.trim() && !moderating) {
       onAddComment(postId, newComment.trim());
       setNewComment('');
       Keyboard.dismiss();
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     }
   };
 
@@ -362,31 +372,83 @@ const CommentPanel = ({
           keyExtractor={(item) => item.id}
           contentContainerStyle={styles.commentsList}
           ListEmptyComponent={
-            <View style={styles.emptyComments}>
-              <Icon name="Message" size={48} color="#CCC" />
-              <Text style={[styles.emptyText, { color: theme.text }]}>No comments yet</Text>
-              <Text style={styles.emptySubtext}>Be the first to comment!</Text>
-            </View>
+            loadingComments ? (
+              <View style={styles.emptyComments}>
+                <Image 
+                  source={require('@/assets/images/mascot/thinking.png')}
+                  style={styles.loadingMascot}
+                />
+                <Text style={[styles.emptyText, { color: theme.text }]}>Loading comments...</Text>
+              </View>
+            ) : (
+              <View style={styles.emptyComments}>
+                <Icon name="Message" size={48} color="#CCC" />
+                <Text style={[styles.emptyText, { color: theme.text }]}>No comments yet</Text>
+                <Text style={styles.emptySubtext}>Be the first to comment!</Text>
+              </View>
+            )
           }
-          renderItem={({ item, index }) => (
-            <Animated.View 
-              entering={FadeInUp.delay(index * 50)}
-              style={styles.commentItem}
-            >
-              <View style={styles.commentAvatar}>
-                <Icon name="Profile" size={18} color="#FFF" variant="Bold" />
-              </View>
-              <View style={styles.commentContent}>
-                <View style={[styles.commentBubble, { backgroundColor: theme.card }]}>
-                  <Text style={[styles.commentAuthor, { color: theme.text }]}>{item.author}</Text>
-                  <Text style={[styles.commentText, { color: theme.text }]}>{item.text}</Text>
+          renderItem={({ item, index }) => {
+            const isHidden = item.moderation?.status === 'hidden';
+            const isIncorrect = item.moderation?.status === 'incorrect';
+            const isAI = item.isAIReply;
+            
+            return (
+              <Animated.View 
+                entering={FadeInUp.delay(index * 50)}
+                style={styles.commentItem}
+              >
+                {isAI ? (
+                  <View style={styles.commentAvatarImage}>
+                    <Image 
+                      source={require('@/assets/images/mascot/explain.png')}
+                      style={styles.mascotAvatar}
+                    />
+                  </View>
+                ) : (
+                  <View style={[styles.commentAvatar, { backgroundColor: theme.primary }]}>
+                    <Icon name="Profile" size={18} color="#FFF" variant="Bold" />
+                  </View>
+                )}
+                <View style={styles.commentContent}>
+                  {isHidden ? (
+                    <View style={[styles.commentBubble, { backgroundColor: theme.card, borderWidth: 1, borderColor: '#FF9F65' }]}>
+                      <View style={styles.hiddenCommentHeader}>
+                        <Icon name="EyeSlash" size={16} color="#FF9F65" />
+                        <Text style={[styles.hiddenCommentTitle, { color: '#FF9F65' }]}>Comment Hidden</Text>
+                      </View>
+                      <Text style={[styles.hiddenCommentReason, { color: theme.textMuted }]}>
+                        {item.moderation?.reason || 'This comment was hidden by the moderator'}
+                      </Text>
+                    </View>
+                  ) : (
+                    <View style={[styles.commentBubble, { backgroundColor: isAI ? 'rgba(94, 114, 228, 0.1)' : theme.card }]}>
+                      <View style={styles.commentHeaderRow}>
+                        <Text style={[styles.commentAuthor, { color: isAI ? '#5E72E4' : theme.text }]}>
+                          {isAI ? 'Schrödi' : item.author}
+                        </Text>
+                        {isIncorrect && !isAI && (
+                          <View style={styles.factCheckBadge}>
+                            <Icon name="InfoCircle" size={12} color="#FF9F65" />
+                            <Text style={styles.factCheckText}>Fact-checked</Text>
+                          </View>
+                        )}
+                      </View>
+                      <Text style={[styles.commentText, { color: theme.text }]}>{item.text}</Text>
+                      {isAI && (
+                        <View style={styles.aiNotice}>
+                          <Text style={styles.aiNoticeText}>AI-generated correction</Text>
+                        </View>
+                      )}
+                    </View>
+                  )}
+                  <Text style={styles.commentTime}>
+                    {formatCommentTime(item.timestamp)}
+                  </Text>
                 </View>
-                <Text style={styles.commentTime}>
-                  {formatCommentTime(item.timestamp)}
-                </Text>
-              </View>
-            </Animated.View>
-          )}
+              </Animated.View>
+            );
+          }}
         />
 
         {/* Comment Input */}
@@ -395,6 +457,23 @@ const CommentPanel = ({
           keyboardVerticalOffset={0}
         >
           <View style={[styles.inputContainer, { backgroundColor: theme.bg, paddingBottom: Math.max(insets.bottom, 16) }]}>
+            {moderating && (
+              <View style={styles.moderatingIndicator}>
+                <Image 
+                  source={require('@/assets/images/mascot/thinking.png')}
+                  style={styles.moderatingMascot}
+                />
+                <Text style={styles.moderatingText}>Schrödi is reviewing your comment...</Text>
+              </View>
+            )}
+            {cooldownRemaining > 0 && (
+              <View style={styles.cooldownIndicator}>
+                <Icon name="Clock" size={16} color="#FF9F65" />
+                <Text style={styles.cooldownText}>
+                  Cooldown: {Math.floor(cooldownRemaining / 60000)}m {Math.floor((cooldownRemaining % 60000) / 1000)}s
+                </Text>
+              </View>
+            )}
             <View style={[styles.inputWrapper, { backgroundColor: theme.card }]}>
               <TextInput
                 style={[styles.input, { color: theme.text }]}
@@ -404,19 +483,20 @@ const CommentPanel = ({
                 onChangeText={setNewComment}
                 multiline
                 maxLength={500}
+                editable={!moderating && cooldownRemaining === 0}
               />
               <TouchableOpacity 
                 style={[
                   styles.sendButton,
-                  !newComment.trim() && styles.sendButtonDisabled
+                  (!newComment.trim() || moderating || cooldownRemaining > 0) && styles.sendButtonDisabled
                 ]}
                 onPress={handleSubmit}
-                disabled={!newComment.trim()}
+                disabled={!newComment.trim() || moderating || cooldownRemaining > 0}
               >
                 <Icon 
                   name="Send" 
                   size={20} 
-                  color={newComment.trim() ? '#FFF' : '#999'} 
+                  color={newComment.trim() && !moderating && cooldownRemaining === 0 ? '#FFF' : '#999'} 
                   variant="Bold"
                 />
               </TouchableOpacity>
@@ -750,6 +830,7 @@ export default function CommunityScreen() {
   const colorScheme = useColorScheme();
   const THEME = colorScheme === 'dark' ? DarkTHEME : LightTHEME;
   const styles = useMemo(() => createStyles(THEME), [THEME]);
+  const { userProfile } = useStorage();
   
   const [searchQuery, setSearchQuery] = useState('');
   const [bookmarkedIds, setBookmarkedIds] = useState<string[]>([]);
@@ -761,6 +842,10 @@ export default function CommunityScreen() {
   const [comments, setComments] = useState<Comment[]>([]);
   const [showCommentPanel, setShowCommentPanel] = useState(false);
   const [activeCommentPost, setActiveCommentPost] = useState<any>(null);
+  const [moderatingComment, setModeratingComment] = useState(false);
+  const [lastCommentTime, setLastCommentTime] = useState<number>(0);
+  const [cooldownRemaining, setCooldownRemaining] = useState<number>(0);
+  const [loadingComments, setLoadingComments] = useState(false);
   
   // Saved collection panel state
   const [showSavedPanel, setShowSavedPanel] = useState(false);
@@ -810,8 +895,37 @@ export default function CommunityScreen() {
   // Load bookmarks on mount
   useEffect(() => {
     loadBookmarks();
-    loadComments();
+    loadLastCommentTime();
   }, []);
+  
+  // Cooldown timer effect
+  useEffect(() => {
+    if (lastCommentTime > 0) {
+      const updateCooldown = () => {
+        const now = Date.now();
+        const elapsed = now - lastCommentTime;
+        const cooldownMs = 5 * 60 * 1000; // 5 minutes
+        const remaining = Math.max(0, cooldownMs - elapsed);
+        setCooldownRemaining(remaining);
+        
+        if (remaining > 0) {
+          setTimeout(updateCooldown, 1000);
+        }
+      };
+      updateCooldown();
+    }
+  }, [lastCommentTime]);
+  
+  const loadLastCommentTime = async () => {
+    try {
+      const saved = await AsyncStorage.getItem('last_comment_time');
+      if (saved) {
+        setLastCommentTime(parseInt(saved, 10));
+      }
+    } catch (error) {
+      console.error('Error loading last comment time:', error);
+    }
+  };
   
   const loadBookmarks = async () => {
     try {
@@ -824,39 +938,119 @@ export default function CommunityScreen() {
     }
   };
   
-  const loadComments = async () => {
+  const handleAddComment = useCallback(async (postId: string, text: string) => {
+    // Check if online
+    const online = await isOnline();
+    if (!online) {
+      Alert.alert(
+        'Offline',
+        'You must be online to post comments.',
+        [{ text: 'OK' }]
+      );
+      return;
+    }
+
+    // Check if user profile exists
+    if (!userProfile) {
+      Alert.alert('Error', 'User profile not found. Please restart the app.');
+      return;
+    }
+
+    // Check cooldown
+    const now = Date.now();
+    const cooldownMs = 5 * 60 * 1000; // 5 minutes
+    const timeSinceLastComment = now - lastCommentTime;
+    
+    if (lastCommentTime > 0 && timeSinceLastComment < cooldownMs) {
+      const remainingSeconds = Math.ceil((cooldownMs - timeSinceLastComment) / 1000);
+      const minutes = Math.floor(remainingSeconds / 60);
+      const seconds = remainingSeconds % 60;
+      
+      Alert.alert(
+        'Comment Cooldown',
+        `Please wait ${minutes}m ${seconds}s before commenting again.`,
+        [{ text: 'OK' }]
+      );
+      return;
+    }
+    
+    setModeratingComment(true);
+    
     try {
-      const saved = await AsyncStorage.getItem(COMMENTS_KEY);
-      if (saved) {
-        setComments(JSON.parse(saved));
+      // Get post context for moderation
+      const post = allFeedItems.find(item => item.id === postId);
+      const postContext = post ? `${post.title || 'Post'}: ${post.content?.substring(0, 200) || ''}` : 'Nuclear science discussion';
+      
+      console.log('[Community] Starting comment moderation...');
+      console.log('[Community] Comment text:', text);
+      console.log('[Community] Post context:', postContext);
+      
+      // Moderate the comment with AI
+      const moderationResult = await moderateComment(text, postContext);
+      
+      console.log('[Community] Moderation result:', moderationResult);
+      
+      // Post comment to Supabase
+      const postedComment = await postComment(
+        postId,
+        userProfile.user_id,
+        userProfile.username || 'Anonymous',
+        userProfile.avatar_url || null,
+        text,
+        moderationResult
+      );
+
+      if (postedComment) {
+        // If comment is incorrect, post AI correction reply
+        if (moderationResult.status === 'incorrect' && moderationResult.correction) {
+          console.log('[Community] Posting AI correction reply to Supabase');
+          await postAIReply(postId, moderationResult.correction);
+        }
+
+        // Reload all comments from Supabase to get the latest state including AI replies
+        const updatedComments = await fetchComments(postId);
+        setComments(updatedComments);
+      }
+      
+      // Update last comment time and save it
+      setLastCommentTime(now);
+      await AsyncStorage.setItem('last_comment_time', now.toString());
+      
+      // Show feedback based on moderation
+      if (moderationResult.status === 'hidden') {
+        Alert.alert(
+          'Comment Hidden',
+          `Your comment was hidden: ${moderationResult.reason}`,
+          [{ text: 'OK' }]
+        );
+      } else if (moderationResult.status === 'incorrect') {
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+      } else {
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       }
     } catch (error) {
-      console.error('Error loading comments:', error);
-    }
-  };
-  
-  const handleAddComment = useCallback(async (postId: string, text: string) => {
-    const newComment: Comment = {
-      id: `comment-${Date.now()}`,
-      postId,
-      text,
-      author: 'You',
-      timestamp: new Date(),
-    };
-    
-    const updatedComments = [...comments, newComment];
-    setComments(updatedComments);
-    
-    try {
-      await AsyncStorage.setItem(COMMENTS_KEY, JSON.stringify(updatedComments));
-    } catch (error) {
       console.error('Error saving comment:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Failed to post comment. Please try again.';
+      Alert.alert('Error', errorMessage);
+    } finally {
+      setModeratingComment(false);
     }
-  }, [comments]);
+  }, [allFeedItems, lastCommentTime, userProfile]);
   
-  const openCommentPanel = useCallback((item: any) => {
+  const openCommentPanel = useCallback(async (item: any) => {
     setActiveCommentPost(item);
     setShowCommentPanel(true);
+    setLoadingComments(true);
+
+    try {
+      // Load comments from Supabase only when opening panel
+      const fetchedComments = await fetchComments(item.id);
+      setComments(fetchedComments);
+    } catch (error) {
+      console.error('Error loading comments:', error);
+    } finally {
+      setLoadingComments(false);
+    }
   }, []);
   
   const handleShare = useCallback(async (item: any) => {
@@ -1320,13 +1514,17 @@ export default function CommunityScreen() {
         onClose={() => {
           setShowCommentPanel(false);
           setActiveCommentPost(null);
+          setComments([]); // Clear comments when closing
         }}
         postId={activeCommentPost?.id || ''}
         postTitle={activeCommentPost?.title || 'Post'}
         comments={comments}
         onAddComment={handleAddComment}
+        moderating={moderatingComment}
         theme={THEME}
         styles={styles}
+        cooldownRemaining={cooldownRemaining}
+        loadingComments={loadingComments}
       />
       
       {/* Saved Panel Modal */}
@@ -1826,6 +2024,12 @@ const createStyles = (theme: typeof LightTHEME) => StyleSheet.create({
     justifyContent: 'center',
     paddingVertical: 60,
   },
+  loadingMascot: {
+    width: 80,
+    height: 80,
+    resizeMode: 'contain',
+    marginBottom: 12,
+  },
   commentItem: {
     flexDirection: 'row',
     marginBottom: 16,
@@ -1839,6 +2043,21 @@ const createStyles = (theme: typeof LightTHEME) => StyleSheet.create({
     justifyContent: 'center',
     marginRight: 10,
   },
+  commentAvatarImage: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    marginRight: 10,
+    overflow: 'hidden',
+    backgroundColor: 'rgba(94, 114, 228, 0.1)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  mascotAvatar: {
+    width: 40,
+    height: 40,
+    resizeMode: 'contain',
+  },
   commentContent: {
     flex: 1,
   },
@@ -1851,6 +2070,87 @@ const createStyles = (theme: typeof LightTHEME) => StyleSheet.create({
     fontSize: 14,
     fontWeight: '700',
     marginBottom: 2,
+  },
+  commentHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 4,
+  },
+  factCheckBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 159, 101, 0.1)',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 8,
+    gap: 4,
+  },
+  factCheckText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#FF9F65',
+    textTransform: 'uppercase',
+  },
+  hiddenCommentHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginBottom: 6,
+  },
+  hiddenCommentTitle: {
+    fontSize: 13,
+    fontWeight: '700',
+  },
+  hiddenCommentReason: {
+    fontSize: 13,
+    lineHeight: 18,
+    fontStyle: 'italic',
+  },
+  aiNotice: {
+    marginTop: 8,
+    paddingTop: 8,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(94, 114, 228, 0.2)',
+  },
+  aiNoticeText: {
+    fontSize: 11,
+    color: '#5E72E4',
+    fontWeight: '600',
+    fontStyle: 'italic',
+  },
+  moderatingIndicator: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 8,
+    gap: 8,
+  },
+  moderatingMascot: {
+    width: 24,
+    height: 24,
+    resizeMode: 'contain',
+  },
+  moderatingText: {
+    fontSize: 13,
+    color: '#5E72E4',
+    fontWeight: '600',
+  },
+  cooldownIndicator: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 8,
+    gap: 8,
+    backgroundColor: '#FFF5ED',
+    borderRadius: 8,
+    marginHorizontal: 16,
+    marginBottom: 8,
+  },
+  cooldownText: {
+    fontSize: 13,
+    color: '#FF9F65',
+    fontWeight: '600',
   },
   commentText: {
     fontSize: 15,

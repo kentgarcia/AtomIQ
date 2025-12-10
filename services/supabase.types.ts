@@ -14,6 +14,51 @@ export type Database = {
   }
   public: {
     Tables: {
+      comments: {
+        Row: {
+          avatar_url: string | null
+          created_at: string | null
+          id: string
+          is_ai_reply: boolean | null
+          moderation_correction: string | null
+          moderation_reason: string | null
+          moderation_status: string | null
+          post_id: string
+          text: string
+          updated_at: string | null
+          user_id: string
+          username: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string | null
+          id?: string
+          is_ai_reply?: boolean | null
+          moderation_correction?: string | null
+          moderation_reason?: string | null
+          moderation_status?: string | null
+          post_id: string
+          text: string
+          updated_at?: string | null
+          user_id: string
+          username: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string | null
+          id?: string
+          is_ai_reply?: boolean | null
+          moderation_correction?: string | null
+          moderation_reason?: string | null
+          moderation_status?: string | null
+          post_id?: string
+          text?: string
+          updated_at?: string | null
+          user_id?: string
+          username?: string
+        }
+        Relationships: []
+      }
       feed_comments: {
         Row: {
           avatar_url: string | null

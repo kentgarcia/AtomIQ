@@ -299,7 +299,7 @@ export default function SettingsScreen() {
         </Animated.View>
 
         {/* Danger Zone */}
-        <Animated.View entering={FadeInDown.delay(400).springify()}>
+        {/* <Animated.View entering={FadeInDown.delay(400).springify()}>
           <Text style={styles.sectionTitle}>Danger Zone</Text>
           <View style={styles.settingsCard}>
             <TouchableOpacity style={styles.settingRow} onPress={handleClearProgress}>
@@ -321,7 +321,7 @@ export default function SettingsScreen() {
               <Icon name="ArrowRight2" size={18} color={THEME.textMuted} />
             </TouchableOpacity>
           </View>
-        </Animated.View>
+        </Animated.View> */}
 
         <View style={{ height: 100 }} />
       </ScrollView>
