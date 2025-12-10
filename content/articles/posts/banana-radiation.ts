@@ -1,21 +1,23 @@
 import { Post } from '../types';
 
-const bananaRadiation: Post = {
-  id: 'banana-radiation',
-  type: 'did-you-know',
-  category: 'science',
-  title: 'Did you know? Bananas are radioactive',
-  content: 'Bananas contain potassium-40, a naturally radioactive isotope. Eating one banana exposes you to 0.0001 mSv of radiation - about the same as living near a nuclear plant for a year. You\'d need to eat 20,000 bananas at once to approach dangerous levels!',
+const nuclearAgriculture: Post = {
+  id: 'nuclear-agriculture',
+  type: 'article',
+  category: 'technology',
+  title: 'Benefits of nuclear science IN Food and agriculture',
+  content: 'Nuclear techniques are used in farming and agricultural communities to combat disease and provide other benefits. The process of treating food with radiant energy isn\'t new; the sun\'s energy, for example, has been used for centuries to preserve meat, fruits, vegetables, and fish.\n\nANSTO researchers are investigating the impact of processes such as heating, mixing, and fermenting on the molecular structure of various foods. Another research project uses radiotracers to investigate a new class of micro- and nano-scale zinc fertilisers for broadacre crops, such as wheat.',
   author: {
-    name: 'Science Facts',
-    avatar: 'https://images.pexels.com/photos/1181695/pexels-photo-1181695.jpeg'
+    name: 'ANSTO',
+    title: 'Australian Nuclear Science & Technology Organisation',
+    avatar: '@/assets/nuclear/author/ANSTO.webp'
   },
-  publishedDate: '2024-11-24',
-  image: 'https://images.pexels.com/photos/1300975/pexels-photo-1300975.jpeg',
-  tags: ['radiation', 'food', 'science', 'fun-facts'],
-  source: 'Health Physics Society',
+  publishedDate: '2024-12-09',
+  image: '@/assets/nuclear/feed-1.webp',
+  tags: ['agriculture', 'food-safety', 'innovation', 'research'],
+  source: 'ANSTO',
+  sourceUrl: 'https://www.ansto.gov.au/education/nuclear-facts/benefits-of-nuclear-science',
   relatedContent: []
 };
 
-export default bananaRadiation;
+export default nuclearAgriculture;
 

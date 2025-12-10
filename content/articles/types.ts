@@ -41,18 +41,21 @@ export interface Article {
 
 export interface Post {
   id: string;
-  type: 'myth-debunk' | 'fact-highlight' | 'quick-tip' | 'did-you-know';
+  type: ArticleType | 'myth-debunk' | 'fact-highlight' | 'quick-tip' | 'did-you-know' | 'news';
   category: ArticleCategory;
   title: string;
   content: string;
   author: {
     name: string;
-    avatar: string;
+    avatar: string | any;
+    title?: string;
   };
   publishedDate: string;
-  image?: string;
+  image?: string | any;
   tags: string[];
   source?: string;
+  sourceUrl?: string;
+  videoUrl?: string;
   relatedContent?: string[]; // IDs of related articles/myths/facts
 }
 

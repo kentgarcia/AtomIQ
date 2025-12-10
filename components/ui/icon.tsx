@@ -12,6 +12,7 @@ const iconNameMap: Record<string, string> = {
   Infinite: 'Unlimited',
   Fire: 'Flashy',
   Book: 'Book1',
+  Trophy: 'MedalStar',
   Target: 'Target',
   Info: 'Information',
   TickSquare: 'TickSquare',

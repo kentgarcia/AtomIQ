@@ -11,6 +11,34 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const { width } = Dimensions.get('window');
 
+// Helper to get image source for local or remote images
+const getImageSource = (imagePath: string | number) => {
+  if (typeof imagePath === 'number') {
+    return imagePath; // Already a require() result
+  }
+  if (typeof imagePath === 'string' && imagePath.startsWith('@/assets/')) {
+    // Map local image paths to require statements (8 feed images + 4 author images)
+    const imageMap: Record<string, any> = {
+      // Feed images (matching available files)
+      '@/assets/nuclear/feed-1.webp': require('@/assets/nuclear/feed-1.webp'),
+      '@/assets/nuclear/feed-2.webp': require('@/assets/nuclear/feed-2.webp'),
+      '@/assets/nuclear/feed-3.webp': require('@/assets/nuclear/feed-3.webp'),
+      '@/assets/nuclear/feed-4.webp': require('@/assets/nuclear/feed-4.webp'),
+      '@/assets/nuclear/feed-5.webp': require('@/assets/nuclear/feed-5.webp'),
+      '@/assets/nuclear/feed-6.webp': require('@/assets/nuclear/feed-6.webp'),
+      '@/assets/nuclear/feed-9.webp': require('@/assets/nuclear/feed-9.webp'),
+      '@/assets/nuclear/feed-10.webp': require('@/assets/nuclear/feed-10.webp'),
+      // Author avatars
+      '@/assets/nuclear/author/ANSTO.webp': require('@/assets/nuclear/author/ANSTO.webp'),
+      '@/assets/nuclear/author/IAEA.webp': require('@/assets/nuclear/author/IAEA.webp'),
+      '@/assets/nuclear/author/NEA.webp': require('@/assets/nuclear/author/NEA.webp'),
+      '@/assets/nuclear/author/PNRI.webp': require('@/assets/nuclear/author/PNRI.webp'),
+    };
+    return imageMap[imagePath] || { uri: imagePath };
+  }
+  return { uri: imagePath };
+};
+
 const LightTHEME = {
   bg: '#F8F9FE',
   card: '#FFFFFF',
@@ -167,6 +195,7 @@ const ReactionButton = ({
 // Storage keys
 const BOOKMARKS_KEY = '@atomiq_bookmarks';
 const COMMENTS_KEY = '@atomiq_comments';
+const COMMENT_GUIDELINES_SEEN_KEY = '@atomiq_comment_guidelines_seen';
 
 // Comment Panel Component
 const CommentPanel = ({
@@ -190,7 +219,36 @@ const CommentPanel = ({
 }) => {
   const insets = useSafeAreaInsets();
   const [newComment, setNewComment] = useState('');
+  const [showGuidelines, setShowGuidelines] = useState(false);
   const postComments = comments.filter(c => c.postId === postId);
+
+  // Check if user has seen guidelines
+  useEffect(() => {
+    const checkGuidelines = async () => {
+      if (visible) {
+        try {
+          const seen = await AsyncStorage.getItem(COMMENT_GUIDELINES_SEEN_KEY);
+          if (!seen) {
+            setShowGuidelines(true);
+          }
+        } catch (error) {
+          console.error('Error checking guidelines:', error);
+        }
+      }
+    };
+    checkGuidelines();
+  }, [visible]);
+
+  const handleGuidelinesConfirm = async () => {
+    try {
+      await AsyncStorage.setItem(COMMENT_GUIDELINES_SEEN_KEY, 'true');
+      setShowGuidelines(false);
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    } catch (error) {
+      console.error('Error saving guidelines:', error);
+      setShowGuidelines(false);
+    }
+  };
 
   const handleSubmit = () => {
     if (newComment.trim()) {
@@ -233,6 +291,70 @@ const CommentPanel = ({
             {postTitle || 'Post'}
           </Text>
         </View>
+
+        {/* Comment Guidelines Modal */}
+        <Modal
+          visible={showGuidelines}
+          transparent
+          animationType="fade"
+          onRequestClose={() => setShowGuidelines(false)}
+        >
+          <View style={styles.guidelinesOverlay}>
+            <Animated.View 
+              entering={ZoomIn.springify()}
+              style={[styles.guidelinesModal, { backgroundColor: theme.card }]}
+            >
+              <View style={styles.guidelinesHeader}>
+                <Icon name="InfoCircle" size={48} color="#5E72E4" />
+                <Text style={[styles.guidelinesTitle, { color: theme.text }]}>Community Guidelines</Text>
+              </View>
+              
+              <ScrollView style={styles.guidelinesContent} showsVerticalScrollIndicator={false}>
+                <View style={styles.guidelineItem}>
+                  <Text style={styles.guidelineEmoji}>✅</Text>
+                  <Text style={[styles.guidelineText, { color: theme.text }]}>
+                    <Text style={styles.guidelineBold}>Be respectful</Text> - Treat others with kindness and respect
+                  </Text>
+                </View>
+                
+                <View style={styles.guidelineItem}>
+                  <Text style={styles.guidelineEmoji}>🧠</Text>
+                  <Text style={[styles.guidelineText, { color: theme.text }]}>
+                    <Text style={styles.guidelineBold}>Stay on topic</Text> - Keep discussions relevant to nuclear science
+                  </Text>
+                </View>
+                
+                <View style={styles.guidelineItem}>
+                  <Text style={styles.guidelineEmoji}>🔬</Text>
+                  <Text style={[styles.guidelineText, { color: theme.text }]}>
+                    <Text style={styles.guidelineBold}>Share knowledge</Text> - Contribute meaningful insights and ask questions
+                  </Text>
+                </View>
+                
+                <View style={styles.guidelineItem}>
+                  <Text style={styles.guidelineEmoji}>🚫</Text>
+                  <Text style={[styles.guidelineText, { color: theme.text }]}>
+                    <Text style={styles.guidelineBold}>No spam or harassment</Text> - Keep the community safe and welcoming
+                  </Text>
+                </View>
+                
+                <View style={styles.guidelineItem}>
+                  <Text style={styles.guidelineEmoji}>📚</Text>
+                  <Text style={[styles.guidelineText, { color: theme.text }]}>
+                    <Text style={styles.guidelineBold}>Cite sources</Text> - Back up claims with credible references when possible
+                  </Text>
+                </View>
+              </ScrollView>
+              
+              <TouchableOpacity 
+                style={styles.guidelinesButton}
+                onPress={handleGuidelinesConfirm}
+              >
+                <Text style={styles.guidelinesButtonText}>I Understand</Text>
+              </TouchableOpacity>
+            </Animated.View>
+          </View>
+        </Modal>
 
         {/* Comments List */}
         <FlatList
@@ -583,13 +705,15 @@ const generateFeedItems = () => {
   posts.forEach((post) => {
     feedItems.push({
       id: `post-${post.id}`,
-      type: 'post',
+      type: 'article',
       contentType: post.type,
       title: post.title,
       content: post.content,
       author: post.author,
       publishedDate: post.publishedDate,
       source: post.source,
+      sourceUrl: post.sourceUrl,
+      videoUrl: post.videoUrl,
       category: post.category,
       tags: post.tags,
       image: post.image,
@@ -896,7 +1020,7 @@ export default function CommunityScreen() {
         <View style={styles.postHeader}>
           <View style={styles.authorAvatar}>
             {item.author?.avatar ? (
-              <Image source={{ uri: item.author.avatar }} style={styles.avatarImage} />
+              <Image source={getImageSource(item.author.avatar)} style={styles.avatarImage} />
             ) : (
               <Icon name="Profile" size={24} color="#FFF" variant="Bold" />
             )}
@@ -1016,7 +1140,7 @@ export default function CommunityScreen() {
               onPress={() => item.type === 'article' && handleArticlePress(item)}
             >
               <Image 
-                source={{ uri: item.image }} 
+                source={getImageSource(item.image)}
                 style={styles.postImage}
                 resizeMode="cover"
               />
@@ -1174,6 +1298,19 @@ export default function CommunityScreen() {
             <Text style={styles.emptyText}>No posts found</Text>
             <Text style={styles.emptySubtext}>Try a different search term</Text>
           </View>
+        }
+        ListFooterComponent={
+          filteredItems.length > 0 ? (
+            <View style={styles.feedFooter}>
+              <View style={styles.footerContent}>
+                <Icon name="Document" size={32} color={THEME.textMuted} />
+                <Text style={[styles.footerTitle, { color: THEME.text }]}>You're all caught up!</Text>
+                <Text style={[styles.footerSubtext, { color: THEME.textMuted }]}>
+                  More content coming soon. Stay tuned for the latest updates on nuclear science and technology.
+                </Text>
+              </View>
+            </View>
+          ) : null
         }
       />
       
@@ -1901,5 +2038,93 @@ const createStyles = (theme: typeof LightTHEME) => StyleSheet.create({
   },
   submitButtonTextDisabled: {
     color: '#999',
+  },
+  
+  // Feed Footer
+  feedFooter: {
+    paddingVertical: 40,
+    paddingHorizontal: 24,
+    alignItems: 'center',
+  },
+  footerContent: {
+    alignItems: 'center',
+    maxWidth: 300,
+  },
+  footerTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    marginTop: 16,
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  footerSubtext: {
+    fontSize: 14,
+    textAlign: 'center',
+    lineHeight: 20,
+  },
+  
+  // Comment Guidelines Modal
+  guidelinesOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  guidelinesModal: {
+    width: '100%',
+    maxWidth: 400,
+    borderRadius: 24,
+    padding: 24,
+    maxHeight: '80%',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  guidelinesHeader: {
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  guidelinesTitle: {
+    fontSize: 22,
+    fontWeight: '700',
+    marginTop: 12,
+    textAlign: 'center',
+  },
+  guidelinesContent: {
+    maxHeight: 300,
+  },
+  guidelineItem: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: 16,
+    paddingRight: 8,
+  },
+  guidelineEmoji: {
+    fontSize: 24,
+    marginRight: 12,
+    marginTop: 2,
+  },
+  guidelineText: {
+    flex: 1,
+    fontSize: 15,
+    lineHeight: 22,
+  },
+  guidelineBold: {
+    fontWeight: '700',
+  },
+  guidelinesButton: {
+    backgroundColor: '#5E72E4',
+    borderRadius: 12,
+    paddingVertical: 16,
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  guidelinesButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '700',
   },
 });

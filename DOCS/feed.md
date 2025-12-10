@@ -3,7 +3,6 @@
 https://www.ansto.gov.au/education/nuclear-facts/benefits-of-nuclear-science
 Author: ANSTO
 Benefits of nuclear science IN Food and agriculture
-Image: feed-1.jpg
 Nuclear techniques are used in farming and agricultural communities to combat disease and provide other benefits. The process of treating food with radiant energy isn't new; the sun's energy, for example, has been used for centuries to preserve meat, fruits, vegetables, and fish.
 ANSTO researchers are investigating the impact of processes such as heating, mixing, and fermenting on the molecular structure of various foods. Another research project uses radiotracers to investigate a new class of micro- and nano-scale zinc fertilisers for broadacre crops, such as wheat.
 
