@@ -1,6 +1,7 @@
 import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 import { createOrUpdateUserProfile, getUserProfile, initDatabase } from './database';
 import { getOnboardingCompleted, setLastActiveDate } from './storage';
+import { checkDailyStreak } from './utils';
 
 interface UserProfile {
   id?: number;
@@ -70,7 +71,12 @@ export const StorageProvider = ({ children }: { children: ReactNode }) => {
       // Check onboarding status
       const completed = await getOnboardingCompleted();
       setOnboardingCompletedState(completed);
-      
+
+      // Daily streak tracking
+      if (profile) {
+        await checkDailyStreak(incrementStreak, updateUserProfile, profile);
+      }
+
       // Update last active date
       const today = new Date().toISOString().split('T')[0];
       await setLastActiveDate(today);

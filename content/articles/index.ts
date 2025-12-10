@@ -6,21 +6,21 @@
 import { Article, Post } from './types';
 
 // Import Articles
-import radiationInDailyLife from './safety/radiation-in-daily-life';
-import howReactorsWork from './technology/how-reactors-work';
+import nuclearWasteManagement from './energy/nuclear-waste-management';
 import nuclearVsRenewables from './environment/nuclear-vs-renewables';
 import nuclearHistory from './history/nuclear-history';
-import nuclearWasteManagement from './energy/nuclear-waste-management';
+import radiationInDailyLife from './safety/radiation-in-daily-life';
+import howReactorsWork from './technology/how-reactors-work';
 
-// Import Posts
-import chernobylWildlife from './posts/chernobyl-wildlife';
-import marieCurieLegacy from './posts/marie-curie-legacy';
-import nuclearMedicine from './posts/nuclear-medicine';
-import bananaRadiation from './posts/banana-radiation';
-import spaceNuclear from './posts/space-nuclear';
-import franceNuclear from './posts/france-nuclear';
-import nuclearSubmarines from './posts/nuclear-submarines';
-import carbonFree from './posts/carbon-free';
+// Import Posts (10 posts from feed.md)
+import aiCancerTreatment from './posts/ai-cancer-treatment';
+import nuclearAgriculture from './posts/banana-radiation';
+import nuclearFission from './posts/carbon-free';
+import nuclearSafety from './posts/nuclear-safety-stats';
+import nuclearScience from './posts/nuclear-science';
+import nutecPlastics from './posts/nutec-plastics';
+import philippinesNuclear from './posts/philippines-nuclear';
+import radioisotopes from './posts/radioisotopes-production';
 
 // Articles Registry
 export const articles: Record<string, Article> = {
@@ -31,16 +31,16 @@ export const articles: Record<string, Article> = {
   'nuclear-waste-management': nuclearWasteManagement,
 };
 
-// Posts Registry
+// Posts Registry (10 posts from feed.md)
 export const posts: Record<string, Post> = {
-  'chernobyl-wildlife': chernobylWildlife,
-  'marie-curie-legacy': marieCurieLegacy,
-  'nuclear-medicine': nuclearMedicine,
-  'banana-radiation': bananaRadiation,
-  'space-nuclear': spaceNuclear,
-  'france-nuclear': franceNuclear,
-  'nuclear-submarines': nuclearSubmarines,
-  'carbon-free': carbonFree,
+  'nuclear-agriculture': nuclearAgriculture,
+  'nuclear-fission-science': nuclearFission,
+  'philippines-nuclear': philippinesNuclear,
+  'nuclear-science': nuclearScience,
+  'nutec-plastics': nutecPlastics,
+  'radioisotopes-production': radioisotopes,
+  'nuclear-safety-stats': nuclearSafety,
+  'ai-cancer-treatment': aiCancerTreatment,
 };
 
 // Helper Functions

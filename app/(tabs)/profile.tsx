@@ -92,6 +92,13 @@ export default function ProfileScreen() {
     ];
   }, [userProfile]);
 
+  // Stats helpers for detail view
+  const totalLessons = 31;
+  const totalMyths = 8;
+  const lessonsProgress = Math.min((userProfile?.lessons_completed || 0) / totalLessons, 1);
+  const mythsProgress = Math.min((userProfile?.myths_busted || 0) / totalMyths, 1);
+  const levelProgress = Math.min((userProfile?.total_xp || 0) % 100 / 100, 1);
+
   const handleSearchFriends = () => {
     setSearchModalVisible(true);
   };
@@ -150,7 +157,7 @@ export default function ProfileScreen() {
 
         {/* Tabs */}
         <View style={styles.tabsContainer}>
-          {['overview', 'stats', 'friends'].map((tab) => (
+          {['overview', 'friends'].map((tab) => (
             <TouchableOpacity 
               key={tab}
               style={[styles.tab, activeTab === tab && styles.activeTab]} 
@@ -213,13 +220,7 @@ export default function ProfileScreen() {
             </Animated.View>
           )}
 
-          {activeTab === 'stats' && (
-             <Animated.View entering={FadeInDown.duration(400)} style={styles.emptyStateContainer}>
-               <Icon name="Chart" size={64} color={THEME.textMuted} variant="Bulk" />
-               <Text style={styles.emptyStateTitle}>Detailed Stats</Text>
-               <Text style={styles.emptyStateDesc}>More detailed statistics and charts coming soon!</Text>
-             </Animated.View>
-          )}
+          {activeTab === 'stats' && null}
 
           {activeTab === 'friends' && (
             <Animated.View entering={FadeInDown.duration(400)}>
@@ -644,6 +645,76 @@ const createStyles = (theme: typeof LightTHEME) => StyleSheet.create({
     borderRadius: 18,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  
+  // Stats detail view
+  statsDetailContainer: {
+    gap: 16,
+  },
+  detailCardLarge: {
+    borderRadius: 20,
+    padding: 16,
+    backgroundColor: theme.card,
+    gap: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 6,
+    elevation: 3,
+  },
+  detailHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  detailIconCircle: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: 'rgba(94,114,228,0.1)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  detailLabel: {
+    fontSize: 14,
+    fontWeight: '700',
+  },
+  detailValue: {
+    fontSize: 24,
+    fontWeight: '800',
+    marginTop: 6,
+    marginBottom: 6,
+  },
+  detailSubtle: {
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  detailProgressBg: {
+    height: 10,
+    borderRadius: 6,
+    backgroundColor: 'rgba(0,0,0,0.06)',
+    overflow: 'hidden',
+  },
+  detailProgressFill: {
+    height: '100%',
+    backgroundColor: '#5E72E4',
+    borderRadius: 6,
+  },
+  detailGrid: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  detailCard: {
+    flex: 1,
+    borderRadius: 16,
+    padding: 14,
+    backgroundColor: theme.card,
+    gap: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 6,
+    elevation: 2,
   },
 });
 

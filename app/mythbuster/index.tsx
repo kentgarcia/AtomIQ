@@ -10,13 +10,13 @@ import React, { useEffect, useState } from 'react';
 import { Dimensions, Image, Pressable, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Gesture, GestureDetector, GestureHandlerRootView } from 'react-native-gesture-handler';
 import Animated, {
-  FadeInDown,
-  interpolate,
-  runOnJS,
-  useAnimatedStyle,
-  useSharedValue,
-  withSpring,
-  withTiming
+    FadeInDown,
+    interpolate,
+    runOnJS,
+    useAnimatedStyle,
+    useSharedValue,
+    withSpring,
+    withTiming
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -101,7 +101,7 @@ const GAME_MODES: ModeConfig[] = [
 
 export default function MythBusterScreen() {
   const router = useRouter();
-  const { addXP } = useStorage();
+  const { addXP, updateUserProfile, userProfile } = useStorage();
   const insets = useSafeAreaInsets();
   const colorScheme = useColorScheme();
   const backgroundColor = colorScheme === 'dark' ? '#1A1A2E' : useThemeColor({}, 'background');
@@ -337,11 +337,19 @@ export default function MythBusterScreen() {
   const finishGame = () => {
     setGameState('results');
     const xpEarned = score;
+    const bustedCount = answers.filter(a => a).length;
     addXP(xpEarned);
-    logDailyActivity(new Date().toISOString().split('T')[0], { 
+
+    // Persist myths busted to profile & daily activity
+    const today = new Date().toISOString().split('T')[0];
+    logDailyActivity(today, { 
       xp_earned: xpEarned, 
-      myths_busted: answers.filter(a => a).length 
+      myths_busted: bustedCount 
     });
+
+    if (userProfile) {
+      updateUserProfile({ myths_busted: (userProfile.myths_busted || 0) + bustedCount });
+    }
   };
 
   const resetGame = () => {

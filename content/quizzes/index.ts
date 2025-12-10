@@ -4,13 +4,27 @@
  */
 
 import { Quiz } from '../types';
-import radiationSafetyQuiz from './radiation-safety-quiz';
 import atomicBasicsQuiz from './atomic-basics-quiz';
+import everydayNuclearQuiz from './everyday-nuclear-quiz';
+import nuclearReactionsQuiz from './nuclear-reactions-quiz';
+import radiationEffectsQuiz from './radiation-effects-quiz';
+import radiationSafetyQuiz from './radiation-safety-quiz';
+import radiationTypesQuiz from './radiation-types-quiz';
+import reactorMechanicsQuiz from './reactor-mechanics-quiz';
+import safetySecurityQuiz from './safety-security-quiz';
+import sustainabilityQuiz from './sustainability-quiz';
 
 // Quiz registry
 export const quizzes: Record<string, Quiz> = {
   'radiation-safety-quiz': radiationSafetyQuiz,
   'atomic-basics-quiz': atomicBasicsQuiz,
+  'nuclear-reactions-quiz': nuclearReactionsQuiz,
+  'radiation-effects-quiz': radiationEffectsQuiz,
+  'everyday-nuclear-quiz': everydayNuclearQuiz,
+  'safety-security-quiz': safetySecurityQuiz,
+  'radiation-types-quiz': radiationTypesQuiz,
+  'reactor-mechanics-quiz': reactorMechanicsQuiz,
+  'sustainability-quiz': sustainabilityQuiz,
 };
 
 // Helper functions
