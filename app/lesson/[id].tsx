@@ -22,7 +22,7 @@ import Animated, {
 const { width, height } = Dimensions.get('window');
 
 // Theme
-const THEME = {
+const LightTHEME = {
   bg: '#F7F7F7',
   card: '#FFFFFF',
   text: '#1F2937',
@@ -34,6 +34,20 @@ const THEME = {
   error: '#EF4444',
   gold: '#FFC107',
   border: '#E5E7EB',
+};
+
+const DarkTHEME = {
+  bg: '#172B4D',
+  card: '#213356',
+  text: '#F6F9FC',
+  textMuted: '#8898AA',
+  primary: '#EA580C',
+  primaryDark: '#C2410C',
+  primaryLight: '#FB923C',
+  success: '#2ECC71',
+  error: '#EF4444',
+  gold: '#FFC107',
+  border: '#2D3A56',
 };
 
 // --- Components for Each Step ---

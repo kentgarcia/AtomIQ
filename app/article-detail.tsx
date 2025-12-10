@@ -1,24 +1,25 @@
-import { Icon } from '@/components/ui/icon';
 import { MarkdownText } from '@/components/markdown-text';
+import { Icon } from '@/components/ui/icon';
 import { getArticleById } from '@/content/articles';
+import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React from 'react';
-import { 
-  Dimensions, 
-  Image, 
-  Linking, 
-  ScrollView, 
-  StyleSheet, 
-  Text, 
-  TouchableOpacity, 
-  View 
+import {
+    Dimensions,
+    Image,
+    Linking,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import Animated, { FadeInDown } from 'react-native-reanimated';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const { width } = Dimensions.get('window');
 
-const THEME = {
+const LightTHEME = {
   bg: '#F7F7F7',
   card: '#FFFFFF',
   text: '#1F2937',
@@ -28,16 +29,28 @@ const THEME = {
   border: '#E5E7EB',
 };
 
+const DarkTHEME = {
+  bg: '#172B4D',
+  card: '#213356',
+  text: '#F6F9FC',
+  textMuted: '#8898AA',
+  primary: '#EA580C',
+  primaryDark: '#C2410C',
+  border: '#2D3A56',
+};
+
 export default function ArticleDetailScreen() {
   const { id } = useLocalSearchParams();
   const router = useRouter();
+  const colorScheme = useColorScheme();
+  const THEME = colorScheme === 'dark' ? DarkTHEME : LightTHEME;
   const articleId = typeof id === 'string' ? id.replace('article-', '') : '';
   
   const article = getArticleById(articleId);
   
   if (!article) {
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={[styles.container, { backgroundColor: THEME.bg }]}>
         <View style={styles.errorContainer}>
           <Icon name="Danger" size={64} color={THEME.primary} />
           <Text style={styles.errorText}>Article not found</Text>

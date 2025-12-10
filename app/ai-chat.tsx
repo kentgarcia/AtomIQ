@@ -1,5 +1,6 @@
 import { MarkdownText } from '@/components/markdown-text';
 import { Icon } from '@/components/ui/icon';
+import { useColorScheme } from '@/hooks/use-color-scheme';
 import { convertMessagesToGeminiFormat, sendMessageToGemini } from '@/services/gemini';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
@@ -24,7 +25,7 @@ import Animated, {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 // Purple Theme matching the app design
-const CHAT_THEME = {
+const LightCHAT_THEME = {
   bg: '#F4F5F7',
   card: '#FFFFFF',
   text: '#2D3436',
@@ -32,9 +33,24 @@ const CHAT_THEME = {
   primary: '#9E87F5',
   primaryDark: '#7C3AED',
   primaryLight: '#B8A5FE',
-  userBubble: '#9E87F5', // Purple for user messages
+  userBubble: '#9E87F5',
   botBubble: '#FFFFFF',
   border: '#E5E7EB',
+  green: '#2ECC71',
+  accent: '#1CB0F6',
+};
+
+const DarkCHAT_THEME = {
+  bg: '#172B4D',
+  card: '#213356',
+  text: '#F6F9FC',
+  textMuted: '#8898AA',
+  primary: '#9E87F5',
+  primaryDark: '#7C3AED',
+  primaryLight: '#B8A5FE',
+  userBubble: '#9E87F5',
+  botBubble: '#213356',
+  border: '#2D3A56',
   green: '#2ECC71',
   accent: '#1CB0F6',
 };
@@ -75,6 +91,8 @@ interface Message {
 export default function AiChatScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const colorScheme = useColorScheme();
+  const CHAT_THEME = colorScheme === 'dark' ? DarkCHAT_THEME : LightCHAT_THEME;
   const scrollViewRef = useRef<ScrollView>(null);
   const [messages, setMessages] = useState<Message[]>(INITIAL_MESSAGES);
   const [inputText, setInputText] = useState('');

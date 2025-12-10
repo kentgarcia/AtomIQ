@@ -1,5 +1,5 @@
 import { Icon } from '@/components/ui/icon';
-import { useThemeColor } from '@/hooks/use-theme-color';
+import { useColorScheme } from '@/hooks/use-color-scheme';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { Dimensions, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
@@ -7,6 +7,24 @@ import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const { width } = Dimensions.get('window');
+
+const LightTHEME = {
+  bg: '#F8F9FE',
+  card: '#FFFFFF',
+  text: '#32325D',
+  textMuted: '#8898AA',
+  primary: '#5E72E4',
+  border: '#E9ECEF',
+};
+
+const DarkTHEME = {
+  bg: '#172B4D',
+  card: '#213356',
+  text: '#F6F9FC',
+  textMuted: '#8898AA',
+  primary: '#5E72E4',
+  border: '#2D3A56',
+};
 
 const GRADIENTS = {
   Purple: ['#B8A5FE', '#9E87F5'] as const,
@@ -20,9 +38,8 @@ const GRADIENTS = {
 export default function ChatLandingScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const backgroundColor = useThemeColor({}, 'background');
-  const textColor = useThemeColor({}, 'text');
-  const cardColor = useThemeColor({}, 'card');
+  const colorScheme = useColorScheme();
+  const THEME = colorScheme === 'dark' ? DarkTHEME : LightTHEME;
 
   const features = [
     {
@@ -52,8 +69,10 @@ export default function ChatLandingScreen() {
     "Explain fusion vs fission"
   ];
 
+  const styles = useMemo(() => createStyles(THEME), [THEME]);
+
   return (
-    <View style={[styles.container, { backgroundColor }]}>
+    <View style={styles.container}>
       <ScrollView 
         contentContainerStyle={[styles.content, { paddingBottom: 100 + insets.bottom, paddingTop: insets.top + 20 }]} 
         showsVerticalScrollIndicator={false}
@@ -73,7 +92,7 @@ export default function ChatLandingScreen() {
           
           <Animated.Text 
             entering={FadeInDown.delay(200).springify()}
-            style={[styles.heroDescription, { color: textColor }]}
+            style={styles.heroDescription}
           >
             Hi! I'm Schrödi. I can explain complex nuclear concepts, debunk myths, and help you learn faster.
           </Animated.Text>
@@ -84,13 +103,13 @@ export default function ChatLandingScreen() {
           {features.map((feature, index) => (
             <View 
               key={index} 
-              style={[styles.featureCard, { backgroundColor: cardColor }]}
+              style={styles.featureCard}
             >
               <View style={[styles.featureIcon, { backgroundColor: feature.color + '20' }]}>
                 <Icon name={feature.icon as any} size={24} color={feature.color} variant="Bold" />
               </View>
               <View style={styles.featureContent}>
-                <Text style={[styles.featureTitle, { color: textColor }]}>{feature.title}</Text>
+                <Text style={styles.featureTitle}>{feature.title}</Text>
                 <Text style={styles.featureDescription}>{feature.description}</Text>
               </View>
             </View>
@@ -124,9 +143,10 @@ export default function ChatLandingScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (theme: typeof LightTHEME) => StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: theme.bg,
   },
   content: {
     paddingBottom: 40,
@@ -233,6 +253,7 @@ const styles = StyleSheet.create({
     lineHeight: 24,
     fontWeight: '500',
     opacity: 0.8,
+    color: theme.text,
   },
 
   // Features
@@ -251,6 +272,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
     shadowRadius: 8,
+    backgroundColor: theme.card,
   },
   featureIcon: {
     width: 48,
@@ -267,10 +289,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '700',
     marginBottom: 4,
+    color: theme.text,
   },
   featureDescription: {
     fontSize: 13,
-    color: '#999',
+    color: theme.textMuted,
     lineHeight: 18,
   },
 

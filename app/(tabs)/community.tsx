@@ -1,6 +1,6 @@
 import { Icon } from '@/components/ui/icon';
 import { getAllArticles, getAllPosts } from '@/content/articles';
-import { useThemeColor } from '@/hooks/use-theme-color';
+import { useColorScheme } from '@/hooks/use-color-scheme';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Haptics from 'expo-haptics';
 import { useRouter } from 'expo-router';
@@ -10,6 +10,24 @@ import Animated, { FadeIn, FadeInDown, FadeInUp, FadeOut, ZoomIn } from 'react-n
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const { width } = Dimensions.get('window');
+
+const LightTHEME = {
+  bg: '#F8F9FE',
+  card: '#FFFFFF',
+  text: '#32325D',
+  textMuted: '#8898AA',
+  primary: '#5E72E4',
+  border: '#E9ECEF',
+};
+
+const DarkTHEME = {
+  bg: '#172B4D',
+  card: '#213356',
+  text: '#F6F9FC',
+  textMuted: '#8898AA',
+  primary: '#5E72E4',
+  border: '#2D3A56',
+};
 
 const GRADIENTS = {
   Purple: ['#B8A5FE', '#9E87F5'] as const,
@@ -48,12 +66,14 @@ const ExpandableText = ({
   text, 
   maxLength = 150,
   style,
-  textColor
+  theme,
+  styles
 }: { 
   text: string; 
   maxLength?: number;
   style?: any;
-  textColor: string;
+  theme: typeof LightTHEME;
+  styles: any;
 }) => {
   const [expanded, setExpanded] = useState(false);
   const needsTruncation = text.length > maxLength;
@@ -63,7 +83,7 @@ const ExpandableText = ({
 
   return (
     <View>
-      <Text style={[style, { color: textColor }]}>{displayText}</Text>
+      <Text style={[style, { color: theme.text }]}>{displayText}</Text>
       {needsTruncation && (
         <TouchableOpacity onPress={() => setExpanded(!expanded)}>
           <Text style={styles.seeMore}>
@@ -82,16 +102,16 @@ const ReactionButton = ({
   onReaction,
   showPicker,
   onTogglePicker,
-  textColor,
-  cardColor
+  theme,
+  styles
 }: {
   itemId: string;
   currentReaction: ReactionType;
   onReaction: (itemId: string, reaction: ReactionType) => void;
   showPicker: boolean;
   onTogglePicker: (itemId: string) => void;
-  textColor: string;
-  cardColor: string;
+  theme: typeof LightTHEME;
+  styles: any;
 }) => {
   const reactionConfig = currentReaction 
     ? REACTIONS.find(r => r.type === currentReaction) 
@@ -104,7 +124,7 @@ const ReactionButton = ({
         <Animated.View 
           entering={FadeIn.duration(200)}
           exiting={FadeOut.duration(150)}
-          style={[styles.picker, { backgroundColor: cardColor }]}
+          style={[styles.picker, { backgroundColor: theme.card }]}
         >
           {REACTIONS.map((reaction, index) => (
             <AnimatedPressable
@@ -135,8 +155,8 @@ const ReactionButton = ({
           </>
         ) : (
           <>
-            <Icon name="Like" size={20} color={textColor} variant="Linear" />
-            <Text style={[styles.buttonText, { color: textColor }]}>Like</Text>
+            <Icon name="Like" size={20} color={theme.text} variant="Linear" />
+            <Text style={[styles.buttonText, { color: theme.text }]}>Like</Text>
           </>
         )}
       </TouchableOpacity>
@@ -156,9 +176,8 @@ const CommentPanel = ({
   postTitle,
   comments,
   onAddComment,
-  textColor,
-  cardColor,
-  backgroundColor
+  theme,
+  styles
 }: {
   visible: boolean;
   onClose: () => void;
@@ -166,9 +185,8 @@ const CommentPanel = ({
   postTitle: string;
   comments: Comment[];
   onAddComment: (postId: string, text: string) => void;
-  textColor: string;
-  cardColor: string;
-  backgroundColor: string;
+  theme: typeof LightTHEME;
+  styles: any;
 }) => {
   const insets = useSafeAreaInsets();
   const [newComment, setNewComment] = useState('');
@@ -199,18 +217,18 @@ const CommentPanel = ({
       presentationStyle="pageSheet"
       onRequestClose={onClose}
     >
-      <View style={[styles.modalContainer, { backgroundColor, paddingTop: insets.top }]}>
+      <View style={[styles.modalContainer, { backgroundColor: theme.bg, paddingTop: insets.top }]}>
         {/* Header */}
         <View style={styles.modalHeader}>
           <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-            <Icon name="CloseCircle" size={28} color={textColor} />
+            <Icon name="CloseCircle" size={28} color={theme.text} />
           </TouchableOpacity>
-          <Text style={[styles.modalTitle, { color: textColor }]}>Comments</Text>
+          <Text style={[styles.modalTitle, { color: theme.text }]}>Comments</Text>
           <View style={{ width: 28 }} />
         </View>
 
         {/* Post Title Preview */}
-        <View style={[styles.postPreview, { backgroundColor: cardColor }]}>
+        <View style={[styles.postPreview, { backgroundColor: theme.card }]}>
           <Text style={styles.postPreviewText} numberOfLines={2}>
             {postTitle || 'Post'}
           </Text>
@@ -224,7 +242,7 @@ const CommentPanel = ({
           ListEmptyComponent={
             <View style={styles.emptyComments}>
               <Icon name="Message" size={48} color="#CCC" />
-              <Text style={[styles.emptyText, { color: textColor }]}>No comments yet</Text>
+              <Text style={[styles.emptyText, { color: theme.text }]}>No comments yet</Text>
               <Text style={styles.emptySubtext}>Be the first to comment!</Text>
             </View>
           }
@@ -237,9 +255,9 @@ const CommentPanel = ({
                 <Icon name="Profile" size={18} color="#FFF" variant="Bold" />
               </View>
               <View style={styles.commentContent}>
-                <View style={[styles.commentBubble, { backgroundColor: cardColor }]}>
-                  <Text style={[styles.commentAuthor, { color: textColor }]}>{item.author}</Text>
-                  <Text style={[styles.commentText, { color: textColor }]}>{item.text}</Text>
+                <View style={[styles.commentBubble, { backgroundColor: theme.card }]}>
+                  <Text style={[styles.commentAuthor, { color: theme.text }]}>{item.author}</Text>
+                  <Text style={[styles.commentText, { color: theme.text }]}>{item.text}</Text>
                 </View>
                 <Text style={styles.commentTime}>
                   {formatCommentTime(item.timestamp)}
@@ -254,10 +272,10 @@ const CommentPanel = ({
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
           keyboardVerticalOffset={0}
         >
-          <View style={[styles.inputContainer, { backgroundColor, paddingBottom: Math.max(insets.bottom, 16) }]}>
-            <View style={[styles.inputWrapper, { backgroundColor: cardColor }]}>
+          <View style={[styles.inputContainer, { backgroundColor: theme.bg, paddingBottom: Math.max(insets.bottom, 16) }]}>
+            <View style={[styles.inputWrapper, { backgroundColor: theme.card }]}>
               <TextInput
-                style={[styles.input, { color: textColor }]}
+                style={[styles.input, { color: theme.text }]}
                 placeholder="Write a comment..."
                 placeholderTextColor="#999"
                 value={newComment}
@@ -295,18 +313,16 @@ const SavedCollectionPanel = ({
   savedItems,
   onItemPress,
   onRemoveItem,
-  textColor,
-  cardColor,
-  backgroundColor
+  theme,
+  styles
 }: {
   visible: boolean;
   onClose: () => void;
   savedItems: any[];
   onItemPress: (item: any) => void;
   onRemoveItem: (itemId: string) => void;
-  textColor: string;
-  cardColor: string;
-  backgroundColor: string;
+  theme: typeof LightTHEME;
+  styles: any;
 }) => {
   const insets = useSafeAreaInsets();
 
@@ -317,13 +333,13 @@ const SavedCollectionPanel = ({
       presentationStyle="pageSheet"
       onRequestClose={onClose}
     >
-      <View style={[styles.modalContainer, { backgroundColor, paddingTop: insets.top }]}>
+      <View style={[styles.modalContainer, { backgroundColor: theme.bg, paddingTop: insets.top }]}>
         {/* Header */}
         <View style={styles.modalHeader}>
           <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-            <Icon name="ArrowLeft" size={24} color={textColor} />
+            <Icon name="ArrowLeft" size={24} color={theme.text} />
           </TouchableOpacity>
-          <Text style={[styles.modalTitle, { color: textColor }]}>Saved Posts</Text>
+          <Text style={[styles.modalTitle, { color: theme.text }]}>Saved Posts</Text>
           <View style={{ width: 24 }} />
         </View>
 
@@ -335,7 +351,7 @@ const SavedCollectionPanel = ({
           ListEmptyComponent={
             <View style={styles.emptyState}>
               <Icon name="Archive" size={60} color="#CCC" />
-              <Text style={[styles.emptyText, { color: textColor }]}>No saved posts</Text>
+              <Text style={[styles.emptyText, { color: theme.text }]}>No saved posts</Text>
               <Text style={styles.emptySubtext}>
                 Posts you save will appear here
               </Text>
@@ -344,7 +360,7 @@ const SavedCollectionPanel = ({
           renderItem={({ item, index }) => (
             <Animated.View entering={FadeInUp.delay(index * 50)}>
               <TouchableOpacity 
-                style={[styles.savedItem, { backgroundColor: cardColor }]}
+                style={[styles.savedItem, { backgroundColor: theme.card }]}
                 onPress={() => onItemPress(item)}
                 activeOpacity={0.7}
               >
@@ -355,7 +371,7 @@ const SavedCollectionPanel = ({
                   />
                 )}
                 <View style={styles.itemContent}>
-                  <Text style={[styles.itemTitle, { color: textColor }]} numberOfLines={2}>
+                  <Text style={[styles.itemTitle, { color: theme.text }]} numberOfLines={2}>
                     {item.title || 'Untitled Post'}
                   </Text>
                   <Text style={styles.itemMeta}>
@@ -393,17 +409,15 @@ const ReportModal = ({
   onClose,
   onSubmit,
   itemId,
-  textColor,
-  cardColor,
-  backgroundColor
+  theme,
+  styles
 }: {
   visible: boolean;
   onClose: () => void;
   onSubmit: (itemId: string, reason: string) => void;
   itemId: string | null;
-  textColor: string;
-  cardColor: string;
-  backgroundColor: string;
+  theme: typeof LightTHEME;
+  styles: any;
 }) => {
   const insets = useSafeAreaInsets();
   const [selectedReason, setSelectedReason] = useState<string | null>(null);
@@ -432,15 +446,15 @@ const ReportModal = ({
       onRequestClose={handleClose}
     >
       <KeyboardAvoidingView 
-        style={[styles.modalContainer, { backgroundColor, paddingTop: insets.top }]}
+        style={[styles.modalContainer, { backgroundColor: theme.bg, paddingTop: insets.top }]}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
         {/* Header */}
         <View style={styles.modalHeader}>
           <TouchableOpacity onPress={handleClose} style={styles.closeButton}>
-            <Icon name="CloseCircle" size={28} color={textColor} />
+            <Icon name="CloseCircle" size={28} color={theme.text} />
           </TouchableOpacity>
-          <Text style={[styles.modalTitle, { color: textColor }]}>Report Post</Text>
+          <Text style={[styles.modalTitle, { color: theme.text }]}>Report Post</Text>
           <View style={{ width: 28 }} />
         </View>
 
@@ -464,7 +478,7 @@ const ReportModal = ({
               key={reason.id}
               style={[
                 styles.reasonItem,
-                { backgroundColor: cardColor },
+                { backgroundColor: theme.card },
                 selectedReason === reason.id && styles.reasonItemSelected
               ]}
               onPress={() => setSelectedReason(reason.id)}
@@ -472,11 +486,11 @@ const ReportModal = ({
               <Icon 
                 name={reason.icon as any} 
                 size={22} 
-                color={selectedReason === reason.id ? '#FF6B6B' : textColor} 
+                color={selectedReason === reason.id ? '#FF6B6B' : theme.text} 
               />
               <Text style={[
                 styles.reasonText,
-                { color: textColor },
+                { color: theme.text },
                 selectedReason === reason.id && styles.reasonTextSelected
               ]}>
                 {reason.label}
@@ -495,9 +509,9 @@ const ReportModal = ({
           {/* Additional Info (shown when 'other' is selected) */}
           {selectedReason === 'other' && (
             <Animated.View entering={FadeInDown.duration(200)}>
-              <Text style={[styles.additionalLabel, { color: textColor }]}>Please describe the issue:</Text>
+              <Text style={[styles.additionalLabel, { color: theme.text }]}>Please describe the issue:</Text>
               <TextInput
-                style={[styles.additionalInput, { backgroundColor: cardColor, color: textColor }]}
+                style={[styles.additionalInput, { backgroundColor: theme.card, color: theme.text }]}
                 placeholder="Tell us more about why you're reporting this post..."
                 placeholderTextColor="#999"
                 value={additionalInfo}
@@ -513,7 +527,7 @@ const ReportModal = ({
         </ScrollView>
 
         {/* Submit Button */}
-        <View style={[styles.footer, { backgroundColor, paddingBottom: insets.bottom + 16 }]}>
+        <View style={[styles.footer, { backgroundColor: theme.bg, paddingBottom: insets.bottom + 16 }]}>
           <TouchableOpacity
             style={[
               styles.submitButton,
@@ -609,9 +623,9 @@ const formatTimeAgo = (dateString: string) => {
 export default function CommunityScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const backgroundColor = useThemeColor({}, 'background');
-  const textColor = useThemeColor({}, 'text');
-  const cardColor = useThemeColor({}, 'card');
+  const colorScheme = useColorScheme();
+  const THEME = colorScheme === 'dark' ? DarkTHEME : LightTHEME;
+  const styles = useMemo(() => createStyles(THEME), [THEME]);
   
   const [searchQuery, setSearchQuery] = useState('');
   const [bookmarkedIds, setBookmarkedIds] = useState<string[]>([]);
@@ -876,7 +890,7 @@ export default function CommunityScreen() {
     return (
       <Animated.View 
         entering={FadeInDown.delay(50 + (index % 10) * 50).springify()}
-        style={[styles.postCard, { backgroundColor: cardColor }]}
+        style={[styles.postCard, { backgroundColor: THEME.card }]}
       >
         {/* Post Header - Author Info */}
         <View style={styles.postHeader}>
@@ -889,7 +903,7 @@ export default function CommunityScreen() {
           </View>
           <View style={styles.authorInfo}>
             <View style={styles.authorNameRow}>
-              <Text style={[styles.authorName, { color: textColor }]}>{item.author?.name || 'AtomIQ'}</Text>
+              <Text style={[styles.authorName, { color: THEME.text }]}>{item.author?.name || 'AtomIQ'}</Text>
               {item.source && (
                 <>
                   <Text style={styles.dotSeparator}>·</Text>
@@ -922,7 +936,7 @@ export default function CommunityScreen() {
               <Animated.View 
                 entering={FadeIn.duration(150)}
                 exiting={FadeOut.duration(100)}
-                style={[styles.moreMenuDropdown, { backgroundColor: cardColor }]}
+                style={[styles.moreMenuDropdown, { backgroundColor: THEME.card }]}
               >
                 <TouchableOpacity 
                   style={styles.moreMenuItem}
@@ -931,9 +945,9 @@ export default function CommunityScreen() {
                   <Icon 
                     name={isBookmarked ? "ArchiveMinus" : "ArchiveAdd"} 
                     size={20} 
-                    color={textColor} 
+                    color={THEME.text}
                   />
-                  <Text style={[styles.moreMenuText, { color: textColor }]}>
+                  <Text style={[styles.moreMenuText, { color: THEME.text }]}>
                     {isBookmarked ? 'Unsave post' : 'Save post'}
                   </Text>
                 </TouchableOpacity>
@@ -942,8 +956,8 @@ export default function CommunityScreen() {
                   style={styles.moreMenuItem}
                   onPress={() => handleCopyLink(item)}
                 >
-                  <Icon name="Link" size={20} color={textColor} />
-                  <Text style={[styles.moreMenuText, { color: textColor }]}>Copy link</Text>
+                  <Icon name="Link" size={20} color={THEME.text} />
+                  <Text style={[styles.moreMenuText, { color: THEME.text }]}>Copy link</Text>
                 </TouchableOpacity>
                 
                 <View style={styles.moreMenuDivider} />
@@ -952,8 +966,8 @@ export default function CommunityScreen() {
                   style={styles.moreMenuItem}
                   onPress={() => handleHidePost(item.id)}
                 >
-                  <Icon name="EyeSlash" size={20} color={textColor} />
-                  <Text style={[styles.moreMenuText, { color: textColor }]}>Hide post</Text>
+                  <Icon name="EyeSlash" size={20} color={THEME.text} />
+                  <Text style={[styles.moreMenuText, { color: THEME.text }]}>Hide post</Text>
                 </TouchableOpacity>
                 
                 <TouchableOpacity 
@@ -983,7 +997,7 @@ export default function CommunityScreen() {
         <View>
           {/* Title */}
           {item.title && (
-            <Text style={[styles.postTitle, { color: textColor }]}>{item.title}</Text>
+            <Text style={[styles.postTitle, { color: THEME.text }]}>{item.title}</Text>
           )}
           
           {/* Content/Excerpt with See More/Less - Using ExpandableText Component */}
@@ -991,7 +1005,8 @@ export default function CommunityScreen() {
             text={item.content || ''} 
             maxLength={150}
             style={styles.postContent}
-            textColor={textColor}
+            theme={THEME}
+            styles={styles}
           />
           
           {/* Image */}
@@ -1045,16 +1060,16 @@ export default function CommunityScreen() {
             onReaction={handleReaction}
             showPicker={showPicker}
             onTogglePicker={toggleReactionPicker}
-            textColor={textColor}
-            cardColor={cardColor}
+            theme={THEME}
+            styles={styles}
           />
           
           <TouchableOpacity 
             style={styles.actionButton}
             onPress={() => openCommentPanel(item)}
           >
-            <Icon name="Message" size={20} color={textColor} variant="Linear" />
-            <Text style={[styles.actionText, { color: textColor }]}>Comment</Text>
+            <Icon name="Message" size={20} color={THEME.text} variant="Linear" />
+            <Text style={[styles.actionText, { color: THEME.text }]}>Comment</Text>
             {comments.filter(c => c.postId === item.id).length > 0 && (
               <View style={styles.commentBadge}>
                 <Text style={styles.commentBadgeText}>
@@ -1068,8 +1083,8 @@ export default function CommunityScreen() {
             style={styles.actionButton}
             onPress={() => handleShare(item)}
           >
-            <Icon name="Send" size={20} color={textColor} variant="Linear" />
-            <Text style={[styles.actionText, { color: textColor }]}>Share</Text>
+            <Icon name="Send" size={20} color={THEME.text} variant="Linear" />
+            <Text style={[styles.actionText, { color: THEME.text }]}>Share</Text>
           </TouchableOpacity>
           
           <TouchableOpacity 
@@ -1079,10 +1094,10 @@ export default function CommunityScreen() {
             <Icon 
               name={isBookmarked ? 'Archive' : 'ArchiveAdd'} 
               size={20} 
-              color={isBookmarked ? '#6A82FB' : textColor} 
+              color={isBookmarked ? '#6A82FB' : THEME.text}
               variant={isBookmarked ? 'Bold' : 'Linear'}
             />
-            <Text style={[styles.actionText, { color: isBookmarked ? '#6A82FB' : textColor }]}>Save</Text>
+            <Text style={[styles.actionText, { color: isBookmarked ? '#6A82FB' : THEME.text }]}>Save</Text>
           </TouchableOpacity>
         </View>
       </Animated.View>
@@ -1090,21 +1105,21 @@ export default function CommunityScreen() {
   };
 
   return (
-    <View style={[styles.container, { backgroundColor }]}>
+    <View style={styles.container}>
       {/* Header */}
-      <View style={[styles.header, { paddingTop: insets.top + 16, backgroundColor: cardColor }]}>
+      <View style={[styles.header, { paddingTop: insets.top + 16 }]}>
         <View style={styles.headerContent}>
           <View style={styles.headerTextContainer}>
-            <Text style={[styles.headerTitle, { color: textColor }]}>Community Feed</Text>
+            <Text style={styles.headerTitle}>Community Feed</Text>
             <Text style={styles.headerSubtitle}>Discover news, articles, and updates</Text>
           </View>
           
           <View style={styles.headerActions}>
             <TouchableOpacity 
-              style={[styles.headerIconButton, { backgroundColor }]}
+              style={styles.headerIconButton}
               onPress={() => setShowSavedPanel(true)}
             >
-              <Icon name="Archive" size={20} color={textColor} variant="Bold" />
+              <Icon name="Archive" size={20} color={THEME.text} variant="Bold" />
               {bookmarkedIds.length > 0 && (
                 <View style={styles.savedBadge}>
                   <Text style={styles.savedBadgeText}>{bookmarkedIds.length}</Text>
@@ -1112,10 +1127,10 @@ export default function CommunityScreen() {
               )}
             </TouchableOpacity>
             <TouchableOpacity 
-              style={[styles.headerIconButton, { backgroundColor }]}
+              style={styles.headerIconButton}
               onPress={() => setShowSearch(!showSearch)}
             >
-              <Icon name={showSearch ? "CloseCircle" : "SearchNormal"} size={20} color={textColor} />
+              <Icon name={showSearch ? "CloseCircle" : "SearchNormal"} size={20} color={THEME.text} />
             </TouchableOpacity>
           </View>
         </View>
@@ -1123,10 +1138,10 @@ export default function CommunityScreen() {
       
       {/* Search Bar */}
       {showSearch && (
-        <Animated.View entering={FadeInDown.duration(200)} style={[styles.searchContainer, { backgroundColor: cardColor }]}>
+        <Animated.View entering={FadeInDown.duration(200)} style={styles.searchContainer}>
           <Icon name="SearchNormal" size={18} color="#999" />
           <TextInput 
-            style={[styles.searchInput, { color: textColor }]}
+            style={styles.searchInput}
             placeholder="Search posts..."
             placeholderTextColor="#999"
             value={searchQuery}
@@ -1156,7 +1171,7 @@ export default function CommunityScreen() {
               style={styles.emptyMascot}
               resizeMode="contain"
             />
-            <Text style={[styles.emptyText, { color: textColor }]}>No posts found</Text>
+            <Text style={styles.emptyText}>No posts found</Text>
             <Text style={styles.emptySubtext}>Try a different search term</Text>
           </View>
         }
@@ -1173,9 +1188,8 @@ export default function CommunityScreen() {
         postTitle={activeCommentPost?.title || 'Post'}
         comments={comments}
         onAddComment={handleAddComment}
-        textColor={textColor}
-        cardColor={cardColor}
-        backgroundColor={backgroundColor}
+        theme={THEME}
+        styles={styles}
       />
       
       {/* Saved Panel Modal */}
@@ -1190,9 +1204,8 @@ export default function CommunityScreen() {
             handleArticlePress(item);
           }
         }}
-        textColor={textColor}
-        cardColor={cardColor}
-        backgroundColor={backgroundColor}
+        theme={THEME}
+        styles={styles}
       />
       
       {/* Report Modal */}
@@ -1204,9 +1217,8 @@ export default function CommunityScreen() {
         }}
         onSubmit={handleReportPost}
         itemId={reportingItemId}
-        textColor={textColor}
-        cardColor={cardColor}
-        backgroundColor={backgroundColor}
+        theme={THEME}
+        styles={styles}
       />
       
       {/* Undo Hide Snackbar */}
@@ -1232,14 +1244,16 @@ export default function CommunityScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (theme: typeof LightTHEME) => StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: theme.bg,
   },
   // Header
   header: {
     paddingHorizontal: 20,
     paddingBottom: 16,
+    backgroundColor: theme.card,
   },
   headerContent: {
     flexDirection: 'row',
@@ -1254,10 +1268,11 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: '800',
     marginBottom: 4,
+    color: theme.text,
   },
   headerSubtitle: {
     fontSize: 14,
-    color: '#8898AA',
+    color: theme.textMuted,
     fontWeight: '500',
   },
   headerActions: {
@@ -1272,6 +1287,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     position: 'relative',
+    backgroundColor: theme.bg,
   },
   savedBadge: {
     position: 'absolute',
@@ -1308,11 +1324,13 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
     shadowRadius: 8,
+    backgroundColor: theme.card,
   },
   searchInput: {
     flex: 1,
     fontSize: 16,
     fontWeight: '600',
+    color: theme.text,
   },
   
   // Feed
@@ -1325,6 +1343,7 @@ const styles = StyleSheet.create({
   },
   postCard: {
     paddingVertical: 16,
+    backgroundColor: theme.card,
   },
   postHeader: {
     flexDirection: 'row',
