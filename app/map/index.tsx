@@ -1,5 +1,6 @@
 import { Icon } from '@/components/ui/icon';
 import { UNITS as SYLLABUS_UNITS } from '@/content/units';
+import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useAllLevels } from '@/hooks/use-storage';
 import { useFocusEffect, useRouter } from 'expo-router';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
@@ -9,12 +10,22 @@ import Svg, { Circle, Defs, G, LinearGradient, Path, Rect, Stop } from 'react-na
 
 const { width } = Dimensions.get('window');
 
-const THEME = {
+const LightTHEME = {
   bg: '#8BC34A', // Main Grass Color
   primary: '#EA580C',
   locked: '#E5E7EB',
   text: '#1F2937',
   textMuted: '#9CA3AF',
+  card: '#FFFFFF',
+};
+
+const DarkTHEME = {
+  bg: '#558B2F', // Darker grass for dark mode
+  primary: '#EA580C',
+  locked: '#2D3A56',
+  text: '#F6F9FC',
+  textMuted: '#8898AA',
+  card: '#213356',
 };
 
 // Helper function to darken a color
@@ -626,6 +637,8 @@ const UNIT_INFO_DATA: { [key: string]: { info: string, references: string[] } } 
 
 export default function MapScreen() {
   const router = useRouter();
+  const colorScheme = useColorScheme();
+  const THEME = colorScheme === 'dark' ? DarkTHEME : LightTHEME;
   const scrollViewRef = useRef<ScrollView>(null);
   const isFirstRender = useRef(true);
   const { levels, loading, refresh } = useAllLevels();

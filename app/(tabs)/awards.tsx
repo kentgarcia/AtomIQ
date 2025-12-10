@@ -1,5 +1,5 @@
 import { Icon } from '@/components/ui/icon';
-import { useThemeColor } from '@/hooks/use-theme-color';
+import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useStorage } from '@/services/StorageContext';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
@@ -10,6 +10,24 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Circle } from 'react-native-svg';
 
 const { width } = Dimensions.get('window');
+
+const LightTHEME = {
+  bg: '#F8F9FE',
+  card: '#FFFFFF',
+  text: '#32325D',
+  textMuted: '#8898AA',
+  primary: '#5E72E4',
+  border: '#E9ECEF',
+};
+
+const DarkTHEME = {
+  bg: '#172B4D',
+  card: '#213356',
+  text: '#F6F9FC',
+  textMuted: '#8898AA',
+  primary: '#5E72E4',
+  border: '#2D3A56',
+};
 
 const GRADIENTS = {
   Purple: ['#B8A5FE', '#9E87F5'] as const,
@@ -44,9 +62,9 @@ export default function AwardsScreen() {
   const { userProfile } = useStorage();
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const backgroundColor = useThemeColor({}, 'background');
-  const textColor = useThemeColor({}, 'text');
-  const cardColor = useThemeColor({}, 'card');
+  const colorScheme = useColorScheme();
+  const THEME = colorScheme === 'dark' ? DarkTHEME : LightTHEME;
+  const styles = useMemo(() => createStyles(THEME), [THEME]);
   
   // State for certificate preview
   const [selectedCertificate, setSelectedCertificate] = useState<typeof CERTIFICATES[0] & { unlocked: boolean } | null>(null);
@@ -110,23 +128,23 @@ export default function AwardsScreen() {
   };
 
   return (
-    <View style={[styles.container, { backgroundColor }]}>
+    <View style={styles.container}>
       {/* Header */}
-      <View style={[styles.header, { paddingTop: insets.top + 16, backgroundColor: cardColor }]}>
+      <View style={[styles.header, { paddingTop: insets.top + 16 }]}>
         <View style={styles.headerContent}>
           <View style={styles.headerTextContainer}>
-            <Text style={[styles.headerTitle, { color: textColor }]}>Hall of Fame</Text>
+            <Text style={styles.headerTitle}>Hall of Fame</Text>
             <Text style={styles.headerSubtitle}>Your achievements</Text>
           </View>
           
           <View style={styles.headerStats}>
-            <View style={[styles.compactStat, { backgroundColor }]}>
-              <Icon name="Medal" size={18} color={textColor} variant="Bold" />
-              <Text style={[styles.compactStatText, { color: textColor }]}>{unlockedAchievements}</Text>
+            <View style={styles.compactStat}>
+              <Icon name="Medal" size={18} color={THEME.text} variant="Bold" />
+              <Text style={styles.compactStatText}>{unlockedAchievements}</Text>
             </View>
-            <View style={[styles.compactStat, { backgroundColor }]}>
-              <Icon name="Document" size={18} color={textColor} variant="Bold" />
-              <Text style={[styles.compactStatText, { color: textColor }]}>{unlockedCertificates}</Text>
+            <View style={styles.compactStat}>
+              <Icon name="Document" size={18} color={THEME.text} variant="Bold" />
+              <Text style={styles.compactStatText}>{unlockedCertificates}</Text>
             </View>
           </View>
         </View>
@@ -139,7 +157,7 @@ export default function AwardsScreen() {
         {/* Leaderboard Teaser */}
         <Animated.View entering={FadeInDown.delay(100).springify()} style={styles.sectionContainer}>
           <TouchableOpacity 
-            style={[styles.leaderboardCard, { backgroundColor: cardColor }]}
+            style={styles.leaderboardCard}
             onPress={() => router.push('/(tabs)/leaderboard')}
             activeOpacity={0.9}
           >
@@ -168,8 +186,8 @@ export default function AwardsScreen() {
         {/* Certificates Section */}
         <Animated.View entering={FadeInDown.delay(200).springify()} style={styles.sectionContainer}>
           <View style={styles.sectionHeader}>
-            <Icon name="Document" size={24} color={textColor} variant="Bold" />
-            <Text style={[styles.sectionTitle, { color: textColor }]}>Certificates</Text>
+            <Icon name="Document" size={24} color={THEME.text} variant="Bold" />
+            <Text style={styles.sectionTitle}>Certificates</Text>
             <Text style={styles.sectionCount}>{unlockedCertificates}/{CERTIFICATES.length}</Text>
           </View>
           <ScrollView 
@@ -189,8 +207,7 @@ export default function AwardsScreen() {
                 <Animated.View 
                   entering={FadeInDown.delay(250 + index * 50).springify()}
                   style={[
-                    styles.certificate, 
-                    { backgroundColor: cardColor },
+                    styles.certificate,
                     !cert.unlocked && styles.certificateLocked
                   ]}
                 >
@@ -225,7 +242,7 @@ export default function AwardsScreen() {
                         <Icon name="Lock1" size={24} color="#999" variant="Bold" />
                       </View>
                       <View style={styles.certificateRight}>
-                        <Text style={[styles.certificateTitleLocked, { color: textColor }]}>{cert.title}</Text>
+                        <Text style={styles.certificateTitleLocked}>{cert.title}</Text>
                         <Text style={styles.certificateDescLocked}>Complete requirements to unlock</Text>
                       </View>
                     </View>
@@ -239,8 +256,8 @@ export default function AwardsScreen() {
         {/* Achievements Section */}
         <Animated.View entering={FadeInDown.delay(300).springify()} style={styles.sectionContainer}>
           <View style={styles.sectionHeader}>
-            <Icon name="Medal" size={24} color={textColor} variant="Bold" />
-            <Text style={[styles.sectionTitle, { color: textColor }]}>Achievements</Text>
+            <Icon name="Medal" size={24} color={THEME.text} variant="Bold" />
+            <Text style={styles.sectionTitle}>Achievements</Text>
             <Text style={styles.sectionCount}>{unlockedAchievements}/{ACHIEVEMENTS.length}</Text>
           </View>
           <View style={styles.achievementsGrid}>
@@ -254,8 +271,7 @@ export default function AwardsScreen() {
                 <Animated.View 
                   entering={FadeInDown.delay(450 + index * 50).springify()}
                   style={[
-                    styles.achievementCard, 
-                    { backgroundColor: cardColor },
+                    styles.achievementCard,
                     achievement.locked && styles.achievementCardLocked
                   ]}
                 >
@@ -299,7 +315,6 @@ export default function AwardsScreen() {
                   <View style={styles.achievementTextContent}>
                     <Text style={[
                       styles.achievementCardTitle,
-                      { color: textColor },
                       achievement.locked && styles.achievementCardTitleLocked
                     ]} numberOfLines={1}>
                       {achievement.title}
@@ -338,7 +353,7 @@ export default function AwardsScreen() {
           {selectedAchievement && (
             <Animated.View 
               entering={FadeInDown.springify()}
-              style={[styles.achievementModalContainer, { backgroundColor: cardColor }]}
+              style={styles.achievementModalContainer}
             >
               {/* Header with Icon */}
               <View style={styles.achievementModalHeader}>
@@ -359,13 +374,13 @@ export default function AwardsScreen() {
                   style={styles.achievementModalClose}
                   onPress={() => setShowAchievementModal(false)}
                 >
-                  <Icon name="CloseCircle" size={28} color={textColor} />
+                  <Icon name="CloseCircle" size={28} color={THEME.text} />
                 </TouchableOpacity>
               </View>
               
               {/* Title & Description */}
               <View style={styles.achievementModalContent}>
-                <Text style={[styles.achievementModalTitle, { color: textColor }]}>
+                <Text style={styles.achievementModalTitle}>
                   {selectedAchievement.title}
                 </Text>
                 <Text style={styles.achievementModalRequirement}>
@@ -375,7 +390,7 @@ export default function AwardsScreen() {
                 {/* Progress Section */}
                 <View style={styles.progressSection}>
                   <View style={styles.progressHeader}>
-                    <Text style={[styles.progressLabel, { color: textColor }]}>Progress</Text>
+                    <Text style={styles.progressLabel}>Progress</Text>
                     <Text style={[styles.progressValue, { color: selectedAchievement.gradient[0] }]}>
                       {selectedAchievement.currentValue} / {selectedAchievement.threshold}
                     </Text>
@@ -383,7 +398,7 @@ export default function AwardsScreen() {
                   
                   {/* Progress Bar */}
                   <View style={styles.progressBarContainer}>
-                    <View style={[styles.progressBarTrack, { backgroundColor: backgroundColor }]}>
+                    <View style={styles.progressBarTrack}>
                       <LinearGradient
                         colors={selectedAchievement.gradient}
                         start={{ x: 0, y: 0 }}
@@ -533,9 +548,10 @@ export default function AwardsScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (theme: typeof LightTHEME) => StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: theme.bg,
   },
   content: {
     paddingBottom: 40,
@@ -544,6 +560,7 @@ const styles = StyleSheet.create({
   header: {
     paddingHorizontal: 20,
     paddingBottom: 16,
+    backgroundColor: theme.card,
   },
   headerContent: {
     flexDirection: 'row',
@@ -558,10 +575,11 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: '800',
     marginBottom: 4,
+    color: theme.text,
   },
   headerSubtitle: {
     fontSize: 14,
-    color: '#8898AA',
+    color: theme.textMuted,
     fontWeight: '500',
   },
   headerStats: {
@@ -575,10 +593,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 16,
+    backgroundColor: theme.bg,
   },
   compactStatText: {
     fontSize: 14,
     fontWeight: '700',
+    color: theme.text,
   },
   
   // Section Container
@@ -596,6 +616,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
+    backgroundColor: theme.card,
   },
   leaderboardGradient: {
     padding: 20,
@@ -650,11 +671,12 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '800',
     flex: 1,
+    color: theme.text,
   },
   sectionCount: {
     fontSize: 14,
     fontWeight: '700',
-    color: '#999',
+    color: theme.textMuted,
   },
 
   // Certificates
@@ -675,6 +697,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
+    backgroundColor: theme.card,
   },
   certificateGradient: {
     flex: 1,
@@ -778,10 +801,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '700',
     marginBottom: 4,
+    color: theme.text,
   },
   certificateDescLocked: {
     fontSize: 13,
-    color: '#999',
+    color: theme.textMuted,
     fontWeight: '500',
   },
 
@@ -807,10 +831,10 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
     shadowRadius: 8,
+    backgroundColor: theme.card,
   },
   achievementCardLocked: {
     opacity: 0.7,
-    backgroundColor: '#F9F9F9',
   },
   circularProgressContainer: {
     position: 'relative',
@@ -837,13 +861,14 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     marginBottom: 4,
     textAlign: 'center',
+    color: theme.text,
   },
   achievementCardTitleLocked: {
-    color: '#999',
+    color: theme.textMuted,
   },
   achievementCardDescription: {
     fontSize: 12,
-    color: '#999',
+    color: theme.textMuted,
     textAlign: 'center',
     fontWeight: '500',
     lineHeight: 16,
@@ -1033,6 +1058,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.3,
     shadowRadius: 20,
+    backgroundColor: theme.card,
   },
   achievementModalHeader: {
     alignItems: 'center',
@@ -1067,10 +1093,11 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     textAlign: 'center',
     marginBottom: 8,
+    color: theme.text,
   },
   achievementModalRequirement: {
     fontSize: 15,
-    color: '#999',
+    color: theme.textMuted,
     textAlign: 'center',
     fontWeight: '500',
     marginBottom: 32,
@@ -1086,6 +1113,7 @@ const styles = StyleSheet.create({
   progressLabel: {
     fontSize: 16,
     fontWeight: '700',
+    color: theme.text,
   },
   progressValue: {
     fontSize: 18,
@@ -1098,6 +1126,7 @@ const styles = StyleSheet.create({
     height: 12,
     borderRadius: 6,
     overflow: 'hidden',
+    backgroundColor: theme.bg,
   },
   progressBarFill: {
     height: '100%',

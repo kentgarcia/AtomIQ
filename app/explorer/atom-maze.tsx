@@ -1,5 +1,6 @@
 import { Icon } from '@/components/ui/icon';
 import { getMazeById } from '@/content/explorer';
+import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useStorage } from '@/services/StorageContext';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -24,97 +25,52 @@ import Animated, {
     withSequence,
     withTiming
 } from 'react-native-reanimated';
-import Svg, { Circle, Path, Rect } from 'react-native-svg';
 
 const { width, height } = Dimensions.get('window');
 
-// Bright Mustard Theme
+// Modern Theme
 const THEME = {
-  bg: '#FFFDE7',
-  bgLight: '#FFF9C4',
-  card: '#FFFFFF',
-  text: '#1F2937',
-  textMuted: '#6B7280',
-  primary: '#FFB300', // Bright Mustard
-  primaryDark: '#FFA000',
-  secondary: '#FFD54F',
-  success: '#22C55E',
-  error: '#EF4444',
-  warning: '#FF8F00',
-  gold: '#FFCA28',
-  playerColor: '#FFB300',
-  monsterColor: '#EF4444',
-  border: '#FFE082',
+  light: {
+    bg: '#FFFFFF',
+    card: '#F9FAFB',
+    text: '#111827',
+    textMuted: '#6B7280',
+    primary: '#FFB300',
+    primaryDark: '#FFA000',
+    success: '#10B981',
+    error: '#EF4444',
+    warning: '#F59E0B',
+    playerColor: '#3B82F6',
+    monsterColor: '#EF4444',
+    border: '#E5E7EB',
+    shadow: 'rgba(0, 0, 0, 0.1)',
+  },
+  dark: {
+    bg: '#0F172A',
+    card: '#1E293B',
+    text: '#F1F5F9',
+    textMuted: '#94A3B8',
+    primary: '#FFB300',
+    primaryDark: '#FFA000',
+    success: '#10B981',
+    error: '#EF4444',
+    warning: '#F59E0B',
+    playerColor: '#3B82F6',
+    monsterColor: '#EF4444',
+    border: '#334155',
+    shadow: 'rgba(0, 0, 0, 0.3)',
+  },
 };
 
-const RETRO_THEME = {
-  white: '#FFFFFF',
-  light: '#C4CFA1', // Classic GB Green-ish tint for "white"
-  mid: '#8B956D',   // Mid tone
-  dark: '#4D533C',  // Dark tone
-  black: '#1F1F1F', // Black
-};
-
-// Monster sprites for fallback
-const MONSTER_SPRITES = {
-  boss: '👹',
-  slime: '👾',
-  ghost: '👻',
-  dragon: '🐉',
-  robot: '🤖',
-};
-
-const PlayerSvg = () => (
-  <Svg width="80" height="80" viewBox="0 0 100 100">
-    <Circle cx="50" cy="30" r="20" fill={RETRO_THEME.black} />
-    <Rect x="40" y="50" width="20" height="30" fill={RETRO_THEME.black} />
-    <Path d="M40 50 L20 70" stroke={RETRO_THEME.black} strokeWidth="5" strokeLinecap="square" />
-    <Path d="M60 50 L80 70" stroke={RETRO_THEME.black} strokeWidth="5" strokeLinecap="square" />
-    <Path d="M45 80 L45 100" stroke={RETRO_THEME.black} strokeWidth="5" strokeLinecap="square" />
-    <Path d="M55 80 L55 100" stroke={RETRO_THEME.black} strokeWidth="5" strokeLinecap="square" />
-  </Svg>
+const PlayerIcon = ({ color }: { color: string }) => (
+  <View style={{ width: 80, height: 80, alignItems: 'center', justifyContent: 'center' }}>
+    <Text style={{ fontSize: 64 }}>🛡️</Text>
+  </View>
 );
 
-const EnemySvg = ({ color, isBoss }: { color: string; isBoss?: boolean }) => (
-  <Svg width={isBoss ? "120" : "80"} height={isBoss ? "120" : "80"} viewBox="0 0 100 100">
-    <Rect x="20" y="20" width="60" height="60" fill={RETRO_THEME.dark} rx="0" />
-    <Rect x="30" y="35" width="10" height="10" fill={RETRO_THEME.white} />
-    <Rect x="60" y="35" width="10" height="10" fill={RETRO_THEME.white} />
-    <Path d="M35 65 L65 65" stroke={RETRO_THEME.white} strokeWidth="3" fill="none" />
-    {isBoss && <Path d="M20 20 L30 5 L40 20 L50 5 L60 20 L70 5 L80 20" fill={RETRO_THEME.dark} stroke={RETRO_THEME.black} strokeWidth="2" />}
-  </Svg>
-);
-
-const GameBoyFrame = ({ children, title, score, onBack }: { 
-  children: React.ReactNode;
-  title?: string;
-  score?: number;
-  onBack?: () => void;
-}) => (
-  <View style={styles.gbContainer}>
-    <View style={styles.gbBezel}>
-      <View style={styles.gbScreen}>
-        {/* In-screen header */}
-        {title && (
-          <View style={styles.gbScreenHeader}>
-            <TouchableOpacity onPress={onBack} style={styles.gbBackBtn}>
-              <Icon name="ArrowLeft2" size={16} color={RETRO_THEME.dark} />
-            </TouchableOpacity>
-            <Text style={styles.gbScreenTitle}>{title}</Text>
-            {score !== undefined && (
-              <View style={styles.gbScoreBadge}>
-                <Text style={styles.gbScoreText}>{score}</Text>
-              </View>
-            )}
-          </View>
-        )}
-        {children}
-      </View>
-      
-      <View style={styles.gbFooter}>
-        <Text style={styles.gbLogo}>ATOM<Text style={styles.gbLogoItalic}>IQ</Text> BATTLE</Text>
-      </View>
-    </View>
+const MonsterIcon = ({ isBoss }: { isBoss?: boolean }) => (
+  <View style={{ width: isBoss ? 100 : 80, height: isBoss ? 100 : 80, alignItems: 'center', justifyContent: 'center' }}>
+    <Text style={{ fontSize: isBoss ? 80 : 64 }}>{isBoss ? '👹' : '👾'}</Text>
   </View>
 );
 
@@ -155,12 +111,11 @@ export default function AtomMazeBattleScreen() {
 
   // UI state
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
-  const [scrambleInput, setScrambleInput] = useState<string[]>([]);
-  const [availableLetters, setAvailableLetters] = useState<string[]>([]);
   const [showResult, setShowResult] = useState<'correct' | 'wrong' | null>(null);
   const [isAnswering, setIsAnswering] = useState(false);
-  const [revealedPositions, setRevealedPositions] = useState<number[]>([]);
-  const [hintTimer, setHintTimer] = useState(60);
+  
+  const colorScheme = useColorScheme();
+  const theme = THEME[colorScheme ?? 'light'];
 
   // Animation values
   const playerShake = useSharedValue(0);
@@ -200,70 +155,21 @@ export default function AtomMazeBattleScreen() {
   const isBossBattle = gameState.phase === 'boss';
   const currentMonster = isBossBattle ? maze?.boss : currentRoom?.monster;
   
-  // For boss battles, collect all scramble questions from all rooms
-  const bossQuestions = useMemo(() => {
-    if (!maze) return [] as { type: 'scramble'; question: string; answer: string; hint?: string }[];
-    const scrambles: { type: 'scramble'; question: string; answer: string; hint?: string }[] = [];
-    maze.rooms.forEach(room => {
-      room.questions.forEach(q => {
-        if (q.type === 'scramble') {
-          scrambles.push(q as { type: 'scramble'; question: string; answer: string; hint?: string });
-        }
-      });
-    });
-    return scrambles;
-  }, [maze]);
+  // Filter to only quiz questions
+  const currentQuestions = useMemo(() => {
+    const questions = isBossBattle 
+      ? maze?.rooms.flatMap(room => room.questions) || []
+      : currentRoom?.questions || [];
+    return questions.filter(q => q.type === 'quiz');
+  }, [isBossBattle, maze, currentRoom]);
   
-  const currentQuestions = isBossBattle ? bossQuestions : (currentRoom?.questions || []);
   const currentQuestion = currentQuestions[gameState.currentQuestionIndex];
 
-  // Initialize scramble letters when question changes
+  // Reset selection when question changes
   useEffect(() => {
-    if (currentQuestion?.type === 'scramble') {
-      const answer = currentQuestion.answer.toUpperCase();
-      const shuffled = answer.split('').sort(() => Math.random() - 0.5);
-      setAvailableLetters(shuffled);
-      setScrambleInput([]);
-      setRevealedPositions([]);
-      setHintTimer(60);
-    }
-  }, [currentQuestion, gameState.currentQuestionIndex, gameState.currentRoomIndex]);
-
-  // Hint timer countdown - reveals a letter every 60 seconds
-  useEffect(() => {
-    if (currentQuestion?.type === 'scramble' && (gameState.phase === 'battle' || gameState.phase === 'boss')) {
-      const timer = setInterval(() => {
-        setHintTimer((prev) => {
-          if (prev <= 1) {
-            // Reveal a random unrevealed position
-            const answer = currentQuestion.answer.toUpperCase();
-            const unrevealedPositions = answer.split('').map((_, i) => i)
-              .filter(i => !revealedPositions.includes(i) && !scrambleInput[i]);
-            
-            if (unrevealedPositions.length > 0) {
-              const randomPos = unrevealedPositions[Math.floor(Math.random() * unrevealedPositions.length)];
-              const letterToReveal = answer[randomPos];
-              
-              // Remove the letter from available letters
-              const letterIndex = availableLetters.indexOf(letterToReveal);
-              if (letterIndex !== -1) {
-                setAvailableLetters(prev => {
-                  const newLetters = [...prev];
-                  newLetters.splice(letterIndex, 1);
-                  return newLetters;
-                });
-              }
-              
-              setRevealedPositions(prev => [...prev, randomPos]);
-            }
-            return 60; // Reset timer for next hint
-          }
-          return prev - 1;
-        });
-      }, 1000);
-      return () => clearInterval(timer);
-    }
-  }, [currentQuestion, gameState.phase, revealedPositions, scrambleInput, availableLetters]);
+    setSelectedAnswer(null);
+    setShowResult(null);
+  }, [currentQuestion]);
 
   // Shake animation for damage
   const triggerPlayerShake = useCallback(() => {
@@ -325,72 +231,12 @@ export default function AtomMazeBattleScreen() {
     setSelectedAnswer(index);
   };
 
-  // Handle scramble letter selection - place in next available non-revealed slot
-  const handleLetterSelect = (letter: string, index: number) => {
-    if (isAnswering || showResult || !currentQuestion) return;
-    
-    // Find the next empty slot that isn't revealed
-    const answerLength = currentQuestion.type === 'scramble' ? currentQuestion.answer.length : 0;
-    let targetSlot = -1;
-    
-    for (let i = 0; i < answerLength; i++) {
-      if (!revealedPositions.includes(i) && !scrambleInput[i]) {
-        targetSlot = i;
-        break;
-      }
-    }
-    
-    if (targetSlot === -1) return; // No available slot
-    
-    const newAvailable = [...availableLetters];
-    newAvailable.splice(index, 1);
-    setAvailableLetters(newAvailable);
-    
-    // Place letter at the target slot
-    const newInput = [...scrambleInput];
-    newInput[targetSlot] = letter;
-    setScrambleInput(newInput);
-  };
-
-  // Handle removing letter from input (keep position, just clear it)
-  const handleLetterRemove = (index: number) => {
-    if (isAnswering || showResult) return;
-    if (revealedPositions.includes(index)) return; // Can't remove revealed letters
-    
-    const letter = scrambleInput[index];
-    if (!letter) return;
-    
-    const newInput = [...scrambleInput];
-    delete newInput[index]; // Remove but keep position
-    setScrambleInput(newInput);
-    setAvailableLetters([...availableLetters, letter]);
-  };
-
-  // Shuffle available letters
-  const handleShuffle = () => {
-    if (isAnswering || showResult) return;
-    const shuffled = [...availableLetters].sort(() => Math.random() - 0.5);
-    setAvailableLetters(shuffled);
-  };
-
   // Submit answer
   const handleSubmit = () => {
-    if (isAnswering || !currentQuestion) return;
+    if (isAnswering || !currentQuestion || selectedAnswer === null) return;
 
     setIsAnswering(true);
-    let isCorrect = false;
-
-    if (currentQuestion.type === 'quiz') {
-      isCorrect = selectedAnswer === currentQuestion.correctAnswer;
-    } else if (currentQuestion.type === 'scramble') {
-      // Build the full answer including revealed letters
-      const correctAnswer = currentQuestion.answer.toUpperCase();
-      const fullAnswer = correctAnswer.split('').map((letter, i) => {
-        if (revealedPositions.includes(i)) return letter;
-        return scrambleInput[i] || '';
-      }).join('');
-      isCorrect = fullAnswer === correctAnswer;
-    }
+    const isCorrect = selectedAnswer === (currentQuestion as any).correctAnswer;
 
     setShowResult(isCorrect ? 'correct' : 'wrong');
 
@@ -401,7 +247,7 @@ export default function AtomMazeBattleScreen() {
 
       if (isBossBattle) {
         // Boss battle: deal damage per correct answer
-        const damagePerHit = Math.ceil((maze?.boss?.maxHp || 100) / bossQuestions.length);
+        const damagePerHit = Math.ceil((maze?.boss?.maxHp || 100) / currentQuestions.length);
         const newBossHp = Math.max(0, gameState.monsterHp - damagePerHit);
 
         setGameState((prev) => ({
@@ -420,7 +266,6 @@ export default function AtomMazeBattleScreen() {
           setTimeout(() => {
             setShowResult(null);
             setSelectedAnswer(null);
-            setScrambleInput([]);
             setIsAnswering(false);
             setGameState((prev) => ({
               ...prev,
@@ -532,7 +377,6 @@ export default function AtomMazeBattleScreen() {
   const handleMonsterDefeated = () => {
     setShowResult(null);
     setSelectedAnswer(null);
-    setScrambleInput([]);
     setIsAnswering(false);
 
     setGameState((prev) => ({
@@ -832,77 +676,82 @@ export default function AtomMazeBattleScreen() {
 
   // Main battle screen
   return (
-    <LinearGradient colors={['#FFFDE7', '#FFF9C4'] as const} style={styles.container}>
-      {/* Battle Arena */}
-      <GameBoyFrame 
-        title={isBossBattle ? '⚔️ BOSS' : `Room ${gameState.currentRoomIndex + 1}/${maze.rooms.length}`}
-        score={gameState.score}
-        onBack={handleExit}
-      >
-        <View style={styles.battleArena}>
-          {/* Floor Line */}
-          <View style={styles.floorLine} />
-          
-          {/* Player Side (Left) */}
-          <Animated.View style={[styles.fighterContainer, playerAnimatedStyle, { zIndex: 10 }]}>
-            <View style={styles.hpBarContainer}>
-              <Text style={styles.fighterName}>You</Text>
-              <View style={styles.hpBarBg}>
-                <View
-                  style={[
-                    styles.hpBarFill,
-                    {
-                      width: `${(gameState.playerHp / gameState.playerMaxHp) * 100}%`,
-                      backgroundColor:
-                        gameState.playerHp > gameState.playerMaxHp * 0.5
-                          ? THEME.success
-                          : gameState.playerHp > gameState.playerMaxHp * 0.25
-                          ? THEME.warning
-                          : THEME.error,
-                    },
-                  ]}
-                />
-              </View>
-              <Text style={styles.hpText}>
-                {gameState.playerHp}/{gameState.playerMaxHp} HP
-              </Text>
-            </View>
-            <View style={styles.svgContainer}>
-              <PlayerSvg />
-            </View>
-          </Animated.View>
+    <View style={[styles.container, { backgroundColor: theme.bg }]}>
+      {/* Modern Header */}
+      <View style={[styles.modernHeader, { backgroundColor: theme.card, borderBottomColor: theme.border }]}>
+        <TouchableOpacity onPress={handleExit} style={[styles.modernBackBtn, { backgroundColor: theme.bg }]}>
+          <Icon name="ArrowLeft2" size={20} color={theme.text} />
+        </TouchableOpacity>
+        <View style={styles.modernHeaderCenter}>
+          <Text style={[styles.modernHeaderTitle, { color: theme.text }]}>
+            {isBossBattle ? '⚔️ BOSS BATTLE' : `Room ${gameState.currentRoomIndex + 1}/${maze.rooms.length}`}
+          </Text>
+          <View style={styles.modernScoreBadge}>
+            <Icon name="Cup" size={14} color="#FFB300" variant="Bold" />
+            <Text style={[styles.modernScoreText, { color: theme.text }]}>{gameState.score}</Text>
+          </View>
+        </View>
+        <View style={{ width: 44 }} />
+      </View>
 
-          {/* Monster Side (Right) */}
-          <Animated.View style={[styles.fighterContainer, monsterAnimatedStyle]}>
-            <View style={styles.hpBarContainer}>
-              <Text style={styles.fighterName}>
-                {isBossBattle ? '👹 ' : ''}
-                {currentMonster?.name || 'Monster'}
-              </Text>
-              <View style={styles.hpBarBg}>
-                <View
-                  style={[
-                    styles.hpBarFill,
-                    {
-                      width: `${(gameState.monsterHp / gameState.monsterMaxHp) * 100}%`,
-                      backgroundColor: THEME.monsterColor,
-                    },
-                  ]}
-                />
-              </View>
-              <Text style={styles.hpText}>
-                {gameState.monsterHp}/{gameState.monsterMaxHp} HP
-              </Text>
-            </View>
-            <View style={styles.svgContainer}>
-              <EnemySvg 
-                color={currentMonster?.color || THEME.monsterColor} 
-                isBoss={isBossBattle}
+      {/* Modern Battle Arena */}
+      <View style={[styles.modernBattleArena, { backgroundColor: theme.card }]}>
+        {/* Player Side */}
+        <Animated.View style={[styles.modernFighter, playerAnimatedStyle]}>
+          <PlayerIcon color={theme.playerColor} />
+          <View style={styles.modernHpContainer}>
+            <Text style={[styles.modernFighterName, { color: theme.text }]}>You</Text>
+            <View style={[styles.modernHpBarBg, { backgroundColor: theme.border }]}>
+              <Animated.View
+                style={[
+                  styles.modernHpBarFill,
+                  {
+                    width: `${(gameState.playerHp / gameState.playerMaxHp) * 100}%`,
+                    backgroundColor:
+                      gameState.playerHp > gameState.playerMaxHp * 0.5
+                        ? theme.success
+                        : gameState.playerHp > gameState.playerMaxHp * 0.25
+                        ? theme.warning
+                        : theme.error,
+                  },
+                ]}
               />
             </View>
-          </Animated.View>
+            <Text style={[styles.modernHpText, { color: theme.textMuted }]}>
+              {gameState.playerHp}/{gameState.playerMaxHp} HP
+            </Text>
+          </View>
+        </Animated.View>
+
+        {/* VS Badge */}
+        <View style={[styles.vsBadge, { backgroundColor: theme.primary }]}>
+          <Text style={styles.vsText}>VS</Text>
         </View>
-      </GameBoyFrame>
+
+        {/* Monster Side */}
+        <Animated.View style={[styles.modernFighter, monsterAnimatedStyle]}>
+          <MonsterIcon isBoss={isBossBattle} />
+          <View style={styles.modernHpContainer}>
+            <Text style={[styles.modernFighterName, { color: theme.text }]}>
+              {currentMonster?.name || 'Monster'}
+            </Text>
+            <View style={[styles.modernHpBarBg, { backgroundColor: theme.border }]}>
+              <Animated.View
+                style={[
+                  styles.modernHpBarFill,
+                  {
+                    width: `${(gameState.monsterHp / gameState.monsterMaxHp) * 100}%`,
+                    backgroundColor: theme.error,
+                  },
+                ]}
+              />
+            </View>
+            <Text style={[styles.modernHpText, { color: theme.textMuted }]}>
+              {gameState.monsterHp}/{gameState.monsterMaxHp} HP
+            </Text>
+          </View>
+        </Animated.View>
+      </View>
 
       {/* Question Area */}
       <ScrollView 
@@ -911,20 +760,20 @@ export default function AtomMazeBattleScreen() {
         showsVerticalScrollIndicator={false}
       >
         {currentQuestion && (
-          <View style={styles.questionCard}>
-            <Text style={styles.questionText}>{currentQuestion.question}</Text>
-            {currentQuestion.type === 'scramble' && currentQuestion.hint && (
-              <Text style={styles.hintText}>💡 {currentQuestion.hint}</Text>
-            )}
+          <View style={[styles.modernQuestionCard, { backgroundColor: theme.card, borderColor: theme.border, shadowColor: theme.shadow }]}>
+            <View style={[styles.modernQuestionBadge, { backgroundColor: theme.primary }]}>
+              <Icon name="MessageQuestion" size={18} color="#FFF" variant="Bold" />
+            </View>
+            <Text style={[styles.modernQuestionText, { color: theme.text }]}>{currentQuestion.question}</Text>
           </View>
         )}
 
-        {/* Answer Area */}
-        {currentQuestion?.type === 'quiz' && (
+        {/* Answer Options */}
+        {currentQuestion && (
           <View style={styles.optionsContainer}>
-            {currentQuestion.options.map((option, index) => {
+            {(currentQuestion as any).options.map((option: string, index: number) => {
               const isSelected = selectedAnswer === index;
-              const isCorrect = index === currentQuestion.correctAnswer;
+              const isCorrect = index === (currentQuestion as any).correctAnswer;
               const showCorrectness = showResult !== null;
               const isWrongAnswer = showCorrectness && isSelected && !isCorrect;
 
@@ -932,29 +781,27 @@ export default function AtomMazeBattleScreen() {
                 <TouchableOpacity
                   key={index}
                   style={[
-                    styles.optionButton,
-                    // Only show correct styling when player got it right
-                    showCorrectness && isCorrect && isSelected && styles.optionCorrect,
-                    // Show wrong styling only for the selected wrong answer
-                    isWrongAnswer && styles.optionWrong,
-                    !showCorrectness && isSelected && styles.optionSelected,
+                    styles.modernOptionButton,
+                    { backgroundColor: theme.card, borderColor: theme.border, shadowColor: theme.shadow },
+                    showCorrectness && isCorrect && isSelected && styles.modernOptionCorrect,
+                    isWrongAnswer && styles.modernOptionWrong,
+                    !showCorrectness && isSelected && [styles.modernOptionSelected, { borderColor: theme.primary }],
                   ]}
                   onPress={() => handleQuizAnswer(index)}
                   disabled={showResult !== null}
                 >
-                  <View style={styles.optionBadge}>
-                    <Text style={styles.optionBadgeText}>
+                  <View style={[styles.modernOptionBadge, { backgroundColor: theme.primary }]}>
+                    <Text style={styles.modernOptionBadgeText}>
                       {String.fromCharCode(65 + index)}
                     </Text>
                   </View>
                   <Text
                     style={[
-                      styles.optionText,
-                      // Only show correct text styling when player got it right
-                      showCorrectness && isCorrect && isSelected && styles.optionTextCorrect,
-                      isWrongAnswer && styles.optionTextWrong,
+                      styles.modernOptionText,
+                      { color: theme.text },
+                      showCorrectness && isCorrect && isSelected && styles.modernOptionTextCorrect,
+                      isWrongAnswer && styles.modernOptionTextWrong,
                     ]}
-                    numberOfLines={2}
                   >
                     {option}
                   </Text>
@@ -1044,14 +891,20 @@ export default function AtomMazeBattleScreen() {
             entering={FadeIn}
             exiting={FadeOut}
             style={[
-              styles.resultFeedback,
-              showResult === 'correct' ? styles.resultCorrect : styles.resultWrong,
+              styles.modernResultFeedback,
+              showResult === 'correct' ? styles.modernResultCorrect : styles.modernResultWrong,
             ]}
           >
-            <Text style={styles.resultFeedbackText}>
+            <Icon 
+              name={showResult === 'correct' ? 'TickCircle' : 'CloseCircle'} 
+              size={24} 
+              color="#FFF" 
+              variant="Bold" 
+            />
+            <Text style={styles.modernResultText}>
               {showResult === 'correct' 
-                ? (isBossBattle ? '✓ CORRECT! Boss takes damage!' : '✓ CORRECT! Monster defeated!') 
-                : '✗ WRONG! Try again!'}
+                ? (isBossBattle ? 'Boss takes damage!' : 'Monster defeated!') 
+                : 'Wrong answer! Try again'}
             </Text>
           </Animated.View>
         )}
@@ -1060,37 +913,25 @@ export default function AtomMazeBattleScreen() {
         {!showResult && (
           <TouchableOpacity
             style={[
-              styles.submitButton,
-              (currentQuestion?.type === 'quiz' && selectedAnswer === null) && styles.submitButtonDisabled,
-              (currentQuestion?.type === 'scramble' && (() => {
-                // Check if all non-revealed positions are filled
-                const answerLen = currentQuestion.answer.length;
-                for (let i = 0; i < answerLen; i++) {
-                  if (!revealedPositions.includes(i) && !scrambleInput[i]) return true;
-                }
-                return false;
-              })()) && styles.submitButtonDisabled,
+              styles.modernSubmitButton,
+              selectedAnswer === null && styles.modernSubmitButtonDisabled,
             ]}
             onPress={handleSubmit}
-            disabled={
-              (currentQuestion?.type === 'quiz' && selectedAnswer === null) ||
-              (currentQuestion?.type === 'scramble' && (() => {
-                const answerLen = currentQuestion?.answer.length || 0;
-                for (let i = 0; i < answerLen; i++) {
-                  if (!revealedPositions.includes(i) && !scrambleInput[i]) return true;
-                }
-                return false;
-              })())
-            }
+            disabled={selectedAnswer === null}
           >
-            <View style={styles.submitButtonGradient}>
-              <Icon name="Sword" size={22} color="#FFF" variant="Bold" />
-              <Text style={styles.submitButtonText}>ATTACK!</Text>
-            </View>
+            <LinearGradient
+              colors={selectedAnswer === null ? ['#9CA3AF', '#6B7280'] : ['#FFB300', '#FF8F00']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.modernSubmitGradient}
+            >
+              <Icon name="Sword" size={24} color="#FFF" variant="Bold" />
+              <Text style={styles.modernSubmitText}>ATTACK</Text>
+            </LinearGradient>
           </TouchableOpacity>
         )}
       </ScrollView>
-    </LinearGradient>
+    </View>
   );
 }
 
@@ -1099,33 +940,119 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   errorText: {
-    color: THEME.text,
     fontSize: 18,
     textAlign: 'center',
     marginTop: 100,
   },
-  exitButton: {
-    alignSelf: 'center',
-    marginTop: 20,
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    backgroundColor: THEME.primary,
-    borderRadius: 8,
+
+  // Modern Header
+  modernHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    paddingTop: 60,
+    borderBottomWidth: 1,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
-  exitButtonText: {
-    color: '#FFF',
+  modernBackBtn: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  modernHeaderCenter: {
+    flex: 1,
+    alignItems: 'center',
+    gap: 4,
+  },
+  modernHeaderTitle: {
+    fontSize: 16,
+    fontWeight: '800',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  modernScoreBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  modernScoreText: {
+    fontSize: 14,
     fontWeight: '700',
   },
 
-  // Battle Arena
-  battleArena: {
+  // Modern Battle Arena
+  modernBattleArena: {
     flexDirection: 'row',
-    alignItems: 'flex-end',
-    justifyContent: 'space-between',
-    paddingHorizontal: 12,
-    paddingVertical: 10,
+    alignItems: 'center',
+    justifyContent: 'space-around',
+    paddingVertical: 30,
+    paddingHorizontal: 20,
+    marginHorizontal: 16,
+    marginTop: 16,
+    borderRadius: 24,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  modernFighter: {
+    alignItems: 'center',
+    gap: 12,
     flex: 1,
-    position: 'relative',
+  },
+  modernHpContainer: {
+    width: '100%',
+    alignItems: 'center',
+    gap: 6,
+  },
+  modernFighterName: {
+    fontSize: 13,
+    fontWeight: '700',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  modernHpBarBg: {
+    width: '100%',
+    height: 10,
+    borderRadius: 5,
+    overflow: 'hidden',
+  },
+  modernHpBarFill: {
+    height: '100%',
+    borderRadius: 5,
+  },
+  modernHpText: {
+    fontSize: 11,
+    fontWeight: '600',
+  },
+  vsBadge: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginHorizontal: 8,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 6,
+    elevation: 5,
+  },
+  vsText: {
+    color: '#FFF',
+    fontSize: 16,
+    fontWeight: '900',
+    letterSpacing: 1,
   },
   gbContainer: {
     backgroundColor: '#1a1a1a',
@@ -1159,6 +1086,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#8B956D',
     borderBottomWidth: 2,
     borderBottomColor: '#4D533C',
+    gap: 8,
   },
   gbBackBtn: {
     width: 28,
@@ -1169,6 +1097,7 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     borderWidth: 1,
     borderColor: '#4D533C',
+    flexShrink: 0,
   },
   gbScreenTitle: {
     flex: 1,
@@ -1178,6 +1107,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace',
     textTransform: 'uppercase',
+    marginHorizontal: 4,
   },
   gbScoreBadge: {
     backgroundColor: '#4D533C',
@@ -1186,6 +1116,7 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     minWidth: 36,
     alignItems: 'center',
+    flexShrink: 0,
   },
   gbScoreText: {
     color: '#C4CFA1',
@@ -1265,84 +1196,92 @@ const styles = StyleSheet.create({
   // Question Area
   questionArea: {
     flex: 1,
+    marginTop: 16,
   },
   questionAreaContent: {
-    paddingHorizontal: 16,
-    paddingBottom: 20,
+    paddingHorizontal: 20,
+    paddingBottom: 30,
+    gap: 16,
   },
-  questionCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 16,
-    padding: 14,
-    marginBottom: 12,
-    borderWidth: 2,
-    borderColor: '#E5E7EB',
-    borderBottomWidth: 3,
+  modernQuestionCard: {
+    borderRadius: 20,
+    padding: 20,
+    borderWidth: 1,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 3,
+    gap: 12,
   },
-  questionText: {
-    fontSize: 15,
-    color: '#1F2937',
+  modernQuestionBadge: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    alignSelf: 'flex-start',
+  },
+  modernQuestionText: {
+    fontSize: 17,
     fontWeight: '600',
-    lineHeight: 22,
-  },
-  hintText: {
-    fontSize: 11,
-    color: '#6B7280',
-    marginTop: 8,
-    fontStyle: 'italic',
+    lineHeight: 26,
   },
 
-  // Quiz Options
+  // Modern Options
   optionsContainer: {
-    gap: 8,
+    gap: 12,
   },
-  optionButton: {
+  modernOptionButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    padding: 12,
-    gap: 10,
+    borderRadius: 16,
+    padding: 16,
+    gap: 12,
     borderWidth: 2,
-    borderBottomWidth: 3,
-    borderColor: '#E5E7EB',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
   },
-  optionSelected: {
-    borderColor: '#FFB300',
-    backgroundColor: '#FFF8E1',
+  modernOptionSelected: {
+    borderWidth: 3,
+    shadowOpacity: 0.15,
   },
-  optionCorrect: {
-    borderColor: '#22C55E',
-    backgroundColor: '#DCFCE7',
+  modernOptionCorrect: {
+    borderColor: '#10B981',
+    backgroundColor: '#D1FAE5',
   },
-  optionWrong: {
+  modernOptionWrong: {
     borderColor: '#EF4444',
     backgroundColor: '#FEE2E2',
   },
-  optionBadge: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    backgroundColor: '#FFB300',
+  modernOptionBadge: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     alignItems: 'center',
     justifyContent: 'center',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
+    elevation: 3,
   },
-  optionBadgeText: {
+  modernOptionBadgeText: {
     color: '#FFFFFF',
     fontWeight: '800',
-    fontSize: 13,
+    fontSize: 16,
   },
-  optionText: {
+  modernOptionText: {
     flex: 1,
-    fontSize: 14,
-    color: '#1F2937',
+    fontSize: 15,
     fontWeight: '500',
+    lineHeight: 22,
   },
-  optionTextCorrect: {
-    color: '#166534',
+  modernOptionTextCorrect: {
+    color: '#065F46',
     fontWeight: '700',
   },
-  optionTextWrong: {
+  modernOptionTextWrong: {
     color: '#991B1B',
     fontWeight: '700',
   },
@@ -1476,57 +1415,56 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
 
-  // Result Feedback
-  resultFeedback: {
-    padding: 12,
-    borderRadius: 12,
-    marginTop: 10,
-    alignItems: 'center',
-    borderWidth: 2,
-    borderBottomWidth: 4,
-  },
-  resultCorrect: {
-    backgroundColor: '#DCFCE7',
-    borderColor: '#22C55E',
-  },
-  resultWrong: {
-    backgroundColor: '#FEE2E2',
-    borderColor: '#EF4444',
-  },
-  resultFeedbackText: {
-    color: '#1F2937',
-    fontWeight: '700',
-    fontSize: 14,
-  },
-
-  // Submit Button
-  submitButton: {
-    marginTop: 14,
-    borderRadius: 16,
-    overflow: 'hidden',
-    alignSelf: 'stretch',
-    backgroundColor: '#FFB300',
-    borderWidth: 2,
-    borderColor: 'rgba(255,255,255,0.3)',
-    borderBottomWidth: 4,
-    borderBottomColor: '#FFA000',
-  },
-  submitButtonDisabled: {
-    opacity: 0.5,
-    backgroundColor: '#9CA3AF',
-    borderBottomColor: '#6B7280',
-  },
-  submitButtonGradient: {
-    paddingVertical: 14,
+  // Modern Result Feedback
+  modernResultFeedback: {
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    flexDirection: 'row',
-    gap: 8,
+    gap: 12,
+    padding: 18,
+    borderRadius: 16,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
   },
-  submitButtonText: {
-    color: '#FFF',
+  modernResultCorrect: {
+    backgroundColor: '#10B981',
+  },
+  modernResultWrong: {
+    backgroundColor: '#EF4444',
+  },
+  modernResultText: {
+    color: '#FFFFFF',
+    fontWeight: '700',
     fontSize: 16,
+  },
+
+  // Modern Submit Button
+  modernSubmitButton: {
+    borderRadius: 16,
+    overflow: 'hidden',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  modernSubmitButtonDisabled: {
+    opacity: 0.6,
+  },
+  modernSubmitGradient: {
+    paddingVertical: 18,
+    paddingHorizontal: 32,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 12,
+  },
+  modernSubmitText: {
+    color: '#FFFFFF',
+    fontSize: 18,
     fontWeight: '800',
+    letterSpacing: 1,
   },
 
   // Intro Screen

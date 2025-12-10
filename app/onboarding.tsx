@@ -18,7 +18,7 @@ import Animated, {
 const { width } = Dimensions.get('window');
 
 // Orange theme matching the app
-const DUO_THEME = {
+const LightDUO_THEME = {
   bg: '#FFFFFF',
   card: '#FFFFFF',
   border: '#E5E5E5',
@@ -31,6 +31,22 @@ const DUO_THEME = {
   accent: '#FB923C', // Light Orange
   accentDark: '#EA580C',
   warning: '#FFC107', // Gold
+  warningDark: '#FFA000',
+};
+
+const DarkDUO_THEME = {
+  bg: '#172B4D',
+  card: '#213356',
+  border: '#2D3A56',
+  text: '#F6F9FC',
+  textMuted: '#8898AA',
+  primary: '#EA580C',
+  primaryDark: '#C2410C',
+  secondary: '#FF4B4B',
+  secondaryDark: '#D32F2F',
+  accent: '#FB923C',
+  accentDark: '#EA580C',
+  warning: '#FFC107',
   warningDark: '#FFA000',
 };
 
@@ -83,6 +99,8 @@ type OnboardingStep = 'splash' | 'features' | 'profile';
 export default function Onboarding() {
   const router = useRouter();
   const { updateUserProfile } = useStorage();
+  const colorScheme = useColorScheme();
+  const DUO_THEME = colorScheme === 'dark' ? DarkDUO_THEME : LightDUO_THEME;
   const [step, setStep] = useState<OnboardingStep>('splash');
   const [currentFeatureIndex, setCurrentFeatureIndex] = useState(0);
   const [username, setUsername] = useState('');

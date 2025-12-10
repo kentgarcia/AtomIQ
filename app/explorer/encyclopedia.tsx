@@ -1,12 +1,13 @@
 import { Icon } from '@/components/ui/icon';
 import { getAllEncyclopediaEntries, searchEncyclopedia } from '@/content/explorer';
 import { getEncyclopediaImage } from '@/content/explorer/encyclopedia/images';
+import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useRouter } from 'expo-router';
-import React, { useState, useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 
-const THEME = {
+const LightTHEME = {
   bg: '#F7F7F7',
   card: '#FFFFFF',
   text: '#1F2937',
@@ -17,8 +18,21 @@ const THEME = {
   border: '#E5E7EB',
 };
 
+const DarkTHEME = {
+  bg: '#172B4D',
+  card: '#213356',
+  text: '#F6F9FC',
+  textMuted: '#8898AA',
+  primary: '#EA580C',
+  primaryDark: '#C2410C',
+  success: '#2ECC71',
+  border: '#2D3A56',
+};
+
 export default function EncyclopediaScreen() {
   const router = useRouter();
+  const colorScheme = useColorScheme();
+  const THEME = colorScheme === 'dark' ? DarkTHEME : LightTHEME;
   const [searchQuery, setSearchQuery] = useState('');
   
   const allEntries = getAllEncyclopediaEntries();

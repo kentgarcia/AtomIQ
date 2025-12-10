@@ -1,5 +1,6 @@
 import { Icon } from '@/components/ui/icon';
 import { getAllMazes } from '@/content/explorer';
+import { useColorScheme } from '@/hooks/use-color-scheme';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import React from 'react';
@@ -10,17 +11,32 @@ const { width } = Dimensions.get('window');
 
 // Mustard Theme - Bright
 const THEME = {
-  bg: '#FFFDE7',
-  card: '#FFFFFF',
-  text: '#1F2937',
-  textMuted: '#6B7280',
-  primary: '#FFB300', // Bright Mustard Yellow
-  primaryDark: '#FFA000',
-  primaryLight: '#FFC107',
-  success: '#2ECC71',
-  error: '#E74C3C',
-  gold: '#FFCA28',
-  border: '#FFE082',
+  light: {
+    bg: '#FFFFFF',
+    card: '#FFFFFF',
+    text: '#1F2937',
+    textMuted: '#6B7280',
+    primary: '#FFB300',
+    primaryDark: '#FFA000',
+    primaryLight: '#FFC107',
+    success: '#2ECC71',
+    error: '#E74C3C',
+    gold: '#FFCA28',
+    border: '#E5E7EB',
+  },
+  dark: {
+    bg: '#0F172A',
+    card: '#1E293B',
+    text: '#F1F5F9',
+    textMuted: '#94A3B8',
+    primary: '#FFB300',
+    primaryDark: '#FFA000',
+    primaryLight: '#FFC107',
+    success: '#2ECC71',
+    error: '#EF4444',
+    gold: '#FFCA28',
+    border: '#334155',
+  },
 };
 
 // Maze colors - Bright Mustard
@@ -45,22 +61,21 @@ const getMazeColors = (theme: string | undefined) => {
 export default function AtomMazeSelectionScreen() {
   const router = useRouter();
   const allMazes = getAllMazes();
+  const colorScheme = useColorScheme();
+  const theme = THEME[colorScheme ?? 'light'];
 
   return (
-    <LinearGradient
-      colors={['#FFFDE7', '#FFF9C4', '#FFEE58'] as const}
-      style={{ flex: 1 }}
-    >
+    <View style={{ flex: 1, backgroundColor: theme.bg }}>
       <SafeAreaView style={{ flex: 1 }}>
         {/* Header */}
         <View style={styles.modeHeader}>
           <TouchableOpacity 
             onPress={() => router.back()}
-            style={styles.backButtonCircle}
+            style={[styles.backButtonCircle, { backgroundColor: theme.card, borderColor: theme.border }]}
           >
-            <Icon name="ArrowLeft2" size={20} color={THEME.text} />
+            <Icon name="ArrowLeft2" size={20} color={theme.text} />
           </TouchableOpacity>
-          <View style={styles.headerBadge}>
+          <View style={[styles.headerBadge, { backgroundColor: theme.primary, borderBottomColor: theme.primaryDark }]}>
             <Icon name="Game" size={18} color="#FFF" variant="Bold" />
             <Text style={styles.headerBadgeText}>AtomMaze</Text>
           </View>
@@ -158,34 +173,34 @@ export default function AtomMazeSelectionScreen() {
           </View>
 
           {/* Info Card */}
-          <Animated.View entering={FadeInDown.delay(500)} style={styles.infoCard}>
+          <Animated.View entering={FadeInDown.delay(500)} style={[styles.infoCard, { backgroundColor: theme.card, borderColor: theme.border }]}>
             <View style={styles.infoIconWrap}>
-              <Icon name="InfoCircle" size={20} color={THEME.primary} />
+              <Icon name="InfoCircle" size={20} color={theme.primary} />
             </View>
-            <Text style={styles.infoText}>
-              Answer <Text style={{ color: THEME.primary, fontWeight: '800' }}>QUIZ</Text> questions and <Text style={{ color: THEME.primary, fontWeight: '800' }}>SCRAMBLE</Text> words to defeat monsters!
+            <Text style={[styles.infoText, { color: theme.text }]}>
+              Answer <Text style={{ color: theme.primary, fontWeight: '800' }}>QUIZ</Text> questions and <Text style={{ color: theme.primary, fontWeight: '800' }}>SCRAMBLE</Text> words to defeat monsters!
             </Text>
           </Animated.View>
 
           {/* How to Play Section */}
           <Animated.View entering={FadeInDown.delay(600)} style={styles.howToPlaySection}>
-            <Text style={styles.howToPlayTitle}>📖 How to Play</Text>
+            <Text style={[styles.howToPlayTitle, { color: theme.text }]}>📖 How to Play</Text>
             <View style={styles.howToPlayGrid}>
-              <View style={styles.howToPlayItem}>
+              <View style={[styles.howToPlayItem, { backgroundColor: theme.card, borderColor: theme.border }]}>
                 <Text style={styles.howToPlayEmoji}>❓</Text>
-                <Text style={styles.howToPlayText}>Answer quiz questions</Text>
+                <Text style={[styles.howToPlayText, { color: theme.text }]}>Answer quiz questions</Text>
               </View>
-              <View style={styles.howToPlayItem}>
+              <View style={[styles.howToPlayItem, { backgroundColor: theme.card, borderColor: theme.border }]}>
                 <Text style={styles.howToPlayEmoji}>🔤</Text>
-                <Text style={styles.howToPlayText}>Unscramble words</Text>
+                <Text style={[styles.howToPlayText, { color: theme.text }]}>Unscramble words</Text>
               </View>
-              <View style={styles.howToPlayItem}>
+              <View style={[styles.howToPlayItem, { backgroundColor: theme.card, borderColor: theme.border }]}>
                 <Text style={styles.howToPlayEmoji}>⚔️</Text>
-                <Text style={styles.howToPlayText}>Deal damage to monsters</Text>
+                <Text style={[styles.howToPlayText, { color: theme.text }]}>Deal damage to monsters</Text>
               </View>
-              <View style={styles.howToPlayItem}>
+              <View style={[styles.howToPlayItem, { backgroundColor: theme.card, borderColor: theme.border }]}>
                 <Text style={styles.howToPlayEmoji}>❤️</Text>
-                <Text style={styles.howToPlayText}>Don't lose all HP!</Text>
+                <Text style={[styles.howToPlayText, { color: theme.text }]}>Don't lose all HP!</Text>
               </View>
             </View>
           </Animated.View>
@@ -193,7 +208,7 @@ export default function AtomMazeSelectionScreen() {
           <View style={{ height: 60 }} />
         </ScrollView>
       </SafeAreaView>
-    </LinearGradient>
+    </View>
   );
 }
 
@@ -203,42 +218,41 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 20,
-    paddingTop: 60,
+    paddingTop: 12,
     paddingBottom: 16,
+    gap: 12,
   },
   backButtonCircle: {
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: '#FFF',
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 2,
-    borderColor: '#E5E7EB',
     borderBottomWidth: 4,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
+    flexShrink: 0,
   },
   headerBadge: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    backgroundColor: THEME.primary,
     paddingHorizontal: 16,
     paddingVertical: 10,
     borderRadius: 20,
     borderWidth: 2,
     borderColor: 'rgba(255,255,255,0.3)',
     borderBottomWidth: 4,
-    borderBottomColor: THEME.primaryDark,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 4,
     elevation: 4,
+    flexShrink: 1,
   },
   headerBadgeText: {
     fontSize: 16,
@@ -459,43 +473,36 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
-    backgroundColor: '#FFF',
     borderRadius: 16,
     padding: 16,
     marginTop: 24,
     borderWidth: 2,
-    borderColor: '#E5E7EB',
     borderBottomWidth: 4,
   },
   infoIconWrap: {
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: THEME.primary + '15',
+    backgroundColor: '#FFB30015',
     alignItems: 'center',
     justifyContent: 'center',
   },
   infoText: {
     flex: 1,
     fontSize: 13,
-    color: THEME.textMuted,
     fontWeight: '500',
     lineHeight: 18,
   },
   // How to Play Section
   howToPlaySection: {
     marginTop: 24,
-    backgroundColor: '#FFF',
     borderRadius: 20,
     padding: 20,
-    borderWidth: 2,
-    borderColor: '#E5E7EB',
-    borderBottomWidth: 4,
+    borderWidth: 0,
   },
   howToPlayTitle: {
     fontSize: 18,
     fontWeight: '800',
-    color: THEME.text,
     marginBottom: 16,
     textAlign: 'center',
   },
@@ -506,20 +513,17 @@ const styles = StyleSheet.create({
   },
   howToPlayItem: {
     width: '47%',
-    backgroundColor: '#FFFDE7',
     borderRadius: 12,
     padding: 16,
     alignItems: 'center',
     gap: 8,
     borderWidth: 2,
-    borderColor: THEME.primary + '30',
   },
   howToPlayEmoji: {
     fontSize: 28,
   },
   howToPlayText: {
     fontSize: 12,
-    color: THEME.textMuted,
     textAlign: 'center',
     fontWeight: '600',
   },
