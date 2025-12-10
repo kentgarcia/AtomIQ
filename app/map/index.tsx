@@ -814,7 +814,7 @@ export default function MapScreen() {
   const reversedUnitsWithGlobal = [...unitsWithGlobalIndex].reverse();
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#8BC34A' }}>
+    <View style={{ flex: 1, backgroundColor: THEME.bg }}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
            <Icon name="ArrowLeft2" size={24} color={THEME.textMuted} />
@@ -894,6 +894,17 @@ export default function MapScreen() {
         })}
         
       </ScrollView>
+
+      {/* Night Mode Tint Overlay */}
+      {colorScheme === 'dark' && (
+        <View 
+          style={[
+            StyleSheet.absoluteFill, 
+            { backgroundColor: 'rgba(13, 25, 48, 0.4)', zIndex: 90 }
+          ]} 
+          pointerEvents="none" 
+        />
+      )}
 
       {/* Unit Info Modal */}
       <Modal
@@ -989,7 +1000,7 @@ const createStyles = (theme: typeof LightTHEME) => StyleSheet.create({
   },
   backBtn: {
     padding: 8,
-    backgroundColor: '#FFF',
+    backgroundColor: theme.card,
     borderRadius: 20,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
@@ -998,7 +1009,7 @@ const createStyles = (theme: typeof LightTHEME) => StyleSheet.create({
     elevation: 3,
   },
   headerTitleContainer: {
-    backgroundColor: '#FFF',
+    backgroundColor: theme.card,
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
@@ -1060,7 +1071,7 @@ const createStyles = (theme: typeof LightTHEME) => StyleSheet.create({
   guideBtn: {
     width: 40,
     height: 40,
-    backgroundColor: '#FFF',
+    backgroundColor: theme.card,
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
@@ -1113,7 +1124,7 @@ const createStyles = (theme: typeof LightTHEME) => StyleSheet.create({
     position: 'absolute',
     bottom: -4,
     right: -4,
-    backgroundColor: '#FFF',
+    backgroundColor: theme.card,
     width: 24,
     height: 24,
     borderRadius: 12,
@@ -1126,7 +1137,7 @@ const createStyles = (theme: typeof LightTHEME) => StyleSheet.create({
   startBubble: {
     position: 'absolute',
     top: -45,
-    backgroundColor: '#FFF',
+    backgroundColor: theme.card,
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 12,
@@ -1151,7 +1162,7 @@ const createStyles = (theme: typeof LightTHEME) => StyleSheet.create({
     marginLeft: -6,
     width: 12,
     height: 12,
-    backgroundColor: '#FFF',
+    backgroundColor: theme.card,
     borderBottomWidth: 2,
     borderRightWidth: 2,
     borderColor: '#E5E7EB',
@@ -1165,7 +1176,7 @@ const createStyles = (theme: typeof LightTHEME) => StyleSheet.create({
     padding: 20,
   },
   modalContent: {
-    backgroundColor: '#FFF',
+    backgroundColor: theme.card,
     borderRadius: 24,
     width: '100%',
     maxWidth: 500,
@@ -1226,11 +1237,11 @@ const createStyles = (theme: typeof LightTHEME) => StyleSheet.create({
     gap: 10,
     paddingVertical: 12,
     paddingHorizontal: 16,
-    backgroundColor: '#F9FAFB',
+    backgroundColor: theme === LightTHEME ? '#F9FAFB' : 'rgba(255,255,255,0.08)',
     borderRadius: 12,
     marginBottom: 8,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: theme === LightTHEME ? '#E5E7EB' : 'rgba(255,255,255,0.12)',
   },
   referenceText: {
     flex: 1,

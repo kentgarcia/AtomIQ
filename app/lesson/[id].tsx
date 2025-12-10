@@ -1,11 +1,12 @@
 import { Icon } from '@/components/ui/icon';
 import { getLessonById } from '@/content/lessons';
+import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useStorage } from '@/services/StorageContext';
 import { getLevelProgress, logDailyActivity, unlockNextLevel, updateLevelProgress } from '@/services/database';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import * as Speech from 'expo-speech';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Dimensions, Image, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Gesture, GestureDetector, GestureHandlerRootView } from 'react-native-gesture-handler';
 import Animated, {
@@ -50,14 +51,12 @@ const DarkTHEME = {
   border: '#2D3A56',
 };
 
-// Default to light theme (will be updated by component)
-let THEME = LightTHEME;
-
 // --- Components for Each Step ---
 
 // 1. Briefing View
-const BriefingView = ({ data, onComplete }: { data: any; onComplete: () => void }) => {
+const BriefingView = ({ data, onComplete, theme }: { data: any; onComplete: () => void; theme: typeof LightTHEME }) => {
   const scale = useSharedValue(1);
+  const styles = useMemo(() => createStyles(theme), [theme]);
 
   useEffect(() => {
     scale.value = withRepeat(withTiming(1.1, { duration: 1000 }), -1, true);
@@ -93,11 +92,13 @@ const BriefingView = ({ data, onComplete }: { data: any; onComplete: () => void 
 };
 
 // 2. MythBuster View (Creative Flashcard with Read Aloud)
-const MythBusterView = ({ data, onComplete }: { data: any; onComplete: () => void }) => {
+const MythBusterView = ({ data, onComplete, theme }: { data: any; onComplete: () => void; theme: typeof LightTHEME }) => {
   const translateX = useSharedValue(0);
   const cardRotate = useSharedValue(0);
   const [showFeedback, setShowFeedback] = useState<null | 'correct' | 'incorrect'>(null);
   const [isSpeaking, setIsSpeaking] = useState(false);
+  const styles = useMemo(() => createStyles(theme), [theme]);
+  const mythStyles = useMemo(() => createMythStyles(theme), [theme]);
   const [leftIndicator, setLeftIndicator] = useState(0);
   const [rightIndicator, setRightIndicator] = useState(0);
 
@@ -169,7 +170,7 @@ const MythBusterView = ({ data, onComplete }: { data: any; onComplete: () => voi
             style={StyleSheet.absoluteFill}
           />
           <View style={mythStyles.indicatorContent}>
-            <Icon name="Forbidden2" size={48} color={THEME.error} />
+            <Icon name="Forbidden2" size={48} color={theme.error} />
             <Text style={mythStyles.indicatorTextLeft}>MYTH</Text>
           </View>
         </Animated.View>
@@ -182,7 +183,7 @@ const MythBusterView = ({ data, onComplete }: { data: any; onComplete: () => voi
             style={StyleSheet.absoluteFill}
           />
           <View style={mythStyles.indicatorContent}>
-            <Icon name="TickCircle" size={48} color={THEME.success} variant="Bold" />
+            <Icon name="TickCircle" size={48} color={theme.success} variant="Bold" />
             <Text style={mythStyles.indicatorTextRight}>FACT</Text>
           </View>
         </Animated.View>
@@ -199,11 +200,11 @@ const MythBusterView = ({ data, onComplete }: { data: any; onComplete: () => voi
               style={mythStyles.speakerBtn}
               onPress={() => Speech.speak(`${data.explanation}. The reality is: ${data.reality}`, { language: 'en', rate: 0.9 })}
             >
-              <Icon name="VolumeHigh" size={22} color={showFeedback === 'correct' ? THEME.success : THEME.error} />
+              <Icon name="VolumeHigh" size={22} color={showFeedback === 'correct' ? theme.success : theme.error} />
             </TouchableOpacity>
 
             {/* Result Icon */}
-            <View style={[mythStyles.resultIconCircle, { backgroundColor: showFeedback === 'correct' ? THEME.success : THEME.error }]}>
+            <View style={[mythStyles.resultIconCircle, { backgroundColor: showFeedback === 'correct' ? theme.success : theme.error }]}>
               <Icon 
                 name={showFeedback === 'correct' ? 'TickCircle' : 'CloseCircle'} 
                 size={36} 
@@ -227,7 +228,7 @@ const MythBusterView = ({ data, onComplete }: { data: any; onComplete: () => voi
 
             {/* Continue Button */}
             <TouchableOpacity 
-              style={[mythStyles.resultContinueBtn, { backgroundColor: showFeedback === 'correct' ? THEME.success : THEME.error, borderBottomColor: showFeedback === 'correct' ? '#1F9D55' : '#C53030' }]} 
+              style={[mythStyles.resultContinueBtn, { backgroundColor: showFeedback === 'correct' ? theme.success : theme.error, borderBottomColor: showFeedback === 'correct' ? '#1F9D55' : '#C53030' }]} 
               onPress={onComplete}
             >
               <Text style={mythStyles.resultContinueBtnText}>CONTINUE</Text>
@@ -250,7 +251,7 @@ const MythBusterView = ({ data, onComplete }: { data: any; onComplete: () => voi
                 <Icon 
                   name={isSpeaking ? "VolumeSlash" : "VolumeHigh"} 
                   size={24} 
-                  color={isSpeaking ? "#FFF" : THEME.primary} 
+                  color={isSpeaking ? "#FFF" : theme.primary} 
                 />
                 <Text style={[mythStyles.speakBtnText, isSpeaking && { color: '#FFF' }]}>
                   {isSpeaking ? 'Stop' : 'Read Aloud'}
@@ -258,8 +259,8 @@ const MythBusterView = ({ data, onComplete }: { data: any; onComplete: () => voi
               </TouchableOpacity>
 
               <View style={styles.swipeInstructions}>
-                <View style={styles.swipeLeft}><Icon name="ArrowLeft2" size={24} color={THEME.error} variant="Bold" /><Text style={{color: THEME.error, fontWeight:'800', fontSize: 14}}>MYTH</Text></View>
-                <View style={styles.swipeRight}><Text style={{color: THEME.success, fontWeight:'800', fontSize: 14}}>FACT</Text><Icon name="ArrowRight2" size={24} color={THEME.success} variant="Bold" /></View>
+                <View style={styles.swipeLeft}><Icon name="ArrowLeft2" size={24} color={theme.error} variant="Bold" /><Text style={{color: theme.error, fontWeight:'800', fontSize: 14}}>MYTH</Text></View>
+                <View style={styles.swipeRight}><Text style={{color: theme.success, fontWeight:'800', fontSize: 14}}>FACT</Text><Icon name="ArrowRight2" size={24} color={theme.success} variant="Bold" /></View>
               </View>
             </Animated.View>
           </GestureDetector>
@@ -270,9 +271,11 @@ const MythBusterView = ({ data, onComplete }: { data: any; onComplete: () => voi
 };
 
 // 3. MicroLearn View - Duolingo Style
-const MicroLearnView = ({ data, onComplete }: { data: any; onComplete: () => void }) => {
+const MicroLearnView = ({ data, onComplete, theme }: { data: any; onComplete: () => void; theme: typeof LightTHEME }) => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isSpeaking, setIsSpeaking] = useState(false);
+  const styles = useMemo(() => createStyles(theme), [theme]);
+  const learnStyles = useMemo(() => createLearnStyles(theme), [theme]);
   
   // Simplified slides: intro, main content, all key points together, summary
   const slides = [
@@ -356,7 +359,7 @@ const MicroLearnView = ({ data, onComplete }: { data: any; onComplete: () => voi
             <Icon 
               name={isSpeaking ? "VolumeSlash" : "VolumeHigh"} 
               size={22} 
-              color={isSpeaking ? '#FFF' : THEME.primary} 
+              color={isSpeaking ? '#FFF' : theme.primary} 
             />
           </TouchableOpacity>
 
@@ -396,7 +399,7 @@ const MicroLearnView = ({ data, onComplete }: { data: any; onComplete: () => voi
               showsVerticalScrollIndicator={false}
             >
               <View style={learnStyles.keypointsHeader}>
-                <Icon name="TickCircle" size={24} color={THEME.success} variant="Bold" />
+                <Icon name="TickCircle" size={24} color={theme.success} variant="Bold" />
                 <Text style={learnStyles.keypointsTitle}>KEY POINTS</Text>
               </View>
               {currentContent.points.map((point: string, i: number) => (
@@ -433,12 +436,12 @@ const MicroLearnView = ({ data, onComplete }: { data: any; onComplete: () => voi
       <View style={learnStyles.navRow}>
         {!isFirstSlide && (
           <TouchableOpacity style={learnStyles.backBtn} onPress={handleBack}>
-            <Icon name="ArrowLeft2" size={20} color={THEME.text} variant="Bold" />
+            <Icon name="ArrowLeft2" size={20} color={theme.text} variant="Bold" />
           </TouchableOpacity>
         )}
         
         <TouchableOpacity 
-          style={[learnStyles.continueBtn, isLastSlide && { backgroundColor: THEME.success, borderColor: '#1F9D55' }]} 
+          style={[learnStyles.continueBtn, isLastSlide && { backgroundColor: theme.success, borderColor: '#1F9D55' }]} 
           onPress={handleNext}
         >
           <Text style={learnStyles.continueBtnText}>{isLastSlide ? 'GOT IT!' : 'CONTINUE'}</Text>
@@ -450,11 +453,13 @@ const MicroLearnView = ({ data, onComplete }: { data: any; onComplete: () => voi
 };
 
 // 4. Lab View (Mini Sim) - Duolingo Style
-const LabView = ({ data, onComplete, onBack }: { data: any; onComplete: () => void; onBack?: () => void }) => {
+const LabView = ({ data, onComplete, onBack, theme }: { data: any; onComplete: () => void; onBack?: () => void; theme: typeof LightTHEME }) => {
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [showFeedback, setShowFeedback] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const scrollViewRef = useRef<ScrollView>(null);
+  const styles = useMemo(() => createStyles(theme), [theme]);
+  const labStyles = useMemo(() => createLabStyles(theme), [theme]);
 
   const handleSelect = (optionId: string) => {
     if (showFeedback) return;
@@ -542,22 +547,22 @@ const LabView = ({ data, onComplete, onBack }: { data: any; onComplete: () => vo
               >
                 <View style={[
                   labStyles.optionIconCircle,
-                  isSelected && !showFeedback && { backgroundColor: THEME.primary + '20' },
-                  showCorrectMark && { backgroundColor: THEME.success + '20' },
-                  showWrongMark && { backgroundColor: THEME.error + '20' },
+                  isSelected && !showFeedback && { backgroundColor: theme.primary + '20' },
+                  showCorrectMark && { backgroundColor: theme.success + '20' },
+                  showWrongMark && { backgroundColor: theme.error + '20' },
                 ]}>
                   <Icon 
                     name={option.icon as any} 
                     size={28} 
-                    color={showCorrectMark ? THEME.success : showWrongMark ? THEME.error : isSelected ? THEME.primary : THEME.textMuted} 
+                    color={showCorrectMark ? theme.success : showWrongMark ? theme.error : isSelected ? theme.primary : theme.textMuted} 
                     variant="Bold" 
                   />
                 </View>
                 <Text style={[
                   labStyles.optionLabel,
-                  isSelected && !showFeedback && { color: THEME.primary, fontWeight: '700' },
-                  showCorrectMark && { color: THEME.success, fontWeight: '700' },
-                  showWrongMark && { color: THEME.error, fontWeight: '700' },
+                  isSelected && !showFeedback && { color: theme.primary, fontWeight: '700' },
+                  showCorrectMark && { color: theme.success, fontWeight: '700' },
+                  showWrongMark && { color: theme.error, fontWeight: '700' },
                 ]}>
                   {option.label}
                 </Text>
@@ -566,9 +571,9 @@ const LabView = ({ data, onComplete, onBack }: { data: any; onComplete: () => vo
                 {(isSelected || showCorrectMark) && (
                   <View style={[
                     labStyles.checkCircle,
-                    showCorrectMark && { backgroundColor: THEME.success, borderColor: THEME.success },
-                    showWrongMark && { backgroundColor: THEME.error, borderColor: THEME.error },
-                    isSelected && !showFeedback && { backgroundColor: THEME.primary, borderColor: THEME.primary },
+                    showCorrectMark && { backgroundColor: theme.success, borderColor: theme.success },
+                    showWrongMark && { backgroundColor: theme.error, borderColor: theme.error },
+                    isSelected && !showFeedback && { backgroundColor: theme.primary, borderColor: theme.primary },
                   ]}>
                     <Icon 
                       name={showWrongMark ? "CloseCircle" : "TickCircle"} 
@@ -594,10 +599,10 @@ const LabView = ({ data, onComplete, onBack }: { data: any; onComplete: () => vo
             <Icon 
               name={isCorrect ? "TickCircle" : "CloseCircle"} 
               size={24} 
-              color={isCorrect ? THEME.success : THEME.error} 
+              color={isCorrect ? theme.success : theme.error} 
               variant="Bold"
             />
-            <Text style={[labStyles.feedbackTitle, { color: isCorrect ? THEME.success : THEME.error }]}>
+            <Text style={[labStyles.feedbackTitle, { color: isCorrect ? theme.success : theme.error }]}>
               {isCorrect ? "Excellent!" : "Not quite!"}
             </Text>
           </View>
@@ -610,7 +615,7 @@ const LabView = ({ data, onComplete, onBack }: { data: any; onComplete: () => vo
       <View style={labStyles.navRow}>
         {onBack && !showFeedback && (
           <TouchableOpacity style={labStyles.backBtn} onPress={onBack}>
-            <Icon name="ArrowLeft2" size={20} color={THEME.text} variant="Bold" />
+            <Icon name="ArrowLeft2" size={20} color={theme.text} variant="Bold" />
           </TouchableOpacity>
         )}
         
@@ -624,7 +629,7 @@ const LabView = ({ data, onComplete, onBack }: { data: any; onComplete: () => vo
           </TouchableOpacity>
         ) : (
           <TouchableOpacity 
-            style={[labStyles.continueBtn, isCorrect && { backgroundColor: THEME.success, borderColor: '#1F9D55' }]} 
+            style={[labStyles.continueBtn, isCorrect && { backgroundColor: theme.success, borderColor: '#1F9D55' }]} 
             onPress={onComplete}
           >
             <Text style={labStyles.continueBtnText}>CONTINUE</Text>
@@ -637,11 +642,13 @@ const LabView = ({ data, onComplete, onBack }: { data: any; onComplete: () => vo
 };
 
 // 5. Assessment (Quiz) - Duolingo Style
-const AssessmentView = ({ data, onComplete }: { data: any; onComplete: () => void }) => {
+const AssessmentView = ({ data, onComplete, theme }: { data: any; onComplete: () => void; theme: typeof LightTHEME }) => {
   const [selected, setSelected] = useState<number | null>(null);
   const [confirmed, setConfirmed] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const scrollViewRef = useRef<ScrollView>(null);
+  const styles = useMemo(() => createStyles(theme), [theme]);
+  const quizStyles = useMemo(() => createQuizStyles(theme), [theme]);
   const correctIndex = data.correctIndex;
   const isCorrect = selected === correctIndex;
 
@@ -685,7 +692,7 @@ const AssessmentView = ({ data, onComplete }: { data: any; onComplete: () => voi
               <Text style={quizStyles.badgeText}>QUIZ</Text>
             </View>
             <TouchableOpacity style={quizStyles.speakerBtn} onPress={speakQuestion}>
-              <Icon name={isSpeaking ? "VolumeSlash" : "VolumeHigh"} size={20} color={isSpeaking ? '#FFF' : THEME.gold} />
+              <Icon name={isSpeaking ? "VolumeSlash" : "VolumeHigh"} size={20} color={isSpeaking ? '#FFF' : theme.gold} />
             </TouchableOpacity>
           </View>
           
@@ -727,16 +734,16 @@ const AssessmentView = ({ data, onComplete }: { data: any; onComplete: () => voi
                   
                   <Text style={[
                     quizStyles.optionText,
-                    isSelected && !confirmed && { color: THEME.primary, fontWeight: '700' },
-                    showCorrectMark && { color: THEME.success, fontWeight: '700' },
-                    showWrongMark && { color: THEME.error, fontWeight: '700' },
+                    isSelected && !confirmed && { color: theme.primary, fontWeight: '700' },
+                    showCorrectMark && { color: theme.success, fontWeight: '700' },
+                    showWrongMark && { color: theme.error, fontWeight: '700' },
                   ]}>{opt}</Text>
 
                   {showCorrectMark && (
-                    <Icon name="TickCircle" size={24} color={THEME.success} variant="Bold" />
+                    <Icon name="TickCircle" size={24} color={theme.success} variant="Bold" />
                   )}
                   {showWrongMark && (
-                    <Icon name="CloseCircle" size={24} color={THEME.error} variant="Bold" />
+                    <Icon name="CloseCircle" size={24} color={theme.error} variant="Bold" />
                   )}
                 </TouchableOpacity>
               </Animated.View>
@@ -754,10 +761,10 @@ const AssessmentView = ({ data, onComplete }: { data: any; onComplete: () => voi
               <Icon 
                 name={isCorrect ? "TickCircle" : "CloseCircle"} 
                 size={24} 
-                color={isCorrect ? THEME.success : THEME.error} 
+                color={isCorrect ? theme.success : theme.error} 
                 variant="Bold"
               />
-              <Text style={[quizStyles.feedbackTitle, { color: isCorrect ? THEME.success : THEME.error }]}>
+              <Text style={[quizStyles.feedbackTitle, { color: isCorrect ? theme.success : theme.error }]}>
                 {isCorrect ? "Correct!" : "Not quite!"}
               </Text>
             </View>
@@ -778,7 +785,7 @@ const AssessmentView = ({ data, onComplete }: { data: any; onComplete: () => voi
           </TouchableOpacity>
         ) : (
           <TouchableOpacity 
-            style={[quizStyles.continueBtn, isCorrect && { backgroundColor: THEME.success, borderColor: '#1F9D55' }]} 
+            style={[quizStyles.continueBtn, isCorrect && { backgroundColor: theme.success, borderColor: '#1F9D55' }]} 
             onPress={onComplete}
           >
             <Text style={quizStyles.continueBtnText}>CONTINUE</Text>
@@ -791,8 +798,9 @@ const AssessmentView = ({ data, onComplete }: { data: any; onComplete: () => voi
 };
 
 // 6. Debrief (Success)
-const DebriefView = ({ data, levelId, isReplay = false }: { data: any; levelId: string; isReplay?: boolean }) => {
+const DebriefView = ({ data, levelId, isReplay = false, theme }: { data: any; levelId: string; isReplay?: boolean; theme: typeof LightTHEME }) => {
   const router = useRouter();
+  const styles = useMemo(() => createStyles(theme), [theme]);
   const { addXP, updateUserProfile, userProfile } = useStorage();
   const [saved, setSaved] = useState(false);
   const [rewardsAwarded, setRewardsAwarded] = useState(false);
@@ -904,7 +912,7 @@ const DebriefView = ({ data, levelId, isReplay = false }: { data: any; levelId: 
         <Animated.View entering={FadeInDown.delay(400)} style={styles.rewardRow}>
           <View style={styles.rewardPill}>
             <LinearGradient
-              colors={[THEME.primary, THEME.primaryLight]}
+              colors={[theme.primary, theme.primaryLight]}
               style={styles.rewardIconWrapper}
             >
               <Icon name="Flash" size={20} color="#FFF" variant="Bold" />
@@ -916,7 +924,7 @@ const DebriefView = ({ data, levelId, isReplay = false }: { data: any; levelId: 
           </View>
           <View style={styles.rewardPill}>
             <LinearGradient
-              colors={[THEME.gold, '#FFA000']}
+              colors={[theme.gold, '#FFA000']}
               style={styles.rewardIconWrapper}
             >
               <Icon name="Star1" size={20} color="#FFF" variant="Bold" />
@@ -930,19 +938,19 @@ const DebriefView = ({ data, levelId, isReplay = false }: { data: any; levelId: 
       ) : (
         <Animated.View entering={FadeInDown.delay(400)} style={styles.rewardRow}>
           <View style={[styles.rewardPill, { opacity: 0.6 }]}>
-            <View style={[styles.rewardIconWrapper, { backgroundColor: THEME.textMuted }]}>
+            <View style={[styles.rewardIconWrapper, { backgroundColor: theme.textMuted }]}>
               <Icon name="TickCircle" size={20} color="#FFF" variant="Bold" />
             </View>
             <View>
               <Text style={styles.rewardLabel}>Already Earned</Text>
-              <Text style={[styles.rewardText, { color: THEME.textMuted }]}>{xpReward} XP</Text>
+              <Text style={[styles.rewardText, { color: theme.textMuted }]}>{xpReward} XP</Text>
             </View>
           </View>
         </Animated.View>
       )}
 
       <Animated.View entering={FadeInDown.delay(600)} style={{ width: '100%' }}>
-        <TouchableOpacity style={[styles.mainBtn, { backgroundColor: THEME.success, borderColor: '#25A25A' }]} onPress={() => router.back()}>
+        <TouchableOpacity style={[styles.mainBtn, { backgroundColor: theme.success, borderColor: '#25A25A' }]} onPress={() => router.back()}>
           <Text style={styles.mainBtnText}>CONTINUE</Text>
           <Icon name="ArrowRight2" size={20} color="#FFF" variant="Bold" />
         </TouchableOpacity>
@@ -956,6 +964,9 @@ export default function LessonScreen() {
   const [step, setStep] = useState(0);
   const [isReplay, setIsReplay] = useState(false);
   const router = useRouter();
+  const colorScheme = useColorScheme();
+  const THEME = colorScheme === 'dark' ? DarkTHEME : LightTHEME;
+  const styles = useMemo(() => createStyles(THEME), [THEME]);
   const levelId = typeof id === 'string' ? id : 'radiation-shielding';
   
   // Load lesson from content system
@@ -987,7 +998,7 @@ export default function LessonScreen() {
   // If lesson not found, show error
   if (!lesson) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#FFF' }}>
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: THEME.bg }}>
         <Icon name="Danger" size={64} color={THEME.error} />
         <Text style={{ fontSize: 18, fontWeight: '700', color: THEME.text, marginTop: 16 }}>
           Lesson not found
@@ -1017,19 +1028,19 @@ export default function LessonScreen() {
   const renderStep = () => {
     switch(currentStep.type) {
       case 'briefing':
-        return <BriefingView key={step} data={currentStep.data} onComplete={nextStep} />;
+        return <BriefingView key={step} data={currentStep.data} onComplete={nextStep} theme={THEME} />;
       case 'myth_buster':
-        return <MythBusterView key={step} data={currentStep.data} onComplete={nextStep} />;
+        return <MythBusterView key={step} data={currentStep.data} onComplete={nextStep} theme={THEME} />;
       case 'micro_learn':
-        return <MicroLearnView key={step} data={currentStep.data} onComplete={nextStep} />;
+        return <MicroLearnView key={step} data={currentStep.data} onComplete={nextStep} theme={THEME} />;
       case 'lab':
-        return <LabView key={step} data={currentStep.data} onComplete={nextStep} onBack={step > 0 ? () => setStep(s => s - 1) : undefined} />;
+        return <LabView key={step} data={currentStep.data} onComplete={nextStep} onBack={step > 0 ? () => setStep(s => s - 1) : undefined} theme={THEME} />;
       case 'assessment':
-        return <AssessmentView key={step} data={currentStep.data} onComplete={nextStep} />;
+        return <AssessmentView key={step} data={currentStep.data} onComplete={nextStep} theme={THEME} />;
       case 'debrief':
-        return <DebriefView key={step} data={currentStep.data} levelId={levelId} isReplay={isReplay} />;
+        return <DebriefView key={step} data={currentStep.data} levelId={levelId} isReplay={isReplay} theme={THEME} />;
       default:
-        return <BriefingView key={step} data={currentStep.data} onComplete={nextStep} />;
+        return <BriefingView key={step} data={currentStep.data} onComplete={nextStep} theme={THEME} />;
     }
   };
 
@@ -1039,7 +1050,7 @@ export default function LessonScreen() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <View style={{ flex: 1, backgroundColor: '#FFF' }}>
+      <View style={{ flex: 1, backgroundColor: THEME.bg }}>
         <SafeAreaView style={{ flex: 1 }}>
           {/* Progress Header - Show for all steps except first (briefing) and last (debrief) */}
           {!isFirstStep && !isLastStep && (
@@ -1067,36 +1078,39 @@ export default function LessonScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (theme: typeof LightTHEME) => StyleSheet.create({
   // Layout
   stepContainer: {
     flex: 1,
     padding: 24,
     justifyContent: 'center',
+    backgroundColor: theme.bg,
   },
   fullScreenCenter: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
     padding: 24,
+    backgroundColor: theme.bg,
   },
   topBar: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 16,
     height: 50,
+    backgroundColor: theme.bg,
   },
   progressBarBg: {
     flex: 1,
     height: 12,
-    backgroundColor: '#E5E7EB',
+    backgroundColor: theme.border,
     borderRadius: 6,
     marginLeft: 16,
     marginRight: 8,
   },
   progressBarFill: {
     height: '100%',
-    backgroundColor: THEME.primary,
+    backgroundColor: theme.primary,
     borderRadius: 6,
   },
 
@@ -1117,33 +1131,33 @@ const styles = StyleSheet.create({
   briefingTitle: {
     fontSize: 24,
     fontWeight: '800',
-    color: THEME.text,
+    color: theme.text,
     marginBottom: 8,
     textAlign: 'center',
   },
   briefingSubtitle: {
     fontSize: 18,
-    color: THEME.textMuted,
+    color: theme.textMuted,
     marginBottom: 48,
     textAlign: 'center',
   },
   loadingBar: {
     width: '80%',
     height: 6,
-    backgroundColor: '#E5E7EB',
+    backgroundColor: theme.border,
     borderRadius: 3,
     overflow: 'hidden',
   },
   loadingFill: {
     height: '100%',
-    backgroundColor: THEME.primary,
+    backgroundColor: theme.primary,
   },
 
   // Headers
   stepHeader: {
     fontSize: 14,
     fontWeight: '800',
-    color: THEME.textMuted,
+    color: theme.textMuted,
     textTransform: 'uppercase',
     marginBottom: 8,
     letterSpacing: 1,
@@ -1152,27 +1166,27 @@ const styles = StyleSheet.create({
   stepSubHeader: {
     fontSize: 20,
     fontWeight: '700',
-    color: THEME.text,
+    color: theme.text,
     textAlign: 'center',
     marginBottom: 32,
   },
 
   // Buttons
   mainBtn: {
-    backgroundColor: THEME.primary,
+    backgroundColor: theme.primary,
     height: 56,
     borderRadius: 16,
     alignItems: 'center',
     justifyContent: 'center',
     borderBottomWidth: 4,
-    borderColor: THEME.primaryDark,
+    borderColor: theme.primaryDark,
     width: '100%',
     marginTop: 'auto',
     flexDirection: 'row',
     gap: 8,
   },
   mainBtnDisabled: {
-    backgroundColor: THEME.textMuted,
+    backgroundColor: theme.textMuted,
     borderColor: '#6B7280',
   },
   mainBtnText: {
@@ -1191,18 +1205,18 @@ const styles = StyleSheet.create({
   swipeCard: {
     width: width - 48,
     height: 350,
-    backgroundColor: '#FFF',
+    backgroundColor: theme.card,
     borderRadius: 24,
     padding: 24,
     borderWidth: 2,
-    borderColor: THEME.border,
+    borderColor: theme.border,
     borderBottomWidth: 6,
     alignItems: 'center',
     justifyContent: 'center',
     elevation: 5,
   },
   mythBadge: {
-    backgroundColor: THEME.primary,
+    backgroundColor: theme.primary,
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 8,
@@ -1219,7 +1233,7 @@ const styles = StyleSheet.create({
   mythText: {
     fontSize: 22,
     fontWeight: '700',
-    color: THEME.text,
+    color: theme.text,
     textAlign: 'center',
     marginBottom: 40,
   },
@@ -1234,14 +1248,14 @@ const styles = StyleSheet.create({
   feedbackCard: {
     width: width - 48,
     height: 350,
-    backgroundColor: THEME.primary,
+    backgroundColor: theme.primary,
     borderRadius: 24,
     padding: 24,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  feedbackCorrect: { backgroundColor: THEME.success },
-  feedbackIncorrect: { backgroundColor: THEME.error },
+  feedbackCorrect: { backgroundColor: theme.success },
+  feedbackIncorrect: { backgroundColor: theme.error },
   feedbackTitle: { fontSize: 28, fontWeight: '800', color: '#FFF', marginBottom: 12 },
   feedbackText: { fontSize: 18, color: '#FFF', textAlign: 'center', lineHeight: 26 },
   continueBtn: { 
@@ -1271,7 +1285,7 @@ const styles = StyleSheet.create({
 
   // MicroLearn
   conceptBadge: {
-    backgroundColor: THEME.primary,
+    backgroundColor: theme.primary,
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
@@ -1279,7 +1293,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 6,
     borderBottomWidth: 3,
-    borderColor: THEME.primaryDark,
+    borderColor: theme.primaryDark,
   },
   conceptBadgeText: {
     color: '#FFF',
@@ -1292,7 +1306,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 24,
     borderWidth: 2,
-    borderColor: THEME.border,
+    borderColor: theme.border,
     borderBottomWidth: 4,
     marginBottom: 24,
   },
@@ -1314,13 +1328,13 @@ const styles = StyleSheet.create({
   conceptTitle: { 
     fontSize: 22, 
     fontWeight: '800', 
-    color: THEME.text, 
+    color: theme.text, 
     marginBottom: 12,
     lineHeight: 30,
   },
   conceptText: { 
     fontSize: 16, 
-    color: THEME.text, 
+    color: theme.text, 
     lineHeight: 26,
     marginBottom: 8,
   },
@@ -1329,7 +1343,7 @@ const styles = StyleSheet.create({
     gap: 12,
     paddingTop: 20,
     borderTopWidth: 1,
-    borderTopColor: THEME.border,
+    borderTopColor: theme.border,
   },
   keyPointRow: {
     flexDirection: 'row',
@@ -1342,7 +1356,7 @@ const styles = StyleSheet.create({
   keyPointText: {
     flex: 1,
     fontSize: 15,
-    color: THEME.text,
+    color: theme.text,
     lineHeight: 22,
     fontWeight: '500',
   },
@@ -1353,7 +1367,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 24,
     borderWidth: 2,
-    borderColor: THEME.border,
+    borderColor: theme.border,
     borderBottomWidth: 4,
     marginBottom: 24,
   },
@@ -1384,7 +1398,7 @@ const styles = StyleSheet.create({
   taskText: {
     fontSize: 16,
     fontWeight: '700',
-    color: THEME.text,
+    color: theme.text,
     lineHeight: 22,
   },
   optionsRow: { 
@@ -1400,25 +1414,25 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 2,
-    borderColor: THEME.border,
+    borderColor: theme.border,
     borderBottomWidth: 4,
     minHeight: 100,
   },
   optionBtnActive: { 
-    borderColor: THEME.primary, 
-    backgroundColor: THEME.primary + '10',
+    borderColor: theme.primary, 
+    backgroundColor: theme.primary + '10',
     transform: [{ scale: 1.05 }],
   },
   optionText: { 
     fontSize: 12, 
     fontWeight: '700', 
-    color: THEME.text 
+    color: theme.text 
   },
   correctBadge: {
     position: 'absolute',
     top: 8,
     right: 8,
-    backgroundColor: THEME.success,
+    backgroundColor: theme.success,
     borderRadius: 12,
     padding: 4,
   },
@@ -1426,7 +1440,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 8,
     right: 8,
-    backgroundColor: THEME.error,
+    backgroundColor: theme.error,
     borderRadius: 12,
     padding: 4,
   },
@@ -1458,14 +1472,14 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 24,
     borderWidth: 2,
-    borderColor: THEME.border,
+    borderColor: theme.border,
     borderBottomWidth: 4,
   },
   questionIconWrapper: {
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: THEME.primary + '15',
+    backgroundColor: theme.primary + '15',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 16,
@@ -1473,7 +1487,7 @@ const styles = StyleSheet.create({
   questionText: { 
     fontSize: 20, 
     fontWeight: '700', 
-    color: THEME.text, 
+    color: theme.text, 
     marginBottom: 24, 
     lineHeight: 30 
   },
@@ -1483,7 +1497,7 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 16,
     borderWidth: 2,
-    borderColor: THEME.border,
+    borderColor: theme.border,
     borderBottomWidth: 4,
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -1499,31 +1513,31 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: THEME.border,
+    backgroundColor: theme.border,
     alignItems: 'center',
     justifyContent: 'center',
   },
   optionLetterText: {
     fontSize: 14,
     fontWeight: '800',
-    color: THEME.text,
+    color: theme.text,
   },
   quizOptionSelected: { 
-    borderColor: THEME.primary, 
-    backgroundColor: THEME.primary + '08',
+    borderColor: theme.primary, 
+    backgroundColor: theme.primary + '08',
     transform: [{ scale: 1.02 }],
   },
   quizOptionCorrect: { 
-    borderColor: THEME.success, 
-    backgroundColor: THEME.success + '15' 
+    borderColor: theme.success, 
+    backgroundColor: theme.success + '15' 
   },
   quizOptionWrong: { 
-    borderColor: THEME.error, 
-    backgroundColor: THEME.error + '15' 
+    borderColor: theme.error, 
+    backgroundColor: theme.error + '15' 
   },
   quizOptionText: { 
     fontSize: 16, 
-    color: THEME.text,
+    color: theme.text,
     flex: 1,
     lineHeight: 22,
   },
@@ -1535,19 +1549,19 @@ const styles = StyleSheet.create({
     height: 200,
     borderRadius: 100,
     borderWidth: 2,
-    borderColor: THEME.gold + '30',
+    borderColor: theme.gold + '30',
     borderStyle: 'dashed',
   },
   successTitle: { 
     fontSize: 32, 
     fontWeight: '800', 
-    color: THEME.text, 
+    color: theme.text, 
     marginBottom: 12,
     textAlign: 'center',
   },
   successText: { 
     fontSize: 18, 
-    color: THEME.textMuted, 
+    color: theme.textMuted, 
     textAlign: 'center', 
     marginBottom: 40,
     lineHeight: 26,
@@ -1568,7 +1582,7 @@ const styles = StyleSheet.create({
     paddingVertical: 16, 
     borderRadius: 20,
     borderWidth: 2,
-    borderColor: THEME.border,
+    borderColor: theme.border,
     borderBottomWidth: 4,
     gap: 12,
     minWidth: 140,
@@ -1583,753 +1597,143 @@ const styles = StyleSheet.create({
   rewardLabel: {
     fontSize: 11,
     fontWeight: '700',
-    color: THEME.textMuted,
+    color: theme.textMuted,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
   rewardText: { 
     fontSize: 20, 
     fontWeight: '800', 
-    color: THEME.text 
+    color: theme.text 
   },
 });
 
-// Myth Buster specific styles
-const mythStyles = StyleSheet.create({
-  fullHeightIndicators: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    pointerEvents: 'none',
-    zIndex: 10,
-  },
-  indicatorLeftFull: {
-    width: 120,
-    height: '100%',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  indicatorRightFull: {
-    width: 120,
-    height: '100%',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  indicatorContent: {
-    alignItems: 'center',
-    gap: 8,
-  },
-  indicatorTextLeft: {
-    color: THEME.error,
-    fontWeight: '800',
-    fontSize: 16,
-    letterSpacing: 1,
-  },
-  indicatorTextRight: {
-    color: THEME.success,
-    fontWeight: '800',
-    fontSize: 16,
-    letterSpacing: 1,
-  },
-  speakBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#FFF3E0',
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    borderRadius: 25,
-    gap: 10,
-    marginBottom: 24,
-    borderWidth: 2,
-    borderColor: THEME.primary,
-  },
-  speakBtnActive: {
-    backgroundColor: THEME.primary,
-    borderColor: THEME.primaryDark,
-  },
-  speakBtnText: {
-    color: THEME.primary,
-    fontWeight: '700',
-    fontSize: 14,
-  },
-  // Enhanced Result Card Styles
-  resultCard: {
-    width: width - 40,
-    backgroundColor: '#FFF',
-    borderRadius: 28,
-    padding: 24,
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 12 },
-    shadowOpacity: 0.15,
-    shadowRadius: 24,
-    elevation: 12,
-    overflow: 'hidden',
-  },
-  resultCorrect: {
-    borderWidth: 2,
-    borderColor: THEME.success,
-    borderBottomWidth: 6,
-  },
-  resultIncorrect: {
-    borderWidth: 2,
-    borderColor: THEME.error,
-    borderBottomWidth: 6,
-  },
-  speakerBtn: {
-    position: 'absolute',
-    top: 16,
-    right: 16,
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: '#F3F4F6',
-    alignItems: 'center',
-    justifyContent: 'center',
-    zIndex: 10,
-  },
-  resultIconCircle: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 12,
-    marginTop: 8,
-  },
-  resultTitle: {
-    fontSize: 26,
-    fontWeight: '800',
-    color: THEME.text,
-    marginBottom: 12,
-  },
-  resultExplanation: {
-    fontSize: 15,
-    color: THEME.text,
-    textAlign: 'center',
-    lineHeight: 22,
-    paddingHorizontal: 8,
-    marginBottom: 16,
-  },
-  realityBox: {
-    width: '100%',
-    backgroundColor: '#F9FAFB',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 20,
-  },
-  realityLabel: {
-    fontSize: 11,
-    fontWeight: '800',
-    color: THEME.gold,
-    letterSpacing: 1,
-    marginBottom: 6,
-  },
-  realityText: {
-    fontSize: 15,
-    color: THEME.text,
-    lineHeight: 22,
-  },
-  resultContinueBtn: {
-    width: '100%',
-    borderRadius: 14,
-    paddingVertical: 15,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderBottomWidth: 4,
-  },
-  resultContinueBtnText: {
-    color: '#FFF',
-    fontSize: 15,
-    fontWeight: '800',
-    letterSpacing: 0.5,
-  },
+// Additional style functions for component-specific styles
+const createMythStyles = (theme: typeof LightTHEME) => ({
+  fullHeightIndicators: { position: 'absolute' as const, top: 0, bottom: 0, left: 0, right: 0 },
+  indicatorLeftFull: { position: 'absolute' as const, top: 0, bottom: 0, left: 0, width: '50%' as const },
+  indicatorRightFull: { position: 'absolute' as const, top: 0, bottom: 0, right: 0, width: '50%' as const },
+  indicatorContent: { flex: 1, alignItems: 'center' as const, justifyContent: 'center' as const },
+  indicatorTextLeft: { fontSize: 16, fontWeight: '800' as const, color: theme.error, marginTop: 8 },
+  indicatorTextRight: { fontSize: 16, fontWeight: '800' as const, color: theme.success, marginTop: 8 },
+  resultCard: { width: width - 48, padding: 24, borderRadius: 24, alignItems: 'center' as const, position: 'relative' as const },
+  resultCorrect: { backgroundColor: theme.success + '15' },
+  resultIncorrect: { backgroundColor: theme.error + '15' },
+  speakerBtn: { position: 'absolute' as const, top: 16, right: 16, padding: 8, backgroundColor: theme.card, borderRadius: 12 },
+  resultIconCircle: { width: 80, height: 80, borderRadius: 40, marginBottom: 16, alignItems: 'center' as const, justifyContent: 'center' as const },
+  resultTitle: { fontSize: 28, fontWeight: '800' as const, color: theme.text, marginBottom: 16 },
+  resultExplanation: { fontSize: 16, color: theme.textMuted, textAlign: 'center' as const, marginBottom: 24, lineHeight: 24 },
+  realityBox: { width: '100%' as const, backgroundColor: theme.card, padding: 16, borderRadius: 16, marginBottom: 24 },
+  realityLabel: { fontSize: 12, fontWeight: '800' as const, color: theme.primary, marginBottom: 8 },
+  realityText: { fontSize: 15, color: theme.text, lineHeight: 22 },
+  resultContinueBtn: { width: '100%' as const, height: 56, borderRadius: 16, alignItems: 'center' as const, justifyContent: 'center' as const, borderBottomWidth: 4 },
+  resultContinueBtnText: { color: '#FFF', fontWeight: '800' as const, fontSize: 16 },
+  speakBtn: { flexDirection: 'row' as const, alignItems: 'center' as const, gap: 8, paddingHorizontal: 16, paddingVertical: 12, backgroundColor: theme.card, borderRadius: 12, borderWidth: 2, borderColor: theme.border },
+  speakBtnActive: { backgroundColor: theme.primary, borderColor: theme.primary },
+  speakBtnText: { fontSize: 14, fontWeight: '700' as const, color: theme.text },
 });
 
-// Duolingo-style Learn Styles
-const learnStyles = StyleSheet.create({
-  progressDots: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: 8,
-    marginBottom: 24,
-  },
-  dot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: '#E5E7EB',
-  },
-  dotActive: {
-    backgroundColor: THEME.primary,
-    width: 24,
-  },
-  dotCompleted: {
-    backgroundColor: THEME.success,
-  },
-  slideCard: {
-    backgroundColor: '#FFF',
-    borderRadius: 24,
-    padding: 24,
-    alignItems: 'center',
-    borderWidth: 2,
-    borderColor: THEME.border,
-    borderBottomWidth: 6,
-    minHeight: 340,
-    maxHeight: 420,
-    justifyContent: 'center',
-  },
-  speakerBtn: {
-    position: 'absolute',
-    top: 16,
-    right: 16,
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: '#F3F4F6',
-    alignItems: 'center',
-    justifyContent: 'center',
-    zIndex: 10,
-  },
-  badgeRow: {
-    marginBottom: 16,
-  },
-  learnBadge: {
-    backgroundColor: THEME.primary,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    borderBottomWidth: 3,
-    borderColor: THEME.primaryDark,
-  },
-  badgeText: {
-    color: '#FFF',
-    fontWeight: '800',
-    fontSize: 12,
-    letterSpacing: 1,
-  },
-  mascotImg: {
-    width: 120,
-    height: 120,
-    marginBottom: 16,
-  },
-  mascotSmall: {
-    width: 70,
-    height: 70,
-    marginBottom: 16,
-  },
-  titleText: {
-    fontSize: 24,
-    fontWeight: '800',
-    color: THEME.text,
-    textAlign: 'center',
-    marginBottom: 8,
-  },
-  subtitleText: {
-    fontSize: 15,
-    color: THEME.textMuted,
-    textAlign: 'center',
-  },
-  contentText: {
-    fontSize: 17,
-    color: THEME.text,
-    textAlign: 'center',
-    lineHeight: 26,
-    fontWeight: '500',
-  },
-  // Key Points - all in one slide
-  keypointsHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    marginBottom: 16,
-    alignSelf: 'center',
-  },
-  keypointsTitle: {
-    fontSize: 14,
-    fontWeight: '800',
-    color: THEME.success,
-    letterSpacing: 1,
-  },
-  keypointItem: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: 12,
-    marginBottom: 14,
-  },
-  keypointBullet: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    backgroundColor: THEME.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  keypointNumber: {
-    color: '#FFF',
-    fontWeight: '800',
-    fontSize: 14,
-  },
-  keypointItemText: {
-    flex: 1,
-    fontSize: 15,
-    color: THEME.text,
-    lineHeight: 22,
-    fontWeight: '500',
-  },
-  // Summary slide
-  summaryBadge: {
-    width: 52,
-    height: 52,
-    borderRadius: 26,
-    backgroundColor: THEME.gold,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 12,
-  },
-  summaryLabel: {
-    fontSize: 12,
-    fontWeight: '800',
-    color: THEME.gold,
-    letterSpacing: 1,
-    marginBottom: 8,
-  },
-  summaryTitle: {
-    fontSize: 20,
-    fontWeight: '800',
-    color: THEME.text,
-    textAlign: 'center',
-    marginBottom: 12,
-  },
-  summaryDivider: {
-    width: 60,
-    height: 3,
-    backgroundColor: THEME.border,
-    borderRadius: 2,
-    marginBottom: 12,
-  },
-  summaryText: {
-    fontSize: 14,
-    color: THEME.textMuted,
-    textAlign: 'center',
-    lineHeight: 22,
-  },
-  summaryMascot: {
-    width: 60,
-    height: 60,
-    marginTop: 16,
-  },
-  // Navigation
-  navRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    marginTop: 16,
-  },
-  backBtn: {
-    width: 56,
-    height: 56,
-    borderRadius: 16,
-    backgroundColor: '#FFF',
-    borderWidth: 2,
-    borderColor: THEME.border,
-    borderBottomWidth: 4,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  continueBtn: {
-    flex: 1,
-    height: 56,
-    borderRadius: 16,
-    backgroundColor: THEME.primary,
-    borderBottomWidth: 4,
-    borderColor: THEME.primaryDark,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-  },
-  continueBtnText: {
-    color: '#FFF',
-    fontWeight: '800',
-    fontSize: 16,
-    letterSpacing: 0.5,
-  },
+const createLearnStyles = (theme: typeof LightTHEME) => ({
+  progressDots: { flexDirection: 'row' as const, justifyContent: 'center' as const, gap: 8, marginBottom: 24 },
+  dot: { width: 8, height: 8, borderRadius: 4, backgroundColor: theme.border },
+  dotActive: { backgroundColor: theme.primary, width: 24 },
+  dotCompleted: { backgroundColor: theme.success },
+  slideCard: { backgroundColor: theme.card, borderRadius: 24, padding: 24, borderWidth: 2, borderColor: theme.border, borderBottomWidth: 4, alignItems: 'center' as const, position: 'relative' as const },
+  speakerBtn: { position: 'absolute' as const, top: 16, right: 16, padding: 8, backgroundColor: theme.bg, borderRadius: 12 },
+  badgeRow: { marginBottom: 16, alignItems: 'center' as const },
+  learnBadge: { backgroundColor: theme.primary, paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8, flexDirection: 'row' as const, alignItems: 'center' as const, gap: 6 },
+  badgeText: { color: '#FFF', fontWeight: '800' as const, fontSize: 12 },
+  mascotImg: { width: 80, height: 80, marginBottom: 16 },
+  mascotSmall: { width: 60, height: 60, marginBottom: 16 },
+  titleText: { fontSize: 24, fontWeight: '800' as const, color: theme.text, textAlign: 'center' as const, marginBottom: 8 },
+  subtitleText: { fontSize: 16, color: theme.textMuted, textAlign: 'center' as const },
+  contentText: { fontSize: 16, color: theme.text, lineHeight: 24, textAlign: 'center' as const },
+  keypointsHeader: { flexDirection: 'row' as const, alignItems: 'center' as const, gap: 8, marginBottom: 16 },
+  keypointsTitle: { fontSize: 18, fontWeight: '800' as const, color: theme.text },
+  keypoint: { flexDirection: 'row' as const, alignItems: 'flex-start' as const, gap: 12, marginBottom: 12, paddingLeft: 8 },
+  keypointText: { flex: 1, fontSize: 15, color: theme.text, lineHeight: 22 },
+  keypointItem: { flexDirection: 'row' as const, alignItems: 'flex-start' as const, gap: 12, marginBottom: 12 },
+  keypointBullet: { width: 24, height: 24, borderRadius: 12, backgroundColor: theme.primary, alignItems: 'center' as const, justifyContent: 'center' as const },
+  keypointNumber: { fontSize: 12, fontWeight: '800' as const, color: '#FFF' },
+  keypointItemText: { flex: 1, fontSize: 15, color: theme.text, lineHeight: 22 },
+  summaryBadge: { marginBottom: 16, alignItems: 'center' as const },
+  summaryLabel: { fontSize: 12, fontWeight: '800' as const, color: theme.primary, marginBottom: 8 },
+  summaryTitle: { fontSize: 20, fontWeight: '800' as const, color: theme.text, textAlign: 'center' as const, marginBottom: 12 },
+  summaryDivider: { width: 60, height: 2, backgroundColor: theme.border, marginBottom: 12 },
+  summaryText: { fontSize: 15, color: theme.textMuted, textAlign: 'center' as const, lineHeight: 22 },
+  summaryMascot: { width: 60, height: 60, marginTop: 16 },
+  navButtons: { flexDirection: 'row' as const, gap: 12, marginTop: 24 },
+  navBtn: { flex: 1, height: 48, borderRadius: 12, alignItems: 'center' as const, justifyContent: 'center' as const, borderWidth: 2 },
+  backBtn: { backgroundColor: theme.bg, borderColor: theme.border },
+  nextBtn: { backgroundColor: theme.primary, borderColor: theme.primaryDark, borderBottomWidth: 4 },
+  btnText: { fontWeight: '700' as const, fontSize: 14 },
+  navRow: { flexDirection: 'row' as const, gap: 12, marginTop: 24 },
+  continueBtn: { flex: 1, height: 56, borderRadius: 16, borderBottomWidth: 4, alignItems: 'center' as const, justifyContent: 'center' as const },
+  continueBtnText: { color: '#FFF', fontWeight: '800' as const, fontSize: 16 },
 });
 
-// Duolingo-style Lab Styles
-const labStyles = StyleSheet.create({
-  headerCard: {
-    backgroundColor: '#FFF',
-    borderRadius: 20,
-    padding: 20,
-    alignItems: 'center',
-    borderWidth: 2,
-    borderColor: THEME.border,
-    borderBottomWidth: 5,
-    marginBottom: 20,
-  },
-  badgeRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    width: '100%',
-    marginBottom: 12,
-  },
-  labBadge: {
-    backgroundColor: '#8B5CF6',
-    paddingHorizontal: 14,
-    paddingVertical: 6,
-    borderRadius: 16,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    borderBottomWidth: 2,
-    borderColor: '#7C3AED',
-  },
-  badgeText: {
-    color: '#FFF',
-    fontWeight: '800',
-    fontSize: 11,
-    letterSpacing: 1,
-  },
-  speakerBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#F3F4F6',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  mascot: {
-    width: 80,
-    height: 80,
-    marginBottom: 12,
-  },
-  taskText: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: THEME.text,
-    textAlign: 'center',
-    lineHeight: 26,
-  },
-  optionsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 12,
-  },
-  optionWrapper: {
-    width: '48%',
-  },
-  optionCard: {
-    backgroundColor: '#FFF',
-    borderRadius: 16,
-    padding: 16,
-    alignItems: 'center',
-    borderWidth: 2,
-    borderColor: THEME.border,
-    borderBottomWidth: 4,
-    minHeight: 100,
-    position: 'relative',
-  },
-  optionSelected: {
-    borderColor: THEME.primary,
-    backgroundColor: THEME.primary + '08',
-  },
-  optionCorrect: {
-    borderColor: THEME.success,
-    backgroundColor: THEME.success + '10',
-  },
-  optionWrong: {
-    borderColor: THEME.error,
-    backgroundColor: THEME.error + '10',
-  },
-  optionIconCircle: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: '#F3F4F6',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 8,
-  },
-  optionLabel: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: THEME.text,
-    textAlign: 'center',
-  },
-  checkCircle: {
-    position: 'absolute',
-    top: 8,
-    right: 8,
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    backgroundColor: THEME.primary,
-    borderWidth: 2,
-    borderColor: THEME.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  feedbackCard: {
-    borderRadius: 16,
-    padding: 16,
-    marginTop: 16,
-  },
-  feedbackCorrect: {
-    backgroundColor: THEME.success + '15',
-  },
-  feedbackWrong: {
-    backgroundColor: THEME.error + '15',
-  },
-  feedbackHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    marginBottom: 8,
-  },
-  feedbackTitle: {
-    fontSize: 18,
-    fontWeight: '800',
-  },
-  feedbackText: {
-    fontSize: 15,
-    color: THEME.text,
-    lineHeight: 22,
-  },
-  checkBtn: {
-    flex: 1,
-    height: 56,
-    borderRadius: 16,
-    backgroundColor: '#8B5CF6',
-    borderBottomWidth: 4,
-    borderColor: '#7C3AED',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  checkBtnDisabled: {
-    backgroundColor: '#E5E7EB',
-    borderColor: '#D1D5DB',
-  },
-  checkBtnText: {
-    color: '#FFF',
-    fontWeight: '800',
-    fontSize: 16,
-    letterSpacing: 0.5,
-  },
-  continueBtn: {
-    flex: 1,
-    height: 56,
-    borderRadius: 16,
-    backgroundColor: THEME.primary,
-    borderBottomWidth: 4,
-    borderColor: THEME.primaryDark,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-  },
-  continueBtnText: {
-    color: '#FFF',
-    fontWeight: '800',
-    fontSize: 16,
-    letterSpacing: 0.5,
-  },
-  navRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    paddingTop: 16,
-  },
-  backBtn: {
-    width: 56,
-    height: 56,
-    borderRadius: 16,
-    backgroundColor: '#FFF',
-    borderWidth: 2,
-    borderColor: THEME.border,
-    borderBottomWidth: 4,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
+const createLabStyles = (theme: typeof LightTHEME) => ({
+  headerCard: { backgroundColor: theme.card, borderRadius: 24, padding: 20, marginBottom: 24, borderWidth: 2, borderColor: theme.border, borderBottomWidth: 4 },
+  headerRow: { flexDirection: 'row' as const, alignItems: 'center' as const, justifyContent: 'space-between' as const, marginBottom: 16 },
+  labBadge: { backgroundColor: theme.primary, paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8, flexDirection: 'row' as const, alignItems: 'center' as const, gap: 6 },
+  badgeText: { color: '#FFF', fontWeight: '800' as const, fontSize: 12 },
+  badgeRow: { marginBottom: 16, alignItems: 'center' as const },
+  speakerBtn: { padding: 8, backgroundColor: theme.bg, borderRadius: 12 },
+  mascot: { width: 60, height: 60, marginBottom: 12, alignSelf: 'center' as const },
+  taskText: { fontSize: 18, fontWeight: '700' as const, color: theme.text, textAlign: 'center' as const, lineHeight: 26 },
+  optionsGrid: { flexDirection: 'row' as const, flexWrap: 'wrap' as const, gap: 12 },
+  optionWrapper: { width: '48%' as const },
+  optionCard: { backgroundColor: theme.card, borderRadius: 16, padding: 16, alignItems: 'center' as const, borderWidth: 2, borderColor: theme.border, borderBottomWidth: 4, minHeight: 100 },
+  optionSelected: { borderColor: theme.primary, backgroundColor: theme.primary + '08' },
+  optionCorrect: { borderColor: theme.success, backgroundColor: theme.success + '10' },
+  optionWrong: { borderColor: theme.error, backgroundColor: theme.error + '10' },
+  optionIconCircle: { width: 48, height: 48, borderRadius: 24, backgroundColor: theme.bg, alignItems: 'center' as const, justifyContent: 'center' as const, marginBottom: 8 },
+  optionLabel: { fontSize: 14, fontWeight: '600' as const, color: theme.text, textAlign: 'center' as const },
+  checkCircle: { position: 'absolute' as const, top: 8, right: 8, width: 24, height: 24, borderRadius: 12, alignItems: 'center' as const, justifyContent: 'center' as const },
+  feedbackCard: { borderRadius: 16, padding: 16, marginTop: 16 },
+  feedbackCorrect: { backgroundColor: theme.success + '15' },
+  feedbackWrong: { backgroundColor: theme.error + '15' },
+  feedbackHeader: { flexDirection: 'row' as const, alignItems: 'center' as const, gap: 8, marginBottom: 8 },
+  feedbackTitle: { fontSize: 18, fontWeight: '800' as const },
+  feedbackText: { fontSize: 15, color: theme.text, lineHeight: 22 },
+  bottomBar: { flexDirection: 'row' as const, gap: 12, paddingTop: 16 },
+  backBtn: { height: 56, borderRadius: 16, backgroundColor: theme.bg, borderWidth: 2, borderColor: theme.border, paddingHorizontal: 24, alignItems: 'center' as const, justifyContent: 'center' as const },
+  checkBtn: { flex: 1, height: 56, borderRadius: 16, backgroundColor: theme.gold, borderBottomWidth: 4, borderColor: '#D97706', alignItems: 'center' as const, justifyContent: 'center' as const },
+  checkBtnDisabled: { backgroundColor: theme.border, borderColor: theme.textMuted },
+  checkBtnText: { color: '#FFF', fontWeight: '800' as const, fontSize: 16 },
+  navRow: { flexDirection: 'row' as const, gap: 12, marginTop: 24 },
+  continueBtn: { flex: 1, height: 56, borderRadius: 16, flexDirection: 'row' as const, alignItems: 'center' as const, justifyContent: 'center' as const, gap: 8, borderBottomWidth: 4 },
+  continueBtnText: { color: '#FFF', fontWeight: '800' as const, fontSize: 16 },
 });
 
-// Duolingo-style Quiz Styles
-const quizStyles = StyleSheet.create({
-  questionCard: {
-    backgroundColor: '#FFF',
-    borderRadius: 20,
-    padding: 20,
-    borderWidth: 2,
-    borderColor: THEME.border,
-    borderBottomWidth: 5,
-    marginBottom: 20,
-  },
-  questionHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 16,
-  },
-  quizBadge: {
-    backgroundColor: THEME.gold,
-    paddingHorizontal: 14,
-    paddingVertical: 6,
-    borderRadius: 16,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    borderBottomWidth: 2,
-    borderColor: '#D97706',
-  },
-  badgeText: {
-    color: '#FFF',
-    fontWeight: '800',
-    fontSize: 11,
-    letterSpacing: 1,
-  },
-  speakerBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#FEF3C7',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  questionText: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: THEME.text,
-    lineHeight: 28,
-    textAlign: 'center',
-  },
-  optionsContainer: {
-    gap: 12,
-  },
-  optionCard: {
-    backgroundColor: '#FFF',
-    borderRadius: 16,
-    padding: 16,
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderWidth: 2,
-    borderColor: THEME.border,
-    borderBottomWidth: 4,
-    gap: 14,
-  },
-  optionSelected: {
-    borderColor: THEME.primary,
-    backgroundColor: THEME.primary + '08',
-  },
-  optionCorrect: {
-    borderColor: THEME.success,
-    backgroundColor: THEME.success + '10',
-  },
-  optionWrong: {
-    borderColor: THEME.error,
-    backgroundColor: THEME.error + '10',
-  },
-  optionLetter: {
-    width: 36,
-    height: 36,
-    borderRadius: 10,
-    backgroundColor: '#F3F4F6',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 2,
-    borderColor: '#E5E7EB',
-  },
-  optionLetterSelected: {
-    backgroundColor: THEME.primary,
-    borderColor: THEME.primary,
-  },
-  optionLetterCorrect: {
-    backgroundColor: THEME.success,
-    borderColor: THEME.success,
-  },
-  optionLetterWrong: {
-    backgroundColor: THEME.error,
-    borderColor: THEME.error,
-  },
-  optionLetterText: {
-    fontSize: 16,
-    fontWeight: '800',
-    color: THEME.textMuted,
-  },
-  optionText: {
-    flex: 1,
-    fontSize: 16,
-    color: THEME.text,
-    fontWeight: '500',
-  },
-  feedbackCard: {
-    borderRadius: 16,
-    padding: 16,
-    marginTop: 16,
-  },
-  feedbackCorrect: {
-    backgroundColor: THEME.success + '15',
-  },
-  feedbackWrong: {
-    backgroundColor: THEME.error + '15',
-  },
-  feedbackHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    marginBottom: 8,
-  },
-  feedbackTitle: {
-    fontSize: 18,
-    fontWeight: '800',
-  },
-  feedbackText: {
-    fontSize: 15,
-    color: THEME.text,
-    lineHeight: 22,
-  },
-  checkBtn: {
-    height: 56,
-    borderRadius: 16,
-    backgroundColor: THEME.gold,
-    borderBottomWidth: 4,
-    borderColor: '#D97706',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  checkBtnDisabled: {
-    backgroundColor: '#E5E7EB',
-    borderColor: '#D1D5DB',
-  },
-  checkBtnText: {
-    color: '#FFF',
-    fontWeight: '800',
-    fontSize: 16,
-    letterSpacing: 0.5,
-  },
-  continueBtn: {
-    height: 56,
-    borderRadius: 16,
-    backgroundColor: THEME.primary,
-    borderBottomWidth: 4,
-    borderColor: THEME.primaryDark,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-  },
-  continueBtnText: {
-    color: '#FFF',
-    fontWeight: '800',
-    fontSize: 16,
-    letterSpacing: 0.5,
-  },
+const createQuizStyles = (theme: typeof LightTHEME) => ({
+  questionCard: { backgroundColor: theme.card, borderRadius: 24, padding: 20, marginBottom: 24, borderWidth: 2, borderColor: theme.border, borderBottomWidth: 4 },
+  questionHeader: { flexDirection: 'row' as const, alignItems: 'center' as const, justifyContent: 'space-between' as const, marginBottom: 16 },
+  quizBadge: { backgroundColor: theme.gold, paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8, flexDirection: 'row' as const, alignItems: 'center' as const, gap: 6 },
+  badgeText: { color: '#FFF', fontWeight: '800' as const, fontSize: 12 },
+  speakerBtn: { padding: 8, backgroundColor: theme.bg, borderRadius: 12 },
+  questionText: { fontSize: 18, fontWeight: '700' as const, color: theme.text, lineHeight: 26 },
+  optionsContainer: { gap: 12, marginBottom: 16 },
+  optionCard: { backgroundColor: theme.card, borderRadius: 16, padding: 16, borderWidth: 2, borderColor: theme.border, borderBottomWidth: 4, flexDirection: 'row' as const, alignItems: 'center' as const, gap: 12 },
+  optionSelected: { borderColor: theme.primary, backgroundColor: theme.primary + '08' },
+  optionCorrect: { borderColor: theme.success, backgroundColor: theme.success + '10' },
+  optionWrong: { borderColor: theme.error, backgroundColor: theme.error + '10' },
+  optionLetter: { width: 32, height: 32, borderRadius: 16, backgroundColor: theme.bg, alignItems: 'center' as const, justifyContent: 'center' as const },
+  optionLetterSelected: { backgroundColor: theme.primary },
+  optionLetterCorrect: { backgroundColor: theme.success },
+  optionLetterWrong: { backgroundColor: theme.error },
+  optionLetterText: { fontSize: 14, fontWeight: '800' as const, color: theme.text },
+  optionText: { flex: 1, fontSize: 15, fontWeight: '600' as const, color: theme.text },
+  optionCheck: { width: 24, height: 24 },
+  feedbackCard: { borderRadius: 16, padding: 16 },
+  feedbackCorrect: { backgroundColor: theme.success + '15' },
+  feedbackWrong: { backgroundColor: theme.error + '15' },
+  feedbackHeader: { flexDirection: 'row' as const, alignItems: 'center' as const, gap: 8, marginBottom: 8 },
+  feedbackTitle: { fontSize: 18, fontWeight: '800' as const },
+  feedbackText: { fontSize: 15, color: theme.text, lineHeight: 22 },
+  checkBtn: { height: 56, borderRadius: 16, backgroundColor: theme.gold, borderBottomWidth: 4, borderColor: '#D97706', alignItems: 'center' as const, justifyContent: 'center' as const },
+  checkBtnDisabled: { backgroundColor: theme.border, borderColor: theme.textMuted },
+  checkBtnText: { color: '#FFF', fontWeight: '800' as const, fontSize: 16 },
+  continueBtn: { height: 56, borderRadius: 16, flexDirection: 'row' as const, alignItems: 'center' as const, justifyContent: 'center' as const, gap: 8, borderBottomWidth: 4 },
+  continueBtnText: { color: '#FFF', fontWeight: '800' as const, fontSize: 16 },
 });

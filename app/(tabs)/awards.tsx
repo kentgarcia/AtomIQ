@@ -10,6 +10,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Circle } from 'react-native-svg';
 
 const { width } = Dimensions.get('window');
+const CERT_CARD_WIDTH = Math.min(300, width - 60);
 
 const LightTHEME = {
   bg: '#F8F9FE',
@@ -140,12 +141,6 @@ export default function AwardsScreen() {
     }
   };
   
-  // Handle save certificate
-  const handleSaveCertificate = () => {
-    // In a real app, this would save to camera roll
-    setShowCertificateModal(false);
-  };
-  
   // Handle achievement click
   const openAchievementDetails = (achievement: typeof achievements[0]) => {
     setSelectedAchievement(achievement);
@@ -220,14 +215,14 @@ export default function AwardsScreen() {
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.certificatesScrollContent}
             decelerationRate="fast"
-            snapToInterval={320}
+            snapToInterval={CERT_CARD_WIDTH + 20}
           >
             {certificates.map((cert, index) => (
               <TouchableOpacity 
                 key={cert.id}
                 activeOpacity={cert.unlocked ? 0.7 : 1}
                 onPress={() => openCertificatePreview(cert)}
-                style={styles.certificateWrapper}
+                style={[styles.certificateWrapper, { width: CERT_CARD_WIDTH }]}
               >
                 <Animated.View 
                   entering={FadeInDown.delay(250 + index * 50).springify()}
@@ -543,21 +538,6 @@ export default function AwardsScreen() {
               {/* Action Buttons */}
               <View style={styles.buttonContainer}>
                 <TouchableOpacity 
-                  style={styles.actionButton}
-                  onPress={handleSaveCertificate}
-                >
-                  <LinearGradient
-                    colors={selectedCertificate.gradient}
-                    style={styles.actionButtonGradient}
-                    start={{ x: 0, y: 0 }}
-                    end={{ x: 1, y: 0 }}
-                  >
-                    <Icon name="DocumentDownload" size={20} color="#FFF" variant="Bold" />
-                    <Text style={styles.saveButtonText}>Save</Text>
-                  </LinearGradient>
-                </TouchableOpacity>
-                
-                <TouchableOpacity 
                   style={[styles.actionButton, styles.closeButtonNew]}
                   onPress={() => setShowCertificateModal(false)}
                 >
@@ -711,7 +691,6 @@ const createStyles = (theme: typeof LightTHEME) => StyleSheet.create({
     paddingBottom: 20, // Space for shadow
   },
   certificateWrapper: {
-    width: 300,
   },
   certificate: {
     height: 170,
@@ -750,6 +729,7 @@ const createStyles = (theme: typeof LightTHEME) => StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'flex-start',
+    minWidth: 0,
   },
   certificateIconBadge: {
     width: 64,
@@ -777,6 +757,8 @@ const createStyles = (theme: typeof LightTHEME) => StyleSheet.create({
     color: '#FFFFFF',
     marginBottom: 12,
     lineHeight: 22,
+    flexShrink: 1,
+    width: '100%',
   },
   certificateButton: {
     backgroundColor: '#FFFFFF',
@@ -827,11 +809,15 @@ const createStyles = (theme: typeof LightTHEME) => StyleSheet.create({
     fontWeight: '700',
     marginBottom: 4,
     color: theme.text,
+    flexShrink: 1,
+    width: '100%',
   },
   certificateDescLocked: {
     fontSize: 13,
     color: theme.textMuted,
     fontWeight: '500',
+    flexShrink: 1,
+    width: '100%',
   },
 
   // Achievements
@@ -1044,19 +1030,6 @@ const createStyles = (theme: typeof LightTHEME) => StyleSheet.create({
     borderRadius: 12,
     overflow: 'hidden',
     minWidth: 130,
-  },
-  actionButtonGradient: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    paddingVertical: 14,
-    paddingHorizontal: 32,
-  },
-  saveButtonText: {
-    color: '#FFF',
-    fontSize: 16,
-    fontWeight: '700',
   },
   closeButtonNew: {
     backgroundColor: '#FFF',

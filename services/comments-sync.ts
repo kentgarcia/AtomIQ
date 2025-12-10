@@ -89,6 +89,11 @@ export const postComment = async (
     throw new Error('You must be online to post comments');
   }
 
+  // If moderation hides the comment, replace content with a hidden notice while still syncing the record
+  const sanitizedText = moderationResult.status === 'hidden'
+    ? `This message was hidden: ${moderationResult.reason || 'Not allowed'}`
+    : text;
+
   try {
     const { data, error } = await supabase
       .from('comments')
@@ -97,7 +102,7 @@ export const postComment = async (
         user_id: userId,
         username: username,
         avatar_url: avatarUrl,
-        text: text,
+        text: sanitizedText,
         moderation_status: moderationResult.status,
         moderation_reason: moderationResult.reason || null,
         moderation_correction: moderationResult.correction || null,

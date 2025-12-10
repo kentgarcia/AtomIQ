@@ -5,6 +5,7 @@ import { useAllLevels } from '@/hooks/use-storage';
 import { useStorage } from '@/services/StorageContext';
 import { isSupabaseConfigured, supabase } from '@/services/supabase';
 import { Tables } from '@/services/supabase.types';
+import { useFocusEffect } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
@@ -57,13 +58,38 @@ type LeaderEntry = {
 export default function HomeScreen() {
   const router = useRouter();
   const { userProfile } = useStorage();
-  const { levels } = useAllLevels();
+  const { levels, refresh } = useAllLevels();
   const colorScheme = useColorScheme();
   const [leaderboardPreview, setLeaderboardPreview] = useState<{ topThree: LeaderEntry[]; userRank?: LeaderEntry | undefined }>({ topThree: [] });
   const [leaderboardError, setLeaderboardError] = useState<string | null>(null);
+  const [greeting, setGreeting] = useState('Hello');
   
   const THEME = colorScheme === 'dark' ? DarkTHEME : LightTHEME;
   const styles = useMemo(() => createStyles(THEME), [THEME]);
+
+  // Update greeting based on local time, refreshing each minute
+  useEffect(() => {
+    const computeGreeting = () => {
+      const hour = new Date().getHours();
+      if (hour < 5) return 'Good Night!';
+      if (hour < 12) return 'Good Morning!';
+      if (hour < 17) return 'Good Afternoon!';
+      if (hour < 21) return 'Good Evening!';
+      return 'Good Night!';
+    };
+
+    const update = () => setGreeting(computeGreeting());
+    update();
+    const id = setInterval(update, 60 * 1000);
+    return () => clearInterval(id);
+  }, []);
+
+  // Refresh levels whenever the tab/screen gains focus so progress is up to date
+  useFocusEffect(
+    useCallback(() => {
+      refresh();
+    }, [refresh])
+  );
 
   // Calculate current progress
   const currentProgress = useMemo(() => {
@@ -193,7 +219,7 @@ export default function HomeScreen() {
     try {
       const { data, error } = await supabase
         .from('users')
-        .select('user_id, username, avatar_url, total_xp, is_npc')
+        .select('user_id, username, avatar_url, total_xp, is_npc, created_at, current_streak, id, lessons_completed, longest_streak, myths_busted, updated_at')
         .order('total_xp', { ascending: false })
         .limit(10);
 
@@ -230,7 +256,7 @@ export default function HomeScreen() {
               style={styles.avatar}
             />
             <View>
-              <Text style={styles.greeting}>Good Afternoon!</Text>
+              <Text style={styles.greeting}>{greeting}</Text>
               <Text style={styles.username}>{userProfile?.username || 'Atom Explorer'}</Text>
             </View>
           </View>
@@ -262,7 +288,7 @@ export default function HomeScreen() {
               <View style={styles.actionIconCircle}>
                 <Icon name="Danger" size={24} color="#FF6B6B" variant="Bold" />
               </View>
-              <Text style={styles.actionText}>MythBuster</Text>
+              <Text style={styles.actionText} numberOfLines={1} ellipsizeMode="tail">MythBuster</Text>
             </LinearGradient>
           </TouchableOpacity>
 
@@ -278,7 +304,7 @@ export default function HomeScreen() {
               <View style={[styles.actionIconCircle, { backgroundColor: 'rgba(255,255,255,0.9)' }]}>
                 <Icon name="Book" size={24} color="#6A82FB" variant="Bold" />
               </View>
-              <Text style={styles.actionText}>Encyclopedia</Text>
+              <Text style={styles.actionText} numberOfLines={1} ellipsizeMode="tail">Encyclopedia</Text>
             </LinearGradient>
           </TouchableOpacity>
 
@@ -294,7 +320,7 @@ export default function HomeScreen() {
               <View style={[styles.actionIconCircle, { backgroundColor: 'rgba(255,255,255,0.9)' }]}>
                 <Icon name="Game" size={24} color="#9E87F5" variant="Bold" />
               </View>
-              <Text style={styles.actionText}>AtomMaze</Text>
+              <Text style={styles.actionText} numberOfLines={1} ellipsizeMode="tail">AtomMaze</Text>
             </LinearGradient>
           </TouchableOpacity>
         </Animated.View>
@@ -483,6 +509,9 @@ const createStyles = (theme: typeof LightTHEME) => StyleSheet.create({
     color: '#FFF',
     fontWeight: '700',
     fontSize: 13,
+    textAlign: 'center',
+    flexShrink: 1,
+    width: '100%',
   },
   bannerContainer: {
     height: 160,

@@ -1,8 +1,10 @@
 import { Icon } from '@/components/ui/icon';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { syncProfileToSupabase } from '@/services/profile-sync';
 import { useStorage } from '@/services/StorageContext';
 import { isSupabaseConfigured, supabase } from '@/services/supabase';
 import { Tables } from '@/services/supabase.types';
+import { useFocusEffect } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Dimensions, Image, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
@@ -194,20 +196,39 @@ export default function LeaderboardScreen() {
     [userProfile]
   );
 
-  const loadLeaderboard = useCallback(async () => {
+  const loadLeaderboard = useCallback(async (isRefresh = false) => {
     if (!isSupabaseConfigured()) {
       setLeaderboardData(buildLeaderboard([]));
       setError(null);
+      if (isRefresh) setRefreshing(false);
       setLoading(false);
-      setRefreshing(false);
       return;
     }
 
     try {
-      setLoading(true);
+      if (isRefresh) {
+        setRefreshing(true);
+      } else {
+        setLoading(true);
+      }
+
+      // Sync local user profile to Supabase before fetching leaderboard
+      if (userProfile) {
+        await syncProfileToSupabase({
+          user_id: userProfile.user_id,
+          username: userProfile.username,
+          avatar_url: userProfile.avatar_url,
+          total_xp: userProfile.total_xp,
+          current_streak: userProfile.current_streak,
+          longest_streak: userProfile.longest_streak,
+          myths_busted: userProfile.myths_busted,
+          lessons_completed: userProfile.lessons_completed,
+        });
+      }
+
       const { data, error: supabaseError } = await supabase
         .from('users')
-        .select('user_id, username, avatar_url, total_xp, current_streak, is_npc')
+        .select('user_id, username, avatar_url, total_xp, current_streak, is_npc, created_at, id, lessons_completed, longest_streak, myths_busted, updated_at')
         .order('total_xp', { ascending: false })
         .limit(100);
 
@@ -223,17 +244,23 @@ export default function LeaderboardScreen() {
       setLoading(false);
       setRefreshing(false);
     }
-  }, [buildLeaderboard]);
+  }, [buildLeaderboard, userProfile]);
 
   const onRefresh = useCallback(() => {
-    setRefreshing(true);
-    loadLeaderboard();
+    loadLeaderboard(true);
   }, [loadLeaderboard]);
 
   useEffect(() => {
     setLeaderboardData(buildLeaderboard([]));
     loadLeaderboard();
   }, [buildLeaderboard, loadLeaderboard]);
+
+  // Refresh when screen regains focus to keep leaderboard fresh
+  useFocusEffect(
+    useCallback(() => {
+      loadLeaderboard(true);
+    }, [loadLeaderboard])
+  );
 
   const topThree = leaderboardData.slice(0, 3);
   const restList = leaderboardData.slice(3);
@@ -370,7 +397,7 @@ export default function LeaderboardScreen() {
       </ScrollView>
 
       {/* Sticky User Bar */}
-      {userRank && userRank.rank > 3 && (
+      {userRank && userRank.rank && userRank.rank > 3 && (
         <View style={[styles.stickyBar, { bottom: 20 }]}>
           <LinearGradient
             colors={GRADIENTS.blueSolid}
