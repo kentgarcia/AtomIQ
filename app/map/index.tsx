@@ -484,7 +484,7 @@ const TerrainLayer = ({
   );
 };
 
-const LevelNode = ({ level, index, globalIndex, unitColor, onPress, showStart = false }: { level: any, index: number, globalIndex: number, unitColor: string, onPress: () => void, showStart?: boolean }) => {
+const LevelNode = ({ level, index, globalIndex, unitColor, onPress, showStart = false, styles }: { level: any, index: number, globalIndex: number, unitColor: string, onPress: () => void, showStart?: boolean, styles: any }) => {
   const pos = getNodePosition(globalIndex);
   const yPos = 60 + index * 120;
   
@@ -639,6 +639,7 @@ export default function MapScreen() {
   const router = useRouter();
   const colorScheme = useColorScheme();
   const THEME = colorScheme === 'dark' ? DarkTHEME : LightTHEME;
+  const styles = React.useMemo(() => createStyles(THEME), [THEME]);
   const scrollViewRef = useRef<ScrollView>(null);
   const isFirstRender = useRef(true);
   const { levels, loading, refresh } = useAllLevels();
@@ -862,6 +863,7 @@ export default function MapScreen() {
                     unitColor={unit.color}
                     onPress={() => handleLevelPress(level.id, level.type)}
                     showStart={level.id === firstCurrentLevelId}
+                    styles={styles}
                   />
                 );
               })}
@@ -970,7 +972,7 @@ export default function MapScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (theme: typeof LightTHEME) => StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -1009,7 +1011,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 16,
     fontWeight: '800',
-    color: THEME.textMuted,
+    color: theme.textMuted,
     textTransform: 'uppercase',
     letterSpacing: 1,
   },
@@ -1139,7 +1141,7 @@ const styles = StyleSheet.create({
   },
   startText: {
     fontWeight: '800',
-    color: THEME.primary,
+    color: theme.primary,
     fontSize: 14,
   },
   bubbleArrow: {
@@ -1184,7 +1186,7 @@ const styles = StyleSheet.create({
   modalSubtitle: {
     fontSize: 12,
     fontWeight: '600',
-    color: THEME.textMuted,
+    color: theme.textMuted,
     textTransform: 'uppercase',
     letterSpacing: 1,
     marginBottom: 4,
@@ -1192,7 +1194,7 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 24,
     fontWeight: '800',
-    color: THEME.text,
+    color: theme.text,
     lineHeight: 30,
   },
   modalCloseBtn: {
@@ -1210,12 +1212,12 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 16,
     fontWeight: '700',
-    color: THEME.text,
+    color: theme.text,
   },
   infoText: {
     fontSize: 15,
     lineHeight: 24,
-    color: THEME.text,
+    color: theme.text,
     opacity: 0.8,
   },
   referenceItem: {
@@ -1233,17 +1235,17 @@ const styles = StyleSheet.create({
   referenceText: {
     flex: 1,
     fontSize: 13,
-    color: THEME.primary,
+    color: theme.primary,
     fontWeight: '500',
   },
   modalActionBtn: {
-    backgroundColor: THEME.primary,
+    backgroundColor: theme.primary,
     paddingVertical: 16,
     borderRadius: 16,
     alignItems: 'center',
     marginTop: 8,
     borderBottomWidth: 4,
-    borderBottomColor: darkenColor(THEME.primary, 0.2),
+    borderBottomColor: darkenColor(theme.primary, 0.2),
   },
   modalActionText: {
     fontSize: 16,
@@ -1264,13 +1266,13 @@ const styles = StyleSheet.create({
   loadingTitle: {
     fontSize: 24,
     fontWeight: '800',
-    color: THEME.text,
+    color: theme.text,
     textAlign: 'center',
     marginBottom: 8,
   },
   loadingSubtitle: {
     fontSize: 16,
-    color: THEME.textMuted,
+    color: theme.textMuted,
     textAlign: 'center',
     marginBottom: 32,
   },

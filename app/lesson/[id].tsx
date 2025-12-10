@@ -9,14 +9,14 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Dimensions, Image, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Gesture, GestureDetector, GestureHandlerRootView } from 'react-native-gesture-handler';
 import Animated, {
-    FadeInDown,
-    interpolate,
-    runOnJS,
-    useAnimatedStyle,
-    useSharedValue,
-    withRepeat,
-    withSpring,
-    withTiming
+  FadeInDown,
+  interpolate,
+  runOnJS,
+  useAnimatedStyle,
+  useSharedValue,
+  withRepeat,
+  withSpring,
+  withTiming
 } from 'react-native-reanimated';
 
 const { width, height } = Dimensions.get('window');
@@ -49,6 +49,9 @@ const DarkTHEME = {
   gold: '#FFC107',
   border: '#2D3A56',
 };
+
+// Default to light theme (will be updated by component)
+let THEME = LightTHEME;
 
 // --- Components for Each Step ---
 

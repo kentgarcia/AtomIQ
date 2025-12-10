@@ -29,6 +29,8 @@ const DarkTHEME = {
   border: '#2D3A56',
 };
 
+let THEME = LightTHEME;
+
 export default function EncyclopediaScreen() {
   const router = useRouter();
   const colorScheme = useColorScheme();

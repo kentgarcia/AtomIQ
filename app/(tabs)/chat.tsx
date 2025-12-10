@@ -2,6 +2,7 @@ import { Icon } from '@/components/ui/icon';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
+import React, { useMemo } from 'react';
 import { Dimensions, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -123,7 +124,7 @@ export default function ChatLandingScreen() {
           <TouchableOpacity 
             style={styles.startButton}
             activeOpacity={0.9}
-            onPress={() => router.push('/ai-chat')}
+            onPress={() => router.push('../ai-chat' as any)}
           >
             <LinearGradient
               colors={GRADIENTS.Purple}

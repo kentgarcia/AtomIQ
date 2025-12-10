@@ -1,5 +1,6 @@
 import { Icon } from '@/components/ui/icon';
 import { getQuizById } from '@/content/quizzes';
+import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useStorage } from '@/services/StorageContext';
 import { logDailyActivity, unlockNextLevel, updateLevelProgress } from '@/services/database';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -42,6 +43,8 @@ export default function QuizScreen() {
   const { id } = useLocalSearchParams();
   const router = useRouter();
   const { addXP } = useStorage();
+  const colorScheme = useColorScheme();
+  const THEME = colorScheme === 'dark' ? DarkTHEME : LightTHEME;
   
   const [quiz, setQuiz] = useState(() => getQuizById(id as string));
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -53,12 +56,13 @@ export default function QuizScreen() {
   const scrollViewRef = useRef<ScrollView>(null);
 
   if (!quiz) {
+    const errorStyles = React.useMemo(() => createStyles(THEME), [THEME]);
     return (
-      <View style={styles.fullScreenCenter}>
+      <View style={errorStyles.fullScreenCenter}>
         <Icon name="Danger" size={64} color={THEME.error} />
-        <Text style={styles.errorText}>Quiz not found</Text>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <Text style={styles.backButtonText}>Go Back</Text>
+        <Text style={errorStyles.errorText}>Quiz not found</Text>
+        <TouchableOpacity onPress={() => router.back()} style={errorStyles.backButton}>
+          <Text style={errorStyles.backButtonText}>Go Back</Text>
         </TouchableOpacity>
       </View>
     );
@@ -138,8 +142,7 @@ export default function QuizScreen() {
           // Award XP and log activity
           addXP(quiz.xpReward);
           logDailyActivity(new Date().toISOString().split('T')[0], {
-            xp_earned: quiz.xpReward,
-            quizzes_completed: 1
+            xp_earned: quiz.xpReward
           });
         } catch (error) {
           console.error('Error saving quiz progress:', error);
@@ -155,9 +158,10 @@ export default function QuizScreen() {
     const correctCount = answers.filter(a => a).length;
     const score = Math.round((correctCount / totalQuestions) * 100);
     const passed = score >= quiz.passingScore;
+    const styles = React.useMemo(() => createStyles(THEME), [THEME]);
 
     return (
-      <View style={{ flex: 1, backgroundColor: '#FFF' }}>
+      <View style={{ flex: 1, backgroundColor: THEME.bg }}>
         <SafeAreaView style={{ flex: 1 }}>
           <View style={styles.resultsContainer}>
             {/* Result Icon */}
@@ -230,8 +234,10 @@ export default function QuizScreen() {
 
   const isCorrect = selectedAnswer === getCorrectAnswerIndex(currentQuestion);
 
+  const styles = React.useMemo(() => createStyles(THEME), [THEME]);
+
   return (
-    <View style={{ flex: 1, backgroundColor: '#FFF' }}>
+    <View style={{ flex: 1, backgroundColor: THEME.bg }}>
       <SafeAreaView style={{ flex: 1 }}>
         {/* Header */}
         <View style={styles.header}>
@@ -376,23 +382,23 @@ export default function QuizScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (theme: typeof LightTHEME) => StyleSheet.create({
   fullScreenCenter: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#FFF',
+    backgroundColor: theme.bg,
     padding: 20,
   },
   errorText: {
     fontSize: 18,
     fontWeight: '700',
-    color: THEME.text,
+    color: theme.text,
     marginTop: 16,
     marginBottom: 20,
   },
   backButton: {
-    backgroundColor: THEME.primary,
+    backgroundColor: theme.primary,
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 12,
@@ -423,11 +429,11 @@ const styles = StyleSheet.create({
   },
   progressBarFill: {
     height: '100%',
-    backgroundColor: THEME.primary,
+    backgroundColor: theme.primary,
     borderRadius: 6,
   },
   questionBadge: {
-    backgroundColor: THEME.primary + '15',
+    backgroundColor: theme.primary + '15',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 12,
@@ -435,7 +441,7 @@ const styles = StyleSheet.create({
   questionBadgeText: {
     fontSize: 13,
     fontWeight: '800',
-    color: THEME.primary,
+    color: theme.primary,
   },
 
   // Content
@@ -444,11 +450,11 @@ const styles = StyleSheet.create({
     paddingBottom: 16,
   },
   questionCard: {
-    backgroundColor: '#FFF',
+    backgroundColor: theme.card,
     borderRadius: 20,
     padding: 20,
     borderWidth: 2,
-    borderColor: THEME.border,
+    borderColor: theme.border,
     borderBottomWidth: 5,
     marginBottom: 20,
   },
@@ -459,7 +465,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   quizBadge: {
-    backgroundColor: THEME.gold,
+    backgroundColor: theme.gold,
     paddingHorizontal: 14,
     paddingVertical: 6,
     borderRadius: 16,
@@ -486,7 +492,7 @@ const styles = StyleSheet.create({
   questionText: {
     fontSize: 20,
     fontWeight: '700',
-    color: THEME.text,
+    color: theme.text,
     lineHeight: 28,
     textAlign: 'center',
   },
@@ -496,27 +502,27 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   optionCard: {
-    backgroundColor: '#FFF',
+    backgroundColor: theme.card,
     borderRadius: 16,
     padding: 16,
     flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 2,
-    borderColor: THEME.border,
+    borderColor: theme.border,
     borderBottomWidth: 4,
     gap: 14,
   },
   optionSelected: {
-    borderColor: THEME.primary,
-    backgroundColor: THEME.primary + '08',
+    borderColor: theme.primary,
+    backgroundColor: theme.primary + '08',
   },
   optionCorrect: {
-    borderColor: THEME.success,
-    backgroundColor: THEME.success + '10',
+    borderColor: theme.success,
+    backgroundColor: theme.success + '10',
   },
   optionWrong: {
-    borderColor: THEME.error,
-    backgroundColor: THEME.error + '10',
+    borderColor: theme.error,
+    backgroundColor: theme.error + '10',
   },
   optionLetter: {
     width: 36,
@@ -529,26 +535,26 @@ const styles = StyleSheet.create({
     borderColor: '#E5E7EB',
   },
   optionLetterSelected: {
-    backgroundColor: THEME.primary,
-    borderColor: THEME.primary,
+    backgroundColor: theme.primary,
+    borderColor: theme.primary,
   },
   optionLetterCorrect: {
-    backgroundColor: THEME.success,
-    borderColor: THEME.success,
+    backgroundColor: theme.success,
+    borderColor: theme.success,
   },
   optionLetterWrong: {
-    backgroundColor: THEME.error,
-    borderColor: THEME.error,
+    backgroundColor: theme.error,
+    borderColor: theme.error,
   },
   optionLetterText: {
     fontSize: 16,
     fontWeight: '800',
-    color: THEME.textMuted,
+    color: theme.textMuted,
   },
   optionText: {
     flex: 1,
     fontSize: 16,
-    color: THEME.text,
+    color: theme.text,
     fontWeight: '500',
   },
 
@@ -559,10 +565,10 @@ const styles = StyleSheet.create({
     marginTop: 16,
   },
   feedbackCorrect: {
-    backgroundColor: THEME.success + '15',
+    backgroundColor: theme.success + '15',
   },
   feedbackWrong: {
-    backgroundColor: THEME.error + '15',
+    backgroundColor: theme.error + '15',
   },
   feedbackHeader: {
     flexDirection: 'row',
@@ -576,7 +582,7 @@ const styles = StyleSheet.create({
   },
   feedbackText: {
     fontSize: 15,
-    color: THEME.text,
+    color: theme.text,
     lineHeight: 22,
   },
 
@@ -588,7 +594,7 @@ const styles = StyleSheet.create({
   checkBtn: {
     height: 56,
     borderRadius: 16,
-    backgroundColor: THEME.gold,
+    backgroundColor: theme.gold,
     borderBottomWidth: 4,
     borderColor: '#D97706',
     alignItems: 'center',
@@ -607,9 +613,9 @@ const styles = StyleSheet.create({
   continueBtn: {
     height: 56,
     borderRadius: 16,
-    backgroundColor: THEME.primary,
+    backgroundColor: theme.primary,
     borderBottomWidth: 4,
-    borderColor: THEME.primaryDark,
+    borderColor: theme.primaryDark,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -640,21 +646,21 @@ const styles = StyleSheet.create({
   resultsTitle: {
     fontSize: 28,
     fontWeight: '800',
-    color: THEME.text,
+    color: theme.text,
     marginBottom: 8,
   },
   resultsSubtitle: {
     fontSize: 16,
-    color: THEME.textMuted,
+    color: theme.textMuted,
     marginBottom: 24,
   },
   statsCard: {
     flexDirection: 'row',
-    backgroundColor: '#FFF',
+    backgroundColor: theme.card,
     borderRadius: 20,
     padding: 20,
     borderWidth: 2,
-    borderColor: THEME.border,
+    borderColor: theme.border,
     borderBottomWidth: 5,
     width: '100%',
     marginBottom: 24,
@@ -674,17 +680,17 @@ const styles = StyleSheet.create({
   statValue: {
     fontSize: 24,
     fontWeight: '800',
-    color: THEME.text,
+    color: theme.text,
   },
   statLabel: {
     fontSize: 12,
     fontWeight: '600',
-    color: THEME.textMuted,
+    color: theme.textMuted,
     marginTop: 2,
   },
   statDivider: {
     width: 1,
-    backgroundColor: THEME.border,
+    backgroundColor: theme.border,
     marginVertical: 8,
   },
   resultsMascot: {
@@ -695,9 +701,9 @@ const styles = StyleSheet.create({
   continueButton: {
     height: 56,
     borderRadius: 16,
-    backgroundColor: THEME.primary,
+    backgroundColor: theme.primary,
     borderBottomWidth: 4,
-    borderColor: THEME.primaryDark,
+    borderColor: theme.primaryDark,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',

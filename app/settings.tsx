@@ -1,6 +1,5 @@
 import { Icon } from '@/components/ui/icon';
-import { useTheme } from '@/hooks/use-color-scheme.tsx';
-import { useThemeColors } from '@/hooks/use-theme-colors';
+import { useTheme } from '@/hooks/use-color-scheme';
 import { clearAllData } from '@/services/database';
 import { useStorage } from '@/services/StorageContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -10,12 +9,30 @@ import { Alert, ScrollView, StyleSheet, Switch, Text, TextInput, TouchableOpacit
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+const LightTHEME = {
+  bg: '#F8F9FE',
+  card: '#FFFFFF',
+  text: '#32325D',
+  textMuted: '#8898AA',
+  primary: '#EA580C',
+  border: '#E5E7EB',
+};
+
+const DarkTHEME = {
+  bg: '#172B4D',
+  card: '#213356',
+  text: '#F6F9FC',
+  textMuted: '#8898AA',
+  primary: '#EA580C',
+  border: '#2D3A56',
+};
+
 export default function SettingsScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { userProfile, updateUserProfile, clearStorage } = useStorage();
-  const { isDark, toggleTheme } = useTheme();
-  const colors = useThemeColors();
+  const { userProfile, updateUserProfile } = useStorage();
+  const { colorScheme, isDark, toggleTheme } = useTheme();
+  const THEME = colorScheme === 'dark' ? DarkTHEME : LightTHEME;
   const [isEditing, setIsEditing] = useState(false);
   const [username, setUsername] = useState(userProfile?.username || '');
   const [notifications, setNotifications] = useState(true);
@@ -115,14 +132,14 @@ export default function SettingsScreen() {
     );
   };
 
-  const styles = createStyles(colors);
+  const styles = React.useMemo(() => createStyles(THEME), [THEME]);
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.background }}>
+    <View style={{ flex: 1, backgroundColor: THEME.bg }}>
       {/* Header */}
       <View style={[styles.header, { paddingTop: insets.top + 12 }]}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-          <Icon name="ArrowLeft2" size={24} color={colors.text} />
+          <Icon name="ArrowLeft2" size={24} color={THEME.text} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Settings</Text>
         <View style={{ width: 40 }} />
@@ -136,7 +153,7 @@ export default function SettingsScreen() {
             {/* User ID (Read-only) */}
             <View style={styles.settingRow}>
               <View style={styles.settingInfo}>
-                <Icon name="ShieldTick" size={20} color={colors.primary} variant="Bold" />
+                <Icon name="ShieldTick" size={20} color={THEME.primary} variant="Bold" />
                 <View style={{ flex: 1 }}>
                   <Text style={styles.settingLabel}>User ID</Text>
                   <Text style={styles.settingDescription}>Your unique identifier</Text>
@@ -149,7 +166,7 @@ export default function SettingsScreen() {
 
             <View style={[styles.settingRow, styles.settingRowBorder]}>
               <View style={styles.settingInfo}>
-                <Icon name="Profile" size={20} color={colors.primary} variant="Bold" />
+                <Icon name="Profile" size={20} color={THEME.primary} variant="Bold" />
                 <Text style={styles.settingLabel}>Username</Text>
               </View>
               {isEditing ? (
@@ -174,7 +191,7 @@ export default function SettingsScreen() {
               ) : (
                 <TouchableOpacity onPress={() => setIsEditing(true)} style={styles.valueRow}>
                   <Text style={styles.settingValue}>{userProfile?.username}</Text>
-                  <Icon name="Edit" size={18} color={colors.textSecondary} />
+                  <Icon name="Edit" size={18} color={THEME.textMuted} />
                 </TouchableOpacity>
               )}
             </View>
@@ -187,7 +204,7 @@ export default function SettingsScreen() {
           <View style={styles.settingsCard}>
             <View style={styles.settingRow}>
               <View style={styles.settingInfo}>
-                <Icon name="Moon" size={20} color={colors.primary} variant="Bold" />
+                <Icon name="Moon" size={20} color={THEME.primary} variant="Bold" />
                 <View>
                   <Text style={styles.settingLabel}>Dark Mode</Text>
                   <Text style={styles.settingDescription}>Switch between light and dark theme</Text>
@@ -196,14 +213,14 @@ export default function SettingsScreen() {
               <Switch
                 value={isDark}
                 onValueChange={toggleTheme}
-                trackColor={{ false: '#E5E5E5', true: colors.primary }}
-                thumbColor={isDark ? '#FFFFFF' : '#FFFFFF'}
+                trackColor={{ false: '#E5E5E5', true: THEME.primary }}
+                thumbColor='#FFFFFF'
               />
             </View>
 
             <View style={[styles.settingRow, styles.settingRowBorder]}>
               <View style={styles.settingInfo}>
-                <Icon name="Notification" size={20} color={colors.primary} variant="Bold" />
+                <Icon name="Notification" size={20} color={THEME.primary} variant="Bold" />
                 <View>
                   <Text style={styles.settingLabel}>Push Notifications</Text>
                   <Text style={styles.settingDescription}>Receive updates and reminders</Text>
@@ -212,14 +229,14 @@ export default function SettingsScreen() {
               <Switch
                 value={notifications}
                 onValueChange={setNotifications}
-                trackColor={{ false: '#E5E5E5', true: colors.primary }}
+                trackColor={{ false: '#E5E5E5', true: THEME.primary }}
                 thumbColor={notifications ? '#FFFFFF' : '#FFFFFF'}
               />
             </View>
 
             <View style={[styles.settingRow, styles.settingRowBorder]}>
               <View style={styles.settingInfo}>
-                <Icon name="VolumeHigh" size={20} color={colors.primary} variant="Bold" />
+                <Icon name="VolumeHigh" size={20} color={THEME.primary} variant="Bold" />
                 <View>
                   <Text style={styles.settingLabel}>Sound Effects</Text>
                   <Text style={styles.settingDescription}>Play sounds for actions</Text>
@@ -228,14 +245,14 @@ export default function SettingsScreen() {
               <Switch
                 value={soundEffects}
                 onValueChange={setSoundEffects}
-                trackColor={{ false: '#E5E5E5', true: colors.primary }}
+                trackColor={{ false: '#E5E5E5', true: THEME.primary }}
                 thumbColor={soundEffects ? '#FFFFFF' : '#FFFFFF'}
               />
             </View>
 
             <View style={[styles.settingRow, styles.settingRowBorder]}>
               <View style={styles.settingInfo}>
-                <Icon name="Clock" size={20} color={colors.primary} variant="Bold" />
+                <Icon name="Clock" size={20} color={THEME.primary} variant="Bold" />
                 <View>
                   <Text style={styles.settingLabel}>Daily Reminder</Text>
                   <Text style={styles.settingDescription}>Remind me to learn daily</Text>
@@ -244,7 +261,7 @@ export default function SettingsScreen() {
               <Switch
                 value={dailyReminder}
                 onValueChange={setDailyReminder}
-                trackColor={{ false: '#E5E5E5', true: colors.primary }}
+                trackColor={{ false: '#E5E5E5', true: THEME.primary }}
                 thumbColor={dailyReminder ? '#FFFFFF' : '#FFFFFF'}
               />
             </View>
@@ -257,7 +274,7 @@ export default function SettingsScreen() {
           <View style={styles.settingsCard}>
             <TouchableOpacity style={styles.settingRow}>
               <View style={styles.settingInfo}>
-                <Icon name="InfoCircle" size={20} color={colors.primary} variant="Bold" />
+                <Icon name="InfoCircle" size={20} color={THEME.primary} variant="Bold" />
                 <Text style={styles.settingLabel}>App Version</Text>
               </View>
               <Text style={styles.settingValue}>1.0.0</Text>
@@ -265,18 +282,18 @@ export default function SettingsScreen() {
 
             <TouchableOpacity style={[styles.settingRow, styles.settingRowBorder]} onPress={handlePrivacyPolicy}>
               <View style={styles.settingInfo}>
-                <Icon name="DocumentText" size={20} color={colors.primary} variant="Bold" />
+                <Icon name="DocumentText" size={20} color={THEME.primary} variant="Bold" />
                 <Text style={styles.settingLabel}>Privacy Policy</Text>
               </View>
-              <Icon name="ArrowRight2" size={18} color={colors.textSecondary} />
+              <Icon name="ArrowRight2" size={18} color={THEME.textMuted} />
             </TouchableOpacity>
 
             <TouchableOpacity style={[styles.settingRow, styles.settingRowBorder]} onPress={handleTermsOfService}>
               <View style={styles.settingInfo}>
-                <Icon name="Shield" size={20} color={colors.primary} variant="Bold" />
+                <Icon name="Shield" size={20} color={THEME.primary} variant="Bold" />
                 <Text style={styles.settingLabel}>Terms of Service</Text>
               </View>
-              <Icon name="ArrowRight2" size={18} color={colors.textSecondary} />
+              <Icon name="ArrowRight2" size={18} color={THEME.textMuted} />
             </TouchableOpacity>
           </View>
         </Animated.View>
@@ -298,10 +315,10 @@ export default function SettingsScreen() {
 
             <TouchableOpacity style={[styles.settingRow, styles.settingRowBorder]} onPress={handleLogout}>
               <View style={styles.settingInfo}>
-                <Icon name="Home" size={20} color={colors.primary} variant="Bold" />
+                <Icon name="Home" size={20} color={THEME.primary} variant="Bold" />
                 <Text style={styles.settingLabel}>Return to Title Screen</Text>
               </View>
-              <Icon name="ArrowRight2" size={18} color={colors.textSecondary} />
+              <Icon name="ArrowRight2" size={18} color={THEME.textMuted} />
             </TouchableOpacity>
           </View>
         </Animated.View>
@@ -312,16 +329,16 @@ export default function SettingsScreen() {
   );
 }
 
-const createStyles = (colors: any) => StyleSheet.create({
+const createStyles = (theme: typeof LightTHEME) => StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 20,
     paddingBottom: 16,
-    backgroundColor: colors.card,
+    backgroundColor: theme.card,
     borderBottomWidth: 1,
-    borderBottomColor: colors.card === '#FFFFFF' ? '#F0F0F0' : '#2A2A2A',
+    borderBottomColor: theme.border,
   },
   backBtn: {
     width: 40,
@@ -333,7 +350,7 @@ const createStyles = (colors: any) => StyleSheet.create({
   headerTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: colors.text,
+    color: theme.text,
   },
   content: {
     padding: 20,
@@ -341,14 +358,14 @@ const createStyles = (colors: any) => StyleSheet.create({
   sectionTitle: {
     fontSize: 14,
     fontWeight: '700',
-    color: colors.textSecondary,
+    color: theme.textMuted,
     marginBottom: 12,
     marginTop: 8,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
   settingsCard: {
-    backgroundColor: colors.card,
+    backgroundColor: theme.card,
     borderRadius: 16,
     marginBottom: 24,
     overflow: 'hidden',
@@ -362,7 +379,7 @@ const createStyles = (colors: any) => StyleSheet.create({
     shadowRadius: 10,
     elevation: 2,
     borderWidth: 1,
-    borderColor: colors.card === '#FFFFFF' ? '#F0F0F0' : '#2A2A2A',
+    borderColor: theme.border,
   },
   settingRow: {
     flexDirection: 'row',
@@ -373,7 +390,7 @@ const createStyles = (colors: any) => StyleSheet.create({
   },
   settingRowBorder: {
     borderTopWidth: 1,
-    borderTopColor: colors.card === '#FFFFFF' ? '#F0F0F0' : '#2A2A2A',
+    borderTopColor: theme.border,
   },
   settingInfo: {
     flexDirection: 'row',
@@ -384,24 +401,24 @@ const createStyles = (colors: any) => StyleSheet.create({
   settingLabel: {
     fontSize: 16,
     fontWeight: '600',
-    color: colors.text,
+    color: theme.text,
   },
   settingDescription: {
     fontSize: 13,
-    color: colors.textSecondary,
+    color: theme.textMuted,
     marginTop: 2,
   },
   settingValue: {
     fontSize: 15,
     fontWeight: '500',
-    color: colors.textSecondary,
+    color: theme.textMuted,
     marginRight: 8,
   },
   userIdText: {
     fontFamily: 'monospace',
     fontSize: 12,
     maxWidth: 180,
-    color: colors.textSecondary,
+    color: theme.textMuted,
   },
   valueRow: {
     flexDirection: 'row',
@@ -417,18 +434,18 @@ const createStyles = (colors: any) => StyleSheet.create({
   },
   input: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: theme.bg,
     borderWidth: 1,
-    borderColor: colors.card === '#FFFFFF' ? '#E0E0E0' : '#2A2A2A',
+    borderColor: theme.border,
     borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 8,
     fontSize: 15,
-    color: colors.text,
+    color: theme.text,
   },
   saveBtn: {
     padding: 8,
-    backgroundColor: colors.primary + '10',
+    backgroundColor: theme.primary + '10',
     borderRadius: 8,
   },
   cancelBtn: {

@@ -6,21 +6,21 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
 import {
-    Alert,
-    Image,
-    KeyboardAvoidingView, Platform,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput, TouchableOpacity,
-    View
+  Alert,
+  Image,
+  KeyboardAvoidingView, Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput, TouchableOpacity,
+  View
 } from 'react-native';
 import Animated, {
-    Easing,
-    FadeInUp,
-    useAnimatedStyle,
-    useSharedValue,
-    withRepeat, withTiming
+  Easing,
+  FadeInUp,
+  useAnimatedStyle,
+  useSharedValue,
+  withRepeat, withTiming
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -55,6 +55,8 @@ const DarkCHAT_THEME = {
   accent: '#1CB0F6',
 };
 
+let CHAT_THEME = LightCHAT_THEME;
+
 const INITIAL_SUGGESTIONS = [
   "Is X-Ray safe?",
   "How do reactors work?",
@@ -63,17 +65,17 @@ const INITIAL_SUGGESTIONS = [
   "Radiation vs. Radioactivity"
 ];
 
-const INITIAL_MESSAGES = [
+const INITIAL_MESSAGES: Message[] = [
   { 
     id: 1, 
-    role: 'bot', 
+    role: 'bot' as const, 
     text: "Greetings, Scientist. I am Schrödi. Accessing the database...",
     citations: [],
     followUpSuggestions: []
   },
   { 
     id: 2, 
-    role: 'bot', 
+    role: 'bot' as const, 
     text: "I am ready. Ask me anything about nuclear physics, safety protocols, or historical events. I'll provide accurate information with reliable sources.",
     citations: ['UNSCEAR', 'IAEA'],
     followUpSuggestions: INITIAL_SUGGESTIONS.slice(0, 4)
@@ -93,6 +95,7 @@ export default function AiChatScreen() {
   const insets = useSafeAreaInsets();
   const colorScheme = useColorScheme();
   const CHAT_THEME = colorScheme === 'dark' ? DarkCHAT_THEME : LightCHAT_THEME;
+  const styles = React.useMemo(() => createStyles(CHAT_THEME), [CHAT_THEME]);
   const scrollViewRef = useRef<ScrollView>(null);
   const [messages, setMessages] = useState<Message[]>(INITIAL_MESSAGES);
   const [inputText, setInputText] = useState('');
@@ -413,10 +416,10 @@ export default function AiChatScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (theme: typeof LightCHAT_THEME) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFF',
+    backgroundColor: theme.bg,
   },
   header: {
     flexDirection: 'row',
@@ -424,9 +427,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingBottom: 16,
     zIndex: 10,
-    backgroundColor: '#FFF',
+    backgroundColor: theme.bg,
     borderBottomWidth: 1,
-    borderBottomColor: '#F0F0F0',
+    borderBottomColor: theme.border,
   },
   backButton: {
     padding: 8,
@@ -445,11 +448,11 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#FFF',
+    backgroundColor: theme.card,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: CHAT_THEME.border,
+    borderColor: theme.border,
   },
   onlineDot: {
     position: 'absolute',
@@ -458,18 +461,18 @@ const styles = StyleSheet.create({
     width: 12,
     height: 12,
     borderRadius: 6,
-    backgroundColor: CHAT_THEME.green,
+    backgroundColor: theme.green,
     borderWidth: 2,
-    borderColor: '#FFF',
+    borderColor: theme.bg,
   },
   headerTitle: {
     fontSize: 18,
     fontWeight: '800',
-    color: CHAT_THEME.text,
+    color: theme.text,
   },
   headerSubtitle: {
     fontSize: 11,
-    color: CHAT_THEME.textMuted,
+    color: theme.textMuted,
     fontWeight: '600',
   },
   clearButton: {
@@ -510,13 +513,13 @@ const styles = StyleSheet.create({
     borderWidth: 2,
   },
   botBubble: {
-    backgroundColor: CHAT_THEME.botBubble,
-    borderColor: CHAT_THEME.border,
+    backgroundColor: theme.botBubble,
+    borderColor: theme.border,
     borderBottomLeftRadius: 4,
   },
   userBubble: {
-    backgroundColor: CHAT_THEME.userBubble,
-    borderColor: CHAT_THEME.userBubble,
+    backgroundColor: theme.userBubble,
+    borderColor: theme.userBubble,
     borderBottomRightRadius: 4,
   },
   messageText: {
@@ -524,7 +527,7 @@ const styles = StyleSheet.create({
     lineHeight: 22,
   },
   botMessageText: {
-    color: CHAT_THEME.text,
+    color: theme.text,
   },
   userMessageText: {
     color: '#FFF',
@@ -537,39 +540,39 @@ const styles = StyleSheet.create({
     marginTop: 12,
     paddingTop: 12,
     borderTopWidth: 1,
-    borderTopColor: CHAT_THEME.border,
+    borderTopColor: theme.border,
   },
   citationBadge: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    backgroundColor: CHAT_THEME.primary + '15',
+    backgroundColor: theme.primary + '15',
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: CHAT_THEME.primary + '30',
+    borderColor: theme.primary + '30',
   },
   citationsTitle: {
     fontSize: 11,
-    color: CHAT_THEME.textMuted,
+    color: theme.textMuted,
     fontWeight: '700',
     marginBottom: 6,
   },
   citationText: {
     fontSize: 10,
-    color: CHAT_THEME.primary,
+    color: theme.primary,
     fontWeight: '700',
   },
   followUpContainer: {
     marginTop: 12,
     paddingTop: 12,
     borderTopWidth: 1,
-    borderTopColor: CHAT_THEME.border,
+    borderTopColor: theme.border,
   },
   followUpTitle: {
     fontSize: 11,
-    color: CHAT_THEME.textMuted,
+    color: theme.textMuted,
     fontWeight: '700',
     marginBottom: 8,
   },
@@ -582,16 +585,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    backgroundColor: CHAT_THEME.primary + '10',
+    backgroundColor: theme.primary + '10',
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: CHAT_THEME.primary + '30',
+    borderColor: theme.primary + '30',
   },
   followUpText: {
     fontSize: 11,
-    color: CHAT_THEME.primary,
+    color: theme.primary,
     fontWeight: '600',
   },
   errorContainer: {
@@ -620,11 +623,11 @@ const styles = StyleSheet.create({
   thinkingBubble: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFF',
+    backgroundColor: theme.card,
     padding: 12,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: CHAT_THEME.border,
+    borderColor: theme.border,
     gap: 8,
   },
   thinkingSpinner: {
@@ -635,13 +638,13 @@ const styles = StyleSheet.create({
   },
   thinkingText: {
     fontSize: 13,
-    color: CHAT_THEME.textMuted,
+    color: theme.textMuted,
     fontStyle: 'italic',
   },
   inputWrapper: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: theme.bg,
     borderTopWidth: 1,
-    borderTopColor: CHAT_THEME.border,
+    borderTopColor: theme.border,
   },
   suggestionsContainer: {
     paddingVertical: 12,
@@ -654,16 +657,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: CHAT_THEME.card,
+    backgroundColor: theme.card,
     paddingHorizontal: 14,
     paddingVertical: 10,
     borderRadius: 20,
     borderWidth: 2,
-    borderColor: CHAT_THEME.border,
+    borderColor: theme.border,
   },
   suggestionText: {
     fontSize: 13,
-    color: CHAT_THEME.text,
+    color: theme.text,
     fontWeight: '700',
   },
   inputContainer: {
@@ -673,19 +676,19 @@ const styles = StyleSheet.create({
   inputFieldWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F9FAFB',
+    backgroundColor: theme.card,
     borderRadius: 28,
     paddingHorizontal: 6,
     paddingVertical: 6,
     borderWidth: 1,
-    borderColor: CHAT_THEME.border,
+    borderColor: theme.border,
   },
   inputField: {
     flex: 1,
     paddingHorizontal: 16,
     paddingVertical: 8,
     fontSize: 16,
-    color: CHAT_THEME.text,
+    color: theme.text,
     maxHeight: 100,
   },
   sendButton: {
@@ -703,7 +706,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   sendButtonDisabled: {
-    backgroundColor: CHAT_THEME.border,
+    backgroundColor: theme.border,
   },
 });
 

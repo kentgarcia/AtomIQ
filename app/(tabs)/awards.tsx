@@ -40,22 +40,47 @@ const GRADIENTS = {
 
 // Achievement thresholds with mapped gradients
 const ACHIEVEMENTS = [
+  // Lesson Completion Milestones
   { id: 1, title: 'First Steps', requirement: 'Complete 1 lesson', threshold: 1, field: 'lessons_completed', icon: 'Award', gradient: GRADIENTS.Yellow },
-  { id: 2, title: 'Myth Buster', requirement: 'Bust 10 myths', threshold: 10, field: 'myths_busted', icon: 'TickCircle', gradient: GRADIENTS.Green },
-  { id: 3, title: 'On Fire', requirement: '7 day streak', threshold: 7, field: 'current_streak', icon: 'Flash', gradient: GRADIENTS.Orange },
-  { id: 4, title: 'XP Master', requirement: 'Earn 1000 XP', threshold: 1000, field: 'total_xp', icon: 'Star', gradient: GRADIENTS.Blue },
-  { id: 5, title: 'Dedicated', requirement: '30 day streak', threshold: 30, field: 'longest_streak', icon: 'Crown', gradient: GRADIENTS.Yellow },
-  { id: 6, title: 'Scholar', requirement: 'Complete 10 lessons', threshold: 10, field: 'lessons_completed', icon: 'Book', gradient: GRADIENTS.Purple },
-  { id: 7, title: 'Nuclear Expert', requirement: 'Earn 5000 XP', threshold: 5000, field: 'total_xp', icon: 'Medal', gradient: GRADIENTS.BlueSolid },
-  { id: 8, title: 'Truth Seeker', requirement: 'Bust 25 myths', threshold: 25, field: 'myths_busted', icon: 'SearchNormal1', gradient: GRADIENTS.Green },
+  { id: 2, title: 'Knowledge Seeker', requirement: 'Complete 5 lessons', threshold: 5, field: 'lessons_completed', icon: 'Book', gradient: GRADIENTS.Orange },
+  { id: 3, title: 'Scholar', requirement: 'Complete 10 lessons', threshold: 10, field: 'lessons_completed', icon: 'Book', gradient: GRADIENTS.Purple },
+  { id: 4, title: 'Diligent Student', requirement: 'Complete 20 lessons', threshold: 20, field: 'lessons_completed', icon: 'Book1', gradient: GRADIENTS.Blue },
+  { id: 5, title: 'Nuclear Graduate', requirement: 'Complete all 31 lessons', threshold: 31, field: 'lessons_completed', icon: 'Award', gradient: GRADIENTS.BlueSolid },
+  
+  // Myth Busting
+  { id: 6, title: 'Fact Checker', requirement: 'Bust 3 myths', threshold: 3, field: 'myths_busted', icon: 'SearchNormal1', gradient: GRADIENTS.Green },
+  { id: 7, title: 'Myth Buster', requirement: 'Bust 8 myths', threshold: 8, field: 'myths_busted', icon: 'TickCircle', gradient: GRADIENTS.Green },
+  { id: 8, title: 'Truth Seeker', requirement: 'Bust all myths', threshold: 8, field: 'myths_busted', icon: 'ShieldTick', gradient: GRADIENTS.Green },
+  
+  // XP Milestones
+  { id: 9, title: 'Rising Star', requirement: 'Earn 500 XP', threshold: 500, field: 'total_xp', icon: 'Star', gradient: GRADIENTS.Yellow },
+  { id: 10, title: 'XP Master', requirement: 'Earn 1000 XP', threshold: 1000, field: 'total_xp', icon: 'Star1', gradient: GRADIENTS.Blue },
+  { id: 11, title: 'Experience Legend', requirement: 'Earn 2000 XP', threshold: 2000, field: 'total_xp', icon: 'Crown', gradient: GRADIENTS.Purple },
+  { id: 12, title: 'Nuclear Expert', requirement: 'Earn all XP (2000+)', threshold: 2000, field: 'total_xp', icon: 'Medal', gradient: GRADIENTS.BlueSolid },
+  
+  // Streak Achievements
+  { id: 13, title: 'Getting Started', requirement: '3 day streak', threshold: 3, field: 'current_streak', icon: 'Flash', gradient: GRADIENTS.Orange },
+  { id: 14, title: 'On Fire', requirement: '7 day streak', threshold: 7, field: 'current_streak', icon: 'Flash', gradient: GRADIENTS.Orange },
+  { id: 15, title: 'Committed', requirement: '14 day streak', threshold: 14, field: 'current_streak', icon: 'Flash1', gradient: GRADIENTS.Orange },
+  { id: 16, title: 'Dedicated', requirement: '30 day streak', threshold: 30, field: 'longest_streak', icon: 'Crown', gradient: GRADIENTS.Yellow },
+  { id: 17, title: 'Unstoppable', requirement: '60 day streak', threshold: 60, field: 'longest_streak', icon: 'Crown1', gradient: GRADIENTS.BlueSolid },
+  
+  // Special Achievements
+  { id: 18, title: 'Early Bird', requirement: 'Complete lesson before 9 AM', threshold: 1, field: 'early_lessons', icon: 'Sun1', gradient: GRADIENTS.Yellow },
+  { id: 19, title: 'Night Owl', requirement: 'Complete lesson after 9 PM', threshold: 1, field: 'late_lessons', icon: 'Moon', gradient: GRADIENTS.Purple },
+  { id: 20, title: 'Perfect Score', requirement: 'Get 100% on any quiz', threshold: 1, field: 'perfect_scores', icon: 'Star', gradient: GRADIENTS.Blue },
+  { id: 21, title: 'Speed Learner', requirement: 'Complete 5 lessons in one day', threshold: 5, field: 'max_lessons_per_day', icon: 'Flash', gradient: GRADIENTS.Orange },
+  { id: 22, title: 'Explorer', requirement: 'Visit all encyclopedia entries', threshold: 50, field: 'encyclopedia_views', icon: 'SearchNormal', gradient: GRADIENTS.Purple },
 ];
 
 // Certificates with mapped gradients
 const CERTIFICATES = [
-  { id: 1, title: 'Nuclear Basics', description: 'Fundamentals of Nuclear Science', gradient: GRADIENTS.Orange, unlockField: 'lessons_completed', threshold: 5 },
-  { id: 2, title: 'Radiation Safety', description: 'Understanding Radiation & Protection', gradient: GRADIENTS.Green, unlockField: 'lessons_completed', threshold: 10 },
-  { id: 3, title: 'Myth Buster Pro', description: 'Debunking Nuclear Misconceptions', gradient: GRADIENTS.Blue, unlockField: 'myths_busted', threshold: 15 },
-  { id: 4, title: 'Nuclear Energy Expert', description: 'Advanced Nuclear Concepts', gradient: GRADIENTS.Purple, unlockField: 'lessons_completed', threshold: 20 },
+  { id: 1, title: 'Nuclear Foundations', description: 'Introduction to Nuclear Science', gradient: GRADIENTS.Orange, unlockField: 'lessons_completed', threshold: 5, unitCovered: 'Unit 1' },
+  { id: 2, title: 'Radiation Expert', description: 'Radiation Effects & Safety Mastery', gradient: GRADIENTS.Green, unlockField: 'lessons_completed', threshold: 11, unitCovered: 'Units 1-3' },
+  { id: 3, title: 'Nuclear Applications Specialist', description: 'Real-World Nuclear Technology', gradient: GRADIENTS.Purple, unlockField: 'lessons_completed', threshold: 14, unitCovered: 'Units 1-4' },
+  { id: 4, title: 'Nuclear Science Scholar', description: 'Comprehensive Nuclear Knowledge', gradient: GRADIENTS.Blue, unlockField: 'lessons_completed', threshold: 20, unitCovered: 'Units 1-6' },
+  { id: 5, title: 'Myth Buster Champion', description: 'Nuclear Misconceptions Debunked', gradient: GRADIENTS.Yellow, unlockField: 'myths_busted', threshold: 8, unitCovered: 'All Units' },
+  { id: 6, title: 'Nuclear Energy Master', description: 'Complete Nuclear Science Curriculum', gradient: GRADIENTS.BlueSolid, unlockField: 'lessons_completed', threshold: 31, unitCovered: 'All 9 Units' },
 ];
 
 export default function AwardsScreen() {
