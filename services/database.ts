@@ -1,7 +1,7 @@
-import { UNITS } from '@/content/units';
-import * as SQLite from 'expo-sqlite';
-import { initExplorerStorage } from './explorer-storage';
-import { LOCAL_FIRST_SCHEMA } from './local-first/schema';
+import { UNITS } from "@/content/units";
+import * as SQLite from "expo-sqlite";
+import { initExplorerStorage } from "./explorer-storage";
+import { LOCAL_FIRST_SCHEMA } from "./local-first/schema";
 
 // Database instance
 let db: SQLite.SQLiteDatabase | null = null;
@@ -9,8 +9,8 @@ let db: SQLite.SQLiteDatabase | null = null;
 // Initialize database
 export const initDatabase = async () => {
   try {
-    db = await SQLite.openDatabaseAsync('atomiq.db');
-    
+    db = await SQLite.openDatabaseAsync("atomiq.db");
+
     // Create tables
     await db.execAsync(`
       PRAGMA journal_mode = WAL;
@@ -94,46 +94,62 @@ export const initDatabase = async () => {
         username TEXT,
         avatar_url TEXT,
         xp INTEGER,
+        is_npc INTEGER DEFAULT 0,
         rank INTEGER,
         cached_at DATETIME DEFAULT CURRENT_TIMESTAMP
       );
     `);
-    
+
     // Migrate existing databases - add user_id column if it doesn't exist
     try {
       await db.execAsync(`
         ALTER TABLE user_profile ADD COLUMN user_id TEXT;
       `);
-      console.log('Migration: Added user_id column to user_profile');
+      console.log("Migration: Added user_id column to user_profile");
     } catch (error) {
       // Column already exists or table doesn't exist yet, ignore
     }
-    
+
+    // Add is_npc to leaderboard cache for offline leaderboard fidelity.
+    try {
+      await db.execAsync(`
+        ALTER TABLE leaderboard ADD COLUMN is_npc INTEGER DEFAULT 0;
+      `);
+      console.log("Migration: Added is_npc column to leaderboard");
+    } catch (error) {
+      // Column already exists, ignore.
+    }
+
     // Generate user_id for existing users without one
-    const existingUser = await db.getFirstAsync('SELECT * FROM user_profile WHERE user_id IS NULL LIMIT 1');
+    const existingUser = await db.getFirstAsync(
+      "SELECT * FROM user_profile WHERE user_id IS NULL LIMIT 1",
+    );
     if (existingUser) {
       const userId = `user_${Date.now()}_${Math.random().toString(36).substring(2, 15)}`;
-      await db.runAsync('UPDATE user_profile SET user_id = ? WHERE user_id IS NULL', [userId]);
-      console.log('Migration: Generated user_id for existing user');
+      await db.runAsync(
+        "UPDATE user_profile SET user_id = ? WHERE user_id IS NULL",
+        [userId],
+      );
+      console.log("Migration: Generated user_id for existing user");
     }
-    
+
     // Initialize local-first database schema (for social features and sync)
     await db.execAsync(LOCAL_FIRST_SCHEMA);
-    
+
     // Initialize levels from syllabus if database is empty
     await initializeLevelsFromSyllabus();
-    
+
     // Initialize chat history tables
-    const { initChatHistoryDB } = await import('./chat-history');
+    const { initChatHistoryDB } = await import("./chat-history");
     await initChatHistoryDB();
-    
+
     // Initialize explorer storage
     await initExplorerStorage();
-    
-    console.log('Database initialized successfully');
+
+    console.log("Database initialized successfully");
     return db;
   } catch (error) {
-    console.error('Error initializing database:', error);
+    console.error("Error initializing database:", error);
     throw error;
   }
 };
@@ -145,13 +161,15 @@ const initializeLevelsFromSyllabus = async () => {
     if (!database) return;
 
     // Check if levels already exist
-    const existingLevels = await database.getFirstAsync('SELECT COUNT(*) as count FROM levels');
+    const existingLevels = await database.getFirstAsync(
+      "SELECT COUNT(*) as count FROM levels",
+    );
     if (existingLevels && (existingLevels as any).count > 0) {
-      console.log('Levels already initialized, skipping...');
+      console.log("Levels already initialized, skipping...");
       return;
     }
 
-    console.log('Initializing levels from syllabus...');
+    console.log("Initializing levels from syllabus...");
 
     // First, insert all units into the units table
     for (const unit of UNITS) {
@@ -159,13 +177,13 @@ const initializeLevelsFromSyllabus = async () => {
         `INSERT OR IGNORE INTO units (id, title, description, color, order_index, is_locked) 
          VALUES (?, ?, ?, ?, ?, ?)`,
         [
-          unit.id, 
-          unit.title, 
-          unit.description, 
-          unit.color, 
+          unit.id,
+          unit.title,
+          unit.description,
+          unit.color,
           unit.order,
-          unit.order === 1 ? 0 : 1 // First unit is unlocked
-        ]
+          unit.order === 1 ? 0 : 1, // First unit is unlocked
+        ],
       );
     }
 
@@ -175,11 +193,19 @@ const initializeLevelsFromSyllabus = async () => {
       for (let i = 0; i < unit.lessonIds.length; i++) {
         const lessonId = unit.lessonIds[i];
         const isFirstLesson = i === 0 && unit.order === 1; // First lesson of first unit
-        
+
         await database.runAsync(
           `INSERT OR IGNORE INTO levels (id, unit_id, type, status, xp_earned, stars, attempts) 
            VALUES (?, ?, ?, ?, ?, ?, ?)`,
-          [lessonId, unit.id, 'lesson', isFirstLesson ? 'current' : 'locked', 0, 0, 0]
+          [
+            lessonId,
+            unit.id,
+            "lesson",
+            isFirstLesson ? "current" : "locked",
+            0,
+            0,
+            0,
+          ],
         );
       }
 
@@ -188,30 +214,122 @@ const initializeLevelsFromSyllabus = async () => {
         await database.runAsync(
           `INSERT OR IGNORE INTO levels (id, unit_id, type, status, xp_earned, stars, attempts) 
            VALUES (?, ?, ?, ?, ?, ?, ?)`,
-          [quizId, unit.id, 'quiz', 'locked', 0, 0, 0]
+          [quizId, unit.id, "quiz", "locked", 0, 0, 0],
         );
       }
     }
 
-    console.log('Levels initialized from syllabus');
+    console.log("Levels initialized from syllabus");
   } catch (error) {
-    console.error('Error initializing levels:', error);
+    console.error("Error initializing levels:", error);
   }
 };
 
 // Get database instance
 export const getDatabase = () => {
   if (!db) {
-    throw new Error('Database not initialized. Call initDatabase() first.');
+    throw new Error("Database not initialized. Call initDatabase() first.");
   }
   return db;
 };
 
+const getDatabaseReady = async (): Promise<SQLite.SQLiteDatabase> => {
+  if (!db) {
+    await initDatabase();
+  }
+
+  return getDatabase();
+};
+
+const normalizeLocalFirstUsername = (value: string): string => {
+  const normalized = value.trim().replace(/\s+/g, " ");
+
+  return normalized || "Scientist";
+};
+
+const resolveUniqueLocalFirstUsername = async (
+  database: SQLite.SQLiteDatabase,
+  userId: string,
+  preferredUsername: string,
+): Promise<string> => {
+  const existingById = await database.getFirstAsync<{
+    username: string | null;
+  }>("SELECT username FROM user_profiles WHERE id = ? LIMIT 1", [userId]);
+
+  if (existingById?.username) {
+    return existingById.username;
+  }
+
+  const base = normalizeLocalFirstUsername(preferredUsername);
+  const idSuffix = userId.replace(/[^a-z0-9]/gi, "").toLowerCase() || "user";
+
+  let candidate = base;
+  for (let attempt = 0; attempt < 8; attempt += 1) {
+    const conflict = await database.getFirstAsync<{ id: string }>(
+      "SELECT id FROM user_profiles WHERE username = ? AND id <> ? LIMIT 1",
+      [candidate, userId],
+    );
+
+    if (!conflict) {
+      return candidate;
+    }
+
+    const suffixLength = Math.min(6 + attempt, idSuffix.length);
+    const suffix = idSuffix.slice(0, suffixLength);
+    candidate = `${base}_${suffix}`;
+  }
+
+  return `${base}_${Date.now().toString(36).slice(-6)}`;
+};
+
 // User Profile Operations
+export const getLegacyUserProfile = async () => {
+  const database = getDatabase();
+  const result = await database.getFirstAsync(
+    "SELECT * FROM user_profile LIMIT 1",
+  );
+  return result;
+};
+
 export const getUserProfile = async () => {
   const database = getDatabase();
-  const result = await database.getFirstAsync('SELECT * FROM user_profile LIMIT 1');
-  return result;
+
+  const localFirstProfile = await database.getFirstAsync<{
+    id: string;
+    username: string;
+    avatar_url: string | null;
+    total_xp: number | null;
+    current_streak: number | null;
+    longest_streak: number | null;
+    myths_busted: number | null;
+    lessons_completed: number | null;
+    created_at: number | null;
+    updated_at: number | null;
+  }>(
+    `SELECT id, username, avatar_url, total_xp, current_streak, longest_streak, myths_busted, lessons_completed, created_at, updated_at
+     FROM user_profiles
+     WHERE deleted_at IS NULL
+     ORDER BY updated_at DESC
+     LIMIT 1`,
+  );
+
+  if (localFirstProfile) {
+    return {
+      id: localFirstProfile.id,
+      user_id: localFirstProfile.id,
+      username: localFirstProfile.username,
+      avatar_url: localFirstProfile.avatar_url || "",
+      total_xp: Number(localFirstProfile.total_xp || 0),
+      current_streak: Number(localFirstProfile.current_streak || 0),
+      longest_streak: Number(localFirstProfile.longest_streak || 0),
+      myths_busted: Number(localFirstProfile.myths_busted || 0),
+      lessons_completed: Number(localFirstProfile.lessons_completed || 0),
+      created_at: localFirstProfile.created_at,
+      updated_at: localFirstProfile.updated_at,
+    };
+  }
+
+  return getLegacyUserProfile();
 };
 
 export const createOrUpdateUserProfile = async (profile: {
@@ -225,8 +343,8 @@ export const createOrUpdateUserProfile = async (profile: {
   lessons_completed?: number;
 }) => {
   const database = getDatabase();
-  const existing = await getUserProfile();
-  
+  const existing = await getLegacyUserProfile();
+
   if (existing) {
     // Update
     await database.runAsync(
@@ -250,44 +368,220 @@ export const createOrUpdateUserProfile = async (profile: {
         profile.longest_streak,
         profile.myths_busted,
         profile.lessons_completed,
-        (existing as any).id
-      ]
+        (existing as any).id,
+      ],
     );
   } else {
     // Create - generate user_id if not provided
-    const userId = profile.user_id || `user_${Date.now()}_${Math.random().toString(36).substring(2, 15)}`;
+    const currentProfile = (await getUserProfile()) as any;
+    const userId =
+      profile.user_id ||
+      currentProfile?.user_id ||
+      `user_${Date.now()}_${Math.random().toString(36).substring(2, 15)}`;
     await database.runAsync(
       `INSERT INTO user_profile (user_id, username, avatar_url, total_xp, current_streak, longest_streak, myths_busted, lessons_completed)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         userId,
-        profile.username || 'Scientist',
-        profile.avatar_url || '',
+        profile.username || "Scientist",
+        profile.avatar_url || "",
         profile.total_xp || 0,
         profile.current_streak || 0,
         profile.longest_streak || 0,
         profile.myths_busted || 0,
-        profile.lessons_completed || 0
-      ]
+        profile.lessons_completed || 0,
+      ],
     );
   }
+
+  // Mirror legacy profile table into local-first profile table.
+  const latestProfile = (await getLegacyUserProfile()) as any;
+  if (latestProfile?.user_id) {
+    const timestamp = Date.now();
+    const createdAt = Date.parse(latestProfile.created_at || "");
+    const level = Math.floor(Number(latestProfile.total_xp || 0) / 100) + 1;
+    const displayName =
+      (latestProfile.username || "Scientist").toString().trim() || "Scientist";
+    const resolvedUsername = await resolveUniqueLocalFirstUsername(
+      database,
+      latestProfile.user_id,
+      displayName,
+    );
+
+    await database.runAsync(
+      `INSERT INTO user_profiles (
+        id,
+        username,
+        display_name,
+        email,
+        avatar_url,
+        bio,
+        total_xp,
+        current_streak,
+        longest_streak,
+        myths_busted,
+        lessons_completed,
+        level,
+        is_premium,
+        notification_preferences,
+        created_at,
+        updated_at,
+        synced_at,
+        is_dirty,
+        deleted_at,
+        version
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ON CONFLICT(id) DO UPDATE SET
+        username = excluded.username,
+        display_name = excluded.display_name,
+        avatar_url = excluded.avatar_url,
+        total_xp = excluded.total_xp,
+        current_streak = excluded.current_streak,
+        longest_streak = excluded.longest_streak,
+        myths_busted = excluded.myths_busted,
+        lessons_completed = excluded.lessons_completed,
+        level = excluded.level,
+        updated_at = excluded.updated_at,
+        is_dirty = 1,
+        version = user_profiles.version + 1`,
+      [
+        latestProfile.user_id,
+        resolvedUsername,
+        displayName,
+        null,
+        latestProfile.avatar_url || null,
+        null,
+        Number(latestProfile.total_xp || 0),
+        Number(latestProfile.current_streak || 0),
+        Number(latestProfile.longest_streak || 0),
+        Number(latestProfile.myths_busted || 0),
+        Number(latestProfile.lessons_completed || 0),
+        level,
+        0,
+        null,
+        Number.isNaN(createdAt) ? timestamp : createdAt,
+        timestamp,
+        null,
+        1,
+        null,
+        1,
+      ],
+    );
+  }
+};
+
+export type LocalLeaderboardUser = {
+  user_id: string;
+  username: string;
+  avatar_url: string | null;
+  total_xp: number;
+  is_npc: boolean;
+};
+
+/**
+ * Save remote leaderboard rows into the local snapshot table.
+ */
+export const saveLeaderboardSnapshot = async (
+  rows: LocalLeaderboardUser[],
+): Promise<void> => {
+  const database = await getDatabaseReady();
+  const cachedAt = new Date().toISOString();
+
+  await database.runAsync("DELETE FROM leaderboard");
+
+  if (rows.length === 0) {
+    return;
+  }
+
+  for (const [index, row] of rows.entries()) {
+    await database.runAsync(
+      `INSERT INTO leaderboard (user_id, username, avatar_url, xp, is_npc, rank, cached_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      [
+        row.user_id,
+        row.username,
+        row.avatar_url,
+        row.total_xp,
+        row.is_npc ? 1 : 0,
+        index + 1,
+        cachedAt,
+      ],
+    );
+  }
+};
+
+/**
+ * Read leaderboard snapshot from local database.
+ */
+export const getLeaderboardSnapshot = async (
+  limit: number = 100,
+): Promise<LocalLeaderboardUser[]> => {
+  const database = await getDatabaseReady();
+
+  const rows = await database.getAllAsync<{
+    user_id: string | null;
+    username: string | null;
+    avatar_url: string | null;
+    xp: number | null;
+    is_npc: number | null;
+  }>(
+    `SELECT user_id, username, avatar_url, xp, is_npc
+     FROM leaderboard
+     ORDER BY rank ASC, xp DESC
+     LIMIT ?`,
+    [limit],
+  );
+
+  return rows
+    .filter((row) => row.user_id && row.username)
+    .map((row) => ({
+      user_id: row.user_id as string,
+      username: row.username as string,
+      avatar_url: row.avatar_url,
+      total_xp: Number(row.xp || 0),
+      is_npc: Boolean(row.is_npc),
+    }));
+};
+
+/**
+ * Latest local cache timestamp for freshness display.
+ */
+export const getLeaderboardSnapshotUpdatedAt = async (): Promise<
+  number | null
+> => {
+  const database = await getDatabaseReady();
+  const row = await database.getFirstAsync<{ cached_at: string | null }>(
+    "SELECT cached_at FROM leaderboard ORDER BY cached_at DESC LIMIT 1",
+  );
+
+  if (!row?.cached_at) {
+    return null;
+  }
+
+  const timestamp = Date.parse(row.cached_at);
+  return Number.isNaN(timestamp) ? null : timestamp;
 };
 
 // Level Operations
 export const getLevelProgress = async (levelId: string) => {
   const database = getDatabase();
-  return await database.getFirstAsync('SELECT * FROM levels WHERE id = ?', [levelId]);
+  return await database.getFirstAsync("SELECT * FROM levels WHERE id = ?", [
+    levelId,
+  ]);
 };
 
-export const updateLevelProgress = async (levelId: string, data: {
-  status?: string;
-  xp_earned?: number;
-  stars?: number;
-  completed_at?: string;
-}) => {
+export const updateLevelProgress = async (
+  levelId: string,
+  data: {
+    status?: string;
+    xp_earned?: number;
+    stars?: number;
+    completed_at?: string;
+  },
+) => {
   const database = getDatabase();
   const existing = await getLevelProgress(levelId);
-  
+
   if (existing) {
     await database.runAsync(
       `UPDATE levels SET 
@@ -297,13 +591,13 @@ export const updateLevelProgress = async (levelId: string, data: {
         completed_at = COALESCE(?, completed_at),
         attempts = attempts + 1
       WHERE id = ?`,
-      [data.status, data.xp_earned, data.stars, data.completed_at, levelId]
+      [data.status, data.xp_earned, data.stars, data.completed_at, levelId],
     );
   } else {
     // Find which unit this level belongs to
-    let unitId = 'atomic-playground'; // Default to first unit
+    let unitId = "atomic-playground"; // Default to first unit
     let unitData = UNITS[0];
-    
+
     for (const unit of UNITS) {
       if (unit.lessonIds.includes(levelId) || unit.quizIds.includes(levelId)) {
         unitId = unit.id;
@@ -311,7 +605,7 @@ export const updateLevelProgress = async (levelId: string, data: {
         break;
       }
     }
-    
+
     // Ensure the unit exists in the units table first
     await database.runAsync(
       `INSERT OR IGNORE INTO units (id, title, description, color, order_index, is_locked) 
@@ -322,42 +616,42 @@ export const updateLevelProgress = async (levelId: string, data: {
         unitData.description,
         unitData.color,
         unitData.order,
-        unitData.order === 1 ? 0 : 1
-      ]
+        unitData.order === 1 ? 0 : 1,
+      ],
     );
-    
+
     // Now insert the level
     await database.runAsync(
       `INSERT INTO levels (id, unit_id, type, status, xp_earned, stars, completed_at, attempts)
        VALUES (?, ?, ?, ?, ?, ?, ?, 1)`,
       [
-        levelId, 
-        unitId, 
-        levelId.includes('quiz') ? 'quiz' : 'lesson',
-        data.status || 'locked', 
-        data.xp_earned || 0, 
-        data.stars || 0, 
-        data.completed_at || null
-      ]
+        levelId,
+        unitId,
+        levelId.includes("quiz") ? "quiz" : "lesson",
+        data.status || "locked",
+        data.xp_earned || 0,
+        data.stars || 0,
+        data.completed_at || null,
+      ],
     );
   }
 };
 
 export const getAllLevels = async () => {
   const database = getDatabase();
-  return await database.getAllAsync('SELECT * FROM levels ORDER BY id');
+  return await database.getAllAsync("SELECT * FROM levels ORDER BY id");
 };
 
 // Unlock next lesson/quiz/unit after completing a level
 export const unlockNextLevel = async (completedLevelId: string) => {
   const database = getDatabase();
-  
+
   try {
     // Find which unit this level belongs to
     let currentUnit = null;
     let levelIndexInUnit = -1;
     let isQuiz = false;
-    
+
     for (const unit of UNITS) {
       const lessonIndex = unit.lessonIds.indexOf(completedLevelId);
       if (lessonIndex !== -1) {
@@ -373,48 +667,55 @@ export const unlockNextLevel = async (completedLevelId: string) => {
         break;
       }
     }
-    
+
     if (!currentUnit) {
-      console.log('Could not find unit for level:', completedLevelId);
+      console.log("Could not find unit for level:", completedLevelId);
       return;
     }
-    
+
     // If this was a quiz (last item in unit), unlock the first lesson of the next unit
     if (isQuiz) {
-      const nextUnitIndex = UNITS.findIndex(u => u.id === currentUnit.id) + 1;
+      const nextUnitIndex = UNITS.findIndex((u) => u.id === currentUnit.id) + 1;
       if (nextUnitIndex < UNITS.length) {
         const nextUnit = UNITS[nextUnitIndex];
         if (nextUnit.lessonIds.length > 0) {
           const nextLevelId = nextUnit.lessonIds[0];
-          console.log('Unlocking first lesson of next unit:', nextLevelId);
-          
+          console.log("Unlocking first lesson of next unit:", nextLevelId);
+
           // Check if level exists, if not insert it
           const existingLevel = await getLevelProgress(nextLevelId);
           if (existingLevel) {
             await database.runAsync(
-              'UPDATE levels SET status = ? WHERE id = ? AND status = ?',
-              ['current', nextLevelId, 'locked']
+              "UPDATE levels SET status = ? WHERE id = ? AND status = ?",
+              ["current", nextLevelId, "locked"],
             );
           } else {
             // Ensure unit exists
             await database.runAsync(
               `INSERT OR IGNORE INTO units (id, title, description, color, order_index, is_locked) 
                VALUES (?, ?, ?, ?, ?, ?)`,
-              [nextUnit.id, nextUnit.title, nextUnit.description, nextUnit.color, nextUnit.order, 0]
+              [
+                nextUnit.id,
+                nextUnit.title,
+                nextUnit.description,
+                nextUnit.color,
+                nextUnit.order,
+                0,
+              ],
             );
-            
+
             // Insert the level as current
             await database.runAsync(
               `INSERT INTO levels (id, unit_id, type, status, xp_earned, stars, attempts)
                VALUES (?, ?, ?, ?, ?, ?, 0)`,
-              [nextLevelId, nextUnit.id, 'lesson', 'current', 0, 0]
+              [nextLevelId, nextUnit.id, "lesson", "current", 0, 0],
             );
           }
-          
+
           // Unlock the next unit
           await database.runAsync(
-            'UPDATE units SET is_locked = 0 WHERE id = ?',
-            [nextUnit.id]
+            "UPDATE units SET is_locked = 0 WHERE id = ?",
+            [nextUnit.id],
           );
         }
       }
@@ -424,53 +725,56 @@ export const unlockNextLevel = async (completedLevelId: string) => {
       if (nextIndex < currentUnit.lessonIds.length) {
         // Unlock next lesson
         const nextLevelId = currentUnit.lessonIds[nextIndex];
-        console.log('Unlocking next lesson:', nextLevelId);
-        
+        console.log("Unlocking next lesson:", nextLevelId);
+
         const existingLevel = await getLevelProgress(nextLevelId);
         if (existingLevel) {
           await database.runAsync(
-            'UPDATE levels SET status = ? WHERE id = ? AND status = ?',
-            ['current', nextLevelId, 'locked']
+            "UPDATE levels SET status = ? WHERE id = ? AND status = ?",
+            ["current", nextLevelId, "locked"],
           );
         } else {
           await database.runAsync(
             `INSERT INTO levels (id, unit_id, type, status, xp_earned, stars, attempts)
              VALUES (?, ?, ?, ?, ?, ?, 0)`,
-            [nextLevelId, currentUnit.id, 'lesson', 'current', 0, 0]
+            [nextLevelId, currentUnit.id, "lesson", "current", 0, 0],
           );
         }
       } else if (currentUnit.quizIds.length > 0) {
         // All lessons done, unlock the quiz
         const quizId = currentUnit.quizIds[0];
-        console.log('All lessons completed, unlocking quiz:', quizId);
-        
+        console.log("All lessons completed, unlocking quiz:", quizId);
+
         const existingQuiz = await getLevelProgress(quizId);
         if (existingQuiz) {
           await database.runAsync(
-            'UPDATE levels SET status = ? WHERE id = ? AND status = ?',
-            ['current', quizId, 'locked']
+            "UPDATE levels SET status = ? WHERE id = ? AND status = ?",
+            ["current", quizId, "locked"],
           );
         } else {
           await database.runAsync(
             `INSERT INTO levels (id, unit_id, type, status, xp_earned, stars, attempts)
              VALUES (?, ?, ?, ?, ?, ?, 0)`,
-            [quizId, currentUnit.id, 'quiz', 'current', 0, 0]
+            [quizId, currentUnit.id, "quiz", "current", 0, 0],
           );
         }
       }
     }
   } catch (error) {
-    console.error('Error unlocking next level:', error);
+    console.error("Error unlocking next level:", error);
   }
 };
 
 // Daily Activity
-export const logDailyActivity = async (date: string, data: {
-  xp_earned?: number;
-  lessons_completed?: number;
-  myths_busted?: number;
-  time_spent_minutes?: number;
-}) => {
+export const logDailyActivity = async (
+  date: string,
+  data: {
+    xp_earned?: number;
+    lessons_completed?: number;
+    myths_busted?: number;
+    time_spent_minutes?: number;
+  },
+) => {
   const database = getDatabase();
   await database.runAsync(
     `INSERT INTO daily_activity (date, xp_earned, lessons_completed, myths_busted, time_spent_minutes)
@@ -485,16 +789,16 @@ export const logDailyActivity = async (date: string, data: {
       data.xp_earned || 0,
       data.lessons_completed || 0,
       data.myths_busted || 0,
-      data.time_spent_minutes || 0
-    ]
+      data.time_spent_minutes || 0,
+    ],
   );
 };
 
 export const getDailyActivity = async (startDate: string, endDate: string) => {
   const database = getDatabase();
   return await database.getAllAsync(
-    'SELECT * FROM daily_activity WHERE date BETWEEN ? AND ? ORDER BY date DESC',
-    [startDate, endDate]
+    "SELECT * FROM daily_activity WHERE date BETWEEN ? AND ? ORDER BY date DESC",
+    [startDate, endDate],
   );
 };
 
@@ -512,9 +816,67 @@ export const clearAllData = async () => {
   `);
 };
 
+const deleteTableRowsIfExists = async (
+  database: SQLite.SQLiteDatabase,
+  tableName: string,
+) => {
+  const table = await database.getFirstAsync<{ name: string }>(
+    "SELECT name FROM sqlite_master WHERE type = 'table' AND name = ?",
+    [tableName],
+  );
+
+  if (!table) {
+    return;
+  }
+
+  await database.execAsync(`DELETE FROM ${tableName};`);
+};
+
+export const deleteAccountData = async () => {
+  const database = await getDatabaseReady();
+
+  // Delete children before parent tables where foreign keys exist.
+  const tableDeletionOrder = [
+    "sync_queue",
+    "sync_status",
+    "poll_votes",
+    "likes",
+    "comments",
+    "bookmarks",
+    "bookmark_collections",
+    "community_posts",
+    "friendships",
+    "notifications",
+    "user_activities",
+    "blocked_users",
+    "reports",
+    "followed_topics",
+    "user_settings",
+    "user_profiles",
+    "explorer_nodes",
+    "explorer_mazes",
+    "explorer_journeys",
+    "chat_messages",
+    "saved_notes",
+    "chat_conversations",
+    "user_profile",
+    "lesson_steps",
+    "levels",
+    "units",
+    "daily_activity",
+    "achievements",
+    "leaderboard",
+  ] as const;
+
+  for (const tableName of tableDeletionOrder) {
+    await deleteTableRowsIfExists(database, tableName);
+  }
+};
+
 export default {
   initDatabase,
   getDatabase,
+  getLegacyUserProfile,
   getUserProfile,
   createOrUpdateUserProfile,
   getLevelProgress,
@@ -524,5 +886,5 @@ export default {
   logDailyActivity,
   getDailyActivity,
   clearAllData,
+  deleteAccountData,
 };
-

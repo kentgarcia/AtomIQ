@@ -7,14 +7,13 @@ import {
     removeFriend,
     searchUsers,
     sendFriendRequest,
-} from '@/services/friends-sync';
-import { syncProfileToSupabase } from '@/services/profile-sync';
-import { useStorage } from '@/services/StorageContext';
-import { useCallback, useState } from 'react';
-import { Alert } from 'react-native';
+} from "@/services/friends-sync";
+import { useStorage } from "@/services/StorageContext";
+import { useCallback, useState } from "react";
+import { Alert } from "react-native";
 
 export const useFriendsSync = () => {
-  const { userProfile, isOnline } = useStorage();
+  const { userProfile, isOnline, syncProfileToSupabase } = useStorage();
   const [friends, setFriends] = useState<Friend[]>([]);
   const [friendRequests, setFriendRequests] = useState<FriendRequest[]>([]);
   const [searchResults, setSearchResults] = useState<any[]>([]);
@@ -26,12 +25,12 @@ export const useFriendsSync = () => {
   const handleSearchUsers = useCallback(
     async (query: string) => {
       if (!userProfile || !isOnline) {
-        Alert.alert('Offline', 'Friend search requires internet connection');
+        Alert.alert("Offline", "Friend search requires internet connection");
         return;
       }
 
       if (!query.trim()) {
-        Alert.alert('Empty Search', 'Please enter a username');
+        Alert.alert("Empty Search", "Please enter a username");
         return;
       }
 
@@ -40,13 +39,13 @@ export const useFriendsSync = () => {
         const results = await searchUsers(query, userProfile.user_id);
         setSearchResults(results);
       } catch (error) {
-        console.error('Search error:', error);
-        Alert.alert('Error', 'Failed to search users');
+        console.error("Search error:", error);
+        Alert.alert("Error", "Failed to search users");
       } finally {
         setIsLoading(false);
       }
     },
-    [userProfile, isOnline]
+    [userProfile, isOnline],
   );
 
   /**
@@ -55,27 +54,18 @@ export const useFriendsSync = () => {
   const handleSendFriendRequest = useCallback(
     async (toUserId: string) => {
       if (!userProfile || !isOnline) {
-        Alert.alert('Offline', 'Friend requests require internet connection');
+        Alert.alert("Offline", "Friend requests require internet connection");
         return;
       }
 
       try {
         setIsLoading(true);
-        
-        // Sync profile first to ensure sender data is up-to-date on Supabase
-        const syncSuccess = await syncProfileToSupabase({
-          user_id: userProfile.user_id,
-          username: userProfile.username,
-          avatar_url: userProfile.avatar_url,
-          total_xp: userProfile.total_xp,
-          current_streak: userProfile.current_streak,
-          longest_streak: userProfile.longest_streak,
-          myths_busted: userProfile.myths_busted,
-          lessons_completed: userProfile.lessons_completed,
-        });
+
+        // Ensure local-first changes are pushed before social mutation.
+        const syncSuccess = await syncProfileToSupabase();
 
         if (!syncSuccess) {
-          Alert.alert('Error', 'Failed to sync profile before sending request');
+          Alert.alert("Error", "Failed to sync profile before sending request");
           return;
         }
 
@@ -84,24 +74,26 @@ export const useFriendsSync = () => {
           userProfile.user_id,
           toUserId,
           userProfile.username,
-          userProfile.avatar_url
+          userProfile.avatar_url,
         );
 
         if (success) {
-          Alert.alert('Success', 'Friend request sent!');
+          Alert.alert("Success", "Friend request sent!");
           // Remove from search results
-          setSearchResults(prev => prev.filter(u => u.user_id !== toUserId));
+          setSearchResults((prev) =>
+            prev.filter((u) => u.user_id !== toUserId),
+          );
         } else {
-          Alert.alert('Error', 'Failed to send friend request');
+          Alert.alert("Error", "Failed to send friend request");
         }
       } catch (error) {
-        console.error('Send request error:', error);
-        Alert.alert('Error', 'Failed to send friend request');
+        console.error("Send request error:", error);
+        Alert.alert("Error", "Failed to send friend request");
       } finally {
         setIsLoading(false);
       }
     },
-    [userProfile, isOnline]
+    [userProfile, isOnline, syncProfileToSupabase],
   );
 
   /**
@@ -117,7 +109,7 @@ export const useFriendsSync = () => {
       const friendsList = await getFriends(userProfile.user_id);
       setFriends(friendsList);
     } catch (error) {
-      console.error('Load friends error:', error);
+      console.error("Load friends error:", error);
     } finally {
       setIsLoading(false);
     }
@@ -136,7 +128,7 @@ export const useFriendsSync = () => {
       const requests = await getFriendRequests(userProfile.user_id);
       setFriendRequests(requests);
     } catch (error) {
-      console.error('Load requests error:', error);
+      console.error("Load requests error:", error);
     } finally {
       setIsLoading(false);
     }
@@ -146,9 +138,16 @@ export const useFriendsSync = () => {
    * Accept a friend request
    */
   const handleAcceptFriendRequest = useCallback(
-    async (requestId: string, fromUserId: string, fromUsername: string, fromAvatarUrl: string | null, fromXp: number, fromStreak: number) => {
+    async (
+      requestId: string,
+      fromUserId: string,
+      fromUsername: string,
+      fromAvatarUrl: string | null,
+      fromXp: number,
+      fromStreak: number,
+    ) => {
       if (!userProfile || !isOnline) {
-        Alert.alert('Offline', 'Action requires internet connection');
+        Alert.alert("Offline", "Action requires internet connection");
         return;
       }
 
@@ -161,24 +160,24 @@ export const useFriendsSync = () => {
           userProfile.username,
           userProfile.avatar_url,
           userProfile.total_xp,
-          userProfile.current_streak
+          userProfile.current_streak,
         );
 
         if (success) {
-          Alert.alert('Success', 'Friend request accepted!');
+          Alert.alert("Success", "Friend request accepted!");
           // Reload both lists
           await Promise.all([loadFriends(), loadFriendRequests()]);
         } else {
-          Alert.alert('Error', 'Failed to accept friend request');
+          Alert.alert("Error", "Failed to accept friend request");
         }
       } catch (error) {
-        console.error('Accept request error:', error);
-        Alert.alert('Error', 'Failed to accept friend request');
+        console.error("Accept request error:", error);
+        Alert.alert("Error", "Failed to accept friend request");
       } finally {
         setIsLoading(false);
       }
     },
-    [userProfile, isOnline, loadFriends, loadFriendRequests]
+    [userProfile, isOnline, loadFriends, loadFriendRequests],
   );
 
   /**
@@ -187,27 +186,27 @@ export const useFriendsSync = () => {
   const handleRemoveFriend = useCallback(
     async (friendId: string) => {
       if (!userProfile || !isOnline) {
-        Alert.alert('Offline', 'Action requires internet connection');
+        Alert.alert("Offline", "Action requires internet connection");
         return;
       }
 
-      Alert.alert('Remove Friend', 'Are you sure?', [
-        { text: 'Cancel', onPress: () => {} },
+      Alert.alert("Remove Friend", "Are you sure?", [
+        { text: "Cancel", onPress: () => {} },
         {
-          text: 'Remove',
+          text: "Remove",
           onPress: async () => {
             try {
               setIsLoading(true);
               const success = await removeFriend(userProfile.user_id, friendId);
               if (success) {
-                Alert.alert('Success', 'Friend removed');
+                Alert.alert("Success", "Friend removed");
                 await loadFriends();
               } else {
-                Alert.alert('Error', 'Failed to remove friend');
+                Alert.alert("Error", "Failed to remove friend");
               }
             } catch (error) {
-              console.error('Remove friend error:', error);
-              Alert.alert('Error', 'Failed to remove friend');
+              console.error("Remove friend error:", error);
+              Alert.alert("Error", "Failed to remove friend");
             } finally {
               setIsLoading(false);
             }
@@ -215,7 +214,7 @@ export const useFriendsSync = () => {
         },
       ]);
     },
-    [userProfile, isOnline, loadFriends]
+    [userProfile, isOnline, loadFriends],
   );
 
   return {

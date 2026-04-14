@@ -7,12 +7,8 @@
       "developmentClient": true,
       "distribution": "internal",
       "env": {
-        "EXPO_PUBLIC_SUPABASE_URL": "https://iuevsehuwyycnzwzzylf.supabase.co",
-        "EXPO_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml1ZXZzZWh1d3l5Y256d3p6eWxmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ4NjQxNzUsImV4cCI6MjA4MDQ0MDE3NX0.qCap1ARHKzZmYPWR-FpL7GbcpVv4YniKgF_Q82jJQrI",
-        "EXPO_PUBLIC_GEMINI_CHAT_API_KEY_1": "AIzaSyCxa21S6wOtIS0x9XzXoFWthp7301ephY0",
-        "EXPO_PUBLIC_GEMINI_CHAT_API_KEY_2": "AIzaSyCjdZ9PomhM_TbJtRKTYCEUNP-g4aUtwSs",
-        "EXPO_PUBLIC_GEMINI_MODERATION_API_KEY_1": "AIzaSyDTKK1hY3BOXP8AwBOT1tYoJE4KYVHzBpg",
-        "EXPO_PUBLIC_GEMINI_MODERATION_API_KEY_2": "AIzaSyApio5MuDtQJiwCPg9LY4FlW1yF6GCFyGU"
+        "EXPO_PUBLIC_SUPABASE_URL": "https://hxtvgalzybshuoadsvny.supabase.co",
+        "EXPO_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh4dHZnYWx6eWJzaHVvYWRzdm55Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYxMzY1NjAsImV4cCI6MjA5MTcxMjU2MH0.V_kyVzR2Br0ZLbRWOenY8akPULViQUSuZfAFcW6aFGQ"
       }
     },
     "preview": {
@@ -21,12 +17,8 @@
       },
       "distribution": "internal",
       "env": {
-        "EXPO_PUBLIC_SUPABASE_URL": "https://iuevsehuwyycnzwzzylf.supabase.co",
-        "EXPO_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml1ZXZzZWh1d3l5Y256d3p6eWxmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ4NjQxNzUsImV4cCI6MjA4MDQ0MDE3NX0.qCap1ARHKzZmYPWR-FpL7GbcpVv4YniKgF_Q82jJQrI",
-        "EXPO_PUBLIC_GEMINI_CHAT_API_KEY_1": "AIzaSyCxa21S6wOtIS0x9XzXoFWthp7301ephY0",
-        "EXPO_PUBLIC_GEMINI_CHAT_API_KEY_2": "AIzaSyCjdZ9PomhM_TbJtRKTYCEUNP-g4aUtwSs",
-        "EXPO_PUBLIC_GEMINI_MODERATION_API_KEY_1": "AIzaSyDTKK1hY3BOXP8AwBOT1tYoJE4KYVHzBpg",
-        "EXPO_PUBLIC_GEMINI_MODERATION_API_KEY_2": "AIzaSyApio5MuDtQJiwCPg9LY4FlW1yF6GCFyGU"
+        "EXPO_PUBLIC_SUPABASE_URL": "https://hxtvgalzybshuoadsvny.supabase.co",
+        "EXPO_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh4dHZnYWx6eWJzaHVvYWRzdm55Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYxMzY1NjAsImV4cCI6MjA5MTcxMjU2MH0.V_kyVzR2Br0ZLbRWOenY8akPULViQUSuZfAFcW6aFGQ"
       }
     },
     "production": {
@@ -34,12 +26,8 @@
         "buildType": "apk"
       },
       "env": {
-        "EXPO_PUBLIC_SUPABASE_URL": "https://iuevsehuwyycnzwzzylf.supabase.co",
-        "EXPO_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml1ZXZzZWh1d3l5Y256d3p6eWxmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ4NjQxNzUsImV4cCI6MjA4MDQ0MDE3NX0.qCap1ARHKzZmYPWR-FpL7GbcpVv4YniKgF_Q82jJQrI",
-        "EXPO_PUBLIC_GEMINI_CHAT_API_KEY_1": "AIzaSyCxa21S6wOtIS0x9XzXoFWthp7301ephY0",
-        "EXPO_PUBLIC_GEMINI_CHAT_API_KEY_2": "AIzaSyCjdZ9PomhM_TbJtRKTYCEUNP-g4aUtwSs",
-        "EXPO_PUBLIC_GEMINI_MODERATION_API_KEY_1": "AIzaSyDTKK1hY3BOXP8AwBOT1tYoJE4KYVHzBpg",
-        "EXPO_PUBLIC_GEMINI_MODERATION_API_KEY_2": "AIzaSyApio5MuDtQJiwCPg9LY4FlW1yF6GCFyGU"
+        "EXPO_PUBLIC_SUPABASE_URL": "https://hxtvgalzybshuoadsvny.supabase.co",
+        "EXPO_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh4dHZnYWx6eWJzaHVvYWRzdm55Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYxMzY1NjAsImV4cCI6MjA5MTcxMjU2MH0.V_kyVzR2Br0ZLbRWOenY8akPULViQUSuZfAFcW6aFGQ"
       }
     }
   },
@@ -47,4 +35,3 @@
     "production": {}
   }
 }
-
