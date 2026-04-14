@@ -1,19 +1,11 @@
-import Constants from 'expo-constants';
-
-// Gemini API Configuration for Chat
-const GEMINI_API_KEYS = [
-  Constants.expoConfig?.extra?.geminiChatApiKey1 || process.env.EXPO_PUBLIC_GEMINI_CHAT_API_KEY_1,
-  Constants.expoConfig?.extra?.geminiChatApiKey2 || process.env.EXPO_PUBLIC_GEMINI_CHAT_API_KEY_2,
-].filter(Boolean); // Remove undefined keys
-
-const GEMINI_MODEL = 'gemini-2.5-flash-lite';
-const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
-
-// Track current API key index
-let currentChatKeyIndex = 0;
+import {
+    ensureSupabaseAuthUserId,
+    isSupabaseConfigured,
+    supabase,
+} from "./supabase";
 
 export interface GeminiMessage {
-  role: 'user' | 'model';
+  role: "user" | "model";
   parts: Array<{ text: string }>;
 }
 
@@ -51,87 +43,132 @@ Format your response as JSON with this structure:
 
 If the user asks something outside nuclear physics, politely redirect them to nuclear-related topics.`;
 
+const supabaseAnonJwt = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY?.trim() || "";
+
+const getGeminiFunctionAuthToken = async (): Promise<string> => {
+  // Edge Functions with verify_jwt expect a JWT token.
+  // Prefer the legacy anon JWT when provided in env.
+  if (supabaseAnonJwt) {
+    return supabaseAnonJwt;
+  }
+
+  await ensureSupabaseAuthUserId();
+
+  const {
+    data: { session },
+    error: sessionError,
+  } = await supabase.auth.getSession();
+
+  if (sessionError) {
+    throw new Error(
+      `Unable to read Supabase auth session: ${sessionError.message}`,
+    );
+  }
+
+  if (session?.access_token) {
+    return session.access_token;
+  }
+
+  throw new Error(
+    "No JWT available for gemini-chat function. Set EXPO_PUBLIC_SUPABASE_ANON_KEY (legacy anon JWT) in .env.local.",
+  );
+};
+
 /**
  * Parse citations from Gemini response
  */
 function parseCitations(text: string): string[] {
   const citations: string[] = [];
-  
+
   // Look for citation patterns like [IAEA], [UNSCEAR], etc.
   const citationPattern = /\[([A-Z0-9\s\-]+)\]/g;
   const matches = text.matchAll(citationPattern);
-  
+
   for (const match of matches) {
     if (!citations.includes(match[1])) {
       citations.push(match[1]);
     }
   }
-  
+
   // Also look for common nuclear organizations
-  const organizations = ['IAEA', 'UNSCEAR', 'NRC', 'WHO', 'ICRP', 'NEA', 'ANS'];
-  organizations.forEach(org => {
+  const organizations = ["IAEA", "UNSCEAR", "NRC", "WHO", "ICRP", "NEA", "ANS"];
+  organizations.forEach((org) => {
     if (text.includes(org) && !citations.includes(org)) {
       citations.push(org);
     }
   });
-  
-  return citations.length > 0 ? citations : ['IAEA', 'UNSCEAR']; // Default citations
+
+  return citations.length > 0 ? citations : ["IAEA", "UNSCEAR"]; // Default citations
 }
 
 /**
  * Extract follow-up suggestions from response
  */
-function extractFollowUpSuggestions(text: string, userQuestion: string): string[] {
+function extractFollowUpSuggestions(
+  text: string,
+  userQuestion: string,
+): string[] {
   const suggestions: string[] = [];
-  
+
   // Try to extract from "You might also ask" or similar patterns
-  const followUpPattern = /(?:You might (?:also )?ask|Follow-up|Related questions?)[:;]?\s*(.+?)(?:\n\n|$)/i;
+  const followUpPattern =
+    /(?:You might (?:also )?ask|Follow-up|Related questions?)[:;]?\s*(.+?)(?:\n\n|$)/i;
   const match = text.match(followUpPattern);
-  
+
   if (match) {
-    const followUps = match[1].split(/[•\-\n]/).map(s => s.trim()).filter(s => s.length > 0);
+    const followUps = match[1]
+      .split(/[•\-\n]/)
+      .map((s) => s.trim())
+      .filter((s) => s.length > 0);
     suggestions.push(...followUps.slice(0, 4));
   }
-  
+
   // Generate contextual suggestions based on the topic
   const topic = userQuestion.toLowerCase();
-  
-  if (topic.includes('radiation') || topic.includes('radioactive')) {
+
+  if (topic.includes("radiation") || topic.includes("radioactive")) {
     suggestions.push(
-      'How is radiation measured?',
-      'What are safe radiation exposure limits?',
-      'How does radiation affect the human body?'
+      "How is radiation measured?",
+      "What are safe radiation exposure limits?",
+      "How does radiation affect the human body?",
     );
-  } else if (topic.includes('reactor') || topic.includes('nuclear power')) {
+  } else if (topic.includes("reactor") || topic.includes("nuclear power")) {
     suggestions.push(
-      'How does nuclear fission work?',
-      'What are the safety features of modern reactors?',
-      'How is nuclear waste managed?'
+      "How does nuclear fission work?",
+      "What are the safety features of modern reactors?",
+      "How is nuclear waste managed?",
     );
-  } else if (topic.includes('myth') || topic.includes('dangerous') || topic.includes('safe')) {
+  } else if (
+    topic.includes("myth") ||
+    topic.includes("dangerous") ||
+    topic.includes("safe")
+  ) {
     suggestions.push(
-      'What are common misconceptions about nuclear energy?',
-      'How safe is nuclear power compared to other energy sources?',
-      'What happened at Chernobyl and Fukushima?'
+      "What are common misconceptions about nuclear energy?",
+      "How safe is nuclear power compared to other energy sources?",
+      "What happened at Chernobyl and Fukushima?",
     );
   } else {
     suggestions.push(
-      'Can you explain this in simpler terms?',
-      'What are the real-world applications?',
-      'How does this relate to nuclear safety?'
+      "Can you explain this in simpler terms?",
+      "What are the real-world applications?",
+      "How does this relate to nuclear safety?",
     );
   }
-  
+
   return [...new Set(suggestions)].slice(0, 4); // Remove duplicates and limit to 4
 }
 
 /**
  * Parse JSON response from Gemini
  */
-function parseGeminiResponse(text: string, userQuestion: string): GeminiResponse {
+function parseGeminiResponse(
+  text: string,
+  userQuestion: string,
+): GeminiResponse {
   // Clean up the text
   let cleanedText = text.trim();
-  
+
   // Try to extract JSON if present
   try {
     const jsonMatch = cleanedText.match(/\{[\s\S]*\}/);
@@ -141,19 +178,21 @@ function parseGeminiResponse(text: string, userQuestion: string): GeminiResponse
         return {
           text: parsed.response || parsed.text || cleanedText,
           citations: parsed.citations || parseCitations(cleanedText),
-          followUpSuggestions: parsed.followUpSuggestions || extractFollowUpSuggestions(cleanedText, userQuestion)
+          followUpSuggestions:
+            parsed.followUpSuggestions ||
+            extractFollowUpSuggestions(cleanedText, userQuestion),
         };
       }
     }
   } catch (e) {
     // If JSON parsing fails, continue with text parsing
   }
-  
+
   // Fallback: parse manually from text
   return {
     text: cleanedText,
     citations: parseCitations(cleanedText),
-    followUpSuggestions: extractFollowUpSuggestions(cleanedText, userQuestion)
+    followUpSuggestions: extractFollowUpSuggestions(cleanedText, userQuestion),
   };
 }
 
@@ -162,139 +201,105 @@ function parseGeminiResponse(text: string, userQuestion: string): GeminiResponse
  */
 export async function sendMessageToGemini(
   userMessage: string,
-  conversationHistory: GeminiMessage[] = []
+  conversationHistory: GeminiMessage[] = [],
 ): Promise<GeminiResponse> {
-  if (!GEMINI_API_KEYS || GEMINI_API_KEYS.length === 0) {
-    throw new Error('Gemini API keys not configured. Please set EXPO_PUBLIC_GEMINI_CHAT_API_KEY_1 and EXPO_PUBLIC_GEMINI_CHAT_API_KEY_2 in your .env file');
+  if (!isSupabaseConfigured()) {
+    throw new Error(
+      "Supabase is not configured. Set EXPO_PUBLIC_SUPABASE_URL and EXPO_PUBLIC_SUPABASE_ANON_KEY (or EXPO_PUBLIC_SUPABASE_KEY).",
+    );
   }
 
-  const maxRetries = GEMINI_API_KEYS.length;
-  let lastError: Error | null = null;
+  try {
+    const authToken = await getGeminiFunctionAuthToken();
 
-  for (let attempt = 0; attempt < maxRetries; attempt++) {
-    const apiKey = GEMINI_API_KEYS[currentChatKeyIndex];
-    
-    try {
-      // Build conversation context
-      const contents = [
-        {
-          role: 'user',
-          parts: [{ text: SYSTEM_PROMPT }]
-        },
-        {
-          role: 'model',
-          parts: [{ text: 'Understood. I am Schrödi, ready to assist with nuclear physics questions and debunk myths with scientific facts.' }]
-        },
-        ...conversationHistory,
-        {
-          role: 'user',
-          parts: [{ text: userMessage }]
-        }
-      ];
+    const { data, error } = await supabase.functions.invoke("gemini-chat", {
+      body: {
+        userMessage,
+        conversationHistory,
+        systemPrompt: SYSTEM_PROMPT,
+      },
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+      },
+    });
 
-      const response = await fetch(
-        `${GEMINI_API_URL}?key=${apiKey}`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            contents: contents,
-            generationConfig: {
-              temperature: 0.7,
-              topK: 40,
-              topP: 0.95,
-              maxOutputTokens: 1024,
-            },
-            safetySettings: [
-              {
-                category: 'HARM_CATEGORY_HARASSMENT',
-                threshold: 'BLOCK_MEDIUM_AND_ABOVE'
-              },
-              {
-                category: 'HARM_CATEGORY_HATE_SPEECH',
-                threshold: 'BLOCK_MEDIUM_AND_ABOVE'
-              },
-              {
-                category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT',
-                threshold: 'BLOCK_MEDIUM_AND_ABOVE'
-              },
-              {
-                category: 'HARM_CATEGORY_DANGEROUS_CONTENT',
-                threshold: 'BLOCK_MEDIUM_AND_ABOVE'
-              }
-            ]
-          })
-        }
-      );
+    if (error) {
+      const context = (error as { context?: Response }).context;
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        
-        // Check for rate limit errors
-        if (response.status === 429 || errorData.error?.message?.includes('quota') || errorData.error?.message?.includes('rate limit')) {
-          console.log(`Chat API key ${currentChatKeyIndex + 1} hit rate limit, switching to next key...`);
-          currentChatKeyIndex = (currentChatKeyIndex + 1) % GEMINI_API_KEYS.length;
-          lastError = new Error('Rate limit reached');
-          continue; // Try next key
+      if (context) {
+        let edgeErrorMessage = "";
+
+        try {
+          const payload = (await context.json()) as {
+            error?: string;
+            message?: string;
+          };
+          edgeErrorMessage =
+            payload?.error || payload?.message || JSON.stringify(payload);
+        } catch {
+          try {
+            edgeErrorMessage = await context.text();
+          } catch {
+            edgeErrorMessage = "";
+          }
         }
-        
+
+        if (edgeErrorMessage) {
+          throw new Error(
+            `Gemini edge function failed (${context.status}): ${edgeErrorMessage}`,
+          );
+        }
+      }
+
+      throw new Error(error.message || "Failed to invoke Gemini chat function");
+    }
+
+    const responseText = data?.text;
+    if (typeof responseText !== "string" || responseText.trim().length === 0) {
+      throw new Error("Invalid response format from Gemini chat function");
+    }
+
+    return parseGeminiResponse(responseText, userMessage);
+  } catch (error) {
+    console.error("Gemini API Error:", error);
+
+    if (error instanceof Error) {
+      if (
+        error.message.includes("401") ||
+        error.message.includes("Invalid JWT")
+      ) {
         throw new Error(
-          errorData.error?.message || 
-          `Gemini API error: ${response.status} ${response.statusText}`
+          "Chat authentication failed: invalid JWT for Edge Functions. Set EXPO_PUBLIC_SUPABASE_ANON_KEY to your legacy anon JWT key, restart Expo, and try again.",
         );
       }
 
-      const data = await response.json();
-      
-      // Check for blocked content
-      if (data.candidates?.[0]?.finishReason === 'SAFETY') {
-        throw new Error('Response was blocked by safety filters. Please rephrase your question.');
+      if (error.message.toLowerCase().includes("api key")) {
+        throw new Error(
+          "Gemini keys are missing or inactive in Supabase. Add keys to the public.gemini_api_keys table and set is_active=true.",
+        );
       }
-      
-      if (!data.candidates || !data.candidates[0]?.content?.parts?.[0]?.text) {
-        const errorMsg = data.error?.message || 'Invalid response format from Gemini API';
-        throw new Error(errorMsg);
-      }
-
-      const responseText = data.candidates[0].content.parts[0].text;
-      return parseGeminiResponse(responseText, userMessage);
-
-    } catch (error) {
-      // If it's a rate limit error, we already logged it and will retry
-      if (error instanceof Error && error.message === 'Rate limit reached') {
-        lastError = error;
-        continue;
-      }
-      
-      console.error('Gemini API Error:', error);
-      
-      // Return a helpful error message
-      if (error instanceof Error) {
-        if (error.message.includes('API key')) {
-          throw new Error('Gemini API key not configured. Please add EXPO_PUBLIC_GEMINI_CHAT_API_KEY_1 and EXPO_PUBLIC_GEMINI_CHAT_API_KEY_2 to your .env file');
-        }
-        throw error;
-      }
-      
-      throw new Error('Failed to communicate with Gemini API. Please check your internet connection.');
+      throw error;
     }
+
+    throw new Error(
+      "Failed to communicate with Gemini service. Please check your internet connection.",
+    );
   }
-  
-  // All keys failed
-  throw new Error('All Gemini chat API keys have reached their rate limit. Please try again later.');
 }
 
 /**
  * Convert chat messages to Gemini format
  */
-export function convertMessagesToGeminiFormat(messages: Array<{ role: string; text: string }>): GeminiMessage[] {
+export function convertMessagesToGeminiFormat(
+  messages: Array<{ role: string; text: string }>,
+): GeminiMessage[] {
   return messages
-    .filter(msg => msg.role === 'user' || msg.role === 'bot' || msg.role === 'model')
-    .map(msg => ({
-      role: msg.role === 'bot' ? 'model' : (msg.role as 'user' | 'model'),
-      parts: [{ text: msg.text }]
+    .filter(
+      (msg) =>
+        msg.role === "user" || msg.role === "bot" || msg.role === "model",
+    )
+    .map((msg) => ({
+      role: msg.role === "bot" ? "model" : (msg.role as "user" | "model"),
+      parts: [{ text: msg.text }],
     }));
 }
-
