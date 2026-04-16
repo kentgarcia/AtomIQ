@@ -1,9 +1,10 @@
 import { Audio, InterruptionModeAndroid, InterruptionModeIOS } from "expo-av";
 import { getSoundEnabled } from "./storage";
 
-export type GameSfx = "correct" | "wrong" | "gameover";
+export type GameSfx = "punch" | "correct" | "wrong" | "gameover";
 
 const sfxSources: Record<GameSfx, number> = {
+  punch: require("../assets/sfx/punch.mp3"),
   correct: require("../assets/sfx/correct.mp3"),
   wrong: require("../assets/sfx/wrong.mp3"),
   gameover: require("../assets/sfx/gameover.mp3"),

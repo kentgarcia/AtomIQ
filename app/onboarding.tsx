@@ -301,6 +301,7 @@ export default function Onboarding() {
       await updateUserProfile({
         user_id: fallbackUserId,
         username: username.trim() || "Scientist",
+        display_name: username.trim() || "Scientist",
       });
 
       // Mark onboarding as completed

@@ -1,6 +1,6 @@
 /**
  * Local-First Database Types
- * 
+ *
  * These types define the schema for a local-first database that can sync with Supabase.
  * All entities include sync metadata (synced_at, is_dirty, deleted_at) for conflict resolution.
  */
@@ -20,6 +20,9 @@ export interface SyncMetadata {
 export interface UserProfile extends SyncMetadata {
   username: string;
   display_name: string;
+  friend_code: string | null;
+  display_name_updated_at: number | null;
+  next_display_name_change_at: number | null;
   email: string | null;
   avatar_url: string | null;
   bio: string | null;
@@ -42,7 +45,7 @@ export interface NotificationPreferences {
 }
 
 // Friend Relationships
-export type FriendshipStatus = 'pending' | 'accepted' | 'blocked' | 'declined';
+export type FriendshipStatus = "pending" | "accepted" | "blocked" | "declined";
 
 export interface Friendship extends SyncMetadata {
   user_id: string; // The user who owns this relationship
@@ -56,14 +59,20 @@ export interface FriendRequest {
   id: string;
   from_user_id: string;
   to_user_id: string;
-  status: 'pending' | 'accepted' | 'declined';
+  status: "pending" | "accepted" | "declined";
   created_at: number;
   responded_at: number | null;
 }
 
 // Community Posts
-export type PostType = 'text' | 'image' | 'poll' | 'achievement' | 'milestone' | 'question';
-export type PostVisibility = 'public' | 'friends' | 'private';
+export type PostType =
+  | "text"
+  | "image"
+  | "poll"
+  | "achievement"
+  | "milestone"
+  | "question";
+export type PostVisibility = "public" | "friends" | "private";
 
 export interface CommunityPost extends SyncMetadata {
   author_id: string;
@@ -101,7 +110,7 @@ export interface Comment extends SyncMetadata {
 }
 
 // Likes (for posts and comments)
-export type LikeableType = 'post' | 'comment';
+export type LikeableType = "post" | "comment";
 
 export interface Like extends SyncMetadata {
   user_id: string;
@@ -117,7 +126,7 @@ export interface PollVote extends SyncMetadata {
 }
 
 // Bookmarks
-export type BookmarkableType = 'post' | 'article' | 'lesson' | 'myth';
+export type BookmarkableType = "post" | "article" | "lesson" | "myth";
 
 export interface Bookmark extends SyncMetadata {
   user_id: string;
@@ -135,16 +144,16 @@ export interface BookmarkCollection extends SyncMetadata {
 }
 
 // Notifications
-export type NotificationType = 
-  | 'friend_request' 
-  | 'friend_accepted' 
-  | 'post_like' 
-  | 'comment' 
-  | 'comment_reply'
-  | 'mention'
-  | 'achievement'
-  | 'streak_reminder'
-  | 'new_content';
+export type NotificationType =
+  | "friend_request"
+  | "friend_accepted"
+  | "post_like"
+  | "comment"
+  | "comment_reply"
+  | "mention"
+  | "achievement"
+  | "streak_reminder"
+  | "new_content";
 
 export interface Notification extends SyncMetadata {
   user_id: string;
@@ -157,14 +166,14 @@ export interface Notification extends SyncMetadata {
 }
 
 // User Activity (for feed and stats)
-export type ActivityType = 
-  | 'lesson_completed' 
-  | 'quiz_completed' 
-  | 'myth_busted' 
-  | 'achievement_unlocked'
-  | 'streak_milestone'
-  | 'level_up'
-  | 'friend_added';
+export type ActivityType =
+  | "lesson_completed"
+  | "quiz_completed"
+  | "myth_busted"
+  | "achievement_unlocked"
+  | "streak_milestone"
+  | "level_up"
+  | "friend_added";
 
 export interface UserActivity extends SyncMetadata {
   user_id: string;
@@ -183,8 +192,13 @@ export interface BlockedUser extends SyncMetadata {
 }
 
 // Reports (for moderation)
-export type ReportType = 'spam' | 'harassment' | 'inappropriate' | 'misinformation' | 'other';
-export type ReportableType = 'post' | 'comment' | 'user';
+export type ReportType =
+  | "spam"
+  | "harassment"
+  | "inappropriate"
+  | "misinformation"
+  | "other";
+export type ReportableType = "post" | "comment" | "user";
 
 export interface Report extends SyncMetadata {
   reporter_id: string;
@@ -192,7 +206,7 @@ export interface Report extends SyncMetadata {
   reportable_id: string;
   type: ReportType;
   description: string | null;
-  status: 'pending' | 'reviewed' | 'resolved' | 'dismissed';
+  status: "pending" | "reviewed" | "resolved" | "dismissed";
 }
 
 // Following Topics/Tags
@@ -206,7 +220,7 @@ export interface FollowedTopic extends SyncMetadata {
 export interface UserSettings {
   id: string;
   user_id: string;
-  theme: 'light' | 'dark' | 'system';
+  theme: "light" | "dark" | "system";
   language: string;
   sound_enabled: boolean;
   haptics_enabled: boolean;
@@ -220,7 +234,7 @@ export interface SyncQueueItem {
   id: string;
   table_name: string;
   record_id: string;
-  operation: 'insert' | 'update' | 'delete';
+  operation: "insert" | "update" | "delete";
   payload: string; // JSON stringified data
   created_at: number;
   attempts: number;
@@ -243,16 +257,27 @@ export interface SyncStatus {
 // For creating new entities (omit sync metadata, id is auto-generated)
 export type CreateUserProfile = Omit<UserProfile, keyof SyncMetadata>;
 export type CreateFriendship = Omit<Friendship, keyof SyncMetadata>;
-export type CreateCommunityPost = Omit<CommunityPost, keyof SyncMetadata | 'likes_count' | 'comments_count' | 'shares_count'>;
-export type CreateComment = Omit<Comment, keyof SyncMetadata | 'likes_count' | 'is_edited'>;
+export type CreateCommunityPost = Omit<
+  CommunityPost,
+  keyof SyncMetadata | "likes_count" | "comments_count" | "shares_count"
+>;
+export type CreateComment = Omit<
+  Comment,
+  keyof SyncMetadata | "likes_count" | "is_edited"
+>;
 export type CreateLike = Omit<Like, keyof SyncMetadata>;
 export type CreateBookmark = Omit<Bookmark, keyof SyncMetadata>;
 export type CreateNotification = Omit<Notification, keyof SyncMetadata>;
 
 // For updating entities
 export type UpdateUserProfile = Partial<CreateUserProfile>;
-export type UpdateCommunityPost = Partial<Pick<CommunityPost, 'title' | 'content' | 'media_urls' | 'visibility' | 'tags'>>;
-export type UpdateComment = Partial<Pick<Comment, 'content'>>;
+export type UpdateCommunityPost = Partial<
+  Pick<
+    CommunityPost,
+    "title" | "content" | "media_urls" | "visibility" | "tags"
+  >
+>;
+export type UpdateComment = Partial<Pick<Comment, "content">>;
 
 // Query types
 export interface PaginationOptions {
@@ -266,15 +291,15 @@ export interface PostQueryOptions extends PaginationOptions {
   type?: PostType;
   tags?: string[];
   is_featured?: boolean;
-  order_by?: 'created_at' | 'likes_count' | 'comments_count';
-  order_direction?: 'asc' | 'desc';
+  order_by?: "created_at" | "likes_count" | "comments_count";
+  order_direction?: "asc" | "desc";
 }
 
 export interface CommentQueryOptions extends PaginationOptions {
   post_id: string;
   parent_comment_id?: string | null;
-  order_by?: 'created_at' | 'likes_count';
-  order_direction?: 'asc' | 'desc';
+  order_by?: "created_at" | "likes_count";
+  order_direction?: "asc" | "desc";
 }
 
 // User with profile preview (for friend lists, mentions, etc.)
@@ -282,6 +307,7 @@ export interface UserPreview {
   id: string;
   username: string;
   display_name: string;
+  friend_code?: string | null;
   avatar_url: string | null;
   level: number;
 }
@@ -308,7 +334,7 @@ export interface FriendWithProfile extends Friendship {
 // Feed item (unified type for activity feed)
 export interface FeedItem {
   id: string;
-  type: 'post' | 'activity' | 'achievement';
+  type: "post" | "activity" | "achievement";
   timestamp: number;
   data: PostWithAuthor | UserActivity;
 }

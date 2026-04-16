@@ -6,6 +6,98 @@ import { LOCAL_FIRST_SCHEMA } from "./local-first/schema";
 // Database instance
 let db: SQLite.SQLiteDatabase | null = null;
 
+const FRIEND_CODE_LENGTH = 6;
+const FRIEND_CODE_ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+const DISPLAY_NAME_CHANGE_COOLDOWN_MS = 7 * 24 * 60 * 60 * 1000;
+
+type TableColumnDefinition = Record<string, string>;
+
+const getTableColumns = async (
+  database: SQLite.SQLiteDatabase,
+  tableName: "user_profile" | "user_profiles",
+): Promise<Set<string>> => {
+  const table = await database.getFirstAsync<{ name: string }>(
+    "SELECT name FROM sqlite_master WHERE type = 'table' AND name = ? LIMIT 1",
+    [tableName],
+  );
+
+  if (!table) {
+    return new Set<string>();
+  }
+
+  const columns = await database.getAllAsync<{ name: string }>(
+    `PRAGMA table_info(${tableName})`,
+  );
+
+  return new Set(columns.map((column) => column.name));
+};
+
+const ensureTableColumns = async (
+  database: SQLite.SQLiteDatabase,
+  tableName: "user_profile" | "user_profiles",
+  definitions: TableColumnDefinition,
+): Promise<void> => {
+  const existingColumns = await getTableColumns(database, tableName);
+  if (existingColumns.size === 0) {
+    return;
+  }
+
+  for (const [columnName, columnDefinition] of Object.entries(definitions)) {
+    if (existingColumns.has(columnName)) {
+      continue;
+    }
+
+    try {
+      await database.execAsync(
+        `ALTER TABLE ${tableName} ADD COLUMN ${columnName} ${columnDefinition};`,
+      );
+      console.log(`Migration: Added ${columnName} column to ${tableName}`);
+    } catch (error) {
+      console.warn(
+        `Migration: Unable to add ${columnName} column to ${tableName}:`,
+        error,
+      );
+    }
+  }
+};
+
+const ensureIdentityProfileColumns = async (
+  database: SQLite.SQLiteDatabase,
+): Promise<void> => {
+  await ensureTableColumns(database, "user_profile", {
+    user_id: "TEXT",
+    display_name: "TEXT",
+    friend_code: "TEXT",
+    display_name_updated_at: "INTEGER",
+    next_display_name_change_at: "INTEGER",
+  });
+
+  await ensureTableColumns(database, "user_profiles", {
+    display_name: "TEXT",
+    friend_code: "TEXT",
+    display_name_updated_at: "INTEGER",
+    next_display_name_change_at: "INTEGER",
+  });
+
+  const legacyColumns = await getTableColumns(database, "user_profile");
+  if (legacyColumns.has("friend_code")) {
+    await database.execAsync(`
+      CREATE UNIQUE INDEX IF NOT EXISTS idx_user_profile_friend_code
+      ON user_profile(friend_code)
+      WHERE friend_code IS NOT NULL;
+    `);
+  }
+
+  const localFirstColumns = await getTableColumns(database, "user_profiles");
+  if (localFirstColumns.has("friend_code")) {
+    await database.execAsync(`
+      CREATE UNIQUE INDEX IF NOT EXISTS idx_user_profiles_friend_code
+      ON user_profiles(friend_code)
+      WHERE friend_code IS NOT NULL;
+    `);
+  }
+};
+
 // Initialize database
 export const initDatabase = async () => {
   try {
@@ -20,6 +112,10 @@ export const initDatabase = async () => {
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         user_id TEXT UNIQUE,
         username TEXT,
+        display_name TEXT,
+        friend_code TEXT,
+        display_name_updated_at INTEGER,
+        next_display_name_change_at INTEGER,
         avatar_url TEXT,
         total_xp INTEGER DEFAULT 0,
         current_streak INTEGER DEFAULT 0,
@@ -100,12 +196,55 @@ export const initDatabase = async () => {
       );
     `);
 
+    // Ensure legacy/local-first identity columns exist before any queries use them.
+    await ensureIdentityProfileColumns(db);
+
     // Migrate existing databases - add user_id column if it doesn't exist
     try {
       await db.execAsync(`
         ALTER TABLE user_profile ADD COLUMN user_id TEXT;
       `);
       console.log("Migration: Added user_id column to user_profile");
+    } catch (error) {
+      // Column already exists or table doesn't exist yet, ignore
+    }
+
+    try {
+      await db.execAsync(`
+        ALTER TABLE user_profile ADD COLUMN display_name TEXT;
+      `);
+      console.log("Migration: Added display_name column to user_profile");
+    } catch (error) {
+      // Column already exists or table doesn't exist yet, ignore
+    }
+
+    try {
+      await db.execAsync(`
+        ALTER TABLE user_profile ADD COLUMN friend_code TEXT;
+      `);
+      console.log("Migration: Added friend_code column to user_profile");
+    } catch (error) {
+      // Column already exists or table doesn't exist yet, ignore
+    }
+
+    try {
+      await db.execAsync(`
+        ALTER TABLE user_profile ADD COLUMN display_name_updated_at INTEGER;
+      `);
+      console.log(
+        "Migration: Added display_name_updated_at column to user_profile",
+      );
+    } catch (error) {
+      // Column already exists or table doesn't exist yet, ignore
+    }
+
+    try {
+      await db.execAsync(`
+        ALTER TABLE user_profile ADD COLUMN next_display_name_change_at INTEGER;
+      `);
+      console.log(
+        "Migration: Added next_display_name_change_at column to user_profile",
+      );
     } catch (error) {
       // Column already exists or table doesn't exist yet, ignore
     }
@@ -135,6 +274,9 @@ export const initDatabase = async () => {
 
     // Initialize local-first database schema (for social features and sync)
     await db.execAsync(LOCAL_FIRST_SCHEMA);
+
+    // Re-run safeguards after schema bootstrap for databases upgrading from older layouts.
+    await ensureIdentityProfileColumns(db);
 
     // Initialize levels from syllabus if database is empty
     await initializeLevelsFromSyllabus();
@@ -241,10 +383,47 @@ const getDatabaseReady = async (): Promise<SQLite.SQLiteDatabase> => {
   return getDatabase();
 };
 
+const generateFriendCode = (): string => {
+  let code = "";
+
+  for (let index = 0; index < FRIEND_CODE_LENGTH; index += 1) {
+    const randomIndex = Math.floor(Math.random() * FRIEND_CODE_ALPHABET.length);
+    code += FRIEND_CODE_ALPHABET[randomIndex];
+  }
+
+  return code;
+};
+
 const normalizeLocalFirstUsername = (value: string): string => {
   const normalized = value.trim().replace(/\s+/g, " ");
 
   return normalized || "Scientist";
+};
+
+const normalizeFriendCode = (value: string): string =>
+  value
+    .toUpperCase()
+    .replace(/[^A-Z0-9]/g, "")
+    .slice(0, FRIEND_CODE_LENGTH);
+
+const parseTimestampValue = (value: unknown): number | null => {
+  if (typeof value === "number" && Number.isFinite(value)) {
+    return value;
+  }
+
+  if (typeof value === "string") {
+    const numeric = Number(value);
+    if (Number.isFinite(numeric) && numeric > 0) {
+      return numeric;
+    }
+
+    const parsedDate = Date.parse(value);
+    if (!Number.isNaN(parsedDate)) {
+      return parsedDate;
+    }
+  }
+
+  return null;
 };
 
 const resolveUniqueLocalFirstUsername = async (
@@ -282,6 +461,52 @@ const resolveUniqueLocalFirstUsername = async (
   return `${base}_${Date.now().toString(36).slice(-6)}`;
 };
 
+const resolveUniqueFriendCode = async (
+  database: SQLite.SQLiteDatabase,
+  userId: string,
+  preferredCode?: string | null,
+): Promise<string> => {
+  const isFriendCodeAvailable = async (candidate: string): Promise<boolean> => {
+    const localFirstConflict = await database.getFirstAsync<{ id: string }>(
+      "SELECT id FROM user_profiles WHERE friend_code = ? AND id <> ? LIMIT 1",
+      [candidate, userId],
+    );
+
+    if (localFirstConflict) {
+      return false;
+    }
+
+    const legacyConflict = await database.getFirstAsync<{
+      user_id: string | null;
+    }>(
+      "SELECT user_id FROM user_profile WHERE friend_code = ? AND COALESCE(user_id, '') <> ? LIMIT 1",
+      [candidate, userId],
+    );
+
+    return !legacyConflict;
+  };
+
+  const normalizedPreferred = preferredCode
+    ? normalizeFriendCode(preferredCode)
+    : "";
+
+  if (
+    normalizedPreferred.length === FRIEND_CODE_LENGTH &&
+    (await isFriendCodeAvailable(normalizedPreferred))
+  ) {
+    return normalizedPreferred;
+  }
+
+  for (let attempt = 0; attempt < 256; attempt += 1) {
+    const candidate = generateFriendCode();
+    if (await isFriendCodeAvailable(candidate)) {
+      return candidate;
+    }
+  }
+
+  throw new Error("Unable to generate a unique friend code");
+};
+
 // User Profile Operations
 export const getLegacyUserProfile = async () => {
   const database = getDatabase();
@@ -293,10 +518,36 @@ export const getLegacyUserProfile = async () => {
 
 export const getUserProfile = async () => {
   const database = getDatabase();
+  await ensureIdentityProfileColumns(database);
+
+  const legacyProfile = (await getLegacyUserProfile()) as any;
+  const preferredUserId =
+    typeof legacyProfile?.user_id === "string" &&
+    legacyProfile.user_id.length > 0
+      ? legacyProfile.user_id
+      : null;
+
+  const localFirstQuery = preferredUserId
+    ? `SELECT id, username, display_name, friend_code, display_name_updated_at, next_display_name_change_at, avatar_url, total_xp, current_streak, longest_streak, myths_busted, lessons_completed, created_at, updated_at
+       FROM user_profiles
+       WHERE deleted_at IS NULL
+         AND id = ?
+       LIMIT 1`
+    : `SELECT id, username, display_name, friend_code, display_name_updated_at, next_display_name_change_at, avatar_url, total_xp, current_streak, longest_streak, myths_busted, lessons_completed, created_at, updated_at
+       FROM user_profiles
+       WHERE deleted_at IS NULL
+         AND id NOT LIKE 'npc_user_%'
+       ORDER BY updated_at DESC
+       LIMIT 1`;
+  const localFirstParams = preferredUserId ? [preferredUserId] : [];
 
   const localFirstProfile = await database.getFirstAsync<{
     id: string;
     username: string;
+    display_name: string | null;
+    friend_code: string | null;
+    display_name_updated_at: number | null;
+    next_display_name_change_at: number | null;
     avatar_url: string | null;
     total_xp: number | null;
     current_streak: number | null;
@@ -305,19 +556,23 @@ export const getUserProfile = async () => {
     lessons_completed: number | null;
     created_at: number | null;
     updated_at: number | null;
-  }>(
-    `SELECT id, username, avatar_url, total_xp, current_streak, longest_streak, myths_busted, lessons_completed, created_at, updated_at
-     FROM user_profiles
-     WHERE deleted_at IS NULL
-     ORDER BY updated_at DESC
-     LIMIT 1`,
-  );
+  }>(localFirstQuery, localFirstParams);
 
   if (localFirstProfile) {
+    const displayName =
+      normalizeLocalFirstUsername(
+        localFirstProfile.display_name || localFirstProfile.username,
+      ) || "Scientist";
+
     return {
       id: localFirstProfile.id,
       user_id: localFirstProfile.id,
-      username: localFirstProfile.username,
+      username: displayName,
+      display_name: displayName,
+      friend_code: localFirstProfile.friend_code || null,
+      display_name_updated_at: localFirstProfile.display_name_updated_at,
+      next_display_name_change_at:
+        localFirstProfile.next_display_name_change_at,
       avatar_url: localFirstProfile.avatar_url || "",
       total_xp: Number(localFirstProfile.total_xp || 0),
       current_streak: Number(localFirstProfile.current_streak || 0),
@@ -329,12 +584,33 @@ export const getUserProfile = async () => {
     };
   }
 
-  return getLegacyUserProfile();
+  if (!legacyProfile) {
+    return null;
+  }
+
+  const legacyDisplayName = normalizeLocalFirstUsername(
+    legacyProfile.display_name || legacyProfile.username || "Scientist",
+  );
+
+  return {
+    ...legacyProfile,
+    username: legacyDisplayName,
+    display_name: legacyDisplayName,
+    friend_code: legacyProfile.friend_code || null,
+    display_name_updated_at: parseTimestampValue(
+      legacyProfile.display_name_updated_at,
+    ),
+    next_display_name_change_at: parseTimestampValue(
+      legacyProfile.next_display_name_change_at,
+    ),
+  };
 };
 
 export const createOrUpdateUserProfile = async (profile: {
   user_id?: string;
   username?: string;
+  display_name?: string;
+  friend_code?: string;
   avatar_url?: string;
   total_xp?: number;
   current_streak?: number;
@@ -343,7 +619,111 @@ export const createOrUpdateUserProfile = async (profile: {
   lessons_completed?: number;
 }) => {
   const database = getDatabase();
+  await ensureIdentityProfileColumns(database);
   const existing = await getLegacyUserProfile();
+
+  const currentProfile = (await getUserProfile()) as any;
+  const userId =
+    profile.user_id ||
+    (existing as any)?.user_id ||
+    currentProfile?.user_id ||
+    `user_${Date.now()}_${Math.random().toString(36).substring(2, 15)}`;
+
+  const localFirstCurrent = await database.getFirstAsync<{
+    username: string | null;
+    display_name: string | null;
+    friend_code: string | null;
+    display_name_updated_at: number | null;
+    next_display_name_change_at: number | null;
+  }>(
+    `SELECT username, display_name, friend_code, display_name_updated_at, next_display_name_change_at
+     FROM user_profiles
+     WHERE id = ?
+     LIMIT 1`,
+    [userId],
+  );
+
+  const nowTimestamp = Date.now();
+  const hasDisplayNameUpdate =
+    typeof profile.display_name === "string" ||
+    typeof profile.username === "string";
+
+  const existingDisplayName = normalizeLocalFirstUsername(
+    (localFirstCurrent?.display_name ||
+      localFirstCurrent?.username ||
+      (existing as any)?.display_name ||
+      (existing as any)?.username ||
+      currentProfile?.display_name ||
+      currentProfile?.username ||
+      "Scientist") as string,
+  );
+
+  const requestedDisplayName = hasDisplayNameUpdate
+    ? normalizeLocalFirstUsername(
+        (profile.display_name ||
+          profile.username ||
+          existingDisplayName) as string,
+      )
+    : existingDisplayName;
+
+  const displayNameChanged =
+    hasDisplayNameUpdate && requestedDisplayName !== existingDisplayName;
+  const currentNextAllowedAt = parseTimestampValue(
+    localFirstCurrent?.next_display_name_change_at ||
+      (existing as any)?.next_display_name_change_at ||
+      currentProfile?.next_display_name_change_at,
+  );
+
+  if (
+    displayNameChanged &&
+    currentNextAllowedAt !== null &&
+    nowTimestamp < currentNextAllowedAt
+  ) {
+    const cooldownError = new Error(
+      "Display name can only be changed once every 7 days",
+    ) as Error & { code?: string; nextAllowedAt?: number };
+    cooldownError.code = "DISPLAY_NAME_COOLDOWN";
+    cooldownError.nextAllowedAt = currentNextAllowedAt;
+    throw cooldownError;
+  }
+
+  const displayNameUpdatedAt = displayNameChanged
+    ? nowTimestamp
+    : parseTimestampValue(
+        localFirstCurrent?.display_name_updated_at ||
+          (existing as any)?.display_name_updated_at ||
+          currentProfile?.display_name_updated_at,
+      );
+
+  const nextDisplayNameChangeAt = displayNameChanged
+    ? nowTimestamp + DISPLAY_NAME_CHANGE_COOLDOWN_MS
+    : parseTimestampValue(
+        localFirstCurrent?.next_display_name_change_at ||
+          (existing as any)?.next_display_name_change_at ||
+          currentProfile?.next_display_name_change_at,
+      ) || 0;
+
+  const resolvedFriendCode = await resolveUniqueFriendCode(
+    database,
+    userId,
+    profile.friend_code ||
+      localFirstCurrent?.friend_code ||
+      (existing as any)?.friend_code ||
+      currentProfile?.friend_code ||
+      null,
+  );
+
+  const stableUsernameSeed =
+    localFirstCurrent?.username ||
+    (existing as any)?.username ||
+    currentProfile?.username ||
+    resolvedFriendCode;
+
+  const resolvedUsername = await resolveUniqueLocalFirstUsername(
+    database,
+    userId,
+    stableUsernameSeed,
+  );
 
   if (existing) {
     // Update
@@ -351,6 +731,10 @@ export const createOrUpdateUserProfile = async (profile: {
       `UPDATE user_profile SET 
         user_id = COALESCE(?, user_id),
         username = COALESCE(?, username),
+        display_name = COALESCE(?, display_name),
+        friend_code = COALESCE(?, friend_code),
+        display_name_updated_at = COALESCE(?, display_name_updated_at),
+        next_display_name_change_at = COALESCE(?, next_display_name_change_at),
         avatar_url = COALESCE(?, avatar_url),
         total_xp = COALESCE(?, total_xp),
         current_streak = COALESCE(?, current_streak),
@@ -360,8 +744,12 @@ export const createOrUpdateUserProfile = async (profile: {
         updated_at = CURRENT_TIMESTAMP
       WHERE id = ?`,
       [
-        profile.user_id,
-        profile.username,
+        userId,
+        hasDisplayNameUpdate ? requestedDisplayName : undefined,
+        requestedDisplayName,
+        resolvedFriendCode,
+        displayNameUpdatedAt,
+        nextDisplayNameChangeAt,
         profile.avatar_url,
         profile.total_xp,
         profile.current_streak,
@@ -373,17 +761,16 @@ export const createOrUpdateUserProfile = async (profile: {
     );
   } else {
     // Create - generate user_id if not provided
-    const currentProfile = (await getUserProfile()) as any;
-    const userId =
-      profile.user_id ||
-      currentProfile?.user_id ||
-      `user_${Date.now()}_${Math.random().toString(36).substring(2, 15)}`;
     await database.runAsync(
-      `INSERT INTO user_profile (user_id, username, avatar_url, total_xp, current_streak, longest_streak, myths_busted, lessons_completed)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO user_profile (user_id, username, display_name, friend_code, display_name_updated_at, next_display_name_change_at, avatar_url, total_xp, current_streak, longest_streak, myths_busted, lessons_completed)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         userId,
-        profile.username || "Scientist",
+        requestedDisplayName,
+        requestedDisplayName,
+        resolvedFriendCode,
+        displayNameUpdatedAt,
+        nextDisplayNameChangeAt,
         profile.avatar_url || "",
         profile.total_xp || 0,
         profile.current_streak || 0,
@@ -400,19 +787,16 @@ export const createOrUpdateUserProfile = async (profile: {
     const timestamp = Date.now();
     const createdAt = Date.parse(latestProfile.created_at || "");
     const level = Math.floor(Number(latestProfile.total_xp || 0) / 100) + 1;
-    const displayName =
-      (latestProfile.username || "Scientist").toString().trim() || "Scientist";
-    const resolvedUsername = await resolveUniqueLocalFirstUsername(
-      database,
-      latestProfile.user_id,
-      displayName,
-    );
+    const localDisplayName = requestedDisplayName;
 
     await database.runAsync(
       `INSERT INTO user_profiles (
         id,
         username,
         display_name,
+        friend_code,
+        display_name_updated_at,
+        next_display_name_change_at,
         email,
         avatar_url,
         bio,
@@ -430,10 +814,13 @@ export const createOrUpdateUserProfile = async (profile: {
         is_dirty,
         deleted_at,
         version
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       ON CONFLICT(id) DO UPDATE SET
-        username = excluded.username,
+        username = COALESCE(user_profiles.username, excluded.username),
         display_name = excluded.display_name,
+        friend_code = COALESCE(user_profiles.friend_code, excluded.friend_code),
+        display_name_updated_at = excluded.display_name_updated_at,
+        next_display_name_change_at = excluded.next_display_name_change_at,
         avatar_url = excluded.avatar_url,
         total_xp = excluded.total_xp,
         current_streak = excluded.current_streak,
@@ -447,7 +834,10 @@ export const createOrUpdateUserProfile = async (profile: {
       [
         latestProfile.user_id,
         resolvedUsername,
-        displayName,
+        localDisplayName,
+        resolvedFriendCode,
+        displayNameUpdatedAt,
+        nextDisplayNameChangeAt,
         null,
         latestProfile.avatar_url || null,
         null,

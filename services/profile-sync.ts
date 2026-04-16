@@ -1,8 +1,16 @@
-import { isSupabaseConfigured, supabase } from './supabase';
+import {
+    ensureSupabaseAuthUserId,
+    isSupabaseConfigured,
+    supabase,
+} from "./supabase";
 
 export interface UserProfileSync {
   user_id: string;
   username: string;
+  display_name?: string;
+  friend_code?: string | null;
+  display_name_updated_at?: number | null;
+  next_display_name_change_at?: number | null;
   avatar_url: string | null;
   total_xp: number | null;
   current_streak: number | null;
@@ -15,40 +23,42 @@ export interface UserProfileSync {
 }
 
 /**
- * Generate a UUID v4
- */
-const generateUUID = (): string => {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-    const r = (Math.random() * 16) | 0;
-    const v = c === 'x' ? r : (r & 0x3) | 0x8;
-    return v.toString(16);
-  });
-};
-
-/**
  * Push local profile to Supabase (upsert)
  */
-export const syncProfileToSupabase = async (profile: UserProfileSync): Promise<boolean> => {
+export const syncProfileToSupabase = async (
+  profile: UserProfileSync,
+): Promise<boolean> => {
   if (!isSupabaseConfigured()) {
-    console.log('Supabase not configured, skipping profile sync');
+    console.log("Supabase not configured, skipping profile sync");
     return false;
   }
 
   try {
-    // First, check if user exists to get their id
-    const { data: existingUser } = await supabase
-      .from('users')
-      .select('id')
-      .eq('user_id', profile.user_id)
-      .single();
+    const authUserId = await ensureSupabaseAuthUserId();
+    if (!authUserId) {
+      console.warn("Unable to initialize Supabase auth user for profile sync");
+      return false;
+    }
 
-    const id = existingUser?.id || generateUUID();
-
-    const { error } = await supabase.from('users').upsert(
+    const { error } = await supabase.from("users").upsert(
       {
-        id: id,
+        id: authUserId,
         user_id: profile.user_id,
         username: profile.username,
+        display_name: profile.display_name || profile.username,
+        friend_code: profile.friend_code || null,
+        display_name_updated_at:
+          profile.display_name_updated_at !== undefined &&
+          profile.display_name_updated_at !== null &&
+          profile.display_name_updated_at > 0
+            ? new Date(profile.display_name_updated_at).toISOString()
+            : null,
+        next_display_name_change_at:
+          profile.next_display_name_change_at !== undefined &&
+          profile.next_display_name_change_at !== null &&
+          profile.next_display_name_change_at > 0
+            ? new Date(profile.next_display_name_change_at).toISOString()
+            : null,
         avatar_url: profile.avatar_url,
         total_xp: profile.total_xp,
         current_streak: profile.current_streak,
@@ -57,13 +67,13 @@ export const syncProfileToSupabase = async (profile: UserProfileSync): Promise<b
         lessons_completed: profile.lessons_completed,
         updated_at: new Date().toISOString(),
       },
-      { onConflict: 'user_id' }
+      { onConflict: "user_id", defaultToNull: false },
     );
 
     if (error) throw error;
     return true;
   } catch (error) {
-    console.error('Error syncing profile to Supabase:', error);
+    console.error("Error syncing profile to Supabase:", error);
     return false;
   }
 };
@@ -71,23 +81,25 @@ export const syncProfileToSupabase = async (profile: UserProfileSync): Promise<b
 /**
  * Pull profile from Supabase
  */
-export const syncProfileFromSupabase = async (userId: string): Promise<UserProfileSync | null> => {
+export const syncProfileFromSupabase = async (
+  userId: string,
+): Promise<UserProfileSync | null> => {
   if (!isSupabaseConfigured()) {
-    console.log('Supabase not configured, skipping profile fetch');
+    console.log("Supabase not configured, skipping profile fetch");
     return null;
   }
 
   try {
     const { data, error } = await supabase
-      .from('users')
-      .select('*')
-      .eq('user_id', userId)
+      .from("users")
+      .select("*")
+      .eq("user_id", userId)
       .single();
 
     if (error) throw error;
     return data;
   } catch (error) {
-    console.error('Error fetching profile from Supabase:', error);
+    console.error("Error fetching profile from Supabase:", error);
     return null;
   }
 };
@@ -98,7 +110,7 @@ export const syncProfileFromSupabase = async (userId: string): Promise<UserProfi
  */
 export const mergeProfileChanges = (
   localProfile: UserProfileSync,
-  remoteProfile: UserProfileSync | null
+  remoteProfile: UserProfileSync | null,
 ): UserProfileSync => {
   if (!remoteProfile) return localProfile;
 
@@ -116,23 +128,25 @@ export const mergeProfileChanges = (
 /**
  * Get user profile by username (for adding friends)
  */
-export const getProfileByUsername = async (username: string): Promise<UserProfileSync | null> => {
+export const getProfileByUsername = async (
+  username: string,
+): Promise<UserProfileSync | null> => {
   if (!isSupabaseConfigured()) {
-    console.log('Supabase not configured, cannot fetch profile by username');
+    console.log("Supabase not configured, cannot fetch profile by username");
     return null;
   }
 
   try {
     const { data, error } = await supabase
-      .from('users')
-      .select('*')
-      .eq('username', username)
+      .from("users")
+      .select("*")
+      .eq("username", username)
       .single();
 
     if (error) throw error;
     return data;
   } catch (error) {
-    console.error('Error fetching profile by username:', error);
+    console.error("Error fetching profile by username:", error);
     return null;
   }
 };
@@ -142,22 +156,22 @@ export const getProfileByUsername = async (username: string): Promise<UserProfil
  */
 export const updateProfileField = async (
   userId: string,
-  field: keyof Omit<UserProfileSync, 'created_at' | 'updated_at' | 'synced_at'>,
-  value: any
+  field: keyof Omit<UserProfileSync, "created_at" | "updated_at" | "synced_at">,
+  value: any,
 ): Promise<boolean> => {
   if (!isSupabaseConfigured()) {
-    console.log('Supabase not configured, skipping field update');
+    console.log("Supabase not configured, skipping field update");
     return false;
   }
 
   try {
     const { error } = await supabase
-      .from('users')
+      .from("users")
       .update({
         [field]: value,
         updated_at: new Date().toISOString(),
       })
-      .eq('user_id', userId);
+      .eq("user_id", userId);
 
     if (error) throw error;
     return true;

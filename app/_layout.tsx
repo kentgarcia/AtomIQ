@@ -3,8 +3,10 @@ import {
     DefaultTheme,
     ThemeProvider as NavigationThemeProvider,
 } from "@react-navigation/native";
+import * as Linking from "expo-linking";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
+import { useEffect, useRef } from "react";
 import "react-native-reanimated";
 
 import { ThemeProvider, useColorScheme } from "@/hooks/use-color-scheme";
@@ -13,6 +15,10 @@ import { usePoppins } from "@/hooks/use-poppins";
 import { StorageProvider } from "@/services/StorageContext";
 import LocalFirstSyncBootstrap from "@/services/local-first/SyncBootstrap";
 import { LocalFirstProvider } from "@/services/local-first/hooks";
+import {
+    completeSupabaseAuthFromRedirectUrl,
+    isSupabaseConfigured,
+} from "@/services/supabase";
 
 export const unstable_settings = {
   anchor: "(tabs)",
@@ -20,6 +26,49 @@ export const unstable_settings = {
 
 function AppContent() {
   const colorScheme = useColorScheme();
+  const handledAuthUrlsRef = useRef<Set<string>>(new Set());
+
+  useEffect(() => {
+    if (!isSupabaseConfigured()) {
+      return;
+    }
+
+    let isMounted = true;
+
+    const maybeHandleAuthRedirect = async (url: string | null | undefined) => {
+      if (!url || !isMounted) {
+        return;
+      }
+
+      if (!/(?:\?|#).*(access_token|refresh_token|code|error)=/.test(url)) {
+        return;
+      }
+
+      if (handledAuthUrlsRef.current.has(url)) {
+        return;
+      }
+
+      handledAuthUrlsRef.current.add(url);
+
+      const result = await completeSupabaseAuthFromRedirectUrl(url);
+      if (result.status === "error" && result.message) {
+        console.warn("Auth callback handling failed:", result.message);
+      }
+    };
+
+    void Linking.getInitialURL().then((url) => {
+      void maybeHandleAuthRedirect(url);
+    });
+
+    const subscription = Linking.addEventListener("url", ({ url }) => {
+      void maybeHandleAuthRedirect(url);
+    });
+
+    return () => {
+      isMounted = false;
+      subscription.remove();
+    };
+  }, []);
 
   return (
     <NavigationThemeProvider

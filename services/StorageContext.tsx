@@ -21,6 +21,10 @@ interface UserProfile {
   id?: number;
   user_id: string; // Unique identifier for Supabase sync
   username: string;
+  display_name?: string;
+  friend_code?: string | null;
+  display_name_updated_at?: number | null;
+  next_display_name_change_at?: number | null;
   avatar_url: string;
   total_xp: number;
   current_streak: number;
@@ -70,6 +74,15 @@ export const StorageProvider = ({ children }: { children: ReactNode }) => {
 
     // Preserve established identities for progressed accounts.
     const isLegacyGeneratedId = profile.user_id.startsWith("user_");
+    const isNpcSeedId = profile.user_id.startsWith("npc_user_");
+    const hasNpcFriendCode =
+      typeof profile.friend_code === "string" &&
+      profile.friend_code.toUpperCase().startsWith("NPC");
+
+    if (isNpcSeedId || hasNpcFriendCode) {
+      return Boolean(authUserId);
+    }
+
     const hasProgress =
       (profile.total_xp || 0) > 0 ||
       (profile.lessons_completed || 0) > 0 ||
@@ -166,12 +179,21 @@ export const StorageProvider = ({ children }: { children: ReactNode }) => {
           }
         }
 
+        if (!activeProfile?.friend_code) {
+          await createOrUpdateUserProfile({ user_id: activeProfile.user_id });
+          const refreshedWithFriendCode = await getUserProfile();
+          if (refreshedWithFriendCode) {
+            activeProfile = refreshedWithFriendCode as UserProfile;
+          }
+        }
+
         setUserProfile(activeProfile);
       } else {
         // Create default profile with unique user_id
         const defaultProfile: UserProfile = {
           user_id: authUserId || generateLocalUserId(),
           username: "Scientist",
+          display_name: "Scientist",
           avatar_url:
             "https://images.pexels.com/photos/1181695/pexels-photo-1181695.jpeg?auto=compress&cs=tinysrgb&w=200",
           total_xp: 0,
@@ -181,7 +203,8 @@ export const StorageProvider = ({ children }: { children: ReactNode }) => {
           lessons_completed: 0,
         };
         await createOrUpdateUserProfile(defaultProfile);
-        activeProfile = defaultProfile;
+        const createdProfile = await getUserProfile();
+        activeProfile = (createdProfile as UserProfile) || defaultProfile;
         setUserProfile(activeProfile);
       }
 
@@ -247,7 +270,23 @@ export const StorageProvider = ({ children }: { children: ReactNode }) => {
 
     try {
       if (syncManager?.isEnabled()) {
-        await syncNow();
+        try {
+          await syncNow();
+        } catch (error) {
+          console.error("Sync manager failed during profile sync:", error);
+          return false;
+        }
+
+        const profileSyncStatus =
+          await syncManager.getSyncStatus("user_profiles");
+        if (profileSyncStatus?.error) {
+          console.warn(
+            "Profile sync status indicates failure:",
+            profileSyncStatus.error,
+          );
+          return false;
+        }
+
         await reloadUserProfile();
         return true;
       }
@@ -256,6 +295,11 @@ export const StorageProvider = ({ children }: { children: ReactNode }) => {
       const success = await syncProfileToSupabase({
         user_id: userProfile.user_id,
         username: userProfile.username,
+        display_name: userProfile.display_name || userProfile.username,
+        friend_code: userProfile.friend_code || null,
+        display_name_updated_at: userProfile.display_name_updated_at || null,
+        next_display_name_change_at:
+          userProfile.next_display_name_change_at || null,
         avatar_url: userProfile.avatar_url,
         total_xp: userProfile.total_xp,
         current_streak: userProfile.current_streak,
