@@ -17,8 +17,42 @@ export class ProfileRepository extends BaseRepository<UserProfile> {
    * Get the current user's profile (there should only be one local profile)
    */
   async getCurrentProfile(): Promise<UserProfile | null> {
-    const profiles = await this.findAll({ limit: 1 });
-    return profiles[0] || null;
+    const legacy = await this.db.getFirstAsync<{ user_id: string | null }>(
+      `SELECT user_id
+       FROM user_profile
+       WHERE user_id IS NOT NULL
+       ORDER BY updated_at DESC
+       LIMIT 1`,
+    );
+
+    if (legacy?.user_id) {
+      const profile = await this.findById(legacy.user_id);
+      if (profile) {
+        return profile;
+      }
+    }
+
+    const nonNpcProfiles = await this.findWhere(
+      "id NOT LIKE 'npc_user_%'",
+      [],
+      {
+        limit: 1,
+        orderBy: "updated_at",
+        orderDirection: "DESC",
+      },
+    );
+
+    if (nonNpcProfiles[0]) {
+      return nonNpcProfiles[0];
+    }
+
+    const fallbackProfiles = await this.findAll({
+      limit: 1,
+      orderBy: "updated_at",
+      orderDirection: "DESC",
+    });
+
+    return fallbackProfiles[0] || null;
   }
 
   /**

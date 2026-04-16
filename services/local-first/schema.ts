@@ -1,6 +1,6 @@
 /**
  * Local-First Database Schema
- * 
+ *
  * This file contains the SQL schema for the local-first database.
  * All tables include sync metadata for future Supabase synchronization.
  */
@@ -17,6 +17,9 @@ CREATE TABLE IF NOT EXISTS user_profiles (
   id TEXT PRIMARY KEY,
   username TEXT UNIQUE NOT NULL,
   display_name TEXT NOT NULL,
+  friend_code TEXT UNIQUE,
+  display_name_updated_at INTEGER,
+  next_display_name_change_at INTEGER,
   email TEXT,
   avatar_url TEXT,
   bio TEXT,
@@ -37,6 +40,9 @@ CREATE TABLE IF NOT EXISTS user_profiles (
 );
 
 CREATE INDEX IF NOT EXISTS idx_user_profiles_username ON user_profiles(username);
+CREATE INDEX IF NOT EXISTS idx_user_profiles_friend_code ON user_profiles(friend_code);
+CREATE INDEX IF NOT EXISTS idx_user_profiles_display_name ON user_profiles(display_name);
+CREATE INDEX IF NOT EXISTS idx_user_profiles_next_display_name_change ON user_profiles(next_display_name_change_at);
 CREATE INDEX IF NOT EXISTS idx_user_profiles_synced ON user_profiles(synced_at);
 CREATE INDEX IF NOT EXISTS idx_user_profiles_dirty ON user_profiles(is_dirty) WHERE is_dirty = 1;
 
@@ -428,19 +434,19 @@ END;
 
 // Table names for sync operations
 export const SYNCABLE_TABLES = [
-  'user_profiles',
-  'friendships',
-  'community_posts',
-  'comments',
-  'likes',
-  'poll_votes',
-  'bookmarks',
-  'bookmark_collections',
-  'notifications',
-  'user_activities',
-  'blocked_users',
-  'reports',
-  'followed_topics',
+  "user_profiles",
+  "friendships",
+  "community_posts",
+  "comments",
+  "likes",
+  "poll_votes",
+  "bookmarks",
+  "bookmark_collections",
+  "notifications",
+  "user_activities",
+  "blocked_users",
+  "reports",
+  "followed_topics",
 ] as const;
 
-export type SyncableTable = typeof SYNCABLE_TABLES[number];
+export type SyncableTable = (typeof SYNCABLE_TABLES)[number];

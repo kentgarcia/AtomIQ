@@ -4,6 +4,7 @@ import {
     FriendRequest,
     getFriendRequests,
     getFriends,
+    getSentFriendRequests,
     removeFriend,
     searchUsers,
     sendFriendRequest,
@@ -17,10 +18,11 @@ export const useFriendsSync = () => {
   const [friends, setFriends] = useState<Friend[]>([]);
   const [friendRequests, setFriendRequests] = useState<FriendRequest[]>([]);
   const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [sentRequestUserIds, setSentRequestUserIds] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
   /**
-   * Search for users by username
+   * Search for users by friend code or display name
    */
   const handleSearchUsers = useCallback(
     async (query: string) => {
@@ -30,14 +32,31 @@ export const useFriendsSync = () => {
       }
 
       if (!query.trim()) {
-        Alert.alert("Empty Search", "Please enter a username");
+        Alert.alert(
+          "Empty Search",
+          "Please enter a friend code or display name",
+        );
         return;
       }
 
       try {
         setIsLoading(true);
-        const results = await searchUsers(query, userProfile.user_id);
-        setSearchResults(results);
+        const [results, sentRequests] = await Promise.all([
+          searchUsers(query, userProfile.user_id),
+          getSentFriendRequests(userProfile.user_id),
+        ]);
+
+        const pendingTargets = new Set(
+          sentRequests.map((request) => request.to_user_id),
+        );
+
+        setSentRequestUserIds(Array.from(pendingTargets));
+        setSearchResults(
+          results.map((result) => ({
+            ...result,
+            hasPendingRequest: pendingTargets.has(result.user_id),
+          })),
+        );
       } catch (error) {
         console.error("Search error:", error);
         Alert.alert("Error", "Failed to search users");
@@ -58,6 +77,11 @@ export const useFriendsSync = () => {
         return;
       }
 
+      if (sentRequestUserIds.includes(toUserId)) {
+        Alert.alert("Already Sent", "Friend request already sent");
+        return;
+      }
+
       try {
         setIsLoading(true);
 
@@ -75,13 +99,19 @@ export const useFriendsSync = () => {
           toUserId,
           userProfile.username,
           userProfile.avatar_url,
+          userProfile.display_name || userProfile.username,
+          userProfile.friend_code || null,
         );
 
         if (success) {
           Alert.alert("Success", "Friend request sent!");
-          // Remove from search results
+          setSentRequestUserIds((prev) =>
+            prev.includes(toUserId) ? prev : [...prev, toUserId],
+          );
           setSearchResults((prev) =>
-            prev.filter((u) => u.user_id !== toUserId),
+            prev.map((u) =>
+              u.user_id === toUserId ? { ...u, hasPendingRequest: true } : u,
+            ),
           );
         } else {
           Alert.alert("Error", "Failed to send friend request");
@@ -93,7 +123,7 @@ export const useFriendsSync = () => {
         setIsLoading(false);
       }
     },
-    [userProfile, isOnline, syncProfileToSupabase],
+    [userProfile, isOnline, syncProfileToSupabase, sentRequestUserIds],
   );
 
   /**

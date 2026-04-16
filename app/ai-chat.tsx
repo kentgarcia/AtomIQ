@@ -2,12 +2,24 @@ import { MarkdownText } from "@/components/markdown-text";
 import { Icon } from "@/components/ui/icon";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import {
+    ChatConversation,
+    ChatMessage,
+    createConversation,
+    deleteConversation,
+    getAllConversations,
+    getCurrentConversationId,
+    initChatHistoryDB,
+    loadConversation,
+    saveConversation,
+    setCurrentConversationId,
+} from "@/services/chat-history";
+import {
     convertMessagesToGeminiFormat,
     sendMessageToGemini,
 } from "@/services/gemini";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
     Alert,
     Image,
@@ -96,6 +108,34 @@ interface Message {
   followUpSuggestions?: string[];
 }
 
+const createSeedMessages = (): Message[] =>
+  INITIAL_MESSAGES.map((message, index) => ({
+    ...message,
+    id: Date.now() + index,
+  }));
+
+const getConversationSuggestions = (messageHistory: Message[]): string[] => {
+  const latestBotSuggestions = [...messageHistory]
+    .reverse()
+    .find(
+      (message) =>
+        message.role === "bot" &&
+        message.followUpSuggestions &&
+        message.followUpSuggestions.length > 0,
+    );
+
+  return latestBotSuggestions?.followUpSuggestions || INITIAL_SUGGESTIONS;
+};
+
+const normalizeLoadedMessages = (messageHistory: ChatMessage[]): Message[] =>
+  messageHistory.map((message, index) => ({
+    id: typeof message.id === "number" ? message.id : Date.now() + index,
+    role: message.role,
+    text: message.text,
+    citations: message.citations || [],
+    followUpSuggestions: message.followUpSuggestions || [],
+  }));
+
 export default function AiChatScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
@@ -103,11 +143,328 @@ export default function AiChatScreen() {
   const CHAT_THEME = colorScheme === "dark" ? DarkCHAT_THEME : LightCHAT_THEME;
   const styles = React.useMemo(() => createStyles(CHAT_THEME), [CHAT_THEME]);
   const scrollViewRef = useRef<ScrollView>(null);
-  const [messages, setMessages] = useState<Message[]>(INITIAL_MESSAGES);
+  const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const skipAutosaveRef = useRef(false);
+  const [messages, setMessages] = useState<Message[]>(() =>
+    createSeedMessages(),
+  );
   const [inputText, setInputText] = useState("");
   const [isThinking, setIsThinking] = useState(false);
   const [suggestions, setSuggestions] = useState<string[]>(INITIAL_SUGGESTIONS);
   const [error, setError] = useState<string | null>(null);
+  const [conversations, setConversations] = useState<ChatConversation[]>([]);
+  const [activeConversationId, setActiveConversationId] = useState<
+    string | null
+  >(null);
+  const [isBootstrapping, setIsBootstrapping] = useState(true);
+  const [isSwitchingConversation, setIsSwitchingConversation] = useState(false);
+  const [isCreatingConversation, setIsCreatingConversation] = useState(false);
+  const [isDeletingConversation, setIsDeletingConversation] = useState(false);
+
+  const isConversationBusy =
+    isBootstrapping ||
+    isSwitchingConversation ||
+    isCreatingConversation ||
+    isDeletingConversation;
+
+  const applyConversationState = useCallback(
+    (nextMessages: Message[], conversationId: string) => {
+      skipAutosaveRef.current = true;
+      setMessages(nextMessages);
+      setSuggestions(getConversationSuggestions(nextMessages));
+      setError(null);
+      setInputText("");
+      setActiveConversationId(conversationId);
+    },
+    [],
+  );
+
+  const refreshConversationList = useCallback(async () => {
+    const nextConversations = await getAllConversations();
+    setConversations(nextConversations);
+    return nextConversations;
+  }, []);
+
+  const hydrateConversation = useCallback(
+    async (conversationId: string): Promise<boolean> => {
+      const loadedConversation = await loadConversation(conversationId);
+
+      if (!loadedConversation) {
+        return false;
+      }
+
+      let nextMessages = normalizeLoadedMessages(loadedConversation.messages);
+      if (!nextMessages.length) {
+        nextMessages = createSeedMessages();
+        await saveConversation(
+          conversationId,
+          nextMessages,
+          loadedConversation.title,
+        );
+      }
+
+      applyConversationState(nextMessages, conversationId);
+      await setCurrentConversationId(conversationId);
+
+      return true;
+    },
+    [applyConversationState],
+  );
+
+  const createAndSwitchConversation = useCallback(async (): Promise<
+    string | null
+  > => {
+    setIsCreatingConversation(true);
+
+    try {
+      const conversationId = await createConversation("New Conversation");
+      const seededMessages = createSeedMessages();
+
+      await saveConversation(conversationId, seededMessages);
+      applyConversationState(seededMessages, conversationId);
+      await setCurrentConversationId(conversationId);
+      await refreshConversationList();
+
+      return conversationId;
+    } catch (creationError) {
+      console.error("Error creating conversation:", creationError);
+      setError("Failed to create a new conversation.");
+      return null;
+    } finally {
+      setIsCreatingConversation(false);
+    }
+  }, [applyConversationState, refreshConversationList]);
+
+  const switchConversation = useCallback(
+    async (conversationId: string) => {
+      if (
+        !conversationId ||
+        conversationId === activeConversationId ||
+        isConversationBusy
+      ) {
+        return;
+      }
+
+      setIsSwitchingConversation(true);
+      try {
+        const didLoadConversation = await hydrateConversation(conversationId);
+        if (!didLoadConversation) {
+          const refreshedConversations = await refreshConversationList();
+          if (refreshedConversations.length > 0) {
+            await hydrateConversation(refreshedConversations[0].id);
+          } else {
+            await createAndSwitchConversation();
+          }
+        }
+      } catch (switchError) {
+        console.error("Error switching conversation:", switchError);
+        setError("Failed to switch conversation.");
+      } finally {
+        setIsSwitchingConversation(false);
+      }
+    },
+    [
+      activeConversationId,
+      createAndSwitchConversation,
+      hydrateConversation,
+      isConversationBusy,
+      refreshConversationList,
+    ],
+  );
+
+  const requestSwitchConversation = useCallback(
+    (conversationId: string) => {
+      if (
+        !conversationId ||
+        conversationId === activeConversationId ||
+        isConversationBusy
+      ) {
+        return;
+      }
+
+      if (inputText.trim().length > 0) {
+        Alert.alert(
+          "Discard draft?",
+          "Switching chats will discard your unsent message.",
+          [
+            { text: "Cancel", style: "cancel" },
+            {
+              text: "Switch Chat",
+              onPress: () => {
+                void switchConversation(conversationId);
+              },
+            },
+          ],
+        );
+        return;
+      }
+
+      void switchConversation(conversationId);
+    },
+    [activeConversationId, inputText, isConversationBusy, switchConversation],
+  );
+
+  const requestNewConversation = useCallback(() => {
+    if (isConversationBusy) {
+      return;
+    }
+
+    if (inputText.trim().length > 0) {
+      Alert.alert(
+        "Discard draft?",
+        "Starting a new chat will discard your unsent message.",
+        [
+          { text: "Cancel", style: "cancel" },
+          {
+            text: "New Chat",
+            onPress: () => {
+              void createAndSwitchConversation();
+            },
+          },
+        ],
+      );
+      return;
+    }
+
+    void createAndSwitchConversation();
+  }, [createAndSwitchConversation, inputText, isConversationBusy]);
+
+  const deleteConversationById = useCallback(
+    async (conversationId: string) => {
+      if (!conversationId || isConversationBusy) {
+        return;
+      }
+
+      setIsDeletingConversation(true);
+      try {
+        await deleteConversation(conversationId);
+        const refreshedConversations = await refreshConversationList();
+
+        if (conversationId === activeConversationId) {
+          if (refreshedConversations.length > 0) {
+            await hydrateConversation(refreshedConversations[0].id);
+          } else {
+            await createAndSwitchConversation();
+          }
+        }
+      } catch (deletionError) {
+        console.error("Error deleting conversation:", deletionError);
+        setError("Failed to delete conversation.");
+      } finally {
+        setIsDeletingConversation(false);
+      }
+    },
+    [
+      activeConversationId,
+      createAndSwitchConversation,
+      hydrateConversation,
+      isConversationBusy,
+      refreshConversationList,
+    ],
+  );
+
+  const requestDeleteConversation = useCallback(
+    (conversationId?: string) => {
+      const targetConversationId = conversationId || activeConversationId;
+      if (!targetConversationId || isConversationBusy) {
+        return;
+      }
+
+      const targetConversation = conversations.find(
+        (conversation) => conversation.id === targetConversationId,
+      );
+
+      Alert.alert(
+        "Delete chat?",
+        `Delete "${targetConversation?.title || "this chat"}"? This cannot be undone.`,
+        [
+          { text: "Cancel", style: "cancel" },
+          {
+            text: "Delete",
+            style: "destructive",
+            onPress: () => {
+              void deleteConversationById(targetConversationId);
+            },
+          },
+        ],
+      );
+    },
+    [
+      activeConversationId,
+      conversations,
+      deleteConversationById,
+      isConversationBusy,
+    ],
+  );
+
+  const bootstrapConversations = useCallback(async () => {
+    setIsBootstrapping(true);
+
+    try {
+      await initChatHistoryDB();
+      let availableConversations = await refreshConversationList();
+      let preferredConversationId = await getCurrentConversationId();
+
+      if (!availableConversations.length) {
+        await createAndSwitchConversation();
+        return;
+      }
+
+      if (
+        !preferredConversationId ||
+        !availableConversations.some(
+          (conversation) => conversation.id === preferredConversationId,
+        )
+      ) {
+        preferredConversationId = availableConversations[0].id;
+      }
+
+      if (preferredConversationId) {
+        const didLoadPreferredConversation = await hydrateConversation(
+          preferredConversationId,
+        );
+
+        if (!didLoadPreferredConversation) {
+          availableConversations = await refreshConversationList();
+          if (availableConversations.length > 0) {
+            await hydrateConversation(availableConversations[0].id);
+          } else {
+            await createAndSwitchConversation();
+          }
+        }
+      }
+    } catch (bootstrapError) {
+      console.error("Error bootstrapping conversations:", bootstrapError);
+      setError("Failed to load conversation history.");
+    } finally {
+      setIsBootstrapping(false);
+    }
+  }, [
+    createAndSwitchConversation,
+    hydrateConversation,
+    refreshConversationList,
+  ]);
+
+  const persistConversationNow = useCallback(
+    async (nextMessages: Message[]) => {
+      if (!activeConversationId) {
+        return;
+      }
+
+      try {
+        if (saveTimeoutRef.current) {
+          clearTimeout(saveTimeoutRef.current);
+          saveTimeoutRef.current = null;
+        }
+
+        await saveConversation(activeConversationId, nextMessages);
+        await refreshConversationList();
+      } catch (persistError) {
+        console.error("Error persisting conversation:", persistError);
+      }
+    },
+    [activeConversationId, refreshConversationList],
+  );
 
   // Thinking Animation (Spinning Atom / Dot)
   const spin = useSharedValue(0);
@@ -135,9 +492,56 @@ export default function AiChatScreen() {
     }
   }, [messages.length]);
 
-  const handleSend = async () => {
-    if (!inputText.trim() || isThinking) return;
+  useEffect(() => {
+    void bootstrapConversations();
+  }, [bootstrapConversations]);
 
+  useEffect(() => {
+    if (!activeConversationId || isBootstrapping) {
+      return;
+    }
+
+    if (skipAutosaveRef.current) {
+      skipAutosaveRef.current = false;
+      return;
+    }
+
+    if (saveTimeoutRef.current) {
+      clearTimeout(saveTimeoutRef.current);
+    }
+
+    saveTimeoutRef.current = setTimeout(async () => {
+      try {
+        await saveConversation(activeConversationId, messages);
+        await refreshConversationList();
+      } catch (autosaveError) {
+        console.error("Error autosaving conversation:", autosaveError);
+      }
+    }, 1200);
+
+    return () => {
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+        saveTimeoutRef.current = null;
+      }
+    };
+  }, [
+    activeConversationId,
+    isBootstrapping,
+    messages,
+    refreshConversationList,
+  ]);
+
+  const handleSend = async () => {
+    if (
+      !inputText.trim() ||
+      isThinking ||
+      !activeConversationId ||
+      isConversationBusy
+    )
+      return;
+
+    const existingMessages = messages;
     const userMessage = inputText.trim();
     const userMsg: Message = {
       id: Date.now(),
@@ -147,16 +551,16 @@ export default function AiChatScreen() {
       followUpSuggestions: [],
     };
 
-    setMessages((prev) => [...prev, userMsg]);
+    const messagesWithUser = [...existingMessages, userMsg];
+
+    setMessages(messagesWithUser);
     setInputText("");
     setIsThinking(true);
     setError(null);
 
     try {
-      // Convert messages to Gemini format (excluding the current user message)
-      const conversationHistory = convertMessagesToGeminiFormat(
-        messages.filter((m) => m.id !== userMsg.id),
-      );
+      const conversationHistory =
+        convertMessagesToGeminiFormat(existingMessages);
 
       // Call Gemini API
       const response = await sendMessageToGemini(
@@ -172,7 +576,10 @@ export default function AiChatScreen() {
         followUpSuggestions: response.followUpSuggestions,
       };
 
-      setMessages((prev) => [...prev, botMsg]);
+      const messagesWithBot = [...messagesWithUser, botMsg];
+
+      setMessages(messagesWithBot);
+      await persistConversationNow(messagesWithBot);
 
       // Update suggestions with follow-ups from the response
       if (
@@ -195,7 +602,10 @@ export default function AiChatScreen() {
         followUpSuggestions: [],
       };
 
-      setMessages((prev) => [...prev, errorMsg]);
+      const messagesWithError = [...messagesWithUser, errorMsg];
+
+      setMessages(messagesWithError);
+      await persistConversationNow(messagesWithError);
 
       // Show alert for API key errors
       if (errorMessage.includes("API key")) {
@@ -248,21 +658,63 @@ export default function AiChatScreen() {
             <Text style={styles.headerSubtitle}>AI Assistant • Online</Text>
           </View>
         </View>
-        <TouchableOpacity
-          onPress={() => {
-            setMessages(INITIAL_MESSAGES);
-            setSuggestions(INITIAL_SUGGESTIONS);
-            setError(null);
-          }}
-          style={styles.clearButton}
+        <View style={styles.headerActions}>
+          <TouchableOpacity
+            onPress={requestNewConversation}
+            style={styles.actionButton}
+            disabled={isConversationBusy}
+          >
+            <Icon name="Add" size={18} color={CHAT_THEME.text} variant="Bold" />
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => requestDeleteConversation()}
+            style={styles.actionButton}
+            disabled={isConversationBusy || !activeConversationId}
+          >
+            <Icon
+              name="Trash"
+              size={18}
+              color={CHAT_THEME.text}
+              variant="Bold"
+            />
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      <View style={styles.conversationStrip}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.conversationScroll}
+          keyboardShouldPersistTaps="handled"
         >
-          <Icon
-            name="Refresh"
-            size={20}
-            color={CHAT_THEME.text}
-            variant="Bold"
-          />
-        </TouchableOpacity>
+          {conversations.map((conversation) => {
+            const isActive = conversation.id === activeConversationId;
+            return (
+              <TouchableOpacity
+                key={conversation.id}
+                style={[
+                  styles.conversationChip,
+                  isActive && styles.conversationChipActive,
+                ]}
+                onPress={() => requestSwitchConversation(conversation.id)}
+                onLongPress={() => requestDeleteConversation(conversation.id)}
+                activeOpacity={0.8}
+                disabled={isConversationBusy}
+              >
+                <Text
+                  numberOfLines={1}
+                  style={[
+                    styles.conversationChipText,
+                    isActive && styles.conversationChipTextActive,
+                  ]}
+                >
+                  {conversation.title}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
+        </ScrollView>
       </View>
 
       {/* Chat Body */}
@@ -434,10 +886,19 @@ export default function AiChatScreen() {
             <TouchableOpacity
               style={[
                 styles.sendButton,
-                (!inputText.trim() || isThinking) && styles.sendButtonDisabled,
+                (!inputText.trim() ||
+                  isThinking ||
+                  isConversationBusy ||
+                  !activeConversationId) &&
+                  styles.sendButtonDisabled,
               ]}
               onPress={handleSend}
-              disabled={!inputText.trim() || isThinking}
+              disabled={
+                !inputText.trim() ||
+                isThinking ||
+                isConversationBusy ||
+                !activeConversationId
+              }
             >
               {inputText.trim() ? (
                 <LinearGradient
@@ -519,8 +980,51 @@ const createStyles = (theme: typeof LightCHAT_THEME) =>
       color: theme.textMuted,
       fontWeight: "600",
     },
-    clearButton: {
-      padding: 8,
+    headerActions: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 6,
+    },
+    actionButton: {
+      width: 34,
+      height: 34,
+      borderRadius: 17,
+      backgroundColor: theme.card,
+      borderWidth: 1,
+      borderColor: theme.border,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    conversationStrip: {
+      borderBottomWidth: 1,
+      borderBottomColor: theme.border,
+      backgroundColor: theme.bg,
+      paddingVertical: 10,
+    },
+    conversationScroll: {
+      paddingHorizontal: 20,
+      gap: 8,
+    },
+    conversationChip: {
+      maxWidth: 200,
+      paddingHorizontal: 12,
+      paddingVertical: 8,
+      borderRadius: 14,
+      borderWidth: 1,
+      borderColor: theme.border,
+      backgroundColor: theme.card,
+    },
+    conversationChipActive: {
+      backgroundColor: theme.primary + "20",
+      borderColor: theme.primary,
+    },
+    conversationChipText: {
+      fontSize: 12,
+      color: theme.textMuted,
+      fontWeight: "700",
+    },
+    conversationChipTextActive: {
+      color: theme.primary,
     },
     chatContent: {
       padding: 20,

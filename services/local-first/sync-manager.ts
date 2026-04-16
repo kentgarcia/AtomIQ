@@ -314,6 +314,7 @@ export class SyncManager {
       const errorMessage =
         error instanceof Error ? error.message : "Unknown error";
       this.emit({ type: "sync_failed", error: errorMessage, timestamp: now() });
+      throw error;
     } finally {
       this.isSyncing = false;
     }
@@ -344,8 +345,23 @@ export class SyncManager {
     await this.updateSyncStatus(tableName, { is_syncing: true });
 
     try {
+      const [currentAuthUserId, currentLocalUserId] = await Promise.all([
+        this.getCurrentAuthUserId(),
+        this.getCurrentLocalUserId(),
+      ]);
+
+      const targetLocalUserId =
+        currentLocalUserId || dirtyRecords[0]?.id || null;
+
+      if (remoteTableName === "users" && !currentAuthUserId) {
+        throw new Error("Missing Supabase auth session for users sync");
+      }
+
       const mappedRecords = dirtyRecords.map((record) =>
-        this.toRemoteRecord(tableName, record),
+        this.toRemoteRecord(tableName, record, {
+          currentAuthUserId,
+          currentLocalUserId: targetLocalUserId,
+        }),
       );
       let pushError: Error | null = null;
 
@@ -356,6 +372,7 @@ export class SyncManager {
             mappedRecords as Database["public"]["Tables"]["users"]["Insert"][],
             {
               onConflict: "user_id",
+              defaultToNull: false,
             },
           );
 
@@ -419,21 +436,50 @@ export class SyncManager {
       const remoteRecords: any[] = [];
 
       if (remoteTableName === "users") {
-        const { data, error } = await this.supabase
+        const [currentAuthUserId, currentLocalUserId] = await Promise.all([
+          this.getCurrentAuthUserId(),
+          this.getCurrentLocalUserId(),
+        ]);
+
+        if (!currentAuthUserId && !currentLocalUserId) {
+          await this.updateSyncStatus(tableName, {
+            last_synced_at: now(),
+            error: null,
+          });
+          return;
+        }
+
+        let usersQuery = this.supabase
           .from("users")
           .select(
-            "id, user_id, username, avatar_url, total_xp, current_streak, longest_streak, myths_busted, lessons_completed, created_at, updated_at",
+            "id, user_id, username, display_name, friend_code, display_name_updated_at, next_display_name_change_at, avatar_url, total_xp, current_streak, longest_streak, myths_busted, lessons_completed, created_at, updated_at, is_npc",
           )
           .gt("updated_at", lastSyncedIso);
+
+        if (
+          currentAuthUserId &&
+          currentLocalUserId &&
+          currentLocalUserId !== currentAuthUserId
+        ) {
+          usersQuery = usersQuery.or(
+            `id.eq.${currentAuthUserId},user_id.eq.${currentLocalUserId}`,
+          );
+        } else if (currentAuthUserId) {
+          usersQuery = usersQuery.eq("id", currentAuthUserId);
+        } else if (currentLocalUserId) {
+          usersQuery = usersQuery.eq("user_id", currentLocalUserId);
+        }
+
+        const { data, error } = await usersQuery;
 
         if (error) {
           throw error;
         }
 
         remoteRecords.push(
-          ...(data || []).map((record) =>
-            this.fromRemoteRecord(tableName, record),
-          ),
+          ...(data || [])
+            .filter((record) => !record.is_npc)
+            .map((record) => this.fromRemoteRecord(tableName, record)),
         );
       }
 
@@ -495,12 +541,23 @@ export class SyncManager {
   private toRemoteRecord(
     tableName: SyncableTable,
     record: any,
+    context?: {
+      currentAuthUserId: string | null;
+      currentLocalUserId: string | null;
+    },
   ): Record<string, any> {
     if (tableName === "user_profiles") {
-      return {
-        id: record.id,
+      const payload: Record<string, any> = {
         user_id: record.id,
         username: record.username,
+        display_name: record.display_name || record.username,
+        friend_code: record.friend_code || null,
+        display_name_updated_at: record.display_name_updated_at
+          ? new Date(record.display_name_updated_at).toISOString()
+          : null,
+        next_display_name_change_at: record.next_display_name_change_at
+          ? new Date(record.next_display_name_change_at).toISOString()
+          : null,
         avatar_url: record.avatar_url,
         total_xp: record.total_xp,
         current_streak: record.current_streak,
@@ -509,9 +566,74 @@ export class SyncManager {
         lessons_completed: record.lessons_completed,
         updated_at: new Date(record.updated_at || now()).toISOString(),
       };
+
+      // Bind only the active local profile to the current auth user.
+      if (
+        context?.currentAuthUserId &&
+        context.currentLocalUserId &&
+        record.id === context.currentLocalUserId
+      ) {
+        payload.id = context.currentAuthUserId;
+      }
+
+      return payload;
     }
 
     return record;
+  }
+
+  private async getCurrentAuthUserId(): Promise<string | null> {
+    if (!this.supabase) {
+      return null;
+    }
+
+    try {
+      const {
+        data: { session },
+      } = await this.supabase.auth.getSession();
+
+      return session?.user?.id ?? null;
+    } catch (error) {
+      console.warn(
+        "[Sync] Unable to read auth user id for sync mapping:",
+        error,
+      );
+      return null;
+    }
+  }
+
+  private async getCurrentLocalUserId(): Promise<string | null> {
+    try {
+      const legacy = await this.db.getFirstAsync<{ user_id: string | null }>(
+        `SELECT user_id
+         FROM user_profile
+         WHERE user_id IS NOT NULL
+         ORDER BY updated_at DESC
+         LIMIT 1`,
+      );
+
+      if (legacy?.user_id) {
+        return legacy.user_id;
+      }
+    } catch {
+      // Ignore legacy table lookup failures and fallback to local-first table.
+    }
+
+    try {
+      const localFirst = await this.db.getFirstAsync<{ id: string | null }>(
+        `SELECT id
+         FROM user_profiles
+         WHERE deleted_at IS NULL
+           AND id NOT LIKE 'npc_user_%'
+         ORDER BY updated_at DESC
+         LIMIT 1`,
+      );
+
+      return localFirst?.id || null;
+    } catch (error) {
+      console.warn("[Sync] Unable to resolve current local user id:", error);
+      return null;
+    }
   }
 
   private fromRemoteRecord(
@@ -520,11 +642,24 @@ export class SyncManager {
   ): Record<string, any> {
     if (tableName === "user_profiles") {
       const totalXP = Number(record.total_xp || 0);
+      const displayName = record.display_name || record.username || "Scientist";
+      const fallbackFriendCode =
+        typeof record.username === "string" &&
+        /^[A-Z0-9]{6}$/.test(record.username)
+          ? record.username
+          : null;
 
       return {
         id: record.user_id || record.id,
         username: record.username || "scientist",
-        display_name: record.username || "Scientist",
+        display_name: displayName,
+        friend_code: record.friend_code || fallbackFriendCode,
+        display_name_updated_at: record.display_name_updated_at
+          ? this.toTimestamp(record.display_name_updated_at)
+          : null,
+        next_display_name_change_at: record.next_display_name_change_at
+          ? this.toTimestamp(record.next_display_name_change_at)
+          : 0,
         email: null,
         avatar_url: record.avatar_url || null,
         bio: null,

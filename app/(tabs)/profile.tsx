@@ -57,7 +57,6 @@ export default function ProfileScreen() {
   const {
     userProfile,
     isOnline,
-    syncProfileToSupabase,
     isSyncing: isBackgroundSyncing,
     pendingChanges,
     lastSyncedAt,
@@ -80,7 +79,6 @@ export default function ProfileScreen() {
   const [searchModalVisible, setSearchModalVisible] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("overview");
-  const [isManualSyncing, setIsManualSyncing] = useState(false);
 
   // Load data per tab when online
   useEffect(() => {
@@ -175,43 +173,12 @@ export default function ProfileScreen() {
     await handleSendFriendRequest(userId);
   };
 
-  const handleSyncProfile = async () => {
-    if (!isOnline) {
-      Alert.alert("Offline", "You need to be online to sync your profile");
-      return;
-    }
-
-    if (!userProfile) {
-      Alert.alert("Error", "User profile not found");
-      return;
-    }
-
-    try {
-      setIsManualSyncing(true);
-      const success = await syncProfileToSupabase();
-
-      if (success) {
-        Alert.alert(
-          "Success",
-          "Profile sync started. Local-first changes will upload in the background.",
-        );
-      } else {
-        Alert.alert("Error", "Failed to sync profile");
-      }
-    } catch (error) {
-      console.error("Sync error:", error);
-      Alert.alert("Error", "An error occurred while syncing");
-    } finally {
-      setIsManualSyncing(false);
-    }
-  };
-
   const syncStatusText = useMemo(() => {
     if (!isOnline) {
       return "Offline mode";
     }
 
-    if (isManualSyncing || isBackgroundSyncing) {
+    if (isBackgroundSyncing) {
       return "Syncing changes...";
     }
 
@@ -224,13 +191,7 @@ export default function ProfileScreen() {
     }
 
     return "Online";
-  }, [
-    isOnline,
-    isManualSyncing,
-    isBackgroundSyncing,
-    pendingChanges,
-    lastSyncedAt,
-  ]);
+  }, [isOnline, isBackgroundSyncing, pendingChanges, lastSyncedAt]);
 
   if (!userProfile) {
     return (
@@ -257,21 +218,6 @@ export default function ProfileScreen() {
         <View style={styles.header}>
           <View style={styles.headerTopRow}>
             <TouchableOpacity
-              style={[styles.iconButton, !isOnline && { opacity: 0.5 }]}
-              onPress={handleSyncProfile}
-              disabled={isManualSyncing || !isOnline}
-            >
-              <Icon
-                name="Refresh"
-                size={24}
-                color={
-                  isManualSyncing || isBackgroundSyncing
-                    ? THEME.primary
-                    : THEME.text
-                }
-              />
-            </TouchableOpacity>
-            <TouchableOpacity
               style={styles.iconButton}
               onPress={() => router.push("/settings")}
             >
@@ -290,7 +236,14 @@ export default function ProfileScreen() {
                 <Text style={styles.levelText}>{userLevel}</Text>
               </View>
             </View>
-            <Text style={styles.name}>{userProfile.username}</Text>
+            <Text style={styles.name}>
+              {userProfile.display_name || userProfile.username}
+            </Text>
+            {userProfile.friend_code ? (
+              <Text style={styles.friendCode}>
+                Friend Code: {userProfile.friend_code}
+              </Text>
+            ) : null}
             <Text style={styles.title}>{userTitle}</Text>
             <Text style={styles.syncStatus}>{syncStatusText}</Text>
           </View>
@@ -500,10 +453,12 @@ export default function ProfileScreen() {
                         </View>
                         <View style={styles.friendInfo}>
                           <Text style={styles.friendName}>
-                            {request.from_username}
+                            {request.from_display_name || request.from_username}
                           </Text>
                           <Text style={styles.friendStats}>
-                            Wants to be friends
+                            {request.from_friend_code
+                              ? `Code: ${request.from_friend_code} • Wants to be friends`
+                              : "Wants to be friends"}
                           </Text>
                         </View>
                       </View>
@@ -514,7 +469,8 @@ export default function ProfileScreen() {
                             handleAcceptFriendRequest(
                               request.id,
                               request.from_user_id,
-                              request.from_username,
+                              request.from_display_name ||
+                                request.from_username,
                               request.from_avatar_url,
                               0,
                               0,
@@ -586,7 +542,7 @@ export default function ProfileScreen() {
               <Icon name="SearchNormal" size={20} color={THEME.textMuted} />
               <TextInput
                 style={styles.modalSearchInput}
-                placeholder="Enter username..."
+                placeholder="Enter friend code or display name..."
                 placeholderTextColor={THEME.textMuted}
                 value={searchQuery}
                 onChangeText={setSearchQuery}
@@ -624,7 +580,7 @@ export default function ProfileScreen() {
                   <Text style={styles.modalEmptyText}>
                     {searchQuery
                       ? "No users found"
-                      : "Search for friends by username"}
+                      : "Search for friends by friend code or display name"}
                   </Text>
                 </View>
               ) : (
@@ -651,22 +607,40 @@ export default function ProfileScreen() {
                     <View style={styles.searchResultInfo}>
                       <View style={styles.usernameBadgeRow}>
                         <Text style={styles.searchResultName}>
-                          {user.username}
+                          {user.display_name || user.username}
                         </Text>
                         {user.is_npc && (
                           <Text style={styles.npcLabel}>NPC</Text>
                         )}
                       </View>
                       <Text style={styles.searchResultStats}>
+                        {user.friend_code ? `Code: ${user.friend_code} • ` : ""}
                         {user.total_xp} XP • Streak: {user.current_streak}
                       </Text>
                     </View>
-                    <TouchableOpacity
-                      style={styles.addButton}
-                      onPress={() => handleAddFriend(user.user_id)}
-                    >
-                      <Icon name="Add" size={18} color="#FFF" variant="Bold" />
-                    </TouchableOpacity>
+                    {user.hasPendingRequest ? (
+                      <View style={styles.sentButton}>
+                        <Icon
+                          name="TickCircle"
+                          size={16}
+                          color={THEME.primary}
+                          variant="Bold"
+                        />
+                        <Text style={styles.sentButtonText}>Sent</Text>
+                      </View>
+                    ) : (
+                      <TouchableOpacity
+                        style={styles.addButton}
+                        onPress={() => handleAddFriend(user.user_id)}
+                      >
+                        <Icon
+                          name="Add"
+                          size={18}
+                          color="#FFF"
+                          variant="Bold"
+                        />
+                      </TouchableOpacity>
+                    )}
                   </View>
                 ))
               )}
@@ -749,6 +723,14 @@ const createStyles = (theme: typeof LightTHEME) =>
       fontWeight: "800",
       color: theme.text,
       marginBottom: 4,
+    },
+    friendCode: {
+      fontSize: 12,
+      fontWeight: "700",
+      color: theme.primary,
+      marginBottom: 4,
+      textTransform: "uppercase",
+      letterSpacing: 0.5,
     },
     title: {
       fontSize: 14,
@@ -1040,6 +1022,24 @@ const createStyles = (theme: typeof LightTHEME) =>
       borderRadius: 18,
       alignItems: "center",
       justifyContent: "center",
+    },
+    sentButton: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 4,
+      minWidth: 64,
+      height: 36,
+      borderRadius: 18,
+      borderWidth: 1,
+      borderColor: theme.primary,
+      backgroundColor: "rgba(94,114,228,0.1)",
+      paddingHorizontal: 10,
+    },
+    sentButtonText: {
+      fontSize: 12,
+      fontWeight: "700",
+      color: theme.primary,
     },
 
     // Stats detail view

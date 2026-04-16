@@ -1,3 +1,4 @@
+import { MarkdownText } from "@/components/markdown-text";
 import { Icon } from "@/components/ui/icon";
 import { getAllMyths } from "@/content/myths";
 import { useColorScheme } from "@/hooks/use-color-scheme";
@@ -1233,14 +1234,11 @@ export default function MythBusterScreen() {
                                     color={selectedMode.color}
                                     variant="Bold"
                                   />
-                                  <Text
-                                    style={[
-                                      styles.resultsCardExplanationText,
-                                      { color: textColor },
-                                    ]}
-                                  >
-                                    {myth.explanation}
-                                  </Text>
+                                  <MarkdownText
+                                    text={myth.explanation}
+                                    style={styles.resultsCardExplanationText}
+                                    textColor={textColor}
+                                  />
                                 </View>
                               </View>
                             )}
