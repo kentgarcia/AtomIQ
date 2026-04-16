@@ -9,7 +9,7 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "lint": "expo lint",
-    "eas:preview:android": "eas build --platform android --profile preview"
+    "eas:preview:android": "npx eas-cli build --platform android --profile preview"
   },
   "dependencies": {
     "@expo-google-fonts/poppins": "^0.4.1",

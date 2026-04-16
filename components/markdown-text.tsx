@@ -1,6 +1,6 @@
-import React from 'react';
-import { Text, StyleSheet, View, TouchableOpacity, Linking } from 'react-native';
-import { Icon } from './ui/icon';
+import { openExternalUrl } from "@/services/open-url";
+import React from "react";
+import { StyleSheet, Text, View } from "react-native";
 
 interface MarkdownTextProps {
   text: string;
@@ -12,11 +12,15 @@ interface MarkdownTextProps {
  * Simple markdown renderer for React Native
  * Supports: bold, italic, code, links, lists, headers, line breaks
  */
-export function MarkdownText({ text, style, textColor = '#2D3436' }: MarkdownTextProps) {
+export function MarkdownText({
+  text,
+  style,
+  textColor = "#2D3436",
+}: MarkdownTextProps) {
   if (!text) return null;
 
   // Process text line by line to handle lists and headers better
-  const lines = text.split('\n');
+  const lines = text.split("\n");
   const elements: React.ReactNode[] = [];
   const processedLines = new Set<number>();
 
@@ -25,35 +29,38 @@ export function MarkdownText({ text, style, textColor = '#2D3436' }: MarkdownTex
 
     const line = lines[lineIndex];
     const processedLine = line.trim();
-    
+
     // Skip empty lines (but preserve spacing)
     if (!processedLine) {
       if (lineIndex < lines.length - 1) {
-        elements.push(<Text key={`br-${lineIndex}`}>{'\n'}</Text>);
+        elements.push(<Text key={`br-${lineIndex}`}>{"\n"}</Text>);
       }
       continue;
     }
 
     // Code blocks
-    if (processedLine.startsWith('```')) {
+    if (processedLine.startsWith("```")) {
       // Find closing ```
-      let codeContent = '';
+      let codeContent = "";
       let codeEnd = lineIndex;
       for (let i = lineIndex + 1; i < lines.length; i++) {
-        if (lines[i].trim().startsWith('```')) {
+        if (lines[i].trim().startsWith("```")) {
           codeEnd = i;
           break;
         }
-        codeContent += (codeContent ? '\n' : '') + lines[i];
+        codeContent += (codeContent ? "\n" : "") + lines[i];
       }
-      
+
       if (codeContent) {
         elements.push(
-          <View key={`codeblock-${lineIndex}`} style={styles.codeBlockContainer}>
+          <View
+            key={`codeblock-${lineIndex}`}
+            style={styles.codeBlockContainer}
+          >
             <Text style={[styles.codeBlock, { color: textColor }]}>
               {codeContent}
             </Text>
-          </View>
+          </View>,
         );
         // Mark all lines in code block as processed
         for (let i = lineIndex; i <= codeEnd; i++) {
@@ -64,41 +71,44 @@ export function MarkdownText({ text, style, textColor = '#2D3436' }: MarkdownTex
     }
 
     // Headers
-    if (processedLine.startsWith('### ')) {
+    if (processedLine.startsWith("### ")) {
       elements.push(
         <Text key={`h3-${lineIndex}`} style={[styles.h3, { color: textColor }]}>
           {processInlineMarkdown(processedLine.substring(4), textColor)}
-          {'\n'}
-        </Text>
+          {"\n"}
+        </Text>,
       );
       continue;
     }
-    if (processedLine.startsWith('## ')) {
+    if (processedLine.startsWith("## ")) {
       elements.push(
         <Text key={`h2-${lineIndex}`} style={[styles.h2, { color: textColor }]}>
           {processInlineMarkdown(processedLine.substring(3), textColor)}
-          {'\n'}
-        </Text>
+          {"\n"}
+        </Text>,
       );
       continue;
     }
-    if (processedLine.startsWith('# ')) {
+    if (processedLine.startsWith("# ")) {
       elements.push(
         <Text key={`h1-${lineIndex}`} style={[styles.h1, { color: textColor }]}>
           {processInlineMarkdown(processedLine.substring(2), textColor)}
-          {'\n'}
-        </Text>
+          {"\n"}
+        </Text>,
       );
       continue;
     }
 
     // Bullet lists
-    if (processedLine.startsWith('- ') || processedLine.startsWith('* ')) {
+    if (processedLine.startsWith("- ") || processedLine.startsWith("* ")) {
       elements.push(
-        <Text key={`bullet-${lineIndex}`} style={[styles.text, { color: textColor }]}>
-          {'\n• '}
+        <Text
+          key={`bullet-${lineIndex}`}
+          style={[styles.text, { color: textColor }]}
+        >
+          {"\n• "}
           {processInlineMarkdown(processedLine.substring(2), textColor)}
-        </Text>
+        </Text>,
       );
       continue;
     }
@@ -107,10 +117,14 @@ export function MarkdownText({ text, style, textColor = '#2D3436' }: MarkdownTex
     const numberedMatch = processedLine.match(/^(\d+)\.\s+(.+)$/);
     if (numberedMatch) {
       elements.push(
-        <Text key={`numbered-${lineIndex}`} style={[styles.text, { color: textColor }]}>
-          {'\n'}
-          {numberedMatch[1]}. {processInlineMarkdown(numberedMatch[2], textColor)}
-        </Text>
+        <Text
+          key={`numbered-${lineIndex}`}
+          style={[styles.text, { color: textColor }]}
+        >
+          {"\n"}
+          {numberedMatch[1]}.{" "}
+          {processInlineMarkdown(numberedMatch[2], textColor)}
+        </Text>,
       );
       continue;
     }
@@ -118,25 +132,27 @@ export function MarkdownText({ text, style, textColor = '#2D3436' }: MarkdownTex
     // Regular text with inline markdown
     if (processedLine) {
       elements.push(
-        <Text key={`text-${lineIndex}`} style={[styles.text, { color: textColor }]}>
+        <Text
+          key={`text-${lineIndex}`}
+          style={[styles.text, { color: textColor }]}
+        >
           {processInlineMarkdown(processedLine, textColor)}
-          {lineIndex < lines.length - 1 ? '\n' : ''}
-        </Text>
+          {lineIndex < lines.length - 1 ? "\n" : ""}
+        </Text>,
       );
     }
   }
 
-  return (
-    <Text style={style}>
-      {elements}
-    </Text>
-  );
+  return <Text style={style}>{elements}</Text>;
 }
 
 /**
  * Process inline markdown (bold, italic, code, links)
  */
-function processInlineMarkdown(text: string, textColor: string): React.ReactNode[] {
+function processInlineMarkdown(
+  text: string,
+  textColor: string,
+): React.ReactNode[] {
   if (!text) return [];
 
   const elements: React.ReactNode[] = [];
@@ -144,7 +160,13 @@ function processInlineMarkdown(text: string, textColor: string): React.ReactNode
   let currentIndex = 0;
 
   // Find all markdown patterns
-  const patterns: Array<{ start: number; end: number; type: string; content: string; url?: string }> = [];
+  const patterns: Array<{
+    start: number;
+    end: number;
+    type: string;
+    content: string;
+    url?: string;
+  }> = [];
 
   // Code blocks (backticks)
   const codeRegex = /`([^`]+)`/g;
@@ -153,7 +175,7 @@ function processInlineMarkdown(text: string, textColor: string): React.ReactNode
     patterns.push({
       start: match.index,
       end: match.index + match[0].length,
-      type: 'code',
+      type: "code",
       content: match[1],
     });
   }
@@ -164,7 +186,7 @@ function processInlineMarkdown(text: string, textColor: string): React.ReactNode
     patterns.push({
       start: match.index,
       end: match.index + match[0].length,
-      type: 'link',
+      type: "link",
       content: match[1],
       url: match[2],
     });
@@ -176,7 +198,7 @@ function processInlineMarkdown(text: string, textColor: string): React.ReactNode
     patterns.push({
       start: match.index,
       end: match.index + match[0].length,
-      type: 'bold',
+      type: "bold",
       content: match[1],
     });
   }
@@ -187,7 +209,7 @@ function processInlineMarkdown(text: string, textColor: string): React.ReactNode
     patterns.push({
       start: match.index,
       end: match.index + match[0].length,
-      type: 'italic',
+      type: "italic",
       content: match[1],
     });
   }
@@ -204,47 +226,53 @@ function processInlineMarkdown(text: string, textColor: string): React.ReactNode
         elements.push(
           <Text key={`text-${keyCounter++}`} style={{ color: textColor }}>
             {beforeText}
-          </Text>
+          </Text>,
         );
       }
     }
 
     // Add pattern element
     switch (pattern.type) {
-      case 'code':
+      case "code":
         elements.push(
           <Text key={`code-${keyCounter++}`} style={styles.code}>
             {pattern.content}
-          </Text>
+          </Text>,
         );
         break;
-      case 'link':
+      case "link":
         elements.push(
           <Text
             key={`link-${keyCounter++}`}
-            style={[styles.link, { color: '#EA580C' }]}
+            style={[styles.link, { color: "#EA580C" }]}
             onPress={() => {
               if (pattern.url) {
-                Linking.openURL(pattern.url).catch(console.error);
+                void openExternalUrl(pattern.url);
               }
             }}
           >
             {pattern.content}
-          </Text>
+          </Text>,
         );
         break;
-      case 'bold':
+      case "bold":
         elements.push(
-          <Text key={`bold-${keyCounter++}`} style={[styles.bold, { color: textColor }]}>
+          <Text
+            key={`bold-${keyCounter++}`}
+            style={[styles.bold, { color: textColor }]}
+          >
             {pattern.content}
-          </Text>
+          </Text>,
         );
         break;
-      case 'italic':
+      case "italic":
         elements.push(
-          <Text key={`italic-${keyCounter++}`} style={[styles.italic, { color: textColor }]}>
+          <Text
+            key={`italic-${keyCounter++}`}
+            style={[styles.italic, { color: textColor }]}
+          >
             {pattern.content}
-          </Text>
+          </Text>,
         );
         break;
     }
@@ -259,12 +287,18 @@ function processInlineMarkdown(text: string, textColor: string): React.ReactNode
       elements.push(
         <Text key={`text-${keyCounter++}`} style={{ color: textColor }}>
           {remainingText}
-        </Text>
+        </Text>,
       );
     }
   }
 
-  return elements.length > 0 ? elements : [<Text key="default" style={{ color: textColor }}>{text}</Text>];
+  return elements.length > 0
+    ? elements
+    : [
+        <Text key="default" style={{ color: textColor }}>
+          {text}
+        </Text>,
+      ];
 }
 
 const styles = StyleSheet.create({
@@ -273,57 +307,56 @@ const styles = StyleSheet.create({
     lineHeight: 22,
   },
   bold: {
-    fontWeight: '800',
+    fontWeight: "800",
   },
   italic: {
-    fontStyle: 'italic',
+    fontStyle: "italic",
   },
   code: {
-    fontFamily: 'monospace',
-    backgroundColor: 'rgba(0, 0, 0, 0.05)',
+    fontFamily: "monospace",
+    backgroundColor: "rgba(0, 0, 0, 0.05)",
     paddingHorizontal: 4,
     paddingVertical: 2,
     borderRadius: 4,
     fontSize: 14,
   },
   codeBlockContainer: {
-    backgroundColor: 'rgba(0, 0, 0, 0.05)',
+    backgroundColor: "rgba(0, 0, 0, 0.05)",
     borderRadius: 8,
     padding: 12,
     marginVertical: 8,
     borderLeftWidth: 3,
-    borderLeftColor: '#EA580C',
+    borderLeftColor: "#EA580C",
   },
   codeBlock: {
-    fontFamily: 'monospace',
+    fontFamily: "monospace",
     fontSize: 13,
     lineHeight: 18,
   },
   link: {
-    color: '#EA580C',
-    textDecorationLine: 'underline',
-    fontWeight: '600',
+    color: "#EA580C",
+    textDecorationLine: "underline",
+    fontWeight: "600",
   },
   h1: {
     fontSize: 24,
-    fontWeight: '800',
+    fontWeight: "800",
     marginTop: 16,
     marginBottom: 8,
     lineHeight: 32,
   },
   h2: {
     fontSize: 20,
-    fontWeight: '800',
+    fontWeight: "800",
     marginTop: 12,
     marginBottom: 6,
     lineHeight: 28,
   },
   h3: {
     fontSize: 18,
-    fontWeight: '700',
+    fontWeight: "700",
     marginTop: 10,
     marginBottom: 4,
     lineHeight: 24,
   },
 });
-
