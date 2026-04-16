@@ -1,42 +1,42 @@
-import { MarkdownText } from '@/components/markdown-text';
-import { Icon } from '@/components/ui/icon';
-import { getArticleById } from '@/content/articles';
-import { useColorScheme } from '@/hooks/use-color-scheme';
-import { useLocalSearchParams, useRouter } from 'expo-router';
-import React from 'react';
+import { MarkdownText } from "@/components/markdown-text";
+import { Icon } from "@/components/ui/icon";
+import { getArticleById } from "@/content/articles";
+import { useColorScheme } from "@/hooks/use-color-scheme";
+import { openExternalUrl } from "@/services/open-url";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import React from "react";
 import {
-  Dimensions,
-  Image,
-  Linking,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View
-} from 'react-native';
-import Animated, { FadeInDown } from 'react-native-reanimated';
-import { SafeAreaView } from 'react-native-safe-area-context';
+    Dimensions,
+    Image,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
+} from "react-native";
+import Animated, { FadeInDown } from "react-native-reanimated";
+import { SafeAreaView } from "react-native-safe-area-context";
 
-const { width } = Dimensions.get('window');
+const { width } = Dimensions.get("window");
 
 const LightTHEME = {
-  bg: '#F7F7F7',
-  card: '#FFFFFF',
-  text: '#1F2937',
-  textMuted: '#9CA3AF',
-  primary: '#EA580C',
-  primaryDark: '#C2410C',
-  border: '#E5E7EB',
+  bg: "#F7F7F7",
+  card: "#FFFFFF",
+  text: "#1F2937",
+  textMuted: "#9CA3AF",
+  primary: "#EA580C",
+  primaryDark: "#C2410C",
+  border: "#E5E7EB",
 };
 
 const DarkTHEME = {
-  bg: '#172B4D',
-  card: '#213356',
-  text: '#F6F9FC',
-  textMuted: '#8898AA',
-  primary: '#EA580C',
-  primaryDark: '#C2410C',
-  border: '#2D3A56',
+  bg: "#172B4D",
+  card: "#213356",
+  text: "#F6F9FC",
+  textMuted: "#8898AA",
+  primary: "#EA580C",
+  primaryDark: "#C2410C",
+  border: "#2D3A56",
 };
 
 let THEME = LightTHEME;
@@ -45,19 +45,19 @@ export default function ArticleDetailScreen() {
   const { id } = useLocalSearchParams();
   const router = useRouter();
   const colorScheme = useColorScheme();
-  const THEME = colorScheme === 'dark' ? DarkTHEME : LightTHEME;
+  const THEME = colorScheme === "dark" ? DarkTHEME : LightTHEME;
   const styles = React.useMemo(() => createStyles(THEME), [THEME]);
-  const articleId = typeof id === 'string' ? id.replace('article-', '') : '';
-  
+  const articleId = typeof id === "string" ? id.replace("article-", "") : "";
+
   const article = getArticleById(articleId);
-  
+
   if (!article) {
     return (
       <SafeAreaView style={[styles.container, { backgroundColor: THEME.bg }]}>
         <View style={styles.errorContainer}>
           <Icon name="Danger" size={64} color={THEME.primary} />
           <Text style={styles.errorText}>Article not found</Text>
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.backButton}
             onPress={() => router.back()}
           >
@@ -67,29 +67,25 @@ export default function ArticleDetailScreen() {
       </SafeAreaView>
     );
   }
-  
+
   const handleOpenSource = async () => {
     if (article.sourceUrl) {
-      try {
-        await Linking.openURL(article.sourceUrl);
-      } catch (error) {
-        console.error('Error opening URL:', error);
-      }
+      await openExternalUrl(article.sourceUrl);
     }
   };
-  
+
   return (
     <SafeAreaView style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.backButton}
           onPress={() => router.back()}
         >
           <Icon name="ArrowLeft" size={24} color={THEME.text} />
         </TouchableOpacity>
         {article.sourceUrl && (
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.externalLinkButton}
             onPress={handleOpenSource}
           >
@@ -98,8 +94,8 @@ export default function ArticleDetailScreen() {
           </TouchableOpacity>
         )}
       </View>
-      
-      <ScrollView 
+
+      <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
@@ -107,35 +103,40 @@ export default function ArticleDetailScreen() {
         {/* Hero Image */}
         {article.image && (
           <Animated.View entering={FadeInDown.delay(100)}>
-            <Image 
-              source={{ uri: article.image }} 
+            <Image
+              source={{ uri: article.image }}
               style={styles.heroImage}
               resizeMode="cover"
             />
           </Animated.View>
         )}
-        
+
         {/* Article Header */}
-        <Animated.View entering={FadeInDown.delay(200)} style={styles.articleHeader}>
+        <Animated.View
+          entering={FadeInDown.delay(200)}
+          style={styles.articleHeader}
+        >
           {/* Category Badge */}
           <View style={styles.categoryBadge}>
-            <Text style={styles.categoryText}>{article.category.toUpperCase()}</Text>
+            <Text style={styles.categoryText}>
+              {article.category.toUpperCase()}
+            </Text>
           </View>
-          
+
           {/* Title */}
           <Text style={styles.title}>{article.title}</Text>
-          
+
           {/* Subtitle */}
           {article.subtitle && (
             <Text style={styles.subtitle}>{article.subtitle}</Text>
           )}
-          
+
           {/* Author Info */}
           <View style={styles.authorSection}>
             <View style={styles.authorAvatar}>
               {article.author.avatar ? (
-                <Image 
-                  source={{ uri: article.author.avatar }} 
+                <Image
+                  source={{ uri: article.author.avatar }}
                   style={styles.avatarImage}
                 />
               ) : (
@@ -152,7 +153,9 @@ export default function ArticleDetailScreen() {
               {article.readTime && (
                 <View style={styles.metaItem}>
                   <Icon name="Clock" size={14} color={THEME.textMuted} />
-                  <Text style={styles.metaText}>{article.readTime} min read</Text>
+                  <Text style={styles.metaText}>
+                    {article.readTime} min read
+                  </Text>
                 </View>
               )}
               {article.difficulty && (
@@ -163,28 +166,32 @@ export default function ArticleDetailScreen() {
               )}
             </View>
           </View>
-          
+
           {/* Published Date */}
           <Text style={styles.publishedDate}>
-            Published {new Date(article.publishedDate).toLocaleDateString('en-US', {
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric'
+            Published{" "}
+            {new Date(article.publishedDate).toLocaleDateString("en-US", {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
             })}
           </Text>
         </Animated.View>
-        
+
         {/* Article Content */}
-        <Animated.View entering={FadeInDown.delay(300)} style={styles.contentContainer}>
-          <MarkdownText 
-            text={article.content} 
-            textColor={THEME.text}
-          />
+        <Animated.View
+          entering={FadeInDown.delay(300)}
+          style={styles.contentContainer}
+        >
+          <MarkdownText text={article.content} textColor={THEME.text} />
         </Animated.View>
-        
+
         {/* Tags */}
         {article.tags && article.tags.length > 0 && (
-          <Animated.View entering={FadeInDown.delay(400)} style={styles.tagsSection}>
+          <Animated.View
+            entering={FadeInDown.delay(400)}
+            style={styles.tagsSection}
+          >
             <Text style={styles.tagsTitle}>Tags</Text>
             <View style={styles.tagsRow}>
               {article.tags.map((tag) => (
@@ -195,17 +202,20 @@ export default function ArticleDetailScreen() {
             </View>
           </Animated.View>
         )}
-        
+
         {/* Source */}
         {article.source && (
-          <Animated.View entering={FadeInDown.delay(500)} style={styles.sourceSection}>
+          <Animated.View
+            entering={FadeInDown.delay(500)}
+            style={styles.sourceSection}
+          >
             <View style={styles.sourceHeader}>
               <Icon name="Link" size={16} color={THEME.primary} />
               <Text style={styles.sourceTitle}>Source</Text>
             </View>
             <Text style={styles.sourceText}>{article.source}</Text>
             {article.sourceUrl && (
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={styles.sourceLinkButton}
                 onPress={handleOpenSource}
               >
@@ -215,7 +225,7 @@ export default function ArticleDetailScreen() {
             )}
           </Animated.View>
         )}
-        
+
         {/* Bottom Spacing */}
         <View style={styles.bottomSpacing} />
       </ScrollView>
@@ -223,218 +233,218 @@ export default function ArticleDetailScreen() {
   );
 }
 
-const createStyles = (theme: typeof LightTHEME) => StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#FFFFFF',
-  },
-  errorContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-  },
-  errorText: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: theme.text,
-    marginTop: 16,
-    marginBottom: 24,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: theme.border,
-  },
-  backButton: {
-    padding: 8,
-  },
-  backButtonText: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: theme.primary,
-  },
-  externalLinkButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    backgroundColor: theme.bg,
-    borderRadius: 8,
-  },
-  externalLinkText: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: theme.primary,
-  },
-  scrollView: {
-    flex: 1,
-  },
-  scrollContent: {
-    paddingBottom: 40,
-  },
-  heroImage: {
-    width: width,
-    height: 250,
-    backgroundColor: theme.bg,
-  },
-  articleHeader: {
-    padding: 20,
-  },
-  categoryBadge: {
-    alignSelf: 'flex-start',
-    backgroundColor: theme.primary + '15',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 8,
-    marginBottom: 12,
-  },
-  categoryText: {
-    fontSize: 11,
-    fontWeight: '800',
-    color: theme.primary,
-    letterSpacing: 0.5,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: '800',
-    color: theme.text,
-    lineHeight: 36,
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: theme.textMuted,
-    lineHeight: 26,
-    marginBottom: 20,
-  },
-  authorSection: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    marginBottom: 16,
-    paddingBottom: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: theme.border,
-  },
-  authorAvatar: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: theme.bg,
-    alignItems: 'center',
-    justifyContent: 'center',
-    overflow: 'hidden',
-  },
-  avatarImage: {
-    width: '100%',
-    height: '100%',
-  },
-  authorInfo: {
-    flex: 1,
-  },
-  authorName: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: theme.text,
-    marginBottom: 2,
-  },
-  authorTitle: {
-    fontSize: 13,
-    color: theme.textMuted,
-  },
-  metaInfo: {
-    gap: 8,
-  },
-  metaItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-  },
-  metaText: {
-    fontSize: 12,
-    color: theme.textMuted,
-    fontWeight: '600',
-  },
-  publishedDate: {
-    fontSize: 13,
-    color: theme.textMuted,
-    fontWeight: '600',
-  },
-  contentContainer: {
-    paddingHorizontal: 20,
-    paddingTop: 8,
-  },
-  tagsSection: {
-    paddingHorizontal: 20,
-    paddingTop: 24,
-  },
-  tagsTitle: {
-    fontSize: 14,
-    fontWeight: '800',
-    color: theme.text,
-    marginBottom: 12,
-  },
-  tagsRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-  },
-  tagChip: {
-    backgroundColor: theme.bg,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 8,
-  },
-  tagText: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: theme.textMuted,
-  },
-  sourceSection: {
-    marginTop: 24,
-    marginHorizontal: 20,
-    padding: 16,
-    backgroundColor: theme.bg,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: theme.border,
-  },
-  sourceHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    marginBottom: 8,
-  },
-  sourceTitle: {
-    fontSize: 13,
-    fontWeight: '800',
-    color: theme.text,
-  },
-  sourceText: {
-    fontSize: 14,
-    color: theme.text,
-    marginBottom: 12,
-  },
-  sourceLinkButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    alignSelf: 'flex-start',
-  },
-  sourceLinkText: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: theme.primary,
-  },
-  bottomSpacing: {
-    height: 40,
-  },
-});
-
+const createStyles = (theme: typeof LightTHEME) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: "#FFFFFF",
+    },
+    errorContainer: {
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+      padding: 20,
+    },
+    errorText: {
+      fontSize: 18,
+      fontWeight: "700",
+      color: theme.text,
+      marginTop: 16,
+      marginBottom: 24,
+    },
+    header: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      paddingHorizontal: 20,
+      paddingVertical: 12,
+      borderBottomWidth: 1,
+      borderBottomColor: theme.border,
+    },
+    backButton: {
+      padding: 8,
+    },
+    backButtonText: {
+      fontSize: 16,
+      fontWeight: "700",
+      color: theme.primary,
+    },
+    externalLinkButton: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 6,
+      paddingHorizontal: 12,
+      paddingVertical: 6,
+      backgroundColor: theme.bg,
+      borderRadius: 8,
+    },
+    externalLinkText: {
+      fontSize: 13,
+      fontWeight: "700",
+      color: theme.primary,
+    },
+    scrollView: {
+      flex: 1,
+    },
+    scrollContent: {
+      paddingBottom: 40,
+    },
+    heroImage: {
+      width: width,
+      height: 250,
+      backgroundColor: theme.bg,
+    },
+    articleHeader: {
+      padding: 20,
+    },
+    categoryBadge: {
+      alignSelf: "flex-start",
+      backgroundColor: theme.primary + "15",
+      paddingHorizontal: 12,
+      paddingVertical: 6,
+      borderRadius: 8,
+      marginBottom: 12,
+    },
+    categoryText: {
+      fontSize: 11,
+      fontWeight: "800",
+      color: theme.primary,
+      letterSpacing: 0.5,
+    },
+    title: {
+      fontSize: 28,
+      fontWeight: "800",
+      color: theme.text,
+      lineHeight: 36,
+      marginBottom: 8,
+    },
+    subtitle: {
+      fontSize: 18,
+      fontWeight: "600",
+      color: theme.textMuted,
+      lineHeight: 26,
+      marginBottom: 20,
+    },
+    authorSection: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 12,
+      marginBottom: 16,
+      paddingBottom: 16,
+      borderBottomWidth: 1,
+      borderBottomColor: theme.border,
+    },
+    authorAvatar: {
+      width: 48,
+      height: 48,
+      borderRadius: 24,
+      backgroundColor: theme.bg,
+      alignItems: "center",
+      justifyContent: "center",
+      overflow: "hidden",
+    },
+    avatarImage: {
+      width: "100%",
+      height: "100%",
+    },
+    authorInfo: {
+      flex: 1,
+    },
+    authorName: {
+      fontSize: 16,
+      fontWeight: "700",
+      color: theme.text,
+      marginBottom: 2,
+    },
+    authorTitle: {
+      fontSize: 13,
+      color: theme.textMuted,
+    },
+    metaInfo: {
+      gap: 8,
+    },
+    metaItem: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 4,
+    },
+    metaText: {
+      fontSize: 12,
+      color: theme.textMuted,
+      fontWeight: "600",
+    },
+    publishedDate: {
+      fontSize: 13,
+      color: theme.textMuted,
+      fontWeight: "600",
+    },
+    contentContainer: {
+      paddingHorizontal: 20,
+      paddingTop: 8,
+    },
+    tagsSection: {
+      paddingHorizontal: 20,
+      paddingTop: 24,
+    },
+    tagsTitle: {
+      fontSize: 14,
+      fontWeight: "800",
+      color: theme.text,
+      marginBottom: 12,
+    },
+    tagsRow: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      gap: 8,
+    },
+    tagChip: {
+      backgroundColor: theme.bg,
+      paddingHorizontal: 12,
+      paddingVertical: 6,
+      borderRadius: 8,
+    },
+    tagText: {
+      fontSize: 13,
+      fontWeight: "600",
+      color: theme.textMuted,
+    },
+    sourceSection: {
+      marginTop: 24,
+      marginHorizontal: 20,
+      padding: 16,
+      backgroundColor: theme.bg,
+      borderRadius: 12,
+      borderWidth: 1,
+      borderColor: theme.border,
+    },
+    sourceHeader: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 8,
+      marginBottom: 8,
+    },
+    sourceTitle: {
+      fontSize: 13,
+      fontWeight: "800",
+      color: theme.text,
+    },
+    sourceText: {
+      fontSize: 14,
+      color: theme.text,
+      marginBottom: 12,
+    },
+    sourceLinkButton: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 6,
+      alignSelf: "flex-start",
+    },
+    sourceLinkText: {
+      fontSize: 14,
+      fontWeight: "700",
+      color: theme.primary,
+    },
+    bottomSpacing: {
+      height: 40,
+    },
+  });

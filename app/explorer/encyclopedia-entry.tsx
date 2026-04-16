@@ -2,12 +2,14 @@ import { Icon } from "@/components/ui/icon";
 import { getEncyclopediaEntryById } from "@/content/explorer";
 import { getEncyclopediaImage } from "@/content/explorer/encyclopedia/images";
 import { useColorScheme } from "@/hooks/use-color-scheme";
+import { openExternalUrl } from "@/services/open-url";
 import * as Haptics from "expo-haptics";
 import { LinearGradient } from "expo-linear-gradient";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import * as Speech from "expo-speech";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
+    Alert,
     Dimensions,
     Image,
     ScrollView,
@@ -217,6 +219,14 @@ export default function EncyclopediaEntryScreen() {
     },
     [isSpeaking, speakingSection],
   );
+
+  const openSourceLink = useCallback(async (url: string) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    const opened = await openExternalUrl(url);
+    if (!opened) {
+      Alert.alert("Unable to open link", "Please try again in a moment.");
+    }
+  }, []);
 
   const speakAll = useCallback(() => {
     if (!entry) return;
@@ -585,17 +595,32 @@ export default function EncyclopediaEntryScreen() {
               <Animated.View
                 key={index}
                 entering={FadeInDown.delay(650 + index * 50)}
-                style={styles.sourceItem}
               >
-                <View style={styles.sourceOrg}>
-                  <Text style={styles.sourceOrgText}>
-                    {source.organization}
-                  </Text>
-                </View>
-                <Text style={styles.sourceTitle}>{source.title}</Text>
-                <Text style={styles.sourceUrl} numberOfLines={1}>
-                  {source.url}
-                </Text>
+                <TouchableOpacity
+                  style={styles.sourceItem}
+                  activeOpacity={0.8}
+                  onPress={() => {
+                    void openSourceLink(source.url);
+                  }}
+                >
+                  <View style={styles.sourceOrg}>
+                    <Text style={styles.sourceOrgText}>
+                      {source.organization}
+                    </Text>
+                  </View>
+                  <Text style={styles.sourceTitle}>{source.title}</Text>
+                  <View style={styles.sourceUrlRow}>
+                    <Text style={styles.sourceUrl} numberOfLines={1}>
+                      {source.url}
+                    </Text>
+                    <Icon
+                      name="ArrowRight2"
+                      size={14}
+                      color={THEME.info}
+                      variant="Bold"
+                    />
+                  </View>
+                </TouchableOpacity>
               </Animated.View>
             ))}
           </Animated.View>
@@ -988,7 +1013,13 @@ const createStyles = (theme: typeof LightTHEME) =>
       color: theme.text,
       marginBottom: 4,
     },
+    sourceUrlRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 8,
+    },
     sourceUrl: {
+      flex: 1,
       fontSize: 12,
       color: theme.info,
     },
