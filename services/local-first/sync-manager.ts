@@ -538,6 +538,10 @@ export class SyncManager {
     return null;
   }
 
+  private isTableSyncSupported(tableName: SyncableTable): boolean {
+    return this.getRemoteTableName(tableName) !== null;
+  }
+
   private toRemoteRecord(
     tableName: SyncableTable,
     record: any,
@@ -777,12 +781,13 @@ export class SyncManager {
     const tables = await this.db.getAllAsync<SyncStatus>(
       "SELECT * FROM sync_status",
     );
-    const pendingItems = await this.db.getFirstAsync<{ count: number }>(
-      "SELECT COUNT(*) as count FROM sync_queue",
-    );
 
     let dirtyCount = 0;
     for (const table of SYNCABLE_TABLES) {
+      if (!this.isTableSyncSupported(table)) {
+        continue;
+      }
+
       const count = await this.db.getFirstAsync<{ count: number }>(
         `SELECT COUNT(*) as count FROM ${table} WHERE is_dirty = 1`,
       );
@@ -799,7 +804,8 @@ export class SyncManager {
 
     return {
       lastSyncedAt,
-      pendingChanges: dirtyCount + (pendingItems?.count || 0),
+      // Pending count should only include records that can actually be pushed.
+      pendingChanges: dirtyCount,
       isSyncing: this.isSyncing,
       tables,
     };

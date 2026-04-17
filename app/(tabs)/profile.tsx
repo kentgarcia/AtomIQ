@@ -1,6 +1,12 @@
 import { Icon } from "@/components/ui/icon";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import useFriendsSync from "@/hooks/use-friends-sync";
+import {
+    PROFILE_AVATAR_OPTIONS,
+    type ProfileAvatarKey,
+    getProfileAvatarSource,
+    normalizeProfileAvatarKey,
+} from "@/services/profile-avatars";
 import { useStorage } from "@/services/StorageContext";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
@@ -56,6 +62,8 @@ export default function ProfileScreen() {
   const router = useRouter();
   const {
     userProfile,
+    updateUserProfile,
+    syncProfileToSupabase,
     isOnline,
     isSyncing: isBackgroundSyncing,
     pendingChanges,
@@ -79,6 +87,8 @@ export default function ProfileScreen() {
   const [searchModalVisible, setSearchModalVisible] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("overview");
+  const [isSavingAvatar, setIsSavingAvatar] = useState(false);
+  const [avatarModalVisible, setAvatarModalVisible] = useState(false);
 
   // Load data per tab when online
   useEffect(() => {
@@ -173,6 +183,29 @@ export default function ProfileScreen() {
     await handleSendFriendRequest(userId);
   };
 
+  const selectedAvatarKey = normalizeProfileAvatarKey(userProfile?.avatar_url);
+
+  const handleSelectAvatar = async (avatarKey: ProfileAvatarKey) => {
+    if (!userProfile || isSavingAvatar || avatarKey === selectedAvatarKey) {
+      return;
+    }
+
+    try {
+      setIsSavingAvatar(true);
+      await updateUserProfile({ avatar_url: avatarKey });
+
+      if (isOnline) {
+        await syncProfileToSupabase();
+      }
+
+      setAvatarModalVisible(false);
+    } catch (error) {
+      Alert.alert("Error", "Failed to update profile avatar.");
+    } finally {
+      setIsSavingAvatar(false);
+    }
+  };
+
   const syncStatusText = useMemo(() => {
     if (!isOnline) {
       return "Offline mode";
@@ -228,9 +261,9 @@ export default function ProfileScreen() {
           <View style={styles.profileInfo}>
             <View style={styles.avatarContainer}>
               <Image
-                source={require("@/assets/images/mascot/profile.png")}
+                source={getProfileAvatarSource(userProfile.avatar_url)}
                 style={styles.avatar}
-                resizeMode="contain"
+                resizeMode="cover"
               />
               <View style={styles.levelBadge}>
                 <Text style={styles.levelText}>{userLevel}</Text>
@@ -246,6 +279,24 @@ export default function ProfileScreen() {
             ) : null}
             <Text style={styles.title}>{userTitle}</Text>
             <Text style={styles.syncStatus}>{syncStatusText}</Text>
+
+            <View style={styles.avatarPickerSection}>
+              <Text style={styles.avatarPickerLabel}>Profile Avatar</Text>
+              <TouchableOpacity
+                style={[
+                  styles.avatarPickerButton,
+                  isSavingAvatar && styles.avatarPickerButtonDisabled,
+                ]}
+                onPress={() => setAvatarModalVisible(true)}
+                disabled={isSavingAvatar}
+                activeOpacity={0.85}
+              >
+                <Icon name="Profile" size={16} color="#FFFFFF" variant="Bold" />
+                <Text style={styles.avatarPickerButtonText}>
+                  {isSavingAvatar ? "Saving..." : "Change Avatar"}
+                </Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
 
@@ -382,24 +433,42 @@ export default function ProfileScreen() {
                   showsVerticalScrollIndicator={false}
                   style={{ marginTop: 20 }}
                 >
-                  {friends.map((friend) => (
-                    <View key={friend.friend_id} style={styles.friendCard}>
-                      <View style={styles.friendAvatar}>
-                        <Icon
-                          name="Profile"
-                          size={24}
-                          color={THEME.primary}
-                          variant="Bold"
-                        />
+                  {friends.map((friend) => {
+                    const friendName =
+                      friend.display_name ||
+                      friend.username ||
+                      "Unknown Explorer";
+                    const friendXp = Number(friend.total_xp || 0);
+                    const friendStreak = Number(friend.current_streak || 0);
+                    const friendCode = friend.friend_code
+                      ? `Code: ${friend.friend_code} • `
+                      : "";
+
+                    return (
+                      <View key={friend.friend_id} style={styles.friendCard}>
+                        <View style={styles.friendAvatar}>
+                          <Icon
+                            name="Profile"
+                            size={24}
+                            color={THEME.primary}
+                            variant="Bold"
+                          />
+                        </View>
+                        <View style={styles.friendInfo}>
+                          <View style={styles.usernameBadgeRow}>
+                            <Text style={styles.friendName}>{friendName}</Text>
+                            {friend.is_npc ? (
+                              <Text style={styles.npcLabel}>NPC</Text>
+                            ) : null}
+                          </View>
+                          <Text style={styles.friendStats}>
+                            {friendCode}
+                            {friendXp} XP • Streak: {friendStreak}
+                          </Text>
+                        </View>
                       </View>
-                      <View style={styles.friendInfo}>
-                        <Text style={styles.friendName}>{friend.username}</Text>
-                        <Text style={styles.friendStats}>
-                          {friend.total_xp} XP • Streak: {friend.current_streak}
-                        </Text>
-                      </View>
-                    </View>
-                  ))}
+                    );
+                  })}
                 </ScrollView>
               )}
             </Animated.View>
@@ -510,6 +579,78 @@ export default function ProfileScreen() {
 
         <View style={{ height: 40 }} />
       </ScrollView>
+
+      {/* Avatar Picker Modal */}
+      <Modal
+        visible={avatarModalVisible}
+        animationType="fade"
+        transparent={true}
+        onRequestClose={() => setAvatarModalVisible(false)}
+      >
+        <View style={styles.avatarModalOverlay}>
+          <View style={styles.avatarModalContent}>
+            <View style={styles.avatarModalHeader}>
+              <Text style={styles.avatarModalTitle}>Choose Avatar</Text>
+              <TouchableOpacity
+                onPress={() => setAvatarModalVisible(false)}
+                style={styles.closeButton}
+              >
+                <Icon
+                  name="CloseCircle"
+                  size={24}
+                  color={THEME.textMuted}
+                  variant="Bold"
+                />
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView
+              showsVerticalScrollIndicator={false}
+              contentContainerStyle={styles.avatarModalGrid}
+            >
+              {PROFILE_AVATAR_OPTIONS.map((avatarOption) => {
+                const isSelected = selectedAvatarKey === avatarOption.key;
+
+                return (
+                  <TouchableOpacity
+                    key={avatarOption.key}
+                    style={[
+                      styles.avatarModalOption,
+                      isSelected && styles.avatarModalOptionSelected,
+                      isSavingAvatar && styles.avatarModalOptionDisabled,
+                    ]}
+                    onPress={() => {
+                      void handleSelectAvatar(avatarOption.key);
+                    }}
+                    activeOpacity={0.85}
+                    disabled={isSavingAvatar}
+                  >
+                    <Image
+                      source={avatarOption.source}
+                      style={styles.avatarModalOptionImage}
+                      resizeMode="cover"
+                    />
+                    {isSelected && (
+                      <View style={styles.avatarModalCheck}>
+                        <Icon
+                          name="TickCircle"
+                          size={16}
+                          color="#22C55E"
+                          variant="Bold"
+                        />
+                      </View>
+                    )}
+                  </TouchableOpacity>
+                );
+              })}
+            </ScrollView>
+
+            <Text style={styles.avatarModalHint}>
+              Tap an avatar to update your profile picture.
+            </Text>
+          </View>
+        </View>
+      </Modal>
 
       {/* Search Friends Modal */}
       <Modal
@@ -742,6 +883,113 @@ const createStyles = (theme: typeof LightTHEME) =>
       color: theme.textMuted,
       fontWeight: "600",
       marginTop: 4,
+    },
+    avatarPickerSection: {
+      marginTop: 12,
+      width: "100%",
+      alignItems: "center",
+    },
+    avatarPickerLabel: {
+      fontSize: 11,
+      fontWeight: "700",
+      color: theme.textMuted,
+      textTransform: "uppercase",
+      letterSpacing: 0.5,
+      marginBottom: 8,
+    },
+    avatarPickerButton: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 8,
+      backgroundColor: theme.primary,
+      borderRadius: 14,
+      paddingHorizontal: 16,
+      paddingVertical: 10,
+      borderBottomWidth: 3,
+      borderBottomColor: "rgba(0,0,0,0.15)",
+    },
+    avatarPickerButtonDisabled: {
+      opacity: 0.65,
+    },
+    avatarPickerButtonText: {
+      color: "#FFFFFF",
+      fontSize: 13,
+      fontWeight: "800",
+      letterSpacing: 0.2,
+    },
+
+    avatarModalOverlay: {
+      flex: 1,
+      backgroundColor: "rgba(0, 0, 0, 0.55)",
+      alignItems: "center",
+      justifyContent: "center",
+      paddingHorizontal: 20,
+    },
+    avatarModalContent: {
+      width: "100%",
+      maxWidth: 360,
+      maxHeight: "74%",
+      backgroundColor: theme.bg,
+      borderRadius: 22,
+      paddingTop: 16,
+      paddingBottom: 14,
+      paddingHorizontal: 16,
+      borderWidth: 1,
+      borderColor: theme.border,
+    },
+    avatarModalHeader: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginBottom: 10,
+    },
+    avatarModalTitle: {
+      fontSize: 20,
+      fontWeight: "800",
+      color: theme.text,
+    },
+    avatarModalGrid: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      justifyContent: "center",
+      gap: 12,
+      paddingTop: 4,
+      paddingBottom: 8,
+    },
+    avatarModalOption: {
+      width: 64,
+      height: 64,
+      borderRadius: 32,
+      overflow: "hidden",
+      borderWidth: 2,
+      borderColor: theme.border,
+      backgroundColor: theme.card,
+    },
+    avatarModalOptionSelected: {
+      borderColor: theme.primary,
+      borderWidth: 3,
+    },
+    avatarModalOptionDisabled: {
+      opacity: 0.65,
+    },
+    avatarModalOptionImage: {
+      width: "100%",
+      height: "100%",
+    },
+    avatarModalCheck: {
+      position: "absolute",
+      bottom: 0,
+      right: 0,
+      backgroundColor: "#FFFFFF",
+      borderRadius: 10,
+      padding: 1,
+    },
+    avatarModalHint: {
+      marginTop: 8,
+      textAlign: "center",
+      color: theme.textMuted,
+      fontSize: 12,
+      fontWeight: "600",
     },
     tabsContainer: {
       flexDirection: "row",

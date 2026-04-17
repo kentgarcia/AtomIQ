@@ -5,6 +5,7 @@ import {
     getLeaderboardSnapshotUpdatedAt,
     saveLeaderboardSnapshot,
 } from "@/services/database";
+import { getProfileAvatarSource } from "@/services/profile-avatars";
 import { useStorage } from "@/services/StorageContext";
 import { isSupabaseConfigured, supabase } from "@/services/supabase";
 import { Tables } from "@/services/supabase.types";
@@ -158,6 +159,7 @@ const CircleAvatar = ({
   borderWidth = 3,
   avatarColor,
   isUser,
+  isNPC,
 }: {
   uri?: string;
   size: number;
@@ -165,9 +167,10 @@ const CircleAvatar = ({
   borderWidth?: number;
   avatarColor?: string;
   isUser?: boolean;
+  isNPC?: boolean;
 }) => {
-  // User avatar - use profile mascot
-  if (isUser || uri === "profile") {
+  // User avatars are always local profile presets.
+  if (!isNPC) {
     return (
       <View
         style={{
@@ -181,9 +184,9 @@ const CircleAvatar = ({
         }}
       >
         <Image
-          source={require("@/assets/images/mascot/profile.png")}
+          source={getProfileAvatarSource(uri)}
           style={{ width: "100%", height: "100%" }}
-          resizeMode="contain"
+          resizeMode="cover"
         />
       </View>
     );
@@ -256,9 +259,15 @@ export default function LeaderboardScreen() {
 
   const buildLeaderboard = useCallback(
     (users: LeaderboardSourceUser[] = []) => {
+      const localDisplayName =
+        userProfile?.display_name || userProfile?.username || "You";
+
       const entries: LeaderboardEntry[] = users.map((user) => ({
         userId: user.user_id,
-        name: user.username,
+        name:
+          user.user_id === userProfile?.user_id
+            ? localDisplayName
+            : user.username,
         title: user.is_npc ? "NPC Challenger" : "Nuclear Learner",
         xp: user.total_xp ?? 0,
         avatar: user.avatar_url ?? undefined,
@@ -273,10 +282,10 @@ export default function LeaderboardScreen() {
       ) {
         entries.push({
           userId: userProfile.user_id,
-          name: userProfile.username || "You",
+          name: localDisplayName,
           title: "Nuclear Learner",
           xp: userProfile.total_xp || 0,
-          avatar: "profile",
+          avatar: userProfile.avatar_url || undefined,
           avatarColor: undefined,
           isUser: true,
           isNPC: false,
@@ -457,6 +466,7 @@ export default function LeaderboardScreen() {
                   uri={topThree[1].avatar}
                   avatarColor={topThree[1].avatarColor}
                   isUser={topThree[1].isUser}
+                  isNPC={topThree[1].isNPC}
                   size={70}
                   borderColor="rgba(255,255,255,0.8)"
                 />
@@ -485,6 +495,7 @@ export default function LeaderboardScreen() {
                   uri={topThree[0].avatar}
                   avatarColor={topThree[0].avatarColor}
                   isUser={topThree[0].isUser}
+                  isNPC={topThree[0].isNPC}
                   size={90}
                   borderColor="#FFD700"
                   borderWidth={4}
@@ -523,6 +534,7 @@ export default function LeaderboardScreen() {
                   uri={topThree[2].avatar}
                   avatarColor={topThree[2].avatarColor}
                   isUser={topThree[2].isUser}
+                  isNPC={topThree[2].isNPC}
                   size={70}
                   borderColor="rgba(255,255,255,0.8)"
                 />
@@ -584,25 +596,14 @@ export default function LeaderboardScreen() {
               </Text>
 
               <View style={styles.listAvatarWrapper}>
-                {user.isUser ? (
-                  <Image
-                    source={require("@/assets/images/mascot/profile.png")}
-                    style={styles.listAvatar}
-                    resizeMode="contain"
-                  />
-                ) : user.avatar ? (
-                  <Image
-                    source={{ uri: user.avatar }}
-                    style={styles.listAvatar}
-                    resizeMode="cover"
-                  />
-                ) : (
-                  <Image
-                    source={require("@/assets/images/mascot/profile.png")}
-                    style={styles.listAvatar}
-                    resizeMode="contain"
-                  />
-                )}
+                <CircleAvatar
+                  uri={user.avatar}
+                  isUser={user.isUser}
+                  isNPC={user.isNPC}
+                  size={40}
+                  borderColor={user.isUser ? THEME.primary : "transparent"}
+                  borderWidth={user.isUser ? 2 : 0}
+                />
                 {user.isNPC && (
                   <View style={styles.npcBadge}>
                     <Icon
@@ -660,18 +661,14 @@ export default function LeaderboardScreen() {
               {userRank.rank}
             </Text>
             <View style={styles.listAvatarWrapper}>
-              <View
-                style={[
-                  styles.listAvatar,
-                  { backgroundColor: "#FFF", padding: 2, overflow: "hidden" },
-                ]}
-              >
-                <Image
-                  source={require("@/assets/images/mascot/profile.png")}
-                  style={{ width: "100%", height: "100%" }}
-                  resizeMode="contain"
-                />
-              </View>
+              <CircleAvatar
+                uri={userRank.avatar}
+                isUser={true}
+                isNPC={false}
+                size={40}
+                borderColor="rgba(255,255,255,0.9)"
+                borderWidth={2}
+              />
             </View>
             <View style={styles.listInfo}>
               <Text style={[styles.listName, { color: "#FFF" }]}>

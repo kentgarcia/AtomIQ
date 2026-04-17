@@ -7,6 +7,7 @@ export interface Friend {
   username: string | null;
   display_name?: string | null;
   friend_code?: string | null;
+  is_npc?: boolean | null;
   avatar_url: string | null;
   total_xp: number | null;
   current_streak: number | null;
@@ -25,6 +26,144 @@ export interface FriendRequest {
   status: string | null;
   created_at: string | null;
 }
+
+type SocialUserShape = {
+  user_id: string;
+  username?: string | null;
+  display_name?: string | null;
+  friend_code?: string | null;
+  avatar_url?: string | null;
+  total_xp?: number | null;
+  current_streak?: number | null;
+  is_npc?: boolean | null;
+};
+
+const NPC_CODE_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+const NPC_NAME_PREFIXES = [
+  "Astra",
+  "Nova",
+  "Lyra",
+  "Orion",
+  "Vega",
+  "Helio",
+  "Quanta",
+  "Iris",
+  "Rhea",
+  "Selene",
+] as const;
+const NPC_NAME_SUFFIXES = [
+  "Pulse",
+  "Flux",
+  "Ray",
+  "Field",
+  "Helix",
+  "Core",
+  "Ion",
+  "Vector",
+  "Spark",
+  "Quark",
+] as const;
+
+const hashSeed = (seed: string): number => {
+  let hash = 2166136261;
+
+  for (const character of seed) {
+    hash ^= character.charCodeAt(0);
+    hash = Math.imul(hash, 16777619);
+  }
+
+  return hash >>> 0;
+};
+
+const isGenericNpcValue = (value?: string | null): boolean => {
+  if (!value) {
+    return true;
+  }
+
+  const normalized = value.trim().toLowerCase();
+  if (!normalized) {
+    return true;
+  }
+
+  return (
+    normalized.startsWith("npc") ||
+    normalized.includes("npc_user") ||
+    normalized.includes("npc-code") ||
+    normalized.includes("npc_code") ||
+    normalized.includes("npc code")
+  );
+};
+
+const isGenericNpcCode = (value?: string | null): boolean => {
+  if (!value) {
+    return true;
+  }
+
+  const normalized = value.replace(/[^A-Za-z0-9]/g, "").toUpperCase();
+  if (!normalized) {
+    return true;
+  }
+
+  return normalized.startsWith("NPC") || normalized === "NPCCODE";
+};
+
+const buildNaturalNpcCode = (seed: string): string => {
+  let state = hashSeed(seed || "NPC");
+  let code = "";
+
+  for (let index = 0; index < 6; index += 1) {
+    state = (Math.imul(state, 1664525) + 1013904223) >>> 0;
+    code += NPC_CODE_ALPHABET[state % NPC_CODE_ALPHABET.length];
+  }
+
+  return code;
+};
+
+const buildNaturalNpcName = (seed: string): string => {
+  const hashedSeed = hashSeed(seed || "npc");
+  const prefix = NPC_NAME_PREFIXES[hashedSeed % NPC_NAME_PREFIXES.length];
+  const suffix =
+    NPC_NAME_SUFFIXES[
+      Math.floor(hashedSeed / NPC_NAME_PREFIXES.length) %
+        NPC_NAME_SUFFIXES.length
+    ];
+
+  return `${prefix} ${suffix}`;
+};
+
+const normalizeSocialUserRecord = <T extends SocialUserShape>(record: T): T => {
+  const isNpc = Boolean(record.is_npc);
+  const seed =
+    record.user_id || record.username || record.display_name || "npc";
+
+  const generatedNpcName = buildNaturalNpcName(seed);
+  const displayName = isNpc
+    ? isGenericNpcValue(record.display_name)
+      ? generatedNpcName
+      : record.display_name
+    : record.display_name || null;
+
+  const username = isNpc
+    ? isGenericNpcValue(record.username)
+      ? displayName || generatedNpcName
+      : record.username
+    : record.username || displayName || "Unknown Explorer";
+
+  const friendCode = isNpc
+    ? isGenericNpcCode(record.friend_code)
+      ? buildNaturalNpcCode(seed)
+      : record.friend_code
+    : record.friend_code || null;
+
+  return {
+    ...record,
+    username,
+    display_name: displayName,
+    friend_code: friendCode,
+    total_xp: Number(record.total_xp || 0),
+    current_streak: Number(record.current_streak || 0),
+  };
+};
 
 /**
  * Search for users by friend code, display name, or username on Supabase
@@ -55,11 +194,17 @@ export const searchUsers = async (
           .limit(10);
 
         if (!codeError && codeData) {
+          const normalizedCodeData = (codeData || []).map((user) =>
+            normalizeSocialUserRecord(user),
+          );
+
           if (currentUserId) {
-            return codeData.filter((user) => user.user_id !== currentUserId);
+            return normalizedCodeData.filter(
+              (user) => user.user_id !== currentUserId,
+            );
           }
 
-          return codeData;
+          return normalizedCodeData;
         }
       } catch {
         // Continue to fallback search for older schemas.
@@ -99,11 +244,15 @@ export const searchUsers = async (
     }
 
     // Filter out current user if provided
+    const normalizedData = (data || []).map((user) =>
+      normalizeSocialUserRecord(user),
+    );
+
     if (currentUserId) {
-      return data?.filter((u) => u.user_id !== currentUserId) || [];
+      return normalizedData.filter((user) => user.user_id !== currentUserId);
     }
 
-    return data || [];
+    return normalizedData;
   } catch (error) {
     console.error("Error searching users:", error);
     return [];
@@ -240,14 +389,69 @@ export const getFriends = async (userId: string): Promise<Friend[]> => {
   }
 
   try {
-    const { data, error } = await supabase
+    const { data: friendRows, error } = await supabase
       .from("friends")
       .select("*")
       .eq("user_id", userId)
       .eq("status", "accepted");
 
     if (error) throw error;
-    return data || [];
+
+    if (!friendRows || friendRows.length === 0) {
+      return [];
+    }
+
+    const friendIds = Array.from(
+      new Set(
+        friendRows
+          .map((friend) => friend.friend_id)
+          .filter((friendId): friendId is string => Boolean(friendId)),
+      ),
+    );
+
+    const profileFields =
+      "user_id, username, display_name, friend_code, avatar_url, total_xp, current_streak, is_npc";
+
+    const profileMap = new Map<string, SocialUserShape>();
+    if (friendIds.length > 0) {
+      const { data: profiles, error: profilesError } = await supabase
+        .from("users")
+        .select(profileFields)
+        .in("user_id", friendIds);
+
+      if (profilesError) {
+        throw profilesError;
+      }
+
+      for (const profile of profiles || []) {
+        profileMap.set(profile.user_id, profile);
+      }
+    }
+
+    return friendRows.map((friendRow) => {
+      const profile = profileMap.get(friendRow.friend_id);
+      const normalized = normalizeSocialUserRecord({
+        user_id: friendRow.friend_id,
+        username: profile?.username ?? friendRow.username,
+        display_name: profile?.display_name ?? null,
+        friend_code: profile?.friend_code ?? null,
+        avatar_url: profile?.avatar_url ?? friendRow.avatar_url,
+        total_xp: profile?.total_xp ?? friendRow.total_xp,
+        current_streak: profile?.current_streak ?? friendRow.current_streak,
+        is_npc: profile?.is_npc ?? false,
+      });
+
+      return {
+        ...friendRow,
+        username: normalized.username,
+        display_name: normalized.display_name,
+        friend_code: normalized.friend_code,
+        avatar_url: normalized.avatar_url || null,
+        total_xp: normalized.total_xp || 0,
+        current_streak: normalized.current_streak || 0,
+        is_npc: normalized.is_npc || false,
+      } as Friend;
+    });
   } catch (error) {
     console.error("Error fetching friends:", error);
     return [];

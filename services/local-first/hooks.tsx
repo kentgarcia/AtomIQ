@@ -1,12 +1,19 @@
 /**
  * Local-First Database Context and Hooks
- * 
+ *
  * Provides React context and hooks for accessing the local-first database.
  */
 
-import * as SQLite from 'expo-sqlite';
-import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { QueryOptions } from './base-repository';
+import * as SQLite from "expo-sqlite";
+import React, {
+    createContext,
+    useCallback,
+    useContext,
+    useEffect,
+    useMemo,
+    useState,
+} from "react";
+import { QueryOptions } from "./base-repository";
 import {
     ActivityRepository,
     BookmarkCollectionRepository,
@@ -17,9 +24,9 @@ import {
     NotificationRepository,
     PostRepository,
     ProfileRepository,
-} from './repositories';
-import { LOCAL_FIRST_SCHEMA } from './schema';
-import { createSyncManager, SyncEvent, SyncManager } from './sync-manager';
+} from "./repositories";
+import { LOCAL_FIRST_SCHEMA } from "./schema";
+import { createSyncManager, SyncEvent, SyncManager } from "./sync-manager";
 import {
     Bookmark,
     Comment,
@@ -28,14 +35,14 @@ import {
     Notification,
     PostQueryOptions,
     UserActivity,
-    UserProfile
-} from './types';
+    UserProfile,
+} from "./types";
 
 // Database context type
 interface LocalFirstContextType {
   isReady: boolean;
   error: Error | null;
-  
+
   // Repositories
   profiles: ProfileRepository | null;
   friendships: FriendshipRepository | null;
@@ -46,10 +53,10 @@ interface LocalFirstContextType {
   bookmarkCollections: BookmarkCollectionRepository | null;
   notifications: NotificationRepository | null;
   activities: ActivityRepository | null;
-  
+
   // Sync manager
   syncManager: SyncManager | null;
-  
+
   // Sync helpers
   syncNow: () => Promise<void>;
   isSyncing: boolean;
@@ -84,7 +91,9 @@ interface LocalFirstProviderProps {
 /**
  * Local-First Database Provider
  */
-export const LocalFirstProvider: React.FC<LocalFirstProviderProps> = ({ children }) => {
+export const LocalFirstProvider: React.FC<LocalFirstProviderProps> = ({
+  children,
+}) => {
   const [db, setDb] = useState<SQLite.SQLiteDatabase | null>(null);
   const [isReady, setIsReady] = useState(false);
   const [error, setError] = useState<Error | null>(null);
@@ -93,47 +102,59 @@ export const LocalFirstProvider: React.FC<LocalFirstProviderProps> = ({ children
   const [lastSyncedAt, setLastSyncedAt] = useState<number | null>(null);
   const [pendingChanges, setPendingChanges] = useState(0);
 
+  const refreshSyncStatus = useCallback(async (manager: SyncManager) => {
+    try {
+      const status = await manager.getOverallStatus();
+      setLastSyncedAt(status.lastSyncedAt);
+      setPendingChanges(status.pendingChanges);
+    } catch (statusError) {
+      console.warn("Failed to refresh sync status:", statusError);
+    }
+  }, []);
+
   // Initialize database
   useEffect(() => {
     const initDatabase = async () => {
       try {
-        const database = await SQLite.openDatabaseAsync('atomiq.db');
-        
+        const database = await SQLite.openDatabaseAsync("atomiq.db");
+
         // Run schema migrations
         await database.execAsync(LOCAL_FIRST_SCHEMA);
-        
+
         // Create sync manager
         const manager = createSyncManager(database);
         await manager.initialize();
-        
+
         // Add sync event listener
         manager.addListener((event: SyncEvent) => {
-          if (event.type === 'sync_started') {
+          if (event.type === "sync_started") {
             setIsSyncing(true);
-          } else if (event.type === 'sync_completed' || event.type === 'sync_failed') {
+          } else if (
+            event.type === "sync_completed" ||
+            event.type === "sync_failed"
+          ) {
             setIsSyncing(false);
-            if (event.type === 'sync_completed') {
+            if (event.type === "sync_completed") {
               setLastSyncedAt(event.timestamp);
             }
+            void refreshSyncStatus(manager);
           }
         });
-        
+
         setDb(database);
         setSyncManager(manager);
         setIsReady(true);
-        
+
         // Get initial sync status
-        const status = await manager.getOverallStatus();
-        setLastSyncedAt(status.lastSyncedAt);
-        setPendingChanges(status.pendingChanges);
+        await refreshSyncStatus(manager);
       } catch (err) {
-        console.error('Failed to initialize local-first database:', err);
-        setError(err instanceof Error ? err : new Error('Unknown error'));
+        console.error("Failed to initialize local-first database:", err);
+        setError(err instanceof Error ? err : new Error("Unknown error"));
       }
     };
 
     initDatabase();
-  }, []);
+  }, [refreshSyncStatus]);
 
   // Create repositories
   const repositories = useMemo(() => {
@@ -168,10 +189,9 @@ export const LocalFirstProvider: React.FC<LocalFirstProviderProps> = ({ children
   const syncNow = useCallback(async () => {
     if (syncManager) {
       await syncManager.syncNow();
-      const status = await syncManager.getOverallStatus();
-      setPendingChanges(status.pendingChanges);
+      await refreshSyncStatus(syncManager);
     }
-  }, [syncManager]);
+  }, [refreshSyncStatus, syncManager]);
 
   const value: LocalFirstContextType = {
     isReady,
@@ -197,7 +217,7 @@ export const LocalFirstProvider: React.FC<LocalFirstProviderProps> = ({ children
 export const useLocalFirst = () => {
   const context = useContext(LocalFirstContext);
   if (!context) {
-    throw new Error('useLocalFirst must be used within a LocalFirstProvider');
+    throw new Error("useLocalFirst must be used within a LocalFirstProvider");
   }
   return context;
 };
@@ -219,7 +239,7 @@ export const useProfile = () => {
       const currentProfile = await profiles.getCurrentProfile();
       setProfile(currentProfile);
     } catch (error) {
-      console.error('Error fetching profile:', error);
+      console.error("Error fetching profile:", error);
     } finally {
       setLoading(false);
     }
@@ -231,19 +251,25 @@ export const useProfile = () => {
     }
   }, [isReady, refresh]);
 
-  const updateProfile = useCallback(async (data: Partial<UserProfile>) => {
-    if (!profiles || !profile) return null;
-    const updated = await profiles.update(profile.id, data);
-    if (updated) setProfile(updated);
-    return updated;
-  }, [profiles, profile]);
+  const updateProfile = useCallback(
+    async (data: Partial<UserProfile>) => {
+      if (!profiles || !profile) return null;
+      const updated = await profiles.update(profile.id, data);
+      if (updated) setProfile(updated);
+      return updated;
+    },
+    [profiles, profile],
+  );
 
-  const addXP = useCallback(async (amount: number) => {
-    if (!profiles || !profile) return null;
-    const updated = await profiles.addXP(profile.id, amount);
-    if (updated) setProfile(updated);
-    return updated;
-  }, [profiles, profile]);
+  const addXP = useCallback(
+    async (amount: number) => {
+      if (!profiles || !profile) return null;
+      const updated = await profiles.addXP(profile.id, amount);
+      if (updated) setProfile(updated);
+      return updated;
+    },
+    [profiles, profile],
+  );
 
   return { profile, loading, refresh, updateProfile, addXP };
 };
@@ -268,7 +294,7 @@ export const useFriends = (userId: string) => {
       setFriends(friendList);
       setPendingRequests(pending);
     } catch (error) {
-      console.error('Error fetching friends:', error);
+      console.error("Error fetching friends:", error);
     } finally {
       setLoading(false);
     }
@@ -280,33 +306,45 @@ export const useFriends = (userId: string) => {
     }
   }, [isReady, refresh]);
 
-  const sendRequest = useCallback(async (toUserId: string) => {
-    if (!friendships) return null;
-    const result = await friendships.sendFriendRequest(userId, toUserId);
-    await refresh();
-    return result;
-  }, [friendships, userId, refresh]);
+  const sendRequest = useCallback(
+    async (toUserId: string) => {
+      if (!friendships) return null;
+      const result = await friendships.sendFriendRequest(userId, toUserId);
+      await refresh();
+      return result;
+    },
+    [friendships, userId, refresh],
+  );
 
-  const acceptRequest = useCallback(async (friendId: string) => {
-    if (!friendships) return false;
-    const result = await friendships.acceptFriendRequest(userId, friendId);
-    await refresh();
-    return result;
-  }, [friendships, userId, refresh]);
+  const acceptRequest = useCallback(
+    async (friendId: string) => {
+      if (!friendships) return false;
+      const result = await friendships.acceptFriendRequest(userId, friendId);
+      await refresh();
+      return result;
+    },
+    [friendships, userId, refresh],
+  );
 
-  const declineRequest = useCallback(async (friendId: string) => {
-    if (!friendships) return false;
-    const result = await friendships.declineFriendRequest(userId, friendId);
-    await refresh();
-    return result;
-  }, [friendships, userId, refresh]);
+  const declineRequest = useCallback(
+    async (friendId: string) => {
+      if (!friendships) return false;
+      const result = await friendships.declineFriendRequest(userId, friendId);
+      await refresh();
+      return result;
+    },
+    [friendships, userId, refresh],
+  );
 
-  const removeFriend = useCallback(async (friendId: string) => {
-    if (!friendships) return false;
-    const result = await friendships.removeFriend(userId, friendId);
-    await refresh();
-    return result;
-  }, [friendships, userId, refresh]);
+  const removeFriend = useCallback(
+    async (friendId: string) => {
+      if (!friendships) return false;
+      const result = await friendships.removeFriend(userId, friendId);
+      await refresh();
+      return result;
+    },
+    [friendships, userId, refresh],
+  );
 
   return {
     friends,
@@ -347,7 +385,7 @@ export const usePosts = (options: Partial<PostQueryOptions> = {}) => {
       setPostList(result);
       setHasMore(result.length === pageSize);
     } catch (error) {
-      console.error('Error fetching posts:', error);
+      console.error("Error fetching posts:", error);
     } finally {
       setLoading(false);
     }
@@ -361,7 +399,7 @@ export const usePosts = (options: Partial<PostQueryOptions> = {}) => {
 
   const loadMore = useCallback(async () => {
     if (!posts || loading || !hasMore) return;
-    
+
     const nextPage = page + 1;
     try {
       const result = await posts.getFeedPosts({
@@ -369,29 +407,35 @@ export const usePosts = (options: Partial<PostQueryOptions> = {}) => {
         limit: pageSize,
         offset: nextPage * pageSize,
       });
-      setPostList(prev => [...prev, ...result]);
+      setPostList((prev) => [...prev, ...result]);
       setPage(nextPage);
       setHasMore(result.length === pageSize);
     } catch (error) {
-      console.error('Error loading more posts:', error);
+      console.error("Error loading more posts:", error);
     }
   }, [posts, options, page, pageSize, loading, hasMore]);
 
-  const createPost = useCallback(async (data: Parameters<PostRepository['createPost']>[0]) => {
-    if (!posts) return null;
-    const newPost = await posts.createPost(data);
-    setPostList(prev => [newPost, ...prev]);
-    return newPost;
-  }, [posts]);
+  const createPost = useCallback(
+    async (data: Parameters<PostRepository["createPost"]>[0]) => {
+      if (!posts) return null;
+      const newPost = await posts.createPost(data);
+      setPostList((prev) => [newPost, ...prev]);
+      return newPost;
+    },
+    [posts],
+  );
 
-  const deletePost = useCallback(async (postId: string) => {
-    if (!posts) return false;
-    const result = await posts.delete(postId);
-    if (result) {
-      setPostList(prev => prev.filter(p => p.id !== postId));
-    }
-    return result;
-  }, [posts]);
+  const deletePost = useCallback(
+    async (postId: string) => {
+      if (!posts) return false;
+      const result = await posts.delete(postId);
+      if (result) {
+        setPostList((prev) => prev.filter((p) => p.id !== postId));
+      }
+      return result;
+    },
+    [posts],
+  );
 
   return {
     posts: postList,
@@ -419,7 +463,7 @@ export const useComments = (postId: string) => {
       const result = await commentRepo.getTopLevelComments(postId);
       setComments(result);
     } catch (error) {
-      console.error('Error fetching comments:', error);
+      console.error("Error fetching comments:", error);
     } finally {
       setLoading(false);
     }
@@ -431,30 +475,39 @@ export const useComments = (postId: string) => {
     }
   }, [isReady, refresh]);
 
-  const addComment = useCallback(async (content: string, authorId: string, parentId?: string) => {
-    if (!commentRepo) return null;
-    const newComment = await commentRepo.createComment({
-      post_id: postId,
-      author_id: authorId,
-      parent_comment_id: parentId || null,
-      content,
-      depth: parentId ? 1 : 0,
-    });
-    await refresh();
-    return newComment;
-  }, [commentRepo, postId, refresh]);
+  const addComment = useCallback(
+    async (content: string, authorId: string, parentId?: string) => {
+      if (!commentRepo) return null;
+      const newComment = await commentRepo.createComment({
+        post_id: postId,
+        author_id: authorId,
+        parent_comment_id: parentId || null,
+        content,
+        depth: parentId ? 1 : 0,
+      });
+      await refresh();
+      return newComment;
+    },
+    [commentRepo, postId, refresh],
+  );
 
-  const deleteComment = useCallback(async (commentId: string) => {
-    if (!commentRepo) return false;
-    const result = await commentRepo.delete(commentId);
-    if (result) await refresh();
-    return result;
-  }, [commentRepo, refresh]);
+  const deleteComment = useCallback(
+    async (commentId: string) => {
+      if (!commentRepo) return false;
+      const result = await commentRepo.delete(commentId);
+      if (result) await refresh();
+      return result;
+    },
+    [commentRepo, refresh],
+  );
 
-  const getReplies = useCallback(async (commentId: string) => {
-    if (!commentRepo) return [];
-    return commentRepo.getReplies(commentId);
-  }, [commentRepo]);
+  const getReplies = useCallback(
+    async (commentId: string) => {
+      if (!commentRepo) return [];
+      return commentRepo.getReplies(commentId);
+    },
+    [commentRepo],
+  );
 
   return {
     comments,
@@ -487,7 +540,7 @@ export const useNotifications = (userId: string) => {
       setNotifications(list);
       setUnreadCount(count);
     } catch (error) {
-      console.error('Error fetching notifications:', error);
+      console.error("Error fetching notifications:", error);
     } finally {
       setLoading(false);
     }
@@ -499,19 +552,28 @@ export const useNotifications = (userId: string) => {
     }
   }, [isReady, refresh]);
 
-  const markAsRead = useCallback(async (notificationId: string) => {
-    if (!notificationRepo) return;
-    await notificationRepo.markAsRead(notificationId);
-    setNotifications(prev =>
-      prev.map(n => (n.id === notificationId ? { ...n, is_read: true, read_at: Date.now() } : n))
-    );
-    setUnreadCount(prev => Math.max(0, prev - 1));
-  }, [notificationRepo]);
+  const markAsRead = useCallback(
+    async (notificationId: string) => {
+      if (!notificationRepo) return;
+      await notificationRepo.markAsRead(notificationId);
+      setNotifications((prev) =>
+        prev.map((n) =>
+          n.id === notificationId
+            ? { ...n, is_read: true, read_at: Date.now() }
+            : n,
+        ),
+      );
+      setUnreadCount((prev) => Math.max(0, prev - 1));
+    },
+    [notificationRepo],
+  );
 
   const markAllAsRead = useCallback(async () => {
     if (!notificationRepo) return;
     await notificationRepo.markAllAsRead(userId);
-    setNotifications(prev => prev.map(n => ({ ...n, is_read: true, read_at: Date.now() })));
+    setNotifications((prev) =>
+      prev.map((n) => ({ ...n, is_read: true, read_at: Date.now() })),
+    );
     setUnreadCount(0);
   }, [notificationRepo, userId]);
 
@@ -540,7 +602,7 @@ export const useBookmarks = (userId: string) => {
       const result = await bookmarkRepo.getUserBookmarks(userId);
       setBookmarks(result);
     } catch (error) {
-      console.error('Error fetching bookmarks:', error);
+      console.error("Error fetching bookmarks:", error);
     } finally {
       setLoading(false);
     }
@@ -552,19 +614,24 @@ export const useBookmarks = (userId: string) => {
     }
   }, [isReady, refresh]);
 
-  const toggleBookmark = useCallback(async (
-    type: Bookmark['bookmarkable_type'],
-    itemId: string
-  ) => {
-    if (!bookmarkRepo) return null;
-    const result = await bookmarkRepo.toggleBookmark(userId, type, itemId);
-    await refresh();
-    return result;
-  }, [bookmarkRepo, userId, refresh]);
+  const toggleBookmark = useCallback(
+    async (type: Bookmark["bookmarkable_type"], itemId: string) => {
+      if (!bookmarkRepo) return null;
+      const result = await bookmarkRepo.toggleBookmark(userId, type, itemId);
+      await refresh();
+      return result;
+    },
+    [bookmarkRepo, userId, refresh],
+  );
 
-  const isBookmarked = useCallback((type: Bookmark['bookmarkable_type'], itemId: string) => {
-    return bookmarks.some(b => b.bookmarkable_type === type && b.bookmarkable_id === itemId);
-  }, [bookmarks]);
+  const isBookmarked = useCallback(
+    (type: Bookmark["bookmarkable_type"], itemId: string) => {
+      return bookmarks.some(
+        (b) => b.bookmarkable_type === type && b.bookmarkable_id === itemId,
+      );
+    },
+    [bookmarks],
+  );
 
   return {
     bookmarks,
@@ -591,7 +658,7 @@ export const useActivity = (userId: string, options: QueryOptions = {}) => {
       const result = await activities.getUserActivity(userId, options);
       setActivityList(result);
     } catch (error) {
-      console.error('Error fetching activity:', error);
+      console.error("Error fetching activity:", error);
     } finally {
       setLoading(false);
     }
@@ -613,7 +680,11 @@ export const useActivity = (userId: string, options: QueryOptions = {}) => {
 /**
  * Hook for like operations
  */
-export const useLike = (userId: string, likeableType: 'post' | 'comment', likeableId: string) => {
+export const useLike = (
+  userId: string,
+  likeableType: "post" | "comment",
+  likeableId: string,
+) => {
   const { likes, isReady } = useLocalFirst();
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
@@ -630,7 +701,7 @@ export const useLike = (userId: string, likeableType: 'post' | 'comment', likeab
       setIsLiked(liked);
       setLikeCount(count);
     } catch (error) {
-      console.error('Error fetching like status:', error);
+      console.error("Error fetching like status:", error);
     } finally {
       setLoading(false);
     }
@@ -646,7 +717,7 @@ export const useLike = (userId: string, likeableType: 'post' | 'comment', likeab
     if (!likes) return;
     const result = await likes.toggleLike(userId, likeableType, likeableId);
     setIsLiked(result.liked);
-    setLikeCount(prev => prev + (result.liked ? 1 : -1));
+    setLikeCount((prev) => prev + (result.liked ? 1 : -1));
     return result;
   }, [likes, userId, likeableType, likeableId]);
 

@@ -12,6 +12,10 @@ import {
     initDatabase,
 } from "./database";
 import { useLocalFirst } from "./local-first/hooks";
+import {
+    DEFAULT_PROFILE_AVATAR_KEY,
+    normalizeProfileAvatarKey,
+} from "./profile-avatars";
 import { syncProfileToSupabase } from "./profile-sync";
 import { getOnboardingCompleted, setLastActiveDate } from "./storage";
 import { ensureSupabaseAuthUserId, isSupabaseConfigured } from "./supabase";
@@ -92,8 +96,23 @@ export const StorageProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const reloadUserProfile = useCallback(async () => {
-    const profile = await getUserProfile();
-    setUserProfile(profile as UserProfile);
+    const profile = (await getUserProfile()) as UserProfile | null;
+    if (!profile) {
+      setUserProfile(null);
+      return;
+    }
+
+    const normalizedAvatar = normalizeProfileAvatarKey(profile.avatar_url);
+    if (profile.avatar_url !== normalizedAvatar) {
+      await createOrUpdateUserProfile({ avatar_url: normalizedAvatar });
+      const refreshedProfile = (await getUserProfile()) as UserProfile | null;
+      setUserProfile(
+        refreshedProfile || { ...profile, avatar_url: normalizedAvatar },
+      );
+      return;
+    }
+
+    setUserProfile(profile);
   }, []);
 
   const checkConnectivity = useCallback(async () => {
@@ -187,6 +206,19 @@ export const StorageProvider = ({ children }: { children: ReactNode }) => {
           }
         }
 
+        if (activeProfile) {
+          const normalizedAvatar = normalizeProfileAvatarKey(
+            activeProfile.avatar_url,
+          );
+          if (activeProfile.avatar_url !== normalizedAvatar) {
+            await createOrUpdateUserProfile({ avatar_url: normalizedAvatar });
+            const refreshedWithAvatar = await getUserProfile();
+            if (refreshedWithAvatar) {
+              activeProfile = refreshedWithAvatar as UserProfile;
+            }
+          }
+        }
+
         setUserProfile(activeProfile);
       } else {
         // Create default profile with unique user_id
@@ -194,8 +226,7 @@ export const StorageProvider = ({ children }: { children: ReactNode }) => {
           user_id: authUserId || generateLocalUserId(),
           username: "Scientist",
           display_name: "Scientist",
-          avatar_url:
-            "https://images.pexels.com/photos/1181695/pexels-photo-1181695.jpeg?auto=compress&cs=tinysrgb&w=200",
+          avatar_url: DEFAULT_PROFILE_AVATAR_KEY,
           total_xp: 0,
           current_streak: 0,
           longest_streak: 0,
@@ -235,7 +266,14 @@ export const StorageProvider = ({ children }: { children: ReactNode }) => {
 
   const updateUserProfile = async (updates: Partial<UserProfile>) => {
     try {
-      await createOrUpdateUserProfile(updates);
+      const normalizedUpdates: Partial<UserProfile> = {
+        ...updates,
+        ...(updates.avatar_url !== undefined
+          ? { avatar_url: normalizeProfileAvatarKey(updates.avatar_url) }
+          : {}),
+      };
+
+      await createOrUpdateUserProfile(normalizedUpdates);
       await reloadUserProfile();
     } catch (error) {
       console.error("Error updating user profile:", error);
@@ -300,7 +338,7 @@ export const StorageProvider = ({ children }: { children: ReactNode }) => {
         display_name_updated_at: userProfile.display_name_updated_at || null,
         next_display_name_change_at:
           userProfile.next_display_name_change_at || null,
-        avatar_url: userProfile.avatar_url,
+        avatar_url: normalizeProfileAvatarKey(userProfile.avatar_url),
         total_xp: userProfile.total_xp,
         current_streak: userProfile.current_streak,
         longest_streak: userProfile.longest_streak,

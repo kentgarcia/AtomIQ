@@ -10,29 +10,30 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
-    Dimensions,
-    Image,
-    Pressable,
-    SafeAreaView,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  Dimensions,
+  Image,
+  Pressable,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import {
-    Gesture,
-    GestureDetector,
-    GestureHandlerRootView,
+  Gesture,
+  GestureDetector,
+  GestureHandlerRootView,
 } from "react-native-gesture-handler";
 import Animated, {
-    FadeInDown,
-    interpolate,
-    runOnJS,
-    useAnimatedStyle,
-    useSharedValue,
-    withSpring,
-    withTiming,
+  FadeInDown,
+  interpolate,
+  runOnJS,
+  useAnimatedStyle,
+  useSharedValue,
+  withRepeat,
+  withSpring,
+  withTiming,
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -95,7 +96,7 @@ const GAME_MODES: ModeConfig[] = [
     color: "#FF3B5C",
     colorSecondary: "#FF6B88",
     rounds: 10,
-    timeLimit: 5,
+    timeLimit: 10,
     xpMultiplier: 1.5,
     difficulty: 2,
     tagline: "Race against the clock!",
@@ -148,6 +149,7 @@ export default function MythBusterScreen() {
   const translateY = useSharedValue(0);
   const rotate = useSharedValue(0);
   const opacity = useSharedValue(1);
+  const timerWiggle = useSharedValue(0);
   const loseExplosionScale = useSharedValue(0.4);
   const loseExplosionRingScale = useSharedValue(0.6);
   const loseExplosionOpacity = useSharedValue(0);
@@ -179,6 +181,25 @@ export default function MythBusterScreen() {
 
     return () => clearInterval(timer);
   }, [timeLeft, gameState, currentIndex]);
+
+  useEffect(() => {
+    if (
+      gameState === "playing" &&
+      selectedMode.timeLimit &&
+      timeLeft !== null &&
+      timeLeft > 0 &&
+      timeLeft <= 3
+    ) {
+      timerWiggle.value = withRepeat(
+        withTiming(1, { duration: 120 }),
+        -1,
+        true,
+      );
+      return;
+    }
+
+    timerWiggle.value = withTiming(0, { duration: 120 });
+  }, [gameState, selectedMode.timeLimit, timeLeft]);
 
   const handleTimeUp = () => {
     if (isAnimating) return;
@@ -499,6 +520,13 @@ export default function MythBusterScreen() {
 
   const truthLabelStyle = useAnimatedStyle(() => ({
     opacity: interpolate(translateX.value, [0, SWIPE_THRESHOLD], [0, 1]),
+  }));
+
+  const timerIconWiggleStyle = useAnimatedStyle(() => ({
+    transform: [
+      { translateX: interpolate(timerWiggle.value, [0, 1], [-2.5, 2.5]) },
+      { rotate: `${interpolate(timerWiggle.value, [0, 1], [-10, 10])}deg` },
+    ],
   }));
 
   const loseExplosionCoreStyle = useAnimatedStyle(() => ({
@@ -862,9 +890,16 @@ export default function MythBusterScreen() {
   }
 
   if (gameState === "results") {
+    const answeredMyths = myths
+      .slice(0, answers.length)
+      .map((myth, index) => ({ ...myth, originalIndex: index }));
+    const totalAnswered = answeredMyths.length;
     const correctAnswers = answers.filter((a) => a).length;
-    const accuracy = Math.round((correctAnswers / myths.length) * 100);
-    const wrongAnswers = myths.length - correctAnswers;
+    const accuracy =
+      totalAnswered > 0
+        ? Math.round((correctAnswers / totalAnswered) * 100)
+        : 0;
+    const wrongAnswers = totalAnswered - correctAnswers;
 
     // Get performance message based on accuracy
     const getPerformanceMessage = () => {
@@ -877,10 +912,8 @@ export default function MythBusterScreen() {
 
     const filteredMyths =
       reviewTab === "wrong"
-        ? myths
-            .map((m, i) => ({ ...m, originalIndex: i }))
-            .filter((_, i) => !answers[i])
-        : myths.map((m, i) => ({ ...m, originalIndex: i }));
+        ? answeredMyths.filter((myth) => !answers[myth.originalIndex])
+        : answeredMyths;
 
     return (
       <GestureHandlerRootView style={{ flex: 1 }}>
@@ -1074,7 +1107,7 @@ export default function MythBusterScreen() {
                         reviewTab === "all" && styles.resultsTabTextActive,
                       ]}
                     >
-                      All ({myths.length})
+                      All ({totalAnswered})
                     </Text>
                   </TouchableOpacity>
                   <TouchableOpacity
@@ -1326,20 +1359,6 @@ export default function MythBusterScreen() {
                     ? `${currentIndex + 1} / ∞`
                     : `${currentIndex + 1} / ${myths.length}`}
                 </Text>
-                {selectedMode.timeLimit && timeLeft !== null && (
-                  <View
-                    style={[
-                      styles.timerBadge,
-                      {
-                        backgroundColor:
-                          timeLeft <= 3 ? THEME.error : selectedMode.color,
-                      },
-                    ]}
-                  >
-                    <Icon name="Timer" size={14} color="#FFF" variant="Bold" />
-                    <Text style={styles.timerText}>{timeLeft}s</Text>
-                  </View>
-                )}
               </View>
               <View
                 style={[styles.progressBar, { backgroundColor: cardColor }]}
@@ -1494,19 +1513,47 @@ export default function MythBusterScreen() {
                         {currentMyth.difficulty.toUpperCase()}
                       </Text>
                     </View>
-                    {selectedMode.id === "endless" && (
-                      <View style={styles.livesContainer}>
-                        {[...Array(3)].map((_, i) => (
-                          <Icon
-                            key={i}
-                            name="Heart"
-                            size={18}
-                            color={i < lives ? THEME.error : "#E5E7EB"}
-                            variant={i < lives ? "Bold" : "Linear"}
-                          />
-                        ))}
+                    {(selectedMode.timeLimit && timeLeft !== null) ||
+                    selectedMode.id === "endless" ? (
+                      <View style={styles.cardHeaderRight}>
+                        {selectedMode.timeLimit && timeLeft !== null && (
+                          <View
+                            style={[
+                              styles.timerBadge,
+                              {
+                                backgroundColor:
+                                  timeLeft <= 3
+                                    ? THEME.error
+                                    : selectedMode.color,
+                              },
+                            ]}
+                          >
+                            <Animated.View style={timerIconWiggleStyle}>
+                              <Icon
+                                name="Timer"
+                                size={18}
+                                color="#FFF"
+                                variant="Bold"
+                              />
+                            </Animated.View>
+                            <Text style={styles.timerText}>{timeLeft}s</Text>
+                          </View>
+                        )}
+                        {selectedMode.id === "endless" && (
+                          <View style={styles.livesContainer}>
+                            {[...Array(3)].map((_, i) => (
+                              <Icon
+                                key={i}
+                                name="Heart"
+                                size={18}
+                                color={i < lives ? THEME.error : "#E5E7EB"}
+                                variant={i < lives ? "Bold" : "Linear"}
+                              />
+                            ))}
+                          </View>
+                        )}
                       </View>
-                    )}
+                    ) : null}
                   </View>
 
                   <View style={styles.cardContent}>
@@ -1945,13 +1992,20 @@ const styles = StyleSheet.create({
   timerBadge: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 4,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
+    justifyContent: "center",
+    gap: 6,
+    minWidth: 88,
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+    borderRadius: 16,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.12,
+    shadowRadius: 4,
+    elevation: 2,
   },
   timerText: {
-    fontSize: 12,
+    fontSize: 14,
     fontWeight: "800",
     color: "#FFF",
   },
@@ -2094,6 +2148,11 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: 24,
+  },
+  cardHeaderRight: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
   },
   difficultyBadge: {
     flexDirection: "row",

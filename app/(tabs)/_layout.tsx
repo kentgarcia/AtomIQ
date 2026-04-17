@@ -1,22 +1,33 @@
-import { Icon } from '@/components/ui/icon';
-import { useColorScheme } from '@/hooks/use-color-scheme';
-import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
-import { Tabs } from 'expo-router';
-import React from 'react';
-import { Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Icon } from "@/components/ui/icon";
+import { useColorScheme } from "@/hooks/use-color-scheme";
+import { playButtonClickSfx } from "@/services/ui-sfx";
+import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";
+import { Tabs } from "expo-router";
+import React from "react";
+import {
+    Platform,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
+} from "react-native";
+import Animated, {
+    useAnimatedStyle,
+    useSharedValue,
+    withSpring,
+} from "react-native-reanimated";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-const TabButton = ({ 
-  tab, 
-  isFocused, 
-  onPress, 
-  theme 
-}: { 
-  tab: any; 
-  isFocused: boolean; 
-  onPress: () => void; 
-  theme: any; 
+const TabButton = ({
+  tab,
+  isFocused,
+  onPress,
+  theme,
+}: {
+  tab: any;
+  isFocused: boolean;
+  onPress: () => void;
+  theme: any;
 }) => {
   const scale = useSharedValue(1);
 
@@ -27,6 +38,7 @@ const TabButton = ({
   });
 
   const handlePress = () => {
+    void playButtonClickSfx();
     scale.value = withSpring(0.9, { damping: 10 }, () => {
       scale.value = withSpring(1, { damping: 10 });
     });
@@ -40,21 +52,28 @@ const TabButton = ({
       style={styles.tabButton}
     >
       <Animated.View style={[styles.tabContent, animatedStyle]}>
-        <View style={[
-          styles.iconContainer, 
-          isFocused && { backgroundColor: theme.active + '15' }
-        ]}>
-          <Icon 
-            name={tab.icon} 
-            size={24} 
-            color={isFocused ? theme.active : theme.inactive} 
-            variant={isFocused ? 'Bold' : 'Linear'}
+        <View
+          style={[
+            styles.iconContainer,
+            isFocused && { backgroundColor: theme.active + "15" },
+          ]}
+        >
+          <Icon
+            name={tab.icon}
+            size={24}
+            color={isFocused ? theme.active : theme.inactive}
+            variant={isFocused ? "Bold" : "Linear"}
           />
         </View>
-        <Text style={[
-          styles.tabLabel, 
-          { color: isFocused ? theme.active : theme.inactive, fontWeight: isFocused ? '700' : '500' }
-        ]}>
+        <Text
+          style={[
+            styles.tabLabel,
+            {
+              color: isFocused ? theme.active : theme.inactive,
+              fontWeight: isFocused ? "700" : "500",
+            },
+          ]}
+        >
           {tab.label}
         </Text>
       </Animated.View>
@@ -65,21 +84,21 @@ const TabButton = ({
 function ModernTabBar({ state, navigation }: BottomTabBarProps) {
   const insets = useSafeAreaInsets();
   const colorScheme = useColorScheme();
-  const isDark = colorScheme === 'dark';
-  
+  const isDark = colorScheme === "dark";
+
   const THEME = {
-    bg: isDark ? '#172B4D' : '#F8F9FE',
-    border: isDark ? '#2D3A56' : '#E5E7EB',
-    active: '#EA580C', // Matching other pages
-    inactive: isDark ? '#8898AA' : '#8898AA',
+    bg: isDark ? "#172B4D" : "#F8F9FE",
+    border: isDark ? "#2D3A56" : "#E5E7EB",
+    active: "#EA580C", // Matching other pages
+    inactive: isDark ? "#8898AA" : "#8898AA",
   };
 
   const tabs = [
-    { name: 'index', icon: 'Home', label: 'Home' },
-    { name: 'community', icon: 'People', label: 'Feed' },
-    { name: 'chat', icon: 'Message', label: 'AI' },
-    { name: 'awards', icon: 'Cup', label: 'Awards' },
-    { name: 'profile', icon: 'Profile', label: 'Profile' },
+    { name: "index", icon: "Home", label: "Home" },
+    { name: "community", icon: "People", label: "Feed" },
+    { name: "chat", icon: "Message", label: "AI" },
+    { name: "awards", icon: "Cup", label: "Awards" },
+    { name: "profile", icon: "Profile", label: "Profile" },
   ] as const;
 
   return (
@@ -87,7 +106,9 @@ function ModernTabBar({ state, navigation }: BottomTabBarProps) {
       style={[
         styles.tabBar,
         {
-          paddingBottom: (insets.bottom || 0) + (Platform.select({ ios: 0, android: 8 }) || 8),
+          paddingBottom:
+            (insets.bottom || 0) +
+            (Platform.select({ ios: 0, android: 8 }) || 8),
           backgroundColor: THEME.bg,
           borderTopColor: THEME.border,
         },
@@ -101,7 +122,7 @@ function ModernTabBar({ state, navigation }: BottomTabBarProps) {
 
         const onPress = () => {
           const event = navigation.emit({
-            type: 'tabPress',
+            type: "tabPress",
             target: state.routes[routeIndex].key,
             canPreventDefault: true,
           });
@@ -131,7 +152,7 @@ export default function TabLayout() {
       screenOptions={{
         headerShown: false,
         tabBarStyle: {
-          display: 'none',
+          display: "none",
         },
       }}
       tabBar={(props) => <ModernTabBar {...props} />}
@@ -139,31 +160,31 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Home',
+          title: "Home",
         }}
       />
       <Tabs.Screen
         name="community"
         options={{
-          title: 'Community',
+          title: "Community",
         }}
       />
       <Tabs.Screen
         name="chat"
         options={{
-          title: 'AI',
+          title: "AI",
         }}
       />
       <Tabs.Screen
         name="awards"
         options={{
-          title: 'Awards',
+          title: "Awards",
         }}
       />
       <Tabs.Screen
         name="profile"
         options={{
-          title: 'Profile',
+          title: "Profile",
         }}
       />
     </Tabs>
@@ -172,31 +193,31 @@ export default function TabLayout() {
 
 const styles = StyleSheet.create({
   tabBar: {
-    flexDirection: 'row',
+    flexDirection: "row",
     borderTopWidth: 1,
     paddingTop: 12,
     paddingHorizontal: 8,
     elevation: 8,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: -2 },
     shadowOpacity: 0.05,
     shadowRadius: 8,
   },
   tabButton: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   tabContent: {
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     gap: 4,
   },
   iconContainer: {
     padding: 8,
     borderRadius: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   tabLabel: {
     fontSize: 10,

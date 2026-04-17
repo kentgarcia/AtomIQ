@@ -1643,9 +1643,10 @@ const createStyles = (theme: typeof LightTHEME) =>
 
     // MythBuster
     cardContainer: {
+      width: "100%",
       alignItems: "center",
       justifyContent: "center",
-      height: 400,
+      minHeight: 400,
     },
     swipeCard: {
       width: width - 48,
@@ -2321,14 +2322,30 @@ const createLearnStyles = (theme: typeof LightTHEME) => ({
     justifyContent: "center" as const,
     borderWidth: 2,
   },
-  backBtn: { backgroundColor: theme.bg, borderColor: theme.border },
+  backBtn: {
+    height: 56,
+    minWidth: 56,
+    borderRadius: 16,
+    backgroundColor: theme.bg,
+    borderWidth: 2,
+    borderColor: theme.border,
+    borderBottomWidth: 4,
+    alignItems: "center" as const,
+    justifyContent: "center" as const,
+    paddingHorizontal: 16,
+  },
   nextBtn: {
     backgroundColor: theme.primary,
     borderColor: theme.primaryDark,
     borderBottomWidth: 4,
   },
   btnText: { fontWeight: "700" as const, fontSize: 14 },
-  navRow: { flexDirection: "row" as const, gap: 12, marginTop: 24 },
+  navRow: {
+    flexDirection: "row" as const,
+    alignItems: "center" as const,
+    gap: 12,
+    marginTop: 24,
+  },
   continueBtn: {
     flex: 1,
     height: 56,
@@ -2336,8 +2353,10 @@ const createLearnStyles = (theme: typeof LightTHEME) => ({
     backgroundColor: theme.primary,
     borderColor: theme.primaryDark,
     borderBottomWidth: 4,
+    flexDirection: "row" as const,
     alignItems: "center" as const,
     justifyContent: "center" as const,
+    gap: 8,
   },
   continueBtnText: { color: "#FFF", fontWeight: "800" as const, fontSize: 16 },
 });
