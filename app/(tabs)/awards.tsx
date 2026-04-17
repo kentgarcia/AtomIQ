@@ -552,7 +552,7 @@ export default function AwardsScreen() {
                         <Icon
                           name="Lock1"
                           size={24}
-                          color="#999"
+                          color={THEME.textMuted}
                           variant="Bold"
                         />
                       </View>
@@ -1144,9 +1144,9 @@ const createStyles = (theme: typeof LightTHEME) =>
       position: "relative",
     },
     certificateLocked: {
-      backgroundColor: "#F5F5F5",
+      backgroundColor: theme.bg,
       borderWidth: 1,
-      borderColor: "#E5E5E5",
+      borderColor: theme.border,
     },
     certificateContent: {
       flex: 1,
@@ -1235,10 +1235,12 @@ const createStyles = (theme: typeof LightTHEME) =>
       width: 64,
       height: 64,
       borderRadius: 32,
-      backgroundColor: "#E0E0E0",
+      backgroundColor: theme.card,
       alignItems: "center",
       justifyContent: "center",
       marginRight: 16,
+      borderWidth: 1,
+      borderColor: theme.border,
     },
     certificateTitleLocked: {
       fontSize: 16,

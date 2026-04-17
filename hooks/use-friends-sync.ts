@@ -9,9 +9,17 @@ import {
     searchUsers,
     sendFriendRequest,
 } from "@/services/friends-sync";
+import { normalizeProfileAvatarKey } from "@/services/profile-avatars";
 import { useStorage } from "@/services/StorageContext";
 import { useCallback, useState } from "react";
 import { Alert } from "react-native";
+
+const FRIENDS_ONLINE_REQUIRED_MESSAGE =
+  "Friend requests are online-only. Connect to the internet and sync your profile first.";
+const FRIENDS_SYNC_REQUIRED_MESSAGE =
+  "Please sync your profile online before sending friend requests, then try again.";
+const FRIENDS_ACTION_SYNC_HINT =
+  "Friend actions need internet and a recent sync. Connect online, sync your profile, then try again.";
 
 export const useFriendsSync = () => {
   const { userProfile, isOnline, syncProfileToSupabase } = useStorage();
@@ -27,7 +35,7 @@ export const useFriendsSync = () => {
   const handleSearchUsers = useCallback(
     async (query: string) => {
       if (!userProfile || !isOnline) {
-        Alert.alert("Offline", "Friend search requires internet connection");
+        Alert.alert("Internet Required", FRIENDS_ONLINE_REQUIRED_MESSAGE);
         return;
       }
 
@@ -72,8 +80,16 @@ export const useFriendsSync = () => {
    */
   const handleSendFriendRequest = useCallback(
     async (toUserId: string) => {
-      if (!userProfile || !isOnline) {
-        Alert.alert("Offline", "Friend requests require internet connection");
+      if (!userProfile) {
+        Alert.alert(
+          "Profile Required",
+          "Finish setting up your profile, then connect online to send friend requests.",
+        );
+        return;
+      }
+
+      if (!isOnline) {
+        Alert.alert("Internet Required", FRIENDS_ONLINE_REQUIRED_MESSAGE);
         return;
       }
 
@@ -89,7 +105,7 @@ export const useFriendsSync = () => {
         const syncSuccess = await syncProfileToSupabase();
 
         if (!syncSuccess) {
-          Alert.alert("Error", "Failed to sync profile before sending request");
+          Alert.alert("Sync Required", FRIENDS_SYNC_REQUIRED_MESSAGE);
           return;
         }
 
@@ -98,7 +114,7 @@ export const useFriendsSync = () => {
           userProfile.user_id,
           toUserId,
           userProfile.username,
-          userProfile.avatar_url,
+          normalizeProfileAvatarKey(userProfile.avatar_url),
           userProfile.display_name || userProfile.username,
           userProfile.friend_code || null,
         );
@@ -114,11 +130,17 @@ export const useFriendsSync = () => {
             ),
           );
         } else {
-          Alert.alert("Error", "Failed to send friend request");
+          Alert.alert(
+            "Send Failed",
+            "Could not send request right now. Make sure you are online and synced, then try again.",
+          );
         }
       } catch (error) {
         console.error("Send request error:", error);
-        Alert.alert("Error", "Failed to send friend request");
+        Alert.alert(
+          "Send Failed",
+          "Could not send request right now. Make sure you are online and synced, then try again.",
+        );
       } finally {
         setIsLoading(false);
       }
@@ -177,7 +199,7 @@ export const useFriendsSync = () => {
       fromStreak: number,
     ) => {
       if (!userProfile || !isOnline) {
-        Alert.alert("Offline", "Action requires internet connection");
+        Alert.alert("Internet Required", FRIENDS_ACTION_SYNC_HINT);
         return;
       }
 
@@ -188,7 +210,7 @@ export const useFriendsSync = () => {
           fromUserId,
           userProfile.user_id,
           userProfile.username,
-          userProfile.avatar_url,
+          normalizeProfileAvatarKey(userProfile.avatar_url),
           userProfile.total_xp,
           userProfile.current_streak,
         );
@@ -198,11 +220,17 @@ export const useFriendsSync = () => {
           // Reload both lists
           await Promise.all([loadFriends(), loadFriendRequests()]);
         } else {
-          Alert.alert("Error", "Failed to accept friend request");
+          Alert.alert(
+            "Action Failed",
+            "Unable to accept right now. Make sure you are online and synced, then try again.",
+          );
         }
       } catch (error) {
         console.error("Accept request error:", error);
-        Alert.alert("Error", "Failed to accept friend request");
+        Alert.alert(
+          "Action Failed",
+          "Unable to accept right now. Make sure you are online and synced, then try again.",
+        );
       } finally {
         setIsLoading(false);
       }
@@ -216,7 +244,7 @@ export const useFriendsSync = () => {
   const handleRemoveFriend = useCallback(
     async (friendId: string) => {
       if (!userProfile || !isOnline) {
-        Alert.alert("Offline", "Action requires internet connection");
+        Alert.alert("Internet Required", FRIENDS_ACTION_SYNC_HINT);
         return;
       }
 
@@ -232,11 +260,17 @@ export const useFriendsSync = () => {
                 Alert.alert("Success", "Friend removed");
                 await loadFriends();
               } else {
-                Alert.alert("Error", "Failed to remove friend");
+                Alert.alert(
+                  "Action Failed",
+                  "Unable to remove friend right now. Make sure you are online and synced, then try again.",
+                );
               }
             } catch (error) {
               console.error("Remove friend error:", error);
-              Alert.alert("Error", "Failed to remove friend");
+              Alert.alert(
+                "Action Failed",
+                "Unable to remove friend right now. Make sure you are online and synced, then try again.",
+              );
             } finally {
               setIsLoading(false);
             }

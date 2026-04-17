@@ -11,6 +11,7 @@ import {
     supabase,
     type TransferCodeRedeemProfile,
 } from "@/services/supabase";
+import { setUiSfxEnabled } from "@/services/ui-sfx";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
@@ -49,17 +50,23 @@ const DarkTHEME = {
 export default function SettingsScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { userProfile, updateUserProfile, syncProfileToSupabase, isOnline } =
-    useStorage();
+  const {
+    userProfile,
+    updateUserProfile,
+    syncProfileToSupabase,
+    isOnline,
+    isSyncing,
+    pendingChanges,
+    lastSyncedAt,
+  } = useStorage();
   const { colorScheme, isDark, toggleTheme } = useTheme();
   const THEME = colorScheme === "dark" ? DarkTHEME : LightTHEME;
   const [isEditing, setIsEditing] = useState(false);
   const [displayName, setDisplayName] = useState(
     userProfile?.display_name || userProfile?.username || "",
   );
-  const [notifications, setNotifications] = useState(true);
   const [soundEffects, setSoundEffects] = useState(true);
-  const [dailyReminder, setDailyReminder] = useState(true);
+  const [isManualSyncing, setIsManualSyncing] = useState(false);
   const [isDeletingAccount, setIsDeletingAccount] = useState(false);
   const [isTransferCodeActionLoading, setIsTransferCodeActionLoading] =
     useState(false);
@@ -163,6 +170,70 @@ export default function SettingsScreen() {
 
     return true;
   };
+
+  const handleManualSyncNow = async () => {
+    if (isManualSyncing || isSyncing) {
+      return;
+    }
+
+    if (!isSupabaseConfigured()) {
+      Alert.alert("Unavailable", "Cloud sync is not configured in this build.");
+      return;
+    }
+
+    if (!isOnline) {
+      Alert.alert(
+        "Internet Required",
+        "Connect to the internet, then tap Sync Now to upload your latest data.",
+      );
+      return;
+    }
+
+    try {
+      setIsManualSyncing(true);
+      const synced = await syncProfileToSupabase();
+
+      if (synced) {
+        Alert.alert("Sync Complete", "Your latest data is now synced online.");
+      } else {
+        Alert.alert(
+          "Sync Needed",
+          "Unable to sync right now. Keep internet on and tap Sync Now again.",
+        );
+      }
+    } catch (error) {
+      Alert.alert(
+        "Sync Failed",
+        "Unable to sync right now. Please try again in a moment.",
+      );
+    } finally {
+      setIsManualSyncing(false);
+    }
+  };
+
+  const syncStatusDescription = (() => {
+    if (!isSupabaseConfigured()) {
+      return "Cloud sync is unavailable in this build.";
+    }
+
+    if (!isOnline) {
+      return "Offline. Connect to internet and tap Sync Now.";
+    }
+
+    if (isSyncing || isManualSyncing) {
+      return "Syncing your latest changes...";
+    }
+
+    if (pendingChanges > 0) {
+      return `${pendingChanges} change${pendingChanges === 1 ? "" : "s"} pending. Tap Sync Now if auto-sync is delayed.`;
+    }
+
+    if (lastSyncedAt) {
+      return `Last synced at ${new Date(lastSyncedAt).toLocaleTimeString()}.`;
+    }
+
+    return "Ready. Tap Sync Now anytime if your changes are not appearing online.";
+  })();
 
   const handleGenerateTransferCode = async () => {
     if (isTransferCodeActionLoading) {
@@ -349,7 +420,9 @@ export default function SettingsScreen() {
   };
 
   const handleSaveDisplayName = async () => {
-    if (displayName.trim().length < 3) {
+    const nextDisplayName = displayName.trim();
+
+    if (nextDisplayName.length < 3) {
       Alert.alert("Error", "Display name must be at least 3 characters long");
       return;
     }
@@ -360,8 +433,36 @@ export default function SettingsScreen() {
     }
 
     try {
-      await updateUserProfile({ display_name: displayName.trim() });
+      // Always save locally first so profile updates still work offline.
+      await updateUserProfile({ display_name: nextDisplayName });
       setIsEditing(false);
+
+      const cloudSyncEnabled = isSupabaseConfigured();
+      if (!cloudSyncEnabled) {
+        Alert.alert(
+          "Success",
+          "Display name updated successfully! You can change it again in 7 days.",
+        );
+        return;
+      }
+
+      if (!isOnline) {
+        Alert.alert(
+          "Saved Offline",
+          "Display name updated on this device. It will sync automatically when internet is available.",
+        );
+        return;
+      }
+
+      const synced = await syncProfileToSupabase();
+      if (!synced) {
+        Alert.alert(
+          "Saved Locally",
+          "Display name updated on this device. Cloud sync will retry automatically when network is stable.",
+        );
+        return;
+      }
+
       Alert.alert(
         "Success",
         "Display name updated successfully! You can change it again in 7 days.",
@@ -371,6 +472,14 @@ export default function SettingsScreen() {
         ?.nextAllowedAt;
       if (nextAllowedAt) {
         Alert.alert("Cooldown Active", formatCooldown(nextAllowedAt));
+        return;
+      }
+
+      if (!isOnline) {
+        Alert.alert(
+          "Offline",
+          "Unable to update display name right now while offline. Please try again once internet is available.",
+        );
         return;
       }
 
@@ -458,6 +567,7 @@ export default function SettingsScreen() {
 
   const handleSoundEffectsToggle = (enabled: boolean) => {
     setSoundEffects(enabled);
+    setUiSfxEnabled(enabled);
     void setSoundEnabled(enabled);
   };
 
@@ -725,29 +835,6 @@ export default function SettingsScreen() {
             <View style={[styles.settingRow, styles.settingRowBorder]}>
               <View style={styles.settingInfo}>
                 <Icon
-                  name="Notification"
-                  size={20}
-                  color={THEME.primary}
-                  variant="Bold"
-                />
-                <View>
-                  <Text style={styles.settingLabel}>Push Notifications</Text>
-                  <Text style={styles.settingDescription}>
-                    Receive updates and reminders
-                  </Text>
-                </View>
-              </View>
-              <Switch
-                value={notifications}
-                onValueChange={setNotifications}
-                trackColor={{ false: "#E5E5E5", true: THEME.primary }}
-                thumbColor={notifications ? "#FFFFFF" : "#FFFFFF"}
-              />
-            </View>
-
-            <View style={[styles.settingRow, styles.settingRowBorder]}>
-              <View style={styles.settingInfo}>
-                <Icon
                   name="VolumeHigh"
                   size={20}
                   color={THEME.primary}
@@ -767,29 +854,6 @@ export default function SettingsScreen() {
                 thumbColor={soundEffects ? "#FFFFFF" : "#FFFFFF"}
               />
             </View>
-
-            <View style={[styles.settingRow, styles.settingRowBorder]}>
-              <View style={styles.settingInfo}>
-                <Icon
-                  name="Clock"
-                  size={20}
-                  color={THEME.primary}
-                  variant="Bold"
-                />
-                <View>
-                  <Text style={styles.settingLabel}>Daily Reminder</Text>
-                  <Text style={styles.settingDescription}>
-                    Remind me to learn daily
-                  </Text>
-                </View>
-              </View>
-              <Switch
-                value={dailyReminder}
-                onValueChange={setDailyReminder}
-                trackColor={{ false: "#E5E5E5", true: THEME.primary }}
-                thumbColor={dailyReminder ? "#FFFFFF" : "#FFFFFF"}
-              />
-            </View>
           </View>
         </Animated.View>
 
@@ -798,6 +862,46 @@ export default function SettingsScreen() {
           <Text style={styles.sectionTitle}>Cloud Sync</Text>
           <View style={styles.settingsCard}>
             <View style={styles.settingRow}>
+              <View style={styles.settingInfo}>
+                <Icon
+                  name="Refresh"
+                  size={20}
+                  color={THEME.primary}
+                  variant="Bold"
+                />
+                <View>
+                  <Text style={styles.settingLabel}>Sync Status</Text>
+                  <Text style={styles.settingDescription}>
+                    {syncStatusDescription}
+                  </Text>
+                </View>
+              </View>
+              <TouchableOpacity
+                style={[
+                  styles.cloudActionBtn,
+                  (!isSupabaseConfigured() ||
+                    !isOnline ||
+                    isManualSyncing ||
+                    isSyncing) &&
+                    styles.cloudActionBtnDisabled,
+                ]}
+                onPress={handleManualSyncNow}
+                disabled={
+                  !isSupabaseConfigured() ||
+                  !isOnline ||
+                  isManualSyncing ||
+                  isSyncing
+                }
+              >
+                {isManualSyncing || isSyncing ? (
+                  <ActivityIndicator size="small" color="#FFFFFF" />
+                ) : (
+                  <Text style={styles.cloudActionBtnText}>Sync Now</Text>
+                )}
+              </TouchableOpacity>
+            </View>
+
+            <View style={[styles.settingRow, styles.settingRowBorder]}>
               <View style={styles.settingInfo}>
                 <Icon
                   name="Profile"

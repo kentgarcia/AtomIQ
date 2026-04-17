@@ -17,6 +17,8 @@ import {
     convertMessagesToGeminiFormat,
     sendMessageToGemini,
 } from "@/services/gemini";
+import { openExternalUrl } from "@/services/open-url";
+import { useStorage } from "@/services/StorageContext";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import React, { useCallback, useEffect, useRef, useState } from "react";
@@ -83,6 +85,39 @@ const INITIAL_SUGGESTIONS = [
   "Radiation vs. Radioactivity",
 ];
 
+const OFFLINE_CHAT_ERROR_MESSAGE =
+  "Schrodi is offline right now. Reconnect to the internet and try again.";
+const OFFLINE_CHAT_ALERT_MESSAGE =
+  "No internet connection right now. Connect online, then send your question again.";
+
+const REFERENCE_URLS: Record<string, string> = {
+  IAEA: "https://www.iaea.org/",
+  UNSCEAR: "https://www.unscear.org/",
+  NRC: "https://www.nrc.gov/",
+  WHO: "https://www.who.int/",
+  ICRP: "https://www.icrp.org/",
+  NEA: "https://www.oecd-nea.org/",
+  ANS: "https://www.ans.org/",
+  EPA: "https://www.epa.gov/radiation",
+  DOE: "https://www.energy.gov/",
+};
+
+const resolveReferenceUrl = (reference: string): string => {
+  const directUrlMatch = reference.match(/https?:\/\/[^\s)\]]+/i);
+  if (directUrlMatch) {
+    return directUrlMatch[0];
+  }
+
+  const normalizedReference = reference.toUpperCase();
+  for (const [key, url] of Object.entries(REFERENCE_URLS)) {
+    if (normalizedReference.includes(key)) {
+      return url;
+    }
+  }
+
+  return `https://www.google.com/search?q=${encodeURIComponent(reference)}`;
+};
+
 const INITIAL_MESSAGES: Message[] = [
   {
     id: 1,
@@ -139,6 +174,7 @@ const normalizeLoadedMessages = (messageHistory: ChatMessage[]): Message[] =>
 export default function AiChatScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const { isOnline } = useStorage();
   const colorScheme = useColorScheme();
   const CHAT_THEME = colorScheme === "dark" ? DarkCHAT_THEME : LightCHAT_THEME;
   const styles = React.useMemo(() => createStyles(CHAT_THEME), [CHAT_THEME]);
@@ -541,6 +577,12 @@ export default function AiChatScreen() {
     )
       return;
 
+    if (!isOnline) {
+      setError(OFFLINE_CHAT_ERROR_MESSAGE);
+      Alert.alert("You're Offline", OFFLINE_CHAT_ALERT_MESSAGE);
+      return;
+    }
+
     const existingMessages = messages;
     const userMessage = inputText.trim();
     const userMsg: Message = {
@@ -590,14 +632,26 @@ export default function AiChatScreen() {
       }
     } catch (err) {
       console.error("Error calling Gemini:", err);
-      const errorMessage =
+      const rawErrorMessage =
         err instanceof Error ? err.message : "Failed to get response from AI";
+      const isOfflineError =
+        !isOnline ||
+        /network request failed|failed to fetch|offline|internet connection|timeout|timed out/i.test(
+          rawErrorMessage,
+        );
+      const errorMessage = isOfflineError
+        ? OFFLINE_CHAT_ERROR_MESSAGE
+        : rawErrorMessage;
       setError(errorMessage);
+
+      const botErrorText = isOfflineError
+        ? "I am offline at the moment. Reconnect to the internet and I will be ready to help."
+        : `I apologize, but I encountered an error: ${errorMessage}. Please try again.`;
 
       const errorMsg: Message = {
         id: Date.now() + 1,
         role: "bot",
-        text: `I apologize, but I encountered an error: ${errorMessage}. Please check your internet connection and try again.`,
+        text: botErrorText,
         citations: [],
         followUpSuggestions: [],
       };
@@ -634,6 +688,16 @@ export default function AiChatScreen() {
     }, 100);
   };
 
+  const handleReferencePress = useCallback(async (reference: string) => {
+    const opened = await openExternalUrl(resolveReferenceUrl(reference));
+    if (!opened) {
+      Alert.alert(
+        "Unable to Open Reference",
+        "This reference could not be opened right now. Please try again.",
+      );
+    }
+  }, []);
+
   return (
     <View style={styles.container}>
       {/* Header - Home Style */}
@@ -651,11 +715,13 @@ export default function AiChatScreen() {
               style={styles.headerAvatarImage}
               resizeMode="contain"
             />
-            <View style={styles.onlineDot} />
+            <View style={[styles.onlineDot, !isOnline && styles.offlineDot]} />
           </View>
           <View>
             <Text style={styles.headerTitle}>Schrödi</Text>
-            <Text style={styles.headerSubtitle}>AI Assistant • Online</Text>
+            <Text style={styles.headerSubtitle}>
+              {isOnline ? "AI Assistant - Online" : "AI Assistant - Offline"}
+            </Text>
           </View>
         </View>
         <View style={styles.headerActions}>
@@ -768,16 +834,23 @@ export default function AiChatScreen() {
                 msg.citations &&
                 msg.citations.length > 0 && (
                   <View style={styles.citationsContainer}>
-                    <Text style={styles.citationsTitle}>Sources:</Text>
+                    <Text style={styles.citationsTitle}>References:</Text>
                     {msg.citations.map((cite, i) => (
-                      <View key={i} style={styles.citationBadge}>
+                      <TouchableOpacity
+                        key={i}
+                        style={styles.citationBadge}
+                        onPress={() => {
+                          void handleReferencePress(cite);
+                        }}
+                        activeOpacity={0.75}
+                      >
                         <Icon
                           name="Link"
                           size={10}
                           color={CHAT_THEME.primary}
                         />
                         <Text style={styles.citationText}>{cite}</Text>
-                      </View>
+                      </TouchableOpacity>
                     ))}
                   </View>
                 )}
@@ -842,7 +915,8 @@ export default function AiChatScreen() {
 
       {/* Input Area */}
       <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        keyboardVerticalOffset={Platform.OS === "ios" ? insets.top : 0}
         style={styles.inputWrapper}
       >
         {/* Suggestion Chips */}
@@ -969,6 +1043,9 @@ const createStyles = (theme: typeof LightCHAT_THEME) =>
       backgroundColor: theme.green,
       borderWidth: 2,
       borderColor: theme.bg,
+    },
+    offlineDot: {
+      backgroundColor: "#F97316",
     },
     headerTitle: {
       fontSize: 18,

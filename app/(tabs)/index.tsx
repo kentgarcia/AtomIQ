@@ -6,6 +6,7 @@ import {
     getLeaderboardSnapshot,
     saveLeaderboardSnapshot,
 } from "@/services/database";
+import { getProfileAvatarSource } from "@/services/profile-avatars";
 import { useStorage } from "@/services/StorageContext";
 import { isSupabaseConfigured, supabase } from "@/services/supabase";
 import { Tables } from "@/services/supabase.types";
@@ -174,6 +175,9 @@ export default function HomeScreen() {
 
   const buildLeaderboard = useCallback(
     (users: LeaderboardSourceUser[] = []) => {
+      const localDisplayName =
+        userProfile?.display_name || userProfile?.username || "You";
+
       const NPC_CHARACTERS = [
         {
           name: "AtomMaster99",
@@ -239,7 +243,10 @@ export default function HomeScreen() {
 
       const entries: LeaderEntry[] = users.map((user) => ({
         userId: user.user_id,
-        name: user.username,
+        name:
+          user.user_id === userProfile?.user_id
+            ? localDisplayName
+            : user.username,
         title: user.is_npc ? "NPC Challenger" : "Nuclear Learner",
         xp: user.total_xp ?? 0,
         avatar: user.avatar_url ?? undefined,
@@ -253,10 +260,10 @@ export default function HomeScreen() {
       ) {
         entries.push({
           userId: userProfile.user_id,
-          name: userProfile.username || "You",
+          name: localDisplayName,
           title: "Nuclear Learner",
           xp: userProfile.total_xp || 0,
-          avatar: "profile",
+          avatar: userProfile.avatar_url || undefined,
           isUser: true,
           isNPC: false,
         });
@@ -386,8 +393,9 @@ export default function HomeScreen() {
         <Animated.View entering={FadeInDown.delay(100)} style={styles.header}>
           <View style={styles.headerLeft}>
             <Image
-              source={require("@/assets/images/mascot/blink.png")}
+              source={getProfileAvatarSource(userProfile?.avatar_url)}
               style={styles.avatar}
+              resizeMode="cover"
             />
             <View>
               <Text style={styles.greeting}>{greeting}</Text>
@@ -557,10 +565,9 @@ export default function HomeScreen() {
               const isUser = leader.isUser;
               const rankColors = ["#FFD700", "#C0C0C0", "#CD7F32"];
               const isFirst = index === 0;
-              const avatarSource =
-                isUser || !leader.avatar
-                  ? require("@/assets/images/mascot/profile.png")
-                  : { uri: leader.avatar };
+              const avatarSource = leader.isNPC
+                ? require("@/assets/images/mascot/profile.png")
+                : getProfileAvatarSource(leader.avatar);
 
               return (
                 <View key={leader.rank} style={styles.leaderboardRow}>

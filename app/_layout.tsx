@@ -4,7 +4,7 @@ import {
     ThemeProvider as NavigationThemeProvider,
 } from "@react-navigation/native";
 import * as Linking from "expo-linking";
-import { Stack } from "expo-router";
+import { Stack, usePathname } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useRef } from "react";
 import "react-native-reanimated";
@@ -19,6 +19,12 @@ import {
     completeSupabaseAuthFromRedirectUrl,
     isSupabaseConfigured,
 } from "@/services/supabase";
+import {
+    initializeUiSfx,
+    installGlobalUiSfxHandlers,
+    setUiSfxPathname,
+    unloadUiSfx,
+} from "@/services/ui-sfx";
 
 export const unstable_settings = {
   anchor: "(tabs)",
@@ -26,7 +32,21 @@ export const unstable_settings = {
 
 function AppContent() {
   const colorScheme = useColorScheme();
+  const pathname = usePathname();
   const handledAuthUrlsRef = useRef<Set<string>>(new Set());
+
+  useEffect(() => {
+    setUiSfxPathname(pathname);
+  }, [pathname]);
+
+  useEffect(() => {
+    installGlobalUiSfxHandlers();
+    void initializeUiSfx();
+
+    return () => {
+      void unloadUiSfx();
+    };
+  }, []);
 
   useEffect(() => {
     if (!isSupabaseConfigured()) {

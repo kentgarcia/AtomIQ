@@ -1,9 +1,13 @@
 import { Icon } from "@/components/ui/icon";
 import { getAllMazes } from "@/content/explorer";
 import { useColorScheme } from "@/hooks/use-color-scheme";
+import {
+    getAllMazeProgress,
+    type MazeProgress,
+} from "@/services/explorer-storage";
 import { LinearGradient } from "expo-linear-gradient";
-import { useRouter } from "expo-router";
-import React from "react";
+import { useFocusEffect, useRouter } from "expo-router";
+import React, { useCallback, useState } from "react";
 import {
     Dimensions,
     Pressable,
@@ -72,6 +76,40 @@ export default function AtomMazeSelectionScreen() {
   const allMazes = getAllMazes();
   const colorScheme = useColorScheme();
   const theme = THEME[colorScheme ?? "light"];
+  const [mazeProgressMap, setMazeProgressMap] = useState<
+    Record<string, MazeProgress>
+  >({});
+
+  useFocusEffect(
+    useCallback(() => {
+      let isActive = true;
+
+      const loadMazeProgress = async () => {
+        try {
+          const allProgress = await getAllMazeProgress();
+          if (!isActive) return;
+
+          const nextMap = allProgress.reduce<Record<string, MazeProgress>>(
+            (acc, progress) => {
+              acc[progress.mazeId] = progress;
+              return acc;
+            },
+            {},
+          );
+
+          setMazeProgressMap(nextMap);
+        } catch (error) {
+          console.error("Failed to load maze progress:", error);
+        }
+      };
+
+      void loadMazeProgress();
+
+      return () => {
+        isActive = false;
+      };
+    }, []),
+  );
 
   return (
     <View style={{ flex: 1, backgroundColor: theme.bg }}>
@@ -111,6 +149,8 @@ export default function AtomMazeSelectionScreen() {
           <View style={styles.modesGridNew}>
             {allMazes.map((maze, index) => {
               const colors = getMazeColors(maze.theme);
+              const progress = mazeProgressMap[maze.id];
+              const isCompleted = !!progress?.completedAt;
               return (
                 <Animated.View
                   key={maze.id}
@@ -148,6 +188,20 @@ export default function AtomMazeSelectionScreen() {
                       end={{ x: 0.3, y: 1 }}
                       style={styles.modeCardGradientNew}
                     >
+                      {isCompleted && (
+                        <View style={styles.completedBadge}>
+                          <Icon
+                            name="TickCircle"
+                            size={13}
+                            color="#22C55E"
+                            variant="Bold"
+                          />
+                          <Text style={styles.completedBadgeText}>
+                            Completed
+                          </Text>
+                        </View>
+                      )}
+
                       {/* Shine Effect */}
                       <View style={styles.cardShine} />
 
@@ -175,7 +229,9 @@ export default function AtomMazeSelectionScreen() {
 
                         {/* Tagline Banner */}
                         <View style={styles.taglineBanner}>
-                          <Text style={styles.taglineText}>Battle Arena!</Text>
+                          <Text style={styles.taglineText}>
+                            {isCompleted ? "Replay Ready" : "Battle Arena!"}
+                          </Text>
                         </View>
                       </View>
 
@@ -468,6 +524,27 @@ const styles = StyleSheet.create({
     borderColor: "rgba(255,255,255,0.3)",
     borderTopColor: "rgba(255,255,255,0.5)",
     borderLeftColor: "rgba(255,255,255,0.4)",
+  },
+  completedBadge: {
+    position: "absolute",
+    top: 12,
+    right: 12,
+    zIndex: 3,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
+    backgroundColor: "rgba(2, 6, 23, 0.82)",
+    borderWidth: 1,
+    borderColor: "rgba(34, 197, 94, 0.7)",
+    borderRadius: 999,
+    paddingHorizontal: 9,
+    paddingVertical: 5,
+  },
+  completedBadgeText: {
+    color: "#DCFCE7",
+    fontSize: 11,
+    fontWeight: "800",
+    letterSpacing: 0.2,
   },
   // Shine Effect
   cardShine: {
