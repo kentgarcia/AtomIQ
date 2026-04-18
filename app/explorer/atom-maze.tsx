@@ -1,14 +1,13 @@
 import { Icon } from "@/components/ui/icon";
 import type { QuizQuestion as AtomMazeQuizQuestion } from "@/content/explorer";
 import { getMazeById } from "@/content/explorer";
-import { getMythBusterQuizQuestionsByDifficulty } from "@/content/quizzes";
+import {
+    getMythBusterQuizQuestionsByDifficulty,
+    type MythBusterQuizDifficulty,
+} from "@/content/quizzes";
 import type { QuizQuestion as RepositoryQuizQuestion } from "@/content/types";
 import { useColorScheme } from "@/hooks/use-color-scheme";
-import {
-    completeMaze,
-    getMazeProgress,
-    startMaze,
-} from "@/services/explorer-storage";
+import { startMaze } from "@/services/explorer-storage";
 import { playGameSfx, preloadGameSfx } from "@/services/game-sfx";
 import { useStorage } from "@/services/StorageContext";
 import { Image as ExpoImage } from "expo-image";
@@ -95,6 +94,114 @@ const BATTLE_TIMING = {
   roomExitDelayMs: 260,
   walkOutMs: 850,
   walkInMs: 620,
+};
+
+const getEndlessRunXpReward = (baseXpReward: number): number => {
+  if (baseXpReward <= 0) {
+    return 0;
+  }
+
+  return Math.max(20, Math.round(baseXpReward * 0.35));
+};
+
+type AtomMazeStageDifficulty = "easy" | "average" | "difficult";
+
+const STAGE_DIFFICULTY_META: Record<
+  AtomMazeStageDifficulty,
+  {
+    label: string;
+    chipBackgroundColor: string;
+    chipTextColor: string;
+  }
+> = {
+  easy: {
+    label: "EASY",
+    chipBackgroundColor: "rgba(34, 197, 94, 0.22)",
+    chipTextColor: "#BBF7D0",
+  },
+  average: {
+    label: "AVERAGE",
+    chipBackgroundColor: "rgba(251, 191, 36, 0.25)",
+    chipTextColor: "#FDE68A",
+  },
+  difficult: {
+    label: "DIFFICULT",
+    chipBackgroundColor: "rgba(239, 68, 68, 0.24)",
+    chipTextColor: "#FCA5A5",
+  },
+};
+
+const STAGE_TO_REPOSITORY_DIFFICULTY: Record<
+  AtomMazeStageDifficulty,
+  MythBusterQuizDifficulty
+> = {
+  easy: "easy",
+  average: "medium",
+  difficult: "hard",
+};
+
+interface IntroHowToPlayStep {
+  id: string;
+  emoji: string;
+  title: string;
+  hint: string;
+  accentColor: string;
+}
+
+const INTRO_HOW_TO_PLAY_STEPS: IntroHowToPlayStep[] = [
+  {
+    id: "quiz",
+    emoji: "❓",
+    title: "Answer Quiz",
+    hint: "Choose the best answer to keep advancing.",
+    accentColor: "#F59E0B",
+  },
+  {
+    id: "combo",
+    emoji: "🔥",
+    title: "Build Combo",
+    hint: "Consecutive correct picks keep your momentum high.",
+    accentColor: "#F97316",
+  },
+  {
+    id: "focus",
+    emoji: "🎯",
+    title: "Keep Focus",
+    hint: "Wrong answers reset your combo streak.",
+    accentColor: "#3B82F6",
+  },
+  {
+    id: "stage",
+    emoji: "🧭",
+    title: "Clear Stage",
+    hint: "Complete each stage to move to the next one.",
+    accentColor: "#EF4444",
+  },
+];
+
+const normalizeQuestionText = (questionText: string): string =>
+  questionText.trim().toLowerCase().replace(/\s+/g, " ");
+
+const getRoomStageDifficulty = (
+  roomIndex: number,
+  totalRooms: number,
+): AtomMazeStageDifficulty => {
+  if (totalRooms <= 1) {
+    return "easy";
+  }
+
+  const maxRoomIndex = Math.max(totalRooms - 1, 1);
+  const normalizedRoomProgress = roomIndex / maxRoomIndex;
+
+  if (normalizedRoomProgress < 1 / 3) {
+    return "easy";
+  }
+
+  if (normalizedRoomProgress < 2 / 3) {
+    return "average";
+  }
+
+  return "difficult";
 };
 
 const shuffleArray = <T,>(values: T[]): T[] => {
@@ -241,6 +348,10 @@ export default function AtomMazeBattleScreen() {
     if (!id) return null;
     return getMazeById(id);
   }, [id]);
+  const endlessRunXpReward = useMemo(
+    () => getEndlessRunXpReward(maze?.xpReward || 0),
+    [maze?.xpReward],
+  );
 
   // Game state
   const [gameState, setGameState] = useState<GameState>({
@@ -275,9 +386,100 @@ export default function AtomMazeBattleScreen() {
 
   const colorScheme = useColorScheme();
   const theme = THEME[colorScheme ?? "light"];
+  const introPalette = useMemo(() => {
+    if (colorScheme === "dark") {
+      return {
+        gradientColors: ["#0B1220", "#1E293B", "#0F172A"] as const,
+        cardBg: "rgba(15, 23, 42, 0.88)",
+        cardBorder: "rgba(148, 163, 184, 0.34)",
+        primaryText: "#F8FAFC",
+        mutedText: "#CBD5E1",
+        subtleBg: "rgba(30, 41, 59, 0.86)",
+        subtleBorder: "rgba(148, 163, 184, 0.28)",
+        iconWrapBg: "rgba(255, 255, 255, 0.08)",
+        backBtnBg: "rgba(15, 23, 42, 0.85)",
+        backBtnBorder: "rgba(148, 163, 184, 0.4)",
+      };
+    }
+
+    return {
+      gradientColors: ["#FFFDE7", "#FFF9C4", "#FFEE58"] as const,
+      cardBg: "#FFFFFF",
+      cardBorder: "#E5E7EB",
+      primaryText: "#1F2937",
+      mutedText: "#6B7280",
+      subtleBg: "#F9FAFB",
+      subtleBorder: "#E5E7EB",
+      iconWrapBg: "#FFF3D9",
+      backBtnBg: "#FFFFFF",
+      backBtnBorder: "#E5E7EB",
+    };
+  }, [colorScheme]);
+  const resultPalette = useMemo(() => {
+    if (colorScheme === "dark") {
+      return {
+        defeatGradient: ["#2C0E16", "#111827", "#0B1220"] as const,
+        victoryGradient: ["#052E2B", "#0F172A", "#111827"] as const,
+        completeGradient: ["#1C1917", "#0F172A", "#052E2B"] as const,
+        cardBg: "rgba(15, 23, 42, 0.9)",
+        cardBorder: "rgba(148, 163, 184, 0.34)",
+        cardShadow: "rgba(2, 6, 23, 0.65)",
+        statsBg: "rgba(30, 41, 59, 0.86)",
+        statsBorder: "rgba(148, 163, 184, 0.3)",
+        statDivider: "rgba(148, 163, 184, 0.24)",
+        primaryText: "#F8FAFC",
+        mutedText: "#CBD5E1",
+        chipBg: "rgba(15, 23, 42, 0.82)",
+        chipBorder: "rgba(148, 163, 184, 0.45)",
+        chipText: "#E2E8F0",
+        defeatAccent: "#F87171",
+        victoryAccent: "#34D399",
+        completeAccent: "#FACC15",
+        rewardCardBg: "rgba(250, 204, 21, 0.14)",
+        rewardCardBorder: "rgba(250, 204, 21, 0.5)",
+        rewardText: "#FDE68A",
+        retryButton: "#DC2626",
+        retryButtonDepth: "#991B1B",
+        nextButton: "#22C55E",
+        nextButtonDepth: "#15803D",
+        completeButton: "#D97706",
+        completeButtonDepth: "#B45309",
+      };
+    }
+
+    return {
+      defeatGradient: ["#FFF7ED", "#FEE2E2", "#FECACA"] as const,
+      victoryGradient: ["#ECFDF5", "#DCFCE7", "#BBF7D0"] as const,
+      completeGradient: ["#FEFCE8", "#FEF3C7", "#FDE68A"] as const,
+      cardBg: "#FFFFFF",
+      cardBorder: "#E5E7EB",
+      cardShadow: "rgba(15, 23, 42, 0.16)",
+      statsBg: "#FFF8E1",
+      statsBorder: "#FFE082",
+      statDivider: "#FFE082",
+      primaryText: "#111827",
+      mutedText: "#6B7280",
+      chipBg: "#FFFFFF",
+      chipBorder: "#E5E7EB",
+      chipText: "#374151",
+      defeatAccent: "#DC2626",
+      victoryAccent: "#059669",
+      completeAccent: "#CA8A04",
+      rewardCardBg: "#FEF9C3",
+      rewardCardBorder: "#FACC15",
+      rewardText: "#B45309",
+      retryButton: "#EF4444",
+      retryButtonDepth: "#B91C1C",
+      nextButton: "#10B981",
+      nextButtonDepth: "#047857",
+      completeButton: "#F59E0B",
+      completeButtonDepth: "#B45309",
+    };
+  }, [colorScheme]);
   const arenaHeight = Math.min(Math.max(height * 0.42, 270), 360);
   const sceneTopPadding = Math.max(insets.top + 4, 10);
   const questionBottomPadding = Math.max(insets.bottom + 12, 18);
+  const introBottomPadding = Math.max(insets.bottom + 28, 36);
   const arenaTextColor = "#F8FAFC";
   const arenaMutedTextColor = "#CBD5E1";
   const arenaTrackColor = "rgba(148, 163, 184, 0.4)";
@@ -370,6 +572,16 @@ export default function AtomMazeBattleScreen() {
   // Get current room and question
   const currentRoom = maze?.rooms[gameState.currentRoomIndex];
   const isBossBattle = gameState.phase === "boss";
+  const totalRoomCount = maze?.rooms.length || 0;
+  const currentRoomStageDifficulty = getRoomStageDifficulty(
+    gameState.currentRoomIndex,
+    totalRoomCount,
+  );
+  const currentStageDifficulty: AtomMazeStageDifficulty = isBossBattle
+    ? "difficult"
+    : currentRoomStageDifficulty;
+  const currentStageDifficultyMeta =
+    STAGE_DIFFICULTY_META[currentStageDifficulty];
   const currentMonster = isBossBattle ? maze?.boss : currentRoom?.monster;
   const isBossLowHp =
     isBossBattle &&
@@ -385,29 +597,52 @@ export default function AtomMazeBattleScreen() {
     );
 
     if (isBossBattle) {
-      const repositoryBossQuestions = getMythBusterQuizQuestionsByDifficulty(
+      const usedStageQuestionKeys = new Set(
+        mazeQuizQuestions.map((question) =>
+          normalizeQuestionText(question.question),
+        ),
+      );
+      const seenBossQuestionKeys = new Set<string>();
+      const nonRepeatingBossQuestionPool: AtomMazeQuizQuestion[] = [];
+      const orderedBossDifficulties: AtomMazeStageDifficulty[] = [
+        "difficult",
+        "average",
         "easy",
-      )
-        .map((question) => toAtomMazeBossQuizQuestion(question))
-        .filter(
-          (question): question is AtomMazeQuizQuestion => question !== null,
-        );
+      ];
 
-      const bossQuestionSource =
-        repositoryBossQuestions.length > 0
-          ? repositoryBossQuestions
-          : mazeQuizQuestions;
+      orderedBossDifficulties.forEach((difficulty) => {
+        getMythBusterQuizQuestionsByDifficulty(
+          STAGE_TO_REPOSITORY_DIFFICULTY[difficulty],
+        )
+          .map((question) => toAtomMazeBossQuizQuestion(question))
+          .filter(
+            (question): question is AtomMazeQuizQuestion => question !== null,
+          )
+          .forEach((question) => {
+            const normalizedQuestion = normalizeQuestionText(question.question);
 
-      if (bossQuestionSource.length === 0) {
+            if (
+              usedStageQuestionKeys.has(normalizedQuestion) ||
+              seenBossQuestionKeys.has(normalizedQuestion)
+            ) {
+              return;
+            }
+
+            seenBossQuestionKeys.add(normalizedQuestion);
+            nonRepeatingBossQuestionPool.push(question);
+          });
+      });
+
+      if (nonRepeatingBossQuestionPool.length === 0) {
         return [];
       }
 
       const targetBossQuestionCount = Math.min(
         Math.max(mazeQuizQuestions.length, 1),
-        bossQuestionSource.length,
+        nonRepeatingBossQuestionPool.length,
       );
 
-      return shuffleArray(bossQuestionSource)
+      return shuffleArray(nonRepeatingBossQuestionPool)
         .slice(0, targetBossQuestionCount)
         .map((question) => shuffleQuizQuestionOptions(question));
     }
@@ -706,23 +941,18 @@ export default function AtomMazeBattleScreen() {
     if (isBossBattle) {
       setGameState((prev) => ({ ...prev, phase: "complete" }));
 
-      // Award XP only once per maze completion. Replays are allowed but don't grant repeat XP.
+      // Endless mode: no persistent completion mark, grant lower XP each clear.
       if (maze) {
         void (async () => {
           try {
-            const existingProgress = await getMazeProgress(maze.id);
-            const isFirstCompletion = !existingProgress?.completedAt;
-
-            await completeMaze(maze.id, gameState.score);
-
-            if (isFirstCompletion) {
-              await addXP(maze.xpReward);
+            if (endlessRunXpReward > 0) {
+              await addXP(endlessRunXpReward);
               setXpAwardedThisRun(true);
             } else {
               setXpAwardedThisRun(false);
             }
           } catch (error) {
-            console.error("Failed to finalize maze completion:", error);
+            console.error("Failed to grant endless run XP:", error);
             setXpAwardedThisRun(false);
           }
         })();
@@ -845,12 +1075,21 @@ export default function AtomMazeBattleScreen() {
   if (gameState.phase === "intro") {
     return (
       <LinearGradient
-        colors={["#FFFDE7", "#FFF9C4", "#FFEE58"] as const}
+        colors={introPalette.gradientColors}
         style={styles.container}
       >
         <View style={styles.introHeader}>
-          <TouchableOpacity onPress={handleExit} style={styles.introBackBtn}>
-            <Icon name="ArrowLeft2" size={20} color={THEME.text} />
+          <TouchableOpacity
+            onPress={handleExit}
+            style={[
+              styles.introBackBtn,
+              {
+                backgroundColor: introPalette.backBtnBg,
+                borderColor: introPalette.backBtnBorder,
+              },
+            ]}
+          >
+            <Icon name="ArrowLeft2" size={20} color={theme.text} />
           </TouchableOpacity>
           <View style={styles.introBadge}>
             <Icon name="Game" size={18} color="#FFF" variant="Bold" />
@@ -859,81 +1098,155 @@ export default function AtomMazeBattleScreen() {
           <View style={{ width: 44 }} />
         </View>
 
-        <Animated.View
-          entering={FadeInDown.delay(200)}
-          style={styles.introContainer}
+        <ScrollView
+          style={styles.introScrollView}
+          contentContainerStyle={[
+            styles.introScrollContent,
+            { paddingBottom: introBottomPadding },
+          ]}
+          showsVerticalScrollIndicator={false}
+          bounces
         >
-          {/* Title Card */}
-          <View style={styles.introCard}>
-            <Text style={styles.introTitle}>{maze.title}</Text>
-            <Text style={styles.introSubtitle}>{maze.theme}</Text>
-            <Text style={styles.introDescription}>{maze.description}</Text>
-          </View>
-
-          {/* Stats Row */}
-          <View style={styles.introStatsRow}>
-            <View style={styles.introStatCard}>
-              <Text style={styles.introStatEmoji}>👾</Text>
-              <Text style={styles.introStatValue}>{maze.rooms.length}</Text>
-              <Text style={styles.introStatLabel}>Monsters</Text>
-            </View>
-            <View style={styles.introStatCard}>
-              <Text style={styles.introStatEmoji}>👹</Text>
-              <Text style={styles.introStatValue}>1</Text>
-              <Text style={styles.introStatLabel}>Boss</Text>
-            </View>
-            <View style={styles.introStatCard}>
-              <Text style={styles.introStatEmoji}>⚡</Text>
-              <Text style={styles.introStatValue}>{maze.xpReward}</Text>
-              <Text style={styles.introStatLabel}>XP</Text>
-            </View>
-          </View>
-
-          {/* How to Play */}
-          <View style={styles.introHowToPlay}>
-            <Text style={styles.introHowToPlayTitle}>How to Play</Text>
-            <View style={styles.introSwipeRow}>
-              <View style={styles.introSwipeItem}>
-                <View style={styles.introSwipeIconWrap}>
-                  <Text style={styles.introSwipeEmoji}>❓</Text>
-                </View>
-                <View style={styles.introSwipeCopy}>
-                  <Text style={styles.introSwipeLabel}>Answer Quiz</Text>
-                  <Text style={styles.introSwipeHint}>
-                    Choose correctly to attack first.
-                  </Text>
-                </View>
-              </View>
-              <View style={styles.introSwipeItem}>
-                <View style={styles.introSwipeIconWrap}>
-                  <Text style={styles.introSwipeEmoji}>🔥</Text>
-                </View>
-                <View style={styles.introSwipeCopy}>
-                  <Text style={styles.introSwipeLabel}>Build Combo</Text>
-                  <Text style={styles.introSwipeHint}>
-                    Chain correct hits for bigger score bursts.
-                  </Text>
-                </View>
-              </View>
-            </View>
-          </View>
-
-          {/* Start Button */}
-          <TouchableOpacity
-            style={styles.startButton}
-            onPress={handleStartGame}
-            activeOpacity={0.9}
+          <Animated.View
+            entering={FadeInDown.delay(200)}
+            style={styles.introContainer}
           >
-            <View style={styles.startButton3DBottom} />
-            <LinearGradient
-              colors={["#FFB300", "#FFA000"] as const}
-              style={styles.startButtonGradient}
+            {/* Title Card */}
+            <View
+              style={[
+                styles.introCard,
+                {
+                  backgroundColor: introPalette.cardBg,
+                  borderColor: introPalette.cardBorder,
+                },
+              ]}
             >
-              <Icon name="Play" size={28} color="#FFF" variant="Bold" />
-              <Text style={styles.startButtonText}>START BATTLE</Text>
-            </LinearGradient>
-          </TouchableOpacity>
-        </Animated.View>
+              <Text
+                style={[styles.introTitle, { color: introPalette.primaryText }]}
+              >
+                {maze.title}
+              </Text>
+              <Text
+                style={[
+                  styles.introSubtitle,
+                  { color: introPalette.mutedText },
+                ]}
+              >
+                {maze.theme}
+              </Text>
+              <Text
+                style={[
+                  styles.introDescription,
+                  { color: introPalette.mutedText },
+                ]}
+              >
+                {maze.description}
+              </Text>
+            </View>
+
+            {/* How to Play */}
+            <View
+              style={[
+                styles.introHowToPlay,
+                {
+                  backgroundColor: introPalette.cardBg,
+                  borderColor: introPalette.cardBorder,
+                },
+              ]}
+            >
+              <View style={styles.introHowToPlayHeaderRow}>
+                <View
+                  style={[
+                    styles.introHowToPlayHeaderIcon,
+                    { backgroundColor: introPalette.iconWrapBg },
+                  ]}
+                >
+                  <Icon
+                    name="MessageQuestion"
+                    size={16}
+                    color={theme.primary}
+                    variant="Bold"
+                  />
+                </View>
+                <Text
+                  style={[
+                    styles.introHowToPlayTitle,
+                    { color: introPalette.primaryText },
+                  ]}
+                >
+                  How to Play
+                </Text>
+              </View>
+              <View style={styles.introSwipeRow}>
+                {INTRO_HOW_TO_PLAY_STEPS.map((step, index) => (
+                  <View
+                    key={step.id}
+                    style={[
+                      styles.introSwipeItem,
+                      {
+                        backgroundColor: introPalette.subtleBg,
+                        borderColor: introPalette.subtleBorder,
+                      },
+                    ]}
+                  >
+                    <View
+                      style={[
+                        styles.introStepNumber,
+                        { backgroundColor: step.accentColor },
+                      ]}
+                    >
+                      <Text style={styles.introStepNumberText}>
+                        {index + 1}
+                      </Text>
+                    </View>
+                    <View
+                      style={[
+                        styles.introSwipeIconWrap,
+                        { backgroundColor: introPalette.iconWrapBg },
+                      ]}
+                    >
+                      <Text style={styles.introSwipeEmoji}>{step.emoji}</Text>
+                    </View>
+                    <View style={styles.introSwipeCopy}>
+                      <Text
+                        style={[
+                          styles.introSwipeLabel,
+                          { color: introPalette.primaryText },
+                        ]}
+                      >
+                        {step.title}
+                      </Text>
+                      <Text
+                        style={[
+                          styles.introSwipeHint,
+                          { color: introPalette.mutedText },
+                        ]}
+                      >
+                        {step.hint}
+                      </Text>
+                    </View>
+                  </View>
+                ))}
+              </View>
+            </View>
+
+            {/* Start Button */}
+            <TouchableOpacity
+              style={styles.startButton}
+              onPress={handleStartGame}
+              activeOpacity={0.9}
+            >
+              <View style={styles.startButton3DBottom} />
+              <LinearGradient
+                colors={["#FFB300", "#FFA000"] as const}
+                style={styles.startButtonGradient}
+              >
+                <Icon name="Play" size={28} color="#FFF" variant="Bold" />
+                <Text style={styles.startButtonText}>START BATTLE</Text>
+              </LinearGradient>
+            </TouchableOpacity>
+          </Animated.View>
+        </ScrollView>
       </LinearGradient>
     );
   }
@@ -942,25 +1255,144 @@ export default function AtomMazeBattleScreen() {
   if (gameState.phase === "defeat") {
     return (
       <LinearGradient
-        colors={["#FFFDE7", "#FFF9C4", "#FEE2E2"] as const}
+        colors={resultPalette.defeatGradient}
         style={styles.container}
       >
         <Animated.View entering={FadeIn} style={styles.resultContainer}>
-          <View style={styles.resultCard}>
-            <Text style={styles.defeatEmoji}>💀</Text>
-            <Text style={styles.defeatTitle}>DEFEATED!</Text>
-            <Text style={styles.defeatSubtitle}>Your HP reached zero...</Text>
+          <View
+            style={[
+              styles.resultStatusChip,
+              {
+                backgroundColor: resultPalette.chipBg,
+                borderColor: resultPalette.chipBorder,
+              },
+            ]}
+          >
+            <Icon
+              name="Danger"
+              size={16}
+              color={resultPalette.defeatAccent}
+              variant="Bold"
+            />
+            <Text
+              style={[
+                styles.resultStatusChipText,
+                { color: resultPalette.chipText },
+              ]}
+            >
+              RUN ENDED
+            </Text>
+          </View>
 
-            <View style={styles.resultStatsCard}>
-              <View style={styles.resultStatRow}>
-                <Text style={styles.resultStatLabel}>Monsters Defeated</Text>
-                <Text style={styles.resultStatValue}>
+          <View
+            style={[
+              styles.resultCard,
+              {
+                backgroundColor: resultPalette.cardBg,
+                borderColor: resultPalette.cardBorder,
+                shadowColor: resultPalette.cardShadow,
+              },
+            ]}
+          >
+            <Text style={styles.defeatEmoji}>💀</Text>
+            <Text
+              style={[
+                styles.defeatTitle,
+                { color: resultPalette.defeatAccent },
+              ]}
+            >
+              DEFEATED!
+            </Text>
+            <Text
+              style={[
+                styles.defeatSubtitle,
+                { color: resultPalette.mutedText },
+              ]}
+            >
+              Your HP reached zero, but your run still counts.
+            </Text>
+
+            <View
+              style={[
+                styles.resultStatsCard,
+                {
+                  backgroundColor: resultPalette.statsBg,
+                  borderColor: resultPalette.statsBorder,
+                },
+              ]}
+            >
+              <View
+                style={[
+                  styles.resultStatRow,
+                  { borderBottomColor: resultPalette.statDivider },
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.resultStatLabel,
+                    { color: resultPalette.mutedText },
+                  ]}
+                >
+                  Monsters Defeated
+                </Text>
+                <Text
+                  style={[
+                    styles.resultStatValue,
+                    { color: resultPalette.primaryText },
+                  ]}
+                >
                   {gameState.defeatedMonsters}
                 </Text>
               </View>
-              <View style={styles.resultStatRow}>
-                <Text style={styles.resultStatLabel}>Final Score</Text>
-                <Text style={styles.resultStatValue}>{gameState.score}</Text>
+              <View
+                style={[
+                  styles.resultStatRow,
+                  { borderBottomColor: resultPalette.statDivider },
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.resultStatLabel,
+                    { color: resultPalette.mutedText },
+                  ]}
+                >
+                  Final Score
+                </Text>
+                <Text
+                  style={[
+                    styles.resultStatValue,
+                    { color: resultPalette.primaryText },
+                  ]}
+                >
+                  {gameState.score}
+                </Text>
+              </View>
+              <View
+                style={[
+                  styles.resultStatRow,
+                  {
+                    borderBottomColor: resultPalette.statDivider,
+                    borderBottomWidth: 0,
+                  },
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.resultStatLabel,
+                    { color: resultPalette.mutedText },
+                  ]}
+                >
+                  Room Reached
+                </Text>
+                <Text
+                  style={[
+                    styles.resultStatValue,
+                    { color: resultPalette.primaryText },
+                  ]}
+                >
+                  {Math.min(gameState.currentRoomIndex + 1, maze.rooms.length)}/
+                  {maze.rooms.length}
+                </Text>
               </View>
             </View>
           </View>
@@ -970,8 +1402,18 @@ export default function AtomMazeBattleScreen() {
             onPress={handleExit}
             activeOpacity={0.9}
           >
-            <View style={styles.retryButton3D} />
-            <View style={styles.retryButtonInner}>
+            <View
+              style={[
+                styles.retryButton3D,
+                { backgroundColor: resultPalette.retryButtonDepth },
+              ]}
+            />
+            <View
+              style={[
+                styles.retryButtonInner,
+                { backgroundColor: resultPalette.retryButton },
+              ]}
+            >
               <Icon name="Refresh" size={22} color="#FFF" variant="Bold" />
               <Text style={styles.retryButtonText}>TRY AGAIN</Text>
             </View>
@@ -985,28 +1427,160 @@ export default function AtomMazeBattleScreen() {
   if (gameState.phase === "victory") {
     return (
       <LinearGradient
-        colors={["#FFFDE7", "#FFF9C4", "#DCFCE7"] as const}
+        colors={resultPalette.victoryGradient}
         style={styles.container}
       >
         <Animated.View entering={FadeIn} style={styles.resultContainer}>
-          <View style={styles.resultCard}>
+          <View
+            style={[
+              styles.resultStatusChip,
+              {
+                backgroundColor: resultPalette.chipBg,
+                borderColor: resultPalette.chipBorder,
+              },
+            ]}
+          >
+            <Icon
+              name="Cup"
+              size={16}
+              color={resultPalette.victoryAccent}
+              variant="Bold"
+            />
+            <Text
+              style={[
+                styles.resultStatusChipText,
+                { color: resultPalette.chipText },
+              ]}
+            >
+              ROOM CLEARED
+            </Text>
+          </View>
+
+          <View
+            style={[
+              styles.resultCard,
+              {
+                backgroundColor: resultPalette.cardBg,
+                borderColor: resultPalette.cardBorder,
+                shadowColor: resultPalette.cardShadow,
+              },
+            ]}
+          >
             <Text style={styles.victoryEmoji}>⚔️</Text>
-            <Text style={styles.victoryTitle}>MONSTER DEFEATED!</Text>
-            <Text style={styles.victorySubtitle}>
+            <Text
+              style={[
+                styles.victoryTitle,
+                { color: resultPalette.victoryAccent },
+              ]}
+            >
+              MONSTER DEFEATED!
+            </Text>
+            <Text
+              style={[
+                styles.victorySubtitle,
+                { color: resultPalette.mutedText },
+              ]}
+            >
               {currentMonster?.defeatMessage || "Well done!"}
             </Text>
 
-            <View style={styles.resultStatsCard}>
-              <View style={styles.resultStatRow}>
-                <Text style={styles.resultStatLabel}>Progress</Text>
-                <Text style={styles.resultStatValue}>
+            <View
+              style={[
+                styles.resultStatsCard,
+                {
+                  backgroundColor: resultPalette.statsBg,
+                  borderColor: resultPalette.statsBorder,
+                },
+              ]}
+            >
+              <View
+                style={[
+                  styles.resultStatRow,
+                  { borderBottomColor: resultPalette.statDivider },
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.resultStatLabel,
+                    { color: resultPalette.mutedText },
+                  ]}
+                >
+                  Progress
+                </Text>
+                <Text
+                  style={[
+                    styles.resultStatValue,
+                    { color: resultPalette.primaryText },
+                  ]}
+                >
                   Room {gameState.currentRoomIndex + 1}/{maze.rooms.length}
                 </Text>
               </View>
-              <View style={styles.resultStatRow}>
-                <Text style={styles.resultStatLabel}>HP Remaining</Text>
+              <View
+                style={[
+                  styles.resultStatRow,
+                  { borderBottomColor: resultPalette.statDivider },
+                ]}
+              >
                 <Text
-                  style={[styles.resultStatValue, { color: THEME.success }]}
+                  style={[
+                    styles.resultStatLabel,
+                    { color: resultPalette.mutedText },
+                  ]}
+                >
+                  Stage Difficulty
+                </Text>
+                <Text
+                  style={[
+                    styles.resultStatValue,
+                    { color: currentStageDifficultyMeta.chipTextColor },
+                  ]}
+                >
+                  {currentStageDifficultyMeta.label}
+                </Text>
+              </View>
+              <View
+                style={[
+                  styles.resultStatRow,
+                  { borderBottomColor: resultPalette.statDivider },
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.resultStatLabel,
+                    { color: resultPalette.mutedText },
+                  ]}
+                >
+                  Combo Streak
+                </Text>
+                <Text
+                  style={[
+                    styles.resultStatValue,
+                    { color: resultPalette.primaryText },
+                  ]}
+                >
+                  {comboStreak}x
+                </Text>
+              </View>
+              <View
+                style={[
+                  styles.resultStatRow,
+                  {
+                    borderBottomColor: resultPalette.statDivider,
+                    borderBottomWidth: 0,
+                  },
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.resultStatLabel,
+                    { color: resultPalette.mutedText },
+                  ]}
+                >
+                  HP Remaining
+                </Text>
+                <Text
+                  style={[styles.resultStatValue, { color: theme.success }]}
                 >
                   {gameState.playerHp}/{gameState.playerMaxHp}
                 </Text>
@@ -1019,8 +1593,18 @@ export default function AtomMazeBattleScreen() {
             onPress={handleNextRoom}
             activeOpacity={0.9}
           >
-            <View style={styles.nextButton3D} />
-            <View style={styles.nextButtonInner}>
+            <View
+              style={[
+                styles.nextButton3D,
+                { backgroundColor: resultPalette.nextButtonDepth },
+              ]}
+            />
+            <View
+              style={[
+                styles.nextButtonInner,
+                { backgroundColor: resultPalette.nextButton },
+              ]}
+            >
               <Text style={styles.nextButtonText}>NEXT ROOM</Text>
               <Icon name="ArrowRight2" size={22} color="#FFF" variant="Bold" />
             </View>
@@ -1120,41 +1704,163 @@ export default function AtomMazeBattleScreen() {
   if (gameState.phase === "complete") {
     return (
       <LinearGradient
-        colors={["#FFFDE7", "#FFF9C4", "#FEF9C3"] as const}
+        colors={resultPalette.completeGradient}
         style={styles.container}
       >
         <Animated.View entering={FadeIn} style={styles.resultContainer}>
-          <View style={styles.resultCard}>
-            <Text style={styles.completeEmoji}>🏆</Text>
-            <Text style={styles.completeTitle}>VICTORY!</Text>
-            <Text style={styles.completeSubtitle}>You defeated the boss!</Text>
+          <View
+            style={[
+              styles.resultStatusChip,
+              {
+                backgroundColor: resultPalette.chipBg,
+                borderColor: resultPalette.chipBorder,
+              },
+            ]}
+          >
+            <Icon
+              name="Gift"
+              size={16}
+              color={resultPalette.completeAccent}
+              variant="Bold"
+            />
+            <Text
+              style={[
+                styles.resultStatusChipText,
+                { color: resultPalette.chipText },
+              ]}
+            >
+              BOSS DEFEATED
+            </Text>
+          </View>
 
-            <View style={styles.rewardCard}>
-              <Icon name="Flash" size={36} color="#FFB300" variant="Bold" />
-              <Text style={styles.rewardText}>
+          <View
+            style={[
+              styles.resultCard,
+              {
+                backgroundColor: resultPalette.cardBg,
+                borderColor: resultPalette.cardBorder,
+                shadowColor: resultPalette.cardShadow,
+              },
+            ]}
+          >
+            <Text style={styles.completeEmoji}>🏆</Text>
+            <Text
+              style={[
+                styles.completeTitle,
+                { color: resultPalette.completeAccent },
+              ]}
+            >
+              VICTORY!
+            </Text>
+            <Text
+              style={[
+                styles.completeSubtitle,
+                { color: resultPalette.mutedText },
+              ]}
+            >
+              You defeated the boss and cleared this run.
+            </Text>
+
+            <View
+              style={[
+                styles.rewardCard,
+                {
+                  backgroundColor: resultPalette.rewardCardBg,
+                  borderColor: resultPalette.rewardCardBorder,
+                },
+              ]}
+            >
+              <Icon
+                name="Flash"
+                size={36}
+                color={resultPalette.completeAccent}
+                variant="Bold"
+              />
+              <Text
+                style={[styles.rewardText, { color: resultPalette.rewardText }]}
+              >
                 {xpAwardedThisRun === null
                   ? "Finalizing..."
                   : xpAwardedThisRun
-                    ? `+${maze.xpReward} XP`
-                    : "Replay run - no extra XP"}
+                    ? `+${endlessRunXpReward} XP`
+                    : "XP reward unavailable"}
               </Text>
             </View>
 
-            <View style={styles.resultStatsCard}>
-              <View style={styles.resultStatRow}>
-                <Text style={styles.resultStatLabel}>Monsters Defeated</Text>
-                <Text style={styles.resultStatValue}>
+            <View
+              style={[
+                styles.resultStatsCard,
+                {
+                  backgroundColor: resultPalette.statsBg,
+                  borderColor: resultPalette.statsBorder,
+                },
+              ]}
+            >
+              <View
+                style={[
+                  styles.resultStatRow,
+                  { borderBottomColor: resultPalette.statDivider },
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.resultStatLabel,
+                    { color: resultPalette.mutedText },
+                  ]}
+                >
+                  Monsters Defeated
+                </Text>
+                <Text
+                  style={[
+                    styles.resultStatValue,
+                    { color: resultPalette.primaryText },
+                  ]}
+                >
                   {gameState.defeatedMonsters}
                 </Text>
               </View>
-              <View style={styles.resultStatRow}>
-                <Text style={styles.resultStatLabel}>Final Score</Text>
-                <Text style={styles.resultStatValue}>{gameState.score}</Text>
-              </View>
-              <View style={styles.resultStatRow}>
-                <Text style={styles.resultStatLabel}>HP Remaining</Text>
+              <View
+                style={[
+                  styles.resultStatRow,
+                  { borderBottomColor: resultPalette.statDivider },
+                ]}
+              >
                 <Text
-                  style={[styles.resultStatValue, { color: THEME.success }]}
+                  style={[
+                    styles.resultStatLabel,
+                    { color: resultPalette.mutedText },
+                  ]}
+                >
+                  Final Score
+                </Text>
+                <Text
+                  style={[
+                    styles.resultStatValue,
+                    { color: resultPalette.primaryText },
+                  ]}
+                >
+                  {gameState.score}
+                </Text>
+              </View>
+              <View
+                style={[
+                  styles.resultStatRow,
+                  {
+                    borderBottomColor: resultPalette.statDivider,
+                    borderBottomWidth: 0,
+                  },
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.resultStatLabel,
+                    { color: resultPalette.mutedText },
+                  ]}
+                >
+                  HP Remaining
+                </Text>
+                <Text
+                  style={[styles.resultStatValue, { color: theme.success }]}
                 >
                   {gameState.playerHp}/{gameState.playerMaxHp}
                 </Text>
@@ -1167,8 +1873,18 @@ export default function AtomMazeBattleScreen() {
             onPress={handleExit}
             activeOpacity={0.9}
           >
-            <View style={styles.completeButton3D} />
-            <View style={styles.completeButtonInner}>
+            <View
+              style={[
+                styles.completeButton3D,
+                { backgroundColor: resultPalette.completeButtonDepth },
+              ]}
+            />
+            <View
+              style={[
+                styles.completeButtonInner,
+                { backgroundColor: resultPalette.completeButton },
+              ]}
+            >
               <Icon name="Gift" size={24} color="#FFF" variant="Bold" />
               <Text style={styles.completeButtonText}>CLAIM REWARD</Text>
             </View>
@@ -1230,6 +1946,24 @@ export default function AtomMazeBattleScreen() {
                   <Icon name="Cup" size={13} color="#FCD34D" variant="Bold" />
                   <Text style={styles.arenaHudScoreText}>
                     {gameState.score}
+                  </Text>
+                </View>
+                <View
+                  style={[
+                    styles.arenaHudDifficultyChip,
+                    {
+                      backgroundColor:
+                        currentStageDifficultyMeta.chipBackgroundColor,
+                    },
+                  ]}
+                >
+                  <Text
+                    style={[
+                      styles.arenaHudDifficultyText,
+                      { color: currentStageDifficultyMeta.chipTextColor },
+                    ]}
+                  >
+                    {currentStageDifficultyMeta.label}
                   </Text>
                 </View>
                 <View style={styles.arenaHudChip}>
@@ -1703,6 +2437,21 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
     fontSize: 12,
     fontWeight: "800",
+  },
+  arenaHudDifficultyChip: {
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: "rgba(255, 255, 255, 0.28)",
+  },
+  arenaHudDifficultyText: {
+    fontSize: 10,
+    fontWeight: "900",
+    letterSpacing: 0.4,
+    textTransform: "uppercase",
   },
   arenaHudChip: {
     flexDirection: "row",
@@ -2303,16 +3052,20 @@ const styles = StyleSheet.create({
     fontWeight: "900",
     color: "#FFF",
   },
-  introContainer: {
+  introScrollView: {
     flex: 1,
+  },
+  introScrollContent: {
     paddingHorizontal: 20,
     paddingTop: 16,
+  },
+  introContainer: {
+    gap: 20,
   },
   introCard: {
     backgroundColor: "#FFFFFF",
     borderRadius: 24,
     padding: 24,
-    marginBottom: 20,
     borderWidth: 2,
     borderColor: "#E5E7EB",
     borderBottomWidth: 4,
@@ -2333,65 +3086,61 @@ const styles = StyleSheet.create({
     color: "#6B7280",
     lineHeight: 22,
   },
-  introStatsRow: {
-    flexDirection: "row",
-    gap: 12,
-    marginBottom: 20,
-  },
-  introStatCard: {
-    flex: 1,
-    backgroundColor: "#FFFFFF",
-    borderRadius: 16,
-    padding: 16,
-    alignItems: "center",
-    borderWidth: 2,
-    borderColor: "#E5E7EB",
-    borderBottomWidth: 4,
-  },
-  introStatEmoji: {
-    fontSize: 28,
-    marginBottom: 4,
-  },
-  introStatValue: {
-    fontSize: 24,
-    fontWeight: "900",
-    color: "#1F2937",
-  },
-  introStatLabel: {
-    fontSize: 12,
-    color: "#6B7280",
-    fontWeight: "600",
-  },
   introHowToPlay: {
     backgroundColor: "#FFFFFF",
     borderRadius: 20,
     padding: 20,
-    marginBottom: 24,
     borderWidth: 2,
     borderColor: "#E5E7EB",
     borderBottomWidth: 4,
+  },
+  introHowToPlayHeaderRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    marginBottom: 14,
+  },
+  introHowToPlayHeaderIcon: {
+    width: 28,
+    height: 28,
+    borderRadius: 10,
+    alignItems: "center",
+    justifyContent: "center",
   },
   introHowToPlayTitle: {
     fontSize: 16,
     fontWeight: "800",
     color: "#1F2937",
     textAlign: "center",
-    marginBottom: 16,
   },
   introSwipeRow: {
     flexDirection: "column",
-    gap: 12,
+    gap: 10,
   },
   introSwipeItem: {
     alignItems: "center",
     flexDirection: "row",
     gap: 12,
     backgroundColor: "#F9FAFB",
-    paddingVertical: 12,
-    paddingHorizontal: 14,
+    paddingVertical: 11,
+    paddingHorizontal: 12,
     borderRadius: 14,
     borderWidth: 1,
     borderColor: "#E5E7EB",
+  },
+  introStepNumber: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
+    flexShrink: 0,
+  },
+  introStepNumberText: {
+    color: "#FFFFFF",
+    fontSize: 11,
+    fontWeight: "900",
   },
   introSwipeIconWrap: {
     width: 34,
@@ -2463,10 +3212,25 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 24,
   },
+  resultStatusChip: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    borderRadius: 999,
+    borderWidth: 1,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    marginBottom: 12,
+  },
+  resultStatusChipText: {
+    fontSize: 12,
+    fontWeight: "900",
+    letterSpacing: 0.8,
+  },
   resultCard: {
     backgroundColor: "#FFFFFF",
     borderRadius: 24,
-    padding: 32,
+    padding: 28,
     alignItems: "center",
     marginBottom: 24,
     borderWidth: 2,
@@ -2492,7 +3256,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingVertical: 8,
+    paddingVertical: 9,
     borderBottomWidth: 1,
     borderBottomColor: "#FFE082",
   },
@@ -2513,7 +3277,7 @@ const styles = StyleSheet.create({
   defeatTitle: {
     fontSize: 36,
     fontWeight: "900",
-    color: THEME.error,
+    color: "#EF4444",
     marginBottom: 8,
   },
   defeatSubtitle: {
@@ -2528,7 +3292,7 @@ const styles = StyleSheet.create({
   victoryTitle: {
     fontSize: 28,
     fontWeight: "900",
-    color: THEME.success,
+    color: "#10B981",
     marginBottom: 8,
   },
   victorySubtitle: {
@@ -2697,7 +3461,7 @@ const styles = StyleSheet.create({
   completeTitle: {
     fontSize: 36,
     fontWeight: "900",
-    color: THEME.gold,
+    color: "#F59E0B",
     marginBottom: 8,
   },
   completeSubtitle: {
@@ -2718,9 +3482,9 @@ const styles = StyleSheet.create({
     borderColor: "#FACC15",
   },
   rewardText: {
-    fontSize: 32,
+    fontSize: 30,
     fontWeight: "900",
-    color: THEME.gold,
+    color: "#B45309",
   },
   retryButton: {
     borderRadius: 16,
@@ -2742,7 +3506,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     gap: 12,
-    backgroundColor: THEME.error,
+    backgroundColor: "#EF4444",
     paddingVertical: 18,
     paddingHorizontal: 48,
     borderRadius: 16,
@@ -2772,7 +3536,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     gap: 12,
-    backgroundColor: THEME.success,
+    backgroundColor: "#10B981",
     paddingVertical: 18,
     paddingHorizontal: 36,
     borderRadius: 16,
@@ -2832,7 +3596,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     gap: 12,
-    backgroundColor: THEME.gold,
+    backgroundColor: "#F59E0B",
     paddingVertical: 18,
     paddingHorizontal: 48,
     borderRadius: 16,
