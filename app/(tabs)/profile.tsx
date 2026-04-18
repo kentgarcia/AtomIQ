@@ -15,6 +15,7 @@ import {
     Alert,
     Dimensions,
     Image,
+    type ImageSourcePropType,
     KeyboardAvoidingView,
     Modal,
     Platform,
@@ -184,6 +185,27 @@ export default function ProfileScreen() {
   };
 
   const selectedAvatarKey = normalizeProfileAvatarKey(userProfile?.avatar_url);
+
+  const resolveFriendAvatarSource = (
+    avatarUrl?: string | null,
+  ): ImageSourcePropType => {
+    const normalized = avatarUrl?.trim();
+    if (!normalized) {
+      return getProfileAvatarSource();
+    }
+
+    const lowerCased = normalized.toLowerCase();
+    if (
+      lowerCased.startsWith("http://") ||
+      lowerCased.startsWith("https://") ||
+      lowerCased.startsWith("file://") ||
+      lowerCased.startsWith("data:")
+    ) {
+      return { uri: normalized };
+    }
+
+    return getProfileAvatarSource(normalized);
+  };
 
   const handleSelectAvatar = async (avatarKey: ProfileAvatarKey) => {
     if (!userProfile || isSavingAvatar || avatarKey === selectedAvatarKey) {
@@ -447,11 +469,12 @@ export default function ProfileScreen() {
                     return (
                       <View key={friend.friend_id} style={styles.friendCard}>
                         <View style={styles.friendAvatar}>
-                          <Icon
-                            name="Profile"
-                            size={24}
-                            color={THEME.primary}
-                            variant="Bold"
+                          <Image
+                            source={resolveFriendAvatarSource(
+                              friend.avatar_url,
+                            )}
+                            style={styles.friendAvatarImage}
+                            resizeMode="cover"
                           />
                         </View>
                         <View style={styles.friendInfo}>
@@ -1379,7 +1402,12 @@ const createStyles = (theme: typeof LightTHEME) =>
       backgroundColor: "rgba(94,114,228,0.1)",
       alignItems: "center",
       justifyContent: "center",
+      overflow: "hidden",
       marginRight: 12,
+    },
+    friendAvatarImage: {
+      width: "100%",
+      height: "100%",
     },
     friendInfo: {
       flex: 1,

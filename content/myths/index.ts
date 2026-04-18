@@ -12,6 +12,7 @@ import radiationGlowsGreenMyth from "./radiation-glows-green";
 // Unit 2
 import fukushimaWasNuclearExplosionMyth from "./fukushima-was-nuclear-explosion";
 import livingNearPlantDangerousMyth from "./living-near-plant-dangerous";
+import mythsFactsPack from "./myths-facts-pack";
 import nuclearPlantsExplodeMyth from "./nuclear-plants-explode";
 
 // Unit 5
@@ -32,6 +33,9 @@ export const myths: Record<string, Myth> = {
   // Unit 5
   "nuclear-waste-forever": nuclearWasteForeverMyth,
   "nuclear-not-clean": nuclearNotCleanMyth,
+
+  // DOCS/myths-facts additions
+  ...mythsFactsPack,
 };
 
 // Helper functions

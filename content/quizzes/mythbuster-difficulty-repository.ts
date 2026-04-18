@@ -1,4 +1,6 @@
 import { Myth, QuizQuestion } from "../types";
+import averageMythBusterQuestions from "./mythbuster-average-questions";
+import difficultMythBusterQuestions from "./mythbuster-difficult-questions";
 
 export type MythBusterQuizDifficulty = "easy" | "medium" | "hard";
 
@@ -674,8 +676,8 @@ const easyMythBusterQuestions: QuizQuestion[] = [
 
 export const mythBusterQuizRepository: MythBusterQuizRepository = {
   easy: easyMythBusterQuestions,
-  medium: [],
-  hard: [],
+  medium: averageMythBusterQuestions,
+  hard: difficultMythBusterQuestions,
 };
 
 export const getMythBusterQuizQuestionsByDifficulty = (

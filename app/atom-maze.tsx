@@ -1,15 +1,10 @@
 import { Icon } from "@/components/ui/icon";
 import { getAllMazes } from "@/content/explorer";
 import { useColorScheme } from "@/hooks/use-color-scheme";
-import {
-    getAllMazeProgress,
-    type MazeProgress,
-} from "@/services/explorer-storage";
 import { LinearGradient } from "expo-linear-gradient";
-import { useFocusEffect, useRouter } from "expo-router";
-import React, { useCallback, useState } from "react";
+import { useRouter } from "expo-router";
+import React from "react";
 import {
-    Dimensions,
     Pressable,
     SafeAreaView,
     ScrollView,
@@ -19,8 +14,6 @@ import {
     View,
 } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
-
-const { width } = Dimensions.get("window");
 
 // Mustard Theme - Bright
 const THEME = {
@@ -71,45 +64,60 @@ const getMazeColors = (theme: string | undefined) => {
   return MAZE_COLORS.default;
 };
 
+type MazeStageDifficulty = "easy" | "average" | "difficult";
+
+const STAGE_DIFFICULTY_META: Record<
+  MazeStageDifficulty,
+  {
+    label: string;
+    backgroundColor: string;
+    textColor: string;
+  }
+> = {
+  easy: {
+    label: "Easy",
+    backgroundColor: "rgba(34, 197, 94, 0.22)",
+    textColor: "#DCFCE7",
+  },
+  average: {
+    label: "Average",
+    backgroundColor: "rgba(251, 191, 36, 0.26)",
+    textColor: "#FEF3C7",
+  },
+  difficult: {
+    label: "Difficult",
+    backgroundColor: "rgba(239, 68, 68, 0.24)",
+    textColor: "#FEE2E2",
+  },
+};
+
+const getMazeStageDifficulty = (
+  index: number,
+  totalMazes: number,
+): MazeStageDifficulty => {
+  if (totalMazes <= 1) {
+    return "easy";
+  }
+
+  const maxIndex = Math.max(totalMazes - 1, 1);
+  const progress = index / maxIndex;
+
+  if (progress < 1 / 3) {
+    return "easy";
+  }
+
+  if (progress < 2 / 3) {
+    return "average";
+  }
+
+  return "difficult";
+};
+
 export default function AtomMazeSelectionScreen() {
   const router = useRouter();
   const allMazes = getAllMazes();
   const colorScheme = useColorScheme();
   const theme = THEME[colorScheme ?? "light"];
-  const [mazeProgressMap, setMazeProgressMap] = useState<
-    Record<string, MazeProgress>
-  >({});
-
-  useFocusEffect(
-    useCallback(() => {
-      let isActive = true;
-
-      const loadMazeProgress = async () => {
-        try {
-          const allProgress = await getAllMazeProgress();
-          if (!isActive) return;
-
-          const nextMap = allProgress.reduce<Record<string, MazeProgress>>(
-            (acc, progress) => {
-              acc[progress.mazeId] = progress;
-              return acc;
-            },
-            {},
-          );
-
-          setMazeProgressMap(nextMap);
-        } catch (error) {
-          console.error("Failed to load maze progress:", error);
-        }
-      };
-
-      void loadMazeProgress();
-
-      return () => {
-        isActive = false;
-      };
-    }, []),
-  );
 
   return (
     <View style={{ flex: 1, backgroundColor: theme.bg }}>
@@ -149,8 +157,13 @@ export default function AtomMazeSelectionScreen() {
           <View style={styles.modesGridNew}>
             {allMazes.map((maze, index) => {
               const colors = getMazeColors(maze.theme);
-              const progress = mazeProgressMap[maze.id];
-              const isCompleted = !!progress?.completedAt;
+              const stageDifficulty = getMazeStageDifficulty(
+                index,
+                allMazes.length,
+              );
+              const stageDifficultyMeta =
+                STAGE_DIFFICULTY_META[stageDifficulty];
+
               return (
                 <Animated.View
                   key={maze.id}
@@ -188,86 +201,43 @@ export default function AtomMazeSelectionScreen() {
                       end={{ x: 0.3, y: 1 }}
                       style={styles.modeCardGradientNew}
                     >
-                      {isCompleted && (
-                        <View style={styles.completedBadge}>
-                          <Icon
-                            name="TickCircle"
-                            size={13}
-                            color="#22C55E"
-                            variant="Bold"
-                          />
-                          <Text style={styles.completedBadgeText}>
-                            Completed
-                          </Text>
-                        </View>
-                      )}
-
-                      {/* Shine Effect */}
-                      <View style={styles.cardShine} />
-
-                      {/* Decorative Circles */}
-                      <View style={[styles.cardCircle, styles.cardCircle1]} />
-                      <View style={[styles.cardCircle, styles.cardCircle2]} />
-
-                      {/* Icon Badge */}
-                      <View style={styles.modeIconBadge}>
-                        <View style={styles.modeIconInner}>
-                          <Text style={{ fontSize: 24 }}>👾</Text>
-                        </View>
-                        {/* Icon Badge Shine */}
-                        <View style={styles.iconBadgeShine} />
-                      </View>
-
                       {/* Content */}
                       <View style={styles.modeCardContent}>
+                        <View style={styles.modeCardHeaderRow}>
+                          <Text style={styles.modeStageText}>
+                            Stage {index + 1}
+                          </Text>
+                          <View
+                            style={[
+                              styles.modeDifficultyChip,
+                              {
+                                backgroundColor:
+                                  stageDifficultyMeta.backgroundColor,
+                              },
+                            ]}
+                          >
+                            <Text
+                              style={[
+                                styles.modeDifficultyChipText,
+                                { color: stageDifficultyMeta.textColor },
+                              ]}
+                            >
+                              {stageDifficultyMeta.label}
+                            </Text>
+                          </View>
+                        </View>
+
                         <Text style={styles.modeCardTitleNew}>
                           {maze.title}
                         </Text>
                         <Text style={styles.modeCardDescNew} numberOfLines={2}>
                           {maze.description}
                         </Text>
-
-                        {/* Tagline Banner */}
-                        <View style={styles.taglineBanner}>
-                          <Text style={styles.taglineText}>
-                            {isCompleted ? "Replay Ready" : "Battle Arena!"}
-                          </Text>
-                        </View>
-                      </View>
-
-                      {/* Stats Row */}
-                      <View style={styles.modeStatsRow}>
-                        {/* Monsters Count */}
-                        <View style={styles.roundsBadge}>
-                          <Text style={{ fontSize: 12 }}>👾</Text>
-                          <Text style={styles.roundsBadgeText}>
-                            {maze.rooms.length}
-                          </Text>
-                        </View>
-
-                        {/* Boss */}
-                        <View style={styles.roundsBadge}>
-                          <Text style={{ fontSize: 12 }}>👹</Text>
-                          <Text style={styles.roundsBadgeText}>1</Text>
-                        </View>
-
-                        {/* XP Reward */}
-                        <View style={styles.xpBadge}>
-                          <Icon
-                            name="Flash"
-                            size={12}
-                            color="#FFD700"
-                            variant="Bold"
-                          />
-                          <Text style={styles.xpBadgeText}>
-                            {maze.xpReward} XP
-                          </Text>
-                        </View>
                       </View>
 
                       {/* Play Arrow */}
                       <View
-                        style={[styles.playArrowCircle, { marginTop: -26 }]}
+                        style={[styles.playArrowCircle, { marginTop: -16 }]}
                       >
                         <Icon
                           name="Play"
@@ -283,143 +253,7 @@ export default function AtomMazeSelectionScreen() {
             })}
           </View>
 
-          {/* Info Card */}
-          <Animated.View
-            entering={FadeInDown.delay(500)}
-            style={[
-              styles.infoCard,
-              { backgroundColor: theme.card, borderColor: theme.border },
-            ]}
-          >
-            <View style={styles.infoIconWrap}>
-              <Icon name="InfoCircle" size={20} color={theme.primary} />
-            </View>
-            <Text style={[styles.infoText, { color: theme.text }]}>
-              Answer{" "}
-              <Text style={{ color: theme.primary, fontWeight: "800" }}>
-                QUIZ
-              </Text>{" "}
-              questions and{" "}
-              <Text style={{ color: theme.primary, fontWeight: "800" }}>
-                SCRAMBLE
-              </Text>{" "}
-              words to defeat monsters!
-            </Text>
-          </Animated.View>
-
-          {/* How to Play Section */}
-          <Animated.View
-            entering={FadeInDown.delay(600)}
-            style={styles.howToPlaySection}
-          >
-            <Text style={[styles.howToPlayTitle, { color: theme.text }]}>
-              📖 How to Play
-            </Text>
-            <View style={styles.howToPlayGrid}>
-              <View
-                style={[
-                  styles.howToPlayItem,
-                  { backgroundColor: theme.card, borderColor: theme.border },
-                ]}
-              >
-                <View
-                  style={[
-                    styles.howToPlayIconBadge,
-                    { backgroundColor: theme.primary + "15" },
-                  ]}
-                >
-                  <Text style={styles.howToPlayEmoji}>❓</Text>
-                </View>
-                <View style={styles.howToPlayCopy}>
-                  <Text style={[styles.howToPlayLabel, { color: theme.text }]}>
-                    Quiz Round
-                  </Text>
-                  <Text
-                    style={[styles.howToPlayText, { color: theme.textMuted }]}
-                  >
-                    Answer the question to strike first.
-                  </Text>
-                </View>
-              </View>
-              <View
-                style={[
-                  styles.howToPlayItem,
-                  { backgroundColor: theme.card, borderColor: theme.border },
-                ]}
-              >
-                <View
-                  style={[
-                    styles.howToPlayIconBadge,
-                    { backgroundColor: theme.primary + "15" },
-                  ]}
-                >
-                  <Text style={styles.howToPlayEmoji}>🔤</Text>
-                </View>
-                <View style={styles.howToPlayCopy}>
-                  <Text style={[styles.howToPlayLabel, { color: theme.text }]}>
-                    Word Puzzle
-                  </Text>
-                  <Text
-                    style={[styles.howToPlayText, { color: theme.textMuted }]}
-                  >
-                    Unscramble terms for bonus damage.
-                  </Text>
-                </View>
-              </View>
-              <View
-                style={[
-                  styles.howToPlayItem,
-                  { backgroundColor: theme.card, borderColor: theme.border },
-                ]}
-              >
-                <View
-                  style={[
-                    styles.howToPlayIconBadge,
-                    { backgroundColor: theme.primary + "15" },
-                  ]}
-                >
-                  <Text style={styles.howToPlayEmoji}>⚔️</Text>
-                </View>
-                <View style={styles.howToPlayCopy}>
-                  <Text style={[styles.howToPlayLabel, { color: theme.text }]}>
-                    Battle
-                  </Text>
-                  <Text
-                    style={[styles.howToPlayText, { color: theme.textMuted }]}
-                  >
-                    Each correct answer chips enemy HP.
-                  </Text>
-                </View>
-              </View>
-              <View
-                style={[
-                  styles.howToPlayItem,
-                  { backgroundColor: theme.card, borderColor: theme.border },
-                ]}
-              >
-                <View
-                  style={[
-                    styles.howToPlayIconBadge,
-                    { backgroundColor: theme.primary + "15" },
-                  ]}
-                >
-                  <Text style={styles.howToPlayEmoji}>❤️</Text>
-                </View>
-                <View style={styles.howToPlayCopy}>
-                  <Text style={[styles.howToPlayLabel, { color: theme.text }]}>
-                    Survive
-                  </Text>
-                  <Text
-                    style={[styles.howToPlayText, { color: theme.textMuted }]}
-                  >
-                    Protect your HP to clear the maze.
-                  </Text>
-                </View>
-              </View>
-            </View>
-          </Animated.View>
-
-          <View style={{ height: 60 }} />
+          <View style={{ height: 36 }} />
         </ScrollView>
       </SafeAreaView>
     </View>
@@ -479,14 +313,15 @@ const styles = StyleSheet.create({
   modeContainer: {
     paddingHorizontal: 20,
     paddingTop: 16,
+    paddingBottom: 12,
   },
   modesGridNew: {
-    gap: 22,
+    gap: 16,
   },
   modeCardNew: {
     borderRadius: 24,
     position: "relative",
-    height: 180,
+    height: 150,
   },
   modeCardPressed: {
     transform: [{ scale: 0.97 }, { translateY: 2 }],
@@ -517,34 +352,14 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     borderRadius: 24,
-    padding: 20,
-    paddingRight: 60,
+    paddingHorizontal: 18,
+    paddingVertical: 16,
+    paddingRight: 68,
     overflow: "hidden",
     borderWidth: 3,
     borderColor: "rgba(255,255,255,0.3)",
     borderTopColor: "rgba(255,255,255,0.5)",
     borderLeftColor: "rgba(255,255,255,0.4)",
-  },
-  completedBadge: {
-    position: "absolute",
-    top: 12,
-    right: 12,
-    zIndex: 3,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 5,
-    backgroundColor: "rgba(2, 6, 23, 0.82)",
-    borderWidth: 1,
-    borderColor: "rgba(34, 197, 94, 0.7)",
-    borderRadius: 999,
-    paddingHorizontal: 9,
-    paddingVertical: 5,
-  },
-  completedBadgeText: {
-    color: "#DCFCE7",
-    fontSize: 11,
-    fontWeight: "800",
-    letterSpacing: 0.2,
   },
   // Shine Effect
   cardShine: {
@@ -613,74 +428,43 @@ const styles = StyleSheet.create({
     transform: [{ rotate: "-20deg" }],
   },
   modeCardContent: {
-    marginLeft: 60,
     flex: 1,
+    gap: 8,
   },
-  modeCardTitleNew: {
-    fontSize: 20,
-    fontWeight: "900",
-    color: "#FFF",
-    marginBottom: 4,
-  },
-  modeCardDescNew: {
-    fontSize: 13,
-    color: "rgba(255,255,255,0.9)",
-    fontWeight: "500",
-    marginBottom: 8,
-  },
-  taglineBanner: {
-    alignSelf: "flex-start",
-    backgroundColor: "rgba(255,255,255,0.25)",
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 10,
-  },
-  taglineText: {
-    fontSize: 11,
-    fontWeight: "700",
-    color: "#FFF",
-  },
-  modeStatsRow: {
+  modeCardHeaderRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 10,
-    marginTop: 14,
-    marginLeft: 64,
+    justifyContent: "space-between",
+    marginBottom: 2,
   },
-  xpBadge: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 4,
-    backgroundColor: "rgba(255,215,0,0.25)",
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: "rgba(255,215,0,0.3)",
-  },
-  xpBadgeText: {
+  modeStageText: {
     fontSize: 12,
     fontWeight: "800",
-    color: "#FFF",
-    textShadowColor: "rgba(0,0,0,0.2)",
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 2,
+    color: "rgba(255,255,255,0.92)",
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
   },
-  roundsBadge: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 4,
-    backgroundColor: "rgba(255,255,255,0.2)",
+  modeDifficultyChip: {
+    borderRadius: 999,
     paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 10,
+    paddingVertical: 4,
     borderWidth: 1,
     borderColor: "rgba(255,255,255,0.3)",
   },
-  roundsBadgeText: {
-    fontSize: 12,
+  modeDifficultyChipText: {
+    fontSize: 11,
     fontWeight: "800",
+  },
+  modeCardTitleNew: {
+    fontSize: 18,
+    fontWeight: "900",
     color: "#FFF",
+  },
+  modeCardDescNew: {
+    fontSize: 12,
+    color: "rgba(255,255,255,0.9)",
+    fontWeight: "500",
+    lineHeight: 16,
   },
   playArrowCircle: {
     position: "absolute",
@@ -702,81 +486,5 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 6,
     elevation: 5,
-  },
-  // Info Card
-  infoCard: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-    borderRadius: 16,
-    padding: 16,
-    marginTop: 24,
-    borderWidth: 2,
-    borderBottomWidth: 4,
-  },
-  infoIconWrap: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: "#FFB30015",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  infoText: {
-    flex: 1,
-    fontSize: 13,
-    fontWeight: "500",
-    lineHeight: 18,
-  },
-  // How to Play Section
-  howToPlaySection: {
-    marginTop: 24,
-    borderRadius: 20,
-    padding: 20,
-    borderWidth: 0,
-  },
-  howToPlayTitle: {
-    fontSize: 18,
-    fontWeight: "800",
-    marginBottom: 16,
-    textAlign: "center",
-  },
-  howToPlayGrid: {
-    flexDirection: "column",
-    gap: 12,
-  },
-  howToPlayItem: {
-    width: "100%",
-    borderRadius: 14,
-    paddingVertical: 12,
-    paddingHorizontal: 14,
-    alignItems: "center",
-    flexDirection: "row",
-    gap: 12,
-    borderWidth: 1,
-  },
-  howToPlayIconBadge: {
-    width: 34,
-    height: 34,
-    borderRadius: 10,
-    alignItems: "center",
-    justifyContent: "center",
-    flexShrink: 0,
-  },
-  howToPlayCopy: {
-    flex: 1,
-    gap: 2,
-  },
-  howToPlayLabel: {
-    fontSize: 13,
-    fontWeight: "700",
-  },
-  howToPlayEmoji: {
-    fontSize: 16,
-  },
-  howToPlayText: {
-    fontSize: 12,
-    fontWeight: "500",
-    lineHeight: 16,
   },
 });
