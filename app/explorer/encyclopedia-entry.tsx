@@ -1,7 +1,7 @@
 import { Icon } from "@/components/ui/icon";
 import { getEncyclopediaEntryById } from "@/content/explorer";
 import { getEncyclopediaImage } from "@/content/explorer/encyclopedia/images";
-import { useColorScheme } from "@/hooks/use-color-scheme";
+import { useTheme, type Palette } from "@/theme";
 import { openExternalUrl } from "@/services/open-url";
 import * as Haptics from "expo-haptics";
 import { LinearGradient } from "expo-linear-gradient";
@@ -10,53 +10,18 @@ import * as Speech from "expo-speech";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
     Alert,
-    Dimensions,
     Image,
     ScrollView,
     StyleSheet,
     Text,
     TouchableOpacity,
+    useWindowDimensions,
     View,
 } from "react-native";
 import Animated, { FadeInDown, ZoomIn } from "react-native-reanimated";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-const { width } = Dimensions.get("window");
-const ENTRY_IMAGE_MAX_WIDTH = width - 40;
 const ENTRY_IMAGE_MAX_HEIGHT = 320;
-
-const LightTHEME = {
-  bg: "#F8F9FE",
-  card: "#FFFFFF",
-  text: "#32325D",
-  textMuted: "#8898AA",
-  primary: "#5E72E4",
-  primaryDark: "#4C63D2",
-  success: "#2ECC71",
-  warning: "#FFC800",
-  info: "#1CB0F6",
-  purple: "#9E87F5",
-  purpleDark: "#7C3AED",
-  danger: "#FF4B4B",
-  dangerDark: "#DC2626",
-  border: "#E9ECEF",
-};
-
-const DarkTHEME = {
-  bg: "#172B4D",
-  card: "#213356",
-  text: "#F6F9FC",
-  textMuted: "#8898AA",
-  primary: "#5E72E4",
-  primaryDark: "#4C63D2",
-  success: "#2ECC71",
-  warning: "#FFC800",
-  info: "#1CB0F6",
-  purple: "#9E87F5",
-  purpleDark: "#7C3AED",
-  danger: "#FF4B4B",
-  dangerDark: "#DC2626",
-  border: "#2D3A56",
-};
 
 // Category color mappings
 const CATEGORY_COLORS: Record<
@@ -132,12 +97,15 @@ const CATEGORY_COLORS: Record<
 
 export default function EncyclopediaEntryScreen() {
   const router = useRouter();
-  const colorScheme = useColorScheme();
+  const insets = useSafeAreaInsets();
+  const { theme } = useTheme();
   const { id } = useLocalSearchParams<{ id: string }>();
+  const { width } = useWindowDimensions();
+  const ENTRY_IMAGE_MAX_WIDTH = width - 40;
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [speakingSection, setSpeakingSection] = useState<string | null>(null);
 
-  const THEME = colorScheme === "dark" ? DarkTHEME : LightTHEME;
+  const THEME = theme.palettes.entry;
   const styles = useMemo(() => createStyles(THEME), [THEME]);
 
   const entry = useMemo(() => {
@@ -176,7 +144,7 @@ export default function EncyclopediaEntryScreen() {
       width: Math.round(displayWidth),
       height: Math.round(displayHeight),
     };
-  }, [entryImageSource]);
+  }, [entryImageSource, width]);
 
   const getCategoryStyle = (category: string) => {
     const key = category?.toLowerCase() || "default";
@@ -289,7 +257,7 @@ export default function EncyclopediaEntryScreen() {
   return (
     <View style={[styles.container, { backgroundColor: THEME.bg }]}>
       {/* Header */}
-      <View style={styles.header}>
+      <View style={[styles.header, { paddingTop: insets.top + 20 }]}>
         <TouchableOpacity
           onPress={() => router.back()}
           style={styles.backButton}
@@ -339,7 +307,7 @@ export default function EncyclopediaEntryScreen() {
       </View>
 
       <ScrollView
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={[styles.scrollContent, { paddingTop: insets.top + 20 }]}
         showsVerticalScrollIndicator={false}
       >
         {/* Term Header Card */}
@@ -633,7 +601,7 @@ export default function EncyclopediaEntryScreen() {
   );
 }
 
-const createStyles = (theme: typeof LightTHEME) =>
+const createStyles = (theme: Palette) =>
   StyleSheet.create({
     container: {
       flex: 1,
@@ -671,7 +639,6 @@ const createStyles = (theme: typeof LightTHEME) =>
       flexDirection: "row",
       alignItems: "center",
       paddingHorizontal: 20,
-      paddingTop: 60,
       paddingBottom: 20,
       backgroundColor: theme.bg,
       gap: 12,

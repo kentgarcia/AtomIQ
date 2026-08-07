@@ -1,5 +1,5 @@
 import { Icon } from "@/components/ui/icon";
-import { useTheme } from "@/hooks/use-color-scheme";
+import { useTheme, type Palette } from "@/theme";
 import { clearAllData, deleteAccountData } from "@/services/database";
 import { getSoundEnabled, setSoundEnabled } from "@/services/storage";
 import { useStorage } from "@/services/StorageContext";
@@ -29,24 +29,6 @@ import {
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-const LightTHEME = {
-  bg: "#F8F9FE",
-  card: "#FFFFFF",
-  text: "#32325D",
-  textMuted: "#8898AA",
-  primary: "#EA580C",
-  border: "#E5E7EB",
-};
-
-const DarkTHEME = {
-  bg: "#172B4D",
-  card: "#213356",
-  text: "#F6F9FC",
-  textMuted: "#8898AA",
-  primary: "#EA580C",
-  border: "#2D3A56",
-};
-
 export default function SettingsScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
@@ -59,8 +41,8 @@ export default function SettingsScreen() {
     pendingChanges,
     lastSyncedAt,
   } = useStorage();
-  const { colorScheme, isDark, toggleTheme } = useTheme();
-  const THEME = colorScheme === "dark" ? DarkTHEME : LightTHEME;
+  const { theme, isDark, toggleTheme } = useTheme();
+  const THEME = theme.palettes.settings;
   const [isEditing, setIsEditing] = useState(false);
   const [displayName, setDisplayName] = useState(
     userProfile?.display_name || userProfile?.username || "",
@@ -1114,7 +1096,7 @@ export default function SettingsScreen() {
   );
 }
 
-const createStyles = (theme: typeof LightTHEME) =>
+const createStyles = (theme: Palette) =>
   StyleSheet.create({
     header: {
       flexDirection: "row",

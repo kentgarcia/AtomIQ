@@ -1,5 +1,6 @@
+import { colors, fontSizes, opacity, radius, shadows, spacing } from "@/theme/tokens";
 import { Icon } from "@/components/ui/icon";
-import { useColorScheme } from "@/hooks/use-color-scheme";
+import { useTheme, withAlpha } from "@/theme";
 import { playButtonClickSfx } from "@/services/ui-sfx";
 import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import { Tabs } from "expo-router";
@@ -55,7 +56,7 @@ const TabButton = ({
         <View
           style={[
             styles.iconContainer,
-            isFocused && { backgroundColor: theme.active + "15" },
+            isFocused && { backgroundColor: withAlpha(theme.active, 0.08) },
           ]}
         >
           <Icon
@@ -83,15 +84,9 @@ const TabButton = ({
 
 function ModernTabBar({ state, navigation }: BottomTabBarProps) {
   const insets = useSafeAreaInsets();
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === "dark";
+  const { theme } = useTheme();
 
-  const THEME = {
-    bg: isDark ? "#172B4D" : "#F8F9FE",
-    border: isDark ? "#2D3A56" : "#E5E7EB",
-    active: "#EA580C", // Matching other pages
-    inactive: isDark ? "#8898AA" : "#8898AA",
-  };
+  const THEME = theme.palettes.tabBar;
 
   const tabs = [
     { name: "index", icon: "Home", label: "Home" },
@@ -195,13 +190,13 @@ const styles = StyleSheet.create({
   tabBar: {
     flexDirection: "row",
     borderTopWidth: 1,
-    paddingTop: 12,
-    paddingHorizontal: 8,
-    elevation: 8,
-    shadowColor: "#000",
+    paddingTop: spacing.lg,
+    paddingHorizontal: spacing.sm,
+    elevation: shadows.md?.elevation ?? 8,
+    shadowColor: colors.role.black,
     shadowOffset: { width: 0, height: -2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
+    shadowOpacity: opacity.subtle,
+    shadowRadius: shadows.md?.shadowRadius ?? 8,
   },
   tabButton: {
     flex: 1,
@@ -211,16 +206,16 @@ const styles = StyleSheet.create({
   tabContent: {
     alignItems: "center",
     justifyContent: "center",
-    gap: 4,
+    gap: spacing.xs,
   },
   iconContainer: {
-    padding: 8,
-    borderRadius: 16,
+    padding: spacing.sm,
+    borderRadius: radius.lg,
     alignItems: "center",
     justifyContent: "center",
   },
   tabLabel: {
-    fontSize: 10,
+    fontSize: fontSizes.xs,
     letterSpacing: 0.2,
   },
 });

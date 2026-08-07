@@ -1,19 +1,18 @@
 import { Icon } from "@/components/ui/icon";
 import { UNITS as SYLLABUS_UNITS } from "@/content/units";
-import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useAllLevels } from "@/hooks/use-storage";
 import { openExternalUrl } from "@/services/open-url";
 import { useFocusEffect, useRouter } from "expo-router";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
     Alert,
-    Dimensions,
     Image,
     Modal,
     ScrollView,
     StyleSheet,
     Text,
     TouchableOpacity,
+    useWindowDimensions,
     View,
 } from "react-native";
 import Animated, {
@@ -23,6 +22,7 @@ import Animated, {
     withRepeat,
     withTiming,
 } from "react-native-reanimated";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Svg, {
     Circle,
     Defs,
@@ -33,25 +33,7 @@ import Svg, {
     Stop,
 } from "react-native-svg";
 
-const { width } = Dimensions.get("window");
-
-const LightTHEME = {
-  bg: "#8BC34A", // Main Grass Color
-  primary: "#EA580C",
-  locked: "#E5E7EB",
-  text: "#1F2937",
-  textMuted: "#9CA3AF",
-  card: "#FFFFFF",
-};
-
-const DarkTHEME = {
-  bg: "#558B2F", // Darker grass for dark mode
-  primary: "#EA580C",
-  locked: "#2D3A56",
-  text: "#F6F9FC",
-  textMuted: "#8898AA",
-  card: "#213356",
-};
+import { useTheme, MapLight as LightTHEME, type Palette } from "@/theme";
 
 // Helper function to darken a color
 const darkenColor = (color: string, amount: number = 0.3): string => {
@@ -319,7 +301,7 @@ const convertSyllabusToMapUnits = (completedLessonIds: string[]) => {
 };
 
 // Global Node Position Calculator
-const getNodePosition = (globalIndex: number) => {
+const getNodePosition = (globalIndex: number, width: number) => {
   // Use a sine wave for X to create a winding path
   const xOffset = Math.sin(globalIndex * 0.8) * 80; // Smoother curve, wider
   return {
@@ -351,7 +333,7 @@ const TerrainLayer = ({
     // levels[1] (Mid) -> global 11
     // levels[2] (Bot) -> global 10
     const logicalIndex = globalStartIndex + (levels.length - 1 - index);
-    const pos = getNodePosition(logicalIndex);
+    const pos = getNodePosition(logicalIndex, width);
     return { x: pos.x, y: 60 + index * 120 };
   });
 
@@ -361,7 +343,7 @@ const TerrainLayer = ({
   let connectionPath = "";
   if (globalStartIndex > 0) {
     const lastPoint = pathPoints[pathPoints.length - 1];
-    const prevUnitTopPos = getNodePosition(globalStartIndex - 1);
+    const prevUnitTopPos = getNodePosition(globalStartIndex - 1, width);
     // Draw line to bottom of component + 60 (which is where the next node would be)
     connectionPath = `M ${lastPoint.x} ${lastPoint.y} L ${prevUnitTopPos.x} ${height + 60}`;
   }
@@ -427,7 +409,7 @@ const TerrainLayer = ({
     // Check connection to previous unit
     if (globalStartIndex > 0) {
       const lastPoint = pathPoints[pathPoints.length - 1];
-      const prevUnitTopPos = getNodePosition(globalStartIndex - 1);
+      const prevUnitTopPos = getNodePosition(globalStartIndex - 1, width);
       const dist = pointToSegmentDistance(
         x,
         y,
@@ -647,7 +629,8 @@ const LevelNode = ({
   showStart?: boolean;
   styles: any;
 }) => {
-  const pos = getNodePosition(globalIndex);
+  const { width } = useWindowDimensions();
+  const pos = getNodePosition(globalIndex, width);
   const yPos = 60 + index * 120;
 
   const isLocked = level.status === "locked";
@@ -802,8 +785,11 @@ const UNIT_INFO_DATA: {
 
 export default function MapScreen() {
   const router = useRouter();
-  const colorScheme = useColorScheme();
-  const THEME = colorScheme === "dark" ? DarkTHEME : LightTHEME;
+  const insets = useSafeAreaInsets();
+  const { theme } = useTheme();
+  const colorScheme = theme.mode;
+  const { width, height: windowHeight } = useWindowDimensions();
+  const THEME = theme.palettes.map;
   const styles = React.useMemo(() => createStyles(THEME), [THEME]);
   const scrollViewRef = useRef<ScrollView>(null);
   const isFirstRender = useRef(true);
@@ -879,7 +865,7 @@ export default function MapScreen() {
     offsetY += 60 + displayIndex * 120;
 
     // Center the node on screen (subtract half screen height)
-    const screenHeight = Dimensions.get("window").height;
+    const screenHeight = windowHeight;
     offsetY -= screenHeight / 2 - 50; // 50 for some padding
 
     // Ensure we don't scroll to negative
@@ -928,7 +914,7 @@ export default function MapScreen() {
   if (loading) {
     return (
       <View style={{ flex: 1, backgroundColor: THEME.bg }}>
-        <View style={styles.header}>
+        <View style={[styles.header, { paddingTop: insets.top + 20 }]}>
           <TouchableOpacity
             onPress={() => router.back()}
             style={styles.backBtn}
@@ -980,7 +966,7 @@ export default function MapScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: THEME.bg }}>
-      <View style={styles.header}>
+      <View style={[styles.header, { paddingTop: insets.top + 20 }]}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
           <Icon name="ArrowLeft2" size={24} color={THEME.textMuted} />
         </TouchableOpacity>
@@ -992,7 +978,7 @@ export default function MapScreen() {
 
       <ScrollView
         ref={scrollViewRef}
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={[styles.scrollContent, { paddingTop: insets.top + 60 }]}
         showsVerticalScrollIndicator={false}
       >
         <View style={{ height: 100 }} />
@@ -1213,13 +1199,12 @@ export default function MapScreen() {
   );
 }
 
-const createStyles = (theme: typeof LightTHEME) =>
+const createStyles = (theme: Palette) =>
   StyleSheet.create({
     header: {
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "space-between",
-      paddingTop: 60,
       paddingHorizontal: 20,
       paddingBottom: 16,
       zIndex: 100,
@@ -1258,7 +1243,6 @@ const createStyles = (theme: typeof LightTHEME) =>
       letterSpacing: 1,
     },
     scrollContent: {
-      paddingTop: 100,
       paddingBottom: 40,
     },
     unitSection: {

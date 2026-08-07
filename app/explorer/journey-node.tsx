@@ -6,24 +6,18 @@ import { getMythById } from '@/content/myths';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useMemo } from 'react';
-import { Dimensions, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-const { width } = Dimensions.get('window');
-
-const THEME = {
-  bg: '#F7F7F7',
-  card: '#FFFFFF',
-  text: '#1F2937',
-  textMuted: '#9CA3AF',
-  primary: '#EA580C',
-  primaryDark: '#C2410C',
-  success: '#2ECC71',
-  border: '#E5E7EB',
-};
+import { useTheme, withAlpha, type Palette } from '@/theme';
 
 export default function JourneyNodeScreen() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
+  const { theme } = useTheme();
+  const THEME = theme.palettes.explorer;
+  const styles = useMemo(() => makeStyles(THEME), [THEME]);
   const { journeyId, nodeId } = useLocalSearchParams<{ journeyId: string; nodeId: string }>();
   
   const journey = useMemo(() => {
@@ -61,7 +55,7 @@ export default function JourneyNodeScreen() {
   return (
     <View style={{ flex: 1, backgroundColor: THEME.bg }}>
       {/* Header */}
-      <View style={styles.header}>
+      <View style={[styles.header, { paddingTop: insets.top + 20 }]}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
           <Icon name="ArrowLeft2" size={24} color={THEME.text} variant="Bold" />
         </TouchableOpacity>
@@ -71,7 +65,7 @@ export default function JourneyNodeScreen() {
         </View>
       </View>
 
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={[styles.scrollContent, { paddingTop: insets.top + 20 }]} showsVerticalScrollIndicator={false}>
         {isMyth && 'mythStatement' in content ? (
           <>
             {/* Encarta-Style Myth Node */}
@@ -85,7 +79,7 @@ export default function JourneyNodeScreen() {
                 style={styles.sectionGradient}
               >
                 <View style={styles.sectionHeader}>
-                  <Icon name="Danger" size={32} color="#FFF" variant="Bold" />
+                  <Icon name="Danger" size={32} color="THEME.white" variant="Bold" />
                   <Text style={styles.sectionTitle}>What People Think</Text>
                 </View>
                 <Text style={styles.mythStatement}>{content.mythStatement}</Text>
@@ -93,15 +87,15 @@ export default function JourneyNodeScreen() {
                   <Text style={styles.commonBeliefsTitle}>Common Beliefs:</Text>
                   <View style={styles.beliefsList}>
                     <View style={styles.beliefItem}>
-                      <Icon name="CloseCircle" size={16} color="rgba(255,255,255,0.9)" />
+                      <Icon name="CloseCircle" size={16} color={withAlpha(THEME.white, 0.9)} />
                       <Text style={styles.beliefText}>This misconception is widespread in popular media</Text>
                     </View>
                     <View style={styles.beliefItem}>
-                      <Icon name="CloseCircle" size={16} color="rgba(255,255,255,0.9)" />
+                      <Icon name="CloseCircle" size={16} color={withAlpha(THEME.white, 0.9)} />
                       <Text style={styles.beliefText}>Often reinforced by movies and TV shows</Text>
                     </View>
                     <View style={styles.beliefItem}>
-                      <Icon name="CloseCircle" size={16} color="rgba(255,255,255,0.9)" />
+                      <Icon name="CloseCircle" size={16} color={withAlpha(THEME.white, 0.9)} />
                       <Text style={styles.beliefText}>Creates unnecessary fear and misunderstanding</Text>
                     </View>
                   </View>
@@ -118,12 +112,12 @@ export default function JourneyNodeScreen() {
                 style={styles.sectionGradient}
               >
                 <View style={styles.sectionHeader}>
-                  <Icon name="TickCircle" size={32} color="#FFF" variant="Bold" />
+                  <Icon name="TickCircle" size={32} color="THEME.white" variant="Bold" />
                   <Text style={styles.sectionTitle}>What Science Says</Text>
                 </View>
                 <Text style={styles.realityStatement}>{content.reality}</Text>
                 <View style={styles.explanationBox}>
-                  <MarkdownText text={content.explanation} style={styles.explanation} textColor="#FFF" />
+                  <MarkdownText text={content.explanation} style={styles.explanation} textColor="THEME.white" />
                 </View>
                 
                 {/* Evidence from Sources */}
@@ -132,7 +126,7 @@ export default function JourneyNodeScreen() {
                     <Text style={styles.evidenceTitle}>Evidence from Scientific Sources:</Text>
                     {content.sources.map((source, index) => (
                       <View key={index} style={styles.evidenceItem}>
-                        <Icon name="Document" size={16} color="rgba(255,255,255,0.9)" />
+                        <Icon name="Document" size={16} color={withAlpha(THEME.white, 0.9)} />
                         <View style={styles.evidenceText}>
                           <Text style={styles.evidenceSource}>{source.title}</Text>
                           {source.author && (
@@ -183,7 +177,7 @@ export default function JourneyNodeScreen() {
               }}
             >
               <Text style={[styles.navButtonText, styles.navButtonTextPrimary]}>Next</Text>
-              <Icon name="ArrowRight2" size={20} color="#FFF" variant="Bold" />
+              <Icon name="ArrowRight2" size={20} color="THEME.white" variant="Bold" />
             </TouchableOpacity>
           )}
         </View>
@@ -192,7 +186,7 @@ export default function JourneyNodeScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (THEME: Palette) => StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
@@ -203,7 +197,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 20,
-    paddingTop: 60,
     paddingBottom: 16,
     backgroundColor: THEME.bg,
     gap: 12,
@@ -212,7 +205,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#FFF',
+    backgroundColor: THEME.white,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 2,
@@ -257,19 +250,19 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 22,
     fontWeight: '800',
-    color: '#FFF',
+    color: 'THEME.white',
   },
   mythStatement: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#FFF',
+    color: 'THEME.white',
     lineHeight: 26,
     marginBottom: 20,
   },
   realityStatement: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#FFF',
+    color: 'THEME.white',
     lineHeight: 26,
     marginBottom: 16,
   },
@@ -277,12 +270,12 @@ const styles = StyleSheet.create({
     marginTop: 16,
     paddingTop: 16,
     borderTopWidth: 1,
-    borderTopColor: 'rgba(255,255,255,0.2)',
+    borderTopColor: withAlpha(THEME.white, 0.2),
   },
   commonBeliefsTitle: {
     fontSize: 14,
     fontWeight: '700',
-    color: 'rgba(255,255,255,0.9)',
+    color: withAlpha(THEME.white, 0.9),
     marginBottom: 12,
   },
   beliefsList: {
@@ -296,30 +289,30 @@ const styles = StyleSheet.create({
   beliefText: {
     flex: 1,
     fontSize: 13,
-    color: 'rgba(255,255,255,0.9)',
+    color: withAlpha(THEME.white, 0.9),
     lineHeight: 20,
   },
   explanationBox: {
-    backgroundColor: 'rgba(255,255,255,0.1)',
+    backgroundColor: withAlpha(THEME.white, 0.1),
     borderRadius: 12,
     padding: 16,
     marginTop: 12,
   },
   explanation: {
     fontSize: 14,
-    color: '#FFF',
+    color: 'THEME.white',
     lineHeight: 22,
   },
   evidenceSection: {
     marginTop: 20,
     paddingTop: 16,
     borderTopWidth: 1,
-    borderTopColor: 'rgba(255,255,255,0.2)',
+    borderTopColor: withAlpha(THEME.white, 0.2),
   },
   evidenceTitle: {
     fontSize: 14,
     fontWeight: '700',
-    color: 'rgba(255,255,255,0.9)',
+    color: withAlpha(THEME.white, 0.9),
     marginBottom: 12,
   },
   evidenceItem: {
@@ -333,15 +326,15 @@ const styles = StyleSheet.create({
   evidenceSource: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#FFF',
+    color: 'THEME.white',
     marginBottom: 2,
   },
   evidenceAuthor: {
     fontSize: 11,
-    color: 'rgba(255,255,255,0.8)',
+    color: withAlpha(THEME.white, 0.8),
   },
   articleCard: {
-    backgroundColor: '#FFF',
+    backgroundColor: THEME.white,
     borderRadius: 20,
     padding: 20,
     marginTop: 16,
@@ -380,7 +373,7 @@ const styles = StyleSheet.create({
     gap: 8,
     paddingVertical: 14,
     borderRadius: 16,
-    backgroundColor: '#FFF',
+    backgroundColor: THEME.white,
     borderWidth: 2,
     borderColor: THEME.border,
     borderBottomWidth: 4,
@@ -395,7 +388,7 @@ const styles = StyleSheet.create({
     color: THEME.primary,
   },
   navButtonTextPrimary: {
-    color: '#FFF',
+    color: 'THEME.white',
   },
 });
 

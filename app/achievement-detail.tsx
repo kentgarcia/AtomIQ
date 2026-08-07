@@ -5,21 +5,9 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useMemo } from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-// Orange theme to match the app
-const THEME = {
-  bg: '#F4F5F7',
-  card: '#FFFFFF',
-  border: '#E5E5E5',
-  text: '#2D3436',
-  textMuted: '#636E72',
-  primary: '#EA580C',
-  primaryLight: '#F97316',
-  accent: '#1CB0F6',
-  warning: '#FFC800',
-  secondary: '#FF4B4B',
-  green: '#2ECC71',
-};
+import { useTheme, AchievementPalette, type Palette } from '@/theme';
 
 // Achievement thresholds - same as profile
 const ACHIEVEMENTS = [
@@ -41,7 +29,7 @@ const ACHIEVEMENTS = [
     threshold: 10, 
     field: 'myths_busted', 
     icon: 'TickCircle', 
-    color: THEME.green,
+    color: AchievementPalette.green,
     description: 'You\'re becoming an expert at separating fact from fiction! Bust 10 myths in the Myth Buster game to earn this achievement.',
     tips: ['Play the Myth Buster game regularly', 'Read each myth carefully', 'Use your knowledge to identify false statements']
   },
@@ -82,6 +70,10 @@ const ACHIEVEMENTS = [
 
 export default function AchievementDetailScreen() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
+  const { theme } = useTheme();
+  const THEME = theme.palettes.achievements;
+  const styles = useMemo(() => makeStyles(THEME), [THEME]);
   const { achievementId } = useLocalSearchParams<{ achievementId: string }>();
   const { userProfile } = useStorage();
 
@@ -104,7 +96,7 @@ export default function AchievementDetailScreen() {
   if (!achievement) {
     return (
       <View style={styles.container}>
-        <View style={styles.header}>
+        <View style={[styles.header, { paddingTop: insets.top + 20 }]}>
           <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
             <Icon name="ArrowLeft2" size={24} color={THEME.text} />
           </TouchableOpacity>
@@ -121,7 +113,7 @@ export default function AchievementDetailScreen() {
   return (
     <View style={styles.container}>
       {/* Header */}
-      <View style={styles.header}>
+      <View style={[styles.header, { paddingTop: insets.top + 20 }]}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
           <Icon name="ArrowLeft2" size={24} color={THEME.text} />
         </TouchableOpacity>
@@ -271,7 +263,7 @@ export default function AchievementDetailScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (THEME: Palette) => StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: THEME.bg,
@@ -281,7 +273,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 24,
-    paddingTop: 60,
     paddingBottom: 16,
     backgroundColor: THEME.bg,
   },
@@ -290,7 +281,7 @@ const styles = StyleSheet.create({
     height: 40,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: THEME.white,
     borderRadius: 12,
     borderWidth: 2,
     borderColor: THEME.border,
@@ -330,11 +321,11 @@ const styles = StyleSheet.create({
     width: 140,
     height: 140,
     borderRadius: 70,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: THEME.white,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 4,
-    shadowColor: '#000',
+    shadowColor: THEME.shadow,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.15,
     shadowRadius: 8,
@@ -348,7 +339,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 20,
     right: 20,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: THEME.white,
     borderRadius: 20,
     borderWidth: 3,
     borderColor: THEME.green,

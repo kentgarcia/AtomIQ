@@ -2,33 +2,25 @@ import { Icon } from '@/components/ui/icon';
 import { getAllJourneys } from '@/content/explorer';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
-import React from 'react';
-import { Dimensions, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import React, { useMemo } from 'react';
+import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-const { width } = Dimensions.get('window');
-
-const THEME = {
-  bg: '#F7F7F7',
-  card: '#FFFFFF',
-  text: '#1F2937',
-  textMuted: '#9CA3AF',
-  primary: '#EA580C',
-  primaryDark: '#C2410C',
-  primaryLight: '#FB923C',
-  success: '#2ECC71',
-  gold: '#FFC107',
-  border: '#E5E7EB',
-};
+import { useTheme, withAlpha, type Palette } from '@/theme';
 
 export default function ExplorerScreen() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
+  const { theme } = useTheme();
+  const THEME = theme.palettes.explorer;
+  const styles = useMemo(() => makeStyles(THEME), [THEME]);
   const allJourneys = getAllJourneys();
 
   return (
     <View style={{ flex: 1, backgroundColor: THEME.bg }}>
       {/* Header */}
-      <View style={styles.header}>
+      <View style={[styles.header, { paddingTop: insets.top + 20 }]}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
           <Icon name="ArrowLeft2" size={24} color={THEME.text} variant="Bold" />
         </TouchableOpacity>
@@ -38,7 +30,7 @@ export default function ExplorerScreen() {
         </View>
       </View>
 
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={[styles.scrollContent, { paddingTop: insets.top + 20 }]} showsVerticalScrollIndicator={false}>
         <Animated.View entering={FadeInDown.delay(100)}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Guided Knowledge Paths</Text>
@@ -120,12 +112,11 @@ export default function ExplorerScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (THEME: Palette) => StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 20,
-    paddingTop: 60,
     paddingBottom: 16,
     backgroundColor: THEME.bg,
     gap: 12,
@@ -134,7 +125,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#FFF',
+    backgroundColor: THEME.card,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 2,
@@ -176,13 +167,13 @@ const styles = StyleSheet.create({
     gap: 20,
   },
   journeyCard: {
-    backgroundColor: '#FFF',
+    backgroundColor: THEME.card,
     borderRadius: 20,
     overflow: 'hidden',
     borderWidth: 2,
     borderColor: THEME.border,
     borderBottomWidth: 4,
-    shadowColor: '#000',
+    shadowColor: THEME.shadow,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
@@ -232,7 +223,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 12,
-    backgroundColor: THEME.primary + '15',
+    backgroundColor: withAlpha(THEME.primary, 0.08),
     marginLeft: 12,
   },
   journeyBadgeText: {

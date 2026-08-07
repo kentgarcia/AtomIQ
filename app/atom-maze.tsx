@@ -1,12 +1,11 @@
 import { Icon } from "@/components/ui/icon";
 import { getAllMazes } from "@/content/explorer";
-import { useColorScheme } from "@/hooks/use-color-scheme";
+
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
-import React from "react";
+import React, { useMemo } from "react";
 import {
     Pressable,
-    SafeAreaView,
     ScrollView,
     StyleSheet,
     Text,
@@ -14,36 +13,9 @@ import {
     View,
 } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
+import { SafeAreaView } from "react-native-safe-area-context";
 
-// Mustard Theme - Bright
-const THEME = {
-  light: {
-    bg: "#FFFFFF",
-    card: "#FFFFFF",
-    text: "#1F2937",
-    textMuted: "#6B7280",
-    primary: "#FFB300",
-    primaryDark: "#FFA000",
-    primaryLight: "#FFC107",
-    success: "#2ECC71",
-    error: "#E74C3C",
-    gold: "#FFCA28",
-    border: "#E5E7EB",
-  },
-  dark: {
-    bg: "#0F172A",
-    card: "#1E293B",
-    text: "#F1F5F9",
-    textMuted: "#94A3B8",
-    primary: "#FFB300",
-    primaryDark: "#FFA000",
-    primaryLight: "#FFC107",
-    success: "#2ECC71",
-    error: "#EF4444",
-    gold: "#FFCA28",
-    border: "#334155",
-  },
-};
+import { useTheme, withAlpha, type Palette } from "@/theme";
 
 // Maze colors - Bright Mustard
 const MAZE_COLORS: Record<string, { color: string; colorSecondary: string }> = {
@@ -116,8 +88,9 @@ const getMazeStageDifficulty = (
 export default function AtomMazeSelectionScreen() {
   const router = useRouter();
   const allMazes = getAllMazes();
-  const colorScheme = useColorScheme();
-  const theme = THEME[colorScheme ?? "light"];
+  const { theme: appTheme } = useTheme();
+  const theme = appTheme.palettes.maze;
+  const styles = useMemo(() => makeStyles(theme), [theme]);
 
   return (
     <View style={{ flex: 1, backgroundColor: theme.bg }}>
@@ -142,7 +115,7 @@ export default function AtomMazeSelectionScreen() {
               },
             ]}
           >
-            <Icon name="Game" size={18} color="#FFF" variant="Bold" />
+            <Icon name="Game" size={18} color={theme.white} variant="Bold" />
             <Text style={styles.headerBadgeText}>AtomMaze</Text>
           </View>
           <View style={{ width: 44 }} />
@@ -260,7 +233,7 @@ export default function AtomMazeSelectionScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (theme: Palette) => StyleSheet.create({
   modeHeader: {
     flexDirection: "row",
     alignItems: "center",
@@ -278,7 +251,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     borderWidth: 2,
     borderBottomWidth: 4,
-    shadowColor: "#000",
+    shadowColor: theme.shadow,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
@@ -293,9 +266,9 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 20,
     borderWidth: 2,
-    borderColor: "rgba(255,255,255,0.3)",
+    borderColor: withAlpha(theme.white, 0.3),
     borderBottomWidth: 4,
-    shadowColor: "#000",
+    shadowColor: theme.shadow,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 4,
@@ -305,7 +278,7 @@ const styles = StyleSheet.create({
   headerBadgeText: {
     fontSize: 16,
     fontWeight: "900",
-    color: "#FFF",
+    color: theme.white,
   },
   modeScrollView: {
     flex: 1,
@@ -357,9 +330,9 @@ const styles = StyleSheet.create({
     paddingRight: 68,
     overflow: "hidden",
     borderWidth: 3,
-    borderColor: "rgba(255,255,255,0.3)",
-    borderTopColor: "rgba(255,255,255,0.5)",
-    borderLeftColor: "rgba(255,255,255,0.4)",
+    borderColor: withAlpha(theme.white, 0.3),
+    borderTopColor: withAlpha(theme.white, 0.5),
+    borderLeftColor: withAlpha(theme.white, 0.4),
   },
   // Shine Effect
   cardShine: {
@@ -368,13 +341,13 @@ const styles = StyleSheet.create({
     left: -50,
     width: 100,
     height: 200,
-    backgroundColor: "rgba(255,255,255,0.15)",
+    backgroundColor: withAlpha(theme.white, 0.15),
     transform: [{ rotate: "45deg" }],
   },
   cardCircle: {
     position: "absolute",
     borderRadius: 100,
-    backgroundColor: "rgba(255,255,255,0.12)",
+    backgroundColor: withAlpha(theme.white, 0.12),
   },
   cardCircle1: {
     width: 140,
@@ -395,23 +368,23 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: "rgba(255,255,255,0.3)",
+    backgroundColor: withAlpha(theme.white, 0.3),
     alignItems: "center",
     justifyContent: "center",
     // 3D effect for badge
     borderWidth: 2,
-    borderColor: "rgba(255,255,255,0.4)",
-    borderTopColor: "rgba(255,255,255,0.6)",
+    borderColor: withAlpha(theme.white, 0.4),
+    borderTopColor: withAlpha(theme.white, 0.6),
   },
   modeIconInner: {
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: "#FFF",
+    backgroundColor: theme.white,
     alignItems: "center",
     justifyContent: "center",
     // Inner shadow effect
-    shadowColor: "#000",
+    shadowColor: theme.shadow,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 3,
@@ -424,7 +397,7 @@ const styles = StyleSheet.create({
     width: 16,
     height: 8,
     borderRadius: 4,
-    backgroundColor: "rgba(255,255,255,0.6)",
+    backgroundColor: withAlpha(theme.white, 0.6),
     transform: [{ rotate: "-20deg" }],
   },
   modeCardContent: {
@@ -440,7 +413,7 @@ const styles = StyleSheet.create({
   modeStageText: {
     fontSize: 12,
     fontWeight: "800",
-    color: "rgba(255,255,255,0.92)",
+    color: withAlpha(theme.white, 0.92),
     textTransform: "uppercase",
     letterSpacing: 0.5,
   },
@@ -449,7 +422,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.3)",
+    borderColor: withAlpha(theme.white, 0.3),
   },
   modeDifficultyChipText: {
     fontSize: 11,
@@ -458,11 +431,11 @@ const styles = StyleSheet.create({
   modeCardTitleNew: {
     fontSize: 18,
     fontWeight: "900",
-    color: "#FFF",
+    color: theme.white,
   },
   modeCardDescNew: {
     fontSize: 12,
-    color: "rgba(255,255,255,0.9)",
+    color: withAlpha(theme.white, 0.9),
     fontWeight: "500",
     lineHeight: 16,
   },
@@ -473,15 +446,15 @@ const styles = StyleSheet.create({
     width: 52,
     height: 52,
     borderRadius: 26,
-    backgroundColor: "#FFF",
+    backgroundColor: theme.white,
     alignItems: "center",
     justifyContent: "center",
     // 3D effect
     borderWidth: 3,
-    borderColor: "rgba(255,255,255,0.9)",
+    borderColor: withAlpha(theme.white, 0.9),
     borderBottomColor: "rgba(0,0,0,0.1)",
     borderRightColor: "rgba(0,0,0,0.05)",
-    shadowColor: "#000",
+    shadowColor: theme.shadow,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,
     shadowRadius: 6,

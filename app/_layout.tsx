@@ -9,9 +9,8 @@ import { StatusBar } from "expo-status-bar";
 import { useEffect, useRef } from "react";
 import "react-native-reanimated";
 
-import { ThemeProvider, useColorScheme } from "@/hooks/use-color-scheme";
-import { useGoogleSansFlex } from "@/hooks/use-google-sans-flex";
-import { usePoppins } from "@/hooks/use-poppins";
+import { ThemeProvider, useColorScheme } from "@/theme";
+import { useSnPro } from "@/hooks/use-snpro";
 import { StorageProvider } from "@/services/StorageContext";
 import LocalFirstSyncBootstrap from "@/services/local-first/SyncBootstrap";
 import { LocalFirstProvider } from "@/services/local-first/hooks";
@@ -128,11 +127,10 @@ function AppContent() {
 }
 
 export default function RootLayout() {
-  const poppinsLoaded = usePoppins();
-  const googleSansLoaded = useGoogleSansFlex();
+  const snProLoaded = useSnPro();
 
   // Wait for fonts to load before rendering
-  if (!poppinsLoaded || !googleSansLoaded) {
+  if (!snProLoaded) {
     return null;
   }
 

@@ -6,7 +6,7 @@ import {
 
 export interface GeminiMessage {
   role: "user" | "model";
-  parts: Array<{ text: string }>;
+  parts: { text: string }[];
 }
 
 export interface GeminiResponse {
@@ -291,7 +291,7 @@ export async function sendMessageToGemini(
  * Convert chat messages to Gemini format
  */
 export function convertMessagesToGeminiFormat(
-  messages: Array<{ role: string; text: string }>,
+  messages: { role: string; text: string }[],
 ): GeminiMessage[] {
   return messages
     .filter(

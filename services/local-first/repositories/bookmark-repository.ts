@@ -173,7 +173,7 @@ export class BookmarkRepository extends BaseRepository<Bookmark> {
    */
   async bulkHasBookmarked(
     userId: string,
-    items: Array<{ type: BookmarkableType; id: string }>
+    items: { type: BookmarkableType; id: string }[]
   ): Promise<Map<string, boolean>> {
     const result = new Map<string, boolean>();
     

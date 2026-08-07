@@ -1,6 +1,6 @@
 import { Icon } from "@/components/ui/icon";
 import { UNITS } from "@/content/units";
-import { useColorScheme } from "@/hooks/use-color-scheme";
+import { useTheme, type Palette } from "@/theme";
 import { useAllLevels } from "@/hooks/use-storage";
 import {
     getLeaderboardSnapshot,
@@ -15,7 +15,6 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
-    Dimensions,
     Image,
     ScrollView,
     StyleSheet,
@@ -24,38 +23,11 @@ import {
     View,
 } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-const { width } = Dimensions.get("window");
-
-// Theme Constants
-const LightTHEME = {
-  bg: "#F8F9FE",
-  card: "#FFFFFF",
-  text: "#32325D",
-  textMuted: "#8898AA",
-  primary: "#5E72E4",
-  border: "#E9ECEF",
-};
-
-const DarkTHEME = {
-  bg: "#172B4D",
-  card: "#213356",
-  text: "#F6F9FC",
-  textMuted: "#8898AA",
-  primary: "#5E72E4",
-  border: "#2D3A56",
-};
+import { GRADIENTS } from "@/constants/gradients";
 
 // Gradient Colors
-const GRADIENTS = {
-  purple: ["#B8A5FE", "#9E87F5"] as const,
-  green: ["#4FD1C5", "#2DCECC"] as const,
-  orange: ["#FF9F65", "#FF6B6B"] as const,
-  yellow: ["#FFD66E", "#FFA043"] as const,
-  blue: ["#6A82FB", "#FC5C7D"] as const,
-  blueSolid: ["#5E72E4", "#825EE4"] as const,
-  cyan: ["#11CDEF", "#1171EF"] as const,
-};
 
 type LeaderEntry = {
   userId?: string;
@@ -75,9 +47,10 @@ type LeaderboardSourceUser = Pick<
 
 export default function HomeScreen() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const { userProfile, isDatabaseReady } = useStorage();
   const { levels, refresh } = useAllLevels();
-  const colorScheme = useColorScheme();
+  const { theme } = useTheme();
   const [leaderboardPreview, setLeaderboardPreview] = useState<{
     topThree: LeaderEntry[];
     userRank?: LeaderEntry | undefined;
@@ -85,7 +58,7 @@ export default function HomeScreen() {
   const [leaderboardError, setLeaderboardError] = useState<string | null>(null);
   const [greeting, setGreeting] = useState("Hello");
 
-  const THEME = colorScheme === "dark" ? DarkTHEME : LightTHEME;
+  const THEME = theme.palettes.tab;
   const styles = useMemo(() => createStyles(THEME), [THEME]);
 
   // Update greeting based on local time, refreshing each minute
@@ -386,7 +359,7 @@ export default function HomeScreen() {
   return (
     <View style={styles.container}>
       <ScrollView
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={[styles.scrollContent, { paddingTop: insets.top + 20 }]}
         showsVerticalScrollIndicator={false}
       >
         {/* Header */}
@@ -615,7 +588,7 @@ export default function HomeScreen() {
   );
 }
 
-const createStyles = (theme: typeof LightTHEME) =>
+const createStyles = (theme: Palette) =>
   StyleSheet.create({
     container: {
       flex: 1,
@@ -623,7 +596,6 @@ const createStyles = (theme: typeof LightTHEME) =>
     },
     scrollContent: {
       padding: 20,
-      paddingTop: 60,
     },
     header: {
       flexDirection: "row",

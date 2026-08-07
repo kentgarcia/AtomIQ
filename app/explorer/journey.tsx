@@ -5,24 +5,18 @@ import { getMythById } from '@/content/myths';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useMemo } from 'react';
-import { Dimensions, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-const { width } = Dimensions.get('window');
-
-const THEME = {
-  bg: '#F7F7F7',
-  card: '#FFFFFF',
-  text: '#1F2937',
-  textMuted: '#9CA3AF',
-  primary: '#EA580C',
-  primaryDark: '#C2410C',
-  success: '#2ECC71',
-  border: '#E5E7EB',
-};
+import { useTheme, withAlpha, type Palette } from '@/theme';
 
 export default function JourneyScreen() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
+  const { theme } = useTheme();
+  const THEME = theme.palettes.explorer;
+  const styles = useMemo(() => makeStyles(THEME), [THEME]);
   const { id } = useLocalSearchParams<{ id: string }>();
   
   const journey = useMemo(() => {
@@ -52,7 +46,7 @@ export default function JourneyScreen() {
   return (
     <View style={{ flex: 1, backgroundColor: THEME.bg }}>
       {/* Header */}
-      <View style={styles.header}>
+      <View style={[styles.header, { paddingTop: insets.top + 20 }]}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
           <Icon name="ArrowLeft2" size={24} color={THEME.text} variant="Bold" />
         </TouchableOpacity>
@@ -62,7 +56,7 @@ export default function JourneyScreen() {
         </View>
       </View>
 
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={[styles.scrollContent, { paddingTop: insets.top + 20 }]} showsVerticalScrollIndicator={false}>
         {/* Journey Overview */}
         <Animated.View entering={FadeInDown.delay(100)} style={styles.overviewCard}>
           <LinearGradient
@@ -74,7 +68,7 @@ export default function JourneyScreen() {
             <Text style={styles.overviewDescription}>{journey.description}</Text>
             <View style={styles.overviewMeta}>
               <View style={styles.metaItem}>
-                <Icon name="Timer" size={16} color="rgba(255,255,255,0.9)" />
+                <Icon name="Timer" size={16} color={withAlpha(THEME.white, 0.9)} />
                 <Text style={styles.metaText}>{journey.estimatedMinutes} minutes</Text>
               </View>
               <View style={styles.metaItem}>
@@ -82,7 +76,7 @@ export default function JourneyScreen() {
                 <Text style={styles.metaText}>{journey.xpReward} XP</Text>
               </View>
               <View style={styles.metaItem}>
-                <Icon name="Book" size={16} color="rgba(255,255,255,0.9)" />
+                <Icon name="Book" size={16} color={withAlpha(THEME.white, 0.9)} />
                 <Text style={styles.metaText}>{journey.nodes.length} stops</Text>
               </View>
             </View>
@@ -115,7 +109,7 @@ export default function JourneyScreen() {
                       'Document'
                     }
                     size={20}
-                    color="#FFF"
+                    color="THEME.white"
                     variant="Bold"
                   />
                 </View>
@@ -168,7 +162,7 @@ export default function JourneyScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (THEME: Palette) => StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
@@ -179,7 +173,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 20,
-    paddingTop: 60,
     paddingBottom: 16,
     backgroundColor: THEME.bg,
     gap: 12,
@@ -188,7 +181,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#FFF',
+    backgroundColor: THEME.white,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 2,
@@ -226,7 +219,7 @@ const styles = StyleSheet.create({
   },
   overviewDescription: {
     fontSize: 15,
-    color: '#FFF',
+    color: 'THEME.white',
     lineHeight: 22,
     marginBottom: 16,
   },
@@ -241,7 +234,7 @@ const styles = StyleSheet.create({
   },
   metaText: {
     fontSize: 13,
-    color: 'rgba(255,255,255,0.9)',
+    color: withAlpha(THEME.white, 0.9),
     fontWeight: '600',
   },
   pathContainer: {
@@ -274,13 +267,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 3,
-    borderColor: '#FFF',
+    borderColor: 'THEME.white',
     zIndex: 1,
   },
   nodeCard: {
     flex: 1,
     marginLeft: 16,
-    backgroundColor: '#FFF',
+    backgroundColor: THEME.white,
     borderRadius: 16,
     borderWidth: 2,
     borderColor: THEME.border,
@@ -332,7 +325,7 @@ const styles = StyleSheet.create({
     color: THEME.primary,
   },
   sourcesContainer: {
-    backgroundColor: '#FFF',
+    backgroundColor: THEME.white,
     borderRadius: 16,
     padding: 16,
     borderWidth: 2,

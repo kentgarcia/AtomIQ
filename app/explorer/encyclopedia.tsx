@@ -1,40 +1,19 @@
 import { Icon } from '@/components/ui/icon';
 import { getAllEncyclopediaEntries, searchEncyclopedia } from '@/content/explorer';
 import { getEncyclopediaImage } from '@/content/explorer/encyclopedia/images';
-import { useColorScheme } from '@/hooks/use-color-scheme';
+import { useTheme, type Palette } from '@/theme';
 import { useRouter } from 'expo-router';
 import React, { useMemo, useState } from 'react';
 import { Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
-
-const LightTHEME = {
-  bg: '#F7F7F7',
-  card: '#FFFFFF',
-  text: '#1F2937',
-  textMuted: '#9CA3AF',
-  primary: '#EA580C',
-  primaryDark: '#C2410C',
-  success: '#2ECC71',
-  border: '#E5E7EB',
-};
-
-const DarkTHEME = {
-  bg: '#172B4D',
-  card: '#213356',
-  text: '#F6F9FC',
-  textMuted: '#8898AA',
-  primary: '#EA580C',
-  primaryDark: '#C2410C',
-  success: '#2ECC71',
-  border: '#2D3A56',
-};
-
-let THEME = LightTHEME;
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function EncyclopediaScreen() {
   const router = useRouter();
-  const colorScheme = useColorScheme();
-  const THEME = colorScheme === 'dark' ? DarkTHEME : LightTHEME;
+  const insets = useSafeAreaInsets();
+  const { theme } = useTheme();
+  const THEME = theme.palettes.explorer;
+  const styles = useMemo(() => makeStyles(THEME), [THEME]);
   const [searchQuery, setSearchQuery] = useState('');
   
   const allEntries = getAllEncyclopediaEntries();
@@ -53,7 +32,7 @@ export default function EncyclopediaScreen() {
   return (
     <View style={{ flex: 1, backgroundColor: THEME.bg }}>
       {/* Header */}
-      <View style={styles.header}>
+      <View style={[styles.header, { paddingTop: insets.top + 20 }]}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
           <Icon name="ArrowLeft2" size={24} color={THEME.text} variant="Bold" />
         </TouchableOpacity>
@@ -83,7 +62,7 @@ export default function EncyclopediaScreen() {
       </View>
 
       {/* Entries List */}
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={[styles.scrollContent, { paddingTop: insets.top + 20 }]} showsVerticalScrollIndicator={false}>
         {filteredEntries.length === 0 ? (
           <View style={styles.emptyState}>
             <Icon name="SearchNormal" size={48} color={THEME.textMuted} />
@@ -124,12 +103,11 @@ export default function EncyclopediaScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (THEME: Palette) => StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 20,
-    paddingTop: 60,
     paddingBottom: 16,
     backgroundColor: THEME.bg,
     gap: 12,
@@ -138,7 +116,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#FFF',
+    backgroundColor: THEME.card,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 2,
@@ -165,7 +143,7 @@ const styles = StyleSheet.create({
   searchBar: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFF',
+    backgroundColor: THEME.card,
     borderRadius: 16,
     paddingHorizontal: 16,
     paddingVertical: 12,
