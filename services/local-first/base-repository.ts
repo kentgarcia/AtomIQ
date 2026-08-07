@@ -350,7 +350,7 @@ export abstract class BaseRepository<T extends SyncMetadata> {
   /**
    * Bulk insert records
    */
-  async bulkCreate(records: Array<Omit<T, keyof SyncMetadata>>): Promise<void> {
+  async bulkCreate(records: Omit<T, keyof SyncMetadata>[]): Promise<void> {
     if (records.length === 0) return;
     
     // Use transaction for better performance

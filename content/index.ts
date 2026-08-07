@@ -4,6 +4,13 @@
  */
 
 // Types
+// Content metadata
+import { getAllLessons } from './lessons';
+import { getAllQuizzes } from './quizzes';
+import { getAllMyths } from './myths';
+import { getAllFacts } from './facts';
+import { ContentMetadata, ContentCategory } from './types';
+
 export * from './types';
 
 // Units
@@ -25,13 +32,6 @@ export { default as myths } from './myths';
 // Facts
 export * from './facts';
 export { default as facts } from './facts';
-
-// Content metadata
-import { getAllLessons } from './lessons';
-import { getAllQuizzes } from './quizzes';
-import { getAllMyths } from './myths';
-import { getAllFacts } from './facts';
-import { ContentMetadata, ContentCategory } from './types';
 
 export const CONTENT_CATEGORIES: ContentCategory[] = [
   {

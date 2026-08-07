@@ -33,11 +33,11 @@ export interface Journey {
   nodes: JourneyNode[];
   xpReward: number;
   tags: string[];
-  sources?: Array<{
+  sources?: {
     title: string;
     url: string;
     organization: 'UNSCEAR' | 'IAEA' | 'NEA' | 'other';
-  }>;
+  }[];
 }
 
 // ============================================
@@ -55,7 +55,7 @@ export interface MythNodeContent {
   whatScienceSays: {
     title: string;
     content: string;
-    evidence: Array<{
+    evidence: {
       statement: string;
       source: {
         organization: 'UNSCEAR' | 'IAEA' | 'NEA' | 'other';
@@ -63,16 +63,16 @@ export interface MythNodeContent {
         url: string;
         year?: number;
       };
-    }>;
+    }[];
     keyFindings: string[];
   };
   multimedia?: {
-    animations?: Array<{
+    animations?: {
       id: string;
       title: string;
       type: 'reactor_safety' | 'radiation_penetration' | 'decay_process' | 'other';
       description: string;
-    }>;
+    }[];
     audioNarration?: {
       url: string;
       duration: number; // seconds
@@ -177,11 +177,11 @@ export interface EncyclopediaEntry {
   quickFacts: string[];
   image?: string; // Optional image path for the entry
   debunkingSnippet?: string; // If it debunks a myth
-  sources: Array<{
+  sources: {
     organization: 'UNSCEAR' | 'IAEA' | 'NEA' | 'other';
     title: string;
     url: string;
-  }>;
+  }[];
   relatedMyths?: string[]; // Myth IDs
   relatedArticles?: string[]; // Article IDs
   difficulty: 'beginner' | 'intermediate' | 'advanced';

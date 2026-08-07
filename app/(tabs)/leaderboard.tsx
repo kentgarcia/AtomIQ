@@ -1,5 +1,5 @@
 import { Icon } from "@/components/ui/icon";
-import { useColorScheme } from "@/hooks/use-color-scheme";
+import { useTheme, type Palette } from "@/theme";
 import {
     getLeaderboardSnapshot,
     getLeaderboardSnapshotUpdatedAt,
@@ -13,7 +13,6 @@ import { useFocusEffect } from "@react-navigation/native";
 import { LinearGradient } from "expo-linear-gradient";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
-    Dimensions,
     Image,
     RefreshControl,
     ScrollView,
@@ -30,36 +29,9 @@ import Animated, {
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-const { width } = Dimensions.get("window");
-
-// Theme Constants
-const LightTHEME = {
-  bg: "#F8F9FE",
-  card: "#FFFFFF",
-  text: "#32325D",
-  textMuted: "#8898AA",
-  primary: "#5E72E4",
-  border: "#E9ECEF",
-};
-
-const DarkTHEME = {
-  bg: "#172B4D",
-  card: "#213356",
-  text: "#F6F9FC",
-  textMuted: "#8898AA",
-  primary: "#5E72E4",
-  border: "#2D3A56",
-};
+import { GRADIENTS } from "@/constants/gradients";
 
 // Gradient Colors
-const GRADIENTS = {
-  purple: ["#B8A5FE", "#9E87F5"] as const,
-  green: ["#4FD1C5", "#2DCECC"] as const,
-  orange: ["#FF9F65", "#FF6B6B"] as const,
-  yellow: ["#FFD66E", "#FFA043"] as const,
-  blue: ["#6A82FB", "#FC5C7D"] as const,
-  blueSolid: ["#5E72E4", "#825EE4"] as const,
-};
 
 // NPC Characters - Personal Goals for the User
 const NPC_CHARACTERS = [
@@ -237,8 +209,8 @@ const CircleAvatar = ({
 
 export default function LeaderboardScreen() {
   const { userProfile, isDatabaseReady } = useStorage();
-  const colorScheme = useColorScheme();
-  const THEME = colorScheme === "dark" ? DarkTHEME : LightTHEME;
+  const { theme } = useTheme();
+  const THEME = theme.palettes.tab;
   const styles = useMemo(() => createStyles(THEME), [THEME]);
   const pulse = useSharedValue(1);
   const [leaderboardData, setLeaderboardData] = useState<LeaderboardEntry[]>(
@@ -693,7 +665,7 @@ export default function LeaderboardScreen() {
   );
 }
 
-const createStyles = (theme: typeof LightTHEME) =>
+const createStyles = (theme: Palette) =>
   StyleSheet.create({
     container: {
       flex: 1,

@@ -19,7 +19,7 @@ type GeminiRole = "user" | "model";
 
 interface GeminiMessage {
   role: GeminiRole;
-  parts: Array<{ text: string }>;
+  parts: { text: string }[];
 }
 
 interface GeminiChatRequest {

@@ -173,7 +173,7 @@ export class LikeRepository extends BaseRepository<Like> {
    */
   async bulkHasLiked(
     userId: string, 
-    items: Array<{ type: LikeableType; id: string }>
+    items: { type: LikeableType; id: string }[]
   ): Promise<Map<string, boolean>> {
     const result = new Map<string, boolean>();
     

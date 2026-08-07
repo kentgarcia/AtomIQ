@@ -1,52 +1,29 @@
 import { MarkdownText } from "@/components/markdown-text";
 import { Icon } from "@/components/ui/icon";
 import { getArticleById } from "@/content/articles";
-import { useColorScheme } from "@/hooks/use-color-scheme";
+import { useTheme, type Palette } from "@/theme";
 import { openExternalUrl } from "@/services/open-url";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React from "react";
 import {
-    Dimensions,
     Image,
     ScrollView,
     StyleSheet,
     Text,
     TouchableOpacity,
+    useWindowDimensions,
     View,
 } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-const { width } = Dimensions.get("window");
-
-const LightTHEME = {
-  bg: "#F7F7F7",
-  card: "#FFFFFF",
-  text: "#1F2937",
-  textMuted: "#9CA3AF",
-  primary: "#EA580C",
-  primaryDark: "#C2410C",
-  border: "#E5E7EB",
-};
-
-const DarkTHEME = {
-  bg: "#172B4D",
-  card: "#213356",
-  text: "#F6F9FC",
-  textMuted: "#8898AA",
-  primary: "#EA580C",
-  primaryDark: "#C2410C",
-  border: "#2D3A56",
-};
-
-let THEME = LightTHEME;
-
 export default function ArticleDetailScreen() {
   const { id } = useLocalSearchParams();
   const router = useRouter();
-  const colorScheme = useColorScheme();
-  const THEME = colorScheme === "dark" ? DarkTHEME : LightTHEME;
-  const styles = React.useMemo(() => createStyles(THEME), [THEME]);
+  const { theme } = useTheme();
+  const THEME = theme.palettes.article;
+  const { width } = useWindowDimensions();
+  const styles = React.useMemo(() => createStyles(THEME, width), [THEME, width]);
   const articleId = typeof id === "string" ? id.replace("article-", "") : "";
 
   const article = getArticleById(articleId);
@@ -233,7 +210,7 @@ export default function ArticleDetailScreen() {
   );
 }
 
-const createStyles = (theme: typeof LightTHEME) =>
+const createStyles = (theme: Palette, width: number) =>
   StyleSheet.create({
     container: {
       flex: 1,

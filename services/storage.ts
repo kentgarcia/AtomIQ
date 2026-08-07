@@ -107,9 +107,9 @@ export const setTheme = async (theme: 'light' | 'dark'): Promise<void> => {
   await setItem(STORAGE_KEYS.THEME, theme);
 };
 
-export const getTheme = async (): Promise<'light' | 'dark'> => {
+export const getTheme = async (): Promise<'light' | 'dark' | null> => {
   const value = await getItem<'light' | 'dark'>(STORAGE_KEYS.THEME);
-  return value ?? 'light';
+  return value ?? null;
 };
 
 export const setHapticsEnabled = async (enabled: boolean): Promise<void> => {
@@ -165,7 +165,7 @@ export const getCacheWithTTL = async <T = any>(key: string): Promise<T | null> =
 };
 
 // Batch Operations
-export const setMultiple = async (items: Array<[string, any]>): Promise<void> => {
+export const setMultiple = async (items: [string, any][]): Promise<void> => {
   try {
     const pairs = items.map(([key, value]) => [key, JSON.stringify(value)] as [string, string]);
     await AsyncStorage.multiSet(pairs);

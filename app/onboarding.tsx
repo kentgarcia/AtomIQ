@@ -1,11 +1,9 @@
 import { Icon } from "@/components/ui/icon";
-import { useTheme } from "@/hooks/use-color-scheme";
 import { useStorage } from "@/services/StorageContext";
 import { setOnboardingCompleted } from "@/services/storage";
 import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
-    Dimensions,
     Image,
     KeyboardAvoidingView,
     Platform,
@@ -26,53 +24,9 @@ import Animated, {
     withSpring,
     withTiming,
 } from "react-native-reanimated";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-const { width } = Dimensions.get("window");
-
-// Orange theme matching the app
-const LightDUO_THEME = {
-  bg: "#FFFFFF",
-  card: "#FFFFFF",
-  border: "#E5E5E5",
-  surfaceSoft: "#F9FAFB",
-  surfaceStrong: "#FFFFFF",
-  ringSubtle: "#E5E5E5",
-  iconSurface: "#F0F9FF",
-  iconBorder: "#E0F2FE",
-  buttonBorder: "rgba(0,0,0,0.1)",
-  text: "#3C3C3C",
-  textMuted: "#777777",
-  primary: "#EA580C", // Orange
-  primaryDark: "#C2410C",
-  secondary: "#FF4B4B", // Red
-  secondaryDark: "#D32F2F",
-  accent: "#FB923C", // Light Orange
-  accentDark: "#EA580C",
-  warning: "#FFC107", // Gold
-  warningDark: "#FFA000",
-};
-
-const DarkDUO_THEME = {
-  bg: "#172B4D",
-  card: "#213356",
-  border: "#2D3A56",
-  surfaceSoft: "#1A2D4A",
-  surfaceStrong: "#213356",
-  ringSubtle: "#334A70",
-  iconSurface: "#243A5B",
-  iconBorder: "#334A70",
-  buttonBorder: "rgba(255,255,255,0.14)",
-  text: "#F6F9FC",
-  textMuted: "#8898AA",
-  primary: "#EA580C",
-  primaryDark: "#C2410C",
-  secondary: "#FF4B4B",
-  secondaryDark: "#D32F2F",
-  accent: "#FB923C",
-  accentDark: "#EA580C",
-  warning: "#FFC107",
-  warningDark: "#FFA000",
-};
+import { useTheme, type Palette } from "@/theme";
 
 // Feature Showcase Data
 const FEATURE_SHOWCASE = [
@@ -146,9 +100,10 @@ type OnboardingStep = "splash" | "features" | "profile";
 
 export default function Onboarding() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const { updateUserProfile, userProfile } = useStorage();
-  const { colorScheme, toggleTheme } = useTheme();
-  const DUO_THEME = colorScheme === "dark" ? DarkDUO_THEME : LightDUO_THEME;
+  const { colorScheme, toggleTheme, theme } = useTheme();
+  const DUO_THEME = theme.palettes.onboarding;
   const [step, setStep] = useState<OnboardingStep>("splash");
   const [currentFeatureIndex, setCurrentFeatureIndex] = useState(0);
   const [username, setUsername] = useState("");
@@ -251,7 +206,7 @@ export default function Onboarding() {
   const renderThemeToggle = () => (
     <TouchableOpacity
       onPress={() => void toggleTheme()}
-      style={styles.themeToggleButton}
+      style={[styles.themeToggleButton, { top: insets.top + 10 }]}
       activeOpacity={0.85}
       accessibilityRole="button"
       accessibilityLabel={`Switch to ${colorScheme === "dark" ? "light" : "dark"} mode`}
@@ -368,7 +323,7 @@ export default function Onboarding() {
         </View>
 
         <ScrollView
-          contentContainerStyle={styles.scrollContent}
+          contentContainerStyle={[styles.scrollContent, { paddingTop: insets.top + 20 }]}
           showsVerticalScrollIndicator={false}
         >
           <Animated.View
@@ -498,7 +453,7 @@ export default function Onboarding() {
           behavior={Platform.OS === "ios" ? "padding" : "height"}
           style={{ flex: 1 }}
         >
-          <ScrollView contentContainerStyle={styles.scrollContent}>
+          <ScrollView contentContainerStyle={[styles.scrollContent, { paddingTop: insets.top + 20 }]}>
             <Animated.View
               entering={FadeInDown.delay(200)}
               style={styles.centerContent}
@@ -548,7 +503,7 @@ export default function Onboarding() {
   return null;
 }
 
-const createStyles = (theme: typeof LightDUO_THEME) =>
+const createStyles = (theme: Palette) =>
   StyleSheet.create({
     container: {
       flex: 1,
@@ -557,11 +512,9 @@ const createStyles = (theme: typeof LightDUO_THEME) =>
     scrollContent: {
       flexGrow: 1,
       padding: 24,
-      paddingTop: 60,
     },
     themeToggleButton: {
       position: "absolute",
-      top: Platform.OS === "ios" ? 54 : 24,
       right: 20,
       zIndex: 50,
       flexDirection: "row",

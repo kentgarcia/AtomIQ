@@ -81,7 +81,7 @@ export const generateModeratorReply = (
  * Batch moderate multiple comments
  */
 export const moderateComments = async (
-  comments: Array<{ text: string; postContext: string }>,
+  comments: { text: string; postContext: string }[],
   onProgress?: (index: number, total: number) => void,
 ): Promise<ModerationResult[]> => {
   const results: ModerationResult[] = [];

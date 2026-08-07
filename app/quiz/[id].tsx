@@ -1,6 +1,6 @@
 import { Icon } from "@/components/ui/icon";
 import { getQuizById } from "@/content/quizzes";
-import { useColorScheme } from "@/hooks/use-color-scheme";
+import { useTheme, type Palette } from "@/theme";
 import { useStorage } from "@/services/StorageContext";
 import {
     logDailyActivity,
@@ -12,9 +12,7 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import * as Speech from "expo-speech";
 import React, { useEffect, useRef, useState } from "react";
 import {
-    Dimensions,
     Image,
-    SafeAreaView,
     ScrollView,
     StyleSheet,
     Text,
@@ -22,43 +20,14 @@ import {
     View,
 } from "react-native";
 import Animated, { FadeInDown, ZoomIn } from "react-native-reanimated";
-
-const { width } = Dimensions.get("window");
-
-const LightTHEME = {
-  bg: "#F7F7F7",
-  card: "#FFFFFF",
-  text: "#1F2937",
-  textMuted: "#9CA3AF",
-  primary: "#EA580C",
-  primaryDark: "#C2410C",
-  primaryLight: "#FF8534",
-  success: "#2ECC71",
-  error: "#EF4444",
-  gold: "#FFC107",
-  border: "#E5E7EB",
-};
-
-const DarkTHEME = {
-  bg: "#172B4D",
-  card: "#213356",
-  text: "#F6F9FC",
-  textMuted: "#8898AA",
-  primary: "#EA580C",
-  primaryDark: "#C2410C",
-  primaryLight: "#FF8534",
-  success: "#2ECC71",
-  error: "#EF4444",
-  gold: "#FFC107",
-  border: "#2D3A56",
-};
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function QuizScreen() {
   const { id } = useLocalSearchParams();
   const router = useRouter();
   const { addXP } = useStorage();
-  const colorScheme = useColorScheme();
-  const THEME = colorScheme === "dark" ? DarkTHEME : LightTHEME;
+  const { theme } = useTheme();
+  const THEME = theme.palettes.quiz;
 
   const [quiz, setQuiz] = useState(() => getQuizById(id as string));
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -557,7 +526,7 @@ export default function QuizScreen() {
   );
 }
 
-const createStyles = (theme: typeof LightTHEME) =>
+const createStyles = (theme: Palette) =>
   StyleSheet.create({
     fullScreenCenter: {
       flex: 1,

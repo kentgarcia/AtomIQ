@@ -1,37 +1,13 @@
 import { Icon } from '@/components/ui/icon';
 import { getAllEncyclopediaEntries, searchEncyclopedia } from '@/content/explorer';
-import { useColorScheme } from '@/hooks/use-color-scheme';
+import { useTheme, type Palette } from '@/theme';
 import * as Haptics from 'expo-haptics';
 import { useRouter } from 'expo-router';
 import * as Speech from 'expo-speech';
 import React, { useCallback, useMemo, useState } from 'react';
-import { Dimensions, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
-
-const { width } = Dimensions.get('window');
-const CARD_WIDTH = (width - 52) / 2;
-
-const LightTHEME = {
-  bg: '#F8F9FE',
-  card: '#FFFFFF',
-  text: '#32325D',
-  textMuted: '#8898AA',
-  primary: '#5E72E4',
-  primaryDark: '#4C63D2',
-  success: '#2ECC71',
-  border: '#E9ECEF',
-};
-
-const DarkTHEME = {
-  bg: '#172B4D',
-  card: '#213356',
-  text: '#F6F9FC',
-  textMuted: '#8898AA',
-  primary: '#5E72E4',
-  primaryDark: '#4C63D2',
-  success: '#2ECC71',
-  border: '#2D3A56',
-};
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 // Category configurations
 const CATEGORY_CONFIG: Record<string, { 
@@ -98,15 +74,15 @@ const CATEGORY_CONFIG: Record<string, {
 
 export default function EncyclopediaScreen() {
   const router = useRouter();
-  const colorScheme = useColorScheme();
+  const insets = useSafeAreaInsets();
+  const { theme } = useTheme();
+  const THEME = theme.palettes.library;
+  const styles = useMemo(() => createStyles(THEME), [THEME]);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [speakingEntryId, setSpeakingEntryId] = useState<string | null>(null);
   const [showCategoryCards, setShowCategoryCards] = useState(false);
-  
-  const THEME = colorScheme === 'dark' ? DarkTHEME : LightTHEME;
-  const styles = useMemo(() => createStyles(THEME), [THEME]);
-  
+
   const allEntries = getAllEncyclopediaEntries();
   
   const filteredEntries = useMemo(() => {
@@ -182,7 +158,7 @@ export default function EncyclopediaScreen() {
   return (
     <View style={[styles.container, { backgroundColor: THEME.bg }]}>
       {/* Header */}
-      <View style={styles.header}>
+      <View style={[styles.header, { paddingTop: insets.top + 20 }]}>
         <TouchableOpacity 
           onPress={() => selectedCategory ? handleBackToCategories() : router.back()} 
           style={styles.backButton}
@@ -224,7 +200,7 @@ export default function EncyclopediaScreen() {
       </View>
 
       {/* Main Content */}
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={[styles.scrollContent, { paddingTop: insets.top + 20 }]} showsVerticalScrollIndicator={false}>
         
         {/* Category Filter Chips - Show when no search */}
         {!searchQuery && (
@@ -329,7 +305,7 @@ export default function EncyclopediaScreen() {
   );
 }
 
-const createStyles = (theme: typeof LightTHEME) => StyleSheet.create({
+const createStyles = (theme: Palette) => StyleSheet.create({
   container: {
     flex: 1,
   },
@@ -337,7 +313,6 @@ const createStyles = (theme: typeof LightTHEME) => StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 20,
-    paddingTop: 60,
     paddingBottom: 20,
     backgroundColor: theme.bg,
     gap: 12,

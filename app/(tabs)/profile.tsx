@@ -1,5 +1,5 @@
 import { Icon } from "@/components/ui/icon";
-import { useColorScheme } from "@/hooks/use-color-scheme";
+import { useTheme, type Palette } from "@/theme";
 import useFriendsSync from "@/hooks/use-friends-sync";
 import {
     PROFILE_AVATAR_OPTIONS,
@@ -13,7 +13,6 @@ import { useRouter } from "expo-router";
 import React, { useEffect, useMemo, useState } from "react";
 import {
     Alert,
-    Dimensions,
     Image,
     type ImageSourcePropType,
     KeyboardAvoidingView,
@@ -24,43 +23,19 @@ import {
     Text,
     TextInput,
     TouchableOpacity,
+    useWindowDimensions,
     View,
 } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-const { width } = Dimensions.get("window");
-
-// Theme Constants
-const LightTHEME = {
-  bg: "#F8F9FE",
-  card: "#FFFFFF",
-  text: "#32325D",
-  textMuted: "#8898AA",
-  primary: "#5E72E4",
-  border: "#E9ECEF",
-};
-
-const DarkTHEME = {
-  bg: "#172B4D",
-  card: "#213356",
-  text: "#F6F9FC",
-  textMuted: "#8898AA",
-  primary: "#5E72E4",
-  border: "#2D3A56",
-};
+import { GRADIENTS } from "@/constants/gradients";
 
 // Gradient Colors
-const GRADIENTS = {
-  purple: ["#B8A5FE", "#9E87F5"] as const,
-  green: ["#4FD1C5", "#2DCECC"] as const,
-  orange: ["#FF9F65", "#FF6B6B"] as const,
-  yellow: ["#FFD66E", "#FFA043"] as const,
-  blue: ["#6A82FB", "#FC5C7D"] as const,
-  blueSolid: ["#5E72E4", "#825EE4"] as const,
-};
 
 export default function ProfileScreen() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const {
     userProfile,
     updateUserProfile,
@@ -81,9 +56,10 @@ export default function ProfileScreen() {
     loadFriendRequests,
     handleAcceptFriendRequest,
   } = useFriendsSync();
-  const colorScheme = useColorScheme();
-  const THEME = colorScheme === "dark" ? DarkTHEME : LightTHEME;
-  const styles = useMemo(() => createStyles(THEME), [THEME]);
+  const { theme } = useTheme();
+  const THEME = theme.palettes.tab;
+  const { width } = useWindowDimensions();
+  const styles = useMemo(() => createStyles(THEME, width), [THEME, width]);
 
   const [searchModalVisible, setSearchModalVisible] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -270,7 +246,7 @@ export default function ProfileScreen() {
         contentContainerStyle={styles.scrollContent}
       >
         {/* Header Section */}
-        <View style={styles.header}>
+        <View style={[styles.header, { paddingTop: insets.top + 20 }]}>
           <View style={styles.headerTopRow}>
             <TouchableOpacity
               style={styles.iconButton}
@@ -816,7 +792,7 @@ export default function ProfileScreen() {
   );
 }
 
-const createStyles = (theme: typeof LightTHEME) =>
+const createStyles = (theme: Palette, width: number) =>
   StyleSheet.create({
     container: {
       flex: 1,
@@ -827,7 +803,6 @@ const createStyles = (theme: typeof LightTHEME) =>
     },
     header: {
       alignItems: "center",
-      paddingTop: 60,
       paddingBottom: 24,
       backgroundColor: theme.bg,
     },
