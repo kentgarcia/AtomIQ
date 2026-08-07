@@ -17,7 +17,7 @@ import type { TextStyle } from "react-native";
 const base = {
   light: {
     /** Page-level background (near-white neutral). */
-    background: "#F5F5F5",
+    background: "#FFFFFF",
     /** Card / raised surface. */
     surface: "#FFFFFF",
     /** Hard-edged separator lines. */
