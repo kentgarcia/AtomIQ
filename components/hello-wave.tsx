@@ -1,3 +1,4 @@
+import {fontFamilies} from "@/theme";
 import Animated from 'react-native-reanimated';
 
 export function HelloWave() {
@@ -5,6 +6,7 @@ export function HelloWave() {
     <Animated.Text
       style={{
         fontSize: 28,
+        fontFamily: fontFamilies.regular,
         lineHeight: 32,
         marginTop: -6,
         animationName: {

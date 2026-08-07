@@ -1,7 +1,7 @@
 import { PageHeader } from '@/components/ui/page-header';
 import { Icon } from '@/components/ui/icon';
 import { getAllEncyclopediaEntries, searchEncyclopedia } from '@/content/explorer';
-import { useTheme, type Palette } from '@/theme';
+import {useTheme, type Palette, fontFamilies} from "@/theme";
 import * as Haptics from 'expo-haptics';
 import { useRouter } from 'expo-router';
 import * as Speech from 'expo-speech';
@@ -323,6 +323,7 @@ const createStyles = (theme: Palette) => StyleSheet.create({
   searchInput: {
     flex: 1,
     fontSize: 16,
+    fontFamily: fontFamilies.regular,
     color: theme.text,
   },
   scrollContent: {
@@ -357,10 +358,12 @@ const createStyles = (theme: Palette) => StyleSheet.create({
   },
   categoryChipIcon: {
     fontSize: 14,
+    fontFamily: fontFamilies.regular,
   },
   categoryChipText: {
     fontSize: 14,
     fontWeight: '600',
+    fontFamily: fontFamilies.semibold,
     color: theme.text,
   },
   categoryChipTextActive: {
@@ -375,6 +378,7 @@ const createStyles = (theme: Palette) => StyleSheet.create({
   resultsCount: {
     fontSize: 14,
     fontWeight: '600',
+    fontFamily: fontFamilies.semibold,
     color: theme.textMuted,
   },
   
@@ -405,6 +409,7 @@ const createStyles = (theme: Palette) => StyleSheet.create({
   entryTerm: {
     fontSize: 16,
     fontWeight: '700',
+    fontFamily: fontFamilies.bold,
     color: theme.text,
     marginBottom: 4,
   },
@@ -413,6 +418,7 @@ const createStyles = (theme: Palette) => StyleSheet.create({
     color: theme.textMuted,
     lineHeight: 20,
     fontWeight: '500',
+    fontFamily: fontFamilies.medium,
   },
   categoryTag: {
     flexDirection: 'row',
@@ -425,10 +431,12 @@ const createStyles = (theme: Palette) => StyleSheet.create({
   },
   categoryIcon: {
     fontSize: 12,
+    fontFamily: fontFamilies.regular,
   },
   categoryText: {
     fontSize: 11,
     fontWeight: '700',
+    fontFamily: fontFamilies.bold,
     textTransform: 'capitalize',
   },
   speakButton: {
@@ -449,11 +457,13 @@ const createStyles = (theme: Palette) => StyleSheet.create({
   emptyText: {
     fontSize: 18,
     fontWeight: '700',
+    fontFamily: fontFamilies.bold,
     color: theme.text,
     marginTop: 16,
   },
   emptySubtext: {
     fontSize: 14,
+    fontFamily: fontFamilies.regular,
     color: theme.textMuted,
     marginTop: 8,
     textAlign: 'center',

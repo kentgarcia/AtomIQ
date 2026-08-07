@@ -1,3 +1,4 @@
+import {fontFamilies} from "@/theme";
 import { Icon } from '@/components/ui/icon';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
@@ -577,11 +578,13 @@ const styles = StyleSheet.create({
   },
   mainIcon: {
     fontSize: 80,
+    fontFamily: fontFamilies.regular,
     marginBottom: 20,
   },
   entranceTitle: {
     fontSize: 32,
     fontWeight: '900',
+    fontFamily: fontFamilies.black,
     color: THEME.text,
     letterSpacing: 4,
     marginBottom: 8,
@@ -589,6 +592,7 @@ const styles = StyleSheet.create({
   },
   entranceSubtitle: {
     fontSize: 16,
+    fontFamily: fontFamilies.regular,
     color: THEME.textMuted,
     letterSpacing: 2,
     textAlign: 'center',
@@ -623,10 +627,12 @@ const styles = StyleSheet.create({
   },
   experimentIcon: {
     fontSize: 64,
+    fontFamily: fontFamilies.regular,
   },
   experimentTitle: {
     fontSize: 28,
     fontWeight: '900',
+    fontFamily: fontFamilies.black,
     color: '#000',
     marginBottom: 8,
     textAlign: 'center',
@@ -634,12 +640,14 @@ const styles = StyleSheet.create({
   experimentSubtitle: {
     fontSize: 18,
     fontWeight: '700',
+    fontFamily: fontFamilies.bold,
     color: 'rgba(0,0,0,0.7)',
     marginBottom: 16,
     textAlign: 'center',
   },
   experimentDescription: {
     fontSize: 14,
+    fontFamily: fontFamilies.regular,
     color: 'rgba(0,0,0,0.6)',
     textAlign: 'center',
     lineHeight: 22,
@@ -657,6 +665,7 @@ const styles = StyleSheet.create({
   startButtonText: {
     fontSize: 16,
     fontWeight: '800',
+    fontFamily: fontFamilies.heavy,
     color: '#FFF',
     letterSpacing: 1,
   },
@@ -698,10 +707,12 @@ const styles = StyleSheet.create({
   simTitle: {
     fontSize: 24,
     fontWeight: '800',
+    fontFamily: fontFamilies.heavy,
     color: THEME.text,
   },
   simSubtitle: {
     fontSize: 14,
+    fontFamily: fontFamilies.regular,
     color: THEME.textMuted,
     marginTop: 4,
   },
@@ -716,17 +727,20 @@ const styles = StyleSheet.create({
   },
   insightEmoji: {
     fontSize: 48,
+    fontFamily: fontFamilies.regular,
     marginBottom: 12,
   },
   insightTitle: {
     fontSize: 22,
     fontWeight: '800',
+    fontFamily: fontFamilies.heavy,
     color: '#000',
     marginBottom: 12,
     textAlign: 'center',
   },
   insightText: {
     fontSize: 15,
+    fontFamily: fontFamilies.regular,
     color: 'rgba(0,0,0,0.8)',
     textAlign: 'center',
     lineHeight: 22,
@@ -737,11 +751,13 @@ const styles = StyleSheet.create({
   comparisonTitle: {
     fontSize: 20,
     fontWeight: '800',
+    fontFamily: fontFamilies.heavy,
     color: THEME.text,
     marginBottom: 8,
   },
   comparisonSubtitle: {
     fontSize: 13,
+    fontFamily: fontFamilies.regular,
     color: THEME.textMuted,
     marginBottom: 20,
   },
@@ -772,6 +788,7 @@ const styles = StyleSheet.create({
   },
   sourceEmoji: {
     fontSize: 28,
+    fontFamily: fontFamilies.regular,
   },
   sourceInfo: {
     flex: 1,
@@ -779,11 +796,13 @@ const styles = StyleSheet.create({
   sourceName: {
     fontSize: 18,
     fontWeight: '800',
+    fontFamily: fontFamilies.heavy,
     color: THEME.text,
     marginBottom: 4,
   },
   sourceDescription: {
     fontSize: 12,
+    fontFamily: fontFamilies.regular,
     color: THEME.textMuted,
   },
   sourceValueContainer: {
@@ -792,6 +811,7 @@ const styles = StyleSheet.create({
   sourceValue: {
     fontSize: 20,
     fontWeight: '800',
+    fontFamily: fontFamilies.heavy,
   },
   barContainer: {
     height: 12,
@@ -814,6 +834,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: THEME.primary,
     fontWeight: '700',
+    fontFamily: fontFamilies.bold,
     textAlign: 'center',
   },
   expandedDetails: {
@@ -824,6 +845,7 @@ const styles = StyleSheet.create({
   },
   detailText: {
     fontSize: 13,
+    fontFamily: fontFamilies.regular,
     color: THEME.textMuted,
     lineHeight: 20,
   },
@@ -838,12 +860,14 @@ const styles = StyleSheet.create({
   conclusionTitle: {
     fontSize: 22,
     fontWeight: '800',
+    fontFamily: fontFamilies.heavy,
     color: THEME.text,
     marginBottom: 12,
     textAlign: 'center',
   },
   conclusionText: {
     fontSize: 15,
+    fontFamily: fontFamilies.regular,
     color: THEME.textMuted,
     lineHeight: 24,
     textAlign: 'center',
@@ -871,6 +895,7 @@ const styles = StyleSheet.create({
   metricButtonText: {
     fontSize: 16,
     fontWeight: '700',
+    fontFamily: fontFamilies.bold,
     color: THEME.textMuted,
   },
   metricButtonTextActive: {
@@ -882,11 +907,13 @@ const styles = StyleSheet.create({
   chartTitle: {
     fontSize: 20,
     fontWeight: '800',
+    fontFamily: fontFamilies.heavy,
     color: THEME.text,
     marginBottom: 8,
   },
   chartSubtitle: {
     fontSize: 13,
+    fontFamily: fontFamilies.regular,
     color: THEME.textMuted,
     marginBottom: 20,
   },
@@ -913,6 +940,7 @@ const styles = StyleSheet.create({
   },
   energyEmoji: {
     fontSize: 28,
+    fontFamily: fontFamilies.regular,
   },
   energyInfo: {
     flex: 1,
@@ -920,6 +948,7 @@ const styles = StyleSheet.create({
   energyLabel: {
     fontSize: 18,
     fontWeight: '800',
+    fontFamily: fontFamilies.heavy,
     color: THEME.text,
     marginBottom: 4,
   },
@@ -927,6 +956,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: THEME.textMuted,
     fontWeight: '600',
+    fontFamily: fontFamilies.semibold,
   },
   badge: {
     paddingHorizontal: 12,
@@ -942,6 +972,7 @@ const styles = StyleSheet.create({
   badgeText: {
     fontSize: 12,
     fontWeight: '700',
+    fontFamily: fontFamilies.bold,
     color: THEME.text,
   },
   chartBarContainer: {
@@ -964,6 +995,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: THEME.primary,
     fontWeight: '700',
+    fontFamily: fontFamilies.bold,
     textAlign: 'center',
   },
 });

@@ -1,3 +1,4 @@
+import {fontFamilies} from "@/theme";
 import { MarkdownText } from "@/components/markdown-text";
 import { Icon } from "@/components/ui/icon";
 import { getAllMyths } from "@/content/myths";
@@ -710,11 +711,11 @@ export default function MythBusterScreen() {
               </View>
               <Text style={[styles.infoText, { color: textColor }]}>
                 Swipe left for{" "}
-                <Text style={{ color: THEME.error, fontWeight: "800" }}>
+                <Text style={{ color: THEME.error, fontWeight: "800", fontFamily: fontFamilies.heavy }}>
                   MYTH
                 </Text>{" "}
                 and right for{" "}
-                <Text style={{ color: THEME.success, fontWeight: "800" }}>
+                <Text style={{ color: THEME.success, fontWeight: "800", fontFamily: fontFamilies.heavy }}>
                   TRUTH
                 </Text>
                 !
@@ -1759,12 +1760,14 @@ const styles = StyleSheet.create({
   introTitle: {
     fontSize: 32,
     fontWeight: "900",
+    fontFamily: fontFamilies.black,
     color: "#FFF",
     marginBottom: 8,
     textAlign: "center",
   },
   introSubtitle: {
     fontSize: 16,
+    fontFamily: fontFamilies.regular,
     color: "rgba(255,255,255,0.9)",
     marginBottom: 40,
     textAlign: "center",
@@ -1797,6 +1800,7 @@ const styles = StyleSheet.create({
   introModePillText: {
     fontSize: 13,
     fontWeight: "700",
+    fontFamily: fontFamilies.bold,
     color: "#FFF",
   },
   introContent: {
@@ -1820,6 +1824,7 @@ const styles = StyleSheet.create({
   introCardTitle: {
     fontSize: 22,
     fontWeight: "900",
+    fontFamily: fontFamilies.black,
     color: THEME.text,
     textAlign: "center",
     marginBottom: 20,
@@ -1841,6 +1846,7 @@ const styles = StyleSheet.create({
   introSwipeLabel: {
     fontSize: 15,
     fontWeight: "800",
+    fontFamily: fontFamilies.heavy,
   },
   introCardDivider: {
     height: 1,
@@ -1856,6 +1862,7 @@ const styles = StyleSheet.create({
   introModeInfoText: {
     fontSize: 14,
     fontWeight: "600",
+    fontFamily: fontFamilies.semibold,
     color: THEME.text,
     flex: 1,
   },
@@ -1872,6 +1879,7 @@ const styles = StyleSheet.create({
   introStatText: {
     fontSize: 13,
     fontWeight: "600",
+    fontFamily: fontFamilies.semibold,
     color: THEME.textMuted,
   },
   introBottom: {
@@ -1890,6 +1898,7 @@ const styles = StyleSheet.create({
   introStartTextColored: {
     fontSize: 17,
     fontWeight: "800",
+    fontFamily: fontFamilies.heavy,
   },
   // Legacy styles
   instructionsCard: {
@@ -1918,6 +1927,7 @@ const styles = StyleSheet.create({
   instructionText: {
     fontSize: 16,
     fontWeight: "700",
+    fontFamily: fontFamilies.bold,
     color: THEME.text,
     flex: 1,
   },
@@ -1933,6 +1943,7 @@ const styles = StyleSheet.create({
   bonusText: {
     fontSize: 14,
     fontWeight: "600",
+    fontFamily: fontFamilies.semibold,
     color: THEME.text,
     flex: 1,
   },
@@ -1951,6 +1962,7 @@ const styles = StyleSheet.create({
   startButtonText: {
     fontSize: 16,
     fontWeight: "800",
+    fontFamily: fontFamilies.heavy,
     color: THEME.primary,
   },
 
@@ -1988,6 +2000,7 @@ const styles = StyleSheet.create({
   progressText: {
     fontSize: 13,
     fontWeight: "700",
+    fontFamily: fontFamilies.bold,
   },
   timerBadge: {
     flexDirection: "row",
@@ -2007,6 +2020,7 @@ const styles = StyleSheet.create({
   timerText: {
     fontSize: 14,
     fontWeight: "800",
+    fontFamily: fontFamilies.heavy,
     color: "#FFF",
   },
   progressBar: {
@@ -2039,6 +2053,7 @@ const styles = StyleSheet.create({
   scoreText: {
     fontSize: 16,
     fontWeight: "800",
+    fontFamily: fontFamilies.heavy,
   },
   endGameButton: {
     flexDirection: "row",
@@ -2057,6 +2072,7 @@ const styles = StyleSheet.create({
   endGameButtonText: {
     fontSize: 14,
     fontWeight: "800",
+    fontFamily: fontFamilies.heavy,
     color: "#FFF",
   },
   streakBannerContainer: {
@@ -2091,12 +2107,14 @@ const styles = StyleSheet.create({
   streakText: {
     fontSize: 18,
     fontWeight: "800",
+    fontFamily: fontFamilies.heavy,
     color: "#FFF",
     marginBottom: 2,
   },
   streakBonus: {
     fontSize: 13,
     fontWeight: "600",
+    fontFamily: fontFamilies.semibold,
     color: "rgba(255,255,255,0.9)",
   },
   cardContainer: {
@@ -2165,6 +2183,7 @@ const styles = StyleSheet.create({
   difficultyText: {
     fontSize: 11,
     fontWeight: "800",
+    fontFamily: fontFamilies.heavy,
   },
   livesContainer: {
     flexDirection: "row",
@@ -2197,6 +2216,7 @@ const styles = StyleSheet.create({
   cardStatement: {
     fontSize: 24,
     fontWeight: "700",
+    fontFamily: fontFamilies.bold,
     lineHeight: 36,
     textAlign: "center",
   },
@@ -2227,6 +2247,7 @@ const styles = StyleSheet.create({
   hintText: {
     fontSize: 12,
     fontWeight: "800",
+    fontFamily: fontFamilies.heavy,
   },
   swipeLabel: {
     position: "absolute",
@@ -2245,6 +2266,7 @@ const styles = StyleSheet.create({
   swipeLabelText: {
     fontSize: 24,
     fontWeight: "900",
+    fontFamily: fontFamilies.black,
   },
   actionButtons: {
     flexDirection: "row",
@@ -2286,6 +2308,7 @@ const styles = StyleSheet.create({
   actionButtonText: {
     fontSize: 18,
     fontWeight: "800",
+    fontFamily: fontFamilies.heavy,
     color: "#FFF",
   },
   loseExplosionOverlay: {
@@ -2321,6 +2344,7 @@ const styles = StyleSheet.create({
   loseExplosionText: {
     fontSize: 36,
     fontWeight: "900",
+    fontFamily: fontFamilies.black,
     color: "#FFF",
     letterSpacing: 2,
   },
@@ -2360,10 +2384,12 @@ const styles = StyleSheet.create({
   resultsHeaderTitle: {
     fontSize: 28,
     fontWeight: "800",
+    fontFamily: fontFamilies.heavy,
   },
   resultsHeaderSubtitle: {
     fontSize: 14,
     fontWeight: "500",
+    fontFamily: fontFamilies.medium,
     marginTop: 2,
   },
   resultsContent: {
@@ -2391,11 +2417,13 @@ const styles = StyleSheet.create({
   },
   resultsScoreEmoji: {
     fontSize: 36,
+    fontFamily: fontFamilies.regular,
     marginBottom: 6,
   },
   resultsScoreTitle: {
     fontSize: 22,
     fontWeight: "900",
+    fontFamily: fontFamilies.black,
     color: "#FFF",
     marginBottom: 12,
     textAlign: "center",
@@ -2412,6 +2440,7 @@ const styles = StyleSheet.create({
   resultsXPText: {
     fontSize: 16,
     fontWeight: "900",
+    fontFamily: fontFamilies.black,
     color: "#FFF",
   },
   // Legacy hero styles
@@ -2432,17 +2461,20 @@ const styles = StyleSheet.create({
   },
   resultsHeroEmoji: {
     fontSize: 32,
+    fontFamily: fontFamilies.regular,
     marginBottom: 8,
   },
   resultsHeroTitle: {
     fontSize: 28,
     fontWeight: "900",
+    fontFamily: fontFamilies.black,
     color: "#FFF",
     marginBottom: 4,
   },
   resultsHeroScore: {
     fontSize: 16,
     fontWeight: "600",
+    fontFamily: fontFamilies.semibold,
     color: "rgba(255,255,255,0.9)",
   },
   resultsStatsRow: {
@@ -2472,11 +2504,13 @@ const styles = StyleSheet.create({
   resultsStatValue: {
     fontSize: 20,
     fontWeight: "900",
+    fontFamily: fontFamilies.black,
     color: THEME.text,
   },
   resultsStatLabel: {
     fontSize: 11,
     fontWeight: "600",
+    fontFamily: fontFamilies.semibold,
     color: THEME.textMuted,
   },
   resultsReviewSection: {
@@ -2488,11 +2522,13 @@ const styles = StyleSheet.create({
   resultsReviewTitle: {
     fontSize: 18,
     fontWeight: "800",
+    fontFamily: fontFamilies.heavy,
     color: THEME.text,
     marginBottom: 4,
   },
   resultsReviewSubtitle: {
     fontSize: 13,
+    fontFamily: fontFamilies.regular,
     color: THEME.textMuted,
   },
   resultsTabRow: {
@@ -2518,6 +2554,7 @@ const styles = StyleSheet.create({
   resultsTabText: {
     fontSize: 14,
     fontWeight: "700",
+    fontFamily: fontFamilies.bold,
     color: THEME.textMuted,
   },
   resultsTabTextActive: {
@@ -2546,10 +2583,12 @@ const styles = StyleSheet.create({
   resultsEmptyTitle: {
     fontSize: 18,
     fontWeight: "800",
+    fontFamily: fontFamilies.heavy,
     color: THEME.success,
   },
   resultsEmptyText: {
     fontSize: 14,
+    fontFamily: fontFamilies.regular,
     color: THEME.textMuted,
   },
   resultsCardList: {
@@ -2596,6 +2635,7 @@ const styles = StyleSheet.create({
   resultsCardNumberText: {
     fontSize: 12,
     fontWeight: "800",
+    fontFamily: fontFamilies.heavy,
     color: "#FFF",
   },
   resultsCardBadge: {
@@ -2606,10 +2646,12 @@ const styles = StyleSheet.create({
   resultsCardBadgeText: {
     fontSize: 10,
     fontWeight: "800",
+    fontFamily: fontFamilies.heavy,
   },
   resultsCardStatement: {
     fontSize: 14,
     fontWeight: "600",
+    fontFamily: fontFamilies.semibold,
     color: THEME.text,
     lineHeight: 20,
   },
@@ -2630,6 +2672,7 @@ const styles = StyleSheet.create({
   resultsCardExplanationText: {
     flex: 1,
     fontSize: 13,
+    fontFamily: fontFamilies.regular,
     color: THEME.text,
     lineHeight: 19,
   },
@@ -2639,6 +2682,7 @@ const styles = StyleSheet.create({
   },
   resultsCardHint: {
     fontSize: 12,
+    fontFamily: fontFamilies.regular,
     color: THEME.textMuted,
   },
   resultsPlayAgainBtn: {
@@ -2656,6 +2700,7 @@ const styles = StyleSheet.create({
   resultsPlayAgainText: {
     fontSize: 16,
     fontWeight: "800",
+    fontFamily: fontFamilies.heavy,
     color: "#FFF",
   },
   resultsHomeBtn: {
@@ -2671,6 +2716,7 @@ const styles = StyleSheet.create({
   resultsHomeText: {
     fontSize: 16,
     fontWeight: "700",
+    fontFamily: fontFamilies.bold,
     color: THEME.text,
   },
   // Legacy Results Styles
@@ -2694,6 +2740,7 @@ const styles = StyleSheet.create({
   resultsTitle: {
     fontSize: 32,
     fontWeight: "900",
+    fontFamily: fontFamilies.black,
     color: "#FFF",
     marginBottom: 32,
     textAlign: "center",
@@ -2723,11 +2770,13 @@ const styles = StyleSheet.create({
   scoreLabel: {
     fontSize: 16,
     fontWeight: "600",
+    fontFamily: fontFamilies.semibold,
     color: THEME.textMuted,
   },
   scoreValue: {
     fontSize: 32,
     fontWeight: "900",
+    fontFamily: fontFamilies.black,
     color: THEME.primary,
   },
   divider: {
@@ -2750,11 +2799,13 @@ const styles = StyleSheet.create({
   statValue: {
     fontSize: 20,
     fontWeight: "800",
+    fontFamily: fontFamilies.heavy,
     color: THEME.text,
   },
   statLabel: {
     fontSize: 11,
     fontWeight: "600",
+    fontFamily: fontFamilies.semibold,
     color: THEME.textMuted,
   },
   resultsActions: {
@@ -2776,6 +2827,7 @@ const styles = StyleSheet.create({
   playAgainText: {
     fontSize: 16,
     fontWeight: "800",
+    fontFamily: fontFamilies.heavy,
     color: THEME.primary,
   },
   homeButton: {
@@ -2790,6 +2842,7 @@ const styles = StyleSheet.create({
   homeButtonText: {
     fontSize: 16,
     fontWeight: "800",
+    fontFamily: fontFamilies.heavy,
     color: "#FFF",
   },
 
@@ -2809,12 +2862,14 @@ const styles = StyleSheet.create({
   modeHeaderTitle: {
     fontSize: 28,
     fontWeight: "800",
+    fontFamily: fontFamilies.heavy,
     marginBottom: 4,
   },
   modeHeaderSubtitle: {
     fontSize: 14,
     color: "#8898AA",
     fontWeight: "500",
+    fontFamily: fontFamilies.medium,
   },
   backButtonCircle: {
     width: 40,
@@ -2901,6 +2956,7 @@ const styles = StyleSheet.create({
   modeTitleNew: {
     fontSize: 24,
     fontWeight: "900",
+    fontFamily: fontFamilies.black,
     color: THEME.text,
     marginBottom: 4,
   },
@@ -2908,6 +2964,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: THEME.textMuted,
     fontWeight: "600",
+    fontFamily: fontFamilies.semibold,
   },
   // New Mode Cards - 3D Style
   modesGridNew: {
@@ -3028,6 +3085,7 @@ const styles = StyleSheet.create({
   modeCardTitleNew: {
     fontSize: 20,
     fontWeight: "900",
+    fontFamily: fontFamilies.black,
     color: "#FFF",
     marginBottom: 4,
   },
@@ -3035,6 +3093,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: "rgba(255,255,255,0.9)",
     fontWeight: "500",
+    fontFamily: fontFamilies.medium,
     marginBottom: 8,
   },
   taglineBanner: {
@@ -3047,6 +3106,7 @@ const styles = StyleSheet.create({
   taglineText: {
     fontSize: 11,
     fontWeight: "700",
+    fontFamily: fontFamilies.bold,
     color: "#FFF",
   },
   modeStatsRow: {
@@ -3078,6 +3138,7 @@ const styles = StyleSheet.create({
   xpBadgeText: {
     fontSize: 12,
     fontWeight: "800",
+    fontFamily: fontFamilies.heavy,
     color: "#FFF",
     textShadowColor: "rgba(0,0,0,0.2)",
     textShadowOffset: { width: 0, height: 1 },
@@ -3097,6 +3158,7 @@ const styles = StyleSheet.create({
   roundsBadgeText: {
     fontSize: 12,
     fontWeight: "800",
+    fontFamily: fontFamilies.heavy,
     color: "#FFF",
   },
   playArrowCircle: {
@@ -3145,17 +3207,20 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 13,
     fontWeight: "500",
+    fontFamily: fontFamilies.medium,
     lineHeight: 18,
   },
   // Legacy styles kept for compatibility
   modeTitle: {
     fontSize: 28,
     fontWeight: "900",
+    fontFamily: fontFamilies.black,
     color: THEME.text,
     marginBottom: 8,
   },
   modeSubtitle: {
     fontSize: 16,
+    fontFamily: fontFamilies.regular,
     color: THEME.textMuted,
     marginBottom: 32,
   },
@@ -3185,10 +3250,12 @@ const styles = StyleSheet.create({
   modeCardTitle: {
     fontSize: 22,
     fontWeight: "900",
+    fontFamily: fontFamilies.black,
     color: "#FFF",
   },
   modeCardDesc: {
     fontSize: 14,
+    fontFamily: fontFamilies.regular,
     color: "rgba(255,255,255,0.9)",
     marginBottom: 8,
   },
@@ -3205,6 +3272,7 @@ const styles = StyleSheet.create({
   modeStatText: {
     fontSize: 13,
     fontWeight: "600",
+    fontFamily: fontFamilies.semibold,
     color: "rgba(255,255,255,0.9)",
   },
   modePlayButton: {
@@ -3219,6 +3287,7 @@ const styles = StyleSheet.create({
   modePlayText: {
     fontSize: 14,
     fontWeight: "800",
+    fontFamily: fontFamilies.heavy,
     color: THEME.text,
   },
 
@@ -3231,11 +3300,13 @@ const styles = StyleSheet.create({
   reviewTitle: {
     fontSize: 20,
     fontWeight: "900",
+    fontFamily: fontFamilies.black,
     color: "#FFF",
     textAlign: "center",
   },
   reviewSubtitle: {
     fontSize: 14,
+    fontFamily: fontFamilies.regular,
     color: "rgba(255,255,255,0.8)",
     textAlign: "center",
     marginBottom: 8,
@@ -3264,6 +3335,7 @@ const styles = StyleSheet.create({
   reviewNumberText: {
     fontSize: 14,
     fontWeight: "800",
+    fontFamily: fontFamilies.heavy,
     color: "#FFF",
   },
   reviewBadgeRow: {
@@ -3279,10 +3351,12 @@ const styles = StyleSheet.create({
   reviewBadgeText: {
     fontSize: 11,
     fontWeight: "800",
+    fontFamily: fontFamilies.heavy,
   },
   reviewStatement: {
     fontSize: 15,
     fontWeight: "600",
+    fontFamily: fontFamilies.semibold,
     color: THEME.text,
     lineHeight: 22,
   },
@@ -3297,6 +3371,7 @@ const styles = StyleSheet.create({
   reviewExplanationText: {
     flex: 1,
     fontSize: 13,
+    fontFamily: fontFamilies.regular,
     color: THEME.textMuted,
     lineHeight: 18,
   },

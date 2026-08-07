@@ -1,7 +1,8 @@
-import { SectionHeader } from "@/components/ui/section-header";
+import { ActionButton, SectionHeader } from "@/components/ui";
 import { Icon } from "@/components/ui/icon";
 import { UNITS } from "@/content/units";
-import { useTheme, type Palette } from "@/theme";
+import { getLessonById } from "@/content/lessons";
+import { colors, fontFamilies, useTheme, withAlpha, type Palette } from "@/theme";
 import { useAllLevels } from "@/hooks/use-storage";
 import {
     getLeaderboardSnapshot,
@@ -12,7 +13,7 @@ import { useStorage } from "@/services/StorageContext";
 import { isSupabaseConfigured, supabase } from "@/services/supabase";
 import { Tables } from "@/services/supabase.types";
 import { useFocusEffect } from "@react-navigation/native";
-import { LinearGradient } from "expo-linear-gradient";
+import { Image as ExpoImage } from "expo-image";
 import { useRouter } from "expo-router";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
@@ -25,10 +26,6 @@ import {
 } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-
-import { GRADIENTS } from "@/constants/gradients";
-
-// Gradient Colors
 
 type LeaderEntry = {
   userId?: string;
@@ -57,27 +54,9 @@ export default function HomeScreen() {
     userRank?: LeaderEntry | undefined;
   }>({ topThree: [] });
   const [leaderboardError, setLeaderboardError] = useState<string | null>(null);
-  const [greeting, setGreeting] = useState("Hello");
 
   const THEME = theme.palettes.tab;
   const styles = useMemo(() => createStyles(THEME), [THEME]);
-
-  // Update greeting based on local time, refreshing each minute
-  useEffect(() => {
-    const computeGreeting = () => {
-      const hour = new Date().getHours();
-      if (hour < 5) return "Good Night!";
-      if (hour < 12) return "Good Morning!";
-      if (hour < 17) return "Good Afternoon!";
-      if (hour < 21) return "Good Evening!";
-      return "Good Night!";
-    };
-
-    const update = () => setGreeting(computeGreeting());
-    update();
-    const id = setInterval(update, 60 * 1000);
-    return () => clearInterval(id);
-  }, []);
 
   // Refresh levels whenever the tab/screen gains focus so progress is up to date
   useFocusEffect(
@@ -127,6 +106,20 @@ export default function HomeScreen() {
       completedLessons: completedInCurrentUnit,
     };
   }, [levels]);
+
+  // Resolve the next lesson title for the Continue Learning card
+  const currentLessonTitle = useMemo(() => {
+    const id = currentProgress.unit.lessonIds[currentProgress.lessonIndex];
+    return getLessonById(id)?.title || "Continue Learning";
+  }, [currentProgress]);
+
+  // Calculate level + XP progress for the hero pill
+  const levelStats = useMemo(() => {
+    const totalXp = userProfile?.total_xp || 0;
+    const level = Math.floor(totalXp / 100) + 1;
+    const levelProgress = Math.min(((totalXp % 100) / 100) * 100, 100);
+    return { level, levelProgress };
+  }, [userProfile]);
 
   // Calculate debunking stats
   const debunkingStats = useMemo(() => {
@@ -362,149 +355,131 @@ export default function HomeScreen() {
       <ScrollView
         contentContainerStyle={[styles.scrollContent, { paddingTop: insets.top + 20 }]}
         showsVerticalScrollIndicator={false}
+        bounces={false}
+        overScrollMode="never"
       >
-        {/* Header */}
-        <Animated.View entering={FadeInDown.delay(100)} style={styles.header}>
-          <View style={styles.headerLeft}>
-            <Image
-              source={getProfileAvatarSource(userProfile?.avatar_url)}
-              style={styles.avatar}
-              resizeMode="cover"
-            />
-            <View>
-              <Text style={styles.greeting}>{greeting}</Text>
-              <Text style={styles.username}>
+        {/* Hero: full-bleed bg image + pill header + mascot */}
+        <Animated.View
+          entering={FadeInDown.delay(100)}
+          style={[styles.hero, { marginTop: -(insets.top + 20) }]}
+        >
+          <ExpoImage
+            source={require("@/assets/images/bg/bg.svg")}
+            style={styles.heroBg}
+            contentFit="cover"
+          />
+          <View
+            style={[styles.heroHeader, { paddingTop: insets.top + 14 }]}
+          >
+            {/* Card: profile avatar + name */}
+            <View style={styles.heroUserCard}>
+              <Image
+                source={getProfileAvatarSource(userProfile?.avatar_url)}
+                style={styles.heroPillAvatar}
+                resizeMode="cover"
+              />
+              <Text style={styles.heroPillName} numberOfLines={1}>
                 {userProfile?.username || "Atom Explorer"}
               </Text>
             </View>
+
+            {/* Card: level */}
+            <View style={styles.heroStatCard}>
+              <Icon
+                name="Ranking"
+                size={14}
+                color={theme.colors.primary}
+                variant="Bold"
+              />
+              <Text style={styles.heroStatText}>
+                {levelStats.level}
+              </Text>
+            </View>
+
+            {/* Card: xp */}
+            <View style={styles.heroStatCard}>
+              <Icon name="Flash" size={14} color="#FFA000" variant="Bold" />
+              <Text style={styles.heroStatText}>
+                {(userProfile?.total_xp || 0).toLocaleString()}
+              </Text>
+            </View>
           </View>
 
-          <View style={styles.gemPill}>
-            <LinearGradient
-              colors={GRADIENTS.yellow}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-              style={styles.gemGradient}
-            >
-              <Icon name="Flash" size={16} color="#FFF" variant="Bold" />
-              <Text style={styles.gemText}>
-                {userProfile?.total_xp || 0} XP
-              </Text>
-            </LinearGradient>
+          {/* Mascot placeholder */}
+          <View style={styles.mascotWrap}>
+            <ExpoImage
+              source={require("@/assets/images/mascot/happy.png")}
+              style={styles.mascot}
+              contentFit="contain"
+            />
           </View>
         </Animated.View>
-
-        {/* Quick Actions Row */}
+        {/* Continue Learning */}
         <Animated.View
           entering={FadeInDown.delay(200)}
-          style={styles.quickActionsRow}
-        >
-          {/* Card 1: MythBuster (Orange) */}
-          <TouchableOpacity
-            style={styles.actionCard}
-            onPress={() => router.push("/mythbuster")}
-          >
-            <LinearGradient
-              colors={GRADIENTS.orange}
-              style={styles.actionGradient}
-            >
-              <View style={styles.actionIconCircle}>
-                <Icon name="Danger" size={24} color="#FF6B6B" variant="Bold" />
-              </View>
-              <Text
-                style={styles.actionText}
-                numberOfLines={1}
-                ellipsizeMode="tail"
-              >
-                MythBuster
-              </Text>
-            </LinearGradient>
-          </TouchableOpacity>
-
-          {/* Card 2: Encyclopedia (Blue) */}
-          <TouchableOpacity
-            style={styles.actionCard}
-            onPress={() => router.push("/encyclopedia")}
-          >
-            <LinearGradient
-              colors={GRADIENTS.blue}
-              style={styles.actionGradient}
-            >
-              <View
-                style={[
-                  styles.actionIconCircle,
-                  { backgroundColor: "rgba(255,255,255,0.9)" },
-                ]}
-              >
-                <Icon name="Book" size={24} color="#6A82FB" variant="Bold" />
-              </View>
-              <Text
-                style={styles.actionText}
-                numberOfLines={1}
-                ellipsizeMode="tail"
-              >
-                Encyclopedia
-              </Text>
-            </LinearGradient>
-          </TouchableOpacity>
-
-          {/* Card 3: AtomMaze (Purple) */}
-          <TouchableOpacity
-            style={styles.actionCard}
-            onPress={() => router.push("/atom-maze")}
-          >
-            <LinearGradient
-              colors={GRADIENTS.purple}
-              style={styles.actionGradient}
-            >
-              <View
-                style={[
-                  styles.actionIconCircle,
-                  { backgroundColor: "rgba(255,255,255,0.9)" },
-                ]}
-              >
-                <Icon name="Game" size={24} color="#9E87F5" variant="Bold" />
-              </View>
-              <Text
-                style={styles.actionText}
-                numberOfLines={1}
-                ellipsizeMode="tail"
-              >
-                AtomMaze
-              </Text>
-            </LinearGradient>
-          </TouchableOpacity>
-        </Animated.View>
-
-        {/* Daily Quiz Banner */}
-        <Animated.View
-          entering={FadeInDown.delay(300)}
           style={styles.bannerContainer}
         >
-          <LinearGradient
-            colors={GRADIENTS.yellow}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={styles.bannerGradient}
+          <View style={styles.bannerIconCircle}>
+            <Icon
+              name={currentProgress.unit.icon || "Atom"}
+              size={22}
+              color="#FFFFFF"
+              variant="Bold"
+            />
+          </View>
+
+          <View style={styles.bannerContent}>
+            <Text style={styles.bannerLabel}>
+              Lesson {currentProgress.lessonIndex + 1}
+            </Text>
+            <Text style={styles.bannerTitle} numberOfLines={1}>
+              {currentLessonTitle}
+            </Text>
+            <Text style={styles.bannerSubtitle} numberOfLines={1}>
+              {currentProgress.unit.title}
+            </Text>
+          </View>
+
+          <TouchableOpacity
+            style={styles.bannerButton}
+            onPress={() => router.push("/map")}
           >
-            <View style={styles.bannerContent}>
-              <Text style={styles.bannerTitle}>Continue Learning</Text>
-              <Text style={styles.bannerSubtitle}>
-                Unit {currentProgress.unit.order}: {currentProgress.unit.title}
-              </Text>
+            <Icon
+              name="ArrowRight"
+              size={18}
+              color={theme.colors.primary}
+              variant="Bold"
+            />
+          </TouchableOpacity>
+        </Animated.View>
+        {/* Quick Actions Row */}
+        <Animated.View
+          entering={FadeInDown.delay(300)}
+          style={styles.quickActionsRow}
+        >
+          {/* Card 1: MythBuster */}
+          <ActionButton
+            icon="Danger"
+            label="MythBuster"
+            iconColor="#FF6B6B"
+            onPress={() => router.push("/mythbuster")}
+          />
 
-              <TouchableOpacity
-                style={styles.bannerButton}
-                onPress={() => router.push("/map")}
-              >
-                <Text style={styles.bannerButtonText}>Continue</Text>
-              </TouchableOpacity>
-            </View>
+          {/* Card 2: Encyclopedia */}
+          <ActionButton
+            icon="Book"
+            label="Encyclopedia"
+            iconColor="#6A82FB"
+            onPress={() => router.push("/encyclopedia")}
+          />
 
-            <View style={styles.bannerImageContainer}>
-              <Icon name="Play" size={80} color="#FFF" variant="Bold" />
-            </View>
-          </LinearGradient>
+          {/* Card 3: AtomMaze */}
+          <ActionButton
+            icon="Game"
+            label="AtomMaze"
+            iconColor="#9E87F5"
+            onPress={() => router.push("/atom-maze")}
+          />
         </Animated.View>
 
         {/* Leaderboard Widget */}
@@ -606,42 +581,80 @@ const createStyles = (theme: Palette) =>
       alignItems: "center",
       marginBottom: 24,
     },
-    headerLeft: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 12,
-    },
-    avatar: {
-      width: 48,
-      height: 48,
-      borderRadius: 24,
-      backgroundColor: "#E9ECEF",
-    },
-    greeting: {
-      fontSize: 14,
-      color: theme.textMuted,
-      fontWeight: "600",
-    },
-    username: {
-      fontSize: 18,
-      color: theme.text,
-      fontWeight: "800",
-    },
-    gemPill: {
-      borderRadius: 20,
+    hero: {
+      marginHorizontal: -20,
+      minHeight: 330,
+      borderRadius: 0,
       overflow: "hidden",
+      marginBottom: 0,
+      elevation: 4,
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.12,
+      shadowRadius: 10,
     },
-    gemGradient: {
+    heroBg: {
+      ...StyleSheet.absoluteFillObject,
+    },
+    heroHeader: {
       flexDirection: "row",
       alignItems: "center",
+      gap: 10,
+      paddingHorizontal: 20,
+      paddingBottom: 14,
+    },
+    heroUserCard: {
+      flex: 1,
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 10,
+      backgroundColor: theme.card,
+      borderWidth: 2,
+      borderColor: theme.border,
+      borderBottomWidth: 4,
+      borderRadius: 20,
       paddingVertical: 6,
       paddingHorizontal: 12,
-      gap: 8,
     },
-    gemText: {
-      color: "#FFF",
+    heroPillAvatar: {
+      width: 26,
+      height: 26,
+      borderRadius: 13,
+      backgroundColor: withAlpha(colors.role.black, 0.08),
+    },
+    heroPillName: {
+      fontSize: 13,
+      color: theme.text,
       fontWeight: "800",
-      fontSize: 14,
+      fontFamily: fontFamilies.heavy,
+    },
+    heroStatCard: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 6,
+      backgroundColor: theme.card,
+      borderWidth: 2,
+      borderColor: theme.border,
+      borderBottomWidth: 4,
+      borderRadius: 20,
+      paddingVertical: 10,
+      paddingHorizontal: 12,
+    },
+    heroStatText: {
+      fontSize: 13,
+      color: theme.text,
+      fontWeight: "800",
+      fontFamily: fontFamilies.heavy,
+    },
+    mascotWrap: {
+      flex: 1,
+      alignItems: "center",
+      justifyContent: "center",
+      paddingTop: 4,
+    },
+    mascot: {
+      width: 158,
+      height: 136,
     },
     plusBtn: {
       width: 18,
@@ -658,91 +671,66 @@ const createStyles = (theme: Palette) =>
       marginBottom: 24,
       gap: 12,
     },
-    actionCard: {
-      flex: 1,
-      height: 110,
-      borderRadius: 20,
-      overflow: "hidden",
-      elevation: 4,
-      shadowColor: "#000",
-      shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.1,
-      shadowRadius: 8,
-    },
-    actionGradient: {
-      flex: 1,
-      alignItems: "center",
-      justifyContent: "center",
-      padding: 12,
-    },
-    actionIconCircle: {
-      width: 44,
-      height: 44,
-      borderRadius: 16,
-      backgroundColor: "rgba(255,255,255,0.9)",
-      alignItems: "center",
-      justifyContent: "center",
-      marginBottom: 12,
-    },
-    actionText: {
-      color: "#FFF",
-      fontWeight: "700",
-      fontSize: 13,
-      textAlign: "center",
-      flexShrink: 1,
-      width: "100%",
-    },
     bannerContainer: {
-      height: 160,
-      borderRadius: 24,
-      overflow: "hidden",
-      marginBottom: 32,
-      elevation: 4,
-      shadowColor: "#000",
-      shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.1,
-      shadowRadius: 8,
-    },
-    bannerGradient: {
-      flex: 1,
+      height: 92,
+      borderRadius: 16,
+      marginTop: -46,
+      marginBottom: 24,
+      backgroundColor: theme.card,
+      borderWidth: 2,
+      borderColor: theme.border,
+      borderBottomWidth: 4,
       flexDirection: "row",
       alignItems: "center",
-      paddingHorizontal: 24,
+      paddingHorizontal: 14,
+      gap: 12,
+      overflow: "hidden",
+    },
+    bannerIconCircle: {
+      width: 48,
+      height: 48,
+      borderRadius: 24,
+      backgroundColor: theme.primary,
+      alignItems: "center",
+      justifyContent: "center",
+      borderWidth: 3,
+      borderColor: theme.card,
     },
     bannerContent: {
       flex: 1,
-      zIndex: 2,
+      flexShrink: 1,
+    },
+    bannerLabel: {
+      fontSize: 11,
+      color: theme.primary,
+      fontWeight: "800",
+      fontFamily: fontFamilies.heavy,
+      textTransform: "uppercase",
+      letterSpacing: 0.4,
+      marginBottom: 2,
     },
     bannerTitle: {
-      fontSize: 24,
+      fontSize: 16,
       fontWeight: "800",
-      color: "#FFF",
-      marginBottom: 4,
+      fontFamily: fontFamilies.heavy,
+      color: theme.text,
+      marginBottom: 1,
     },
     bannerSubtitle: {
-      fontSize: 14,
-      color: "rgba(255,255,255,0.9)",
-      marginBottom: 20,
+      fontSize: 12,
+      color: theme.textMuted,
       fontWeight: "600",
+      fontFamily: fontFamilies.semibold,
     },
     bannerButton: {
-      backgroundColor: "#FFF",
-      paddingVertical: 10,
-      paddingHorizontal: 20,
+      width: 40,
+      height: 40,
       borderRadius: 20,
-      alignSelf: "flex-start",
-    },
-    bannerButtonText: {
-      color: "#FFA043",
-      fontWeight: "800",
-      fontSize: 14,
-    },
-    bannerImageContainer: {
-      position: "absolute",
-      right: 20,
-      bottom: 20,
-      opacity: 0.9,
-      transform: [{ rotate: "-10deg" }],
+      borderWidth: 2,
+      borderColor: theme.primary,
+      backgroundColor: "transparent",
+      alignItems: "center",
+      justifyContent: "center",
     },
     arrowButton: {
       width: 32,
@@ -786,6 +774,7 @@ const createStyles = (theme: Palette) =>
       color: "#FFF",
       fontSize: 12,
       fontWeight: "800",
+      fontFamily: fontFamilies.heavy,
     },
     leaderAvatar: {
       width: 40,
@@ -796,12 +785,14 @@ const createStyles = (theme: Palette) =>
     leaderName: {
       fontSize: 14,
       fontWeight: "700",
+      fontFamily: fontFamilies.bold,
       color: theme.text,
     },
     leaderScore: {
       fontSize: 12,
       color: theme.textMuted,
       fontWeight: "600",
+      fontFamily: fontFamilies.semibold,
     },
     viewAllLink: {
       marginTop: 16,
@@ -810,6 +801,7 @@ const createStyles = (theme: Palette) =>
     viewAllText: {
       color: theme.primary,
       fontWeight: "700",
+      fontFamily: fontFamilies.bold,
       fontSize: 14,
     },
   });

@@ -26,7 +26,7 @@ import Animated, {
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { useTheme, type Palette } from "@/theme";
+import {useTheme, type Palette, fontFamilies} from "@/theme";
 
 // Feature Showcase Data
 const FEATURE_SHOWCASE = [
@@ -530,6 +530,7 @@ const createStyles = (theme: Palette) =>
     themeToggleText: {
       fontSize: 12,
       fontWeight: "800",
+      fontFamily: fontFamilies.heavy,
       color: theme.text,
       textTransform: "uppercase",
       letterSpacing: 0.6,
@@ -594,6 +595,7 @@ const createStyles = (theme: Palette) =>
     splashTitle: {
       fontSize: 48,
       fontWeight: "800",
+      fontFamily: fontFamilies.heavy,
       color: theme.text,
       letterSpacing: 2,
     },
@@ -604,6 +606,7 @@ const createStyles = (theme: Palette) =>
       textTransform: "uppercase",
       marginTop: 8,
       fontWeight: "700",
+      fontFamily: fontFamilies.bold,
     },
     bottomContainer: {
       width: "100%",
@@ -633,6 +636,7 @@ const createStyles = (theme: Palette) =>
     buttonText: {
       fontSize: 16,
       fontWeight: "800",
+      fontFamily: fontFamilies.heavy,
       color: "#FFF",
       textTransform: "uppercase",
       letterSpacing: 1.5,
@@ -669,6 +673,7 @@ const createStyles = (theme: Palette) =>
       color: theme.accent,
       fontSize: 12,
       fontWeight: "800",
+      fontFamily: fontFamilies.heavy,
       textTransform: "uppercase",
       letterSpacing: 1,
     },
@@ -697,6 +702,7 @@ const createStyles = (theme: Palette) =>
     featureTitle: {
       fontSize: 32,
       fontWeight: "800",
+      fontFamily: fontFamilies.heavy,
       color: theme.text,
       marginBottom: 8,
       textAlign: "center",
@@ -704,6 +710,7 @@ const createStyles = (theme: Palette) =>
     featureSubtitle: {
       fontSize: 18,
       fontWeight: "600",
+      fontFamily: fontFamilies.semibold,
       color: theme.textMuted,
       marginBottom: 16,
       textAlign: "center",
@@ -716,6 +723,7 @@ const createStyles = (theme: Palette) =>
       marginBottom: 24,
       paddingHorizontal: 8,
       fontWeight: "500",
+      fontFamily: fontFamilies.medium,
     },
     featureHighlights: {
       width: "100%",
@@ -740,6 +748,7 @@ const createStyles = (theme: Palette) =>
     highlightText: {
       fontSize: 15,
       fontWeight: "600",
+      fontFamily: fontFamilies.semibold,
       color: theme.text,
       flex: 1,
     },
@@ -755,6 +764,7 @@ const createStyles = (theme: Palette) =>
     skipButtonText: {
       fontSize: 14,
       fontWeight: "600",
+      fontFamily: fontFamilies.semibold,
       color: theme.textMuted,
     },
     featureIndicators: {
@@ -792,6 +802,7 @@ const createStyles = (theme: Palette) =>
     titleLarge: {
       fontSize: 32,
       fontWeight: "800",
+      fontFamily: fontFamilies.heavy,
       color: theme.text,
       marginBottom: 8,
       textAlign: "center",
@@ -802,6 +813,7 @@ const createStyles = (theme: Palette) =>
       marginBottom: 48,
       textAlign: "center",
       fontWeight: "500",
+      fontFamily: fontFamilies.medium,
     },
     inputWrapper: {
       width: "100%",
@@ -817,6 +829,7 @@ const createStyles = (theme: Palette) =>
       fontSize: 18,
       color: theme.text,
       fontWeight: "600",
+      fontFamily: fontFamilies.semibold,
       textAlign: "center",
     },
     inputFocused: {

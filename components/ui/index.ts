@@ -8,6 +8,9 @@ export type { TextProps, TextVariant, TextColor } from "./text";
 export { Button } from "./button";
 export type { ButtonProps } from "./button";
 
+export { ActionButton } from "./action-button";
+export type { ActionButtonProps } from "./action-button";
+
 export { IconButton } from "./icon-button";
 export type { IconButtonProps } from "./icon-button";
 

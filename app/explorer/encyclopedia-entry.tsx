@@ -2,7 +2,7 @@ import { PageHeader } from "@/components/ui/page-header";
 import { Icon } from "@/components/ui/icon";
 import { getEncyclopediaEntryById } from "@/content/explorer";
 import { getEncyclopediaImage } from "@/content/explorer/encyclopedia/images";
-import { useTheme, type Palette } from "@/theme";
+import {useTheme, type Palette, fontFamilies} from "@/theme";
 import { openExternalUrl } from "@/services/open-url";
 import * as Haptics from "expo-haptics";
 import { LinearGradient } from "expo-linear-gradient";
@@ -609,11 +609,13 @@ const createStyles = (theme: Palette) =>
     },
     notFoundEmoji: {
       fontSize: 64,
+      fontFamily: fontFamilies.regular,
       marginBottom: 16,
     },
     notFoundText: {
       fontSize: 20,
       fontWeight: "800",
+      fontFamily: fontFamilies.heavy,
       color: theme.text,
       marginBottom: 20,
     },
@@ -629,6 +631,7 @@ const createStyles = (theme: Palette) =>
     notFoundButtonText: {
       fontSize: 14,
       fontWeight: "800",
+      fontFamily: fontFamilies.heavy,
       color: "#FFF",
     },
     header: {
@@ -657,6 +660,7 @@ const createStyles = (theme: Palette) =>
     headerTitle: {
       fontSize: 20,
       fontWeight: "800",
+      fontFamily: fontFamilies.heavy,
       color: theme.text,
       marginBottom: 4,
     },
@@ -671,10 +675,12 @@ const createStyles = (theme: Palette) =>
     },
     categoryIcon: {
       fontSize: 12,
+      fontFamily: fontFamilies.regular,
     },
     categoryText: {
       fontSize: 11,
       fontWeight: "700",
+      fontFamily: fontFamilies.bold,
       textTransform: "capitalize",
     },
     listenAllButton: {
@@ -743,6 +749,7 @@ const createStyles = (theme: Palette) =>
     termLetterText: {
       fontSize: 36,
       fontWeight: "800",
+      fontFamily: fontFamilies.heavy,
       color: "#FFF",
     },
     termInfo: {
@@ -751,6 +758,7 @@ const createStyles = (theme: Palette) =>
     term: {
       fontSize: 26,
       fontWeight: "800",
+      fontFamily: fontFamilies.heavy,
       color: theme.text,
       marginBottom: 10,
     },
@@ -769,10 +777,12 @@ const createStyles = (theme: Palette) =>
     },
     metaBadgeEmoji: {
       fontSize: 12,
+      fontFamily: fontFamilies.regular,
     },
     metaBadgeText: {
       fontSize: 11,
       fontWeight: "700",
+      fontFamily: fontFamilies.bold,
       textTransform: "uppercase",
     },
     difficultyBadge: {
@@ -784,6 +794,7 @@ const createStyles = (theme: Palette) =>
     difficultyText: {
       fontSize: 11,
       fontWeight: "700",
+      fontFamily: fontFamilies.bold,
       color: theme.textMuted,
       textTransform: "uppercase",
     },
@@ -818,10 +829,12 @@ const createStyles = (theme: Palette) =>
     },
     sectionIconEmoji: {
       fontSize: 18,
+      fontFamily: fontFamilies.regular,
     },
     sectionTitle: {
       fontSize: 18,
       fontWeight: "800",
+      fontFamily: fontFamilies.heavy,
       color: theme.text,
     },
     sectionTtsButton: {
@@ -840,6 +853,7 @@ const createStyles = (theme: Palette) =>
       color: theme.text,
       lineHeight: 26,
       fontWeight: "500",
+      fontFamily: fontFamilies.medium,
     },
     factItem: {
       flexDirection: "row",
@@ -861,11 +875,13 @@ const createStyles = (theme: Palette) =>
     factNumberText: {
       fontSize: 14,
       fontWeight: "800",
+      fontFamily: fontFamilies.heavy,
       color: "#FFF",
     },
     factText: {
       flex: 1,
       fontSize: 15,
+      fontFamily: fontFamilies.regular,
       color: theme.text,
       lineHeight: 22,
     },
@@ -903,10 +919,12 @@ const createStyles = (theme: Palette) =>
     },
     debunkIconEmoji: {
       fontSize: 20,
+      fontFamily: fontFamilies.regular,
     },
     debunkTitle: {
       fontSize: 20,
       fontWeight: "800",
+      fontFamily: fontFamilies.heavy,
       color: "#FFF",
     },
     debunkTtsButton: {
@@ -924,6 +942,7 @@ const createStyles = (theme: Palette) =>
     },
     debunkText: {
       fontSize: 15,
+      fontFamily: fontFamilies.regular,
       color: "#FFF",
       lineHeight: 24,
     },
@@ -948,6 +967,7 @@ const createStyles = (theme: Palette) =>
     relatedTermText: {
       fontSize: 13,
       fontWeight: "700",
+      fontFamily: fontFamilies.bold,
       color: theme.purpleDark,
       textTransform: "capitalize",
     },
@@ -968,11 +988,13 @@ const createStyles = (theme: Palette) =>
     sourceOrgText: {
       fontSize: 11,
       fontWeight: "800",
+      fontFamily: fontFamilies.heavy,
       color: "#FFF",
     },
     sourceTitle: {
       fontSize: 15,
       fontWeight: "700",
+      fontFamily: fontFamilies.bold,
       color: theme.text,
       marginBottom: 4,
     },
@@ -984,6 +1006,7 @@ const createStyles = (theme: Palette) =>
     sourceUrl: {
       flex: 1,
       fontSize: 12,
+      fontFamily: fontFamilies.regular,
       color: theme.info,
     },
   });

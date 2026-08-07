@@ -2,7 +2,7 @@ import { PageHeader } from '@/components/ui/page-header';
 import { Icon } from '@/components/ui/icon';
 import { getAllEncyclopediaEntries, searchEncyclopedia } from '@/content/explorer';
 import { getEncyclopediaImage } from '@/content/explorer/encyclopedia/images';
-import { useTheme, type Palette } from '@/theme';
+import {useTheme, type Palette, fontFamilies} from "@/theme";
 import { useRouter } from 'expo-router';
 import React, { useMemo, useState } from 'react';
 import { Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
@@ -120,6 +120,7 @@ const makeStyles = (THEME: Palette) => StyleSheet.create({
   searchInput: {
     flex: 1,
     fontSize: 15,
+    fontFamily: fontFamilies.regular,
     color: THEME.text,
   },
   scrollContent: {
@@ -147,11 +148,13 @@ const makeStyles = (THEME: Palette) => StyleSheet.create({
   entryTerm: {
     fontSize: 16,
     fontWeight: '700',
+    fontFamily: fontFamilies.bold,
     color: THEME.text,
     marginBottom: 4,
   },
   entryDefinition: {
     fontSize: 14,
+    fontFamily: fontFamilies.regular,
     color: THEME.textMuted,
     lineHeight: 20,
   },
@@ -163,11 +166,13 @@ const makeStyles = (THEME: Palette) => StyleSheet.create({
   emptyText: {
     fontSize: 18,
     fontWeight: '700',
+    fontFamily: fontFamilies.bold,
     color: THEME.text,
     marginTop: 16,
   },
   emptySubtext: {
     fontSize: 14,
+    fontFamily: fontFamilies.regular,
     color: THEME.textMuted,
     marginTop: 4,
   },

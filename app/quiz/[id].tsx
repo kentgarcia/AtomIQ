@@ -1,6 +1,6 @@
 import { Icon } from "@/components/ui/icon";
 import { getQuizById } from "@/content/quizzes";
-import { useTheme, type Palette } from "@/theme";
+import {useTheme, type Palette, fontFamilies} from "@/theme";
 import { useStorage } from "@/services/StorageContext";
 import {
     logDailyActivity,
@@ -419,14 +419,17 @@ export default function QuizScreen() {
                             !showExplanation && {
                               color: THEME.primary,
                               fontWeight: "700",
+                              fontFamily: fontFamilies.bold,
                             },
                           showCorrectMark && {
                             color: THEME.success,
                             fontWeight: "700",
+                            fontFamily: fontFamilies.bold,
                           },
                           showWrongMark && {
                             color: THEME.error,
                             fontWeight: "700",
+                            fontFamily: fontFamilies.bold,
                           },
                         ]}
                       >
@@ -538,6 +541,7 @@ const createStyles = (theme: Palette) =>
     errorText: {
       fontSize: 18,
       fontWeight: "700",
+      fontFamily: fontFamilies.bold,
       color: theme.text,
       marginTop: 16,
       marginBottom: 20,
@@ -551,6 +555,7 @@ const createStyles = (theme: Palette) =>
     backButtonText: {
       color: "#FFF",
       fontWeight: "700",
+      fontFamily: fontFamilies.bold,
       fontSize: 16,
     },
 
@@ -586,6 +591,7 @@ const createStyles = (theme: Palette) =>
     questionBadgeText: {
       fontSize: 13,
       fontWeight: "800",
+      fontFamily: fontFamilies.heavy,
       color: theme.primary,
     },
 
@@ -623,6 +629,7 @@ const createStyles = (theme: Palette) =>
     quizBadgeText: {
       color: "#FFF",
       fontWeight: "800",
+      fontFamily: fontFamilies.heavy,
       fontSize: 11,
       letterSpacing: 1,
     },
@@ -637,6 +644,7 @@ const createStyles = (theme: Palette) =>
     questionText: {
       fontSize: 20,
       fontWeight: "700",
+      fontFamily: fontFamilies.bold,
       color: theme.text,
       lineHeight: 28,
       textAlign: "center",
@@ -694,6 +702,7 @@ const createStyles = (theme: Palette) =>
     optionLetterText: {
       fontSize: 16,
       fontWeight: "800",
+      fontFamily: fontFamilies.heavy,
       color: theme.textMuted,
     },
     optionText: {
@@ -701,6 +710,7 @@ const createStyles = (theme: Palette) =>
       fontSize: 16,
       color: theme.text,
       fontWeight: "500",
+      fontFamily: fontFamilies.medium,
     },
 
     // Feedback
@@ -724,9 +734,11 @@ const createStyles = (theme: Palette) =>
     feedbackTitle: {
       fontSize: 18,
       fontWeight: "800",
+      fontFamily: fontFamilies.heavy,
     },
     feedbackText: {
       fontSize: 15,
+      fontFamily: fontFamilies.regular,
       color: theme.text,
       lineHeight: 22,
     },
@@ -752,6 +764,7 @@ const createStyles = (theme: Palette) =>
     checkBtnText: {
       color: "#FFF",
       fontWeight: "800",
+      fontFamily: fontFamilies.heavy,
       fontSize: 16,
       letterSpacing: 0.5,
     },
@@ -769,6 +782,7 @@ const createStyles = (theme: Palette) =>
     continueBtnText: {
       color: "#FFF",
       fontWeight: "800",
+      fontFamily: fontFamilies.heavy,
       fontSize: 16,
       letterSpacing: 0.5,
     },
@@ -791,11 +805,13 @@ const createStyles = (theme: Palette) =>
     resultsTitle: {
       fontSize: 28,
       fontWeight: "800",
+      fontFamily: fontFamilies.heavy,
       color: theme.text,
       marginBottom: 8,
     },
     resultsSubtitle: {
       fontSize: 16,
+      fontFamily: fontFamilies.regular,
       color: theme.textMuted,
       marginBottom: 24,
     },
@@ -825,11 +841,13 @@ const createStyles = (theme: Palette) =>
     statValue: {
       fontSize: 24,
       fontWeight: "800",
+      fontFamily: fontFamilies.heavy,
       color: theme.text,
     },
     statLabel: {
       fontSize: 12,
       fontWeight: "600",
+      fontFamily: fontFamilies.semibold,
       color: theme.textMuted,
       marginTop: 2,
     },
@@ -857,6 +875,7 @@ const createStyles = (theme: Palette) =>
     continueButtonText: {
       color: "#FFF",
       fontWeight: "800",
+      fontFamily: fontFamilies.heavy,
       fontSize: 16,
       letterSpacing: 0.5,
     },

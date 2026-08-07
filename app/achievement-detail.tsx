@@ -8,7 +8,7 @@ import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-nati
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { useTheme, AchievementPalette, type Palette } from '@/theme';
+import {useTheme, AchievementPalette, type Palette, fontFamilies} from "@/theme";
 
 // Achievement thresholds - same as profile
 const ACHIEVEMENTS = [
@@ -278,6 +278,7 @@ const makeStyles = (THEME: Palette) => StyleSheet.create({
   headerTitle: {
     fontSize: 20,
     fontWeight: '800',
+    fontFamily: fontFamilies.heavy,
     color: THEME.text,
   },
   errorContainer: {
@@ -287,6 +288,7 @@ const makeStyles = (THEME: Palette) => StyleSheet.create({
   },
   errorText: {
     fontSize: 16,
+    fontFamily: fontFamilies.regular,
     color: THEME.textMuted,
   },
   content: {
@@ -345,6 +347,7 @@ const makeStyles = (THEME: Palette) => StyleSheet.create({
   achievementTitle: {
     fontSize: 28,
     fontWeight: '800',
+    fontFamily: fontFamilies.heavy,
     color: THEME.text,
     marginBottom: 8,
   },
@@ -354,11 +357,13 @@ const makeStyles = (THEME: Palette) => StyleSheet.create({
   achievementRequirement: {
     fontSize: 16,
     fontWeight: '700',
+    fontFamily: fontFamilies.bold,
     color: THEME.primary,
     marginBottom: 16,
   },
   achievementDescription: {
     fontSize: 15,
+    fontFamily: fontFamilies.regular,
     color: THEME.textMuted,
     lineHeight: 24,
   },
@@ -379,11 +384,13 @@ const makeStyles = (THEME: Palette) => StyleSheet.create({
   progressLabel: {
     fontSize: 16,
     fontWeight: '700',
+    fontFamily: fontFamilies.bold,
     color: THEME.text,
   },
   progressPercentage: {
     fontSize: 20,
     fontWeight: '800',
+    fontFamily: fontFamilies.heavy,
     color: THEME.primary,
   },
   progressBarLarge: {
@@ -411,11 +418,13 @@ const makeStyles = (THEME: Palette) => StyleSheet.create({
     fontSize: 12,
     color: THEME.textMuted,
     fontWeight: '600',
+    fontFamily: fontFamilies.semibold,
     marginBottom: 4,
   },
   progressStatValue: {
     fontSize: 20,
     fontWeight: '800',
+    fontFamily: fontFamilies.heavy,
     color: THEME.text,
   },
   progressDivider: {
@@ -439,6 +448,7 @@ const makeStyles = (THEME: Palette) => StyleSheet.create({
   tipsTitle: {
     fontSize: 18,
     fontWeight: '800',
+    fontFamily: fontFamilies.heavy,
     color: THEME.text,
   },
   tipItem: {
@@ -459,6 +469,7 @@ const makeStyles = (THEME: Palette) => StyleSheet.create({
   tipBulletText: {
     fontSize: 14,
     fontWeight: '800',
+    fontFamily: fontFamilies.heavy,
     color: THEME.primary,
   },
   tipText: {
@@ -467,6 +478,7 @@ const makeStyles = (THEME: Palette) => StyleSheet.create({
     color: THEME.text,
     lineHeight: 22,
     fontWeight: '500',
+    fontFamily: fontFamilies.medium,
   },
 });
 

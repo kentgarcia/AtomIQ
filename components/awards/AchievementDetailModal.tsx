@@ -9,7 +9,7 @@ import {
 import Animated, { FadeInDown } from "react-native-reanimated";
 
 import { Icon } from "@/components/ui/icon";
-import { TabLight as LightTHEME } from "@/theme";
+import {TabLight as LightTHEME, fontFamilies} from "@/theme";
 
 const createAchievementModalStyles = (
   theme: typeof LightTHEME,
@@ -65,6 +65,7 @@ const createAchievementModalStyles = (
     achievementModalTitle: {
       fontSize: 24,
       fontWeight: "800",
+      fontFamily: fontFamilies.heavy,
       textAlign: "center",
       marginBottom: 8,
       color: theme.text,
@@ -74,6 +75,7 @@ const createAchievementModalStyles = (
       color: theme.textMuted,
       textAlign: "center",
       fontWeight: "500",
+      fontFamily: fontFamilies.medium,
       marginBottom: 32,
     },
     progressSection: {
@@ -87,11 +89,13 @@ const createAchievementModalStyles = (
     progressLabel: {
       fontSize: 16,
       fontWeight: "700",
+      fontFamily: fontFamilies.bold,
       color: theme.text,
     },
     progressValue: {
       fontSize: 18,
       fontWeight: "800",
+      fontFamily: fontFamilies.heavy,
     },
     progressBarContainer: {
       gap: 12,
@@ -109,6 +113,7 @@ const createAchievementModalStyles = (
     progressPercentage: {
       fontSize: 14,
       fontWeight: "700",
+      fontFamily: fontFamilies.bold,
       textAlign: "right",
     },
     statusContainer: {
@@ -128,12 +133,14 @@ const createAchievementModalStyles = (
       fontSize: 14,
       color: "#666",
       fontWeight: "500",
+      fontFamily: fontFamilies.medium,
       lineHeight: 20,
     },
     statusTextUnlocked: {
       flex: 1,
       fontSize: 14,
       fontWeight: "700",
+      fontFamily: fontFamilies.bold,
       lineHeight: 20,
     },
   });

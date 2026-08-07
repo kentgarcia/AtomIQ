@@ -1,3 +1,4 @@
+import {fontFamilies} from "@/theme";
 /**
  * Dynamic Lesson Renderer
  * Renders lesson steps based on content from the content system
@@ -449,11 +450,13 @@ const mythStyles = StyleSheet.create({
     color: "#FFF",
     fontSize: 16,
     fontWeight: "800",
+    fontFamily: fontFamilies.heavy,
     letterSpacing: 1,
   },
   headerSubtext: {
     color: THEME.textMuted,
     fontSize: 14,
+    fontFamily: fontFamilies.regular,
     marginTop: 12,
   },
   indicatorContainer: {
@@ -484,11 +487,13 @@ const mythStyles = StyleSheet.create({
   indicatorTextLeft: {
     color: THEME.error,
     fontWeight: "800",
+    fontFamily: fontFamilies.heavy,
     fontSize: 14,
   },
   indicatorTextRight: {
     color: THEME.success,
     fontWeight: "800",
+    fontFamily: fontFamilies.heavy,
     fontSize: 14,
   },
   flashCard: {
@@ -541,6 +546,7 @@ const mythStyles = StyleSheet.create({
   questionMark: {
     fontSize: 32,
     fontWeight: "900",
+    fontFamily: fontFamilies.black,
     color: THEME.primary,
   },
   mythContent: {
@@ -551,12 +557,14 @@ const mythStyles = StyleSheet.create({
     fontSize: 48,
     color: "rgba(239,68,68,0.2)",
     fontWeight: "900",
+    fontFamily: fontFamilies.black,
     lineHeight: 48,
     marginBottom: -10,
   },
   mythText: {
     fontSize: 22,
     fontWeight: "700",
+    fontFamily: fontFamilies.bold,
     color: THEME.text,
     textAlign: "center",
     lineHeight: 32,
@@ -566,6 +574,7 @@ const mythStyles = StyleSheet.create({
     fontSize: 48,
     color: "rgba(239,68,68,0.2)",
     fontWeight: "900",
+    fontFamily: fontFamilies.black,
     lineHeight: 48,
     marginTop: -10,
     alignSelf: "flex-end",
@@ -595,6 +604,7 @@ const mythStyles = StyleSheet.create({
   speakBtnText: {
     color: THEME.primary,
     fontWeight: "700",
+    fontFamily: fontFamilies.bold,
     fontSize: 14,
   },
   swipeHint: {
@@ -618,11 +628,13 @@ const mythStyles = StyleSheet.create({
   },
   swipeHintText: {
     fontWeight: "700",
+    fontFamily: fontFamilies.bold,
     fontSize: 12,
   },
   swipeDivider: {
     color: THEME.textMuted,
     fontSize: 11,
+    fontFamily: fontFamilies.regular,
   },
   feedbackCard: {
     width: width - 32,
@@ -656,11 +668,13 @@ const mythStyles = StyleSheet.create({
   feedbackTitle: {
     fontSize: 32,
     fontWeight: "900",
+    fontFamily: fontFamilies.black,
     color: "#FFF",
     marginBottom: 8,
   },
   feedbackSubtitle: {
     fontSize: 16,
+    fontFamily: fontFamilies.regular,
     color: "rgba(255,255,255,0.9)",
     marginBottom: 20,
   },
@@ -680,6 +694,7 @@ const mythStyles = StyleSheet.create({
   explanationLabel: {
     fontSize: 12,
     fontWeight: "800",
+    fontFamily: fontFamilies.heavy,
     color: THEME.text,
     flex: 1,
   },
@@ -690,6 +705,7 @@ const mythStyles = StyleSheet.create({
   },
   explanationText: {
     fontSize: 15,
+    fontFamily: fontFamilies.regular,
     color: THEME.text,
     lineHeight: 22,
     marginBottom: 16,
@@ -704,6 +720,7 @@ const mythStyles = StyleSheet.create({
   realityLabel: {
     fontSize: 12,
     fontWeight: "800",
+    fontFamily: fontFamilies.heavy,
     color: THEME.text,
     marginBottom: 6,
   },
@@ -712,6 +729,7 @@ const mythStyles = StyleSheet.create({
     color: THEME.text,
     lineHeight: 20,
     fontWeight: "600",
+    fontFamily: fontFamilies.semibold,
   },
   continueBtn: {
     width: "100%",
@@ -733,6 +751,7 @@ const mythStyles = StyleSheet.create({
   continueBtnText: {
     fontSize: 16,
     fontWeight: "800",
+    fontFamily: fontFamilies.heavy,
   },
 });
 
@@ -916,7 +935,7 @@ export const AssessmentRenderer = ({
                 <Text
                   style={[
                     styles.quizOptionText,
-                    (confirmed || selected === index) && { fontWeight: "700" },
+                    (confirmed || selected === index) && { fontWeight: "700", fontFamily: fontFamilies.bold },
                   ]}
                 >
                   {opt}
@@ -1018,6 +1037,7 @@ const styles = StyleSheet.create({
   stepHeader: {
     fontSize: 14,
     fontWeight: "800",
+    fontFamily: fontFamilies.heavy,
     color: THEME.primary,
     textAlign: "center",
     letterSpacing: 2,
@@ -1025,6 +1045,7 @@ const styles = StyleSheet.create({
   },
   stepSubHeader: {
     fontSize: 13,
+    fontFamily: fontFamilies.regular,
     color: THEME.textMuted,
     textAlign: "center",
     marginBottom: 24,
@@ -1045,12 +1066,14 @@ const styles = StyleSheet.create({
   briefingTitle: {
     fontSize: 28,
     fontWeight: "800",
+    fontFamily: fontFamilies.heavy,
     color: THEME.text,
     textAlign: "center",
     marginBottom: 8,
   },
   briefingSubtitle: {
     fontSize: 18,
+    fontFamily: fontFamilies.regular,
     color: THEME.textMuted,
     textAlign: "center",
     marginBottom: 32,
@@ -1095,11 +1118,13 @@ const styles = StyleSheet.create({
   mythBadgeText: {
     color: "#FFF",
     fontWeight: "800",
+    fontFamily: fontFamilies.heavy,
     fontSize: 12,
   },
   mythText: {
     fontSize: 24,
     fontWeight: "700",
+    fontFamily: fontFamilies.bold,
     color: THEME.text,
     textAlign: "center",
     marginBottom: 24,
@@ -1141,12 +1166,14 @@ const styles = StyleSheet.create({
   feedbackTitle: {
     fontSize: 32,
     fontWeight: "800",
+    fontFamily: fontFamilies.heavy,
     color: "#FFF",
     marginTop: 16,
     marginBottom: 16,
   },
   feedbackText: {
     fontSize: 16,
+    fontFamily: fontFamilies.regular,
     color: "rgba(255,255,255,0.9)",
     textAlign: "center",
     marginBottom: 16,
@@ -1161,6 +1188,7 @@ const styles = StyleSheet.create({
   realityLabel: {
     fontSize: 12,
     fontWeight: "800",
+    fontFamily: fontFamilies.heavy,
     color: "#FFF",
     marginBottom: 8,
   },
@@ -1168,6 +1196,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#FFF",
     fontWeight: "600",
+    fontFamily: fontFamilies.semibold,
   },
   continueBtn: {
     backgroundColor: "#FFF",
@@ -1180,6 +1209,7 @@ const styles = StyleSheet.create({
   continueBtnText: {
     fontSize: 16,
     fontWeight: "800",
+    fontFamily: fontFamilies.heavy,
     color: THEME.text,
   },
   conceptCard: {
@@ -1200,11 +1230,13 @@ const styles = StyleSheet.create({
   conceptTitle: {
     fontSize: 22,
     fontWeight: "800",
+    fontFamily: fontFamilies.heavy,
     color: THEME.text,
     marginBottom: 12,
   },
   conceptText: {
     fontSize: 16,
+    fontFamily: fontFamilies.regular,
     color: THEME.text,
     lineHeight: 24,
     marginBottom: 16,
@@ -1215,6 +1247,7 @@ const styles = StyleSheet.create({
   keyPointsTitle: {
     fontSize: 14,
     fontWeight: "800",
+    fontFamily: fontFamilies.heavy,
     color: THEME.primary,
     marginBottom: 12,
   },
@@ -1227,6 +1260,7 @@ const styles = StyleSheet.create({
   keyPointText: {
     flex: 1,
     fontSize: 14,
+    fontFamily: fontFamilies.regular,
     color: THEME.text,
     lineHeight: 20,
   },
@@ -1242,6 +1276,7 @@ const styles = StyleSheet.create({
   taskText: {
     fontSize: 18,
     fontWeight: "700",
+    fontFamily: fontFamilies.bold,
     color: THEME.text,
     textAlign: "center",
     marginBottom: 24,
@@ -1272,6 +1307,7 @@ const styles = StyleSheet.create({
   optionText: {
     fontSize: 14,
     fontWeight: "700",
+    fontFamily: fontFamilies.bold,
     color: THEME.text,
     textAlign: "center",
   },
@@ -1291,6 +1327,7 @@ const styles = StyleSheet.create({
   resultText: {
     flex: 1,
     fontSize: 14,
+    fontFamily: fontFamilies.regular,
     color: THEME.text,
   },
   quizCard: {
@@ -1299,6 +1336,7 @@ const styles = StyleSheet.create({
   questionText: {
     fontSize: 20,
     fontWeight: "700",
+    fontFamily: fontFamilies.bold,
     color: THEME.text,
     marginBottom: 24,
     lineHeight: 28,
@@ -1337,6 +1375,7 @@ const styles = StyleSheet.create({
   },
   quizOptionText: {
     fontSize: 16,
+    fontFamily: fontFamilies.regular,
     color: THEME.text,
   },
   explanationBox: {
@@ -1349,6 +1388,7 @@ const styles = StyleSheet.create({
   },
   explanationText: {
     fontSize: 14,
+    fontFamily: fontFamilies.regular,
     color: THEME.text,
     lineHeight: 20,
   },
@@ -1366,16 +1406,19 @@ const styles = StyleSheet.create({
   mainBtnText: {
     fontSize: 16,
     fontWeight: "800",
+    fontFamily: fontFamilies.heavy,
     color: "#FFF",
   },
   successTitle: {
     fontSize: 32,
     fontWeight: "800",
+    fontFamily: fontFamilies.heavy,
     color: THEME.primary,
     marginBottom: 12,
   },
   successText: {
     fontSize: 18,
+    fontFamily: fontFamilies.regular,
     color: THEME.textMuted,
     textAlign: "center",
     marginBottom: 32,
@@ -1400,6 +1443,7 @@ const styles = StyleSheet.create({
   rewardText: {
     fontSize: 18,
     fontWeight: "800",
+    fontFamily: fontFamilies.heavy,
     color: THEME.text,
   },
 });

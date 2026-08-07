@@ -1,5 +1,5 @@
 import { Icon } from "@/components/ui/icon";
-import { useTheme, type Palette } from "@/theme";
+import {useTheme, type Palette, fontFamilies} from "@/theme";
 import useFriendsSync from "@/hooks/use-friends-sync";
 import {
     PROFILE_AVATAR_OPTIONS,
@@ -855,17 +855,20 @@ const createStyles = (theme: Palette, width: number) =>
     levelText: {
       color: "#FFF",
       fontWeight: "800",
+      fontFamily: fontFamilies.heavy,
       fontSize: 14,
     },
     name: {
       fontSize: 24,
       fontWeight: "800",
+      fontFamily: fontFamilies.heavy,
       color: theme.text,
       marginBottom: 4,
     },
     friendCode: {
       fontSize: 12,
       fontWeight: "700",
+      fontFamily: fontFamilies.bold,
       color: theme.primary,
       marginBottom: 4,
       textTransform: "uppercase",
@@ -875,11 +878,13 @@ const createStyles = (theme: Palette, width: number) =>
       fontSize: 14,
       color: theme.textMuted,
       fontWeight: "600",
+      fontFamily: fontFamilies.semibold,
     },
     syncStatus: {
       fontSize: 12,
       color: theme.textMuted,
       fontWeight: "600",
+      fontFamily: fontFamilies.semibold,
       marginTop: 4,
     },
     avatarPickerSection: {
@@ -890,6 +895,7 @@ const createStyles = (theme: Palette, width: number) =>
     avatarPickerLabel: {
       fontSize: 11,
       fontWeight: "700",
+      fontFamily: fontFamilies.bold,
       color: theme.textMuted,
       textTransform: "uppercase",
       letterSpacing: 0.5,
@@ -913,6 +919,7 @@ const createStyles = (theme: Palette, width: number) =>
       color: "#FFFFFF",
       fontSize: 13,
       fontWeight: "800",
+      fontFamily: fontFamilies.heavy,
       letterSpacing: 0.2,
     },
 
@@ -944,6 +951,7 @@ const createStyles = (theme: Palette, width: number) =>
     avatarModalTitle: {
       fontSize: 20,
       fontWeight: "800",
+      fontFamily: fontFamilies.heavy,
       color: theme.text,
     },
     avatarModalGrid: {
@@ -988,6 +996,7 @@ const createStyles = (theme: Palette, width: number) =>
       color: theme.textMuted,
       fontSize: 12,
       fontWeight: "600",
+      fontFamily: fontFamilies.semibold,
     },
     tabsContainer: {
       flexDirection: "row",
@@ -1009,11 +1018,13 @@ const createStyles = (theme: Palette, width: number) =>
     tabText: {
       fontSize: 14,
       fontWeight: "600",
+      fontFamily: fontFamilies.semibold,
       color: theme.textMuted,
     },
     activeTabText: {
       color: theme.primary,
       fontWeight: "700",
+      fontFamily: fontFamilies.bold,
     },
     contentArea: {
       paddingHorizontal: 20,
@@ -1035,11 +1046,13 @@ const createStyles = (theme: Palette, width: number) =>
     progressTitle: {
       fontSize: 18,
       fontWeight: "800",
+      fontFamily: fontFamilies.heavy,
       color: "#FFF",
     },
     xpText: {
       fontSize: 14,
       fontWeight: "700",
+      fontFamily: fontFamilies.bold,
       color: "rgba(255,255,255,0.9)",
     },
     progressBarBg: {
@@ -1058,6 +1071,7 @@ const createStyles = (theme: Palette, width: number) =>
       fontSize: 12,
       color: "rgba(255,255,255,0.8)",
       fontWeight: "600",
+      fontFamily: fontFamilies.semibold,
     },
     statsGrid: {
       flexDirection: "row",
@@ -1088,6 +1102,7 @@ const createStyles = (theme: Palette, width: number) =>
     statValue: {
       fontSize: 24,
       fontWeight: "800",
+      fontFamily: fontFamilies.heavy,
       color: "#FFF",
       marginBottom: 4,
     },
@@ -1095,6 +1110,7 @@ const createStyles = (theme: Palette, width: number) =>
       fontSize: 12,
       color: "rgba(255,255,255,0.9)",
       fontWeight: "600",
+      fontFamily: fontFamilies.semibold,
     },
     emptyStateContainer: {
       alignItems: "center",
@@ -1106,12 +1122,14 @@ const createStyles = (theme: Palette, width: number) =>
     emptyStateTitle: {
       fontSize: 18,
       fontWeight: "800",
+      fontFamily: fontFamilies.heavy,
       color: theme.text,
       marginTop: 16,
       marginBottom: 8,
     },
     emptyStateDesc: {
       fontSize: 14,
+      fontFamily: fontFamilies.regular,
       color: theme.textMuted,
       textAlign: "center",
       lineHeight: 20,
@@ -1132,6 +1150,7 @@ const createStyles = (theme: Palette, width: number) =>
       color: "#FFF",
       fontSize: 16,
       fontWeight: "700",
+      fontFamily: fontFamilies.bold,
     },
     modalOverlay: {
       flex: 1,
@@ -1155,6 +1174,7 @@ const createStyles = (theme: Palette, width: number) =>
     modalTitle: {
       fontSize: 20,
       fontWeight: "700",
+      fontFamily: fontFamilies.bold,
       color: theme.text,
     },
     closeButton: {
@@ -1176,6 +1196,7 @@ const createStyles = (theme: Palette, width: number) =>
       fontSize: 16,
       color: theme.text,
       fontWeight: "600",
+      fontFamily: fontFamilies.semibold,
     },
     searchButton: {
       backgroundColor: theme.primary,
@@ -1187,6 +1208,7 @@ const createStyles = (theme: Palette, width: number) =>
       color: "#FFF",
       fontSize: 14,
       fontWeight: "700",
+      fontFamily: fontFamilies.bold,
     },
     modalResults: {
       flex: 1,
@@ -1199,6 +1221,7 @@ const createStyles = (theme: Palette, width: number) =>
     },
     modalEmptyText: {
       fontSize: 14,
+      fontFamily: fontFamilies.regular,
       color: theme.textMuted,
       marginTop: 12,
       textAlign: "center",
@@ -1226,6 +1249,7 @@ const createStyles = (theme: Palette, width: number) =>
     searchResultName: {
       fontSize: 16,
       fontWeight: "700",
+      fontFamily: fontFamilies.bold,
       color: theme.text,
       marginBottom: 4,
     },
@@ -1233,6 +1257,7 @@ const createStyles = (theme: Palette, width: number) =>
       fontSize: 12,
       color: theme.textMuted,
       fontWeight: "600",
+      fontFamily: fontFamilies.semibold,
     },
     npcBadge: {
       position: "absolute",
@@ -1255,6 +1280,7 @@ const createStyles = (theme: Palette, width: number) =>
     npcLabel: {
       fontSize: 10,
       fontWeight: "700",
+      fontFamily: fontFamilies.bold,
       color: "#FFD66E",
       backgroundColor: "rgba(255, 214, 110, 0.1)",
       paddingHorizontal: 6,
@@ -1285,6 +1311,7 @@ const createStyles = (theme: Palette, width: number) =>
     sentButtonText: {
       fontSize: 12,
       fontWeight: "700",
+      fontFamily: fontFamilies.bold,
       color: theme.primary,
     },
 
@@ -1319,16 +1346,19 @@ const createStyles = (theme: Palette, width: number) =>
     detailLabel: {
       fontSize: 14,
       fontWeight: "700",
+      fontFamily: fontFamilies.bold,
     },
     detailValue: {
       fontSize: 24,
       fontWeight: "800",
+      fontFamily: fontFamilies.heavy,
       marginTop: 6,
       marginBottom: 6,
     },
     detailSubtle: {
       fontSize: 12,
       fontWeight: "600",
+      fontFamily: fontFamilies.semibold,
     },
     detailProgressBg: {
       height: 10,
@@ -1390,6 +1420,7 @@ const createStyles = (theme: Palette, width: number) =>
     friendName: {
       fontSize: 16,
       fontWeight: "700",
+      fontFamily: fontFamilies.bold,
       color: theme.text,
       marginBottom: 2,
     },
@@ -1397,6 +1428,7 @@ const createStyles = (theme: Palette, width: number) =>
       fontSize: 12,
       color: theme.textMuted,
       fontWeight: "500",
+      fontFamily: fontFamilies.medium,
     },
     requestHeader: {
       flexDirection: "row",
@@ -1408,6 +1440,7 @@ const createStyles = (theme: Palette, width: number) =>
     sectionTitle: {
       fontSize: 16,
       fontWeight: "700",
+      fontFamily: fontFamilies.bold,
       color: theme.text,
     },
     refreshButton: {
@@ -1424,6 +1457,7 @@ const createStyles = (theme: Palette, width: number) =>
     refreshButtonText: {
       fontSize: 12,
       fontWeight: "700",
+      fontFamily: fontFamilies.bold,
       color: theme.primary,
     },
     requestCard: {

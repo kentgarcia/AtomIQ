@@ -1,5 +1,5 @@
 import { Icon } from "@/components/ui/icon";
-import { useTheme, type Palette } from "@/theme";
+import {useTheme, type Palette, fontFamilies} from "@/theme";
 import { clearAllData, deleteAccountData } from "@/services/database";
 import { getSoundEnabled, setSoundEnabled } from "@/services/storage";
 import { useStorage } from "@/services/StorageContext";
@@ -1118,6 +1118,7 @@ const createStyles = (theme: Palette) =>
     headerTitle: {
       fontSize: 18,
       fontWeight: "700",
+      fontFamily: fontFamilies.bold,
       color: theme.text,
     },
     content: {
@@ -1126,6 +1127,7 @@ const createStyles = (theme: Palette) =>
     sectionTitle: {
       fontSize: 14,
       fontWeight: "700",
+      fontFamily: fontFamilies.bold,
       color: theme.textMuted,
       marginBottom: 12,
       marginTop: 8,
@@ -1169,16 +1171,19 @@ const createStyles = (theme: Palette) =>
     settingLabel: {
       fontSize: 16,
       fontWeight: "600",
+      fontFamily: fontFamilies.semibold,
       color: theme.text,
     },
     settingDescription: {
       fontSize: 13,
+      fontFamily: fontFamilies.regular,
       color: theme.textMuted,
       marginTop: 2,
     },
     settingValue: {
       fontSize: 15,
       fontWeight: "500",
+      fontFamily: fontFamilies.medium,
       color: theme.textMuted,
       marginRight: 8,
     },
@@ -1198,6 +1203,7 @@ const createStyles = (theme: Palette) =>
       color: "#FFFFFF",
       fontSize: 13,
       fontWeight: "700",
+      fontFamily: fontFamilies.bold,
     },
     friendCodeValue: {
       fontFamily: "monospace",
@@ -1228,6 +1234,7 @@ const createStyles = (theme: Palette) =>
       paddingHorizontal: 12,
       paddingVertical: 8,
       fontSize: 15,
+      fontFamily: fontFamilies.regular,
       color: theme.text,
     },
     transferCodeInput: {
@@ -1254,11 +1261,13 @@ const createStyles = (theme: Palette) =>
     transferPreviewTitle: {
       fontSize: 14,
       fontWeight: "700",
+      fontFamily: fontFamilies.bold,
       color: theme.text,
       marginBottom: 6,
     },
     transferPreviewLine: {
       fontSize: 13,
+      fontFamily: fontFamilies.regular,
       color: theme.textMuted,
     },
     transferOverwriteBtn: {
@@ -1273,6 +1282,7 @@ const createStyles = (theme: Palette) =>
       color: "#FFFFFF",
       fontSize: 13,
       fontWeight: "700",
+      fontFamily: fontFamilies.bold,
     },
     saveBtn: {
       padding: 8,
@@ -1293,11 +1303,13 @@ const createStyles = (theme: Palette) =>
       fontSize: 12,
       color: theme.primary,
       fontWeight: "600",
+      fontFamily: fontFamilies.semibold,
       lineHeight: 18,
     },
     destructiveLabel: {
       fontSize: 16,
       fontWeight: "600",
+      fontFamily: fontFamilies.semibold,
       color: "#EF4444",
     },
   });

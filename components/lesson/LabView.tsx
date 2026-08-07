@@ -10,7 +10,7 @@ import {
 import Animated, { FadeInDown } from "react-native-reanimated";
 import * as Speech from "expo-speech";
 
-import { type Palette } from "@/theme";
+import {type Palette, fontFamilies} from "@/theme";
 import { Icon } from "@/components/ui/icon";
 
 import { createLabStyles, createStyles } from "./styles";
@@ -161,14 +161,17 @@ export const LabView = ({
                         !showFeedback && {
                           color: theme.primary,
                           fontWeight: "700",
+                          fontFamily: fontFamilies.bold,
                         },
                       showCorrectMark && {
                         color: theme.success,
                         fontWeight: "700",
+                        fontFamily: fontFamilies.bold,
                       },
                       showWrongMark && {
                         color: theme.error,
                         fontWeight: "700",
+                        fontFamily: fontFamilies.bold,
                       },
                     ]}
                   >

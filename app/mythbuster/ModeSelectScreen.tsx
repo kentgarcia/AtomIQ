@@ -1,5 +1,5 @@
 import { Icon } from "@/components/ui/icon";
-import { MythTheme as THEME } from "@/theme";
+import { fontFamilies, MythTheme as THEME } from "@/theme";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import React from "react";
@@ -199,11 +199,11 @@ export default function ModeSelectScreen({
               </View>
               <Text style={[styles.infoText, { color: textColor }]}>
                 Swipe left for{" "}
-                <Text style={{ color: THEME.error, fontWeight: "800" }}>
+                <Text style={{ color: THEME.error, fontWeight: "800", fontFamily: fontFamilies.heavy }}>
                   MYTH
                 </Text>{" "}
                 and right for{" "}
-                <Text style={{ color: THEME.success, fontWeight: "800" }}>
+                <Text style={{ color: THEME.success, fontWeight: "800", fontFamily: fontFamilies.heavy }}>
                   TRUTH
                 </Text>
                 !

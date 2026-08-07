@@ -8,7 +8,7 @@ import Animated, { FadeInDown } from "react-native-reanimated";
 import Svg, { Circle } from "react-native-svg";
 
 import { Icon } from "@/components/ui/icon";
-import { TabLight as LightTHEME } from "@/theme";
+import {TabLight as LightTHEME, fontFamilies} from "@/theme";
 
 const createAchievementStyles = (theme: typeof LightTHEME, width: number) =>
   StyleSheet.create({
@@ -54,6 +54,7 @@ const createAchievementStyles = (theme: typeof LightTHEME, width: number) =>
     achievementCardTitle: {
       fontSize: 15,
       fontWeight: "800",
+      fontFamily: fontFamilies.heavy,
       marginBottom: 4,
       textAlign: "center",
       color: theme.text,
@@ -66,6 +67,7 @@ const createAchievementStyles = (theme: typeof LightTHEME, width: number) =>
       color: theme.textMuted,
       textAlign: "center",
       fontWeight: "500",
+      fontFamily: fontFamilies.medium,
       lineHeight: 16,
     },
     achievementStatusBadge: {
@@ -77,6 +79,7 @@ const createAchievementStyles = (theme: typeof LightTHEME, width: number) =>
     achievementStatusText: {
       fontSize: 10,
       fontWeight: "700",
+      fontFamily: fontFamilies.bold,
     },
   });
 

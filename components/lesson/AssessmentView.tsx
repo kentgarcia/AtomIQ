@@ -9,7 +9,7 @@ import {
 import Animated, { FadeInDown } from "react-native-reanimated";
 import * as Speech from "expo-speech";
 
-import { type Palette } from "@/theme";
+import {type Palette, fontFamilies} from "@/theme";
 import { Icon } from "@/components/ui/icon";
 
 import { createQuizStyles, createStyles } from "./styles";
@@ -143,14 +143,17 @@ export const AssessmentView = ({
                         !confirmed && {
                           color: theme.primary,
                           fontWeight: "700",
+                          fontFamily: fontFamilies.bold,
                         },
                       showCorrectMark && {
                         color: theme.success,
                         fontWeight: "700",
+                        fontFamily: fontFamilies.bold,
                       },
                       showWrongMark && {
                         color: theme.error,
                         fontWeight: "700",
+                        fontFamily: fontFamilies.bold,
                       },
                     ]}
                   >
