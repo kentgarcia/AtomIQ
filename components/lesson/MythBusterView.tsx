@@ -19,7 +19,7 @@ import Animated, {
 import { LinearGradient } from "expo-linear-gradient";
 import * as Speech from "expo-speech";
 
-import { type Palette } from "@/theme";
+import {type Palette, fontFamilies} from "@/theme";
 import { Icon } from "@/components/ui/icon";
 
 import { createMythStyles, createStyles } from "./styles";
@@ -283,6 +283,7 @@ export const MythBusterView = ({
                     style={{
                       color: theme.error,
                       fontWeight: "800",
+                      fontFamily: fontFamilies.heavy,
                       fontSize: 14,
                     }}
                   >
@@ -294,6 +295,7 @@ export const MythBusterView = ({
                     style={{
                       color: theme.success,
                       fontWeight: "800",
+                      fontFamily: fontFamilies.heavy,
                       fontSize: 14,
                     }}
                   >

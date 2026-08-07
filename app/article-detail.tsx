@@ -1,7 +1,8 @@
 import { MarkdownText } from "@/components/markdown-text";
+import { getContentImage } from "@/components/community/image-source";
 import { Icon } from "@/components/ui/icon";
-import { getArticleById } from "@/content/articles";
-import { useTheme, type Palette } from "@/theme";
+import { getArticleById, getPostById } from "@/content/articles";
+import {useTheme, type Palette, fontFamilies} from "@/theme";
 import { openExternalUrl } from "@/services/open-url";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React from "react";
@@ -17,6 +18,21 @@ import {
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+type ReaderContent = {
+  title: string;
+  content: string;
+  category: string;
+  subtitle?: string;
+  readTime?: number;
+  difficulty?: string;
+  author: { name: string; avatar?: any; title?: string };
+  publishedDate: string;
+  image?: any;
+  source?: string;
+  sourceUrl?: string;
+  tags?: string[];
+};
+
 export default function ArticleDetailScreen() {
   const { id } = useLocalSearchParams();
   const router = useRouter();
@@ -26,7 +42,8 @@ export default function ArticleDetailScreen() {
   const styles = React.useMemo(() => createStyles(THEME, width), [THEME, width]);
   const articleId = typeof id === "string" ? id.replace("article-", "") : "";
 
-  const article = getArticleById(articleId);
+  const article = (getArticleById(articleId) ||
+    getPostById(articleId)) as ReaderContent | undefined;
 
   if (!article) {
     return (
@@ -81,7 +98,7 @@ export default function ArticleDetailScreen() {
         {article.image && (
           <Animated.View entering={FadeInDown.delay(100)}>
             <Image
-              source={{ uri: article.image }}
+              source={getContentImage(article.image)}
               style={styles.heroImage}
               resizeMode="cover"
             />
@@ -113,7 +130,7 @@ export default function ArticleDetailScreen() {
             <View style={styles.authorAvatar}>
               {article.author.avatar ? (
                 <Image
-                  source={{ uri: article.author.avatar }}
+                  source={getContentImage(article.author.avatar)}
                   style={styles.avatarImage}
                 />
               ) : (
@@ -214,7 +231,7 @@ const createStyles = (theme: Palette, width: number) =>
   StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: "#FFFFFF",
+      backgroundColor: theme.bg,
     },
     errorContainer: {
       flex: 1,
@@ -225,6 +242,7 @@ const createStyles = (theme: Palette, width: number) =>
     errorText: {
       fontSize: 18,
       fontWeight: "700",
+      fontFamily: fontFamilies.bold,
       color: theme.text,
       marginTop: 16,
       marginBottom: 24,
@@ -244,6 +262,7 @@ const createStyles = (theme: Palette, width: number) =>
     backButtonText: {
       fontSize: 16,
       fontWeight: "700",
+      fontFamily: fontFamilies.bold,
       color: theme.primary,
     },
     externalLinkButton: {
@@ -258,6 +277,7 @@ const createStyles = (theme: Palette, width: number) =>
     externalLinkText: {
       fontSize: 13,
       fontWeight: "700",
+      fontFamily: fontFamilies.bold,
       color: theme.primary,
     },
     scrollView: {
@@ -285,12 +305,14 @@ const createStyles = (theme: Palette, width: number) =>
     categoryText: {
       fontSize: 11,
       fontWeight: "800",
+      fontFamily: fontFamilies.heavy,
       color: theme.primary,
       letterSpacing: 0.5,
     },
     title: {
       fontSize: 28,
       fontWeight: "800",
+      fontFamily: fontFamilies.heavy,
       color: theme.text,
       lineHeight: 36,
       marginBottom: 8,
@@ -298,6 +320,7 @@ const createStyles = (theme: Palette, width: number) =>
     subtitle: {
       fontSize: 18,
       fontWeight: "600",
+      fontFamily: fontFamilies.semibold,
       color: theme.textMuted,
       lineHeight: 26,
       marginBottom: 20,
@@ -330,11 +353,13 @@ const createStyles = (theme: Palette, width: number) =>
     authorName: {
       fontSize: 16,
       fontWeight: "700",
+      fontFamily: fontFamilies.bold,
       color: theme.text,
       marginBottom: 2,
     },
     authorTitle: {
       fontSize: 13,
+      fontFamily: fontFamilies.regular,
       color: theme.textMuted,
     },
     metaInfo: {
@@ -349,11 +374,13 @@ const createStyles = (theme: Palette, width: number) =>
       fontSize: 12,
       color: theme.textMuted,
       fontWeight: "600",
+      fontFamily: fontFamilies.semibold,
     },
     publishedDate: {
       fontSize: 13,
       color: theme.textMuted,
       fontWeight: "600",
+      fontFamily: fontFamilies.semibold,
     },
     contentContainer: {
       paddingHorizontal: 20,
@@ -366,6 +393,7 @@ const createStyles = (theme: Palette, width: number) =>
     tagsTitle: {
       fontSize: 14,
       fontWeight: "800",
+      fontFamily: fontFamilies.heavy,
       color: theme.text,
       marginBottom: 12,
     },
@@ -383,6 +411,7 @@ const createStyles = (theme: Palette, width: number) =>
     tagText: {
       fontSize: 13,
       fontWeight: "600",
+      fontFamily: fontFamilies.semibold,
       color: theme.textMuted,
     },
     sourceSection: {
@@ -403,10 +432,12 @@ const createStyles = (theme: Palette, width: number) =>
     sourceTitle: {
       fontSize: 13,
       fontWeight: "800",
+      fontFamily: fontFamilies.heavy,
       color: theme.text,
     },
     sourceText: {
       fontSize: 14,
+      fontFamily: fontFamilies.regular,
       color: theme.text,
       marginBottom: 12,
     },
@@ -419,6 +450,7 @@ const createStyles = (theme: Palette, width: number) =>
     sourceLinkText: {
       fontSize: 14,
       fontWeight: "700",
+      fontFamily: fontFamilies.bold,
       color: theme.primary,
     },
     bottomSpacing: {

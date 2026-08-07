@@ -9,7 +9,7 @@ import {
 import Animated, { FadeInDown } from "react-native-reanimated";
 
 import { Icon } from "@/components/ui/icon";
-import { TabLight as LightTHEME } from "@/theme";
+import {TabLight as LightTHEME, fontFamilies} from "@/theme";
 
 const createCertificatePreviewStyles = (
   theme: typeof LightTHEME,
@@ -67,10 +67,12 @@ const createCertificatePreviewStyles = (
     certHeaderText: {
       fontSize: 36,
       fontWeight: "300",
+      fontFamily: fontFamilies.light,
       letterSpacing: 8,
     },
     certOfText: {
       fontSize: 14,
+      fontFamily: fontFamilies.regular,
       color: "#666",
       fontStyle: "italic",
       marginVertical: 4,
@@ -78,6 +80,7 @@ const createCertificatePreviewStyles = (
     certAchievementText: {
       fontSize: 20,
       fontWeight: "600",
+      fontFamily: fontFamilies.semibold,
       letterSpacing: 6,
     },
     decorativeLine: {
@@ -91,6 +94,7 @@ const createCertificatePreviewStyles = (
     },
     certPresentedTo: {
       fontSize: 12,
+      fontFamily: fontFamilies.regular,
       color: "#666",
       fontStyle: "italic",
       marginBottom: 12,
@@ -98,12 +102,14 @@ const createCertificatePreviewStyles = (
     certRecipientName: {
       fontSize: 32,
       fontWeight: "600",
+      fontFamily: fontFamilies.semibold,
       color: "#1a1a1a",
       marginBottom: 16,
       textAlign: "center",
     },
     certCompletionText: {
       fontSize: 12,
+      fontFamily: fontFamilies.regular,
       color: "#666",
       fontStyle: "italic",
       marginBottom: 16,
@@ -111,11 +117,13 @@ const createCertificatePreviewStyles = (
     courseTitle: {
       fontSize: 22,
       fontWeight: "700",
+      fontFamily: fontFamilies.bold,
       textAlign: "center",
       marginBottom: 8,
     },
     courseDescription: {
       fontSize: 14,
+      fontFamily: fontFamilies.regular,
       color: "#555",
       textAlign: "center",
       fontStyle: "italic",
@@ -127,16 +135,19 @@ const createCertificatePreviewStyles = (
     },
     issueDateText: {
       fontSize: 11,
+      fontFamily: fontFamilies.regular,
       color: "#888",
       marginBottom: 12,
     },
     issuerName: {
       fontSize: 20,
       fontWeight: "800",
+      fontFamily: fontFamilies.heavy,
       letterSpacing: 4,
     },
     issuerTagline: {
       fontSize: 10,
+      fontFamily: fontFamilies.regular,
       color: "#888",
       letterSpacing: 1,
       marginTop: 4,
@@ -164,6 +175,7 @@ const createCertificatePreviewStyles = (
       color: "#333",
       fontSize: 16,
       fontWeight: "700",
+      fontFamily: fontFamilies.bold,
     },
   });
 

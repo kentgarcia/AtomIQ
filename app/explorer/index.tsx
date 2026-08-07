@@ -9,7 +9,7 @@ import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'rea
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { useTheme, withAlpha, type Palette } from '@/theme';
+import {useTheme, withAlpha, type Palette, fontFamilies} from "@/theme";
 
 export default function ExplorerScreen() {
   const router = useRouter();
@@ -163,6 +163,7 @@ const makeStyles = (THEME: Palette) => StyleSheet.create({
   journeyTitle: {
     fontSize: 20,
     fontWeight: '800',
+    fontFamily: fontFamilies.heavy,
     color: THEME.text,
     marginBottom: 4,
     lineHeight: 26,
@@ -171,6 +172,7 @@ const makeStyles = (THEME: Palette) => StyleSheet.create({
     fontSize: 14,
     color: THEME.textMuted,
     fontWeight: '600',
+    fontFamily: fontFamilies.semibold,
   },
   journeyBadge: {
     paddingHorizontal: 10,
@@ -182,11 +184,13 @@ const makeStyles = (THEME: Palette) => StyleSheet.create({
   journeyBadgeText: {
     fontSize: 11,
     fontWeight: '700',
+    fontFamily: fontFamilies.bold,
     color: THEME.primary,
     textTransform: 'uppercase',
   },
   journeyDescription: {
     fontSize: 14,
+    fontFamily: fontFamilies.regular,
     color: THEME.text,
     lineHeight: 20,
     marginBottom: 16,
@@ -209,9 +213,11 @@ const makeStyles = (THEME: Palette) => StyleSheet.create({
     fontSize: 12,
     color: THEME.textMuted,
     fontWeight: '600',
+    fontFamily: fontFamilies.semibold,
   },
   metaDot: {
     fontSize: 12,
+    fontFamily: fontFamilies.regular,
     color: THEME.border,
   },
   journeyFooter: {
@@ -232,6 +238,7 @@ const makeStyles = (THEME: Palette) => StyleSheet.create({
   tagText: {
     fontSize: 11,
     fontWeight: '600',
+    fontFamily: fontFamilies.semibold,
     color: THEME.textMuted,
     textTransform: 'capitalize',
   },

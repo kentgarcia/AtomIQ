@@ -34,7 +34,7 @@ import Svg, {
     Stop,
 } from "react-native-svg";
 
-import { useTheme, MapLight as LightTHEME, type Palette } from "@/theme";
+import {useTheme, MapLight as LightTHEME, type Palette, fontFamilies} from "@/theme";
 
 // Helper function to darken a color
 const darkenColor = (color: string, amount: number = 0.3): string => {
@@ -1231,6 +1231,7 @@ const createStyles = (theme: Palette) =>
     headerTitle: {
       fontSize: 16,
       fontWeight: "800",
+      fontFamily: fontFamilies.heavy,
       color: theme.textMuted,
       textTransform: "uppercase",
       letterSpacing: 1,
@@ -1266,6 +1267,7 @@ const createStyles = (theme: Palette) =>
     unitSubtitle: {
       fontSize: 12,
       fontWeight: "600",
+      fontFamily: fontFamilies.semibold,
       color: "rgba(255,255,255,0.8)",
       textTransform: "uppercase",
       letterSpacing: 1,
@@ -1273,6 +1275,7 @@ const createStyles = (theme: Palette) =>
     unitTitle: {
       fontSize: 20,
       fontWeight: "800",
+      fontFamily: fontFamilies.heavy,
       color: "#FFF",
       marginBottom: 4,
     },
@@ -1360,6 +1363,7 @@ const createStyles = (theme: Palette) =>
     },
     startText: {
       fontWeight: "800",
+      fontFamily: fontFamilies.heavy,
       color: theme.primary,
       fontSize: 14,
     },
@@ -1405,6 +1409,7 @@ const createStyles = (theme: Palette) =>
     modalSubtitle: {
       fontSize: 12,
       fontWeight: "600",
+      fontFamily: fontFamilies.semibold,
       color: theme.textMuted,
       textTransform: "uppercase",
       letterSpacing: 1,
@@ -1413,6 +1418,7 @@ const createStyles = (theme: Palette) =>
     modalTitle: {
       fontSize: 24,
       fontWeight: "800",
+      fontFamily: fontFamilies.heavy,
       color: theme.text,
       lineHeight: 30,
     },
@@ -1424,6 +1430,7 @@ const createStyles = (theme: Palette) =>
     },
     infoText: {
       fontSize: 15,
+      fontFamily: fontFamilies.regular,
       lineHeight: 24,
       color: theme.text,
       opacity: 0.8,
@@ -1446,6 +1453,7 @@ const createStyles = (theme: Palette) =>
       fontSize: 13,
       color: theme.primary,
       fontWeight: "500",
+      fontFamily: fontFamilies.medium,
     },
     modalActionBtn: {
       backgroundColor: theme.primary,
@@ -1459,6 +1467,7 @@ const createStyles = (theme: Palette) =>
     modalActionText: {
       fontSize: 16,
       fontWeight: "700",
+      fontFamily: fontFamilies.bold,
       color: "#FFF",
     },
     loadingContainer: {
@@ -1475,12 +1484,14 @@ const createStyles = (theme: Palette) =>
     loadingTitle: {
       fontSize: 24,
       fontWeight: "800",
+      fontFamily: fontFamilies.heavy,
       color: theme.text,
       textAlign: "center",
       marginBottom: 8,
     },
     loadingSubtitle: {
       fontSize: 16,
+      fontFamily: fontFamilies.regular,
       color: theme.textMuted,
       textAlign: "center",
       marginBottom: 32,

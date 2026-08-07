@@ -1,3 +1,4 @@
+import {fontFamilies} from "@/theme";
 import { MarkdownText } from "@/components/markdown-text";
 import { Icon } from "@/components/ui/icon";
 import { useColorScheme } from "@/hooks/use-color-scheme";
@@ -1050,12 +1051,14 @@ const createStyles = (theme: typeof LightCHAT_THEME) =>
     headerTitle: {
       fontSize: 18,
       fontWeight: "800",
+      fontFamily: fontFamilies.heavy,
       color: theme.text,
     },
     headerSubtitle: {
       fontSize: 11,
       color: theme.textMuted,
       fontWeight: "600",
+      fontFamily: fontFamilies.semibold,
     },
     headerActions: {
       flexDirection: "row",
@@ -1099,6 +1102,7 @@ const createStyles = (theme: typeof LightCHAT_THEME) =>
       fontSize: 12,
       color: theme.textMuted,
       fontWeight: "700",
+      fontFamily: fontFamilies.bold,
     },
     conversationChipTextActive: {
       color: theme.primary,
@@ -1149,6 +1153,7 @@ const createStyles = (theme: typeof LightCHAT_THEME) =>
     },
     messageText: {
       fontSize: 15,
+      fontFamily: fontFamilies.regular,
       lineHeight: 22,
     },
     botMessageText: {
@@ -1157,6 +1162,7 @@ const createStyles = (theme: typeof LightCHAT_THEME) =>
     userMessageText: {
       color: "#FFF",
       fontWeight: "600",
+      fontFamily: fontFamilies.semibold,
     },
     citationsContainer: {
       flexDirection: "row",
@@ -1182,12 +1188,14 @@ const createStyles = (theme: typeof LightCHAT_THEME) =>
       fontSize: 11,
       color: theme.textMuted,
       fontWeight: "700",
+      fontFamily: fontFamilies.bold,
       marginBottom: 6,
     },
     citationText: {
       fontSize: 10,
       color: theme.primary,
       fontWeight: "700",
+      fontFamily: fontFamilies.bold,
     },
     followUpContainer: {
       marginTop: 12,
@@ -1199,6 +1207,7 @@ const createStyles = (theme: typeof LightCHAT_THEME) =>
       fontSize: 11,
       color: theme.textMuted,
       fontWeight: "700",
+      fontFamily: fontFamilies.bold,
       marginBottom: 8,
     },
     followUpChips: {
@@ -1221,6 +1230,7 @@ const createStyles = (theme: typeof LightCHAT_THEME) =>
       fontSize: 11,
       color: theme.primary,
       fontWeight: "600",
+      fontFamily: fontFamilies.semibold,
     },
     errorContainer: {
       flexDirection: "row",
@@ -1238,6 +1248,7 @@ const createStyles = (theme: typeof LightCHAT_THEME) =>
       fontSize: 12,
       color: "#DC2626",
       fontWeight: "600",
+      fontFamily: fontFamilies.semibold,
     },
     thinkingWrapper: {
       flexDirection: "row",
@@ -1263,6 +1274,7 @@ const createStyles = (theme: typeof LightCHAT_THEME) =>
     },
     thinkingText: {
       fontSize: 13,
+      fontFamily: fontFamilies.regular,
       color: theme.textMuted,
       fontStyle: "italic",
     },
@@ -1293,6 +1305,7 @@ const createStyles = (theme: typeof LightCHAT_THEME) =>
       fontSize: 13,
       color: theme.text,
       fontWeight: "700",
+      fontFamily: fontFamilies.bold,
     },
     inputContainer: {
       paddingHorizontal: 20,
@@ -1313,6 +1326,7 @@ const createStyles = (theme: typeof LightCHAT_THEME) =>
       paddingHorizontal: 16,
       paddingVertical: 8,
       fontSize: 16,
+      fontFamily: fontFamilies.regular,
       color: theme.text,
       maxHeight: 100,
     },

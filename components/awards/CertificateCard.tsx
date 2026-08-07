@@ -8,7 +8,7 @@ import {
 import Animated, { FadeInDown } from "react-native-reanimated";
 
 import { Icon } from "@/components/ui/icon";
-import { TabLight as LightTHEME } from "@/theme";
+import {TabLight as LightTHEME, fontFamilies} from "@/theme";
 
 const createCertificateStyles = (theme: typeof LightTHEME) =>
   StyleSheet.create({
@@ -68,6 +68,7 @@ const createCertificateStyles = (theme: typeof LightTHEME) =>
     certificateLabel: {
       fontSize: 10,
       fontWeight: "800",
+      fontFamily: fontFamilies.heavy,
       color: "rgba(255,255,255,0.8)",
       letterSpacing: 1,
       marginBottom: 4,
@@ -75,6 +76,7 @@ const createCertificateStyles = (theme: typeof LightTHEME) =>
     certificateTitle: {
       fontSize: 18,
       fontWeight: "800",
+      fontFamily: fontFamilies.heavy,
       color: "#FFFFFF",
       marginBottom: 12,
       lineHeight: 22,
@@ -91,6 +93,7 @@ const createCertificateStyles = (theme: typeof LightTHEME) =>
     certificateButtonText: {
       fontSize: 12,
       fontWeight: "800",
+      fontFamily: fontFamilies.heavy,
     },
     certDecoration1: {
       position: "absolute",
@@ -130,6 +133,7 @@ const createCertificateStyles = (theme: typeof LightTHEME) =>
     certificateTitleLocked: {
       fontSize: 16,
       fontWeight: "700",
+      fontFamily: fontFamilies.bold,
       marginBottom: 4,
       color: theme.text,
       flexShrink: 1,
@@ -139,6 +143,7 @@ const createCertificateStyles = (theme: typeof LightTHEME) =>
       fontSize: 13,
       color: theme.textMuted,
       fontWeight: "500",
+      fontFamily: fontFamilies.medium,
       flexShrink: 1,
       width: "100%",
     },

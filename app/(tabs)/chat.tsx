@@ -1,6 +1,5 @@
 import { Icon } from "@/components/ui/icon";
-import { useTheme } from "@/theme";
-import { withAlpha } from "@/theme";
+import { fontFamilies, useTheme, withAlpha } from "@/theme";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import React, { useMemo } from "react";
@@ -173,6 +172,7 @@ const createStyles = (theme: ThemeType) =>
             textAlign: "center",
             lineHeight: theme.lineHeights.xl,
             fontWeight: theme.fontWeights.medium,
+            fontFamily: fontFamilies.medium,
             opacity: 0.8,
             color: theme.colors.text,
         },
@@ -212,6 +212,7 @@ const createStyles = (theme: ThemeType) =>
         },
         featureDescription: {
             fontSize: theme.fontSizes.md,
+            fontFamily: fontFamilies.regular,
             color: theme.colors.textMuted,
             lineHeight: theme.lineHeights.md,
         },

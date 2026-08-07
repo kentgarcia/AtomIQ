@@ -1,5 +1,5 @@
 import { Icon } from "@/components/ui/icon";
-import { useTheme, type Palette } from "@/theme";
+import {useTheme, type Palette, fontFamilies} from "@/theme";
 import {
     getLeaderboardSnapshot,
     getLeaderboardSnapshotUpdatedAt,
@@ -698,6 +698,7 @@ const createStyles = (theme: Palette) =>
       color: "#FFF",
       fontSize: 20,
       fontWeight: "700",
+      fontFamily: fontFamilies.bold,
       marginBottom: 10,
     },
     podiumContainer: {
@@ -743,10 +744,12 @@ const createStyles = (theme: Palette) =>
       color: "#FFF",
       fontSize: 12,
       fontWeight: "800",
+      fontFamily: fontFamilies.heavy,
     },
     podiumName: {
       color: "#FFF",
       fontWeight: "600",
+      fontFamily: fontFamilies.semibold,
       fontSize: 13,
       marginTop: 4,
       textAlign: "center",
@@ -754,11 +757,13 @@ const createStyles = (theme: Palette) =>
     podiumNameLarge: {
       fontSize: 15,
       fontWeight: "700",
+      fontFamily: fontFamilies.bold,
     },
     podiumXP: {
       color: "rgba(255,255,255,0.9)",
       fontSize: 11,
       fontWeight: "600",
+      fontFamily: fontFamilies.semibold,
       marginTop: 2,
       flexDirection: "row",
       alignItems: "center",
@@ -787,6 +792,7 @@ const createStyles = (theme: Palette) =>
     listRankText: {
       color: theme.textMuted,
       fontWeight: "800",
+      fontFamily: fontFamilies.heavy,
       fontSize: 16,
       width: 30,
       textAlign: "center",
@@ -807,12 +813,14 @@ const createStyles = (theme: Palette) =>
     listName: {
       color: theme.text,
       fontWeight: "800",
+      fontFamily: fontFamilies.heavy,
       fontSize: 16,
     },
     listTitle: {
       color: theme.textMuted,
       fontSize: 13,
       fontWeight: "600",
+      fontFamily: fontFamilies.semibold,
       marginTop: 2,
     },
     npcBadge: {
@@ -836,6 +844,7 @@ const createStyles = (theme: Palette) =>
     xpText: {
       color: theme.textMuted,
       fontWeight: "800",
+      fontFamily: fontFamilies.heavy,
       fontSize: 14,
     },
     stickyBar: {

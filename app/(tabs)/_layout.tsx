@@ -1,14 +1,13 @@
-import { colors, fontSizes, opacity, radius, shadows, spacing } from "@/theme/tokens";
+import { colors, spacing } from "@/theme/tokens";
 import { Icon } from "@/components/ui/icon";
-import { useTheme, withAlpha } from "@/theme";
+import {useTheme, withAlpha} from "@/theme";
 import { playButtonClickSfx } from "@/services/ui-sfx";
+import { LinearGradient } from "expo-linear-gradient";
 import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import { Tabs } from "expo-router";
 import React from "react";
 import {
-    Platform,
     StyleSheet,
-    Text,
     TouchableOpacity,
     View,
 } from "react-native";
@@ -56,27 +55,16 @@ const TabButton = ({
         <View
           style={[
             styles.iconContainer,
-            isFocused && { backgroundColor: withAlpha(theme.active, 0.08) },
+            isFocused && { backgroundColor: withAlpha(theme.active, 0.1) },
           ]}
         >
           <Icon
             name={tab.icon}
-            size={24}
+            size={26}
             color={isFocused ? theme.active : theme.inactive}
             variant={isFocused ? "Bold" : "Linear"}
           />
         </View>
-        <Text
-          style={[
-            styles.tabLabel,
-            {
-              color: isFocused ? theme.active : theme.inactive,
-              fontWeight: isFocused ? "700" : "500",
-            },
-          ]}
-        >
-          {tab.label}
-        </Text>
       </Animated.View>
     </TouchableOpacity>
   );
@@ -90,26 +78,32 @@ function ModernTabBar({ state, navigation }: BottomTabBarProps) {
 
   const tabs = [
     { name: "index", icon: "Home", label: "Home" },
-    { name: "community", icon: "People", label: "Feed" },
+    { name: "community", icon: "People", label: "Discover" },
     { name: "chat", icon: "Message", label: "AI" },
     { name: "awards", icon: "Cup", label: "Awards" },
     { name: "profile", icon: "Profile", label: "Profile" },
   ] as const;
 
   return (
-    <View
-      style={[
-        styles.tabBar,
-        {
-          paddingBottom:
-            (insets.bottom || 0) +
-            (Platform.select({ ios: 0, android: 8 }) || 8),
-          backgroundColor: THEME.bg,
-          borderTopColor: THEME.border,
-        },
-      ]}
-    >
-      {tabs.map((tab) => {
+    <View pointerEvents="box-none" style={StyleSheet.absoluteFill}>
+      <LinearGradient
+        pointerEvents="none"
+        colors={[withAlpha(THEME.bg, 0), withAlpha(THEME.bg, 0.96)]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 0, y: 1 }}
+        style={styles.fade}
+      />
+      <View
+        style={[
+          styles.tabBar,
+          {
+            bottom: (insets.bottom || 0) + 16,
+            backgroundColor: colors.role.onSurface,
+            borderColor: THEME.border,
+          },
+        ]}
+      >
+        {tabs.map((tab) => {
         const routeIndex = state.routes.findIndex((r) => r.name === tab.name);
         if (routeIndex === -1) return null;
 
@@ -138,6 +132,7 @@ function ModernTabBar({ state, navigation }: BottomTabBarProps) {
         );
       })}
     </View>
+    </View>
   );
 }
 
@@ -161,7 +156,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="community"
         options={{
-          title: "Community",
+          title: "Discovery Hub",
         }}
       />
       <Tabs.Screen
@@ -188,15 +183,28 @@ export default function TabLayout() {
 
 const styles = StyleSheet.create({
   tabBar: {
+    position: "absolute",
+    left: 36,
+    right: 36,
     flexDirection: "row",
-    borderTopWidth: 1,
-    paddingTop: spacing.lg,
+    alignItems: "center",
+    borderRadius: 34,
+    borderWidth: 2,
+    borderBottomWidth: 5,
+    paddingVertical: spacing.sm,
     paddingHorizontal: spacing.sm,
-    elevation: shadows.md?.elevation ?? 8,
+    elevation: 16,
     shadowColor: colors.role.black,
-    shadowOffset: { width: 0, height: -2 },
-    shadowOpacity: opacity.subtle,
-    shadowRadius: shadows.md?.shadowRadius ?? 8,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.18,
+    shadowRadius: 16,
+  },
+  fade: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    bottom: 0,
+    height: 180,
   },
   tabButton: {
     flex: 1,
@@ -206,16 +214,12 @@ const styles = StyleSheet.create({
   tabContent: {
     alignItems: "center",
     justifyContent: "center",
-    gap: spacing.xs,
   },
   iconContainer: {
-    padding: spacing.sm,
-    borderRadius: radius.lg,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     alignItems: "center",
     justifyContent: "center",
-  },
-  tabLabel: {
-    fontSize: fontSizes.xs,
-    letterSpacing: 0.2,
   },
 });

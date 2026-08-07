@@ -15,7 +15,7 @@ import {
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { useTheme, withAlpha, type Palette } from "@/theme";
+import {useTheme, withAlpha, type Palette, fontFamilies} from "@/theme";
 
 // Maze colors - Bright Mustard
 const MAZE_COLORS: Record<string, { color: string; colorSecondary: string }> = {
@@ -278,6 +278,7 @@ const makeStyles = (theme: Palette) => StyleSheet.create({
   headerBadgeText: {
     fontSize: 16,
     fontWeight: "900",
+    fontFamily: fontFamilies.black,
     color: theme.white,
   },
   modeScrollView: {
@@ -413,6 +414,7 @@ const makeStyles = (theme: Palette) => StyleSheet.create({
   modeStageText: {
     fontSize: 12,
     fontWeight: "800",
+    fontFamily: fontFamilies.heavy,
     color: withAlpha(theme.white, 0.92),
     textTransform: "uppercase",
     letterSpacing: 0.5,
@@ -427,16 +429,19 @@ const makeStyles = (theme: Palette) => StyleSheet.create({
   modeDifficultyChipText: {
     fontSize: 11,
     fontWeight: "800",
+    fontFamily: fontFamilies.heavy,
   },
   modeCardTitleNew: {
     fontSize: 18,
     fontWeight: "900",
+    fontFamily: fontFamilies.black,
     color: theme.white,
   },
   modeCardDescNew: {
     fontSize: 12,
     color: withAlpha(theme.white, 0.9),
     fontWeight: "500",
+    fontFamily: fontFamilies.medium,
     lineHeight: 16,
   },
   playArrowCircle: {

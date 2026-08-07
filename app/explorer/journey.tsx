@@ -10,7 +10,7 @@ import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-nati
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { useTheme, withAlpha, type Palette } from '@/theme';
+import {useTheme, withAlpha, type Palette, fontFamilies} from "@/theme";
 
 export default function JourneyScreen() {
   const router = useRouter();
@@ -184,6 +184,7 @@ const makeStyles = (THEME: Palette) => StyleSheet.create({
   },
   overviewDescription: {
     fontSize: 15,
+    fontFamily: fontFamilies.regular,
     color: 'THEME.white',
     lineHeight: 22,
     marginBottom: 16,
@@ -201,6 +202,7 @@ const makeStyles = (THEME: Palette) => StyleSheet.create({
     fontSize: 13,
     color: withAlpha(THEME.white, 0.9),
     fontWeight: '600',
+    fontFamily: fontFamilies.semibold,
   },
   pathContainer: {
     marginBottom: 24,
@@ -208,6 +210,7 @@ const makeStyles = (THEME: Palette) => StyleSheet.create({
   pathTitle: {
     fontSize: 18,
     fontWeight: '800',
+    fontFamily: fontFamilies.heavy,
     color: THEME.text,
     marginBottom: 16,
   },
@@ -257,11 +260,13 @@ const makeStyles = (THEME: Palette) => StyleSheet.create({
   nodeNumber: {
     fontSize: 12,
     fontWeight: '800',
+    fontFamily: fontFamilies.heavy,
     color: THEME.primary,
   },
   nodeType: {
     fontSize: 10,
     fontWeight: '700',
+    fontFamily: fontFamilies.bold,
     color: THEME.textMuted,
     backgroundColor: THEME.bg,
     paddingHorizontal: 8,
@@ -271,11 +276,13 @@ const makeStyles = (THEME: Palette) => StyleSheet.create({
   nodeTitle: {
     fontSize: 16,
     fontWeight: '700',
+    fontFamily: fontFamilies.bold,
     color: THEME.text,
     marginBottom: 4,
   },
   nodeDescription: {
     fontSize: 13,
+    fontFamily: fontFamilies.regular,
     color: THEME.textMuted,
     marginBottom: 12,
   },
@@ -287,6 +294,7 @@ const makeStyles = (THEME: Palette) => StyleSheet.create({
   nodePreviewText: {
     fontSize: 13,
     fontWeight: '700',
+    fontFamily: fontFamilies.bold,
     color: THEME.primary,
   },
   sourcesContainer: {
@@ -300,6 +308,7 @@ const makeStyles = (THEME: Palette) => StyleSheet.create({
   sourcesTitle: {
     fontSize: 16,
     fontWeight: '800',
+    fontFamily: fontFamilies.heavy,
     color: THEME.text,
     marginBottom: 12,
   },
@@ -314,11 +323,13 @@ const makeStyles = (THEME: Palette) => StyleSheet.create({
   sourceTitle: {
     fontSize: 13,
     fontWeight: '600',
+    fontFamily: fontFamilies.semibold,
     color: THEME.text,
     marginBottom: 2,
   },
   sourceOrg: {
     fontSize: 11,
+    fontFamily: fontFamilies.regular,
     color: THEME.textMuted,
   },
 });

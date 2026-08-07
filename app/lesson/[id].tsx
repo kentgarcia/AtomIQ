@@ -13,7 +13,7 @@ import Animated from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { getLevelProgress, updateLevelProgress } from "@/services/database";
-import { useTheme, type Palette } from "@/theme";
+import {useTheme, type Palette, fontFamilies} from "@/theme";
 
 import { AssessmentView } from "@/components/lesson/AssessmentView";
 import { BriefingView } from "@/components/lesson/BriefingView";
@@ -78,6 +78,7 @@ export default function LessonScreen() {
           style={{
             fontSize: 18,
             fontWeight: "700",
+            fontFamily: fontFamilies.bold,
             color: THEME.text,
             marginTop: 16,
           }}
@@ -94,7 +95,7 @@ export default function LessonScreen() {
           }}
           onPress={() => router.back()}
         >
-          <Text style={{ color: "#FFF", fontWeight: "700" }}>Go Back</Text>
+          <Text style={{ color: "#FFF", fontWeight: "700", fontFamily: fontFamilies.bold }}>Go Back</Text>
         </TouchableOpacity>
       </View>
     );
