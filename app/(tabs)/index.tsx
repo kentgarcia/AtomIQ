@@ -1,3 +1,4 @@
+import { SectionHeader } from "@/components/ui/section-header";
 import { Icon } from "@/components/ui/icon";
 import { UNITS } from "@/content/units";
 import { useTheme, type Palette } from "@/theme";
@@ -507,17 +508,19 @@ export default function HomeScreen() {
         </Animated.View>
 
         {/* Leaderboard Widget */}
-        <Animated.View
-          entering={FadeInDown.delay(400)}
-          style={styles.sectionHeader}
-        >
-          <Text style={styles.sectionTitle}>Leaderboard</Text>
-          <TouchableOpacity
-            style={styles.arrowButton}
-            onPress={() => router.push("/(tabs)/leaderboard")}
-          >
-            <Icon name="ArrowRight" size={20} color={THEME.textMuted} />
-          </TouchableOpacity>
+        <Animated.View entering={FadeInDown.delay(400)}>
+          <SectionHeader
+            title="Leaderboard"
+            palette={THEME}
+            right={
+              <TouchableOpacity
+                style={styles.arrowButton}
+                onPress={() => router.push("/(tabs)/leaderboard")}
+              >
+                <Icon name="ArrowRight" size={20} color={THEME.textMuted} />
+              </TouchableOpacity>
+            }
+          />
         </Animated.View>
 
         <Animated.View
@@ -740,17 +743,6 @@ const createStyles = (theme: Palette) =>
       bottom: 20,
       opacity: 0.9,
       transform: [{ rotate: "-10deg" }],
-    },
-    sectionHeader: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "center",
-      marginBottom: 16,
-    },
-    sectionTitle: {
-      fontSize: 20,
-      fontWeight: "800",
-      color: theme.text,
     },
     arrowButton: {
       width: 32,

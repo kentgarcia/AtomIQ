@@ -1,3 +1,4 @@
+import { PageHeader } from '@/components/ui/page-header';
 import { Icon } from '@/components/ui/icon';
 import { getAllEncyclopediaEntries, searchEncyclopedia } from '@/content/explorer';
 import { getEncyclopediaImage } from '@/content/explorer/encyclopedia/images';
@@ -31,16 +32,12 @@ export default function EncyclopediaScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: THEME.bg }}>
-      {/* Header */}
-      <View style={[styles.header, { paddingTop: insets.top + 20 }]}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <Icon name="ArrowLeft2" size={24} color={THEME.text} variant="Bold" />
-        </TouchableOpacity>
-        <View style={styles.headerContent}>
-          <Text style={styles.headerTitle}>Knowledge Vault</Text>
-          <Text style={styles.headerSubtitle}>Searchable Nuclear Science Encyclopedia</Text>
-        </View>
-      </View>
+      <PageHeader
+        title={"Knowledge Vault"}
+        subtitle={"Searchable Nuclear Science Encyclopedia"}
+        onBack={() => router.back()}
+        palette={THEME}
+      />
 
       {/* Search Bar */}
       <View style={styles.searchContainer}>
@@ -104,38 +101,6 @@ export default function EncyclopediaScreen() {
 }
 
 const makeStyles = (THEME: Palette) => StyleSheet.create({
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingBottom: 16,
-    backgroundColor: THEME.bg,
-    gap: 12,
-  },
-  backButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: THEME.card,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 2,
-    borderColor: THEME.border,
-    borderBottomWidth: 4,
-  },
-  headerContent: {
-    flex: 1,
-  },
-  headerTitle: {
-    fontSize: 24,
-    fontWeight: '800',
-    color: THEME.text,
-  },
-  headerSubtitle: {
-    fontSize: 13,
-    color: THEME.textMuted,
-    marginTop: 2,
-  },
   searchContainer: {
     paddingHorizontal: 20,
     paddingBottom: 12,

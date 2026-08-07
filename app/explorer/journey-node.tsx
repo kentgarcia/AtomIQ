@@ -1,4 +1,6 @@
 import MarkdownText from '@/components/markdown-text';
+import { PageHeader } from '@/components/ui/page-header';
+import { SectionHeader } from '@/components/ui/section-header';
 import { Icon } from '@/components/ui/icon';
 import { getArticleById } from '@/content/articles';
 import { getJourneyById } from '@/content/explorer';
@@ -54,16 +56,12 @@ export default function JourneyNodeScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: THEME.bg }}>
-      {/* Header */}
-      <View style={[styles.header, { paddingTop: insets.top + 20 }]}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <Icon name="ArrowLeft2" size={24} color={THEME.text} variant="Bold" />
-        </TouchableOpacity>
-        <View style={styles.headerContent}>
-          <Text style={styles.headerTitle}>{node.title}</Text>
-          <Text style={styles.headerSubtitle}>{journey.title}</Text>
-        </View>
-      </View>
+      <PageHeader
+        title={node.title}
+        subtitle={journey.title}
+        onBack={() => router.back()}
+        palette={THEME}
+      />
 
       <ScrollView contentContainerStyle={[styles.scrollContent, { paddingTop: insets.top + 20 }]} showsVerticalScrollIndicator={false}>
         {isMyth && 'mythStatement' in content ? (
@@ -78,10 +76,13 @@ export default function JourneyNodeScreen() {
                 end={{ x: 1, y: 1 }}
                 style={styles.sectionGradient}
               >
-                <View style={styles.sectionHeader}>
-                  <Icon name="Danger" size={32} color="THEME.white" variant="Bold" />
-                  <Text style={styles.sectionTitle}>What People Think</Text>
-                </View>
+                <SectionHeader
+                  icon="Danger"
+                  iconColor={THEME.white}
+                  titleColor={THEME.white}
+                  title="What People Think"
+                  palette={THEME}
+                />
                 <Text style={styles.mythStatement}>{content.mythStatement}</Text>
                 <View style={styles.commonBeliefs}>
                   <Text style={styles.commonBeliefsTitle}>Common Beliefs:</Text>
@@ -111,13 +112,16 @@ export default function JourneyNodeScreen() {
                 end={{ x: 1, y: 1 }}
                 style={styles.sectionGradient}
               >
-                <View style={styles.sectionHeader}>
-                  <Icon name="TickCircle" size={32} color="THEME.white" variant="Bold" />
-                  <Text style={styles.sectionTitle}>What Science Says</Text>
-                </View>
+                <SectionHeader
+                  icon="TickCircle"
+                  iconColor={THEME.white}
+                  titleColor={THEME.white}
+                  title="What Science Says"
+                  palette={THEME}
+                />
                 <Text style={styles.realityStatement}>{content.reality}</Text>
                 <View style={styles.explanationBox}>
-                  <MarkdownText text={content.explanation} style={styles.explanation} textColor="THEME.white" />
+                  <MarkdownText text={content.explanation} style={styles.explanation} textColor={THEME.white} />
                 </View>
                 
                 {/* Evidence from Sources */}
@@ -177,7 +181,7 @@ export default function JourneyNodeScreen() {
               }}
             >
               <Text style={[styles.navButtonText, styles.navButtonTextPrimary]}>Next</Text>
-              <Icon name="ArrowRight2" size={20} color="THEME.white" variant="Bold" />
+              <Icon name="ArrowRight2" size={20} color={THEME.white} variant="Bold" />
             </TouchableOpacity>
           )}
         </View>
@@ -192,38 +196,6 @@ const makeStyles = (THEME: Palette) => StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: THEME.bg,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingBottom: 16,
-    backgroundColor: THEME.bg,
-    gap: 12,
-  },
-  backButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: THEME.white,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 2,
-    borderColor: THEME.border,
-    borderBottomWidth: 4,
-  },
-  headerContent: {
-    flex: 1,
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: '800',
-    color: THEME.text,
-  },
-  headerSubtitle: {
-    fontSize: 13,
-    color: THEME.textMuted,
-    marginTop: 2,
   },
   scrollContent: {
     paddingHorizontal: 20,
@@ -241,28 +213,17 @@ const makeStyles = (THEME: Palette) => StyleSheet.create({
   sectionGradient: {
     padding: 20,
   },
-  sectionHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    marginBottom: 16,
-  },
-  sectionTitle: {
-    fontSize: 22,
-    fontWeight: '800',
-    color: 'THEME.white',
-  },
   mythStatement: {
     fontSize: 18,
     fontWeight: '700',
-    color: 'THEME.white',
+    color: THEME.white,
     lineHeight: 26,
     marginBottom: 20,
   },
   realityStatement: {
     fontSize: 18,
     fontWeight: '700',
-    color: 'THEME.white',
+    color: THEME.white,
     lineHeight: 26,
     marginBottom: 16,
   },
@@ -300,7 +261,7 @@ const makeStyles = (THEME: Palette) => StyleSheet.create({
   },
   explanation: {
     fontSize: 14,
-    color: 'THEME.white',
+    color: THEME.white,
     lineHeight: 22,
   },
   evidenceSection: {
@@ -326,7 +287,7 @@ const makeStyles = (THEME: Palette) => StyleSheet.create({
   evidenceSource: {
     fontSize: 13,
     fontWeight: '600',
-    color: 'THEME.white',
+    color: THEME.white,
     marginBottom: 2,
   },
   evidenceAuthor: {
@@ -388,7 +349,7 @@ const makeStyles = (THEME: Palette) => StyleSheet.create({
     color: THEME.primary,
   },
   navButtonTextPrimary: {
-    color: 'THEME.white',
+    color: THEME.white,
   },
 });
 

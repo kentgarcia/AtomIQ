@@ -1,3 +1,5 @@
+import { PageHeader } from '@/components/ui/page-header';
+import { SectionHeader } from '@/components/ui/section-header';
 import { Icon } from '@/components/ui/icon';
 import { getAllJourneys } from '@/content/explorer';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -19,23 +21,20 @@ export default function ExplorerScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: THEME.bg }}>
-      {/* Header */}
-      <View style={[styles.header, { paddingTop: insets.top + 20 }]}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <Icon name="ArrowLeft2" size={24} color={THEME.text} variant="Bold" />
-        </TouchableOpacity>
-        <View style={styles.headerContent}>
-          <Text style={styles.headerTitle}>AtomIQ Explorer</Text>
-          <Text style={styles.headerSubtitle}>Encarta-Style Knowledge Journey</Text>
-        </View>
-      </View>
+      <PageHeader
+        title={"AtomIQ Explorer"}
+        subtitle={"Encarta-Style Knowledge Journey"}
+        onBack={() => router.back()}
+        palette={THEME}
+      />
 
       <ScrollView contentContainerStyle={[styles.scrollContent, { paddingTop: insets.top + 20 }]} showsVerticalScrollIndicator={false}>
         <Animated.View entering={FadeInDown.delay(100)}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Guided Knowledge Paths</Text>
-            <Text style={styles.sectionSubtitle}>Explore nuclear science through curated journeys</Text>
-          </View>
+          <SectionHeader
+            title="Guided Knowledge Paths"
+            subtitle="Explore nuclear science through curated journeys"
+            palette={THEME}
+          />
 
             <View style={styles.journeysContainer}>
               {allJourneys.map((journey, index) => (
@@ -113,55 +112,9 @@ export default function ExplorerScreen() {
 }
 
 const makeStyles = (THEME: Palette) => StyleSheet.create({
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingBottom: 16,
-    backgroundColor: THEME.bg,
-    gap: 12,
-  },
-  backButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: THEME.card,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 2,
-    borderColor: THEME.border,
-    borderBottomWidth: 4,
-  },
-  headerContent: {
-    flex: 1,
-  },
-  headerTitle: {
-    fontSize: 24,
-    fontWeight: '800',
-    color: THEME.text,
-  },
-  headerSubtitle: {
-    fontSize: 13,
-    color: THEME.textMuted,
-    marginTop: 2,
-  },
   scrollContent: {
     paddingHorizontal: 20,
     paddingBottom: 40,
-  },
-  sectionHeader: {
-    marginTop: 24,
-    marginBottom: 16,
-  },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: '800',
-    color: THEME.text,
-    marginBottom: 4,
-  },
-  sectionSubtitle: {
-    fontSize: 13,
-    color: THEME.textMuted,
   },
   journeysContainer: {
     gap: 20,

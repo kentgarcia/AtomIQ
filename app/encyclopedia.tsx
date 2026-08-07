@@ -1,3 +1,4 @@
+import { PageHeader } from '@/components/ui/page-header';
 import { Icon } from '@/components/ui/icon';
 import { getAllEncyclopediaEntries, searchEncyclopedia } from '@/content/explorer';
 import { useTheme, type Palette } from '@/theme';
@@ -157,24 +158,16 @@ export default function EncyclopediaScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: THEME.bg }]}>
-      {/* Header */}
-      <View style={[styles.header, { paddingTop: insets.top + 20 }]}>
-        <TouchableOpacity 
-          onPress={() => selectedCategory ? handleBackToCategories() : router.back()} 
-          style={styles.backButton}
-        >
-          <Icon name="ArrowLeft2" size={24} color={THEME.text} variant="Bold" />
-        </TouchableOpacity>
-        <View style={styles.headerContent}>
-          <Text style={styles.headerTitle}>Knowledge Vault</Text>
-          <Text style={styles.headerSubtitle}>
-            {selectedCategory 
-              ? `${filteredEntries.length} terms in ${selectedCategory}`
-              : `${totalEntries} Nuclear Science Terms`
-            }
-          </Text>
-        </View>
-      </View>
+      <PageHeader
+        title="Knowledge Vault"
+        subtitle={
+          selectedCategory
+            ? `${filteredEntries.length} terms in ${selectedCategory}`
+            : `${totalEntries} Nuclear Science Terms`
+        }
+        onBack={() => (selectedCategory ? handleBackToCategories() : router.back())}
+        palette={THEME}
+      />
 
       {/* Search Bar */}
       <View style={styles.searchContainer}>
@@ -308,40 +301,6 @@ export default function EncyclopediaScreen() {
 const createStyles = (theme: Palette) => StyleSheet.create({
   container: {
     flex: 1,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingBottom: 20,
-    backgroundColor: theme.bg,
-    gap: 12,
-  },
-  backButton: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: theme.card,
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-  },
-  headerContent: {
-    flex: 1,
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: '800',
-    color: theme.text,
-  },
-  headerSubtitle: {
-    fontSize: 14,
-    color: theme.textMuted,
-    marginTop: 2,
-    fontWeight: '600',
   },
   searchContainer: {
     paddingHorizontal: 20,

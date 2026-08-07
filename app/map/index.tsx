@@ -1,3 +1,4 @@
+import { SectionHeader } from "@/components/ui/section-header";
 import { Icon } from "@/components/ui/icon";
 import { UNITS as SYLLABUS_UNITS } from "@/content/units";
 import { useAllLevels } from "@/hooks/use-storage";
@@ -1124,15 +1125,12 @@ export default function MapScreen() {
 
               {/* Unit Information */}
               <View style={styles.modalSection}>
-                <View style={styles.sectionHeader}>
-                  <Icon
-                    name="InfoCircle"
-                    size={20}
-                    color={THEME.primary}
-                    variant="Bold"
-                  />
-                  <Text style={styles.sectionTitle}>About This Unit</Text>
-                </View>
+                <SectionHeader
+                  icon="InfoCircle"
+                  iconColor={THEME.primary}
+                  title="About This Unit"
+                  palette={THEME}
+                />
                 <Text style={styles.infoText}>
                   {selectedUnit && UNIT_INFO_DATA[selectedUnit.id]?.info}
                 </Text>
@@ -1141,17 +1139,12 @@ export default function MapScreen() {
               {/* References */}
               {selectedUnit && UNIT_INFO_DATA[selectedUnit.id]?.references && (
                 <View style={styles.modalSection}>
-                  <View style={styles.sectionHeader}>
-                    <Icon
-                      name="Book1"
-                      size={20}
-                      color={THEME.primary}
-                      variant="Bold"
-                    />
-                    <Text style={styles.sectionTitle}>
-                      References & Resources
-                    </Text>
-                  </View>
+                  <SectionHeader
+                    icon="Book1"
+                    iconColor={THEME.primary}
+                    title="References & Resources"
+                    palette={THEME}
+                  />
                   {UNIT_INFO_DATA[selectedUnit.id].references.map(
                     (ref, index) => (
                       <TouchableOpacity
@@ -1428,17 +1421,6 @@ const createStyles = (theme: Palette) =>
     },
     modalSection: {
       marginBottom: 24,
-    },
-    sectionHeader: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 8,
-      marginBottom: 12,
-    },
-    sectionTitle: {
-      fontSize: 16,
-      fontWeight: "700",
-      color: theme.text,
     },
     infoText: {
       fontSize: 15,

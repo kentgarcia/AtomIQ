@@ -18,6 +18,7 @@ import { AchievementDetailModal } from "@/components/awards/AchievementDetailMod
 import { CertificateCard } from "@/components/awards/CertificateCard";
 import { CertificatePreviewModal } from "@/components/awards/CertificatePreviewModal";
 import { createStyles } from "@/components/awards/styles";
+import { SectionHeader } from "@/components/ui/section-header";
 import { Icon } from "@/components/ui/icon";
 
 import { GRADIENTS } from "@/constants/gradients";
@@ -451,13 +452,16 @@ export default function AwardsScreen() {
           entering={FadeInDown.delay(200).springify()}
           style={styles.sectionContainer}
         >
-          <View style={styles.sectionHeader}>
-            <Icon name="Document" size={24} color={THEME.text} variant="Bold" />
-            <Text style={styles.sectionTitle}>Certificates</Text>
-            <Text style={styles.sectionCount}>
-              {unlockedCertificates}/{CERTIFICATES.length}
-            </Text>
-          </View>
+          <SectionHeader
+            icon="Document"
+            title="Certificates"
+            palette={THEME}
+            right={
+              <Text style={styles.sectionCount}>
+                {unlockedCertificates}/{CERTIFICATES.length}
+              </Text>
+            }
+          />
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
@@ -483,13 +487,16 @@ export default function AwardsScreen() {
           entering={FadeInDown.delay(300).springify()}
           style={styles.sectionContainer}
         >
-          <View style={styles.sectionHeader}>
-            <Icon name="Medal" size={24} color={THEME.text} variant="Bold" />
-            <Text style={styles.sectionTitle}>Achievements</Text>
-            <Text style={styles.sectionCount}>
-              {unlockedAchievements}/{ACHIEVEMENTS.length}
-            </Text>
-          </View>
+          <SectionHeader
+            icon="Medal"
+            title="Achievements"
+            palette={THEME}
+            right={
+              <Text style={styles.sectionCount}>
+                {unlockedAchievements}/{ACHIEVEMENTS.length}
+              </Text>
+            }
+          />
           <View style={styles.achievementsGrid}>
             {achievements.map((achievement, index) => (
               <AchievementCard
