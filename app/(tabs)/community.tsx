@@ -1,17 +1,19 @@
+import { getContentImage } from "@/components/community/image-source";
 import { Icon } from "@/components/ui/icon";
 import { getAllArticles, getAllPosts } from "@/content/articles";
-import { getContentImage } from "@/components/community/image-source";
 import { useTheme } from "@/theme";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Image as ExpoImage } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import Animated, {
+  Easing,
+  useAnimatedStyle,
+  useSharedValue,
+  withRepeat,
+  withTiming,
+} from "react-native-reanimated";
 import {
   FlatList,
   Image,
@@ -55,8 +57,7 @@ const CATEGORY_FILTERS: Record<string, (item: any) => boolean> = {
     it.tags?.some((t: string) =>
       ["research", "discovery", "innovation", "breakthrough"].includes(t),
     ),
-  safety: (it) =>
-    it.category === "safety" || it.tags?.includes("safety"),
+  safety: (it) => it.category === "safety" || it.tags?.includes("safety"),
 };
 
 // Helper to generate feed items from articles and posts only
@@ -132,6 +133,27 @@ export default function CommunityScreen() {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFilter, setActiveFilter] = useState<string>("all");
   const [bookmarkedIds, setBookmarkedIds] = useState<string[]>([]);
+
+  const mascotY = useSharedValue(0);
+  const mascotRotate = useSharedValue(0);
+  useEffect(() => {
+    mascotY.value = withRepeat(
+      withTiming(-6, { duration: 2200, easing: Easing.inOut(Easing.sin) }),
+      -1,
+      true
+    );
+    mascotRotate.value = withRepeat(
+      withTiming(3, { duration: 2200, easing: Easing.inOut(Easing.sin) }),
+      -1,
+      true
+    );
+  }, [mascotY, mascotRotate]);
+  const mascotStyle = useAnimatedStyle(() => ({
+    transform: [
+      { translateY: mascotY.value },
+      { rotate: `${mascotRotate.value}deg` },
+    ],
+  }));
 
   const SKY: [string, string, string] = isDark
     ? ["#23305B", "#3C5587", THEME.bg]
@@ -233,10 +255,7 @@ export default function CommunityScreen() {
             </View>
           )}
           <TouchableOpacity
-            style={[
-              styles.saveButton,
-              isBookmarked && styles.saveButtonActive,
-            ]}
+            style={[styles.saveButton, isBookmarked && styles.saveButtonActive]}
             onPress={() => toggleBookmark(item.id)}
             hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
           >
@@ -294,11 +313,13 @@ export default function CommunityScreen() {
           </View>
 
           <View style={styles.headerRight}>
-            <ExpoImage
-              source={require("@/assets/images/mascot/discover.png")}
-              style={styles.headerMascot}
-              contentFit="contain"
-            />
+            <Animated.View style={mascotStyle}>
+              <ExpoImage
+                source={require("@/assets/images/mascot/discover.svg")}
+                style={styles.headerMascot}
+                contentFit="contain"
+              />
+            </Animated.View>
           </View>
         </View>
 
@@ -418,7 +439,9 @@ export default function CommunityScreen() {
                 <Text style={[styles.footerTitle, { color: THEME.text }]}>
                   You&apos;re all caught up!
                 </Text>
-                <Text style={[styles.footerSubtext, { color: THEME.textMuted }]}>
+                <Text
+                  style={[styles.footerSubtext, { color: THEME.textMuted }]}
+                >
                   More content coming soon. Stay tuned for the latest updates on
                   nuclear science and technology.
                 </Text>
