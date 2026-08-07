@@ -1,4 +1,4 @@
-import { colors, spacing } from "@/theme/tokens";
+import { spacing } from "@/theme/tokens";
 import { Icon } from "@/components/ui/icon";
 import {useTheme, withAlpha} from "@/theme";
 import { playButtonClickSfx } from "@/services/ui-sfx";
@@ -98,8 +98,9 @@ function ModernTabBar({ state, navigation }: BottomTabBarProps) {
           styles.tabBar,
           {
             bottom: (insets.bottom || 0) + 16,
-            backgroundColor: colors.role.onSurface,
+            backgroundColor: THEME.bg,
             borderColor: THEME.border,
+            shadowColor: THEME.shadow,
           },
         ]}
       >
@@ -194,7 +195,6 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.sm,
     paddingHorizontal: spacing.sm,
     elevation: 16,
-    shadowColor: colors.role.black,
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.18,
     shadowRadius: 16,
