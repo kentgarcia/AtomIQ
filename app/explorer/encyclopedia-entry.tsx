@@ -1,3 +1,4 @@
+import { PageHeader } from "@/components/ui/page-header";
 import { Icon } from "@/components/ui/icon";
 import { getEncyclopediaEntryById } from "@/content/explorer";
 import { getEncyclopediaImage } from "@/content/explorer/encyclopedia/images";
@@ -256,55 +257,50 @@ export default function EncyclopediaEntryScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: THEME.bg }]}>
-      {/* Header */}
-      <View style={[styles.header, { paddingTop: insets.top + 20 }]}>
-        <TouchableOpacity
-          onPress={() => router.back()}
-          style={styles.backButton}
-        >
-          <Icon name="ArrowLeft2" size={24} color={THEME.text} variant="Bold" />
-        </TouchableOpacity>
-        <View style={styles.headerContent}>
-          <Text style={styles.headerTitle}>{entry.term}</Text>
-          <View
+      <PageHeader
+        title={entry.term}
+        onBack={() => router.back()}
+        palette={THEME}
+        right={
+          <TouchableOpacity
             style={[
-              styles.categoryBadge,
-              { backgroundColor: categoryStyle.bg },
+              styles.listenAllButton,
+              isSpeaking &&
+                speakingSection === "all" &&
+                styles.listenAllButtonActive,
             ]}
+            onPress={speakAll}
           >
-            <Text style={styles.categoryIcon}>{categoryStyle.icon}</Text>
-            <Text
-              style={[styles.categoryText, { color: categoryStyle.border }]}
-            >
-              {entry.category}
-            </Text>
-          </View>
-        </View>
-        {/* Listen All Button */}
-        <TouchableOpacity
+            <Icon
+              name={
+                isSpeaking && speakingSection === "all"
+                  ? "VolumeSlash"
+                  : "VolumeHigh"
+              }
+              size={20}
+              color={
+                isSpeaking && speakingSection === "all"
+                  ? THEME.primary
+                  : THEME.textMuted
+              }
+            />
+          </TouchableOpacity>
+        }
+      >
+        <View
           style={[
-            styles.listenAllButton,
-            isSpeaking &&
-              speakingSection === "all" &&
-              styles.listenAllButtonActive,
+            styles.categoryBadge,
+            { backgroundColor: categoryStyle.bg },
           ]}
-          onPress={speakAll}
         >
-          <Icon
-            name={
-              isSpeaking && speakingSection === "all"
-                ? "VolumeSlash"
-                : "VolumeHigh"
-            }
-            size={20}
-            color={
-              isSpeaking && speakingSection === "all"
-                ? THEME.primary
-                : THEME.textMuted
-            }
-          />
-        </TouchableOpacity>
-      </View>
+          <Text style={styles.categoryIcon}>{categoryStyle.icon}</Text>
+          <Text
+            style={[styles.categoryText, { color: categoryStyle.border }]}
+          >
+            {entry.category}
+          </Text>
+        </View>
+      </PageHeader>
 
       <ScrollView
         contentContainerStyle={[styles.scrollContent, { paddingTop: insets.top + 20 }]}

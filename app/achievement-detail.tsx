@@ -1,3 +1,4 @@
+import { PageHeader } from '@/components/ui/page-header';
 import { Icon } from '@/components/ui/icon';
 import { useStorage } from '@/services/StorageContext';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -96,13 +97,7 @@ export default function AchievementDetailScreen() {
   if (!achievement) {
     return (
       <View style={styles.container}>
-        <View style={[styles.header, { paddingTop: insets.top + 20 }]}>
-          <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-            <Icon name="ArrowLeft2" size={24} color={THEME.text} />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>Achievement</Text>
-          <View style={{ width: 40 }} />
-        </View>
+        <PageHeader title="Achievement" onBack={() => router.back()} palette={THEME} centered />
         <View style={styles.errorContainer}>
           <Text style={styles.errorText}>Achievement not found</Text>
         </View>
@@ -113,13 +108,7 @@ export default function AchievementDetailScreen() {
   return (
     <View style={styles.container}>
       {/* Header */}
-      <View style={[styles.header, { paddingTop: insets.top + 20 }]}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <Icon name="ArrowLeft2" size={24} color={THEME.text} />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Achievement</Text>
-        <View style={{ width: 40 }} />
-      </View>
+      <PageHeader title="Achievement" onBack={() => router.back()} palette={THEME} centered />
 
       <ScrollView 
         contentContainerStyle={styles.content}
