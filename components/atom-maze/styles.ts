@@ -1,4 +1,5 @@
 import { Platform, StyleSheet } from "react-native";
+import { fontFamilies } from "@/theme";
 
 export const styles = StyleSheet.create({
   container: {
@@ -780,6 +781,7 @@ export const styles = StyleSheet.create({
   introBadgeText: {
     fontSize: 16,
     fontWeight: "900",
+    fontFamily: fontFamilies.heavy,
     color: "#FFF",
   },
   introScrollView: {
@@ -803,129 +805,38 @@ export const styles = StyleSheet.create({
   introTitle: {
     fontSize: 28,
     fontWeight: "900",
+    fontFamily: fontFamilies.heavy,
     color: "#1F2937",
     marginBottom: 4,
   },
   introSubtitle: {
     fontSize: 14,
+    fontWeight: "600",
+    fontFamily: fontFamilies.semibold,
     color: "#6B7280",
     marginBottom: 12,
   },
   introDescription: {
     fontSize: 14,
+    fontFamily: fontFamilies.regular,
     color: "#6B7280",
     lineHeight: 22,
   },
-  introHowToPlay: {
-    backgroundColor: "#FFFFFF",
+  startButtonCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 12,
+    paddingVertical: 18,
     borderRadius: 20,
-    padding: 20,
     borderWidth: 2,
-    borderColor: "#E5E7EB",
     borderBottomWidth: 4,
   },
-  introHowToPlayHeaderRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 8,
-    marginBottom: 14,
-  },
-  introHowToPlayHeaderIcon: {
-    width: 28,
-    height: 28,
-    borderRadius: 10,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  introHowToPlayTitle: {
-    fontSize: 16,
-    fontWeight: "800",
-    color: "#1F2937",
-    textAlign: "center",
-  },
-  introSwipeRow: {
-    flexDirection: "column",
-    gap: 10,
-  },
-  introSwipeItem: {
-    alignItems: "center",
-    flexDirection: "row",
-    gap: 12,
-    backgroundColor: "#F9FAFB",
-    paddingVertical: 11,
-    paddingHorizontal: 12,
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: "#E5E7EB",
-  },
-  introStepNumber: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    alignItems: "center",
-    justifyContent: "center",
-    flexShrink: 0,
-  },
-  introStepNumberText: {
-    color: "#FFFFFF",
-    fontSize: 11,
+  startButtonCardText: {
+    fontSize: 17,
     fontWeight: "900",
-  },
-  introSwipeIconWrap: {
-    width: 34,
-    height: 34,
-    borderRadius: 10,
-    backgroundColor: "#FFF3D9",
-    alignItems: "center",
-    justifyContent: "center",
-    flexShrink: 0,
-  },
-  introSwipeEmoji: {
-    fontSize: 16,
-  },
-  introSwipeCopy: {
-    flex: 1,
-    gap: 2,
-  },
-  introSwipeLabel: {
-    fontSize: 13,
-    fontWeight: "700",
-    color: "#1F2937",
-  },
-  introSwipeHint: {
-    fontSize: 12,
-    fontWeight: "500",
-    color: "#6B7280",
-    lineHeight: 16,
-  },
-  startButton: {
-    borderRadius: 20,
-    overflow: "hidden",
-    position: "relative",
-  },
-  startButton3DBottom: {
-    position: "absolute",
-    bottom: -4,
-    left: 0,
-    right: 0,
-    height: 8,
-    backgroundColor: "#FFA000",
-    borderBottomLeftRadius: 20,
-    borderBottomRightRadius: 20,
-  },
-  startButtonGradient: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: 20,
-    paddingHorizontal: 40,
-    gap: 12,
-  },
-  startButtonText: {
-    color: "#FFF",
-    fontSize: 20,
-    fontWeight: "900",
+    fontFamily: fontFamilies.heavy,
+    letterSpacing: 0.5,
   },
   backButton: {
     padding: 12,

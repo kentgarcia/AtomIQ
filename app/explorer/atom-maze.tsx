@@ -39,6 +39,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 // Modern Theme
 import { useTheme } from "@/theme";
+import { HowToPlayCard } from "@/components/games/HowToPlayCard";
 import { MAZE_BATTLE_ART, MonsterIcon, PlayerIcon } from "@/components/atom-maze/icons";
 import { styles } from "@/components/atom-maze/styles";
 
@@ -100,40 +101,35 @@ const STAGE_TO_REPOSITORY_DIFFICULTY: Record<
 
 interface IntroHowToPlayStep {
   id: string;
-  emoji: string;
+  icon: string;
   title: string;
   hint: string;
-  accentColor: string;
 }
 
 const INTRO_HOW_TO_PLAY_STEPS: IntroHowToPlayStep[] = [
   {
     id: "quiz",
-    emoji: "❓",
+    icon: "MessageQuestion",
     title: "Answer Quiz",
     hint: "Choose the best answer to keep advancing.",
-    accentColor: "#F59E0B",
   },
   {
     id: "combo",
-    emoji: "🔥",
+    icon: "Activity",
     title: "Build Combo",
     hint: "Consecutive correct picks keep your momentum high.",
-    accentColor: "#F97316",
   },
   {
     id: "focus",
-    emoji: "🎯",
+    icon: "Eye",
     title: "Keep Focus",
     hint: "Wrong answers reset your combo streak.",
-    accentColor: "#3B82F6",
   },
   {
     id: "stage",
-    emoji: "🧭",
+    icon: "Map",
     title: "Clear Stage",
     hint: "Complete each stage to move to the next one.",
-    accentColor: "#EF4444",
   },
 ];
 
@@ -295,7 +291,7 @@ export default function AtomMazeBattleScreen() {
   const introPalette = useMemo(() => {
     if (colorScheme === "dark") {
       return {
-        gradientColors: ["#0B1220", "#1E293B", "#0F172A"] as const,
+        background: "#0B1220",
         cardBg: "rgba(15, 23, 42, 0.88)",
         cardBorder: "rgba(148, 163, 184, 0.34)",
         primaryText: "#F8FAFC",
@@ -309,7 +305,7 @@ export default function AtomMazeBattleScreen() {
     }
 
     return {
-      gradientColors: ["#FFFDE7", "#FFF9C4", "#FFEE58"] as const,
+      background: "#FFFDE7",
       cardBg: "#FFFFFF",
       cardBorder: "#E5E7EB",
       primaryText: "#1F2937",
@@ -980,9 +976,11 @@ export default function AtomMazeBattleScreen() {
   // Render intro screen
   if (gameState.phase === "intro") {
     return (
-      <LinearGradient
-        colors={introPalette.gradientColors}
-        style={styles.container}
+      <View
+        style={[
+          styles.container,
+          { backgroundColor: introPalette.background },
+        ]}
       >
         <View style={styles.introHeader}>
           <TouchableOpacity
@@ -1051,109 +1049,32 @@ export default function AtomMazeBattleScreen() {
             </View>
 
             {/* How to Play */}
-            <View
+            <HowToPlayCard
+                steps={INTRO_HOW_TO_PLAY_STEPS}
+                palette={introPalette}
+                accentColor={theme.primary}
+            />
+
+            {/* Start Button */}
+            <TouchableOpacity
               style={[
-                styles.introHowToPlay,
+                styles.startButtonCard,
                 {
                   backgroundColor: introPalette.cardBg,
                   borderColor: introPalette.cardBorder,
                 },
               ]}
-            >
-              <View style={styles.introHowToPlayHeaderRow}>
-                <View
-                  style={[
-                    styles.introHowToPlayHeaderIcon,
-                    { backgroundColor: introPalette.iconWrapBg },
-                  ]}
-                >
-                  <Icon
-                    name="MessageQuestion"
-                    size={16}
-                    color={theme.primary}
-                    variant="Bold"
-                  />
-                </View>
-                <Text
-                  style={[
-                    styles.introHowToPlayTitle,
-                    { color: introPalette.primaryText },
-                  ]}
-                >
-                  How to Play
-                </Text>
-              </View>
-              <View style={styles.introSwipeRow}>
-                {INTRO_HOW_TO_PLAY_STEPS.map((step, index) => (
-                  <View
-                    key={step.id}
-                    style={[
-                      styles.introSwipeItem,
-                      {
-                        backgroundColor: introPalette.subtleBg,
-                        borderColor: introPalette.subtleBorder,
-                      },
-                    ]}
-                  >
-                    <View
-                      style={[
-                        styles.introStepNumber,
-                        { backgroundColor: step.accentColor },
-                      ]}
-                    >
-                      <Text style={styles.introStepNumberText}>
-                        {index + 1}
-                      </Text>
-                    </View>
-                    <View
-                      style={[
-                        styles.introSwipeIconWrap,
-                        { backgroundColor: introPalette.iconWrapBg },
-                      ]}
-                    >
-                      <Text style={styles.introSwipeEmoji}>{step.emoji}</Text>
-                    </View>
-                    <View style={styles.introSwipeCopy}>
-                      <Text
-                        style={[
-                          styles.introSwipeLabel,
-                          { color: introPalette.primaryText },
-                        ]}
-                      >
-                        {step.title}
-                      </Text>
-                      <Text
-                        style={[
-                          styles.introSwipeHint,
-                          { color: introPalette.mutedText },
-                        ]}
-                      >
-                        {step.hint}
-                      </Text>
-                    </View>
-                  </View>
-                ))}
-              </View>
-            </View>
-
-            {/* Start Button */}
-            <TouchableOpacity
-              style={styles.startButton}
               onPress={handleStartGame}
               activeOpacity={0.9}
             >
-              <View style={styles.startButton3DBottom} />
-              <LinearGradient
-                colors={["#FFB300", "#FFA000"] as const}
-                style={styles.startButtonGradient}
-              >
-                <Icon name="Play" size={28} color="#FFF" variant="Bold" />
-                <Text style={styles.startButtonText}>START BATTLE</Text>
-              </LinearGradient>
+              <Icon name="Play" size={26} color={theme.primary} variant="Bold" />
+              <Text style={[styles.startButtonCardText, { color: theme.primary }]}>
+                START BATTLE
+              </Text>
             </TouchableOpacity>
           </Animated.View>
         </ScrollView>
-      </LinearGradient>
+      </View>
     );
   }
 

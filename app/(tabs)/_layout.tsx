@@ -1,33 +1,41 @@
-import { spacing } from "@/theme/tokens";
-import { Icon } from "@/components/ui/icon";
-import {useTheme, withAlpha} from "@/theme";
 import { playButtonClickSfx } from "@/services/ui-sfx";
-import { LinearGradient } from "expo-linear-gradient";
+import { useTheme, withAlpha } from "@/theme";
+import { spacing } from "@/theme/tokens";
 import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";
+import { Image } from "expo-image";
+import { LinearGradient } from "expo-linear-gradient";
 import { Tabs } from "expo-router";
 import React from "react";
-import {
-    StyleSheet,
-    TouchableOpacity,
-    View,
-} from "react-native";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
 import Animated, {
-    useAnimatedStyle,
-    useSharedValue,
-    withSpring,
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import Svg, { Path } from "react-native-svg";
+
+const TAB_ICONS = {
+  map: require("@/assets/images/icons/map.png"),
+  discovery: require("@/assets/images/icons/community.png"),
+  ai: require("@/assets/images/icons/ai.png"),
+  games: require("@/assets/images/icons/games.png"),
+  profile: require("@/assets/images/icons/profile.png"),
+};
+
+/* Sharp triangle pointing up (active tab marker). ViewBox 24 x 12 */
+const ACTIVE_TRIANGLE = "M 12 0 L 24 12 L 0 12 Z";
 
 const TabButton = ({
   tab,
   isFocused,
   onPress,
-  theme,
+  activeColor,
 }: {
-  tab: any;
+  tab: { name: string; icon: number; label: string };
   isFocused: boolean;
   onPress: () => void;
-  theme: any;
+  activeColor: string;
 }) => {
   const scale = useSharedValue(1);
 
@@ -51,21 +59,24 @@ const TabButton = ({
       activeOpacity={1}
       style={styles.tabButton}
     >
-      <Animated.View style={[styles.tabContent, animatedStyle]}>
-        <View
-          style={[
-            styles.iconContainer,
-            isFocused && { backgroundColor: withAlpha(theme.active, 0.1) },
-          ]}
-        >
-          <Icon
-            name={tab.icon}
-            size={26}
-            color={isFocused ? theme.active : theme.inactive}
-            variant={isFocused ? "Bold" : "Linear"}
-          />
-        </View>
-      </Animated.View>
+      <View style={styles.tabContent}>
+        <Animated.View style={animatedStyle}>
+          <View style={styles.iconContainer}>
+            <Image
+              source={tab.icon}
+              style={styles.tabImage}
+              contentFit="contain"
+            />
+          </View>
+        </Animated.View>
+        {isFocused && (
+          <View style={styles.activeMarker} pointerEvents="none">
+            <Svg width={24} height={12} viewBox="0 0 24 12">
+              <Path d={ACTIVE_TRIANGLE} fill={activeColor} />
+            </Svg>
+          </View>
+        )}
+      </View>
     </TouchableOpacity>
   );
 };
@@ -77,11 +88,11 @@ function ModernTabBar({ state, navigation }: BottomTabBarProps) {
   const THEME = theme.palettes.tabBar;
 
   const tabs = [
-    { name: "index", icon: "Home", label: "Home" },
-    { name: "community", icon: "People", label: "Discover" },
-    { name: "chat", icon: "Message", label: "AI" },
-    { name: "awards", icon: "Cup", label: "Awards" },
-    { name: "profile", icon: "Profile", label: "Profile" },
+    { name: "index", icon: TAB_ICONS.map, label: "Home" },
+    { name: "community", icon: TAB_ICONS.discovery, label: "Discover" },
+    { name: "chat", icon: TAB_ICONS.ai, label: "AI" },
+    { name: "awards", icon: TAB_ICONS.games, label: "Games" },
+    { name: "profile", icon: TAB_ICONS.profile, label: "Profile" },
   ] as const;
 
   return (
@@ -105,34 +116,34 @@ function ModernTabBar({ state, navigation }: BottomTabBarProps) {
         ]}
       >
         {tabs.map((tab) => {
-        const routeIndex = state.routes.findIndex((r) => r.name === tab.name);
-        if (routeIndex === -1) return null;
+          const routeIndex = state.routes.findIndex((r) => r.name === tab.name);
+          if (routeIndex === -1) return null;
 
-        const isFocused = state.index === routeIndex;
+          const isFocused = state.index === routeIndex;
 
-        const onPress = () => {
-          const event = navigation.emit({
-            type: "tabPress",
-            target: state.routes[routeIndex].key,
-            canPreventDefault: true,
-          });
+          const onPress = () => {
+            const event = navigation.emit({
+              type: "tabPress",
+              target: state.routes[routeIndex].key,
+              canPreventDefault: true,
+            });
 
-          if (!isFocused && !event.defaultPrevented) {
-            navigation.navigate(state.routes[routeIndex].name);
-          }
-        };
+            if (!isFocused && !event.defaultPrevented) {
+              navigation.navigate(state.routes[routeIndex].name);
+            }
+          };
 
-        return (
-          <TabButton
-            key={tab.name}
-            tab={tab}
-            isFocused={isFocused}
-            onPress={onPress}
-            theme={THEME}
-          />
-        );
-      })}
-    </View>
+          return (
+            <TabButton
+              key={tab.name}
+              tab={tab}
+              isFocused={isFocused}
+              onPress={onPress}
+              activeColor={THEME.active}
+            />
+          );
+        })}
+      </View>
     </View>
   );
 }
@@ -169,7 +180,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="awards"
         options={{
-          title: "Awards",
+          title: "Games",
         }}
       />
       <Tabs.Screen
@@ -215,11 +226,20 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
+  activeMarker: {
+    position: "absolute",
+    bottom: -8,
+    alignSelf: "center",
+  },
   iconContainer: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
     alignItems: "center",
     justifyContent: "center",
+  },
+  tabImage: {
+    width: 40,
+    height: 40,
   },
 });

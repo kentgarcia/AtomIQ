@@ -1,570 +1,828 @@
-import { ActionButton, SectionHeader } from "@/components/ui";
 import { Icon } from "@/components/ui/icon";
+import { SectionHeader } from "@/components/ui/section-header";
 import { UNITS } from "@/content/units";
-import { getLessonById } from "@/content/lessons";
-import { colors, fontFamilies, useTheme, withAlpha, type Palette } from "@/theme";
 import { useAllLevels } from "@/hooks/use-storage";
-import {
-    getLeaderboardSnapshot,
-    saveLeaderboardSnapshot,
-} from "@/services/database";
+import { openExternalUrl } from "@/services/open-url";
 import { getProfileAvatarSource } from "@/services/profile-avatars";
 import { useStorage } from "@/services/StorageContext";
-import { isSupabaseConfigured, supabase } from "@/services/supabase";
-import { Tables } from "@/services/supabase.types";
-import { useFocusEffect } from "@react-navigation/native";
-import { Image as ExpoImage } from "expo-image";
-import { useRouter } from "expo-router";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useTheme, type Palette, fontFamilies } from "@/theme";
+import { useFocusEffect, useRouter } from "expo-router";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
+    Alert,
     Image,
+    Modal,
     ScrollView,
     StyleSheet,
     Text,
     TouchableOpacity,
+    useWindowDimensions,
     View,
 } from "react-native";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated, {
+    FadeInDown,
+    FadeOutDown,
+    useAnimatedStyle,
+    useSharedValue,
+    withRepeat,
+    withTiming,
+} from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import Svg, { Path } from "react-native-svg";
 
-type LeaderEntry = {
-  userId?: string;
-  name: string;
-  title: string;
-  xp: number;
-  avatar?: string;
-  isUser?: boolean;
-  isNPC?: boolean;
-  rank?: number;
+const NODE_SIZE = 70;
+const NODE_ROW_GAP = 120;
+const NODE_TOP = 88;
+const SECTION_PAD = 110;
+/* Sticky card geometry (safe-area-relative) */
+const CARD_TOP = 78;
+const CARD_AREA = 190;
+
+type NodeStatus = "locked" | "current" | "completed";
+
+type PathNode = {
+  id: string;
+  type: "star" | "book" | "chest" | "trophy";
+  status: NodeStatus;
 };
 
-type LeaderboardSourceUser = Pick<
-  Tables<"users">,
-  "user_id" | "username" | "avatar_url" | "total_xp" | "is_npc"
->;
+type PathUnit = {
+  id: string;
+  title: string;
+  subtitle: string;
+  description: string;
+  color: string;
+  icon: string;
+  levels: PathNode[];
+  isLocked: boolean;
+};
+
+type CardUnit = {
+  id: string;
+  unit: PathUnit;
+  y: number;
+};
+
+/* Scroll offset that centers a node in the visible area. */
+const computeNodeScrollY = (
+  units: PathUnit[],
+  unitIndex: number,
+  rowIndex: number,
+  windowHeight: number,
+): number => {
+  let offset = 0;
+  for (let j = 0; j < unitIndex; j++) {
+    offset += units[j].levels.length * NODE_ROW_GAP + SECTION_PAD;
+  }
+  offset += NODE_TOP + rowIndex * NODE_ROW_GAP;
+  return Math.max(0, offset - (windowHeight - 320) / 2);
+};
+
+const buildPath = (completedLessonIds: string[]): PathUnit[] => {
+  return UNITS.map((unit, unitIndex) => {
+    const isPreviousUnitCompleted =
+      unitIndex === 0 ||
+      UNITS[unitIndex - 1].lessonIds.every((id) =>
+        completedLessonIds.includes(id),
+      );
+
+    const isUnitLocked = !isPreviousUnitCompleted;
+
+    const levels: PathNode[] = unit.lessonIds.map((lessonId, index) => {
+      const isCompleted = completedLessonIds.includes(lessonId);
+      const isFirst = index === 0;
+      const previousCompleted =
+        index === 0 || completedLessonIds.includes(unit.lessonIds[index - 1]);
+
+      let status: NodeStatus = "locked";
+      if (!isUnitLocked && isCompleted) {
+        status = "completed";
+      } else if (!isUnitLocked && (previousCompleted || isFirst)) {
+        status = "current";
+      }
+
+      const types = ["star", "book", "chest"] as const;
+      return {
+        id: lessonId,
+        type: types[index % types.length],
+        status,
+      };
+    });
+
+    if (unit.quizIds.length > 0) {
+      const quizId = unit.quizIds[0];
+      const isQuizCompleted = completedLessonIds.includes(quizId);
+      const allLessonsCompleted = unit.lessonIds.every((id) =>
+        completedLessonIds.includes(id),
+      );
+
+      let quizStatus: NodeStatus = "locked";
+      if (!isUnitLocked && isQuizCompleted) {
+        quizStatus = "completed";
+      } else if (!isUnitLocked && allLessonsCompleted) {
+        quizStatus = "current";
+      }
+
+      levels.push({ id: quizId, type: "trophy", status: quizStatus });
+    }
+
+    return {
+      id: unit.id,
+      title: unit.title,
+      subtitle: unit.subtitle,
+      description: unit.description,
+      color: isUnitLocked ? "#9CA3AF" : unit.color,
+      icon: unit.icon,
+      levels,
+      isLocked: isUnitLocked,
+    };
+  });
+};
+
+const getNodeX = (globalIndex: number, width: number) =>
+  width / 2 + Math.sin(globalIndex * 0.8) * 80;
+
+const getGreeting = () => {
+  const hour = new Date().getHours();
+  if (hour < 12) return "Good morning";
+  if (hour < 18) return "Good afternoon";
+  return "Good evening";
+};
+
+const UNIT_INFO_DATA: Record<string, { info: string; references: string[] }> = {
+  "atomic-playground": {
+    info: "Explore the basics of nuclear science, including atoms, isotopes, and the energy contained within nuclei. You'll understand atomic structure, nuclear energy fundamentals, and recognize common misconceptions.",
+    references: [
+      "https://www.britannica.com/science/atom",
+      "https://openstax.org/books/anatomy-and-physiology/pages/2-1-elements-and-atoms-the-building-blocks-of-matter",
+      "https://www.iaea.org/newscenter/news/what-is-nuclear-energy-the-science-of-nuclear-power",
+    ],
+  },
+  "nuclear-reactions": {
+    info: "Explore the fundamental nuclear reactions that power stars, fuel nuclear power plants, and enable essential technologies. You'll gain foundational knowledge about how nuclear reactions work, how energy is released, and how these processes are safely controlled.",
+    references: [
+      "https://www.iaea.org/topics/nuclear-fission",
+      "https://www.britannica.com/science/nuclear-fusion",
+      "https://www.world-nuclear.org/information-library/nuclear-fuel-cycle/introduction/physics-of-nuclear-energy.aspx",
+    ],
+  },
+  "radiation-effects": {
+    info: "Learn about different types of radiation, how radiation interacts with matter, and the real science behind radiation effects on human health and the environment. This unit provides factual, science-based understanding of radiation.",
+    references: [
+      "https://www.iaea.org/topics/radiation-protection",
+      "https://www.epa.gov/radiation/radiation-basics",
+      "https://www.nrc.gov/about-nrc/radiation/health-effects.html",
+    ],
+  },
+  "nuclear-everyday-life": {
+    info: "Discover the many peaceful applications of nuclear technology in medicine, agriculture, industry, and environmental protection. Learn how nuclear science improves lives every day.",
+    references: [
+      "https://www.iaea.org/topics/nuclear-applications",
+      "https://www.world-nuclear.org/information-library/non-power-nuclear-applications.aspx",
+      "https://www.who.int/health-topics/ionizing-radiation",
+    ],
+  },
+  "nuclear-safety-security": {
+    info: "Focuses on how countries, scientists, and international organizations work together to ensure nuclear technology is used safely, securely, and responsibly. Learn about safety frameworks, regulations, and global cooperation.",
+    references: [
+      "https://www.iaea.org/topics/nuclear-safety-and-security",
+      "https://www.nrc.gov/about-nrc/regulatory/enforcement/safety-culture.html",
+      "https://www.world-nuclear.org/information-library/safety-and-security.aspx",
+    ],
+  },
+  "invisible-rays": {
+    info: 'Learn about different types of radiation and how to protect against them. Demystify "Radiation" by breaking it down into manageable types.',
+    references: [
+      "https://www.epa.gov/radiation/radiation-protection",
+      "https://www.nrc.gov/about-nrc/radiation/protects-you.html",
+    ],
+  },
+  "dose-poison": {
+    info: "Understand radiation doses, measurements, and health effects. Contextualize safety using radiation comparison and dose visualization.",
+    references: [
+      "https://www.iaea.org/topics/radiation-dosimetry",
+      "https://xkcd.com/radiation/",
+    ],
+  },
+  "engine-room": {
+    info: 'Discover how nuclear reactors generate clean, reliable energy. Explain the mechanics to debunk the "Explosion" myth.',
+    references: [
+      "https://www.world-nuclear.org/information-library/nuclear-fuel-cycle/nuclear-power-reactors.aspx",
+      "https://www.ucs.org/resources/how-nuclear-power-works",
+    ],
+  },
+  "green-horizon": {
+    info: "Explore nuclear energy's environmental benefits and waste management. Address environmental concerns using energy statistics visualizations.",
+    references: [
+      "https://www.world-nuclear.org/information-library/energy-and-the-environment.aspx",
+      "https://www.iaea.org/topics/waste-management",
+    ],
+  },
+};
 
 export default function HomeScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { userProfile, isDatabaseReady } = useStorage();
-  const { levels, refresh } = useAllLevels();
+  const { userProfile } = useStorage();
+  const { levels, loading, refresh } = useAllLevels();
   const { theme } = useTheme();
-  const [leaderboardPreview, setLeaderboardPreview] = useState<{
-    topThree: LeaderEntry[];
-    userRank?: LeaderEntry | undefined;
-  }>({ topThree: [] });
-  const [leaderboardError, setLeaderboardError] = useState<string | null>(null);
-
+  const { width, height: windowHeight } = useWindowDimensions();
   const THEME = theme.palettes.tab;
   const styles = useMemo(() => createStyles(THEME), [THEME]);
 
-  // Refresh levels whenever the tab/screen gains focus so progress is up to date
+  // Plain background (white in light mode, same navy as Discovery in dark)
+  const pageBg = theme.mode === "dark" ? THEME.bg : "#FFFFFF";
+
+  // Winding path stroke (subtle, visible on the plain background)
+  const pathStroke =
+    theme.mode === "dark" ? "rgba(255,255,255,0.25)" : "rgba(17,24,39,0.18)";
+
+  const scrollViewRef = useRef<ScrollView>(null);
+  const [selectedUnit, setSelectedUnit] = useState<{
+    id: string;
+    title: string;
+    subtitle: string;
+  } | null>(null);
+  const [cardUnit, setCardUnit] = useState<CardUnit | null>(null);
+  const [arrowDir, setArrowDir] = useState<"up" | "down" | null>(null);
+
   useFocusEffect(
     useCallback(() => {
       refresh();
     }, [refresh]),
   );
 
-  // Calculate current progress
-  const currentProgress = useMemo(() => {
-    const completedLessonIds = levels
-      .filter((l) => l.status === "completed")
-      .map((l) => l.id);
-
-    // Find the current unit and lesson
-    let currentUnit = UNITS[0];
-    let currentLessonIndex = 0;
-    let totalLessonsInUnit = currentUnit.lessonIds.length;
-    let completedInCurrentUnit = 0;
-
-    for (const unit of UNITS) {
-      const completedInUnit = unit.lessonIds.filter((id) =>
-        completedLessonIds.includes(id),
-      ).length;
-      const totalInUnit = unit.lessonIds.length;
-
-      if (completedInUnit < totalInUnit) {
-        // This is the current unit
-        currentUnit = unit;
-        currentLessonIndex = completedInUnit;
-        totalLessonsInUnit = totalInUnit;
-        completedInCurrentUnit = completedInUnit;
-        break;
-      }
-    }
-
-    const progressPercentage =
-      totalLessonsInUnit > 0
-        ? Math.round((completedInCurrentUnit / totalLessonsInUnit) * 100)
-        : 0;
-
-    return {
-      unit: currentUnit,
-      lessonIndex: currentLessonIndex,
-      totalLessons: totalLessonsInUnit,
-      progressPercentage,
-      completedLessons: completedInCurrentUnit,
-    };
-  }, [levels]);
-
-  // Resolve the next lesson title for the Continue Learning card
-  const currentLessonTitle = useMemo(() => {
-    const id = currentProgress.unit.lessonIds[currentProgress.lessonIndex];
-    return getLessonById(id)?.title || "Continue Learning";
-  }, [currentProgress]);
-
-  // Calculate level + XP progress for the hero pill
-  const levelStats = useMemo(() => {
-    const totalXp = userProfile?.total_xp || 0;
-    const level = Math.floor(totalXp / 100) + 1;
-    const levelProgress = Math.min(((totalXp % 100) / 100) * 100, 100);
-    return { level, levelProgress };
-  }, [userProfile]);
-
-  // Calculate debunking stats
-  const debunkingStats = useMemo(() => {
-    const totalLessons = userProfile?.lessons_completed || 0;
-    const totalMyths = userProfile?.myths_busted || 0;
-    const total = totalLessons + totalMyths;
-
-    // Calculate percentages for the bar chart
-    const mythsPercentage = total > 0 ? totalMyths / Math.max(total, 50) : 0;
-    const lessonsPercentage =
-      total > 0 ? totalLessons / Math.max(total, 50) : 0;
-
-    return {
-      totalLessons,
-      totalMyths,
-      mythsPercentage: Math.min(mythsPercentage, 1),
-      lessonsPercentage: Math.min(lessonsPercentage, 1),
-    };
-  }, [userProfile]);
-
-  const buildLeaderboard = useCallback(
-    (users: LeaderboardSourceUser[] = []) => {
-      const localDisplayName =
-        userProfile?.display_name || userProfile?.username || "You";
-
-      const NPC_CHARACTERS = [
-        {
-          name: "AtomMaster99",
-          title: "Radiation Pioneer",
-          baseXP: 2000,
-          isNPC: true,
-        },
-        {
-          name: "NuclearNinja",
-          title: "Physics Legend",
-          baseXP: 1800,
-          isNPC: true,
-        },
-        {
-          name: "ReactorRex",
-          title: "Reactor Architect",
-          baseXP: 1600,
-          isNPC: true,
-        },
-        {
-          name: "QuantumQuinn",
-          title: "Quantum Master",
-          baseXP: 1400,
-          isNPC: true,
-        },
-        {
-          name: "FissionFiona",
-          title: "Fission Expert",
-          baseXP: 1200,
-          isNPC: true,
-        },
-        {
-          name: "AtomSmasher",
-          title: "Atom Splitter",
-          baseXP: 1000,
-          isNPC: true,
-        },
-        {
-          name: "BetaBeast",
-          title: "Beta Decay Pro",
-          baseXP: 800,
-          isNPC: true,
-        },
-        {
-          name: "ElementElla",
-          title: "Element Hunter",
-          baseXP: 600,
-          isNPC: true,
-        },
-        {
-          name: "NuclearNora",
-          title: "Nuclear Theorist",
-          baseXP: 400,
-          isNPC: true,
-        },
-        {
-          name: "ChemWizard",
-          title: "Chemistry Wizard",
-          baseXP: 200,
-          isNPC: true,
-        },
-      ];
-
-      const entries: LeaderEntry[] = users.map((user) => ({
-        userId: user.user_id,
-        name:
-          user.user_id === userProfile?.user_id
-            ? localDisplayName
-            : user.username,
-        title: user.is_npc ? "NPC Challenger" : "Nuclear Learner",
-        xp: user.total_xp ?? 0,
-        avatar: user.avatar_url ?? undefined,
-        isUser: user.user_id === userProfile?.user_id,
-        isNPC: Boolean(user.is_npc),
-      }));
-
-      if (
-        userProfile &&
-        !entries.some((entry) => entry.userId === userProfile.user_id)
-      ) {
-        entries.push({
-          userId: userProfile.user_id,
-          name: localDisplayName,
-          title: "Nuclear Learner",
-          xp: userProfile.total_xp || 0,
-          avatar: userProfile.avatar_url || undefined,
-          isUser: true,
-          isNPC: false,
-        });
-      }
-
-      let entriesWithFallback = entries;
-      if (entriesWithFallback.length < 3) {
-        const needed = 3 - entriesWithFallback.length;
-        const fallback = NPC_CHARACTERS.slice(0, needed).map(
-          (npc): LeaderEntry => ({
-            name: npc.name,
-            title: npc.title,
-            xp: npc.baseXP,
-            isNPC: true,
-          }),
-        );
-        entriesWithFallback = [...entriesWithFallback, ...fallback];
-      }
-
-      const ranked = entriesWithFallback
-        .sort((a, b) => (b.xp ?? 0) - (a.xp ?? 0))
-        .map((entry, index) => ({ ...entry, rank: index + 1 }));
-
-      return {
-        topThree: ranked.slice(0, 3),
-        userRank: ranked.find((entry) => entry.isUser),
-      };
-    },
-    [userProfile],
+  // Stable key so `units` (and everything depending on it) only rebuilds when
+  // progress actually changes — not on every render
+  const completedKey = useMemo(
+    () =>
+      levels
+        .filter((l) => l.status === "completed")
+        .map((l) => l.id)
+        .join("|"),
+    [levels],
   );
 
-  const loadLeaderboard = useCallback(async () => {
-    try {
-      if (!isDatabaseReady) {
-        setLeaderboardPreview(buildLeaderboard([]));
-        setLeaderboardError(null);
-        return;
-      }
+  const units = useMemo(
+    () => buildPath(completedKey ? completedKey.split("|") : []),
+    [completedKey],
+  );
 
-      const localSnapshot = await getLeaderboardSnapshot(10);
-      if (localSnapshot.length > 0) {
-        setLeaderboardPreview(buildLeaderboard(localSnapshot));
-        setLeaderboardError(null);
-      }
-
-      if (!isSupabaseConfigured()) {
-        if (localSnapshot.length === 0) {
-          setLeaderboardPreview(buildLeaderboard([]));
-        }
-        return;
-      }
-
-      const { data, error } = await supabase
-        .from("users")
-        .select(
-          "user_id, username, avatar_url, total_xp, is_npc, created_at, current_streak, id, lessons_completed, longest_streak, myths_busted, updated_at",
-        )
-        .order("total_xp", { ascending: false })
-        .limit(10);
-
-      if (error) {
-        if (error.code === "PGRST205") {
-          if (localSnapshot.length === 0) {
-            setLeaderboardPreview(buildLeaderboard([]));
-          }
-
-          setLeaderboardError(
-            "Remote leaderboard setup pending. Showing local leaderboard.",
-          );
-          return;
-        }
-
-        throw error;
-      }
-
-      const normalizedUsers: LeaderboardSourceUser[] = (data || []).map(
-        (row) => ({
-          user_id: row.user_id,
-          username: row.username,
-          avatar_url: row.avatar_url,
-          total_xp: row.total_xp,
-          is_npc: row.is_npc,
-        }),
-      );
-
-      await saveLeaderboardSnapshot(
-        normalizedUsers.map((row) => ({
-          user_id: row.user_id,
-          username: row.username,
-          avatar_url: row.avatar_url,
-          total_xp: row.total_xp ?? 0,
-          is_npc: Boolean(row.is_npc),
-        })),
-      );
-
-      setLeaderboardPreview(buildLeaderboard(normalizedUsers));
-      setLeaderboardError(null);
-    } catch (err) {
-      console.error("Error loading leaderboard preview:", err);
-      const localSnapshot = await getLeaderboardSnapshot(10);
-
-      if (localSnapshot.length > 0) {
-        setLeaderboardError("Showing cached leaderboard");
-        setLeaderboardPreview(buildLeaderboard(localSnapshot));
-      } else {
-        setLeaderboardError("Showing offline leaderboard");
-        setLeaderboardPreview(buildLeaderboard([]));
-      }
+  // Locate the first "current" (next up) node
+  let firstCurrentId: string | null = null;
+  let currentUnitIndex = -1;
+  let currentRowIndex = -1;
+  for (let u = 0; u < units.length; u++) {
+    const idx = units[u].levels.findIndex((l) => l.status === "current");
+    if (idx !== -1) {
+      firstCurrentId = units[u].levels[idx].id;
+      currentUnitIndex = u;
+      currentRowIndex = idx;
+      break;
     }
-  }, [buildLeaderboard, isDatabaseReady]);
+  }
 
+  // Section offsets for each unit (for the sticky unit card)
+  const cardUnits = useMemo(() => {
+    const list: CardUnit[] = [];
+    let offset = 0;
+    for (const unit of units) {
+      list.push({ id: unit.id, unit, y: offset });
+      offset += unit.levels.length * NODE_ROW_GAP + SECTION_PAD;
+    }
+    return list;
+  }, [units]);
+
+  // Show the unit holding the first "current" (next up) node initially
   useEffect(() => {
-    setLeaderboardPreview(buildLeaderboard([]));
-    loadLeaderboard();
-  }, [buildLeaderboard, loadLeaderboard]);
+    if (cardUnits.length > 0 && !cardUnit) {
+      const initial =
+        cardUnits[Math.max(0, currentUnitIndex)] ??
+        cardUnits[cardUnits.length - 1];
+      setCardUnit(initial);
+    }
+  }, [cardUnits, currentUnitIndex]);
 
-  const topThree = leaderboardPreview.topThree;
-  const userRank = leaderboardPreview.userRank;
+const handleScroll = useCallback(
+    (e: { nativeEvent: { contentOffset: { y: number } } }) => {
+      const scrollY = e.nativeEvent.contentOffset.y;
+      // Switch when a section's start crosses the card's middle band,
+      // measured in scroll-space
+      const cardMid = CARD_TOP + 44;
+      const target = scrollY - (insets.top + (CARD_AREA - cardMid));
+      let best: CardUnit | null = null;
+      let bestDist = Infinity;
+      for (const n of cardUnits) {
+        const dist = Math.abs(n.y - target);
+        if (dist < bestDist) {
+          bestDist = dist;
+          best = n;
+        }
+      }
+      if (best) {
+        setCardUnit((prev) => (prev?.id === best!.id ? prev : best));
+      }
+      // Point the jump arrow at the current node: down if it's below the
+      // viewing band, up if it's above, hidden while it overlaps the band
+      if (currentUnitIndex !== -1) {
+        let nodeY = 0;
+        for (let j = 0; j < currentUnitIndex; j++) {
+          nodeY += units[j].levels.length * NODE_ROW_GAP + SECTION_PAD;
+        }
+        nodeY += NODE_TOP + currentRowIndex * NODE_ROW_GAP;
+        const screenTop = insets.top + CARD_AREA + nodeY - scrollY;
+        const bandTop = insets.top + CARD_TOP + 96;
+        const bandBottom = windowHeight - 170;
+        const overlapsBand = screenTop + NODE_SIZE > bandTop && screenTop < bandBottom;
+        const dir = overlapsBand ? null : screenTop >= bandBottom ? "down" : "up";
+        setArrowDir((prev) => (prev === dir ? prev : dir));
+      }
+    },
+    [
+      cardUnits,
+      insets.top,
+      units,
+      currentUnitIndex,
+      currentRowIndex,
+      windowHeight,
+    ],
+  );
+
+  const scrollToCurrent = useCallback(() => {
+    if (currentUnitIndex === -1) return;
+    scrollViewRef.current?.scrollTo({
+      y: computeNodeScrollY(units, currentUnitIndex, currentRowIndex, windowHeight),
+      animated: true,
+    });
+  }, [units, currentUnitIndex, currentRowIndex, windowHeight]);
+
+  // Scroll to the current node when the target actually changes (initial
+  // load, or progress gained on refocus) — never on unrelated re-renders
+  const prevAutoScrollTarget = useRef<string>("");
+  useEffect(() => {
+    if (!loading && currentUnitIndex !== -1) {
+      const targetKey = `${completedKey}|${currentUnitIndex}|${currentRowIndex}`;
+      if (prevAutoScrollTarget.current === targetKey) return;
+      prevAutoScrollTarget.current = targetKey;
+      const timer = setTimeout(() => {
+        scrollViewRef.current?.scrollTo({
+          y: computeNodeScrollY(units, currentUnitIndex, currentRowIndex, windowHeight),
+          animated: false,
+        });
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [loading, units, completedKey, currentUnitIndex, currentRowIndex]);
+
+  const handleNodePress = (node: PathNode) => {
+    if (node.type === "trophy" || node.id.includes("-quiz")) {
+      router.push(`/quiz/${node.id}`);
+    } else {
+      router.push(`/lesson/${node.id}`);
+    }
+  };
+
+  const LoadingDot = ({ delay, color }: { delay: number; color: string }) => {
+    const scale = useSharedValue(1);
+    const opacity = useSharedValue(1);
+
+    useEffect(() => {
+      scale.value = withRepeat(withTiming(1.3, { duration: 600 }), -1, true);
+      opacity.value = withRepeat(withTiming(0.4, { duration: 600 }), -1, true);
+    }, []);
+
+    const animatedStyle = useAnimatedStyle(() => ({
+      transform: [{ scale: scale.value }],
+      opacity: opacity.value,
+    }));
+
+    return (
+      <Animated.View
+        entering={FadeInDown.delay(delay).springify()}
+        style={[styles.loadingDot, { backgroundColor: color }, animatedStyle]}
+      />
+    );
+  };
+
+  if (loading) {
+    return (
+      <View style={[styles.container, { backgroundColor: pageBg }]}>
+        <View style={[styles.loadingContainer, { paddingTop: insets.top }]}>
+          <Animated.View entering={FadeInDown.springify().damping(10)}>
+            <Image
+              source={require("@/assets/images/mascot/explain.png")}
+              style={styles.loadingMascot}
+              resizeMode="contain"
+            />
+          </Animated.View>
+          <Text style={styles.loadingTitle}>Preparing Your Journey</Text>
+          <Text style={styles.loadingSubtitle}>Loading learning path...</Text>
+          <View style={styles.loadingDotsContainer}>
+            <LoadingDot delay={300} color="#FFB74D" />
+            <LoadingDot delay={400} color="#64B5F6" />
+            <LoadingDot delay={500} color="#81C784" />
+          </View>
+        </View>
+      </View>
+    );
+  }
+
+  // Global index across all units (for the winding path)
+  let globalCounter = 0;
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: pageBg }]}>
+
       <ScrollView
-        contentContainerStyle={[styles.scrollContent, { paddingTop: insets.top + 20 }]}
+        ref={scrollViewRef}
+        onScroll={handleScroll}
+        scrollEventThrottle={16}
+        contentContainerStyle={{
+          paddingTop: insets.top + CARD_AREA,
+          paddingBottom: 130 + insets.bottom,
+        }}
         showsVerticalScrollIndicator={false}
-        bounces={false}
-        overScrollMode="never"
       >
-        {/* Hero: full-bleed bg image + pill header + mascot */}
-        <Animated.View
-          entering={FadeInDown.delay(100)}
-          style={[styles.hero, { marginTop: -(insets.top + 20) }]}
+        {units.map((unit) => {
+          const sectionHeight =
+            unit.levels.length * NODE_ROW_GAP + SECTION_PAD;
+
+          // Position nodes (natural order, level 0 on top)
+          const nextGlobal = globalCounter;
+          globalCounter += unit.levels.length;
+
+          const pathPoints = unit.levels.map((_, i) => ({
+            x: getNodeX(nextGlobal + i, width),
+            y: NODE_TOP + i * NODE_ROW_GAP,
+          }));
+
+          const pathD = pathPoints
+            .map((p, i) => `${i === 0 ? "M" : "L"} ${p.x} ${p.y}`)
+            .join(" ");
+
+          return (
+            <View key={unit.id} style={{ height: sectionHeight }}>
+              {/* Winding path */}
+              <Svg
+                width={width}
+                height={sectionHeight}
+                style={styles.pathLayer}
+              >
+                <Path
+                  d={pathD}
+                  stroke={pathStroke}
+                  strokeWidth={5}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeDasharray="6 12"
+                  fill="none"
+                />
+              </Svg>
+
+              {/* Nodes */}
+              {unit.levels.map((node, i) => (
+                <LessonNode
+                  key={node.id}
+                  node={node}
+                  x={pathPoints[i].x}
+                  y={pathPoints[i].y}
+                  unitColor={unit.color}
+                  firstId={firstCurrentId}
+                  onPress={() => handleNodePress(node)}
+                  styles={styles}
+                />
+              ))}
+
+              {/* Unit divider */}
+              <View style={styles.unitDivider}>
+                <View
+                  style={[styles.unitDividerLine, { backgroundColor: pathStroke }]}
+                />
+                <Text style={styles.unitDividerText} numberOfLines={1}>
+                  {unit.title}
+                </Text>
+                <View
+                  style={[styles.unitDividerLine, { backgroundColor: pathStroke }]}
+                />
+              </View>
+            </View>
+          );
+        })}
+      </ScrollView>
+
+      {/* Sticky "lesson in view" card */}
+      {cardUnit && (
+        <View
+          style={[styles.nowCard, { top: insets.top + CARD_TOP }]}
+          pointerEvents="box-none"
         >
-          <ExpoImage
-            source={require("@/assets/images/bg/bg.svg")}
-            style={styles.heroBg}
-            contentFit="cover"
-          />
-          <View
-            style={[styles.heroHeader, { paddingTop: insets.top + 14 }]}
+          <View style={{ flex: 1 }}>
+            <Text style={styles.unitSubtitle} numberOfLines={1}>
+              {cardUnit.unit.subtitle}
+            </Text>
+            <Text style={styles.unitTitle} numberOfLines={1}>
+              {cardUnit.unit.title}
+            </Text>
+            <Text style={styles.nowDesc} numberOfLines={2}>
+              {UNIT_INFO_DATA[cardUnit.unit.id]?.info ?? cardUnit.unit.subtitle}
+            </Text>
+          </View>
+          <TouchableOpacity
+            style={styles.infoBtn}
+            disabled={cardUnit.unit.isLocked}
+            onPress={() =>
+              !cardUnit.unit.isLocked &&
+              setSelectedUnit({
+                id: cardUnit.unit.id,
+                title: cardUnit.unit.title,
+                subtitle: cardUnit.unit.subtitle,
+              })
+            }
           >
-            {/* Card: profile avatar + name */}
-            <View style={styles.heroUserCard}>
-              <Image
-                source={getProfileAvatarSource(userProfile?.avatar_url)}
-                style={styles.heroPillAvatar}
-                resizeMode="cover"
-              />
-              <Text style={styles.heroPillName} numberOfLines={1}>
-                {userProfile?.username || "Atom Explorer"}
-              </Text>
-            </View>
-
-            {/* Card: level */}
-            <View style={styles.heroStatCard}>
-              <Icon
-                name="Ranking"
-                size={14}
-                color={theme.colors.primary}
-                variant="Bold"
-              />
-              <Text style={styles.heroStatText}>
-                {levelStats.level}
-              </Text>
-            </View>
-
-            {/* Card: xp */}
-            <View style={styles.heroStatCard}>
-              <Icon name="Flash" size={14} color="#FFA000" variant="Bold" />
-              <Text style={styles.heroStatText}>
-                {(userProfile?.total_xp || 0).toLocaleString()}
-              </Text>
-            </View>
-          </View>
-
-          {/* Mascot placeholder */}
-          <View style={styles.mascotWrap}>
-            <ExpoImage
-              source={require("@/assets/images/mascot/happy.png")}
-              style={styles.mascot}
-              contentFit="contain"
-            />
-          </View>
-        </Animated.View>
-        {/* Continue Learning */}
-        <Animated.View
-          entering={FadeInDown.delay(200)}
-          style={styles.bannerContainer}
-        >
-          <View style={styles.bannerIconCircle}>
             <Icon
-              name={currentProgress.unit.icon || "Atom"}
-              size={22}
+              name={cardUnit.unit.isLocked ? "Lock" : "InfoCircle"}
+              size={20}
+              color={cardUnit.unit.isLocked ? "#9CA3AF" : theme.primary}
+              variant={cardUnit.unit.isLocked ? "Bold" : "Linear"}
+            />
+          </TouchableOpacity>
+        </View>
+      )}
+
+      {/* Solid backdrop so scrolling map content never shows in the header */}
+      <View
+        pointerEvents="none"
+        style={[
+          styles.headerBackdrop,
+          { height: insets.top + CARD_TOP, backgroundColor: pageBg },
+        ]}
+      />
+
+      {/* Floating header */}
+      <View style={[styles.header, { paddingTop: insets.top + 12 }]}>
+        <View style={styles.avatarWrap}>
+          <Image
+            source={getProfileAvatarSource(userProfile?.avatar_url)}
+            style={styles.avatar}
+            resizeMode="cover"
+          />
+        </View>
+        <View style={{ flex: 1 }}>
+          <Text style={styles.greetingLabel}>{getGreeting()}</Text>
+          <Text style={styles.greetingName} numberOfLines={1}>
+            {userProfile?.display_name ||
+              userProfile?.username ||
+              "Atom Explorer"}
+          </Text>
+        </View>
+        <View style={styles.xpPill}>
+          <Icon name="Flash" size={15} color="#FFA000" variant="Bold" />
+          <Text style={styles.xpText}>
+            {(userProfile?.total_xp || 0).toLocaleString()}
+          </Text>
+        </View>
+      </View>
+
+      {/* Floating "jump to current lesson" arrow */}
+      {arrowDir && currentUnitIndex !== -1 && (
+        <Animated.View
+          entering={FadeInDown.duration(250)}
+          exiting={FadeOutDown.duration(200)}
+          style={[styles.nextBtn, { bottom: insets.bottom + 130 }]}
+        >
+          <TouchableOpacity
+            style={styles.nextBtnInner}
+            activeOpacity={0.85}
+            onPress={scrollToCurrent}
+          >
+            <Icon
+              name={arrowDir === "up" ? "ArrowUp" : "ArrowDown"}
+              size={24}
               color="#FFFFFF"
               variant="Bold"
             />
-          </View>
-
-          <View style={styles.bannerContent}>
-            <Text style={styles.bannerLabel}>
-              Lesson {currentProgress.lessonIndex + 1}
-            </Text>
-            <Text style={styles.bannerTitle} numberOfLines={1}>
-              {currentLessonTitle}
-            </Text>
-            <Text style={styles.bannerSubtitle} numberOfLines={1}>
-              {currentProgress.unit.title}
-            </Text>
-          </View>
-
-          <TouchableOpacity
-            style={styles.bannerButton}
-            onPress={() => router.push("/map")}
-          >
-            <Icon
-              name="ArrowRight"
-              size={18}
-              color={theme.colors.primary}
-              variant="Bold"
-            />
           </TouchableOpacity>
         </Animated.View>
-        {/* Quick Actions Row */}
-        <Animated.View
-          entering={FadeInDown.delay(300)}
-          style={styles.quickActionsRow}
-        >
-          {/* Card 1: MythBuster */}
-          <ActionButton
-            icon="Danger"
-            label="MythBuster"
-            iconColor="#FF6B6B"
-            onPress={() => router.push("/mythbuster")}
-          />
+      )}
 
-          {/* Card 2: Encyclopedia */}
-          <ActionButton
-            icon="Book"
-            label="Encyclopedia"
-            iconColor="#6A82FB"
-            onPress={() => router.push("/encyclopedia")}
-          />
+      {/* Unit info modal */}
+      <Modal
+        visible={selectedUnit !== null}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setSelectedUnit(null)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <ScrollView showsVerticalScrollIndicator={false}>
+              <View style={styles.modalHeader}>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.modalSubtitle}>
+                    {selectedUnit?.subtitle}
+                  </Text>
+                  <Text style={styles.modalTitle}>{selectedUnit?.title}</Text>
+                </View>
+                <TouchableOpacity
+                  onPress={() => setSelectedUnit(null)}
+                  style={styles.modalCloseBtn}
+                >
+                  <Icon
+                    name="CloseCircle"
+                    size={28}
+                    color={THEME.textMuted}
+                    variant="Bold"
+                  />
+                </TouchableOpacity>
+              </View>
 
-          {/* Card 3: AtomMaze */}
-          <ActionButton
-            icon="Game"
-            label="AtomMaze"
-            iconColor="#9E87F5"
-            onPress={() => router.push("/atom-maze")}
-          />
-        </Animated.View>
+              <View style={styles.modalSection}>
+                <SectionHeader
+                  icon="InfoCircle"
+                  iconColor={THEME.primary}
+                  title="About This Unit"
+                  titleColor="#1F2937"
+                  palette={THEME}
+                />
+                <Text style={styles.infoText}>
+                  {selectedUnit && UNIT_INFO_DATA[selectedUnit.id]?.info}
+                </Text>
+              </View>
 
-        {/* Leaderboard Widget */}
-        <Animated.View entering={FadeInDown.delay(400)}>
-          <SectionHeader
-            title="Leaderboard"
-            palette={THEME}
-            right={
-              <TouchableOpacity
-                style={styles.arrowButton}
-                onPress={() => router.push("/(tabs)/leaderboard")}
-              >
-                <Icon name="ArrowRight" size={20} color={THEME.textMuted} />
-              </TouchableOpacity>
-            }
-          />
-        </Animated.View>
-
-        <Animated.View
-          entering={FadeInDown.delay(500)}
-          style={styles.leaderboardContainer}
-        >
-          {leaderboardError && (
-            <Text style={{ color: THEME.textMuted, marginBottom: 8 }}>
-              {leaderboardError}
-            </Text>
-          )}
-          {topThree.length === 0 ? (
-            <Text style={{ color: THEME.textMuted }}>
-              Loading leaderboard...
-            </Text>
-          ) : (
-            topThree.map((leader, index) => {
-              const isUser = leader.isUser;
-              const rankColors = ["#FFD700", "#C0C0C0", "#CD7F32"];
-              const isFirst = index === 0;
-              const avatarSource = leader.isNPC
-                ? require("@/assets/images/mascot/profile.png")
-                : getProfileAvatarSource(leader.avatar);
-
-              return (
-                <View key={leader.rank} style={styles.leaderboardRow}>
-                  <View style={styles.rankInfo}>
-                    <View
-                      style={[
-                        styles.rankBadge,
-                        { backgroundColor: rankColors[index] || "#E9ECEF" },
-                      ]}
-                    >
-                      <Text style={styles.rankText}>{leader.rank}</Text>
-                    </View>
-                    <Image source={avatarSource} style={styles.leaderAvatar} />
-                    <View>
-                      <Text style={styles.leaderName}>
-                        {leader.name} {isUser && "(You)"}
-                      </Text>
-                      <Text style={styles.leaderScore}>{leader.xp} XP</Text>
-                    </View>
-                  </View>
-                  {isFirst && (
-                    <Icon
-                      name="Crown"
-                      size={24}
-                      color="#FFD700"
-                      variant="Bold"
-                    />
+              {selectedUnit && UNIT_INFO_DATA[selectedUnit.id]?.references && (
+                <View style={styles.modalSection}>
+                  <SectionHeader
+                    icon="Book1"
+                    iconColor={THEME.primary}
+                    title="References & Resources"
+                    titleColor="#1F2937"
+                    palette={THEME}
+                  />
+                  {UNIT_INFO_DATA[selectedUnit.id].references.map(
+                    (ref, index) => (
+                      <TouchableOpacity
+                        key={index}
+                        style={styles.referenceItem}
+                        onPress={async () => {
+                          const opened = await openExternalUrl(ref);
+                          if (!opened) {
+                            Alert.alert("Error", "Could not open link");
+                          }
+                        }}
+                      >
+                        <Icon
+                          name="Link"
+                          size={16}
+                          color={THEME.primary}
+                          variant="Bold"
+                        />
+                        <Text style={styles.referenceText} numberOfLines={1}>
+                          {ref.replace("https://", "").replace("http://", "")}
+                        </Text>
+                        <Icon
+                          name="ArrowRight2"
+                          size={16}
+                          color={THEME.textMuted}
+                        />
+                      </TouchableOpacity>
+                    ),
                   )}
                 </View>
-              );
-            })
-          )}
+              )}
 
-          <TouchableOpacity
-            style={styles.viewAllLink}
-            onPress={() => router.push("/(tabs)/leaderboard")}
-          >
-            <Text style={styles.viewAllText}>View Full Leaderboard</Text>
-          </TouchableOpacity>
-        </Animated.View>
-
-        <View style={{ height: 100 }} />
-      </ScrollView>
+              <TouchableOpacity
+                style={styles.modalActionBtn}
+                onPress={() => setSelectedUnit(null)}
+              >
+                <Text style={styles.modalActionText}>Got it!</Text>
+              </TouchableOpacity>
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
+
+const LessonNode = ({
+  node,
+  x,
+  y,
+  unitColor,
+  firstId,
+  onPress,
+  styles,
+}: {
+  node: PathNode;
+  x: number;
+  y: number;
+  unitColor: string;
+  firstId: string | null;
+  onPress: () => void;
+  styles: any;
+}) => {
+  const isLocked = node.status === "locked";
+  const isCurrent = node.status === "current";
+  const isCompleted = node.status === "completed";
+  const isFirst = firstId === node.id;
+
+  const pulse = useSharedValue(1);
+  const ring = useSharedValue(1);
+
+  useEffect(() => {
+    if (isCurrent) {
+      pulse.value = withRepeat(withTiming(1.12, { duration: 800 }), -1, true);
+      ring.value = withRepeat(
+        withTiming(1.35, { duration: 800 }),
+        -1,
+        true,
+      );
+    }
+  }, [isCurrent]);
+
+  const pulseStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: pulse.value }],
+  }));
+  const ringStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: ring.value }],
+    opacity: 0.5 - (ring.value - 1) * 1.4,
+  }));
+
+  let iconName = "Star";
+  if (node.type === "book") iconName = "Book";
+  if (node.type === "chest") iconName = "Box";
+  if (node.type === "trophy") iconName = "Cup";
+
+  const faceColor = isLocked
+    ? "#E5E7EB"
+    : isCompleted
+      ? "#FFFFFF"
+      : unitColor;
+  const iconColor = isLocked ? "#9CA3AF" : isCompleted ? unitColor : "#FFFFFF";
+
+  return (
+    <View
+      style={[
+        styles.nodeWrap,
+        { left: x - NODE_SIZE / 2, top: y - NODE_SIZE / 2 },
+      ]}
+    >
+      {isCurrent && (
+        <Animated.View style={[styles.pulseRing, { borderColor: unitColor }, ringStyle]} />
+      )}
+      <TouchableOpacity
+        activeOpacity={0.8}
+        onPress={isLocked ? undefined : onPress}
+      >
+        <Animated.View
+          style={[
+            styles.node,
+            isCurrent ? pulseStyle : {},
+            { shadowColor: isLocked ? "#00000030" : `${unitColor}80` },
+          ]}
+        >
+          <View
+            style={[
+              styles.nodeLip,
+              { backgroundColor: isLocked ? "#CFD8DC" : unitColor },
+            ]}
+          />
+          <View
+            style={[
+              styles.nodeFace,
+              {
+                backgroundColor: faceColor,
+                borderWidth: isCurrent ? 0 : 2,
+                borderColor: isCompleted ? unitColor : "transparent",
+              },
+            ]}
+          >
+            <Icon
+              name={iconName}
+              size={isCurrent || node.type === "trophy" ? 30 : 24}
+              color={iconColor}
+              variant="Bold"
+            />
+            {isCompleted && (
+              <View style={styles.crownBadge}>
+                <Icon name="Crown1" size={12} color="#FFC107" variant="Bold" />
+              </View>
+            )}
+          </View>
+        </Animated.View>
+      </TouchableOpacity>
+
+      {isFirst && (
+        <Animated.View
+          entering={FadeInDown.delay(300)}
+          style={styles.startBubble}
+        >
+          <Text style={styles.startText}>START</Text>
+          <View style={styles.bubbleArrow} />
+        </Animated.View>
+      )}
+    </View>
+  );
+};
 
 const createStyles = (theme: Palette) =>
   StyleSheet.create({
@@ -572,236 +830,381 @@ const createStyles = (theme: Palette) =>
       flex: 1,
       backgroundColor: theme.bg,
     },
-    scrollContent: {
-      padding: 20,
-    },
-    header: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "center",
-      marginBottom: 24,
-    },
-    hero: {
-      marginHorizontal: -20,
-      minHeight: 330,
-      borderRadius: 0,
-      overflow: "hidden",
-      marginBottom: 0,
-      elevation: 4,
-      shadowColor: "#000",
-      shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.12,
-      shadowRadius: 10,
-    },
-    heroBg: {
+    pathLayer: {
       ...StyleSheet.absoluteFillObject,
     },
-    heroHeader: {
+    /* Solid backdrop behind the header (covers scrolled map content) */
+    headerBackdrop: {
+      position: "absolute",
+      top: 0,
+      left: 0,
+      right: 0,
+      zIndex: 85,
+    },
+    /* Floating header — plain row, no box */
+    header: {
+      position: "absolute",
+      top: 0,
+      left: 0,
+      right: 0,
       flexDirection: "row",
       alignItems: "center",
-      gap: 10,
+      gap: 12,
       paddingHorizontal: 20,
-      paddingBottom: 14,
+      paddingBottom: 12,
+      zIndex: 100,
+      pointerEvents: "box-none",
     },
-    heroUserCard: {
-      flex: 1,
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 10,
-      backgroundColor: theme.card,
+    avatarWrap: {
+      width: 46,
+      height: 46,
+      borderRadius: 23,
+      backgroundColor: "#FFFFFF",
       borderWidth: 2,
-      borderColor: theme.border,
+      borderColor: "#E5E7EB",
       borderBottomWidth: 4,
-      borderRadius: 20,
-      paddingVertical: 6,
-      paddingHorizontal: 12,
     },
-    heroPillAvatar: {
-      width: 26,
-      height: 26,
-      borderRadius: 13,
-      backgroundColor: withAlpha(colors.role.black, 0.08),
+    avatar: {
+      width: "100%",
+      height: "100%",
+      borderRadius: 23,
     },
-    heroPillName: {
-      fontSize: 13,
-      color: theme.text,
-      fontWeight: "800",
-      fontFamily: fontFamilies.heavy,
-    },
-    heroStatCard: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 6,
-      backgroundColor: theme.card,
-      borderWidth: 2,
-      borderColor: theme.border,
-      borderBottomWidth: 4,
-      borderRadius: 20,
-      paddingVertical: 10,
-      paddingHorizontal: 12,
-    },
-    heroStatText: {
-      fontSize: 13,
-      color: theme.text,
-      fontWeight: "800",
-      fontFamily: fontFamilies.heavy,
-    },
-    mascotWrap: {
-      flex: 1,
-      alignItems: "center",
-      justifyContent: "center",
-      paddingTop: 4,
-    },
-    mascot: {
-      width: 158,
-      height: 136,
-    },
-    plusBtn: {
-      width: 18,
-      height: 18,
-      borderRadius: 9,
-      backgroundColor: "#FFF",
-      alignItems: "center",
-      justifyContent: "center",
-      marginLeft: 4,
-    },
-    quickActionsRow: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-      marginBottom: 24,
-      gap: 12,
-    },
-    bannerContainer: {
-      height: 92,
-      borderRadius: 16,
-      marginTop: -46,
-      marginBottom: 24,
-      backgroundColor: theme.card,
-      borderWidth: 2,
-      borderColor: theme.border,
-      borderBottomWidth: 4,
-      flexDirection: "row",
-      alignItems: "center",
-      paddingHorizontal: 14,
-      gap: 12,
-      overflow: "hidden",
-    },
-    bannerIconCircle: {
-      width: 48,
-      height: 48,
-      borderRadius: 24,
-      backgroundColor: theme.primary,
-      alignItems: "center",
-      justifyContent: "center",
-      borderWidth: 3,
-      borderColor: theme.card,
-    },
-    bannerContent: {
-      flex: 1,
-      flexShrink: 1,
-    },
-    bannerLabel: {
+    greetingLabel: {
       fontSize: 11,
-      color: theme.primary,
-      fontWeight: "800",
-      fontFamily: fontFamilies.heavy,
-      textTransform: "uppercase",
-      letterSpacing: 0.4,
-      marginBottom: 2,
-    },
-    bannerTitle: {
-      fontSize: 16,
-      fontWeight: "800",
-      fontFamily: fontFamilies.heavy,
-      color: theme.text,
-      marginBottom: 1,
-    },
-    bannerSubtitle: {
-      fontSize: 12,
-      color: theme.textMuted,
       fontWeight: "600",
       fontFamily: fontFamilies.semibold,
+      color: theme.textMuted,
+      textTransform: "uppercase",
+      letterSpacing: 0.6,
+      marginBottom: 1,
     },
-    bannerButton: {
-      width: 40,
-      height: 40,
-      borderRadius: 20,
-      borderWidth: 2,
-      borderColor: theme.primary,
-      backgroundColor: "transparent",
-      alignItems: "center",
-      justifyContent: "center",
+    greetingName: {
+      fontSize: 17,
+      fontWeight: "800",
+      fontFamily: fontFamilies.heavy,
+      color: theme.text,
     },
-    arrowButton: {
-      width: 32,
-      height: 32,
-      borderRadius: 16,
-      backgroundColor: theme.card,
-      alignItems: "center",
-      justifyContent: "center",
-    },
-    leaderboardContainer: {
-      backgroundColor: theme.card,
-      borderRadius: 24,
-      padding: 16,
-      elevation: 2,
-      shadowColor: "#000",
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.05,
-      shadowRadius: 4,
-    },
-    leaderboardRow: {
+    xpPill: {
       flexDirection: "row",
       alignItems: "center",
-      justifyContent: "space-between",
-      paddingVertical: 12,
-      borderBottomWidth: 1,
-      borderBottomColor: theme.border,
+      gap: 5,
+      backgroundColor: "#FFFFFF",
+      paddingHorizontal: 12,
+      paddingVertical: 10,
+      borderRadius: 20,
+      borderWidth: 2,
+      borderColor: "#E5E7EB",
+      borderBottomWidth: 4,
     },
-    rankInfo: {
+    xpText: {
+      fontSize: 13,
+      fontWeight: "800",
+      fontFamily: fontFamilies.heavy,
+      color: "#1F2937",
+    },
+    /* Sticky unit card — fixed light surface (never black in dark mode) */
+    nowCard: {
+      position: "absolute",
+      left: 20,
+      right: 20,
+      zIndex: 90,
       flexDirection: "row",
       alignItems: "center",
       gap: 12,
+      backgroundColor: "#FFFFFF",
+      borderRadius: 24,
+      padding: 20,
+      borderWidth: 2,
+      borderColor: "#E5E7EB",
+      borderBottomWidth: 4,
     },
-    rankBadge: {
+    nowDesc: {
+      fontSize: 12,
+      fontFamily: fontFamilies.regular,
+      lineHeight: 16,
+      color: "#9CA3AF",
+      marginTop: 2,
+    },
+    /* Nodes */
+    nodeWrap: {
+      position: "absolute",
+      width: NODE_SIZE,
+      height: NODE_SIZE,
+      alignItems: "center",
+      justifyContent: "center",
+      zIndex: 10,
+    },
+    pulseRing: {
+      position: "absolute",
+      width: NODE_SIZE,
+      height: NODE_SIZE,
+      borderRadius: NODE_SIZE / 2,
+      borderWidth: 3,
+    },
+    node: {
+      width: NODE_SIZE,
+      height: NODE_SIZE,
+      borderRadius: NODE_SIZE / 2,
+      alignItems: "center",
+      justifyContent: "center",
+      elevation: 5,
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.25,
+      shadowRadius: 5,
+    },
+    nodeLip: {
+      position: "absolute",
+      bottom: 0,
+      left: 0,
+      right: 0,
+      height: "100%",
+      borderRadius: NODE_SIZE / 2,
+      zIndex: -1,
+      transform: [{ translateY: 5 }],
+    },
+    nodeFace: {
+      width: "100%",
+      height: "100%",
+      borderRadius: NODE_SIZE / 2,
+      alignItems: "center",
+      justifyContent: "center",
+      zIndex: 1,
+    },
+    crownBadge: {
+      position: "absolute",
+      bottom: -4,
+      right: -4,
+      backgroundColor: theme.card,
       width: 24,
       height: 24,
       borderRadius: 12,
       alignItems: "center",
       justifyContent: "center",
+      borderWidth: 2,
+      borderColor: "#E5E7EB",
+      zIndex: 20,
     },
-    rankText: {
-      color: "#FFF",
-      fontSize: 12,
+    startBubble: {
+      position: "absolute",
+      top: -40,
+      alignSelf: "center",
+      backgroundColor: theme.card,
+      paddingHorizontal: 12,
+      paddingVertical: 7,
+      borderRadius: 12,
+      borderWidth: 2,
+      borderColor: "#E5E7EB",
+      zIndex: 20,
+      elevation: 4,
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
+    },
+    startText: {
       fontWeight: "800",
       fontFamily: fontFamilies.heavy,
+      color: theme.primary,
+      fontSize: 13,
     },
-    leaderAvatar: {
-      width: 40,
-      height: 40,
-      borderRadius: 20,
-      backgroundColor: "#E9ECEF",
+    bubbleArrow: {
+      position: "absolute",
+      bottom: -7,
+      left: "50%",
+      marginLeft: -6,
+      width: 12,
+      height: 12,
+      backgroundColor: theme.card,
+      borderBottomWidth: 2,
+      borderRightWidth: 2,
+      borderColor: "#E5E7EB",
+      transform: [{ rotate: "45deg" }],
     },
-    leaderName: {
-      fontSize: 14,
-      fontWeight: "700",
-      fontFamily: fontFamilies.bold,
-      color: theme.text,
+    unitDivider: {
+      position: "absolute",
+      top: 24,
+      left: 20,
+      right: 20,
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 14,
     },
-    leaderScore: {
-      fontSize: 12,
+    unitDividerLine: {
+      flex: 1,
+      height: 2,
+      borderRadius: 1,
+    },
+    unitDividerText: {
+      fontSize: 13,
+      fontWeight: "800",
+      fontFamily: fontFamilies.heavy,
       color: theme.textMuted,
+      textTransform: "uppercase",
+      letterSpacing: 1,
+    },
+    unitSubtitle: {
+      fontSize: 11,
       fontWeight: "600",
       fontFamily: fontFamilies.semibold,
+      color: "#9CA3AF",
+      textTransform: "uppercase",
+      letterSpacing: 0.6,
+      marginBottom: 2,
     },
-    viewAllLink: {
-      marginTop: 16,
+    unitTitle: {
+      fontSize: 17,
+      fontWeight: "800",
+      fontFamily: fontFamilies.heavy,
+      color: "#1F2937",
+    },
+    infoBtn: {
+      width: 40,
+      height: 40,
+      backgroundColor: "#F4F5F7",
+      borderRadius: 12,
       alignItems: "center",
+      justifyContent: "center",
     },
-    viewAllText: {
+    /* Floating "jump to current lesson" arrow */
+    nextBtn: {
+      position: "absolute",
+      right: 24,
+      width: 56,
+      height: 56,
+      zIndex: 95,
+    },
+    nextBtnInner: {
+      flex: 1,
+      borderRadius: 28,
+      backgroundColor: theme.primary,
+      alignItems: "center",
+      justifyContent: "center",
+      borderBottomWidth: 4,
+      borderBottomColor: "rgba(0,0,0,0.15)",
+    },
+    /* Modal */
+    modalOverlay: {
+      flex: 1,
+      backgroundColor: "rgba(0, 0, 0, 0.7)",
+      justifyContent: "center",
+      alignItems: "center",
+      padding: 20,
+    },
+    modalContent: {
+      backgroundColor: "#FFFFFF",
+      borderRadius: 24,
+      width: "100%",
+      maxWidth: 500,
+      maxHeight: "80%",
+      padding: 24,
+      borderWidth: 2,
+      borderColor: "#E5E7EB",
+      borderBottomWidth: 4,
+    },
+    modalHeader: {
+      flexDirection: "row",
+      alignItems: "flex-start",
+      marginBottom: 24,
+      gap: 12,
+    },
+    modalSubtitle: {
+      fontSize: 12,
+      fontWeight: "600",
+      fontFamily: fontFamilies.semibold,
+      color: "#9CA3AF",
+      textTransform: "uppercase",
+      letterSpacing: 1,
+      marginBottom: 4,
+    },
+    modalTitle: {
+      fontSize: 24,
+      fontWeight: "800",
+      fontFamily: fontFamilies.heavy,
+      color: "#1F2937",
+      lineHeight: 30,
+    },
+    modalCloseBtn: {
+      padding: 4,
+    },
+    modalSection: {
+      marginBottom: 24,
+    },
+    infoText: {
+      fontSize: 15,
+      fontFamily: fontFamilies.regular,
+      lineHeight: 24,
+      color: "#374151",
+    },
+    referenceItem: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 10,
+      paddingVertical: 12,
+      paddingHorizontal: 16,
+      backgroundColor: "#F4F5F7",
+      borderRadius: 14,
+      marginBottom: 8,
+      borderWidth: 2,
+      borderColor: "#E5E7EB",
+      borderBottomWidth: 4,
+    },
+    referenceText: {
+      flex: 1,
+      fontSize: 13,
       color: theme.primary,
+      fontWeight: "500",
+      fontFamily: fontFamilies.medium,
+    },
+    modalActionBtn: {
+      backgroundColor: theme.primary,
+      paddingVertical: 16,
+      borderRadius: 16,
+      alignItems: "center",
+      marginTop: 8,
+      borderBottomWidth: 4,
+      borderBottomColor: "rgba(0,0,0,0.15)",
+    },
+    modalActionText: {
+      fontSize: 16,
       fontWeight: "700",
       fontFamily: fontFamilies.bold,
-      fontSize: 14,
+      color: "#FFF",
+    },
+    /* Loading */
+    loadingContainer: {
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+      paddingHorizontal: 40,
+    },
+    loadingMascot: {
+      width: 180,
+      height: 180,
+      marginBottom: 24,
+    },
+    loadingTitle: {
+      fontSize: 24,
+      fontWeight: "800",
+      fontFamily: fontFamilies.heavy,
+      color: theme.text,
+      textAlign: "center",
+      marginBottom: 8,
+    },
+    loadingSubtitle: {
+      fontSize: 16,
+      fontFamily: fontFamilies.regular,
+      color: theme.textMuted,
+      textAlign: "center",
+      marginBottom: 32,
+    },
+    loadingDotsContainer: {
+      flexDirection: "row",
+      gap: 12,
+      alignItems: "center",
+    },
+    loadingDot: {
+      width: 16,
+      height: 16,
+      borderRadius: 8,
     },
   });

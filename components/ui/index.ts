@@ -8,12 +8,6 @@ export type { TextProps, TextVariant, TextColor } from "./text";
 export { Button } from "./button";
 export type { ButtonProps } from "./button";
 
-export { ActionButton } from "./action-button";
-export type { ActionButtonProps } from "./action-button";
-
-export { IconButton } from "./icon-button";
-export type { IconButtonProps } from "./icon-button";
-
 export { Card } from "./card";
 export type { CardVariant, CardProps } from "./card";
 
@@ -31,12 +25,6 @@ export type { ChipProps } from "./chip";
 
 export { Divider } from "./divider";
 export type { DividerProps } from "./divider";
-
-export { Spinner, LoadingState } from "./spinner";
-export type { SpinnerProps, LoadingStateProps } from "./spinner";
-
-export { EmptyState } from "./empty-state";
-export type { EmptyStateProps } from "./empty-state";
 
 export { PageHeader } from "./page-header";
 export type { PageHeaderProps } from "./page-header";
