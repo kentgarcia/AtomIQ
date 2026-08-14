@@ -97,7 +97,6 @@ function AppContent() {
         <Stack.Screen name="index" options={{ headerShown: false }} />
         <Stack.Screen name="onboarding" options={{ headerShown: false }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="map" options={{ headerShown: false }} />
         <Stack.Screen name="lesson" options={{ headerShown: false }} />
         <Stack.Screen name="ai-chat" options={{ headerShown: false }} />
         <Stack.Screen name="mythbuster" options={{ headerShown: false }} />

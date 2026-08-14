@@ -1,6 +1,7 @@
 import {fontFamilies} from "@/theme";
 import { MarkdownText } from "@/components/markdown-text";
 import { Icon } from "@/components/ui/icon";
+import { HowToPlayCard } from "@/components/games/HowToPlayCard";
 import { getAllMyths } from "@/content/myths";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useThemeColor } from "@/hooks/use-theme-color";
@@ -8,8 +9,8 @@ import { useStorage } from "@/services/StorageContext";
 import { logDailyActivity } from "@/services/database";
 import { playGameSfx, preloadGameSfx } from "@/services/game-sfx";
 import { LinearGradient } from "expo-linear-gradient";
-import { useRouter } from "expo-router";
-import React, { useEffect, useState } from "react";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Dimensions,
   Image,
@@ -120,6 +121,7 @@ const GAME_MODES: ModeConfig[] = [
 
 export default function MythBusterScreen() {
   const router = useRouter();
+  const { mode: modeParam } = useLocalSearchParams<{ mode?: string }>();
   const { addXP, updateUserProfile, userProfile } = useStorage();
   const insets = useSafeAreaInsets();
   const colorScheme = useColorScheme();
@@ -316,6 +318,19 @@ export default function MythBusterScreen() {
     setGameState("intro");
     setTimeLeft(mode.timeLimit ?? null);
   };
+
+  // Arrived from the Games tab difficulty panel → skip mode select
+  const autoStartedRef = useRef(false);
+  useEffect(() => {
+    if (autoStartedRef.current) return;
+    if (!modeParam) return;
+    const param = Array.isArray(modeParam) ? modeParam[0] : modeParam;
+    const mode = GAME_MODES.find((m) => m.id === param);
+    if (mode) {
+      autoStartedRef.current = true;
+      startMode(mode);
+    }
+  }, [modeParam]);
 
   const handleSwipe = (direction: "truth" | "myth") => {
     if (!currentMyth || isAnimating) return;
@@ -744,148 +759,142 @@ export default function MythBusterScreen() {
       }
     };
 
+    const getModeDescription = () => {
+      switch (selectedMode.id) {
+        case "quick":
+          return "Take your time and judge each statement at your own pace.";
+        case "challenge":
+          return `Race the clock — you have ${selectedMode.timeLimit} seconds per statement!`;
+        case "endless":
+          return "You have 3 lives. How far can you go before you run out?";
+        default:
+          return "Swipe to judge each statement.";
+      }
+    };
+
     return (
       <GestureHandlerRootView style={{ flex: 1 }}>
-        <LinearGradient
-          colors={[selectedMode.colorSecondary, selectedMode.color]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 0, y: 1 }}
-          style={styles.fullScreen}
+        <View
+          style={[
+            styles.fullScreen,
+            { backgroundColor: selectedMode.colorSecondary },
+          ]}
         >
           <SafeAreaView style={styles.fullScreen}>
             {/* Header */}
             <View style={styles.introHeader}>
               <TouchableOpacity onPress={resetGame} style={styles.introBackBtn}>
-                <Icon name="ArrowLeft2" size={20} color="#FFF" />
+                <Icon name="ArrowLeft2" size={20} color="#1F2937" />
               </TouchableOpacity>
-              <View style={styles.introModePillLight}>
-                <Icon
-                  name={selectedMode.icon as any}
-                  size={14}
-                  color="#FFF"
-                  variant="Bold"
-                />
-                <Text style={styles.introModePillText}>
-                  {selectedMode.title}
-                </Text>
+              <View
+                style={[
+                  styles.introBadge,
+                  { backgroundColor: selectedMode.color },
+                ]}
+              >
+                <Icon name="Game" size={18} color="#FFF" variant="Bold" />
+                <Text style={styles.introBadgeText}>Myth Buster</Text>
               </View>
               <View style={{ width: 44 }} />
             </View>
 
-            <View style={styles.introContent}>
-              {/* Single white card with all instructions */}
-              <View style={styles.introWhiteCard}>
-                <Text style={styles.introCardTitle}>How to Play</Text>
-
-                {/* Swipe instructions */}
-                <View style={styles.introSwipeRow}>
-                  <View
-                    style={[
-                      styles.introSwipeItem,
-                      { backgroundColor: THEME.error + "10" },
-                    ]}
-                  >
-                    <Icon
-                      name="ArrowLeft"
-                      size={20}
-                      color={THEME.error}
-                      variant="Bold"
-                    />
-                    <Text
-                      style={[styles.introSwipeLabel, { color: THEME.error }]}
-                    >
-                      MYTH
-                    </Text>
-                  </View>
-                  <View
-                    style={[
-                      styles.introSwipeItem,
-                      { backgroundColor: THEME.success + "10" },
-                    ]}
-                  >
-                    <Text
-                      style={[styles.introSwipeLabel, { color: THEME.success }]}
-                    >
-                      TRUTH
-                    </Text>
-                    <Icon
-                      name="ArrowRight"
-                      size={20}
-                      color={THEME.success}
-                      variant="Bold"
-                    />
-                  </View>
-                </View>
-
-                {/* Divider */}
-                <View style={styles.introCardDivider} />
-
-                {/* Mode info */}
-                <View style={styles.introModeInfo}>
-                  <Icon
-                    name={
-                      selectedMode.id === "endless"
-                        ? "Heart"
-                        : (selectedMode.icon as any)
-                    }
-                    size={18}
-                    color={selectedMode.color}
-                    variant="Bold"
-                  />
-                  <Text style={styles.introModeInfoText}>
-                    {getModeInstruction()}
+            <ScrollView
+              style={styles.introScrollView}
+              contentContainerStyle={styles.introScrollContent}
+              showsVerticalScrollIndicator={false}
+              bounces
+            >
+              <View style={styles.introContainer}>
+                {/* Title Card */}
+                <View style={styles.introCard}>
+                  <Text style={styles.introTitle}>{selectedMode.title}</Text>
+                  <Text style={styles.introSubtitle}>Swipe MYTH or TRUTH</Text>
+                  <Text style={styles.introDescription}>
+                    {getModeDescription()}
                   </Text>
                 </View>
 
-                {/* Stats row */}
-                <View style={styles.introStatsRow}>
-                  <View style={styles.introStatItem}>
-                    <Icon name="Layer" size={16} color={THEME.textMuted} />
-                    <Text style={styles.introStatText}>
-                      {selectedMode.rounds === 999 ? "∞" : selectedMode.rounds}{" "}
-                      rounds
-                    </Text>
-                  </View>
-                  <View style={styles.introStatItem}>
-                    <Icon
-                      name="Flash"
-                      size={16}
-                      color={THEME.gold}
-                      variant="Bold"
-                    />
-                    <Text style={styles.introStatText}>
-                      {selectedMode.xpMultiplier}x XP
-                    </Text>
-                  </View>
-                </View>
-              </View>
-            </View>
-
-            {/* Bottom Start Button */}
-            <View style={styles.introBottom}>
-              <TouchableOpacity
-                onPress={() => setGameState("playing")}
-                activeOpacity={0.9}
-                style={styles.introStartBtnWhite}
-              >
-                <Text
-                  style={[
-                    styles.introStartTextColored,
-                    { color: selectedMode.color },
+                {/* How to Play */}
+                <HowToPlayCard
+                  steps={[
+                    {
+                      id: "myth",
+                      icon: "Dislike",
+                      title: "Swipe MYTH",
+                      hint: "Swipe a statement left when it's a myth.",
+                    },
+                    {
+                      id: "truth",
+                      icon: "Like",
+                      title: "Swipe TRUTH",
+                      hint: "Swipe right when it's actually a fact.",
+                    },
+                    {
+                      id: "mode",
+                      icon: selectedMode.id === "endless" ? "Heart" : "Timer",
+                      title: selectedMode.title,
+                      hint: getModeInstruction(),
+                    },
                   ]}
-                >
-                  Start Game
-                </Text>
-                <Icon
-                  name="ArrowRight2"
-                  size={20}
-                  color={selectedMode.color}
-                  variant="Bold"
+                  palette={{
+                    cardBg: "#FFFFFF",
+                    cardBorder: "#E5E7EB",
+                    primaryText: "#1F2937",
+                    mutedText: "#6B7280",
+                    subtleBg: "#F9FAFB",
+                    subtleBorder: "#E5E7EB",
+                    iconWrapBg: "#F3F4F6",
+                  }}
+                  accentColor={selectedMode.color}
+                  footer={
+                    <View style={styles.introStatsRow}>
+                      <View style={styles.introStatItem}>
+                        <Icon name="Layer" size={16} color={THEME.textMuted} />
+                        <Text style={styles.introStatText}>
+                          {selectedMode.rounds === 999 ? "∞" : selectedMode.rounds}{" "}
+                          rounds
+                        </Text>
+                      </View>
+                      <View style={styles.introStatItem}>
+                        <Icon
+                          name="Flash"
+                          size={16}
+                          color={THEME.gold}
+                          variant="Bold"
+                        />
+                        <Text style={styles.introStatText}>
+                          {selectedMode.xpMultiplier}x XP
+                        </Text>
+                      </View>
+                    </View>
+                  }
                 />
-              </TouchableOpacity>
-            </View>
+
+                {/* Start Button */}
+                <TouchableOpacity
+                  style={styles.startButtonCard}
+                  onPress={() => setGameState("playing")}
+                  activeOpacity={0.9}
+                >
+                  <Icon
+                    name="Play"
+                    size={26}
+                    color={selectedMode.color}
+                    variant="Bold"
+                  />
+                  <Text
+                    style={[
+                      styles.startButtonCardText,
+                      { color: selectedMode.color },
+                    ]}
+                  >
+                    START GAME
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </ScrollView>
           </SafeAreaView>
-        </LinearGradient>
+        </View>
       </GestureHandlerRootView>
     );
   }
@@ -1784,87 +1793,68 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: "rgba(255,255,255,0.2)",
+    backgroundColor: "#FFF",
     alignItems: "center",
     justifyContent: "center",
+    borderWidth: 2,
+    borderColor: "#E5E7EB",
+    borderBottomWidth: 4,
   },
-  introModePillLight: {
+  introBadge: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 6,
-    backgroundColor: "rgba(255,255,255,0.2)",
-    paddingHorizontal: 14,
-    paddingVertical: 8,
+    gap: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
     borderRadius: 20,
+    borderWidth: 2,
+    borderColor: "rgba(255,255,255,0.3)",
+    borderBottomWidth: 4,
+    borderBottomColor: "rgba(0,0,0,0.2)",
   },
-  introModePillText: {
-    fontSize: 13,
-    fontWeight: "700",
-    fontFamily: fontFamilies.bold,
+  introBadgeText: {
+    fontSize: 16,
+    fontWeight: "900",
+    fontFamily: fontFamilies.heavy,
     color: "#FFF",
   },
-  introContent: {
+  introScrollView: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    paddingHorizontal: 24,
   },
-  // Single white card
-  introWhiteCard: {
+  introScrollContent: {
+    paddingHorizontal: 20,
+    paddingTop: 16,
+  },
+  introContainer: {
+    gap: 20,
+  },
+  introCard: {
     backgroundColor: "#FFF",
     borderRadius: 24,
     padding: 24,
-    width: "100%",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 12,
-    elevation: 6,
+    borderWidth: 2,
+    borderColor: "#E5E7EB",
+    borderBottomWidth: 4,
   },
-  introCardTitle: {
-    fontSize: 22,
+  introTitle: {
+    fontSize: 28,
     fontWeight: "900",
-    fontFamily: fontFamilies.black,
-    color: THEME.text,
-    textAlign: "center",
-    marginBottom: 20,
-  },
-  introSwipeRow: {
-    flexDirection: "row",
-    gap: 12,
-    marginBottom: 20,
-  },
-  introSwipeItem: {
-    flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 8,
-    paddingVertical: 14,
-    borderRadius: 12,
-  },
-  introSwipeLabel: {
-    fontSize: 15,
-    fontWeight: "800",
     fontFamily: fontFamilies.heavy,
+    color: "#1F2937",
+    marginBottom: 4,
   },
-  introCardDivider: {
-    height: 1,
-    backgroundColor: THEME.border,
-    marginBottom: 16,
-  },
-  introModeInfo: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
-    marginBottom: 16,
-  },
-  introModeInfoText: {
+  introSubtitle: {
     fontSize: 14,
     fontWeight: "600",
     fontFamily: fontFamilies.semibold,
-    color: THEME.text,
-    flex: 1,
+    color: "#6B7280",
+    marginBottom: 12,
+  },
+  introDescription: {
+    fontSize: 14,
+    fontFamily: fontFamilies.regular,
+    color: "#6B7280",
+    lineHeight: 22,
   },
   introStatsRow: {
     flexDirection: "row",
@@ -1882,23 +1872,23 @@ const styles = StyleSheet.create({
     fontFamily: fontFamilies.semibold,
     color: THEME.textMuted,
   },
-  introBottom: {
-    paddingHorizontal: 24,
-    paddingBottom: 32,
-  },
-  introStartBtnWhite: {
+  startButtonCard: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    gap: 10,
-    backgroundColor: "#FFF",
+    gap: 12,
     paddingVertical: 18,
-    borderRadius: 28,
+    borderRadius: 20,
+    borderWidth: 2,
+    borderBottomWidth: 4,
+    backgroundColor: "#FFF",
+    borderColor: "#E5E7EB",
   },
-  introStartTextColored: {
+  startButtonCardText: {
     fontSize: 17,
-    fontWeight: "800",
+    fontWeight: "900",
     fontFamily: fontFamilies.heavy,
+    letterSpacing: 0.5,
   },
   // Legacy styles
   instructionsCard: {

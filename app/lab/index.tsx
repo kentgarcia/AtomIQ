@@ -1,7 +1,8 @@
 import {fontFamilies} from "@/theme";
 import { Icon } from '@/components/ui/icon';
+import { HowToPlayCard } from '@/components/games/HowToPlayCard';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useState, useEffect, useRef } from 'react';
 import { Dimensions, ScrollView, StyleSheet, Text, TouchableOpacity, View, Animated as RNAnimated } from 'react-native';
 import Animated, { 
@@ -65,6 +66,42 @@ function EntranceScreen({ onSelectSim }: { onSelectSim: (sim: 'dose-visualizer' 
       description: 'Compare nuclear energy safety and emissions vs fossil fuels',
       color: '#06FFA5',
       gradient: ['#06FFA5', '#00D9FF'],
+    },
+    {
+      id: 'how-to-play',
+      icon: 'Activity',
+      guide: true,
+    },
+  ];
+
+  const guidePalette = {
+    cardBg: THEME.card,
+    cardBorder: THEME.border,
+    primaryText: THEME.text,
+    mutedText: THEME.textMuted,
+    subtleBg: 'rgba(255, 255, 255, 0.06)',
+    subtleBorder: THEME.border,
+    iconWrapBg: 'rgba(255, 255, 255, 0.1)',
+  };
+
+  const HOW_TO_PLAY_STEPS = [
+    {
+      id: 'choose',
+      title: 'Pick an Experiment',
+      hint: 'Swipe between Dose Visualizer and Energy Showdown.',
+      icon: 'Layer',
+    },
+    {
+      id: 'compare',
+      title: 'Tap & Compare',
+      hint: 'Tap sources and switch metrics to compare the values.',
+      icon: 'Chart',
+    },
+    {
+      id: 'verdict',
+      title: 'Learn the Verdict',
+      hint: 'Read the verdicts and see why nuclear wins on safety.',
+      icon: 'InfoCircle',
     },
   ];
 
@@ -157,6 +194,33 @@ function EntranceScreen({ onSelectSim }: { onSelectSim: (sim: 'dose-visualizer' 
             transform: [{ scale: cardStyle.scale }],
             opacity: cardStyle.opacity,
           }));
+
+          if ("guide" in exp) {
+            return (
+              <Animated.View
+                key={exp.id}
+                style={[styles.experimentCard, { width: CARD_WIDTH }, animatedCardStyle]}
+              >
+                <View style={styles.howToSlide}>
+                  <View style={styles.experimentIconContainer}>
+                    <Icon name={exp.icon} size={64} color={THEME.primary} variant="Bold" />
+                  </View>
+                  <View style={{ width: '100%' }}>
+                    <HowToPlayCard
+                      steps={HOW_TO_PLAY_STEPS}
+                      palette={guidePalette}
+                      accentColor={THEME.primary}
+                    />
+                  </View>
+                  <View style={styles.howToHint}>
+                    <Icon name="ArrowLeft2" size={16} color={THEME.textMuted} />
+                    <Text style={styles.howToHintText}>Swipe to explore</Text>
+                    <Icon name="ArrowRight2" size={16} color={THEME.textMuted} />
+                  </View>
+                </View>
+              </Animated.View>
+            );
+          }
 
           return (
             <Animated.View
@@ -529,7 +593,10 @@ function EnergyShowdown({ onBack }: { onBack: () => void }) {
 
 export default function LabScreen() {
   const router = useRouter();
-  const [mode, setMode] = useState<LabMode>('entrance');
+  const { exp } = useLocalSearchParams<{ exp?: string }>();
+  const initialMode: LabMode =
+    exp === 'dose-visualizer' || exp === 'energy-showdown' ? exp : 'entrance';
+  const [mode, setMode] = useState<LabMode>(initialMode);
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
@@ -608,6 +675,30 @@ const styles = StyleSheet.create({
     marginRight: CARD_SPACING,
     borderRadius: 24,
     overflow: 'hidden',
+  },
+  howToSlide: {
+    padding: 32,
+    minHeight: 400,
+    backgroundColor: THEME.card,
+    borderColor: THEME.border,
+    borderWidth: 2,
+    borderRadius: 24,
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  howToHint: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginTop: 24,
+  },
+  howToHintText: {
+    color: THEME.textMuted,
+    fontSize: 13,
+    fontWeight: '600',
+    fontFamily: fontFamilies.semibold,
+    letterSpacing: 1,
+    textTransform: 'uppercase',
   },
   experimentGradient: {
     padding: 32,
