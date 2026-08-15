@@ -18,6 +18,7 @@ const iconNameMap: Record<string, string> = {
   TickSquare: "TickSquare",
   Sun: "Sun1",
   Sword: "Slash",
+  Loader: "Refresh",
 };
 
 interface IconProps {

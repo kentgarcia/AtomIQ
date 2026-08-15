@@ -1,0 +1,2379 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AtomIQ — Content Editor</title>
+<!--
+  ===========================================================================
+  AtomIQ Content Editor
+
+  A tiny, server-less authoring tool that runs ENTIRELY in the browser using
+  sql.js (SQLite compiled to WebAssembly). No backend, no uploads.
+
+  Three tabs
+    1. Editor — the friendly lesson / step editor:
+         - browse lessons grouped by unit (search included)
+         - create / duplicate / delete lessons & steps
+         - edit every field of a lesson (metadata, prerequisites, tags)
+         - type-specific forms for all 6 step types:
+             briefing, myth_buster, micro_learn, lab, assessment, debrief
+         - every change autosaves to the in-memory database, then hit
+           "Export .db" to download and re-bundle into the app.
+    2. Quiz Editor — quizzes, their questions, and the standalone
+         mythbuster question banks (used by the atom-maze boss battles):
+         - create / duplicate / delete quizzes
+         - edit quiz metadata (difficulty, category, passing score, XP,
+           optional time limits, tags, legacy unit_id / JSON metadata)
+         - per-question forms for all 4 types (multiple_choice, true_false,
+           matching, fill_blank): options, correct answer (numeric index or
+           boolean), explanation, points, image & per-question time limit
+         - browse the easy / medium / hard mythbuster pools and add /
+           move / duplicate / delete each question directly
+    3. SQL Console — the raw-power safety valve: run any SQL against the
+         same in-memory database, inspect tables, repair edge cases.
+
+  Workflow
+    1. Load content.db (upload / drag-drop) OR "New blank DB" to start empty
+       (schema matches scripts/content-migration/schema.sql).
+    2. Edit lessons & steps in the Editor tab.
+    3. "Export .db" downloads the modified database, then copy it over
+       assets/database/content.db (and bump CONTENT_DB_VERSION in
+       services/content-db.ts).
+
+  HOW TO RUN
+    Prefer: npm run content-editor   (serves the repo + auto-detects DB, then
+            opens the editor — see scripts/content-editor.js).
+    Or just open this file in a modern browser (needs internet the first time
+    to fetch sql.js + Bootstrap from a CDN).
+
+    AUTO-DETECT: when served over http:// the tool probes
+    ../content/lessons/content.db and ../assets/database/content.db and loads
+    the first match automatically. Browsers block fetch on file:// so opening
+    the HTML directly won't auto-load — use the picker or "New blank DB".
+
+  NOTE
+    This tool is for authoring/QA only — it never ships with the app.
+    The app reads the same .db via expo-sqlite (services/content-db.ts).
+  ===========================================================================
+-->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+<script>
+// Resolve theme before first paint to avoid a flash: saved choice wins, else follow system.
+(function () {
+  var saved = null;
+  try { saved = localStorage.getItem("atomiq-editor-theme"); } catch (e) {}
+  var theme = saved === "light" || saved === "dark" ? saved
+            : (window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark");
+  document.documentElement.setAttribute("data-bs-theme", theme);
+})();
+</script>
+<style>
+  body{min-height:100vh}
+  .app-container{max-width:1360px;margin:0 auto;padding:1.5rem 1.25rem 6rem}
+  /* drop zone */
+  .dropzone{border:2px dashed var(--bs-secondary);border-radius:var(--bs-border-radius-lg);transition:.15s}
+  .dropzone.drag{border-color:var(--bs-primary);background:var(--bs-primary-bg-subtle)}
+  /* lesson tree */
+  .unit-label{font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--bs-secondary-color)}
+  #tree .list-group{border-radius:var(--bs-border-radius);overflow:hidden}
+  #tree .lesson-item{cursor:pointer}
+  #tree .lesson-item.active .idx{color:var(--bs-emphasis-color)}
+  /* chips (tags / prerequisites) */
+  .chips{display:flex;flex-wrap:wrap;gap:.4rem;align-items:center}
+  .chip{display:inline-flex;align-items:center;gap:.35rem;border-radius:2rem;padding:.28rem .7rem;font-size:.82rem;
+        background:var(--bs-secondary-bg);border:1px solid var(--bs-border-color);color:var(--bs-body-color)}
+  .chip .x{background:none;border:0;padding:0;line-height:1;color:var(--bs-secondary-color);font-size:.9rem}
+  .chip .x:hover{color:var(--bs-danger)}
+  .chip.on{background:var(--bs-primary);border-color:var(--bs-primary);color:#fff}
+  .chip.toggle{cursor:pointer;user-select:none}
+  /* steps */
+  .step{box-shadow:var(--bs-box-shadow-sm)}
+  .step-head .badge{letter-spacing:.06em;text-transform:uppercase}
+  /* toast */
+  .status{position:fixed;bottom:1.25rem;right:1.25rem;z-index:2000;opacity:0;transform:translateY(12px);
+          transition:.25s;box-shadow:var(--bs-box-shadow-lg);pointer-events:none}
+  .status.show{opacity:1;transform:none}
+  textarea.form-control{font-family:var(--bs-font-monospace);font-size:.82rem}
+  .kv .form-control{font-size:.9rem}
+  .opt4 .form-control{padding:.32rem .6rem;font-size:.86rem}
+  #toolbar{position:sticky;top:0;z-index:1000;backdrop-filter:blur(6px);background:color-mix(in srgb, var(--bs-body-bg) 88%, transparent)}
+</style>
+</head>
+<body>
+<div class="app-container">
+
+  <!-- Header -->
+  <nav class="navbar navbar-expand-lg mb-4" id="toolbar">
+    <div class="container-fluid px-0">
+      <div>
+        <span class="navbar-brand fw-bold mb-0">
+          <i class="bi bi-database-gear me-2 text-primary"></i>AtomIQ Content Editor
+        </span>
+        <div class="text-secondary small">sql.js (SQLite → WebAssembly) · everything stays in your browser</div>
+      </div>
+      <div class="d-flex align-items-center gap-2">
+        <span id="dbState" class="badge text-bg-secondary">No database loaded</span>
+        <button id="themeBtn" class="btn btn-outline-secondary btn-sm" title="Toggle light / dark theme" aria-label="Toggle theme">
+          <i class="bi bi-moon-fill" id="themeIcon"></i>
+        </button>
+        <button id="exportTopBtn" class="btn btn-success btn-sm" disabled><i class="bi bi-download me-1"></i>Export .db</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- 0. Load / create -->
+  <div class="dropzone d-flex align-items-center flex-wrap gap-3 px-4 py-3 mb-3" id="drop">
+    <button id="pickBtn" class="btn btn-primary">
+      <i class="bi bi-folder2-open me-1"></i>Choose content.db…
+    </button>
+    <button id="newDbBtn" class="btn btn-outline-secondary" title="Start from an empty schema matching scripts/content-migration/schema.sql">
+      <i class="bi bi-file-earmark-plus me-1"></i>New blank DB
+    </button>
+    <span class="text-secondary small">or drop a file here</span>
+    <span class="ms-auto text-secondary small" id="dropInfo">No file selected</span>
+    <input type="file" id="fileInput" accept=".db,.sqlite,.sqlite3,application/vnd.sqlite3,application/octet-stream" hidden />
+  </div>
+
+  <!-- Stats -->
+  <div class="row g-3 mb-3" id="stats">
+    <div class="col-6 col-md-3"><div class="card text-center h-100 py-2"><div class="fs-3 fw-bold" id="stTables">—</div><div class="text-secondary small">Tables</div></div></div>
+    <div class="col-6 col-md-3"><div class="card text-center h-100 py-2"><div class="fs-3 fw-bold" id="stLessons">—</div><div class="text-secondary small">Lessons</div></div></div>
+    <div class="col-6 col-md-3"><div class="card text-center h-100 py-2"><div class="fs-3 fw-bold" id="stSteps">—</div><div class="text-secondary small">Steps</div></div></div>
+    <div class="col-6 col-md-3"><div class="card text-center h-100 py-2"><div class="fs-3 fw-bold" id="stQuizzes">—</div><div class="text-secondary small">Quizzes</div></div></div>
+    <div class="col-6 col-md-3"><div class="card text-center h-100 py-2"><div class="fs-3 fw-bold" id="stQuestions">—</div><div class="text-secondary small">Quiz questions</div></div></div>
+    <div class="col-6 col-md-3"><div class="card text-center h-100 py-2"><div class="fs-3 fw-bold" id="stMythbusters">—</div><div class="text-secondary small">Mythbuster</div></div></div>
+    <div class="col-6 col-md-3"><div class="card text-center h-100 py-2"><div class="fs-3 fw-bold" id="stSize">—</div><div class="text-secondary small">DB size</div></div></div>
+  </div>
+
+  <!-- Tabs -->
+  <ul class="nav nav-pills mb-3" id="pills">
+    <li class="nav-item"><button class="nav-link tab active" data-tab="editor"><i class="bi bi-pencil-square me-1"></i>Editor</button></li>
+    <li class="nav-item"><button class="nav-link tab" data-tab="quiz"><i class="bi bi-patch-question me-1"></i>Quiz Editor</button></li>
+    <li class="nav-item"><button class="nav-link tab" data-tab="sql"><i class="bi bi-terminal me-1"></i>SQL Console</button></li>
+  </ul>
+
+  <!-- ================= Editor tab ================= -->
+  <div id="tab-editor">
+    <div class="row g-4">
+      <!-- Tree -->
+      <div class="col-lg-4 col-xl-3">
+        <div class="card">
+          <div class="card-header d-flex align-items-center gap-2">
+            <i class="bi bi-list-ul me-1"></i>Lessons <span class="badge text-bg-secondary" id="treeCount"></span>
+          </div>
+          <div class="card-body">
+            <div class="input-group input-group-sm mb-2">
+              <span class="input-group-text"><i class="bi bi-search"></i></span>
+              <input id="treeSearch" class="form-control" placeholder="Search lessons…" />
+            </div>
+            <div class="tree" id="tree">
+              <div class="text-secondary small py-2">Load a database or create a blank one to start editing.</div>
+            </div>
+          </div>
+          <div class="card-footer">
+            <button class="btn btn-outline-primary btn-sm w-100" id="newLessonBtn" disabled>
+              <i class="bi bi-plus-lg me-1"></i>New lesson
+            </button>
+            <div id="addForm" style="display:none" class="mt-3">
+              <input id="afId" class="form-control form-control-sm mb-2" placeholder="lesson-id (kebab-case)" spellcheck="false" />
+              <input id="afTitle" class="form-control form-control-sm mb-2" placeholder="Title" />
+              <input id="afUnit" class="form-control form-control-sm mb-2" placeholder="unit_id (e.g. atomic-playground)" />
+              <div class="d-flex gap-2">
+                <button id="afCreate" class="btn btn-primary btn-sm flex-grow-1">Create</button>
+                <button id="afCancel" class="btn btn-outline-secondary btn-sm">Cancel</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main panel -->
+      <div class="col-lg-8 col-xl-9" id="main">
+        <div id="emptyPanel" class="card">
+          <div class="card-body text-secondary">
+            <i class="bi bi-arrow-left-circle fs-5 me-2 align-middle"></i>Select a lesson on the left to edit it.
+            Every change autosaves to the in-memory DB — hit <b>Export .db</b> when done.
+          </div>
+        </div>
+
+        <!-- Lesson metadata -->
+        <div id="lessonCard" style="display:none">
+          <div class="card mb-3">
+            <div class="card-header d-flex align-items-center flex-wrap gap-2">
+              <i class="bi bi-journal-text text-primary"></i>
+              <strong>Lesson <span class="text-secondary small" id="leLabel"></span></strong>
+              <span class="ms-auto d-flex gap-2">
+                <button id="dupLessonBtn" class="btn btn-outline-secondary btn-sm"><i class="bi bi-files me-1"></i>Duplicate</button>
+                <button id="delLessonBtn" class="btn btn-outline-danger btn-sm"><i class="bi bi-trash me-1"></i>Delete</button>
+              </span>
+            </div>
+            <div class="card-body">
+              <div class="mb-3">
+                <label class="form-label small fw-semibold text-secondary">Title</label>
+                <input data-fl="title" class="form-control" placeholder="Lesson title" />
+              </div>
+              <div class="mb-3">
+                <label class="form-label small fw-semibold text-secondary">Description</label>
+                <textarea data-fl="description" class="form-control" rows="2" placeholder="One or two sentences shown in lists / progress"></textarea>
+              </div>
+              <div class="row g-3">
+                <div class="col-md-4">
+                  <label class="form-label small fw-semibold text-secondary">Unit <span class="text-secondary small">(unit_id)</span></label>
+                  <input data-fl="unit_id" class="form-control" placeholder="atomic-playground" />
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label small fw-semibold text-secondary">Difficulty</label>
+                  <select data-fl="difficulty" class="form-select">
+                    <option value="beginner">beginner</option>
+                    <option value="intermediate">intermediate</option>
+                    <option value="advanced">advanced</option>
+                  </select>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label small fw-semibold text-secondary">XP reward</label>
+                  <input type="number" data-fl="xp_reward" class="form-control" min="0" step="10" />
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label small fw-semibold text-secondary">Estimated minutes</label>
+                  <input type="number" data-fl="estimated_minutes" class="form-control" min="1" step="1" />
+                </div>
+                <div class="col-md-8">
+                  <label class="form-label small fw-semibold text-secondary">Prerequisites <span class="text-secondary small">(click to toggle)</span></label>
+                  <div class="chips" id="preChips"></div>
+                </div>
+              </div>
+              <div class="mt-3">
+                <label class="form-label small fw-semibold text-secondary">Tags</label>
+                <div class="chips" id="tagChips"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Steps -->
+          <div class="card">
+            <div class="card-header d-flex align-items-center flex-wrap gap-2">
+              <i class="bi bi-stack text-primary"></i>
+              <strong>Steps <span class="badge text-bg-secondary" id="stepCount"></span></strong>
+              <span class="ms-auto d-flex align-items-center gap-2">
+                <span class="text-secondary small">Add step:</span>
+                <select id="newStepType" class="form-select form-select-sm w-auto">
+                  <option value="briefing">Briefing</option>
+                  <option value="myth_buster">Myth Buster</option>
+                  <option value="micro_learn">Micro Learn</option>
+                  <option value="lab">Lab</option>
+                  <option value="assessment">Assessment</option>
+                  <option value="debrief">Debrief</option>
+                </select>
+                <button id="addStepBtn" class="btn btn-primary btn-sm">+ Add</button>
+              </span>
+            </div>
+            <div class="card-body" id="steps">
+              <div class="text-secondary small">No lesson selected.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= Quiz Editor tab ================= -->
+  <div id="tab-quiz" style="display:none">
+    <div class="row g-4">
+      <!-- Trees -->
+      <div class="col-lg-4 col-xl-3">
+        <div class="card mb-3">
+          <div class="card-header d-flex align-items-center gap-2">
+            <i class="bi bi-patch-question me-1"></i>Quizzes <span class="badge text-bg-secondary" id="quizTreeCount"></span>
+          </div>
+          <div class="card-body">
+            <div class="input-group input-group-sm mb-2">
+              <span class="input-group-text"><i class="bi bi-search"></i></span>
+              <input id="quizSearch" class="form-control" placeholder="Search quizzes…" />
+            </div>
+            <div class="tree" id="quizTree">
+              <div class="text-secondary small py-2">Load a database or create a blank one to start editing.</div>
+            </div>
+          </div>
+          <div class="card-footer">
+            <button class="btn btn-outline-primary btn-sm w-100" id="newQuizBtn" disabled>
+              <i class="bi bi-plus-lg me-1"></i>New quiz
+            </button>
+            <div id="quizAddForm" style="display:none" class="mt-3">
+              <input id="qafId" class="form-control form-control-sm mb-2" placeholder="quiz-id (kebab-case)" spellcheck="false" />
+              <input id="qafTitle" class="form-control form-control-sm mb-2" placeholder="Title" />
+              <div class="d-flex gap-2">
+                <button id="qafCreate" class="btn btn-primary btn-sm flex-grow-1">Create</button>
+                <button id="qafCancel" class="btn btn-outline-secondary btn-sm">Cancel</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header d-flex align-items-center gap-2">
+            <i class="bi bi-shield-exclamation me-1"></i>Mythbuster Bank <span class="badge text-bg-secondary" id="mbTreeCount"></span>
+          </div>
+          <div class="card-body">
+            <div class="btn-group btn-group-sm w-100 mb-2" id="mbFilterBtns" role="group">
+              <button type="button" class="btn btn-outline-secondary active" data-mbf="">All</button>
+              <button type="button" class="btn btn-outline-secondary" data-mbf="easy">Easy</button>
+              <button type="button" class="btn btn-outline-secondary" data-mbf="medium">Medium</button>
+              <button type="button" class="btn btn-outline-secondary" data-mbf="hard">Hard</button>
+            </div>
+            <div class="input-group input-group-sm mb-2">
+              <span class="input-group-text"><i class="bi bi-search"></i></span>
+              <input id="mbSearch" class="form-control" placeholder="Search questions…" />
+            </div>
+            <div class="tree" id="mbTree">
+              <div class="text-secondary small py-2">Load a database or create a blank one to start editing.</div>
+            </div>
+          </div>
+          <div class="card-footer">
+            <button class="btn btn-outline-primary btn-sm w-100" id="newMbBtn" disabled>
+              <i class="bi bi-plus-lg me-1"></i>New question
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main panel -->
+      <div class="col-lg-8 col-xl-9" id="qmain">
+        <div id="qEmptyPanel" class="card">
+          <div class="card-body text-secondary">
+            <i class="bi bi-arrow-left-circle fs-5 me-2 align-middle"></i>Select a quiz or a mythbuster question on the left to edit it.
+            Quiz changes autosave to the in-memory DB — hit <b>Export .db</b> when done.
+          </div>
+        </div>
+
+        <!-- Quiz metadata + questions -->
+        <div id="quizCard" style="display:none">
+          <div class="card mb-3">
+            <div class="card-header d-flex align-items-center flex-wrap gap-2">
+              <i class="bi bi-patch-question text-primary"></i>
+              <strong>Quiz <span class="text-secondary small" id="qzLabel"></span></strong>
+              <span class="ms-auto d-flex gap-2">
+                <button id="dupQuizBtn" class="btn btn-outline-secondary btn-sm"><i class="bi bi-files me-1"></i>Duplicate</button>
+                <button id="delQuizBtn" class="btn btn-outline-danger btn-sm"><i class="bi bi-trash me-1"></i>Delete</button>
+              </span>
+            </div>
+            <div class="card-body">
+              <div class="mb-3">
+                <label class="form-label small fw-semibold text-secondary">Title</label>
+                <input data-qfl="title" class="form-control" placeholder="Quiz title" />
+              </div>
+              <div class="mb-3">
+                <label class="form-label small fw-semibold text-secondary">Description</label>
+                <textarea data-qfl="description" class="form-control" rows="2" placeholder="One or two sentences shown in lists / progress"></textarea>
+              </div>
+              <div class="row g-3">
+                <div class="col-md-4">
+                  <label class="form-label small fw-semibold text-secondary">Category</label>
+                  <input data-qfl="category" class="form-control" placeholder="safety / energy / …" />
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label small fw-semibold text-secondary">Difficulty</label>
+                  <select data-qfl="difficulty" class="form-select">
+                    <option value="easy">easy</option>
+                    <option value="medium">medium</option>
+                    <option value="hard">hard</option>
+                    <option value="beginner">beginner</option>
+                  </select>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label small fw-semibold text-secondary">Passing score %</label>
+                  <input type="number" data-qfl="passing_score" class="form-control" min="0" max="100" step="1" />
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label small fw-semibold text-secondary">XP reward</label>
+                  <input type="number" data-qfl="xp_reward" class="form-control" min="0" step="10" />
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label small fw-semibold text-secondary">Time limit (s) <span class="text-secondary small">(optional)</span></label>
+                  <input type="number" data-qfl="time_limit" class="form-control" min="0" step="1" placeholder="blank = none" />
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label small fw-semibold text-secondary">Est. minutes <span class="text-secondary small">(legacy)</span></label>
+                  <input type="number" data-qfl="estimated_minutes" class="form-control" min="1" step="1" placeholder="blank = none" />
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label small fw-semibold text-secondary">Unit id <span class="text-secondary small">(legacy)</span></label>
+                  <input data-qfl="unit_id" class="form-control" placeholder="atomic-playground (optional)" />
+                </div>
+                <div class="col-md-8">
+                  <label class="form-label small fw-semibold text-secondary">Tags</label>
+                  <div class="chips" id="qzTags"></div>
+                </div>
+                <div class="col-12">
+                  <label class="form-label small fw-semibold text-secondary">Metadata <span class="text-secondary small">(raw JSON — legacy, atomic-basics only)</span></label>
+                  <textarea data-qfl="metadata" class="form-control" rows="2" placeholder="{}" spellcheck="false"></textarea>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Questions -->
+          <div class="card">
+            <div class="card-header d-flex align-items-center flex-wrap gap-2">
+              <i class="bi bi-list-check text-primary"></i>
+              <strong>Questions <span class="badge text-bg-secondary" id="qzQCount"></span></strong>
+              <button class="btn btn-primary btn-sm ms-auto" id="addQuestionBtn"><i class="bi bi-plus-lg me-1"></i>Add</button>
+            </div>
+            <div class="card-body" id="qzQuestions">
+              <div class="text-secondary small">No quiz selected.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mythbuster single question editor -->
+        <div id="mbCard" style="display:none">
+          <div class="card mb-3">
+            <div class="card-header d-flex align-items-center flex-wrap gap-2">
+              <i class="bi bi-shield-exclamation text-primary"></i>
+              <strong>Mythbuster question <span class="text-secondary small" id="mbLabel"></span></strong>
+              <span class="ms-auto d-flex gap-2">
+                <button class="btn btn-outline-secondary btn-sm" data-act="mb-move" data-dir="-1" title="move up in pool"><i class="bi bi-arrow-up"></i></button>
+                <button class="btn btn-outline-secondary btn-sm" data-act="mb-move" data-dir="1" title="move down in pool"><i class="bi bi-arrow-down"></i></button>
+                <button class="btn btn-outline-secondary btn-sm" data-act="mb-dup" title="duplicate"><i class="bi bi-files"></i></button>
+                <button class="btn btn-outline-danger btn-sm" data-act="mb-del" title="delete"><i class="bi bi-trash"></i></button>
+              </span>
+            </div>
+            <div class="card-body">
+              <div class="row g-3">
+                <div class="col-md-4 mb-3">
+                  <label class="form-label small fw-semibold text-secondary mb-1">Difficulty</label>
+                  <select data-mf="difficulty" class="form-select">
+                    <option value="easy">easy</option>
+                    <option value="medium">medium</option>
+                    <option value="hard">hard</option>
+                  </select>
+                </div>
+                <div class="col-md-4 mb-3">
+                  <label class="form-label small fw-semibold text-secondary mb-1">Type</label>
+                  <select data-mf="type" class="form-select">
+                    <option value="multiple_choice">Multiple choice</option>
+                    <option value="true_false">True / False</option>
+                    <option value="matching">Matching</option>
+                    <option value="fill_blank">Fill in the blank</option>
+                  </select>
+                </div>
+                <div class="col-md-4 mb-3">
+                  <label class="form-label small fw-semibold text-secondary mb-1">Points</label>
+                  <input type="number" data-mf="points" class="form-control" min="0" step="1" />
+                </div>
+                <div class="col-12 mb-3">
+                  <label class="form-label small fw-semibold text-secondary mb-1">Question</label>
+                  <textarea data-mf="question" class="form-control" rows="2" placeholder="The question…"></textarea>
+                </div>
+                <div class="col-12 mb-3">
+                  <label class="form-label small fw-semibold text-secondary mb-1 d-flex justify-content-between">
+                    <span>Options</span>
+                    <button type="button" class="btn btn-sm btn-outline-primary py-0" data-act="mb-add-opt"><i class="bi bi-plus-lg me-1"></i>add</button>
+                  </label>
+                  <div id="mbOptions"></div>
+                  <div class="form-text">● marks the option at the chosen correct index</div>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label class="form-label small fw-semibold text-secondary mb-1">Correct answer</label>
+                  <div id="mbAnswer"></div>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label class="form-label small fw-semibold text-secondary mb-1">Explanation</label>
+                  <textarea data-mf="explanation" class="form-control" rows="3" placeholder="Shown after answering…"></textarea>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= SQL tab ================= -->
+  <div id="tab-sql" style="display:none">
+    <div class="row g-4">
+      <div class="col-lg-7">
+        <div class="card">
+          <div class="card-header"><i class="bi bi-terminal me-1 text-primary"></i>SQL Console</div>
+          <div class="card-body">
+            <textarea id="sqlInput" class="form-control" spellcheck="false" rows="9" placeholder="SELECT * FROM lessons;"
+            >SELECT l.id, l.title, l.unit_id, COUNT(s.id) AS steps
+FROM lessons l LEFT JOIN lesson_steps s ON s.lesson_id = l.id
+GROUP BY l.id
+ORDER BY l.unit_id, l.id;</textarea>
+            <div class="d-flex flex-wrap gap-2 mt-3">
+              <button id="runBtn" class="btn btn-primary btn-sm"><i class="bi bi-play-fill me-1"></i>Run SQL</button>
+              <button class="btn btn-outline-secondary btn-sm" data-sql="SELECT * FROM lessons;" onclick="setQuick(this)">all lessons</button>
+              <button class="btn btn-outline-secondary btn-sm" data-sql="SELECT * FROM lesson_steps ORDER BY lesson_id, position LIMIT 100;" onclick="setQuick(this)">all steps</button>
+              <button class="btn btn-outline-secondary btn-sm" data-sql="SELECT name FROM sqlite_master WHERE type IN ('table','view') ORDER BY name;" onclick="setQuick(this)">tables</button>
+              <button class="btn btn-outline-secondary btn-sm" data-sql="SELECT * FROM quizzes ORDER BY id;" onclick="setQuick(this)">all quizzes</button>
+              <button class="btn btn-outline-secondary btn-sm" data-sql="SELECT quiz_id, position, id, type, question FROM quiz_questions ORDER BY quiz_id, position LIMIT 100;" onclick="setQuick(this)">all questions</button>
+              <button class="btn btn-outline-secondary btn-sm" data-sql="SELECT difficulty, position, id, question FROM mythbuster_questions ORDER BY difficulty, position LIMIT 100;" onclick="setQuick(this)">mythbuster</button>
+            </div>
+            <label class="form-label small fw-semibold text-secondary mt-3 mb-1">Result — <span id="rowCount" class="text-secondary normal-case fw-normal">0 rows</span></label>
+            <div class="table-responsive" id="result" style="max-height:480px"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-5">
+        <div class="card mb-3">
+          <div class="card-header"><i class="bi bi-box-arrow-down me-1 text-success"></i>Export</div>
+          <div class="card-body">
+            <div class="small text-secondary mb-3">
+              Serializes the in-memory database to bytes and downloads it as a new <code>.db</code>.
+              Copy it over <code>assets/database/content.db</code> and bump
+              <code>CONTENT_DB_VERSION</code> in <code>services/content-db.ts</code> to ship it.
+            </div>
+            <div class="d-flex gap-2 flex-wrap">
+              <button id="exportBtn" class="btn btn-success" disabled><i class="bi bi-download me-1"></i>Export &amp; download .db</button>
+              <button id="resetBtn" class="btn btn-outline-secondary"><i class="bi bi-arrow-counterclockwise me-1"></i>Start over</button>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><i class="bi bi-table me-1 text-primary"></i>Tables</div>
+          <div class="card-body p-0"><div class="table-responsive" style="max-height:300px">
+            <table class="table table-sm table-hover align-middle mb-0">
+              <thead class="table-secondary"><tr><th>Name</th></tr></thead>
+              <tbody id="tableList"></tbody>
+            </table>
+          </div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="status toast align-items-center text-bg-success border-0" id="status" role="alert">
+  <div class="d-flex">
+    <div class="toast-body" id="statusBody"></div>
+  </div>
+</div>
+
+<!-- sql.js loaded from CDN (WebAssembly build). locateFile points at the .wasm -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.13.0/sql-wasm.js"></script>
+<script>
+"use strict";
+const $ = s => document.querySelector(s);
+const WASM_BASE = "https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.13.0/";
+
+const STEP_TYPES = {
+  briefing:    { label: "Briefing",    color: "#5e72e4" },
+  myth_buster: { label: "Myth Buster", color: "#f59e0b" },
+  micro_learn: { label: "Micro Learn", color: "#16a34a" },
+  lab:         { label: "Lab",         color: "#ec4899" },
+  assessment:  { label: "Assessment",  color: "#a855f7" },
+  debrief:     { label: "Debrief",     color: "#06b6d4" },
+};
+
+// ---------------------------------------------------------------------------
+// State
+// ---------------------------------------------------------------------------
+let SQL = null;
+let db = null;
+let dbName = "";
+let cur = null;
+let curId = null;
+let toastT;
+// Quiz editor state (independent from the lesson editor)
+let curQuiz = null;      // { id, quiz:{...}, questions:[...] }
+let quizPanelOn = false; // whether the left panel currently points at a quiz
+let curMb = null;        // single mythbuster_questions row (parsed)
+let mbPanelOn = false;
+let mbFilter = "";       // "" | "easy" | "medium" | "hard"
+
+const esc = s => String(s == null ? "" : s)
+  .replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+function toast(m, err) {
+  const e = $("#status");
+  e.classList.add("show");
+  e.classList.toggle("text-bg-success", !err);
+  e.classList.toggle("text-bg-danger", !!err);
+  $("#statusBody").textContent = m;
+  clearTimeout(toastT);
+  toastT = setTimeout(() => e.classList.remove("show"), 2400);
+}
+
+// ---------------------------------------------------------------------------
+// sql.js wrappers (db.exec accepts NO params; use prepare/bind)
+// ---------------------------------------------------------------------------
+function qAll(sql, params) {
+  const stmt = db.prepare(sql);
+  const rows = [];
+  try {
+    if (params) stmt.bind(params);
+    while (stmt.step()) rows.push(stmt.getAsObject());
+    return rows;
+  } finally { stmt.free(); }
+}
+
+function qVal(sql, params, def) {
+  const rows = qAll(sql, params);
+  if (!rows.length) return def;
+  const keys = Object.keys(rows[0]);
+  return keys.length ? rows[0][keys[0]] : def;
+}
+
+function run(sql, params) {
+  db.run(sql, params || []);
+}
+
+function tableNames() {
+  try {
+    return qAll("SELECT name FROM sqlite_master WHERE type IN ('table','view') ORDER BY name").map(r => r.name);
+  } catch { return []; }
+}
+
+function safeExec(sql) {
+  try { return qVal(sql); } catch { return null; }
+}
+
+// ---------------------------------------------------------------------------
+// Schema (matches scripts/content-migration/schema.sql)
+// ---------------------------------------------------------------------------
+const SCHEMA_SQL = `
+CREATE TABLE IF NOT EXISTS lessons (
+  id                 TEXT PRIMARY KEY,
+  title              TEXT NOT NULL,
+  description        TEXT NOT NULL,
+  unit_id            TEXT NOT NULL,
+  difficulty         TEXT NOT NULL CHECK (difficulty IN ('beginner','intermediate','advanced')),
+  estimated_minutes  INTEGER NOT NULL CHECK (estimated_minutes > 0),
+  xp_reward          INTEGER NOT NULL DEFAULT 0,
+  prerequisites      TEXT NOT NULL DEFAULT '[]',
+  tags               TEXT NOT NULL DEFAULT '[]',
+  created_at         INTEGER NOT NULL DEFAULT (strftime('%s','now')),
+  updated_at         INTEGER NOT NULL DEFAULT (strftime('%s','now'))
+);
+CREATE TABLE IF NOT EXISTS lesson_steps (
+  lesson_id  TEXT NOT NULL REFERENCES lessons(id) ON DELETE CASCADE,
+  id         TEXT NOT NULL,
+  step_type  TEXT NOT NULL CHECK (step_type IN ('briefing','myth_buster','micro_learn','lab','assessment','debrief')),
+  position   INTEGER NOT NULL CHECK (position >= 0),
+  data       TEXT NOT NULL DEFAULT '{}',
+  created_at INTEGER NOT NULL DEFAULT (strftime('%s','now')),
+  updated_at INTEGER NOT NULL DEFAULT (strftime('%s','now')),
+  PRIMARY KEY (lesson_id, id),
+  UNIQUE (lesson_id, position)
+);
+CREATE INDEX IF NOT EXISTS idx_lessons_unit_id     ON lessons(unit_id);
+CREATE INDEX IF NOT EXISTS idx_lessons_difficulty  ON lessons(difficulty);
+CREATE INDEX IF NOT EXISTS idx_lesson_steps_lesson ON lesson_steps(lesson_id);
+CREATE INDEX IF NOT EXISTS idx_lesson_steps_type   ON lesson_steps(step_type);
+
+CREATE TABLE IF NOT EXISTS quizzes (
+  id                 TEXT PRIMARY KEY,
+  title              TEXT NOT NULL,
+  description        TEXT NOT NULL DEFAULT '',
+  category           TEXT NOT NULL DEFAULT '',
+  difficulty         TEXT NOT NULL DEFAULT 'easy'
+                     CHECK (difficulty IN ('easy', 'medium', 'hard', 'beginner')),
+  passing_score      INTEGER NOT NULL DEFAULT 70,
+  xp_reward          INTEGER NOT NULL DEFAULT 0,
+  time_limit         INTEGER,
+  unit_id            TEXT,
+  estimated_minutes  INTEGER,
+  metadata           TEXT NOT NULL DEFAULT '{}'
+                     CONSTRAINT quizzes_metadata_json CHECK (json_valid(metadata)),
+  tags               TEXT NOT NULL DEFAULT '[]'
+                     CONSTRAINT quizzes_tags_json CHECK (json_valid(tags)),
+  created_at         INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
+  updated_at         INTEGER NOT NULL DEFAULT (strftime('%s', 'now'))
+);
+CREATE TABLE IF NOT EXISTS quiz_questions (
+  quiz_id        TEXT NOT NULL REFERENCES quizzes(id) ON DELETE CASCADE,
+  id             TEXT NOT NULL,
+  position       INTEGER NOT NULL CHECK (position >= 0),
+  type           TEXT NOT NULL CHECK (type IN ('multiple_choice', 'true_false', 'matching', 'fill_blank')),
+  question       TEXT NOT NULL DEFAULT '',
+  options        TEXT NOT NULL DEFAULT '[]'
+                 CONSTRAINT quiz_questions_options_json CHECK (json_valid(options)),
+  correct_answer TEXT NOT NULL DEFAULT '0'
+                 CONSTRAINT quiz_questions_answer_json CHECK (json_valid(correct_answer)),
+  explanation    TEXT NOT NULL DEFAULT '',
+  difficulty     TEXT NOT NULL DEFAULT 'easy'
+                 CHECK (difficulty IN ('easy', 'medium', 'hard')),
+  points         INTEGER NOT NULL DEFAULT 10,
+  image          TEXT,
+  time_limit     INTEGER,
+  created_at     INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
+  updated_at     INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
+  PRIMARY KEY (quiz_id, id),
+  UNIQUE (quiz_id, position)
+);
+CREATE TABLE IF NOT EXISTS mythbuster_questions (
+  id            TEXT PRIMARY KEY,
+  difficulty    TEXT NOT NULL CHECK (difficulty IN ('easy', 'medium', 'hard')),
+  type          TEXT NOT NULL DEFAULT 'multiple_choice'
+                CHECK (type IN ('multiple_choice', 'true_false', 'matching', 'fill_blank')),
+  question      TEXT NOT NULL DEFAULT '',
+  options       TEXT NOT NULL DEFAULT '[]'
+                CONSTRAINT mythbuster_options_json CHECK (json_valid(options)),
+  correct_answer TEXT NOT NULL DEFAULT '0'
+                CONSTRAINT mythbuster_answer_json CHECK (json_valid(correct_answer)),
+  explanation   TEXT NOT NULL DEFAULT '',
+  points        INTEGER NOT NULL DEFAULT 5,
+  position      INTEGER NOT NULL DEFAULT 0,
+  created_at    INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
+  updated_at    INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
+  UNIQUE (difficulty, position)
+);
+CREATE INDEX IF NOT EXISTS idx_quizzes_category    ON quizzes(category);
+CREATE INDEX IF NOT EXISTS idx_quizzes_difficulty  ON quizzes(difficulty);
+CREATE INDEX IF NOT EXISTS idx_quiz_questions_quiz ON quiz_questions(quiz_id);
+CREATE INDEX IF NOT EXISTS idx_mythbuster_difficulty ON mythbuster_questions(difficulty);
+`;
+
+// ---------------------------------------------------------------------------
+// 1. Load / create database
+// ---------------------------------------------------------------------------
+const AUTO_CANDIDATES = [
+  { path: "../content/lessons/content.db", label: "content/lessons/content.db" },
+  { path: "../assets/database/content.db", label: "assets/database/content.db" },
+];
+
+function openDb(bytes, name, size, sourceLabel) {
+  if (!SQL) { toast("sql.js is still loading — try again in a moment", 1); return; }
+  try {
+    db = new SQL.Database(bytes);
+    dbName = name.replace(/\.(db|sqlite3?)$/i, "") + ".db";
+    ensureSchema();
+    afterLoad(size);
+    renderTree();
+    const all = allLessons();
+    if (all.length) loadLesson(all[0].id);
+    toast((sourceLabel ? sourceLabel + " — loaded " : "Loaded ") + name);
+  } catch (e) {
+    db = null; cur = null; curId = null;
+    toast("Failed to open database: " + e.message, 1);
+  }
+}
+
+function loadDatabase(file) {
+  const reader = new FileReader();
+  reader.onerror = () => toast("Could not read file", 1);
+  reader.onload = () => {
+    try { openDb(new Uint8Array(reader.result), file.name, file.size); }
+    catch (e) { toast("Failed to read file: " + e.message, 1); }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+async function autoDetectDb() {
+  if (!SQL) return;
+  for (const c of AUTO_CANDIDATES) {
+    try {
+      const resp = await fetch(c.path, { cache: "no-store" });
+      if (!resp.ok) continue;
+      const bytes = new Uint8Array(await resp.arrayBuffer());
+      openDb(bytes, c.label, bytes.length, "Auto-detect");
+      return true;
+    } catch { /* CORS / file:// etc. */ }
+  }
+  return false;
+}
+
+function newBlankDb() {
+  if (!SQL) { toast("sql.js is still loading", 1); return; }
+  if (db && !confirm("Replace the current in-memory database with a blank one?")) return;
+  if (db) { db.close(); db = null; }
+  db = new SQL.Database();
+  dbName = "content.db";
+  db.exec(SCHEMA_SQL);
+  afterLoad(0);
+  renderTree();
+  selectNone();
+  toast("Created blank database (" + tableNames().length + " tables)");
+}
+
+function ensureSchema() {
+  const t = tableNames();
+  const need = ["lessons", "lesson_steps", "quizzes", "quiz_questions", "mythbuster_questions"];
+  if (need.some(n => !t.includes(n))) db.exec(SCHEMA_SQL);
+}
+
+function afterLoad(size) {
+  const b = $("#dbState");
+  b.textContent = "Loaded: " + dbName;
+  b.className = "badge text-bg-success";
+  $("#dropInfo").textContent = dbName + (size ? " · " + (size / 1024).toFixed(1) + " KB" : " · blank");
+  $("#exportBtn").disabled = false;
+  $("#exportTopBtn").disabled = false;
+  $("#newLessonBtn").disabled = false;
+  $("#newQuizBtn").disabled = false;
+  $("#newMbBtn").disabled = false;
+  refreshStats(size);
+  renderTables();
+  renderQuizTree();
+  renderMbTree();
+  const qs = allQuizzes();
+  if (qs.length) loadQuiz(qs[0].id);
+}
+
+function refreshStats(sizeBytes) {
+  $("#stTables").textContent = tableNames().length;
+  $("#stLessons").textContent = safeExec("SELECT COUNT(*) c FROM lessons") || 0;
+  $("#stSteps").textContent = safeExec("SELECT COUNT(*) c FROM lesson_steps") || 0;
+  $("#stQuizzes").textContent = safeExec("SELECT COUNT(*) c FROM quizzes") || 0;
+  $("#stQuestions").textContent = safeExec("SELECT COUNT(*) c FROM quiz_questions") || 0;
+  $("#stMythbusters").textContent = safeExec("SELECT COUNT(*) c FROM mythbuster_questions") || 0;
+  if (sizeBytes) $("#stSize").textContent = (sizeBytes / 1024).toFixed(1) + " KB";
+}
+
+function selectNone() {
+  cur = null; curId = null;
+  $("#lessonCard").style.display = "none";
+  $("#emptyPanel").style.display = "block";
+  renderTree();
+}
+
+// ---------------------------------------------------------------------------
+// 2. Data helpers
+// ---------------------------------------------------------------------------
+function allLessons() {
+  try {
+    return qAll(`SELECT l.id, l.title, l.unit_id,
+        (SELECT COUNT(*) FROM lesson_steps s WHERE s.lesson_id = l.id) c
+        FROM lessons l ORDER BY l.unit_id, l.id`);
+  } catch { return []; }
+}
+
+function emptyData(type) {
+  switch (type) {
+    case "briefing":    return { topic: "", mission: "", icon: "" };
+    case "myth_buster": return { myth: "", reality: "", explanation: "", image: "" };
+    case "micro_learn": return { title: "", content: "", keyPoints: [], image: "" };
+    case "lab":         return { title: "", description: "", task: "", options: [{ id: "", label: "", icon: "" }], correctAnswer: "", explanation: "" };
+    case "assessment":  return { question: "", options: [""], correctIndex: 0, explanation: "", image: "" };
+    case "debrief":     return { title: "", message: "", rewards: { xp: 0, stars: 3 } };
+  }
+  return {};
+}
+
+function nextStepId(type) {
+  const base = { briefing: "briefing", myth_buster: "myth-buster", micro_learn: "micro-learn",
+                 lab: "lab", assessment: "assessment", debrief: "debrief" }[type] || type;
+  const taken = new Set(cur.steps.map(s => s.id));
+  let id = base, n = 1;
+  while (taken.has(id)) id = base + "-" + (++n);
+  return id;
+}
+
+function loadLesson(id) {
+  const rows = qAll("SELECT * FROM lessons WHERE id = ?", [id]);
+  if (!rows.length) { toast("Lesson not found", 1); return; }
+  const l = rows[0];
+  cur = {
+    id,
+    lesson: {
+      id: l.id, title: l.title || "", description: l.description || "",
+      unit_id: l.unit_id || "", difficulty: l.difficulty || "beginner",
+      estimated_minutes: l.estimated_minutes || 0, xp_reward: l.xp_reward || 0,
+      prerequisites: JSON.parse(l.prerequisites || "[]"),
+      tags: JSON.parse(l.tags || "[]"),
+    },
+    steps: qAll("SELECT id, step_type, data FROM lesson_steps WHERE lesson_id = ? ORDER BY position", [id])
+      .map(s => ({ id: s.id, type: s.step_type, data: safeJSON(s.data) })),
+  };
+  curId = id;
+  renderLesson();
+  renderTree();
+}
+
+function safeJSON(s) {
+  try { return JSON.parse(s); } catch { return {}; }
+}
+
+function saveLesson(field, value) {
+  if (!cur) return;
+  if (field === "prerequisites" || field === "tags") value = JSON.stringify(value);
+  run("UPDATE lessons SET " + field + " = ?, updated_at = strftime('%s','now') WHERE id = ?",
+      [value, cur.id]);
+  cur.lesson[field] = field === "prerequisites" || field === "tags" ? JSON.parse(value) : value;
+  refreshStats();
+  renderTree();
+  if (field === "tags") renderTags();
+  if (field === "prerequisites") renderPrereqs();
+}
+
+function saveStep(stepId, dataObj) {
+  const st = cur.steps.find(s => s.id === stepId);
+  if (!st) return;
+  st.data = dataObj;
+  run("UPDATE lesson_steps SET data = ?, updated_at = strftime('%s','now') WHERE lesson_id = ? AND id = ?",
+      [JSON.stringify(dataObj), cur.id, stepId]);
+}
+
+function reloadSteps() {
+  cur.steps = qAll("SELECT id, step_type, data FROM lesson_steps WHERE lesson_id = ? ORDER BY position", [cur.id])
+    .map(s => ({ id: s.id, type: s.step_type, data: safeJSON(s.data) }));
+}
+
+// ---------------------------------------------------------------------------
+// 3. Step CRUD
+// ---------------------------------------------------------------------------
+function addStep(type) {
+  if (!cur) return;
+  const id = nextStepId(type);
+  const pos = cur.steps.length;
+  run("INSERT INTO lesson_steps (lesson_id, id, step_type, position, data) VALUES (?,?,?,?,?)",
+      [cur.id, id, type, pos, JSON.stringify(emptyData(type))]);
+  reloadSteps();
+  renderSteps();
+  refreshStats();
+  renderTree();
+  const el = document.querySelector('[data-step="' + esc(id) + '"]');
+  if (el) el.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  toast("Added " + STEP_TYPES[type].label);
+}
+
+function deleteStep(index) {
+  if (!cur || !confirm("Delete this step?")) return;
+  const st = cur.steps[index];
+  run("DELETE FROM lesson_steps WHERE lesson_id = ? AND id = ?", [cur.id, st.id]);
+  reloadSteps();
+  renumberAll();
+  renderSteps(); renderTree(); refreshStats();
+  toast("Step deleted");
+}
+
+function moveStep(index, dir) {
+  const j = index + dir;
+  if (j < 0 || j >= cur.steps.length) return;
+  const a = cur.steps[index], b = cur.steps[j];
+  db.exec("BEGIN");
+  try {
+    run("UPDATE lesson_steps SET position = ? WHERE lesson_id = ? AND id = ?", [j + 100000, cur.id, a.id]);
+    run("UPDATE lesson_steps SET position = ? WHERE lesson_id = ? AND id = ?", [index, cur.id, b.id]);
+    run("UPDATE lesson_steps SET position = ? WHERE lesson_id = ? AND id = ?", [j, cur.id, a.id]);
+    db.exec("COMMIT");
+  } catch (e) { db.exec("ROLLBACK"); throw e; }
+  cur.steps[index] = b; cur.steps[j] = a;
+  renderSteps();
+}
+
+function duplicateStep(index) {
+  if (!cur) return;
+  const src = cur.steps[index];
+  const id = nextStepId(src.type);
+  const pos = cur.steps.length;
+  run("INSERT INTO lesson_steps (lesson_id, id, step_type, position, data) VALUES (?,?,?,?,?)",
+      [cur.id, id, src.type, pos, JSON.stringify(src.data)]);
+  reloadSteps(); renderSteps(); refreshStats(); renderTree();
+  toast("Step duplicated");
+}
+
+function renumberAll() {
+  db.exec("BEGIN");
+  try {
+    cur.steps.forEach((s, i) =>
+      run("UPDATE lesson_steps SET position = ?, updated_at = strftime('%s','now') WHERE lesson_id = ? AND id = ?",
+          [i, cur.id, s.id]));
+    db.exec("COMMIT");
+  } catch (e) { db.exec("ROLLBACK"); throw e; }
+}
+
+// ---------------------------------------------------------------------------
+// 4. Rendering: tree
+// ---------------------------------------------------------------------------
+function renderTree() {
+  const t = $("#tree");
+  const lessons = allLessons();
+  $("#treeCount").textContent = lessons.length + " lesson" + (lessons.length === 1 ? "" : "s");
+  if (!db || !lessons.length) {
+    t.innerHTML = '<div class="text-secondary small py-2"><i class="bi bi-info-circle me-1"></i>' +
+      (db ? "No lessons yet — click “New lesson”." : "Load a database or create a blank one.") + "</div>";
+    return;
+  }
+  const q = ($("#treeSearch").value || "").trim().toLowerCase();
+  const byUnit = {};
+  lessons.forEach(l => {
+    if (q && !(l.title.toLowerCase().includes(q) || l.id.toLowerCase().includes(q))) return;
+    (byUnit[l.unit_id] = byUnit[l.unit_id] || []).push(l);
+  });
+  const units = Object.keys(byUnit).sort();
+  t.innerHTML = units.length
+    ? units.map(u => `
+      <div class="unit-label d-flex align-items-center gap-1 px-1 mt-2 mb-1">
+        <span class="text-truncate">${esc(u || "(no unit)")}</span><span class="badge text-bg-secondary rounded-pill">${byUnit[u].length}</span>
+      </div>
+      <div class="list-group list-group-flush mb-2">` +
+        byUnit[u].map(l =>
+          `<div class="list-group-item list-group-item-action lesson-item small ${l.id === curId ? "active" : ""}" data-act="pick" data-id="${esc(l.id)}">
+             <span class="nm flex-grow-1 text-truncate">${esc(l.title || l.id)}</span>
+             <span class="nsteps badge text-bg-secondary rounded-pill">${l.c}</span>
+           </div>`).join("") +
+      `</div>`).join("")
+    : '<div class="text-secondary small py-2">No matching lessons.</div>';
+}
+
+// ---------------------------------------------------------------------------
+// 5. Rendering: lesson form
+// ---------------------------------------------------------------------------
+function renderLesson() {
+  $("#lessonCard").style.display = "block";
+  $("#emptyPanel").style.display = "none";
+  const l = cur.lesson;
+  $("#leLabel").textContent = " · " + l.id;
+  document.querySelectorAll("#lessonCard [data-fl]").forEach(el => {
+    const f = el.dataset.fl;
+    if (f === "difficulty") el.value = l[f];
+    else el.value = l[f] == null ? "" : l[f];
+  });
+  renderTags();
+  renderPrereqs();
+  $("#stepCount").textContent = cur.steps.length + " step" + (cur.steps.length === 1 ? "" : "s");
+  renderSteps();
+}
+
+function allTags() {
+  try {
+    return qAll("SELECT DISTINCT json_each.value v FROM lessons, json_each(lessons.tags) ORDER BY 1").map(r => r.v);
+  } catch { return []; }
+}
+
+function renderTags() {
+  const box = $("#tagChips");
+  const tags = (cur.lesson.tags || []).filter(Boolean);
+  const all = allTags();
+  box.innerHTML =
+    tags.map((t, i) => `<span class="chip">${esc(t)}<button class="x" data-act="del-tag" data-i="${i}"><i class="bi bi-x-lg"></i></button></span>`).join("") +
+    `<input id="tagInputNew" class="form-control form-control-sm w-auto flex-grow-1" placeholder="add tag… ↵" list="tagSuggests" style="min-width:140px" />`;
+  let dl = $("#tagSuggests");
+  if (!dl) { dl = document.createElement("datalist"); dl.id = "tagSuggests"; document.body.appendChild(dl); }
+  dl.innerHTML = all.map(t => `<option value="${esc(t)}"></option>`).join("");
+  const ni = $("#tagInputNew");
+  ni.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); addTag(ni); } });
+  ni.addEventListener("change", () => { if (ni.value) addTag(ni); });
+}
+
+function addTag(input) {
+  const v = input.value.trim();
+  if (v && !(cur.lesson.tags || []).includes(v)) {
+    const tags = cur.lesson.tags || [];
+    tags.push(v);
+    saveLesson("tags", tags);
+    toast("Tag added");
+  }
+  input.value = "";
+  input.focus();
+}
+
+function renderPrereqs() {
+  const box = $("#preChips");
+  const chosen = new Set(cur.lesson.prerequisites || []);
+  const lessons = allLessons().filter(l => l.id !== cur.id).sort((a, b) => a.id < b.id ? -1 : 1);
+  box.innerHTML = lessons.length
+    ? lessons.map(l => {
+        const on = chosen.has(l.id);
+        return `<span class="chip ${on ? "on" : ""} toggle" data-act="toggle-pre" data-id="${esc(l.id)}" title="toggle">${esc(l.title || l.id)}</span>`;
+      }).join("")
+    : '<span class="text-secondary small">(no other lessons)</span>';
+}
+
+// ---------------------------------------------------------------------------
+// 6. Rendering: steps
+// ---------------------------------------------------------------------------
+function stepTitle(s) {
+  const d = s.data || {};
+  switch (s.type) {
+    case "briefing": return d.topic || d.mission || "Briefing";
+    case "myth_buster": return d.myth || "Myth Buster";
+    case "micro_learn": return d.title || "Micro Learn";
+    case "lab": return d.title || "Lab";
+    case "assessment": return d.question || "Assessment";
+    case "debrief": return d.title || "Debrief";
+  }
+  return "";
+}
+
+function renderSteps() {
+  const box = $("#steps");
+  if (!cur.steps.length) {
+    box.innerHTML = '<div class="text-secondary small">No steps yet — add one above (a lesson usually starts with a Briefing).</div>';
+    return;
+  }
+  box.innerHTML = cur.steps.map((s, i) => {
+    const t = STEP_TYPES[s.type] || { label: s.type, color: "#888" };
+    return `<div class="step card mb-3" data-step="${esc(s.id)}">
+      <div class="card-header py-2 d-flex align-items-center gap-2 flex-wrap">
+        <span class="badge" style="background:${t.color}">${t.label}</span>
+        <span class="pos badge text-bg-light text-body rounded-pill">#${i + 1}</span>
+        <span class="title flex-grow-1 text-truncate">${esc(stepTitle(s))}</span>
+        <span class="btn-group btn-group-sm">
+          <button class="btn btn-outline-secondary" data-act="move-step" data-i="${i}" data-dir="-1" title="move up"><i class="bi bi-arrow-up"></i></button>
+          <button class="btn btn-outline-secondary" data-act="move-step" data-i="${i}" data-dir="1" title="move down"><i class="bi bi-arrow-down"></i></button>
+          <button class="btn btn-outline-secondary" data-act="dup-step" data-i="${i}" title="duplicate"><i class="bi bi-files"></i></button>
+          <button class="btn btn-outline-danger" data-act="del-step" data-i="${i}" title="delete"><i class="bi bi-trash"></i></button>
+        </span>
+      </div>
+      <div class="card-body">${stepForm(s)}</div>
+    </div>`;
+  }).join("");
+}
+
+function F(label, body, half) {
+  return `<div class="${half ? "col-md-6" : "col-12"} mb-3">
+    <label class="form-label small fw-semibold text-secondary mb-1">${label}</label>${body}</div>`;
+}
+function I(sid, field, value, ph) {
+  return `<input data-sf="${field}" data-sid="${esc(sid)}" class="form-control" value="${esc(value)}" placeholder="${esc(ph || "")}" />`;
+}
+function TA(sid, field, value, ph, rows) {
+  return `<textarea data-sf="${field}" data-sid="${esc(sid)}" class="form-control" style="min-height:${(rows || 3) * 26}px" placeholder="${esc(ph || "")}">${esc(value)}</textarea>`;
+}
+function rowOpen(halfCount) { return `<div class="row g-3">`; }
+
+function stepForm(s) {
+  const d = s.data || {};
+  switch (s.type) {
+    case "briefing": return (
+      rowOpen() +
+      F("Topic", I(s.id, "topic", d.topic, "e.g. Background Radiation")) +
+      F("Mission", I(s.id, "mission", d.mission, "e.g. Discover Natural Radiation!")) +
+      F("Icon", I(s.id, "icon", d.icon, "iconsax name, e.g. Sun"), true) +
+      `</div>`
+    );
+    case "myth_buster": return (
+      rowOpen() +
+      F("Myth (the false claim)", I(s.id, "myth", d.myth, "e.g. All radiation is man-made and dangerous")) +
+      F("Reality (the truth)", I(s.id, "reality", d.reality, "e.g. 80% of exposure is from nature")) +
+      F("Explanation", TA(s.id, "explanation", d.explanation, "Why it's a myth…", 4)) +
+      F("Image URL", I(s.id, "image", d.image, "https://… (optional)"), true) +
+      `</div>`
+    );
+    case "micro_learn": return (
+      rowOpen() +
+      F("Title", I(s.id, "title", d.title, "Micro-lesson title")) +
+      F("Image URL", I(s.id, "image", d.image, "https://… (optional)"), true) +
+      F("Content", TA(s.id, "content", d.content, "Body text…", 5)) +
+      kpForm(s) +
+      `</div>`
+    );
+    case "lab": return (
+      rowOpen() +
+      F("Title", I(s.id, "title", d.title, "Lab title")) +
+      F("Correct answer (option id)", I(s.id, "correctAnswer", d.correctAnswer, "e.g. denver"), true) +
+      F("Description", TA(s.id, "description", d.description, "Context / story…", 3)) +
+      F("Task", TA(s.id, "task", d.task, "What the learner should work out…", 3)) +
+      labOptionsForm(s) +
+      F("Explanation", TA(s.id, "explanation", d.explanation, "Shown after answering…", 4)) +
+      `</div>`
+    );
+    case "assessment": return (
+      rowOpen() +
+      F("Question", TA(s.id, "question", d.question, "The question…", 3)) +
+      assessOptionsForm(s) +
+      F("Correct answer index (0-based)",
+        `<input type="number" class="form-control" data-sf="correctIndex" data-sid="${esc(s.id)}" value="${esc(d.correctIndex)}" min="0" step="1" />
+         <span class="form-text">● = the option marked correct in the list above</span>`, true) +
+      F("Explanation", TA(s.id, "explanation", d.explanation, "Shown after answering…", 4)) +
+      F("Image URL", I(s.id, "image", d.image, "https://… (optional)"), true) +
+      `</div>`
+    );
+    case "debrief": {
+      const r = d.rewards || {};
+      return (
+        rowOpen() +
+        F("Title", I(s.id, "title", d.title, "e.g. Radiation Reality Check!")) +
+        F("Message", TA(s.id, "message", d.message, "Congratulatory message…", 3)) +
+        F("XP reward", `<input type="number" class="form-control" data-sf="rewards.xp" data-sid="${esc(s.id)}" value="${esc(r.xp == null ? 0 : r.xp)}" min="0" step="10" />`, true) +
+        F("Stars (0–5)", `<input type="number" class="form-control" data-sf="rewards.stars" data-sid="${esc(s.id)}" value="${esc(r.stars == null ? 3 : r.stars)}" min="0" max="5" step="1" />`, true) +
+        `</div>`
+      );
+    }
+  }
+  return "";
+}
+
+function kpForm(s) {
+  const kps = Array.isArray(s.data.keyPoints) ? s.data.keyPoints : [];
+  const rows = kps.map((k, i) =>
+    `<div class="kv input-group input-group-sm mb-1">
+       <span class="input-group-text small">${i + 1}</span>
+       <input class="form-control" data-kp="${i}" data-sid="${esc(s.id)}" value="${esc(k)}" placeholder="Key point…" />
+       <button class="btn btn-outline-danger" data-act="del-kp" data-i="${i}" data-sid="${esc(s.id)}"><i class="bi bi-x"></i></button>
+     </div>`).join("");
+  return `<div class="col-12 mb-3">
+    <label class="form-label small fw-semibold text-secondary mb-1 d-flex justify-content-between">
+      <span>Key points</span>
+      <button type="button" class="btn btn-sm btn-outline-primary py-0" data-act="add-kp" data-sid="${esc(s.id)}"><i class="bi bi-plus-lg me-1"></i>add</button>
+    </label>
+    ${rows}
+    <div class="form-text">dot points shown as a checklist in the app</div></div>`;
+}
+
+function labOptionsForm(s) {
+  const opts = Array.isArray(s.data.options) ? s.data.options : [];
+  const rows = opts.map((o, i) =>
+    `<div class="kv d-flex align-items-center gap-2 mb-1">
+       <span class="badge text-bg-light text-body rounded-pill flex-shrink-0">${i + 1}</span>
+       <div class="opt4 row g-1 flex-grow-1">
+         <div class="col-3"><input class="form-control" data-sid="${esc(s.id)}" data-oi="${i}" data-of="id" value="${esc(o.id)}" placeholder="id" /></div>
+         <div class="col-6"><input class="form-control" data-sid="${esc(s.id)}" data-oi="${i}" data-of="label" value="${esc(o.label)}" placeholder="label" /></div>
+         <div class="col-3"><input class="form-control" data-sid="${esc(s.id)}" data-oi="${i}" data-of="icon" value="${esc(o.icon)}" placeholder="icon" /></div>
+       </div>
+       <button class="btn btn-outline-danger btn-sm flex-shrink-0" data-act="del-opt" data-i="${i}" data-sid="${esc(s.id)}"><i class="bi bi-x"></i></button>
+     </div>`).join("");
+  return `<div class="col-12 mb-3">
+    <label class="form-label small fw-semibold text-secondary mb-1 d-flex justify-content-between">
+      <span>Options</span>
+      <button type="button" class="btn btn-sm btn-outline-primary py-0" data-act="add-opt" data-sid="${esc(s.id)}"><i class="bi bi-plus-lg me-1"></i>add</button>
+    </label>
+    ${rows}
+    <div class="form-text">id, label, icon (iconsax). “Correct answer” above matches an option id.</div></div>`;
+}
+
+function assessOptionsForm(s) {
+  const opts = Array.isArray(s.data.options) ? s.data.options : [];
+  const ci = Number(s.data.correctIndex);
+  const rows = opts.map((o, i) =>
+    `<div class="kv input-group input-group-sm mb-1">
+       <span class="input-group-text small">${i + 1}</span>
+       <input class="form-control" data-sid="${esc(s.id)}" data-oi="${i}" data-of="text" value="${esc(o)}" placeholder="Option text…" />
+       <span class="input-group-text ${i === ci ? "text-success" : "opacity-25"}" title="correct option">●</span>
+       <button class="btn btn-outline-danger" data-act="del-opt" data-i="${i}" data-sid="${esc(s.id)}"><i class="bi bi-x"></i></button>
+     </div>`).join("");
+  return `<div class="col-12 mb-3">
+    <label class="form-label small fw-semibold text-secondary mb-1 d-flex justify-content-between">
+      <span>Options</span>
+      <button type="button" class="btn btn-sm btn-outline-primary py-0" data-act="add-opt" data-sid="${esc(s.id)}"><i class="bi bi-plus-lg me-1"></i>add</button>
+    </label>
+    ${rows}
+    <div class="form-text">● marks the option at the chosen correct index</div></div>`;
+}
+
+// ---------------------------------------------------------------------------
+// 7. Event delegation
+// ---------------------------------------------------------------------------
+function onMainInput(e) {
+  const el = e.target;
+
+  if (el.dataset.fl) {
+    let v = el.value;
+    if (el.type === "number") v = Number(v);
+    saveLesson(el.dataset.fl, v);
+    return;
+  }
+
+  if (el.dataset.sf && el.dataset.sid) {
+    const st = cur.steps.find(s => s.id === el.dataset.sid);
+    if (!st) return;
+    const key = el.dataset.sf;
+    let v = el.type === "number" ? Number(el.value) : el.value;
+    if (key.includes(".")) {
+      const parts = key.split(".");
+      if (typeof st.data[parts[0]] !== "object") st.data[parts[0]] = {};
+      st.data[parts[0]][parts[1]] = v;
+    } else {
+      st.data[key] = v;
+    }
+    saveStep(st.id, st.data);
+    const head = el.closest(".step").querySelector(".step-head .title") ||
+                 el.closest(".step").querySelector(".card-header .title");
+    if (head && key === "title") head.textContent = st.data.title || STEP_TYPES[st.type].label;
+    if (head && key === "topic") head.textContent = st.data.topic || "Briefing";
+    return;
+  }
+
+  if (el.dataset.kp != null && el.dataset.sid) {
+    const st = cur.steps.find(s => s.id === el.dataset.sid);
+    if (!st) return;
+    st.data.keyPoints[Number(el.dataset.kp)] = el.value;
+    saveStep(st.id, st.data);
+    return;
+  }
+
+  if (el.dataset.oi != null && el.dataset.sid && el.dataset.of) {
+    const st = cur.steps.find(s => s.id === el.dataset.sid);
+    if (!st) return;
+    const i = Number(el.dataset.oi);
+    if (st.type === "lab") st.data.options[i][el.dataset.of] = el.value;
+    else if (st.type === "assessment" && el.dataset.of === "text") st.data.options[i] = el.value;
+    saveStep(st.id, st.data);
+    return;
+  }
+}
+
+function onMainClick(e) {
+  const el = e.target.closest("[data-act]");
+  if (!el) return;
+  const a = el.dataset.act;
+  const i = Number(el.dataset.i);
+  const sid = el.dataset.sid;
+  const st = sid ? cur.steps.find(s => s.id === sid) : null;
+
+  switch (a) {
+    case "pick":
+      loadLesson(el.dataset.id);
+      break;
+    case "toggle-pre": {
+      const arr = cur.lesson.prerequisites || [];
+      const idx = arr.indexOf(el.dataset.id);
+      if (idx > -1) arr.splice(idx, 1); else arr.push(el.dataset.id);
+      saveLesson("prerequisites", arr);
+      renderPrereqs();
+      break;
+    }
+    case "del-tag": {
+      const arr = cur.lesson.tags || [];
+      arr.splice(i, 1);
+      saveLesson("tags", arr);
+      renderTags();
+      break;
+    }
+    case "add-kp":
+      if (st) { st.data.keyPoints = st.data.keyPoints || []; st.data.keyPoints.push(""); saveStep(sid, st.data); renderSteps(); }
+      break;
+    case "del-kp":
+      if (st) { st.data.keyPoints.splice(i, 1); saveStep(sid, st.data); renderSteps(); }
+      break;
+    case "add-opt":
+      if (st) {
+        if (st.type === "lab") st.data.options.push({ id: "", label: "", icon: "" });
+        else if (st.type === "assessment") st.data.options.push("");
+        saveStep(sid, st.data); renderSteps();
+      }
+      break;
+    case "del-opt":
+      if (st) { st.data.options.splice(i, 1); saveStep(sid, st.data); renderSteps(); }
+      break;
+    case "move-step":
+      moveStep(i, Number(el.dataset.dir));
+      break;
+    case "dup-step":
+      duplicateStep(i);
+      break;
+    case "del-step":
+      deleteStep(i);
+      break;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// 8. SQL console
+// ---------------------------------------------------------------------------
+function setQuick(btn) { $("#sqlInput").value = btn.dataset.sql; runSql(); }
+
+async function runSql() {
+  if (!db) { toast("Load a database first", 1); return; }
+  const sql = $("#sqlInput").value.trim();
+  if (!sql) return;
+  const out = $("#result");
+  out.innerHTML = '<div class="text-secondary small py-2">Running…</div>';
+  try {
+    const results = db.exec(sql);
+    renderResults(out, results);
+    toast("Query OK");
+    refreshStats(); renderTree();
+    if (curId) { try { loadLesson(curId); } catch {} }
+  } catch (e) {
+    out.innerHTML = '<div class="text-danger small py-2"><i class="bi bi-exclamation-triangle me-1"></i>' + esc(e.message) + "</div>";
+    $("#rowCount").textContent = "error";
+    setTimeout(() => toast("Query failed", 1), 50);
+  }
+}
+
+function renderResults(out, results) {
+  $("#rowCount").textContent = results.length
+    ? results.reduce((sum, r) => sum + r.values.length, 0) + " rows"
+    : "0 rows (statement executed)";
+  if (!results.length) {
+    out.innerHTML = '<div class="text-secondary small py-2">Statement executed — no result set returned.</div>';
+    return;
+  }
+  out.innerHTML = results.map((rs, idx) => {
+    const head = rs.columns.map(c => "<th>" + esc(c) + "</th>").join("");
+    const rows = rs.values.map(vals =>
+      "<tr>" + vals.map(v => "<td>" + cell(v) + "</td>").join("") + "</tr>"
+    ).join("");
+    return (results.length > 1
+      ? '<div class="text-secondary small my-1">Result set ' + (idx + 1) + " of " + results.length + "</div>"
+      : "") +
+      "<table class='table table-sm table-hover align-middle mb-0'><thead class='table-secondary'><tr>" + head + "</tr></thead><tbody>" + rows + "</tbody></table>";
+  }).join("");
+}
+
+function cell(v) {
+  if (v === null || v === undefined) return '<span class="text-danger">NULL</span>';
+  if (v instanceof Uint8Array) {
+    const hex = Array.from(v).slice(0, 12).map(b => b.toString(16).padStart(2, "0")).join("");
+    return '<span class="text-info">X&apos;' + esc(hex) + "…&apos; (" + v.length + " bytes)</span>";
+  }
+  const s = String(v);
+  if (s.length > 200) return '<span class="text-truncate" style="white-space:pre-wrap" title="' + esc(s) + '">' + esc(s.slice(0, 200)) + "…</span>";
+  return '<span style="white-space:pre-wrap;word-break:break-word">' + esc(s) + "</span>";
+}
+
+function renderTables() {
+  const list = $("#tableList");
+  try {
+    const r = db.exec("SELECT name FROM sqlite_master WHERE type IN ('table','view') ORDER BY name");
+    if (!r.length) { list.innerHTML = '<tr><td class="text-secondary small">No tables</td></tr>'; return; }
+    list.innerHTML = r[0].values.map(v => "<tr><td>" + esc(v[0]) + "</td></tr>").join("");
+  } catch { list.innerHTML = '<tr><td class="text-secondary small">—</td></tr>'; }
+}
+
+function exportDb() {
+  if (!db) { toast("Nothing to export", 1); return; }
+  try {
+    const bytes = db.export();
+    const blob = new Blob([bytes], { type: "application/octet-stream" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = dbName && dbName.endsWith(".db") ? dbName : dbName + ".db";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 8000);
+    toast("Exported " + a.download);
+  } catch (e) { toast("Export failed: " + e.message, 1); }
+}
+
+function resetAll() {
+  if (db) { db.close(); db = null; }
+  cur = null; curId = null;
+  curQuiz = null; curMb = null;
+  const b = $("#dbState");
+  b.textContent = "No database loaded";
+  b.className = "badge text-bg-secondary";
+  $("#dropInfo").textContent = "No file selected";
+  ["#stTables", "#stLessons", "#stSteps", "#stSize", "#stQuizzes", "#stQuestions", "#stMythbusters"].forEach(sel => $(sel).textContent = "—");
+  $("#exportBtn").disabled = true;
+  $("#exportTopBtn").disabled = true;
+  $("#newLessonBtn").disabled = true;
+  $("#newQuizBtn").disabled = true;
+  $("#newMbBtn").disabled = true;
+  $("#tableList").innerHTML = "";
+  $("#result").innerHTML = '<div class="text-secondary small py-2">Load a database to begin.</div>';
+  $("#lessonCard").style.display = "none";
+  $("#emptyPanel").style.display = "block";
+  $("#quizCard").style.display = "none";
+  $("#mbCard").style.display = "none";
+  $("#qEmptyPanel").style.display = "block";
+  $("#quizTree").innerHTML = '<div class="text-secondary small py-2">Load a database to begin.</div>';
+  $("#mbTree").innerHTML = '<div class="text-secondary small py-2">Load a database to begin.</div>';
+  renderTree();
+  renderQuizTree();
+  renderMbTree();
+  toast("Session cleared");
+}
+
+// ---------------------------------------------------------------------------
+// 8b. Quiz & Mythbuster editor
+// ---------------------------------------------------------------------------
+const QUIZ_Q_TYPES = {
+  multiple_choice: "Multiple choice",
+  true_false: "True / False",
+  matching: "Matching",
+  fill_blank: "Fill in the blank",
+};
+const QCOL = {
+  question: "question", type: "type", options: "options", correctAnswer: "correct_answer",
+  explanation: "explanation", difficulty: "difficulty", points: "points",
+  image: "image", timeLimit: "time_limit",
+};
+
+function allQuizzes() {
+  try {
+    return qAll(`SELECT q.id, q.title, q.difficulty, q.category,
+        (SELECT COUNT(*) FROM quiz_questions qq WHERE qq.quiz_id = q.id) c
+        FROM quizzes q ORDER BY q.title`);
+  } catch { return []; }
+}
+
+function emptyQuizQuestion() {
+  return { id: "", type: "multiple_choice", question: "", options: [],
+           correctAnswer: 0, explanation: "", difficulty: "easy", points: 10,
+           image: null, timeLimit: null };
+}
+
+function loadQuiz(id) {
+  const rows = qAll("SELECT * FROM quizzes WHERE id = ?", [id]);
+  if (!rows.length) { toast("Quiz not found", 1); return; }
+  const r = rows[0];
+  curQuiz = {
+    id,
+    quiz: {
+      id: r.id, title: r.title || "", description: r.description || "",
+      category: r.category || "", difficulty: r.difficulty || "easy",
+      passing_score: r.passing_score == null ? 70 : r.passing_score,
+      xp_reward: r.xp_reward || 0,
+      time_limit: r.time_limit == null ? "" : r.time_limit,
+      unit_id: r.unit_id || "",
+      estimated_minutes: r.estimated_minutes == null ? "" : r.estimated_minutes,
+      metadata: r.metadata || "{}",
+      tags: safeJSON(r.tags),
+    },
+    questions: qAll("SELECT * FROM quiz_questions WHERE quiz_id = ? ORDER BY position", [id])
+      .map(q => ({
+        id: q.id, type: q.type || "multiple_choice", question: q.question || "",
+        options: safeJSON(q.options), correctAnswer: safeJSON(q.correct_answer),
+        explanation: q.explanation || "", difficulty: q.difficulty || "easy",
+        points: q.points || 10, image: q.image, timeLimit: q.time_limit,
+      })),
+  };
+  showQuizPanel();
+}
+
+function saveQuizField(field, value) {
+  if (!curQuiz) return;
+  if (field === "tags") value = JSON.stringify(value);
+  if (field === "metadata") {
+    try { JSON.parse(value || "{}"); }
+    catch { toast("Metadata must be valid JSON", 1); return; }
+  }
+  run("UPDATE quizzes SET " + field + " = ?, updated_at = strftime('%s','now') WHERE id = ?",
+      [value, curQuiz.id]);
+  curQuiz.quiz[field] = field === "tags" ? JSON.parse(value) : value;
+  refreshStats();
+  renderQuizTree();
+  if (field === "tags") renderQuizTags();
+}
+
+function saveQuizQuestion(qid, key, value) {
+  const q = curQuiz.questions.find(x => x.id === qid);
+  if (!q || !QCOL[key]) return;
+  let store = value;
+  if (key === "options" || key === "correctAnswer") store = JSON.stringify(value);
+  run("UPDATE quiz_questions SET " + QCOL[key] + " = ?, updated_at = strftime('%s','now') WHERE quiz_id = ? AND id = ?",
+      [store, curQuiz.id, qid]);
+}
+
+function nextQuizQuestionId() {
+  const taken = new Set(curQuiz.questions.map(x => x.id));
+  let id = "q", n = 0;
+  do { n++; id = "q" + n; } while (taken.has(id));
+  return id;
+}
+
+function addQuizQuestion() {
+  if (!curQuiz) return;
+  const id = nextQuizQuestionId();
+  const pos = curQuiz.questions.length;
+  const q = emptyQuizQuestion(); q.id = id;
+  run("INSERT INTO quiz_questions (quiz_id, id, position, type, question, options, correct_answer, explanation, difficulty, points) VALUES (?,?,?,?,?,?,?,?,?,?)",
+      [curQuiz.id, id, pos, q.type, q.question, JSON.stringify(q.options),
+       JSON.stringify(q.correctAnswer), q.explanation, q.difficulty, q.points]);
+  curQuiz.questions.push(q);
+  renderQuiz();
+  refreshStats();
+  renderQuizTree();
+  const el = document.querySelector('[data-qid="' + id + '"]');
+  if (el) el.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  toast("Question added");
+}
+
+function renumberQuizQuestions() {
+  db.exec("BEGIN");
+  try {
+    curQuiz.questions.forEach((q, i) =>
+      run("UPDATE quiz_questions SET position = ? WHERE quiz_id = ? AND id = ?", [i, curQuiz.id, q.id]));
+    db.exec("COMMIT");
+  } catch (e) { db.exec("ROLLBACK"); throw e; }
+}
+
+function moveQuizQuestion(index, dir) {
+  const j = index + dir;
+  if (j < 0 || j >= curQuiz.questions.length) return;
+  const a = curQuiz.questions[index], b = curQuiz.questions[j];
+  db.exec("BEGIN");
+  try {
+    run("UPDATE quiz_questions SET position = ? WHERE quiz_id = ? AND id = ?", [j + 100000, curQuiz.id, a.id]);
+    run("UPDATE quiz_questions SET position = ? WHERE quiz_id = ? AND id = ?", [index, curQuiz.id, b.id]);
+    run("UPDATE quiz_questions SET position = ? WHERE quiz_id = ? AND id = ?", [j, curQuiz.id, a.id]);
+    db.exec("COMMIT");
+  } catch (e) { db.exec("ROLLBACK"); throw e; }
+  curQuiz.questions[index] = b; curQuiz.questions[j] = a;
+  renderQuiz();
+}
+
+function duplicateQuizQuestion(index) {
+  const src = curQuiz.questions[index];
+  const id = nextQuizQuestionId();
+  const pos = curQuiz.questions.length;
+  run("INSERT INTO quiz_questions (quiz_id, id, position, type, question, options, correct_answer, explanation, difficulty, points, image, time_limit) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",
+      [curQuiz.id, id, pos, src.type, src.question, JSON.stringify(src.options),
+       JSON.stringify(src.correctAnswer), src.explanation, src.difficulty, src.points,
+       src.image, src.timeLimit]);
+  curQuiz.questions.push(Object.assign({}, src, { id }));
+  renderQuiz(); refreshStats(); renderQuizTree();
+  toast("Question duplicated");
+}
+
+function deleteQuizQuestion(index) {
+  const q = curQuiz.questions[index];
+  if (!q || !confirm("Delete this question?")) return;
+  run("DELETE FROM quiz_questions WHERE quiz_id = ? AND id = ?", [curQuiz.id, q.id]);
+  curQuiz.questions.splice(index, 1);
+  renumberQuizQuestions();
+  renderQuiz(); refreshStats(); renderQuizTree();
+  toast("Question deleted");
+}
+
+function showAllPanelsHidden() {
+  $("#qEmptyPanel").style.display = "none";
+  $("#quizCard").style.display = "none";
+  $("#mbCard").style.display = "none";
+}
+function showQuizPanel() {
+  quizPanelOn = true; mbPanelOn = false;
+  showAllPanelsHidden();
+  $("#quizCard").style.display = "block";
+  renderQuiz();
+}
+function showMbPanel() {
+  quizPanelOn = false; mbPanelOn = true;
+  showAllPanelsHidden();
+  $("#mbCard").style.display = "block";
+  renderMb();
+}
+
+function renderQuiz() {
+  $("#quizCard").style.display = "block";
+  $("#qEmptyPanel").style.display = "none";
+  const q = curQuiz.quiz;
+  $("#qzLabel").textContent = " · " + q.id;
+  document.querySelectorAll("#quizCard [data-qfl]").forEach(el => {
+    el.value = q[el.dataset.qfl] == null ? "" : q[el.dataset.qfl];
+  });
+  renderQuizTags();
+  $("#qzQCount").textContent = curQuiz.questions.length +
+    " question" + (curQuiz.questions.length === 1 ? "" : "s");
+  renderQuizQuestions();
+}
+
+function renderQuizTags() {
+  const box = $("#qzTags");
+  const tags = (curQuiz.quiz.tags || []).filter(Boolean);
+  box.innerHTML =
+    tags.map((t, i) => `<span class="chip">${esc(t)}<button class="x" data-act="qz-del-tag" data-i="${i}"><i class="bi bi-x-lg"></i></button></span>`).join("") +
+    `<input id="qzTagNew" class="form-control form-control-sm w-auto flex-grow-1" placeholder="add tag… ↵" style="min-width:140px" />`;
+  const ni = $("#qzTagNew");
+  ni.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); addQuizTag(ni); } });
+  ni.addEventListener("change", () => { if (ni.value) addQuizTag(ni); });
+}
+
+function addQuizTag(input) {
+  const v = input.value.trim();
+  if (v && !(curQuiz.quiz.tags || []).includes(v)) {
+    curQuiz.quiz.tags.push(v);
+    saveQuizField("tags", curQuiz.quiz.tags);
+  }
+  input.value = "";
+  input.focus();
+}
+
+function IA(sid, field, value, ph) {
+  return `<input data-qf="${field}" data-qid="${esc(sid)}" class="form-control" value="${esc(value)}" placeholder="${esc(ph || "")}" />`;
+}
+function QA(sid, field, value, ph, rows) {
+  return `<textarea data-qf="${field}" data-qid="${esc(sid)}" class="form-control" style="min-height:${(rows || 3) * 26}px" placeholder="${esc(ph || "")}">${esc(value)}</textarea>`;
+}
+
+function questionTitle(q) {
+  return q.question || QUIZ_Q_TYPES[q.type] || q.type;
+}
+
+function qOptionsForm(q) {
+  if (q.type === "true_false") {
+    return `<div class="col-12 mb-3">
+      <label class="form-label small fw-semibold text-secondary mb-1">Options</label>
+      <div class="chips"><span class="chip on">True</span><span class="chip on">False</span></div>
+      <div class="form-text">True / False questions use fixed True / False options</div></div>`;
+  }
+  const opts = Array.isArray(q.options) ? q.options : [];
+  const ci = Number(q.correctAnswer);
+  const rows = opts.map((o, i) =>
+    `<div class="kv input-group input-group-sm mb-1">
+       <span class="input-group-text small">${i + 1}</span>
+       <input class="form-control" data-qid="${esc(q.id)}" data-qoi="${i}" value="${esc(o)}" placeholder="Option text…" />
+       <span class="input-group-text ${i === ci ? "text-success" : "opacity-25"}" title="chosen correct option">●</span>
+       <button class="btn btn-outline-danger" data-act="qz-del-opt" data-i="${i}" data-qid="${esc(q.id)}"><i class="bi bi-x"></i></button>
+     </div>`).join("");
+  return `<div class="col-12 mb-3">
+    <label class="form-label small fw-semibold text-secondary mb-1 d-flex justify-content-between">
+      <span>Options</span>
+      <button type="button" class="btn btn-sm btn-outline-primary py-0" data-act="qz-add-opt" data-qid="${esc(q.id)}"><i class="bi bi-plus-lg me-1"></i>add</button>
+    </label>
+    ${rows}
+    <div class="form-text">each option is one row; ● marks the option at the chosen correct index</div></div>`;
+}
+
+function qAnswerInput(q) {
+  if (q.type === "true_false") {
+    const v = q.correctAnswer === true ? "true" : "false";
+    return `<select data-qf="correctAnswer" data-qid="${esc(q.id)}" class="form-select">
+      <option value="true" ${v === "true" ? "selected" : ""}>True</option>
+      <option value="false" ${v === "false" ? "selected" : ""}>False</option></select>`;
+  }
+  return `<input type="number" class="form-control" data-qf="correctAnswer" data-qid="${esc(q.id)}" value="${esc(Number(q.correctAnswer) || 0)}" min="0" step="1" />`;
+}
+
+function renderQuizQuestions() {
+  const box = $("#qzQuestions");
+  if (!curQuiz.questions.length) {
+    box.innerHTML = '<div class="text-secondary small">No questions yet — click “Add”.</div>';
+    return;
+  }
+  box.innerHTML = curQuiz.questions.map((q, i) => `
+    <div class="step card mb-3" data-qid="${esc(q.id)}">
+      <div class="card-header py-2 d-flex align-items-center gap-2 flex-wrap">
+        <span class="badge" style="background:#a855f7">${esc(QUIZ_Q_TYPES[q.type] || q.type)}</span>
+        <span class="pos badge text-bg-light text-body rounded-pill">#${i + 1}</span>
+        <span class="title flex-grow-1 text-truncate">${esc(questionTitle(q))}</span>
+        <span class="btn-group btn-group-sm">
+          <button class="btn btn-outline-secondary" data-act="qz-move" data-i="${i}" data-dir="-1" title="move up"><i class="bi bi-arrow-up"></i></button>
+          <button class="btn btn-outline-secondary" data-act="qz-move" data-i="${i}" data-dir="1" title="move down"><i class="bi bi-arrow-down"></i></button>
+          <button class="btn btn-outline-secondary" data-act="qz-dup" data-i="${i}" title="duplicate"><i class="bi bi-files"></i></button>
+          <button class="btn btn-outline-danger" data-act="qz-del" data-i="${i}" title="delete"><i class="bi bi-trash"></i></button>
+        </span>
+      </div>
+      <div class="card-body">
+        <div class="row g-3">
+          ${F("Question", QA(q.id, "question", q.question, "The question…", 2))}
+          <div class="col-md-4 mb-3">
+            <label class="form-label small fw-semibold text-secondary mb-1">Type</label>
+            <select data-qf="type" data-qid="${esc(q.id)}" class="form-select">${Object.keys(QUIZ_Q_TYPES).map(t => `<option value="${t}" ${q.type === t ? "selected" : ""}>${QUIZ_Q_TYPES[t]}</option>`).join("")}</select>
+          </div>
+          <div class="col-md-4 mb-3">
+            <label class="form-label small fw-semibold text-secondary mb-1">Difficulty</label>
+            <select data-qf="difficulty" data-qid="${esc(q.id)}" class="form-select">
+              <option value="easy" ${q.difficulty === "easy" ? "selected" : ""}>easy</option>
+              <option value="medium" ${q.difficulty === "medium" ? "selected" : ""}>medium</option>
+              <option value="hard" ${q.difficulty === "hard" ? "selected" : ""}>hard</option>
+            </select>
+          </div>
+          <div class="col-md-4 mb-3">
+            <label class="form-label small fw-semibold text-secondary mb-1">Points</label>
+            <input type="number" class="form-control" data-qf="points" data-qid="${esc(q.id)}" value="${esc(q.points != null ? q.points : 10)}" min="0" step="1" />
+          </div>
+          ${qOptionsForm(q)}
+          <div class="col-md-4 mb-3">
+            <label class="form-label small fw-semibold text-secondary mb-1">Correct answer</label>
+            ${qAnswerInput(q)}
+            <span class="form-text">${q.type === "true_false" ? "choose True / False" : "option index (0-based) — ● marks the position"}</span>
+          </div>
+          <div class="col-md-4 mb-3">
+            <label class="form-label small fw-semibold text-secondary mb-1">Image URL</label>
+            ${IA(q.id, "image", q.image || "", "https://… (optional)")}
+          </div>
+          <div class="col-md-4 mb-3">
+            <label class="form-label small fw-semibold text-secondary mb-1">Time limit (s) <span class="text-secondary small">(optional)</span></label>
+            <input type="number" class="form-control" data-qf="timeLimit" data-qid="${esc(q.id)}" value="${esc(q.timeLimit == null ? "" : q.timeLimit)}" min="0" step="1" placeholder="blank = none" />
+          </div>
+          ${F("Explanation", QA(q.id, "explanation", q.explanation, "Shown after answering…", 3))}
+        </div>
+      </div>
+    </div>`).join("");
+}
+
+// --- Mythbuster bank ---
+
+function emptyMb(difficulty) {
+  return { id: "", difficulty: difficulty || "easy", type: "multiple_choice", question: "",
+           options: [], correctAnswer: 0, explanation: "", points: 5 };
+}
+
+function nextMbId(diff) {
+  let n = 0, id;
+  do { n++; id = "mb-" + diff + "-q" + n; }
+  while (qAll("SELECT 1 FROM mythbuster_questions WHERE id = ?", [id]).length);
+  return id;
+}
+
+function mbPool(diff) {
+  return qAll("SELECT id FROM mythbuster_questions WHERE difficulty = ? ORDER BY position", [diff]).map(r => r.id);
+}
+
+function nextMbPosition(diff) {
+  const r = qAll("SELECT MAX(position) m FROM mythbuster_questions WHERE difficulty = ?", [diff]);
+  return (r.length && r[0].m != null) ? r[0].m + 1 : 0;
+}
+
+function renumberMbPool(diff) {
+  db.exec("BEGIN");
+  try {
+    mbPool(diff).forEach((id, i) => run("UPDATE mythbuster_questions SET position = ? WHERE id = ?", [i, id]));
+    db.exec("COMMIT");
+  } catch (e) { db.exec("ROLLBACK"); throw e; }
+}
+
+function loadMb(id) {
+  const rows = qAll("SELECT * FROM mythbuster_questions WHERE id = ?", [id]);
+  if (!rows.length) { toast("Question not found", 1); return; }
+  const r = rows[0];
+  curMb = {
+    id,
+    difficulty: r.difficulty || "easy",
+    type: r.type || "multiple_choice",
+    question: r.question || "",
+    options: safeJSON(r.options),
+    correctAnswer: safeJSON(r.correct_answer),
+    explanation: r.explanation || "",
+    points: r.points || 5,
+  };
+  showMbPanel();
+}
+
+function saveMbField(field, value) {
+  if (!curMb) return;
+  const col = field === "correctAnswer" ? "correct_answer" : field;
+  let store = value;
+  if (field === "options" || field === "correctAnswer") store = JSON.stringify(value);
+  run("UPDATE mythbuster_questions SET " + col + " = ?, updated_at = strftime('%s','now') WHERE id = ?",
+      [store, curMb.id]);
+  curMb[field] = value;
+  renderMbTree();
+  refreshStats();
+}
+
+function addMb(diff) {
+  const d = diff || "easy";
+  const id = nextMbId(d);
+  const pos = nextMbPosition(d);
+  const m = emptyMb(d); m.id = id;
+  run("INSERT INTO mythbuster_questions (id, difficulty, type, question, options, correct_answer, explanation, points, position) VALUES (?,?,?,?,?,?,?,?,?)",
+      [id, d, m.type, m.question, JSON.stringify(m.options), JSON.stringify(m.correctAnswer),
+       m.explanation, m.points, pos]);
+  curMb = m;
+  mbFilter = d;
+  document.querySelectorAll("#mbFilterBtns [data-mbf]").forEach(x => x.classList.toggle("active", x.dataset.mbf === d));
+  renderMbTree(); refreshStats();
+  showMbPanel();
+  toast("Mythbuster question added (" + d + ")");
+}
+
+function moveMb(direction) {
+  const pool = mbPool(curMb.difficulty);
+  const idx = pool.indexOf(curMb.id);
+  const j = idx + direction;
+  if (idx < 0 || j < 0 || j >= pool.length) return;
+  const a = pool[idx], b = pool[j];
+  db.exec("BEGIN");
+  try {
+    run("UPDATE mythbuster_questions SET position = ? WHERE id = ?", [j + 100000, a]);
+    run("UPDATE mythbuster_questions SET position = ? WHERE id = ?", [idx, b]);
+    run("UPDATE mythbuster_questions SET position = ? WHERE id = ?", [j, a]);
+    db.exec("COMMIT");
+  } catch (e) { db.exec("ROLLBACK"); throw e; }
+  renderMbTree();
+}
+
+function duplicateMb() {
+  const d = curMb.difficulty;
+  const id = nextMbId(d);
+  run("INSERT INTO mythbuster_questions (id, difficulty, type, question, options, correct_answer, explanation, points, position) VALUES (?,?,?,?,?,?,?,?,?)",
+      [id, d, curMb.type, curMb.question, JSON.stringify(curMb.options),
+       JSON.stringify(curMb.correctAnswer), curMb.explanation, curMb.points, nextMbPosition(d)]);
+  renderMbTree(); refreshStats();
+  toast("Duplicated");
+}
+
+function deleteMb() {
+  if (!curMb || !confirm("Delete this mythbuster question?")) return;
+  const d = curMb.difficulty;
+  const id = curMb.id;
+  run("DELETE FROM mythbuster_questions WHERE id = ?", [id]);
+  renumberMbPool(d);
+  curMb = null;
+  showAllPanelsHidden();
+  if (curQuiz) showQuizPanel(); else $("#qEmptyPanel").style.display = "block";
+  renderMbTree(); refreshStats();
+  toast("Question deleted");
+}
+
+function renderMb() {
+  $("#mbCard").style.display = "block";
+  $("#qEmptyPanel").style.display = "none";
+  $("#mbLabel").textContent = " · " + curMb.id;
+  $("#mbCard [data-mf='difficulty']").value = curMb.difficulty;
+  $("#mbCard [data-mf='type']").value = curMb.type;
+  $("#mbCard [data-mf='question']").value = curMb.question;
+  $("#mbCard [data-mf='explanation']").value = curMb.explanation;
+  $("#mbCard [data-mf='points']").value = curMb.points;
+  const optsBox = $("#mbOptions");
+  if (curMb.type === "true_false") {
+    optsBox.innerHTML = '<div class="chips"><span class="chip on">True</span><span class="chip on">False</span></div>';
+  } else {
+    const ci = Number(curMb.correctAnswer);
+    optsBox.innerHTML = (Array.isArray(curMb.options) ? curMb.options : []).map((o, i) =>
+      `<div class="kv input-group input-group-sm mb-1">
+         <span class="input-group-text small">${i + 1}</span>
+         <input class="form-control" data-moi="${i}" value="${esc(o)}" placeholder="Option text…" />
+         <span class="input-group-text ${i === ci ? "text-success" : "opacity-25"}" title="chosen correct option">●</span>
+         <button class="btn btn-outline-danger" data-act="mb-del-opt" data-i="${i}"><i class="bi bi-x"></i></button>
+       </div>`).join("") ||
+      '<div class="text-secondary small">No options yet — click “add”.</div>';
+  }
+  $("#mbAnswer").innerHTML = curMb.type === "true_false"
+    ? `<select data-mf="correctAnswer" class="form-select">
+         <option value="true" ${curMb.correctAnswer === true ? "selected" : ""}>True</option>
+         <option value="false" ${curMb.correctAnswer === false ? "selected" : ""}>False</option></select>
+       <div class="form-text">choose True / False</div>`
+    : `<input type="number" class="form-control" data-mf="correctAnswer" value="${esc(Number(curMb.correctAnswer) || 0)}" min="0" step="1" />
+       <div class="form-text">option index (0-based) — ● marks the position</div>`;
+}
+
+// --- Trees ---
+
+function renderQuizTree() {
+  const t = $("#quizTree");
+  const quizzes = allQuizzes();
+  $("#quizTreeCount").textContent = quizzes.length + " quiz" + (quizzes.length === 1 ? "" : "zes");
+  if (!db || !quizzes.length) {
+    t.innerHTML = '<div class="text-secondary small py-2"><i class="bi bi-info-circle me-1"></i>' +
+      (db ? "No quizzes yet — click “New quiz”." : "Load a database or create a blank one.") + "</div>";
+    return;
+  }
+  const q = ($("#quizSearch").value || "").trim().toLowerCase();
+  const list = quizzes.filter(qu => !q || qu.title.toLowerCase().includes(q) || qu.id.toLowerCase().includes(q));
+  t.innerHTML = list.length
+    ? `<div class="list-group list-group-flush">` +
+        list.map(qu =>
+          `<div class="list-group-item list-group-item-action lesson-item small ${qu.id === (curQuiz && curQuiz.id) ? "active" : ""}" data-act="qz-pick" data-id="${esc(qu.id)}">
+             <span class="nm flex-grow-1 text-truncate">${esc(qu.title || qu.id)}</span>
+             <span class="nsteps badge text-bg-secondary rounded-pill">${qu.c}</span>
+             <span class="badge text-bg-secondary rounded-pill">${esc(qu.difficulty)}</span>
+           </div>`).join("") +
+      `</div>`
+    : '<div class="text-secondary small py-2">No matching quizzes.</div>';
+}
+
+function renderMbTree() {
+  const t = $("#mbTree");
+  let rows = [];
+  try {
+    rows = qAll("SELECT id, difficulty, question FROM mythbuster_questions ORDER BY difficulty, position");
+  } catch { }
+  const filtered = rows.filter(r => !mbFilter || r.difficulty === mbFilter);
+  $("#mbTreeCount").textContent = filtered.length + " question" + (filtered.length === 1 ? "" : "s");
+  if (!db || !filtered.length) {
+    t.innerHTML = '<div class="text-secondary small py-2"><i class="bi bi-info-circle me-1"></i>' +
+      (db ? "No mythbuster questions yet — click “New question”." : "Load a database or create a blank one.") + "</div>";
+    return;
+  }
+  const q = ($("#mbSearch").value || "").trim().toLowerCase();
+  const list = filtered.filter(r => !q || r.question.toLowerCase().includes(q) || r.id.toLowerCase().includes(q));
+  t.innerHTML = list.length
+    ? `<div class="list-group list-group-flush">` +
+        list.map(r =>
+          `<div class="list-group-item list-group-item-action lesson-item small ${r.id === (curMb && curMb.id) ? "active" : ""}" data-act="mb-pick" data-id="${esc(r.id)}">
+             <span class="nm flex-grow-1 text-truncate">${esc(r.question || r.id)}</span>
+             <span class="badge text-bg-secondary rounded-pill">${esc(r.difficulty)}</span>
+           </div>`).join("") +
+      `</div>`
+    : '<div class="text-secondary small py-2">No matching questions.</div>';
+}
+
+// --- Quiz / mythbuster event handlers (delegated on #qmain) ---
+
+function onQuizInput(e) {
+  const el = e.target;
+
+  if (el.dataset.qfl) {
+    if (el.dataset.qfl === "metadata" && e.type !== "change") return; // validate only on blur/change
+    let v = el.value;
+    if (el.type === "number") v = Number(v);
+    if (el.dataset.qfl === "time_limit" || el.dataset.qfl === "estimated_minutes") {
+      v = ("" + el.value).trim() === "" ? null : Number(el.value);
+    }
+    saveQuizField(el.dataset.qfl, v);
+    return;
+  }
+
+  if (el.dataset.qf && el.dataset.qid) {
+    const q = curQuiz.questions.find(x => x.id === el.dataset.qid);
+    if (!q) return;
+    const key = el.dataset.qf;
+    if (key === "type") {
+      const prev = q.type;
+      q.type = el.value;
+      if (el.value === "true_false" && prev !== "true_false") {
+        q.options = ["True", "False"];
+        q.correctAnswer = false;
+        saveQuizQuestion(q.id, "options", q.options);
+        saveQuizQuestion(q.id, "correctAnswer", q.correctAnswer);
+      } else if (prev === "true_false" && el.value !== "true_false") {
+        q.correctAnswer = 0;
+        saveQuizQuestion(q.id, "correctAnswer", q.correctAnswer);
+      }
+      saveQuizQuestion(q.id, "type", el.value);
+      renderQuiz();
+      return;
+    }
+    if (key === "correctAnswer") {
+      q.correctAnswer = q.type === "true_false" ? el.value === "true" : Math.max(0, Number(el.value) || 0);
+      saveQuizQuestion(q.id, "correctAnswer", q.correctAnswer);
+      return;
+    }
+    let v = el.value;
+    if (key === "points") v = ("" + el.value).trim() === "" ? q.points || 10 : Number(el.value);
+    if (key === "timeLimit") v = ("" + el.value).trim() === "" ? null : Number(el.value);
+    q[key] = v;
+    saveQuizQuestion(q.id, key, v);
+    if (key === "question") {
+      const head = el.closest(".step").querySelector(".card-header .title");
+      if (head) head.textContent = v || QUIZ_Q_TYPES[q.type];
+    }
+    return;
+  }
+
+  if (el.dataset.qoi != null && el.dataset.qid) {
+    const q = curQuiz.questions.find(x => x.id === el.dataset.qid);
+    if (!q) return;
+    q.options[Number(el.dataset.qoi)] = el.value;
+    saveQuizQuestion(q.id, "options", q.options);
+    return;
+  }
+
+  if (el.dataset.mf) {
+    if (!curMb) return;
+    const key = el.dataset.mf;
+    if (key === "difficulty") {
+      const old = curMb.difficulty, next = el.value;
+      if (old === next) return;
+      curMb.difficulty = next;
+      run("UPDATE mythbuster_questions SET difficulty = ?, position = ?, updated_at = strftime('%s','now') WHERE id = ?",
+          [next, nextMbPosition(next), curMb.id]);
+      renumberMbPool(old);
+      renderMbTree(); refreshStats();
+      renderMb();
+      return;
+    }
+    if (key === "type") {
+      const prev = curMb.type;
+      curMb.type = el.value;
+      if (el.value === "true_false" && prev !== "true_false") {
+        curMb.options = ["True", "False"];
+        curMb.correctAnswer = false;
+        saveMbField("options", curMb.options);
+        saveMbField("correctAnswer", curMb.correctAnswer);
+      } else if (prev === "true_false" && el.value !== "true_false") {
+        curMb.correctAnswer = 0;
+        saveMbField("correctAnswer", curMb.correctAnswer);
+      }
+      saveMbField("type", el.value);
+      renderMb();
+      return;
+    }
+    if (key === "correctAnswer") {
+      curMb.correctAnswer = curMb.type === "true_false" ? el.value === "true" : Math.max(0, Number(el.value) || 0);
+      saveMbField("correctAnswer", curMb.correctAnswer);
+      return;
+    }
+    let v = el.value;
+    if (key === "points") v = ("" + el.value).trim() === "" ? curMb.points || 5 : Number(el.value);
+    curMb[key] = v;
+    saveMbField(key, v);
+    return;
+  }
+
+  if (el.dataset.moi != null) {
+    if (!curMb) return;
+    curMb.options[Number(el.dataset.moi)] = el.value;
+    saveMbField("options", curMb.options);
+  }
+}
+
+function onQuizClick(e) {
+  const el = e.target.closest("[data-act]");
+  if (!el) return;
+  const a = el.dataset.act;
+  const i = Number(el.dataset.i);
+  const qid = el.dataset.qid;
+  const q = qid ? curQuiz.questions.find(x => x.id === qid) : null;
+
+  switch (a) {
+    case "qz-pick":
+      loadQuiz(el.dataset.id);
+      break;
+    case "qz-del-tag": {
+      if (!curQuiz) return;
+      const arr = curQuiz.quiz.tags || [];
+      arr.splice(i, 1);
+      saveQuizField("tags", arr);
+      renderQuizTags();
+      break;
+    }
+    case "qz-add-opt":
+      if (q) { q.options.push(""); saveQuizQuestion(q.id, "options", q.options); renderQuizQuestions(); }
+      break;
+    case "qz-del-opt":
+      if (q) { q.options.splice(i, 1); saveQuizQuestion(q.id, "options", q.options); renderQuizQuestions(); }
+      break;
+    case "qz-move":
+      if (curQuiz) moveQuizQuestion(i, Number(el.dataset.dir));
+      break;
+    case "qz-dup":
+      if (curQuiz) duplicateQuizQuestion(i);
+      break;
+    case "qz-del":
+      if (curQuiz) deleteQuizQuestion(i);
+      break;
+    case "mb-pick":
+      loadMb(el.dataset.id);
+      break;
+    case "mb-move":
+      if (curMb) moveMb(Number(el.dataset.dir));
+      break;
+    case "mb-dup":
+      if (curMb) duplicateMb();
+      break;
+    case "mb-del":
+      deleteMb();
+      break;
+    case "mb-add-opt":
+      if (curMb) { curMb.options.push(""); saveMbField("options", curMb.options); renderMb(); }
+      break;
+    case "mb-del-opt":
+      if (curMb) { curMb.options.splice(i, 1); saveMbField("options", curMb.options); renderMb(); }
+      break;
+  }
+}
+
+// Quiz-level CRUD
+function createQuiz() {
+  const id = $("#qafId").value.trim().toLowerCase().replace(/\s+/g, "-");
+  const title = $("#qafTitle").value.trim();
+  if (!id) { toast("Quiz id is required (kebab-case)", 1); return; }
+  if (qAll("SELECT 1 FROM quizzes WHERE id = ?", [id]).length) {
+    toast("A quiz with id '" + id + "' already exists", 1); return;
+  }
+  run("INSERT INTO quizzes (id, title, description, category, difficulty, passing_score, xp_reward, metadata, tags) VALUES (?,?,?,?,?,?,?,?,?)",
+      [id, title || id, "", "", "easy", 70, 0, "{}", "[]"]);
+  $("#quizAddForm").style.display = "none";
+  $("#qafId").value = ""; $("#qafTitle").value = "";
+  refreshStats(); renderQuizTree();
+  loadQuiz(id);
+  toast("Quiz created");
+}
+
+function duplicateQuiz() {
+  if (!curQuiz) return;
+  const src = curQuiz;
+  let id = src.id + "-copy", n = 1;
+  while (qAll("SELECT 1 FROM quizzes WHERE id = ?", [id]).length) id = src.id + "-copy" + (++n);
+  db.exec("BEGIN");
+  try {
+    run("INSERT INTO quizzes (id, title, description, category, difficulty, passing_score, xp_reward, time_limit, unit_id, estimated_minutes, metadata, tags) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",
+        [id, src.quiz.title + " (copy)", src.quiz.description, src.quiz.category,
+         src.quiz.difficulty, src.quiz.passing_score, src.quiz.xp_reward,
+         src.quiz.time_limit === "" ? null : src.quiz.time_limit,
+         src.quiz.unit_id,
+         src.quiz.estimated_minutes === "" ? null : src.quiz.estimated_minutes,
+         src.quiz.metadata, JSON.stringify(src.quiz.tags)]);
+    src.questions.forEach((q, i) => {
+      run("INSERT INTO quiz_questions (quiz_id, id, position, type, question, options, correct_answer, explanation, difficulty, points, image, time_limit) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",
+          [id, q.id + "-c", i, q.type, q.question, JSON.stringify(q.options),
+           JSON.stringify(q.correctAnswer), q.explanation, q.difficulty, q.points, q.image, q.timeLimit]);
+    });
+    db.exec("COMMIT");
+  } catch (err) { try { db.exec("ROLLBACK"); } catch {} toast("Duplicate failed: " + err.message, 1); return; }
+  renderQuizTree(); refreshStats();
+  loadQuiz(id);
+  toast("Duplicated to '" + id + "'");
+}
+
+function deleteQuiz() {
+  if (!curQuiz || !confirm("Delete quiz '" + curQuiz.quiz.title + "' and ALL its questions?")) return;
+  run("DELETE FROM quizzes WHERE id = ?", [curQuiz.id]);
+  curQuiz = null;
+  showAllPanelsHidden();
+  $("#qEmptyPanel").style.display = "block";
+  renderQuizTree(); refreshStats();
+  toast("Quiz deleted");
+}
+
+// ---------------------------------------------------------------------------
+// 9. Wiring
+// ---------------------------------------------------------------------------
+function init() {
+  initSqlJs({ locateFile: f => WASM_BASE + f })
+    .then(S => {
+      SQL = S;
+      toast("sql.js ready");
+      autoDetectDb().then(ok => {
+        if (ok) toast("Auto-loaded database from repo");
+        else $("#dropInfo").textContent = "No file loaded — auto-detect works when served over http://";
+      });
+    })
+    .catch(e => toast("sql.js failed to load: " + e.message, 1));
+
+  const input = $("#fileInput");
+  const pick = $("#pickBtn");
+  const drop = $("#drop");
+
+  pick.onclick = () => input.click();
+  input.onchange = e => { if (e.target.files[0]) loadDatabase(e.target.files[0]); };
+  $("#newDbBtn").onclick = newBlankDb;
+
+  ["dragover", "dragenter"].forEach(ev => drop.addEventListener(ev, e => {
+    e.preventDefault(); drop.classList.add("drag");
+  }));
+  ["dragleave", "drop"].forEach(ev => drop.addEventListener(ev, e => {
+    e.preventDefault(); drop.classList.remove("drag");
+  }));
+  drop.addEventListener("drop", e => {
+    const f = e.dataTransfer.files && e.dataTransfer.files[0];
+    if (f) loadDatabase(f);
+  });
+
+  document.querySelectorAll(".tab").forEach(tab => {
+    tab.addEventListener("click", () => {
+      document.querySelectorAll(".tab").forEach(t => t.classList.toggle("active", t === tab));
+      const name = tab.dataset.tab;
+      ["editor", "quiz", "sql"].forEach(k => {
+        $("#tab-" + k).style.display = name === k ? "block" : "none";
+      });
+    });
+  });
+
+  $("#newLessonBtn").onclick = () => {
+    const show = $("#addForm").style.display !== "block";
+    $("#addForm").style.display = show ? "block" : "none";
+    if (show) $("#afId").focus();
+  };
+  $("#afCancel").onclick = () => { $("#addForm").style.display = "none"; };
+  $("#afCreate").onclick = createLesson;
+
+  $("#dupLessonBtn").onclick = duplicateLesson;
+  $("#delLessonBtn").onclick = deleteLesson;
+
+  $("#addStepBtn").onclick = () => addStep($("#newStepType").value);
+
+  $("#main").addEventListener("input", onMainInput);
+  $("#main").addEventListener("click", onMainClick);
+  $("#treeSearch").addEventListener("input", renderTree);
+  $("#tree").addEventListener("click", e => {
+    const it = e.target.closest(".lesson-item");
+    if (it) loadLesson(it.dataset.id);
+  });
+
+  $("#runBtn").onclick = runSql;
+  $("#sqlInput").addEventListener("keydown", e => {
+    if ((e.ctrlKey || e.metaKey) && e.key === "Enter") runSql();
+  });
+  document.addEventListener("keydown", e => {
+    if ((e.ctrlKey || e.metaKey) && e.key === "s") { e.preventDefault(); exportDb(); }
+  });
+  $("#exportBtn").onclick = exportDb;
+  $("#exportTopBtn").onclick = exportDb;
+  $("#resetBtn").onclick = resetAll;
+
+  // ---- Quiz Editor wiring ----
+  $("#newQuizBtn").onclick = () => {
+    const show = $("#quizAddForm").style.display !== "block";
+    $("#quizAddForm").style.display = show ? "block" : "none";
+    if (show) $("#qafId").focus();
+  };
+  $("#qafCancel").onclick = () => { $("#quizAddForm").style.display = "none"; };
+  $("#qafCreate").onclick = createQuiz;
+  $("#dupQuizBtn").onclick = duplicateQuiz;
+  $("#delQuizBtn").onclick = deleteQuiz;
+  $("#addQuestionBtn").onclick = addQuizQuestion;
+  $("#newMbBtn").onclick = () => addMb(mbFilter || "easy");
+
+  const qm = $("#qmain");
+  qm.addEventListener("input", onQuizInput);
+  qm.addEventListener("change", onQuizInput);
+  qm.addEventListener("click", onQuizClick);
+
+  $("#quizSearch").addEventListener("input", renderQuizTree);
+  $("#mbSearch").addEventListener("input", renderMbTree);
+  $("#quizTree").addEventListener("click", e => {
+    const it = e.target.closest('[data-act="qz-pick"]');
+    if (it) loadQuiz(it.dataset.id);
+  });
+  $("#mbTree").addEventListener("click", e => {
+    const it = e.target.closest('[data-act="mb-pick"]');
+    if (it) loadMb(it.dataset.id);
+  });
+  $("#mbFilterBtns").addEventListener("click", e => {
+    const b = e.target.closest("[data-mbf]");
+    if (!b) return;
+    mbFilter = b.dataset.mbf;
+    document.querySelectorAll("#mbFilterBtns [data-mbf]").forEach(x => x.classList.toggle("active", x === b));
+    renderMbTree();
+  });
+
+  // theme toggle
+  const themeBtn = $("#themeBtn");
+  const themeIcon = $("#themeIcon");
+  function applyThemeIcon() {
+    const dark = document.documentElement.getAttribute("data-bs-theme") === "dark";
+    themeIcon.className = dark ? "bi bi-moon-fill" : "bi bi-sun-fill";
+  }
+  themeBtn.addEventListener("click", () => {
+    const next = document.documentElement.getAttribute("data-bs-theme") === "dark" ? "light" : "dark";
+    document.documentElement.setAttribute("data-bs-theme", next);
+    try { localStorage.setItem("atomiq-editor-theme", next); } catch (e) {}
+    applyThemeIcon();
+    toast(next === "dark" ? "Dark mode" : "Light mode");
+  });
+  applyThemeIcon();
+}
+
+// lesson-level CRUD
+function createLesson() {
+  const id = $("#afId").value.trim().toLowerCase().replace(/\s+/g, "-");
+  const title = $("#afTitle").value.trim();
+  let unit = $("#afUnit").value.trim();
+  if (!id) { toast("Lesson id is required (kebab-case)", 1); return; }
+  if (qAll("SELECT 1 FROM lessons WHERE id = ?", [id]).length) {
+    toast("A lesson with id '" + id + "' already exists", 1); return;
+  }
+  const lessons = allLessons();
+  if (!unit && cur) unit = cur.lesson.unit_id;
+  if (!unit) unit = "atomic-playground";
+  run("INSERT INTO lessons (id, title, description, unit_id, difficulty, estimated_minutes, xp_reward) VALUES (?,?,?,?,?,?,?)",
+      [id, title || id, "", unit, "beginner", 8, 70]);
+  $("#addForm").style.display = "none";
+  $("#afTitle").value = ""; $("#afUnit").value = ""; $("#afId").value = "";
+  refreshStats();
+  renderTree();
+  loadLesson(id);
+  toast("Lesson created");
+}
+
+function duplicateLesson() {
+  if (!cur) return;
+  const src = cur;
+  let id = src.id + "-copy", n = 1;
+  while (qAll("SELECT 1 FROM lessons WHERE id = ?", [id]).length) id = src.id + "-copy" + (++n);
+  const now = Math.floor(Date.now() / 1000);
+  const l = src.lesson;
+  db.exec("BEGIN");
+  try {
+    run("INSERT INTO lessons (id, title, description, unit_id, difficulty, estimated_minutes, xp_reward, prerequisites, tags, created_at, updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?)",
+        [id, l.title + " (copy)", l.description, l.unit_id, l.difficulty, l.estimated_minutes, l.xp_reward,
+         JSON.stringify(l.prerequisites), JSON.stringify(l.tags), now, now]);
+    src.steps.forEach((s, i) => {
+      run("INSERT INTO lesson_steps (lesson_id, id, step_type, position, data) VALUES (?,?,?,?,?)",
+          [id, s.id + "-c", s.type, i, JSON.stringify(s.data)]);
+    });
+    db.exec("COMMIT");
+  } catch (e) { try { db.exec("ROLLBACK"); } catch {} }
+  renderTree(); refreshStats();
+  loadLesson(id);
+  toast("Duplicated to '" + id + "'");
+}
+
+function deleteLesson() {
+  if (!cur || !confirm("Delete lesson '" + cur.lesson.title + "' and ALL its steps?")) return;
+  const id = cur.id;
+  run("DELETE FROM lessons WHERE id = ?", [id]);
+  cur = null; curId = null;
+  renderTree(); refreshStats();
+  selectNone();
+  toast("Lesson deleted");
+}
+
+document.addEventListener("DOMContentLoaded", init);
+</script>
+</body>
+</html>

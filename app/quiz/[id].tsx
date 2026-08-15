@@ -1,5 +1,6 @@
 import { Icon } from "@/components/ui/icon";
 import { getQuizById } from "@/content/quizzes";
+import type { Quiz } from "@/content/types";
 import {useTheme, type Palette, fontFamilies} from "@/theme";
 import { useStorage } from "@/services/StorageContext";
 import {
@@ -12,6 +13,7 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import * as Speech from "expo-speech";
 import React, { useEffect, useRef, useState } from "react";
 import {
+    ActivityIndicator,
     Image,
     ScrollView,
     StyleSheet,
@@ -29,7 +31,8 @@ export default function QuizScreen() {
   const { theme } = useTheme();
   const THEME = theme.palettes.quiz;
 
-  const [quiz, setQuiz] = useState(() => getQuizById(id as string));
+  const [quiz, setQuiz] = useState<Quiz | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [answers, setAnswers] = useState<boolean[]>([]);
@@ -42,17 +45,43 @@ export default function QuizScreen() {
     void preloadGameSfx();
   }, []);
 
-  if (!quiz) {
-    const errorStyles = React.useMemo(() => createStyles(THEME), [THEME]);
+  useEffect(() => {
+    let active = true;
+    const quizId = Array.isArray(id) ? id[0] : id;
+    if (!quizId) {
+      setIsLoading(false);
+      return;
+    }
+    void getQuizById(quizId).then((loadedQuiz) => {
+      if (!active) return;
+      setQuiz(loadedQuiz);
+      setIsLoading(false);
+    });
+    return () => {
+      active = false;
+    };
+  }, [id]);
+
+  const loadingStyles = React.useMemo(() => createStyles(THEME), [THEME]);
+
+  if (isLoading) {
     return (
-      <View style={errorStyles.fullScreenCenter}>
+      <View style={loadingStyles.fullScreenCenter}>
+        <ActivityIndicator size="large" color={THEME.success} />
+      </View>
+    );
+  }
+
+  if (!quiz) {
+    return (
+      <View style={loadingStyles.fullScreenCenter}>
         <Icon name="Danger" size={64} color={THEME.error} />
-        <Text style={errorStyles.errorText}>Quiz not found</Text>
+        <Text style={loadingStyles.errorText}>Quiz not found</Text>
         <TouchableOpacity
           onPress={() => router.back()}
-          style={errorStyles.backButton}
+          style={loadingStyles.backButton}
         >
-          <Text style={errorStyles.backButtonText}>Go Back</Text>
+          <Text style={loadingStyles.backButtonText}>Go Back</Text>
         </TouchableOpacity>
       </View>
     );
@@ -151,7 +180,7 @@ export default function QuizScreen() {
     const correctCount = answers.filter((a) => a).length;
     const score = Math.round((correctCount / totalQuestions) * 100);
     const passed = score >= quiz.passingScore;
-    const styles = React.useMemo(() => createStyles(THEME), [THEME]);
+    const styles = loadingStyles;
 
     return (
       <View style={{ flex: 1, backgroundColor: THEME.bg }}>
@@ -299,7 +328,7 @@ export default function QuizScreen() {
 
   const isCorrect = selectedAnswer === getCorrectAnswerIndex(currentQuestion);
 
-  const styles = React.useMemo(() => createStyles(THEME), [THEME]);
+  const styles = loadingStyles;
 
   return (
     <View style={{ flex: 1, backgroundColor: THEME.bg }}>

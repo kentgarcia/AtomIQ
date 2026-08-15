@@ -1,57 +1,83 @@
 /**
- * Quiz Registry
- * Import and export all quizzes here
+ * Quiz registry — DB-backed facade.
+ *
+ * The hardcoded TypeScript quiz objects (and the standalone atom-maze
+ * mythbuster question banks) were migrated into the pre-populated SQLite
+ * database (`content.db`, bundled under `assets/database/`). This module keeps
+ * the app's existing import surface (`getQuizById`, `getAllQuizzes`, the
+ * mythbuster bank helpers) stable while delegating every lookup to the
+ * on-device database via `services/content-db.ts`.
+ *
+ * NOTE: lookups are now asynchronous (SQLite reads on device are async), so
+ * callers must `await` the results where they previously read plain objects.
  */
 
-import { Quiz } from "../types";
-import atomicBasicsQuiz from "./atomic-basics-quiz";
-import everydayNuclearQuiz from "./everyday-nuclear-quiz";
-import nuclearReactionsQuiz from "./nuclear-reactions-quiz";
-import radiationEffectsQuiz from "./radiation-effects-quiz";
-import radiationSafetyQuiz from "./radiation-safety-quiz";
-import radiationTypesQuiz from "./radiation-types-quiz";
-import reactorMechanicsQuiz from "./reactor-mechanics-quiz";
-import safetySecurityQuiz from "./safety-security-quiz";
-import sustainabilityQuiz from "./sustainability-quiz";
+import { contentRepository } from "@/services/content-db";
 
-// Quiz registry
-export const quizzes: Record<string, Quiz> = {
-  "radiation-safety-quiz": radiationSafetyQuiz,
-  "atomic-basics-quiz": atomicBasicsQuiz,
-  "nuclear-reactions-quiz": nuclearReactionsQuiz,
-  "radiation-effects-quiz": radiationEffectsQuiz,
-  "everyday-nuclear-quiz": everydayNuclearQuiz,
-  "safety-security-quiz": safetySecurityQuiz,
-  "radiation-types-quiz": radiationTypesQuiz,
-  "reactor-mechanics-quiz": reactorMechanicsQuiz,
-  "sustainability-quiz": sustainabilityQuiz,
-};
+import type { Myth as MythType, Quiz, QuizQuestion } from "@/content/types";
 
-// Helper functions
-export const getQuizById = (id: string): Quiz | undefined => {
-  return quizzes[id];
-};
+/** Mythbuster pool difficulties mirror the old repository keys. */
+export type MythBusterQuizDifficulty = "easy" | "medium" | "hard";
 
-export const getQuizzesByCategory = (category: string): Quiz[] => {
-  return Object.values(quizzes).filter((quiz) => quiz.category === category);
-};
+/** Record of every mythbuster difficulty pool -> its questions. */
+export type MythBusterQuizRepository = Record<
+  MythBusterQuizDifficulty,
+  QuizQuestion[]
+>;
 
-export const getQuizzesByTag = (tag: string): Quiz[] => {
-  return Object.values(quizzes).filter((quiz) => quiz.tags.includes(tag));
-};
+/** Hypothetical Myth-derived seed shape (kept for API compatibility). */
+export type MythBusterStatementSeed = Pick<
+  MythType,
+  "id" | "mythStatement" | "reality" | "explanation" | "category" | "difficulty"
+>;
 
+/** Fetch a full quiz (questions + parsed JSON) by its id, or `null`. */
+export const getQuizById = (id: string): Promise<Quiz | null> =>
+  contentRepository.getQuizById(id);
+
+/** Every quiz, fully hydrated, ordered by id. */
+export const getAllQuizzes = (): Promise<Quiz[]> =>
+  contentRepository.getAllQuizzes();
+
+/** Quizzes sharing a category. */
+export const getQuizzesByCategory = (category: string): Promise<Quiz[]> =>
+  contentRepository.getAllQuizzes().then((quizzes) =>
+    quizzes.filter((quiz) => quiz.category === category),
+  );
+
+/** Quizzes whose tags include `tag`. */
+export const getQuizzesByTag = (tag: string): Promise<Quiz[]> =>
+  contentRepository.getAllQuizzes().then((quizzes) =>
+    quizzes.filter((quiz) => quiz.tags.includes(tag)),
+  );
+
+/** Quizzes matching a difficulty. */
 export const getQuizzesByDifficulty = (
   difficulty: "easy" | "medium" | "hard",
-): Quiz[] => {
-  return Object.values(quizzes).filter(
-    (quiz) => quiz.difficulty === difficulty,
+): Promise<Quiz[]> =>
+  contentRepository.getAllQuizzes().then((quizzes) =>
+    quizzes.filter((quiz) => quiz.difficulty === difficulty),
   );
+
+/**
+ * Mythbuster question bank for a single difficulty pool (easy/medium/hard),
+ * used by the atom-maze boss battles.
+ */
+export const getMythBusterQuizQuestionsByDifficulty = (
+  difficulty: MythBusterQuizDifficulty,
+): Promise<QuizQuestion[]> =>
+  contentRepository.getMythBusterQuizQuestionsByDifficulty(difficulty);
+
+/** Every question across all mythbuster difficulty pools. */
+export const getAllMythBusterQuizQuestions = (): Promise<QuizQuestion[]> =>
+  contentRepository.getAllMythBusterQuizQuestions();
+
+export default {
+  getQuizById,
+  getAllQuizzes,
+  getQuizzesByCategory,
+  getQuizzesByTag,
+  getQuizzesByDifficulty,
+  getMythBusterQuizQuestionsByDifficulty,
+  getAllMythBusterQuizQuestions,
 };
-
-export const getAllQuizzes = (): Quiz[] => {
-  return Object.values(quizzes);
-};
-
-export * from "./mythbuster-difficulty-repository";
-
-export default quizzes;

@@ -82,11 +82,12 @@ export interface QuizQuestion {
   type: QuizType;
   question: string;
   options?: string[]; // For multiple choice
-  correctAnswer: string | number;
+  correctAnswer: string | number | boolean; // index for multiple choice; boolean for true/false
   explanation: string;
   difficulty: 'easy' | 'medium' | 'hard';
   image?: string;
   points: number;
+  timeLimit?: number; // In seconds (legacy; kept on pre-migration question data)
 }
 
 export interface Quiz {
@@ -100,6 +101,10 @@ export interface Quiz {
   passingScore: number; // Percentage
   xpReward: number;
   tags: string[];
+  // Optional legacy fields carried by the pre-migration data (kept for fidelity).
+  unitId?: string;
+  estimatedMinutes?: number;
+  metadata?: Record<string, unknown>; // e.g. { author, version, lastUpdated, ... }
 }
 
 // ============================================
