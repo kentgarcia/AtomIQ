@@ -1,4 +1,4 @@
-export type GameState = "mode-select" | "intro" | "playing" | "results";
+export type GameState = "intro" | "playing" | "results";
 export type GameMode = "quick" | "challenge" | "endless";
 
 export interface ModeConfig {
