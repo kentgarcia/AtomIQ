@@ -58,7 +58,7 @@ const THEME = {
   border: "#E5E7EB",
 };
 
-type GameState = "mode-select" | "intro" | "playing" | "results";
+type GameState = "intro" | "playing" | "results";
 type GameMode = "quick" | "challenge" | "endless";
 
 interface ModeConfig {
@@ -130,10 +130,19 @@ export default function MythBusterScreen() {
   const textColor =
     colorScheme === "dark" ? "#EAEAEA" : useThemeColor({}, "text");
   const cardColor =
-    colorScheme === "dark" ? "#16213E" : useThemeColor({}, "card");
+    colorScheme === "dark" ? "#213356" : useThemeColor({}, "card");
+  const borderColor =
+    colorScheme === "dark" ? "#2D3A56" : "#E5E7EB";
+  const subtleBg =
+    colorScheme === "dark" ? "#1A2D4A" : "#F4F5F7";
+  const mutedText =
+    colorScheme === "dark" ? "#8898AA" : "#6B7280";
 
-  const [gameState, setGameState] = useState<GameState>("mode-select");
-  const [selectedMode, setSelectedMode] = useState<ModeConfig>(GAME_MODES[0]);
+  const [gameState, setGameState] = useState<GameState>("intro");
+  const [selectedMode, setSelectedMode] = useState<ModeConfig>(() => {
+    const param = Array.isArray(modeParam) ? modeParam[0] : modeParam;
+    return GAME_MODES.find((m) => m.id === param) ?? GAME_MODES[0];
+  });
   const [currentIndex, setCurrentIndex] = useState(0);
   const [score, setScore] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
@@ -319,17 +328,14 @@ export default function MythBusterScreen() {
     setTimeLeft(mode.timeLimit ?? null);
   };
 
-  // Arrived from the Games tab difficulty panel → skip mode select
+  // Arrived from the Games tab difficulty panel → start the game directly
   const autoStartedRef = useRef(false);
   useEffect(() => {
     if (autoStartedRef.current) return;
-    if (!modeParam) return;
+    autoStartedRef.current = true;
     const param = Array.isArray(modeParam) ? modeParam[0] : modeParam;
-    const mode = GAME_MODES.find((m) => m.id === param);
-    if (mode) {
-      autoStartedRef.current = true;
-      startMode(mode);
-    }
+    const mode = GAME_MODES.find((m) => m.id === param) ?? GAME_MODES[0];
+    startMode(mode);
   }, [modeParam]);
 
   const handleSwipe = (direction: "truth" | "myth") => {
@@ -488,8 +494,8 @@ export default function MythBusterScreen() {
 
   const resetGame = () => {
     resetRoundState();
-    setGameState("mode-select");
     setMyths([]);
+    router.back();
   };
 
   const gesture = Gesture.Pan()
@@ -559,190 +565,6 @@ export default function MythBusterScreen() {
     opacity: loseExplosionFlashOpacity.value,
   }));
 
-  if (gameState === "mode-select") {
-    return (
-      <GestureHandlerRootView style={{ flex: 1 }}>
-        <View style={[styles.fullScreen, { backgroundColor }]}>
-          {/* Header */}
-          <View
-            style={[
-              styles.modeHeader,
-              { paddingTop: insets.top + 16, backgroundColor: cardColor },
-            ]}
-          >
-            <TouchableOpacity
-              onPress={() => router.back()}
-              style={[styles.backButtonCircle, { backgroundColor }]}
-            >
-              <Icon name="ArrowLeft2" size={20} color={textColor} />
-            </TouchableOpacity>
-            <View style={styles.headerTextContainer}>
-              <Text style={[styles.modeHeaderTitle, { color: textColor }]}>
-                MythBuster
-              </Text>
-              <Text style={styles.modeHeaderSubtitle}>
-                Choose your challenge
-              </Text>
-            </View>
-            <View style={{ width: 40 }} />
-          </View>
-
-          <ScrollView
-            style={styles.modeScrollView}
-            contentContainerStyle={styles.modeContainer}
-            showsVerticalScrollIndicator={false}
-          >
-            {/* Mode Cards */}
-            <View style={styles.modesGridNew}>
-              {GAME_MODES.map((mode, index) => (
-                <Pressable
-                  key={mode.id}
-                  onPress={() => startMode(mode)}
-                  style={({ pressed }) => [
-                    styles.modeCardNew,
-                    pressed && styles.modeCardPressed,
-                  ]}
-                >
-                  {/* 3D Card Bottom Layer (Shadow/Depth) */}
-                  <View
-                    style={[
-                      styles.card3DBottom,
-                      { backgroundColor: mode.color + "AA" },
-                    ]}
-                  />
-
-                  {/* 3D Card Middle Layer */}
-                  <View
-                    style={[
-                      styles.card3DMiddle,
-                      { backgroundColor: mode.color },
-                    ]}
-                  />
-
-                  {/* Card Background Gradient - Top Layer */}
-                  <LinearGradient
-                    colors={[mode.colorSecondary, mode.color]}
-                    start={{ x: 0, y: 0 }}
-                    end={{ x: 0.3, y: 1 }}
-                    style={styles.modeCardGradientNew}
-                  >
-                    {/* Shine Effect */}
-                    <View style={styles.cardShine} />
-
-                    {/* Decorative Circles */}
-                    <View style={[styles.cardCircle, styles.cardCircle1]} />
-                    <View style={[styles.cardCircle, styles.cardCircle2]} />
-
-                    {/* Icon Badge */}
-                    <View style={styles.modeIconBadge}>
-                      <View style={styles.modeIconInner}>
-                        <Icon
-                          name={mode.icon as any}
-                          size={28}
-                          color={mode.color}
-                          variant="Bold"
-                        />
-                      </View>
-                      {/* Icon Badge Shine */}
-                      <View style={styles.iconBadgeShine} />
-                    </View>
-
-                    {/* Content */}
-                    <View style={styles.modeCardContent}>
-                      <Text style={styles.modeCardTitleNew}>{mode.title}</Text>
-                      <Text style={styles.modeCardDescNew}>
-                        {mode.description}
-                      </Text>
-
-                      {/* Tagline Banner */}
-                      <View style={styles.taglineBanner}>
-                        <Text style={styles.taglineText}>{mode.tagline}</Text>
-                      </View>
-                    </View>
-
-                    {/* Stats Row */}
-                    <View style={styles.modeStatsRow}>
-                      {/* Difficulty Stars */}
-                      <View style={styles.difficultyStars}>
-                        {[1, 2, 3].map((star) => (
-                          <Icon
-                            key={star}
-                            name="Star1"
-                            size={14}
-                            color={
-                              star <= mode.difficulty
-                                ? "#FFD700"
-                                : "rgba(255,255,255,0.3)"
-                            }
-                            variant="Bold"
-                          />
-                        ))}
-                      </View>
-
-                      {/* XP Multiplier */}
-                      <View style={styles.xpBadge}>
-                        <Icon
-                          name="Flash"
-                          size={12}
-                          color="#FFD700"
-                          variant="Bold"
-                        />
-                        <Text style={styles.xpBadgeText}>
-                          {mode.xpMultiplier}x
-                        </Text>
-                      </View>
-
-                      {/* Rounds */}
-                      <View style={styles.roundsBadge}>
-                        <Icon
-                          name="Layer"
-                          size={12}
-                          color="rgba(255,255,255,0.9)"
-                        />
-                        <Text style={styles.roundsBadgeText}>
-                          {mode.rounds === 999 ? "∞" : mode.rounds}
-                        </Text>
-                      </View>
-                    </View>
-
-                    {/* Play Arrow */}
-                    <View style={styles.playArrowCircle}>
-                      <Icon
-                        name="Play"
-                        size={20}
-                        color={mode.color}
-                        variant="Bold"
-                      />
-                    </View>
-                  </LinearGradient>
-                </Pressable>
-              ))}
-            </View>
-
-            {/* Info Card */}
-            <View style={[styles.infoCard, { backgroundColor: cardColor }]}>
-              <View style={styles.infoIconWrap}>
-                <Icon name="InfoCircle" size={20} color={THEME.primary} />
-              </View>
-              <Text style={[styles.infoText, { color: textColor }]}>
-                Swipe left for{" "}
-                <Text style={{ color: THEME.error, fontWeight: "800", fontFamily: fontFamilies.heavy }}>
-                  MYTH
-                </Text>{" "}
-                and right for{" "}
-                <Text style={{ color: THEME.success, fontWeight: "800", fontFamily: fontFamilies.heavy }}>
-                  TRUTH
-                </Text>
-                !
-              </Text>
-            </View>
-
-            <View style={{ height: 60 }} />
-          </ScrollView>
-        </View>
-      </GestureHandlerRootView>
-    );
-  }
 
   if (gameState === "intro") {
     // Mode-specific instructions
@@ -783,8 +605,14 @@ export default function MythBusterScreen() {
           <SafeAreaView style={styles.fullScreen}>
             {/* Header */}
             <View style={styles.introHeader}>
-              <TouchableOpacity onPress={resetGame} style={styles.introBackBtn}>
-                <Icon name="ArrowLeft2" size={20} color="#1F2937" />
+              <TouchableOpacity
+                onPress={resetGame}
+                style={[
+                  styles.introBackBtn,
+                  { backgroundColor: cardColor, borderColor },
+                ]}
+              >
+                <Icon name="ArrowLeft2" size={20} color={textColor} />
               </TouchableOpacity>
               <View
                 style={[
@@ -806,10 +634,23 @@ export default function MythBusterScreen() {
             >
               <View style={styles.introContainer}>
                 {/* Title Card */}
-                <View style={styles.introCard}>
-                  <Text style={styles.introTitle}>{selectedMode.title}</Text>
-                  <Text style={styles.introSubtitle}>Swipe MYTH or TRUTH</Text>
-                  <Text style={styles.introDescription}>
+                <View
+                  style={[
+                    styles.introCard,
+                    { backgroundColor: cardColor, borderColor },
+                  ]}
+                >
+                  <Text style={[styles.introTitle, { color: textColor }]}>
+                    {selectedMode.title}
+                  </Text>
+                  <Text
+                    style={[styles.introSubtitle, { color: mutedText }]}
+                  >
+                    Swipe MYTH or TRUTH
+                  </Text>
+                  <Text
+                    style={[styles.introDescription, { color: mutedText }]}
+                  >
                     {getModeDescription()}
                   </Text>
                 </View>
@@ -837,13 +678,13 @@ export default function MythBusterScreen() {
                     },
                   ]}
                   palette={{
-                    cardBg: "#FFFFFF",
-                    cardBorder: "#E5E7EB",
-                    primaryText: "#1F2937",
-                    mutedText: "#6B7280",
-                    subtleBg: "#F9FAFB",
-                    subtleBorder: "#E5E7EB",
-                    iconWrapBg: "#F3F4F6",
+                    cardBg: cardColor,
+                    cardBorder: borderColor,
+                    primaryText: textColor,
+                    mutedText: mutedText,
+                    subtleBg: subtleBg,
+                    subtleBorder: borderColor,
+                    iconWrapBg: subtleBg,
                   }}
                   accentColor={selectedMode.color}
                   footer={
@@ -872,7 +713,10 @@ export default function MythBusterScreen() {
 
                 {/* Start Button */}
                 <TouchableOpacity
-                  style={styles.startButtonCard}
+                  style={[
+                    styles.startButtonCard,
+                    { backgroundColor: cardColor, borderColor },
+                  ]}
                   onPress={() => setGameState("playing")}
                   activeOpacity={0.9}
                 >
@@ -1309,7 +1153,7 @@ export default function MythBusterScreen() {
                     styles.resultsPlayAgainBtn,
                     { backgroundColor: selectedMode.color },
                   ]}
-                  onPress={resetGame}
+                  onPress={() => startMode(selectedMode)}
                   activeOpacity={0.8}
                 >
                   <Icon name="Refresh" size={20} color="#FFF" variant="Bold" />
@@ -1483,158 +1327,61 @@ export default function MythBusterScreen() {
             <GestureDetector gesture={gesture}>
               <Animated.View style={[styles.card, animatedStyle]}>
                 <View
-                  style={[styles.cardInner, { backgroundColor: cardColor }]}
+                  style={[
+                    styles.cardInner,
+                    { backgroundColor: cardColor, borderColor },
+                  ]}
                 >
-                  {/* Decorative corner accents */}
-                  <View
-                    style={[
-                      styles.cardCornerAccent,
-                      styles.cardCornerTopLeft,
-                      { backgroundColor: selectedMode.color },
-                    ]}
-                  />
-                  <View
-                    style={[
-                      styles.cardCornerAccent,
-                      styles.cardCornerBottomRight,
-                      { backgroundColor: selectedMode.color },
-                    ]}
-                  />
-
-                  <View style={styles.cardHeader}>
-                    <View
-                      style={[
-                        styles.difficultyBadge,
-                        { backgroundColor: selectedMode.color + "20" },
-                      ]}
-                    >
-                      <Icon
-                        name="Layer"
-                        size={14}
-                        color={selectedMode.color}
-                        variant="Bold"
-                      />
-                      <Text
+                  {selectedMode.timeLimit && timeLeft !== null ? (
+                    <View style={styles.cardHeaderRight}>
+                      <View
                         style={[
-                          styles.difficultyText,
-                          { color: selectedMode.color },
+                          styles.timerBadge,
+                          {
+                            backgroundColor:
+                              timeLeft <= 3
+                                ? THEME.error
+                                : selectedMode.color,
+                          },
                         ]}
                       >
-                        {currentMyth.difficulty.toUpperCase()}
-                      </Text>
-                    </View>
-                    {(selectedMode.timeLimit && timeLeft !== null) ||
-                    selectedMode.id === "endless" ? (
-                      <View style={styles.cardHeaderRight}>
-                        {selectedMode.timeLimit && timeLeft !== null && (
-                          <View
-                            style={[
-                              styles.timerBadge,
-                              {
-                                backgroundColor:
-                                  timeLeft <= 3
-                                    ? THEME.error
-                                    : selectedMode.color,
-                              },
-                            ]}
-                          >
-                            <Animated.View style={timerIconWiggleStyle}>
-                              <Icon
-                                name="Timer"
-                                size={18}
-                                color="#FFF"
-                                variant="Bold"
-                              />
-                            </Animated.View>
-                            <Text style={styles.timerText}>{timeLeft}s</Text>
-                          </View>
-                        )}
-                        {selectedMode.id === "endless" && (
-                          <View style={styles.livesContainer}>
-                            {[...Array(3)].map((_, i) => (
-                              <Icon
-                                key={i}
-                                name="Heart"
-                                size={18}
-                                color={i < lives ? THEME.error : "#E5E7EB"}
-                                variant={i < lives ? "Bold" : "Linear"}
-                              />
-                            ))}
-                          </View>
-                        )}
+                        <Animated.View style={timerIconWiggleStyle}>
+                          <Icon
+                            name="Timer"
+                            size={18}
+                            color="#FFF"
+                            variant="Bold"
+                          />
+                        </Animated.View>
+                        <Text style={styles.timerText}>{timeLeft}s</Text>
                       </View>
-                    ) : null}
-                  </View>
+                    </View>
+                  ) : null}
+
+                  {selectedMode.id === "endless" && (
+                    <View style={styles.cardHeaderRight}>
+                      <View style={styles.livesContainer}>
+                        {[...Array(3)].map((_, i) => (
+                          <Icon
+                            key={i}
+                            name="Heart"
+                            size={18}
+                            color={i < lives ? THEME.error : "#E5E7EB"}
+                            variant={i < lives ? "Bold" : "Linear"}
+                          />
+                        ))}
+                      </View>
+                    </View>
+                  )}
 
                   <View style={styles.cardContent}>
-                    <View style={styles.quoteContainer}>
-                      <Text
-                        style={[
-                          styles.quoteMarkTop,
-                          { color: selectedMode.color },
-                        ]}
-                      >
-                        "
-                      </Text>
-                      <Text
-                        style={[styles.cardStatement, { color: textColor }]}
-                      >
-                        {currentMyth.statement}
-                      </Text>
-                      <Text
-                        style={[
-                          styles.quoteMarkBottom,
-                          { color: selectedMode.color },
-                        ]}
-                      >
-                        "
-                      </Text>
-                    </View>
-                  </View>
-
-                  <View style={styles.cardFooter}>
-                    <View
-                      style={[
-                        styles.swipeHint,
-                        { backgroundColor: backgroundColor },
-                      ]}
+                    <Text
+                      style={[styles.cardStatement, { color: textColor }]}
                     >
-                      <View
-                        style={[
-                          styles.swipeHintItem,
-                          { backgroundColor: THEME.error + "15" },
-                        ]}
-                      >
-                        <Icon
-                          name="ArrowLeft"
-                          size={14}
-                          color={THEME.error}
-                          variant="Bold"
-                        />
-                        <Text style={[styles.hintText, { color: THEME.error }]}>
-                          MYTH
-                        </Text>
-                      </View>
-                      <View style={styles.swipeHintDivider} />
-                      <View
-                        style={[
-                          styles.swipeHintItem,
-                          { backgroundColor: THEME.success + "15" },
-                        ]}
-                      >
-                        <Text
-                          style={[styles.hintText, { color: THEME.success }]}
-                        >
-                          TRUTH
-                        </Text>
-                        <Icon
-                          name="ArrowRight"
-                          size={14}
-                          color={THEME.success}
-                          variant="Bold"
-                        />
-                      </View>
-                    </View>
+                      {"\u201C"}
+                      {currentMyth.statement}
+                      {"\u201D"}
+                    </Text>
                   </View>
                 </View>
               </Animated.View>
@@ -1656,22 +1403,24 @@ export default function MythBusterScreen() {
               activeOpacity={isAnimating ? 1 : 0.8}
               disabled={isAnimating}
             >
-              <LinearGradient
-                colors={[THEME.error, "#C0392B"]}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={styles.actionButtonGradient}
-              >
-                <View style={styles.actionButtonIcon}>
-                  <Icon
-                    name="CloseCircle"
-                    size={28}
-                    color="#FFF"
-                    variant="Bold"
-                  />
+              <View
+                  style={[
+                    styles.actionButtonGradient,
+                    { backgroundColor: cardColor, borderColor },
+                  ]}
+                >
+                  <View style={[styles.actionButtonIcon, { backgroundColor: subtleBg }]}>
+                    <Icon
+                      name="CloseCircle"
+                      size={24}
+                      color={THEME.error}
+                      variant="Bold"
+                    />
+                  </View>
+                  <Text style={[styles.actionButtonText, { color: THEME.error }]}>
+                    MYTH
+                  </Text>
                 </View>
-                <Text style={styles.actionButtonText}>MYTH</Text>
-              </LinearGradient>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -1685,22 +1434,24 @@ export default function MythBusterScreen() {
               activeOpacity={isAnimating ? 1 : 0.8}
               disabled={isAnimating}
             >
-              <LinearGradient
-                colors={[THEME.success, "#27AE60"]}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={styles.actionButtonGradient}
-              >
-                <View style={styles.actionButtonIcon}>
-                  <Icon
-                    name="TickCircle"
-                    size={28}
-                    color="#FFF"
-                    variant="Bold"
-                  />
+              <View
+                  style={[
+                    styles.actionButtonGradient,
+                    { backgroundColor: cardColor, borderColor },
+                  ]}
+                >
+                  <View style={[styles.actionButtonIcon, { backgroundColor: subtleBg }]}>
+                    <Icon
+                      name="TickCircle"
+                      size={24}
+                      color={THEME.success}
+                      variant="Bold"
+                    />
+                  </View>
+                  <Text style={[styles.actionButtonText, { color: THEME.success }]}>
+                    TRUTH
+                  </Text>
                 </View>
-                <Text style={styles.actionButtonText}>TRUTH</Text>
-              </LinearGradient>
             </TouchableOpacity>
           </View>
         )}
@@ -1750,37 +1501,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
 
-  // Intro Screen
-  introContainer: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    paddingHorizontal: 30,
-  },
-  introIcon: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    backgroundColor: "rgba(255,255,255,0.2)",
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 24,
-  },
-  introTitle: {
-    fontSize: 32,
-    fontWeight: "900",
-    fontFamily: fontFamilies.black,
-    color: "#FFF",
-    marginBottom: 8,
-    textAlign: "center",
-  },
-  introSubtitle: {
-    fontSize: 16,
-    fontFamily: fontFamilies.regular,
-    color: "rgba(255,255,255,0.9)",
-    marginBottom: 40,
-    textAlign: "center",
-  },
   // Intro Screen with colored background
   introHeader: {
     flexDirection: "row",
@@ -1793,11 +1513,9 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: "#FFF",
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 2,
-    borderColor: "#E5E7EB",
     borderBottomWidth: 4,
   },
   introBadge: {
@@ -1829,31 +1547,31 @@ const styles = StyleSheet.create({
     gap: 20,
   },
   introCard: {
-    backgroundColor: "#FFF",
-    borderRadius: 24,
+    borderRadius: 20,
     padding: 24,
     borderWidth: 2,
-    borderColor: "#E5E7EB",
     borderBottomWidth: 4,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 6,
+    elevation: 3,
   },
   introTitle: {
     fontSize: 28,
     fontWeight: "900",
     fontFamily: fontFamilies.heavy,
-    color: "#1F2937",
     marginBottom: 4,
   },
   introSubtitle: {
     fontSize: 14,
     fontWeight: "600",
     fontFamily: fontFamilies.semibold,
-    color: "#6B7280",
     marginBottom: 12,
   },
   introDescription: {
     fontSize: 14,
     fontFamily: fontFamilies.regular,
-    color: "#6B7280",
     lineHeight: 22,
   },
   introStatsRow: {
@@ -1881,79 +1599,17 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     borderWidth: 2,
     borderBottomWidth: 4,
-    backgroundColor: "#FFF",
-    borderColor: "#E5E7EB",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 6,
+    elevation: 3,
   },
   startButtonCardText: {
     fontSize: 17,
     fontWeight: "900",
     fontFamily: fontFamilies.heavy,
     letterSpacing: 0.5,
-  },
-  // Legacy styles
-  instructionsCard: {
-    backgroundColor: "#FFF",
-    borderRadius: 24,
-    padding: 24,
-    width: "100%",
-    marginBottom: 32,
-    gap: 20,
-    borderWidth: 2,
-    borderColor: "#E5E7EB",
-    borderBottomWidth: 4,
-  },
-  instructionRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 16,
-  },
-  swipeDemo: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  instructionText: {
-    fontSize: 16,
-    fontWeight: "700",
-    fontFamily: fontFamilies.bold,
-    color: THEME.text,
-    flex: 1,
-  },
-  bonusInfo: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-    backgroundColor: THEME.gold + "20",
-    padding: 12,
-    borderRadius: 12,
-    marginTop: 8,
-  },
-  bonusText: {
-    fontSize: 14,
-    fontWeight: "600",
-    fontFamily: fontFamilies.semibold,
-    color: THEME.text,
-    flex: 1,
-  },
-  startButton: {
-    backgroundColor: "#FFF",
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 8,
-    paddingVertical: 16,
-    borderRadius: 24,
-    borderWidth: 2,
-    borderColor: "#E5E7EB",
-    borderBottomWidth: 4,
-  },
-  startButtonText: {
-    fontSize: 16,
-    fontWeight: "800",
-    fontFamily: fontFamilies.heavy,
-    color: THEME.primary,
   },
 
   // Game Screen
@@ -2114,8 +1770,8 @@ const styles = StyleSheet.create({
     position: "relative",
   },
   card: {
-    width: width - 40,
-    height: height * 0.55,
+    width: width - 48,
+    height: height * 0.45,
     position: "absolute",
   },
   cardBehind: {
@@ -2124,56 +1780,18 @@ const styles = StyleSheet.create({
   },
   cardInner: {
     flex: 1,
-    borderRadius: 32,
-    padding: 28,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.15,
-    shadowRadius: 16,
-    elevation: 8,
+    borderRadius: 20,
+    padding: 20,
+    borderWidth: 3,
+    borderBottomWidth: 6,
     position: "relative",
-  },
-  cardCornerAccent: {
-    position: "absolute",
-    width: 40,
-    height: 40,
-    opacity: 0.15,
-  },
-  cardCornerTopLeft: {
-    top: 0,
-    left: 0,
-    borderTopLeftRadius: 32,
-    borderBottomRightRadius: 32,
-  },
-  cardCornerBottomRight: {
-    bottom: 0,
-    right: 0,
-    borderTopLeftRadius: 32,
-    borderBottomRightRadius: 32,
-  },
-  cardHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 24,
   },
   cardHeaderRight: {
     flexDirection: "row",
     alignItems: "center",
     gap: 10,
-  },
-  difficultyBadge: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 16,
-  },
-  difficultyText: {
-    fontSize: 11,
-    fontWeight: "800",
-    fontFamily: fontFamilies.heavy,
+    alignSelf: "flex-end",
+    marginBottom: 24,
   },
   livesContainer: {
     flexDirection: "row",
@@ -2183,25 +1801,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-  },
-  quoteContainer: {
-    alignItems: "center",
-    justifyContent: "center",
-    paddingHorizontal: 20,
-  },
-  quoteMarkTop: {
-    fontSize: 48,
-    fontWeight: "900" as "900",
-    opacity: 0.3,
-    marginBottom: 16,
-    lineHeight: 48,
-  },
-  quoteMarkBottom: {
-    fontSize: 48,
-    fontWeight: "900" as "900",
-    opacity: 0.3,
-    marginTop: 16,
-    lineHeight: 48,
+    paddingHorizontal: 16,
   },
   cardStatement: {
     fontSize: 24,
@@ -2209,35 +1809,6 @@ const styles = StyleSheet.create({
     fontFamily: fontFamilies.bold,
     lineHeight: 36,
     textAlign: "center",
-  },
-  cardFooter: {
-    alignItems: "center",
-    marginTop: 16,
-  },
-  swipeHint: {
-    flexDirection: "row",
-    alignItems: "center",
-    borderRadius: 20,
-    padding: 4,
-    gap: 4,
-  },
-  swipeHintItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 16,
-  },
-  swipeHintDivider: {
-    width: 2,
-    height: 20,
-    backgroundColor: "#E5E7EB",
-  },
-  hintText: {
-    fontSize: 12,
-    fontWeight: "800",
-    fontFamily: fontFamilies.heavy,
   },
   swipeLabel: {
     position: "absolute",
@@ -2266,26 +1837,26 @@ const styles = StyleSheet.create({
   },
   actionButton: {
     flex: 1,
-    borderRadius: 24,
-    overflow: "hidden",
+    borderRadius: 20,
+    borderWidth: 2,
+    borderBottomWidth: 4,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 4,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 6,
+    elevation: 3,
   },
   actionButtonGradient: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    paddingVertical: 18,
-    gap: 10,
+    paddingVertical: 16,
+    gap: 12,
   },
   actionButtonIcon: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: "rgba(255,255,255,0.2)",
+    width: 38,
+    height: 38,
+    borderRadius: 12,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -2296,10 +1867,10 @@ const styles = StyleSheet.create({
     // Styles applied via gradient
   },
   actionButtonText: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: "800",
     fontFamily: fontFamilies.heavy,
-    color: "#FFF",
+    letterSpacing: 0.5,
   },
   loseExplosionOverlay: {
     ...StyleSheet.absoluteFillObject,
@@ -2836,450 +2407,6 @@ const styles = StyleSheet.create({
     color: "#FFF",
   },
 
-  // Mode Selection Screen
-  modeHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 20,
-    paddingBottom: 16,
-  },
-  headerTextContainer: {
-    flex: 1,
-    alignItems: "center",
-    paddingHorizontal: 12,
-  },
-  modeHeaderTitle: {
-    fontSize: 28,
-    fontWeight: "800",
-    fontFamily: fontFamilies.heavy,
-    marginBottom: 4,
-  },
-  modeHeaderSubtitle: {
-    fontSize: 14,
-    color: "#8898AA",
-    fontWeight: "500",
-    fontFamily: fontFamilies.medium,
-  },
-  backButtonCircle: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  modeScrollView: {
-    flex: 1,
-  },
-  modeContainer: {
-    paddingHorizontal: 20,
-    paddingTop: 8,
-  },
-  // Decorations
-  decorationsContainer: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    height: 150,
-    overflow: "hidden",
-    zIndex: 0,
-  },
-  floatingDecor: {
-    position: "absolute",
-  },
-  triangle: {
-    width: 0,
-    height: 0,
-    backgroundColor: "transparent",
-    borderStyle: "solid",
-    borderLeftWidth: 8,
-    borderRightWidth: 8,
-    borderBottomWidth: 16,
-    borderLeftColor: "transparent",
-    borderRightColor: "transparent",
-  },
-  buntingContainer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    gap: 8,
-    marginTop: -8,
-    paddingHorizontal: 20,
-  },
-  buntingFlag: {
-    width: 20,
-    height: 28,
-    borderRadius: 2,
-    borderBottomLeftRadius: 10,
-    borderBottomRightRadius: 10,
-  },
-  // Title Section
-  titleSection: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-    marginBottom: 28,
-    marginTop: 8,
-  },
-  titleMascot: {
-    width: 90,
-    height: 90,
-  },
-  titleBubble: {
-    flex: 1,
-    backgroundColor: "#FFF",
-    borderRadius: 24,
-    padding: 18,
-    // 3D effect
-    borderWidth: 3,
-    borderColor: "rgba(255,255,255,0.9)",
-    borderTopColor: "rgba(255,255,255,1)",
-    borderBottomColor: "#E5E7EB",
-    borderBottomWidth: 5,
-    position: "relative",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
-  },
-  modeTitleNew: {
-    fontSize: 24,
-    fontWeight: "900",
-    fontFamily: fontFamilies.black,
-    color: THEME.text,
-    marginBottom: 4,
-  },
-  modeSubtitleNew: {
-    fontSize: 14,
-    color: THEME.textMuted,
-    fontWeight: "600",
-    fontFamily: fontFamilies.semibold,
-  },
-  // New Mode Cards - 3D Style
-  modesGridNew: {
-    gap: 22,
-  },
-  modeCardNew: {
-    borderRadius: 24,
-    position: "relative",
-    height: 160,
-  },
-  modeCardPressed: {
-    transform: [{ scale: 0.97 }, { translateY: 2 }],
-  },
-  // 3D Layers
-  card3DBottom: {
-    position: "absolute",
-    top: 8,
-    left: 4,
-    right: -4,
-    bottom: -8,
-    borderRadius: 24,
-    opacity: 0.4,
-  },
-  card3DMiddle: {
-    position: "absolute",
-    top: 4,
-    left: 2,
-    right: -2,
-    bottom: -4,
-    borderRadius: 24,
-    opacity: 0.6,
-  },
-  modeCardGradientNew: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    borderRadius: 24,
-    padding: 20,
-    paddingRight: 60,
-    overflow: "hidden",
-    borderWidth: 3,
-    borderColor: "rgba(255,255,255,0.3)",
-    borderTopColor: "rgba(255,255,255,0.5)",
-    borderLeftColor: "rgba(255,255,255,0.4)",
-  },
-  // Shine Effect
-  cardShine: {
-    position: "absolute",
-    top: -50,
-    left: -50,
-    width: 100,
-    height: 200,
-    backgroundColor: "rgba(255,255,255,0.15)",
-    transform: [{ rotate: "45deg" }],
-  },
-  cardCircle: {
-    position: "absolute",
-    borderRadius: 100,
-    backgroundColor: "rgba(255,255,255,0.12)",
-  },
-  cardCircle1: {
-    width: 140,
-    height: 140,
-    top: -40,
-    right: -40,
-  },
-  cardCircle2: {
-    width: 100,
-    height: 100,
-    bottom: -30,
-    left: -30,
-  },
-  modeIconBadge: {
-    position: "absolute",
-    top: 16,
-    left: 16,
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: "rgba(255,255,255,0.3)",
-    alignItems: "center",
-    justifyContent: "center",
-    // 3D effect for badge
-    borderWidth: 2,
-    borderColor: "rgba(255,255,255,0.4)",
-    borderTopColor: "rgba(255,255,255,0.6)",
-  },
-  modeIconInner: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: "#FFF",
-    alignItems: "center",
-    justifyContent: "center",
-    // Inner shadow effect
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
-    elevation: 2,
-  },
-  iconBadgeShine: {
-    position: "absolute",
-    top: 4,
-    left: 8,
-    width: 16,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: "rgba(255,255,255,0.6)",
-    transform: [{ rotate: "-20deg" }],
-  },
-  modeCardContent: {
-    marginLeft: 60,
-    flex: 1,
-  },
-  modeCardTitleNew: {
-    fontSize: 20,
-    fontWeight: "900",
-    fontFamily: fontFamilies.black,
-    color: "#FFF",
-    marginBottom: 4,
-  },
-  modeCardDescNew: {
-    fontSize: 13,
-    color: "rgba(255,255,255,0.9)",
-    fontWeight: "500",
-    fontFamily: fontFamilies.medium,
-    marginBottom: 8,
-  },
-  taglineBanner: {
-    alignSelf: "flex-start",
-    backgroundColor: "rgba(255,255,255,0.25)",
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 10,
-  },
-  taglineText: {
-    fontSize: 11,
-    fontWeight: "700",
-    fontFamily: fontFamilies.bold,
-    color: "#FFF",
-  },
-  modeStatsRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
-    marginTop: 14,
-    marginLeft: 64,
-  },
-  difficultyStars: {
-    flexDirection: "row",
-    gap: 3,
-    backgroundColor: "rgba(0,0,0,0.12)",
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 10,
-  },
-  xpBadge: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 4,
-    backgroundColor: "rgba(255,215,0,0.25)",
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: "rgba(255,215,0,0.3)",
-  },
-  xpBadgeText: {
-    fontSize: 12,
-    fontWeight: "800",
-    fontFamily: fontFamilies.heavy,
-    color: "#FFF",
-    textShadowColor: "rgba(0,0,0,0.2)",
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 2,
-  },
-  roundsBadge: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 4,
-    backgroundColor: "rgba(255,255,255,0.2)",
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.3)",
-  },
-  roundsBadgeText: {
-    fontSize: 12,
-    fontWeight: "800",
-    fontFamily: fontFamilies.heavy,
-    color: "#FFF",
-  },
-  playArrowCircle: {
-    position: "absolute",
-    right: 16,
-    top: "50%",
-    marginTop: -26,
-    width: 52,
-    height: 52,
-    borderRadius: 26,
-    backgroundColor: "#FFF",
-    alignItems: "center",
-    justifyContent: "center",
-    // 3D effect
-    borderWidth: 3,
-    borderColor: "rgba(255,255,255,0.9)",
-    borderBottomColor: "rgba(0,0,0,0.1)",
-    borderRightColor: "rgba(0,0,0,0.05)",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 6,
-    elevation: 5,
-  },
-  // Info Card
-  infoCard: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-    borderRadius: 16,
-    padding: 16,
-    marginTop: 24,
-    borderWidth: 2,
-    borderColor: "#E5E7EB",
-    borderBottomWidth: 4,
-  },
-  infoIconWrap: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: THEME.primary + "15",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  infoText: {
-    flex: 1,
-    fontSize: 13,
-    fontWeight: "500",
-    fontFamily: fontFamilies.medium,
-    lineHeight: 18,
-  },
-  // Legacy styles kept for compatibility
-  modeTitle: {
-    fontSize: 28,
-    fontWeight: "900",
-    fontFamily: fontFamilies.black,
-    color: THEME.text,
-    marginBottom: 8,
-  },
-  modeSubtitle: {
-    fontSize: 16,
-    fontFamily: fontFamilies.regular,
-    color: THEME.textMuted,
-    marginBottom: 32,
-  },
-  modesGrid: {
-    gap: 16,
-  },
-  modeCard: {
-    borderRadius: 24,
-    overflow: "hidden",
-    borderWidth: 2,
-    borderColor: "#E5E7EB",
-    borderBottomWidth: 4,
-  },
-  modeCardGradient: {
-    padding: 24,
-    gap: 12,
-  },
-  modeIconCircle: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    backgroundColor: "rgba(255,255,255,0.2)",
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 8,
-  },
-  modeCardTitle: {
-    fontSize: 22,
-    fontWeight: "900",
-    fontFamily: fontFamilies.black,
-    color: "#FFF",
-  },
-  modeCardDesc: {
-    fontSize: 14,
-    fontFamily: fontFamilies.regular,
-    color: "rgba(255,255,255,0.9)",
-    marginBottom: 8,
-  },
-  modeStats: {
-    flexDirection: "row",
-    gap: 16,
-    marginBottom: 12,
-  },
-  modeStatItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-  },
-  modeStatText: {
-    fontSize: 13,
-    fontWeight: "600",
-    fontFamily: fontFamilies.semibold,
-    color: "rgba(255,255,255,0.9)",
-  },
-  modePlayButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 8,
-    backgroundColor: "#FFF",
-    paddingVertical: 12,
-    borderRadius: 16,
-  },
-  modePlayText: {
-    fontSize: 14,
-    fontWeight: "800",
-    fontFamily: fontFamilies.heavy,
-    color: THEME.text,
-  },
 
   // Review Section
   reviewSection: {
