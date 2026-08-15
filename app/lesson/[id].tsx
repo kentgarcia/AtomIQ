@@ -1,5 +1,6 @@
 import { Icon } from "@/components/ui/icon";
 import { getLessonById } from "@/content/lessons";
+import type { Lesson } from "@/content/types";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useMemo, useState } from "react";
 import {
@@ -34,8 +35,28 @@ export default function LessonScreen() {
   const styles = useMemo(() => createStyles(THEME, width), [THEME, width]);
   const levelId = typeof id === "string" ? id : "radiation-shielding";
 
-  // Load lesson from content system
-  const lesson = getLessonById(levelId);
+  // Load lesson from the on-device content database (async — SQLite read).
+  const [lesson, setLesson] = useState<Lesson | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    setIsLoading(true);
+    getLessonById(levelId)
+      .then((loaded) => {
+        if (!cancelled) setLesson(loaded);
+      })
+      .catch((error) => {
+        console.error("Error loading lesson:", error);
+        if (!cancelled) setLesson(null);
+      })
+      .finally(() => {
+        if (!cancelled) setIsLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [levelId]);
 
   // Check if this is a replay and only mark in_progress for new lessons
   useEffect(() => {
@@ -63,6 +84,31 @@ export default function LessonScreen() {
   }, [levelId]);
 
   // If lesson not found, show error
+  if (isLoading) {
+    return (
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+          backgroundColor: THEME.bg,
+        }}
+      >
+        <Icon name="Loader" size={48} color={THEME.textMuted} />
+        <Text
+          style={{
+            fontSize: 16,
+            fontFamily: fontFamilies.semibold,
+            color: THEME.textMuted,
+            marginTop: 12,
+          }}
+        >
+          Loading lesson…
+        </Text>
+      </View>
+    );
+  }
+
   if (!lesson) {
     return (
       <View

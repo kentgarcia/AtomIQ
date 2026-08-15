@@ -2,7 +2,7 @@ import { Icon } from "@/components/ui/icon";
 import type { QuizQuestion as AtomMazeQuizQuestion } from "@/content/explorer";
 import { getMazeById } from "@/content/explorer";
 import {
-    getMythBusterQuizQuestionsByDifficulty,
+    getAllMythBusterQuizQuestions,
     type MythBusterQuizDifficulty,
 } from "@/content/quizzes";
 import type { QuizQuestion as RepositoryQuizQuestion } from "@/content/types";
@@ -490,6 +490,37 @@ export default function AtomMazeBattleScreen() {
     gameState.monsterMaxHp > 0 &&
     gameState.monsterHp / gameState.monsterMaxHp <= BOSS_LOW_HP_THRESHOLD;
 
+  // Boss battle question pool, loaded once from the DB-backed mythbuster bank.
+  const [mythBusterBossQuestions, setMythBusterBossQuestions] = useState<
+    Partial<Record<MythBusterQuizDifficulty, AtomMazeQuizQuestion[]>>
+  >({});
+
+  useEffect(() => {
+    let active = true;
+    void getAllMythBusterQuizQuestions()
+      .then((questions) => {
+        if (!active) return;
+        const pool: Partial<
+          Record<MythBusterQuizDifficulty, AtomMazeQuizQuestion[]>
+        > = {};
+        for (const difficulty of ["easy", "medium", "hard"] as const) {
+          pool[difficulty] = questions
+            .filter((question) => question.difficulty === difficulty)
+            .map(toAtomMazeBossQuizQuestion)
+            .filter(
+              (question): question is AtomMazeQuizQuestion => question !== null,
+            );
+        }
+        setMythBusterBossQuestions(pool);
+      })
+      .catch(() => {
+        // Non-fatal: boss battle simply has no extra questions to draw from.
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
+
   // Filter to only quiz questions
   const currentQuestions = useMemo(() => {
     const mazeQuizQuestions = (
@@ -513,13 +544,8 @@ export default function AtomMazeBattleScreen() {
       ];
 
       orderedBossDifficulties.forEach((difficulty) => {
-        getMythBusterQuizQuestionsByDifficulty(
-          STAGE_TO_REPOSITORY_DIFFICULTY[difficulty],
-        )
-          .map((question) => toAtomMazeBossQuizQuestion(question))
-          .filter(
-            (question): question is AtomMazeQuizQuestion => question !== null,
-          )
+        (mythBusterBossQuestions[STAGE_TO_REPOSITORY_DIFFICULTY[difficulty]] ??
+          [])
           .forEach((question) => {
             const normalizedQuestion = normalizeQuestionText(question.question);
 
@@ -555,7 +581,7 @@ export default function AtomMazeBattleScreen() {
           question.type === "quiz",
       )
       .map((question) => shuffleQuizQuestionOptions(question));
-  }, [isBossBattle, maze, currentRoom]);
+  }, [isBossBattle, maze, currentRoom, mythBusterBossQuestions]);
 
   const currentQuestion = currentQuestions[gameState.currentQuestionIndex];
 

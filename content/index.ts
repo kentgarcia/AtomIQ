@@ -5,7 +5,7 @@
 
 // Types
 // Content metadata
-import { getAllLessons } from './lessons';
+import { getAllLessons, getLessonById } from './lessons';
 import { getAllQuizzes } from './quizzes';
 import { getAllMyths } from './myths';
 import { getAllFacts } from './facts';
@@ -17,9 +17,8 @@ export * from './types';
 export * from './units';
 export { default as UNITS } from './units';
 
-// Lessons
+// Lessons (DB-backed — lookups are async)
 export * from './lessons';
-export { default as lessons } from './lessons';
 
 // Quizzes
 export * from './quizzes';
@@ -78,10 +77,10 @@ export const CONTENT_CATEGORIES: ContentCategory[] = [
   }
 ];
 
-export const getContentMetadata = (): ContentMetadata => {
+export const getContentMetadata = async (): Promise<ContentMetadata> => {
   return {
-    totalLessons: getAllLessons().length,
-    totalQuizzes: getAllQuizzes().length,
+    totalLessons: (await getAllLessons()).length,
+    totalQuizzes: (await getAllQuizzes()).length,
     totalMyths: getAllMyths().length,
     totalFacts: getAllFacts().length,
     categories: CONTENT_CATEGORIES,
@@ -90,16 +89,16 @@ export const getContentMetadata = (): ContentMetadata => {
 };
 
 // Search across all content
-export const searchContent = (query: string) => {
+export const searchContent = async (query: string) => {
   const lowerQuery = query.toLowerCase();
-  
-  const matchingLessons = getAllLessons().filter(lesson =>
+
+  const matchingLessons = (await getAllLessons()).filter(lesson =>
     lesson.title.toLowerCase().includes(lowerQuery) ||
     lesson.description.toLowerCase().includes(lowerQuery) ||
     lesson.tags.some(tag => tag.toLowerCase().includes(lowerQuery))
   );
   
-  const matchingQuizzes = getAllQuizzes().filter(quiz =>
+  const matchingQuizzes = (await getAllQuizzes()).filter(quiz =>
     quiz.title.toLowerCase().includes(lowerQuery) ||
     quiz.description.toLowerCase().includes(lowerQuery) ||
     quiz.tags.some(tag => tag.toLowerCase().includes(lowerQuery))
@@ -142,7 +141,8 @@ export const getRelatedContent = (contentId: string, contentType: 'lesson' | 'qu
 };
 
 export default {
-  lessons,
+  getLessonById,
+  getAllLessons,
   quizzes,
   myths,
   facts,

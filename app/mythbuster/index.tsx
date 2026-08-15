@@ -9,6 +9,7 @@ import { useStorage } from "@/services/StorageContext";
 import { logDailyActivity } from "@/services/database";
 import { playGameSfx, preloadGameSfx } from "@/services/game-sfx";
 import { LinearGradient } from "expo-linear-gradient";
+import * as Speech from "expo-speech";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
 import {
@@ -42,6 +43,9 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 const { width, height } = Dimensions.get("window");
 const SWIPE_THRESHOLD = width * 0.3;
 const LOSE_EXPLOSION_DURATION_MS = 700;
+const RESULT_CARD_W = width - 48;
+const RESULTS_CARD_GAP = 16;
+const RESULTS_STEP = RESULT_CARD_W + RESULTS_CARD_GAP;
 
 // Theme
 const THEME = {
@@ -130,7 +134,7 @@ export default function MythBusterScreen() {
   const textColor =
     colorScheme === "dark" ? "#EAEAEA" : useThemeColor({}, "text");
   const cardColor =
-    colorScheme === "dark" ? "#213356" : useThemeColor({}, "card");
+    colorScheme === "dark" ? "#213356" : "#FCFCF9";
   const borderColor =
     colorScheme === "dark" ? "#2D3A56" : "#E5E7EB";
   const subtleBg =
@@ -151,7 +155,9 @@ export default function MythBusterScreen() {
   const [myths, setMyths] = useState<any[]>([]);
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
   const [lives, setLives] = useState(3); // For endless mode
+  const [pressedBtn, setPressedBtn] = useState<"myth" | "truth" | null>(null);
   const [reviewTab, setReviewTab] = useState<"all" | "wrong">("all");
+  const [resultsIndex, setResultsIndex] = useState(0);
   const [expandedCard, setExpandedCard] = useState<number | null>(null);
   const [shownMythIds, setShownMythIds] = useState<Set<string>>(new Set()); // Track shown myths in endless
   const [allGameStatements, setAllGameStatements] = useState<any[]>([]); // All possible myths for endless
@@ -172,6 +178,29 @@ export default function MythBusterScreen() {
   useEffect(() => {
     void preloadGameSfx();
   }, []);
+
+  // Cleanup speech on unmount
+  useEffect(() => {
+    return () => {
+      Speech.stop();
+    };
+  }, []);
+
+  // Stop any ongoing TTS when the statement changes
+  useEffect(() => {
+    if (gameState !== "playing") return;
+    Speech.stop();
+  }, [currentMyth?.id, gameState]);
+
+  const speakStatement = () => {
+    if (!currentMyth) return;
+    Speech.stop();
+    Speech.speak(`"${currentMyth.statement}"`, {
+      language: "en",
+      rate: 0.9,
+      pitch: 1.0,
+    });
+  };
 
   // Timer countdown effect for challenge mode
   useEffect(() => {
@@ -536,6 +565,41 @@ export default function MythBusterScreen() {
     opacity: opacity.value,
   }));
 
+  const resultsAnsweredCount = Math.min(answers.length, myths.length);
+  const resultsWrongCount = answers
+    .slice(0, resultsAnsweredCount)
+    .filter((a) => !a).length;
+  const resultsDeckSize =
+    1 + (reviewTab === "wrong" ? resultsWrongCount : resultsAnsweredCount);
+
+  const resultRowX = useSharedValue(0);
+  const resultsGesture = Gesture.Pan()
+    .activeOffsetX([-12, 12])
+    .onUpdate((event) => {
+      resultRowX.value = -resultsIndex * RESULTS_STEP + event.translationX;
+    })
+    .onEnd((event) => {
+      if (
+        Math.abs(event.translationX) > SWIPE_THRESHOLD ||
+        Math.abs(event.velocityX) > 500
+      ) {
+        const dir = event.translationX < 0 ? 1 : -1;
+        const next = Math.max(
+          0,
+          Math.min(resultsDeckSize - 1, resultsIndex + dir),
+        );
+        resultRowX.value = withTiming(-next * RESULTS_STEP, {
+          duration: 250,
+        });
+        runOnJS(setResultsIndex)(next);
+      } else {
+        resultRowX.value = withSpring(-resultsIndex * RESULT_CARD_W);
+      }
+    });
+  const resultsRowStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: resultRowX.value }],
+  }));
+
   const mythLabelStyle = useAnimatedStyle(() => ({
     opacity: interpolate(translateX.value, [-SWIPE_THRESHOLD, 0], [1, 0]),
   }));
@@ -625,7 +689,6 @@ export default function MythBusterScreen() {
               </View>
               <View style={{ width: 44 }} />
             </View>
-
             <ScrollView
               style={styles.introScrollView}
               contentContainerStyle={styles.introScrollContent}
@@ -646,7 +709,7 @@ export default function MythBusterScreen() {
                   <Text
                     style={[styles.introSubtitle, { color: mutedText }]}
                   >
-                    Swipe MYTH or TRUTH
+                    Swipe MYTH or FACT
                   </Text>
                   <Text
                     style={[styles.introDescription, { color: mutedText }]}
@@ -667,7 +730,7 @@ export default function MythBusterScreen() {
                     {
                       id: "truth",
                       icon: "Like",
-                      title: "Swipe TRUTH",
+                      title: "Swipe FACT",
                       hint: "Swipe right when it's actually a fact.",
                     },
                     {
@@ -737,6 +800,7 @@ export default function MythBusterScreen() {
                 </TouchableOpacity>
               </View>
             </ScrollView>
+
           </SafeAreaView>
         </View>
       </GestureHandlerRootView>
@@ -774,25 +838,20 @@ export default function MythBusterScreen() {
         <LinearGradient
           colors={
             colorScheme === "dark"
-              ? ["#1A1A2E", "#1A1A2E"]
-              : ["#FFF9E6", "#FFF5D6", "#FFFBF0"]
+              ? ["#4E6B33", "#3A5224"]
+              : ["#CBE982", "#9DC53E"]
           }
           style={styles.fullScreen}
         >
           <SafeAreaView style={styles.fullScreen}>
             {/* Header */}
-            <View style={[styles.resultsHeader, { paddingTop: insets.top }]}>
+            <View style={styles.resultsHeader}>
               <View style={styles.resultsHeaderContent}>
                 <TouchableOpacity
                   onPress={resetGame}
                   style={[
                     styles.resultsBackBtn,
-                    {
-                      backgroundColor:
-                        colorScheme === "dark"
-                          ? "rgba(255,255,255,0.1)"
-                          : "rgba(255,255,255,0.2)",
-                    },
+                    { backgroundColor: cardColor, borderColor },
                   ]}
                   activeOpacity={0.7}
                 >
@@ -817,370 +876,336 @@ export default function MythBusterScreen() {
               </View>
             </View>
 
-            <ScrollView
-              style={{ flex: 1 }}
-              contentContainerStyle={styles.resultsContent}
-              showsVerticalScrollIndicator={false}
-            >
-              {/* Score Card with Mascot */}
-              <View style={styles.resultsScoreCard}>
-                <LinearGradient
-                  colors={[selectedMode.color, selectedMode.color + "DD"]}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 1 }}
-                  style={styles.resultsScoreGradient}
-                >
-                  <Image
-                    source={
-                      accuracy >= 50
-                        ? require("@/assets/images/mascot/happy.png")
-                        : require("@/assets/images/mascot/fix.png")
-                    }
-                    style={styles.resultsScoreMascot}
-                    resizeMode="contain"
-                  />
-                  <Text style={styles.resultsScoreEmoji}>
-                    {performance.emoji}
-                  </Text>
-                  <Text style={styles.resultsScoreTitle}>
-                    {performance.text}
-                  </Text>
-                  <View style={styles.resultsXPBadge}>
-                    <Icon name="Flash" size={20} color="#FFF" variant="Bold" />
-                    <Text style={styles.resultsXPText}>{score} XP</Text>
-                  </View>
-                </LinearGradient>
-              </View>
-
-              {/* Stats Row */}
-              <View style={styles.resultsStatsRow}>
-                <View
+            {/* Review filter tabs */}
+            <View style={[styles.resultTabRow, styles.resultsTabsWrap]}>
+              <TouchableOpacity
+                style={[
+                  styles.resultTab,
+                  reviewTab === "all" && [
+                    styles.resultTabActive,
+                    { backgroundColor: selectedMode.color },
+                  ],
+                ]}
+                onPress={() => {
+                  setReviewTab("all");
+                  setResultsIndex(0);
+                  resultRowX.value = 0;
+                }}
+                activeOpacity={0.7}
+              >
+                <Text
                   style={[
-                    styles.resultsStatCard,
-                    { backgroundColor: cardColor },
+                    styles.resultTabText,
+                    reviewTab === "all" && styles.resultTabTextActive,
                   ]}
                 >
-                  <View
-                    style={[
-                      styles.resultsStatIcon,
-                      { backgroundColor: THEME.success + "20" },
-                    ]}
-                  >
-                    <Icon
-                      name="TickCircle"
-                      size={20}
-                      color={THEME.success}
-                      variant="Bold"
-                    />
-                  </View>
-                  <Text style={[styles.resultsStatValue, { color: textColor }]}>
-                    {correctAnswers}
-                  </Text>
-                  <Text style={styles.resultsStatLabel}>Correct</Text>
-                </View>
-                <View
+                  All ({totalAnswered})
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[
+                  styles.resultTab,
+                  reviewTab === "wrong" && [
+                    styles.resultTabActive,
+                    { backgroundColor: THEME.error },
+                  ],
+                ]}
+                onPress={() => {
+                  setReviewTab("wrong");
+                  setResultsIndex(0);
+                  resultRowX.value = 0;
+                }}
+                activeOpacity={0.7}
+              >
+                <Text
                   style={[
-                    styles.resultsStatCard,
-                    { backgroundColor: cardColor },
+                    styles.resultTabText,
+                    reviewTab === "wrong" && styles.resultTabTextActive,
                   ]}
                 >
-                  <View
-                    style={[
-                      styles.resultsStatIcon,
-                      { backgroundColor: THEME.error + "20" },
-                    ]}
-                  >
-                    <Icon
-                      name="CloseCircle"
-                      size={20}
-                      color={THEME.error}
-                      variant="Bold"
-                    />
-                  </View>
-                  <Text style={[styles.resultsStatValue, { color: textColor }]}>
-                    {wrongAnswers}
-                  </Text>
-                  <Text style={styles.resultsStatLabel}>Wrong</Text>
-                </View>
-                <View
+                  Missed ({wrongAnswers})
+                </Text>
+              </TouchableOpacity>
+            </View>
+
+            <GestureDetector gesture={resultsGesture}>
+              <View style={styles.resultsPager}>
+                <Animated.View
                   style={[
-                    styles.resultsStatCard,
-                    { backgroundColor: cardColor },
+                    styles.resultsRow,
+                    {
+                      width:
+                        RESULT_CARD_W * resultsDeckSize +
+                        RESULTS_CARD_GAP * (resultsDeckSize - 1),
+                    },
+                    resultsRowStyle,
                   ]}
                 >
+                  {/* Card 1: Results */}
                   <View
                     style={[
-                      styles.resultsStatIcon,
-                      { backgroundColor: selectedMode.color + "20" },
+                      styles.resultCard,
+                      { backgroundColor: cardColor, borderColor },
                     ]}
                   >
-                    <Icon
-                      name="Chart"
-                      size={20}
-                      color={selectedMode.color}
-                      variant="Bold"
-                    />
-                  </View>
-                  <Text style={[styles.resultsStatValue, { color: textColor }]}>
-                    {accuracy}%
-                  </Text>
-                  <Text style={styles.resultsStatLabel}>Accuracy</Text>
-                </View>
-              </View>
-
-              {/* Review Section */}
-              <View style={styles.resultsReviewSection}>
-                <View style={styles.resultsReviewHeader}>
-                  <Text
-                    style={[styles.resultsReviewTitle, { color: textColor }]}
-                  >
-                    Review Answers
-                  </Text>
-                  <Text style={styles.resultsReviewSubtitle}>
-                    Tap cards to see explanations
-                  </Text>
-                </View>
-
-                {/* Tab Buttons */}
-                <View
-                  style={[styles.resultsTabRow, { backgroundColor: cardColor }]}
-                >
-                  <TouchableOpacity
-                    style={[
-                      styles.resultsTab,
-                      reviewTab === "all" && [
-                        styles.resultsTabActive,
-                        { backgroundColor: selectedMode.color },
-                      ],
-                    ]}
-                    onPress={() => setReviewTab("all")}
-                  >
-                    <Text
-                      style={[
-                        styles.resultsTabText,
-                        reviewTab === "all" && styles.resultsTabTextActive,
-                      ]}
-                    >
-                      All ({totalAnswered})
-                    </Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={[
-                      styles.resultsTab,
-                      reviewTab === "wrong" && [
-                        styles.resultsTabActive,
-                        { backgroundColor: THEME.error },
-                      ],
-                    ]}
-                    onPress={() => setReviewTab("wrong")}
-                  >
-                    <Text
-                      style={[
-                        styles.resultsTabText,
-                        reviewTab === "wrong" && styles.resultsTabTextActive,
-                      ]}
-                    >
-                      Missed ({wrongAnswers})
-                    </Text>
-                  </TouchableOpacity>
-                </View>
-
-                {/* Review Cards */}
-                {filteredMyths.length === 0 ? (
-                  <View
-                    style={[
-                      styles.resultsEmptyState,
-                      { backgroundColor: cardColor },
-                    ]}
-                  >
-                    <View style={styles.resultsEmptyIcon}>
-                      <Icon
-                        name="TickCircle"
-                        size={40}
-                        color={THEME.success}
-                        variant="Bold"
-                      />
-                    </View>
-                    <Text
-                      style={[
-                        styles.resultsEmptyTitle,
-                        { color: THEME.success },
-                      ]}
-                    >
-                      Perfect Score!
-                    </Text>
-                    <Text style={styles.resultsEmptyText}>
-                      You got all answers correct!
-                    </Text>
-                  </View>
-                ) : (
-                  <View style={styles.resultsCardList}>
-                    {filteredMyths.map((myth) => {
-                      const isCorrect = answers[myth.originalIndex];
-                      const isExpanded = expandedCard === myth.originalIndex;
-
-                      return (
-                        <TouchableOpacity
-                          key={myth.originalIndex}
+                    <View style={styles.resultHeaderRow}>
+                      <View style={styles.resultHeaderLeft}>
+                        <View
                           style={[
-                            styles.resultsReviewCard,
-                            { backgroundColor: cardColor },
+                            styles.resultHeaderPill,
+                            { backgroundColor: selectedMode.color },
                           ]}
-                          onPress={() =>
-                            setExpandedCard(
-                              isExpanded ? null : myth.originalIndex,
-                            )
-                          }
-                          activeOpacity={0.7}
                         >
-                          {/* Colored side indicator */}
+                          <Icon
+                            name="Chart"
+                            size={16}
+                            color="#FFF"
+                            variant="Bold"
+                          />
+                          <Text style={styles.resultHeaderPillText}>
+                            {selectedMode.title} Mode
+                          </Text>
+                        </View>
+                      </View>
+                      <View
+                        style={[
+                          styles.resultHeaderChip,
+                          { backgroundColor: selectedMode.color },
+                        ]}
+                      >
+                        <Text style={styles.resultHeaderChipText}>
+                          {accuracy}% ACC
+                        </Text>
+                      </View>
+                    </View>
+
+                    {/* Mascot + performance */}
+                    <View style={styles.resultHeroArea}>
+                      <Image
+                        source={
+                          accuracy >= 50
+                            ? require("@/assets/images/mascot/happy.png")
+                            : require("@/assets/images/mascot/fix.png")
+                        }
+                        style={styles.resultHeroMascot}
+                        resizeMode="contain"
+                      />
+                      <Text style={styles.resultHeroEmoji}>
+                        {performance.emoji}
+                      </Text>
+                      <Text
+                        style={[styles.resultHeroTitle, { color: textColor }]}
+                      >
+                        {performance.text}
+                      </Text>
+                      <View
+                        style={[
+                          styles.resultXPBadge,
+                          { backgroundColor: THEME.gold },
+                        ]}
+                      >
+                        <Icon
+                          name="Flash"
+                          size={18}
+                          color="#FFF"
+                          variant="Bold"
+                        />
+                        <Text style={styles.resultXPText}>{score} XP</Text>
+                      </View>
+                    </View>
+
+                    {/* Stats row */}
+                    <View style={styles.resultStatsRow}>
+                      <View
+                        style={[
+                          styles.resultStatCard,
+                          { backgroundColor: THEME.success + "14" },
+                        ]}
+                      >
+                        <Icon
+                          name="TickCircle"
+                          size={22}
+                          color={THEME.success}
+                          variant="Bold"
+                        />
+                        <Text
+                          style={[styles.resultStatValue, { color: textColor }]}
+                        >
+                          {correctAnswers}
+                        </Text>
+                        <Text style={styles.resultStatLabel}>Correct</Text>
+                      </View>
+                      <View
+                        style={[
+                          styles.resultStatCard,
+                          { backgroundColor: THEME.error + "14" },
+                        ]}
+                      >
+                        <Icon
+                          name="CloseCircle"
+                          size={22}
+                          color={THEME.error}
+                          variant="Bold"
+                        />
+                        <Text
+                          style={[styles.resultStatValue, { color: textColor }]}
+                        >
+                          {wrongAnswers}
+                        </Text>
+                        <Text style={styles.resultStatLabel}>Wrong</Text>
+                      </View>
+                      <View
+                        style={[
+                          styles.resultStatCard,
+                          { backgroundColor: selectedMode.color + "14" },
+                        ]}
+                      >
+                        <Icon
+                          name="Chart"
+                          size={22}
+                          color={selectedMode.color}
+                          variant="Bold"
+                        />
+                        <Text
+                          style={[styles.resultStatValue, { color: textColor }]}
+                        >
+                          {accuracy}%
+                        </Text>
+                        <Text style={styles.resultStatLabel}>Accuracy</Text>
+                      </View>
+                    </View>
+                  </View>
+
+                  {/* Statement cards */}
+                  {filteredMyths.map((myth) => {
+                    const isCorrect = answers[myth.originalIndex];
+                    return (
+                      <View
+                        key={myth.originalIndex}
+                        style={[
+                          styles.resultCard,
+                          { backgroundColor: cardColor, borderColor },
+                        ]}
+                      >
+                        <View style={styles.resultHeaderRow}>
+                          <View style={styles.resultHeaderLeft}>
+                            <View
+                              style={[
+                                styles.resultHeaderPill,
+                                { backgroundColor: selectedMode.color },
+                              ]}
+                            >
+                              <Text style={styles.resultHeaderPillText}>
+                                #{myth.originalIndex + 1}
+                              </Text>
+                            </View>
+                          </View>
                           <View
                             style={[
-                              styles.resultsCardIndicator,
+                              styles.resultHeaderChip,
                               {
                                 backgroundColor: isCorrect
                                   ? THEME.success
                                   : THEME.error,
                               },
                             ]}
-                          />
-
-                          <View style={styles.resultsCardInner}>
-                            {/* Card Header */}
-                            <View style={styles.resultsCardHeader}>
-                              <View
-                                style={[
-                                  styles.resultsCardNumber,
-                                  {
-                                    backgroundColor: isCorrect
-                                      ? THEME.success
-                                      : THEME.error,
-                                  },
-                                ]}
-                              >
-                                <Text style={styles.resultsCardNumberText}>
-                                  {myth.originalIndex + 1}
-                                </Text>
-                              </View>
-                              <View
-                                style={[
-                                  styles.resultsCardBadge,
-                                  {
-                                    backgroundColor: myth.isTrue
-                                      ? THEME.success + "15"
-                                      : THEME.error + "15",
-                                  },
-                                ]}
-                              >
-                                <Text
-                                  style={[
-                                    styles.resultsCardBadgeText,
-                                    {
-                                      color: myth.isTrue
-                                        ? THEME.success
-                                        : THEME.error,
-                                    },
-                                  ]}
-                                >
-                                  {myth.isTrue ? "TRUTH" : "MYTH"}
-                                </Text>
-                              </View>
-                              <View style={{ flex: 1 }} />
-                              <Icon
-                                name={isCorrect ? "TickCircle" : "CloseCircle"}
-                                size={22}
-                                color={isCorrect ? THEME.success : THEME.error}
-                                variant="Bold"
-                              />
-                            </View>
-
-                            {/* Statement */}
-                            <Text
-                              style={[
-                                styles.resultsCardStatement,
-                                { color: textColor },
-                              ]}
-                              numberOfLines={isExpanded ? undefined : 2}
-                            >
-                              {myth.statement}
+                          >
+                            <Text style={styles.resultHeaderChipText}>
+                              {myth.isTrue ? "FACT" : "MYTH"} ·{" "}
+                              {isCorrect ? "Correct" : "Wrong"}
                             </Text>
+                          </View>
+                        </View>
 
-                            {/* Expanded Content */}
-                            {isExpanded && (
-                              <View style={styles.resultsCardExpanded}>
-                                <View style={styles.resultsCardDivider} />
-                                <View
-                                  style={[
-                                    styles.resultsCardExplanation,
-                                    { backgroundColor: backgroundColor },
-                                  ]}
-                                >
-                                  <Icon
-                                    name="Lamp"
-                                    size={16}
-                                    color={selectedMode.color}
-                                    variant="Bold"
-                                  />
-                                  <MarkdownText
-                                    text={myth.explanation}
-                                    style={styles.resultsCardExplanationText}
-                                    textColor={textColor}
-                                  />
-                                </View>
-                              </View>
-                            )}
+                        {/* Statement */}
+                        <View style={styles.resultStatementWrap}>
+                          <Text
+                            style={[
+                              styles.resultStatementTitle,
+                              { color: textColor },
+                            ]}
+                            numberOfLines={4}
+                          >
+                            {"\u201C"}{myth.statement}{"\u201D"}
+                          </Text>
+                        </View>
 
-                            {/* Expand hint */}
-                            <View style={styles.resultsCardFooter}>
-                              <Icon
-                                name={isExpanded ? "ArrowUp2" : "ArrowDown2"}
-                                size={16}
-                                color={THEME.textMuted}
+                        {/* Example section with explanation */}
+                        <View style={styles.exampleSection}>
+                          <View style={styles.exampleTab}>
+                            <Icon
+                              name="VolumeHigh"
+                              size={22}
+                              color="#A5A5A5"
+                              variant="Bold"
+                            />
+                          </View>
+                          <ScrollView
+                            style={styles.resultReviewScroll}
+                            contentContainerStyle={styles.resultStatementContent}
+                            showsVerticalScrollIndicator={false}
+                          >
+                            <View style={styles.exampleBody}>
+                              <MarkdownText
+                                text={myth.explanation}
+                                style={styles.exampleExplainText}
+                                textColor="#7A7A7A"
                               />
                             </View>
-                          </View>
-                        </TouchableOpacity>
-                      );
-                    })}
-                  </View>
-                )}
+                          </ScrollView>
+                        </View>
+                      </View>
+                    );
+                  })}
+                </Animated.View>
               </View>
+            </GestureDetector>
 
-              {/* Action Buttons */}
-              <View style={styles.resultsActions}>
-                <TouchableOpacity
+            {/* Pager dots */}
+            <View style={styles.resultsDots}>
+              {Array.from({ length: resultsDeckSize }).map((_, i) => (
+                <View
+                  key={i}
                   style={[
-                    styles.resultsPlayAgainBtn,
-                    { backgroundColor: selectedMode.color },
+                    styles.resultsDot,
+                    resultsIndex === i && styles.resultsDotActive,
                   ]}
-                  onPress={() => startMode(selectedMode)}
-                  activeOpacity={0.8}
-                >
-                  <Icon name="Refresh" size={20} color="#FFF" variant="Bold" />
-                  <Text style={styles.resultsPlayAgainText}>Play Again</Text>
-                </TouchableOpacity>
+                />
+              ))}
+            </View>
 
-                <TouchableOpacity
-                  style={[
-                    styles.resultsHomeBtn,
-                    {
-                      backgroundColor: cardColor,
-                      borderColor:
-                        colorScheme === "dark" ? "#2D3748" : THEME.border,
-                    },
-                  ]}
-                  onPress={() => router.back()}
-                  activeOpacity={0.8}
-                >
-                  <Icon name="Home2" size={20} color={textColor} />
-                  <Text style={[styles.resultsHomeText, { color: textColor }]}>
-                    Back to Home
-                  </Text>
-                </TouchableOpacity>
-              </View>
+            {/* Action Buttons */}
+            <View style={styles.resultsActions}>
+              <TouchableOpacity
+                style={[
+                  styles.resultsPlayAgainBtn,
+                  { backgroundColor: selectedMode.color },
+                ]}
+                onPress={() => startMode(selectedMode)}
+                activeOpacity={0.8}
+              >
+                <Icon name="Refresh" size={20} color="#FFF" variant="Bold" />
+                <Text style={styles.resultsPlayAgainText}>Play Again</Text>
+              </TouchableOpacity>
 
-              <View style={{ height: 40 }} />
-            </ScrollView>
+              <TouchableOpacity
+                style={[
+                  styles.resultsHomeBtn,
+                  {
+                    backgroundColor: cardColor,
+                    borderColor:
+                      colorScheme === "dark" ? "#2D3748" : THEME.border,
+                  },
+                ]}
+                onPress={() => router.back()}
+                activeOpacity={0.8}
+              >
+                <Icon name="Home2" size={20} color={textColor} />
+                <Text style={[styles.resultsHomeText, { color: textColor }]}>
+                  Back to Home
+                </Text>
+              </TouchableOpacity>
+            </View>
           </SafeAreaView>
         </LinearGradient>
       </GestureHandlerRootView>
@@ -1191,7 +1216,11 @@ export default function MythBusterScreen() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <LinearGradient
-        colors={[backgroundColor, backgroundColor]}
+        colors={
+          colorScheme === "dark"
+            ? ["#4E6B33", "#3A5224"]
+            : ["#CBE982", "#9DC53E"]
+        }
         style={{ flex: 1 }}
       >
         <View
@@ -1201,7 +1230,10 @@ export default function MythBusterScreen() {
           <View style={styles.gameHeader}>
             <TouchableOpacity
               onPress={() => resetGame()}
-              style={[styles.gameCloseButton, { backgroundColor: cardColor }]}
+              style={[
+                styles.gameCloseButton,
+                { backgroundColor: cardColor, borderColor },
+              ]}
             >
               <Icon name="Close" size={20} color={textColor} />
             </TouchableOpacity>
@@ -1233,7 +1265,10 @@ export default function MythBusterScreen() {
             </View>
 
             <View
-              style={[styles.scoreContainer, { backgroundColor: cardColor }]}
+              style={[
+                styles.scoreContainer,
+                { backgroundColor: cardColor, borderColor },
+              ]}
             >
               <Icon name="Flash" size={16} color={THEME.gold} variant="Bold" />
               <Text style={[styles.scoreText, { color: textColor }]}>
@@ -1309,7 +1344,7 @@ export default function MythBusterScreen() {
               variant="Bold"
             />
             <Text style={[styles.swipeLabelText, { color: THEME.success }]}>
-              TRUTH
+              FACT
             </Text>
           </Animated.View>
 
@@ -1332,8 +1367,32 @@ export default function MythBusterScreen() {
                     { backgroundColor: cardColor, borderColor },
                   ]}
                 >
-                  {selectedMode.timeLimit && timeLeft !== null ? (
-                    <View style={styles.cardHeaderRight}>
+                <View style={styles.cardHeader}>
+                  <TouchableOpacity
+                    onPress={speakStatement}
+                    style={styles.cardSpeaker}
+                    activeOpacity={0.7}
+                  >
+                    <Icon
+                      name="VolumeHigh"
+                      size={20}
+                      color="#8A8A8A"
+                      variant="Bold"
+                    />
+                  </TouchableOpacity>
+
+                  <View style={styles.cardHeaderRight}>
+                    <View style={styles.progressPill}>
+                      <Text style={styles.progressCurrent}>
+                        {currentIndex + 1}
+                      </Text>
+                      <Text style={styles.progressTotal}>
+                        {" "}
+                        / {myths.length}
+                      </Text>
+                    </View>
+
+                    {selectedMode.timeLimit && timeLeft !== null ? (
                       <View
                         style={[
                           styles.timerBadge,
@@ -1355,11 +1414,9 @@ export default function MythBusterScreen() {
                         </Animated.View>
                         <Text style={styles.timerText}>{timeLeft}s</Text>
                       </View>
-                    </View>
-                  ) : null}
+                    ) : null}
 
-                  {selectedMode.id === "endless" && (
-                    <View style={styles.cardHeaderRight}>
+                    {selectedMode.id === "endless" && (
                       <View style={styles.livesContainer}>
                         {[...Array(3)].map((_, i) => (
                           <Icon
@@ -1371,8 +1428,9 @@ export default function MythBusterScreen() {
                           />
                         ))}
                       </View>
-                    </View>
-                  )}
+                    )}
+                  </View>
+                </View>
 
                   <View style={styles.cardContent}>
                     <Text
@@ -1393,65 +1451,85 @@ export default function MythBusterScreen() {
         {currentMyth && (
           <View style={styles.actionButtons}>
             <TouchableOpacity
-              style={[styles.actionButton, styles.mythButton]}
+              style={[
+                styles.actionButton,
+                { backgroundColor: "#B03A2E", borderColor: "#B03A2E" },
+                pressedBtn === "myth" && styles.actionButtonPressed,
+              ]}
               onPress={() => {
                 if (isAnimating || currentIndex >= myths.length) return;
                 translateX.value = withSpring(-width);
                 opacity.value = withTiming(0, { duration: 200 });
                 handleSwipe("myth");
               }}
-              activeOpacity={isAnimating ? 1 : 0.8}
+              onPressIn={() => setPressedBtn("myth")}
+              onPressOut={() => setPressedBtn(null)}
+              activeOpacity={1}
               disabled={isAnimating}
             >
-              <View
+              <LinearGradient
+                colors={["#F2715B", "#DF3A2A"]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={styles.actionButtonFace}
+              >
+                <View style={styles.actionButtonGlare} />
+                <Icon
+                  name="CloseCircle"
+                  size={24}
+                  color="#FFFFFF"
+                  variant="Bold"
+                />
+                <Text
                   style={[
-                    styles.actionButtonGradient,
-                    { backgroundColor: cardColor, borderColor },
+                    styles.actionButtonText,
+                    { textShadowColor: "#B03A2E" },
                   ]}
                 >
-                  <View style={[styles.actionButtonIcon, { backgroundColor: subtleBg }]}>
-                    <Icon
-                      name="CloseCircle"
-                      size={24}
-                      color={THEME.error}
-                      variant="Bold"
-                    />
-                  </View>
-                  <Text style={[styles.actionButtonText, { color: THEME.error }]}>
-                    MYTH
-                  </Text>
-                </View>
+                  MYTH
+                </Text>
+              </LinearGradient>
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={[styles.actionButton, styles.truthButton]}
+              style={[
+                styles.actionButton,
+                { backgroundColor: "#239B56", borderColor: "#239B56" },
+                pressedBtn === "truth" && styles.actionButtonPressed,
+              ]}
               onPress={() => {
                 if (isAnimating || currentIndex >= myths.length) return;
                 translateX.value = withSpring(width);
                 opacity.value = withTiming(0, { duration: 200 });
                 handleSwipe("truth");
               }}
-              activeOpacity={isAnimating ? 1 : 0.8}
+              onPressIn={() => setPressedBtn("truth")}
+              onPressOut={() => setPressedBtn(null)}
+              activeOpacity={1}
               disabled={isAnimating}
             >
-              <View
+              <LinearGradient
+                colors={["#55D981", "#27AE60"]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={styles.actionButtonFace}
+              >
+                <View style={styles.actionButtonGlare} />
+                <Icon
+                  name="TickCircle"
+                  size={24}
+                  color="#FFFFFF"
+                  variant="Bold"
+                />
+                <Text
                   style={[
-                    styles.actionButtonGradient,
-                    { backgroundColor: cardColor, borderColor },
+                    styles.actionButtonText,
+                    { textShadowColor: "#239B56" },
                   ]}
                 >
-                  <View style={[styles.actionButtonIcon, { backgroundColor: subtleBg }]}>
-                    <Icon
-                      name="TickCircle"
-                      size={24}
-                      color={THEME.success}
-                      variant="Bold"
-                    />
-                  </View>
-                  <Text style={[styles.actionButtonText, { color: THEME.success }]}>
-                    TRUTH
-                  </Text>
-                </View>
+                  FACT
+                </Text>
+              </LinearGradient>
             </TouchableOpacity>
           </View>
         )}
@@ -1626,6 +1704,8 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
+    borderWidth: 2,
+    borderBottomWidth: 4,
     alignItems: "center",
     justifyContent: "center",
     shadowColor: "#000",
@@ -1690,6 +1770,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 20,
+    borderWidth: 2,
+    borderBottomWidth: 4,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
@@ -1780,18 +1862,67 @@ const styles = StyleSheet.create({
   },
   cardInner: {
     flex: 1,
-    borderRadius: 20,
-    padding: 20,
-    borderWidth: 3,
-    borderBottomWidth: 6,
+    borderRadius: 32,
+    padding: 24,
     position: "relative",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 20 },
+    shadowOpacity: 0.1,
+    shadowRadius: 40,
+    elevation: 10,
+    borderTopWidth: 1,
+    borderTopColor: "rgba(255,255,255,0.6)",
+  },
+  cardHeader: {
+    position: "absolute",
+    top: 24,
+    left: 24,
+    right: 24,
+    zIndex: 5,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  cardSpeaker: {
+    width: 46,
+    height: 46,
+    borderRadius: 23,
+    borderWidth: 2,
+    borderColor: "#E6E6E6",
+    backgroundColor: "#FFFFFF",
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.02,
+    shadowRadius: 4,
+    elevation: 1,
   },
   cardHeaderRight: {
     flexDirection: "row",
     alignItems: "center",
     gap: 10,
-    alignSelf: "flex-end",
-    marginBottom: 24,
+  },
+  progressPill: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#ECECEB",
+    borderRadius: 20,
+    paddingVertical: 8,
+    paddingHorizontal: 14,
+    marginRight: 4,
+  },
+  progressCurrent: {
+    fontSize: 15,
+    fontWeight: "800",
+    fontFamily: fontFamilies.heavy,
+    color: "#83B625",
+  },
+  progressTotal: {
+    fontSize: 15,
+    fontWeight: "800",
+    fontFamily: fontFamilies.heavy,
+    color: "#A3A3A3",
   },
   livesContainer: {
     flexDirection: "row",
@@ -1837,40 +1968,48 @@ const styles = StyleSheet.create({
   },
   actionButton: {
     flex: 1,
-    borderRadius: 20,
+    height: 68,
+    borderRadius: 44,
     borderWidth: 2,
-    borderBottomWidth: 4,
+    borderBottomWidth: 6,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 6,
-    elevation: 3,
+    shadowOffset: { width: 0, height: 14 },
+    shadowOpacity: 0.18,
+    shadowRadius: 20,
+    elevation: 8,
   },
-  actionButtonGradient: {
+  actionButtonFace: {
+    flex: 1,
+    borderRadius: 40,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    paddingVertical: 16,
-    gap: 12,
+    gap: 8,
+    overflow: "hidden",
+    position: "relative",
   },
-  actionButtonIcon: {
-    width: 38,
-    height: 38,
-    borderRadius: 12,
-    alignItems: "center",
-    justifyContent: "center",
+  actionButtonPressed: {
+    transform: [{ translateY: 4 }],
+    borderBottomWidth: 2,
   },
-  mythButton: {
-    // Styles applied via gradient
-  },
-  truthButton: {
-    // Styles applied via gradient
+  actionButtonGlare: {
+    position: "absolute",
+    top: 10,
+    left: 12,
+    width: 16,
+    height: 8,
+    borderRadius: 10,
+    backgroundColor: "rgba(255,255,255,0.75)",
+    transform: [{ rotate: "-10deg" }],
   },
   actionButtonText: {
-    fontSize: 16,
-    fontWeight: "800",
-    fontFamily: fontFamilies.heavy,
-    letterSpacing: 0.5,
+    fontSize: 24,
+    fontWeight: "900",
+    fontFamily: fontFamilies.black,
+    color: "#FFFFFF",
+    letterSpacing: 1,
+    textShadowOffset: { width: 0, height: 3 },
+    textShadowRadius: 0,
   },
   loseExplosionOverlay: {
     ...StyleSheet.absoluteFillObject,
@@ -1923,7 +2062,8 @@ const styles = StyleSheet.create({
   },
   resultsHeader: {
     paddingHorizontal: 20,
-    paddingBottom: 16,
+    paddingTop: 16,
+    paddingBottom: 12,
   },
   resultsHeaderContent: {
     flexDirection: "row",
@@ -1941,17 +2081,21 @@ const styles = StyleSheet.create({
     borderRadius: 22,
     alignItems: "center",
     justifyContent: "center",
+    borderWidth: 2,
+    borderBottomWidth: 4,
   },
   resultsHeaderTitle: {
-    fontSize: 28,
+    fontSize: 18,
     fontWeight: "800",
     fontFamily: fontFamilies.heavy,
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
   },
   resultsHeaderSubtitle: {
-    fontSize: 14,
+    fontSize: 12,
     fontWeight: "500",
     fontFamily: fontFamilies.medium,
-    marginTop: 2,
+    marginTop: 4,
   },
   resultsContent: {
     padding: 20,
@@ -2253,8 +2397,7 @@ const styles = StyleSheet.create({
     gap: 8,
     backgroundColor: THEME.primary,
     paddingVertical: 16,
-    borderRadius: 16,
-    marginBottom: 12,
+    borderRadius: 18,
     borderBottomWidth: 4,
     borderBottomColor: "rgba(0,0,0,0.15)",
   },
@@ -2270,7 +2413,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     gap: 8,
     paddingVertical: 16,
-    borderRadius: 16,
+    borderRadius: 18,
     borderWidth: 2,
     borderBottomWidth: 4,
   },
@@ -2372,6 +2515,9 @@ const styles = StyleSheet.create({
   resultsActions: {
     width: "100%",
     gap: 12,
+    paddingHorizontal: 24,
+    paddingTop: 12,
+    paddingBottom: 8,
   },
   playAgainButton: {
     backgroundColor: "#FFF",
@@ -2491,5 +2637,277 @@ const styles = StyleSheet.create({
     fontFamily: fontFamilies.regular,
     color: THEME.textMuted,
     lineHeight: 18,
+  },
+
+
+  resultXPBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 20,
+  },
+  resultXPText: {
+    color: "#FFF",
+    fontSize: 16,
+    fontWeight: "900",
+    fontFamily: fontFamilies.black,
+  },
+  resultStatsRow: {
+    flexDirection: "row",
+    gap: 10,
+  },
+  resultStatCard: {
+    flex: 1,
+    alignItems: "center",
+    borderRadius: 16,
+    paddingVertical: 14,
+  },
+  resultStatValue: {
+    fontSize: 20,
+    fontWeight: "900",
+    fontFamily: fontFamilies.black,
+    marginTop: 4,
+  },
+  resultStatLabel: {
+    fontSize: 11,
+    fontWeight: "700",
+    fontFamily: fontFamilies.semibold,
+    color: THEME.textMuted,
+    marginTop: 2,
+  },
+  resultsPager: {
+    flex: 1,
+    overflow: "hidden",
+    paddingHorizontal: 24,
+  },
+  resultsRow: {
+    flexDirection: "row",
+    gap: RESULTS_CARD_GAP,
+  },
+  resultCard: {
+    width: RESULT_CARD_W,
+    height: height * 0.52,
+    borderRadius: 32,
+    padding: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 20 },
+    shadowOpacity: 0.1,
+    shadowRadius: 40,
+    elevation: 10,
+    borderTopWidth: 1,
+    borderTopColor: "rgba(255,255,255,0.6)",
+  },
+  resultHeaderRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  resultHeaderLeft: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  resultHeaderPill: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+  },
+  resultHeaderPillText: {
+    color: "#FFF",
+    fontSize: 13,
+    fontWeight: "800",
+    fontFamily: fontFamilies.heavy,
+  },
+  resultHeaderChip: {
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 14,
+  },
+  resultHeaderChipText: {
+    color: "#FFF",
+    fontSize: 12,
+    fontWeight: "800",
+    fontFamily: fontFamilies.heavy,
+  },
+  resultHeroArea: {
+    alignItems: "center",
+    marginTop: 8,
+    marginBottom: 16,
+  },
+  resultHeroMascot: {
+    width: 88,
+    height: 88,
+    marginBottom: 2,
+  },
+  resultHeroEmoji: {
+    fontSize: 28,
+    marginBottom: 2,
+  },
+  resultHeroTitle: {
+    fontSize: 22,
+    fontWeight: "900",
+    fontFamily: fontFamilies.black,
+  },
+  resultReviewHeader: {
+    marginBottom: 12,
+  },
+  resultReviewTitle: {
+    fontSize: 20,
+    fontWeight: "900",
+    fontFamily: fontFamilies.black,
+  },
+  resultReviewSubtitle: {
+    fontSize: 12,
+    color: THEME.textMuted,
+    fontFamily: fontFamilies.regular,
+    marginTop: 2,
+  },
+  resultTabRow: {
+    flexDirection: "row",
+    gap: 8,
+    marginBottom: 12,
+  },
+  resultTab: {
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 16,
+    backgroundColor: "rgba(0,0,0,0.06)",
+  },
+  resultTabActive: {},
+  resultTabText: {
+    fontSize: 13,
+    fontWeight: "700",
+    fontFamily: fontFamilies.semibold,
+    color: THEME.textMuted,
+  },
+  resultTabTextActive: {
+    color: "#FFF",
+  },
+  resultReviewScroll: {
+    flex: 1,
+  },
+  resultReviewList: {
+    gap: 12,
+    paddingBottom: 8,
+  },
+  exampleSection: {
+    flex: 1,
+  },
+  exampleTab: {
+    alignSelf: "flex-start",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#ECECEB",
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    paddingHorizontal: 18,
+    paddingVertical: 10,
+    zIndex: 2,
+    marginBottom: -1,
+  },
+  resultsTabsWrap: {
+    paddingHorizontal: 24,
+    marginBottom: 4,
+  },
+  resultStatementWrap: {
+    marginVertical: 18,
+  },
+  resultStatementTitle: {
+    textAlign: "center",
+    fontSize: 20,
+    fontWeight: "800",
+    fontFamily: fontFamilies.heavy,
+    lineHeight: 28,
+  },
+  resultStatementContent: {
+    paddingBottom: 8,
+  },
+  exampleTabNumber: {
+    color: "#FFF",
+    fontSize: 14,
+    fontWeight: "900",
+    fontFamily: fontFamilies.heavy,
+  },
+  exampleTabBadge: {
+    backgroundColor: "rgba(255,255,255,0.25)",
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 10,
+  },
+  exampleTabBadgeText: {
+    color: "#FFF",
+    fontSize: 11,
+    fontWeight: "800",
+    fontFamily: fontFamilies.heavy,
+  },
+  exampleTabSpacer: {
+    flex: 1,
+  },
+  exampleBody: {
+    flex: 1,
+    backgroundColor: "#ECECEB",
+    borderTopRightRadius: 24,
+    borderBottomLeftRadius: 24,
+    borderBottomRightRadius: 24,
+    padding: 20,
+  },
+  exampleStatement: {
+    color: "#1A1A1A",
+    fontSize: 17,
+    fontWeight: "700",
+    fontFamily: fontFamilies.semibold,
+    lineHeight: 24,
+    marginBottom: 12,
+  },
+  exampleDivider: {
+    height: 1,
+    backgroundColor: "rgba(0,0,0,0.08)",
+    marginVertical: 12,
+  },
+  exampleExplainRow: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: 8,
+  },
+  exampleExplainText: {
+    fontSize: 15,
+    lineHeight: 20,
+  },
+  resultEmpty: {
+    alignItems: "center",
+    paddingVertical: 40,
+  },
+  resultEmptyTitle: {
+    fontSize: 18,
+    fontWeight: "900",
+    fontFamily: fontFamilies.heavy,
+    marginTop: 8,
+  },
+  resultEmptyText: {
+    fontSize: 13,
+    color: THEME.textMuted,
+    marginTop: 2,
+    textAlign: "center",
+  },
+  resultsDots: {
+    flexDirection: "row",
+    justifyContent: "center",
+    gap: 8,
+    paddingVertical: 14,
+  },
+  resultsDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: THEME.textMuted,
+  },
+  resultsDotActive: {
+    width: 20,
+    backgroundColor: THEME.gold,
   },
 });
