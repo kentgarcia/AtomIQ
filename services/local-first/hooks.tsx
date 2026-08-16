@@ -26,7 +26,6 @@ import {
     ProfileRepository,
 } from "./repositories";
 import { LOCAL_FIRST_SCHEMA } from "./schema";
-import { createSyncManager, SyncEvent, SyncManager } from "./sync-manager";
 import {
     Bookmark,
     Comment,
@@ -53,15 +52,6 @@ interface LocalFirstContextType {
   bookmarkCollections: BookmarkCollectionRepository | null;
   notifications: NotificationRepository | null;
   activities: ActivityRepository | null;
-
-  // Sync manager
-  syncManager: SyncManager | null;
-
-  // Sync helpers
-  syncNow: () => Promise<void>;
-  isSyncing: boolean;
-  lastSyncedAt: number | null;
-  pendingChanges: number;
 }
 
 const LocalFirstContext = createContext<LocalFirstContextType>({
@@ -76,11 +66,6 @@ const LocalFirstContext = createContext<LocalFirstContextType>({
   bookmarkCollections: null,
   notifications: null,
   activities: null,
-  syncManager: null,
-  syncNow: async () => {},
-  isSyncing: false,
-  lastSyncedAt: null,
-  pendingChanges: 0,
 });
 
 // Provider props
@@ -97,20 +82,6 @@ export const LocalFirstProvider: React.FC<LocalFirstProviderProps> = ({
   const [db, setDb] = useState<SQLite.SQLiteDatabase | null>(null);
   const [isReady, setIsReady] = useState(false);
   const [error, setError] = useState<Error | null>(null);
-  const [syncManager, setSyncManager] = useState<SyncManager | null>(null);
-  const [isSyncing, setIsSyncing] = useState(false);
-  const [lastSyncedAt, setLastSyncedAt] = useState<number | null>(null);
-  const [pendingChanges, setPendingChanges] = useState(0);
-
-  const refreshSyncStatus = useCallback(async (manager: SyncManager) => {
-    try {
-      const status = await manager.getOverallStatus();
-      setLastSyncedAt(status.lastSyncedAt);
-      setPendingChanges(status.pendingChanges);
-    } catch (statusError) {
-      console.warn("Failed to refresh sync status:", statusError);
-    }
-  }, []);
 
   // Initialize database
   useEffect(() => {
@@ -121,32 +92,8 @@ export const LocalFirstProvider: React.FC<LocalFirstProviderProps> = ({
         // Run schema migrations
         await database.execAsync(LOCAL_FIRST_SCHEMA);
 
-        // Create sync manager
-        const manager = createSyncManager(database);
-        await manager.initialize();
-
-        // Add sync event listener
-        manager.addListener((event: SyncEvent) => {
-          if (event.type === "sync_started") {
-            setIsSyncing(true);
-          } else if (
-            event.type === "sync_completed" ||
-            event.type === "sync_failed"
-          ) {
-            setIsSyncing(false);
-            if (event.type === "sync_completed") {
-              setLastSyncedAt(event.timestamp);
-            }
-            void refreshSyncStatus(manager);
-          }
-        });
-
         setDb(database);
-        setSyncManager(manager);
         setIsReady(true);
-
-        // Get initial sync status
-        await refreshSyncStatus(manager);
       } catch (err) {
         console.error("Failed to initialize local-first database:", err);
         setError(err instanceof Error ? err : new Error("Unknown error"));
@@ -154,7 +101,7 @@ export const LocalFirstProvider: React.FC<LocalFirstProviderProps> = ({
     };
 
     initDatabase();
-  }, [refreshSyncStatus]);
+  }, []);
 
   // Create repositories
   const repositories = useMemo(() => {
@@ -185,23 +132,10 @@ export const LocalFirstProvider: React.FC<LocalFirstProviderProps> = ({
     };
   }, [db]);
 
-  // Sync now function
-  const syncNow = useCallback(async () => {
-    if (syncManager) {
-      await syncManager.syncNow();
-      await refreshSyncStatus(syncManager);
-    }
-  }, [refreshSyncStatus, syncManager]);
-
   const value: LocalFirstContextType = {
     isReady,
     error,
     ...repositories,
-    syncManager,
-    syncNow,
-    isSyncing,
-    lastSyncedAt,
-    pendingChanges,
   };
 
   return (

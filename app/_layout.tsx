@@ -3,21 +3,14 @@ import {
     DefaultTheme,
     ThemeProvider as NavigationThemeProvider,
 } from "@react-navigation/native";
-import * as Linking from "expo-linking";
 import { Stack, usePathname } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import "react-native-reanimated";
 
 import { ThemeProvider, useColorScheme } from "@/theme";
 import { useSnPro } from "@/hooks/use-snpro";
 import { StorageProvider } from "@/services/StorageContext";
-import LocalFirstSyncBootstrap from "@/services/local-first/SyncBootstrap";
-import { LocalFirstProvider } from "@/services/local-first/hooks";
-import {
-    completeSupabaseAuthFromRedirectUrl,
-    isSupabaseConfigured,
-} from "@/services/supabase";
 import {
     initializeUiSfx,
     installGlobalUiSfxHandlers,
@@ -32,7 +25,6 @@ export const unstable_settings = {
 function AppContent() {
   const colorScheme = useColorScheme();
   const pathname = usePathname();
-  const handledAuthUrlsRef = useRef<Set<string>>(new Set());
 
   useEffect(() => {
     setUiSfxPathname(pathname);
@@ -44,48 +36,6 @@ function AppContent() {
 
     return () => {
       void unloadUiSfx();
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!isSupabaseConfigured()) {
-      return;
-    }
-
-    let isMounted = true;
-
-    const maybeHandleAuthRedirect = async (url: string | null | undefined) => {
-      if (!url || !isMounted) {
-        return;
-      }
-
-      if (!/(?:\?|#).*(access_token|refresh_token|code|error)=/.test(url)) {
-        return;
-      }
-
-      if (handledAuthUrlsRef.current.has(url)) {
-        return;
-      }
-
-      handledAuthUrlsRef.current.add(url);
-
-      const result = await completeSupabaseAuthFromRedirectUrl(url);
-      if (result.status === "error" && result.message) {
-        console.warn("Auth callback handling failed:", result.message);
-      }
-    };
-
-    void Linking.getInitialURL().then((url) => {
-      void maybeHandleAuthRedirect(url);
-    });
-
-    const subscription = Linking.addEventListener("url", ({ url }) => {
-      void maybeHandleAuthRedirect(url);
-    });
-
-    return () => {
-      isMounted = false;
-      subscription.remove();
     };
   }, []);
 
@@ -140,13 +90,10 @@ export default function RootLayout() {
   }
 
   return (
-    <LocalFirstProvider>
-      <LocalFirstSyncBootstrap />
-      <StorageProvider>
-        <ThemeProvider>
-          <AppContent />
-        </ThemeProvider>
-      </StorageProvider>
-    </LocalFirstProvider>
+    <StorageProvider>
+      <ThemeProvider>
+        <AppContent />
+      </ThemeProvider>
+    </StorageProvider>
   );
 }

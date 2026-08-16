@@ -333,35 +333,6 @@ CREATE TABLE IF NOT EXISTS user_settings (
 
 CREATE INDEX IF NOT EXISTS idx_user_settings_user ON user_settings(user_id);
 
--- ==================== SYNC TABLES ====================
-
--- Sync Queue (tracks pending changes to sync to server)
-CREATE TABLE IF NOT EXISTS sync_queue (
-  id TEXT PRIMARY KEY,
-  table_name TEXT NOT NULL,
-  record_id TEXT NOT NULL,
-  operation TEXT NOT NULL CHECK(operation IN ('insert', 'update', 'delete')),
-  payload TEXT NOT NULL, -- JSON stringified data
-  created_at INTEGER NOT NULL,
-  attempts INTEGER DEFAULT 0,
-  last_attempt_at INTEGER,
-  error TEXT,
-  UNIQUE(table_name, record_id, operation)
-);
-
-CREATE INDEX IF NOT EXISTS idx_sync_queue_table ON sync_queue(table_name);
-CREATE INDEX IF NOT EXISTS idx_sync_queue_created ON sync_queue(created_at ASC);
-
--- Sync Status (tracks overall sync state per table)
-CREATE TABLE IF NOT EXISTS sync_status (
-  id TEXT PRIMARY KEY,
-  table_name TEXT UNIQUE NOT NULL,
-  last_synced_at INTEGER,
-  last_sync_version INTEGER DEFAULT 0,
-  is_syncing INTEGER DEFAULT 0,
-  error TEXT
-);
-
 -- ==================== TRIGGERS ====================
 
 -- Auto-update updated_at timestamp
@@ -431,22 +402,3 @@ BEGIN
   UPDATE comments SET likes_count = likes_count - 1 WHERE id = NEW.likeable_id;
 END;
 `;
-
-// Table names for sync operations
-export const SYNCABLE_TABLES = [
-  "user_profiles",
-  "friendships",
-  "community_posts",
-  "comments",
-  "likes",
-  "poll_votes",
-  "bookmarks",
-  "bookmark_collections",
-  "notifications",
-  "user_activities",
-  "blocked_users",
-  "reports",
-  "followed_topics",
-] as const;
-
-export type SyncableTable = (typeof SYNCABLE_TABLES)[number];
