@@ -100,7 +100,7 @@ export function Button({
             palette: paletteStyles,
             textColors: textColor,
         };
-    }, [theme, variant, size, accent, fullWidth]);
+    }, [theme, size, accent, fullWidth]);
 
     if (disabled || loading) {
         return (

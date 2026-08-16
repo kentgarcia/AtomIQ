@@ -16,7 +16,6 @@ import React, { useEffect, useRef, useState } from "react";
 import {
   Dimensions,
   Image,
-  Pressable,
   SafeAreaView,
   ScrollView,
   StyleSheet,
@@ -130,18 +129,13 @@ export default function MythBusterScreen() {
   const { updateUserProfile, userProfile } = useStorage();
   const insets = useSafeAreaInsets();
   const colorScheme = useColorScheme();
-  const backgroundColor =
-    colorScheme === "dark" ? "#1A1A2E" : useThemeColor({}, "background");
-  const textColor =
-    colorScheme === "dark" ? "#EAEAEA" : useThemeColor({}, "text");
-  const cardColor =
-    colorScheme === "dark" ? "#213356" : "#FCFCF9";
-  const borderColor =
-    colorScheme === "dark" ? "#2D3A56" : "#E5E7EB";
-  const subtleBg =
-    colorScheme === "dark" ? "#1A2D4A" : "#F4F5F7";
-  const mutedText =
-    colorScheme === "dark" ? "#8898AA" : "#6B7280";
+  const themeText = useThemeColor({}, "text");
+  const isDark = colorScheme === "dark";
+  const textColor = isDark ? "#EAEAEA" : themeText;
+  const cardColor = isDark ? "#213356" : "#FCFCF9";
+  const borderColor = isDark ? "#2D3A56" : "#E5E7EB";
+  const subtleBg = isDark ? "#1A2D4A" : "#F4F5F7";
+  const mutedText = isDark ? "#8898AA" : "#6B7280";
 
   const [gameState, setGameState] = useState<GameState>("intro");
   const [selectedMode, setSelectedMode] = useState<ModeConfig>(() => {
@@ -159,7 +153,6 @@ export default function MythBusterScreen() {
   const [pressedBtn, setPressedBtn] = useState<"myth" | "truth" | null>(null);
   const [reviewTab, setReviewTab] = useState<"all" | "wrong">("all");
   const [resultsIndex, setResultsIndex] = useState(0);
-  const [expandedCard, setExpandedCard] = useState<number | null>(null);
   const [shownMythIds, setShownMythIds] = useState<Set<string>>(new Set()); // Track shown myths in endless
   const [allGameStatements, setAllGameStatements] = useState<any[]>([]); // All possible myths for endless
   const [isLoseExplosionVisible, setIsLoseExplosionVisible] = useState(false);
@@ -301,7 +294,6 @@ export default function MythBusterScreen() {
     setTimeLeft(null);
     setLives(3);
     setReviewTab("all");
-    setExpandedCard(null);
     setShownMythIds(new Set());
     setAllGameStatements([]);
     setIsLoseExplosionVisible(false);

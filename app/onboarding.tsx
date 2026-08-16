@@ -166,12 +166,6 @@ export default function Onboarding() {
   }: any) => {
     const scale = useSharedValue(1);
 
-    const animatedStyle = useAnimatedStyle(() => {
-      return {
-        transform: [{ scale: scale.value }],
-      };
-    });
-
     const handlePressIn = () => {
       scale.value = withSpring(0.96);
     };

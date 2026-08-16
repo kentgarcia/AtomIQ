@@ -38,7 +38,6 @@ import {
 import Animated, {
     Easing,
     FadeInUp,
-    useAnimatedStyle,
     useSharedValue,
     withRepeat,
     withTiming,
@@ -75,8 +74,6 @@ const DarkCHAT_THEME = {
   green: "#2ECC71",
   accent: "#1CB0F6",
 };
-
-let CHAT_THEME = LightCHAT_THEME;
 
 const INITIAL_SUGGESTIONS = [
   "Is X-Ray safe?",
@@ -515,10 +512,6 @@ export default function AiChatScreen() {
       spin.value = 0;
     }
   }, [isThinking]);
-
-  const spinStyle = useAnimatedStyle(() => ({
-    transform: [{ rotate: `${spin.value}deg` }],
-  }));
 
   // Scroll to bottom when new messages arrive
   useEffect(() => {

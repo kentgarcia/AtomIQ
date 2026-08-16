@@ -30,13 +30,6 @@ const FEATURES: { icon: string; title: string; description: string; color: Featu
     },
 ];
 
-const SUGGESTIONS = [
-    "How does a nuclear reactor work?",
-    "Is radiation always dangerous?",
-    "What is half-life?",
-    "Explain fusion vs fission",
-];
-
 /* Autumn-tinted icon circle for each feature */
 const FEATURE_ACCENTS: Record<FeatureColor, { bg: string; icon: string }> = {
     primary: { bg: "rgba(255,140,0,0.12)", icon: "#E67E22" },
@@ -90,7 +83,7 @@ export default function ChatLandingScreen() {
                         entering={FadeInDown.delay(200).springify()}
                         style={styles.heroDescription}
                     >
-                        Hi! I'm Schrödi. I can explain complex nuclear concepts, debunk myths, and
+                        Hi! I&apos;m Schrödi. I can explain complex nuclear concepts, debunk myths, and
                         help you learn faster.
                     </Animated.Text>
                 </View>

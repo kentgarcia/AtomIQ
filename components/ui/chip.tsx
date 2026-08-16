@@ -3,7 +3,7 @@
  */
 
 import React from "react";
-import { Pressable, View, type StyleProp, type ViewStyle } from "react-native";
+import { Pressable, type StyleProp, type ViewStyle } from "react-native";
 
 import { Icon } from "@/components/ui/icon";
 import { useTheme } from "@/theme/useTheme";

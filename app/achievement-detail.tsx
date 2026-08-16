@@ -4,9 +4,8 @@ import { useStorage } from '@/services/StorageContext';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useMemo } from 'react';
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import {useTheme, AchievementPalette, type Palette, fontFamilies} from "@/theme";
 
@@ -71,7 +70,6 @@ export const ACHIEVEMENTS = [
 
 export default function AchievementDetailScreen() {
   const router = useRouter();
-  const insets = useSafeAreaInsets();
   const { theme } = useTheme();
   const THEME = theme.palettes.achievements;
   const styles = useMemo(() => makeStyles(THEME), [THEME]);
