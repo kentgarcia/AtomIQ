@@ -1,70 +1,59 @@
 /**
- * Myth Registry
- * Import and export all myths here
+ * Myth registry — DB-backed facade.
+ *
+ * The hardcoded TypeScript myth objects (including the in-doc `myths-facts-pack`)
+ * were migrated into the pre-populated SQLite database (`content.db`, bundled
+ * under `assets/database/`). This module keeps the app's existing import surface
+ * (`getMythById`, `getAllMyths`, and the filter/sort helpers) stable while
+ * delegating every lookup to the on-device database via `services/content-db.ts`.
+ *
+ * NOTE: lookups are now asynchronous (SQLite reads on device are async), so
+ * callers must `await` the results where they previously read plain objects.
  */
 
-import { Myth } from "../types";
+import { contentRepository } from "@/services/content-db";
 
-// Unit 1
-import allRadiationManmadeMyth from "./all-radiation-manmade";
-import radiationGlowsGreenMyth from "./radiation-glows-green";
+import type { Myth } from "@/content/types";
 
-// Unit 2
-import fukushimaWasNuclearExplosionMyth from "./fukushima-was-nuclear-explosion";
-import livingNearPlantDangerousMyth from "./living-near-plant-dangerous";
-import mythsFactsPack from "./myths-facts-pack";
-import nuclearPlantsExplodeMyth from "./nuclear-plants-explode";
+/** Fetch a myth by its id, or `null`. */
+export const getMythById = (id: string): Promise<Myth | null> =>
+  contentRepository.getMythById(id);
 
-// Unit 5
-import nuclearNotCleanMyth from "./nuclear-not-clean";
-import nuclearWasteForeverMyth from "./nuclear-waste-forever";
+/** Every myth, fully hydrated, ordered by id. */
+export const getAllMyths = (): Promise<Myth[]> =>
+  contentRepository.getAllMyths();
 
-// Myth registry
-export const myths: Record<string, Myth> = {
-  // Unit 1
-  "all-radiation-manmade": allRadiationManmadeMyth,
-  "radiation-glows-green": radiationGlowsGreenMyth,
+/** Myths sharing a category (e.g. 'safety', 'basics'). */
+export const getMythsByCategory = (category: string): Promise<Myth[]> =>
+  contentRepository.getAllMyths().then((myths) =>
+    myths.filter((myth) => myth.category === category),
+  );
 
-  // Unit 2
-  "nuclear-plants-explode": nuclearPlantsExplodeMyth,
-  "living-near-plant-dangerous": livingNearPlantDangerousMyth,
-  "fukushima-was-nuclear-explosion": fukushimaWasNuclearExplosionMyth,
+/** Myths whose tags include `tag`. */
+export const getMythsByTag = (tag: string): Promise<Myth[]> =>
+  contentRepository.getAllMyths().then((myths) =>
+    myths.filter((myth) => myth.tags.includes(tag)),
+  );
 
-  // Unit 5
-  "nuclear-waste-forever": nuclearWasteForeverMyth,
-  "nuclear-not-clean": nuclearNotCleanMyth,
-
-  // DOCS/myths-facts additions
-  ...mythsFactsPack,
-};
-
-// Helper functions
-export const getMythById = (id: string): Myth | undefined => {
-  return myths[id];
-};
-
-export const getMythsByCategory = (category: string): Myth[] => {
-  return Object.values(myths).filter((myth) => myth.category === category);
-};
-
-export const getMythsByTag = (tag: string): Myth[] => {
-  return Object.values(myths).filter((myth) => myth.tags.includes(tag));
-};
-
+/** Myths matching a difficulty pool (easy/medium/hard). */
 export const getMythsByDifficulty = (
   difficulty: "easy" | "medium" | "hard",
-): Myth[] => {
-  return Object.values(myths).filter((myth) => myth.difficulty === difficulty);
+): Promise<Myth[]> =>
+  contentRepository.getAllMyths().then((myths) =>
+    myths.filter((myth) => myth.difficulty === difficulty),
+  );
+
+/** The most common/popular myths, ranked by `popularity` desc. */
+export const getPopularMyths = async (limit = 10): Promise<Myth[]> => {
+  const myths = await contentRepository.getAllMyths();
+  return [...myths].sort((a, b) => b.popularity - a.popularity).slice(0, limit);
 };
 
-export const getPopularMyths = (limit: number = 10): Myth[] => {
-  return Object.values(myths)
-    .sort((a, b) => b.popularity - a.popularity)
-    .slice(0, limit);
+export default {
+  getMythById,
+  getAllMyths,
+  getMythsByCategory,
+  getMythsByTag,
+  getMythsByDifficulty,
+  getPopularMyths,
 };
-
-export const getAllMyths = (): Myth[] => {
-  return Object.values(myths);
-};
-
-export default myths;

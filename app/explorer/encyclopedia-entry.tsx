@@ -1,7 +1,8 @@
 import { PageHeader } from "@/components/ui/page-header";
 import { Icon } from "@/components/ui/icon";
 import { getEncyclopediaEntryById } from "@/content/explorer";
-import { getEncyclopediaImage } from "@/content/explorer/encyclopedia/images";
+import type { EncyclopediaEntry } from "@/content/explorer";
+import { getEncyclopediaImage } from "@/content/explorer/images";
 import {useTheme, type Palette, fontFamilies} from "@/theme";
 import { openExternalUrl } from "@/services/open-url";
 import * as Haptics from "expo-haptics";
@@ -109,9 +110,25 @@ export default function EncyclopediaEntryScreen() {
   const THEME = theme.palettes.entry;
   const styles = useMemo(() => createStyles(THEME), [THEME]);
 
-  const entry = useMemo(() => {
-    if (!id) return null;
-    return getEncyclopediaEntryById(id);
+  // Entry content lives in the content database — resolve it asynchronously.
+  const [entry, setEntry] = useState<EncyclopediaEntry | null>(null);
+  const [entryLoaded, setEntryLoaded] = useState(false);
+  useEffect(() => {
+    let alive = true;
+    setEntryLoaded(false);
+    setEntry(null);
+    if (!id) {
+      setEntryLoaded(true);
+      return;
+    }
+    getEncyclopediaEntryById(id).then((found) => {
+      if (!alive) return;
+      setEntry(found ?? null);
+      setEntryLoaded(true);
+    });
+    return () => {
+      alive = false;
+    };
   }, [id]);
 
   const entryImageSource = useMemo(() => {
@@ -241,7 +258,9 @@ export default function EncyclopediaEntryScreen() {
       <View style={styles.container}>
         <View style={styles.notFoundContainer}>
           <Text style={styles.notFoundEmoji}>🔍</Text>
-          <Text style={styles.notFoundText}>Entry not found</Text>
+          <Text style={styles.notFoundText}>
+            {entryLoaded ? "Entry not found" : "Loading…"}
+          </Text>
           <TouchableOpacity
             style={styles.notFoundButton}
             onPress={() => router.back()}
@@ -519,13 +538,10 @@ export default function EncyclopediaEntryScreen() {
                   <TouchableOpacity
                     style={styles.relatedTermPill}
                     onPress={() => {
-                      const relatedEntry = getEncyclopediaEntryById(term);
-                      if (relatedEntry) {
-                        Speech.stop();
-                        router.replace(
-                          `/explorer/encyclopedia-entry?id=${term}`,
-                        );
-                      }
+                      // Related terms are cross-references within the vault —
+                      // navigating replaces the screen so Back stays useful.
+                      Speech.stop();
+                      router.replace(`/explorer/encyclopedia-entry?id=${term}`);
                     }}
                   >
                     <Text style={styles.relatedTermText}>

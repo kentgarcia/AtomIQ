@@ -6,9 +6,9 @@
 // Types
 // Content metadata
 import { getAllLessons, getLessonById } from './lessons';
-import { getAllQuizzes } from './quizzes';
-import { getAllMyths } from './myths';
-import { getAllFacts } from './facts';
+import quizzes, { getAllQuizzes } from './quizzes';
+import myths, { getAllMyths } from './myths';
+import facts, { getAllFacts } from './facts';
 import { ContentMetadata, ContentCategory } from './types';
 
 export * from './types';
@@ -24,11 +24,9 @@ export * from './lessons';
 export * from './quizzes';
 export { default as quizzes } from './quizzes';
 
-// Myths
+// Myths & facts (DB-backed — lookups are async)
 export * from './myths';
 export { default as myths } from './myths';
-
-// Facts
 export * from './facts';
 export { default as facts } from './facts';
 
@@ -81,8 +79,8 @@ export const getContentMetadata = async (): Promise<ContentMetadata> => {
   return {
     totalLessons: (await getAllLessons()).length,
     totalQuizzes: (await getAllQuizzes()).length,
-    totalMyths: getAllMyths().length,
-    totalFacts: getAllFacts().length,
+    totalMyths: (await getAllMyths()).length,
+    totalFacts: (await getAllFacts()).length,
     categories: CONTENT_CATEGORIES,
     lastUpdated: new Date().toISOString()
   };
@@ -104,13 +102,13 @@ export const searchContent = async (query: string) => {
     quiz.tags.some(tag => tag.toLowerCase().includes(lowerQuery))
   );
   
-  const matchingMyths = getAllMyths().filter(myth =>
+  const matchingMyths = (await getAllMyths()).filter(myth =>
     myth.title.toLowerCase().includes(lowerQuery) ||
     myth.mythStatement.toLowerCase().includes(lowerQuery) ||
     myth.tags.some(tag => tag.toLowerCase().includes(lowerQuery))
   );
   
-  const matchingFacts = getAllFacts().filter(fact =>
+  const matchingFacts = (await getAllFacts()).filter(fact =>
     fact.title.toLowerCase().includes(lowerQuery) ||
     fact.statement.toLowerCase().includes(lowerQuery) ||
     fact.tags.some(tag => tag.toLowerCase().includes(lowerQuery))

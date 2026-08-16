@@ -1,13 +1,15 @@
-import MarkdownText from '@/components/markdown-text';
+import { MarkdownText } from '@/components/markdown-text';
 import { PageHeader } from '@/components/ui/page-header';
 import { SectionHeader } from '@/components/ui/section-header';
 import { Icon } from '@/components/ui/icon';
 import { getArticleById } from '@/content/articles';
+import type { Article } from '@/content/articles/types';
 import { getJourneyById } from '@/content/explorer';
 import { getMythById } from '@/content/myths';
+import type { Myth } from '@/content/types';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -32,19 +34,79 @@ export default function JourneyNodeScreen() {
     return journey.nodes.find(n => n.id === nodeId);
   }, [journey, nodeId]);
 
+  // Myth and article content is DB-backed (async) — resolve it once per node.
+  const [myth, setMyth] = useState<Myth | null>(null);
+  const [mythRead, setMythRead] = useState(false);
+  const [article, setArticle] = useState<Article | null>(null);
+  const [articleRead, setArticleRead] = useState(false);
+  useEffect(() => {
+    let alive = true;
+    if (node && node.type === 'myth') {
+      setMythRead(false);
+      setMyth(null);
+      getMythById(node.contentId).then((m) => {
+        if (!alive) return;
+        setMyth(m);
+        setMythRead(true);
+      });
+    } else {
+      setMythRead(true);
+      setMyth(null);
+    }
+    if (node && node.type === 'article') {
+      setArticleRead(false);
+      setArticle(null);
+      getArticleById(node.contentId).then((a) => {
+        if (!alive) return;
+        setArticle(a);
+        setArticleRead(true);
+      });
+    } else {
+      setArticleRead(true);
+      setArticle(null);
+    }
+    return () => {
+      alive = false;
+    };
+  }, [node]);
+
   const content = useMemo(() => {
     if (!node) return null;
     switch (node.type) {
       case 'myth':
-        return getMythById(node.contentId);
+        return myth;
       case 'article':
-        return getArticleById(node.contentId);
+        return article;
       default:
         return null;
     }
-  }, [node]);
+  }, [node, myth, article]);
 
-  if (!journey || !node || !content) {
+  if (!journey || !node) {
+    return (
+      <View style={styles.container}>
+        <Text>Content not found</Text>
+      </View>
+    );
+  }
+
+  if (node.type === 'myth' && !mythRead) {
+    return (
+      <View style={styles.container}>
+        <Text>Loading content…</Text>
+      </View>
+    );
+  }
+
+  if (node.type === 'article' && !articleRead) {
+    return (
+      <View style={styles.container}>
+        <Text>Loading content…</Text>
+      </View>
+    );
+  }
+
+  if (!content) {
     return (
       <View style={styles.container}>
         <Text>Content not found</Text>
@@ -148,7 +210,7 @@ export default function JourneyNodeScreen() {
           /* Article or Other Content */
           <Animated.View entering={FadeInDown.delay(100)} style={styles.articleCard}>
             <Text style={styles.articleTitle}>{content.title}</Text>
-            {content.excerpt && (
+            {'excerpt' in content && content.excerpt && (
               <Text style={styles.articleExcerpt}>{content.excerpt}</Text>
             )}
             {'content' in content && (

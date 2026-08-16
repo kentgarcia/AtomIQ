@@ -5,7 +5,7 @@ import { getArticleById, getPostById } from "@/content/articles";
 import {useTheme, type Palette, fontFamilies} from "@/theme";
 import { openExternalUrl } from "@/services/open-url";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
     Image,
     ScrollView,
@@ -42,15 +42,33 @@ export default function ArticleDetailScreen() {
   const styles = React.useMemo(() => createStyles(THEME, width), [THEME, width]);
   const articleId = typeof id === "string" ? id.replace("article-", "") : "";
 
-  const article = (getArticleById(articleId) ||
-    getPostById(articleId)) as ReaderContent | undefined;
+  // Articles and posts live in the content database — resolve asynchronously.
+  const [article, setArticle] = useState<ReaderContent | null>(null);
+  const [loaded, setLoaded] = useState(false);
+  useEffect(() => {
+    let alive = true;
+    setLoaded(false);
+    setArticle(null);
+    Promise.all([getArticleById(articleId), getPostById(articleId)]).then(
+      ([foundArticle, foundPost]) => {
+        if (!alive) return;
+        setArticle((foundArticle || foundPost) as ReaderContent | null);
+        setLoaded(true);
+      },
+    );
+    return () => {
+      alive = false;
+    };
+  }, [articleId]);
 
   if (!article) {
     return (
       <SafeAreaView style={[styles.container, { backgroundColor: THEME.bg }]}>
         <View style={styles.errorContainer}>
           <Icon name="Danger" size={64} color={THEME.primary} />
-          <Text style={styles.errorText}>Article not found</Text>
+          <Text style={styles.errorText}>
+            {loaded ? "Article not found" : "Loading…"}
+          </Text>
           <TouchableOpacity
             style={styles.backButton}
             onPress={() => router.back()}

@@ -24,13 +24,22 @@
  *   The script applies schema.sql (in this same folder), then ingests every
  *   `.json` file produced by ts-to-json.js. File shape drives which table it
  *   lands in:
- *     - object with `steps[]`    -> lessons + lesson_steps
- *     - object with `questions[]`-> quizzes + quiz_questions
- *     - plain array             -> mythbuster_questions (atom-maze boss bank)
+ *     - array with `mythStatement`/`reality` entries -> myths
+ *     - object with `steps[]`     -> lessons + lesson_steps
+ *     - object with `questions[]` -> quizzes + quiz_questions
+ *     - object with `rooms[]`     -> mazes + maze_rooms (Atom Maze levels)
+ *     - object with `mythStatement` -> a single myth
+ *     - object with `statement`   -> a single fact
+ *     - plain array              -> mythbuster_questions (atom-maze boss bank)
  *   It is idempotent: re-running replaces existing rows (INSERT OR REPLACE)
  *   inside a single transaction, so you can safely re-seed after regenerating
  *   JSON. Run it once per content directory against the same dbPath; both
  *   content/lessons/json and content/quizzes/json feed the same content.db.
+ *
+ *   NOTE: the one-time TS -> JSON migration is COMPLETE and the intermediate
+ *   json/ folders were removed. The content database (content/lessons/
+ *   content.db, edited via `npm run content-editor`) is now the source of
+ *   truth — this script + ts-to-json.js remain for future bulk migrations.
  *
  * DEFAULTS
  *   jsonDir = content/lessons/json     (output of ts-to-json.js)
@@ -112,6 +121,60 @@ const insertMythBusterQuestion = db.prepare(`
     (id, difficulty, type, question, options, correct_answer, explanation, points, position)
   VALUES
     (@id, @difficulty, @type, @question, @options, @correctAnswer, @explanation, @points, @position)
+`);
+
+const insertArticle = db.prepare(`
+  INSERT OR REPLACE INTO articles
+    (id, type, category, title, subtitle, content, excerpt, author,
+     published_date, read_time, image, tags, source, source_url,
+     related_myths, related_facts, featured, difficulty)
+  VALUES
+    (@id, @type, @category, @title, @subtitle, @content, @excerpt, @author,
+     @publishedDate, @readTime, @image, @tags, @source, @sourceUrl,
+     @relatedMyths, @relatedFacts, @featured, @difficulty)
+`);
+
+const insertPost = db.prepare(`
+  INSERT OR REPLACE INTO posts
+    (id, type, category, title, content, author, published_date, image, tags,
+     source, source_url, video_url, related_content)
+  VALUES
+    (@id, @type, @category, @title, @content, @author, @publishedDate, @image, @tags,
+     @source, @sourceUrl, @videoUrl, @relatedContent)
+`);
+
+const insertMyth = db.prepare(`
+  INSERT OR REPLACE INTO myths
+    (id, title, myth_statement, reality, explanation, category, difficulty, sources,
+     related_facts, related_lessons, image, tags, popularity)
+  VALUES
+    (@id, @title, @mythStatement, @reality, @explanation, @category, @difficulty, @sources,
+     @relatedFacts, @relatedLessons, @image, @tags, @popularity)
+`);
+
+const insertFact = db.prepare(`
+  INSERT OR REPLACE INTO facts
+    (id, title, statement, explanation, category, importance, sources,
+     related_myths, related_lessons, image, tags, date_added, last_updated)
+  VALUES
+    (@id, @title, @statement, @explanation, @category, @importance, @sources,
+     @relatedMyths, @relatedLessons, @image, @tags, @dateAdded, @lastUpdated)
+`);
+
+const insertMaze = db.prepare(`
+  INSERT OR REPLACE INTO mazes
+    (id, title, description, theme, xp_reward, time_limit, player_max_hp, boss)
+  VALUES
+    (@id, @title, @description, @theme, @xpReward, @timeLimit, @playerMaxHp, @boss)
+`);
+
+const insertMazeRoom = db.prepare(`
+  INSERT OR REPLACE INTO maze_rooms
+    (maze_id, id, position, title, description, monster, questions,
+     damage_per_correct, explanation, next_room_id, alternative_path_id, unlock_condition)
+  VALUES
+    (@mazeId, @id, @position, @title, @description, @monster, @questions,
+     @damagePerCorrect, @explanation, @nextRoomId, @alternativePathId, @unlockCondition)
 `);
 
 // Wrapping each lesson (and its steps) in a transaction is what makes the
@@ -200,6 +263,157 @@ const insertMythBusterBank = db.transaction((questions) => {
   });
 });
 
+// Insert a single Myth resource. `relatedFacts`/`relatedLessons` are optional
+// arrays of ids; `sources` is an array of Source objects. Mirror the domain
+// `Myth` shape from content/types.ts exactly.
+const insertMythResource = db.transaction((myth) => {
+  insertMyth.run({
+    id: myth.id,
+    title: myth.title,
+    mythStatement: myth.mythStatement,
+    reality: myth.reality,
+    explanation: myth.explanation ?? "",
+    category: myth.category ?? "",
+    difficulty: myth.difficulty ?? "easy",
+    sources: JSON.stringify(myth.sources || []),
+    relatedFacts: JSON.stringify(myth.relatedFacts || []),
+    relatedLessons: JSON.stringify(myth.relatedLessons || []),
+    image: myth.image ?? null,
+    tags: JSON.stringify(myth.tags || []),
+    popularity: myth.popularity ?? 0,
+  });
+});
+
+// Insert a single Fact resource, mirroring the domain `Fact` from content/types.ts.
+const insertFactResource = db.transaction((fact) => {
+  insertFact.run({
+    id: fact.id,
+    title: fact.title,
+    statement: fact.statement,
+    explanation: fact.explanation ?? "",
+    category: fact.category ?? "",
+    importance: fact.importance ?? "medium",
+    sources: JSON.stringify(fact.sources || []),
+    relatedMyths: JSON.stringify(fact.relatedMyths || []),
+    relatedLessons: JSON.stringify(fact.relatedLessons || []),
+    image: fact.image ?? null,
+    tags: JSON.stringify(fact.tags || []),
+    dateAdded: fact.dateAdded ?? "",
+    lastUpdated: fact.lastUpdated ?? "",
+  });
+});
+
+// Insert an Atom Maze challenge + its ordered rooms. Monsters are embedded
+// JSON (the boss on the maze, a monster per room) and questions is a JSON
+// array of BattleQuestions, mirroring the domain AtomMazeChallenge shape.
+const insertMazeWithRooms = db.transaction((maze) => {
+  insertMaze.run({
+    id: maze.id,
+    title: maze.title,
+    description: maze.description,
+    theme: maze.theme ?? "",
+    xpReward: maze.xpReward ?? 0,
+    timeLimit: maze.timeLimit ?? null,
+    playerMaxHp: maze.playerMaxHp ?? 100,
+    boss: JSON.stringify(maze.boss || {}),
+  });
+
+  (maze.rooms || []).forEach((room, index) => {
+    insertMazeRoom.run({
+      mazeId: maze.id,
+      id: room.id,
+      position: index,
+      title: room.title,
+      description: room.description,
+      monster: JSON.stringify(room.monster || {}),
+      questions: JSON.stringify(room.questions || []),
+      damagePerCorrect: room.damagePerCorrect ?? 0,
+      explanation: room.explanation ?? "",
+      nextRoomId: room.nextRoomId ?? null,
+      alternativePathId: room.alternativePathId ?? null,
+      unlockCondition: room.unlockCondition
+        ? JSON.stringify(room.unlockCondition)
+        : null,
+    });
+  });
+});
+
+const insertEncyclopediaEntry = db.prepare(`
+  INSERT OR REPLACE INTO encyclopedia_entries
+    (id, term, definition, category, related_terms, quick_facts, sources,
+     image, debunking_snippet, related_myths, related_articles, difficulty)
+  VALUES
+    (@id, @term, @definition, @category, @relatedTerms, @quickFacts, @sources,
+     @image, @debunkingSnippet, @relatedMyths, @relatedArticles, @difficulty)
+`);
+
+// Insert a single Article (long-form Learn & Explore content). `author` is a
+// JSON object; `relatedMyths`/`relatedFacts` are optional id arrays. Mirrors
+// the domain `Article` shape from content/articles/types.ts.
+const insertArticleResource = db.transaction((article) => {
+  insertArticle.run({
+    id: article.id,
+    type: article.type ?? "article",
+    category: article.category ?? "",
+    title: article.title,
+    subtitle: article.subtitle ?? null,
+    content: article.content ?? "",
+    excerpt: article.excerpt ?? "",
+    author: JSON.stringify(article.author || {}),
+    publishedDate: article.publishedDate ?? "",
+    readTime: article.readTime ?? 0,
+    image: article.image ?? null,
+    tags: JSON.stringify(article.tags || []),
+    source: article.source ?? null,
+    sourceUrl: article.sourceUrl ?? null,
+    relatedMyths: JSON.stringify(article.relatedMyths || []),
+    relatedFacts: JSON.stringify(article.relatedFacts || []),
+    featured: article.featured ? 1 : 0,
+    difficulty: article.difficulty ?? null,
+  });
+});
+
+// Insert a single Post (community-feed item). `author` is a JSON object and
+// `relatedContent` is an optional id array. Mirrors the domain `Post` shape
+// from content/articles/types.ts.
+const insertPostResource = db.transaction((post) => {
+  insertPost.run({
+    id: post.id,
+    type: post.type ?? "news",
+    category: post.category ?? "",
+    title: post.title,
+    content: post.content ?? "",
+    author: JSON.stringify(post.author || {}),
+    publishedDate: post.publishedDate ?? "",
+    image: post.image ?? null,
+    tags: JSON.stringify(post.tags || []),
+    source: post.source ?? null,
+    sourceUrl: post.sourceUrl ?? null,
+    videoUrl: post.videoUrl ?? null,
+    relatedContent: JSON.stringify(post.relatedContent || []),
+  });
+});
+
+// Insert encyclopedia entries from an object of entries (people.json / terms.json).
+const insertEncyclopediaEntries = db.transaction((entries) => {
+  for (const entry of Object.values(entries)) {
+    insertEncyclopediaEntry.run({
+      id: entry.id,
+      term: entry.term,
+      definition: entry.definition,
+      category: entry.category ?? "",
+      relatedTerms: JSON.stringify(entry.relatedTerms || []),
+      quickFacts: JSON.stringify(entry.quickFacts || []),
+      sources: JSON.stringify(entry.sources || []),
+      image: entry.image ?? null,
+      debunkingSnippet: entry.debunkingSnippet ?? null,
+      relatedMyths: JSON.stringify(entry.relatedMyths || []),
+      relatedArticles: JSON.stringify(entry.relatedArticles || []),
+      difficulty: entry.difficulty ?? "beginner",
+    });
+  }
+});
+
 // ---------------------------------------------------------------------------
 // Ingest
 // ---------------------------------------------------------------------------
@@ -218,15 +432,100 @@ let stepCount = 0;
 let quizCount = 0;
 let quizQuestionCount = 0;
 let mythBusterCount = 0;
+let mythCount = 0;
+let factCount = 0;
+let mazeCount = 0;
+let mazeRoomCount = 0;
+let encyclopediaCount = 0;
+let articleCount = 0;
+let postCount = 0;
 
 for (const file of jsonFiles) {
   const filePath = path.join(jsonDir, file);
   const data = JSON.parse(fs.readFileSync(filePath, "utf8"));
 
   if (Array.isArray(data)) {
-    insertMythBusterBank(data);
-    mythBusterCount += data.length;
-    console.log(`  + ${data.length} mythbuster question(s) (${file})`);
+    const isMythList = data.some(
+      (item) =>
+        typeof item?.mythStatement === "string" &&
+        typeof item?.reality === "string",
+    );
+    if (isMythList) {
+      data.forEach((myth) => insertMythResource(myth));
+      mythCount += data.length;
+      console.log(`  + ${data.length} myth(s) (${file})`);
+    } else {
+      insertMythBusterBank(data);
+      mythBusterCount += data.length;
+      console.log(`  + ${data.length} mythbuster question(s) (${file})`);
+    }
+    continue;
+  }
+
+  // Atom Maze challenge: an object with a `rooms` array.
+  if (Array.isArray(data?.rooms)) {
+    if (data.id && data.id !== path.basename(file, ".json")) {
+      console.warn(`  ! id "${data.id}" does not match filename "${file}"`);
+    }
+    insertMazeWithRooms(data);
+    mazeCount += 1;
+    mazeRoomCount += (data.rooms || []).length;
+    console.log(
+      `  + ${data.title} maze (${file}) — ${(data.rooms || []).length} room(s)`,
+    );
+    continue;
+  }
+
+  // Encyclopedia entries: object where values have `term`, `definition`, `category`, `quickFacts`.
+  // Matches the EncyclopediaEntry shape from content/explorer/types.ts.
+  if (
+    data &&
+    typeof data === "object" &&
+    !Array.isArray(data) &&
+    Object.values(data).some(
+      (v) =>
+        typeof v?.term === "string" &&
+        typeof v?.definition === "string" &&
+        typeof v?.category === "string" &&
+        Array.isArray(v?.quickFacts),
+    )
+  ) {
+    insertEncyclopediaEntries(data);
+    encyclopediaCount += Object.keys(data).length;
+    console.log(`  + ${Object.keys(data).length} encyclopedia entries (${file})`);
+    continue;
+  }
+
+  // Article: has an `excerpt` + `readTime` (Posts have neither).
+  // Matches the Article shape from content/articles/types.ts.
+  if (typeof data?.excerpt === "string" && typeof data?.readTime === "number") {
+    if (data.id && data.id !== path.basename(file, ".json")) {
+      console.warn(`  ! id "${data.id}" does not match filename "${file}"`);
+    }
+    insertArticleResource(data);
+    articleCount += 1;
+    console.log(`  + ${data.title} article (${file})`);
+    continue;
+  }
+
+  // Posts record: an object whose values are post-shaped (title + content +
+  // author, no excerpt/readTime) — e.g. scienceDaily2026Posts.json.
+  if (
+    data &&
+    typeof data === "object" &&
+    !Array.isArray(data) &&
+    Object.values(data).some(
+      (v) =>
+        typeof v?.title === "string" &&
+        typeof v?.content === "string" &&
+        v?.author &&
+        typeof v?.author === "object",
+    )
+  ) {
+    const posts = Object.values(data);
+    posts.forEach((post) => insertPostResource(post));
+    postCount += posts.length;
+    console.log(`  + ${posts.length} post(s) (${file})`);
     continue;
   }
 
@@ -238,6 +537,42 @@ for (const file of jsonFiles) {
     quizCount += 1;
     quizQuestionCount += (data.questions || []).length;
     console.log(`  + ${data.title} quiz (${file}) — ${(data.questions || []).length} question(s)`);
+    continue;
+  }
+
+  if (typeof data?.mythStatement === "string") {
+    if (data.id && data.id !== path.basename(file, ".json")) {
+      console.warn(`  ! id "${data.id}" does not match filename "${file}"`);
+    }
+    insertMythResource(data);
+    mythCount += 1;
+    console.log(`  + ${data.title} myth (${file})`);
+    continue;
+  }
+
+  if (typeof data?.statement === "string") {
+    if (data.id && data.id !== path.basename(file, ".json")) {
+      console.warn(`  ! id "${data.id}" does not match filename "${file}"`);
+    }
+    insertFactResource(data);
+    factCount += 1;
+    console.log(`  + ${data.title} fact (${file})`);
+    continue;
+  }
+
+  // Post: a single feed item (title + content + author object).
+  if (
+    typeof data?.title === "string" &&
+    typeof data?.content === "string" &&
+    data?.author &&
+    typeof data?.author === "object"
+  ) {
+    if (data.id && data.id !== path.basename(file, ".json")) {
+      console.warn(`  ! id "${data.id}" does not match filename "${file}"`);
+    }
+    insertPostResource(data);
+    postCount += 1;
+    console.log(`  + ${data.title} post (${file})`);
     continue;
   }
 
@@ -270,10 +605,35 @@ const { count: quizQuestionRows } = db
 const { count: mythBusterRows } = db
   .prepare(`SELECT COUNT(*) AS count FROM mythbuster_questions`)
   .get();
+const { count: mythRows } = db
+  .prepare(`SELECT COUNT(*) AS count FROM myths`)
+  .get();
+const { count: factRows } = db
+  .prepare(`SELECT COUNT(*) AS count FROM facts`)
+  .get();
+const { count: mazeRows } = db
+  .prepare(`SELECT COUNT(*) AS count FROM mazes`)
+  .get();
+const { count: mazeRoomRows } = db
+  .prepare(`SELECT COUNT(*) AS count FROM maze_rooms`)
+  .get();
+const { count: encyclopediaRows } = db
+  .prepare(`SELECT COUNT(*) AS count FROM encyclopedia_entries`)
+  .get();
+const { count: articleRows } = db
+  .prepare(`SELECT COUNT(*) AS count FROM articles`)
+  .get();
+const { count: postRows } = db
+  .prepare(`SELECT COUNT(*) AS count FROM posts`)
+  .get();
 
 console.log(
   `\nDone. ${lessonRows} lessons / ${stepRows} steps · ` +
     `${quizRows} quizzes / ${quizQuestionRows} questions · ` +
-    `${mythBusterRows} mythbuster questions in ${dbPath}`,
+    `${mythBusterRows} mythbuster questions · ` +
+    `${mythRows} myths · ${factRows} facts · ` +
+    `${mazeRows} mazes / ${mazeRoomRows} rooms · ` +
+    `${encyclopediaRows} encyclopedia entries · ` +
+    `${articleRows} articles · ${postRows} posts in ${dbPath}`,
 );
 db.close();

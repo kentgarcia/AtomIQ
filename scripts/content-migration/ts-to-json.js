@@ -19,6 +19,11 @@
  *   property assignments referencing other bindings) is skipped with a warning
  *   while the remaining serilaizable exports are still written.
  *
+ *   References to other top-level consts inside the same file (e.g. a Maze
+ *   object whose `boss`/`monster` property points at a Monster const defined
+ *   earlier in the file) are resolved inline: the referenced const's object
+ *   literal is inlined into the output. Cyclic references are rejected.
+ *
  * HOW TO RUN
  *   node scripts/content-migration/ts-to-json.js [inputDir] [outputDir]
  *
@@ -75,17 +80,20 @@ function propertyName(sourceFile, name) {
 }
 
 /** Convert an ObjectLiteralExpression into a plain object. */
-function objectToValue(sourceFile, node) {
+function objectToValue(sourceFile, node, refs, seen = new Set()) {
   const obj = {};
   for (const prop of node.properties) {
     if (ts.isPropertyAssignment(prop)) {
       const key = propertyName(sourceFile, prop.name);
-      const value = astToValue(sourceFile, prop.initializer);
+      const value = astToValue(sourceFile, prop.initializer, refs, seen);
       // `undefined` has no JSON representation — omit the key entirely.
       if (value !== undefined) obj[key] = value;
     } else if (ts.isShorthandPropertyAssignment(prop)) {
-      // e.g. `{ demo }` — the referenced variable value is not resolvable here.
-      throw unsupported(sourceFile, prop, "Cannot serialize shorthand property assignment");
+      // e.g. `{ demo }` — can be resolved when the referenced const is a
+      // known top-level object/array literal in this file.
+      const name = prop.name.text;
+      const value = astToValue(sourceFile, prop.name, refs, seen);
+      if (value !== undefined) obj[name] = value;
     } else if (ts.isSpreadAssignment(prop)) {
       throw unsupported(sourceFile, prop, "Cannot serialize object spread element");
     } else if (ts.isMethodDeclaration(prop)) {
@@ -98,19 +106,19 @@ function objectToValue(sourceFile, node) {
 }
 
 /** Convert any supported AST node into a JSON-able JavaScript value. */
-function astToValue(sourceFile, node) {
+function astToValue(sourceFile, node, refs = null, seen = new Set()) {
   if (node === undefined || node === null) return undefined;
 
   switch (node.kind) {
     case ts.SyntaxKind.ObjectLiteralExpression:
-      return objectToValue(sourceFile, node);
+      return objectToValue(sourceFile, node, refs, seen);
 
     case ts.SyntaxKind.ArrayLiteralExpression:
       return node.elements.map((element) => {
         if (ts.isSpreadElement(element)) {
           throw unsupported(sourceFile, element, "Cannot serialize array spread element");
         }
-        return astToValue(sourceFile, element);
+        return astToValue(sourceFile, element, refs, seen);
       });
 
     case ts.SyntaxKind.StringLiteral:
@@ -121,7 +129,7 @@ function astToValue(sourceFile, node) {
       // `Hello ${name}!` — only useful when interpolated values are strings.
       let result = node.head.text;
       for (const span of node.templateSpans) {
-        result += String(astToValue(sourceFile, span.expression));
+        result += String(astToValue(sourceFile, span.expression, refs, seen));
         result += span.literal.text;
       }
       return result;
@@ -132,7 +140,7 @@ function astToValue(sourceFile, node) {
 
     case ts.SyntaxKind.PrefixUnaryExpression:
       if (node.operator === ts.SyntaxKind.MinusToken) {
-        return -astToValue(sourceFile, node.operand);
+        return -astToValue(sourceFile, node.operand, refs, seen);
       }
       throw unsupported(sourceFile, node, "Cannot serialize prefix operator");
 
@@ -145,6 +153,14 @@ function astToValue(sourceFile, node) {
 
     case ts.SyntaxKind.Identifier:
       if (node.text === "undefined") return undefined;
+      // Resolve references to other top-level consts declared in this file.
+      if (refs && refs.has(node.text)) {
+        if (seen.has(node.text)) {
+          throw unsupported(sourceFile, node, `Cannot serialize cycle involving '${node.text}'`);
+        }
+        const nextSeen = new Set(seen).add(node.text);
+        return astToValue(sourceFile, refs.get(node.text), refs, nextSeen);
+      }
       throw unsupported(sourceFile, node, `Cannot serialize bare identifier '${node.text}'`);
 
     default:
@@ -166,8 +182,35 @@ function extractExportedObjects(fileName, contents) {
   const results = [];
   const errors = [];
 
+  // Collect every top-level const whose initializer is a serializable literal
+  // (object, array, or plain string/number/boolean — exported or not) so that
+  // identifiers inside exported values — e.g. a maze whose `boss`/`monster`
+  // points at a Monster const, or an author `avatar` alias for a shared path —
+  // can be resolved to their literal value.
+  const refs = new Map();
+  for (const stmt of sourceFile.statements) {
+    if (ts.isVariableStatement(stmt)) {
+      for (const decl of stmt.declarationList.declarations) {
+        if (
+          decl.initializer &&
+          (ts.isObjectLiteralExpression(decl.initializer) ||
+            ts.isArrayLiteralExpression(decl.initializer) ||
+            ts.isStringLiteral(decl.initializer) ||
+            ts.isNumericLiteral(decl.initializer) ||
+            decl.initializer.kind === ts.SyntaxKind.TrueKeyword ||
+            decl.initializer.kind === ts.SyntaxKind.FalseKeyword)
+        ) {
+          refs.set(
+            ts.isIdentifier(decl.name) ? decl.name.text : decl.name.getText(sourceFile),
+            decl.initializer,
+          );
+        }
+      }
+    }
+  }
+
   const recordValue = (constName, node) => {
-    results.push({ constName, value: astToValue(sourceFile, node) });
+    results.push({ constName, value: astToValue(sourceFile, node, refs) });
   };
 
   for (const stmt of sourceFile.statements) {
@@ -203,16 +246,24 @@ function extractExportedObjects(fileName, contents) {
       continue;
     }
 
-    // `export default { ... }` with an inline object/array literal
-    if (
-      ts.isExportAssignment(stmt) &&
-      (ts.isObjectLiteralExpression(stmt.expression) ||
-        ts.isArrayLiteralExpression(stmt.expression))
-    ) {
-      try {
-        recordValue("default", stmt.expression);
-      } catch (err) {
-        errors.push(err);
+    // `export default { ... }` with an inline object/array literal, or
+    // `export default foo` aliasing a top-level const object/array
+    if (ts.isExportAssignment(stmt)) {
+      if (
+        ts.isObjectLiteralExpression(stmt.expression) ||
+        ts.isArrayLiteralExpression(stmt.expression)
+      ) {
+        try {
+          recordValue("default", stmt.expression);
+        } catch (err) {
+          errors.push(err);
+        }
+      } else if (ts.isIdentifier(stmt.expression) && refs.has(stmt.expression.text)) {
+        try {
+          recordValue(stmt.expression.text, refs.get(stmt.expression.text));
+        } catch (err) {
+          errors.push(err);
+        }
       }
     }
   }

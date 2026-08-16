@@ -1,39 +1,25 @@
 /**
  * AtomIQ Explorer Content Registry
- * Central hub for all Explorer journeys, mazes, and encyclopedia entries
+ * Central hub for all Explorer journeys, mazes, and encyclopedia entries.
+ *
+ * Mazes and encyclopedia entries are stored in the SQLite content database
+ * (see @/services/content-db) and fetched through the async repository;
+ * journeys remain in-repo data registries below.
  */
 
 import { AtomMazeChallenge, EncyclopediaEntry, Journey } from './types';
 
+import { contentRepository } from '@/services/content-db';
+
 // Import journeys
 import nuclearSafetyJourney from './journeys/nuclear-safety-journey';
 import radiationRealityJourney from './journeys/radiation-reality-journey';
-
-// Import mazes
-import nuclearHistoryMaze from './mazes/nuclear-history-maze';
-import radiationBasicsMaze from './mazes/radiation-basics-maze';
-import reactorTechMaze from './mazes/reactor-tech-maze';
-import safetyMaze from './mazes/safety-maze';
-
-// Import encyclopedia entries
-import { encyclopediaDatabase } from './encyclopedia/database';
 
 // Journey Registry
 export const journeys: Record<string, Journey> = {
   'radiation-reality': radiationRealityJourney,
   'nuclear-safety': nuclearSafetyJourney,
 };
-
-// Maze Registry
-export const atomMazes: Record<string, AtomMazeChallenge> = {
-  'safety-maze': safetyMaze,
-  'radiation-basics-maze': radiationBasicsMaze,
-  'nuclear-history-maze': nuclearHistoryMaze,
-  'reactor-tech-maze': reactorTechMaze,
-};
-
-// Encyclopedia Registry
-export const encyclopedia: Record<string, EncyclopediaEntry> = encyclopediaDatabase;
 
 // Helper Functions
 
@@ -53,38 +39,36 @@ export const getJourneysByDifficulty = (difficulty: 'beginner' | 'intermediate' 
   return Object.values(journeys).filter(journey => journey.difficulty === difficulty);
 };
 
-export const getMazeById = (id: string): AtomMazeChallenge | undefined => {
-  return atomMazes[id];
+export const getMazeById = async (id: string): Promise<AtomMazeChallenge | undefined> => {
+  const maze = await contentRepository.getMazeById(id);
+  return maze ?? undefined;
 };
 
-export const getAllMazes = (): AtomMazeChallenge[] => {
-  return Object.values(atomMazes);
+export const getAllMazes = async (): Promise<AtomMazeChallenge[]> => {
+  return contentRepository.getAllMazes();
 };
 
-export const getEncyclopediaEntryById = (id: string): EncyclopediaEntry | undefined => {
-  return encyclopedia[id];
+export const getEncyclopediaEntryById = async (id: string): Promise<EncyclopediaEntry | undefined> => {
+  const entry = await contentRepository.getEncyclopediaEntryById(id);
+  return entry ?? undefined;
 };
 
-export const getAllEncyclopediaEntries = (): EncyclopediaEntry[] => {
-  return Object.values(encyclopedia);
+export const getAllEncyclopediaEntries = async (): Promise<EncyclopediaEntry[]> => {
+  return contentRepository.getAllEncyclopediaEntries();
 };
 
-export const searchEncyclopedia = (query: string): EncyclopediaEntry[] => {
-  const lowerQuery = query.toLowerCase();
-  return Object.values(encyclopedia).filter(entry =>
-    entry.term.toLowerCase().includes(lowerQuery) ||
-    entry.definition.toLowerCase().includes(lowerQuery) ||
-    entry.category.toLowerCase().includes(lowerQuery) ||
-    entry.quickFacts.some(fact => fact.toLowerCase().includes(lowerQuery))
-  );
+export const searchEncyclopedia = async (query: string): Promise<EncyclopediaEntry[]> => {
+  return contentRepository.searchEncyclopedia(query);
 };
 
-export const getEncyclopediaByCategory = (category: string): EncyclopediaEntry[] => {
-  return Object.values(encyclopedia).filter(entry => entry.category === category);
+export const getEncyclopediaByCategory = async (category: string): Promise<EncyclopediaEntry[]> => {
+  return contentRepository.getEncyclopediaByCategory(category);
 };
 
-export const getEncyclopediaByDifficulty = (difficulty: 'beginner' | 'intermediate' | 'advanced'): EncyclopediaEntry[] => {
-  return Object.values(encyclopedia).filter(entry => entry.difficulty === difficulty);
+export const getEncyclopediaByDifficulty = async (
+  difficulty: 'beginner' | 'intermediate' | 'advanced',
+): Promise<EncyclopediaEntry[]> => {
+  return contentRepository.getEncyclopediaByDifficulty(difficulty);
 };
 
 // Export types

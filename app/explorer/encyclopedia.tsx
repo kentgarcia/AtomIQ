@@ -1,10 +1,11 @@
 import { PageHeader } from '@/components/ui/page-header';
 import { Icon } from '@/components/ui/icon';
-import { getAllEncyclopediaEntries, searchEncyclopedia } from '@/content/explorer';
-import { getEncyclopediaImage } from '@/content/explorer/encyclopedia/images';
+import { getAllEncyclopediaEntries } from '@/content/explorer';
+import type { EncyclopediaEntry } from '@/content/explorer';
+import { getEncyclopediaImage } from '@/content/explorer/images';
 import {useTheme, type Palette, fontFamilies} from "@/theme";
 import { useRouter } from 'expo-router';
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -16,18 +17,35 @@ export default function EncyclopediaScreen() {
   const THEME = theme.palettes.explorer;
   const styles = useMemo(() => makeStyles(THEME), [THEME]);
   const [searchQuery, setSearchQuery] = useState('');
-  
-  const allEntries = getAllEncyclopediaEntries();
-  
+
+  // Encyclopedia entries live in the content database — resolve once, async.
+  const [allEntries, setAllEntries] = useState<EncyclopediaEntry[]>([]);
+  useEffect(() => {
+    let alive = true;
+    getAllEncyclopediaEntries().then((entries) => {
+      if (alive) setAllEntries(entries);
+    });
+    return () => {
+      alive = false;
+    };
+  }, []);
+
   const filteredEntries = useMemo(() => {
     let entries = allEntries;
-    
-    if (searchQuery.trim()) {
-      entries = searchEncyclopedia(searchQuery);
+
+    const query = searchQuery.trim().toLowerCase();
+    if (query) {
+      entries = entries.filter(
+        (entry) =>
+          entry.term.toLowerCase().includes(query) ||
+          entry.definition.toLowerCase().includes(query) ||
+          entry.category.toLowerCase().includes(query) ||
+          entry.quickFacts.some((fact) => fact.toLowerCase().includes(query)),
+      );
     }
-    
+
     // Sort alphabetically
-    return entries.sort((a, b) => a.term.localeCompare(b.term));
+    return [...entries].sort((a, b) => a.term.localeCompare(b.term));
   }, [searchQuery, allEntries]);
 
   return (

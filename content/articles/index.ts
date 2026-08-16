@@ -1,130 +1,99 @@
 /**
- * Articles and Posts Registry
- * Central hub for all Learn & Explore content
+ * Articles & Posts registry — DB-backed facade.
+ *
+ * The hardcoded TypeScript article and post objects were migrated into the
+ * pre-populated SQLite database (`content.db`, bundled under
+ * `assets/database/`). This module keeps the app's existing import surface
+ * (`getArticleById`, `getPostById`, `getAllArticles`, `getAllPosts`, and the
+ * filter/sort/search helpers) stable while delegating every lookup to the
+ * on-device database via `services/content-db.ts`.
+ *
+ * NOTE: lookups are now asynchronous (SQLite reads on device are async), so
+ * callers must `await` the results where they previously read plain objects.
  */
 
-import { Article, Post } from "./types";
+import { contentRepository } from "@/services/content-db";
 
-// Import Articles
-import nuclearWasteManagement from "./energy/nuclear-waste-management";
-import nuclearVsRenewables from "./environment/nuclear-vs-renewables";
-import nuclearHistory from "./history/nuclear-history";
-import radiationInDailyLife from "./safety/radiation-in-daily-life";
-import howReactorsWork from "./technology/how-reactors-work";
+import type { Article, ArticleCategory, Post } from "./types";
 
-// Import Posts (10 posts from feed.md)
-import aiCancerTreatment from "./posts/ai-cancer-treatment";
-import nuclearAgriculture from "./posts/banana-radiation";
-import nuclearFission from "./posts/carbon-free";
-import nuclearSafety from "./posts/nuclear-safety-stats";
-import nuclearScience from "./posts/nuclear-science";
-import nutecPlastics from "./posts/nutec-plastics";
-import philippinesNuclear from "./posts/philippines-nuclear";
-import radioisotopes from "./posts/radioisotopes-production";
-import { scienceDaily2026Posts } from "./posts/sciencedaily-2026";
+/** Fetch an article by its id, or `null`. */
+export const getArticleById = (id: string): Promise<Article | null> =>
+  contentRepository.getArticleById(id);
 
-// Articles Registry
-export const articles: Record<string, Article> = {
-  "radiation-in-daily-life": radiationInDailyLife,
-  "how-reactors-work": howReactorsWork,
-  "nuclear-vs-renewables": nuclearVsRenewables,
-  "nuclear-history": nuclearHistory,
-  "nuclear-waste-management": nuclearWasteManagement,
-};
+/** Fetch a post by its id, or `null`. */
+export const getPostById = (id: string): Promise<Post | null> =>
+  contentRepository.getPostById(id);
 
-// Posts Registry (10 posts from feed.md)
-export const posts: Record<string, Post> = {
-  "nuclear-agriculture": nuclearAgriculture,
-  "nuclear-fission-science": nuclearFission,
-  "philippines-nuclear": philippinesNuclear,
-  "nuclear-science": nuclearScience,
-  "nutec-plastics": nutecPlastics,
-  "radioisotopes-production": radioisotopes,
-  "nuclear-safety-stats": nuclearSafety,
-  "ai-cancer-treatment": aiCancerTreatment,
-  ...scienceDaily2026Posts,
-};
+/** Every article, newest first. */
+export const getAllArticles = (): Promise<Article[]> =>
+  contentRepository.getAllArticles();
 
-// Helper Functions
+/** Every post, newest first. */
+export const getAllPosts = (): Promise<Post[]> =>
+  contentRepository.getAllPosts();
 
-export const getArticleById = (id: string): Article | undefined => {
-  return articles[id];
-};
-
-export const getPostById = (id: string): Post | undefined => {
-  return posts[id];
-};
-
-export const getAllArticles = (): Article[] => {
-  return Object.values(articles);
-};
-
-export const getAllPosts = (): Post[] => {
-  return Object.values(posts);
-};
-
-export const getFeaturedArticles = (): Article[] => {
-  return Object.values(articles).filter((article) => article.featured);
-};
-
-export const getArticlesByCategory = (category: string): Article[] => {
-  return Object.values(articles).filter(
-    (article) => article.category === category,
+/** Articles flagged as featured. */
+export const getFeaturedArticles = (): Promise<Article[]> =>
+  contentRepository.getAllArticles().then((articles) =>
+    articles.filter((article) => article.featured),
   );
-};
 
-export const getPostsByCategory = (category: string): Post[] => {
-  return Object.values(posts).filter((post) => post.category === category);
-};
+/** Articles sharing a category (e.g. 'safety', 'history'). */
+export const getArticlesByCategory = (category: ArticleCategory): Promise<Article[]> =>
+  contentRepository.getAllArticles().then((articles) =>
+    articles.filter((article) => article.category === category),
+  );
 
+/** Posts sharing a category (e.g. 'energy', 'technology'). */
+export const getPostsByCategory = (category: ArticleCategory): Promise<Post[]> =>
+  contentRepository.getAllPosts().then((posts) =>
+    posts.filter((post) => post.category === category),
+  );
+
+/** Articles matching a difficulty level. */
 export const getArticlesByDifficulty = (
   difficulty: "beginner" | "intermediate" | "advanced",
-): Article[] => {
-  return Object.values(articles).filter(
-    (article) => article.difficulty === difficulty,
+): Promise<Article[]> =>
+  contentRepository.getAllArticles().then((articles) =>
+    articles.filter((article) => article.difficulty === difficulty),
   );
+
+/** The `limit` most recently published articles. */
+export const getRecentArticles = async (limit: number = 5): Promise<Article[]> => {
+  const articles = await contentRepository.getAllArticles();
+  return articles.slice(0, limit);
 };
 
-export const getRecentArticles = (limit: number = 5): Article[] => {
-  return Object.values(articles)
-    .sort(
-      (a, b) =>
-        new Date(b.publishedDate).getTime() -
-        new Date(a.publishedDate).getTime(),
-    )
-    .slice(0, limit);
+/** The `limit` most recently published posts. */
+export const getRecentPosts = async (limit: number = 5): Promise<Post[]> => {
+  const posts = await contentRepository.getAllPosts();
+  return posts.slice(0, limit);
 };
 
-export const getRecentPosts = (limit: number = 5): Post[] => {
-  return Object.values(posts)
-    .sort(
-      (a, b) =>
-        new Date(b.publishedDate).getTime() -
-        new Date(a.publishedDate).getTime(),
-    )
-    .slice(0, limit);
-};
-
-export const searchArticles = (query: string): Article[] => {
+/** Full-text-ish article search across title, excerpt, and tags. */
+export const searchArticles = (query: string): Promise<Article[]> => {
   const lowerQuery = query.toLowerCase();
-  return Object.values(articles).filter(
-    (article) =>
-      article.title.toLowerCase().includes(lowerQuery) ||
-      article.excerpt.toLowerCase().includes(lowerQuery) ||
-      article.tags.some((tag) => tag.toLowerCase().includes(lowerQuery)),
+  return contentRepository.getAllArticles().then((articles) =>
+    articles.filter(
+      (article) =>
+        article.title.toLowerCase().includes(lowerQuery) ||
+        article.excerpt.toLowerCase().includes(lowerQuery) ||
+        article.tags.some((tag) => tag.toLowerCase().includes(lowerQuery)),
+    ),
   );
 };
 
-export const searchPosts = (query: string): Post[] => {
+/** Post search across title, content, and tags. */
+export const searchPosts = (query: string): Promise<Post[]> => {
   const lowerQuery = query.toLowerCase();
-  return Object.values(posts).filter(
-    (post) =>
-      post.title.toLowerCase().includes(lowerQuery) ||
-      post.content.toLowerCase().includes(lowerQuery) ||
-      post.tags.some((tag) => tag.toLowerCase().includes(lowerQuery)),
+  return contentRepository.getAllPosts().then((posts) =>
+    posts.filter(
+      (post) =>
+        post.title.toLowerCase().includes(lowerQuery) ||
+        post.content.toLowerCase().includes(lowerQuery) ||
+        post.tags.some((tag) => tag.toLowerCase().includes(lowerQuery)),
+    ),
   );
 };
 
-// Export types
-export type { Article, Post } from "./types";
-
+export type { Article, ArticleCategory, ArticleType, Post } from "./types";

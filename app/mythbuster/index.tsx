@@ -311,10 +311,10 @@ export default function MythBusterScreen() {
     loseExplosionFlashOpacity.value = 0;
   };
 
-  const startMode = (mode: ModeConfig) => {
+  const startMode = async (mode: ModeConfig) => {
     resetRoundState();
     setSelectedMode(mode);
-    const allMyths = getAllMyths();
+    const allMyths = await getAllMyths();
 
     // Transform myths into game statements (mix of myths and truths)
     const gameStatements = allMyths.flatMap((myth) => [
@@ -364,7 +364,7 @@ export default function MythBusterScreen() {
     autoStartedRef.current = true;
     const param = Array.isArray(modeParam) ? modeParam[0] : modeParam;
     const mode = GAME_MODES.find((m) => m.id === param) ?? GAME_MODES[0];
-    startMode(mode);
+    void startMode(mode);
   }, [modeParam]);
 
   const handleSwipe = (direction: "truth" | "myth") => {

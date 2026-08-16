@@ -1,11 +1,13 @@
 import { PageHeader } from '@/components/ui/page-header';
 import { Icon } from '@/components/ui/icon';
 import { getArticleById } from '@/content/articles';
+import type { Article } from '@/content/articles/types';
 import { getJourneyById } from '@/content/explorer';
 import { getMythById } from '@/content/myths';
+import type { Myth } from '@/content/types';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -25,6 +27,39 @@ export default function JourneyScreen() {
     return getJourneyById(id);
   }, [id]);
 
+  // Myth and article node content is DB-backed (async) — resolve once per journey.
+  const [mythContents, setMythContents] = useState<Record<string, Myth | undefined>>({});
+  const [articleContents, setArticleContents] = useState<Record<string, Article | undefined>>({});
+  useEffect(() => {
+    if (!journey) return;
+    let alive = true;
+    const mythIds = journey.nodes
+      .filter((n) => n.type === "myth")
+      .map((n) => n.contentId);
+    Promise.all(mythIds.map((cid) => getMythById(cid))).then((results) => {
+      if (!alive) return;
+      const map: Record<string, Myth | undefined> = {};
+      mythIds.forEach((cid, i) => {
+        map[cid] = results[i] ?? undefined;
+      });
+      setMythContents(map);
+    });
+    const articleIds = journey.nodes
+      .filter((n) => n.type === "article")
+      .map((n) => n.contentId);
+    Promise.all(articleIds.map((cid) => getArticleById(cid))).then((results) => {
+      if (!alive) return;
+      const map: Record<string, Article | undefined> = {};
+      articleIds.forEach((cid, i) => {
+        map[cid] = results[i] ?? undefined;
+      });
+      setArticleContents(map);
+    });
+    return () => {
+      alive = false;
+    };
+  }, [journey]);
+
   if (!journey) {
     return (
       <View style={styles.container}>
@@ -35,10 +70,10 @@ export default function JourneyScreen() {
 
   const getNodeContent = (node: typeof journey.nodes[0]) => {
     switch (node.type) {
-      case 'myth':
-        return getMythById(node.contentId);
-      case 'article':
-        return getArticleById(node.contentId);
+      case "myth":
+        return mythContents[node.contentId] ?? undefined;
+      case "article":
+        return articleContents[node.contentId] ?? undefined;
       default:
         return null;
     }
