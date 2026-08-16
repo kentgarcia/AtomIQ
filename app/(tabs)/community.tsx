@@ -156,9 +156,9 @@ export default function CommunityScreen() {
     ],
   }));
 
-  const SKY: [string, string, string] = isDark
-    ? ["#23305B", "#3C5587", THEME.bg]
-    : ["#6FC6E8", "#A6DAF0", THEME.bg];
+  const SKY: [string, string] = isDark
+    ? [THEME.bg, THEME.bg]
+    : ["#FFF3E0", "#FFFFFF"];
 
   // Generate feed items (articles + posts live in the content database)
   useEffect(() => {
@@ -271,7 +271,7 @@ export default function CommunityScreen() {
             <Icon
               name={isBookmarked ? "Archive" : "ArchiveAdd"}
               size={16}
-              color={isBookmarked ? "#FFFFFF" : THEME.text}
+              color={isBookmarked ? "#FFFFFF" : "#888888"}
               variant="Bold"
             />
           </TouchableOpacity>
@@ -303,16 +303,18 @@ export default function CommunityScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: SKY[0] }]}>
+      {/* Autumn gradient flowing through the whole page */}
+      <LinearGradient
+        colors={SKY}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 0, y: 1 }}
+        style={styles.pageGradient}
+        pointerEvents="none"
+      />
+
       {/* Header */}
       <View style={[styles.header, { paddingTop: insets.top + 16 }]}>
-        <LinearGradient
-          colors={SKY}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 0, y: 1 }}
-          style={styles.headerGradient}
-        />
-
         <View style={styles.headerContent}>
           <View style={styles.headerTextContainer}>
             <Text style={styles.headerTitle}>Discovery Hub</Text>
@@ -368,7 +370,7 @@ export default function CommunityScreen() {
             <Icon
               name="Star"
               size={16}
-              color={activeFilter === "saved" ? "#FFFFFF" : THEME.text}
+              color={activeFilter === "saved" ? "#FFFFFF" : "#888888"}
               variant="Bold"
             />
           </TouchableOpacity>

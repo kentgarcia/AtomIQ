@@ -10,6 +10,7 @@ import { StackCard } from "@/components/games/StackCard";
 import { Icon } from "@/components/ui/icon";
 import { fontFamilies, useTheme } from "@/theme";
 import * as Haptics from "expo-haptics";
+import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
@@ -108,8 +109,13 @@ export function PickAGame() {
     const insets = useSafeAreaInsets();
     const router = useRouter();
     const { height: windowHeight, width: windowWidth } = useWindowDimensions();
-    const { theme } = useTheme();
+    const { theme, isDark } = useTheme();
     const tab = theme.palettes.tab;
+
+    // Autumn gradient background, matching home / profile / discovery
+    const SKY: [string, string] = isDark
+        ? [tab.bg, tab.bg]
+        : ["#FFF3E0", "#FFFFFF"];
 
     // Stack area sits below the header and above the floating tab bar
     const stackH = Math.round(
@@ -220,7 +226,16 @@ export function PickAGame() {
     ];
 
     return (
-        <View style={[styles.screen, { paddingTop: insets.top + 18, backgroundColor: tab.bg }]}>
+        <View style={[styles.screen, { paddingTop: insets.top + 18, backgroundColor: SKY[0] }]}>
+            {/* Autumn gradient flowing through the whole page */}
+            <LinearGradient
+                colors={SKY}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 0, y: 1 }}
+                style={StyleSheet.absoluteFill}
+                pointerEvents="none"
+            />
+
             {/* Header */}
             <View style={styles.header}>
                 <Pressable
@@ -230,14 +245,14 @@ export function PickAGame() {
                         pressed && styles.logoPressed,
                     ]}
                 >
-                    <QuestionMark color={tab.textMuted} />
+                    <QuestionMark color="#E67E22" />
                 </Pressable>
 
                 <View style={styles.titleGroup}>
                     <Text style={[styles.titlePick, { color: tab.text }]}>Pick</Text>
                     <View style={styles.titleBottomRow}>
                         <Text style={[styles.titleA, { color: tab.text }]}>a</Text>
-                        <Text style={[styles.titleGame, { color: tab.text }]}>Game</Text>
+                        <Text style={[styles.titleGame, { color: "#FF8C00" }]}>Game</Text>
                     </View>
                     <Pressable onPress={closeDifficulty} hitSlop={12}>
                         <Animated.View
@@ -254,10 +269,11 @@ export function PickAGame() {
                 </View>
             </View>
 
-            {/* Sliding layers — picker vs difficulty panel */}
+            {/* Sliding layers — picker vs difficulty panel. Both transparent;
+                the base gradient covers the full screen behind them. */}
             <View style={styles.stage}>
                 <Animated.View
-                    style={[styles.layer, { backgroundColor: tab.bg }, gamesSlide]}
+                    style={[styles.layer, gamesSlide]}
                     pointerEvents={activeGame === null ? "auto" : "none"}
                 >
                     {/* Full-bleed slanted card stack */}
@@ -296,7 +312,6 @@ export function PickAGame() {
                             styles.modalContent,
                             {
                                 backgroundColor: tab.card,
-                                borderColor: tab.border,
                             },
                         ]}
                     >
@@ -334,20 +349,14 @@ export function PickAGame() {
                                     styles.guideRow,
                                     {
                                         backgroundColor: tab.bg,
-                                        borderColor: tab.border,
                                     },
                                 ]}
                             >
-                                <View
-                                    style={[
-                                        styles.guideRowIcon,
-                                        { backgroundColor: tab.card },
-                                    ]}
-                                >
+                                <View style={styles.guideRowIcon}>
                                     <Icon
                                         name={row.icon}
                                         size={20}
-                                        color={tab.text}
+                                        color="#E67E22"
                                         variant="Bold"
                                     />
                                 </View>
@@ -375,7 +384,7 @@ export function PickAGame() {
                         <Pressable
                             style={({ pressed }) => [
                                 styles.guideActionBtn,
-                                { backgroundColor: tab.primary },
+                                { backgroundColor: "#FF8C00" },
                                 pressed && { transform: [{ scale: 0.97 }] },
                             ]}
                             onPress={() => setGuideVisible(false)}
@@ -470,8 +479,11 @@ const styles = StyleSheet.create({
         maxWidth: 500,
         maxHeight: "80%",
         padding: 24,
-        borderWidth: 2,
-        borderBottomWidth: 4,
+        elevation: 8,
+        shadowColor: "#000000",
+        shadowOffset: { width: 0, height: 8 },
+        shadowOpacity: 0.15,
+        shadowRadius: 16,
     },
     modalHeader: {
         flexDirection: "row",
@@ -504,8 +516,6 @@ const styles = StyleSheet.create({
         paddingHorizontal: 16,
         borderRadius: 14,
         marginBottom: 8,
-        borderWidth: 2,
-        borderBottomWidth: 4,
     },
     guideRowIcon: {
         width: 40,
@@ -514,6 +524,7 @@ const styles = StyleSheet.create({
         alignItems: "center",
         justifyContent: "center",
         flexShrink: 0,
+        backgroundColor: "#FFF3E0",
     },
     guideRowText: {
         flex: 1,
@@ -535,7 +546,7 @@ const styles = StyleSheet.create({
         alignItems: "center",
         marginTop: 8,
         borderBottomWidth: 4,
-        borderBottomColor: "rgba(0,0,0,0.3)",
+        borderBottomColor: "#E67E22",
     },
     guideActionText: {
         fontSize: 16,

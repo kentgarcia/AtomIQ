@@ -106,6 +106,8 @@ function AppContent() {
         <Stack.Screen name="leaderboard" options={{ headerShown: false }} />
         <Stack.Screen name="profile" options={{ headerShown: false }} />
         <Stack.Screen name="settings" options={{ headerShown: false }} />
+        <Stack.Screen name="streak" options={{ headerShown: false }} />
+        <Stack.Screen name="missions" options={{ headerShown: false }} />
         <Stack.Screen name="lab" options={{ headerShown: false }} />
         <Stack.Screen name="explorer" options={{ headerShown: false }} />
         <Stack.Screen name="atom-maze" options={{ headerShown: false }} />

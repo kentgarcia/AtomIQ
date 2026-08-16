@@ -2,10 +2,12 @@ import { Icon } from "@/components/ui/icon";
 import { SectionHeader } from "@/components/ui/section-header";
 import { UNITS } from "@/content/units";
 import { useAllLevels } from "@/hooks/use-storage";
+import { useDailyMissions } from "@/hooks/use-daily-missions";
 import { openExternalUrl } from "@/services/open-url";
 import { getProfileAvatarSource } from "@/services/profile-avatars";
 import { useStorage } from "@/services/StorageContext";
 import { useTheme, type Palette, fontFamilies } from "@/theme";
+import { LinearGradient } from "expo-linear-gradient";
 import { useFocusEffect, useRouter } from "expo-router";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
@@ -20,6 +22,7 @@ import {
     View,
 } from "react-native";
 import Animated, {
+    Easing,
     FadeInDown,
     FadeOutDown,
     useAnimatedStyle,
@@ -28,15 +31,43 @@ import Animated, {
     withTiming,
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import Svg, { Path } from "react-native-svg";
+import Svg, { Path, Polyline } from "react-native-svg";
 
-const NODE_SIZE = 70;
+const NODE_SIZE = 79;
 const NODE_ROW_GAP = 120;
 const NODE_TOP = 88;
 const SECTION_PAD = 110;
 /* Sticky card geometry (safe-area-relative) */
 const CARD_TOP = 78;
 const CARD_AREA = 190;
+
+/* Node look taken from the reference button design — square button, the lip
+   is interior depth at the bottom like the reference's inset shadow */
+const NODE_RADIUS = 23;
+const NODE_BORDER = 5;
+const NODE_INNER_RADIUS = NODE_RADIUS - NODE_BORDER;
+const NODE_LIP = 10; /* 3D lip band (reference 14px inset shadow at 110px) */
+const NODE_LIP_PRESSED = 5; /* lip shallows out when pressed (reference 14 → 7) */
+const NODE_PRESS_SHIFT = 6; /* button sinks 6px when pressed (reference :active) */
+const BADGE_SIZE = 26;
+
+/* Diagonal glass-stripe overlay (reference button ::before) */
+const GLASS_COLORS = [
+  "rgba(255,255,255,0)",
+  "rgba(255,255,255,0.2)",
+  "rgba(255,255,255,0.2)",
+  "rgba(255,255,255,0)",
+  "rgba(255,255,255,0)",
+  "rgba(255,255,255,0.1)",
+  "rgba(255,255,255,0.1)",
+  "rgba(255,255,255,0)",
+] as const;
+const GLASS_LOCATIONS = [0, 0.25, 0.48, 0.481, 0.58, 0.581, 0.75, 0.751] as const;
+
+/* Maple leaf decoration (same path as the provided SVG) */
+const LEAF_PATH =
+  "M15.362 9.69s-.75 1.108-1.068 0c-.318-1.109-1.346-4.949-1.762-5.226l-.417-.278s-.078 1.506-.594 1.307c-.515-.198-4.313-2.217-4.63-2.652l-.317-.397s.355 3.328-.515 2.615c0 0 1.113 2.771-2.573 3.048 0 0 1.186 3.087 4.552 4.75 0 0 1.148 1.783-.949 1.503 0 0-2.932-.395-3.325-.752 0 0-1.548 3.01-3.764 3.128 0 0 2.656 1.504 2.337 4.156 0 0 5.107.041 4.911.832-.2.795-.555 1.601-.555 1.601s4.71-.929 5.422-2.194c0 0 .989.99 1.071 1.939 0 0 2.693-.594 2.452-2.296 0 0 1.269.948 1.427 2.551l.554-.375s-.319-1.661-1.464-2.967c0 0-.517-1.308.789-.633 0 0 3.085 1.029 5.7-.833 0 0-2.888-.948-3.006-1.978 0 0 5.394-3.326 5.625-5.542 0 0-1.944.198-2.972-.633 0 0-1.309-.396.394-4.791 0 0-1.227.724-1.62-3.636 0 0-3.051 4.665-4.518 3.082.001-.001-1.382 3.047-1.185 4.671z";
+const LEAF_COLORS = ["#D35400", "#E67E22", "#C0392B", "#F39C12"];
 
 type NodeStatus = "locked" | "current" | "completed";
 
@@ -62,6 +93,9 @@ type CardUnit = {
   unit: PathUnit;
   y: number;
 };
+
+/* Reference press transition: 0.15s cubic-bezier(0.4, 0, 0.2, 1) */
+const PRESS_EASING = Easing.bezier(0.4, 0, 0.2, 1);
 
 /* Scroll offset that centers a node in the visible area. */
 const computeNodeScrollY = (
@@ -149,6 +183,65 @@ const getGreeting = () => {
   return "Good evening";
 };
 
+/* Darken (negative amount) or lighten a hex color, used for the node 3D lip */
+const shadeColor = (hex: string, amount: number): string => {
+  const mix = (v: number) =>
+    Math.max(0, Math.min(255, Math.round(v + 255 * amount)))
+      .toString(16)
+      .padStart(2, "0");
+  return `#${mix(parseInt(hex.slice(1, 3), 16))}${mix(
+    parseInt(hex.slice(3, 5), 16),
+  )}${mix(parseInt(hex.slice(5, 7), 16))}`;
+};
+
+/* Linear mix between two hex colors (extends the page gradient under the header) */
+const mixHex = (a: string, b: string, t: number): string => {
+  const pa = [1, 3, 5].map((i) => parseInt(a.slice(i, i + 2), 16));
+  const pb = [1, 3, 5].map((i) => parseInt(b.slice(i, i + 2), 16));
+  const mixed = pa.map((v, i) => Math.round(v + (pb[i] - v) * t));
+  return `#${mixed.map((v) => v.toString(16).padStart(2, "0")).join("")}`;
+};
+
+/* Deterministic 0..1 pseudo-random so the leaf layout is stable across renders */
+const pseudoRandom = (seed: number): number => {
+  const x = Math.sin(seed * 127.1 + 311.7) * 43758.5453;
+  return x - Math.floor(x);
+};
+
+type LeafSpec = {
+  side: "left" | "right";
+  top: number;
+  size: number;
+  rotation: number;
+  flipX: boolean;
+  opacity: number;
+  offsetX: number;
+  color: string;
+};
+
+/* Autumn leaves scattered down both edges of the scrolling map */
+const buildLeaves = (height: number): LeafSpec[] => {
+  const leaves: LeafSpec[] = [];
+  let seed = 0;
+  let top = 160;
+  while (top < height - 80) {
+    const r = (k: number) => pseudoRandom(seed * 8 + k);
+    leaves.push({
+      side: r(1) < 0.5 ? "left" : "right",
+      top,
+      size: 48 + Math.round(r(2) * 60),
+      rotation: Math.round(r(3) * 360),
+      flipX: r(4) < 0.5,
+      opacity: 0.65 + r(5) * 0.35,
+      offsetX: -Math.round(r(6) * 18),
+      color: LEAF_COLORS[Math.floor(r(7) * LEAF_COLORS.length)],
+    });
+    top += 140 + Math.round(r(8) * 140);
+    seed += 1;
+  }
+  return leaves;
+};
+
 const UNIT_INFO_DATA: Record<string, { info: string; references: string[] }> = {
   "atomic-playground": {
     info: "Explore the basics of nuclear science, including atoms, isotopes, and the energy contained within nuclei. You'll understand atomic structure, nuclear energy fundamentals, and recognize common misconceptions.",
@@ -225,13 +318,25 @@ export default function HomeScreen() {
   const insets = useSafeAreaInsets();
   const { userProfile } = useStorage();
   const { levels, loading, refresh } = useAllLevels();
+  const { claimableCount, refresh: refreshMissions } = useDailyMissions();
   const { theme } = useTheme();
   const { width, height: windowHeight } = useWindowDimensions();
   const THEME = theme.palettes.tab;
   const styles = useMemo(() => createStyles(THEME), [THEME]);
 
-  // Plain background (white in light mode, same navy as Discovery in dark)
-  const pageBg = theme.mode === "dark" ? THEME.bg : "#FFFFFF";
+  // Autumn gradient background (cream → white, like the reference design)
+  const bgTop = theme.mode === "dark" ? THEME.bg : "#FFF3E0";
+  const bgBottom = theme.mode === "dark" ? THEME.bg : "#FFFFFF";
+  // Page-gradient color at the header backdrop's bottom edge so the backdrop
+  // blends seamlessly into the background
+  const backdropBottom =
+    theme.mode === "dark"
+      ? THEME.bg
+      : mixHex(
+          "#FFF3E0",
+          "#FFFFFF",
+          Math.min(1, (insets.top + CARD_TOP) / windowHeight),
+        );
 
   // Winding path stroke (subtle, visible on the plain background)
   const pathStroke =
@@ -249,7 +354,8 @@ export default function HomeScreen() {
   useFocusEffect(
     useCallback(() => {
       refresh();
-    }, [refresh]),
+      refreshMissions();
+    }, [refresh, refreshMissions]),
   );
 
   // Stable key so `units` (and everything depending on it) only rebuilds when
@@ -266,6 +372,22 @@ export default function HomeScreen() {
   const units = useMemo(
     () => buildPath(completedKey ? completedKey.split("|") : []),
     [completedKey],
+  );
+
+  // Total scrollable map height (for scattering leaves down both edges)
+  const mapContentHeight = useMemo(
+    () =>
+      units.reduce(
+        (acc, unit) => acc + unit.levels.length * NODE_ROW_GAP + SECTION_PAD,
+        0,
+      ),
+    [units],
+  );
+
+  // Deterministic pseudo-random leaf layout down the edges of the map
+  const leaves = useMemo(
+    () => buildLeaves(mapContentHeight),
+    [mapContentHeight],
   );
 
   // Locate the first "current" (next up) node
@@ -406,7 +528,12 @@ const handleScroll = useCallback(
 
   if (loading) {
     return (
-      <View style={[styles.container, { backgroundColor: pageBg }]}>
+      <View style={[styles.container, { backgroundColor: bgTop }]}>
+        <LinearGradient
+          colors={[bgTop, bgBottom]}
+          style={styles.bgGradient}
+          pointerEvents="none"
+        />
         <View style={[styles.loadingContainer, { paddingTop: insets.top }]}>
           <Animated.View entering={FadeInDown.springify().damping(10)}>
             <Image
@@ -431,7 +558,12 @@ const handleScroll = useCallback(
   let globalCounter = 0;
 
   return (
-    <View style={[styles.container, { backgroundColor: pageBg }]}>
+    <View style={[styles.container, { backgroundColor: bgTop }]}>
+      <LinearGradient
+        colors={[bgTop, bgBottom]}
+        style={styles.bgGradient}
+        pointerEvents="none"
+      />
 
       <ScrollView
         ref={scrollViewRef}
@@ -443,6 +575,37 @@ const handleScroll = useCallback(
         }}
         showsVerticalScrollIndicator={false}
       >
+        {/* Autumn leaves scattered down both edges of the scrolling map */}
+        <View
+          pointerEvents="none"
+          style={[styles.leafLayer, { height: mapContentHeight }]}
+        >
+          {leaves.map((leaf, index) => (
+            <Svg
+              key={index}
+              width={leaf.size}
+              height={leaf.size}
+              viewBox="0 0 25.263 25.263"
+              style={[
+                styles.leaf,
+                {
+                  top: leaf.top,
+                  opacity: leaf.opacity,
+                  transform: [
+                    { rotate: `${leaf.rotation}deg` },
+                    { scaleX: leaf.flipX ? -1 : 1 },
+                  ],
+                },
+                leaf.side === "left"
+                  ? { left: leaf.offsetX }
+                  : { right: leaf.offsetX },
+              ]}
+            >
+              <Path d={LEAF_PATH} fill={leaf.color} />
+            </Svg>
+          ))}
+        </View>
+
         {units.map((unit) => {
           const sectionHeight =
             unit.levels.length * NODE_ROW_GAP + SECTION_PAD;
@@ -510,52 +673,54 @@ const handleScroll = useCallback(
         })}
       </ScrollView>
 
-      {/* Sticky "lesson in view" card */}
-      {cardUnit && (
-        <View
-          style={[styles.nowCard, { top: insets.top + CARD_TOP }]}
-          pointerEvents="box-none"
-        >
-          <View style={{ flex: 1 }}>
-            <Text style={styles.unitSubtitle} numberOfLines={1}>
-              {cardUnit.unit.subtitle}
-            </Text>
-            <Text style={styles.unitTitle} numberOfLines={1}>
-              {cardUnit.unit.title}
-            </Text>
-            <Text style={styles.nowDesc} numberOfLines={2}>
-              {UNIT_INFO_DATA[cardUnit.unit.id]?.info ?? cardUnit.unit.subtitle}
-            </Text>
-          </View>
-          <TouchableOpacity
-            style={styles.infoBtn}
-            disabled={cardUnit.unit.isLocked}
-            onPress={() =>
-              !cardUnit.unit.isLocked &&
-              setSelectedUnit({
-                id: cardUnit.unit.id,
-                title: cardUnit.unit.title,
-                subtitle: cardUnit.unit.subtitle,
-              })
-            }
-          >
-            <Icon
-              name={cardUnit.unit.isLocked ? "Lock" : "InfoCircle"}
-              size={20}
-              color={cardUnit.unit.isLocked ? "#9CA3AF" : theme.primary}
-              variant={cardUnit.unit.isLocked ? "Bold" : "Linear"}
-            />
-          </TouchableOpacity>
-        </View>
-      )}
+      {/* Sticky "lesson in view" card (reference lesson-card design) */}
+      {cardUnit &&
+        (() => {
+          // Look up the fresh unit so the card stays current after refocus
+          const activeUnit =
+            cardUnits.find((c) => c.id === cardUnit.id)?.unit ?? cardUnit.unit;
 
-      {/* Solid backdrop so scrolling map content never shows in the header */}
-      <View
+          return (
+            <View
+              style={[styles.nowCard, { top: insets.top + CARD_TOP }]}
+              pointerEvents="box-none"
+            >
+              <View style={{ flex: 1 }}>
+                <Text style={styles.unitSubtitle} numberOfLines={1}>
+                  {activeUnit.subtitle}
+                </Text>
+                <Text style={styles.unitTitle} numberOfLines={2}>
+                  {activeUnit.title}
+                </Text>
+              </View>
+              <TouchableOpacity
+                style={styles.infoBtn}
+                disabled={activeUnit.isLocked}
+                onPress={() =>
+                  !activeUnit.isLocked &&
+                  setSelectedUnit({
+                    id: activeUnit.id,
+                    title: activeUnit.title,
+                    subtitle: activeUnit.subtitle,
+                  })
+                }
+              >
+                <Icon
+                  name={activeUnit.isLocked ? "Lock" : "InfoCircle"}
+                  size={18}
+                  color={activeUnit.isLocked ? "#9CA3AF" : THEME.primary}
+                  variant={activeUnit.isLocked ? "Bold" : "Linear"}
+                />
+              </TouchableOpacity>
+            </View>
+          );
+        })()}
+
+      {/* Gradient backdrop so scrolling map content never shows in the header */}
+      <LinearGradient
         pointerEvents="none"
-        style={[
-          styles.headerBackdrop,
-          { height: insets.top + CARD_TOP, backgroundColor: pageBg },
-        ]}
+        colors={[bgTop, backdropBottom]}
+        style={[styles.headerBackdrop, { height: insets.top + CARD_TOP }]}
       />
 
       {/* Floating header */}
@@ -604,6 +769,22 @@ const handleScroll = useCallback(
           </TouchableOpacity>
         </Animated.View>
       )}
+
+      {/* Floating daily missions button */}
+      <View style={[styles.missionBtn, { bottom: insets.bottom + 130 }]}>
+        <TouchableOpacity
+          style={styles.missionBtnInner}
+          activeOpacity={0.85}
+          onPress={() => router.push("/missions")}
+        >
+          <Icon name="Medal" size={24} color="#FFFFFF" variant="Bold" />
+        </TouchableOpacity>
+        {claimableCount > 0 && (
+          <View style={styles.missionBadge}>
+            <Text style={styles.missionBadgeText}>{claimableCount}</Text>
+          </View>
+        )}
+      </View>
 
       {/* Unit info modal */}
       <Modal
@@ -726,25 +907,34 @@ const LessonNode = ({
   const isFirst = firstId === node.id;
 
   const pulse = useSharedValue(1);
-  const ring = useSharedValue(1);
+  const pressed = useSharedValue(0);
 
   useEffect(() => {
     if (isCurrent) {
       pulse.value = withRepeat(withTiming(1.12, { duration: 800 }), -1, true);
-      ring.value = withRepeat(
-        withTiming(1.35, { duration: 800 }),
-        -1,
-        true,
-      );
     }
   }, [isCurrent]);
 
-  const pulseStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: pulse.value }],
+  // Reference :active — button sinks, lip shallows, badge follows it down
+  const handlePressIn = useCallback(() => {
+    pressed.value = withTiming(1, { duration: 150, easing: PRESS_EASING });
+  }, [pressed]);
+  const handlePressOut = useCallback(() => {
+    pressed.value = withTiming(0, { duration: 150, easing: PRESS_EASING });
+  }, [pressed]);
+
+  const nodeStyle = useAnimatedStyle(() => ({
+    transform: [
+      { translateY: pressed.value * NODE_PRESS_SHIFT },
+      { scale: pulse.value },
+    ],
   }));
-  const ringStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: ring.value }],
-    opacity: 0.5 - (ring.value - 1) * 1.4,
+  /* Face recedes upward when pressed, shallowing the lip below it */
+  const faceStyle = useAnimatedStyle(() => ({
+    bottom: NODE_LIP - pressed.value * (NODE_LIP - NODE_LIP_PRESSED),
+  }));
+  const badgeStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: pressed.value * NODE_PRESS_SHIFT }],
   }));
 
   let iconName = "Star";
@@ -752,12 +942,11 @@ const LessonNode = ({
   if (node.type === "chest") iconName = "Box";
   if (node.type === "trophy") iconName = "Cup";
 
-  const faceColor = isLocked
-    ? "#E5E7EB"
-    : isCompleted
-      ? "#FFFFFF"
-      : unitColor;
-  const iconColor = isLocked ? "#9CA3AF" : isCompleted ? unitColor : "#FFFFFF";
+  const faceColor = isLocked ? "#E5E7EB" : unitColor;
+  const lipColor = isLocked
+    ? shadeColor("#E5E7EB", -0.12)
+    : shadeColor(unitColor, -0.14);
+  const iconColor = isLocked ? "#9CA3AF" : "#FFFFFF";
 
   return (
     <View
@@ -766,50 +955,66 @@ const LessonNode = ({
         { left: x - NODE_SIZE / 2, top: y - NODE_SIZE / 2 },
       ]}
     >
-      {isCurrent && (
-        <Animated.View style={[styles.pulseRing, { borderColor: unitColor }, ringStyle]} />
-      )}
       <TouchableOpacity
-        activeOpacity={0.8}
-        onPress={isLocked ? undefined : onPress}
+        activeOpacity={1}
+        disabled={isLocked}
+        onPress={onPress}
+        onPressIn={handlePressIn}
+        onPressOut={handlePressOut}
       >
         <Animated.View
           style={[
             styles.node,
-            isCurrent ? pulseStyle : {},
-            { shadowColor: isLocked ? "#00000030" : `${unitColor}80` },
+            nodeStyle,
+            { shadowColor: isLocked ? "#000000" : `${unitColor}80` },
           ]}
         >
-          <View
-            style={[
-              styles.nodeLip,
-              { backgroundColor: isLocked ? "#CFD8DC" : unitColor },
-            ]}
-          />
-          <View
-            style={[
-              styles.nodeFace,
-              {
-                backgroundColor: faceColor,
-                borderWidth: isCurrent ? 0 : 2,
-                borderColor: isCompleted ? unitColor : "transparent",
-              },
-            ]}
-          >
+          {/* Inner rounded rect in lip color — its own painted corners */}
+          <View style={[styles.nodeInner, { backgroundColor: lipColor }]}>
+            {/* Face on top, leaving the rounded lip strip exposed below */}
+            <Animated.View
+              style={[styles.nodeFace, faceStyle, { backgroundColor: faceColor }]}
+            >
+              {/* Diagonal glass stripes (reference button ::before) */}
+              <LinearGradient
+                colors={GLASS_COLORS}
+                locations={GLASS_LOCATIONS}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.nodeGlass}
+              />
+            </Animated.View>
             <Icon
               name={iconName}
-              size={isCurrent || node.type === "trophy" ? 30 : 24}
+              size={isCurrent || node.type === "trophy" ? 32 : 26}
               color={iconColor}
               variant="Bold"
+              style={{ marginBottom: Math.round(NODE_LIP / 2) }}
             />
-            {isCompleted && (
-              <View style={styles.crownBadge}>
-                <Icon name="Crown1" size={12} color="#FFC107" variant="Bold" />
-              </View>
-            )}
           </View>
         </Animated.View>
       </TouchableOpacity>
+
+      {/* Completed check badge */}
+      {isCompleted && (
+        <Animated.View style={[styles.completedBadge, badgeStyle]}>
+          <LinearGradient
+            colors={["#FFBC00", "#FF7B00"]}
+            style={styles.completedBadgeFill}
+          >
+            <Svg width={11} height={11} viewBox="0 0 24 24">
+              <Polyline
+                points="20 6 9 17 4 12"
+                stroke="#333333"
+                strokeWidth={4.5}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                fill="none"
+              />
+            </Svg>
+          </LinearGradient>
+        </Animated.View>
+      )}
 
       {isFirst && (
         <Animated.View
@@ -829,6 +1034,19 @@ const createStyles = (theme: Palette) =>
     container: {
       flex: 1,
       backgroundColor: theme.bg,
+    },
+    bgGradient: {
+      ...StyleSheet.absoluteFillObject,
+    },
+    leafLayer: {
+      position: "absolute",
+      top: 0,
+      left: 0,
+      right: 0,
+      zIndex: 0,
+    },
+    leaf: {
+      position: "absolute",
     },
     pathLayer: {
       ...StyleSheet.absoluteFillObject,
@@ -902,7 +1120,7 @@ const createStyles = (theme: Palette) =>
       fontFamily: fontFamilies.heavy,
       color: "#1F2937",
     },
-    /* Sticky unit card — fixed light surface (never black in dark mode) */
+    /* Sticky unit card — left-aligned text, info button centered on the right */
     nowCard: {
       position: "absolute",
       left: 20,
@@ -914,16 +1132,11 @@ const createStyles = (theme: Palette) =>
       backgroundColor: "#FFFFFF",
       borderRadius: 24,
       padding: 20,
-      borderWidth: 2,
-      borderColor: "#E5E7EB",
-      borderBottomWidth: 4,
-    },
-    nowDesc: {
-      fontSize: 12,
-      fontFamily: fontFamilies.regular,
-      lineHeight: 16,
-      color: "#9CA3AF",
-      marginTop: 2,
+      shadowColor: "#000000",
+      shadowOffset: { width: 0, height: 6 },
+      shadowOpacity: 0.08,
+      shadowRadius: 10,
+      elevation: 5,
     },
     /* Nodes */
     nodeWrap: {
@@ -934,55 +1147,64 @@ const createStyles = (theme: Palette) =>
       justifyContent: "center",
       zIndex: 10,
     },
-    pulseRing: {
-      position: "absolute",
-      width: NODE_SIZE,
-      height: NODE_SIZE,
-      borderRadius: NODE_SIZE / 2,
-      borderWidth: 3,
-    },
+    /* Reference "button" node: square with white border wrapping the face */
     node: {
       width: NODE_SIZE,
       height: NODE_SIZE,
-      borderRadius: NODE_SIZE / 2,
+      borderRadius: NODE_RADIUS,
+      borderWidth: NODE_BORDER,
+      borderColor: "#FFFFFF",
+      backgroundColor: "#FFFFFF",
+      elevation: 6,
+      shadowColor: "#000000",
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.15,
+      shadowRadius: 6,
+    },
+    /* Fills the area inside the border; painted in the lip color */
+    nodeInner: {
+      flex: 1,
+      alignSelf: "stretch",
+      borderRadius: NODE_INNER_RADIUS,
       alignItems: "center",
       justifyContent: "center",
-      elevation: 5,
-      shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.25,
-      shadowRadius: 5,
     },
-    nodeLip: {
+    /* Face covering everything except the bottom lip strip — the exposed
+       inner rect below it is the lip, rounded by its own painted corners */
+    nodeFace: {
       position: "absolute",
-      bottom: 0,
+      top: 0,
       left: 0,
       right: 0,
-      height: "100%",
-      borderRadius: NODE_SIZE / 2,
-      zIndex: -1,
-      transform: [{ translateY: 5 }],
+      bottom: NODE_LIP,
+      borderRadius: NODE_INNER_RADIUS,
     },
-    nodeFace: {
-      width: "100%",
-      height: "100%",
-      borderRadius: NODE_SIZE / 2,
-      alignItems: "center",
-      justifyContent: "center",
-      zIndex: 1,
+    nodeGlass: {
+      ...StyleSheet.absoluteFillObject,
+      borderRadius: NODE_INNER_RADIUS,
     },
-    crownBadge: {
+    completedBadge: {
       position: "absolute",
-      bottom: -4,
-      right: -4,
-      backgroundColor: theme.card,
-      width: 24,
-      height: 24,
-      borderRadius: 12,
+      bottom: -8,
+      alignSelf: "center",
+      width: BADGE_SIZE,
+      height: BADGE_SIZE,
+      borderRadius: BADGE_SIZE / 2,
+      borderWidth: 4,
+      borderColor: "#FFFFFF",
+      backgroundColor: "#FF7B00",
+      zIndex: 20,
+      elevation: 3,
+      shadowColor: "#000000",
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.15,
+      shadowRadius: 3,
+    },
+    completedBadgeFill: {
+      flex: 1,
+      borderRadius: 9,
       alignItems: "center",
       justifyContent: "center",
-      borderWidth: 2,
-      borderColor: "#E5E7EB",
-      zIndex: 20,
     },
     startBubble: {
       position: "absolute",
@@ -1046,22 +1268,22 @@ const createStyles = (theme: Palette) =>
       fontSize: 11,
       fontWeight: "600",
       fontFamily: fontFamilies.semibold,
-      color: "#9CA3AF",
+      color: "#888888",
       textTransform: "uppercase",
-      letterSpacing: 0.6,
-      marginBottom: 2,
+      letterSpacing: 0.8,
+      marginBottom: 3,
     },
     unitTitle: {
-      fontSize: 17,
-      fontWeight: "800",
+      fontSize: 22,
+      fontWeight: "700",
       fontFamily: fontFamilies.heavy,
-      color: "#1F2937",
+      color: "#333333",
     },
     infoBtn: {
-      width: 40,
-      height: 40,
+      width: 36,
+      height: 36,
       backgroundColor: "#F4F5F7",
-      borderRadius: 12,
+      borderRadius: 18,
       alignItems: "center",
       justifyContent: "center",
     },
@@ -1081,6 +1303,43 @@ const createStyles = (theme: Palette) =>
       justifyContent: "center",
       borderBottomWidth: 4,
       borderBottomColor: "rgba(0,0,0,0.15)",
+    },
+    /* Floating daily missions button */
+    missionBtn: {
+      position: "absolute",
+      left: 24,
+      width: 56,
+      height: 56,
+      zIndex: 95,
+    },
+    missionBtnInner: {
+      flex: 1,
+      borderRadius: 28,
+      backgroundColor: "#FF8C00",
+      alignItems: "center",
+      justifyContent: "center",
+      borderBottomWidth: 4,
+      borderBottomColor: "rgba(0,0,0,0.15)",
+    },
+    missionBadge: {
+      position: "absolute",
+      top: -4,
+      right: -4,
+      minWidth: 22,
+      height: 22,
+      borderRadius: 11,
+      backgroundColor: "#EF4444",
+      borderWidth: 2,
+      borderColor: "#FFFFFF",
+      alignItems: "center",
+      justifyContent: "center",
+      paddingHorizontal: 4,
+    },
+    missionBadgeText: {
+      color: "#FFFFFF",
+      fontSize: 11,
+      fontWeight: "800",
+      fontFamily: fontFamilies.heavy,
     },
     /* Modal */
     modalOverlay: {

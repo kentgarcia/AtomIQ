@@ -11,7 +11,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {useTheme, AchievementPalette, type Palette, fontFamilies} from "@/theme";
 
 // Achievement thresholds - same as profile
-const ACHIEVEMENTS = [
+export const ACHIEVEMENTS = [
   { 
     id: 1, 
     title: 'First Steps', 

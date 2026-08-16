@@ -2,7 +2,8 @@
  * StackCard — full-bleed slanted card used by the Games picker and the
  * in-page difficulty stacks. Keeps the -4° slant through its entrance
  * animation (the enter animation lives on the outer wrapper, the rotate
- * on the inner view).
+ * on the inner view). Autumn style: white card, soft shadow, tinted icon
+ * circle in the game's accent color.
  */
 
 import { Icon } from "@/components/ui/icon";
@@ -21,29 +22,47 @@ const springPressIn = () =>
 const springPressOut = () =>
     withSpring(1, { damping: 16, stiffness: 260, mass: 0.5 });
 
+const isHex = (value: string) => /^#[0-9a-fA-F]{6}$/.test(value);
+
+/* Soft tint of the accent color for the icon circle */
+const tint = (hex: string) =>
+  isHex(hex) ? `${hex}26` : "rgba(0,0,0,0.06)";
+
+/* Darkened accent so the icon reads on the tinted circle */
+const shade = (hex: string, amount: number) => {
+  if (!isHex(hex)) return hex;
+  const mix = (v: number) =>
+    Math.max(0, Math.min(255, Math.round(v + 255 * amount)))
+      .toString(16)
+      .padStart(2, "0");
+  return `#${mix(parseInt(hex.slice(1, 3), 16))}${mix(
+    parseInt(hex.slice(3, 5), 16),
+  )}${mix(parseInt(hex.slice(5, 7), 16))}`;
+};
+
 export interface StackCardProps {
-    title: string;
-    color: string;
-    icon: string;
-    delay: number;
-    height: number;
-    onPress: () => void;
+  title: string;
+  color: string;
+  icon: string;
+  delay: number;
+  height: number;
+  onPress: () => void;
 }
 
 export function StackCard({
-    title,
-    color,
-    icon,
-    delay,
-    height,
-    onPress,
+  title,
+  color,
+  icon,
+  delay,
+  height,
+  onPress,
 }: StackCardProps) {
-    const pressScale = useSharedValue(1);
-    const pressStyle = useAnimatedStyle(() => ({
-        transform: [{ scale: pressScale.value }],
-    }));
+  const pressScale = useSharedValue(1);
+  const pressStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: pressScale.value }],
+  }));
 
-    return (
+  return (
         <Animated.View
             entering={ZoomIn.duration(280)
                 .delay(delay)
@@ -56,7 +75,6 @@ export function StackCard({
                     styles.card,
                     {
                         height,
-                        backgroundColor: color,
                         transform: [{ rotate: "-4deg" }],
                     },
                 ]}
@@ -71,8 +89,8 @@ export function StackCard({
                     }}
                     onPress={onPress}
                 >
-                    <Animated.View style={[styles.iconWrapper, pressStyle]}>
-                        <Icon name={icon} size={46} color="#050505" variant="Bold" />
+                    <Animated.View style={[styles.iconWrapper, pressStyle, { backgroundColor: tint(color) }]}>
+                        <Icon name={icon} size={42} color={shade(color, -0.32)} variant="Bold" />
                     </Animated.View>
                     <Text style={styles.cardTitle}>{title}</Text>
                 </Pressable>
@@ -89,6 +107,13 @@ const styles = StyleSheet.create({
         alignItems: "center",
         justifyContent: "center",
         paddingHorizontal: 28,
+        backgroundColor: "#FFFFFF",
+        borderRadius: 22,
+        elevation: 4,
+        shadowColor: "#000000",
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.07,
+        shadowRadius: 8,
     },
     cardPressArea: {
         flex: 1,
@@ -98,8 +123,9 @@ const styles = StyleSheet.create({
         gap: 20,
     },
     iconWrapper: {
-        width: 60,
-        height: 60,
+        width: 64,
+        height: 64,
+        borderRadius: 32,
         alignItems: "center",
         justifyContent: "center",
     },
@@ -107,7 +133,7 @@ const styles = StyleSheet.create({
         fontSize: 26,
         fontFamily: fontFamilies.heavy,
         fontWeight: "900",
-        color: "#050505",
+        color: "#333333",
         letterSpacing: -0.5,
     },
 });
