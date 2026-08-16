@@ -2,9 +2,13 @@
 -- AtomIQ content database schema
 --
 -- Stores Lesson content (with nested Steps), Quizzes (with nested Questions),
--- and the standalone Mythbuster question banks used by the atom-maze boss
--- battles. The flexible `data` payload on each lesson step is stored as a JSON
--- document whose shape is dictated by the step's `step_type`:
+-- the standalone Mythbuster question banks used by the atom-maze boss
+-- battles, the Myths and Facts reference resources, the Atom Maze challenges
+-- (with nested Rooms and JSON-encoded Monsters + BattleQuestions), the
+-- Encyclopedia entries (with JSON-encoded flexible fields), and the Articles
+-- + Posts powering the Learn & Explore feed (JSON-encoded author objects). The flexible `data` payload on
+-- each lesson step is stored as a JSON document whose shape is dictated by
+-- the step's `step_type`:
 --
 --   briefing   -> { topic, mission, icon }
 --   myth_buster-> { myth, reality, explanation, image? }
@@ -137,6 +141,182 @@ CREATE TABLE IF NOT EXISTS mythbuster_questions (
 );
 
 -- ----------------------------------------------------------------------------
+-- Myths (myth-busting resource articles)
+-- ----------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS myths (
+  id             TEXT PRIMARY KEY,                -- myth.id
+  title          TEXT NOT NULL,
+  myth_statement TEXT NOT NULL,                   -- the (false) claim being debunked
+  reality        TEXT NOT NULL,                   -- the true reality
+  explanation    TEXT NOT NULL DEFAULT '',        -- long-form debunk
+  category       TEXT NOT NULL DEFAULT '',        -- myth.category
+  difficulty     TEXT NOT NULL DEFAULT 'easy'
+                 CHECK (difficulty IN ('easy', 'medium', 'hard')),
+  sources        TEXT NOT NULL DEFAULT '[]'       -- JSON array of Source objects
+                 CONSTRAINT myths_sources_json CHECK (json_valid(sources)),
+  related_facts  TEXT NOT NULL DEFAULT '[]'       -- JSON array of fact ids
+                 CONSTRAINT myths_related_facts_json CHECK (json_valid(related_facts)),
+  related_lessons TEXT NOT NULL DEFAULT '[]'      -- JSON array of lesson ids
+                 CONSTRAINT myths_related_lessons_json CHECK (json_valid(related_lessons)),
+  image          TEXT,                             -- nullable
+  tags           TEXT NOT NULL DEFAULT '[]'       -- JSON array of strings
+                 CONSTRAINT myths_tags_json CHECK (json_valid(tags)),
+  popularity     INTEGER NOT NULL DEFAULT 0,       -- how common this myth is (1-10)
+  created_at     INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
+  updated_at     INTEGER NOT NULL DEFAULT (strftime('%s', 'now'))
+);
+
+-- ----------------------------------------------------------------------------
+-- Facts (standalone factual reference entries)
+-- ----------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS facts (
+  id             TEXT PRIMARY KEY,                -- fact.id
+  title          TEXT NOT NULL,
+  statement      TEXT NOT NULL,                   -- the headline fact
+  explanation    TEXT NOT NULL DEFAULT '',        -- long-form context
+  category       TEXT NOT NULL DEFAULT '',        -- fact.category
+  importance     TEXT NOT NULL DEFAULT 'medium'
+                 CHECK (importance IN ('low', 'medium', 'high', 'critical')),
+  sources        TEXT NOT NULL DEFAULT '[]'       -- JSON array of Source objects
+                 CONSTRAINT facts_sources_json CHECK (json_valid(sources)),
+  related_myths  TEXT NOT NULL DEFAULT '[]'       -- JSON array of myth ids
+                 CONSTRAINT facts_related_myths_json CHECK (json_valid(related_myths)),
+  related_lessons TEXT NOT NULL DEFAULT '[]'      -- JSON array of lesson ids
+                 CONSTRAINT facts_related_lessons_json CHECK (json_valid(related_lessons)),
+  image          TEXT,                             -- nullable
+  tags           TEXT NOT NULL DEFAULT '[]'       -- JSON array of strings
+                 CONSTRAINT facts_tags_json CHECK (json_valid(tags)),
+  date_added     TEXT NOT NULL DEFAULT '',         -- ISO date string
+  last_updated   TEXT NOT NULL DEFAULT '',         -- ISO date string
+  created_at     INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
+  updated_at     INTEGER NOT NULL DEFAULT (strftime('%s', 'now'))
+);
+
+-- ----------------------------------------------------------------------------
+-- Atom Mazes (Pokemon-style challenge levels)
+-- ----------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS mazes (
+  id              TEXT PRIMARY KEY,                -- maze.id (e.g. 'safety-maze')
+  title           TEXT NOT NULL,
+  description     TEXT NOT NULL,
+  theme           TEXT NOT NULL DEFAULT '',        -- maze.theme
+  xp_reward       INTEGER NOT NULL DEFAULT 0,
+  time_limit      INTEGER,                         -- seconds; nullable
+  player_max_hp   INTEGER NOT NULL DEFAULT 100,    -- player HP for this maze
+  boss            TEXT NOT NULL DEFAULT '{}'       -- JSON Monster object (final boss)
+                  CONSTRAINT mazes_boss_json CHECK (json_valid(boss)),
+  created_at      INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
+  updated_at      INTEGER NOT NULL DEFAULT (strftime('%s', 'now'))
+);
+
+-- ----------------------------------------------------------------------------
+-- Maze rooms (nested children of mazes)
+-- ----------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS maze_rooms (
+  maze_id           TEXT NOT NULL REFERENCES mazes(id) ON DELETE CASCADE,
+  id                TEXT NOT NULL,                 -- room.id (unique within its maze)
+  position          INTEGER NOT NULL CHECK (position >= 0),   -- 0-based order within the maze
+  title             TEXT NOT NULL,
+  description       TEXT NOT NULL,
+  monster           TEXT NOT NULL DEFAULT '{}'     -- JSON Monster object to fight
+                    CONSTRAINT maze_rooms_monster_json CHECK (json_valid(monster)),
+  questions         TEXT NOT NULL DEFAULT '[]'     -- JSON array of BattleQuestions
+                    CONSTRAINT maze_rooms_questions_json CHECK (json_valid(questions)),
+  damage_per_correct INTEGER NOT NULL DEFAULT 0,   -- damage dealt per correct answer
+  explanation       TEXT NOT NULL DEFAULT '',      -- shown after defeating the monster
+  next_room_id      TEXT,                           -- path through the maze; nullable
+  alternative_path_id TEXT,                          -- branching path; nullable
+  unlock_condition  TEXT                            -- JSON { type, value }; nullable
+                    CHECK (unlock_condition IS NULL OR json_valid(unlock_condition)),
+  created_at        INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
+  updated_at        INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
+  PRIMARY KEY (maze_id, id),
+  UNIQUE (maze_id, position)
+);
+
+-- ----------------------------------------------------------------------------
+-- Encyclopedia entries (A-Z terms and notable people)
+-- ----------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS encyclopedia_entries (
+  id             TEXT PRIMARY KEY,                -- entry.id
+  term           TEXT NOT NULL,                   -- entry.term (display name)
+  definition     TEXT NOT NULL,                   -- entry.definition
+  category       TEXT NOT NULL DEFAULT '',        -- entry.category
+  related_terms  TEXT NOT NULL DEFAULT '[]'       -- JSON array of term ids
+                 CONSTRAINT encyclopedia_related_terms_json CHECK (json_valid(related_terms)),
+  quick_facts    TEXT NOT NULL DEFAULT '[]'       -- JSON array of strings
+                 CONSTRAINT encyclopedia_quick_facts_json CHECK (json_valid(quick_facts)),
+  sources        TEXT NOT NULL DEFAULT '[]'       -- JSON array of Source objects
+                 CONSTRAINT encyclopedia_sources_json CHECK (json_valid(sources)),
+  image          TEXT,                             -- nullable
+  debunking_snippet TEXT,                          -- nullable; short myth debunk
+  related_myths  TEXT NOT NULL DEFAULT '[]'       -- JSON array of myth ids
+                 CONSTRAINT encyclopedia_related_myths_json CHECK (json_valid(related_myths)),
+  related_articles TEXT NOT NULL DEFAULT '[]'     -- JSON array of article ids
+                 CONSTRAINT encyclopedia_related_articles_json CHECK (json_valid(related_articles)),
+  difficulty     TEXT NOT NULL DEFAULT 'beginner'
+                 CHECK (difficulty IN ('beginner', 'intermediate', 'advanced')),
+  created_at     INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
+  updated_at     INTEGER NOT NULL DEFAULT (strftime('%s', 'now'))
+);
+
+-- ----------------------------------------------------------------------------
+-- Articles (long-form Learn & Explore reading content)
+-- ----------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS articles (
+  id             TEXT PRIMARY KEY,                -- article.id
+  type           TEXT NOT NULL DEFAULT 'article'
+                 CHECK (type IN ('article', 'news', 'research', 'opinion', 'guide')),
+  category       TEXT NOT NULL DEFAULT '',
+  title          TEXT NOT NULL,
+  subtitle       TEXT,                            -- nullable
+  content        TEXT NOT NULL DEFAULT '',        -- markdown body
+  excerpt        TEXT NOT NULL DEFAULT '',        -- short summary for lists/feed
+  author         TEXT NOT NULL DEFAULT '{}'       -- JSON { name, avatar, title }
+                 CONSTRAINT articles_author_json CHECK (json_valid(author)),
+  published_date TEXT NOT NULL DEFAULT '',        -- ISO date string
+  read_time      INTEGER NOT NULL DEFAULT 0,      -- minutes
+  image          TEXT,                            -- nullable; asset path or URL
+  tags           TEXT NOT NULL DEFAULT '[]'       -- JSON array of strings
+                 CONSTRAINT articles_tags_json CHECK (json_valid(tags)),
+  source         TEXT,
+  source_url     TEXT,
+  related_myths  TEXT NOT NULL DEFAULT '[]'       -- JSON array of myth ids
+                 CONSTRAINT articles_related_myths_json CHECK (json_valid(related_myths)),
+  related_facts  TEXT NOT NULL DEFAULT '[]'       -- JSON array of fact ids
+                 CONSTRAINT articles_related_facts_json CHECK (json_valid(related_facts)),
+  featured       INTEGER NOT NULL DEFAULT 0,      -- 1 = featured in the feed
+  difficulty     TEXT
+                 CHECK (difficulty IS NULL OR difficulty IN ('beginner', 'intermediate', 'advanced')),
+  created_at     INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
+  updated_at     INTEGER NOT NULL DEFAULT (strftime('%s', 'now'))
+);
+
+-- ----------------------------------------------------------------------------
+-- Posts (short community-feed items)
+-- ----------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS posts (
+  id              TEXT PRIMARY KEY,               -- post.id
+  type            TEXT NOT NULL DEFAULT 'news',   -- article types + feed-only types
+  category        TEXT NOT NULL DEFAULT '',
+  title           TEXT NOT NULL,
+  content         TEXT NOT NULL DEFAULT '',
+  author          TEXT NOT NULL DEFAULT '{}'      -- JSON { name, avatar, title }
+                  CONSTRAINT posts_author_json CHECK (json_valid(author)),
+  published_date  TEXT NOT NULL DEFAULT '',       -- ISO date string
+  image           TEXT,                           -- nullable; asset path or URL
+  tags            TEXT NOT NULL DEFAULT '[]'      -- JSON array of strings
+                  CONSTRAINT posts_tags_json CHECK (json_valid(tags)),
+  source          TEXT,
+  source_url      TEXT,
+  video_url       TEXT,
+  related_content TEXT NOT NULL DEFAULT '[]'      -- JSON array of content ids
+                  CONSTRAINT posts_related_content_json CHECK (json_valid(related_content)),
+  created_at      INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
+  updated_at      INTEGER NOT NULL DEFAULT (strftime('%s', 'now'))
+);
+
+-- ----------------------------------------------------------------------------
 -- Indexes
 -- ----------------------------------------------------------------------------
 CREATE INDEX IF NOT EXISTS idx_lessons_unit_id     ON lessons(unit_id);
@@ -147,6 +327,18 @@ CREATE INDEX IF NOT EXISTS idx_quizzes_category    ON quizzes(category);
 CREATE INDEX IF NOT EXISTS idx_quizzes_difficulty  ON quizzes(difficulty);
 CREATE INDEX IF NOT EXISTS idx_quiz_questions_quiz ON quiz_questions(quiz_id);
 CREATE INDEX IF NOT EXISTS idx_mythbuster_difficulty ON mythbuster_questions(difficulty);
+CREATE INDEX IF NOT EXISTS idx_myths_category      ON myths(category);
+CREATE INDEX IF NOT EXISTS idx_myths_difficulty    ON myths(difficulty);
+CREATE INDEX IF NOT EXISTS idx_facts_category      ON facts(category);
+CREATE INDEX IF NOT EXISTS idx_facts_importance    ON facts(importance);
+CREATE INDEX IF NOT EXISTS idx_maze_rooms_maze     ON maze_rooms(maze_id);
+CREATE INDEX IF NOT EXISTS idx_encyclopedia_category ON encyclopedia_entries(category);
+CREATE INDEX IF NOT EXISTS idx_encyclopedia_difficulty ON encyclopedia_entries(difficulty);
+CREATE INDEX IF NOT EXISTS idx_articles_category    ON articles(category);
+CREATE INDEX IF NOT EXISTS idx_articles_featured    ON articles(featured);
+CREATE INDEX IF NOT EXISTS idx_articles_published   ON articles(published_date);
+CREATE INDEX IF NOT EXISTS idx_posts_category       ON posts(category);
+CREATE INDEX IF NOT EXISTS idx_posts_published      ON posts(published_date);
 
 -- Optional JSON1 expression index example — makes `WHERE json_extract(tags,'$[0]') = 'basics'` fast
 -- CREATE INDEX IF NOT EXISTS idx_lessons_tags_json ON lessons(json_extract(tags, '$'));

@@ -1,48 +1,66 @@
 /**
- * Fact Registry
- * Import and export all facts here
+ * Fact registry — DB-backed facade.
+ *
+ * The hardcoded TypeScript fact objects were migrated into the pre-populated
+ * SQLite database (`content.db`, bundled under `assets/database/`). This module
+ * keeps the app's existing import surface (`getFactById`, `getAllFacts`, and the
+ * filter/sort helpers) stable while delegating every lookup to the on-device
+ * database via `services/content-db.ts`.
+ *
+ * NOTE: lookups are now asynchronous (SQLite reads on device are async), so
+ * callers must `await` the results where they previously read plain objects.
  */
 
-import { Fact } from '../types';
-import nuclearWasteVolumeFact from './nuclear-waste-volume';
-import carbonEmissionsFact from './carbon-emissions';
+import { contentRepository } from "@/services/content-db";
 
-// Fact registry
-export const facts: Record<string, Fact> = {
-  'nuclear-waste-volume': nuclearWasteVolumeFact,
-  'carbon-emissions': carbonEmissionsFact,
-};
+import type { Fact } from "@/content/types";
 
-// Helper functions
-export const getFactById = (id: string): Fact | undefined => {
-  return facts[id];
-};
+/** Fetch a fact by its id, or `null`. */
+export const getFactById = (id: string): Promise<Fact | null> =>
+  contentRepository.getFactById(id);
 
-export const getFactsByCategory = (category: string): Fact[] => {
-  return Object.values(facts).filter(fact => fact.category === category);
-};
+/** Every fact, fully hydrated, ordered by id. */
+export const getAllFacts = (): Promise<Fact[]> =>
+  contentRepository.getAllFacts();
 
-export const getFactsByTag = (tag: string): Fact[] => {
-  return Object.values(facts).filter(fact => fact.tags.includes(tag));
-};
+/** Facts sharing a category (e.g. 'environment'). */
+export const getFactsByCategory = (category: string): Promise<Fact[]> =>
+  contentRepository.getAllFacts().then((facts) =>
+    facts.filter((fact) => fact.category === category),
+  );
 
-export const getFactsByImportance = (importance: 'low' | 'medium' | 'high' | 'critical'): Fact[] => {
-  return Object.values(facts).filter(fact => fact.importance === importance);
-};
+/** Facts whose tags include `tag`. */
+export const getFactsByTag = (tag: string): Promise<Fact[]> =>
+  contentRepository.getAllFacts().then((facts) =>
+    facts.filter((fact) => fact.tags.includes(tag)),
+  );
 
-export const getCriticalFacts = (): Fact[] => {
-  return Object.values(facts).filter(fact => fact.importance === 'critical');
-};
+/** Facts of a given importance (low/medium/high/critical). */
+export const getFactsByImportance = (
+  importance: "low" | "medium" | "high" | "critical",
+): Promise<Fact[]> =>
+  contentRepository.getAllFacts().then((facts) =>
+    facts.filter((fact) => fact.importance === importance),
+  );
 
-export const getRecentFacts = (limit: number = 10): Fact[] => {
-  return Object.values(facts)
-    .sort((a, b) => new Date(b.dateAdded).getTime() - new Date(a.dateAdded).getTime())
+/** Only the critical facts. */
+export const getCriticalFacts = (): Promise<Fact[]> =>
+  getFactsByImportance("critical");
+
+/** The most recently added facts, by `dateAdded` desc. */
+export const getRecentFacts = async (limit = 10): Promise<Fact[]> => {
+  const facts = await contentRepository.getAllFacts();
+  return [...facts]
+    .sort((a, b) => Date.parse(b.dateAdded) - Date.parse(a.dateAdded))
     .slice(0, limit);
 };
 
-export const getAllFacts = (): Fact[] => {
-  return Object.values(facts);
+export default {
+  getFactById,
+  getAllFacts,
+  getFactsByCategory,
+  getFactsByTag,
+  getFactsByImportance,
+  getCriticalFacts,
+  getRecentFacts,
 };
-
-export default facts;
-

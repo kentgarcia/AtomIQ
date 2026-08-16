@@ -28,18 +28,57 @@
          - per-question forms for all 4 types (multiple_choice, true_false,
            matching, fill_blank): options, correct answer (numeric index or
            boolean), explanation, points, image & per-question time limit
-         - browse the easy / medium / hard mythbuster pools and add /
-           move / duplicate / delete each question directly
-    3. SQL Console — the raw-power safety valve: run any SQL against the
-         same in-memory database, inspect tables, repair edge cases.
+          - browse the easy / medium / hard mythbuster pools and add /
+            move / duplicate / delete each question directly
+     3. Myths & Facts — the reference resources (what the app serves from the
+          myths / facts tables via services/content-db.ts):
+          - create / duplicate / delete myths and facts
+          - edit myth fields (title, category, difficulty, popularity,
+            myth_statement, reality, explanation, sources / related ids /
+            tags as JSON, optional image)
+          - edit fact fields (title, category, importance, statement,
+            explanation, sources / related ids / tags as JSON, dates)
+          - every change autosaves; hit "Export .db" when done
+     4. Encyclopedia — the A-Z terms and notable people served from the
+          encyclopedia_entries table (via services/content-db.ts):
+          - create / duplicate / delete entries
+          - edit entry fields (term, category, difficulty, definition,
+            quick facts as chips, related terms / myths / articles and
+            sources as JSON, optional image & myth-debunking snippet)
+          - every change autosaves; hit "Export .db" when done
+     5. Articles & Posts — the Learn & Explore feed content (articles and
+          posts tables via services/content-db.ts):
+          - create / duplicate / delete articles and posts
+          - edit article fields (type, category, subtitle, excerpt, markdown
+            content, author JSON, dates, read time, featured flag, tags)
+          - edit post fields (type, category, content, author JSON, video /
+            source URLs, related content ids, tags)
+          - every change autosaves; hit "Export .db" when done
+     6. SQL Console — the raw-power safety valve: run any SQL against the
+          same in-memory database, inspect tables, repair edge cases.
 
   Workflow
-    1. Load content.db (upload / drag-drop) OR "New blank DB" to start empty
-       (schema matches scripts/content-migration/schema.sql).
-    2. Edit lessons & steps in the Editor tab.
-    3. "Export .db" downloads the modified database, then copy it over
-       assets/database/content.db (and bump CONTENT_DB_VERSION in
-       services/content-db.ts).
+    1. Load content.db (upload / drag-drop) OR "New blank DB" to start empty.
+       When served via `npm run content-editor` the repo database and the
+       repo's scripts/content-migration/schema.sql are auto-detected.
+    2. Edit content in any tab — every change autosaves to the in-memory
+       database. No raw JSON typing: id references (related myths / facts /
+       lessons / terms / articles / posts) are chip multi-selects fed by the
+       database, sources are row editors (organization / title / URL), and
+       authors are plain name/title/avatar fields. The only JSON textarea
+       left is the legacy quiz metadata blob (validated live: green = valid,
+       red = invalid, pretty-printed on blur).
+    3. Ship it, either way:
+         - "Save to repo" (only when served by `npm run content-editor`):
+           POSTs the database to the dev server, which writes it over
+           content/lessons/content.db AND assets/database/content.db
+           (keeping a .bak-<timestamp> of each) and bumps
+           CONTENT_DB_VERSION in services/content-db.ts automatically.
+         - "Export .db": downloads the database — copy it over
+           assets/database/content.db and bump CONTENT_DB_VERSION yourself.
+       Both run PRAGMA integrity_check first; Ctrl/Cmd+S exports.
+    The toolbar shows an "Unsaved" badge while edits haven't been exported
+    or saved yet, and leaving the page with unsaved edits warns first.
 
   HOW TO RUN
     Prefer: npm run content-editor   (serves the repo + auto-detects DB, then
@@ -59,6 +98,9 @@
 -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
 <script>
 // Resolve theme before first paint to avoid a flash: saved choice wins, else follow system.
 (function () {
@@ -70,53 +112,243 @@
 })();
 </script>
 <style>
-  body{min-height:100vh}
-  .app-container{max-width:1360px;margin:0 auto;padding:1.5rem 1.25rem 6rem}
-  /* drop zone */
-  .dropzone{border:2px dashed var(--bs-secondary);border-radius:var(--bs-border-radius-lg);transition:.15s}
-  .dropzone.drag{border-color:var(--bs-primary);background:var(--bs-primary-bg-subtle)}
-  /* lesson tree */
-  .unit-label{font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--bs-secondary-color)}
-  #tree .list-group{border-radius:var(--bs-border-radius);overflow:hidden}
-  #tree .lesson-item{cursor:pointer}
-  #tree .lesson-item.active .idx{color:var(--bs-emphasis-color)}
-  /* chips (tags / prerequisites) */
-  .chips{display:flex;flex-wrap:wrap;gap:.4rem;align-items:center}
-  .chip{display:inline-flex;align-items:center;gap:.35rem;border-radius:2rem;padding:.28rem .7rem;font-size:.82rem;
-        background:var(--bs-secondary-bg);border:1px solid var(--bs-border-color);color:var(--bs-body-color)}
-  .chip .x{background:none;border:0;padding:0;line-height:1;color:var(--bs-secondary-color);font-size:.9rem}
-  .chip .x:hover{color:var(--bs-danger)}
-  .chip.on{background:var(--bs-primary);border-color:var(--bs-primary);color:#fff}
-  .chip.toggle{cursor:pointer;user-select:none}
-  /* steps */
-  .step{box-shadow:var(--bs-box-shadow-sm)}
-  .step-head .badge{letter-spacing:.06em;text-transform:uppercase}
-  /* toast */
-  .status{position:fixed;bottom:1.25rem;right:1.25rem;z-index:2000;opacity:0;transform:translateY(12px);
-          transition:.25s;box-shadow:var(--bs-box-shadow-lg);pointer-events:none}
-  .status.show{opacity:1;transform:none}
-  textarea.form-control{font-family:var(--bs-font-monospace);font-size:.82rem}
-  .kv .form-control{font-size:.9rem}
-  .opt4 .form-control{padding:.32rem .6rem;font-size:.86rem}
-  #toolbar{position:sticky;top:0;z-index:1000;backdrop-filter:blur(6px);background:color-mix(in srgb, var(--bs-body-bg) 88%, transparent)}
+/* ===========================================================================
+   AtomIQ Content Editor — design system
+   Inter for UI, JetBrains Mono for data fields. Accent gradient is an
+   indigo→violet pair that adapts to Bootstrap 5.3 dark / light themes.
+   =========================================================================== */
+:root {
+  --ae-font: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --ae-mono: "JetBrains Mono", ui-monospace, "Cascadia Mono", Menlo, monospace;
+  --ae-brand-1: #6366f1;
+  --ae-brand-2: #8b5cf6;
+  --ae-grad: linear-gradient(135deg, var(--ae-brand-1), var(--ae-brand-2));
+  --ae-radius: 14px;
+  --ae-radius-sm: 10px;
+}
+[data-bs-theme="dark"] {
+  --ae-surface: #171a26;
+  --ae-surface-2: #1e2230;
+  --ae-line: #2a2f40;
+  --ae-accent-soft: rgba(99, 102, 241, .16);
+  --ae-accent-line: rgba(99, 102, 241, .45);
+  color-scheme: dark;
+}
+[data-bs-theme="light"] {
+  --ae-surface: #ffffff;
+  --ae-surface-2: #f5f6fb;
+  --ae-line: #e4e6f0;
+  --ae-accent-soft: rgba(99, 102, 241, .10);
+  --ae-accent-line: rgba(99, 102, 241, .40);
+  color-scheme: light;
+}
+
+html { scroll-behavior: smooth; }
+body{
+  min-height:100vh;
+  font-family: var(--ae-font);
+  font-size: .92rem;
+  background:
+    radial-gradient(1100px 500px at 85% -10%, var(--ae-accent-soft), transparent 60%),
+    radial-gradient(900px 420px at -10% 0%, rgba(139, 92, 246, .10), transparent 55%),
+    var(--bs-body-bg);
+}
+.app-container{max-width:1380px;margin:0 auto;padding:1.75rem 1.25rem 7rem}
+
+/* ---------- toolbar ---------- */
+#toolbar{
+  position:sticky;top:0;z-index:1000;
+  backdrop-filter:blur(14px) saturate(1.3);
+  background:color-mix(in srgb, var(--bs-body-bg) 82%, transparent);
+  border-bottom:1px solid var(--ae-line);
+  margin-bottom:1.4rem !important;
+}
+.brand-mark{
+  width:42px;height:42px;border-radius:12px;flex:none;
+  display:grid;place-items:center;color:#fff;font-size:1.35rem;
+  background:var(--ae-grad);
+  box-shadow:0 6px 18px -6px rgba(99,102,241,.65);
+}
+.navbar-brand{font-weight:800;letter-spacing:-.02em;font-size:1.15rem}
+#dbState{font-weight:600;border-radius:999px;padding:.45em .9em}
+#dirtyBadge{font-weight:600;border-radius:999px;padding:.45em .9em;display:none}
+
+/* ---------- dropzone ---------- */
+.dropzone{
+  border:2px dashed var(--ae-line);border-radius:var(--ae-radius);
+  background:var(--ae-surface);
+  transition:.18s ease;
+}
+.dropzone:hover{border-color:var(--ae-accent-line)}
+.dropzone.drag{border-color:var(--ae-brand-1);background:var(--ae-accent-soft);transform:scale(1.005)}
+
+/* ---------- stat cards ---------- */
+#stats .card{
+  border:1px solid var(--ae-line);border-radius:var(--ae-radius);
+  background:var(--ae-surface);
+  transition:transform .15s ease, box-shadow .15s ease;
+}
+#stats .card:hover{transform:translateY(-2px);box-shadow:0 10px 24px -14px rgba(0,0,0,.55)}
+#stats .st-icon{
+  width:34px;height:34px;border-radius:10px;display:grid;place-items:center;
+  font-size:1rem;color:#fff;margin:0 auto .35rem;
+}
+.st-grad-a{background:var(--ae-grad)}
+.st-grad-b{background:linear-gradient(135deg,#06b6d4,#3b82f6)}
+.st-grad-c{background:linear-gradient(135deg,#10b981,#22c55e)}
+.st-grad-d{background:linear-gradient(135deg,#f59e0b,#f97316)}
+.st-grad-e{background:linear-gradient(135deg,#ec4899,#f43f5e)}
+#stats .fs-3{font-weight:800;letter-spacing:-.02em}
+
+/* ---------- tabs ---------- */
+#pills{gap:.35rem}
+#pills .nav-link{
+  border-radius:999px;font-weight:600;font-size:.88rem;
+  color:var(--bs-secondary-color);
+  padding:.5rem 1.05rem;
+  border:1px solid transparent;
+  transition:.15s ease;
+  display:inline-flex;align-items:center;gap:.4rem;
+}
+#pills .nav-link:hover{color:var(--bs-body-color);background:var(--ae-surface-2)}
+#pills .nav-link.active{
+  background:var(--ae-grad);border-color:transparent;color:#fff;
+  box-shadow:0 6px 16px -8px rgba(99,102,241,.7);
+}
+#pills .pill-count{
+  font-size:.7rem;font-weight:700;border-radius:999px;padding:.1em .55em;
+  background:rgba(255,255,255,.22);
+}
+#pills .nav-link:not(.active) .pill-count{background:var(--ae-surface-2);color:var(--bs-secondary-color)}
+
+/* ---------- cards ---------- */
+.card{
+  border:1px solid var(--ae-line);border-radius:var(--ae-radius);
+  background:var(--ae-surface);
+  box-shadow:0 1px 2px rgba(0,0,0,.14);
+}
+.card-header{
+  background:transparent;border-bottom:1px solid var(--ae-line);
+  font-weight:600;border-radius:var(--ae-radius) var(--ae-radius) 0 0 !important;
+}
+.card-footer{background:transparent;border-top:1px solid var(--ae-line)}
+.form-label{margin-bottom:.3rem}
+
+/* ---------- trees ---------- */
+.unit-label{font-size:.7rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--bs-secondary-color)}
+#tree .list-group, .tree .list-group{border-radius:var(--ae-radius-sm);overflow:hidden}
+.tree .list-group-item, #tree .lesson-item{
+  cursor:pointer;border:0;border-radius:var(--ae-radius-sm) !important;
+  margin-bottom:.25rem;background:var(--ae-surface-2);
+  transition:.12s ease;
+}
+.tree .list-group-item:hover{background:var(--ae-accent-soft);transform:translateX(2px)}
+.tree .list-group-item.active{
+  background:var(--ae-grad) !important;color:#fff;
+  box-shadow:0 6px 14px -8px rgba(99,102,241,.8);
+}
+.tree .list-group-item.active .badge{background:rgba(255,255,255,.25) !important;color:#fff !important}
+.tree .lesson-item .idx{color:var(--bs-secondary-color)}
+
+/* ---------- chips ---------- */
+.chips{display:flex;flex-wrap:wrap;gap:.4rem;align-items:center}
+.chip{
+  display:inline-flex;align-items:center;gap:.35rem;border-radius:999px;
+  padding:.3rem .75rem;font-size:.8rem;font-weight:500;
+  background:var(--ae-surface-2);border:1px solid var(--ae-line);
+  color:var(--bs-body-color);transition:.12s ease;
+}
+.chip .x{background:none;border:0;padding:0;line-height:1;color:var(--bs-secondary-color);font-size:.9rem}
+.chip .x:hover{color:var(--bs-danger)}
+.chip.on{background:var(--ae-grad);border-color:transparent;color:#fff}
+.chip.toggle{cursor:pointer;user-select:none}
+.chip.toggle:hover{border-color:var(--ae-accent-line)}
+
+/* ---------- steps / question cards ---------- */
+.step{box-shadow:0 2px 10px -6px rgba(0,0,0,.5);border-radius:var(--ae-radius-sm)}
+.step-head .badge{letter-spacing:.06em;text-transform:uppercase}
+
+/* ---------- data fields ---------- */
+textarea.form-control{
+  font-family:var(--ae-mono);font-size:.8rem;line-height:1.55;
+  border-radius:var(--ae-radius-sm);
+}
+textarea.form-control[data-json]{
+  background:color-mix(in srgb, var(--ae-brand-1) 5%, var(--bs-body-bg));
+  transition:border-color .15s ease, box-shadow .15s ease;
+}
+textarea.form-control[data-json].json-ok{border-color:rgba(16,185,129,.55);box-shadow:0 0 0 .18rem rgba(16,185,129,.14) inset}
+textarea.form-control[data-json].json-bad{border-color:rgba(244,63,94,.65);box-shadow:0 0 0 .18rem rgba(244,63,94,.15) inset}
+.kv .form-control{font-size:.9rem}
+.opt4 .form-control{padding:.32rem .6rem;font-size:.86rem}
+.form-control, .form-select{border-radius:var(--ae-radius-sm)}
+.form-control:focus, .form-select:focus{border-color:var(--ae-accent-line);box-shadow:0 0 0 .2rem var(--ae-accent-soft)}
+.btn{border-radius:var(--ae-radius-sm);font-weight:600}
+.btn-primary{background:var(--ae-grad);border:0}
+.btn-primary:hover,.btn-primary:focus{background:linear-gradient(135deg,#5458ee,#7c4df4);box-shadow:0 6px 16px -8px rgba(99,102,241,.8)}
+.btn:active{transform:translateY(1px)}
+
+/* ---------- SQL console ---------- */
+#sqlInput{border-radius:var(--ae-radius-sm)}
+#result table thead{position:sticky;top:0;background:var(--ae-surface-2)}
+#result table thead th{background:var(--ae-surface-2);border-bottom:1px solid var(--ae-line)}
+
+/* ---------- toast ---------- */
+.status{
+  position:fixed;bottom:1.25rem;right:1.25rem;z-index:2000;
+  opacity:0;transform:translateY(12px);transition:.25s;
+  border-radius:999px !important;box-shadow:var(--bs-box-shadow-lg);
+  pointer-events:none;font-weight:600;
+}
+.status.show{opacity:1;transform:none}
+
+/* ---------- structured editors (refbox / sources / author) ---------- */
+.refbox-chips .chip .refbox-id{
+  font-family:var(--ae-mono);font-size:.66rem;opacity:.72;margin-left:.15rem;
+}
+.refbox-add{max-width:460px}
+.refbox-select{font-size:.84rem}
+.structured .src-row{
+  padding:.45rem .55rem;border:1px solid var(--ae-line);border-radius:var(--ae-radius-sm);
+  background:var(--ae-surface-2);margin-bottom:.4rem;
+}
+.structured .src-row:focus-within{border-color:var(--ae-accent-line)}
+.structured .src-row input{font-size:.84rem}
+.author-grid input{font-size:.84rem}
+
+/* ---------- misc ---------- */
+::-webkit-scrollbar{width:9px;height:9px}
+::-webkit-scrollbar-thumb{background:var(--ae-line);border-radius:999px;border:2px solid transparent;background-clip:content-box}
+::-webkit-scrollbar-thumb:hover{background:var(--bs-secondary-color);background-clip:content-box}
+::-webkit-scrollbar-track{background:transparent}
+:focus-visible{outline:2px solid var(--ae-accent-line);outline-offset:1px}
+#toolbar{position:sticky;top:0;z-index:1000}
+.text-secondary{color:var(--bs-secondary-color) !important}
+code{color:var(--ae-brand-2)}
+[data-bs-theme="light"] code{color:var(--ae-brand-1)}
 </style>
 </head>
 <body>
 <div class="app-container">
 
   <!-- Header -->
-  <nav class="navbar navbar-expand-lg mb-4" id="toolbar">
-    <div class="container-fluid px-0">
-      <div>
-        <span class="navbar-brand fw-bold mb-0">
-          <i class="bi bi-database-gear me-2 text-primary"></i>AtomIQ Content Editor
-        </span>
-        <div class="text-secondary small">sql.js (SQLite → WebAssembly) · everything stays in your browser</div>
+  <nav class="navbar navbar-expand-lg mb-3" id="toolbar">
+    <div class="container-fluid px-0 gap-3">
+      <div class="d-flex align-items-center gap-3">
+        <div class="brand-mark"><i class="bi bi-atom"></i></div>
+        <div>
+          <span class="navbar-brand fw-bold mb-0 d-block">AtomIQ Content Editor</span>
+          <div class="text-secondary small">sql.js (SQLite → WebAssembly) · everything stays in your browser</div>
+        </div>
       </div>
-      <div class="d-flex align-items-center gap-2">
+      <div class="d-flex align-items-center gap-2 ms-auto flex-wrap">
         <span id="dbState" class="badge text-bg-secondary">No database loaded</span>
+        <span id="dirtyBadge" class="badge text-bg-warning" title="You have changes not yet exported / saved"><i class="bi bi-pencil-fill me-1"></i>Unsaved</span>
         <button id="themeBtn" class="btn btn-outline-secondary btn-sm" title="Toggle light / dark theme" aria-label="Toggle theme">
           <i class="bi bi-moon-fill" id="themeIcon"></i>
+        </button>
+        <button id="saveRepoBtn" class="btn btn-primary btn-sm" style="display:none" title="Write this database over content/lessons/content.db + assets/database/content.db and bump CONTENT_DB_VERSION">
+          <i class="bi bi-cloud-arrow-up me-1"></i>Save to repo
         </button>
         <button id="exportTopBtn" class="btn btn-success btn-sm" disabled><i class="bi bi-download me-1"></i>Export .db</button>
       </div>
@@ -138,19 +370,26 @@
 
   <!-- Stats -->
   <div class="row g-3 mb-3" id="stats">
-    <div class="col-6 col-md-3"><div class="card text-center h-100 py-2"><div class="fs-3 fw-bold" id="stTables">—</div><div class="text-secondary small">Tables</div></div></div>
-    <div class="col-6 col-md-3"><div class="card text-center h-100 py-2"><div class="fs-3 fw-bold" id="stLessons">—</div><div class="text-secondary small">Lessons</div></div></div>
-    <div class="col-6 col-md-3"><div class="card text-center h-100 py-2"><div class="fs-3 fw-bold" id="stSteps">—</div><div class="text-secondary small">Steps</div></div></div>
-    <div class="col-6 col-md-3"><div class="card text-center h-100 py-2"><div class="fs-3 fw-bold" id="stQuizzes">—</div><div class="text-secondary small">Quizzes</div></div></div>
-    <div class="col-6 col-md-3"><div class="card text-center h-100 py-2"><div class="fs-3 fw-bold" id="stQuestions">—</div><div class="text-secondary small">Quiz questions</div></div></div>
-    <div class="col-6 col-md-3"><div class="card text-center h-100 py-2"><div class="fs-3 fw-bold" id="stMythbusters">—</div><div class="text-secondary small">Mythbuster</div></div></div>
-    <div class="col-6 col-md-3"><div class="card text-center h-100 py-2"><div class="fs-3 fw-bold" id="stSize">—</div><div class="text-secondary small">DB size</div></div></div>
+    <div class="col-6 col-md-4 col-xl"><div class="card text-center h-100 py-2"><div><div class="st-icon st-grad-a"><i class="bi bi-stack"></i></div><div class="fs-4 fw-bold" id="stTables">—</div><div class="text-secondary small">Tables</div></div></div></div>
+    <div class="col-6 col-md-4 col-xl"><div class="card text-center h-100 py-2"><div><div class="st-icon st-grad-a"><i class="bi bi-journal-text"></i></div><div class="fs-4 fw-bold" id="stLessons">—</div><div class="text-secondary small">Lessons</div></div></div></div>
+    <div class="col-6 col-md-4 col-xl"><div class="card text-center h-100 py-2"><div><div class="st-icon st-grad-a"><i class="bi bi-layers"></i></div><div class="fs-4 fw-bold" id="stSteps">—</div><div class="text-secondary small">Steps</div></div></div></div>
+    <div class="col-6 col-md-4 col-xl"><div class="card text-center h-100 py-2"><div><div class="st-icon st-grad-b"><i class="bi bi-patch-question"></i></div><div class="fs-4 fw-bold" id="stQuizzes">—</div><div class="text-secondary small">Quizzes</div></div></div></div>
+    <div class="col-6 col-md-4 col-xl"><div class="card text-center h-100 py-2"><div><div class="st-icon st-grad-b"><i class="bi bi-list-check"></i></div><div class="fs-4 fw-bold" id="stQuestions">—</div><div class="text-secondary small">Quiz questions</div></div></div></div>
+    <div class="col-6 col-md-4 col-xl"><div class="card text-center h-100 py-2"><div><div class="st-icon st-grad-b"><i class="bi bi-shield-exclamation"></i></div><div class="fs-4 fw-bold" id="stMythbusters">—</div><div class="text-secondary small">Mythbuster</div></div></div></div>
+    <div class="col-6 col-md-4 col-xl"><div class="card text-center h-100 py-2"><div><div class="st-icon st-grad-c"><i class="bi bi-shield-x"></i></div><div class="fs-4 fw-bold" id="stMyths">—</div><div class="text-secondary small">Myths</div></div></div></div>
+    <div class="col-6 col-md-4 col-xl"><div class="card text-center h-100 py-2"><div><div class="st-icon st-grad-c"><i class="bi bi-check2-circle"></i></div><div class="fs-4 fw-bold" id="stFacts">—</div><div class="text-secondary small">Facts</div></div></div></div>
+    <div class="col-6 col-md-4 col-xl"><div class="card text-center h-100 py-2"><div><div class="st-icon st-grad-d"><i class="bi bi-book"></i></div><div class="fs-4 fw-bold" id="stEncyclopedia">—</div><div class="text-secondary small">Encyclopedia</div></div></div></div>
+    <div class="col-6 col-md-4 col-xl"><div class="card text-center h-100 py-2"><div><div class="st-icon st-grad-d"><i class="bi bi-newspaper"></i></div><div class="fs-4 fw-bold" id="stArticles">—</div><div class="text-secondary small">Articles / Posts</div></div></div></div>
+    <div class="col-6 col-md-4 col-xl"><div class="card text-center h-100 py-2"><div><div class="st-icon st-grad-e"><i class="bi bi-database"></i></div><div class="fs-4 fw-bold" id="stSize">—</div><div class="text-secondary small">DB size</div></div></div></div>
   </div>
 
   <!-- Tabs -->
   <ul class="nav nav-pills mb-3" id="pills">
-    <li class="nav-item"><button class="nav-link tab active" data-tab="editor"><i class="bi bi-pencil-square me-1"></i>Editor</button></li>
-    <li class="nav-item"><button class="nav-link tab" data-tab="quiz"><i class="bi bi-patch-question me-1"></i>Quiz Editor</button></li>
+    <li class="nav-item"><button class="nav-link tab active" data-tab="editor"><i class="bi bi-pencil-square me-1"></i>Editor <span class="pill-count" id="pillEditor"></span></button></li>
+    <li class="nav-item"><button class="nav-link tab" data-tab="quiz"><i class="bi bi-patch-question me-1"></i>Quiz Editor <span class="pill-count" id="pillQuiz"></span></button></li>
+    <li class="nav-item"><button class="nav-link tab" data-tab="mythfacts"><i class="bi bi-shield-check me-1"></i>Myths &amp; Facts <span class="pill-count" id="pillMf"></span></button></li>
+    <li class="nav-item"><button class="nav-link tab" data-tab="encyclopedia"><i class="bi bi-book me-1"></i>Encyclopedia <span class="pill-count" id="pillEnc"></span></button></li>
+    <li class="nav-item"><button class="nav-link tab" data-tab="articles"><i class="bi bi-newspaper me-1"></i>Articles &amp; Posts <span class="pill-count" id="pillArt"></span></button></li>
     <li class="nav-item"><button class="nav-link tab" data-tab="sql"><i class="bi bi-terminal me-1"></i>SQL Console</button></li>
   </ul>
 
@@ -490,6 +729,564 @@
     </div>
   </div>
 
+  <!-- ================= Myths & Facts Editor tab ================= -->
+  <div id="tab-mythfacts" style="display:none">
+    <div class="row g-4">
+      <!-- Trees -->
+      <div class="col-lg-4 col-xl-3">
+        <div class="card mb-3">
+          <div class="card-header d-flex align-items-center gap-2">
+            <i class="bi bi-shield-x me-1"></i>Myths <span class="badge text-bg-secondary" id="mythTreeCount"></span>
+          </div>
+          <div class="card-body">
+            <div class="input-group input-group-sm mb-2">
+              <span class="input-group-text"><i class="bi bi-search"></i></span>
+              <input id="mythSearch" class="form-control" placeholder="Search myths…" />
+            </div>
+            <div class="tree" id="mythTree">
+              <div class="text-secondary small py-2">Load a database or create a blank one to start editing.</div>
+            </div>
+          </div>
+          <div class="card-footer">
+            <button class="btn btn-outline-primary btn-sm w-100" id="newMythBtn" disabled>
+              <i class="bi bi-plus-lg me-1"></i>New myth
+            </button>
+            <div id="mythAddForm" style="display:none" class="mt-3">
+              <input id="mifId" class="form-control form-control-sm mb-2" placeholder="myth-id (kebab-case)" spellcheck="false" />
+              <input id="mifTitle" class="form-control form-control-sm mb-2" placeholder="Title" />
+              <div class="d-flex gap-2">
+                <button id="mifCreate" class="btn btn-primary btn-sm flex-grow-1">Create</button>
+                <button id="mifCancel" class="btn btn-outline-secondary btn-sm">Cancel</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header d-flex align-items-center gap-2">
+            <i class="bi bi-check2-circle me-1"></i>Facts <span class="badge text-bg-secondary" id="factTreeCount"></span>
+          </div>
+          <div class="card-body">
+            <div class="input-group input-group-sm mb-2">
+              <span class="input-group-text"><i class="bi bi-search"></i></span>
+              <input id="factSearch" class="form-control" placeholder="Search facts…" />
+            </div>
+            <div class="tree" id="factTree">
+              <div class="text-secondary small py-2">Load a database or create a blank one to start editing.</div>
+            </div>
+          </div>
+          <div class="card-footer">
+            <button class="btn btn-outline-primary btn-sm w-100" id="newFactBtn" disabled>
+              <i class="bi bi-plus-lg me-1"></i>New fact
+            </button>
+            <div id="factAddForm" style="display:none" class="mt-3">
+              <input id="fifId" class="form-control form-control-sm mb-2" placeholder="fact-id (kebab-case)" spellcheck="false" />
+              <input id="fifTitle" class="form-control form-control-sm mb-2" placeholder="Title" />
+              <div class="d-flex gap-2">
+                <button id="fifCreate" class="btn btn-primary btn-sm flex-grow-1">Create</button>
+                <button id="fifCancel" class="btn btn-outline-secondary btn-sm">Cancel</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main panel -->
+      <div class="col-lg-8 col-xl-9" id="mfmain">
+        <div id="mfEmptyPanel" class="card">
+          <div class="card-body text-secondary">
+            <i class="bi bi-arrow-left-circle fs-5 me-2 align-middle"></i>Select a myth or a fact on the left to edit it.
+            Changes autosave to the in-memory DB — hit <b>Export .db</b> when done.
+          </div>
+        </div>
+
+        <!-- Myth editor -->
+        <div id="mythCard" style="display:none">
+          <div class="card mb-3">
+            <div class="card-header d-flex align-items-center flex-wrap gap-2">
+              <i class="bi bi-shield-x text-primary"></i>
+              <strong>Myth <span class="text-secondary small" id="mythLabel"></span></strong>
+              <span class="ms-auto d-flex gap-2">
+                <button id="dupMythBtn" class="btn btn-outline-secondary btn-sm"><i class="bi bi-files me-1"></i>Duplicate</button>
+                <button id="delMythBtn" class="btn btn-outline-danger btn-sm"><i class="bi bi-trash me-1"></i>Delete</button>
+              </span>
+            </div>
+            <div class="card-body">
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label small fw-semibold text-secondary">Title</label>
+                  <input data-emyth="title" class="form-control" placeholder="Myth title" />
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label small fw-semibold text-secondary">Category</label>
+                  <input data-emyth="category" class="form-control" placeholder="safety / basics / …" />
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label small fw-semibold text-secondary">Difficulty</label>
+                  <select data-emyth="difficulty" class="form-select">
+                    <option value="easy">easy</option>
+                    <option value="medium">medium</option>
+                    <option value="hard">hard</option>
+                  </select>
+                </div>
+                <div class="col-12">
+                  <label class="form-label small fw-semibold text-secondary">Myth statement <span class="text-secondary small">(the false claim)</span></label>
+                  <textarea data-emyth="mythStatement" class="form-control" rows="2" placeholder="The myth being debunked…"></textarea>
+                </div>
+                <div class="col-12">
+                  <label class="form-label small fw-semibold text-secondary">Reality</label>
+                  <textarea data-emyth="reality" class="form-control" rows="2" placeholder="The true reality…"></textarea>
+                </div>
+                <div class="col-12">
+                  <label class="form-label small fw-semibold text-secondary">Explanation</label>
+                  <textarea data-emyth="explanation" class="form-control" rows="4" placeholder="Long-form debunk…"></textarea>
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label small fw-semibold text-secondary">Popularity (1-10)</label>
+                  <input type="number" data-emyth="popularity" class="form-control" min="0" max="10" step="1" />
+                </div>
+                <div class="col-md-5">
+                  <label class="form-label small fw-semibold text-secondary">Image <span class="text-secondary small">(optional)</span></label>
+                  <input data-emyth="image" class="form-control" placeholder="https://… or empty" />
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label small fw-semibold text-secondary">Related lessons</label>
+                  <div class="refbox" id="mythRelLessons"></div>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label small fw-semibold text-secondary">Sources</label>
+                  <div class="structured" id="mythSources"></div>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label small fw-semibold text-secondary">Related facts</label>
+                  <div class="refbox" id="mythRelFacts"></div>
+                </div>
+                <div class="col-12">
+                  <label class="form-label small fw-semibold text-secondary">Tags</label>
+                  <div class="chips" id="mythTags"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Fact editor -->
+        <div id="factCard" style="display:none">
+          <div class="card mb-3">
+            <div class="card-header d-flex align-items-center flex-wrap gap-2">
+              <i class="bi bi-check2-circle text-primary"></i>
+              <strong>Fact <span class="text-secondary small" id="factLabel"></span></strong>
+              <span class="ms-auto d-flex gap-2">
+                <button id="dupFactBtn" class="btn btn-outline-secondary btn-sm"><i class="bi bi-files me-1"></i>Duplicate</button>
+                <button id="delFactBtn" class="btn btn-outline-danger btn-sm"><i class="bi bi-trash me-1"></i>Delete</button>
+              </span>
+            </div>
+            <div class="card-body">
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label small fw-semibold text-secondary">Title</label>
+                  <input data-efact="title" class="form-control" placeholder="Fact title" />
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label small fw-semibold text-secondary">Category</label>
+                  <input data-efact="category" class="form-control" placeholder="environment / waste / …" />
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label small fw-semibold text-secondary">Importance</label>
+                  <select data-efact="importance" class="form-select">
+                    <option value="low">low</option>
+                    <option value="medium">medium</option>
+                    <option value="high">high</option>
+                    <option value="critical">critical</option>
+                  </select>
+                </div>
+                <div class="col-12">
+                  <label class="form-label small fw-semibold text-secondary">Statement <span class="text-secondary small">(headline fact)</span></label>
+                  <textarea data-efact="statement" class="form-control" rows="2" placeholder="The fact…"></textarea>
+                </div>
+                <div class="col-12">
+                  <label class="form-label small fw-semibold text-secondary">Explanation</label>
+                  <textarea data-efact="explanation" class="form-control" rows="4" placeholder="Supporting context…"></textarea>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label small fw-semibold text-secondary">Date added <span class="text-secondary small">(ISO)</span></label>
+                  <input data-efact="dateAdded" class="form-control" placeholder="2025-01-01T00:00:00.000Z" spellcheck="false" />
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label small fw-semibold text-secondary">Last updated <span class="text-secondary small">(ISO)</span></label>
+                  <input data-efact="lastUpdated" class="form-control" placeholder="2025-01-01T00:00:00.000Z" spellcheck="false" />
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label small fw-semibold text-secondary">Image <span class="text-secondary small">(optional)</span></label>
+                  <input data-efact="image" class="form-control" placeholder="https://… or empty" />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label small fw-semibold text-secondary">Sources</label>
+                  <div class="structured" id="factSources"></div>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label small fw-semibold text-secondary">Related myths</label>
+                  <div class="refbox" id="factRelMyths"></div>
+                </div>
+                <div class="col-12">
+                  <label class="form-label small fw-semibold text-secondary">Related lessons</label>
+                  <div class="refbox" id="factRelLessons"></div>
+                </div>
+                <div class="col-12">
+                  <label class="form-label small fw-semibold text-secondary">Tags</label>
+                  <div class="chips" id="factTags"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= Encyclopedia tab ================= -->
+  <div id="tab-encyclopedia" style="display:none">
+    <div class="row g-4">
+      <!-- Tree -->
+      <div class="col-lg-4 col-xl-3">
+        <div class="card">
+          <div class="card-header d-flex align-items-center gap-2">
+            <i class="bi bi-book me-1"></i>Entries <span class="badge text-bg-secondary" id="encTreeCount"></span>
+          </div>
+          <div class="card-body">
+            <div class="input-group input-group-sm mb-2">
+              <span class="input-group-text"><i class="bi bi-search"></i></span>
+              <input id="encSearch" class="form-control" placeholder="Search entries…" />
+            </div>
+            <div class="tree" id="encTree">
+              <div class="text-secondary small py-2">Load a database or create a blank one to start editing.</div>
+            </div>
+          </div>
+          <div class="card-footer">
+            <button class="btn btn-outline-primary btn-sm w-100" id="newEncBtn" disabled>
+              <i class="bi bi-plus-lg me-1"></i>New entry
+            </button>
+            <div id="encAddForm" style="display:none" class="mt-3">
+              <input id="eifId" class="form-control form-control-sm mb-2" placeholder="entry-id (kebab-case)" spellcheck="false" />
+              <input id="eifTerm" class="form-control form-control-sm mb-2" placeholder="Term" />
+              <div class="d-flex gap-2">
+                <button id="eifCreate" class="btn btn-primary btn-sm flex-grow-1">Create</button>
+                <button id="eifCancel" class="btn btn-outline-secondary btn-sm">Cancel</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main panel -->
+      <div class="col-lg-8 col-xl-9" id="encmain">
+        <div id="encEmptyPanel" class="card">
+          <div class="card-body text-secondary">
+            <i class="bi bi-arrow-left-circle fs-5 me-2 align-middle"></i>Select an entry on the left to edit it.
+            Changes autosave to the in-memory DB — hit <b>Export .db</b> when done.
+          </div>
+        </div>
+
+        <!-- Entry editor -->
+        <div id="encCard" style="display:none">
+          <div class="card mb-3">
+            <div class="card-header d-flex align-items-center flex-wrap gap-2">
+              <i class="bi bi-book text-primary"></i>
+              <strong>Entry <span class="text-secondary small" id="encLabel"></span></strong>
+              <span class="ms-auto d-flex gap-2">
+                <button id="dupEncBtn" class="btn btn-outline-secondary btn-sm"><i class="bi bi-files me-1"></i>Duplicate</button>
+                <button id="delEncBtn" class="btn btn-outline-danger btn-sm"><i class="bi bi-trash me-1"></i>Delete</button>
+              </span>
+            </div>
+            <div class="card-body">
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label small fw-semibold text-secondary">Term <span class="text-secondary small">(display name)</span></label>
+                  <input data-eenc="term" class="form-control" placeholder="Alpha Particle (α)" />
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label small fw-semibold text-secondary">Category</label>
+                  <input data-eenc="category" class="form-control" placeholder="science / people / …" />
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label small fw-semibold text-secondary">Difficulty</label>
+                  <select data-eenc="difficulty" class="form-select">
+                    <option value="beginner">beginner</option>
+                    <option value="intermediate">intermediate</option>
+                    <option value="advanced">advanced</option>
+                  </select>
+                </div>
+                <div class="col-12">
+                  <label class="form-label small fw-semibold text-secondary">Definition</label>
+                  <textarea data-eenc="definition" class="form-control" rows="3" placeholder="The encyclopedia definition…"></textarea>
+                </div>
+                <div class="col-12">
+                  <label class="form-label small fw-semibold text-secondary">Quick facts <span class="text-secondary small">(one per chip)</span></label>
+                  <div class="chips" id="encQuickFacts"></div>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label small fw-semibold text-secondary">Related terms</label>
+                  <div class="refbox" id="encRelTerms"></div>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label small fw-semibold text-secondary">Sources</label>
+                  <div class="structured" id="encSources"></div>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label small fw-semibold text-secondary">Related myths</label>
+                  <div class="refbox" id="encRelMyths"></div>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label small fw-semibold text-secondary">Related articles</label>
+                  <div class="refbox" id="encRelArticles"></div>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label small fw-semibold text-secondary">Image <span class="text-secondary small">(optional)</span></label>
+                  <input data-eenc="image" class="form-control" placeholder="/assets/images/… or empty" />
+                </div>
+                <div class="col-12">
+                  <label class="form-label small fw-semibold text-secondary">Debunking snippet <span class="text-secondary small">(optional short myth debunk)</span></label>
+                  <textarea data-eenc="debunkingSnippet" class="form-control" rows="2" placeholder="Shown when this entry debunks a common myth…"></textarea>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= Articles & Posts tab ================= -->
+  <div id="tab-articles" style="display:none">
+    <div class="row g-4">
+      <!-- Trees -->
+      <div class="col-lg-4 col-xl-3">
+        <div class="card mb-3">
+          <div class="card-header d-flex align-items-center gap-2">
+            <i class="bi bi-file-text me-1"></i>Articles <span class="badge text-bg-secondary" id="artTreeCount"></span>
+          </div>
+          <div class="card-body">
+            <div class="input-group input-group-sm mb-2">
+              <span class="input-group-text"><i class="bi bi-search"></i></span>
+              <input id="artSearch" class="form-control" placeholder="Search articles…" />
+            </div>
+            <div class="tree" id="artTree">
+              <div class="text-secondary small py-2">Load a database or create a blank one to start editing.</div>
+            </div>
+          </div>
+          <div class="card-footer">
+            <button class="btn btn-outline-primary btn-sm w-100" id="newArtBtn" disabled>
+              <i class="bi bi-plus-lg me-1"></i>New article
+            </button>
+            <div id="artAddForm" style="display:none" class="mt-3">
+              <input id="aafId" class="form-control form-control-sm mb-2" placeholder="article-id (kebab-case)" spellcheck="false" />
+              <input id="aafTitle" class="form-control form-control-sm mb-2" placeholder="Title" />
+              <div class="d-flex gap-2">
+                <button id="aafCreate" class="btn btn-primary btn-sm flex-grow-1">Create</button>
+                <button id="aafCancel" class="btn btn-outline-secondary btn-sm">Cancel</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header d-flex align-items-center gap-2">
+            <i class="bi bi-megaphone me-1"></i>Posts <span class="badge text-bg-secondary" id="postTreeCount"></span>
+          </div>
+          <div class="card-body">
+            <div class="input-group input-group-sm mb-2">
+              <span class="input-group-text"><i class="bi bi-search"></i></span>
+              <input id="postSearch" class="form-control" placeholder="Search posts…" />
+            </div>
+            <div class="tree" id="postTree">
+              <div class="text-secondary small py-2">Load a database or create a blank one to start editing.</div>
+            </div>
+          </div>
+          <div class="card-footer">
+            <button class="btn btn-outline-primary btn-sm w-100" id="newPostBtn" disabled>
+              <i class="bi bi-plus-lg me-1"></i>New post
+            </button>
+            <div id="postAddForm" style="display:none" class="mt-3">
+              <input id="pafId" class="form-control form-control-sm mb-2" placeholder="post-id (kebab-case)" spellcheck="false" />
+              <input id="pafTitle" class="form-control form-control-sm mb-2" placeholder="Title" />
+              <div class="d-flex gap-2">
+                <button id="pafCreate" class="btn btn-primary btn-sm flex-grow-1">Create</button>
+                <button id="pafCancel" class="btn btn-outline-secondary btn-sm">Cancel</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main panel -->
+      <div class="col-lg-8 col-xl-9" id="apmain">
+        <div id="apEmptyPanel" class="card">
+          <div class="card-body text-secondary">
+            <i class="bi bi-arrow-left-circle fs-5 me-2 align-middle"></i>Select an article or a post on the left to edit it.
+            Changes autosave to the in-memory DB — hit <b>Export .db</b> when done.
+          </div>
+        </div>
+
+        <!-- Article editor -->
+        <div id="artCard" style="display:none">
+          <div class="card mb-3">
+            <div class="card-header d-flex align-items-center flex-wrap gap-2">
+              <i class="bi bi-file-text text-primary"></i>
+              <strong>Article <span class="text-secondary small" id="artLabel"></span></strong>
+              <span class="ms-auto d-flex gap-2">
+                <button id="dupArtBtn" class="btn btn-outline-secondary btn-sm"><i class="bi bi-files me-1"></i>Duplicate</button>
+                <button id="delArtBtn" class="btn btn-outline-danger btn-sm"><i class="bi bi-trash me-1"></i>Delete</button>
+              </span>
+            </div>
+            <div class="card-body">
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label small fw-semibold text-secondary">Title</label>
+                  <input data-eart="title" class="form-control" placeholder="Article title" />
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label small fw-semibold text-secondary">Type</label>
+                  <select data-eart="type" class="form-select">
+                    <option value="article">article</option>
+                    <option value="news">news</option>
+                    <option value="research">research</option>
+                    <option value="opinion">opinion</option>
+                    <option value="guide">guide</option>
+                  </select>
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label small fw-semibold text-secondary">Category</label>
+                  <input data-eart="category" class="form-control" placeholder="safety / history / …" />
+                </div>
+                <div class="col-md-8">
+                  <label class="form-label small fw-semibold text-secondary">Subtitle <span class="text-secondary small">(optional)</span></label>
+                  <input data-eart="subtitle" class="form-control" placeholder="Displayed under the title…" />
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label small fw-semibold text-secondary">Difficulty <span class="text-secondary small">(optional)</span></label>
+                  <select data-eart="difficulty" class="form-select">
+                    <option value="">— none —</option>
+                    <option value="beginner">beginner</option>
+                    <option value="intermediate">intermediate</option>
+                    <option value="advanced">advanced</option>
+                  </select>
+                </div>
+                <div class="col-12">
+                  <label class="form-label small fw-semibold text-secondary">Excerpt <span class="text-secondary small">(feed summary)</span></label>
+                  <textarea data-eart="excerpt" class="form-control" rows="2" placeholder="One or two sentences…"></textarea>
+                </div>
+                <div class="col-12">
+                  <label class="form-label small fw-semibold text-secondary">Content <span class="text-secondary small">(markdown)</span></label>
+                  <textarea data-eart="content" class="form-control" rows="12" placeholder="# Heading…"></textarea>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label small fw-semibold text-secondary">Author</label>
+                  <div class="structured" id="artAuthor"></div>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label small fw-semibold text-secondary">Related myths</label>
+                  <div class="refbox" id="artRelMyths"></div>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label small fw-semibold text-secondary">Related facts</label>
+                  <div class="refbox" id="artRelFacts"></div>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label small fw-semibold text-secondary">Published date</label>
+                  <input data-eart="publishedDate" class="form-control" placeholder="2026-01-31" spellcheck="false" />
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label small fw-semibold text-secondary">Read time (minutes)</label>
+                  <input type="number" data-eart="readTime" class="form-control" min="0" step="1" />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label small fw-semibold text-secondary">Image <span class="text-secondary small">(optional)</span></label>
+                  <input data-eart="image" class="form-control" placeholder="@/assets/… or https://…" />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label small fw-semibold text-secondary">Source <span class="text-secondary small">(name + optional URL)</span></label>
+                  <input data-eart="source" class="form-control mb-2" placeholder="IAEA" />
+                  <input data-eart="sourceUrl" class="form-control" placeholder="https://…" spellcheck="false" />
+                </div>
+                <div class="col-md-4 d-flex align-items-end gap-2 pb-2">
+                  <input type="checkbox" data-eart="featured" class="form-check-input mt-0" id="artFeaturedChk" />
+                  <label class="form-check-label small fw-semibold text-secondary" for="artFeaturedChk">Featured in feed</label>
+                </div>
+                <div class="col-12">
+                  <label class="form-label small fw-semibold text-secondary">Tags</label>
+                  <div class="chips" id="artTags"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Post editor -->
+        <div id="postCard" style="display:none">
+          <div class="card mb-3">
+            <div class="card-header d-flex align-items-center flex-wrap gap-2">
+              <i class="bi bi-megaphone text-primary"></i>
+              <strong>Post <span class="text-secondary small" id="postLabel"></span></strong>
+              <span class="ms-auto d-flex gap-2">
+                <button id="dupPostBtn" class="btn btn-outline-secondary btn-sm"><i class="bi bi-files me-1"></i>Duplicate</button>
+                <button id="delPostBtn" class="btn btn-outline-danger btn-sm"><i class="bi bi-trash me-1"></i>Delete</button>
+              </span>
+            </div>
+            <div class="card-body">
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label small fw-semibold text-secondary">Title</label>
+                  <input data-epost="title" class="form-control" placeholder="Post title" />
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label small fw-semibold text-secondary">Type</label>
+                  <input data-epost="type" class="form-control" placeholder="news / quick-tip / …" />
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label small fw-semibold text-secondary">Category</label>
+                  <input data-epost="category" class="form-control" placeholder="energy / technology / …" />
+                </div>
+                <div class="col-12">
+                  <label class="form-label small fw-semibold text-secondary">Content</label>
+                  <textarea data-epost="content" class="form-control" rows="6" placeholder="The post body…"></textarea>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label small fw-semibold text-secondary">Author</label>
+                  <div class="structured" id="postAuthor"></div>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label small fw-semibold text-secondary">Published date</label>
+                  <input data-epost="publishedDate" class="form-control" placeholder="2026-01-31" spellcheck="false" />
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label small fw-semibold text-secondary">Image <span class="text-secondary small">(optional)</span></label>
+                  <input data-epost="image" class="form-control" placeholder="@/assets/… or https://…" />
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label small fw-semibold text-secondary">Source <span class="text-secondary small">(name + optional URL)</span></label>
+                  <input data-epost="source" class="form-control mb-2" placeholder="ANSTO" />
+                  <input data-epost="sourceUrl" class="form-control" placeholder="https://…" spellcheck="false" />
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label small fw-semibold text-secondary">Video URL <span class="text-secondary small">(optional)</span></label>
+                  <input data-epost="videoUrl" class="form-control" placeholder="https://…" spellcheck="false" />
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label small fw-semibold text-secondary">Related content</label>
+                  <div class="refbox" id="postRelContent"></div>
+                </div>
+                <div class="col-12">
+                  <label class="form-label small fw-semibold text-secondary">Tags</label>
+                  <div class="chips" id="postTags"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- ================= SQL tab ================= -->
   <div id="tab-sql" style="display:none">
     <div class="row g-4">
@@ -510,6 +1307,9 @@ ORDER BY l.unit_id, l.id;</textarea>
               <button class="btn btn-outline-secondary btn-sm" data-sql="SELECT * FROM quizzes ORDER BY id;" onclick="setQuick(this)">all quizzes</button>
               <button class="btn btn-outline-secondary btn-sm" data-sql="SELECT quiz_id, position, id, type, question FROM quiz_questions ORDER BY quiz_id, position LIMIT 100;" onclick="setQuick(this)">all questions</button>
               <button class="btn btn-outline-secondary btn-sm" data-sql="SELECT difficulty, position, id, question FROM mythbuster_questions ORDER BY difficulty, position LIMIT 100;" onclick="setQuick(this)">mythbuster</button>
+              <button class="btn btn-outline-secondary btn-sm" data-sql="SELECT id, term, category, difficulty FROM encyclopedia_entries ORDER BY term;" onclick="setQuick(this)">encyclopedia</button>
+              <button class="btn btn-outline-secondary btn-sm" data-sql="SELECT id, type, category, title, published_date, featured FROM articles ORDER BY published_date DESC;" onclick="setQuick(this)">articles</button>
+              <button class="btn btn-outline-secondary btn-sm" data-sql="SELECT id, type, category, title, published_date FROM posts ORDER BY published_date DESC;" onclick="setQuick(this)">posts</button>
             </div>
             <label class="form-label small fw-semibold text-secondary mt-3 mb-1">Result — <span id="rowCount" class="text-secondary normal-case fw-normal">0 rows</span></label>
             <div class="table-responsive" id="result" style="max-height:480px"></div>
@@ -521,13 +1321,24 @@ ORDER BY l.unit_id, l.id;</textarea>
         <div class="card mb-3">
           <div class="card-header"><i class="bi bi-box-arrow-down me-1 text-success"></i>Export</div>
           <div class="card-body">
+            <div class="small text-secondary mb-2">
+              <b>Save to repo</b> (recommended when the editor is served via
+              <code>npm run content-editor</code>): writes this database over
+              <code>content/lessons/content.db</code> <i>and</i>
+              <code>assets/database/content.db</code>, keeps a
+              <code>.bak-&lt;timestamp&gt;</code> of the previous file, and bumps
+              <code>CONTENT_DB_VERSION</code> in <code>services/content-db.ts</code>
+              so every device refreshes its bundled copy on next launch.
+            </div>
             <div class="small text-secondary mb-3">
-              Serializes the in-memory database to bytes and downloads it as a new <code>.db</code>.
-              Copy it over <code>assets/database/content.db</code> and bump
-              <code>CONTENT_DB_VERSION</code> in <code>services/content-db.ts</code> to ship it.
+              <b>Export .db</b> just downloads the file — copy it over
+              <code>assets/database/content.db</code> and bump the version yourself.
+              Both paths run a SQLite <code>integrity_check</code> first.
+              <span class="d-block mt-1"><kbd>Ctrl</kbd>/<kbd>⌘</kbd> + <kbd>S</kbd> exports.</span>
             </div>
             <div class="d-flex gap-2 flex-wrap">
               <button id="exportBtn" class="btn btn-success" disabled><i class="bi bi-download me-1"></i>Export &amp; download .db</button>
+              <button id="saveRepoBtn2" class="btn btn-primary" style="display:none" onclick="saveToRepo()"><i class="bi bi-cloud-arrow-up me-1"></i>Save to repo</button>
               <button id="resetBtn" class="btn btn-outline-secondary"><i class="bi bi-arrow-counterclockwise me-1"></i>Start over</button>
             </div>
           </div>
@@ -583,6 +1394,16 @@ let quizPanelOn = false; // whether the left panel currently points at a quiz
 let curMb = null;        // single mythbuster_questions row (parsed)
 let mbPanelOn = false;
 let mbFilter = "";       // "" | "easy" | "medium" | "hard"
+// Myths & Facts editor state
+let curMyth = null;      // { id, title, mythStatement, reality, ... } (parsed)
+let mythPanelOn = false;
+let curFact = null;      // { id, title, statement, importance, ... } (parsed)
+let factPanelOn = false;
+// Encyclopedia editor state
+let curEnc = null;       // { id, term, definition, quickFacts, ... } (parsed)
+// Articles & Posts editor state
+let curArt = null;       // { id, title, excerpt, author, tags, ... } (parsed)
+let curPost = null;      // { id, title, content, author, tags, ... } (parsed)
 
 const esc = s => String(s == null ? "" : s)
   .replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -595,6 +1416,283 @@ function toast(m, err) {
   $("#statusBody").textContent = m;
   clearTimeout(toastT);
   toastT = setTimeout(() => e.classList.remove("show"), 2400);
+}
+
+// ---------------------------------------------------------------------------
+// Editor niceties: dirty tracking, JSON-field validation, save-to-repo
+// ---------------------------------------------------------------------------
+let dirty = false;
+
+function setDirty(v) {
+  dirty = v;
+  $("#dirtyBadge").style.display = v ? "inline-block" : "none";
+}
+
+window.addEventListener("beforeunload", e => {
+  if (dirty) { e.preventDefault(); e.returnValue = ""; }
+});
+
+// --- JSON textareas: live validity + auto pretty-format on blur -------------
+// Every textarea below holds raw JSON (ids arrays, source objects, …). They
+// get a data-json attribute at startup; while typing the border shows
+// green/red, and on blur valid JSON is reformatted to 2-space pretty print.
+// Every textarea below holds raw JSON. Most JSON fields now use friendly
+// structured editors (renderRefbox / renderSources / renderAuthor); the only
+// remaining JSON textarea is the legacy quiz `metadata` blob.
+const JSON_FIELD_ATTRS = [
+  ["data-qfl", ["metadata"]],
+];
+
+function tagJsonFields() {
+  JSON_FIELD_ATTRS.forEach(([attr, fields]) =>
+    fields.forEach(f =>
+      document.querySelectorAll(`[${attr}="${f}"]`).forEach(el => {
+        if (el.tagName === "TEXTAREA") el.setAttribute("data-json", "");
+      })
+    )
+  );
+}
+
+function validateJSONField(el, format) {
+  const v = el.value.trim();
+  el.classList.remove("json-ok", "json-bad");
+  if (!v) { el.title = "JSON — leave empty for the default"; return true; }
+  try {
+    const parsed = JSON.parse(v);
+    el.classList.add("json-ok");
+    el.title = "Valid JSON (" + (Array.isArray(parsed) ? parsed.length + " items" : typeof parsed) + ")";
+    if (format) {
+      const pretty = JSON.stringify(parsed, null, 2);
+      if (pretty !== el.value) el.value = pretty;
+    }
+    return true;
+  } catch (e) {
+    el.classList.add("json-bad");
+    el.title = "Invalid JSON — " + e.message;
+    return false;
+  }
+}
+
+document.addEventListener("input", e => {
+  const el = e.target;
+  if (el.matches && el.matches("textarea[data-json]")) validateJSONField(el, false);
+});
+document.addEventListener("change", e => {
+  const el = e.target;
+  if (el.matches && el.matches("textarea[data-json]")) validateJSONField(el, true);
+});
+
+// ---------------------------------------------------------------------------
+// Structured editors — friendly replacements for the raw JSON fields.
+//
+// Non-programmers should never have to type `["id-1","id-2"]` or
+// `{"name":"…"}`. Three reusable components cover every JSON field:
+//   renderRefbox   — chip multi-select of ids pulled live from the database
+//                    (facts, myths, lessons, encyclopedia entries, …)
+//   renderSources  — row editor for the [{organization,title,url}] arrays
+//   renderAuthor   — plain Name / Title / Avatar inputs for the author object
+// (The quiz `metadata` blob stays a JSON textarea — it's a legacy field.)
+// ---------------------------------------------------------------------------
+
+/** Catalog of referenceable ids for a kind, [{id,label}] from the database. */
+function refList(kind) {
+  const map = {
+    myths: "SELECT id, title AS label FROM myths ORDER BY title",
+    facts: "SELECT id, title AS label FROM facts ORDER BY title",
+    lessons: "SELECT id, title AS label FROM lessons ORDER BY title",
+    entries: "SELECT id, term AS label FROM encyclopedia_entries ORDER BY term",
+    articles: "SELECT id, title AS label FROM articles ORDER BY title",
+    posts: "SELECT id, title AS label FROM posts ORDER BY title",
+  };
+  if (!map[kind]) return [];
+  try { return qAll(map[kind]).map(r => ({ id: r.id, label: r.label || r.id })); }
+  catch { return []; }
+}
+
+/** Grouped catalog (posts' relatedContent may point at articles/posts/myths/facts). */
+function refGroups(kind) {
+  if (kind !== "mixed") return null;
+  return [
+    { label: "Articles", options: refList("articles") },
+    { label: "Posts", options: refList("posts") },
+    { label: "Myths", options: refList("myths") },
+    { label: "Facts", options: refList("facts") },
+  ].filter(g => g.options.length);
+}
+
+/**
+ * Render a chip multi-select of database ids into `boxSel`.
+ * cfg = { kind, get: () => string[], set: (arr) => void }.
+ */
+function renderRefbox(boxSel, cfg) {
+  const box = $(boxSel);
+  if (!box) return;
+  const groups = refGroups(cfg.kind);
+  const flat = groups ? groups.flatMap(g => g.options) : refList(cfg.kind);
+  const meta = new Map(flat.map(o => [o.id, o.label]));
+  const selected = (cfg.get() || []).filter(Boolean);
+  const chosen = new Set(selected);
+
+  const chips = selected.map(id =>
+    `<span class="chip" title="${esc(id)}">${esc(meta.get(id) || id)}<span class="refbox-id">${esc(id)}</span>` +
+    `<button class="x" data-act="refbox-del" data-id="${esc(id)}" title="Remove"><i class="bi bi-x-lg"></i></button></span>`
+  ).join("");
+
+  const optionsHtml = groups
+    ? groups.map(g => {
+        const opts = g.options.filter(o => !chosen.has(o.id));
+        return opts.length
+          ? `<optgroup label="${esc(g.label)}">` + opts.map(o => `<option value="${esc(o.id)}">${esc(o.label)} · ${esc(o.id)}</option>`).join("") + "</optgroup>"
+          : "";
+      }).join("")
+    : flat.filter(o => !chosen.has(o.id))
+        .map(o => `<option value="${esc(o.id)}">${esc(o.label)} · ${esc(o.id)}</option>`).join("");
+  const remaining = flat.filter(o => !chosen.has(o.id)).length;
+
+  box.innerHTML =
+    `<div class="chips refbox-chips mb-2">${chips || '<span class="text-secondary small">None selected yet</span>'}</div>` +
+    `<div class="input-group input-group-sm refbox-add">` +
+      `<select class="form-select refbox-select"${remaining ? "" : " disabled"}>` +
+        (remaining ? optionsHtml : '<option value="">— everything is already linked —</option>') +
+      `</select>` +
+      `<button class="btn btn-outline-primary" data-act="refbox-add"${remaining ? "" : " disabled"}><i class="bi bi-plus-lg me-1"></i>Add</button>` +
+    `</div>`;
+
+  box.querySelector('[data-act="refbox-add"]').onclick = () => {
+    const s = box.querySelector(".refbox-select");
+    if (!s || !s.value) return;
+    const arr = (cfg.get() || []).filter(Boolean);
+    if (!arr.includes(s.value)) cfg.set([...arr, s.value]);
+  };
+  box.querySelectorAll('[data-act="refbox-del"]').forEach(b => {
+    b.onclick = () => cfg.set((cfg.get() || []).filter(id => id !== b.dataset.id));
+  });
+}
+
+/**
+ * Render a row editor for `sources` arrays ([{organization,title,url}]).
+ * cfg = { get: () => array, set: (arr, quiet) => void } — `quiet` saves
+ * without re-rendering so typing keeps focus.
+ */
+function renderSources(boxSel, cfg) {
+  const box = $(boxSel);
+  if (!box) return;
+  const rows = Array.isArray(cfg.get()) ? cfg.get() : [];
+  const collect = () => Array.from(box.querySelectorAll(".src-row")).map(r => ({
+    organization: r.querySelector(".src-org").value.trim(),
+    title: r.querySelector(".src-title").value.trim(),
+    url: r.querySelector(".src-url").value.trim(),
+  }));
+  const keep = arr => arr.filter(s => s.organization || s.title || s.url);
+
+  box.innerHTML =
+    (rows.length
+      ? rows.map((s, i) =>
+          `<div class="src-row" data-i="${i}">
+             <div class="row g-1 align-items-center">
+               <div class="col-md"><input class="form-control form-control-sm src-org" placeholder="Organization (e.g. IAEA)" value="${esc(s.organization || "")}"></div>
+               <div class="col-md"><input class="form-control form-control-sm src-title" placeholder="Title (e.g. Radiation Protection)" value="${esc(s.title || "")}"></div>
+               <div class="col-lg"><input class="form-control form-control-sm src-url" placeholder="https://…" spellcheck="false" value="${esc(s.url || "")}"></div>
+               <div class="col-auto"><button class="btn btn-outline-danger btn-sm" data-act="src-del" data-i="${i}" title="Remove source"><i class="bi bi-x"></i></button></div>
+             </div>
+           </div>`).join("")
+      : '<div class="text-secondary small mb-2">No sources yet.</div>') +
+    `<button class="btn btn-outline-primary btn-sm" data-act="src-add"><i class="bi bi-plus-lg me-1"></i>Add source</button>`;
+
+  box.querySelectorAll(".src-row input").forEach(inp => {
+    inp.addEventListener("input", () => cfg.set(keep(collect()), true));
+  });
+  box.querySelector('[data-act="src-add"]').onclick = () => cfg.set([...rows, { organization: "", title: "", url: "" }]);
+  box.querySelectorAll('[data-act="src-del"]').forEach(b => {
+    b.onclick = () => { const next = collect(); next.splice(Number(b.dataset.i), 1); cfg.set(next); };
+  });
+}
+
+/**
+ * Render Name / Title / Avatar inputs for an author object.
+ * cfg = { get: () => {name,avatar,title}, set: (obj) => void }.
+ */
+function renderAuthor(boxSel, cfg) {
+  const box = $(boxSel);
+  if (!box) return;
+  const a = cfg.get() || {};
+  box.innerHTML =
+    `<div class="row g-2">
+       <div class="col-12"><input class="form-control form-control-sm au-name" placeholder="Name (e.g. Dr. Sarah Chen)" value="${esc(a.name || "")}"></div>
+       <div class="col-12"><input class="form-control form-control-sm au-title" placeholder="Title (optional — e.g. Radiation Safety Specialist)" value="${esc(a.title || "")}"></div>
+       <div class="col-12"><input class="form-control form-control-sm au-avatar" placeholder="Avatar — @/assets/… path or https://… URL" value="${esc(a.avatar || "")}"></div>
+     </div>`;
+  const update = () => cfg.set({
+    name: box.querySelector(".au-name").value,
+    title: box.querySelector(".au-title").value,
+    avatar: box.querySelector(".au-avatar").value,
+  });
+  box.querySelectorAll("input").forEach(i => i.addEventListener("input", update));
+}
+// --- Save-to-repo (only available when served via `npm run content-editor`) --
+const SAVE_API = { ping: "../__editor/ping", save: "../__editor/save-db" };
+let saveApiAvailable = false;
+
+async function detectSaveApi() {
+  try {
+    const r = await fetch(SAVE_API.ping, { cache: "no-store" });
+    if (r.ok) {
+      const j = await r.json();
+      saveApiAvailable = !!(j && j.ok);
+    }
+  } catch { /* static hosting / file:// — button stays hidden */ }
+  ["#saveRepoBtn", "#saveRepoBtn2"].forEach(sel => {
+    const btn = $(sel);
+    if (btn) btn.style.display = saveApiAvailable ? "inline-block" : "none";
+  });
+}
+
+function checkDbIntegrity() {
+  try {
+    const r = db.exec("PRAGMA integrity_check");
+    const ok = !!(r.length && r[0].values.length && r[0].values[0][0] === "ok");
+    if (!ok && r.length) console.warn("integrity_check:", r[0].values);
+    return ok;
+  } catch { return false; }
+}
+
+async function saveToRepo() {
+  if (!db) { toast("Nothing to save — load a database first", 1); return; }
+  const btns = ["#saveRepoBtn", "#saveRepoBtn2"].map($).filter(Boolean);
+  btns.forEach(b => { b.disabled = true; });
+  const label = b => { b.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Saving…'; };
+  const restore = b => {
+    b.disabled = false;
+    b.innerHTML = '<i class="bi bi-cloud-arrow-up me-1"></i>Save to repo';
+  };
+  btns.forEach(label);
+  try {
+    if (!checkDbIntegrity()) throw new Error("database failed PRAGMA integrity_check");
+    const bytes = db.export();
+    const resp = await fetch(SAVE_API.save, { method: "POST", body: bytes });
+    const j = await resp.json().catch(() => ({}));
+    if (!resp.ok || !j.ok) throw new Error(j.error || ("HTTP " + resp.status));
+    setDirty(false);
+    toast("Saved to repo · content.db v" + (j.version ?? "?") + " · " + Math.round(j.bytes / 1024) + " KB");
+  } catch (e) {
+    toast("Save failed: " + e.message, 1);
+  } finally {
+    btns.forEach(restore);
+  }
+}
+
+// --- Remote schema: prefer the repo's schema.sql so the editor can never
+// drift from scripts/content-migration/schema.sql (falls back to the copy
+// embedded below when the file isn't reachable, e.g. on file://). -----------
+let REMOTE_SCHEMA_SQL = null;
+async function fetchRemoteSchema() {
+  try {
+    const r = await fetch("../scripts/content-migration/schema.sql", { cache: "no-store" });
+    if (r.ok) {
+      const text = await r.text();
+      if (text.includes("CREATE TABLE")) REMOTE_SCHEMA_SQL = text;
+    }
+  } catch { /* fall back to the embedded schema */ }
 }
 
 // ---------------------------------------------------------------------------
@@ -619,6 +1717,7 @@ function qVal(sql, params, def) {
 
 function run(sql, params) {
   db.run(sql, params || []);
+  setDirty(true);
 }
 
 function tableNames() {
@@ -725,6 +1824,170 @@ CREATE INDEX IF NOT EXISTS idx_quizzes_category    ON quizzes(category);
 CREATE INDEX IF NOT EXISTS idx_quizzes_difficulty  ON quizzes(difficulty);
 CREATE INDEX IF NOT EXISTS idx_quiz_questions_quiz ON quiz_questions(quiz_id);
 CREATE INDEX IF NOT EXISTS idx_mythbuster_difficulty ON mythbuster_questions(difficulty);
+
+CREATE TABLE IF NOT EXISTS myths (
+  id             TEXT PRIMARY KEY,
+  title          TEXT NOT NULL,
+  myth_statement TEXT NOT NULL DEFAULT '',
+  reality        TEXT NOT NULL DEFAULT '',
+  explanation    TEXT NOT NULL DEFAULT '',
+  category       TEXT NOT NULL DEFAULT '',
+  difficulty     TEXT NOT NULL DEFAULT 'easy'
+                 CHECK (difficulty IN ('easy', 'medium', 'hard')),
+  sources        TEXT NOT NULL DEFAULT '[]'
+                 CONSTRAINT myths_sources_json CHECK (json_valid(sources)),
+  related_facts  TEXT NOT NULL DEFAULT '[]'
+                 CONSTRAINT myths_related_facts_json CHECK (json_valid(related_facts)),
+  related_lessons TEXT NOT NULL DEFAULT '[]'
+                 CONSTRAINT myths_related_lessons_json CHECK (json_valid(related_lessons)),
+  image          TEXT,
+  tags           TEXT NOT NULL DEFAULT '[]'
+                 CONSTRAINT myths_tags_json CHECK (json_valid(tags)),
+  popularity     INTEGER NOT NULL DEFAULT 0,
+  created_at     INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
+  updated_at     INTEGER NOT NULL DEFAULT (strftime('%s', 'now'))
+);
+CREATE TABLE IF NOT EXISTS facts (
+  id             TEXT PRIMARY KEY,
+  title          TEXT NOT NULL,
+  statement      TEXT NOT NULL DEFAULT '',
+  explanation    TEXT NOT NULL DEFAULT '',
+  category       TEXT NOT NULL DEFAULT '',
+  importance     TEXT NOT NULL DEFAULT 'medium'
+                 CHECK (importance IN ('low', 'medium', 'high', 'critical')),
+  sources        TEXT NOT NULL DEFAULT '[]'
+                 CONSTRAINT facts_sources_json CHECK (json_valid(sources)),
+  related_myths  TEXT NOT NULL DEFAULT '[]'
+                 CONSTRAINT facts_related_myths_json CHECK (json_valid(related_myths)),
+  related_lessons TEXT NOT NULL DEFAULT '[]'
+                 CONSTRAINT facts_related_lessons_json CHECK (json_valid(related_lessons)),
+  image          TEXT,
+  tags           TEXT NOT NULL DEFAULT '[]'
+                 CONSTRAINT facts_tags_json CHECK (json_valid(tags)),
+  date_added     TEXT NOT NULL DEFAULT '',
+  last_updated   TEXT NOT NULL DEFAULT '',
+  created_at     INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
+  updated_at     INTEGER NOT NULL DEFAULT (strftime('%s', 'now'))
+);
+CREATE INDEX IF NOT EXISTS idx_myths_category      ON myths(category);
+CREATE INDEX IF NOT EXISTS idx_myths_difficulty    ON myths(difficulty);
+CREATE INDEX IF NOT EXISTS idx_facts_category      ON facts(category);
+CREATE INDEX IF NOT EXISTS idx_facts_importance    ON facts(importance);
+
+CREATE TABLE IF NOT EXISTS mazes (
+  id              TEXT PRIMARY KEY,
+  title           TEXT NOT NULL,
+  description     TEXT NOT NULL,
+  theme           TEXT NOT NULL DEFAULT '',
+  xp_reward       INTEGER NOT NULL DEFAULT 0,
+  time_limit      INTEGER,
+  player_max_hp   INTEGER NOT NULL DEFAULT 100,
+  boss            TEXT NOT NULL DEFAULT '{}'
+                  CONSTRAINT mazes_boss_json CHECK (json_valid(boss)),
+  created_at      INTEGER NOT NULL DEFAULT (strftime('%s','now')),
+  updated_at      INTEGER NOT NULL DEFAULT (strftime('%s','now'))
+);
+CREATE TABLE IF NOT EXISTS maze_rooms (
+  maze_id           TEXT NOT NULL REFERENCES mazes(id) ON DELETE CASCADE,
+  id                TEXT NOT NULL,
+  position          INTEGER NOT NULL CHECK (position >= 0),
+  title             TEXT NOT NULL,
+  description       TEXT NOT NULL,
+  monster           TEXT NOT NULL DEFAULT '{}'
+                    CONSTRAINT maze_rooms_monster_json CHECK (json_valid(monster)),
+  questions         TEXT NOT NULL DEFAULT '[]'
+                    CONSTRAINT maze_rooms_questions_json CHECK (json_valid(questions)),
+  damage_per_correct INTEGER NOT NULL DEFAULT 0,
+  explanation       TEXT NOT NULL DEFAULT '',
+  next_room_id      TEXT,
+  alternative_path_id TEXT,
+  unlock_condition  TEXT
+                    CHECK (unlock_condition IS NULL OR json_valid(unlock_condition)),
+  created_at        INTEGER NOT NULL DEFAULT (strftime('%s','now')),
+  updated_at        INTEGER NOT NULL DEFAULT (strftime('%s','now')),
+  PRIMARY KEY (maze_id, id),
+  UNIQUE (maze_id, position)
+);
+CREATE INDEX IF NOT EXISTS idx_maze_rooms_maze     ON maze_rooms(maze_id);
+
+CREATE TABLE IF NOT EXISTS encyclopedia_entries (
+  id             TEXT PRIMARY KEY,
+  term           TEXT NOT NULL,
+  definition     TEXT NOT NULL,
+  category       TEXT NOT NULL DEFAULT '',
+  related_terms  TEXT NOT NULL DEFAULT '[]'
+                 CONSTRAINT encyclopedia_related_terms_json CHECK (json_valid(related_terms)),
+  quick_facts    TEXT NOT NULL DEFAULT '[]'
+                 CONSTRAINT encyclopedia_quick_facts_json CHECK (json_valid(quick_facts)),
+  sources        TEXT NOT NULL DEFAULT '[]'
+                 CONSTRAINT encyclopedia_sources_json CHECK (json_valid(sources)),
+  image          TEXT,
+  debunking_snippet TEXT,
+  related_myths  TEXT NOT NULL DEFAULT '[]'
+                 CONSTRAINT encyclopedia_related_myths_json CHECK (json_valid(related_myths)),
+  related_articles TEXT NOT NULL DEFAULT '[]'
+                 CONSTRAINT encyclopedia_related_articles_json CHECK (json_valid(related_articles)),
+  difficulty     TEXT NOT NULL DEFAULT 'beginner'
+                 CHECK (difficulty IN ('beginner', 'intermediate', 'advanced')),
+  created_at     INTEGER NOT NULL DEFAULT (strftime('%s','now')),
+  updated_at     INTEGER NOT NULL DEFAULT (strftime('%s','now'))
+);
+CREATE INDEX IF NOT EXISTS idx_encyclopedia_category ON encyclopedia_entries(category);
+CREATE INDEX IF NOT EXISTS idx_encyclopedia_difficulty ON encyclopedia_entries(difficulty);
+
+CREATE TABLE IF NOT EXISTS articles (
+  id             TEXT PRIMARY KEY,
+  type           TEXT NOT NULL DEFAULT 'article'
+                 CHECK (type IN ('article', 'news', 'research', 'opinion', 'guide')),
+  category       TEXT NOT NULL DEFAULT '',
+  title          TEXT NOT NULL,
+  subtitle       TEXT,
+  content        TEXT NOT NULL DEFAULT '',
+  excerpt        TEXT NOT NULL DEFAULT '',
+  author         TEXT NOT NULL DEFAULT '{}'
+                 CONSTRAINT articles_author_json CHECK (json_valid(author)),
+  published_date TEXT NOT NULL DEFAULT '',
+  read_time      INTEGER NOT NULL DEFAULT 0,
+  image          TEXT,
+  tags           TEXT NOT NULL DEFAULT '[]'
+                 CONSTRAINT articles_tags_json CHECK (json_valid(tags)),
+  source         TEXT,
+  source_url     TEXT,
+  related_myths  TEXT NOT NULL DEFAULT '[]'
+                 CONSTRAINT articles_related_myths_json CHECK (json_valid(related_myths)),
+  related_facts  TEXT NOT NULL DEFAULT '[]'
+                 CONSTRAINT articles_related_facts_json CHECK (json_valid(related_facts)),
+  featured       INTEGER NOT NULL DEFAULT 0,
+  difficulty     TEXT
+                 CHECK (difficulty IS NULL OR difficulty IN ('beginner', 'intermediate', 'advanced')),
+  created_at     INTEGER NOT NULL DEFAULT (strftime('%s','now')),
+  updated_at     INTEGER NOT NULL DEFAULT (strftime('%s','now'))
+);
+CREATE TABLE IF NOT EXISTS posts (
+  id              TEXT PRIMARY KEY,
+  type            TEXT NOT NULL DEFAULT 'news',
+  category        TEXT NOT NULL DEFAULT '',
+  title           TEXT NOT NULL,
+  content         TEXT NOT NULL DEFAULT '',
+  author          TEXT NOT NULL DEFAULT '{}'
+                  CONSTRAINT posts_author_json CHECK (json_valid(author)),
+  published_date  TEXT NOT NULL DEFAULT '',
+  image           TEXT,
+  tags            TEXT NOT NULL DEFAULT '[]'
+                  CONSTRAINT posts_tags_json CHECK (json_valid(tags)),
+  source          TEXT,
+  source_url      TEXT,
+  video_url       TEXT,
+  related_content TEXT NOT NULL DEFAULT '[]'
+                  CONSTRAINT posts_related_content_json CHECK (json_valid(related_content)),
+  created_at      INTEGER NOT NULL DEFAULT (strftime('%s','now')),
+  updated_at      INTEGER NOT NULL DEFAULT (strftime('%s','now'))
+);
+CREATE INDEX IF NOT EXISTS idx_articles_category  ON articles(category);
+CREATE INDEX IF NOT EXISTS idx_articles_featured  ON articles(featured);
+CREATE INDEX IF NOT EXISTS idx_articles_published ON articles(published_date);
+CREATE INDEX IF NOT EXISTS idx_posts_category     ON posts(category);
+CREATE INDEX IF NOT EXISTS idx_posts_published    ON posts(published_date);
 `;
 
 // ---------------------------------------------------------------------------
@@ -741,6 +2004,7 @@ function openDb(bytes, name, size, sourceLabel) {
     db = new SQL.Database(bytes);
     dbName = name.replace(/\.(db|sqlite3?)$/i, "") + ".db";
     ensureSchema();
+    setDirty(false);
     afterLoad(size);
     renderTree();
     const all = allLessons();
@@ -782,7 +2046,8 @@ function newBlankDb() {
   if (db) { db.close(); db = null; }
   db = new SQL.Database();
   dbName = "content.db";
-  db.exec(SCHEMA_SQL);
+  db.exec(REMOTE_SCHEMA_SQL || SCHEMA_SQL);
+  setDirty(false);
   afterLoad(0);
   renderTree();
   selectNone();
@@ -791,8 +2056,8 @@ function newBlankDb() {
 
 function ensureSchema() {
   const t = tableNames();
-  const need = ["lessons", "lesson_steps", "quizzes", "quiz_questions", "mythbuster_questions"];
-  if (need.some(n => !t.includes(n))) db.exec(SCHEMA_SQL);
+  const need = ["lessons", "lesson_steps", "quizzes", "quiz_questions", "mythbuster_questions", "myths", "facts", "mazes", "maze_rooms", "encyclopedia_entries", "articles", "posts"];
+  if (need.some(n => !t.includes(n))) db.exec(REMOTE_SCHEMA_SQL || SCHEMA_SQL);
 }
 
 function afterLoad(size) {
@@ -805,10 +2070,20 @@ function afterLoad(size) {
   $("#newLessonBtn").disabled = false;
   $("#newQuizBtn").disabled = false;
   $("#newMbBtn").disabled = false;
+  $("#newMythBtn").disabled = false;
+  $("#newFactBtn").disabled = false;
+  $("#newEncBtn").disabled = false;
+  $("#newArtBtn").disabled = false;
+  $("#newPostBtn").disabled = false;
   refreshStats(size);
   renderTables();
   renderQuizTree();
   renderMbTree();
+  renderMythTree();
+  renderFactTree();
+  renderEncTree();
+  renderArtTree();
+  renderPostTree();
   const qs = allQuizzes();
   if (qs.length) loadQuiz(qs[0].id);
 }
@@ -820,7 +2095,20 @@ function refreshStats(sizeBytes) {
   $("#stQuizzes").textContent = safeExec("SELECT COUNT(*) c FROM quizzes") || 0;
   $("#stQuestions").textContent = safeExec("SELECT COUNT(*) c FROM quiz_questions") || 0;
   $("#stMythbusters").textContent = safeExec("SELECT COUNT(*) c FROM mythbuster_questions") || 0;
+  $("#stMyths").textContent = safeExec("SELECT COUNT(*) c FROM myths") || 0;
+  $("#stFacts").textContent = safeExec("SELECT COUNT(*) c FROM facts") || 0;
+  $("#stEncyclopedia").textContent = safeExec("SELECT COUNT(*) c FROM encyclopedia_entries") || 0;
+  $("#stArticles").textContent =
+    ((safeExec("SELECT COUNT(*) c FROM articles") || 0) + "/" +
+     (safeExec("SELECT COUNT(*) c FROM posts") || 0));
   if (sizeBytes) $("#stSize").textContent = (sizeBytes / 1024).toFixed(1) + " KB";
+  // Tab pill counts
+  const pill = (sel, v) => { const el = $(sel); if (el) el.textContent = v; };
+  pill("#pillEditor", safeExec("SELECT COUNT(*) c FROM lessons") ?? "");
+  pill("#pillQuiz", safeExec("SELECT COUNT(*) c FROM quizzes") ?? "");
+  pill("#pillMf", ((safeExec("SELECT COUNT(*) c FROM myths") || 0) + (safeExec("SELECT COUNT(*) c FROM facts") || 0)) || "");
+  pill("#pillEnc", safeExec("SELECT COUNT(*) c FROM encyclopedia_entries") ?? "");
+  pill("#pillArt", ((safeExec("SELECT COUNT(*) c FROM articles") || 0) + (safeExec("SELECT COUNT(*) c FROM posts") || 0)) || "");
 }
 
 function selectNone() {
@@ -1419,6 +2707,7 @@ function renderTables() {
 
 function exportDb() {
   if (!db) { toast("Nothing to export", 1); return; }
+  if (!checkDbIntegrity()) { toast("Export blocked — database failed integrity check", 1); return; }
   try {
     const bytes = db.export();
     const blob = new Blob([bytes], { type: "application/octet-stream" });
@@ -1430,24 +2719,35 @@ function exportDb() {
     a.click();
     a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 8000);
-    toast("Exported " + a.download);
+    setDirty(false);
+    toast("Exported " + a.download + " · " + (bytes.length / 1024).toFixed(1) + " KB · copy over assets/database/content.db");
   } catch (e) { toast("Export failed: " + e.message, 1); }
 }
 
 function resetAll() {
   if (db) { db.close(); db = null; }
+  setDirty(false);
   cur = null; curId = null;
   curQuiz = null; curMb = null;
+  curMyth = null; curFact = null;
+  curEnc = null;
+  curArt = null; curPost = null;
   const b = $("#dbState");
   b.textContent = "No database loaded";
   b.className = "badge text-bg-secondary";
   $("#dropInfo").textContent = "No file selected";
-  ["#stTables", "#stLessons", "#stSteps", "#stSize", "#stQuizzes", "#stQuestions", "#stMythbusters"].forEach(sel => $(sel).textContent = "—");
+  ["#stTables", "#stLessons", "#stSteps", "#stSize", "#stQuizzes", "#stQuestions", "#stMythbusters", "#stMyths", "#stFacts", "#stEncyclopedia", "#stArticles"].forEach(sel => $(sel).textContent = "—");
+  ["#pillEditor", "#pillQuiz", "#pillMf", "#pillEnc", "#pillArt"].forEach(sel => { const el = $(sel); if (el) el.textContent = ""; });
   $("#exportBtn").disabled = true;
   $("#exportTopBtn").disabled = true;
   $("#newLessonBtn").disabled = true;
   $("#newQuizBtn").disabled = true;
   $("#newMbBtn").disabled = true;
+  $("#newMythBtn").disabled = true;
+  $("#newFactBtn").disabled = true;
+  $("#newEncBtn").disabled = true;
+  $("#newArtBtn").disabled = true;
+  $("#newPostBtn").disabled = true;
   $("#tableList").innerHTML = "";
   $("#result").innerHTML = '<div class="text-secondary small py-2">Load a database to begin.</div>';
   $("#lessonCard").style.display = "none";
@@ -1457,9 +2757,27 @@ function resetAll() {
   $("#qEmptyPanel").style.display = "block";
   $("#quizTree").innerHTML = '<div class="text-secondary small py-2">Load a database to begin.</div>';
   $("#mbTree").innerHTML = '<div class="text-secondary small py-2">Load a database to begin.</div>';
+  $("#mythCard").style.display = "none";
+  $("#factCard").style.display = "none";
+  $("#mfEmptyPanel").style.display = "block";
+  $("#mythTree").innerHTML = '<div class="text-secondary small py-2">Load a database to begin.</div>';
+  $("#factTree").innerHTML = '<div class="text-secondary small py-2">Load a database to begin.</div>';
+  $("#encCard").style.display = "none";
+  $("#encEmptyPanel").style.display = "block";
+  $("#encTree").innerHTML = '<div class="text-secondary small py-2">Load a database to begin.</div>';
+  $("#artCard").style.display = "none";
+  $("#postCard").style.display = "none";
+  $("#apEmptyPanel").style.display = "block";
+  $("#artTree").innerHTML = '<div class="text-secondary small py-2">Load a database to begin.</div>';
+  $("#postTree").innerHTML = '<div class="text-secondary small py-2">Load a database to begin.</div>';
   renderTree();
   renderQuizTree();
   renderMbTree();
+  renderMythTree();
+  renderFactTree();
+  renderEncTree();
+  renderArtTree();
+  renderPostTree();
   toast("Session cleared");
 }
 
@@ -1919,6 +3237,885 @@ function renderMb() {
        <div class="form-text">option index (0-based) — ● marks the position</div>`;
 }
 
+// --- Myths & Facts editor ---
+
+const MYTH_COLS = {
+  title: "title", mythStatement: "myth_statement", reality: "reality",
+  explanation: "explanation", category: "category", difficulty: "difficulty",
+  image: "image", popularity: "popularity", tags: "tags", sources: "sources",
+  relatedFacts: "related_facts", relatedLessons: "related_lessons",
+};
+const FACT_COLS = {
+  title: "title", statement: "statement", explanation: "explanation",
+  category: "category", importance: "importance", image: "image", tags: "tags",
+  sources: "sources", relatedMyths: "related_myths",
+  relatedLessons: "related_lessons", dateAdded: "date_added", lastUpdated: "last_updated",
+};
+const MYTH_JSON_COLS = ["tags", "sources", "relatedFacts", "relatedLessons"];
+const FACT_JSON_COLS = ["tags", "sources", "relatedMyths", "relatedLessons"];
+
+function allMyths() {
+  try {
+    return qAll("SELECT id, title, category, difficulty FROM myths ORDER BY id");
+  } catch { return []; }
+}
+function allFacts() {
+  try {
+    return qAll("SELECT id, title, category, importance FROM facts ORDER BY id");
+  } catch { return []; }
+}
+
+function loadMyth(id) {
+  const rows = qAll("SELECT * FROM myths WHERE id = ?", [id]);
+  if (!rows.length) { toast("Myth not found", 1); return; }
+  const r = rows[0];
+  curMyth = {
+    id,
+    title: r.title || "",
+    mythStatement: r.myth_statement || "",
+    reality: r.reality || "",
+    explanation: r.explanation || "",
+    category: r.category || "",
+    difficulty: r.difficulty || "easy",
+    image: r.image || "",
+    popularity: r.popularity || 0,
+    sources: safeJSON(r.sources),
+    relatedFacts: safeJSON(r.related_facts),
+    relatedLessons: safeJSON(r.related_lessons),
+    tags: safeJSON(r.tags),
+  };
+  showMythPanel();
+}
+
+function loadFact(id) {
+  const rows = qAll("SELECT * FROM facts WHERE id = ?", [id]);
+  if (!rows.length) { toast("Fact not found", 1); return; }
+  const r = rows[0];
+  curFact = {
+    id,
+    title: r.title || "",
+    statement: r.statement || "",
+    explanation: r.explanation || "",
+    category: r.category || "",
+    importance: r.importance || "medium",
+    image: r.image || "",
+    sources: safeJSON(r.sources),
+    relatedMyths: safeJSON(r.related_myths),
+    relatedLessons: safeJSON(r.related_lessons),
+    tags: safeJSON(r.tags),
+    dateAdded: r.date_added || "",
+    lastUpdated: r.last_updated || "",
+  };
+  showFactPanel();
+}
+
+function savemythField(field, value) {
+  if (!curMyth || !MYTH_COLS[field]) return;
+  const col = MYTH_COLS[field];
+  if (MYTH_JSON_COLS.indexOf(field) >= 0 && !Array.isArray(value)) {
+    let parsed;
+    try { parsed = JSON.parse(value); }
+    catch { toast(field + " must be valid JSON", 1); return; }
+    if (!Array.isArray(parsed)) { toast(field + " must be a JSON array", 1); return; }
+    value = parsed;
+  }
+  run("UPDATE myths SET " + col + " = ?, updated_at = strftime('%s','now') WHERE id = ?",
+      [Array.isArray(value) ? JSON.stringify(value) : value, curMyth.id]);
+  curMyth[field] = value;
+  refreshStats();
+  renderMythTree();
+  if (field === "tags") renderMythTags();
+}
+
+function savefactField(field, value) {
+  if (!curFact || !FACT_COLS[field]) return;
+  const col = FACT_COLS[field];
+  if (FACT_JSON_COLS.indexOf(field) >= 0 && !Array.isArray(value)) {
+    let parsed;
+    try { parsed = JSON.parse(value); }
+    catch { toast(field + " must be valid JSON", 1); return; }
+    if (!Array.isArray(parsed)) { toast(field + " must be a JSON array", 1); return; }
+    value = parsed;
+  }
+  run("UPDATE facts SET " + col + " = ?, updated_at = strftime('%s','now') WHERE id = ?",
+      [Array.isArray(value) ? JSON.stringify(value) : value, curFact.id]);
+  curFact[field] = value;
+  refreshStats();
+  renderFactTree();
+  if (field === "tags") renderFactTags();
+}
+
+function renderMyth() {
+  $("#mythCard").style.display = "block";
+  $("#mfEmptyPanel").style.display = "none";
+  $("#mythLabel").textContent = " · " + curMyth.id;
+  document.querySelectorAll("#mythCard [data-emyth]").forEach(el => {
+    const key = el.dataset.emyth;
+    if (MYTH_JSON_COLS.indexOf(key) >= 0) return; // structured editors below
+    el.value = curMyth[key] == null ? "" : curMyth[key];
+  });
+  renderMythTags();
+  renderMythStructured();
+}
+
+function renderMythStructured() {
+  if (!curMyth) return;
+  renderSources("#mythSources", {
+    get: () => curMyth.sources || [],
+    set: (arr, quiet) => { savemythField("sources", arr); if (!quiet) renderMythStructured(); },
+  });
+  renderRefbox("#mythRelFacts", {
+    kind: "facts",
+    get: () => curMyth.relatedFacts || [],
+    set: arr => { savemythField("relatedFacts", arr); renderMythStructured(); },
+  });
+  renderRefbox("#mythRelLessons", {
+    kind: "lessons",
+    get: () => curMyth.relatedLessons || [],
+    set: arr => { savemythField("relatedLessons", arr); renderMythStructured(); },
+  });
+}
+
+function renderFact() {
+  $("#factCard").style.display = "block";
+  $("#mfEmptyPanel").style.display = "none";
+  $("#factLabel").textContent = " · " + curFact.id;
+  document.querySelectorAll("#factCard [data-efact]").forEach(el => {
+    const key = el.dataset.efact;
+    if (FACT_JSON_COLS.indexOf(key) >= 0) return; // structured editors below
+    el.value = curFact[key] == null ? "" : curFact[key];
+  });
+  renderFactTags();
+  renderFactStructured();
+}
+
+function renderFactStructured() {
+  if (!curFact) return;
+  renderSources("#factSources", {
+    get: () => curFact.sources || [],
+    set: (arr, quiet) => { savefactField("sources", arr); if (!quiet) renderFactStructured(); },
+  });
+  renderRefbox("#factRelMyths", {
+    kind: "myths",
+    get: () => curFact.relatedMyths || [],
+    set: arr => { savefactField("relatedMyths", arr); renderFactStructured(); },
+  });
+  renderRefbox("#factRelLessons", {
+    kind: "lessons",
+    get: () => curFact.relatedLessons || [],
+    set: arr => { savefactField("relatedLessons", arr); renderFactStructured(); },
+  });
+}
+
+function renderMythTags() {
+  const box = $("#mythTags");
+  const tags = (curMyth.tags || []).filter(Boolean);
+  box.innerHTML =
+    tags.map((t, i) => `<span class="chip">${esc(t)}<button class="x" data-act="myth-del-tag" data-i="${i}"><i class="bi bi-x-lg"></i></button></span>`).join("") +
+    `<input id="mythTagNew" class="form-control form-control-sm w-auto flex-grow-1" placeholder="add tag… ↵" style="min-width:140px" />`;
+  const ni = $("#mythTagNew");
+  ni.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); addMythTag(ni); } });
+  ni.addEventListener("change", () => { if (ni.value) addMythTag(ni); });
+}
+function addMythTag(input) {
+  const v = input.value.trim();
+  if (v && !(curMyth.tags || []).includes(v)) {
+    curMyth.tags.push(v);
+    savemythField("tags", curMyth.tags);
+  }
+  input.value = "";
+  input.focus();
+}
+function renderFactTags() {
+  const box = $("#factTags");
+  const tags = (curFact.tags || []).filter(Boolean);
+  box.innerHTML =
+    tags.map((t, i) => `<span class="chip">${esc(t)}<button class="x" data-act="fact-del-tag" data-i="${i}"><i class="bi bi-x-lg"></i></button></span>`).join("") +
+    `<input id="factTagNew" class="form-control form-control-sm w-auto flex-grow-1" placeholder="add tag… ↵" style="min-width:140px" />`;
+  const ni = $("#factTagNew");
+  ni.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); addFactTag(ni); } });
+  ni.addEventListener("change", () => { if (ni.value) addFactTag(ni); });
+}
+function addFactTag(input) {
+  const v = input.value.trim();
+  if (v && !(curFact.tags || []).includes(v)) {
+    curFact.tags.push(v);
+    savefactField("tags", curFact.tags);
+  }
+  input.value = "";
+  input.focus();
+}
+
+function showMfPanelsHidden() {
+  $("#mfEmptyPanel").style.display = "none";
+  $("#mythCard").style.display = "none";
+  $("#factCard").style.display = "none";
+}
+function showMythPanel() {
+  mythPanelOn = true; factPanelOn = false;
+  showMfPanelsHidden();
+  $("#mythCard").style.display = "block";
+  renderMyth();
+}
+function showFactPanel() {
+  mythPanelOn = false; factPanelOn = true;
+  showMfPanelsHidden();
+  $("#factCard").style.display = "block";
+  renderFact();
+}
+
+function createmyth() {
+  const id = $("#mifId").value.trim().toLowerCase().replace(/\s+/g, "-");
+  const title = $("#mifTitle").value.trim();
+  if (!id) { toast("Myth id is required (kebab-case)", 1); return; }
+  if (qAll("SELECT 1 FROM myths WHERE id = ?", [id]).length) {
+    toast("A myth with id '" + id + "' already exists", 1); return;
+  }
+  run("INSERT INTO myths (id, title, myth_statement, reality, explanation, category, difficulty, sources, related_facts, related_lessons, image, tags, popularity) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)",
+      [id, title || id, "", "", "", "", "easy", "[]", "[]", "[]", null, "[]", 0]);
+  $("#mythAddForm").style.display = "none";
+  $("#mifId").value = ""; $("#mifTitle").value = "";
+  refreshStats(); renderMythTree();
+  loadMyth(id);
+  toast("Myth created");
+}
+
+function duplicatemyth() {
+  if (!curMyth) return;
+  const src = curMyth;
+  let id = src.id + "-copy", n = 1;
+  while (qAll("SELECT 1 FROM myths WHERE id = ?", [id]).length) id = src.id + "-copy" + (++n);
+  run("INSERT INTO myths (id, title, myth_statement, reality, explanation, category, difficulty, sources, related_facts, related_lessons, image, tags, popularity) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)",
+      [id, src.title + " (copy)", src.mythStatement, src.reality, src.explanation, src.category,
+       src.difficulty, JSON.stringify(src.sources), JSON.stringify(src.relatedFacts),
+       JSON.stringify(src.relatedLessons), src.image || null, JSON.stringify(src.tags), src.popularity]);
+  renderMythTree(); refreshStats();
+  loadMyth(id);
+  toast("Duplicated to '" + id + "'");
+}
+
+function deletemyth() {
+  if (!curMyth || !confirm("Delete myth '" + curMyth.title + "'?")) return;
+  run("DELETE FROM myths WHERE id = ?", [curMyth.id]);
+  curMyth = null;
+  showMfPanelsHidden();
+  $("#mfEmptyPanel").style.display = "block";
+  renderMythTree(); refreshStats();
+  toast("Myth deleted");
+}
+
+function createfact() {
+  const id = $("#fifId").value.trim().toLowerCase().replace(/\s+/g, "-");
+  const title = $("#fifTitle").value.trim();
+  if (!id) { toast("Fact id is required (kebab-case)", 1); return; }
+  if (qAll("SELECT 1 FROM facts WHERE id = ?", [id]).length) {
+    toast("A fact with id '" + id + "' already exists", 1); return;
+  }
+  const now = new Date().toISOString();
+  run("INSERT INTO facts (id, title, statement, explanation, category, importance, sources, related_myths, related_lessons, image, tags, date_added, last_updated) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)",
+      [id, title || id, "", "", "", "medium", "[]", "[]", "[]", null, "[]", now, ""]);
+  $("#factAddForm").style.display = "none";
+  $("#fifId").value = ""; $("#fifTitle").value = "";
+  refreshStats(); renderFactTree();
+  loadFact(id);
+  toast("Fact created");
+}
+
+function duplicatefact() {
+  if (!curFact) return;
+  const src = curFact;
+  let id = src.id + "-copy", n = 1;
+  while (qAll("SELECT 1 FROM facts WHERE id = ?", [id]).length) id = src.id + "-copy" + (++n);
+  run("INSERT INTO facts (id, title, statement, explanation, category, importance, sources, related_myths, related_lessons, image, tags, date_added, last_updated) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)",
+      [id, src.title + " (copy)", src.statement, src.explanation, src.category, src.importance,
+       JSON.stringify(src.sources), JSON.stringify(src.relatedMyths), JSON.stringify(src.relatedLessons),
+       src.image || null, JSON.stringify(src.tags), src.dateAdded || new Date().toISOString(), ""]);
+  renderFactTree(); refreshStats();
+  loadFact(id);
+  toast("Duplicated to '" + id + "'");
+}
+
+function deletefact() {
+  if (!curFact || !confirm("Delete fact '" + curFact.title + "'?")) return;
+  run("DELETE FROM facts WHERE id = ?", [curFact.id]);
+  curFact = null;
+  showMfPanelsHidden();
+  $("#mfEmptyPanel").style.display = "block";
+  renderFactTree(); refreshStats();
+  toast("Fact deleted");
+}
+
+// --- Myths / Facts event handlers (delegated on #mfmain) ---
+
+function onMfInput(e) {
+  const el = e.target;
+  if (el.dataset.emyth) {
+    if (!curMyth) return;
+    const key = el.dataset.emyth;
+    if (key === "popularity") { savemythField(key, Math.max(0, Number(el.value) || 0)); return; }
+    if (MYTH_JSON_COLS.indexOf(key) >= 0 && e.type !== "change") return;
+    savemythField(key, el.value);
+    return;
+  }
+  if (el.dataset.efact) {
+    if (!curFact) return;
+    const key = el.dataset.efact;
+    if (FACT_JSON_COLS.indexOf(key) >= 0 && e.type !== "change") return;
+    savefactField(key, el.value);
+  }
+}
+
+function onMfClick(e) {
+  const el = e.target.closest("[data-act]");
+  if (!el) return;
+  const a = el.dataset.act;
+  const i = Number(el.dataset.i);
+  switch (a) {
+    case "myth-pick": loadMyth(el.dataset.id); break;
+    case "fact-pick": loadFact(el.dataset.id); break;
+    case "myth-del-tag":
+      if (curMyth) { const arr = curMyth.tags || []; arr.splice(i, 1); savemythField("tags", arr); renderMythTags(); }
+      break;
+    case "fact-del-tag":
+      if (curFact) { const arr = curFact.tags || []; arr.splice(i, 1); savefactField("tags", arr); renderFactTags(); }
+      break;
+    case "myth-dup": if (curMyth) duplicatemyth(); break;
+    case "myth-del": deletemyth(); break;
+    case "fact-dup": if (curFact) duplicatefact(); break;
+    case "fact-del": deletefact(); break;
+  }
+}
+
+// --- Encyclopedia editor ---
+
+const ENC_COLS = {
+  term: "term", definition: "definition", category: "category", difficulty: "difficulty",
+  image: "image", debunkingSnippet: "debunking_snippet", relatedTerms: "related_terms",
+  quickFacts: "quick_facts", sources: "sources", relatedMyths: "related_myths",
+  relatedArticles: "related_articles",
+};
+const ENC_JSON_COLS = ["relatedTerms", "quickFacts", "sources", "relatedMyths", "relatedArticles"];
+
+function allEncEntries() {
+  try {
+    return qAll("SELECT id, term, category, difficulty FROM encyclopedia_entries ORDER BY term");
+  } catch { return []; }
+}
+
+function loadEnc(id) {
+  const rows = qAll("SELECT * FROM encyclopedia_entries WHERE id = ?", [id]);
+  if (!rows.length) { toast("Entry not found", 1); return; }
+  const r = rows[0];
+  curEnc = {
+    id,
+    term: r.term || "",
+    definition: r.definition || "",
+    category: r.category || "",
+    difficulty: r.difficulty || "beginner",
+    image: r.image || "",
+    debunkingSnippet: r.debunking_snippet || "",
+    sources: safeJSON(r.sources),
+    relatedTerms: safeJSON(r.related_terms),
+    quickFacts: safeJSON(r.quick_facts),
+    relatedMyths: safeJSON(r.related_myths),
+    relatedArticles: safeJSON(r.related_articles),
+  };
+  showEncPanel();
+}
+
+function saveEncField(field, value) {
+  if (!curEnc || !ENC_COLS[field]) return;
+  const col = ENC_COLS[field];
+  if (ENC_JSON_COLS.indexOf(field) >= 0 && !Array.isArray(value)) {
+    let parsed;
+    try { parsed = JSON.parse(value); }
+    catch { toast(field + " must be valid JSON", 1); return; }
+    if (!Array.isArray(parsed)) { toast(field + " must be a JSON array", 1); return; }
+    value = parsed;
+  }
+  let store = Array.isArray(value) ? JSON.stringify(value) : value;
+  if (field === "image" || field === "debunkingSnippet") store = ("" + (value ?? "")).trim() || null;
+  run("UPDATE encyclopedia_entries SET " + col + " = ?, updated_at = strftime('%s','now') WHERE id = ?",
+      [store, curEnc.id]);
+  curEnc[field] = value;
+  refreshStats();
+  renderEncTree();
+  if (field === "quickFacts") renderEncQuickFacts();
+}
+
+function renderEnc() {
+  $("#encCard").style.display = "block";
+  $("#encEmptyPanel").style.display = "none";
+  $("#encLabel").textContent = " · " + curEnc.id;
+  document.querySelectorAll("#encCard [data-eenc]").forEach(el => {
+    const key = el.dataset.eenc;
+    if (ENC_JSON_COLS.indexOf(key) >= 0) return; // structured editors below
+    el.value = curEnc[key] == null ? "" : curEnc[key];
+  });
+  renderEncQuickFacts();
+  renderEncStructured();
+}
+
+function renderEncStructured() {
+  if (!curEnc) return;
+  renderSources("#encSources", {
+    get: () => curEnc.sources || [],
+    set: (arr, quiet) => { saveEncField("sources", arr); if (!quiet) renderEncStructured(); },
+  });
+  renderRefbox("#encRelTerms", {
+    kind: "entries",
+    get: () => curEnc.relatedTerms || [],
+    set: arr => { saveEncField("relatedTerms", arr); renderEncStructured(); },
+  });
+  renderRefbox("#encRelMyths", {
+    kind: "myths",
+    get: () => curEnc.relatedMyths || [],
+    set: arr => { saveEncField("relatedMyths", arr); renderEncStructured(); },
+  });
+  renderRefbox("#encRelArticles", {
+    kind: "articles",
+    get: () => curEnc.relatedArticles || [],
+    set: arr => { saveEncField("relatedArticles", arr); renderEncStructured(); },
+  });
+}
+
+function renderEncQuickFacts() {
+  const box = $("#encQuickFacts");
+  const facts = (curEnc.quickFacts || []).filter(Boolean);
+  box.innerHTML =
+    facts.map((f, i) => `<span class="chip">${esc(f)}<button class="x" data-act="enc-del-qf" data-i="${i}"><i class="bi bi-x-lg"></i></button></span>`).join("") +
+    `<input id="encQfNew" class="form-control form-control-sm w-auto flex-grow-1" placeholder="add quick fact… ↵" style="min-width:180px" />`;
+  const ni = $("#encQfNew");
+  ni.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); addEncQuickFact(ni); } });
+  ni.addEventListener("change", () => { if (ni.value) addEncQuickFact(ni); });
+}
+function addEncQuickFact(input) {
+  const v = input.value.trim();
+  if (v && !(curEnc.quickFacts || []).includes(v)) {
+    curEnc.quickFacts.push(v);
+    saveEncField("quickFacts", curEnc.quickFacts);
+  }
+  input.value = "";
+  input.focus();
+}
+
+function showEncPanel() {
+  $("#encEmptyPanel").style.display = "none";
+  $("#encCard").style.display = "block";
+  renderEnc();
+}
+
+function createEnc() {
+  const id = $("#eifId").value.trim().toLowerCase().replace(/\s+/g, "-");
+  const term = $("#eifTerm").value.trim();
+  if (!id) { toast("Entry id is required (kebab-case)", 1); return; }
+  if (qAll("SELECT 1 FROM encyclopedia_entries WHERE id = ?", [id]).length) {
+    toast("An entry with id '" + id + "' already exists", 1); return;
+  }
+  run("INSERT INTO encyclopedia_entries (id, term, definition, category, difficulty, related_terms, quick_facts, sources, related_myths, related_articles) VALUES (?,?,?,?,?,?,?,?,?,?)",
+      [id, term || id, "", "", "beginner", "[]", "[]", "[]", "[]", "[]"]);
+  $("#encAddForm").style.display = "none";
+  $("#eifId").value = ""; $("#eifTerm").value = "";
+  refreshStats(); renderEncTree();
+  loadEnc(id);
+  toast("Entry created");
+}
+
+function duplicateEnc() {
+  if (!curEnc) return;
+  const src = curEnc;
+  let id = src.id + "-copy", n = 1;
+  while (qAll("SELECT 1 FROM encyclopedia_entries WHERE id = ?", [id]).length) id = src.id + "-copy" + (++n);
+  run("INSERT INTO encyclopedia_entries (id, term, definition, category, difficulty, related_terms, quick_facts, sources, image, debunking_snippet, related_myths, related_articles) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",
+      [id, src.term + " (copy)", src.definition, src.category, src.difficulty,
+       JSON.stringify(src.relatedTerms), JSON.stringify(src.quickFacts),
+       JSON.stringify(src.sources), src.image || null, src.debunkingSnippet || null,
+       JSON.stringify(src.relatedMyths), JSON.stringify(src.relatedArticles)]);
+  renderEncTree(); refreshStats();
+  loadEnc(id);
+  toast("Duplicated to '" + id + "'");
+}
+
+function deleteEnc() {
+  if (!curEnc || !confirm("Delete entry '" + curEnc.term + "'?")) return;
+  run("DELETE FROM encyclopedia_entries WHERE id = ?", [curEnc.id]);
+  curEnc = null;
+  $("#encCard").style.display = "none";
+  $("#encEmptyPanel").style.display = "block";
+  renderEncTree(); refreshStats();
+  toast("Entry deleted");
+}
+
+// --- Encyclopedia event handlers (delegated on #encmain) ---
+
+function onEncInput(e) {
+  const el = e.target;
+  if (!el.dataset.eenc || !curEnc) return;
+  const key = el.dataset.eenc;
+  if (ENC_JSON_COLS.indexOf(key) >= 0 && e.type !== "change") return;
+  saveEncField(key, el.value);
+}
+
+function onEncClick(e) {
+  const el = e.target.closest("[data-act]");
+  if (!el) return;
+  switch (el.dataset.act) {
+    case "enc-pick": loadEnc(el.dataset.id); break;
+    case "enc-del-qf":
+      if (curEnc) { curEnc.quickFacts.splice(Number(el.dataset.i), 1); saveEncField("quickFacts", curEnc.quickFacts); }
+      break;
+  }
+}
+
+// --- Articles & Posts editor ---
+
+const ART_COLS = {
+  title: "title", type: "type", category: "category", subtitle: "subtitle",
+  content: "content", excerpt: "excerpt", author: "author",
+  publishedDate: "published_date", readTime: "read_time", image: "image",
+  tags: "tags", source: "source", sourceUrl: "source_url",
+  relatedMyths: "related_myths", relatedFacts: "related_facts",
+  featured: "featured", difficulty: "difficulty",
+};
+const POST_COLS = {
+  title: "title", type: "type", category: "category", content: "content",
+  author: "author", publishedDate: "published_date", image: "image",
+  tags: "tags", source: "source", sourceUrl: "source_url",
+  videoUrl: "video_url", relatedContent: "related_content",
+};
+const ART_JSON_COLS = ["tags", "author", "relatedMyths", "relatedFacts"];
+const POST_JSON_COLS = ["tags", "author", "relatedContent"];
+const ART_NULLABLE = ["subtitle", "image", "source", "sourceUrl", "difficulty"];
+const POST_NULLABLE = ["image", "source", "sourceUrl", "videoUrl"];
+
+function allArticles() {
+  try {
+    return qAll("SELECT id, title, category, type, featured FROM articles ORDER BY published_date DESC, id");
+  } catch { return []; }
+}
+function allPosts() {
+  try {
+    return qAll("SELECT id, title, category, type FROM posts ORDER BY published_date DESC, id");
+  } catch { return []; }
+}
+
+function loadArt(id) {
+  const rows = qAll("SELECT * FROM articles WHERE id = ?", [id]);
+  if (!rows.length) { toast("Article not found", 1); return; }
+  const r = rows[0];
+  curArt = {
+    id,
+    title: r.title || "",
+    type: r.type || "article",
+    category: r.category || "",
+    subtitle: r.subtitle || "",
+    content: r.content || "",
+    excerpt: r.excerpt || "",
+    author: safeJSON(r.author),
+    publishedDate: r.published_date || "",
+    readTime: r.read_time || 0,
+    image: r.image || "",
+    source: r.source || "",
+    sourceUrl: r.source_url || "",
+    relatedMyths: safeJSON(r.related_myths),
+    relatedFacts: safeJSON(r.related_facts),
+    featured: !!r.featured,
+    difficulty: r.difficulty || "",
+    tags: safeJSON(r.tags),
+  };
+  showArtPanel();
+}
+
+function loadPost(id) {
+  const rows = qAll("SELECT * FROM posts WHERE id = ?", [id]);
+  if (!rows.length) { toast("Post not found", 1); return; }
+  const r = rows[0];
+  curPost = {
+    id,
+    title: r.title || "",
+    type: r.type || "news",
+    category: r.category || "",
+    content: r.content || "",
+    author: safeJSON(r.author),
+    publishedDate: r.published_date || "",
+    image: r.image || "",
+    source: r.source || "",
+    sourceUrl: r.source_url || "",
+    videoUrl: r.video_url || "",
+    relatedContent: safeJSON(r.related_content),
+    tags: safeJSON(r.tags),
+  };
+  showPostPanel();
+}
+
+// Shared field saver for the two tables. `cols` maps field -> column,
+// `jsonCols` are parsed from JSON textareas, `nullable` fields store "" as
+// NULL, and `coerce` lets callers convert types before storing.
+function saveContentField(kind, field, value) {
+  const isArt = kind === "article";
+  const cur = isArt ? curArt : curPost;
+  const cols = isArt ? ART_COLS : POST_COLS;
+  const jsonCols = isArt ? ART_JSON_COLS : POST_JSON_COLS;
+  const nullable = isArt ? ART_NULLABLE : POST_NULLABLE;
+  if (!cur || !cols[field]) return;
+  let store = value;
+  if (jsonCols.indexOf(field) >= 0) {
+    if (typeof value === "string") {
+      let parsed;
+      try { parsed = JSON.parse(value); }
+      catch { toast(field + " must be valid JSON", 1); return; }
+      if (field !== "author" && !Array.isArray(parsed)) { toast(field + " must be a JSON array", 1); return; }
+      if (field === "author" && (typeof parsed !== "object" || Array.isArray(parsed) || parsed === null)) {
+        toast("author must be a JSON object", 1); return;
+      }
+      value = parsed;
+    }
+    store = JSON.stringify(value);
+  } else if (field === "readTime") {
+    value = Math.max(0, Number(value) || 0);
+    store = value;
+  } else if (field === "featured") {
+    value = !!value;
+    store = value ? 1 : 0;
+  } else if (nullable.indexOf(field) >= 0) {
+    store = ("" + (value ?? "")).trim() || null;
+    if (field === "difficulty") value = store || "";
+  }
+  run("UPDATE " + (isArt ? "articles" : "posts") + " SET " + cols[field] + " = ?, updated_at = strftime('%s','now') WHERE id = ?",
+      [store, cur.id]);
+  cur[field] = value;
+  refreshStats();
+  if (isArt) renderArtTree(); else renderPostTree();
+  if (field === "tags") { isArt ? renderArtTags() : renderPostTags(); }
+}
+
+function renderArt() {
+  $("#artCard").style.display = "block";
+  $("#apEmptyPanel").style.display = "none";
+  $("#postCard").style.display = "none";
+  $("#artLabel").textContent = " · " + curArt.id;
+  document.querySelectorAll("#artCard [data-eart]").forEach(el => {
+    const key = el.dataset.eart;
+    if (key === "featured") { el.checked = !!curArt.featured; return; }
+    if (key === "readTime") { el.value = curArt.readTime; return; }
+    if (ART_JSON_COLS.indexOf(key) >= 0) return; // structured editors below
+    el.value = curArt[key] == null ? "" : curArt[key];
+  });
+  renderArtTags();
+  renderArtStructured();
+}
+
+function renderArtStructured() {
+  if (!curArt) return;
+  renderAuthor("#artAuthor", {
+    get: () => curArt.author || {},
+    set: obj => { saveContentField("article", "author", obj); curArt.author = obj; },
+  });
+  renderRefbox("#artRelMyths", {
+    kind: "myths",
+    get: () => curArt.relatedMyths || [],
+    set: arr => { saveContentField("article", "relatedMyths", arr); renderArtStructured(); },
+  });
+  renderRefbox("#artRelFacts", {
+    kind: "facts",
+    get: () => curArt.relatedFacts || [],
+    set: arr => { saveContentField("article", "relatedFacts", arr); renderArtStructured(); },
+  });
+}
+
+function renderPost() {
+  $("#postCard").style.display = "block";
+  $("#apEmptyPanel").style.display = "none";
+  $("#artCard").style.display = "none";
+  $("#postLabel").textContent = " · " + curPost.id;
+  document.querySelectorAll("#postCard [data-epost]").forEach(el => {
+    const key = el.dataset.epost;
+    if (POST_JSON_COLS.indexOf(key) >= 0) return; // structured editors below
+    el.value = curPost[key] == null ? "" : curPost[key];
+  });
+  renderPostTags();
+  renderPostStructured();
+}
+
+function renderPostStructured() {
+  if (!curPost) return;
+  renderAuthor("#postAuthor", {
+    get: () => curPost.author || {},
+    set: obj => { saveContentField("post", "author", obj); curPost.author = obj; },
+  });
+  renderRefbox("#postRelContent", {
+    kind: "mixed",
+    get: () => curPost.relatedContent || [],
+    set: arr => { saveContentField("post", "relatedContent", arr); renderPostStructured(); },
+  });
+}
+
+function renderArtTags() {
+  const box = $("#artTags");
+  const tags = (curArt.tags || []).filter(Boolean);
+  box.innerHTML =
+    tags.map((t, i) => `<span class="chip">${esc(t)}<button class="x" data-act="art-del-tag" data-i="${i}"><i class="bi bi-x-lg"></i></button></span>`).join("") +
+    `<input id="artTagNew" class="form-control form-control-sm w-auto flex-grow-1" placeholder="add tag… ↵" style="min-width:140px" />`;
+  const ni = $("#artTagNew");
+  ni.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); addContentTag("article", ni); } });
+  ni.addEventListener("change", () => { if (ni.value) addContentTag("article", ni); });
+}
+function renderPostTags() {
+  const box = $("#postTags");
+  const tags = (curPost.tags || []).filter(Boolean);
+  box.innerHTML =
+    tags.map((t, i) => `<span class="chip">${esc(t)}<button class="x" data-act="post-del-tag" data-i="${i}"><i class="bi bi-x-lg"></i></button></span>`).join("") +
+    `<input id="postTagNew" class="form-control form-control-sm w-auto flex-grow-1" placeholder="add tag… ↵" style="min-width:140px" />`;
+  const ni = $("#postTagNew");
+  ni.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); addContentTag("post", ni); } });
+  ni.addEventListener("change", () => { if (ni.value) addContentTag("post", ni); });
+}
+function addContentTag(kind, input) {
+  const v = input.value.trim();
+  const cur = kind === "article" ? curArt : curPost;
+  if (v && cur && !(cur.tags || []).includes(v)) {
+    cur.tags.push(v);
+    saveContentField(kind, "tags", cur.tags);
+  }
+  input.value = "";
+  input.focus();
+}
+
+function showApPanelsHidden() {
+  $("#apEmptyPanel").style.display = "none";
+  $("#artCard").style.display = "none";
+  $("#postCard").style.display = "none";
+}
+function showArtPanel() {
+  showApPanelsHidden();
+  $("#artCard").style.display = "block";
+  renderArt();
+}
+function showPostPanel() {
+  showApPanelsHidden();
+  $("#postCard").style.display = "block";
+  renderPost();
+}
+
+function createArt() {
+  const id = $("#aafId").value.trim().toLowerCase().replace(/\s+/g, "-");
+  const title = $("#aafTitle").value.trim();
+  if (!id) { toast("Article id is required (kebab-case)", 1); return; }
+  if (qAll("SELECT 1 FROM articles WHERE id = ?", [id]).length) {
+    toast("An article with id '" + id + "' already exists", 1); return;
+  }
+  run("INSERT INTO articles (id, type, category, title, content, excerpt, author, published_date, read_time, tags, related_myths, related_facts, featured) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)",
+      [id, "article", "", title || id, "", "", "{}", new Date().toISOString().slice(0, 10), 5, "[]", "[]", "[]", 0]);
+  $("#artAddForm").style.display = "none";
+  $("#aafId").value = ""; $("#aafTitle").value = "";
+  refreshStats(); renderArtTree();
+  loadArt(id);
+  toast("Article created");
+}
+
+function duplicateArt() {
+  if (!curArt) return;
+  const src = curArt;
+  let id = src.id + "-copy", n = 1;
+  while (qAll("SELECT 1 FROM articles WHERE id = ?", [id]).length) id = src.id + "-copy" + (++n);
+  run("INSERT INTO articles (id, type, category, title, subtitle, content, excerpt, author, published_date, read_time, image, tags, source, source_url, related_myths, related_facts, featured, difficulty) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+      [id, src.type, src.category, src.title + " (copy)", src.subtitle || null, src.content, src.excerpt,
+       JSON.stringify(src.author || {}), src.publishedDate, src.readTime, src.image || null,
+       JSON.stringify(src.tags), src.source || null, src.sourceUrl || null,
+       JSON.stringify(src.relatedMyths || []), JSON.stringify(src.relatedFacts || []),
+       src.featured ? 1 : 0, src.difficulty || null]);
+  renderArtTree(); refreshStats();
+  loadArt(id);
+  toast("Duplicated to '" + id + "'");
+}
+
+function deleteArt() {
+  if (!curArt || !confirm("Delete article '" + curArt.title + "'?")) return;
+  run("DELETE FROM articles WHERE id = ?", [curArt.id]);
+  curArt = null;
+  showApPanelsHidden();
+  $("#apEmptyPanel").style.display = "block";
+  renderArtTree(); refreshStats();
+  toast("Article deleted");
+}
+
+function createPost() {
+  const id = $("#pafId").value.trim().toLowerCase().replace(/\s+/g, "-");
+  const title = $("#pafTitle").value.trim();
+  if (!id) { toast("Post id is required (kebab-case)", 1); return; }
+  if (qAll("SELECT 1 FROM posts WHERE id = ?", [id]).length) {
+    toast("A post with id '" + id + "' already exists", 1); return;
+  }
+  run("INSERT INTO posts (id, type, category, title, content, author, published_date, tags, related_content) VALUES (?,?,?,?,?,?,?,?,?)",
+      [id, "news", "", title || id, "", "{}", new Date().toISOString().slice(0, 10), "[]", "[]"]);
+  $("#postAddForm").style.display = "none";
+  $("#pafId").value = ""; $("#pafTitle").value = "";
+  refreshStats(); renderPostTree();
+  loadPost(id);
+  toast("Post created");
+}
+
+function duplicatePost() {
+  if (!curPost) return;
+  const src = curPost;
+  let id = src.id + "-copy", n = 1;
+  while (qAll("SELECT 1 FROM posts WHERE id = ?", [id]).length) id = src.id + "-copy" + (++n);
+  run("INSERT INTO posts (id, type, category, title, content, author, published_date, image, tags, source, source_url, video_url, related_content) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)",
+      [id, src.type, src.category, src.title + " (copy)", src.content,
+       JSON.stringify(src.author || {}), src.publishedDate, src.image || null,
+       JSON.stringify(src.tags), src.source || null, src.sourceUrl || null,
+       src.videoUrl || null, JSON.stringify(src.relatedContent || [])]);
+  renderPostTree(); refreshStats();
+  loadPost(id);
+  toast("Duplicated to '" + id + "'");
+}
+
+function deletePost() {
+  if (!curPost || !confirm("Delete post '" + curPost.title + "'?")) return;
+  run("DELETE FROM posts WHERE id = ?", [curPost.id]);
+  curPost = null;
+  showApPanelsHidden();
+  $("#apEmptyPanel").style.display = "block";
+  renderPostTree(); refreshStats();
+  toast("Post deleted");
+}
+
+// --- Articles / Posts event handlers (delegated on #apmain) ---
+
+function onApInput(e) {
+  const el = e.target;
+  if (el.dataset.eart) {
+    if (!curArt) return;
+    const key = el.dataset.eart;
+    if (key === "featured") { saveContentField("article", key, el.checked); return; }
+    if ((ART_JSON_COLS.indexOf(key) >= 0) && e.type !== "change") return;
+    saveContentField("article", key, el.value);
+    return;
+  }
+  if (el.dataset.epost) {
+    if (!curPost) return;
+    const key = el.dataset.epost;
+    if ((POST_JSON_COLS.indexOf(key) >= 0) && e.type !== "change") return;
+    saveContentField("post", key, el.value);
+  }
+}
+
+function onApClick(e) {
+  const el = e.target.closest("[data-act]");
+  if (!el) return;
+  const i = Number(el.dataset.i);
+  switch (el.dataset.act) {
+    case "art-pick": loadArt(el.dataset.id); break;
+    case "post-pick": loadPost(el.dataset.id); break;
+    case "art-del-tag":
+      if (curArt) { curArt.tags.splice(i, 1); saveContentField("article", "tags", curArt.tags); renderArtTags(); }
+      break;
+    case "post-del-tag":
+      if (curPost) { curPost.tags.splice(i, 1); saveContentField("post", "tags", curPost.tags); renderPostTags(); }
+      break;
+  }
+}
+
 // --- Trees ---
 
 function renderQuizTree() {
@@ -1968,6 +4165,121 @@ function renderMbTree() {
            </div>`).join("") +
       `</div>`
     : '<div class="text-secondary small py-2">No matching questions.</div>';
+}
+
+function renderMythTree() {
+  const t = $("#mythTree");
+  const myths = allMyths();
+  $("#mythTreeCount").textContent = myths.length + " myth" + (myths.length === 1 ? "" : "s");
+  if (!db || !myths.length) {
+    t.innerHTML = '<div class="text-secondary small py-2"><i class="bi bi-info-circle me-1"></i>' +
+      (db ? "No myths yet — click “New myth”." : "Load a database or create a blank one.") + "</div>";
+    return;
+  }
+  const q = ($("#mythSearch").value || "").trim().toLowerCase();
+  const list = myths.filter(m => !q || m.title.toLowerCase().includes(q) || m.id.toLowerCase().includes(q));
+  t.innerHTML = list.length
+    ? `<div class="list-group list-group-flush">` +
+        list.map(m =>
+          `<div class="list-group-item list-group-item-action lesson-item small ${m.id === (curMyth && curMyth.id) ? "active" : ""}" data-act="myth-pick" data-id="${esc(m.id)}">
+             <span class="nm flex-grow-1 text-truncate">${esc(m.title || m.id)}</span>
+             <span class="badge text-bg-secondary rounded-pill">${esc(m.difficulty)}</span>
+             <span class="badge text-bg-secondary rounded-pill">${esc(m.category)}</span>
+           </div>`).join("") +
+      `</div>`
+    : '<div class="text-secondary small py-2">No matching myths.</div>';
+}
+
+function renderFactTree() {
+  const t = $("#factTree");
+  const facts = allFacts();
+  $("#factTreeCount").textContent = facts.length + " fact" + (facts.length === 1 ? "" : "s");
+  if (!db || !facts.length) {
+    t.innerHTML = '<div class="text-secondary small py-2"><i class="bi bi-info-circle me-1"></i>' +
+      (db ? "No facts yet — click “New fact”." : "Load a database or create a blank one.") + "</div>";
+    return;
+  }
+  const q = ($("#factSearch").value || "").trim().toLowerCase();
+  const list = facts.filter(f => !q || f.title.toLowerCase().includes(q) || f.id.toLowerCase().includes(q));
+  t.innerHTML = list.length
+    ? `<div class="list-group list-group-flush">` +
+        list.map(f =>
+          `<div class="list-group-item list-group-item-action lesson-item small ${f.id === (curFact && curFact.id) ? "active" : ""}" data-act="fact-pick" data-id="${esc(f.id)}">
+             <span class="nm flex-grow-1 text-truncate">${esc(f.title || f.id)}</span>
+             <span class="badge text-bg-secondary rounded-pill">${esc(f.importance)}</span>
+             <span class="badge text-bg-secondary rounded-pill">${esc(f.category)}</span>
+           </div>`).join("") +
+      `</div>`
+    : '<div class="text-secondary small py-2">No matching facts.</div>';
+}
+
+function renderEncTree() {
+  const t = $("#encTree");
+  const entries = allEncEntries();
+  $("#encTreeCount").textContent = entries.length + " entr" + (entries.length === 1 ? "y" : "ies");
+  if (!db || !entries.length) {
+    t.innerHTML = '<div class="text-secondary small py-2"><i class="bi bi-info-circle me-1"></i>' +
+      (db ? "No entries yet — click “New entry”." : "Load a database or create a blank one.") + "</div>";
+    return;
+  }
+  const q = ($("#encSearch").value || "").trim().toLowerCase();
+  const list = entries.filter(e => !q || (e.term || "").toLowerCase().includes(q) || e.id.toLowerCase().includes(q) || (e.category || "").toLowerCase().includes(q));
+  t.innerHTML = list.length
+    ? `<div class="list-group list-group-flush">` +
+        list.map(e =>
+          `<div class="list-group-item list-group-item-action lesson-item small ${e.id === (curEnc && curEnc.id) ? "active" : ""}" data-act="enc-pick" data-id="${esc(e.id)}">
+             <span class="nm flex-grow-1 text-truncate">${esc(e.term || e.id)}</span>
+             <span class="badge text-bg-secondary rounded-pill">${esc(e.difficulty)}</span>
+             <span class="badge text-bg-secondary rounded-pill">${esc(e.category)}</span>
+           </div>`).join("") +
+      `</div>`
+    : '<div class="text-secondary small py-2">No matching entries.</div>';
+}
+
+function renderArtTree() {
+  const t = $("#artTree");
+  const arts = allArticles();
+  $("#artTreeCount").textContent = arts.length + " article" + (arts.length === 1 ? "" : "s");
+  if (!db || !arts.length) {
+    t.innerHTML = '<div class="text-secondary small py-2"><i class="bi bi-info-circle me-1"></i>' +
+      (db ? "No articles yet — click “New article”." : "Load a database or create a blank one.") + "</div>";
+    return;
+  }
+  const q = ($("#artSearch").value || "").trim().toLowerCase();
+  const list = arts.filter(a => !q || (a.title || "").toLowerCase().includes(q) || a.id.toLowerCase().includes(q) || (a.category || "").toLowerCase().includes(q));
+  t.innerHTML = list.length
+    ? `<div class="list-group list-group-flush">` +
+        list.map(a =>
+          `<div class="list-group-item list-group-item-action lesson-item small ${a.id === (curArt && curArt.id) ? "active" : ""}" data-act="art-pick" data-id="${esc(a.id)}">
+             <span class="nm flex-grow-1 text-truncate">${a.featured ? "★ " : ""}${esc(a.title || a.id)}</span>
+             <span class="badge text-bg-secondary rounded-pill">${esc(a.type)}</span>
+             <span class="badge text-bg-secondary rounded-pill">${esc(a.category)}</span>
+           </div>`).join("") +
+      `</div>`
+    : '<div class="text-secondary small py-2">No matching articles.</div>';
+}
+
+function renderPostTree() {
+  const t = $("#postTree");
+  const posts = allPosts();
+  $("#postTreeCount").textContent = posts.length + " post" + (posts.length === 1 ? "" : "s");
+  if (!db || !posts.length) {
+    t.innerHTML = '<div class="text-secondary small py-2"><i class="bi bi-info-circle me-1"></i>' +
+      (db ? "No posts yet — click “New post”." : "Load a database or create a blank one.") + "</div>";
+    return;
+  }
+  const q = ($("#postSearch").value || "").trim().toLowerCase();
+  const list = posts.filter(p => !q || (p.title || "").toLowerCase().includes(q) || p.id.toLowerCase().includes(q) || (p.category || "").toLowerCase().includes(q));
+  t.innerHTML = list.length
+    ? `<div class="list-group list-group-flush">` +
+        list.map(p =>
+          `<div class="list-group-item list-group-item-action lesson-item small ${p.id === (curPost && curPost.id) ? "active" : ""}" data-act="post-pick" data-id="${esc(p.id)}">
+             <span class="nm flex-grow-1 text-truncate">${esc(p.title || p.id)}</span>
+             <span class="badge text-bg-secondary rounded-pill">${esc(p.type)}</span>
+             <span class="badge text-bg-secondary rounded-pill">${esc(p.category)}</span>
+           </div>`).join("") +
+      `</div>`
+    : '<div class="text-secondary small py-2">No matching posts.</div>';
 }
 
 // --- Quiz / mythbuster event handlers (delegated on #qmain) ---
@@ -2197,12 +4509,17 @@ function init() {
     .then(S => {
       SQL = S;
       toast("sql.js ready");
-      autoDetectDb().then(ok => {
+      tagJsonFields();
+      detectSaveApi();
+      // Prefer the repo's schema.sql, then auto-load the repo database.
+      fetchRemoteSchema().then(() => autoDetectDb()).then(ok => {
         if (ok) toast("Auto-loaded database from repo");
         else $("#dropInfo").textContent = "No file loaded — auto-detect works when served over http://";
       });
     })
     .catch(e => toast("sql.js failed to load: " + e.message, 1));
+
+  $("#saveRepoBtn").onclick = saveToRepo;
 
   const input = $("#fileInput");
   const pick = $("#pickBtn");
@@ -2227,7 +4544,7 @@ function init() {
     tab.addEventListener("click", () => {
       document.querySelectorAll(".tab").forEach(t => t.classList.toggle("active", t === tab));
       const name = tab.dataset.tab;
-      ["editor", "quiz", "sql"].forEach(k => {
+      ["editor", "quiz", "mythfacts", "encyclopedia", "articles", "sql"].forEach(k => {
         $("#tab-" + k).style.display = name === k ? "block" : "none";
       });
     });
@@ -2299,6 +4616,102 @@ function init() {
     mbFilter = b.dataset.mbf;
     document.querySelectorAll("#mbFilterBtns [data-mbf]").forEach(x => x.classList.toggle("active", x === b));
     renderMbTree();
+  });
+
+  // ---- Myths & Facts Editor wiring ----
+  $("#newMythBtn").onclick = () => {
+    const show = $("#mythAddForm").style.display !== "block";
+    $("#mythAddForm").style.display = show ? "block" : "none";
+    if (show) $("#mifId").focus();
+  };
+  $("#mifCancel").onclick = () => { $("#mythAddForm").style.display = "none"; };
+  $("#mifCreate").onclick = createmyth;
+  $("#dupMythBtn").onclick = duplicatemyth;
+  $("#delMythBtn").onclick = deletemyth;
+
+  $("#newFactBtn").onclick = () => {
+    const show = $("#factAddForm").style.display !== "block";
+    $("#factAddForm").style.display = show ? "block" : "none";
+    if (show) $("#fifId").focus();
+  };
+  $("#fifCancel").onclick = () => { $("#factAddForm").style.display = "none"; };
+  $("#fifCreate").onclick = createfact;
+  $("#dupFactBtn").onclick = duplicatefact;
+  $("#delFactBtn").onclick = deletefact;
+
+  const mf = $("#mfmain");
+  mf.addEventListener("input", onMfInput);
+  mf.addEventListener("change", onMfInput);
+  mf.addEventListener("click", onMfClick);
+
+  $("#mythSearch").addEventListener("input", renderMythTree);
+  $("#factSearch").addEventListener("input", renderFactTree);
+  $("#mythTree").addEventListener("click", e => {
+    const it = e.target.closest('[data-act="myth-pick"]');
+    if (it) loadMyth(it.dataset.id);
+  });
+  $("#factTree").addEventListener("click", e => {
+    const it = e.target.closest('[data-act="fact-pick"]');
+    if (it) loadFact(it.dataset.id);
+  });
+
+  // ---- Encyclopedia Editor wiring ----
+  $("#newEncBtn").onclick = () => {
+    const show = $("#encAddForm").style.display !== "block";
+    $("#encAddForm").style.display = show ? "block" : "none";
+    if (show) $("#eifId").focus();
+  };
+  $("#eifCancel").onclick = () => { $("#encAddForm").style.display = "none"; };
+  $("#eifCreate").onclick = createEnc;
+  $("#dupEncBtn").onclick = duplicateEnc;
+  $("#delEncBtn").onclick = deleteEnc;
+
+  const em = $("#encmain");
+  em.addEventListener("input", onEncInput);
+  em.addEventListener("change", onEncInput);
+  em.addEventListener("click", onEncClick);
+
+  $("#encSearch").addEventListener("input", renderEncTree);
+  $("#encTree").addEventListener("click", e => {
+    const it = e.target.closest('[data-act="enc-pick"]');
+    if (it) loadEnc(it.dataset.id);
+  });
+
+  // ---- Articles & Posts Editor wiring ----
+  $("#newArtBtn").onclick = () => {
+    const show = $("#artAddForm").style.display !== "block";
+    $("#artAddForm").style.display = show ? "block" : "none";
+    if (show) $("#aafId").focus();
+  };
+  $("#aafCancel").onclick = () => { $("#artAddForm").style.display = "none"; };
+  $("#aafCreate").onclick = createArt;
+  $("#dupArtBtn").onclick = duplicateArt;
+  $("#delArtBtn").onclick = deleteArt;
+
+  $("#newPostBtn").onclick = () => {
+    const show = $("#postAddForm").style.display !== "block";
+    $("#postAddForm").style.display = show ? "block" : "none";
+    if (show) $("#pafId").focus();
+  };
+  $("#pafCancel").onclick = () => { $("#postAddForm").style.display = "none"; };
+  $("#pafCreate").onclick = createPost;
+  $("#dupPostBtn").onclick = duplicatePost;
+  $("#delPostBtn").onclick = deletePost;
+
+  const apm = $("#apmain");
+  apm.addEventListener("input", onApInput);
+  apm.addEventListener("change", onApInput);
+  apm.addEventListener("click", onApClick);
+
+  $("#artSearch").addEventListener("input", renderArtTree);
+  $("#postSearch").addEventListener("input", renderPostTree);
+  $("#artTree").addEventListener("click", e => {
+    const it = e.target.closest('[data-act="art-pick"]');
+    if (it) loadArt(it.dataset.id);
+  });
+  $("#postTree").addEventListener("click", e => {
+    const it = e.target.closest('[data-act="post-pick"]');
+    if (it) loadPost(it.dataset.id);
   });
 
   // theme toggle

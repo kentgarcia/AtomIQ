@@ -27,7 +27,29 @@ import { Directory, File } from "expo-file-system";
 import * as SQLite from "expo-sqlite";
 import { Platform } from "react-native";
 
-import type { Lesson, LessonStep, Quiz, QuizQuestion, QuizType } from "@/content/types";
+import type {
+  Article,
+  Post,
+} from "@/content/articles/types";
+
+import type {
+  Fact,
+  Lesson,
+  LessonStep,
+  Myth,
+  Quiz,
+  QuizQuestion,
+  QuizType,
+} from "@/content/types";
+
+import type {
+  AtomMazeChallenge,
+  AtomMazeRoom,
+  BattleQuestion,
+  EncyclopediaEntry,
+  Monster,
+  MonsterElement,
+} from "@/content/explorer/types";
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -41,7 +63,7 @@ export const CONTENT_DB_NAME = "content.db";
  * file lets us detect stale copies and re-copy the fresh bundle on the next
  * launch (otherwise the device would silently keep using old content forever).
  */
-export const CONTENT_DB_VERSION = 2;
+export const CONTENT_DB_VERSION = 7;
 
 /** Marker file stored next to the db, whose content is CONTENT_DB_VERSION. */
 const VERSION_MARKER = "content.db.version";
@@ -174,6 +196,28 @@ function parseJsonArray(raw: string | null | undefined): string[] {
   }
 }
 
+/** Safely JSON.parse a column that holds an array of objects (e.g. `sources`). */
+function parseJsonRecords<T>(raw: string | null | undefined): T[] {
+  if (!raw) return [];
+  try {
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? (parsed as T[]) : [];
+  } catch {
+    return [];
+  }
+}
+
+/** Safely JSON.parse a column that holds a single JSON object (e.g. a maze `boss`). */
+function parseJsonObject<T>(raw: string | null | undefined): T | null {
+  if (!raw) return null;
+  try {
+    const parsed = JSON.parse(raw);
+    return typeof parsed === "object" && parsed !== null ? (parsed as T) : null;
+  } catch {
+    return null;
+  }
+}
+
 /** Parse the flexible step `data` JSON back into a plain object. */
 function parseStepData(raw: string): Record<string, unknown> {
   if (!raw) return {};
@@ -241,6 +285,67 @@ interface MythBusterQuestionRow {
   points: number;
 }
 
+/** Raw shape of a `myths` row as returned by expo-sqlite. */
+interface MythRow {
+  id: string;
+  title: string;
+  myth_statement: string;
+  reality: string;
+  explanation: string;
+  category: string;
+  difficulty: string;
+  sources: string; // JSON array of Source objects
+  related_facts: string; // JSON array of fact ids
+  related_lessons: string; // JSON array of lesson ids
+  image: string | null;
+  tags: string; // JSON array of strings
+  popularity: number;
+}
+
+/** Raw shape of a `facts` row as returned by expo-sqlite. */
+interface FactRow {
+  id: string;
+  title: string;
+  statement: string;
+  explanation: string;
+  category: string;
+  importance: string;
+  sources: string; // JSON array of Source objects
+  related_myths: string; // JSON array of myth ids
+  related_lessons: string; // JSON array of lesson ids
+  image: string | null;
+  tags: string; // JSON array of strings
+  date_added: string;
+  last_updated: string;
+}
+
+/** Raw shape of a `mazes` row as returned by expo-sqlite. */
+interface MazeRow {
+  id: string;
+  title: string;
+  description: string;
+  theme: string;
+  xp_reward: number;
+  time_limit: number | null;
+  player_max_hp: number;
+  boss: string; // JSON Monster object (final boss)
+}
+
+/** Raw shape of a `maze_rooms` row as returned by expo-sqlite. */
+interface MazeRoomRow {
+  maze_id: string;
+  id: string;
+  title: string;
+  description: string;
+  monster: string; // JSON Monster object
+  questions: string; // JSON array of BattleQuestions
+  damage_per_correct: number;
+  explanation: string;
+  next_room_id: string | null;
+  alternative_path_id: string | null;
+  unlock_condition: string | null; // JSON { type, value } when set
+}
+
 /** Parse the quizzes.metadata JSON back into a plain object. */
 function parseMetadata(raw: string | null | undefined): Record<string, unknown> {
   if (!raw) return {};
@@ -301,6 +406,48 @@ function mapMythBusterQuestionRow(row: MythBusterQuestionRow): QuizQuestion {
   };
 }
 
+/** Flatten a myth row into the domain `Myth` shape, mirroring content/types.ts. */
+function mapMythRow(row: MythRow): Myth {
+  const relatedFacts = parseJsonArray(row.related_facts);
+  const relatedLessons = parseJsonArray(row.related_lessons);
+  return {
+    id: row.id,
+    title: row.title,
+    mythStatement: row.myth_statement,
+    reality: row.reality,
+    explanation: row.explanation,
+    category: row.category,
+    difficulty: row.difficulty as Myth["difficulty"],
+    sources: parseJsonRecords(row.sources),
+    ...(relatedFacts.length ? { relatedFacts } : {}),
+    ...(relatedLessons.length ? { relatedLessons } : {}),
+    ...(row.image ? { image: row.image } : {}),
+    tags: parseJsonArray(row.tags),
+    popularity: row.popularity,
+  };
+}
+
+/** Flatten a fact row into the domain `Fact` shape, mirroring content/types.ts. */
+function mapFactRow(row: FactRow): Fact {
+  const relatedMyths = parseJsonArray(row.related_myths);
+  const relatedLessons = parseJsonArray(row.related_lessons);
+  return {
+    id: row.id,
+    title: row.title,
+    statement: row.statement,
+    explanation: row.explanation,
+    category: row.category,
+    importance: row.importance as Fact["importance"],
+    sources: parseJsonRecords(row.sources),
+    ...(relatedMyths.length ? { relatedMyths } : {}),
+    ...(relatedLessons.length ? { relatedLessons } : {}),
+    ...(row.image ? { image: row.image } : {}),
+    tags: parseJsonArray(row.tags),
+    dateAdded: row.date_added,
+    lastUpdated: row.last_updated,
+  };
+}
+
 /** Flatten a lesson row into the domain `Lesson` shape, without steps yet. */
 function mapLessonRow(row: LessonRow) {
   return {
@@ -314,6 +461,177 @@ function mapLessonRow(row: LessonRow) {
     prerequisites: parseJsonArray(row.prerequisites),
     tags: parseJsonArray(row.tags),
     steps: [] as LessonStep[],
+  };
+}
+
+/** Parse an embedded monster object, falling back to an empty monster. */
+function parseMonster(raw: string | null | undefined): Monster {
+  return (
+    parseJsonObject<Monster>(raw) ?? {
+      id: "",
+      name: "",
+      element: "nuclear" as MonsterElement,
+      maxHp: 0,
+      attackPower: 0,
+      sprite: "",
+      color: "",
+      defeatMessage: "",
+    }
+  );
+}
+
+/** Flatten a maze room row into the domain `AtomMazeRoom` shape. */
+function mapMazeRoomRow(row: MazeRoomRow): AtomMazeRoom {
+  return {
+    id: row.id,
+    title: row.title,
+    description: row.description,
+    monster: parseMonster(row.monster),
+    questions: parseJsonRecords<BattleQuestion>(row.questions),
+    damagePerCorrect: row.damage_per_correct,
+    explanation: row.explanation,
+    ...(row.next_room_id ? { nextRoomId: row.next_room_id } : {}),
+    ...(row.alternative_path_id ? { alternativePathId: row.alternative_path_id } : {}),
+    ...(row.unlock_condition
+      ? {
+          unlockCondition: parseJsonObject<NonNullable<AtomMazeRoom["unlockCondition"]>>(
+            row.unlock_condition,
+          ) ?? undefined,
+        }
+      : {}),
+  };
+}
+
+/** Flatten a maze row + its (already ordered) room rows into `AtomMazeChallenge`. */
+function mapMazeRow(row: MazeRow, rooms: MazeRoomRow[]): AtomMazeChallenge {
+  return {
+    id: row.id,
+    title: row.title,
+    description: row.description,
+    theme: row.theme,
+    rooms: rooms.map(mapMazeRoomRow),
+    xpReward: row.xp_reward,
+    ...(row.time_limit != null ? { timeLimit: row.time_limit } : {}),
+    playerMaxHp: row.player_max_hp,
+    boss: parseMonster(row.boss),
+  };
+}
+
+/** Raw shape of an `encyclopedia_entries` row as returned by expo-sqlite. */
+interface EncyclopediaEntryRow {
+  id: string;
+  term: string;
+  definition: string;
+  category: string;
+  related_terms: string; // JSON array of term ids
+  quick_facts: string; // JSON array of strings
+  sources: string; // JSON array of Source objects
+  image: string | null;
+  debunking_snippet: string | null;
+  related_myths: string; // JSON array of myth ids
+  related_articles: string; // JSON array of article ids
+  difficulty: string;
+}
+
+/** Flatten an encyclopedia entry row into the domain `EncyclopediaEntry` shape. */
+function mapEncyclopediaEntryRow(row: EncyclopediaEntryRow): EncyclopediaEntry {
+  return {
+    id: row.id,
+    term: row.term,
+    definition: row.definition,
+    category: row.category,
+    relatedTerms: parseJsonArray(row.related_terms),
+    quickFacts: parseJsonArray(row.quick_facts),
+    sources: parseJsonRecords(row.sources),
+    ...(row.image ? { image: row.image } : {}),
+    ...(row.debunking_snippet ? { debunkingSnippet: row.debunking_snippet } : {}),
+    ...(row.related_myths ? { relatedMyths: parseJsonArray(row.related_myths) } : {}),
+    ...(row.related_articles ? { relatedArticles: parseJsonArray(row.related_articles) } : {}),
+    difficulty: row.difficulty as EncyclopediaEntry["difficulty"],
+  };
+}
+
+/** Raw shape of an `articles` row as returned by expo-sqlite. */
+interface ArticleRow {
+  id: string;
+  type: string;
+  category: string;
+  title: string;
+  subtitle: string | null;
+  content: string;
+  excerpt: string;
+  author: string; // JSON { name, avatar, title }
+  published_date: string;
+  read_time: number;
+  image: string | null;
+  tags: string; // JSON array of strings
+  source: string | null;
+  source_url: string | null;
+  related_myths: string; // JSON array of myth ids
+  related_facts: string; // JSON array of fact ids
+  featured: number; // 0 / 1
+  difficulty: string | null;
+}
+
+/** Flatten an article row into the domain `Article` shape. */
+function mapArticleRow(row: ArticleRow): Article {
+  return {
+    id: row.id,
+    type: row.type as Article["type"],
+    category: row.category as Article["category"],
+    title: row.title,
+    ...(row.subtitle ? { subtitle: row.subtitle } : {}),
+    content: row.content,
+    excerpt: row.excerpt,
+    author:
+      parseJsonObject<Article["author"]>(row.author) ?? { name: "", avatar: "", title: "" },
+    publishedDate: row.published_date,
+    readTime: row.read_time,
+    ...(row.image ? { image: row.image } : {}),
+    tags: parseJsonArray(row.tags),
+    ...(row.source ? { source: row.source } : {}),
+    ...(row.source_url ? { sourceUrl: row.source_url } : {}),
+    ...(row.related_myths ? { relatedMyths: parseJsonArray(row.related_myths) } : {}),
+    ...(row.related_facts ? { relatedFacts: parseJsonArray(row.related_facts) } : {}),
+    ...(row.featured ? { featured: true } : {}),
+    ...(row.difficulty ? { difficulty: row.difficulty as Article["difficulty"] } : {}),
+  };
+}
+
+/** Raw shape of a `posts` row as returned by expo-sqlite. */
+interface PostRow {
+  id: string;
+  type: string;
+  category: string;
+  title: string;
+  content: string;
+  author: string; // JSON { name, avatar, title }
+  published_date: string;
+  image: string | null;
+  tags: string; // JSON array of strings
+  source: string | null;
+  source_url: string | null;
+  video_url: string | null;
+  related_content: string; // JSON array of content ids
+}
+
+/** Flatten a post row into the domain `Post` shape. */
+function mapPostRow(row: PostRow): Post {
+  return {
+    id: row.id,
+    type: row.type as Post["type"],
+    category: row.category as Post["category"],
+    title: row.title,
+    content: row.content,
+    author:
+      parseJsonObject<Post["author"]>(row.author) ?? { name: "", avatar: "" },
+    publishedDate: row.published_date,
+    ...(row.image ? { image: row.image } : {}),
+    tags: parseJsonArray(row.tags),
+    ...(row.source ? { source: row.source } : {}),
+    ...(row.source_url ? { sourceUrl: row.source_url } : {}),
+    ...(row.video_url ? { videoUrl: row.video_url } : {}),
+    ...(row.related_content ? { relatedContent: parseJsonArray(row.related_content) } : {}),
   };
 }
 
@@ -503,6 +821,250 @@ export class ContentRepository {
       "SELECT * FROM mythbuster_questions ORDER BY difficulty ASC, position ASC, id ASC",
     );
     return rows.map(mapMythBusterQuestionRow);
+  }
+
+  // -------------------------------------------------------------------------
+  // Myths & facts
+  // -------------------------------------------------------------------------
+
+  /** Fetch a single myth by id, or `null`. */
+  async getMythById(id: string): Promise<Myth | null> {
+    const db = await getReadyContentDb();
+    const row = await db.getFirstAsync<MythRow>(
+      "SELECT * FROM myths WHERE id = ? LIMIT 1",
+      [id],
+    );
+    return row ? mapMythRow(row) : null;
+  }
+
+  /** Every myth, fully hydrated, ordered by id. */
+  async getAllMyths(): Promise<Myth[]> {
+    const db = await getReadyContentDb();
+    const rows = await db.getAllAsync<MythRow>("SELECT * FROM myths ORDER BY id");
+    return rows.map(mapMythRow);
+  }
+
+  /** Number of myths seeded — handy for integrity checks on launch. */
+  async getMythCount(): Promise<number> {
+    const db = await getReadyContentDb();
+    const { count } = (await db.getFirstAsync<{ count: number }>(
+      "SELECT COUNT(*) AS count FROM myths",
+    )) as { count: number };
+    return count;
+  }
+
+  /** Fetch a single fact by id, or `null`. */
+  async getFactById(id: string): Promise<Fact | null> {
+    const db = await getReadyContentDb();
+    const row = await db.getFirstAsync<FactRow>(
+      "SELECT * FROM facts WHERE id = ? LIMIT 1",
+      [id],
+    );
+    return row ? mapFactRow(row) : null;
+  }
+
+  /** Every fact, fully hydrated, ordered by id. */
+  async getAllFacts(): Promise<Fact[]> {
+    const db = await getReadyContentDb();
+    const rows = await db.getAllAsync<FactRow>("SELECT * FROM facts ORDER BY id");
+    return rows.map(mapFactRow);
+  }
+
+  /** Number of facts seeded — handy for integrity checks on launch. */
+  async getFactCount(): Promise<number> {
+    const db = await getReadyContentDb();
+    const { count } = (await db.getFirstAsync<{ count: number }>(
+      "SELECT COUNT(*) AS count FROM facts",
+    )) as { count: number };
+    return count;
+  }
+
+  // -------------------------------------------------------------------------
+  // Mazes
+  // -------------------------------------------------------------------------
+
+  /**
+   * Fetch a full maze by ID: the `mazes` row plus its `maze_rooms` rows
+   * ordered by `position`, with every embedded JSON column (boss, monsters,
+   * questions, unlock conditions) parsed back into usable objects. Returns
+   * `null` when no maze with that ID exists.
+   */
+  async getMazeById(id: string): Promise<AtomMazeChallenge | null> {
+    const db = await getReadyContentDb();
+
+    const row = await db.getFirstAsync<MazeRow>(
+      "SELECT * FROM mazes WHERE id = ? LIMIT 1",
+      [id],
+    );
+    if (!row) return null;
+
+    const roomRows = await db.getAllAsync<MazeRoomRow>(
+      "SELECT * FROM maze_rooms WHERE maze_id = ? ORDER BY position ASC",
+      [id],
+    );
+
+    return mapMazeRow(row, roomRows);
+  }
+
+  /**
+   * Every maze, fully hydrated (rooms + parsed monster/question JSON),
+   * ordered by id. Used by the game picker / difficulty panel.
+   */
+  async getAllMazes(): Promise<AtomMazeChallenge[]> {
+    const db = await getReadyContentDb();
+
+    const rows = await db.getAllAsync<MazeRow>("SELECT * FROM mazes ORDER BY id");
+    if (rows.length === 0) return [];
+
+    const roomRows = await db.getAllAsync<MazeRoomRow>(
+      "SELECT * FROM maze_rooms ORDER BY maze_id ASC, position ASC",
+    );
+
+    // Group rooms by maze while preserving `position` order.
+    const roomsByMazeId = new Map<string, MazeRoomRow[]>();
+    for (const roomRow of roomRows) {
+      const list = roomsByMazeId.get(roomRow.maze_id);
+      if (list) list.push(roomRow);
+      else roomsByMazeId.set(roomRow.maze_id, [roomRow]);
+    }
+
+    return rows.map((row) => mapMazeRow(row, roomsByMazeId.get(row.id) ?? []));
+  }
+
+  /** Number of mazes seeded — handy for integrity checks on launch. */
+  async getMazeCount(): Promise<number> {
+    const db = await getReadyContentDb();
+    const { count } = (await db.getFirstAsync<{ count: number }>(
+      "SELECT COUNT(*) AS count FROM mazes",
+    )) as { count: number };
+    return count;
+  }
+
+  // -------------------------------------------------------------------------
+  // Encyclopedia
+  // -------------------------------------------------------------------------
+
+  /**
+   * Fetch a single encyclopedia entry by id, or `null`.
+   */
+  async getEncyclopediaEntryById(id: string): Promise<EncyclopediaEntry | null> {
+    const db = await getReadyContentDb();
+    const row = await db.getFirstAsync<EncyclopediaEntryRow>(
+      "SELECT * FROM encyclopedia_entries WHERE id = ? LIMIT 1",
+      [id],
+    );
+    return row ? mapEncyclopediaEntryRow(row) : null;
+  }
+
+  /**
+   * Every encyclopedia entry, fully hydrated (JSON columns parsed),
+   * ordered by term.
+   */
+  async getAllEncyclopediaEntries(): Promise<EncyclopediaEntry[]> {
+    const db = await getReadyContentDb();
+    const rows = await db.getAllAsync<EncyclopediaEntryRow>(
+      "SELECT * FROM encyclopedia_entries ORDER BY term",
+    );
+    return rows.map(mapEncyclopediaEntryRow);
+  }
+
+  /**
+   * Search encyclopedia entries by query string (term, definition, category, quickFacts).
+   * Note: This uses SQLite LIKE for simplicity; for large datasets a FTS5 virtual table would be better.
+   */
+  async searchEncyclopedia(query: string): Promise<EncyclopediaEntry[]> {
+    const db = await getReadyContentDb();
+    const lowerQuery = query.toLowerCase();
+    const rows = await db.getAllAsync<EncyclopediaEntryRow>(
+      `SELECT * FROM encyclopedia_entries
+       WHERE lower(term) LIKE ?
+          OR lower(definition) LIKE ?
+          OR lower(category) LIKE ?
+          OR EXISTS (
+            SELECT 1 FROM json_each(quick_facts)
+            WHERE lower(value) LIKE ?
+          )
+       ORDER BY term`,
+      [`%${lowerQuery}%`, `%${lowerQuery}%`, `%${lowerQuery}%`, `%${lowerQuery}%`],
+    );
+    return rows.map(mapEncyclopediaEntryRow);
+  }
+
+  /** Encyclopedia entries filtered by category, ordered by term. */
+  async getEncyclopediaByCategory(category: string): Promise<EncyclopediaEntry[]> {
+    const db = await getReadyContentDb();
+    const rows = await db.getAllAsync<EncyclopediaEntryRow>(
+      "SELECT * FROM encyclopedia_entries WHERE category = ? ORDER BY term",
+      [category],
+    );
+    return rows.map(mapEncyclopediaEntryRow);
+  }
+
+  /** Encyclopedia entries filtered by difficulty, ordered by term. */
+  async getEncyclopediaByDifficulty(
+    difficulty: "beginner" | "intermediate" | "advanced",
+  ): Promise<EncyclopediaEntry[]> {
+    const db = await getReadyContentDb();
+    const rows = await db.getAllAsync<EncyclopediaEntryRow>(
+      "SELECT * FROM encyclopedia_entries WHERE difficulty = ? ORDER BY term",
+      [difficulty],
+    );
+    return rows.map(mapEncyclopediaEntryRow);
+  }
+
+  /** Number of encyclopedia entries seeded — handy for integrity checks on launch. */
+  async getEncyclopediaCount(): Promise<number> {
+    const db = await getReadyContentDb();
+    const { count } = (await db.getFirstAsync<{ count: number }>(
+      "SELECT COUNT(*) AS count FROM encyclopedia_entries",
+    )) as { count: number };
+    return count;
+  }
+
+  // -------------------------------------------------------------------------
+  // Articles & Posts
+  // -------------------------------------------------------------------------
+
+  /** Fetch a single article by id, or `null`. */
+  async getArticleById(id: string): Promise<Article | null> {
+    const db = await getReadyContentDb();
+    const row = await db.getFirstAsync<ArticleRow>(
+      "SELECT * FROM articles WHERE id = ? LIMIT 1",
+      [id],
+    );
+    return row ? mapArticleRow(row) : null;
+  }
+
+  /**
+   * Every article, fully hydrated (JSON columns parsed), newest first.
+   */
+  async getAllArticles(): Promise<Article[]> {
+    const db = await getReadyContentDb();
+    const rows = await db.getAllAsync<ArticleRow>(
+      "SELECT * FROM articles ORDER BY published_date DESC, id",
+    );
+    return rows.map(mapArticleRow);
+  }
+
+  /** Fetch a single post by id, or `null`. */
+  async getPostById(id: string): Promise<Post | null> {
+    const db = await getReadyContentDb();
+    const row = await db.getFirstAsync<PostRow>(
+      "SELECT * FROM posts WHERE id = ? LIMIT 1",
+      [id],
+    );
+    return row ? mapPostRow(row) : null;
+  }
+
+  /**
+   * Every post, fully hydrated (JSON columns parsed), newest first.
+   */
+  async getAllPosts(): Promise<Post[]> {
+    const db = await getReadyContentDb();
+    const rows = await db.getAllAsync<PostRow>(
+      "SELECT * FROM posts ORDER BY published_date DESC, id",
+    );
+    return rows.map(mapPostRow);
   }
 
   // -------------------------------------------------------------------------

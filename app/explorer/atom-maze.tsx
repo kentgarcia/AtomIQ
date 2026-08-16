@@ -1,5 +1,8 @@
 import { Icon } from "@/components/ui/icon";
-import type { QuizQuestion as AtomMazeQuizQuestion } from "@/content/explorer";
+import type {
+    AtomMazeChallenge,
+    QuizQuestion as AtomMazeQuizQuestion,
+} from "@/content/explorer";
 import { getMazeById } from "@/content/explorer";
 import {
     getAllMythBusterQuizQuestions,
@@ -245,9 +248,24 @@ export default function AtomMazeBattleScreen() {
   const insets = useSafeAreaInsets();
   const { width, height } = useWindowDimensions();
 
-  const maze = useMemo(() => {
-    if (!id) return null;
-    return getMazeById(id);
+  const [maze, setMaze] = useState<AtomMazeChallenge | null>(null);
+  const [mazeLoaded, setMazeLoaded] = useState(false);
+  useEffect(() => {
+    let cancelled = false;
+    if (!id) {
+      setMaze(null);
+      setMazeLoaded(true);
+      return;
+    }
+    void getMazeById(id).then((found) => {
+      if (!cancelled) {
+        setMaze(found ?? null);
+        setMazeLoaded(true);
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
   }, [id]);
   const endlessRunXpReward = useMemo(
     () => getEndlessRunXpReward(maze?.xpReward || 0),
@@ -988,12 +1006,20 @@ export default function AtomMazeBattleScreen() {
     return () => subscription.remove();
   }, [shouldConfirmExit, showExitConfirmation]);
 
+  if (!mazeLoaded) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.errorText}>Loading maze…</Text>
+      </View>
+    );
+  }
+
   if (!maze) {
     return (
       <View style={styles.container}>
         <Text style={styles.errorText}>Maze not found</Text>
-        <TouchableOpacity style={styles.exitButton} onPress={handleExit}>
-          <Text style={styles.exitButtonText}>Go Back</Text>
+        <TouchableOpacity style={styles.nextButton} onPress={handleExit}>
+          <Text style={styles.nextButtonText}>Go Back</Text>
         </TouchableOpacity>
       </View>
     );

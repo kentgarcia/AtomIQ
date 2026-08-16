@@ -9,7 +9,7 @@ import { getAllMazes } from "@/content/explorer";
 import { GAME_MODES } from "@/app/mythbuster/modes";
 import { useTheme } from "@/theme";
 import { useRouter } from "expo-router";
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { StyleSheet, useWindowDimensions, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -53,6 +53,20 @@ export function DifficultyPanel({
     const { theme } = useTheme();
     const tab = theme.palettes.tab;
 
+    // Mazes live in the SQLite content database and load async.
+    const [mazes, setMazes] = useState<
+        { id: string; title: string; theme?: string }[]
+    >([]);
+    useEffect(() => {
+        let cancelled = false;
+        void getAllMazes().then((all) => {
+            if (!cancelled) setMazes(all);
+        });
+        return () => {
+            cancelled = true;
+        };
+    }, []);
+
     // Same stacking math as the game picker: stack fills the area below
     // the header and above the floating tab bar.
     const stackH = Math.round(
@@ -61,7 +75,7 @@ export function DifficultyPanel({
 
     const items = useMemo(() => {
         if (game === "atom-maze") {
-            return getAllMazes().map((maze, i) => ({
+            return mazes.map((maze, i) => ({
                 key: maze.id,
                 title: maze.title,
                 color: getMazeColor(maze.theme),
@@ -101,7 +115,7 @@ export function DifficultyPanel({
                     router.push("/lab?exp=energy-showdown"),
             },
         ];
-    }, [game, router]);
+    }, [game, router, mazes]);
 
     const cardH = Math.round(stackH / Math.max(items.length, 1));
 

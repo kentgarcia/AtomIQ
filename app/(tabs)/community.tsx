@@ -60,10 +60,10 @@ const CATEGORY_FILTERS: Record<string, (item: any) => boolean> = {
   safety: (it) => it.category === "safety" || it.tags?.includes("safety"),
 };
 
-// Helper to generate feed items from articles and posts only
-const generateFeedItems = () => {
-  const articles = getAllArticles();
-  const posts = getAllPosts();
+// Helper to generate feed items from articles and posts only (DB-backed, async)
+const generateFeedItems = async () => {
+  const articles = await getAllArticles();
+  const posts = await getAllPosts();
 
   const feedItems: any[] = [];
 
@@ -133,6 +133,7 @@ export default function CommunityScreen() {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFilter, setActiveFilter] = useState<string>("all");
   const [bookmarkedIds, setBookmarkedIds] = useState<string[]>([]);
+  const [allFeedItems, setAllFeedItems] = useState<any[]>([]);
 
   const mascotY = useSharedValue(0);
   const mascotRotate = useSharedValue(0);
@@ -159,8 +160,16 @@ export default function CommunityScreen() {
     ? ["#23305B", "#3C5587", THEME.bg]
     : ["#6FC6E8", "#A6DAF0", THEME.bg];
 
-  // Generate feed items
-  const allFeedItems = useMemo(() => generateFeedItems(), []);
+  // Generate feed items (articles + posts live in the content database)
+  useEffect(() => {
+    let alive = true;
+    generateFeedItems().then((items) => {
+      if (alive) setAllFeedItems(items);
+    });
+    return () => {
+      alive = false;
+    };
+  }, []);
 
   // Get saved items
   const savedItems = useMemo(() => {
