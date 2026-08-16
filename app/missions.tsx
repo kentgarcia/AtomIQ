@@ -1,8 +1,8 @@
 import { Icon } from "@/components/ui/icon";
 import { useDailyMissions } from "@/hooks/use-daily-missions";
 import { useTheme, fontFamilies } from "@/theme";
-import { useRouter } from "expo-router";
-import React, { useEffect, useMemo, useState } from "react";
+import { useFocusEffect, useRouter } from "expo-router";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
     ScrollView,
     StyleSheet,
@@ -45,9 +45,11 @@ export default function MissionsScreen() {
     return () => clearInterval(timer);
   }, []);
 
-  useEffect(() => {
-    void refresh();
-  }, [refresh]);
+  useFocusEffect(
+    useCallback(() => {
+      void refresh();
+    }, [refresh]),
+  );
 
   const styles = useMemo(() => createStyles(), []);
 
@@ -114,7 +116,7 @@ export default function MissionsScreen() {
             return (
               <Animated.View
                 key={mission.id}
-                entering={FadeInDown.delay(80 + index * 80).springify()}
+                entering={FadeInDown.delay(140 + index * 80).springify()}
                 style={[
                   styles.card,
                   styles.missionCard,
@@ -184,6 +186,24 @@ export default function MissionsScreen() {
                     >
                       <Text style={styles.claimText}>Claim +{mission.reward} XP</Text>
                     </TouchableOpacity>
+                  ) : mission.type === "mythbuster" ? (
+                    <TouchableOpacity
+                      style={styles.playBtn}
+                      activeOpacity={0.85}
+                      onPress={() => router.push("/mythbuster")}
+                    >
+                      <Icon name="Play" size={15} color="#FFFFFF" variant="Bold" />
+                      <Text style={styles.claimText}>Play</Text>
+                    </TouchableOpacity>
+                  ) : mission.type === "fact" ? (
+                    <TouchableOpacity
+                      style={styles.readBtn}
+                      activeOpacity={0.85}
+                      onPress={() => router.push("/daily-fact")}
+                    >
+                      <Icon name="Book" size={15} color="#FFFFFF" variant="Bold" />
+                      <Text style={styles.claimText}>Read</Text>
+                    </TouchableOpacity>
                   ) : (
                     <View style={styles.lockedPill}>
                       <Text style={styles.lockedText}>In progress</Text>
@@ -196,7 +216,7 @@ export default function MissionsScreen() {
 
           {/* Motivation footer */}
           <Animated.View
-            entering={FadeInDown.delay(300).springify()}
+            entering={FadeInDown.delay(380).springify()}
             style={styles.card}
           >
             <View style={styles.tipRow}>
@@ -338,6 +358,21 @@ const createStyles = () =>
       fontFamily: fontFamilies.semibold,
       color: "#9CA3AF",
     },
+    rewardPill: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 4,
+      backgroundColor: CREAM,
+      borderRadius: 12,
+      paddingHorizontal: 10,
+      paddingVertical: 6,
+    },
+    rewardText: {
+      fontSize: 12,
+      fontWeight: "800",
+      fontFamily: fontFamilies.heavy,
+      color: "#E67E22",
+    },
     /* Mission cards */
     missionCard: {
       paddingTop: 20,
@@ -378,21 +413,6 @@ const createStyles = () =>
       color: "#9CA3AF",
       marginTop: 2,
     },
-    rewardPill: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 4,
-      backgroundColor: CREAM,
-      borderRadius: 12,
-      paddingHorizontal: 10,
-      paddingVertical: 6,
-    },
-    rewardText: {
-      fontSize: 12,
-      fontWeight: "800",
-      fontFamily: fontFamilies.heavy,
-      color: "#E67E22",
-    },
     missionTrack: {
       alignSelf: "stretch",
       height: 8,
@@ -412,6 +432,9 @@ const createStyles = () =>
       marginTop: 10,
     },
     claimBtn: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 6,
       backgroundColor: BTN_COLOR,
       borderBottomWidth: 4,
       borderBottomColor: BTN_LIP,
@@ -424,6 +447,28 @@ const createStyles = () =>
       fontWeight: "800",
       fontFamily: fontFamilies.heavy,
       color: "#FFFFFF",
+    },
+    playBtn: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 6,
+      backgroundColor: "#8B5CF6",
+      borderBottomWidth: 4,
+      borderBottomColor: "#6D28D9",
+      borderRadius: 14,
+      paddingHorizontal: 18,
+      paddingVertical: 10,
+    },
+    readBtn: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 6,
+      backgroundColor: "#2ECC71",
+      borderBottomWidth: 4,
+      borderBottomColor: "#27AE60",
+      borderRadius: 14,
+      paddingHorizontal: 18,
+      paddingVertical: 10,
     },
     claimedPill: {
       flexDirection: "row",

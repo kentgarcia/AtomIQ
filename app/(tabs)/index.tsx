@@ -682,36 +682,67 @@ const handleScroll = useCallback(
 
           return (
             <View
-              style={[styles.nowCard, { top: insets.top + CARD_TOP }]}
+              style={[styles.nowCardWrap, { top: insets.top + CARD_TOP }]}
               pointerEvents="box-none"
             >
-              <View style={{ flex: 1 }}>
-                <Text style={styles.unitSubtitle} numberOfLines={1}>
-                  {activeUnit.subtitle}
-                </Text>
-                <Text style={styles.unitTitle} numberOfLines={2}>
-                  {activeUnit.title}
-                </Text>
+              <View style={styles.nowCard}>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.unitSubtitle} numberOfLines={1}>
+                    {activeUnit.subtitle}
+                  </Text>
+                  <Text style={styles.unitTitle} numberOfLines={2}>
+                    {activeUnit.title}
+                  </Text>
+                </View>
+                <TouchableOpacity
+                  style={styles.infoBtn}
+                  disabled={activeUnit.isLocked}
+                  onPress={() =>
+                    !activeUnit.isLocked &&
+                    setSelectedUnit({
+                      id: activeUnit.id,
+                      title: activeUnit.title,
+                      subtitle: activeUnit.subtitle,
+                    })
+                  }
+                >
+                  <Icon
+                    name={activeUnit.isLocked ? "Lock" : "InfoCircle"}
+                    size={18}
+                    color={activeUnit.isLocked ? "#9CA3AF" : THEME.primary}
+                    variant={activeUnit.isLocked ? "Bold" : "Linear"}
+                  />
+                </TouchableOpacity>
               </View>
-              <TouchableOpacity
-                style={styles.infoBtn}
-                disabled={activeUnit.isLocked}
-                onPress={() =>
-                  !activeUnit.isLocked &&
-                  setSelectedUnit({
-                    id: activeUnit.id,
-                    title: activeUnit.title,
-                    subtitle: activeUnit.subtitle,
-                  })
-                }
-              >
-                <Icon
-                  name={activeUnit.isLocked ? "Lock" : "InfoCircle"}
-                  size={18}
-                  color={activeUnit.isLocked ? "#9CA3AF" : THEME.primary}
-                  variant={activeUnit.isLocked ? "Bold" : "Linear"}
-                />
-              </TouchableOpacity>
+
+              {/* Sticky button dock: missions + daily myth/fact */}
+              <View style={styles.buttonDock}>
+                <View style={styles.missionBtn}>
+                  <TouchableOpacity
+                    style={styles.missionBtnInner}
+                    activeOpacity={0.85}
+                    onPress={() => router.push("/missions")}
+                  >
+                    <Icon name="Medal" size={24} color="#FFFFFF" variant="Bold" />
+                  </TouchableOpacity>
+                  {claimableCount > 0 && (
+                    <View style={styles.missionBadge}>
+                      <Text style={styles.missionBadgeText}>{claimableCount}</Text>
+                    </View>
+                  )}
+                </View>
+
+                {/* Daily myth/fact button */}
+                <View style={styles.factBtn}>
+                  <TouchableOpacity
+                    style={styles.factBtnInner}
+                    activeOpacity={0.85}
+                    onPress={() => router.push("/daily-fact")}
+                  >
+                    <Icon name="Book" size={24} color="#FFFFFF" variant="Bold" />
+                  </TouchableOpacity>
+                </View>
+              </View>
             </View>
           );
         })()}
@@ -769,22 +800,6 @@ const handleScroll = useCallback(
           </TouchableOpacity>
         </Animated.View>
       )}
-
-      {/* Floating daily missions button */}
-      <View style={[styles.missionBtn, { bottom: insets.bottom + 130 }]}>
-        <TouchableOpacity
-          style={styles.missionBtnInner}
-          activeOpacity={0.85}
-          onPress={() => router.push("/missions")}
-        >
-          <Icon name="Medal" size={24} color="#FFFFFF" variant="Bold" />
-        </TouchableOpacity>
-        {claimableCount > 0 && (
-          <View style={styles.missionBadge}>
-            <Text style={styles.missionBadgeText}>{claimableCount}</Text>
-          </View>
-        )}
-      </View>
 
       {/* Unit info modal */}
       <Modal
@@ -1121,11 +1136,14 @@ const createStyles = (theme: Palette) =>
       color: "#1F2937",
     },
     /* Sticky unit card — left-aligned text, info button centered on the right */
-    nowCard: {
+    nowCardWrap: {
       position: "absolute",
       left: 20,
       right: 20,
       zIndex: 90,
+      gap: 12,
+    },
+    nowCard: {
       flexDirection: "row",
       alignItems: "center",
       gap: 12,
@@ -1304,18 +1322,40 @@ const createStyles = (theme: Palette) =>
       borderBottomWidth: 4,
       borderBottomColor: "rgba(0,0,0,0.15)",
     },
-    /* Floating daily missions button */
+    /* Sticky button dock: missions + daily myth/fact */
+    buttonDock: {
+      flexDirection: "column",
+      alignItems: "center",
+      alignSelf: "flex-start",
+      gap: 12,
+      paddingVertical: 10,
+      paddingHorizontal: 8,
+      borderRadius: 30,
+      backgroundColor: "rgba(74, 74, 84, 0.85)",
+      zIndex: 95,
+    },
     missionBtn: {
-      position: "absolute",
-      left: 24,
       width: 56,
       height: 56,
-      zIndex: 95,
     },
     missionBtnInner: {
       flex: 1,
       borderRadius: 28,
       backgroundColor: "#FF8C00",
+      alignItems: "center",
+      justifyContent: "center",
+      borderBottomWidth: 4,
+      borderBottomColor: "rgba(0,0,0,0.15)",
+    },
+    /* Daily myth/fact button below the missions button */
+    factBtn: {
+      width: 56,
+      height: 56,
+    },
+    factBtnInner: {
+      flex: 1,
+      borderRadius: 28,
+      backgroundColor: "#2ECC71",
       alignItems: "center",
       justifyContent: "center",
       borderBottomWidth: 4,
