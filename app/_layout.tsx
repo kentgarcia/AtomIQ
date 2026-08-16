@@ -108,6 +108,10 @@ function AppContent() {
         <Stack.Screen name="settings" options={{ headerShown: false }} />
         <Stack.Screen name="streak" options={{ headerShown: false }} />
         <Stack.Screen name="missions" options={{ headerShown: false }} />
+        <Stack.Screen
+          name="daily-fact"
+          options={{ headerShown: false, presentation: "modal" }}
+        />
         <Stack.Screen name="lab" options={{ headerShown: false }} />
         <Stack.Screen name="explorer" options={{ headerShown: false }} />
         <Stack.Screen name="atom-maze" options={{ headerShown: false }} />
