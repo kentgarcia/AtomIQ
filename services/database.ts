@@ -618,7 +618,7 @@ export const createOrUpdateUserProfile = async (profile: {
   user_id?: string;
   username?: string;
   display_name?: string;
-  friend_code?: string;
+  friend_code?: string | null;
   avatar_url?: string;
   total_xp?: number;
   current_streak?: number;
@@ -960,7 +960,13 @@ export const updateLevelProgress = async (
         completed_at = COALESCE(?, completed_at),
         attempts = attempts + 1
       WHERE id = ?`,
-      [data.status, data.xp_earned, data.stars, data.completed_at, levelId],
+      [
+        data.status ?? null,
+        data.xp_earned ?? null,
+        data.stars ?? null,
+        data.completed_at ?? null,
+        levelId,
+      ],
     );
   } else {
     // Find which unit this level belongs to

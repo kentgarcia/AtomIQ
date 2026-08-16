@@ -161,13 +161,13 @@ function processInlineMarkdown(
   let currentIndex = 0;
 
   // Find all markdown patterns
-  const patterns: Array<{
+  const patterns: {
     start: number;
     end: number;
     type: string;
     content: string;
     url?: string;
-  }> = [];
+  }[] = [];
 
   // Code blocks (backticks)
   const codeRegex = /`([^`]+)`/g;

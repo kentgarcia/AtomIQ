@@ -130,10 +130,6 @@ export default function EncyclopediaScreen() {
       .sort((a, b) => b.count - a.count); // Sort by count descending
   }, [allEntries]);
 
-  const categories = useMemo(() => {
-    return categoriesWithCounts.map(c => c.category);
-  }, [categoriesWithCounts]);
-
   const getCategoryConfig = (category: string) => {
     const key = category.toLowerCase();
     return CATEGORY_CONFIG[key] || CATEGORY_CONFIG['default'];
@@ -266,7 +262,6 @@ export default function EncyclopediaScreen() {
               </View>
             ) : (
               filteredEntries.map((entry, index) => {
-                const categoryConfig = getCategoryConfig(entry.category);
                 const isSpeaking = speakingEntryId === entry.id;
                 
                 return (

@@ -1,15 +1,18 @@
 import { Icon } from "@/components/ui/icon";
 import {useTheme, type Palette, fontFamilies} from "@/theme";
-import { clearAllData, deleteAccountData } from "@/services/database";
+import { deleteAccountData } from "@/services/database";
 import { getSoundEnabled, setSoundEnabled } from "@/services/storage";
 import { useStorage } from "@/services/StorageContext";
 import { setUiSfxEnabled } from "@/services/ui-sfx";
+import Constants from "expo-constants";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
     ActivityIndicator,
     Alert,
+    Image,
+    Modal,
     ScrollView,
     StyleSheet,
     Switch,
@@ -20,6 +23,9 @@ import {
 } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+
+const APP_VERSION =
+  Constants.expoConfig?.version ?? Constants.nativeAppVersion ?? "1.0.0";
 
 export default function SettingsScreen() {
   const router = useRouter();
@@ -36,6 +42,7 @@ export default function SettingsScreen() {
   );
   const [soundEffects, setSoundEffects] = useState(true);
   const [isDeletingAccount, setIsDeletingAccount] = useState(false);
+  const [versionModalVisible, setVersionModalVisible] = useState(false);
 
   const nextDisplayNameChangeAt =
     userProfile?.next_display_name_change_at &&
@@ -115,82 +122,12 @@ export default function SettingsScreen() {
     }
   };
 
-  const handleClearProgress = () => {
-    Alert.alert(
-      "Clear All Progress",
-      "Are you sure you want to delete all your progress? This action cannot be undone.",
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Clear",
-          style: "destructive",
-          onPress: async () => {
-            try {
-              // Clear database
-              await clearAllData();
-              // Clear AsyncStorage
-              await AsyncStorage.clear();
-              Alert.alert("Success", "All progress has been cleared", [
-                {
-                  text: "OK",
-                  onPress: () => router.replace("/onboarding"),
-                },
-              ]);
-            } catch (error) {
-              console.error("Error clearing progress:", error);
-              Alert.alert("Error", "Failed to clear progress");
-            }
-          },
-        },
-      ],
-    );
-  };
-
-  const handleLogout = () => {
-    Alert.alert(
-      "Return to Title Screen",
-      "Are you sure you want to return to the title screen?",
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Continue",
-          style: "default",
-          onPress: () => {
-            router.replace("/");
-          },
-        },
-      ],
-    );
-  };
-
   const handlePrivacyPolicy = () => {
-    Alert.alert(
-      "Privacy Policy",
-      "AtomIQ Privacy Policy\n\n" +
-        "1. Data Collection: We collect minimal user data including display name, progress, and achievements stored locally on your device.\n\n" +
-        "2. Data Storage: All data is stored locally using SQLite.\n\n" +
-        "3. Data Usage: Your data is used solely to provide and improve the learning experience.\n\n" +
-        "4. Third-Party Services: We may use Google Gemini AI for chat assistance. Chat data is processed according to Google's privacy policy.\n\n" +
-        "5. User Rights: You can delete all your data at any time from the settings.\n\n" +
-        "For more information, visit our website.",
-      [{ text: "OK" }],
-    );
+    router.push("/privacy-policy");
   };
 
   const handleTermsOfService = () => {
-    Alert.alert(
-      "Terms of Service",
-      "AtomIQ Terms of Service\n\n" +
-        "1. Acceptance: By using AtomIQ, you agree to these terms.\n\n" +
-        "2. Educational Purpose: This app is for educational purposes only and provides information about nuclear science.\n\n" +
-        '3. Content Accuracy: While we strive for accuracy, content is provided "as is" without warranties.\n\n' +
-        "4. User Conduct: Users must use the app responsibly and not attempt to compromise its security.\n\n" +
-        "5. Account: You are responsible for maintaining the security of your account.\n\n" +
-        "6. Termination: We reserve the right to terminate access for violations of these terms.\n\n" +
-        "7. Changes: Terms may be updated periodically. Continued use constitutes acceptance.\n\n" +
-        "For complete terms, visit our website.",
-      [{ text: "OK" }],
-    );
+    router.push("/terms-of-service");
   };
 
   const handleSoundEffectsToggle = (enabled: boolean) => {
@@ -409,7 +346,10 @@ export default function SettingsScreen() {
         <Animated.View entering={FadeInDown.delay(400).springify()}>
           <Text style={styles.sectionTitle}>About</Text>
           <View style={styles.settingsCard}>
-            <TouchableOpacity style={styles.settingRow}>
+            <TouchableOpacity
+              style={styles.settingRow}
+              onPress={() => setVersionModalVisible(true)}
+            >
               <View style={styles.settingInfo}>
                 <Icon
                   name="InfoCircle"
@@ -419,7 +359,10 @@ export default function SettingsScreen() {
                 />
                 <Text style={styles.settingLabel}>App Version</Text>
               </View>
-              <Text style={styles.settingValue}>1.0.0</Text>
+              <View style={styles.valueRow}>
+                <Text style={styles.settingValue}>{APP_VERSION}</Text>
+                <Icon name="ArrowRight2" size={18} color={THEME.textMuted} />
+              </View>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -485,6 +428,68 @@ export default function SettingsScreen() {
 
         <View style={{ height: 100 }} />
       </ScrollView>
+
+      {/* App Version Modal */}
+      <Modal
+        visible={versionModalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setVersionModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <Animated.View
+            entering={FadeInDown.duration(300).springify()}
+            style={styles.modalCard}
+          >
+            <TouchableOpacity
+              onPress={() => setVersionModalVisible(false)}
+              style={styles.modalCloseBtn}
+            >
+              <Icon name="CloseCircle" size={28} color={THEME.textMuted} variant="Bold" />
+            </TouchableOpacity>
+
+            <View style={styles.modalIconWrap}>
+              <Image
+                source={require("@/assets/images/icon.png")}
+                style={styles.modalIcon}
+                resizeMode="contain"
+              />
+            </View>
+
+            <Text style={styles.modalTitle}>AtomIQ</Text>
+            <View style={styles.versionBadge}>
+              <Icon name="Crown1" size={13} color="#FFC107" variant="Bold" />
+              <Text style={styles.versionBadgeText}>Version {APP_VERSION}</Text>
+            </View>
+
+            <Text style={styles.modalSubtitle}>
+              Learn nuclear science one atom at a time.
+            </Text>
+
+            <View style={styles.modalDivider} />
+
+            <View style={styles.modalInfoRow}>
+              <Icon name="Code" size={18} color={THEME.primary} variant="Bold" />
+              <Text style={styles.modalInfoText}>Built with React Native</Text>
+            </View>
+            <View style={styles.modalInfoRow}>
+              <Icon name="DocumentText" size={18} color={THEME.primary} variant="Bold" />
+              <Text style={styles.modalInfoText}>Educational content</Text>
+            </View>
+
+            <Text style={styles.modalCopyright}>
+              © 2026 AtomIQ. All rights reserved.
+            </Text>
+
+            <TouchableOpacity
+              style={styles.modalGotItBtn}
+              onPress={() => setVersionModalVisible(false)}
+            >
+              <Text style={styles.modalGotItText}>Got it!</Text>
+            </TouchableOpacity>
+          </Animated.View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -631,5 +636,128 @@ const createStyles = (theme: Palette) =>
       fontWeight: "600",
       fontFamily: fontFamilies.semibold,
       color: "#EF4444",
+    },
+    /* App Version Modal */
+    modalOverlay: {
+      flex: 1,
+      backgroundColor: "rgba(0, 0, 0, 0.7)",
+      justifyContent: "center",
+      alignItems: "center",
+      padding: 28,
+    },
+    modalCard: {
+      width: "100%",
+      maxWidth: 380,
+      backgroundColor: theme.card,
+      borderRadius: 28,
+      padding: 28,
+      alignItems: "center",
+      borderWidth: 1,
+      borderColor: theme.border,
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 12 },
+      shadowOpacity: 0.25,
+      shadowRadius: 24,
+      elevation: 12,
+    },
+    modalCloseBtn: {
+      position: "absolute",
+      top: 16,
+      right: 16,
+      padding: 4,
+      zIndex: 10,
+    },
+    modalIconWrap: {
+      width: 88,
+      height: 88,
+      borderRadius: 28,
+      backgroundColor: "#FFF7ED",
+      borderWidth: 2,
+      borderColor: "#FFEDD5",
+      alignItems: "center",
+      justifyContent: "center",
+      marginBottom: 18,
+      shadowColor: theme.primary,
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.2,
+      shadowRadius: 10,
+      elevation: 4,
+    },
+    modalIcon: {
+      width: 64,
+      height: 64,
+    },
+    modalTitle: {
+      fontSize: 24,
+      fontWeight: "800",
+      fontFamily: fontFamilies.heavy,
+      color: theme.text,
+      marginBottom: 10,
+    },
+    versionBadge: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 6,
+      backgroundColor: "#FEF3C7",
+      paddingHorizontal: 14,
+      paddingVertical: 6,
+      borderRadius: 16,
+      marginBottom: 14,
+    },
+    versionBadgeText: {
+      fontSize: 13,
+      fontWeight: "700",
+      fontFamily: fontFamilies.bold,
+      color: "#92400E",
+    },
+    modalSubtitle: {
+      fontSize: 14,
+      fontFamily: fontFamilies.regular,
+      color: theme.textMuted,
+      textAlign: "center",
+      lineHeight: 21,
+      marginBottom: 18,
+    },
+    modalDivider: {
+      width: "70%",
+      height: 1,
+      backgroundColor: theme.border,
+      marginBottom: 18,
+    },
+    modalInfoRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 10,
+      marginBottom: 12,
+    },
+    modalInfoText: {
+      fontSize: 14,
+      fontFamily: fontFamilies.regular,
+      color: theme.text,
+    },
+    modalCopyright: {
+      fontSize: 12,
+      fontFamily: fontFamilies.regular,
+      color: theme.textMuted,
+      marginTop: 6,
+      marginBottom: 18,
+    },
+    modalGotItBtn: {
+      alignSelf: "stretch",
+      backgroundColor: theme.primary,
+      paddingVertical: 14,
+      borderRadius: 16,
+      alignItems: "center",
+      shadowColor: theme.primary,
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.3,
+      shadowRadius: 8,
+      elevation: 4,
+    },
+    modalGotItText: {
+      fontSize: 16,
+      fontWeight: "700",
+      fontFamily: fontFamilies.bold,
+      color: "#FFFFFF",
     },
   });

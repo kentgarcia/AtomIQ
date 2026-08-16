@@ -26,7 +26,7 @@ export interface ScreenProps {
     /** Content width constraint look & feel */
     contentContainerStyle?: StyleProp<ViewStyle>;
     style?: StyleProp<ViewStyle>;
-    edges?: ReadonlyArray<"top" | "right" | "bottom" | "left">;
+    edges?: readonly ("top" | "right" | "bottom" | "left")[];
     refreshControl?: ComponentProps<typeof ScrollView>["refreshControl"];
     keyboardAvoiding?: boolean;
 }

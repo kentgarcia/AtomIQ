@@ -135,7 +135,7 @@ export const MicroLearnView = ({
               />
               <Text style={learnStyles.titleText}>{data.title}</Text>
               <Text style={learnStyles.subtitleText}>
-                Let's learn something new!
+                Let&apos;s learn something new!
               </Text>
             </>
           )}

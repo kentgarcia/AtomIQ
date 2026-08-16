@@ -714,35 +714,6 @@ const handleScroll = useCallback(
                   />
                 </TouchableOpacity>
               </View>
-
-              {/* Sticky button dock: missions + daily myth/fact */}
-              <View style={styles.buttonDock}>
-                <View style={styles.missionBtn}>
-                  <TouchableOpacity
-                    style={styles.missionBtnInner}
-                    activeOpacity={0.85}
-                    onPress={() => router.push("/missions")}
-                  >
-                    <Icon name="Medal" size={24} color="#FFFFFF" variant="Bold" />
-                  </TouchableOpacity>
-                  {claimableCount > 0 && (
-                    <View style={styles.missionBadge}>
-                      <Text style={styles.missionBadgeText}>{claimableCount}</Text>
-                    </View>
-                  )}
-                </View>
-
-                {/* Daily myth/fact button */}
-                <View style={styles.factBtn}>
-                  <TouchableOpacity
-                    style={styles.factBtnInner}
-                    activeOpacity={0.85}
-                    onPress={() => router.push("/daily-fact")}
-                  >
-                    <Icon name="Book" size={24} color="#FFFFFF" variant="Bold" />
-                  </TouchableOpacity>
-                </View>
-              </View>
             </View>
           );
         })()}
@@ -771,11 +742,40 @@ const handleScroll = useCallback(
               "Atom Explorer"}
           </Text>
         </View>
+
+        {/* XP */}
         <View style={styles.xpPill}>
           <Icon name="Flash" size={15} color="#FFA000" variant="Bold" />
           <Text style={styles.xpText}>
             {(userProfile?.total_xp || 0).toLocaleString()}
           </Text>
+        </View>
+
+        {/* Daily missions button */}
+        <View style={styles.headerIconBtnWrap}>
+          <TouchableOpacity
+            style={styles.headerIconBtn}
+            activeOpacity={0.85}
+            onPress={() => router.push("/missions")}
+          >
+            <Icon name="Medal" size={20} color="#FF8C00" variant="Bold" />
+          </TouchableOpacity>
+          {claimableCount > 0 && (
+            <View style={styles.missionBadge}>
+              <Text style={styles.missionBadgeText}>{claimableCount}</Text>
+            </View>
+          )}
+        </View>
+
+        {/* Daily fact button */}
+        <View style={styles.headerIconBtnWrap}>
+          <TouchableOpacity
+            style={styles.headerIconBtn}
+            activeOpacity={0.85}
+            onPress={() => router.push("/daily-fact")}
+          >
+            <Icon name="Book" size={20} color="#2ECC71" variant="Bold" />
+          </TouchableOpacity>
         </View>
       </View>
 
@@ -1123,11 +1123,13 @@ const createStyles = (theme: Palette) =>
       gap: 5,
       backgroundColor: "#FFFFFF",
       paddingHorizontal: 12,
-      paddingVertical: 10,
+      height: 40,
       borderRadius: 20,
-      borderWidth: 2,
-      borderColor: "#E5E7EB",
-      borderBottomWidth: 4,
+      elevation: 3,
+      shadowColor: "#000000",
+      shadowOffset: { width: 0, height: 3 },
+      shadowOpacity: 0.08,
+      shadowRadius: 6,
     },
     xpText: {
       fontSize: 13,
@@ -1322,44 +1324,23 @@ const createStyles = (theme: Palette) =>
       borderBottomWidth: 4,
       borderBottomColor: "rgba(0,0,0,0.15)",
     },
-    /* Sticky button dock: missions + daily myth/fact */
-    buttonDock: {
-      flexDirection: "column",
-      alignItems: "center",
-      alignSelf: "flex-start",
-      gap: 12,
-      paddingVertical: 10,
-      paddingHorizontal: 8,
-      borderRadius: 30,
-      backgroundColor: "rgba(74, 74, 84, 0.85)",
-      zIndex: 95,
+    /* Header missions / daily-fact buttons (white circle, like profile header) */
+    headerIconBtnWrap: {
+      width: 40,
+      height: 40,
     },
-    missionBtn: {
-      width: 56,
-      height: 56,
-    },
-    missionBtnInner: {
-      flex: 1,
-      borderRadius: 28,
-      backgroundColor: "#FF8C00",
+    headerIconBtn: {
+      width: 40,
+      height: 40,
+      borderRadius: 20,
+      backgroundColor: "#FFFFFF",
       alignItems: "center",
       justifyContent: "center",
-      borderBottomWidth: 4,
-      borderBottomColor: "rgba(0,0,0,0.15)",
-    },
-    /* Daily myth/fact button below the missions button */
-    factBtn: {
-      width: 56,
-      height: 56,
-    },
-    factBtnInner: {
-      flex: 1,
-      borderRadius: 28,
-      backgroundColor: "#2ECC71",
-      alignItems: "center",
-      justifyContent: "center",
-      borderBottomWidth: 4,
-      borderBottomColor: "rgba(0,0,0,0.15)",
+      elevation: 3,
+      shadowColor: "#000000",
+      shadowOffset: { width: 0, height: 3 },
+      shadowOpacity: 0.08,
+      shadowRadius: 6,
     },
     missionBadge: {
       position: "absolute",

@@ -2,26 +2,24 @@ import {fontFamilies} from "@/theme";
 import { Icon } from '@/components/ui/icon';
 import { HowToPlayCard } from '@/components/games/HowToPlayCard';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useLocalSearchParams, useRouter } from 'expo-router';
-import React, { useState, useEffect, useRef } from 'react';
-import { Dimensions, ScrollView, StyleSheet, Text, TouchableOpacity, View, Animated as RNAnimated } from 'react-native';
+import { useLocalSearchParams } from 'expo-router';
+import React, { useState, useEffect } from 'react';
+import { Dimensions, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Animated, { 
   FadeInDown, 
-  FadeIn,
   useAnimatedStyle, 
   useSharedValue, 
-  withSpring, 
   withTiming,
   withRepeat,
   interpolate,
   Extrapolate,
   useAnimatedScrollHandler,
-  runOnJS
+  type SharedValue,
 } from 'react-native-reanimated';
-import { GestureDetector, Gesture, GestureHandlerRootView } from 'react-native-gesture-handler';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-const { width, height } = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 const CARD_WIDTH = width - 80;
 const CARD_SPACING = 20;
 
@@ -41,14 +39,156 @@ const THEME = {
 
 type LabMode = 'entrance' | 'dose-visualizer' | 'energy-showdown';
 
+interface ExperimentCardData {
+  id: string;
+  title: string;
+  subtitle: string;
+  icon: string;
+  description: string;
+  color: string;
+  gradient: [string, string];
+  guide?: false;
+}
+
+interface GuideCardData {
+  id: string;
+  icon: string;
+  guide: true;
+}
+
+type ExperimentEntry = ExperimentCardData | GuideCardData;
+
+const guidePalette = {
+  cardBg: THEME.card,
+  cardBorder: THEME.border,
+  primaryText: THEME.text,
+  mutedText: THEME.textMuted,
+  subtleBg: 'rgba(255, 255, 255, 0.06)',
+  subtleBorder: THEME.border,
+  iconWrapBg: 'rgba(255, 255, 255, 0.1)',
+};
+
+const HOW_TO_PLAY_STEPS = [
+  {
+    id: 'choose',
+    title: 'Pick an Experiment',
+    hint: 'Swipe between Dose Visualizer and Energy Showdown.',
+    icon: 'Layer',
+  },
+  {
+    id: 'compare',
+    title: 'Tap & Compare',
+    hint: 'Tap sources and switch metrics to compare the values.',
+    icon: 'Chart',
+  },
+  {
+    id: 'verdict',
+    title: 'Learn the Verdict',
+    hint: 'Read the verdicts and see why nuclear wins on safety.',
+    icon: 'InfoCircle',
+  },
+];
+
+function ExperimentCardView({
+  exp,
+  scrollX,
+  index,
+  onSelectSim,
+}: {
+  exp: ExperimentEntry;
+  scrollX: SharedValue<number>;
+  index: number;
+  onSelectSim: (sim: 'dose-visualizer' | 'energy-showdown') => void;
+}) {
+  const animatedCardStyle = useAnimatedStyle(() => {
+    const inputRange = [
+      (index - 1) * (CARD_WIDTH + CARD_SPACING),
+      index * (CARD_WIDTH + CARD_SPACING),
+      (index + 1) * (CARD_WIDTH + CARD_SPACING),
+    ];
+
+    return {
+      transform: [
+        {
+          scale: interpolate(
+            scrollX.value,
+            inputRange,
+            [0.9, 1, 0.9],
+            Extrapolate.CLAMP,
+          ),
+        },
+      ],
+      opacity: interpolate(
+        scrollX.value,
+        inputRange,
+        [0.6, 1, 0.6],
+        Extrapolate.CLAMP,
+      ),
+    };
+  });
+
+  if (exp.guide) {
+    return (
+      <Animated.View
+        style={[styles.experimentCard, { width: CARD_WIDTH }, animatedCardStyle]}
+      >
+        <View style={styles.howToSlide}>
+          <View style={styles.experimentIconContainer}>
+            <Icon name={exp.icon} size={64} color={THEME.primary} variant="Bold" />
+          </View>
+          <View style={{ width: '100%' }}>
+            <HowToPlayCard
+              steps={HOW_TO_PLAY_STEPS}
+              palette={guidePalette}
+              accentColor={THEME.primary}
+            />
+          </View>
+          <View style={styles.howToHint}>
+            <Icon name="ArrowLeft2" size={16} color={THEME.textMuted} />
+            <Text style={styles.howToHintText}>Swipe to explore</Text>
+            <Icon name="ArrowRight2" size={16} color={THEME.textMuted} />
+          </View>
+        </View>
+      </Animated.View>
+    );
+  }
+
+  return (
+    <Animated.View
+      style={[styles.experimentCard, { width: CARD_WIDTH }, animatedCardStyle]}
+    >
+      <LinearGradient
+        colors={exp.gradient}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.experimentGradient}
+      >
+        <View style={styles.experimentIconContainer}>
+          <Text style={styles.experimentIcon}>{exp.icon}</Text>
+        </View>
+        <Text style={styles.experimentTitle}>{exp.title}</Text>
+        <Text style={styles.experimentSubtitle}>{exp.subtitle}</Text>
+        <Text style={styles.experimentDescription}>{exp.description}</Text>
+        <TouchableOpacity
+          style={styles.startButton}
+          onPress={() => onSelectSim(exp.id as 'dose-visualizer' | 'energy-showdown')}
+          activeOpacity={0.8}
+        >
+          <Text style={styles.startButtonText}>START EXPERIMENT</Text>
+          <Icon name="ArrowRight2" size={20} color="#000" variant="Bold" />
+        </TouchableOpacity>
+      </LinearGradient>
+    </Animated.View>
+  );
+}
+
 // Entrance Screen Component
 function EntranceScreen({ onSelectSim }: { onSelectSim: (sim: 'dose-visualizer' | 'energy-showdown') => void }) {
-  const [selectedIndex, setSelectedIndex] = useState(0);
   const scrollX = useSharedValue(0);
   const scale = useSharedValue(1);
   const rotation = useSharedValue(0);
 
-  const experiments = [
+  const experiments: ExperimentEntry[] = [
     {
       id: 'dose-visualizer',
       title: 'Dose Visualizer',
@@ -71,37 +211,6 @@ function EntranceScreen({ onSelectSim }: { onSelectSim: (sim: 'dose-visualizer' 
       id: 'how-to-play',
       icon: 'Activity',
       guide: true,
-    },
-  ];
-
-  const guidePalette = {
-    cardBg: THEME.card,
-    cardBorder: THEME.border,
-    primaryText: THEME.text,
-    mutedText: THEME.textMuted,
-    subtleBg: 'rgba(255, 255, 255, 0.06)',
-    subtleBorder: THEME.border,
-    iconWrapBg: 'rgba(255, 255, 255, 0.1)',
-  };
-
-  const HOW_TO_PLAY_STEPS = [
-    {
-      id: 'choose',
-      title: 'Pick an Experiment',
-      hint: 'Swipe between Dose Visualizer and Energy Showdown.',
-      icon: 'Layer',
-    },
-    {
-      id: 'compare',
-      title: 'Tap & Compare',
-      hint: 'Tap sources and switch metrics to compare the values.',
-      icon: 'Chart',
-    },
-    {
-      id: 'verdict',
-      title: 'Learn the Verdict',
-      hint: 'Read the verdicts and see why nuclear wins on safety.',
-      icon: 'InfoCircle',
     },
   ];
 
@@ -131,31 +240,6 @@ function EntranceScreen({ onSelectSim }: { onSelectSim: (sim: 'dose-visualizer' 
   const animatedIconStyle = useAnimatedStyle(() => ({
     transform: [{ rotate: `${rotation.value}deg` }],
   }));
-
-  const getCardStyle = (index: number) => {
-    'worklet';
-    const inputRange = [
-      (index - 1) * (CARD_WIDTH + CARD_SPACING),
-      index * (CARD_WIDTH + CARD_SPACING),
-      (index + 1) * (CARD_WIDTH + CARD_SPACING),
-    ];
-
-    const scale = interpolate(
-      scrollX.value,
-      inputRange,
-      [0.9, 1, 0.9],
-      Extrapolate.CLAMP
-    );
-
-    const opacity = interpolate(
-      scrollX.value,
-      inputRange,
-      [0.6, 1, 0.6],
-      Extrapolate.CLAMP
-    );
-
-    return { scale, opacity };
-  };
 
   return (
     <View style={styles.entranceContainer}>
@@ -188,69 +272,15 @@ function EntranceScreen({ onSelectSim }: { onSelectSim: (sim: 'dose-visualizer' 
         snapToInterval={CARD_WIDTH + CARD_SPACING}
         decelerationRate="fast"
       >
-        {experiments.map((exp, index) => {
-          const cardStyle = getCardStyle(index);
-          const animatedCardStyle = useAnimatedStyle(() => ({
-            transform: [{ scale: cardStyle.scale }],
-            opacity: cardStyle.opacity,
-          }));
-
-          if ("guide" in exp) {
-            return (
-              <Animated.View
-                key={exp.id}
-                style={[styles.experimentCard, { width: CARD_WIDTH }, animatedCardStyle]}
-              >
-                <View style={styles.howToSlide}>
-                  <View style={styles.experimentIconContainer}>
-                    <Icon name={exp.icon} size={64} color={THEME.primary} variant="Bold" />
-                  </View>
-                  <View style={{ width: '100%' }}>
-                    <HowToPlayCard
-                      steps={HOW_TO_PLAY_STEPS}
-                      palette={guidePalette}
-                      accentColor={THEME.primary}
-                    />
-                  </View>
-                  <View style={styles.howToHint}>
-                    <Icon name="ArrowLeft2" size={16} color={THEME.textMuted} />
-                    <Text style={styles.howToHintText}>Swipe to explore</Text>
-                    <Icon name="ArrowRight2" size={16} color={THEME.textMuted} />
-                  </View>
-                </View>
-              </Animated.View>
-            );
-          }
-
-          return (
-            <Animated.View
-              key={exp.id}
-              style={[styles.experimentCard, { width: CARD_WIDTH }, animatedCardStyle]}
-            >
-              <LinearGradient
-                colors={exp.gradient}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={styles.experimentGradient}
-              >
-                <View style={styles.experimentIconContainer}>
-                  <Text style={styles.experimentIcon}>{exp.icon}</Text>
-                </View>
-                <Text style={styles.experimentTitle}>{exp.title}</Text>
-                <Text style={styles.experimentSubtitle}>{exp.subtitle}</Text>
-                <Text style={styles.experimentDescription}>{exp.description}</Text>
-                <TouchableOpacity
-                  style={styles.startButton}
-                  onPress={() => onSelectSim(exp.id as 'dose-visualizer' | 'energy-showdown')}
-                  activeOpacity={0.8}
-                >
-                  <Text style={styles.startButtonText}>START EXPERIMENT</Text>
-                  <Icon name="ArrowRight2" size={20} color="#000" variant="Bold" />
-                </TouchableOpacity>
-              </LinearGradient>
-            </Animated.View>
-          );
-        })}
+        {experiments.map((exp, index) => (
+          <ExperimentCardView
+            key={exp.id}
+            exp={exp}
+            scrollX={scrollX}
+            index={index}
+            onSelectSim={onSelectSim}
+          />
+        ))}
       </Animated.ScrollView>
 
       {/* Indicators */}
@@ -592,7 +622,6 @@ function EnergyShowdown({ onBack }: { onBack: () => void }) {
 }
 
 export default function LabScreen() {
-  const router = useRouter();
   const { exp } = useLocalSearchParams<{ exp?: string }>();
   const initialMode: LabMode =
     exp === 'dose-visualizer' || exp === 'energy-showdown' ? exp : 'entrance';
@@ -790,6 +819,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingVertical: 16,
+  },
+  backButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   simHeaderContent: {
     flex: 1,

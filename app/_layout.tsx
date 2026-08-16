@@ -56,6 +56,8 @@ function AppContent() {
         <Stack.Screen name="leaderboard" options={{ headerShown: false }} />
         <Stack.Screen name="profile" options={{ headerShown: false }} />
         <Stack.Screen name="settings" options={{ headerShown: false }} />
+        <Stack.Screen name="privacy-policy" options={{ headerShown: false }} />
+        <Stack.Screen name="terms-of-service" options={{ headerShown: false }} />
         <Stack.Screen name="streak" options={{ headerShown: false }} />
         <Stack.Screen name="missions" options={{ headerShown: false }} />
         <Stack.Screen

@@ -27,7 +27,7 @@ import Animated, {
     ZoomIn
 } from "react-native-reanimated";
 
-const { width, height } = Dimensions.get("window");
+const { width } = Dimensions.get("window");
 
 const THEME = {
   bg: "#F7F7F7",
@@ -363,9 +363,9 @@ export const MythBusterRenderer = ({
 
               {/* Myth Content */}
               <View style={mythStyles.mythContent}>
-                <Text style={mythStyles.quoteOpen}>"</Text>
+                <Text style={mythStyles.quoteOpen}>&quot;</Text>
                 <Text style={mythStyles.mythText}>{data.myth}</Text>
-                <Text style={mythStyles.quoteClose}>"</Text>
+                <Text style={mythStyles.quoteClose}>&quot;</Text>
               </View>
 
               {data.image && (
