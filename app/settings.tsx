@@ -3,14 +3,6 @@ import {useTheme, type Palette, fontFamilies} from "@/theme";
 import { clearAllData, deleteAccountData } from "@/services/database";
 import { getSoundEnabled, setSoundEnabled } from "@/services/storage";
 import { useStorage } from "@/services/StorageContext";
-import {
-    isSupabaseConfigured,
-    issueTransferCode,
-    previewTransferCode,
-    redeemTransferCode,
-    supabase,
-    type TransferCodeRedeemProfile,
-} from "@/services/supabase";
 import { setUiSfxEnabled } from "@/services/ui-sfx";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
@@ -35,11 +27,6 @@ export default function SettingsScreen() {
   const {
     userProfile,
     updateUserProfile,
-    syncProfileToSupabase,
-    isOnline,
-    isSyncing,
-    pendingChanges,
-    lastSyncedAt,
   } = useStorage();
   const { theme, isDark, toggleTheme } = useTheme();
   const THEME = theme.palettes.settings;
@@ -48,22 +35,7 @@ export default function SettingsScreen() {
     userProfile?.display_name || userProfile?.username || "",
   );
   const [soundEffects, setSoundEffects] = useState(true);
-  const [isManualSyncing, setIsManualSyncing] = useState(false);
   const [isDeletingAccount, setIsDeletingAccount] = useState(false);
-  const [isTransferCodeActionLoading, setIsTransferCodeActionLoading] =
-    useState(false);
-  const [activeTransferCode, setActiveTransferCode] = useState<string | null>(
-    null,
-  );
-  const [transferCodeExpiresAt, setTransferCodeExpiresAt] = useState<
-    string | null
-  >(null);
-  const [transferCodeInput, setTransferCodeInput] = useState("");
-  const [previewTransferProfile, setPreviewTransferProfile] =
-    useState<TransferCodeRedeemProfile | null>(null);
-  const [pendingTransferCode, setPendingTransferCode] = useState<string | null>(
-    null,
-  );
 
   const nextDisplayNameChangeAt =
     userProfile?.next_display_name_change_at &&
@@ -109,298 +81,6 @@ export default function SettingsScreen() {
     setDisplayName(userProfile?.display_name || userProfile?.username || "");
   }, [userProfile?.display_name, userProfile?.username]);
 
-  const normalizeTransferCodeInput = (value: string): string => {
-    return value.replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
-  };
-
-  const getTransferCodeExpiryText = (expiresAt: string | null): string => {
-    if (!expiresAt) {
-      return "Generate a code to move your account to another device";
-    }
-
-    const expiresAtMs = new Date(expiresAt).getTime();
-    if (Number.isNaN(expiresAtMs)) {
-      return "Code expires soon";
-    }
-
-    const remainingMs = expiresAtMs - Date.now();
-    if (remainingMs <= 0) {
-      return "Code expired - generate a new one";
-    }
-
-    const remainingMinutes = Math.max(Math.ceil(remainingMs / (60 * 1000)), 1);
-    return `Expires in ${remainingMinutes} minute${remainingMinutes === 1 ? "" : "s"}`;
-  };
-
-  const syncBeforeTransferAction = async (): Promise<boolean> => {
-    if (!isOnline) {
-      Alert.alert(
-        "Offline",
-        "Transfer code actions require internet so your data can sync first.",
-      );
-      return false;
-    }
-
-    const synced = await syncProfileToSupabase();
-    if (!synced) {
-      Alert.alert(
-        "Sync Required",
-        "Unable to sync your latest data. Try again when network is stable.",
-      );
-      return false;
-    }
-
-    return true;
-  };
-
-  const handleManualSyncNow = async () => {
-    if (isManualSyncing || isSyncing) {
-      return;
-    }
-
-    if (!isSupabaseConfigured()) {
-      Alert.alert("Unavailable", "Cloud sync is not configured in this build.");
-      return;
-    }
-
-    if (!isOnline) {
-      Alert.alert(
-        "Internet Required",
-        "Connect to the internet, then tap Sync Now to upload your latest data.",
-      );
-      return;
-    }
-
-    try {
-      setIsManualSyncing(true);
-      const synced = await syncProfileToSupabase();
-
-      if (synced) {
-        Alert.alert("Sync Complete", "Your latest data is now synced online.");
-      } else {
-        Alert.alert(
-          "Sync Needed",
-          "Unable to sync right now. Keep internet on and tap Sync Now again.",
-        );
-      }
-    } catch (error) {
-      Alert.alert(
-        "Sync Failed",
-        "Unable to sync right now. Please try again in a moment.",
-      );
-    } finally {
-      setIsManualSyncing(false);
-    }
-  };
-
-  const syncStatusDescription = (() => {
-    if (!isSupabaseConfigured()) {
-      return "Cloud sync is unavailable in this build.";
-    }
-
-    if (!isOnline) {
-      return "Offline. Connect to internet and tap Sync Now.";
-    }
-
-    if (isSyncing || isManualSyncing) {
-      return "Syncing your latest changes...";
-    }
-
-    if (pendingChanges > 0) {
-      return `${pendingChanges} change${pendingChanges === 1 ? "" : "s"} pending. Tap Sync Now if auto-sync is delayed.`;
-    }
-
-    if (lastSyncedAt) {
-      return `Last synced at ${new Date(lastSyncedAt).toLocaleTimeString()}.`;
-    }
-
-    return "Ready. Tap Sync Now anytime if your changes are not appearing online.";
-  })();
-
-  const handleGenerateTransferCode = async () => {
-    if (isTransferCodeActionLoading) {
-      return;
-    }
-
-    if (!isSupabaseConfigured()) {
-      Alert.alert(
-        "Unavailable",
-        "Transfer codes require Supabase configuration in this build.",
-      );
-      return;
-    }
-
-    try {
-      const syncReady = await syncBeforeTransferAction();
-      if (!syncReady) {
-        return;
-      }
-
-      setIsTransferCodeActionLoading(true);
-      const result = await issueTransferCode();
-
-      if (result.status === "success") {
-        setActiveTransferCode(result.code ?? null);
-        setTransferCodeExpiresAt(result.expiresAt ?? null);
-        setPreviewTransferProfile(null);
-        setPendingTransferCode(null);
-        Alert.alert(
-          "Transfer Code Ready",
-          `Use ${result.code} on your new device. ${getTransferCodeExpiryText(result.expiresAt ?? null)}.`,
-        );
-        return;
-      }
-
-      Alert.alert(
-        "Transfer Code",
-        result.message || "Unable to generate a transfer code.",
-      );
-    } catch (error) {
-      Alert.alert(
-        "Transfer Code",
-        error instanceof Error
-          ? error.message
-          : "Unable to generate a transfer code.",
-      );
-    } finally {
-      setIsTransferCodeActionLoading(false);
-    }
-  };
-
-  const handlePreviewTransferCode = async () => {
-    if (isTransferCodeActionLoading) {
-      return;
-    }
-
-    if (!isSupabaseConfigured()) {
-      Alert.alert(
-        "Unavailable",
-        "Transfer codes require Supabase configuration in this build.",
-      );
-      return;
-    }
-
-    const normalizedCode = normalizeTransferCodeInput(transferCodeInput);
-    if (normalizedCode.length !== 8) {
-      Alert.alert("Invalid Code", "Transfer code must be 8 letters or digits.");
-      return;
-    }
-
-    try {
-      const syncReady = await syncBeforeTransferAction();
-      if (!syncReady) {
-        return;
-      }
-
-      setIsTransferCodeActionLoading(true);
-      const result = await previewTransferCode(normalizedCode);
-
-      if (result.status !== "success" || !result.profile) {
-        Alert.alert(
-          "Transfer Code",
-          result.message || "Unable to import account from this code.",
-        );
-        return;
-      }
-
-      setPendingTransferCode(normalizedCode);
-      setPreviewTransferProfile(result.profile);
-    } catch (error) {
-      Alert.alert(
-        "Transfer Code",
-        error instanceof Error
-          ? error.message
-          : "Unable to preview account from this code.",
-      );
-    } finally {
-      setIsTransferCodeActionLoading(false);
-    }
-  };
-
-  const executeTransferOverwrite = async () => {
-    if (!pendingTransferCode || !previewTransferProfile) {
-      return;
-    }
-
-    if (isTransferCodeActionLoading) {
-      return;
-    }
-
-    try {
-      const syncReady = await syncBeforeTransferAction();
-      if (!syncReady) {
-        return;
-      }
-
-      setIsTransferCodeActionLoading(true);
-      const result = await redeemTransferCode(pendingTransferCode, true);
-
-      if (result.status !== "success" || !result.profile) {
-        Alert.alert(
-          "Transfer Code",
-          result.message || "Unable to overwrite current data with this code.",
-        );
-        return;
-      }
-
-      await updateUserProfile({
-        user_id: result.profile.user_id,
-        username: result.profile.username,
-        display_name: result.profile.display_name,
-        friend_code: result.profile.friend_code || undefined,
-        display_name_updated_at: result.profile.display_name_updated_at,
-        next_display_name_change_at: result.profile.next_display_name_change_at,
-        avatar_url: result.profile.avatar_url || "",
-        total_xp: result.profile.total_xp,
-        current_streak: result.profile.current_streak,
-        longest_streak: result.profile.longest_streak,
-        myths_busted: result.profile.myths_busted,
-        lessons_completed: result.profile.lessons_completed,
-      });
-
-      setTransferCodeInput("");
-      setActiveTransferCode(null);
-      setTransferCodeExpiresAt(null);
-      setPendingTransferCode(null);
-      setPreviewTransferProfile(null);
-
-      Alert.alert(
-        "Account Imported",
-        "Your current device data has been overwritten with the transfer code profile.",
-      );
-    } catch (error) {
-      Alert.alert(
-        "Transfer Code",
-        error instanceof Error
-          ? error.message
-          : "Unable to overwrite current data with this code.",
-      );
-    } finally {
-      setIsTransferCodeActionLoading(false);
-    }
-  };
-
-  const handleConfirmTransferOverwrite = () => {
-    if (!previewTransferProfile) {
-      return;
-    }
-
-    Alert.alert(
-      "Overwrite Current Data",
-      "This will replace your current local profile with the previewed transfer data.",
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Overwrite",
-          style: "destructive",
-          onPress: () => {
-            void executeTransferOverwrite();
-          },
-        },
-      ],
-    );
-  };
-
   const handleSaveDisplayName = async () => {
     const nextDisplayName = displayName.trim();
 
@@ -419,32 +99,6 @@ export default function SettingsScreen() {
       await updateUserProfile({ display_name: nextDisplayName });
       setIsEditing(false);
 
-      const cloudSyncEnabled = isSupabaseConfigured();
-      if (!cloudSyncEnabled) {
-        Alert.alert(
-          "Success",
-          "Display name updated successfully! You can change it again in 7 days.",
-        );
-        return;
-      }
-
-      if (!isOnline) {
-        Alert.alert(
-          "Saved Offline",
-          "Display name updated on this device. It will sync automatically when internet is available.",
-        );
-        return;
-      }
-
-      const synced = await syncProfileToSupabase();
-      if (!synced) {
-        Alert.alert(
-          "Saved Locally",
-          "Display name updated on this device. Cloud sync will retry automatically when network is stable.",
-        );
-        return;
-      }
-
       Alert.alert(
         "Success",
         "Display name updated successfully! You can change it again in 7 days.",
@@ -454,14 +108,6 @@ export default function SettingsScreen() {
         ?.nextAllowedAt;
       if (nextAllowedAt) {
         Alert.alert("Cooldown Active", formatCooldown(nextAllowedAt));
-        return;
-      }
-
-      if (!isOnline) {
-        Alert.alert(
-          "Offline",
-          "Unable to update display name right now while offline. Please try again once internet is available.",
-        );
         return;
       }
 
@@ -522,7 +168,7 @@ export default function SettingsScreen() {
       "Privacy Policy",
       "AtomIQ Privacy Policy\n\n" +
         "1. Data Collection: We collect minimal user data including display name, progress, and achievements stored locally on your device.\n\n" +
-        "2. Data Storage: All data is stored locally using SQLite. When Supabase sync is enabled, data may be synced to secure cloud storage.\n\n" +
+        "2. Data Storage: All data is stored locally using SQLite.\n\n" +
         "3. Data Usage: Your data is used solely to provide and improve the learning experience.\n\n" +
         "4. Third-Party Services: We may use Google Gemini AI for chat assistance. Chat data is processed according to Google's privacy policy.\n\n" +
         "5. User Rights: You can delete all your data at any time from the settings.\n\n" +
@@ -553,53 +199,6 @@ export default function SettingsScreen() {
     void setSoundEnabled(enabled);
   };
 
-  const isIgnorableSupabaseError = (error: any): boolean => {
-    return error?.code === "PGRST205" || error?.code === "42P01";
-  };
-
-  const deleteRemoteAccountData = async (userId: string): Promise<boolean> => {
-    if (!isSupabaseConfigured()) {
-      return true;
-    }
-
-    try {
-      const runDelete = async (operation: Promise<{ error: any }>) => {
-        const { error } = await operation;
-        if (error && !isIgnorableSupabaseError(error)) {
-          throw error;
-        }
-      };
-
-      await runDelete(
-        supabase.from("friend_requests").delete().eq("from_user_id", userId),
-      );
-      await runDelete(
-        supabase.from("friend_requests").delete().eq("to_user_id", userId),
-      );
-      await runDelete(supabase.from("friends").delete().eq("user_id", userId));
-      await runDelete(
-        supabase.from("friends").delete().eq("friend_id", userId),
-      );
-      await runDelete(supabase.from("comments").delete().eq("user_id", userId));
-      await runDelete(
-        supabase.from("feed_comments").delete().eq("user_id", userId),
-      );
-      await runDelete(
-        supabase.from("user_stats").delete().eq("user_id", userId),
-      );
-      await runDelete(
-        supabase.from("leaderboard").delete().eq("user_id", userId),
-      );
-      await runDelete(supabase.from("users").delete().eq("user_id", userId));
-
-      await supabase.auth.signOut();
-      return true;
-    } catch (error) {
-      console.error("Error deleting remote account data:", error);
-      return false;
-    }
-  };
-
   const executeDeleteAccount = async () => {
     if (isDeletingAccount) {
       return;
@@ -608,28 +207,15 @@ export default function SettingsScreen() {
     try {
       setIsDeletingAccount(true);
 
-      let remoteCleanupSucceeded = true;
-      if (userProfile?.user_id) {
-        remoteCleanupSucceeded = await deleteRemoteAccountData(
-          userProfile.user_id,
-        );
-      }
-
       await deleteAccountData();
       await AsyncStorage.clear();
 
-      Alert.alert(
-        remoteCleanupSucceeded ? "Account Deleted" : "Account Deleted Locally",
-        remoteCleanupSucceeded
-          ? "Your account has been deleted."
-          : "Your account was deleted on this device, but cloud cleanup could not be completed.",
-        [
-          {
-            text: "OK",
-            onPress: () => router.replace("/onboarding"),
-          },
-        ],
-      );
+      Alert.alert("Account Deleted", "Your account has been deleted.", [
+        {
+          text: "OK",
+          onPress: () => router.replace("/onboarding"),
+        },
+      ]);
     } catch (error) {
       console.error("Error deleting account:", error);
       Alert.alert("Error", "Failed to delete account. Please try again.");
@@ -690,26 +276,6 @@ export default function SettingsScreen() {
           <Text style={styles.sectionTitle}>Account</Text>
           <View style={styles.settingsCard}>
             <View style={styles.settingRow}>
-              <View style={styles.settingInfo}>
-                <Icon
-                  name="ShieldTick"
-                  size={20}
-                  color={THEME.primary}
-                  variant="Bold"
-                />
-                <View style={{ flex: 1 }}>
-                  <Text style={styles.settingLabel}>Friend Code</Text>
-                  <Text style={styles.settingDescription}>
-                    Share this code so others can add you
-                  </Text>
-                </View>
-              </View>
-              <Text style={[styles.settingValue, styles.friendCodeValue]}>
-                {userProfile?.friend_code || "Generating..."}
-              </Text>
-            </View>
-
-            <View style={[styles.settingRow, styles.settingRowBorder]}>
               <View style={styles.settingInfo}>
                 <Icon
                   name="Profile"
@@ -836,179 +402,6 @@ export default function SettingsScreen() {
                 thumbColor={soundEffects ? "#FFFFFF" : "#FFFFFF"}
               />
             </View>
-          </View>
-        </Animated.View>
-
-        {/* Cloud Sync Section */}
-        <Animated.View entering={FadeInDown.delay(300).springify()}>
-          <Text style={styles.sectionTitle}>Cloud Sync</Text>
-          <View style={styles.settingsCard}>
-            <View style={styles.settingRow}>
-              <View style={styles.settingInfo}>
-                <Icon
-                  name="Refresh"
-                  size={20}
-                  color={THEME.primary}
-                  variant="Bold"
-                />
-                <View>
-                  <Text style={styles.settingLabel}>Sync Status</Text>
-                  <Text style={styles.settingDescription}>
-                    {syncStatusDescription}
-                  </Text>
-                </View>
-              </View>
-              <TouchableOpacity
-                style={[
-                  styles.cloudActionBtn,
-                  (!isSupabaseConfigured() ||
-                    !isOnline ||
-                    isManualSyncing ||
-                    isSyncing) &&
-                    styles.cloudActionBtnDisabled,
-                ]}
-                onPress={handleManualSyncNow}
-                disabled={
-                  !isSupabaseConfigured() ||
-                  !isOnline ||
-                  isManualSyncing ||
-                  isSyncing
-                }
-              >
-                {isManualSyncing || isSyncing ? (
-                  <ActivityIndicator size="small" color="#FFFFFF" />
-                ) : (
-                  <Text style={styles.cloudActionBtnText}>Sync Now</Text>
-                )}
-              </TouchableOpacity>
-            </View>
-
-            <View style={[styles.settingRow, styles.settingRowBorder]}>
-              <View style={styles.settingInfo}>
-                <Icon
-                  name="Profile"
-                  size={20}
-                  color={THEME.primary}
-                  variant="Bold"
-                />
-                <View>
-                  <Text style={styles.settingLabel}>Transfer Code</Text>
-                  <Text style={styles.settingDescription}>
-                    {getTransferCodeExpiryText(transferCodeExpiresAt)}
-                  </Text>
-                </View>
-              </View>
-              <TouchableOpacity
-                style={[
-                  styles.cloudActionBtn,
-                  (!isSupabaseConfigured() || isTransferCodeActionLoading) &&
-                    styles.cloudActionBtnDisabled,
-                ]}
-                onPress={handleGenerateTransferCode}
-                disabled={
-                  !isSupabaseConfigured() || isTransferCodeActionLoading
-                }
-              >
-                {isTransferCodeActionLoading ? (
-                  <ActivityIndicator size="small" color="#FFFFFF" />
-                ) : (
-                  <Text style={styles.cloudActionBtnText}>
-                    {activeTransferCode ? "Regenerate" : "Generate"}
-                  </Text>
-                )}
-              </TouchableOpacity>
-            </View>
-
-            {activeTransferCode ? (
-              <View style={[styles.settingRow, styles.settingRowBorder]}>
-                <View style={styles.settingInfo}>
-                  <Icon
-                    name="ShieldTick"
-                    size={20}
-                    color={THEME.primary}
-                    variant="Bold"
-                  />
-                  <View>
-                    <Text style={styles.settingLabel}>Active Code</Text>
-                    <Text style={styles.settingDescription}>
-                      Enter this on your new device
-                    </Text>
-                  </View>
-                </View>
-                <Text style={styles.transferCodeValue}>
-                  {activeTransferCode}
-                </Text>
-              </View>
-            ) : null}
-
-            <View style={[styles.settingRow, styles.settingRowBorder]}>
-              <TextInput
-                style={[styles.input, styles.transferCodeInput]}
-                value={transferCodeInput}
-                onChangeText={(text) => {
-                  setTransferCodeInput(normalizeTransferCodeInput(text));
-                  setPendingTransferCode(null);
-                  setPreviewTransferProfile(null);
-                }}
-                placeholder="Enter transfer code"
-                autoCapitalize="none"
-                autoCorrect={false}
-                maxLength={8}
-              />
-              <TouchableOpacity
-                style={[
-                  styles.cloudActionBtn,
-                  styles.transferCodeRedeemBtn,
-                  (!isSupabaseConfigured() || isTransferCodeActionLoading) &&
-                    styles.cloudActionBtnDisabled,
-                ]}
-                onPress={handlePreviewTransferCode}
-                disabled={
-                  !isSupabaseConfigured() || isTransferCodeActionLoading
-                }
-              >
-                {isTransferCodeActionLoading ? (
-                  <ActivityIndicator size="small" color="#FFFFFF" />
-                ) : (
-                  <Text style={styles.cloudActionBtnText}>Preview</Text>
-                )}
-              </TouchableOpacity>
-            </View>
-
-            {previewTransferProfile ? (
-              <View
-                style={[styles.transferPreviewCard, styles.settingRowBorder]}
-              >
-                <Text style={styles.transferPreviewTitle}>
-                  Code Data Preview
-                </Text>
-                <Text style={styles.transferPreviewLine}>
-                  Display Name: {previewTransferProfile.display_name}
-                </Text>
-                <Text style={styles.transferPreviewLine}>
-                  Friend Code: {previewTransferProfile.friend_code || "None"}
-                </Text>
-                <Text style={styles.transferPreviewLine}>
-                  XP: {previewTransferProfile.total_xp}
-                </Text>
-                <Text style={styles.transferPreviewLine}>
-                  Lessons: {previewTransferProfile.lessons_completed}
-                </Text>
-                <Text style={styles.transferPreviewLine}>
-                  Myths Busted: {previewTransferProfile.myths_busted}
-                </Text>
-
-                <TouchableOpacity
-                  style={styles.transferOverwriteBtn}
-                  onPress={handleConfirmTransferOverwrite}
-                  disabled={isTransferCodeActionLoading}
-                >
-                  <Text style={styles.transferOverwriteBtnText}>
-                    Overwrite Current Data
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            ) : null}
           </View>
         </Animated.View>
 
@@ -1187,32 +580,6 @@ const createStyles = (theme: Palette) =>
       color: theme.textMuted,
       marginRight: 8,
     },
-    cloudActionBtn: {
-      backgroundColor: theme.primary,
-      paddingHorizontal: 12,
-      paddingVertical: 8,
-      borderRadius: 10,
-      minWidth: 100,
-      alignItems: "center",
-      justifyContent: "center",
-    },
-    cloudActionBtnDisabled: {
-      opacity: 0.6,
-    },
-    cloudActionBtnText: {
-      color: "#FFFFFF",
-      fontSize: 13,
-      fontWeight: "700",
-      fontFamily: fontFamilies.bold,
-    },
-    friendCodeValue: {
-      fontFamily: "monospace",
-      fontSize: 13,
-      fontWeight: "700",
-      color: theme.primary,
-      textTransform: "uppercase",
-      letterSpacing: 1,
-    },
     valueRow: {
       flexDirection: "row",
       alignItems: "center",
@@ -1236,53 +603,6 @@ const createStyles = (theme: Palette) =>
       fontSize: 15,
       fontFamily: fontFamilies.regular,
       color: theme.text,
-    },
-    transferCodeInput: {
-      marginRight: 0,
-    },
-    transferCodeRedeemBtn: {
-      marginLeft: 10,
-      minWidth: 88,
-    },
-    transferCodeValue: {
-      fontFamily: "monospace",
-      fontSize: 18,
-      fontWeight: "700",
-      color: theme.primary,
-      letterSpacing: 2,
-    },
-    transferPreviewCard: {
-      paddingHorizontal: 16,
-      paddingTop: 14,
-      paddingBottom: 16,
-      gap: 4,
-      backgroundColor: theme.bg,
-    },
-    transferPreviewTitle: {
-      fontSize: 14,
-      fontWeight: "700",
-      fontFamily: fontFamilies.bold,
-      color: theme.text,
-      marginBottom: 6,
-    },
-    transferPreviewLine: {
-      fontSize: 13,
-      fontFamily: fontFamilies.regular,
-      color: theme.textMuted,
-    },
-    transferOverwriteBtn: {
-      marginTop: 12,
-      backgroundColor: "#EF4444",
-      borderRadius: 10,
-      paddingVertical: 10,
-      alignItems: "center",
-      justifyContent: "center",
-    },
-    transferOverwriteBtnText: {
-      color: "#FFFFFF",
-      fontSize: 13,
-      fontWeight: "700",
-      fontFamily: fontFamilies.bold,
     },
     saveBtn: {
       padding: 8,

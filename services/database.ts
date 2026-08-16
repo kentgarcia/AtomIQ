@@ -879,35 +879,6 @@ export type LocalLeaderboardUser = {
 /**
  * Save remote leaderboard rows into the local snapshot table.
  */
-export const saveLeaderboardSnapshot = async (
-  rows: LocalLeaderboardUser[],
-): Promise<void> => {
-  const database = await getDatabaseReady();
-  const cachedAt = new Date().toISOString();
-
-  await database.runAsync("DELETE FROM leaderboard");
-
-  if (rows.length === 0) {
-    return;
-  }
-
-  for (const [index, row] of rows.entries()) {
-    await database.runAsync(
-      `INSERT INTO leaderboard (user_id, username, avatar_url, xp, is_npc, rank, cached_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      [
-        row.user_id,
-        row.username,
-        row.avatar_url,
-        row.total_xp,
-        row.is_npc ? 1 : 0,
-        index + 1,
-        cachedAt,
-      ],
-    );
-  }
-};
-
 /**
  * Read leaderboard snapshot from local database.
  */
@@ -1270,8 +1241,6 @@ export const deleteAccountData = async () => {
 
   // Delete children before parent tables where foreign keys exist.
   const tableDeletionOrder = [
-    "sync_queue",
-    "sync_status",
     "poll_votes",
     "likes",
     "comments",

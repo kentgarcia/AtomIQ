@@ -3,12 +3,10 @@ import {useTheme, type Palette, fontFamilies} from "@/theme";
 import {
     getLeaderboardSnapshot,
     getLeaderboardSnapshotUpdatedAt,
-    saveLeaderboardSnapshot,
+    type LocalLeaderboardUser,
 } from "@/services/database";
 import { getProfileAvatarSource } from "@/services/profile-avatars";
 import { useStorage } from "@/services/StorageContext";
-import { isSupabaseConfigured, supabase } from "@/services/supabase";
-import { Tables } from "@/services/supabase.types";
 import { useFocusEffect } from "@react-navigation/native";
 import { LinearGradient } from "expo-linear-gradient";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
@@ -119,10 +117,7 @@ type LeaderboardEntry = {
   rank?: number;
 };
 
-type LeaderboardSourceUser = Pick<
-  Tables<"users">,
-  "user_id" | "username" | "avatar_url" | "total_xp" | "is_npc"
->;
+type LeaderboardSourceUser = LocalLeaderboardUser;
 
 const CircleAvatar = ({
   uri,
@@ -309,59 +304,9 @@ export default function LeaderboardScreen() {
           setLeaderboardData(buildLeaderboard(localSnapshot));
           setLastUpdatedAt(cachedAt);
           setError(null);
+        } else {
+          setLeaderboardData(buildLeaderboard([]));
         }
-
-        if (!isSupabaseConfigured()) {
-          if (localSnapshot.length === 0) {
-            setLeaderboardData(buildLeaderboard([]));
-          }
-          return;
-        }
-
-        const { data, error: supabaseError } = await supabase
-          .from("users")
-          .select(
-            "user_id, username, avatar_url, total_xp, current_streak, is_npc, created_at, id, lessons_completed, longest_streak, myths_busted, updated_at",
-          )
-          .order("total_xp", { ascending: false })
-          .limit(100);
-
-        if (supabaseError) {
-          if (supabaseError.code === "PGRST205") {
-            if (localSnapshot.length === 0) {
-              setLeaderboardData(buildLeaderboard([]));
-            }
-
-            setError("Remote leaderboard setup pending. Showing local data.");
-            return;
-          }
-
-          throw supabaseError;
-        }
-
-        const normalizedUsers: LeaderboardSourceUser[] = (data || []).map(
-          (row) => ({
-            user_id: row.user_id,
-            username: row.username,
-            avatar_url: row.avatar_url,
-            total_xp: row.total_xp,
-            is_npc: row.is_npc,
-          }),
-        );
-
-        await saveLeaderboardSnapshot(
-          normalizedUsers.map((row) => ({
-            user_id: row.user_id,
-            username: row.username,
-            avatar_url: row.avatar_url,
-            total_xp: row.total_xp ?? 0,
-            is_npc: Boolean(row.is_npc),
-          })),
-        );
-
-        setLeaderboardData(buildLeaderboard(normalizedUsers));
-        setLastUpdatedAt(Date.now());
-        setError(null);
       } catch (err) {
         console.error("Error loading leaderboard:", err);
         const localSnapshot = await getLeaderboardSnapshot(100);

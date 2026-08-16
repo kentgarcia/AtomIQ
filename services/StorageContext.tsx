@@ -11,15 +11,13 @@ import {
     getUserProfile,
     initDatabase,
 } from "./database";
-import { useLocalFirst } from "./local-first/hooks";
 import {
     DEFAULT_PROFILE_AVATAR_KEY,
     normalizeProfileAvatarKey,
 } from "./profile-avatars";
-import { syncProfileToSupabase } from "./profile-sync";
 import { getOnboardingCompleted, setLastActiveDate } from "./storage";
 import { recordMissionEvent } from "./missions";
-import { ensureSupabaseAuthUserId, isSupabaseConfigured } from "./supabase";
+import { isSupabaseConfigured } from "./supabase";
 import { checkDailyStreak } from "./utils";
 
 interface UserProfile {
@@ -47,18 +45,12 @@ interface StorageContextType {
   addXP: (amount: number) => Promise<void>;
   incrementStreak: () => Promise<void>;
   onboardingCompleted: boolean;
-  syncProfileToSupabase: () => Promise<boolean>;
   isOnline: boolean;
-  isSyncing: boolean;
-  pendingChanges: number;
-  lastSyncedAt: number | null;
 }
 
 const StorageContext = createContext<StorageContextType | undefined>(undefined);
 
 export const StorageProvider = ({ children }: { children: ReactNode }) => {
-  const { syncManager, syncNow, isSyncing, pendingChanges, lastSyncedAt } =
-    useLocalFirst();
   const [isLoading, setIsLoading] = useState(true);
   const [isInitialized, setIsInitialized] = useState(false);
   const [isDatabaseReady, setIsDatabaseReady] = useState(false);
@@ -68,33 +60,6 @@ export const StorageProvider = ({ children }: { children: ReactNode }) => {
 
   const generateLocalUserId = () =>
     `user_${Date.now()}_${Math.random().toString(36).substring(2, 15)}`;
-
-  const shouldAdoptAuthUserId = (
-    profile: UserProfile,
-    authUserId: string,
-  ): boolean => {
-    if (!profile.user_id || profile.user_id === authUserId) {
-      return Boolean(authUserId);
-    }
-
-    // Preserve established identities for progressed accounts.
-    const isLegacyGeneratedId = profile.user_id.startsWith("user_");
-    const isNpcSeedId = profile.user_id.startsWith("npc_user_");
-    const hasNpcFriendCode =
-      typeof profile.friend_code === "string" &&
-      profile.friend_code.toUpperCase().startsWith("NPC");
-
-    if (isNpcSeedId || hasNpcFriendCode) {
-      return Boolean(authUserId);
-    }
-
-    const hasProgress =
-      (profile.total_xp || 0) > 0 ||
-      (profile.lessons_completed || 0) > 0 ||
-      (profile.myths_busted || 0) > 0;
-
-    return isLegacyGeneratedId && !hasProgress;
-  };
 
   const reloadUserProfile = useCallback(async () => {
     const profile = (await getUserProfile()) as UserProfile | null;
@@ -165,14 +130,6 @@ export const StorageProvider = ({ children }: { children: ReactNode }) => {
     };
   }, [checkConnectivity]);
 
-  useEffect(() => {
-    if (!isDatabaseReady || !lastSyncedAt) {
-      return;
-    }
-
-    void reloadUserProfile();
-  }, [isDatabaseReady, lastSyncedAt, reloadUserProfile]);
-
   const initializeStorage = async () => {
     try {
       setIsLoading(true);
@@ -182,22 +139,12 @@ export const StorageProvider = ({ children }: { children: ReactNode }) => {
       setIsDatabaseReady(true); // Mark database as ready immediately after init
       console.log("Database ready for use");
 
-      const authUserId = await ensureSupabaseAuthUserId();
-
       // Load user profile
       const profile = await getUserProfile();
       let activeProfile: UserProfile | null = null;
 
       if (profile) {
         activeProfile = profile as UserProfile;
-
-        if (authUserId && shouldAdoptAuthUserId(activeProfile, authUserId)) {
-          await createOrUpdateUserProfile({ user_id: authUserId });
-          const refreshedProfile = await getUserProfile();
-          if (refreshedProfile) {
-            activeProfile = refreshedProfile as UserProfile;
-          }
-        }
 
         if (!activeProfile?.friend_code) {
           await createOrUpdateUserProfile({ user_id: activeProfile.user_id });
@@ -224,7 +171,7 @@ export const StorageProvider = ({ children }: { children: ReactNode }) => {
       } else {
         // Create default profile with unique user_id
         const defaultProfile: UserProfile = {
-          user_id: authUserId || generateLocalUserId(),
+          user_id: generateLocalUserId(),
           username: "Scientist",
           display_name: "Scientist",
           avatar_url: DEFAULT_PROFILE_AVATAR_KEY,
@@ -304,63 +251,6 @@ export const StorageProvider = ({ children }: { children: ReactNode }) => {
     });
   };
 
-  const syncProfileToSupabaseLocal = async (): Promise<boolean> => {
-    if (!userProfile || !isOnline) {
-      console.log("Offline or no profile to sync");
-      return false;
-    }
-
-    try {
-      if (syncManager?.isEnabled()) {
-        try {
-          await syncNow();
-        } catch (error) {
-          console.error("Sync manager failed during profile sync:", error);
-          return false;
-        }
-
-        const profileSyncStatus =
-          await syncManager.getSyncStatus("user_profiles");
-        if (profileSyncStatus?.error) {
-          console.warn(
-            "Profile sync status indicates failure:",
-            profileSyncStatus.error,
-          );
-          return false;
-        }
-
-        await reloadUserProfile();
-        return true;
-      }
-
-      // Fallback for older flows before local-first sync manager is fully enabled.
-      const success = await syncProfileToSupabase({
-        user_id: userProfile.user_id,
-        username: userProfile.username,
-        display_name: userProfile.display_name || userProfile.username,
-        friend_code: userProfile.friend_code || null,
-        display_name_updated_at: userProfile.display_name_updated_at || null,
-        next_display_name_change_at:
-          userProfile.next_display_name_change_at || null,
-        avatar_url: normalizeProfileAvatarKey(userProfile.avatar_url),
-        total_xp: userProfile.total_xp,
-        current_streak: userProfile.current_streak,
-        longest_streak: userProfile.longest_streak,
-        myths_busted: userProfile.myths_busted,
-        lessons_completed: userProfile.lessons_completed,
-      });
-
-      if (success) {
-        await reloadUserProfile();
-      }
-
-      return success;
-    } catch (error) {
-      console.error("Error syncing profile:", error);
-      return false;
-    }
-  };
-
   return (
     <StorageContext.Provider
       value={{
@@ -372,11 +262,7 @@ export const StorageProvider = ({ children }: { children: ReactNode }) => {
         addXP,
         incrementStreak,
         onboardingCompleted,
-        syncProfileToSupabase: syncProfileToSupabaseLocal,
         isOnline,
-        isSyncing,
-        pendingChanges,
-        lastSyncedAt,
       }}
     >
       {children}

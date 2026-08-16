@@ -10,7 +10,6 @@ import {
 import { getBestGameScores, type GameBestScore } from "@/services/database";
 import { useStorage } from "@/services/StorageContext";
 import { LinearGradient } from "expo-linear-gradient";
-import * as Clipboard from "expo-clipboard";
 import { useFocusEffect, useRouter } from "expo-router";
 import React, { useCallback, useMemo, useState } from "react";
 import {
@@ -39,8 +38,6 @@ export default function ProfileScreen() {
   const {
     userProfile,
     updateUserProfile,
-    syncProfileToSupabase,
-    isOnline,
   } = useStorage();
   const { theme } = useTheme();
   const THEME = theme.palettes.tab;
@@ -48,7 +45,6 @@ export default function ProfileScreen() {
 
   const [isSavingAvatar, setIsSavingAvatar] = useState(false);
   const [avatarModalVisible, setAvatarModalVisible] = useState(false);
-  const [codeCopied, setCodeCopied] = useState(false);
 
   // Card flip (profile ⇄ stats)
   const flipped = useSharedValue(0);
@@ -136,23 +132,9 @@ export default function ProfileScreen() {
   const unlockedCount = awards.filter((a) => a.unlocked).length;
 
   const handleShare = () => {
-    const code = userProfile?.friend_code
-      ? `My friend code: ${userProfile.friend_code}\n`
-      : "";
     Share.share({
-      message: `Join me learning nuclear science on AtomIQ! 🚀\n${code}`,
+      message: `Join me learning nuclear science on AtomIQ! 🚀`,
     }).catch(() => {});
-  };
-
-  const handleCopyCode = async () => {
-    if (!userProfile?.friend_code) return;
-    try {
-      await Clipboard.setStringAsync(userProfile.friend_code);
-      setCodeCopied(true);
-      setTimeout(() => setCodeCopied(false), 1500);
-    } catch {
-      Alert.alert("Error", "Could not copy the friend code.");
-    }
   };
 
   const selectedAvatarKey = normalizeProfileAvatarKey(userProfile?.avatar_url);
@@ -165,10 +147,6 @@ export default function ProfileScreen() {
     try {
       setIsSavingAvatar(true);
       await updateUserProfile({ avatar_url: avatarKey });
-
-      if (isOnline) {
-        await syncProfileToSupabase();
-      }
 
       setAvatarModalVisible(false);
     } catch {
@@ -294,23 +272,6 @@ export default function ProfileScreen() {
                   {userProfile.display_name || userProfile.username}
                 </Text>
                 <Text style={styles.title}>{userTitle}</Text>
-                {userProfile.friend_code ? (
-                  <TouchableOpacity
-                    style={styles.codePill}
-                    onPress={handleCopyCode}
-                    activeOpacity={0.7}
-                  >
-                    <Text style={styles.codeText}>
-                      {userProfile.friend_code}
-                    </Text>
-                    <Icon
-                      name={codeCopied ? "CopySuccess" : "Copy"}
-                      size={14}
-                      color="#E67E22"
-                      variant="Bold"
-                    />
-                  </TouchableOpacity>
-                ) : null}
               </View>
             </View>
 
@@ -702,24 +663,6 @@ const createStyles = (theme: Palette) =>
       fontWeight: "600",
       fontFamily: fontFamilies.semibold,
       marginBottom: 8,
-    },
-    /* Friend code pill with copy action */
-    codePill: {
-      flexDirection: "row",
-      alignItems: "center",
-      alignSelf: "flex-start",
-      gap: 8,
-      backgroundColor: "#FFF3E0",
-      borderRadius: 12,
-      paddingHorizontal: 12,
-      paddingVertical: 6,
-    },
-    codeText: {
-      fontSize: 13,
-      fontWeight: "800",
-      fontFamily: fontFamilies.heavy,
-      color: "#E67E22",
-      letterSpacing: 0.5,
     },
     /* Level progress, inside the profile card */
     levelSection: {
