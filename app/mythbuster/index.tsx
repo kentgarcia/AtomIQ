@@ -6,7 +6,8 @@ import { getAllMyths } from "@/content/myths";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useStorage } from "@/services/StorageContext";
-import { logDailyActivity } from "@/services/database";
+import { logDailyActivity, saveGameScore } from "@/services/database";
+import { recordMissionEvent } from "@/services/missions";
 import { playGameSfx, preloadGameSfx } from "@/services/game-sfx";
 import { LinearGradient } from "expo-linear-gradient";
 import * as Speech from "expo-speech";
@@ -126,7 +127,7 @@ const GAME_MODES: ModeConfig[] = [
 export default function MythBusterScreen() {
   const router = useRouter();
   const { mode: modeParam } = useLocalSearchParams<{ mode?: string }>();
-  const { addXP, updateUserProfile, userProfile } = useStorage();
+  const { updateUserProfile, userProfile } = useStorage();
   const insets = useSafeAreaInsets();
   const colorScheme = useColorScheme();
   const backgroundColor =
@@ -474,16 +475,21 @@ export default function MythBusterScreen() {
 
   const finishGame = () => {
     setGameState("results");
-    const xpEarned = score;
     const bustedCount = answers.filter((a) => a).length;
-    addXP(xpEarned);
+
+    // Games award leaderboard points instead of XP
+    void saveGameScore("myth-buster", score).catch((error) => {
+      console.error("Failed to save game score:", error);
+    });
 
     // Persist myths busted to profile & daily activity
     const today = new Date().toISOString().split("T")[0];
     logDailyActivity(today, {
-      xp_earned: xpEarned,
       myths_busted: bustedCount,
     });
+
+    // A played round (any difficulty) counts toward the daily mission
+    recordMissionEvent("mythbuster", 1);
 
     if (userProfile) {
       updateUserProfile({

@@ -194,6 +194,14 @@ export const initDatabase = async () => {
         rank INTEGER,
         cached_at DATETIME DEFAULT CURRENT_TIMESTAMP
       );
+
+      -- Personal game leaderboard (best scores per game)
+      CREATE TABLE IF NOT EXISTS game_scores (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        game_id TEXT NOT NULL,
+        score INTEGER NOT NULL,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      );
     `);
 
     // Ensure legacy/local-first identity columns exist before any queries use them.
@@ -1192,6 +1200,40 @@ export const getDailyActivity = async (startDate: string, endDate: string) => {
   );
 };
 
+/* ---------- Personal game leaderboard ---------- */
+
+export const saveGameScore = async (gameId: string, score: number) => {
+  const database = getDatabase();
+  await database.runAsync(
+    "INSERT INTO game_scores (game_id, score) VALUES (?, ?)",
+    [gameId, Math.max(0, Math.round(score))],
+  );
+};
+
+export type GameBestScore = {
+  game_id: string;
+  best: number;
+  plays: number;
+};
+
+export const getBestGameScores = async (): Promise<GameBestScore[]> => {
+  const database = getDatabase();
+  return (await database.getAllAsync(
+    "SELECT game_id, MAX(score) as best, COUNT(*) as plays FROM game_scores GROUP BY game_id ORDER BY best DESC",
+  )) as GameBestScore[];
+};
+
+export const getGameScores = async (
+  gameId: string,
+  limit = 10,
+): Promise<{ score: number; created_at: string }[]> => {
+  const database = getDatabase();
+  return (await database.getAllAsync(
+    "SELECT score, created_at FROM game_scores WHERE game_id = ? ORDER BY score DESC LIMIT ?",
+    [gameId, limit],
+  )) as { score: number; created_at: string }[];
+};
+
 // Clear all data (for testing/reset)
 export const clearAllData = async () => {
   const database = getDatabase();
@@ -1203,6 +1245,7 @@ export const clearAllData = async () => {
     DELETE FROM daily_activity;
     DELETE FROM achievements;
     DELETE FROM leaderboard;
+    DELETE FROM game_scores;
   `);
 };
 
@@ -1256,6 +1299,7 @@ export const deleteAccountData = async () => {
     "daily_activity",
     "achievements",
     "leaderboard",
+    "game_scores",
   ] as const;
 
   for (const tableName of tableDeletionOrder) {
@@ -1275,6 +1319,9 @@ export default {
   unlockNextLevel,
   logDailyActivity,
   getDailyActivity,
+  saveGameScore,
+  getBestGameScores,
+  getGameScores,
   clearAllData,
   deleteAccountData,
 };

@@ -11,12 +11,12 @@ import {
 import type { QuizQuestion as RepositoryQuizQuestion } from "@/content/types";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { startMaze } from "@/services/explorer-storage";
+import { saveGameScore } from "@/services/database";
 import { playGameSfx, preloadGameSfx } from "@/services/game-sfx";
-import { useStorage } from "@/services/StorageContext";
 import { Image as ExpoImage } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
     Alert,
     BackHandler,
@@ -56,14 +56,6 @@ const BATTLE_TIMING = {
   roomExitDelayMs: 260,
   walkOutMs: 850,
   walkInMs: 620,
-};
-
-const getEndlessRunXpReward = (baseXpReward: number): number => {
-  if (baseXpReward <= 0) {
-    return 0;
-  }
-
-  return Math.max(20, Math.round(baseXpReward * 0.35));
 };
 
 type AtomMazeStageDifficulty = "easy" | "average" | "difficult";
@@ -244,7 +236,6 @@ interface GameState {
 export default function AtomMazeBattleScreen() {
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { addXP } = useStorage();
   const insets = useSafeAreaInsets();
   const { width, height } = useWindowDimensions();
 
@@ -267,11 +258,6 @@ export default function AtomMazeBattleScreen() {
       cancelled = true;
     };
   }, [id]);
-  const endlessRunXpReward = useMemo(
-    () => getEndlessRunXpReward(maze?.xpReward || 0),
-    [maze?.xpReward],
-  );
-
   // Game state
   const [gameState, setGameState] = useState<GameState>({
     phase: "intro",
@@ -284,6 +270,12 @@ export default function AtomMazeBattleScreen() {
     score: 0,
     defeatedMonsters: 0,
   });
+
+  // Mirror the live score so async run-complete handlers read the latest value
+  const scoreRef = useRef(0);
+  useEffect(() => {
+    scoreRef.current = gameState.score;
+  }, [gameState.score]);
 
   // UI state
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
@@ -887,18 +879,15 @@ export default function AtomMazeBattleScreen() {
     if (isBossBattle) {
       setGameState((prev) => ({ ...prev, phase: "complete" }));
 
-      // Endless mode: no persistent completion mark, grant lower XP each clear.
+      // Endless mode: save the run's score to the personal game leaderboard
+      // instead of awarding XP.
       if (maze) {
         void (async () => {
           try {
-            if (endlessRunXpReward > 0) {
-              await addXP(endlessRunXpReward);
-              setXpAwardedThisRun(true);
-            } else {
-              setXpAwardedThisRun(false);
-            }
+            await saveGameScore("atom-maze", scoreRef.current);
+            setXpAwardedThisRun(true);
           } catch (error) {
-            console.error("Failed to grant endless run XP:", error);
+            console.error("Failed to save game score:", error);
             setXpAwardedThisRun(false);
           }
         })();
@@ -1661,8 +1650,8 @@ export default function AtomMazeBattleScreen() {
                 {xpAwardedThisRun === null
                   ? "Finalizing..."
                   : xpAwardedThisRun
-                    ? `+${endlessRunXpReward} XP`
-                    : "XP reward unavailable"}
+                    ? `${scoreRef.current} points saved!`
+                    : "Could not save score"}
               </Text>
             </View>
 

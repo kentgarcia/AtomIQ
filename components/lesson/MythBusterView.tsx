@@ -18,6 +18,7 @@ import Animated, {
 } from "react-native-reanimated";
 import { LinearGradient } from "expo-linear-gradient";
 import * as Speech from "expo-speech";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import {type Palette, fontFamilies} from "@/theme";
 import { Icon } from "@/components/ui/icon";
@@ -27,10 +28,12 @@ import { createMythStyles, createStyles } from "./styles";
 export const MythBusterView = ({
   data,
   onComplete,
+  topBarHeight,
   theme,
 }: {
   data: any;
   onComplete: () => void;
+  topBarHeight: number;
   theme: Palette;
 }) => {
   const translateX = useSharedValue(0);
@@ -42,8 +45,9 @@ export const MythBusterView = ({
   const { width } = useWindowDimensions();
   const styles = useMemo(() => createStyles(theme, width), [theme, width]);
   const mythStyles = useMemo(() => createMythStyles(theme, width), [theme, width]);
-  const [leftIndicator, setLeftIndicator] = useState(0);
-  const [rightIndicator, setRightIndicator] = useState(0);
+  const leftIndicator = useSharedValue(0);
+  const rightIndicator = useSharedValue(0);
+  const insets = useSafeAreaInsets();
 
   // Stop speech when component unmounts
   useEffect(() => {
@@ -78,17 +82,19 @@ export const MythBusterView = ({
         [-5, 5],
       ); // Very subtle rotation
 
-      runOnJS(setLeftIndicator)(
-        Math.max(0, Math.min(1, -event.translationX / 100)),
+      leftIndicator.value = Math.max(
+        0,
+        Math.min(1, -event.translationX / 100),
       );
-      runOnJS(setRightIndicator)(
-        Math.max(0, Math.min(1, event.translationX / 100)),
+      rightIndicator.value = Math.max(
+        0,
+        Math.min(1, event.translationX / 100),
       );
     })
     .onEnd((event) => {
       if (showFeedback) return;
-      runOnJS(setLeftIndicator)(0);
-      runOnJS(setRightIndicator)(0);
+      leftIndicator.value = withTiming(0, { duration: 200 });
+      rightIndicator.value = withTiming(0, { duration: 200 });
 
       if (Math.abs(event.translationX) > 120) {
         const isLeft = event.translationX < 0;
@@ -111,43 +117,87 @@ export const MythBusterView = ({
     ],
   }));
 
+  const leftIndicatorStyle = useAnimatedStyle(() => ({
+    opacity: leftIndicator.value,
+  }));
+  const rightIndicatorStyle = useAnimatedStyle(() => ({
+    opacity: rightIndicator.value,
+  }));
+
   return (
-    <View style={styles.stepContainer}>
-      {/* Full Height Swipe Indicators */}
-      <View style={mythStyles.fullHeightIndicators}>
-        <Animated.View
-          style={[mythStyles.indicatorLeftFull, { opacity: leftIndicator }]}
-        >
+    <View style={{ flex: 1 }}>
+      {/* Full-screen swipe tint — escapes the step area so the gradient also
+          covers the header bar and the safe-area margins */}
+      <View
+        pointerEvents="none"
+        style={{
+          position: "absolute",
+          top: -(topBarHeight + insets.top),
+          bottom: -insets.bottom,
+          left: -insets.left,
+          right: -insets.right,
+        }}
+      >
+        <Animated.View style={[mythStyles.indicatorFull, leftIndicatorStyle]}>
           <LinearGradient
             colors={[
               "rgba(239,68,68,0.5)",
-              "rgba(239,68,68,0.2)",
-              "transparent",
+              "rgba(239,68,68,0.18)",
+              "rgba(239,68,68,0.03)",
             ]}
             start={{ x: 0, y: 0.5 }}
             end={{ x: 1, y: 0.5 }}
             style={StyleSheet.absoluteFill}
           />
-          <View style={mythStyles.indicatorContent}>
+          {/* Vertical wash so the top and bottom edges join the tint */}
+          <LinearGradient
+            colors={[
+              "rgba(239,68,68,0.25)",
+              "rgba(239,68,68,0)",
+              "rgba(239,68,68,0)",
+              "rgba(239,68,68,0.25)",
+            ]}
+            start={{ x: 0.5, y: 0 }}
+            end={{ x: 0.5, y: 1 }}
+            style={StyleSheet.absoluteFill}
+          />
+          <View
+            style={[mythStyles.indicatorContent, mythStyles.indicatorContentLeft]}
+          >
             <Icon name="Forbidden2" size={48} color={theme.error} />
             <Text style={mythStyles.indicatorTextLeft}>MYTH</Text>
           </View>
         </Animated.View>
 
-        <Animated.View
-          style={[mythStyles.indicatorRightFull, { opacity: rightIndicator }]}
-        >
+        <Animated.View style={[mythStyles.indicatorFull, rightIndicatorStyle]}>
           <LinearGradient
             colors={[
-              "transparent",
-              "rgba(46,204,113,0.2)",
+              "rgba(46,204,113,0.03)",
+              "rgba(46,204,113,0.18)",
               "rgba(46,204,113,0.5)",
             ]}
             start={{ x: 0, y: 0.5 }}
             end={{ x: 1, y: 0.5 }}
             style={StyleSheet.absoluteFill}
           />
-          <View style={mythStyles.indicatorContent}>
+          {/* Vertical wash so the top and bottom edges join the tint */}
+          <LinearGradient
+            colors={[
+              "rgba(46,204,113,0.25)",
+              "rgba(46,204,113,0)",
+              "rgba(46,204,113,0)",
+              "rgba(46,204,113,0.25)",
+            ]}
+            start={{ x: 0.5, y: 0 }}
+            end={{ x: 0.5, y: 1 }}
+            style={StyleSheet.absoluteFill}
+          />
+          <View
+            style={[
+              mythStyles.indicatorContent,
+              mythStyles.indicatorContentRight,
+            ]}
+          >
             <Icon
               name="TickCircle"
               size={48}
@@ -159,6 +209,8 @@ export const MythBusterView = ({
         </Animated.View>
       </View>
 
+      {/* Transparent so the full-screen tint shows through from behind */}
+      <View style={[styles.stepContainer, { backgroundColor: "transparent" }]}>
       <Text style={styles.stepHeader}>MYTH BUSTER</Text>
       <Text style={styles.stepSubHeader}>
         Swipe LEFT for Myth, RIGHT for Fact
@@ -246,7 +298,7 @@ export const MythBusterView = ({
                 <Icon name="Danger" size={24} color="#FFF" />
                 <Text style={styles.mythBadgeText}>MYTH?</Text>
               </View>
-              <Text style={styles.mythText}>"{data.myth}"</Text>
+              <Text style={styles.mythText}>&ldquo;{data.myth}&rdquo;</Text>
 
               {/* Read Aloud Button */}
               <TouchableOpacity
@@ -312,6 +364,7 @@ export const MythBusterView = ({
             </Animated.View>
           </GestureDetector>
         )}
+      </View>
       </View>
     </View>
   );

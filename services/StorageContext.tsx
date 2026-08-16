@@ -18,6 +18,7 @@ import {
 } from "./profile-avatars";
 import { syncProfileToSupabase } from "./profile-sync";
 import { getOnboardingCompleted, setLastActiveDate } from "./storage";
+import { recordMissionEvent } from "./missions";
 import { ensureSupabaseAuthUserId, isSupabaseConfigured } from "./supabase";
 import { checkDailyStreak } from "./utils";
 
@@ -255,6 +256,9 @@ export const StorageProvider = ({ children }: { children: ReactNode }) => {
       // Update last active date
       const today = new Date().toISOString().split("T")[0];
       await setLastActiveDate(today);
+
+      // A successful app launch today counts as a daily login
+      await recordMissionEvent("login", 1);
 
       setIsInitialized(true);
     } catch (error) {

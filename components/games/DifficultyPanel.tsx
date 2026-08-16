@@ -50,8 +50,7 @@ export function DifficultyPanel({
     const router = useRouter();
     const insets = useSafeAreaInsets();
     const { height: windowHeight } = useWindowDimensions();
-    const { theme } = useTheme();
-    const tab = theme.palettes.tab;
+    useTheme();
 
     // Mazes live in the SQLite content database and load async.
     const [mazes, setMazes] = useState<
@@ -120,7 +119,8 @@ export function DifficultyPanel({
     const cardH = Math.round(stackH / Math.max(items.length, 1));
 
     return (
-        <View style={[styles.panel, { backgroundColor: tab.bg }]}>
+        /* Transparent so the wrapping layer's gradient shows through */
+        <View style={styles.panel}>
             <View
                 style={[
                     styles.stack,

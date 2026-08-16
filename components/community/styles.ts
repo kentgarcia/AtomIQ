@@ -8,14 +8,14 @@ export const createStyles = (theme: typeof LightTHEME) =>
       flex: 1,
       backgroundColor: theme.bg,
     },
+    /* Autumn gradient flowing through the whole page (like home & profile) */
+    pageGradient: {
+      ...StyleSheet.absoluteFillObject,
+    },
     // Header
     header: {
       paddingHorizontal: 20,
       paddingBottom: 16,
-      overflow: "hidden",
-    },
-    headerGradient: {
-      ...StyleSheet.absoluteFillObject,
     },
     headerContent: {
       flexDirection: "row",
@@ -31,12 +31,12 @@ export const createStyles = (theme: typeof LightTHEME) =>
       fontSize: 28,
       fontWeight: "800",
       marginBottom: 4,
-      color: "#FFFFFF",
+      color: theme.text,
       letterSpacing: -0.5,
     },
     headerSubtitle: {
       fontSize: 14,
-      color: "rgba(255,255,255,0.92)",
+      color: theme.textMuted,
       fontWeight: "600",
     },
     headerRight: {
@@ -58,10 +58,12 @@ export const createStyles = (theme: typeof LightTHEME) =>
       paddingVertical: 12,
       borderRadius: 20,
       gap: 12,
-      backgroundColor: theme.card,
-      borderWidth: 2,
-      borderColor: theme.border,
-      borderBottomWidth: 4,
+      backgroundColor: "#FFFFFF",
+      elevation: 3,
+      shadowColor: "#000000",
+      shadowOffset: { width: 0, height: 3 },
+      shadowOpacity: 0.08,
+      shadowRadius: 6,
       zIndex: 1,
     },
     searchInput: {
@@ -73,7 +75,7 @@ export const createStyles = (theme: typeof LightTHEME) =>
 
     // Category pills
     categoryRow: {
-      backgroundColor: theme.bg,
+      backgroundColor: "transparent",
     },
     categoryScrollContent: {
       paddingHorizontal: 20,
@@ -87,22 +89,28 @@ export const createStyles = (theme: typeof LightTHEME) =>
       paddingHorizontal: 16,
       paddingVertical: 10,
       borderRadius: 20,
-      backgroundColor: theme.card,
-      borderWidth: 2,
-      borderColor: theme.border,
-      borderBottomWidth: 4,
+      backgroundColor: "#FFFFFF",
+      elevation: 2,
+      shadowColor: "#000000",
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.06,
+      shadowRadius: 4,
     },
     categoryChipIcon: {
       paddingHorizontal: 12,
     },
     categoryChipActive: {
-      backgroundColor: theme.primary,
-      borderColor: theme.primary,
+      backgroundColor: "#FF8C00",
+      elevation: 4,
+      shadowColor: "#FF8C00",
+      shadowOffset: { width: 0, height: 3 },
+      shadowOpacity: 0.35,
+      shadowRadius: 6,
     },
     categoryChipText: {
       fontSize: 14,
       fontWeight: "700",
-      color: theme.text,
+      color: "#555555",
     },
     categoryChipTextActive: {
       color: "#FFFFFF",
@@ -120,18 +128,20 @@ export const createStyles = (theme: typeof LightTHEME) =>
     galleryCard: {
       flex: 1,
       marginBottom: 16,
-      borderRadius: 20,
-      backgroundColor: theme.card,
-      borderWidth: 2,
-      borderColor: theme.border,
-      borderBottomWidth: 4,
+      borderRadius: 24,
+      backgroundColor: "#FFFFFF",
       overflow: "hidden",
+      elevation: 4,
+      shadowColor: "#000000",
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.06,
+      shadowRadius: 8,
     },
     galleryImageWrap: {
       position: "relative",
       width: "100%",
       height: 120,
-      backgroundColor: theme.bg,
+      backgroundColor: "#FFF3E0",
     },
     galleryImage: {
       width: "100%",
@@ -141,7 +151,7 @@ export const createStyles = (theme: typeof LightTHEME) =>
       flex: 1,
       alignItems: "center",
       justifyContent: "center",
-      backgroundColor: theme.bg,
+      backgroundColor: "#FFF3E0",
     },
     saveButton: {
       position: "absolute",
@@ -150,15 +160,17 @@ export const createStyles = (theme: typeof LightTHEME) =>
       width: 30,
       height: 30,
       borderRadius: 15,
-      backgroundColor: "rgba(255,255,255,0.9)",
-      borderWidth: 1,
-      borderColor: theme.border,
+      backgroundColor: "rgba(255,255,255,0.95)",
       alignItems: "center",
       justifyContent: "center",
+      elevation: 2,
+      shadowColor: "#000000",
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
     },
     saveButtonActive: {
-      backgroundColor: theme.primary,
-      borderColor: theme.primary,
+      backgroundColor: "#FF8C00",
     },
     galleryBody: {
       paddingHorizontal: 12,
@@ -167,7 +179,7 @@ export const createStyles = (theme: typeof LightTHEME) =>
     galleryCategory: {
       fontSize: 10,
       fontWeight: "800",
-      color: theme.primary,
+      color: "#E67E22",
       letterSpacing: 0.5,
       marginBottom: 4,
       textTransform: "uppercase",
@@ -176,7 +188,7 @@ export const createStyles = (theme: typeof LightTHEME) =>
       fontSize: 15,
       fontWeight: "700",
       lineHeight: 20,
-      color: theme.text,
+      color: "#333333",
       marginBottom: 8,
       minHeight: 40,
     },
@@ -194,7 +206,7 @@ export const createStyles = (theme: typeof LightTHEME) =>
     galleryMetaText: {
       fontSize: 11,
       fontWeight: "600",
-      color: theme.textMuted,
+      color: "#888888",
       flexShrink: 1,
     },
 

@@ -181,13 +181,6 @@ export const createStyles = (theme: Palette, width: number) =>
       justifyContent: "center",
     },
     feedbackCorrect: { backgroundColor: theme.success },
-    feedbackIncorrect: { backgroundColor: theme.error },
-    feedbackTitle: {
-      fontSize: 28,
-      fontWeight: "800",
-      color: "#FFF",
-      marginBottom: 12,
-    },
     feedbackText: {
       fontSize: 18,
       color: "#FFF",
@@ -203,40 +196,8 @@ export const createStyles = (theme: Palette, width: number) =>
       borderColor: "rgba(0,0,0,0.1)",
     },
     continueBtnText: { fontWeight: "800", fontSize: 16 },
-    overlayIndicator: {
-      position: "absolute",
-      top: 20,
-      paddingHorizontal: 16,
-      paddingVertical: 8,
-      borderRadius: 12,
-      borderWidth: 3,
-      borderColor: "#FFF",
-    },
-    overlayText: {
-      color: "#FFF",
-      fontWeight: "800",
-      fontSize: 18,
-      letterSpacing: 2,
-    },
 
     // MicroLearn
-    conceptBadge: {
-      backgroundColor: theme.primary,
-      paddingHorizontal: 16,
-      paddingVertical: 8,
-      borderRadius: 20,
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 6,
-      borderBottomWidth: 3,
-      borderColor: theme.primaryDark,
-    },
-    conceptBadgeText: {
-      color: "#FFF",
-      fontWeight: "800",
-      fontSize: 12,
-      letterSpacing: 1,
-    },
     conceptCard: {
       backgroundColor: "#FFF",
       borderRadius: 20,
@@ -245,21 +206,6 @@ export const createStyles = (theme: Palette, width: number) =>
       borderColor: theme.border,
       borderBottomWidth: 4,
       marginBottom: 24,
-    },
-    conceptImageContainer: {
-      height: 150,
-      marginBottom: 20,
-      borderRadius: 16,
-      alignItems: "center",
-      justifyContent: "center",
-    },
-    conceptMascot: {
-      width: 120,
-      height: 120,
-    },
-    labMascot: {
-      width: 56,
-      height: 56,
     },
     conceptTitle: {
       fontSize: 22,
@@ -273,21 +219,6 @@ export const createStyles = (theme: Palette, width: number) =>
       color: theme.text,
       lineHeight: 26,
       marginBottom: 8,
-    },
-    keyPointsWrapper: {
-      marginTop: 20,
-      gap: 12,
-      paddingTop: 20,
-      borderTopWidth: 1,
-      borderTopColor: theme.border,
-    },
-    keyPointRow: {
-      flexDirection: "row",
-      alignItems: "flex-start",
-      gap: 12,
-    },
-    keyPointDot: {
-      marginTop: 2,
     },
     keyPointText: {
       flex: 1,
@@ -306,30 +237,6 @@ export const createStyles = (theme: Palette, width: number) =>
       borderColor: theme.border,
       borderBottomWidth: 4,
       marginBottom: 24,
-    },
-    labIconWrapper: {
-      width: 56,
-      height: 56,
-      borderRadius: 28,
-      backgroundColor: "#8B5CF6" + "15",
-      alignItems: "center",
-      justifyContent: "center",
-      marginBottom: 16,
-    },
-    taskBox: {
-      marginTop: 16,
-      padding: 16,
-      backgroundColor: "#F3F4F6",
-      borderRadius: 12,
-      borderLeftWidth: 4,
-      borderLeftColor: "#8B5CF6",
-    },
-    taskLabel: {
-      fontSize: 11,
-      fontWeight: "800",
-      color: "#8B5CF6",
-      letterSpacing: 1,
-      marginBottom: 6,
     },
     taskText: {
       fontSize: 16,
@@ -364,41 +271,11 @@ export const createStyles = (theme: Palette, width: number) =>
       fontWeight: "700",
       color: theme.text,
     },
-    correctBadge: {
-      position: "absolute",
-      top: 8,
-      right: 8,
-      backgroundColor: theme.success,
-      borderRadius: 12,
-      padding: 4,
-    },
-    wrongBadge: {
-      position: "absolute",
-      top: 8,
-      right: 8,
-      backgroundColor: theme.error,
-      borderRadius: 12,
-      padding: 4,
-    },
-    feedbackBox: {
-      padding: 20,
-      borderRadius: 16,
-      borderWidth: 2,
-      marginBottom: 24,
-    },
     feedbackHeader: {
       flexDirection: "row",
       alignItems: "center",
       gap: 10,
       marginBottom: 12,
-    },
-    feedbackMascot: {
-      width: 40,
-      height: 40,
-    },
-    feedbackHeaderText: {
-      fontSize: 18,
-      fontWeight: "800",
     },
 
     // Quiz
@@ -410,15 +287,6 @@ export const createStyles = (theme: Palette, width: number) =>
       borderWidth: 2,
       borderColor: theme.border,
       borderBottomWidth: 4,
-    },
-    questionIconWrapper: {
-      width: 56,
-      height: 56,
-      borderRadius: 28,
-      backgroundColor: theme.primary + "15",
-      alignItems: "center",
-      justifyContent: "center",
-      marginBottom: 16,
     },
     questionText: {
       fontSize: 20,
@@ -438,12 +306,6 @@ export const createStyles = (theme: Palette, width: number) =>
       flexDirection: "row",
       justifyContent: "space-between",
       alignItems: "center",
-    },
-    quizOptionContent: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 12,
-      flex: 1,
     },
     optionLetter: {
       width: 32,
@@ -546,31 +408,22 @@ export const createStyles = (theme: Palette, width: number) =>
 
 // Additional style functions for component-specific styles
 export const createMythStyles = (theme: Palette, width: number) => ({
-  fullHeightIndicators: {
-    position: "absolute" as const,
-    top: 0,
-    bottom: 0,
-    left: 0,
-    right: 0,
-  },
-  indicatorLeftFull: {
-    position: "absolute" as const,
-    top: 0,
-    bottom: 0,
-    left: 0,
-    width: "50%" as const,
-  },
-  indicatorRightFull: {
-    position: "absolute" as const,
-    top: 0,
-    bottom: 0,
-    right: 0,
-    width: "50%" as const,
+  indicatorFull: {
+    ...StyleSheet.absoluteFillObject,
   },
   indicatorContent: {
     flex: 1,
     alignItems: "center" as const,
     justifyContent: "center" as const,
+  },
+  /* Anchor the MYTH/FACT mark toward the side being dragged */
+  indicatorContentLeft: {
+    alignItems: "flex-start" as const,
+    paddingLeft: "12%" as const,
+  },
+  indicatorContentRight: {
+    alignItems: "flex-end" as const,
+    paddingRight: "12%" as const,
   },
   indicatorTextLeft: {
     fontSize: 16,
