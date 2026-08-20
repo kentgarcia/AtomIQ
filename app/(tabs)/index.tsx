@@ -512,16 +512,18 @@ const handleScroll = useCallback(
     }
   };
 
-  /* Icon-only action button with a rounded bottom lip (missions row action) */
+  /* Action button with a rounded bottom lip (missions row action) */
   const ActionButton = ({
     color,
     lipColor,
     icon,
+    label,
     onPress,
   }: {
     color: string;
     lipColor: string;
     icon: string;
+    label: string;
     onPress: () => void;
   }) => (
     <View style={[styles.actionBtnClip, { backgroundColor: color }]}>
@@ -531,6 +533,7 @@ const handleScroll = useCallback(
         onPress={onPress}
       >
         <Icon name={icon} size={15} color="#FFFFFF" variant="Bold" />
+        <Text style={styles.actionBtnText}>{label}</Text>
       </TouchableOpacity>
       <View style={[styles.actionBtnLip, { backgroundColor: lipColor }]} />
     </View>
@@ -875,10 +878,7 @@ const handleScroll = useCallback(
                     </View>
                     {mission.isClaimed ? (
                       <Animated.View
-                        entering={ZoomIn.duration(200)
-                          .springify()
-                          .damping(20)
-                          .stiffness(260)}
+                        entering={ZoomIn.duration(200)}
                         style={styles.claimedPill}
                       >
                         <Icon
@@ -894,6 +894,7 @@ const handleScroll = useCallback(
                         color={BTN_COLOR}
                         lipColor={BTN_LIP}
                         icon="TickCircle"
+                        label="Claim"
                         onPress={() => void claimMission(mission)}
                       />
                     ) : mission.type === "mythbuster" ? (
@@ -901,6 +902,7 @@ const handleScroll = useCallback(
                         color="#8B5CF6"
                         lipColor="#6D28D9"
                         icon="Play"
+                        label="Play"
                         onPress={() => router.push("/mythbuster")}
                       />
                     ) : mission.type === "fact" ? (
@@ -908,6 +910,7 @@ const handleScroll = useCallback(
                         color="#2ECC71"
                         lipColor="#27AE60"
                         icon="Book"
+                        label="Read"
                         onPress={() => setDailyPanel("fact")}
                       />
                     ) : (
@@ -981,10 +984,7 @@ const handleScroll = useCallback(
               <View style={styles.factAction}>
                 {factClaimed ? (
                   <Animated.View
-                    entering={ZoomIn.duration(200)
-                      .springify()
-                      .damping(20)
-                      .stiffness(260)}
+                    entering={ZoomIn.duration(200)}
                     style={styles.factReadPill}
                   >
                     <Icon
@@ -1002,6 +1002,7 @@ const handleScroll = useCallback(
                     onPress={() => void handleMarkFactRead()}
                   >
                     <Icon name="Book" size={17} color="#FFFFFF" variant="Bold" />
+                    <Text style={styles.factReadBtnText}>Read & Claim</Text>
                   </TouchableOpacity>
                 )}
               </View>
@@ -1604,15 +1605,23 @@ const createStyles = (theme: Palette) =>
     },
     /* Mission row actions */
     actionBtnClip: {
-      width: 36,
       height: 36,
       borderRadius: 13,
       overflow: "hidden",
     },
     actionBtnFace: {
       flex: 1,
+      flexDirection: "row",
       alignItems: "center",
       justifyContent: "center",
+      gap: 5,
+      paddingHorizontal: 12,
+    },
+    actionBtnText: {
+      fontSize: 12,
+      fontWeight: "800",
+      fontFamily: fontFamilies.heavy,
+      color: "#FFFFFF",
     },
     actionBtnLip: {
       position: "absolute",
@@ -1733,14 +1742,22 @@ const createStyles = (theme: Palette) =>
       justifyContent: "flex-start",
     },
     factReadBtn: {
-      width: 36,
-      height: 36,
-      borderRadius: 13,
+      flexDirection: "row",
       alignItems: "center",
       justifyContent: "center",
+      gap: 6,
+      paddingHorizontal: 16,
+      height: 40,
+      borderRadius: 13,
       backgroundColor: BTN_COLOR,
       borderBottomWidth: 4,
       borderBottomColor: BTN_LIP,
+    },
+    factReadBtnText: {
+      fontSize: 13,
+      fontWeight: "800",
+      fontFamily: fontFamilies.heavy,
+      color: "#FFFFFF",
     },
     factReadPill: {
       flexDirection: "row",

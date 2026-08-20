@@ -22,6 +22,7 @@ import {
     BackHandler,
     Platform,
     ScrollView,
+    StyleSheet,
     Text,
     TouchableOpacity,
     useWindowDimensions,
@@ -29,11 +30,13 @@ import {
     View,
 } from "react-native";
 import Animated, {
+    Easing,
     FadeIn,
     FadeInDown,
     FadeOut,
     runOnJS,
     useAnimatedStyle,
+    useReducedMotion,
     useSharedValue,
     withSequence,
     withTiming,
@@ -56,6 +59,40 @@ const BATTLE_TIMING = {
   roomExitDelayMs: 260,
   walkOutMs: 850,
   walkInMs: 620,
+};
+
+// Shared instructions-page backdrop (same for every maze) — copies the
+// autumn cream → white gradient used across the home + games tabs.
+const INTRO_SKY_LIGHT: [string, string] = ["#FFF3E0", "#FFFFFF"];
+
+/* Maze stage colors (mirrors the DifficultyPanel on the games tab). */
+const MAZE_COLORS: Record<string, string> = {
+  safety: "#FFB300",
+  radiation: "#FFA000",
+  history: "#FF8F00",
+  reactor: "#FFD54F",
+  default: "#FFB300",
+};
+
+const getMazeColor = (themeName: string | undefined): string => {
+  if (!themeName) return MAZE_COLORS.default;
+  const lowerTheme = themeName.toLowerCase();
+  if (lowerTheme.includes("safety")) return MAZE_COLORS.safety;
+  if (lowerTheme.includes("radiation")) return MAZE_COLORS.radiation;
+  if (lowerTheme.includes("history")) return MAZE_COLORS.history;
+  if (lowerTheme.includes("reactor")) return MAZE_COLORS.reactor;
+  return MAZE_COLORS.default;
+};
+
+/* Darken a hex color for the badge's 3D lip. */
+const darkenHex = (hex: string, amount: number): string => {
+  const mix = (v: number) =>
+    Math.max(0, Math.round(v * (1 - amount)))
+      .toString(16)
+      .padStart(2, "0");
+  return `#${mix(parseInt(hex.slice(1, 3), 16))}${mix(
+    parseInt(hex.slice(3, 5), 16),
+  )}${mix(parseInt(hex.slice(5, 7), 16))}`;
 };
 
 type AtomMazeStageDifficulty = "easy" | "average" | "difficult";
@@ -214,6 +251,109 @@ const toAtomMazeBossQuizQuestion = (
   };
 };
 
+const HP_BAR_SEGMENTS = 10;
+const HP_FILL_DURATION_MS = 380;
+const EASE_OUT = Easing.bezier(0.23, 1, 0.32, 1);
+
+const getHpBarColor = (ratio: number): string => {
+  if (ratio > 0.5) return "#4ADE80";
+  if (ratio > 0.25) return "#FCD34D";
+  return "#F87171";
+};
+
+// Pokemon-style segmented HP bar. The filled width drains on the UI thread
+// when HP changes; static divider lines keep the segmented look while the
+// fill slides underneath (no per-frame sibling layout).
+const SegmentedHpBar = ({
+  current,
+  max,
+}: {
+  current: number;
+  max: number;
+}) => {
+  const reducedMotion = useReducedMotion();
+  const ratio = max > 0 ? Math.max(0, current) / max : 0;
+  const fillColor = getHpBarColor(ratio);
+  const progress = useSharedValue(ratio);
+
+  useEffect(() => {
+    if (reducedMotion) {
+      progress.set(ratio);
+    } else {
+      progress.set(
+        withTiming(ratio, {
+          duration: HP_FILL_DURATION_MS,
+          easing: EASE_OUT,
+        }),
+      );
+    }
+  }, [ratio, reducedMotion, progress]);
+
+  const fillWidth = useAnimatedStyle(() => ({
+    width: `${progress.get() * 100}%`,
+  }));
+
+  return (
+    <View style={styles.hpSegmentTrack}>
+      <Animated.View
+        style={[
+          styles.hpSegmentFill,
+          { backgroundColor: fillColor },
+          fillWidth,
+        ]}
+      />
+      {Array.from({ length: HP_BAR_SEGMENTS - 1 }, (_, index) => (
+        <View
+          key={index}
+          style={[styles.hpSegmentDivider, { left: `${index * 10}%` }]}
+        />
+      ))}
+    </View>
+  );
+};
+
+// Pokemon-style HP card pinned below the header.
+const PokemonHpBox = ({
+  name,
+  sub,
+  current,
+  max,
+  cardStyle,
+  textColor,
+  subColor,
+  valueColor,
+}: {
+  name: string;
+  sub: string;
+  current: number;
+  max: number;
+  cardStyle: object;
+  textColor: string;
+  subColor: string;
+  valueColor: string;
+}) => {
+  return (
+    <View style={[styles.hpBox, cardStyle]}>
+      <View style={styles.hpBoxBody}>
+        <View style={styles.hpBoxTopRow}>
+          <Text style={[styles.hpBoxName, { color: textColor }]} numberOfLines={1}>
+            {name}
+          </Text>
+          <Text style={[styles.hpBoxLevel, { color: subColor }]} numberOfLines={1}>
+            {sub}
+          </Text>
+        </View>
+        <View style={styles.hpBoxBottomRow}>
+          <SegmentedHpBar current={current} max={max} />
+          <Text style={[styles.hpBoxValue, { color: valueColor }]}>
+            {Math.max(0, current)}/{max}
+          </Text>
+        </View>
+      </View>
+    </View>
+  );
+};
+
 interface GameState {
   phase:
     | "intro"
@@ -293,6 +433,10 @@ export default function AtomMazeBattleScreen() {
   } | null>(null);
   const [isPlayerHurt, setIsPlayerHurt] = useState(false);
   const [isMonsterHurt, setIsMonsterHurt] = useState(false);
+  const [isPlayerAttacking, setIsPlayerAttacking] = useState(false);
+  const [isMonsterAttacking, setIsMonsterAttacking] = useState(false);
+  const [isMonsterFaint, setIsMonsterFaint] = useState(false);
+  const [isStageTransitioning, setIsStageTransitioning] = useState(false);
   const [showBossNotice, setShowBossNotice] = useState(false);
 
   const colorScheme = useColorScheme();
@@ -388,13 +532,72 @@ export default function AtomMazeBattleScreen() {
       completeButtonDepth: "#B45309",
     };
   }, [colorScheme]);
+  // Quiz colors — amber maze theme, adapted per color scheme.
+  const quizPalette = useMemo(() => {
+    const dark = colorScheme === "dark";
+    const tintAmber = dark
+      ? "rgba(255, 179, 0, 0.18)"
+      : "#FFF8E1";
+    const tintGreen = dark
+      ? "rgba(46, 204, 113, 0.18)"
+      : "#E8F5E9";
+    const tintRed = dark ? "rgba(239, 68, 68, 0.16)" : "#FEE2E2";
+    return {
+      option: {
+        backgroundColor: theme.card,
+        borderColor: theme.border,
+        borderBottomColor: dark ? "#26334A" : "#D1D5DB",
+      },
+      selected: {
+        borderColor: theme.primary,
+        borderBottomColor: theme.primaryDark,
+        backgroundColor: tintAmber,
+      },
+      correct: {
+        backgroundColor: tintGreen,
+        borderColor: "#2ECC71",
+        borderBottomColor: "#229954",
+      },
+      wrong: {
+        backgroundColor: tintRed,
+        borderColor: "#EF4444",
+        borderBottomColor: "#DC2626",
+      },
+      textCorrect: dark ? "#4ADE80" : "#15803D",
+      textWrong: dark ? "#FCA5A5" : "#991B1B",
+      feedbackCorrect: {
+        backgroundColor: tintGreen,
+        borderColor: "rgba(46, 204, 113, 0.55)",
+      },
+      feedbackWrong: {
+        backgroundColor: tintRed,
+        borderColor: "rgba(239, 68, 68, 0.55)",
+      },
+    };
+  }, [colorScheme, theme]);
+  // HP card surface + text colors, mode-aware.
+  const hpCard = useMemo(() => {
+    const dark = colorScheme === "dark";
+    return {
+      cardStyle: {
+        backgroundColor: theme.card,
+        borderColor: theme.border,
+        borderBottomColor: dark ? "#26334A" : "#D1D5DB",
+        shadowColor: dark ? "#000000" : "#0F172A",
+        shadowOffset: { width: 0, height: 3 },
+        shadowOpacity: dark ? 0.45 : 0.12,
+        shadowRadius: 6,
+        elevation: 3,
+      },
+      textColor: dark ? "#F8FAFC" : "#111827",
+      subColor: dark ? "#FFCA28" : "#B45309",
+      valueColor: dark ? "#94A3B8" : "#6B7280",
+    };
+  }, [colorScheme, theme]);
   const arenaHeight = Math.min(Math.max(height * 0.42, 270), 360);
   const sceneTopPadding = Math.max(insets.top + 4, 10);
   const questionBottomPadding = Math.max(insets.bottom + 12, 18);
   const introBottomPadding = Math.max(insets.bottom + 28, 36);
-  const arenaTextColor = "#F8FAFC";
-  const arenaMutedTextColor = "#CBD5E1";
-  const arenaTrackColor = "rgba(148, 163, 184, 0.4)";
   const shouldConfirmExit =
     gameState.phase === "battle" ||
     gameState.phase === "victory" ||
@@ -478,6 +681,10 @@ export default function AtomMazeBattleScreen() {
       setLastDamage(null);
       setIsPlayerHurt(false);
       setIsMonsterHurt(false);
+      setIsPlayerAttacking(false);
+      setIsMonsterAttacking(false);
+      setIsMonsterFaint(false);
+      setIsStageTransitioning(false);
     }
   }, [maze]);
 
@@ -642,6 +849,8 @@ export default function AtomMazeBattleScreen() {
     );
 
     if (isPlayer) {
+      setIsPlayerAttacking(true);
+      setTimeout(() => setIsPlayerAttacking(false), 280);
       playerLunge.value = withSequence(
         withTiming(26, { duration: 90 }),
         withTiming(0, { duration: 130 }),
@@ -651,6 +860,8 @@ export default function AtomMazeBattleScreen() {
         withTiming(1, { duration: 130 }),
       );
     } else {
+      setIsMonsterAttacking(true);
+      setTimeout(() => setIsMonsterAttacking(false), 280);
       monsterLunge.value = withSequence(
         withTiming(-26, { duration: 90 }),
         withTiming(0, { duration: 130 }),
@@ -684,7 +895,7 @@ export default function AtomMazeBattleScreen() {
 
   // Handle quiz answer selection
   const handleQuizAnswer = (index: number) => {
-    if (isAnswering || showResult) return;
+    if (isAnswering || showResult || isStageTransitioning) return;
 
     if (selectedAnswer === index) {
       handleSubmit();
@@ -696,7 +907,7 @@ export default function AtomMazeBattleScreen() {
 
   // Submit answer
   const handleSubmit = () => {
-    if (isAnswering || !currentQuestion || selectedAnswer === null) return;
+    if (isAnswering || !currentQuestion || selectedAnswer === null || isStageTransitioning) return;
 
     setIsAnswering(true);
     const isCorrect = selectedAnswer === currentQuestion.correctAnswer;
@@ -838,6 +1049,9 @@ export default function AtomMazeBattleScreen() {
       playerX.value = -width;
       monsterOpacity.value = 1;
       setIsMonsterHurt(false);
+      setIsMonsterFaint(false);
+      setIsPlayerAttacking(false);
+      setIsMonsterAttacking(false);
 
       // Update state for next room
       const nextRoom = maze?.rooms[nextRoomIndex];
@@ -852,8 +1066,11 @@ export default function AtomMazeBattleScreen() {
         monsterMaxHp: nextMonsterHp,
       }));
 
-      // Walk in to center
+      // Walk in to center, then unlock the quiz
       playerX.value = withTiming(0, { duration: BATTLE_TIMING.walkInMs });
+      setTimeout(() => {
+        setIsStageTransitioning(false);
+      }, BATTLE_TIMING.walkInMs);
     } else {
       // All rooms cleared, face the boss!
       setGameState((prev) => ({ ...prev, phase: "boss_intro" }));
@@ -867,6 +1084,7 @@ export default function AtomMazeBattleScreen() {
     setShowResult(null);
     setSelectedAnswer(null);
     setIsAnswering(false);
+    setIsStageTransitioning(true);
 
     setGameState((prev) => ({
       ...prev,
@@ -896,6 +1114,7 @@ export default function AtomMazeBattleScreen() {
     }
 
     // Animate monster death and player walk
+    setIsMonsterFaint(true);
     monsterOpacity.value = withTiming(0, {
       duration: BATTLE_TIMING.monsterFadeMs,
     });
@@ -930,6 +1149,10 @@ export default function AtomMazeBattleScreen() {
       monsterMaxHp: bossHp,
     }));
     setIsMonsterHurt(false);
+    setIsMonsterFaint(false);
+    setIsPlayerAttacking(false);
+    setIsMonsterAttacking(false);
+    setIsStageTransitioning(false);
   };
 
   // Start the game
@@ -942,6 +1165,10 @@ export default function AtomMazeBattleScreen() {
     setXpAwardedThisRun(null);
     setComboStreak(0);
     setLastDamage(null);
+    setIsPlayerHurt(false);
+    setIsMonsterHurt(false);
+    setIsMonsterFaint(false);
+    setIsStageTransitioning(false);
     setGameState((prev) => ({ ...prev, phase: "battle" }));
   };
 
@@ -1016,13 +1243,18 @@ export default function AtomMazeBattleScreen() {
 
   // Render intro screen
   if (gameState.phase === "intro") {
+    const mazeColor = getMazeColor(maze.theme);
     return (
-      <View
-        style={[
-          styles.container,
-          { backgroundColor: introPalette.background },
-        ]}
-      >
+      <View style={styles.container}>
+        <LinearGradient
+          colors={
+            colorScheme === "dark"
+              ? [introPalette.background, introPalette.background]
+              : INTRO_SKY_LIGHT
+          }
+          style={StyleSheet.absoluteFill}
+          pointerEvents="none"
+        />
         <View style={styles.introHeader}>
           <TouchableOpacity
             onPress={handleExit}
@@ -1034,9 +1266,17 @@ export default function AtomMazeBattleScreen() {
               },
             ]}
           >
-            <Icon name="ArrowLeft2" size={20} color={theme.text} />
+            <Icon name="ArrowLeft2" size={20} color={introPalette.primaryText} />
           </TouchableOpacity>
-          <View style={styles.introBadge}>
+          <View
+            style={[
+              styles.introBadge,
+              {
+                backgroundColor: mazeColor,
+                borderBottomColor: darkenHex(mazeColor, 0.18),
+              },
+            ]}
+          >
             <Icon name="Game" size={18} color="#FFF" variant="Bold" />
             <Text style={styles.introBadgeText}>AtomMaze</Text>
           </View>
@@ -1066,6 +1306,19 @@ export default function AtomMazeBattleScreen() {
                 },
               ]}
             >
+              <View style={styles.introModeRow}>
+                <View
+                  style={[
+                    styles.introModeIcon,
+                    { backgroundColor: `${mazeColor}1A` },
+                  ]}
+                >
+                  <Icon name="Grid9" size={22} color={mazeColor} variant="Bold" />
+                </View>
+                <Text style={[styles.introTagline, { color: mazeColor }]}>
+                  {maze.theme}
+                </Text>
+              </View>
               <Text
                 style={[styles.introTitle, { color: introPalette.primaryText }]}
               >
@@ -1077,7 +1330,7 @@ export default function AtomMazeBattleScreen() {
                   { color: introPalette.mutedText },
                 ]}
               >
-                {maze.theme}
+                {maze.rooms.length} rooms · Boss: {maze.boss.name}
               </Text>
               <Text
                 style={[
@@ -1093,7 +1346,7 @@ export default function AtomMazeBattleScreen() {
             <HowToPlayCard
                 steps={INTRO_HOW_TO_PLAY_STEPS}
                 palette={introPalette}
-                accentColor={theme.primary}
+                accentColor={mazeColor}
             />
 
             {/* Start Button */}
@@ -1108,8 +1361,8 @@ export default function AtomMazeBattleScreen() {
               onPress={handleStartGame}
               activeOpacity={0.9}
             >
-              <Icon name="Play" size={26} color={theme.primary} variant="Bold" />
-              <Text style={[styles.startButtonCardText, { color: theme.primary }]}>
+              <Icon name="Play" size={26} color={mazeColor} variant="Bold" />
+              <Text style={[styles.startButtonCardText, { color: mazeColor }]}>
                 START BATTLE
               </Text>
             </TouchableOpacity>
@@ -1162,7 +1415,18 @@ export default function AtomMazeBattleScreen() {
               },
             ]}
           >
-            <Text style={styles.defeatEmoji}>💀</Text>
+            <View style={styles.resultSpriteRow}>
+              <ExpoImage
+                source={MAZE_BATTLE_ART.battlerFaint}
+                contentFit="contain"
+                style={styles.resultSpriteSmall}
+              />
+              <ExpoImage
+                source={MAZE_BATTLE_ART.enemyWin}
+                contentFit="contain"
+                style={styles.resultSprite}
+              />
+            </View>
             <Text
               style={[
                 styles.defeatTitle,
@@ -1334,7 +1598,18 @@ export default function AtomMazeBattleScreen() {
               },
             ]}
           >
-            <Text style={styles.victoryEmoji}>⚔️</Text>
+            <View style={styles.resultSpriteRow}>
+              <ExpoImage
+                source={MAZE_BATTLE_ART.battlerWin}
+                contentFit="contain"
+                style={styles.resultSpriteSmall}
+              />
+              <ExpoImage
+                source={MAZE_BATTLE_ART.enemyFaint}
+                contentFit="contain"
+                style={styles.resultSprite}
+              />
+            </View>
             <Text
               style={[
                 styles.victoryTitle,
@@ -1611,7 +1886,13 @@ export default function AtomMazeBattleScreen() {
               },
             ]}
           >
-            <Text style={styles.completeEmoji}>🏆</Text>
+            <View style={styles.resultSpriteRow}>
+              <ExpoImage
+                source={MAZE_BATTLE_ART.battlerWin}
+                contentFit="contain"
+                style={styles.resultSprite}
+              />
+            </View>
             <Text
               style={[
                 styles.completeTitle,
@@ -1795,175 +2076,160 @@ export default function AtomMazeBattleScreen() {
           style={styles.battleBackdropOverlay}
         />
 
-        <View style={styles.arenaHudContainer}>
-          <View style={styles.arenaHudGlass}>
-            <TouchableOpacity
-              onPress={handleExit}
-              style={styles.arenaHudBackBtn}
-            >
-              <Icon name="ArrowLeft2" size={18} color="#FFFFFF" />
-            </TouchableOpacity>
-            <View style={styles.arenaHudCenter}>
-              <Text style={styles.arenaHudTitle}>
-                {isBossBattle
-                  ? "⚔️ BOSS BATTLE"
-                  : `Room ${gameState.currentRoomIndex + 1}/${maze.rooms.length}`}
-              </Text>
-              <View style={styles.arenaHudMetaRow}>
-                <View style={styles.arenaHudScoreBadge}>
-                  <Icon name="Cup" size={13} color="#FCD34D" variant="Bold" />
-                  <Text style={styles.arenaHudScoreText}>
-                    {gameState.score}
-                  </Text>
-                </View>
-                <View
-                  style={[
-                    styles.arenaHudDifficultyChip,
-                    {
-                      backgroundColor:
-                        currentStageDifficultyMeta.chipBackgroundColor,
-                    },
-                  ]}
-                >
-                  <Text
+        {/* Header: HUD bar (in flow) */}
+        <View style={styles.arenaHeader}>
+          <View style={styles.arenaHudContainer}>
+            <View style={styles.arenaHudGlass}>
+              <TouchableOpacity
+                onPress={handleExit}
+                style={styles.arenaHudBackBtn}
+              >
+                <Icon name="ArrowLeft2" size={18} color="#FFFFFF" />
+              </TouchableOpacity>
+              <View style={styles.arenaHudCenter}>
+                <Text style={styles.arenaHudTitle}>
+                  {isBossBattle
+                    ? "⚔️ BOSS BATTLE"
+                    : `Room ${gameState.currentRoomIndex + 1}/${maze.rooms.length}`}
+                </Text>
+                <View style={styles.arenaHudMetaRow}>
+                  <View style={styles.arenaHudScoreBadge}>
+                    <Icon name="Cup" size={13} color="#FCD34D" variant="Bold" />
+                    <Text style={styles.arenaHudScoreText}>
+                      {gameState.score}
+                    </Text>
+                  </View>
+                  <View
                     style={[
-                      styles.arenaHudDifficultyText,
-                      { color: currentStageDifficultyMeta.chipTextColor },
+                      styles.arenaHudDifficultyChip,
+                      {
+                        backgroundColor:
+                          currentStageDifficultyMeta.chipBackgroundColor,
+                      },
                     ]}
                   >
-                    {currentStageDifficultyMeta.label}
-                  </Text>
-                </View>
-                <View style={styles.arenaHudChip}>
-                  <Icon name="MessageQuestion" size={12} color="#E2E8F0" />
-                  <Text style={styles.arenaHudChipText}>
-                    Q
-                    {Math.min(
-                      gameState.currentQuestionIndex + 1,
-                      Math.max(currentQuestions.length, 1),
-                    )}
-                    /{Math.max(currentQuestions.length, 1)}
-                  </Text>
-                </View>
-                {comboStreak > 1 && (
-                  <View style={styles.arenaHudComboChip}>
-                    <Icon
-                      name="Flash"
-                      size={12}
-                      color="#FFFFFF"
-                      variant="Bold"
-                    />
-                    <Text style={styles.arenaHudComboText}>x{comboStreak}</Text>
+                    <Text
+                      style={[
+                        styles.arenaHudDifficultyText,
+                        { color: currentStageDifficultyMeta.chipTextColor },
+                      ]}
+                    >
+                      {currentStageDifficultyMeta.label}
+                    </Text>
                   </View>
-                )}
+                  <View style={styles.arenaHudChip}>
+                    <Icon name="MessageQuestion" size={12} color="#E2E8F0" />
+                    <Text style={styles.arenaHudChipText}>
+                      Q
+                      {Math.min(
+                        gameState.currentQuestionIndex + 1,
+                        Math.max(currentQuestions.length, 1),
+                      )}
+                      /{Math.max(currentQuestions.length, 1)}
+                    </Text>
+                  </View>
+                  {comboStreak > 1 && (
+                    <View style={styles.arenaHudComboChip}>
+                      <Icon
+                        name="Flash"
+                        size={12}
+                        color="#FFFFFF"
+                        variant="Bold"
+                      />
+                      <Text style={styles.arenaHudComboText}>x{comboStreak}</Text>
+                    </View>
+                  )}
+                </View>
               </View>
+              <View style={styles.arenaHudPlaceholder} />
             </View>
-            <View style={styles.arenaHudPlaceholder} />
+          </View>
+
+          {/* HP cards below the header — never overlaps it */}
+          <View style={styles.arenaHpRow}>
+            <PokemonHpBox
+              name="You"
+              sub={`Room ${Math.min(gameState.currentRoomIndex + 1, totalRoomCount)}/${totalRoomCount}`}
+              current={gameState.playerHp}
+              max={gameState.playerMaxHp}
+              cardStyle={hpCard.cardStyle}
+              textColor={hpCard.textColor}
+              subColor={hpCard.subColor}
+              valueColor={hpCard.valueColor}
+            />
+            <PokemonHpBox
+              name={currentMonster?.name || "Monster"}
+              sub={isBossBattle ? "BOSS" : currentStageDifficultyMeta.label}
+              current={gameState.monsterHp}
+              max={gameState.monsterMaxHp}
+              cardStyle={hpCard.cardStyle}
+              textColor={hpCard.textColor}
+              subColor={hpCard.subColor}
+              valueColor={hpCard.valueColor}
+            />
           </View>
         </View>
 
-        {isBossBattle && showBossNotice && (
-          <Animated.View
-            entering={FadeInDown.duration(220)}
-            exiting={FadeOut.duration(180)}
-            style={styles.bossBattleNotice}
-          >
-            <Icon name="Danger" size={16} color="#FDE68A" variant="Bold" />
-            <Text style={styles.bossBattleNoticeText}>
-              Boss battle started. Correct answers deal direct damage.
-            </Text>
-          </Animated.View>
-        )}
-
-        {/* Player Side */}
-        <Animated.View style={[styles.modernFighter, playerAnimatedStyle]}>
-          <PlayerIcon isHurt={isPlayerHurt} />
-          {lastDamage?.target === "player" && (
+        {/* Fighters + transient boss notice */}
+        <View style={styles.arenaFighters}>
+          {isBossBattle && showBossNotice && (
             <Animated.View
-              entering={FadeInDown.duration(120)}
+              entering={FadeInDown.duration(220)}
               exiting={FadeOut.duration(180)}
-              style={styles.damagePopupPlayer}
+              style={styles.bossBattleNotice}
             >
-              <Text style={styles.damagePopupText}>-{lastDamage.amount}</Text>
+              <Icon name="Danger" size={16} color="#FDE68A" variant="Bold" />
+              <Text style={styles.bossBattleNoticeText}>
+                Boss battle started. Correct answers deal direct damage.
+              </Text>
             </Animated.View>
           )}
-          <View style={styles.modernHpContainer}>
-            <Text style={[styles.modernFighterName, { color: arenaTextColor }]}>
-              You
-            </Text>
-            <View
-              style={[
-                styles.modernHpBarBg,
-                { backgroundColor: arenaTrackColor },
-              ]}
-            >
+
+          {/* Player Side */}
+        <Animated.View style={[styles.modernFighter, playerAnimatedStyle]}>
+          <View style={styles.fighterSpriteWrap}>
+            <PlayerIcon
+              isAttacking={isPlayerAttacking}
+              isHurt={isPlayerHurt}
+            />
+            {lastDamage?.target === "player" && (
               <Animated.View
-                style={[
-                  styles.modernHpBarFill,
-                  {
-                    width: `${(gameState.playerHp / gameState.playerMaxHp) * 100}%`,
-                    backgroundColor:
-                      gameState.playerHp > gameState.playerMaxHp * 0.5
-                        ? theme.success
-                        : gameState.playerHp > gameState.playerMaxHp * 0.25
-                          ? theme.warning
-                          : theme.error,
-                  },
-                ]}
-              />
-            </View>
-            <Text style={[styles.modernHpText, { color: arenaMutedTextColor }]}>
-              {gameState.playerHp}/{gameState.playerMaxHp} HP
-            </Text>
+                entering={FadeInDown.duration(120)}
+                exiting={FadeOut.duration(180)}
+                style={styles.damagePopupPlayer}
+              >
+                <Text style={styles.damagePopupText}>
+                  -{lastDamage.amount}
+                </Text>
+              </Animated.View>
+            )}
           </View>
         </Animated.View>
-
-        {/* VS Badge */}
-        <View style={[styles.vsBadge, { backgroundColor: theme.primary }]}>
-          <Text style={styles.vsText}>VS</Text>
-        </View>
 
         {/* Monster Side */}
         <Animated.View style={[styles.modernFighter, monsterAnimatedStyle]}>
-          <MonsterIcon
-            isBoss={isBossBattle}
-            isHurt={isMonsterHurt}
-            isLowBoss={isBossLowHp}
-          />
-          {lastDamage?.target === "monster" && (
-            <Animated.View
-              entering={FadeInDown.duration(120)}
-              exiting={FadeOut.duration(180)}
-              style={styles.damagePopupMonster}
-            >
-              <Text style={styles.damagePopupText}>-{lastDamage.amount}</Text>
-            </Animated.View>
-          )}
-          <View style={styles.modernHpContainer}>
-            <Text style={[styles.modernFighterName, { color: arenaTextColor }]}>
-              {currentMonster?.name || "Monster"}
-            </Text>
-            <View
-              style={[
-                styles.modernHpBarBg,
-                { backgroundColor: arenaTrackColor },
-              ]}
-            >
+          <View style={styles.fighterSpriteWrap}>
+            <MonsterIcon
+              isBoss={isBossBattle}
+              isHurt={isMonsterHurt}
+              isAttacking={isMonsterAttacking}
+              isFaint={isMonsterFaint}
+              isLowBoss={isBossLowHp}
+            />
+            {lastDamage?.target === "monster" && (
               <Animated.View
-                style={[
-                  styles.modernHpBarFill,
-                  {
-                    width: `${(gameState.monsterHp / gameState.monsterMaxHp) * 100}%`,
-                    backgroundColor: theme.error,
-                  },
-                ]}
-              />
-            </View>
-            <Text style={[styles.modernHpText, { color: arenaMutedTextColor }]}>
-              {gameState.monsterHp}/{gameState.monsterMaxHp} HP
-            </Text>
+                entering={FadeInDown.duration(120)}
+                exiting={FadeOut.duration(180)}
+                style={styles.damagePopupMonster}
+              >
+                <Text style={styles.damagePopupText}>
+                  -{lastDamage.amount}
+                </Text>
+              </Animated.View>
+            )}
           </View>
         </Animated.View>
+        </View>
       </Animated.View>
 
       {/* Question Area */}
@@ -1977,38 +2243,16 @@ export default function AtomMazeBattleScreen() {
         bounces={false}
       >
         {currentQuestion && (
-          <View
-            style={[
-              styles.modernQuestionCard,
-              {
-                backgroundColor: theme.card,
-                borderColor: theme.border,
-                shadowColor: theme.shadow,
-              },
-            ]}
-          >
-            <View
-              style={[
-                styles.modernQuestionBadge,
-                { backgroundColor: theme.primary },
-              ]}
-            >
-              <Icon
-                name="MessageQuestion"
-                size={18}
-                color="#FFF"
-                variant="Bold"
-              />
-            </View>
-            <Text style={[styles.modernQuestionText, { color: theme.text }]}>
+          <View style={styles.quizCard}>
+            <Text style={[styles.lessonQuestionText, { color: theme.text }]}>
               {currentQuestion.question}
             </Text>
           </View>
         )}
 
-        {/* Answer Options */}
+        {/* Answer Options — same design as the lesson-screen quiz */}
         {currentQuestion && (
-          <View style={styles.optionsContainer}>
+          <View style={styles.quizOptions}>
             {currentQuestion.options.map((option: string, index: number) => {
               const isSelected = selectedAnswer === index;
               const isCorrect = index === currentQuestion.correctAnswer;
@@ -2019,117 +2263,126 @@ export default function AtomMazeBattleScreen() {
                 <TouchableOpacity
                   key={index}
                   style={[
-                    styles.modernOptionButton,
-                    styles.modernOptionButtonHalf,
-                    {
-                      backgroundColor: theme.card,
-                      borderColor: theme.border,
-                      shadowColor: theme.shadow,
-                    },
+                    styles.lessonOption,
+                    quizPalette.option,
                     showCorrectness &&
                       isCorrect &&
-                      isSelected &&
-                      styles.modernOptionCorrect,
-                    isWrongAnswer && styles.modernOptionWrong,
+                      quizPalette.correct,
+                    isWrongAnswer && quizPalette.wrong,
                     !showCorrectness &&
-                      isSelected && [
-                        styles.modernOptionSelected,
-                        { borderColor: theme.primary },
-                      ],
+                      isSelected &&
+                      quizPalette.selected,
                   ]}
                   onPress={() => handleQuizAnswer(index)}
-                  disabled={showResult !== null}
+                  disabled={showResult !== null || isStageTransitioning}
+                  activeOpacity={0.8}
                 >
-                  <View
-                    style={[
-                      styles.modernOptionBadge,
-                      { backgroundColor: theme.primary },
-                    ]}
-                  >
-                    <Text style={styles.modernOptionBadgeText}>
-                      {String.fromCharCode(65 + index)}
-                    </Text>
-                  </View>
                   <Text
                     style={[
-                      styles.modernOptionText,
+                      styles.lessonOptionText,
                       { color: theme.text },
                       showCorrectness &&
                         isCorrect &&
-                        isSelected &&
-                        styles.modernOptionTextCorrect,
-                      isWrongAnswer && styles.modernOptionTextWrong,
+                        { color: quizPalette.textCorrect },
+                      isWrongAnswer && { color: quizPalette.textWrong },
+                      (showCorrectness || isSelected) &&
+                        styles.lessonOptionTextEmphasis,
                     ]}
                   >
                     {option}
                   </Text>
+                  {showCorrectness && isCorrect && (
+                    <Icon
+                      name="TickCircle"
+                      size={22}
+                      color="#2ECC71"
+                      variant="Bold"
+                    />
+                  )}
+                  {isWrongAnswer && (
+                    <Icon
+                      name="CloseCircle"
+                      size={22}
+                      color="#EF4444"
+                      variant="Bold"
+                    />
+                  )}
                 </TouchableOpacity>
               );
             })}
           </View>
         )}
 
-        {/* Result feedback */}
+        {/* Result feedback — Lab-style tinted box, mode-aware */}
         {showResult && (
           <Animated.View
             entering={FadeIn}
             exiting={FadeOut}
             style={[
-              styles.modernResultFeedback,
+              styles.quizResultBox,
               showResult === "correct"
-                ? styles.modernResultCorrect
-                : styles.modernResultWrong,
+                ? quizPalette.feedbackCorrect
+                : quizPalette.feedbackWrong,
             ]}
           >
             <Icon
               name={showResult === "correct" ? "TickCircle" : "CloseCircle"}
-              size={24}
-              color="#FFF"
+              size={30}
+              color={showResult === "correct" ? "#2ECC71" : "#EF4444"}
               variant="Bold"
             />
-            <Text style={styles.modernResultText}>
-              {showResult === "correct"
-                ? comboStreak > 1
-                  ? `Combo x${comboStreak}! Direct hit!`
-                  : isBossBattle
-                    ? "Boss takes damage!"
-                    : "Monster defeated!"
-                : "Ouch! The monster strikes back"}
-            </Text>
+            <View style={styles.quizResultContent}>
+              <Text
+                style={[
+                  styles.quizResultTitle,
+                  {
+                    color:
+                      showResult === "correct"
+                        ? quizPalette.textCorrect
+                        : quizPalette.textWrong,
+                  },
+                ]}
+              >
+                {showResult === "correct"
+                  ? comboStreak > 1
+                    ? `COMBO x${comboStreak}!`
+                    : "DIRECT HIT!"
+                  : "MONSTER STRIKES!"}
+              </Text>
+              <Text
+                style={[styles.quizResultSubtitle, { color: theme.text }]}
+              >
+                {showResult === "correct"
+                  ? comboStreak > 1
+                    ? "Direct hit on the monster!"
+                    : isBossBattle
+                      ? "The boss takes damage."
+                      : "The monster is defeated."
+                  : "Ouch! The monster strikes back."}
+              </Text>
+            </View>
           </Animated.View>
         )}
 
         {/* Submit button */}
         {!showResult && (
           <View style={styles.attackActionWrap}>
-            {selectedAnswer !== null && (
-              <Text style={styles.quickTapHint}>
-                Tap the same answer again for instant attack
-              </Text>
-            )}
             <TouchableOpacity
               style={[
                 styles.modernSubmitButton,
-                selectedAnswer === null && styles.modernSubmitButtonDisabled,
+                (selectedAnswer === null || isStageTransitioning) &&
+                  styles.modernSubmitButtonDisabled,
+                { backgroundColor: theme.primary, borderBottomColor: theme.primaryDark },
               ]}
               onPress={handleSubmit}
-              disabled={selectedAnswer === null}
+              disabled={selectedAnswer === null || isStageTransitioning}
             >
-              <LinearGradient
-                colors={
-                  selectedAnswer === null
-                    ? ["#9CA3AF", "#6B7280"]
-                    : ["#FFB300", "#FF8F00"]
-                }
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
-                style={styles.modernSubmitGradient}
-              >
-                <Icon name="Sword" size={24} color="#FFF" variant="Bold" />
+              <View style={styles.modernSubmitGradient}>
+                <Icon name="Sword" size={22} color="#FFF" variant="Bold" />
                 <Text style={styles.modernSubmitText}>
                   {selectedAnswer === null ? "PICK AN ANSWER" : "ATTACK NOW"}
                 </Text>
-              </LinearGradient>
+              </View>
             </TouchableOpacity>
           </View>
         )}

@@ -1,7 +1,6 @@
 import { Icon } from "@/components/ui/icon";
 import {useTheme, type Palette, fontFamilies} from "@/theme";
 import { deleteAccountData } from "@/services/database";
-import { getContentDbStatus, contentRepository } from "@/services/content-db";
 import { getSoundEnabled, setSoundEnabled } from "@/services/storage";
 import { useStorage } from "@/services/StorageContext";
 import { setUiSfxEnabled } from "@/services/ui-sfx";
@@ -31,82 +30,20 @@ const APP_VERSION =
 export default function SettingsScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const {
-    userProfile,
-    updateUserProfile,
-  } = useStorage();
+  const { userProfile } = useStorage();
   const { theme, isDark, toggleTheme } = useTheme();
   const THEME = theme.palettes.settings;
-  const [isEditing, setIsEditing] = useState(false);
-  const [displayName, setDisplayName] = useState(
-    userProfile?.display_name || userProfile?.username || "",
-  );
   const [soundEffects, setSoundEffects] = useState(true);
   const [isDeletingAccount, setIsDeletingAccount] = useState(false);
   const [versionModalVisible, setVersionModalVisible] = useState(false);
-  const [contentDbLabel, setContentDbLabel] = useState("Checking...");
-  const [contentDbError, setContentDbError] = useState<string | null>(null);
+  const [deleteModalVisible, setDeleteModalVisible] = useState(false);
+  const [confirmText, setConfirmText] = useState("");
 
-  // Surface the bundled content database status so seeding failures are
-  // visible in the app instead of showing "no data" screens.
-  useEffect(() => {
-    let mounted = true;
-
-    const checkContentDb = async () => {
-      try {
-        const { seeded, version, lastError } = getContentDbStatus();
-        if (lastError) {
-          if (mounted) {
-            setContentDbError(lastError);
-            setContentDbLabel(`Seed failed (v${version})`);
-          }
-          return;
-        }
-        if (seeded) {
-          if (mounted) {
-            setContentDbLabel(`Ready (v${version})`);
-          }
-          return;
-        }
-        const lessonCount = await contentRepository.getLessonCount();
-        if (mounted) {
-          setContentDbLabel(
-            lessonCount > 0 ? `Ready — ${lessonCount} lessons (v${version})` : "Empty",
-          );
-        }
-      } catch (error) {
-        if (mounted) {
-          setContentDbError(error instanceof Error ? error.message : String(error));
-          setContentDbLabel("Unavailable");
-        }
-      }
-    };
-
-    void checkContentDb();
-
-    return () => {
-      mounted = false;
-    };
-  }, []);
-
-  const nextDisplayNameChangeAt =
-    userProfile?.next_display_name_change_at &&
-    userProfile.next_display_name_change_at > 0
-      ? userProfile.next_display_name_change_at
-      : 0;
-  const canChangeDisplayName =
-    !nextDisplayNameChangeAt || Date.now() >= nextDisplayNameChangeAt;
-
-  const formatCooldown = (timestamp: number) => {
-    const diffMs = Math.max(timestamp - Date.now(), 0);
-    const diffDays = Math.ceil(diffMs / (24 * 60 * 60 * 1000));
-
-    if (diffDays <= 1) {
-      return "You can change your display name again in less than 1 day.";
-    }
-
-    return `You can change your display name again in ${diffDays} days.`;
-  };
+  const deleteConfirmationPhrase =
+    userProfile?.display_name || userProfile?.username || "DELETE";
+  const canConfirmDelete =
+    confirmText.trim().toLowerCase() ===
+    deleteConfirmationPhrase.trim().toLowerCase();
 
   useEffect(() => {
     let mounted = true;
@@ -130,50 +67,8 @@ export default function SettingsScreen() {
   }, []);
 
   useEffect(() => {
-    setDisplayName(userProfile?.display_name || userProfile?.username || "");
-  }, [userProfile?.display_name, userProfile?.username]);
-
-  const handleSaveDisplayName = async () => {
-    const nextDisplayName = displayName.trim();
-
-    if (nextDisplayName.length < 3) {
-      Alert.alert("Error", "Display name must be at least 3 characters long");
-      return;
-    }
-
-    if (!canChangeDisplayName && nextDisplayNameChangeAt) {
-      Alert.alert("Cooldown Active", formatCooldown(nextDisplayNameChangeAt));
-      return;
-    }
-
-    try {
-      // Always save locally first so profile updates still work offline.
-      await updateUserProfile({ display_name: nextDisplayName });
-      setIsEditing(false);
-
-      Alert.alert(
-        "Success",
-        "Display name updated successfully! You can change it again in 7 days.",
-      );
-    } catch (error) {
-      const nextAllowedAt = (error as { nextAllowedAt?: number })
-        ?.nextAllowedAt;
-      if (nextAllowedAt) {
-        Alert.alert("Cooldown Active", formatCooldown(nextAllowedAt));
-        return;
-      }
-
-      Alert.alert("Error", "Failed to update display name");
-    }
-  };
-
-  const handlePrivacyPolicy = () => {
-    router.push("/privacy-policy");
-  };
-
-  const handleTermsOfService = () => {
-    router.push("/terms-of-service");
-  };
+    setConfirmText("");
+  }, [deleteModalVisible]);
 
   const handleSoundEffectsToggle = (enabled: boolean) => {
     setSoundEffects(enabled);
@@ -206,34 +101,16 @@ export default function SettingsScreen() {
     }
   };
 
+  const handlePrivacyPolicy = () => {
+    router.push("/privacy-policy");
+  };
+
+  const handleTermsOfService = () => {
+    router.push("/terms-of-service");
+  };
+
   const handleDeleteAccount = () => {
-    Alert.alert(
-      "Delete Account",
-      "This will permanently delete your account and all local data. This action cannot be undone.",
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Continue",
-          style: "destructive",
-          onPress: () => {
-            Alert.alert(
-              "Final Confirmation",
-              "Are you absolutely sure you want to delete your account forever?",
-              [
-                { text: "Cancel", style: "cancel" },
-                {
-                  text: "Delete Forever",
-                  style: "destructive",
-                  onPress: () => {
-                    void executeDeleteAccount();
-                  },
-                },
-              ],
-            );
-          },
-        },
-      ],
-    );
+    setDeleteModalVisible(true);
   };
 
   const styles = React.useMemo(() => createStyles(THEME), [THEME]);
@@ -253,90 +130,8 @@ export default function SettingsScreen() {
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
-        {/* Account Section */}
-        <Animated.View entering={FadeInDown.delay(100).springify()}>
-          <Text style={styles.sectionTitle}>Account</Text>
-          <View style={styles.settingsCard}>
-            <View style={styles.settingRow}>
-              <View style={styles.settingInfo}>
-                <Icon
-                  name="Profile"
-                  size={20}
-                  color={THEME.primary}
-                  variant="Bold"
-                />
-                <View style={{ flex: 1 }}>
-                  <Text style={styles.settingLabel}>Display Name</Text>
-                  <Text style={styles.settingDescription}>
-                    Can be changed once every 7 days
-                  </Text>
-                </View>
-              </View>
-              {isEditing ? (
-                <View style={styles.editRow}>
-                  <TextInput
-                    style={styles.input}
-                    value={displayName}
-                    onChangeText={setDisplayName}
-                    placeholder="Enter display name"
-                    autoFocus
-                  />
-                  <TouchableOpacity
-                    onPress={handleSaveDisplayName}
-                    style={styles.saveBtn}
-                    disabled={!canChangeDisplayName}
-                  >
-                    <Icon
-                      name="TickCircle"
-                      size={20}
-                      color={canChangeDisplayName ? "#2ECC71" : THEME.textMuted}
-                      variant="Bold"
-                    />
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    onPress={() => {
-                      setIsEditing(false);
-                      setDisplayName(
-                        userProfile?.display_name ||
-                          userProfile?.username ||
-                          "",
-                      );
-                    }}
-                    style={styles.cancelBtn}
-                  >
-                    <Icon
-                      name="CloseCircle"
-                      size={20}
-                      color="#EF4444"
-                      variant="Bold"
-                    />
-                  </TouchableOpacity>
-                </View>
-              ) : (
-                <TouchableOpacity
-                  onPress={() => setIsEditing(true)}
-                  style={styles.valueRow}
-                >
-                  <Text style={styles.settingValue}>
-                    {userProfile?.display_name || userProfile?.username}
-                  </Text>
-                  <Icon name="Edit" size={18} color={THEME.textMuted} />
-                </TouchableOpacity>
-              )}
-            </View>
-
-            {!canChangeDisplayName && nextDisplayNameChangeAt ? (
-              <View style={styles.cooldownBanner}>
-                <Text style={styles.cooldownText}>
-                  {formatCooldown(nextDisplayNameChangeAt)}
-                </Text>
-              </View>
-            ) : null}
-          </View>
-        </Animated.View>
-
         {/* Preferences Section */}
-        <Animated.View entering={FadeInDown.delay(200).springify()}>
+        <Animated.View entering={FadeInDown.delay(100).springify()}>
           <Text style={styles.sectionTitle}>Preferences</Text>
           <View style={styles.settingsCard}>
             <View style={styles.settingRow}>
@@ -409,31 +204,6 @@ export default function SettingsScreen() {
                 <Icon name="ArrowRight2" size={18} color={THEME.textMuted} />
               </View>
             </TouchableOpacity>
-
-            <View style={[styles.settingRow, styles.settingRowBorder]}>
-              <View style={styles.settingInfo}>
-                <Icon
-                  name="Document"
-                  size={20}
-                  color={contentDbError ? "#EF4444" : THEME.primary}
-                  variant="Bold"
-                />
-                <View style={{ flex: 1 }}>
-                  <Text style={styles.settingLabel}>Content Database</Text>
-                  <Text
-                    style={[
-                      styles.settingDescription,
-                      contentDbError ? { color: "#EF4444" } : null,
-                    ]}
-                    numberOfLines={2}
-                  >
-                    {contentDbError
-                      ? `Seed error: ${contentDbError}`
-                      : contentDbLabel}
-                  </Text>
-                </View>
-              </View>
-            </View>
 
             <TouchableOpacity
               style={[styles.settingRow, styles.settingRowBorder]}
@@ -560,6 +330,83 @@ export default function SettingsScreen() {
           </Animated.View>
         </View>
       </Modal>
+
+      {/* Delete Account Modal */}
+      <Modal
+        visible={deleteModalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setDeleteModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <Animated.View
+            entering={FadeInDown.duration(300).springify()}
+            style={styles.deleteModalCard}
+          >
+            <TouchableOpacity
+              onPress={() => setDeleteModalVisible(false)}
+              style={styles.modalCloseBtn}
+            >
+              <Icon name="CloseCircle" size={28} color={THEME.textMuted} variant="Bold" />
+            </TouchableOpacity>
+
+            <View style={styles.deleteModalIconWrap}>
+              <Icon name="Trash" size={32} color="#EF4444" variant="Bold" />
+            </View>
+
+            <Text style={styles.deleteModalTitle}>Delete Account?</Text>
+
+            <Text style={styles.deleteModalText}>
+              This will permanently delete your account and all local data. This
+              action cannot be undone.
+            </Text>
+
+            <Text style={styles.deleteModalText}>
+              Type{" "}
+              <Text style={styles.deleteModalPhrase}>
+                {deleteConfirmationPhrase}
+              </Text>{" "}
+              to confirm.
+            </Text>
+
+            <TextInput
+              style={styles.input}
+              value={confirmText}
+              onChangeText={setConfirmText}
+              placeholder={deleteConfirmationPhrase}
+              autoCapitalize="none"
+              autoCorrect={false}
+            />
+
+            <View style={styles.deleteModalActions}>
+              <TouchableOpacity
+                onPress={() => setDeleteModalVisible(false)}
+                style={styles.deleteModalCancelBtn}
+                disabled={isDeletingAccount}
+              >
+                <Text style={styles.deleteModalCancelText}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => {
+                  setDeleteModalVisible(false);
+                  void executeDeleteAccount();
+                }}
+                style={[
+                  styles.deleteModalConfirmBtn,
+                  !canConfirmDelete && styles.deleteModalConfirmBtnDisabled,
+                ]}
+                disabled={!canConfirmDelete || isDeletingAccount}
+              >
+                {isDeletingAccount ? (
+                  <ActivityIndicator color="#FFFFFF" size="small" />
+                ) : (
+                  <Text style={styles.deleteModalConfirmText}>Delete Forever</Text>
+                )}
+              </TouchableOpacity>
+            </View>
+          </Animated.View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -660,13 +507,6 @@ const createStyles = (theme: Palette) =>
       alignItems: "center",
       gap: 8,
     },
-    editRow: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 8,
-      flex: 1,
-      justifyContent: "flex-end",
-    },
     input: {
       flex: 1,
       backgroundColor: theme.bg,
@@ -678,28 +518,6 @@ const createStyles = (theme: Palette) =>
       fontSize: 15,
       fontFamily: fontFamilies.regular,
       color: theme.text,
-    },
-    saveBtn: {
-      padding: 8,
-      backgroundColor: theme.primary + "10",
-      borderRadius: 8,
-    },
-    cancelBtn: {
-      padding: 8,
-    },
-    cooldownBanner: {
-      paddingHorizontal: 16,
-      paddingBottom: 14,
-      paddingTop: 2,
-      borderTopWidth: 1,
-      borderTopColor: theme.border,
-    },
-    cooldownText: {
-      fontSize: 12,
-      color: theme.primary,
-      fontWeight: "600",
-      fontFamily: fontFamilies.semibold,
-      lineHeight: 18,
     },
     destructiveLabel: {
       fontSize: 16,
@@ -825,6 +643,92 @@ const createStyles = (theme: Palette) =>
       elevation: 4,
     },
     modalGotItText: {
+      fontSize: 16,
+      fontWeight: "700",
+      fontFamily: fontFamilies.bold,
+      color: "#FFFFFF",
+    },
+    /* Delete Account Modal */
+    deleteModalCard: {
+      width: "100%",
+      maxWidth: 380,
+      backgroundColor: theme.card,
+      borderRadius: 28,
+      padding: 28,
+      borderWidth: 1,
+      borderColor: theme.border,
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 12 },
+      shadowOpacity: 0.25,
+      shadowRadius: 24,
+      elevation: 12,
+    },
+    deleteModalIconWrap: {
+      width: 68,
+      height: 68,
+      borderRadius: 22,
+      backgroundColor: "#FEE2E2",
+      alignItems: "center",
+      justifyContent: "center",
+      marginBottom: 18,
+    },
+    deleteModalTitle: {
+      fontSize: 22,
+      fontWeight: "800",
+      fontFamily: fontFamilies.heavy,
+      color: theme.text,
+      marginBottom: 10,
+    },
+    deleteModalText: {
+      fontSize: 14,
+      fontFamily: fontFamilies.regular,
+      color: theme.textMuted,
+      lineHeight: 21,
+      marginBottom: 8,
+    },
+    deleteModalPhrase: {
+      fontWeight: "700",
+      fontFamily: fontFamilies.bold,
+      color: "#EF4444",
+    },
+    deleteModalActions: {
+      flexDirection: "row",
+      gap: 12,
+      marginTop: 20,
+    },
+    deleteModalCancelBtn: {
+      flex: 1,
+      paddingVertical: 14,
+      borderRadius: 16,
+      alignItems: "center",
+      borderWidth: 1,
+      borderColor: theme.border,
+      backgroundColor: theme.bg,
+    },
+    deleteModalCancelText: {
+      fontSize: 16,
+      fontWeight: "700",
+      fontFamily: fontFamilies.bold,
+      color: theme.text,
+    },
+    deleteModalConfirmBtn: {
+      flex: 1,
+      paddingVertical: 14,
+      borderRadius: 16,
+      alignItems: "center",
+      backgroundColor: "#EF4444",
+      shadowColor: "#EF4444",
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.3,
+      shadowRadius: 8,
+      elevation: 4,
+    },
+    deleteModalConfirmBtnDisabled: {
+      opacity: 0.4,
+      shadowOpacity: 0,
+      elevation: 0,
+    },
+    deleteModalConfirmText: {
       fontSize: 16,
       fontWeight: "700",
       fontFamily: fontFamilies.bold,

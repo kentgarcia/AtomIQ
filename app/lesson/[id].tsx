@@ -13,7 +13,6 @@ import {
     View,
 } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import Animated, { Keyframe } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { getLevelProgress, updateLevelProgress } from "@/services/database";
@@ -27,23 +26,6 @@ import { LessonPreview } from "@/components/lesson/LessonPreview";
 import { MicroLearnView } from "@/components/lesson/MicroLearnView";
 import { MythBusterView } from "@/components/lesson/MythBusterView";
 import { createStyles } from "@/components/lesson/styles";
-
-/* Preview → lesson handoff: a full-width slide — the lesson glides in from
-   the right while the preview glides out to the left. Intermediate stops
-   approximate an ease-out curve (keyframes interpolate linearly). */
-const PREVIEW_EXIT = new Keyframe({
-  0: { transform: [{ translateX: 0 }] },
-  30: { transform: [{ translateX: "-66%" }] },
-  60: { transform: [{ translateX: "-94%" }] },
-  100: { transform: [{ translateX: "-100%" }] },
-}).duration(420);
-
-const LESSON_ENTER = new Keyframe({
-  0: { transform: [{ translateX: "100%" }] },
-  30: { transform: [{ translateX: "34%" }] },
-  60: { transform: [{ translateX: "6%" }] },
-  100: { transform: [{ translateX: 0 }] },
-}).duration(420);
 
 export default function LessonScreen() {
   const { id } = useLocalSearchParams();
@@ -251,9 +233,9 @@ export default function LessonScreen() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <View style={{ flex: 1, backgroundColor: THEME.bg }}>
-        {/* Lesson content — mounts (and enters) when the preview proceeds */}
+        {/* Lesson content — mounts when the preview proceeds */}
         {started && (
-          <Animated.View entering={LESSON_ENTER} style={{ flex: 1 }}>
+          <View style={{ flex: 1 }}>
             <SafeAreaView style={{ flex: 1 }}>
               {/* Progress Header - hidden on first and last steps */}
               {!isFirstStep && !isLastStep && (
@@ -268,7 +250,7 @@ export default function LessonScreen() {
                     <Icon name="Close" size={24} color={THEME.textMuted} />
                   </TouchableOpacity>
                   <View style={styles.progressBarBg}>
-                    <Animated.View
+                    <View
                       style={[
                         styles.progressBarFill,
                         { width: `${((step + 1) / totalSteps) * 100}%` },
@@ -280,16 +262,12 @@ export default function LessonScreen() {
 
               <View style={{ flex: 1 }}>{renderStep()}</View>
             </SafeAreaView>
-          </Animated.View>
+          </View>
         )}
 
-        {/* Preview overlay — lives in the same tree as the lesson so both
-            animate together when started flips */}
+        {/* Preview overlay — replaced instantly when the lesson starts */}
         {!started && (
-          <Animated.View
-            exiting={PREVIEW_EXIT}
-            style={[StyleSheet.absoluteFill, { zIndex: 50 }]}
-          >
+          <View style={[StyleSheet.absoluteFill, { zIndex: 50 }]}>
             <LinearGradient
               colors={["#FFF3E0", "#FFFFFF"]}
               style={StyleSheet.absoluteFill}
@@ -307,7 +285,7 @@ export default function LessonScreen() {
                 onProceed={handleProceed}
               />
             </SafeAreaView>
-          </Animated.View>
+          </View>
         )}
       </View>
     </GestureHandlerRootView>
