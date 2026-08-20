@@ -91,27 +91,24 @@ export const styles = StyleSheet.create({
 
   // Modern Battle Arena
   modernBattleArena: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-around",
-    paddingTop: 92,
-    paddingBottom: 22,
-    paddingHorizontal: 14,
+    flexDirection: "column",
+    paddingTop: 14,
+    paddingBottom: 16,
+    paddingHorizontal: 12,
     marginHorizontal: 12,
     marginTop: 8,
     borderRadius: 22,
     overflow: "hidden",
-    minHeight: 270,
+    minHeight: 295,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
     elevation: 4,
   },
+  arenaHeader: {
+    gap: 10,
+  },
   arenaHudContainer: {
-    position: "absolute",
-    top: 10,
-    left: 10,
-    right: 10,
     zIndex: 3,
   },
   arenaHudGlass: {
@@ -124,6 +121,20 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 9,
     gap: 8,
+  },
+  arenaHpRow: {
+    flexDirection: "row",
+    alignItems: "stretch",
+    justifyContent: "space-between",
+    gap: 10,
+  },
+  arenaFighters: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "stretch",
+    justifyContent: "space-around",
+    gap: 8,
+    position: "relative",
   },
   arenaHudBackBtn: {
     width: 34,
@@ -221,7 +232,7 @@ export const styles = StyleSheet.create({
     position: "absolute",
     left: 14,
     right: 14,
-    top: 70,
+    top: 6,
     zIndex: 2,
     flexDirection: "row",
     alignItems: "center",
@@ -249,42 +260,26 @@ export const styles = StyleSheet.create({
   },
   modernFighter: {
     alignItems: "center",
-    gap: 12,
+    justifyContent: "flex-end",
     flex: 1,
     zIndex: 1,
   },
-  modernHpContainer: {
-    width: "100%",
-    alignItems: "center",
-    gap: 6,
-  },
-  modernFighterName: {
-    fontSize: 13,
-    fontWeight: "700",
-    textTransform: "uppercase",
-    letterSpacing: 0.5,
-  },
-  modernHpBarBg: {
-    width: "100%",
-    height: 10,
-    borderRadius: 5,
-    overflow: "hidden",
-  },
-  modernHpBarFill: {
-    height: "100%",
-    borderRadius: 5,
-  },
-  modernHpText: {
-    fontSize: 11,
-    fontWeight: "600",
+  fighterSpriteWrap: {
+    position: "relative",
   },
   damagePopupPlayer: {
+    position: "absolute",
+    top: -22,
+    zIndex: 4,
     backgroundColor: "rgba(239, 68, 68, 0.92)",
     borderRadius: 14,
     paddingHorizontal: 12,
     paddingVertical: 5,
   },
   damagePopupMonster: {
+    position: "absolute",
+    top: -22,
+    zIndex: 4,
     backgroundColor: "rgba(16, 185, 129, 0.92)",
     borderRadius: 14,
     paddingHorizontal: 12,
@@ -296,23 +291,81 @@ export const styles = StyleSheet.create({
     fontWeight: "900",
     letterSpacing: 0.3,
   },
-  vsBadge: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+
+  // Pokemon-style HP cards below the arena header
+  hpBox: {
+    flex: 1,
+    maxWidth: 200,
+    flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
-    marginHorizontal: 8,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
+    borderRadius: 14,
+    borderWidth: 1.5,
+    borderBottomWidth: 3,
+    paddingVertical: 8,
+    paddingHorizontal: 10,
+    shadowOffset: { width: 0, height: 3 },
     shadowRadius: 6,
-    elevation: 5,
+    elevation: 3,
   },
-  vsText: {
-    color: "#FFF",
-    fontSize: 16,
+  hpBoxBody: {
+    flex: 1,
+    justifyContent: "center",
+    gap: 4,
+  },
+  hpBoxTopRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 6,
+  },
+  hpBoxName: {
+    flexShrink: 1,
+    fontSize: 12,
+    fontWeight: "800",
+    textTransform: "uppercase",
+    letterSpacing: 0.4,
+  },
+  hpBoxLevel: {
+    color: "#FCD34D",
+    fontSize: 9.5,
     fontWeight: "900",
-    letterSpacing: 1,
+    flexShrink: 1,
+    textAlign: "right",
+  },
+  hpBoxBottomRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+  },
+  hpSegmentTrack: {
+    flex: 1,
+    flexDirection: "row",
+    height: 8,
+    backgroundColor: "rgba(2, 6, 23, 0.55)",
+    borderRadius: 4,
+    paddingHorizontal: 1,
+    paddingVertical: 1,
+    overflow: "hidden",
+  },
+  hpSegmentFill: {
+    position: "absolute",
+    left: 1,
+    top: 1,
+    bottom: 1,
+    borderRadius: 2,
+  },
+  hpSegmentDivider: {
+    position: "absolute",
+    top: 1,
+    bottom: 1,
+    width: 2,
+    backgroundColor: "rgba(2, 6, 23, 0.55)",
+  },
+  hpBoxValue: {
+    fontSize: 10,
+    fontWeight: "700",
+    minWidth: 52,
+    textAlign: "right",
   },
   gbContainer: {
     backgroundColor: "#1a1a1a",
@@ -463,94 +516,50 @@ export const styles = StyleSheet.create({
     paddingBottom: 18,
     gap: 10,
   },
-  modernQuestionCard: {
-    borderRadius: 16,
-    padding: 14,
-    borderWidth: 1,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-    elevation: 3,
-    gap: 8,
+
+  // Quiz question card — clean white card (colors applied inline from the maze theme)
+  quizCard: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 20,
+    padding: 16,
+    borderWidth: 2,
+    borderColor: "#E5E7EB",
+    borderBottomWidth: 4,
+    borderBottomColor: "#D1D5DB",
   },
-  modernQuestionBadge: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    alignItems: "center",
-    justifyContent: "center",
-    alignSelf: "flex-start",
-  },
-  modernQuestionText: {
-    fontSize: 15,
-    fontWeight: "600",
-    lineHeight: 22,
+  lessonQuestionText: {
+    fontSize: 18,
+    fontWeight: "700",
+    lineHeight: 26,
   },
 
-  // Modern Options
-  optionsContainer: {
+  // Lesson-style options — Lab 2-column grid with quiz card polish
+  quizOptions: {
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "space-between",
     gap: 10,
   },
-  modernOptionButton: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    borderRadius: 14,
-    paddingHorizontal: 12,
+  lessonOption: {
+    width: "48.6%",
+    minHeight: 68,
+    borderRadius: 16,
     paddingVertical: 12,
-    gap: 8,
+    paddingHorizontal: 12,
     borderWidth: 2,
-    minHeight: 78,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  modernOptionButtonHalf: {
-    width: "48.4%",
-  },
-  modernOptionSelected: {
-    borderWidth: 3,
-    shadowOpacity: 0.15,
-  },
-  modernOptionCorrect: {
-    borderColor: "#10B981",
-    backgroundColor: "#D1FAE5",
-  },
-  modernOptionWrong: {
-    borderColor: "#EF4444",
-    backgroundColor: "#FEE2E2",
-  },
-  modernOptionBadge: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
+    borderBottomWidth: 4,
+    flexDirection: "row",
+    justifyContent: "space-between",
     alignItems: "center",
-    justifyContent: "center",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 3,
-    elevation: 3,
+    gap: 8,
   },
-  modernOptionBadgeText: {
-    color: "#FFFFFF",
-    fontWeight: "800",
-    fontSize: 13,
-  },
-  modernOptionText: {
+  lessonOptionText: {
     flex: 1,
-    fontSize: 13,
+    fontSize: 14,
     fontWeight: "500",
-    lineHeight: 18,
+    lineHeight: 19,
   },
-  modernOptionTextCorrect: {
-    color: "#065F46",
-    fontWeight: "700",
-  },
-  modernOptionTextWrong: {
-    color: "#991B1B",
+  lessonOptionTextEmphasis: {
     fontWeight: "700",
   },
 
@@ -683,55 +692,49 @@ export const styles = StyleSheet.create({
     fontWeight: "600",
   },
 
-  // Modern Result Feedback
-  modernResultFeedback: {
+  // Quiz result feedback — colors applied inline from the maze theme
+  quizResultBox: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
     gap: 12,
     padding: 14,
-    borderRadius: 16,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 4,
+    borderRadius: 14,
+    borderWidth: 1.5,
   },
-  modernResultCorrect: {
-    backgroundColor: "#10B981",
+  quizResultContent: {
+    flex: 1,
+    gap: 2,
   },
-  modernResultWrong: {
-    backgroundColor: "#EF4444",
+  quizResultTitle: {
+    fontSize: 15,
+    fontWeight: "800",
   },
-  modernResultText: {
-    color: "#FFFFFF",
-    fontWeight: "700",
-    fontSize: 14,
+  quizResultSubtitle: {
+    fontSize: 13,
+    fontWeight: "500",
   },
 
   attackActionWrap: {
     gap: 8,
   },
-  quickTapHint: {
-    fontSize: 12,
-    fontWeight: "700",
-    color: "#9A3412",
-    textAlign: "center",
-  },
 
-  // Modern Submit Button
+  // Lesson-style Submit Button
   modernSubmitButton: {
     borderRadius: 16,
     overflow: "hidden",
+    borderBottomWidth: 4,
+    borderBottomColor: "#C2410C",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,
     shadowRadius: 8,
     elevation: 5,
   },
   modernSubmitButtonDisabled: {
+    borderBottomColor: "#6B7280",
     opacity: 0.6,
   },
   modernSubmitGradient: {
-    paddingVertical: 14,
+    paddingVertical: 16,
     paddingHorizontal: 20,
     flexDirection: "row",
     alignItems: "center",
@@ -740,7 +743,7 @@ export const styles = StyleSheet.create({
   },
   modernSubmitText: {
     color: "#FFFFFF",
-    fontSize: 15,
+    fontSize: 16,
     fontWeight: "800",
     letterSpacing: 0.6,
   },
@@ -808,6 +811,26 @@ export const styles = StyleSheet.create({
     fontFamily: fontFamilies.heavy,
     color: "#1F2937",
     marginBottom: 4,
+  },
+  introModeRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    marginBottom: 14,
+  },
+  introModeIcon: {
+    width: 42,
+    height: 42,
+    borderRadius: 14,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  introTagline: {
+    flex: 1,
+    fontSize: 13,
+    fontWeight: "800",
+    fontFamily: fontFamilies.heavy,
+    letterSpacing: 0.3,
   },
   introSubtitle: {
     fontSize: 14,
@@ -914,6 +937,22 @@ export const styles = StyleSheet.create({
   defeatEmoji: {
     fontSize: 80,
     marginBottom: 16,
+  },
+  resultSpriteRow: {
+    flexDirection: "row",
+    alignItems: "flex-end",
+    justifyContent: "center",
+    gap: 28,
+    marginBottom: 16,
+  },
+  resultSprite: {
+    width: 150,
+    height: 150,
+  },
+  resultSpriteSmall: {
+    width: 104,
+    height: 104,
+    opacity: 0.85,
   },
   defeatTitle: {
     fontSize: 36,

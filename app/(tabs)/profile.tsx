@@ -2,6 +2,7 @@ import { Icon } from "@/components/ui/icon";
 import {useTheme, type Palette, fontFamilies} from "@/theme";
 import { ACHIEVEMENTS } from "@/app/achievement-detail";
 import {
+    DEFAULT_PROFILE_AVATAR_KEY,
     PROFILE_AVATAR_OPTIONS,
     type ProfileAvatarKey,
     getProfileAvatarSource,
@@ -13,6 +14,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useFocusEffect, useRouter } from "expo-router";
 import React, { useCallback, useMemo, useState } from "react";
 import {
+    ActivityIndicator,
     Alert,
     Image,
     Modal,
@@ -20,6 +22,7 @@ import {
     Share,
     StyleSheet,
     Text,
+    TextInput,
     TouchableOpacity,
     View,
 } from "react-native";
@@ -43,8 +46,11 @@ export default function ProfileScreen() {
   const THEME = theme.palettes.tab;
   const styles = useMemo(() => createStyles(THEME), [THEME]);
 
-  const [isSavingAvatar, setIsSavingAvatar] = useState(false);
-  const [avatarModalVisible, setAvatarModalVisible] = useState(false);
+  const [isSavingProfile, setIsSavingProfile] = useState(false);
+  const [editModalVisible, setEditModalVisible] = useState(false);
+  const [profileName, setProfileName] = useState("");
+  const [pendingAvatarKey, setPendingAvatarKey] =
+    useState<ProfileAvatarKey>(DEFAULT_PROFILE_AVATAR_KEY);
 
   // Card flip (profile ⇄ stats)
   const flipped = useSharedValue(0);
@@ -139,20 +145,32 @@ export default function ProfileScreen() {
 
   const selectedAvatarKey = normalizeProfileAvatarKey(userProfile?.avatar_url);
 
-  const handleSelectAvatar = async (avatarKey: ProfileAvatarKey) => {
-    if (!userProfile || isSavingAvatar || avatarKey === selectedAvatarKey) {
-      return;
-    }
+  const openEditModal = () => {
+    if (!userProfile) return;
+    setProfileName(userProfile.display_name || userProfile.username || "");
+    setPendingAvatarKey(selectedAvatarKey);
+    setEditModalVisible(true);
+  };
+
+  const handleSaveProfile = async () => {
+    if (!userProfile || isSavingProfile) return;
+
+    const trimmedName = profileName.trim();
+    if (!trimmedName) return;
 
     try {
-      setIsSavingAvatar(true);
-      await updateUserProfile({ avatar_url: avatarKey });
-
-      setAvatarModalVisible(false);
+      setIsSavingProfile(true);
+      await updateUserProfile({
+        display_name: trimmedName,
+        ...(pendingAvatarKey !== selectedAvatarKey
+          ? { avatar_url: pendingAvatarKey }
+          : {}),
+      });
+      setEditModalVisible(false);
     } catch {
-      Alert.alert("Error", "Failed to update profile avatar.");
+      Alert.alert("Error", "Failed to update profile.");
     } finally {
-      setIsSavingAvatar(false);
+      setIsSavingProfile(false);
     }
   };
 
@@ -221,7 +239,7 @@ export default function ProfileScreen() {
           <View style={{ flex: 1 }} />
           <TouchableOpacity
             style={styles.iconButton}
-            onPress={() => setAvatarModalVisible(true)}
+            onPress={openEditModal}
           >
             <Icon name="Edit2" size={20} color="#555555" variant="Bold" />
           </TouchableOpacity>
@@ -254,7 +272,7 @@ export default function ProfileScreen() {
             <View style={styles.profileRow}>
               <TouchableOpacity
                 activeOpacity={0.85}
-                onPress={() => setAvatarModalVisible(true)}
+                onPress={openEditModal}
               >
                 <View style={styles.avatarContainer}>
                   <Image
@@ -484,19 +502,19 @@ export default function ProfileScreen() {
         </Animated.View>
       </ScrollView>
 
-      {/* Avatar Picker Modal */}
+      {/* Edit Profile Modal */}
       <Modal
-        visible={avatarModalVisible}
+        visible={editModalVisible}
         animationType="fade"
         transparent={true}
-        onRequestClose={() => setAvatarModalVisible(false)}
+        onRequestClose={() => setEditModalVisible(false)}
       >
         <View style={styles.avatarModalOverlay}>
           <View style={styles.avatarModalContent}>
             <View style={styles.avatarModalHeader}>
-              <Text style={styles.avatarModalTitle}>Choose Avatar</Text>
+              <Text style={styles.avatarModalTitle}>Edit Profile</Text>
               <TouchableOpacity
-                onPress={() => setAvatarModalVisible(false)}
+                onPress={() => setEditModalVisible(false)}
                 style={styles.closeButton}
               >
                 <Icon
@@ -512,46 +530,74 @@ export default function ProfileScreen() {
               showsVerticalScrollIndicator={false}
               contentContainerStyle={styles.avatarModalGrid}
             >
-              {PROFILE_AVATAR_OPTIONS.map((avatarOption) => {
-                const isSelected = selectedAvatarKey === avatarOption.key;
+              <View style={styles.nameFieldSection}>
+                <Text style={styles.nameFieldLabel}>Display Name</Text>
+                <TextInput
+                  style={styles.nameInput}
+                  value={profileName}
+                  onChangeText={setProfileName}
+                  placeholder="Your display name"
+                  placeholderTextColor={THEME.textMuted}
+                  maxLength={24}
+                  autoCorrect={false}
+                  returnKeyType="done"
+                />
+              </View>
 
-                return (
-                  <TouchableOpacity
-                    key={avatarOption.key}
-                    style={[
-                      styles.avatarModalOption,
-                      isSelected && styles.avatarModalOptionSelected,
-                      isSavingAvatar && styles.avatarModalOptionDisabled,
-                    ]}
-                    onPress={() => {
-                      void handleSelectAvatar(avatarOption.key);
-                    }}
-                    activeOpacity={0.85}
-                    disabled={isSavingAvatar}
-                  >
-                    <Image
-                      source={avatarOption.source}
-                      style={styles.avatarModalOptionImage}
-                      resizeMode="cover"
-                    />
-                    {isSelected && (
-                      <View style={styles.avatarModalCheck}>
-                        <Icon
-                          name="TickCircle"
-                          size={16}
-                          color="#22C55E"
-                          variant="Bold"
-                        />
-                      </View>
-                    )}
-                  </TouchableOpacity>
-                );
-              })}
+              <Text style={styles.nameFieldLabel}>Avatar</Text>
+              <View style={styles.avatarOptionsWrap}>
+                {PROFILE_AVATAR_OPTIONS.map((avatarOption) => {
+                  const isSelected = pendingAvatarKey === avatarOption.key;
+
+                  return (
+                    <TouchableOpacity
+                      key={avatarOption.key}
+                      style={[
+                        styles.avatarModalOption,
+                        isSelected && styles.avatarModalOptionSelected,
+                        isSavingProfile && styles.avatarModalOptionDisabled,
+                      ]}
+                      onPress={() => setPendingAvatarKey(avatarOption.key)}
+                      activeOpacity={0.85}
+                      disabled={isSavingProfile}
+                    >
+                      <Image
+                        source={avatarOption.source}
+                        style={styles.avatarModalOptionImage}
+                        resizeMode="cover"
+                      />
+                      {isSelected && (
+                        <View style={styles.avatarModalCheck}>
+                          <Icon
+                            name="TickCircle"
+                            size={16}
+                            color="#22C55E"
+                            variant="Bold"
+                          />
+                        </View>
+                      )}
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
             </ScrollView>
 
-            <Text style={styles.avatarModalHint}>
-              Tap an avatar to update your profile picture.
-            </Text>
+            <TouchableOpacity
+              style={[
+                styles.saveButton,
+                (!profileName.trim() || isSavingProfile) &&
+                  styles.saveButtonDisabled,
+              ]}
+              onPress={() => void handleSaveProfile()}
+              activeOpacity={0.85}
+              disabled={!profileName.trim() || isSavingProfile}
+            >
+              {isSavingProfile ? (
+                <ActivityIndicator color="#FFFFFF" size="small" />
+              ) : (
+                <Text style={styles.saveButtonText}>Save Changes</Text>
+              )}
+            </TouchableOpacity>
           </View>
         </View>
       </Modal>
@@ -989,12 +1035,62 @@ const createStyles = (theme: Palette) =>
       padding: 4,
     },
     avatarModalGrid: {
+      paddingTop: 4,
+      paddingBottom: 8,
+    },
+    nameFieldSection: {
+      marginBottom: 14,
+    },
+    nameFieldLabel: {
+      fontSize: 12,
+      fontWeight: "800",
+      fontFamily: fontFamilies.heavy,
+      color: theme.textMuted,
+      textTransform: "uppercase",
+      letterSpacing: 0.4,
+      marginBottom: 8,
+    },
+    nameInput: {
+      backgroundColor: theme.card,
+      borderWidth: 1,
+      borderColor: theme.border,
+      borderRadius: 12,
+      paddingHorizontal: 14,
+      paddingVertical: 12,
+      fontSize: 15,
+      fontWeight: "600",
+      fontFamily: fontFamilies.semibold,
+      color: theme.text,
+    },
+    avatarOptionsWrap: {
       flexDirection: "row",
       flexWrap: "wrap",
       justifyContent: "center",
       gap: 12,
-      paddingTop: 4,
-      paddingBottom: 8,
+    },
+    saveButton: {
+      marginTop: 6,
+      alignSelf: "stretch",
+      backgroundColor: "#FF8C00",
+      borderRadius: 14,
+      paddingVertical: 14,
+      alignItems: "center",
+      shadowColor: "#FF8C00",
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.3,
+      shadowRadius: 8,
+      elevation: 4,
+    },
+    saveButtonDisabled: {
+      opacity: 0.4,
+      shadowOpacity: 0,
+      elevation: 0,
+    },
+    saveButtonText: {
+      fontSize: 16,
+      fontWeight: "800",
+      fontFamily: fontFamilies.heavy,
+      color: "#FFFFFF",
     },
     avatarModalOption: {
       width: 64,
@@ -1023,13 +1119,5 @@ const createStyles = (theme: Palette) =>
       backgroundColor: "#FFFFFF",
       borderRadius: 10,
       padding: 1,
-    },
-    avatarModalHint: {
-      marginTop: 8,
-      textAlign: "center",
-      color: theme.textMuted,
-      fontSize: 12,
-      fontWeight: "600",
-      fontFamily: fontFamilies.semibold,
     },
   });
