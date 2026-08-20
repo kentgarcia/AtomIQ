@@ -27,6 +27,10 @@ import { Directory, File } from "expo-file-system";
 import * as SQLite from "expo-sqlite";
 import { Platform } from "react-native";
 
+// expo-sqlite's native module (not part of the public API, but the same
+// module expo-sqlite itself uses for `SQLiteProvider` asset databases).
+import ExpoSQLiteModule from "expo-sqlite/build/ExpoSQLite";
+
 import type {
   Article,
   Post,
@@ -76,6 +80,49 @@ const CDB_DIR = (): string => SQLite.defaultDatabaseDirectory;
 // ---------------------------------------------------------------------------
 
 let seeded = false;
+let seedPromise: Promise<void> | null = null;
+let lastSeedError: Error | null = null;
+
+/**
+ * Run a quick sanity query against the on-device content database to confirm
+ * it actually contains data (catches "open succeeded but empty/corrupt file"
+ * cases that otherwise look like a successful install).
+ */
+async function verifyContentDb(): Promise<boolean> {
+  try {
+    const db = await SQLite.openDatabaseAsync(CONTENT_DB_NAME);
+    try {
+      const row = await db.getFirstAsync<{ count: number }>(
+        "SELECT COUNT(*) AS count FROM lessons",
+      );
+      const count = row?.count ?? 0;
+      console.log(`[content-db] Integrity check: ${count} lessons seeded`);
+      return count > 0;
+    } finally {
+      await db.closeAsync().catch(() => {});
+    }
+  } catch (e) {
+    console.error("[content-db] Integrity check failed:", e);
+    return false;
+  }
+}
+
+/**
+ * Copy the bundled content.db into writable SQLite storage using the native
+ * Kotlin copy primitive that expo-sqlite itself uses for asset databases.
+ * Falls back to the expo-file-system copy when the module is unavailable.
+ */
+async function copyBundledDatabase(assetUri: string, destPath: string): Promise<void> {
+  const importAssetDatabaseAsync = ExpoSQLiteModule?.importAssetDatabaseAsync;
+  if (typeof importAssetDatabaseAsync === "function") {
+    await importAssetDatabaseAsync(destPath, assetUri, true);
+    return;
+  }
+  const source = new File(assetUri);
+  const dest = new File(destPath);
+  if (dest.exists) dest.delete();
+  source.copy(dest);
+}
 
 /**
  * Ensure the bundled content.db is present in writable storage.
@@ -86,51 +133,88 @@ let seeded = false;
  *   2. Otherwise delete any stale copy, copy the freshly bundled asset into
  *      `SQLite.defaultDatabaseDirectory`, and write the version marker.
  *
- * This method is idempotent and safe to call multiple times.
+ * This method is idempotent and safe to call multiple times (concurrent
+ * callers share a single seeding run).
  */
-export async function ensureContentDatabase(): Promise<void> {
+export function ensureContentDatabase(): Promise<void> {
   // Bundled-asset copying only applies to native platforms.
   if (Platform.OS === "web") {
     console.warn("[content-db] Bundled asset seeding is native-only; open the DB directly instead.");
-    return;
+    return Promise.resolve();
   }
-  if (seeded) return; // already ran this session
+  if (seeded) return Promise.resolve();
+  if (seedPromise) return seedPromise;
 
-  const dbDir = new Directory(CDB_DIR());
-  if (!dbDir.exists) {
-    dbDir.create({ intermediates: true, idempotent: true });
-  }
+  seedPromise = (async () => {
+    try {
+      const dbDir = new Directory(CDB_DIR());
+      if (!dbDir.exists) {
+        dbDir.create({ intermediates: true, idempotent: true });
+      }
 
-  const dest = new File(CDB_DIR(), CONTENT_DB_NAME);
-  const destMarker = new File(CDB_DIR(), VERSION_MARKER);
+      const dest = new File(CDB_DIR(), CONTENT_DB_NAME);
+      const destMarker = new File(CDB_DIR(), VERSION_MARKER);
 
-  const isFresh =
-    dest.exists &&
-    destMarker.exists &&
-    destMarker.textSync().trim() === String(CONTENT_DB_VERSION);
+      const isFresh =
+        dest.exists &&
+        destMarker.exists &&
+        destMarker.textSync().trim() === String(CONTENT_DB_VERSION);
 
-  if (isFresh) {
-    seeded = true;
-    return;
-  }
+      if (isFresh) {
+        // Fast path: fresh copy present — but confirm it is not an empty shell.
+        if (await verifyContentDb()) {
+          seeded = true;
+          return;
+        }
+        console.warn("[content-db] Existing copy failed integrity check; re-seeding");
+      }
 
-  // Resolve the bundled asset to a real file (downloadAsync copies it out of
-  // the read-only package into the cache so we can `File.copy` from it).
-  const asset = Asset.fromModule(require("@/assets/database/content.db"));
-  await asset.downloadAsync();
-  if (!asset.localUri) {
-    throw new Error("[content-db] Bundled asset could not be resolved to a local file.");
-  }
-  const source = new File(asset.localUri);
+      console.log("[content-db] Seeding bundled content database...");
 
-  // Remove any stale local copy before replacing it.
-  if (dest.exists) dest.delete();
+      // Resolve the bundled asset to a real file (downloadAsync copies it out of
+      // the read-only package into the cache so we can copy from it).
+      const asset = Asset.fromModule(require("@/assets/database/content.db"));
+      await asset.downloadAsync();
+      if (!asset.localUri) {
+        throw new Error("[content-db] Bundled asset could not be resolved to a local file.");
+      }
 
-  source.copy(dest); // synchronous copy via the modern expo-file-system API
-  destMarker.write(String(CONTENT_DB_VERSION));
+      // Same destination expo-sqlite uses when opening `content.db`.
+      const dbDirPath = SQLite.defaultDatabaseDirectory;
+      const destPath = `${dbDirPath.replace(/\/*$/, "")}/${CONTENT_DB_NAME}`;
 
-  console.log(`[content-db] Seeded ${CONTENT_DB_NAME} (v${CONTENT_DB_VERSION}) to ${dest.uri}`);
-  seeded = true;
+      await copyBundledDatabase(asset.localUri, destPath);
+      destMarker.write(String(CONTENT_DB_VERSION));
+
+      if (!(await verifyContentDb())) {
+        throw new Error("[content-db] Seeded copy failed integrity check (no lessons found).");
+      }
+
+      console.log(`[content-db] Seeded ${CONTENT_DB_NAME} (v${CONTENT_DB_VERSION}) to ${dest.uri}`);
+      seeded = true;
+    } catch (e) {
+      lastSeedError = e instanceof Error ? e : new Error(String(e));
+      console.error("[content-db] Seeding content database FAILED:", lastSeedError);
+      throw lastSeedError;
+    } finally {
+      seedPromise = null;
+    }
+  })();
+
+  return seedPromise;
+}
+
+/** Status of the content database seeding — surfaced in the Settings screen. */
+export function getContentDbStatus(): {
+  seeded: boolean;
+  version: number;
+  lastError: string | null;
+} {
+  return {
+    seeded,
+    version: CONTENT_DB_VERSION,
+    lastError: lastSeedError ? lastSeedError.message : null,
+  };
 }
 
 // ---------------------------------------------------------------------------

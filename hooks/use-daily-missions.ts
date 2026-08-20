@@ -49,9 +49,14 @@ export const useDailyMissions = () => {
   );
 
   const markFactRead = useCallback(async () => {
+    const mission = DAILY_MISSIONS.find((m) => m.type === "fact");
+    if (!mission || !state || state.claimed.includes(mission.id)) return;
+
     await recordMissionEvent("fact", 1);
+    await addXP(mission.reward);
+    await claimDailyMission(mission.id);
     await refresh();
-  }, [refresh]);
+  }, [state, addXP, refresh]);
 
   const missions: MissionView[] = DAILY_MISSIONS.map((mission) => {
     const progress = Math.min(state?.progress[mission.type] || 0, mission.target);

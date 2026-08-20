@@ -10,6 +10,7 @@ import "react-native-reanimated";
 
 import { ThemeProvider, useColorScheme } from "@/theme";
 import { useSnPro } from "@/hooks/use-snpro";
+import { ensureContentDatabase } from "@/services/content-db";
 import { StorageProvider } from "@/services/StorageContext";
 import {
     initializeUiSfx,
@@ -33,6 +34,11 @@ function AppContent() {
   useEffect(() => {
     installGlobalUiSfxHandlers();
     void initializeUiSfx();
+
+    // Prime the bundled content database (lessons/quizzes/myths/facts/games).
+    void ensureContentDatabase().catch((e) => {
+      console.error("[content-db] Startup seeding failed:", e);
+    });
 
     return () => {
       void unloadUiSfx();
@@ -59,11 +65,6 @@ function AppContent() {
         <Stack.Screen name="privacy-policy" options={{ headerShown: false }} />
         <Stack.Screen name="terms-of-service" options={{ headerShown: false }} />
         <Stack.Screen name="streak" options={{ headerShown: false }} />
-        <Stack.Screen name="missions" options={{ headerShown: false }} />
-        <Stack.Screen
-          name="daily-fact"
-          options={{ headerShown: false, presentation: "modal" }}
-        />
         <Stack.Screen name="lab" options={{ headerShown: false }} />
         <Stack.Screen name="explorer" options={{ headerShown: false }} />
         <Stack.Screen name="atom-maze" options={{ headerShown: false }} />
