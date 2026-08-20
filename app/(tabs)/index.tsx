@@ -1,19 +1,22 @@
 import { Icon } from "@/components/ui/icon";
-import { SectionHeader } from "@/components/ui/section-header";
 import { UNITS } from "@/content/units";
 import { useAllLevels } from "@/hooks/use-storage";
-import { useDailyMissions } from "@/hooks/use-daily-missions";
+import {
+  useDailyMissions,
+  type MissionView,
+} from "@/hooks/use-daily-missions";
+import { getDailyFact, type DailyFact } from "@/services/missions";
 import { openExternalUrl } from "@/services/open-url";
 import { getProfileAvatarSource } from "@/services/profile-avatars";
 import { useStorage } from "@/services/StorageContext";
 import { useTheme, type Palette, fontFamilies } from "@/theme";
+import * as Haptics from "expo-haptics";
 import { LinearGradient } from "expo-linear-gradient";
 import { useFocusEffect, useRouter } from "expo-router";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
     Alert,
     Image,
-    Modal,
     ScrollView,
     StyleSheet,
     Text,
@@ -22,21 +25,26 @@ import {
     View,
 } from "react-native";
 import Animated, {
+    cancelAnimation,
     Easing,
+    FadeIn,
     FadeInDown,
+    FadeOut,
     FadeOutDown,
+    LinearTransition,
     useAnimatedStyle,
     useSharedValue,
     withRepeat,
     withTiming,
+    ZoomIn,
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import Svg, { Path, Polyline } from "react-native-svg";
+import Svg, { Path, Polygon, Polyline } from "react-native-svg";
 
 const NODE_SIZE = 79;
 const NODE_ROW_GAP = 120;
 const NODE_TOP = 88;
-const SECTION_PAD = 110;
+const SECTION_PAD = 48;
 /* Sticky card geometry (safe-area-relative) */
 const CARD_TOP = 78;
 const CARD_AREA = 190;
@@ -64,10 +72,14 @@ const GLASS_COLORS = [
 ] as const;
 const GLASS_LOCATIONS = [0, 0.25, 0.48, 0.481, 0.58, 0.581, 0.75, 0.751] as const;
 
-/* Maple leaf decoration (same path as the provided SVG) */
-const LEAF_PATH =
-  "M15.362 9.69s-.75 1.108-1.068 0c-.318-1.109-1.346-4.949-1.762-5.226l-.417-.278s-.078 1.506-.594 1.307c-.515-.198-4.313-2.217-4.63-2.652l-.317-.397s.355 3.328-.515 2.615c0 0 1.113 2.771-2.573 3.048 0 0 1.186 3.087 4.552 4.75 0 0 1.148 1.783-.949 1.503 0 0-2.932-.395-3.325-.752 0 0-1.548 3.01-3.764 3.128 0 0 2.656 1.504 2.337 4.156 0 0 5.107.041 4.911.832-.2.795-.555 1.601-.555 1.601s4.71-.929 5.422-2.194c0 0 .989.99 1.071 1.939 0 0 2.693-.594 2.452-2.296 0 0 1.269.948 1.427 2.551l.554-.375s-.319-1.661-1.464-2.967c0 0-.517-1.308.789-.633 0 0 3.085 1.029 5.7-.833 0 0-2.888-.948-3.006-1.978 0 0 5.394-3.326 5.625-5.542 0 0-1.944.198-2.972-.633 0 0-1.309-.396.394-4.791 0 0-1.227.724-1.62-3.636 0 0-3.051 4.665-4.518 3.082.001-.001-1.382 3.047-1.185 4.671z";
-const LEAF_COLORS = ["#D35400", "#E67E22", "#C0392B", "#F39C12"];
+/* Autumn action tokens, shared with the missions + daily-fact screens */
+const BTN_COLOR = "#FF8C00";
+const BTN_LIP = "#E67E22";
+const CREAM = "#FFF3E0";
+
+/* Flat-top hexagon for the per-mission icon (46x46 viewBox), inset so the
+   thicker rounding stroke stays inside the canvas */
+const HEX_POINTS = "23,6.3 37.72,14.5 37.72,31.5 23,39.7 8.28,31.5 8.28,14.5";
 
 type NodeStatus = "locked" | "current" | "completed";
 
@@ -96,6 +108,9 @@ type CardUnit = {
 
 /* Reference press transition: 0.15s cubic-bezier(0.4, 0, 0.2, 1) */
 const PRESS_EASING = Easing.bezier(0.4, 0, 0.2, 1);
+
+/* Standard UI ease-out (fade up, settle) for state-driven fills */
+const EASE_OUT = Easing.bezier(0.23, 1, 0.32, 1);
 
 /* Scroll offset that centers a node in the visible area. */
 const computeNodeScrollY = (
@@ -202,46 +217,6 @@ const mixHex = (a: string, b: string, t: number): string => {
   return `#${mixed.map((v) => v.toString(16).padStart(2, "0")).join("")}`;
 };
 
-/* Deterministic 0..1 pseudo-random so the leaf layout is stable across renders */
-const pseudoRandom = (seed: number): number => {
-  const x = Math.sin(seed * 127.1 + 311.7) * 43758.5453;
-  return x - Math.floor(x);
-};
-
-type LeafSpec = {
-  side: "left" | "right";
-  top: number;
-  size: number;
-  rotation: number;
-  flipX: boolean;
-  opacity: number;
-  offsetX: number;
-  color: string;
-};
-
-/* Autumn leaves scattered down both edges of the scrolling map */
-const buildLeaves = (height: number): LeafSpec[] => {
-  const leaves: LeafSpec[] = [];
-  let seed = 0;
-  let top = 160;
-  while (top < height - 80) {
-    const r = (k: number) => pseudoRandom(seed * 8 + k);
-    leaves.push({
-      side: r(1) < 0.5 ? "left" : "right",
-      top,
-      size: 48 + Math.round(r(2) * 60),
-      rotation: Math.round(r(3) * 360),
-      flipX: r(4) < 0.5,
-      opacity: 0.65 + r(5) * 0.35,
-      offsetX: -Math.round(r(6) * 18),
-      color: LEAF_COLORS[Math.floor(r(7) * LEAF_COLORS.length)],
-    });
-    top += 140 + Math.round(r(8) * 140);
-    seed += 1;
-  }
-  return leaves;
-};
-
 const UNIT_INFO_DATA: Record<string, { info: string; references: string[] }> = {
   "atomic-playground": {
     info: "Explore the basics of nuclear science, including atoms, isotopes, and the energy contained within nuclei. You'll understand atomic structure, nuclear energy fundamentals, and recognize common misconceptions.",
@@ -318,7 +293,14 @@ export default function HomeScreen() {
   const insets = useSafeAreaInsets();
   const { userProfile } = useStorage();
   const { levels, loading, refresh } = useAllLevels();
-  const { claimableCount, refresh: refreshMissions } = useDailyMissions();
+  const {
+    missions,
+    claim,
+    claimableCount,
+    completedCount,
+    markFactRead,
+    refresh: refreshMissions,
+  } = useDailyMissions();
   const { theme } = useTheme();
   const { width, height: windowHeight } = useWindowDimensions();
   const THEME = theme.palettes.tab;
@@ -343,13 +325,51 @@ export default function HomeScreen() {
     theme.mode === "dark" ? "rgba(255,255,255,0.25)" : "rgba(17,24,39,0.18)";
 
   const scrollViewRef = useRef<ScrollView>(null);
-  const [selectedUnit, setSelectedUnit] = useState<{
-    id: string;
-    title: string;
-    subtitle: string;
-  } | null>(null);
+  const [infoOpen, setInfoOpen] = useState(false);
   const [cardUnit, setCardUnit] = useState<CardUnit | null>(null);
   const [arrowDir, setArrowDir] = useState<"up" | "down" | null>(null);
+  const [dailyPanel, setDailyPanel] = useState<"missions" | "fact" | null>(null);
+  const [dailyFact, setDailyFact] = useState<DailyFact | null>(null);
+
+  useEffect(() => {
+    void getDailyFact().then(setDailyFact);
+  }, []);
+
+  /* Today's fact is claimed once the "fact" mission flips to claimed */
+  const factClaimed = missions.some((m) => m.type === "fact" && m.isClaimed);
+  const remainingReward = missions
+    .filter((m) => !m.isClaimed)
+    .reduce((sum, m) => sum + m.reward, 0);
+
+  /* Missions progress fill — grows left-to-right when a claim lands */
+  const fill = useSharedValue(0);
+  const fillStyle = useAnimatedStyle(() => ({
+    transformOrigin: "left",
+    transform: [{ scaleX: Math.max(0.08, fill.get()) }],
+  }));
+  useEffect(() => {
+    fill.set(
+      withTiming(missions.length ? completedCount / missions.length : 0, {
+        duration: 300,
+        easing: EASE_OUT,
+      }),
+    );
+  }, [fill, missions.length, completedCount]);
+
+  const claimMission = useCallback(
+    async (mission: MissionView) => {
+      if (!mission.isComplete || mission.isClaimed) return;
+      await claim(mission);
+      await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    },
+    [claim],
+  );
+
+  const handleMarkFactRead = useCallback(async () => {
+    if (factClaimed) return;
+    await markFactRead();
+    await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+  }, [markFactRead, factClaimed]);
 
   useFocusEffect(
     useCallback(() => {
@@ -372,22 +392,6 @@ export default function HomeScreen() {
   const units = useMemo(
     () => buildPath(completedKey ? completedKey.split("|") : []),
     [completedKey],
-  );
-
-  // Total scrollable map height (for scattering leaves down both edges)
-  const mapContentHeight = useMemo(
-    () =>
-      units.reduce(
-        (acc, unit) => acc + unit.levels.length * NODE_ROW_GAP + SECTION_PAD,
-        0,
-      ),
-    [units],
-  );
-
-  // Deterministic pseudo-random leaf layout down the edges of the map
-  const leaves = useMemo(
-    () => buildLeaves(mapContentHeight),
-    [mapContentHeight],
   );
 
   // Locate the first "current" (next up) node
@@ -428,6 +432,10 @@ export default function HomeScreen() {
 const handleScroll = useCallback(
     (e: { nativeEvent: { contentOffset: { y: number } } }) => {
       const scrollY = e.nativeEvent.contentOffset.y;
+      // The expanded panels are a peek, not a screen — dismiss them as
+      // soon as the map moves so they never cover the path
+      setDailyPanel(null);
+      setInfoOpen(false);
       // Switch when a section's start crosses the card's middle band,
       // measured in scroll-space
       const cardMid = CARD_TOP + 44;
@@ -504,55 +512,29 @@ const handleScroll = useCallback(
     }
   };
 
-  const LoadingDot = ({ delay, color }: { delay: number; color: string }) => {
-    const scale = useSharedValue(1);
-    const opacity = useSharedValue(1);
-
-    useEffect(() => {
-      scale.value = withRepeat(withTiming(1.3, { duration: 600 }), -1, true);
-      opacity.value = withRepeat(withTiming(0.4, { duration: 600 }), -1, true);
-    }, []);
-
-    const animatedStyle = useAnimatedStyle(() => ({
-      transform: [{ scale: scale.value }],
-      opacity: opacity.value,
-    }));
-
-    return (
-      <Animated.View
-        entering={FadeInDown.delay(delay).springify()}
-        style={[styles.loadingDot, { backgroundColor: color }, animatedStyle]}
-      />
-    );
-  };
-
-  if (loading) {
-    return (
-      <View style={[styles.container, { backgroundColor: bgTop }]}>
-        <LinearGradient
-          colors={[bgTop, bgBottom]}
-          style={styles.bgGradient}
-          pointerEvents="none"
-        />
-        <View style={[styles.loadingContainer, { paddingTop: insets.top }]}>
-          <Animated.View entering={FadeInDown.springify().damping(10)}>
-            <Image
-              source={require("@/assets/images/mascot/explain.png")}
-              style={styles.loadingMascot}
-              resizeMode="contain"
-            />
-          </Animated.View>
-          <Text style={styles.loadingTitle}>Preparing Your Journey</Text>
-          <Text style={styles.loadingSubtitle}>Loading learning path...</Text>
-          <View style={styles.loadingDotsContainer}>
-            <LoadingDot delay={300} color="#FFB74D" />
-            <LoadingDot delay={400} color="#64B5F6" />
-            <LoadingDot delay={500} color="#81C784" />
-          </View>
-        </View>
-      </View>
-    );
-  }
+  /* Icon-only action button with a rounded bottom lip (missions row action) */
+  const ActionButton = ({
+    color,
+    lipColor,
+    icon,
+    onPress,
+  }: {
+    color: string;
+    lipColor: string;
+    icon: string;
+    onPress: () => void;
+  }) => (
+    <View style={[styles.actionBtnClip, { backgroundColor: color }]}>
+      <TouchableOpacity
+        style={[styles.actionBtnFace, { backgroundColor: color }]}
+        activeOpacity={0.85}
+        onPress={onPress}
+      >
+        <Icon name={icon} size={15} color="#FFFFFF" variant="Bold" />
+      </TouchableOpacity>
+      <View style={[styles.actionBtnLip, { backgroundColor: lipColor }]} />
+    </View>
+  );
 
   // Global index across all units (for the winding path)
   let globalCounter = 0;
@@ -575,37 +557,6 @@ const handleScroll = useCallback(
         }}
         showsVerticalScrollIndicator={false}
       >
-        {/* Autumn leaves scattered down both edges of the scrolling map */}
-        <View
-          pointerEvents="none"
-          style={[styles.leafLayer, { height: mapContentHeight }]}
-        >
-          {leaves.map((leaf, index) => (
-            <Svg
-              key={index}
-              width={leaf.size}
-              height={leaf.size}
-              viewBox="0 0 25.263 25.263"
-              style={[
-                styles.leaf,
-                {
-                  top: leaf.top,
-                  opacity: leaf.opacity,
-                  transform: [
-                    { rotate: `${leaf.rotation}deg` },
-                    { scaleX: leaf.flipX ? -1 : 1 },
-                  ],
-                },
-                leaf.side === "left"
-                  ? { left: leaf.offsetX }
-                  : { right: leaf.offsetX },
-              ]}
-            >
-              <Path d={LEAF_PATH} fill={leaf.color} />
-            </Svg>
-          ))}
-        </View>
-
         {units.map((unit) => {
           const sectionHeight =
             unit.levels.length * NODE_ROW_GAP + SECTION_PAD;
@@ -673,110 +624,390 @@ const handleScroll = useCallback(
         })}
       </ScrollView>
 
-      {/* Sticky "lesson in view" card (reference lesson-card design) */}
-      {cardUnit &&
-        (() => {
-          // Look up the fresh unit so the card stays current after refocus
-          const activeUnit =
-            cardUnits.find((c) => c.id === cardUnit.id)?.unit ?? cardUnit.unit;
-
-          return (
-            <View
-              style={[styles.nowCardWrap, { top: insets.top + CARD_TOP }]}
-              pointerEvents="box-none"
-            >
-              <View style={styles.nowCard}>
-                <View style={{ flex: 1 }}>
-                  <Text style={styles.unitSubtitle} numberOfLines={1}>
-                    {activeUnit.subtitle}
-                  </Text>
-                  <Text style={styles.unitTitle} numberOfLines={2}>
-                    {activeUnit.title}
-                  </Text>
-                </View>
-                <TouchableOpacity
-                  style={styles.infoBtn}
-                  disabled={activeUnit.isLocked}
-                  onPress={() =>
-                    !activeUnit.isLocked &&
-                    setSelectedUnit({
-                      id: activeUnit.id,
-                      title: activeUnit.title,
-                      subtitle: activeUnit.subtitle,
-                    })
-                  }
-                >
-                  <Icon
-                    name={activeUnit.isLocked ? "Lock" : "InfoCircle"}
-                    size={18}
-                    color={activeUnit.isLocked ? "#9CA3AF" : THEME.primary}
-                    variant={activeUnit.isLocked ? "Bold" : "Linear"}
-                  />
-                </TouchableOpacity>
-              </View>
-            </View>
-          );
-        })()}
-
       {/* Gradient backdrop so scrolling map content never shows in the header */}
       <LinearGradient
         pointerEvents="none"
         colors={[bgTop, backdropBottom]}
-        style={[styles.headerBackdrop, { height: insets.top + CARD_TOP }]}
+        style={[styles.headerBackdrop, { height: insets.top + CARD_AREA }]}
       />
 
-      {/* Floating header */}
+      {/* Floating header + lesson card, one rounded container */}
       <View style={[styles.header, { paddingTop: insets.top + 12 }]}>
-        <View style={styles.avatarWrap}>
-          <Image
-            source={getProfileAvatarSource(userProfile?.avatar_url)}
-            style={styles.avatar}
-            resizeMode="cover"
-          />
-        </View>
-        <View style={{ flex: 1 }}>
-          <Text style={styles.greetingLabel}>{getGreeting()}</Text>
-          <Text style={styles.greetingName} numberOfLines={1}>
-            {userProfile?.display_name ||
-              userProfile?.username ||
-              "Atom Explorer"}
-          </Text>
-        </View>
-
-        {/* XP */}
-        <View style={styles.xpPill}>
-          <Icon name="Flash" size={15} color="#FFA000" variant="Bold" />
-          <Text style={styles.xpText}>
-            {(userProfile?.total_xp || 0).toLocaleString()}
-          </Text>
-        </View>
-
-        {/* Daily missions button */}
-        <View style={styles.headerIconBtnWrap}>
-          <TouchableOpacity
-            style={styles.headerIconBtn}
-            activeOpacity={0.85}
-            onPress={() => router.push("/missions")}
-          >
-            <Icon name="Medal" size={20} color="#FF8C00" variant="Bold" />
-          </TouchableOpacity>
-          {claimableCount > 0 && (
-            <View style={styles.missionBadge}>
-              <Text style={styles.missionBadgeText}>{claimableCount}</Text>
+        {/* One rounded amber card holding the header row and the lesson card —
+            layout-animated so the daily panels morph the card open, not pop in */}
+        <Animated.View
+          layout={LinearTransition.duration(260).easing(EASE_OUT)}
+          style={styles.headerBar}
+        >
+          <View style={styles.headerRow}>
+            <View style={styles.avatarWrap}>
+              <Image
+                source={getProfileAvatarSource(userProfile?.avatar_url)}
+                style={styles.avatar}
+                resizeMode="cover"
+              />
             </View>
-          )}
-        </View>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.greetingLabel}>{getGreeting()}</Text>
+              <Text style={styles.greetingName} numberOfLines={1}>
+                {userProfile?.display_name ||
+                  userProfile?.username ||
+                  "Atom Explorer"}
+              </Text>
+            </View>
 
-        {/* Daily fact button */}
-        <View style={styles.headerIconBtnWrap}>
-          <TouchableOpacity
-            style={styles.headerIconBtn}
-            activeOpacity={0.85}
-            onPress={() => router.push("/daily-fact")}
-          >
-            <Icon name="Book" size={20} color="#2ECC71" variant="Bold" />
-          </TouchableOpacity>
-        </View>
+            {/* XP */}
+            <View style={styles.xpPill}>
+              <Icon name="Flash" size={15} color="#FFA000" variant="Bold" />
+              <Text style={styles.xpText}>
+                {(userProfile?.total_xp || 0).toLocaleString()}
+              </Text>
+            </View>
+
+            {/* Daily missions + fact — two icon buttons, expand the card */}
+            <View style={styles.dailyRow}>
+              <TouchableOpacity
+                style={[
+                  styles.dailyChip,
+                  dailyPanel === "missions" && styles.dailyChipActive,
+                ]}
+                activeOpacity={0.85}
+                hitSlop={{ top: 6, bottom: 6, left: 8, right: 8 }}
+                onPress={() => {
+                  setInfoOpen(false);
+                  setDailyPanel((p) => (p === "missions" ? null : "missions"));
+                }}
+              >
+                <Icon name="Medal" size={19} color="#FF8C00" variant="Bold" />
+                {claimableCount > 0 && (
+                  <View style={styles.missionBadge}>
+                    <Text style={styles.missionBadgeText}>{claimableCount}</Text>
+                  </View>
+                )}
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[
+                  styles.dailyChip,
+                  dailyPanel === "fact" && styles.dailyChipActive,
+                ]}
+                activeOpacity={0.85}
+                hitSlop={{ top: 6, bottom: 6, left: 8, right: 8 }}
+                onPress={() => {
+                  setInfoOpen(false);
+                  setDailyPanel((p) => (p === "fact" ? null : "fact"));
+                }}
+              >
+                <Icon name="Book" size={19} color="#2ECC71" variant="Bold" />
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          {cardUnit &&
+            (() => {
+              // Look up the fresh unit so the card stays current after refocus
+              const activeUnit =
+                cardUnits.find((c) => c.id === cardUnit.id)?.unit ??
+                cardUnit.unit;
+              const unitInfo = UNIT_INFO_DATA[activeUnit.id];
+
+              return (
+                <Animated.View
+                  layout={LinearTransition.duration(260).easing(EASE_OUT)}
+                  style={styles.nowCard}
+                >
+                  <View style={styles.nowCardRow}>
+                    {/* Keyed by unit so a section change crossfades the
+                        title/subtitle instead of snapping */}
+                    <View style={styles.nowCardText} key={activeUnit.id}>
+                      <Animated.View
+                        entering={FadeIn.duration(200)}
+                        exiting={FadeOut.duration(150)}
+                      >
+                        <Text style={styles.unitSubtitle} numberOfLines={1}>
+                          {activeUnit.subtitle}
+                        </Text>
+                        <Text style={styles.unitTitle} numberOfLines={2}>
+                          {activeUnit.title}
+                        </Text>
+                      </Animated.View>
+                    </View>
+                    <TouchableOpacity
+                      style={[
+                        styles.infoBtn,
+                        infoOpen && styles.infoBtnActive,
+                      ]}
+                      disabled={activeUnit.isLocked}
+                      onPress={() => {
+                        if (activeUnit.isLocked) return;
+                        setDailyPanel(null);
+                        setInfoOpen((o) => !o);
+                      }}
+                    >
+                      <Icon
+                        name={
+                          activeUnit.isLocked
+                            ? "Lock"
+                            : infoOpen
+                              ? "CloseCircle"
+                              : "InfoCircle"
+                        }
+                        size={18}
+                        color={
+                          activeUnit.isLocked
+                            ? "#9CA3AF"
+                            : infoOpen
+                              ? "#724D06"
+                              : THEME.primary
+                        }
+                        variant={
+                          activeUnit.isLocked || infoOpen ? "Bold" : "Linear"
+                        }
+                      />
+                    </TouchableOpacity>
+                  </View>
+
+                  {/* Unit info expands inside the card — no modal */}
+                  {infoOpen && unitInfo?.info && (
+                    <Animated.View
+                      entering={FadeIn.duration(200)}
+                      exiting={FadeOut.duration(160)}
+                      style={styles.infoSection}
+                    >
+                      <View style={styles.infoDivider} />
+                      <Text style={styles.infoLabel}>About this unit</Text>
+                      <Text style={styles.infoBody}>{unitInfo.info}</Text>
+                      {unitInfo.references.length > 0 && (
+                        <>
+                          <Text style={styles.infoLabel}>
+                            References & Resources
+                          </Text>
+                          <ScrollView
+                            showsVerticalScrollIndicator={false}
+                            style={styles.infoRefs}
+                          >
+                            {unitInfo.references.map((ref, index) => (
+                              <TouchableOpacity
+                                key={index}
+                                style={styles.referenceItem}
+                                onPress={async () => {
+                                  const opened = await openExternalUrl(ref);
+                                  if (!opened) {
+                                    Alert.alert("Error", "Could not open link");
+                                  }
+                                }}
+                              >
+                                <Icon
+                                  name="Link"
+                                  size={14}
+                                  color={THEME.primary}
+                                  variant="Bold"
+                                />
+                                <Text
+                                  style={styles.referenceText}
+                                  numberOfLines={1}
+                                >
+                                  {ref
+                                    .replace("https://", "")
+                                    .replace("http://", "")}
+                                </Text>
+                                <Icon
+                                  name="ArrowRight2"
+                                  size={14}
+                                  color={THEME.textMuted}
+                                />
+                              </TouchableOpacity>
+                            ))}
+                          </ScrollView>
+                        </>
+                      )}
+                    </Animated.View>
+                  )}
+                </Animated.View>
+              );
+            })()}
+
+          {/* Daily missions panel — claims happen right here */}
+          {dailyPanel === "missions" && (
+            <Animated.View
+              entering={FadeIn.duration(200)}
+              exiting={FadeOut.duration(160)}
+              style={styles.dailyPanel}
+            >
+              <View style={styles.panelHeader}>
+                <Text style={styles.panelTitle}>Daily Missions</Text>
+                <Text style={styles.panelMeta}>
+                  {completedCount}/{missions.length} · {remainingReward} XP left
+                </Text>
+              </View>
+              <View style={styles.panelProgressTrack}>
+                <Animated.View style={[styles.panelProgressFill, fillStyle]} />
+              </View>
+              {missions.map((mission) => {
+                const showClaim = mission.isComplete && !mission.isClaimed;
+                return (
+                  <View key={mission.id} style={styles.panelRow}>
+                    <View style={styles.missionIconBox}>
+                      <Svg width={40} height={40} viewBox="0 0 46 46">
+                        <Polygon
+                          points={HEX_POINTS}
+                          fill={mission.isComplete ? BTN_COLOR : CREAM}
+                          stroke={mission.isComplete ? BTN_COLOR : CREAM}
+                          strokeWidth={12}
+                          strokeLinejoin="round"
+                        />
+                      </Svg>
+                      <Icon
+                        name={mission.icon}
+                        size={19}
+                        color={mission.isComplete ? "#FFFFFF" : BTN_COLOR}
+                        variant="Bold"
+                        style={styles.missionIconOverlay}
+                      />
+                    </View>
+                    <View style={styles.missionInfo}>
+                      <Text style={styles.missionTitle} numberOfLines={1}>
+                        {mission.title}
+                      </Text>
+                      <Text style={styles.missionDesc} numberOfLines={1}>
+                        {mission.description}
+                      </Text>
+                    </View>
+                    {mission.isClaimed ? (
+                      <Animated.View
+                        entering={ZoomIn.duration(200)
+                          .springify()
+                          .damping(20)
+                          .stiffness(260)}
+                        style={styles.claimedPill}
+                      >
+                        <Icon
+                          name="TickCircle"
+                          size={14}
+                          color="#FFFFFF"
+                          variant="Bold"
+                        />
+                        <Text style={styles.claimedText}>Claimed</Text>
+                      </Animated.View>
+                    ) : showClaim ? (
+                      <ActionButton
+                        color={BTN_COLOR}
+                        lipColor={BTN_LIP}
+                        icon="TickCircle"
+                        onPress={() => void claimMission(mission)}
+                      />
+                    ) : mission.type === "mythbuster" ? (
+                      <ActionButton
+                        color="#8B5CF6"
+                        lipColor="#6D28D9"
+                        icon="Play"
+                        onPress={() => router.push("/mythbuster")}
+                      />
+                    ) : mission.type === "fact" ? (
+                      <ActionButton
+                        color="#2ECC71"
+                        lipColor="#27AE60"
+                        icon="Book"
+                        onPress={() => setDailyPanel("fact")}
+                      />
+                    ) : (
+                      <View style={styles.lockedPill}>
+                        <Text style={styles.lockedText}>In progress</Text>
+                      </View>
+                    )}
+                  </View>
+                );
+              })}
+            </Animated.View>
+          )}
+
+          {/* Daily fact panel — today's myth or fact, read in place */}
+          {dailyPanel === "fact" && (
+            <Animated.View
+              entering={FadeIn.duration(200)}
+              exiting={FadeOut.duration(160)}
+              style={styles.dailyPanel}
+            >
+              <View style={styles.factHeader}>
+                <View style={styles.factHeaderLeft}>
+                  <View
+                    style={[
+                      styles.factBadge,
+                      dailyFact?.kind === "myth" && styles.factBadgeMyth,
+                    ]}
+                  >
+                    <Icon
+                      name={
+                        dailyFact?.kind === "myth" ? "CloseCircle" : "TickCircle"
+                      }
+                      size={12}
+                      color="#FFFFFF"
+                      variant="Bold"
+                    />
+                    <Text style={styles.factBadgeText}>
+                      {dailyFact?.kind === "myth" ? "MYTH" : "DAILY FACT"}
+                    </Text>
+                  </View>
+                  <Text style={styles.factTitle} numberOfLines={1}>
+                    {dailyFact?.title ?? "Loading today's fact..."}
+                  </Text>
+                </View>
+                <View style={styles.rewardPill}>
+                  <Icon name="Flash" size={13} color="#FFA000" variant="Bold" />
+                  <Text style={styles.rewardText}>+50 XP</Text>
+                </View>
+              </View>
+              <ScrollView
+                showsVerticalScrollIndicator={false}
+                style={styles.panelScroll}
+              >
+                <View style={styles.panelScrollInner}>
+                  {dailyFact ? (
+                    <>
+                      <Text style={styles.factStatement}>
+                        {"\u201C"}{dailyFact.statement}{"\u201D"}
+                      </Text>
+                      <View style={styles.factDivider} />
+                      <Text style={styles.factExplainLabel}>Why it matters</Text>
+                      <Text style={styles.factExplain}>
+                        {dailyFact.explanation}
+                      </Text>
+                    </>
+                  ) : (
+                    <Text style={styles.factExplain}>Loading...</Text>
+                  )}
+                </View>
+              </ScrollView>
+              <View style={styles.factAction}>
+                {factClaimed ? (
+                  <Animated.View
+                    entering={ZoomIn.duration(200)
+                      .springify()
+                      .damping(20)
+                      .stiffness(260)}
+                    style={styles.factReadPill}
+                  >
+                    <Icon
+                      name="TickCircle"
+                      size={15}
+                      color="#FFFFFF"
+                      variant="Bold"
+                    />
+                    <Text style={styles.factReadText}>Read & Claimed</Text>
+                  </Animated.View>
+                ) : (
+                  <TouchableOpacity
+                    style={styles.factReadBtn}
+                    activeOpacity={0.85}
+                    onPress={() => void handleMarkFactRead()}
+                  >
+                    <Icon name="Book" size={17} color="#FFFFFF" variant="Bold" />
+                  </TouchableOpacity>
+                )}
+              </View>
+            </Animated.View>
+          )}
+        </Animated.View>
       </View>
 
       {/* Floating "jump to current lesson" arrow */}
@@ -785,116 +1016,24 @@ const handleScroll = useCallback(
           entering={FadeInDown.duration(250)}
           exiting={FadeOutDown.duration(200)}
           style={[styles.nextBtn, { bottom: insets.bottom + 130 }]}
-        >
-          <TouchableOpacity
-            style={styles.nextBtnInner}
-            activeOpacity={0.85}
-            onPress={scrollToCurrent}
-          >
-            <Icon
-              name={arrowDir === "up" ? "ArrowUp" : "ArrowDown"}
-              size={24}
-              color="#FFFFFF"
-              variant="Bold"
-            />
-          </TouchableOpacity>
-        </Animated.View>
-      )}
-
-      {/* Unit info modal */}
-      <Modal
-        visible={selectedUnit !== null}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setSelectedUnit(null)}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <ScrollView showsVerticalScrollIndicator={false}>
-              <View style={styles.modalHeader}>
-                <View style={{ flex: 1 }}>
-                  <Text style={styles.modalSubtitle}>
-                    {selectedUnit?.subtitle}
-                  </Text>
-                  <Text style={styles.modalTitle}>{selectedUnit?.title}</Text>
-                </View>
-                <TouchableOpacity
-                  onPress={() => setSelectedUnit(null)}
-                  style={styles.modalCloseBtn}
-                >
-                  <Icon
-                    name="CloseCircle"
-                    size={28}
-                    color={THEME.textMuted}
-                    variant="Bold"
-                  />
-                </TouchableOpacity>
-              </View>
-
-              <View style={styles.modalSection}>
-                <SectionHeader
-                  icon="InfoCircle"
-                  iconColor={THEME.primary}
-                  title="About This Unit"
-                  titleColor="#1F2937"
-                  palette={THEME}
-                />
-                <Text style={styles.infoText}>
-                  {selectedUnit && UNIT_INFO_DATA[selectedUnit.id]?.info}
-                </Text>
-              </View>
-
-              {selectedUnit && UNIT_INFO_DATA[selectedUnit.id]?.references && (
-                <View style={styles.modalSection}>
-                  <SectionHeader
-                    icon="Book1"
-                    iconColor={THEME.primary}
-                    title="References & Resources"
-                    titleColor="#1F2937"
-                    palette={THEME}
-                  />
-                  {UNIT_INFO_DATA[selectedUnit.id].references.map(
-                    (ref, index) => (
-                      <TouchableOpacity
-                        key={index}
-                        style={styles.referenceItem}
-                        onPress={async () => {
-                          const opened = await openExternalUrl(ref);
-                          if (!opened) {
-                            Alert.alert("Error", "Could not open link");
-                          }
-                        }}
-                      >
-                        <Icon
-                          name="Link"
-                          size={16}
-                          color={THEME.primary}
-                          variant="Bold"
-                        />
-                        <Text style={styles.referenceText} numberOfLines={1}>
-                          {ref.replace("https://", "").replace("http://", "")}
-                        </Text>
-                        <Icon
-                          name="ArrowRight2"
-                          size={16}
-                          color={THEME.textMuted}
-                        />
-                      </TouchableOpacity>
-                    ),
-                  )}
-                </View>
-              )}
-
+>
+            <View style={styles.nextBtnClip}>
               <TouchableOpacity
-                style={styles.modalActionBtn}
-                onPress={() => setSelectedUnit(null)}
+                style={styles.nextBtnInner}
+                activeOpacity={0.85}
+                onPress={scrollToCurrent}
               >
-                <Text style={styles.modalActionText}>Got it!</Text>
+                <Icon
+                  name={arrowDir === "up" ? "ArrowUp" : "ArrowDown"}
+                  size={24}
+                  color="#FFFFFF"
+                  variant="Bold"
+                />
               </TouchableOpacity>
-            </ScrollView>
-          </View>
-        </View>
-      </Modal>
+              <View style={styles.nextBtnLip} />
+            </View>
+          </Animated.View>
+        )}
     </View>
   );
 }
@@ -926,7 +1065,13 @@ const LessonNode = ({
 
   useEffect(() => {
     if (isCurrent) {
+      // Loop the "next up" pulse while this node is the current lesson
       pulse.value = withRepeat(withTiming(1.12, { duration: 800 }), -1, true);
+    } else {
+      // The infinite loop only stops when it's cancelled — otherwise a node
+      // that was current keeps pulsing forever after it's completed
+      cancelAnimation(pulse);
+      pulse.set(1);
     }
   }, [isCurrent]);
 
@@ -1053,16 +1198,6 @@ const createStyles = (theme: Palette) =>
     bgGradient: {
       ...StyleSheet.absoluteFillObject,
     },
-    leafLayer: {
-      position: "absolute",
-      top: 0,
-      left: 0,
-      right: 0,
-      zIndex: 0,
-    },
-    leaf: {
-      position: "absolute",
-    },
     pathLayer: {
       ...StyleSheet.absoluteFillObject,
     },
@@ -1074,19 +1209,33 @@ const createStyles = (theme: Palette) =>
       right: 0,
       zIndex: 85,
     },
-    /* Floating header — plain row, no box */
+    /* Floating header — positioning wrapper for the rounded bar */
     header: {
       position: "absolute",
       top: 0,
       left: 0,
       right: 0,
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 12,
-      paddingHorizontal: 20,
+      paddingHorizontal: 16,
       paddingBottom: 12,
       zIndex: 100,
       pointerEvents: "box-none",
+    },
+    /* One rounded amber card holding the header row and the lesson card */
+    headerBar: {
+      backgroundColor: "#FFCA5F",
+      borderRadius: 26,
+      padding: 10,
+      gap: 12,
+      elevation: 4,
+      shadowColor: "#000000",
+      shadowOffset: { width: 0, height: 3 },
+      shadowOpacity: 0.1,
+      shadowRadius: 6,
+    },
+    headerRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 12,
     },
     avatarWrap: {
       width: 46,
@@ -1106,7 +1255,7 @@ const createStyles = (theme: Palette) =>
       fontSize: 11,
       fontWeight: "600",
       fontFamily: fontFamilies.semibold,
-      color: theme.textMuted,
+      color: "#724D06",
       textTransform: "uppercase",
       letterSpacing: 0.6,
       marginBottom: 1,
@@ -1115,48 +1264,71 @@ const createStyles = (theme: Palette) =>
       fontSize: 17,
       fontWeight: "800",
       fontFamily: fontFamilies.heavy,
-      color: theme.text,
+      color: "#724D06",
     },
     xpPill: {
       flexDirection: "row",
       alignItems: "center",
       gap: 5,
-      backgroundColor: "#FFFFFF",
+      backgroundColor: "#434343",
       paddingHorizontal: 12,
       height: 40,
-      borderRadius: 20,
-      elevation: 3,
-      shadowColor: "#000000",
-      shadowOffset: { width: 0, height: 3 },
-      shadowOpacity: 0.08,
-      shadowRadius: 6,
+      borderRadius: 14,
     },
     xpText: {
       fontSize: 13,
       fontWeight: "800",
       fontFamily: fontFamilies.heavy,
-      color: "#1F2937",
+      color: "#FFFFFF",
     },
-    /* Sticky unit card — left-aligned text, info button centered on the right */
-    nowCardWrap: {
-      position: "absolute",
-      left: 20,
-      right: 20,
-      zIndex: 90,
-      gap: 12,
-    },
+    /* Lesson card — its own separate card design nested in the header bar */
     nowCard: {
+      backgroundColor: "#FFFFFF",
+      borderRadius: 20,
+      padding: 16,
+      borderWidth: 2,
+      borderColor: "#E5E7EB",
+      borderBottomWidth: 4,
+    },
+    nowCardRow: {
       flexDirection: "row",
       alignItems: "center",
       gap: 12,
-      backgroundColor: "#FFFFFF",
-      borderRadius: 24,
-      padding: 20,
-      shadowColor: "#000000",
-      shadowOffset: { width: 0, height: 6 },
-      shadowOpacity: 0.08,
-      shadowRadius: 10,
-      elevation: 5,
+    },
+    nowCardText: {
+      flex: 1,
+      overflow: "hidden",
+    },
+    /* Unit info expands inside the lesson card */
+    infoSection: {
+      marginTop: 12,
+    },
+    infoDivider: {
+      height: 1,
+      backgroundColor: "#F0F0F0",
+      marginBottom: 12,
+    },
+    infoLabel: {
+      fontSize: 10,
+      fontWeight: "700",
+      fontFamily: fontFamilies.heavy,
+      color: "#9CA3AF",
+      textTransform: "uppercase",
+      letterSpacing: 0.8,
+      marginBottom: 5,
+    },
+    infoBody: {
+      fontSize: 13,
+      fontFamily: fontFamilies.regular,
+      color: "#555555",
+      lineHeight: 20,
+    },
+    infoRefs: {
+      maxHeight: 172,
+      marginTop: 2,
+    },
+    infoBtnActive: {
+      backgroundColor: "#FFE0B2",
     },
     /* Nodes */
     nodeWrap: {
@@ -1264,7 +1436,7 @@ const createStyles = (theme: Palette) =>
     },
     unitDivider: {
       position: "absolute",
-      top: 24,
+      top: 10,
       left: 20,
       right: 20,
       flexDirection: "row",
@@ -1294,7 +1466,7 @@ const createStyles = (theme: Palette) =>
       marginBottom: 3,
     },
     unitTitle: {
-      fontSize: 22,
+      fontSize: 20,
       fontWeight: "700",
       fontFamily: fontFamilies.heavy,
       color: "#333333",
@@ -1315,32 +1487,282 @@ const createStyles = (theme: Palette) =>
       height: 56,
       zIndex: 95,
     },
-    nextBtnInner: {
+    /* Rounded clip so the bottom lip's corners stay round */
+    nextBtnClip: {
       flex: 1,
       borderRadius: 28,
+      overflow: "hidden",
+      backgroundColor: theme.primary,
+    },
+    nextBtnInner: {
+      flex: 1,
       backgroundColor: theme.primary,
       alignItems: "center",
       justifyContent: "center",
-      borderBottomWidth: 4,
-      borderBottomColor: "rgba(0,0,0,0.15)",
     },
-    /* Header missions / daily-fact buttons (white circle, like profile header) */
-    headerIconBtnWrap: {
+    nextBtnLip: {
+      position: "absolute",
+      left: 0,
+      right: 0,
+      bottom: 0,
+      height: 4,
+      backgroundColor: "rgba(0,0,0,0.15)",
+    },
+    /* Daily missions + fact icons: two square buttons that expand the card */
+    dailyRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 8,
+    },
+    dailyChip: {
       width: 40,
       height: 40,
-    },
-    headerIconBtn: {
-      width: 40,
-      height: 40,
-      borderRadius: 20,
+      borderRadius: 14,
       backgroundColor: "#FFFFFF",
       alignItems: "center",
       justifyContent: "center",
-      elevation: 3,
+      borderWidth: 2,
+      borderColor: "#FFDD8D",
+      borderBottomWidth: 4,
+      elevation: 2,
+    },
+    dailyChipActive: {
+      backgroundColor: "#FFE0B2",
+    },
+    /* Expanded daily panel — a white card floating under the header bar */
+    dailyPanel: {
+      backgroundColor: "#FFFFFF",
+      borderRadius: 20,
+      padding: 14,
+      gap: 12,
+      borderWidth: 2,
+      borderColor: "#E5E7EB",
+      borderBottomWidth: 4,
+      elevation: 6,
       shadowColor: "#000000",
-      shadowOffset: { width: 0, height: 3 },
-      shadowOpacity: 0.08,
-      shadowRadius: 6,
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.12,
+      shadowRadius: 8,
+    },
+    panelHeader: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      gap: 12,
+    },
+    panelTitle: {
+      fontSize: 15,
+      fontWeight: "800",
+      fontFamily: fontFamilies.heavy,
+      color: "#333333",
+    },
+    panelMeta: {
+      fontSize: 12,
+      fontFamily: fontFamilies.semibold,
+      color: "#9CA3AF",
+    },
+    panelProgressTrack: {
+      height: 8,
+      borderRadius: 4,
+      backgroundColor: "#F4F5F7",
+      overflow: "hidden",
+    },
+    panelProgressFill: {
+      width: "100%",
+      height: "100%",
+      borderRadius: 4,
+      backgroundColor: BTN_COLOR,
+    },
+    panelRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 12,
+    },
+    missionIconBox: {
+      width: 40,
+      height: 40,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    missionIconOverlay: {
+      position: "absolute",
+    },
+    missionInfo: {
+      flex: 1,
+    },
+    missionTitle: {
+      fontSize: 13,
+      fontWeight: "800",
+      fontFamily: fontFamilies.heavy,
+      color: "#333333",
+    },
+    missionDesc: {
+      fontSize: 11,
+      fontFamily: fontFamilies.regular,
+      color: "#9CA3AF",
+      marginTop: 1,
+    },
+    /* Mission row actions */
+    actionBtnClip: {
+      width: 36,
+      height: 36,
+      borderRadius: 13,
+      overflow: "hidden",
+    },
+    actionBtnFace: {
+      flex: 1,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    actionBtnLip: {
+      position: "absolute",
+      left: 0,
+      right: 0,
+      bottom: 0,
+      height: 4,
+    },
+    claimedPill: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 5,
+      backgroundColor: "#2ECC71",
+      borderRadius: 12,
+      paddingHorizontal: 11,
+      height: 32,
+    },
+    claimedText: {
+      fontSize: 12,
+      fontWeight: "800",
+      fontFamily: fontFamilies.heavy,
+      color: "#FFFFFF",
+    },
+    lockedPill: {
+      backgroundColor: "#F4F5F7",
+      borderRadius: 12,
+      paddingHorizontal: 11,
+      height: 32,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    lockedText: {
+      fontSize: 12,
+      fontFamily: fontFamilies.semibold,
+      color: "#9CA3AF",
+    },
+    /* Daily fact panel */
+    factHeader: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      gap: 12,
+    },
+    factHeaderLeft: {
+      flex: 1,
+      alignItems: "flex-start",
+      gap: 6,
+    },
+    factBadge: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 5,
+      backgroundColor: "#2ECC71",
+      borderRadius: 8,
+      paddingHorizontal: 7,
+      paddingVertical: 3,
+    },
+    factBadgeMyth: {
+      backgroundColor: "#E74C3C",
+    },
+    factBadgeText: {
+      fontSize: 10,
+      fontWeight: "800",
+      fontFamily: fontFamilies.heavy,
+      color: "#FFFFFF",
+      letterSpacing: 0.6,
+    },
+    factTitle: {
+      fontSize: 14,
+      fontWeight: "800",
+      fontFamily: fontFamilies.heavy,
+      color: "#333333",
+    },
+    rewardPill: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 4,
+      backgroundColor: CREAM,
+      borderRadius: 10,
+      paddingHorizontal: 9,
+      paddingVertical: 5,
+    },
+    rewardText: {
+      fontSize: 11,
+      fontWeight: "800",
+      fontFamily: fontFamilies.heavy,
+      color: "#E67E22",
+    },
+    factStatement: {
+      fontSize: 15,
+      fontWeight: "700",
+      fontFamily: fontFamilies.bold,
+      color: "#1F2937",
+      lineHeight: 23,
+    },
+    factDivider: {
+      height: 1,
+      backgroundColor: "#F0F0F0",
+      marginVertical: 12,
+    },
+    factExplainLabel: {
+      fontSize: 10,
+      fontWeight: "700",
+      fontFamily: fontFamilies.heavy,
+      color: "#9CA3AF",
+      textTransform: "uppercase",
+      letterSpacing: 0.8,
+      marginBottom: 5,
+    },
+    factExplain: {
+      fontSize: 13,
+      fontFamily: fontFamilies.regular,
+      color: "#555555",
+      lineHeight: 20,
+    },
+    factAction: {
+      flexDirection: "row",
+      justifyContent: "flex-start",
+    },
+    factReadBtn: {
+      width: 36,
+      height: 36,
+      borderRadius: 13,
+      alignItems: "center",
+      justifyContent: "center",
+      backgroundColor: BTN_COLOR,
+      borderBottomWidth: 4,
+      borderBottomColor: BTN_LIP,
+    },
+    factReadPill: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 6,
+      backgroundColor: "#2ECC71",
+      borderRadius: 13,
+      paddingHorizontal: 15,
+      height: 40,
+    },
+    factReadText: {
+      fontSize: 13,
+      fontWeight: "800",
+      fontFamily: fontFamilies.heavy,
+      color: "#FFFFFF",
+    },
+    /* Long fact content scrolls within the panel */
+    panelScroll: {
+      maxHeight: 280,
+    },
+    panelScrollInner: {
+      paddingVertical: 2,
     },
     missionBadge: {
       position: "absolute",
@@ -1362,59 +1784,6 @@ const createStyles = (theme: Palette) =>
       fontWeight: "800",
       fontFamily: fontFamilies.heavy,
     },
-    /* Modal */
-    modalOverlay: {
-      flex: 1,
-      backgroundColor: "rgba(0, 0, 0, 0.7)",
-      justifyContent: "center",
-      alignItems: "center",
-      padding: 20,
-    },
-    modalContent: {
-      backgroundColor: "#FFFFFF",
-      borderRadius: 24,
-      width: "100%",
-      maxWidth: 500,
-      maxHeight: "80%",
-      padding: 24,
-      borderWidth: 2,
-      borderColor: "#E5E7EB",
-      borderBottomWidth: 4,
-    },
-    modalHeader: {
-      flexDirection: "row",
-      alignItems: "flex-start",
-      marginBottom: 24,
-      gap: 12,
-    },
-    modalSubtitle: {
-      fontSize: 12,
-      fontWeight: "600",
-      fontFamily: fontFamilies.semibold,
-      color: "#9CA3AF",
-      textTransform: "uppercase",
-      letterSpacing: 1,
-      marginBottom: 4,
-    },
-    modalTitle: {
-      fontSize: 24,
-      fontWeight: "800",
-      fontFamily: fontFamilies.heavy,
-      color: "#1F2937",
-      lineHeight: 30,
-    },
-    modalCloseBtn: {
-      padding: 4,
-    },
-    modalSection: {
-      marginBottom: 24,
-    },
-    infoText: {
-      fontSize: 15,
-      fontFamily: fontFamilies.regular,
-      lineHeight: 24,
-      color: "#374151",
-    },
     referenceItem: {
       flexDirection: "row",
       alignItems: "center",
@@ -1434,57 +1803,5 @@ const createStyles = (theme: Palette) =>
       color: theme.primary,
       fontWeight: "500",
       fontFamily: fontFamilies.medium,
-    },
-    modalActionBtn: {
-      backgroundColor: theme.primary,
-      paddingVertical: 16,
-      borderRadius: 16,
-      alignItems: "center",
-      marginTop: 8,
-      borderBottomWidth: 4,
-      borderBottomColor: "rgba(0,0,0,0.15)",
-    },
-    modalActionText: {
-      fontSize: 16,
-      fontWeight: "700",
-      fontFamily: fontFamilies.bold,
-      color: "#FFF",
-    },
-    /* Loading */
-    loadingContainer: {
-      flex: 1,
-      justifyContent: "center",
-      alignItems: "center",
-      paddingHorizontal: 40,
-    },
-    loadingMascot: {
-      width: 180,
-      height: 180,
-      marginBottom: 24,
-    },
-    loadingTitle: {
-      fontSize: 24,
-      fontWeight: "800",
-      fontFamily: fontFamilies.heavy,
-      color: theme.text,
-      textAlign: "center",
-      marginBottom: 8,
-    },
-    loadingSubtitle: {
-      fontSize: 16,
-      fontFamily: fontFamilies.regular,
-      color: theme.textMuted,
-      textAlign: "center",
-      marginBottom: 32,
-    },
-    loadingDotsContainer: {
-      flexDirection: "row",
-      gap: 12,
-      alignItems: "center",
-    },
-    loadingDot: {
-      width: 16,
-      height: 16,
-      borderRadius: 8,
     },
   });

@@ -1,6 +1,7 @@
 import { Icon } from "@/components/ui/icon";
 import {useTheme, type Palette, fontFamilies} from "@/theme";
 import { deleteAccountData } from "@/services/database";
+import { getContentDbStatus, contentRepository } from "@/services/content-db";
 import { getSoundEnabled, setSoundEnabled } from "@/services/storage";
 import { useStorage } from "@/services/StorageContext";
 import { setUiSfxEnabled } from "@/services/ui-sfx";
@@ -43,6 +44,50 @@ export default function SettingsScreen() {
   const [soundEffects, setSoundEffects] = useState(true);
   const [isDeletingAccount, setIsDeletingAccount] = useState(false);
   const [versionModalVisible, setVersionModalVisible] = useState(false);
+  const [contentDbLabel, setContentDbLabel] = useState("Checking...");
+  const [contentDbError, setContentDbError] = useState<string | null>(null);
+
+  // Surface the bundled content database status so seeding failures are
+  // visible in the app instead of showing "no data" screens.
+  useEffect(() => {
+    let mounted = true;
+
+    const checkContentDb = async () => {
+      try {
+        const { seeded, version, lastError } = getContentDbStatus();
+        if (lastError) {
+          if (mounted) {
+            setContentDbError(lastError);
+            setContentDbLabel(`Seed failed (v${version})`);
+          }
+          return;
+        }
+        if (seeded) {
+          if (mounted) {
+            setContentDbLabel(`Ready (v${version})`);
+          }
+          return;
+        }
+        const lessonCount = await contentRepository.getLessonCount();
+        if (mounted) {
+          setContentDbLabel(
+            lessonCount > 0 ? `Ready — ${lessonCount} lessons (v${version})` : "Empty",
+          );
+        }
+      } catch (error) {
+        if (mounted) {
+          setContentDbError(error instanceof Error ? error.message : String(error));
+          setContentDbLabel("Unavailable");
+        }
+      }
+    };
+
+    void checkContentDb();
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   const nextDisplayNameChangeAt =
     userProfile?.next_display_name_change_at &&
@@ -347,7 +392,7 @@ export default function SettingsScreen() {
           <Text style={styles.sectionTitle}>About</Text>
           <View style={styles.settingsCard}>
             <TouchableOpacity
-              style={styles.settingRow}
+              style={[styles.settingRow, styles.settingRowBorder]}
               onPress={() => setVersionModalVisible(true)}
             >
               <View style={styles.settingInfo}>
@@ -364,6 +409,31 @@ export default function SettingsScreen() {
                 <Icon name="ArrowRight2" size={18} color={THEME.textMuted} />
               </View>
             </TouchableOpacity>
+
+            <View style={[styles.settingRow, styles.settingRowBorder]}>
+              <View style={styles.settingInfo}>
+                <Icon
+                  name="Document"
+                  size={20}
+                  color={contentDbError ? "#EF4444" : THEME.primary}
+                  variant="Bold"
+                />
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.settingLabel}>Content Database</Text>
+                  <Text
+                    style={[
+                      styles.settingDescription,
+                      contentDbError ? { color: "#EF4444" } : null,
+                    ]}
+                    numberOfLines={2}
+                  >
+                    {contentDbError
+                      ? `Seed error: ${contentDbError}`
+                      : contentDbLabel}
+                  </Text>
+                </View>
+              </View>
+            </View>
 
             <TouchableOpacity
               style={[styles.settingRow, styles.settingRowBorder]}
