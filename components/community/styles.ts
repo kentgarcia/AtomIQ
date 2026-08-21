@@ -1,6 +1,6 @@
 import { StyleSheet } from "react-native";
 
-import { TabLight as LightTHEME } from "@/theme";
+import { TabLight as LightTHEME, fontFamilies } from "@/theme";
 
 export const createStyles = (theme: typeof LightTHEME) =>
   StyleSheet.create({
@@ -12,10 +12,12 @@ export const createStyles = (theme: typeof LightTHEME) =>
     pageGradient: {
       ...StyleSheet.absoluteFillObject,
     },
-    // Header
+    // Header — mascot is enlarged but laid behind text (absolute, no layout impact)
     header: {
       paddingHorizontal: 20,
-      paddingBottom: 16,
+      paddingBottom: 8,
+      position: "relative",
+      overflow: "visible",
     },
     headerContent: {
       flexDirection: "row",
@@ -26,10 +28,11 @@ export const createStyles = (theme: typeof LightTHEME) =>
     headerTextContainer: {
       flex: 1,
       paddingRight: 8,
+      zIndex: 1,
     },
     headerTitle: {
       fontSize: 28,
-      fontWeight: "800",
+      fontFamily: fontFamilies.heavy,
       marginBottom: 4,
       color: theme.text,
       letterSpacing: -0.5,
@@ -37,50 +40,95 @@ export const createStyles = (theme: typeof LightTHEME) =>
     headerSubtitle: {
       fontSize: 14,
       color: theme.textMuted,
-      fontWeight: "600",
+      fontFamily: fontFamilies.semibold,
     },
+    // Old inline mascot slot (kept for compat, not used in new header)
     headerRight: {
       flexDirection: "row",
       alignItems: "center",
       gap: 10,
     },
+    // Enlarged background mascot — absolute, behind text, does not consume layout
+    headerMascotWrap: {
+      position: "absolute",
+      top: -6,
+      right: -12,
+      width: 168,
+      height: 168,
+      alignItems: "center",
+      justifyContent: "center",
+      zIndex: 0,
+      pointerEvents: "none",
+      opacity: 1,
+    },
     headerMascot: {
-      width: 100,
-      height: 100,
+      width: 168,
+      height: 168,
+    },
+    headerMascotShadow: {
+      position: "absolute",
+      bottom: 12,
+      alignSelf: "center",
+      width: 72,
+      height: 12,
+      borderRadius: 6,
+      backgroundColor: "rgba(0,0,0,0.08)",
     },
 
-    // Search
+    // Search — premium white card with amber inner icon (matches profile/home input cards)
     searchContainer: {
       flexDirection: "row",
       alignItems: "center",
       marginTop: 14,
-      paddingHorizontal: 16,
-      paddingVertical: 12,
-      borderRadius: 20,
-      gap: 12,
+      paddingHorizontal: 12,
+      paddingVertical: 8,
+      borderRadius: 16,
+      gap: 10,
       backgroundColor: "#FFFFFF",
-      elevation: 3,
+      borderWidth: 2,
+      borderColor: "#E5E7EB",
+      borderBottomWidth: 4,
+      elevation: 4,
       shadowColor: "#000000",
-      shadowOffset: { width: 0, height: 3 },
-      shadowOpacity: 0.08,
-      shadowRadius: 6,
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.06,
+      shadowRadius: 8,
       zIndex: 1,
+    },
+    searchIconCircle: {
+      width: 36,
+      height: 36,
+      borderRadius: 12,
+      backgroundColor: "#FFF3E0",
+      alignItems: "center",
+      justifyContent: "center",
     },
     searchInput: {
       flex: 1,
-      fontSize: 16,
-      fontWeight: "600",
+      fontSize: 15,
+      fontFamily: fontFamilies.semibold,
       color: theme.text,
+      paddingVertical: 4,
     },
-
-    // Category pills
+    searchClearButton: {
+      width: 32,
+      height: 32,
+      borderRadius: 16,
+      backgroundColor: "#F9FAFB",
+      alignItems: "center",
+      justifyContent: "center",
+      borderWidth: 1,
+      borderColor: "#E5E7EB",
+    },
+    // Category pills — white cards with bottom lip, active orange with lip (home/profile action style)
     categoryRow: {
       backgroundColor: "transparent",
     },
     categoryScrollContent: {
       paddingHorizontal: 20,
-      paddingVertical: 12,
-      gap: 8,
+      paddingTop: 6,
+      paddingBottom: 10,
+      gap: 10,
     },
     categoryChip: {
       flexDirection: "row",
@@ -88,35 +136,42 @@ export const createStyles = (theme: typeof LightTHEME) =>
       justifyContent: "center",
       paddingHorizontal: 16,
       paddingVertical: 10,
-      borderRadius: 20,
+      borderRadius: 14,
       backgroundColor: "#FFFFFF",
+      borderWidth: 2,
+      borderColor: "#E5E7EB",
+      borderBottomWidth: 4,
       elevation: 2,
       shadowColor: "#000000",
       shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.06,
+      shadowOpacity: 0.05,
       shadowRadius: 4,
     },
     categoryChipIcon: {
       paddingHorizontal: 12,
+      paddingVertical: 10,
     },
     categoryChipActive: {
       backgroundColor: "#FF8C00",
+      borderColor: "#E67E22",
+      borderBottomColor: "#CC6A1A",
       elevation: 4,
       shadowColor: "#FF8C00",
-      shadowOffset: { width: 0, height: 3 },
-      shadowOpacity: 0.35,
-      shadowRadius: 6,
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.28,
+      shadowRadius: 8,
     },
     categoryChipText: {
-      fontSize: 14,
-      fontWeight: "700",
+      fontSize: 13,
+      fontFamily: fontFamilies.heavy,
       color: "#555555",
+      letterSpacing: 0.1,
     },
     categoryChipTextActive: {
       color: "#FFFFFF",
     },
 
-    // Gallery
+    // Gallery — original design (restored)
     galleryContent: {
       paddingHorizontal: 16,
       paddingTop: 8,
@@ -178,7 +233,7 @@ export const createStyles = (theme: typeof LightTHEME) =>
     },
     galleryCategory: {
       fontSize: 10,
-      fontWeight: "800",
+      fontFamily: fontFamilies.heavy,
       color: "#E67E22",
       letterSpacing: 0.5,
       marginBottom: 4,
@@ -186,7 +241,7 @@ export const createStyles = (theme: typeof LightTHEME) =>
     },
     galleryTitle: {
       fontSize: 15,
-      fontWeight: "700",
+      fontFamily: fontFamilies.bold,
       lineHeight: 20,
       color: "#333333",
       marginBottom: 8,
@@ -205,7 +260,7 @@ export const createStyles = (theme: typeof LightTHEME) =>
     },
     galleryMetaText: {
       fontSize: 11,
-      fontWeight: "600",
+      fontFamily: fontFamilies.semibold,
       color: "#888888",
       flexShrink: 1,
     },
@@ -252,7 +307,7 @@ export const createStyles = (theme: typeof LightTHEME) =>
     },
     authorName: {
       fontSize: 16,
-      fontWeight: "700",
+      fontFamily: fontFamilies.bold,
     },
     dotSeparator: {
       marginHorizontal: 4,
@@ -262,7 +317,7 @@ export const createStyles = (theme: typeof LightTHEME) =>
     sourceLabel: {
       fontSize: 13,
       color: "#6A82FB",
-      fontWeight: "700",
+      fontFamily: fontFamilies.bold,
     },
     postMeta: {
       flexDirection: "row",
@@ -272,17 +327,17 @@ export const createStyles = (theme: typeof LightTHEME) =>
     timeAgo: {
       fontSize: 13,
       color: "#999",
-      fontWeight: "500",
+      fontFamily: fontFamilies.medium,
     },
     categoryLabel: {
       fontSize: 13,
       color: "#999",
-      fontWeight: "500",
+      fontFamily: fontFamilies.medium,
     },
     readTimeLabel: {
       fontSize: 13,
       color: "#999",
-      fontWeight: "500",
+      fontFamily: fontFamilies.medium,
     },
     moreButtonContainer: {
       position: "relative",
@@ -318,7 +373,7 @@ export const createStyles = (theme: typeof LightTHEME) =>
     },
     moreMenuText: {
       fontSize: 15,
-      fontWeight: "600",
+      fontFamily: fontFamilies.semibold,
     },
     moreMenuTextDanger: {
       color: "#E53935",
@@ -334,7 +389,7 @@ export const createStyles = (theme: typeof LightTHEME) =>
     },
     postTitle: {
       fontSize: 18,
-      fontWeight: "700",
+      fontFamily: fontFamilies.bold,
       lineHeight: 24,
       paddingHorizontal: 20,
       marginBottom: 8,
@@ -347,7 +402,7 @@ export const createStyles = (theme: typeof LightTHEME) =>
     seeMore: {
       fontSize: 15,
       color: "#999",
-      fontWeight: "700",
+      fontFamily: fontFamilies.bold,
       paddingHorizontal: 20,
       marginTop: 4,
       marginBottom: 8,
@@ -362,7 +417,7 @@ export const createStyles = (theme: typeof LightTHEME) =>
     readMoreLink: {
       fontSize: 15,
       color: "#6A82FB",
-      fontWeight: "700",
+      fontFamily: fontFamilies.bold,
       paddingHorizontal: 20,
       marginTop: 8,
       marginBottom: 8,
@@ -382,7 +437,7 @@ export const createStyles = (theme: typeof LightTHEME) =>
     },
     reactionLabel: {
       fontSize: 14,
-      fontWeight: "600",
+      fontFamily: fontFamilies.semibold,
     },
     divider: {
       height: 1,
@@ -405,7 +460,7 @@ export const createStyles = (theme: typeof LightTHEME) =>
     },
     actionText: {
       fontSize: 14,
-      fontWeight: "700",
+      fontFamily: fontFamilies.bold,
     },
     commentBadge: {
       backgroundColor: "#6A82FB",
@@ -420,7 +475,7 @@ export const createStyles = (theme: typeof LightTHEME) =>
     commentBadgeText: {
       color: "#FFFFFF",
       fontSize: 11,
-      fontWeight: "700",
+      fontFamily: fontFamilies.bold,
     },
 
     // Reaction Button
@@ -460,30 +515,76 @@ export const createStyles = (theme: typeof LightTHEME) =>
     },
     buttonText: {
       fontSize: 13,
-      fontWeight: "700",
+      fontFamily: fontFamilies.bold,
     },
 
-    // Empty State
+    // Empty State — premium white card with amber accent (like profile sectionCard)
     emptyState: {
       alignItems: "center",
       justifyContent: "center",
-      paddingVertical: 80,
+      marginTop: 24,
+      marginHorizontal: 4,
+      paddingVertical: 32,
+      paddingHorizontal: 24,
+      backgroundColor: "#FFFFFF",
+      borderRadius: 20,
+      borderWidth: 2,
+      borderColor: "#E5E7EB",
+      borderBottomWidth: 4,
+      elevation: 3,
+      shadowColor: "#000000",
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.06,
+      shadowRadius: 8,
     },
     emptyMascot: {
-      width: 120,
-      height: 120,
-      opacity: 0.8,
+      width: 96,
+      height: 96,
+      opacity: 0.9,
     },
-    emptyText: {
-      fontSize: 18,
-      fontWeight: "700",
+    emptyBadge: {
+      backgroundColor: "#FFF3E0",
+      paddingHorizontal: 10,
+      paddingVertical: 4,
+      borderRadius: 8,
       marginTop: 16,
     },
+    emptyBadgeText: {
+      fontSize: 10,
+      fontFamily: fontFamilies.heavy,
+      color: "#E67E22",
+      letterSpacing: 0.6,
+      textTransform: "uppercase",
+    },
+    emptyText: {
+      fontSize: 17,
+      fontFamily: fontFamilies.heavy,
+      marginTop: 12,
+      color: "#1F2937",
+      textAlign: "center",
+    },
     emptySubtext: {
-      fontSize: 15,
-      color: "#999",
-      marginTop: 4,
-      fontWeight: "500",
+      fontSize: 13,
+      color: "#6B7280",
+      marginTop: 6,
+      fontFamily: fontFamilies.medium,
+      textAlign: "center",
+      lineHeight: 18,
+    },
+    emptyAction: {
+      marginTop: 16,
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 6,
+      backgroundColor: "#FFF3E0",
+      paddingHorizontal: 14,
+      paddingVertical: 8,
+      borderRadius: 12,
+    },
+    emptyActionText: {
+      fontSize: 12,
+      fontFamily: fontFamilies.heavy,
+      color: "#E67E22",
     },
 
     // Undo Snackbar
@@ -511,7 +612,7 @@ export const createStyles = (theme: typeof LightTHEME) =>
     },
     undoSnackbarText: {
       fontSize: 15,
-      fontWeight: "600",
+      fontFamily: fontFamilies.semibold,
       color: "#FFFFFF",
     },
     undoButton: {
@@ -520,7 +621,7 @@ export const createStyles = (theme: typeof LightTHEME) =>
     },
     undoButtonText: {
       fontSize: 14,
-      fontWeight: "800",
+      fontFamily: fontFamilies.heavy,
       color: "#6A82FB",
       letterSpacing: 0.5,
     },
@@ -543,7 +644,7 @@ export const createStyles = (theme: typeof LightTHEME) =>
     },
     modalTitle: {
       fontSize: 20,
-      fontWeight: "800",
+      fontFamily: fontFamilies.heavy,
       letterSpacing: -0.5,
     },
     postPreview: {
@@ -555,7 +656,7 @@ export const createStyles = (theme: typeof LightTHEME) =>
     postPreviewText: {
       fontSize: 14,
       color: "#999",
-      fontWeight: "600",
+      fontFamily: fontFamilies.semibold,
     },
     commentsList: {
       padding: 16,
@@ -610,7 +711,7 @@ export const createStyles = (theme: typeof LightTHEME) =>
     },
     commentAuthor: {
       fontSize: 14,
-      fontWeight: "700",
+      fontFamily: fontFamilies.bold,
       marginBottom: 2,
     },
     commentHeaderRow: {
@@ -630,7 +731,7 @@ export const createStyles = (theme: typeof LightTHEME) =>
     },
     factCheckText: {
       fontSize: 10,
-      fontWeight: "700",
+      fontFamily: fontFamilies.bold,
       color: "#FF9F65",
       textTransform: "uppercase",
     },
@@ -642,7 +743,7 @@ export const createStyles = (theme: typeof LightTHEME) =>
     },
     hiddenCommentTitle: {
       fontSize: 13,
-      fontWeight: "700",
+      fontFamily: fontFamilies.bold,
     },
     hiddenCommentReason: {
       fontSize: 13,
@@ -658,7 +759,7 @@ export const createStyles = (theme: typeof LightTHEME) =>
     aiNoticeText: {
       fontSize: 11,
       color: "#5E72E4",
-      fontWeight: "600",
+      fontFamily: fontFamilies.semibold,
       fontStyle: "italic",
     },
     moderatingIndicator: {
@@ -676,7 +777,7 @@ export const createStyles = (theme: typeof LightTHEME) =>
     moderatingText: {
       fontSize: 13,
       color: "#5E72E4",
-      fontWeight: "600",
+      fontFamily: fontFamilies.semibold,
     },
     cooldownIndicator: {
       flexDirection: "row",
@@ -692,7 +793,7 @@ export const createStyles = (theme: typeof LightTHEME) =>
     cooldownText: {
       fontSize: 13,
       color: "#FF9F65",
-      fontWeight: "600",
+      fontFamily: fontFamilies.semibold,
     },
     commentText: {
       fontSize: 15,
@@ -703,7 +804,7 @@ export const createStyles = (theme: typeof LightTHEME) =>
       color: "#999",
       marginTop: 4,
       marginLeft: 4,
-      fontWeight: "600",
+      fontFamily: fontFamilies.semibold,
     },
     inputContainer: {
       borderTopWidth: 1,
@@ -723,7 +824,7 @@ export const createStyles = (theme: typeof LightTHEME) =>
       maxHeight: 100,
       paddingTop: 8,
       paddingBottom: 8,
-      fontWeight: "500",
+      fontFamily: fontFamilies.medium,
     },
     sendButton: {
       width: 36,
@@ -768,7 +869,7 @@ export const createStyles = (theme: typeof LightTHEME) =>
     },
     itemTitle: {
       fontSize: 15,
-      fontWeight: "600",
+      fontFamily: fontFamilies.semibold,
       marginBottom: 4,
     },
     itemMeta: {
@@ -798,7 +899,7 @@ export const createStyles = (theme: typeof LightTHEME) =>
     },
     sectionTitle: {
       fontSize: 14,
-      fontWeight: "600",
+      fontFamily: fontFamilies.semibold,
       color: "#999",
       marginBottom: 12,
       textTransform: "uppercase",
@@ -821,7 +922,7 @@ export const createStyles = (theme: typeof LightTHEME) =>
     reasonText: {
       flex: 1,
       fontSize: 15,
-      fontWeight: "500",
+      fontFamily: fontFamilies.medium,
     },
     reasonTextSelected: {
       color: "#FF6B6B",
@@ -846,7 +947,7 @@ export const createStyles = (theme: typeof LightTHEME) =>
     },
     additionalLabel: {
       fontSize: 14,
-      fontWeight: "600",
+      fontFamily: fontFamilies.semibold,
       marginTop: 16,
       marginBottom: 8,
     },
@@ -875,34 +976,64 @@ export const createStyles = (theme: typeof LightTHEME) =>
     },
     submitButtonText: {
       fontSize: 16,
-      fontWeight: "700",
+      fontFamily: fontFamilies.bold,
       color: "#FFFFFF",
     },
     submitButtonTextDisabled: {
       color: "#999",
     },
 
-    // Feed Footer
+    // Feed Footer — white card with amber icon (matches streakCard / sectionCard)
     feedFooter: {
-      paddingVertical: 40,
-      paddingHorizontal: 24,
+      marginTop: 8,
+      marginHorizontal: 4,
+      paddingVertical: 24,
+      paddingHorizontal: 20,
       alignItems: "center",
+      backgroundColor: "#FFFFFF",
+      borderRadius: 20,
+      borderWidth: 2,
+      borderColor: "#E5E7EB",
+      borderBottomWidth: 4,
+      elevation: 3,
+      shadowColor: "#000000",
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.06,
+      shadowRadius: 8,
     },
     footerContent: {
       alignItems: "center",
       maxWidth: 300,
     },
+    footerIconCircle: {
+      width: 52,
+      height: 52,
+      borderRadius: 26,
+      backgroundColor: "#FFF3E0",
+      alignItems: "center",
+      justifyContent: "center",
+      marginBottom: 12,
+    },
     footerTitle: {
-      fontSize: 18,
-      fontWeight: "700",
-      marginTop: 16,
-      marginBottom: 8,
+      fontSize: 16,
+      fontFamily: fontFamilies.heavy,
+      marginBottom: 6,
       textAlign: "center",
+      color: "#1F2937",
     },
     footerSubtext: {
-      fontSize: 14,
+      fontSize: 13,
       textAlign: "center",
-      lineHeight: 20,
+      lineHeight: 19,
+      color: "#6B7280",
+      fontFamily: fontFamilies.medium,
+    },
+    footerDivider: {
+      width: 36,
+      height: 3,
+      borderRadius: 2,
+      backgroundColor: "#FFF3E0",
+      marginTop: 14,
     },
 
     // Comment Guidelines Modal
@@ -931,7 +1062,7 @@ export const createStyles = (theme: typeof LightTHEME) =>
     },
     guidelinesTitle: {
       fontSize: 22,
-      fontWeight: "700",
+      fontFamily: fontFamilies.bold,
       marginTop: 12,
       textAlign: "center",
     },
@@ -955,7 +1086,7 @@ export const createStyles = (theme: typeof LightTHEME) =>
       lineHeight: 22,
     },
     guidelineBold: {
-      fontWeight: "700",
+      fontFamily: fontFamilies.bold,
     },
     guidelinesButton: {
       backgroundColor: "#5E72E4",
@@ -967,6 +1098,6 @@ export const createStyles = (theme: typeof LightTHEME) =>
     guidelinesButtonText: {
       color: "#FFFFFF",
       fontSize: 16,
-      fontWeight: "700",
+      fontFamily: fontFamilies.bold,
     },
   });

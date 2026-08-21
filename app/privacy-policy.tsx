@@ -14,6 +14,8 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 type Section = { title: string; body: string };
 
+const LAST_UPDATED = "January 15, 2026";
+
 const SECTIONS: Section[] = [
   {
     title: "1. Introduction",
@@ -75,36 +77,42 @@ export default function PrivacyPolicyScreen() {
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
-        {/* Hero card */}
-        <Animated.View entering={FadeInDown.delay(50).springify()}>
-          <View style={styles.heroCard}>
-            <View style={styles.heroIcon}>
-              <Icon name="DocumentText" size={30} color="#FFFFFF" variant="Bold" />
-            </View>
-            <Text style={styles.heroTitle}>Your Privacy Matters</Text>
-            <Text style={styles.heroSub}>
-              AtomIQ is designed to work locally, so your learning stays on your
-              device.
-            </Text>
+        <Animated.View entering={FadeInDown.delay(80).springify()}>
+          <View style={styles.metaRow}>
+            <Icon name="Calendar" size={14} color={THEME.textMuted} />
+            <Text style={styles.metaText}>Last updated: {LAST_UPDATED}</Text>
           </View>
+
+          <View style={styles.docCard}>
+            <View style={styles.docHeader}>
+              <View style={styles.docIcon}>
+                <Icon name="DocumentText" size={22} color={THEME.primary} variant="Bold" />
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.docTitle}>Privacy Policy</Text>
+                <Text style={styles.docSubtitle}>
+                  How AtomIQ collects, uses, and protects your information.
+                </Text>
+              </View>
+            </View>
+
+            <View style={styles.headerDivider} />
+
+            {SECTIONS.map((section, index) => (
+              <View key={section.title} style={styles.block}>
+                <Text style={styles.blockTitle}>{section.title}</Text>
+                <Text style={styles.blockBody}>{section.body}</Text>
+                {index < SECTIONS.length - 1 && <View style={styles.blockDivider} />}
+              </View>
+            ))}
+          </View>
+
+          <Text style={styles.footerNote}>
+            © 2026 AtomIQ. All rights reserved.
+          </Text>
         </Animated.View>
 
-        {SECTIONS.map((section, index) => (
-          <Animated.View
-            key={section.title}
-            entering={FadeInDown.delay(100 + index * 40).springify()}
-          >
-            <View style={styles.sectionCard}>
-              <View style={styles.sectionHeaderRow}>
-                <View style={styles.bullet} />
-                <Text style={styles.sectionTitle}>{section.title}</Text>
-              </View>
-              <Text style={styles.sectionBody}>{section.body}</Text>
-            </View>
-          </Animated.View>
-        ))}
-
-        <View style={{ height: 60 }} />
+        <View style={{ height: 40 }} />
       </ScrollView>
     </View>
   );
@@ -131,19 +139,28 @@ const createStyles = (theme: Palette) =>
     },
     headerTitle: {
       fontSize: 18,
-      fontWeight: "700",
       fontFamily: fontFamilies.bold,
       color: theme.text,
     },
     content: {
       padding: 20,
     },
-    heroCard: {
+    metaRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 6,
+      marginBottom: 14,
+      paddingHorizontal: 2,
+    },
+    metaText: {
+      fontSize: 12,
+      fontFamily: fontFamilies.medium,
+      color: theme.textMuted,
+    },
+    docCard: {
       backgroundColor: theme.card,
       borderRadius: 20,
-      padding: 24,
-      alignItems: "center",
-      marginBottom: 20,
+      padding: 22,
       borderWidth: 1,
       borderColor: theme.border,
       shadowColor: "#000",
@@ -152,65 +169,68 @@ const createStyles = (theme: Palette) =>
       shadowRadius: 10,
       elevation: 2,
     },
-    heroIcon: {
-      width: 64,
-      height: 64,
-      borderRadius: 22,
-      backgroundColor: theme.primary,
-      alignItems: "center",
-      justifyContent: "center",
-      marginBottom: 16,
-      shadowColor: theme.primary,
-      shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.3,
-      shadowRadius: 8,
-      elevation: 4,
-    },
-    heroTitle: {
-      fontSize: 20,
-      fontWeight: "800",
-      fontFamily: fontFamilies.heavy,
-      color: theme.text,
-      marginBottom: 6,
-    },
-    heroSub: {
-      fontSize: 14,
-      fontFamily: fontFamilies.regular,
-      color: theme.textMuted,
-      textAlign: "center",
-      lineHeight: 21,
-    },
-    sectionCard: {
-      backgroundColor: theme.card,
-      borderRadius: 16,
-      padding: 18,
-      marginBottom: 14,
-      borderWidth: 1,
-      borderColor: theme.border,
-    },
-    sectionHeaderRow: {
+    docHeader: {
       flexDirection: "row",
       alignItems: "center",
-      gap: 10,
-      marginBottom: 8,
+      gap: 14,
+      marginBottom: 18,
     },
-    bullet: {
-      width: 8,
-      height: 8,
-      borderRadius: 4,
-      backgroundColor: theme.primary,
+    docIcon: {
+      width: 44,
+      height: 44,
+      borderRadius: 12,
+      backgroundColor: theme.primary + "14",
+      borderWidth: 1,
+      borderColor: theme.primary + "22",
+      alignItems: "center",
+      justifyContent: "center",
     },
-    sectionTitle: {
-      flex: 1,
-      fontSize: 16,
-      fontWeight: "700",
+    docTitle: {
+      fontSize: 18,
       fontFamily: fontFamilies.bold,
       color: theme.text,
+      marginBottom: 2,
     },
-    sectionBody: {
+    docSubtitle: {
+      fontSize: 13,
+      fontFamily: fontFamilies.regular,
+      color: theme.textMuted,
+      lineHeight: 18,
+    },
+    headerDivider: {
+      height: 1,
+      backgroundColor: theme.border,
+      marginBottom: 20,
+    },
+    block: {
+      paddingVertical: 2,
+    },
+    blockTitle: {
+      fontSize: 15,
+      fontFamily: fontFamilies.bold,
+      color: theme.text,
+      marginBottom: 8,
+      lineHeight: 22,
+    },
+    blockBody: {
       fontSize: 14,
       fontFamily: fontFamilies.regular,
       color: theme.textMuted,
       lineHeight: 22,
+    },
+    blockDivider: {
+      height: 1,
+      backgroundColor: theme.border,
+      marginTop: 18,
+      marginBottom: 2,
+      opacity: 0.7,
+    },
+    footerNote: {
+      fontSize: 12,
+      fontFamily: fontFamilies.regular,
+      color: theme.textMuted,
+      textAlign: "center",
+      marginTop: 18,
+      lineHeight: 18,
     },
   });

@@ -5,7 +5,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useMemo } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
-import Animated, { FadeInDown } from 'react-native-reanimated';
+import Animated, { FadeIn, FadeInDown, useReducedMotion } from 'react-native-reanimated';
 
 import {useTheme, AchievementPalette, type Palette, fontFamilies} from "@/theme";
 
@@ -36,13 +36,13 @@ export const ACHIEVEMENTS = [
   { 
     id: 3, 
     title: 'On Fire', 
-    requirement: '7 day streak', 
+    requirement: 'Reach a 7 day streak', 
     threshold: 7, 
-    field: 'current_streak', 
+    field: 'longest_streak', 
     icon: 'Flash', 
     color: '#EA580C',
-    description: 'You\'re on fire! Maintain a 7-day learning streak to show your dedication to mastering nuclear science.',
-    tips: ['Log in daily to maintain your streak', 'Complete at least one lesson or activity per day', 'Don\'t break the chain!']
+    description: 'You\'re on fire! Reach a 7-day learning streak to show your dedication to mastering nuclear science.',
+    tips: ['Log in daily to maintain your streak', 'Open the app once a day — that alone counts', 'Don\'t break the chain!']
   },
   { 
     id: 4, 
@@ -75,6 +75,7 @@ export default function AchievementDetailScreen() {
   const styles = useMemo(() => makeStyles(THEME), [THEME]);
   const { achievementId } = useLocalSearchParams<{ achievementId: string }>();
   const { userProfile } = useStorage();
+  const reducedMotion = useReducedMotion();
 
   const achievement = useMemo(() => {
     const ach = ACHIEVEMENTS.find(a => a.id === parseInt(achievementId || '0'));
@@ -114,7 +115,7 @@ export default function AchievementDetailScreen() {
       >
         {/* Achievement Icon Card */}
         <Animated.View 
-          entering={FadeInDown.delay(100).springify()}
+          entering={reducedMotion ? FadeIn.duration(120) : FadeInDown.delay(100).springify()}
           style={styles.iconCard}
         >
           <LinearGradient
@@ -157,7 +158,7 @@ export default function AchievementDetailScreen() {
 
         {/* Achievement Info */}
         <Animated.View 
-          entering={FadeInDown.delay(200).springify()}
+          entering={reducedMotion ? FadeIn.duration(120) : FadeInDown.delay(200).springify()}
           style={styles.infoCard}
         >
           <Text style={[
@@ -176,7 +177,7 @@ export default function AchievementDetailScreen() {
 
         {/* Progress Card */}
         <Animated.View 
-          entering={FadeInDown.delay(300).springify()}
+          entering={reducedMotion ? FadeIn.duration(120) : FadeInDown.delay(300).springify()}
           style={styles.progressCard}
         >
           <View style={styles.progressHeader}>
@@ -227,7 +228,7 @@ export default function AchievementDetailScreen() {
 
         {/* Tips Card */}
         <Animated.View 
-          entering={FadeInDown.delay(400).springify()}
+          entering={reducedMotion ? FadeIn.duration(120) : FadeInDown.delay(400).springify()}
           style={styles.tipsCard}
         >
           <View style={styles.tipsHeader}>
@@ -275,7 +276,6 @@ const makeStyles = (THEME: Palette) => StyleSheet.create({
   },
   headerTitle: {
     fontSize: 20,
-    fontWeight: '800',
     fontFamily: fontFamilies.heavy,
     color: THEME.text,
   },
@@ -344,7 +344,6 @@ const makeStyles = (THEME: Palette) => StyleSheet.create({
   },
   achievementTitle: {
     fontSize: 28,
-    fontWeight: '800',
     fontFamily: fontFamilies.heavy,
     color: THEME.text,
     marginBottom: 8,
@@ -354,7 +353,6 @@ const makeStyles = (THEME: Palette) => StyleSheet.create({
   },
   achievementRequirement: {
     fontSize: 16,
-    fontWeight: '700',
     fontFamily: fontFamilies.bold,
     color: THEME.primary,
     marginBottom: 16,
@@ -381,13 +379,11 @@ const makeStyles = (THEME: Palette) => StyleSheet.create({
   },
   progressLabel: {
     fontSize: 16,
-    fontWeight: '700',
     fontFamily: fontFamilies.bold,
     color: THEME.text,
   },
   progressPercentage: {
     fontSize: 20,
-    fontWeight: '800',
     fontFamily: fontFamilies.heavy,
     color: THEME.primary,
   },
@@ -415,13 +411,11 @@ const makeStyles = (THEME: Palette) => StyleSheet.create({
   progressStatLabel: {
     fontSize: 12,
     color: THEME.textMuted,
-    fontWeight: '600',
     fontFamily: fontFamilies.semibold,
     marginBottom: 4,
   },
   progressStatValue: {
     fontSize: 20,
-    fontWeight: '800',
     fontFamily: fontFamilies.heavy,
     color: THEME.text,
   },
@@ -445,7 +439,6 @@ const makeStyles = (THEME: Palette) => StyleSheet.create({
   },
   tipsTitle: {
     fontSize: 18,
-    fontWeight: '800',
     fontFamily: fontFamilies.heavy,
     color: THEME.text,
   },
@@ -466,7 +459,6 @@ const makeStyles = (THEME: Palette) => StyleSheet.create({
   },
   tipBulletText: {
     fontSize: 14,
-    fontWeight: '800',
     fontFamily: fontFamilies.heavy,
     color: THEME.primary,
   },
@@ -475,7 +467,6 @@ const makeStyles = (THEME: Palette) => StyleSheet.create({
     fontSize: 15,
     color: THEME.text,
     lineHeight: 22,
-    fontWeight: '500',
     fontFamily: fontFamilies.medium,
   },
 });

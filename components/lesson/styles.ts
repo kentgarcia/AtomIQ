@@ -1,6 +1,6 @@
 import { StyleSheet } from "react-native";
 
-import { type Palette } from "@/theme";
+import { type Palette, fontFamilies } from "@/theme";
 
 export const createStyles = (theme: Palette, width: number) =>
   StyleSheet.create({
@@ -55,7 +55,7 @@ export const createStyles = (theme: Palette, width: number) =>
     },
     briefingTitle: {
       fontSize: 24,
-      fontWeight: "800",
+      fontFamily: fontFamilies.heavy,
       color: theme.text,
       marginBottom: 8,
       textAlign: "center",
@@ -81,7 +81,7 @@ export const createStyles = (theme: Palette, width: number) =>
     // Headers
     stepHeader: {
       fontSize: 14,
-      fontWeight: "800",
+      fontFamily: fontFamilies.heavy,
       color: theme.textMuted,
       textTransform: "uppercase",
       marginBottom: 8,
@@ -90,7 +90,7 @@ export const createStyles = (theme: Palette, width: number) =>
     },
     stepSubHeader: {
       fontSize: 20,
-      fontWeight: "700",
+      fontFamily: fontFamilies.bold,
       color: theme.text,
       textAlign: "center",
       marginBottom: 32,
@@ -116,7 +116,7 @@ export const createStyles = (theme: Palette, width: number) =>
     },
     mainBtnText: {
       color: "#FFF",
-      fontWeight: "800",
+      fontFamily: fontFamilies.heavy,
       fontSize: 16,
       letterSpacing: 1,
     },
@@ -153,12 +153,12 @@ export const createStyles = (theme: Palette, width: number) =>
     },
     mythBadgeText: {
       color: "#FFF",
-      fontWeight: "800",
+      fontFamily: fontFamilies.heavy,
       fontSize: 12,
     },
     mythText: {
       fontSize: 22,
-      fontWeight: "700",
+      fontFamily: fontFamilies.bold,
       color: theme.text,
       textAlign: "center",
       marginBottom: 40,
@@ -195,7 +195,7 @@ export const createStyles = (theme: Palette, width: number) =>
       borderBottomWidth: 4,
       borderColor: "rgba(0,0,0,0.1)",
     },
-    continueBtnText: { fontWeight: "800", fontSize: 16 },
+    continueBtnText: { fontFamily: fontFamilies.heavy, fontSize: 16 },
 
     // MicroLearn
     conceptCard: {
@@ -209,7 +209,7 @@ export const createStyles = (theme: Palette, width: number) =>
     },
     conceptTitle: {
       fontSize: 22,
-      fontWeight: "800",
+      fontFamily: fontFamilies.heavy,
       color: theme.text,
       marginBottom: 12,
       lineHeight: 30,
@@ -225,7 +225,7 @@ export const createStyles = (theme: Palette, width: number) =>
       fontSize: 15,
       color: theme.text,
       lineHeight: 22,
-      fontWeight: "500",
+      fontFamily: fontFamilies.medium,
     },
 
     // Lab
@@ -240,7 +240,7 @@ export const createStyles = (theme: Palette, width: number) =>
     },
     taskText: {
       fontSize: 16,
-      fontWeight: "700",
+      fontFamily: fontFamilies.bold,
       color: theme.text,
       lineHeight: 22,
     },
@@ -268,7 +268,7 @@ export const createStyles = (theme: Palette, width: number) =>
     },
     optionText: {
       fontSize: 12,
-      fontWeight: "700",
+      fontFamily: fontFamilies.bold,
       color: theme.text,
     },
     feedbackHeader: {
@@ -290,7 +290,7 @@ export const createStyles = (theme: Palette, width: number) =>
     },
     questionText: {
       fontSize: 20,
-      fontWeight: "700",
+      fontFamily: fontFamilies.bold,
       color: theme.text,
       marginBottom: 24,
       lineHeight: 30,
@@ -317,7 +317,7 @@ export const createStyles = (theme: Palette, width: number) =>
     },
     optionLetterText: {
       fontSize: 14,
-      fontWeight: "800",
+      fontFamily: fontFamilies.heavy,
       color: theme.text,
     },
     quizOptionSelected: {
@@ -352,7 +352,7 @@ export const createStyles = (theme: Palette, width: number) =>
     },
     successTitle: {
       fontSize: 32,
-      fontWeight: "800",
+      fontFamily: fontFamilies.heavy,
       color: theme.text,
       marginBottom: 12,
       textAlign: "center",
@@ -394,14 +394,14 @@ export const createStyles = (theme: Palette, width: number) =>
     },
     rewardLabel: {
       fontSize: 11,
-      fontWeight: "700",
+      fontFamily: fontFamilies.bold,
       color: theme.textMuted,
       textTransform: "uppercase",
       letterSpacing: 0.5,
     },
     rewardText: {
       fontSize: 20,
-      fontWeight: "800",
+      fontFamily: fontFamilies.heavy,
       color: theme.text,
     },
   });
@@ -427,13 +427,13 @@ export const createMythStyles = (theme: Palette, width: number) => ({
   },
   indicatorTextLeft: {
     fontSize: 16,
-    fontWeight: "800" as const,
+    fontFamily: fontFamilies.heavy,
     color: theme.error,
     marginTop: 8,
   },
   indicatorTextRight: {
     fontSize: 16,
-    fontWeight: "800" as const,
+    fontFamily: fontFamilies.heavy,
     color: theme.success,
     marginTop: 8,
   },
@@ -464,7 +464,7 @@ export const createMythStyles = (theme: Palette, width: number) => ({
   },
   resultTitle: {
     fontSize: 28,
-    fontWeight: "800" as const,
+    fontFamily: fontFamilies.heavy,
     color: theme.text,
     marginBottom: 16,
   },
@@ -484,7 +484,7 @@ export const createMythStyles = (theme: Palette, width: number) => ({
   },
   realityLabel: {
     fontSize: 12,
-    fontWeight: "800" as const,
+    fontFamily: fontFamilies.heavy,
     color: theme.primary,
     marginBottom: 8,
   },
@@ -499,7 +499,7 @@ export const createMythStyles = (theme: Palette, width: number) => ({
   },
   resultContinueBtnText: {
     color: "#FFF",
-    fontWeight: "800" as const,
+    fontFamily: fontFamilies.heavy,
     fontSize: 16,
   },
   speakBtn: {
@@ -517,7 +517,7 @@ export const createMythStyles = (theme: Palette, width: number) => ({
     backgroundColor: theme.primary,
     borderColor: theme.primary,
   },
-  speakBtnText: { fontSize: 14, fontWeight: "700" as const, color: theme.text },
+  speakBtnText: { fontSize: 14, fontFamily: fontFamilies.bold, color: theme.text },
 });
 
 export const createLearnStyles = (theme: Palette) => ({
@@ -558,12 +558,12 @@ export const createLearnStyles = (theme: Palette) => ({
     alignItems: "center" as const,
     gap: 6,
   },
-  badgeText: { color: "#FFF", fontWeight: "800" as const, fontSize: 12 },
+  badgeText: { color: "#FFF", fontFamily: fontFamilies.heavy, fontSize: 12 },
   mascotImg: { width: 80, height: 80, marginBottom: 16 },
   mascotSmall: { width: 60, height: 60, marginBottom: 16 },
   titleText: {
     fontSize: 24,
-    fontWeight: "800" as const,
+    fontFamily: fontFamilies.heavy,
     color: theme.text,
     textAlign: "center" as const,
     marginBottom: 8,
@@ -587,7 +587,7 @@ export const createLearnStyles = (theme: Palette) => ({
   },
   keypointsTitle: {
     fontSize: 18,
-    fontWeight: "800" as const,
+    fontFamily: fontFamilies.heavy,
     color: theme.text,
   },
   keypoint: {
@@ -612,7 +612,7 @@ export const createLearnStyles = (theme: Palette) => ({
     alignItems: "center" as const,
     justifyContent: "center" as const,
   },
-  keypointNumber: { fontSize: 12, fontWeight: "800" as const, color: "#FFF" },
+  keypointNumber: { fontSize: 12, fontFamily: fontFamilies.heavy, color: "#FFF" },
   keypointItemText: {
     flex: 1,
     fontSize: 15,
@@ -622,13 +622,13 @@ export const createLearnStyles = (theme: Palette) => ({
   summaryBadge: { marginBottom: 16, alignItems: "center" as const },
   summaryLabel: {
     fontSize: 12,
-    fontWeight: "800" as const,
+    fontFamily: fontFamilies.heavy,
     color: theme.primary,
     marginBottom: 8,
   },
   summaryTitle: {
     fontSize: 20,
-    fontWeight: "800" as const,
+    fontFamily: fontFamilies.heavy,
     color: theme.text,
     textAlign: "center" as const,
     marginBottom: 12,
@@ -672,7 +672,7 @@ export const createLearnStyles = (theme: Palette) => ({
     borderColor: theme.primaryDark,
     borderBottomWidth: 4,
   },
-  btnText: { fontWeight: "700" as const, fontSize: 14 },
+  btnText: { fontFamily: fontFamilies.bold, fontSize: 14 },
   navRow: {
     flexDirection: "row" as const,
     alignItems: "center" as const,
@@ -691,7 +691,7 @@ export const createLearnStyles = (theme: Palette) => ({
     justifyContent: "center" as const,
     gap: 8,
   },
-  continueBtnText: { color: "#FFF", fontWeight: "800" as const, fontSize: 16 },
+  continueBtnText: { color: "#FFF", fontFamily: fontFamilies.heavy, fontSize: 16 },
 });
 
 export const createLabStyles = (theme: Palette) => ({
@@ -719,7 +719,7 @@ export const createLabStyles = (theme: Palette) => ({
     alignItems: "center" as const,
     gap: 6,
   },
-  badgeText: { color: "#FFF", fontWeight: "800" as const, fontSize: 12 },
+  badgeText: { color: "#FFF", fontFamily: fontFamilies.heavy, fontSize: 12 },
   badgeRow: { marginBottom: 16, alignItems: "center" as const },
   speakerBtn: { padding: 8, backgroundColor: theme.bg, borderRadius: 12 },
   mascot: {
@@ -730,7 +730,7 @@ export const createLabStyles = (theme: Palette) => ({
   },
   taskText: {
     fontSize: 18,
-    fontWeight: "700" as const,
+    fontFamily: fontFamilies.bold,
     color: theme.text,
     textAlign: "center" as const,
     lineHeight: 26,
@@ -774,7 +774,7 @@ export const createLabStyles = (theme: Palette) => ({
   },
   optionLabel: {
     fontSize: 14,
-    fontWeight: "600" as const,
+    fontFamily: fontFamilies.semibold,
     color: theme.text,
     textAlign: "center" as const,
   },
@@ -797,7 +797,7 @@ export const createLabStyles = (theme: Palette) => ({
     gap: 8,
     marginBottom: 8,
   },
-  feedbackTitle: { fontSize: 18, fontWeight: "800" as const },
+  feedbackTitle: { fontSize: 18, fontFamily: fontFamilies.heavy,},
   feedbackText: { fontSize: 15, color: theme.text, lineHeight: 22 },
   bottomBar: { flexDirection: "row" as const, gap: 12, paddingTop: 16 },
   backBtn: {
@@ -824,7 +824,7 @@ export const createLabStyles = (theme: Palette) => ({
     backgroundColor: theme.border,
     borderColor: theme.textMuted,
   },
-  checkBtnText: { color: "#FFF", fontWeight: "800" as const, fontSize: 16 },
+  checkBtnText: { color: "#FFF", fontFamily: fontFamilies.heavy, fontSize: 16 },
   navRow: { flexDirection: "row" as const, gap: 12, marginTop: 24 },
   continueBtn: {
     flex: 1,
@@ -838,7 +838,7 @@ export const createLabStyles = (theme: Palette) => ({
     gap: 8,
     borderBottomWidth: 4,
   },
-  continueBtnText: { color: "#FFF", fontWeight: "800" as const, fontSize: 16 },
+  continueBtnText: { color: "#FFF", fontFamily: fontFamilies.heavy, fontSize: 16 },
 });
 
 export const createQuizStyles = (theme: Palette) => ({
@@ -866,11 +866,11 @@ export const createQuizStyles = (theme: Palette) => ({
     alignItems: "center" as const,
     gap: 6,
   },
-  badgeText: { color: "#FFF", fontWeight: "800" as const, fontSize: 12 },
+  badgeText: { color: "#FFF", fontFamily: fontFamilies.heavy, fontSize: 12 },
   speakerBtn: { padding: 8, backgroundColor: theme.bg, borderRadius: 12 },
   questionText: {
     fontSize: 18,
-    fontWeight: "700" as const,
+    fontFamily: fontFamilies.bold,
     color: theme.text,
     lineHeight: 26,
   },
@@ -911,13 +911,13 @@ export const createQuizStyles = (theme: Palette) => ({
   optionLetterWrong: { backgroundColor: theme.error },
   optionLetterText: {
     fontSize: 14,
-    fontWeight: "800" as const,
+    fontFamily: fontFamilies.heavy,
     color: theme.text,
   },
   optionText: {
     flex: 1,
     fontSize: 15,
-    fontWeight: "600" as const,
+    fontFamily: fontFamilies.semibold,
     color: theme.text,
   },
   optionCheck: { width: 24, height: 24 },
@@ -930,7 +930,7 @@ export const createQuizStyles = (theme: Palette) => ({
     gap: 8,
     marginBottom: 8,
   },
-  feedbackTitle: { fontSize: 18, fontWeight: "800" as const },
+  feedbackTitle: { fontSize: 18, fontFamily: fontFamilies.heavy,},
   feedbackText: { fontSize: 15, color: theme.text, lineHeight: 22 },
   checkBtn: {
     height: 56,
@@ -945,7 +945,7 @@ export const createQuizStyles = (theme: Palette) => ({
     backgroundColor: theme.border,
     borderColor: theme.textMuted,
   },
-  checkBtnText: { color: "#FFF", fontWeight: "800" as const, fontSize: 16 },
+  checkBtnText: { color: "#FFF", fontFamily: fontFamilies.heavy, fontSize: 16 },
   continueBtn: {
     height: 56,
     borderRadius: 16,
@@ -957,5 +957,5 @@ export const createQuizStyles = (theme: Palette) => ({
     gap: 8,
     borderBottomWidth: 4,
   },
-  continueBtnText: { color: "#FFF", fontWeight: "800" as const, fontSize: 16 },
+  continueBtnText: { color: "#FFF", fontFamily: fontFamilies.heavy, fontSize: 16 },
 });

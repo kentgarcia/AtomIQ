@@ -13,10 +13,12 @@ import { useRouter } from "expo-router";
 
 import {
     getLevelProgress,
+    getUserProfile,
     logDailyActivity,
     unlockNextLevel,
     updateLevelProgress,
 } from "@/services/database";
+import { toLocalIsoDate } from "@/services/utils";
 import { useStorage } from "@/services/StorageContext";
 
 import { type Palette } from "@/theme";
@@ -38,7 +40,7 @@ export const DebriefView = ({
   const router = useRouter();
   const { width } = useWindowDimensions();
   const styles = useMemo(() => createStyles(theme, width), [theme, width]);
-  const { addXP, updateUserProfile, userProfile } = useStorage();
+  const { addXP, updateUserProfile } = useStorage();
   const [saved, setSaved] = useState(false);
   const [rewardsAwarded, setRewardsAwarded] = useState(false);
   const scale = useSharedValue(0);
@@ -83,15 +85,19 @@ export const DebriefView = ({
           // Add XP to user
           await addXP(xpEarned);
 
-          // Increment lessons completed
-          if (userProfile) {
+          // Increment lessons completed — read fresh from the DB so rapid
+          // successive completions never undercount off stale state
+          const freshProfile = (await getUserProfile()) as {
+            lessons_completed?: number;
+          } | null;
+          if (freshProfile) {
             await updateUserProfile({
-              lessons_completed: userProfile.lessons_completed + 1,
+              lessons_completed: (freshProfile.lessons_completed || 0) + 1,
             });
           }
 
           // Log daily activity
-          const today = new Date().toISOString().split("T")[0];
+          const today = toLocalIsoDate();
           await logDailyActivity(today, {
             xp_earned: xpEarned,
             lessons_completed: 1,
@@ -111,7 +117,7 @@ export const DebriefView = ({
     };
 
     saveProgress();
-  }, [saved, levelId, addXP, updateUserProfile, userProfile]);
+  }, [saved, levelId, addXP, updateUserProfile]);
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }],

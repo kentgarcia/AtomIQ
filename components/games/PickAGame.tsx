@@ -424,7 +424,6 @@ const styles = StyleSheet.create({
     titlePick: {
         fontSize: 84,
         fontFamily: fontFamilies.heavy,
-        fontWeight: "900",
         letterSpacing: -4,
         lineHeight: 78,
     },
@@ -435,14 +434,12 @@ const styles = StyleSheet.create({
     titleGame: {
         fontSize: 84,
         fontFamily: fontFamilies.heavy,
-        fontWeight: "900",
         letterSpacing: -4,
         lineHeight: 78,
     },
     titleA: {
         fontSize: 34,
         fontFamily: fontFamilies.heavy,
-        fontWeight: "900",
         letterSpacing: -1.5,
         marginLeft: 4,
     },
@@ -493,7 +490,6 @@ const styles = StyleSheet.create({
     },
     modalSubtitle: {
         fontSize: 12,
-        fontWeight: "600",
         fontFamily: fontFamilies.semibold,
         textTransform: "uppercase",
         letterSpacing: 1,
@@ -501,7 +497,6 @@ const styles = StyleSheet.create({
     },
     modalTitle: {
         fontSize: 24,
-        fontWeight: "800",
         fontFamily: fontFamilies.heavy,
         lineHeight: 30,
     },
@@ -531,7 +526,6 @@ const styles = StyleSheet.create({
     },
     guideRowTitle: {
         fontSize: 14,
-        fontWeight: "800",
         fontFamily: fontFamilies.heavy,
         marginBottom: 2,
     },
@@ -550,7 +544,6 @@ const styles = StyleSheet.create({
     },
     guideActionText: {
         fontSize: 16,
-        fontWeight: "700",
         fontFamily: fontFamilies.bold,
         color: "#FFFFFF",
     },

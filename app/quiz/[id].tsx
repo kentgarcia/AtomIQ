@@ -4,10 +4,12 @@ import type { Quiz } from "@/content/types";
 import {useTheme, type Palette, fontFamilies} from "@/theme";
 import { useStorage } from "@/services/StorageContext";
 import {
+    getLevelProgress,
     logDailyActivity,
     unlockNextLevel,
     updateLevelProgress,
 } from "@/services/database";
+import { toLocalIsoDate } from "@/services/utils";
 import { playGameSfx, preloadGameSfx } from "@/services/game-sfx";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import * as Speech from "expo-speech";
@@ -150,6 +152,12 @@ export default function QuizScreen() {
 
       if (passed) {
         try {
+          // Only award rewards on the first pass — replays must not farm XP
+          const existingProgress = (await getLevelProgress(id as string)) as {
+            status?: string;
+          } | null;
+          const isAlreadyCompleted = existingProgress?.status === "completed";
+
           // Mark quiz as completed in database
           await updateLevelProgress(id as string, {
             status: "completed",
@@ -158,14 +166,16 @@ export default function QuizScreen() {
             completed_at: new Date().toISOString(),
           });
 
-          // Unlock next unit/lesson
-          await unlockNextLevel(id as string);
+          if (!isAlreadyCompleted) {
+            // Unlock next unit/lesson
+            await unlockNextLevel(id as string);
 
-          // Award XP and log activity
-          addXP(quiz.xpReward);
-          logDailyActivity(new Date().toISOString().split("T")[0], {
-            xp_earned: quiz.xpReward,
-          });
+            // Award XP and log activity
+            await addXP(quiz.xpReward);
+            await logDailyActivity(toLocalIsoDate(), {
+              xp_earned: quiz.xpReward,
+            });
+          }
         } catch (error) {
           console.error("Error saving quiz progress:", error);
         }
@@ -447,17 +457,14 @@ export default function QuizScreen() {
                           isSelected &&
                             !showExplanation && {
                               color: THEME.primary,
-                              fontWeight: "700",
                               fontFamily: fontFamilies.bold,
                             },
                           showCorrectMark && {
                             color: THEME.success,
-                            fontWeight: "700",
                             fontFamily: fontFamilies.bold,
                           },
                           showWrongMark && {
                             color: THEME.error,
-                            fontWeight: "700",
                             fontFamily: fontFamilies.bold,
                           },
                         ]}
@@ -569,7 +576,6 @@ const createStyles = (theme: Palette) =>
     },
     errorText: {
       fontSize: 18,
-      fontWeight: "700",
       fontFamily: fontFamilies.bold,
       color: theme.text,
       marginTop: 16,
@@ -583,7 +589,6 @@ const createStyles = (theme: Palette) =>
     },
     backButtonText: {
       color: "#FFF",
-      fontWeight: "700",
       fontFamily: fontFamilies.bold,
       fontSize: 16,
     },
@@ -619,7 +624,6 @@ const createStyles = (theme: Palette) =>
     },
     questionBadgeText: {
       fontSize: 13,
-      fontWeight: "800",
       fontFamily: fontFamilies.heavy,
       color: theme.primary,
     },
@@ -657,7 +661,6 @@ const createStyles = (theme: Palette) =>
     },
     quizBadgeText: {
       color: "#FFF",
-      fontWeight: "800",
       fontFamily: fontFamilies.heavy,
       fontSize: 11,
       letterSpacing: 1,
@@ -672,7 +675,6 @@ const createStyles = (theme: Palette) =>
     },
     questionText: {
       fontSize: 20,
-      fontWeight: "700",
       fontFamily: fontFamilies.bold,
       color: theme.text,
       lineHeight: 28,
@@ -730,7 +732,6 @@ const createStyles = (theme: Palette) =>
     },
     optionLetterText: {
       fontSize: 16,
-      fontWeight: "800",
       fontFamily: fontFamilies.heavy,
       color: theme.textMuted,
     },
@@ -738,7 +739,6 @@ const createStyles = (theme: Palette) =>
       flex: 1,
       fontSize: 16,
       color: theme.text,
-      fontWeight: "500",
       fontFamily: fontFamilies.medium,
     },
 
@@ -762,7 +762,6 @@ const createStyles = (theme: Palette) =>
     },
     feedbackTitle: {
       fontSize: 18,
-      fontWeight: "800",
       fontFamily: fontFamilies.heavy,
     },
     feedbackText: {
@@ -792,7 +791,6 @@ const createStyles = (theme: Palette) =>
     },
     checkBtnText: {
       color: "#FFF",
-      fontWeight: "800",
       fontFamily: fontFamilies.heavy,
       fontSize: 16,
       letterSpacing: 0.5,
@@ -810,7 +808,6 @@ const createStyles = (theme: Palette) =>
     },
     continueBtnText: {
       color: "#FFF",
-      fontWeight: "800",
       fontFamily: fontFamilies.heavy,
       fontSize: 16,
       letterSpacing: 0.5,
@@ -833,7 +830,6 @@ const createStyles = (theme: Palette) =>
     },
     resultsTitle: {
       fontSize: 28,
-      fontWeight: "800",
       fontFamily: fontFamilies.heavy,
       color: theme.text,
       marginBottom: 8,
@@ -869,13 +865,11 @@ const createStyles = (theme: Palette) =>
     },
     statValue: {
       fontSize: 24,
-      fontWeight: "800",
       fontFamily: fontFamilies.heavy,
       color: theme.text,
     },
     statLabel: {
       fontSize: 12,
-      fontWeight: "600",
       fontFamily: fontFamilies.semibold,
       color: theme.textMuted,
       marginTop: 2,
@@ -903,7 +897,6 @@ const createStyles = (theme: Palette) =>
     },
     continueButtonText: {
       color: "#FFF",
-      fontWeight: "800",
       fontFamily: fontFamilies.heavy,
       fontSize: 16,
       letterSpacing: 0.5,

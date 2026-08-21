@@ -236,7 +236,6 @@ const makeStyles = (THEME: Palette) => StyleSheet.create({
   metaText: {
     fontSize: 13,
     color: withAlpha(THEME.white, 0.9),
-    fontWeight: '600',
     fontFamily: fontFamilies.semibold,
   },
   pathContainer: {
@@ -244,7 +243,6 @@ const makeStyles = (THEME: Palette) => StyleSheet.create({
   },
   pathTitle: {
     fontSize: 18,
-    fontWeight: '800',
     fontFamily: fontFamilies.heavy,
     color: THEME.text,
     marginBottom: 16,
@@ -294,13 +292,11 @@ const makeStyles = (THEME: Palette) => StyleSheet.create({
   },
   nodeNumber: {
     fontSize: 12,
-    fontWeight: '800',
     fontFamily: fontFamilies.heavy,
     color: THEME.primary,
   },
   nodeType: {
     fontSize: 10,
-    fontWeight: '700',
     fontFamily: fontFamilies.bold,
     color: THEME.textMuted,
     backgroundColor: THEME.bg,
@@ -310,7 +306,6 @@ const makeStyles = (THEME: Palette) => StyleSheet.create({
   },
   nodeTitle: {
     fontSize: 16,
-    fontWeight: '700',
     fontFamily: fontFamilies.bold,
     color: THEME.text,
     marginBottom: 4,
@@ -328,7 +323,6 @@ const makeStyles = (THEME: Palette) => StyleSheet.create({
   },
   nodePreviewText: {
     fontSize: 13,
-    fontWeight: '700',
     fontFamily: fontFamilies.bold,
     color: THEME.primary,
   },
@@ -342,7 +336,6 @@ const makeStyles = (THEME: Palette) => StyleSheet.create({
   },
   sourcesTitle: {
     fontSize: 16,
-    fontWeight: '800',
     fontFamily: fontFamilies.heavy,
     color: THEME.text,
     marginBottom: 12,
@@ -357,7 +350,6 @@ const makeStyles = (THEME: Palette) => StyleSheet.create({
   },
   sourceTitle: {
     fontSize: 13,
-    fontWeight: '600',
     fontFamily: fontFamilies.semibold,
     color: THEME.text,
     marginBottom: 2,

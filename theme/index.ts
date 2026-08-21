@@ -70,3 +70,5 @@ export {
     zIndex,
 } from "./tokens";
 export type { Spacing, Radius } from "./tokens";
+
+export * from "./motion";

@@ -21,6 +21,9 @@ export const STORAGE_KEYS = {
   // Cache
   LEADERBOARD_CACHE: '@atomiq:leaderboard_cache',
   FEED_CACHE: '@atomiq:feed_cache',
+
+  // Achievements
+  ACHIEVEMENT_UNLOCKS: '@atomiq:achievement_unlocks',
 } as const;
 
 // Generic Storage Operations
@@ -164,6 +167,15 @@ export const getCacheWithTTL = async <T = any>(key: string): Promise<T | null> =
   return cached.data;
 };
 
+// Achievement unlocks
+export const getUnlockedAchievementIds = async (): Promise<number[] | null> => {
+  return await getItem<number[]>(STORAGE_KEYS.ACHIEVEMENT_UNLOCKS);
+};
+
+export const setUnlockedAchievementIds = async (ids: number[]): Promise<void> => {
+  await setItem(STORAGE_KEYS.ACHIEVEMENT_UNLOCKS, ids);
+};
+
 // Batch Operations
 export const setMultiple = async (items: [string, any][]): Promise<void> => {
   try {
@@ -220,5 +232,7 @@ export default {
   getCacheWithTTL,
   setMultiple,
   getMultiple,
+  getUnlockedAchievementIds,
+  setUnlockedAchievementIds,
 };
 

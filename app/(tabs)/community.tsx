@@ -6,10 +6,12 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Image as ExpoImage } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
+import * as Haptics from "expo-haptics";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import Animated, {
   Easing,
   useAnimatedStyle,
+  useReducedMotion,
   useSharedValue,
   withRepeat,
   withTiming,
@@ -135,9 +137,15 @@ export default function CommunityScreen() {
   const [bookmarkedIds, setBookmarkedIds] = useState<string[]>([]);
   const [allFeedItems, setAllFeedItems] = useState<any[]>([]);
 
+  const reducedMotion = useReducedMotion();
   const mascotY = useSharedValue(0);
   const mascotRotate = useSharedValue(0);
   useEffect(() => {
+    if (reducedMotion) {
+      mascotY.value = 0;
+      mascotRotate.value = 0;
+      return;
+    }
     mascotY.value = withRepeat(
       withTiming(-6, { duration: 2200, easing: Easing.inOut(Easing.sin) }),
       -1,
@@ -148,7 +156,7 @@ export default function CommunityScreen() {
       -1,
       true
     );
-  }, [mascotY, mascotRotate]);
+  }, [mascotY, mascotRotate, reducedMotion]);
   const mascotStyle = useAnimatedStyle(() => ({
     transform: [
       { translateY: mascotY.value },
@@ -221,6 +229,7 @@ export default function CommunityScreen() {
 
   const toggleBookmark = async (itemId: string) => {
     try {
+      void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       let newBookmarks: string[];
       if (bookmarkedIds.includes(itemId)) {
         newBookmarks = bookmarkedIds.filter((id) => id !== itemId);
@@ -234,8 +243,16 @@ export default function CommunityScreen() {
     }
   };
 
+  const selectFilter = useCallback((id: string) => {
+    if (id !== activeFilter) {
+      void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      setActiveFilter(id);
+    }
+  }, [activeFilter]);
+
   const openItem = useCallback(
     (item: any) => {
+      void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       router.push(`/article-detail?id=${item.id}`);
     },
     [router],
@@ -313,8 +330,19 @@ export default function CommunityScreen() {
         pointerEvents="none"
       />
 
-      {/* Header */}
+      {/* Header — enlarged mascot behind text (absolute, no layout) */}
       <View style={[styles.header, { paddingTop: insets.top + 16 }]}>
+        {/* Background mascot: 168px, behind text, still floating */}
+        <View style={styles.headerMascotWrap} pointerEvents="none">
+          <Animated.View style={mascotStyle}>
+            <ExpoImage
+              source={require("@/assets/images/mascot/discover.svg")}
+              style={styles.headerMascot}
+              contentFit="contain"
+            />
+          </Animated.View>
+        </View>
+
         <View style={styles.headerContent}>
           <View style={styles.headerTextContainer}>
             <Text style={styles.headerTitle}>Discovery Hub</Text>
@@ -322,37 +350,34 @@ export default function CommunityScreen() {
               Explore stories, facts, and breakthroughs
             </Text>
           </View>
-
-          <View style={styles.headerRight}>
-            <Animated.View style={mascotStyle}>
-              <ExpoImage
-                source={require("@/assets/images/mascot/discover.svg")}
-                style={styles.headerMascot}
-                contentFit="contain"
-              />
-            </Animated.View>
-          </View>
         </View>
 
-        {/* Search Bar */}
+        {/* Search Bar — premium card with amber icon pill */}
         <View style={styles.searchContainer}>
-          <Icon name="SearchNormal" size={18} color="#999" variant="Bold" />
+          <View style={styles.searchIconCircle}>
+            <Icon name="SearchNormal" size={18} color="#E67E22" variant="Bold" />
+          </View>
           <TextInput
             style={styles.searchInput}
             placeholder="Search stories, facts, and more..."
-            placeholderTextColor="#999"
+            placeholderTextColor="#9CA3AF"
             value={searchQuery}
             onChangeText={setSearchQuery}
+            returnKeyType="search"
           />
-          {searchQuery.length > 0 && (
-            <TouchableOpacity onPress={() => setSearchQuery("")}>
-              <Icon name="CloseCircle" size={18} color="#999" />
+          {searchQuery.length > 0 ? (
+            <TouchableOpacity
+              style={styles.searchClearButton}
+              onPress={() => setSearchQuery("")}
+              activeOpacity={0.85}
+            >
+              <Icon name="CloseCircle" size={16} color="#9CA3AF" variant="Bold" />
             </TouchableOpacity>
-          )}
+          ) : null}
         </View>
       </View>
 
-      {/* Category Pills */}
+      {/* Category Pills — 3D lip cards */}
       <View style={styles.categoryRow}>
         <ScrollView
           horizontal
@@ -365,12 +390,13 @@ export default function CommunityScreen() {
               styles.categoryChipIcon,
               activeFilter === "saved" && styles.categoryChipActive,
             ]}
-            onPress={() => setActiveFilter("saved")}
+            activeOpacity={0.85}
+            onPress={() => selectFilter("saved")}
           >
             <Icon
               name="Star"
               size={16}
-              color={activeFilter === "saved" ? "#FFFFFF" : "#888888"}
+              color={activeFilter === "saved" ? "#FFFFFF" : "#6B7280"}
               variant="Bold"
             />
           </TouchableOpacity>
@@ -380,7 +406,8 @@ export default function CommunityScreen() {
               styles.categoryChip,
               activeFilter === "all" && styles.categoryChipActive,
             ]}
-            onPress={() => setActiveFilter("all")}
+            activeOpacity={0.85}
+            onPress={() => selectFilter("all")}
           >
             <Text
               style={[
@@ -399,7 +426,8 @@ export default function CommunityScreen() {
                 styles.categoryChip,
                 activeFilter === cat.id && styles.categoryChipActive,
               ]}
-              onPress={() => setActiveFilter(cat.id)}
+              activeOpacity={0.85}
+              onPress={() => selectFilter(cat.id)}
             >
               <Text
                 style={[
@@ -430,6 +458,11 @@ export default function CommunityScreen() {
               style={styles.emptyMascot}
               resizeMode="contain"
             />
+            <View style={styles.emptyBadge}>
+              <Text style={styles.emptyBadgeText}>
+                {activeFilter === "saved" ? "Saved" : "No results"}
+              </Text>
+            </View>
             <Text style={styles.emptyText}>
               {activeFilter === "saved"
                 ? "No saved stories yet"
@@ -437,26 +470,35 @@ export default function CommunityScreen() {
             </Text>
             <Text style={styles.emptySubtext}>
               {activeFilter === "saved"
-                ? "Tap Save on a story to add it to your collection"
-                : "Try a different category or search term"}
+                ? "Tap the bookmark on a story to add it to your collection"
+                : "Try a different category or search term to discover more stories"}
             </Text>
+            {activeFilter !== "all" && activeFilter !== "saved" && (
+              <TouchableOpacity
+                style={styles.emptyAction}
+                activeOpacity={0.85}
+                onPress={() => selectFilter("all")}
+              >
+                <Icon name="Refresh" size={14} color="#E67E22" variant="Bold" />
+                <Text style={styles.emptyActionText}>Show all stories</Text>
+              </TouchableOpacity>
+            )}
           </View>
         }
         ListFooterComponent={
           activeFilter !== "saved" && visibleItems.length > 0 ? (
             <View style={styles.feedFooter}>
+              <View style={styles.footerIconCircle}>
+                <Icon name="TickCircle" size={24} color="#E67E22" variant="Bold" />
+              </View>
               <View style={styles.footerContent}>
-                <Icon name="Document" size={32} color={THEME.textMuted} />
-                <Text style={[styles.footerTitle, { color: THEME.text }]}>
-                  You&apos;re all caught up!
-                </Text>
-                <Text
-                  style={[styles.footerSubtext, { color: THEME.textMuted }]}
-                >
-                  More content coming soon. Stay tuned for the latest updates on
-                  nuclear science and technology.
+                <Text style={styles.footerTitle}>You&apos;re all caught up!</Text>
+                <Text style={styles.footerSubtext}>
+                  More stories, facts and breakthroughs are on the way. Check back
+                  soon for fresh discoveries from the world of nuclear science.
                 </Text>
               </View>
+              <View style={styles.footerDivider} />
             </View>
           ) : null
         }

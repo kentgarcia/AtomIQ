@@ -1043,14 +1043,12 @@ const createStyles = (theme: typeof LightCHAT_THEME) =>
     },
     headerTitle: {
       fontSize: 18,
-      fontWeight: "800",
       fontFamily: fontFamilies.heavy,
       color: theme.text,
     },
     headerSubtitle: {
       fontSize: 11,
       color: theme.textMuted,
-      fontWeight: "600",
       fontFamily: fontFamilies.semibold,
     },
     headerActions: {
@@ -1094,7 +1092,6 @@ const createStyles = (theme: typeof LightCHAT_THEME) =>
     conversationChipText: {
       fontSize: 12,
       color: theme.textMuted,
-      fontWeight: "700",
       fontFamily: fontFamilies.bold,
     },
     conversationChipTextActive: {
@@ -1154,7 +1151,6 @@ const createStyles = (theme: typeof LightCHAT_THEME) =>
     },
     userMessageText: {
       color: "#FFF",
-      fontWeight: "600",
       fontFamily: fontFamilies.semibold,
     },
     citationsContainer: {
@@ -1180,14 +1176,12 @@ const createStyles = (theme: typeof LightCHAT_THEME) =>
     citationsTitle: {
       fontSize: 11,
       color: theme.textMuted,
-      fontWeight: "700",
       fontFamily: fontFamilies.bold,
       marginBottom: 6,
     },
     citationText: {
       fontSize: 10,
       color: theme.primary,
-      fontWeight: "700",
       fontFamily: fontFamilies.bold,
     },
     followUpContainer: {
@@ -1199,7 +1193,6 @@ const createStyles = (theme: typeof LightCHAT_THEME) =>
     followUpTitle: {
       fontSize: 11,
       color: theme.textMuted,
-      fontWeight: "700",
       fontFamily: fontFamilies.bold,
       marginBottom: 8,
     },
@@ -1222,7 +1215,6 @@ const createStyles = (theme: typeof LightCHAT_THEME) =>
     followUpText: {
       fontSize: 11,
       color: theme.primary,
-      fontWeight: "600",
       fontFamily: fontFamilies.semibold,
     },
     errorContainer: {
@@ -1240,7 +1232,6 @@ const createStyles = (theme: typeof LightCHAT_THEME) =>
       flex: 1,
       fontSize: 12,
       color: "#DC2626",
-      fontWeight: "600",
       fontFamily: fontFamilies.semibold,
     },
     thinkingWrapper: {
@@ -1297,7 +1288,6 @@ const createStyles = (theme: typeof LightCHAT_THEME) =>
     suggestionText: {
       fontSize: 13,
       color: theme.text,
-      fontWeight: "700",
       fontFamily: fontFamilies.bold,
     },
     inputContainer: {

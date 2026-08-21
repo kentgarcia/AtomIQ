@@ -142,17 +142,14 @@ export const AssessmentView = ({
                       isSelected &&
                         !confirmed && {
                           color: theme.primary,
-                          fontWeight: "700",
                           fontFamily: fontFamilies.bold,
                         },
                       showCorrectMark && {
                         color: theme.success,
-                        fontWeight: "700",
                         fontFamily: fontFamilies.bold,
                       },
                       showWrongMark && {
                         color: theme.error,
-                        fontWeight: "700",
                         fontFamily: fontFamilies.bold,
                       },
                     ]}
