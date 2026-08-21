@@ -30,7 +30,6 @@ import {
     View,
 } from "react-native";
 import Animated, {
-    Easing,
     FadeIn,
     FadeInDown,
     FadeOut,
@@ -45,6 +44,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 // Modern Theme
 import { useTheme } from "@/theme";
+import { EASE_OUT } from "@/theme/motion";
 import { HowToPlayCard } from "@/components/games/HowToPlayCard";
 import { MAZE_BATTLE_ART, MonsterIcon, PlayerIcon } from "@/components/atom-maze/icons";
 import { styles } from "@/components/atom-maze/styles";
@@ -253,7 +253,6 @@ const toAtomMazeBossQuizQuestion = (
 
 const HP_BAR_SEGMENTS = 10;
 const HP_FILL_DURATION_MS = 380;
-const EASE_OUT = Easing.bezier(0.23, 1, 0.32, 1);
 
 const getHpBarColor = (ratio: number): string => {
   if (ratio > 0.5) return "#4ADE80";

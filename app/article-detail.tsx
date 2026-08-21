@@ -259,7 +259,6 @@ const createStyles = (theme: Palette, width: number) =>
     },
     errorText: {
       fontSize: 18,
-      fontWeight: "700",
       fontFamily: fontFamilies.bold,
       color: theme.text,
       marginTop: 16,
@@ -279,7 +278,6 @@ const createStyles = (theme: Palette, width: number) =>
     },
     backButtonText: {
       fontSize: 16,
-      fontWeight: "700",
       fontFamily: fontFamilies.bold,
       color: theme.primary,
     },
@@ -294,7 +292,6 @@ const createStyles = (theme: Palette, width: number) =>
     },
     externalLinkText: {
       fontSize: 13,
-      fontWeight: "700",
       fontFamily: fontFamilies.bold,
       color: theme.primary,
     },
@@ -322,14 +319,12 @@ const createStyles = (theme: Palette, width: number) =>
     },
     categoryText: {
       fontSize: 11,
-      fontWeight: "800",
       fontFamily: fontFamilies.heavy,
       color: theme.primary,
       letterSpacing: 0.5,
     },
     title: {
       fontSize: 28,
-      fontWeight: "800",
       fontFamily: fontFamilies.heavy,
       color: theme.text,
       lineHeight: 36,
@@ -337,7 +332,6 @@ const createStyles = (theme: Palette, width: number) =>
     },
     subtitle: {
       fontSize: 18,
-      fontWeight: "600",
       fontFamily: fontFamilies.semibold,
       color: theme.textMuted,
       lineHeight: 26,
@@ -370,7 +364,6 @@ const createStyles = (theme: Palette, width: number) =>
     },
     authorName: {
       fontSize: 16,
-      fontWeight: "700",
       fontFamily: fontFamilies.bold,
       color: theme.text,
       marginBottom: 2,
@@ -391,13 +384,11 @@ const createStyles = (theme: Palette, width: number) =>
     metaText: {
       fontSize: 12,
       color: theme.textMuted,
-      fontWeight: "600",
       fontFamily: fontFamilies.semibold,
     },
     publishedDate: {
       fontSize: 13,
       color: theme.textMuted,
-      fontWeight: "600",
       fontFamily: fontFamilies.semibold,
     },
     contentContainer: {
@@ -410,7 +401,6 @@ const createStyles = (theme: Palette, width: number) =>
     },
     tagsTitle: {
       fontSize: 14,
-      fontWeight: "800",
       fontFamily: fontFamilies.heavy,
       color: theme.text,
       marginBottom: 12,
@@ -428,7 +418,6 @@ const createStyles = (theme: Palette, width: number) =>
     },
     tagText: {
       fontSize: 13,
-      fontWeight: "600",
       fontFamily: fontFamilies.semibold,
       color: theme.textMuted,
     },
@@ -449,7 +438,6 @@ const createStyles = (theme: Palette, width: number) =>
     },
     sourceTitle: {
       fontSize: 13,
-      fontWeight: "800",
       fontFamily: fontFamilies.heavy,
       color: theme.text,
     },
@@ -467,7 +455,6 @@ const createStyles = (theme: Palette, width: number) =>
     },
     sourceLinkText: {
       fontSize: 14,
-      fontWeight: "700",
       fontFamily: fontFamilies.bold,
       color: theme.primary,
     },

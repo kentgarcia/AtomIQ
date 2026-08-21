@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useContext } from 'react';
 import { getLevelProgress, getAllLevels, getDailyActivity } from '@/services/database';
 import { getCurrentLevel, getCacheWithTTL } from '@/services/storage';
+import { toLocalIsoDate } from '@/services/utils';
 import { useStorage as useStorageContext } from '@/services/StorageContext';
 
 /**
@@ -117,10 +118,10 @@ export const useWeeklyActivity = () => {
   useEffect(() => {
     const loadActivity = async () => {
       try {
-        const endDate = new Date().toISOString().split('T')[0];
-        const startDate = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
-          .toISOString()
-          .split('T')[0];
+        const endDate = toLocalIsoDate();
+        const start = new Date();
+        start.setDate(start.getDate() - 7);
+        const startDate = toLocalIsoDate(start);
 
         const data = await getDailyActivity(startDate, endDate);
         setActivity(data);

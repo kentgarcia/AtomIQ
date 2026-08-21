@@ -9,9 +9,11 @@ import React from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import Animated, {
   useAnimatedStyle,
+  useReducedMotion,
   useSharedValue,
-  withSpring,
+  withTiming,
 } from "react-native-reanimated";
+import { EASE_OUT } from "@/theme/motion";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Svg, { Path } from "react-native-svg";
 
@@ -38,18 +40,27 @@ const TabButton = ({
   activeColor: string;
 }) => {
   const scale = useSharedValue(1);
+  const reducedMotion = useReducedMotion();
 
   const animatedStyle = useAnimatedStyle(() => {
     return {
-      transform: [{ scale: scale.value }],
+      transform: [{ scale: reducedMotion ? 1 : scale.value }],
     };
   });
 
   const handlePress = () => {
     void playButtonClickSfx();
-    scale.value = withSpring(0.9, { damping: 10 }, () => {
-      scale.value = withSpring(1, { damping: 10 });
-    });
+    if (reducedMotion) {
+      scale.value = withTiming(0.99, { duration: 100, easing: EASE_OUT });
+      setTimeout(() => {
+        scale.value = withTiming(1, { duration: 120, easing: EASE_OUT });
+      }, 100);
+    } else {
+      scale.value = withTiming(0.97, { duration: 100, easing: EASE_OUT });
+      setTimeout(() => {
+        scale.value = withTiming(1, { duration: 160, easing: EASE_OUT });
+      }, 100);
+    }
     onPress();
   };
 

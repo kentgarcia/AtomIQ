@@ -26,13 +26,13 @@ import {
 } from "react-native";
 import Animated, {
     cancelAnimation,
-    Easing,
     FadeIn,
     FadeInDown,
     FadeOut,
     FadeOutDown,
     LinearTransition,
     useAnimatedStyle,
+    useReducedMotion,
     useSharedValue,
     withRepeat,
     withTiming,
@@ -40,6 +40,7 @@ import Animated, {
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Svg, { Path, Polygon, Polyline } from "react-native-svg";
+import { DURATION, EASE_OUT, PRESS_EASING } from "@/theme/motion";
 
 const NODE_SIZE = 79;
 const NODE_ROW_GAP = 120;
@@ -105,12 +106,6 @@ type CardUnit = {
   unit: PathUnit;
   y: number;
 };
-
-/* Reference press transition: 0.15s cubic-bezier(0.4, 0, 0.2, 1) */
-const PRESS_EASING = Easing.bezier(0.4, 0, 0.2, 1);
-
-/* Standard UI ease-out (fade up, settle) for state-driven fills */
-const EASE_OUT = Easing.bezier(0.23, 1, 0.32, 1);
 
 /* Scroll offset that centers a node in the visible area. */
 const computeNodeScrollY = (
@@ -291,7 +286,7 @@ const UNIT_INFO_DATA: Record<string, { info: string; references: string[] }> = {
 export default function HomeScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { userProfile } = useStorage();
+  const { userProfile, levelUpLevel, dismissLevelUp } = useStorage();
   const { levels, loading, refresh } = useAllLevels();
   const {
     missions,
@@ -305,6 +300,7 @@ export default function HomeScreen() {
   const { width, height: windowHeight } = useWindowDimensions();
   const THEME = theme.palettes.tab;
   const styles = useMemo(() => createStyles(THEME), [THEME]);
+  const reducedMotion = useReducedMotion();
 
   // Autumn gradient background (cream → white, like the reference design)
   const bgTop = theme.mode === "dark" ? THEME.bg : "#FFF3E0";
@@ -348,13 +344,18 @@ export default function HomeScreen() {
     transform: [{ scaleX: Math.max(0.08, fill.get()) }],
   }));
   useEffect(() => {
-    fill.set(
-      withTiming(missions.length ? completedCount / missions.length : 0, {
-        duration: 300,
-        easing: EASE_OUT,
-      }),
-    );
-  }, [fill, missions.length, completedCount]);
+    const target = missions.length ? completedCount / missions.length : 0;
+    if (reducedMotion) {
+      fill.set(target);
+    } else {
+      fill.set(
+        withTiming(target, {
+          duration: 300,
+          easing: EASE_OUT,
+        }),
+      );
+    }
+  }, [fill, missions.length, completedCount, reducedMotion]);
 
   const claimMission = useCallback(
     async (mission: MissionView) => {
@@ -639,7 +640,7 @@ const handleScroll = useCallback(
         {/* One rounded amber card holding the header row and the lesson card —
             layout-animated so the daily panels morph the card open, not pop in */}
         <Animated.View
-          layout={LinearTransition.duration(260).easing(EASE_OUT)}
+          layout={reducedMotion ? undefined : LinearTransition.duration(DURATION.medium).easing(EASE_OUT)}
           style={styles.headerBar}
         >
           <View style={styles.headerRow}>
@@ -659,7 +660,6 @@ const handleScroll = useCallback(
               </Text>
             </View>
 
-            {/* XP */}
             <View style={styles.xpPill}>
               <Icon name="Flash" size={15} color="#FFA000" variant="Bold" />
               <Text style={styles.xpText}>
@@ -716,7 +716,7 @@ const handleScroll = useCallback(
 
               return (
                 <Animated.View
-                  layout={LinearTransition.duration(260).easing(EASE_OUT)}
+                  layout={reducedMotion ? undefined : LinearTransition.duration(DURATION.medium).easing(EASE_OUT)}
                   style={styles.nowCard}
                 >
                   <View style={styles.nowCardRow}>
@@ -724,7 +724,7 @@ const handleScroll = useCallback(
                         title/subtitle instead of snapping */}
                     <View style={styles.nowCardText} key={activeUnit.id}>
                       <Animated.View
-                        entering={FadeIn.duration(200)}
+                        entering={reducedMotion ? FadeIn.duration(120) : FadeIn.duration(200)}
                         exiting={FadeOut.duration(150)}
                       >
                         <Text style={styles.unitSubtitle} numberOfLines={1}>
@@ -773,7 +773,7 @@ const handleScroll = useCallback(
                   {/* Unit info expands inside the card — no modal */}
                   {infoOpen && unitInfo?.info && (
                     <Animated.View
-                      entering={FadeIn.duration(200)}
+                      entering={reducedMotion ? FadeIn.duration(120) : FadeIn.duration(200)}
                       exiting={FadeOut.duration(160)}
                       style={styles.infoSection}
                     >
@@ -833,7 +833,7 @@ const handleScroll = useCallback(
           {/* Daily missions panel — claims happen right here */}
           {dailyPanel === "missions" && (
             <Animated.View
-              entering={FadeIn.duration(200)}
+              entering={reducedMotion ? FadeIn.duration(120) : FadeIn.duration(200)}
               exiting={FadeOut.duration(160)}
               style={styles.dailyPanel}
             >
@@ -878,7 +878,7 @@ const handleScroll = useCallback(
                     </View>
                     {mission.isClaimed ? (
                       <Animated.View
-                        entering={ZoomIn.duration(200)}
+                        entering={reducedMotion ? FadeIn.duration(120) : ZoomIn.duration(200)}
                         style={styles.claimedPill}
                       >
                         <Icon
@@ -984,7 +984,7 @@ const handleScroll = useCallback(
               <View style={styles.factAction}>
                 {factClaimed ? (
                   <Animated.View
-                    entering={ZoomIn.duration(200)}
+                    entering={reducedMotion ? FadeIn.duration(120) : ZoomIn.duration(200)}
                     style={styles.factReadPill}
                   >
                     <Icon
@@ -1014,7 +1014,7 @@ const handleScroll = useCallback(
       {/* Floating "jump to current lesson" arrow */}
       {arrowDir && currentUnitIndex !== -1 && (
         <Animated.View
-          entering={FadeInDown.duration(250)}
+          entering={reducedMotion ? FadeIn.duration(120) : FadeInDown.duration(250)}
           exiting={FadeOutDown.duration(200)}
           style={[styles.nextBtn, { bottom: insets.bottom + 130 }]}
 >
@@ -1035,6 +1035,34 @@ const handleScroll = useCallback(
             </View>
           </Animated.View>
         )}
+
+      {/* Level-up celebration — pops once when XP crosses a level boundary */}
+      {levelUpLevel !== null && (
+        <View style={styles.levelUpOverlay}>
+          <Animated.View
+            entering={reducedMotion ? FadeIn.duration(120) : ZoomIn.duration(250)}
+            exiting={FadeOut.duration(180)}
+            style={styles.levelUpCard}
+          >
+            <View style={styles.levelUpCrown}>
+              <Icon name="Crown1" size={30} color="#FFC107" variant="Bold" />
+            </View>
+            <Text style={styles.levelUpLabel}>LEVEL UP!</Text>
+            <Text style={styles.levelUpValue}>Level {levelUpLevel}</Text>
+<Text style={styles.levelUpSub}>
+            You&apos;ve reached a new tier of nuclear mastery. Keep earning XP
+            to level up again!
+          </Text>
+            <TouchableOpacity
+              style={styles.levelUpBtn}
+              activeOpacity={0.85}
+              onPress={dismissLevelUp}
+            >
+              <Text style={styles.levelUpBtnText}>Keep Going</Text>
+            </TouchableOpacity>
+          </Animated.View>
+        </View>
+      )}
     </View>
   );
 }
@@ -1063,8 +1091,14 @@ const LessonNode = ({
 
   const pulse = useSharedValue(1);
   const pressed = useSharedValue(0);
+  const reducedMotion = useReducedMotion();
 
   useEffect(() => {
+    if (reducedMotion) {
+      cancelAnimation(pulse);
+      pulse.set(1);
+      return;
+    }
     if (isCurrent) {
       // Loop the "next up" pulse while this node is the current lesson
       pulse.value = withRepeat(withTiming(1.12, { duration: 800 }), -1, true);
@@ -1074,15 +1108,23 @@ const LessonNode = ({
       cancelAnimation(pulse);
       pulse.set(1);
     }
-  }, [isCurrent]);
+  }, [isCurrent, reducedMotion]);
 
   // Reference :active — button sinks, lip shallows, badge follows it down
   const handlePressIn = useCallback(() => {
-    pressed.value = withTiming(1, { duration: 150, easing: PRESS_EASING });
-  }, [pressed]);
+    if (reducedMotion) {
+      pressed.value = withTiming(0.4, { duration: 120, easing: PRESS_EASING });
+    } else {
+      pressed.value = withTiming(1, { duration: DURATION.press, easing: PRESS_EASING });
+    }
+  }, [pressed, reducedMotion]);
   const handlePressOut = useCallback(() => {
-    pressed.value = withTiming(0, { duration: 150, easing: PRESS_EASING });
-  }, [pressed]);
+    if (reducedMotion) {
+      pressed.value = withTiming(0, { duration: 120, easing: PRESS_EASING });
+    } else {
+      pressed.value = withTiming(0, { duration: DURATION.press, easing: PRESS_EASING });
+    }
+  }, [pressed, reducedMotion]);
 
   const nodeStyle = useAnimatedStyle(() => ({
     transform: [
@@ -1179,7 +1221,7 @@ const LessonNode = ({
 
       {isFirst && (
         <Animated.View
-          entering={FadeInDown.delay(300)}
+          entering={reducedMotion ? FadeIn.duration(120) : FadeInDown.delay(300)}
           style={styles.startBubble}
         >
           <Text style={styles.startText}>START</Text>
@@ -1254,7 +1296,6 @@ const createStyles = (theme: Palette) =>
     },
     greetingLabel: {
       fontSize: 11,
-      fontWeight: "600",
       fontFamily: fontFamilies.semibold,
       color: "#724D06",
       textTransform: "uppercase",
@@ -1263,7 +1304,6 @@ const createStyles = (theme: Palette) =>
     },
     greetingName: {
       fontSize: 17,
-      fontWeight: "800",
       fontFamily: fontFamilies.heavy,
       color: "#724D06",
     },
@@ -1278,7 +1318,6 @@ const createStyles = (theme: Palette) =>
     },
     xpText: {
       fontSize: 13,
-      fontWeight: "800",
       fontFamily: fontFamilies.heavy,
       color: "#FFFFFF",
     },
@@ -1311,7 +1350,6 @@ const createStyles = (theme: Palette) =>
     },
     infoLabel: {
       fontSize: 10,
-      fontWeight: "700",
       fontFamily: fontFamilies.heavy,
       color: "#9CA3AF",
       textTransform: "uppercase",
@@ -1417,7 +1455,6 @@ const createStyles = (theme: Palette) =>
       shadowRadius: 4,
     },
     startText: {
-      fontWeight: "800",
       fontFamily: fontFamilies.heavy,
       color: theme.primary,
       fontSize: 13,
@@ -1451,7 +1488,6 @@ const createStyles = (theme: Palette) =>
     },
     unitDividerText: {
       fontSize: 13,
-      fontWeight: "800",
       fontFamily: fontFamilies.heavy,
       color: theme.textMuted,
       textTransform: "uppercase",
@@ -1459,7 +1495,6 @@ const createStyles = (theme: Palette) =>
     },
     unitSubtitle: {
       fontSize: 11,
-      fontWeight: "600",
       fontFamily: fontFamilies.semibold,
       color: "#888888",
       textTransform: "uppercase",
@@ -1468,7 +1503,6 @@ const createStyles = (theme: Palette) =>
     },
     unitTitle: {
       fontSize: 20,
-      fontWeight: "700",
       fontFamily: fontFamilies.heavy,
       color: "#333333",
     },
@@ -1553,7 +1587,6 @@ const createStyles = (theme: Palette) =>
     },
     panelTitle: {
       fontSize: 15,
-      fontWeight: "800",
       fontFamily: fontFamilies.heavy,
       color: "#333333",
     },
@@ -1593,7 +1626,6 @@ const createStyles = (theme: Palette) =>
     },
     missionTitle: {
       fontSize: 13,
-      fontWeight: "800",
       fontFamily: fontFamilies.heavy,
       color: "#333333",
     },
@@ -1619,7 +1651,6 @@ const createStyles = (theme: Palette) =>
     },
     actionBtnText: {
       fontSize: 12,
-      fontWeight: "800",
       fontFamily: fontFamilies.heavy,
       color: "#FFFFFF",
     },
@@ -1641,7 +1672,6 @@ const createStyles = (theme: Palette) =>
     },
     claimedText: {
       fontSize: 12,
-      fontWeight: "800",
       fontFamily: fontFamilies.heavy,
       color: "#FFFFFF",
     },
@@ -1684,14 +1714,12 @@ const createStyles = (theme: Palette) =>
     },
     factBadgeText: {
       fontSize: 10,
-      fontWeight: "800",
       fontFamily: fontFamilies.heavy,
       color: "#FFFFFF",
       letterSpacing: 0.6,
     },
     factTitle: {
       fontSize: 14,
-      fontWeight: "800",
       fontFamily: fontFamilies.heavy,
       color: "#333333",
     },
@@ -1706,13 +1734,11 @@ const createStyles = (theme: Palette) =>
     },
     rewardText: {
       fontSize: 11,
-      fontWeight: "800",
       fontFamily: fontFamilies.heavy,
       color: "#E67E22",
     },
     factStatement: {
       fontSize: 15,
-      fontWeight: "700",
       fontFamily: fontFamilies.bold,
       color: "#1F2937",
       lineHeight: 23,
@@ -1724,7 +1750,6 @@ const createStyles = (theme: Palette) =>
     },
     factExplainLabel: {
       fontSize: 10,
-      fontWeight: "700",
       fontFamily: fontFamilies.heavy,
       color: "#9CA3AF",
       textTransform: "uppercase",
@@ -1755,7 +1780,6 @@ const createStyles = (theme: Palette) =>
     },
     factReadBtnText: {
       fontSize: 13,
-      fontWeight: "800",
       fontFamily: fontFamilies.heavy,
       color: "#FFFFFF",
     },
@@ -1770,7 +1794,6 @@ const createStyles = (theme: Palette) =>
     },
     factReadText: {
       fontSize: 13,
-      fontWeight: "800",
       fontFamily: fontFamilies.heavy,
       color: "#FFFFFF",
     },
@@ -1798,7 +1821,6 @@ const createStyles = (theme: Palette) =>
     missionBadgeText: {
       color: "#FFFFFF",
       fontSize: 11,
-      fontWeight: "800",
       fontFamily: fontFamilies.heavy,
     },
     referenceItem: {
@@ -1818,7 +1840,76 @@ const createStyles = (theme: Palette) =>
       flex: 1,
       fontSize: 13,
       color: theme.primary,
-      fontWeight: "500",
       fontFamily: fontFamilies.medium,
+    },
+    /* Level-up celebration overlay */
+    levelUpOverlay: {
+      ...StyleSheet.absoluteFillObject,
+      backgroundColor: "rgba(0, 0, 0, 0.45)",
+      alignItems: "center",
+      justifyContent: "center",
+      paddingHorizontal: 28,
+      zIndex: 50,
+    },
+    levelUpCard: {
+      width: "100%",
+      maxWidth: 340,
+      backgroundColor: "rgba(255, 255, 255, 0.97)",
+      borderRadius: 26,
+      paddingVertical: 30,
+      paddingHorizontal: 26,
+      alignItems: "center",
+      elevation: 12,
+      shadowColor: "#000000",
+      shadowOffset: { width: 0, height: 10 },
+      shadowOpacity: 0.25,
+      shadowRadius: 24,
+    },
+    levelUpCrown: {
+      width: 72,
+      height: 72,
+      borderRadius: 36,
+      backgroundColor: "#FFF8E1",
+      borderWidth: 3,
+      borderColor: "#FFE082",
+      alignItems: "center",
+      justifyContent: "center",
+      marginBottom: 14,
+    },
+    levelUpLabel: {
+      fontSize: 13,
+      fontFamily: fontFamilies.heavy,
+      color: "#E67E22",
+      letterSpacing: 2,
+      textTransform: "uppercase",
+      marginBottom: 6,
+    },
+    levelUpValue: {
+      fontSize: 30,
+      fontFamily: fontFamilies.heavy,
+      color: "#333333",
+      marginBottom: 10,
+    },
+    levelUpSub: {
+      fontSize: 13,
+      fontFamily: fontFamilies.regular,
+      color: "#888888",
+      textAlign: "center",
+      lineHeight: 20,
+      marginBottom: 20,
+    },
+    levelUpBtn: {
+      alignSelf: "stretch",
+      alignItems: "center",
+      paddingVertical: 13,
+      borderRadius: 15,
+      backgroundColor: BTN_COLOR,
+      borderBottomWidth: 4,
+      borderBottomColor: BTN_LIP,
+    },
+    levelUpBtnText: {
+      fontSize: 15,
+      fontFamily: fontFamilies.heavy,
+      color: "#FFFFFF",
     },
   });

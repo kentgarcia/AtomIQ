@@ -449,7 +449,6 @@ const mythStyles = StyleSheet.create({
   headerText: {
     color: "#FFF",
     fontSize: 16,
-    fontWeight: "800",
     fontFamily: fontFamilies.heavy,
     letterSpacing: 1,
   },
@@ -486,13 +485,11 @@ const mythStyles = StyleSheet.create({
   },
   indicatorTextLeft: {
     color: THEME.error,
-    fontWeight: "800",
     fontFamily: fontFamilies.heavy,
     fontSize: 14,
   },
   indicatorTextRight: {
     color: THEME.success,
-    fontWeight: "800",
     fontFamily: fontFamilies.heavy,
     fontSize: 14,
   },
@@ -545,7 +542,6 @@ const mythStyles = StyleSheet.create({
   },
   questionMark: {
     fontSize: 32,
-    fontWeight: "900",
     fontFamily: fontFamilies.black,
     color: THEME.primary,
   },
@@ -556,14 +552,12 @@ const mythStyles = StyleSheet.create({
   quoteOpen: {
     fontSize: 48,
     color: "rgba(239,68,68,0.2)",
-    fontWeight: "900",
     fontFamily: fontFamilies.black,
     lineHeight: 48,
     marginBottom: -10,
   },
   mythText: {
     fontSize: 22,
-    fontWeight: "700",
     fontFamily: fontFamilies.bold,
     color: THEME.text,
     textAlign: "center",
@@ -573,7 +567,6 @@ const mythStyles = StyleSheet.create({
   quoteClose: {
     fontSize: 48,
     color: "rgba(239,68,68,0.2)",
-    fontWeight: "900",
     fontFamily: fontFamilies.black,
     lineHeight: 48,
     marginTop: -10,
@@ -603,7 +596,6 @@ const mythStyles = StyleSheet.create({
   },
   speakBtnText: {
     color: THEME.primary,
-    fontWeight: "700",
     fontFamily: fontFamilies.bold,
     fontSize: 14,
   },
@@ -627,7 +619,6 @@ const mythStyles = StyleSheet.create({
     gap: 4,
   },
   swipeHintText: {
-    fontWeight: "700",
     fontFamily: fontFamilies.bold,
     fontSize: 12,
   },
@@ -667,7 +658,6 @@ const mythStyles = StyleSheet.create({
   },
   feedbackTitle: {
     fontSize: 32,
-    fontWeight: "900",
     fontFamily: fontFamilies.black,
     color: "#FFF",
     marginBottom: 8,
@@ -693,7 +683,6 @@ const mythStyles = StyleSheet.create({
   },
   explanationLabel: {
     fontSize: 12,
-    fontWeight: "800",
     fontFamily: fontFamilies.heavy,
     color: THEME.text,
     flex: 1,
@@ -719,7 +708,6 @@ const mythStyles = StyleSheet.create({
   },
   realityLabel: {
     fontSize: 12,
-    fontWeight: "800",
     fontFamily: fontFamilies.heavy,
     color: THEME.text,
     marginBottom: 6,
@@ -728,7 +716,6 @@ const mythStyles = StyleSheet.create({
     fontSize: 14,
     color: THEME.text,
     lineHeight: 20,
-    fontWeight: "600",
     fontFamily: fontFamilies.semibold,
   },
   continueBtn: {
@@ -750,7 +737,6 @@ const mythStyles = StyleSheet.create({
   },
   continueBtnText: {
     fontSize: 16,
-    fontWeight: "800",
     fontFamily: fontFamilies.heavy,
   },
 });
@@ -935,7 +921,6 @@ export const AssessmentRenderer = ({
                 <Text
                   style={[
                     styles.quizOptionText,
-                    (confirmed || selected === index) && { fontWeight: "700", fontFamily: fontFamilies.bold },
                   ]}
                 >
                   {opt}
@@ -1036,7 +1021,6 @@ const styles = StyleSheet.create({
   },
   stepHeader: {
     fontSize: 14,
-    fontWeight: "800",
     fontFamily: fontFamilies.heavy,
     color: THEME.primary,
     textAlign: "center",
@@ -1065,7 +1049,6 @@ const styles = StyleSheet.create({
   },
   briefingTitle: {
     fontSize: 28,
-    fontWeight: "800",
     fontFamily: fontFamilies.heavy,
     color: THEME.text,
     textAlign: "center",
@@ -1117,13 +1100,11 @@ const styles = StyleSheet.create({
   },
   mythBadgeText: {
     color: "#FFF",
-    fontWeight: "800",
     fontFamily: fontFamilies.heavy,
     fontSize: 12,
   },
   mythText: {
     fontSize: 24,
-    fontWeight: "700",
     fontFamily: fontFamilies.bold,
     color: THEME.text,
     textAlign: "center",
@@ -1165,7 +1146,6 @@ const styles = StyleSheet.create({
   },
   feedbackTitle: {
     fontSize: 32,
-    fontWeight: "800",
     fontFamily: fontFamilies.heavy,
     color: "#FFF",
     marginTop: 16,
@@ -1187,7 +1167,6 @@ const styles = StyleSheet.create({
   },
   realityLabel: {
     fontSize: 12,
-    fontWeight: "800",
     fontFamily: fontFamilies.heavy,
     color: "#FFF",
     marginBottom: 8,
@@ -1195,7 +1174,6 @@ const styles = StyleSheet.create({
   realityText: {
     fontSize: 14,
     color: "#FFF",
-    fontWeight: "600",
     fontFamily: fontFamilies.semibold,
   },
   continueBtn: {
@@ -1208,7 +1186,6 @@ const styles = StyleSheet.create({
   },
   continueBtnText: {
     fontSize: 16,
-    fontWeight: "800",
     fontFamily: fontFamilies.heavy,
     color: THEME.text,
   },
@@ -1229,7 +1206,6 @@ const styles = StyleSheet.create({
   },
   conceptTitle: {
     fontSize: 22,
-    fontWeight: "800",
     fontFamily: fontFamilies.heavy,
     color: THEME.text,
     marginBottom: 12,
@@ -1246,7 +1222,6 @@ const styles = StyleSheet.create({
   },
   keyPointsTitle: {
     fontSize: 14,
-    fontWeight: "800",
     fontFamily: fontFamilies.heavy,
     color: THEME.primary,
     marginBottom: 12,
@@ -1275,7 +1250,6 @@ const styles = StyleSheet.create({
   },
   taskText: {
     fontSize: 18,
-    fontWeight: "700",
     fontFamily: fontFamilies.bold,
     color: THEME.text,
     textAlign: "center",
@@ -1306,7 +1280,6 @@ const styles = StyleSheet.create({
   },
   optionText: {
     fontSize: 14,
-    fontWeight: "700",
     fontFamily: fontFamilies.bold,
     color: THEME.text,
     textAlign: "center",
@@ -1335,7 +1308,6 @@ const styles = StyleSheet.create({
   },
   questionText: {
     fontSize: 20,
-    fontWeight: "700",
     fontFamily: fontFamilies.bold,
     color: THEME.text,
     marginBottom: 24,
@@ -1405,13 +1377,11 @@ const styles = StyleSheet.create({
   },
   mainBtnText: {
     fontSize: 16,
-    fontWeight: "800",
     fontFamily: fontFamilies.heavy,
     color: "#FFF",
   },
   successTitle: {
     fontSize: 32,
-    fontWeight: "800",
     fontFamily: fontFamilies.heavy,
     color: THEME.primary,
     marginBottom: 12,
@@ -1442,7 +1412,6 @@ const styles = StyleSheet.create({
   },
   rewardText: {
     fontSize: 18,
-    fontWeight: "800",
     fontFamily: fontFamilies.heavy,
     color: THEME.text,
   },

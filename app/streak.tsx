@@ -144,8 +144,8 @@ export default function StreakScreen() {
             <Text style={styles.heroValue}>{currentStreak} day streak</Text>
             <Text style={styles.heroSub}>
               {currentStreak > 0
-                ? "You're on fire! Keep learning daily to grow it."
-                : "Complete a lesson today to start a new streak!"}
+                ? "You're on fire! Open AtomIQ every day to keep it growing."
+                : "Open AtomIQ today to start a new streak!"}
             </Text>
             <View style={styles.longestPill}>
               <Icon name="Cup" size={16} color="#E67E22" variant="Bold" />
@@ -197,7 +197,7 @@ export default function StreakScreen() {
             {[
               {
                 icon: "Book",
-                text: "Finish at least one lesson or quiz each day.",
+                text: "Open the app once a day — every check-in counts as an active day.",
               },
               {
                 icon: "CalendarTick",
@@ -308,7 +308,6 @@ const createStyles = () =>
     },
     heroValue: {
       fontSize: 24,
-      fontWeight: "800",
       fontFamily: fontFamilies.heavy,
       color: "#333333",
       marginTop: 10,
@@ -333,13 +332,11 @@ const createStyles = () =>
     },
     longestText: {
       fontSize: 13,
-      fontWeight: "800",
       fontFamily: fontFamilies.heavy,
       color: "#E67E22",
     },
     cardTitle: {
       fontSize: 16,
-      fontWeight: "800",
       fontFamily: fontFamilies.heavy,
       color: "#333333",
       alignSelf: "flex-start",
@@ -371,7 +368,6 @@ const createStyles = () =>
     },
     dayLabel: {
       fontSize: 12,
-      fontWeight: "600",
       fontFamily: fontFamilies.semibold,
       color: "#888888",
     },

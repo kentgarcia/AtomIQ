@@ -309,7 +309,6 @@ const styles = StyleSheet.create({
     lineHeight: 22,
   },
   bold: {
-    fontWeight: "800",
     fontFamily: fontFamilies.heavy,
   },
   italic: {
@@ -339,12 +338,10 @@ const styles = StyleSheet.create({
   link: {
     color: "#EA580C",
     textDecorationLine: "underline",
-    fontWeight: "600",
     fontFamily: fontFamilies.semibold,
   },
   h1: {
     fontSize: 24,
-    fontWeight: "800",
     fontFamily: fontFamilies.heavy,
     marginTop: 16,
     marginBottom: 8,
@@ -352,7 +349,6 @@ const styles = StyleSheet.create({
   },
   h2: {
     fontSize: 20,
-    fontWeight: "800",
     fontFamily: fontFamilies.heavy,
     marginTop: 12,
     marginBottom: 6,
@@ -360,7 +356,6 @@ const styles = StyleSheet.create({
   },
   h3: {
     fontSize: 18,
-    fontWeight: "700",
     fontFamily: fontFamilies.bold,
     marginTop: 10,
     marginBottom: 4,

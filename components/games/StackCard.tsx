@@ -132,7 +132,6 @@ const styles = StyleSheet.create({
     cardTitle: {
         fontSize: 26,
         fontFamily: fontFamilies.heavy,
-        fontWeight: "900",
         color: "#333333",
         letterSpacing: -0.5,
     },

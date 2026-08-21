@@ -2,98 +2,31 @@
  * Common storage utilities and helper functions
  */
 
-import { updateLevelProgress, logDailyActivity, getUserProfile } from './database';
-import { setCurrentLevel, getLastActiveDate } from './storage';
+import { getLastActiveDate } from './storage';
 
 /**
- * Complete a lesson and update all related data
+ * Local timezone ISO date (YYYY-MM-DD). Day boundaries follow the device
+ * clock so "today" is always the local day — required for streaks and
+ * daily activity to match what users actually see.
  */
-export const completeLessonFlow = async (
-  levelId: string,
-  xpEarned: number,
-  stars: number,
-  updateUserProfile: (updates: any) => Promise<void>,
-  addXP: (amount: number) => Promise<void>,
-  userProfile: any
-) => {
-  try {
-    // 1. Update level progress
-    await updateLevelProgress(levelId, {
-      status: 'completed',
-      xp_earned: xpEarned,
-      stars: stars,
-      completed_at: new Date().toISOString()
-    });
-
-    // 2. Add XP to user
-    await addXP(xpEarned);
-
-    // 3. Increment lessons completed
-    if (userProfile) {
-      await updateUserProfile({
-        lessons_completed: userProfile.lessons_completed + 1
-      });
-    }
-
-    // 4. Log daily activity
-    const today = new Date().toISOString().split('T')[0];
-    await logDailyActivity(today, {
-      xp_earned: xpEarned,
-      lessons_completed: 1,
-      time_spent_minutes: 5 // Can be tracked more accurately
-    });
-
-    return { success: true };
-  } catch (error) {
-    console.error('Error completing lesson:', error);
-    return { success: false, error };
-  }
-};
+export const toLocalIsoDate = (date: Date = new Date()): string =>
+  `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(
+    date.getDate(),
+  ).padStart(2, '0')}`;
 
 /**
- * Start a lesson and mark as in progress
+ * Whole days between two stored dates, using local midnight. Handles
+ * legacy full-timestamp values and DST shifts of ±1h between days.
  */
-export const startLessonFlow = async (levelId: string) => {
-  try {
-    // Save current level for Resume functionality
-    await setCurrentLevel(levelId);
+const wholeDaysBetween = (fromIso: string, toIso: string): number | null => {
+  const from = new Date(`${String(fromIso).slice(0, 10)}T00:00:00`);
+  const to = new Date(`${String(toIso).slice(0, 10)}T00:00:00`);
 
-    // Update level status
-    await updateLevelProgress(levelId, {
-      status: 'in_progress'
-    });
-
-    return { success: true };
-  } catch (error) {
-    console.error('Error starting lesson:', error);
-    return { success: false, error };
+  if (Number.isNaN(from.getTime()) || Number.isNaN(to.getTime())) {
+    return null;
   }
-};
 
-/**
- * Record a myth being busted
- */
-export const bustMythFlow = async (
-  updateUserProfile: (updates: any) => Promise<void>,
-  userProfile: any
-) => {
-  try {
-    if (userProfile) {
-      await updateUserProfile({
-        myths_busted: userProfile.myths_busted + 1
-      });
-
-      const today = new Date().toISOString().split('T')[0];
-      await logDailyActivity(today, {
-        myths_busted: 1
-      });
-    }
-
-    return { success: true };
-  } catch (error) {
-    console.error('Error busting myth:', error);
-    return { success: false, error };
-  }
+  return Math.round((to.getTime() - from.getTime()) / 86_400_000);
 };
 
 /**
@@ -106,19 +39,21 @@ export const checkDailyStreak = async (
 ) => {
   try {
     const lastActive = await getLastActiveDate();
-    const today = new Date().toISOString().split('T')[0];
+    const today = toLocalIsoDate();
 
     if (!lastActive) {
-      // First time user
+      // First day using the app — today counts as day 1 of the streak
       await incrementStreak();
       return { streakIncremented: true, streakBroken: false };
     }
 
-    const lastDate = new Date(lastActive);
-    const todayDate = new Date(today);
-    const diffDays = Math.floor(
-      (todayDate.getTime() - lastDate.getTime()) / (1000 * 60 * 60 * 24)
-    );
+    const diffDays = wholeDaysBetween(lastActive, today);
+
+    if (diffDays === null) {
+      // Unreadable stored date — restart the streak from today
+      await incrementStreak();
+      return { streakIncremented: true, streakBroken: false };
+    }
 
     if (diffDays === 1) {
       // Consecutive day - increment streak
@@ -126,7 +61,7 @@ export const checkDailyStreak = async (
       return { streakIncremented: true, streakBroken: false };
     } else if (diffDays > 1) {
       // Streak broken - reset
-      if (userProfile) {
+      if (userProfile?.current_streak > 0) {
         await updateUserProfile({ current_streak: 0 });
       }
       return { streakIncremented: false, streakBroken: true };
@@ -140,158 +75,7 @@ export const checkDailyStreak = async (
   }
 };
 
-/**
- * Get formatted stats for display
- */
-export const getFormattedStats = async () => {
-  try {
-    const profile = await getUserProfile();
-    
-    if (!profile) {
-      return {
-        totalXP: 0,
-        currentStreak: 0,
-        longestStreak: 0,
-        mythsBusted: 0,
-        lessonsCompleted: 0,
-        rank: 'Beginner'
-      };
-    }
-
-    // Determine rank based on XP
-    let rank = 'Beginner';
-    const xp = (profile as any).total_xp || 0;
-    
-    if (xp >= 5000) rank = 'Nuclear Expert';
-    else if (xp >= 2000) rank = 'Reactor Operator';
-    else if (xp >= 1000) rank = 'Nuclear Technician';
-    else if (xp >= 500) rank = 'Lab Assistant';
-    else if (xp >= 100) rank = 'Student';
-
-    return {
-      totalXP: (profile as any).total_xp || 0,
-      currentStreak: (profile as any).current_streak || 0,
-      longestStreak: (profile as any).longest_streak || 0,
-      mythsBusted: (profile as any).myths_busted || 0,
-      lessonsCompleted: (profile as any).lessons_completed || 0,
-      rank
-    };
-  } catch (error) {
-    console.error('Error getting formatted stats:', error);
-    return {
-      totalXP: 0,
-      currentStreak: 0,
-      longestStreak: 0,
-      mythsBusted: 0,
-      lessonsCompleted: 0,
-      rank: 'Beginner'
-    };
-  }
-};
-
-/**
- * Calculate XP needed for next rank
- */
-export const getXPForNextRank = (currentXP: number) => {
-  const ranks = [
-    { name: 'Beginner', xp: 0 },
-    { name: 'Student', xp: 100 },
-    { name: 'Lab Assistant', xp: 500 },
-    { name: 'Nuclear Technician', xp: 1000 },
-    { name: 'Reactor Operator', xp: 2000 },
-    { name: 'Nuclear Expert', xp: 5000 },
-  ];
-
-  for (let i = 0; i < ranks.length; i++) {
-    if (currentXP < ranks[i].xp) {
-      return {
-        nextRank: ranks[i].name,
-        xpNeeded: ranks[i].xp - currentXP,
-        progress: i > 0 ? (currentXP - ranks[i - 1].xp) / (ranks[i].xp - ranks[i - 1].xp) : 0
-      };
-    }
-  }
-
-  return {
-    nextRank: 'Max Rank',
-    xpNeeded: 0,
-    progress: 1
-  };
-};
-
-/**
- * Format date for display
- */
-export const formatDate = (dateString: string) => {
-  const date = new Date(dateString);
-  const now = new Date();
-  const diffMs = now.getTime() - date.getTime();
-  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-
-  if (diffDays === 0) return 'Today';
-  if (diffDays === 1) return 'Yesterday';
-  if (diffDays < 7) return `${diffDays} days ago`;
-  
-  return date.toLocaleDateString('en-US', { 
-    month: 'short', 
-    day: 'numeric',
-    year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined
-  });
-};
-
-/**
- * Get achievement progress
- */
-export const getAchievementProgress = (userProfile: any) => {
-  const achievements = [
-    {
-      id: 'first_lesson',
-      title: 'First Steps',
-      description: 'Complete your first lesson',
-      icon: 'Book',
-      unlocked: (userProfile?.lessons_completed || 0) >= 1
-    },
-    {
-      id: 'myth_buster',
-      title: 'Myth Buster',
-      description: 'Bust 10 myths',
-      icon: 'ShieldTick',
-      unlocked: (userProfile?.myths_busted || 0) >= 10
-    },
-    {
-      id: 'week_streak',
-      title: 'Dedicated Learner',
-      description: 'Maintain a 7-day streak',
-      icon: 'Flash',
-      unlocked: (userProfile?.current_streak || 0) >= 7
-    },
-    {
-      id: 'xp_master',
-      title: 'XP Master',
-      description: 'Earn 1000 XP',
-      icon: 'Crown1',
-      unlocked: (userProfile?.total_xp || 0) >= 1000
-    },
-    {
-      id: 'completionist',
-      title: 'Completionist',
-      description: 'Complete 50 lessons',
-      icon: 'Cup',
-      unlocked: (userProfile?.lessons_completed || 0) >= 50
-    }
-  ];
-
-  return achievements;
-};
-
 export default {
-  completeLessonFlow,
-  startLessonFlow,
-  bustMythFlow,
   checkDailyStreak,
-  getFormattedStats,
-  getXPForNextRank,
-  formatDate,
-  getAchievementProgress
+  toLocalIsoDate
 };
-

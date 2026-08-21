@@ -5,10 +5,14 @@ import {
     getLeaderboardSnapshotUpdatedAt,
     type LocalLeaderboardUser,
 } from "@/services/database";
-import { getProfileAvatarSource } from "@/services/profile-avatars";
+import {
+  getProfileAvatarSource,
+  PROFILE_AVATAR_OPTIONS,
+} from "@/services/profile-avatars";
 import { useStorage } from "@/services/StorageContext";
 import { useFocusEffect } from "@react-navigation/native";
 import { LinearGradient } from "expo-linear-gradient";
+import { useRouter } from "expo-router";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
     Image,
@@ -16,23 +20,24 @@ import {
     ScrollView,
     StyleSheet,
     Text,
+    TouchableOpacity,
     View,
 } from "react-native";
 import Animated, {
+    FadeIn,
     FadeInDown,
+    LinearTransition,
     useAnimatedStyle,
+    useReducedMotion,
     useSharedValue,
     withRepeat,
     withTiming,
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-
-import { GRADIENTS } from "@/constants/gradients";
-
-// Gradient Colors
+import { DURATION, EASE_OUT } from "@/theme/motion";
 
 // NPC Characters - Personal Goals for the User
-const NPC_CHARACTERS = [
+export const NPC_CHARACTERS = [
   {
     name: "AtomMaster99",
     title: "Radiation Pioneer",
@@ -136,8 +141,29 @@ const CircleAvatar = ({
   isUser?: boolean;
   isNPC?: boolean;
 }) => {
-  // User avatars are always local profile presets.
-  if (!isNPC) {
+  if (uri) {
+    const isRemote = uri.startsWith("http://") || uri.startsWith("https://");
+    if (isRemote) {
+      return (
+        <View
+          style={{
+            width: size,
+            height: size,
+            borderRadius: size / 2,
+            borderWidth,
+            borderColor,
+            overflow: "hidden",
+          }}
+        >
+          <Image
+            source={{ uri }}
+            style={{ width: "100%", height: "100%" }}
+            resizeMode="cover"
+          />
+        </View>
+      );
+    }
+    // Local profile preset (works for both user and NPCs)
     return (
       <View
         style={{
@@ -152,28 +178,6 @@ const CircleAvatar = ({
       >
         <Image
           source={getProfileAvatarSource(uri)}
-          style={{ width: "100%", height: "100%" }}
-          resizeMode="cover"
-        />
-      </View>
-    );
-  }
-
-  // Remote avatar
-  if (uri) {
-    return (
-      <View
-        style={{
-          width: size,
-          height: size,
-          borderRadius: size / 2,
-          borderWidth,
-          borderColor,
-          overflow: "hidden",
-        }}
-      >
-        <Image
-          source={{ uri }}
           style={{ width: "100%", height: "100%" }}
           resizeMode="cover"
         />
@@ -205,9 +209,13 @@ const CircleAvatar = ({
 export default function LeaderboardScreen() {
   const { userProfile, isDatabaseReady } = useStorage();
   const { theme } = useTheme();
+  const router = useRouter();
   const THEME = theme.palettes.tab;
   const styles = useMemo(() => createStyles(THEME), [THEME]);
+  const bgColors: [string, string] =
+    theme.mode === "dark" ? [THEME.bg, THEME.bg] : ["#FFF3E0", "#FFFFFF"];
   const pulse = useSharedValue(1);
+  const reducedMotion = useReducedMotion();
   const [leaderboardData, setLeaderboardData] = useState<LeaderboardEntry[]>(
     [],
   );
@@ -217,8 +225,12 @@ export default function LeaderboardScreen() {
   const [lastUpdatedAt, setLastUpdatedAt] = useState<number | null>(null);
 
   React.useEffect(() => {
+    if (reducedMotion) {
+      pulse.value = 1;
+      return;
+    }
     pulse.value = withRepeat(withTiming(1.02, { duration: 1000 }), -1, true);
-  }, []);
+  }, [reducedMotion]);
 
   const pulseStyle = useAnimatedStyle(() => ({
     transform: [{ scale: pulse.value }],
@@ -259,22 +271,28 @@ export default function LeaderboardScreen() {
         });
       }
 
-      let entriesWithFallback = entries;
-      if (entriesWithFallback.length < 3) {
-        const needed = 3 - entriesWithFallback.length;
-        const fallback = NPC_CHARACTERS.slice(0, needed).map(
-          (npc): LeaderboardEntry => ({
+      // Always merge the full NPC personal-goal roster: the leaderboard is
+      // local-only (the sync snapshot table is never populated anymore), so
+      // the rivals keep the board full of targets to climb past — even while
+      // the user is offline.
+      for (let idx = 0; idx < NPC_CHARACTERS.length; idx++) {
+        const npc = NPC_CHARACTERS[idx];
+        if (!entries.some((entry) => entry.name === npc.name)) {
+          // Deterministic randomized avatar per NPC (stable across reloads)
+          const avatarKey =
+            PROFILE_AVATAR_OPTIONS[idx % PROFILE_AVATAR_OPTIONS.length].key;
+          entries.push({
             name: npc.name,
             title: npc.title,
             xp: npc.baseXP,
+            avatar: avatarKey,
             avatarColor: npc.avatarColor,
             isNPC: true,
-          }),
-        );
-        entriesWithFallback = [...entriesWithFallback, ...fallback];
+          });
+        }
       }
 
-      return entriesWithFallback
+      return entries
         .sort((a, b) => (b.xp ?? 0) - (a.xp ?? 0))
         .map((entry, index) => ({ ...entry, rank: index + 1 }));
     },
@@ -363,30 +381,47 @@ export default function LeaderboardScreen() {
   }
 
   return (
-    <View style={styles.container}>
-      {/* Fixed Header */}
-      <View style={styles.headerContainer}>
-        <LinearGradient
-          colors={GRADIENTS.blueSolid}
-          style={styles.headerGradient}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-        >
-          <Text style={styles.headerTitle}>Leaderboard</Text>
+    <View style={[styles.container, { backgroundColor: bgColors[0] }]}>
+      <LinearGradient
+        colors={bgColors}
+        style={styles.bgGradient}
+        pointerEvents="none"
+      />
+      {/* Header — amber outer like profile/home */}
+      <Animated.View
+        entering={reducedMotion ? FadeIn.duration(120) : FadeInDown.springify()}
+        layout={reducedMotion ? undefined : LinearTransition.duration(DURATION.medium).easing(EASE_OUT)}
+        style={[styles.headerContainer, { marginTop: insets.top + 12 }]}
+      >
+        <View style={styles.headerTopRow}>
+          <TouchableOpacity
+            style={styles.backButton}
+            activeOpacity={0.85}
+            onPress={() => router.back()}
+          >
+            <Icon name="ArrowLeft2" size={20} color="#FF8C00" variant="Bold" />
+          </TouchableOpacity>
+          <View style={styles.headerTitlePill}>
+            <Icon name="Crown1" size={14} color="#FFFFFF" variant="Bold" />
+            <Text style={styles.headerTitle}>Leaderboard</Text>
+          </View>
+          <View style={{ width: 40 }} />
+        </View>
 
-          {/* Podium */}
-          <View style={styles.podiumContainer}>
-            {/* Rank 2 */}
-            <View style={[styles.podiumColumn, styles.podiumSide]}>
-              <View style={styles.podiumAvatarWrapper}>
-                <CircleAvatar
-                  uri={topThree[1].avatar}
-                  avatarColor={topThree[1].avatarColor}
-                  isUser={topThree[1].isUser}
-                  isNPC={topThree[1].isNPC}
-                  size={70}
-                  borderColor="rgba(255,255,255,0.8)"
-                />
+          {/* Podium — white inner card like profile/home */}
+          <View style={styles.podiumCard}>
+            <View style={styles.podiumContainer}>
+              {/* Rank 2 */}
+              <View style={[styles.podiumColumn, styles.podiumSide]}>
+                <View style={styles.podiumAvatarWrapper}>
+                  <CircleAvatar
+                    uri={topThree[1].avatar}
+                    avatarColor={topThree[1].avatarColor}
+                    isUser={topThree[1].isUser}
+                    isNPC={topThree[1].isNPC}
+                    size={70}
+                    borderColor="#E5E7EB"
+                  />
                 <View
                   style={[styles.rankBadge, { backgroundColor: "#C0C0C0" }]}
                 >
@@ -453,7 +488,7 @@ export default function LeaderboardScreen() {
                   isUser={topThree[2].isUser}
                   isNPC={topThree[2].isNPC}
                   size={70}
-                  borderColor="rgba(255,255,255,0.8)"
+                  borderColor="#E5E7EB"
                 />
                 <View
                   style={[styles.rankBadge, { backgroundColor: "#CD7F32" }]}
@@ -465,15 +500,15 @@ export default function LeaderboardScreen() {
               <Text style={styles.podiumXP}>{topThree[2].xp} XP</Text>
             </View>
           </View>
-        </LinearGradient>
-      </View>
+          </View>
+        </Animated.View>
 
       {/* Scrollable List */}
       <ScrollView
         style={{ flex: 1 }}
         contentContainerStyle={[
           styles.scrollContent,
-          { paddingBottom: 120 + insets.bottom },
+          { paddingBottom: 160 + insets.bottom },
         ]}
         showsVerticalScrollIndicator={false}
         refreshControl={
@@ -500,7 +535,7 @@ export default function LeaderboardScreen() {
           {restList.map((user, index) => (
             <Animated.View
               key={user.rank}
-              entering={FadeInDown.delay(index * 50)}
+              entering={reducedMotion ? FadeIn.duration(120) : FadeInDown.delay(index * 50)}
               style={[styles.listItem, user.isUser && styles.listItemActive]}
             >
               <Text
@@ -560,19 +595,17 @@ export default function LeaderboardScreen() {
         </View>
       </ScrollView>
 
-      {/* Sticky User Bar */}
+      {/* Sticky User Bar — above the tab bar, white card like profile */}
       {userRank && userRank.rank && userRank.rank > 3 && (
-        <View style={[styles.stickyBar, { bottom: 20 }]}>
-          <LinearGradient
-            colors={GRADIENTS.blueSolid}
-            style={styles.stickyBarGradient}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
-          >
+        <Animated.View
+          entering={reducedMotion ? FadeIn.duration(120) : FadeIn.duration(200)}
+          style={[styles.stickyBar, { bottom: insets.bottom + 88 }]}
+        >
+          <View style={styles.stickyBarInner}>
             <Text
               style={[
                 styles.listRankText,
-                { color: "#FFF", width: 30, textAlign: "center" },
+                { color: "#E67E22", width: 30, textAlign: "center" },
               ]}
             >
               {userRank.rank}
@@ -583,28 +616,26 @@ export default function LeaderboardScreen() {
                 isUser={true}
                 isNPC={false}
                 size={40}
-                borderColor="rgba(255,255,255,0.9)"
+                borderColor="#FFCA5F"
                 borderWidth={2}
               />
             </View>
             <View style={styles.listInfo}>
-              <Text style={[styles.listName, { color: "#FFF" }]}>
+              <Text style={[styles.listName, { color: "#333333" }]}>
                 {userRank.name}
               </Text>
-              <Text
-                style={[styles.listTitle, { color: "rgba(255,255,255,0.8)" }]}
-              >
+              <Text style={[styles.listTitle, { color: "#9CA3AF" }]}>
                 {userRank.title}
               </Text>
             </View>
             <View style={styles.listXP}>
-              <Icon name="Flash" size={16} color="#FFD700" variant="Bold" />
-              <Text style={[styles.xpText, { color: "#FFF" }]}>
+              <Icon name="Flash" size={16} color="#FF8C00" variant="Bold" />
+              <Text style={[styles.xpText, { color: "#E67E22" }]}>
                 {userRank.xp.toLocaleString()} XP
               </Text>
             </View>
-          </LinearGradient>
-        </View>
+          </View>
+        </Animated.View>
       )}
     </View>
   );
@@ -616,42 +647,78 @@ const createStyles = (theme: Palette) =>
       flex: 1,
       backgroundColor: theme.bg,
     },
+    bgGradient: {
+      ...StyleSheet.absoluteFillObject,
+    },
     scrollContent: {
-      paddingTop: 20,
+      paddingTop: 12,
       paddingBottom: 100,
     },
     headerContainer: {
-      borderBottomLeftRadius: 30,
-      borderBottomRightRadius: 30,
-      overflow: "hidden",
-      marginBottom: 0,
-      backgroundColor: theme.card,
-      zIndex: 10,
+      marginHorizontal: 20,
+      backgroundColor: "#FFCA5F",
+      borderRadius: 26,
+      padding: 10,
+      gap: 10,
       elevation: 4,
-      shadowColor: "#5E72E4",
-      shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.2,
-      shadowRadius: 8,
+      shadowColor: "#000000",
+      shadowOffset: { width: 0, height: 3 },
+      shadowOpacity: 0.1,
+      shadowRadius: 6,
     },
     headerGradient: {
-      paddingTop: 50,
-      paddingBottom: 20,
-      paddingHorizontal: 20,
+      paddingBottom: 0,
+      paddingHorizontal: 0,
       alignItems: "center",
     },
+    headerTopRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      width: "100%",
+      paddingHorizontal: 4,
+      paddingTop: 2,
+      paddingBottom: 2,
+    },
+    backButton: {
+      width: 40,
+      height: 40,
+      borderRadius: 14,
+      backgroundColor: "#FFFFFF",
+      alignItems: "center",
+      justifyContent: "center",
+      borderWidth: 2,
+      borderColor: "#FFDD8D",
+      borderBottomWidth: 4,
+    },
+    headerTitlePill: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 6,
+      backgroundColor: "#434343",
+      paddingHorizontal: 14,
+      height: 40,
+      borderRadius: 14,
+    },
     headerTitle: {
-      color: "#FFF",
-      fontSize: 20,
-      fontWeight: "700",
+      color: "#FFFFFF",
+      fontSize: 14,
       fontFamily: fontFamilies.bold,
-      marginBottom: 10,
+    },
+    podiumCard: {
+      backgroundColor: "#FFFFFF",
+      borderRadius: 20,
+      padding: 16,
+      borderWidth: 2,
+      borderColor: "#E5E7EB",
+      borderBottomWidth: 4,
     },
     podiumContainer: {
       flexDirection: "row",
       alignItems: "flex-end",
       justifyContent: "center",
-      gap: 24,
-      marginTop: 10,
+      gap: 16,
+      marginTop: 4,
     },
     podiumColumn: {
       alignItems: "center",
@@ -688,27 +755,24 @@ const createStyles = (theme: Palette) =>
     rankText: {
       color: "#FFF",
       fontSize: 12,
-      fontWeight: "800",
       fontFamily: fontFamilies.heavy,
     },
     podiumName: {
-      color: "#FFF",
-      fontWeight: "600",
-      fontFamily: fontFamilies.semibold,
-      fontSize: 13,
-      marginTop: 4,
+      color: "#333333",
+      fontFamily: fontFamilies.bold,
+      fontSize: 12,
+      marginTop: 6,
       textAlign: "center",
     },
     podiumNameLarge: {
-      fontSize: 15,
-      fontWeight: "700",
-      fontFamily: fontFamilies.bold,
+      fontSize: 14,
+      fontFamily: fontFamilies.heavy,
+      color: "#333333",
     },
     podiumXP: {
-      color: "rgba(255,255,255,0.9)",
+      color: "#E67E22",
       fontSize: 11,
-      fontWeight: "600",
-      fontFamily: fontFamilies.semibold,
+      fontFamily: fontFamilies.bold,
       marginTop: 2,
       flexDirection: "row",
       alignItems: "center",
@@ -716,13 +780,17 @@ const createStyles = (theme: Palette) =>
     listContainer: {
       paddingHorizontal: 20,
       gap: 12,
+      marginTop: 12,
     },
     listItem: {
       flexDirection: "row",
       alignItems: "center",
-      backgroundColor: theme.card,
+      backgroundColor: "#FFFFFF",
       padding: 16,
       borderRadius: 20,
+      borderWidth: 2,
+      borderColor: "#E5E7EB",
+      borderBottomWidth: 4,
       elevation: 2,
       shadowColor: "#000",
       shadowOffset: { width: 0, height: 2 },
@@ -730,13 +798,11 @@ const createStyles = (theme: Palette) =>
       shadowRadius: 4,
     },
     listItemActive: {
-      backgroundColor: theme.card,
-      borderWidth: 1,
-      borderColor: theme.primary,
+      backgroundColor: "#FFF3E0",
+      borderColor: "#FFCA5F",
     },
     listRankText: {
-      color: theme.textMuted,
-      fontWeight: "800",
+      color: "#9CA3AF",
       fontFamily: fontFamilies.heavy,
       fontSize: 16,
       width: 30,
@@ -756,15 +822,13 @@ const createStyles = (theme: Palette) =>
       flex: 1,
     },
     listName: {
-      color: theme.text,
-      fontWeight: "800",
+      color: "#333333",
       fontFamily: fontFamilies.heavy,
-      fontSize: 16,
+      fontSize: 15,
     },
     listTitle: {
-      color: theme.textMuted,
-      fontSize: 13,
-      fontWeight: "600",
+      color: "#9CA3AF",
+      fontSize: 12,
       fontFamily: fontFamilies.semibold,
       marginTop: 2,
     },
@@ -787,8 +851,7 @@ const createStyles = (theme: Palette) =>
       gap: 4,
     },
     xpText: {
-      color: theme.textMuted,
-      fontWeight: "800",
+      color: "#E67E22",
       fontFamily: fontFamilies.heavy,
       fontSize: 14,
     },
@@ -799,14 +862,19 @@ const createStyles = (theme: Palette) =>
       borderRadius: 20,
       overflow: "hidden",
       elevation: 8,
-      shadowColor: "#5E72E4",
+      shadowColor: "#000",
       shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.3,
+      shadowOpacity: 0.15,
       shadowRadius: 8,
     },
-    stickyBarGradient: {
+    stickyBarInner: {
       flexDirection: "row",
       alignItems: "center",
       padding: 16,
+      backgroundColor: "#FFFFFF",
+      borderRadius: 20,
+      borderWidth: 2,
+      borderColor: "#FFCA5F",
+      borderBottomWidth: 4,
     },
   });

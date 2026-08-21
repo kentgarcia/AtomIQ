@@ -13,6 +13,7 @@ import React from "react";
 import { StyleSheet, Text, View, type StyleProp, type ViewStyle } from "react-native";
 
 import { Icon } from "@/components/ui/icon";
+import { fontFamilies } from "@/theme";
 import { useTheme } from "@/theme/useTheme";
 import type { Palette } from "@/theme/themes";
 
@@ -74,7 +75,7 @@ const styles = StyleSheet.create({
     },
     title: {
         fontSize: 20,
-        fontWeight: "800",
+        fontFamily: fontFamilies.heavy,
     },
     subtitle: {
         fontSize: 13,

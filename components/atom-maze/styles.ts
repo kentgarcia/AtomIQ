@@ -43,7 +43,6 @@ export const styles = StyleSheet.create({
   },
   modernHeaderTitle: {
     fontSize: 16,
-    fontWeight: "800",
     textTransform: "uppercase",
     letterSpacing: 0.5,
   },
@@ -54,7 +53,6 @@ export const styles = StyleSheet.create({
   },
   modernScoreText: {
     fontSize: 14,
-    fontWeight: "700",
   },
   modernHudRow: {
     flexDirection: "row",
@@ -72,7 +70,6 @@ export const styles = StyleSheet.create({
   },
   modernHudChipText: {
     fontSize: 12,
-    fontWeight: "700",
   },
   modernComboChip: {
     flexDirection: "row",
@@ -86,7 +83,6 @@ export const styles = StyleSheet.create({
   modernComboChipText: {
     color: "#FFFFFF",
     fontSize: 12,
-    fontWeight: "800",
   },
 
   // Modern Battle Arena
@@ -154,7 +150,6 @@ export const styles = StyleSheet.create({
   arenaHudTitle: {
     color: "#F8FAFC",
     fontSize: 14,
-    fontWeight: "900",
     textTransform: "uppercase",
     letterSpacing: 0.5,
   },
@@ -178,7 +173,6 @@ export const styles = StyleSheet.create({
   arenaHudScoreText: {
     color: "#FFFFFF",
     fontSize: 12,
-    fontWeight: "800",
   },
   arenaHudDifficultyChip: {
     alignItems: "center",
@@ -191,7 +185,6 @@ export const styles = StyleSheet.create({
   },
   arenaHudDifficultyText: {
     fontSize: 10,
-    fontWeight: "900",
     letterSpacing: 0.4,
     textTransform: "uppercase",
   },
@@ -209,7 +202,6 @@ export const styles = StyleSheet.create({
   arenaHudChipText: {
     color: "#E2E8F0",
     fontSize: 12,
-    fontWeight: "700",
   },
   arenaHudComboChip: {
     flexDirection: "row",
@@ -223,7 +215,6 @@ export const styles = StyleSheet.create({
   arenaHudComboText: {
     color: "#FFFFFF",
     fontSize: 12,
-    fontWeight: "800",
   },
   arenaHudPlaceholder: {
     width: 34,
@@ -248,7 +239,6 @@ export const styles = StyleSheet.create({
   bossBattleNoticeText: {
     color: "#FFFFFF",
     fontSize: 12,
-    fontWeight: "800",
     letterSpacing: 0.2,
     textAlign: "center",
   },
@@ -288,7 +278,6 @@ export const styles = StyleSheet.create({
   damagePopupText: {
     color: "#FFFFFF",
     fontSize: 13,
-    fontWeight: "900",
     letterSpacing: 0.3,
   },
 
@@ -321,14 +310,12 @@ export const styles = StyleSheet.create({
   hpBoxName: {
     flexShrink: 1,
     fontSize: 12,
-    fontWeight: "800",
     textTransform: "uppercase",
     letterSpacing: 0.4,
   },
   hpBoxLevel: {
     color: "#FCD34D",
     fontSize: 9.5,
-    fontWeight: "900",
     flexShrink: 1,
     textAlign: "right",
   },
@@ -363,7 +350,6 @@ export const styles = StyleSheet.create({
   },
   hpBoxValue: {
     fontSize: 10,
-    fontWeight: "700",
     minWidth: 52,
     textAlign: "right",
   },
@@ -415,7 +401,6 @@ export const styles = StyleSheet.create({
   gbScreenTitle: {
     flex: 1,
     fontSize: 11,
-    fontWeight: "800",
     color: "#1F1F1F",
     textAlign: "center",
     fontFamily: Platform.OS === "ios" ? "Courier" : "monospace",
@@ -433,7 +418,6 @@ export const styles = StyleSheet.create({
   },
   gbScoreText: {
     color: "#C4CFA1",
-    fontWeight: "800",
     fontSize: 11,
     fontFamily: Platform.OS === "ios" ? "Courier" : "monospace",
   },
@@ -444,12 +428,10 @@ export const styles = StyleSheet.create({
   gbLogo: {
     color: "#CCC",
     fontSize: 14,
-    fontWeight: "900",
     fontStyle: "italic",
     letterSpacing: 1,
   },
   gbLogoItalic: {
-    fontWeight: "400",
     fontSize: 14,
   },
   floorLine: {
@@ -474,7 +456,6 @@ export const styles = StyleSheet.create({
   },
   fighterName: {
     fontSize: 10,
-    fontWeight: "700",
     color: "#1F1F1F",
     fontFamily: Platform.OS === "ios" ? "Courier" : "monospace",
     textTransform: "uppercase",
@@ -496,7 +477,6 @@ export const styles = StyleSheet.create({
   hpText: {
     fontSize: 8,
     color: "#1F1F1F",
-    fontWeight: "600",
     fontFamily: Platform.OS === "ios" ? "Courier" : "monospace",
   },
   svgContainer: {
@@ -529,7 +509,6 @@ export const styles = StyleSheet.create({
   },
   lessonQuestionText: {
     fontSize: 18,
-    fontWeight: "700",
     lineHeight: 26,
   },
 
@@ -556,11 +535,9 @@ export const styles = StyleSheet.create({
   lessonOptionText: {
     flex: 1,
     fontSize: 14,
-    fontWeight: "500",
     lineHeight: 19,
   },
   lessonOptionTextEmphasis: {
-    fontWeight: "700",
   },
 
   // Scramble
@@ -610,7 +587,6 @@ export const styles = StyleSheet.create({
   },
   scrambleSlotText: {
     fontSize: 18,
-    fontWeight: "800",
     color: "#1F2937",
   },
   scrambleSlotTextRevealed: {
@@ -636,7 +612,6 @@ export const styles = StyleSheet.create({
   },
   scrambleLetterText: {
     fontSize: 18,
-    fontWeight: "800",
     color: "#1F2937",
   },
   scrambleActions: {
@@ -660,7 +635,6 @@ export const styles = StyleSheet.create({
   shuffleButtonText: {
     color: "#FFF",
     fontSize: 13,
-    fontWeight: "700",
   },
   hintTimerBadge: {
     flexDirection: "row",
@@ -676,7 +650,6 @@ export const styles = StyleSheet.create({
   hintTimerText: {
     color: "#92400E",
     fontSize: 12,
-    fontWeight: "600",
   },
   revealedBadge: {
     backgroundColor: "#DCFCE7",
@@ -689,7 +662,6 @@ export const styles = StyleSheet.create({
   revealedBadgeText: {
     color: "#166534",
     fontSize: 12,
-    fontWeight: "600",
   },
 
   // Quiz result feedback — colors applied inline from the maze theme
@@ -707,11 +679,9 @@ export const styles = StyleSheet.create({
   },
   quizResultTitle: {
     fontSize: 15,
-    fontWeight: "800",
   },
   quizResultSubtitle: {
     fontSize: 13,
-    fontWeight: "500",
   },
 
   attackActionWrap: {
@@ -744,7 +714,6 @@ export const styles = StyleSheet.create({
   modernSubmitText: {
     color: "#FFFFFF",
     fontSize: 16,
-    fontWeight: "800",
     letterSpacing: 0.6,
   },
 
@@ -783,7 +752,6 @@ export const styles = StyleSheet.create({
   },
   introBadgeText: {
     fontSize: 16,
-    fontWeight: "900",
     fontFamily: fontFamilies.heavy,
     color: "#FFF",
   },
@@ -807,7 +775,6 @@ export const styles = StyleSheet.create({
   },
   introTitle: {
     fontSize: 28,
-    fontWeight: "900",
     fontFamily: fontFamilies.heavy,
     color: "#1F2937",
     marginBottom: 4,
@@ -828,13 +795,11 @@ export const styles = StyleSheet.create({
   introTagline: {
     flex: 1,
     fontSize: 13,
-    fontWeight: "800",
     fontFamily: fontFamilies.heavy,
     letterSpacing: 0.3,
   },
   introSubtitle: {
     fontSize: 14,
-    fontWeight: "600",
     fontFamily: fontFamilies.semibold,
     color: "#6B7280",
     marginBottom: 12,
@@ -857,7 +822,6 @@ export const styles = StyleSheet.create({
   },
   startButtonCardText: {
     fontSize: 17,
-    fontWeight: "900",
     fontFamily: fontFamilies.heavy,
     letterSpacing: 0.5,
   },
@@ -888,7 +852,6 @@ export const styles = StyleSheet.create({
   },
   resultStatusChipText: {
     fontSize: 12,
-    fontWeight: "900",
     letterSpacing: 0.8,
   },
   resultCard: {
@@ -927,12 +890,10 @@ export const styles = StyleSheet.create({
   resultStatLabel: {
     fontSize: 14,
     color: "#6B7280",
-    fontWeight: "600",
   },
   resultStatValue: {
     fontSize: 16,
     color: "#1F2937",
-    fontWeight: "800",
   },
   defeatEmoji: {
     fontSize: 80,
@@ -956,7 +917,6 @@ export const styles = StyleSheet.create({
   },
   defeatTitle: {
     fontSize: 36,
-    fontWeight: "900",
     color: "#EF4444",
     marginBottom: 8,
   },
@@ -971,7 +931,6 @@ export const styles = StyleSheet.create({
   },
   victoryTitle: {
     fontSize: 28,
-    fontWeight: "900",
     color: "#10B981",
     marginBottom: 8,
   },
@@ -987,7 +946,6 @@ export const styles = StyleSheet.create({
   },
   bossIntroTitle: {
     fontSize: 34,
-    fontWeight: "900",
     color: "#FACC15",
     marginBottom: 10,
     textTransform: "uppercase",
@@ -995,7 +953,6 @@ export const styles = StyleSheet.create({
   },
   bossIntroName: {
     fontSize: 25,
-    fontWeight: "800",
     color: "#F8FAFC",
     marginBottom: 10,
     textAlign: "center",
@@ -1043,7 +1000,6 @@ export const styles = StyleSheet.create({
   bossAlertChipText: {
     color: "#FEF3C7",
     fontSize: 12,
-    fontWeight: "900",
     letterSpacing: 1,
   },
   bossIntroCard: {
@@ -1095,14 +1051,12 @@ export const styles = StyleSheet.create({
   },
   bossStatValue: {
     fontSize: 24,
-    fontWeight: "900",
     color: "#F8FAFC",
     marginTop: 6,
   },
   bossStatLabel: {
     fontSize: 11,
     color: "#94A3B8",
-    fontWeight: "700",
     marginTop: 2,
   },
   bossIntroArtWrap: {
@@ -1131,7 +1085,6 @@ export const styles = StyleSheet.create({
   bossIntroHintText: {
     color: "#E2E8F0",
     fontSize: 12,
-    fontWeight: "700",
     textAlign: "center",
   },
   completeEmoji: {
@@ -1140,7 +1093,6 @@ export const styles = StyleSheet.create({
   },
   completeTitle: {
     fontSize: 36,
-    fontWeight: "900",
     color: "#F59E0B",
     marginBottom: 8,
   },
@@ -1163,7 +1115,6 @@ export const styles = StyleSheet.create({
   },
   rewardText: {
     fontSize: 30,
-    fontWeight: "900",
     color: "#B45309",
   },
   retryButton: {
@@ -1194,7 +1145,6 @@ export const styles = StyleSheet.create({
   retryButtonText: {
     color: "#FFF",
     fontSize: 18,
-    fontWeight: "900",
   },
   nextButton: {
     borderRadius: 16,
@@ -1224,7 +1174,6 @@ export const styles = StyleSheet.create({
   nextButtonText: {
     color: "#FFF",
     fontSize: 18,
-    fontWeight: "900",
   },
   bossButton: {
     borderRadius: 16,
@@ -1253,7 +1202,6 @@ export const styles = StyleSheet.create({
   bossButtonText: {
     color: "#FFF",
     fontSize: 17,
-    fontWeight: "900",
     letterSpacing: 0.6,
   },
   completeButton: {
@@ -1284,6 +1232,5 @@ export const styles = StyleSheet.create({
   completeButtonText: {
     color: "#FFF",
     fontSize: 18,
-    fontWeight: "900",
   },
 });

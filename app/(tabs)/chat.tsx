@@ -168,7 +168,6 @@ const createStyles = (isDark: boolean) =>
             fontSize: 17,
             textAlign: "center",
             lineHeight: 26,
-            fontWeight: "600",
             fontFamily: fontFamilies.medium,
             color: isDark ? "#8898AA" : "#6B7280",
         },

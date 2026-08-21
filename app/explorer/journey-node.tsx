@@ -277,7 +277,6 @@ const makeStyles = (THEME: Palette) => StyleSheet.create({
   },
   mythStatement: {
     fontSize: 18,
-    fontWeight: '700',
     fontFamily: fontFamilies.bold,
     color: THEME.white,
     lineHeight: 26,
@@ -285,7 +284,6 @@ const makeStyles = (THEME: Palette) => StyleSheet.create({
   },
   realityStatement: {
     fontSize: 18,
-    fontWeight: '700',
     fontFamily: fontFamilies.bold,
     color: THEME.white,
     lineHeight: 26,
@@ -299,7 +297,6 @@ const makeStyles = (THEME: Palette) => StyleSheet.create({
   },
   commonBeliefsTitle: {
     fontSize: 14,
-    fontWeight: '700',
     fontFamily: fontFamilies.bold,
     color: withAlpha(THEME.white, 0.9),
     marginBottom: 12,
@@ -339,7 +336,6 @@ const makeStyles = (THEME: Palette) => StyleSheet.create({
   },
   evidenceTitle: {
     fontSize: 14,
-    fontWeight: '700',
     fontFamily: fontFamilies.bold,
     color: withAlpha(THEME.white, 0.9),
     marginBottom: 12,
@@ -354,7 +350,6 @@ const makeStyles = (THEME: Palette) => StyleSheet.create({
   },
   evidenceSource: {
     fontSize: 13,
-    fontWeight: '600',
     fontFamily: fontFamilies.semibold,
     color: THEME.white,
     marginBottom: 2,
@@ -375,7 +370,6 @@ const makeStyles = (THEME: Palette) => StyleSheet.create({
   },
   articleTitle: {
     fontSize: 24,
-    fontWeight: '800',
     fontFamily: fontFamilies.heavy,
     color: THEME.text,
     marginBottom: 12,
@@ -418,7 +412,6 @@ const makeStyles = (THEME: Palette) => StyleSheet.create({
   },
   navButtonText: {
     fontSize: 15,
-    fontWeight: '700',
     fontFamily: fontFamilies.bold,
     color: THEME.primary,
   },

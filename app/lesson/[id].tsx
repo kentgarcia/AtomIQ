@@ -118,7 +118,6 @@ export default function LessonScreen() {
         <Text
           style={{
             fontSize: 18,
-            fontWeight: "700",
             fontFamily: fontFamilies.bold,
             color: THEME.text,
             marginTop: 16,
@@ -136,7 +135,6 @@ export default function LessonScreen() {
           }}
           onPress={() => router.back()}
         >
-          <Text style={{ color: "#FFF", fontWeight: "700", fontFamily: fontFamilies.bold }}>Go Back</Text>
         </TouchableOpacity>
       </View>
     );

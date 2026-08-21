@@ -162,7 +162,6 @@ const makeStyles = (THEME: Palette) => StyleSheet.create({
   },
   journeyTitle: {
     fontSize: 20,
-    fontWeight: '800',
     fontFamily: fontFamilies.heavy,
     color: THEME.text,
     marginBottom: 4,
@@ -171,7 +170,6 @@ const makeStyles = (THEME: Palette) => StyleSheet.create({
   journeySubtitle: {
     fontSize: 14,
     color: THEME.textMuted,
-    fontWeight: '600',
     fontFamily: fontFamilies.semibold,
   },
   journeyBadge: {
@@ -183,7 +181,6 @@ const makeStyles = (THEME: Palette) => StyleSheet.create({
   },
   journeyBadgeText: {
     fontSize: 11,
-    fontWeight: '700',
     fontFamily: fontFamilies.bold,
     color: THEME.primary,
     textTransform: 'uppercase',
@@ -212,7 +209,6 @@ const makeStyles = (THEME: Palette) => StyleSheet.create({
   metaText: {
     fontSize: 12,
     color: THEME.textMuted,
-    fontWeight: '600',
     fontFamily: fontFamilies.semibold,
   },
   metaDot: {
@@ -237,7 +233,6 @@ const makeStyles = (THEME: Palette) => StyleSheet.create({
   },
   tagText: {
     fontSize: 11,
-    fontWeight: '600',
     fontFamily: fontFamilies.semibold,
     color: THEME.textMuted,
     textTransform: 'capitalize',

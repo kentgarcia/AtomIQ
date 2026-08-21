@@ -8,6 +8,7 @@ import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import "react-native-reanimated";
 
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { ThemeProvider, useColorScheme } from "@/theme";
 import { useSnPro } from "@/hooks/use-snpro";
 import { ensureContentDatabase } from "@/services/content-db";
@@ -93,10 +94,12 @@ export default function RootLayout() {
   }
 
   return (
-    <StorageProvider>
-      <ThemeProvider>
-        <AppContent />
-      </ThemeProvider>
-    </StorageProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <StorageProvider>
+        <ThemeProvider>
+          <AppContent />
+        </ThemeProvider>
+      </StorageProvider>
+    </GestureHandlerRootView>
   );
 }

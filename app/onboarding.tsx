@@ -523,7 +523,6 @@ const createStyles = (theme: Palette) =>
     },
     themeToggleText: {
       fontSize: 12,
-      fontWeight: "800",
       fontFamily: fontFamilies.heavy,
       color: theme.text,
       textTransform: "uppercase",
@@ -588,7 +587,6 @@ const createStyles = (theme: Palette) =>
     },
     splashTitle: {
       fontSize: 48,
-      fontWeight: "800",
       fontFamily: fontFamilies.heavy,
       color: theme.text,
       letterSpacing: 2,
@@ -599,7 +597,6 @@ const createStyles = (theme: Palette) =>
       letterSpacing: 1,
       textTransform: "uppercase",
       marginTop: 8,
-      fontWeight: "700",
       fontFamily: fontFamilies.bold,
     },
     bottomContainer: {
@@ -629,7 +626,6 @@ const createStyles = (theme: Palette) =>
     },
     buttonText: {
       fontSize: 16,
-      fontWeight: "800",
       fontFamily: fontFamilies.heavy,
       color: "#FFF",
       textTransform: "uppercase",
@@ -666,7 +662,6 @@ const createStyles = (theme: Palette) =>
     badgeText: {
       color: theme.accent,
       fontSize: 12,
-      fontWeight: "800",
       fontFamily: fontFamilies.heavy,
       textTransform: "uppercase",
       letterSpacing: 1,
@@ -695,7 +690,6 @@ const createStyles = (theme: Palette) =>
     },
     featureTitle: {
       fontSize: 32,
-      fontWeight: "800",
       fontFamily: fontFamilies.heavy,
       color: theme.text,
       marginBottom: 8,
@@ -703,7 +697,6 @@ const createStyles = (theme: Palette) =>
     },
     featureSubtitle: {
       fontSize: 18,
-      fontWeight: "600",
       fontFamily: fontFamilies.semibold,
       color: theme.textMuted,
       marginBottom: 16,
@@ -716,7 +709,6 @@ const createStyles = (theme: Palette) =>
       textAlign: "center",
       marginBottom: 24,
       paddingHorizontal: 8,
-      fontWeight: "500",
       fontFamily: fontFamilies.medium,
     },
     featureHighlights: {
@@ -741,7 +733,6 @@ const createStyles = (theme: Palette) =>
     },
     highlightText: {
       fontSize: 15,
-      fontWeight: "600",
       fontFamily: fontFamilies.semibold,
       color: theme.text,
       flex: 1,
@@ -757,7 +748,6 @@ const createStyles = (theme: Palette) =>
     },
     skipButtonText: {
       fontSize: 14,
-      fontWeight: "600",
       fontFamily: fontFamilies.semibold,
       color: theme.textMuted,
     },
@@ -795,7 +785,6 @@ const createStyles = (theme: Palette) =>
     },
     titleLarge: {
       fontSize: 32,
-      fontWeight: "800",
       fontFamily: fontFamilies.heavy,
       color: theme.text,
       marginBottom: 8,
@@ -806,7 +795,6 @@ const createStyles = (theme: Palette) =>
       color: theme.textMuted,
       marginBottom: 48,
       textAlign: "center",
-      fontWeight: "500",
       fontFamily: fontFamilies.medium,
     },
     inputWrapper: {
@@ -822,7 +810,6 @@ const createStyles = (theme: Palette) =>
       padding: 20,
       fontSize: 18,
       color: theme.text,
-      fontWeight: "600",
       fontFamily: fontFamilies.semibold,
       textAlign: "center",
     },

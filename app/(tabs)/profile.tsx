@@ -1,6 +1,7 @@
 import { Icon } from "@/components/ui/icon";
 import {useTheme, type Palette, fontFamilies} from "@/theme";
 import { ACHIEVEMENTS } from "@/app/achievement-detail";
+import { NPC_CHARACTERS } from "@/app/(tabs)/leaderboard";
 import {
     DEFAULT_PROFILE_AVATAR_KEY,
     PROFILE_AVATAR_OPTIONS,
@@ -9,6 +10,7 @@ import {
     normalizeProfileAvatarKey,
 } from "@/services/profile-avatars";
 import { getBestGameScores, type GameBestScore } from "@/services/database";
+import { getUnlockedAchievementIds, setUnlockedAchievementIds } from "@/services/storage";
 import { useStorage } from "@/services/StorageContext";
 import { LinearGradient } from "expo-linear-gradient";
 import { useFocusEffect, useRouter } from "expo-router";
@@ -17,7 +19,9 @@ import {
     ActivityIndicator,
     Alert,
     Image,
+    KeyboardAvoidingView,
     Modal,
+    Platform,
     ScrollView,
     Share,
     StyleSheet,
@@ -26,18 +30,26 @@ import {
     TouchableOpacity,
     View,
 } from "react-native";
+import * as Haptics from "expo-haptics";
 import Animated, {
+    FadeIn,
     FadeInDown,
+    FadeOut,
+    LinearTransition,
+    ZoomIn,
     interpolate,
     useAnimatedStyle,
+    useReducedMotion,
     useSharedValue,
     withTiming,
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { DURATION, EASE_OUT } from "@/theme/motion";
 
 export default function ProfileScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const reducedMotion = useReducedMotion();
   const {
     userProfile,
     updateUserProfile,
@@ -78,6 +90,33 @@ export default function ProfileScreen() {
   }, [userLevel]);
 
   const levelProgress = Math.min(((userProfile?.total_xp || 0) % 100) / 100, 1);
+
+  // Title milestones — tap the title pill to see progress
+  const [showTitleProgress, setShowTitleProgress] = useState(false);
+  const TITLE_MILESTONES = useMemo(
+    () => [
+      { title: "Atomic Novice", minLevel: 1, icon: "Star", color: "#64B5F6" },
+      { title: "Isotope Initiate", minLevel: 5, icon: "Flash", color: "#FF8C00" },
+      { title: "Fusion Explorer", minLevel: 10, icon: "Cup", color: "#8B5CF6" },
+      { title: "Quantum Master", minLevel: 20, icon: "Crown", color: "#FFD700" },
+    ],
+    [],
+  );
+  const titleProgress = useMemo(() => {
+    const idx = TITLE_MILESTONES.findIndex((m) => m.title === userTitle);
+    const current = TITLE_MILESTONES[idx];
+    const next = TITLE_MILESTONES[idx + 1] ?? null;
+    if (!next) {
+      return { idx, current, next, xpNeeded: 0, levelNeeded: 0, progress: 1 };
+    }
+    const xpNeeded = Math.max(0, (next.minLevel - 1) * 100 - (userProfile?.total_xp ?? 0));
+    const levelNeeded = Math.max(0, next.minLevel - userLevel);
+    // Progress within current bracket
+    const span = next.minLevel - current.minLevel;
+    const progressed = userLevel - current.minLevel;
+    const progress = span > 0 ? Math.min(1, Math.max(0, progressed / span)) : 1;
+    return { idx, current, next, xpNeeded, levelNeeded, progress };
+  }, [TITLE_MILESTONES, userTitle, userLevel, userProfile?.total_xp]);
 
   const stats = useMemo(() => {
     return [
@@ -121,12 +160,9 @@ export default function ProfileScreen() {
       .catch((error) => console.error("Failed to load game scores:", error));
   }, []);
 
-  // Refresh when returning to the tab (e.g. after finishing a game)
-  useFocusEffect(
-    useCallback(() => {
-      refreshBestScores();
-    }, [refreshBestScores]),
-  );
+  // Newly unlocked achievements, celebrated once via overlay on this screen
+  const [celebrationAwards, setCelebrationAwards] =
+    useState<(typeof ACHIEVEMENTS)[number][] | null>(null);
 
   // Awards — achievements unlocked from the profile's numbers
   const awards = useMemo(() => {
@@ -137,6 +173,41 @@ export default function ProfileScreen() {
   }, [userProfile]);
   const unlockedCount = awards.filter((a) => a.unlocked).length;
 
+  const checkAchievementUnlocks = useCallback(async () => {
+    if (!userProfile) return;
+    const unlocked = awards.filter((a) => a.unlocked);
+    const unlockedIds = unlocked.map((a) => a.id);
+    const stored = await getUnlockedAchievementIds();
+
+    // First run ever — treat current state as the baseline, no retroactive party.
+    if (stored === null) {
+      await setUnlockedAchievementIds(unlockedIds);
+      return;
+    }
+
+    const newlyUnlocked = unlocked.filter((a) => !stored.includes(a.id));
+    if (newlyUnlocked.length === 0) return;
+
+    setCelebrationAwards(newlyUnlocked);
+    await setUnlockedAchievementIds([
+      ...new Set([...stored, ...newlyUnlocked.map((a) => a.id)]),
+    ]);
+  }, [awards, userProfile]);
+
+  // Global rank vs the NPC rivals (the only "opponents" on the local board)
+  const leaderboardRank = useMemo(() => {
+    const xp = userProfile?.total_xp ?? 0;
+    return 1 + NPC_CHARACTERS.filter((npc) => npc.baseXP > xp).length;
+  }, [userProfile]);
+
+  // Refresh when returning to the tab (e.g. after finishing a game)
+  useFocusEffect(
+    useCallback(() => {
+      refreshBestScores();
+      void checkAchievementUnlocks();
+    }, [refreshBestScores, checkAchievementUnlocks]),
+  );
+
   const handleShare = () => {
     Share.share({
       message: `Join me learning nuclear science on AtomIQ! 🚀`,
@@ -144,6 +215,13 @@ export default function ProfileScreen() {
   };
 
   const selectedAvatarKey = normalizeProfileAvatarKey(userProfile?.avatar_url);
+  const hasChanges = useMemo(() => {
+    if (!userProfile) return false;
+    const trimmed = profileName.trim();
+    const nameChanged = trimmed !== (userProfile.display_name || userProfile.username || "");
+    const avatarChanged = pendingAvatarKey !== selectedAvatarKey;
+    return (nameChanged || avatarChanged) && !!trimmed;
+  }, [profileName, pendingAvatarKey, selectedAvatarKey, userProfile]);
 
   const openEditModal = () => {
     if (!userProfile) return;
@@ -175,13 +253,13 @@ export default function ProfileScreen() {
   };
 
   const toggleFlip = useCallback(() => {
-    flipped.value = withTiming(flipped.value === 1 ? 0 : 1, { duration: 550 });
+    flipped.value = withTiming(flipped.value === 1 ? 0 : 1, { duration: DURATION.flip });
   }, [flipped]);
 
   const frontStyle = useAnimatedStyle(() => ({
     transform: [
       { perspective: 800 },
-      { rotateY: `${flipped.value * 180}deg` },
+      { rotateY: `${flipped.value * (reducedMotion ? 0 : 180)}deg` },
     ],
     // Opacity guard — backfaceVisibility alone is unreliable on Android
     opacity: flipped.value < 0.5 ? 1 : 0,
@@ -189,7 +267,7 @@ export default function ProfileScreen() {
   const backStyle = useAnimatedStyle(() => ({
     transform: [
       { perspective: 800 },
-      { rotateY: `${-180 + flipped.value * 180}deg` },
+      { rotateY: `${-180 + flipped.value * (reducedMotion ? 0 : 180)}deg` },
     ],
     opacity: flipped.value < 0.5 ? 0 : 1,
   }));
@@ -251,111 +329,205 @@ export default function ProfileScreen() {
           </TouchableOpacity>
         </View>
 
-        {/* Flip card: profile on the front, stats on the back */}
+        {/* Profile Card — amber outer wrapper (same as home headerBar) */}
         <Animated.View
-          entering={FadeInDown.springify()}
-          style={[styles.profileCard, cardHeightStyle]}
+          entering={reducedMotion ? FadeIn.duration(120) : FadeInDown.springify()}
+          layout={reducedMotion ? undefined : LinearTransition.duration(DURATION.medium).easing(EASE_OUT)}
+          style={styles.profileCard}
         >
-          {/* Front face */}
-          <Animated.View
-            onLayout={(e) => setFrontHeight(e.nativeEvent.layout.height)}
-            style={[styles.cardFace, frontStyle]}
-          >
-            {/* Flip to stats */}
+          {/* First row: title pill (tap for progress) + stats button — same as home header */}
+          <View style={styles.profileCardHeader}>
             <TouchableOpacity
-              style={styles.flipCornerBtn}
-              onPress={toggleFlip}
-              activeOpacity={0.8}
+              style={styles.levelPill}
+              activeOpacity={0.85}
+              onPress={() => setShowTitleProgress((v) => !v)}
             >
-              <Icon name="ChartSquare" size={17} color="#E67E22" variant="Bold" />
-            </TouchableOpacity>
-            <View style={styles.profileRow}>
-              <TouchableOpacity
-                activeOpacity={0.85}
-                onPress={openEditModal}
-              >
-                <View style={styles.avatarContainer}>
-                  <Image
-                    source={getProfileAvatarSource(userProfile.avatar_url)}
-                    style={styles.avatar}
-                    resizeMode="cover"
-                  />
-                  <View style={styles.levelBadge}>
-                    <Text style={styles.levelBadgeText}>{userLevel}</Text>
-                  </View>
-                </View>
-              </TouchableOpacity>
-              <View style={styles.profileTextCol}>
-                <Text style={styles.name} numberOfLines={1}>
-                  {userProfile.display_name || userProfile.username}
-                </Text>
-                <Text style={styles.title}>{userTitle}</Text>
-              </View>
-            </View>
-
-            {/* Level progress */}
-            <View style={styles.levelSection}>
-              <View style={styles.levelMetaRow}>
-                <Text style={styles.levelLabel}>Level {userLevel}</Text>
-                <Text style={styles.levelXp}>
-                  {userProfile.total_xp.toLocaleString()} XP
-                </Text>
-              </View>
-              <View style={styles.levelBarBg}>
-                <View
-                  style={[
-                    styles.levelBarFill,
-                    { width: `${levelProgress * 100}%` },
-                  ]}
-                />
-              </View>
-              <Text style={styles.levelHint}>
-                {100 - (userProfile.total_xp % 100)} XP until Level{" "}
-                {userLevel + 1}
-              </Text>
-            </View>
-          </Animated.View>
-
-          {/* Back face — stats */}
-          <Animated.View
-            onLayout={(e) => setBackHeight(e.nativeEvent.layout.height)}
-            style={[styles.cardFace, backStyle]}
-          >
-            {/* Flip back to profile */}
-            <TouchableOpacity
-              style={styles.flipCornerBtn}
-              onPress={toggleFlip}
-              activeOpacity={0.8}
-            >
+              <Icon name="Crown" size={14} color="#FFFFFF" variant="Bold" />
+              <Text style={styles.levelPillText}>{userTitle}</Text>
               <Icon
-                name="ArrowSwapHorizontal"
-                size={17}
-                color="#E67E22"
+                name={showTitleProgress ? "ArrowUp2" : "ArrowDown2"}
+                size={12}
+                color="#FFFFFF"
                 variant="Bold"
               />
             </TouchableOpacity>
-            <Text style={styles.statsTitle}>Your Stats</Text>
-            <View style={styles.statsGrid}>
-              {stats.map((stat) => (
-                <View key={stat.label} style={styles.statTile}>
-                  <View style={[styles.statIconCircle, { backgroundColor: `${stat.color}1A` }]}>
-                    <Icon
-                      name={stat.icon}
-                      size={20}
-                      color={stat.color}
-                      variant="Bold"
+            <TouchableOpacity
+              style={styles.flipCornerBtn}
+              onPress={toggleFlip}
+              activeOpacity={0.85}
+            >
+              <Icon name="ChartSquare" size={19} color="#FF8C00" variant="Bold" />
+            </TouchableOpacity>
+          </View>
+
+          {/* Inner white card — flips between profile and stats (profile first) */}
+          <Animated.View style={cardHeightStyle}>
+            {/* Front face — avatar left, lvl + XP on the right */}
+            <Animated.View
+              onLayout={(e) => setFrontHeight(e.nativeEvent.layout.height)}
+              style={[styles.cardFace, frontStyle]}
+            >
+              <View style={styles.profileRowCompact}>
+                <TouchableOpacity
+                  activeOpacity={0.85}
+                  onPress={openEditModal}
+                >
+                  <View style={styles.avatarContainer}>
+                    <Image
+                      source={getProfileAvatarSource(userProfile.avatar_url)}
+                      style={styles.avatar}
+                      resizeMode="cover"
+                    />
+                    <View style={styles.levelBadge}>
+                      <Text style={styles.levelBadgeText}>{userLevel}</Text>
+                    </View>
+                  </View>
+                </TouchableOpacity>
+                <View style={styles.profileInfo}>
+                  <Text style={styles.name} numberOfLines={1}>
+                    {userProfile.display_name || userProfile.username}
+                  </Text>
+                  <View style={styles.levelSectionCompact}>
+                    <View style={styles.levelMetaRow}>
+                      <Text style={styles.levelLabel}>Level {userLevel}</Text>
+                      <Text style={styles.levelXp}>
+                        {userProfile.total_xp.toLocaleString()} XP
+                      </Text>
+                    </View>
+                    <View style={styles.levelBarBg}>
+                      <View
+                        style={[
+                          styles.levelBarFill,
+                          { width: `${levelProgress * 100}%` },
+                        ]}
+                      />
+                    </View>
+                    <Text style={styles.levelHint}>
+                      {100 - (userProfile.total_xp % 100)} XP until Level{" "}
+                      {userLevel + 1}
+                    </Text>
+                  </View>
+                </View>
+              </View>
+            </Animated.View>
+
+            {/* Back face — stats */}
+            <Animated.View
+              onLayout={(e) => setBackHeight(e.nativeEvent.layout.height)}
+              style={[styles.cardFace, backStyle]}
+            >
+              <Text style={styles.statsTitle}>Your Stats</Text>
+              <View style={styles.statsGrid}>
+                {stats.map((stat) => (
+                  <View key={stat.label} style={styles.statTile}>
+                    <View style={[styles.statIconCircle, { backgroundColor: `${stat.color}1A` }]}>
+                      <Icon
+                        name={stat.icon}
+                        size={20}
+                        color={stat.color}
+                        variant="Bold"
+                      />
+                    </View>
+                    <Text style={styles.statValue}>{stat.value}</Text>
+                    <Text style={styles.statLabel}>{stat.label}</Text>
+                  </View>
+                ))}
+              </View>
+            </Animated.View>
+            </Animated.View>
+
+          {/* Title milestone progress — below the profile card, inside same amber wrapper */}
+          {showTitleProgress && (
+            <Animated.View
+              entering={reducedMotion ? FadeIn.duration(120) : FadeIn.duration(DURATION.small)}
+              exiting={FadeOut.duration(DURATION.press)}
+              layout={reducedMotion ? undefined : LinearTransition.duration(DURATION.medium).easing(EASE_OUT)}
+              style={styles.titleProgressPanel}
+            >
+              <View style={styles.titleProgressHeader}>
+                <Text style={styles.titleProgressLabel}>Title progress</Text>
+                {titleProgress.next ? (
+                  <Text style={styles.titleProgressMeta}>
+                    {titleProgress.xpNeeded.toLocaleString()} XP to {titleProgress.next.title}
+                  </Text>
+                ) : (
+                  <Text style={styles.titleProgressMeta}>Highest title reached</Text>
+                )}
+              </View>
+
+              {titleProgress.next ? (
+                <>
+                  <View style={styles.titleProgressTrack}>
+                    <View
+                      style={[
+                        styles.titleProgressFill,
+                        { width: `${Math.round(titleProgress.progress * 100)}%` },
+                      ]}
                     />
                   </View>
-                  <Text style={styles.statValue}>{stat.value}</Text>
-                  <Text style={styles.statLabel}>{stat.label}</Text>
+                  <Text style={styles.titleProgressHint}>
+                    Level {userLevel} → Level {titleProgress.next.minLevel} · {titleProgress.levelNeeded} level{titleProgress.levelNeeded === 1 ? "" : "s"} to go
+                  </Text>
+                </>
+              ) : (
+                <View style={[styles.titleProgressTrack, { backgroundColor: "#FFF3E0" }]}>
+                  <View style={[styles.titleProgressFill, { width: "100%" }]} />
                 </View>
-              ))}
-            </View>
-          </Animated.View>
+              )}
+
+              <View style={styles.titleMilestoneList}>
+                {TITLE_MILESTONES.map((m, i) => {
+                  const isUnlocked = userLevel >= m.minLevel;
+                  const isCurrent = i === titleProgress.idx;
+                  return (
+                    <View
+                      key={m.title}
+                      style={[
+                        styles.titleMilestoneRow,
+                        isCurrent && styles.titleMilestoneRowCurrent,
+                      ]}
+                    >
+                      <View
+                        style={[
+                          styles.titleMilestoneIcon,
+                          { backgroundColor: isUnlocked ? `${m.color}22` : "#F4F5F7" },
+                          isCurrent && { borderWidth: 2, borderColor: m.color },
+                        ]}
+                      >
+                        <Icon
+                          name={m.icon}
+                          size={16}
+                          color={isUnlocked ? m.color : "#C9CDD3"}
+                          variant="Bold"
+                        />
+                      </View>
+                      <View style={{ flex: 1 }}>
+                        <Text
+                          style={[
+                            styles.titleMilestoneName,
+                            isCurrent && { color: m.color },
+                            !isUnlocked && { color: "#AAAAAA" },
+                          ]}
+                        >
+                          {m.title}
+                        </Text>
+                        <Text style={styles.titleMilestoneLevel}>Level {m.minLevel}+</Text>
+                      </View>
+                      {isUnlocked ? (
+                        <Icon name="TickCircle" size={18} color="#22C55E" variant="Bold" />
+                      ) : (
+                        <Icon name="Lock" size={16} color="#C9CDD3" variant="Bold" />
+                      )}
+                    </View>
+                  );
+                })}
+              </View>
+            </Animated.View>
+          )}
         </Animated.View>
 
         {/* Streak card */}
-        <Animated.View entering={FadeInDown.delay(100).springify()}>
+        <Animated.View entering={reducedMotion ? FadeIn.duration(120) : FadeInDown.delay(100).springify()}>
           <TouchableOpacity
             style={styles.streakCard}
             activeOpacity={0.85}
@@ -380,7 +552,7 @@ export default function ProfileScreen() {
 
         {/* Awards — badges & certificates */}
         <Animated.View
-          entering={FadeInDown.delay(150).springify()}
+          entering={reducedMotion ? FadeIn.duration(120) : FadeInDown.delay(200).springify()}
           style={styles.sectionCard}
         >
           <View style={styles.sectionHeader}>
@@ -431,7 +603,7 @@ export default function ProfileScreen() {
 
         {/* Personal game leaderboard */}
         <Animated.View
-          entering={FadeInDown.delay(200).springify()}
+          entering={reducedMotion ? FadeIn.duration(120) : FadeInDown.delay(250).springify()}
           style={styles.sectionCard}
         >
           <View style={styles.sectionHeader}>
@@ -441,6 +613,25 @@ export default function ProfileScreen() {
               <Text style={styles.countPillText}>Personal bests</Text>
             </View>
           </View>
+          {/* Global ranking — merged from separate card */}
+          <TouchableOpacity
+            style={[styles.leaderRow, styles.leaderRowDivider]}
+            activeOpacity={0.85}
+            onPress={() => router.push("/leaderboard")}
+          >
+            <View style={[styles.leaderIconCircle, { backgroundColor: "#FFF3E0" }]}>
+              <Icon name="Cup" size={20} color="#E67E22" variant="Bold" />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.leaderTitle}>Ranking</Text>
+              <Text style={styles.leaderPlays}>
+                Rank #{leaderboardRank} of {NPC_CHARACTERS.length + 1} • Tap to view
+              </Text>
+            </View>
+            <View style={styles.streakArrow}>
+              <Icon name="ArrowRight2" size={16} color="#E67E22" variant="Bold" />
+            </View>
+          </TouchableOpacity>
           {GAME_LEADERBOARD_META.map((game, index) => {
             const best = bestScores.find((s) => s.game_id === game.id);
             const isTop = bestScores[0]?.game_id === game.id && !!best;
@@ -502,36 +693,81 @@ export default function ProfileScreen() {
         </Animated.View>
       </ScrollView>
 
-      {/* Edit Profile Modal */}
+      {/* Edit Profile Modal — beautiful */}
       <Modal
         visible={editModalVisible}
         animationType="fade"
         transparent={true}
         onRequestClose={() => setEditModalVisible(false)}
       >
-        <View style={styles.avatarModalOverlay}>
-          <View style={styles.avatarModalContent}>
+        <Animated.View
+          entering={FadeIn.duration(180)}
+          exiting={FadeOut.duration(150)}
+          style={styles.avatarModalOverlay}
+        >
+          <KeyboardAvoidingView
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+            style={styles.keyboardAvoidingView}
+            keyboardVerticalOffset={insets.top + 12}
+          >
+            <Animated.View
+              entering={reducedMotion ? FadeIn.duration(200) : ZoomIn.duration(260).easing(EASE_OUT)}
+              exiting={FadeOut.duration(150)}
+              style={styles.avatarModalContent}
+            >
+            <View style={styles.dragHandle} />
             <View style={styles.avatarModalHeader}>
-              <Text style={styles.avatarModalTitle}>Edit Profile</Text>
+              <View style={styles.editHeaderLeft}>
+                <View style={styles.editHeaderIcon}>
+                  <Icon name="Edit2" size={16} color="#FF8C00" variant="Bold" />
+                </View>
+                <Text style={styles.avatarModalTitle}>Edit Profile</Text>
+              </View>
               <TouchableOpacity
                 onPress={() => setEditModalVisible(false)}
-                style={styles.closeButton}
+                style={styles.closeButtonNew}
+                activeOpacity={0.85}
               >
-                <Icon
-                  name="CloseCircle"
-                  size={24}
-                  color={THEME.textMuted}
-                  variant="Bold"
-                />
+                <Icon name="CloseCircle" size={20} color="#9CA3AF" variant="Bold" />
               </TouchableOpacity>
             </View>
 
-            <ScrollView
-              showsVerticalScrollIndicator={false}
-              contentContainerStyle={styles.avatarModalGrid}
-            >
-              <View style={styles.nameFieldSection}>
+            {/* Live preview — amber outer like profile card */}
+            <View style={styles.previewCard}>
+              <Text style={styles.previewLabel}>Preview</Text>
+              <View style={styles.previewInner}>
+                <View style={styles.previewAvatarWrap}>
+                  <Image
+                    source={getProfileAvatarSource(pendingAvatarKey)}
+                    style={styles.previewAvatar}
+                    resizeMode="cover"
+                  />
+                  <View style={styles.previewLevelBadge}>
+                    <Text style={styles.previewLevelText}>{userLevel}</Text>
+                  </View>
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.previewName} numberOfLines={1}>
+                    {profileName.trim() || "Your name"}
+                  </Text>
+                  <Text style={styles.previewTitle}>{userTitle}</Text>
+                  <View style={styles.previewXpRow}>
+                    <Icon name="Flash" size={12} color="#E67E22" variant="Bold" />
+                    <Text style={styles.previewXp}>{(userProfile?.total_xp || 0).toLocaleString()} XP</Text>
+                  </View>
+                </View>
+                <View style={styles.previewCheck}>
+                  <Icon name="Eye" size={16} color="#FF8C00" variant="Bold" />
+                </View>
+              </View>
+            </View>
+
+            <View style={styles.nameFieldSection}>
+              <View style={styles.nameFieldHeader}>
                 <Text style={styles.nameFieldLabel}>Display Name</Text>
+                <Text style={styles.charCount}>{profileName.length}/24</Text>
+              </View>
+              <View style={styles.nameInputWrap}>
                 <TextInput
                   style={styles.nameInput}
                   value={profileName}
@@ -542,22 +778,48 @@ export default function ProfileScreen() {
                   autoCorrect={false}
                   returnKeyType="done"
                 />
+                {profileName.length > 0 && (
+                  <TouchableOpacity
+                    onPress={() => setProfileName("")}
+                    style={styles.clearButton}
+                    activeOpacity={0.7}
+                  >
+                    <Icon name="CloseCircle" size={18} color="#C9CDD3" variant="Bold" />
+                  </TouchableOpacity>
+                )}
               </View>
+            </View>
 
-              <Text style={styles.nameFieldLabel}>Avatar</Text>
-              <View style={styles.avatarOptionsWrap}>
-                {PROFILE_AVATAR_OPTIONS.map((avatarOption) => {
-                  const isSelected = pendingAvatarKey === avatarOption.key;
+            <View style={styles.avatarSectionHeader}>
+              <Text style={styles.nameFieldLabel}>Choose Avatar</Text>
+              <Text style={styles.avatarCount}>{PROFILE_AVATAR_OPTIONS.length} options</Text>
+            </View>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.avatarOptionsWrap}
+              style={styles.avatarScroll}
+            >
+              {PROFILE_AVATAR_OPTIONS.map((avatarOption, index) => {
+                const isSelected = pendingAvatarKey === avatarOption.key;
 
-                  return (
+                return (
+                  <Animated.View
+                    key={avatarOption.key}
+                    entering={reducedMotion ? FadeIn.duration(120) : FadeInDown.delay(index * 24).springify()}
+                    layout={reducedMotion ? undefined : LinearTransition.duration(DURATION.small).easing(EASE_OUT)}
+                    style={styles.avatarOptionWrapper}
+                  >
                     <TouchableOpacity
-                      key={avatarOption.key}
                       style={[
                         styles.avatarModalOption,
                         isSelected && styles.avatarModalOptionSelected,
                         isSavingProfile && styles.avatarModalOptionDisabled,
                       ]}
-                      onPress={() => setPendingAvatarKey(avatarOption.key)}
+                      onPress={() => {
+                        void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                        setPendingAvatarKey(avatarOption.key);
+                      }}
                       activeOpacity={0.85}
                       disabled={isSavingProfile}
                     >
@@ -566,41 +828,92 @@ export default function ProfileScreen() {
                         style={styles.avatarModalOptionImage}
                         resizeMode="cover"
                       />
-                      {isSelected && (
-                        <View style={styles.avatarModalCheck}>
-                          <Icon
-                            name="TickCircle"
-                            size={16}
-                            color="#22C55E"
-                            variant="Bold"
-                          />
-                        </View>
-                      )}
                     </TouchableOpacity>
-                  );
-                })}
-              </View>
+                    {isSelected && (
+                      <Animated.View
+                        entering={ZoomIn.springify()}
+                        style={styles.avatarModalCheck}
+                      >
+                        <Icon name="TickCircle" size={16} color="#FFFFFF" variant="Bold" />
+                      </Animated.View>
+                    )}
+                  </Animated.View>
+                );
+              })}
             </ScrollView>
 
             <TouchableOpacity
               style={[
                 styles.saveButton,
-                (!profileName.trim() || isSavingProfile) &&
-                  styles.saveButtonDisabled,
+                (!hasChanges || isSavingProfile) && styles.saveButtonDisabled,
               ]}
               onPress={() => void handleSaveProfile()}
               activeOpacity={0.85}
-              disabled={!profileName.trim() || isSavingProfile}
+              disabled={!hasChanges || isSavingProfile}
             >
               {isSavingProfile ? (
                 <ActivityIndicator color="#FFFFFF" size="small" />
               ) : (
-                <Text style={styles.saveButtonText}>Save Changes</Text>
+                <View style={styles.saveButtonContent}>
+                  <Icon
+                    name={hasChanges ? "TickCircle" : "InfoCircle"}
+                    size={18}
+                    color="#FFFFFF"
+                    variant="Bold"
+                  />
+                  <Text style={styles.saveButtonText}>{hasChanges ? "Save Changes" : "No changes yet"}</Text>
+                </View>
               )}
             </TouchableOpacity>
-          </View>
-        </View>
+          </Animated.View>
+          </KeyboardAvoidingView>
+        </Animated.View>
       </Modal>
+
+      {/* Achievement unlocked celebration */}
+      {celebrationAwards != null && celebrationAwards.length > 0 && (
+        <View style={styles.celebrationOverlay}>
+          <Animated.View
+            entering={reducedMotion ? FadeIn.duration(120) : FadeInDown.springify().delay(80)}
+            style={styles.celebrationCard}
+          >
+            <View style={styles.celebrationIconWrap}>
+              <Icon name="Award" size={34} color="#FFC800" variant="Bold" />
+            </View>
+            <Text style={styles.celebrationTitle}>Achievement Unlocked!</Text>
+            {celebrationAwards.map((badge) => (
+              <View key={badge.id} style={styles.celebrationRow}>
+                <View
+                  style={[
+                    styles.celebrationBadge,
+                    { backgroundColor: `${badge.color}22` },
+                  ]}
+                >
+                  <Icon
+                    name={badge.icon}
+                    size={24}
+                    color={badge.color}
+                    variant="Bold"
+                  />
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.celebrationBadgeTitle}>{badge.title}</Text>
+                  <Text style={styles.celebrationBadgeReq}>
+                    {badge.requirement}
+                  </Text>
+                </View>
+              </View>
+            ))}
+            <TouchableOpacity
+              style={styles.celebrationButton}
+              activeOpacity={0.85}
+              onPress={() => setCelebrationAwards(null)}
+            >
+              <Text style={styles.celebrationButtonText}>Awesome!</Text>
+            </TouchableOpacity>
+          </Animated.View>
+        </View>
+      )}
     </View>
   );
 }
@@ -639,16 +952,121 @@ const createStyles = (theme: Palette) =>
       shadowOpacity: 0.08,
       shadowRadius: 6,
     },
-    /* Flip card shell — the faces rotate inside it */
+    /* Flip card shell — amber outer like home's headerBar */
     profileCard: {
       marginHorizontal: 20,
-      borderRadius: 24,
-      backgroundColor: "#FFFFFF",
-      elevation: 5,
+      backgroundColor: "#FFCA5F",
+      borderRadius: 26,
+      padding: 10,
+      gap: 10,
+      elevation: 4,
       shadowColor: "#000000",
-      shadowOffset: { width: 0, height: 6 },
-      shadowOpacity: 0.08,
-      shadowRadius: 10,
+      shadowOffset: { width: 0, height: 3 },
+      shadowOpacity: 0.1,
+      shadowRadius: 6,
+    },
+    profileCardHeader: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      paddingHorizontal: 4,
+      paddingTop: 2,
+      paddingBottom: 2,
+    },
+    levelPill: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 5,
+      backgroundColor: "#434343",
+      paddingHorizontal: 12,
+      height: 40,
+      borderRadius: 14,
+    },
+    levelPillText: {
+      fontSize: 13,
+      fontFamily: fontFamilies.heavy,
+      color: "#FFFFFF",
+    },
+    titleProgressPanel: {
+      backgroundColor: "#FFFFFF",
+      borderRadius: 16,
+      padding: 14,
+      borderWidth: 2,
+      borderColor: "#E5E7EB",
+      borderBottomWidth: 4,
+      gap: 10,
+    },
+    titleProgressHeader: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      gap: 12,
+    },
+    titleProgressLabel: {
+      fontSize: 10,
+      fontFamily: fontFamilies.heavy,
+      color: "#9CA3AF",
+      textTransform: "uppercase",
+      letterSpacing: 0.8,
+    },
+    titleProgressMeta: {
+      fontSize: 11,
+      fontFamily: fontFamilies.bold,
+      color: "#E67E22",
+    },
+    titleProgressTrack: {
+      height: 8,
+      borderRadius: 4,
+      backgroundColor: "#FFF3E0",
+      overflow: "hidden",
+    },
+    titleProgressFill: {
+      height: "100%",
+      borderRadius: 4,
+      backgroundColor: "#FF8C00",
+    },
+    titleProgressHint: {
+      fontSize: 11,
+      fontFamily: fontFamilies.semibold,
+      color: "#888888",
+    },
+    titleMilestoneList: {
+      gap: 8,
+      marginTop: 2,
+    },
+    titleMilestoneRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 10,
+      paddingVertical: 8,
+      paddingHorizontal: 10,
+      borderRadius: 12,
+      backgroundColor: "#F9FAFB",
+    },
+    titleMilestoneRowCurrent: {
+      backgroundColor: "#FFF3E0",
+    },
+    titleMilestoneIcon: {
+      width: 32,
+      height: 32,
+      borderRadius: 16,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    titleMilestoneName: {
+      fontSize: 13,
+      fontFamily: fontFamilies.heavy,
+      color: "#333333",
+    },
+    titleMilestoneLevel: {
+      fontSize: 11,
+      fontFamily: fontFamilies.semibold,
+      color: "#9CA3AF",
+      marginTop: 1,
+    },
+    flipClip: {
+      position: "relative",
+      minHeight: 240,
     },
     cardFace: {
       position: "absolute",
@@ -656,15 +1074,29 @@ const createStyles = (theme: Palette) =>
       left: 0,
       right: 0,
       backgroundColor: "#FFFFFF",
-      borderRadius: 24,
-      padding: 24,
-      paddingTop: 28,
+      borderRadius: 20,
+      padding: 16,
+      borderWidth: 2,
+      borderColor: "#E5E7EB",
+      borderBottomWidth: 4,
       backfaceVisibility: "hidden",
     },
     profileRow: {
       flexDirection: "row",
       alignItems: "center",
       gap: 16,
+    },
+    profileRowCompact: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 14,
+    },
+    profileInfo: {
+      flex: 1,
+      gap: 2,
+    },
+    levelSectionCompact: {
+      marginTop: 8,
     },
     avatarContainer: {
       position: "relative",
@@ -692,13 +1124,11 @@ const createStyles = (theme: Palette) =>
     },
     levelBadgeText: {
       color: "#FFF",
-      fontWeight: "800",
       fontFamily: fontFamilies.heavy,
       fontSize: 12,
     },
     name: {
       fontSize: 20,
-      fontWeight: "800",
       fontFamily: fontFamilies.heavy,
       color: "#333333",
       marginBottom: 2,
@@ -706,7 +1136,6 @@ const createStyles = (theme: Palette) =>
     title: {
       fontSize: 13,
       color: "#888888",
-      fontWeight: "600",
       fontFamily: fontFamilies.semibold,
       marginBottom: 8,
     },
@@ -722,13 +1151,11 @@ const createStyles = (theme: Palette) =>
     },
     levelLabel: {
       fontSize: 13,
-      fontWeight: "800",
       fontFamily: fontFamilies.heavy,
       color: "#333333",
     },
     levelXp: {
       fontSize: 12,
-      fontWeight: "700",
       fontFamily: fontFamilies.bold,
       color: "#E67E22",
     },
@@ -745,23 +1172,20 @@ const createStyles = (theme: Palette) =>
     },
     levelHint: {
       fontSize: 11,
-      fontWeight: "600",
       fontFamily: fontFamilies.semibold,
       color: "#888888",
       marginTop: 6,
     },
-    /* Flip corner button shared by both faces */
     flipCornerBtn: {
-      position: "absolute",
-      top: 12,
-      right: 12,
-      width: 34,
-      height: 34,
-      borderRadius: 17,
-      backgroundColor: "#FFF3E0",
+      width: 40,
+      height: 40,
+      borderRadius: 14,
+      backgroundColor: "#FFFFFF",
       alignItems: "center",
       justifyContent: "center",
-      zIndex: 5,
+      borderWidth: 2,
+      borderColor: "#FFDD8D",
+      borderBottomWidth: 4,
     },
     profileTextCol: {
       flex: 1,
@@ -770,7 +1194,6 @@ const createStyles = (theme: Palette) =>
     /* Stats (back face) */
     statsTitle: {
       fontSize: 16,
-      fontWeight: "800",
       fontFamily: fontFamilies.heavy,
       color: "#333333",
       alignSelf: "center",
@@ -799,13 +1222,11 @@ const createStyles = (theme: Palette) =>
     },
     statValue: {
       fontSize: 22,
-      fontWeight: "800",
       fontFamily: fontFamilies.heavy,
       color: "#333333",
     },
     statLabel: {
       fontSize: 12,
-      fontWeight: "600",
       fontFamily: fontFamilies.semibold,
       color: "#888888",
       marginTop: 2,
@@ -836,13 +1257,11 @@ const createStyles = (theme: Palette) =>
     },
     streakValue: {
       fontSize: 16,
-      fontWeight: "800",
       fontFamily: fontFamilies.heavy,
       color: "#333333",
     },
     streakSub: {
       fontSize: 12,
-      fontWeight: "600",
       fontFamily: fontFamilies.semibold,
       color: "#888888",
       marginTop: 2,
@@ -876,7 +1295,6 @@ const createStyles = (theme: Palette) =>
     },
     sectionTitle: {
       fontSize: 16,
-      fontWeight: "800",
       fontFamily: fontFamilies.heavy,
       color: "#333333",
     },
@@ -891,7 +1309,6 @@ const createStyles = (theme: Palette) =>
     },
     countPillText: {
       fontSize: 11,
-      fontWeight: "800",
       fontFamily: fontFamilies.heavy,
       color: "#E67E22",
     },
@@ -918,7 +1335,6 @@ const createStyles = (theme: Palette) =>
     },
     badgeLabel: {
       fontSize: 10,
-      fontWeight: "700",
       fontFamily: fontFamilies.bold,
       color: "#555555",
       textAlign: "center",
@@ -947,7 +1363,6 @@ const createStyles = (theme: Palette) =>
     },
     leaderRankText: {
       fontSize: 11,
-      fontWeight: "800",
       fontFamily: fontFamilies.heavy,
       color: "#E67E22",
     },
@@ -960,13 +1375,11 @@ const createStyles = (theme: Palette) =>
     },
     leaderTitle: {
       fontSize: 14,
-      fontWeight: "800",
       fontFamily: fontFamilies.heavy,
       color: "#333333",
     },
     leaderPlays: {
       fontSize: 11,
-      fontWeight: "600",
       fontFamily: fontFamilies.semibold,
       color: "#888888",
       marginTop: 1,
@@ -985,7 +1398,6 @@ const createStyles = (theme: Palette) =>
     },
     leaderScoreText: {
       fontSize: 13,
-      fontWeight: "800",
       fontFamily: fontFamilies.heavy,
       color: "#555555",
     },
@@ -994,45 +1406,251 @@ const createStyles = (theme: Palette) =>
     },
     leaderNoScore: {
       fontSize: 14,
-      fontWeight: "800",
       fontFamily: fontFamilies.heavy,
       color: "#C9CDD3",
     },
 
-    /* Avatar picker modal */
+    /* Achievement unlocked celebration */
+    celebrationOverlay: {
+      ...StyleSheet.absoluteFillObject,
+      backgroundColor: "rgba(0, 0, 0, 0.55)",
+      alignItems: "center",
+      justifyContent: "center",
+      paddingHorizontal: 24,
+      zIndex: 50,
+    },
+    celebrationCard: {
+      width: "100%",
+      maxWidth: 340,
+      backgroundColor: "#FFFFFF",
+      borderRadius: 24,
+      padding: 24,
+      alignItems: "center",
+      elevation: 10,
+      shadowColor: "#000000",
+      shadowOffset: { width: 0, height: 8 },
+      shadowOpacity: 0.2,
+      shadowRadius: 16,
+    },
+    celebrationIconWrap: {
+      width: 64,
+      height: 64,
+      borderRadius: 32,
+      backgroundColor: "#FFF9E5",
+      alignItems: "center",
+      justifyContent: "center",
+      marginBottom: 12,
+    },
+    celebrationTitle: {
+      fontSize: 18,
+      fontFamily: fontFamilies.heavy,
+      color: "#333333",
+      marginBottom: 16,
+    },
+    celebrationRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 12,
+      width: "100%",
+      backgroundColor: "#F4F5F7",
+      borderRadius: 14,
+      padding: 12,
+      marginBottom: 10,
+    },
+    celebrationBadge: {
+      width: 44,
+      height: 44,
+      borderRadius: 22,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    celebrationBadgeTitle: {
+      fontSize: 14,
+      fontFamily: fontFamilies.heavy,
+      color: "#333333",
+    },
+    celebrationBadgeReq: {
+      fontSize: 11,
+      fontFamily: fontFamilies.semibold,
+      color: "#888888",
+      marginTop: 1,
+    },
+    celebrationButton: {
+      width: "100%",
+      backgroundColor: "#FF8C00",
+      borderRadius: 16,
+      paddingVertical: 14,
+      alignItems: "center",
+      marginTop: 6,
+    },
+    celebrationButtonText: {
+      fontSize: 15,
+      fontFamily: fontFamilies.heavy,
+      color: "#FFFFFF",
+    },
+
+    /* Avatar picker modal — beautiful */
     avatarModalOverlay: {
       flex: 1,
-      backgroundColor: "rgba(0, 0, 0, 0.55)",
+      backgroundColor: "rgba(0, 0, 0, 0.45)",
       alignItems: "center",
       justifyContent: "center",
       paddingHorizontal: 20,
     },
+    keyboardAvoidingView: {
+      flex: 1,
+      width: "100%",
+      justifyContent: "center",
+      alignItems: "center",
+    },
     avatarModalContent: {
       width: "100%",
-      maxWidth: 360,
-      maxHeight: "74%",
-      backgroundColor: theme.bg,
-      borderRadius: 22,
-      paddingTop: 16,
-      paddingBottom: 14,
-      paddingHorizontal: 16,
-      borderWidth: 1,
-      borderColor: theme.border,
+      maxWidth: 380,
+      maxHeight: "82%",
+      backgroundColor: "#FFFFFF",
+      borderRadius: 26,
+      padding: 16,
+      paddingTop: 12,
+      borderWidth: 2,
+      borderColor: "#E5E7EB",
+      borderBottomWidth: 4,
+      shadowColor: "#000000",
+      shadowOffset: { width: 0, height: 8 },
+      shadowOpacity: 0.12,
+      shadowRadius: 16,
+      elevation: 10,
+      overflow: "hidden",
+      flexShrink: 1,
+    },
+    dragHandle: {
+      width: 36,
+      height: 4,
+      borderRadius: 2,
+      backgroundColor: "#E5E7EB",
+      alignSelf: "center",
+      marginBottom: 8,
     },
     avatarModalHeader: {
       flexDirection: "row",
       justifyContent: "space-between",
       alignItems: "center",
-      marginBottom: 10,
+      marginBottom: 8,
+    },
+    editHeaderLeft: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 10,
+    },
+    editHeaderIcon: {
+      width: 32,
+      height: 32,
+      borderRadius: 16,
+      backgroundColor: "#FFF3E0",
+      alignItems: "center",
+      justifyContent: "center",
     },
     avatarModalTitle: {
-      fontSize: 20,
-      fontWeight: "800",
+      fontSize: 18,
       fontFamily: fontFamilies.heavy,
-      color: theme.text,
+      color: "#333333",
     },
     closeButton: {
       padding: 4,
+    },
+    closeButtonNew: {
+      width: 36,
+      height: 36,
+      borderRadius: 18,
+      backgroundColor: "#F9FAFB",
+      alignItems: "center",
+      justifyContent: "center",
+      borderWidth: 1,
+      borderColor: "#E5E7EB",
+    },
+    previewCard: {
+      backgroundColor: "#FFCA5F",
+      borderRadius: 20,
+      padding: 10,
+      gap: 6,
+      marginBottom: 12,
+    },
+    previewLabel: {
+      fontSize: 10,
+      fontFamily: fontFamilies.heavy,
+      color: "#724D06",
+      textTransform: "uppercase",
+      letterSpacing: 0.7,
+      paddingHorizontal: 4,
+    },
+    previewInner: {
+      backgroundColor: "#FFFFFF",
+      borderRadius: 16,
+      padding: 12,
+      borderWidth: 2,
+      borderColor: "#E5E7EB",
+      borderBottomWidth: 4,
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 12,
+    },
+    previewAvatarWrap: {
+      position: "relative",
+    },
+    previewAvatar: {
+      width: 56,
+      height: 56,
+      borderRadius: 28,
+      backgroundColor: "#FFF3E0",
+      borderWidth: 2,
+      borderColor: "#FFF3E0",
+    },
+    previewLevelBadge: {
+      position: "absolute",
+      bottom: -4,
+      right: -4,
+      backgroundColor: "#FF8C00",
+      width: 22,
+      height: 22,
+      borderRadius: 11,
+      alignItems: "center",
+      justifyContent: "center",
+      borderWidth: 2,
+      borderColor: "#FFFFFF",
+    },
+    previewLevelText: {
+      color: "#FFFFFF",
+      fontSize: 10,
+      fontFamily: fontFamilies.heavy,
+    },
+    previewName: {
+      fontSize: 16,
+      fontFamily: fontFamilies.heavy,
+      color: "#333333",
+      marginBottom: 2,
+    },
+    previewTitle: {
+      fontSize: 12,
+      fontFamily: fontFamilies.semibold,
+      color: "#888888",
+    },
+    previewXpRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 4,
+      marginTop: 4,
+    },
+    previewXp: {
+      fontSize: 11,
+      fontFamily: fontFamilies.bold,
+      color: "#E67E22",
+    },
+    previewCheck: {
+      width: 28,
+      height: 28,
+      borderRadius: 14,
+      backgroundColor: "#FFF3E0",
+      alignItems: "center",
+      justifyContent: "center",
     },
     avatarModalGrid: {
       paddingTop: 4,
@@ -1041,69 +1659,124 @@ const createStyles = (theme: Palette) =>
     nameFieldSection: {
       marginBottom: 14,
     },
-    nameFieldLabel: {
-      fontSize: 12,
-      fontWeight: "800",
-      fontFamily: fontFamilies.heavy,
-      color: theme.textMuted,
-      textTransform: "uppercase",
-      letterSpacing: 0.4,
+    nameFieldHeader: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
       marginBottom: 8,
     },
-    nameInput: {
+    nameFieldLabel: {
+      fontSize: 12,
+      fontFamily: fontFamilies.heavy,
+      color: "#9CA3AF",
+      textTransform: "uppercase",
+      letterSpacing: 0.4,
+    },
+    charCount: {
+      fontSize: 11,
+      fontFamily: fontFamilies.semibold,
+      color: "#9CA3AF",
+    },
+    nameInputWrap: {
+      flexDirection: "row",
+      alignItems: "center",
       backgroundColor: theme.card,
       borderWidth: 1,
       borderColor: theme.border,
       borderRadius: 12,
+      paddingRight: 8,
+    },
+    nameInput: {
+      flex: 1,
+      backgroundColor: "transparent",
+      borderWidth: 0,
       paddingHorizontal: 14,
       paddingVertical: 12,
       fontSize: 15,
-      fontWeight: "600",
       fontFamily: fontFamilies.semibold,
       color: theme.text,
     },
+    clearButton: {
+      padding: 6,
+    },
+    avatarSectionHeader: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginBottom: 8,
+      marginTop: 4,
+    },
+    avatarCount: {
+      fontSize: 11,
+      fontFamily: fontFamilies.semibold,
+      color: "#9CA3AF",
+    },
     avatarOptionsWrap: {
       flexDirection: "row",
-      flexWrap: "wrap",
-      justifyContent: "center",
+      alignItems: "center",
       gap: 12,
+      paddingHorizontal: 4,
+      paddingVertical: 8,
+      paddingRight: 16,
+    },
+    avatarScroll: {
+      height: 88,
+      flexGrow: 0,
+      flexShrink: 0,
+      marginTop: 4,
+    },
+    avatarOptionWrapper: {
+      position: "relative",
+      width: 72,
+      height: 72,
     },
     saveButton: {
-      marginTop: 6,
+      marginTop: 12,
       alignSelf: "stretch",
       backgroundColor: "#FF8C00",
       borderRadius: 14,
       paddingVertical: 14,
       alignItems: "center",
+      justifyContent: "center",
       shadowColor: "#FF8C00",
       shadowOffset: { width: 0, height: 4 },
       shadowOpacity: 0.3,
       shadowRadius: 8,
       elevation: 4,
+      flexShrink: 0,
     },
     saveButtonDisabled: {
       opacity: 0.4,
       shadowOpacity: 0,
       elevation: 0,
     },
+    saveButtonContent: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 8,
+    },
     saveButtonText: {
       fontSize: 16,
-      fontWeight: "800",
       fontFamily: fontFamilies.heavy,
       color: "#FFFFFF",
     },
     avatarModalOption: {
-      width: 64,
-      height: 64,
-      borderRadius: 32,
+      width: 72,
+      height: 72,
+      borderRadius: 36,
       overflow: "hidden",
       borderWidth: 2,
-      borderColor: theme.border,
-      backgroundColor: theme.card,
+      borderColor: "#E5E7EB",
+      backgroundColor: "#FFFFFF",
     },
     avatarModalOptionSelected: {
-      borderColor: theme.primary,
+      borderColor: "#FF8C00",
       borderWidth: 3,
+      shadowColor: "#FF8C00",
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.15,
+      shadowRadius: 8,
+      elevation: 3,
     },
     avatarModalOptionDisabled: {
       opacity: 0.65,
@@ -1114,10 +1787,15 @@ const createStyles = (theme: Palette) =>
     },
     avatarModalCheck: {
       position: "absolute",
-      bottom: 0,
-      right: 0,
-      backgroundColor: "#FFFFFF",
-      borderRadius: 10,
-      padding: 1,
+      bottom: -2,
+      right: -2,
+      width: 22,
+      height: 22,
+      borderRadius: 11,
+      backgroundColor: "#22C55E",
+      alignItems: "center",
+      justifyContent: "center",
+      borderWidth: 2,
+      borderColor: "#FFFFFF",
     },
   });

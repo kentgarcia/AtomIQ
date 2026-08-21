@@ -1,20 +1,26 @@
 import { ImageSourcePropType } from "react-native";
 
 const PROFILE_AVATAR_MAP = {
-  "default.png": require("@/assets/images/profile/default.png"),
-  "pic-1.png": require("@/assets/images/profile/pic-1.png"),
-  "pic-2.png": require("@/assets/images/profile/pic-2.png"),
-  "pic-3.png": require("@/assets/images/profile/pic-3.png"),
-  "pic-4.png": require("@/assets/images/profile/pic-4.png"),
-  "pic-5.png": require("@/assets/images/profile/pic-5.png"),
-  "pic-6.png": require("@/assets/images/profile/pic-6.png"),
-  "pic-7.png": require("@/assets/images/profile/pic-7.png"),
-  "pic-8.png": require("@/assets/images/profile/pic-8.png"),
+  "corgi.png": require("@/assets/images/profile/corgi.png"),
+  "baby-axolotl.png": require("@/assets/images/profile/baby-axolotl.png"),
+  "cloud.png": require("@/assets/images/profile/cloud.png"),
+  "dandelion.png": require("@/assets/images/profile/dandelion.png"),
+  "dog.png": require("@/assets/images/profile/dog.png"),
+  "fox.png": require("@/assets/images/profile/fox.png"),
+  "gray-seal.png": require("@/assets/images/profile/gray-seal.png"),
+  "monkey.png": require("@/assets/images/profile/monkey.png"),
+  "pig.png": require("@/assets/images/profile/pig.png"),
+  "rabbit.png": require("@/assets/images/profile/rabbit.png"),
+  "robot.png": require("@/assets/images/profile/robot.png"),
+  "tiger.png": require("@/assets/images/profile/tiger.png"),
+  "walrus.png": require("@/assets/images/profile/walrus.png"),
+  "whale-shark.png": require("@/assets/images/profile/whale-shark.png"),
+  "yeti.png": require("@/assets/images/profile/yeti.png"),
 } as const;
 
 export type ProfileAvatarKey = keyof typeof PROFILE_AVATAR_MAP;
 
-export const DEFAULT_PROFILE_AVATAR_KEY: ProfileAvatarKey = "default.png";
+export const DEFAULT_PROFILE_AVATAR_KEY: ProfileAvatarKey = "corgi.png";
 
 const PROFILE_AVATAR_KEYS = Object.keys(
   PROFILE_AVATAR_MAP,
@@ -26,6 +32,15 @@ const LEGACY_AVATAR_ALIASES: Record<string, ProfileAvatarKey> = {
   profile: DEFAULT_PROFILE_AVATAR_KEY,
   "profile.png": DEFAULT_PROFILE_AVATAR_KEY,
   "mascot/profile.png": DEFAULT_PROFILE_AVATAR_KEY,
+  "default.png": DEFAULT_PROFILE_AVATAR_KEY,
+  "pic-1.png": DEFAULT_PROFILE_AVATAR_KEY,
+  "pic-2.png": DEFAULT_PROFILE_AVATAR_KEY,
+  "pic-3.png": DEFAULT_PROFILE_AVATAR_KEY,
+  "pic-4.png": DEFAULT_PROFILE_AVATAR_KEY,
+  "pic-5.png": DEFAULT_PROFILE_AVATAR_KEY,
+  "pic-6.png": DEFAULT_PROFILE_AVATAR_KEY,
+  "pic-7.png": DEFAULT_PROFILE_AVATAR_KEY,
+  "pic-8.png": DEFAULT_PROFILE_AVATAR_KEY,
 };
 
 export const isProfileAvatarKey = (

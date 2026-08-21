@@ -334,7 +334,6 @@ export const MythBusterView = ({
                   <Text
                     style={{
                       color: theme.error,
-                      fontWeight: "800",
                       fontFamily: fontFamilies.heavy,
                       fontSize: 14,
                     }}
@@ -346,7 +345,6 @@ export const MythBusterView = ({
                   <Text
                     style={{
                       color: theme.success,
-                      fontWeight: "800",
                       fontFamily: fontFamilies.heavy,
                       fontSize: 14,
                     }}

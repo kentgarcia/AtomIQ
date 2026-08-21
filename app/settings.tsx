@@ -321,12 +321,14 @@ export default function SettingsScreen() {
               © 2026 AtomIQ. All rights reserved.
             </Text>
 
-            <TouchableOpacity
-              style={styles.modalGotItBtn}
-              onPress={() => setVersionModalVisible(false)}
-            >
-              <Text style={styles.modalGotItText}>Got it!</Text>
-            </TouchableOpacity>
+            <View style={styles.modalActions}>
+              <TouchableOpacity
+                style={styles.modalPrimaryBtn}
+                onPress={() => setVersionModalVisible(false)}
+              >
+                <Text style={styles.modalPrimaryBtnText}>Got it!</Text>
+              </TouchableOpacity>
+            </View>
           </Animated.View>
         </View>
       </Modal>
@@ -432,7 +434,6 @@ const createStyles = (theme: Palette) =>
     },
     headerTitle: {
       fontSize: 18,
-      fontWeight: "700",
       fontFamily: fontFamilies.bold,
       color: theme.text,
     },
@@ -441,7 +442,6 @@ const createStyles = (theme: Palette) =>
     },
     sectionTitle: {
       fontSize: 14,
-      fontWeight: "700",
       fontFamily: fontFamilies.bold,
       color: theme.textMuted,
       marginBottom: 12,
@@ -485,7 +485,6 @@ const createStyles = (theme: Palette) =>
     },
     settingLabel: {
       fontSize: 16,
-      fontWeight: "600",
       fontFamily: fontFamilies.semibold,
       color: theme.text,
     },
@@ -497,7 +496,6 @@ const createStyles = (theme: Palette) =>
     },
     settingValue: {
       fontSize: 15,
-      fontWeight: "500",
       fontFamily: fontFamilies.medium,
       color: theme.textMuted,
       marginRight: 8,
@@ -508,20 +506,20 @@ const createStyles = (theme: Palette) =>
       gap: 8,
     },
     input: {
-      flex: 1,
+      alignSelf: "stretch",
       backgroundColor: theme.bg,
       borderWidth: 1,
       borderColor: theme.border,
-      borderRadius: 8,
-      paddingHorizontal: 12,
-      paddingVertical: 8,
+      borderRadius: 12,
+      paddingHorizontal: 14,
+      paddingVertical: 12,
       fontSize: 15,
       fontFamily: fontFamilies.regular,
       color: theme.text,
+      marginTop: 8,
     },
     destructiveLabel: {
       fontSize: 16,
-      fontWeight: "600",
       fontFamily: fontFamilies.semibold,
       color: "#EF4444",
     },
@@ -556,31 +554,26 @@ const createStyles = (theme: Palette) =>
       zIndex: 10,
     },
     modalIconWrap: {
-      width: 88,
-      height: 88,
-      borderRadius: 28,
+      width: 68,
+      height: 68,
+      borderRadius: 22,
       backgroundColor: "#FFF7ED",
       borderWidth: 2,
       borderColor: "#FFEDD5",
       alignItems: "center",
       justifyContent: "center",
       marginBottom: 18,
-      shadowColor: theme.primary,
-      shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.2,
-      shadowRadius: 10,
-      elevation: 4,
     },
     modalIcon: {
-      width: 64,
-      height: 64,
+      width: 48,
+      height: 48,
     },
     modalTitle: {
-      fontSize: 24,
-      fontWeight: "800",
+      fontSize: 22,
       fontFamily: fontFamilies.heavy,
       color: theme.text,
       marginBottom: 10,
+      textAlign: "center",
     },
     versionBadge: {
       flexDirection: "row",
@@ -594,7 +587,6 @@ const createStyles = (theme: Palette) =>
     },
     versionBadgeText: {
       fontSize: 13,
-      fontWeight: "700",
       fontFamily: fontFamilies.bold,
       color: "#92400E",
     },
@@ -630,21 +622,26 @@ const createStyles = (theme: Palette) =>
       marginTop: 6,
       marginBottom: 18,
     },
-    modalGotItBtn: {
+    modalActions: {
+      flexDirection: "row",
+      gap: 12,
+      marginTop: 10,
       alignSelf: "stretch",
-      backgroundColor: theme.primary,
+    },
+    modalPrimaryBtn: {
+      flex: 1,
       paddingVertical: 14,
       borderRadius: 16,
       alignItems: "center",
+      backgroundColor: theme.primary,
       shadowColor: theme.primary,
       shadowOffset: { width: 0, height: 4 },
       shadowOpacity: 0.3,
       shadowRadius: 8,
       elevation: 4,
     },
-    modalGotItText: {
+    modalPrimaryBtnText: {
       fontSize: 16,
-      fontWeight: "700",
       fontFamily: fontFamilies.bold,
       color: "#FFFFFF",
     },
@@ -674,7 +671,6 @@ const createStyles = (theme: Palette) =>
     },
     deleteModalTitle: {
       fontSize: 22,
-      fontWeight: "800",
       fontFamily: fontFamilies.heavy,
       color: theme.text,
       marginBottom: 10,
@@ -687,7 +683,6 @@ const createStyles = (theme: Palette) =>
       marginBottom: 8,
     },
     deleteModalPhrase: {
-      fontWeight: "700",
       fontFamily: fontFamilies.bold,
       color: "#EF4444",
     },
@@ -707,7 +702,6 @@ const createStyles = (theme: Palette) =>
     },
     deleteModalCancelText: {
       fontSize: 16,
-      fontWeight: "700",
       fontFamily: fontFamilies.bold,
       color: theme.text,
     },
@@ -730,7 +724,6 @@ const createStyles = (theme: Palette) =>
     },
     deleteModalConfirmText: {
       fontSize: 16,
-      fontWeight: "700",
       fontFamily: fontFamilies.bold,
       color: "#FFFFFF",
     },

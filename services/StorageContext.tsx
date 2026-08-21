@@ -4,8 +4,10 @@ import React, {
     useCallback,
     useContext,
     useEffect,
+    useRef,
     useState,
 } from "react";
+import { AppState } from "react-native";
 import {
     createOrUpdateUserProfile,
     getUserProfile,
@@ -18,7 +20,7 @@ import {
 import { getOnboardingCompleted, setLastActiveDate } from "./storage";
 import { recordMissionEvent } from "./missions";
 import { isSupabaseConfigured } from "./supabase";
-import { checkDailyStreak } from "./utils";
+import { checkDailyStreak, toLocalIsoDate } from "./utils";
 
 interface UserProfile {
   id?: number;
@@ -44,6 +46,8 @@ interface StorageContextType {
   updateUserProfile: (updates: Partial<UserProfile>) => Promise<void>;
   addXP: (amount: number) => Promise<void>;
   incrementStreak: () => Promise<void>;
+  levelUpLevel: number | null;
+  dismissLevelUp: () => void;
   onboardingCompleted: boolean;
   isOnline: boolean;
 }
@@ -57,6 +61,7 @@ export const StorageProvider = ({ children }: { children: ReactNode }) => {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [onboardingCompleted, setOnboardingCompletedState] = useState(false);
   const [isOnline, setIsOnline] = useState(true);
+  const [levelUpLevel, setLevelUpLevel] = useState<number | null>(null);
 
   const generateLocalUserId = () =>
     `user_${Date.now()}_${Math.random().toString(36).substring(2, 15)}`;
@@ -191,21 +196,9 @@ export const StorageProvider = ({ children }: { children: ReactNode }) => {
       const completed = await getOnboardingCompleted();
       setOnboardingCompletedState(completed);
 
-      // Daily streak tracking
-      if (activeProfile) {
-        await checkDailyStreak(
-          incrementStreak,
-          updateUserProfile,
-          activeProfile,
-        );
-      }
-
-      // Update last active date
-      const today = new Date().toISOString().split("T")[0];
-      await setLastActiveDate(today);
-
-      // A successful app launch today counts as a daily login
-      await recordMissionEvent("login", 1);
+      // Daily streak tracking + daily login mission (idempotent per day;
+      // also re-runs whenever the app returns to the foreground)
+      await ensureDailyTracking();
 
       setIsInitialized(true);
     } catch (error) {
@@ -215,41 +208,115 @@ export const StorageProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const updateUserProfile = async (updates: Partial<UserProfile>) => {
-    try {
-      const normalizedUpdates: Partial<UserProfile> = {
-        ...updates,
-        ...(updates.avatar_url !== undefined
-          ? { avatar_url: normalizeProfileAvatarKey(updates.avatar_url) }
-          : {}),
-      };
+  const updateUserProfile = useCallback(
+    async (updates: Partial<UserProfile>) => {
+      try {
+        const normalizedUpdates: Partial<UserProfile> = {
+          ...updates,
+          ...(updates.avatar_url !== undefined
+            ? { avatar_url: normalizeProfileAvatarKey(updates.avatar_url) }
+            : {}),
+        };
 
-      await createOrUpdateUserProfile(normalizedUpdates);
-      await reloadUserProfile();
-    } catch (error) {
-      console.error("Error updating user profile:", error);
-      throw error;
-    }
-  };
+        await createOrUpdateUserProfile(normalizedUpdates);
+        await reloadUserProfile();
+      } catch (error) {
+        console.error("Error updating user profile:", error);
+        throw error;
+      }
+    },
+    [reloadUserProfile],
+  );
 
-  const addXP = async (amount: number) => {
-    if (!userProfile) return;
+  const addXP = useCallback(
+    async (amount: number) => {
+      // Read the freshest profile from the DB — React state can lag during
+      // rapid, overlapping awards (lesson + mission claim), which would
+      // otherwise clobber XP.
+      const profile = (await getUserProfile()) as UserProfile | null;
+      if (!profile) return;
 
-    const newTotalXP = userProfile.total_xp + amount;
-    await updateUserProfile({ total_xp: newTotalXP });
-  };
+      const prevTotalXP = profile.total_xp || 0;
+      const newTotalXP = prevTotalXP + Math.max(0, Math.round(amount));
 
-  const incrementStreak = async () => {
-    if (!userProfile) return;
+      await updateUserProfile({ total_xp: newTotalXP });
 
-    const newStreak = userProfile.current_streak + 1;
-    const newLongest = Math.max(newStreak, userProfile.longest_streak);
+      // Level-up detection — every 100 XP bumps the displayed level
+      const prevLevel = Math.floor(prevTotalXP / 100) + 1;
+      const newLevel = Math.floor(newTotalXP / 100) + 1;
+      if (newLevel > prevLevel) {
+        setLevelUpLevel(newLevel);
+      }
+    },
+    [updateUserProfile],
+  );
+
+  const incrementStreak = useCallback(async () => {
+    // Read the freshest profile from the DB directly — during cold-start
+    // initialization the React state (`userProfile`) has not flushed yet
+    // and would still be null, silently dropping the increment.
+    const profile = (await getUserProfile()) as UserProfile | null;
+    if (!profile) return;
+
+    const newStreak = (profile.current_streak || 0) + 1;
+    const newLongest = Math.max(newStreak, profile.longest_streak || 0);
 
     await updateUserProfile({
       current_streak: newStreak,
       longest_streak: newLongest,
     });
-  };
+  }, [updateUserProfile]);
+
+  // Idempotent per-day tracker: runs the streak check, marks the day as
+  // active, and credits the daily login mission — exactly once per day.
+  // A promise lock serializes concurrent invocations (cold-start init can
+  // race AppState "active") so the streak can never double-increment.
+  const dailyTrackedDateRef = useRef<string | null>(null);
+  const dailyTrackingPromiseRef = useRef<Promise<void> | null>(null);
+
+  const ensureDailyTracking = useCallback((): Promise<void> => {
+    const today = toLocalIsoDate();
+    if (dailyTrackedDateRef.current === today) {
+      return Promise.resolve();
+    }
+
+    if (!dailyTrackingPromiseRef.current) {
+      dailyTrackingPromiseRef.current = (async () => {
+        try {
+          const profile = (await getUserProfile()) as UserProfile | null;
+          await checkDailyStreak(incrementStreak, updateUserProfile, profile);
+        } catch (error) {
+          // Keep the day unclaimed so the next foreground retries.
+          console.error("Error running daily streak check:", error);
+          return;
+        }
+
+        // A successful app open today counts as a daily login
+        await setLastActiveDate(today);
+        await recordMissionEvent("login", 1);
+        dailyTrackedDateRef.current = today;
+      })().finally(() => {
+        dailyTrackingPromiseRef.current = null;
+      });
+    }
+
+    return dailyTrackingPromiseRef.current;
+  }, [incrementStreak, updateUserProfile]);
+
+  // Keep streaks + daily-login mission honest when the app is backgrounded
+  // overnight and reopened without a cold start (midnight rollover).
+  useEffect(() => {
+    const subscription = AppState.addEventListener("change", (state) => {
+      if (state === "active") {
+        void ensureDailyTracking();
+      }
+    });
+    return () => subscription.remove();
+  }, [ensureDailyTracking]);
+
+  const dismissLevelUp = useCallback(() => {
+    setLevelUpLevel(null);
+  }, []);
 
   return (
     <StorageContext.Provider
@@ -261,6 +328,8 @@ export const StorageProvider = ({ children }: { children: ReactNode }) => {
         updateUserProfile,
         addXP,
         incrementStreak,
+        levelUpLevel,
+        dismissLevelUp,
         onboardingCompleted,
         isOnline,
       }}

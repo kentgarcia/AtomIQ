@@ -173,7 +173,6 @@ const styles = StyleSheet.create({
     },
     title: {
         fontSize: 16,
-        fontWeight: "800",
         fontFamily: fontFamilies.heavy,
         textAlign: "center",
     },
@@ -200,7 +199,6 @@ const styles = StyleSheet.create({
     stepNumberText: {
         color: "#FFFFFF",
         fontSize: 11,
-        fontWeight: "900",
         fontFamily: fontFamilies.heavy,
     },
     stepIconWrap: {
@@ -217,12 +215,10 @@ const styles = StyleSheet.create({
     },
     stepTitle: {
         fontSize: 13,
-        fontWeight: "700",
         fontFamily: fontFamilies.semibold,
     },
     stepHint: {
         fontSize: 12,
-        fontWeight: "500",
         fontFamily: fontFamilies.regular,
         lineHeight: 16,
     },
