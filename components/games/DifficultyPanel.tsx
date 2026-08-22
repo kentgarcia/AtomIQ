@@ -73,17 +73,6 @@ export function DifficultyPanel({
     );
 
     const items = useMemo(() => {
-        if (game === "atom-maze") {
-            return mazes.map((maze, i) => ({
-                key: maze.id,
-                title: maze.title,
-                color: getMazeColor(maze.theme),
-                icon: "Grid9",
-                delay: 50 + i * 50,
-                onPress: () =>
-                    router.push(`/explorer/atom-maze?id=${maze.id}`),
-            }));
-        }
         if (game === "mythbuster") {
             return GAME_MODES.map((mode, i) => ({
                 key: mode.id,
@@ -94,26 +83,42 @@ export function DifficultyPanel({
                 onPress: () => router.push(`/mythbuster?mode=${mode.id}`),
             }));
         }
-        return [
-            {
-                key: "dose-visualizer",
-                title: "Dose Visualizer",
-                color: "#00D9FF",
-                icon: "Chart",
-                delay: 50,
-                onPress: () =>
-                    router.push("/lab?exp=dose-visualizer"),
-            },
-            {
-                key: "energy-showdown",
-                title: "Energy Showdown",
-                color: "#06FFA5",
-                icon: "Flash",
-                delay: 100,
-                onPress: () =>
-                    router.push("/lab?exp=energy-showdown"),
-            },
-        ];
+        if (game === "lab") {
+            return [
+                {
+                    key: "radiation-shield",
+                    title: "Radiation Shield Lab",
+                    color: "#FF8C00",
+                    icon: "ShieldTick",
+                    delay: 50,
+                    onPress: () => router.push("/lab?exp=radiation-shield"),
+                },
+                {
+                    key: "build-atom",
+                    title: "Build an Atom",
+                    color: "#1CB0F6",
+                    icon: "Atom",
+                    delay: 100,
+                    onPress: () => router.push("/lab?exp=build-atom"),
+                },
+                {
+                    key: "decay-lab",
+                    title: "Radioactive Decay Lab",
+                    color: "#2ECC71",
+                    icon: "Timer1",
+                    delay: 150,
+                    onPress: () => router.push("/lab?exp=decay-lab"),
+                },
+            ];
+        }
+        return mazes.map((maze, i) => ({
+            key: maze.id,
+            title: maze.title,
+            color: getMazeColor(maze.theme),
+            icon: "Grid9",
+            delay: 50 + i * 50,
+            onPress: () => router.push(`/explorer/atom-maze?id=${maze.id}`),
+        }));
     }, [game, router, mazes]);
 
     const cardH = Math.round(stackH / Math.max(items.length, 1));

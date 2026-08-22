@@ -125,9 +125,7 @@ export function PickAGame() {
 
     // Games with difficulty selection stay on this page: the picker slides
     // out and the difficulty panel slides in (and back again).
-    const [activeGame, setActiveGame] = useState<
-        "atom-maze" | "mythbuster" | "lab" | null
-    >(null);
+    const [activeGame, setActiveGame] = useState<"atom-maze" | "mythbuster" | "lab" | null>(null);
     const SLIDE = { duration: 320, easing: Easing.inOut(Easing.cubic) };
 
     const gamesX = useSharedValue(0);

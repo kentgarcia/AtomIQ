@@ -79,19 +79,19 @@ const FEATURE_SHOWCASE = [
     ],
   },
   {
-    id: "ai-chat",
-    title: "AI Assistant",
-    subtitle: "Your Learning Companion",
+    id: "guide",
+    title: "AtomIQ Guide",
+    subtitle: "Your Learning Navigator",
     description:
-      "Chat with your AI tutor anytime. Get instant answers, explanations, and personalized guidance on your nuclear science journey.",
-    icon: "Message",
+      "Tap your way through lessons, the encyclopedia, discoveries, games and more. AtomIQ Guide routes you to the right content — no typing required.",
+    icon: "Teacher",
     gradient: ["#FF4B4B", "#FF6B6B"],
     mascot: require("@/assets/images/mascot/thinking.png"),
     highlights: [
-      "Instant Answers",
-      "Personalized Help",
-      "24/7 Available",
-      "Smart Explanations",
+      "Learn & Explore",
+      "Discover & Practice",
+      "Track Progress",
+      "Play Games",
     ],
   },
 ];
