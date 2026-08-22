@@ -93,6 +93,10 @@ const TabButton = ({
 };
 
 function ModernTabBar({ state, navigation }: BottomTabBarProps) {
+  // Guide: show bar on landing, hide on chat (immersive)
+  const focused = state.routes[state.index];
+  const hide = (focused.params as any)?.hideTabBar === true || (focused.params as any)?.hideTabBar === "true";
+  if (focused?.name === "chat" && hide) return null;
   const insets = useSafeAreaInsets();
   const { theme } = useTheme();
 
@@ -101,7 +105,7 @@ function ModernTabBar({ state, navigation }: BottomTabBarProps) {
   const tabs = [
     { name: "index", icon: TAB_ICONS.map, label: "Home" },
     { name: "community", icon: TAB_ICONS.discovery, label: "Discover" },
-    { name: "chat", icon: TAB_ICONS.ai, label: "AI" },
+    { name: "chat", icon: TAB_ICONS.ai, label: "Guide" },
     { name: "awards", icon: TAB_ICONS.games, label: "Games" },
     { name: "profile", icon: TAB_ICONS.profile, label: "Profile" },
   ] as const;
@@ -185,7 +189,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="chat"
         options={{
-          title: "AI",
+          title: "Guide",
         }}
       />
       <Tabs.Screen

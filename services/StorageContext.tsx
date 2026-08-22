@@ -19,7 +19,6 @@ import {
 } from "./profile-avatars";
 import { getOnboardingCompleted, setLastActiveDate } from "./storage";
 import { recordMissionEvent } from "./missions";
-import { isSupabaseConfigured } from "./supabase";
 import { checkDailyStreak, toLocalIsoDate } from "./utils";
 
 interface UserProfile {
@@ -49,7 +48,6 @@ interface StorageContextType {
   levelUpLevel: number | null;
   dismissLevelUp: () => void;
   onboardingCompleted: boolean;
-  isOnline: boolean;
 }
 
 const StorageContext = createContext<StorageContextType | undefined>(undefined);
@@ -60,7 +58,6 @@ export const StorageProvider = ({ children }: { children: ReactNode }) => {
   const [isDatabaseReady, setIsDatabaseReady] = useState(false);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [onboardingCompleted, setOnboardingCompletedState] = useState(false);
-  const [isOnline, setIsOnline] = useState(true);
   const [levelUpLevel, setLevelUpLevel] = useState<number | null>(null);
 
   const generateLocalUserId = () =>
@@ -86,54 +83,9 @@ export const StorageProvider = ({ children }: { children: ReactNode }) => {
     setUserProfile(profile);
   }, []);
 
-  const checkConnectivity = useCallback(async () => {
-    if (!isSupabaseConfigured()) {
-      setIsOnline(false);
-      return;
-    }
-
-    try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 4000);
-
-      const response = await fetch(
-        `${process.env.EXPO_PUBLIC_SUPABASE_URL}/rest/v1/`,
-        {
-          method: "HEAD",
-          headers: {
-            apikey:
-              process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY ||
-              process.env.EXPO_PUBLIC_SUPABASE_KEY ||
-              "",
-          },
-          signal: controller.signal,
-        },
-      );
-
-      clearTimeout(timeoutId);
-
-      // Any non-5xx response confirms network reachability to Supabase.
-      setIsOnline(response.status < 500);
-    } catch {
-      setIsOnline(false);
-    }
-  }, []);
-
   useEffect(() => {
     initializeStorage();
   }, []);
-
-  useEffect(() => {
-    void checkConnectivity();
-
-    const intervalId = setInterval(() => {
-      void checkConnectivity();
-    }, 30000);
-
-    return () => {
-      clearInterval(intervalId);
-    };
-  }, [checkConnectivity]);
 
   const initializeStorage = async () => {
     try {
@@ -331,7 +283,6 @@ export const StorageProvider = ({ children }: { children: ReactNode }) => {
         levelUpLevel,
         dismissLevelUp,
         onboardingCompleted,
-        isOnline,
       }}
     >
       {children}

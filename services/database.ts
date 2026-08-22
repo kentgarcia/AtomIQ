@@ -289,10 +289,6 @@ export const initDatabase = async () => {
     // Initialize levels from syllabus if database is empty
     await initializeLevelsFromSyllabus();
 
-    // Initialize chat history tables
-    const { initChatHistoryDB } = await import("./chat-history");
-    await initChatHistoryDB();
-
     // Initialize explorer storage
     await initExplorerStorage();
 
@@ -1264,9 +1260,7 @@ export const deleteAccountData = async () => {
     "explorer_nodes",
     "explorer_mazes",
     "explorer_journeys",
-    "chat_messages",
     "saved_notes",
-    "chat_conversations",
     "user_profile",
     "lesson_steps",
     "levels",
