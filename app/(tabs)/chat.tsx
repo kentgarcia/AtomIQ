@@ -37,15 +37,6 @@ const INTENT_PHRASE: Record<GuideIntent, string> = {
   continue: "I want to continue",
   progress: "Show my progress",
 };
-const INTENT_COLOR: Record<GuideIntent, { bg: string; border: string }> = {
-  learn: { bg: "#FF8C00", border: "#E67E22" },
-  explore: { bg: "#5E72E4", border: "#4C63D2" },
-  discover: { bg: "#2ECC71", border: "#27AE60" },
-  practice: { bg: "#E67E22", border: "#D35400" },
-  review: { bg: "#E74C3C", border: "#C0392B" },
-  progress: { bg: "#9B59B6", border: "#8E44AD" },
-  continue: { bg: "#3498DB", border: "#2980B9" },
-};
 const MASCOTS: Record<string, any> = {
   happy: require("@/assets/images/mascot/happy.png"),
   thinking: require("@/assets/images/mascot/thinking.png"),
@@ -89,7 +80,6 @@ export default function GuideScreen() {
   const [state, setState] = React.useState<GuideState | null>(null);
   const [guideCtx, setGuideCtx] = React.useState<Awaited<ReturnType<typeof getGuideContext>> | null>(null);
   const [ready, setReady] = React.useState(false);
-  const [draftText, setDraftText] = React.useState("");
   const [pendingPill, setPendingPill] = React.useState<GuidePill | null>(null);
   const contentRef = useRef<LoadedContent | null>(null);
 
@@ -108,9 +98,8 @@ export default function GuideScreen() {
     try { (router as any).setParams?.({ hideTabBar: mode === "guide" ? "true" : undefined }); } catch {}
   }, [mode, navigation, router]);
 
-  // clear draft when switching modes
+  // clear pending pill when switching modes
   useEffect(() => {
-    setDraftText("");
     setPendingPill(null);
   }, [mode]);
 
@@ -131,7 +120,6 @@ export default function GuideScreen() {
   const handleSelectPill = (pill: GuidePill) => {
     if (!state || !contentRef.current) return;
     if (pill.payload.type === "utility" && pill.payload.utility === "start-over") {
-      setDraftText("");
       setPendingPill(null);
       (async () => { const ctx = await getGuideContext(userProfile); setGuideCtx(ctx); setState(initialGuideState(ctx)); })();
       return;
@@ -144,56 +132,22 @@ export default function GuideScreen() {
     })();
   };
   const handleCardCta = (card: GuideCard) => navigateDestination(router, card.destination);
-  const getDraftForTurns = (turns: GuideTurn[]) => {
-    const users = turns.filter((t) => t.role === "user");
-    if (!users.length) return "";
-    const last = users[users.length - 1];
-    const LABEL_TO_INTENT: Record<string, GuideIntent> = {
-      Learn: "learn",
-      Explore: "explore",
-      Discover: "discover",
-      Practice: "practice",
-      Review: "review",
-      Progress: "progress",
-    };
-    const lastIntent = LABEL_TO_INTENT[last.text];
-    if (lastIntent) return INTENT_PHRASE[lastIntent];
-    if (users.length >= 2) {
-      const prev = users[users.length - 2];
-      const prevIntent = LABEL_TO_INTENT[prev.text];
-      if (prevIntent) return `${INTENT_PHRASE[prevIntent]} [ ${last.text} ]`;
-    }
-    return last.text;
-  };
   const handleRevert = (turnIndex: number) => {
     setPendingPill(null);
     setState((prev) => {
       if (!prev) return prev;
       const newTurns = prev.turns.slice(0, turnIndex);
-      setDraftText(getDraftForTurns(newTurns));
       return { ...prev, turns: newTurns };
     });
   };
   const handlePillPress = (pill: GuidePill) => {
     // Dashboard from completion exits Guide Mode
     if (pill.label === "Dashboard" && pill.payload.type === "utility") {
-      setDraftText("Dashboard");
       setPendingPill(pill);
       handleSelectPill(pill);
       setMode("landing");
       return;
     }
-    let text: string;
-    if (pill.payload.type === "intent") {
-      text = INTENT_PHRASE[pill.payload.intent];
-    } else if (pill.payload.type === "topic" || pill.payload.type === "category") {
-      const prefix = state?.intent ? INTENT_PHRASE[state.intent] : "";
-      // visually embed choice with brackets and spaces: I want to learn about [ Atoms ]
-      text = prefix ? `${prefix} [ ${pill.label} ]` : `[ ${pill.label} ]`;
-    } else {
-      text = pill.label;
-    }
-    setDraftText(text);
     setPendingPill(pill);
     handleSelectPill(pill);
   };
@@ -234,7 +188,6 @@ export default function GuideScreen() {
 
   // ---- Guide Mode (Immersive) --------------------------------------------------
   const activeTurn: GuideTurn | null = state.turns.length && state.turns[state.turns.length - 1].role === "guide" ? (state.turns[state.turns.length - 1] as GuideTurn) : null;
-  const userTurns = state.turns.filter((t) => t.role === "user");
   const mascotSrc = MASCOT_FOR_MOOD[state.mascotMood] ?? MASCOTS.happy;
   const sentenceHeader = (() => {
     if (!state.intent || !activeTurn?.pills?.length) return null;
@@ -393,24 +346,6 @@ export default function GuideScreen() {
           </Animated.View>
         )}
         {!showCards && activeTurn && !activeTurn.pills?.length && <Text style={styles.bottomHint}>Choose Start Over to begin a new path</Text>}
-        {/* Sentence Composer — read-only, no cursor/keyboard/Send */}
-        <View style={styles.inputBar} accessibilityRole="text" accessibilityLabel={draftText || "Choose an option below"}>
-          <Text style={[styles.inputPlaceholder, draftText ? { color: "#333333", fontFamily: fontFamilies.medium } : null]} numberOfLines={1}>
-            {draftText || "Choose an option below"}
-          </Text>
-          {userTurns.length > 0 && (
-            <Pressable
-              onPress={handleUndo}
-              hitSlop={8}
-              accessibilityLabel="Back to previous choice"
-              accessibilityRole="button"
-              style={({ pressed }) => [styles.undoBtn, { opacity: pressed ? 0.7 : 1 }]}
-            >
-              <Icon name="Eraser" size={14} color="#6B7280" variant="Bold" />
-              <Text style={styles.undoText}>Back</Text>
-            </Pressable>
-          )}
-        </View>
       </Animated.View>
     </View>
   );
@@ -467,7 +402,7 @@ function LandingDashboard({ ctx, content, userProfile, onEnterChat, onDirectNav 
         {/* weak spots — only if you have them */}
         {weakChips.length > 0 && (
           <View style={styles.sectionCard}>
-            <View style={styles.sectionHead}><Text style={styles.sectionTitle}>Focus areas</Text><Pressable onPress={() => onEnterChat("review")}><Text style={[styles.linkText, { color: c.primary }]}>Review all →</Text></Pressable></View>
+            <View style={styles.sectionHead}><Text style={styles.sectionTitle}>Focus areas</Text><Pressable onPress={() => onEnterChat("review")}><Text style={[styles.linkText, { color: c.primary }]}>Review all</Text></Pressable></View>
             <View style={{ gap: 8 }}>
               {weakChips.map((q: any) => (
                 <View key={q.id} style={[styles.weakRow, { backgroundColor: "#F9FAFB", borderColor: "#F4F5F7" }]}>
@@ -524,22 +459,6 @@ const styles = StyleSheet.create({
   historyChipText: { fontSize: 12, fontFamily: fontFamilies.semibold },
   bottomSheet: { borderTopLeftRadius: 26, borderTopRightRadius: 26, borderTopWidth: 1, paddingHorizontal: 16, paddingTop: 14, shadowColor: "#000", shadowOffset: { width: 0, height: -4 }, shadowOpacity: 0.08, shadowRadius: 14, elevation: 8 },
   chatBox: { backgroundColor: "#FFFFFF", borderTopLeftRadius: 26, borderTopRightRadius: 26, borderTopWidth: 1, borderColor: "#E5E7EB", paddingHorizontal: 16, paddingTop: 12, shadowColor: "#000", shadowOffset: { width: 0, height: -4 }, shadowOpacity: 0.08, shadowRadius: 14, elevation: 8 },
-  inputBar: { flexDirection: "row", alignItems: "center", gap: 10, backgroundColor: "#F9FAFB", borderRadius: 999, paddingHorizontal: 14, paddingVertical: 10, borderWidth: 1, borderColor: "#E5E7EB", marginTop: 14 },
-  inputPlaceholder: { flex: 1, fontSize: 13, fontFamily: fontFamilies.regular, color: "#9CA3AF" },
-  sendCircle: { width: 32, height: 32, borderRadius: 16, backgroundColor: "#FF8C00", alignItems: "center", justifyContent: "center" },
-  undoBtn: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 999,
-    backgroundColor: "#E5E7EB",
-    borderWidth: 1,
-    borderColor: "#D1D5DB",
-    borderBottomWidth: 3,
-  },
-  undoText: { fontSize: 12, fontFamily: fontFamilies.heavy, color: "#6B7280" },
   // chat — fixed amber header (app design)
   chatHeaderContainer: { paddingHorizontal: 16, zIndex: 10 },
   chatHeaderBar: {
