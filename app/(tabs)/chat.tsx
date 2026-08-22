@@ -219,27 +219,15 @@ export default function GuideScreen() {
         </Pressable>
         <View style={{ flex: 1 }} />
         {state.turns.length > 1 && (
-          <>
-            <Pressable
-              onPress={handleUndo}
-              hitSlop={8}
-              accessibilityLabel="Go back to previous choice"
-              accessibilityRole="button"
-              style={({ pressed }) => [styles.chatBackBtn, { opacity: pressed ? 0.8 : 1 }]}
-            >
-              <Icon name="ArrowLeft" size={16} color="#333333" variant="Bold" />
-              <Text style={styles.chatBackText}>Back</Text>
-            </Pressable>
-            <Pressable
-              onPress={() => handleSelectPill({ id: "util-start-over", label: "Start Over", kind: "utility", icon: "Refresh", payload: { type: "utility", utility: "start-over" } } as GuidePill)}
-              hitSlop={8}
-              accessibilityLabel="Start over guide"
-              accessibilityRole="button"
-              style={({ pressed }) => [styles.startOverLink, { opacity: pressed ? 0.6 : 1 }]}
-            >
-              <Text style={styles.startOverLinkText}>Start Over</Text>
-            </Pressable>
-          </>
+          <Pressable
+            onPress={() => handleSelectPill({ id: "util-start-over", label: "Start Over", kind: "utility", icon: "Refresh", payload: { type: "utility", utility: "start-over" } } as GuidePill)}
+            hitSlop={8}
+            accessibilityLabel="Start over guide"
+            accessibilityRole="button"
+            style={({ pressed }) => [styles.startOverLink, { opacity: pressed ? 0.6 : 1 }]}
+          >
+            <Text style={styles.startOverLinkText}>Start Over</Text>
+          </Pressable>
         )}
       </View>
 
@@ -346,6 +334,19 @@ export default function GuideScreen() {
           </Animated.View>
         )}
         {!showCards && activeTurn && !activeTurn.pills?.length && <Text style={styles.bottomHint}>Choose Start Over to begin a new path</Text>}
+        {/* Full-width Back button (replaces the old input field spot) */}
+        {state.turns.length > 1 && (
+          <Pressable
+            onPress={handleUndo}
+            hitSlop={4}
+            accessibilityLabel="Go back to previous choice"
+            accessibilityRole="button"
+            style={({ pressed }) => [styles.bottomBackButton, { opacity: pressed ? 0.88 : 1, transform: [{ scale: pressed ? 0.98 : 1 }] }]}
+          >
+            <Icon name="ArrowLeft" size={16} color="#FFFFFF" variant="Bold" />
+            <Text style={styles.bottomBackButtonText}>Back</Text>
+          </Pressable>
+        )}
       </Animated.View>
     </View>
   );
@@ -459,6 +460,25 @@ const styles = StyleSheet.create({
   historyChipText: { fontSize: 12, fontFamily: fontFamilies.semibold },
   bottomSheet: { borderTopLeftRadius: 26, borderTopRightRadius: 26, borderTopWidth: 1, paddingHorizontal: 16, paddingTop: 14, shadowColor: "#000", shadowOffset: { width: 0, height: -4 }, shadowOpacity: 0.08, shadowRadius: 14, elevation: 8 },
   chatBox: { backgroundColor: "#FFFFFF", borderTopLeftRadius: 26, borderTopRightRadius: 26, borderTopWidth: 1, borderColor: "#E5E7EB", paddingHorizontal: 16, paddingTop: 12, shadowColor: "#000", shadowOffset: { width: 0, height: -4 }, shadowOpacity: 0.08, shadowRadius: 14, elevation: 8 },
+  bottomBackButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    backgroundColor: "#FF8C00",
+    marginTop: 14,
+    paddingVertical: 14,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: "#E67E22",
+    borderBottomWidth: 4,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.18,
+    shadowRadius: 6,
+    elevation: 4,
+  },
+  bottomBackButtonText: { fontSize: 15, fontFamily: fontFamilies.heavy, color: "#FFFFFF" },
   // chat — fixed amber header (app design)
   chatHeaderContainer: { paddingHorizontal: 16, zIndex: 10 },
   chatHeaderBar: {
