@@ -37,7 +37,6 @@ import type {
 } from "@/content/articles/types";
 
 import type {
-  Fact,
   Lesson,
   LessonStep,
   Myth,
@@ -67,7 +66,7 @@ export const CONTENT_DB_NAME = "content.db";
  * file lets us detect stale copies and re-copy the fresh bundle on the next
  * launch (otherwise the device would silently keep using old content forever).
  */
-export const CONTENT_DB_VERSION = 7;
+export const CONTENT_DB_VERSION = 9;
 
 /** Marker file stored next to the db, whose content is CONTENT_DB_VERSION. */
 const VERSION_MARKER = "content.db.version";
@@ -386,22 +385,6 @@ interface MythRow {
   popularity: number;
 }
 
-/** Raw shape of a `facts` row as returned by expo-sqlite. */
-interface FactRow {
-  id: string;
-  title: string;
-  statement: string;
-  explanation: string;
-  category: string;
-  importance: string;
-  sources: string; // JSON array of Source objects
-  related_myths: string; // JSON array of myth ids
-  related_lessons: string; // JSON array of lesson ids
-  image: string | null;
-  tags: string; // JSON array of strings
-  date_added: string;
-  last_updated: string;
-}
 
 /** Raw shape of a `mazes` row as returned by expo-sqlite. */
 interface MazeRow {
@@ -492,7 +475,6 @@ function mapMythBusterQuestionRow(row: MythBusterQuestionRow): QuizQuestion {
 
 /** Flatten a myth row into the domain `Myth` shape, mirroring content/types.ts. */
 function mapMythRow(row: MythRow): Myth {
-  const relatedFacts = parseJsonArray(row.related_facts);
   const relatedLessons = parseJsonArray(row.related_lessons);
   return {
     id: row.id,
@@ -503,32 +485,10 @@ function mapMythRow(row: MythRow): Myth {
     category: row.category,
     difficulty: row.difficulty as Myth["difficulty"],
     sources: parseJsonRecords(row.sources),
-    ...(relatedFacts.length ? { relatedFacts } : {}),
     ...(relatedLessons.length ? { relatedLessons } : {}),
     ...(row.image ? { image: row.image } : {}),
     tags: parseJsonArray(row.tags),
     popularity: row.popularity,
-  };
-}
-
-/** Flatten a fact row into the domain `Fact` shape, mirroring content/types.ts. */
-function mapFactRow(row: FactRow): Fact {
-  const relatedMyths = parseJsonArray(row.related_myths);
-  const relatedLessons = parseJsonArray(row.related_lessons);
-  return {
-    id: row.id,
-    title: row.title,
-    statement: row.statement,
-    explanation: row.explanation,
-    category: row.category,
-    importance: row.importance as Fact["importance"],
-    sources: parseJsonRecords(row.sources),
-    ...(relatedMyths.length ? { relatedMyths } : {}),
-    ...(relatedLessons.length ? { relatedLessons } : {}),
-    ...(row.image ? { image: row.image } : {}),
-    tags: parseJsonArray(row.tags),
-    dateAdded: row.date_added,
-    lastUpdated: row.last_updated,
   };
 }
 
@@ -676,7 +636,6 @@ function mapArticleRow(row: ArticleRow): Article {
     ...(row.source ? { source: row.source } : {}),
     ...(row.source_url ? { sourceUrl: row.source_url } : {}),
     ...(row.related_myths ? { relatedMyths: parseJsonArray(row.related_myths) } : {}),
-    ...(row.related_facts ? { relatedFacts: parseJsonArray(row.related_facts) } : {}),
     ...(row.featured ? { featured: true } : {}),
     ...(row.difficulty ? { difficulty: row.difficulty as Article["difficulty"] } : {}),
   };
@@ -933,32 +892,6 @@ export class ContentRepository {
     const db = await getReadyContentDb();
     const { count } = (await db.getFirstAsync<{ count: number }>(
       "SELECT COUNT(*) AS count FROM myths",
-    )) as { count: number };
-    return count;
-  }
-
-  /** Fetch a single fact by id, or `null`. */
-  async getFactById(id: string): Promise<Fact | null> {
-    const db = await getReadyContentDb();
-    const row = await db.getFirstAsync<FactRow>(
-      "SELECT * FROM facts WHERE id = ? LIMIT 1",
-      [id],
-    );
-    return row ? mapFactRow(row) : null;
-  }
-
-  /** Every fact, fully hydrated, ordered by id. */
-  async getAllFacts(): Promise<Fact[]> {
-    const db = await getReadyContentDb();
-    const rows = await db.getAllAsync<FactRow>("SELECT * FROM facts ORDER BY id");
-    return rows.map(mapFactRow);
-  }
-
-  /** Number of facts seeded — handy for integrity checks on launch. */
-  async getFactCount(): Promise<number> {
-    const db = await getReadyContentDb();
-    const { count } = (await db.getFirstAsync<{ count: number }>(
-      "SELECT COUNT(*) AS count FROM facts",
     )) as { count: number };
     return count;
   }

@@ -120,31 +120,10 @@ export interface Myth {
   category: string;
   difficulty: 'easy' | 'medium' | 'hard';
   sources: Source[];
-  relatedFacts?: string[]; // Fact IDs
   relatedLessons?: string[]; // Lesson IDs
   image?: string;
   tags: string[];
   popularity: number; // How common this myth is (1-10)
-}
-
-// ============================================
-// FACT TYPES
-// ============================================
-
-export interface Fact {
-  id: string;
-  title: string;
-  statement: string;
-  explanation: string;
-  category: string;
-  importance: 'low' | 'medium' | 'high' | 'critical';
-  sources: Source[];
-  relatedMyths?: string[]; // Myth IDs
-  relatedLessons?: string[]; // Lesson IDs
-  image?: string;
-  tags: string[];
-  dateAdded: string;
-  lastUpdated: string;
 }
 
 // ============================================
@@ -201,7 +180,6 @@ export interface ContentMetadata {
   totalLessons: number;
   totalQuizzes: number;
   totalMyths: number;
-  totalFacts: number;
   categories: ContentCategory[];
   lastUpdated: string;
 }

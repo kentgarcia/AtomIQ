@@ -34,7 +34,6 @@ export interface Article {
   source?: string;
   sourceUrl?: string;
   relatedMyths?: string[]; // IDs of related myths
-  relatedFacts?: string[]; // IDs of related facts
   featured?: boolean;
   difficulty?: 'beginner' | 'intermediate' | 'advanced';
 }
