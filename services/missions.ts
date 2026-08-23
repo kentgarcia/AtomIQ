@@ -1,4 +1,3 @@
-import { getAllFacts } from "@/content/facts";
 import { getAllMyths } from "@/content/myths";
 import { getItem, setItem } from "@/services/storage";
 
@@ -21,7 +20,7 @@ export interface MissionsState {
 }
 
 export type DailyFact = {
-  kind: "myth" | "fact";
+  kind: "myth";
   title: string;
   statement: string;
   explanation: string;
@@ -121,7 +120,7 @@ export const claimDailyMission = async (missionId: string): Promise<void> => {
 /* ------------------------------------------------------------------ */
 
 const FALLBACK_FACT: DailyFact = {
-  kind: "fact",
+  kind: "myth",
   title: "Nuclear powers the stars",
   statement:
     "Nuclear fusion in the Sun's core releases the energy that lights our sky.",
@@ -137,22 +136,14 @@ const dayOfYear = (date: Date): number => {
 
 export const getDailyFact = async (): Promise<DailyFact> => {
   try {
-    const [myths, facts] = await Promise.all([getAllMyths(), getAllFacts()]);
+    const [myths] = await Promise.all([getAllMyths()]);
 
-    const items: DailyFact[] = [
-      ...myths.map((myth) => ({
-        kind: "myth" as const,
-        title: myth.title,
-        statement: myth.mythStatement,
-        explanation: myth.explanation,
-      })),
-      ...facts.map((fact) => ({
-        kind: "fact" as const,
-        title: fact.title,
-        statement: fact.statement,
-        explanation: fact.explanation,
-      })),
-    ];
+    const items: DailyFact[] = myths.map((myth) => ({
+      kind: "myth" as const,
+      title: myth.title,
+      statement: myth.mythStatement,
+      explanation: myth.explanation,
+    }));
 
     if (items.length === 0) {
       return FALLBACK_FACT;

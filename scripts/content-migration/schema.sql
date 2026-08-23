@@ -166,31 +166,9 @@ CREATE TABLE IF NOT EXISTS myths (
   updated_at     INTEGER NOT NULL DEFAULT (strftime('%s', 'now'))
 );
 
--- ----------------------------------------------------------------------------
--- Facts (standalone factual reference entries)
--- ----------------------------------------------------------------------------
-CREATE TABLE IF NOT EXISTS facts (
-  id             TEXT PRIMARY KEY,                -- fact.id
-  title          TEXT NOT NULL,
-  statement      TEXT NOT NULL,                   -- the headline fact
-  explanation    TEXT NOT NULL DEFAULT '',        -- long-form context
-  category       TEXT NOT NULL DEFAULT '',        -- fact.category
-  importance     TEXT NOT NULL DEFAULT 'medium'
-                 CHECK (importance IN ('low', 'medium', 'high', 'critical')),
-  sources        TEXT NOT NULL DEFAULT '[]'       -- JSON array of Source objects
-                 CONSTRAINT facts_sources_json CHECK (json_valid(sources)),
-  related_myths  TEXT NOT NULL DEFAULT '[]'       -- JSON array of myth ids
-                 CONSTRAINT facts_related_myths_json CHECK (json_valid(related_myths)),
-  related_lessons TEXT NOT NULL DEFAULT '[]'      -- JSON array of lesson ids
-                 CONSTRAINT facts_related_lessons_json CHECK (json_valid(related_lessons)),
-  image          TEXT,                             -- nullable
-  tags           TEXT NOT NULL DEFAULT '[]'       -- JSON array of strings
-                 CONSTRAINT facts_tags_json CHECK (json_valid(tags)),
-  date_added     TEXT NOT NULL DEFAULT '',         -- ISO date string
-  last_updated   TEXT NOT NULL DEFAULT '',         -- ISO date string
-  created_at     INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
-  updated_at     INTEGER NOT NULL DEFAULT (strftime('%s', 'now'))
-);
+-- NOTE: the standalone `facts` table was retired — verified truths live in
+-- each myth's `reality` field. The `related_facts` columns on myths/articles
+-- remain as legacy (empty) JSON arrays.
 
 -- ----------------------------------------------------------------------------
 -- Atom Mazes (Pokemon-style challenge levels)

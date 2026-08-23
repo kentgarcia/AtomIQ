@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Serves the repo root over HTTP and opens the AtomIQ Content Editor.
-// The editor (tools/content-sql.html) auto-detects content/lessons/content.db
+// The editor (tools/content-sql.html) auto-detects content/database/content.db
 // only when served over http:// (browsers block fetch on file:// sockets).
 //
 // Zero dependencies — a tiny static file server using only Node core.
@@ -47,7 +47,7 @@ const MIME = {
 // GET /__editor/ping — lets the editor detect this endpoint is available
 // (it only exists when the page is served via `npm run content-editor`).
 const DB_PATHS = [
-  path.join(ROOT, "content", "lessons", "content.db"),
+  path.join(ROOT, "content", "database", "content.db"),
   path.join(ROOT, "assets", "database", "content.db"),
 ];
 const VERSION_FILE = path.join(ROOT, "services", "content-db.ts");

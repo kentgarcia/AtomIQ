@@ -71,7 +71,7 @@
     3. Ship it, either way:
          - "Save to repo" (only when served by `npm run content-editor`):
            POSTs the database to the dev server, which writes it over
-           content/lessons/content.db AND assets/database/content.db
+           content/database/content.db AND assets/database/content.db
            (keeping a .bak-<timestamp> of each) and bumps
            CONTENT_DB_VERSION in services/content-db.ts automatically.
          - "Export .db": downloads the database — copy it over
@@ -87,7 +87,7 @@
     to fetch sql.js + Bootstrap from a CDN).
 
     AUTO-DETECT: when served over http:// the tool probes
-    ../content/lessons/content.db and ../assets/database/content.db and loads
+    ../content/database/content.db and ../assets/database/content.db and loads
     the first match automatically. Browsers block fetch on file:// so opening
     the HTML directly won't auto-load — use the picker or "New blank DB".
 
@@ -347,7 +347,7 @@ code{color:var(--ae-brand-2)}
         <button id="themeBtn" class="btn btn-outline-secondary btn-sm" title="Toggle light / dark theme" aria-label="Toggle theme">
           <i class="bi bi-moon-fill" id="themeIcon"></i>
         </button>
-        <button id="saveRepoBtn" class="btn btn-primary btn-sm" style="display:none" title="Write this database over content/lessons/content.db + assets/database/content.db and bump CONTENT_DB_VERSION">
+        <button id="saveRepoBtn" class="btn btn-primary btn-sm" style="display:none" title="Write this database over content/database/content.db + assets/database/content.db and bump CONTENT_DB_VERSION">
           <i class="bi bi-cloud-arrow-up me-1"></i>Save to repo
         </button>
         <button id="exportTopBtn" class="btn btn-success btn-sm" disabled><i class="bi bi-download me-1"></i>Export .db</button>
@@ -1324,7 +1324,7 @@ ORDER BY l.unit_id, l.id;</textarea>
             <div class="small text-secondary mb-2">
               <b>Save to repo</b> (recommended when the editor is served via
               <code>npm run content-editor</code>): writes this database over
-              <code>content/lessons/content.db</code> <i>and</i>
+              <code>content/database/content.db</code> <i>and</i>
               <code>assets/database/content.db</code>, keeps a
               <code>.bak-&lt;timestamp&gt;</code> of the previous file, and bumps
               <code>CONTENT_DB_VERSION</code> in <code>services/content-db.ts</code>
@@ -1994,7 +1994,7 @@ CREATE INDEX IF NOT EXISTS idx_posts_published    ON posts(published_date);
 // 1. Load / create database
 // ---------------------------------------------------------------------------
 const AUTO_CANDIDATES = [
-  { path: "../content/lessons/content.db", label: "content/lessons/content.db" },
+  { path: "../content/database/content.db", label: "content/database/content.db" },
   { path: "../assets/database/content.db", label: "assets/database/content.db" },
 ];
 

@@ -18,8 +18,8 @@
  *   Examples:
  *     node scripts/content-migration/seed-sqlite.js
  *         # uses defaults below
- *     node scripts/content-migration/seed-sqlite.js content/lessons/json my-content.db
- *     node scripts/content-migration/seed-sqlite.js content/quizzes/json content/lessons/content.db
+ *     node scripts/content-migration/seed-sqlite.js content/json my-content.db
+ *     node scripts/content-migration/seed-sqlite.js content/quizzes/json content/database/content.db
  *
  *   The script applies schema.sql (in this same folder), then ingests every
  *   `.json` file produced by ts-to-json.js. File shape drives which table it
@@ -34,7 +34,7 @@
  *   It is idempotent: re-running replaces existing rows (INSERT OR REPLACE)
  *   inside a single transaction, so you can safely re-seed after regenerating
  *   JSON. Run it once per content directory against the same dbPath; both
- *   content/lessons/json and content/quizzes/json feed the same content.db.
+ *   content/json and content/quizzes/json feed the same content.db.
  *
  *   NOTE: the one-time TS -> JSON migration is COMPLETE and the intermediate
  *   json/ folders were removed. The content database (content/lessons/
@@ -42,8 +42,8 @@
  *   truth — this script + ts-to-json.js remain for future bulk migrations.
  *
  * DEFAULTS
- *   jsonDir = content/lessons/json     (output of ts-to-json.js)
- *   dbPath  = content/lessons/content.db
+ *   jsonDir = content/json     (output of ts-to-json.js)
+ *   dbPath  = content/database/content.db
  */
 
 const Database = require("better-sqlite3");
@@ -56,7 +56,7 @@ const path = require("path");
 
 const SCHEMA_PATH = path.join(__dirname, "schema.sql");
 const DEFAULT_JSON_DIR = path.join(__dirname, "..", "..", "content", "lessons", "json");
-const DEFAULT_DB_PATH = path.join(__dirname, "..", "..", "content", "lessons", "content.db");
+const DEFAULT_DB_PATH = path.join(__dirname, "..", "..", "content", "database", "content.db");
 
 const [jsonDirArg = DEFAULT_JSON_DIR, dbPathArg = DEFAULT_DB_PATH] = process.argv.slice(2);
 
