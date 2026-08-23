@@ -75,6 +75,11 @@ export default function GuideScreen() {
   const insets = useSafeAreaInsets();
   const c = theme.colors;
   const reducedMotion = useReducedMotion();
+  const isDark = theme.mode === "dark";
+  const P = isDark
+    ? { card: "#213356", border: "#2D3A56", softBorder: "#26365A", soft: "#1A2D4A", creamTint: "#4A381B", text: "#F6F9FC", textSecondary: "#C0CBDD", muted: "#8898AA", faint: "#667799" }
+    : { card: "#FFFFFF", border: "#E5E7EB", softBorder: "#F4F5F7", soft: "#F9FAFB", creamTint: "#FFF3E0", text: "#333333", textSecondary: "#555555", muted: "#888888", faint: "#9CA3AF" };
+  const styles = React.useMemo(() => createStyles(P), [P]);
 
   const [mode, setMode] = React.useState<"landing" | "guide">("landing");
   const [state, setState] = React.useState<GuideState | null>(null);
@@ -214,7 +219,7 @@ export default function GuideScreen() {
           accessibilityRole="button"
           style={({ pressed }) => [styles.chatBackBtn, { opacity: pressed ? 0.8 : 1 }]}
         >
-          <Icon name="ArrowLeft" size={16} color="#333333" variant="Bold" />
+          <Icon name="ArrowLeft" size={16} color={isDark ? "#C0CBDD" : "#333333"} variant="Bold" />
           <Text style={styles.chatBackText}>Dashboard</Text>
         </Pressable>
         <View style={{ flex: 1 }} />
@@ -243,7 +248,7 @@ export default function GuideScreen() {
       <Animated.View entering={reducedMotion ? FadeIn.duration(150) : FadeInUp.duration(300)} style={[styles.chatBox, { paddingBottom: insets.bottom + 14 }]}>
         <View style={styles.chatHandle} />
         {sentenceHeader && showOptionPills && (
-          <View style={styles.sentenceHeader}><Text style={[styles.sentencePrefix, { color: "#333333" }]}>{sentenceHeader}</Text><View style={[styles.blankLine, { backgroundColor: "#E5E7EB" }]} /><Icon name="Edit" size={12} color="#9CA3AF" variant="Linear" /></View>
+          <View style={styles.sentenceHeader}><Text style={[styles.sentencePrefix, { color: P.text }]}>{sentenceHeader}</Text><View style={[styles.blankLine, { backgroundColor: P.softBorder }]} /><Icon name="Edit" size={12} color={P.faint} variant="Linear" /></View>
         )}
         {showCards && activeTurn?.cards && (
           <>
@@ -325,9 +330,9 @@ export default function GuideScreen() {
                   hitSlop={4}
                   accessibilityLabel={pill.label}
                   accessibilityRole="button"
-                  style={({ pressed }) => [styles.optionPill, { backgroundColor: isSelected ? "#FF8C00" : pressed ? "#FFF3E0" : "#FFFFFF", borderColor: isSelected ? "#E67E22" : "#E5E7EB", opacity: pressed ? 0.95 : 1 }]}
+                  style={({ pressed }) => [styles.optionPill, { backgroundColor: isSelected ? "#FF8C00" : pressed ? P.creamTint : P.card, borderColor: isSelected ? "#E67E22" : P.border, opacity: pressed ? 0.95 : 1 }]}
                 >
-                  <Text style={[styles.optionPillText, { color: isSelected ? "#FFFFFF" : "#333333" }]}>{pill.label}</Text>
+                  <Text style={[styles.optionPillText, { color: isSelected ? "#FFFFFF" : P.text }]}>{pill.label}</Text>
                 </Pressable>
               );
             })}
@@ -357,6 +362,11 @@ function LandingDashboard({ ctx, content, userProfile, onEnterChat, onDirectNav 
   const { theme } = useTheme();
   const c = theme.colors;
   const insets = useSafeAreaInsets();
+  const isDark = theme.mode === "dark";
+  const P = isDark
+    ? { card: "#213356", border: "#2D3A56", softBorder: "#26365A", soft: "#1A2D4A", creamTint: "#4A381B", text: "#F6F9FC", textSecondary: "#C0CBDD", muted: "#8898AA", faint: "#667799" }
+    : { card: "#FFFFFF", border: "#E5E7EB", softBorder: "#F4F5F7", soft: "#F9FAFB", creamTint: "#FFF3E0", text: "#333333", textSecondary: "#555555", muted: "#888888", faint: "#9CA3AF" };
+  const styles = React.useMemo(() => createStyles(P), [P]);
   const weakChips = useMemo(() => ctx.weakQuizIds.slice(0, 3).map((id) => content.quizzes.find((q) => q.id === id)).filter(Boolean) as any[], [ctx.weakQuizIds, content.quizzes]);
 
   return (
@@ -406,10 +416,10 @@ function LandingDashboard({ ctx, content, userProfile, onEnterChat, onDirectNav 
             <View style={styles.sectionHead}><Text style={styles.sectionTitle}>Focus areas</Text><Pressable onPress={() => onEnterChat("review")}><Text style={[styles.linkText, { color: c.primary }]}>Review all</Text></Pressable></View>
             <View style={{ gap: 8 }}>
               {weakChips.map((q: any) => (
-                <View key={q.id} style={[styles.weakRow, { backgroundColor: "#F9FAFB", borderColor: "#F4F5F7" }]}>
-                  <View style={[styles.weakIcon, { backgroundColor: "#FFF3E0" }]}><Icon name="Refresh" size={14} color="#E67E22" variant="Bold" /></View>
-                  <Text style={[styles.weakText, { color: "#333333" }]} numberOfLines={1}>{q.title}</Text>
-                  <Pressable onPress={() => onEnterChat("review")} style={({ pressed }) => [styles.weakBtn, { backgroundColor: "#FFFFFF", borderColor: "#E5E7EB", opacity: pressed ? 0.8 : 1 }]}><Text style={[styles.weakBtnText, { color: "#333333" }]}>Fix</Text></Pressable>
+                <View key={q.id} style={[styles.weakRow, { backgroundColor: P.soft, borderColor: P.softBorder }]}>
+                  <View style={[styles.weakIcon, { backgroundColor: P.creamTint }]}><Icon name="Refresh" size={14} color="#E67E22" variant="Bold" /></View>
+                  <Text style={[styles.weakText, { color: P.text }]} numberOfLines={1}>{q.title}</Text>
+                  <Pressable onPress={() => onEnterChat("review")} style={({ pressed }) => [styles.weakBtn, { backgroundColor: P.card, borderColor: P.border, opacity: pressed ? 0.8 : 1 }]}><Text style={[styles.weakBtnText, { color: P.text }]}>Fix</Text></Pressable>
                 </View>
               ))}
             </View>
@@ -421,7 +431,7 @@ function LandingDashboard({ ctx, content, userProfile, onEnterChat, onDirectNav 
           <Text style={[styles.sectionTitle, { marginBottom: 12 }]}>Quick starts</Text>
           <View style={styles.tileGrid}>
             {QUICK_TILES.map((t) => (
-              <Pressable key={t.intent} onPress={() => onEnterChat(t.intent)} style={({ pressed }) => [styles.tile, { backgroundColor: "#FDFBF7", borderColor: "#F4F5F7", opacity: pressed ? 0.9 : 1 }]}>
+              <Pressable key={t.intent} onPress={() => onEnterChat(t.intent)} style={({ pressed }) => [styles.tile, { backgroundColor: P.soft, borderColor: P.softBorder, opacity: pressed ? 0.9 : 1 }]}>
                 <View style={[styles.tileIcon, { backgroundColor: `${t.color}14` }]}><Icon name={t.icon} size={18} color={t.color} variant="Bold" /></View>
                 <Text style={styles.tileTitle}>{t.title}</Text>
                 <Text style={styles.tileDesc}>{t.desc}</Text>
@@ -434,7 +444,8 @@ function LandingDashboard({ ctx, content, userProfile, onEnterChat, onDirectNav 
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (P: { card: string; border: string; softBorder: string; soft: string; creamTint: string; text: string; textSecondary: string; muted: string; faint: string }) =>
+  StyleSheet.create({
   container: { flex: 1 },
   loading: { flex: 1, alignItems: "center", justifyContent: "center", gap: 10 },
   loadingText: { fontSize: 13, fontFamily: fontFamilies.regular },
@@ -459,7 +470,7 @@ const styles = StyleSheet.create({
   historyChip: { paddingHorizontal: 12, paddingVertical: 7, borderRadius: 999, borderWidth: 1, maxWidth: 160 },
   historyChipText: { fontSize: 12, fontFamily: fontFamilies.semibold },
   bottomSheet: { borderTopLeftRadius: 26, borderTopRightRadius: 26, borderTopWidth: 1, paddingHorizontal: 16, paddingTop: 14, shadowColor: "#000", shadowOffset: { width: 0, height: -4 }, shadowOpacity: 0.08, shadowRadius: 14, elevation: 8 },
-  chatBox: { backgroundColor: "#FFFFFF", borderTopLeftRadius: 26, borderTopRightRadius: 26, borderTopWidth: 1, borderColor: "#E5E7EB", paddingHorizontal: 16, paddingTop: 12, shadowColor: "#000", shadowOffset: { width: 0, height: -4 }, shadowOpacity: 0.08, shadowRadius: 14, elevation: 8 },
+  chatBox: { backgroundColor: P.card, borderTopLeftRadius: 26, borderTopRightRadius: 26, borderTopWidth: 1, borderColor: P.border, paddingHorizontal: 16, paddingTop: 12, shadowColor: "#000", shadowOffset: { width: 0, height: -4 }, shadowOpacity: 0.08, shadowRadius: 14, elevation: 8 },
   bottomBackButton: {
     flexDirection: "row",
     alignItems: "center",
@@ -500,12 +511,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 999,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: P.card,
     borderWidth: 1,
-    borderColor: "#E5E7EB",
+    borderColor: P.border,
     borderBottomWidth: 2,
   },
-  chatBackText: { fontSize: 12, fontFamily: fontFamilies.heavy, color: "#333333" },
+  chatBackText: { fontSize: 12, fontFamily: fontFamilies.heavy, color: P.text },
   chatTitleCenter: { flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 6 },
   chatTitleText: { fontSize: 14, fontFamily: fontFamilies.heavy, color: "#724D06" },
   chatResetBtn: {
@@ -515,26 +526,26 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 999,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: P.card,
     borderWidth: 1,
-    borderColor: "#E5E7EB",
+    borderColor: P.border,
     borderBottomWidth: 2,
   },
-  chatResetText: { fontSize: 12, fontFamily: fontFamilies.semibold, color: "#333333" },
+  chatResetText: { fontSize: 12, fontFamily: fontFamilies.semibold, color: P.text },
   chatResetPlaceholder: { width: 72 },
   startOverLink: { paddingHorizontal: 8, paddingVertical: 8, justifyContent: "center" },
-  startOverLinkText: { fontSize: 12, fontFamily: fontFamilies.medium, color: "#9CA3AF" },
+  startOverLinkText: { fontSize: 12, fontFamily: fontFamilies.medium, color: P.faint },
   // center — mascot + overlay speech card (big & bold)
   mascotStage: { alignItems: "center", justifyContent: "center", width: "100%" },
   mascotWrapLarge: { alignItems: "center", justifyContent: "center" },
   mascotLarge: { width: 220, height: 220 },
   speechOverlayCard: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: P.card,
     borderRadius: 20,
     paddingHorizontal: 20,
     paddingVertical: 18,
     borderWidth: 2,
-    borderColor: "#E5E7EB",
+    borderColor: P.border,
     borderBottomWidth: 4,
     maxWidth: 340,
     width: "92%",
@@ -547,8 +558,8 @@ const styles = StyleSheet.create({
     elevation: 5,
     zIndex: 2,
   },
-  speechOverlayText: { fontSize: 20, fontFamily: fontFamilies.heavy, lineHeight: 26, color: "#333333", textAlign: "center" },
-  chatHandle: { width: 36, height: 4, borderRadius: 2, backgroundColor: "#E5E7EB", alignSelf: "center", marginBottom: 12 },
+  speechOverlayText: { fontSize: 20, fontFamily: fontFamilies.heavy, lineHeight: 26, color: P.text, textAlign: "center" },
+  chatHandle: { width: 36, height: 4, borderRadius: 2, backgroundColor: P.softBorder, alignSelf: "center", marginBottom: 12 },
   bottomPillContainer: { alignItems: "center", justifyContent: "center", paddingHorizontal: 16, paddingTop: 12 },
   roundedPillButton: {
     flexDirection: "row",
@@ -611,8 +622,8 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     borderWidth: 1,
     borderBottomWidth: 4,
-    borderColor: "#E5E7EB",
-    backgroundColor: "#FFFFFF",
+    borderColor: P.border,
+    backgroundColor: P.card,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.06,
@@ -641,14 +652,14 @@ const styles = StyleSheet.create({
   heroSub: { fontSize: 12, fontFamily: fontFamilies.medium, color: "#7A4D00", marginTop: 4, lineHeight: 16 },
   heroMascot: { width: 84, height: 84 },
   heroBubble: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: P.card,
     borderRadius: 20,
     padding: 16,
     borderWidth: 2,
-    borderColor: "#E5E7EB",
+    borderColor: P.border,
     borderBottomWidth: 4,
   },
-  heroBubbleText: { fontSize: 13, fontFamily: fontFamilies.medium, lineHeight: 18, color: "#333333" },
+  heroBubbleText: { fontSize: 13, fontFamily: fontFamilies.medium, lineHeight: 18, color: P.text },
   heroCta: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8, borderRadius: 14, paddingVertical: 12, marginTop: 2 },
   heroCtaText: { fontSize: 14, fontFamily: fontFamilies.heavy },
   // home header — exact copy from app/(tabs)/index.tsx
@@ -669,9 +680,9 @@ const styles = StyleSheet.create({
     width: 46,
     height: 46,
     borderRadius: 23,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: P.card,
     borderWidth: 2,
-    borderColor: "#E5E7EB",
+    borderColor: P.border,
     borderBottomWidth: 4,
   },
   homeAvatar: { width: "100%", height: "100%", borderRadius: 23 },
@@ -681,7 +692,7 @@ const styles = StyleSheet.create({
   homeXpText: { fontSize: 13, fontFamily: fontFamilies.heavy, color: "#FFFFFF" },
   headerStack: { gap: 0 },
   whiteBehindWrapper: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: P.card,
     borderTopLeftRadius: 0,
     borderTopRightRadius: 0,
     borderBottomLeftRadius: 20,
@@ -698,23 +709,23 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   shrodiCard: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: P.card,
     borderRadius: 20,
     padding: 16,
     borderWidth: 2,
-    borderColor: "#E5E7EB",
+    borderColor: P.border,
     borderBottomWidth: 4,
     flexDirection: "row",
     alignItems: "center",
     gap: 12,
   },
-  shrodiTitle: { fontSize: 15, fontFamily: fontFamilies.heavy, color: "#333333" },
-  shrodiOverview: { fontSize: 12, fontFamily: fontFamilies.regular, color: "#666666", lineHeight: 16 },
+  shrodiTitle: { fontSize: 15, fontFamily: fontFamilies.heavy, color: P.text },
+  shrodiOverview: { fontSize: 12, fontFamily: fontFamilies.regular, color: P.textSecondary, lineHeight: 16 },
   shrodiAvatarWrap: {
     width: 64,
     height: 64,
     borderRadius: 32,
-    backgroundColor: "#FFF3E0",
+    backgroundColor: P.creamTint,
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 2,
@@ -723,7 +734,7 @@ const styles = StyleSheet.create({
   },
   shrodiAvatar: { width: 56, height: 56 },
   nextCard: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: P.card,
     borderRadius: 24,
     padding: 20,
     borderWidth: 0,
@@ -736,16 +747,16 @@ const styles = StyleSheet.create({
   },
   nextCardHeader: { flexDirection: "row", gap: 12 },
   nextIcon: { width: 38, height: 38, borderRadius: 12, alignItems: "center", justifyContent: "center" },
-  nextLabel: { fontSize: 10, fontFamily: fontFamilies.heavy, letterSpacing: 0.7, color: "#9CA3AF" },
-  nextTitle: { fontSize: 15, fontFamily: fontFamilies.heavy, marginTop: 2, color: "#333333" },
-  nextSub: { fontSize: 12, fontFamily: fontFamilies.regular, marginTop: 4, lineHeight: 16, color: "#888888" },
+  nextLabel: { fontSize: 10, fontFamily: fontFamilies.heavy, letterSpacing: 0.7, color: P.faint },
+  nextTitle: { fontSize: 15, fontFamily: fontFamilies.heavy, marginTop: 2, color: P.text },
+  nextSub: { fontSize: 12, fontFamily: fontFamilies.regular, marginTop: 4, lineHeight: 16, color: P.muted },
   nextActions: { flexDirection: "row", gap: 10 },
   nextPrimary: { flex: 1, borderRadius: 12, paddingVertical: 11, alignItems: "center" },
   nextPrimaryText: { fontSize: 13, fontFamily: fontFamilies.heavy },
-  nextSecondary: { borderRadius: 12, borderWidth: 1, paddingHorizontal: 16, justifyContent: "center", borderColor: "#E5E7EB" },
-  nextSecondaryText: { fontSize: 13, fontFamily: fontFamilies.semibold, color: "#333333" },
+  nextSecondary: { borderRadius: 12, borderWidth: 1, paddingHorizontal: 16, justifyContent: "center", borderColor: P.border },
+  nextSecondaryText: { fontSize: 13, fontFamily: fontFamilies.semibold, color: P.text },
   sectionCard: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: P.card,
     borderRadius: 24,
     padding: 20,
     borderWidth: 0,
@@ -756,8 +767,8 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   sectionHead: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 16 },
-  sectionTitle: { fontSize: 16, fontFamily: fontFamilies.heavy, color: "#333333" },
-  sectionMeta: { fontSize: 12, fontFamily: fontFamilies.semibold, color: "#888888" },
+  sectionTitle: { fontSize: 16, fontFamily: fontFamilies.heavy, color: P.text },
+  sectionMeta: { fontSize: 12, fontFamily: fontFamilies.semibold, color: P.muted },
   linkText: { fontSize: 12, fontFamily: fontFamilies.heavy },
   weakRow: { flexDirection: "row", alignItems: "center", gap: 10, borderWidth: 1, borderRadius: 12, paddingHorizontal: 12, paddingVertical: 10 },
   weakIcon: { width: 28, height: 28, borderRadius: 14, alignItems: "center", justifyContent: "center" },
@@ -767,8 +778,8 @@ const styles = StyleSheet.create({
   tileGrid: { flexDirection: "row", flexWrap: "wrap", gap: 10 },
   tile: { width: "48%", borderRadius: 14, borderWidth: 1, padding: 12, gap: 6 },
   tileIcon: { width: 32, height: 32, borderRadius: 12, alignItems: "center", justifyContent: "center" },
-  tileTitle: { fontSize: 13, fontFamily: fontFamilies.heavy, color: "#333333" },
-  tileDesc: { fontSize: 11, fontFamily: fontFamilies.regular, lineHeight: 14, color: "#888888" },
+  tileTitle: { fontSize: 13, fontFamily: fontFamilies.heavy, color: P.text },
+  tileDesc: { fontSize: 11, fontFamily: fontFamilies.regular, lineHeight: 14, color: P.muted },
   guideCta3d: {
     flexDirection: "row",
     alignItems: "center",

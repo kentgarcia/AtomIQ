@@ -211,7 +211,8 @@ export default function LeaderboardScreen() {
   const { theme } = useTheme();
   const router = useRouter();
   const THEME = theme.palettes.tab;
-  const styles = useMemo(() => createStyles(THEME), [THEME]);
+  const isDark = theme.mode === "dark";
+  const styles = useMemo(() => createStyles(THEME, isDark), [THEME, isDark]);
   const bgColors: [string, string] =
     theme.mode === "dark" ? [THEME.bg, THEME.bg] : ["#FFF3E0", "#FFFFFF"];
   const pulse = useSharedValue(1);
@@ -641,8 +642,24 @@ export default function LeaderboardScreen() {
   );
 }
 
-const createStyles = (theme: Palette) =>
-  StyleSheet.create({
+const createStyles = (theme: Palette, isDark: boolean) => {
+  /* Mode-aware neutral surfaces — amber header identity stays in both modes */
+  const P = isDark
+    ? {
+        card: "#213356",
+        border: "#2D3A56",
+        creamTint: "#4A381B",
+        text: "#F6F9FC",
+        muted: "#8898AA",
+      }
+    : {
+        card: "#FFFFFF",
+        border: "#E5E7EB",
+        creamTint: "#FFF3E0",
+        text: "#333333",
+        muted: "#9CA3AF",
+      };
+  return StyleSheet.create({
     container: {
       flex: 1,
       backgroundColor: theme.bg,
@@ -684,7 +701,7 @@ const createStyles = (theme: Palette) =>
       width: 40,
       height: 40,
       borderRadius: 14,
-      backgroundColor: "#FFFFFF",
+      backgroundColor: P.card,
       alignItems: "center",
       justifyContent: "center",
       borderWidth: 2,
@@ -706,11 +723,11 @@ const createStyles = (theme: Palette) =>
       fontFamily: fontFamilies.bold,
     },
     podiumCard: {
-      backgroundColor: "#FFFFFF",
+      backgroundColor: P.card,
       borderRadius: 20,
       padding: 16,
       borderWidth: 2,
-      borderColor: "#E5E7EB",
+      borderColor: P.border,
       borderBottomWidth: 4,
     },
     podiumContainer: {
@@ -758,7 +775,7 @@ const createStyles = (theme: Palette) =>
       fontFamily: fontFamilies.heavy,
     },
     podiumName: {
-      color: "#333333",
+      color: P.text,
       fontFamily: fontFamilies.bold,
       fontSize: 12,
       marginTop: 6,
@@ -767,7 +784,7 @@ const createStyles = (theme: Palette) =>
     podiumNameLarge: {
       fontSize: 14,
       fontFamily: fontFamilies.heavy,
-      color: "#333333",
+      color: P.text,
     },
     podiumXP: {
       color: "#E67E22",
@@ -785,11 +802,11 @@ const createStyles = (theme: Palette) =>
     listItem: {
       flexDirection: "row",
       alignItems: "center",
-      backgroundColor: "#FFFFFF",
+      backgroundColor: P.card,
       padding: 16,
       borderRadius: 20,
       borderWidth: 2,
-      borderColor: "#E5E7EB",
+      borderColor: P.border,
       borderBottomWidth: 4,
       elevation: 2,
       shadowColor: "#000",
@@ -798,11 +815,11 @@ const createStyles = (theme: Palette) =>
       shadowRadius: 4,
     },
     listItemActive: {
-      backgroundColor: "#FFF3E0",
+      backgroundColor: P.creamTint,
       borderColor: "#FFCA5F",
     },
     listRankText: {
-      color: "#9CA3AF",
+      color: P.muted,
       fontFamily: fontFamilies.heavy,
       fontSize: 16,
       width: 30,
@@ -822,12 +839,12 @@ const createStyles = (theme: Palette) =>
       flex: 1,
     },
     listName: {
-      color: "#333333",
+      color: P.text,
       fontFamily: fontFamilies.heavy,
       fontSize: 15,
     },
     listTitle: {
-      color: "#9CA3AF",
+      color: P.muted,
       fontSize: 12,
       fontFamily: fontFamilies.semibold,
       marginTop: 2,
@@ -871,10 +888,11 @@ const createStyles = (theme: Palette) =>
       flexDirection: "row",
       alignItems: "center",
       padding: 16,
-      backgroundColor: "#FFFFFF",
+      backgroundColor: P.card,
       borderRadius: 20,
       borderWidth: 2,
       borderColor: "#FFCA5F",
       borderBottomWidth: 4,
     },
   });
+};

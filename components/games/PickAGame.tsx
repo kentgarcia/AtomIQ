@@ -111,6 +111,10 @@ export function PickAGame() {
     const { height: windowHeight, width: windowWidth } = useWindowDimensions();
     const { theme, isDark } = useTheme();
     const tab = theme.palettes.tab;
+    const P = isDark
+        ? { card: "#213356", border: "#2D3A56", softBorder: "#26365A", soft: "#1A2D4A", creamTint: "#4A381B", text: "#F6F9FC", textSecondary: "#C0CBDD", muted: "#8898AA", faint: "#667799" }
+        : { card: "#FFFFFF", border: "#E5E7EB", softBorder: "#F4F5F7", soft: "#F9FAFB", creamTint: "#FFF3E0", text: "#333333", textSecondary: "#555555", muted: "#888888", faint: "#9CA3AF" };
+    const styles = React.useMemo(() => createStyles(P), [P]);
 
     // Autumn gradient background, matching home / profile / discovery
     const SKY: [string, string] = isDark
@@ -305,74 +309,44 @@ export function PickAGame() {
                 onRequestClose={() => setGuideVisible(false)}
             >
                 <View style={styles.modalOverlay}>
-                    <View
-                        style={[
-                            styles.modalContent,
-                            {
-                                backgroundColor: tab.card,
-                            },
-                        ]}
-                    >
+                    <View style={styles.modalContent}>
+                        <View style={styles.dragHandle} />
+
                         <View style={styles.modalHeader}>
-                            <View style={{ flex: 1 }}>
-                                <Text
-                                    style={[
-                                        styles.modalSubtitle,
-                                        { color: tab.textMuted },
-                                    ]}
-                                >
-                                    Games
-                                </Text>
-                                <Text style={[styles.modalTitle, { color: tab.text }]}>
-                                    How to Play
-                                </Text>
+                            <View style={styles.modalHeaderLeft}>
+                                <View style={styles.modalHeaderIcon}>
+                                    <Icon name="MessageQuestion" size={16} color="#FF8C00" variant="Bold" />
+                                </View>
+                                <Text style={styles.modalTitle}>How to Play</Text>
                             </View>
                             <Pressable
                                 onPress={() => setGuideVisible(false)}
-                                style={styles.modalCloseBtn}
+                                style={({ pressed }) => [styles.modalCloseBtn, pressed && { opacity: 0.8 }]}
                             >
                                 <Icon
                                     name="CloseCircle"
-                                    size={28}
-                                    color={tab.textMuted}
+                                    size={20}
+                                    color={isDark ? "#667799" : "#9CA3AF"}
                                     variant="Bold"
                                 />
                             </Pressable>
                         </View>
 
                         {GUIDE_ROWS.map((row) => (
-                            <View
-                                key={row.title}
-                                style={[
-                                    styles.guideRow,
-                                    {
-                                        backgroundColor: tab.bg,
-                                    },
-                                ]}
-                            >
+                            <View key={row.title} style={styles.guideRow}>
                                 <View style={styles.guideRowIcon}>
                                     <Icon
                                         name={row.icon}
                                         size={20}
-                                        color="#E67E22"
+                                        color="#FF8C00"
                                         variant="Bold"
                                     />
                                 </View>
                                 <View style={styles.guideRowText}>
-                                    <Text
-                                        style={[
-                                            styles.guideRowTitle,
-                                            { color: tab.text },
-                                        ]}
-                                    >
+                                    <Text style={styles.guideRowTitle}>
                                         {row.title}
                                     </Text>
-                                    <Text
-                                        style={[
-                                            styles.guideRowDesc,
-                                            { color: tab.textMuted },
-                                        ]}
-                                    >
+                                    <Text style={styles.guideRowDesc}>
                                         {row.desc}
                                     </Text>
                                 </View>
@@ -382,12 +356,12 @@ export function PickAGame() {
                         <Pressable
                             style={({ pressed }) => [
                                 styles.guideActionBtn,
-                                { backgroundColor: "#FF8C00" },
-                                pressed && { transform: [{ scale: 0.97 }] },
+                                pressed && { transform: [{ scale: 0.97 }], opacity: 0.96 },
                             ]}
                             onPress={() => setGuideVisible(false)}
                         >
-                            <Text style={styles.guideActionText}>Got it!</Text>
+                            <Icon name="TickCircle" size={18} color="#FFFFFF" variant="Bold" />
+                            <Text style={styles.guideActionText}>Got it</Text>
                         </Pressable>
                     </View>
                 </View>
@@ -396,7 +370,8 @@ export function PickAGame() {
     );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (P: { card: string; border: string; softBorder: string; soft: string; creamTint: string; text: string; textSecondary: string; muted: string; faint: string }) =>
+  StyleSheet.create({
     screen: {
         flex: 1,
     },
@@ -460,55 +435,85 @@ const styles = StyleSheet.create({
         flex: 1,
         marginHorizontal: -14,
     },
-    /* Guide modal */
+    /* Guide modal — profile edit-modal design */
     modalOverlay: {
         flex: 1,
-        backgroundColor: "rgba(0, 0, 0, 0.7)",
+        backgroundColor: "rgba(0, 0, 0, 0.45)",
         justifyContent: "center",
         alignItems: "center",
         padding: 20,
     },
     modalContent: {
-        borderRadius: 24,
+        borderRadius: 26,
         width: "100%",
-        maxWidth: 500,
-        maxHeight: "80%",
-        padding: 24,
-        elevation: 8,
+        maxWidth: 380,
+        maxHeight: "82%",
+        padding: 16,
+        paddingTop: 12,
+        borderWidth: 2,
+        borderBottomWidth: 4,
+        borderColor: P.border,
+        backgroundColor: P.card,
+        elevation: 10,
         shadowColor: "#000000",
         shadowOffset: { width: 0, height: 8 },
-        shadowOpacity: 0.15,
+        shadowOpacity: 0.12,
         shadowRadius: 16,
+    },
+    dragHandle: {
+        width: 36,
+        height: 4,
+        borderRadius: 2,
+        backgroundColor: P.softBorder,
+        alignSelf: "center",
+        marginBottom: 8,
     },
     modalHeader: {
         flexDirection: "row",
-        alignItems: "flex-start",
-        marginBottom: 24,
+        justifyContent: "space-between",
+        alignItems: "center",
+        marginBottom: 14,
         gap: 12,
     },
-    modalSubtitle: {
-        fontSize: 12,
-        fontFamily: fontFamilies.semibold,
-        textTransform: "uppercase",
-        letterSpacing: 1,
-        marginBottom: 4,
+    modalHeaderLeft: {
+        flexDirection: "row",
+        alignItems: "center",
+        gap: 10,
+    },
+    modalHeaderIcon: {
+        width: 32,
+        height: 32,
+        borderRadius: 16,
+        backgroundColor: P.creamTint,
+        alignItems: "center",
+        justifyContent: "center",
     },
     modalTitle: {
-        fontSize: 24,
+        fontSize: 18,
         fontFamily: fontFamilies.heavy,
-        lineHeight: 30,
+        color: P.text,
     },
     modalCloseBtn: {
-        padding: 4,
+        width: 36,
+        height: 36,
+        borderRadius: 18,
+        alignItems: "center",
+        justifyContent: "center",
+        backgroundColor: P.soft,
+        borderWidth: 1,
+        borderColor: P.border,
     },
     guideRow: {
         flexDirection: "row",
         alignItems: "center",
         gap: 12,
-        paddingVertical: 12,
-        paddingHorizontal: 16,
-        borderRadius: 14,
+        paddingVertical: 10,
+        paddingHorizontal: 12,
+        borderRadius: 12,
         marginBottom: 8,
+        backgroundColor: P.soft,
+        borderWidth: 1,
+        borderColor: P.softBorder,
     },
     guideRowIcon: {
         width: 40,
@@ -517,7 +522,7 @@ const styles = StyleSheet.create({
         alignItems: "center",
         justifyContent: "center",
         flexShrink: 0,
-        backgroundColor: "#FFF3E0",
+        backgroundColor: P.creamTint,
     },
     guideRowText: {
         flex: 1,
@@ -525,24 +530,36 @@ const styles = StyleSheet.create({
     guideRowTitle: {
         fontSize: 14,
         fontFamily: fontFamilies.heavy,
+        color: P.text,
         marginBottom: 2,
     },
     guideRowDesc: {
         fontSize: 13,
-        fontFamily: fontFamilies.regular,
-        lineHeight: 19,
+        fontFamily: fontFamilies.semibold,
+        color: P.muted,
+        lineHeight: 18,
     },
     guideActionBtn: {
-        paddingVertical: 16,
-        borderRadius: 16,
+        flexDirection: "row",
         alignItems: "center",
-        marginTop: 8,
+        justifyContent: "center",
+        gap: 6,
+        marginTop: 6,
+        paddingVertical: 14,
+        borderRadius: 16,
+        borderWidth: 1,
         borderBottomWidth: 4,
-        borderBottomColor: "#E67E22",
+        borderColor: "#E67E22",
+        backgroundColor: "#FF8C00",
+        shadowColor: "#000000",
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.12,
+        shadowRadius: 8,
+        elevation: 4,
     },
     guideActionText: {
-        fontSize: 16,
-        fontFamily: fontFamilies.bold,
+        fontSize: 15,
+        fontFamily: fontFamilies.heavy,
         color: "#FFFFFF",
     },
 });

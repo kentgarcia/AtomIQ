@@ -92,19 +92,6 @@ export function HowToPlayCard({
                         >
                             <Text style={styles.stepNumberText}>{index + 1}</Text>
                         </View>
-                        <View
-                            style={[
-                                styles.stepIconWrap,
-                                { backgroundColor: palette.iconWrapBg },
-                            ]}
-                        >
-                            <Icon
-                                name={step.icon}
-                                size={18}
-                                color={palette.primaryText}
-                                variant="Bold"
-                            />
-                        </View>
                         <View style={styles.stepCopy}>
                             <Text
                                 style={[
@@ -147,51 +134,49 @@ export default HowToPlayCard;
 const styles = StyleSheet.create({
     card: {
         borderRadius: 20,
-        padding: 20,
+        padding: 16,
         borderWidth: 2,
         borderBottomWidth: 4,
         alignSelf: "stretch",
         shadowColor: "#000",
-        shadowOffset: { width: 0, height: 2 },
+        shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.08,
-        shadowRadius: 6,
-        elevation: 3,
+        shadowRadius: 10,
+        elevation: 5,
     },
     headerRow: {
         flexDirection: "row",
         alignItems: "center",
-        justifyContent: "center",
-        gap: 8,
+        gap: 10,
         marginBottom: 14,
     },
     headerIcon: {
-        width: 28,
-        height: 28,
-        borderRadius: 10,
+        width: 32,
+        height: 32,
+        borderRadius: 16,
         alignItems: "center",
         justifyContent: "center",
     },
     title: {
         fontSize: 16,
         fontFamily: fontFamilies.heavy,
-        textAlign: "center",
     },
     steps: {
-        gap: 10,
+        gap: 8,
     },
     stepRow: {
         alignItems: "center",
         flexDirection: "row",
         gap: 12,
-        paddingVertical: 11,
+        paddingVertical: 10,
         paddingHorizontal: 12,
-        borderRadius: 14,
+        borderRadius: 12,
         borderWidth: 1,
     },
     stepNumber: {
-        width: 24,
-        height: 24,
-        borderRadius: 12,
+        width: 26,
+        height: 26,
+        borderRadius: 13,
         alignItems: "center",
         justifyContent: "center",
         flexShrink: 0,
@@ -201,25 +186,17 @@ const styles = StyleSheet.create({
         fontSize: 11,
         fontFamily: fontFamilies.heavy,
     },
-    stepIconWrap: {
-        width: 34,
-        height: 34,
-        borderRadius: 10,
-        alignItems: "center",
-        justifyContent: "center",
-        flexShrink: 0,
-    },
     stepCopy: {
         flex: 1,
-        gap: 2,
+        gap: 1,
     },
     stepTitle: {
         fontSize: 13,
-        fontFamily: fontFamilies.semibold,
+        fontFamily: fontFamilies.heavy,
     },
     stepHint: {
         fontSize: 12,
-        fontFamily: fontFamilies.regular,
+        fontFamily: fontFamilies.semibold,
         lineHeight: 16,
     },
     divider: {
