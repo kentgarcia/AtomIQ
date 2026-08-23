@@ -111,14 +111,24 @@ export function DifficultyPanel({
                 },
             ];
         }
-        return mazes.map((maze, i) => ({
-            key: maze.id,
-            title: maze.title,
-            color: getMazeColor(maze.theme),
-            icon: "Grid9",
-            delay: 50 + i * 50,
-            onPress: () => router.push(`/explorer/atom-maze?id=${maze.id}`),
-        }));
+        return [
+            {
+                key: "endless",
+                title: "Endless Maze",
+                color: "#7C3AED",
+                icon: "Unlimited",
+                delay: 50,
+                onPress: () => router.push("/explorer/atom-maze?id=endless"),
+            },
+            ...mazes.map((maze, i) => ({
+                key: maze.id,
+                title: maze.title,
+                color: getMazeColor(maze.theme),
+                icon: "Grid9",
+                delay: 100 + i * 50,
+                onPress: () => router.push(`/explorer/atom-maze?id=${maze.id}`),
+            })),
+        ];
     }, [game, router, mazes]);
 
     const cardH = Math.round(stackH / Math.max(items.length, 1));
