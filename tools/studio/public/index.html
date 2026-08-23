@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AtomIQ Content Studio</title>
+<link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+<div id="app">
+  <aside id="sidebar">
+    <header>
+      <h1>AtomIQ <span>Studio</span></h1>
+      <p id="db-info">loading…</p>
+    </header>
+    <nav id="table-list" aria-label="Tables"></nav>
+    <footer>
+      <button id="btn-query" class="ghost">SQL</button>
+      <button id="btn-backup" class="ghost">Backup</button>
+      <button id="btn-bump">Bump version</button>
+    </footer>
+  </aside>
+
+  <aside id="rows-sidebar" hidden>
+    <div class="toolbar">
+      <input id="search" type="search" placeholder="Search…" autocomplete="off" />
+    </div>
+    <div class="toolbar slim">
+      <span id="row-count"></span>
+      <div class="spacer"></div>
+      <button id="btn-new">＋ New</button>
+    </div>
+    <ul id="rows"></ul>
+  </aside>
+
+  <main id="main">
+    <!-- editor -->
+    <section id="editor-view">
+      <div class="toolbar">
+        <strong id="editor-title">Select a row</strong>
+        <div class="spacer"></div>
+        <span id="dirty" hidden>unsaved</span>
+        <button id="btn-delete" class="danger ghost">Delete</button>
+        <button id="btn-save" disabled>Save</button>
+      </div>
+      <form id="form"></form>
+    </section>
+
+    <!-- SQL console -->
+    <section id="query-view" hidden>
+      <div class="toolbar">
+        <strong>SQL console</strong><span class="hint">read-only · SELECT / WITH / PRAGMA · Ctrl+Enter to run</span>
+        <div class="spacer"></div>
+        <button id="btn-close-query" class="ghost">✕ Close</button>
+      </div>
+      <textarea id="sql-input" spellcheck="false" placeholder="SELECT id, title FROM lessons LIMIT 20;"></textarea>
+      <pre id="sql-output"></pre>
+    </section>
+  </main>
+</div>
+
+<template id="tpl-toast-zone"></template>
+<div id="toasts"></div>
+<script type="module" src="./app.js"></script>
+</body>
+</html>
