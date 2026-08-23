@@ -56,7 +56,8 @@ export default function ProfileScreen() {
   } = useStorage();
   const { theme } = useTheme();
   const THEME = theme.palettes.tab;
-  const styles = useMemo(() => createStyles(THEME), [THEME]);
+  const isDark = theme.mode === "dark";
+  const styles = useMemo(() => createStyles(THEME, isDark), [THEME, isDark]);
 
   const [isSavingProfile, setIsSavingProfile] = useState(false);
   const [editModalVisible, setEditModalVisible] = useState(false);
@@ -312,20 +313,20 @@ export default function ProfileScreen() {
         {/* Header: Share / Edit / Settings */}
         <View style={[styles.headerRow, { paddingTop: insets.top + 12 }]}>
           <TouchableOpacity style={styles.iconButton} onPress={handleShare}>
-            <Icon name="Share" size={20} color="#555555" variant="Bold" />
+            <Icon name="Share" size={20} color={isDark ? "#C0CBDD" : "#555555"} variant="Bold" />
           </TouchableOpacity>
           <View style={{ flex: 1 }} />
           <TouchableOpacity
             style={styles.iconButton}
             onPress={openEditModal}
           >
-            <Icon name="Edit2" size={20} color="#555555" variant="Bold" />
+            <Icon name="Edit2" size={20} color={isDark ? "#C0CBDD" : "#555555"} variant="Bold" />
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.iconButton}
             onPress={() => router.push("/settings")}
           >
-            <Icon name="Setting" size={20} color="#555555" variant="Bold" />
+            <Icon name="Setting" size={20} color={isDark ? "#C0CBDD" : "#555555"} variant="Bold" />
           </TouchableOpacity>
         </View>
 
@@ -773,7 +774,7 @@ export default function ProfileScreen() {
                   value={profileName}
                   onChangeText={setProfileName}
                   placeholder="Your display name"
-                  placeholderTextColor={THEME.textMuted}
+                  placeholderTextColor={isDark ? "#667799" : "#9CA3AF"}
                   maxLength={24}
                   autoCorrect={false}
                   returnKeyType="done"
@@ -918,8 +919,32 @@ export default function ProfileScreen() {
   );
 }
 
-const createStyles = (theme: Palette) =>
-  StyleSheet.create({
+const createStyles = (theme: Palette, isDark: boolean) => {
+  /* Mode-aware neutral surfaces — brand accents stay identical */
+  const P = isDark
+    ? {
+        card: "#213356",
+        border: "#2D3A56",
+        softBorder: "#26365A",
+        soft: "#1A2D4A",
+        creamTint: "#4A381B",
+        text: "#F6F9FC",
+        textSecondary: "#C0CBDD",
+        muted: "#8898AA",
+        faint: "#667799",
+      }
+    : {
+        card: "#FFFFFF",
+        border: "#E5E7EB",
+        softBorder: "#F4F5F7",
+        soft: "#F9FAFB",
+        creamTint: "#FFF3E0",
+        text: "#333333",
+        textSecondary: "#555555",
+        muted: "#888888",
+        faint: "#9CA3AF",
+      };
+  return StyleSheet.create({
     container: {
       flex: 1,
       backgroundColor: theme.bg,
@@ -943,7 +968,7 @@ const createStyles = (theme: Palette) =>
       width: 40,
       height: 40,
       borderRadius: 20,
-      backgroundColor: "#FFFFFF",
+      backgroundColor: P.card,
       alignItems: "center",
       justifyContent: "center",
       elevation: 3,
@@ -988,11 +1013,11 @@ const createStyles = (theme: Palette) =>
       color: "#FFFFFF",
     },
     titleProgressPanel: {
-      backgroundColor: "#FFFFFF",
+      backgroundColor: P.card,
       borderRadius: 16,
       padding: 14,
       borderWidth: 2,
-      borderColor: "#E5E7EB",
+      borderColor: P.border,
       borderBottomWidth: 4,
       gap: 10,
     },
@@ -1005,7 +1030,7 @@ const createStyles = (theme: Palette) =>
     titleProgressLabel: {
       fontSize: 10,
       fontFamily: fontFamilies.heavy,
-      color: "#9CA3AF",
+      color: P.faint,
       textTransform: "uppercase",
       letterSpacing: 0.8,
     },
@@ -1017,7 +1042,7 @@ const createStyles = (theme: Palette) =>
     titleProgressTrack: {
       height: 8,
       borderRadius: 4,
-      backgroundColor: "#FFF3E0",
+      backgroundColor: P.creamTint,
       overflow: "hidden",
     },
     titleProgressFill: {
@@ -1028,7 +1053,7 @@ const createStyles = (theme: Palette) =>
     titleProgressHint: {
       fontSize: 11,
       fontFamily: fontFamilies.semibold,
-      color: "#888888",
+      color: P.muted,
     },
     titleMilestoneList: {
       gap: 8,
@@ -1041,10 +1066,10 @@ const createStyles = (theme: Palette) =>
       paddingVertical: 8,
       paddingHorizontal: 10,
       borderRadius: 12,
-      backgroundColor: "#F9FAFB",
+      backgroundColor: P.soft,
     },
     titleMilestoneRowCurrent: {
-      backgroundColor: "#FFF3E0",
+      backgroundColor: P.creamTint,
     },
     titleMilestoneIcon: {
       width: 32,
@@ -1056,12 +1081,12 @@ const createStyles = (theme: Palette) =>
     titleMilestoneName: {
       fontSize: 13,
       fontFamily: fontFamilies.heavy,
-      color: "#333333",
+      color: P.text,
     },
     titleMilestoneLevel: {
       fontSize: 11,
       fontFamily: fontFamilies.semibold,
-      color: "#9CA3AF",
+      color: P.faint,
       marginTop: 1,
     },
     flipClip: {
@@ -1073,11 +1098,11 @@ const createStyles = (theme: Palette) =>
       top: 0,
       left: 0,
       right: 0,
-      backgroundColor: "#FFFFFF",
+      backgroundColor: P.card,
       borderRadius: 20,
       padding: 16,
       borderWidth: 2,
-      borderColor: "#E5E7EB",
+      borderColor: P.border,
       borderBottomWidth: 4,
       backfaceVisibility: "hidden",
     },
@@ -1105,9 +1130,9 @@ const createStyles = (theme: Palette) =>
       width: 84,
       height: 84,
       borderRadius: 42,
-      backgroundColor: "#FFF3E0",
+      backgroundColor: P.creamTint,
       borderWidth: 3,
-      borderColor: "#FFF3E0",
+      borderColor: P.creamTint,
     },
     levelBadge: {
       position: "absolute",
@@ -1130,12 +1155,12 @@ const createStyles = (theme: Palette) =>
     name: {
       fontSize: 20,
       fontFamily: fontFamilies.heavy,
-      color: "#333333",
+      color: P.text,
       marginBottom: 2,
     },
     title: {
       fontSize: 13,
-      color: "#888888",
+      color: P.muted,
       fontFamily: fontFamilies.semibold,
       marginBottom: 8,
     },
@@ -1152,7 +1177,7 @@ const createStyles = (theme: Palette) =>
     levelLabel: {
       fontSize: 13,
       fontFamily: fontFamilies.heavy,
-      color: "#333333",
+      color: P.text,
     },
     levelXp: {
       fontSize: 12,
@@ -1162,7 +1187,7 @@ const createStyles = (theme: Palette) =>
     levelBarBg: {
       height: 10,
       borderRadius: 5,
-      backgroundColor: "#FFF3E0",
+      backgroundColor: P.creamTint,
       overflow: "hidden",
     },
     levelBarFill: {
@@ -1173,14 +1198,14 @@ const createStyles = (theme: Palette) =>
     levelHint: {
       fontSize: 11,
       fontFamily: fontFamilies.semibold,
-      color: "#888888",
+      color: P.muted,
       marginTop: 6,
     },
     flipCornerBtn: {
       width: 40,
       height: 40,
       borderRadius: 14,
-      backgroundColor: "#FFFFFF",
+      backgroundColor: P.card,
       alignItems: "center",
       justifyContent: "center",
       borderWidth: 2,
@@ -1195,7 +1220,7 @@ const createStyles = (theme: Palette) =>
     statsTitle: {
       fontSize: 16,
       fontFamily: fontFamilies.heavy,
-      color: "#333333",
+      color: P.text,
       alignSelf: "center",
       marginBottom: 16,
     },
@@ -1209,7 +1234,7 @@ const createStyles = (theme: Palette) =>
       alignItems: "center",
       paddingVertical: 14,
       borderRadius: 18,
-      backgroundColor: "#FDFBF7",
+      backgroundColor: P.soft,
       marginBottom: 10,
     },
     statIconCircle: {
@@ -1223,12 +1248,12 @@ const createStyles = (theme: Palette) =>
     statValue: {
       fontSize: 22,
       fontFamily: fontFamilies.heavy,
-      color: "#333333",
+      color: P.text,
     },
     statLabel: {
       fontSize: 12,
       fontFamily: fontFamilies.semibold,
-      color: "#888888",
+      color: P.muted,
       marginTop: 2,
     },
     /* Streak card */
@@ -1238,7 +1263,7 @@ const createStyles = (theme: Palette) =>
       flexDirection: "row",
       alignItems: "center",
       gap: 14,
-      backgroundColor: "#FFFFFF",
+      backgroundColor: P.card,
       borderRadius: 24,
       padding: 18,
       elevation: 5,
@@ -1251,26 +1276,26 @@ const createStyles = (theme: Palette) =>
       width: 52,
       height: 52,
       borderRadius: 26,
-      backgroundColor: "#FFF3E0",
+      backgroundColor: P.creamTint,
       alignItems: "center",
       justifyContent: "center",
     },
     streakValue: {
       fontSize: 16,
       fontFamily: fontFamilies.heavy,
-      color: "#333333",
+      color: P.text,
     },
     streakSub: {
       fontSize: 12,
       fontFamily: fontFamilies.semibold,
-      color: "#888888",
+      color: P.muted,
       marginTop: 2,
     },
     streakArrow: {
       width: 34,
       height: 34,
       borderRadius: 17,
-      backgroundColor: "#FFF3E0",
+      backgroundColor: P.creamTint,
       alignItems: "center",
       justifyContent: "center",
     },
@@ -1278,7 +1303,7 @@ const createStyles = (theme: Palette) =>
     sectionCard: {
       marginHorizontal: 20,
       marginTop: 20,
-      backgroundColor: "#FFFFFF",
+      backgroundColor: P.card,
       borderRadius: 24,
       padding: 20,
       elevation: 5,
@@ -1296,13 +1321,13 @@ const createStyles = (theme: Palette) =>
     sectionTitle: {
       fontSize: 16,
       fontFamily: fontFamilies.heavy,
-      color: "#333333",
+      color: P.text,
     },
     countPill: {
       flexDirection: "row",
       alignItems: "center",
       gap: 5,
-      backgroundColor: "#FFF3E0",
+      backgroundColor: P.creamTint,
       borderRadius: 12,
       paddingHorizontal: 10,
       paddingVertical: 5,
@@ -1331,16 +1356,16 @@ const createStyles = (theme: Palette) =>
       justifyContent: "center",
     },
     badgeLocked: {
-      backgroundColor: "#F4F5F7",
+      backgroundColor: P.soft,
     },
     badgeLabel: {
       fontSize: 10,
       fontFamily: fontFamilies.bold,
-      color: "#555555",
+      color: P.textSecondary,
       textAlign: "center",
     },
     badgeLabelLocked: {
-      color: "#AAAAAA",
+      color: P.faint,
     },
     /* Personal game leaderboard rows */
     leaderRow: {
@@ -1351,13 +1376,13 @@ const createStyles = (theme: Palette) =>
     },
     leaderRowDivider: {
       borderBottomWidth: 1,
-      borderBottomColor: "#F4F5F7",
+      borderBottomColor: P.softBorder,
     },
     leaderRank: {
       width: 22,
       height: 22,
       borderRadius: 11,
-      backgroundColor: "#FFF3E0",
+      backgroundColor: P.creamTint,
       alignItems: "center",
       justifyContent: "center",
     },
@@ -1376,30 +1401,30 @@ const createStyles = (theme: Palette) =>
     leaderTitle: {
       fontSize: 14,
       fontFamily: fontFamilies.heavy,
-      color: "#333333",
+      color: P.text,
     },
     leaderPlays: {
       fontSize: 11,
       fontFamily: fontFamilies.semibold,
-      color: "#888888",
+      color: P.muted,
       marginTop: 1,
     },
     leaderScorePill: {
       flexDirection: "row",
       alignItems: "center",
       gap: 5,
-      backgroundColor: "#F4F5F7",
+      backgroundColor: P.soft,
       borderRadius: 12,
       paddingHorizontal: 12,
       paddingVertical: 7,
     },
     leaderScorePillTop: {
-      backgroundColor: "#FFF3E0",
+      backgroundColor: P.creamTint,
     },
     leaderScoreText: {
       fontSize: 13,
       fontFamily: fontFamilies.heavy,
-      color: "#555555",
+      color: P.textSecondary,
     },
     leaderScoreTextTop: {
       color: "#E67E22",
@@ -1407,7 +1432,7 @@ const createStyles = (theme: Palette) =>
     leaderNoScore: {
       fontSize: 14,
       fontFamily: fontFamilies.heavy,
-      color: "#C9CDD3",
+      color: P.faint,
     },
 
     /* Achievement unlocked celebration */
@@ -1422,7 +1447,7 @@ const createStyles = (theme: Palette) =>
     celebrationCard: {
       width: "100%",
       maxWidth: 340,
-      backgroundColor: "#FFFFFF",
+      backgroundColor: P.card,
       borderRadius: 24,
       padding: 24,
       alignItems: "center",
@@ -1436,7 +1461,7 @@ const createStyles = (theme: Palette) =>
       width: 64,
       height: 64,
       borderRadius: 32,
-      backgroundColor: "#FFF9E5",
+      backgroundColor: P.creamTint,
       alignItems: "center",
       justifyContent: "center",
       marginBottom: 12,
@@ -1444,7 +1469,7 @@ const createStyles = (theme: Palette) =>
     celebrationTitle: {
       fontSize: 18,
       fontFamily: fontFamilies.heavy,
-      color: "#333333",
+      color: P.text,
       marginBottom: 16,
     },
     celebrationRow: {
@@ -1452,7 +1477,7 @@ const createStyles = (theme: Palette) =>
       alignItems: "center",
       gap: 12,
       width: "100%",
-      backgroundColor: "#F4F5F7",
+      backgroundColor: P.soft,
       borderRadius: 14,
       padding: 12,
       marginBottom: 10,
@@ -1467,12 +1492,12 @@ const createStyles = (theme: Palette) =>
     celebrationBadgeTitle: {
       fontSize: 14,
       fontFamily: fontFamilies.heavy,
-      color: "#333333",
+      color: P.text,
     },
     celebrationBadgeReq: {
       fontSize: 11,
       fontFamily: fontFamilies.semibold,
-      color: "#888888",
+      color: P.muted,
       marginTop: 1,
     },
     celebrationButton: {
@@ -1507,12 +1532,12 @@ const createStyles = (theme: Palette) =>
       width: "100%",
       maxWidth: 380,
       maxHeight: "82%",
-      backgroundColor: "#FFFFFF",
+      backgroundColor: P.card,
       borderRadius: 26,
       padding: 16,
       paddingTop: 12,
       borderWidth: 2,
-      borderColor: "#E5E7EB",
+      borderColor: P.border,
       borderBottomWidth: 4,
       shadowColor: "#000000",
       shadowOffset: { width: 0, height: 8 },
@@ -1545,14 +1570,14 @@ const createStyles = (theme: Palette) =>
       width: 32,
       height: 32,
       borderRadius: 16,
-      backgroundColor: "#FFF3E0",
+      backgroundColor: P.creamTint,
       alignItems: "center",
       justifyContent: "center",
     },
     avatarModalTitle: {
       fontSize: 18,
       fontFamily: fontFamilies.heavy,
-      color: "#333333",
+      color: P.text,
     },
     closeButton: {
       padding: 4,
@@ -1561,11 +1586,11 @@ const createStyles = (theme: Palette) =>
       width: 36,
       height: 36,
       borderRadius: 18,
-      backgroundColor: "#F9FAFB",
+      backgroundColor: P.soft,
       alignItems: "center",
       justifyContent: "center",
       borderWidth: 1,
-      borderColor: "#E5E7EB",
+      borderColor: P.border,
     },
     previewCard: {
       backgroundColor: "#FFCA5F",
@@ -1583,11 +1608,11 @@ const createStyles = (theme: Palette) =>
       paddingHorizontal: 4,
     },
     previewInner: {
-      backgroundColor: "#FFFFFF",
+      backgroundColor: P.card,
       borderRadius: 16,
       padding: 12,
       borderWidth: 2,
-      borderColor: "#E5E7EB",
+      borderColor: P.border,
       borderBottomWidth: 4,
       flexDirection: "row",
       alignItems: "center",
@@ -1600,9 +1625,9 @@ const createStyles = (theme: Palette) =>
       width: 56,
       height: 56,
       borderRadius: 28,
-      backgroundColor: "#FFF3E0",
+      backgroundColor: P.creamTint,
       borderWidth: 2,
-      borderColor: "#FFF3E0",
+      borderColor: P.creamTint,
     },
     previewLevelBadge: {
       position: "absolute",
@@ -1625,13 +1650,13 @@ const createStyles = (theme: Palette) =>
     previewName: {
       fontSize: 16,
       fontFamily: fontFamilies.heavy,
-      color: "#333333",
+      color: P.text,
       marginBottom: 2,
     },
     previewTitle: {
       fontSize: 12,
       fontFamily: fontFamilies.semibold,
-      color: "#888888",
+      color: P.muted,
     },
     previewXpRow: {
       flexDirection: "row",
@@ -1648,7 +1673,7 @@ const createStyles = (theme: Palette) =>
       width: 28,
       height: 28,
       borderRadius: 14,
-      backgroundColor: "#FFF3E0",
+      backgroundColor: P.creamTint,
       alignItems: "center",
       justifyContent: "center",
     },
@@ -1668,14 +1693,14 @@ const createStyles = (theme: Palette) =>
     nameFieldLabel: {
       fontSize: 12,
       fontFamily: fontFamilies.heavy,
-      color: "#9CA3AF",
+      color: P.faint,
       textTransform: "uppercase",
       letterSpacing: 0.4,
     },
     charCount: {
       fontSize: 11,
       fontFamily: fontFamilies.semibold,
-      color: "#9CA3AF",
+      color: P.faint,
     },
     nameInputWrap: {
       flexDirection: "row",
@@ -1709,7 +1734,7 @@ const createStyles = (theme: Palette) =>
     avatarCount: {
       fontSize: 11,
       fontFamily: fontFamilies.semibold,
-      color: "#9CA3AF",
+      color: P.faint,
     },
     avatarOptionsWrap: {
       flexDirection: "row",
@@ -1766,8 +1791,8 @@ const createStyles = (theme: Palette) =>
       borderRadius: 36,
       overflow: "hidden",
       borderWidth: 2,
-      borderColor: "#E5E7EB",
-      backgroundColor: "#FFFFFF",
+      borderColor: P.border,
+      backgroundColor: P.card,
     },
     avatarModalOptionSelected: {
       borderColor: "#FF8C00",
@@ -1799,3 +1824,4 @@ const createStyles = (theme: Palette) =>
       borderColor: "#FFFFFF",
     },
   });
+};

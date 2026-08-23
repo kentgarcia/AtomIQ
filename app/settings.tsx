@@ -12,6 +12,7 @@ import {
     ActivityIndicator,
     Alert,
     Image,
+    Linking,
     Modal,
     ScrollView,
     StyleSheet,
@@ -108,6 +109,7 @@ export default function SettingsScreen() {
   const handleTermsOfService = () => {
     router.push("/terms-of-service");
   };
+
 
   const handleDeleteAccount = () => {
     setDeleteModalVisible(true);
@@ -281,54 +283,68 @@ export default function SettingsScreen() {
             entering={FadeInDown.duration(300).springify()}
             style={styles.modalCard}
           >
-            <TouchableOpacity
-              onPress={() => setVersionModalVisible(false)}
-              style={styles.modalCloseBtn}
-            >
-              <Icon name="CloseCircle" size={28} color={THEME.textMuted} variant="Bold" />
-            </TouchableOpacity>
+            <View style={styles.dragHandle} />
 
-            <View style={styles.modalIconWrap}>
+            <View style={styles.modalHeader}>
+              <View style={styles.modalHeaderLeft}>
+                <View style={styles.modalHeaderIcon}>
+                  <Icon name="InfoCircle" size={16} color="#FF8C00" variant="Bold" />
+                </View>
+                <Text style={styles.modalTitle}>App Version</Text>
+              </View>
+              <TouchableOpacity
+                onPress={() => setVersionModalVisible(false)}
+                style={styles.modalCloseBtn}
+                activeOpacity={0.85}
+              >
+                <Icon name="CloseCircle" size={20} color="#9CA3AF" variant="Bold" />
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.modalHero}>
               <Image
                 source={require("@/assets/images/icon.png")}
                 style={styles.modalIcon}
                 resizeMode="contain"
               />
+              <Text style={styles.modalAppName}>AtomIQ</Text>
+              <View style={styles.versionBadge}>
+                <Icon name="Crown1" size={13} color="#E67E22" variant="Bold" />
+                <Text style={styles.versionBadgeText}>Version {APP_VERSION}</Text>
+              </View>
+              <Text style={styles.modalSubtitle}>
+                Learn nuclear science one atom at a time.
+              </Text>
             </View>
 
-            <Text style={styles.modalTitle}>AtomIQ</Text>
-            <View style={styles.versionBadge}>
-              <Icon name="Crown1" size={13} color="#FFC107" variant="Bold" />
-              <Text style={styles.versionBadgeText}>Version {APP_VERSION}</Text>
+            <View style={styles.creditRow}>
+              <Icon name="Cup" size={16} color="#FF8C00" variant="Bold" />
+              <View style={{ flex: 1 }}>
+                <Text style={styles.creditText}>
+                  Made for the MythSmashers by the DOST-PNRI, representing the
+                  Philippines in international competition.
+                </Text>
+                <TouchableOpacity
+                  onPress={() => Linking.openURL("https://www.linkedin.com/in/kentgarcia").catch(() => {})}
+                  activeOpacity={0.7}
+                >
+                  <Text style={styles.creditLink}>Developed by Kent Garcia</Text>
+                </TouchableOpacity>
+              </View>
             </View>
 
-            <Text style={styles.modalSubtitle}>
-              Learn nuclear science one atom at a time.
-            </Text>
-
-            <View style={styles.modalDivider} />
-
-            <View style={styles.modalInfoRow}>
-              <Icon name="Code" size={18} color={THEME.primary} variant="Bold" />
-              <Text style={styles.modalInfoText}>Built with React Native</Text>
-            </View>
-            <View style={styles.modalInfoRow}>
-              <Icon name="DocumentText" size={18} color={THEME.primary} variant="Bold" />
-              <Text style={styles.modalInfoText}>Educational content</Text>
-            </View>
+            <TouchableOpacity
+              style={styles.modalPrimaryBtn}
+              activeOpacity={0.85}
+              onPress={() => setVersionModalVisible(false)}
+            >
+              <Icon name="TickCircle" size={18} color="#FFFFFF" variant="Bold" />
+              <Text style={styles.modalPrimaryBtnText}>Got it</Text>
+            </TouchableOpacity>
 
             <Text style={styles.modalCopyright}>
               © 2026 AtomIQ. All rights reserved.
             </Text>
-
-            <View style={styles.modalActions}>
-              <TouchableOpacity
-                style={styles.modalPrimaryBtn}
-                onPress={() => setVersionModalVisible(false)}
-              >
-                <Text style={styles.modalPrimaryBtnText}>Got it!</Text>
-              </TouchableOpacity>
-            </View>
           </Animated.View>
         </View>
       </Modal>
@@ -343,25 +359,34 @@ export default function SettingsScreen() {
         <View style={styles.modalOverlay}>
           <Animated.View
             entering={FadeInDown.duration(300).springify()}
-            style={styles.deleteModalCard}
+            style={styles.modalCard}
           >
-            <TouchableOpacity
-              onPress={() => setDeleteModalVisible(false)}
-              style={styles.modalCloseBtn}
-            >
-              <Icon name="CloseCircle" size={28} color={THEME.textMuted} variant="Bold" />
-            </TouchableOpacity>
+            <View style={styles.dragHandle} />
 
-            <View style={styles.deleteModalIconWrap}>
-              <Icon name="Trash" size={32} color="#EF4444" variant="Bold" />
+            <View style={styles.modalHeader}>
+              <View style={styles.modalHeaderLeft}>
+                <View style={styles.deleteModalHeaderIcon}>
+                  <Icon name="Trash" size={16} color="#EF4444" variant="Bold" />
+                </View>
+                <Text style={styles.modalTitle}>Delete Account</Text>
+              </View>
+              <TouchableOpacity
+                onPress={() => setDeleteModalVisible(false)}
+                style={styles.modalCloseBtn}
+                activeOpacity={0.85}
+                disabled={isDeletingAccount}
+              >
+                <Icon name="CloseCircle" size={20} color="#9CA3AF" variant="Bold" />
+              </TouchableOpacity>
             </View>
 
-            <Text style={styles.deleteModalTitle}>Delete Account?</Text>
-
-            <Text style={styles.deleteModalText}>
-              This will permanently delete your account and all local data. This
-              action cannot be undone.
-            </Text>
+            <View style={styles.deleteModalWarning}>
+              <Icon name="Danger" size={18} color="#EF4444" variant="Bold" />
+              <Text style={styles.deleteModalWarningText}>
+                This will permanently delete your account and all local data.
+                This action cannot be undone.
+              </Text>
+            </View>
 
             <Text style={styles.deleteModalText}>
               Type{" "}
@@ -376,6 +401,7 @@ export default function SettingsScreen() {
               value={confirmText}
               onChangeText={setConfirmText}
               placeholder={deleteConfirmationPhrase}
+              placeholderTextColor="#C9CDD3"
               autoCapitalize="none"
               autoCorrect={false}
             />
@@ -384,6 +410,7 @@ export default function SettingsScreen() {
               <TouchableOpacity
                 onPress={() => setDeleteModalVisible(false)}
                 style={styles.deleteModalCancelBtn}
+                activeOpacity={0.85}
                 disabled={isDeletingAccount}
               >
                 <Text style={styles.deleteModalCancelText}>Cancel</Text>
@@ -397,12 +424,16 @@ export default function SettingsScreen() {
                   styles.deleteModalConfirmBtn,
                   !canConfirmDelete && styles.deleteModalConfirmBtnDisabled,
                 ]}
+                activeOpacity={0.85}
                 disabled={!canConfirmDelete || isDeletingAccount}
               >
                 {isDeletingAccount ? (
                   <ActivityIndicator color="#FFFFFF" size="small" />
                 ) : (
-                  <Text style={styles.deleteModalConfirmText}>Delete Forever</Text>
+                  <>
+                    <Icon name="Trash" size={16} color="#FFFFFF" variant="Bold" />
+                    <Text style={styles.deleteModalConfirmText}>Delete Forever</Text>
+                  </>
                 )}
               </TouchableOpacity>
             </View>
@@ -507,189 +538,230 @@ const createStyles = (theme: Palette) =>
     },
     input: {
       alignSelf: "stretch",
-      backgroundColor: theme.bg,
-      borderWidth: 1,
-      borderColor: theme.border,
-      borderRadius: 12,
+      backgroundColor: "#F9FAFB",
+      borderWidth: 2,
+      borderColor: "#E5E7EB",
+      borderBottomWidth: 4,
+      borderRadius: 14,
       paddingHorizontal: 14,
       paddingVertical: 12,
       fontSize: 15,
-      fontFamily: fontFamilies.regular,
+      fontFamily: fontFamilies.semibold,
       color: theme.text,
-      marginTop: 8,
+      marginTop: 12,
     },
     destructiveLabel: {
       fontSize: 16,
       fontFamily: fontFamilies.semibold,
       color: "#EF4444",
     },
-    /* App Version Modal */
+    /* App Version + Delete modals — profile edit-modal design */
     modalOverlay: {
       flex: 1,
-      backgroundColor: "rgba(0, 0, 0, 0.7)",
+      backgroundColor: "rgba(0, 0, 0, 0.45)",
       justifyContent: "center",
       alignItems: "center",
-      padding: 28,
+      padding: 20,
     },
     modalCard: {
       width: "100%",
       maxWidth: 380,
-      backgroundColor: theme.card,
-      borderRadius: 28,
-      padding: 28,
-      alignItems: "center",
-      borderWidth: 1,
-      borderColor: theme.border,
-      shadowColor: "#000",
-      shadowOffset: { width: 0, height: 12 },
-      shadowOpacity: 0.25,
-      shadowRadius: 24,
-      elevation: 12,
-    },
-    modalCloseBtn: {
-      position: "absolute",
-      top: 16,
-      right: 16,
-      padding: 4,
-      zIndex: 10,
-    },
-    modalIconWrap: {
-      width: 68,
-      height: 68,
-      borderRadius: 22,
-      backgroundColor: "#FFF7ED",
+      backgroundColor: "#FFFFFF",
+      borderRadius: 26,
+      padding: 16,
+      paddingTop: 12,
       borderWidth: 2,
-      borderColor: "#FFEDD5",
+      borderColor: "#E5E7EB",
+      borderBottomWidth: 4,
+      shadowColor: "#000000",
+      shadowOffset: { width: 0, height: 8 },
+      shadowOpacity: 0.12,
+      shadowRadius: 16,
+      elevation: 10,
+    },
+    dragHandle: {
+      width: 36,
+      height: 4,
+      borderRadius: 2,
+      backgroundColor: "#E5E7EB",
+      alignSelf: "center",
+      marginBottom: 8,
+    },
+    modalHeader: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginBottom: 14,
+    },
+    modalHeaderLeft: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 10,
+    },
+    modalHeaderIcon: {
+      width: 32,
+      height: 32,
+      borderRadius: 16,
+      backgroundColor: "#FFF3E0",
       alignItems: "center",
       justifyContent: "center",
-      marginBottom: 18,
+    },
+    deleteModalHeaderIcon: {
+      width: 32,
+      height: 32,
+      borderRadius: 16,
+      backgroundColor: "#FEE2E2",
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    modalCloseBtn: {
+      width: 36,
+      height: 36,
+      borderRadius: 18,
+      backgroundColor: "#F9FAFB",
+      alignItems: "center",
+      justifyContent: "center",
+      borderWidth: 1,
+      borderColor: "#E5E7EB",
+    },
+    modalHero: {
+      alignItems: "center",
+      paddingVertical: 8,
+      marginBottom: 14,
     },
     modalIcon: {
-      width: 48,
-      height: 48,
+      width: 56,
+      height: 56,
+      borderRadius: 28,
+      borderWidth: 2,
+      borderColor: "#FFE0B2",
+      marginBottom: 10,
+    },
+    modalAppName: {
+      fontSize: 20,
+      fontFamily: fontFamilies.heavy,
+      color: "#333333",
+      marginBottom: 8,
     },
     modalTitle: {
-      fontSize: 22,
+      fontSize: 18,
       fontFamily: fontFamilies.heavy,
-      color: theme.text,
-      marginBottom: 10,
-      textAlign: "center",
+      color: "#333333",
     },
     versionBadge: {
       flexDirection: "row",
       alignItems: "center",
       gap: 6,
-      backgroundColor: "#FEF3C7",
+      backgroundColor: "#FFFFFF",
+      borderWidth: 2,
+      borderColor: "#FFE0B2",
       paddingHorizontal: 14,
       paddingVertical: 6,
-      borderRadius: 16,
-      marginBottom: 14,
+      borderRadius: 999,
+      marginBottom: 10,
     },
     versionBadgeText: {
       fontSize: 13,
-      fontFamily: fontFamilies.bold,
-      color: "#92400E",
+      fontFamily: fontFamilies.heavy,
+      color: "#E67E22",
     },
     modalSubtitle: {
-      fontSize: 14,
-      fontFamily: fontFamilies.regular,
-      color: theme.textMuted,
+      fontSize: 13,
+      fontFamily: fontFamilies.medium,
+      color: "#888888",
       textAlign: "center",
-      lineHeight: 21,
-      marginBottom: 18,
+      lineHeight: 18,
+      marginBottom: 14,
     },
-    modalDivider: {
-      width: "70%",
-      height: 1,
-      backgroundColor: theme.border,
-      marginBottom: 18,
-    },
-    modalInfoRow: {
+    creditRow: {
       flexDirection: "row",
-      alignItems: "center",
+      alignItems: "flex-start",
       gap: 10,
-      marginBottom: 12,
+      backgroundColor: "#F9FAFB",
+      borderWidth: 1,
+      borderColor: "#F4F5F7",
+      borderRadius: 12,
+      paddingHorizontal: 12,
+      paddingVertical: 10,
     },
-    modalInfoText: {
-      fontSize: 14,
-      fontFamily: fontFamilies.regular,
-      color: theme.text,
+    creditText: {
+      fontSize: 12,
+      fontFamily: fontFamilies.medium,
+      color: "#666666",
+      lineHeight: 17,
+    },
+    creditLink: {
+      fontSize: 12,
+      fontFamily: fontFamilies.heavy,
+      color: "#FF8C00",
+      marginTop: 4,
+      textDecorationLine: "underline",
     },
     modalCopyright: {
-      fontSize: 12,
+      fontSize: 11,
       fontFamily: fontFamilies.regular,
-      color: theme.textMuted,
-      marginTop: 6,
-      marginBottom: 18,
-    },
-    modalActions: {
-      flexDirection: "row",
-      gap: 12,
-      marginTop: 10,
-      alignSelf: "stretch",
+      color: "#9CA3AF",
+      marginTop: 12,
+      textAlign: "center",
     },
     modalPrimaryBtn: {
-      flex: 1,
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 6,
+      marginTop: 6,
       paddingVertical: 14,
       borderRadius: 16,
-      alignItems: "center",
-      backgroundColor: theme.primary,
-      shadowColor: theme.primary,
+      borderWidth: 1,
+      borderBottomWidth: 4,
+      borderColor: "#E67E22",
+      backgroundColor: "#FF8C00",
+      shadowColor: "#000000",
       shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.3,
+      shadowOpacity: 0.12,
       shadowRadius: 8,
       elevation: 4,
     },
     modalPrimaryBtnText: {
-      fontSize: 16,
-      fontFamily: fontFamilies.bold,
+      fontSize: 15,
+      fontFamily: fontFamilies.heavy,
       color: "#FFFFFF",
     },
     /* Delete Account Modal */
-    deleteModalCard: {
-      width: "100%",
-      maxWidth: 380,
-      backgroundColor: theme.card,
-      borderRadius: 28,
-      padding: 28,
+    deleteModalWarning: {
+      flexDirection: "row",
+      alignItems: "flex-start",
+      gap: 10,
+      backgroundColor: "#FEF2F2",
       borderWidth: 1,
-      borderColor: theme.border,
-      shadowColor: "#000",
-      shadowOffset: { width: 0, height: 12 },
-      shadowOpacity: 0.25,
-      shadowRadius: 24,
-      elevation: 12,
+      borderColor: "#FECACA",
+      borderRadius: 12,
+      padding: 12,
+      marginBottom: 12,
     },
-    deleteModalIconWrap: {
-      width: 68,
-      height: 68,
-      borderRadius: 22,
-      backgroundColor: "#FEE2E2",
-      alignItems: "center",
-      justifyContent: "center",
-      marginBottom: 18,
-    },
-    deleteModalTitle: {
-      fontSize: 22,
-      fontFamily: fontFamilies.heavy,
-      color: theme.text,
-      marginBottom: 10,
+    deleteModalWarningText: {
+      flex: 1,
+      fontSize: 13,
+      fontFamily: fontFamilies.medium,
+      color: "#B91C1C",
+      lineHeight: 18,
     },
     deleteModalText: {
-      fontSize: 14,
-      fontFamily: fontFamilies.regular,
-      color: theme.textMuted,
-      lineHeight: 21,
-      marginBottom: 8,
+      fontSize: 13,
+      fontFamily: fontFamilies.medium,
+      color: "#666666",
+      lineHeight: 18,
+      marginBottom: 4,
     },
     deleteModalPhrase: {
-      fontFamily: fontFamilies.bold,
+      fontFamily: fontFamilies.heavy,
       color: "#EF4444",
+      textTransform: "uppercase",
     },
     deleteModalActions: {
       flexDirection: "row",
-      gap: 12,
-      marginTop: 20,
+      gap: 10,
+      marginTop: 16,
     },
     deleteModalCancelBtn: {
       flex: 1,
@@ -697,23 +769,30 @@ const createStyles = (theme: Palette) =>
       borderRadius: 16,
       alignItems: "center",
       borderWidth: 1,
-      borderColor: theme.border,
-      backgroundColor: theme.bg,
+      borderBottomWidth: 3,
+      borderColor: "#E5E7EB",
+      backgroundColor: "#FFFFFF",
     },
     deleteModalCancelText: {
-      fontSize: 16,
-      fontFamily: fontFamilies.bold,
-      color: theme.text,
+      fontSize: 14,
+      fontFamily: fontFamilies.heavy,
+      color: "#6B7280",
     },
     deleteModalConfirmBtn: {
-      flex: 1,
+      flex: 1.4,
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 6,
       paddingVertical: 14,
       borderRadius: 16,
-      alignItems: "center",
+      borderWidth: 1,
+      borderBottomWidth: 4,
+      borderColor: "#DC2626",
       backgroundColor: "#EF4444",
-      shadowColor: "#EF4444",
+      shadowColor: "#000000",
       shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.3,
+      shadowOpacity: 0.12,
       shadowRadius: 8,
       elevation: 4,
     },
@@ -723,8 +802,8 @@ const createStyles = (theme: Palette) =>
       elevation: 0,
     },
     deleteModalConfirmText: {
-      fontSize: 16,
-      fontFamily: fontFamilies.bold,
+      fontSize: 14,
+      fontFamily: fontFamilies.heavy,
       color: "#FFFFFF",
     },
   });

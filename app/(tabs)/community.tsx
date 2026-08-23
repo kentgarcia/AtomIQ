@@ -360,7 +360,7 @@ export default function CommunityScreen() {
           <TextInput
             style={styles.searchInput}
             placeholder="Search stories, facts, and more..."
-            placeholderTextColor="#9CA3AF"
+            placeholderTextColor={isDark ? "#667799" : "#9CA3AF"}
             value={searchQuery}
             onChangeText={setSearchQuery}
             returnKeyType="search"
@@ -396,7 +396,7 @@ export default function CommunityScreen() {
             <Icon
               name="Star"
               size={16}
-              color={activeFilter === "saved" ? "#FFFFFF" : "#6B7280"}
+              color={activeFilter === "saved" ? "#FFFFFF" : isDark ? "#8898AA" : "#6B7280"}
               variant="Bold"
             />
           </TouchableOpacity>

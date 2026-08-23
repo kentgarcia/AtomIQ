@@ -14,7 +14,7 @@ import Animated, {
 } from "react-native-reanimated";
 
 import { Icon } from "@/components/ui/icon";
-import { fontFamilies } from "@/theme";
+import { fontFamilies, useTheme } from "@/theme";
 
 import type { GuideCard } from "@/services/guide/types";
 
@@ -42,8 +42,35 @@ export interface ContentCardProps {
 }
 
 export function ContentCard({ card, onCta }: ContentCardProps) {
+  const { isDark } = useTheme();
   const reduce = useReducedMotion();
   const pressed = useSharedValue(0);
+
+  // Mode-aware neutral surfaces — brand accents stay identical
+  const P = isDark
+    ? {
+        card: "#213356",
+        border: "#2D3A56",
+        borderActive: "#FFCA5F",
+        soft: "#1A2D4A",
+        creamTint: "#4A381B",
+        text: "#F6F9FC",
+        textSecondary: "#C0CBDD",
+        muted: "#8898AA",
+        faint: "#9CA3AF",
+      }
+    : {
+        card: "#FFFFFF",
+        border: "#E5E7EB",
+        borderActive: "#FFCA5F",
+        soft: "#F4F5F7",
+        creamTint: "#FFF3E0",
+        text: "#333333",
+        textSecondary: "#666666",
+        muted: "#888888",
+        faint: "#9CA3AF",
+      };
+  const styles = React.useMemo(() => createStyles(P), [P]);
 
   const animated = useAnimatedStyle(() => {
     if (reduce) return { transform: [{ scale: 1 }] };
@@ -75,21 +102,21 @@ export function ContentCard({ card, onCta }: ContentCardProps) {
   // Badge — mirrors profile's countPill / badgeCircle language
   const badgeStyle = (() => {
     if (!card.badge) return null;
-    if (isLocked) return { bg: "#F4F5F7", text: "#9CA3AF" };
+    if (isLocked) return { bg: P.soft, text: P.faint };
     if (isCompleted) return { bg: "#22C55E1A", text: "#22C55E" };
-    if (isRecommended) return { bg: "#FFF3E0", text: "#E67E22" };
+    if (isRecommended) return { bg: P.creamTint, text: "#E67E22" };
     return { bg: `${accent}1A`, text: accent };
   })();
 
-  const ctaBg = isLocked ? "#E5E7EB" : "#FF8C00";
-  const ctaBorder = isLocked ? "#D1D5DB" : "#E67E22";
-  const ctaTextColor = isLocked ? "#9CA3AF" : "#FFFFFF";
+  const ctaBg = isLocked ? P.border : "#FF8C00";
+  const ctaBorder = isLocked ? P.faint : "#E67E22";
+  const ctaTextColor = isLocked ? P.faint : "#FFFFFF";
 
   return (
     <Animated.View
       style={[
         styles.card,
-        { borderColor: isRecommended ? "#FFCA5F" : "#E5E7EB" },
+        { borderColor: isRecommended ? P.borderActive : P.border },
         animated,
       ]}
       accessibilityLabel={`${typeLabel}: ${card.title}`}
@@ -101,13 +128,13 @@ export function ContentCard({ card, onCta }: ContentCardProps) {
         <View
           style={[
             styles.iconWrap,
-            { backgroundColor: isLocked ? "#F4F5F7" : `${accent}14` },
+            { backgroundColor: isLocked ? P.soft : `${accent}14` },
           ]}
         >
           <Icon
             name={isLocked ? "Lock" : CARD_ICON[card.kind]}
             size={20}
-            color={isLocked ? "#9CA3AF" : accent}
+            color={isLocked ? P.faint : accent}
             variant="Bold"
           />
         </View>
@@ -153,14 +180,17 @@ export function ContentCard({ card, onCta }: ContentCardProps) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (P: { card: string; border: string; soft: string; creamTint: string; text: string; textSecondary: string; muted: string; faint: string }) =>
+  StyleSheet.create({
   card: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: P.card,
     borderRadius: 20,
     padding: 16,
     borderWidth: 2,
     borderBottomWidth: 4,
     marginBottom: 10,
+    /* Fill the wrap so every card matches the tallest sibling */
+    flexGrow: 1,
     shadowColor: "#000000",
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.08,
@@ -170,7 +200,7 @@ const styles = StyleSheet.create({
   typeLabel: {
     fontSize: 10,
     fontFamily: fontFamilies.heavy,
-    color: "#9CA3AF",
+    color: P.faint,
     letterSpacing: 0.8,
     textTransform: "uppercase",
     marginBottom: 10,
@@ -193,13 +223,13 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 16,
     fontFamily: fontFamilies.heavy,
-    color: "#333333",
+    color: P.text,
     lineHeight: 20,
   },
   subtitle: {
     fontSize: 12,
     fontFamily: fontFamilies.semibold,
-    color: "#888888",
+    color: P.muted,
     marginTop: 2,
   },
   badge: {
@@ -216,8 +246,9 @@ const styles = StyleSheet.create({
   body: {
     fontSize: 13,
     fontFamily: fontFamilies.regular,
-    color: "#666666",
+    color: P.textSecondary,
     marginTop: 10,
+    marginBottom: 16,
     lineHeight: 18,
   },
   cta: {

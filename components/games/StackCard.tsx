@@ -7,7 +7,7 @@
  */
 
 import { Icon } from "@/components/ui/icon";
-import { fontFamilies } from "@/theme";
+import { fontFamilies, useTheme } from "@/theme";
 import React from "react";
 import { Pressable, StyleSheet, Text } from "react-native";
 import Animated, {
@@ -57,6 +57,7 @@ export function StackCard({
   height,
   onPress,
 }: StackCardProps) {
+  const { isDark } = useTheme();
   const pressScale = useSharedValue(1);
   const pressStyle = useAnimatedStyle(() => ({
     transform: [{ scale: pressScale.value }],
@@ -73,6 +74,7 @@ export function StackCard({
             <Animated.View
                 style={[
                     styles.card,
+                    isDark && styles.cardDark,
                     {
                         height,
                         transform: [{ rotate: "-4deg" }],
@@ -80,7 +82,7 @@ export function StackCard({
                 ]}
             >
                 <Pressable
-                    style={styles.cardPressArea}
+                    style={[styles.cardPressArea, isDark && styles.cardPressAreaDark]}
                     onPressIn={() => {
                         pressScale.value = springPressIn();
                     }}
@@ -92,7 +94,7 @@ export function StackCard({
                     <Animated.View style={[styles.iconWrapper, pressStyle, { backgroundColor: tint(color) }]}>
                         <Icon name={icon} size={42} color={shade(color, -0.32)} variant="Bold" />
                     </Animated.View>
-                    <Text style={styles.cardTitle}>{title}</Text>
+                    <Text style={[styles.cardTitle, isDark && styles.cardTitleDark]}>{title}</Text>
                 </Pressable>
             </Animated.View>
         </Animated.View>
@@ -134,5 +136,15 @@ const styles = StyleSheet.create({
         fontFamily: fontFamilies.heavy,
         color: "#333333",
         letterSpacing: -0.5,
+    },
+    /* Dark mode */
+    cardDark: {
+        backgroundColor: "#213356",
+    },
+    cardPressAreaDark: {
+        backgroundColor: "#213356",
+    },
+    cardTitleDark: {
+        color: "#F6F9FC",
     },
 });

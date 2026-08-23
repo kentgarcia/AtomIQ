@@ -71,7 +71,21 @@ export const ACHIEVEMENTS = [
 export default function AchievementDetailScreen() {
   const router = useRouter();
   const { theme } = useTheme();
-  const THEME = theme.palettes.achievements;
+  const isDark = theme.mode === "dark";
+  /* Mode-aware achievement palette */
+  const THEME: Palette = isDark
+    ? {
+        ...theme.palettes.achievements,
+        bg: "#172B4D",
+        card: "#213356",
+        border: "#2D3A56",
+        white: "#213356",
+        text: "#F6F9FC",
+        textMuted: "#8898AA",
+        primary: "#FF8C00",
+        __isDark: "1",
+      }
+    : { ...theme.palettes.achievements, __isDark: "" };
   const styles = useMemo(() => makeStyles(THEME), [THEME]);
   const { achievementId } = useLocalSearchParams<{ achievementId: string }>();
   const { userProfile } = useStorage();
@@ -136,7 +150,7 @@ export default function AchievementDetailScreen() {
                 <Icon 
                   name="Lock1" 
                   size={64} 
-                  color="#999" 
+                  color={isDark ? '#667799' : '#999'} 
                   variant="Bold" 
                 />
               ) : (
@@ -190,7 +204,7 @@ export default function AchievementDetailScreen() {
           <View style={styles.progressBarLarge}>
             <LinearGradient
               colors={(achievement.locked 
-                ? ['#E0E0E0', '#D0D0D0'] 
+                ? isDark ? ['#334A70', '#26365A'] : ['#E0E0E0', '#D0D0D0'] 
                 : [achievement.color, achievement.color + 'CC']) as readonly [string, string]
               }
               start={{ x: 0, y: 0 }}
@@ -321,8 +335,8 @@ const makeStyles = (THEME: Palette) => StyleSheet.create({
     elevation: 5,
   },
   largeIconCircleLocked: {
-    backgroundColor: '#F5F5F5',
-    borderColor: '#D0D0D0',
+    backgroundColor: THEME.__isDark ? '#334A70' : '#F5F5F5',
+    borderColor: THEME.__isDark ? '#26365A' : '#D0D0D0',
   },
   largeBadge: {
     position: 'absolute',
@@ -390,7 +404,7 @@ const makeStyles = (THEME: Palette) => StyleSheet.create({
   progressBarLarge: {
     width: '100%',
     height: 16,
-    backgroundColor: '#E8E8E8',
+    backgroundColor: THEME.__isDark ? '#26365A' : '#E8E8E8',
     borderRadius: 8,
     overflow: 'hidden',
     marginBottom: 20,

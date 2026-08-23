@@ -102,7 +102,31 @@ export default function StreakScreen() {
     };
   }, []);
 
-  const styles = useMemo(() => createStyles(), []);
+  const isDark = theme.mode === "dark";
+  const P = isDark
+    ? {
+        card: "#213356",
+        border: "#2D3A56",
+        softBorder: "#26365A",
+        soft: "#1A2D4A",
+        creamTint: "#4A381B",
+        text: "#F6F9FC",
+        textSecondary: "#C0CBDD",
+        muted: "#8898AA",
+        faint: "#667799",
+      }
+    : {
+        card: "#FFFFFF",
+        border: "#E5E7EB",
+        softBorder: "#F4F5F7",
+        soft: "#F9FAFB",
+        creamTint: CREAM,
+        text: "#333333",
+        textSecondary: "#555555",
+        muted: "#888888",
+        faint: "#AAAAAA",
+      };
+  const styles = useMemo(() => createStyles(P), [P]);
 
   return (
     <View style={[styles.container, { backgroundColor: bgColors[0] }]}>
@@ -117,7 +141,7 @@ export default function StreakScreen() {
           style={[styles.closeBtn, { top: insets.top + 10 }]}
           onPress={() => router.back()}
         >
-          <Icon name="Close" size={22} color="#888888" />
+          <Icon name="Close" size={22} color={isDark ? "#8898AA" : "#888888"} />
         </TouchableOpacity>
 
         <ScrollView
@@ -222,7 +246,17 @@ export default function StreakScreen() {
   );
 }
 
-const createStyles = () =>
+const createStyles = (P: {
+    card: string;
+    border: string;
+    softBorder: string;
+    soft: string;
+    creamTint: string;
+    text: string;
+    textSecondary: string;
+    muted: string;
+    faint: string;
+}) =>
   StyleSheet.create({
     container: {
       flex: 1,
@@ -233,7 +267,7 @@ const createStyles = () =>
       width: 40,
       height: 40,
       borderRadius: 20,
-      backgroundColor: "#FFFFFF",
+      backgroundColor: P.card,
       alignItems: "center",
       justifyContent: "center",
       zIndex: 10,
@@ -250,7 +284,7 @@ const createStyles = () =>
     },
     /* Shared rounded card, like the profile cards */
     card: {
-      backgroundColor: "#FFFFFF",
+      backgroundColor: P.card,
       borderRadius: 24,
       padding: 24,
       paddingTop: 28,
@@ -280,8 +314,8 @@ const createStyles = () =>
       height: 92,
       borderRadius: 28,
       borderWidth: 5,
-      borderColor: "#FFFFFF",
-      backgroundColor: "#FFFFFF",
+      borderColor: P.border,
+      backgroundColor: P.card,
       marginBottom: 6,
       elevation: 6,
       shadowColor: "#000000",
@@ -309,13 +343,13 @@ const createStyles = () =>
     heroValue: {
       fontSize: 24,
       fontFamily: fontFamilies.heavy,
-      color: "#333333",
+      color: P.text,
       marginTop: 10,
     },
     heroSub: {
       fontSize: 13,
       fontFamily: fontFamilies.regular,
-      color: "#888888",
+      color: P.muted,
       textAlign: "center",
       lineHeight: 19,
       marginTop: 6,
@@ -325,7 +359,7 @@ const createStyles = () =>
       flexDirection: "row",
       alignItems: "center",
       gap: 8,
-      backgroundColor: CREAM,
+      backgroundColor: P.creamTint,
       borderRadius: 14,
       paddingHorizontal: 14,
       paddingVertical: 8,
@@ -338,7 +372,7 @@ const createStyles = () =>
     cardTitle: {
       fontSize: 16,
       fontFamily: fontFamilies.heavy,
-      color: "#333333",
+      color: P.text,
       alignSelf: "flex-start",
       marginBottom: 16,
     },
@@ -355,7 +389,7 @@ const createStyles = () =>
       width: 36,
       height: 36,
       borderRadius: 18,
-      backgroundColor: "#F4F5F7",
+      backgroundColor: P.soft,
       alignItems: "center",
       justifyContent: "center",
     },
@@ -369,7 +403,7 @@ const createStyles = () =>
     dayLabel: {
       fontSize: 12,
       fontFamily: fontFamilies.semibold,
-      color: "#888888",
+      color: P.muted,
     },
     dayLabelToday: {
       color: "#E67E22",
@@ -378,7 +412,7 @@ const createStyles = () =>
     weekHint: {
       fontSize: 11,
       fontFamily: fontFamilies.regular,
-      color: "#AAAAAA",
+      color: P.faint,
       textAlign: "center",
       marginTop: 16,
     },
@@ -393,7 +427,7 @@ const createStyles = () =>
       width: 34,
       height: 34,
       borderRadius: 17,
-      backgroundColor: CREAM,
+      backgroundColor: P.creamTint,
       alignItems: "center",
       justifyContent: "center",
     },
@@ -401,7 +435,7 @@ const createStyles = () =>
       flex: 1,
       fontSize: 13,
       fontFamily: fontFamilies.regular,
-      color: "#555555",
+      color: P.textSecondary,
       lineHeight: 19,
     },
   });
