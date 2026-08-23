@@ -66,7 +66,7 @@ export const CONTENT_DB_NAME = "content.db";
  * file lets us detect stale copies and re-copy the fresh bundle on the next
  * launch (otherwise the device would silently keep using old content forever).
  */
-export const CONTENT_DB_VERSION = 9;
+export const CONTENT_DB_VERSION = 847142882;
 
 /** Marker file stored next to the db, whose content is CONTENT_DB_VERSION. */
 const VERSION_MARKER = "content.db.version";
