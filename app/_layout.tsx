@@ -10,6 +10,7 @@ import "react-native-reanimated";
 
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { ThemeProvider, useColorScheme } from "@/theme";
+import { useAndroidBackPolicy } from "@/hooks/use-android-back";
 import { useSnPro } from "@/hooks/use-snpro";
 import { ensureContentDatabase } from "@/services/content-db";
 import { StorageProvider } from "@/services/StorageContext";
@@ -27,6 +28,7 @@ export const unstable_settings = {
 function AppContent() {
   const colorScheme = useColorScheme();
   const pathname = usePathname();
+  useAndroidBackPolicy();
 
   useEffect(() => {
     setUiSfxPathname(pathname);

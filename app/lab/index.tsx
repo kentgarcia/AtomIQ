@@ -5,7 +5,12 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
 import { ScrollView, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View } from "react-native";
-import * as Haptics from "expo-haptics";
+import {
+  impactLight,
+  impactMedium,
+  notifyError,
+  notifySuccess,
+} from "@/services/haptics";
 import Animated, {
   FadeIn,
   FadeInDown,
@@ -67,7 +72,7 @@ function LabHeader({
             (pressed.value = withTiming(0, { duration: DURATION.press, easing: PRESS_EASING }))
           }
           onPress={() => {
-            void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            impactLight();
             onBack();
           }}
         >
@@ -102,7 +107,7 @@ function SelectPill({
       style={[styles.pill, active && { backgroundColor: color, borderColor: color }]}
       activeOpacity={0.85}
       onPress={() => {
-        void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        impactLight();
         onPress();
       }}
     >
@@ -137,7 +142,7 @@ function PrimaryButton({
           (pressed.value = withTiming(0, { duration: DURATION.press, easing: PRESS_EASING }))
         }
         onPress={() => {
-          void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+          impactMedium();
           onPress();
         }}
       >
@@ -176,7 +181,7 @@ function Stepper({
       disabled={disabled}
       onPress={() => {
         if (disabled) return;
-        void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        impactLight();
         handler();
       }}
     >
@@ -227,7 +232,7 @@ function SliderRow({
           style={styles.sliderDec}
           activeOpacity={0.8}
           onPress={() => {
-            void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            impactLight();
             dec();
           }}
         >
@@ -241,7 +246,7 @@ function SliderRow({
           style={styles.sliderDec}
           activeOpacity={0.8}
           onPress={() => {
-            void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            impactLight();
             inc();
           }}
         >
@@ -292,7 +297,7 @@ function ResultCard({
             style={[styles.actionBtn, a.primary ? styles.actionBtnPrimary : styles.actionBtnGhost]}
             activeOpacity={0.85}
             onPress={() => {
-              void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              impactLight();
               a.onPress();
             }}
           >
@@ -591,7 +596,7 @@ function BuildAnAtom({ onBack }: { onBack: () => void }) {
     ) {
       setResult("correct");
       setHint(null);
-      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      notifySuccess();
     } else {
       setResult("wrong");
       if (protons !== target.protons) {
@@ -601,7 +606,7 @@ function BuildAnAtom({ onBack }: { onBack: () => void }) {
       } else {
         setHint("Electrons set the charge. A neutral atom has equal protons and electrons.");
       }
-      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      notifyError();
     }
   };
 
@@ -712,7 +717,7 @@ function BuildAnAtom({ onBack }: { onBack: () => void }) {
                   style={styles.adjustBtn}
                   activeOpacity={0.85}
                   onPress={() => {
-                    void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    impactLight();
                     setResult("idle");
                   }}
                 >
@@ -836,7 +841,7 @@ function DecayLab({ onBack }: { onBack: () => void }) {
 
   const runSimulation = () => {
     setPhase("observe");
-    void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    impactMedium();
   };
 
   useEffect(() => {
@@ -1019,7 +1024,7 @@ function DecayLab({ onBack }: { onBack: () => void }) {
             style={[styles.challengeCard, { borderColor: C.amber }]}
             activeOpacity={0.85}
             onPress={() => {
-              void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              impactLight();
               setChallengeOpen(true);
               setInitial(800);
               setTime(0);
@@ -1121,7 +1126,7 @@ export default function LabScreen() {
   const { exp } = useLocalSearchParams<{ exp?: string }>();
 
   const handleGameBack = useCallback(() => {
-    void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    impactLight();
     if (router.canGoBack()) router.back();
     else router.replace("/(tabs)/awards");
   }, [router]);

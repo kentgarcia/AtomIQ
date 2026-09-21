@@ -6,7 +6,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Image as ExpoImage } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
-import * as Haptics from "expo-haptics";
+import { impactLight } from "@/services/haptics";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import Animated, {
   Easing,
@@ -229,7 +229,7 @@ export default function CommunityScreen() {
 
   const toggleBookmark = async (itemId: string) => {
     try {
-      void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      impactLight();
       let newBookmarks: string[];
       if (bookmarkedIds.includes(itemId)) {
         newBookmarks = bookmarkedIds.filter((id) => id !== itemId);
@@ -245,14 +245,14 @@ export default function CommunityScreen() {
 
   const selectFilter = useCallback((id: string) => {
     if (id !== activeFilter) {
-      void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      impactLight();
       setActiveFilter(id);
     }
   }, [activeFilter]);
 
   const openItem = useCallback(
     (item: any) => {
-      void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      impactLight();
       router.push(`/article-detail?id=${item.id}`);
     },
     [router],

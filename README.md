@@ -27,7 +27,7 @@ Built with **Expo (React Native) + TypeScript**, with content stored in a local 
 | Local storage | expo-sqlite (content + app database), AsyncStorage |
 | Animation | react-native-reanimated v4, react-native-gesture-handler |
 | Graphics | react-native-svg, expo-linear-gradient, expo-image |
-| Media | expo-speech (TTS), expo-haptics, expo-av (SFX) |
+| Media | expo-speech (TTS), expo-haptics, expo-audio (SFX) |
 | UI kit | Custom design-system components under `components/ui` with a themed autumn light/dark palette |
 
 ## Project Structure

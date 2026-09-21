@@ -27,7 +27,6 @@ import {
     Text,
     TouchableOpacity,
     useWindowDimensions,
-    Vibration,
     View,
 } from "react-native";
 import Animated, {
@@ -46,6 +45,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 // Modern Theme
 import { useTheme } from "@/theme";
 import { EASE_OUT } from "@/theme/motion";
+import { vibrate } from "@/services/haptics";
 import { HowToPlayCard } from "@/components/games/HowToPlayCard";
 import { MAZE_BATTLE_ART, MonsterIcon, PlayerIcon } from "@/components/atom-maze/icons";
 import { styles } from "@/components/atom-maze/styles";
@@ -1002,7 +1002,7 @@ export default function AtomMazeBattleScreen() {
       withTiming(0, { duration: 40 }),
     );
     if (Platform.OS !== "web") {
-      Vibration.vibrate(70);
+      vibrate(70);
     }
   }, []);
 

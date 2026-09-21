@@ -1,4 +1,4 @@
-import * as Haptics from "expo-haptics";
+import { select } from "@/services/haptics";
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
@@ -40,7 +40,7 @@ export function FastAlphabet({ data, availableSet, onCharSelect, onPreviewChange
 
   const notifyChange = (idx: number) => {
     const ch = data[idx] ?? "";
-    Haptics.selectionAsync();
+    select();
     onCharSelect?.(ch);
     onPreviewChange?.(ch);
   };

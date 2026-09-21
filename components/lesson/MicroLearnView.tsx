@@ -8,7 +8,7 @@ import {
     View,
 } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
-import * as Speech from "expo-speech";
+import { speakSafely, stopSpeech } from "@/services/speech";
 
 import { type Palette } from "@/theme";
 import { Icon } from "@/components/ui/icon";
@@ -46,7 +46,7 @@ export const MicroLearnView = ({
 
   const speakContent = () => {
     if (isSpeaking) {
-      Speech.stop();
+      stopSpeech();
       setIsSpeaking(false);
     } else {
       let text = "";
@@ -58,7 +58,7 @@ export const MicroLearnView = ({
         text = `Summary: ${data.title}. ${data.content}`;
 
       setIsSpeaking(true);
-      Speech.speak(text, {
+      speakSafely(text, {
         language: "en",
         rate: 0.9,
         onDone: () => setIsSpeaking(false),
@@ -68,7 +68,7 @@ export const MicroLearnView = ({
   };
 
   const handleNext = () => {
-    Speech.stop();
+    stopSpeech();
     setIsSpeaking(false);
     if (isLastSlide) {
       onComplete();
@@ -78,7 +78,7 @@ export const MicroLearnView = ({
   };
 
   const handleBack = () => {
-    Speech.stop();
+    stopSpeech();
     setIsSpeaking(false);
     if (!isFirstSlide) {
       setCurrentSlide((prev) => prev - 1);

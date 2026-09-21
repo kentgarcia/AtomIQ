@@ -12,7 +12,7 @@ import {
 import { toLocalIsoDate } from "@/services/utils";
 import { playGameSfx, preloadGameSfx } from "@/services/game-sfx";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import * as Speech from "expo-speech";
+import { speakSafely, stopSpeech } from "@/services/speech";
 import React, { useEffect, useRef, useState } from "react";
 import {
     ActivityIndicator,
@@ -95,11 +95,11 @@ export default function QuizScreen() {
 
   const speakQuestion = () => {
     if (isSpeaking) {
-      Speech.stop();
+      stopSpeech();
       setIsSpeaking(false);
     } else {
       setIsSpeaking(true);
-      Speech.speak(currentQuestion.question, {
+      speakSafely(currentQuestion.question, {
         language: "en",
         rate: 0.9,
         onDone: () => setIsSpeaking(false),
@@ -123,7 +123,7 @@ export default function QuizScreen() {
 
   const handleSubmitAnswer = () => {
     if (selectedAnswer === null) return;
-    Speech.stop();
+    stopSpeech();
     setIsSpeaking(false);
 
     const correctIndex = getCorrectAnswerIndex(currentQuestion);

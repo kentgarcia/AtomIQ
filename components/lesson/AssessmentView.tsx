@@ -7,7 +7,7 @@ import {
     View,
 } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
-import * as Speech from "expo-speech";
+import { speakSafely, stopSpeech } from "@/services/speech";
 
 import {type Palette, fontFamilies} from "@/theme";
 import { Icon } from "@/components/ui/icon";
@@ -35,11 +35,11 @@ export const AssessmentView = ({
 
   const speakQuestion = () => {
     if (isSpeaking) {
-      Speech.stop();
+      stopSpeech();
       setIsSpeaking(false);
     } else {
       setIsSpeaking(true);
-      Speech.speak(data.question, {
+      speakSafely(data.question, {
         language: "en",
         rate: 0.9,
         onDone: () => setIsSpeaking(false),

@@ -9,7 +9,7 @@ import { DifficultyPanel } from "@/components/games/DifficultyPanel";
 import { StackCard } from "@/components/games/StackCard";
 import { Icon } from "@/components/ui/icon";
 import { fontFamilies, useTheme } from "@/theme";
-import * as Haptics from "expo-haptics";
+import { impactLight, impactMedium } from "@/services/haptics";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
@@ -142,7 +142,7 @@ export function PickAGame() {
     }));
 
     const openDifficulty = (game: "atom-maze" | "mythbuster" | "lab") => {
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+        impactMedium();
         setActiveGame(game);
         gamesX.value = withTiming(-windowWidth, SLIDE);
         diffX.value = withTiming(0, SLIDE);
@@ -150,7 +150,7 @@ export function PickAGame() {
 
     const closeDifficulty = () => {
         if (activeGame === null) return;
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        impactLight();
         diffX.value = withTiming(windowWidth, SLIDE, (finished) => {
             if (finished) {
                 runOnJS(setActiveGame)(null);
@@ -199,13 +199,13 @@ export function PickAGame() {
             openDifficulty(game.route.slice(1) as "atom-maze" | "mythbuster" | "lab");
             return;
         }
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+        impactMedium();
         router.push(game.route);
     };
 
     const [guideVisible, setGuideVisible] = useState(false);
     const openGuide = () => {
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        impactLight();
         setGuideVisible(true);
     };
 

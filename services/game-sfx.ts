@@ -1,4 +1,4 @@
-import { Audio, InterruptionModeAndroid, InterruptionModeIOS } from "expo-av";
+import { createAudioPlayer, setAudioModeAsync, type AudioPlayer } from "expo-audio";
 import { getSoundEnabled } from "./storage";
 
 export type GameSfx = "punch" | "correct" | "wrong" | "gameover";
@@ -10,7 +10,7 @@ const sfxSources: Record<GameSfx, number> = {
   gameover: require("../assets/sfx/gameover.mp3"),
 };
 
-const soundCache: Partial<Record<GameSfx, Audio.Sound>> = {};
+const soundCache: Partial<Record<GameSfx, AudioPlayer>> = {};
 let audioModeConfigured = false;
 
 const configureAudioMode = async () => {
@@ -19,14 +19,13 @@ const configureAudioMode = async () => {
   }
 
   try {
-    await Audio.setAudioModeAsync({
-      allowsRecordingIOS: false,
-      playsInSilentModeIOS: true,
-      staysActiveInBackground: false,
-      interruptionModeIOS: InterruptionModeIOS.MixWithOthers,
-      shouldDuckAndroid: true,
-      interruptionModeAndroid: InterruptionModeAndroid.DuckOthers,
-      playThroughEarpieceAndroid: false,
+    // Short game effects: play in silent mode (iOS), mix with other apps
+    // (no audio-focus steal on Android), never record or run in background.
+    await setAudioModeAsync({
+      playsInSilentMode: true,
+      interruptionMode: "mixWithOthers",
+      allowsRecording: false,
+      shouldPlayInBackground: false,
     });
   } catch (error) {
     console.warn("Unable to configure audio mode for game SFX:", error);
@@ -35,26 +34,27 @@ const configureAudioMode = async () => {
   }
 };
 
-const getOrCreateSound = async (type: GameSfx): Promise<Audio.Sound> => {
+const getOrCreatePlayer = (type: GameSfx): AudioPlayer => {
   const cached = soundCache[type];
   if (cached) {
     return cached;
   }
 
-  const { sound } = await Audio.Sound.createAsync(sfxSources[type], {
-    shouldPlay: false,
-    volume: 1,
-  });
-
-  soundCache[type] = sound;
-  return sound;
+  const player = createAudioPlayer(sfxSources[type]);
+  player.volume = 1;
+  soundCache[type] = player;
+  return player;
 };
 
 export const preloadGameSfx = async (): Promise<void> => {
   await configureAudioMode();
-  await Promise.all(
-    (Object.keys(sfxSources) as GameSfx[]).map(getOrCreateSound),
-  );
+  for (const type of Object.keys(sfxSources) as GameSfx[]) {
+    try {
+      getOrCreatePlayer(type);
+    } catch (error) {
+      console.warn(`Unable to preload ${type} game SFX:`, error);
+    }
+  }
 };
 
 export const playGameSfx = async (type: GameSfx): Promise<void> => {
@@ -65,27 +65,30 @@ export const playGameSfx = async (type: GameSfx): Promise<void> => {
     }
 
     await configureAudioMode();
-    const sound = await getOrCreateSound(type);
-    await sound.replayAsync();
+    const player = getOrCreatePlayer(type);
+    try {
+      await player.seekTo(0);
+    } catch {
+      // Seek can fail before the source finishes loading; fall through
+      // and attempt playback anyway.
+    }
+    player.play();
   } catch (error) {
     console.warn(`Unable to play ${type} game SFX:`, error);
   }
 };
 
 export const unloadGameSfx = async (): Promise<void> => {
-  const sounds = Object.values(soundCache).filter(Boolean) as Audio.Sound[];
-
-  await Promise.all(
-    sounds.map(async (sound) => {
-      try {
-        await sound.unloadAsync();
-      } catch {
-        // Ignore unload failures.
-      }
-    }),
-  );
-
   for (const key of Object.keys(soundCache) as GameSfx[]) {
+    const player = soundCache[key];
+    if (!player) {
+      continue;
+    }
+    try {
+      player.remove();
+    } catch {
+      // Ignore unload failures.
+    }
     delete soundCache[key];
   }
 };
