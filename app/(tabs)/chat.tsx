@@ -49,7 +49,7 @@ const MASCOT_FOR_MOOD: Record<MascotMood, any> = {
   greeting: MASCOTS.happy,
   thinking: MASCOTS.thinking,
   excited: MASCOTS.idea,
-  explaining: MASCOTS.explain,
+  explaining: MASCOTS.happy2,
   celebrating: MASCOTS.happy,
   encouraging: MASCOTS.blink,
 };
