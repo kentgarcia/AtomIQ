@@ -14,44 +14,48 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 type Section = { title: string; body: string };
 
-const LAST_UPDATED = "January 15, 2026";
+const LAST_UPDATED = "September 21, 2026";
 
 const SECTIONS: Section[] = [
   {
     title: "1. Introduction",
-    body: "AtomIQ (\"we\", \"us\", or \"our\") is an educational app designed to help you learn about nuclear science. This Privacy Policy explains what information we collect, how we use it, and the choices you have. By using AtomIQ, you agree to the practices described below.",
+    body: "AtomIQ (\"we\", \"us\", or \"our\") is a local-first educational app for learning nuclear science — including lessons and quizzes, the MythBuster game, the Shrodi guide, discovery feed, explorer journeys and encyclopedia, interactive labs, daily facts and missions, and XP, streaks, achievements, and leaderboards. This Privacy Policy explains what information the app handles, how it is stored, and the choices you have. By using AtomIQ, you agree to the practices described below.",
   },
   {
     title: "2. Data We Collect",
-    body: "We collect minimal data needed to power your learning experience. This includes your display name, learning progress, XP, streaks, achievements, and app preferences. We do not require you to create an online account or provide personal information to use the app.",
+    body: "We collect only the minimum needed for your learning experience, and you provide it directly in the app: your display name or username, avatar choice, onboarding selections, learning progress (completed lessons, quizzes, journeys, nodes, and mazes), XP, levels, stars, streaks, missions, achievements and awards, game scores, bookmarks, and app preferences (theme, sound effects, haptics, notification and unit/level state). We do not require an online account, email, phone number, or any government identifier.",
   },
   {
     title: "3. How We Store Your Data",
-    body: "All of your progress and preferences are stored locally on your device using SQLite and local storage. We do not maintain a cloud database of your profile, and your data never leaves your device unless you choose to engage with features covered in this policy.",
+    body: "Everything is stored locally on your device using SQLite and AsyncStorage — your profile, progress, and preferences never leave your device and are never uploaded to our servers, because we operate none. Uninstalling the app or clearing its data removes this information. There is no cloud sync or cross-device backup provided by AtomIQ.",
   },
   {
-    title: "4. AI Chat Assistance",
-    body: "AtomIQ includes an AI-powered chat tutor. When you send a message, it may be processed by a third-party AI provider (such as Google Gemini) to generate a helpful reply. Please do not share personal or sensitive information in chat. Chat data is handled according to the respective provider's privacy policy.",
+    title: "4. What We Do Not Collect",
+    body: "AtomIQ has no analytics SDK, no advertising SDK, no user tracking, and no data brokers. We do not collect precise location, contacts, photos, microphone or camera input, device advertising identifiers, or browsing history. We do not sell, rent, or share your personal information with anyone, and the simulated leaderboard characters and community feed content are bundled or generated on-device — they involve no real users and no social data leaving your phone.",
   },
   {
-    title: "5. Third-Party Services",
-    body: "We may rely on third-party services such as AI providers to operate certain features. These services process data only as needed to deliver the feature, and each is governed by its own privacy policy. We do not sell your data to anyone.",
+    title: "5. Network Use and External Content",
+    body: "AtomIQ's core features — lessons, quizzes, games, the Shrodi guide, encyclopedia, labs, and progress tracking — work fully offline from the bundled database. A network connection is used only when you choose to open an external source link (for example IAEA, Britannica, EPA, or World Nuclear Association references) in the in-app browser, visit the developer credit link in Settings, or load a remote cover image. Those external sites and image hosts are governed by their own privacy policies, and we encourage you to review them before interacting.",
   },
   {
-    title: "6. Your Rights",
-    body: "You are in control of your data. You can clear all progress or permanently delete your account and all local data at any time from the Settings screen. Deleting your data is irreversible.",
+    title: "6. Device Features",
+    body: "Text-to-speech read-aloud, haptics, and sound effects run on your device using OS capabilities (such as the system speech engine). Lesson text you choose to hear is processed on-device for playback and is not sent by AtomIQ to any server. AtomIQ does not request microphone, camera, or background-location access.",
   },
   {
     title: "7. Children's Privacy",
-    body: "AtomIQ is an educational tool suitable for all ages. We do not knowingly collect personal information from children. Because the app runs locally without a login, children can use it without sharing any personal data.",
+    body: "AtomIQ is an educational tool suitable for general audiences, including students using it with a parent, guardian, or teacher. Because the app runs locally without logins and we knowingly collect no personal information from anyone — children included — a child can learn without sharing personal data. Parents or guardians who want progress removed can delete it at any time from Settings.",
   },
   {
-    title: "8. Changes to This Policy",
-    body: "We may update this Privacy Policy from time to time. When we do, the effective date at the top of this page will be revised. Continued use of the app after changes are posted constitutes acceptance of the updated policy.",
+    title: "8. Your Rights and Controls",
+    body: "You are in control of your data. You can review and change your display name, avatar, and preferences in Profile and Settings, remove bookmarks and progress as you learn, or permanently delete your profile and all local data via Settings > Delete Account. Deletion is immediate and irreversible on the device. To exercise a question or request about this policy, contact us at the address below.",
   },
   {
-    title: "9. Contact Us",
-    body: "If you have any questions about this Privacy Policy or how your data is handled, please contact us at support@atomiq.app.",
+    title: "9. Data Security",
+    body: "Local-only storage greatly limits exposure, and we take reasonable steps to keep the app's code and bundled content safe. No method of storage is perfectly secure, so please protect your device with a lock screen, be cautious with device backups and shared devices, and keep your operating system up to date.",
+  },
+  {
+    title: "10. Changes to This Policy",
+    body: "We may update this Privacy Policy from time to time, for example when features or legal requirements change. When we do, the effective date at the top of this page will be revised, and material changes will be reflected in the app. Continued use of the app after changes are posted constitutes acceptance of the updated policy.",
   },
 ];
 
