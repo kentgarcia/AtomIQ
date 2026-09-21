@@ -17,7 +17,7 @@ import Animated, {
     withTiming,
 } from "react-native-reanimated";
 import { LinearGradient } from "expo-linear-gradient";
-import * as Speech from "expo-speech";
+import { speakSafely, stopSpeech } from "@/services/speech";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import {type Palette, fontFamilies} from "@/theme";
@@ -52,17 +52,17 @@ export const MythBusterView = ({
   // Stop speech when component unmounts
   useEffect(() => {
     return () => {
-      Speech.stop();
+      stopSpeech();
     };
   }, []);
 
   const speakMyth = async () => {
     if (isSpeaking) {
-      Speech.stop();
+      stopSpeech();
       setIsSpeaking(false);
     } else {
       setIsSpeaking(true);
-      Speech.speak(data.myth, {
+      speakSafely(data.myth, {
         language: "en",
         pitch: 1.0,
         rate: 0.9,
@@ -101,7 +101,7 @@ export const MythBusterView = ({
         translateX.value = withTiming(isLeft ? -width * 1.5 : width * 1.5, {
           duration: 200,
         });
-        runOnJS(Speech.stop)();
+        runOnJS(stopSpeech)();
         runOnJS(setIsSpeaking)(false);
         runOnJS(setShowFeedback)(isLeft ? "correct" : "incorrect");
       } else {
@@ -231,7 +231,7 @@ export const MythBusterView = ({
             <TouchableOpacity
               style={mythStyles.speakerBtn}
               onPress={() =>
-                Speech.speak(
+                speakSafely(
                   `${data.explanation}. The reality is: ${data.reality}`,
                   { language: "en", rate: 0.9 },
                 )

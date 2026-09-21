@@ -30,7 +30,7 @@ import {
     TouchableOpacity,
     View,
 } from "react-native";
-import * as Haptics from "expo-haptics";
+import { impactLight } from "@/services/haptics";
 import Animated, {
     FadeIn,
     FadeInDown,
@@ -818,7 +818,7 @@ export default function ProfileScreen() {
                         isSavingProfile && styles.avatarModalOptionDisabled,
                       ]}
                       onPress={() => {
-                        void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                        impactLight();
                         setPendingAvatarKey(avatarOption.key);
                       }}
                       activeOpacity={0.85}

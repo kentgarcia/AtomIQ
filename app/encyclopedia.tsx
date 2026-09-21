@@ -2,11 +2,11 @@ import { Icon } from "@/components/ui/icon";
 import { getAllEncyclopediaEntries } from "@/content/explorer";
 import type { EncyclopediaEntry } from "@/content/explorer";
 import { useTheme, fontFamilies } from "@/theme";
-import * as Haptics from "expo-haptics";
+import { impactLight, impactMedium } from "@/services/haptics";
 import { Image as ExpoImage } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
-import * as Speech from "expo-speech";
+import { speakSafely, stopSpeech } from "@/services/speech";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   ScrollView,
@@ -146,7 +146,7 @@ export default function EncyclopediaScreen() {
 
   useEffect(() => {
     return () => {
-      Speech.stop();
+      stopSpeech();
     };
   }, []);
 
@@ -238,14 +238,14 @@ export default function EncyclopediaScreen() {
 
   const speakTerm = useCallback(
     (entry: EncyclopediaEntry) => {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      impactLight();
       if (speakingEntryId === entry.id) {
-        Speech.stop();
+        stopSpeech();
         setSpeakingEntryId(null);
       } else {
-        Speech.stop();
+        stopSpeech();
         setSpeakingEntryId(entry.id);
-        Speech.speak(`${entry.term}. ${entry.definition}`, {
+        speakSafely(`${entry.term}. ${entry.definition}`, {
           language: "en",
           rate: 0.85,
           pitch: 1.0,
@@ -258,18 +258,18 @@ export default function EncyclopediaScreen() {
   );
 
   const handleCategorySelect = (cat: string) => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    impactMedium();
     setSelectedCategories((prev) => (prev.includes(cat) ? prev.filter((c) => c !== cat) : [...prev, cat]));
     setSelectedLetter(null);
   };
 
   const handleLetterPick = (letter: string) => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    impactLight();
     setSelectedLetter((prev) => (prev === letter ? null : letter));
   };
 
   const clearFilters = () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    impactLight();
     setSelectedCategories([]);
     setSelectedLetter(null);
     setSearchQuery("");

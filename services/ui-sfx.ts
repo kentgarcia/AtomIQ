@@ -1,4 +1,4 @@
-import { Audio, InterruptionModeAndroid, InterruptionModeIOS } from "expo-av";
+import { createAudioPlayer, setAudioModeAsync, type AudioPlayer } from "expo-audio";
 import { Pressable, TouchableOpacity } from "react-native";
 import { getSoundEnabled } from "./storage";
 
@@ -15,7 +15,7 @@ const GAME_ROUTE_PATTERNS = [
 ];
 
 let audioModeConfigured = false;
-let clickSound: Audio.Sound | null = null;
+let clickPlayer: AudioPlayer | null = null;
 let soundEnabledCache: boolean | null = null;
 let currentPathname = "";
 let handlersInstalled = false;
@@ -49,14 +49,13 @@ const configureAudioMode = async () => {
   }
 
   try {
-    await Audio.setAudioModeAsync({
-      allowsRecordingIOS: false,
-      playsInSilentModeIOS: true,
-      staysActiveInBackground: false,
-      interruptionModeIOS: InterruptionModeIOS.MixWithOthers,
-      shouldDuckAndroid: true,
-      interruptionModeAndroid: InterruptionModeAndroid.DuckOthers,
-      playThroughEarpieceAndroid: false,
+    // UI clicks: mix with other apps (no audio-focus steal on Android),
+    // play in silent mode (iOS), never record or run in background.
+    await setAudioModeAsync({
+      playsInSilentMode: true,
+      interruptionMode: "mixWithOthers",
+      allowsRecording: false,
+      shouldPlayInBackground: false,
     });
   } catch (error) {
     console.warn("Unable to configure audio mode for UI SFX:", error);
@@ -65,18 +64,15 @@ const configureAudioMode = async () => {
   }
 };
 
-const getOrCreateClickSound = async (): Promise<Audio.Sound> => {
-  if (clickSound) {
-    return clickSound;
+const getOrCreateClickPlayer = (): AudioPlayer => {
+  if (clickPlayer) {
+    return clickPlayer;
   }
 
-  const { sound } = await Audio.Sound.createAsync(buttonClickSource, {
-    shouldPlay: false,
-    volume: 0.65,
-  });
-
-  clickSound = sound;
-  return sound;
+  const player = createAudioPlayer(buttonClickSource);
+  player.volume = 0.65;
+  clickPlayer = player;
+  return player;
 };
 
 const getSoundEnabledCached = async (): Promise<boolean> => {
@@ -98,7 +94,11 @@ export const setUiSfxPathname = (pathname: string): void => {
 
 export const initializeUiSfx = async (): Promise<void> => {
   await configureAudioMode();
-  await getOrCreateClickSound();
+  try {
+    getOrCreateClickPlayer();
+  } catch (error) {
+    console.warn("Unable to preload button click SFX:", error);
+  }
   await getSoundEnabledCached();
 };
 
@@ -120,8 +120,14 @@ export const playButtonClickSfx = async (): Promise<void> => {
 
     lastClickAt = now;
     await configureAudioMode();
-    const sound = await getOrCreateClickSound();
-    await sound.replayAsync();
+    const player = getOrCreateClickPlayer();
+    try {
+      await player.seekTo(0);
+    } catch {
+      // Seek can fail before the source finishes loading; fall through
+      // and attempt playback anyway.
+    }
+    player.play();
   } catch (error) {
     console.warn("Unable to play button click SFX:", error);
   }
@@ -152,15 +158,15 @@ export const installGlobalUiSfxHandlers = (): void => {
 };
 
 export const unloadUiSfx = async (): Promise<void> => {
-  if (!clickSound) {
+  if (!clickPlayer) {
     return;
   }
 
   try {
-    await clickSound.unloadAsync();
+    clickPlayer.remove();
   } catch {
     // Ignore unload failures.
   } finally {
-    clickSound = null;
+    clickPlayer = null;
   }
 };

@@ -26,7 +26,7 @@ import Animated, {
     FadeInDown,
     FadeInUp,
 } from "react-native-reanimated";
-import * as Haptics from "expo-haptics";
+import { impactLight } from "@/services/haptics";
 import { LinearGradient } from "expo-linear-gradient";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -182,7 +182,7 @@ export default function Onboarding() {
     );
 
     const handleNextFeature = () => {
-        void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        impactLight();
         if (currentFeatureIndex < FEATURE_SHOWCASE.length - 1) {
             setCurrentFeatureIndex(currentFeatureIndex + 1);
         } else {
@@ -444,7 +444,7 @@ export default function Onboarding() {
                                         style={[styles.avatarOption, isSelected && styles.avatarOptionSelected]}
                                         activeOpacity={0.85}
                                         onPress={() => {
-                                            void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                                            impactLight();
                                             setAvatarKey(option.key);
                                         }}
                                     >
@@ -470,7 +470,7 @@ export default function Onboarding() {
                             style={styles.consentRow}
                             activeOpacity={0.8}
                             onPress={() => {
-                                void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                                impactLight();
                                 setAgreed((v) => !v);
                             }}
                             accessibilityRole="checkbox"

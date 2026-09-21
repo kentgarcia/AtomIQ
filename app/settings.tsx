@@ -1,7 +1,13 @@
 import { Icon } from "@/components/ui/icon";
 import {useTheme, type Palette, fontFamilies} from "@/theme";
 import { deleteAccountData } from "@/services/database";
-import { getSoundEnabled, setSoundEnabled } from "@/services/storage";
+import { setHapticsGate } from "@/services/haptics";
+import {
+  getHapticsEnabled,
+  getSoundEnabled,
+  setHapticsEnabled,
+  setSoundEnabled,
+} from "@/services/storage";
 import { useStorage } from "@/services/StorageContext";
 import { setUiSfxEnabled } from "@/services/ui-sfx";
 import Constants from "expo-constants";
@@ -35,6 +41,7 @@ export default function SettingsScreen() {
   const { theme, isDark, toggleTheme } = useTheme();
   const THEME = theme.palettes.settings;
   const [soundEffects, setSoundEffects] = useState(true);
+  const [haptics, setHaptics] = useState(true);
   const [isDeletingAccount, setIsDeletingAccount] = useState(false);
   const [versionModalVisible, setVersionModalVisible] = useState(false);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
@@ -51,9 +58,14 @@ export default function SettingsScreen() {
 
     const loadPreferences = async () => {
       try {
-        const soundEnabled = await getSoundEnabled();
+        const [soundEnabled, hapticsEnabled] = await Promise.all([
+          getSoundEnabled(),
+          getHapticsEnabled(),
+        ]);
         if (mounted) {
           setSoundEffects(soundEnabled);
+          setHaptics(hapticsEnabled);
+          setHapticsGate(hapticsEnabled);
         }
       } catch (error) {
         console.error("Error loading sound preference:", error);
@@ -75,6 +87,12 @@ export default function SettingsScreen() {
     setSoundEffects(enabled);
     setUiSfxEnabled(enabled);
     void setSoundEnabled(enabled);
+  };
+
+  const handleHapticsToggle = (enabled: boolean) => {
+    setHaptics(enabled);
+    setHapticsGate(enabled);
+    void setHapticsEnabled(enabled);
   };
 
   const executeDeleteAccount = async () => {
@@ -179,6 +197,29 @@ export default function SettingsScreen() {
                 onValueChange={handleSoundEffectsToggle}
                 trackColor={{ false: "#E5E5E5", true: THEME.primary }}
                 thumbColor={soundEffects ? "#FFFFFF" : "#FFFFFF"}
+              />
+            </View>
+
+            <View style={styles.settingRow}>
+              <View style={styles.settingInfo}>
+                <Icon
+                  name="Vibe"
+                  size={20}
+                  color={THEME.primary}
+                  variant="Bold"
+                />
+                <View>
+                  <Text style={styles.settingLabel}>Haptics</Text>
+                  <Text style={styles.settingDescription}>
+                    Vibrate on actions and game events
+                  </Text>
+                </View>
+              </View>
+              <Switch
+                value={haptics}
+                onValueChange={handleHapticsToggle}
+                trackColor={{ false: "#E5E5E5", true: THEME.primary }}
+                thumbColor={haptics ? "#FFFFFF" : "#FFFFFF"}
               />
             </View>
           </View>

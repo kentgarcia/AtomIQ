@@ -11,7 +11,7 @@ import { toLocalIsoDate } from "@/services/utils";
 import { recordMissionEvent } from "@/services/missions";
 import { playGameSfx, preloadGameSfx } from "@/services/game-sfx";
 import { LinearGradient } from "expo-linear-gradient";
-import * as Speech from "expo-speech";
+import { speakSafely, stopSpeech } from "@/services/speech";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
 import {
@@ -268,20 +268,20 @@ export default function MythBusterScreen() {
   // Cleanup speech on unmount
   useEffect(() => {
     return () => {
-      Speech.stop();
+      stopSpeech();
     };
   }, []);
 
   // Stop any ongoing TTS when the statement changes
   useEffect(() => {
     if (gameState !== "playing") return;
-    Speech.stop();
+    stopSpeech();
   }, [currentMyth?.id, gameState]);
 
   const speakStatement = () => {
     if (!currentMyth) return;
-    Speech.stop();
-    Speech.speak(`"${currentMyth.statement}"`, {
+    stopSpeech();
+    speakSafely(`"${currentMyth.statement}"`, {
       language: "en",
       rate: 0.9,
       pitch: 1.0,
@@ -1663,18 +1663,6 @@ export default function MythBusterScreen() {
 const styles = StyleSheet.create({
   fullScreen: {
     flex: 1,
-  },
-  closeBtn: {
-    position: "absolute",
-    top: 60,
-    right: 20,
-    zIndex: 10,
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: "rgba(0,0,0,0.2)",
-    alignItems: "center",
-    justifyContent: "center",
   },
 
   // Intro Screen with colored background

@@ -4,10 +4,10 @@ import type { EncyclopediaEntry } from "@/content/explorer";
 import { getEncyclopediaImage } from "@/content/explorer/images";
 import { useTheme, fontFamilies } from "@/theme";
 import { openExternalUrl } from "@/services/open-url";
-import * as Haptics from "expo-haptics";
+import { impactLight, impactMedium } from "@/services/haptics";
 import { LinearGradient } from "expo-linear-gradient";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import * as Speech from "expo-speech";
+import { speakSafely, stopSpeech } from "@/services/speech";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Alert, Image, ScrollView, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View } from "react-native";
 import Animated, { FadeInDown, ZoomIn } from "react-native-reanimated";
@@ -99,22 +99,22 @@ export default function EncyclopediaEntryScreen() {
 
   useEffect(() => {
     return () => {
-      Speech.stop();
+      stopSpeech();
     };
   }, []);
 
   const speakText = useCallback(
     (text: string, section: string) => {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      impactLight();
       if (isSpeaking && speakingSection === section) {
-        Speech.stop();
+        stopSpeech();
         setIsSpeaking(false);
         setSpeakingSection(null);
       } else {
-        Speech.stop();
+        stopSpeech();
         setIsSpeaking(true);
         setSpeakingSection(section);
-        Speech.speak(text, {
+        speakSafely(text, {
           language: "en",
           rate: 0.85,
           pitch: 1.0,
@@ -133,16 +133,16 @@ export default function EncyclopediaEntryScreen() {
   );
 
   const openSourceLink = useCallback(async (url: string) => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    impactLight();
     const opened = await openExternalUrl(url);
     if (!opened) Alert.alert("Unable to open link", "Please try again in a moment.");
   }, []);
 
   const speakAll = useCallback(() => {
     if (!entry) return;
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    impactMedium();
     if (isSpeaking) {
-      Speech.stop();
+      stopSpeech();
       setIsSpeaking(false);
       setSpeakingSection(null);
     } else {
@@ -151,7 +151,7 @@ export default function EncyclopediaEntryScreen() {
       let fullText = `${entry.term}. ${entry.definition}`;
       if (entry.quickFacts && entry.quickFacts.length > 0) fullText += ` Quick facts: ${entry.quickFacts.join(". ")}`;
       if (entry.debunkingSnippet) fullText += ` Myth debunking: ${entry.debunkingSnippet}`;
-      Speech.speak(fullText, {
+      speakSafely(fullText, {
         language: "en",
         rate: 0.85,
         pitch: 1.0,
@@ -286,7 +286,7 @@ export default function EncyclopediaEntryScreen() {
                   <TouchableOpacity
                     style={styles.pill}
                     onPress={() => {
-                      Speech.stop();
+                      stopSpeech();
                       router.replace(`/explorer/encyclopedia-entry?id=${term}`);
                     }}
                     activeOpacity={0.88}

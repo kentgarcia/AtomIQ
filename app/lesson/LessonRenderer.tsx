@@ -6,7 +6,7 @@ import {fontFamilies} from "@/theme";
 
 import { Icon } from "@/components/ui/icon";
 import { LinearGradient } from "expo-linear-gradient";
-import * as Speech from "expo-speech";
+import { speakSafely, stopSpeech } from "@/services/speech";
 import React, { useEffect, useState } from "react";
 import {
     Dimensions,
@@ -106,17 +106,17 @@ export const MythBusterRenderer = ({
   // Stop speech when component unmounts or feedback shows
   useEffect(() => {
     return () => {
-      Speech.stop();
+      stopSpeech();
     };
   }, []);
 
   const speakMyth = async () => {
     if (isSpeaking) {
-      Speech.stop();
+      stopSpeech();
       setIsSpeaking(false);
     } else {
       setIsSpeaking(true);
-      Speech.speak(data.myth, {
+      speakSafely(data.myth, {
         language: "en",
         pitch: 1.0,
         rate: 0.9,
@@ -127,7 +127,7 @@ export const MythBusterRenderer = ({
   };
 
   const speakFeedback = (text: string) => {
-    Speech.speak(text, {
+    speakSafely(text, {
       language: "en",
       pitch: 1.0,
       rate: 0.9,
@@ -165,7 +165,7 @@ export const MythBusterRenderer = ({
         });
         translateY.value = withSpring(isLeft ? -50 : -50);
         cardScale.value = withSpring(0.8);
-        runOnJS(Speech.stop)();
+        runOnJS(stopSpeech)();
         runOnJS(setIsSpeaking)(false);
         runOnJS(setShowFeedback)(isLeft ? "correct" : "incorrect");
       } else {

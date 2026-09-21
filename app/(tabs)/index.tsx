@@ -10,7 +10,7 @@ import { openExternalUrl } from "@/services/open-url";
 import { getProfileAvatarSource } from "@/services/profile-avatars";
 import { useStorage } from "@/services/StorageContext";
 import { useTheme, type Palette, fontFamilies } from "@/theme";
-import * as Haptics from "expo-haptics";
+import { notifySuccess } from "@/services/haptics";
 import { LinearGradient } from "expo-linear-gradient";
 import { useFocusEffect, useRouter } from "expo-router";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -362,7 +362,7 @@ export default function HomeScreen() {
     async (mission: MissionView) => {
       if (!mission.isComplete || mission.isClaimed) return;
       await claim(mission);
-      await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      notifySuccess();
     },
     [claim],
   );
@@ -370,7 +370,7 @@ export default function HomeScreen() {
   const handleMarkFactRead = useCallback(async () => {
     if (factClaimed) return;
     await markFactRead();
-    await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    notifySuccess();
   }, [markFactRead, factClaimed]);
 
   useFocusEffect(
