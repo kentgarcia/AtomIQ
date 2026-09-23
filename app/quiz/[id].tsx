@@ -144,9 +144,12 @@ export default function QuizScreen() {
       setSelectedAnswer(null);
       setShowExplanation(false);
     } else {
-      const correctCount =
-        answers.filter((a) => a).length +
-        (selectedAnswer === getCorrectAnswerIndex(currentQuestion) ? 1 : 0);
+      // answers already contains every submitted answer (FINISH only appears
+      // after CHECK appends the last one), so count it directly. Adding
+      // selectedAnswer on top double-counts the final question when answered
+      // correctly — inflating the score enough to flip a fail into a pass
+      // and wrongly mark the exam completed.
+      const correctCount = answers.filter((a) => a).length;
       const score = Math.round((correctCount / totalQuestions) * 100);
       const passed = score >= quiz.passingScore;
 
@@ -393,9 +396,16 @@ export default function QuizScreen() {
             <Text style={styles.questionText}>{currentQuestion.question}</Text>
           </Animated.View>
 
-          {/* Options */}
+          {/* Options — an empty/missing options array (bad content row)
+              would render zero buttons and soft-lock the quiz, so true/false
+              questions always fall back to True/False choices. */}
           <View style={styles.optionsContainer}>
-            {(currentQuestion.options || ["True", "False"]).map(
+            {(currentQuestion.options?.length
+              ? currentQuestion.options
+              : currentQuestion.type === "true_false"
+                ? ["True", "False"]
+                : []
+            ).map(
               (option, index) => {
                 const isSelected = selectedAnswer === index;
                 // For true/false, correctAnswer is boolean, convert to index (0=True, 1=False)

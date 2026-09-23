@@ -15,7 +15,7 @@ import Animated, {
     useSharedValue,
     withTiming,
 } from "react-native-reanimated";
-import { fontFamilies } from "@/theme";
+import { fontFamilies, useTheme } from "@/theme";
 
 /* Autumn design tokens shared with the home map (reference design) */
 const BTN_COLOR = "#FF8C00";
@@ -53,6 +53,8 @@ export function LessonPreview({
   onProceed,
 }: LessonPreviewProps) {
   const pressed = useSharedValue(0);
+  const { theme, isDark } = useTheme();
+  const LP = theme.palettes.lesson;
 
   // Reference :active — button sinks and the lip shallows
   const handlePressIn = useCallback(() => {
@@ -80,8 +82,11 @@ export function LessonPreview({
   return (
     <View style={styles.root}>
       {/* Close */}
-      <TouchableOpacity style={styles.closeBtn} onPress={onClose}>
-        <Icon name="Close" size={22} color="#888888" />
+      <TouchableOpacity
+        style={[styles.closeBtn, { backgroundColor: LP.card }]}
+        onPress={onClose}
+      >
+        <Icon name="Close" size={22} color={isDark ? LP.textMuted : "#888888"} />
       </TouchableOpacity>
 
       <View style={styles.body}>
@@ -95,33 +100,64 @@ export function LessonPreview({
 
         <Animated.View
           entering={FadeInDown.delay(100).springify()}
-          style={[styles.card, { opacity: loading ? 0.7 : 1 }]}
+          style={[
+            styles.card,
+            { opacity: loading ? 0.7 : 1, backgroundColor: LP.card },
+          ]}
         >
           {isReplay && (
-            <View style={styles.reviewPill}>
+            <View
+              style={[
+                styles.reviewPill,
+                isDark && { backgroundColor: "rgba(255, 140, 0, 0.16)" },
+              ]}
+            >
               <Icon name="TickSquare" size={14} color="#E67E22" variant="Bold" />
               <Text style={styles.reviewText}>Completed — review mode</Text>
             </View>
           )}
-          <Text style={styles.eyebrow} numberOfLines={1}>
+          <Text style={[styles.eyebrow, { color: LP.textMuted }]} numberOfLines={1}>
             {unitSubtitle}
           </Text>
-          <Text style={styles.title}>{title}</Text>
-          <Text style={styles.description}>{description}</Text>
+          <Text style={[styles.title, { color: LP.text }]}>{title}</Text>
+          <Text style={[styles.description, { color: LP.textMuted }]}>
+            {description}
+          </Text>
 
           {lesson && (
             <View style={styles.metaRow}>
-              <View style={styles.metaPill}>
+              <View
+                style={[
+                  styles.metaPill,
+                  isDark && { backgroundColor: "rgba(255, 255, 255, 0.08)" },
+                ]}
+              >
                 <Icon name="Flash" size={14} color="#F59E0B" variant="Bold" />
-                <Text style={styles.metaText}>{lesson.xpReward} XP</Text>
+                <Text style={[styles.metaText, { color: LP.text }]}>
+                  {lesson.xpReward} XP
+                </Text>
               </View>
-              <View style={styles.metaPill}>
+              <View
+                style={[
+                  styles.metaPill,
+                  isDark && { backgroundColor: "rgba(255, 255, 255, 0.08)" },
+                ]}
+              >
                 <Icon name="Clock" size={14} color="#64B5F6" variant="Bold" />
-                <Text style={styles.metaText}>~{lesson.estimatedMinutes} min</Text>
+                <Text style={[styles.metaText, { color: LP.text }]}>
+                  ~{lesson.estimatedMinutes} min
+                </Text>
               </View>
-              <View style={styles.metaPill}>
+              <View
+                style={[
+                  styles.metaPill,
+                  isDark && { backgroundColor: "rgba(255, 255, 255, 0.08)" },
+                ]}
+              >
                 <Icon name="Book" size={14} color="#81C784" variant="Bold" />
-                <Text style={styles.metaText}>{lesson.steps.length} steps</Text>
+                <Text style={[styles.metaText, { color: LP.text }]}>
+                  {lesson.steps.length} steps
+                </Text>
               </View>
             </View>
           )}
@@ -139,7 +175,7 @@ export function LessonPreview({
             onPressIn={handlePressIn}
             onPressOut={handlePressOut}
           >
-            <View style={styles.btn}>
+            <View style={[styles.btn, { borderColor: LP.card, backgroundColor: LP.card }]}>
               <View style={[styles.btnInner, { backgroundColor: BTN_LIP }]}>
                 <Animated.View
                   style={[styles.btnFace, faceStyle, { backgroundColor: BTN_COLOR }]}

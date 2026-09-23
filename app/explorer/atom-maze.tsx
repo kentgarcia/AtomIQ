@@ -2276,14 +2276,24 @@ export default function AtomMazeBattleScreen() {
     );
   }
 
-  // Main battle screen
+  // Main battle screen — default cream → white gradient (light) like the
+  // home + games tabs, solid theme background in dark mode.
+  const battleGradient: [string, string] =
+    colorScheme === "dark"
+      ? [appTheme.colors.background, appTheme.colors.background]
+      : INTRO_SKY_LIGHT;
   return (
     <View
       style={[
         styles.container,
-        { backgroundColor: theme.bg, paddingTop: sceneTopPadding },
+        { backgroundColor: battleGradient[0], paddingTop: sceneTopPadding },
       ]}
     >
+      <LinearGradient
+        colors={battleGradient}
+        style={StyleSheet.absoluteFill}
+        pointerEvents="none"
+      />
       {/* Modern Battle Arena */}
       <Animated.View
         style={[

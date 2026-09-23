@@ -47,11 +47,9 @@ const C = {
 // Reusable building blocks
 // ==================================================================
 function LabHeader({
-  emoji,
   title,
   onBack,
 }: {
-  emoji?: string;
   title: string;
   onBack: () => void;
 }) {
@@ -80,7 +78,6 @@ function LabHeader({
         </TouchableOpacity>
       </Animated.View>
       <View style={styles.titlePill}>
-        {emoji ? <Text style={styles.titlePillEmoji}>{emoji}</Text> : null}
         <Icon name="Atom" size={14} color={C.white} variant="Bold" />
         <Text style={styles.titlePillText}>{title}</Text>
       </View>
@@ -117,14 +114,15 @@ function SelectPill({
   );
 }
 
+// NOTE: SelectPill's `emoji` slot is intentionally kept — it renders Greek
+// scientific symbols (α / β / γ), not pictograph emojis.
+
 function PrimaryButton({
   label,
   onPress,
-  emoji,
 }: {
   label: string;
   onPress: () => void;
-  emoji?: string;
 }) {
   const pressed = useSharedValue(0);
   const pressStyle = useAnimatedStyle(() => ({
@@ -146,7 +144,6 @@ function PrimaryButton({
           onPress();
         }}
       >
-        {emoji ? <Text style={styles.primaryBtnEmoji}>{emoji}</Text> : null}
         <Text style={styles.primaryBtnText}>{label}</Text>
       </TouchableOpacity>
     </Animated.View>
@@ -258,14 +255,14 @@ function SliderRow({
 }
 
 function ResultCard({
-  emoji,
+  icon,
   title,
   subtitle,
   concept,
   children,
   actions,
 }: {
-  emoji: string;
+  icon: string;
   title: string;
   subtitle: string;
   concept?: string;
@@ -279,7 +276,7 @@ function ResultCard({
       style={[styles.sectionCard, { borderColor: C.success, alignItems: "center", gap: 12 }]}
     >
       <View style={[styles.resultIcon, { backgroundColor: C.success + "18" }]}>
-        <Text style={styles.resultEmoji}>{emoji}</Text>
+        <Icon name={icon} size={26} color={C.success} variant="Bold" />
       </View>
       <Text style={styles.resultTitle}>{title}</Text>
       <Text style={styles.resultSubtitle}>{subtitle}</Text>
@@ -388,7 +385,9 @@ function RadiationShieldLab({ onBack }: { onBack: () => void }) {
         ]}
         showsVerticalScrollIndicator={false}
       >
-        <LabHeader emoji="☢️" title="Radiation Shield Lab" onBack={onBack} />
+        <LabHeader title="Radiation Shield Lab" onBack={onBack} />
+
+        <HintBox text="Goal: get the detector below 20 units. Step 1: pick a radiation source and shield. Step 2: set the thickness. Step 3: press Run Experiment." />
 
         <Animated.View
           entering={reducedMotion ? FadeIn.duration(120) : FadeInDown.springify()}
@@ -436,7 +435,7 @@ function RadiationShieldLab({ onBack }: { onBack: () => void }) {
             </Text>
           </View>
 
-          <PrimaryButton label="Run Experiment" onPress={runExperiment} emoji="⚡" />
+          <PrimaryButton label="Run Experiment" onPress={runExperiment} />
         </Animated.View>
 
         {!challengeDone ? (
@@ -455,13 +454,13 @@ function RadiationShieldLab({ onBack }: { onBack: () => void }) {
           </Animated.View>
         ) : (
           <ResultCard
-            emoji="🎉"
+            icon="TickCircle"
             title="Experiment Complete!"
             subtitle="You discovered that different materials provide different levels of shielding against radiation."
             concept="Radiation Shielding"
             actions={[
-              { label: "📖 Learn More", onPress: () => onBack(), primary: true },
-              { label: "🧪 Experiment Again", onPress: reset },
+              { label: "Learn More", onPress: () => onBack(), primary: true },
+              { label: "Experiment Again", onPress: reset },
             ]}
           >
             <HintBox text="Denser materials (like lead) and greater thickness attenuate radiation more effectively." />
@@ -569,9 +568,12 @@ function BuildAnAtom({ onBack }: { onBack: () => void }) {
   const bgBottom = theme.mode === "dark" ? THEME.bg : C.white;
 
   const [index, setIndex] = useState(0);
-  const [protons, setProtons] = useState(ATOM_CHALLENGES[0].protons);
-  const [neutrons, setNeutrons] = useState(ATOM_CHALLENGES[0].neutrons);
-  const [electrons, setElectrons] = useState(ATOM_CHALLENGES[0].electrons);
+  // Always start from an empty atom — pre-filling the target's counts meant
+  // every challenge (including "Next Challenge") arrived already solved and
+  // only needed a Build Atom tap to win.
+  const [protons, setProtons] = useState(0);
+  const [neutrons, setNeutrons] = useState(0);
+  const [electrons, setElectrons] = useState(0);
   const [result, setResult] = useState<"idle" | "correct" | "wrong">("idle");
   const [hint, setHint] = useState<string | null>(null);
 
@@ -579,11 +581,10 @@ function BuildAnAtom({ onBack }: { onBack: () => void }) {
   const element = ELEMENTS[protons];
 
   const loadChallenge = (i: number) => {
-    const t = ATOM_CHALLENGES[i];
     setIndex(i);
-    setProtons(t.protons);
-    setNeutrons(t.neutrons);
-    setElectrons(t.electrons);
+    setProtons(0);
+    setNeutrons(0);
+    setElectrons(0);
     setResult("idle");
     setHint(null);
   };
@@ -626,7 +627,7 @@ function BuildAnAtom({ onBack }: { onBack: () => void }) {
         ]}
         showsVerticalScrollIndicator={false}
       >
-        <LabHeader emoji="🧬" title="Build an Atom" onBack={onBack} />
+        <LabHeader title="Build an Atom" onBack={onBack} />
 
         {result !== "correct" ? (
           <>
@@ -642,7 +643,7 @@ function BuildAnAtom({ onBack }: { onBack: () => void }) {
                 </View>
                 <Text style={styles.targetLabel}>{target.label}</Text>
               </View>
-              <Text style={styles.targetHint}>Match the protons, neutrons and electrons.</Text>
+              <Text style={styles.targetHint}>Use the steppers below to add particles and build {target.label}, then press Build Atom.</Text>
             </Animated.View>
 
             <Animated.View
@@ -703,7 +704,7 @@ function BuildAnAtom({ onBack }: { onBack: () => void }) {
                   onInc={() => setElectrons((e) => Math.min(20, e + 1))}
                 />
               </View>
-              <PrimaryButton label="Build Atom" onPress={build} emoji="🧬" />
+              <PrimaryButton label="Build Atom" onPress={build} />
             </Animated.View>
 
             {result === "wrong" && hint ? (
@@ -728,7 +729,7 @@ function BuildAnAtom({ onBack }: { onBack: () => void }) {
           </>
         ) : (
           <ResultCard
-            emoji="🧬"
+            icon="Atom"
             title={`${target.label} Created!`}
             subtitle={
               element
@@ -863,7 +864,9 @@ function DecayLab({ onBack }: { onBack: () => void }) {
         ]}
         showsVerticalScrollIndicator={false}
       >
-        <LabHeader emoji="⏳" title="Radioactive Decay Lab" onBack={onBack} />
+        <LabHeader title="Radioactive Decay Lab" onBack={onBack} />
+
+        <HintBox text="Goal: find out how many atoms remain after two half-lives. Step 1: pick your prediction below. Step 2: press Run Simulation above. Step 3: compare." />
 
         <Animated.View
           entering={reducedMotion ? FadeIn.duration(120) : FadeInDown.springify()}
@@ -941,7 +944,7 @@ function DecayLab({ onBack }: { onBack: () => void }) {
             </View>
           </View>
 
-          <PrimaryButton label="Run Simulation" onPress={runSimulation} emoji="▶" />
+          <PrimaryButton label="Run Simulation" onPress={runSimulation} />
         </Animated.View>
 
         <Animated.View
@@ -950,7 +953,7 @@ function DecayLab({ onBack }: { onBack: () => void }) {
         >
           <View style={styles.challengeHeader}>
             <Icon name="LampCharge" size={16} color={C.amberDark} variant="Bold" />
-            <Text style={styles.challengeTitle}>Predict</Text>
+            <Text style={styles.challengeTitle}>Step 1 — Predict</Text>
           </View>
           <Text style={styles.challengeText}>
             If the sample starts with 1,000 radioactive atoms, approximately how many remain after two half-lives?
@@ -967,20 +970,34 @@ function DecayLab({ onBack }: { onBack: () => void }) {
           </View>
         </Animated.View>
 
-        {phase === "observe" && prediction !== null ? (
+        {phase === "observe" ? (
           <Animated.View
             entering={FadeIn.duration(180)}
             style={[styles.sectionCard, { borderColor: THEME.border, gap: 10 }]}
           >
-            <Text style={styles.compareText}>
-              Your prediction: <Text style={{ fontFamily: fontFamilies.heavy }}>{prediction}</Text>
-            </Text>
-            <Text style={styles.compareText}>
-              Observed (at 2 half-lives):{" "}
-              <Text style={{ fontFamily: fontFamilies.heavy, color: C.success }}>
-                {Math.round(remaining(1000, iso.halfLife, iso.halfLife * 2)).toLocaleString()}
+            {prediction !== null ? (
+              <>
+                <Text style={styles.compareText}>
+                  Your prediction: <Text style={{ fontFamily: fontFamilies.heavy }}>{prediction}</Text>
+                </Text>
+                <Text style={styles.compareText}>
+                  Observed (at 2 half-lives):{" "}
+                  <Text style={{ fontFamily: fontFamilies.heavy, color: C.success }}>
+                    {Math.round(remaining(1000, iso.halfLife, iso.halfLife * 2)).toLocaleString()}
+                  </Text>
+                </Text>
+              </>
+            ) : (
+              <Text style={styles.compareText}>
+                Observed (at 2 half-lives):{" "}
+                <Text style={{ fontFamily: fontFamilies.heavy, color: C.success }}>
+                  {Math.round(remaining(1000, iso.halfLife, iso.halfLife * 2)).toLocaleString()}
+                </Text>{" "}
+                — now pick your prediction in Step 1 above to compare.
               </Text>
-            </Text>
+            )}
+            {prediction !== null ? (
+              <>
             <Text style={[styles.cardTitle, { marginTop: 4 }]}>What did you discover?</Text>
             <View style={styles.pillRow}>
               {[
@@ -1016,6 +1033,8 @@ function DecayLab({ onBack }: { onBack: () => void }) {
                 </Text>
               </View>
             ) : null}
+              </>
+            ) : null}
           </Animated.View>
         ) : null}
 
@@ -1047,14 +1066,14 @@ function DecayLab({ onBack }: { onBack: () => void }) {
           </TouchableOpacity>
         ) : challengeDone ? (
           <ResultCard
-            emoji="🎉"
+            icon="TickCircle"
             title="Experiment Complete"
             subtitle="You observed how radioactive samples change over time. A sample doesn't disappear all at once — its amount decreases progressively."
             concept="Half-Life"
             actions={[
-              { label: "📖 Explore Decay", onPress: () => onBack(), primary: true },
+              { label: "Explore Decay", onPress: () => onBack(), primary: true },
               {
-                label: "🧪 Try Another Isotope",
+                label: "Try Another Isotope",
                 onPress: () => {
                   setChallengeOpen(false);
                   setChallengeDone(false);
@@ -1183,7 +1202,6 @@ const styles = StyleSheet.create({
     height: 40,
     borderRadius: 14,
   },
-  titlePillEmoji: { fontSize: 14 },
   titlePillText: { fontSize: 13, fontFamily: fontFamilies.heavy, color: C.white },
   simContent: { paddingHorizontal: 20, gap: 20 },
   sectionCard: {
@@ -1228,7 +1246,6 @@ const styles = StyleSheet.create({
     borderBottomColor: C.amberDark,
   },
   primaryBtnText: { fontSize: 15, fontFamily: fontFamilies.heavy, color: C.white },
-  primaryBtnEmoji: { fontSize: 16 },
   stepper: { flexDirection: "row", alignItems: "center", gap: 12 },
   stepperBtn: {
     width: 40,
@@ -1338,7 +1355,6 @@ const styles = StyleSheet.create({
   },
   tableCell: { flex: 1, fontSize: 12, fontFamily: fontFamilies.regular, color: C.inkSoft },
   resultIcon: { width: 52, height: 52, borderRadius: 26, alignItems: "center", justifyContent: "center" },
-  resultEmoji: { fontSize: 24 },
   resultTitle: { fontSize: 18, fontFamily: fontFamilies.heavy, color: C.ink, textAlign: "center" },
   resultSubtitle: { fontSize: 13, fontFamily: fontFamilies.regular, color: C.inkSoft, lineHeight: 20, textAlign: "center" },
   conceptPill: { borderRadius: 14, paddingHorizontal: 16, paddingVertical: 10, alignItems: "center", gap: 2 },

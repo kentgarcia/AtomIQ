@@ -28,6 +28,20 @@ export const stopSpeech = (): void => {
   })();
 };
 
+/**
+ * Strip characters that Android TTS engines choke on. Lesson key points
+ * (the only slide type that regularly fails) are full of `•` bullets and
+ * stray newlines — Google/Samsung TTS fires `onError` and speaks nothing
+ * for those, while iOS reads them fine. Normalizing centrally fixes every
+ * call site (lessons, encyclopedia, mythbuster) at once.
+ */
+const sanitizeSpeechText = (text: string): string =>
+  text
+    .replace(/[•·▪▫◦]/g, ". ")
+    .replace(/\s+/g, " ")
+    .replace(/(\.\s*){2,}/g, ". ")
+    .trim();
+
 export const speakSafely = (
   text: string,
   options: SpeechOptions = {},
@@ -51,7 +65,7 @@ export const speakSafely = (
     }
   };
 
-  const trimmed = (text ?? "").trim();
+  const trimmed = sanitizeSpeechText(text ?? "");
   if (!trimmed) {
     reset();
     return;

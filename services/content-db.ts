@@ -22,14 +22,10 @@
  *   const lesson = await contentRepository.getLessonById("background-radiation");
  */
 
-import { Asset } from "expo-asset";
-import { Directory, File } from "expo-file-system";
+import * as FileSystem from "expo-file-system/legacy";
 import * as SQLite from "expo-sqlite";
+import { importDatabaseFromAssetAsync } from "expo-sqlite";
 import { Platform } from "react-native";
-
-// expo-sqlite's native module (not part of the public API, but the same
-// module expo-sqlite itself uses for `SQLiteProvider` asset databases).
-import ExpoSQLiteModule from "expo-sqlite/build/ExpoSQLite";
 
 import type {
   Article,
@@ -66,13 +62,32 @@ export const CONTENT_DB_NAME = "content.db";
  * file lets us detect stale copies and re-copy the fresh bundle on the next
  * launch (otherwise the device would silently keep using old content forever).
  */
-export const CONTENT_DB_VERSION = 847142882;
+export const CONTENT_DB_VERSION = 130426397;
 
 /** Marker file stored next to the db, whose content is CONTENT_DB_VERSION. */
 const VERSION_MARKER = "content.db.version";
 
-/** The writable directory (files/SQLite on Android, Library/LocalDatabase on iOS). */
-const CDB_DIR = (): string => SQLite.defaultDatabaseDirectory;
+/**
+ * URI helpers for the SQLite directory.
+ *
+ * `SQLite.defaultDatabaseDirectory` is a raw filesystem path on Android
+ * (e.g. `/data/user/0/<pkg>/files/SQLite` — no `file://` scheme), while the
+ * file-system APIs require a `file://` URI. Passing the raw path straight
+ * into `File`/`Directory` breaks seeding on Android release builds, so every
+ * marker/dir operation below goes through these normalized URIs via the
+ * battle-tested legacy `expo-file-system` API. The actual database copy uses
+ * expo-sqlite's own official primitive (the same one `SQLiteProvider`
+ * uses for asset databases), which handles native paths internally.
+ */
+const toFileUri = (path: string): string =>
+  path.startsWith("file://") ? path : `file://${path}`;
+
+const dbDirUri = (): string =>
+  toFileUri(SQLite.defaultDatabaseDirectory.replace(/\/*$/, ""));
+
+const dbFileUri = (): string => `${dbDirUri()}/${CONTENT_DB_NAME}`;
+
+const versionMarkerUri = (): string => `${dbDirUri()}/${VERSION_MARKER}`;
 
 // ---------------------------------------------------------------------------
 // Copy from the read-only bundle into writable local storage (first launch)
@@ -107,20 +122,16 @@ async function verifyContentDb(): Promise<boolean> {
 }
 
 /**
- * Copy the bundled content.db into writable SQLite storage using the native
- * Kotlin copy primitive that expo-sqlite itself uses for asset databases.
- * Falls back to the expo-file-system copy when the module is unavailable.
+ * Copy the bundled content.db into writable SQLite storage using expo-sqlite's
+ * official asset-import primitive (the same one `SQLiteProvider` uses for
+ * `assetSource`). This resolves the bundled asset and performs the copy
+ * natively, so it behaves identically on iOS and Android release builds.
  */
-async function copyBundledDatabase(assetUri: string, destPath: string): Promise<void> {
-  const importAssetDatabaseAsync = ExpoSQLiteModule?.importAssetDatabaseAsync;
-  if (typeof importAssetDatabaseAsync === "function") {
-    await importAssetDatabaseAsync(destPath, assetUri, true);
-    return;
-  }
-  const source = new File(assetUri);
-  const dest = new File(destPath);
-  if (dest.exists) dest.delete();
-  source.copy(dest);
+async function copyBundledDatabase(): Promise<void> {
+  await importDatabaseFromAssetAsync(CONTENT_DB_NAME, {
+    assetId: require("@/assets/database/content.db"),
+    forceOverwrite: true,
+  });
 }
 
 /**
@@ -146,50 +157,51 @@ export function ensureContentDatabase(): Promise<void> {
 
   seedPromise = (async () => {
     try {
-      const dbDir = new Directory(CDB_DIR());
-      if (!dbDir.exists) {
-        dbDir.create({ intermediates: true, idempotent: true });
+      // The SQLite directory is created lazily by expo-sqlite; make sure it
+      // exists before the marker ops below touch it.
+      const dirInfo = await FileSystem.getInfoAsync(dbDirUri());
+      if (!dirInfo.exists) {
+        await FileSystem.makeDirectoryAsync(dbDirUri(), {
+          intermediates: true,
+        });
       }
 
-      const dest = new File(CDB_DIR(), CONTENT_DB_NAME);
-      const destMarker = new File(CDB_DIR(), VERSION_MARKER);
-
-      const isFresh =
-        dest.exists &&
-        destMarker.exists &&
-        destMarker.textSync().trim() === String(CONTENT_DB_VERSION);
-
-      if (isFresh) {
-        // Fast path: fresh copy present — but confirm it is not an empty shell.
-        if (await verifyContentDb()) {
-          seeded = true;
-          return;
+      const markerInfo = await FileSystem.getInfoAsync(versionMarkerUri());
+      if (markerInfo.exists) {
+        let marker = "";
+        try {
+          marker = (await FileSystem.readAsStringAsync(versionMarkerUri())).trim();
+        } catch (e) {
+          console.warn("[content-db] Version marker unreadable; re-seeding", e);
         }
-        console.warn("[content-db] Existing copy failed integrity check; re-seeding");
+
+        if (marker === String(CONTENT_DB_VERSION)) {
+          // Fast path: fresh copy present — but confirm it is not an empty shell.
+          if (await verifyContentDb()) {
+            seeded = true;
+            return;
+          }
+          console.warn("[content-db] Existing copy failed integrity check; re-seeding");
+        }
       }
 
       console.log("[content-db] Seeding bundled content database...");
 
-      // Resolve the bundled asset to a real file (downloadAsync copies it out of
-      // the read-only package into the cache so we can copy from it).
-      const asset = Asset.fromModule(require("@/assets/database/content.db"));
-      await asset.downloadAsync();
-      if (!asset.localUri) {
-        throw new Error("[content-db] Bundled asset could not be resolved to a local file.");
-      }
+      // Delete any stale/partial copy first so the import starts clean (this
+      // also clears leftover -shm/-wal sidecars from a previous version).
+      await FileSystem.deleteAsync(dbFileUri(), { idempotent: true });
 
-      // Same destination expo-sqlite uses when opening `content.db`.
-      const dbDirPath = SQLite.defaultDatabaseDirectory;
-      const destPath = `${dbDirPath.replace(/\/*$/, "")}/${CONTENT_DB_NAME}`;
-
-      await copyBundledDatabase(asset.localUri, destPath);
-      destMarker.write(String(CONTENT_DB_VERSION));
+      await copyBundledDatabase();
+      await FileSystem.writeAsStringAsync(
+        versionMarkerUri(),
+        String(CONTENT_DB_VERSION),
+      );
 
       if (!(await verifyContentDb())) {
         throw new Error("[content-db] Seeded copy failed integrity check (no lessons found).");
       }
 
-      console.log(`[content-db] Seeded ${CONTENT_DB_NAME} (v${CONTENT_DB_VERSION}) to ${dest.uri}`);
+      console.log(`[content-db] Seeded ${CONTENT_DB_NAME} (v${CONTENT_DB_VERSION})`);
       seeded = true;
     } catch (e) {
       lastSeedError = e instanceof Error ? e : new Error(String(e));
@@ -228,7 +240,12 @@ let dbPromise: Promise<SQLite.SQLiteDatabase> | null = null;
  */
 export function getContentDb(): Promise<SQLite.SQLiteDatabase> {
   if (!dbPromise) {
-    dbPromise = SQLite.openDatabaseAsync(CONTENT_DB_NAME);
+    dbPromise = SQLite.openDatabaseAsync(CONTENT_DB_NAME).catch((error) => {
+      // Never cache a rejected handle — a transient open failure must not
+      // poison every later query for the rest of the app session.
+      dbPromise = null;
+      throw error;
+    });
   }
   return dbPromise;
 }

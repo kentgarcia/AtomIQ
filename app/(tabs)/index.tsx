@@ -124,11 +124,15 @@ const computeNodeScrollY = (
 
 const buildPath = (completedLessonIds: string[]): PathUnit[] => {
   return UNITS.map((unit, unitIndex) => {
+    // A unit only counts as finished when its lessons AND its final exam
+    // (quiz) are all completed — finishing the last lesson alone must not
+    // open the next unit.
+    const prevUnit = unitIndex > 0 ? UNITS[unitIndex - 1] : null;
     const isPreviousUnitCompleted =
       unitIndex === 0 ||
-      UNITS[unitIndex - 1].lessonIds.every((id) =>
-        completedLessonIds.includes(id),
-      );
+      (prevUnit !== null &&
+        prevUnit.lessonIds.every((id) => completedLessonIds.includes(id)) &&
+        prevUnit.quizIds.every((id) => completedLessonIds.includes(id)));
 
     const isUnitLocked = !isPreviousUnitCompleted;
 
@@ -202,6 +206,25 @@ const shadeColor = (hex: string, amount: number): string => {
   return `#${mix(parseInt(hex.slice(1, 3), 16))}${mix(
     parseInt(hex.slice(3, 5), 16),
   )}${mix(parseInt(hex.slice(5, 7), 16))}`;
+};
+
+/* Daily-fact rich text: myth content ships with **bold** markers and "- "
+   list lines. Nested <Text> inherits the parent size/color/line-height, so
+   bold spans only override the family — base styling stays intact. */
+const renderRichText = (text: string): React.ReactNode[] => {
+  const normalized = text
+    .split("\n")
+    .map((line) => line.replace(/^\s*-\s+/, "\u2022 "))
+    .join("\n");
+  return normalized.split("**").map((part, i) =>
+    i % 2 === 1 ? (
+      <Text key={i} style={{ fontFamily: fontFamilies.bold }}>
+        {part}
+      </Text>
+    ) : (
+      <Text key={i}>{part}</Text>
+    ),
+  );
 };
 
 /* Linear mix between two hex colors (extends the page gradient under the header) */
@@ -970,12 +993,12 @@ const handleScroll = useCallback(
                   {dailyFact ? (
                     <>
                       <Text style={styles.factStatement}>
-                        {"\u201C"}{dailyFact.statement}{"\u201D"}
+                        {"\u201C"}{renderRichText(dailyFact.statement)}{"\u201D"}
                       </Text>
                       <View style={styles.factDivider} />
                       <Text style={styles.factExplainLabel}>Why it matters</Text>
                       <Text style={styles.factExplain}>
-                        {dailyFact.explanation}
+                        {renderRichText(dailyFact.explanation)}
                       </Text>
                     </>
                   ) : (
@@ -1877,14 +1900,17 @@ const createStyles = (theme: Palette, isDark: boolean) => {
       color: theme.primary,
       fontFamily: fontFamilies.medium,
     },
-    /* Level-up celebration overlay */
+    /* Level-up celebration overlay — must sit above the sticky header
+       (zIndex 100) on iOS and above its elevation on Android, so the dim
+       covers the header too and the card is never buried under it. */
     levelUpOverlay: {
       ...StyleSheet.absoluteFillObject,
       backgroundColor: "rgba(0, 0, 0, 0.45)",
       alignItems: "center",
       justifyContent: "center",
       paddingHorizontal: 28,
-      zIndex: 50,
+      zIndex: 200,
+      elevation: 24,
     },
     levelUpCard: {
       width: "100%",
