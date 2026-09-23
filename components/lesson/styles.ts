@@ -375,7 +375,7 @@ export const createStyles = (theme: Palette, width: number) =>
     rewardPill: {
       flexDirection: "row",
       alignItems: "center",
-      backgroundColor: "#FFF",
+      backgroundColor: theme.card,
       paddingHorizontal: 20,
       paddingVertical: 16,
       borderRadius: 20,

@@ -47,8 +47,8 @@ export const DebriefView = ({
   const rotation = useSharedValue(0);
 
   useEffect(() => {
-    // Celebration animation
-    scale.value = withSpring(1, { damping: 8 });
+    // Gentle celebration pop-in — low overshoot so the mascot settles fast.
+    scale.value = withSpring(1, { damping: 20, stiffness: 150 });
     rotation.value = withRepeat(withTiming(360, { duration: 2000 }), -1, false);
 
     // Save progress when reaching this screen
@@ -144,7 +144,7 @@ export const DebriefView = ({
       <Animated.View style={[styles.decorativeRing, rotationStyle]} />
 
       <Animated.View
-        entering={FadeInDown.springify()}
+        entering={FadeInDown.duration(350)}
         style={[styles.mascotLarge, animatedStyle]}
       >
         <Image

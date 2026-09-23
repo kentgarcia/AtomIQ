@@ -1,6 +1,7 @@
 import { Icon } from "@/components/ui/icon";
 import {useTheme, type Palette, fontFamilies} from "@/theme";
-import { deleteAccountData } from "@/services/database";
+import { deleteAccountData, getUserProfile } from "@/services/database";
+import { contentRepository, getContentDbStatus } from "@/services/content-db";
 import { setHapticsGate } from "@/services/haptics";
 import {
   getHapticsEnabled,
@@ -46,6 +47,67 @@ export default function SettingsScreen() {
   const [versionModalVisible, setVersionModalVisible] = useState(false);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [confirmText, setConfirmText] = useState("");
+
+  interface DataStatus {
+    contentLabel: string;
+    contentOk: boolean;
+    storageLabel: string;
+    storageOk: boolean;
+  }
+
+  const [dataStatus, setDataStatus] = useState<DataStatus | null>(null);
+
+  // On-device database diagnostics — lets testers confirm the bundled
+  // content.db actually seeded without needing logcat/Metro access.
+  useEffect(() => {
+    if (!versionModalVisible) {
+      return;
+    }
+
+    let cancelled = false;
+    setDataStatus(null);
+
+    (async () => {
+      let contentLabel = "Checking…";
+      let contentOk = false;
+      try {
+        const status = getContentDbStatus();
+        const lessons = await contentRepository.getLessonCount();
+        if (status.lastError) {
+          contentLabel = `Failed: ${status.lastError}`;
+        } else if (status.seeded && lessons > 0) {
+          contentLabel = `Ready — ${lessons} lessons (v${status.version})`;
+          contentOk = true;
+        } else {
+          contentLabel = "Not seeded yet";
+        }
+      } catch (error) {
+        contentLabel = `Failed: ${error instanceof Error ? error.message : String(error)}`;
+      }
+
+      let storageLabel = "Checking…";
+      let storageOk = false;
+      try {
+        const profile = await getUserProfile();
+        if (profile) {
+          storageLabel = "Ready";
+          storageOk = true;
+        } else {
+          storageLabel = "Empty (no profile)";
+        }
+      } catch (error) {
+        storageLabel = `Failed: ${error instanceof Error ? error.message : String(error)}`;
+      }
+
+      if (!cancelled) {
+        setDataStatus({ contentLabel, contentOk, storageLabel, storageOk });
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [versionModalVisible]);
 
   const deleteConfirmationPhrase =
     userProfile?.display_name || userProfile?.username || "DELETE";
@@ -356,6 +418,44 @@ export default function SettingsScreen() {
               <Text style={styles.modalSubtitle}>
                 Learn nuclear science one atom at a time.
               </Text>
+            </View>
+
+            <View style={styles.dataStatusBlock}>
+              <Text style={styles.dataStatusTitle}>Data status</Text>
+              <View style={styles.dataStatusRow}>
+                <View
+                  style={[
+                    styles.dataStatusDot,
+                    {
+                      backgroundColor: dataStatus
+                        ? dataStatus.contentOk
+                          ? "#22C55E"
+                          : "#EF4444"
+                        : "#D1D5DB",
+                    },
+                  ]}
+                />
+                <Text style={styles.dataStatusText} numberOfLines={3}>
+                  Content DB: {dataStatus ? dataStatus.contentLabel : "Checking…"}
+                </Text>
+              </View>
+              <View style={styles.dataStatusRow}>
+                <View
+                  style={[
+                    styles.dataStatusDot,
+                    {
+                      backgroundColor: dataStatus
+                        ? dataStatus.storageOk
+                          ? "#22C55E"
+                          : "#EF4444"
+                        : "#D1D5DB",
+                    },
+                  ]}
+                />
+                <Text style={styles.dataStatusText} numberOfLines={2}>
+                  Progress DB: {dataStatus ? dataStatus.storageLabel : "Checking…"}
+                </Text>
+              </View>
             </View>
 
             <View style={styles.creditRow}>
@@ -744,6 +844,39 @@ const createStyles = (theme: Palette) =>
       color: "#9CA3AF",
       marginTop: 12,
       textAlign: "center",
+    },
+    dataStatusBlock: {
+      backgroundColor: "#F9FAFB",
+      borderWidth: 1,
+      borderColor: "#F4F5F7",
+      borderRadius: 12,
+      paddingHorizontal: 12,
+      paddingVertical: 10,
+      marginBottom: 10,
+      gap: 8,
+    },
+    dataStatusTitle: {
+      fontSize: 12,
+      fontFamily: fontFamilies.heavy,
+      color: "#333333",
+    },
+    dataStatusRow: {
+      flexDirection: "row",
+      alignItems: "flex-start",
+      gap: 8,
+    },
+    dataStatusDot: {
+      width: 10,
+      height: 10,
+      borderRadius: 5,
+      marginTop: 4,
+    },
+    dataStatusText: {
+      flex: 1,
+      fontSize: 12,
+      fontFamily: fontFamilies.medium,
+      color: "#666666",
+      lineHeight: 17,
     },
     modalPrimaryBtn: {
       flexDirection: "row",

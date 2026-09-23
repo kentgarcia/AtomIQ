@@ -246,8 +246,32 @@ export default function ProfileScreen() {
           : {}),
       });
       setEditModalVisible(false);
-    } catch {
-      Alert.alert("Error", "Failed to update profile.");
+    } catch (error) {
+      // Display names are rate-limited to one change per 7 days — surface
+      // that instead of a generic failure, and still persist an avatar-only
+      // change so the save isn't a total loss.
+      const cooldown = error as { code?: string; nextAllowedAt?: number };
+      if (cooldown?.code === "DISPLAY_NAME_COOLDOWN") {
+        if (pendingAvatarKey !== selectedAvatarKey) {
+          try {
+            await updateUserProfile({ avatar_url: pendingAvatarKey });
+            setEditModalVisible(false);
+          } catch {
+            // Avatar save also failed; the alert below covers it.
+          }
+        }
+        const nextDate = cooldown.nextAllowedAt
+          ? new Date(cooldown.nextAllowedAt).toLocaleDateString()
+          : null;
+        Alert.alert(
+          "Display name limited",
+          nextDate
+            ? `Names can only be changed once every 7 days. You can pick a new name on ${nextDate}.`
+            : "Display name can only be changed once every 7 days.",
+        );
+      } else {
+        Alert.alert("Error", "Failed to update profile.");
+      }
     } finally {
       setIsSavingProfile(false);
     }
@@ -707,7 +731,7 @@ export default function ProfileScreen() {
           style={styles.avatarModalOverlay}
         >
           <KeyboardAvoidingView
-            behavior={Platform.OS === "ios" ? "padding" : "height"}
+            behavior={Platform.OS === "ios" ? "padding" : undefined}
             style={styles.keyboardAvoidingView}
             keyboardVerticalOffset={insets.top + 12}
           >
@@ -715,6 +739,17 @@ export default function ProfileScreen() {
               entering={reducedMotion ? FadeIn.duration(200) : ZoomIn.duration(260).easing(EASE_OUT)}
               exiting={FadeOut.duration(150)}
               style={styles.avatarModalContent}
+            >
+            {/* Scrollable so every field stays reachable while the Android
+                keyboard is open (no height-shrink squeezing like KAV "height"
+                behavior does — that buried the Save button). */}
+            <ScrollView
+              style={styles.avatarModalScroll}
+              contentContainerStyle={styles.avatarModalScrollContent}
+              showsVerticalScrollIndicator={false}
+              bounces={false}
+              keyboardShouldPersistTaps="handled"
+              keyboardDismissMode="on-drag"
             >
             <View style={styles.dragHandle} />
             <View style={styles.avatarModalHeader}>
@@ -789,6 +824,15 @@ export default function ProfileScreen() {
                   </TouchableOpacity>
                 )}
               </View>
+              {userProfile?.next_display_name_change_at &&
+              userProfile.next_display_name_change_at > Date.now() ? (
+                <Text style={styles.nameCooldownHint}>
+                  Name can be changed again on{" "}
+                  {new Date(
+                    userProfile.next_display_name_change_at,
+                  ).toLocaleDateString()}
+                </Text>
+              ) : null}
             </View>
 
             <View style={styles.avatarSectionHeader}>
@@ -866,6 +910,7 @@ export default function ProfileScreen() {
                 </View>
               )}
             </TouchableOpacity>
+            </ScrollView>
           </Animated.View>
           </KeyboardAvoidingView>
         </Animated.View>
@@ -1547,6 +1592,14 @@ const createStyles = (theme: Palette, isDark: boolean) => {
       overflow: "hidden",
       flexShrink: 1,
     },
+    avatarModalScroll: {
+      width: "100%",
+      flexGrow: 1,
+      flexShrink: 1,
+    },
+    avatarModalScrollContent: {
+      paddingBottom: 4,
+    },
     dragHandle: {
       width: 36,
       height: 4,
@@ -1723,6 +1776,12 @@ const createStyles = (theme: Palette, isDark: boolean) => {
     },
     clearButton: {
       padding: 6,
+    },
+    nameCooldownHint: {
+      fontSize: 11,
+      fontFamily: fontFamilies.medium,
+      color: P.faint,
+      marginTop: 6,
     },
     avatarSectionHeader: {
       flexDirection: "row",

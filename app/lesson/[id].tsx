@@ -267,7 +267,9 @@ export default function LessonScreen() {
         {!started && (
           <View style={[StyleSheet.absoluteFill, { zIndex: 50 }]}>
             <LinearGradient
-              colors={["#FFF3E0", "#FFFFFF"]}
+              colors={
+                theme.mode === "dark" ? [THEME.bg, THEME.bg] : ["#FFF3E0", "#FFFFFF"]
+              }
               style={StyleSheet.absoluteFill}
               pointerEvents="none"
             />
