@@ -18,6 +18,7 @@ import {
     ActivityIndicator,
     Image,
     ScrollView,
+    type ScrollViewInstance,
     StyleSheet,
     Text,
     TouchableOpacity,
@@ -41,7 +42,7 @@ export default function QuizScreen() {
   const [showExplanation, setShowExplanation] = useState(false);
   const [quizComplete, setQuizComplete] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
-  const scrollViewRef = useRef<ScrollView>(null);
+  const scrollViewRef = useRef<ScrollViewInstance>(null);
 
   useEffect(() => {
     void preloadGameSfx();

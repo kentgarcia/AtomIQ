@@ -500,7 +500,7 @@ export default function CommunityScreen() {
               </View>
               <View style={styles.footerDivider} />
             </View>
-          ) : null
+          ) : undefined
         }
       />
     </View>

@@ -10,6 +10,7 @@ import { speakSafely, stopSpeech } from "@/services/speech";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   ScrollView,
+  type ScrollViewInstance,
   StyleSheet,
   Text,
   TextInput,
@@ -202,7 +203,7 @@ export default function EncyclopediaScreen() {
     return Object.entries(groups).sort(([a], [b]) => a.localeCompare(b));
   }, [filteredEntries]);
 
-  const scrollRef = useRef<ScrollView>(null);
+  const scrollRef = useRef<ScrollViewInstance>(null);
   const sectionY = useRef<Record<string, number>>({});
   const availableLetters = useMemo(() => new Set(letters), [letters]);
   const scrollToLetter = useCallback(

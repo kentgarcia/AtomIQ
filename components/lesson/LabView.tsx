@@ -2,6 +2,7 @@ import { useMemo, useRef, useState } from "react";
 import {
     Image,
     ScrollView,
+    type ScrollViewInstance,
     Text,
     TouchableOpacity,
     useWindowDimensions,
@@ -29,7 +30,7 @@ export const LabView = ({
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [showFeedback, setShowFeedback] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
-  const scrollViewRef = useRef<ScrollView>(null);
+  const scrollViewRef = useRef<ScrollViewInstance>(null);
   const { width } = useWindowDimensions();
   const styles = useMemo(() => createStyles(theme, width), [theme, width]);
   const labStyles = useMemo(() => createLabStyles(theme), [theme]);

@@ -12,10 +12,11 @@
 
 ## 3. Build config verify (P0-5)
 - [ ] `eas.json > build.production.android.buildType` is `"app-bundle"` (Play rejects APKs).
-- [ ] No `targetSdkVersion` / `minSdkVersion` overrides in `app.json` — Expo SDK 54 defaults apply (target API 35 / Android 15, min API 24).
-- [ ] In the EAS build log, confirm: `targetSdkVersion = 35`, no legacy-`.so` / 16 KB-page-size warnings, and output is a single `.aab`.
+- [ ] No `targetSdkVersion` / `minSdkVersion` overrides in `app.json` — Expo SDK 58 defaults apply (target API 36 / Android 16, compile API 37, min API 24).
+- [ ] In the EAS build log, confirm: `targetSdkVersion = 36`, `compileSdkVersion = 37`, no legacy-`.so` / 16 KB-page-size warnings, and output is a single `.aab`.
+- [ ] R8 minification is enabled by default on SDK 58 release builds. Verify the minified preview APK and production AAB on a physical device (fonts, SQLite seeding, images/SVG, audio, TTS, haptics, deep links). Add narrowly scoped keep rules only if a real release-only failure is reproduced.
 - [ ] Confirm merged manifest permissions contain ONLY:
-  `INTERNET`, `ACCESS_NETWORK_STATE`, `MODIFY_AUDIO_SETTINGS`, `VIBRATE` (if added by plugins).
+  `INTERNET`, `MODIFY_AUDIO_SETTINGS`, `VIBRATE` (if added by plugins).
   Must NOT contain `RECORD_AUDIO` (disabled via `expo-audio` plugin `recordAudioAndroid: false`), `FOREGROUND_SERVICE*`, or location/camera/mic permissions.
 
 ## 4. Pre-upload gates
