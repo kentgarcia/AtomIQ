@@ -36,7 +36,8 @@ export const ThemeContext = createContext<ThemeContextValue | undefined>(
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
     // Seed from the OS color scheme; a persisted user preference overrides it.
-    const systemScheme = useRNColorScheme() ?? "light";
+    const systemScheme: ThemeMode =
+        useRNColorScheme() === "dark" ? "dark" : "light";
     const [colorScheme, setColorSchemeState] = useState<ThemeMode>(systemScheme);
 
     useEffect(() => {
