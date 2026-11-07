@@ -7,12 +7,11 @@
     "icon": "./assets/images/icon.png",
     "scheme": "atomiq",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
     "ios": {
       "supportsTablet": true
     },
     "android": {
-      "package": "com.atomiq.app",
+      "package": "com.dostpnri.atomiq",
       "versionCode": 1,
       "softwareKeyboardLayoutMode": "resize",
       "adaptiveIcon": {
@@ -22,10 +21,8 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "permissions": [
-        "INTERNET",
-        "ACCESS_NETWORK_STATE"
+        "INTERNET"
       ],
-      "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false
     },
     "web": {
@@ -55,7 +52,8 @@
         {
           "recordAudioAndroid": false
         }
-      ]
+      ],
+      "expo-image"
     ],
     "experiments": {
       "typedRoutes": true,
