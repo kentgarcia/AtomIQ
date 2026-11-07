@@ -1,6 +1,7 @@
 # AtomIQ — Google Play Launch Readiness Spec
 
 **Date:** 2026-09-21
+**Baseline upgraded:** 2026-11-07 — Expo SDK 58 / React Native 0.88 / React 19.3 / Expo Router 58 (target API 36, compile API 37, min API 24).
 **Baseline inspected:** `app.json` v1.0.0 / versionCode 1, `eas.json`, `package.json` (Expo SDK ~54.0.36, RN 0.81.5, React 19, newArchEnabled), `services/content-db.ts` (CONTENT_DB_VERSION hash-derived), custom tab bar, `expo-av` SFX, `expo-speech` TTS, `expo-haptics`, edge-to-edge enabled.
 **Constraint:** tested only in Expo Go on iPhone. Zero Android device testing so far. This spec assumes every Android code path is unverified.
 
@@ -10,13 +11,13 @@
 
 | Area | State |
 |---|---|
-| Package ID | `com.atomiq.app` set in `app.json` — valid, keep it forever once published |
+| Package ID | `com.dostpnri.atomiq` set in `app.json` — valid, keep it forever once published |
 | Icons | `icon.png` 1024×1024 ✓; adaptive foreground 512×512 ✓; background 512×512 ✓; monochrome ✓ |
 | Splash | `splash-icon.png` 1024×1024, plugin configured with light/dark bg |
 | Orientation | Portrait locked — fine for launch |
-| Edge-to-edge | `edgeToEdgeEnabled: true` already set (required for Android 15+ / targetSdk 35+) |
+| Edge-to-edge | Always enabled on SDK 58 (required for Android 15+ / targetSdk 35+); the old `edgeToEdgeEnabled` flag is no longer valid |
 | Keyboard | `softwareKeyboardLayoutMode: resize` set |
-| Permissions | Only `INTERNET`, `ACCESS_NETWORK_STATE` — minimal surface |
+| Permissions | Only `INTERNET` — minimal surface |
 | Privacy/Terms | In-app `privacy-policy` + `terms-of-service` screens exist |
 | Offline-first | Content ships as `assets/database/content.db` (604 KB) + `sync-content.js` hash-versioned reseed; total `assets/` ~21 MB |
 | EAS project | `projectId` present; `preview` profile builds APK |
@@ -50,7 +51,7 @@ Either way, verify `playsInSilentModeIOS`-equivalent behavior has an Android cou
 Decide once, before first upload: let Play App Signing manage the key (default, recommended). Back up the upload keystore per EAS docs. Record who holds the EAS credentials — losing this blocks all future updates.
 
 ### P0-5. Target API / 16 KB page-size readiness
-New apps must target the current required API (Android 15 / API 35 as of this SDK). Expo SDK 54 handles this by default — **do not** override `targetSdkVersion`. Verify in the EAS build log that `targetSdkVersion = 35` and that the build is 16 KB-page-size compatible (SDK 54 + RN 0.81 + newArchEnabled is; confirm no legacy `.so` warns in the build output).
+New apps must target the current required API (Android 16 / API 36 as of SDK 58). Expo SDK 58 handles this by default — **do not** override `targetSdkVersion`. Verify in the EAS build log that `targetSdkVersion = 36`, `compileSdkVersion = 37`, and that the build is 16 KB-page-size compatible (SDK 58 + RN 0.88 + New Architecture is; confirm no legacy `.so` warns in the build output).
 
 ---
 
@@ -101,7 +102,7 @@ TTS is core UX (lesson views, quiz, encyclopedia, mythbuster call `Speech.speak`
 
 ## 4. Play Console / policy checklist
 
-- [ ] **Package:** `com.atomiq.app` — immutable after first upload. Confirm no rename planned.
+- [ ] **Package:** `com.dostpnri.atomiq` — immutable after first upload. Confirm no rename planned.
 - [ ] **Signing:** Play App Signing on; upload key backed up; EAS `credentials` documented.
 - [ ] **Content rating (IARC):** Education app, no ads/IAP; "Community" tab is local bundled articles (no real UGC, no chat with strangers) — answer UGC questions as NO; TTS reads science content only. Complete questionnaire truthfully; expect Everyone / Everyone 10+.
 - [ ] **Target audience:** if under-13 can use it, complete Families / Designed for Families declarations if applicable; otherwise set 13+ and reflect in listing + privacy policy.
@@ -142,7 +143,7 @@ TTS is core UX (lesson views, quiz, encyclopedia, mythbuster call `Speech.speak`
 - [ ] Dark / Light / System theme + edge-to-edge status/nav contrast *.
 - [ ] External links (article, encyclopedia, settings LinkedIn) with Chrome present/absent.
 - [ ] Profile: rename, avatar, delete-all-data → onboarding resets.
-- [ ] 30-min soak: no ANR, no `Audio.Sound` leak (`adb shell dumpsys meminfo com.atomiq.app` stable).
+- [ ] 30-min soak: no ANR, no `Audio.Sound` leak (`adb shell dumpsys meminfo com.dostpnri.atomiq` stable).
 
 ### Gate 4 — Pre-launch report
 Upload to **Closed testing** first; fix all crashes/ANRs in Pre-launch report (Firebase Test Lab) — especially on API 26–29 if minSdk allows them.

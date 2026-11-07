@@ -13,19 +13,21 @@
  * StyleSheet.create survives in screens.
  */
 
-import { StyleSheet } from "react-native";
+import { StyleSheet, type ImageStyle, type TextStyle, type ViewStyle } from "react-native";
 
 import type { Theme } from "./themes";
 
 export type StyleFn<TStyles> = (theme: Theme) => TStyles;
-export type NamedStyles<T> = StyleSheet.NamedStyles<T>;
+export type NamedStyles<T> = {
+    [P in keyof T]: ViewStyle | TextStyle | ImageStyle;
+};
 
 export function createStyles<TStyles extends Record<string, unknown>>(
     factory: StyleFn<TStyles>,
-): (theme: Theme) => StyleSheet.NamedStyles<TStyles> {
+): (theme: Theme) => NamedStyles<TStyles> {
     return (theme: Theme) => {
         const styles = factory(theme);
-        return StyleSheet.create(styles as StyleSheet.NamedStyles<TStyles>);
+        return StyleSheet.create(styles as NamedStyles<TStyles>);
     };
 }
 

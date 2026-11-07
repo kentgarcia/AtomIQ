@@ -21,6 +21,7 @@ import {
     Alert,
     Image,
     ScrollView,
+    type ScrollViewInstance,
     StyleSheet,
     Text,
     TouchableOpacity,
@@ -347,7 +348,7 @@ export default function HomeScreen() {
   const pathStroke =
     theme.mode === "dark" ? "rgba(255,255,255,0.25)" : "rgba(17,24,39,0.18)";
 
-  const scrollViewRef = useRef<ScrollView>(null);
+  const scrollViewRef = useRef<ScrollViewInstance>(null);
   const [infoOpen, setInfoOpen] = useState(false);
   const [cardUnit, setCardUnit] = useState<CardUnit | null>(null);
   const [arrowDir, setArrowDir] = useState<"up" | "down" | null>(null);

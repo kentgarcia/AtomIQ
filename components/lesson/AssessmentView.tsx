@@ -1,6 +1,7 @@
 import { useMemo, useRef, useState } from "react";
 import {
     ScrollView,
+    type ScrollViewInstance,
     Text,
     TouchableOpacity,
     useWindowDimensions,
@@ -26,7 +27,7 @@ export const AssessmentView = ({
   const [selected, setSelected] = useState<number | null>(null);
   const [confirmed, setConfirmed] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
-  const scrollViewRef = useRef<ScrollView>(null);
+  const scrollViewRef = useRef<ScrollViewInstance>(null);
   const { width } = useWindowDimensions();
   const styles = useMemo(() => createStyles(theme, width), [theme, width]);
   const quizStyles = useMemo(() => createQuizStyles(theme), [theme]);

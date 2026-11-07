@@ -49,7 +49,7 @@ const GAMES = [
         color: "#1ee2e6",
         delay: 100,
         icon: "Grid9",
-        route: "/atom-maze" as const,
+        route: "/explorer/atom-maze" as const,
     },
     {
         title: "Lab Experiment",
@@ -192,11 +192,15 @@ export function PickAGame() {
 
     const handleSelect = (game: (typeof GAMES)[number]) => {
         if (
-            game.route === "/atom-maze" ||
+            game.route === "/explorer/atom-maze" ||
             game.route === "/mythbuster" ||
             game.route === "/lab"
         ) {
-            openDifficulty(game.route.slice(1) as "atom-maze" | "mythbuster" | "lab");
+            openDifficulty(
+                game.route === "/explorer/atom-maze"
+                    ? "atom-maze"
+                    : (game.route.slice(1) as "mythbuster" | "lab"),
+            );
             return;
         }
         impactMedium();

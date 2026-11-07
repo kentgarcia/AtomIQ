@@ -92,7 +92,7 @@ const TabButton = ({
   );
 };
 
-function ModernTabBar({ state, navigation }: BottomTabBarProps) {
+function ModernTabBar({ state, emitter, navigateToTab }: BottomTabBarProps) {
   // Hooks must run before any early return (rules of hooks)
   const insets = useSafeAreaInsets();
   const { theme } = useTheme();
@@ -141,14 +141,14 @@ function ModernTabBar({ state, navigation }: BottomTabBarProps) {
           const isFocused = state.index === routeIndex;
 
           const onPress = () => {
-            const event = navigation.emit({
+            const event = emitter.emit({
               type: "tabPress",
               target: state.routes[routeIndex].key,
               canPreventDefault: true,
             });
 
             if (!isFocused && !event.defaultPrevented) {
-              navigation.navigate(state.routes[routeIndex].name);
+              navigateToTab(state.routes[routeIndex].key);
             }
           };
 
@@ -206,6 +206,13 @@ export default function TabLayout() {
         name="profile"
         options={{
           title: "Profile",
+        }}
+      />
+      <Tabs.Screen
+        name="leaderboard"
+        options={{
+          href: null,
+          title: "Leaderboard",
         }}
       />
     </Tabs>

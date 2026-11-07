@@ -21,9 +21,9 @@ Built with **Expo (React Native) + TypeScript**, with content stored in a local 
 
 | Area | Technology |
 | --- | --- |
-| Framework | Expo SDK 54, React Native 0.81, React 19 |
+| Framework | Expo SDK 58, React Native 0.88, React 19.3 |
 | Language | TypeScript (strict) |
-| Routing | expo-router v6 (file-based) |
+| Routing | expo-router v58 (file-based) |
 | Local storage | expo-sqlite (content + app database), AsyncStorage |
 | Animation | react-native-reanimated v4, react-native-gesture-handler |
 | Graphics | react-native-svg, expo-linear-gradient, expo-image |
@@ -52,7 +52,7 @@ theme/                Design tokens, palettes, ThemeProvider, useTheme
 
 ## Getting Started
 
-Prerequisites: Node.js 18+ and npm.
+Prerequisites: Node.js 22.13+ and npm.
 
 ```bash
 # Install dependencies

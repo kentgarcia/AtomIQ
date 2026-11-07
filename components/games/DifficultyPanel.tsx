@@ -6,7 +6,7 @@
 
 import { StackCard } from "@/components/games/StackCard";
 import { getAllMazes } from "@/content/explorer";
-import { GAME_MODES } from "@/app/mythbuster/modes";
+import { GAME_MODES } from "@/constants/mythbuster-modes";
 import { useTheme } from "@/theme";
 import { useRouter } from "expo-router";
 import React, { useEffect, useMemo, useState } from "react";
