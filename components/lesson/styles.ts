@@ -409,7 +409,11 @@ export const createStyles = (theme: Palette, width: number) =>
 // Additional style functions for component-specific styles
 export const createMythStyles = (theme: Palette, width: number) => ({
   indicatorFull: {
-    ...StyleSheet.absoluteFillObject,
+    position: "absolute" as const,
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
   },
   indicatorContent: {
     flex: 1,

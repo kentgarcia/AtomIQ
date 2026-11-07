@@ -3,12 +3,12 @@
  * the engine never deals with routes and the UI never hardcodes them.
  */
 
-import type { Router } from "expo-router";
+import type { ImperativeRouter } from "expo-router";
 
 import type { GuideDestination } from "./types";
 
 export const navigateDestination = (
-  router: Router,
+  router: ImperativeRouter,
   destination: GuideDestination,
 ): void => {
   switch (destination.screen) {

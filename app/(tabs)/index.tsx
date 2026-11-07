@@ -1,4 +1,6 @@
+import { BetaNoticeModal } from "@/components/ui/beta-notice-modal";
 import { Icon } from "@/components/ui/icon";
+import { BETA_FEEDBACK_FORM_URL, BETA_NOTICE_ID } from "@/constants/beta";
 import { UNITS } from "@/content/units";
 import { useAllLevels } from "@/hooks/use-storage";
 import {
@@ -8,6 +10,7 @@ import {
 import { getDailyFact, type DailyFact } from "@/services/missions";
 import { openExternalUrl } from "@/services/open-url";
 import { getProfileAvatarSource } from "@/services/profile-avatars";
+import { getBetaNoticeSeen, setBetaNoticeSeen } from "@/services/storage";
 import { useStorage } from "@/services/StorageContext";
 import { useTheme, type Palette, fontFamilies } from "@/theme";
 import { notifySuccess } from "@/services/haptics";
@@ -350,10 +353,41 @@ export default function HomeScreen() {
   const [arrowDir, setArrowDir] = useState<"up" | "down" | null>(null);
   const [dailyPanel, setDailyPanel] = useState<"missions" | "fact" | null>(null);
   const [dailyFact, setDailyFact] = useState<DailyFact | null>(null);
+  const [betaNoticeVisible, setBetaNoticeVisible] = useState(false);
 
   useEffect(() => {
     void getDailyFact().then(setDailyFact);
   }, []);
+
+  /* Public-beta notice — shown once per notice id (see constants/beta.ts) */
+  useEffect(() => {
+    let cancelled = false;
+    void getBetaNoticeSeen().then((seenId) => {
+      if (!cancelled && seenId !== BETA_NOTICE_ID) {
+        setBetaNoticeVisible(true);
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const dismissBetaNotice = useCallback(() => {
+    setBetaNoticeVisible(false);
+    void setBetaNoticeSeen(BETA_NOTICE_ID);
+  }, []);
+
+  const openBetaFeedback = useCallback(async () => {
+    const opened = await openExternalUrl(BETA_FEEDBACK_FORM_URL);
+    if (!opened) {
+      Alert.alert(
+        "Couldn't open the form",
+        "Please check your internet connection and try again.",
+      );
+      return;
+    }
+    dismissBetaNotice();
+  }, [dismissBetaNotice]);
 
   /* Today's fact is claimed once the "fact" mission flips to claimed */
   const factClaimed = missions.some((m) => m.type === "fact" && m.isClaimed);
@@ -1036,6 +1070,17 @@ const handleScroll = useCallback(
         </Animated.View>
       </View>
 
+      {/* Reopen the beta notice + feedback form */}
+      <TouchableOpacity
+        style={[styles.betaFab, { bottom: insets.bottom + 130 }]}
+        activeOpacity={0.85}
+        onPress={() => setBetaNoticeVisible(true)}
+        accessibilityRole="button"
+        accessibilityLabel="Open beta information and feedback"
+      >
+        <Icon name="InfoCircle" size={20} color="#FF8C00" variant="Bold" />
+      </TouchableOpacity>
+
       {/* Floating "jump to current lesson" arrow */}
       {arrowDir && currentUnitIndex !== -1 && (
         <Animated.View
@@ -1088,6 +1133,13 @@ const handleScroll = useCallback(
           </Animated.View>
         </View>
       )}
+
+      {/* Public beta notice — shown on startup so testers know what to expect */}
+      <BetaNoticeModal
+        visible={betaNoticeVisible}
+        onDismiss={dismissBetaNotice}
+        onOpenFeedback={() => void openBetaFeedback()}
+      />
     </View>
   );
 }
@@ -1297,10 +1349,18 @@ const createStyles = (theme: Palette, isDark: boolean) => {
       backgroundColor: theme.bg,
     },
     bgGradient: {
-      ...StyleSheet.absoluteFillObject,
+      position: "absolute",
+      top: 0,
+      right: 0,
+      bottom: 0,
+      left: 0,
     },
     pathLayer: {
-      ...StyleSheet.absoluteFillObject,
+      position: "absolute",
+      top: 0,
+      right: 0,
+      bottom: 0,
+      left: 0,
     },
     /* Solid backdrop behind the header (covers scrolled map content) */
     headerBackdrop: {
@@ -1469,7 +1529,11 @@ const createStyles = (theme: Palette, isDark: boolean) => {
       borderRadius: NODE_INNER_RADIUS,
     },
     nodeGlass: {
-      ...StyleSheet.absoluteFillObject,
+      position: "absolute",
+      top: 0,
+      right: 0,
+      bottom: 0,
+      left: 0,
       borderRadius: NODE_INNER_RADIUS,
     },
     completedBadge: {
@@ -1573,6 +1637,26 @@ const createStyles = (theme: Palette, isDark: boolean) => {
       justifyContent: "center",
     },
     /* Floating "jump to current lesson" arrow */
+    /* Persistent beta / feedback shortcut (bottom-left, above the tab bar) */
+    betaFab: {
+      position: "absolute",
+      left: 24,
+      width: 40,
+      height: 40,
+      borderRadius: 14,
+      alignItems: "center",
+      justifyContent: "center",
+      backgroundColor: P.card,
+      borderWidth: 2,
+      borderColor: P.chipBorder,
+      borderBottomWidth: 4,
+      elevation: 2,
+      zIndex: 95,
+      shadowColor: "#000000",
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.12,
+      shadowRadius: 4,
+    },
     nextBtn: {
       position: "absolute",
       right: 24,
@@ -1904,7 +1988,11 @@ const createStyles = (theme: Palette, isDark: boolean) => {
        (zIndex 100) on iOS and above its elevation on Android, so the dim
        covers the header too and the card is never buried under it. */
     levelUpOverlay: {
-      ...StyleSheet.absoluteFillObject,
+      position: "absolute",
+      top: 0,
+      right: 0,
+      bottom: 0,
+      left: 0,
       backgroundColor: "rgba(0, 0, 0, 0.45)",
       alignItems: "center",
       justifyContent: "center",

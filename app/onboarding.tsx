@@ -220,7 +220,7 @@ export default function Onboarding() {
         return (
             <View style={[styles.container, { backgroundColor: P.bgBottom }]}>
                 {renderThemeToggle()}
-                <LinearGradient colors={[P.bgTop, P.bgBottom]} style={StyleSheet.absoluteFillObject} />
+                <LinearGradient colors={[P.bgTop, P.bgBottom]} style={StyleSheet.absoluteFill} />
                 <View style={[styles.splashContent, { paddingTop: insets.top + 24, paddingBottom: insets.bottom + 24 }]}>
                     <Animated.View entering={FadeInDown.springify()} style={styles.mascotWrap}>
                         <Image
@@ -271,7 +271,7 @@ export default function Onboarding() {
         return (
             <View style={[styles.container, { backgroundColor: P.bgBottom }]}>
                 {renderThemeToggle()}
-                <LinearGradient colors={[P.bgTop, P.bgBottom]} style={StyleSheet.absoluteFillObject} />
+                <LinearGradient colors={[P.bgTop, P.bgBottom]} style={StyleSheet.absoluteFill} />
                 <ScrollView
                     contentContainerStyle={[
                         styles.scrollContent,
@@ -368,7 +368,7 @@ export default function Onboarding() {
     return (
         <View style={[styles.container, { backgroundColor: P.bgBottom }]}>
             {renderThemeToggle()}
-            <LinearGradient colors={[P.bgTop, P.bgBottom]} style={StyleSheet.absoluteFillObject} />
+            <LinearGradient colors={[P.bgTop, P.bgBottom]} style={StyleSheet.absoluteFill} />
             <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{ flex: 1 }}>
                 <ScrollView
                     contentContainerStyle={[

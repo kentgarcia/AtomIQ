@@ -1176,7 +1176,13 @@ export default function LabScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  bgGradient: { ...StyleSheet.absoluteFillObject },
+  bgGradient: {
+    position: "absolute",
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
+  },
   iconButton: {
     width: 40,
     height: 40,

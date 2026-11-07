@@ -10,7 +10,7 @@ import {
   PROFILE_AVATAR_OPTIONS,
 } from "@/services/profile-avatars";
 import { useStorage } from "@/services/StorageContext";
-import { useFocusEffect } from "@react-navigation/native";
+import { useFocusEffect } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
@@ -665,7 +665,11 @@ const createStyles = (theme: Palette, isDark: boolean) => {
       backgroundColor: theme.bg,
     },
     bgGradient: {
-      ...StyleSheet.absoluteFillObject,
+      position: "absolute",
+      top: 0,
+      right: 0,
+      bottom: 0,
+      left: 0,
     },
     scrollContent: {
       paddingTop: 12,
