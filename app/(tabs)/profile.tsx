@@ -825,6 +825,7 @@ export default function ProfileScreen() {
                 )}
               </View>
               {userProfile?.next_display_name_change_at &&
+              // eslint-disable-next-line react-hooks/purity -- cooldown is compared to the current clock at render time
               userProfile.next_display_name_change_at > Date.now() ? (
                 <Text style={styles.nameCooldownHint}>
                   Name can be changed again on{" "}
@@ -995,7 +996,11 @@ const createStyles = (theme: Palette, isDark: boolean) => {
       backgroundColor: theme.bg,
     },
     bgGradient: {
-      ...StyleSheet.absoluteFillObject,
+      position: "absolute",
+      top: 0,
+      right: 0,
+      bottom: 0,
+      left: 0,
     },
     scrollContent: {
       paddingBottom: 40,
@@ -1482,7 +1487,11 @@ const createStyles = (theme: Palette, isDark: boolean) => {
 
     /* Achievement unlocked celebration */
     celebrationOverlay: {
-      ...StyleSheet.absoluteFillObject,
+      position: "absolute",
+      top: 0,
+      right: 0,
+      bottom: 0,
+      left: 0,
       backgroundColor: "rgba(0, 0, 0, 0.55)",
       alignItems: "center",
       justifyContent: "center",

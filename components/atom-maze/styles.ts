@@ -254,10 +254,18 @@ export const styles = StyleSheet.create({
     textAlign: "center",
   },
   battleBackdropImage: {
-    ...StyleSheet.absoluteFillObject,
+    position: "absolute",
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
   },
   battleBackdropOverlay: {
-    ...StyleSheet.absoluteFillObject,
+    position: "absolute",
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
   },
   modernFighter: {
     alignItems: "center",
@@ -1007,7 +1015,11 @@ export const styles = StyleSheet.create({
     lineHeight: 22,
   },
   bossIntroAtmosphere: {
-    ...StyleSheet.absoluteFillObject,
+    position: "absolute",
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
   },
   bossIntroGlowPrimary: {
     position: "absolute",
@@ -1070,7 +1082,11 @@ export const styles = StyleSheet.create({
     marginBottom: 10,
   },
   bossIntroArtRing: {
-    ...StyleSheet.absoluteFillObject,
+    position: "absolute",
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
     borderRadius: 88,
     borderWidth: 2,
     borderColor: "rgba(248, 113, 113, 0.75)",

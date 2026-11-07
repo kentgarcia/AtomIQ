@@ -35,7 +35,11 @@ export const createStyles = (theme: typeof LightTHEME) => {
     },
     /* Autumn gradient flowing through the whole page (like home & profile) */
     pageGradient: {
-      ...StyleSheet.absoluteFillObject,
+      position: "absolute",
+      top: 0,
+      right: 0,
+      bottom: 0,
+      left: 0,
     },
     // Header — mascot is enlarged but laid behind text (absolute, no layout impact)
     header: {

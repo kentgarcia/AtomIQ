@@ -1567,7 +1567,7 @@ export default function MythBusterScreen() {
                   { backgroundColor: THEME.dangerDark },
                 ]}
               />
-              <View
+              <Animated.View
                 style={[
                   styles.actionButtonFace,
                   { backgroundColor: THEME.error },
@@ -1581,7 +1581,7 @@ export default function MythBusterScreen() {
                   variant="Bold"
                 />
                 <Text style={styles.actionButtonText}>MYTH</Text>
-              </View>
+              </Animated.View>
             </AnimatedTouchableOpacity>
 
             <AnimatedTouchableOpacity
@@ -1613,7 +1613,7 @@ export default function MythBusterScreen() {
                   { backgroundColor: THEME.successDark },
                 ]}
               />
-              <View
+              <Animated.View
                 style={[
                   styles.actionButtonFace,
                   { backgroundColor: THEME.success },
@@ -1627,7 +1627,7 @@ export default function MythBusterScreen() {
                   variant="Bold"
                 />
                 <Text style={styles.actionButtonText}>FACT</Text>
-              </View>
+              </Animated.View>
             </AnimatedTouchableOpacity>
           </View>
         )}
@@ -2034,7 +2034,11 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
   actionButtonLip: {
-    ...StyleSheet.absoluteFillObject,
+    position: "absolute",
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
     borderRadius: 20,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
@@ -2043,7 +2047,10 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   actionButtonFace: {
-    ...StyleSheet.absoluteFillObject,
+    position: "absolute",
+    top: 0,
+    right: 0,
+    left: 0,
     bottom: 4,
     borderRadius: 20,
     flexDirection: "row",
@@ -2058,13 +2065,21 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
   },
   loseExplosionOverlay: {
-    ...StyleSheet.absoluteFillObject,
+    position: "absolute",
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
     alignItems: "center",
     justifyContent: "center",
     zIndex: 40,
   },
   loseExplosionFlash: {
-    ...StyleSheet.absoluteFillObject,
+    position: "absolute",
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
     backgroundColor: "#FFFFFF",
   },
   loseExplosionRing: {

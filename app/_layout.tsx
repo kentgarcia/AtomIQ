@@ -1,9 +1,10 @@
 import {
     DarkTheme,
     DefaultTheme,
+    Stack,
     ThemeProvider as NavigationThemeProvider,
-} from "@react-navigation/native";
-import { Stack, usePathname } from "expo-router";
+    usePathname,
+} from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import "react-native-reanimated";

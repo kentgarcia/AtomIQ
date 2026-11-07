@@ -1,10 +1,10 @@
 import { playButtonClickSfx } from "@/services/ui-sfx";
 import { useTheme, withAlpha } from "@/theme";
 import { spacing } from "@/theme/tokens";
-import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";
+import type { BottomTabBarProps } from "expo-router/js-tabs";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
-import { Tabs } from "expo-router";
+import { Tabs } from "expo-router/js-tabs";
 import React from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import Animated, {
@@ -93,12 +93,16 @@ const TabButton = ({
 };
 
 function ModernTabBar({ state, navigation }: BottomTabBarProps) {
-  // Guide: show bar on landing, hide on chat (immersive)
-  const focused = state.routes[state.index];
-  const hide = (focused.params as any)?.hideTabBar === true || (focused.params as any)?.hideTabBar === "true";
-  if (focused?.name === "chat" && hide) return null;
+  // Hooks must run before any early return (rules of hooks)
   const insets = useSafeAreaInsets();
   const { theme } = useTheme();
+
+  // Guide: show bar on landing, hide on chat (immersive)
+  const focused = state.routes[state.index];
+  const hide =
+    (focused.params as any)?.hideTabBar === true ||
+    (focused.params as any)?.hideTabBar === "true";
+  if (focused?.name === "chat" && hide) return null;
 
   const THEME = theme.palettes.tabBar;
 

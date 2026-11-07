@@ -20,8 +20,7 @@ import type { GuideCard, GuideIntent, GuidePill, GuideState, GuideTurn, MascotMo
 import { getProfileAvatarSource } from "@/services/profile-avatars";
 import { fontFamilies, useTheme } from "@/theme";
 import { LinearGradient } from "expo-linear-gradient";
-import { useRouter } from "expo-router";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRouter } from "expo-router";
 import React, { useEffect, useMemo, useRef } from "react";
 import { ActivityIndicator, Image, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import Animated, { FadeIn, FadeInUp, useAnimatedStyle, useReducedMotion, useSharedValue, withRepeat, withTiming } from "react-native-reanimated";
@@ -180,7 +179,7 @@ export default function GuideScreen() {
   if (!ready || !state || !guideCtx || !contentRef.current) {
     return (
       <View style={[styles.container, { backgroundColor: c.background }]}>
-        <LinearGradient colors={["#FFF3E0", "#FFFFFF"]} style={StyleSheet.absoluteFillObject} />
+        <LinearGradient colors={["#FFF3E0", "#FFFFFF"]} style={StyleSheet.absoluteFill} />
         <View style={styles.loading}><ActivityIndicator color={c.primary} /><Text style={[styles.loadingText, { color: c.textMuted }]}>Loading your guide…</Text></View>
       </View>
     );
@@ -209,7 +208,7 @@ export default function GuideScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: c.background }]}>
-      <LinearGradient colors={theme.mode === "dark" ? [c.background, c.surface] : ["#FFF3E0", "#FFFFFF"]} style={StyleSheet.absoluteFillObject} />
+      <LinearGradient colors={theme.mode === "dark" ? [c.background, c.surface] : ["#FFF3E0", "#FFFFFF"]} style={StyleSheet.absoluteFill} />
       {/* Immersive Guide Mode header — minimal */}
       <View style={[styles.chatHeaderPlain, { paddingTop: insets.top + 8 }]}>
         <Pressable
@@ -371,7 +370,7 @@ function LandingDashboard({ ctx, content, userProfile, onEnterChat, onDirectNav 
 
   return (
     <View style={[styles.container, { backgroundColor: c.background }]}>
-      <LinearGradient colors={theme.mode === "dark" ? [c.background, c.surface] : ["#FFF3E0", "#FFFFFF"]} style={StyleSheet.absoluteFillObject} />
+      <LinearGradient colors={theme.mode === "dark" ? [c.background, c.surface] : ["#FFF3E0", "#FFFFFF"]} style={StyleSheet.absoluteFill} />
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={[styles.landingScroll, { paddingTop: insets.top + 12, paddingBottom: insets.bottom + 24 }]}>
         {/* overlapping header stack — amber on top, white behind */}
         <View style={styles.headerStack}>
