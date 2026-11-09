@@ -1,4 +1,5 @@
 import { BetaNoticeModal } from "@/components/ui/beta-notice-modal";
+import { useTabBarInset } from "@/components/layout";
 import { Icon } from "@/components/ui/icon";
 import { BETA_FEEDBACK_FORM_URL, BETA_NOTICE_ID } from "@/constants/beta";
 import { UNITS } from "@/content/units";
@@ -12,7 +13,7 @@ import { openExternalUrl } from "@/services/open-url";
 import { getProfileAvatarSource } from "@/services/profile-avatars";
 import { getBetaNoticeSeen, setBetaNoticeSeen } from "@/services/storage";
 import { useStorage } from "@/services/StorageContext";
-import { useTheme, type Palette, fontFamilies } from "@/theme";
+import { useTheme, type Palette, fontFamilies, useResponsiveLayout } from "@/theme";
 import { notifySuccess } from "@/services/haptics";
 import { LinearGradient } from "expo-linear-gradient";
 import { useFocusEffect, useRouter } from "expo-router";
@@ -325,6 +326,11 @@ export default function HomeScreen() {
   } = useDailyMissions();
   const { theme } = useTheme();
   const { width, height: windowHeight } = useWindowDimensions();
+  const { contentMaxWidth } = useResponsiveLayout();
+  const tabBarInset = useTabBarInset();
+  // The winding map is laid out inside the readable frame, not the raw
+  // viewport, so tablet nodes do not spread edge-to-edge.
+  const mapWidth = Math.min(width, contentMaxWidth);
   const THEME = theme.palettes.tab;
   const isDark = theme.mode === "dark";
   const styles = useMemo(() => createStyles(THEME, isDark), [THEME, isDark]);
@@ -615,8 +621,11 @@ const handleScroll = useCallback(
         onScroll={handleScroll}
         scrollEventThrottle={16}
         contentContainerStyle={{
+          width: "100%",
+          maxWidth: mapWidth,
+          alignSelf: "center",
           paddingTop: insets.top + CARD_AREA,
-          paddingBottom: 130 + insets.bottom,
+          paddingBottom: tabBarInset + 24,
         }}
         showsVerticalScrollIndicator={false}
       >
@@ -629,7 +638,7 @@ const handleScroll = useCallback(
           globalCounter += unit.levels.length;
 
           const pathPoints = unit.levels.map((_, i) => ({
-            x: getNodeX(nextGlobal + i, width),
+            x: getNodeX(nextGlobal + i, mapWidth),
             y: NODE_TOP + i * NODE_ROW_GAP,
           }));
 
@@ -641,7 +650,7 @@ const handleScroll = useCallback(
             <View key={unit.id} style={{ height: sectionHeight }}>
               {/* Winding path */}
               <Svg
-                width={width}
+                width={mapWidth}
                 height={sectionHeight}
                 style={styles.pathLayer}
               >
@@ -701,7 +710,10 @@ const handleScroll = useCallback(
             layout-animated so the daily panels morph the card open, not pop in */}
         <Animated.View
           layout={reducedMotion ? undefined : LinearTransition.duration(DURATION.medium).easing(EASE_OUT)}
-          style={styles.headerBar}
+          style={[
+            styles.headerBar,
+            { width: "100%", maxWidth: contentMaxWidth, alignSelf: "center" },
+          ]}
         >
           <View style={styles.headerRow}>
             <View style={styles.avatarWrap}>
@@ -713,7 +725,7 @@ const handleScroll = useCallback(
             </View>
             <View style={{ flex: 1 }}>
               <Text style={styles.greetingLabel}>{getGreeting()}</Text>
-              <Text style={styles.greetingName} numberOfLines={1}>
+              <Text style={styles.greetingName}>
                 {userProfile?.display_name ||
                   userProfile?.username ||
                   "Atom Explorer"}

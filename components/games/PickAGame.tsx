@@ -7,8 +7,9 @@
 
 import { DifficultyPanel } from "@/components/games/DifficultyPanel";
 import { StackCard } from "@/components/games/StackCard";
+import { useTabBarInset } from "@/components/layout";
 import { Icon } from "@/components/ui/icon";
-import { fontFamilies, useTheme } from "@/theme";
+import { fontFamilies, useResponsiveLayout, useTheme } from "@/theme";
 import { impactLight, impactMedium } from "@/services/haptics";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
@@ -34,7 +35,6 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Svg, { Path } from "react-native-svg";
 
 const HEADER_H = 200;
-const TAB_CLEAR = 110;
 
 const GAMES = [
     {
@@ -109,6 +109,8 @@ export function PickAGame() {
     const insets = useSafeAreaInsets();
     const router = useRouter();
     const { height: windowHeight, width: windowWidth } = useWindowDimensions();
+    const { contentMaxWidth } = useResponsiveLayout();
+    const tabBarInset = useTabBarInset();
     const { theme, isDark } = useTheme();
     const tab = theme.palettes.tab;
     const P = isDark
@@ -122,8 +124,9 @@ export function PickAGame() {
         : ["#FFF3E0", "#FFFFFF"];
 
     // Stack area sits below the header and above the floating tab bar
+    const bottomReserve = tabBarInset + 16;
     const stackH = Math.round(
-        windowHeight - insets.top - 18 - HEADER_H - insets.bottom - TAB_CLEAR,
+        windowHeight - insets.top - 18 - HEADER_H - bottomReserve,
     );
     const cardH = Math.round(stackH / GAMES.length);
 
@@ -243,7 +246,12 @@ export function PickAGame() {
             />
 
             {/* Header */}
-            <View style={styles.header}>
+            <View
+                style={[
+                    styles.header,
+                    { width: "100%", maxWidth: contentMaxWidth, alignSelf: "center" },
+                ]}
+            >
                 <Pressable
                     onPress={openGuide}
                     style={({ pressed }) => [
@@ -277,13 +285,18 @@ export function PickAGame() {
 
             {/* Sliding layers — picker vs difficulty panel. Both transparent;
                 the base gradient covers the full screen behind them. */}
-            <View style={styles.stage}>
+            <View
+                style={[
+                    styles.stage,
+                    { width: "100%", maxWidth: contentMaxWidth, alignSelf: "center" },
+                ]}
+            >
                 <Animated.View
                     style={[styles.layer, gamesSlide]}
                     pointerEvents={activeGame === null ? "auto" : "none"}
                 >
                     {/* Full-bleed slanted card stack */}
-                    <View style={[styles.cardsList, { paddingBottom: insets.bottom + TAB_CLEAR }]}>
+                    <View style={[styles.cardsList, { paddingBottom: bottomReserve }]}>
                         {GAMES.map((game) => (
                             <StackCard
                                 key={game.title}

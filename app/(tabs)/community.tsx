@@ -1,7 +1,13 @@
 import { getContentImage } from "@/components/community/image-source";
+import { useTabBarInset } from "@/components/layout";
 import { Icon } from "@/components/ui/icon";
 import { getAllArticles, getAllPosts } from "@/content/articles";
-import { useTheme } from "@/theme";
+import {
+  getColumnCount,
+  layout,
+  useResponsiveLayout,
+  useTheme,
+} from "@/theme";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Image as ExpoImage } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
@@ -129,8 +135,23 @@ export default function CommunityScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { theme, isDark } = useTheme();
+  const { contentWidth, contentMaxWidth, contentFrameStyle, gutter } =
+    useResponsiveLayout();
+  const tabBarInset = useTabBarInset();
   const THEME = theme.palettes.tab;
   const styles = useMemo(() => createStyles(THEME), [THEME]);
+
+  // Keep the gallery two-up only while each card keeps the minimum readable
+  // width. Compact phones fall back to a single column.
+  const galleryColumns = useMemo(
+    () =>
+      getColumnCount(contentWidth, {
+        minItemWidth: layout.gridItemMinWidth,
+        gap: layout.gridGap,
+        maxColumns: 2,
+      }),
+    [contentWidth],
+  );
 
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFilter, setActiveFilter] = useState<string>("all");
@@ -331,7 +352,7 @@ export default function CommunityScreen() {
       />
 
       {/* Header — enlarged mascot behind text (absolute, no layout) */}
-      <View style={[styles.header, { paddingTop: insets.top + 16 }]}>
+      <View style={[styles.header, contentFrameStyle, { paddingTop: insets.top + 16 }]}>
         {/* Background mascot: 168px, behind text, still floating */}
         <View style={styles.headerMascotWrap} pointerEvents="none">
           <Animated.View style={mascotStyle}>
@@ -370,6 +391,9 @@ export default function CommunityScreen() {
               style={styles.searchClearButton}
               onPress={() => setSearchQuery("")}
               activeOpacity={0.85}
+              hitSlop={8}
+              accessibilityRole="button"
+              accessibilityLabel="Clear search"
             >
               <Icon name="CloseCircle" size={16} color="#9CA3AF" variant="Bold" />
             </TouchableOpacity>
@@ -378,11 +402,19 @@ export default function CommunityScreen() {
       </View>
 
       {/* Category Pills — 3D lip cards */}
-      <View style={styles.categoryRow}>
+      <View
+        style={[
+          styles.categoryRow,
+          { width: "100%", maxWidth: contentMaxWidth, alignSelf: "center" },
+        ]}
+      >
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.categoryScrollContent}
+          contentContainerStyle={[
+            styles.categoryScrollContent,
+            { paddingHorizontal: gutter },
+          ]}
         >
           <TouchableOpacity
             style={[
@@ -391,6 +423,10 @@ export default function CommunityScreen() {
               activeFilter === "saved" && styles.categoryChipActive,
             ]}
             activeOpacity={0.85}
+            hitSlop={6}
+            accessibilityRole="button"
+            accessibilityLabel="Saved stories"
+            accessibilityState={{ selected: activeFilter === "saved" }}
             onPress={() => selectFilter("saved")}
           >
             <Icon
@@ -407,6 +443,10 @@ export default function CommunityScreen() {
               activeFilter === "all" && styles.categoryChipActive,
             ]}
             activeOpacity={0.85}
+            hitSlop={6}
+            accessibilityRole="button"
+            accessibilityLabel="All categories"
+            accessibilityState={{ selected: activeFilter === "all" }}
             onPress={() => selectFilter("all")}
           >
             <Text
@@ -427,6 +467,10 @@ export default function CommunityScreen() {
                 activeFilter === cat.id && styles.categoryChipActive,
               ]}
               activeOpacity={0.85}
+              hitSlop={6}
+              accessibilityRole="button"
+              accessibilityLabel={cat.label}
+              accessibilityState={{ selected: activeFilter === cat.id }}
               onPress={() => selectFilter(cat.id)}
             >
               <Text
@@ -444,12 +488,17 @@ export default function CommunityScreen() {
 
       {/* Gallery */}
       <FlatList
+        key={`gallery-${galleryColumns}`}
         data={visibleItems}
         renderItem={renderGalleryItem}
         keyExtractor={(item) => item.id}
-        numColumns={2}
-        columnWrapperStyle={styles.galleryRow}
-        contentContainerStyle={styles.galleryContent}
+        numColumns={galleryColumns}
+        columnWrapperStyle={galleryColumns > 1 ? styles.galleryRow : undefined}
+        contentContainerStyle={[
+          styles.galleryContent,
+          contentFrameStyle,
+          { paddingBottom: tabBarInset + 24 },
+        ]}
         showsVerticalScrollIndicator={false}
         ListEmptyComponent={
           <View style={styles.emptyState}>

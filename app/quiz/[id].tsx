@@ -1,7 +1,7 @@
 import { Icon } from "@/components/ui/icon";
 import { getQuizById } from "@/content/quizzes";
 import type { Quiz } from "@/content/types";
-import {useTheme, type Palette, fontFamilies} from "@/theme";
+import {useTheme, type Palette, fontFamilies, useResponsiveLayout} from "@/theme";
 import { useStorage } from "@/services/StorageContext";
 import {
     getLevelProgress,
@@ -13,10 +13,13 @@ import { toLocalIsoDate } from "@/services/utils";
 import { playGameSfx, preloadGameSfx } from "@/services/game-sfx";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { speakSafely, stopSpeech } from "@/services/speech";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
     ActivityIndicator,
+    Alert,
+    BackHandler,
     Image,
+    Platform,
     ScrollView,
     type ScrollViewInstance,
     StyleSheet,
@@ -32,6 +35,7 @@ export default function QuizScreen() {
   const router = useRouter();
   const { addXP } = useStorage();
   const { theme } = useTheme();
+  const { contentMaxWidth, gutter } = useResponsiveLayout();
   const THEME = theme.palettes.quiz;
 
   const [quiz, setQuiz] = useState<Quiz | null>(null);
@@ -66,6 +70,45 @@ export default function QuizScreen() {
   }, [id]);
 
   const loadingStyles = React.useMemo(() => createStyles(THEME), [THEME]);
+
+  const confirmExit = useCallback(() => {
+    Alert.alert(
+      "Leave this quiz?",
+      "Your answers in this attempt will be lost.",
+      [
+        { text: "Stay", style: "cancel" },
+        {
+          text: "Leave",
+          style: "destructive",
+          onPress: () => router.back(),
+        },
+      ],
+    );
+  }, [router]);
+
+  const handleExit = useCallback(() => {
+    if (!quizComplete) {
+      confirmExit();
+      return;
+    }
+    router.back();
+  }, [confirmExit, quizComplete, router]);
+
+  useEffect(() => {
+    if (Platform.OS !== "android" || quizComplete) {
+      return;
+    }
+
+    const subscription = BackHandler.addEventListener(
+      "hardwareBackPress",
+      () => {
+        confirmExit();
+        return true;
+      },
+    );
+
+    return () => subscription.remove();
+  }, [confirmExit, quizComplete]);
 
   if (isLoading) {
     return (
@@ -199,7 +242,17 @@ export default function QuizScreen() {
     return (
       <View style={{ flex: 1, backgroundColor: THEME.bg }}>
         <SafeAreaView style={{ flex: 1 }}>
-          <View style={styles.resultsContainer}>
+          <View
+            style={[
+              styles.resultsContainer,
+              {
+                width: "100%",
+                maxWidth: contentMaxWidth,
+                alignSelf: "center",
+                paddingHorizontal: gutter,
+              },
+            ]}
+          >
             {/* Result Icon */}
             <Animated.View
               entering={ZoomIn.springify().damping(12)}
@@ -348,10 +401,23 @@ export default function QuizScreen() {
     <View style={{ flex: 1, backgroundColor: THEME.bg }}>
       <SafeAreaView style={{ flex: 1 }}>
         {/* Header */}
-        <View style={styles.header}>
+        <View
+          style={[
+            styles.header,
+            {
+              width: "100%",
+              maxWidth: contentMaxWidth,
+              alignSelf: "center",
+              paddingHorizontal: gutter,
+            },
+          ]}
+        >
           <TouchableOpacity
-            onPress={() => router.back()}
+            onPress={handleExit}
             style={styles.closeBtn}
+            hitSlop={8}
+            accessibilityRole="button"
+            accessibilityLabel="Close quiz"
           >
             <Icon name="Close" size={24} color={THEME.textMuted} />
           </TouchableOpacity>
@@ -368,7 +434,16 @@ export default function QuizScreen() {
         <ScrollView
           ref={scrollViewRef}
           style={{ flex: 1 }}
-          contentContainerStyle={styles.content}
+          contentContainerStyle={[
+            styles.content,
+            {
+              width: "100%",
+              maxWidth: contentMaxWidth,
+              alignSelf: "center",
+              padding: gutter,
+              paddingBottom: 16,
+            },
+          ]}
           showsVerticalScrollIndicator={false}
         >
           {/* Question Card */}
@@ -385,6 +460,9 @@ export default function QuizScreen() {
               <TouchableOpacity
                 style={styles.speakerBtn}
                 onPress={speakQuestion}
+                hitSlop={8}
+                accessibilityRole="button"
+                accessibilityLabel={isSpeaking ? "Stop reading question" : "Read question aloud"}
               >
                 <Icon
                   name={isSpeaking ? "VolumeSlash" : "VolumeHigh"}

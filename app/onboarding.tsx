@@ -1,6 +1,6 @@
 import { Icon } from "@/components/ui/icon";
 import { useStorage } from "@/services/StorageContext";
-import { fontFamilies, useTheme } from "@/theme";
+import { fontFamilies, useResponsiveLayout, useTheme } from "@/theme";
 import { setOnboardingCompleted } from "@/services/storage";
 import {
     DEFAULT_PROFILE_AVATAR_KEY,
@@ -9,8 +9,9 @@ import {
     getProfileAvatarSource,
 } from "@/services/profile-avatars";
 import { useRouter } from "expo-router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
+    BackHandler,
     Image,
     KeyboardAvoidingView,
     Platform,
@@ -85,6 +86,7 @@ type OnboardingStep = "splash" | "features" | "profile";
 export default function Onboarding() {
     const router = useRouter();
     const insets = useSafeAreaInsets();
+    const { contentMaxWidth } = useResponsiveLayout();
     const { updateUserProfile, userProfile } = useStorage();
     const { theme, toggleTheme } = useTheme();
     const isDark = theme.mode === "dark";
@@ -154,6 +156,31 @@ export default function Onboarding() {
     const [isFinishing, setIsFinishing] = useState(false);
     const [agreed, setAgreed] = useState(false);
 
+    // Android back walks onboarding backwards instead of exiting the flow and
+    // losing the in-progress step state.
+    useEffect(() => {
+        if (Platform.OS !== "android") {
+            return;
+        }
+
+        const subscription = BackHandler.addEventListener(
+            "hardwareBackPress",
+            () => {
+                if (step === "profile") {
+                    setStep("features");
+                    return true;
+                }
+                if (step === "features") {
+                    setStep("splash");
+                    return true;
+                }
+                return false;
+            },
+        );
+
+        return () => subscription.remove();
+    }, [step]);
+
     /* 3D press button (home-screen ActionButton language) */
     const Button3D = ({
         onPress,
@@ -221,7 +248,13 @@ export default function Onboarding() {
             <View style={[styles.container, { backgroundColor: P.bgBottom }]}>
                 {renderThemeToggle()}
                 <LinearGradient colors={[P.bgTop, P.bgBottom]} style={StyleSheet.absoluteFill} />
-                <View style={[styles.splashContent, { paddingTop: insets.top + 24, paddingBottom: insets.bottom + 24 }]}>
+                <View
+                    style={[
+                        styles.splashContent,
+                        { width: "100%", maxWidth: contentMaxWidth, alignSelf: "center" },
+                        { paddingTop: insets.top + 24, paddingBottom: insets.bottom + 24 },
+                    ]}
+                >
                     <Animated.View entering={FadeInDown.springify()} style={styles.mascotWrap}>
                         <Image
                             source={require("@/assets/images/mascot/happy_2.png")}
@@ -275,6 +308,7 @@ export default function Onboarding() {
                 <ScrollView
                     contentContainerStyle={[
                         styles.scrollContent,
+                        { width: "100%", maxWidth: contentMaxWidth, alignSelf: "center" },
                         { paddingTop: insets.top + 16, paddingBottom: insets.bottom + 24 },
                     ]}
                     showsVerticalScrollIndicator={false}
@@ -374,6 +408,7 @@ export default function Onboarding() {
                     contentContainerStyle={[
                         styles.scrollContent,
                         styles.profileContent,
+                        { width: "100%", maxWidth: contentMaxWidth, alignSelf: "center" },
                         { paddingTop: insets.top + 24, paddingBottom: insets.bottom + 24 },
                     ]}
                     showsVerticalScrollIndicator={false}
@@ -389,7 +424,7 @@ export default function Onboarding() {
                                 resizeMode="cover"
                             />
                             <View style={{ flex: 1 }}>
-                                <Text style={styles.profileName} numberOfLines={1}>
+                                <Text style={styles.profileName}>
                                     {username.trim() || "Your name"}
                                 </Text>
                                 <Text style={styles.profileHint}>Level 1 · Atomic Novice</Text>

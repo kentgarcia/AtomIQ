@@ -1,11 +1,8 @@
 import { Icon } from "@/components/ui/icon";
 import { getDailyActivity } from "@/services/database";
 import { useStorage } from "@/services/StorageContext";
-import {
-    SafeAreaView,
-    useSafeAreaInsets,
-} from "react-native-safe-area-context";
-import { useTheme, fontFamilies } from "@/theme";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { useTheme, fontFamilies, useResponsiveLayout } from "@/theme";
 import { useRouter } from "expo-router";
 import React, { useEffect, useMemo, useState } from "react";
 import {
@@ -61,7 +58,8 @@ const buildWeek = (): WeekDay[] => {
 
 export default function StreakScreen() {
   const router = useRouter();
-  const insets = useSafeAreaInsets();
+  const { width, contentMaxWidth, gutter } = useResponsiveLayout();
+  const frameLeft = Math.max(gutter, (width - contentMaxWidth) / 2 + gutter);
   const { theme } = useTheme();
   const { userProfile } = useStorage();
   const bgColors: [string, string] =
@@ -138,8 +136,11 @@ export default function StreakScreen() {
 
       <SafeAreaView style={{ flex: 1 }}>
         <TouchableOpacity
-          style={[styles.closeBtn, { top: insets.top + 10 }]}
+          style={[styles.closeBtn, { top: 10, left: frameLeft }]}
           onPress={() => router.back()}
+          hitSlop={4}
+          accessibilityRole="button"
+          accessibilityLabel="Close streak details"
         >
           <Icon name="Close" size={22} color={isDark ? "#8898AA" : "#888888"} />
         </TouchableOpacity>
@@ -148,7 +149,14 @@ export default function StreakScreen() {
           showsVerticalScrollIndicator={false}
           contentContainerStyle={[
             styles.scrollContent,
-            { paddingTop: insets.top + 10 },
+            {
+              paddingTop: 10,
+              paddingHorizontal: gutter,
+              paddingBottom: 40,
+              width: "100%",
+              maxWidth: contentMaxWidth,
+              alignSelf: "center",
+            },
           ]}
         >
           {/* Hero card */}

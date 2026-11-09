@@ -1,5 +1,6 @@
 import { Icon } from "@/components/ui/icon";
-import {useTheme, type Palette, fontFamilies} from "@/theme";
+import { useTabBarInset } from "@/components/layout";
+import {useTheme, type Palette, fontFamilies, useResponsiveLayout} from "@/theme";
 import {
     getLeaderboardSnapshot,
     getLeaderboardSnapshotUpdatedAt,
@@ -365,6 +366,8 @@ export default function LeaderboardScreen() {
   const restList = leaderboardData.slice(3);
   const userRank = leaderboardData.find((item) => item.isUser);
   const insets = useSafeAreaInsets();
+  const { contentMaxWidth } = useResponsiveLayout();
+  const tabBarInset = useTabBarInset();
 
   if (leaderboardData.length < 3) {
     return (
@@ -398,6 +401,9 @@ export default function LeaderboardScreen() {
           <TouchableOpacity
             style={styles.backButton}
             activeOpacity={0.85}
+            hitSlop={4}
+            accessibilityRole="button"
+            accessibilityLabel="Go back"
             onPress={() => router.back()}
           >
             <Icon name="ArrowLeft2" size={20} color="#FF8C00" variant="Bold" />
@@ -509,7 +515,8 @@ export default function LeaderboardScreen() {
         style={{ flex: 1 }}
         contentContainerStyle={[
           styles.scrollContent,
-          { paddingBottom: 160 + insets.bottom },
+          { width: "100%", maxWidth: contentMaxWidth, alignSelf: "center" },
+          { paddingBottom: tabBarInset + 24 },
         ]}
         showsVerticalScrollIndicator={false}
         refreshControl={
@@ -598,45 +605,50 @@ export default function LeaderboardScreen() {
 
       {/* Sticky User Bar — above the tab bar, white card like profile */}
       {userRank && userRank.rank && userRank.rank > 3 && (
-        <Animated.View
-          entering={reducedMotion ? FadeIn.duration(120) : FadeIn.duration(200)}
-          style={[styles.stickyBar, { bottom: insets.bottom + 88 }]}
+        <View
+          pointerEvents="box-none"
+          style={[styles.stickyLayer, { bottom: tabBarInset + 12 }]}
         >
-          <View style={styles.stickyBarInner}>
-            <Text
-              style={[
-                styles.listRankText,
-                { color: "#E67E22", width: 30, textAlign: "center" },
-              ]}
-            >
-              {userRank.rank}
-            </Text>
-            <View style={styles.listAvatarWrapper}>
-              <CircleAvatar
-                uri={userRank.avatar}
-                isUser={true}
-                isNPC={false}
-                size={40}
-                borderColor="#FFCA5F"
-                borderWidth={2}
-              />
-            </View>
-            <View style={styles.listInfo}>
-              <Text style={[styles.listName, { color: "#333333" }]}>
-                {userRank.name}
+          <Animated.View
+            entering={reducedMotion ? FadeIn.duration(120) : FadeIn.duration(200)}
+            style={[styles.stickyBar, { maxWidth: contentMaxWidth - 40 }]}
+          >
+            <View style={styles.stickyBarInner}>
+              <Text
+                style={[
+                  styles.listRankText,
+                  { color: "#E67E22", width: 30, textAlign: "center" },
+                ]}
+              >
+                {userRank.rank}
               </Text>
-              <Text style={[styles.listTitle, { color: "#9CA3AF" }]}>
-                {userRank.title}
-              </Text>
+              <View style={styles.listAvatarWrapper}>
+                <CircleAvatar
+                  uri={userRank.avatar}
+                  isUser={true}
+                  isNPC={false}
+                  size={40}
+                  borderColor="#FFCA5F"
+                  borderWidth={2}
+                />
+              </View>
+              <View style={styles.listInfo}>
+                <Text style={[styles.listName, { color: "#333333" }]}>
+                  {userRank.name}
+                </Text>
+                <Text style={[styles.listTitle, { color: "#9CA3AF" }]}>
+                  {userRank.title}
+                </Text>
+              </View>
+              <View style={styles.listXP}>
+                <Icon name="Flash" size={16} color="#FF8C00" variant="Bold" />
+                <Text style={[styles.xpText, { color: "#E67E22" }]}>
+                  {userRank.xp.toLocaleString()} XP
+                </Text>
+              </View>
             </View>
-            <View style={styles.listXP}>
-              <Icon name="Flash" size={16} color="#FF8C00" variant="Bold" />
-              <Text style={[styles.xpText, { color: "#E67E22" }]}>
-                {userRank.xp.toLocaleString()} XP
-              </Text>
-            </View>
-          </View>
-        </Animated.View>
+          </Animated.View>
+        </View>
       )}
     </View>
   );
@@ -876,10 +888,15 @@ const createStyles = (theme: Palette, isDark: boolean) => {
       fontFamily: fontFamilies.heavy,
       fontSize: 14,
     },
-    stickyBar: {
+    stickyLayer: {
       position: "absolute",
-      left: 20,
-      right: 20,
+      left: 0,
+      right: 0,
+      alignItems: "center",
+      paddingHorizontal: 20,
+    },
+    stickyBar: {
+      width: "100%",
       borderRadius: 20,
       overflow: "hidden",
       elevation: 8,

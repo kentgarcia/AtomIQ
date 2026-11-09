@@ -5,6 +5,7 @@
  */
 
 import { StackCard } from "@/components/games/StackCard";
+import { useTabBarInset } from "@/components/layout";
 import { getAllMazes } from "@/content/explorer";
 import { GAME_MODES } from "@/constants/mythbuster-modes";
 import { useTheme } from "@/theme";
@@ -14,7 +15,6 @@ import { StyleSheet, useWindowDimensions, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const HEADER_H = 200;
-const TAB_CLEAR = 110;
 
 /* ------------------------------------------------------------------ */
 /* Maze stage colors (mirrors app/atom-maze.tsx)                       */
@@ -50,6 +50,7 @@ export function DifficultyPanel({
     const router = useRouter();
     const insets = useSafeAreaInsets();
     const { height: windowHeight } = useWindowDimensions();
+    const tabBarInset = useTabBarInset();
     useTheme();
 
     // Mazes live in the SQLite content database and load async.
@@ -69,7 +70,7 @@ export function DifficultyPanel({
     // Same stacking math as the game picker: stack fills the area below
     // the header and above the floating tab bar.
     const stackH = Math.round(
-        windowHeight - insets.top - 18 - HEADER_H - insets.bottom - TAB_CLEAR,
+        windowHeight - insets.top - 18 - HEADER_H - tabBarInset - 16,
     );
 
     const items = useMemo(() => {
@@ -139,7 +140,7 @@ export function DifficultyPanel({
             <View
                 style={[
                     styles.stack,
-                    { paddingBottom: insets.bottom + TAB_CLEAR },
+                    { paddingBottom: tabBarInset + 16 },
                 ]}
             >
                 {items.map((item) => (

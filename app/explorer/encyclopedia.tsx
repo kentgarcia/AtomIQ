@@ -2,7 +2,7 @@ import { Icon } from "@/components/ui/icon";
 import { getAllEncyclopediaEntries } from "@/content/explorer";
 import type { EncyclopediaEntry } from "@/content/explorer";
 import { getEncyclopediaImage } from "@/content/explorer/images";
-import { useTheme, fontFamilies } from "@/theme";
+import { useTheme, fontFamilies, useResponsiveLayout } from "@/theme";
 import { Image as ExpoImage } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
@@ -37,6 +37,7 @@ const AMBER_DEEP = "#FF8C00";
 export default function EncyclopediaScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const { contentMaxWidth, gutter } = useResponsiveLayout();
   const { theme, isDark } = useTheme();
   const THEME = theme.palettes.explorer;
   const bgTop = isDark ? THEME.bg : CREAM_TOP;
@@ -88,15 +89,33 @@ export default function EncyclopediaScreen() {
       <LinearGradient colors={[bgTop, bgBottom]} style={StyleSheet.absoluteFill} pointerEvents="none" />
 
       {/* Explorer vault header — same amber language, explorer-tinted subtitle */}
-      <View style={[styles.headerWrap, { paddingTop: insets.top + 12 }]}>
+      <View
+        style={[
+          styles.headerWrap,
+          {
+            paddingTop: insets.top + 12,
+            paddingHorizontal: gutter,
+            width: "100%",
+            maxWidth: contentMaxWidth,
+            alignSelf: "center",
+          },
+        ]}
+      >
         <View style={styles.headerBar}>
           <View style={styles.headerRow}>
-            <TouchableOpacity style={styles.backBtn} onPress={() => router.back()} activeOpacity={0.9}>
+            <TouchableOpacity
+              style={styles.backBtn}
+              onPress={() => router.back()}
+              activeOpacity={0.9}
+              hitSlop={5}
+              accessibilityRole="button"
+              accessibilityLabel="Go back"
+            >
               <Icon name="ArrowLeft2" size={20} color="#7C4A00" variant="Bold" />
             </TouchableOpacity>
             <View style={styles.headerCopy}>
               <Text style={styles.headerTitle}>Explorer Vault</Text>
-              <Text style={styles.headerSub} numberOfLines={1}>
+              <Text style={styles.headerSub}>
                 {hasFilter ? `${filteredEntries.length} results` : `${allEntries.length} terms · Encarta-style archive`}
               </Text>
             </View>
@@ -112,7 +131,12 @@ export default function EncyclopediaScreen() {
               onChangeText={setSearchQuery}
             />
             {searchQuery.length > 0 && (
-              <TouchableOpacity onPress={() => setSearchQuery("")} hitSlop={8}>
+              <TouchableOpacity
+                onPress={() => setSearchQuery("")}
+                hitSlop={8}
+                accessibilityRole="button"
+                accessibilityLabel="Clear search"
+              >
                 <Icon name="CloseCircle" size={18} color="#9CA3AF" />
               </TouchableOpacity>
             )}
@@ -124,6 +148,9 @@ export default function EncyclopediaScreen() {
             <TouchableOpacity
               style={[styles.pill, !selectedCategory && styles.pillActive]}
               onPress={() => setSelectedCategory(null)}
+              hitSlop={6}
+              accessibilityRole="button"
+              accessibilityState={{ selected: !selectedCategory }}
             >
               <Text style={[styles.pillText, !selectedCategory && styles.pillTextActive]}>All</Text>
             </TouchableOpacity>
@@ -134,6 +161,9 @@ export default function EncyclopediaScreen() {
                   key={category}
                   style={[styles.pill, active && styles.pillActive]}
                   onPress={() => setSelectedCategory(active ? null : category)}
+                  hitSlop={6}
+                  accessibilityRole="button"
+                  accessibilityState={{ selected: active }}
                 >
                   <Text style={[styles.pillText, active && styles.pillTextActive]}>{cfg.label}</Text>
                 </TouchableOpacity>
@@ -143,7 +173,19 @@ export default function EncyclopediaScreen() {
         </View>
       </View>
 
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        contentContainerStyle={[
+          styles.scrollContent,
+          {
+            width: "100%",
+            maxWidth: contentMaxWidth,
+            alignSelf: "center",
+            paddingHorizontal: gutter,
+            paddingBottom: insets.bottom + 40,
+          },
+        ]}
+        showsVerticalScrollIndicator={false}
+      >
         {filteredEntries.length === 0 ? (
           <View style={styles.empty}>
             <ExpoImage source={require("@/assets/images/mascot/blink.png")} style={styles.emptyMascot} contentFit="contain" />
@@ -171,7 +213,7 @@ export default function EncyclopediaScreen() {
                   )}
                   <View style={styles.cardMain}>
                     <View style={styles.cardTopRow}>
-                      <Text style={[styles.term, isDark && { color: theme.palettes.explorer.text }]} numberOfLines={1}>
+                      <Text style={[styles.term, isDark && { color: theme.palettes.explorer.text }]}>
                         {entry.term}
                       </Text>
                       <View style={[styles.catPill, { backgroundColor: cfg.soft }]}>
