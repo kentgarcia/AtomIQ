@@ -2,14 +2,14 @@ import { Icon } from "@/components/ui/icon";
 import { getEncyclopediaEntryById } from "@/content/explorer";
 import type { EncyclopediaEntry } from "@/content/explorer";
 import { getEncyclopediaImage } from "@/content/explorer/images";
-import { useTheme, fontFamilies } from "@/theme";
+import { useTheme, fontFamilies, useResponsiveLayout } from "@/theme";
 import { openExternalUrl } from "@/services/open-url";
 import { impactLight, impactMedium } from "@/services/haptics";
 import { LinearGradient } from "expo-linear-gradient";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { speakSafely, stopSpeech } from "@/services/speech";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { Alert, Image, ScrollView, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View } from "react-native";
+import { Alert, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import Animated, { FadeInDown, ZoomIn } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -39,10 +39,10 @@ const CATEGORY_COLORS: Record<string, { bg: string; border: string; icon: string
 export default function EncyclopediaEntryScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const { contentMaxWidth, gutter, contentWidth } = useResponsiveLayout();
   const { theme, isDark } = useTheme();
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { width } = useWindowDimensions();
-  const ENTRY_IMAGE_MAX_WIDTH = width - 32;
+  const ENTRY_IMAGE_MAX_WIDTH = Math.max(0, contentWidth - 16);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [speakingSection, setSpeakingSection] = useState<string | null>(null);
 
@@ -90,7 +90,7 @@ export default function EncyclopediaEntryScreen() {
       displayWidth = displayHeight * aspectRatio;
     }
     return { width: Math.round(displayWidth), height: Math.round(displayHeight) };
-  }, [entryImageSource, width]);
+  }, [entryImageSource, ENTRY_IMAGE_MAX_WIDTH]);
 
   const getCategoryStyle = (category: string) => {
     const key = category?.toLowerCase() || "default";
@@ -186,14 +186,32 @@ export default function EncyclopediaEntryScreen() {
       <LinearGradient colors={[bgTop, bgBottom]} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }} style={StyleSheet.absoluteFill} pointerEvents="none" />
 
       {/* Amber vault header */}
-      <View style={[styles.headerWrap, { paddingTop: insets.top + 12 }]}>
+      <View
+        style={[
+          styles.headerWrap,
+          {
+            paddingTop: insets.top + 12,
+            paddingHorizontal: gutter,
+            width: "100%",
+            maxWidth: contentMaxWidth,
+            alignSelf: "center",
+          },
+        ]}
+      >
         <View style={styles.headerBar}>
           <View style={styles.headerRow}>
-            <TouchableOpacity style={styles.backBtn} onPress={() => router.back()} activeOpacity={0.9}>
+            <TouchableOpacity
+              style={styles.backBtn}
+              onPress={() => router.back()}
+              activeOpacity={0.9}
+              hitSlop={5}
+              accessibilityRole="button"
+              accessibilityLabel="Go back"
+            >
               <Icon name="ArrowLeft2" size={20} color="#7C4A00" variant="Bold" />
             </TouchableOpacity>
             <View style={styles.headerCopy}>
-              <Text style={styles.headerTitle} numberOfLines={1}>
+              <Text style={styles.headerTitle}>
                 {entry.term}
               </Text>
             </View>
@@ -201,6 +219,9 @@ export default function EncyclopediaEntryScreen() {
               style={[styles.speakAllBtn, isSpeaking && speakingSection === "all" && styles.speakAllActive]}
               onPress={speakAll}
               activeOpacity={0.9}
+              hitSlop={5}
+              accessibilityRole="button"
+              accessibilityLabel={isSpeaking && speakingSection === "all" ? "Stop reading entry" : "Read entry aloud"}
             >
               <Icon name={isSpeaking && speakingSection === "all" ? "VolumeSlash" : "VolumeHigh"} size={18} color={isSpeaking && speakingSection === "all" ? "#FFFFFF" : "#7C4A00"} variant="Bold" />
             </TouchableOpacity>
@@ -208,7 +229,19 @@ export default function EncyclopediaEntryScreen() {
         </View>
       </View>
 
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={[
+          styles.scrollContent,
+          {
+            width: "100%",
+            maxWidth: contentMaxWidth,
+            alignSelf: "center",
+            paddingHorizontal: gutter,
+            paddingBottom: insets.bottom + 24,
+          },
+        ]}
+      >
         {/* Image */}
         {entry.image && entryImageSource && (
           <Animated.View entering={FadeInDown.delay(120).springify()} style={styles.imageCard}>
@@ -223,6 +256,9 @@ export default function EncyclopediaEntryScreen() {
             <TouchableOpacity
               style={[styles.ttsBtn, speakingSection === "definition" && styles.ttsActive]}
               onPress={() => speakText(entry.definition, "definition")}
+              hitSlop={8}
+              accessibilityRole="button"
+              accessibilityLabel={speakingSection === "definition" ? "Stop reading definition" : "Read definition aloud"}
             >
               <Icon name={speakingSection === "definition" ? "VolumeSlash" : "VolumeHigh"} size={16} color={speakingSection === "definition" ? "#FFFFFF" : "#7C4A00"} variant="Bold" />
             </TouchableOpacity>
@@ -239,6 +275,9 @@ export default function EncyclopediaEntryScreen() {
               <TouchableOpacity
                 style={[styles.ttsBtn, speakingSection === "facts" && styles.ttsActive]}
                 onPress={() => speakText(`Quick facts about ${entry.term}: ${entry.quickFacts.join(". ")}`, "facts")}
+                hitSlop={8}
+                accessibilityRole="button"
+                accessibilityLabel={speakingSection === "facts" ? "Stop reading quick facts" : "Read quick facts aloud"}
               >
                 <Icon name={speakingSection === "facts" ? "VolumeSlash" : "VolumeHigh"} size={16} color={speakingSection === "facts" ? "#FFFFFF" : "#7C4A00"} variant="Bold" />
               </TouchableOpacity>
@@ -264,6 +303,9 @@ export default function EncyclopediaEntryScreen() {
                 <TouchableOpacity
                   style={[styles.mythTts, speakingSection === "myth" && styles.mythTtsActive]}
                   onPress={() => speakText(`Myth busting: ${entry.debunkingSnippet}`, "myth")}
+                  hitSlop={8}
+                  accessibilityRole="button"
+                  accessibilityLabel={speakingSection === "myth" ? "Stop reading myth debunking" : "Read myth debunking aloud"}
                 >
                   <Icon name={speakingSection === "myth" ? "VolumeSlash" : "VolumeHigh"} size={16} color="#FFFFFF" variant="Bold" />
                 </TouchableOpacity>
@@ -290,6 +332,8 @@ export default function EncyclopediaEntryScreen() {
                       router.replace(`/explorer/encyclopedia-entry?id=${term}`);
                     }}
                     activeOpacity={0.88}
+                    hitSlop={7}
+                    accessibilityRole="link"
                   >
                     <Text style={styles.pillText}>{term.replace(/-/g, " ")}</Text>
                     <Icon name="ArrowRight2" size={12} color="#7C4A00" variant="Bold" />

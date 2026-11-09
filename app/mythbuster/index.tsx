@@ -1,4 +1,4 @@
-import {fontFamilies} from "@/theme";
+import {fontFamilies, useResponsiveLayout} from "@/theme";
 import { MarkdownText } from "@/components/markdown-text";
 import { Icon } from "@/components/ui/icon";
 import { HowToPlayCard } from "@/components/games/HowToPlayCard";
@@ -13,11 +13,13 @@ import { playGameSfx, preloadGameSfx } from "@/services/game-sfx";
 import { LinearGradient } from "expo-linear-gradient";
 import { speakSafely, stopSpeech } from "@/services/speech";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
+  Alert,
+  BackHandler,
   Dimensions,
   Image,
-  SafeAreaView,
+  Platform,
   ScrollView,
   StyleSheet,
   Text,
@@ -52,8 +54,6 @@ const SWIPE_THRESHOLD = width * 0.3;
 const LOSE_EXPLOSION_DURATION_MS = 700;
 const RESULT_CARD_W = width - 96;
 const RESULTS_CARD_GAP = 12;
-const RESULTS_STEP = RESULT_CARD_W + RESULTS_CARD_GAP;
-const RESULTS_CARD_OFFSET = (width - 48 - RESULT_CARD_W) / 2;
 
 const AnimatedTouchableOpacity =
   Animated.createAnimatedComponent(TouchableOpacity);
@@ -186,6 +186,15 @@ export default function MythBusterScreen() {
   const { mode: modeParam } = useLocalSearchParams<{ mode?: string }>();
   const { updateUserProfile, userProfile } = useStorage();
   const insets = useSafeAreaInsets();
+  const {
+    width: windowWidth,
+    contentMaxWidth,
+    gutter,
+  } = useResponsiveLayout();
+  const frameWidth = Math.min(windowWidth, contentMaxWidth);
+  const resultCardWidth = Math.max(0, frameWidth - 96);
+  const resultsStep = resultCardWidth + RESULTS_CARD_GAP;
+  const resultsCardOffset = (frameWidth - 48 - resultCardWidth) / 2;
   const colorScheme = useColorScheme();
   const themeText = useThemeColor({}, "text");
   const themeBackground = useThemeColor({}, "background");
@@ -651,6 +660,45 @@ export default function MythBusterScreen() {
     router.back();
   };
 
+  const confirmExit = useCallback(() => {
+    Alert.alert(
+      "Leave this game?",
+      "Your current run and score will be lost.",
+      [
+        { text: "Stay", style: "cancel" },
+        {
+          text: "Leave",
+          style: "destructive",
+          onPress: () => router.back(),
+        },
+      ],
+    );
+  }, [router]);
+
+  const handleExit = useCallback(() => {
+    if (gameState === "playing") {
+      confirmExit();
+      return;
+    }
+    router.back();
+  }, [confirmExit, gameState, router]);
+
+  useEffect(() => {
+    if (Platform.OS !== "android" || gameState !== "playing") {
+      return;
+    }
+
+    const subscription = BackHandler.addEventListener(
+      "hardwareBackPress",
+      () => {
+        confirmExit();
+        return true;
+      },
+    );
+
+    return () => subscription.remove();
+  }, [confirmExit, gameState]);
+
   const gesture = Gesture.Pan()
     .onUpdate((event) => {
       translateX.value = event.translationX;
@@ -704,12 +752,12 @@ export default function MythBusterScreen() {
       ? Math.round((correctAnswers / totalAnswered) * 100)
       : 0;
 
-  const resultRowX = useSharedValue(RESULTS_CARD_OFFSET);
+  const resultRowX = useSharedValue(resultsCardOffset);
   const resultsGesture = Gesture.Pan()
     .activeOffsetX([-12, 12])
     .onUpdate((event) => {
       resultRowX.value =
-        -resultsIndex * RESULTS_STEP + RESULTS_CARD_OFFSET + event.translationX;
+        -resultsIndex * resultsStep + resultsCardOffset + event.translationX;
     })
     .onEnd((event) => {
       if (
@@ -722,7 +770,7 @@ export default function MythBusterScreen() {
           Math.min(resultsDeckSize - 1, resultsIndex + dir),
         );
         resultRowX.value = withTiming(
-          -next * RESULTS_STEP + RESULTS_CARD_OFFSET,
+          -next * resultsStep + resultsCardOffset,
           {
             duration: 250,
             easing: EASE_OUT,
@@ -731,7 +779,7 @@ export default function MythBusterScreen() {
         runOnJS(setResultsIndex)(next);
       } else {
         resultRowX.value = withSpring(
-          -resultsIndex * RESULTS_STEP + RESULTS_CARD_OFFSET,
+          -resultsIndex * resultsStep + resultsCardOffset,
         );
       }
     });
@@ -805,15 +853,29 @@ export default function MythBusterScreen() {
             style={StyleSheet.absoluteFill}
             pointerEvents="none"
           />
-          <SafeAreaView style={styles.fullScreen}>
+          <View style={[styles.fullScreen, { paddingTop: insets.top }]}>
             {/* Header */}
-            <View style={styles.introHeader}>
+            <View
+              style={[
+                styles.introHeader,
+                {
+                  paddingTop: 16,
+                  width: "100%",
+                  maxWidth: contentMaxWidth,
+                  alignSelf: "center",
+                  paddingHorizontal: gutter,
+                },
+              ]}
+            >
               <TouchableOpacity
                 onPress={resetGame}
                 style={[
                   styles.introBackBtn,
                   { backgroundColor: cardColor, borderColor },
                 ]}
+                hitSlop={2}
+                accessibilityRole="button"
+                accessibilityLabel="Go back"
               >
                 <Icon name="ArrowLeft2" size={20} color={textColor} />
               </TouchableOpacity>
@@ -833,7 +895,16 @@ export default function MythBusterScreen() {
             </View>
             <ScrollView
               style={styles.introScrollView}
-              contentContainerStyle={styles.introScrollContent}
+              contentContainerStyle={[
+                styles.introScrollContent,
+                {
+                  width: "100%",
+                  maxWidth: contentMaxWidth,
+                  alignSelf: "center",
+                  paddingHorizontal: gutter,
+                  paddingBottom: insets.bottom + 24,
+                },
+              ]}
               showsVerticalScrollIndicator={false}
               bounces
             >
@@ -932,7 +1003,7 @@ export default function MythBusterScreen() {
               </Animated.View>
             </ScrollView>
 
-          </SafeAreaView>
+          </View>
         </View>
       </GestureHandlerRootView>
     );
@@ -968,9 +1039,19 @@ export default function MythBusterScreen() {
           style={StyleSheet.absoluteFill}
           pointerEvents="none"
         />
-          <SafeAreaView style={styles.fullScreen}>
+          <View style={[styles.fullScreen, { paddingTop: insets.top }]}>
             {/* Header */}
-            <View style={styles.resultsHeader}>
+            <View
+              style={[
+                styles.resultsHeader,
+                {
+                  width: "100%",
+                  maxWidth: contentMaxWidth,
+                  alignSelf: "center",
+                  paddingHorizontal: gutter,
+                },
+              ]}
+            >
               <View style={styles.resultsHeaderContent}>
                 <TouchableOpacity
                   onPress={resetGame}
@@ -979,6 +1060,9 @@ export default function MythBusterScreen() {
                     { backgroundColor: cardColor, borderColor },
                   ]}
                   activeOpacity={0.7}
+                  hitSlop={2}
+                  accessibilityRole="button"
+                  accessibilityLabel="Back to game intro"
                 >
                   <Icon name="ArrowLeft2" size={20} color={textColor} />
                 </TouchableOpacity>
@@ -1015,9 +1099,12 @@ export default function MythBusterScreen() {
                 onPress={() => {
                   setReviewTab("all");
                   setResultsIndex(0);
-                  resultRowX.value = RESULTS_CARD_OFFSET;
+                  resultRowX.value = resultsCardOffset;
                 }}
                 activeOpacity={0.7}
+                hitSlop={4}
+                accessibilityRole="button"
+                accessibilityState={{ selected: reviewTab === "all" }}
               >
                 <Text
                   style={[
@@ -1040,9 +1127,12 @@ export default function MythBusterScreen() {
                 onPress={() => {
                   setReviewTab("wrong");
                   setResultsIndex(0);
-                  resultRowX.value = RESULTS_CARD_OFFSET;
+                  resultRowX.value = resultsCardOffset;
                 }}
                 activeOpacity={0.7}
+                hitSlop={4}
+                accessibilityRole="button"
+                accessibilityState={{ selected: reviewTab === "wrong" }}
               >
                 <Text
                   style={[
@@ -1062,7 +1152,7 @@ export default function MythBusterScreen() {
                     styles.resultsRow,
                     {
                       width:
-                        RESULT_CARD_W * resultsDeckSize +
+                        resultCardWidth * resultsDeckSize +
                         RESULTS_CARD_GAP * (resultsDeckSize - 1),
                     },
                     resultsRowStyle,
@@ -1073,7 +1163,11 @@ export default function MythBusterScreen() {
                     style={[
                       styles.resultCard,
                       styles.resultSummaryCard,
-                      { backgroundColor: cardColor, borderColor },
+                      {
+                        width: resultCardWidth,
+                        backgroundColor: cardColor,
+                        borderColor,
+                      },
                     ]}
                   >
                     {/* Mascot + performance */}
@@ -1167,7 +1261,11 @@ export default function MythBusterScreen() {
                         key={myth.originalIndex}
                         style={[
                           styles.resultCard,
-                          { backgroundColor: cardColor, borderColor },
+                          {
+                            width: resultCardWidth,
+                            backgroundColor: cardColor,
+                            borderColor,
+                          },
                         ]}
                       >
                         <View style={styles.resultHeaderRow}>
@@ -1271,7 +1369,16 @@ export default function MythBusterScreen() {
             </View>
 
             {/* Action Buttons */}
-            <View style={styles.resultsActions}>
+            <View
+              style={[
+                styles.resultsActions,
+                {
+                  maxWidth: contentMaxWidth,
+                  alignSelf: "center",
+                  paddingBottom: insets.bottom + 24,
+                },
+              ]}
+            >
               <TouchableOpacity
                 style={[
                   styles.resultsPlayAgainBtn,
@@ -1302,7 +1409,7 @@ export default function MythBusterScreen() {
                 </Text>
               </TouchableOpacity>
             </View>
-          </SafeAreaView>
+          </View>
         </Animated.View>
       </GestureHandlerRootView>
     );
@@ -1321,16 +1428,28 @@ export default function MythBusterScreen() {
           pointerEvents="none"
         />
         <View
-          style={[styles.gameHeaderContainer, { paddingTop: insets.top + 16 }]}
+          style={[
+            styles.gameHeaderContainer,
+            {
+              paddingTop: insets.top + 16,
+              paddingHorizontal: gutter,
+              width: "100%",
+              maxWidth: contentMaxWidth,
+              alignSelf: "center",
+            },
+          ]}
         >
           {/* Header */}
           <View style={styles.gameHeader}>
             <TouchableOpacity
-              onPress={() => resetGame()}
+              onPress={handleExit}
               style={[
                 styles.gameCloseButton,
                 { backgroundColor: cardColor, borderColor },
               ]}
+              hitSlop={4}
+              accessibilityRole="button"
+              accessibilityLabel="Exit game"
             >
               <Icon name="Close" size={20} color={textColor} />
             </TouchableOpacity>
@@ -1447,7 +1566,7 @@ export default function MythBusterScreen() {
           {currentMyth && (
             <GestureDetector gesture={gesture}>
               <Animated.View
-                style={[styles.card, animatedStyle]}
+                style={[styles.card, { width: frameWidth - 48 }, animatedStyle]}
               >
                 <View
                   style={[
@@ -1460,6 +1579,9 @@ export default function MythBusterScreen() {
                     onPress={speakStatement}
                     style={styles.cardSpeaker}
                     activeOpacity={0.7}
+                    hitSlop={8}
+                    accessibilityRole="button"
+                    accessibilityLabel="Read statement aloud"
                   >
                     <Icon
                       name="VolumeHigh"
@@ -1537,7 +1659,18 @@ export default function MythBusterScreen() {
 
         {/* Action Buttons */}
         {currentMyth && (
-          <View style={styles.actionButtons}>
+          <View
+            style={[
+              styles.actionButtons,
+              {
+                paddingHorizontal: gutter,
+                paddingBottom: insets.bottom + 24,
+                width: "100%",
+                maxWidth: contentMaxWidth,
+                alignSelf: "center",
+              },
+            ]}
+          >
             <AnimatedTouchableOpacity
               style={[styles.actionButton, pressButtonStyle]}
               onPress={() => {

@@ -5,9 +5,10 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useMemo } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { FadeIn, FadeInDown, useReducedMotion } from 'react-native-reanimated';
 
-import {useTheme, AchievementPalette, type Palette, fontFamilies} from "@/theme";
+import {useTheme, AchievementPalette, type Palette, fontFamilies, useResponsiveLayout} from "@/theme";
 
 // Achievement thresholds - same as profile
 export const ACHIEVEMENTS = [
@@ -70,6 +71,8 @@ export const ACHIEVEMENTS = [
 
 export default function AchievementDetailScreen() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
+  const { contentMaxWidth } = useResponsiveLayout();
   const { theme } = useTheme();
   const isDark = theme.mode === "dark";
   /* Mode-aware achievement palette */
@@ -123,8 +126,11 @@ export default function AchievementDetailScreen() {
       {/* Header */}
       <PageHeader title="Achievement" onBack={() => router.back()} palette={THEME} centered />
 
-      <ScrollView 
-        contentContainerStyle={styles.content}
+      <ScrollView
+        contentContainerStyle={[
+          styles.content,
+          { width: "100%", maxWidth: contentMaxWidth, alignSelf: "center", paddingBottom: insets.bottom + 24 },
+        ]}
         showsVerticalScrollIndicator={false}
       >
         {/* Achievement Icon Card */}

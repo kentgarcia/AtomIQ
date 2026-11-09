@@ -90,6 +90,8 @@ export function StackCard({
                         pressScale.value = springPressOut();
                     }}
                     onPress={onPress}
+                    accessibilityRole="button"
+                    accessibilityLabel={title}
                 >
                     <Animated.View style={[styles.iconWrapper, pressStyle, { backgroundColor: tint(color) }]}>
                         <Icon name={icon} size={42} color={shade(color, -0.32)} variant="Bold" />

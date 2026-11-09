@@ -9,6 +9,7 @@
 
 import { ContentCard } from "@/components/guide/ContentCard";
 import { ProfileProgressCard } from "@/components/guide/ProfileProgressCard";
+import { useTabBarInset } from "@/components/layout";
 import { Icon } from "@/components/ui/icon";
 import { useStorage } from "@/services/StorageContext";
 import { applySelection, initialGuideState } from "@/services/guide/engine";
@@ -18,7 +19,7 @@ import { loadGuideContent, type LoadedContent } from "@/services/guide/topics";
 import { navigateDestination } from "@/services/guide/navigate";
 import type { GuideCard, GuideIntent, GuidePill, GuideState, GuideTurn, MascotMood } from "@/services/guide/types";
 import { getProfileAvatarSource } from "@/services/profile-avatars";
-import { fontFamilies, useTheme } from "@/theme";
+import { fontFamilies, useResponsiveLayout, useTheme } from "@/theme";
 import { LinearGradient } from "expo-linear-gradient";
 import { useNavigation, useRouter } from "expo-router";
 import React, { useEffect, useMemo, useRef } from "react";
@@ -72,6 +73,7 @@ export default function GuideScreen() {
   const router = useRouter();
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
+  const { contentMaxWidth } = useResponsiveLayout();
   const c = theme.colors;
   const reducedMotion = useReducedMotion();
   const isDark = theme.mode === "dark";
@@ -210,7 +212,17 @@ export default function GuideScreen() {
     <View style={[styles.container, { backgroundColor: c.background }]}>
       <LinearGradient colors={theme.mode === "dark" ? [c.background, c.surface] : ["#FFF3E0", "#FFFFFF"]} style={StyleSheet.absoluteFill} />
       {/* Immersive Guide Mode header — minimal */}
-      <View style={[styles.chatHeaderPlain, { paddingTop: insets.top + 8 }]}>
+      <View
+        style={[
+          styles.chatHeaderPlain,
+          {
+            paddingTop: insets.top + 8,
+            width: "100%",
+            maxWidth: contentMaxWidth,
+            alignSelf: "center",
+          },
+        ]}
+      >
         <Pressable
           onPress={() => setMode("landing")}
           hitSlop={8}
@@ -244,7 +256,18 @@ export default function GuideScreen() {
         </View>
       </View>
 
-      <Animated.View entering={reducedMotion ? FadeIn.duration(150) : FadeInUp.duration(300)} style={[styles.chatBox, { paddingBottom: insets.bottom + 14 }]}>
+      <Animated.View
+        entering={reducedMotion ? FadeIn.duration(150) : FadeInUp.duration(300)}
+        style={[
+          styles.chatBox,
+          {
+            paddingBottom: insets.bottom + 14,
+            width: "100%",
+            maxWidth: contentMaxWidth,
+            alignSelf: "center",
+          },
+        ]}
+      >
         <View style={styles.chatHandle} />
         {sentenceHeader && showOptionPills && (
           <View style={styles.sentenceHeader}><Text style={[styles.sentencePrefix, { color: P.text }]}>{sentenceHeader}</Text><View style={[styles.blankLine, { backgroundColor: P.softBorder }]} /><Icon name="Edit" size={12} color={P.faint} variant="Linear" /></View>
@@ -361,6 +384,8 @@ function LandingDashboard({ ctx, content, userProfile, onEnterChat, onDirectNav 
   const { theme } = useTheme();
   const c = theme.colors;
   const insets = useSafeAreaInsets();
+  const { contentMaxWidth } = useResponsiveLayout();
+  const tabBarInset = useTabBarInset();
   const isDark = theme.mode === "dark";
   const P = isDark
     ? { card: "#213356", border: "#2D3A56", softBorder: "#26365A", soft: "#1A2D4A", creamTint: "#4A381B", text: "#F6F9FC", textSecondary: "#C0CBDD", muted: "#8898AA", faint: "#667799" }
@@ -371,7 +396,19 @@ function LandingDashboard({ ctx, content, userProfile, onEnterChat, onDirectNav 
   return (
     <View style={[styles.container, { backgroundColor: c.background }]}>
       <LinearGradient colors={theme.mode === "dark" ? [c.background, c.surface] : ["#FFF3E0", "#FFFFFF"]} style={StyleSheet.absoluteFill} />
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={[styles.landingScroll, { paddingTop: insets.top + 12, paddingBottom: insets.bottom + 24 }]}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={[
+          styles.landingScroll,
+          {
+            width: "100%",
+            maxWidth: contentMaxWidth,
+            alignSelf: "center",
+            paddingTop: insets.top + 12,
+            paddingBottom: tabBarInset + 24,
+          },
+        ]}
+      >
         {/* overlapping header stack — amber on top, white behind */}
         <View style={styles.headerStack}>
           <View style={styles.homeHeaderBar}>
@@ -381,7 +418,7 @@ function LandingDashboard({ ctx, content, userProfile, onEnterChat, onDirectNav 
               </View>
               <View style={{ flex: 1 }}>
                 <Text style={styles.homeGreetingLabel}>{getGreeting()}</Text>
-                <Text style={styles.homeGreetingName} numberOfLines={1}>{userProfile?.display_name || userProfile?.username || "Atom Explorer"}</Text>
+                <Text style={styles.homeGreetingName}>{userProfile?.display_name || userProfile?.username || "Atom Explorer"}</Text>
               </View>
               <View style={styles.homeXpPill}>
                 <Icon name="Flash" size={15} color="#FFA000" variant="Bold" />

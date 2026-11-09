@@ -2,7 +2,7 @@ import { MarkdownText } from "@/components/markdown-text";
 import { getContentImage } from "@/components/community/image-source";
 import { Icon } from "@/components/ui/icon";
 import { getArticleById, getPostById } from "@/content/articles";
-import {useTheme, type Palette, fontFamilies} from "@/theme";
+import {useTheme, type Palette, fontFamilies, useResponsiveLayout} from "@/theme";
 import { openExternalUrl } from "@/services/open-url";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
@@ -39,7 +39,9 @@ export default function ArticleDetailScreen() {
   const { theme } = useTheme();
   const THEME = theme.palettes.article;
   const { width } = useWindowDimensions();
-  const styles = React.useMemo(() => createStyles(THEME, width), [THEME, width]);
+  const { contentMaxWidth, gutter } = useResponsiveLayout();
+  const imageWidth = Math.min(width, contentMaxWidth);
+  const styles = React.useMemo(() => createStyles(THEME, imageWidth), [THEME, imageWidth]);
   const articleId = typeof id === "string" ? id.replace("article-", "") : "";
 
   // Articles and posts live in the content database — resolve asynchronously.
@@ -89,10 +91,23 @@ export default function ArticleDetailScreen() {
   return (
     <SafeAreaView style={styles.container}>
       {/* Header */}
-      <View style={styles.header}>
+      <View
+        style={[
+          styles.header,
+          {
+            paddingHorizontal: gutter,
+            width: "100%",
+            maxWidth: contentMaxWidth,
+            alignSelf: "center",
+          },
+        ]}
+      >
         <TouchableOpacity
           style={styles.backButton}
           onPress={() => router.back()}
+          hitSlop={4}
+          accessibilityRole="button"
+          accessibilityLabel="Go back"
         >
           <Icon name="ArrowLeft" size={24} color={THEME.text} />
         </TouchableOpacity>
@@ -100,6 +115,9 @@ export default function ArticleDetailScreen() {
           <TouchableOpacity
             style={styles.externalLinkButton}
             onPress={handleOpenSource}
+            hitSlop={4}
+            accessibilityRole="link"
+            accessibilityLabel="Open article source"
           >
             <Icon name="Link" size={20} color={THEME.primary} />
             <Text style={styles.externalLinkText}>Open Source</Text>
@@ -109,7 +127,10 @@ export default function ArticleDetailScreen() {
 
       <ScrollView
         style={styles.scrollView}
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={[
+          styles.scrollContent,
+          { width: "100%", maxWidth: contentMaxWidth, alignSelf: "center" },
+        ]}
         showsVerticalScrollIndicator={false}
       >
         {/* Hero Image */}

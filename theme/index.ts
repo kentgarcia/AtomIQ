@@ -72,3 +72,15 @@ export {
 export type { Spacing, Radius } from "./tokens";
 
 export * from "./motion";
+
+export {
+    layout,
+    getWidthClass,
+    getHeightClass,
+    getHorizontalGutter,
+    getContentMaxWidth,
+    getContentWidth,
+    getColumnCount,
+    useResponsiveLayout,
+} from "./layout";
+export type { WidthClass, HeightClass, ResponsiveLayout } from "./layout";

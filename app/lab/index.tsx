@@ -1,10 +1,10 @@
-import { fontFamilies, useTheme } from "@/theme";
+import { fontFamilies, useTheme, useResponsiveLayout } from "@/theme";
 import { DURATION, PRESS_EASING } from "@/theme/motion";
 import { Icon } from "@/components/ui/icon";
 import { LinearGradient } from "expo-linear-gradient";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
-import { ScrollView, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View } from "react-native";
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import {
   impactLight,
   impactMedium,
@@ -63,6 +63,9 @@ function LabHeader({
         <TouchableOpacity
           style={styles.iconButton}
           activeOpacity={0.85}
+          hitSlop={4}
+          accessibilityRole="button"
+          accessibilityLabel="Go back"
           onPressIn={() =>
             (pressed.value = withTiming(1, { duration: DURATION.press, easing: PRESS_EASING }))
           }
@@ -103,6 +106,9 @@ function SelectPill({
     <TouchableOpacity
       style={[styles.pill, active && { backgroundColor: color, borderColor: color }]}
       activeOpacity={0.85}
+      hitSlop={6}
+      accessibilityRole="button"
+      accessibilityState={{ selected: active }}
       onPress={() => {
         impactLight();
         onPress();
@@ -176,6 +182,8 @@ function Stepper({
       ]}
       activeOpacity={0.8}
       disabled={disabled}
+      hitSlop={4}
+      accessibilityRole="button"
       onPress={() => {
         if (disabled) return;
         impactLight();
@@ -347,6 +355,7 @@ type ExpEntry = { rad: Radiation; mat: Material; thickness: number; reading: num
 
 function RadiationShieldLab({ onBack }: { onBack: () => void }) {
   const insets = useSafeAreaInsets();
+  const { contentMaxWidth, gutter } = useResponsiveLayout();
   const reducedMotion = useReducedMotion();
   const { theme } = useTheme();
   const THEME = theme.palettes.tab;
@@ -381,7 +390,14 @@ function RadiationShieldLab({ onBack }: { onBack: () => void }) {
         style={{ flex: 1 }}
         contentContainerStyle={[
           styles.simContent,
-          { paddingTop: insets.top + 12, paddingBottom: insets.bottom + 24 },
+          {
+            paddingTop: insets.top + 12,
+            paddingBottom: insets.bottom + 24,
+            paddingHorizontal: gutter,
+            width: "100%",
+            maxWidth: contentMaxWidth,
+            alignSelf: "center",
+          },
         ]}
         showsVerticalScrollIndicator={false}
       >
@@ -561,6 +577,7 @@ function chargeLabel(protons: number, electrons: number): string {
 
 function BuildAnAtom({ onBack }: { onBack: () => void }) {
   const insets = useSafeAreaInsets();
+  const { contentMaxWidth, gutter } = useResponsiveLayout();
   const reducedMotion = useReducedMotion();
   const { theme } = useTheme();
   const THEME = theme.palettes.tab;
@@ -623,7 +640,14 @@ function BuildAnAtom({ onBack }: { onBack: () => void }) {
         style={{ flex: 1 }}
         contentContainerStyle={[
           styles.simContent,
-          { paddingTop: insets.top + 12, paddingBottom: insets.bottom + 24 },
+          {
+            paddingTop: insets.top + 12,
+            paddingBottom: insets.bottom + 24,
+            paddingHorizontal: gutter,
+            width: "100%",
+            maxWidth: contentMaxWidth,
+            alignSelf: "center",
+          },
         ]}
         showsVerticalScrollIndicator={false}
       >
@@ -798,13 +822,12 @@ function remaining(initial: number, halfLife: number, t: number): number {
 
 function DecayLab({ onBack }: { onBack: () => void }) {
   const insets = useSafeAreaInsets();
+  const { contentMaxWidth, gutter, contentWidth } = useResponsiveLayout();
   const reducedMotion = useReducedMotion();
   const { theme } = useTheme();
   const THEME = theme.palettes.tab;
   const bgTop = theme.mode === "dark" ? THEME.bg : C.cream;
   const bgBottom = theme.mode === "dark" ? THEME.bg : C.white;
-  const { width: windowWidth } = useWindowDimensions();
-
   const [iso, setIso] = useState<Isotope>(ISOTOPES[0]);
   const [initial, setInitial] = useState(1000);
   const [time, setTime] = useState(0);
@@ -818,7 +841,7 @@ function DecayLab({ onBack }: { onBack: () => void }) {
   const rem = Math.round(remaining(initial, iso.halfLife, time));
   const halfLives = iso.halfLife > 0 ? time / iso.halfLife : 0;
 
-  const graphW = windowWidth - 40;
+  const graphW = Math.max(0, contentWidth - 56);
   const graphH = 160;
   const pad = 16;
 
@@ -860,7 +883,14 @@ function DecayLab({ onBack }: { onBack: () => void }) {
         style={{ flex: 1 }}
         contentContainerStyle={[
           styles.simContent,
-          { paddingTop: insets.top + 12, paddingBottom: insets.bottom + 24 },
+          {
+            paddingTop: insets.top + 12,
+            paddingBottom: insets.bottom + 24,
+            paddingHorizontal: gutter,
+            width: "100%",
+            maxWidth: contentMaxWidth,
+            alignSelf: "center",
+          },
         ]}
         showsVerticalScrollIndicator={false}
       >

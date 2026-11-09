@@ -1,7 +1,7 @@
 import { Icon } from "@/components/ui/icon";
 import { getAllEncyclopediaEntries } from "@/content/explorer";
 import type { EncyclopediaEntry } from "@/content/explorer";
-import { useTheme, fontFamilies } from "@/theme";
+import { useTheme, fontFamilies, useResponsiveLayout } from "@/theme";
 import { impactLight, impactMedium } from "@/services/haptics";
 import { Image as ExpoImage } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
@@ -122,6 +122,7 @@ const ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("") as readonly string[];
 export default function EncyclopediaScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const { contentMaxWidth, gutter } = useResponsiveLayout();
   const { theme, isDark } = useTheme();
   const THEME = theme.palettes.library;
 
@@ -338,7 +339,18 @@ export default function EncyclopediaScreen() {
       />
 
       {/* Amber vault header — floating like Home's headerBar */}
-      <View style={[styles.headerWrap, { paddingTop: insets.top + 12 }]}>
+      <View
+        style={[
+          styles.headerWrap,
+          {
+            paddingTop: insets.top + 12,
+            paddingHorizontal: gutter,
+            width: "100%",
+            maxWidth: contentMaxWidth,
+            alignSelf: "center",
+          },
+        ]}
+      >
         <Animated.View
           layout={LinearTransition.duration(240).easing(Easing.bezier(0.23, 1, 0.32, 1))}
           style={styles.headerBar}
@@ -348,6 +360,9 @@ export default function EncyclopediaScreen() {
               onPress={() => (hasActiveFilter ? clearFilters() : router.back())}
               style={styles.backBtn}
               activeOpacity={0.9}
+              hitSlop={5}
+              accessibilityRole="button"
+              accessibilityLabel={hasActiveFilter ? "Clear filters" : "Go back"}
             >
               <Icon
                 name={hasActiveFilter ? "CloseCircle" : "ArrowLeft2"}
@@ -358,10 +373,10 @@ export default function EncyclopediaScreen() {
             </TouchableOpacity>
 
             <View style={styles.headerCopy}>
-              <Text style={styles.headerTitle} numberOfLines={1}>
+              <Text style={styles.headerTitle}>
                 Knowledge Vault
               </Text>
-              <Text style={styles.headerSubtitle} numberOfLines={1}>
+              <Text style={styles.headerSubtitle}>
                 {selectedCategories.length > 0
                   ? selectedCategories.length === 1
                     ? `${filteredEntries.length} in ${getVaultCat(selectedCategories[0]!).label}`
@@ -389,7 +404,12 @@ export default function EncyclopediaScreen() {
               returnKeyType="search"
             />
             {searchQuery.length > 0 && (
-              <TouchableOpacity onPress={() => setSearchQuery("")} hitSlop={8}>
+              <TouchableOpacity
+                onPress={() => setSearchQuery("")}
+                hitSlop={8}
+                accessibilityRole="button"
+                accessibilityLabel="Clear search"
+              >
                 <Icon name="CloseCircle" size={18} color="#9CA3AF" />
               </TouchableOpacity>
             )}
@@ -403,6 +423,8 @@ export default function EncyclopediaScreen() {
                   <TouchableOpacity
                     onPress={() => setSelectedCategories((prev) => prev.filter((c) => c !== cat))}
                     hitSlop={6}
+                    accessibilityRole="button"
+                    accessibilityLabel={`Remove ${getVaultCat(cat).label} filter`}
                   >
                     <Icon name="CloseCircle" size={14} color="#FFFFFF" />
                   </TouchableOpacity>
@@ -411,12 +433,23 @@ export default function EncyclopediaScreen() {
               {selectedLetter && (
                 <View style={styles.activeChipLetter}>
                   <Text style={styles.activeChipLetterText}>{selectedLetter}</Text>
-                  <TouchableOpacity onPress={() => setSelectedLetter(null)} hitSlop={6}>
+                  <TouchableOpacity
+                    onPress={() => setSelectedLetter(null)}
+                    hitSlop={6}
+                    accessibilityRole="button"
+                    accessibilityLabel={`Remove letter ${selectedLetter} filter`}
+                  >
                     <Icon name="CloseCircle" size={14} color="#7C4A00" />
                   </TouchableOpacity>
                 </View>
               )}
-              <TouchableOpacity style={styles.clearLink} onPress={clearFilters}>
+              <TouchableOpacity
+                style={styles.clearLink}
+                onPress={clearFilters}
+                hitSlop={8}
+                accessibilityRole="button"
+                accessibilityLabel="Clear all filters"
+              >
                 <Text style={styles.clearLinkText}>Clear</Text>
               </TouchableOpacity>
             </View>
@@ -434,6 +467,9 @@ export default function EncyclopediaScreen() {
               style={[styles.pill, selectedCategories.length === 0 && styles.pillActive]}
               onPress={clearFilters}
               activeOpacity={0.9}
+              hitSlop={6}
+              accessibilityRole="button"
+              accessibilityState={{ selected: selectedCategories.length === 0 }}
             >
               <Text style={[styles.pillText, selectedCategories.length === 0 && styles.pillTextActive]}>All</Text>
             </TouchableOpacity>
@@ -445,6 +481,9 @@ export default function EncyclopediaScreen() {
                   style={[styles.pill, active && styles.pillActive]}
                   onPress={() => handleCategorySelect(category)}
                   activeOpacity={0.9}
+                  hitSlop={6}
+                  accessibilityRole="button"
+                  accessibilityState={{ selected: active }}
                 >
                   <Text style={[styles.pillText, active && styles.pillTextActive]}>{cfg.label}</Text>
                 </TouchableOpacity>
@@ -455,11 +494,22 @@ export default function EncyclopediaScreen() {
       </View>
 
       {/* Main content */}
-      <View style={styles.body}>
+      <View
+        style={[
+          styles.body,
+          { width: "100%", maxWidth: contentMaxWidth, alignSelf: "center" },
+        ]}
+      >
         <ScrollView
           ref={scrollRef}
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.scrollContent}
+          contentContainerStyle={[
+            styles.scrollContent,
+            {
+              paddingHorizontal: gutter,
+              paddingBottom: insets.bottom + 36,
+            },
+          ]}
           scrollEventThrottle={16}
           onScroll={showScroller}
           onScrollBeginDrag={showScroller}
@@ -549,7 +599,7 @@ export default function EncyclopediaScreen() {
                             onPress={() => router.push(`/explorer/encyclopedia-entry?id=${entry.id}`)}
                           >
                             <View style={[styles.entryTopRow, isDark && { borderBottomColor: theme.palettes.library.border }]}>
-                              <Text style={[styles.entryTerm, isDark && { color: theme.palettes.library.text }]} numberOfLines={1}>
+                              <Text style={[styles.entryTerm, isDark && { color: theme.palettes.library.text }]}>
                                 {entry.term}
                               </Text>
                               <View style={styles.entryActions}>
@@ -559,7 +609,9 @@ export default function EncyclopediaScreen() {
                                     e.stopPropagation();
                                     speakTerm(entry);
                                   }}
-                                  hitSlop={6}
+                                  hitSlop={7}
+                                  accessibilityRole="button"
+                                  accessibilityLabel={isSpeaking ? "Stop reading term" : "Read term aloud"}
                                 >
                                   <Icon
                                     name={isSpeaking ? "VolumeSlash" : "VolumeHigh"}

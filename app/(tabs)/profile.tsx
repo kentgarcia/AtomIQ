@@ -1,5 +1,6 @@
 import { Icon } from "@/components/ui/icon";
-import {useTheme, type Palette, fontFamilies} from "@/theme";
+import { useTabBarInset } from "@/components/layout";
+import {useTheme, type Palette, fontFamilies, useResponsiveLayout} from "@/theme";
 import { ACHIEVEMENTS } from "@/app/achievement-detail";
 import { NPC_CHARACTERS } from "@/app/(tabs)/leaderboard";
 import {
@@ -49,6 +50,8 @@ import { DURATION, EASE_OUT } from "@/theme/motion";
 export default function ProfileScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const { contentMaxWidth } = useResponsiveLayout();
+  const tabBarInset = useTabBarInset();
   const reducedMotion = useReducedMotion();
   const {
     userProfile,
@@ -330,25 +333,40 @@ export default function ProfileScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={[
           styles.scrollContent,
-          /* Clear the tab bar so the last card isn't covered */
-          { paddingBottom: insets.bottom + 96 },
+          /* Cap the readable width on tablets without adding a second gutter;
+             the cards already carry their own 20 dp margins. */
+          { width: "100%", maxWidth: contentMaxWidth, alignSelf: "center" },
+          /* Clear the measured tab bar so the last card isn't covered */
+          { paddingBottom: tabBarInset + 16 },
         ]}
       >
         {/* Header: Share / Edit / Settings */}
         <View style={[styles.headerRow, { paddingTop: insets.top + 12 }]}>
-          <TouchableOpacity style={styles.iconButton} onPress={handleShare}>
+          <TouchableOpacity
+            style={styles.iconButton}
+            onPress={handleShare}
+            hitSlop={8}
+            accessibilityRole="button"
+            accessibilityLabel="Share profile"
+          >
             <Icon name="Share" size={20} color={isDark ? "#C0CBDD" : "#555555"} variant="Bold" />
           </TouchableOpacity>
           <View style={{ flex: 1 }} />
           <TouchableOpacity
             style={styles.iconButton}
             onPress={openEditModal}
+            hitSlop={8}
+            accessibilityRole="button"
+            accessibilityLabel="Edit profile"
           >
             <Icon name="Edit2" size={20} color={isDark ? "#C0CBDD" : "#555555"} variant="Bold" />
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.iconButton}
             onPress={() => router.push("/settings")}
+            hitSlop={8}
+            accessibilityRole="button"
+            accessibilityLabel="Open settings"
           >
             <Icon name="Setting" size={20} color={isDark ? "#C0CBDD" : "#555555"} variant="Bold" />
           </TouchableOpacity>
@@ -409,7 +427,7 @@ export default function ProfileScreen() {
                   </View>
                 </TouchableOpacity>
                 <View style={styles.profileInfo}>
-                  <Text style={styles.name} numberOfLines={1}>
+                  <Text style={styles.name}>
                     {userProfile.display_name || userProfile.username}
                   </Text>
                   <View style={styles.levelSectionCompact}>
@@ -731,7 +749,7 @@ export default function ProfileScreen() {
           style={styles.avatarModalOverlay}
         >
           <KeyboardAvoidingView
-            behavior={Platform.OS === "ios" ? "padding" : undefined}
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
             style={styles.keyboardAvoidingView}
             keyboardVerticalOffset={insets.top + 12}
           >

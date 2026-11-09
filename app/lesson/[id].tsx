@@ -6,6 +6,9 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
+    Alert,
+    BackHandler,
+    Platform,
     StyleSheet,
     Text,
     TouchableOpacity,
@@ -16,7 +19,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { getLevelProgress, updateLevelProgress } from "@/services/database";
-import {useTheme, fontFamilies} from "@/theme";
+import {useTheme, fontFamilies, useResponsiveLayout} from "@/theme";
 
 import { AssessmentView } from "@/components/lesson/AssessmentView";
 import { BriefingView } from "@/components/lesson/BriefingView";
@@ -37,6 +40,7 @@ export default function LessonScreen() {
   const { theme } = useTheme();
   const THEME = theme.palettes.lesson;
   const { width } = useWindowDimensions();
+  const { contentMaxWidth } = useResponsiveLayout();
   const styles = useMemo(() => createStyles(THEME, width), [THEME, width]);
   const levelId = typeof id === "string" ? id : "radiation-shielding";
 
@@ -103,6 +107,50 @@ export default function LessonScreen() {
     setStarted(true);
   }, [isReplay, levelId, lesson]);
 
+  const totalSteps = lesson?.steps.length ?? 0;
+  const isFirstStep = step === 0;
+  const isLastStep = step === totalSteps - 1;
+  const shouldConfirmExit = started && !isLastStep;
+
+  const confirmExit = useCallback(() => {
+    Alert.alert(
+      "Leave this lesson?",
+      "Your progress in this lesson will be lost.",
+      [
+        { text: "Stay", style: "cancel" },
+        {
+          text: "Leave",
+          style: "destructive",
+          onPress: () => router.back(),
+        },
+      ],
+    );
+  }, [router]);
+
+  const handleClose = useCallback(() => {
+    if (shouldConfirmExit) {
+      confirmExit();
+      return;
+    }
+    router.back();
+  }, [confirmExit, router, shouldConfirmExit]);
+
+  useEffect(() => {
+    if (Platform.OS !== "android" || !shouldConfirmExit) {
+      return;
+    }
+
+    const subscription = BackHandler.addEventListener(
+      "hardwareBackPress",
+      () => {
+        confirmExit();
+        return true;
+      },
+    );
+
+    return () => subscription.remove();
+  }, [confirmExit, shouldConfirmExit]);
+
   // If lesson not found, show error
   if (!isLoading && !lesson) {
     return (
@@ -134,7 +182,18 @@ export default function LessonScreen() {
             borderRadius: 12,
           }}
           onPress={() => router.back()}
+          accessibilityRole="button"
+          accessibilityLabel="Go back"
         >
+          <Text
+            style={{
+              color: "#FFFFFF",
+              fontFamily: fontFamilies.heavy,
+              fontSize: 15,
+            }}
+          >
+            Go Back
+          </Text>
         </TouchableOpacity>
       </View>
     );
@@ -224,10 +283,6 @@ export default function LessonScreen() {
     }
   };
 
-  const totalSteps = lesson?.steps.length ?? 0;
-  const isFirstStep = step === 0;
-  const isLastStep = step === totalSteps - 1;
-
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <View style={{ flex: 1, backgroundColor: THEME.bg }}>
@@ -238,12 +293,22 @@ export default function LessonScreen() {
               {/* Progress Header - hidden on first and last steps */}
               {!isFirstStep && !isLastStep && (
                 <View
-                  style={styles.topBar}
+                  style={[
+                    styles.topBar,
+                    {
+                      width: "100%",
+                      maxWidth: contentMaxWidth,
+                      alignSelf: "center",
+                    },
+                  ]}
                   onLayout={(e) => setTopBarHeight(e.nativeEvent.layout.height)}
                 >
                   <TouchableOpacity
-                    onPress={() => router.back()}
+                    onPress={handleClose}
                     style={{ padding: 8 }}
+                    hitSlop={4}
+                    accessibilityRole="button"
+                    accessibilityLabel="Close lesson"
                   >
                     <Icon name="Close" size={24} color={THEME.textMuted} />
                   </TouchableOpacity>

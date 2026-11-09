@@ -43,7 +43,7 @@ import Animated, {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 // Modern Theme
-import { useTheme } from "@/theme";
+import { useTheme, useResponsiveLayout } from "@/theme";
 import { EASE_OUT } from "@/theme/motion";
 import { vibrate } from "@/services/haptics";
 import { HowToPlayCard } from "@/components/games/HowToPlayCard";
@@ -507,6 +507,7 @@ export default function AtomMazeBattleScreen() {
   // from the mythbuster bank with a difficulty ramp and zero repeats.
   const isEndlessMode = id === "endless";
   const insets = useSafeAreaInsets();
+  const { contentMaxWidth, gutter } = useResponsiveLayout();
   const { width, height } = useWindowDimensions();
 
   const [maze, setMaze] = useState<AtomMazeChallenge | null>(null);
@@ -1486,7 +1487,18 @@ export default function AtomMazeBattleScreen() {
           style={StyleSheet.absoluteFill}
           pointerEvents="none"
         />
-        <View style={styles.introHeader}>
+        <View
+          style={[
+            styles.introHeader,
+            {
+              paddingTop: insets.top + 16,
+              paddingHorizontal: gutter,
+              width: "100%",
+              maxWidth: contentMaxWidth,
+              alignSelf: "center",
+            },
+          ]}
+        >
           <TouchableOpacity
             onPress={handleExit}
             style={[
@@ -1496,6 +1508,9 @@ export default function AtomMazeBattleScreen() {
                 borderColor: introPalette.backBtnBorder,
               },
             ]}
+            hitSlop={2}
+            accessibilityRole="button"
+            accessibilityLabel="Go back"
           >
             <Icon name="ArrowLeft2" size={20} color={introPalette.primaryText} />
           </TouchableOpacity>
@@ -1518,7 +1533,13 @@ export default function AtomMazeBattleScreen() {
           style={styles.introScrollView}
           contentContainerStyle={[
             styles.introScrollContent,
-            { paddingBottom: introBottomPadding },
+            {
+              paddingBottom: introBottomPadding,
+              paddingHorizontal: gutter,
+              width: "100%",
+              maxWidth: contentMaxWidth,
+              alignSelf: "center",
+            },
           ]}
           showsVerticalScrollIndicator={false}
           bounces
@@ -2299,7 +2320,11 @@ export default function AtomMazeBattleScreen() {
         style={[
           styles.modernBattleArena,
           { height: arenaHeight },
-          { backgroundColor: theme.card },
+          {
+            width: contentMaxWidth - 24,
+            alignSelf: "center",
+            backgroundColor: theme.card,
+          },
           arenaAnimatedStyle,
         ]}
       >
@@ -2326,6 +2351,9 @@ export default function AtomMazeBattleScreen() {
               <TouchableOpacity
                 onPress={handleExit}
                 style={styles.arenaHudBackBtn}
+                hitSlop={7}
+                accessibilityRole="button"
+                accessibilityLabel="Exit maze"
               >
                 <Icon name="ArrowLeft2" size={18} color="#FFFFFF" />
               </TouchableOpacity>
@@ -2480,7 +2508,13 @@ export default function AtomMazeBattleScreen() {
         style={styles.questionArea}
         contentContainerStyle={[
           styles.questionAreaContent,
-          { paddingBottom: questionBottomPadding },
+          {
+            paddingBottom: questionBottomPadding,
+            paddingHorizontal: gutter,
+            width: "100%",
+            maxWidth: contentMaxWidth,
+            alignSelf: "center",
+          },
         ]}
         showsVerticalScrollIndicator={false}
         bounces={false}

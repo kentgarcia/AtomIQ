@@ -1,5 +1,5 @@
 import { Icon } from "@/components/ui/icon";
-import { useTheme, type Palette, fontFamilies } from "@/theme";
+import { useTheme, type Palette, fontFamilies, useResponsiveLayout } from "@/theme";
 import { useRouter } from "expo-router";
 import React from "react";
 import {
@@ -78,6 +78,7 @@ const SECTIONS: Section[] = [
 export default function TermsOfServiceScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const { contentMaxWidth, gutter } = useResponsiveLayout();
   const { theme } = useTheme();
   const THEME = theme.palettes.settings;
   const styles = React.useMemo(() => createStyles(THEME), [THEME]);
@@ -85,8 +86,25 @@ export default function TermsOfServiceScreen() {
   return (
     <View style={{ flex: 1, backgroundColor: THEME.bg }}>
       {/* Header */}
-      <View style={[styles.header, { paddingTop: insets.top + 12 }]}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
+      <View
+        style={[
+          styles.header,
+          {
+            paddingTop: insets.top + 12,
+            paddingHorizontal: gutter,
+            width: "100%",
+            maxWidth: contentMaxWidth,
+            alignSelf: "center",
+          },
+        ]}
+      >
+        <TouchableOpacity
+          onPress={() => router.back()}
+          style={styles.backBtn}
+          hitSlop={4}
+          accessibilityRole="button"
+          accessibilityLabel="Go back"
+        >
           <Icon name="ArrowLeft2" size={24} color={THEME.text} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Terms of Service</Text>
@@ -94,7 +112,16 @@ export default function TermsOfServiceScreen() {
       </View>
 
       <ScrollView
-        contentContainerStyle={styles.content}
+        contentContainerStyle={[
+          styles.content,
+          {
+            width: "100%",
+            maxWidth: contentMaxWidth,
+            alignSelf: "center",
+            padding: gutter,
+            paddingBottom: insets.bottom + 24,
+          },
+        ]}
         showsVerticalScrollIndicator={false}
       >
         <Animated.View entering={FadeInDown.delay(80).springify()}>

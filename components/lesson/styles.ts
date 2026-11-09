@@ -1,18 +1,28 @@
 import { StyleSheet } from "react-native";
 
-import { type Palette, fontFamilies } from "@/theme";
+import { layout, type Palette, fontFamilies } from "@/theme";
 
-export const createStyles = (theme: Palette, width: number) =>
-  StyleSheet.create({
+/** Cap lesson content to the readable frame on tablets. */
+const clampFrameWidth = (width: number) => Math.min(width, layout.readableMaxWidth);
+
+export const createStyles = (theme: Palette, width: number) => {
+  const frameWidth = clampFrameWidth(width);
+  return StyleSheet.create({
     // Layout
     stepContainer: {
       flex: 1,
+      width: "100%",
+      maxWidth: frameWidth,
+      alignSelf: "center",
       padding: 24,
       justifyContent: "center",
       backgroundColor: theme.bg,
     },
     fullScreenCenter: {
       flex: 1,
+      width: "100%",
+      maxWidth: frameWidth,
+      alignSelf: "center",
       alignItems: "center",
       justifyContent: "center",
       padding: 24,
@@ -129,7 +139,7 @@ export const createStyles = (theme: Palette, width: number) =>
       minHeight: 400,
     },
     swipeCard: {
-      width: width - 48,
+      width: frameWidth - 48,
       height: 350,
       backgroundColor: theme.card,
       borderRadius: 24,
@@ -172,7 +182,7 @@ export const createStyles = (theme: Palette, width: number) =>
     swipeLeft: { flexDirection: "row", alignItems: "center", gap: 4 },
     swipeRight: { flexDirection: "row", alignItems: "center", gap: 4 },
     feedbackCard: {
-      width: width - 48,
+      width: frameWidth - 48,
       height: 350,
       backgroundColor: theme.primary,
       borderRadius: 24,
@@ -405,9 +415,12 @@ export const createStyles = (theme: Palette, width: number) =>
       color: theme.text,
     },
   });
+};
 
 // Additional style functions for component-specific styles
-export const createMythStyles = (theme: Palette, width: number) => ({
+export const createMythStyles = (theme: Palette, width: number) => {
+  const frameWidth = clampFrameWidth(width);
+  return {
   indicatorFull: {
     position: "absolute" as const,
     top: 0,
@@ -442,7 +455,7 @@ export const createMythStyles = (theme: Palette, width: number) => ({
     marginTop: 8,
   },
   resultCard: {
-    width: width - 48,
+    width: frameWidth - 48,
     padding: 24,
     borderRadius: 24,
     alignItems: "center" as const,
@@ -522,7 +535,8 @@ export const createMythStyles = (theme: Palette, width: number) => ({
     borderColor: theme.primary,
   },
   speakBtnText: { fontSize: 14, fontFamily: fontFamilies.bold, color: theme.text },
-});
+  };
+};
 
 export const createLearnStyles = (theme: Palette) => ({
   progressDots: {

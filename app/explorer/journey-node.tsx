@@ -14,11 +14,12 @@ import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-nati
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import {useTheme, withAlpha, type Palette, fontFamilies} from "@/theme";
+import {useTheme, withAlpha, type Palette, fontFamilies, useResponsiveLayout} from "@/theme";
 
 export default function JourneyNodeScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const { contentMaxWidth } = useResponsiveLayout();
   const { theme } = useTheme();
   const THEME = theme.palettes.explorer;
   const styles = useMemo(() => makeStyles(THEME), [THEME]);
@@ -125,7 +126,13 @@ export default function JourneyNodeScreen() {
         palette={THEME}
       />
 
-      <ScrollView contentContainerStyle={[styles.scrollContent, { paddingTop: insets.top + 20 }]} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        contentContainerStyle={[
+          styles.scrollContent,
+          { paddingTop: 20, width: "100%", maxWidth: contentMaxWidth, alignSelf: "center", paddingBottom: insets.bottom + 24 },
+        ]}
+        showsVerticalScrollIndicator={false}
+      >
         {isMyth && 'mythStatement' in content ? (
           <>
             {/* Encarta-Style Myth Node */}

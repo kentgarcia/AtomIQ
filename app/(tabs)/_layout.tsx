@@ -1,5 +1,9 @@
+import {
+  TabBarInsetProvider,
+  useTabBarHeightReporter,
+} from "@/components/layout";
 import { playButtonClickSfx } from "@/services/ui-sfx";
-import { useTheme, withAlpha } from "@/theme";
+import { layout, useTheme, withAlpha } from "@/theme";
 import { spacing } from "@/theme/tokens";
 import type { BottomTabBarProps } from "expo-router/js-tabs";
 import { Image } from "expo-image";
@@ -68,6 +72,9 @@ const TabButton = ({
     <TouchableOpacity
       onPress={handlePress}
       activeOpacity={1}
+      accessibilityRole="tab"
+      accessibilityLabel={tab.label}
+      accessibilityState={{ selected: isFocused }}
       style={styles.tabButton}
     >
       <View style={styles.tabContent}>
@@ -96,6 +103,7 @@ function ModernTabBar({ state, emitter, navigateToTab }: BottomTabBarProps) {
   // Hooks must run before any early return (rules of hooks)
   const insets = useSafeAreaInsets();
   const { theme } = useTheme();
+  const reportTabBarHeight = useTabBarHeightReporter();
 
   // Guide: show bar on landing, hide on chat (immersive)
   const focused = state.routes[state.index];
@@ -125,43 +133,52 @@ function ModernTabBar({ state, emitter, navigateToTab }: BottomTabBarProps) {
       />
       <View
         style={[
-          styles.tabBar,
-          {
-            bottom: (insets.bottom || 0) + 16,
-            backgroundColor: THEME.bg,
-            borderColor: THEME.border,
-            shadowColor: THEME.shadow,
-          },
+          styles.tabBarLayer,
+          { bottom: (insets.bottom || 0) + layout.tabBar.gap },
         ]}
       >
-        {tabs.map((tab) => {
-          const routeIndex = state.routes.findIndex((r) => r.name === tab.name);
-          if (routeIndex === -1) return null;
+        <View
+          onLayout={(event) =>
+            reportTabBarHeight?.(event.nativeEvent.layout.height)
+          }
+          style={[
+            styles.tabBar,
+            {
+              backgroundColor: THEME.bg,
+              borderColor: THEME.border,
+              shadowColor: THEME.shadow,
+            },
+          ]}
+        >
+          {tabs.map((tab) => {
+            const routeIndex = state.routes.findIndex((r) => r.name === tab.name);
+            if (routeIndex === -1) return null;
 
-          const isFocused = state.index === routeIndex;
+            const isFocused = state.index === routeIndex;
 
-          const onPress = () => {
-            const event = emitter.emit({
-              type: "tabPress",
-              target: state.routes[routeIndex].key,
-              canPreventDefault: true,
-            });
+            const onPress = () => {
+              const event = emitter.emit({
+                type: "tabPress",
+                target: state.routes[routeIndex].key,
+                canPreventDefault: true,
+              });
 
-            if (!isFocused && !event.defaultPrevented) {
-              navigateToTab(state.routes[routeIndex].key);
-            }
-          };
+              if (!isFocused && !event.defaultPrevented) {
+                navigateToTab(state.routes[routeIndex].key);
+              }
+            };
 
-          return (
-            <TabButton
-              key={tab.name}
-              tab={tab}
-              isFocused={isFocused}
-              onPress={onPress}
-              activeColor={THEME.active}
-            />
-          );
-        })}
+            return (
+              <TabButton
+                key={tab.name}
+                tab={tab}
+                isFocused={isFocused}
+                onPress={onPress}
+                activeColor={THEME.active}
+              />
+            );
+          })}
+        </View>
       </View>
     </View>
   );
@@ -169,61 +186,69 @@ function ModernTabBar({ state, emitter, navigateToTab }: BottomTabBarProps) {
 
 export default function TabLayout() {
   return (
-    <Tabs
-      screenOptions={{
-        headerShown: false,
-        tabBarStyle: {
-          display: "none",
-        },
-      }}
-      tabBar={(props) => <ModernTabBar {...props} />}
-    >
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: "Home",
+    <TabBarInsetProvider>
+      <Tabs
+        screenOptions={{
+          headerShown: false,
+          tabBarStyle: {
+            display: "none",
+          },
         }}
-      />
-      <Tabs.Screen
-        name="community"
-        options={{
-          title: "Discovery Hub",
-        }}
-      />
-      <Tabs.Screen
-        name="chat"
-        options={{
-          title: "Guide",
-        }}
-      />
-      <Tabs.Screen
-        name="awards"
-        options={{
-          title: "Games",
-        }}
-      />
-      <Tabs.Screen
-        name="profile"
-        options={{
-          title: "Profile",
-        }}
-      />
-      <Tabs.Screen
-        name="leaderboard"
-        options={{
-          href: null,
-          title: "Leaderboard",
-        }}
-      />
-    </Tabs>
+        tabBar={(props) => <ModernTabBar {...props} />}
+      >
+        <Tabs.Screen
+          name="index"
+          options={{
+            title: "Home",
+          }}
+        />
+        <Tabs.Screen
+          name="community"
+          options={{
+            title: "Discovery Hub",
+          }}
+        />
+        <Tabs.Screen
+          name="chat"
+          options={{
+            title: "Guide",
+          }}
+        />
+        <Tabs.Screen
+          name="awards"
+          options={{
+            title: "Games",
+          }}
+        />
+        <Tabs.Screen
+          name="profile"
+          options={{
+            title: "Profile",
+          }}
+        />
+        <Tabs.Screen
+          name="leaderboard"
+          options={{
+            href: null,
+            title: "Leaderboard",
+          }}
+        />
+      </Tabs>
+    </TabBarInsetProvider>
   );
 }
 
 const styles = StyleSheet.create({
-  tabBar: {
+  tabBarLayer: {
     position: "absolute",
-    left: 36,
-    right: 36,
+    left: 0,
+    right: 0,
+    alignItems: "center",
+    paddingHorizontal: layout.tabBar.horizontalMargin,
+  },
+  tabBar: {
+    width: "100%",
+    maxWidth: layout.tabBar.maxWidth,
     flexDirection: "row",
     alignItems: "center",
     borderRadius: 34,
@@ -245,6 +270,7 @@ const styles = StyleSheet.create({
   },
   tabButton: {
     flex: 1,
+    minHeight: layout.minTouchTarget,
     alignItems: "center",
     justifyContent: "center",
   },

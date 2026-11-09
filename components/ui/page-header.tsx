@@ -16,7 +16,6 @@ import React from "react";
 import {
     StyleSheet,
     Text,
-    TouchableOpacity,
     View,
     type StyleProp,
     type ViewStyle,
@@ -24,8 +23,10 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Icon } from "@/components/ui/icon";
+import { PressableIconButton } from "@/components/layout";
 import { fontFamilies } from "@/theme";
 import { useTheme } from "@/theme/useTheme";
+import { useResponsiveLayout } from "@/theme/layout";
 import type { Palette } from "@/theme/themes";
 
 export interface PageHeaderProps {
@@ -59,30 +60,39 @@ export function PageHeader({
     const { theme } = useTheme();
     const p = palette ?? theme.palettes.tab;
     const insets = useSafeAreaInsets();
+    const { contentMaxWidth, gutter } = useResponsiveLayout();
     const paddingTop = topInset ?? insets.top + 20;
 
     return (
         <View
             style={[
                 styles.row,
-                { backgroundColor: p.bg, paddingTop },
+                {
+                    backgroundColor: p.bg,
+                    paddingTop,
+                    paddingHorizontal: gutter,
+                    width: "100%",
+                    maxWidth: contentMaxWidth,
+                    alignSelf: "center",
+                },
                 style,
             ]}
         >
             {onBack ? (
-                <TouchableOpacity
+                <PressableIconButton
+                    accessibilityLabel="Go back"
                     onPress={onBack}
+                    visualSize={40}
                     style={[styles.back, { backgroundColor: p.card, borderColor: p.border }]}
                 >
                     <Icon name="ArrowLeft2" size={24} color={p.text} variant="Bold" />
-                </TouchableOpacity>
+                </PressableIconButton>
             ) : null}
 
             <View style={styles.content}>
                 {title ? (
                     <Text
                         style={[styles.title, centered && styles.titleCentered, { color: p.text }]}
-                        numberOfLines={1}
                     >
                         {title}
                     </Text>
@@ -90,7 +100,6 @@ export function PageHeader({
                 {subtitle ? (
                     <Text
                         style={[styles.subtitle, centered && styles.subtitleCentered, { color: p.textMuted }]}
-                        numberOfLines={1}
                     >
                         {subtitle}
                     </Text>
@@ -126,6 +135,7 @@ const styles = StyleSheet.create({
     },
     title: {
         fontSize: 24,
+        lineHeight: 30,
         fontFamily: fontFamilies.heavy,
     },
     titleCentered: {
@@ -133,6 +143,7 @@ const styles = StyleSheet.create({
     },
     subtitle: {
         fontSize: 13,
+        lineHeight: 18,
     },
     subtitleCentered: {
         textAlign: "center",
