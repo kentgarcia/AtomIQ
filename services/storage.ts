@@ -6,6 +6,7 @@ export const STORAGE_KEYS = {
   ONBOARDING_COMPLETED: '@atomiq:onboarding_completed',
   FIRST_LAUNCH: '@atomiq:first_launch',
   APP_VERSION: '@atomiq:app_version',
+  BETA_NOTICE_SEEN: '@atomiq:beta_notice_seen',
   
   // User Preferences
   THEME: '@atomiq:theme',
@@ -85,6 +86,15 @@ export const setFirstLaunch = async (isFirst: boolean): Promise<void> => {
 export const getFirstLaunch = async (): Promise<boolean> => {
   const value = await getItem<boolean>(STORAGE_KEYS.FIRST_LAUNCH);
   return value ?? true; // Default to true if not set
+};
+
+// Public Beta
+export const setBetaNoticeSeen = async (noticeId: string): Promise<void> => {
+  await setItem(STORAGE_KEYS.BETA_NOTICE_SEEN, noticeId);
+};
+
+export const getBetaNoticeSeen = async (): Promise<string | null> => {
+  return await getItem<string>(STORAGE_KEYS.BETA_NOTICE_SEEN);
 };
 
 // User Preferences

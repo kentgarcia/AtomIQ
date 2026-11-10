@@ -1,5 +1,7 @@
 import { Icon } from "@/components/ui/icon";
-import {useTheme, type Palette, fontFamilies} from "@/theme";
+import { BETA_FEEDBACK_FORM_URL } from "@/constants/beta";
+import { openExternalUrl } from "@/services/open-url";
+import {useTheme, type Palette, fontFamilies, useResponsiveLayout} from "@/theme";
 import { deleteAccountData, getUserProfile } from "@/services/database";
 import { contentRepository, getContentDbStatus } from "@/services/content-db";
 import { setHapticsGate } from "@/services/haptics";
@@ -19,8 +21,10 @@ import {
     ActivityIndicator,
     Alert,
     Image,
+    KeyboardAvoidingView,
     Linking,
     Modal,
+    Platform,
     ScrollView,
     StyleSheet,
     Switch,
@@ -182,6 +186,16 @@ export default function SettingsScreen() {
     }
   };
 
+  const handleBetaFeedback = async () => {
+    const opened = await openExternalUrl(BETA_FEEDBACK_FORM_URL);
+    if (!opened) {
+      Alert.alert(
+        "Couldn't open the form",
+        "Please check your internet connection and try again.",
+      );
+    }
+  };
+
   const handlePrivacyPolicy = () => {
     router.push("/privacy-policy");
   };
@@ -196,12 +210,30 @@ export default function SettingsScreen() {
   };
 
   const styles = React.useMemo(() => createStyles(THEME), [THEME]);
+  const { contentMaxWidth, gutter } = useResponsiveLayout();
 
   return (
     <View style={{ flex: 1, backgroundColor: THEME.bg }}>
       {/* Header */}
-      <View style={[styles.header, { paddingTop: insets.top + 12 }]}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
+      <View
+        style={[
+          styles.header,
+          {
+            paddingTop: insets.top + 12,
+            paddingHorizontal: gutter,
+            width: "100%",
+            maxWidth: contentMaxWidth,
+            alignSelf: "center",
+          },
+        ]}
+      >
+        <TouchableOpacity
+          onPress={() => router.back()}
+          style={styles.backBtn}
+          hitSlop={4}
+          accessibilityRole="button"
+          accessibilityLabel="Go back"
+        >
           <Icon name="ArrowLeft2" size={24} color={THEME.text} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Settings</Text>
@@ -209,7 +241,16 @@ export default function SettingsScreen() {
       </View>
 
       <ScrollView
-        contentContainerStyle={styles.content}
+        contentContainerStyle={[
+          styles.content,
+          {
+            width: "100%",
+            maxWidth: contentMaxWidth,
+            alignSelf: "center",
+            padding: gutter,
+            paddingBottom: insets.bottom + 24,
+          },
+        ]}
         showsVerticalScrollIndicator={false}
       >
         {/* Preferences Section */}
@@ -291,6 +332,27 @@ export default function SettingsScreen() {
         <Animated.View entering={FadeInDown.delay(400).springify()}>
           <Text style={styles.sectionTitle}>About</Text>
           <View style={styles.settingsCard}>
+            <TouchableOpacity
+              style={[styles.settingRow, styles.settingRowBorder]}
+              onPress={() => void handleBetaFeedback()}
+            >
+              <View style={styles.settingInfo}>
+                <Icon
+                  name="Message"
+                  size={20}
+                  color={THEME.primary}
+                  variant="Bold"
+                />
+                <View>
+                  <Text style={styles.settingLabel}>Beta Feedback</Text>
+                  <Text style={styles.settingDescription}>
+                    Help us improve AtomIQ
+                  </Text>
+                </View>
+              </View>
+              <Icon name="ArrowRight2" size={18} color={THEME.textMuted} />
+            </TouchableOpacity>
+
             <TouchableOpacity
               style={[styles.settingRow, styles.settingRowBorder]}
               onPress={() => setVersionModalVisible(true)}
@@ -399,6 +461,9 @@ export default function SettingsScreen() {
                 onPress={() => setVersionModalVisible(false)}
                 style={styles.modalCloseBtn}
                 activeOpacity={0.85}
+                hitSlop={6}
+                accessibilityRole="button"
+                accessibilityLabel="Close app version"
               >
                 <Icon name="CloseCircle" size={20} color="#9CA3AF" variant="Bold" />
               </TouchableOpacity>
@@ -497,11 +562,15 @@ export default function SettingsScreen() {
         animationType="fade"
         onRequestClose={() => setDeleteModalVisible(false)}
       >
-        <View style={styles.modalOverlay}>
-          <Animated.View
-            entering={FadeInDown.duration(300).springify()}
-            style={styles.modalCard}
-          >
+        <KeyboardAvoidingView
+          style={{ flex: 1 }}
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+        >
+          <View style={styles.modalOverlay}>
+            <Animated.View
+              entering={FadeInDown.duration(300).springify()}
+              style={styles.modalCard}
+            >
             <View style={styles.dragHandle} />
 
             <View style={styles.modalHeader}>
@@ -516,6 +585,9 @@ export default function SettingsScreen() {
                 style={styles.modalCloseBtn}
                 activeOpacity={0.85}
                 disabled={isDeletingAccount}
+                hitSlop={6}
+                accessibilityRole="button"
+                accessibilityLabel="Close delete account"
               >
                 <Icon name="CloseCircle" size={20} color="#9CA3AF" variant="Bold" />
               </TouchableOpacity>
@@ -578,8 +650,9 @@ export default function SettingsScreen() {
                 )}
               </TouchableOpacity>
             </View>
-          </Animated.View>
-        </View>
+            </Animated.View>
+          </View>
+        </KeyboardAvoidingView>
       </Modal>
     </View>
   );
