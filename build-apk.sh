@@ -1,7 +1,7 @@
 #!/bin/bash
 # Quick script to build APK with environment variables
 
-echo "íº€ AtomIQ APK Builder"
+echo "ğŸš€ AtomIQ APK Builder"
 echo "===================="
 echo ""
 
@@ -12,18 +12,22 @@ if ! command -v eas &> /dev/null; then
 fi
 
 # Check if logged in
-echo "í³ Checking EAS login status..."
+echo "ğŸš€ Checking EAS login status..."
 if ! eas whoami &> /dev/null; then
     echo "Please login to EAS:"
     eas login
 fi
 
 echo ""
-echo "í´ Pushing environment secrets to EAS..."
-eas secret:push --scope project --env-file .env.local --force
+if [ -f .env.local ]; then
+    echo "ğŸš€ Pushing environment secrets to EAS..."
+    eas secret:push --scope project --env-file .env.local --force
+else
+    echo "ğŸš€ No .env.local found â€” skipping secret upload."
+fi
 
 echo ""
-echo "í³¦ Starting APK build..."
+echo "ğŸš€ Starting APK build..."
 echo "Choose build profile:"
 echo "  1) Preview (for testing)"
 echo "  2) Production (for release)"

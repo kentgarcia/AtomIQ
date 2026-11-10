@@ -13,10 +13,17 @@ expo-env.d.ts
 .kotlin/
 *.orig.*
 *.jks
+*.keystore
 *.p8
 *.p12
 *.key
 *.mobileprovision
+
+# Signing secrets (never commit)
+credentials.json
+
+# IDE state
+.openidea/
 
 # Metro
 .metro-health-check*
