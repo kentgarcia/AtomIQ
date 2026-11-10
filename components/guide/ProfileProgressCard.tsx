@@ -63,7 +63,7 @@ export function ProfileProgressCard() {
             </View>
           </View>
           <View style={styles.profileInfo}>
-            <Text style={styles.name} numberOfLines={1}>{userProfile.display_name || userProfile.username}</Text>
+            <Text style={styles.name}>{userProfile.display_name || userProfile.username}</Text>
             <View style={styles.levelSectionCompact}>
               <View style={styles.levelMetaRow}>
                 <Text style={styles.levelLabel}>Level {userLevel}</Text>

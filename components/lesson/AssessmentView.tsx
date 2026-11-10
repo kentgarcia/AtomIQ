@@ -79,6 +79,9 @@ export const AssessmentView = ({
             <TouchableOpacity
               style={quizStyles.speakerBtn}
               onPress={speakQuestion}
+              hitSlop={8}
+              accessibilityRole="button"
+              accessibilityLabel={isSpeaking ? "Stop reading question" : "Read question aloud"}
             >
               <Icon
                 name={isSpeaking ? "VolumeSlash" : "VolumeHigh"}

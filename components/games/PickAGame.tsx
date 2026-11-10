@@ -339,6 +339,9 @@ export function PickAGame() {
                             <Pressable
                                 onPress={() => setGuideVisible(false)}
                                 style={({ pressed }) => [styles.modalCloseBtn, pressed && { opacity: 0.8 }]}
+                                hitSlop={6}
+                                accessibilityRole="button"
+                                accessibilityLabel="Close how to play"
                             >
                                 <Icon
                                     name="CloseCircle"

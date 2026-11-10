@@ -87,6 +87,10 @@ export function Pill({
           });
         }}
         onPress={onPress}
+        hitSlop={6}
+        accessibilityRole="button"
+        accessibilityLabel={label}
+        accessibilityState={{ disabled }}
         style={({ pressed: isPressed }) => [
           styles.pill,
           isUtility ? styles.pillUtility : styles.pillDefault,

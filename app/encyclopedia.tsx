@@ -625,7 +625,7 @@ export default function EncyclopediaScreen() {
                                 </View>
                               </View>
                             </View>
-                            <Text style={[styles.entryDef, isDark && { color: theme.palettes.library.textMuted }]} numberOfLines={2}>
+                            <Text style={[styles.entryDef, isDark && { color: theme.palettes.library.textMuted }]}>
                               {entry.definition}
                             </Text>
                           </TouchableOpacity>

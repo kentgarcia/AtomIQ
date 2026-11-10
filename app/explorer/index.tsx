@@ -77,7 +77,7 @@ export default function ExplorerScreen() {
                       </View>
                     </View>
                     
-                    <Text style={styles.journeyDescription} numberOfLines={2}>
+                    <Text style={styles.journeyDescription}>
                       {journey.description}
                     </Text>
                     

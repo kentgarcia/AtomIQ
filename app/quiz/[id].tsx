@@ -52,6 +52,13 @@ export default function QuizScreen() {
     void preloadGameSfx();
   }, []);
 
+  // Never let narration bleed into the next screen.
+  useEffect(() => {
+    return () => {
+      stopSpeech();
+    };
+  }, []);
+
   useEffect(() => {
     let active = true;
     const quizId = Array.isArray(id) ? id[0] : id;
@@ -242,8 +249,9 @@ export default function QuizScreen() {
     return (
       <View style={{ flex: 1, backgroundColor: THEME.bg }}>
         <SafeAreaView style={{ flex: 1 }}>
-          <View
-            style={[
+          <ScrollView
+            style={{ flex: 1 }}
+            contentContainerStyle={[
               styles.resultsContainer,
               {
                 width: "100%",
@@ -252,6 +260,7 @@ export default function QuizScreen() {
                 paddingHorizontal: gutter,
               },
             ]}
+            showsVerticalScrollIndicator={false}
           >
             {/* Result Icon */}
             <Animated.View
@@ -377,6 +386,8 @@ export default function QuizScreen() {
                   },
                 ]}
                 onPress={() => router.back()}
+                accessibilityRole="button"
+                accessibilityLabel="Continue"
               >
                 <Text style={styles.continueButtonText}>CONTINUE</Text>
                 <Icon
@@ -387,7 +398,7 @@ export default function QuizScreen() {
                 />
               </TouchableOpacity>
             </Animated.View>
-          </View>
+          </ScrollView>
         </SafeAreaView>
       </View>
     );
@@ -904,7 +915,7 @@ const createStyles = (theme: Palette) =>
 
     // Results
     resultsContainer: {
-      flex: 1,
+      flexGrow: 1,
       alignItems: "center",
       justifyContent: "center",
       padding: 24,
@@ -956,6 +967,7 @@ const createStyles = (theme: Palette) =>
       fontSize: 24,
       fontFamily: fontFamilies.heavy,
       color: theme.text,
+      fontVariant: ["tabular-nums"],
     },
     statLabel: {
       fontSize: 12,

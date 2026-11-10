@@ -1305,7 +1305,6 @@ export default function MythBusterScreen() {
                               styles.resultStatementTitle,
                               { color: textColor },
                             ]}
-                            numberOfLines={4}
                           >
                             {"\u201C"}{myth.statement}{"\u201D"}
                           </Text>
@@ -1500,6 +1499,9 @@ export default function MythBusterScreen() {
                   { backgroundColor: selectedMode.color },
                 ]}
                 activeOpacity={0.8}
+                hitSlop={6}
+                accessibilityRole="button"
+                accessibilityLabel="End endless game"
               >
                 <Icon name="Flag" size={16} color="#FFF" variant="Bold" />
                 <Text style={styles.endGameButtonText}>End</Text>
@@ -1939,6 +1941,7 @@ const styles = StyleSheet.create({
   progressText: {
     fontSize: 13,
     fontFamily: fontFamilies.bold,
+    fontVariant: ["tabular-nums"],
   },
   timerBadge: {
     flexDirection: "row",
@@ -1959,6 +1962,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: fontFamilies.heavy,
     color: "#FFF",
+    fontVariant: ["tabular-nums"],
   },
   progressBar: {
     height: 8,
@@ -1993,6 +1997,7 @@ const styles = StyleSheet.create({
   scoreText: {
     fontSize: 16,
     fontFamily: fontFamilies.heavy,
+    fontVariant: ["tabular-nums"],
   },
   endGameButton: {
     flexDirection: "row",
@@ -2625,6 +2630,7 @@ const styles = StyleSheet.create({
     fontSize: 32,
     fontFamily: fontFamilies.black,
     color: THEME.primary,
+    fontVariant: ["tabular-nums"],
   },
   divider: {
     height: 2,
