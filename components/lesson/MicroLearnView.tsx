@@ -112,6 +112,9 @@ export const MicroLearnView = ({
           <TouchableOpacity
             style={learnStyles.speakerBtn}
             onPress={speakContent}
+            hitSlop={8}
+            accessibilityRole="button"
+            accessibilityLabel={isSpeaking ? "Stop reading content" : "Read content aloud"}
           >
             <Icon
               name={isSpeaking ? "VolumeSlash" : "VolumeHigh"}
@@ -206,7 +209,12 @@ export const MicroLearnView = ({
       {/* Navigation Buttons */}
       <View style={learnStyles.navRow}>
         {!isFirstSlide && (
-          <TouchableOpacity style={learnStyles.backBtn} onPress={handleBack}>
+          <TouchableOpacity
+            style={learnStyles.backBtn}
+            onPress={handleBack}
+            accessibilityRole="button"
+            accessibilityLabel="Go back"
+          >
             <Icon
               name="ArrowLeft2"
               size={20}

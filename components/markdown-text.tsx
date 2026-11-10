@@ -1,7 +1,7 @@
 import {fontFamilies} from "@/theme";
 import { openExternalUrl } from "@/services/open-url";
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { Alert, StyleSheet, Text, View } from "react-native";
 
 interface MarkdownTextProps {
   text: string;
@@ -246,10 +246,17 @@ function processInlineMarkdown(
           <Text
             key={`link-${keyCounter++}`}
             style={[styles.link, { color: "#EA580C" }]}
+            accessibilityRole="link"
             onPress={() => {
-              if (pattern.url) {
-                void openExternalUrl(pattern.url);
-              }
+              if (!pattern.url) return;
+              void openExternalUrl(pattern.url).then((opened) => {
+                if (!opened) {
+                  Alert.alert(
+                    "Unable to open link",
+                    "No browser is available right now. Please try again in a moment.",
+                  );
+                }
+              });
             }}
           >
             {pattern.content}

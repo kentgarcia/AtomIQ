@@ -139,7 +139,7 @@ export function ContentCard({ card, onCta }: ContentCardProps) {
           />
         </View>
         <View style={styles.headerText}>
-          <Text style={styles.title} numberOfLines={2}>{card.title}</Text>
+          <Text style={styles.title}>{card.title}</Text>
           {card.subtitle ? (
             <Text style={styles.subtitle} numberOfLines={1}>{card.subtitle}</Text>
           ) : null}

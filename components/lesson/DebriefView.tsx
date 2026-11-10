@@ -1,5 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
-import { Image, Text, TouchableOpacity, useWindowDimensions, View } from "react-native";
+import {
+  Image,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  useWindowDimensions,
+  View,
+} from "react-native";
 import Animated, {
     FadeInDown,
     useAnimatedStyle,
@@ -139,7 +146,19 @@ export const DebriefView = ({
     : data.message || "Great job! You've completed this lesson.";
 
   return (
-    <View style={styles.fullScreenCenter}>
+    <ScrollView
+      style={{ flex: 1, backgroundColor: theme.bg }}
+      contentContainerStyle={{
+        flexGrow: 1,
+        width: "100%",
+        maxWidth: 720,
+        alignSelf: "center",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: 24,
+      }}
+      showsVerticalScrollIndicator={false}
+    >
       {/* Decorative rotating rings */}
       <Animated.View style={[styles.decorativeRing, rotationStyle]} />
 
@@ -226,6 +245,6 @@ export const DebriefView = ({
           <Icon name="ArrowRight2" size={20} color="#FFF" variant="Bold" />
         </TouchableOpacity>
       </Animated.View>
-    </View>
+    </ScrollView>
   );
 };

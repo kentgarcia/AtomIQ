@@ -84,7 +84,13 @@ export const LabView = ({
               <Icon name="Microscope" size={18} color="#FFF" variant="Bold" />
               <Text style={labStyles.badgeText}>LAB</Text>
             </View>
-            <TouchableOpacity style={labStyles.speakerBtn} onPress={speakTask}>
+            <TouchableOpacity
+              style={labStyles.speakerBtn}
+              onPress={speakTask}
+              hitSlop={8}
+              accessibilityRole="button"
+              accessibilityLabel={isSpeaking ? "Stop reading lab task" : "Read lab task aloud"}
+            >
               <Icon
                 name={isSpeaking ? "VolumeSlash" : "VolumeHigh"}
                 size={20}
@@ -243,7 +249,12 @@ export const LabView = ({
       {/* Bottom Buttons */}
       <View style={labStyles.navRow}>
         {onBack && !showFeedback && (
-          <TouchableOpacity style={labStyles.backBtn} onPress={onBack}>
+          <TouchableOpacity
+            style={labStyles.backBtn}
+            onPress={onBack}
+            accessibilityRole="button"
+            accessibilityLabel="Go back"
+          >
             <Icon
               name="ArrowLeft2"
               size={20}

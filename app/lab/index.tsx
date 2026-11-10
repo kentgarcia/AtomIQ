@@ -236,6 +236,9 @@ function SliderRow({
         <TouchableOpacity
           style={styles.sliderDec}
           activeOpacity={0.8}
+          hitSlop={6}
+          accessibilityRole="button"
+          accessibilityLabel={`Decrease ${label}`}
           onPress={() => {
             impactLight();
             dec();
@@ -250,6 +253,9 @@ function SliderRow({
         <TouchableOpacity
           style={styles.sliderDec}
           activeOpacity={0.8}
+          hitSlop={6}
+          accessibilityRole="button"
+          accessibilityLabel={`Increase ${label}`}
           onPress={() => {
             impactLight();
             inc();

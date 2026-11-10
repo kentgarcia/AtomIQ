@@ -319,7 +319,7 @@ export default function CommunityScreen() {
           <Text style={styles.galleryCategory}>
             {(item.category || "News").toUpperCase()}
           </Text>
-          <Text style={styles.galleryTitle} numberOfLines={2}>
+          <Text style={styles.galleryTitle}>
             {item.title}
           </Text>
           <View style={styles.galleryMeta}>

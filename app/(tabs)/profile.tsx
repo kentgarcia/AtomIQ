@@ -383,6 +383,10 @@ export default function ProfileScreen() {
             <TouchableOpacity
               style={styles.levelPill}
               activeOpacity={0.85}
+              hitSlop={4}
+              accessibilityRole="button"
+              accessibilityLabel={showTitleProgress ? "Hide title progress" : "Show title progress"}
+              accessibilityState={{ expanded: showTitleProgress }}
               onPress={() => setShowTitleProgress((v) => !v)}
             >
               <Icon name="Crown" size={14} color="#FFFFFF" variant="Bold" />
@@ -398,6 +402,9 @@ export default function ProfileScreen() {
               style={styles.flipCornerBtn}
               onPress={toggleFlip}
               activeOpacity={0.85}
+              hitSlop={4}
+              accessibilityRole="button"
+              accessibilityLabel="Flip profile card"
             >
               <Icon name="ChartSquare" size={19} color="#FF8C00" variant="Bold" />
             </TouchableOpacity>
@@ -635,7 +642,6 @@ export default function ProfileScreen() {
                     styles.badgeLabel,
                     !award.unlocked && styles.badgeLabelLocked,
                   ]}
-                  numberOfLines={1}
                 >
                   {award.title}
                 </Text>
@@ -781,6 +787,9 @@ export default function ProfileScreen() {
                 onPress={() => setEditModalVisible(false)}
                 style={styles.closeButtonNew}
                 activeOpacity={0.85}
+                hitSlop={6}
+                accessibilityRole="button"
+                accessibilityLabel="Close edit profile"
               >
                 <Icon name="CloseCircle" size={20} color="#9CA3AF" variant="Bold" />
               </TouchableOpacity>
@@ -801,7 +810,7 @@ export default function ProfileScreen() {
                   </View>
                 </View>
                 <View style={{ flex: 1 }}>
-                  <Text style={styles.previewName} numberOfLines={1}>
+                  <Text style={styles.previewName}>
                     {profileName.trim() || "Your name"}
                   </Text>
                   <Text style={styles.previewTitle}>{userTitle}</Text>
@@ -837,6 +846,9 @@ export default function ProfileScreen() {
                     onPress={() => setProfileName("")}
                     style={styles.clearButton}
                     activeOpacity={0.7}
+                    hitSlop={8}
+                    accessibilityRole="button"
+                    accessibilityLabel="Clear display name"
                   >
                     <Icon name="CloseCircle" size={18} color="#C9CDD3" variant="Bold" />
                   </TouchableOpacity>
@@ -880,6 +892,9 @@ export default function ProfileScreen() {
                         isSelected && styles.avatarModalOptionSelected,
                         isSavingProfile && styles.avatarModalOptionDisabled,
                       ]}
+                      accessibilityRole="button"
+                      accessibilityLabel={`Avatar option ${index + 1}`}
+                      accessibilityState={{ selected: isSelected, disabled: isSavingProfile }}
                       onPress={() => {
                         impactLight();
                         setPendingAvatarKey(avatarOption.key);
@@ -1352,6 +1367,7 @@ const createStyles = (theme: Palette, isDark: boolean) => {
       fontSize: 16,
       fontFamily: fontFamilies.heavy,
       color: P.text,
+      fontVariant: ["tabular-nums"],
     },
     streakSub: {
       fontSize: 12,

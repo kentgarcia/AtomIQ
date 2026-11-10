@@ -85,6 +85,9 @@ export function LessonPreview({
       <TouchableOpacity
         style={[styles.closeBtn, { backgroundColor: LP.card }]}
         onPress={onClose}
+        hitSlop={4}
+        accessibilityRole="button"
+        accessibilityLabel="Close lesson preview"
       >
         <Icon name="Close" size={22} color={isDark ? LP.textMuted : "#888888"} />
       </TouchableOpacity>

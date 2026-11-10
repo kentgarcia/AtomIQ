@@ -220,7 +220,7 @@ export default function EncyclopediaScreen() {
                         <Text style={[styles.catPillText, { color: cfg.border }]}>{cfg.label}</Text>
                       </View>
                     </View>
-                    <Text style={[styles.def, isDark && { color: theme.palettes.explorer.textMuted }]} numberOfLines={2}>
+                    <Text style={[styles.def, isDark && { color: theme.palettes.explorer.textMuted }]}>
                       {entry.definition}
                     </Text>
                     {entry.quickFacts.length > 0 && (

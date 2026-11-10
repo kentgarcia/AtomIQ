@@ -887,6 +887,7 @@ const createStyles = (theme: Palette, isDark: boolean) => {
       color: "#E67E22",
       fontFamily: fontFamilies.heavy,
       fontSize: 14,
+      fontVariant: ["tabular-nums"],
     },
     stickyLayer: {
       position: "absolute",

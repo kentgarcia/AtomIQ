@@ -454,7 +454,7 @@ function LandingDashboard({ ctx, content, userProfile, onEnterChat, onDirectNav 
               {weakChips.map((q: any) => (
                 <View key={q.id} style={[styles.weakRow, { backgroundColor: P.soft, borderColor: P.softBorder }]}>
                   <View style={[styles.weakIcon, { backgroundColor: P.creamTint }]}><Icon name="Refresh" size={14} color="#E67E22" variant="Bold" /></View>
-                  <Text style={[styles.weakText, { color: P.text }]} numberOfLines={1}>{q.title}</Text>
+                  <Text style={[styles.weakText, { color: P.text }]}>{q.title}</Text>
                   <Pressable onPress={() => onEnterChat("review")} style={({ pressed }) => [styles.weakBtn, { backgroundColor: P.card, borderColor: P.border, opacity: pressed ? 0.8 : 1 }]}><Text style={[styles.weakBtnText, { color: P.text }]}>Fix</Text></Pressable>
                 </View>
               ))}

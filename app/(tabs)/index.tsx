@@ -596,6 +596,8 @@ const handleScroll = useCallback(
       <TouchableOpacity
         style={[styles.actionBtnFace, { backgroundColor: color }]}
         activeOpacity={0.85}
+        accessibilityRole="button"
+        accessibilityLabel={label}
         onPress={onPress}
       >
         <Icon name={icon} size={15} color="#FFFFFF" variant="Bold" />
@@ -685,7 +687,7 @@ const handleScroll = useCallback(
                 <View
                   style={[styles.unitDividerLine, { backgroundColor: pathStroke }]}
                 />
-                <Text style={styles.unitDividerText} numberOfLines={1}>
+                <Text style={styles.unitDividerText}>
                   {unit.title}
                 </Text>
                 <View
@@ -799,10 +801,10 @@ const handleScroll = useCallback(
                         entering={reducedMotion ? FadeIn.duration(120) : FadeIn.duration(200)}
                         exiting={FadeOut.duration(150)}
                       >
-                        <Text style={styles.unitSubtitle} numberOfLines={1}>
+                        <Text style={styles.unitSubtitle}>
                           {activeUnit.subtitle}
                         </Text>
-                        <Text style={styles.unitTitle} numberOfLines={2}>
+                        <Text style={styles.unitTitle}>
                           {activeUnit.title}
                         </Text>
                       </Animated.View>
@@ -813,6 +815,12 @@ const handleScroll = useCallback(
                         infoOpen && styles.infoBtnActive,
                       ]}
                       disabled={activeUnit.isLocked}
+                      hitSlop={6}
+                      accessibilityRole="button"
+                      accessibilityLabel={
+                        infoOpen ? "Hide unit details" : "Show unit details"
+                      }
+                      accessibilityState={{ disabled: activeUnit.isLocked }}
                       onPress={() => {
                         if (activeUnit.isLocked) return;
                         setDailyPanel(null);
@@ -941,10 +949,10 @@ const handleScroll = useCallback(
                       />
                     </View>
                     <View style={styles.missionInfo}>
-                      <Text style={styles.missionTitle} numberOfLines={1}>
+                      <Text style={styles.missionTitle}>
                         {mission.title}
                       </Text>
-                      <Text style={styles.missionDesc} numberOfLines={1}>
+                      <Text style={styles.missionDesc}>
                         {mission.description}
                       </Text>
                     </View>
@@ -1023,7 +1031,7 @@ const handleScroll = useCallback(
                       {dailyFact?.kind === "myth" ? "MYTH" : "DAILY FACT"}
                     </Text>
                   </View>
-                  <Text style={styles.factTitle} numberOfLines={1}>
+                  <Text style={styles.factTitle}>
                     {dailyFact?.title ?? "Loading today's fact..."}
                   </Text>
                 </View>
@@ -1071,6 +1079,9 @@ const handleScroll = useCallback(
                   <TouchableOpacity
                     style={styles.factReadBtn}
                     activeOpacity={0.85}
+                    hitSlop={4}
+                    accessibilityRole="button"
+                    accessibilityLabel="Read and claim daily fact"
                     onPress={() => void handleMarkFactRead()}
                   >
                     <Icon name="Book" size={17} color="#FFFFFF" variant="Bold" />
@@ -1087,6 +1098,7 @@ const handleScroll = useCallback(
       <TouchableOpacity
         style={[styles.betaFab, { bottom: insets.bottom + 130 }]}
         activeOpacity={0.85}
+        hitSlop={4}
         onPress={() => setBetaNoticeVisible(true)}
         accessibilityRole="button"
         accessibilityLabel="Open beta information and feedback"
@@ -1105,6 +1117,9 @@ const handleScroll = useCallback(
               <TouchableOpacity
                 style={styles.nextBtnInner}
                 activeOpacity={0.85}
+                hitSlop={6}
+                accessibilityRole="button"
+                accessibilityLabel="Jump to current lesson"
                 onPress={scrollToCurrent}
               >
                 <Icon
@@ -1451,6 +1466,7 @@ const createStyles = (theme: Palette, isDark: boolean) => {
       fontSize: 13,
       fontFamily: fontFamilies.heavy,
       color: "#FFFFFF",
+      fontVariant: ["tabular-nums"],
     },
     /* Lesson card — its own separate card design nested in the header bar */
     nowCard: {

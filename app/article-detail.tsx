@@ -7,6 +7,7 @@ import { openExternalUrl } from "@/services/open-url";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
+    Alert,
     Image,
     ScrollView,
     StyleSheet,
@@ -83,8 +84,13 @@ export default function ArticleDetailScreen() {
   }
 
   const handleOpenSource = async () => {
-    if (article.sourceUrl) {
-      await openExternalUrl(article.sourceUrl);
+    if (!article.sourceUrl) return;
+    const opened = await openExternalUrl(article.sourceUrl);
+    if (!opened) {
+      Alert.alert(
+        "Unable to open link",
+        "No browser is available right now. Please try again in a moment.",
+      );
     }
   };
 

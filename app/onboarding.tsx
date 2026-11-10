@@ -132,6 +132,7 @@ export default function Onboarding() {
             onPress={() => void toggleTheme()}
             style={[styles.themeToggle, { top: insets.top + 12 }]}
             activeOpacity={0.85}
+            hitSlop={6}
             accessibilityRole="button"
             accessibilityLabel={`Switch to ${isDark ? "light" : "dark"} mode`}
         >
@@ -452,6 +453,9 @@ export default function Onboarding() {
                                     onPress={() => setUsername("")}
                                     style={styles.clearBtn}
                                     activeOpacity={0.7}
+                                    hitSlop={8}
+                                    accessibilityRole="button"
+                                    accessibilityLabel="Clear display name"
                                 >
                                     <Icon name="CloseCircle" size={18} color={P.clearIcon} variant="Bold" />
                                 </TouchableOpacity>
@@ -478,6 +482,9 @@ export default function Onboarding() {
                                         key={option.key}
                                         style={[styles.avatarOption, isSelected && styles.avatarOptionSelected]}
                                         activeOpacity={0.85}
+                                        accessibilityRole="button"
+                                        accessibilityLabel={`Choose avatar ${option.key}`}
+                                        accessibilityState={{ selected: isSelected }}
                                         onPress={() => {
                                             impactLight();
                                             setAvatarKey(option.key);

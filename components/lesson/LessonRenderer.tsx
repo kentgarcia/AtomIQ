@@ -290,6 +290,9 @@ export const MythBusterRenderer = ({
                     )
                   }
                   style={mythStyles.speakBtnSmall}
+                  hitSlop={8}
+                  accessibilityRole="button"
+                  accessibilityLabel="Read feedback aloud"
                 >
                   <Icon
                     name="VolumeHigh"
@@ -382,6 +385,9 @@ export const MythBusterRenderer = ({
                   isSpeaking && mythStyles.speakBtnActive,
                 ]}
                 onPress={speakMyth}
+                hitSlop={4}
+                accessibilityRole="button"
+                accessibilityLabel={isSpeaking ? "Stop reading myth" : "Read myth aloud"}
               >
                 <Icon
                   name={isSpeaking ? "VolumeSlash" : "VolumeHigh"}
