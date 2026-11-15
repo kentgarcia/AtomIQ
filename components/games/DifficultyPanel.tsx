@@ -152,6 +152,7 @@ export function DifficultyPanel({
                         delay={item.delay}
                         height={cardH}
                         onPress={item.onPress}
+                        animateIn={false}
                     />
                 ))}
             </View>

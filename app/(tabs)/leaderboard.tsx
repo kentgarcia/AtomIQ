@@ -1,6 +1,6 @@
 import { Icon } from "@/components/ui/icon";
 import { useTabBarInset } from "@/components/layout";
-import {useTheme, type Palette, fontFamilies, useResponsiveLayout} from "@/theme";
+import {useTheme, type Theme, fontFaces, useResponsiveLayout} from "@/theme";
 import {
     getLeaderboardSnapshot,
     getLeaderboardSnapshotUpdatedAt,
@@ -142,6 +142,7 @@ const CircleAvatar = ({
   isUser?: boolean;
   isNPC?: boolean;
 }) => {
+  const { theme } = useTheme();
   if (uri) {
     const isRemote = uri.startsWith("http://") || uri.startsWith("https://");
     if (isRemote) {
@@ -174,7 +175,7 @@ const CircleAvatar = ({
           borderWidth,
           borderColor,
           overflow: "hidden",
-          backgroundColor: "#FFF",
+          backgroundColor: theme.colors.card,
         }}
       >
         <Image
@@ -195,7 +196,7 @@ const CircleAvatar = ({
         borderWidth,
         borderColor,
         overflow: "hidden",
-        backgroundColor: "#FFF",
+        backgroundColor: theme.colors.card,
       }}
     >
       <Image
@@ -211,11 +212,11 @@ export default function LeaderboardScreen() {
   const { userProfile, isDatabaseReady } = useStorage();
   const { theme } = useTheme();
   const router = useRouter();
-  const THEME = theme.palettes.tab;
-  const isDark = theme.mode === "dark";
-  const styles = useMemo(() => createStyles(THEME, isDark), [THEME, isDark]);
+  const styles = useMemo(() => createStyles(theme), [theme]);
   const bgColors: [string, string] =
-    theme.mode === "dark" ? [THEME.bg, THEME.bg] : ["#FFF3E0", "#FFFFFF"];
+    theme.mode === "dark"
+      ? [theme.colors.background, theme.colors.background]
+      : [theme.colors.pageGradientTop, theme.colors.pageGradientBottom];
   const pulse = useSharedValue(1);
   const reducedMotion = useReducedMotion();
   const [leaderboardData, setLeaderboardData] = useState<LeaderboardEntry[]>(
@@ -377,7 +378,7 @@ export default function LeaderboardScreen() {
           { alignItems: "center", justifyContent: "center" },
         ]}
       >
-        <Text style={{ color: THEME.textMuted }}>
+        <Text style={{ color: theme.colors.textMuted }}>
           {loading ? "Loading leaderboard..." : "Preparing leaderboard..."}
         </Text>
       </View>
@@ -427,10 +428,10 @@ export default function LeaderboardScreen() {
                     isUser={topThree[1].isUser}
                     isNPC={topThree[1].isNPC}
                     size={70}
-                    borderColor="#E5E7EB"
+                    borderColor={theme.colors.border}
                   />
                 <View
-                  style={[styles.rankBadge, { backgroundColor: "#C0C0C0" }]}
+                  style={[styles.rankBadge, { backgroundColor: "#C0C0C0" }]} // theme-allow: silver podium medal
                 >
                   <Text style={[styles.rankText, { color: "#FFF" }]}>2</Text>
                 </View>
@@ -523,18 +524,18 @@ export default function LeaderboardScreen() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            tintColor={THEME.primary}
+            tintColor={theme.colors.primary}
           />
         }
       >
         {error && (
           <View style={{ paddingHorizontal: 20, marginBottom: 12 }}>
-            <Text style={{ color: THEME.textMuted }}>{error}</Text>
+            <Text style={{ color: theme.colors.textMuted }}>{error}</Text>
           </View>
         )}
         {lastUpdatedAt && (
           <View style={{ paddingHorizontal: 20, marginBottom: 12 }}>
-            <Text style={{ color: THEME.textMuted }}>
+            <Text style={{ color: theme.colors.textMuted }}>
               Last updated {new Date(lastUpdatedAt).toLocaleTimeString()}
             </Text>
           </View>
@@ -549,7 +550,7 @@ export default function LeaderboardScreen() {
               <Text
                 style={[
                   styles.listRankText,
-                  user.isUser && { color: THEME.primary },
+                  user.isUser && { color: theme.colors.primary },
                 ]}
               >
                 {user.rank}
@@ -561,7 +562,7 @@ export default function LeaderboardScreen() {
                   isUser={user.isUser}
                   isNPC={user.isNPC}
                   size={40}
-                  borderColor={user.isUser ? THEME.primary : "transparent"}
+                  borderColor={user.isUser ? theme.colors.primary : "transparent"}
                   borderWidth={user.isUser ? 2 : 0}
                 />
                 {user.isNPC && (
@@ -580,7 +581,7 @@ export default function LeaderboardScreen() {
                 <Text
                   style={[
                     styles.listName,
-                    user.isUser && { color: THEME.primary },
+                    user.isUser && { color: theme.colors.primary },
                   ]}
                 >
                   {user.name} {user.isUser && "(You)"}
@@ -592,7 +593,7 @@ export default function LeaderboardScreen() {
                 <Text
                   style={[
                     styles.xpText,
-                    user.isUser && { color: THEME.primary },
+                    user.isUser && { color: theme.colors.primary },
                   ]}
                 >
                   {user.xp.toLocaleString()} XP
@@ -633,10 +634,10 @@ export default function LeaderboardScreen() {
                 />
               </View>
               <View style={styles.listInfo}>
-                <Text style={[styles.listName, { color: "#333333" }]}>
+                <Text style={[styles.listName, { color: theme.colors.text }]}>
                   {userRank.name}
                 </Text>
-                <Text style={[styles.listTitle, { color: "#9CA3AF" }]}>
+                <Text style={[styles.listTitle, { color: theme.colors.textFaint }]}>
                   {userRank.title}
                 </Text>
               </View>
@@ -654,27 +655,13 @@ export default function LeaderboardScreen() {
   );
 }
 
-const createStyles = (theme: Palette, isDark: boolean) => {
+const createStyles = (theme: Theme) => {
   /* Mode-aware neutral surfaces — amber header identity stays in both modes */
-  const P = isDark
-    ? {
-        card: "#213356",
-        border: "#2D3A56",
-        creamTint: "#4A381B",
-        text: "#F6F9FC",
-        muted: "#8898AA",
-      }
-    : {
-        card: "#FFFFFF",
-        border: "#E5E7EB",
-        creamTint: "#FFF3E0",
-        text: "#333333",
-        muted: "#9CA3AF",
-      };
+  const P = theme.palettes.ui;
   return StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: theme.bg,
+      backgroundColor: P.background,
     },
     bgGradient: {
       position: "absolute",
@@ -694,7 +681,7 @@ const createStyles = (theme: Palette, isDark: boolean) => {
       padding: 10,
       gap: 10,
       elevation: 4,
-      shadowColor: "#000000",
+      shadowColor: theme.colors.shadow,
       shadowOffset: { width: 0, height: 3 },
       shadowOpacity: 0.1,
       shadowRadius: 6,
@@ -728,15 +715,15 @@ const createStyles = (theme: Palette, isDark: boolean) => {
       flexDirection: "row",
       alignItems: "center",
       gap: 6,
-      backgroundColor: "#434343",
+      backgroundColor: theme.colors.inverseSurface,
       paddingHorizontal: 14,
       height: 40,
       borderRadius: 14,
     },
     headerTitle: {
-      color: "#FFFFFF",
+      color: theme.colors.inverseText,
       fontSize: 14,
-      fontFamily: fontFamilies.bold,
+      ...fontFaces.bold,
     },
     podiumCard: {
       backgroundColor: P.card,
@@ -782,30 +769,30 @@ const createStyles = (theme: Palette, isDark: boolean) => {
       justifyContent: "center",
       alignItems: "center",
       borderWidth: 2,
-      borderColor: "#FFF",
+      borderColor: theme.colors.card,
       zIndex: 5,
     },
     rankText: {
       color: "#FFF",
       fontSize: 12,
-      fontFamily: fontFamilies.heavy,
+      ...fontFaces.heavy,
     },
     podiumName: {
       color: P.text,
-      fontFamily: fontFamilies.bold,
+      ...fontFaces.bold,
       fontSize: 12,
       marginTop: 6,
       textAlign: "center",
     },
     podiumNameLarge: {
       fontSize: 14,
-      fontFamily: fontFamilies.heavy,
+      ...fontFaces.heavy,
       color: P.text,
     },
     podiumXP: {
       color: "#E67E22",
       fontSize: 11,
-      fontFamily: fontFamilies.bold,
+      ...fontFaces.bold,
       marginTop: 2,
       flexDirection: "row",
       alignItems: "center",
@@ -825,7 +812,7 @@ const createStyles = (theme: Palette, isDark: boolean) => {
       borderColor: P.border,
       borderBottomWidth: 4,
       elevation: 2,
-      shadowColor: "#000",
+      shadowColor: theme.colors.shadow,
       shadowOffset: { width: 0, height: 2 },
       shadowOpacity: 0.05,
       shadowRadius: 4,
@@ -836,7 +823,7 @@ const createStyles = (theme: Palette, isDark: boolean) => {
     },
     listRankText: {
       color: P.muted,
-      fontFamily: fontFamilies.heavy,
+      ...fontFaces.heavy,
       fontSize: 16,
       width: 30,
       textAlign: "center",
@@ -856,13 +843,13 @@ const createStyles = (theme: Palette, isDark: boolean) => {
     },
     listName: {
       color: P.text,
-      fontFamily: fontFamilies.heavy,
+      ...fontFaces.heavy,
       fontSize: 15,
     },
     listTitle: {
       color: P.muted,
       fontSize: 12,
-      fontFamily: fontFamilies.semibold,
+      ...fontFaces.semibold,
       marginTop: 2,
     },
     npcBadge: {
@@ -872,7 +859,7 @@ const createStyles = (theme: Palette, isDark: boolean) => {
       width: 18,
       height: 18,
       borderRadius: 9,
-      backgroundColor: "#FFF",
+      backgroundColor: theme.colors.card,
       alignItems: "center",
       justifyContent: "center",
       borderWidth: 1,
@@ -885,7 +872,7 @@ const createStyles = (theme: Palette, isDark: boolean) => {
     },
     xpText: {
       color: "#E67E22",
-      fontFamily: fontFamilies.heavy,
+      ...fontFaces.heavy,
       fontSize: 14,
       fontVariant: ["tabular-nums"],
     },
@@ -901,7 +888,7 @@ const createStyles = (theme: Palette, isDark: boolean) => {
       borderRadius: 20,
       overflow: "hidden",
       elevation: 8,
-      shadowColor: "#000",
+      shadowColor: theme.colors.shadow,
       shadowOffset: { width: 0, height: 4 },
       shadowOpacity: 0.15,
       shadowRadius: 8,

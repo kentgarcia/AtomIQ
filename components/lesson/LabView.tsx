@@ -9,9 +9,12 @@ import {
     View,
 } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
-import { speakSafely, stopSpeech } from "@/services/speech";
+import { readAloud } from "@/services/media";
+import { buildFeedbackSpeech, buildQuestionSpeech } from "@/services/media-core";
+import { playAnswerSfx } from "@/services/game-sfx";
+import { ReadAloudButton } from "@/components/ui/read-aloud-button";
 
-import {type Palette, fontFamilies} from "@/theme";
+import {type Palette, fontFaces} from "@/theme";
 import { Icon } from "@/components/ui/icon";
 
 import { createLabStyles, createStyles } from "./styles";
@@ -21,15 +24,17 @@ export const LabView = ({
   onComplete,
   onBack,
   theme,
+  source,
 }: {
   data: any;
   onComplete: () => void;
   onBack?: () => void;
   theme: Palette;
+  /** Optional lesson/step identity included in icon diagnostics. */
+  source?: string;
 }) => {
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [showFeedback, setShowFeedback] = useState(false);
-  const [isSpeaking, setIsSpeaking] = useState(false);
   const scrollViewRef = useRef<ScrollViewInstance>(null);
   const { width } = useWindowDimensions();
   const styles = useMemo(() => createStyles(theme, width), [theme, width]);
@@ -40,8 +45,12 @@ export const LabView = ({
     setSelectedOption(optionId);
   };
 
+  const readAloudOwner = `lab:${data.title ?? ""}:${data.task ?? ""}`;
+
   const handleCheck = () => {
     if (!selectedOption) return;
+    readAloud.stop("answered", readAloudOwner);
+    void playAnswerSfx(selectedOption === data.correctAnswer);
     setShowFeedback(true);
     // Auto-scroll to feedback after a short delay
     setTimeout(() => {
@@ -50,21 +59,6 @@ export const LabView = ({
   };
 
   const isCorrect = selectedOption === data.correctAnswer;
-
-  const speakTask = () => {
-    if (isSpeaking) {
-      stopSpeech();
-      setIsSpeaking(false);
-    } else {
-      setIsSpeaking(true);
-      speakSafely(data.task, {
-        language: "en",
-        rate: 0.9,
-        onDone: () => setIsSpeaking(false),
-        onStopped: () => setIsSpeaking(false),
-      });
-    }
-  };
 
   return (
     <View style={styles.stepContainer}>
@@ -84,19 +78,19 @@ export const LabView = ({
               <Icon name="Microscope" size={18} color="#FFF" variant="Bold" />
               <Text style={labStyles.badgeText}>LAB</Text>
             </View>
-            <TouchableOpacity
-              style={labStyles.speakerBtn}
-              onPress={speakTask}
-              hitSlop={8}
-              accessibilityRole="button"
-              accessibilityLabel={isSpeaking ? "Stop reading lab task" : "Read lab task aloud"}
-            >
-              <Icon
-                name={isSpeaking ? "VolumeSlash" : "VolumeHigh"}
-                size={20}
-                color={isSpeaking ? "#FFF" : "#8B5CF6"}
-              />
-            </TouchableOpacity>
+            <ReadAloudButton
+              ownerId={readAloudOwner}
+              subject={showFeedback ? "explanation" : "lab task"}
+              accent="#8B5CF6"
+              text={() =>
+                showFeedback
+                  ? buildFeedbackSpeech(isCorrect, data.explanation)
+                  : buildQuestionSpeech(
+                      data.task,
+                      (data.options ?? []).map((o: any) => o.label ?? String(o.id)),
+                    )
+              }
+            />
           </View>
 
           <Image
@@ -147,7 +141,12 @@ export const LabView = ({
                     ]}
                   >
                     <Icon
-                      name={option.icon as any}
+                      name={option.icon}
+                      source={
+                        source
+                          ? `${source} option:${option.id}`
+                          : `lab-option:${option.id}`
+                      }
                       size={28}
                       color={
                         showCorrectMark
@@ -167,15 +166,15 @@ export const LabView = ({
                       isSelected &&
                         !showFeedback && {
                           color: theme.primary,
-                          fontFamily: fontFamilies.bold,
+                          ...fontFaces.bold,
                         },
                       showCorrectMark && {
                         color: theme.success,
-                        fontFamily: fontFamilies.bold,
+                        ...fontFaces.bold,
                       },
                       showWrongMark && {
                         color: theme.error,
-                        fontFamily: fontFamilies.bold,
+                        ...fontFaces.bold,
                       },
                     ]}
                   >

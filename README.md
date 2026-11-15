@@ -101,7 +101,7 @@ Customize your avatar and display name, choose light/dark/system themes, control
 | Data | Expo SQLite for bundled content and local app state; AsyncStorage for lightweight preferences |
 | UI and motion | Custom components, React Native Reanimated 4, Gesture Handler, SVG, Linear Gradient, Expo Image |
 | Feedback | Expo Audio, Expo Speech, Expo Haptics |
-| Typography | Bundled SNPro font family |
+| Typography | Bundled Intern variable font (`wght` 100–900) |
 | Builds | EAS Build; preview APKs and production Android App Bundles |
 
 ## Project map

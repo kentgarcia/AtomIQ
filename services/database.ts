@@ -1266,6 +1266,8 @@ export const deleteAccountData = async () => {
     "levels",
     "units",
     "daily_activity",
+    "activity_days",
+    "activity_meta",
     "achievements",
     "leaderboard",
     "game_scores",

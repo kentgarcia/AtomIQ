@@ -30,3 +30,13 @@ The `index.ts` facades keep the app's import surface (`@/content/lessons`,
 
 Transient `-wal` / `-shm` files next to a `.db` are SQLite sidecars; they are
 gitignored and safe to delete when no process has the database open.
+
+## Quality gates
+
+- `npm run validate:content` checks every learner-facing question and the
+  article/research metadata (see `docs/CONTENT_QUESTION_QUALITY.md` and
+  `docs/ARTICLE_PIPELINE.md`). Run it before `sync-content`.
+- `npm run test:content` unit-tests the rules.
+- Repeatable content migrations live in `scripts/content-migration/`
+  (`fix-question-context.mjs`, `add-article-pipeline.mjs`,
+  `add-beginner-articles.mjs`).

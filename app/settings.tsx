@@ -1,22 +1,19 @@
 import { Icon } from "@/components/ui/icon";
+import { GrowCard, GrowModal, useModalOrigin } from "@/components/ui/grow-modal";
 import { BETA_FEEDBACK_FORM_URL } from "@/constants/beta";
 import { openExternalUrl } from "@/services/open-url";
-import {useTheme, type Palette, fontFamilies, useResponsiveLayout} from "@/theme";
+import {useTheme, createStyles, fontFaces, useResponsiveLayout, withAlpha} from "@/theme";
 import { deleteAccountData, getUserProfile } from "@/services/database";
 import { contentRepository, getContentDbStatus } from "@/services/content-db";
 import { setHapticsGate } from "@/services/haptics";
-import {
-  getHapticsEnabled,
-  getSoundEnabled,
-  setHapticsEnabled,
-  setSoundEnabled,
-} from "@/services/storage";
+import { getHapticsEnabled, setHapticsEnabled } from "@/services/storage";
+import { setMediaPreference } from "@/services/media";
+import { useMediaPreferences } from "@/hooks/use-read-aloud";
 import { useStorage } from "@/services/StorageContext";
-import { setUiSfxEnabled } from "@/services/ui-sfx";
 import Constants from "expo-constants";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
     ActivityIndicator,
     Alert,
@@ -26,12 +23,12 @@ import {
     Modal,
     Platform,
     ScrollView,
-    StyleSheet,
     Switch,
     Text,
     TextInput,
     TouchableOpacity,
     View,
+    type ImageStyle,
 } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -44,11 +41,13 @@ export default function SettingsScreen() {
   const insets = useSafeAreaInsets();
   const { userProfile } = useStorage();
   const { theme, isDark, toggleTheme } = useTheme();
-  const THEME = theme.palettes.settings;
-  const [soundEffects, setSoundEffects] = useState(true);
+  const accent = theme.palettes.settings.primary;
+  // Sound effects + Read Aloud come from the one shared media preference store.
+  const { soundEffects, readAloud: readAloudEnabled } = useMediaPreferences();
   const [haptics, setHaptics] = useState(true);
   const [isDeletingAccount, setIsDeletingAccount] = useState(false);
   const [versionModalVisible, setVersionModalVisible] = useState(false);
+  const { anchor: versionAnchor, origin: versionOrigin, capture: versionCapture } = useModalOrigin();
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [confirmText, setConfirmText] = useState("");
 
@@ -124,12 +123,8 @@ export default function SettingsScreen() {
 
     const loadPreferences = async () => {
       try {
-        const [soundEnabled, hapticsEnabled] = await Promise.all([
-          getSoundEnabled(),
-          getHapticsEnabled(),
-        ]);
+        const hapticsEnabled = await getHapticsEnabled();
         if (mounted) {
-          setSoundEffects(soundEnabled);
           setHaptics(hapticsEnabled);
           setHapticsGate(hapticsEnabled);
         }
@@ -150,9 +145,11 @@ export default function SettingsScreen() {
   }, [deleteModalVisible]);
 
   const handleSoundEffectsToggle = (enabled: boolean) => {
-    setSoundEffects(enabled);
-    setUiSfxEnabled(enabled);
-    void setSoundEnabled(enabled);
+    setMediaPreference("soundEffects", enabled);
+  };
+
+  const handleReadAloudToggle = (enabled: boolean) => {
+    setMediaPreference("readAloud", enabled);
   };
 
   const handleHapticsToggle = (enabled: boolean) => {
@@ -209,11 +206,11 @@ export default function SettingsScreen() {
     setDeleteModalVisible(true);
   };
 
-  const styles = React.useMemo(() => createStyles(THEME), [THEME]);
+  const styles = useMemo(() => makeStyles(theme), [theme]);
   const { contentMaxWidth, gutter } = useResponsiveLayout();
 
   return (
-    <View style={{ flex: 1, backgroundColor: THEME.bg }}>
+    <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
       {/* Header */}
       <View
         style={[
@@ -234,7 +231,7 @@ export default function SettingsScreen() {
           accessibilityRole="button"
           accessibilityLabel="Go back"
         >
-          <Icon name="ArrowLeft2" size={24} color={THEME.text} />
+          <Icon name="ArrowLeft2" size={24} color={theme.colors.text} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Settings</Text>
         <View style={{ width: 40 }} />
@@ -262,7 +259,7 @@ export default function SettingsScreen() {
                 <Icon
                   name="Moon"
                   size={20}
-                  color={THEME.primary}
+                  color={accent}
                   variant="Bold"
                 />
                 <View>
@@ -275,8 +272,8 @@ export default function SettingsScreen() {
               <Switch
                 value={isDark}
                 onValueChange={toggleTheme}
-                trackColor={{ false: "#E5E5E5", true: THEME.primary }}
-                thumbColor="#FFFFFF"
+                trackColor={{ false: theme.colors.switchTrack, true: accent }}
+                thumbColor={theme.colors.onPrimary}
               />
             </View>
 
@@ -285,7 +282,7 @@ export default function SettingsScreen() {
                 <Icon
                   name="VolumeHigh"
                   size={20}
-                  color={THEME.primary}
+                  color={accent}
                   variant="Bold"
                 />
                 <View>
@@ -298,8 +295,31 @@ export default function SettingsScreen() {
               <Switch
                 value={soundEffects}
                 onValueChange={handleSoundEffectsToggle}
-                trackColor={{ false: "#E5E5E5", true: THEME.primary }}
-                thumbColor={soundEffects ? "#FFFFFF" : "#FFFFFF"}
+                trackColor={{ false: theme.colors.switchTrack, true: accent }}
+                thumbColor={theme.colors.onPrimary}
+              />
+            </View>
+
+            <View style={[styles.settingRow, styles.settingRowBorder]}>
+              <View style={styles.settingInfo}>
+                <Icon
+                  name="Microphone2"
+                  size={20}
+                  color={accent}
+                  variant="Bold"
+                />
+                <View>
+                  <Text style={styles.settingLabel}>Read Aloud</Text>
+                  <Text style={styles.settingDescription}>
+                    Show speaker buttons that read questions and lessons
+                  </Text>
+                </View>
+              </View>
+              <Switch
+                value={readAloudEnabled}
+                onValueChange={handleReadAloudToggle}
+                trackColor={{ false: theme.colors.switchTrack, true: accent }}
+                thumbColor={theme.colors.onPrimary}
               />
             </View>
 
@@ -308,7 +328,7 @@ export default function SettingsScreen() {
                 <Icon
                   name="Vibe"
                   size={20}
-                  color={THEME.primary}
+                  color={accent}
                   variant="Bold"
                 />
                 <View>
@@ -321,8 +341,8 @@ export default function SettingsScreen() {
               <Switch
                 value={haptics}
                 onValueChange={handleHapticsToggle}
-                trackColor={{ false: "#E5E5E5", true: THEME.primary }}
-                thumbColor={haptics ? "#FFFFFF" : "#FFFFFF"}
+                trackColor={{ false: theme.colors.switchTrack, true: accent }}
+                thumbColor={theme.colors.onPrimary}
               />
             </View>
           </View>
@@ -340,7 +360,7 @@ export default function SettingsScreen() {
                 <Icon
                   name="Message"
                   size={20}
-                  color={THEME.primary}
+                  color={accent}
                   variant="Bold"
                 />
                 <View>
@@ -350,25 +370,26 @@ export default function SettingsScreen() {
                   </Text>
                 </View>
               </View>
-              <Icon name="ArrowRight2" size={18} color={THEME.textMuted} />
+              <Icon name="ArrowRight2" size={18} color={theme.colors.textMuted} />
             </TouchableOpacity>
 
             <TouchableOpacity
               style={[styles.settingRow, styles.settingRowBorder]}
-              onPress={() => setVersionModalVisible(true)}
+              ref={versionAnchor}
+              onPress={() => versionCapture(() => setVersionModalVisible(true))}
             >
               <View style={styles.settingInfo}>
                 <Icon
                   name="InfoCircle"
                   size={20}
-                  color={THEME.primary}
+                  color={accent}
                   variant="Bold"
                 />
                 <Text style={styles.settingLabel}>App Version</Text>
               </View>
               <View style={styles.valueRow}>
                 <Text style={styles.settingValue}>{APP_VERSION}</Text>
-                <Icon name="ArrowRight2" size={18} color={THEME.textMuted} />
+                <Icon name="ArrowRight2" size={18} color={theme.colors.textMuted} />
               </View>
             </TouchableOpacity>
 
@@ -380,12 +401,12 @@ export default function SettingsScreen() {
                 <Icon
                   name="DocumentText"
                   size={20}
-                  color={THEME.primary}
+                  color={accent}
                   variant="Bold"
                 />
                 <Text style={styles.settingLabel}>Privacy Policy</Text>
               </View>
-              <Icon name="ArrowRight2" size={18} color={THEME.textMuted} />
+              <Icon name="ArrowRight2" size={18} color={theme.colors.textMuted} />
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -396,12 +417,12 @@ export default function SettingsScreen() {
                 <Icon
                   name="Shield"
                   size={20}
-                  color={THEME.primary}
+                  color={accent}
                   variant="Bold"
                 />
                 <Text style={styles.settingLabel}>Terms of Service</Text>
               </View>
-              <Icon name="ArrowRight2" size={18} color={THEME.textMuted} />
+              <Icon name="ArrowRight2" size={18} color={theme.colors.textMuted} />
             </TouchableOpacity>
           </View>
         </Animated.View>
@@ -416,7 +437,7 @@ export default function SettingsScreen() {
               disabled={isDeletingAccount}
             >
               <View style={styles.settingInfo}>
-                <Icon name="Trash" size={20} color="#EF4444" variant="Bold" />
+                <Icon name="Trash" size={20} color={theme.colors.error} variant="Bold" />
                 <View>
                   <Text style={styles.destructiveLabel}>Delete Account</Text>
                   <Text style={styles.settingDescription}>
@@ -425,9 +446,9 @@ export default function SettingsScreen() {
                 </View>
               </View>
               {isDeletingAccount ? (
-                <ActivityIndicator color="#EF4444" size="small" />
+                <ActivityIndicator color={theme.colors.error} size="small" />
               ) : (
-                <Icon name="ArrowRight2" size={18} color="#EF4444" />
+                <Icon name="ArrowRight2" size={18} color={theme.colors.error} />
               )}
             </TouchableOpacity>
           </View>
@@ -437,17 +458,13 @@ export default function SettingsScreen() {
       </ScrollView>
 
       {/* App Version Modal */}
-      <Modal
+      <GrowModal
         visible={versionModalVisible}
-        transparent
-        animationType="fade"
+        origin={versionOrigin}
         onRequestClose={() => setVersionModalVisible(false)}
       >
         <View style={styles.modalOverlay}>
-          <Animated.View
-            entering={FadeInDown.duration(300).springify()}
-            style={styles.modalCard}
-          >
+          <GrowCard style={styles.modalCard}>
             <View style={styles.dragHandle} />
 
             <View style={styles.modalHeader}>
@@ -465,14 +482,14 @@ export default function SettingsScreen() {
                 accessibilityRole="button"
                 accessibilityLabel="Close app version"
               >
-                <Icon name="CloseCircle" size={20} color="#9CA3AF" variant="Bold" />
+                <Icon name="CloseCircle" size={20} color={theme.colors.textFaint} variant="Bold" />
               </TouchableOpacity>
             </View>
 
             <View style={styles.modalHero}>
               <Image
                 source={require("@/assets/images/icon.png")}
-                style={styles.modalIcon}
+                style={styles.modalIcon as ImageStyle}
                 resizeMode="contain"
               />
               <Text style={styles.modalAppName}>AtomIQ</Text>
@@ -494,9 +511,9 @@ export default function SettingsScreen() {
                     {
                       backgroundColor: dataStatus
                         ? dataStatus.contentOk
-                          ? "#22C55E"
-                          : "#EF4444"
-                        : "#D1D5DB",
+                          ? theme.colors.success
+                          : theme.colors.error
+                        : theme.colors.borderStrong,
                     },
                   ]}
                 />
@@ -511,9 +528,9 @@ export default function SettingsScreen() {
                     {
                       backgroundColor: dataStatus
                         ? dataStatus.storageOk
-                          ? "#22C55E"
-                          : "#EF4444"
-                        : "#D1D5DB",
+                          ? theme.colors.success
+                          : theme.colors.error
+                        : theme.colors.borderStrong,
                     },
                   ]}
                 />
@@ -544,16 +561,16 @@ export default function SettingsScreen() {
               activeOpacity={0.85}
               onPress={() => setVersionModalVisible(false)}
             >
-              <Icon name="TickCircle" size={18} color="#FFFFFF" variant="Bold" />
+              <Icon name="TickCircle" size={18} color={theme.colors.onPrimary} variant="Bold" />
               <Text style={styles.modalPrimaryBtnText}>Got it</Text>
             </TouchableOpacity>
 
             <Text style={styles.modalCopyright}>
               © 2026 AtomIQ. All rights reserved.
             </Text>
-          </Animated.View>
+          </GrowCard>
         </View>
-      </Modal>
+      </GrowModal>
 
       {/* Delete Account Modal */}
       <Modal
@@ -576,7 +593,7 @@ export default function SettingsScreen() {
             <View style={styles.modalHeader}>
               <View style={styles.modalHeaderLeft}>
                 <View style={styles.deleteModalHeaderIcon}>
-                  <Icon name="Trash" size={16} color="#EF4444" variant="Bold" />
+                  <Icon name="Trash" size={16} color={theme.colors.error} variant="Bold" />
                 </View>
                 <Text style={styles.modalTitle}>Delete Account</Text>
               </View>
@@ -589,12 +606,12 @@ export default function SettingsScreen() {
                 accessibilityRole="button"
                 accessibilityLabel="Close delete account"
               >
-                <Icon name="CloseCircle" size={20} color="#9CA3AF" variant="Bold" />
+                <Icon name="CloseCircle" size={20} color={theme.colors.textFaint} variant="Bold" />
               </TouchableOpacity>
             </View>
 
             <View style={styles.deleteModalWarning}>
-              <Icon name="Danger" size={18} color="#EF4444" variant="Bold" />
+              <Icon name="Danger" size={18} color={theme.colors.error} variant="Bold" />
               <Text style={styles.deleteModalWarningText}>
                 This will permanently delete your account and all local data.
                 This action cannot be undone.
@@ -614,7 +631,7 @@ export default function SettingsScreen() {
               value={confirmText}
               onChangeText={setConfirmText}
               placeholder={deleteConfirmationPhrase}
-              placeholderTextColor="#C9CDD3"
+              placeholderTextColor={theme.colors.textFaint}
               autoCapitalize="none"
               autoCorrect={false}
             />
@@ -641,10 +658,10 @@ export default function SettingsScreen() {
                 disabled={!canConfirmDelete || isDeletingAccount}
               >
                 {isDeletingAccount ? (
-                  <ActivityIndicator color="#FFFFFF" size="small" />
+                  <ActivityIndicator color={theme.colors.onPrimary} size="small" />
                 ) : (
                   <>
-                    <Icon name="Trash" size={16} color="#FFFFFF" variant="Bold" />
+                    <Icon name="Trash" size={16} color={theme.colors.onPrimary} variant="Bold" />
                     <Text style={styles.deleteModalConfirmText}>Delete Forever</Text>
                   </>
                 )}
@@ -658,17 +675,17 @@ export default function SettingsScreen() {
   );
 }
 
-const createStyles = (theme: Palette) =>
-  StyleSheet.create({
+const makeStyles = createStyles((theme) => {
+  return {
     header: {
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "space-between",
       paddingHorizontal: 20,
       paddingBottom: 16,
-      backgroundColor: theme.card,
+      backgroundColor: theme.colors.card,
       borderBottomWidth: 1,
-      borderBottomColor: theme.border,
+      borderBottomColor: theme.colors.border,
     },
     backBtn: {
       width: 40,
@@ -679,28 +696,28 @@ const createStyles = (theme: Palette) =>
     },
     headerTitle: {
       fontSize: 18,
-      fontFamily: fontFamilies.bold,
-      color: theme.text,
+      ...fontFaces.bold,
+      color: theme.colors.text,
     },
     content: {
       padding: 20,
     },
     sectionTitle: {
       fontSize: 14,
-      fontFamily: fontFamilies.bold,
-      color: theme.textMuted,
+      ...fontFaces.bold,
+      color: theme.colors.textMuted,
       marginBottom: 12,
       marginTop: 8,
       textTransform: "uppercase",
       letterSpacing: 0.5,
     },
     settingsCard: {
-      backgroundColor: theme.card,
+      backgroundColor: theme.colors.card,
       borderRadius: 16,
       marginBottom: 24,
       overflow: "hidden",
       // Modern shadow
-      shadowColor: "#000",
+      shadowColor: theme.colors.shadow,
       shadowOffset: {
         width: 0,
         height: 2,
@@ -709,7 +726,7 @@ const createStyles = (theme: Palette) =>
       shadowRadius: 10,
       elevation: 2,
       borderWidth: 1,
-      borderColor: theme.border,
+      borderColor: theme.colors.border,
     },
     settingRow: {
       flexDirection: "row",
@@ -720,7 +737,7 @@ const createStyles = (theme: Palette) =>
     },
     settingRowBorder: {
       borderTopWidth: 1,
-      borderTopColor: theme.border,
+      borderTopColor: theme.colors.border,
     },
     settingInfo: {
       flexDirection: "row",
@@ -730,19 +747,19 @@ const createStyles = (theme: Palette) =>
     },
     settingLabel: {
       fontSize: 16,
-      fontFamily: fontFamilies.semibold,
-      color: theme.text,
+      ...fontFaces.semibold,
+      color: theme.colors.text,
     },
     settingDescription: {
       fontSize: 13,
-      fontFamily: fontFamilies.regular,
-      color: theme.textMuted,
+      ...fontFaces.regular,
+      color: theme.colors.textMuted,
       marginTop: 2,
     },
     settingValue: {
       fontSize: 15,
-      fontFamily: fontFamilies.medium,
-      color: theme.textMuted,
+      ...fontFaces.medium,
+      color: theme.colors.textMuted,
       marginRight: 8,
     },
     valueRow: {
@@ -752,27 +769,27 @@ const createStyles = (theme: Palette) =>
     },
     input: {
       alignSelf: "stretch",
-      backgroundColor: "#F9FAFB",
+      backgroundColor: theme.colors.input,
       borderWidth: 2,
-      borderColor: "#E5E7EB",
+      borderColor: theme.colors.border,
       borderBottomWidth: 4,
       borderRadius: 14,
       paddingHorizontal: 14,
       paddingVertical: 12,
       fontSize: 15,
-      fontFamily: fontFamilies.semibold,
-      color: theme.text,
+      ...fontFaces.semibold,
+      color: theme.colors.text,
       marginTop: 12,
     },
     destructiveLabel: {
       fontSize: 16,
-      fontFamily: fontFamilies.semibold,
-      color: "#EF4444",
+      ...fontFaces.semibold,
+      color: theme.colors.error,
     },
     /* App Version + Delete modals — profile edit-modal design */
     modalOverlay: {
       flex: 1,
-      backgroundColor: "rgba(0, 0, 0, 0.45)",
+      backgroundColor: theme.colors.overlay,
       justifyContent: "center",
       alignItems: "center",
       padding: 20,
@@ -780,14 +797,14 @@ const createStyles = (theme: Palette) =>
     modalCard: {
       width: "100%",
       maxWidth: 380,
-      backgroundColor: "#FFFFFF",
+      backgroundColor: theme.colors.card,
       borderRadius: 26,
       padding: 16,
       paddingTop: 12,
       borderWidth: 2,
-      borderColor: "#E5E7EB",
+      borderColor: theme.colors.border,
       borderBottomWidth: 4,
-      shadowColor: "#000000",
+      shadowColor: theme.colors.shadow,
       shadowOffset: { width: 0, height: 8 },
       shadowOpacity: 0.12,
       shadowRadius: 16,
@@ -797,7 +814,7 @@ const createStyles = (theme: Palette) =>
       width: 36,
       height: 4,
       borderRadius: 2,
-      backgroundColor: "#E5E7EB",
+      backgroundColor: theme.colors.border,
       alignSelf: "center",
       marginBottom: 8,
     },
@@ -816,7 +833,7 @@ const createStyles = (theme: Palette) =>
       width: 32,
       height: 32,
       borderRadius: 16,
-      backgroundColor: "#FFF3E0",
+      backgroundColor: theme.colors.creamTint,
       alignItems: "center",
       justifyContent: "center",
     },
@@ -824,7 +841,7 @@ const createStyles = (theme: Palette) =>
       width: 32,
       height: 32,
       borderRadius: 16,
-      backgroundColor: "#FEE2E2",
+      backgroundColor: theme.colors.errorSurface,
       alignItems: "center",
       justifyContent: "center",
     },
@@ -832,11 +849,11 @@ const createStyles = (theme: Palette) =>
       width: 36,
       height: 36,
       borderRadius: 18,
-      backgroundColor: "#F9FAFB",
+      backgroundColor: theme.colors.input,
       alignItems: "center",
       justifyContent: "center",
       borderWidth: 1,
-      borderColor: "#E5E7EB",
+      borderColor: theme.colors.border,
     },
     modalHero: {
       alignItems: "center",
@@ -848,27 +865,27 @@ const createStyles = (theme: Palette) =>
       height: 56,
       borderRadius: 28,
       borderWidth: 2,
-      borderColor: "#FFE0B2",
+      borderColor: theme.colors.creamBorder,
       marginBottom: 10,
     },
     modalAppName: {
       fontSize: 20,
-      fontFamily: fontFamilies.heavy,
-      color: "#333333",
+      ...fontFaces.heavy,
+      color: theme.colors.text,
       marginBottom: 8,
     },
     modalTitle: {
       fontSize: 18,
-      fontFamily: fontFamilies.heavy,
-      color: "#333333",
+      ...fontFaces.heavy,
+      color: theme.colors.text,
     },
     versionBadge: {
       flexDirection: "row",
       alignItems: "center",
       gap: 6,
-      backgroundColor: "#FFFFFF",
+      backgroundColor: theme.colors.card,
       borderWidth: 2,
-      borderColor: "#FFE0B2",
+      borderColor: theme.colors.creamBorder,
       paddingHorizontal: 14,
       paddingVertical: 6,
       borderRadius: 999,
@@ -876,13 +893,13 @@ const createStyles = (theme: Palette) =>
     },
     versionBadgeText: {
       fontSize: 13,
-      fontFamily: fontFamilies.heavy,
+      ...fontFaces.heavy,
       color: "#E67E22",
     },
     modalSubtitle: {
       fontSize: 13,
-      fontFamily: fontFamilies.medium,
-      color: "#888888",
+      ...fontFaces.medium,
+      color: theme.colors.textMuted,
       textAlign: "center",
       lineHeight: 18,
       marginBottom: 14,
@@ -891,37 +908,37 @@ const createStyles = (theme: Palette) =>
       flexDirection: "row",
       alignItems: "flex-start",
       gap: 10,
-      backgroundColor: "#F9FAFB",
+      backgroundColor: theme.colors.surfaceSoft,
       borderWidth: 1,
-      borderColor: "#F4F5F7",
+      borderColor: theme.colors.borderSubtle,
       borderRadius: 12,
       paddingHorizontal: 12,
       paddingVertical: 10,
     },
     creditText: {
       fontSize: 12,
-      fontFamily: fontFamilies.medium,
-      color: "#666666",
+      ...fontFaces.medium,
+      color: theme.colors.textSecondary,
       lineHeight: 17,
     },
     creditLink: {
       fontSize: 12,
-      fontFamily: fontFamilies.heavy,
+      ...fontFaces.heavy,
       color: "#FF8C00",
       marginTop: 4,
       textDecorationLine: "underline",
     },
     modalCopyright: {
       fontSize: 11,
-      fontFamily: fontFamilies.regular,
-      color: "#9CA3AF",
+      ...fontFaces.regular,
+      color: theme.colors.textFaint,
       marginTop: 12,
       textAlign: "center",
     },
     dataStatusBlock: {
-      backgroundColor: "#F9FAFB",
+      backgroundColor: theme.colors.surfaceSoft,
       borderWidth: 1,
-      borderColor: "#F4F5F7",
+      borderColor: theme.colors.borderSubtle,
       borderRadius: 12,
       paddingHorizontal: 12,
       paddingVertical: 10,
@@ -930,8 +947,8 @@ const createStyles = (theme: Palette) =>
     },
     dataStatusTitle: {
       fontSize: 12,
-      fontFamily: fontFamilies.heavy,
-      color: "#333333",
+      ...fontFaces.heavy,
+      color: theme.colors.text,
     },
     dataStatusRow: {
       flexDirection: "row",
@@ -947,8 +964,8 @@ const createStyles = (theme: Palette) =>
     dataStatusText: {
       flex: 1,
       fontSize: 12,
-      fontFamily: fontFamilies.medium,
-      color: "#666666",
+      ...fontFaces.medium,
+      color: theme.colors.textSecondary,
       lineHeight: 17,
     },
     modalPrimaryBtn: {
@@ -963,7 +980,7 @@ const createStyles = (theme: Palette) =>
       borderBottomWidth: 4,
       borderColor: "#E67E22",
       backgroundColor: "#FF8C00",
-      shadowColor: "#000000",
+      shadowColor: theme.colors.shadow,
       shadowOffset: { width: 0, height: 4 },
       shadowOpacity: 0.12,
       shadowRadius: 8,
@@ -971,17 +988,17 @@ const createStyles = (theme: Palette) =>
     },
     modalPrimaryBtnText: {
       fontSize: 15,
-      fontFamily: fontFamilies.heavy,
-      color: "#FFFFFF",
+      ...fontFaces.heavy,
+      color: theme.colors.onPrimary,
     },
     /* Delete Account Modal */
     deleteModalWarning: {
       flexDirection: "row",
       alignItems: "flex-start",
       gap: 10,
-      backgroundColor: "#FEF2F2",
+      backgroundColor: theme.colors.errorSurface,
       borderWidth: 1,
-      borderColor: "#FECACA",
+      borderColor: withAlpha(theme.colors.error, 0.35),
       borderRadius: 12,
       padding: 12,
       marginBottom: 12,
@@ -989,20 +1006,20 @@ const createStyles = (theme: Palette) =>
     deleteModalWarningText: {
       flex: 1,
       fontSize: 13,
-      fontFamily: fontFamilies.medium,
-      color: "#B91C1C",
+      ...fontFaces.medium,
+      color: theme.colors.error,
       lineHeight: 18,
     },
     deleteModalText: {
       fontSize: 13,
-      fontFamily: fontFamilies.medium,
-      color: "#666666",
+      ...fontFaces.medium,
+      color: theme.colors.textSecondary,
       lineHeight: 18,
       marginBottom: 4,
     },
     deleteModalPhrase: {
-      fontFamily: fontFamilies.heavy,
-      color: "#EF4444",
+      ...fontFaces.heavy,
+      color: theme.colors.error,
       textTransform: "uppercase",
     },
     deleteModalActions: {
@@ -1017,13 +1034,13 @@ const createStyles = (theme: Palette) =>
       alignItems: "center",
       borderWidth: 1,
       borderBottomWidth: 3,
-      borderColor: "#E5E7EB",
-      backgroundColor: "#FFFFFF",
+      borderColor: theme.colors.border,
+      backgroundColor: theme.colors.card,
     },
     deleteModalCancelText: {
       fontSize: 14,
-      fontFamily: fontFamilies.heavy,
-      color: "#6B7280",
+      ...fontFaces.heavy,
+      color: theme.colors.textMuted,
     },
     deleteModalConfirmBtn: {
       flex: 1.4,
@@ -1035,9 +1052,9 @@ const createStyles = (theme: Palette) =>
       borderRadius: 16,
       borderWidth: 1,
       borderBottomWidth: 4,
-      borderColor: "#DC2626",
-      backgroundColor: "#EF4444",
-      shadowColor: "#000000",
+      borderColor: theme.colors.dangerDark,
+      backgroundColor: theme.colors.error,
+      shadowColor: theme.colors.shadow,
       shadowOffset: { width: 0, height: 4 },
       shadowOpacity: 0.12,
       shadowRadius: 8,
@@ -1050,7 +1067,8 @@ const createStyles = (theme: Palette) =>
     },
     deleteModalConfirmText: {
       fontSize: 14,
-      fontFamily: fontFamilies.heavy,
-      color: "#FFFFFF",
+      ...fontFaces.heavy,
+      color: theme.colors.onPrimary,
     },
-  });
+  };
+});

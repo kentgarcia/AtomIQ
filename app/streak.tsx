@@ -1,8 +1,15 @@
 import { Icon } from "@/components/ui/icon";
+import { ActivityExplainer, ContributionGraph } from "@/components/activity/ContributionGraph";
+import { useActivityDays } from "@/components/activity/use-activity-days";
 import { getDailyActivity } from "@/services/database";
 import { useStorage } from "@/services/StorageContext";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useTheme, fontFamilies, useResponsiveLayout } from "@/theme";
+import {
+  useTheme,
+  fontFaces,
+  useResponsiveLayout,
+  createStyles,
+} from "@/theme";
 import { useRouter } from "expo-router";
 import React, { useEffect, useMemo, useState } from "react";
 import {
@@ -18,7 +25,6 @@ import { LinearGradient } from "expo-linear-gradient";
 /* Autumn design tokens shared with the profile + home screens */
 const BTN_COLOR = "#FF8C00";
 const BTN_LIP = "#E67E22";
-const CREAM = "#FFF3E0";
 const DAY_LABELS = ["S", "M", "T", "W", "T", "F", "S"];
 
 type WeekDay = {
@@ -62,12 +68,14 @@ export default function StreakScreen() {
   const frameLeft = Math.max(gutter, (width - contentMaxWidth) / 2 + gutter);
   const { theme } = useTheme();
   const { userProfile } = useStorage();
-  const bgColors: [string, string] =
-    theme.mode === "dark"
-      ? [theme.palettes.tab.bg, theme.palettes.tab.bg]
-      : [CREAM, "#FFFFFF"];
+  const bgColors: [string, string] = [
+    theme.colors.pageGradientTop,
+    theme.colors.pageGradientBottom,
+  ];
+  const styles = useMemo(() => makeStyles(theme), [theme]);
 
   const [week, setWeek] = useState<WeekDay[]>(() => buildWeek());
+  const activity = useActivityDays();
 
   const currentStreak = userProfile?.current_streak || 0;
   const longestStreak = userProfile?.longest_streak || 0;
@@ -100,32 +108,6 @@ export default function StreakScreen() {
     };
   }, []);
 
-  const isDark = theme.mode === "dark";
-  const P = isDark
-    ? {
-        card: "#213356",
-        border: "#2D3A56",
-        softBorder: "#26365A",
-        soft: "#1A2D4A",
-        creamTint: "#4A381B",
-        text: "#F6F9FC",
-        textSecondary: "#C0CBDD",
-        muted: "#8898AA",
-        faint: "#667799",
-      }
-    : {
-        card: "#FFFFFF",
-        border: "#E5E7EB",
-        softBorder: "#F4F5F7",
-        soft: "#F9FAFB",
-        creamTint: CREAM,
-        text: "#333333",
-        textSecondary: "#555555",
-        muted: "#888888",
-        faint: "#AAAAAA",
-      };
-  const styles = useMemo(() => createStyles(P), [P]);
-
   return (
     <View style={[styles.container, { backgroundColor: bgColors[0] }]}>
       <LinearGradient
@@ -142,7 +124,7 @@ export default function StreakScreen() {
           accessibilityRole="button"
           accessibilityLabel="Close streak details"
         >
-          <Icon name="Close" size={22} color={isDark ? "#8898AA" : "#888888"} />
+          <Icon name="Close" size={22} color={theme.colors.textMuted} />
         </TouchableOpacity>
 
         <ScrollView
@@ -169,7 +151,7 @@ export default function StreakScreen() {
             <View style={styles.sunButton}>
               <View style={[styles.sunInner, { backgroundColor: BTN_LIP }]}>
                 <View style={[styles.sunFace, { backgroundColor: BTN_COLOR }]}>
-                  <Icon name="Sun" size={34} color="#FFFFFF" variant="Bold" />
+                  <Icon name="Sun" size={34} color={theme.colors.onPrimary} variant="Bold" />
                 </View>
               </View>
             </View>
@@ -204,7 +186,7 @@ export default function StreakScreen() {
                     ]}
                   >
                     {day.active ? (
-                      <Icon name="TickCircle" size={16} color="#FFFFFF" variant="Bold" />
+                      <Icon name="TickCircle" size={16} color={theme.colors.onPrimary} variant="Bold" />
                     ) : null}
                   </View>
                   <Text
@@ -248,24 +230,25 @@ export default function StreakScreen() {
               </View>
             ))}
           </Animated.View>
+
+          {/* Learning activity history (on-device). The streak shown is the
+              same profile value as the hero card above. */}
+          <Text style={styles.sectionHeading} accessibilityRole="header">
+            Learning activity
+          </Text>
+          <ContributionGraph
+            days={activity.days}
+            todayKey={activity.todayKey}
+            currentStreak={currentStreak}
+          />
+          <ActivityExplainer />
         </ScrollView>
       </SafeAreaView>
     </View>
   );
 }
 
-const createStyles = (P: {
-    card: string;
-    border: string;
-    softBorder: string;
-    soft: string;
-    creamTint: string;
-    text: string;
-    textSecondary: string;
-    muted: string;
-    faint: string;
-}) =>
-  StyleSheet.create({
+const makeStyles = createStyles((theme) => ({
     container: {
       flex: 1,
     },
@@ -275,12 +258,12 @@ const createStyles = (P: {
       width: 40,
       height: 40,
       borderRadius: 20,
-      backgroundColor: P.card,
+      backgroundColor: theme.colors.card,
       alignItems: "center",
       justifyContent: "center",
       zIndex: 10,
       elevation: 3,
-      shadowColor: "#000000",
+      shadowColor: theme.colors.shadow,
       shadowOffset: { width: 0, height: 3 },
       shadowOpacity: 0.08,
       shadowRadius: 6,
@@ -292,14 +275,14 @@ const createStyles = (P: {
     },
     /* Shared rounded card, like the profile cards */
     card: {
-      backgroundColor: P.card,
+      backgroundColor: theme.colors.card,
       borderRadius: 24,
       padding: 24,
       paddingTop: 28,
       alignItems: "center",
       marginBottom: 20,
       elevation: 5,
-      shadowColor: "#000000",
+      shadowColor: theme.colors.shadow,
       shadowOffset: { width: 0, height: 6 },
       shadowOpacity: 0.08,
       shadowRadius: 10,
@@ -322,11 +305,11 @@ const createStyles = (P: {
       height: 92,
       borderRadius: 28,
       borderWidth: 5,
-      borderColor: P.border,
-      backgroundColor: P.card,
+      borderColor: theme.colors.border,
+      backgroundColor: theme.colors.card,
       marginBottom: 6,
       elevation: 6,
-      shadowColor: "#000000",
+      shadowColor: theme.colors.shadow,
       shadowOffset: { width: 0, height: 4 },
       shadowOpacity: 0.15,
       shadowRadius: 6,
@@ -350,14 +333,14 @@ const createStyles = (P: {
     },
     heroValue: {
       fontSize: 24,
-      fontFamily: fontFamilies.heavy,
-      color: P.text,
+      ...fontFaces.heavy,
+      color: theme.colors.text,
       marginTop: 10,
     },
     heroSub: {
       fontSize: 13,
-      fontFamily: fontFamilies.regular,
-      color: P.muted,
+      ...fontFaces.regular,
+      color: theme.colors.textMuted,
       textAlign: "center",
       lineHeight: 19,
       marginTop: 6,
@@ -367,20 +350,27 @@ const createStyles = (P: {
       flexDirection: "row",
       alignItems: "center",
       gap: 8,
-      backgroundColor: P.creamTint,
+      backgroundColor: theme.colors.creamTint,
       borderRadius: 14,
       paddingHorizontal: 14,
       paddingVertical: 8,
     },
     longestText: {
       fontSize: 13,
-      fontFamily: fontFamilies.heavy,
+      ...fontFaces.heavy,
       color: "#E67E22",
+    },
+    sectionHeading: {
+      fontSize: 18,
+      ...fontFaces.heavy,
+      color: theme.colors.text,
+      marginBottom: 10,
+      marginTop: 4,
     },
     cardTitle: {
       fontSize: 16,
-      fontFamily: fontFamilies.heavy,
-      color: P.text,
+      ...fontFaces.heavy,
+      color: theme.colors.text,
       alignSelf: "flex-start",
       marginBottom: 16,
     },
@@ -397,7 +387,7 @@ const createStyles = (P: {
       width: 36,
       height: 36,
       borderRadius: 18,
-      backgroundColor: P.soft,
+      backgroundColor: theme.colors.surfaceSoft,
       alignItems: "center",
       justifyContent: "center",
     },
@@ -410,17 +400,17 @@ const createStyles = (P: {
     },
     dayLabel: {
       fontSize: 12,
-      fontFamily: fontFamilies.semibold,
-      color: P.muted,
+      ...fontFaces.semibold,
+      color: theme.colors.textMuted,
     },
     dayLabelToday: {
       color: "#E67E22",
-      fontFamily: fontFamilies.bold,
+      ...fontFaces.bold,
     },
     weekHint: {
       fontSize: 11,
-      fontFamily: fontFamilies.regular,
-      color: P.faint,
+      ...fontFaces.regular,
+      color: theme.colors.textFaint,
       textAlign: "center",
       marginTop: 16,
     },
@@ -435,15 +425,15 @@ const createStyles = (P: {
       width: 34,
       height: 34,
       borderRadius: 17,
-      backgroundColor: P.creamTint,
+      backgroundColor: theme.colors.creamTint,
       alignItems: "center",
       justifyContent: "center",
     },
     tipText: {
       flex: 1,
       fontSize: 13,
-      fontFamily: fontFamilies.regular,
-      color: P.textSecondary,
+      ...fontFaces.regular,
+      color: theme.colors.textSecondary,
       lineHeight: 19,
     },
-  });
+  }));

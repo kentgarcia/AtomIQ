@@ -1,4 +1,4 @@
-import {fontFamilies} from "@/theme";
+import { createStyles, fontFaces, useTheme, withAlpha } from "@/theme";
 /**
  * Dynamic Lesson Renderer
  * Renders lesson steps based on content from the content system
@@ -6,8 +6,11 @@ import {fontFamilies} from "@/theme";
 
 import { Icon } from "@/components/ui/icon";
 import { LinearGradient } from "expo-linear-gradient";
-import { speakSafely, stopSpeech } from "@/services/speech";
-import React, { useEffect, useState } from "react";
+import { ReadAloudButton } from "@/components/ui/read-aloud-button";
+import { playAnswerSfx } from "@/services/game-sfx";
+import { readAloud } from "@/services/media";
+import { buildMythFeedbackSpeech, buildMythSpeech } from "@/services/media-core";
+import React, { useEffect, useMemo, useState } from "react";
 import {
     Dimensions,
     Image,
@@ -29,20 +32,6 @@ import Animated, {
 
 const { width } = Dimensions.get("window");
 
-const THEME = {
-  bg: "#F7F7F7",
-  card: "#FFFFFF",
-  text: "#1F2937",
-  textMuted: "#6B7280",
-  primary: "#EA580C",
-  primaryDark: "#C2410C",
-  primaryLight: "#FB923C",
-  success: "#2ECC71",
-  error: "#EF4444",
-  gold: "#FFC107",
-  border: "#E5E7EB",
-};
-
 // ============================================
 // STEP RENDERERS
 // ============================================
@@ -55,6 +44,9 @@ export const BriefingRenderer = ({
   data: any;
   onComplete: () => void;
 }) => {
+  const { theme } = useTheme();
+  const styles = useMemo(() => makeStyles(theme), [theme]);
+
   useEffect(() => {
     const timer = setTimeout(onComplete, 3000);
     return () => clearTimeout(timer);
@@ -92,6 +84,10 @@ export const MythBusterRenderer = ({
   data: any;
   onComplete: () => void;
 }) => {
+  const { theme } = useTheme();
+  const LP = theme.palettes.lesson;
+  const styles = useMemo(() => makeStyles(theme), [theme]);
+  const mythStyles = useMemo(() => makeMythStyles(theme), [theme]);
   const translateX = useSharedValue(0);
   const translateY = useSharedValue(0);
   const cardRotate = useSharedValue(0);
@@ -99,39 +95,16 @@ export const MythBusterRenderer = ({
   const [showFeedback, setShowFeedback] = useState<
     null | "correct" | "incorrect"
   >(null);
-  const [isSpeaking, setIsSpeaking] = useState(false);
   const [leftIndicator, setLeftIndicator] = useState(0);
   const [rightIndicator, setRightIndicator] = useState(0);
 
-  // Stop speech when component unmounts or feedback shows
-  useEffect(() => {
-    return () => {
-      stopSpeech();
-    };
-  }, []);
-
-  const speakMyth = async () => {
-    if (isSpeaking) {
-      stopSpeech();
-      setIsSpeaking(false);
-    } else {
-      setIsSpeaking(true);
-      speakSafely(data.myth, {
-        language: "en",
-        pitch: 1.0,
-        rate: 0.9,
-        onDone: () => setIsSpeaking(false),
-        onStopped: () => setIsSpeaking(false),
-      });
-    }
-  };
-
-  const speakFeedback = (text: string) => {
-    speakSafely(text, {
-      language: "en",
-      pitch: 1.0,
-      rate: 0.9,
-    });
+  // Read Aloud policy: the claim before the swipe, the reality after it.
+  // Both controls share one owner id so answering hands over cleanly.
+  const readAloudOwner = `lesson-myth:${data.myth}`;
+  const handleSwiped = (isLeft: boolean) => {
+    readAloud.stop("answered", readAloudOwner);
+    void playAnswerSfx(isLeft);
+    setShowFeedback(isLeft ? "correct" : "incorrect");
   };
 
   const pan = Gesture.Pan()
@@ -165,9 +138,7 @@ export const MythBusterRenderer = ({
         });
         translateY.value = withSpring(isLeft ? -50 : -50);
         cardScale.value = withSpring(0.8);
-        runOnJS(stopSpeech)();
-        runOnJS(setIsSpeaking)(false);
-        runOnJS(setShowFeedback)(isLeft ? "correct" : "incorrect");
+        runOnJS(handleSwiped)(isLeft);
       } else {
         translateX.value = withSpring(0, { damping: 15 });
         translateY.value = withSpring(0);
@@ -202,12 +173,12 @@ export const MythBusterRenderer = ({
           style={[mythStyles.indicatorLeft, { opacity: leftIndicator }]}
         >
           <LinearGradient
-            colors={["rgba(239,68,68,0.3)", "transparent"]}
+            colors={[withAlpha(theme.colors.error, 0.3), "transparent"]}
             start={{ x: 0, y: 0.5 }}
             end={{ x: 1, y: 0.5 }}
             style={StyleSheet.absoluteFill}
           />
-          <Icon name="Forbidden2" size={40} color={THEME.error} />
+          <Icon name="Forbidden2" size={40} color={theme.colors.error} />
           <Text style={mythStyles.indicatorTextLeft}>MYTH</Text>
         </Animated.View>
 
@@ -215,7 +186,7 @@ export const MythBusterRenderer = ({
           style={[mythStyles.indicatorRight, { opacity: rightIndicator }]}
         >
           <LinearGradient
-            colors={["transparent", "rgba(46,204,113,0.3)"]}
+            colors={["transparent", withAlpha(theme.colors.success, 0.3)]}
             start={{ x: 0, y: 0.5 }}
             end={{ x: 1, y: 0.5 }}
             style={StyleSheet.absoluteFill}
@@ -223,7 +194,7 @@ export const MythBusterRenderer = ({
           <Icon
             name="TickCircle"
             size={40}
-            color={THEME.success}
+            color={theme.colors.success}
             variant="Bold"
           />
           <Text style={mythStyles.indicatorTextRight}>FACT</Text>
@@ -249,8 +220,8 @@ export const MythBusterRenderer = ({
                   {
                     backgroundColor:
                       showFeedback === "correct"
-                        ? "rgba(46,204,113,0.3)"
-                        : "rgba(239,68,68,0.3)",
+                        ? withAlpha(theme.colors.success, 0.3)
+                        : withAlpha(theme.colors.error, 0.3),
                   },
                 ]}
               />
@@ -279,29 +250,19 @@ export const MythBusterRenderer = ({
                   name="InfoCircle"
                   size={20}
                   color={
-                    showFeedback === "correct" ? THEME.success : THEME.error
+                    showFeedback === "correct" ? theme.colors.success : theme.colors.error
                   }
                 />
                 <Text style={mythStyles.explanationLabel}>THE TRUTH</Text>
-                <TouchableOpacity
-                  onPress={() =>
-                    speakFeedback(
-                      `${data.explanation}. The reality is: ${data.reality}`,
-                    )
+                <ReadAloudButton
+                  ownerId={`${readAloudOwner}:feedback`}
+                  subject="explanation"
+                  size={36}
+                  accent={
+                    showFeedback === "correct" ? theme.colors.success : theme.colors.error
                   }
-                  style={mythStyles.speakBtnSmall}
-                  hitSlop={8}
-                  accessibilityRole="button"
-                  accessibilityLabel="Read feedback aloud"
-                >
-                  <Icon
-                    name="VolumeHigh"
-                    size={18}
-                    color={
-                      showFeedback === "correct" ? THEME.success : THEME.error
-                    }
-                  />
-                </TouchableOpacity>
+                  text={() => buildMythFeedbackSpeech(data.reality, data.explanation)}
+                />
               </View>
               <Text style={mythStyles.explanationText}>{data.explanation}</Text>
 
@@ -316,7 +277,7 @@ export const MythBusterRenderer = ({
               onPress={onComplete}
             >
               <LinearGradient
-                colors={["#FFF", "#F0F0F0"]}
+                colors={[theme.colors.card, theme.colors.surfaceSoft]}
                 style={mythStyles.continueBtnGradient}
               >
                 <Text
@@ -325,8 +286,8 @@ export const MythBusterRenderer = ({
                     {
                       color:
                         showFeedback === "correct"
-                          ? THEME.success
-                          : THEME.error,
+                          ? theme.colors.success
+                          : theme.colors.error,
                     },
                   ]}
                 >
@@ -336,7 +297,7 @@ export const MythBusterRenderer = ({
                   name="ArrowRight2"
                   size={20}
                   color={
-                    showFeedback === "correct" ? THEME.success : THEME.error
+                    showFeedback === "correct" ? theme.colors.success : theme.colors.error
                   }
                 />
               </LinearGradient>
@@ -347,16 +308,16 @@ export const MythBusterRenderer = ({
             <Animated.View style={[mythStyles.flashCard, cardStyle]}>
               {/* Card Decorations */}
               <View style={mythStyles.cardCornerTL}>
-                <Icon name="Danger" size={16} color="rgba(239,68,68,0.3)" />
+                <Icon name="Danger" size={16} color={withAlpha(theme.colors.error, 0.3)} />
               </View>
               <View style={mythStyles.cardCornerTR}>
-                <Icon name="Danger" size={16} color="rgba(239,68,68,0.3)" />
+                <Icon name="Danger" size={16} color={withAlpha(theme.colors.error, 0.3)} />
               </View>
               <View style={mythStyles.cardCornerBL}>
-                <Icon name="Danger" size={16} color="rgba(239,68,68,0.3)" />
+                <Icon name="Danger" size={16} color={withAlpha(theme.colors.error, 0.3)} />
               </View>
               <View style={mythStyles.cardCornerBR}>
-                <Icon name="Danger" size={16} color="rgba(239,68,68,0.3)" />
+                <Icon name="Danger" size={16} color={withAlpha(theme.colors.error, 0.3)} />
               </View>
 
               {/* Question Mark Badge */}
@@ -379,37 +340,21 @@ export const MythBusterRenderer = ({
               )}
 
               {/* Read Aloud Button */}
-              <TouchableOpacity
-                style={[
-                  mythStyles.speakBtn,
-                  isSpeaking && mythStyles.speakBtnActive,
-                ]}
-                onPress={speakMyth}
-                hitSlop={4}
-                accessibilityRole="button"
-                accessibilityLabel={isSpeaking ? "Stop reading myth" : "Read myth aloud"}
-              >
-                <Icon
-                  name={isSpeaking ? "VolumeSlash" : "VolumeHigh"}
-                  size={24}
-                  color={isSpeaking ? "#FFF" : THEME.primary}
-                />
-                <Text
-                  style={[
-                    mythStyles.speakBtnText,
-                    isSpeaking && { color: "#FFF" },
-                  ]}
-                >
-                  {isSpeaking ? "Stop" : "Read Aloud"}
-                </Text>
-              </TouchableOpacity>
+              <ReadAloudButton
+                ownerId={readAloudOwner}
+                subject="myth"
+                variant="pill"
+                accent={LP.primary}
+                text={() => buildMythSpeech(data.myth)}
+                style={{ marginBottom: 24 }}
+              />
 
               {/* Swipe Instructions */}
               <View style={mythStyles.swipeHint}>
                 <View style={mythStyles.swipeHintLeft}>
-                  <Icon name="ArrowLeft2" size={18} color={THEME.error} />
+                  <Icon name="ArrowLeft2" size={18} color={theme.colors.error} />
                   <Text
-                    style={[mythStyles.swipeHintText, { color: THEME.error }]}
+                    style={[mythStyles.swipeHintText, { color: theme.colors.error }]}
                   >
                     MYTH
                   </Text>
@@ -417,11 +362,11 @@ export const MythBusterRenderer = ({
                 <Text style={mythStyles.swipeDivider}>Swipe to answer</Text>
                 <View style={mythStyles.swipeHintRight}>
                   <Text
-                    style={[mythStyles.swipeHintText, { color: THEME.success }]}
+                    style={[mythStyles.swipeHintText, { color: theme.colors.success }]}
                   >
                     FACT
                   </Text>
-                  <Icon name="ArrowRight2" size={18} color={THEME.success} />
+                  <Icon name="ArrowRight2" size={18} color={theme.colors.success} />
                 </View>
               </View>
             </Animated.View>
@@ -433,7 +378,7 @@ export const MythBusterRenderer = ({
 };
 
 // Myth Buster specific styles
-const mythStyles = StyleSheet.create({
+const makeMythStyles = createStyles((theme) => ({
   header: {
     alignItems: "center",
     marginBottom: 16,
@@ -441,27 +386,27 @@ const mythStyles = StyleSheet.create({
   headerBadge: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: THEME.error,
+    backgroundColor: theme.colors.error,
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 25,
     gap: 8,
-    shadowColor: THEME.error,
+    shadowColor: theme.colors.error,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 6,
   },
   headerText: {
-    color: "#FFF",
+    color: theme.colors.onPrimary,
     fontSize: 16,
-    fontFamily: fontFamilies.heavy,
+    ...fontFaces.heavy,
     letterSpacing: 1,
   },
   headerSubtext: {
-    color: THEME.textMuted,
+    color: theme.colors.textMuted,
     fontSize: 14,
-    fontFamily: fontFamilies.regular,
+    ...fontFaces.regular,
     marginTop: 12,
   },
   indicatorContainer: {
@@ -490,28 +435,28 @@ const mythStyles = StyleSheet.create({
     gap: 8,
   },
   indicatorTextLeft: {
-    color: THEME.error,
-    fontFamily: fontFamilies.heavy,
+    color: theme.colors.error,
+    ...fontFaces.heavy,
     fontSize: 14,
   },
   indicatorTextRight: {
-    color: THEME.success,
-    fontFamily: fontFamilies.heavy,
+    color: theme.colors.success,
+    ...fontFaces.heavy,
     fontSize: 14,
   },
   flashCard: {
     width: width - 48,
-    backgroundColor: "#FFF",
+    backgroundColor: theme.colors.card,
     borderRadius: 28,
     padding: 28,
     alignItems: "center",
-    shadowColor: "#000",
+    shadowColor: theme.colors.shadow,
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.15,
     shadowRadius: 24,
     elevation: 12,
     borderWidth: 3,
-    borderColor: "rgba(239,68,68,0.15)",
+    borderColor: withAlpha(theme.colors.error, 0.15),
     position: "relative",
     overflow: "hidden",
   },
@@ -539,17 +484,17 @@ const mythStyles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: "#FFF3E0",
+    backgroundColor: theme.colors.creamTint,
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 20,
     borderWidth: 3,
-    borderColor: THEME.primary,
+    borderColor: theme.palettes.lesson.primary,
   },
   questionMark: {
     fontSize: 32,
-    fontFamily: fontFamilies.black,
-    color: THEME.primary,
+    ...fontFaces.black,
+    color: theme.palettes.lesson.primary,
   },
   mythContent: {
     alignItems: "center",
@@ -557,23 +502,23 @@ const mythStyles = StyleSheet.create({
   },
   quoteOpen: {
     fontSize: 48,
-    color: "rgba(239,68,68,0.2)",
-    fontFamily: fontFamilies.black,
+    color: withAlpha(theme.colors.error, 0.2),
+    ...fontFaces.black,
     lineHeight: 48,
     marginBottom: -10,
   },
   mythText: {
     fontSize: 22,
-    fontFamily: fontFamilies.bold,
-    color: THEME.text,
+    ...fontFaces.bold,
+    color: theme.colors.text,
     textAlign: "center",
     lineHeight: 32,
     paddingHorizontal: 8,
   },
   quoteClose: {
     fontSize: 48,
-    color: "rgba(239,68,68,0.2)",
-    fontFamily: fontFamilies.black,
+    color: withAlpha(theme.colors.error, 0.2),
+    ...fontFaces.black,
     lineHeight: 48,
     marginTop: -10,
     alignSelf: "flex-end",
@@ -587,22 +532,22 @@ const mythStyles = StyleSheet.create({
   speakBtn: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#FFF3E0",
+    backgroundColor: theme.colors.creamTint,
     paddingHorizontal: 20,
     paddingVertical: 12,
     borderRadius: 25,
     gap: 10,
     marginBottom: 24,
     borderWidth: 2,
-    borderColor: THEME.primary,
+    borderColor: theme.palettes.lesson.primary,
   },
   speakBtnActive: {
-    backgroundColor: THEME.primary,
-    borderColor: THEME.primaryDark,
+    backgroundColor: theme.palettes.lesson.primary,
+    borderColor: theme.palettes.lesson.primaryDark,
   },
   speakBtnText: {
-    color: THEME.primary,
-    fontFamily: fontFamilies.bold,
+    color: theme.palettes.lesson.primary,
+    ...fontFaces.bold,
     fontSize: 14,
   },
   swipeHint: {
@@ -612,7 +557,7 @@ const mythStyles = StyleSheet.create({
     width: "100%",
     paddingTop: 16,
     borderTopWidth: 1,
-    borderTopColor: THEME.border,
+    borderTopColor: theme.colors.border,
   },
   swipeHintLeft: {
     flexDirection: "row",
@@ -625,30 +570,30 @@ const mythStyles = StyleSheet.create({
     gap: 4,
   },
   swipeHintText: {
-    fontFamily: fontFamilies.bold,
+    ...fontFaces.bold,
     fontSize: 12,
   },
   swipeDivider: {
-    color: THEME.textMuted,
+    color: theme.colors.textMuted,
     fontSize: 11,
-    fontFamily: fontFamilies.regular,
+    ...fontFaces.regular,
   },
   feedbackCard: {
     width: width - 32,
     padding: 28,
     borderRadius: 28,
     alignItems: "center",
-    shadowColor: "#000",
+    shadowColor: theme.colors.shadow,
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.2,
     shadowRadius: 24,
     elevation: 12,
   },
   feedbackCorrect: {
-    backgroundColor: THEME.success,
+    backgroundColor: theme.colors.success,
   },
   feedbackIncorrect: {
-    backgroundColor: THEME.error,
+    backgroundColor: theme.colors.error,
   },
   resultIconContainer: {
     marginBottom: 16,
@@ -664,18 +609,18 @@ const mythStyles = StyleSheet.create({
   },
   feedbackTitle: {
     fontSize: 32,
-    fontFamily: fontFamilies.black,
-    color: "#FFF",
+    ...fontFaces.black,
+    color: theme.colors.onPrimary,
     marginBottom: 8,
   },
   feedbackSubtitle: {
     fontSize: 16,
-    fontFamily: fontFamilies.regular,
-    color: "rgba(255,255,255,0.9)",
+    ...fontFaces.regular,
+    color: withAlpha(theme.colors.onPrimary, 0.9),
     marginBottom: 20,
   },
   explanationCard: {
-    backgroundColor: "#FFF",
+    backgroundColor: theme.colors.card,
     borderRadius: 20,
     padding: 20,
     width: "100%",
@@ -689,46 +634,46 @@ const mythStyles = StyleSheet.create({
   },
   explanationLabel: {
     fontSize: 12,
-    fontFamily: fontFamilies.heavy,
-    color: THEME.text,
+    ...fontFaces.heavy,
+    color: theme.colors.text,
     flex: 1,
   },
   speakBtnSmall: {
     padding: 6,
-    backgroundColor: "rgba(0,0,0,0.05)",
+    backgroundColor: theme.colors.surfaceSoft,
     borderRadius: 12,
   },
   explanationText: {
     fontSize: 15,
-    fontFamily: fontFamilies.regular,
-    color: THEME.text,
+    ...fontFaces.regular,
+    color: theme.colors.text,
     lineHeight: 22,
     marginBottom: 16,
   },
   realitySection: {
-    backgroundColor: "#FFF9E6",
+    backgroundColor: theme.colors.warningSurface,
     borderRadius: 12,
     padding: 14,
     borderLeftWidth: 4,
-    borderLeftColor: THEME.gold,
+    borderLeftColor: theme.colors.gold,
   },
   realityLabel: {
     fontSize: 12,
-    fontFamily: fontFamilies.heavy,
-    color: THEME.text,
+    ...fontFaces.heavy,
+    color: theme.colors.text,
     marginBottom: 6,
   },
   realityText: {
     fontSize: 14,
-    color: THEME.text,
+    color: theme.colors.text,
     lineHeight: 20,
-    fontFamily: fontFamilies.semibold,
+    ...fontFaces.semibold,
   },
   continueBtn: {
     width: "100%",
     borderRadius: 16,
     overflow: "hidden",
-    shadowColor: "#000",
+    shadowColor: theme.colors.shadow,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
@@ -743,9 +688,9 @@ const mythStyles = StyleSheet.create({
   },
   continueBtnText: {
     fontSize: 16,
-    fontFamily: fontFamilies.heavy,
+    ...fontFaces.heavy,
   },
-});
+}));
 
 // 3. Micro Learn
 export const MicroLearnRenderer = ({
@@ -755,6 +700,10 @@ export const MicroLearnRenderer = ({
   data: any;
   onComplete: () => void;
 }) => {
+  const { theme } = useTheme();
+  const LP = theme.palettes.lesson;
+  const styles = useMemo(() => makeStyles(theme), [theme]);
+
   return (
     <View style={styles.stepContainer}>
       <Text style={styles.stepHeader}>THE CONCEPT</Text>
@@ -776,7 +725,7 @@ export const MicroLearnRenderer = ({
                 <Icon
                   name="TickCircle"
                   size={16}
-                  color={THEME.primary}
+                  color={LP.primary}
                   variant="Bold"
                 />
                 <Text style={styles.keyPointText}>{point}</Text>
@@ -801,6 +750,9 @@ export const LabRenderer = ({
   data: any;
   onComplete: () => void;
 }) => {
+  const { theme } = useTheme();
+  const LP = theme.palettes.lesson;
+  const styles = useMemo(() => makeStyles(theme), [theme]);
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [showResult, setShowResult] = useState(false);
 
@@ -834,8 +786,8 @@ export const LabRenderer = ({
                   size={24}
                   color={
                     selectedOption === option.id
-                      ? THEME.primary
-                      : THEME.textMuted
+                      ? LP.primary
+                      : theme.colors.textMuted
                   }
                 />
               )}
@@ -855,7 +807,7 @@ export const LabRenderer = ({
             <Icon
               name={isCorrect ? "TickCircle" : "CloseCircle"}
               size={32}
-              color={isCorrect ? THEME.success : THEME.error}
+              color={isCorrect ? theme.colors.success : theme.colors.error}
               variant="Bold"
             />
             <Text style={styles.resultText}>{data.explanation}</Text>
@@ -884,6 +836,8 @@ export const AssessmentRenderer = ({
   data: any;
   onComplete: () => void;
 }) => {
+  const { theme } = useTheme();
+  const styles = useMemo(() => makeStyles(theme), [theme]);
   const [selected, setSelected] = useState<number | null>(null);
   const [confirmed, setConfirmed] = useState(false);
 
@@ -935,7 +889,7 @@ export const AssessmentRenderer = ({
                   <Icon
                     name="TickCircle"
                     size={20}
-                    color={THEME.success}
+                    color={theme.colors.success}
                     variant="Bold"
                   />
                 )}
@@ -978,6 +932,9 @@ export const DebriefRenderer = ({
   levelId: string;
   onComplete: () => void;
 }) => {
+  const { theme } = useTheme();
+  const styles = useMemo(() => makeStyles(theme), [theme]);
+
   return (
     <View style={styles.fullScreenCenter}>
       <Animated.View
@@ -996,11 +953,11 @@ export const DebriefRenderer = ({
 
       <View style={styles.rewardRow}>
         <View style={styles.rewardPill}>
-          <Icon name="Flash" size={24} color={THEME.gold} variant="Bold" />
+          <Icon name="Flash" size={24} color={theme.colors.gold} variant="Bold" />
           <Text style={styles.rewardText}>+{data.rewards.xp} XP</Text>
         </View>
         <View style={styles.rewardPill}>
-          <Icon name="Star1" size={24} color={THEME.gold} variant="Bold" />
+          <Icon name="Star1" size={24} color={theme.colors.gold} variant="Bold" />
           <Text style={styles.rewardText}>{data.rewards.stars} Stars</Text>
         </View>
       </View>
@@ -1013,7 +970,9 @@ export const DebriefRenderer = ({
 };
 
 // Styles
-const styles = StyleSheet.create({
+const makeStyles = createStyles((theme) => {
+  const LP = theme.palettes.lesson;
+  return {
   fullScreenCenter: {
     flex: 1,
     justifyContent: "center",
@@ -1027,16 +986,16 @@ const styles = StyleSheet.create({
   },
   stepHeader: {
     fontSize: 14,
-    fontFamily: fontFamilies.heavy,
-    color: THEME.primary,
+    ...fontFaces.heavy,
+    color: LP.primary,
     textAlign: "center",
     letterSpacing: 2,
     marginBottom: 8,
   },
   stepSubHeader: {
     fontSize: 13,
-    fontFamily: fontFamilies.regular,
-    color: THEME.textMuted,
+    ...fontFaces.regular,
+    color: theme.colors.textMuted,
     textAlign: "center",
     marginBottom: 24,
   },
@@ -1055,29 +1014,29 @@ const styles = StyleSheet.create({
   },
   briefingTitle: {
     fontSize: 28,
-    fontFamily: fontFamilies.heavy,
-    color: THEME.text,
+    ...fontFaces.heavy,
+    color: theme.colors.text,
     textAlign: "center",
     marginBottom: 8,
   },
   briefingSubtitle: {
     fontSize: 18,
-    fontFamily: fontFamilies.regular,
-    color: THEME.textMuted,
+    ...fontFaces.regular,
+    color: theme.colors.textMuted,
     textAlign: "center",
     marginBottom: 32,
   },
   loadingBar: {
     width: 200,
     height: 4,
-    backgroundColor: THEME.border,
+    backgroundColor: theme.colors.border,
     borderRadius: 2,
     overflow: "hidden",
   },
   loadingFill: {
     width: "100%",
     height: "100%",
-    backgroundColor: THEME.primary,
+    backgroundColor: LP.primary,
   },
   cardContainer: {
     flex: 1,
@@ -1086,18 +1045,18 @@ const styles = StyleSheet.create({
   },
   swipeCard: {
     width: width - 48,
-    backgroundColor: "#FFF",
+    backgroundColor: theme.colors.card,
     borderRadius: 24,
     padding: 32,
     alignItems: "center",
     borderWidth: 2,
-    borderColor: THEME.border,
+    borderColor: theme.colors.border,
     borderBottomWidth: 6,
   },
   mythBadge: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: THEME.error,
+    backgroundColor: theme.colors.error,
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
@@ -1105,14 +1064,14 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   mythBadgeText: {
-    color: "#FFF",
-    fontFamily: fontFamilies.heavy,
+    color: theme.colors.onPrimary,
+    ...fontFaces.heavy,
     fontSize: 12,
   },
   mythText: {
     fontSize: 24,
-    fontFamily: fontFamilies.bold,
-    color: THEME.text,
+    ...fontFaces.bold,
+    color: theme.colors.text,
     textAlign: "center",
     marginBottom: 24,
   },
@@ -1145,27 +1104,27 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   feedbackCorrect: {
-    backgroundColor: THEME.success,
+    backgroundColor: theme.colors.success,
   },
   feedbackIncorrect: {
-    backgroundColor: THEME.error,
+    backgroundColor: theme.colors.error,
   },
   feedbackTitle: {
     fontSize: 32,
-    fontFamily: fontFamilies.heavy,
-    color: "#FFF",
+    ...fontFaces.heavy,
+    color: theme.colors.onPrimary,
     marginTop: 16,
     marginBottom: 16,
   },
   feedbackText: {
     fontSize: 16,
-    fontFamily: fontFamilies.regular,
-    color: "rgba(255,255,255,0.9)",
+    ...fontFaces.regular,
+    color: withAlpha(theme.colors.onPrimary, 0.9),
     textAlign: "center",
     marginBottom: 16,
   },
   realityBox: {
-    backgroundColor: "rgba(255,255,255,0.2)",
+    backgroundColor: withAlpha(theme.colors.onPrimary, 0.2),
     padding: 16,
     borderRadius: 12,
     width: "100%",
@@ -1173,35 +1132,35 @@ const styles = StyleSheet.create({
   },
   realityLabel: {
     fontSize: 12,
-    fontFamily: fontFamilies.heavy,
-    color: "#FFF",
+    ...fontFaces.heavy,
+    color: theme.colors.onPrimary,
     marginBottom: 8,
   },
   realityText: {
     fontSize: 14,
-    color: "#FFF",
-    fontFamily: fontFamilies.semibold,
+    color: theme.colors.onPrimary,
+    ...fontFaces.semibold,
   },
   continueBtn: {
-    backgroundColor: "#FFF",
+    backgroundColor: theme.colors.card,
     paddingHorizontal: 32,
     paddingVertical: 16,
     borderRadius: 16,
     borderBottomWidth: 4,
-    borderBottomColor: "rgba(0,0,0,0.1)",
+    borderBottomColor: withAlpha(theme.colors.shadow, 0.1),
   },
   continueBtnText: {
     fontSize: 16,
-    fontFamily: fontFamilies.heavy,
-    color: THEME.text,
+    ...fontFaces.heavy,
+    color: theme.colors.text,
   },
   conceptCard: {
-    backgroundColor: "#FFF",
+    backgroundColor: theme.colors.card,
     borderRadius: 24,
     padding: 24,
     marginBottom: 24,
     borderWidth: 2,
-    borderColor: THEME.border,
+    borderColor: theme.colors.border,
     borderBottomWidth: 4,
   },
   conceptImage: {
@@ -1212,14 +1171,14 @@ const styles = StyleSheet.create({
   },
   conceptTitle: {
     fontSize: 22,
-    fontFamily: fontFamilies.heavy,
-    color: THEME.text,
+    ...fontFaces.heavy,
+    color: theme.colors.text,
     marginBottom: 12,
   },
   conceptText: {
     fontSize: 16,
-    fontFamily: fontFamilies.regular,
-    color: THEME.text,
+    ...fontFaces.regular,
+    color: theme.colors.text,
     lineHeight: 24,
     marginBottom: 16,
   },
@@ -1228,8 +1187,8 @@ const styles = StyleSheet.create({
   },
   keyPointsTitle: {
     fontSize: 14,
-    fontFamily: fontFamilies.heavy,
-    color: THEME.primary,
+    ...fontFaces.heavy,
+    color: LP.primary,
     marginBottom: 12,
   },
   keyPoint: {
@@ -1241,23 +1200,23 @@ const styles = StyleSheet.create({
   keyPointText: {
     flex: 1,
     fontSize: 14,
-    fontFamily: fontFamilies.regular,
-    color: THEME.text,
+    ...fontFaces.regular,
+    color: theme.colors.text,
     lineHeight: 20,
   },
   labCard: {
-    backgroundColor: "#FFF",
+    backgroundColor: theme.colors.card,
     borderRadius: 24,
     padding: 24,
     marginBottom: 24,
     borderWidth: 2,
-    borderColor: THEME.border,
+    borderColor: theme.colors.border,
     borderBottomWidth: 4,
   },
   taskText: {
     fontSize: 18,
-    fontFamily: fontFamilies.bold,
-    color: THEME.text,
+    ...fontFaces.bold,
+    color: theme.colors.text,
     textAlign: "center",
     marginBottom: 24,
   },
@@ -1271,23 +1230,23 @@ const styles = StyleSheet.create({
   optionBtn: {
     flex: 1,
     minWidth: "45%",
-    backgroundColor: "#FFF",
+    backgroundColor: theme.colors.card,
     padding: 16,
     borderRadius: 16,
     alignItems: "center",
     borderWidth: 2,
-    borderColor: THEME.border,
+    borderColor: theme.colors.border,
     borderBottomWidth: 4,
     gap: 8,
   },
   optionBtnActive: {
-    borderColor: THEME.primary,
-    backgroundColor: "#FFF5EB",
+    borderColor: LP.primary,
+    backgroundColor: theme.colors.creamTint,
   },
   optionText: {
     fontSize: 14,
-    fontFamily: fontFamilies.bold,
-    color: THEME.text,
+    ...fontFaces.bold,
+    color: theme.colors.text,
     textAlign: "center",
   },
   resultBox: {
@@ -1298,24 +1257,24 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   resultCorrect: {
-    backgroundColor: "#E8F5E9",
+    backgroundColor: theme.colors.successSurface,
   },
   resultIncorrect: {
-    backgroundColor: "#FEE2E2",
+    backgroundColor: theme.colors.errorSurface,
   },
   resultText: {
     flex: 1,
     fontSize: 14,
-    fontFamily: fontFamilies.regular,
-    color: THEME.text,
+    ...fontFaces.regular,
+    color: theme.colors.text,
   },
   quizCard: {
     marginBottom: 24,
   },
   questionText: {
     fontSize: 20,
-    fontFamily: fontFamilies.bold,
-    color: THEME.text,
+    ...fontFaces.bold,
+    color: theme.colors.text,
     marginBottom: 24,
     lineHeight: 28,
   },
@@ -1329,73 +1288,73 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   quizOption: {
-    backgroundColor: "#FFF",
+    backgroundColor: theme.colors.card,
     padding: 16,
     borderRadius: 16,
     borderWidth: 2,
-    borderColor: THEME.border,
+    borderColor: theme.colors.border,
     borderBottomWidth: 4,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
   },
   quizOptionSelected: {
-    borderColor: THEME.primary,
-    backgroundColor: "#FFF5EB",
+    borderColor: LP.primary,
+    backgroundColor: theme.colors.creamTint,
   },
   quizOptionCorrect: {
-    borderColor: THEME.success,
-    backgroundColor: "#E8F5E9",
+    borderColor: theme.colors.success,
+    backgroundColor: theme.colors.successSurface,
   },
   quizOptionWrong: {
-    borderColor: THEME.error,
-    backgroundColor: "#FEE2E2",
+    borderColor: theme.colors.error,
+    backgroundColor: theme.colors.errorSurface,
   },
   quizOptionText: {
     fontSize: 16,
-    fontFamily: fontFamilies.regular,
-    color: THEME.text,
+    ...fontFaces.regular,
+    color: theme.colors.text,
   },
   explanationBox: {
-    backgroundColor: "#F0F9FF",
+    backgroundColor: theme.colors.infoSurface,
     padding: 16,
     borderRadius: 12,
     marginTop: 16,
     borderLeftWidth: 4,
-    borderLeftColor: THEME.primary,
+    borderLeftColor: LP.primary,
   },
   explanationText: {
     fontSize: 14,
-    fontFamily: fontFamilies.regular,
-    color: THEME.text,
+    ...fontFaces.regular,
+    color: theme.colors.text,
     lineHeight: 20,
   },
   mainBtn: {
-    backgroundColor: THEME.primary,
+    backgroundColor: LP.primary,
     paddingVertical: 18,
     borderRadius: 16,
     alignItems: "center",
     borderBottomWidth: 4,
-    borderBottomColor: THEME.primaryDark,
+    borderBottomColor: LP.primaryDark,
   },
   mainBtnDisabled: {
     opacity: 0.5,
   },
   mainBtnText: {
     fontSize: 16,
-    fontFamily: fontFamilies.heavy,
-    color: "#FFF",
+    ...fontFaces.heavy,
+    color: theme.colors.onPrimary,
   },
   successTitle: {
     fontSize: 32,
-    fontFamily: fontFamilies.heavy,
-    color: THEME.primary,
+    ...fontFaces.heavy,
+    color: LP.primary,
     marginBottom: 12,
   },
   successText: {
     fontSize: 18,
-    fontFamily: fontFamilies.regular,
-    color: THEME.textMuted,
+    ...fontFaces.regular,
+    color: theme.colors.textMuted,
     textAlign: "center",
     marginBottom: 32,
   },
@@ -1407,20 +1366,21 @@ const styles = StyleSheet.create({
   rewardPill: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#FFF",
+    backgroundColor: theme.colors.card,
     paddingHorizontal: 20,
     paddingVertical: 12,
     borderRadius: 20,
     borderWidth: 2,
-    borderColor: THEME.border,
+    borderColor: theme.colors.border,
     borderBottomWidth: 4,
     gap: 8,
   },
   rewardText: {
     fontSize: 18,
-    fontFamily: fontFamilies.heavy,
-    color: THEME.text,
+    ...fontFaces.heavy,
+    color: theme.colors.text,
   },
+  };
 });
 
 export default {

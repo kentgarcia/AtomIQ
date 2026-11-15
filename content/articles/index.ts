@@ -96,4 +96,13 @@ export const searchPosts = (query: string): Promise<Post[]> => {
   );
 };
 
-export type { Article, ArticleCategory, ArticleType, Post } from "./types";
+export type {
+  Article,
+  ArticleCategory,
+  ArticleSourceMeta,
+  ArticleType,
+  Post,
+  ReviewStatus,
+  SourceType,
+  SummaryOrigin,
+} from "./types";

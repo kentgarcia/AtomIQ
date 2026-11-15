@@ -1,19 +1,32 @@
-import {fontFamilies, useResponsiveLayout} from "@/theme";
+import {
+  createStyles,
+  fontFaces,
+  useResponsiveLayout,
+  useTheme,
+  withAlpha,
+} from "@/theme";
 import { MarkdownText } from "@/components/markdown-text";
 import { Icon } from "@/components/ui/icon";
 import { HowToPlayCard } from "@/components/games/HowToPlayCard";
 import { getAllMyths } from "@/content/myths";
-import { useColorScheme } from "@/hooks/use-color-scheme";
-import { useThemeColor } from "@/hooks/use-theme-color";
 import { useStorage } from "@/services/StorageContext";
+import { recordActivity } from "@/services/activity-log";
 import { logDailyActivity, saveGameScore } from "@/services/database";
 import { toLocalIsoDate } from "@/services/utils";
 import { recordMissionEvent } from "@/services/missions";
 import { playGameSfx, preloadGameSfx } from "@/services/game-sfx";
 import { LinearGradient } from "expo-linear-gradient";
-import { speakSafely, stopSpeech } from "@/services/speech";
+import { ReadAloudButton } from "@/components/ui/read-aloud-button";
+import { readAloud } from "@/services/media";
+import { buildMythSpeech } from "@/services/media-core";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import {
   Alert,
   BackHandler,
@@ -97,26 +110,8 @@ const CountUpText = ({
   );
 };
 
-// Theme
-const THEME = {
-  bg: "#F7F7F7",
-  card: "#FFFFFF",
-  text: "#1F2937",
-  textMuted: "#9CA3AF",
-  primary: "#EA580C",
-  primaryDark: "#C2410C",
-  primaryLight: "#FB923C",
-  success: "#2ECC71",
-  successDark: "#10B981",
-  error: "#EF4444",
-  dangerDark: "#DC2626",
-  gold: "#FFC107",
-  border: "#E5E7EB",
-};
-
-// Shared screen backdrop (same for every mode) — copies the autumn
-// cream → white gradient used across the home + games tabs.
-const APP_SKY_LIGHT: [string, string] = ["#FFF3E0", "#FFE4C4"];
+// Shared screen backdrop mirrors the autumn cream → white page gradient used
+// across the home + games tabs (mode-aware via theme.colors.pageGradient*).
 
 
 
@@ -195,18 +190,17 @@ export default function MythBusterScreen() {
   const resultCardWidth = Math.max(0, frameWidth - 96);
   const resultsStep = resultCardWidth + RESULTS_CARD_GAP;
   const resultsCardOffset = (frameWidth - 48 - resultCardWidth) / 2;
-  const colorScheme = useColorScheme();
-  const themeText = useThemeColor({}, "text");
-  const themeBackground = useThemeColor({}, "background");
-  const isDark = colorScheme === "dark";
-  const appSky: [string, string] = isDark
-    ? [themeBackground, themeBackground]
-    : APP_SKY_LIGHT;
-  const textColor = isDark ? "#EAEAEA" : themeText;
-  const cardColor = isDark ? "#213356" : "#FCFCF9";
-  const borderColor = isDark ? "#2D3A56" : "#E5E7EB";
-  const subtleBg = isDark ? "#1A2D4A" : "#F4F5F7";
-  const mutedText = isDark ? "#8898AA" : "#6B7280";
+  const { theme } = useTheme();
+  const appSky: [string, string] = [
+    theme.colors.pageGradientTop,
+    theme.colors.pageGradientBottom,
+  ];
+  const textColor = theme.colors.text;
+  const cardColor = theme.colors.card;
+  const borderColor = theme.colors.border;
+  const subtleBg = theme.colors.surfaceSoft;
+  const mutedText = theme.colors.textMuted;
+  const styles = useMemo(() => makeStyles(theme), [theme]);
 
   const [gameState, setGameState] = useState<GameState>("intro");
   const [selectedMode, setSelectedMode] = useState<ModeConfig>(() => {
@@ -274,28 +268,14 @@ export default function MythBusterScreen() {
     void preloadGameSfx();
   }, []);
 
-  // Cleanup speech on unmount
-  useEffect(() => {
-    return () => {
-      stopSpeech();
-    };
-  }, []);
+  // Read Aloud: one control per statement. A new statement changes the owner
+  // id, which stops the previous narration; leaving the game stops it too.
+  const readAloudOwner = `mythbuster:${currentMyth?.id ?? "none"}`;
 
-  // Stop any ongoing TTS when the statement changes
+  // Leaving the playing state (game over, results) ends any narration.
   useEffect(() => {
-    if (gameState !== "playing") return;
-    stopSpeech();
-  }, [currentMyth?.id, gameState]);
-
-  const speakStatement = () => {
-    if (!currentMyth) return;
-    stopSpeech();
-    speakSafely(`"${currentMyth.statement}"`, {
-      language: "en",
-      rate: 0.9,
-      pitch: 1.0,
-    });
-  };
+    if (gameState !== "playing") readAloud.stop("screen-exit");
+  }, [gameState]);
 
   // Timer countdown effect for challenge mode
   useEffect(() => {
@@ -488,6 +468,7 @@ export default function MythBusterScreen() {
     if (!currentMyth || isAnimating) return;
 
     setIsAnimating(true);
+    readAloud.stop("answered", readAloudOwner);
 
     const isCorrect =
       (direction === "myth" && !currentMyth.isTrue) ||
@@ -613,6 +594,7 @@ export default function MythBusterScreen() {
 
     // A played round (any difficulty) counts toward the daily mission
     recordMissionEvent("mythbuster", 1);
+    recordActivity("game_session", { id: "myth-buster" });
 
     if (userProfile) {
       updateUserProfile({
@@ -1121,7 +1103,7 @@ export default function MythBusterScreen() {
                   { backgroundColor: subtleBg },
                   reviewTab === "wrong" && [
                     styles.resultTabActive,
-                    { backgroundColor: THEME.error },
+                    { backgroundColor: theme.colors.error },
                   ],
                 ]}
                 onPress={() => {
@@ -1198,13 +1180,13 @@ export default function MythBusterScreen() {
                       <View
                         style={[
                           styles.resultStatCard,
-                          { backgroundColor: THEME.success + "14" },
+                          { backgroundColor: withAlpha(theme.colors.success, 0.08) },
                         ]}
                       >
                         <Icon
                           name="TickCircle"
                           size={22}
-                          color={THEME.success}
+                          color={theme.colors.success}
                           variant="Bold"
                         />
                         <CountUpText
@@ -1216,13 +1198,13 @@ export default function MythBusterScreen() {
                       <View
                         style={[
                           styles.resultStatCard,
-                          { backgroundColor: THEME.error + "14" },
+                          { backgroundColor: withAlpha(theme.colors.error, 0.08) },
                         ]}
                       >
                         <Icon
                           name="CloseCircle"
                           size={22}
-                          color={THEME.error}
+                          color={theme.colors.error}
                           variant="Bold"
                         />
                         <CountUpText
@@ -1234,7 +1216,7 @@ export default function MythBusterScreen() {
                       <View
                         style={[
                           styles.resultStatCard,
-                          { backgroundColor: selectedMode.color + "14" },
+                          { backgroundColor: withAlpha(selectedMode.color, 0.08) },
                         ]}
                       >
                         <Icon
@@ -1286,8 +1268,8 @@ export default function MythBusterScreen() {
                               styles.resultHeaderChip,
                               {
                                 backgroundColor: isCorrect
-                                  ? THEME.success
-                                  : THEME.error,
+                                  ? theme.colors.success
+                                  : theme.colors.error,
                               },
                             ]}
                           >
@@ -1393,11 +1375,7 @@ export default function MythBusterScreen() {
               <TouchableOpacity
                 style={[
                   styles.resultsHomeBtn,
-                  {
-                    backgroundColor: cardColor,
-                    borderColor:
-                      colorScheme === "dark" ? "#2D3748" : THEME.border,
-                  },
+                  { backgroundColor: cardColor, borderColor },
                 ]}
                 onPress={() => router.back()}
                 activeOpacity={0.8}
@@ -1483,7 +1461,7 @@ export default function MythBusterScreen() {
                 scorePulseStyle,
               ]}
             >
-              <Icon name="Flash" size={16} color={THEME.gold} variant="Bold" />
+              <Icon name="Flash" size={16} color={theme.colors.gold} variant="Bold" />
               <Text style={[styles.scoreText, { color: textColor }]}>
                 {score}
               </Text>
@@ -1542,10 +1520,10 @@ export default function MythBusterScreen() {
             <Icon
               name="CloseCircle"
               size={48}
-              color={THEME.error}
+              color={theme.colors.error}
               variant="Bold"
             />
-            <Text style={[styles.swipeLabelText, { color: THEME.error }]}>
+            <Text style={[styles.swipeLabelText, { color: theme.colors.error }]}>
               MYTH
             </Text>
           </Animated.View>
@@ -1556,10 +1534,10 @@ export default function MythBusterScreen() {
             <Icon
               name="TickCircle"
               size={48}
-              color={THEME.success}
+              color={theme.colors.success}
               variant="Bold"
             />
-            <Text style={[styles.swipeLabelText, { color: THEME.success }]}>
+            <Text style={[styles.swipeLabelText, { color: theme.colors.success }]}>
               FACT
             </Text>
           </Animated.View>
@@ -1577,21 +1555,13 @@ export default function MythBusterScreen() {
                   ]}
                 >
                 <View style={styles.cardHeader}>
-                  <TouchableOpacity
-                    onPress={speakStatement}
-                    style={styles.cardSpeaker}
-                    activeOpacity={0.7}
-                    hitSlop={8}
-                    accessibilityRole="button"
-                    accessibilityLabel="Read statement aloud"
-                  >
-                    <Icon
-                      name="VolumeHigh"
-                      size={20}
-                      color="#8A8A8A"
-                      variant="Bold"
-                    />
-                  </TouchableOpacity>
+                  <ReadAloudButton
+                    ownerId={readAloudOwner}
+                    subject="statement"
+                    size={46}
+                    accent={theme.colors.primary}
+                    text={() => buildMythSpeech(currentMyth.statement)}
+                  />
 
                   <View style={styles.cardHeaderRight}>
                     <View style={styles.progressPill}>
@@ -1611,7 +1581,7 @@ export default function MythBusterScreen() {
                           {
                             backgroundColor:
                               timeLeft <= 3
-                                ? THEME.error
+                                ? theme.colors.error
                                 : selectedMode.color,
                           },
                         ]}
@@ -1635,7 +1605,7 @@ export default function MythBusterScreen() {
                             key={i}
                             name="Heart"
                             size={18}
-                            color={i < lives ? THEME.error : "#E5E7EB"}
+                            color={i < lives ? theme.colors.error : theme.colors.border}
                             variant={i < lives ? "Bold" : "Linear"}
                           />
                         ))}
@@ -1699,13 +1669,13 @@ export default function MythBusterScreen() {
               <View
                 style={[
                   styles.actionButtonLip,
-                  { backgroundColor: THEME.dangerDark },
+                  { backgroundColor: theme.colors.dangerDark },
                 ]}
               />
               <Animated.View
                 style={[
                   styles.actionButtonFace,
-                  { backgroundColor: THEME.error },
+                  { backgroundColor: theme.colors.error },
                   pressFaceStyle,
                 ]}
               >
@@ -1745,13 +1715,13 @@ export default function MythBusterScreen() {
               <View
                 style={[
                   styles.actionButtonLip,
-                  { backgroundColor: THEME.successDark },
+                  { backgroundColor: theme.colors.successDark },
                 ]}
               />
               <Animated.View
                 style={[
                   styles.actionButtonFace,
-                  { backgroundColor: THEME.success },
+                  { backgroundColor: theme.colors.success },
                   truthPressFaceStyle,
                 ]}
               >
@@ -1795,7 +1765,7 @@ export default function MythBusterScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = createStyles((theme) => ({
   fullScreen: {
     flex: 1,
   },
@@ -1825,13 +1795,13 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 20,
     borderWidth: 2,
-    borderColor: "rgba(255,255,255,0.3)",
+    borderColor: withAlpha(theme.colors.onPrimary, 0.3),
     borderBottomWidth: 4,
-    borderBottomColor: "rgba(0,0,0,0.2)",
+    borderBottomColor: withAlpha(theme.colors.shadow, 0.2),
   },
   introBadgeText: {
     fontSize: 16,
-    fontFamily: fontFamilies.heavy,
+    ...fontFaces.heavy,
     color: "#FFF",
   },
   introScrollView: {
@@ -1849,7 +1819,7 @@ const styles = StyleSheet.create({
     padding: 24,
     borderWidth: 2,
     borderBottomWidth: 4,
-    shadowColor: "#000",
+    shadowColor: theme.colors.shadow,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.08,
     shadowRadius: 6,
@@ -1857,17 +1827,17 @@ const styles = StyleSheet.create({
   },
   introTitle: {
     fontSize: 28,
-    fontFamily: fontFamilies.heavy,
+    ...fontFaces.heavy,
     marginBottom: 4,
   },
   introSubtitle: {
     fontSize: 14,
-    fontFamily: fontFamilies.semibold,
+    ...fontFaces.semibold,
     marginBottom: 12,
   },
   introDescription: {
     fontSize: 14,
-    fontFamily: fontFamilies.regular,
+    ...fontFaces.regular,
     lineHeight: 22,
   },
   introStatsRow: {
@@ -1882,7 +1852,7 @@ const styles = StyleSheet.create({
   },
   introStatText: {
     fontSize: 13,
-    fontFamily: fontFamilies.semibold,
+    ...fontFaces.semibold,
   },
   startButtonCard: {
     flexDirection: "row",
@@ -1893,7 +1863,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     borderWidth: 2,
     borderBottomWidth: 4,
-    shadowColor: "#000",
+    shadowColor: theme.colors.shadow,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.08,
     shadowRadius: 6,
@@ -1901,7 +1871,7 @@ const styles = StyleSheet.create({
   },
   startButtonCardText: {
     fontSize: 17,
-    fontFamily: fontFamilies.heavy,
+    ...fontFaces.heavy,
     letterSpacing: 0.5,
   },
 
@@ -1923,7 +1893,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 4,
     alignItems: "center",
     justifyContent: "center",
-    shadowColor: "#000",
+    shadowColor: theme.colors.shadow,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
     shadowRadius: 4,
@@ -1940,7 +1910,7 @@ const styles = StyleSheet.create({
   },
   progressText: {
     fontSize: 13,
-    fontFamily: fontFamilies.bold,
+    ...fontFaces.bold,
     fontVariant: ["tabular-nums"],
   },
   timerBadge: {
@@ -1952,7 +1922,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 7,
     borderRadius: 16,
-    shadowColor: "#000",
+    shadowColor: theme.colors.shadow,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.12,
     shadowRadius: 4,
@@ -1960,7 +1930,7 @@ const styles = StyleSheet.create({
   },
   timerText: {
     fontSize: 14,
-    fontFamily: fontFamilies.heavy,
+    ...fontFaces.heavy,
     color: "#FFF",
     fontVariant: ["tabular-nums"],
   },
@@ -1968,7 +1938,7 @@ const styles = StyleSheet.create({
     height: 8,
     borderRadius: 4,
     overflow: "hidden",
-    shadowColor: "#000",
+    shadowColor: theme.colors.shadow,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
     shadowRadius: 2,
@@ -1988,7 +1958,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     borderWidth: 2,
     borderBottomWidth: 4,
-    shadowColor: "#000",
+    shadowColor: theme.colors.shadow,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
     shadowRadius: 4,
@@ -1996,7 +1966,7 @@ const styles = StyleSheet.create({
   },
   scoreText: {
     fontSize: 16,
-    fontFamily: fontFamilies.heavy,
+    ...fontFaces.heavy,
     fontVariant: ["tabular-nums"],
   },
   endGameButton: {
@@ -2007,7 +1977,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     borderRadius: 20,
     marginLeft: 8,
-    shadowColor: "#000",
+    shadowColor: theme.colors.shadow,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 4,
@@ -2015,7 +1985,7 @@ const styles = StyleSheet.create({
   },
   endGameButtonText: {
     fontSize: 14,
-    fontFamily: fontFamilies.heavy,
+    ...fontFaces.heavy,
     color: "#FFF",
   },
   streakBannerContainer: {
@@ -2029,7 +1999,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 16,
     borderRadius: 20,
-    shadowColor: "#000",
+    shadowColor: theme.colors.shadow,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.15,
     shadowRadius: 8,
@@ -2039,7 +2009,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: "rgba(255,255,255,0.2)",
+    backgroundColor: withAlpha(theme.colors.onPrimary, 0.2),
     alignItems: "center",
     justifyContent: "center",
     marginRight: 12,
@@ -2049,7 +2019,7 @@ const styles = StyleSheet.create({
   },
   streakText: {
     fontSize: 18,
-    fontFamily: fontFamilies.heavy,
+    ...fontFaces.heavy,
     color: "#FFF",
     marginBottom: 2,
   },
@@ -2069,13 +2039,13 @@ const styles = StyleSheet.create({
     borderRadius: 32,
     padding: 24,
     position: "relative",
-    shadowColor: "#000",
+    shadowColor: theme.colors.shadow,
     shadowOffset: { width: 0, height: 20 },
     shadowOpacity: 0.1,
     shadowRadius: 40,
     elevation: 10,
     borderTopWidth: 1,
-    borderTopColor: "rgba(255,255,255,0.6)",
+    borderTopColor: theme.colors.borderSubtle,
   },
   cardHeader: {
     position: "absolute",
@@ -2092,11 +2062,11 @@ const styles = StyleSheet.create({
     height: 46,
     borderRadius: 23,
     borderWidth: 2,
-    borderColor: "#E6E6E6",
-    backgroundColor: "#FFFFFF",
+    borderColor: theme.colors.border,
+    backgroundColor: theme.colors.card,
     alignItems: "center",
     justifyContent: "center",
-    shadowColor: "#000",
+    shadowColor: theme.colors.shadow,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.02,
     shadowRadius: 4,
@@ -2110,7 +2080,7 @@ const styles = StyleSheet.create({
   progressPill: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#ECECEB",
+    backgroundColor: theme.colors.surfaceSoft,
     borderRadius: 20,
     paddingVertical: 8,
     paddingHorizontal: 14,
@@ -2118,13 +2088,13 @@ const styles = StyleSheet.create({
   },
   progressCurrent: {
     fontSize: 15,
-    fontFamily: fontFamilies.heavy,
+    ...fontFaces.heavy,
     color: "#83B625",
   },
   progressTotal: {
     fontSize: 15,
-    fontFamily: fontFamilies.heavy,
-    color: "#A3A3A3",
+    ...fontFaces.heavy,
+    color: theme.colors.textFaint,
   },
   livesContainer: {
     flexDirection: "row",
@@ -2138,7 +2108,7 @@ const styles = StyleSheet.create({
   },
   cardStatement: {
     fontSize: 24,
-    fontFamily: fontFamilies.bold,
+    ...fontFaces.bold,
     lineHeight: 36,
     textAlign: "center",
   },
@@ -2158,7 +2128,7 @@ const styles = StyleSheet.create({
   },
   swipeLabelText: {
     fontSize: 24,
-    fontFamily: fontFamilies.black,
+    ...fontFaces.black,
   },
   actionButtons: {
     flexDirection: "row",
@@ -2178,7 +2148,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     borderRadius: 20,
-    shadowColor: "#000",
+    shadowColor: theme.colors.shadow,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.12,
     shadowRadius: 10,
@@ -2198,7 +2168,7 @@ const styles = StyleSheet.create({
   },
   actionButtonText: {
     fontSize: 20,
-    fontFamily: fontFamilies.heavy,
+    ...fontFaces.heavy,
     color: "#FFFFFF",
     letterSpacing: 1,
   },
@@ -2218,14 +2188,14 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     left: 0,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: theme.colors.onPrimary,
   },
   loseExplosionRing: {
     width: 300,
     height: 300,
     borderRadius: 150,
     borderWidth: 14,
-    backgroundColor: "rgba(255,255,255,0.08)",
+    backgroundColor: withAlpha(theme.colors.onPrimary, 0.08),
     position: "absolute",
   },
   loseExplosionCore: {
@@ -2234,7 +2204,7 @@ const styles = StyleSheet.create({
     borderRadius: 90,
     alignItems: "center",
     justifyContent: "center",
-    shadowColor: "#000",
+    shadowColor: theme.colors.shadow,
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.35,
     shadowRadius: 16,
@@ -2242,7 +2212,7 @@ const styles = StyleSheet.create({
   },
   loseExplosionText: {
     fontSize: 36,
-    fontFamily: fontFamilies.black,
+    ...fontFaces.black,
     color: "#FFF",
     letterSpacing: 2,
   },
@@ -2256,7 +2226,7 @@ const styles = StyleSheet.create({
   // New Results Screen Styles
   resultsScreen: {
     flex: 1,
-    backgroundColor: THEME.bg,
+    backgroundColor: theme.colors.background,
   },
   resultsHeader: {
     paddingHorizontal: 20,
@@ -2284,13 +2254,13 @@ const styles = StyleSheet.create({
   },
   resultsHeaderTitle: {
     fontSize: 18,
-    fontFamily: fontFamilies.heavy,
+    ...fontFaces.heavy,
     textTransform: "uppercase",
     letterSpacing: 0.5,
   },
   resultsHeaderSubtitle: {
     fontSize: 12,
-    fontFamily: fontFamilies.medium,
+    ...fontFaces.medium,
     marginTop: 4,
   },
   resultsContent: {
@@ -2301,7 +2271,7 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     marginBottom: 16,
     overflow: "hidden",
-    shadowColor: "#000",
+    shadowColor: theme.colors.shadow,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,
     shadowRadius: 8,
@@ -2318,12 +2288,12 @@ const styles = StyleSheet.create({
   },
   resultsScoreEmoji: {
     fontSize: 36,
-    fontFamily: fontFamilies.regular,
+    ...fontFaces.regular,
     marginBottom: 6,
   },
   resultsScoreTitle: {
     fontSize: 22,
-    fontFamily: fontFamilies.black,
+    ...fontFaces.black,
     color: "#FFF",
     marginBottom: 12,
     textAlign: "center",
@@ -2346,18 +2316,18 @@ const styles = StyleSheet.create({
   },
   resultsHeroEmoji: {
     fontSize: 32,
-    fontFamily: fontFamilies.regular,
+    ...fontFaces.regular,
     marginBottom: 8,
   },
   resultsHeroTitle: {
     fontSize: 28,
-    fontFamily: fontFamilies.black,
+    ...fontFaces.black,
     color: "#FFF",
     marginBottom: 4,
   },
   resultsHeroScore: {
     fontSize: 16,
-    fontFamily: fontFamilies.semibold,
+    ...fontFaces.semibold,
     color: "rgba(255,255,255,0.9)",
   },
   resultsStatsRow: {
@@ -2371,7 +2341,7 @@ const styles = StyleSheet.create({
     padding: 16,
     alignItems: "center",
     gap: 8,
-    shadowColor: "#000",
+    shadowColor: theme.colors.shadow,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
@@ -2386,13 +2356,13 @@ const styles = StyleSheet.create({
   },
   resultsStatValue: {
     fontSize: 20,
-    fontFamily: fontFamilies.black,
-    color: THEME.text,
+    ...fontFaces.black,
+    color: theme.colors.text,
   },
   resultsStatLabel: {
     fontSize: 11,
-    fontFamily: fontFamilies.semibold,
-    color: THEME.textMuted,
+    ...fontFaces.semibold,
+    color: theme.colors.textMuted,
   },
   resultsReviewSection: {
     marginBottom: 24,
@@ -2402,21 +2372,21 @@ const styles = StyleSheet.create({
   },
   resultsReviewTitle: {
     fontSize: 18,
-    fontFamily: fontFamilies.heavy,
-    color: THEME.text,
+    ...fontFaces.heavy,
+    color: theme.colors.text,
     marginBottom: 4,
   },
   resultsReviewSubtitle: {
     fontSize: 13,
-    fontFamily: fontFamilies.regular,
-    color: THEME.textMuted,
+    ...fontFaces.regular,
+    color: theme.colors.textMuted,
   },
   resultsTabRow: {
     flexDirection: "row",
     borderRadius: 16,
     padding: 6,
     marginBottom: 16,
-    shadowColor: "#000",
+    shadowColor: theme.colors.shadow,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
@@ -2427,7 +2397,7 @@ const styles = StyleSheet.create({
     padding: 32,
     alignItems: "center",
     gap: 12,
-    shadowColor: "#000",
+    shadowColor: theme.colors.shadow,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
@@ -2437,20 +2407,20 @@ const styles = StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: 32,
-    backgroundColor: THEME.success + "15",
+    backgroundColor: withAlpha(theme.colors.success, 0.08),
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 4,
   },
   resultsEmptyTitle: {
     fontSize: 18,
-    fontFamily: fontFamilies.heavy,
-    color: THEME.success,
+    ...fontFaces.heavy,
+    color: theme.colors.success,
   },
   resultsEmptyText: {
     fontSize: 14,
-    fontFamily: fontFamilies.regular,
-    color: THEME.textMuted,
+    ...fontFaces.regular,
+    color: theme.colors.textMuted,
   },
   resultsCardList: {
     gap: 12,
@@ -2459,7 +2429,7 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     flexDirection: "row",
     overflow: "hidden",
-    shadowColor: "#000",
+    shadowColor: theme.colors.shadow,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
@@ -2474,11 +2444,11 @@ const styles = StyleSheet.create({
   },
   resultsReviewCardCorrect: {
     borderLeftWidth: 4,
-    borderLeftColor: THEME.success,
+    borderLeftColor: theme.colors.success,
   },
   resultsReviewCardWrong: {
     borderLeftWidth: 4,
-    borderLeftColor: THEME.error,
+    borderLeftColor: theme.colors.error,
   },
   resultsCardHeader: {
     flexDirection: "row",
@@ -2495,7 +2465,7 @@ const styles = StyleSheet.create({
   },
   resultsCardNumberText: {
     fontSize: 12,
-    fontFamily: fontFamilies.heavy,
+    ...fontFaces.heavy,
     color: "#FFF",
   },
   resultsCardBadge: {
@@ -2505,12 +2475,12 @@ const styles = StyleSheet.create({
   },
   resultsCardBadgeText: {
     fontSize: 10,
-    fontFamily: fontFamilies.heavy,
+    ...fontFaces.heavy,
   },
   resultsCardStatement: {
     fontSize: 14,
-    fontFamily: fontFamilies.semibold,
-    color: THEME.text,
+    ...fontFaces.semibold,
+    color: theme.colors.text,
     lineHeight: 20,
   },
   resultsCardExpanded: {
@@ -2518,7 +2488,7 @@ const styles = StyleSheet.create({
   },
   resultsCardDivider: {
     height: 1,
-    backgroundColor: THEME.border,
+    backgroundColor: theme.colors.border,
     marginBottom: 12,
   },
   resultsCardExplanation: {
@@ -2530,8 +2500,8 @@ const styles = StyleSheet.create({
   resultsCardExplanationText: {
     flex: 1,
     fontSize: 13,
-    fontFamily: fontFamilies.regular,
-    color: THEME.text,
+    ...fontFaces.regular,
+    color: theme.colors.text,
     lineHeight: 19,
   },
   resultsCardFooter: {
@@ -2540,23 +2510,23 @@ const styles = StyleSheet.create({
   },
   resultsCardHint: {
     fontSize: 12,
-    fontFamily: fontFamilies.regular,
-    color: THEME.textMuted,
+    ...fontFaces.regular,
+    color: theme.colors.textMuted,
   },
   resultsPlayAgainBtn: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     gap: 8,
-    backgroundColor: THEME.primary,
+    backgroundColor: theme.myth.primary,
     paddingVertical: 16,
     borderRadius: 18,
     borderBottomWidth: 4,
-    borderBottomColor: "rgba(0,0,0,0.15)",
+    borderBottomColor: withAlpha(theme.colors.shadow, 0.15),
   },
   resultsPlayAgainText: {
     fontSize: 16,
-    fontFamily: fontFamilies.heavy,
+    ...fontFaces.heavy,
     color: "#FFF",
   },
   resultsHomeBtn: {
@@ -2571,15 +2541,15 @@ const styles = StyleSheet.create({
   },
   resultsHomeText: {
     fontSize: 16,
-    fontFamily: fontFamilies.bold,
-    color: THEME.text,
+    ...fontFaces.bold,
+    color: theme.colors.text,
   },
   // Legacy Results Styles
   resultsIcon: {
     width: 120,
     height: 120,
     borderRadius: 60,
-    backgroundColor: "rgba(255,255,255,0.2)",
+    backgroundColor: withAlpha(theme.colors.onPrimary, 0.2),
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 24,
@@ -2594,19 +2564,19 @@ const styles = StyleSheet.create({
   },
   resultsTitle: {
     fontSize: 32,
-    fontFamily: fontFamilies.black,
+    ...fontFaces.black,
     color: "#FFF",
     marginBottom: 32,
     textAlign: "center",
   },
   scoreCard: {
-    backgroundColor: "#FFF",
+    backgroundColor: theme.colors.card,
     borderRadius: 24,
     padding: 24,
     width: "100%",
     marginBottom: 32,
     borderWidth: 2,
-    borderColor: "#E5E7EB",
+    borderColor: theme.colors.border,
     borderBottomWidth: 4,
     alignItems: "center",
   },
@@ -2623,18 +2593,18 @@ const styles = StyleSheet.create({
   },
   scoreLabel: {
     fontSize: 16,
-    fontFamily: fontFamilies.semibold,
-    color: THEME.textMuted,
+    ...fontFaces.semibold,
+    color: theme.colors.textMuted,
   },
   scoreValue: {
     fontSize: 32,
-    fontFamily: fontFamilies.black,
-    color: THEME.primary,
+    ...fontFaces.black,
+    color: theme.myth.primary,
     fontVariant: ["tabular-nums"],
   },
   divider: {
     height: 2,
-    backgroundColor: "#E5E7EB",
+    backgroundColor: theme.colors.border,
     marginBottom: 16,
   },
   statsGrid: {
@@ -2645,19 +2615,19 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     gap: 8,
-    backgroundColor: THEME.bg,
+    backgroundColor: theme.colors.background,
     padding: 16,
     borderRadius: 16,
   },
   statValue: {
     fontSize: 20,
-    fontFamily: fontFamilies.heavy,
-    color: THEME.text,
+    ...fontFaces.heavy,
+    color: theme.colors.text,
   },
   statLabel: {
     fontSize: 11,
-    fontFamily: fontFamilies.semibold,
-    color: THEME.textMuted,
+    ...fontFaces.semibold,
+    color: theme.colors.textMuted,
   },
   resultsActions: {
     width: "100%",
@@ -2667,7 +2637,7 @@ const styles = StyleSheet.create({
     paddingBottom: 8,
   },
   playAgainButton: {
-    backgroundColor: "#FFF",
+    backgroundColor: theme.colors.card,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
@@ -2675,26 +2645,26 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     borderRadius: 24,
     borderWidth: 2,
-    borderColor: "#E5E7EB",
+    borderColor: theme.colors.border,
     borderBottomWidth: 4,
   },
   playAgainText: {
     fontSize: 16,
-    fontFamily: fontFamilies.heavy,
-    color: THEME.primary,
+    ...fontFaces.heavy,
+    color: theme.myth.primary,
   },
   homeButton: {
-    backgroundColor: "rgba(255,255,255,0.2)",
+    backgroundColor: withAlpha(theme.colors.onPrimary, 0.2),
     alignItems: "center",
     justifyContent: "center",
     paddingVertical: 16,
     borderRadius: 24,
     borderWidth: 2,
-    borderColor: "rgba(255,255,255,0.3)",
+    borderColor: withAlpha(theme.colors.onPrimary, 0.3),
   },
   homeButtonText: {
     fontSize: 16,
-    fontFamily: fontFamilies.heavy,
+    ...fontFaces.heavy,
     color: "#FFF",
   },
 
@@ -2707,24 +2677,24 @@ const styles = StyleSheet.create({
   },
   reviewTitle: {
     fontSize: 20,
-    fontFamily: fontFamilies.black,
+    ...fontFaces.black,
     color: "#FFF",
     textAlign: "center",
   },
   reviewSubtitle: {
     fontSize: 14,
-    fontFamily: fontFamilies.regular,
+    ...fontFaces.regular,
     color: "rgba(255,255,255,0.8)",
     textAlign: "center",
     marginBottom: 8,
   },
   reviewCard: {
-    backgroundColor: "#FFF",
+    backgroundColor: theme.colors.card,
     borderRadius: 16,
     padding: 16,
     gap: 12,
     borderWidth: 2,
-    borderColor: "#E5E7EB",
+    borderColor: theme.colors.border,
     borderBottomWidth: 4,
   },
   reviewHeader: {
@@ -2741,7 +2711,7 @@ const styles = StyleSheet.create({
   },
   reviewNumberText: {
     fontSize: 14,
-    fontFamily: fontFamilies.heavy,
+    ...fontFaces.heavy,
     color: "#FFF",
   },
   reviewBadgeRow: {
@@ -2756,18 +2726,18 @@ const styles = StyleSheet.create({
   },
   reviewBadgeText: {
     fontSize: 11,
-    fontFamily: fontFamilies.heavy,
+    ...fontFaces.heavy,
   },
   reviewStatement: {
     fontSize: 15,
-    fontFamily: fontFamilies.semibold,
-    color: THEME.text,
+    ...fontFaces.semibold,
+    color: theme.colors.text,
     lineHeight: 22,
   },
   reviewExplanation: {
     flexDirection: "row",
     gap: 8,
-    backgroundColor: THEME.bg,
+    backgroundColor: theme.colors.background,
     padding: 12,
     borderRadius: 12,
     marginTop: 4,
@@ -2775,8 +2745,8 @@ const styles = StyleSheet.create({
   reviewExplanationText: {
     flex: 1,
     fontSize: 13,
-    fontFamily: fontFamilies.regular,
-    color: THEME.textMuted,
+    ...fontFaces.regular,
+    color: theme.colors.textMuted,
     lineHeight: 18,
   },
 
@@ -2792,13 +2762,13 @@ const styles = StyleSheet.create({
   },
   resultStatValue: {
     fontSize: 17,
-    fontFamily: fontFamilies.black,
+    ...fontFaces.black,
     marginTop: 2,
   },
   resultStatLabel: {
     fontSize: 11,
-    fontFamily: fontFamilies.semibold,
-    color: THEME.textMuted,
+    ...fontFaces.semibold,
+    color: theme.colors.textMuted,
     marginTop: 2,
   },
   resultsPager: {
@@ -2816,13 +2786,13 @@ const styles = StyleSheet.create({
     aspectRatio: 0.85,
     borderRadius: 32,
     padding: 20,
-    shadowColor: "#000",
+    shadowColor: theme.colors.shadow,
     shadowOffset: { width: 0, height: 20 },
     shadowOpacity: 0.1,
     shadowRadius: 40,
     elevation: 10,
     borderTopWidth: 1,
-    borderTopColor: "rgba(255,255,255,0.6)",
+    borderTopColor: theme.colors.borderSubtle,
   },
   resultSummaryCard: {
     justifyContent: "center",
@@ -2847,7 +2817,7 @@ const styles = StyleSheet.create({
   resultHeaderPillText: {
     color: "#FFF",
     fontSize: 13,
-    fontFamily: fontFamilies.heavy,
+    ...fontFaces.heavy,
   },
   resultHeaderChip: {
     paddingHorizontal: 10,
@@ -2857,7 +2827,7 @@ const styles = StyleSheet.create({
   resultHeaderChipText: {
     color: "#FFF",
     fontSize: 12,
-    fontFamily: fontFamilies.heavy,
+    ...fontFaces.heavy,
   },
   resultHeroArea: {
     alignItems: "center",
@@ -2871,19 +2841,19 @@ const styles = StyleSheet.create({
   },
   resultHeroTitle: {
     fontSize: 18,
-    fontFamily: fontFamilies.black,
+    ...fontFaces.black,
   },
   resultReviewHeader: {
     marginBottom: 12,
   },
   resultReviewTitle: {
     fontSize: 20,
-    fontFamily: fontFamilies.black,
+    ...fontFaces.black,
   },
   resultReviewSubtitle: {
     fontSize: 12,
-    color: THEME.textMuted,
-    fontFamily: fontFamilies.regular,
+    color: theme.colors.textMuted,
+    ...fontFaces.regular,
     marginTop: 2,
   },
   resultTabRow: {
@@ -2899,8 +2869,8 @@ const styles = StyleSheet.create({
   resultTabActive: {},
   resultTabText: {
     fontSize: 13,
-    fontFamily: fontFamilies.semibold,
-    color: THEME.textMuted,
+    ...fontFaces.semibold,
+    color: theme.colors.textMuted,
   },
   resultReviewScroll: {
     flex: 1,
@@ -2920,7 +2890,7 @@ const styles = StyleSheet.create({
   },
   exampleLabel: {
     fontSize: 11,
-    fontFamily: fontFamilies.heavy,
+    ...fontFaces.heavy,
     textTransform: "uppercase",
     letterSpacing: 0.8,
   },
@@ -2934,7 +2904,7 @@ const styles = StyleSheet.create({
   resultStatementTitle: {
     textAlign: "center",
     fontSize: 17,
-    fontFamily: fontFamilies.heavy,
+    ...fontFaces.heavy,
     lineHeight: 24,
   },
   resultStatementContent: {
@@ -2947,15 +2917,15 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   exampleStatement: {
-    color: "#1A1A1A",
+    color: theme.colors.text,
     fontSize: 17,
-    fontFamily: fontFamilies.semibold,
+    ...fontFaces.semibold,
     lineHeight: 24,
     marginBottom: 12,
   },
   exampleDivider: {
     height: 1,
-    backgroundColor: "rgba(0,0,0,0.08)",
+    backgroundColor: theme.colors.borderSubtle,
     marginVertical: 12,
   },
   exampleExplainRow: {
@@ -2973,12 +2943,12 @@ const styles = StyleSheet.create({
   },
   resultEmptyTitle: {
     fontSize: 18,
-    fontFamily: fontFamilies.heavy,
+    ...fontFaces.heavy,
     marginTop: 8,
   },
   resultEmptyText: {
     fontSize: 13,
-    color: THEME.textMuted,
+    color: theme.colors.textMuted,
     marginTop: 2,
     textAlign: "center",
   },
@@ -2992,10 +2962,10 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: THEME.textMuted,
+    backgroundColor: theme.colors.textMuted,
   },
   resultsDotActive: {
     width: 20,
-    backgroundColor: THEME.gold,
+    backgroundColor: theme.colors.gold,
   },
-});
+}));

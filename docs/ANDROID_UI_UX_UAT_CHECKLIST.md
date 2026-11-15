@@ -120,7 +120,7 @@ At least one run must use a production-like APK/AAB installed outside Expo Go. R
 
 ## 7. Typography, visual parity, and accessibility
 
-- [ ] **P1*** SNPro is used on Android after cold start; there is no visible system-font flash in the main flows.
+- [ ] **P1*** Intern is used on Android after cold start, and bold/heavy text renders at the right weight (not regular); there is no visible system-font flash in the main flows.
 - [ ] **P1*** At default font scale, headings, body text, labels, buttons, tabs, quiz answers, and error messages are not clipped or unexpectedly ellipsized.
 - [ ] **P0*** At font scale 2.0, the same text remains readable; buttons grow vertically or wrap instead of shrinking below a readable size.
 - [ ] **P1*** XP, streak, score, timer, and progress values remain aligned when digit lengths change.

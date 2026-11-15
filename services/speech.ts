@@ -1,88 +1,51 @@
 import * as Speech from "expo-speech";
-import type { SpeechOptions } from "expo-speech";
+
+import type { ReadAloudEngine } from "./media-core";
 
 /**
- * Guarded expo-speech wrapper (Google Play readiness).
+ * expo-speech adapter for the shared Read Aloud controller
+ * (services/media-core.ts → services/media.ts).
  *
- * TTS was only ever tested on iPhone. On Android the engine varies
- * (Google TTS vs Samsung TTS vs none installed, voice data not
- * downloaded, OEM rate clamping), and failures surface as a native
- * `onError` callback that most call sites never handled — leaving
- * `isSpeaking` stuck at true with a dead speaker button.
+ * Do NOT call expo-speech from screens. Use `useReadAloud` /
+ * `<ReadAloudButton />`, which route through the single controller so every
+ * surface shares one state machine (spec §4.1, docs/MEDIA_POLICY.md).
  *
- * Rules enforced here:
- * - Every `speakSafely` call injects an `onError` handler that funnels
- *   into the caller's `onStopped`, so speaking state always resets.
- * - Synchronous throws (missing engine) and empty text also reset.
- * - Over-long input is truncated to `maxSpeechInputLength`.
- * - `stopSpeech` never throws / never floats an unhandled rejection.
+ * Android TTS engines vary (Google vs Samsung vs none installed, voice data
+ * missing, OEM rate clamping) and report failures through `onError`; the
+ * controller turns every one of those paths into a visible, self-healing
+ * state, so this adapter only has to be honest and never throw.
  */
+export const expoSpeechEngine: ReadAloudEngine = {
+  speak(text, options, callbacks) {
+    const safe =
+      text.length > Speech.maxSpeechInputLength
+        ? text.slice(0, Speech.maxSpeechInputLength)
+        : text;
 
-export const stopSpeech = (): void => {
-  void (async () => {
+    Speech.speak(safe, {
+      language: options.language,
+      rate: options.rate,
+      pitch: options.pitch,
+      onStart: callbacks.onStart,
+      onDone: callbacks.onDone,
+      onStopped: callbacks.onStopped,
+      onError: (error: Error) => callbacks.onError(error),
+    });
+  },
+
+  async stop() {
     try {
       await Speech.stop();
     } catch {
       // No engine, already stopped, or activity gone — safe to ignore.
     }
-  })();
-};
+  },
 
-/**
- * Strip characters that Android TTS engines choke on. Lesson key points
- * (the only slide type that regularly fails) are full of `•` bullets and
- * stray newlines — Google/Samsung TTS fires `onError` and speaks nothing
- * for those, while iOS reads them fine. Normalizing centrally fixes every
- * call site (lessons, encyclopedia, mythbuster) at once.
- */
-const sanitizeSpeechText = (text: string): string =>
-  text
-    .replace(/[•·▪▫◦]/g, ". ")
-    .replace(/\s+/g, " ")
-    .replace(/(\.\s*){2,}/g, ". ")
-    .trim();
-
-export const speakSafely = (
-  text: string,
-  options: SpeechOptions = {},
-): void => {
-  const { onStopped, onError, ...rest } = options;
-
-  const reset = (): void => {
+  async isSpeaking() {
     try {
-      onStopped?.();
+      return await Speech.isSpeakingAsync();
     } catch {
-      // Caller cleanup must never crash the speaker.
+      return true; // a failed probe is not evidence of silence
     }
-  };
-
-  const fail = (error: unknown): void => {
-    reset();
-    try {
-      onError?.(error as Error);
-    } catch {
-      // Ignore caller error-handler failures.
-    }
-  };
-
-  const trimmed = sanitizeSpeechText(text ?? "");
-  if (!trimmed) {
-    reset();
-    return;
-  }
-
-  const safe =
-    trimmed.length > Speech.maxSpeechInputLength
-      ? trimmed.slice(0, Speech.maxSpeechInputLength)
-      : trimmed;
-
-  try {
-    Speech.speak(safe, {
-      ...rest,
-      onStopped,
-      onError: (error: Error) => fail(error),
-    });
-  } catch (error) {
-    fail(error);
-  }
+  },
 };

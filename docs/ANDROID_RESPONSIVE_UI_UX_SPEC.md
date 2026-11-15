@@ -26,7 +26,7 @@ The following are part of the current app baseline and must be treated as inputs
 
 - `app.json` keeps portrait orientation; SDK 58 always draws edge-to-edge (the removed `edgeToEdgeEnabled` flag is no longer needed).
 - The custom tab bar in `app/(tabs)/_layout.tsx` is absolutely positioned and uses `useSafeAreaInsets()`.
-- The app uses a custom SNPro font family loaded before the root layout renders.
+- The app uses the Intern variable font (one file, `wght` 100–900) loaded before the root layout renders. Weights are selected with `fontWeight` via the `fontFaces.*` spreads from `@/theme`.
 - `softwareKeyboardLayoutMode` is `resize` on Android.
 - The app has lessons, quizzes, MythBuster, Lab, Explorer/Atom Maze, Guide, Discovery, Games, Profile, Settings, onboarding, and detail screens.
 - The existing design tokens live in `theme/tokens.ts` and feature themes live in `theme/themes.ts`.
@@ -122,7 +122,7 @@ Decorative elements may overlap. Interactive elements may not overlap one anothe
 
 ### 5.1 Typography
 
-- Use the bundled SNPro family on Android; do not silently fall back to the system font.
+- Use the bundled Intern family on Android; do not silently fall back to the system font.
 - Every text style must have a line height that supports the intended font size and wrapping.
 - Text must remain readable at Android font scale `1.0`, `1.3`, and `2.0`.
 - No heading, label, button title, tab label, quiz option, or error message may be clipped, ellipsized unexpectedly, or overlap an icon.

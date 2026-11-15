@@ -13,6 +13,7 @@ import { Image as ExpoImage } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import { impactLight } from "@/services/haptics";
+import { SlidingHighlight, useSlidingHighlight } from "@/components/ui/sliding-highlight";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import Animated, {
   Easing,
@@ -108,6 +109,8 @@ const generateFeedItems = async () => {
       content: post.content,
       author: post.author,
       publishedDate: post.publishedDate,
+      readTime: post.readTime,
+      difficulty: post.difficulty,
       source: post.source,
       sourceUrl: post.sourceUrl,
       videoUrl: post.videoUrl,
@@ -134,12 +137,11 @@ const generateFeedItems = async () => {
 export default function CommunityScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { theme, isDark } = useTheme();
+  const { theme } = useTheme();
   const { contentWidth, contentMaxWidth, contentFrameStyle, gutter } =
     useResponsiveLayout();
   const tabBarInset = useTabBarInset();
-  const THEME = theme.palettes.tab;
-  const styles = useMemo(() => createStyles(THEME), [THEME]);
+  const styles = useMemo(() => createStyles(theme), [theme]);
 
   // Keep the gallery two-up only while each card keeps the minimum readable
   // width. Compact phones fall back to a single column.
@@ -159,6 +161,9 @@ export default function CommunityScreen() {
   const [allFeedItems, setAllFeedItems] = useState<any[]>([]);
 
   const reducedMotion = useReducedMotion();
+  // One orange pill travels between category chips (docs/CONTINUITY_SPEC.md, C8).
+  const chipHighlight = useSlidingHighlight(activeFilter);
+  const restFilter = chipHighlight.restId;
   const mascotY = useSharedValue(0);
   const mascotRotate = useSharedValue(0);
   useEffect(() => {
@@ -185,9 +190,10 @@ export default function CommunityScreen() {
     ],
   }));
 
-  const SKY: [string, string] = isDark
-    ? [THEME.bg, THEME.bg]
-    : ["#FFF3E0", "#FFFFFF"];
+  const SKY: [string, string] = [
+    theme.colors.pageGradientTop,
+    theme.colors.pageGradientBottom,
+  ];
 
   // Generate feed items (articles + posts live in the content database)
   useEffect(() => {
@@ -298,7 +304,7 @@ export default function CommunityScreen() {
             />
           ) : (
             <View style={styles.galleryImagePlaceholder}>
-              <Icon name="Atom" size={32} color={THEME.textMuted} />
+              <Icon name="Atom" size={32} color={theme.colors.textMuted} />
             </View>
           )}
           <TouchableOpacity
@@ -309,7 +315,7 @@ export default function CommunityScreen() {
             <Icon
               name={isBookmarked ? "Archive" : "ArchiveAdd"}
               size={16}
-              color={isBookmarked ? "#FFFFFF" : "#888888"}
+              color={isBookmarked ? "#FFFFFF" : theme.colors.textMuted}
               variant="Bold"
             />
           </TouchableOpacity>
@@ -330,7 +336,7 @@ export default function CommunityScreen() {
             )}
             {item.readTime && (
               <View style={styles.galleryMetaItem}>
-                <Icon name="Clock" size={12} color={THEME.textMuted} />
+                <Icon name="Clock" size={12} color={theme.colors.textMuted} />
                 <Text style={styles.galleryMetaText}>{item.readTime}m</Text>
               </View>
             )}
@@ -381,7 +387,7 @@ export default function CommunityScreen() {
           <TextInput
             style={styles.searchInput}
             placeholder="Search stories, facts, and more..."
-            placeholderTextColor={isDark ? "#667799" : "#9CA3AF"}
+            placeholderTextColor={theme.colors.textFaint}
             value={searchQuery}
             onChangeText={setSearchQuery}
             returnKeyType="search"
@@ -395,7 +401,7 @@ export default function CommunityScreen() {
               accessibilityRole="button"
               accessibilityLabel="Clear search"
             >
-              <Icon name="CloseCircle" size={16} color="#9CA3AF" variant="Bold" />
+              <Icon name="CloseCircle" size={16} color={theme.colors.textFaint} variant="Bold" />
             </TouchableOpacity>
           ) : null}
         </View>
@@ -420,8 +426,9 @@ export default function CommunityScreen() {
             style={[
               styles.categoryChip,
               styles.categoryChipIcon,
-              activeFilter === "saved" && styles.categoryChipActive,
+              restFilter === "saved" && styles.categoryChipActive,
             ]}
+            onLayout={chipHighlight.onItemLayout("saved")}
             activeOpacity={0.85}
             hitSlop={6}
             accessibilityRole="button"
@@ -432,7 +439,7 @@ export default function CommunityScreen() {
             <Icon
               name="Star"
               size={16}
-              color={activeFilter === "saved" ? "#FFFFFF" : isDark ? "#8898AA" : "#6B7280"}
+              color={restFilter === "saved" ? theme.colors.onPrimary : theme.colors.textMuted}
               variant="Bold"
             />
           </TouchableOpacity>
@@ -440,8 +447,9 @@ export default function CommunityScreen() {
           <TouchableOpacity
             style={[
               styles.categoryChip,
-              activeFilter === "all" && styles.categoryChipActive,
+              restFilter === "all" && styles.categoryChipActive,
             ]}
+            onLayout={chipHighlight.onItemLayout("all")}
             activeOpacity={0.85}
             hitSlop={6}
             accessibilityRole="button"
@@ -452,7 +460,7 @@ export default function CommunityScreen() {
             <Text
               style={[
                 styles.categoryChipText,
-                activeFilter === "all" && styles.categoryChipTextActive,
+                restFilter === "all" && styles.categoryChipTextActive,
               ]}
             >
               All
@@ -464,8 +472,9 @@ export default function CommunityScreen() {
               key={cat.id}
               style={[
                 styles.categoryChip,
-                activeFilter === cat.id && styles.categoryChipActive,
+                restFilter === cat.id && styles.categoryChipActive,
               ]}
+              onLayout={chipHighlight.onItemLayout(cat.id)}
               activeOpacity={0.85}
               hitSlop={6}
               accessibilityRole="button"
@@ -476,13 +485,26 @@ export default function CommunityScreen() {
               <Text
                 style={[
                   styles.categoryChipText,
-                  activeFilter === cat.id && styles.categoryChipTextActive,
+                  restFilter === cat.id && styles.categoryChipTextActive,
                 ]}
               >
                 {cat.label}
               </Text>
             </TouchableOpacity>
           ))}
+          <SlidingHighlight
+            state={chipHighlight}
+            style={[styles.categoryChip, styles.categoryChipActive]}
+            renderContent={(id) =>
+              id === "saved" ? (
+                <Icon name="Star" size={16} color={theme.colors.onPrimary} variant="Bold" />
+              ) : (
+                <Text style={[styles.categoryChipText, styles.categoryChipTextActive]}>
+                  {id === "all" ? "All" : (CATEGORIES.find((c) => c.id === id)?.label ?? "")}
+                </Text>
+              )
+            }
+          />
         </ScrollView>
       </View>
 

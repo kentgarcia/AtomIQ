@@ -1,13 +1,15 @@
-import {fontFamilies} from "@/theme";
+import { createStyles, fontFaces, useTheme } from "@/theme";
 import { openExternalUrl } from "@/services/open-url";
-import React from "react";
-import { Alert, StyleSheet, Text, View } from "react-native";
+import React, { useMemo } from "react";
+import { Alert, Text, View } from "react-native";
 
 interface MarkdownTextProps {
   text: string;
   style?: any;
   textColor?: string;
 }
+
+type MarkdownStyles = ReturnType<typeof makeStyles>;
 
 /**
  * Simple markdown renderer for React Native
@@ -16,8 +18,12 @@ interface MarkdownTextProps {
 export function MarkdownText({
   text,
   style,
-  textColor = "#2D3436",
+  textColor,
 }: MarkdownTextProps) {
+  const { theme } = useTheme();
+  const styles = useMemo(() => makeStyles(theme), [theme]);
+  const resolvedTextColor = textColor ?? theme.colors.text;
+
   if (!text) return null;
 
   // Process text line by line to handle lists and headers better
@@ -58,7 +64,7 @@ export function MarkdownText({
             key={`codeblock-${lineIndex}`}
             style={styles.codeBlockContainer}
           >
-            <Text style={[styles.codeBlock, { color: textColor }]}>
+            <Text style={[styles.codeBlock, { color: resolvedTextColor }]}>
               {codeContent}
             </Text>
           </View>,
@@ -74,8 +80,8 @@ export function MarkdownText({
     // Headers
     if (processedLine.startsWith("### ")) {
       elements.push(
-        <Text key={`h3-${lineIndex}`} style={[styles.h3, { color: textColor }]}>
-          {processInlineMarkdown(processedLine.substring(4), textColor)}
+        <Text key={`h3-${lineIndex}`} style={[styles.h3, { color: resolvedTextColor }]}>
+          {processInlineMarkdown(processedLine.substring(4), resolvedTextColor, styles)}
           {"\n"}
         </Text>,
       );
@@ -83,8 +89,8 @@ export function MarkdownText({
     }
     if (processedLine.startsWith("## ")) {
       elements.push(
-        <Text key={`h2-${lineIndex}`} style={[styles.h2, { color: textColor }]}>
-          {processInlineMarkdown(processedLine.substring(3), textColor)}
+        <Text key={`h2-${lineIndex}`} style={[styles.h2, { color: resolvedTextColor }]}>
+          {processInlineMarkdown(processedLine.substring(3), resolvedTextColor, styles)}
           {"\n"}
         </Text>,
       );
@@ -92,8 +98,8 @@ export function MarkdownText({
     }
     if (processedLine.startsWith("# ")) {
       elements.push(
-        <Text key={`h1-${lineIndex}`} style={[styles.h1, { color: textColor }]}>
-          {processInlineMarkdown(processedLine.substring(2), textColor)}
+        <Text key={`h1-${lineIndex}`} style={[styles.h1, { color: resolvedTextColor }]}>
+          {processInlineMarkdown(processedLine.substring(2), resolvedTextColor, styles)}
           {"\n"}
         </Text>,
       );
@@ -105,10 +111,10 @@ export function MarkdownText({
       elements.push(
         <Text
           key={`bullet-${lineIndex}`}
-          style={[styles.text, { color: textColor }]}
+          style={[styles.text, { color: resolvedTextColor }]}
         >
           {"\n• "}
-          {processInlineMarkdown(processedLine.substring(2), textColor)}
+          {processInlineMarkdown(processedLine.substring(2), resolvedTextColor, styles)}
         </Text>,
       );
       continue;
@@ -120,11 +126,11 @@ export function MarkdownText({
       elements.push(
         <Text
           key={`numbered-${lineIndex}`}
-          style={[styles.text, { color: textColor }]}
+          style={[styles.text, { color: resolvedTextColor }]}
         >
           {"\n"}
           {numberedMatch[1]}.{" "}
-          {processInlineMarkdown(numberedMatch[2], textColor)}
+          {processInlineMarkdown(numberedMatch[2], resolvedTextColor, styles)}
         </Text>,
       );
       continue;
@@ -135,9 +141,9 @@ export function MarkdownText({
       elements.push(
         <Text
           key={`text-${lineIndex}`}
-          style={[styles.text, { color: textColor }]}
+          style={[styles.text, { color: resolvedTextColor }]}
         >
-          {processInlineMarkdown(processedLine, textColor)}
+          {processInlineMarkdown(processedLine, resolvedTextColor, styles)}
           {lineIndex < lines.length - 1 ? "\n" : ""}
         </Text>,
       );
@@ -153,6 +159,7 @@ export function MarkdownText({
 function processInlineMarkdown(
   text: string,
   textColor: string,
+  styles: MarkdownStyles,
 ): React.ReactNode[] {
   if (!text) return [];
 
@@ -245,7 +252,7 @@ function processInlineMarkdown(
         elements.push(
           <Text
             key={`link-${keyCounter++}`}
-            style={[styles.link, { color: "#EA580C" }]}
+            style={styles.link}
             accessibilityRole="link"
             onPress={() => {
               if (!pattern.url) return;
@@ -309,33 +316,33 @@ function processInlineMarkdown(
       ];
 }
 
-const styles = StyleSheet.create({
+const makeStyles = createStyles((theme) => ({
   text: {
     fontSize: 15,
-    fontFamily: fontFamilies.regular,
+    ...fontFaces.regular,
     lineHeight: 22,
   },
   bold: {
-    fontFamily: fontFamilies.heavy,
+    ...fontFaces.heavy,
   },
   italic: {
     fontStyle: "italic",
   },
   code: {
     fontFamily: "monospace",
-    backgroundColor: "rgba(0, 0, 0, 0.05)",
+    backgroundColor: theme.colors.surfaceSoft,
     paddingHorizontal: 4,
     paddingVertical: 2,
     borderRadius: 4,
     fontSize: 14,
   },
   codeBlockContainer: {
-    backgroundColor: "rgba(0, 0, 0, 0.05)",
+    backgroundColor: theme.colors.surfaceSoft,
     borderRadius: 8,
     padding: 12,
     marginVertical: 8,
     borderLeftWidth: 3,
-    borderLeftColor: "#EA580C",
+    borderLeftColor: theme.colors.link,
   },
   codeBlock: {
     fontFamily: "monospace",
@@ -343,29 +350,29 @@ const styles = StyleSheet.create({
     lineHeight: 18,
   },
   link: {
-    color: "#EA580C",
+    color: theme.colors.link,
     textDecorationLine: "underline",
-    fontFamily: fontFamilies.semibold,
+    ...fontFaces.semibold,
   },
   h1: {
     fontSize: 24,
-    fontFamily: fontFamilies.heavy,
+    ...fontFaces.heavy,
     marginTop: 16,
     marginBottom: 8,
     lineHeight: 32,
   },
   h2: {
     fontSize: 20,
-    fontFamily: fontFamilies.heavy,
+    ...fontFaces.heavy,
     marginTop: 12,
     marginBottom: 6,
     lineHeight: 28,
   },
   h3: {
     fontSize: 18,
-    fontFamily: fontFamilies.bold,
+    ...fontFaces.bold,
     marginTop: 10,
     marginBottom: 4,
     lineHeight: 24,
   },
-});
+}));

@@ -3,10 +3,9 @@
  * ever exists; every navigation is one tap on a pill like the spec requires.
  */
 
-import React from "react";
+import React, { useMemo } from "react";
 import {
   Pressable,
-  StyleSheet,
   Text,
   type StyleProp,
   type ViewStyle,
@@ -20,7 +19,7 @@ import Animated, {
 } from "react-native-reanimated";
 
 import { Icon } from "@/components/ui/icon";
-import { DURATION, fontFamilies, PRESS_EASING } from "@/theme";
+import { createStyles, DURATION, fontFaces, PRESS_EASING, useTheme } from "@/theme";
 
 export interface PillProps {
   label: string;
@@ -31,6 +30,50 @@ export interface PillProps {
   style?: StyleProp<ViewStyle>;
 }
 
+const makeStyles = createStyles((theme) => {
+  const c = theme.colors;
+  return {
+    wrap: {
+      alignSelf: "flex-start",
+    },
+    pill: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 6,
+      paddingVertical: 11,
+      paddingHorizontal: 14,
+      borderRadius: 14,
+      borderWidth: 1,
+      borderBottomWidth: 4,
+      shadowColor: c.shadow,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.06,
+      shadowRadius: 6,
+      elevation: 2,
+      minHeight: 44,
+    },
+    pillDefault: {
+      backgroundColor: c.card,
+      borderColor: c.border,
+    },
+    pillUtility: {
+      backgroundColor: c.surfaceSoft,
+      borderColor: c.border,
+      minHeight: 38,
+      paddingVertical: 9,
+      borderRadius: 12,
+    },
+    icon: {
+      marginRight: 1,
+    },
+    label: {
+      fontSize: 14,
+      ...fontFaces.semibold,
+    },
+  };
+});
+
 export function Pill({
   label,
   icon,
@@ -39,8 +82,10 @@ export function Pill({
   disabled = false,
   style,
 }: PillProps) {
+  const { theme } = useTheme();
   const reduce = useReducedMotion();
   const pressed = useSharedValue(0);
+  const styles = useMemo(() => makeStyles(theme), [theme]);
 
   const animated = useAnimatedStyle(() => {
     if (reduce) return { transform: [{ scale: 1 }] };
@@ -51,23 +96,21 @@ export function Pill({
     return { transform: [{ scale }] };
   });
 
-  // Mirrors profile's 3D white pills — optionPill (#FFFFFF / #E5E7EB / bottom 4)
-  // and utility as a muted countPill-like treatment.
   const isUtility = variant === "utility";
   const palette = isUtility
     ? {
-        bg: "#F9FAFB",
-        border: "#E5E7EB",
-        borderBottom: "#D1D5DB",
-        text: "#9CA3AF",
-        icon: "#9CA3AF",
+        bg: theme.colors.surfaceSoft,
+        border: theme.colors.border,
+        borderBottom: theme.colors.borderStrong,
+        text: theme.colors.textMuted,
+        icon: theme.colors.textFaint,
       }
     : {
-        bg: "#FFFFFF",
-        border: "#E5E7EB",
-        borderBottom: "#E5E7EB",
-        text: "#333333",
-        icon: "#FF8C00",
+        bg: theme.colors.card,
+        border: theme.colors.border,
+        borderBottom: theme.colors.borderStrong,
+        text: theme.colors.text,
+        icon: theme.colors.link,
       };
 
   return (
@@ -117,44 +160,3 @@ export function Pill({
     </Animated.View>
   );
 }
-
-const styles = StyleSheet.create({
-  wrap: {
-    alignSelf: "flex-start",
-  },
-  pill: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 6,
-    paddingVertical: 11,
-    paddingHorizontal: 14,
-    borderRadius: 14,
-    borderWidth: 1,
-    borderBottomWidth: 4,
-    shadowColor: "#000000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 6,
-    elevation: 2,
-    minHeight: 44,
-  },
-  pillDefault: {
-    backgroundColor: "#FFFFFF",
-    borderColor: "#E5E7EB",
-  },
-  pillUtility: {
-    backgroundColor: "#F9FAFB",
-    borderColor: "#E5E7EB",
-    minHeight: 38,
-    paddingVertical: 9,
-    borderRadius: 12,
-  },
-  icon: {
-    marginRight: 1,
-  },
-  label: {
-    fontSize: 14,
-    fontFamily: fontFamilies.semibold,
-  },
-});

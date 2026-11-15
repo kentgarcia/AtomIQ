@@ -6,19 +6,19 @@ import {
     usePathname,
 } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import "react-native-reanimated";
 
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { ThemeProvider, useColorScheme } from "@/theme";
+import { ThemeProvider, useTheme } from "@/theme";
 import { useAndroidBackPolicy } from "@/hooks/use-android-back";
-import { useSnPro } from "@/hooks/use-snpro";
+import { useAppFonts } from "@/hooks/use-app-fonts";
 import { ensureContentDatabase } from "@/services/content-db";
 import { StorageProvider } from "@/services/StorageContext";
+import { installMediaLifecycle, setMediaPathname } from "@/services/media";
 import {
     initializeUiSfx,
     installGlobalUiSfxHandlers,
-    setUiSfxPathname,
     unloadUiSfx,
 } from "@/services/ui-sfx";
 
@@ -27,17 +27,37 @@ export const unstable_settings = {
 };
 
 function AppContent() {
-  const colorScheme = useColorScheme();
+  const { theme, isDark } = useTheme();
   const pathname = usePathname();
   useAndroidBackPolicy();
 
+  // Keep React Navigation chrome on the same palette as the app surfaces.
+  const navigationTheme = useMemo(() => {
+    const base = isDark ? DarkTheme : DefaultTheme;
+    return {
+      ...base,
+      colors: {
+        ...base.colors,
+        primary: theme.colors.primary,
+        background: theme.colors.background,
+        card: theme.colors.surface,
+        text: theme.colors.text,
+        border: theme.colors.border,
+        notification: theme.colors.error,
+      },
+    };
+  }, [isDark, theme]);
+
   useEffect(() => {
-    setUiSfxPathname(pathname);
+    // Single media policy: route-aware SFX/music gates + stops narration.
+    setMediaPathname(pathname);
   }, [pathname]);
 
   useEffect(() => {
     installGlobalUiSfxHandlers();
     void initializeUiSfx();
+    // Preferences, AppState and screen-reader listeners for all media.
+    const removeMediaLifecycle = installMediaLifecycle();
 
     // Prime the bundled content database (lessons/quizzes/myths/facts/games).
     void ensureContentDatabase().catch((e) => {
@@ -45,14 +65,13 @@ function AppContent() {
     });
 
     return () => {
+      removeMediaLifecycle();
       void unloadUiSfx();
     };
   }, []);
 
   return (
-    <NavigationThemeProvider
-      value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
-    >
+    <NavigationThemeProvider value={navigationTheme}>
       <Stack>
         <Stack.Screen name="index" options={{ headerShown: false }} />
         <Stack.Screen name="onboarding" options={{ headerShown: false }} />
@@ -67,6 +86,7 @@ function AppContent() {
         <Stack.Screen name="lab" options={{ headerShown: false }} />
         <Stack.Screen name="explorer" options={{ headerShown: false }} />
         <Stack.Screen name="encyclopedia" options={{ headerShown: false }} />
+        <Stack.Screen name="periodic-table" options={{ headerShown: false }} />
         <Stack.Screen
           name="achievement-detail"
           options={{ headerShown: false, presentation: "modal" }}
@@ -77,16 +97,16 @@ function AppContent() {
           options={{ presentation: "modal", title: "Modal" }}
         />
       </Stack>
-      <StatusBar style={colorScheme === "dark" ? "light" : "dark"} />
+      <StatusBar style={isDark ? "light" : "dark"} />
     </NavigationThemeProvider>
   );
 }
 
 export default function RootLayout() {
-  const snProLoaded = useSnPro();
+  const fontsLoaded = useAppFonts();
 
   // Wait for fonts to load before rendering
-  if (!snProLoaded) {
+  if (!fontsLoaded) {
     return null;
   }
 

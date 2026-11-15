@@ -1,10 +1,9 @@
 import { Icon } from "@/components/ui/icon";
-import { fontFamilies, radius, spacing, useTheme } from "@/theme";
+import { createStyles, fontFaces, radius, spacing, useTheme } from "@/theme";
 import React, { useMemo } from "react";
 import {
   Modal,
   ScrollView,
-  StyleSheet,
   Text,
   TouchableOpacity,
   useWindowDimensions,
@@ -32,8 +31,7 @@ export function BetaNoticeModal({
   onOpenFeedback,
 }: BetaNoticeModalProps) {
   const { theme } = useTheme();
-  const isDark = theme.mode === "dark";
-  const styles = useMemo(() => createStyles(isDark), [isDark]);
+  const styles = useMemo(() => makeStyles(theme), [theme]);
   const reducedMotion = useReducedMotion();
   const { height } = useWindowDimensions();
   const insets = useSafeAreaInsets();
@@ -128,31 +126,10 @@ export function BetaNoticeModal({
   );
 }
 
-const createStyles = (isDark: boolean) => {
-  const P = isDark
-    ? {
-        card: "#213356",
-        border: "#2D3A56",
-        text: "#F6F9FC",
-        textSecondary: "#C0CBDD",
-        muted: "#8898AA",
-        soft: "#1A2D4A",
-        softBorder: "#26365A",
-      }
-    : {
-        card: "#FFFFFF",
-        border: "#E5E7EB",
-        text: "#333333",
-        textSecondary: "#555555",
-        muted: "#888888",
-        soft: "#FFF8EE",
-        softBorder: "#F5E6D0",
-      };
-
-  return StyleSheet.create({
+const makeStyles = createStyles((theme) => ({
     overlay: {
       flex: 1,
-      backgroundColor: "rgba(0, 0, 0, 0.55)",
+      backgroundColor: theme.colors.overlay,
       alignItems: "center",
       justifyContent: "center",
       padding: spacing.xl,
@@ -160,22 +137,22 @@ const createStyles = (isDark: boolean) => {
     card: {
       width: "100%",
       maxWidth: 400,
-      backgroundColor: P.card,
+      backgroundColor: theme.colors.card,
       borderRadius: radius["2xl"],
       padding: spacing.lg,
       borderWidth: 2,
-      borderColor: P.border,
+      borderColor: theme.colors.border,
       borderBottomWidth: 4,
-      shadowColor: "#000000",
+      shadowColor: theme.colors.shadow,
       shadowOffset: { width: 0, height: 10 },
-      shadowOpacity: isDark ? 0.4 : 0.18,
+      shadowOpacity: theme.mode === "dark" ? 0.4 : 0.18,
       shadowRadius: 20,
       elevation: 12,
     },
     title: {
       fontSize: 21,
-      fontFamily: fontFamilies.heavy,
-      color: P.text,
+      ...fontFaces.heavy,
+      color: theme.colors.text,
       marginBottom: 8,
     },
     bodyScroll: {
@@ -187,17 +164,17 @@ const createStyles = (isDark: boolean) => {
     },
     body: {
       fontSize: 13,
-      fontFamily: fontFamilies.regular,
-      color: P.textSecondary,
+      ...fontFaces.regular,
+      color: theme.colors.textSecondary,
       lineHeight: 19,
       marginBottom: 12,
     },
     callout: {
       flexDirection: "row",
       gap: 10,
-      backgroundColor: P.soft,
+      backgroundColor: theme.colors.surfaceSoft,
       borderWidth: 1,
-      borderColor: P.softBorder,
+      borderColor: theme.colors.borderSubtle,
       borderRadius: radius.lg,
       padding: 12,
       marginBottom: 12,
@@ -208,21 +185,21 @@ const createStyles = (isDark: boolean) => {
       borderRadius: 16,
       alignItems: "center",
       justifyContent: "center",
-      backgroundColor: isDark ? "#3A2C12" : "#FFE8CC",
+      backgroundColor: theme.colors.creamTint,
     },
     calloutTextWrap: {
       flex: 1,
     },
     calloutTitle: {
       fontSize: 13,
-      fontFamily: fontFamilies.bold,
-      color: P.text,
+      ...fontFaces.bold,
+      color: theme.colors.text,
       marginBottom: 3,
     },
     calloutBody: {
       fontSize: 12,
-      fontFamily: fontFamilies.regular,
-      color: P.textSecondary,
+      ...fontFaces.regular,
+      color: theme.colors.textSecondary,
       lineHeight: 18,
     },
     primaryBtn: {
@@ -240,7 +217,7 @@ const createStyles = (isDark: boolean) => {
     },
     primaryBtnText: {
       fontSize: 15,
-      fontFamily: fontFamilies.heavy,
+      ...fontFaces.heavy,
       color: "#FFFFFF",
     },
     secondaryBtn: {
@@ -252,16 +229,15 @@ const createStyles = (isDark: boolean) => {
     },
     secondaryBtnText: {
       fontSize: 14,
-      fontFamily: fontFamilies.semibold,
-      color: P.muted,
+      ...fontFaces.semibold,
+      color: theme.colors.textMuted,
     },
     footnote: {
       fontSize: 11,
-      fontFamily: fontFamilies.regular,
-      color: P.muted,
+      ...fontFaces.regular,
+      color: theme.colors.textMuted,
       textAlign: "center",
       lineHeight: 16,
       marginTop: 2,
     },
-  });
-};
+}));

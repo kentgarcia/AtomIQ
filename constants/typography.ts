@@ -1,6 +1,6 @@
 /**
  * Typography System — centralized font configuration.
- * Using SNPro (Sonos Sans Pro) for the entire design.
+ * Using Intern (variable font) for the entire design.
  *
  * This file is a compatibility layer over the design tokens in
  * `@/theme/tokens.ts` — font families, weights and sizes are defined
@@ -10,47 +10,48 @@
 import { Platform, type TextStyle } from "react-native";
 
 import {
-    fontFamilies as FontFamilies,
+    fontFamily,
+    fontFaces as FontFaces,
     fontSizes,
     lineHeights,
     typography,
 } from "@/theme/tokens";
 
 // Legacy Typography Styles - predefined text styles for consistent use
-// Using SNPro weight font files, sourced from the design tokens.
+// Weights come from the Intern variable font via the design tokens.
 export const TypographyStyles: Record<string, TextStyle> = {
-  // Headings - Use SNPro with specific weight font files
+  // Headings
   h1: {
-    fontFamily: FontFamilies.heavy,
+    ...FontFaces.heavy,
     fontSize: fontSizes["10xl"],
     lineHeight: lineHeights["9xl"],
     letterSpacing: -1,
   },
   h2: {
-    fontFamily: FontFamilies.bold,
+    ...FontFaces.bold,
     fontSize: fontSizes["8xl"],
     lineHeight: lineHeights["7xl"],
     letterSpacing: -0.5,
   },
   h3: {
-    fontFamily: FontFamilies.semibold,
+    ...FontFaces.semibold,
     fontSize: fontSizes["6xl"],
     lineHeight: lineHeights["5xl"],
     letterSpacing: 0,
   },
   h4: {
-    fontFamily: FontFamilies.medium,
+    ...FontFaces.medium,
     fontSize: fontSizes["4xl"],
     lineHeight: lineHeights["4xl"],
     letterSpacing: 0,
   },
 
-  // Body Text - Use SNPro
+  // Body Text
   body: typography.body,
   bodyLarge: typography.bodyLarge,
   bodyMedium: typography.bodyStrong,
   bodyBold: {
-    fontFamily: FontFamilies.bold,
+    ...FontFaces.bold,
     fontSize: fontSizes.xl,
     lineHeight: lineHeights.xl,
     letterSpacing: 0,
@@ -63,20 +64,21 @@ export const TypographyStyles: Record<string, TextStyle> = {
 };
 
 // Legacy Fonts export for backward compatibility
+// `Fonts.*` are family names only; pair with `FontFaces`/`fontFaces` for weight.
 export const Fonts = {
-  heading: FontFamilies.heading,
-  subheading: FontFamilies.subheading,
-  body: FontFamilies.body,
-  bodyMedium: FontFamilies.bodyMedium,
-  bodyBold: FontFamilies.bodyBold,
+  heading: fontFamily,
+  subheading: fontFamily,
+  body: fontFamily,
+  bodyMedium: fontFamily,
+  bodyBold: fontFamily,
   ...Platform.select({
     ios: {
-      sans: FontFamilies.body,
+      sans: fontFamily,
       serif: "ui-serif",
       mono: "ui-monospace",
     },
     default: {
-      sans: FontFamilies.body,
+      sans: fontFamily,
       serif: "serif",
       mono: "monospace",
     },

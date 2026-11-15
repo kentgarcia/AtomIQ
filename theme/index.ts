@@ -59,7 +59,7 @@ export {
     spacing,
     radius,
     typography,
-    fontFamilies,
+    fontFaces,
     fontWeights,
     fontSizes,
     lineHeights,
@@ -72,6 +72,15 @@ export {
 export type { Spacing, Radius } from "./tokens";
 
 export * from "./motion";
+
+export {
+    AA_LARGE,
+    AA_TEXT,
+    contrastRatio,
+    parseColor,
+    pickReadableText,
+    relativeLuminance,
+} from "./contrast";
 
 export {
     layout,

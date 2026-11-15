@@ -17,10 +17,13 @@ import Animated, {
     withTiming,
 } from "react-native-reanimated";
 import { LinearGradient } from "expo-linear-gradient";
-import { speakSafely, stopSpeech } from "@/services/speech";
+import { ReadAloudButton } from "@/components/ui/read-aloud-button";
+import { playAnswerSfx } from "@/services/game-sfx";
+import { readAloud } from "@/services/media";
+import { buildMythFeedbackSpeech, buildMythSpeech } from "@/services/media-core";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import {type Palette, fontFamilies} from "@/theme";
+import {type Palette, fontFaces} from "@/theme";
 import { Icon } from "@/components/ui/icon";
 
 import { createMythStyles, createStyles } from "./styles";
@@ -41,7 +44,6 @@ export const MythBusterView = ({
   const [showFeedback, setShowFeedback] = useState<
     null | "correct" | "incorrect"
   >(null);
-  const [isSpeaking, setIsSpeaking] = useState(false);
   const { width } = useWindowDimensions();
   const styles = useMemo(() => createStyles(theme, width), [theme, width]);
   const mythStyles = useMemo(() => createMythStyles(theme, width), [theme, width]);
@@ -49,27 +51,12 @@ export const MythBusterView = ({
   const rightIndicator = useSharedValue(0);
   const insets = useSafeAreaInsets();
 
-  // Stop speech when component unmounts
-  useEffect(() => {
-    return () => {
-      stopSpeech();
-    };
-  }, []);
-
-  const speakMyth = async () => {
-    if (isSpeaking) {
-      stopSpeech();
-      setIsSpeaking(false);
-    } else {
-      setIsSpeaking(true);
-      speakSafely(data.myth, {
-        language: "en",
-        pitch: 1.0,
-        rate: 0.9,
-        onDone: () => setIsSpeaking(false),
-        onStopped: () => setIsSpeaking(false),
-      });
-    }
+  // Read Aloud policy: the claim before the swipe, the reality after it.
+  const readAloudOwner = `lesson-myth:${data.myth}`;
+  const handleSwiped = (isLeft: boolean) => {
+    readAloud.stop("answered", readAloudOwner);
+    void playAnswerSfx(isLeft);
+    setShowFeedback(isLeft ? "correct" : "incorrect");
   };
 
   const pan = Gesture.Pan()
@@ -101,9 +88,7 @@ export const MythBusterView = ({
         translateX.value = withTiming(isLeft ? -width * 1.5 : width * 1.5, {
           duration: 200,
         });
-        runOnJS(stopSpeech)();
-        runOnJS(setIsSpeaking)(false);
-        runOnJS(setShowFeedback)(isLeft ? "correct" : "incorrect");
+        runOnJS(handleSwiped)(isLeft);
       } else {
         translateX.value = withSpring(0, { damping: 20 });
         cardRotate.value = withSpring(0);
@@ -228,24 +213,13 @@ export const MythBusterView = ({
             ]}
           >
             {/* Speaker Button - Top Right */}
-            <TouchableOpacity
-              style={mythStyles.speakerBtn}
-              onPress={() =>
-                speakSafely(
-                  `${data.explanation}. The reality is: ${data.reality}`,
-                  { language: "en", rate: 0.9 },
-                )
-              }
-              hitSlop={8}
-              accessibilityRole="button"
-              accessibilityLabel="Read explanation aloud"
-            >
-              <Icon
-                name="VolumeHigh"
-                size={22}
-                color={showFeedback === "correct" ? theme.success : theme.error}
-              />
-            </TouchableOpacity>
+            <ReadAloudButton
+              ownerId={`${readAloudOwner}:feedback`}
+              subject="explanation"
+              accent={showFeedback === "correct" ? theme.success : theme.error}
+              text={() => buildMythFeedbackSpeech(data.reality, data.explanation)}
+              style={{ position: "absolute", top: 16, right: 16 }}
+            />
 
             {/* Result Icon */}
             <View
@@ -304,30 +278,14 @@ export const MythBusterView = ({
               <Text style={styles.mythText}>&ldquo;{data.myth}&rdquo;</Text>
 
               {/* Read Aloud Button */}
-              <TouchableOpacity
-                style={[
-                  mythStyles.speakBtn,
-                  isSpeaking && mythStyles.speakBtnActive,
-                ]}
-                onPress={speakMyth}
-                hitSlop={4}
-                accessibilityRole="button"
-                accessibilityLabel={isSpeaking ? "Stop reading myth" : "Read myth aloud"}
-              >
-                <Icon
-                  name={isSpeaking ? "VolumeSlash" : "VolumeHigh"}
-                  size={24}
-                  color={isSpeaking ? "#FFF" : theme.primary}
-                />
-                <Text
-                  style={[
-                    mythStyles.speakBtnText,
-                    isSpeaking && { color: "#FFF" },
-                  ]}
-                >
-                  {isSpeaking ? "Stop" : "Read Aloud"}
-                </Text>
-              </TouchableOpacity>
+              <ReadAloudButton
+                ownerId={readAloudOwner}
+                subject="myth"
+                variant="pill"
+                accent={theme.primary}
+                text={() => buildMythSpeech(data.myth)}
+                style={{ marginBottom: 12 }}
+              />
 
               <View style={styles.swipeInstructions}>
                 <View style={styles.swipeLeft}>
@@ -340,7 +298,7 @@ export const MythBusterView = ({
                   <Text
                     style={{
                       color: theme.error,
-                      fontFamily: fontFamilies.heavy,
+                      ...fontFaces.heavy,
                       fontSize: 14,
                     }}
                   >
@@ -351,7 +309,7 @@ export const MythBusterView = ({
                   <Text
                     style={{
                       color: theme.success,
-                      fontFamily: fontFamilies.heavy,
+                      ...fontFaces.heavy,
                       fontSize: 14,
                     }}
                   >

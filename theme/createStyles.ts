@@ -22,13 +22,10 @@ export type NamedStyles<T> = {
     [P in keyof T]: ViewStyle | TextStyle | ImageStyle;
 };
 
-export function createStyles<TStyles extends Record<string, unknown>>(
+export function createStyles<TStyles extends NamedStyles<TStyles>>(
     factory: StyleFn<TStyles>,
-): (theme: Theme) => NamedStyles<TStyles> {
-    return (theme: Theme) => {
-        const styles = factory(theme);
-        return StyleSheet.create(styles as NamedStyles<TStyles>);
-    };
+): (theme: Theme) => TStyles {
+    return (theme: Theme) => StyleSheet.create(factory(theme));
 }
 
 /** Resolve `theme.spacing` quickly inside factories. */

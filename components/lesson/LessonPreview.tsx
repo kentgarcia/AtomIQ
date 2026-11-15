@@ -1,9 +1,8 @@
 import { Icon } from "@/components/ui/icon";
 import type { Lesson } from "@/content/types";
-import React, { useCallback } from "react";
+import React, { useCallback, useMemo } from "react";
 import {
     Image,
-    StyleSheet,
     Text,
     TouchableOpacity,
     View,
@@ -15,7 +14,7 @@ import Animated, {
     useSharedValue,
     withTiming,
 } from "react-native-reanimated";
-import { fontFamilies, useTheme } from "@/theme";
+import { createStyles, fontFaces, useTheme } from "@/theme";
 
 /* Autumn design tokens shared with the home map (reference design) */
 const BTN_COLOR = "#FF8C00";
@@ -53,8 +52,9 @@ export function LessonPreview({
   onProceed,
 }: LessonPreviewProps) {
   const pressed = useSharedValue(0);
-  const { theme, isDark } = useTheme();
+  const { theme } = useTheme();
   const LP = theme.palettes.lesson;
+  const styles = useMemo(() => makeStyles(theme), [theme]);
 
   // Reference :active — button sinks and the lip shallows
   const handlePressIn = useCallback(() => {
@@ -89,7 +89,7 @@ export function LessonPreview({
         accessibilityRole="button"
         accessibilityLabel="Close lesson preview"
       >
-        <Icon name="Close" size={22} color={isDark ? LP.textMuted : "#888888"} />
+        <Icon name="Close" size={22} color={theme.colors.textMuted} />
       </TouchableOpacity>
 
       <View style={styles.body}>
@@ -109,12 +109,7 @@ export function LessonPreview({
           ]}
         >
           {isReplay && (
-            <View
-              style={[
-                styles.reviewPill,
-                isDark && { backgroundColor: "rgba(255, 140, 0, 0.16)" },
-              ]}
-            >
+            <View style={styles.reviewPill}>
               <Icon name="TickSquare" size={14} color="#E67E22" variant="Bold" />
               <Text style={styles.reviewText}>Completed — review mode</Text>
             </View>
@@ -129,34 +124,19 @@ export function LessonPreview({
 
           {lesson && (
             <View style={styles.metaRow}>
-              <View
-                style={[
-                  styles.metaPill,
-                  isDark && { backgroundColor: "rgba(255, 255, 255, 0.08)" },
-                ]}
-              >
+              <View style={styles.metaPill}>
                 <Icon name="Flash" size={14} color="#F59E0B" variant="Bold" />
                 <Text style={[styles.metaText, { color: LP.text }]}>
                   {lesson.xpReward} XP
                 </Text>
               </View>
-              <View
-                style={[
-                  styles.metaPill,
-                  isDark && { backgroundColor: "rgba(255, 255, 255, 0.08)" },
-                ]}
-              >
+              <View style={styles.metaPill}>
                 <Icon name="Clock" size={14} color="#64B5F6" variant="Bold" />
                 <Text style={[styles.metaText, { color: LP.text }]}>
                   ~{lesson.estimatedMinutes} min
                 </Text>
               </View>
-              <View
-                style={[
-                  styles.metaPill,
-                  isDark && { backgroundColor: "rgba(255, 255, 255, 0.08)" },
-                ]}
-              >
+              <View style={styles.metaPill}>
                 <Icon name="Book" size={14} color="#81C784" variant="Bold" />
                 <Text style={[styles.metaText, { color: LP.text }]}>
                   {lesson.steps.length} steps
@@ -196,7 +176,7 @@ export function LessonPreview({
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = createStyles((theme) => ({
   root: {
     flex: 1,
   },
@@ -207,12 +187,12 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: theme.colors.card,
     alignItems: "center",
     justifyContent: "center",
     zIndex: 10,
     elevation: 3,
-    shadowColor: "#000000",
+    shadowColor: theme.colors.shadow,
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.08,
     shadowRadius: 6,
@@ -232,12 +212,12 @@ const styles = StyleSheet.create({
   },
   card: {
     width: "100%",
-    backgroundColor: "#FFFFFF",
+    backgroundColor: theme.colors.card,
     borderRadius: 24,
     padding: 24,
     alignItems: "center",
     elevation: 5,
-    shadowColor: "#000000",
+    shadowColor: theme.colors.shadow,
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.08,
     shadowRadius: 10,
@@ -246,7 +226,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 6,
-    backgroundColor: "#FFF3E0",
+    backgroundColor: theme.colors.creamTint,
     borderRadius: 14,
     paddingHorizontal: 12,
     paddingVertical: 6,
@@ -254,13 +234,13 @@ const styles = StyleSheet.create({
   },
   reviewText: {
     fontSize: 12,
-    fontFamily: fontFamilies.bold,
+    ...fontFaces.bold,
     color: "#E67E22",
   },
   eyebrow: {
     fontSize: 11,
-    fontFamily: fontFamilies.semibold,
-    color: "#888888",
+    ...fontFaces.semibold,
+    color: theme.colors.textFaint,
     textTransform: "uppercase",
     letterSpacing: 0.8,
     textAlign: "center",
@@ -268,14 +248,14 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 24,
-    fontFamily: fontFamilies.heavy,
-    color: "#333333",
+    ...fontFaces.heavy,
+    color: theme.colors.text,
     textAlign: "center",
   },
   description: {
     fontSize: 14,
-    fontFamily: fontFamilies.regular,
-    color: "#666666",
+    ...fontFaces.regular,
+    color: theme.colors.textSecondary,
     textAlign: "center",
     lineHeight: 21,
     marginTop: 10,
@@ -291,29 +271,29 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 5,
-    backgroundColor: "#FFF8EF",
+    backgroundColor: theme.colors.creamTint,
     borderRadius: 14,
     paddingHorizontal: 12,
     paddingVertical: 7,
   },
   metaText: {
     fontSize: 12,
-    fontFamily: fontFamilies.bold,
-    color: "#555555",
+    ...fontFaces.bold,
+    color: theme.colors.textSecondary,
   },
   btnWrap: {
     width: "100%",
     marginTop: 28,
   },
-  /* Reference button: white border wrapping an orange face over a lip */
+  /* Reference button: card-colored border wrapping an orange face over a lip */
   btn: {
     height: BTN_HEIGHT,
     borderRadius: BTN_RADIUS,
     borderWidth: BTN_BORDER,
-    borderColor: "#FFFFFF",
-    backgroundColor: "#FFFFFF",
+    borderColor: theme.colors.card,
+    backgroundColor: theme.colors.card,
     elevation: 8,
-    shadowColor: "#000000",
+    shadowColor: theme.colors.shadow,
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.12,
     shadowRadius: 8,
@@ -341,7 +321,7 @@ const styles = StyleSheet.create({
   },
   btnText: {
     fontSize: 17,
-    fontFamily: fontFamilies.heavy,
-    color: "#FFFFFF",
+    ...fontFaces.heavy,
+    color: theme.colors.onPrimary,
   },
-});
+}));

@@ -12,6 +12,8 @@ export const STORAGE_KEYS = {
   THEME: '@atomiq:theme',
   NOTIFICATIONS_ENABLED: '@atomiq:notifications_enabled',
   SOUND_ENABLED: '@atomiq:sound_enabled',
+  MUSIC_ENABLED: '@atomiq:music_enabled',
+  READ_ALOUD_ENABLED: '@atomiq:read_aloud_enabled',
   HAPTICS_ENABLED: '@atomiq:haptics_enabled',
   
   // Session Data
@@ -113,6 +115,24 @@ export const setSoundEnabled = async (enabled: boolean): Promise<void> => {
 
 export const getSoundEnabled = async (): Promise<boolean> => {
   const value = await getItem<boolean>(STORAGE_KEYS.SOUND_ENABLED);
+  return value ?? true;
+};
+
+export const setMusicEnabled = async (enabled: boolean): Promise<void> => {
+  await setItem(STORAGE_KEYS.MUSIC_ENABLED, enabled);
+};
+
+export const getMusicEnabled = async (): Promise<boolean> => {
+  const value = await getItem<boolean>(STORAGE_KEYS.MUSIC_ENABLED);
+  return value ?? true;
+};
+
+export const setReadAloudEnabled = async (enabled: boolean): Promise<void> => {
+  await setItem(STORAGE_KEYS.READ_ALOUD_ENABLED, enabled);
+};
+
+export const getReadAloudEnabled = async (): Promise<boolean> => {
+  const value = await getItem<boolean>(STORAGE_KEYS.READ_ALOUD_ENABLED);
   return value ?? true;
 };
 

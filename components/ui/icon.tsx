@@ -1,33 +1,45 @@
 import * as IconsaxReactNative from "iconsax-react-native";
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
+import { Text } from "react-native";
 
-// Map custom names to actual icon names
-const iconNameMap: Record<string, string> = {
-  Atom: "CpuSetting",
-  Message: "MessageText",
-  Ranking: "Medal",
-  Close: "CloseCircle",
-  Quote: "MessageText1",
-  Percentage: "PercentageSquare",
-  Infinite: "Unlimited",
-  Fire: "Flashy",
-  Book: "Book1",
-  Trophy: "MedalStar",
-  Target: "Target",
-  Info: "Information",
-  TickSquare: "TickSquare",
-  Sun: "Sun1",
-  Sword: "Slash",
-  Loader: "Refresh",
-};
+import { reportIconDiagnostic } from "./icon-diagnostics";
+import {
+  FALLBACK_ICON_NAME,
+  resolveIconName,
+  type IconVariant,
+} from "./icon-registry";
 
-interface IconProps {
-  name: string;
+export interface IconProps {
+  /**
+   * Iconsax export name or a reviewed alias from `icon-registry.ts`.
+   *
+   * Optional so callers can pass an optional content field directly. An empty
+   * or missing name renders the visible fallback instead of a blank slot.
+   */
+  name?: string | null;
   size?: number;
   color?: string;
-  variant?: "Linear" | "Outline" | "TwoTone" | "Bulk" | "Broken" | "Bold";
+  variant?: IconVariant;
   style?: any;
+  /**
+   * Optional diagnostic context, e.g. `lesson:background-radiation step:lab
+   * option:denver`. Included when the name is invalid so the source can be
+   * fixed without reproducing the screen.
+   */
+  source?: string;
 }
+
+type IconComponent = React.ComponentType<{
+  size?: number;
+  color?: string;
+  variant?: IconVariant;
+  style?: any;
+}>;
+
+const ICON_SURFACE = IconsaxReactNative as unknown as Record<
+  string,
+  IconComponent | undefined
+>;
 
 export function Icon({
   name,
@@ -35,25 +47,35 @@ export function Icon({
   color = "#000",
   variant = "Bold",
   style,
+  source,
 }: IconProps) {
-  const IconComponent = useMemo(() => {
-    // Check if we have a custom mapping for this icon name
-    const actualIconName = iconNameMap[name] || name;
+  const resolution = useMemo(
+    () => resolveIconName(name ?? "", ICON_SURFACE),
+    [name],
+  );
 
-    // Get the icon component from the iconsax library
-    const component = (IconsaxReactNative as any)[actualIconName];
-
-    if (!component) {
-      console.warn(
-        `Icon "${name}" (mapped to "${actualIconName}") not found in iconsax-react-native`,
-      );
+  useEffect(() => {
+    if (!resolution.valid) {
+      reportIconDiagnostic({ ...resolution, source });
     }
+  }, [resolution, source]);
 
-    return component;
-  }, [name]);
+  const componentName = resolution.valid
+    ? resolution.resolved
+    : FALLBACK_ICON_NAME;
+  const IconComponent = ICON_SURFACE[componentName];
 
+  // The fallback is a known installed export, but a broken/mismatched
+  // dependency must still not turn this into an invisible slot.
   if (!IconComponent) {
-    return null;
+    return (
+      <Text
+        accessibilityLabel={resolution.valid ? "Icon unavailable" : "Missing icon"}
+        style={[{ fontSize: size, color }, style]}
+      >
+        !
+      </Text>
+    );
   }
 
   return (

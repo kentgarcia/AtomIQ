@@ -8,14 +8,14 @@
 import { DifficultyPanel } from "@/components/games/DifficultyPanel";
 import { StackCard } from "@/components/games/StackCard";
 import { useTabBarInset } from "@/components/layout";
+import { GrowCard, GrowModal, useModalOrigin } from "@/components/ui/grow-modal";
 import { Icon } from "@/components/ui/icon";
-import { fontFamilies, useResponsiveLayout, useTheme } from "@/theme";
+import { createStyles, fontFaces, useResponsiveLayout, useTheme } from "@/theme";
 import { impactLight, impactMedium } from "@/services/haptics";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
-    Modal,
     Pressable,
     StyleSheet,
     Text,
@@ -23,18 +23,57 @@ import {
     View,
 } from "react-native";
 import Animated, {
-    Easing,
+    Extrapolation,
+    interpolate,
     runOnJS,
     useAnimatedStyle,
+    useReducedMotion,
     useSharedValue,
+    type SharedValue,
     withRepeat,
     withSpring,
     withTiming,
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { DURATION, EASE_DRAWER } from "@/theme/motion";
 import Svg, { Path } from "react-native-svg";
 
 const HEADER_H = 200;
+
+type DifficultyGame = "atom-maze" | "mythbuster" | "lab";
+
+/** Picker ⇄ difficulty panel (docs/CONTINUITY_SPEC.md, C3). */
+const EXPAND = { duration: DURATION.expand - 50, easing: EASE_DRAWER };
+
+/**
+ * One picker card. While the picker turns into a difficulty panel, the other
+ * cards fade out first and the tapped card hands over to the panel that grows
+ * out of its slot. `t` is 0 at the picker and 1 at the panel.
+ */
+function GameSlot({
+    index,
+    t,
+    selected,
+    reducedMotion,
+    children,
+}: {
+    index: number;
+    t: SharedValue<number>;
+    selected: SharedValue<number>;
+    reducedMotion: boolean;
+    children: React.ReactNode;
+}) {
+    const style = useAnimatedStyle(() => {
+        if (reducedMotion) return { opacity: 1 - t.value };
+        const isTapped = selected.value === index;
+        return {
+            opacity: isTapped
+                ? interpolate(t.value, [0, 0.25, 0.55], [1, 1, 0], Extrapolation.CLAMP)
+                : interpolate(t.value, [0, 0.3], [1, 0], Extrapolation.CLAMP),
+        };
+    });
+    return <Animated.View style={style}>{children}</Animated.View>;
+}
 
 const GAMES = [
     {
@@ -108,20 +147,17 @@ const RightArrow = ({ color = "#C7CBD4" }: { color?: string }) => (
 export function PickAGame() {
     const insets = useSafeAreaInsets();
     const router = useRouter();
-    const { height: windowHeight, width: windowWidth } = useWindowDimensions();
+    const { height: windowHeight } = useWindowDimensions();
     const { contentMaxWidth } = useResponsiveLayout();
     const tabBarInset = useTabBarInset();
     const { theme, isDark } = useTheme();
     const tab = theme.palettes.tab;
-    const P = isDark
-        ? { card: "#213356", border: "#2D3A56", softBorder: "#26365A", soft: "#1A2D4A", creamTint: "#4A381B", text: "#F6F9FC", textSecondary: "#C0CBDD", muted: "#8898AA", faint: "#667799" }
-        : { card: "#FFFFFF", border: "#E5E7EB", softBorder: "#F4F5F7", soft: "#F9FAFB", creamTint: "#FFF3E0", text: "#333333", textSecondary: "#555555", muted: "#888888", faint: "#9CA3AF" };
-    const styles = React.useMemo(() => createStyles(P), [P]);
+    const styles = React.useMemo(() => makeStyles(theme), [theme]);
 
     // Autumn gradient background, matching home / profile / discovery
     const SKY: [string, string] = isDark
         ? [tab.bg, tab.bg]
-        : ["#FFF3E0", "#FFFFFF"];
+        : [theme.colors.pageGradientTop, theme.colors.background];
 
     // Stack area sits below the header and above the floating tab bar
     const bottomReserve = tabBarInset + 16;
@@ -130,36 +166,48 @@ export function PickAGame() {
     );
     const cardH = Math.round(stackH / GAMES.length);
 
-    // Games with difficulty selection stay on this page: the picker slides
-    // out and the difficulty panel slides in (and back again).
-    const [activeGame, setActiveGame] = useState<"atom-maze" | "mythbuster" | "lab" | null>(null);
-    const SLIDE = { duration: 320, easing: Easing.inOut(Easing.cubic) };
+    // Games with difficulty selection stay on this page: the difficulty stack
+    // grows out of the tapped card's slot (and folds back into it). `activeGame`
+    // is the logical state; `panelGame` stays mounted until the close finishes,
+    // so a new tap mid-animation simply takes over from where it is.
+    const reducedMotion = useReducedMotion();
+    const [activeGame, setActiveGame] = useState<DifficultyGame | null>(null);
+    const [panelGame, setPanelGame] = useState<DifficultyGame | null>(null);
+    const [stageH, setStageH] = useState(0);
+    const t = useSharedValue(0);
+    const selected = useSharedValue(-1);
+    const timing = reducedMotion ? { duration: 150 } : EXPAND;
 
-    const gamesX = useSharedValue(0);
-    const diffX = useSharedValue(windowWidth);
-    const gamesSlide = useAnimatedStyle(() => ({
-        transform: [{ translateX: gamesX.value }],
-    }));
-    const diffSlide = useAnimatedStyle(() => ({
-        transform: [{ translateX: diffX.value }],
-    }));
+    const clearPanel = () => setPanelGame(null);
 
-    const openDifficulty = (game: "atom-maze" | "mythbuster" | "lab") => {
+    const panelStyle = useAnimatedStyle(() => {
+        if (reducedMotion || stageH === 0) return { opacity: t.value };
+        const startScale = cardH / stageH;
+        const startY = selected.value * cardH + cardH / 2 - stageH / 2;
+        return {
+            opacity: interpolate(t.value, [0, 0.2, 0.55], [0, 0, 1], Extrapolation.CLAMP),
+            transform: [
+                { translateY: startY * (1 - t.value) },
+                { scaleY: startScale + (1 - startScale) * t.value },
+            ],
+        };
+    });
+
+    const openDifficulty = (game: DifficultyGame, index: number) => {
         impactMedium();
+        selected.value = index;
         setActiveGame(game);
-        gamesX.value = withTiming(-windowWidth, SLIDE);
-        diffX.value = withTiming(0, SLIDE);
+        setPanelGame(game);
+        t.value = withTiming(1, timing);
     };
 
     const closeDifficulty = () => {
         if (activeGame === null) return;
         impactLight();
-        diffX.value = withTiming(windowWidth, SLIDE, (finished) => {
-            if (finished) {
-                runOnJS(setActiveGame)(null);
-            }
+        setActiveGame(null);
+        t.value = withTiming(0, timing, (finished) => {
+            if (finished) runOnJS(clearPanel)();
         });
-        gamesX.value = withTiming(0, SLIDE);
     };
 
     // Header arrow: nudges while picking, rotates 180° and darkens to
@@ -193,7 +241,7 @@ export function PickAGame() {
         transform: [{ translateX: arrowX.value }],
     }));
 
-    const handleSelect = (game: (typeof GAMES)[number]) => {
+    const handleSelect = (game: (typeof GAMES)[number], index: number) => {
         if (
             game.route === "/explorer/atom-maze" ||
             game.route === "/mythbuster" ||
@@ -203,6 +251,7 @@ export function PickAGame() {
                 game.route === "/explorer/atom-maze"
                     ? "atom-maze"
                     : (game.route.slice(1) as "mythbuster" | "lab"),
+                index,
             );
             return;
         }
@@ -211,9 +260,10 @@ export function PickAGame() {
     };
 
     const [guideVisible, setGuideVisible] = useState(false);
+    const { anchor: guideAnchor, origin: guideOrigin, capture: guideCapture } = useModalOrigin();
     const openGuide = () => {
         impactLight();
-        setGuideVisible(true);
+        guideCapture(() => setGuideVisible(true));
     };
 
     const GUIDE_ROWS = [
@@ -253,6 +303,7 @@ export function PickAGame() {
                 ]}
             >
                 <Pressable
+                    ref={guideAnchor}
                     onPress={openGuide}
                     style={({ pressed }) => [
                         styles.logoContainer,
@@ -290,43 +341,53 @@ export function PickAGame() {
                     styles.stage,
                     { width: "100%", maxWidth: contentMaxWidth, alignSelf: "center" },
                 ]}
+                onLayout={(e) => setStageH(e.nativeEvent.layout.height)}
             >
-                <Animated.View
-                    style={[styles.layer, gamesSlide]}
+                <View
+                    style={styles.layer}
                     pointerEvents={activeGame === null ? "auto" : "none"}
                 >
                     {/* Full-bleed slanted card stack */}
                     <View style={[styles.cardsList, { paddingBottom: bottomReserve }]}>
-                        {GAMES.map((game) => (
-                            <StackCard
+                        {GAMES.map((game, index) => (
+                            <GameSlot
                                 key={game.title}
-                                title={game.title}
-                                color={game.color}
-                                icon={game.icon}
-                                delay={game.delay}
-                                height={cardH}
-                                onPress={() => handleSelect(game)}
-                            />
+                                index={index}
+                                t={t}
+                                selected={selected}
+                                reducedMotion={reducedMotion}
+                            >
+                                <StackCard
+                                    title={game.title}
+                                    color={game.color}
+                                    icon={game.icon}
+                                    delay={game.delay}
+                                    height={cardH}
+                                    onPress={() => handleSelect(game, index)}
+                                />
+                            </GameSlot>
                         ))}
                     </View>
-                </Animated.View>
+                </View>
 
-                {activeGame !== null && (
-                    <Animated.View style={[styles.layer, diffSlide]}>
-                        <DifficultyPanel game={activeGame} />
+                {panelGame !== null && (
+                    <Animated.View
+                        style={[styles.layer, panelStyle]}
+                        pointerEvents={activeGame !== null ? "auto" : "none"}
+                    >
+                        <DifficultyPanel game={panelGame} />
                     </Animated.View>
                 )}
             </View>
 
             {/* How to Play guide */}
-            <Modal
+            <GrowModal
                 visible={guideVisible}
-                transparent
-                animationType="fade"
+                origin={guideOrigin}
                 onRequestClose={() => setGuideVisible(false)}
             >
                 <View style={styles.modalOverlay}>
-                    <View style={styles.modalContent}>
+                    <GrowCard style={styles.modalContent}>
                         <View style={styles.dragHandle} />
 
                         <View style={styles.modalHeader}>
@@ -346,7 +407,7 @@ export function PickAGame() {
                                 <Icon
                                     name="CloseCircle"
                                     size={20}
-                                    color={isDark ? "#667799" : "#9CA3AF"}
+                                    color={theme.colors.textFaint}
                                     variant="Bold"
                                 />
                             </Pressable>
@@ -383,15 +444,16 @@ export function PickAGame() {
                             <Icon name="TickCircle" size={18} color="#FFFFFF" variant="Bold" />
                             <Text style={styles.guideActionText}>Got it</Text>
                         </Pressable>
-                    </View>
+                    </GrowCard>
                 </View>
-            </Modal>
+            </GrowModal>
         </View>
     );
 }
 
-const createStyles = (P: { card: string; border: string; softBorder: string; soft: string; creamTint: string; text: string; textSecondary: string; muted: string; faint: string }) =>
-  StyleSheet.create({
+const makeStyles = createStyles((theme) => {
+  const ui = theme.palettes.ui;
+  return {
     screen: {
         flex: 1,
     },
@@ -416,7 +478,7 @@ const createStyles = (P: { card: string; border: string; softBorder: string; sof
     },
     titlePick: {
         fontSize: 84,
-        fontFamily: fontFamilies.heavy,
+        ...fontFaces.heavy,
         letterSpacing: -4,
         lineHeight: 78,
     },
@@ -426,13 +488,13 @@ const createStyles = (P: { card: string; border: string; softBorder: string; sof
     },
     titleGame: {
         fontSize: 84,
-        fontFamily: fontFamilies.heavy,
+        ...fontFaces.heavy,
         letterSpacing: -4,
         lineHeight: 78,
     },
     titleA: {
         fontSize: 34,
-        fontFamily: fontFamilies.heavy,
+        ...fontFaces.heavy,
         letterSpacing: -1.5,
         marginLeft: 4,
     },
@@ -466,7 +528,7 @@ const createStyles = (P: { card: string; border: string; softBorder: string; sof
     /* Guide modal — profile edit-modal design */
     modalOverlay: {
         flex: 1,
-        backgroundColor: "rgba(0, 0, 0, 0.45)",
+        backgroundColor: theme.colors.overlay,
         justifyContent: "center",
         alignItems: "center",
         padding: 20,
@@ -480,10 +542,10 @@ const createStyles = (P: { card: string; border: string; softBorder: string; sof
         paddingTop: 12,
         borderWidth: 2,
         borderBottomWidth: 4,
-        borderColor: P.border,
-        backgroundColor: P.card,
+        borderColor: ui.border,
+        backgroundColor: ui.card,
         elevation: 10,
-        shadowColor: "#000000",
+        shadowColor: theme.colors.shadow,
         shadowOffset: { width: 0, height: 8 },
         shadowOpacity: 0.12,
         shadowRadius: 16,
@@ -492,7 +554,7 @@ const createStyles = (P: { card: string; border: string; softBorder: string; sof
         width: 36,
         height: 4,
         borderRadius: 2,
-        backgroundColor: P.softBorder,
+        backgroundColor: ui.softBorder,
         alignSelf: "center",
         marginBottom: 8,
     },
@@ -512,14 +574,14 @@ const createStyles = (P: { card: string; border: string; softBorder: string; sof
         width: 32,
         height: 32,
         borderRadius: 16,
-        backgroundColor: P.creamTint,
+        backgroundColor: ui.creamTint,
         alignItems: "center",
         justifyContent: "center",
     },
     modalTitle: {
         fontSize: 18,
-        fontFamily: fontFamilies.heavy,
-        color: P.text,
+        ...fontFaces.heavy,
+        color: ui.text,
     },
     modalCloseBtn: {
         width: 36,
@@ -527,9 +589,9 @@ const createStyles = (P: { card: string; border: string; softBorder: string; sof
         borderRadius: 18,
         alignItems: "center",
         justifyContent: "center",
-        backgroundColor: P.soft,
+        backgroundColor: ui.soft,
         borderWidth: 1,
-        borderColor: P.border,
+        borderColor: ui.border,
     },
     guideRow: {
         flexDirection: "row",
@@ -539,9 +601,9 @@ const createStyles = (P: { card: string; border: string; softBorder: string; sof
         paddingHorizontal: 12,
         borderRadius: 12,
         marginBottom: 8,
-        backgroundColor: P.soft,
+        backgroundColor: ui.soft,
         borderWidth: 1,
-        borderColor: P.softBorder,
+        borderColor: ui.softBorder,
     },
     guideRowIcon: {
         width: 40,
@@ -550,21 +612,21 @@ const createStyles = (P: { card: string; border: string; softBorder: string; sof
         alignItems: "center",
         justifyContent: "center",
         flexShrink: 0,
-        backgroundColor: P.creamTint,
+        backgroundColor: ui.creamTint,
     },
     guideRowText: {
         flex: 1,
     },
     guideRowTitle: {
         fontSize: 14,
-        fontFamily: fontFamilies.heavy,
-        color: P.text,
+        ...fontFaces.heavy,
+        color: ui.text,
         marginBottom: 2,
     },
     guideRowDesc: {
         fontSize: 13,
-        fontFamily: fontFamilies.semibold,
-        color: P.muted,
+        ...fontFaces.semibold,
+        color: ui.muted,
         lineHeight: 18,
     },
     guideActionBtn: {
@@ -579,7 +641,7 @@ const createStyles = (P: { card: string; border: string; softBorder: string; sof
         borderBottomWidth: 4,
         borderColor: "#E67E22",
         backgroundColor: "#FF8C00",
-        shadowColor: "#000000",
+        shadowColor: theme.colors.shadow,
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.12,
         shadowRadius: 8,
@@ -587,9 +649,10 @@ const createStyles = (P: { card: string; border: string; softBorder: string; sof
     },
     guideActionText: {
         fontSize: 15,
-        fontFamily: fontFamilies.heavy,
+        ...fontFaces.heavy,
         color: "#FFFFFF",
     },
+  };
 });
 
 export default PickAGame;

@@ -20,22 +20,42 @@ const base = {
     background: "#FFFFFF",
     /** Card / raised surface. */
     surface: "#FFFFFF",
+    /** Elevated surface above a card (sheets, modals, nested cards). */
+    surfaceRaised: "#FFFFFF",
+    /** Higher-contrast surface used for inverses and selected panels. */
+    surfaceStrong: "#FFFFFF",
     /** Hard-edged separator lines. */
     border: "#E5E7EB",
+    /** Stronger outline used for inputs and focused controls. */
+    borderStrong: "#D1D5DB",
     /* Strong foreground text. */
     text: "#32325D",
     /* Muted foreground text. */
     textMuted: "#8898AA",
+    /* Disabled / de-emphasized foreground text. */
+    textFaint: "#9CA3AF",
     /** Lightly tinted fill (soft panels, hover states). */
     surfaceSoft: "#F4F5F7",
+    /** Editable field fill. */
+    input: "#F9FAFB",
+    /** Inverse surface (snackbars, tooltips) and its foreground. */
+    inverseSurface: "#1F2937",
+    inverseText: "#FFFFFF",
   },
   dark: {
     background: "#172B4D",
     surface: "#213356",
+    surfaceRaised: "#26365A",
+    surfaceStrong: "#213356",
     border: "#2D3A56",
+    borderStrong: "#334A70",
     text: "#F6F9FC",
     textMuted: "#8898AA",
+    textFaint: "#667799",
     surfaceSoft: "#1A2D4A",
+    input: "#1A2D4A",
+    inverseSurface: "#F6F9FC",
+    inverseText: "#172B4D",
   },
 } as const;
 
@@ -76,6 +96,30 @@ const brand = {
 /* ------------------------------------------------------------------ */
 /* Colors: semantic roles (shared across light & dark)                 */
 /* ------------------------------------------------------------------ */
+
+/* Warm brand family used by the home/profile/guide header treatment. */
+const warm = {
+  light: {
+    header: "#FFCA5F",
+    headerText: "#724D06",
+    chipBorder: "#FFDD8D",
+    chipActive: "#FFE0B2",
+    cream: "#FFF3E0",
+    creamStrong: "#FFE0B2",
+    gradientTop: "#FFF3E0",
+    gradientBottom: "#FFFFFF",
+  },
+  dark: {
+    header: "#3A2C12",
+    headerText: "#FFD98A",
+    chipBorder: "#6B5320",
+    chipActive: "#4A381B",
+    cream: "#4A381B",
+    creamStrong: "#5A4620",
+    gradientTop: "#172B4D",
+    gradientBottom: "#172B4D",
+  },
+} as const;
 
 const role = {
   success: "#2ECC71",
@@ -134,26 +178,16 @@ export const radius = {
 export type Radius = keyof typeof radius;
 
 /* ------------------------------------------------------------------ */
-/* Typography — SNPro family + size/weight/line-height scale           */
+/* Typography — Intern variable font + size/weight/line-height scale   */
 /* ------------------------------------------------------------------ */
 
-export const fontFamilies = {
-  thin: "SNPro-Thin",
-  light: "SNPro-Light",
-  book: "SNPro-Book",
-  regular: "SNPro-Regular",
-  medium: "SNPro-Medium",
-  semibold: "SNPro-Semibold",
-  bold: "SNPro-Bold",
-  heavy: "SNPro-Heavy",
-  black: "SNPro-Black",
-  /* Semantic aliases (legacy names) */
-  heading: "SNPro-Bold",
-  subheading: "SNPro-Medium",
-  body: "SNPro-Book",
-  bodyMedium: "SNPro-Medium",
-  bodyBold: "SNPro-Bold",
-} as const;
+/**
+ * The single bundled family: `assets/fonts/Intern-Variable.ttf` is a variable
+ * font (`wght` 100–900, `opsz` 14–32), loaded once under this name by
+ * `hooks/use-app-fonts.ts`. Weight is selected with the `fontWeight` style prop,
+ * not by picking a different family name.
+ */
+export const fontFamily = "Intern" as const;
 
 export const fontWeights = {
   thin: "100",
@@ -166,6 +200,31 @@ export const fontWeights = {
   heavy: "800",
   black: "900",
 } as const;
+
+type FontFace = { fontFamily: typeof fontFamily; fontWeight: (typeof fontWeights)[keyof typeof fontWeights] };
+
+/**
+ * Ready-to-spread text faces. Always spread the whole face so family and weight
+ * stay paired: `{ ...fontFaces.bold, fontSize: 16 }`. Setting only `fontFamily`
+ * would render the regular (400) instance.
+ */
+export const fontFaces = {
+  thin: { fontFamily, fontWeight: fontWeights.thin },
+  light: { fontFamily, fontWeight: fontWeights.light },
+  book: { fontFamily, fontWeight: fontWeights.book },
+  regular: { fontFamily, fontWeight: fontWeights.regular },
+  medium: { fontFamily, fontWeight: fontWeights.medium },
+  semibold: { fontFamily, fontWeight: fontWeights.semibold },
+  bold: { fontFamily, fontWeight: fontWeights.bold },
+  heavy: { fontFamily, fontWeight: fontWeights.heavy },
+  black: { fontFamily, fontWeight: fontWeights.black },
+  /* Semantic aliases (legacy names) */
+  heading: { fontFamily, fontWeight: fontWeights.bold },
+  subheading: { fontFamily, fontWeight: fontWeights.medium },
+  body: { fontFamily, fontWeight: fontWeights.book },
+  bodyMedium: { fontFamily, fontWeight: fontWeights.medium },
+  bodyBold: { fontFamily, fontWeight: fontWeights.bold },
+} as const satisfies Record<string, FontFace>;
 
 export const fontSizes = {
   xs: 10,
@@ -203,96 +262,84 @@ export const lineHeights = {
 /** Precomposed text roles consumed by <Text> and `typography.*` helpers. */
 export const typography = {
   display: {
-    fontFamily: fontFamilies.black,
-    fontWeight: "normal" as const,
+    ...fontFaces.black,
     fontStyle: "normal" as const,
     fontSize: fontSizes["10xl"],
     lineHeight: lineHeights["9xl"],
     letterSpacing: -1,
   },
   hero: {
-    fontFamily: fontFamilies.heavy,
-    fontWeight: "normal" as const,
+    ...fontFaces.heavy,
     fontStyle: "normal" as const,
     fontSize: fontSizes["7xl"],
     lineHeight: lineHeights["7xl"],
     letterSpacing: -0.5,
   },
   heading: {
-    fontFamily: fontFamilies.semibold,
-    fontWeight: "normal" as const,
+    ...fontFaces.semibold,
     fontStyle: "normal" as const,
     fontSize: fontSizes["6xl"],
     lineHeight: lineHeights["6xl"],
     letterSpacing: 0,
   },
   title: {
-    fontFamily: fontFamilies.heavy,
-    fontWeight: "normal" as const,
+    ...fontFaces.heavy,
     fontStyle: "normal" as const,
     fontSize: fontSizes["5xl"],
     lineHeight: lineHeights["6xl"],
     letterSpacing: -0.3,
   },
   subtitle: {
-    fontFamily: fontFamilies.medium,
-    fontWeight: "normal" as const,
+    ...fontFaces.medium,
     fontStyle: "normal" as const,
     fontSize: fontSizes["3xl"],
     lineHeight: lineHeights["4xl"],
     letterSpacing: 0,
   },
   body: {
-    fontFamily: fontFamilies.book,
-    fontWeight: "normal" as const,
+    ...fontFaces.book,
     fontStyle: "normal" as const,
     fontSize: fontSizes.xl,
     lineHeight: lineHeights.xl,
     letterSpacing: 0,
   },
   bodyStrong: {
-    fontFamily: fontFamilies.medium,
-    fontWeight: "normal" as const,
+    ...fontFaces.medium,
     fontStyle: "normal" as const,
     fontSize: fontSizes.xl,
     lineHeight: lineHeights.xl,
     letterSpacing: 0,
   },
   bodyLarge: {
-    fontFamily: fontFamilies.book,
-    fontWeight: "normal" as const,
+    ...fontFaces.book,
     fontStyle: "normal" as const,
     fontSize: fontSizes["2xl"],
     lineHeight: lineHeights["2xl"],
     letterSpacing: 0,
   },
   caption: {
-    fontFamily: fontFamilies.book,
-    fontWeight: "normal" as const,
+    ...fontFaces.book,
     fontStyle: "normal" as const,
     fontSize: fontSizes.lg,
     lineHeight: lineHeights.lg,
     letterSpacing: 0,
   },
   label: {
-    fontFamily: fontFamilies.medium,
-    fontWeight: "normal" as const,
+    ...fontFaces.medium,
     fontStyle: "normal" as const,
     fontSize: fontSizes.lg,
     lineHeight: lineHeights.lg,
     letterSpacing: 0.25,
   },
   micro: {
-    fontFamily: fontFamilies.book,
-    fontWeight: "normal" as const,
+    ...fontFaces.book,
     fontStyle: "normal" as const,
     fontSize: fontSizes.sm,
     lineHeight: lineHeights.md,
     letterSpacing: 0,
   },
   button: {
-    fontFamily: fontFamilies.semibold,
-    fontWeight: "normal" as const,
+    ...fontFaces.semibold,
     fontStyle: "normal" as const,
     fontSize: fontSizes.xl,
     lineHeight: lineHeights.xl,
@@ -394,10 +441,12 @@ export const colors = {
   base,
   role,
   brand,
+  warm,
 } as const;
 
 export const paletteColors = {
   base,
   brand,
   role,
+  warm,
 } as const;

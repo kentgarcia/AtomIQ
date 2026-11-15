@@ -1,12 +1,12 @@
 import { Icon } from "@/components/ui/icon";
 import { getAllEncyclopediaEntries } from "@/content/explorer";
 import type { EncyclopediaEntry } from "@/content/explorer";
-import { useTheme, fontFamilies, useResponsiveLayout } from "@/theme";
+import { useTheme, fontFaces, useResponsiveLayout, createStyles, withAlpha } from "@/theme";
 import { impactLight, impactMedium } from "@/services/haptics";
 import { Image as ExpoImage } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
-import { speakSafely, stopSpeech } from "@/services/speech";
+import { ReadAloudButton } from "@/components/ui/read-aloud-button";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   ScrollView,
@@ -27,6 +27,7 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import { FastAlphabet } from "@/components/ui/fast-alphabet";
+import { PERIODIC_TABLE_HREF } from "@/services/periodic-table";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 /* -------------------------------------------------------------------------------- */
@@ -36,7 +37,6 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 type VaultCat = {
   label: string;
   bg: string;
-  soft: string;
   border: string;
   icon: string;
   gradient: readonly [string, string];
@@ -46,7 +46,6 @@ const CATEGORY_VAULT: Record<string, VaultCat> = {
   science: {
     label: "Science",
     bg: "#8B5CF6",
-    soft: "#EDE9FE",
     border: "#7C3AED",
     icon: "🔬",
     gradient: ["#8B5CF6", "#6D28D9"] as const,
@@ -54,7 +53,6 @@ const CATEGORY_VAULT: Record<string, VaultCat> = {
   technology: {
     label: "Technology",
     bg: "#3B82F6",
-    soft: "#DBEAFE",
     border: "#2563EB",
     icon: "⚙️",
     gradient: ["#3B82F6", "#1D4ED8"] as const,
@@ -62,7 +60,6 @@ const CATEGORY_VAULT: Record<string, VaultCat> = {
   safety: {
     label: "Safety",
     bg: "#10B981",
-    soft: "#D1FAE5",
     border: "#059669",
     icon: "🛡️",
     gradient: ["#10B981", "#047857"] as const,
@@ -70,7 +67,6 @@ const CATEGORY_VAULT: Record<string, VaultCat> = {
   environment: {
     label: "Environment",
     bg: "#059669",
-    soft: "#ECFDF5",
     border: "#047857",
     icon: "🌿",
     gradient: ["#059669", "#065F46"] as const,
@@ -78,7 +74,6 @@ const CATEGORY_VAULT: Record<string, VaultCat> = {
   people: {
     label: "People",
     bg: "#F59E0B",
-    soft: "#FEF3C7",
     border: "#D97706",
     icon: "🧑‍🔬",
     gradient: ["#F59E0B", "#D97706"] as const,
@@ -86,7 +81,6 @@ const CATEGORY_VAULT: Record<string, VaultCat> = {
   history: {
     label: "History",
     bg: "#CA8A04",
-    soft: "#FEF9C3",
     border: "#A16207",
     icon: "📜",
     gradient: ["#CA8A04", "#854D0E"] as const,
@@ -94,7 +88,6 @@ const CATEGORY_VAULT: Record<string, VaultCat> = {
   default: {
     label: "Archive",
     bg: "#6B7280",
-    soft: "#F3F4F6",
     border: "#4B5563",
     icon: "📖",
     gradient: ["#6B7280", "#4B5563"] as const,
@@ -104,36 +97,21 @@ const CATEGORY_VAULT: Record<string, VaultCat> = {
 const getVaultCat = (cat: string): VaultCat =>
   CATEGORY_VAULT[cat?.toLowerCase()] ?? CATEGORY_VAULT.default;
 
-const DIFF_LABEL: Record<string, { bg: string; color: string; label: string }> = {
-  beginner: { bg: "#ECFDF5", color: "#059669", label: "Beginner" },
-  intermediate: { bg: "#FFF7ED", color: "#EA580C", label: "Intermediate" },
-  advanced: { bg: "#FEF2F2", color: "#DC2626", label: "Advanced" },
-};
-
-/* Visual constants matching Home & Community */
-const AMBER = "#FFCA5F";
-const AMBER_DEEP = "#FF8C00";
-const AMBER_LIP = "#E67E22";
-const CREAM_TOP = "#FFF3E0";
-const CREAM_BOTTOM = "#FFFFFF";
-const CARD_WHITE = "#FFFFFF";
+/* Visual constants matching Home & Community (brand amber, mode-aware via theme) */
 const ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("") as readonly string[];
 
 export default function EncyclopediaScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { contentMaxWidth, gutter } = useResponsiveLayout();
-  const { theme, isDark } = useTheme();
-  const THEME = theme.palettes.library;
+  const { theme } = useTheme();
+  const bgTop = theme.colors.pageGradientTop;
+  const bgBottom = theme.colors.pageGradientBottom;
 
-  const bgTop = isDark ? THEME.bg : CREAM_TOP;
-  const bgBottom = isDark ? THEME.bg : CREAM_BOTTOM;
-
-  const styles = useMemo(() => createStyles(isDark), [isDark]);
+  const styles = useMemo(() => makeStyles(theme), [theme]);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedLetter, setSelectedLetter] = useState<string | null>(null);
-  const [speakingEntryId, setSpeakingEntryId] = useState<string | null>(null);
 
   const [allEntries, setAllEntries] = useState<EncyclopediaEntry[]>([]);
   useEffect(() => {
@@ -143,12 +121,6 @@ export default function EncyclopediaScreen() {
     });
     return () => {
       alive = false;
-    };
-  }, []);
-
-  useEffect(() => {
-    return () => {
-      stopSpeech();
     };
   }, []);
 
@@ -236,27 +208,6 @@ export default function EncyclopediaScreen() {
       }
     },
     []
-  );
-
-  const speakTerm = useCallback(
-    (entry: EncyclopediaEntry) => {
-      impactLight();
-      if (speakingEntryId === entry.id) {
-        stopSpeech();
-        setSpeakingEntryId(null);
-      } else {
-        stopSpeech();
-        setSpeakingEntryId(entry.id);
-        speakSafely(`${entry.term}. ${entry.definition}`, {
-          language: "en",
-          rate: 0.85,
-          pitch: 1.0,
-          onDone: () => setSpeakingEntryId(null),
-          onStopped: () => setSpeakingEntryId(null),
-        });
-      }
-    },
-    [speakingEntryId]
   );
 
   const handleCategorySelect = (cat: string) => {
@@ -367,7 +318,7 @@ export default function EncyclopediaScreen() {
               <Icon
                 name={hasActiveFilter ? "CloseCircle" : "ArrowLeft2"}
                 size={20}
-                color="#7C4A00"
+                color={theme.colors.amberText}
                 variant="Bold"
               />
             </TouchableOpacity>
@@ -388,14 +339,24 @@ export default function EncyclopediaScreen() {
                       : `${totalEntries} terms · ${categoriesWithCounts.length} archives`}
               </Text>
             </View>
+            <TouchableOpacity
+              onPress={() => router.push(PERIODIC_TABLE_HREF)}
+              style={styles.backBtn}
+              activeOpacity={0.9}
+              hitSlop={5}
+              accessibilityRole="button"
+              accessibilityLabel="Open the periodic table"
+            >
+              <Icon name="Element4" size={20} color={theme.colors.amberText} variant="Bold" />
+            </TouchableOpacity>
           </View>
 
-          <View style={[styles.searchCard, isDark && { backgroundColor: theme.palettes.library.card }]}>
-            <Icon name="SearchNormal" size={18} color="#9CA3AF" variant="Bold" />
+          <View style={styles.searchCard}>
+            <Icon name="SearchNormal" size={18} color={theme.colors.textFaint} variant="Bold" />
             <TextInput
-              style={[styles.searchInput, isDark && { color: theme.palettes.library.text }]}
+              style={styles.searchInput}
               placeholder="Search terms, facts, people…"
-              placeholderTextColor="#9CA3AF"
+              placeholderTextColor={theme.colors.textFaint}
               value={searchQuery}
               onChangeText={(t) => {
                 setSearchQuery(t);
@@ -410,7 +371,7 @@ export default function EncyclopediaScreen() {
                 accessibilityRole="button"
                 accessibilityLabel="Clear search"
               >
-                <Icon name="CloseCircle" size={18} color="#9CA3AF" />
+                <Icon name="CloseCircle" size={18} color={theme.colors.textFaint} />
               </TouchableOpacity>
             )}
           </View>
@@ -426,7 +387,7 @@ export default function EncyclopediaScreen() {
                     accessibilityRole="button"
                     accessibilityLabel={`Remove ${getVaultCat(cat).label} filter`}
                   >
-                    <Icon name="CloseCircle" size={14} color="#FFFFFF" />
+                    <Icon name="CloseCircle" size={14} color={theme.colors.onPrimary} />
                   </TouchableOpacity>
                 </View>
               ))}
@@ -439,7 +400,7 @@ export default function EncyclopediaScreen() {
                     accessibilityRole="button"
                     accessibilityLabel={`Remove letter ${selectedLetter} filter`}
                   >
-                    <Icon name="CloseCircle" size={14} color="#7C4A00" />
+                    <Icon name="CloseCircle" size={14} color={theme.colors.amberText} />
                   </TouchableOpacity>
                 </View>
               )}
@@ -531,7 +492,7 @@ export default function EncyclopediaScreen() {
           {hasActiveFilter && (
             <Animated.View entering={FadeIn.duration(200)} style={styles.resultsBar}>
               <View style={styles.resultsLeft}>
-                <Icon name="Book" size={14} color="#7C4A00" variant="Bold" />
+                <Icon name="Book" size={14} color={theme.colors.amberText} variant="Bold" />
                 <Text style={styles.resultsText}>
                   {filteredEntries.length} {filteredEntries.length === 1 ? "result" : "results"}
                   {selectedCategories.length > 0
@@ -556,7 +517,7 @@ export default function EncyclopediaScreen() {
                 style={styles.emptyMascot}
                 contentFit="contain"
               />
-              <Text style={[styles.emptyTitle, isDark && { color: theme.palettes.library.text }]}>
+              <Text style={styles.emptyTitle}>
                 No entries found
               </Text>
               <Text style={styles.emptySub}>
@@ -586,7 +547,6 @@ export default function EncyclopediaScreen() {
 
                   <View style={styles.cardsCol}>
                     {entries.map((entry, idx) => {
-                      const isSpeaking = speakingEntryId === entry.id;
                       return (
                         <Animated.View
                           key={entry.id}
@@ -595,37 +555,28 @@ export default function EncyclopediaScreen() {
                         >
                           <TouchableOpacity
                             activeOpacity={0.86}
-                            style={[styles.entryCard, isDark && { backgroundColor: theme.palettes.library.card, borderColor: theme.palettes.library.border }]}
+                            style={styles.entryCard}
                             onPress={() => router.push(`/explorer/encyclopedia-entry?id=${entry.id}`)}
                           >
-                            <View style={[styles.entryTopRow, isDark && { borderBottomColor: theme.palettes.library.border }]}>
-                              <Text style={[styles.entryTerm, isDark && { color: theme.palettes.library.text }]}>
+                            <View style={styles.entryTopRow}>
+                              <Text style={styles.entryTerm}>
                                 {entry.term}
                               </Text>
                               <View style={styles.entryActions}>
-                                <TouchableOpacity
-                                  style={[styles.speakBtn, isSpeaking && styles.speakBtnActive]}
-                                  onPress={(e) => {
-                                    e.stopPropagation();
-                                    speakTerm(entry);
-                                  }}
-                                  hitSlop={7}
-                                  accessibilityRole="button"
-                                  accessibilityLabel={isSpeaking ? "Stop reading term" : "Read term aloud"}
-                                >
-                                  <Icon
-                                    name={isSpeaking ? "VolumeSlash" : "VolumeHigh"}
-                                    size={16}
-                                    color={isSpeaking ? "#FFFFFF" : "#9CA3AF"}
-                                    variant="Bold"
-                                  />
-                                </TouchableOpacity>
+                                <ReadAloudButton
+                                  ownerId={`encyclopedia:${entry.id}`}
+                                  subject={`definition of ${entry.term}`}
+                                  size={36}
+                                  accent={theme.colors.link}
+                                  onStart={impactLight}
+                                  text={() => `${entry.term}. ${entry.definition}`}
+                                />
                                 <View style={styles.goCircle}>
-                                  <Icon name="ArrowRight2" size={16} color={isDark ? "#FFFFFF" : "#7C4A00"} variant="Bold" />
+                                  <Icon name="ArrowRight2" size={16} color={theme.colors.amberText} variant="Bold" />
                                 </View>
                               </View>
                             </View>
-                            <Text style={[styles.entryDef, isDark && { color: theme.palettes.library.textMuted }]}>
+                            <Text style={styles.entryDef}>
                               {entry.definition}
                             </Text>
                           </TouchableOpacity>
@@ -641,7 +592,7 @@ export default function EncyclopediaScreen() {
           <View style={{ height: 28 }} />
           {filteredEntries.length > 0 && (
             <View style={styles.footer}>
-              <Icon name="Book" size={18} color="#D1D5DB" variant="Bold" />
+              <Icon name="Book" size={18} color={theme.colors.textFaint} variant="Bold" />
               <Text style={styles.footerText}>End of vault · {filteredEntries.length} shown</Text>
             </View>
           )}
@@ -670,527 +621,526 @@ export default function EncyclopediaScreen() {
   );
 }
 
-const createStyles = (isDark: boolean) =>
-  StyleSheet.create({
-    container: { flex: 1 },
-    headerWrap: {
-      paddingHorizontal: 16,
-      paddingBottom: 8,
-      gap: 10,
-      zIndex: 10,
-    },
-    headerBar: {
-      backgroundColor: AMBER,
-      borderRadius: 26,
-      padding: 12,
-      gap: 12,
-      elevation: 6,
-      shadowColor: "#000000",
-      shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.12,
-      shadowRadius: 10,
-      borderWidth: 2,
-      borderColor: "rgba(124, 74, 0, 0.08)",
-      borderBottomWidth: 4,
-    },
-    headerRow: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 12,
-    },
-    backBtn: {
-      width: 38,
-      height: 38,
-      borderRadius: 19,
-      backgroundColor: CARD_WHITE,
-      alignItems: "center",
-      justifyContent: "center",
-      borderWidth: 2,
-      borderColor: "#FDE68A",
-      borderBottomWidth: 4,
-    },
-    headerCopy: { flex: 1 },
-    headerTitle: {
-      fontSize: 18,
-      fontFamily: fontFamilies.heavy,
-      color: "#7C4A00",
-      letterSpacing: -0.4,
-    },
-    headerSubtitle: {
-      fontSize: 12,
-      fontFamily: fontFamilies.semibold,
-      color: "#9A5A00",
-      marginTop: 1,
-    },
-    headerRight: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 8,
-    },
-    mascot: { width: 44, height: 44 },
-    vaultBadge: {
-      width: 38,
-      height: 38,
-      borderRadius: 19,
-      backgroundColor: "#7C4A00",
-      alignItems: "center",
-      justifyContent: "center",
-      borderWidth: 2,
-      borderColor: "rgba(255,255,255,0.5)",
-      borderBottomWidth: 4,
-    },
-    searchCard: {
-      flexDirection: "row",
-      alignItems: "center",
-      backgroundColor: CARD_WHITE,
-      borderRadius: 20,
-      paddingHorizontal: 14,
-      paddingVertical: 12,
-      gap: 10,
-      borderWidth: 2,
-      borderColor: "#FDE68A",
-      borderBottomWidth: 4,
-      elevation: 2,
-      shadowColor: "#000",
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.06,
-      shadowRadius: 6,
-    },
-    searchInput: {
-      flex: 1,
-      fontSize: 15,
-      fontFamily: fontFamilies.semibold,
-      color: "#3D2A00",
-      paddingVertical: 0,
-    },
-    kbdHint: {
-      backgroundColor: "#FFF7ED",
-      paddingHorizontal: 8,
-      paddingVertical: 4,
-      borderRadius: 8,
-      borderWidth: 1,
-      borderColor: "#FDE68A",
-    },
-    kbdText: { fontSize: 11, fontFamily: fontFamilies.heavy, color: "#9A5A00" },
-    activeFilterRow: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 8,
-      flexWrap: "wrap",
-    },
-    activeChip: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 6,
-      paddingHorizontal: 10,
-      paddingVertical: 7,
-      borderRadius: 20,
-      borderWidth: 1,
-      borderColor: "rgba(0,0,0,0.06)",
-      backgroundColor: CARD_WHITE,
-    },
-    activeChipSelected: {
-      backgroundColor: AMBER_DEEP,
-      borderColor: AMBER_LIP,
-      borderWidth: 2,
-    },
-    activeChipEmoji: { fontSize: 12 },
-    activeChipText: { fontSize: 12, fontFamily: fontFamilies.heavy, color: "#57534E" },
-    activeChipTextSelected: { color: "#FFFFFF" },
-    activeChipLetter: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 6,
-      backgroundColor: CARD_WHITE,
-      paddingHorizontal: 10,
-      paddingVertical: 7,
-      borderRadius: 20,
-      borderWidth: 2,
-      borderColor: "#FDE68A",
-    },
-    activeChipLetterText: { fontSize: 12, fontFamily: fontFamilies.heavy, color: "#7C4A00" },
-    clearLink: {
-      paddingHorizontal: 8,
-      paddingVertical: 6,
-    },
-    clearLinkText: { fontSize: 12, fontFamily: fontFamilies.heavy, color: "#7C4A00", textDecorationLine: "underline" },
-    pillsRow: { },
-    pillsContent: { paddingHorizontal: 4, gap: 8, paddingVertical: 2 },
-    pill: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 6,
-      backgroundColor: CARD_WHITE,
-      paddingHorizontal: 14,
-      paddingVertical: 10,
-      borderRadius: 20,
-      borderWidth: 2,
-      borderColor: "rgba(0,0,0,0.06)",
-      elevation: 2,
-      shadowColor: "#000",
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.06,
-      shadowRadius: 4,
-    },
-    pillActive: {
-      backgroundColor: AMBER_DEEP,
-      borderColor: AMBER_LIP,
-      elevation: 5,
-      shadowColor: AMBER_DEEP,
-      shadowOpacity: 0.28,
-    },
-    pillEmoji: { fontSize: 13 },
-    pillText: { fontSize: 13, fontFamily: fontFamilies.bold, color: "#57534E" },
-    pillTextActive: { color: CARD_WHITE },
-    pillCount: {
-      backgroundColor: "#FFF7ED",
-      paddingHorizontal: 7,
-      paddingVertical: 2,
-      borderRadius: 10,
-      minWidth: 22,
-      alignItems: "center",
-    },
-    pillCountActive: { backgroundColor: "rgba(255,255,255,0.22)" },
-    pillCountText: { fontSize: 11, fontFamily: fontFamilies.heavy, color: "#9A5A00" },
-    pillCountTextActive: { color: CARD_WHITE },
-    body: { flex: 1, flexDirection: "row" },
-    scrollContent: { paddingHorizontal: 16, paddingTop: 8, paddingBottom: 36, gap: 14, flexGrow: 1 },
-    gridSection: { gap: 14 },
-    sectionHead: { gap: 2, paddingHorizontal: 2 },
-    sectionTitle: { fontSize: 16, fontFamily: fontFamilies.heavy, color: isDark ? "#FFFFFF" : "#44403C" },
-    sectionSubtitle: { fontSize: 12, fontFamily: fontFamilies.semibold, color: "#A8A29E" },
-    vaultGrid: { flexDirection: "row", flexWrap: "wrap", gap: 12 },
-    vaultCard: {
-      width: "48.2%",
-      backgroundColor: CARD_WHITE,
-      borderRadius: 22,
-      overflow: "hidden",
-      borderWidth: 2,
-      borderColor: "#F5F5F4",
-      borderBottomWidth: 4,
-      elevation: 3,
-      shadowColor: "#000",
-      shadowOffset: { width: 0, height: 3 },
-      shadowOpacity: 0.07,
-      shadowRadius: 8,
-    },
-    vaultCardTop: {
-      height: 92,
-      padding: 14,
-      flexDirection: "row",
-      alignItems: "flex-start",
-      justifyContent: "space-between",
-    },
-    vaultIconWrap: {
-      width: 48,
-      height: 48,
-      borderRadius: 16,
-      backgroundColor: "rgba(255,255,255,0.22)",
-      alignItems: "center",
-      justifyContent: "center",
-      borderWidth: 2,
-      borderColor: "rgba(255,255,255,0.35)",
-    },
-    vaultIcon: { fontSize: 24 },
-    vaultCountPill: {
-      backgroundColor: CARD_WHITE,
-      paddingHorizontal: 9,
-      paddingVertical: 5,
-      borderRadius: 12,
-      minWidth: 32,
-      alignItems: "center",
-    },
-    vaultCountText: { fontSize: 13, fontFamily: fontFamilies.heavy, color: "#44403C" },
-    vaultCardBody: { paddingHorizontal: 12, paddingVertical: 12, gap: 6 },
-    vaultCardTitle: { fontSize: 15, fontFamily: fontFamilies.heavy, color: "#44403C" },
-    vaultCardSub: { fontSize: 12, fontFamily: fontFamilies.semibold, color: "#A8A29E" },
-    vaultCardFoot: { flexDirection: "row", alignItems: "center", gap: 6, marginTop: 2 },
-    vaultDot: { width: 8, height: 8, borderRadius: 4 },
-    vaultCardAction: { fontSize: 12, fontFamily: fontFamilies.heavy, color: "#78716C" },
-    quickStats: {
-      flexDirection: "row",
-      backgroundColor: CARD_WHITE,
-      borderRadius: 20,
-      padding: 14,
-      borderWidth: 2,
-      borderColor: "#F5F5F4",
-      borderBottomWidth: 4,
-      alignItems: "center",
-      elevation: 2,
-      shadowColor: "#000",
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.06,
-      shadowRadius: 6,
-    },
-    statCard: { flex: 1, alignItems: "center", gap: 2 },
-    statValue: { fontSize: 20, fontFamily: fontFamilies.heavy, color: "#7C4A00" },
-    statLabel: { fontSize: 11, fontFamily: fontFamilies.heavy, color: "#A8A29E", textTransform: "uppercase", letterSpacing: 0.6 },
-    statDivider: { width: 1, height: 32, backgroundColor: "#F5F5F4", marginHorizontal: 8 },
-    azRow: { flexDirection: "row", alignItems: "center", gap: 10, paddingHorizontal: 2 },
-    azLabel: { fontSize: 11, fontFamily: fontFamilies.heavy, color: "#A8A29E", textTransform: "uppercase", letterSpacing: 0.8 },
-    azContent: { gap: 6, paddingRight: 8 },
-    azChip: {
-      paddingHorizontal: 10,
-      paddingVertical: 7,
-      borderRadius: 12,
-      backgroundColor: CARD_WHITE,
-      borderWidth: 2,
-      borderColor: "#F5F5F4",
-      minWidth: 32,
-      alignItems: "center",
-    },
-    azChipActive: { backgroundColor: AMBER_DEEP, borderColor: AMBER_LIP },
-    azChipText: { fontSize: 12, fontFamily: fontFamilies.heavy, color: "#57534E" },
-    azChipTextActive: { color: CARD_WHITE },
-    resultsBar: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "space-between",
-      backgroundColor: CARD_WHITE,
-      paddingHorizontal: 14,
-      paddingVertical: 10,
-      borderRadius: 16,
-      borderWidth: 2,
-      borderColor: "#F5F5F4",
-    },
-    resultsLeft: { flexDirection: "row", alignItems: "center", gap: 8 },
-    resultsText: { fontSize: 13, fontFamily: fontFamilies.heavy, color: "#57534E" },
-    resultsClear: { paddingHorizontal: 8, paddingVertical: 4 },
-    resultsClearText: { fontSize: 12, fontFamily: fontFamilies.heavy, color: AMBER_DEEP },
-    groupsWrap: { gap: 18 },
-    letterRow: { flexDirection: "row", alignItems: "center", gap: 10, marginBottom: 10 },
-    letterBadge: {
-      width: 32,
-      height: 32,
-      borderRadius: 12,
-      backgroundColor: "#7C4A00",
-      alignItems: "center",
-      justifyContent: "center",
-      borderWidth: 2,
-      borderColor: "#FDE68A",
-      borderBottomWidth: 3,
-    },
-    letterText: { fontSize: 14, fontFamily: fontFamilies.heavy, color: CARD_WHITE },
-    letterLine: { flex: 1, height: 2, backgroundColor: "#F5F5F4", borderRadius: 1 },
-    letterCount: { fontSize: 11, fontFamily: fontFamilies.heavy, color: "#A8A29E", minWidth: 22, textAlign: "right" },
-    cardsCol: { gap: 10 },
-    entryCard: {
-      backgroundColor: CARD_WHITE,
-      borderRadius: 20,
-      padding: 14,
-      gap: 12,
-      borderWidth: 2,
-      borderColor: "#F5F5F4",
-      borderBottomWidth: 4,
-      elevation: 2,
-      shadowColor: "#000",
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.05,
-      shadowRadius: 6,
-    },
-    entryTopRow: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "space-between",
-      gap: 12,
-      paddingBottom: 10,
-      borderBottomWidth: 1,
-      borderBottomColor: "#F5F5F4",
-    },
-    entryTop: { flexDirection: "row", gap: 12 },
-    letterAvatar: {
-      width: 44,
-      height: 44,
-      borderRadius: 14,
-      alignItems: "center",
-      justifyContent: "center",
-      borderWidth: 2,
-      marginTop: 1,
-    },
-    letterAvatarText: { fontSize: 17, fontFamily: fontFamilies.heavy },
-    entryMain: { flex: 1, gap: 6 },
-    entryTerm: { flex: 1, fontSize: 15, fontFamily: fontFamilies.heavy, color: "#1C1917", minWidth: 0 },
-    catPillGray: {
-      backgroundColor: "#F5F5F4",
-      paddingHorizontal: 10,
-      paddingVertical: 5,
-      borderRadius: 10,
-      borderWidth: 1,
-      borderColor: "#E7E5E4",
-    },
-    catTextGray: { fontSize: 11, fontFamily: fontFamilies.heavy, color: "#78716C", textTransform: "uppercase", letterSpacing: 0.3 },
-    entryDef: { fontSize: 13, fontFamily: fontFamilies.medium, color: "#78716C", lineHeight: 19 },
-    entryFoot: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingTop: 10, borderTopWidth: 1, borderTopColor: "#F5F5F4" },
-    footLeft: { flexDirection: "row", alignItems: "center", gap: 6, flex: 1 },
-    footDot: { width: 6, height: 6, borderRadius: 3 },
-    footLabel: { fontSize: 11, fontFamily: fontFamilies.heavy, color: "#A8A29E", textTransform: "uppercase", letterSpacing: 0.4 },
-    entryActions: { flexDirection: "row", alignItems: "center", gap: 8 },
-    speakBtn: {
-      width: 34,
-      height: 34,
-      borderRadius: 17,
-      backgroundColor: "#F5F5F4",
-      alignItems: "center",
-      justifyContent: "center",
-      borderWidth: 2,
-      borderColor: "#E7E5E4",
-    },
-    speakBtnActive: { backgroundColor: AMBER_DEEP, borderColor: AMBER_LIP },
-    goCircle: {
-      width: 34,
-      height: 34,
-      borderRadius: 17,
-      backgroundColor: AMBER,
-      alignItems: "center",
-      justifyContent: "center",
-      borderWidth: 2,
-      borderColor: "#FDE68A",
-      borderBottomWidth: 4,
-    },
-    emptyState: {
-      alignItems: "center",
-      justifyContent: "center",
-      paddingVertical: 36,
-      paddingHorizontal: 20,
-      backgroundColor: CARD_WHITE,
-      borderRadius: 22,
-      borderWidth: 2,
-      borderColor: "#F5F5F4",
-      borderBottomWidth: 4,
-      gap: 8,
-    },
-    emptyMascot: { width: 100, height: 100, opacity: 0.9 },
-    emptyTitle: { fontSize: 16, fontFamily: fontFamilies.heavy, color: "#44403C" },
-    emptySub: { fontSize: 13, fontFamily: fontFamilies.medium, color: "#A8A29E", textAlign: "center" },
-    emptyBtn: {
-      marginTop: 8,
-      backgroundColor: AMBER_DEEP,
-      paddingHorizontal: 18,
-      paddingVertical: 10,
-      borderRadius: 14,
-      borderWidth: 2,
-      borderColor: AMBER_LIP,
-      borderBottomWidth: 4,
-    },
-    emptyBtnText: { fontSize: 13, fontFamily: fontFamilies.heavy, color: CARD_WHITE },
-    footer: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8, paddingVertical: 8 },
-    footerText: { fontSize: 12, fontFamily: fontFamilies.heavy, color: "#A8A29E" },
-    rail: {
-      position: "absolute",
-      right: 2,
-      top: 8,
-      bottom: 12,
-      width: 28,
-      alignItems: "center",
-      justifyContent: "center",
-    },
-    railCard: {
-      backgroundColor: "rgba(255,255,255,0.96)",
-      borderRadius: 14,
-      paddingVertical: 6,
-      paddingHorizontal: 4,
-      gap: 1,
-      borderWidth: 1,
-      borderColor: "#F5F5F4",
-      elevation: 3,
-      shadowColor: "#000",
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.08,
-      shadowRadius: 6,
-    },
-    railCardFast: {
-      backgroundColor: "rgba(255,255,255,0.96)",
-      borderRadius: 16,
-      paddingVertical: 5,
-      paddingHorizontal: 3,
-      borderWidth: 1,
-      borderColor: "#F5F5F4",
-      elevation: 3,
-      shadowColor: "#000",
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.08,
-      shadowRadius: 6,
-      alignItems: "center",
-      width: 30,
-    },
-    railTrack: {
-      position: "absolute",
-      left: 14.5,
-      top: 8,
-      bottom: 8,
-      width: 1.5,
-      borderRadius: 1,
-      backgroundColor: "#E7E5E4",
-      opacity: 0.9,
-    },
-    railTrackActive: {
-      backgroundColor: "#FDE68A",
-      width: 2,
-    },
-    railCell: {
-      width: 24,
-      height: 15.5,
-      alignItems: "center",
-      justifyContent: "center",
-      borderRadius: 6,
-      flexDirection: "row",
-      gap: 2,
-    },
-    railCellActive: {
-      backgroundColor: AMBER_DEEP,
-      shadowColor: AMBER_DEEP,
-      shadowOffset: { width: 0, height: 1 },
-      shadowOpacity: 0.28,
-      shadowRadius: 4,
-      elevation: 2,
-    },
-    railCellDim: { opacity: 0.32 },
-    railTap: {
-      flex: 1,
-      alignItems: "center",
-      justifyContent: "center",
-      width: "100%",
-    },
-    railDot: {
-      position: "absolute",
-      right: -4,
-      width: 6,
-      height: 6,
-      borderRadius: 3,
-      backgroundColor: AMBER_DEEP,
-      borderWidth: 1,
-      borderColor: "#FFFFFF",
-    },
-    railCardScrubbing: {
-      backgroundColor: "#FFFFFF",
-      borderColor: "#FDE68A",
-      shadowOpacity: 0.16,
-      shadowRadius: 10,
-      transform: [{ scale: 1.04 }],
-    },
-    railItem: { width: 20, height: 16, alignItems: "center", justifyContent: "center", borderRadius: 6 },
-    railItemActive: { backgroundColor: AMBER_DEEP },
-    railItemDim: { opacity: 0.35 },
-    railText: { fontSize: 9.5, fontFamily: fontFamilies.heavy, color: "#57534E", textAlign: "center" },
-    railTextActive: { color: CARD_WHITE },
-    railTextDim: { color: "#A8A29E" },
-    railPreview: {
-      position: "absolute",
-      alignSelf: "center",
-      top: "42%",
-      width: 86,
-      height: 86,
-      borderRadius: 22,
-      backgroundColor: "#1C1917",
-      alignItems: "center",
-      justifyContent: "center",
-      elevation: 8,
-      shadowColor: "#000",
-      shadowOffset: { width: 0, height: 6 },
-      shadowOpacity: 0.24,
-      shadowRadius: 12,
-      borderWidth: 2,
-      borderColor: "#FDE68A",
-    },
-    railPreviewText: { fontSize: 44, fontFamily: fontFamilies.heavy, color: CARD_WHITE, lineHeight: 48 },
-  });
+const makeStyles = createStyles((theme) => ({
+  container: { flex: 1 },
+  headerWrap: {
+    paddingHorizontal: 16,
+    paddingBottom: 8,
+    gap: 10,
+    zIndex: 10,
+  },
+  headerBar: {
+    backgroundColor: theme.colors.amberSurface,
+    borderRadius: 26,
+    padding: 12,
+    gap: 12,
+    elevation: 6,
+    shadowColor: theme.colors.shadow,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.12,
+    shadowRadius: 10,
+    borderWidth: 2,
+    borderColor: withAlpha(theme.colors.amberText, 0.08),
+    borderBottomWidth: 4,
+  },
+  headerRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
+  backBtn: {
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    backgroundColor: theme.colors.card,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 2,
+    borderColor: theme.colors.amberBorder,
+    borderBottomWidth: 4,
+  },
+  headerCopy: { flex: 1 },
+  headerTitle: {
+    fontSize: 18,
+    ...fontFaces.heavy,
+    color: theme.colors.amberText,
+    letterSpacing: -0.4,
+  },
+  headerSubtitle: {
+    fontSize: 12,
+    ...fontFaces.semibold,
+    color: theme.colors.amberText,
+    marginTop: 1,
+  },
+  headerRight: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  mascot: { width: 44, height: 44 },
+  vaultBadge: {
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    backgroundColor: theme.colors.amberSurfaceStrong,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 2,
+    borderColor: withAlpha(theme.colors.onPrimary, 0.5),
+    borderBottomWidth: 4,
+  },
+  searchCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: theme.colors.card,
+    borderRadius: 20,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    gap: 10,
+    borderWidth: 2,
+    borderColor: theme.colors.amberBorder,
+    borderBottomWidth: 4,
+    elevation: 2,
+    shadowColor: theme.colors.shadow,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 6,
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: 15,
+    ...fontFaces.semibold,
+    color: theme.colors.text,
+    paddingVertical: 0,
+  },
+  kbdHint: {
+    backgroundColor: theme.colors.creamTint,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: theme.colors.amberBorder,
+  },
+  kbdText: { fontSize: 11, ...fontFaces.heavy, color: theme.colors.amberText },
+  activeFilterRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    flexWrap: "wrap",
+  },
+  activeChip: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    paddingHorizontal: 10,
+    paddingVertical: 7,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: theme.colors.borderSubtle,
+    backgroundColor: theme.colors.card,
+  },
+  activeChipSelected: {
+    backgroundColor: theme.colors.link,
+    borderColor: theme.myth.primaryDark,
+    borderWidth: 2,
+  },
+  activeChipEmoji: { fontSize: 12 },
+  activeChipText: { fontSize: 12, ...fontFaces.heavy, color: theme.colors.textSecondary },
+  activeChipTextSelected: { color: theme.colors.onPrimary },
+  activeChipLetter: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    backgroundColor: theme.colors.card,
+    paddingHorizontal: 10,
+    paddingVertical: 7,
+    borderRadius: 20,
+    borderWidth: 2,
+    borderColor: theme.colors.amberBorder,
+  },
+  activeChipLetterText: { fontSize: 12, ...fontFaces.heavy, color: theme.colors.amberText },
+  clearLink: {
+    paddingHorizontal: 8,
+    paddingVertical: 6,
+  },
+  clearLinkText: { fontSize: 12, ...fontFaces.heavy, color: theme.colors.amberText, textDecorationLine: "underline" },
+  pillsRow: { },
+  pillsContent: { paddingHorizontal: 4, gap: 8, paddingVertical: 2 },
+  pill: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    backgroundColor: theme.colors.card,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 20,
+    borderWidth: 2,
+    borderColor: theme.colors.borderSubtle,
+    elevation: 2,
+    shadowColor: theme.colors.shadow,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 4,
+  },
+  pillActive: {
+    backgroundColor: theme.colors.link,
+    borderColor: theme.myth.primaryDark,
+    elevation: 5,
+    shadowColor: theme.colors.link,
+    shadowOpacity: 0.28,
+  },
+  pillEmoji: { fontSize: 13 },
+  pillText: { fontSize: 13, ...fontFaces.bold, color: theme.colors.textSecondary },
+  pillTextActive: { color: theme.colors.onPrimary },
+  pillCount: {
+    backgroundColor: theme.colors.creamTint,
+    paddingHorizontal: 7,
+    paddingVertical: 2,
+    borderRadius: 10,
+    minWidth: 22,
+    alignItems: "center",
+  },
+  pillCountActive: { backgroundColor: withAlpha(theme.colors.onPrimary, 0.22) },
+  pillCountText: { fontSize: 11, ...fontFaces.heavy, color: theme.colors.amberText },
+  pillCountTextActive: { color: theme.colors.onPrimary },
+  body: { flex: 1, flexDirection: "row" },
+  scrollContent: { paddingHorizontal: 16, paddingTop: 8, paddingBottom: 36, gap: 14, flexGrow: 1 },
+  gridSection: { gap: 14 },
+  sectionHead: { gap: 2, paddingHorizontal: 2 },
+  sectionTitle: { fontSize: 16, ...fontFaces.heavy, color: theme.colors.text },
+  sectionSubtitle: { fontSize: 12, ...fontFaces.semibold, color: theme.colors.textFaint },
+  vaultGrid: { flexDirection: "row", flexWrap: "wrap", gap: 12 },
+  vaultCard: {
+    width: "48.2%",
+    backgroundColor: theme.colors.card,
+    borderRadius: 22,
+    overflow: "hidden",
+    borderWidth: 2,
+    borderColor: theme.colors.borderSubtle,
+    borderBottomWidth: 4,
+    elevation: 3,
+    shadowColor: theme.colors.shadow,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.07,
+    shadowRadius: 8,
+  },
+  vaultCardTop: {
+    height: 92,
+    padding: 14,
+    flexDirection: "row",
+    alignItems: "flex-start",
+    justifyContent: "space-between",
+  },
+  vaultIconWrap: {
+    width: 48,
+    height: 48,
+    borderRadius: 16,
+    backgroundColor: withAlpha(theme.colors.onPrimary, 0.22),
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 2,
+    borderColor: withAlpha(theme.colors.onPrimary, 0.35),
+  },
+  vaultIcon: { fontSize: 24 },
+  vaultCountPill: {
+    backgroundColor: theme.colors.card,
+    paddingHorizontal: 9,
+    paddingVertical: 5,
+    borderRadius: 12,
+    minWidth: 32,
+    alignItems: "center",
+  },
+  vaultCountText: { fontSize: 13, ...fontFaces.heavy, color: theme.colors.text },
+  vaultCardBody: { paddingHorizontal: 12, paddingVertical: 12, gap: 6 },
+  vaultCardTitle: { fontSize: 15, ...fontFaces.heavy, color: theme.colors.text },
+  vaultCardSub: { fontSize: 12, ...fontFaces.semibold, color: theme.colors.textFaint },
+  vaultCardFoot: { flexDirection: "row", alignItems: "center", gap: 6, marginTop: 2 },
+  vaultDot: { width: 8, height: 8, borderRadius: 4 },
+  vaultCardAction: { fontSize: 12, ...fontFaces.heavy, color: theme.colors.textMuted },
+  quickStats: {
+    flexDirection: "row",
+    backgroundColor: theme.colors.card,
+    borderRadius: 20,
+    padding: 14,
+    borderWidth: 2,
+    borderColor: theme.colors.borderSubtle,
+    borderBottomWidth: 4,
+    alignItems: "center",
+    elevation: 2,
+    shadowColor: theme.colors.shadow,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 6,
+  },
+  statCard: { flex: 1, alignItems: "center", gap: 2 },
+  statValue: { fontSize: 20, ...fontFaces.heavy, color: theme.colors.amberText },
+  statLabel: { fontSize: 11, ...fontFaces.heavy, color: theme.colors.textFaint, textTransform: "uppercase", letterSpacing: 0.6 },
+  statDivider: { width: 1, height: 32, backgroundColor: theme.colors.borderSubtle, marginHorizontal: 8 },
+  azRow: { flexDirection: "row", alignItems: "center", gap: 10, paddingHorizontal: 2 },
+  azLabel: { fontSize: 11, ...fontFaces.heavy, color: theme.colors.textFaint, textTransform: "uppercase", letterSpacing: 0.8 },
+  azContent: { gap: 6, paddingRight: 8 },
+  azChip: {
+    paddingHorizontal: 10,
+    paddingVertical: 7,
+    borderRadius: 12,
+    backgroundColor: theme.colors.card,
+    borderWidth: 2,
+    borderColor: theme.colors.borderSubtle,
+    minWidth: 32,
+    alignItems: "center",
+  },
+  azChipActive: { backgroundColor: theme.colors.link, borderColor: theme.myth.primaryDark },
+  azChipText: { fontSize: 12, ...fontFaces.heavy, color: theme.colors.textSecondary },
+  azChipTextActive: { color: theme.colors.onPrimary },
+  resultsBar: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    backgroundColor: theme.colors.card,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 16,
+    borderWidth: 2,
+    borderColor: theme.colors.borderSubtle,
+  },
+  resultsLeft: { flexDirection: "row", alignItems: "center", gap: 8 },
+  resultsText: { fontSize: 13, ...fontFaces.heavy, color: theme.colors.textSecondary },
+  resultsClear: { paddingHorizontal: 8, paddingVertical: 4 },
+  resultsClearText: { fontSize: 12, ...fontFaces.heavy, color: theme.colors.link },
+  groupsWrap: { gap: 18 },
+  letterRow: { flexDirection: "row", alignItems: "center", gap: 10, marginBottom: 10 },
+  letterBadge: {
+    width: 32,
+    height: 32,
+    borderRadius: 12,
+    backgroundColor: theme.colors.amberSurfaceStrong,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 2,
+    borderColor: theme.colors.amberBorder,
+    borderBottomWidth: 3,
+  },
+  letterText: { fontSize: 14, ...fontFaces.heavy, color: theme.colors.amberText },
+  letterLine: { flex: 1, height: 2, backgroundColor: theme.colors.borderSubtle, borderRadius: 1 },
+  letterCount: { fontSize: 11, ...fontFaces.heavy, color: theme.colors.textFaint, minWidth: 22, textAlign: "right" },
+  cardsCol: { gap: 10 },
+  entryCard: {
+    backgroundColor: theme.colors.card,
+    borderRadius: 20,
+    padding: 14,
+    gap: 12,
+    borderWidth: 2,
+    borderColor: theme.colors.borderSubtle,
+    borderBottomWidth: 4,
+    elevation: 2,
+    shadowColor: theme.colors.shadow,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 6,
+  },
+  entryTopRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 12,
+    paddingBottom: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.borderSubtle,
+  },
+  entryTop: { flexDirection: "row", gap: 12 },
+  letterAvatar: {
+    width: 44,
+    height: 44,
+    borderRadius: 14,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 2,
+    marginTop: 1,
+  },
+  letterAvatarText: { fontSize: 17, ...fontFaces.heavy },
+  entryMain: { flex: 1, gap: 6 },
+  entryTerm: { flex: 1, fontSize: 15, ...fontFaces.heavy, color: theme.colors.text, minWidth: 0 },
+  catPillGray: {
+    backgroundColor: theme.colors.surfaceSoft,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+  },
+  catTextGray: { fontSize: 11, ...fontFaces.heavy, color: theme.colors.textMuted, textTransform: "uppercase", letterSpacing: 0.3 },
+  entryDef: { fontSize: 13, ...fontFaces.medium, color: theme.colors.textMuted, lineHeight: 19 },
+  entryFoot: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingTop: 10, borderTopWidth: 1, borderTopColor: theme.colors.borderSubtle },
+  footLeft: { flexDirection: "row", alignItems: "center", gap: 6, flex: 1 },
+  footDot: { width: 6, height: 6, borderRadius: 3 },
+  footLabel: { fontSize: 11, ...fontFaces.heavy, color: theme.colors.textFaint, textTransform: "uppercase", letterSpacing: 0.4 },
+  entryActions: { flexDirection: "row", alignItems: "center", gap: 8 },
+  speakBtn: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    backgroundColor: theme.colors.surfaceSoft,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 2,
+    borderColor: theme.colors.border,
+  },
+  speakBtnActive: { backgroundColor: theme.colors.link, borderColor: theme.myth.primaryDark },
+  goCircle: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    backgroundColor: theme.colors.amberSurface,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 2,
+    borderColor: theme.colors.amberBorder,
+    borderBottomWidth: 4,
+  },
+  emptyState: {
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 36,
+    paddingHorizontal: 20,
+    backgroundColor: theme.colors.card,
+    borderRadius: 22,
+    borderWidth: 2,
+    borderColor: theme.colors.borderSubtle,
+    borderBottomWidth: 4,
+    gap: 8,
+  },
+  emptyMascot: { width: 100, height: 100, opacity: 0.9 },
+  emptyTitle: { fontSize: 16, ...fontFaces.heavy, color: theme.colors.text },
+  emptySub: { fontSize: 13, ...fontFaces.medium, color: theme.colors.textFaint, textAlign: "center" },
+  emptyBtn: {
+    marginTop: 8,
+    backgroundColor: theme.colors.link,
+    paddingHorizontal: 18,
+    paddingVertical: 10,
+    borderRadius: 14,
+    borderWidth: 2,
+    borderColor: theme.myth.primaryDark,
+    borderBottomWidth: 4,
+  },
+  emptyBtnText: { fontSize: 13, ...fontFaces.heavy, color: theme.colors.onPrimary },
+  footer: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8, paddingVertical: 8 },
+  footerText: { fontSize: 12, ...fontFaces.heavy, color: theme.colors.textFaint },
+  rail: {
+    position: "absolute",
+    right: 2,
+    top: 8,
+    bottom: 12,
+    width: 28,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  railCard: {
+    backgroundColor: theme.colors.card,
+    borderRadius: 14,
+    paddingVertical: 6,
+    paddingHorizontal: 4,
+    gap: 1,
+    borderWidth: 1,
+    borderColor: theme.colors.borderSubtle,
+    elevation: 3,
+    shadowColor: theme.colors.shadow,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 6,
+  },
+  railCardFast: {
+    backgroundColor: theme.colors.card,
+    borderRadius: 16,
+    paddingVertical: 5,
+    paddingHorizontal: 3,
+    borderWidth: 1,
+    borderColor: theme.colors.borderSubtle,
+    elevation: 3,
+    shadowColor: theme.colors.shadow,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 6,
+    alignItems: "center",
+    width: 30,
+  },
+  railTrack: {
+    position: "absolute",
+    left: 14.5,
+    top: 8,
+    bottom: 8,
+    width: 1.5,
+    borderRadius: 1,
+    backgroundColor: theme.colors.border,
+    opacity: 0.9,
+  },
+  railTrackActive: {
+    backgroundColor: theme.colors.amberBorder,
+    width: 2,
+  },
+  railCell: {
+    width: 24,
+    height: 15.5,
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 6,
+    flexDirection: "row",
+    gap: 2,
+  },
+  railCellActive: {
+    backgroundColor: theme.colors.link,
+    shadowColor: theme.colors.link,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.28,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  railCellDim: { opacity: 0.32 },
+  railTap: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    width: "100%",
+  },
+  railDot: {
+    position: "absolute",
+    right: -4,
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: theme.colors.link,
+    borderWidth: 1,
+    borderColor: theme.colors.card,
+  },
+  railCardScrubbing: {
+    backgroundColor: theme.colors.card,
+    borderColor: theme.colors.amberBorder,
+    shadowOpacity: 0.16,
+    shadowRadius: 10,
+    transform: [{ scale: 1.04 }],
+  },
+  railItem: { width: 20, height: 16, alignItems: "center", justifyContent: "center", borderRadius: 6 },
+  railItemActive: { backgroundColor: theme.colors.link },
+  railItemDim: { opacity: 0.35 },
+  railText: { fontSize: 9.5, ...fontFaces.heavy, color: theme.colors.textSecondary, textAlign: "center" },
+  railTextActive: { color: theme.colors.onPrimary },
+  railTextDim: { color: theme.colors.textFaint },
+  railPreview: {
+    position: "absolute",
+    alignSelf: "center",
+    top: "42%",
+    width: 86,
+    height: 86,
+    borderRadius: 22,
+    backgroundColor: theme.colors.inverseSurface,
+    alignItems: "center",
+    justifyContent: "center",
+    elevation: 8,
+    shadowColor: theme.colors.shadow,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.24,
+    shadowRadius: 12,
+    borderWidth: 2,
+    borderColor: theme.colors.amberBorder,
+  },
+  railPreviewText: { fontSize: 44, ...fontFaces.heavy, color: theme.colors.inverseText, lineHeight: 48 },
+}));

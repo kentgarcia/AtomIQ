@@ -1,6 +1,6 @@
 import { StyleSheet } from "react-native";
 
-import { layout, type Palette, fontFamilies } from "@/theme";
+import { layout, type Palette, fontFaces } from "@/theme";
 
 /** Cap lesson content to the readable frame on tablets. */
 const clampFrameWidth = (width: number) => Math.min(width, layout.readableMaxWidth);
@@ -65,7 +65,7 @@ export const createStyles = (theme: Palette, width: number) => {
     },
     briefingTitle: {
       fontSize: 24,
-      fontFamily: fontFamilies.heavy,
+      ...fontFaces.heavy,
       color: theme.text,
       marginBottom: 8,
       textAlign: "center",
@@ -91,7 +91,7 @@ export const createStyles = (theme: Palette, width: number) => {
     // Headers
     stepHeader: {
       fontSize: 14,
-      fontFamily: fontFamilies.heavy,
+      ...fontFaces.heavy,
       color: theme.textMuted,
       textTransform: "uppercase",
       marginBottom: 8,
@@ -100,7 +100,7 @@ export const createStyles = (theme: Palette, width: number) => {
     },
     stepSubHeader: {
       fontSize: 20,
-      fontFamily: fontFamilies.bold,
+      ...fontFaces.bold,
       color: theme.text,
       textAlign: "center",
       marginBottom: 32,
@@ -122,11 +122,11 @@ export const createStyles = (theme: Palette, width: number) => {
     },
     mainBtnDisabled: {
       backgroundColor: theme.textMuted,
-      borderColor: "#6B7280",
+      borderColor: theme.borderStrong,
     },
     mainBtnText: {
       color: "#FFF",
-      fontFamily: fontFamilies.heavy,
+      ...fontFaces.heavy,
       fontSize: 16,
       letterSpacing: 1,
     },
@@ -163,12 +163,12 @@ export const createStyles = (theme: Palette, width: number) => {
     },
     mythBadgeText: {
       color: "#FFF",
-      fontFamily: fontFamilies.heavy,
+      ...fontFaces.heavy,
       fontSize: 12,
     },
     mythText: {
       fontSize: 22,
-      fontFamily: fontFamilies.bold,
+      ...fontFaces.bold,
       color: theme.text,
       textAlign: "center",
       marginBottom: 40,
@@ -198,18 +198,18 @@ export const createStyles = (theme: Palette, width: number) => {
       lineHeight: 26,
     },
     continueBtn: {
-      backgroundColor: "#FFF",
+      backgroundColor: theme.card,
       paddingHorizontal: 32,
       paddingVertical: 14,
       borderRadius: 16,
       borderBottomWidth: 4,
-      borderColor: "rgba(0,0,0,0.1)",
+      borderColor: theme.border,
     },
-    continueBtnText: { fontFamily: fontFamilies.heavy, fontSize: 16 },
+    continueBtnText: { ...fontFaces.heavy, fontSize: 16 },
 
     // MicroLearn
     conceptCard: {
-      backgroundColor: "#FFF",
+      backgroundColor: theme.card,
       borderRadius: 20,
       padding: 24,
       borderWidth: 2,
@@ -219,7 +219,7 @@ export const createStyles = (theme: Palette, width: number) => {
     },
     conceptTitle: {
       fontSize: 22,
-      fontFamily: fontFamilies.heavy,
+      ...fontFaces.heavy,
       color: theme.text,
       marginBottom: 12,
       lineHeight: 30,
@@ -235,12 +235,12 @@ export const createStyles = (theme: Palette, width: number) => {
       fontSize: 15,
       color: theme.text,
       lineHeight: 22,
-      fontFamily: fontFamilies.medium,
+      ...fontFaces.medium,
     },
 
     // Lab
     labCard: {
-      backgroundColor: "#FFF",
+      backgroundColor: theme.card,
       borderRadius: 20,
       padding: 24,
       borderWidth: 2,
@@ -250,7 +250,7 @@ export const createStyles = (theme: Palette, width: number) => {
     },
     taskText: {
       fontSize: 16,
-      fontFamily: fontFamilies.bold,
+      ...fontFaces.bold,
       color: theme.text,
       lineHeight: 22,
     },
@@ -261,7 +261,7 @@ export const createStyles = (theme: Palette, width: number) => {
       marginBottom: 24,
     },
     optionBtn: {
-      backgroundColor: "#FFF",
+      backgroundColor: theme.card,
       padding: 16,
       borderRadius: 16,
       alignItems: "center",
@@ -278,7 +278,7 @@ export const createStyles = (theme: Palette, width: number) => {
     },
     optionText: {
       fontSize: 12,
-      fontFamily: fontFamilies.bold,
+      ...fontFaces.bold,
       color: theme.text,
     },
     feedbackHeader: {
@@ -291,7 +291,7 @@ export const createStyles = (theme: Palette, width: number) => {
     // Quiz
     quizCard: {
       marginBottom: 24,
-      backgroundColor: "#FFF",
+      backgroundColor: theme.card,
       borderRadius: 20,
       padding: 24,
       borderWidth: 2,
@@ -300,14 +300,14 @@ export const createStyles = (theme: Palette, width: number) => {
     },
     questionText: {
       fontSize: 20,
-      fontFamily: fontFamilies.bold,
+      ...fontFaces.bold,
       color: theme.text,
       marginBottom: 24,
       lineHeight: 30,
     },
     quizOptions: { gap: 12 },
     quizOption: {
-      backgroundColor: "#FFF",
+      backgroundColor: theme.card,
       padding: 16,
       borderRadius: 16,
       borderWidth: 2,
@@ -327,7 +327,7 @@ export const createStyles = (theme: Palette, width: number) => {
     },
     optionLetterText: {
       fontSize: 14,
-      fontFamily: fontFamilies.heavy,
+      ...fontFaces.heavy,
       color: theme.text,
     },
     quizOptionSelected: {
@@ -362,7 +362,7 @@ export const createStyles = (theme: Palette, width: number) => {
     },
     successTitle: {
       fontSize: 32,
-      fontFamily: fontFamilies.heavy,
+      ...fontFaces.heavy,
       color: theme.text,
       marginBottom: 12,
       textAlign: "center",
@@ -404,14 +404,14 @@ export const createStyles = (theme: Palette, width: number) => {
     },
     rewardLabel: {
       fontSize: 11,
-      fontFamily: fontFamilies.bold,
+      ...fontFaces.bold,
       color: theme.textMuted,
       textTransform: "uppercase",
       letterSpacing: 0.5,
     },
     rewardText: {
       fontSize: 20,
-      fontFamily: fontFamilies.heavy,
+      ...fontFaces.heavy,
       color: theme.text,
     },
   });
@@ -444,13 +444,13 @@ export const createMythStyles = (theme: Palette, width: number) => {
   },
   indicatorTextLeft: {
     fontSize: 16,
-    fontFamily: fontFamilies.heavy,
+    ...fontFaces.heavy,
     color: theme.error,
     marginTop: 8,
   },
   indicatorTextRight: {
     fontSize: 16,
-    fontFamily: fontFamilies.heavy,
+    ...fontFaces.heavy,
     color: theme.success,
     marginTop: 8,
   },
@@ -481,7 +481,7 @@ export const createMythStyles = (theme: Palette, width: number) => {
   },
   resultTitle: {
     fontSize: 28,
-    fontFamily: fontFamilies.heavy,
+    ...fontFaces.heavy,
     color: theme.text,
     marginBottom: 16,
   },
@@ -501,7 +501,7 @@ export const createMythStyles = (theme: Palette, width: number) => {
   },
   realityLabel: {
     fontSize: 12,
-    fontFamily: fontFamilies.heavy,
+    ...fontFaces.heavy,
     color: theme.primary,
     marginBottom: 8,
   },
@@ -516,7 +516,7 @@ export const createMythStyles = (theme: Palette, width: number) => {
   },
   resultContinueBtnText: {
     color: "#FFF",
-    fontFamily: fontFamilies.heavy,
+    ...fontFaces.heavy,
     fontSize: 16,
   },
   speakBtn: {
@@ -534,7 +534,7 @@ export const createMythStyles = (theme: Palette, width: number) => {
     backgroundColor: theme.primary,
     borderColor: theme.primary,
   },
-  speakBtnText: { fontSize: 14, fontFamily: fontFamilies.bold, color: theme.text },
+  speakBtnText: { fontSize: 14, ...fontFaces.bold, color: theme.text },
   };
 };
 
@@ -576,12 +576,12 @@ export const createLearnStyles = (theme: Palette) => ({
     alignItems: "center" as const,
     gap: 6,
   },
-  badgeText: { color: "#FFF", fontFamily: fontFamilies.heavy, fontSize: 12 },
+  badgeText: { color: "#FFF", ...fontFaces.heavy, fontSize: 12 },
   mascotImg: { width: 80, height: 80, marginBottom: 16 },
   mascotSmall: { width: 60, height: 60, marginBottom: 16 },
   titleText: {
     fontSize: 24,
-    fontFamily: fontFamilies.heavy,
+    ...fontFaces.heavy,
     color: theme.text,
     textAlign: "center" as const,
     marginBottom: 8,
@@ -605,7 +605,7 @@ export const createLearnStyles = (theme: Palette) => ({
   },
   keypointsTitle: {
     fontSize: 18,
-    fontFamily: fontFamilies.heavy,
+    ...fontFaces.heavy,
     color: theme.text,
   },
   keypoint: {
@@ -630,7 +630,7 @@ export const createLearnStyles = (theme: Palette) => ({
     alignItems: "center" as const,
     justifyContent: "center" as const,
   },
-  keypointNumber: { fontSize: 12, fontFamily: fontFamilies.heavy, color: "#FFF" },
+  keypointNumber: { fontSize: 12, ...fontFaces.heavy, color: "#FFF" },
   keypointItemText: {
     flex: 1,
     fontSize: 15,
@@ -640,13 +640,13 @@ export const createLearnStyles = (theme: Palette) => ({
   summaryBadge: { marginBottom: 16, alignItems: "center" as const },
   summaryLabel: {
     fontSize: 12,
-    fontFamily: fontFamilies.heavy,
+    ...fontFaces.heavy,
     color: theme.primary,
     marginBottom: 8,
   },
   summaryTitle: {
     fontSize: 20,
-    fontFamily: fontFamilies.heavy,
+    ...fontFaces.heavy,
     color: theme.text,
     textAlign: "center" as const,
     marginBottom: 12,
@@ -690,7 +690,7 @@ export const createLearnStyles = (theme: Palette) => ({
     borderColor: theme.primaryDark,
     borderBottomWidth: 4,
   },
-  btnText: { fontFamily: fontFamilies.bold, fontSize: 14 },
+  btnText: { ...fontFaces.bold, fontSize: 14 },
   navRow: {
     flexDirection: "row" as const,
     alignItems: "center" as const,
@@ -709,7 +709,7 @@ export const createLearnStyles = (theme: Palette) => ({
     justifyContent: "center" as const,
     gap: 8,
   },
-  continueBtnText: { color: "#FFF", fontFamily: fontFamilies.heavy, fontSize: 16 },
+  continueBtnText: { color: "#FFF", ...fontFaces.heavy, fontSize: 16 },
 });
 
 export const createLabStyles = (theme: Palette) => ({
@@ -737,7 +737,7 @@ export const createLabStyles = (theme: Palette) => ({
     alignItems: "center" as const,
     gap: 6,
   },
-  badgeText: { color: "#FFF", fontFamily: fontFamilies.heavy, fontSize: 12 },
+  badgeText: { color: "#FFF", ...fontFaces.heavy, fontSize: 12 },
   badgeRow: { marginBottom: 16, alignItems: "center" as const },
   speakerBtn: { padding: 8, backgroundColor: theme.bg, borderRadius: 12 },
   mascot: {
@@ -748,7 +748,7 @@ export const createLabStyles = (theme: Palette) => ({
   },
   taskText: {
     fontSize: 18,
-    fontFamily: fontFamilies.bold,
+    ...fontFaces.bold,
     color: theme.text,
     textAlign: "center" as const,
     lineHeight: 26,
@@ -792,7 +792,7 @@ export const createLabStyles = (theme: Palette) => ({
   },
   optionLabel: {
     fontSize: 14,
-    fontFamily: fontFamilies.semibold,
+    ...fontFaces.semibold,
     color: theme.text,
     textAlign: "center" as const,
   },
@@ -815,7 +815,7 @@ export const createLabStyles = (theme: Palette) => ({
     gap: 8,
     marginBottom: 8,
   },
-  feedbackTitle: { fontSize: 18, fontFamily: fontFamilies.heavy,},
+  feedbackTitle: { fontSize: 18, ...fontFaces.heavy,},
   feedbackText: { fontSize: 15, color: theme.text, lineHeight: 22 },
   bottomBar: { flexDirection: "row" as const, gap: 12, paddingTop: 16 },
   backBtn: {
@@ -842,7 +842,7 @@ export const createLabStyles = (theme: Palette) => ({
     backgroundColor: theme.border,
     borderColor: theme.textMuted,
   },
-  checkBtnText: { color: "#FFF", fontFamily: fontFamilies.heavy, fontSize: 16 },
+  checkBtnText: { color: "#FFF", ...fontFaces.heavy, fontSize: 16 },
   navRow: { flexDirection: "row" as const, gap: 12, marginTop: 24 },
   continueBtn: {
     flex: 1,
@@ -856,7 +856,7 @@ export const createLabStyles = (theme: Palette) => ({
     gap: 8,
     borderBottomWidth: 4,
   },
-  continueBtnText: { color: "#FFF", fontFamily: fontFamilies.heavy, fontSize: 16 },
+  continueBtnText: { color: "#FFF", ...fontFaces.heavy, fontSize: 16 },
 });
 
 export const createQuizStyles = (theme: Palette) => ({
@@ -884,11 +884,11 @@ export const createQuizStyles = (theme: Palette) => ({
     alignItems: "center" as const,
     gap: 6,
   },
-  badgeText: { color: "#FFF", fontFamily: fontFamilies.heavy, fontSize: 12 },
+  badgeText: { color: "#FFF", ...fontFaces.heavy, fontSize: 12 },
   speakerBtn: { padding: 8, backgroundColor: theme.bg, borderRadius: 12 },
   questionText: {
     fontSize: 18,
-    fontFamily: fontFamilies.bold,
+    ...fontFaces.bold,
     color: theme.text,
     lineHeight: 26,
   },
@@ -929,13 +929,13 @@ export const createQuizStyles = (theme: Palette) => ({
   optionLetterWrong: { backgroundColor: theme.error },
   optionLetterText: {
     fontSize: 14,
-    fontFamily: fontFamilies.heavy,
+    ...fontFaces.heavy,
     color: theme.text,
   },
   optionText: {
     flex: 1,
     fontSize: 15,
-    fontFamily: fontFamilies.semibold,
+    ...fontFaces.semibold,
     color: theme.text,
   },
   optionCheck: { width: 24, height: 24 },
@@ -948,7 +948,7 @@ export const createQuizStyles = (theme: Palette) => ({
     gap: 8,
     marginBottom: 8,
   },
-  feedbackTitle: { fontSize: 18, fontFamily: fontFamilies.heavy,},
+  feedbackTitle: { fontSize: 18, ...fontFaces.heavy,},
   feedbackText: { fontSize: 15, color: theme.text, lineHeight: 22 },
   checkBtn: {
     height: 56,
@@ -963,7 +963,7 @@ export const createQuizStyles = (theme: Palette) => ({
     backgroundColor: theme.border,
     borderColor: theme.textMuted,
   },
-  checkBtnText: { color: "#FFF", fontFamily: fontFamilies.heavy, fontSize: 16 },
+  checkBtnText: { color: "#FFF", ...fontFaces.heavy, fontSize: 16 },
   continueBtn: {
     height: 56,
     borderRadius: 16,
@@ -975,5 +975,5 @@ export const createQuizStyles = (theme: Palette) => ({
     gap: 8,
     borderBottomWidth: 4,
   },
-  continueBtnText: { color: "#FFF", fontFamily: fontFamilies.heavy, fontSize: 16 },
+  continueBtnText: { color: "#FFF", ...fontFaces.heavy, fontSize: 16 },
 });

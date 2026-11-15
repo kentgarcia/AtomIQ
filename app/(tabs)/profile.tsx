@@ -1,6 +1,7 @@
 import { Icon } from "@/components/ui/icon";
+import { RecentActivityStrip } from "@/components/activity/RecentActivityStrip";
 import { useTabBarInset } from "@/components/layout";
-import {useTheme, type Palette, fontFamilies, useResponsiveLayout} from "@/theme";
+import {useTheme, type Theme, fontFaces, useResponsiveLayout} from "@/theme";
 import { ACHIEVEMENTS } from "@/app/achievement-detail";
 import { NPC_CHARACTERS } from "@/app/(tabs)/leaderboard";
 import {
@@ -58,9 +59,7 @@ export default function ProfileScreen() {
     updateUserProfile,
   } = useStorage();
   const { theme } = useTheme();
-  const THEME = theme.palettes.tab;
-  const isDark = theme.mode === "dark";
-  const styles = useMemo(() => createStyles(THEME, isDark), [THEME, isDark]);
+  const styles = useMemo(() => createStyles(theme), [theme]);
 
   const [isSavingProfile, setIsSavingProfile] = useState(false);
   const [editModalVisible, setEditModalVisible] = useState(false);
@@ -76,8 +75,8 @@ export default function ProfileScreen() {
   // Autumn gradient background, matching the home screen
   const bgColors: [string, string] =
     theme.mode === "dark"
-      ? [THEME.bg, THEME.bg]
-      : ["#FFF3E0", "#FFFFFF"];
+      ? [theme.colors.background, theme.colors.background]
+      : [theme.colors.pageGradientTop, theme.colors.pageGradientBottom];
 
   // Calculate user level
   const userLevel = useMemo(() => {
@@ -317,7 +316,7 @@ export default function ProfileScreen() {
           justifyContent: "center",
         }}
       >
-        <Text style={{ color: THEME.textMuted }}>Loading profile...</Text>
+        <Text style={{ color: theme.colors.textMuted }}>Loading profile...</Text>
       </View>
     );
   }
@@ -349,7 +348,7 @@ export default function ProfileScreen() {
             accessibilityRole="button"
             accessibilityLabel="Share profile"
           >
-            <Icon name="Share" size={20} color={isDark ? "#C0CBDD" : "#555555"} variant="Bold" />
+            <Icon name="Share" size={20} color={theme.colors.textSecondary} variant="Bold" />
           </TouchableOpacity>
           <View style={{ flex: 1 }} />
           <TouchableOpacity
@@ -359,7 +358,7 @@ export default function ProfileScreen() {
             accessibilityRole="button"
             accessibilityLabel="Edit profile"
           >
-            <Icon name="Edit2" size={20} color={isDark ? "#C0CBDD" : "#555555"} variant="Bold" />
+            <Icon name="Edit2" size={20} color={theme.colors.textSecondary} variant="Bold" />
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.iconButton}
@@ -368,7 +367,7 @@ export default function ProfileScreen() {
             accessibilityRole="button"
             accessibilityLabel="Open settings"
           >
-            <Icon name="Setting" size={20} color={isDark ? "#C0CBDD" : "#555555"} variant="Bold" />
+            <Icon name="Setting" size={20} color={theme.colors.textSecondary} variant="Bold" />
           </TouchableOpacity>
         </View>
 
@@ -520,7 +519,7 @@ export default function ProfileScreen() {
                   </Text>
                 </>
               ) : (
-                <View style={[styles.titleProgressTrack, { backgroundColor: "#FFF3E0" }]}>
+                <View style={[styles.titleProgressTrack, { backgroundColor: theme.colors.creamTint }]}>
                   <View style={[styles.titleProgressFill, { width: "100%" }]} />
                 </View>
               )}
@@ -540,14 +539,14 @@ export default function ProfileScreen() {
                       <View
                         style={[
                           styles.titleMilestoneIcon,
-                          { backgroundColor: isUnlocked ? `${m.color}22` : "#F4F5F7" },
+                          { backgroundColor: isUnlocked ? `${m.color}22` : theme.colors.surfaceSoft },
                           isCurrent && { borderWidth: 2, borderColor: m.color },
                         ]}
                       >
                         <Icon
                           name={m.icon}
                           size={16}
-                          color={isUnlocked ? m.color : "#C9CDD3"}
+                          color={isUnlocked ? m.color : theme.colors.textFaint}
                           variant="Bold"
                         />
                       </View>
@@ -556,7 +555,7 @@ export default function ProfileScreen() {
                           style={[
                             styles.titleMilestoneName,
                             isCurrent && { color: m.color },
-                            !isUnlocked && { color: "#AAAAAA" },
+                            !isUnlocked && { color: theme.colors.textFaint },
                           ]}
                         >
                           {m.title}
@@ -566,7 +565,7 @@ export default function ProfileScreen() {
                       {isUnlocked ? (
                         <Icon name="TickCircle" size={18} color="#22C55E" variant="Bold" />
                       ) : (
-                        <Icon name="Lock" size={16} color="#C9CDD3" variant="Bold" />
+                        <Icon name="Lock" size={16} color={theme.colors.textFaint} variant="Bold" />
                       )}
                     </View>
                   );
@@ -599,6 +598,8 @@ export default function ProfileScreen() {
             </View>
           </TouchableOpacity>
         </Animated.View>
+
+        <RecentActivityStrip />
 
         {/* Awards — badges & certificates */}
         <Animated.View
@@ -633,7 +634,7 @@ export default function ProfileScreen() {
                   <Icon
                     name={award.icon}
                     size={24}
-                    color={award.unlocked ? award.color : "#C9CDD3"}
+                    color={award.unlocked ? award.color : theme.colors.textFaint}
                     variant="Bold"
                   />
                 </View>
@@ -668,7 +669,7 @@ export default function ProfileScreen() {
             activeOpacity={0.85}
             onPress={() => router.push("/leaderboard")}
           >
-            <View style={[styles.leaderIconCircle, { backgroundColor: "#FFF3E0" }]}>
+            <View style={[styles.leaderIconCircle, { backgroundColor: theme.colors.creamTint }]}>
               <Icon name="Cup" size={20} color="#E67E22" variant="Bold" />
             </View>
             <View style={{ flex: 1 }}>
@@ -791,7 +792,7 @@ export default function ProfileScreen() {
                 accessibilityRole="button"
                 accessibilityLabel="Close edit profile"
               >
-                <Icon name="CloseCircle" size={20} color="#9CA3AF" variant="Bold" />
+                <Icon name="CloseCircle" size={20} color={theme.colors.textFaint} variant="Bold" />
               </TouchableOpacity>
             </View>
 
@@ -836,7 +837,7 @@ export default function ProfileScreen() {
                   value={profileName}
                   onChangeText={setProfileName}
                   placeholder="Your display name"
-                  placeholderTextColor={isDark ? "#667799" : "#9CA3AF"}
+                  placeholderTextColor={theme.colors.textFaint}
                   maxLength={24}
                   autoCorrect={false}
                   returnKeyType="done"
@@ -850,7 +851,7 @@ export default function ProfileScreen() {
                     accessibilityRole="button"
                     accessibilityLabel="Clear display name"
                   >
-                    <Icon name="CloseCircle" size={18} color="#C9CDD3" variant="Bold" />
+                    <Icon name="CloseCircle" size={18} color={theme.colors.textFaint} variant="Bold" />
                   </TouchableOpacity>
                 )}
               </View>
@@ -998,35 +999,13 @@ export default function ProfileScreen() {
   );
 }
 
-const createStyles = (theme: Palette, isDark: boolean) => {
-  /* Mode-aware neutral surfaces — brand accents stay identical */
-  const P = isDark
-    ? {
-        card: "#213356",
-        border: "#2D3A56",
-        softBorder: "#26365A",
-        soft: "#1A2D4A",
-        creamTint: "#4A381B",
-        text: "#F6F9FC",
-        textSecondary: "#C0CBDD",
-        muted: "#8898AA",
-        faint: "#667799",
-      }
-    : {
-        card: "#FFFFFF",
-        border: "#E5E7EB",
-        softBorder: "#F4F5F7",
-        soft: "#F9FAFB",
-        creamTint: "#FFF3E0",
-        text: "#333333",
-        textSecondary: "#555555",
-        muted: "#888888",
-        faint: "#9CA3AF",
-      };
+const createStyles = (theme: Theme) => {
+  /* Shared mode-aware neutral surfaces — brand accents stay identical */
+  const P = theme.palettes.ui;
   return StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: theme.bg,
+      backgroundColor: P.background,
     },
     bgGradient: {
       position: "absolute",
@@ -1055,7 +1034,7 @@ const createStyles = (theme: Palette, isDark: boolean) => {
       alignItems: "center",
       justifyContent: "center",
       elevation: 3,
-      shadowColor: "#000000",
+      shadowColor: theme.colors.shadow,
       shadowOffset: { width: 0, height: 3 },
       shadowOpacity: 0.08,
       shadowRadius: 6,
@@ -1068,7 +1047,7 @@ const createStyles = (theme: Palette, isDark: boolean) => {
       padding: 10,
       gap: 10,
       elevation: 4,
-      shadowColor: "#000000",
+      shadowColor: theme.colors.shadow,
       shadowOffset: { width: 0, height: 3 },
       shadowOpacity: 0.1,
       shadowRadius: 6,
@@ -1085,15 +1064,15 @@ const createStyles = (theme: Palette, isDark: boolean) => {
       flexDirection: "row",
       alignItems: "center",
       gap: 5,
-      backgroundColor: "#434343",
+      backgroundColor: theme.colors.inverseSurface,
       paddingHorizontal: 12,
       height: 40,
       borderRadius: 14,
     },
     levelPillText: {
       fontSize: 13,
-      fontFamily: fontFamilies.heavy,
-      color: "#FFFFFF",
+      ...fontFaces.heavy,
+      color: theme.colors.inverseText,
     },
     titleProgressPanel: {
       backgroundColor: P.card,
@@ -1112,14 +1091,14 @@ const createStyles = (theme: Palette, isDark: boolean) => {
     },
     titleProgressLabel: {
       fontSize: 10,
-      fontFamily: fontFamilies.heavy,
+      ...fontFaces.heavy,
       color: P.faint,
       textTransform: "uppercase",
       letterSpacing: 0.8,
     },
     titleProgressMeta: {
       fontSize: 11,
-      fontFamily: fontFamilies.bold,
+      ...fontFaces.bold,
       color: "#E67E22",
     },
     titleProgressTrack: {
@@ -1135,7 +1114,7 @@ const createStyles = (theme: Palette, isDark: boolean) => {
     },
     titleProgressHint: {
       fontSize: 11,
-      fontFamily: fontFamilies.semibold,
+      ...fontFaces.semibold,
       color: P.muted,
     },
     titleMilestoneList: {
@@ -1163,12 +1142,12 @@ const createStyles = (theme: Palette, isDark: boolean) => {
     },
     titleMilestoneName: {
       fontSize: 13,
-      fontFamily: fontFamilies.heavy,
+      ...fontFaces.heavy,
       color: P.text,
     },
     titleMilestoneLevel: {
       fontSize: 11,
-      fontFamily: fontFamilies.semibold,
+      ...fontFaces.semibold,
       color: P.faint,
       marginTop: 1,
     },
@@ -1228,23 +1207,23 @@ const createStyles = (theme: Palette, isDark: boolean) => {
       alignItems: "center",
       justifyContent: "center",
       borderWidth: 3,
-      borderColor: "#FFFFFF",
+      borderColor: theme.colors.card,
     },
     levelBadgeText: {
       color: "#FFF",
-      fontFamily: fontFamilies.heavy,
+      ...fontFaces.heavy,
       fontSize: 12,
     },
     name: {
       fontSize: 20,
-      fontFamily: fontFamilies.heavy,
+      ...fontFaces.heavy,
       color: P.text,
       marginBottom: 2,
     },
     title: {
       fontSize: 13,
       color: P.muted,
-      fontFamily: fontFamilies.semibold,
+      ...fontFaces.semibold,
       marginBottom: 8,
     },
     /* Level progress, inside the profile card */
@@ -1259,12 +1238,12 @@ const createStyles = (theme: Palette, isDark: boolean) => {
     },
     levelLabel: {
       fontSize: 13,
-      fontFamily: fontFamilies.heavy,
+      ...fontFaces.heavy,
       color: P.text,
     },
     levelXp: {
       fontSize: 12,
-      fontFamily: fontFamilies.bold,
+      ...fontFaces.bold,
       color: "#E67E22",
     },
     levelBarBg: {
@@ -1280,7 +1259,7 @@ const createStyles = (theme: Palette, isDark: boolean) => {
     },
     levelHint: {
       fontSize: 11,
-      fontFamily: fontFamilies.semibold,
+      ...fontFaces.semibold,
       color: P.muted,
       marginTop: 6,
     },
@@ -1302,7 +1281,7 @@ const createStyles = (theme: Palette, isDark: boolean) => {
     /* Stats (back face) */
     statsTitle: {
       fontSize: 16,
-      fontFamily: fontFamilies.heavy,
+      ...fontFaces.heavy,
       color: P.text,
       alignSelf: "center",
       marginBottom: 16,
@@ -1330,12 +1309,12 @@ const createStyles = (theme: Palette, isDark: boolean) => {
     },
     statValue: {
       fontSize: 22,
-      fontFamily: fontFamilies.heavy,
+      ...fontFaces.heavy,
       color: P.text,
     },
     statLabel: {
       fontSize: 12,
-      fontFamily: fontFamilies.semibold,
+      ...fontFaces.semibold,
       color: P.muted,
       marginTop: 2,
     },
@@ -1350,7 +1329,7 @@ const createStyles = (theme: Palette, isDark: boolean) => {
       borderRadius: 24,
       padding: 18,
       elevation: 5,
-      shadowColor: "#000000",
+      shadowColor: theme.colors.shadow,
       shadowOffset: { width: 0, height: 6 },
       shadowOpacity: 0.08,
       shadowRadius: 10,
@@ -1365,13 +1344,13 @@ const createStyles = (theme: Palette, isDark: boolean) => {
     },
     streakValue: {
       fontSize: 16,
-      fontFamily: fontFamilies.heavy,
+      ...fontFaces.heavy,
       color: P.text,
       fontVariant: ["tabular-nums"],
     },
     streakSub: {
       fontSize: 12,
-      fontFamily: fontFamilies.semibold,
+      ...fontFaces.semibold,
       color: P.muted,
       marginTop: 2,
     },
@@ -1391,7 +1370,7 @@ const createStyles = (theme: Palette, isDark: boolean) => {
       borderRadius: 24,
       padding: 20,
       elevation: 5,
-      shadowColor: "#000000",
+      shadowColor: theme.colors.shadow,
       shadowOffset: { width: 0, height: 6 },
       shadowOpacity: 0.08,
       shadowRadius: 10,
@@ -1404,7 +1383,7 @@ const createStyles = (theme: Palette, isDark: boolean) => {
     },
     sectionTitle: {
       fontSize: 16,
-      fontFamily: fontFamilies.heavy,
+      ...fontFaces.heavy,
       color: P.text,
     },
     countPill: {
@@ -1418,7 +1397,7 @@ const createStyles = (theme: Palette, isDark: boolean) => {
     },
     countPillText: {
       fontSize: 11,
-      fontFamily: fontFamilies.heavy,
+      ...fontFaces.heavy,
       color: "#E67E22",
     },
     /* Awards badges */
@@ -1444,7 +1423,7 @@ const createStyles = (theme: Palette, isDark: boolean) => {
     },
     badgeLabel: {
       fontSize: 10,
-      fontFamily: fontFamilies.bold,
+      ...fontFaces.bold,
       color: P.textSecondary,
       textAlign: "center",
     },
@@ -1472,7 +1451,7 @@ const createStyles = (theme: Palette, isDark: boolean) => {
     },
     leaderRankText: {
       fontSize: 11,
-      fontFamily: fontFamilies.heavy,
+      ...fontFaces.heavy,
       color: "#E67E22",
     },
     leaderIconCircle: {
@@ -1484,12 +1463,12 @@ const createStyles = (theme: Palette, isDark: boolean) => {
     },
     leaderTitle: {
       fontSize: 14,
-      fontFamily: fontFamilies.heavy,
+      ...fontFaces.heavy,
       color: P.text,
     },
     leaderPlays: {
       fontSize: 11,
-      fontFamily: fontFamilies.semibold,
+      ...fontFaces.semibold,
       color: P.muted,
       marginTop: 1,
     },
@@ -1507,7 +1486,7 @@ const createStyles = (theme: Palette, isDark: boolean) => {
     },
     leaderScoreText: {
       fontSize: 13,
-      fontFamily: fontFamilies.heavy,
+      ...fontFaces.heavy,
       color: P.textSecondary,
     },
     leaderScoreTextTop: {
@@ -1515,7 +1494,7 @@ const createStyles = (theme: Palette, isDark: boolean) => {
     },
     leaderNoScore: {
       fontSize: 14,
-      fontFamily: fontFamilies.heavy,
+      ...fontFaces.heavy,
       color: P.faint,
     },
 
@@ -1526,7 +1505,7 @@ const createStyles = (theme: Palette, isDark: boolean) => {
       right: 0,
       bottom: 0,
       left: 0,
-      backgroundColor: "rgba(0, 0, 0, 0.55)",
+      backgroundColor: theme.colors.overlay,
       alignItems: "center",
       justifyContent: "center",
       paddingHorizontal: 24,
@@ -1540,7 +1519,7 @@ const createStyles = (theme: Palette, isDark: boolean) => {
       padding: 24,
       alignItems: "center",
       elevation: 10,
-      shadowColor: "#000000",
+      shadowColor: theme.colors.shadow,
       shadowOffset: { width: 0, height: 8 },
       shadowOpacity: 0.2,
       shadowRadius: 16,
@@ -1556,7 +1535,7 @@ const createStyles = (theme: Palette, isDark: boolean) => {
     },
     celebrationTitle: {
       fontSize: 18,
-      fontFamily: fontFamilies.heavy,
+      ...fontFaces.heavy,
       color: P.text,
       marginBottom: 16,
     },
@@ -1579,12 +1558,12 @@ const createStyles = (theme: Palette, isDark: boolean) => {
     },
     celebrationBadgeTitle: {
       fontSize: 14,
-      fontFamily: fontFamilies.heavy,
+      ...fontFaces.heavy,
       color: P.text,
     },
     celebrationBadgeReq: {
       fontSize: 11,
-      fontFamily: fontFamilies.semibold,
+      ...fontFaces.semibold,
       color: P.muted,
       marginTop: 1,
     },
@@ -1598,14 +1577,14 @@ const createStyles = (theme: Palette, isDark: boolean) => {
     },
     celebrationButtonText: {
       fontSize: 15,
-      fontFamily: fontFamilies.heavy,
+      ...fontFaces.heavy,
       color: "#FFFFFF",
     },
 
     /* Avatar picker modal — beautiful */
     avatarModalOverlay: {
       flex: 1,
-      backgroundColor: "rgba(0, 0, 0, 0.45)",
+      backgroundColor: theme.colors.overlay,
       alignItems: "center",
       justifyContent: "center",
       paddingHorizontal: 20,
@@ -1627,7 +1606,7 @@ const createStyles = (theme: Palette, isDark: boolean) => {
       borderWidth: 2,
       borderColor: P.border,
       borderBottomWidth: 4,
-      shadowColor: "#000000",
+      shadowColor: theme.colors.shadow,
       shadowOffset: { width: 0, height: 8 },
       shadowOpacity: 0.12,
       shadowRadius: 16,
@@ -1647,7 +1626,7 @@ const createStyles = (theme: Palette, isDark: boolean) => {
       width: 36,
       height: 4,
       borderRadius: 2,
-      backgroundColor: "#E5E7EB",
+      backgroundColor: P.border,
       alignSelf: "center",
       marginBottom: 8,
     },
@@ -1672,7 +1651,7 @@ const createStyles = (theme: Palette, isDark: boolean) => {
     },
     avatarModalTitle: {
       fontSize: 18,
-      fontFamily: fontFamilies.heavy,
+      ...fontFaces.heavy,
       color: P.text,
     },
     closeButton: {
@@ -1697,7 +1676,7 @@ const createStyles = (theme: Palette, isDark: boolean) => {
     },
     previewLabel: {
       fontSize: 10,
-      fontFamily: fontFamilies.heavy,
+      ...fontFaces.heavy,
       color: "#724D06",
       textTransform: "uppercase",
       letterSpacing: 0.7,
@@ -1736,22 +1715,22 @@ const createStyles = (theme: Palette, isDark: boolean) => {
       alignItems: "center",
       justifyContent: "center",
       borderWidth: 2,
-      borderColor: "#FFFFFF",
+      borderColor: theme.colors.card,
     },
     previewLevelText: {
       color: "#FFFFFF",
       fontSize: 10,
-      fontFamily: fontFamilies.heavy,
+      ...fontFaces.heavy,
     },
     previewName: {
       fontSize: 16,
-      fontFamily: fontFamilies.heavy,
+      ...fontFaces.heavy,
       color: P.text,
       marginBottom: 2,
     },
     previewTitle: {
       fontSize: 12,
-      fontFamily: fontFamilies.semibold,
+      ...fontFaces.semibold,
       color: P.muted,
     },
     previewXpRow: {
@@ -1762,7 +1741,7 @@ const createStyles = (theme: Palette, isDark: boolean) => {
     },
     previewXp: {
       fontSize: 11,
-      fontFamily: fontFamilies.bold,
+      ...fontFaces.bold,
       color: "#E67E22",
     },
     previewCheck: {
@@ -1788,22 +1767,22 @@ const createStyles = (theme: Palette, isDark: boolean) => {
     },
     nameFieldLabel: {
       fontSize: 12,
-      fontFamily: fontFamilies.heavy,
+      ...fontFaces.heavy,
       color: P.faint,
       textTransform: "uppercase",
       letterSpacing: 0.4,
     },
     charCount: {
       fontSize: 11,
-      fontFamily: fontFamilies.semibold,
+      ...fontFaces.semibold,
       color: P.faint,
     },
     nameInputWrap: {
       flexDirection: "row",
       alignItems: "center",
-      backgroundColor: theme.card,
+      backgroundColor: P.card,
       borderWidth: 1,
-      borderColor: theme.border,
+      borderColor: P.border,
       borderRadius: 12,
       paddingRight: 8,
     },
@@ -1814,15 +1793,15 @@ const createStyles = (theme: Palette, isDark: boolean) => {
       paddingHorizontal: 14,
       paddingVertical: 12,
       fontSize: 15,
-      fontFamily: fontFamilies.semibold,
-      color: theme.text,
+      ...fontFaces.semibold,
+      color: P.text,
     },
     clearButton: {
       padding: 6,
     },
     nameCooldownHint: {
       fontSize: 11,
-      fontFamily: fontFamilies.medium,
+      ...fontFaces.medium,
       color: P.faint,
       marginTop: 6,
     },
@@ -1835,7 +1814,7 @@ const createStyles = (theme: Palette, isDark: boolean) => {
     },
     avatarCount: {
       fontSize: 11,
-      fontFamily: fontFamilies.semibold,
+      ...fontFaces.semibold,
       color: P.faint,
     },
     avatarOptionsWrap: {
@@ -1884,7 +1863,7 @@ const createStyles = (theme: Palette, isDark: boolean) => {
     },
     saveButtonText: {
       fontSize: 16,
-      fontFamily: fontFamilies.heavy,
+      ...fontFaces.heavy,
       color: "#FFFFFF",
     },
     avatarModalOption: {
@@ -1923,7 +1902,7 @@ const createStyles = (theme: Palette, isDark: boolean) => {
       alignItems: "center",
       justifyContent: "center",
       borderWidth: 2,
-      borderColor: "#FFFFFF",
+      borderColor: theme.colors.card,
     },
   });
 };

@@ -266,6 +266,25 @@ CREATE TABLE IF NOT EXISTS articles (
   featured       INTEGER NOT NULL DEFAULT 0,      -- 1 = featured in the feed
   difficulty     TEXT
                  CHECK (difficulty IS NULL OR difficulty IN ('beginner', 'intermediate', 'advanced')),
+  -- Research pipeline (docs/ARTICLE_PIPELINE.md). Added to existing databases by
+  -- scripts/content-migration/add-article-pipeline.mjs; kept in sync here for fresh seeds.
+  source_type    TEXT NOT NULL DEFAULT ''         -- kind of source publisher; '' = not yet classified
+                 CHECK (source_type IN ('', 'government-agency', 'international-organization', 'research-institution', 'university', 'industry-association', 'standards-body', 'news-media', 'encyclopedia', 'textbook', 'other')),
+  source_note    TEXT NOT NULL DEFAULT '',        -- what the source is / what the summary draws from it
+  source_published_date TEXT,                     -- ISO date of the source itself (nullable)
+  review_status  TEXT NOT NULL DEFAULT 'needs-review'
+                 CHECK (review_status IN ('draft', 'needs-review', 'in-review', 'reviewed', 'outdated')),
+  last_reviewed  TEXT NOT NULL DEFAULT '',        -- ISO date of the last editorial check
+  reviewed_by    TEXT,
+  review_notes   TEXT,                            -- editor-facing; never shown to learners
+  summary_origin TEXT NOT NULL DEFAULT 'unknown'
+                 CHECK (summary_origin IN ('unknown', 'original', 'adapted', 'excerpt')),
+  related_lessons  TEXT NOT NULL DEFAULT '[]'     -- JSON array of lesson ids
+                 CONSTRAINT articles_related_lessons_json CHECK (json_valid(related_lessons)),
+  related_concepts TEXT NOT NULL DEFAULT '[]'     -- JSON array of encyclopedia entry ids
+                 CONSTRAINT articles_related_concepts_json CHECK (json_valid(related_concepts)),
+  related_elements TEXT NOT NULL DEFAULT '[]'     -- JSON array of element symbols
+                 CONSTRAINT articles_related_elements_json CHECK (json_valid(related_elements)),
   created_at     INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
   updated_at     INTEGER NOT NULL DEFAULT (strftime('%s', 'now'))
 );
@@ -290,6 +309,30 @@ CREATE TABLE IF NOT EXISTS posts (
   video_url       TEXT,
   related_content TEXT NOT NULL DEFAULT '[]'      -- JSON array of content ids
                   CONSTRAINT posts_related_content_json CHECK (json_valid(related_content)),
+  -- Research pipeline (docs/ARTICLE_PIPELINE.md). Added to existing databases by
+  -- scripts/content-migration/add-article-pipeline.mjs; kept in sync here for fresh seeds.
+  source_type    TEXT NOT NULL DEFAULT ''         -- kind of source publisher; '' = not yet classified
+                 CHECK (source_type IN ('', 'government-agency', 'international-organization', 'research-institution', 'university', 'industry-association', 'standards-body', 'news-media', 'encyclopedia', 'textbook', 'other')),
+  source_note    TEXT NOT NULL DEFAULT '',        -- what the source is / what the summary draws from it
+  source_published_date TEXT,                     -- ISO date of the source itself (nullable)
+  review_status  TEXT NOT NULL DEFAULT 'needs-review'
+                 CHECK (review_status IN ('draft', 'needs-review', 'in-review', 'reviewed', 'outdated')),
+  last_reviewed  TEXT NOT NULL DEFAULT '',        -- ISO date of the last editorial check
+  reviewed_by    TEXT,
+  review_notes   TEXT,                            -- editor-facing; never shown to learners
+  summary_origin TEXT NOT NULL DEFAULT 'unknown'
+                 CHECK (summary_origin IN ('unknown', 'original', 'adapted', 'excerpt')),
+  related_lessons  TEXT NOT NULL DEFAULT '[]'     -- JSON array of lesson ids
+                 CONSTRAINT posts_related_lessons_json CHECK (json_valid(related_lessons)),
+  related_concepts TEXT NOT NULL DEFAULT '[]'     -- JSON array of encyclopedia entry ids
+                 CONSTRAINT posts_related_concepts_json CHECK (json_valid(related_concepts)),
+  related_elements TEXT NOT NULL DEFAULT '[]'     -- JSON array of element symbols
+                 CONSTRAINT posts_related_elements_json CHECK (json_valid(related_elements)),
+  read_time      INTEGER NOT NULL DEFAULT 0,      -- minutes
+  difficulty     TEXT
+                 CHECK (difficulty IS NULL OR difficulty IN ('beginner', 'intermediate', 'advanced')),
+  related_myths  TEXT NOT NULL DEFAULT '[]'       -- JSON array of myth ids
+                 CONSTRAINT posts_related_myths_json CHECK (json_valid(related_myths)),
   created_at      INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
   updated_at      INTEGER NOT NULL DEFAULT (strftime('%s', 'now'))
 );

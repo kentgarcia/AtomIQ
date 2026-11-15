@@ -1,5 +1,10 @@
 import { createAudioPlayer, setAudioModeAsync, type AudioPlayer } from "expo-audio";
-import { getSoundEnabled } from "./storage";
+import { canPlayGameSfx } from "./media-core";
+import {
+  ensureMediaPreferencesLoaded,
+  getMediaEnvironment,
+  getMediaPreferences,
+} from "./media";
 
 export type GameSfx = "punch" | "correct" | "wrong" | "gameover";
 
@@ -59,8 +64,9 @@ export const preloadGameSfx = async (): Promise<void> => {
 
 export const playGameSfx = async (type: GameSfx): Promise<void> => {
   try {
-    const soundEnabled = await getSoundEnabled();
-    if (!soundEnabled) {
+    // One preference source + lifecycle gate shared with UI clicks.
+    await ensureMediaPreferencesLoaded();
+    if (!canPlayGameSfx(getMediaPreferences(), getMediaEnvironment())) {
       return;
     }
 
@@ -77,6 +83,10 @@ export const playGameSfx = async (type: GameSfx): Promise<void> => {
     console.warn(`Unable to play ${type} game SFX:`, error);
   }
 };
+
+/** Correct/wrong feedback — the same cue on every learning surface. */
+export const playAnswerSfx = (isCorrect: boolean): Promise<void> =>
+  playGameSfx(isCorrect ? "correct" : "wrong");
 
 export const unloadGameSfx = async (): Promise<void> => {
   for (const key of Object.keys(soundCache) as GameSfx[]) {

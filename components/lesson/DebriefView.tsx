@@ -25,6 +25,7 @@ import {
     unlockNextLevel,
     updateLevelProgress,
 } from "@/services/database";
+import { recordActivity } from "@/services/activity-log";
 import { toLocalIsoDate } from "@/services/utils";
 import { useStorage } from "@/services/StorageContext";
 
@@ -81,6 +82,7 @@ export const DebriefView = ({
           completed_at:
             existingProgress?.completed_at || new Date().toISOString(),
         });
+        recordActivity("lesson_complete", { id: levelId });
 
         // Unlock next lesson/unit when completing for the first time
         if (!isAlreadyCompleted) {

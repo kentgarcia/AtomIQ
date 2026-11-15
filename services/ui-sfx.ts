@@ -1,47 +1,20 @@
 import { createAudioPlayer, setAudioModeAsync, type AudioPlayer } from "expo-audio";
 import { Pressable, TouchableOpacity } from "react-native";
-import { getSoundEnabled } from "./storage";
+import { canPlayUiClick } from "./media-core";
+import {
+  ensureMediaPreferencesLoaded,
+  getCurrentRouteMediaPolicy,
+  getMediaEnvironment,
+  getMediaPreferences,
+  setMediaPathname,
+} from "./media";
 
 const buttonClickSource = require("../assets/sfx/button-click.mp3");
 
-const GAME_ROUTE_PATTERNS = [
-  /^\/quiz(?:\/|$)/,
-  /^\/quiz-results(?:\/|$)/,
-  /^\/mythbuster(?:\/|$)/,
-  /^\/lesson(?:\/|$)/,
-  /^\/lab(?:\/|$)/,
-  /^\/explorer\/atom-maze(?:\/|$)/,
-  /^\/atom-maze(?:\/|$)/,
-];
-
 let audioModeConfigured = false;
 let clickPlayer: AudioPlayer | null = null;
-let soundEnabledCache: boolean | null = null;
-let currentPathname = "";
 let handlersInstalled = false;
 let lastClickAt = 0;
-
-const normalizePathname = (pathname?: string | null): string => {
-  if (!pathname) {
-    return "";
-  }
-
-  return pathname
-    .toLowerCase()
-    .replace(/\/(\([^/]+\))/g, "")
-    .replace(/\/+/g, "/")
-    .replace(/\/$/, "");
-};
-
-const shouldPlayForCurrentRoute = (): boolean => {
-  const normalized = normalizePathname(currentPathname);
-
-  if (!normalized) {
-    return true;
-  }
-
-  return !GAME_ROUTE_PATTERNS.some((pattern) => pattern.test(normalized));
-};
 
 const configureAudioMode = async () => {
   if (audioModeConfigured) {
@@ -75,21 +48,9 @@ const getOrCreateClickPlayer = (): AudioPlayer => {
   return player;
 };
 
-const getSoundEnabledCached = async (): Promise<boolean> => {
-  if (soundEnabledCache !== null) {
-    return soundEnabledCache;
-  }
-
-  soundEnabledCache = await getSoundEnabled();
-  return soundEnabledCache;
-};
-
-export const setUiSfxEnabled = (enabled: boolean): void => {
-  soundEnabledCache = enabled;
-};
-
+/** Route changes are owned by the media policy; kept for call-site compat. */
 export const setUiSfxPathname = (pathname: string): void => {
-  currentPathname = pathname;
+  setMediaPathname(pathname);
 };
 
 export const initializeUiSfx = async (): Promise<void> => {
@@ -99,22 +60,26 @@ export const initializeUiSfx = async (): Promise<void> => {
   } catch (error) {
     console.warn("Unable to preload button click SFX:", error);
   }
-  await getSoundEnabledCached();
+  await ensureMediaPreferencesLoaded();
 };
 
 export const playButtonClickSfx = async (): Promise<void> => {
   try {
-    if (!shouldPlayForCurrentRoute()) {
+    // Same gate as every other effect: shared preference, app foreground,
+    // screen-reader state and the current surface's route policy.
+    await ensureMediaPreferencesLoaded();
+    if (
+      !canPlayUiClick(
+        getMediaPreferences(),
+        getMediaEnvironment(),
+        getCurrentRouteMediaPolicy(),
+      )
+    ) {
       return;
     }
 
     const now = Date.now();
     if (now - lastClickAt < 60) {
-      return;
-    }
-
-    const soundEnabled = await getSoundEnabledCached();
-    if (!soundEnabled) {
       return;
     }
 

@@ -12,7 +12,7 @@ import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-nati
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import {useTheme, withAlpha, type Palette, fontFamilies, useResponsiveLayout} from "@/theme";
+import {useTheme, withAlpha, type Palette, fontFaces, useResponsiveLayout} from "@/theme";
 
 export default function JourneyScreen() {
   const router = useRouter();
@@ -148,7 +148,7 @@ export default function JourneyScreen() {
                       'Document'
                     }
                     size={20}
-                    color="THEME.white"
+                    color={THEME.white}
                     variant="Bold"
                   />
                 </View>
@@ -226,8 +226,8 @@ const makeStyles = (THEME: Palette) => StyleSheet.create({
   },
   overviewDescription: {
     fontSize: 15,
-    fontFamily: fontFamilies.regular,
-    color: 'THEME.white',
+    ...fontFaces.regular,
+    color: THEME.white,
     lineHeight: 22,
     marginBottom: 16,
   },
@@ -243,14 +243,14 @@ const makeStyles = (THEME: Palette) => StyleSheet.create({
   metaText: {
     fontSize: 13,
     color: withAlpha(THEME.white, 0.9),
-    fontFamily: fontFamilies.semibold,
+    ...fontFaces.semibold,
   },
   pathContainer: {
     marginBottom: 24,
   },
   pathTitle: {
     fontSize: 18,
-    fontFamily: fontFamilies.heavy,
+    ...fontFaces.heavy,
     color: THEME.text,
     marginBottom: 16,
   },
@@ -275,13 +275,13 @@ const makeStyles = (THEME: Palette) => StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 3,
-    borderColor: 'THEME.white',
+    borderColor: THEME.white,
     zIndex: 1,
   },
   nodeCard: {
     flex: 1,
     marginLeft: 16,
-    backgroundColor: THEME.white,
+    backgroundColor: THEME.card,
     borderRadius: 16,
     borderWidth: 2,
     borderColor: THEME.border,
@@ -299,12 +299,12 @@ const makeStyles = (THEME: Palette) => StyleSheet.create({
   },
   nodeNumber: {
     fontSize: 12,
-    fontFamily: fontFamilies.heavy,
+    ...fontFaces.heavy,
     color: THEME.primary,
   },
   nodeType: {
     fontSize: 10,
-    fontFamily: fontFamilies.bold,
+    ...fontFaces.bold,
     color: THEME.textMuted,
     backgroundColor: THEME.bg,
     paddingHorizontal: 8,
@@ -313,13 +313,13 @@ const makeStyles = (THEME: Palette) => StyleSheet.create({
   },
   nodeTitle: {
     fontSize: 16,
-    fontFamily: fontFamilies.bold,
+    ...fontFaces.bold,
     color: THEME.text,
     marginBottom: 4,
   },
   nodeDescription: {
     fontSize: 13,
-    fontFamily: fontFamilies.regular,
+    ...fontFaces.regular,
     color: THEME.textMuted,
     marginBottom: 12,
   },
@@ -330,11 +330,11 @@ const makeStyles = (THEME: Palette) => StyleSheet.create({
   },
   nodePreviewText: {
     fontSize: 13,
-    fontFamily: fontFamilies.bold,
+    ...fontFaces.bold,
     color: THEME.primary,
   },
   sourcesContainer: {
-    backgroundColor: THEME.white,
+    backgroundColor: THEME.card,
     borderRadius: 16,
     padding: 16,
     borderWidth: 2,
@@ -343,7 +343,7 @@ const makeStyles = (THEME: Palette) => StyleSheet.create({
   },
   sourcesTitle: {
     fontSize: 16,
-    fontFamily: fontFamilies.heavy,
+    ...fontFaces.heavy,
     color: THEME.text,
     marginBottom: 12,
   },
@@ -357,13 +357,13 @@ const makeStyles = (THEME: Palette) => StyleSheet.create({
   },
   sourceTitle: {
     fontSize: 13,
-    fontFamily: fontFamilies.semibold,
+    ...fontFaces.semibold,
     color: THEME.text,
     marginBottom: 2,
   },
   sourceOrg: {
     fontSize: 11,
-    fontFamily: fontFamilies.regular,
+    ...fontFaces.regular,
     color: THEME.textMuted,
   },
 });

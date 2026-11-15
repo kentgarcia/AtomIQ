@@ -8,9 +8,12 @@ import {
     View,
 } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
-import { speakSafely, stopSpeech } from "@/services/speech";
+import { readAloud } from "@/services/media";
+import { buildFeedbackSpeech, buildQuestionSpeech } from "@/services/media-core";
+import { playAnswerSfx } from "@/services/game-sfx";
+import { ReadAloudButton } from "@/components/ui/read-aloud-button";
 
-import {type Palette, fontFamilies} from "@/theme";
+import {type Palette, fontFaces} from "@/theme";
 import { Icon } from "@/components/ui/icon";
 
 import { createQuizStyles, createStyles } from "./styles";
@@ -26,7 +29,6 @@ export const AssessmentView = ({
 }) => {
   const [selected, setSelected] = useState<number | null>(null);
   const [confirmed, setConfirmed] = useState(false);
-  const [isSpeaking, setIsSpeaking] = useState(false);
   const scrollViewRef = useRef<ScrollViewInstance>(null);
   const { width } = useWindowDimensions();
   const styles = useMemo(() => createStyles(theme, width), [theme, width]);
@@ -34,23 +36,14 @@ export const AssessmentView = ({
   const correctIndex = data.correctIndex;
   const isCorrect = selected === correctIndex;
 
-  const speakQuestion = () => {
-    if (isSpeaking) {
-      stopSpeech();
-      setIsSpeaking(false);
-    } else {
-      setIsSpeaking(true);
-      speakSafely(data.question, {
-        language: "en",
-        rate: 0.9,
-        onDone: () => setIsSpeaking(false),
-        onStopped: () => setIsSpeaking(false),
-      });
-    }
-  };
+  // Same Read Aloud policy as the standalone quiz: question + choices before
+  // answering, verdict + explanation after.
+  const readAloudOwner = `lesson-assessment:${data.question}`;
 
   const handleCheck = () => {
     if (selected === null) return;
+    readAloud.stop("answered", readAloudOwner);
+    void playAnswerSfx(selected === correctIndex);
     setConfirmed(true);
     // Auto-scroll to feedback after a short delay
     setTimeout(() => {
@@ -76,19 +69,16 @@ export const AssessmentView = ({
               <Icon name="Cup" size={18} color="#FFF" variant="Bold" />
               <Text style={quizStyles.badgeText}>QUIZ</Text>
             </View>
-            <TouchableOpacity
-              style={quizStyles.speakerBtn}
-              onPress={speakQuestion}
-              hitSlop={8}
-              accessibilityRole="button"
-              accessibilityLabel={isSpeaking ? "Stop reading question" : "Read question aloud"}
-            >
-              <Icon
-                name={isSpeaking ? "VolumeSlash" : "VolumeHigh"}
-                size={20}
-                color={isSpeaking ? "#FFF" : theme.gold}
-              />
-            </TouchableOpacity>
+            <ReadAloudButton
+              ownerId={readAloudOwner}
+              subject={confirmed ? "explanation" : "question"}
+              accent={theme.gold}
+              text={() =>
+                confirmed
+                  ? buildFeedbackSpeech(isCorrect, data.explanation)
+                  : buildQuestionSpeech(data.question, data.options)
+              }
+            />
           </View>
 
           <Text style={quizStyles.questionText}>{data.question}</Text>
@@ -146,15 +136,15 @@ export const AssessmentView = ({
                       isSelected &&
                         !confirmed && {
                           color: theme.primary,
-                          fontFamily: fontFamilies.bold,
+                          ...fontFaces.bold,
                         },
                       showCorrectMark && {
                         color: theme.success,
-                        fontFamily: fontFamilies.bold,
+                        ...fontFaces.bold,
                       },
                       showWrongMark && {
                         color: theme.error,
-                        fontFamily: fontFamilies.bold,
+                        ...fontFaces.bold,
                       },
                     ]}
                   >

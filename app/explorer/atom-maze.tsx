@@ -10,10 +10,27 @@ import {
     type MythBusterQuizDifficulty,
 } from "@/content/quizzes";
 import type { QuizQuestion as RepositoryQuizQuestion } from "@/content/types";
-import { useColorScheme } from "@/hooks/use-color-scheme";
 import { startMaze } from "@/services/explorer-storage";
+import {
+    addItems,
+    beginAnswer,
+    commitCorrect,
+    createEndlessPicker,
+    createProgression,
+    getAvailable,
+    makeQuestionId,
+    resolveWrong,
+    serveNext,
+    type PoolItem,
+    type ProgressionState,
+    type ServeOptions,
+} from "@/services/atom-maze-progression";
+import { recordActivity } from "@/services/activity-log";
 import { saveGameScore } from "@/services/database";
 import { playGameSfx, preloadGameSfx } from "@/services/game-sfx";
+import { ReadAloudButton } from "@/components/ui/read-aloud-button";
+import { readAloud } from "@/services/media";
+import { buildQuestionSpeech } from "@/services/media-core";
 import { Image as ExpoImage } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -71,10 +88,6 @@ const ENDLESS_TIMING = {
   walkOutMs: 0,
   walkInMs: 90,
 };
-
-// Shared instructions-page backdrop (same for every maze) — copies the
-// autumn cream → white gradient used across the home + games tabs.
-const INTRO_SKY_LIGHT: [string, string] = ["#FFF3E0", "#FFFFFF"];
 
 /* Maze stage colors (mirrors the DifficultyPanel on the games tab). */
 const MAZE_COLORS: Record<string, string> = {
@@ -176,9 +189,6 @@ const INTRO_HOW_TO_PLAY_STEPS: IntroHowToPlayStep[] = [
   },
 ];
 
-const normalizeQuestionText = (questionText: string): string =>
-  questionText.trim().toLowerCase().replace(/\s+/g, " ");
-
 const getRoomStageDifficulty = (
   roomIndex: number,
   totalRooms: number,
@@ -271,6 +281,19 @@ type MythBusterQuestionPool = Partial<
   Record<MythBusterQuizDifficulty, AtomMazeQuizQuestion[]>
 >;
 
+/** A question that has been served (identity + attempt token + payload). */
+interface ServedQuestion {
+  id: string;
+  token: string;
+  /** Options are shuffled once at serve time and then frozen. */
+  question: AtomMazeQuizQuestion;
+}
+
+const EXHAUSTED_ENDLESS_NOTICE =
+  "You have answered every question in the Endless Maze bank. Questions never repeat within a run, so start a new run to replay them from the beginning.";
+const EXHAUSTED_BOSS_NOTICE =
+  "The boss has run out of fresh questions. Questions never repeat within a run, so start a new run to replay them from the beginning.";
+
 const ENDLESS_MONSTER_ROSTER = [
   { name: "Radon Wisp", element: "radiation", sprite: "👻", color: "#9C6ADE" },
   { name: "Neutron Pup", element: "nuclear", sprite: "🐕", color: "#F59E0B" },
@@ -282,53 +305,15 @@ const ENDLESS_MONSTER_ROSTER = [
   { name: "Isotope Bat", element: "atomic", sprite: "🦇", color: "#8B5CF6" },
 ] as const;
 
-/** Difficulty weights ramp with the wave count but never hit zero. */
-const pickEndlessDifficulty = (wave: number): MythBusterQuizDifficulty => {
-  if (wave < 5) return "easy";
-  const t = Math.min((wave - 5) / 25, 1); // ramps across waves 6–30
-  const wEasy = 0.55 - 0.4 * t; // .55 → .15
-  const wMedium = 0.3 + 0.15 * t; // .30 → .45
-  const wHard = 0.5 * t * t; // 0 → .50
-  const roll = Math.random() * (wEasy + wMedium + wHard);
-  if (roll < wEasy) return "easy";
-  if (roll < wEasy + wMedium) return "medium";
-  return "hard";
-};
-
 /**
- * Build one endless room from an unused mythbuster question at the ramped
- * difficulty, falling back to any unused question so a run only ends when
- * the whole bank is exhausted. Mutates `usedIds`. Returns null when dry.
+ * Build one endless room around an already-served question. Question
+ * selection (difficulty ramp, no repeats) lives in
+ * services/atom-maze-progression.ts; this only dresses the wave.
  */
-const generateEndlessRoom = (
+const buildEndlessRoom = (
   wave: number,
-  pools: MythBusterQuestionPool,
-  usedIds: Set<string>,
-): AtomMazeRoom | null => {
-  const takeQuestion = (
-    difficulty: MythBusterQuizDifficulty,
-  ): AtomMazeQuizQuestion | null => {
-    for (const question of pools[difficulty] ?? []) {
-      if (!usedIds.has(question.question)) return question;
-    }
-    return null;
-  };
-
-  let difficulty = pickEndlessDifficulty(wave);
-  let picked = takeQuestion(difficulty);
-  if (!picked) {
-    for (const alt of ["easy", "medium", "hard"] as const) {
-      picked = takeQuestion(alt);
-      if (picked) {
-        difficulty = alt;
-        break;
-      }
-    }
-  }
-  if (!picked) return null; // bank exhausted — end the run
-
-  usedIds.add(picked.question);
-
+  question: AtomMazeQuizQuestion,
+): AtomMazeRoom => {
   const roster = ENDLESS_MONSTER_ROSTER[wave % ENDLESS_MONSTER_ROSTER.length];
   const maxHp = 50 + wave * 10;
   const attackPower = Math.min(18 + Math.floor(wave * 1.5), 45);
@@ -347,38 +332,33 @@ const generateEndlessRoom = (
       color: roster.color,
       defeatMessage: `${roster.name} is down!`,
     },
-    questions: [picked],
+    questions: [question],
     damagePerCorrect: maxHp,
     explanation: "",
   };
 };
 
-const buildEndlessBaseMaze = (pools: MythBusterQuestionPool): AtomMazeChallenge => {
-  const usedIds = new Set<string>();
-  const rooms = [generateEndlessRoom(0, pools, usedIds), generateEndlessRoom(1, pools, usedIds)]
-    .filter((room): room is AtomMazeRoom => room !== null);
-  return {
-    id: "endless",
-    title: "Endless Maze",
-    description:
-      "Survive as many waves as you can. Questions start easy and get tougher the deeper you go — one wrong answer costs HP, so stay sharp!",
-    theme: "Endless Challenge",
-    rooms,
-    xpReward: 0,
-    playerMaxHp: 100,
-    boss: {
-      id: "endless-gauntlet",
-      name: "The Gauntlet",
-      element: "fusion",
-      maxHp: 9999,
-      attackPower: 45,
-      sprite: "♾️",
-      color: "#7C3AED",
-      defeatMessage: "You conquered The Gauntlet!",
-      isBoss: true,
-    },
-  };
-};
+const buildEndlessMaze = (rooms: AtomMazeRoom[]): AtomMazeChallenge => ({
+  id: "endless",
+  title: "Endless Maze",
+  description:
+    "Survive as many waves as you can. Questions start easy and get tougher the deeper you go — one wrong answer costs HP, so stay sharp!",
+  theme: "Endless Challenge",
+  rooms,
+  xpReward: 0,
+  playerMaxHp: 100,
+  boss: {
+    id: "endless-gauntlet",
+    name: "The Gauntlet",
+    element: "fusion",
+    maxHp: 9999,
+    attackPower: 45,
+    sprite: "♾️",
+    color: "#7C3AED",
+    defeatMessage: "You conquered The Gauntlet!",
+    isBoss: true,
+  },
+});
 
 const HP_FILL_DURATION_MS = 380;
 
@@ -576,8 +556,8 @@ export default function AtomMazeBattleScreen() {
   const [isStageTransitioning, setIsStageTransitioning] = useState(false);
   const [showBossNotice, setShowBossNotice] = useState(false);
 
-  const colorScheme = useColorScheme();
   const { theme: appTheme } = useTheme();
+  const colorScheme = appTheme.mode;
   const theme = appTheme.palettes.mazeGame;
   const introPalette = useMemo(() => {
     if (colorScheme === "dark") {
@@ -585,8 +565,8 @@ export default function AtomMazeBattleScreen() {
         background: "#0B1220",
         cardBg: "rgba(15, 23, 42, 0.88)",
         cardBorder: "rgba(148, 163, 184, 0.34)",
-        primaryText: "#F8FAFC",
-        mutedText: "#CBD5E1",
+        primaryText: appTheme.colors.text,
+        mutedText: appTheme.colors.textMuted,
         subtleBg: "rgba(30, 41, 59, 0.86)",
         subtleBorder: "rgba(148, 163, 184, 0.28)",
         iconWrapBg: "rgba(255, 255, 255, 0.08)",
@@ -596,18 +576,18 @@ export default function AtomMazeBattleScreen() {
     }
 
     return {
-      background: "#FFFDE7",
-      cardBg: "#FFFFFF",
-      cardBorder: "#E5E7EB",
-      primaryText: "#1F2937",
-      mutedText: "#6B7280",
-      subtleBg: "#F9FAFB",
-      subtleBorder: "#E5E7EB",
-      iconWrapBg: "#FFF3D9",
-      backBtnBg: "#FFFFFF",
-      backBtnBorder: "#E5E7EB",
+      background: appTheme.colors.pageGradientTop,
+      cardBg: appTheme.colors.card,
+      cardBorder: appTheme.colors.border,
+      primaryText: appTheme.colors.text,
+      mutedText: appTheme.colors.textMuted,
+      subtleBg: appTheme.colors.surfaceSoft,
+      subtleBorder: appTheme.colors.border,
+      iconWrapBg: appTheme.colors.creamTint,
+      backBtnBg: appTheme.colors.card,
+      backBtnBorder: appTheme.colors.border,
     };
-  }, [colorScheme]);
+  }, [appTheme, colorScheme]);
   const resultPalette = useMemo(() => {
     if (colorScheme === "dark") {
       return {
@@ -616,12 +596,12 @@ export default function AtomMazeBattleScreen() {
         completeGradient: ["#1C1917", "#0F172A", "#052E2B"] as const,
         cardBg: "rgba(15, 23, 42, 0.9)",
         cardBorder: "rgba(148, 163, 184, 0.34)",
-        cardShadow: "rgba(2, 6, 23, 0.65)",
+        cardShadow: appTheme.colors.shadow,
         statsBg: "rgba(30, 41, 59, 0.86)",
         statsBorder: "rgba(148, 163, 184, 0.3)",
         statDivider: "rgba(148, 163, 184, 0.24)",
-        primaryText: "#F8FAFC",
-        mutedText: "#CBD5E1",
+        primaryText: appTheme.colors.text,
+        mutedText: appTheme.colors.textMuted,
         chipBg: "rgba(15, 23, 42, 0.82)",
         chipBorder: "rgba(148, 163, 184, 0.45)",
         chipText: "#E2E8F0",
@@ -641,24 +621,24 @@ export default function AtomMazeBattleScreen() {
     }
 
     return {
-      defeatGradient: ["#FFF7ED", "#FEE2E2", "#FECACA"] as const,
-      victoryGradient: ["#ECFDF5", "#DCFCE7", "#BBF7D0"] as const,
-      completeGradient: ["#FEFCE8", "#FEF3C7", "#FDE68A"] as const,
-      cardBg: "#FFFFFF",
-      cardBorder: "#E5E7EB",
-      cardShadow: "rgba(15, 23, 42, 0.16)",
-      statsBg: "#FFF8E1",
-      statsBorder: "#FFE082",
-      statDivider: "#FFE082",
-      primaryText: "#111827",
-      mutedText: "#6B7280",
-      chipBg: "#FFFFFF",
-      chipBorder: "#E5E7EB",
-      chipText: "#374151",
+      defeatGradient: ["#FFF7ED", "#FEE2E2", "#FECACA"] as const, // theme-allow: light result celebration art
+      victoryGradient: ["#ECFDF5", "#DCFCE7", "#BBF7D0"] as const, // theme-allow: light result celebration art
+      completeGradient: ["#FEFCE8", "#FEF3C7", "#FDE68A"] as const, // theme-allow: light result celebration art
+      cardBg: appTheme.colors.card,
+      cardBorder: appTheme.colors.border,
+      cardShadow: appTheme.colors.shadow,
+      statsBg: appTheme.colors.creamTint,
+      statsBorder: appTheme.colors.creamBorder,
+      statDivider: appTheme.colors.creamBorder,
+      primaryText: appTheme.colors.text,
+      mutedText: appTheme.colors.textMuted,
+      chipBg: appTheme.colors.card,
+      chipBorder: appTheme.colors.border,
+      chipText: appTheme.colors.textSecondary,
       defeatAccent: "#DC2626",
       victoryAccent: "#059669",
       completeAccent: "#CA8A04",
-      rewardCardBg: "#FEF9C3",
+      rewardCardBg: appTheme.colors.warningSurface,
       rewardCardBorder: "#FACC15",
       rewardText: "#B45309",
       retryButton: "#EF4444",
@@ -668,22 +648,22 @@ export default function AtomMazeBattleScreen() {
       completeButton: "#F59E0B",
       completeButtonDepth: "#B45309",
     };
-  }, [colorScheme]);
+  }, [appTheme, colorScheme]);
   // Quiz colors — amber maze theme, adapted per color scheme.
   const quizPalette = useMemo(() => {
     const dark = colorScheme === "dark";
     const tintAmber = dark
       ? "rgba(255, 179, 0, 0.18)"
-      : "#FFF8E1";
+      : appTheme.colors.creamTint;
     const tintGreen = dark
       ? "rgba(46, 204, 113, 0.18)"
-      : "#E8F5E9";
-    const tintRed = dark ? "rgba(239, 68, 68, 0.16)" : "#FEE2E2";
+      : appTheme.colors.successSurface;
+    const tintRed = dark ? "rgba(239, 68, 68, 0.16)" : appTheme.colors.errorSurface;
     return {
       option: {
         backgroundColor: theme.card,
         borderColor: theme.border,
-        borderBottomColor: dark ? "#26334A" : "#D1D5DB",
+        borderBottomColor: appTheme.colors.borderStrong,
       },
       selected: {
         borderColor: theme.primary,
@@ -711,7 +691,7 @@ export default function AtomMazeBattleScreen() {
         borderColor: "rgba(239, 68, 68, 0.55)",
       },
     };
-  }, [colorScheme, theme]);
+  }, [appTheme, colorScheme, theme]);
   // HP card surface + text colors, mode-aware.
   const hpCard = useMemo(() => {
     const dark = colorScheme === "dark";
@@ -719,18 +699,18 @@ export default function AtomMazeBattleScreen() {
       cardStyle: {
         backgroundColor: theme.card,
         borderColor: theme.border,
-        borderBottomColor: dark ? "#26334A" : "#D1D5DB",
-        shadowColor: dark ? "#000000" : "#0F172A",
+        borderBottomColor: appTheme.colors.borderStrong,
+        shadowColor: appTheme.colors.shadow,
         shadowOffset: { width: 0, height: 3 },
         shadowOpacity: dark ? 0.45 : 0.12,
         shadowRadius: 6,
         elevation: 3,
       },
-      textColor: dark ? "#F8FAFC" : "#111827",
-      subColor: dark ? "#FFCA28" : "#B45309",
-      valueColor: dark ? "#94A3B8" : "#6B7280",
+      textColor: appTheme.colors.text,
+      subColor: appTheme.colors.amberText,
+      valueColor: appTheme.colors.textMuted,
     };
-  }, [colorScheme, theme]);
+  }, [appTheme, colorScheme, theme]);
   const arenaHeight = Math.min(Math.max(height * 0.42, 270), 360);
   const sceneTopPadding = Math.max(insets.top + 4, 10);
   const questionBottomPadding = Math.max(insets.bottom + 12, 18);
@@ -749,6 +729,7 @@ export default function AtomMazeBattleScreen() {
     if (gameState.phase === "defeat") {
       void playGameSfx("gameover");
     }
+    if (gameState.phase === "defeat" || gameState.phase === "complete") recordActivity("game_session", { id: "atom-maze" });
   }, [gameState.phase]);
 
   useEffect(() => {
@@ -788,47 +769,204 @@ export default function AtomMazeBattleScreen() {
   const arenaPulse = useSharedValue(0);
   const monsterOpacity = useSharedValue(1);
 
+  // -----------------------------------------------------------------------
+  // Question progression (services/atom-maze-progression.ts).
+  //
+  // The progression state lives in a ref so answer/transition callbacks that
+  // fire later (timeouts, animation-complete) always read and write the live
+  // state instead of a stale render closure. Question identity + status are
+  // tracked there independently of display order; a question is consumed only
+  // when the correct-answer transition commits (idempotent, token-keyed).
+  // -----------------------------------------------------------------------
+  const progressionRef = useRef<ProgressionState>(createProgression());
+  const questionPayloadsRef = useRef<Map<string, AtomMazeQuizQuestion>>(
+    new Map(),
+  );
+  const servedRef = useRef<ServedQuestion | null>(null);
+  const [servedQuestion, setServedQuestion] = useState<ServedQuestion | null>(
+    null,
+  );
+  const [exhaustionNotice, setExhaustionNotice] = useState<string | null>(null);
+  const bossQuestionCountRef = useRef(0);
+  const [bossQuestionTotal, setBossQuestionTotal] = useState(0);
+
+  // Live mirrors for async callbacks (timeouts / animation completions).
+  const gameStateRef = useRef(gameState);
+  const mazeRef = useRef(maze);
+  useEffect(() => {
+    gameStateRef.current = gameState;
+    mazeRef.current = maze;
+  }, [gameState, maze]);
+
+  // Timers owned by the screen, cleared on unmount so a late callback can
+  // never touch a dismissed run.
+  const timersRef = useRef<Set<ReturnType<typeof setTimeout>>>(new Set());
+  const schedule = (fn: () => void, ms: number) => {
+    const handle = setTimeout(() => {
+      timersRef.current.delete(handle);
+      fn();
+    }, ms);
+    timersRef.current.add(handle);
+  };
+  const clearScheduled = () => {
+    timersRef.current.forEach((handle) => clearTimeout(handle));
+    timersRef.current.clear();
+  };
+  useEffect(() => clearScheduled, []);
+
+  /** Serve the next question from the pool (idempotent while unresolved). */
+  const serveQuestion = (options?: ServeOptions): ServedQuestion | null => {
+    const result = serveNext(progressionRef.current, options);
+    progressionRef.current = result.state;
+
+    if (!result.served || !result.token) {
+      servedRef.current = null;
+      setServedQuestion(null);
+      return null;
+    }
+    if (servedRef.current && servedRef.current.token === result.token) {
+      return servedRef.current;
+    }
+    const payload = questionPayloadsRef.current.get(result.served.id);
+    if (!payload) {
+      servedRef.current = null;
+      setServedQuestion(null);
+      return null;
+    }
+    const served: ServedQuestion = {
+      id: result.served.id,
+      token: result.token,
+      question: shuffleQuizQuestionOptions(payload),
+    };
+    servedRef.current = served;
+    setServedQuestion(served);
+    if (__DEV__) {
+      console.log(
+        `[atom-maze] run ${result.state.runId} served #${result.state.servedLog.length}: ${served.id}`,
+      );
+    }
+    return served;
+  };
+
+  const resetServed = () => {
+    servedRef.current = null;
+    setServedQuestion(null);
+    setExhaustionNotice(null);
+    bossQuestionCountRef.current = 0;
+    setBossQuestionTotal(0);
+  };
+
+  /** First room (from `fromIndex`) that still has an unserved question. */
+  const findPlayableRoomIndex = (
+    m: AtomMazeChallenge,
+    fromIndex: number,
+  ): number => {
+    for (let index = fromIndex; index < m.rooms.length; index += 1) {
+      if (getAvailable(progressionRef.current, m.rooms[index].id).length > 0) {
+        return index;
+      }
+    }
+    return -1;
+  };
+
+  /** Fresh progression over a fixed (DB) maze; serves the first room. */
+  const initFixedRun = (m: AtomMazeChallenge): number => {
+    const payloads = new Map<string, AtomMazeQuizQuestion>();
+    const items: PoolItem[] = [];
+    for (const room of m.rooms) {
+      for (const question of room.questions) {
+        if (question.type !== "quiz") continue;
+        const questionId = makeQuestionId(question.question);
+        if (payloads.has(questionId)) continue; // identity-level dedupe
+        payloads.set(questionId, question);
+        items.push({ id: questionId, group: room.id });
+      }
+    }
+    questionPayloadsRef.current = payloads;
+    progressionRef.current = createProgression(
+      items,
+      progressionRef.current.runId + 1,
+    );
+    resetServed();
+    const startIndex = findPlayableRoomIndex(m, 0);
+    if (startIndex >= 0) {
+      serveQuestion({ group: m.rooms[startIndex].id });
+    }
+    return Math.max(startIndex, 0);
+  };
+
+  /** Fresh progression over the mythbuster bank; serves wave 0. */
+  const initEndlessRun = (pool: MythBusterQuestionPool): AtomMazeChallenge => {
+    const payloads = new Map<string, AtomMazeQuizQuestion>();
+    const items: PoolItem[] = [];
+    for (const difficulty of ["easy", "medium", "hard"] as const) {
+      for (const question of pool[difficulty] ?? []) {
+        const questionId = makeQuestionId(question.question);
+        if (payloads.has(questionId)) continue;
+        payloads.set(questionId, question);
+        items.push({ id: questionId, group: "endless", difficulty });
+      }
+    }
+    questionPayloadsRef.current = payloads;
+    progressionRef.current = createProgression(
+      items,
+      progressionRef.current.runId + 1,
+    );
+    resetServed();
+    const first = serveQuestion({ pick: createEndlessPicker(0) });
+    if (!first) setExhaustionNotice(EXHAUSTED_ENDLESS_NOTICE);
+    return buildEndlessMaze(first ? [buildEndlessRoom(0, first.question)] : []);
+  };
+
+  /** Reset every per-run UI/animation value for a (re)started run. */
+  const resetRunUi = (m: AtomMazeChallenge, startRoomIndex: number) => {
+    const playerMaxHp = m.playerMaxHp || 100;
+    const startRoom = m.rooms[startRoomIndex];
+    const monsterMaxHp = startRoom?.monster?.maxHp || 50;
+
+    setGameState({
+      phase: "intro",
+      currentRoomIndex: startRoomIndex,
+      currentQuestionIndex: 0,
+      playerHp: playerMaxHp,
+      playerMaxHp: playerMaxHp,
+      monsterHp: monsterMaxHp,
+      monsterMaxHp: monsterMaxHp,
+      score: 0,
+      defeatedMonsters: 0,
+    });
+
+    // Reset animations
+    playerX.value = 0;
+    playerLunge.value = 0;
+    monsterLunge.value = 0;
+    arenaPulse.value = 0;
+    monsterOpacity.value = 1;
+    setXpAwardedThisRun(null);
+    setComboStreak(0);
+    setLastDamage(null);
+    setSelectedAnswer(null);
+    setShowResult(null);
+    setIsAnswering(false);
+    setIsPlayerHurt(false);
+    setIsMonsterHurt(false);
+    setIsPlayerAttacking(false);
+    setIsMonsterAttacking(false);
+    setIsMonsterFaint(false);
+    setIsStageTransitioning(false);
+  };
+
   // Initialize game
   const didInitMazeRef = useRef<string | null>(null);
   useEffect(() => {
     if (!maze) return;
-    // Endless regenerates the maze object as waves are appended; initialize
-    // only once so appending rooms never resets an in-progress run.
+    // Endless appends rooms as waves are served; initialize only once so
+    // appending rooms never resets an in-progress run.
     if (isEndlessMode && didInitMazeRef.current === maze.id) return;
     didInitMazeRef.current = maze.id;
-    {
-      const playerMaxHp = maze.playerMaxHp || 100;
-      const firstRoom = maze.rooms[0];
-      const monsterMaxHp = firstRoom?.monster?.maxHp || 50;
-
-      setGameState({
-        phase: "intro",
-        currentRoomIndex: 0,
-        currentQuestionIndex: 0,
-        playerHp: playerMaxHp,
-        playerMaxHp: playerMaxHp,
-        monsterHp: monsterMaxHp,
-        monsterMaxHp: monsterMaxHp,
-        score: 0,
-        defeatedMonsters: 0,
-      });
-
-      // Reset animations
-      playerX.value = 0;
-      playerLunge.value = 0;
-      monsterLunge.value = 0;
-      arenaPulse.value = 0;
-      monsterOpacity.value = 1;
-      setXpAwardedThisRun(null);
-      setComboStreak(0);
-      setLastDamage(null);
-      setIsPlayerHurt(false);
-      setIsMonsterHurt(false);
-      setIsPlayerAttacking(false);
-      setIsMonsterAttacking(false);
-      setIsMonsterFaint(false);
-      setIsStageTransitioning(false);
-    }
+    // Endless built its progression together with the maze (see pool load).
+    const startRoomIndex = isEndlessMode ? 0 : initFixedRun(maze);
+    resetRunUi(maze, startRoomIndex);
   }, [maze]);
 
   // Get current room and question
@@ -851,17 +989,14 @@ export default function AtomMazeBattleScreen() {
     gameState.monsterHp / gameState.monsterMaxHp <= BOSS_LOW_HP_THRESHOLD;
 
   // Boss battle question pool, loaded once from the DB-backed mythbuster bank.
-  const [mythBusterBossQuestions, setMythBusterBossQuestions] = useState<
-    Partial<Record<MythBusterQuizDifficulty, AtomMazeQuizQuestion[]>>
-  >({});
+  const [mythBusterBossQuestions, setMythBusterBossQuestions] =
+    useState<MythBusterQuestionPool>({});
 
   useEffect(() => {
     let active = true;
     void getAllMythBusterQuizQuestions()
       .then((questions) => {
-        const pool: Partial<
-          Record<MythBusterQuizDifficulty, AtomMazeQuizQuestion[]>
-        > = {};
+        const pool: MythBusterQuestionPool = {};
         for (const difficulty of ["easy", "medium", "hard"] as const) {
           pool[difficulty] = questions
             .filter((question) => question.difficulty === difficulty)
@@ -873,7 +1008,7 @@ export default function AtomMazeBattleScreen() {
         if (!active) return;
         setMythBusterBossQuestions(pool);
         if (isEndlessMode) {
-          setMaze(buildEndlessBaseMaze(pool));
+          setMaze(initEndlessRun(pool));
         }
       })
       .catch(() => {
@@ -884,114 +1019,30 @@ export default function AtomMazeBattleScreen() {
     };
   }, []);
 
-  // -----------------------------------------------------------------------
-  // Endless Maze — procedural room generation from the mythbuster bank.
-  // Waves start easy; medium/hard mix in as waves progress, but lower
-  // difficulties keep appearing. No question ever repeats within a run;
-  // exhausting the whole bank ends the run gracefully.
-  // -----------------------------------------------------------------------
+  // The question currently on screen. Its identity/token is stable across
+  // re-renders; options were shuffled once when it was served.
+  const currentQuestion = servedQuestion?.question;
+  const currentQuestionTotal = isBossBattle
+    ? bossQuestionTotal
+    : (currentRoom?.questions || []).filter(
+        (question) => question.type === "quiz",
+      ).length;
 
-  const endlessUsedIdsRef = useRef<Set<string>>(new Set());
+  // Reset selection only when a different question is served (not on any
+  // re-render or on a retry of the same question).
+  const servedToken = servedQuestion?.token ?? null;
 
-  /** Make sure generated rooms exist through `upToIndex` (inclusive). */
-  const ensureEndlessRooms = useCallback(
-    (upToIndex: number) => {
-      if (!isEndlessMode) return;
-      setMaze((prev) => {
-        if (!prev) return prev;
-        if (prev.rooms.length > upToIndex && prev.rooms[upToIndex]) return prev;
-        const rooms = [...prev.rooms];
-        while (rooms.length <= upToIndex) {
-          const room = generateEndlessRoom(
-            rooms.length,
-            mythBusterBossQuestions,
-            endlessUsedIdsRef.current,
-          );
-          if (!room) break; // out of questions — leave rooms short
-          rooms.push(room);
-        }
-        return { ...prev, rooms };
-      });
-    },
-    [isEndlessMode, mythBusterBossQuestions],
-  );
-
-  // Keep one spare room generated ahead of the player.
+  // Read Aloud policy: reads the current question and its choices. The owner
+  // id is the served token, so a new question stops the old narration, and
+  // answering (or a result showing) ends it.
+  const readAloudOwner = `atom-maze:${servedToken ?? "none"}`;
   useEffect(() => {
-    if (isEndlessMode && gameState.phase === "battle") {
-      ensureEndlessRooms(gameState.currentRoomIndex + 2);
-    }
-  }, [ensureEndlessRooms, gameState.currentRoomIndex, gameState.phase, isEndlessMode]);
-
-  // Filter to only quiz questions
-  const currentQuestions = useMemo(() => {
-    const mazeQuizQuestions = (
-      maze?.rooms.flatMap((room) => room.questions) || []
-    ).filter(
-      (question): question is AtomMazeQuizQuestion => question.type === "quiz",
-    );
-
-    if (isBossBattle) {
-      const usedStageQuestionKeys = new Set(
-        mazeQuizQuestions.map((question) =>
-          normalizeQuestionText(question.question),
-        ),
-      );
-      const seenBossQuestionKeys = new Set<string>();
-      const nonRepeatingBossQuestionPool: AtomMazeQuizQuestion[] = [];
-      const orderedBossDifficulties: AtomMazeStageDifficulty[] = [
-        "difficult",
-        "average",
-        "easy",
-      ];
-
-      orderedBossDifficulties.forEach((difficulty) => {
-        (mythBusterBossQuestions[STAGE_TO_REPOSITORY_DIFFICULTY[difficulty]] ??
-          [])
-          .forEach((question) => {
-            const normalizedQuestion = normalizeQuestionText(question.question);
-
-            if (
-              usedStageQuestionKeys.has(normalizedQuestion) ||
-              seenBossQuestionKeys.has(normalizedQuestion)
-            ) {
-              return;
-            }
-
-            seenBossQuestionKeys.add(normalizedQuestion);
-            nonRepeatingBossQuestionPool.push(question);
-          });
-      });
-
-      if (nonRepeatingBossQuestionPool.length === 0) {
-        return [];
-      }
-
-      const targetBossQuestionCount = Math.min(
-        Math.max(mazeQuizQuestions.length, 1),
-        nonRepeatingBossQuestionPool.length,
-      );
-
-      return shuffleArray(nonRepeatingBossQuestionPool)
-        .slice(0, targetBossQuestionCount)
-        .map((question) => shuffleQuizQuestionOptions(question));
-    }
-
-    return (currentRoom?.questions || [])
-      .filter(
-        (question): question is AtomMazeQuizQuestion =>
-          question.type === "quiz",
-      )
-      .map((question) => shuffleQuizQuestionOptions(question));
-  }, [isBossBattle, maze, currentRoom, mythBusterBossQuestions]);
-
-  const currentQuestion = currentQuestions[gameState.currentQuestionIndex];
-
-  // Reset selection when question changes
+    if (showResult !== null) readAloud.stop("answered", readAloudOwner);
+  }, [showResult, readAloudOwner]);
   useEffect(() => {
     setSelectedAnswer(null);
     setShowResult(null);
-  }, [currentQuestion]);
+  }, [servedToken]);
 
   // Shake animation for damage
   const triggerPlayerShake = useCallback(() => {
@@ -1090,14 +1141,56 @@ export default function AtomMazeBattleScreen() {
     setSelectedAnswer(index);
   };
 
+  /** Persist an endless run's score (also used when the bank runs dry). */
+  const saveEndlessScore = () => {
+    void (async () => {
+      try {
+        await saveGameScore("atom-maze", scoreRef.current);
+        setXpAwardedThisRun(true);
+      } catch (error) {
+        console.error("Failed to save game score:", error);
+        setXpAwardedThisRun(false);
+      }
+    })();
+  };
+
+  /** Boss: after a resolved question, serve the next one or end the run. */
+  const advanceBossQuestion = () => {
+    setShowResult(null);
+    setSelectedAnswer(null);
+    const next = serveQuestion({ group: "boss" });
+    if (!next) {
+      // Boss pool exhausted: explain it instead of silently repeating.
+      setExhaustionNotice(EXHAUSTED_BOSS_NOTICE);
+      setIsAnswering(false);
+      setGameState((prev) => ({ ...prev, phase: "defeat" }));
+      return;
+    }
+    setIsAnswering(false);
+    setGameState((prev) => ({
+      ...prev,
+      currentQuestionIndex: prev.currentQuestionIndex + 1,
+    }));
+  };
+
   // Submit answer
   const handleSubmit = () => {
-    if (isAnswering || !currentQuestion || selectedAnswer === null || isStageTransitioning) return;
+    const served = servedRef.current;
+    if (isAnswering || !served || selectedAnswer === null || isStageTransitioning) return;
+
+    // Synchronous, token-keyed gate: a second tap / duplicate callback for
+    // the same serve is rejected before any state or sound is touched.
+    const begun = beginAnswer(progressionRef.current, served.token);
+    if (!begun.applied) return;
+    progressionRef.current = begun.state;
+
+    const token = served.token;
+    const live = gameStateRef.current;
     // Endless rolls at a quicker pace: shorter pause between answer and result.
     const resultMs = isEndlessMode ? ENDLESS_TIMING.resultMs : BATTLE_TIMING.resultMs;
 
     setIsAnswering(true);
-    const isCorrect = selectedAnswer === currentQuestion.correctAnswer;
+    const isCorrect = selectedAnswer === served.question.correctAnswer;
     void playGameSfx(isCorrect ? "correct" : "wrong");
 
     setShowResult(isCorrect ? "correct" : "wrong");
@@ -1108,18 +1201,28 @@ export default function AtomMazeBattleScreen() {
 
       // Player attacks monster
       triggerAttackAnimation(true);
-      setTimeout(() => {
+      schedule(() => {
         void playGameSfx("punch");
         triggerMonsterShake();
         triggerMonsterHurtPose();
       }, BATTLE_TIMING.impactMs);
 
+      // The question is consumed only when the correct-answer transition
+      // commits (after the result delay). The commit is idempotent: a
+      // duplicate callback returns `applied: false` and is ignored.
+      const commitAndContinue = (onCommitted: () => void) => {
+        const committed = commitCorrect(progressionRef.current, token);
+        if (!committed.applied) return;
+        progressionRef.current = committed.state;
+        onCommitted();
+      };
+
       if (isBossBattle) {
         // Boss battle: deal damage per correct answer
         const damagePerHit = Math.ceil(
-          (maze?.boss?.maxHp || 100) / currentQuestions.length,
+          (maze?.boss?.maxHp || 100) / Math.max(bossQuestionCountRef.current, 1),
         );
-        const newBossHp = Math.max(0, gameState.monsterHp - damagePerHit);
+        const newBossHp = Math.max(0, live.monsterHp - damagePerHit);
         setLastDamage({ target: "monster", amount: damagePerHit });
 
         setGameState((prev) => ({
@@ -1128,45 +1231,28 @@ export default function AtomMazeBattleScreen() {
           score: prev.score + 15,
         }));
 
-        // Check if boss is defeated
-        if (newBossHp <= 0) {
-          setTimeout(() => {
-            handleMonsterDefeated();
-          }, resultMs);
-        } else {
-          // Move to the next boss question without repeating previous ones.
-          setTimeout(() => {
-            const nextQuestionIndex = gameState.currentQuestionIndex + 1;
-
-            if (nextQuestionIndex >= currentQuestions.length) {
-              setShowResult(null);
-              setSelectedAnswer(null);
-              setIsAnswering(false);
-              setGameState((prev) => ({ ...prev, phase: "defeat" }));
-              return;
+        schedule(() => {
+          commitAndContinue(() => {
+            if (newBossHp <= 0) {
+              handleMonsterDefeated();
+            } else {
+              // Move to a fresh boss question; never the answered one.
+              advanceBossQuestion();
             }
-
-            setShowResult(null);
-            setSelectedAnswer(null);
-            setIsAnswering(false);
-            setGameState((prev) => ({
-              ...prev,
-              currentQuestionIndex: nextQuestionIndex,
-            }));
-          }, resultMs);
-        }
+          });
+        }, resultMs);
       } else {
         // Regular room: correct answer defeats the monster instantly!
-        setLastDamage({ target: "monster", amount: gameState.monsterHp });
+        setLastDamage({ target: "monster", amount: live.monsterHp });
         setGameState((prev) => ({
           ...prev,
           monsterHp: 0,
           score: prev.score + 10,
         }));
 
-        // Monster defeated - proceed to next room after delay
-        setTimeout(() => {
-          handleMonsterDefeated();
+        // Monster defeated - commit, then proceed to next room after delay
+        schedule(() => {
+          commitAndContinue(() => handleMonsterDefeated());
         }, resultMs);
       }
     } else {
@@ -1174,14 +1260,14 @@ export default function AtomMazeBattleScreen() {
 
       // Monster attacks player - wrong answer deals damage but stays on same question
       triggerAttackAnimation(false);
-      setTimeout(() => {
+      schedule(() => {
         void playGameSfx("punch");
         triggerPlayerShake();
         triggerPlayerHurtPose();
       }, BATTLE_TIMING.impactMs);
 
       const damage = currentMonster?.attackPower || 20;
-      const newPlayerHp = Math.max(0, gameState.playerHp - damage);
+      const newPlayerHp = Math.max(0, live.playerHp - damage);
       setLastDamage({ target: "player", amount: damage });
 
       setGameState((prev) => ({
@@ -1193,45 +1279,30 @@ export default function AtomMazeBattleScreen() {
       if (newPlayerHp <= 0) {
         // Endless runs record their score even on defeat.
         if (isEndlessMode) {
-          void (async () => {
-            try {
-              await saveGameScore("atom-maze", scoreRef.current);
-              setXpAwardedThisRun(true);
-            } catch (error) {
-              console.error("Failed to save game score:", error);
-              setXpAwardedThisRun(false);
-            }
-          })();
+          saveEndlessScore();
         }
-        setTimeout(() => {
+        schedule(() => {
           setGameState((prev) => ({ ...prev, phase: "defeat" }));
         }, resultMs);
         return;
       }
 
-      // Boss battle never repeats a question; regular rooms still retry on wrong answer.
-      setTimeout(() => {
+      // Boss battle never repeats a question (the missed one is retired);
+      // regular rooms retry the same question on a wrong answer.
+      schedule(() => {
         if (isBossBattle) {
-          const nextQuestionIndex = gameState.currentQuestionIndex + 1;
-
-          if (nextQuestionIndex >= currentQuestions.length) {
-            setShowResult(null);
-            setSelectedAnswer(null);
-            setIsAnswering(false);
-            setGameState((prev) => ({ ...prev, phase: "defeat" }));
-            return;
-          }
-
-          setShowResult(null);
-          setSelectedAnswer(null);
-          setIsAnswering(false);
-          setGameState((prev) => ({
-            ...prev,
-            currentQuestionIndex: nextQuestionIndex,
-          }));
+          const resolved = resolveWrong(progressionRef.current, token, {
+            retire: true,
+          });
+          if (!resolved.applied) return;
+          progressionRef.current = resolved.state;
+          advanceBossQuestion();
           return;
         }
 
+        const resolved = resolveWrong(progressionRef.current, token);
+        if (!resolved.applied) return;
+        progressionRef.current = resolved.state;
         setShowResult(null);
         setSelectedAnswer(null);
         setIsAnswering(false);
@@ -1239,13 +1310,66 @@ export default function AtomMazeBattleScreen() {
     }
   };
 
+  // Guards against a duplicate animation-complete / callback leaving the
+  // same room twice (keyed by run id + room index).
+  const lastLeftRoomRef = useRef<string | null>(null);
+
   // Handle next room transition
   const handleNextRoomTransition = () => {
-    // Check if there are more rooms
-    const nextRoomIndex = gameState.currentRoomIndex + 1;
-    if (nextRoomIndex < (maze?.rooms.length || 0)) {
-      // Update state for next room
-      const nextRoom = maze?.rooms[nextRoomIndex];
+    const m = mazeRef.current;
+    const live = gameStateRef.current;
+    const leaveKey = `${progressionRef.current.runId}:${live.currentRoomIndex}`;
+    if (lastLeftRoomRef.current === leaveKey) return;
+    lastLeftRoomRef.current = leaveKey;
+
+    if (isEndlessMode) {
+      // Endless: draw the next wave's question from the unanswered pool.
+      const nextRoomIndex = live.currentRoomIndex + 1;
+      const served = serveQuestion({ pick: createEndlessPicker(nextRoomIndex) });
+
+      if (!served) {
+        // Bank exhausted — finish the run and explain how to replay.
+        setExhaustionNotice(EXHAUSTED_ENDLESS_NOTICE);
+        saveEndlessScore();
+        playerX.value = 0;
+        monsterOpacity.value = 1;
+        setGameState((prev) => ({ ...prev, phase: "complete" }));
+        return;
+      }
+
+      const nextRoom = buildEndlessRoom(nextRoomIndex, served.question);
+      setMaze((prev) =>
+        prev && prev.rooms.length === nextRoomIndex
+          ? { ...prev, rooms: [...prev.rooms, nextRoom] }
+          : prev,
+      );
+      const nextMonsterHp = nextRoom.monster.maxHp || 50;
+
+      setGameState((prev) => ({
+        ...prev,
+        phase: "battle",
+        currentRoomIndex: nextRoomIndex,
+        currentQuestionIndex: 0,
+        monsterHp: nextMonsterHp,
+        monsterMaxHp: nextMonsterHp,
+      }));
+
+      // Fast waves: no walk-in, unlock the quiz right away.
+      playerX.value = 0;
+      monsterOpacity.value = 1;
+      setIsMonsterHurt(false);
+      setIsMonsterFaint(false);
+      setIsPlayerAttacking(false);
+      setIsMonsterAttacking(false);
+      setIsStageTransitioning(false);
+      return;
+    }
+
+    // Fixed maze: next room that still has an unanswered question.
+    const nextRoomIndex = m ? findPlayableRoomIndex(m, live.currentRoomIndex + 1) : -1;
+    if (m && nextRoomIndex >= 0) {
+      const nextRoom = m.rooms[nextRoomIndex];
+      serveQuestion({ group: nextRoom.id });
       const nextMonsterHp = nextRoom?.monster?.maxHp || 50;
 
       setGameState((prev) => ({
@@ -1257,18 +1381,6 @@ export default function AtomMazeBattleScreen() {
         monsterMaxHp: nextMonsterHp,
       }));
 
-      if (isEndlessMode) {
-        // Fast waves: no walk-in, unlock the quiz right away.
-        playerX.value = 0;
-        monsterOpacity.value = 1;
-        setIsMonsterHurt(false);
-        setIsMonsterFaint(false);
-        setIsPlayerAttacking(false);
-        setIsMonsterAttacking(false);
-        setIsStageTransitioning(false);
-        return;
-      }
-
       // Reset positions off-screen left
       playerX.value = -width;
       monsterOpacity.value = 1;
@@ -1279,23 +1391,9 @@ export default function AtomMazeBattleScreen() {
 
       // Walk in to center, then unlock the quiz
       playerX.value = withTiming(0, { duration: BATTLE_TIMING.walkInMs });
-      setTimeout(() => {
+      schedule(() => {
         setIsStageTransitioning(false);
       }, BATTLE_TIMING.walkInMs);
-    } else if (isEndlessMode) {
-      // Endless: no more questions in the bank — finish the run gracefully.
-      void (async () => {
-        try {
-          await saveGameScore("atom-maze", scoreRef.current);
-          setXpAwardedThisRun(true);
-        } catch (error) {
-          console.error("Failed to save game score:", error);
-          setXpAwardedThisRun(false);
-        }
-      })();
-      playerX.value = 0;
-      monsterOpacity.value = 1;
-      setGameState((prev) => ({ ...prev, phase: "complete" }));
     } else {
       // All rooms cleared, face the boss!
       setGameState((prev) => ({ ...prev, phase: "boss_intro" }));
@@ -1325,15 +1423,7 @@ export default function AtomMazeBattleScreen() {
       // Endless mode: save the run's score to the personal game leaderboard
       // instead of awarding XP.
       if (maze) {
-        void (async () => {
-          try {
-            await saveGameScore("atom-maze", scoreRef.current);
-            setXpAwardedThisRun(true);
-          } catch (error) {
-            console.error("Failed to save game score:", error);
-            setXpAwardedThisRun(false);
-          }
-        })();
+        saveEndlessScore();
       }
       return;
     }
@@ -1343,7 +1433,7 @@ export default function AtomMazeBattleScreen() {
 
     if (isEndlessMode) {
       // No walking theatrics — roll straight into the next wave.
-      runOnJS(handleNextRoomTransition)();
+      handleNextRoomTransition();
       return;
     }
 
@@ -1352,7 +1442,7 @@ export default function AtomMazeBattleScreen() {
     });
 
     // Walk to next room
-    setTimeout(() => {
+    schedule(() => {
       playerX.value = withTiming(
         width,
         { duration: BATTLE_TIMING.walkOutMs },
@@ -1370,9 +1460,63 @@ export default function AtomMazeBattleScreen() {
     handleNextRoomTransition();
   };
 
+  // Guards a double tap on the boss-intro button (keyed by run id).
+  const bossStartedRunRef = useRef<number | null>(null);
+
   // Start boss battle
   const handleStartBossBattle = () => {
-    const bossHp = maze?.boss?.maxHp || 100;
+    const runId = progressionRef.current.runId;
+    if (bossStartedRunRef.current === runId) return;
+    bossStartedRunRef.current = runId;
+
+    const m = mazeRef.current;
+    const bossHp = m?.boss?.maxHp || 100;
+
+    // Build the boss queue once: identity-deduped against every question
+    // already registered for this run (so nothing from the rooms can come
+    // back), shuffled once, and frozen into the progression pool.
+    const known = progressionRef.current.entries;
+    const seen = new Set<string>();
+    const candidates: { id: string; question: AtomMazeQuizQuestion }[] = [];
+    const orderedBossDifficulties: AtomMazeStageDifficulty[] = [
+      "difficult",
+      "average",
+      "easy",
+    ];
+    for (const difficulty of orderedBossDifficulties) {
+      for (const question of mythBusterBossQuestions[
+        STAGE_TO_REPOSITORY_DIFFICULTY[difficulty]
+      ] ?? []) {
+        const questionId = makeQuestionId(question.question);
+        if (known[questionId] || seen.has(questionId)) continue;
+        seen.add(questionId);
+        candidates.push({ id: questionId, question });
+      }
+    }
+    const roomQuestionCount = (m?.rooms ?? []).reduce(
+      (total, room) =>
+        total + room.questions.filter((question) => question.type === "quiz").length,
+      0,
+    );
+    const bossCount = Math.min(Math.max(roomQuestionCount, 1), candidates.length);
+    const bossQueue = shuffleArray(candidates).slice(0, bossCount);
+    bossQueue.forEach((entry) =>
+      questionPayloadsRef.current.set(entry.id, entry.question),
+    );
+    progressionRef.current = addItems(
+      progressionRef.current,
+      bossQueue.map((entry) => ({ id: entry.id, group: "boss" })),
+    );
+    bossQuestionCountRef.current = bossQueue.length;
+    setBossQuestionTotal(bossQueue.length);
+
+    const first = serveQuestion({ group: "boss" });
+    if (!first) {
+      setExhaustionNotice(EXHAUSTED_BOSS_NOTICE);
+      setGameState((prev) => ({ ...prev, phase: "defeat" }));
+      return;
+    }
+
     setGameState((prev) => ({
       ...prev,
       phase: "boss",
@@ -1402,6 +1546,82 @@ export default function AtomMazeBattleScreen() {
     setIsMonsterFaint(false);
     setIsStageTransitioning(false);
     setGameState((prev) => ({ ...prev, phase: "battle" }));
+  };
+
+  // Intentional replay: a fresh run over the whole question pool. Reached
+  // from the pool-exhausted notice; the old run's tokens can no longer commit.
+  const handleStartNewRun = () => {
+    clearScheduled();
+    lastLeftRoomRef.current = null;
+    bossStartedRunRef.current = null;
+
+    if (isEndlessMode) {
+      const nextMaze = initEndlessRun(mythBusterBossQuestions);
+      mazeRef.current = nextMaze;
+      setMaze(nextMaze);
+      resetRunUi(nextMaze, 0);
+      return;
+    }
+    if (maze) {
+      const startRoomIndex = initFixedRun(maze);
+      resetRunUi(maze, startRoomIndex);
+    }
+  };
+
+  /**
+   * Pool-exhausted explanation (spec §4.4): tells the learner why the run
+   * ended and how replay works, instead of silently repeating questions.
+   */
+  const renderExhaustionNotice = () => {
+    if (!exhaustionNotice) return null;
+    return (
+      <View
+        accessibilityRole="alert"
+        testID="atom-maze-exhaustion-notice"
+        style={{
+          width: "100%",
+          marginBottom: 14,
+          padding: 14,
+          borderRadius: 16,
+          borderWidth: 1,
+          gap: 10,
+          backgroundColor: resultPalette.statsBg,
+          borderColor: resultPalette.statsBorder,
+        }}
+      >
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+          <Icon name="InfoCircle" size={18} color={resultPalette.primaryText} variant="Bold" />
+          <Text
+            style={{
+              flex: 1,
+              fontSize: 14,
+              fontWeight: "800",
+              color: resultPalette.primaryText,
+            }}
+          >
+            All questions answered
+          </Text>
+        </View>
+        <Text style={{ fontSize: 13, lineHeight: 19, color: resultPalette.mutedText }}>
+          {exhaustionNotice}
+        </Text>
+        <TouchableOpacity
+          accessibilityRole="button"
+          accessibilityLabel="Start a new run"
+          onPress={handleStartNewRun}
+          activeOpacity={0.9}
+          style={{
+            minHeight: 44,
+            borderRadius: 12,
+            alignItems: "center",
+            justifyContent: "center",
+            backgroundColor: resultPalette.nextButton,
+          }}
+        >
+          <Text style={styles.nextButtonText}>START NEW RUN</Text>
+        </TouchableOpacity>
+      </View>
+    );
   };
 
   const showExitConfirmation = useCallback(() => {
@@ -1482,7 +1702,7 @@ export default function AtomMazeBattleScreen() {
           colors={
             colorScheme === "dark"
               ? [introPalette.background, introPalette.background]
-              : INTRO_SKY_LIGHT
+              : [appTheme.colors.pageGradientTop, appTheme.colors.pageGradientBottom]
           }
           style={StyleSheet.absoluteFill}
           pointerEvents="none"
@@ -1782,6 +2002,8 @@ export default function AtomMazeBattleScreen() {
               </View>
             </View>
           </View>
+
+          {renderExhaustionNotice()}
 
           <TouchableOpacity
             style={styles.retryButton}
@@ -2126,7 +2348,7 @@ export default function AtomMazeBattleScreen() {
                 { color: resultPalette.chipText },
               ]}
             >
-              BOSS DEFEATED
+              {isEndlessMode ? "BANK CLEARED" : "BOSS DEFEATED"}
             </Text>
           </View>
 
@@ -2161,7 +2383,9 @@ export default function AtomMazeBattleScreen() {
                 { color: resultPalette.mutedText },
               ]}
             >
-              You defeated the boss and cleared this run.
+              {isEndlessMode
+                ? "You answered every question in the bank."
+                : "You defeated the boss and cleared this run."}
             </Text>
 
             <View
@@ -2271,6 +2495,8 @@ export default function AtomMazeBattleScreen() {
             </View>
           </View>
 
+          {renderExhaustionNotice()}
+
           <TouchableOpacity
             style={styles.completeButton}
             onPress={handleExit}
@@ -2302,7 +2528,7 @@ export default function AtomMazeBattleScreen() {
   const battleGradient: [string, string] =
     colorScheme === "dark"
       ? [appTheme.colors.background, appTheme.colors.background]
-      : INTRO_SKY_LIGHT;
+      : [appTheme.colors.pageGradientTop, appTheme.colors.pageGradientBottom];
   return (
     <View
       style={[
@@ -2389,14 +2615,14 @@ export default function AtomMazeBattleScreen() {
                     </Text>
                   </View>
                   <View style={styles.arenaHudChip}>
-                    <Icon name="MessageQuestion" size={12} color="#E2E8F0" />
+                    <Icon name="MessageQuestion" size={12} color="#E2E8F0" />{/* theme-allow: inverse HUD icon on dark arena art */}
                     <Text style={styles.arenaHudChipText}>
                       Q
                       {Math.min(
                         gameState.currentQuestionIndex + 1,
-                        Math.max(currentQuestions.length, 1),
+                        Math.max(currentQuestionTotal, 1),
                       )}
-                      /{Math.max(currentQuestions.length, 1)}
+                      /{Math.max(currentQuestionTotal, 1)}
                     </Text>
                   </View>
                   {comboStreak > 1 && (
@@ -2521,6 +2747,14 @@ export default function AtomMazeBattleScreen() {
       >
         {currentQuestion && (
           <View style={styles.quizCard}>
+            <ReadAloudButton
+              ownerId={readAloudOwner}
+              subject="question"
+              variant="pill"
+              accent={theme.primary}
+              text={() => buildQuestionSpeech(currentQuestion.question, currentQuestion.options)}
+              style={{ marginBottom: 12 }}
+            />
             <Text style={[styles.lessonQuestionText, { color: theme.text }]}>
               {currentQuestion.question}
             </Text>

@@ -1,5 +1,5 @@
 import { Platform, StyleSheet } from "react-native";
-import { fontFamilies } from "@/theme";
+import { fontFaces } from "@/theme";
 
 export const styles = StyleSheet.create({
   container: {
@@ -7,7 +7,7 @@ export const styles = StyleSheet.create({
   },
   errorText: {
     fontSize: 18,
-    fontFamily: fontFamilies.medium,
+    ...fontFaces.medium,
     textAlign: "center",
     marginTop: 100,
   },
@@ -44,7 +44,7 @@ export const styles = StyleSheet.create({
   },
   modernHeaderTitle: {
     fontSize: 16,
-    fontFamily: fontFamilies.heavy,
+    ...fontFaces.heavy,
     textTransform: "uppercase",
     letterSpacing: 0.5,
   },
@@ -55,7 +55,7 @@ export const styles = StyleSheet.create({
   },
   modernScoreText: {
     fontSize: 14,
-    fontFamily: fontFamilies.heavy,
+    ...fontFaces.heavy,
   },
   modernHudRow: {
     flexDirection: "row",
@@ -73,7 +73,7 @@ export const styles = StyleSheet.create({
   },
   modernHudChipText: {
     fontSize: 12,
-    fontFamily: fontFamilies.semibold,
+    ...fontFaces.semibold,
   },
   modernComboChip: {
     flexDirection: "row",
@@ -87,7 +87,7 @@ export const styles = StyleSheet.create({
   modernComboChipText: {
     color: "#FFFFFF",
     fontSize: 12,
-    fontFamily: fontFamilies.heavy,
+    ...fontFaces.heavy,
   },
 
   // Modern Battle Arena
@@ -155,7 +155,7 @@ export const styles = StyleSheet.create({
   arenaHudTitle: {
     color: "#F8FAFC",
     fontSize: 14,
-    fontFamily: fontFamilies.heavy,
+    ...fontFaces.heavy,
     textTransform: "uppercase",
     letterSpacing: 0.5,
   },
@@ -179,7 +179,7 @@ export const styles = StyleSheet.create({
   arenaHudScoreText: {
     color: "#FFFFFF",
     fontSize: 12,
-    fontFamily: fontFamilies.heavy,
+    ...fontFaces.heavy,
     fontVariant: ["tabular-nums"],
   },
   arenaHudDifficultyChip: {
@@ -193,7 +193,7 @@ export const styles = StyleSheet.create({
   },
   arenaHudDifficultyText: {
     fontSize: 10,
-    fontFamily: fontFamilies.heavy,
+    ...fontFaces.heavy,
     letterSpacing: 0.4,
     textTransform: "uppercase",
   },
@@ -211,7 +211,7 @@ export const styles = StyleSheet.create({
   arenaHudChipText: {
     color: "#E2E8F0",
     fontSize: 12,
-    fontFamily: fontFamilies.semibold,
+    ...fontFaces.semibold,
   },
   arenaHudComboChip: {
     flexDirection: "row",
@@ -225,7 +225,7 @@ export const styles = StyleSheet.create({
   arenaHudComboText: {
     color: "#FFFFFF",
     fontSize: 12,
-    fontFamily: fontFamilies.heavy,
+    ...fontFaces.heavy,
   },
   arenaHudPlaceholder: {
     width: 34,
@@ -250,7 +250,7 @@ export const styles = StyleSheet.create({
   bossBattleNoticeText: {
     color: "#FFFFFF",
     fontSize: 12,
-    fontFamily: fontFamilies.semibold,
+    ...fontFaces.semibold,
     letterSpacing: 0.2,
     textAlign: "center",
   },
@@ -298,7 +298,7 @@ export const styles = StyleSheet.create({
   damagePopupText: {
     color: "#FFFFFF",
     fontSize: 13,
-    fontFamily: fontFamilies.heavy,
+    ...fontFaces.heavy,
     letterSpacing: 0.3,
   },
 
@@ -331,14 +331,14 @@ export const styles = StyleSheet.create({
   hpBoxName: {
     flexShrink: 1,
     fontSize: 12,
-    fontFamily: fontFamilies.heavy,
+    ...fontFaces.heavy,
     textTransform: "uppercase",
     letterSpacing: 0.4,
   },
   hpBoxLevel: {
     color: "#FCD34D",
     fontSize: 9.5,
-    fontFamily: fontFamilies.semibold,
+    ...fontFaces.semibold,
     flexShrink: 1,
     textAlign: "right",
   },
@@ -373,7 +373,7 @@ export const styles = StyleSheet.create({
   },
   hpBoxValue: {
     fontSize: 10,
-    fontFamily: fontFamilies.medium,
+    ...fontFaces.medium,
     minWidth: 52,
     textAlign: "right",
   },
@@ -533,7 +533,7 @@ export const styles = StyleSheet.create({
   },
   lessonQuestionText: {
     fontSize: 18,
-    fontFamily: fontFamilies.bold,
+    ...fontFaces.bold,
     lineHeight: 26,
   },
 
@@ -566,7 +566,7 @@ export const styles = StyleSheet.create({
   lessonOptionText: {
     flex: 1,
     fontSize: 14,
-    fontFamily: fontFamilies.bold,
+    ...fontFaces.bold,
     lineHeight: 19,
   },
   lessonOptionTextEmphasis: {
@@ -619,7 +619,7 @@ export const styles = StyleSheet.create({
   },
   scrambleSlotText: {
     fontSize: 18,
-    fontFamily: fontFamilies.bold,
+    ...fontFaces.bold,
     color: "#1F2937",
   },
   scrambleSlotTextRevealed: {
@@ -645,7 +645,7 @@ export const styles = StyleSheet.create({
   },
   scrambleLetterText: {
     fontSize: 18,
-    fontFamily: fontFamilies.bold,
+    ...fontFaces.bold,
     color: "#1F2937",
   },
   scrambleActions: {
@@ -669,7 +669,7 @@ export const styles = StyleSheet.create({
   shuffleButtonText: {
     color: "#FFF",
     fontSize: 13,
-    fontFamily: fontFamilies.heavy,
+    ...fontFaces.heavy,
   },
   hintTimerBadge: {
     flexDirection: "row",
@@ -685,7 +685,7 @@ export const styles = StyleSheet.create({
   hintTimerText: {
     color: "#92400E",
     fontSize: 12,
-    fontFamily: fontFamilies.semibold,
+    ...fontFaces.semibold,
   },
   revealedBadge: {
     backgroundColor: "#DCFCE7",
@@ -698,7 +698,7 @@ export const styles = StyleSheet.create({
   revealedBadgeText: {
     color: "#166534",
     fontSize: 12,
-    fontFamily: fontFamilies.semibold,
+    ...fontFaces.semibold,
   },
 
   // Quiz result feedback — colors applied inline from the maze theme
@@ -716,11 +716,11 @@ export const styles = StyleSheet.create({
   },
   quizResultTitle: {
     fontSize: 15,
-    fontFamily: fontFamilies.heavy,
+    ...fontFaces.heavy,
   },
   quizResultSubtitle: {
     fontSize: 13,
-    fontFamily: fontFamilies.regular,
+    ...fontFaces.regular,
   },
 
   attackActionWrap: {
@@ -753,7 +753,7 @@ export const styles = StyleSheet.create({
   modernSubmitText: {
     color: "#FFFFFF",
     fontSize: 16,
-    fontFamily: fontFamilies.heavy,
+    ...fontFaces.heavy,
     letterSpacing: 0.6,
   },
 
@@ -792,7 +792,7 @@ export const styles = StyleSheet.create({
   },
   introBadgeText: {
     fontSize: 16,
-    fontFamily: fontFamilies.heavy,
+    ...fontFaces.heavy,
     color: "#FFF",
   },
   introScrollView: {
@@ -815,7 +815,7 @@ export const styles = StyleSheet.create({
   },
   introTitle: {
     fontSize: 28,
-    fontFamily: fontFamilies.heavy,
+    ...fontFaces.heavy,
     color: "#1F2937",
     marginBottom: 4,
   },
@@ -835,18 +835,18 @@ export const styles = StyleSheet.create({
   introTagline: {
     flex: 1,
     fontSize: 13,
-    fontFamily: fontFamilies.heavy,
+    ...fontFaces.heavy,
     letterSpacing: 0.3,
   },
   introSubtitle: {
     fontSize: 14,
-    fontFamily: fontFamilies.semibold,
+    ...fontFaces.semibold,
     color: "#6B7280",
     marginBottom: 12,
   },
   introDescription: {
     fontSize: 14,
-    fontFamily: fontFamilies.regular,
+    ...fontFaces.regular,
     color: "#6B7280",
     lineHeight: 22,
   },
@@ -862,7 +862,7 @@ export const styles = StyleSheet.create({
   },
   startButtonCardText: {
     fontSize: 17,
-    fontFamily: fontFamilies.heavy,
+    ...fontFaces.heavy,
     letterSpacing: 0.5,
   },
   backButton: {
@@ -871,7 +871,7 @@ export const styles = StyleSheet.create({
   backButtonText: {
     color: "#6B7280",
     fontSize: 14,
-    fontFamily: fontFamilies.semibold,
+    ...fontFaces.semibold,
   },
 
   // Result Screens
@@ -893,7 +893,7 @@ export const styles = StyleSheet.create({
   },
   resultStatusChipText: {
     fontSize: 12,
-    fontFamily: fontFamilies.heavy,
+    ...fontFaces.heavy,
     letterSpacing: 0.8,
   },
   resultCard: {
@@ -931,12 +931,12 @@ export const styles = StyleSheet.create({
   },
   resultStatLabel: {
     fontSize: 14,
-    fontFamily: fontFamilies.medium,
+    ...fontFaces.medium,
     color: "#6B7280",
   },
   resultStatValue: {
     fontSize: 16,
-    fontFamily: fontFamilies.heavy,
+    ...fontFaces.heavy,
     color: "#1F2937",
   },
   defeatEmoji: {
@@ -961,13 +961,13 @@ export const styles = StyleSheet.create({
   },
   defeatTitle: {
     fontSize: 36,
-    fontFamily: fontFamilies.heavy,
+    ...fontFaces.heavy,
     color: "#EF4444",
     marginBottom: 8,
   },
   defeatSubtitle: {
     fontSize: 16,
-    fontFamily: fontFamilies.regular,
+    ...fontFaces.regular,
     color: "#6B7280",
     marginBottom: 24,
   },
@@ -977,13 +977,13 @@ export const styles = StyleSheet.create({
   },
   victoryTitle: {
     fontSize: 28,
-    fontFamily: fontFamilies.heavy,
+    ...fontFaces.heavy,
     color: "#10B981",
     marginBottom: 8,
   },
   victorySubtitle: {
     fontSize: 14,
-    fontFamily: fontFamilies.regular,
+    ...fontFaces.regular,
     color: "#6B7280",
     textAlign: "center",
     marginBottom: 24,
@@ -994,7 +994,7 @@ export const styles = StyleSheet.create({
   },
   bossIntroTitle: {
     fontSize: 34,
-    fontFamily: fontFamilies.heavy,
+    ...fontFaces.heavy,
     color: "#FACC15",
     marginBottom: 10,
     textTransform: "uppercase",
@@ -1002,14 +1002,14 @@ export const styles = StyleSheet.create({
   },
   bossIntroName: {
     fontSize: 25,
-    fontFamily: fontFamilies.heavy,
+    ...fontFaces.heavy,
     color: "#F8FAFC",
     marginBottom: 10,
     textAlign: "center",
   },
   bossIntroSubtitle: {
     fontSize: 15,
-    fontFamily: fontFamilies.regular,
+    ...fontFaces.regular,
     color: "#CBD5E1",
     textAlign: "center",
     marginBottom: 20,
@@ -1055,7 +1055,7 @@ export const styles = StyleSheet.create({
   bossAlertChipText: {
     color: "#FEF3C7",
     fontSize: 12,
-    fontFamily: fontFamilies.heavy,
+    ...fontFaces.heavy,
     letterSpacing: 1,
   },
   bossIntroCard: {
@@ -1111,13 +1111,13 @@ export const styles = StyleSheet.create({
   },
   bossStatValue: {
     fontSize: 24,
-    fontFamily: fontFamilies.heavy,
+    ...fontFaces.heavy,
     color: "#F8FAFC",
     marginTop: 6,
   },
   bossStatLabel: {
     fontSize: 11,
-    fontFamily: fontFamilies.semibold,
+    ...fontFaces.semibold,
     color: "#94A3B8",
     marginTop: 2,
   },
@@ -1147,7 +1147,7 @@ export const styles = StyleSheet.create({
   bossIntroHintText: {
     color: "#E2E8F0",
     fontSize: 12,
-    fontFamily: fontFamilies.medium,
+    ...fontFaces.medium,
     textAlign: "center",
   },
   completeEmoji: {
@@ -1156,13 +1156,13 @@ export const styles = StyleSheet.create({
   },
   completeTitle: {
     fontSize: 36,
-    fontFamily: fontFamilies.heavy,
+    ...fontFaces.heavy,
     color: "#F59E0B",
     marginBottom: 8,
   },
   completeSubtitle: {
     fontSize: 16,
-    fontFamily: fontFamilies.regular,
+    ...fontFaces.regular,
     color: "#6B7280",
     marginBottom: 24,
   },
@@ -1180,7 +1180,7 @@ export const styles = StyleSheet.create({
   },
   rewardText: {
     fontSize: 30,
-    fontFamily: fontFamilies.heavy,
+    ...fontFaces.heavy,
     color: "#B45309",
   },
   retryButton: {
@@ -1211,7 +1211,7 @@ export const styles = StyleSheet.create({
   retryButtonText: {
     color: "#FFF",
     fontSize: 18,
-    fontFamily: fontFamilies.heavy,
+    ...fontFaces.heavy,
   },
   nextButton: {
     borderRadius: 16,
@@ -1241,7 +1241,7 @@ export const styles = StyleSheet.create({
   nextButtonText: {
     color: "#FFF",
     fontSize: 18,
-    fontFamily: fontFamilies.heavy,
+    ...fontFaces.heavy,
   },
   bossButton: {
     borderRadius: 16,
@@ -1270,7 +1270,7 @@ export const styles = StyleSheet.create({
   bossButtonText: {
     color: "#FFF",
     fontSize: 17,
-    fontFamily: fontFamilies.heavy,
+    ...fontFaces.heavy,
     letterSpacing: 0.6,
   },
   completeButton: {
@@ -1301,6 +1301,6 @@ export const styles = StyleSheet.create({
   completeButtonText: {
     color: "#FFF",
     fontSize: 18,
-    fontFamily: fontFamilies.heavy,
+    ...fontFaces.heavy,
   },
 });

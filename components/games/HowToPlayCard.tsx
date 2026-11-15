@@ -6,9 +6,9 @@
  */
 
 import { Icon } from "@/components/ui/icon";
-import { fontFamilies } from "@/theme";
+import { createStyles, fontFaces, useTheme } from "@/theme";
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { Text, View } from "react-native";
 
 export interface HowToPlayStep {
     id: string;
@@ -46,6 +46,9 @@ export function HowToPlayCard({
     headerIcon = "MessageQuestion",
     footer,
 }: HowToPlayCardProps) {
+    const { theme } = useTheme();
+    const styles = React.useMemo(() => makeStyles(theme), [theme]);
+
     return (
         <View
             style={[
@@ -131,14 +134,14 @@ export function HowToPlayCard({
 
 export default HowToPlayCard;
 
-const styles = StyleSheet.create({
+const makeStyles = createStyles((theme) => ({
     card: {
         borderRadius: 20,
         padding: 16,
         borderWidth: 2,
         borderBottomWidth: 4,
         alignSelf: "stretch",
-        shadowColor: "#000",
+        shadowColor: theme.colors.shadow,
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.08,
         shadowRadius: 10,
@@ -159,7 +162,7 @@ const styles = StyleSheet.create({
     },
     title: {
         fontSize: 16,
-        fontFamily: fontFamilies.heavy,
+        ...fontFaces.heavy,
     },
     steps: {
         gap: 8,
@@ -184,7 +187,7 @@ const styles = StyleSheet.create({
     stepNumberText: {
         color: "#FFFFFF",
         fontSize: 11,
-        fontFamily: fontFamilies.heavy,
+        ...fontFaces.heavy,
     },
     stepCopy: {
         flex: 1,
@@ -192,15 +195,15 @@ const styles = StyleSheet.create({
     },
     stepTitle: {
         fontSize: 13,
-        fontFamily: fontFamilies.heavy,
+        ...fontFaces.heavy,
     },
     stepHint: {
         fontSize: 12,
-        fontFamily: fontFamilies.semibold,
+        ...fontFaces.semibold,
         lineHeight: 16,
     },
     divider: {
         height: 1,
         marginVertical: 14,
     },
-});
+}));

@@ -1,6 +1,8 @@
 import {
+  useTabBarInset,
   TabBarInsetProvider,
   useTabBarHeightReporter,
+  useTabBarVisible,
 } from "@/components/layout";
 import { playButtonClickSfx } from "@/services/ui-sfx";
 import { layout, useTheme, withAlpha } from "@/theme";
@@ -15,9 +17,10 @@ import Animated, {
   useAnimatedStyle,
   useReducedMotion,
   useSharedValue,
+  withSequence,
   withTiming,
 } from "react-native-reanimated";
-import { EASE_OUT } from "@/theme/motion";
+import { DURATION, EASE_DRAWER, EASE_OUT } from "@/theme/motion";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Svg, { Path } from "react-native-svg";
 
@@ -31,17 +34,76 @@ const TAB_ICONS = {
 
 /* Sharp triangle pointing up (active tab marker). ViewBox 24 x 12 */
 const ACTIVE_TRIANGLE = "M 12 0 L 24 12 L 0 12 Z";
+const MARKER_WIDTH = 24;
+const MARKER_HEIGHT = 12;
+
+/**
+ * One marker for the whole bar (docs/CONTINUITY_SPEC.md, C2). It travels to
+ * the chosen tab, stretching a little on the way and settling as it lands.
+ * Position is derived from a fractional tab index, so a width change (rotation,
+ * tablet resize) repositions it without animating.
+ */
+const TabMarker = ({
+  index,
+  count,
+  width,
+  color,
+}: {
+  index: number;
+  count: number;
+  width: number;
+  color: string;
+}) => {
+  const reducedMotion = useReducedMotion();
+  const position = useSharedValue(index);
+  const stretch = useSharedValue(0);
+  const tabWidth = width / count;
+
+  React.useEffect(() => {
+    if (reducedMotion) {
+      position.value = index;
+      return;
+    }
+    position.value = withTiming(index, {
+      duration: DURATION.sheet,
+      easing: EASE_DRAWER,
+    });
+    stretch.value = withSequence(
+      withTiming(1, { duration: 160, easing: EASE_OUT }),
+      withTiming(0, { duration: 240, easing: EASE_OUT }),
+    );
+  }, [index, reducedMotion, position, stretch]);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [
+      {
+        translateX: position.value * tabWidth + (tabWidth - MARKER_WIDTH) / 2,
+      },
+      { scaleX: 1 + 0.15 * stretch.value },
+      { scaleY: 1 - 0.1 * stretch.value },
+    ],
+  }));
+
+  return (
+    <Animated.View
+      pointerEvents="none"
+      style={[styles.activeMarker, animatedStyle]}
+    >
+      <Svg width={MARKER_WIDTH} height={MARKER_HEIGHT} viewBox="0 0 24 12">
+        <Path d={ACTIVE_TRIANGLE} fill={color} />
+      </Svg>
+    </Animated.View>
+  );
+};
 
 const TabButton = ({
   tab,
   isFocused,
   onPress,
-  activeColor,
 }: {
   tab: { name: string; icon: number; label: string };
   isFocused: boolean;
   onPress: () => void;
-  activeColor: string;
 }) => {
   const scale = useSharedValue(1);
   const reducedMotion = useReducedMotion();
@@ -87,13 +149,6 @@ const TabButton = ({
             />
           </View>
         </Animated.View>
-        {isFocused && (
-          <View style={styles.activeMarker} pointerEvents="none">
-            <Svg width={24} height={12} viewBox="0 0 24 12">
-              <Path d={ACTIVE_TRIANGLE} fill={activeColor} />
-            </Svg>
-          </View>
-        )}
       </View>
     </TouchableOpacity>
   );
@@ -102,17 +157,20 @@ const TabButton = ({
 function ModernTabBar({ state, emitter, navigateToTab }: BottomTabBarProps) {
   // Hooks must run before any early return (rules of hooks)
   const insets = useSafeAreaInsets();
+  const tabBarInset = useTabBarInset();
   const { theme } = useTheme();
   const reportTabBarHeight = useTabBarHeightReporter();
-
-  // Guide: show bar on landing, hide on chat (immersive)
-  const focused = state.routes[state.index];
-  const hide =
-    (focused.params as any)?.hideTabBar === true ||
-    (focused.params as any)?.hideTabBar === "true";
-  if (focused?.name === "chat" && hide) return null;
+  const [tabsWidth, setTabsWidth] = React.useState(0);
+  // Immersive screens (Guide mode) and the soft keyboard hide the bar through
+  // the inset provider, so screens and bar always agree about the reserved
+  // space — see components/layout/tab-bar-inset.tsx.
+  const barVisible = useTabBarVisible();
+  if (!barVisible) return null;
 
   const THEME = theme.palettes.tabBar;
+  // The fade may only cover the band the screens reserve for the bar. A taller
+  // fade washed out the last content row (Discover/Practice descriptions).
+  const fadeHeight = tabBarInset;
 
   const tabs = [
     { name: "index", icon: TAB_ICONS.map, label: "Home" },
@@ -122,6 +180,10 @@ function ModernTabBar({ state, emitter, navigateToTab }: BottomTabBarProps) {
     { name: "profile", icon: TAB_ICONS.profile, label: "Profile" },
   ] as const;
 
+  const activeTabIndex = tabs.findIndex(
+    (tab) => state.routes[state.index]?.name === tab.name,
+  );
+
   return (
     <View pointerEvents="box-none" style={StyleSheet.absoluteFill}>
       <LinearGradient
@@ -129,7 +191,7 @@ function ModernTabBar({ state, emitter, navigateToTab }: BottomTabBarProps) {
         colors={[withAlpha(THEME.bg, 0), withAlpha(THEME.bg, 0.96)]}
         start={{ x: 0, y: 0 }}
         end={{ x: 0, y: 1 }}
-        style={styles.fade}
+        style={[styles.fade, { height: fadeHeight }]}
       />
       <View
         style={[
@@ -150,6 +212,10 @@ function ModernTabBar({ state, emitter, navigateToTab }: BottomTabBarProps) {
             },
           ]}
         >
+          <View
+            style={styles.tabsRow}
+            onLayout={(event) => setTabsWidth(event.nativeEvent.layout.width)}
+          >
           {tabs.map((tab) => {
             const routeIndex = state.routes.findIndex((r) => r.name === tab.name);
             if (routeIndex === -1) return null;
@@ -174,10 +240,18 @@ function ModernTabBar({ state, emitter, navigateToTab }: BottomTabBarProps) {
                 tab={tab}
                 isFocused={isFocused}
                 onPress={onPress}
-                activeColor={THEME.active}
               />
             );
           })}
+          {tabsWidth > 0 && activeTabIndex !== -1 ? (
+            <TabMarker
+              index={activeTabIndex}
+              count={tabs.length}
+              width={tabsWidth}
+              color={THEME.active}
+            />
+          ) : null}
+          </View>
         </View>
       </View>
     </View>
@@ -266,7 +340,11 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    height: 180,
+  },
+  tabsRow: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
   },
   tabButton: {
     flex: 1,
@@ -280,8 +358,8 @@ const styles = StyleSheet.create({
   },
   activeMarker: {
     position: "absolute",
+    left: 0,
     bottom: -8,
-    alignSelf: "center",
   },
   iconContainer: {
     width: 56,

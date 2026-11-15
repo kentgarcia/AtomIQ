@@ -1,10 +1,9 @@
 import { Icon } from "@/components/ui/icon";
-import { useTheme, type Palette, fontFamilies, useResponsiveLayout } from "@/theme";
+import { createStyles, useTheme, fontFaces, useResponsiveLayout, withAlpha } from "@/theme";
 import { useRouter } from "expo-router";
 import React from "react";
 import {
     ScrollView,
-    StyleSheet,
     Text,
     TouchableOpacity,
     View,
@@ -80,11 +79,11 @@ export default function TermsOfServiceScreen() {
   const insets = useSafeAreaInsets();
   const { contentMaxWidth, gutter } = useResponsiveLayout();
   const { theme } = useTheme();
-  const THEME = theme.palettes.settings;
-  const styles = React.useMemo(() => createStyles(THEME), [THEME]);
+  const styles = React.useMemo(() => makeStyles(theme), [theme]);
+  const accent = theme.palettes.settings.primary;
 
   return (
-    <View style={{ flex: 1, backgroundColor: THEME.bg }}>
+    <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
       {/* Header */}
       <View
         style={[
@@ -105,7 +104,7 @@ export default function TermsOfServiceScreen() {
           accessibilityRole="button"
           accessibilityLabel="Go back"
         >
-          <Icon name="ArrowLeft2" size={24} color={THEME.text} />
+          <Icon name="ArrowLeft2" size={24} color={theme.colors.text} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Terms of Service</Text>
         <View style={{ width: 40 }} />
@@ -126,14 +125,14 @@ export default function TermsOfServiceScreen() {
       >
         <Animated.View entering={FadeInDown.delay(80).springify()}>
           <View style={styles.metaRow}>
-            <Icon name="Calendar" size={14} color={THEME.textMuted} />
+            <Icon name="Calendar" size={14} color={theme.colors.textMuted} />
             <Text style={styles.metaText}>Last updated: {LAST_UPDATED}</Text>
           </View>
 
           <View style={styles.docCard}>
             <View style={styles.docHeader}>
               <View style={styles.docIcon}>
-                <Icon name="Shield" size={22} color={THEME.primary} variant="Bold" />
+                <Icon name="Shield" size={22} color={accent} variant="Bold" />
               </View>
               <View style={{ flex: 1 }}>
                 <Text style={styles.docTitle}>Terms of Service</Text>
@@ -165,17 +164,16 @@ export default function TermsOfServiceScreen() {
   );
 }
 
-const createStyles = (theme: Palette) =>
-  StyleSheet.create({
+const makeStyles = createStyles((theme) => ({
     header: {
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "space-between",
       paddingHorizontal: 20,
       paddingBottom: 16,
-      backgroundColor: theme.card,
+      backgroundColor: theme.colors.card,
       borderBottomWidth: 1,
-      borderBottomColor: theme.border,
+      borderBottomColor: theme.colors.border,
     },
     backBtn: {
       width: 40,
@@ -186,8 +184,8 @@ const createStyles = (theme: Palette) =>
     },
     headerTitle: {
       fontSize: 18,
-      fontFamily: fontFamilies.bold,
-      color: theme.text,
+      ...fontFaces.bold,
+      color: theme.colors.text,
     },
     content: {
       padding: 20,
@@ -201,16 +199,16 @@ const createStyles = (theme: Palette) =>
     },
     metaText: {
       fontSize: 12,
-      fontFamily: fontFamilies.medium,
-      color: theme.textMuted,
+      ...fontFaces.medium,
+      color: theme.colors.textMuted,
     },
     docCard: {
-      backgroundColor: theme.card,
+      backgroundColor: theme.colors.card,
       borderRadius: 20,
       padding: 22,
       borderWidth: 1,
-      borderColor: theme.border,
-      shadowColor: "#000",
+      borderColor: theme.colors.border,
+      shadowColor: theme.colors.shadow,
       shadowOffset: { width: 0, height: 2 },
       shadowOpacity: 0.05,
       shadowRadius: 10,
@@ -226,27 +224,27 @@ const createStyles = (theme: Palette) =>
       width: 44,
       height: 44,
       borderRadius: 12,
-      backgroundColor: theme.primary + "14",
+      backgroundColor: withAlpha(theme.palettes.settings.primary, 0.08),
       borderWidth: 1,
-      borderColor: theme.primary + "22",
+      borderColor: withAlpha(theme.palettes.settings.primary, 0.14),
       alignItems: "center",
       justifyContent: "center",
     },
     docTitle: {
       fontSize: 18,
-      fontFamily: fontFamilies.bold,
-      color: theme.text,
+      ...fontFaces.bold,
+      color: theme.colors.text,
       marginBottom: 2,
     },
     docSubtitle: {
       fontSize: 13,
-      fontFamily: fontFamilies.regular,
-      color: theme.textMuted,
+      ...fontFaces.regular,
+      color: theme.colors.textMuted,
       lineHeight: 18,
     },
     headerDivider: {
       height: 1,
-      backgroundColor: theme.border,
+      backgroundColor: theme.colors.border,
       marginBottom: 20,
     },
     block: {
@@ -254,30 +252,30 @@ const createStyles = (theme: Palette) =>
     },
     blockTitle: {
       fontSize: 15,
-      fontFamily: fontFamilies.bold,
-      color: theme.text,
+      ...fontFaces.bold,
+      color: theme.colors.text,
       marginBottom: 8,
       lineHeight: 22,
     },
     blockBody: {
       fontSize: 14,
-      fontFamily: fontFamilies.regular,
-      color: theme.textMuted,
+      ...fontFaces.regular,
+      color: theme.colors.textMuted,
       lineHeight: 22,
     },
     blockDivider: {
       height: 1,
-      backgroundColor: theme.border,
+      backgroundColor: theme.colors.border,
       marginTop: 18,
       marginBottom: 2,
       opacity: 0.7,
     },
     footerNote: {
       fontSize: 12,
-      fontFamily: fontFamilies.regular,
-      color: theme.textMuted,
+      ...fontFaces.regular,
+      color: theme.colors.textMuted,
       textAlign: "center",
       marginTop: 18,
       lineHeight: 18,
     },
-  });
+  }));

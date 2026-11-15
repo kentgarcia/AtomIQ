@@ -4,8 +4,8 @@
  * profile) and a single CTA that routes into the matching feature screen.
  */
 
-import React from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import React, { useMemo } from "react";
+import { Pressable, Text, View } from "react-native";
 import Animated, {
   useAnimatedStyle,
   useReducedMotion,
@@ -14,7 +14,7 @@ import Animated, {
 } from "react-native-reanimated";
 
 import { Icon } from "@/components/ui/icon";
-import { fontFamilies, useTheme } from "@/theme";
+import { createStyles, fontFaces, useTheme, withAlpha } from "@/theme";
 
 import type { GuideCard } from "@/services/guide/types";
 
@@ -36,41 +36,114 @@ const CARD_ACCENT: Record<GuideCard["kind"], string> = {
   "profile-summary": "#FF8C00",
 };
 
+const makeStyles = createStyles((theme) => {
+  const c = theme.colors;
+  return {
+    card: {
+      backgroundColor: c.card,
+      borderRadius: 20,
+      padding: 16,
+      borderWidth: 2,
+      borderBottomWidth: 4,
+      marginBottom: 10,
+      /* Fill the wrap so every card matches the tallest sibling */
+      flexGrow: 1,
+      shadowColor: c.shadow,
+      shadowOffset: { width: 0, height: 6 },
+      shadowOpacity: 0.08,
+      shadowRadius: 10,
+      elevation: 5,
+    },
+    typeLabel: {
+      fontSize: 10,
+      ...fontFaces.heavy,
+      color: c.textFaint,
+      letterSpacing: 0.8,
+      textTransform: "uppercase",
+      marginBottom: 10,
+    },
+    header: {
+      flexDirection: "row",
+      alignItems: "flex-start",
+      gap: 10,
+    },
+    iconWrap: {
+      width: 40,
+      height: 40,
+      borderRadius: 20,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    headerText: {
+      flex: 1,
+    },
+    title: {
+      fontSize: 16,
+      ...fontFaces.heavy,
+      color: c.text,
+      lineHeight: 20,
+    },
+    subtitle: {
+      fontSize: 12,
+      ...fontFaces.semibold,
+      color: c.textMuted,
+      marginTop: 2,
+    },
+    badge: {
+      flexDirection: "row",
+      alignItems: "center",
+      paddingHorizontal: 10,
+      paddingVertical: 5,
+      borderRadius: 12,
+    },
+    badgeText: {
+      fontSize: 11,
+      ...fontFaces.heavy,
+    },
+    body: {
+      fontSize: 13,
+      ...fontFaces.regular,
+      color: c.textSecondary,
+      marginTop: 10,
+      marginBottom: 16,
+      lineHeight: 18,
+    },
+    cta: {
+      marginTop: "auto",
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 6,
+      paddingVertical: 14,
+      borderRadius: 16,
+      borderWidth: 1,
+      borderBottomWidth: 4,
+      minHeight: 48,
+      shadowColor: c.shadow,
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.12,
+      shadowRadius: 8,
+      elevation: 4,
+    },
+    ctaText: {
+      fontSize: 14,
+      ...fontFaces.heavy,
+    },
+  };
+});
+
 export interface ContentCardProps {
   card: GuideCard;
   onCta: () => void;
 }
 
 export function ContentCard({ card, onCta }: ContentCardProps) {
-  const { isDark } = useTheme();
+  const { theme } = useTheme();
+  const styles = useMemo(() => makeStyles(theme), [theme]);
   const reduce = useReducedMotion();
   const pressed = useSharedValue(0);
 
-  // Mode-aware neutral surfaces — brand accents stay identical
-  const P = isDark
-    ? {
-        card: "#213356",
-        border: "#2D3A56",
-        borderActive: "#FFCA5F",
-        soft: "#1A2D4A",
-        creamTint: "#4A381B",
-        text: "#F6F9FC",
-        textSecondary: "#C0CBDD",
-        muted: "#8898AA",
-        faint: "#9CA3AF",
-      }
-    : {
-        card: "#FFFFFF",
-        border: "#E5E7EB",
-        borderActive: "#FFCA5F",
-        soft: "#F4F5F7",
-        creamTint: "#FFF3E0",
-        text: "#333333",
-        textSecondary: "#666666",
-        muted: "#888888",
-        faint: "#9CA3AF",
-      };
-  const styles = React.useMemo(() => createStyles(P), [P]);
+  const c = theme.colors;
 
   const animated = useAnimatedStyle(() => {
     if (reduce) return { transform: [{ scale: 1 }] };
@@ -102,21 +175,21 @@ export function ContentCard({ card, onCta }: ContentCardProps) {
   // Badge — mirrors profile's countPill / badgeCircle language
   const badgeStyle = (() => {
     if (!card.badge) return null;
-    if (isLocked) return { bg: P.soft, text: P.faint };
-    if (isCompleted) return { bg: "#22C55E1A", text: "#22C55E" };
-    if (isRecommended) return { bg: P.creamTint, text: "#E67E22" };
-    return { bg: `${accent}1A`, text: accent };
+    if (isLocked) return { bg: c.surfaceSoft, text: c.textFaint };
+    if (isCompleted) return { bg: withAlpha(c.success, 0.1), text: c.success };
+    if (isRecommended) return { bg: c.creamTint, text: c.amberText };
+    return { bg: withAlpha(accent, 0.1), text: accent };
   })();
 
-  const ctaBg = isLocked ? P.border : "#FF8C00";
-  const ctaBorder = isLocked ? P.faint : "#E67E22";
-  const ctaTextColor = isLocked ? P.faint : "#FFFFFF";
+  const ctaBg = isLocked ? c.border : "#FF8C00";
+  const ctaBorder = isLocked ? c.textFaint : "#E67E22";
+  const ctaTextColor = isLocked ? c.textFaint : c.onPrimary;
 
   return (
     <Animated.View
       style={[
         styles.card,
-        { borderColor: isRecommended ? P.borderActive : P.border },
+        { borderColor: isRecommended ? c.amberBorder : c.border },
         animated,
       ]}
       accessibilityLabel={`${typeLabel}: ${card.title}`}
@@ -128,13 +201,13 @@ export function ContentCard({ card, onCta }: ContentCardProps) {
         <View
           style={[
             styles.iconWrap,
-            { backgroundColor: isLocked ? P.soft : `${accent}14` },
+            { backgroundColor: isLocked ? c.surfaceSoft : withAlpha(accent, 0.08) },
           ]}
         >
           <Icon
             name={isLocked ? "Lock" : CARD_ICON[card.kind]}
             size={20}
-            color={isLocked ? P.faint : accent}
+            color={isLocked ? c.textFaint : accent}
             variant="Bold"
           />
         </View>
@@ -174,102 +247,8 @@ export function ContentCard({ card, onCta }: ContentCardProps) {
         ]}
       >
         <Text style={[styles.ctaText, { color: ctaTextColor }]}>{card.ctaLabel}</Text>
-        {!isLocked && <Icon name="ArrowRight2" size={16} color="#FFFFFF" variant="Bold" />}
+        {!isLocked && <Icon name="ArrowRight2" size={16} color={c.onPrimary} variant="Bold" />}
       </Pressable>
     </Animated.View>
   );
 }
-
-const createStyles = (P: { card: string; border: string; soft: string; creamTint: string; text: string; textSecondary: string; muted: string; faint: string }) =>
-  StyleSheet.create({
-  card: {
-    backgroundColor: P.card,
-    borderRadius: 20,
-    padding: 16,
-    borderWidth: 2,
-    borderBottomWidth: 4,
-    marginBottom: 10,
-    /* Fill the wrap so every card matches the tallest sibling */
-    flexGrow: 1,
-    shadowColor: "#000000",
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.08,
-    shadowRadius: 10,
-    elevation: 5,
-  },
-  typeLabel: {
-    fontSize: 10,
-    fontFamily: fontFamilies.heavy,
-    color: P.faint,
-    letterSpacing: 0.8,
-    textTransform: "uppercase",
-    marginBottom: 10,
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    gap: 10,
-  },
-  iconWrap: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  headerText: {
-    flex: 1,
-  },
-  title: {
-    fontSize: 16,
-    fontFamily: fontFamilies.heavy,
-    color: P.text,
-    lineHeight: 20,
-  },
-  subtitle: {
-    fontSize: 12,
-    fontFamily: fontFamilies.semibold,
-    color: P.muted,
-    marginTop: 2,
-  },
-  badge: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 12,
-  },
-  badgeText: {
-    fontSize: 11,
-    fontFamily: fontFamilies.heavy,
-  },
-  body: {
-    fontSize: 13,
-    fontFamily: fontFamilies.regular,
-    color: P.textSecondary,
-    marginTop: 10,
-    marginBottom: 16,
-    lineHeight: 18,
-  },
-  cta: {
-    marginTop: "auto",
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 6,
-    paddingVertical: 14,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderBottomWidth: 4,
-    minHeight: 48,
-    shadowColor: "#000000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.12,
-    shadowRadius: 8,
-    elevation: 4,
-  },
-  ctaText: {
-    fontSize: 14,
-    fontFamily: fontFamilies.heavy,
-  },
-});

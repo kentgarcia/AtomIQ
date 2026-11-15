@@ -7,12 +7,14 @@
  */
 
 import { Icon } from "@/components/ui/icon";
-import { fontFamilies, useTheme } from "@/theme";
+import { createStyles, fontFaces, useTheme } from "@/theme";
 import React from "react";
-import { Pressable, StyleSheet, Text } from "react-native";
+import { Pressable, Text } from "react-native";
 import Animated, {
+    FadeIn,
     ZoomIn,
     useAnimatedStyle,
+    useReducedMotion,
     useSharedValue,
     withSpring,
 } from "react-native-reanimated";
@@ -47,6 +49,8 @@ export interface StackCardProps {
   delay: number;
   height: number;
   onPress: () => void;
+  /** Play the pop-in on mount. Off when a parent transition owns the entrance. */
+  animateIn?: boolean;
 }
 
 export function StackCard({
@@ -56,8 +60,11 @@ export function StackCard({
   delay,
   height,
   onPress,
+  animateIn = true,
 }: StackCardProps) {
-  const { isDark } = useTheme();
+  const reducedMotion = useReducedMotion();
+  const { theme } = useTheme();
+  const styles = React.useMemo(() => makeStyles(theme), [theme]);
   const pressScale = useSharedValue(1);
   const pressStyle = useAnimatedStyle(() => ({
     transform: [{ scale: pressScale.value }],
@@ -65,16 +72,21 @@ export function StackCard({
 
   return (
         <Animated.View
-            entering={ZoomIn.duration(280)
-                .delay(delay)
-                .springify()
-                .damping(20)
-                .stiffness(260)}
+            entering={
+                !animateIn
+                    ? undefined
+                    : reducedMotion
+                      ? FadeIn.duration(120)
+                      : ZoomIn.duration(280)
+                          .delay(delay)
+                          .springify()
+                          .damping(20)
+                          .stiffness(260)
+            }
         >
             <Animated.View
                 style={[
                     styles.card,
-                    isDark && styles.cardDark,
                     {
                         height,
                         transform: [{ rotate: "-4deg" }],
@@ -82,7 +94,7 @@ export function StackCard({
                 ]}
             >
                 <Pressable
-                    style={[styles.cardPressArea, isDark && styles.cardPressAreaDark]}
+                    style={styles.cardPressArea}
                     onPressIn={() => {
                         pressScale.value = springPressIn();
                     }}
@@ -96,7 +108,7 @@ export function StackCard({
                     <Animated.View style={[styles.iconWrapper, pressStyle, { backgroundColor: tint(color) }]}>
                         <Icon name={icon} size={42} color={shade(color, -0.32)} variant="Bold" />
                     </Animated.View>
-                    <Text style={[styles.cardTitle, isDark && styles.cardTitleDark]}>{title}</Text>
+                    <Text style={styles.cardTitle}>{title}</Text>
                 </Pressable>
             </Animated.View>
         </Animated.View>
@@ -105,16 +117,16 @@ export function StackCard({
 
 export default StackCard;
 
-const styles = StyleSheet.create({
+const makeStyles = createStyles((theme) => ({
     card: {
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "center",
         paddingHorizontal: 28,
-        backgroundColor: "#FFFFFF",
+        backgroundColor: theme.colors.card,
         borderRadius: 22,
         elevation: 4,
-        shadowColor: "#000000",
+        shadowColor: theme.colors.shadow,
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.07,
         shadowRadius: 8,
@@ -135,18 +147,8 @@ const styles = StyleSheet.create({
     },
     cardTitle: {
         fontSize: 26,
-        fontFamily: fontFamilies.heavy,
-        color: "#333333",
+        ...fontFaces.heavy,
+        color: theme.colors.text,
         letterSpacing: -0.5,
     },
-    /* Dark mode */
-    cardDark: {
-        backgroundColor: "#213356",
-    },
-    cardPressAreaDark: {
-        backgroundColor: "#213356",
-    },
-    cardTitleDark: {
-        color: "#F6F9FC",
-    },
-});
+}));

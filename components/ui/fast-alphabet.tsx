@@ -1,9 +1,14 @@
 import { select } from "@/services/haptics";
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, { runOnJS, useAnimatedReaction, useAnimatedStyle, useDerivedValue, useSharedValue } from "react-native-reanimated";
-import { fontFamilies } from "@/theme";
+import { createStyles, fontFaces, useTheme } from "@/theme";
+
+function useAlphabetStyles() {
+  const { theme } = useTheme();
+  return React.useMemo(() => makeStyles(theme), [theme]);
+}
 
 type FastAlphabetProps = {
   data: string[];
@@ -13,6 +18,7 @@ type FastAlphabetProps = {
 };
 
 function Cell({ letter, has }: { letter: string; has: boolean }) {
+  const styles = useAlphabetStyles();
   return (
     <View style={[styles.cell, !has && styles.cellDim]} pointerEvents="none">
       <Text style={[styles.text, !has && styles.textDim]}>{letter}</Text>
@@ -21,6 +27,7 @@ function Cell({ letter, has }: { letter: string; has: boolean }) {
 }
 
 function PreviewText({ activeCharSV }: { activeCharSV: any }) {
+  const styles = useAlphabetStyles();
   const [letter, setLetter] = React.useState("");
   useAnimatedReaction(
     () => activeCharSV.value,
@@ -33,6 +40,7 @@ function PreviewText({ activeCharSV }: { activeCharSV: any }) {
 }
 
 export function FastAlphabet({ data, availableSet, onCharSelect, onPreviewChange }: FastAlphabetProps) {
+  const styles = useAlphabetStyles();
   const heightSV = useSharedValue(1);
   const activeIdxSV = useSharedValue(-1);
   const activeCharSV = useSharedValue("");
@@ -135,16 +143,16 @@ export function FastAlphabet({ data, availableSet, onCharSelect, onPreviewChange
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = createStyles((theme) => ({
   container: {
-    backgroundColor: "rgba(255,255,255,0.96)",
+    backgroundColor: theme.colors.surface,
     borderRadius: 16,
     paddingVertical: 5,
     paddingHorizontal: 3,
     borderWidth: 1,
-    borderColor: "#F5F5F4",
+    borderColor: theme.colors.borderSubtle,
     elevation: 3,
-    shadowColor: "#000",
+    shadowColor: theme.colors.shadow,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.08,
     shadowRadius: 6,
@@ -157,18 +165,18 @@ const styles = StyleSheet.create({
     width: 52,
     height: 52,
     borderRadius: 14,
-    backgroundColor: "#1C1917",
+    backgroundColor: theme.colors.inverseSurface,
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 1.5,
     borderColor: "#FDE68A",
-    shadowColor: "#000",
+    shadowColor: theme.colors.shadow,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.22,
     shadowRadius: 8,
     elevation: 6,
   },
-  previewText: { fontSize: 22, fontFamily: fontFamilies.heavy, color: "#FFFFFF", lineHeight: 22 },
+  previewText: { fontSize: 22, ...fontFaces.heavy, color: theme.colors.inverseText, lineHeight: 22 },
   cell: {
     width: 24,
     height: 15.5,
@@ -177,6 +185,6 @@ const styles = StyleSheet.create({
     borderRadius: 6,
   },
   cellDim: { opacity: 0.32 },
-  text: { fontSize: 9.5, fontFamily: fontFamilies.heavy, color: "#57534E", textAlign: "center" },
-  textDim: { color: "#A8A29E" },
-});
+  text: { fontSize: 9.5, ...fontFaces.heavy, color: theme.colors.textSecondary, textAlign: "center" },
+  textDim: { color: theme.colors.textFaint },
+}));

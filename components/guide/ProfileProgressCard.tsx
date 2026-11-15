@@ -1,14 +1,168 @@
 import { Icon } from "@/components/ui/icon";
 import { getProfileAvatarSource } from "@/services/profile-avatars";
 import { useStorage } from "@/services/StorageContext";
-import { fontFamilies } from "@/theme";
+import { createStyles, fontFaces, useTheme } from "@/theme";
 import { useRouter } from "expo-router";
 import React, { useMemo } from "react";
-import { Image, Pressable, StyleSheet, Text, View } from "react-native";
+import { Image, Pressable, Text, View } from "react-native";
+
+const makeStyles = createStyles((theme) => {
+  const c = theme.colors;
+  return {
+    outer: {
+      backgroundColor: c.amberSurface,
+      borderRadius: 26,
+      padding: 10,
+      gap: 10,
+      shadowColor: c.shadow,
+      shadowOffset: { width: 0, height: 3 },
+      shadowOpacity: 0.1,
+      shadowRadius: 6,
+      elevation: 4,
+    },
+    header: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      paddingHorizontal: 4,
+      paddingTop: 2,
+      paddingBottom: 2,
+    },
+    levelPill: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 5,
+      backgroundColor: c.inverseSurface,
+      paddingHorizontal: 12,
+      height: 36,
+      borderRadius: 14,
+    },
+    levelPillText: {
+      fontSize: 13,
+      ...fontFaces.heavy,
+      color: c.inverseText,
+    },
+    viewProfileBtn: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 4,
+      backgroundColor: c.card,
+      paddingHorizontal: 10,
+      paddingVertical: 6,
+      borderRadius: 999,
+      borderWidth: 1,
+      borderColor: c.amberBorder,
+    },
+    viewProfileText: {
+      fontSize: 12,
+      ...fontFaces.heavy,
+      color: c.link,
+    },
+    inner: {
+      backgroundColor: c.card,
+      borderRadius: 20,
+      padding: 16,
+      borderWidth: 2,
+      borderColor: c.border,
+      borderBottomWidth: 4,
+    },
+    profileRowCompact: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 14,
+    },
+    profileInfo: {
+      flex: 1,
+      gap: 2,
+    },
+    levelSectionCompact: {
+      marginTop: 8,
+    },
+    avatarContainer: {
+      position: "relative",
+    },
+    avatar: {
+      width: 72,
+      height: 72,
+      borderRadius: 36,
+      backgroundColor: c.creamTint,
+      borderWidth: 3,
+      borderColor: c.creamTint,
+    },
+    levelBadge: {
+      position: "absolute",
+      bottom: -2,
+      right: -2,
+      backgroundColor: c.link,
+      width: 26,
+      height: 26,
+      borderRadius: 13,
+      alignItems: "center",
+      justifyContent: "center",
+      borderWidth: 2,
+      borderColor: c.card,
+    },
+    levelBadgeText: {
+      color: c.onPrimary,
+      ...fontFaces.heavy,
+      fontSize: 11,
+    },
+    name: {
+      fontSize: 18,
+      ...fontFaces.heavy,
+      color: c.text,
+      marginBottom: 2,
+    },
+    levelMetaRow: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginBottom: 6,
+    },
+    levelLabel: {
+      fontSize: 13,
+      ...fontFaces.heavy,
+      color: c.text,
+    },
+    levelXp: {
+      fontSize: 12,
+      ...fontFaces.bold,
+      color: c.link,
+    },
+    levelBarBg: {
+      height: 10,
+      borderRadius: 5,
+      backgroundColor: c.creamTint,
+      overflow: "hidden",
+    },
+    levelBarFill: {
+      height: "100%",
+      borderRadius: 5,
+      backgroundColor: c.link,
+    },
+    levelHint: {
+      fontSize: 11,
+      ...fontFaces.semibold,
+      color: c.textMuted,
+      marginTop: 6,
+    },
+    loadingText: {
+      color: c.text,
+      ...fontFaces.medium,
+    },
+    loadingOuter: {
+      backgroundColor: c.amberSurface,
+      borderRadius: 26,
+      padding: 16,
+    },
+  };
+});
 
 export function ProfileProgressCard() {
+  const { theme } = useTheme();
   const { userProfile } = useStorage();
   const router = useRouter();
+  const styles = useMemo(() => makeStyles(theme), [theme]);
 
   const userLevel = useMemo(() => {
     if (!userProfile) return 1;
@@ -26,8 +180,8 @@ export function ProfileProgressCard() {
 
   if (!userProfile) {
     return (
-      <View style={styles.outer}>
-        <Text style={{ color: "#333333", fontFamily: fontFamilies.medium }}>Loading profile…</Text>
+      <View style={styles.loadingOuter}>
+        <Text style={styles.loadingText}>Loading profile…</Text>
       </View>
     );
   }
@@ -37,7 +191,7 @@ export function ProfileProgressCard() {
       {/* Header inside amber — level pill */}
       <View style={styles.header}>
         <View style={styles.levelPill}>
-          <Icon name="Crown" size={14} color="#FFFFFF" variant="Bold" />
+          <Icon name="Crown" size={14} color={theme.colors.inverseText} variant="Bold" />
           <Text style={styles.levelPillText}>{userTitle}</Text>
         </View>
         <View style={{ flex: 1 }} />
@@ -49,11 +203,11 @@ export function ProfileProgressCard() {
           accessibilityRole="button"
         >
           <Text style={styles.viewProfileText}>View</Text>
-          <Icon name="ArrowRight" size={14} color="#FF8C00" variant="Bold" />
+          <Icon name="ArrowRight" size={14} color={theme.colors.link} variant="Bold" />
         </Pressable>
       </View>
 
-      {/* Inner white card — avatar + level/XP */}
+      {/* Inner card — avatar + level/XP */}
       <View style={styles.inner}>
         <View style={styles.profileRowCompact}>
           <View style={styles.avatarContainer}>
@@ -82,143 +236,3 @@ export function ProfileProgressCard() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  outer: {
-    backgroundColor: "#FFCA5F",
-    borderRadius: 26,
-    padding: 10,
-    gap: 10,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
-    elevation: 4,
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 4,
-    paddingTop: 2,
-    paddingBottom: 2,
-  },
-  levelPill: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 5,
-    backgroundColor: "#434343",
-    paddingHorizontal: 12,
-    height: 36,
-    borderRadius: 14,
-  },
-  levelPillText: {
-    fontSize: 13,
-    fontFamily: fontFamilies.heavy,
-    color: "#FFFFFF",
-  },
-  viewProfileBtn: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 4,
-    backgroundColor: "#FFFFFF",
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 999,
-    borderWidth: 1,
-    borderColor: "#FFE0B2",
-  },
-  viewProfileText: {
-    fontSize: 12,
-    fontFamily: fontFamilies.heavy,
-    color: "#FF8C00",
-  },
-  inner: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: 20,
-    padding: 16,
-    borderWidth: 2,
-    borderColor: "#E5E7EB",
-    borderBottomWidth: 4,
-  },
-  profileRowCompact: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 14,
-  },
-  profileInfo: {
-    flex: 1,
-    gap: 2,
-  },
-  levelSectionCompact: {
-    marginTop: 8,
-  },
-  avatarContainer: {
-    position: "relative",
-  },
-  avatar: {
-    width: 72,
-    height: 72,
-    borderRadius: 36,
-    backgroundColor: "#FFF3E0",
-    borderWidth: 3,
-    borderColor: "#FFF3E0",
-  },
-  levelBadge: {
-    position: "absolute",
-    bottom: -2,
-    right: -2,
-    backgroundColor: "#FF8C00",
-    width: 26,
-    height: 26,
-    borderRadius: 13,
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 2,
-    borderColor: "#FFFFFF",
-  },
-  levelBadgeText: {
-    color: "#FFF",
-    fontFamily: fontFamilies.heavy,
-    fontSize: 11,
-  },
-  name: {
-    fontSize: 18,
-    fontFamily: fontFamilies.heavy,
-    color: "#333333",
-    marginBottom: 2,
-  },
-  levelMetaRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 6,
-  },
-  levelLabel: {
-    fontSize: 13,
-    fontFamily: fontFamilies.heavy,
-    color: "#333333",
-  },
-  levelXp: {
-    fontSize: 12,
-    fontFamily: fontFamilies.bold,
-    color: "#E67E22",
-  },
-  levelBarBg: {
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: "#FFF3E0",
-    overflow: "hidden",
-  },
-  levelBarFill: {
-    height: "100%",
-    borderRadius: 5,
-    backgroundColor: "#FF8C00",
-  },
-  levelHint: {
-    fontSize: 11,
-    fontFamily: fontFamilies.semibold,
-    color: "#888888",
-    marginTop: 6,
-  },
-});

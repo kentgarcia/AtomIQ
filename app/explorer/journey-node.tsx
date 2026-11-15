@@ -14,7 +14,7 @@ import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-nati
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import {useTheme, withAlpha, type Palette, fontFamilies, useResponsiveLayout} from "@/theme";
+import {useTheme, withAlpha, type Palette, fontFaces, useResponsiveLayout} from "@/theme";
 
 export default function JourneyNodeScreen() {
   const router = useRouter();
@@ -284,14 +284,14 @@ const makeStyles = (THEME: Palette) => StyleSheet.create({
   },
   mythStatement: {
     fontSize: 18,
-    fontFamily: fontFamilies.bold,
+    ...fontFaces.bold,
     color: THEME.white,
     lineHeight: 26,
     marginBottom: 20,
   },
   realityStatement: {
     fontSize: 18,
-    fontFamily: fontFamilies.bold,
+    ...fontFaces.bold,
     color: THEME.white,
     lineHeight: 26,
     marginBottom: 16,
@@ -304,7 +304,7 @@ const makeStyles = (THEME: Palette) => StyleSheet.create({
   },
   commonBeliefsTitle: {
     fontSize: 14,
-    fontFamily: fontFamilies.bold,
+    ...fontFaces.bold,
     color: withAlpha(THEME.white, 0.9),
     marginBottom: 12,
   },
@@ -319,7 +319,7 @@ const makeStyles = (THEME: Palette) => StyleSheet.create({
   beliefText: {
     flex: 1,
     fontSize: 13,
-    fontFamily: fontFamilies.regular,
+    ...fontFaces.regular,
     color: withAlpha(THEME.white, 0.9),
     lineHeight: 20,
   },
@@ -331,7 +331,7 @@ const makeStyles = (THEME: Palette) => StyleSheet.create({
   },
   explanation: {
     fontSize: 14,
-    fontFamily: fontFamilies.regular,
+    ...fontFaces.regular,
     color: THEME.white,
     lineHeight: 22,
   },
@@ -343,7 +343,7 @@ const makeStyles = (THEME: Palette) => StyleSheet.create({
   },
   evidenceTitle: {
     fontSize: 14,
-    fontFamily: fontFamilies.bold,
+    ...fontFaces.bold,
     color: withAlpha(THEME.white, 0.9),
     marginBottom: 12,
   },
@@ -357,17 +357,17 @@ const makeStyles = (THEME: Palette) => StyleSheet.create({
   },
   evidenceSource: {
     fontSize: 13,
-    fontFamily: fontFamilies.semibold,
+    ...fontFaces.semibold,
     color: THEME.white,
     marginBottom: 2,
   },
   evidenceAuthor: {
     fontSize: 11,
-    fontFamily: fontFamilies.regular,
+    ...fontFaces.regular,
     color: withAlpha(THEME.white, 0.8),
   },
   articleCard: {
-    backgroundColor: THEME.white,
+    backgroundColor: THEME.card,
     borderRadius: 20,
     padding: 20,
     marginTop: 16,
@@ -377,20 +377,20 @@ const makeStyles = (THEME: Palette) => StyleSheet.create({
   },
   articleTitle: {
     fontSize: 24,
-    fontFamily: fontFamilies.heavy,
+    ...fontFaces.heavy,
     color: THEME.text,
     marginBottom: 12,
   },
   articleExcerpt: {
     fontSize: 15,
-    fontFamily: fontFamilies.regular,
+    ...fontFaces.regular,
     color: THEME.textMuted,
     lineHeight: 22,
     marginBottom: 16,
   },
   articleContent: {
     fontSize: 15,
-    fontFamily: fontFamilies.regular,
+    ...fontFaces.regular,
     color: THEME.text,
     lineHeight: 24,
   },
@@ -408,7 +408,7 @@ const makeStyles = (THEME: Palette) => StyleSheet.create({
     gap: 8,
     paddingVertical: 14,
     borderRadius: 16,
-    backgroundColor: THEME.white,
+    backgroundColor: THEME.card,
     borderWidth: 2,
     borderColor: THEME.border,
     borderBottomWidth: 4,
@@ -419,7 +419,7 @@ const makeStyles = (THEME: Palette) => StyleSheet.create({
   },
   navButtonText: {
     fontSize: 15,
-    fontFamily: fontFamilies.bold,
+    ...fontFaces.bold,
     color: THEME.primary,
   },
   navButtonTextPrimary: {

@@ -1,5 +1,6 @@
-import {fontFamilies} from "@/theme";
-import { StyleSheet, Text, type TextProps } from 'react-native';
+import {createStyles, fontFaces, useTheme} from "@/theme";
+import React, { useMemo } from 'react';
+import { Text, type TextProps } from 'react-native';
 
 import { useThemeColor } from '@/hooks/use-theme-color';
 
@@ -17,6 +18,8 @@ export function ThemedText({
   ...rest
 }: ThemedTextProps) {
   const color = useThemeColor({ light: lightColor, dark: darkColor }, 'text');
+  const { theme } = useTheme();
+  const styles = useMemo(() => makeStyles(theme), [theme]);
 
   return (
     <Text
@@ -34,30 +37,30 @@ export function ThemedText({
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = createStyles((theme) => ({
   default: {
     fontSize: 16,
-    fontFamily: fontFamilies.regular,
+    ...fontFaces.regular,
     lineHeight: 24,
   },
   defaultSemiBold: {
     fontSize: 16,
     lineHeight: 24,
-    fontFamily: fontFamilies.semibold,
+    ...fontFaces.semibold,
   },
   title: {
     fontSize: 32,
-    fontFamily: fontFamilies.bold,
+    ...fontFaces.bold,
     lineHeight: 32,
   },
   subtitle: {
     fontSize: 20,
-    fontFamily: fontFamilies.bold,
+    ...fontFaces.bold,
   },
   link: {
     lineHeight: 30,
     fontSize: 16,
-    fontFamily: fontFamilies.regular,
-    color: '#0a7ea4',
+    ...fontFaces.regular,
+    color: theme.colors.link,
   },
-});
+}));

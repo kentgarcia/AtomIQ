@@ -1,37 +1,26 @@
 import { StyleSheet } from "react-native";
 
-import { TabLight as LightTHEME, fontFamilies } from "@/theme";
+import { fontFaces, withAlpha, type Theme } from "@/theme";
 
-export const createStyles = (theme: typeof LightTHEME) => {
+export const createStyles = (theme: Theme) => {
+  const ui = theme.palettes.ui;
+  const colors = theme.colors;
   /* Mode-aware neutral surfaces — brand accents stay identical */
-  const isDark = theme.bg.toUpperCase() !== "#FFFFFF" && theme.bg.toLowerCase() !== "#ffffff";
-  const P = isDark
-    ? {
-        card: "#213356",
-        border: "#2D3A56",
-        softBorder: "#26365A",
-        soft: "#1A2D4A",
-        creamTint: "#4A381B",
-        text: "#F6F9FC",
-        textSecondary: "#C0CBDD",
-        muted: "#8898AA",
-        faint: "#667799",
-      }
-    : {
-        card: "#FFFFFF",
-        border: "#E5E7EB",
-        softBorder: "#F4F5F7",
-        soft: "#F9FAFB",
-        creamTint: "#FFF3E0",
-        text: "#333333",
-        textSecondary: "#555555",
-        muted: "#888888",
-        faint: "#999999",
-      };
+  const P = {
+    card: ui.card,
+    border: ui.border,
+    softBorder: ui.softBorder,
+    soft: ui.soft,
+    creamTint: ui.creamTint,
+    text: ui.text,
+    textSecondary: ui.textSecondary,
+    muted: ui.muted,
+    faint: ui.faint,
+  };
   return StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: theme.bg,
+      backgroundColor: ui.background,
     },
     /* Autumn gradient flowing through the whole page (like home & profile) */
     pageGradient: {
@@ -61,15 +50,15 @@ export const createStyles = (theme: typeof LightTHEME) => {
     },
     headerTitle: {
       fontSize: 28,
-      fontFamily: fontFamilies.heavy,
+      ...fontFaces.heavy,
       marginBottom: 4,
-      color: theme.text,
+      color: ui.text,
       letterSpacing: -0.5,
     },
     headerSubtitle: {
       fontSize: 14,
-      color: theme.textMuted,
-      fontFamily: fontFamilies.semibold,
+      color: ui.muted,
+      ...fontFaces.semibold,
     },
     // Old inline mascot slot (kept for compat, not used in new header)
     headerRight: {
@@ -101,7 +90,7 @@ export const createStyles = (theme: typeof LightTHEME) => {
       width: 72,
       height: 12,
       borderRadius: 6,
-      backgroundColor: "rgba(0,0,0,0.08)",
+      backgroundColor: withAlpha(colors.shadow, 0.08),
     },
 
     // Search — premium white card with amber inner icon (matches profile/home input cards)
@@ -118,7 +107,7 @@ export const createStyles = (theme: typeof LightTHEME) => {
       borderColor: P.border,
       borderBottomWidth: 4,
       elevation: 4,
-      shadowColor: "#000000",
+      shadowColor: colors.shadow,
       shadowOffset: { width: 0, height: 4 },
       shadowOpacity: 0.06,
       shadowRadius: 8,
@@ -135,8 +124,8 @@ export const createStyles = (theme: typeof LightTHEME) => {
     searchInput: {
       flex: 1,
       fontSize: 15,
-      fontFamily: fontFamilies.semibold,
-      color: theme.text,
+      ...fontFaces.semibold,
+      color: ui.text,
       paddingVertical: 4,
     },
     searchClearButton: {
@@ -171,7 +160,7 @@ export const createStyles = (theme: typeof LightTHEME) => {
       borderColor: P.border,
       borderBottomWidth: 4,
       elevation: 2,
-      shadowColor: "#000000",
+      shadowColor: colors.shadow,
       shadowOffset: { width: 0, height: 2 },
       shadowOpacity: 0.05,
       shadowRadius: 4,
@@ -192,7 +181,7 @@ export const createStyles = (theme: typeof LightTHEME) => {
     },
     categoryChipText: {
       fontSize: 13,
-      fontFamily: fontFamilies.heavy,
+      ...fontFaces.heavy,
       color: P.textSecondary,
       letterSpacing: 0.1,
     },
@@ -216,7 +205,7 @@ export const createStyles = (theme: typeof LightTHEME) => {
       backgroundColor: P.card,
       overflow: "hidden",
       elevation: 4,
-      shadowColor: "#000000",
+      shadowColor: colors.shadow,
       shadowOffset: { width: 0, height: 4 },
       shadowOpacity: 0.06,
       shadowRadius: 8,
@@ -244,11 +233,11 @@ export const createStyles = (theme: typeof LightTHEME) => {
       width: 30,
       height: 30,
       borderRadius: 15,
-      backgroundColor: "rgba(255,255,255,0.95)",
+      backgroundColor: ui.card,
       alignItems: "center",
       justifyContent: "center",
       elevation: 2,
-      shadowColor: "#000000",
+      shadowColor: colors.shadow,
       shadowOffset: { width: 0, height: 2 },
       shadowOpacity: 0.1,
       shadowRadius: 4,
@@ -262,7 +251,7 @@ export const createStyles = (theme: typeof LightTHEME) => {
     },
     galleryCategory: {
       fontSize: 10,
-      fontFamily: fontFamilies.heavy,
+      ...fontFaces.heavy,
       color: "#E67E22",
       letterSpacing: 0.5,
       marginBottom: 4,
@@ -270,7 +259,7 @@ export const createStyles = (theme: typeof LightTHEME) => {
     },
     galleryTitle: {
       fontSize: 15,
-      fontFamily: fontFamilies.bold,
+      ...fontFaces.bold,
       lineHeight: 20,
       color: P.text,
       marginBottom: 8,
@@ -289,7 +278,7 @@ export const createStyles = (theme: typeof LightTHEME) => {
     },
     galleryMetaText: {
       fontSize: 11,
-      fontFamily: fontFamilies.semibold,
+      ...fontFaces.semibold,
       color: P.muted,
       flexShrink: 1,
     },
@@ -304,7 +293,7 @@ export const createStyles = (theme: typeof LightTHEME) => {
     },
     postCard: {
       paddingVertical: 16,
-      backgroundColor: theme.card,
+      backgroundColor: ui.card,
     },
     postHeader: {
       flexDirection: "row",
@@ -336,7 +325,7 @@ export const createStyles = (theme: typeof LightTHEME) => {
     },
     authorName: {
       fontSize: 16,
-      fontFamily: fontFamilies.bold,
+      ...fontFaces.bold,
     },
     dotSeparator: {
       marginHorizontal: 4,
@@ -346,7 +335,7 @@ export const createStyles = (theme: typeof LightTHEME) => {
     sourceLabel: {
       fontSize: 13,
       color: "#6A82FB",
-      fontFamily: fontFamilies.bold,
+      ...fontFaces.bold,
     },
     postMeta: {
       flexDirection: "row",
@@ -356,17 +345,17 @@ export const createStyles = (theme: typeof LightTHEME) => {
     timeAgo: {
       fontSize: 13,
       color: P.faint,
-      fontFamily: fontFamilies.medium,
+      ...fontFaces.medium,
     },
     categoryLabel: {
       fontSize: 13,
       color: P.faint,
-      fontFamily: fontFamilies.medium,
+      ...fontFaces.medium,
     },
     readTimeLabel: {
       fontSize: 13,
       color: P.faint,
-      fontFamily: fontFamilies.medium,
+      ...fontFaces.medium,
     },
     moreButtonContainer: {
       position: "relative",
@@ -384,7 +373,7 @@ export const createStyles = (theme: typeof LightTHEME) => {
       paddingVertical: 8,
       minWidth: 180,
       elevation: 8,
-      shadowColor: "#000",
+      shadowColor: colors.shadow,
       shadowOffset: { width: 0, height: 4 },
       shadowOpacity: 0.15,
       shadowRadius: 12,
@@ -402,7 +391,7 @@ export const createStyles = (theme: typeof LightTHEME) => {
     },
     moreMenuText: {
       fontSize: 15,
-      fontFamily: fontFamilies.semibold,
+      ...fontFaces.semibold,
     },
     moreMenuTextDanger: {
       color: "#E53935",
@@ -418,7 +407,7 @@ export const createStyles = (theme: typeof LightTHEME) => {
     },
     postTitle: {
       fontSize: 18,
-      fontFamily: fontFamilies.bold,
+      ...fontFaces.bold,
       lineHeight: 24,
       paddingHorizontal: 20,
       marginBottom: 8,
@@ -431,7 +420,7 @@ export const createStyles = (theme: typeof LightTHEME) => {
     seeMore: {
       fontSize: 15,
       color: P.faint,
-      fontFamily: fontFamilies.bold,
+      ...fontFaces.bold,
       paddingHorizontal: 20,
       marginTop: 4,
       marginBottom: 8,
@@ -446,7 +435,7 @@ export const createStyles = (theme: typeof LightTHEME) => {
     readMoreLink: {
       fontSize: 15,
       color: "#6A82FB",
-      fontFamily: fontFamilies.bold,
+      ...fontFaces.bold,
       paddingHorizontal: 20,
       marginTop: 8,
       marginBottom: 8,
@@ -466,7 +455,7 @@ export const createStyles = (theme: typeof LightTHEME) => {
     },
     reactionLabel: {
       fontSize: 14,
-      fontFamily: fontFamilies.semibold,
+      ...fontFaces.semibold,
     },
     divider: {
       height: 1,
@@ -489,7 +478,7 @@ export const createStyles = (theme: typeof LightTHEME) => {
     },
     actionText: {
       fontSize: 14,
-      fontFamily: fontFamilies.bold,
+      ...fontFaces.bold,
     },
     commentBadge: {
       backgroundColor: "#6A82FB",
@@ -504,7 +493,7 @@ export const createStyles = (theme: typeof LightTHEME) => {
     commentBadgeText: {
       color: "#FFFFFF",
       fontSize: 11,
-      fontFamily: fontFamilies.bold,
+      ...fontFaces.bold,
     },
 
     // Reaction Button
@@ -530,7 +519,7 @@ export const createStyles = (theme: typeof LightTHEME) => {
       paddingVertical: 6,
       marginBottom: 8,
       elevation: 4,
-      shadowColor: "#000",
+      shadowColor: colors.shadow,
       shadowOffset: { width: 0, height: 2 },
       shadowOpacity: 0.1,
       shadowRadius: 8,
@@ -544,7 +533,7 @@ export const createStyles = (theme: typeof LightTHEME) => {
     },
     buttonText: {
       fontSize: 13,
-      fontFamily: fontFamilies.bold,
+      ...fontFaces.bold,
     },
 
     // Empty State — premium white card with amber accent (like profile sectionCard)
@@ -561,7 +550,7 @@ export const createStyles = (theme: typeof LightTHEME) => {
       borderColor: P.border,
       borderBottomWidth: 4,
       elevation: 3,
-      shadowColor: "#000000",
+      shadowColor: colors.shadow,
       shadowOffset: { width: 0, height: 4 },
       shadowOpacity: 0.06,
       shadowRadius: 8,
@@ -580,23 +569,23 @@ export const createStyles = (theme: typeof LightTHEME) => {
     },
     emptyBadgeText: {
       fontSize: 10,
-      fontFamily: fontFamilies.heavy,
+      ...fontFaces.heavy,
       color: "#E67E22",
       letterSpacing: 0.6,
       textTransform: "uppercase",
     },
     emptyText: {
       fontSize: 17,
-      fontFamily: fontFamilies.heavy,
+      ...fontFaces.heavy,
       marginTop: 12,
-      color: "#1F2937",
+      color: ui.text,
       textAlign: "center",
     },
     emptySubtext: {
       fontSize: 13,
-      color: "#6B7280",
+      color: ui.muted,
       marginTop: 6,
-      fontFamily: fontFamilies.medium,
+      ...fontFaces.medium,
       textAlign: "center",
       lineHeight: 18,
     },
@@ -612,7 +601,7 @@ export const createStyles = (theme: typeof LightTHEME) => {
     },
     emptyActionText: {
       fontSize: 12,
-      fontFamily: fontFamilies.heavy,
+      ...fontFaces.heavy,
       color: "#E67E22",
     },
 
@@ -621,7 +610,7 @@ export const createStyles = (theme: typeof LightTHEME) => {
       position: "absolute",
       left: 16,
       right: 16,
-      backgroundColor: "#323232",
+      backgroundColor: colors.inverseSurface,
       borderRadius: 16,
       flexDirection: "row",
       alignItems: "center",
@@ -629,7 +618,7 @@ export const createStyles = (theme: typeof LightTHEME) => {
       paddingVertical: 14,
       paddingHorizontal: 16,
       elevation: 6,
-      shadowColor: "#000",
+      shadowColor: colors.shadow,
       shadowOffset: { width: 0, height: 4 },
       shadowOpacity: 0.3,
       shadowRadius: 8,
@@ -641,8 +630,8 @@ export const createStyles = (theme: typeof LightTHEME) => {
     },
     undoSnackbarText: {
       fontSize: 15,
-      fontFamily: fontFamilies.semibold,
-      color: "#FFFFFF",
+      ...fontFaces.semibold,
+      color: colors.inverseText,
     },
     undoButton: {
       paddingVertical: 6,
@@ -650,7 +639,7 @@ export const createStyles = (theme: typeof LightTHEME) => {
     },
     undoButtonText: {
       fontSize: 14,
-      fontFamily: fontFamilies.heavy,
+      ...fontFaces.heavy,
       color: "#6A82FB",
       letterSpacing: 0.5,
     },
@@ -673,7 +662,7 @@ export const createStyles = (theme: typeof LightTHEME) => {
     },
     modalTitle: {
       fontSize: 20,
-      fontFamily: fontFamilies.heavy,
+      ...fontFaces.heavy,
       letterSpacing: -0.5,
     },
     postPreview: {
@@ -685,7 +674,7 @@ export const createStyles = (theme: typeof LightTHEME) => {
     postPreviewText: {
       fontSize: 14,
       color: P.faint,
-      fontFamily: fontFamilies.semibold,
+      ...fontFaces.semibold,
     },
     commentsList: {
       padding: 16,
@@ -740,7 +729,7 @@ export const createStyles = (theme: typeof LightTHEME) => {
     },
     commentAuthor: {
       fontSize: 14,
-      fontFamily: fontFamilies.bold,
+      ...fontFaces.bold,
       marginBottom: 2,
     },
     commentHeaderRow: {
@@ -760,7 +749,7 @@ export const createStyles = (theme: typeof LightTHEME) => {
     },
     factCheckText: {
       fontSize: 10,
-      fontFamily: fontFamilies.bold,
+      ...fontFaces.bold,
       color: "#FF9F65",
       textTransform: "uppercase",
     },
@@ -772,7 +761,7 @@ export const createStyles = (theme: typeof LightTHEME) => {
     },
     hiddenCommentTitle: {
       fontSize: 13,
-      fontFamily: fontFamilies.bold,
+      ...fontFaces.bold,
     },
     hiddenCommentReason: {
       fontSize: 13,
@@ -788,7 +777,7 @@ export const createStyles = (theme: typeof LightTHEME) => {
     aiNoticeText: {
       fontSize: 11,
       color: "#5E72E4",
-      fontFamily: fontFamilies.semibold,
+      ...fontFaces.semibold,
       fontStyle: "italic",
     },
     moderatingIndicator: {
@@ -806,7 +795,7 @@ export const createStyles = (theme: typeof LightTHEME) => {
     moderatingText: {
       fontSize: 13,
       color: "#5E72E4",
-      fontFamily: fontFamilies.semibold,
+      ...fontFaces.semibold,
     },
     cooldownIndicator: {
       flexDirection: "row",
@@ -814,7 +803,7 @@ export const createStyles = (theme: typeof LightTHEME) => {
       justifyContent: "center",
       paddingVertical: 8,
       gap: 8,
-      backgroundColor: "#FFF5ED",
+      backgroundColor: colors.warningSurface,
       borderRadius: 8,
       marginHorizontal: 16,
       marginBottom: 8,
@@ -822,7 +811,7 @@ export const createStyles = (theme: typeof LightTHEME) => {
     cooldownText: {
       fontSize: 13,
       color: "#FF9F65",
-      fontFamily: fontFamilies.semibold,
+      ...fontFaces.semibold,
     },
     commentText: {
       fontSize: 15,
@@ -833,7 +822,7 @@ export const createStyles = (theme: typeof LightTHEME) => {
       color: P.faint,
       marginTop: 4,
       marginLeft: 4,
-      fontFamily: fontFamilies.semibold,
+      ...fontFaces.semibold,
     },
     inputContainer: {
       borderTopWidth: 1,
@@ -853,7 +842,7 @@ export const createStyles = (theme: typeof LightTHEME) => {
       maxHeight: 100,
       paddingTop: 8,
       paddingBottom: 8,
-      fontFamily: fontFamilies.medium,
+      ...fontFaces.medium,
     },
     sendButton: {
       width: 36,
@@ -881,7 +870,7 @@ export const createStyles = (theme: typeof LightTHEME) => {
       padding: 12,
       marginBottom: 12,
       elevation: 2,
-      shadowColor: "#000",
+      shadowColor: colors.shadow,
       shadowOffset: { width: 0, height: 2 },
       shadowOpacity: 0.05,
       shadowRadius: 4,
@@ -898,7 +887,7 @@ export const createStyles = (theme: typeof LightTHEME) => {
     },
     itemTitle: {
       fontSize: 15,
-      fontFamily: fontFamilies.semibold,
+      ...fontFaces.semibold,
       marginBottom: 4,
     },
     itemMeta: {
@@ -928,7 +917,7 @@ export const createStyles = (theme: typeof LightTHEME) => {
     },
     sectionTitle: {
       fontSize: 14,
-      fontFamily: fontFamilies.semibold,
+      ...fontFaces.semibold,
       color: P.faint,
       marginBottom: 12,
       textTransform: "uppercase",
@@ -944,14 +933,14 @@ export const createStyles = (theme: typeof LightTHEME) => {
       gap: 12,
     },
     reasonItemSelected: {
-      backgroundColor: "rgba(255, 107, 107, 0.1)",
+      backgroundColor: colors.errorSurface,
       borderWidth: 1,
       borderColor: "#FF6B6B",
     },
     reasonText: {
       flex: 1,
       fontSize: 15,
-      fontFamily: fontFamilies.medium,
+      ...fontFaces.medium,
     },
     reasonTextSelected: {
       color: "#FF6B6B",
@@ -961,7 +950,7 @@ export const createStyles = (theme: typeof LightTHEME) => {
       height: 22,
       borderRadius: 11,
       borderWidth: 2,
-      borderColor: "#DDD",
+      borderColor: ui.border,
       alignItems: "center",
       justifyContent: "center",
     },
@@ -976,7 +965,7 @@ export const createStyles = (theme: typeof LightTHEME) => {
     },
     additionalLabel: {
       fontSize: 14,
-      fontFamily: fontFamilies.semibold,
+      ...fontFaces.semibold,
       marginTop: 16,
       marginBottom: 8,
     },
@@ -1005,7 +994,7 @@ export const createStyles = (theme: typeof LightTHEME) => {
     },
     submitButtonText: {
       fontSize: 16,
-      fontFamily: fontFamilies.bold,
+      ...fontFaces.bold,
       color: "#FFFFFF",
     },
     submitButtonTextDisabled: {
@@ -1025,7 +1014,7 @@ export const createStyles = (theme: typeof LightTHEME) => {
       borderColor: P.border,
       borderBottomWidth: 4,
       elevation: 3,
-      shadowColor: "#000000",
+      shadowColor: colors.shadow,
       shadowOffset: { width: 0, height: 4 },
       shadowOpacity: 0.06,
       shadowRadius: 8,
@@ -1045,17 +1034,17 @@ export const createStyles = (theme: typeof LightTHEME) => {
     },
     footerTitle: {
       fontSize: 16,
-      fontFamily: fontFamilies.heavy,
+      ...fontFaces.heavy,
       marginBottom: 6,
       textAlign: "center",
-      color: "#1F2937",
+      color: ui.text,
     },
     footerSubtext: {
       fontSize: 13,
       textAlign: "center",
       lineHeight: 19,
-      color: "#6B7280",
-      fontFamily: fontFamilies.medium,
+      color: ui.muted,
+      ...fontFaces.medium,
     },
     footerDivider: {
       width: 36,
@@ -1068,7 +1057,7 @@ export const createStyles = (theme: typeof LightTHEME) => {
     // Comment Guidelines Modal
     guidelinesOverlay: {
       flex: 1,
-      backgroundColor: "rgba(0, 0, 0, 0.6)",
+      backgroundColor: colors.overlay,
       justifyContent: "center",
       alignItems: "center",
       padding: 20,
@@ -1079,7 +1068,7 @@ export const createStyles = (theme: typeof LightTHEME) => {
       borderRadius: 24,
       padding: 24,
       maxHeight: "80%",
-      shadowColor: "#000",
+      shadowColor: colors.shadow,
       shadowOffset: { width: 0, height: 4 },
       shadowOpacity: 0.3,
       shadowRadius: 8,
@@ -1091,7 +1080,7 @@ export const createStyles = (theme: typeof LightTHEME) => {
     },
     guidelinesTitle: {
       fontSize: 22,
-      fontFamily: fontFamilies.bold,
+      ...fontFaces.bold,
       marginTop: 12,
       textAlign: "center",
     },
@@ -1115,7 +1104,7 @@ export const createStyles = (theme: typeof LightTHEME) => {
       lineHeight: 22,
     },
     guidelineBold: {
-      fontFamily: fontFamilies.bold,
+      ...fontFaces.bold,
     },
     guidelinesButton: {
       backgroundColor: "#5E72E4",
@@ -1127,7 +1116,7 @@ export const createStyles = (theme: typeof LightTHEME) => {
     guidelinesButtonText: {
       color: "#FFFFFF",
       fontSize: 16,
-      fontFamily: fontFamilies.bold,
+      ...fontFaces.bold,
     },
   });
 };

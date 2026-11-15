@@ -1,13 +1,16 @@
 import { Icon } from "@/components/ui/icon";
+import { ElementChip } from "@/components/periodic-table/ElementChip";
+import { findElementsForTerms } from "@/services/periodic-table";
 import { getEncyclopediaEntryById } from "@/content/explorer";
 import type { EncyclopediaEntry } from "@/content/explorer";
 import { getEncyclopediaImage } from "@/content/explorer/images";
-import { useTheme, fontFamilies, useResponsiveLayout } from "@/theme";
+import { useTheme, type Theme, fontFaces, useResponsiveLayout } from "@/theme";
 import { openExternalUrl } from "@/services/open-url";
 import { impactLight, impactMedium } from "@/services/haptics";
 import { LinearGradient } from "expo-linear-gradient";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { speakSafely, stopSpeech } from "@/services/speech";
+import { ReadAloudButton } from "@/components/ui/read-aloud-button";
+import { readAloud } from "@/services/media";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Alert, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import Animated, { FadeInDown, ZoomIn } from "react-native-reanimated";
@@ -17,39 +20,18 @@ const ENTRY_IMAGE_MAX_HEIGHT = 320;
 
 const AMBER = "#FFCA5F";
 const AMBER_DEEP = "#FF8C00";
-const CREAM_TOP = "#FFF3E0";
-const CREAM_BOTTOM = "#FFFFFF";
-const CARD_WHITE = "#FFFFFF";
-
-const CATEGORY_COLORS: Record<string, { bg: string; border: string; icon: string; gradient: readonly [string, string] }> = {
-  radiation: { bg: "#FEF3C7", border: "#F59E0B", icon: "☢️", gradient: ["#F59E0B", "#D97706"] as const },
-  nuclear: { bg: "#DBEAFE", border: "#3B82F6", icon: "⚛️", gradient: ["#3B82F6", "#2563EB"] as const },
-  safety: { bg: "#D1FAE5", border: "#10B981", icon: "🛡️", gradient: ["#10B981", "#059669"] as const },
-  physics: { bg: "#EDE9FE", border: "#8B5CF6", icon: "🔬", gradient: ["#8B5CF6", "#7C3AED"] as const },
-  science: { bg: "#EDE9FE", border: "#8B5CF6", icon: "🔬", gradient: ["#8B5CF6", "#7C3AED"] as const },
-  energy: { bg: "#FEE2E2", border: "#EF4444", icon: "⚡", gradient: ["#EF4444", "#DC2626"] as const },
-  medicine: { bg: "#FCE7F3", border: "#EC4899", icon: "💊", gradient: ["#EC4899", "#DB2777"] as const },
-  environment: { bg: "#ECFDF5", border: "#059669", icon: "🌿", gradient: ["#059669", "#047857"] as const },
-  history: { bg: "#FEF9C3", border: "#CA8A04", icon: "📜", gradient: ["#CA8A04", "#A16207"] as const },
-  technology: { bg: "#E0E7FF", border: "#6366F1", icon: "🔧", gradient: ["#6366F1", "#4F46E5"] as const },
-  people: { bg: "#FEF3C7", border: "#F59E0B", icon: "🧑‍🔬", gradient: ["#F59E0B", "#D97706"] as const },
-  default: { bg: "#F3F4F6", border: "#6B7280", icon: "📖", gradient: ["#6B7280", "#4B5563"] as const },
-};
 
 export default function EncyclopediaEntryScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { contentMaxWidth, gutter, contentWidth } = useResponsiveLayout();
-  const { theme, isDark } = useTheme();
+  const { theme } = useTheme();
   const { id } = useLocalSearchParams<{ id: string }>();
   const ENTRY_IMAGE_MAX_WIDTH = Math.max(0, contentWidth - 16);
-  const [isSpeaking, setIsSpeaking] = useState(false);
-  const [speakingSection, setSpeakingSection] = useState<string | null>(null);
 
-  const THEME = theme.palettes.entry;
-  const bgTop = isDark ? THEME.bg : CREAM_TOP;
-  const bgBottom = isDark ? THEME.bg : CREAM_BOTTOM;
-  const styles = useMemo(() => createStyles(isDark), [isDark]);
+  const bgTop = theme.colors.pageGradientTop;
+  const bgBottom = theme.colors.pageGradientBottom;
+  const styles = useMemo(() => createStyles(theme), [theme]);
 
   const [entry, setEntry] = useState<EncyclopediaEntry | null>(null);
   const [entryLoaded, setEntryLoaded] = useState(false);
@@ -92,80 +74,25 @@ export default function EncyclopediaEntryScreen() {
     return { width: Math.round(displayWidth), height: Math.round(displayHeight) };
   }, [entryImageSource, ENTRY_IMAGE_MAX_WIDTH]);
 
-  const getCategoryStyle = (category: string) => {
-    const key = category?.toLowerCase() || "default";
-    return CATEGORY_COLORS[key] || CATEGORY_COLORS["default"];
-  };
-
-  useEffect(() => {
-    return () => {
-      stopSpeech();
-    };
-  }, []);
-
-  const speakText = useCallback(
-    (text: string, section: string) => {
-      impactLight();
-      if (isSpeaking && speakingSection === section) {
-        stopSpeech();
-        setIsSpeaking(false);
-        setSpeakingSection(null);
-      } else {
-        stopSpeech();
-        setIsSpeaking(true);
-        setSpeakingSection(section);
-        speakSafely(text, {
-          language: "en",
-          rate: 0.85,
-          pitch: 1.0,
-          onDone: () => {
-            setIsSpeaking(false);
-            setSpeakingSection(null);
-          },
-          onStopped: () => {
-            setIsSpeaking(false);
-            setSpeakingSection(null);
-          },
-        });
-      }
-    },
-    [isSpeaking, speakingSection]
-  );
-
   const openSourceLink = useCallback(async (url: string) => {
     impactLight();
     const opened = await openExternalUrl(url);
     if (!opened) Alert.alert("Unable to open link", "Please try again in a moment.");
   }, []);
 
-  const speakAll = useCallback(() => {
-    if (!entry) return;
-    impactMedium();
-    if (isSpeaking) {
-      stopSpeech();
-      setIsSpeaking(false);
-      setSpeakingSection(null);
-    } else {
-      setIsSpeaking(true);
-      setSpeakingSection("all");
-      let fullText = `${entry.term}. ${entry.definition}`;
-      if (entry.quickFacts && entry.quickFacts.length > 0) fullText += ` Quick facts: ${entry.quickFacts.join(". ")}`;
-      if (entry.debunkingSnippet) fullText += ` Myth debunking: ${entry.debunkingSnippet}`;
-      speakSafely(fullText, {
-        language: "en",
-        rate: 0.85,
-        pitch: 1.0,
-        onDone: () => {
-          setIsSpeaking(false);
-          setSpeakingSection(null);
-        },
-        onStopped: () => {
-          setIsSpeaking(false);
-          setSpeakingSection(null);
-        },
-      });
-    }
-  }, [entry, isSpeaking]);
+  // Periodic-table links: cheap first-word lookups on the term and related ids.
+  const elementLinks = useMemo(
+    () => (entry ? findElementsForTerms([entry.term, ...(entry.relatedTerms ?? [])]) : []),
+    [entry],
+  );
+
+  const getFullEntrySpeech = useCallback(() => {
+    if (!entry) return "";
+    let fullText = `${entry.term}. ${entry.definition}`;
+    if (entry.quickFacts && entry.quickFacts.length > 0) fullText += ` Quick facts: ${entry.quickFacts.join(". ")}`;
+    if (entry.debunkingSnippet) fullText += ` Myth debunking: ${entry.debunkingSnippet}`;
+    return fullText;
+  }, [entry]);
 
   if (!entry) {
     return (
@@ -215,16 +142,14 @@ export default function EncyclopediaEntryScreen() {
                 {entry.term}
               </Text>
             </View>
-            <TouchableOpacity
-              style={[styles.speakAllBtn, isSpeaking && speakingSection === "all" && styles.speakAllActive]}
-              onPress={speakAll}
-              activeOpacity={0.9}
-              hitSlop={5}
-              accessibilityRole="button"
-              accessibilityLabel={isSpeaking && speakingSection === "all" ? "Stop reading entry" : "Read entry aloud"}
-            >
-              <Icon name={isSpeaking && speakingSection === "all" ? "VolumeSlash" : "VolumeHigh"} size={18} color={isSpeaking && speakingSection === "all" ? "#FFFFFF" : "#7C4A00"} variant="Bold" />
-            </TouchableOpacity>
+            <ReadAloudButton
+              ownerId={`encyclopedia-entry:${entry.id}:all`}
+              subject="entry"
+              size={38}
+              accent={AMBER_DEEP}
+              onStart={impactMedium}
+              text={getFullEntrySpeech}
+            />
           </View>
         </View>
       </View>
@@ -253,15 +178,14 @@ export default function EncyclopediaEntryScreen() {
         <Animated.View entering={FadeInDown.delay(160).springify()} style={styles.card}>
           <View style={styles.cardHeader}>
             <Text style={styles.cardTitle}>Definition</Text>
-            <TouchableOpacity
-              style={[styles.ttsBtn, speakingSection === "definition" && styles.ttsActive]}
-              onPress={() => speakText(entry.definition, "definition")}
-              hitSlop={8}
-              accessibilityRole="button"
-              accessibilityLabel={speakingSection === "definition" ? "Stop reading definition" : "Read definition aloud"}
-            >
-              <Icon name={speakingSection === "definition" ? "VolumeSlash" : "VolumeHigh"} size={16} color={speakingSection === "definition" ? "#FFFFFF" : "#7C4A00"} variant="Bold" />
-            </TouchableOpacity>
+            <ReadAloudButton
+              ownerId={`encyclopedia-entry:${entry.id}:definition`}
+              subject="definition"
+              size={34}
+              accent={AMBER_DEEP}
+              onStart={impactLight}
+              text={entry.definition}
+            />
           </View>
           <View style={styles.divider} />
           <Text style={styles.definition}>{entry.definition}</Text>
@@ -272,15 +196,14 @@ export default function EncyclopediaEntryScreen() {
           <Animated.View entering={FadeInDown.delay(220).springify()} style={styles.card}>
             <View style={styles.cardHeader}>
               <Text style={styles.cardTitle}>Quick Facts</Text>
-              <TouchableOpacity
-                style={[styles.ttsBtn, speakingSection === "facts" && styles.ttsActive]}
-                onPress={() => speakText(`Quick facts about ${entry.term}: ${entry.quickFacts.join(". ")}`, "facts")}
-                hitSlop={8}
-                accessibilityRole="button"
-                accessibilityLabel={speakingSection === "facts" ? "Stop reading quick facts" : "Read quick facts aloud"}
-              >
-                <Icon name={speakingSection === "facts" ? "VolumeSlash" : "VolumeHigh"} size={16} color={speakingSection === "facts" ? "#FFFFFF" : "#7C4A00"} variant="Bold" />
-              </TouchableOpacity>
+              <ReadAloudButton
+                ownerId={`encyclopedia-entry:${entry.id}:facts`}
+                subject="quick facts"
+                size={34}
+                accent={AMBER_DEEP}
+                onStart={impactLight}
+                text={() => `Quick facts about ${entry.term}: ${entry.quickFacts.join(". ")}`}
+              />
             </View>
             <View style={styles.divider} />
             {entry.quickFacts.map((fact, index) => (
@@ -300,18 +223,32 @@ export default function EncyclopediaEntryScreen() {
             <LinearGradient colors={["#EF4444", "#DC2626"]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.mythGradient}>
               <View style={styles.mythHeader}>
                 <Text style={styles.mythTitle}>Myth Busted!</Text>
-                <TouchableOpacity
-                  style={[styles.mythTts, speakingSection === "myth" && styles.mythTtsActive]}
-                  onPress={() => speakText(`Myth busting: ${entry.debunkingSnippet}`, "myth")}
-                  hitSlop={8}
-                  accessibilityRole="button"
-                  accessibilityLabel={speakingSection === "myth" ? "Stop reading myth debunking" : "Read myth debunking aloud"}
-                >
-                  <Icon name={speakingSection === "myth" ? "VolumeSlash" : "VolumeHigh"} size={16} color="#FFFFFF" variant="Bold" />
-                </TouchableOpacity>
+                <ReadAloudButton
+                  ownerId={`encyclopedia-entry:${entry.id}:myth`}
+                  subject="myth debunking"
+                  size={34}
+                  accent={theme.colors.error}
+                  onStart={impactLight}
+                  text={() => `Myth busting: ${entry.debunkingSnippet}`}
+                />
               </View>
               <Text style={styles.mythText}>{entry.debunkingSnippet}</Text>
             </LinearGradient>
+          </Animated.View>
+        )}
+
+        {/* Periodic table elements mentioned by this entry */}
+        {elementLinks.length > 0 && (
+          <Animated.View entering={FadeInDown.delay(320).springify()} style={styles.card}>
+            <View style={styles.cardHeader}>
+              <Text style={styles.cardTitle}>In the Periodic Table</Text>
+            </View>
+            <View style={styles.divider} />
+            <View style={styles.pillsWrap}>
+              {elementLinks.map((el) => (
+                <ElementChip key={el.symbol} symbol={el.symbol} />
+              ))}
+            </View>
           </Animated.View>
         )}
 
@@ -328,7 +265,7 @@ export default function EncyclopediaEntryScreen() {
                   <TouchableOpacity
                     style={styles.pill}
                     onPress={() => {
-                      stopSpeech();
+                      readAloud.stop("route-change");
                       router.replace(`/explorer/encyclopedia-entry?id=${term}`);
                     }}
                     activeOpacity={0.88}
@@ -379,25 +316,26 @@ export default function EncyclopediaEntryScreen() {
   );
 }
 
-const createStyles = (isDark: boolean) =>
-  StyleSheet.create({
+const createStyles = (theme: Theme) => {
+  const c = theme.colors;
+  return StyleSheet.create({
     container: { flex: 1 },
     notFoundWrap: { flex: 1, alignItems: "center", justifyContent: "center", padding: 24 },
     notFoundCard: {
-      backgroundColor: CARD_WHITE,
+      backgroundColor: c.card,
       borderRadius: 22,
       padding: 24,
       alignItems: "center",
       borderWidth: 2,
-      borderColor: "#F5F5F4",
+      borderColor: c.borderSubtle,
       borderBottomWidth: 4,
       width: "100%",
       maxWidth: 320,
     },
     notFoundEmoji: { fontSize: 48, marginBottom: 12 },
-    notFoundText: { fontSize: 16, fontFamily: fontFamilies.heavy, color: "#44403C", marginBottom: 16 },
+    notFoundText: { fontSize: 16, ...fontFaces.heavy, color: c.text, marginBottom: 16 },
     notFoundButton: { backgroundColor: AMBER_DEEP, paddingHorizontal: 18, paddingVertical: 10, borderRadius: 14, borderWidth: 2, borderColor: "#E67E22", borderBottomWidth: 4 },
-    notFoundButtonText: { color: CARD_WHITE, fontFamily: fontFamilies.heavy, fontSize: 13 },
+    notFoundButtonText: { color: c.onPrimary, ...fontFaces.heavy, fontSize: 13 },
     headerWrap: { paddingHorizontal: 16, paddingBottom: 10, zIndex: 10 },
     headerBar: {
       backgroundColor: AMBER,
@@ -405,10 +343,10 @@ const createStyles = (isDark: boolean) =>
       padding: 12,
       gap: 10,
       borderWidth: 2,
-      borderColor: "rgba(124,74,0,0.08)",
+      borderColor: c.creamBorder,
       borderBottomWidth: 4,
       elevation: 6,
-      shadowColor: "#000",
+      shadowColor: c.shadow,
       shadowOffset: { width: 0, height: 4 },
       shadowOpacity: 0.12,
       shadowRadius: 10,
@@ -418,7 +356,7 @@ const createStyles = (isDark: boolean) =>
       width: 38,
       height: 38,
       borderRadius: 19,
-      backgroundColor: CARD_WHITE,
+      backgroundColor: c.card,
       alignItems: "center",
       justifyContent: "center",
       borderWidth: 2,
@@ -426,18 +364,18 @@ const createStyles = (isDark: boolean) =>
       borderBottomWidth: 4,
     },
     headerCopy: { flex: 1, gap: 6 },
-    headerTitle: { fontSize: 18, fontFamily: fontFamilies.heavy, color: "#7C4A00", letterSpacing: -0.3 },
+    headerTitle: { fontSize: 18, ...fontFaces.heavy, color: "#7C4A00", letterSpacing: -0.3 },
     headerSubRow: { flexDirection: "row", gap: 8, alignItems: "center", flexWrap: "wrap" },
     catPill: { flexDirection: "row", alignItems: "center", gap: 4, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 10 },
     catEmoji: { fontSize: 11 },
-    catText: { fontSize: 11, fontFamily: fontFamilies.heavy, textTransform: "uppercase" },
-    diffPill: { backgroundColor: CARD_WHITE, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 10, borderWidth: 1, borderColor: "#FDE68A" },
-    diffText: { fontSize: 11, fontFamily: fontFamilies.heavy, color: "#7C4A00", textTransform: "uppercase" },
+    catText: { fontSize: 11, ...fontFaces.heavy, textTransform: "uppercase" },
+    diffPill: { backgroundColor: c.card, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 10, borderWidth: 1, borderColor: "#FDE68A" },
+    diffText: { fontSize: 11, ...fontFaces.heavy, color: "#7C4A00", textTransform: "uppercase" },
     speakAllBtn: {
       width: 38,
       height: 38,
       borderRadius: 19,
-      backgroundColor: CARD_WHITE,
+      backgroundColor: c.card,
       alignItems: "center",
       justifyContent: "center",
       borderWidth: 2,
@@ -447,11 +385,11 @@ const createStyles = (isDark: boolean) =>
     speakAllActive: { backgroundColor: AMBER_DEEP, borderColor: "#E67E22" },
     scrollContent: { paddingHorizontal: 16, paddingTop: 14, paddingBottom: 24, gap: 12 },
     heroCard: {
-      backgroundColor: CARD_WHITE,
+      backgroundColor: c.card,
       borderRadius: 20,
       padding: 14,
       borderWidth: 2,
-      borderColor: "#F5F5F4",
+      borderColor: c.borderSubtle,
       borderBottomWidth: 4,
       flexDirection: "row",
       gap: 12,
@@ -459,15 +397,15 @@ const createStyles = (isDark: boolean) =>
     },
     heroRow: { flexDirection: "row", gap: 12, alignItems: "center", flex: 1 },
     letterAvatar: { width: 48, height: 48, borderRadius: 14, alignItems: "center", justifyContent: "center", borderWidth: 2 },
-    letterText: { fontSize: 20, fontFamily: fontFamilies.heavy },
+    letterText: { fontSize: 20, ...fontFaces.heavy },
     heroText: { flex: 1, gap: 4 },
-    heroTerm: { fontSize: 18, fontFamily: fontFamilies.heavy, color: "#1C1917" },
-    heroDef: { fontSize: 13, fontFamily: fontFamilies.medium, color: "#78716C", lineHeight: 18 },
+    heroTerm: { fontSize: 18, ...fontFaces.heavy, color: c.text },
+    heroDef: { fontSize: 13, ...fontFaces.medium, color: c.textMuted, lineHeight: 18 },
     imageCard: {
-      backgroundColor: CARD_WHITE,
+      backgroundColor: c.card,
       borderRadius: 20,
       borderWidth: 2,
-      borderColor: "#F5F5F4",
+      borderColor: c.borderSubtle,
       borderBottomWidth: 4,
       overflow: "hidden",
       padding: 8,
@@ -475,11 +413,11 @@ const createStyles = (isDark: boolean) =>
     },
     entryImage: { borderRadius: 14 },
     card: {
-      backgroundColor: CARD_WHITE,
+      backgroundColor: c.card,
       borderRadius: 20,
       padding: 14,
       borderWidth: 2,
-      borderColor: "#F5F5F4",
+      borderColor: c.borderSubtle,
       borderBottomWidth: 4,
       gap: 10,
     },
@@ -487,51 +425,52 @@ const createStyles = (isDark: boolean) =>
     cardTitleRow: { flexDirection: "row", alignItems: "center", gap: 8 },
     cardIcon: { width: 32, height: 32, borderRadius: 10, alignItems: "center", justifyContent: "center" },
     cardIconEmoji: { fontSize: 16 },
-    cardTitle: { fontSize: 15, fontFamily: fontFamilies.heavy, color: "#1C1917" },
+    cardTitle: { fontSize: 15, ...fontFaces.heavy, color: c.text },
     ttsBtn: {
       width: 32,
       height: 32,
       borderRadius: 16,
-      backgroundColor: "#F5F5F4",
+      backgroundColor: c.surfaceSoft,
       alignItems: "center",
       justifyContent: "center",
       borderWidth: 1,
-      borderColor: "#E7E5E4",
+      borderColor: c.border,
     },
     ttsActive: { backgroundColor: AMBER_DEEP, borderColor: "#E67E22" },
-    divider: { height: 1, backgroundColor: "#F5F5F4", borderRadius: 1 },
-    definition: { fontSize: 14, fontFamily: fontFamilies.medium, color: "#1C1917", lineHeight: 22 },
+    divider: { height: 1, backgroundColor: c.borderSubtle, borderRadius: 1 },
+    definition: { fontSize: 14, ...fontFaces.medium, color: c.text, lineHeight: 22 },
     factRow: { flexDirection: "row", gap: 10, alignItems: "flex-start", paddingVertical: 6 },
     factNum: { width: 28, height: 28, borderRadius: 14, backgroundColor: AMBER, alignItems: "center", justifyContent: "center", borderWidth: 1, borderColor: "#FDE68A" },
-    factNumText: { fontSize: 12, fontFamily: fontFamilies.heavy, color: "#7C4A00" },
-    factText: { flex: 1, fontSize: 13, fontFamily: fontFamilies.medium, color: "#1C1917", lineHeight: 19 },
+    factNumText: { fontSize: 12, ...fontFaces.heavy, color: "#7C4A00" },
+    factText: { flex: 1, fontSize: 13, ...fontFaces.medium, color: c.text, lineHeight: 19 },
     mythCard: { borderRadius: 20, overflow: "hidden", borderWidth: 2, borderColor: "#FECACA", borderBottomWidth: 4 },
     mythGradient: { padding: 14, gap: 10 },
     mythHeader: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
     mythTitleRow: { flexDirection: "row", alignItems: "center", gap: 8 },
-    mythIconWrap: { width: 32, height: 32, borderRadius: 10, backgroundColor: "rgba(255,255,255,0.22)", alignItems: "center", justifyContent: "center", borderWidth: 1, borderColor: "rgba(255,255,255,0.3)" },
+    mythIconWrap: { width: 32, height: 32, borderRadius: 10, backgroundColor: "rgba(255,255,255,0.22)", alignItems: "center", justifyContent: "center", borderWidth: 1, borderColor: "rgba(255,255,255,0.3)" }, // theme-allow: inverse overlay on myth gradient
     mythIcon: { fontSize: 16 },
-    mythTitle: { fontSize: 15, fontFamily: fontFamilies.heavy, color: "#FFFFFF" },
-    mythTts: { width: 32, height: 32, borderRadius: 16, backgroundColor: "rgba(255,255,255,0.18)", alignItems: "center", justifyContent: "center", borderWidth: 1, borderColor: "rgba(255,255,255,0.3)" },
-    mythTtsActive: { backgroundColor: "rgba(0,0,0,0.18)" },
-    mythText: { fontSize: 13, fontFamily: fontFamilies.medium, color: "#FFFFFF", lineHeight: 20 },
+    mythTitle: { fontSize: 15, ...fontFaces.heavy, color: "#FFFFFF" },
+    mythTts: { width: 32, height: 32, borderRadius: 16, backgroundColor: "rgba(255,255,255,0.18)", alignItems: "center", justifyContent: "center", borderWidth: 1, borderColor: "rgba(255,255,255,0.3)" }, // theme-allow: inverse overlay on myth gradient
+    mythTtsActive: { backgroundColor: "rgba(0,0,0,0.18)" }, // theme-allow: pressed tint on myth gradient
+    mythText: { fontSize: 13, ...fontFaces.medium, color: "#FFFFFF", lineHeight: 20 },
     pillsWrap: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
     pill: {
       flexDirection: "row",
       alignItems: "center",
       gap: 6,
-      backgroundColor: "#F5F5F4",
+      backgroundColor: c.surfaceSoft,
       paddingHorizontal: 12,
       paddingVertical: 8,
       borderRadius: 12,
       borderWidth: 1,
-      borderColor: "#E7E5E4",
+      borderColor: c.border,
     },
-    pillText: { fontSize: 12, fontFamily: fontFamilies.heavy, color: "#57534E", textTransform: "capitalize" },
-    sourceRow: { gap: 6, paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: "#F5F5F4" },
+    pillText: { fontSize: 12, ...fontFaces.heavy, color: c.textSecondary, textTransform: "capitalize" },
+    sourceRow: { gap: 6, paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: c.borderSubtle },
     sourceOrg: { alignSelf: "flex-start", backgroundColor: AMBER, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 8, borderWidth: 1, borderColor: "#FDE68A" },
-    sourceOrgText: { fontSize: 11, fontFamily: fontFamilies.heavy, color: "#7C4A00" },
-    sourceTitle: { fontSize: 13, fontFamily: fontFamilies.heavy, color: "#1C1917" },
+    sourceOrgText: { fontSize: 11, ...fontFaces.heavy, color: "#7C4A00" },
+    sourceTitle: { fontSize: 13, ...fontFaces.heavy, color: c.text },
     sourceUrlRow: { flexDirection: "row", alignItems: "center", gap: 6 },
-    sourceUrl: { flex: 1, fontSize: 12, fontFamily: fontFamilies.medium, color: "#7C4A00" },
+    sourceUrl: { flex: 1, fontSize: 12, ...fontFaces.medium, color: "#7C4A00" },
   });
+};

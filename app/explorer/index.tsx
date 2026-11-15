@@ -9,7 +9,7 @@ import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'rea
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import {useTheme, withAlpha, type Palette, fontFamilies, useResponsiveLayout} from "@/theme";
+import {useTheme, withAlpha, type Palette, fontFaces, useResponsiveLayout} from "@/theme";
 
 export default function ExplorerScreen() {
   const router = useRouter();
@@ -169,7 +169,7 @@ const makeStyles = (THEME: Palette) => StyleSheet.create({
   },
   journeyTitle: {
     fontSize: 20,
-    fontFamily: fontFamilies.heavy,
+    ...fontFaces.heavy,
     color: THEME.text,
     marginBottom: 4,
     lineHeight: 26,
@@ -177,7 +177,7 @@ const makeStyles = (THEME: Palette) => StyleSheet.create({
   journeySubtitle: {
     fontSize: 14,
     color: THEME.textMuted,
-    fontFamily: fontFamilies.semibold,
+    ...fontFaces.semibold,
   },
   journeyBadge: {
     paddingHorizontal: 10,
@@ -188,13 +188,13 @@ const makeStyles = (THEME: Palette) => StyleSheet.create({
   },
   journeyBadgeText: {
     fontSize: 11,
-    fontFamily: fontFamilies.bold,
+    ...fontFaces.bold,
     color: THEME.primary,
     textTransform: 'uppercase',
   },
   journeyDescription: {
     fontSize: 14,
-    fontFamily: fontFamilies.regular,
+    ...fontFaces.regular,
     color: THEME.text,
     lineHeight: 20,
     marginBottom: 16,
@@ -216,11 +216,11 @@ const makeStyles = (THEME: Palette) => StyleSheet.create({
   metaText: {
     fontSize: 12,
     color: THEME.textMuted,
-    fontFamily: fontFamilies.semibold,
+    ...fontFaces.semibold,
   },
   metaDot: {
     fontSize: 12,
-    fontFamily: fontFamilies.regular,
+    ...fontFaces.regular,
     color: THEME.border,
   },
   journeyFooter: {
@@ -240,7 +240,7 @@ const makeStyles = (THEME: Palette) => StyleSheet.create({
   },
   tagText: {
     fontSize: 11,
-    fontFamily: fontFamilies.semibold,
+    ...fontFaces.semibold,
     color: THEME.textMuted,
     textTransform: 'capitalize',
   },

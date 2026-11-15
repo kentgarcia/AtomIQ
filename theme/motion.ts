@@ -9,5 +9,11 @@ export const DURATION = {
   medium: 260,
   modal: 250,
   flip: 400,
+  /** Incoming content when a flow advances (lesson steps). */
+  step: 350,
+  /** Travelling indicators (tab marker, segment thumb) and sheets. */
+  sheet: 400,
+  /** Something that becomes a full screen. */
+  expand: 500,
 } as const;
 export const SPRING = { damping: 18, stiffness: 220 } as const;

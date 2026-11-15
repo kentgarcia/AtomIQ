@@ -1,9 +1,10 @@
-import { fontFamilies, useTheme, useResponsiveLayout } from "@/theme";
+import { fontFaces, useTheme, useResponsiveLayout, type Theme } from "@/theme";
 import { DURATION, PRESS_EASING } from "@/theme/motion";
 import { Icon } from "@/components/ui/icon";
+import { recordActivity } from "@/services/activity-log";
 import { LinearGradient } from "expo-linear-gradient";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import {
   impactLight,
@@ -25,23 +26,44 @@ import Svg, { Circle, Path } from "react-native-svg";
 // ==================================================================
 // Shared palette (autumn / amber — matches Profile & home surfaces)
 // ==================================================================
-const C = {
+const BRAND = {
   amberOuter: "#FFCA5F",
   amber: "#FF8C00",
   amberDark: "#E67E22",
-  cream: "#FFF3E0",
-  white: "#FFFFFF",
-  ink: "#333333",
-  inkSoft: "#666666",
-  muted: "#9CA3AF",
   success: "#2ECC71",
   successDark: "#10B981",
   danger: "#FF6B6B",
   dangerDark: "#EF4444",
   info: "#1CB0F6",
-  border: "#E5E7EB",
-  onAmber: "#434343",
 };
+
+const makePalette = (theme: Theme) => {
+  const c = theme.colors;
+  return {
+    ...BRAND,
+    cream: c.creamTint,
+    white: c.card,
+    ink: c.text,
+    inkSoft: c.textSecondary,
+    muted: c.textMuted,
+    border: c.border,
+    onAmber: c.inverseSurface,
+    onInverse: c.inverseText,
+    onAccent: c.onPrimary,
+    soft: c.surfaceSoft,
+    shadow: c.shadow,
+    warningSurface: c.warningSurface,
+    warningBorder: c.warning,
+  };
+};
+
+/** Resolve the lab palette and styles against the active theme. */
+function useLabStyles() {
+  const { theme } = useTheme();
+  const C = useMemo(() => makePalette(theme), [theme]);
+  const styles = useMemo(() => makeStyles(theme), [theme]);
+  return { C, styles };
+}
 
 // ==================================================================
 // Reusable building blocks
@@ -53,6 +75,7 @@ function LabHeader({
   title: string;
   onBack: () => void;
 }) {
+  const { C, styles } = useLabStyles();
   const pressed = useSharedValue(0);
   const pressStyle = useAnimatedStyle(() => ({
     transform: [{ scale: 1 - pressed.value * 0.06 }],
@@ -77,11 +100,11 @@ function LabHeader({
             onBack();
           }}
         >
-          <Icon name="ArrowLeft2" size={20} color="#555555" variant="Bold" />
+          <Icon name="ArrowLeft2" size={20} color={C.inkSoft} variant="Bold" />
         </TouchableOpacity>
       </Animated.View>
       <View style={styles.titlePill}>
-        <Icon name="Atom" size={14} color={C.white} variant="Bold" />
+        <Icon name="Atom" size={14} color={C.onInverse} variant="Bold" />
         <Text style={styles.titlePillText}>{title}</Text>
       </View>
       <View style={{ width: 40 }} />
@@ -93,7 +116,7 @@ function SelectPill({
   label,
   active,
   onPress,
-  color = C.amber,
+  color = BRAND.amber,
   emoji,
 }: {
   label: string;
@@ -102,6 +125,7 @@ function SelectPill({
   color?: string;
   emoji?: string;
 }) {
+  const { styles } = useLabStyles();
   return (
     <TouchableOpacity
       style={[styles.pill, active && { backgroundColor: color, borderColor: color }]}
@@ -130,6 +154,7 @@ function PrimaryButton({
   label: string;
   onPress: () => void;
 }) {
+  const { styles } = useLabStyles();
   const pressed = useSharedValue(0);
   const pressStyle = useAnimatedStyle(() => ({
     transform: [{ scale: 1 - pressed.value * 0.03 }],
@@ -162,7 +187,7 @@ function Stepper({
   onInc,
   min = 0,
   max = 30,
-  accent = C.amber,
+  accent = BRAND.amber,
 }: {
   value: number;
   onDec: () => void;
@@ -171,6 +196,7 @@ function Stepper({
   max?: number;
   accent?: string;
 }) {
+  const { styles } = useLabStyles();
   const decDisabled = value <= min;
   const incDisabled = value >= max;
   const btn = (disabled: boolean, symbol: string, handler: () => void) => (
@@ -221,6 +247,7 @@ function SliderRow({
   onValueChange: (v: number) => void;
   display: string;
 }) {
+  const { styles } = useLabStyles();
   const pct = max > min ? ((value - min) / (max - min)) * 100 : 0;
   const dec = () => onValueChange(Math.max(min, Math.round(value - step)));
   const inc = () => onValueChange(Math.min(max, Math.round(value + step)));
@@ -283,6 +310,7 @@ function ResultCard({
   children?: React.ReactNode;
   actions: { label: string; onPress: () => void; primary?: boolean }[];
 }) {
+  const { C, styles } = useLabStyles();
   const reducedMotion = useReducedMotion();
   return (
     <Animated.View
@@ -323,9 +351,10 @@ function ResultCard({
 }
 
 function HintBox({ text }: { text: string }) {
+  const { C, styles } = useLabStyles();
   return (
     <View style={styles.hintBox}>
-      <Icon name="Bulb" size={16} color={C.amberDark} variant="Bold" />
+      <Icon name="LampOn" size={16} color={C.amberDark} variant="Bold" />
       <Text style={styles.hintText}>{text}</Text>
     </View>
   );
@@ -364,9 +393,9 @@ function RadiationShieldLab({ onBack }: { onBack: () => void }) {
   const { contentMaxWidth, gutter } = useResponsiveLayout();
   const reducedMotion = useReducedMotion();
   const { theme } = useTheme();
-  const THEME = theme.palettes.tab;
-  const bgTop = theme.mode === "dark" ? THEME.bg : C.cream;
-  const bgBottom = theme.mode === "dark" ? THEME.bg : C.white;
+  const { C, styles } = useLabStyles();
+  const bgTop = theme.colors.pageGradientTop;
+  const bgBottom = theme.colors.pageGradientBottom;
 
   const [rad, setRad] = useState<Radiation>("gamma");
   const [mat, setMat] = useState<Material>("paper");
@@ -379,8 +408,10 @@ function RadiationShieldLab({ onBack }: { onBack: () => void }) {
     const r = detectorReading(rad, mat, thickness);
     setReading(r);
     setHistory((h) => [{ rad, mat, thickness, reading: r }, ...h].slice(0, 6));
-    if (r < 20) setChallengeDone(true);
-    else setChallengeDone(false);
+    if (r < 20) {
+      setChallengeDone(true);
+      recordActivity("lab_session", { id: "radiation-shielding" });
+    } else setChallengeDone(false);
   }, [rad, mat, thickness]);
 
   const reset = () => {
@@ -413,7 +444,7 @@ function RadiationShieldLab({ onBack }: { onBack: () => void }) {
 
         <Animated.View
           entering={reducedMotion ? FadeIn.duration(120) : FadeInDown.springify()}
-          style={[styles.sectionCard, { borderColor: THEME.border }]}
+          style={[styles.sectionCard, { borderColor: C.border }]}
         >
           <Text style={styles.cardTitle}>Radiation Source</Text>
           <View style={styles.pillRow}>
@@ -466,11 +497,11 @@ function RadiationShieldLab({ onBack }: { onBack: () => void }) {
             style={[styles.challengeCard, { borderColor: C.amber }]}
           >
             <View style={styles.challengeHeader}>
-              <Icon name="Beaker" size={16} color={C.amberDark} variant="Bold" />
+              <Icon name="ChemicalGlass" size={16} color={C.amberDark} variant="Bold" />
               <Text style={styles.challengeTitle}>Lab Challenge</Text>
             </View>
             <Text style={styles.challengeText}>
-              Reduce the detector reading below <Text style={{ fontFamily: fontFamilies.heavy }}>20 units</Text>. Change the
+              Reduce the detector reading below <Text style={{ ...fontFaces.heavy }}>20 units</Text>. Change the
               material and thickness to find the best shield.
             </Text>
           </Animated.View>
@@ -492,7 +523,7 @@ function RadiationShieldLab({ onBack }: { onBack: () => void }) {
         {history.length > 0 ? (
           <Animated.View
             entering={reducedMotion ? FadeIn.duration(120) : FadeInDown.delay(80).springify()}
-            style={[styles.sectionCard, { borderColor: THEME.border }]}
+            style={[styles.sectionCard, { borderColor: C.border }]}
           >
             <Text style={styles.cardTitle}>Experiment History</Text>
             <View style={styles.tableHeader}>
@@ -512,7 +543,7 @@ function RadiationShieldLab({ onBack }: { onBack: () => void }) {
                   <Text
                     style={[
                       styles.tableCell,
-                      { textAlign: "right", fontFamily: fontFamilies.heavy, color: h.reading < 20 ? C.success : C.ink },
+                      { textAlign: "right", ...fontFaces.heavy, color: h.reading < 20 ? C.success : C.ink },
                     ]}
                   >
                     {h.reading}
@@ -586,9 +617,9 @@ function BuildAnAtom({ onBack }: { onBack: () => void }) {
   const { contentMaxWidth, gutter } = useResponsiveLayout();
   const reducedMotion = useReducedMotion();
   const { theme } = useTheme();
-  const THEME = theme.palettes.tab;
-  const bgTop = theme.mode === "dark" ? THEME.bg : C.cream;
-  const bgBottom = theme.mode === "dark" ? THEME.bg : C.white;
+  const { C, styles } = useLabStyles();
+  const bgTop = theme.colors.pageGradientTop;
+  const bgBottom = theme.colors.pageGradientBottom;
 
   const [index, setIndex] = useState(0);
   // Always start from an empty atom — pre-filling the target's counts meant
@@ -619,6 +650,7 @@ function BuildAnAtom({ onBack }: { onBack: () => void }) {
       electrons === target.electrons
     ) {
       setResult("correct");
+      recordActivity("lab_session", { id: `build-an-atom:${index}` });
       setHint(null);
       notifySuccess();
     } else {
@@ -678,7 +710,7 @@ function BuildAnAtom({ onBack }: { onBack: () => void }) {
 
             <Animated.View
               entering={reducedMotion ? FadeIn.duration(120) : FadeInDown.delay(60).springify()}
-              style={[styles.sectionCard, { borderColor: THEME.border, alignItems: "center", gap: 14 }]}
+              style={[styles.sectionCard, { borderColor: C.border, alignItems: "center", gap: 14 }]}
             >
               <View style={styles.nucleus}>
                 <Text style={styles.nucleusSymbol}>{element ? element.symbol : "?"}</Text>
@@ -700,7 +732,7 @@ function BuildAnAtom({ onBack }: { onBack: () => void }) {
 
             <Animated.View
               entering={reducedMotion ? FadeIn.duration(120) : FadeInDown.delay(100).springify()}
-              style={[styles.sectionCard, { borderColor: THEME.border, gap: 14 }]}
+              style={[styles.sectionCard, { borderColor: C.border, gap: 14 }]}
             >
               <View style={styles.buildRow}>
                 <Text style={styles.buildLabel}>Protons</Text>
@@ -817,9 +849,9 @@ type Isotope = {
 };
 
 const ISOTOPES: Isotope[] = [
-  { key: "c14", label: "Carbon-14", halfLife: 5730, unit: "years", color: C.amber },
-  { key: "i131", label: "Iodine-131", halfLife: 8, unit: "days", color: C.success },
-  { key: "tc99m", label: "Technetium-99m", halfLife: 6, unit: "hours", color: C.info },
+  { key: "c14", label: "Carbon-14", halfLife: 5730, unit: "years", color: BRAND.amber },
+  { key: "i131", label: "Iodine-131", halfLife: 8, unit: "days", color: BRAND.success },
+  { key: "tc99m", label: "Technetium-99m", halfLife: 6, unit: "hours", color: BRAND.info },
 ];
 
 function remaining(initial: number, halfLife: number, t: number): number {
@@ -831,9 +863,9 @@ function DecayLab({ onBack }: { onBack: () => void }) {
   const { contentMaxWidth, gutter, contentWidth } = useResponsiveLayout();
   const reducedMotion = useReducedMotion();
   const { theme } = useTheme();
-  const THEME = theme.palettes.tab;
-  const bgTop = theme.mode === "dark" ? THEME.bg : C.cream;
-  const bgBottom = theme.mode === "dark" ? THEME.bg : C.white;
+  const { C, styles } = useLabStyles();
+  const bgTop = theme.colors.pageGradientTop;
+  const bgBottom = theme.colors.pageGradientBottom;
   const [iso, setIso] = useState<Isotope>(ISOTOPES[0]);
   const [initial, setInitial] = useState(1000);
   const [time, setTime] = useState(0);
@@ -877,6 +909,7 @@ function DecayLab({ onBack }: { onBack: () => void }) {
   useEffect(() => {
     if (challengeOpen && initial === 800 && rem >= 150 && rem <= 250) {
       setChallengeDone(true);
+      recordActivity("lab_session", { id: "half-life" });
     } else if (challengeOpen) {
       setChallengeDone(false);
     }
@@ -906,7 +939,7 @@ function DecayLab({ onBack }: { onBack: () => void }) {
 
         <Animated.View
           entering={reducedMotion ? FadeIn.duration(120) : FadeInDown.springify()}
-          style={[styles.sectionCard, { borderColor: THEME.border }]}
+          style={[styles.sectionCard, { borderColor: C.border }]}
         >
           <Text style={styles.cardTitle}>Sample</Text>
           <View style={styles.pillRow}>
@@ -944,7 +977,7 @@ function DecayLab({ onBack }: { onBack: () => void }) {
                   key={i}
                   style={[
                     styles.dot,
-                    i < dotCount ? { backgroundColor: iso.color } : { backgroundColor: "#F3F4F6" },
+                    i < dotCount ? { backgroundColor: iso.color } : { backgroundColor: C.soft },
                   ]}
                 />
               ))}
@@ -967,7 +1000,7 @@ function DecayLab({ onBack }: { onBack: () => void }) {
             <Text style={styles.detectorValue}>{rem.toLocaleString()} atoms</Text>
           </View>
 
-          <View style={[styles.graphWrap, { borderColor: THEME.border }]}>
+          <View style={[styles.graphWrap, { borderColor: C.border }]}>
             <Svg width={graphW} height={graphH}>
               <Path d={areaPath} fill={`${iso.color}14`} />
               <Path d={curvePath} stroke={iso.color} strokeWidth={2.5} fill="none" strokeLinecap="round" />
@@ -985,7 +1018,7 @@ function DecayLab({ onBack }: { onBack: () => void }) {
 
         <Animated.View
           entering={reducedMotion ? FadeIn.duration(120) : FadeInDown.delay(60).springify()}
-          style={[styles.sectionCard, { borderColor: THEME.border, gap: 12 }]}
+          style={[styles.sectionCard, { borderColor: C.border, gap: 12 }]}
         >
           <View style={styles.challengeHeader}>
             <Icon name="LampCharge" size={16} color={C.amberDark} variant="Bold" />
@@ -1009,16 +1042,16 @@ function DecayLab({ onBack }: { onBack: () => void }) {
         {phase === "observe" ? (
           <Animated.View
             entering={FadeIn.duration(180)}
-            style={[styles.sectionCard, { borderColor: THEME.border, gap: 10 }]}
+            style={[styles.sectionCard, { borderColor: C.border, gap: 10 }]}
           >
             {prediction !== null ? (
               <>
                 <Text style={styles.compareText}>
-                  Your prediction: <Text style={{ fontFamily: fontFamilies.heavy }}>{prediction}</Text>
+                  Your prediction: <Text style={{ ...fontFaces.heavy }}>{prediction}</Text>
                 </Text>
                 <Text style={styles.compareText}>
                   Observed (at 2 half-lives):{" "}
-                  <Text style={{ fontFamily: fontFamilies.heavy, color: C.success }}>
+                  <Text style={{ ...fontFaces.heavy, color: C.success }}>
                     {Math.round(remaining(1000, iso.halfLife, iso.halfLife * 2)).toLocaleString()}
                   </Text>
                 </Text>
@@ -1026,7 +1059,7 @@ function DecayLab({ onBack }: { onBack: () => void }) {
             ) : (
               <Text style={styles.compareText}>
                 Observed (at 2 half-lives):{" "}
-                <Text style={{ fontFamily: fontFamilies.heavy, color: C.success }}>
+                <Text style={{ ...fontFaces.heavy, color: C.success }}>
                   {Math.round(remaining(1000, iso.halfLife, iso.halfLife * 2)).toLocaleString()}
                 </Text>{" "}
                 — now pick your prediction in Step 1 above to compare.
@@ -1094,8 +1127,8 @@ function DecayLab({ onBack }: { onBack: () => void }) {
               <Text style={styles.challengeTitle}>Lab Challenge</Text>
             </View>
             <Text style={styles.challengeText}>
-              You have a sample with <Text style={{ fontFamily: fontFamilies.heavy }}>800 atoms</Text>. Adjust the
-              simulation until approximately <Text style={{ fontFamily: fontFamilies.heavy }}>200 atoms remain</Text>.
+              You have a sample with <Text style={{ ...fontFaces.heavy }}>800 atoms</Text>. Adjust the
+              simulation until approximately <Text style={{ ...fontFaces.heavy }}>200 atoms remain</Text>.
               (Hint: 800 → 400 → 200.)
             </Text>
             <Text style={styles.challengeTap}>Tap to start the challenge →</Text>
@@ -1124,11 +1157,11 @@ function DecayLab({ onBack }: { onBack: () => void }) {
           />
         ) : (
           <View style={[styles.sectionCard, { borderColor: C.amber, alignItems: "center", gap: 10 }]}>
-            <Icon name="TimeCircle" size={20} color={C.amberDark} variant="Bold" />
+            <Icon name="Clock" size={20} color={C.amberDark} variant="Bold" />
             <Text style={styles.challengeTitle}>Adjust time until ~200 atoms remain.</Text>
             <Text style={styles.challengeText}>Current: {rem.toLocaleString()} atoms</Text>
             {rem >= 150 && rem <= 250 ? (
-              <Text style={{ color: C.success, fontFamily: fontFamilies.heavy }}>Great — you are in range!</Text>
+              <Text style={{ color: C.success, ...fontFaces.heavy }}>Great — you are in range!</Text>
             ) : null}
             <PrimaryButton
               label="Back to Challenge"
@@ -1146,7 +1179,7 @@ function DecayLab({ onBack }: { onBack: () => void }) {
 
         <Animated.View
           entering={reducedMotion ? FadeIn.duration(120) : FadeInDown.delay(80).springify()}
-          style={[styles.sectionCard, { borderColor: THEME.border, gap: 10 }]}
+          style={[styles.sectionCard, { borderColor: C.border, gap: 10 }]}
         >
           <Text style={styles.cardTitle}>Which sample decays fastest?</Text>
           <Text style={styles.sectionSubtitle}>
@@ -1177,6 +1210,7 @@ function DecayLab({ onBack }: { onBack: () => void }) {
 // DifficultyPanel; bare /lab redirects to the game picker.
 // ==================================================================
 export default function LabScreen() {
+  const { C, styles } = useLabStyles();
   const router = useRouter();
   const { exp } = useLocalSearchParams<{ exp?: string }>();
 
@@ -1204,13 +1238,15 @@ export default function LabScreen() {
   if (exp === "decay-lab" || exp === "energy-showdown") return <DecayLab onBack={handleGameBack} />;
 
   return (
-    <View style={[styles.container, { backgroundColor: "#FFF3E0", justifyContent: "center", alignItems: "center" }]}>
-      <Text style={{ fontFamily: fontFamilies.heavy, color: C.ink }}>Redirecting to Games…</Text>
+    <View style={[styles.container, { backgroundColor: C.cream, justifyContent: "center", alignItems: "center" }]}>
+      <Text style={{ ...fontFaces.heavy, color: C.ink }}>Redirecting to Games…</Text>
     </View>
   );
 }
 
-const styles = StyleSheet.create({
+function makeStyles(theme: Theme) {
+  const C = makePalette(theme);
+  return StyleSheet.create({
   container: { flex: 1 },
   bgGradient: {
     position: "absolute",
@@ -1227,7 +1263,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     elevation: 3,
-    shadowColor: "#000000",
+    shadowColor: C.shadow,
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.08,
     shadowRadius: 6,
@@ -1244,7 +1280,7 @@ const styles = StyleSheet.create({
     height: 40,
     borderRadius: 14,
   },
-  titlePillText: { fontSize: 13, fontFamily: fontFamilies.heavy, color: C.white },
+  titlePillText: { fontSize: 13, ...fontFaces.heavy, color: C.onInverse },
   simContent: { paddingHorizontal: 20, gap: 20 },
   sectionCard: {
     backgroundColor: C.white,
@@ -1253,14 +1289,14 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderBottomWidth: 4,
     elevation: 5,
-    shadowColor: "#000000",
+    shadowColor: C.shadow,
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.08,
     shadowRadius: 10,
     gap: 14,
   },
-  cardTitle: { fontSize: 14, fontFamily: fontFamilies.heavy, color: C.ink },
-  sectionSubtitle: { fontSize: 12, fontFamily: fontFamilies.regular, color: C.muted, lineHeight: 18 },
+  cardTitle: { fontSize: 14, ...fontFaces.heavy, color: C.ink },
+  sectionSubtitle: { fontSize: 12, ...fontFaces.regular, color: C.muted, lineHeight: 18 },
   pillRow: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
   pill: {
     flexDirection: "row",
@@ -1273,9 +1309,9 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: C.border,
   },
-  pillText: { fontSize: 13, fontFamily: fontFamilies.heavy, color: C.inkSoft },
-  pillTextActive: { color: C.white },
-  pillEmoji: { fontSize: 14, fontFamily: fontFamilies.heavy, color: C.inkSoft },
+  pillText: { fontSize: 13, ...fontFaces.heavy, color: C.inkSoft },
+  pillTextActive: { color: C.onAccent },
+  pillEmoji: { fontSize: 14, ...fontFaces.heavy, color: C.inkSoft },
   primaryBtn: {
     backgroundColor: C.amber,
     borderRadius: 16,
@@ -1287,7 +1323,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 4,
     borderBottomColor: C.amberDark,
   },
-  primaryBtnText: { fontSize: 15, fontFamily: fontFamilies.heavy, color: C.white },
+  primaryBtnText: { fontSize: 15, ...fontFaces.heavy, color: C.onAccent },
   stepper: { flexDirection: "row", alignItems: "center", gap: 12 },
   stepperBtn: {
     width: 40,
@@ -1297,7 +1333,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   stepperBtnDisabled: { opacity: 0.35 },
-  stepperBtnText: { fontSize: 20, fontFamily: fontFamilies.heavy, color: C.white },
+  stepperBtnText: { fontSize: 20, ...fontFaces.heavy, color: C.onAccent },
   stepperValue: {
     minWidth: 52,
     height: 40,
@@ -1309,12 +1345,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     paddingHorizontal: 10,
   },
-  stepperValueText: { fontSize: 16, fontFamily: fontFamilies.heavy },
+  stepperValueText: { fontSize: 16, ...fontFaces.heavy },
   sliderRow: { gap: 10 },
   sliderLabelRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
-  sliderLabel: { fontSize: 13, fontFamily: fontFamilies.heavy, color: C.ink },
+  sliderLabel: { fontSize: 13, ...fontFaces.heavy, color: C.ink },
   sliderValuePill: { backgroundColor: C.cream, borderRadius: 12, paddingHorizontal: 10, paddingVertical: 5 },
-  sliderValueText: { fontSize: 12, fontFamily: fontFamilies.heavy, color: C.amberDark },
+  sliderValueText: { fontSize: 12, ...fontFaces.heavy, color: C.amberDark },
   sliderTrackRow: { flexDirection: "row", alignItems: "center", gap: 10 },
   sliderDec: {
     width: 36,
@@ -1326,7 +1362,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  sliderDecText: { fontSize: 18, fontFamily: fontFamilies.heavy, color: C.ink },
+  sliderDecText: { fontSize: 18, ...fontFaces.heavy, color: C.ink },
   sliderTrack: {
     flex: 1,
     height: 10,
@@ -1347,7 +1383,7 @@ const styles = StyleSheet.create({
     borderColor: C.white,
     marginLeft: -11,
     elevation: 3,
-    shadowColor: "#000",
+    shadowColor: C.shadow,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.15,
     shadowRadius: 4,
@@ -1361,8 +1397,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#FFDD8D",
   },
-  detectorLabel: { fontSize: 11, fontFamily: fontFamilies.bold, color: C.muted, textTransform: "uppercase", letterSpacing: 1 },
-  detectorValue: { fontSize: 22, fontFamily: fontFamilies.heavy, color: C.ink },
+  detectorLabel: { fontSize: 11, ...fontFaces.bold, color: C.muted, textTransform: "uppercase", letterSpacing: 1 },
+  detectorValue: { fontSize: 22, ...fontFaces.heavy, color: C.ink },
   challengeCard: {
     borderRadius: 24,
     padding: 20,
@@ -1371,15 +1407,15 @@ const styles = StyleSheet.create({
     borderBottomWidth: 4,
     gap: 10,
     elevation: 5,
-    shadowColor: "#000000",
+    shadowColor: C.shadow,
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.08,
     shadowRadius: 10,
   },
   challengeHeader: { flexDirection: "row", alignItems: "center", gap: 8 },
-  challengeTitle: { fontSize: 14, fontFamily: fontFamilies.heavy, color: C.ink },
-  challengeText: { fontSize: 13, fontFamily: fontFamilies.regular, color: C.inkSoft, lineHeight: 20 },
-  challengeTap: { fontSize: 12, fontFamily: fontFamilies.bold, color: C.amberDark },
+  challengeTitle: { fontSize: 14, ...fontFaces.heavy, color: C.ink },
+  challengeText: { fontSize: 13, ...fontFaces.regular, color: C.inkSoft, lineHeight: 20 },
+  challengeTap: { fontSize: 12, ...fontFaces.bold, color: C.amberDark },
   tableHeader: {
     flexDirection: "row",
     gap: 8,
@@ -1387,38 +1423,38 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: C.border,
   },
-  tableHeaderCell: { flex: 1, fontSize: 11, fontFamily: fontFamilies.heavy, color: C.muted, textTransform: "uppercase" },
+  tableHeaderCell: { flex: 1, fontSize: 11, ...fontFaces.heavy, color: C.muted, textTransform: "uppercase" },
   tableRow: {
     flexDirection: "row",
     gap: 8,
     paddingVertical: 10,
     borderBottomWidth: 1,
-    borderBottomColor: "#F3F4F6",
+    borderBottomColor: C.soft,
   },
-  tableCell: { flex: 1, fontSize: 12, fontFamily: fontFamilies.regular, color: C.inkSoft },
+  tableCell: { flex: 1, fontSize: 12, ...fontFaces.regular, color: C.inkSoft },
   resultIcon: { width: 52, height: 52, borderRadius: 26, alignItems: "center", justifyContent: "center" },
-  resultTitle: { fontSize: 18, fontFamily: fontFamilies.heavy, color: C.ink, textAlign: "center" },
-  resultSubtitle: { fontSize: 13, fontFamily: fontFamilies.regular, color: C.inkSoft, lineHeight: 20, textAlign: "center" },
+  resultTitle: { fontSize: 18, ...fontFaces.heavy, color: C.ink, textAlign: "center" },
+  resultSubtitle: { fontSize: 13, ...fontFaces.regular, color: C.inkSoft, lineHeight: 20, textAlign: "center" },
   conceptPill: { borderRadius: 14, paddingHorizontal: 16, paddingVertical: 10, alignItems: "center", gap: 2 },
-  conceptPillLabel: { fontSize: 11, fontFamily: fontFamilies.bold, color: C.muted, textTransform: "uppercase", letterSpacing: 0.8 },
-  conceptPillValue: { fontSize: 13, fontFamily: fontFamilies.heavy, color: C.amberDark },
+  conceptPillLabel: { fontSize: 11, ...fontFaces.bold, color: C.muted, textTransform: "uppercase", letterSpacing: 0.8 },
+  conceptPillValue: { fontSize: 13, ...fontFaces.heavy, color: C.amberDark },
   actionRow: { flexDirection: "row", gap: 10, marginTop: 4 },
   actionBtn: { flex: 1, paddingVertical: 12, borderRadius: 14, alignItems: "center", borderWidth: 2 },
   actionBtnPrimary: { backgroundColor: C.amber, borderColor: C.amberDark, borderBottomWidth: 4 },
   actionBtnGhost: { backgroundColor: C.white, borderColor: C.border },
-  actionBtnText: { fontSize: 13, fontFamily: fontFamilies.heavy, color: C.inkSoft },
-  actionBtnTextPrimary: { color: C.white },
+  actionBtnText: { fontSize: 13, ...fontFaces.heavy, color: C.inkSoft },
+  actionBtnTextPrimary: { color: C.onAccent },
   hintBox: {
     flexDirection: "row",
     gap: 10,
-    backgroundColor: "#FFFBEB",
+    backgroundColor: C.warningSurface,
     borderRadius: 14,
     padding: 12,
     borderWidth: 1,
-    borderColor: "#FDE68A",
+    borderColor: C.warningBorder,
     alignItems: "center",
   },
-  hintText: { flex: 1, fontSize: 12, fontFamily: fontFamilies.regular, color: C.inkSoft, lineHeight: 18 },
+  hintText: { flex: 1, fontSize: 12, ...fontFaces.regular, color: C.inkSoft, lineHeight: 18 },
   targetCard: {
     backgroundColor: C.amberOuter,
     borderRadius: 26,
@@ -1430,9 +1466,9 @@ const styles = StyleSheet.create({
   },
   targetHeader: { flexDirection: "row", alignItems: "center", gap: 10 },
   levelPill: { borderRadius: 12, paddingHorizontal: 10, paddingVertical: 5 },
-  levelPillText: { fontSize: 11, fontFamily: fontFamilies.heavy, color: C.white },
-  targetLabel: { fontSize: 16, fontFamily: fontFamilies.heavy, color: C.onAmber, flex: 1 },
-  targetHint: { fontSize: 12, fontFamily: fontFamilies.regular, color: C.onAmber, opacity: 0.8 },
+  levelPillText: { fontSize: 11, ...fontFaces.heavy, color: C.onAccent },
+  targetLabel: { fontSize: 16, ...fontFaces.heavy, color: C.onAmber, flex: 1 },
+  targetHint: { fontSize: 12, ...fontFaces.regular, color: C.onAmber, opacity: 0.8 },
   nucleus: {
     width: 120,
     height: 120,
@@ -1444,29 +1480,29 @@ const styles = StyleSheet.create({
     borderWidth: 3,
     borderColor: C.amber,
   },
-  nucleusSymbol: { fontSize: 32, fontFamily: fontFamilies.heavy, color: C.white },
+  nucleusSymbol: { fontSize: 32, ...fontFaces.heavy, color: C.onInverse },
   nucleusCounts: { flexDirection: "row", gap: 12 },
-  nucleusCount: { fontSize: 12, fontFamily: fontFamilies.heavy, color: C.cream },
+  nucleusCount: { fontSize: 12, ...fontFaces.heavy, color: C.cream },
   electronCloud: { flexDirection: "row", flexWrap: "wrap", gap: 6, justifyContent: "center", maxWidth: 220 },
   electronDot: { width: 12, height: 12, borderRadius: 6, backgroundColor: C.amber },
-  electronMore: { fontSize: 12, fontFamily: fontFamilies.heavy, color: C.muted },
-  atomCaption: { fontSize: 12, fontFamily: fontFamilies.heavy, color: C.muted },
+  electronMore: { fontSize: 12, ...fontFaces.heavy, color: C.muted },
+  atomCaption: { fontSize: 12, ...fontFaces.heavy, color: C.muted },
   buildRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 12 },
-  buildLabel: { fontSize: 13, fontFamily: fontFamilies.heavy, color: C.ink },
+  buildLabel: { fontSize: 13, ...fontFaces.heavy, color: C.ink },
   wrongCard: {
     flexDirection: "row",
     gap: 10,
-    backgroundColor: "#FFFBEB",
+    backgroundColor: C.warningSurface,
     borderRadius: 16,
     padding: 14,
     borderWidth: 1,
-    borderColor: "#FDE68A",
+    borderColor: C.warningBorder,
     alignItems: "center",
   },
-  wrongTitle: { fontSize: 13, fontFamily: fontFamilies.heavy, color: C.amberDark },
-  wrongText: { fontSize: 12, fontFamily: fontFamilies.regular, color: C.inkSoft, lineHeight: 18, marginTop: 2 },
+  wrongTitle: { fontSize: 13, ...fontFaces.heavy, color: C.amberDark },
+  wrongText: { fontSize: 12, ...fontFaces.regular, color: C.inkSoft, lineHeight: 18, marginTop: 2 },
   adjustBtn: { backgroundColor: C.white, borderWidth: 1, borderColor: C.border, borderRadius: 12, paddingHorizontal: 14, paddingVertical: 8 },
-  adjustBtnText: { fontSize: 12, fontFamily: fontFamilies.heavy, color: C.ink },
+  adjustBtnText: { fontSize: 12, ...fontFaces.heavy, color: C.ink },
   atomStatRow: {
     flexDirection: "row",
     alignItems: "center",
@@ -1477,32 +1513,32 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   atomStat: { alignItems: "center", gap: 2 },
-  atomStatValue: { fontSize: 16, fontFamily: fontFamilies.heavy, color: C.amber },
-  atomStatLabel: { fontSize: 11, fontFamily: fontFamilies.bold, color: C.muted },
+  atomStatValue: { fontSize: 16, ...fontFaces.heavy, color: C.amber },
+  atomStatLabel: { fontSize: 11, ...fontFaces.bold, color: C.muted },
   atomStatDivider: { width: 1, height: 32, backgroundColor: "#FFDD8D" },
   sampleStatsRow: { flexDirection: "row", gap: 12 },
   sampleStat: { flex: 1, backgroundColor: C.cream, borderRadius: 12, padding: 10, alignItems: "center", gap: 2 },
-  sampleStatValue: { fontSize: 16, fontFamily: fontFamilies.heavy, color: C.ink },
-  sampleStatLabel: { fontSize: 11, fontFamily: fontFamilies.bold, color: C.muted },
+  sampleStatValue: { fontSize: 16, ...fontFaces.heavy, color: C.ink },
+  sampleStatLabel: { fontSize: 11, ...fontFaces.bold, color: C.muted },
   sampleBox: { gap: 10, alignItems: "center" },
   dotGrid: { flexDirection: "row", flexWrap: "wrap", width: 160, gap: 4, justifyContent: "center" },
   dot: { width: 12, height: 12, borderRadius: 6 },
-  sampleCaption: { fontSize: 11, fontFamily: fontFamilies.bold, color: C.muted },
+  sampleCaption: { fontSize: 11, ...fontFaces.bold, color: C.muted },
   graphWrap: {
     borderRadius: 16,
     borderWidth: 1,
     padding: 8,
-    backgroundColor: "#FAFAFA",
+    backgroundColor: C.soft,
     gap: 6,
   },
   graphLabels: { flexDirection: "row", justifyContent: "space-between", paddingHorizontal: 8 },
-  graphLabel: { fontSize: 10, fontFamily: fontFamilies.bold, color: C.muted },
+  graphLabel: { fontSize: 10, ...fontFaces.bold, color: C.muted },
   compareTable: { gap: 8 },
   compareRow: { flexDirection: "row", alignItems: "center", gap: 10 },
   compareDot: { width: 10, height: 10, borderRadius: 5 },
-  compareLabel: { flex: 1, fontSize: 13, fontFamily: fontFamilies.heavy, color: C.ink },
-  compareHalfLife: { fontSize: 12, fontFamily: fontFamilies.regular, color: C.muted },
-  compareText: { fontSize: 12, fontFamily: fontFamilies.regular, color: C.inkSoft, lineHeight: 18 },
+  compareLabel: { flex: 1, fontSize: 13, ...fontFaces.heavy, color: C.ink },
+  compareHalfLife: { fontSize: 12, ...fontFaces.regular, color: C.muted },
+  compareText: { fontSize: 12, ...fontFaces.regular, color: C.inkSoft, lineHeight: 18 },
   conclusionInline: {
     flexDirection: "row",
     alignItems: "center",
@@ -1513,6 +1549,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: C.border,
   },
-  conclusionInlineText: { flex: 1, fontSize: 12, fontFamily: fontFamilies.bold, lineHeight: 18 },
-});
+  conclusionInlineText: { flex: 1, fontSize: 12, ...fontFaces.bold, lineHeight: 18 },
+  });
+}
 

@@ -1,6 +1,6 @@
 import { Icon } from "@/components/ui/icon";
 import { useStorage } from "@/services/StorageContext";
-import { fontFamilies, useResponsiveLayout, useTheme } from "@/theme";
+import { fontFaces, useResponsiveLayout, useTheme, createStyles } from "@/theme";
 import { setOnboardingCompleted } from "@/services/storage";
 import {
     DEFAULT_PROFILE_AVATAR_KEY,
@@ -34,7 +34,6 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 /* Autumn action tokens — same as home screen */
 const BTN_COLOR = "#FF8C00";
 const BTN_LIP = "#E67E22";
-const CREAM = "#FFF3E0";
 
 const FEATURE_SHOWCASE = [
     {
@@ -90,41 +89,11 @@ export default function Onboarding() {
     const { updateUserProfile, userProfile } = useStorage();
     const { theme, toggleTheme } = useTheme();
     const isDark = theme.mode === "dark";
-    /* Mode-aware surfaces — mirrors tokens.base light/dark */
-    const P = isDark
-        ? {
-            bgTop: "#172B4D",
-            bgBottom: "#172B4D",
-            card: "#213356",
-            border: "#2D3A56",
-            text: "#F6F9FC",
-            textSecondary: "#C0CBDD",
-            muted: "#8898AA",
-            faint: "#667799",
-            soft: "#1A2D4A",
-            softBorder: "#26365A",
-            track: "#1A2D4A",
-            dot: "#334A70",
-            clearIcon: "#667799",
-            shadowOpacity: 0.3,
-          }
-        : {
-            bgTop: CREAM,
-            bgBottom: "#FFFFFF",
-            card: "#FFFFFF",
-            border: "#E5E7EB",
-            text: "#333333",
-            textSecondary: "#555555",
-            muted: "#888888",
-            faint: "#9CA3AF",
-            soft: "#F9FAFB",
-            softBorder: "#F4F5F7",
-            track: CREAM,
-            dot: "#E5E7EB",
-            clearIcon: "#C9CDD3",
-            shadowOpacity: 0.08,
-          };
-    const styles = React.useMemo(() => createStyles(P), [P]);
+    const styles = React.useMemo(() => makeStyles(theme), [theme]);
+    const pageGradient: [string, string] = [
+        theme.colors.pageGradientTop,
+        theme.colors.pageGradientBottom,
+    ];
 
     /* Dark mode toggle — floating pill, top-right, on every step */
     const renderThemeToggle = () => (
@@ -139,10 +108,10 @@ export default function Onboarding() {
             <Icon
                 name={isDark ? "Moon" : "Sun"}
                 size={16}
-                color={isDark ? "#FFC107" : P.faint}
+                color={isDark ? theme.colors.warning : theme.colors.textFaint}
                 variant="Bold"
             />
-            <Text style={[styles.themeToggleText, { color: P.text }]}>
+            <Text style={[styles.themeToggleText, { color: theme.colors.text }]}>
                 {isDark ? "Dark" : "Light"}
             </Text>
         </TouchableOpacity>
@@ -246,9 +215,9 @@ export default function Onboarding() {
     /* ---------------- Splash ---------------- */
     if (step === "splash") {
         return (
-            <View style={[styles.container, { backgroundColor: P.bgBottom }]}>
+            <View style={[styles.container, { backgroundColor: theme.colors.pageGradientBottom }]}>
                 {renderThemeToggle()}
-                <LinearGradient colors={[P.bgTop, P.bgBottom]} style={StyleSheet.absoluteFill} />
+                <LinearGradient colors={pageGradient} style={StyleSheet.absoluteFill} />
                 <View
                     style={[
                         styles.splashContent,
@@ -303,9 +272,9 @@ export default function Onboarding() {
         const isLast = currentFeatureIndex === FEATURE_SHOWCASE.length - 1;
 
         return (
-            <View style={[styles.container, { backgroundColor: P.bgBottom }]}>
+            <View style={[styles.container, { backgroundColor: theme.colors.pageGradientBottom }]}>
                 {renderThemeToggle()}
-                <LinearGradient colors={[P.bgTop, P.bgBottom]} style={StyleSheet.absoluteFill} />
+                <LinearGradient colors={pageGradient} style={StyleSheet.absoluteFill} />
                 <ScrollView
                     contentContainerStyle={[
                         styles.scrollContent,
@@ -401,9 +370,9 @@ export default function Onboarding() {
 
     /* ---------------- Profile setup ---------------- */
     return (
-        <View style={[styles.container, { backgroundColor: P.bgBottom }]}>
+        <View style={[styles.container, { backgroundColor: theme.colors.pageGradientBottom }]}>
             {renderThemeToggle()}
-            <LinearGradient colors={[P.bgTop, P.bgBottom]} style={StyleSheet.absoluteFill} />
+            <LinearGradient colors={pageGradient} style={StyleSheet.absoluteFill} />
             <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{ flex: 1 }}>
                 <ScrollView
                     contentContainerStyle={[
@@ -440,7 +409,7 @@ export default function Onboarding() {
                             <TextInput
                                 style={styles.input}
                                 placeholder="Your display name"
-                                placeholderTextColor={P.faint}
+                                placeholderTextColor={theme.colors.textFaint}
                                 value={username}
                                 onChangeText={(text) => setUsername(text.slice(0, 24))}
                                 autoCapitalize="none"
@@ -457,7 +426,7 @@ export default function Onboarding() {
                                     accessibilityRole="button"
                                     accessibilityLabel="Clear display name"
                                 >
-                                    <Icon name="CloseCircle" size={18} color={P.clearIcon} variant="Bold" />
+                                    <Icon name="CloseCircle" size={18} color={theme.colors.textFaint} variant="Bold" />
                                 </TouchableOpacity>
                             )}
                         </View>
@@ -556,28 +525,12 @@ export default function Onboarding() {
     );
 }
 
-interface OPalette {
-    bgTop: string;
-    bgBottom: string;
-    card: string;
-    border: string;
-    text: string;
-    textSecondary: string;
-    muted: string;
-    faint: string;
-    soft: string;
-    softBorder: string;
-    track: string;
-    dot: string;
-    clearIcon: string;
-    shadowOpacity: number;
-}
-
-const createStyles = (P: OPalette) =>
-  StyleSheet.create({
+const makeStyles = createStyles((theme) => {
+    const shadowOpacity = theme.mode === "dark" ? 0.3 : 0.08;
+    return {
     container: {
         flex: 1,
-        backgroundColor: "#FFFFFF",
+        backgroundColor: theme.colors.background,
     },
     /* Dark mode toggle — floating pill, top-right */
     themeToggle: {
@@ -590,19 +543,19 @@ const createStyles = (P: OPalette) =>
         paddingHorizontal: 12,
         paddingVertical: 9,
         borderRadius: 999,
-        backgroundColor: P.card,
+        backgroundColor: theme.colors.card,
         borderWidth: 2,
         borderBottomWidth: 4,
-        borderColor: P.border,
-        shadowColor: "#000000",
+        borderColor: theme.colors.border,
+        shadowColor: theme.colors.shadow,
         shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: P.shadowOpacity,
+        shadowOpacity,
         shadowRadius: 6,
         elevation: 3,
     },
     themeToggleText: {
         fontSize: 12,
-        fontFamily: fontFamilies.heavy,
+        ...fontFaces.heavy,
     },
     /* Splash */
     splashContent: {
@@ -626,29 +579,29 @@ const createStyles = (P: OPalette) =>
     heroCard: {
         width: "100%",
         maxWidth: 380,
-        backgroundColor: P.card,
+        backgroundColor: theme.colors.card,
         borderRadius: 26,
         borderWidth: 2,
         borderBottomWidth: 4,
-        borderColor: P.border,
+        borderColor: theme.colors.border,
         padding: 20,
         alignItems: "center",
-        shadowColor: "#000000",
+        shadowColor: theme.colors.shadow,
         shadowOffset: { width: 0, height: 6 },
-        shadowOpacity: P.shadowOpacity,
+        shadowOpacity,
         shadowRadius: 10,
         elevation: 5,
     },
     splashTitle: {
         fontSize: 40,
-        fontFamily: fontFamilies.heavy,
+        ...fontFaces.heavy,
         letterSpacing: -1,
-        color: P.text,
+        color: theme.colors.text,
     },
     splashSubtitle: {
         fontSize: 14,
-        fontFamily: fontFamilies.semibold,
-        color: P.muted,
+        ...fontFaces.semibold,
+        color: theme.colors.textMuted,
         textAlign: "center",
         marginTop: 6,
         lineHeight: 20,
@@ -662,9 +615,9 @@ const createStyles = (P: OPalette) =>
         flexDirection: "row",
         alignItems: "center",
         gap: 10,
-        backgroundColor: P.soft,
+        backgroundColor: theme.colors.surfaceSoft,
         borderWidth: 1,
-        borderColor: P.softBorder,
+        borderColor: theme.colors.borderSubtle,
         borderRadius: 12,
         paddingHorizontal: 12,
         paddingVertical: 10,
@@ -672,8 +625,8 @@ const createStyles = (P: OPalette) =>
     splashPointText: {
         flex: 1,
         fontSize: 13,
-        fontFamily: fontFamilies.medium,
-        color: P.textSecondary,
+        ...fontFaces.medium,
+        color: theme.colors.textSecondary,
     },
     bottomContainer: {
         width: "100%",
@@ -694,7 +647,7 @@ const createStyles = (P: OPalette) =>
         borderWidth: 1,
         borderBottomWidth: 4,
         borderColor: BTN_LIP,
-        shadowColor: "#000000",
+        shadowColor: theme.colors.shadow,
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.12,
         shadowRadius: 8,
@@ -705,8 +658,8 @@ const createStyles = (P: OPalette) =>
     },
     btnText: {
         fontSize: 15,
-        fontFamily: fontFamilies.heavy,
-        color: "#FFFFFF",
+        ...fontFaces.heavy,
+        color: theme.colors.onPrimary,
     },
     /* Feature tour */
     scrollContent: {
@@ -717,7 +670,7 @@ const createStyles = (P: OPalette) =>
     progressTrack: {
         height: 10,
         borderRadius: 5,
-        backgroundColor: P.track,
+        backgroundColor: theme.colors.surfaceSoft,
         overflow: "hidden",
     },
     progressFill: {
@@ -735,16 +688,16 @@ const createStyles = (P: OPalette) =>
         gap: 14,
     },
     tourCard: {
-        backgroundColor: P.card,
+        backgroundColor: theme.colors.card,
         borderRadius: 26,
         borderWidth: 2,
         borderBottomWidth: 4,
-        borderColor: P.border,
+        borderColor: theme.colors.border,
         padding: 20,
         alignItems: "center",
-        shadowColor: "#000000",
+        shadowColor: theme.colors.shadow,
         shadowOffset: { width: 0, height: 6 },
-        shadowOpacity: P.shadowOpacity,
+        shadowOpacity,
         shadowRadius: 10,
         elevation: 5,
     },
@@ -752,7 +705,7 @@ const createStyles = (P: OPalette) =>
         width: 132,
         height: 132,
         borderRadius: 66,
-        backgroundColor: P.track,
+        backgroundColor: theme.colors.surfaceSoft,
         alignItems: "center",
         justifyContent: "center",
         marginBottom: 14,
@@ -772,20 +725,20 @@ const createStyles = (P: OPalette) =>
     },
     stepChipText: {
         fontSize: 11,
-        fontFamily: fontFamilies.heavy,
+        ...fontFaces.heavy,
         textTransform: "uppercase",
         letterSpacing: 0.6,
     },
     featureTitle: {
         fontSize: 24,
-        fontFamily: fontFamilies.heavy,
-        color: P.text,
+        ...fontFaces.heavy,
+        color: theme.colors.text,
         textAlign: "center",
     },
     featureDescription: {
         fontSize: 14,
-        fontFamily: fontFamilies.medium,
-        color: P.muted,
+        ...fontFaces.medium,
+        color: theme.colors.textMuted,
         textAlign: "center",
         lineHeight: 21,
         marginTop: 8,
@@ -799,9 +752,9 @@ const createStyles = (P: OPalette) =>
         flexDirection: "row",
         alignItems: "center",
         gap: 10,
-        backgroundColor: P.soft,
+        backgroundColor: theme.colors.surfaceSoft,
         borderWidth: 1,
-        borderColor: P.softBorder,
+        borderColor: theme.colors.borderSubtle,
         borderRadius: 12,
         paddingHorizontal: 12,
         paddingVertical: 10,
@@ -816,8 +769,8 @@ const createStyles = (P: OPalette) =>
     highlightText: {
         flex: 1,
         fontSize: 13,
-        fontFamily: fontFamilies.medium,
-        color: P.textSecondary,
+        ...fontFaces.medium,
+        color: theme.colors.textSecondary,
     },
     dots: {
         flexDirection: "row",
@@ -828,7 +781,7 @@ const createStyles = (P: OPalette) =>
         width: 8,
         height: 8,
         borderRadius: 4,
-        backgroundColor: P.dot,
+        backgroundColor: theme.colors.border,
     },
     dotActive: {
         width: 22,
@@ -841,8 +794,8 @@ const createStyles = (P: OPalette) =>
     },
     skipText: {
         fontSize: 13,
-        fontFamily: fontFamilies.heavy,
-        color: P.faint,
+        ...fontFaces.heavy,
+        color: theme.colors.textFaint,
     },
     /* Profile */
     /* Vertically center the whole form when it fits the screen */
@@ -856,15 +809,15 @@ const createStyles = (P: OPalette) =>
     },
     profileHeading: {
         fontSize: 22,
-        fontFamily: fontFamilies.heavy,
-        color: P.text,
+        ...fontFaces.heavy,
+        color: theme.colors.text,
     },
     previewInner: {
-        backgroundColor: P.card,
+        backgroundColor: theme.colors.card,
         borderRadius: 20,
         borderWidth: 2,
         borderBottomWidth: 4,
-        borderColor: P.border,
+        borderColor: theme.colors.border,
         padding: 14,
         flexDirection: "row",
         alignItems: "center",
@@ -874,19 +827,19 @@ const createStyles = (P: OPalette) =>
         width: 64,
         height: 64,
         borderRadius: 32,
-        backgroundColor: P.track,
+        backgroundColor: theme.colors.surfaceSoft,
         borderWidth: 3,
-        borderColor: P.track,
+        borderColor: theme.colors.surfaceSoft,
     },
     profileName: {
         fontSize: 18,
-        fontFamily: fontFamilies.heavy,
-        color: P.text,
+        ...fontFaces.heavy,
+        color: theme.colors.text,
     },
     profileHint: {
         fontSize: 12,
-        fontFamily: fontFamilies.semibold,
-        color: P.muted,
+        ...fontFaces.semibold,
+        color: theme.colors.textMuted,
         marginTop: 2,
     },
     fieldSection: {
@@ -894,24 +847,24 @@ const createStyles = (P: OPalette) =>
     },
     fieldLabel: {
         fontSize: 13,
-        fontFamily: fontFamilies.heavy,
-        color: P.text,
+        ...fontFaces.heavy,
+        color: theme.colors.text,
     },
     inputWrap: {
         position: "relative",
     },
     input: {
-        backgroundColor: P.soft,
+        backgroundColor: theme.colors.input,
         borderWidth: 2,
         borderBottomWidth: 4,
-        borderColor: P.border,
+        borderColor: theme.colors.border,
         borderRadius: 14,
         paddingHorizontal: 14,
         paddingVertical: 14,
         paddingRight: 44,
         fontSize: 15,
-        fontFamily: fontFamilies.semibold,
-        color: P.text,
+        ...fontFaces.semibold,
+        color: theme.colors.text,
     },
     clearBtn: {
         position: "absolute",
@@ -923,8 +876,8 @@ const createStyles = (P: OPalette) =>
     charCount: {
         alignSelf: "flex-end",
         fontSize: 11,
-        fontFamily: fontFamilies.semibold,
-        color: P.faint,
+        ...fontFaces.semibold,
+        color: theme.colors.textFaint,
     },
     avatarSectionHeader: {
         flexDirection: "row",
@@ -933,8 +886,8 @@ const createStyles = (P: OPalette) =>
     },
     avatarCount: {
         fontSize: 11,
-        fontFamily: fontFamilies.semibold,
-        color: P.faint,
+        ...fontFaces.semibold,
+        color: theme.colors.textFaint,
     },
     avatarOptionsWrap: {
         gap: 10,
@@ -945,8 +898,8 @@ const createStyles = (P: OPalette) =>
         height: 64,
         borderRadius: 32,
         borderWidth: 2,
-        borderColor: P.border,
-        backgroundColor: P.track,
+        borderColor: theme.colors.border,
+        backgroundColor: theme.colors.surfaceSoft,
     },
     avatarOptionSelected: {
         borderWidth: 3,
@@ -968,7 +921,7 @@ const createStyles = (P: OPalette) =>
         alignItems: "center",
         justifyContent: "center",
         borderWidth: 2,
-        borderColor: "#FFFFFF",
+        borderColor: theme.colors.onPrimary,
     },
     /* Terms & Privacy consent */
     consentRow: {
@@ -983,8 +936,8 @@ const createStyles = (P: OPalette) =>
         borderRadius: 7,
         borderWidth: 2,
         borderBottomWidth: 3,
-        borderColor: P.border,
-        backgroundColor: P.soft,
+        borderColor: theme.colors.border,
+        backgroundColor: theme.colors.input,
         alignItems: "center",
         justifyContent: "center",
         marginTop: 1,
@@ -996,13 +949,14 @@ const createStyles = (P: OPalette) =>
     consentText: {
         flex: 1,
         fontSize: 12,
-        fontFamily: fontFamilies.medium,
-        color: P.muted,
+        ...fontFaces.medium,
+        color: theme.colors.textMuted,
         lineHeight: 17,
     },
     consentLink: {
-        fontFamily: fontFamilies.heavy,
+        ...fontFaces.heavy,
         color: BTN_COLOR,
         textDecorationLine: "underline",
     },
+    };
 });

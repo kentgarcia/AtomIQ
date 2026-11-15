@@ -8,12 +8,15 @@ import {
     View,
 } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
-import { speakSafely, stopSpeech } from "@/services/speech";
+import { ReadAloudButton } from "@/components/ui/read-aloud-button";
 
 import { type Palette } from "@/theme";
 import { Icon } from "@/components/ui/icon";
+import { getStepVisuals, getVisualSpeechText } from "@/content/visual-blocks";
+import { useResponsiveLayout } from "@/theme/layout";
 
 import { createLearnStyles, createStyles } from "./styles";
+import { VisualBlockList } from "./visual";
 
 export const MicroLearnView = ({
   data,
@@ -25,15 +28,23 @@ export const MicroLearnView = ({
   theme: Palette;
 }) => {
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [isSpeaking, setIsSpeaking] = useState(false);
   const { width } = useWindowDimensions();
   const styles = useMemo(() => createStyles(theme, width), [theme, width]);
   const learnStyles = useMemo(() => createLearnStyles(theme), [theme]);
 
-  // Simplified slides: intro, main content, all key points together, summary
+  const responsive = useResponsiveLayout();
+  const visuals = getStepVisuals(data);
+  // Visual blocks scroll inside the card; leave room for dots, nav row and padding.
+  const visualsMaxHeight = Math.max(
+    260,
+    responsive.height - responsive.insets.top - responsive.insets.bottom - 330,
+  );
+
+  // Simplified slides: intro, main content, visual blocks (when authored), all key points together, summary
   const slides = [
     { type: "intro", title: data.title },
     { type: "content", content: data.content },
+    ...(visuals.length > 0 ? [{ type: "visuals", visuals }] : []),
     ...(data.keyPoints && data.keyPoints.length > 0
       ? [{ type: "keypoints", points: data.keyPoints }]
       : []),
@@ -44,32 +55,20 @@ export const MicroLearnView = ({
   const isFirstSlide = currentSlide === 0;
   const currentContent = slides[currentSlide];
 
-  const speakContent = () => {
-    if (isSpeaking) {
-      stopSpeech();
-      setIsSpeaking(false);
-    } else {
-      let text = "";
-      if (currentContent.type === "intro") text = data.title;
-      else if (currentContent.type === "content") text = currentContent.content;
-      else if (currentContent.type === "keypoints")
-        text = currentContent.points.join(". ");
-      else if (currentContent.type === "summary")
-        text = `Summary: ${data.title}. ${data.content}`;
-
-      setIsSpeaking(true);
-      speakSafely(text, {
-        language: "en",
-        rate: 0.9,
-        onDone: () => setIsSpeaking(false),
-        onStopped: () => setIsSpeaking(false),
-      });
-    }
+  // What Read Aloud reads depends on the slide. Changing slide changes the
+  // control's owner id, which stops the previous narration automatically.
+  const getSlideSpeech = (): string => {
+    if (currentContent.type === "intro") return data.title;
+    if (currentContent.type === "content") return currentContent.content;
+    if (currentContent.type === "keypoints")
+      return currentContent.points.join(". ");
+    if (currentContent.type === "visuals")
+      return getVisualSpeechText(visuals);
+    return `Summary: ${data.title}. ${data.content}`;
   };
+  const readAloudOwner = `lesson-learn:${data.title}:${currentSlide}`;
 
   const handleNext = () => {
-    stopSpeech();
-    setIsSpeaking(false);
     if (isLastSlide) {
       onComplete();
     } else {
@@ -78,8 +77,6 @@ export const MicroLearnView = ({
   };
 
   const handleBack = () => {
-    stopSpeech();
-    setIsSpeaking(false);
     if (!isFirstSlide) {
       setCurrentSlide((prev) => prev - 1);
     }
@@ -109,19 +106,13 @@ export const MicroLearnView = ({
           style={learnStyles.slideCard}
         >
           {/* Speaker Button */}
-          <TouchableOpacity
+          <ReadAloudButton
+            ownerId={readAloudOwner}
+            subject="lesson content"
+            accent={theme.primary}
+            text={getSlideSpeech}
             style={learnStyles.speakerBtn}
-            onPress={speakContent}
-            hitSlop={8}
-            accessibilityRole="button"
-            accessibilityLabel={isSpeaking ? "Stop reading content" : "Read content aloud"}
-          >
-            <Icon
-              name={isSpeaking ? "VolumeSlash" : "VolumeHigh"}
-              size={22}
-              color={isSpeaking ? "#FFF" : theme.primary}
-            />
-          </TouchableOpacity>
+          />
 
           {currentContent.type === "intro" && (
             <>
@@ -154,6 +145,24 @@ export const MicroLearnView = ({
                 {currentContent.content}
               </Text>
             </>
+          )}
+
+          {currentContent.type === "visuals" && (
+            <View style={{ width: "100%" }}>
+              <View style={learnStyles.keypointsHeader}>
+                <Icon name="Eye" size={24} color={theme.primary} variant="Bold" />
+                <Text style={learnStyles.keypointsTitle}>SEE IT</Text>
+              </View>
+              <ScrollView
+                style={{ maxHeight: visualsMaxHeight }}
+                contentContainerStyle={{ paddingBottom: 8 }}
+                showsVerticalScrollIndicator
+                nestedScrollEnabled
+                keyboardShouldPersistTaps="handled"
+              >
+                <VisualBlockList visuals={visuals} />
+              </ScrollView>
+            </View>
           )}
 
           {currentContent.type === "keypoints" && (

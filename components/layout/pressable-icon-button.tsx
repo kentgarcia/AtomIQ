@@ -15,6 +15,7 @@ import {
 } from "react-native";
 
 import { playButtonClickSfx } from "@/services/ui-sfx";
+import { useTheme, withAlpha } from "@/theme";
 import { layout } from "@/theme/layout";
 
 export interface PressableIconButtonProps {
@@ -37,6 +38,7 @@ export function PressableIconButton({
     disabled = false,
     testID,
 }: PressableIconButtonProps) {
+    const { theme } = useTheme();
     const size = Math.max(1, visualSize);
     const hitSlop = Math.max(0, (layout.minTouchTarget - size) / 2);
 
@@ -48,7 +50,7 @@ export function PressableIconButton({
             disabled={disabled}
             testID={testID}
             hitSlop={hitSlop}
-            android_ripple={{ color: "rgba(0,0,0,0.08)", borderless: true }}
+            android_ripple={{ color: withAlpha(theme.colors.text, 0.08), borderless: true }}
             onPress={() => {
                 if (disabled) {
                     return;

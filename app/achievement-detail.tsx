@@ -4,11 +4,11 @@ import { useStorage } from '@/services/StorageContext';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useMemo } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { FadeIn, FadeInDown, useReducedMotion } from 'react-native-reanimated';
 
-import {useTheme, AchievementPalette, type Palette, fontFamilies, useResponsiveLayout} from "@/theme";
+import {createStyles, useTheme, AchievementPalette, fontFaces, useResponsiveLayout, withAlpha} from "@/theme";
 
 // Achievement thresholds - same as profile
 export const ACHIEVEMENTS = [
@@ -74,22 +74,8 @@ export default function AchievementDetailScreen() {
   const insets = useSafeAreaInsets();
   const { contentMaxWidth } = useResponsiveLayout();
   const { theme } = useTheme();
-  const isDark = theme.mode === "dark";
-  /* Mode-aware achievement palette */
-  const THEME: Palette = isDark
-    ? {
-        ...theme.palettes.achievements,
-        bg: "#172B4D",
-        card: "#213356",
-        border: "#2D3A56",
-        white: "#213356",
-        text: "#F6F9FC",
-        textMuted: "#8898AA",
-        primary: "#FF8C00",
-        __isDark: "1",
-      }
-    : { ...theme.palettes.achievements, __isDark: "" };
-  const styles = useMemo(() => makeStyles(THEME), [THEME]);
+  const accent = theme.palettes.achievements.primary;
+  const styles = useMemo(() => makeStyles(theme), [theme]);
   const { achievementId } = useLocalSearchParams<{ achievementId: string }>();
   const { userProfile } = useStorage();
   const reducedMotion = useReducedMotion();
@@ -113,7 +99,7 @@ export default function AchievementDetailScreen() {
   if (!achievement) {
     return (
       <View style={styles.container}>
-        <PageHeader title="Achievement" onBack={() => router.back()} palette={THEME} centered />
+        <PageHeader title="Achievement" onBack={() => router.back()} palette={theme.palettes.achievements} centered />
         <View style={styles.errorContainer}>
           <Text style={styles.errorText}>Achievement not found</Text>
         </View>
@@ -124,7 +110,7 @@ export default function AchievementDetailScreen() {
   return (
     <View style={styles.container}>
       {/* Header */}
-      <PageHeader title="Achievement" onBack={() => router.back()} palette={THEME} centered />
+      <PageHeader title="Achievement" onBack={() => router.back()} palette={theme.palettes.achievements} centered />
 
       <ScrollView
         contentContainerStyle={[
@@ -140,7 +126,7 @@ export default function AchievementDetailScreen() {
         >
           <LinearGradient
             colors={(achievement.locked 
-              ? ['#F5F5F5', '#E8E8E8'] 
+              ? [theme.colors.surfaceSoft, theme.colors.surfaceRaised]
               : [achievement.color + '30', achievement.color + '15']) as readonly [string, string]
             }
             start={{ x: 0, y: 0 }}
@@ -156,7 +142,7 @@ export default function AchievementDetailScreen() {
                 <Icon 
                   name="Lock1" 
                   size={64} 
-                  color={isDark ? '#667799' : '#999'} 
+                  color={theme.colors.textFaint}
                   variant="Bold" 
                 />
               ) : (
@@ -170,7 +156,7 @@ export default function AchievementDetailScreen() {
             </View>
             {!achievement.locked && (
               <View style={styles.largeBadge}>
-                <Icon name="TickCircle" size={28} color={THEME.green} variant="Bold" />
+                <Icon name="TickCircle" size={28} color={theme.colors.success} variant="Bold" />
               </View>
             )}
           </LinearGradient>
@@ -210,7 +196,7 @@ export default function AchievementDetailScreen() {
           <View style={styles.progressBarLarge}>
             <LinearGradient
               colors={(achievement.locked 
-                ? isDark ? ['#334A70', '#26365A'] : ['#E0E0E0', '#D0D0D0'] 
+                ? [theme.colors.disabled, theme.colors.borderStrong]
                 : [achievement.color, achievement.color + 'CC']) as readonly [string, string]
               }
               start={{ x: 0, y: 0 }}
@@ -239,7 +225,7 @@ export default function AchievementDetailScreen() {
             <View style={styles.progressDivider} />
             <View style={styles.progressStat}>
               <Text style={styles.progressStatLabel}>Remaining</Text>
-              <Text style={[styles.progressStatValue, { color: achievement.locked ? achievement.color : THEME.green }]}>
+              <Text style={[styles.progressStatValue, { color: achievement.locked ? achievement.color : theme.colors.success }]}>
                 {Math.max(0, achievement.threshold - achievement.currentValue)}
               </Text>
             </View>
@@ -252,7 +238,7 @@ export default function AchievementDetailScreen() {
           style={styles.tipsCard}
         >
           <View style={styles.tipsHeader}>
-            <Icon name="InfoCircle" size={20} color={THEME.primary} variant="Bold" />
+            <Icon name="InfoCircle" size={20} color={accent} variant="Bold" />
             <Text style={styles.tipsTitle}>How to Unlock</Text>
           </View>
           {achievement.tips.map((tip, index) => (
@@ -271,10 +257,12 @@ export default function AchievementDetailScreen() {
   );
 }
 
-const makeStyles = (THEME: Palette) => StyleSheet.create({
+const makeStyles = createStyles((theme) => {
+  const accent = theme.palettes.achievements.primary;
+  return {
   container: {
     flex: 1,
-    backgroundColor: THEME.bg,
+    backgroundColor: theme.colors.background,
   },
   header: {
     flexDirection: 'row',
@@ -282,22 +270,22 @@ const makeStyles = (THEME: Palette) => StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 24,
     paddingBottom: 16,
-    backgroundColor: THEME.bg,
+    backgroundColor: theme.colors.background,
   },
   backButton: {
     width: 40,
     height: 40,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: THEME.white,
+    backgroundColor: theme.colors.card,
     borderRadius: 12,
     borderWidth: 2,
-    borderColor: THEME.border,
+    borderColor: theme.colors.border,
   },
   headerTitle: {
     fontSize: 20,
-    fontFamily: fontFamilies.heavy,
-    color: THEME.text,
+    ...fontFaces.heavy,
+    color: theme.colors.text,
   },
   errorContainer: {
     flex: 1,
@@ -306,8 +294,8 @@ const makeStyles = (THEME: Palette) => StyleSheet.create({
   },
   errorText: {
     fontSize: 16,
-    fontFamily: fontFamilies.regular,
-    color: THEME.textMuted,
+    ...fontFaces.regular,
+    color: theme.colors.textMuted,
   },
   content: {
     padding: 24,
@@ -318,7 +306,7 @@ const makeStyles = (THEME: Palette) => StyleSheet.create({
     overflow: 'hidden',
     marginBottom: 24,
     borderWidth: 2,
-    borderColor: THEME.border,
+    borderColor: theme.colors.border,
   },
   iconCardGradient: {
     padding: 40,
@@ -330,66 +318,66 @@ const makeStyles = (THEME: Palette) => StyleSheet.create({
     width: 140,
     height: 140,
     borderRadius: 70,
-    backgroundColor: THEME.white,
+    backgroundColor: theme.colors.card,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 4,
-    shadowColor: THEME.shadow,
+    shadowColor: theme.colors.shadow,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.15,
     shadowRadius: 8,
     elevation: 5,
   },
   largeIconCircleLocked: {
-    backgroundColor: THEME.__isDark ? '#334A70' : '#F5F5F5',
-    borderColor: THEME.__isDark ? '#26365A' : '#D0D0D0',
+    backgroundColor: theme.colors.disabled,
+    borderColor: theme.colors.border,
   },
   largeBadge: {
     position: 'absolute',
     top: 20,
     right: 20,
-    backgroundColor: THEME.white,
+    backgroundColor: theme.colors.card,
     borderRadius: 20,
     borderWidth: 3,
-    borderColor: THEME.green,
+    borderColor: theme.colors.success,
     padding: 4,
   },
   infoCard: {
-    backgroundColor: THEME.card,
+    backgroundColor: theme.colors.card,
     borderRadius: 20,
     padding: 24,
     marginBottom: 16,
     borderWidth: 2,
-    borderColor: THEME.border,
+    borderColor: theme.colors.border,
   },
   achievementTitle: {
     fontSize: 28,
-    fontFamily: fontFamilies.heavy,
-    color: THEME.text,
+    ...fontFaces.heavy,
+    color: theme.colors.text,
     marginBottom: 8,
   },
   achievementTitleLocked: {
-    color: THEME.textMuted,
+    color: theme.colors.textMuted,
   },
   achievementRequirement: {
     fontSize: 16,
-    fontFamily: fontFamilies.bold,
-    color: THEME.primary,
+    ...fontFaces.bold,
+    color: accent,
     marginBottom: 16,
   },
   achievementDescription: {
     fontSize: 15,
-    fontFamily: fontFamilies.regular,
-    color: THEME.textMuted,
+    ...fontFaces.regular,
+    color: theme.colors.textMuted,
     lineHeight: 24,
   },
   progressCard: {
-    backgroundColor: THEME.card,
+    backgroundColor: theme.colors.card,
     borderRadius: 20,
     padding: 24,
     marginBottom: 16,
     borderWidth: 2,
-    borderColor: THEME.border,
+    borderColor: theme.colors.border,
   },
   progressHeader: {
     flexDirection: 'row',
@@ -399,18 +387,18 @@ const makeStyles = (THEME: Palette) => StyleSheet.create({
   },
   progressLabel: {
     fontSize: 16,
-    fontFamily: fontFamilies.bold,
-    color: THEME.text,
+    ...fontFaces.bold,
+    color: theme.colors.text,
   },
   progressPercentage: {
     fontSize: 20,
-    fontFamily: fontFamilies.heavy,
-    color: THEME.primary,
+    ...fontFaces.heavy,
+    color: accent,
   },
   progressBarLarge: {
     width: '100%',
     height: 16,
-    backgroundColor: THEME.__isDark ? '#26365A' : '#E8E8E8',
+    backgroundColor: theme.colors.disabled,
     borderRadius: 8,
     overflow: 'hidden',
     marginBottom: 20,
@@ -430,26 +418,26 @@ const makeStyles = (THEME: Palette) => StyleSheet.create({
   },
   progressStatLabel: {
     fontSize: 12,
-    color: THEME.textMuted,
-    fontFamily: fontFamilies.semibold,
+    color: theme.colors.textMuted,
+    ...fontFaces.semibold,
     marginBottom: 4,
   },
   progressStatValue: {
     fontSize: 20,
-    fontFamily: fontFamilies.heavy,
-    color: THEME.text,
+    ...fontFaces.heavy,
+    color: theme.colors.text,
   },
   progressDivider: {
     width: 1,
     height: 40,
-    backgroundColor: THEME.border,
+    backgroundColor: theme.colors.border,
   },
   tipsCard: {
-    backgroundColor: THEME.card,
+    backgroundColor: theme.colors.card,
     borderRadius: 20,
     padding: 24,
     borderWidth: 2,
-    borderColor: THEME.border,
+    borderColor: theme.colors.border,
   },
   tipsHeader: {
     flexDirection: 'row',
@@ -459,8 +447,8 @@ const makeStyles = (THEME: Palette) => StyleSheet.create({
   },
   tipsTitle: {
     fontSize: 18,
-    fontFamily: fontFamilies.heavy,
-    color: THEME.text,
+    ...fontFaces.heavy,
+    color: theme.colors.text,
   },
   tipItem: {
     flexDirection: 'row',
@@ -471,7 +459,7 @@ const makeStyles = (THEME: Palette) => StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: 14,
-    backgroundColor: THEME.primary + '20',
+    backgroundColor: withAlpha(accent, 0.13),
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
@@ -479,15 +467,16 @@ const makeStyles = (THEME: Palette) => StyleSheet.create({
   },
   tipBulletText: {
     fontSize: 14,
-    fontFamily: fontFamilies.heavy,
-    color: THEME.primary,
+    ...fontFaces.heavy,
+    color: accent,
   },
   tipText: {
     flex: 1,
     fontSize: 15,
-    color: THEME.text,
+    color: theme.colors.text,
     lineHeight: 22,
-    fontFamily: fontFamilies.medium,
+    ...fontFaces.medium,
   },
+  };
 });
 

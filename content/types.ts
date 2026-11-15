@@ -32,7 +32,187 @@ export interface MicroLearnStep {
   content: string;
   image?: string;
   keyPoints?: string[];
+  /** Structured visual lesson blocks (see docs/VISUAL_LESSON_BLOCKS.md). Additive; optional. */
+  visuals?: VisualBlock[];
 }
+
+/** Briefing steps auto-advance, so `visuals` is accepted by the schema but not rendered there yet. */
+export interface BriefingStep {
+  topic: string;
+  mission: string;
+  icon?: string;
+  visuals?: VisualBlock[];
+}
+
+/** Debrief steps accept `visuals` for a future recap figure; not rendered yet. */
+export interface DebriefStep {
+  title: string;
+  message: string;
+  rewards?: { xp?: number; stars?: number };
+  visuals?: VisualBlock[];
+}
+
+// ============================================
+// VISUAL LESSON BLOCKS
+// ============================================
+
+export type VisualBlockKind =
+  | 'diagram'
+  | 'process_flow'
+  | 'model'
+  | 'comparison_cards'
+  | 'annotated_illustration'
+  | 'real_life_example';
+
+/** Semantic hue for illustration shapes. Mapped to theme roles by the renderer. */
+export type VisualTone =
+  | 'primary'
+  | 'accent'
+  | 'success'
+  | 'warning'
+  | 'danger'
+  | 'info'
+  | 'neutral';
+
+/** Where a visual's facts or imagery come from. */
+export type VisualSource =
+  | { type: 'original'; note: string }
+  | {
+      type: 'reference';
+      publisher: string;
+      title: string;
+      year?: number | string;
+      url?: string;
+      note?: string;
+      /** True when the figures should be re-checked against the publisher before wide release. */
+      verify?: boolean;
+    };
+
+export interface VisualResponsiveHint {
+  /** Content width (dp) below which the figure's labels fall back to a stacked list. Default 280. */
+  stackBelow?: number;
+  /** Tablet arrangement of figure + legend. Default 'side-by-side'. */
+  tabletLayout?: 'side-by-side' | 'stacked';
+}
+
+interface VisualBlockBase {
+  /** Globally unique, stable id (kebab-case). */
+  id: string;
+  /** What the learner should be able to do/explain after this visual. Authoring-first field. */
+  learningObjective: string;
+  title: string;
+  /** The teaching text shown as normal body copy next to the figure. */
+  explanation: string;
+  /** Screen-reader description of what the figure SHOWS (not a copy of the title). */
+  altText: string;
+  /** Plain-text equivalent that fully conveys the content (every label, value and relationship). */
+  plainText: string;
+  caption?: string;
+  /** Required for comparison_cards and real_life_example (external facts); recommended elsewhere. */
+  source?: VisualSource;
+  /** Credit line for imagery/illustration. */
+  credit?: string;
+  responsive?: VisualResponsiveHint;
+}
+
+/** A shape in a 100-unit-wide scene. Coordinates are scene units; y grows downward. */
+export type SceneShape =
+  | { t: 'rect'; x: number; y: number; w: number; h: number; tone?: VisualTone; fill?: 'solid' | 'soft' | 'none'; rx?: number }
+  | { t: 'circle'; x: number; y: number; r: number; tone?: VisualTone; fill?: 'solid' | 'soft' | 'none' }
+  | { t: 'line'; x1: number; y1: number; x2: number; y2: number; tone?: VisualTone; dash?: boolean; arrow?: boolean; width?: number }
+  | { t: 'text'; x: number; y: number; text: string; size?: number; anchor?: 'start' | 'middle' | 'end'; tone?: VisualTone; keep?: boolean };
+
+export interface VisualScene {
+  /** Scene height in units (width is always 100). 20-120. */
+  height: number;
+  shapes: SceneShape[];
+}
+
+export interface VisualCallout {
+  /** Marker text drawn in the figure, e.g. "1". */
+  id: string;
+  label: string;
+  detail: string;
+  /** Marker position in scene units. */
+  x: number;
+  y: number;
+}
+
+export interface VisualKeyItem {
+  tone: VisualTone;
+  label: string;
+  /** Shape used in the key swatch so meaning never relies on color alone. */
+  swatch?: 'circle' | 'square' | 'line';
+}
+
+interface SceneBlockFields {
+  scene: VisualScene;
+  callouts: VisualCallout[];
+  key?: VisualKeyItem[];
+}
+
+export interface DiagramBlock extends VisualBlockBase, SceneBlockFields {
+  kind: 'diagram';
+}
+
+export interface ModelBlock extends VisualBlockBase, SceneBlockFields {
+  kind: 'model';
+}
+
+export interface AnnotatedIllustrationBlock extends VisualBlockBase, SceneBlockFields {
+  kind: 'annotated_illustration';
+}
+
+export interface ProcessFlowStep {
+  label: string;
+  detail?: string;
+  /** Short value shown large, e.g. "50". */
+  value?: string;
+  /** 0-1 proportion drawn as a meter (e.g. amount remaining). */
+  meter?: number;
+}
+
+export interface ProcessFlowBlock extends VisualBlockBase {
+  kind: 'process_flow';
+  steps: ProcessFlowStep[];
+}
+
+export interface ComparisonItem {
+  label: string;
+  /** Display value with its unit, e.g. "about 0.1 mSv". */
+  value: string;
+  detail?: string;
+  /** Positive number in the shared unit; used only to draw the bar. */
+  numeric?: number;
+  tone?: VisualTone;
+}
+
+export interface ComparisonCardsBlock extends VisualBlockBase {
+  kind: 'comparison_cards';
+  items: ComparisonItem[];
+  /** Bar scale when every item has `numeric`. Default 'none'. */
+  scale?: 'log' | 'linear' | 'none';
+  /** Note shown under the cards, e.g. "Bars use a log scale". */
+  scaleNote?: string;
+}
+
+export interface RealLifeExampleBlock extends VisualBlockBase {
+  kind: 'real_life_example';
+  headline: string;
+  whatYouSee: string;
+  theScience: string;
+  whyItMatters: string;
+  facts?: string[];
+  scene?: VisualScene;
+}
+
+export type VisualBlock =
+  | DiagramBlock
+  | ProcessFlowBlock
+  | ModelBlock
+  | ComparisonCardsBlock
+  | AnnotatedIllustrationBlock
+  | RealLifeExampleBlock;
 
 export interface LabStep {
   title: string;

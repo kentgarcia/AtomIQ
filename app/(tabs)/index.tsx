@@ -13,7 +13,7 @@ import { openExternalUrl } from "@/services/open-url";
 import { getProfileAvatarSource } from "@/services/profile-avatars";
 import { getBetaNoticeSeen, setBetaNoticeSeen } from "@/services/storage";
 import { useStorage } from "@/services/StorageContext";
-import { useTheme, type Palette, fontFamilies, useResponsiveLayout } from "@/theme";
+import { useTheme, createStyles, withAlpha, fontFaces, useResponsiveLayout } from "@/theme";
 import { notifySuccess } from "@/services/haptics";
 import { LinearGradient } from "expo-linear-gradient";
 import { useFocusEffect, useRouter } from "expo-router";
@@ -23,7 +23,6 @@ import {
     Image,
     ScrollView,
     type ScrollViewInstance,
-    StyleSheet,
     Text,
     TouchableOpacity,
     useWindowDimensions,
@@ -81,7 +80,6 @@ const GLASS_LOCATIONS = [0, 0.25, 0.48, 0.481, 0.58, 0.581, 0.75, 0.751] as cons
 /* Autumn action tokens, shared with the missions + daily-fact screens */
 const BTN_COLOR = "#FF8C00";
 const BTN_LIP = "#E67E22";
-const CREAM = "#FFF3E0";
 
 /* Flat-top hexagon for the per-mission icon (46x46 viewBox), inset so the
    thicker rounding stroke stays inside the canvas */
@@ -127,7 +125,10 @@ const computeNodeScrollY = (
   return Math.max(0, offset - (windowHeight - 320) / 2);
 };
 
-const buildPath = (completedLessonIds: string[]): PathUnit[] => {
+const buildPath = (
+  completedLessonIds: string[],
+  lockedColor: string,
+): PathUnit[] => {
   return UNITS.map((unit, unitIndex) => {
     // A unit only counts as finished when its lessons AND its final exam
     // (quiz) are all completed — finishing the last lesson alone must not
@@ -184,7 +185,7 @@ const buildPath = (completedLessonIds: string[]): PathUnit[] => {
       title: unit.title,
       subtitle: unit.subtitle,
       description: unit.description,
-      color: isUnitLocked ? "#9CA3AF" : unit.color,
+      color: isUnitLocked ? lockedColor : unit.color,
       icon: unit.icon,
       levels,
       isLocked: isUnitLocked,
@@ -223,7 +224,7 @@ const renderRichText = (text: string): React.ReactNode[] => {
     .join("\n");
   return normalized.split("**").map((part, i) =>
     i % 2 === 1 ? (
-      <Text key={i} style={{ fontFamily: fontFamilies.bold }}>
+      <Text key={i} style={{ ...fontFaces.bold }}>
         {part}
       </Text>
     ) : (
@@ -325,34 +326,30 @@ export default function HomeScreen() {
     refresh: refreshMissions,
   } = useDailyMissions();
   const { theme } = useTheme();
+  const c = theme.colors;
   const { width, height: windowHeight } = useWindowDimensions();
   const { contentMaxWidth } = useResponsiveLayout();
   const tabBarInset = useTabBarInset();
   // The winding map is laid out inside the readable frame, not the raw
   // viewport, so tablet nodes do not spread edge-to-edge.
   const mapWidth = Math.min(width, contentMaxWidth);
-  const THEME = theme.palettes.tab;
   const isDark = theme.mode === "dark";
-  const styles = useMemo(() => createStyles(THEME, isDark), [THEME, isDark]);
+  const styles = useMemo(() => makeStyles(theme), [theme]);
   const reducedMotion = useReducedMotion();
 
   // Autumn gradient background (cream → white, like the reference design)
-  const bgTop = theme.mode === "dark" ? THEME.bg : "#FFF3E0";
-  const bgBottom = theme.mode === "dark" ? THEME.bg : "#FFFFFF";
+  const bgTop = c.pageGradientTop;
+  const bgBottom = c.pageGradientBottom;
   // Page-gradient color at the header backdrop's bottom edge so the backdrop
   // blends seamlessly into the background
-  const backdropBottom =
-    theme.mode === "dark"
-      ? THEME.bg
-      : mixHex(
-          "#FFF3E0",
-          "#FFFFFF",
-          Math.min(1, (insets.top + CARD_TOP) / windowHeight),
-        );
+  const backdropBottom = mixHex(
+    c.pageGradientTop,
+    c.pageGradientBottom,
+    Math.min(1, (insets.top + CARD_TOP) / windowHeight),
+  );
 
   // Winding path stroke (subtle, visible on the plain background)
-  const pathStroke =
-    theme.mode === "dark" ? "rgba(255,255,255,0.25)" : "rgba(17,24,39,0.18)";
+  const pathStroke = withAlpha(c.text, isDark ? 0.25 : 0.18);
 
   const scrollViewRef = useRef<ScrollViewInstance>(null);
   const [infoOpen, setInfoOpen] = useState(false);
@@ -456,8 +453,8 @@ export default function HomeScreen() {
   );
 
   const units = useMemo(
-    () => buildPath(completedKey ? completedKey.split("|") : []),
-    [completedKey],
+    () => buildPath(completedKey ? completedKey.split("|") : [], c.textFaint),
+    [completedKey, c.textFaint],
   );
 
   // Locate the first "current" (next up) node
@@ -676,7 +673,10 @@ const handleScroll = useCallback(
                   y={pathPoints[i].y}
                   unitColor={unit.color}
                   firstId={firstCurrentId}
-                  isDark={isDark}
+                  lockedFaceColor={theme.colors.borderStrong}
+                  lockedIconColor={theme.colors.textMuted}
+                  onNodeIconColor={theme.colors.onPrimary}
+                  shadowColor={theme.colors.shadow}
                   onPress={() => handleNodePress(node)}
                   styles={styles}
                 />
@@ -841,7 +841,7 @@ const handleScroll = useCallback(
                             ? "#9CA3AF"
                             : infoOpen
                               ? "#724D06"
-                              : THEME.primary
+                              : c.primary
                         }
                         variant={
                           activeUnit.isLocked || infoOpen ? "Bold" : "Linear"
@@ -883,7 +883,7 @@ const handleScroll = useCallback(
                                 <Icon
                                   name="Link"
                                   size={14}
-                                  color={THEME.primary}
+                                  color={c.primary}
                                   variant="Bold"
                                 />
                                 <Text
@@ -897,7 +897,7 @@ const handleScroll = useCallback(
                                 <Icon
                                   name="ArrowRight2"
                                   size={14}
-                                  color={THEME.textMuted}
+                                  color={c.textMuted}
                                 />
                               </TouchableOpacity>
                             ))}
@@ -934,8 +934,8 @@ const handleScroll = useCallback(
                       <Svg width={40} height={40} viewBox="0 0 46 46">
                         <Polygon
                           points={HEX_POINTS}
-                          fill={mission.isComplete ? BTN_COLOR : isDark ? "#334A70" : CREAM}
-                          stroke={mission.isComplete ? BTN_COLOR : isDark ? "#334A70" : CREAM}
+                          fill={mission.isComplete ? BTN_COLOR : c.creamTint}
+                          stroke={mission.isComplete ? BTN_COLOR : c.creamTint}
                           strokeWidth={12}
                           strokeLinejoin="round"
                         />
@@ -1180,7 +1180,10 @@ const LessonNode = ({
   firstId,
   onPress,
   styles,
-  isDark,
+  lockedFaceColor,
+  lockedIconColor,
+  onNodeIconColor,
+  shadowColor,
 }: {
   node: PathNode;
   x: number;
@@ -1189,7 +1192,10 @@ const LessonNode = ({
   firstId: string | null;
   onPress: () => void;
   styles: any;
-  isDark: boolean;
+  lockedFaceColor: string;
+  lockedIconColor: string;
+  onNodeIconColor: string;
+  shadowColor: string;
 }) => {
   const isLocked = node.status === "locked";
   const isCurrent = node.status === "current";
@@ -1252,12 +1258,12 @@ const LessonNode = ({
   if (node.type === "chest") iconName = "Box";
   if (node.type === "trophy") iconName = "Cup";
 
-  const lockedFace = isDark ? "#334A70" : "#E5E7EB";
+  const lockedFace = lockedFaceColor;
   const faceColor = isLocked ? lockedFace : unitColor;
   const lipColor = isLocked
     ? shadeColor(lockedFace, -0.12)
     : shadeColor(unitColor, -0.14);
-  const iconColor = isLocked ? (isDark ? "#8898AA" : "#9CA3AF") : "#FFFFFF";
+  const iconColor = isLocked ? lockedIconColor : onNodeIconColor;
 
   return (
     <View
@@ -1277,7 +1283,7 @@ const LessonNode = ({
           style={[
             styles.node,
             nodeStyle,
-            { shadowColor: isLocked ? "#000000" : `${unitColor}80` },
+            { shadowColor: isLocked ? shadowColor : `${unitColor}80` },
           ]}
         >
           {/* Inner rounded rect in lip color — its own painted corners */}
@@ -1340,41 +1346,12 @@ const LessonNode = ({
   );
 };
 
-const createStyles = (theme: Palette, isDark: boolean) => {
-  /* Mode-aware neutral surfaces — brand accents stay identical */
-  const P = isDark
-    ? {
-        headerBg: "#FFCA5F",
-        headerText: "#724D06",
-        chipBorder: "#FFDD8D",
-        chipActive: "#FFE0B2",
-        card: "#213356",
-        border: "#2D3A56",
-        softBorder: "#26365A",
-        soft: "#1A2D4A",
-        text: "#F6F9FC",
-        textSecondary: "#C0CBDD",
-        muted: "#8898AA",
-        faint: "#667799",
-      }
-    : {
-        headerBg: "#FFCA5F",
-        headerText: "#724D06",
-        chipBorder: "#FFDD8D",
-        chipActive: "#FFE0B2",
-        card: "#FFFFFF",
-        border: "#E5E7EB",
-        softBorder: "#F0F0F0",
-        soft: "#F4F5F7",
-        text: "#333333",
-        textSecondary: "#555555",
-        muted: "#888888",
-        faint: "#9CA3AF",
-      };
-  return StyleSheet.create({
+const makeStyles = createStyles((theme) => {
+  const c = theme.colors;
+  return {
     container: {
       flex: 1,
-      backgroundColor: theme.bg,
+      backgroundColor: c.background,
     },
     bgGradient: {
       position: "absolute",
@@ -1411,12 +1388,12 @@ const createStyles = (theme: Palette, isDark: boolean) => {
     },
     /* One rounded amber card holding the header row and the lesson card */
     headerBar: {
-      backgroundColor: P.headerBg,
+      backgroundColor: c.amberSurface,
       borderRadius: 26,
       padding: 10,
       gap: 12,
       elevation: 4,
-      shadowColor: "#000000",
+      shadowColor: c.shadow,
       shadowOffset: { width: 0, height: 3 },
       shadowOpacity: 0.1,
       shadowRadius: 6,
@@ -1430,9 +1407,9 @@ const createStyles = (theme: Palette, isDark: boolean) => {
       width: 46,
       height: 46,
       borderRadius: 23,
-      backgroundColor: P.card,
+      backgroundColor: c.card,
       borderWidth: 2,
-      borderColor: P.border,
+      borderColor: c.border,
       borderBottomWidth: 4,
     },
     avatar: {
@@ -1442,39 +1419,39 @@ const createStyles = (theme: Palette, isDark: boolean) => {
     },
     greetingLabel: {
       fontSize: 11,
-      fontFamily: fontFamilies.semibold,
-      color: P.headerText,
+      ...fontFaces.semibold,
+      color: c.amberText,
       textTransform: "uppercase",
       letterSpacing: 0.6,
       marginBottom: 1,
     },
     greetingName: {
       fontSize: 17,
-      fontFamily: fontFamilies.heavy,
-      color: P.headerText,
+      ...fontFaces.heavy,
+      color: c.amberText,
     },
     xpPill: {
       flexDirection: "row",
       alignItems: "center",
       gap: 5,
-      backgroundColor: "#434343",
+      backgroundColor: c.inverseSurface,
       paddingHorizontal: 12,
       height: 40,
       borderRadius: 14,
     },
     xpText: {
       fontSize: 13,
-      fontFamily: fontFamilies.heavy,
+      ...fontFaces.heavy,
       color: "#FFFFFF",
       fontVariant: ["tabular-nums"],
     },
     /* Lesson card — its own separate card design nested in the header bar */
     nowCard: {
-      backgroundColor: P.card,
+      backgroundColor: c.card,
       borderRadius: 20,
       padding: 16,
       borderWidth: 2,
-      borderColor: P.border,
+      borderColor: c.border,
       borderBottomWidth: 4,
     },
     nowCardRow: {
@@ -1492,21 +1469,21 @@ const createStyles = (theme: Palette, isDark: boolean) => {
     },
     infoDivider: {
       height: 1,
-      backgroundColor: P.softBorder,
+      backgroundColor: c.borderSubtle,
       marginBottom: 12,
     },
     infoLabel: {
       fontSize: 10,
-      fontFamily: fontFamilies.heavy,
-      color: P.faint,
+      ...fontFaces.heavy,
+      color: c.textFaint,
       textTransform: "uppercase",
       letterSpacing: 0.8,
       marginBottom: 5,
     },
     infoBody: {
       fontSize: 13,
-      fontFamily: fontFamilies.regular,
-      color: P.textSecondary,
+      ...fontFaces.regular,
+      color: c.textSecondary,
       lineHeight: 20,
     },
     infoRefs: {
@@ -1514,7 +1491,7 @@ const createStyles = (theme: Palette, isDark: boolean) => {
       marginTop: 2,
     },
     infoBtnActive: {
-      backgroundColor: P.chipActive,
+      backgroundColor: c.amberSurfaceStrong,
     },
     /* Nodes */
     nodeWrap: {
@@ -1531,10 +1508,10 @@ const createStyles = (theme: Palette, isDark: boolean) => {
       height: NODE_SIZE,
       borderRadius: NODE_RADIUS,
       borderWidth: NODE_BORDER,
-      borderColor: isDark ? "#2D3A56" : "#FFFFFF",
-      backgroundColor: isDark ? "#172B4D" : "#FFFFFF",
+      borderColor: c.border,
+      backgroundColor: c.card,
       elevation: 6,
-      shadowColor: "#000000",
+      shadowColor: c.shadow,
       shadowOffset: { width: 0, height: 4 },
       shadowOpacity: 0.15,
       shadowRadius: 6,
@@ -1573,11 +1550,11 @@ const createStyles = (theme: Palette, isDark: boolean) => {
       height: BADGE_SIZE,
       borderRadius: BADGE_SIZE / 2,
       borderWidth: 4,
-      borderColor: "#FFFFFF",
+      borderColor: c.card,
       backgroundColor: "#FF7B00",
       zIndex: 20,
       elevation: 3,
-      shadowColor: "#000000",
+      shadowColor: c.shadow,
       shadowOffset: { width: 0, height: 2 },
       shadowOpacity: 0.15,
       shadowRadius: 3,
@@ -1592,22 +1569,22 @@ const createStyles = (theme: Palette, isDark: boolean) => {
       position: "absolute",
       top: -40,
       alignSelf: "center",
-      backgroundColor: theme.card,
+      backgroundColor: c.card,
       paddingHorizontal: 12,
       paddingVertical: 7,
       borderRadius: 12,
       borderWidth: 2,
-      borderColor: P.border,
+      borderColor: c.border,
       zIndex: 20,
       elevation: 4,
-      shadowColor: "#000",
+      shadowColor: c.shadow,
       shadowOffset: { width: 0, height: 2 },
       shadowOpacity: 0.1,
       shadowRadius: 4,
     },
     startText: {
-      fontFamily: fontFamilies.heavy,
-      color: theme.primary,
+      ...fontFaces.heavy,
+      color: c.primary,
       fontSize: 13,
     },
     bubbleArrow: {
@@ -1617,10 +1594,10 @@ const createStyles = (theme: Palette, isDark: boolean) => {
       marginLeft: -6,
       width: 12,
       height: 12,
-      backgroundColor: theme.card,
+      backgroundColor: c.card,
       borderBottomWidth: 2,
       borderRightWidth: 2,
-      borderColor: P.border,
+      borderColor: c.border,
       transform: [{ rotate: "45deg" }],
     },
     unitDivider: {
@@ -1639,28 +1616,28 @@ const createStyles = (theme: Palette, isDark: boolean) => {
     },
     unitDividerText: {
       fontSize: 13,
-      fontFamily: fontFamilies.heavy,
-      color: theme.textMuted,
+      ...fontFaces.heavy,
+      color: c.textMuted,
       textTransform: "uppercase",
       letterSpacing: 1,
     },
     unitSubtitle: {
       fontSize: 11,
-      fontFamily: fontFamilies.semibold,
-      color: P.muted,
+      ...fontFaces.semibold,
+      color: c.textMuted,
       textTransform: "uppercase",
       letterSpacing: 0.8,
       marginBottom: 3,
     },
     unitTitle: {
       fontSize: 20,
-      fontFamily: fontFamilies.heavy,
-      color: P.text,
+      ...fontFaces.heavy,
+      color: c.text,
     },
     infoBtn: {
       width: 36,
       height: 36,
-      backgroundColor: P.soft,
+      backgroundColor: c.surfaceSoft,
       borderRadius: 18,
       alignItems: "center",
       justifyContent: "center",
@@ -1675,13 +1652,13 @@ const createStyles = (theme: Palette, isDark: boolean) => {
       borderRadius: 14,
       alignItems: "center",
       justifyContent: "center",
-      backgroundColor: P.card,
+      backgroundColor: c.card,
       borderWidth: 2,
-      borderColor: P.chipBorder,
+      borderColor: c.amberBorder,
       borderBottomWidth: 4,
       elevation: 2,
       zIndex: 95,
-      shadowColor: "#000000",
+      shadowColor: c.shadow,
       shadowOffset: { width: 0, height: 2 },
       shadowOpacity: 0.12,
       shadowRadius: 4,
@@ -1698,11 +1675,11 @@ const createStyles = (theme: Palette, isDark: boolean) => {
       flex: 1,
       borderRadius: 28,
       overflow: "hidden",
-      backgroundColor: theme.primary,
+      backgroundColor: c.primary,
     },
     nextBtnInner: {
       flex: 1,
-      backgroundColor: theme.primary,
+      backgroundColor: c.primary,
       alignItems: "center",
       justifyContent: "center",
     },
@@ -1712,7 +1689,7 @@ const createStyles = (theme: Palette, isDark: boolean) => {
       right: 0,
       bottom: 0,
       height: 4,
-      backgroundColor: "rgba(0,0,0,0.15)",
+      backgroundColor: withAlpha(c.text, 0.15),
     },
     /* Daily missions + fact icons: two square buttons that expand the card */
     dailyRow: {
@@ -1724,28 +1701,28 @@ const createStyles = (theme: Palette, isDark: boolean) => {
       width: 40,
       height: 40,
       borderRadius: 14,
-      backgroundColor: P.card,
+      backgroundColor: c.card,
       alignItems: "center",
       justifyContent: "center",
       borderWidth: 2,
-      borderColor: P.chipBorder,
+      borderColor: c.amberBorder,
       borderBottomWidth: 4,
       elevation: 2,
     },
     dailyChipActive: {
-      backgroundColor: P.chipActive,
+      backgroundColor: c.amberSurfaceStrong,
     },
     /* Expanded daily panel — a white card floating under the header bar */
     dailyPanel: {
-      backgroundColor: P.card,
+      backgroundColor: c.card,
       borderRadius: 20,
       padding: 14,
       gap: 12,
       borderWidth: 2,
-      borderColor: P.border,
+      borderColor: c.border,
       borderBottomWidth: 4,
       elevation: 6,
-      shadowColor: "#000000",
+      shadowColor: c.shadow,
       shadowOffset: { width: 0, height: 4 },
       shadowOpacity: 0.12,
       shadowRadius: 8,
@@ -1758,18 +1735,18 @@ const createStyles = (theme: Palette, isDark: boolean) => {
     },
     panelTitle: {
       fontSize: 15,
-      fontFamily: fontFamilies.heavy,
-      color: P.text,
+      ...fontFaces.heavy,
+      color: c.text,
     },
     panelMeta: {
       fontSize: 12,
-      fontFamily: fontFamilies.semibold,
-      color: P.faint,
+      ...fontFaces.semibold,
+      color: c.textFaint,
     },
     panelProgressTrack: {
       height: 8,
       borderRadius: 4,
-      backgroundColor: P.soft,
+      backgroundColor: c.surfaceSoft,
       overflow: "hidden",
     },
     panelProgressFill: {
@@ -1797,13 +1774,13 @@ const createStyles = (theme: Palette, isDark: boolean) => {
     },
     missionTitle: {
       fontSize: 13,
-      fontFamily: fontFamilies.heavy,
-      color: P.text,
+      ...fontFaces.heavy,
+      color: c.text,
     },
     missionDesc: {
       fontSize: 11,
-      fontFamily: fontFamilies.regular,
-      color: P.faint,
+      ...fontFaces.regular,
+      color: c.textFaint,
       marginTop: 1,
     },
     /* Mission row actions */
@@ -1822,7 +1799,7 @@ const createStyles = (theme: Palette, isDark: boolean) => {
     },
     actionBtnText: {
       fontSize: 12,
-      fontFamily: fontFamilies.heavy,
+      ...fontFaces.heavy,
       color: "#FFFFFF",
     },
     actionBtnLip: {
@@ -1843,11 +1820,11 @@ const createStyles = (theme: Palette, isDark: boolean) => {
     },
     claimedText: {
       fontSize: 12,
-      fontFamily: fontFamilies.heavy,
+      ...fontFaces.heavy,
       color: "#FFFFFF",
     },
     lockedPill: {
-      backgroundColor: P.soft,
+      backgroundColor: c.surfaceSoft,
       borderRadius: 12,
       paddingHorizontal: 11,
       height: 32,
@@ -1856,8 +1833,8 @@ const createStyles = (theme: Palette, isDark: boolean) => {
     },
     lockedText: {
       fontSize: 12,
-      fontFamily: fontFamilies.semibold,
-      color: P.faint,
+      ...fontFaces.semibold,
+      color: c.textFaint,
     },
     /* Daily fact panel */
     factHeader: {
@@ -1885,52 +1862,52 @@ const createStyles = (theme: Palette, isDark: boolean) => {
     },
     factBadgeText: {
       fontSize: 10,
-      fontFamily: fontFamilies.heavy,
+      ...fontFaces.heavy,
       color: "#FFFFFF",
       letterSpacing: 0.6,
     },
     factTitle: {
       fontSize: 14,
-      fontFamily: fontFamilies.heavy,
-      color: P.text,
+      ...fontFaces.heavy,
+      color: c.text,
     },
     rewardPill: {
       flexDirection: "row",
       alignItems: "center",
       gap: 4,
-      backgroundColor: isDark ? "#4A381B" : CREAM,
+      backgroundColor: c.creamTint,
       borderRadius: 10,
       paddingHorizontal: 9,
       paddingVertical: 5,
     },
     rewardText: {
       fontSize: 11,
-      fontFamily: fontFamilies.heavy,
-      color: isDark ? "#FFB25E" : "#E67E22",
+      ...fontFaces.heavy,
+      color: c.amberText,
     },
     factStatement: {
       fontSize: 15,
-      fontFamily: fontFamilies.bold,
-      color: P.text,
+      ...fontFaces.bold,
+      color: c.text,
       lineHeight: 23,
     },
     factDivider: {
       height: 1,
-      backgroundColor: P.softBorder,
+      backgroundColor: c.borderSubtle,
       marginVertical: 12,
     },
     factExplainLabel: {
       fontSize: 10,
-      fontFamily: fontFamilies.heavy,
-      color: P.faint,
+      ...fontFaces.heavy,
+      color: c.textFaint,
       textTransform: "uppercase",
       letterSpacing: 0.8,
       marginBottom: 5,
     },
     factExplain: {
       fontSize: 13,
-      fontFamily: fontFamilies.regular,
-      color: P.textSecondary,
+      ...fontFaces.regular,
+      color: c.textSecondary,
       lineHeight: 20,
     },
     factAction: {
@@ -1951,7 +1928,7 @@ const createStyles = (theme: Palette, isDark: boolean) => {
     },
     factReadBtnText: {
       fontSize: 13,
-      fontFamily: fontFamilies.heavy,
+      ...fontFaces.heavy,
       color: "#FFFFFF",
     },
     factReadPill: {
@@ -1965,7 +1942,7 @@ const createStyles = (theme: Palette, isDark: boolean) => {
     },
     factReadText: {
       fontSize: 13,
-      fontFamily: fontFamilies.heavy,
+      ...fontFaces.heavy,
       color: "#FFFFFF",
     },
     /* Long fact content scrolls within the panel */
@@ -1982,9 +1959,9 @@ const createStyles = (theme: Palette, isDark: boolean) => {
       minWidth: 22,
       height: 22,
       borderRadius: 11,
-      backgroundColor: "#EF4444",
+      backgroundColor: c.error,
       borderWidth: 2,
-      borderColor: "#FFFFFF",
+      borderColor: c.card,
       alignItems: "center",
       justifyContent: "center",
       paddingHorizontal: 4,
@@ -1992,7 +1969,7 @@ const createStyles = (theme: Palette, isDark: boolean) => {
     missionBadgeText: {
       color: "#FFFFFF",
       fontSize: 11,
-      fontFamily: fontFamilies.heavy,
+      ...fontFaces.heavy,
     },
     referenceItem: {
       flexDirection: "row",
@@ -2000,18 +1977,18 @@ const createStyles = (theme: Palette, isDark: boolean) => {
       gap: 10,
       paddingVertical: 12,
       paddingHorizontal: 16,
-      backgroundColor: P.soft,
+      backgroundColor: c.surfaceSoft,
       borderRadius: 14,
       marginBottom: 8,
       borderWidth: 2,
-      borderColor: P.border,
+      borderColor: c.border,
       borderBottomWidth: 4,
     },
     referenceText: {
       flex: 1,
       fontSize: 13,
-      color: theme.primary,
-      fontFamily: fontFamilies.medium,
+      color: c.primary,
+      ...fontFaces.medium,
     },
     /* Level-up celebration overlay — must sit above the sticky header
        (zIndex 100) on iOS and above its elevation on Android, so the dim
@@ -2022,7 +1999,7 @@ const createStyles = (theme: Palette, isDark: boolean) => {
       right: 0,
       bottom: 0,
       left: 0,
-      backgroundColor: "rgba(0, 0, 0, 0.45)",
+      backgroundColor: c.overlay,
       alignItems: "center",
       justifyContent: "center",
       paddingHorizontal: 28,
@@ -2032,13 +2009,13 @@ const createStyles = (theme: Palette, isDark: boolean) => {
     levelUpCard: {
       width: "100%",
       maxWidth: 340,
-      backgroundColor: isDark ? "rgba(33, 51, 86, 0.97)" : "rgba(255, 255, 255, 0.97)",
+      backgroundColor: c.card,
       borderRadius: 26,
       paddingVertical: 30,
       paddingHorizontal: 26,
       alignItems: "center",
       elevation: 12,
-      shadowColor: "#000000",
+      shadowColor: c.shadow,
       shadowOffset: { width: 0, height: 10 },
       shadowOpacity: 0.25,
       shadowRadius: 24,
@@ -2047,16 +2024,16 @@ const createStyles = (theme: Palette, isDark: boolean) => {
       width: 72,
       height: 72,
       borderRadius: 36,
-      backgroundColor: "#FFF8E1",
+      backgroundColor: c.creamTint,
       borderWidth: 3,
-      borderColor: "#FFE082",
+      borderColor: c.creamBorder,
       alignItems: "center",
       justifyContent: "center",
       marginBottom: 14,
     },
     levelUpLabel: {
       fontSize: 13,
-      fontFamily: fontFamilies.heavy,
+      ...fontFaces.heavy,
       color: "#E67E22",
       letterSpacing: 2,
       textTransform: "uppercase",
@@ -2064,14 +2041,14 @@ const createStyles = (theme: Palette, isDark: boolean) => {
     },
     levelUpValue: {
       fontSize: 30,
-      fontFamily: fontFamilies.heavy,
-      color: P.text,
+      ...fontFaces.heavy,
+      color: c.text,
       marginBottom: 10,
     },
     levelUpSub: {
       fontSize: 13,
-      fontFamily: fontFamilies.regular,
-      color: P.muted,
+      ...fontFaces.regular,
+      color: c.textMuted,
       textAlign: "center",
       lineHeight: 20,
       marginBottom: 20,
@@ -2087,8 +2064,8 @@ const createStyles = (theme: Palette, isDark: boolean) => {
     },
     levelUpBtnText: {
       fontSize: 15,
-      fontFamily: fontFamilies.heavy,
+      ...fontFaces.heavy,
       color: "#FFFFFF",
     },
-  });
-};
+  };
+});

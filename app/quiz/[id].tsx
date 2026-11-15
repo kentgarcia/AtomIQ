@@ -1,7 +1,8 @@
 import { Icon } from "@/components/ui/icon";
 import { getQuizById } from "@/content/quizzes";
 import type { Quiz } from "@/content/types";
-import {useTheme, type Palette, fontFamilies, useResponsiveLayout} from "@/theme";
+import {useTheme, type Palette, fontFaces, useResponsiveLayout} from "@/theme";
+import { recordActivity } from "@/services/activity-log";
 import { useStorage } from "@/services/StorageContext";
 import {
     getLevelProgress,
@@ -10,9 +11,11 @@ import {
     updateLevelProgress,
 } from "@/services/database";
 import { toLocalIsoDate } from "@/services/utils";
-import { playGameSfx, preloadGameSfx } from "@/services/game-sfx";
+import { playAnswerSfx, preloadGameSfx } from "@/services/game-sfx";
+import { readAloud } from "@/services/media";
+import { buildFeedbackSpeech, buildQuestionSpeech } from "@/services/media-core";
+import { ReadAloudButton } from "@/components/ui/read-aloud-button";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { speakSafely, stopSpeech } from "@/services/speech";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
     ActivityIndicator,
@@ -45,18 +48,10 @@ export default function QuizScreen() {
   const [answers, setAnswers] = useState<boolean[]>([]);
   const [showExplanation, setShowExplanation] = useState(false);
   const [quizComplete, setQuizComplete] = useState(false);
-  const [isSpeaking, setIsSpeaking] = useState(false);
   const scrollViewRef = useRef<ScrollViewInstance>(null);
 
   useEffect(() => {
     void preloadGameSfx();
-  }, []);
-
-  // Never let narration bleed into the next screen.
-  useEffect(() => {
-    return () => {
-      stopSpeech();
-    };
   }, []);
 
   useEffect(() => {
@@ -144,20 +139,14 @@ export default function QuizScreen() {
   const totalQuestions = quiz.questions.length;
   const progress = ((currentQuestionIndex + 1) / totalQuestions) * 100;
 
-  const speakQuestion = () => {
-    if (isSpeaking) {
-      stopSpeech();
-      setIsSpeaking(false);
-    } else {
-      setIsSpeaking(true);
-      speakSafely(currentQuestion.question, {
-        language: "en",
-        rate: 0.9,
-        onDone: () => setIsSpeaking(false),
-        onStopped: () => setIsSpeaking(false),
-      });
-    }
-  };
+  // Read Aloud policy: before answering it reads the question and choices,
+  // after answering it reads the verdict + explanation. One shared channel.
+  const readAloudOwner = `quiz:${id}:${currentQuestionIndex}`;
+  const questionChoices = currentQuestion.options?.length
+    ? currentQuestion.options
+    : currentQuestion.type === "true_false"
+      ? ["True", "False"]
+      : [];
 
   const handleAnswerSelect = (index: number) => {
     if (showExplanation) return;
@@ -174,12 +163,11 @@ export default function QuizScreen() {
 
   const handleSubmitAnswer = () => {
     if (selectedAnswer === null) return;
-    stopSpeech();
-    setIsSpeaking(false);
+    readAloud.stop("answered", readAloudOwner);
 
     const correctIndex = getCorrectAnswerIndex(currentQuestion);
     const isCorrect = selectedAnswer === correctIndex;
-    void playGameSfx(isCorrect ? "correct" : "wrong");
+    void playAnswerSfx(isCorrect);
     setAnswers([...answers, isCorrect]);
     setShowExplanation(true);
 
@@ -203,8 +191,10 @@ export default function QuizScreen() {
       const correctCount = answers.filter((a) => a).length;
       const score = Math.round((correctCount / totalQuestions) * 100);
       const passed = score >= quiz.passingScore;
+      recordActivity("quiz_attempt", { id: String(id) });
 
       if (passed) {
+        recordActivity("quiz_complete", { id: String(id) });
         try {
           // Only award rewards on the first pass — replays must not farm XP
           const existingProgress = (await getLevelProgress(id as string)) as {
@@ -468,19 +458,19 @@ export default function QuizScreen() {
                 <Icon name="Cup" size={18} color="#FFF" variant="Bold" />
                 <Text style={styles.quizBadgeText}>QUIZ</Text>
               </View>
-              <TouchableOpacity
-                style={styles.speakerBtn}
-                onPress={speakQuestion}
-                hitSlop={8}
-                accessibilityRole="button"
-                accessibilityLabel={isSpeaking ? "Stop reading question" : "Read question aloud"}
-              >
-                <Icon
-                  name={isSpeaking ? "VolumeSlash" : "VolumeHigh"}
-                  size={20}
-                  color={isSpeaking ? "#FFF" : THEME.gold}
-                />
-              </TouchableOpacity>
+              <ReadAloudButton
+                ownerId={readAloudOwner}
+                subject={showExplanation ? "explanation" : "question"}
+                accent={THEME.gold}
+                text={() =>
+                  showExplanation
+                    ? buildFeedbackSpeech(
+                        selectedAnswer === getCorrectAnswerIndex(currentQuestion),
+                        currentQuestion.explanation,
+                      )
+                    : buildQuestionSpeech(currentQuestion.question, questionChoices)
+                }
+              />
             </View>
 
             <Text style={styles.questionText}>{currentQuestion.question}</Text>
@@ -557,15 +547,15 @@ export default function QuizScreen() {
                           isSelected &&
                             !showExplanation && {
                               color: THEME.primary,
-                              fontFamily: fontFamilies.bold,
+                              ...fontFaces.bold,
                             },
                           showCorrectMark && {
                             color: THEME.success,
-                            fontFamily: fontFamilies.bold,
+                            ...fontFaces.bold,
                           },
                           showWrongMark && {
                             color: THEME.error,
-                            fontFamily: fontFamilies.bold,
+                            ...fontFaces.bold,
                           },
                         ]}
                       >
@@ -676,7 +666,7 @@ const createStyles = (theme: Palette) =>
     },
     errorText: {
       fontSize: 18,
-      fontFamily: fontFamilies.bold,
+      ...fontFaces.bold,
       color: theme.text,
       marginTop: 16,
       marginBottom: 20,
@@ -689,7 +679,7 @@ const createStyles = (theme: Palette) =>
     },
     backButtonText: {
       color: "#FFF",
-      fontFamily: fontFamilies.bold,
+      ...fontFaces.bold,
       fontSize: 16,
     },
 
@@ -707,7 +697,7 @@ const createStyles = (theme: Palette) =>
     progressBarBg: {
       flex: 1,
       height: 12,
-      backgroundColor: "#E5E7EB",
+      backgroundColor: theme.border,
       borderRadius: 6,
       overflow: "hidden",
     },
@@ -724,7 +714,7 @@ const createStyles = (theme: Palette) =>
     },
     questionBadgeText: {
       fontSize: 13,
-      fontFamily: fontFamilies.heavy,
+      ...fontFaces.heavy,
       color: theme.primary,
     },
 
@@ -761,7 +751,7 @@ const createStyles = (theme: Palette) =>
     },
     quizBadgeText: {
       color: "#FFF",
-      fontFamily: fontFamilies.heavy,
+      ...fontFaces.heavy,
       fontSize: 11,
       letterSpacing: 1,
     },
@@ -769,13 +759,13 @@ const createStyles = (theme: Palette) =>
       width: 40,
       height: 40,
       borderRadius: 20,
-      backgroundColor: "#FEF3C7",
+      backgroundColor: theme.creamTint,
       alignItems: "center",
       justifyContent: "center",
     },
     questionText: {
       fontSize: 20,
-      fontFamily: fontFamilies.bold,
+      ...fontFaces.bold,
       color: theme.text,
       lineHeight: 28,
       textAlign: "center",
@@ -812,11 +802,11 @@ const createStyles = (theme: Palette) =>
       width: 36,
       height: 36,
       borderRadius: 10,
-      backgroundColor: "#F3F4F6",
+      backgroundColor: theme.soft,
       alignItems: "center",
       justifyContent: "center",
       borderWidth: 2,
-      borderColor: "#E5E7EB",
+      borderColor: theme.border,
     },
     optionLetterSelected: {
       backgroundColor: theme.primary,
@@ -832,14 +822,14 @@ const createStyles = (theme: Palette) =>
     },
     optionLetterText: {
       fontSize: 16,
-      fontFamily: fontFamilies.heavy,
+      ...fontFaces.heavy,
       color: theme.textMuted,
     },
     optionText: {
       flex: 1,
       fontSize: 16,
       color: theme.text,
-      fontFamily: fontFamilies.medium,
+      ...fontFaces.medium,
     },
 
     // Feedback
@@ -862,11 +852,11 @@ const createStyles = (theme: Palette) =>
     },
     feedbackTitle: {
       fontSize: 18,
-      fontFamily: fontFamilies.heavy,
+      ...fontFaces.heavy,
     },
     feedbackText: {
       fontSize: 15,
-      fontFamily: fontFamilies.regular,
+      ...fontFaces.regular,
       color: theme.text,
       lineHeight: 22,
     },
@@ -886,12 +876,12 @@ const createStyles = (theme: Palette) =>
       justifyContent: "center",
     },
     checkBtnDisabled: {
-      backgroundColor: "#E5E7EB",
-      borderColor: "#D1D5DB",
+      backgroundColor: theme.border,
+      borderColor: theme.borderStrong,
     },
     checkBtnText: {
       color: "#FFF",
-      fontFamily: fontFamilies.heavy,
+      ...fontFaces.heavy,
       fontSize: 16,
       letterSpacing: 0.5,
     },
@@ -908,7 +898,7 @@ const createStyles = (theme: Palette) =>
     },
     continueBtnText: {
       color: "#FFF",
-      fontFamily: fontFamilies.heavy,
+      ...fontFaces.heavy,
       fontSize: 16,
       letterSpacing: 0.5,
     },
@@ -930,13 +920,13 @@ const createStyles = (theme: Palette) =>
     },
     resultsTitle: {
       fontSize: 28,
-      fontFamily: fontFamilies.heavy,
+      ...fontFaces.heavy,
       color: theme.text,
       marginBottom: 8,
     },
     resultsSubtitle: {
       fontSize: 16,
-      fontFamily: fontFamilies.regular,
+      ...fontFaces.regular,
       color: theme.textMuted,
       marginBottom: 24,
     },
@@ -965,13 +955,13 @@ const createStyles = (theme: Palette) =>
     },
     statValue: {
       fontSize: 24,
-      fontFamily: fontFamilies.heavy,
+      ...fontFaces.heavy,
       color: theme.text,
       fontVariant: ["tabular-nums"],
     },
     statLabel: {
       fontSize: 12,
-      fontFamily: fontFamilies.semibold,
+      ...fontFaces.semibold,
       color: theme.textMuted,
       marginTop: 2,
     },
@@ -998,7 +988,7 @@ const createStyles = (theme: Palette) =>
     },
     continueButtonText: {
       color: "#FFF",
-      fontFamily: fontFamilies.heavy,
+      ...fontFaces.heavy,
       fontSize: 16,
       letterSpacing: 0.5,
     },

@@ -24,7 +24,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Icon } from "@/components/ui/icon";
 import { PressableIconButton } from "@/components/layout";
-import { fontFamilies } from "@/theme";
+import { fontFaces } from "@/theme";
 import { useTheme } from "@/theme/useTheme";
 import { useResponsiveLayout } from "@/theme/layout";
 import type { Palette } from "@/theme/themes";
@@ -136,7 +136,7 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 24,
         lineHeight: 30,
-        fontFamily: fontFamilies.heavy,
+        ...fontFaces.heavy,
     },
     titleCentered: {
         textAlign: "center",

@@ -7,13 +7,13 @@
  *    when it is not the latest turn (lets the learner rewind a branch).
  */
 
-import React from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import React, { useMemo } from "react";
+import { Pressable, Text, View } from "react-native";
 
 import { ContentCard } from "@/components/guide/ContentCard";
 import { Pill } from "@/components/guide/Pill";
 import { Icon } from "@/components/ui/icon";
-import { fontFamilies } from "@/theme";
+import { createStyles, fontFaces, useTheme } from "@/theme";
 
 import type { GuideCard, GuidePill, GuideTurn } from "@/services/guide/types";
 
@@ -27,6 +27,115 @@ export interface GuideBubbleProps {
   onStartOver: () => void;
 }
 
+const makeStyles = createStyles((theme) => {
+  const c = theme.colors;
+  return {
+    guideRow: {
+      flexDirection: "row",
+      alignItems: "flex-start",
+      gap: 10,
+      marginBottom: 16,
+    },
+    avatar: {
+      width: 40,
+      height: 40,
+      borderRadius: 20,
+      backgroundColor: c.card,
+      alignItems: "center",
+      justifyContent: "center",
+      marginTop: 2,
+      borderWidth: 2,
+      borderColor: c.border,
+      borderBottomWidth: 4,
+      shadowColor: c.shadow,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.06,
+      shadowRadius: 6,
+      elevation: 2,
+    },
+    guideCol: {
+      flex: 1,
+      gap: 0,
+    },
+    bubble: {
+      backgroundColor: c.card,
+      borderRadius: 20,
+      borderTopLeftRadius: 6,
+      borderWidth: 2,
+      borderColor: c.border,
+      borderBottomWidth: 4,
+      paddingVertical: 14,
+      paddingHorizontal: 16,
+      alignSelf: "flex-start",
+      maxWidth: "100%",
+      shadowColor: c.shadow,
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.06,
+      shadowRadius: 8,
+      elevation: 3,
+    },
+    bubbleText: {
+      fontSize: 14,
+      lineHeight: 20,
+      ...fontFaces.semibold,
+      color: c.text,
+    },
+    cards: {
+      marginTop: 12,
+      gap: 10,
+    },
+    pillRow: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      gap: 8,
+      marginTop: 14,
+    },
+    utilRow: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      gap: 8,
+      marginTop: 12,
+    },
+    userRow: {
+      flexDirection: "row",
+      justifyContent: "flex-end",
+      marginBottom: 16,
+    },
+    userChipWrap: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 10,
+      maxWidth: "85%",
+    },
+    userChip: {
+      backgroundColor: c.link,
+      borderWidth: 1,
+      borderColor: c.link,
+      borderBottomWidth: 4,
+      paddingVertical: 10,
+      paddingHorizontal: 14,
+      borderRadius: 16,
+      borderTopRightRadius: 6,
+      shadowColor: c.shadow,
+      shadowOffset: { width: 0, height: 3 },
+      shadowOpacity: 0.1,
+      shadowRadius: 6,
+      elevation: 3,
+    },
+    userChipText: {
+      fontSize: 14,
+      ...fontFaces.heavy,
+      color: c.onPrimary,
+    },
+    change: {
+      fontSize: 13,
+      ...fontFaces.heavy,
+      color: c.link,
+      textDecorationLine: "underline",
+    },
+  };
+});
+
 export function GuideBubble({
   turn,
   active,
@@ -35,6 +144,9 @@ export function GuideBubble({
   onRevert,
   onStartOver,
 }: GuideBubbleProps) {
+  const { theme } = useTheme();
+  const styles = useMemo(() => makeStyles(theme), [theme]);
+
   if (turn.role === "user") {
     return (
       <View style={styles.userRow}>
@@ -55,7 +167,7 @@ export function GuideBubble({
   return (
     <View style={styles.guideRow}>
       <View style={styles.avatar}>
-        <Icon name="Atom" size={20} color="#FF8C00" variant="Bold" />
+        <Icon name="Atom" size={20} color={theme.colors.link} variant="Bold" />
       </View>
       <View style={styles.guideCol}>
         <View style={styles.bubble}>
@@ -107,109 +219,3 @@ export function GuideBubble({
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  guideRow: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    gap: 10,
-    marginBottom: 16,
-  },
-  avatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: "#FFFFFF",
-    alignItems: "center",
-    justifyContent: "center",
-    marginTop: 2,
-    borderWidth: 2,
-    borderColor: "#E5E7EB",
-    borderBottomWidth: 4,
-    shadowColor: "#000000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 6,
-    elevation: 2,
-  },
-  guideCol: {
-    flex: 1,
-    gap: 0,
-  },
-  bubble: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: 20,
-    borderTopLeftRadius: 6,
-    borderWidth: 2,
-    borderColor: "#E5E7EB",
-    borderBottomWidth: 4,
-    paddingVertical: 14,
-    paddingHorizontal: 16,
-    alignSelf: "flex-start",
-    maxWidth: "100%",
-    shadowColor: "#000000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 3,
-  },
-  bubbleText: {
-    fontSize: 14,
-    lineHeight: 20,
-    fontFamily: fontFamilies.semibold,
-    color: "#333333",
-  },
-  cards: {
-    marginTop: 12,
-    gap: 10,
-  },
-  pillRow: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 8,
-    marginTop: 14,
-  },
-  utilRow: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 8,
-    marginTop: 12,
-  },
-  userRow: {
-    flexDirection: "row",
-    justifyContent: "flex-end",
-    marginBottom: 16,
-  },
-  userChipWrap: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
-    maxWidth: "85%",
-  },
-  userChip: {
-    backgroundColor: "#FF8C00",
-    borderWidth: 1,
-    borderColor: "#E67E22",
-    borderBottomWidth: 4,
-    paddingVertical: 10,
-    paddingHorizontal: 14,
-    borderRadius: 16,
-    borderTopRightRadius: 6,
-    shadowColor: "#000000",
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
-    elevation: 3,
-  },
-  userChipText: {
-    fontSize: 14,
-    fontFamily: fontFamilies.heavy,
-    color: "#FFFFFF",
-  },
-  change: {
-    fontSize: 13,
-    fontFamily: fontFamilies.heavy,
-    color: "#E67E22",
-    textDecorationLine: "underline",
-  },
-});

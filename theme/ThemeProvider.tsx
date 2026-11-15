@@ -1,7 +1,10 @@
 /**
  * Global ThemeProvider.
  *
- * - Seeds from the OS color scheme, then honors a persisted user override.
+ * - Seeds from the OS color scheme and keeps following it while no user
+ *   override is saved.
+ * - A persisted user override wins over the OS scheme, including after a
+ *   cold start.
  * - Context value is stable and memoized.
  * - Use `useTheme()` from `../useTheme` to consume `theme`, `colorScheme`,
  *   `isDark`, `toggleTheme` and `setColorScheme`.
@@ -35,25 +38,30 @@ export const ThemeContext = createContext<ThemeContextValue | undefined>(
 );
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-    // Seed from the OS color scheme; a persisted user preference overrides it.
+    // The OS scheme is the live fallback; a saved user choice overrides it.
     const systemScheme: ThemeMode =
         useRNColorScheme() === "dark" ? "dark" : "light";
-    const [colorScheme, setColorSchemeState] = useState<ThemeMode>(systemScheme);
+    const [override, setOverride] = useState<ThemeMode | null>(null);
 
     useEffect(() => {
         let cancelled = false;
         void getTheme().then((saved) => {
-            if (!cancelled && (saved === "light" || saved === "dark")) {
-                setColorSchemeState(saved);
+            if (cancelled) return;
+            if (saved === "light" || saved === "dark") {
+                setOverride(saved);
             }
+            // A null/missing saved value means "follow the system".
         });
         return () => {
             cancelled = true;
         };
     }, []);
 
+    const colorScheme = override ?? systemScheme;
+
     const setColorScheme = useCallback(async (scheme: ThemeMode) => {
-        setColorSchemeState(scheme);
+        // Update the mounted tree immediately, then persist.
+        setOverride(scheme);
         await saveTheme(scheme);
     }, []);
 

@@ -1,18 +1,24 @@
-import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useStorage } from '@/services/StorageContext';
+import { useTheme } from '@/theme';
 import { Redirect } from 'expo-router';
 import { ActivityIndicator, View } from 'react-native';
 
 export default function Index() {
   const { isLoading, onboardingCompleted } = useStorage();
-  const colorScheme = useColorScheme();
-  const bgColor = colorScheme === 'dark' ? '#172B4D' : '#F7F7F7';
+  const { theme } = useTheme();
 
   // Show loading while checking onboarding status
   if (isLoading) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: bgColor }}>
-        <ActivityIndicator size="large" color="#EA580C" />
+      <View
+        style={{
+          flex: 1,
+          justifyContent: 'center',
+          alignItems: 'center',
+          backgroundColor: theme.colors.background,
+        }}
+      >
+        <ActivityIndicator size="large" color={theme.colors.primary} />
       </View>
     );
   }

@@ -18,8 +18,9 @@ import {
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { recordActivity } from "@/services/activity-log";
 import { getLevelProgress, updateLevelProgress } from "@/services/database";
-import {useTheme, fontFamilies, useResponsiveLayout} from "@/theme";
+import {useTheme, fontFaces, useResponsiveLayout} from "@/theme";
 
 import { AssessmentView } from "@/components/lesson/AssessmentView";
 import { BriefingView } from "@/components/lesson/BriefingView";
@@ -29,10 +30,19 @@ import { LessonPreview } from "@/components/lesson/LessonPreview";
 import { MicroLearnView } from "@/components/lesson/MicroLearnView";
 import { MythBusterView } from "@/components/lesson/MythBusterView";
 import { createStyles } from "@/components/lesson/styles";
+import {
+  LessonProgressFill,
+  LessonStepFrame,
+  type StepDirection,
+} from "@/components/lesson/StepTransition";
+import { DURATION } from "@/theme/motion";
+import Animated, { FadeIn, FadeOut, useReducedMotion } from "react-native-reanimated";
 
 export default function LessonScreen() {
   const { id } = useLocalSearchParams();
   const [step, setStep] = useState(0);
+  const [direction, setDirection] = useState<StepDirection>("forward");
+  const reducedMotion = useReducedMotion();
   const [isReplay, setIsReplay] = useState(false);
   const [started, setStarted] = useState(false);
   const [topBarHeight, setTopBarHeight] = useState(0);
@@ -166,7 +176,7 @@ export default function LessonScreen() {
         <Text
           style={{
             fontSize: 18,
-            fontFamily: fontFamilies.bold,
+            ...fontFaces.bold,
             color: THEME.text,
             marginTop: 16,
           }}
@@ -188,7 +198,7 @@ export default function LessonScreen() {
           <Text
             style={{
               color: "#FFFFFF",
-              fontFamily: fontFamilies.heavy,
+              ...fontFaces.heavy,
               fontSize: 15,
             }}
           >
@@ -200,7 +210,11 @@ export default function LessonScreen() {
   }
 
   // Simple step manager
-  const nextStep = () => setStep((s) => s + 1);
+  const nextStep = () => {
+    recordActivity("lesson_step", { id: `${levelId}:${lesson?.steps[step]?.id ?? step}` });
+    setDirection("forward");
+    setStep((s) => s + 1);
+  };
 
   // Get current step from lesson (undefined while still loading)
   const currentStep = lesson?.steps[step];
@@ -248,7 +262,15 @@ export default function LessonScreen() {
             key={step}
             data={currentStep.data}
             onComplete={nextStep}
-            onBack={step > 0 ? () => setStep((s) => s - 1) : undefined}
+            onBack={
+              step > 0
+                ? () => {
+                    setDirection("back");
+                    setStep((s) => s - 1);
+                  }
+                : undefined
+            }
+            source={`lesson:${levelId} step:${currentStep.id}`}
             theme={THEME}
           />
         );
@@ -292,7 +314,9 @@ export default function LessonScreen() {
             <SafeAreaView style={{ flex: 1 }}>
               {/* Progress Header - hidden on first and last steps */}
               {!isFirstStep && !isLastStep && (
-                <View
+                <Animated.View
+                  entering={FadeIn.duration(reducedMotion ? 150 : DURATION.small)}
+                  exiting={FadeOut.duration(reducedMotion ? 100 : DURATION.small)}
                   style={[
                     styles.topBar,
                     {
@@ -313,17 +337,19 @@ export default function LessonScreen() {
                     <Icon name="Close" size={24} color={THEME.textMuted} />
                   </TouchableOpacity>
                   <View style={styles.progressBarBg}>
-                    <View
-                      style={[
-                        styles.progressBarFill,
-                        { width: `${((step + 1) / totalSteps) * 100}%` },
-                      ]}
+                    <LessonProgressFill
+                      progress={(step + 1) / totalSteps}
+                      style={styles.progressBarFill}
                     />
                   </View>
-                </View>
+                </Animated.View>
               )}
 
-              <View style={{ flex: 1 }}>{renderStep()}</View>
+              <View style={{ flex: 1 }}>
+                <LessonStepFrame key={step} direction={direction}>
+                  {renderStep()}
+                </LessonStepFrame>
+              </View>
             </SafeAreaView>
           </View>
         )}
@@ -333,7 +359,9 @@ export default function LessonScreen() {
           <View style={[StyleSheet.absoluteFill, { zIndex: 50 }]}>
             <LinearGradient
               colors={
-                theme.mode === "dark" ? [THEME.bg, THEME.bg] : ["#FFF3E0", "#FFFFFF"]
+                theme.mode === "dark"
+                  ? [theme.colors.background, theme.colors.background]
+                  : [theme.colors.pageGradientTop, theme.colors.pageGradientBottom]
               }
               style={StyleSheet.absoluteFill}
               pointerEvents="none"

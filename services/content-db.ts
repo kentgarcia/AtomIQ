@@ -29,7 +29,11 @@ import { Platform } from "react-native";
 
 import type {
   Article,
+  ArticleSourceMeta,
   Post,
+  ReviewStatus,
+  SourceType,
+  SummaryOrigin,
 } from "@/content/articles/types";
 
 import type {
@@ -62,7 +66,7 @@ export const CONTENT_DB_NAME = "content.db";
  * file lets us detect stale copies and re-copy the fresh bundle on the next
  * launch (otherwise the device would silently keep using old content forever).
  */
-export const CONTENT_DB_VERSION = 130426397;
+export const CONTENT_DB_VERSION = 761032891;
 
 /** Marker file stored next to the db, whose content is CONTENT_DB_VERSION. */
 const VERSION_MARKER = "content.db.version";
@@ -632,6 +636,51 @@ interface ArticleRow {
   related_facts: string; // JSON array of fact ids
   featured: number; // 0 / 1
   difficulty: string | null;
+  // Research-pipeline columns (docs/ARTICLE_PIPELINE.md). Optional so a bundle
+  // built before the pipeline migration still maps cleanly.
+  source_type?: string | null;
+  source_note?: string | null;
+  source_published_date?: string | null;
+  review_status?: string | null;
+  last_reviewed?: string | null;
+  reviewed_by?: string | null;
+  review_notes?: string | null;
+  summary_origin?: string | null;
+  related_lessons?: string | null; // JSON array of lesson ids
+  related_concepts?: string | null; // JSON array of encyclopedia entry ids
+  related_elements?: string | null; // JSON array of element symbols
+}
+
+/** Map the shared research-pipeline columns of an article/post row. */
+function mapSourceMeta(row: {
+  source_type?: string | null;
+  source_note?: string | null;
+  source_published_date?: string | null;
+  review_status?: string | null;
+  last_reviewed?: string | null;
+  reviewed_by?: string | null;
+  review_notes?: string | null;
+  summary_origin?: string | null;
+  related_lessons?: string | null;
+  related_concepts?: string | null;
+  related_elements?: string | null;
+}): ArticleSourceMeta {
+  const lessons = parseJsonArray(row.related_lessons);
+  const concepts = parseJsonArray(row.related_concepts);
+  const elements = parseJsonArray(row.related_elements);
+  return {
+    ...(row.source_type ? { sourceType: row.source_type as SourceType } : {}),
+    ...(row.source_note ? { sourceNote: row.source_note } : {}),
+    ...(row.source_published_date ? { sourcePublishedDate: row.source_published_date } : {}),
+    ...(row.review_status ? { reviewStatus: row.review_status as ReviewStatus } : {}),
+    ...(row.last_reviewed ? { lastReviewed: row.last_reviewed } : {}),
+    ...(row.reviewed_by ? { reviewedBy: row.reviewed_by } : {}),
+    ...(row.review_notes ? { reviewNotes: row.review_notes } : {}),
+    ...(row.summary_origin ? { summaryOrigin: row.summary_origin as SummaryOrigin } : {}),
+    ...(lessons.length ? { relatedLessons: lessons } : {}),
+    ...(concepts.length ? { relatedConcepts: concepts } : {}),
+    ...(elements.length ? { relatedElements: elements } : {}),
+  };
 }
 
 /** Flatten an article row into the domain `Article` shape. */
@@ -655,6 +704,7 @@ function mapArticleRow(row: ArticleRow): Article {
     ...(row.related_myths ? { relatedMyths: parseJsonArray(row.related_myths) } : {}),
     ...(row.featured ? { featured: true } : {}),
     ...(row.difficulty ? { difficulty: row.difficulty as Article["difficulty"] } : {}),
+    ...mapSourceMeta(row),
   };
 }
 
@@ -673,6 +723,20 @@ interface PostRow {
   source_url: string | null;
   video_url: string | null;
   related_content: string; // JSON array of content ids
+  read_time?: number | null; // minutes (pipeline migration)
+  difficulty?: string | null;
+  related_myths?: string | null; // JSON array of myth ids
+  source_type?: string | null;
+  source_note?: string | null;
+  source_published_date?: string | null;
+  review_status?: string | null;
+  last_reviewed?: string | null;
+  reviewed_by?: string | null;
+  review_notes?: string | null;
+  summary_origin?: string | null;
+  related_lessons?: string | null;
+  related_concepts?: string | null;
+  related_elements?: string | null;
 }
 
 /** Flatten a post row into the domain `Post` shape. */
@@ -692,6 +756,10 @@ function mapPostRow(row: PostRow): Post {
     ...(row.source_url ? { sourceUrl: row.source_url } : {}),
     ...(row.video_url ? { videoUrl: row.video_url } : {}),
     ...(row.related_content ? { relatedContent: parseJsonArray(row.related_content) } : {}),
+    ...(row.read_time ? { readTime: row.read_time } : {}),
+    ...(row.difficulty ? { difficulty: row.difficulty as Post["difficulty"] } : {}),
+    ...(parseJsonArray(row.related_myths).length ? { relatedMyths: parseJsonArray(row.related_myths) } : {}),
+    ...mapSourceMeta(row),
   };
 }
 

@@ -14,6 +14,8 @@ export {
     TabBarInsetProvider,
     useTabBarInset,
     useTabBarHeightReporter,
+    useTabBarVisible,
+    useHideTabBar,
     useBottomInset,
 } from "./tab-bar-inset";
 export type { TabBarInsetValue } from "./tab-bar-inset";

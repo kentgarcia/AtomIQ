@@ -121,7 +121,7 @@ Engine (`services/guide/engine.ts`) is **pure**: `initialGuideState(ctx)` + `app
 
 ## 4. UI Details
 
-* **Colors / Tokens:** `theme` `SemanticColors` + `colors.brand` (`#FFCA5F` amber, `#FF8C00` orange, `#5E72E4` indigo, `#2ECC71` success), `spacing`/`radius`/`fontFamilies` (`SNPro-Heavy`/`Medium`/`Regular`), `DURATION`/`EASE_OUT`.
+* **Colors / Tokens:** `theme` `SemanticColors` + `colors.brand` (`#FFCA5F` amber, `#FF8C00` orange, `#5E72E4` indigo, `#2ECC71` success), `spacing`/`radius`/`fontFaces` (spread `fontFaces.heavy`/`medium`/`regular` → Intern + `fontWeight`), `DURATION`/`EASE_OUT`.
 * **Typography:** `heroEyebrow` 10 heavy `#724D06` uppercase, `heroTitle` 22 heavy `#724D06`, `speechOverlayText` 20 heavy `#333333` center, `phraseText`/`optionPillText` 14 semibold, `inputPlaceholder` 13 regular.
 * **Shadows / Borders:** Amber outer `elevation:4`/`shadowRadius:6`, white cards `elevation:5`/`shadowRadius:10`, `borderBottomWidth:4` for 3D lip, `borderRadius:20-26`/`999` for pills.
 * **Animations:** mascot float `withRepeat` 1600/2200 ms, `FadeInUp` 220-300 ms for bubble/chatBox, `FadeIn` 200 ms for optionGrid, `useReducedMotion` guards.
