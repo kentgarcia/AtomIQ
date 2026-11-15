@@ -576,14 +576,14 @@ export default function AtomMazeBattleScreen() {
     }
 
     return {
-      background: appTheme.colors.pageGradientTop,
+      background: appTheme.colors.background,
       cardBg: appTheme.colors.card,
       cardBorder: appTheme.colors.border,
       primaryText: appTheme.colors.text,
       mutedText: appTheme.colors.textMuted,
       subtleBg: appTheme.colors.surfaceSoft,
       subtleBorder: appTheme.colors.border,
-      iconWrapBg: appTheme.colors.creamTint,
+      iconWrapBg: appTheme.colors.surfaceSoft,
       backBtnBg: appTheme.colors.card,
       backBtnBorder: appTheme.colors.border,
     };
@@ -627,9 +627,9 @@ export default function AtomMazeBattleScreen() {
       cardBg: appTheme.colors.card,
       cardBorder: appTheme.colors.border,
       cardShadow: appTheme.colors.shadow,
-      statsBg: appTheme.colors.creamTint,
-      statsBorder: appTheme.colors.creamBorder,
-      statDivider: appTheme.colors.creamBorder,
+      statsBg: appTheme.colors.surfaceSoft,
+      statsBorder: appTheme.colors.border,
+      statDivider: appTheme.colors.border,
       primaryText: appTheme.colors.text,
       mutedText: appTheme.colors.textMuted,
       chipBg: appTheme.colors.card,
@@ -654,7 +654,7 @@ export default function AtomMazeBattleScreen() {
     const dark = colorScheme === "dark";
     const tintAmber = dark
       ? "rgba(255, 179, 0, 0.18)"
-      : appTheme.colors.creamTint;
+      : appTheme.colors.surfaceSoft;
     const tintGreen = dark
       ? "rgba(46, 204, 113, 0.18)"
       : appTheme.colors.successSurface;
@@ -672,7 +672,7 @@ export default function AtomMazeBattleScreen() {
       },
       correct: {
         backgroundColor: tintGreen,
-        borderColor: "#2ECC71",
+        borderColor: "#58CC02",
         borderBottomColor: "#229954",
       },
       wrong: {
@@ -707,7 +707,7 @@ export default function AtomMazeBattleScreen() {
         elevation: 3,
       },
       textColor: appTheme.colors.text,
-      subColor: appTheme.colors.amberText,
+      subColor: appTheme.colors.primaryLight,
       valueColor: appTheme.colors.textMuted,
     };
   }, [appTheme, colorScheme, theme]);
@@ -1697,16 +1697,7 @@ export default function AtomMazeBattleScreen() {
   if (gameState.phase === "intro") {
     const mazeColor = getMazeColor(maze.theme);
     return (
-      <View style={styles.container}>
-        <LinearGradient
-          colors={
-            colorScheme === "dark"
-              ? [introPalette.background, introPalette.background]
-              : [appTheme.colors.pageGradientTop, appTheme.colors.pageGradientBottom]
-          }
-          style={StyleSheet.absoluteFill}
-          pointerEvents="none"
-        />
+      <View style={[styles.container, { backgroundColor: introPalette.background }]}>
         <View
           style={[
             styles.introHeader,
@@ -2525,10 +2516,10 @@ export default function AtomMazeBattleScreen() {
 
   // Main battle screen — default cream → white gradient (light) like the
   // home + games tabs, solid theme background in dark mode.
-  const battleGradient: [string, string] =
-    colorScheme === "dark"
-      ? [appTheme.colors.background, appTheme.colors.background]
-      : [appTheme.colors.pageGradientTop, appTheme.colors.pageGradientBottom];
+  const battleGradient: [string, string] = [
+    appTheme.colors.background,
+    appTheme.colors.background,
+  ];
   return (
     <View
       style={[
@@ -2806,7 +2797,7 @@ export default function AtomMazeBattleScreen() {
                     <Icon
                       name="TickCircle"
                       size={22}
-                      color="#2ECC71"
+                      color="#58CC02"
                       variant="Bold"
                     />
                   )}
@@ -2839,7 +2830,7 @@ export default function AtomMazeBattleScreen() {
             <Icon
               name={showResult === "correct" ? "TickCircle" : "CloseCircle"}
               size={30}
-              color={showResult === "correct" ? "#2ECC71" : "#EF4444"}
+              color={showResult === "correct" ? "#58CC02" : "#EF4444"}
               variant="Bold"
             />
             <View style={styles.quizResultContent}>

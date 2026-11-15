@@ -4,7 +4,6 @@ import type { EncyclopediaEntry } from "@/content/explorer";
 import { getEncyclopediaImage } from "@/content/explorer/images";
 import { useTheme, type Theme, fontFaces, useResponsiveLayout, withAlpha } from "@/theme";
 import { Image as ExpoImage } from "expo-image";
-import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import React, { useEffect, useMemo, useState } from "react";
 import { Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
@@ -28,16 +27,14 @@ const CATS: Record<string, VaultCat> = {
 };
 const getCat = (c: string) => CATS[c?.toLowerCase()] ?? CATS.default;
 
-const AMBER = "#FFCA5F";
-const AMBER_DEEP = "#FF8C00";
+const AMBER_DEEP = "#EA580C";
 
 export default function EncyclopediaScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { contentMaxWidth, gutter } = useResponsiveLayout();
   const { theme, isDark } = useTheme();
-  const bgTop = theme.colors.pageGradientTop;
-  const bgBottom = theme.colors.pageGradientBottom;
+  const bgTop = theme.colors.background;
 
   const styles = useMemo(() => makeStyles(theme), [theme]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -82,7 +79,6 @@ export default function EncyclopediaScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: bgTop }]}>
-      <LinearGradient colors={[bgTop, bgBottom]} style={StyleSheet.absoluteFill} pointerEvents="none" />
 
       {/* Explorer vault header — same amber language, explorer-tinted subtitle */}
       <View
@@ -107,7 +103,7 @@ export default function EncyclopediaScreen() {
               accessibilityRole="button"
               accessibilityLabel="Go back"
             >
-              <Icon name="ArrowLeft2" size={20} color="#7C4A00" variant="Bold" />
+              <Icon name="ArrowLeft2" size={20} color={theme.colors.text} variant="Bold" />
             </TouchableOpacity>
             <View style={styles.headerCopy}>
               <Text style={styles.headerTitle}>Explorer Vault</Text>
@@ -249,12 +245,12 @@ const makeStyles = (theme: Theme) => {
     container: { flex: 1 },
     headerWrap: { paddingHorizontal: 16, paddingBottom: 8, gap: 10 },
     headerBar: {
-      backgroundColor: AMBER,
+      backgroundColor: c.card,
       borderRadius: 26,
       padding: 12,
       gap: 12,
       borderWidth: 2,
-      borderColor: c.creamBorder,
+      borderColor: c.border,
       borderBottomWidth: 4,
       elevation: 4,
       shadowColor: c.shadow,
@@ -271,12 +267,12 @@ const makeStyles = (theme: Theme) => {
       alignItems: "center",
       justifyContent: "center",
       borderWidth: 2,
-      borderColor: "#FDE68A",
+      borderColor: c.border,
       borderBottomWidth: 4,
     },
     headerCopy: { flex: 1 },
-    headerTitle: { fontSize: 18, ...fontFaces.heavy, color: "#7C4A00", letterSpacing: -0.3 },
-    headerSub: { fontSize: 12, ...fontFaces.semibold, color: "#9A5A00", marginTop: 1 },
+    headerTitle: { fontSize: 18, ...fontFaces.heavy, color: theme.colors.text, letterSpacing: -0.3 },
+    headerSub: { fontSize: 12, ...fontFaces.semibold, color: c.textMuted, marginTop: 1 },
     mascot: { width: 42, height: 42 },
     searchCard: {
       flexDirection: "row",
@@ -287,7 +283,7 @@ const makeStyles = (theme: Theme) => {
       paddingVertical: 11,
       gap: 10,
       borderWidth: 2,
-      borderColor: c.creamBorder,
+      borderColor: c.border,
       borderBottomWidth: 4,
     },
     searchInput: { flex: 1, fontSize: 14, ...fontFaces.semibold, color: c.text, paddingVertical: 0 },
@@ -304,7 +300,7 @@ const makeStyles = (theme: Theme) => {
       borderWidth: 2,
       borderColor: c.borderSubtle,
     },
-    pillActive: { backgroundColor: AMBER_DEEP, borderColor: "#E67E22" },
+    pillActive: { backgroundColor: AMBER_DEEP, borderColor: "#C2410C" },
     pillEmoji: { fontSize: 12 },
     pillText: { fontSize: 13, ...fontFaces.bold, color: c.textSecondary },
     pillTextActive: { color: c.onPrimary },

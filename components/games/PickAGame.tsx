@@ -7,20 +7,18 @@
 
 import { DifficultyPanel } from "@/components/games/DifficultyPanel";
 import { StackCard } from "@/components/games/StackCard";
-import { useTabBarInset } from "@/components/layout";
+import { PageBackground, useTabBarInset } from "@/components/layout";
 import { GrowCard, GrowModal, useModalOrigin } from "@/components/ui/grow-modal";
 import { Icon } from "@/components/ui/icon";
 import { createStyles, fontFaces, useResponsiveLayout, useTheme } from "@/theme";
 import { impactLight, impactMedium } from "@/services/haptics";
-import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
-    Pressable,
-    StyleSheet,
-    Text,
-    useWindowDimensions,
-    View,
+  Pressable,
+  Text,
+  useWindowDimensions,
+  View,
 } from "react-native";
 import Animated, {
     Extrapolation,
@@ -150,14 +148,10 @@ export function PickAGame() {
     const { height: windowHeight } = useWindowDimensions();
     const { contentMaxWidth } = useResponsiveLayout();
     const tabBarInset = useTabBarInset();
-    const { theme, isDark } = useTheme();
+    const { theme } = useTheme();
     const tab = theme.palettes.tab;
     const styles = React.useMemo(() => makeStyles(theme), [theme]);
 
-    // Autumn gradient background, matching home / profile / discovery
-    const SKY: [string, string] = isDark
-        ? [tab.bg, tab.bg]
-        : [theme.colors.pageGradientTop, theme.colors.background];
 
     // Stack area sits below the header and above the floating tab bar
     const bottomReserve = tabBarInset + 16;
@@ -285,15 +279,8 @@ export function PickAGame() {
     ];
 
     return (
-        <View style={[styles.screen, { paddingTop: insets.top + 18, backgroundColor: SKY[0] }]}>
-            {/* Autumn gradient flowing through the whole page */}
-            <LinearGradient
-                colors={SKY}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 0, y: 1 }}
-                style={StyleSheet.absoluteFill}
-                pointerEvents="none"
-            />
+        <View style={[styles.screen, { paddingTop: insets.top + 18, backgroundColor: theme.colors.background }]}>
+            <PageBackground />
 
             {/* Header */}
             <View
@@ -310,14 +297,14 @@ export function PickAGame() {
                         pressed && styles.logoPressed,
                     ]}
                 >
-                    <QuestionMark color="#E67E22" />
+                    <QuestionMark color="#C2410C" />
                 </Pressable>
 
                 <View style={styles.titleGroup}>
                     <Text style={[styles.titlePick, { color: tab.text }]}>Pick</Text>
                     <View style={styles.titleBottomRow}>
                         <Text style={[styles.titleA, { color: tab.text }]}>a</Text>
-                        <Text style={[styles.titleGame, { color: "#FF8C00" }]}>Game</Text>
+                        <Text style={[styles.titleGame, { color: "#EA580C" }]}>Game</Text>
                     </View>
                     <Pressable onPress={closeDifficulty} hitSlop={12}>
                         <Animated.View
@@ -393,7 +380,7 @@ export function PickAGame() {
                         <View style={styles.modalHeader}>
                             <View style={styles.modalHeaderLeft}>
                                 <View style={styles.modalHeaderIcon}>
-                                    <Icon name="MessageQuestion" size={16} color="#FF8C00" variant="Bold" />
+                                    <Icon name="MessageQuestion" size={16} color="#EA580C" variant="Bold" />
                                 </View>
                                 <Text style={styles.modalTitle}>How to Play</Text>
                             </View>
@@ -419,7 +406,7 @@ export function PickAGame() {
                                     <Icon
                                         name={row.icon}
                                         size={20}
-                                        color="#FF8C00"
+                                        color="#EA580C"
                                         variant="Bold"
                                     />
                                 </View>
@@ -574,7 +561,7 @@ const makeStyles = createStyles((theme) => {
         width: 32,
         height: 32,
         borderRadius: 16,
-        backgroundColor: ui.creamTint,
+        backgroundColor: ui.soft,
         alignItems: "center",
         justifyContent: "center",
     },
@@ -612,7 +599,7 @@ const makeStyles = createStyles((theme) => {
         alignItems: "center",
         justifyContent: "center",
         flexShrink: 0,
-        backgroundColor: ui.creamTint,
+        backgroundColor: ui.soft,
     },
     guideRowText: {
         flex: 1,
@@ -639,8 +626,8 @@ const makeStyles = createStyles((theme) => {
         borderRadius: 16,
         borderWidth: 1,
         borderBottomWidth: 4,
-        borderColor: "#E67E22",
-        backgroundColor: "#FF8C00",
+        borderColor: "#C2410C",
+        backgroundColor: "#EA580C",
         shadowColor: theme.colors.shadow,
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.12,

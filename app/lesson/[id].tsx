@@ -3,7 +3,6 @@ import { getLessonById } from "@/content/lessons";
 import { UNITS } from "@/content/units";
 import type { Lesson } from "@/content/types";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { LinearGradient } from "expo-linear-gradient";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
     Alert,
@@ -356,16 +355,7 @@ export default function LessonScreen() {
 
         {/* Preview overlay — replaced instantly when the lesson starts */}
         {!started && (
-          <View style={[StyleSheet.absoluteFill, { zIndex: 50 }]}>
-            <LinearGradient
-              colors={
-                theme.mode === "dark"
-                  ? [theme.colors.background, theme.colors.background]
-                  : [theme.colors.pageGradientTop, theme.colors.pageGradientBottom]
-              }
-              style={StyleSheet.absoluteFill}
-              pointerEvents="none"
-            />
+          <View style={[StyleSheet.absoluteFill, { zIndex: 50, backgroundColor: theme.colors.background }]}>
             <SafeAreaView style={{ flex: 1 }}>
               <LessonPreview
                 lesson={lesson}

@@ -759,7 +759,7 @@ const createStyles = (theme: Palette) =>
       width: 40,
       height: 40,
       borderRadius: 20,
-      backgroundColor: theme.creamTint,
+      backgroundColor: theme.surfaceSoft,
       alignItems: "center",
       justifyContent: "center",
     },

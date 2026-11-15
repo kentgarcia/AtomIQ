@@ -32,7 +32,7 @@ export interface MicroLearnStep {
   content: string;
   image?: string;
   keyPoints?: string[];
-  /** Structured visual lesson blocks (see docs/VISUAL_LESSON_BLOCKS.md). Additive; optional. */
+  /** Structured visual lesson blocks (see docs/completed/VISUAL_LESSON_BLOCKS.md). Additive; optional. */
   visuals?: VisualBlock[];
 }
 

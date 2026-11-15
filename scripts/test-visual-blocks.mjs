@@ -1,4 +1,4 @@
-// Visual lesson block tests (docs/VISUAL_LESSON_BLOCKS.md).  Run: npm run test:visuals
+// Visual lesson block tests (docs/completed/VISUAL_LESSON_BLOCKS.md).  Run: npm run test:visuals
 import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";

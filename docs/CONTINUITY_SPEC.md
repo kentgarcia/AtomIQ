@@ -66,7 +66,7 @@ All values are defaults. Phone is the target; on a wide tablet or web window, sc
 
 ### C2. Bottom tab bar: one marker travels
 
-> **Implemented** in `app/(tabs)/_layout.tsx` (`TabMarker`). The stretch is a symmetric scaleX 1.15 / scaleY 0.9 pulse over the move, not a true leading-edge-first stretch. The optional tab content shift was not done.
+> **Superseded 2026-11-16.** The travelling triangle was removed; the active tab is now a Duolingo-style rounded square (tinted fill + accent border) that slides to the chosen tab (one shared highlight, `DURATION.sheet`, `EASE_DRAWER`, instant under reduced motion). Original note: implemented in `app/(tabs)/_layout.tsx` (`TabMarker`). The stretch is a symmetric scaleX 1.15 / scaleY 0.9 pulse over the move, not a true leading-edge-first stretch. The optional tab content shift was not done.
 
 - **Where:** `app/(tabs)/_layout.tsx` (`ModernTabBar`, `TabButton`); every tab switch (phone and tablet).
 - **Now:** The triangle marker unmounts from the old tab and mounts on the new one. Tab content swaps with no motion.

@@ -99,14 +99,8 @@ const REQUIRED_ROLES = [
   "inverseSurface",
   "inverseText",
   "switchTrack",
-  "creamTint",
-  "creamBorder",
-  "amberSurface",
-  "amberSurfaceStrong",
-  "amberText",
-  "amberBorder",
-  "pageGradientTop",
-  "pageGradientBottom",
+  "primarySurface",
+  "primaryBorder",
   "successSurface",
   "warningSurface",
   "errorSurface",
@@ -128,10 +122,7 @@ const MODE_DEPENDENT_ROLES = [
   "textFaint",
   "inverseSurface",
   "inverseText",
-  "creamTint",
-  "amberSurface",
-  "pageGradientTop",
-  "pageGradientBottom",
+  "primarySurface",
 ];
 
 const FEATURE_PALETTES = [
@@ -151,7 +142,6 @@ const FEATURE_PALETTES = [
   "tabBar",
   "legacy",
   "ui",
-  "amber",
 ];
 
 const isHexOrRgb = (value) =>
@@ -203,19 +193,13 @@ test("every feature palette is present in both modes", () => {
   }
 });
 
-test("shared ui/amber palettes change with the theme", () => {
+test("shared ui palette changes with the theme", () => {
   const lightUi = themes.light.palettes.ui;
   const darkUi = themes.dark.palettes.ui;
 
-  for (const key of ["background", "card", "raised", "strong", "border", "text", "creamTint"]) {
+  for (const key of ["background", "card", "raised", "strong", "border", "text", "soft"]) {
     assert.notEqual(lightUi[key], darkUi[key], `palettes.ui.${key} must change between modes`);
   }
-
-  assert.notEqual(
-    themes.light.palettes.amber.header,
-    themes.dark.palettes.amber.header,
-    "palettes.amber.header must change between modes",
-  );
 });
 
 test("createStyles factories recompute surface/text/border per theme", () => {
@@ -245,7 +229,6 @@ test("feature palette factories switch surfaces as well", () => {
   const makeStyles = createStyles((theme) => ({
     card: { backgroundColor: theme.palettes.ui.card },
     lesson: { backgroundColor: theme.palettes.lesson.card },
-    amber: { backgroundColor: theme.palettes.amber.header },
     myth: { backgroundColor: theme.myth.card },
     lab: { backgroundColor: theme.lab.card },
   }));
@@ -255,7 +238,6 @@ test("feature palette factories switch surfaces as well", () => {
 
   assert.notEqual(light.card.backgroundColor, dark.card.backgroundColor);
   assert.notEqual(light.lesson.backgroundColor, dark.lesson.backgroundColor);
-  assert.notEqual(light.amber.backgroundColor, dark.amber.backgroundColor);
   assert.notEqual(light.myth.backgroundColor, dark.myth.backgroundColor);
   assert.notEqual(light.lab.backgroundColor, dark.lab.backgroundColor);
 });
@@ -271,5 +253,43 @@ test("withAlpha derives from resolved mode-aware bases", () => {
       withAlpha(themes.dark.colors[role], 0.5),
       `withAlpha(${role}) must change between modes`,
     );
+  }
+});
+
+test("retired roles stay removed (warm/cream/gradient/indigo chrome)", () => {
+  for (const mode of ["light", "dark"]) {
+    for (const role of [
+      "creamTint", "creamBorder", "amberSurface", "amberSurfaceStrong", "amberText",
+      "amberBorder", "pageGradientTop", "pageGradientBottom",
+    ]) {
+      assert.equal(themes[mode].colors[role], undefined, `${mode}.colors.${role} must not exist`);
+    }
+    assert.equal(themes[mode].palettes.amber, undefined, "palettes.amber must not exist");
+    assert.equal(themes[mode].accents.indigo, undefined, "accents.indigo must not exist");
+  }
+});
+
+test("orange is the only brand accent on the semantic roles", () => {
+  const { colors: c } = themes.light;
+  const { colors: d } = themes.dark;
+  assert.equal(c.primary, d.primary);
+  for (const role of ["primary", "tint", "accent", "tabIconSelected"]) {
+    assert.equal(c[role], "#EA580C", `light.${role}`);
+    assert.equal(d[role], "#EA580C", `dark.${role}`);
+  }
+});
+
+test("backgrounds are plain neutrals: white (light) and slate (dark)", () => {
+  assert.equal(themes.light.colors.background, "#FFFFFF");
+  assert.equal(themes.light.colors.card, "#FFFFFF");
+  assert.equal(themes.dark.colors.background, "#131F24");
+  for (const mode of ["light", "dark"]) {
+    for (const key of ["lesson", "quiz", "article", "explorer", "settings", "onboarding", "maze", "mazeGame", "tab"]) {
+      const p = themes[mode].palettes[key];
+      const bg = p.bg ?? p.background;
+      assert.equal(bg, themes[mode].colors.background, `${mode}.palettes.${key} background`);
+    }
+    assert.equal(themes[mode].lab.bg, themes[mode].colors.background, `${mode}.lab.bg`);
+    assert.equal(themes[mode].myth.bg, themes[mode].colors.background, `${mode}.myth.bg`);
   }
 });

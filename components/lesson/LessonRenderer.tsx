@@ -484,7 +484,7 @@ const makeMythStyles = createStyles((theme) => ({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: theme.colors.creamTint,
+    backgroundColor: theme.colors.surfaceSoft,
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 20,
@@ -532,7 +532,7 @@ const makeMythStyles = createStyles((theme) => ({
   speakBtn: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: theme.colors.creamTint,
+    backgroundColor: theme.colors.surfaceSoft,
     paddingHorizontal: 20,
     paddingVertical: 12,
     borderRadius: 25,
@@ -1241,7 +1241,7 @@ const makeStyles = createStyles((theme) => {
   },
   optionBtnActive: {
     borderColor: LP.primary,
-    backgroundColor: theme.colors.creamTint,
+    backgroundColor: theme.colors.surfaceSoft,
   },
   optionText: {
     fontSize: 14,
@@ -1300,7 +1300,7 @@ const makeStyles = createStyles((theme) => {
   },
   quizOptionSelected: {
     borderColor: LP.primary,
-    backgroundColor: theme.colors.creamTint,
+    backgroundColor: theme.colors.surfaceSoft,
   },
   quizOptionCorrect: {
     borderColor: theme.colors.success,

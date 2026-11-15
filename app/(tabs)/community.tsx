@@ -1,5 +1,5 @@
 import { getContentImage } from "@/components/community/image-source";
-import { useTabBarInset } from "@/components/layout";
+import { PageBackground, useTabBarInset } from "@/components/layout";
 import { Icon } from "@/components/ui/icon";
 import { getAllArticles, getAllPosts } from "@/content/articles";
 import {
@@ -10,7 +10,6 @@ import {
 } from "@/theme";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Image as ExpoImage } from "expo-image";
-import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import { impactLight } from "@/services/haptics";
 import { SlidingHighlight, useSlidingHighlight } from "@/components/ui/sliding-highlight";
@@ -191,8 +190,8 @@ export default function CommunityScreen() {
   }));
 
   const SKY: [string, string] = [
-    theme.colors.pageGradientTop,
-    theme.colors.pageGradientBottom,
+    theme.colors.background,
+    theme.colors.background,
   ];
 
   // Generate feed items (articles + posts live in the content database)
@@ -348,14 +347,7 @@ export default function CommunityScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: SKY[0] }]}>
-      {/* Autumn gradient flowing through the whole page */}
-      <LinearGradient
-        colors={SKY}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 0, y: 1 }}
-        style={styles.pageGradient}
-        pointerEvents="none"
-      />
+      <PageBackground />
 
       {/* Header — enlarged mascot behind text (absolute, no layout) */}
       <View style={[styles.header, contentFrameStyle, { paddingTop: insets.top + 16 }]}>
@@ -382,7 +374,7 @@ export default function CommunityScreen() {
         {/* Search Bar — premium card with amber icon pill */}
         <View style={styles.searchContainer}>
           <View style={styles.searchIconCircle}>
-            <Icon name="SearchNormal" size={18} color="#E67E22" variant="Bold" />
+            <Icon name="SearchNormal" size={18} color="#C2410C" variant="Bold" />
           </View>
           <TextInput
             style={styles.searchInput}
@@ -550,7 +542,7 @@ export default function CommunityScreen() {
                 activeOpacity={0.85}
                 onPress={() => selectFilter("all")}
               >
-                <Icon name="Refresh" size={14} color="#E67E22" variant="Bold" />
+                <Icon name="Refresh" size={14} color="#C2410C" variant="Bold" />
                 <Text style={styles.emptyActionText}>Show all stories</Text>
               </TouchableOpacity>
             )}
@@ -560,7 +552,7 @@ export default function CommunityScreen() {
           activeFilter !== "saved" && visibleItems.length > 0 ? (
             <View style={styles.feedFooter}>
               <View style={styles.footerIconCircle}>
-                <Icon name="TickCircle" size={24} color="#E67E22" variant="Bold" />
+                <Icon name="TickCircle" size={24} color="#C2410C" variant="Bold" />
               </View>
               <View style={styles.footerContent}>
                 <Text style={styles.footerTitle}>You&apos;re all caught up!</Text>

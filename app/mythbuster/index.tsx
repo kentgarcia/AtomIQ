@@ -111,7 +111,7 @@ const CountUpText = ({
 };
 
 // Shared screen backdrop mirrors the autumn cream → white page gradient used
-// across the home + games tabs (mode-aware via theme.colors.pageGradient*).
+// across the home + games tabs (theme.colors.background).
 
 
 
@@ -191,10 +191,6 @@ export default function MythBusterScreen() {
   const resultsStep = resultCardWidth + RESULTS_CARD_GAP;
   const resultsCardOffset = (frameWidth - 48 - resultCardWidth) / 2;
   const { theme } = useTheme();
-  const appSky: [string, string] = [
-    theme.colors.pageGradientTop,
-    theme.colors.pageGradientBottom,
-  ];
   const textColor = theme.colors.text;
   const cardColor = theme.colors.card;
   const borderColor = theme.colors.border;
@@ -830,9 +826,8 @@ export default function MythBusterScreen() {
     return (
       <GestureHandlerRootView style={{ flex: 1 }}>
         <View style={styles.fullScreen}>
-          <LinearGradient
-            colors={appSky}
-            style={StyleSheet.absoluteFill}
+          <View
+            style={[StyleSheet.absoluteFill, { backgroundColor: theme.colors.background }]}
             pointerEvents="none"
           />
           <View style={[styles.fullScreen, { paddingTop: insets.top }]}>
@@ -1016,11 +1011,10 @@ export default function MythBusterScreen() {
           entering={FadeIn.duration(200).easing(EASE_OUT)}
           style={styles.fullScreen}
         >
-        <LinearGradient
-          colors={appSky}
-          style={StyleSheet.absoluteFill}
-          pointerEvents="none"
-        />
+        <View
+            style={[StyleSheet.absoluteFill, { backgroundColor: theme.colors.background }]}
+            pointerEvents="none"
+          />
           <View style={[styles.fullScreen, { paddingTop: insets.top }]}>
             {/* Header */}
             <View
@@ -1399,11 +1393,10 @@ export default function MythBusterScreen() {
         entering={FadeIn.duration(200).easing(EASE_OUT)}
         style={styles.fullScreen}
       >
-        <LinearGradient
-          colors={appSky}
-          style={StyleSheet.absoluteFill}
-          pointerEvents="none"
-        />
+        <View
+            style={[StyleSheet.absoluteFill, { backgroundColor: theme.colors.background }]}
+            pointerEvents="none"
+          />
         <View
           style={[
             styles.gameHeaderContainer,

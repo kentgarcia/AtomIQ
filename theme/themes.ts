@@ -4,7 +4,8 @@
  * - `semantic` colors are the baseline roles components use (background,
  *   surface, card, text, border, primary, success, ...).
  * - `accents` are per-brand color scales used when a surface should take
- *   the identity of a feature (indigo tabs, orange learning, amber maze...).
+ *   the identity of a feature (orange learning, neon lab...). Orange is the
+ *   only brand accent; surfaces are the neutral light/dark scale.
  * - `palettes` are the per-feature color maps a screen may theme against.
  *
  * Screens & components consume these through `useTheme()` and must never
@@ -57,6 +58,10 @@ export interface SemanticColors {
     primary: string;
     primaryDark: string;
     primaryLight: string;
+    /** Opaque soft/selected fill behind orange text (selected cards, chips). */
+    primarySurface: string;
+    /** Outline for selected cards, chips and focused inputs. */
+    primaryBorder: string;
     secondary: string;
     accent: string;
     border: string;
@@ -90,14 +95,6 @@ export interface SemanticColors {
     inverseSurface: string;
     inverseText: string;
     switchTrack: string;
-    creamTint: string;
-    creamBorder: string;
-    amberSurface: string;
-    amberSurfaceStrong: string;
-    amberText: string;
-    amberBorder: string;
-    pageGradientTop: string;
-    pageGradientBottom: string;
     successSurface: string;
     warningSurface: string;
     errorSurface: string;
@@ -120,15 +117,9 @@ export interface AccentScale {
     onPrimary: string;
 }
 
-export type AccentName = "indigo" | "orange" | "amber" | "neon";
+export type AccentName = "orange" | "amber" | "neon";
 
 const buildAccents = (mode: ThemeMode): Record<AccentName, AccentScale> => {
-    const indigo: AccentScale = {
-        primary: colors.brand.indigo[500],
-        primaryDark: colors.brand.indigo[600],
-        primaryLight: colors.brand.indigo[300],
-        onPrimary: colors.role.onSurface,
-    };
     const orange: AccentScale = {
         primary: colors.brand.orange[500],
         primaryDark: colors.brand.orange[600],
@@ -147,7 +138,7 @@ const buildAccents = (mode: ThemeMode): Record<AccentName, AccentScale> => {
         primaryLight: colors.brand.neon[400],
         onPrimary: colors.role.black,
     };
-    return { indigo, orange, amber, neon };
+    return { orange, amber, neon };
 };
 
 /* ------------------------------------------------------------------ */
@@ -157,7 +148,6 @@ const buildAccents = (mode: ThemeMode): Record<AccentName, AccentScale> => {
 const semantic = (mode: ThemeMode): SemanticColors => {
     const isLight = mode === "light";
     const base = colors.base[mode];
-    const warm = colors.warm[mode];
     return {
         background: base.background,
         surface: base.surface,
@@ -166,19 +156,23 @@ const semantic = (mode: ThemeMode): SemanticColors => {
         surfaceSoft: base.surfaceSoft,
         card: base.surface,
         input: base.input,
-        primary: colors.brand.indigo[500],
-        primaryDark: colors.brand.indigo[600],
-        primaryLight: colors.brand.indigo[300],
-        secondary: colors.brand.indigo[600],
-        accent: colors.brand.indigo[500],
+        /* Orange is the only brand accent. `primaryLight` is the orange used
+           for text/icons on a neutral surface (AA on white / on dark). */
+        primary: colors.brand.orange[500],
+        primaryDark: colors.brand.orange[600],
+        primaryLight: isLight ? colors.brand.orange[600] : colors.brand.orange[400],
+        primarySurface: isLight ? colors.brand.orange.surfaceLight : colors.brand.orange.surfaceDark,
+        primaryBorder: isLight ? colors.brand.orange[500] : colors.brand.orange[400],
+        secondary: base.textMuted,
+        accent: colors.brand.orange[500],
         border: base.border,
         borderStrong: base.borderStrong,
-        borderSubtle: isLight ? "#EEF0F6" : "#26365A",
+        borderSubtle: isLight ? "#F0F0F0" : "#2A383F",
         text: base.text,
-        textSecondary: isLight ? "#525F7F" : "#C0CBDD",
+        textSecondary: isLight ? "#5C5C5C" : "#C5D2DA",
         textMuted: base.textMuted,
         textFaint: base.textFaint,
-        link: colors.brand.orange[500],
+        link: isLight ? colors.brand.orange[600] : colors.brand.orange[400],
         success: colors.role.success,
         successDark: colors.role.successDark,
         warning: colors.role.warning,
@@ -188,29 +182,21 @@ const semantic = (mode: ThemeMode): SemanticColors => {
         gold: colors.role.gold,
         danger: colors.role.danger,
         dangerDark: colors.role.dangerDark,
-        disabled: isLight ? "#E0E0E0" : "#334A70",
-        disabledText: isLight ? "#9E9E9E" : "#667799",
+        disabled: isLight ? "#E5E5E5" : "#2A383F",
+        disabledText: isLight ? "#AFAFAF" : "#667985",
         overlay: isLight ? "rgba(0, 0, 0, 0.5)" : "rgba(0, 0, 0, 0.65)",
         shadow: colors.role.black,
-        ring: colors.brand.indigo[300],
-        tint: colors.brand.indigo[500],
-        icon: isLight ? colors.brand.indigo[600] : colors.brand.indigo[300],
-        tabIconDefault: isLight ? "#9E9E9E" : "#667799",
-        tabIconSelected: colors.brand.indigo[500],
+        ring: colors.brand.orange[400],
+        tint: colors.brand.orange[500],
+        icon: isLight ? "#5C5C5C" : "#C5D2DA",
+        tabIconDefault: base.textMuted,
+        tabIconSelected: colors.brand.orange[500],
         onPrimary: colors.role.onSurface,
         onSurface: colors.role.onSurface,
         inverseSurface: base.inverseSurface,
         inverseText: base.inverseText,
-        switchTrack: isLight ? "#E5E5E5" : "#334A70",
-        creamTint: warm.cream,
-        creamBorder: warm.creamStrong,
-        amberSurface: warm.header,
-        amberSurfaceStrong: warm.chipActive,
-        amberText: warm.headerText,
-        amberBorder: warm.chipBorder,
-        pageGradientTop: warm.gradientTop,
-        pageGradientBottom: warm.gradientBottom,
-        successSurface: isLight ? "rgba(46, 204, 113, 0.12)" : "rgba(46, 204, 113, 0.18)",
+        switchTrack: isLight ? "#E5E5E5" : "#3C4D57",
+        successSurface: isLight ? "rgba(88, 204, 2, 0.12)" : "rgba(88, 204, 2, 0.18)",
         warningSurface: isLight ? "rgba(255, 193, 7, 0.14)" : "rgba(255, 193, 7, 0.2)",
         errorSurface: isLight ? "rgba(239, 68, 68, 0.1)" : "rgba(239, 68, 68, 0.18)",
         infoSurface: isLight ? "rgba(28, 176, 246, 0.1)" : "rgba(28, 176, 246, 0.18)",
@@ -225,19 +211,19 @@ const borderFor = (mode: ThemeMode) => colors.base[mode].border;
 /* Feature palettes (legacy surfaces, now token-sourced)               */
 /* ------------------------------------------------------------------ */
 
-/* Indigo identity — tabs, library, encyclopedia entry, AI chat. */
+/* Tabs, library, encyclopedia entry, AI chat — neutral surfaces, orange accent. */
 const tab = (mode: ThemeMode) => ({
     bg: colors.base[mode].background,
     card: colors.base[mode].surface,
     text: colors.base[mode].text,
     textMuted: colors.base[mode].textMuted,
-    primary: colors.brand.indigo[500],
+    primary: colors.brand.orange[500],
     border: borderFor(mode),
 });
 
 const library = (mode: ThemeMode) => ({
     ...tab(mode),
-    primaryDark: colors.brand.indigo[600],
+    primaryDark: colors.brand.orange[600],
     success: colors.role.success,
 });
 
@@ -248,8 +234,8 @@ const entry = (mode: ThemeMode) => {
         card: colors.base[mode].surface,
         text: colors.base[mode].text,
         textMuted: colors.base[mode].textMuted,
-        primary: colors.brand.indigo[500],
-        primaryDark: colors.brand.indigo[600],
+        primary: colors.brand.orange[500],
+        primaryDark: colors.brand.orange[600],
         success: colors.role.success,
         warning: isLight ? "#FFC800" : colors.role.warning,
         info: colors.role.info,
@@ -301,7 +287,6 @@ const explorer = (mode: ThemeMode) => ({
 
 /* Orange identity — MythBuster. Fully mode-aware. */
 const myth = (mode: ThemeMode) => {
-    const isLight = mode === "light";
     return {
         bg: colors.base[mode].background,
         card: colors.base[mode].surface,
@@ -311,27 +296,26 @@ const myth = (mode: ThemeMode) => {
         primaryDark: colors.brand.orange[600],
         primaryLight: colors.brand.orange[400],
         success: colors.role.success,
-        error: isLight ? "#E74C3C" : colors.role.error,
+        error: colors.role.error,
         gold: colors.role.gold,
         border: colors.base[mode].border,
     };
 };
 
-/* Amber identity — the Atom Maze. */
+/* Atom Maze — neutral surfaces, orange accent (artwork keeps its own hues). */
 const maze = (mode: ThemeMode) => {
-    const isLight = mode === "light";
     return {
-        bg: isLight ? "#FFFFFF" : "#0F172A",
-        card: isLight ? "#FFFFFF" : "#1E293B",
-        text: isLight ? "#1F2937" : colors.base[mode].text,
-        textMuted: isLight ? "#6B7280" : "#94A3B8",
-        primary: colors.brand.amber[400],
-        primaryDark: colors.brand.amber[500],
-        primaryLight: colors.brand.amber[300],
+        bg: colors.base[mode].background,
+        card: colors.base[mode].surface,
+        text: colors.base[mode].text,
+        textMuted: colors.base[mode].textMuted,
+        primary: colors.brand.orange[500],
+        primaryDark: colors.brand.orange[600],
+        primaryLight: colors.brand.orange[400],
         success: colors.role.success,
-        error: isLight ? "#E74C3C" : colors.role.error,
+        error: colors.role.error,
         gold: colors.brand.amber[300],
-        border: isLight ? "#E5E7EB" : "#334155",
+        border: colors.base[mode].border,
     };
 };
 
@@ -339,18 +323,18 @@ const maze = (mode: ThemeMode) => {
 const mazeGame = (mode: ThemeMode) => {
     const isLight = mode === "light";
     return {
-        bg: isLight ? "#FFFFFF" : "#0F172A",
-        card: isLight ? "#F9FAFB" : "#1E293B",
-        text: isLight ? "#111827" : colors.base[mode].text,
-        textMuted: isLight ? "#6B7280" : "#94A3B8",
-        primary: colors.brand.amber[400],
-        primaryDark: colors.brand.amber[500],
-        success: "#10B981",
+        bg: colors.base[mode].background,
+        card: colors.base[mode].surfaceSoft,
+        text: colors.base[mode].text,
+        textMuted: colors.base[mode].textMuted,
+        primary: colors.brand.orange[500],
+        primaryDark: colors.brand.orange[600],
+        success: colors.role.success,
         error: colors.role.error,
-        warning: "#F59E0B",
+        warning: colors.role.warning,
         playerColor: colors.role.info,
         monsterColor: colors.role.error,
-        border: isLight ? "#E5E7EB" : "#334155",
+        border: colors.base[mode].border,
         shadow: isLight ? "rgba(0, 0, 0, 0.1)" : "rgba(0, 0, 0, 0.3)",
     };
 };
@@ -359,8 +343,8 @@ const mazeGame = (mode: ThemeMode) => {
 const map = (mode: ThemeMode) => ({
     bg: mode === "light" ? "#8BC34A" : "#558B2F",
     primary: colors.brand.orange[500],
-    locked: mode === "light" ? "#E5E7EB" : "#2D3A56",
-    text: mode === "light" ? "#1F2937" : colors.base[mode].text,
+    locked: colors.base[mode].border,
+    text: colors.base[mode].text,
     textMuted: colors.base[mode].textMuted,
     card: colors.base[mode].surface,
 });
@@ -389,9 +373,9 @@ const onboarding = (mode: ThemeMode) => {
         border: base.border,
         surfaceSoft: base.surfaceSoft,
         surfaceStrong: base.surfaceStrong,
-        ringSubtle: isLight ? "#E5E5E5" : "#334A70",
-        iconSurface: isLight ? "#F0F9FF" : "#243A5B",
-        iconBorder: isLight ? "#E0F2FE" : "#334A70",
+        ringSubtle: base.border,
+        iconSurface: base.surfaceSoft,
+        iconBorder: base.border,
         buttonBorder: isLight ? "rgba(0,0,0,0.1)" : "rgba(255,255,255,0.14)",
         text: base.text,
         textMuted: base.textMuted,
@@ -410,16 +394,16 @@ const onboarding = (mode: ThemeMode) => {
 const lab = (mode: ThemeMode) => {
     const isLight = mode === "light";
     return {
-        bg: isLight ? "#F4F6FF" : "#0A0E27",
-        card: isLight ? "#FFFFFF" : "#1A1F3A",
-        text: isLight ? "#1F2937" : "#FFFFFF",
-        textMuted: isLight ? "#64748B" : "#8B92B2",
+        bg: colors.base[mode].background,
+        card: colors.base[mode].surface,
+        text: colors.base[mode].text,
+        textMuted: colors.base[mode].textMuted,
         primary: isLight ? colors.brand.neon[600] : colors.brand.neon[500],
         secondary: colors.brand.neon[700],
         accent: isLight ? "#D81B60" : colors.brand.neon.accent,
         success: isLight ? "#059669" : colors.brand.neon[400],
         danger: isLight ? colors.role.dangerDark : colors.brand.neon.accent,
-        border: isLight ? "#E2E8F0" : "#2A2F4A",
+        border: colors.base[mode].border,
         glow: isLight ? colors.brand.neon[600] : colors.brand.neon[500],
     };
 };
@@ -442,36 +426,17 @@ const ui = (mode: ThemeMode) => {
         card: base.surface,
         raised: base.surfaceRaised,
         strong: base.surfaceStrong,
-        soft: isLight ? "#F9FAFB" : "#1A2D4A",
-        softBorder: isLight ? "#F4F5F7" : "#26365A",
+        soft: base.surfaceSoft,
+        softBorder: isLight ? "#F0F0F0" : "#2A383F",
         border: base.border,
         borderStrong: base.borderStrong,
         text: base.text,
-        textSecondary: isLight ? "#555555" : "#C0CBDD",
-        muted: isLight ? "#888888" : "#8898AA",
-        faint: isLight ? "#9CA3AF" : "#667799",
-        creamTint: colors.warm[mode].cream,
-        creamBorder: colors.warm[mode].creamStrong,
+        textSecondary: isLight ? "#5C5C5C" : "#C5D2DA",
+        muted: base.textMuted,
+        faint: base.textFaint,
         shadow: mode === "light" ? colors.role.black : "rgba(0, 0, 0, 0.8)",
         overlay: isLight ? "rgba(0, 0, 0, 0.5)" : "rgba(0, 0, 0, 0.65)",
         onAccent: colors.role.onSurface,
-    };
-};
-
-/* Warm header identity (home / profile / guide / labs). */
-const amber = (mode: ThemeMode) => {
-    const warm = colors.warm[mode];
-    return {
-        header: warm.header,
-        headerText: warm.headerText,
-        chipBorder: warm.chipBorder,
-        chipActive: warm.chipActive,
-        cream: warm.cream,
-        creamStrong: warm.creamStrong,
-        primary: colors.brand.orange[500],
-        primaryDark: colors.brand.orange[600],
-        lip: colors.brand.orange[600],
-        onPrimary: colors.role.onSurface,
     };
 };
 
@@ -479,15 +444,15 @@ const amber = (mode: ThemeMode) => {
 const legacy = (mode: ThemeMode) => ({
     text: colors.base[mode].text,
     background: colors.base[mode].background,
-    tint: colors.brand.indigo[500],
-    icon: mode === "light" ? colors.brand.indigo[600] : colors.brand.indigo[300],
-    tabIconDefault: "#9E9E9E",
-    tabIconSelected: colors.brand.indigo[500],
+    tint: colors.brand.orange[500],
+    icon: mode === "light" ? "#5C5C5C" : "#C5D2DA",
+    tabIconDefault: colors.base[mode].textMuted,
+    tabIconSelected: colors.brand.orange[500],
     card: colors.base[mode].surface,
-    primary: colors.brand.indigo[500],
-    primaryDark: colors.brand.indigo[600],
-    secondary: colors.brand.indigo[600],
-    accent: colors.brand.indigo[300],
+    primary: colors.brand.orange[500],
+    primaryDark: colors.brand.orange[600],
+    secondary: colors.base[mode].textMuted,
+    accent: colors.brand.orange[400],
     textSecondary: colors.base[mode].textMuted,
 });
 
@@ -517,7 +482,6 @@ export interface Theme {
         tabBar: Palette;
         legacy: Palette;
         ui: Palette;
-        amber: Palette;
     };
     myth: Palette;
     lab: Palette;
@@ -565,7 +529,6 @@ const buildTheme = (mode: ThemeMode): Theme => ({
         tabBar: withShadow(mode, tabBar(mode)),
         legacy: withShadow(mode, legacy(mode)),
         ui: withShadow(mode, ui(mode)),
-        amber: withShadow(mode, amber(mode)),
     },
     myth: { ...myth(mode), shadow: colors.role.black },
     lab: { ...lab(mode), shadow: colors.role.black },

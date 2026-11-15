@@ -9,7 +9,7 @@
 
 import { ContentCard } from "@/components/guide/ContentCard";
 import { ProfileProgressCard } from "@/components/guide/ProfileProgressCard";
-import { useHideTabBar, useTabBarInset } from "@/components/layout";
+import { PageBackground, useHideTabBar, useTabBarInset } from "@/components/layout";
 import { Icon } from "@/components/ui/icon";
 import { ReadAloudButton } from "@/components/ui/read-aloud-button";
 import { useStorage } from "@/services/StorageContext";
@@ -22,10 +22,9 @@ import type { GuideCard, GuideIntent, GuidePill, GuideState, GuideTurn, MascotMo
 import { getProfileAvatarSource } from "@/services/profile-avatars";
 import { createStyles, fontFaces, useResponsiveLayout, useTheme } from "@/theme";
 import { getIntentPillColors, getOptionColors } from "@/theme/option-states";
-import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import React, { useEffect, useMemo, useRef } from "react";
-import { ActivityIndicator, Image, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, Image, Pressable, ScrollView, Text, View } from "react-native";
 import Animated, { FadeIn, FadeInUp, useAnimatedStyle, useReducedMotion, useSharedValue, withRepeat, withTiming } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -56,10 +55,10 @@ const MASCOT_FOR_MOOD: Record<MascotMood, any> = {
   encouraging: MASCOTS.blink,
 };
 const QUICK_TILES: { intent: GuideIntent; icon: string; color: string; title: string; desc: string }[] = [
-  { intent: "learn", icon: "Book", color: "#FF8C00", title: "Learn", desc: "Build your understanding through lessons." },
-  { intent: "explore", icon: "SearchNormal", color: "#5E72E4", title: "Explore", desc: "Dive into a topic." },
-  { intent: "discover", icon: "DocumentText", color: "#2ECC71", title: "Discover", desc: "Find facts, encyclopedia entries, and articles." },
-  { intent: "practice", icon: "Game", color: "#E67E22", title: "Practice", desc: "Test knowledge through quizzes and games." },
+  { intent: "learn", icon: "Book", color: "#EA580C", title: "Learn", desc: "Build your understanding through lessons." },
+  { intent: "explore", icon: "SearchNormal", color: "#1CB0F6", title: "Explore", desc: "Dive into a topic." },
+  { intent: "discover", icon: "DocumentText", color: "#58CC02", title: "Discover", desc: "Find facts, encyclopedia entries, and articles." },
+  { intent: "practice", icon: "Game", color: "#C2410C", title: "Practice", desc: "Test knowledge through quizzes and games." },
 ];
 const getGreeting = () => {
   const hour = new Date().getHours();
@@ -177,7 +176,7 @@ export default function GuideScreen() {
   if (!ready || !state || !guideCtx || !contentRef.current) {
     return (
       <View style={[styles.container, { backgroundColor: c.background }]}>
-        <LinearGradient colors={[c.pageGradientTop, c.pageGradientBottom]} style={StyleSheet.absoluteFill} />
+      <PageBackground />
         <View style={styles.loading}><ActivityIndicator color={c.primary} /><Text style={[styles.loadingText, { color: c.textMuted }]}>Loading your guide…</Text></View>
       </View>
     );
@@ -206,7 +205,7 @@ export default function GuideScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: c.background }]}>
-      <LinearGradient colors={[c.pageGradientTop, c.pageGradientBottom]} style={StyleSheet.absoluteFill} />
+      <PageBackground />
       {/* Immersive Guide Mode header — minimal */}
       <View
         style={[
@@ -254,7 +253,7 @@ export default function GuideScreen() {
                 ownerId={`guide:${activeTurn.id}`}
                 subject="message"
                 variant="pill"
-                accent={c.amberText}
+                accent={c.primaryLight}
                 text={() => activeTurn.text}
                 style={{ marginTop: 12 }}
               />
@@ -417,7 +416,7 @@ function LandingDashboard({ ctx, content, userProfile, onEnterChat, onDirectNav 
 
   return (
     <View style={[styles.container, { backgroundColor: c.background }]}>
-      <LinearGradient colors={[c.pageGradientTop, c.pageGradientBottom]} style={StyleSheet.absoluteFill} />
+      <PageBackground />
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={[
@@ -475,7 +474,7 @@ function LandingDashboard({ ctx, content, userProfile, onEnterChat, onDirectNav 
             <View style={{ gap: 8 }}>
               {weakChips.map((q: any) => (
                 <View key={q.id} style={[styles.weakRow, { backgroundColor: c.surfaceSoft, borderColor: c.borderSubtle }]}>
-                  <View style={[styles.weakIcon, { backgroundColor: c.creamTint }]}><Icon name="Refresh" size={14} color="#E67E22" variant="Bold" /></View>
+                  <View style={[styles.weakIcon, { backgroundColor: c.surfaceSoft }]}><Icon name="Refresh" size={14} color="#C2410C" variant="Bold" /></View>
                   <Text style={[styles.weakText, { color: c.text }]}>{q.title}</Text>
                   <Pressable onPress={() => onEnterChat("review")} style={({ pressed }) => [styles.weakBtn, { backgroundColor: c.card, borderColor: c.border, opacity: pressed ? 0.8 : 1 }]}><Text style={[styles.weakBtnText, { color: c.text }]}>Fix</Text></Pressable>
                 </View>
@@ -512,7 +511,7 @@ const makeStyles = createStyles((theme) => {
   backBtn: { flexDirection: "row", alignItems: "center", gap: 6, paddingHorizontal: 10, paddingVertical: 7, borderRadius: 999, borderWidth: 1 },
   backText: { fontSize: 12, ...fontFaces.semibold },
   topBarLeft: { flexDirection: "row", alignItems: "center", gap: 6 },
-  liveDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: "#2ECC71" },
+  liveDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: "#58CC02" },
   topBarTitle: { fontSize: 13, ...fontFaces.heavy },
   startOverBtn: { flexDirection: "row", alignItems: "center", gap: 6, paddingHorizontal: 12, paddingVertical: 7, borderRadius: 999, borderWidth: 1 },
   startOverText: { fontSize: 12, ...fontFaces.semibold },
@@ -535,12 +534,12 @@ const makeStyles = createStyles((theme) => {
     alignItems: "center",
     justifyContent: "center",
     gap: 8,
-    backgroundColor: "#FF8C00",
+    backgroundColor: "#EA580C",
     marginTop: 14,
     paddingVertical: 14,
     borderRadius: 999,
     borderWidth: 1,
-    borderColor: "#E67E22",
+    borderColor: "#C2410C",
     borderBottomWidth: 4,
     shadowColor: c.shadow,
     shadowOffset: { width: 0, height: 3 },
@@ -552,7 +551,7 @@ const makeStyles = createStyles((theme) => {
   // chat — fixed amber header (app design)
   chatHeaderContainer: { paddingHorizontal: 16, zIndex: 10 },
   chatHeaderBar: {
-    backgroundColor: c.amberSurface,
+    backgroundColor: c.surfaceSoft,
     borderRadius: 26,
     padding: 10,
     shadowColor: c.shadow,
@@ -577,7 +576,7 @@ const makeStyles = createStyles((theme) => {
   },
   chatBackText: { fontSize: 12, ...fontFaces.heavy, color: c.text },
   chatTitleCenter: { flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 6 },
-  chatTitleText: { fontSize: 14, ...fontFaces.heavy, color: c.amberText },
+  chatTitleText: { fontSize: 14, ...fontFaces.heavy, color: c.primaryLight },
   chatResetBtn: {
     flexDirection: "row",
     alignItems: "center",
@@ -625,12 +624,12 @@ const makeStyles = createStyles((theme) => {
     alignItems: "center",
     justifyContent: "center",
     gap: 8,
-    backgroundColor: "#FF8C00",
+    backgroundColor: "#EA580C",
     paddingHorizontal: 28,
     paddingVertical: 16,
     borderRadius: 999,
     borderWidth: 1,
-    borderColor: "#E67E22",
+    borderColor: "#C2410C",
     borderBottomWidth: 4,
     shadowColor: c.shadow,
     shadowOffset: { width: 0, height: 4 },
@@ -695,7 +694,7 @@ const makeStyles = createStyles((theme) => {
   // landing — copied from profile/home page (amber outer + white section cards)
   landingScroll: { paddingHorizontal: 16, gap: 14, paddingBottom: 8 },
   heroCard: {
-    backgroundColor: c.amberSurface,
+    backgroundColor: c.surfaceSoft,
     borderRadius: 26,
     padding: 10,
     gap: 10,
@@ -706,9 +705,9 @@ const makeStyles = createStyles((theme) => {
     elevation: 4,
   },
   heroTop: { flexDirection: "row", gap: 12, alignItems: "center" },
-  heroEyebrow: { fontSize: 10, ...fontFaces.heavy, color: c.amberText, letterSpacing: 0.8 },
-  heroTitle: { fontSize: 22, ...fontFaces.heavy, color: c.amberText, marginTop: 2 },
-  heroSub: { fontSize: 12, ...fontFaces.medium, color: c.amberText, marginTop: 4, lineHeight: 16 },
+  heroEyebrow: { fontSize: 10, ...fontFaces.heavy, color: c.primaryLight, letterSpacing: 0.8 },
+  heroTitle: { fontSize: 22, ...fontFaces.heavy, color: c.primaryLight, marginTop: 2 },
+  heroSub: { fontSize: 12, ...fontFaces.medium, color: c.primaryLight, marginTop: 4, lineHeight: 16 },
   heroMascot: { width: 84, height: 84 },
   heroBubble: {
     backgroundColor: c.card,
@@ -723,7 +722,7 @@ const makeStyles = createStyles((theme) => {
   heroCtaText: { fontSize: 14, ...fontFaces.heavy },
   // home header — exact copy from app/(tabs)/index.tsx
   homeHeaderBar: {
-    backgroundColor: c.amberSurface,
+    backgroundColor: c.surfaceSoft,
     borderRadius: 26,
     padding: 10,
     gap: 12,
@@ -745,8 +744,8 @@ const makeStyles = createStyles((theme) => {
     borderBottomWidth: 4,
   },
   homeAvatar: { width: "100%", height: "100%", borderRadius: 23 },
-  homeGreetingLabel: { fontSize: 11, ...fontFaces.semibold, color: c.amberText, textTransform: "uppercase", letterSpacing: 0.6, marginBottom: 1 },
-  homeGreetingName: { fontSize: 17, ...fontFaces.heavy, color: c.amberText },
+  homeGreetingLabel: { fontSize: 11, ...fontFaces.semibold, color: c.primaryLight, textTransform: "uppercase", letterSpacing: 0.6, marginBottom: 1 },
+  homeGreetingName: { fontSize: 17, ...fontFaces.heavy, color: c.primaryLight },
   homeXpPill: { flexDirection: "row", alignItems: "center", gap: 5, backgroundColor: c.inverseSurface, paddingHorizontal: 12, height: 40, borderRadius: 14 },
   homeXpText: { fontSize: 13, ...fontFaces.heavy, color: c.inverseText },
   headerStack: { gap: 0 },
@@ -784,11 +783,11 @@ const makeStyles = createStyles((theme) => {
     width: 64,
     height: 64,
     borderRadius: 32,
-    backgroundColor: c.creamTint,
+    backgroundColor: c.surfaceSoft,
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 2,
-    borderColor: c.creamBorder,
+    borderColor: c.border,
     overflow: "hidden",
   },
   shrodiAvatar: { width: 56, height: 56 },
@@ -845,12 +844,12 @@ const makeStyles = createStyles((theme) => {
     alignItems: "center",
     justifyContent: "center",
     gap: 8,
-    backgroundColor: "#FF8C00",
+    backgroundColor: "#EA580C",
     borderRadius: 16,
     paddingVertical: 16,
     paddingHorizontal: 20,
     borderWidth: 1,
-    borderColor: "#E67E22",
+    borderColor: "#C2410C",
     borderBottomWidth: 4,
     shadowColor: c.shadow,
     shadowOffset: { width: 0, height: 4 },

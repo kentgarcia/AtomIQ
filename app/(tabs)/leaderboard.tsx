@@ -12,7 +12,6 @@ import {
 } from "@/services/profile-avatars";
 import { useStorage } from "@/services/StorageContext";
 import { useFocusEffect } from "expo-router";
-import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
@@ -50,7 +49,7 @@ export const NPC_CHARACTERS = [
     name: "NuclearNinja",
     title: "Physics Legend",
     baseXP: 1800,
-    avatarColor: "#2ECC71",
+    avatarColor: "#58CC02",
     isNPC: true,
   },
   {
@@ -216,7 +215,7 @@ export default function LeaderboardScreen() {
   const bgColors: [string, string] =
     theme.mode === "dark"
       ? [theme.colors.background, theme.colors.background]
-      : [theme.colors.pageGradientTop, theme.colors.pageGradientBottom];
+      : [theme.colors.background, theme.colors.background];
   const pulse = useSharedValue(1);
   const reducedMotion = useReducedMotion();
   const [leaderboardData, setLeaderboardData] = useState<LeaderboardEntry[]>(
@@ -387,11 +386,6 @@ export default function LeaderboardScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: bgColors[0] }]}>
-      <LinearGradient
-        colors={bgColors}
-        style={styles.bgGradient}
-        pointerEvents="none"
-      />
       {/* Header — amber outer like profile/home */}
       <Animated.View
         entering={reducedMotion ? FadeIn.duration(120) : FadeInDown.springify()}
@@ -407,7 +401,7 @@ export default function LeaderboardScreen() {
             accessibilityLabel="Go back"
             onPress={() => router.back()}
           >
-            <Icon name="ArrowLeft2" size={20} color="#FF8C00" variant="Bold" />
+            <Icon name="ArrowLeft2" size={20} color="#EA580C" variant="Bold" />
           </TouchableOpacity>
           <View style={styles.headerTitlePill}>
             <Icon name="Crown1" size={14} color="#FFFFFF" variant="Bold" />
@@ -618,7 +612,7 @@ export default function LeaderboardScreen() {
               <Text
                 style={[
                   styles.listRankText,
-                  { color: "#E67E22", width: 30, textAlign: "center" },
+                  { color: "#C2410C", width: 30, textAlign: "center" },
                 ]}
               >
                 {userRank.rank}
@@ -629,7 +623,7 @@ export default function LeaderboardScreen() {
                   isUser={true}
                   isNPC={false}
                   size={40}
-                  borderColor="#FFCA5F"
+                  borderColor={theme.colors.primary}
                   borderWidth={2}
                 />
               </View>
@@ -642,8 +636,8 @@ export default function LeaderboardScreen() {
                 </Text>
               </View>
               <View style={styles.listXP}>
-                <Icon name="Flash" size={16} color="#FF8C00" variant="Bold" />
-                <Text style={[styles.xpText, { color: "#E67E22" }]}>
+                <Icon name="Flash" size={16} color="#EA580C" variant="Bold" />
+                <Text style={[styles.xpText, { color: "#C2410C" }]}>
                   {userRank.xp.toLocaleString()} XP
                 </Text>
               </View>
@@ -676,7 +670,10 @@ const createStyles = (theme: Theme) => {
     },
     headerContainer: {
       marginHorizontal: 20,
-      backgroundColor: "#FFCA5F",
+      backgroundColor: theme.colors.card,
+      borderWidth: 2,
+      borderColor: theme.colors.border,
+      borderBottomWidth: 4,
       borderRadius: 26,
       padding: 10,
       gap: 10,
@@ -708,7 +705,7 @@ const createStyles = (theme: Theme) => {
       alignItems: "center",
       justifyContent: "center",
       borderWidth: 2,
-      borderColor: "#FFDD8D",
+      borderColor: theme.colors.border,
       borderBottomWidth: 4,
     },
     headerTitlePill: {
@@ -790,7 +787,7 @@ const createStyles = (theme: Theme) => {
       color: P.text,
     },
     podiumXP: {
-      color: "#E67E22",
+      color: "#C2410C",
       fontSize: 11,
       ...fontFaces.bold,
       marginTop: 2,
@@ -818,8 +815,8 @@ const createStyles = (theme: Theme) => {
       shadowRadius: 4,
     },
     listItemActive: {
-      backgroundColor: P.creamTint,
-      borderColor: "#FFCA5F",
+      backgroundColor: theme.colors.primarySurface,
+      borderColor: theme.colors.primaryBorder,
     },
     listRankText: {
       color: P.muted,
@@ -871,7 +868,7 @@ const createStyles = (theme: Theme) => {
       gap: 4,
     },
     xpText: {
-      color: "#E67E22",
+      color: "#C2410C",
       ...fontFaces.heavy,
       fontSize: 14,
       fontVariant: ["tabular-nums"],
@@ -900,7 +897,7 @@ const createStyles = (theme: Theme) => {
       backgroundColor: P.card,
       borderRadius: 20,
       borderWidth: 2,
-      borderColor: "#FFCA5F",
+      borderColor: theme.colors.border,
       borderBottomWidth: 4,
     },
   });

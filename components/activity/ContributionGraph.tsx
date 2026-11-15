@@ -439,7 +439,7 @@ const makeStyles = createStyles((theme) => ({
     marginTop: 14,
     padding: 12,
     borderRadius: 14,
-    backgroundColor: theme.colors.creamTint,
+    backgroundColor: theme.colors.surfaceSoft,
   },
   privacyText: {
     flex: 1,

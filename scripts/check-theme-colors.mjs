@@ -55,6 +55,18 @@ const LIGHT_SURFACE_LITERALS = new Set([
   "#fbfbfb",
 ]);
 
+/**
+ * Retired chrome roles (docs/completed/NEUTRAL_THEME_ORANGE_ACCENT_SPEC.md): pages sit on
+ * plain `background`, orange is the only accent, indigo/warm header colors are gone.
+ */
+const RETIRED_IDENTIFIERS =
+  /\b(?:pageGradient(?:Top|Bottom)|creamTint|creamBorder|amberSurface(?:Strong)?|amberText|amberBorder|palettes\.amber|accents\.indigo)\b/;
+const RETIRED_LITERALS = new Set([
+  "#5e72e4", "#4c63d2", "#9e87f5", "#8b9cf0", "#3b4bb8", // indigo brand
+  "#ffca5f", "#ffdd8d", "#ffe0b2", "#fff3e0", "#724d06", // warm header / cream
+  "#172b4d", "#213356", "#26365a", "#1a2d4a", "#334a70", // navy dark surfaces
+]);
+
 const COLOR_RE =
   /#[0-9A-Fa-f]{3,8}\b|rgba?\(\s*\d+\s*,\s*\d+\s*,\s*\d+(?:\s*,\s*[\d.]+)?\s*\)/g;
 
@@ -207,6 +219,30 @@ function scanFile(file) {
         message:
           "withAlpha() applied to a color literal — apply it to a mode-aware theme color",
       });
+    }
+  });
+
+  // 3b. Retired warm/cream/gradient/indigo roles and literals.
+  lines.forEach((line, index) => {
+    if (/theme-allow\b/i.test(line)) return;
+    const trimmed = line.trim();
+    if (trimmed.startsWith("//") || trimmed.startsWith("*") || trimmed.startsWith("/*")) return;
+    if (RETIRED_IDENTIFIERS.test(line)) {
+      violations.push({
+        file: relPath,
+        line: index + 1,
+        message:
+          "retired theme role — use background / surfaceSoft / border / primarySurface / primaryBorder",
+      });
+    }
+    for (const raw of line.match(COLOR_RE) || []) {
+      if (RETIRED_LITERALS.has(normalize(raw))) {
+        violations.push({
+          file: relPath,
+          line: index + 1,
+          message: `retired indigo/warm/navy color ${raw} — orange is the only accent; surfaces use theme roles`,
+        });
+      }
     }
   });
 

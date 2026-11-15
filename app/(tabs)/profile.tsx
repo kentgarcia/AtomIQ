@@ -1,6 +1,6 @@
 import { Icon } from "@/components/ui/icon";
 import { RecentActivityStrip } from "@/components/activity/RecentActivityStrip";
-import { useTabBarInset } from "@/components/layout";
+import { PageBackground, useTabBarInset } from "@/components/layout";
 import {useTheme, type Theme, fontFaces, useResponsiveLayout} from "@/theme";
 import { ACHIEVEMENTS } from "@/app/achievement-detail";
 import { NPC_CHARACTERS } from "@/app/(tabs)/leaderboard";
@@ -14,7 +14,6 @@ import {
 import { getBestGameScores, type GameBestScore } from "@/services/database";
 import { getUnlockedAchievementIds, setUnlockedAchievementIds } from "@/services/storage";
 import { useStorage } from "@/services/StorageContext";
-import { LinearGradient } from "expo-linear-gradient";
 import { useFocusEffect, useRouter } from "expo-router";
 import React, { useCallback, useMemo, useState } from "react";
 import {
@@ -76,7 +75,7 @@ export default function ProfileScreen() {
   const bgColors: [string, string] =
     theme.mode === "dark"
       ? [theme.colors.background, theme.colors.background]
-      : [theme.colors.pageGradientTop, theme.colors.pageGradientBottom];
+      : [theme.colors.background, theme.colors.background];
 
   // Calculate user level
   const userLevel = useMemo(() => {
@@ -99,7 +98,7 @@ export default function ProfileScreen() {
   const TITLE_MILESTONES = useMemo(
     () => [
       { title: "Atomic Novice", minLevel: 1, icon: "Star", color: "#64B5F6" },
-      { title: "Isotope Initiate", minLevel: 5, icon: "Flash", color: "#FF8C00" },
+      { title: "Isotope Initiate", minLevel: 5, icon: "Flash", color: "#EA580C" },
       { title: "Fusion Explorer", minLevel: 10, icon: "Cup", color: "#8B5CF6" },
       { title: "Quantum Master", minLevel: 20, icon: "Crown", color: "#FFD700" },
     ],
@@ -127,7 +126,7 @@ export default function ProfileScreen() {
         label: "Streak",
         value: userProfile?.current_streak ?? 0,
         icon: "Sun",
-        color: "#E67E22",
+        color: "#C2410C",
       },
       {
         label: "Best",
@@ -323,11 +322,7 @@ export default function ProfileScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: bgColors[0] }]}>
-      <LinearGradient
-        colors={bgColors}
-        style={styles.bgGradient}
-        pointerEvents="none"
-      />
+      <PageBackground />
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={[
@@ -405,7 +400,7 @@ export default function ProfileScreen() {
               accessibilityRole="button"
               accessibilityLabel="Flip profile card"
             >
-              <Icon name="ChartSquare" size={19} color="#FF8C00" variant="Bold" />
+              <Icon name="ChartSquare" size={19} color="#EA580C" variant="Bold" />
             </TouchableOpacity>
           </View>
 
@@ -519,7 +514,7 @@ export default function ProfileScreen() {
                   </Text>
                 </>
               ) : (
-                <View style={[styles.titleProgressTrack, { backgroundColor: theme.colors.creamTint }]}>
+                <View style={[styles.titleProgressTrack, { backgroundColor: theme.colors.surfaceSoft }]}>
                   <View style={[styles.titleProgressFill, { width: "100%" }]} />
                 </View>
               )}
@@ -583,7 +578,7 @@ export default function ProfileScreen() {
             onPress={() => router.push("/streak")}
           >
             <View style={styles.streakIconCircle}>
-              <Icon name="Sun" size={26} color="#E67E22" variant="Bold" />
+              <Icon name="Sun" size={26} color="#C2410C" variant="Bold" />
             </View>
             <View style={{ flex: 1 }}>
               <Text style={styles.streakValue}>
@@ -594,7 +589,7 @@ export default function ProfileScreen() {
               </Text>
             </View>
             <View style={styles.streakArrow}>
-              <Icon name="ArrowRight2" size={18} color="#E67E22" variant="Bold" />
+              <Icon name="ArrowRight2" size={18} color="#C2410C" variant="Bold" />
             </View>
           </TouchableOpacity>
         </Animated.View>
@@ -659,7 +654,7 @@ export default function ProfileScreen() {
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Game Leaderboard</Text>
             <View style={styles.countPill}>
-              <Icon name="Cup" size={13} color="#E67E22" variant="Bold" />
+              <Icon name="Cup" size={13} color="#C2410C" variant="Bold" />
               <Text style={styles.countPillText}>Personal bests</Text>
             </View>
           </View>
@@ -669,8 +664,8 @@ export default function ProfileScreen() {
             activeOpacity={0.85}
             onPress={() => router.push("/leaderboard")}
           >
-            <View style={[styles.leaderIconCircle, { backgroundColor: theme.colors.creamTint }]}>
-              <Icon name="Cup" size={20} color="#E67E22" variant="Bold" />
+            <View style={[styles.leaderIconCircle, { backgroundColor: theme.colors.surfaceSoft }]}>
+              <Icon name="Cup" size={20} color="#C2410C" variant="Bold" />
             </View>
             <View style={{ flex: 1 }}>
               <Text style={styles.leaderTitle}>Ranking</Text>
@@ -679,7 +674,7 @@ export default function ProfileScreen() {
               </Text>
             </View>
             <View style={styles.streakArrow}>
-              <Icon name="ArrowRight2" size={16} color="#E67E22" variant="Bold" />
+              <Icon name="ArrowRight2" size={16} color="#C2410C" variant="Bold" />
             </View>
           </TouchableOpacity>
           {GAME_LEADERBOARD_META.map((game, index) => {
@@ -780,7 +775,7 @@ export default function ProfileScreen() {
             <View style={styles.avatarModalHeader}>
               <View style={styles.editHeaderLeft}>
                 <View style={styles.editHeaderIcon}>
-                  <Icon name="Edit2" size={16} color="#FF8C00" variant="Bold" />
+                  <Icon name="Edit2" size={16} color="#EA580C" variant="Bold" />
                 </View>
                 <Text style={styles.avatarModalTitle}>Edit Profile</Text>
               </View>
@@ -816,12 +811,12 @@ export default function ProfileScreen() {
                   </Text>
                   <Text style={styles.previewTitle}>{userTitle}</Text>
                   <View style={styles.previewXpRow}>
-                    <Icon name="Flash" size={12} color="#E67E22" variant="Bold" />
+                    <Icon name="Flash" size={12} color="#C2410C" variant="Bold" />
                     <Text style={styles.previewXp}>{(userProfile?.total_xp || 0).toLocaleString()} XP</Text>
                   </View>
                 </View>
                 <View style={styles.previewCheck}>
-                  <Icon name="Eye" size={16} color="#FF8C00" variant="Bold" />
+                  <Icon name="Eye" size={16} color="#EA580C" variant="Bold" />
                 </View>
               </View>
             </View>
@@ -1042,7 +1037,10 @@ const createStyles = (theme: Theme) => {
     /* Flip card shell — amber outer like home's headerBar */
     profileCard: {
       marginHorizontal: 20,
-      backgroundColor: "#FFCA5F",
+      backgroundColor: theme.colors.card,
+      borderWidth: 2,
+      borderColor: theme.colors.border,
+      borderBottomWidth: 4,
       borderRadius: 26,
       padding: 10,
       gap: 10,
@@ -1099,18 +1097,18 @@ const createStyles = (theme: Theme) => {
     titleProgressMeta: {
       fontSize: 11,
       ...fontFaces.bold,
-      color: "#E67E22",
+      color: "#C2410C",
     },
     titleProgressTrack: {
       height: 8,
       borderRadius: 4,
-      backgroundColor: P.creamTint,
+      backgroundColor: P.soft,
       overflow: "hidden",
     },
     titleProgressFill: {
       height: "100%",
       borderRadius: 4,
-      backgroundColor: "#FF8C00",
+      backgroundColor: "#EA580C",
     },
     titleProgressHint: {
       fontSize: 11,
@@ -1131,7 +1129,7 @@ const createStyles = (theme: Theme) => {
       backgroundColor: P.soft,
     },
     titleMilestoneRowCurrent: {
-      backgroundColor: P.creamTint,
+      backgroundColor: P.soft,
     },
     titleMilestoneIcon: {
       width: 32,
@@ -1192,15 +1190,15 @@ const createStyles = (theme: Theme) => {
       width: 84,
       height: 84,
       borderRadius: 42,
-      backgroundColor: P.creamTint,
+      backgroundColor: P.soft,
       borderWidth: 3,
-      borderColor: P.creamTint,
+      borderColor: P.soft,
     },
     levelBadge: {
       position: "absolute",
       bottom: -2,
       right: -2,
-      backgroundColor: "#FF8C00",
+      backgroundColor: "#EA580C",
       width: 30,
       height: 30,
       borderRadius: 15,
@@ -1244,18 +1242,18 @@ const createStyles = (theme: Theme) => {
     levelXp: {
       fontSize: 12,
       ...fontFaces.bold,
-      color: "#E67E22",
+      color: "#C2410C",
     },
     levelBarBg: {
       height: 10,
       borderRadius: 5,
-      backgroundColor: P.creamTint,
+      backgroundColor: P.soft,
       overflow: "hidden",
     },
     levelBarFill: {
       height: "100%",
       borderRadius: 5,
-      backgroundColor: "#FF8C00",
+      backgroundColor: "#EA580C",
     },
     levelHint: {
       fontSize: 11,
@@ -1271,7 +1269,7 @@ const createStyles = (theme: Theme) => {
       alignItems: "center",
       justifyContent: "center",
       borderWidth: 2,
-      borderColor: "#FFDD8D",
+      borderColor: theme.colors.border,
       borderBottomWidth: 4,
     },
     profileTextCol: {
@@ -1338,7 +1336,7 @@ const createStyles = (theme: Theme) => {
       width: 52,
       height: 52,
       borderRadius: 26,
-      backgroundColor: P.creamTint,
+      backgroundColor: P.soft,
       alignItems: "center",
       justifyContent: "center",
     },
@@ -1358,7 +1356,7 @@ const createStyles = (theme: Theme) => {
       width: 34,
       height: 34,
       borderRadius: 17,
-      backgroundColor: P.creamTint,
+      backgroundColor: P.soft,
       alignItems: "center",
       justifyContent: "center",
     },
@@ -1390,7 +1388,7 @@ const createStyles = (theme: Theme) => {
       flexDirection: "row",
       alignItems: "center",
       gap: 5,
-      backgroundColor: P.creamTint,
+      backgroundColor: P.soft,
       borderRadius: 12,
       paddingHorizontal: 10,
       paddingVertical: 5,
@@ -1398,7 +1396,7 @@ const createStyles = (theme: Theme) => {
     countPillText: {
       fontSize: 11,
       ...fontFaces.heavy,
-      color: "#E67E22",
+      color: "#C2410C",
     },
     /* Awards badges */
     badgesRow: {
@@ -1445,14 +1443,14 @@ const createStyles = (theme: Theme) => {
       width: 22,
       height: 22,
       borderRadius: 11,
-      backgroundColor: P.creamTint,
+      backgroundColor: P.soft,
       alignItems: "center",
       justifyContent: "center",
     },
     leaderRankText: {
       fontSize: 11,
       ...fontFaces.heavy,
-      color: "#E67E22",
+      color: "#C2410C",
     },
     leaderIconCircle: {
       width: 40,
@@ -1482,7 +1480,7 @@ const createStyles = (theme: Theme) => {
       paddingVertical: 7,
     },
     leaderScorePillTop: {
-      backgroundColor: P.creamTint,
+      backgroundColor: P.soft,
     },
     leaderScoreText: {
       fontSize: 13,
@@ -1490,7 +1488,7 @@ const createStyles = (theme: Theme) => {
       color: P.textSecondary,
     },
     leaderScoreTextTop: {
-      color: "#E67E22",
+      color: "#C2410C",
     },
     leaderNoScore: {
       fontSize: 14,
@@ -1528,7 +1526,7 @@ const createStyles = (theme: Theme) => {
       width: 64,
       height: 64,
       borderRadius: 32,
-      backgroundColor: P.creamTint,
+      backgroundColor: P.soft,
       alignItems: "center",
       justifyContent: "center",
       marginBottom: 12,
@@ -1569,7 +1567,7 @@ const createStyles = (theme: Theme) => {
     },
     celebrationButton: {
       width: "100%",
-      backgroundColor: "#FF8C00",
+      backgroundColor: "#EA580C",
       borderRadius: 16,
       paddingVertical: 14,
       alignItems: "center",
@@ -1645,7 +1643,7 @@ const createStyles = (theme: Theme) => {
       width: 32,
       height: 32,
       borderRadius: 16,
-      backgroundColor: P.creamTint,
+      backgroundColor: P.soft,
       alignItems: "center",
       justifyContent: "center",
     },
@@ -1668,7 +1666,7 @@ const createStyles = (theme: Theme) => {
       borderColor: P.border,
     },
     previewCard: {
-      backgroundColor: "#FFCA5F",
+      backgroundColor: theme.colors.surfaceSoft,
       borderRadius: 20,
       padding: 10,
       gap: 6,
@@ -1677,7 +1675,7 @@ const createStyles = (theme: Theme) => {
     previewLabel: {
       fontSize: 10,
       ...fontFaces.heavy,
-      color: "#724D06",
+      color: theme.colors.textMuted,
       textTransform: "uppercase",
       letterSpacing: 0.7,
       paddingHorizontal: 4,
@@ -1700,15 +1698,15 @@ const createStyles = (theme: Theme) => {
       width: 56,
       height: 56,
       borderRadius: 28,
-      backgroundColor: P.creamTint,
+      backgroundColor: P.soft,
       borderWidth: 2,
-      borderColor: P.creamTint,
+      borderColor: P.soft,
     },
     previewLevelBadge: {
       position: "absolute",
       bottom: -4,
       right: -4,
-      backgroundColor: "#FF8C00",
+      backgroundColor: "#EA580C",
       width: 22,
       height: 22,
       borderRadius: 11,
@@ -1742,13 +1740,13 @@ const createStyles = (theme: Theme) => {
     previewXp: {
       fontSize: 11,
       ...fontFaces.bold,
-      color: "#E67E22",
+      color: "#C2410C",
     },
     previewCheck: {
       width: 28,
       height: 28,
       borderRadius: 14,
-      backgroundColor: P.creamTint,
+      backgroundColor: P.soft,
       alignItems: "center",
       justifyContent: "center",
     },
@@ -1839,12 +1837,12 @@ const createStyles = (theme: Theme) => {
     saveButton: {
       marginTop: 12,
       alignSelf: "stretch",
-      backgroundColor: "#FF8C00",
+      backgroundColor: "#EA580C",
       borderRadius: 14,
       paddingVertical: 14,
       alignItems: "center",
       justifyContent: "center",
-      shadowColor: "#FF8C00",
+      shadowColor: "#EA580C",
       shadowOffset: { width: 0, height: 4 },
       shadowOpacity: 0.3,
       shadowRadius: 8,
@@ -1876,9 +1874,9 @@ const createStyles = (theme: Theme) => {
       backgroundColor: P.card,
     },
     avatarModalOptionSelected: {
-      borderColor: "#FF8C00",
+      borderColor: "#EA580C",
       borderWidth: 3,
-      shadowColor: "#FF8C00",
+      shadowColor: "#EA580C",
       shadowOffset: { width: 0, height: 4 },
       shadowOpacity: 0.15,
       shadowRadius: 8,

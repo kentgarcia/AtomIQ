@@ -10,6 +10,8 @@ import { useMemo } from "react";
 import { useWindowDimensions, type ViewStyle } from "react-native";
 import { useSafeAreaInsets, type EdgeInsets } from "react-native-safe-area-context";
 
+import { resolveTabBarMetrics, TAB_BAR_CONSTANTS } from "./tab-bar-metrics";
+
 export const layout = {
     /** Below this width the screen is "compact". */
     compactBelow: 360,
@@ -33,12 +35,15 @@ export const layout = {
     },
     /** Gap used by responsive grids. */
     gridGap: 12,
-    /** Floating tab bar metrics (content height excludes safe-area inset). */
+    /**
+     * Regular-variant tab bar constants, re-exported for reference only.
+     * Position and reserved space come from `resolveTabBarMetrics()`
+     * (theme/tab-bar-metrics.ts); never recompute them from these.
+     */
     tabBar: {
-        contentHeight: 79,
-        gap: 16,
-        horizontalMargin: 36,
-        maxWidth: 520,
+        gap: TAB_BAR_CONSTANTS.regular.gap,
+        horizontalMargin: TAB_BAR_CONSTANTS.maxMargin,
+        maxWidth: TAB_BAR_CONSTANTS.maxWidth,
     },
 } as const;
 
@@ -164,8 +169,11 @@ export function useResponsiveLayout(): ResponsiveLayout {
             gutter,
             contentMaxWidth,
             contentWidth,
-            tabBarReservedHeight:
-                layout.tabBar.contentHeight + layout.tabBar.gap + insets.bottom,
+            tabBarReservedHeight: resolveTabBarMetrics({
+                windowWidth: width,
+                windowHeight: height,
+                insets,
+            }).reservedHeight,
             contentFrameStyle,
         };
     }, [width, height, fontScale, insets]);

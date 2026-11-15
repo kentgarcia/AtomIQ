@@ -169,7 +169,7 @@ const makeStyles = createStyles((theme) => ({
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 1.5,
-    borderColor: "#FDE68A",
+    borderColor: theme.colors.primaryBorder,
     shadowColor: theme.colors.shadow,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.22,

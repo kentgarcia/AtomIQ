@@ -18,8 +18,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const ENTRY_IMAGE_MAX_HEIGHT = 320;
 
-const AMBER = "#FFCA5F";
-const AMBER_DEEP = "#FF8C00";
+const AMBER_DEEP = "#EA580C";
 
 export default function EncyclopediaEntryScreen() {
   const router = useRouter();
@@ -29,8 +28,7 @@ export default function EncyclopediaEntryScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const ENTRY_IMAGE_MAX_WIDTH = Math.max(0, contentWidth - 16);
 
-  const bgTop = theme.colors.pageGradientTop;
-  const bgBottom = theme.colors.pageGradientBottom;
+  const bgTop = theme.colors.background;
   const styles = useMemo(() => createStyles(theme), [theme]);
 
   const [entry, setEntry] = useState<EncyclopediaEntry | null>(null);
@@ -110,7 +108,6 @@ export default function EncyclopediaEntryScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: bgTop }]}>
-      <LinearGradient colors={[bgTop, bgBottom]} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }} style={StyleSheet.absoluteFill} pointerEvents="none" />
 
       {/* Amber vault header */}
       <View
@@ -135,7 +132,7 @@ export default function EncyclopediaEntryScreen() {
               accessibilityRole="button"
               accessibilityLabel="Go back"
             >
-              <Icon name="ArrowLeft2" size={20} color="#7C4A00" variant="Bold" />
+              <Icon name="ArrowLeft2" size={20} color={theme.colors.text} variant="Bold" />
             </TouchableOpacity>
             <View style={styles.headerCopy}>
               <Text style={styles.headerTitle}>
@@ -273,7 +270,7 @@ export default function EncyclopediaEntryScreen() {
                     accessibilityRole="link"
                   >
                     <Text style={styles.pillText}>{term.replace(/-/g, " ")}</Text>
-                    <Icon name="ArrowRight2" size={12} color="#7C4A00" variant="Bold" />
+                    <Icon name="ArrowRight2" size={12} color={theme.colors.text} variant="Bold" />
                   </TouchableOpacity>
                 </Animated.View>
               ))}
@@ -303,7 +300,7 @@ export default function EncyclopediaEntryScreen() {
                   <Text style={styles.sourceUrl} numberOfLines={1}>
                     {source.url}
                   </Text>
-                  <Icon name="ArrowRight2" size={14} color="#7C4A00" variant="Bold" />
+                  <Icon name="ArrowRight2" size={14} color={theme.colors.text} variant="Bold" />
                 </View>
               </TouchableOpacity>
             ))}
@@ -334,16 +331,16 @@ const createStyles = (theme: Theme) => {
     },
     notFoundEmoji: { fontSize: 48, marginBottom: 12 },
     notFoundText: { fontSize: 16, ...fontFaces.heavy, color: c.text, marginBottom: 16 },
-    notFoundButton: { backgroundColor: AMBER_DEEP, paddingHorizontal: 18, paddingVertical: 10, borderRadius: 14, borderWidth: 2, borderColor: "#E67E22", borderBottomWidth: 4 },
+    notFoundButton: { backgroundColor: AMBER_DEEP, paddingHorizontal: 18, paddingVertical: 10, borderRadius: 14, borderWidth: 2, borderColor: "#C2410C", borderBottomWidth: 4 },
     notFoundButtonText: { color: c.onPrimary, ...fontFaces.heavy, fontSize: 13 },
     headerWrap: { paddingHorizontal: 16, paddingBottom: 10, zIndex: 10 },
     headerBar: {
-      backgroundColor: AMBER,
+      backgroundColor: c.card,
       borderRadius: 26,
       padding: 12,
       gap: 10,
       borderWidth: 2,
-      borderColor: c.creamBorder,
+      borderColor: c.border,
       borderBottomWidth: 4,
       elevation: 6,
       shadowColor: c.shadow,
@@ -360,17 +357,17 @@ const createStyles = (theme: Theme) => {
       alignItems: "center",
       justifyContent: "center",
       borderWidth: 2,
-      borderColor: "#FDE68A",
+      borderColor: c.border,
       borderBottomWidth: 4,
     },
     headerCopy: { flex: 1, gap: 6 },
-    headerTitle: { fontSize: 18, ...fontFaces.heavy, color: "#7C4A00", letterSpacing: -0.3 },
+    headerTitle: { fontSize: 18, ...fontFaces.heavy, color: c.text, letterSpacing: -0.3 },
     headerSubRow: { flexDirection: "row", gap: 8, alignItems: "center", flexWrap: "wrap" },
     catPill: { flexDirection: "row", alignItems: "center", gap: 4, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 10 },
     catEmoji: { fontSize: 11 },
     catText: { fontSize: 11, ...fontFaces.heavy, textTransform: "uppercase" },
-    diffPill: { backgroundColor: c.card, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 10, borderWidth: 1, borderColor: "#FDE68A" },
-    diffText: { fontSize: 11, ...fontFaces.heavy, color: "#7C4A00", textTransform: "uppercase" },
+    diffPill: { backgroundColor: c.card, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 10, borderWidth: 1, borderColor: c.border },
+    diffText: { fontSize: 11, ...fontFaces.heavy, color: c.text, textTransform: "uppercase" },
     speakAllBtn: {
       width: 38,
       height: 38,
@@ -379,10 +376,10 @@ const createStyles = (theme: Theme) => {
       alignItems: "center",
       justifyContent: "center",
       borderWidth: 2,
-      borderColor: "#FDE68A",
+      borderColor: c.border,
       borderBottomWidth: 4,
     },
-    speakAllActive: { backgroundColor: AMBER_DEEP, borderColor: "#E67E22" },
+    speakAllActive: { backgroundColor: AMBER_DEEP, borderColor: "#C2410C" },
     scrollContent: { paddingHorizontal: 16, paddingTop: 14, paddingBottom: 24, gap: 12 },
     heroCard: {
       backgroundColor: c.card,
@@ -436,12 +433,12 @@ const createStyles = (theme: Theme) => {
       borderWidth: 1,
       borderColor: c.border,
     },
-    ttsActive: { backgroundColor: AMBER_DEEP, borderColor: "#E67E22" },
+    ttsActive: { backgroundColor: AMBER_DEEP, borderColor: "#C2410C" },
     divider: { height: 1, backgroundColor: c.borderSubtle, borderRadius: 1 },
     definition: { fontSize: 14, ...fontFaces.medium, color: c.text, lineHeight: 22 },
     factRow: { flexDirection: "row", gap: 10, alignItems: "flex-start", paddingVertical: 6 },
-    factNum: { width: 28, height: 28, borderRadius: 14, backgroundColor: AMBER, alignItems: "center", justifyContent: "center", borderWidth: 1, borderColor: "#FDE68A" },
-    factNumText: { fontSize: 12, ...fontFaces.heavy, color: "#7C4A00" },
+    factNum: { width: 28, height: 28, borderRadius: 14, backgroundColor: c.primarySurface, alignItems: "center", justifyContent: "center", borderWidth: 1, borderColor: c.primaryBorder },
+    factNumText: { fontSize: 12, ...fontFaces.heavy, color: c.primaryLight },
     factText: { flex: 1, fontSize: 13, ...fontFaces.medium, color: c.text, lineHeight: 19 },
     mythCard: { borderRadius: 20, overflow: "hidden", borderWidth: 2, borderColor: "#FECACA", borderBottomWidth: 4 },
     mythGradient: { padding: 14, gap: 10 },
@@ -467,10 +464,10 @@ const createStyles = (theme: Theme) => {
     },
     pillText: { fontSize: 12, ...fontFaces.heavy, color: c.textSecondary, textTransform: "capitalize" },
     sourceRow: { gap: 6, paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: c.borderSubtle },
-    sourceOrg: { alignSelf: "flex-start", backgroundColor: AMBER, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 8, borderWidth: 1, borderColor: "#FDE68A" },
-    sourceOrgText: { fontSize: 11, ...fontFaces.heavy, color: "#7C4A00" },
+    sourceOrg: { alignSelf: "flex-start", backgroundColor: c.primarySurface, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 8, borderWidth: 1, borderColor: c.primaryBorder },
+    sourceOrgText: { fontSize: 11, ...fontFaces.heavy, color: c.primaryLight },
     sourceTitle: { fontSize: 13, ...fontFaces.heavy, color: c.text },
     sourceUrlRow: { flexDirection: "row", alignItems: "center", gap: 6 },
-    sourceUrl: { flex: 1, fontSize: 12, ...fontFaces.medium, color: "#7C4A00" },
+    sourceUrl: { flex: 1, fontSize: 12, ...fontFaces.medium, color: c.link },
   });
 };

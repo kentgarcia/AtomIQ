@@ -2,7 +2,6 @@ import { fontFaces, useTheme, useResponsiveLayout, type Theme } from "@/theme";
 import { DURATION, PRESS_EASING } from "@/theme/motion";
 import { Icon } from "@/components/ui/icon";
 import { recordActivity } from "@/services/activity-log";
-import { LinearGradient } from "expo-linear-gradient";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
@@ -27,11 +26,10 @@ import Svg, { Circle, Path } from "react-native-svg";
 // Shared palette (autumn / amber — matches Profile & home surfaces)
 // ==================================================================
 const BRAND = {
-  amberOuter: "#FFCA5F",
-  amber: "#FF8C00",
-  amberDark: "#E67E22",
-  success: "#2ECC71",
-  successDark: "#10B981",
+  amber: "#EA580C",
+  amberDark: "#C2410C",
+  success: "#58CC02",
+  successDark: "#46A302",
   danger: "#FF6B6B",
   dangerDark: "#EF4444",
   info: "#1CB0F6",
@@ -41,7 +39,8 @@ const makePalette = (theme: Theme) => {
   const c = theme.colors;
   return {
     ...BRAND,
-    cream: c.creamTint,
+    amberOuter: c.surfaceSoft,
+    cream: c.surfaceSoft,
     white: c.card,
     ink: c.text,
     inkSoft: c.textSecondary,
@@ -394,8 +393,7 @@ function RadiationShieldLab({ onBack }: { onBack: () => void }) {
   const reducedMotion = useReducedMotion();
   const { theme } = useTheme();
   const { C, styles } = useLabStyles();
-  const bgTop = theme.colors.pageGradientTop;
-  const bgBottom = theme.colors.pageGradientBottom;
+  const bgTop = theme.colors.background;
 
   const [rad, setRad] = useState<Radiation>("gamma");
   const [mat, setMat] = useState<Material>("paper");
@@ -422,7 +420,6 @@ function RadiationShieldLab({ onBack }: { onBack: () => void }) {
 
   return (
     <View style={[styles.container, { backgroundColor: bgTop }]}>
-      <LinearGradient colors={[bgTop, bgBottom]} style={styles.bgGradient} pointerEvents="none" />
       <ScrollView
         style={{ flex: 1 }}
         contentContainerStyle={[
@@ -618,8 +615,7 @@ function BuildAnAtom({ onBack }: { onBack: () => void }) {
   const reducedMotion = useReducedMotion();
   const { theme } = useTheme();
   const { C, styles } = useLabStyles();
-  const bgTop = theme.colors.pageGradientTop;
-  const bgBottom = theme.colors.pageGradientBottom;
+  const bgTop = theme.colors.background;
 
   const [index, setIndex] = useState(0);
   // Always start from an empty atom — pre-filling the target's counts meant
@@ -673,7 +669,6 @@ function BuildAnAtom({ onBack }: { onBack: () => void }) {
 
   return (
     <View style={[styles.container, { backgroundColor: bgTop }]}>
-      <LinearGradient colors={[bgTop, bgBottom]} style={styles.bgGradient} pointerEvents="none" />
       <ScrollView
         style={{ flex: 1 }}
         contentContainerStyle={[
@@ -864,8 +859,7 @@ function DecayLab({ onBack }: { onBack: () => void }) {
   const reducedMotion = useReducedMotion();
   const { theme } = useTheme();
   const { C, styles } = useLabStyles();
-  const bgTop = theme.colors.pageGradientTop;
-  const bgBottom = theme.colors.pageGradientBottom;
+  const bgTop = theme.colors.background;
   const [iso, setIso] = useState<Isotope>(ISOTOPES[0]);
   const [initial, setInitial] = useState(1000);
   const [time, setTime] = useState(0);
@@ -917,7 +911,6 @@ function DecayLab({ onBack }: { onBack: () => void }) {
 
   return (
     <View style={[styles.container, { backgroundColor: bgTop }]}>
-      <LinearGradient colors={[bgTop, bgBottom]} style={styles.bgGradient} pointerEvents="none" />
       <ScrollView
         style={{ flex: 1 }}
         contentContainerStyle={[
@@ -1395,7 +1388,7 @@ function makeStyles(theme: Theme) {
     alignItems: "center",
     gap: 4,
     borderWidth: 1,
-    borderColor: "#FFDD8D",
+    borderColor: C.border,
   },
   detectorLabel: { fontSize: 11, ...fontFaces.bold, color: C.muted, textTransform: "uppercase", letterSpacing: 1 },
   detectorValue: { fontSize: 22, ...fontFaces.heavy, color: C.ink },
@@ -1515,7 +1508,7 @@ function makeStyles(theme: Theme) {
   atomStat: { alignItems: "center", gap: 2 },
   atomStatValue: { fontSize: 16, ...fontFaces.heavy, color: C.amber },
   atomStatLabel: { fontSize: 11, ...fontFaces.bold, color: C.muted },
-  atomStatDivider: { width: 1, height: 32, backgroundColor: "#FFDD8D" },
+  atomStatDivider: { width: 1, height: 32, backgroundColor: C.border },
   sampleStatsRow: { flexDirection: "row", gap: 12 },
   sampleStat: { flex: 1, backgroundColor: C.cream, borderRadius: 12, padding: 10, alignItems: "center", gap: 2 },
   sampleStatValue: { fontSize: 16, ...fontFaces.heavy, color: C.ink },

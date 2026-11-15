@@ -24,6 +24,8 @@ The following are mandatory sources of truth:
 - `useTheme()` for `theme`, `colorScheme`, `isDark`, and theme actions;
 - `StatusBar` and the Expo Router navigation theme for system/navigation chrome.
 
+Color values (neutral light/dark scale and the orange accent) are specified in [`NEUTRAL_THEME_ORANGE_ACCENT_SPEC.md`](./completed/NEUTRAL_THEME_ORANGE_ACCENT_SPEC.md); this spec governs behavior and coverage.
+
 Legacy color helpers may remain temporarily for compatibility, but new screen code must not introduce another color system or a screen-local copy of the theme palette.
 
 ## 3. Known leakage risks to audit first

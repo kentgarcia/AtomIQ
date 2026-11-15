@@ -13,18 +13,16 @@ import {
 import { useRouter } from "expo-router";
 import React, { useEffect, useMemo, useState } from "react";
 import {
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
-import { LinearGradient } from "expo-linear-gradient";
 
 /* Autumn design tokens shared with the profile + home screens */
-const BTN_COLOR = "#FF8C00";
-const BTN_LIP = "#E67E22";
+const BTN_COLOR = "#EA580C";
+const BTN_LIP = "#C2410C";
 const DAY_LABELS = ["S", "M", "T", "W", "T", "F", "S"];
 
 type WeekDay = {
@@ -69,8 +67,8 @@ export default function StreakScreen() {
   const { theme } = useTheme();
   const { userProfile } = useStorage();
   const bgColors: [string, string] = [
-    theme.colors.pageGradientTop,
-    theme.colors.pageGradientBottom,
+    theme.colors.background,
+    theme.colors.background,
   ];
   const styles = useMemo(() => makeStyles(theme), [theme]);
 
@@ -110,11 +108,6 @@ export default function StreakScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: bgColors[0] }]}>
-      <LinearGradient
-        colors={bgColors}
-        style={StyleSheet.absoluteFill}
-        pointerEvents="none"
-      />
 
       <SafeAreaView style={{ flex: 1 }}>
         <TouchableOpacity
@@ -162,7 +155,7 @@ export default function StreakScreen() {
                 : "Open AtomIQ today to start a new streak!"}
             </Text>
             <View style={styles.longestPill}>
-              <Icon name="Cup" size={16} color="#E67E22" variant="Bold" />
+              <Icon name="Cup" size={16} color="#C2410C" variant="Bold" />
               <Text style={styles.longestText}>
                 Longest streak: {longestStreak} {longestStreak === 1 ? "day" : "days"}
               </Text>
@@ -224,7 +217,7 @@ export default function StreakScreen() {
             ].map((tip, index) => (
               <View key={index} style={styles.tipRow}>
                 <View style={styles.tipIconCircle}>
-                  <Icon name={tip.icon} size={16} color="#E67E22" variant="Bold" />
+                  <Icon name={tip.icon} size={16} color="#C2410C" variant="Bold" />
                 </View>
                 <Text style={styles.tipText}>{tip.text}</Text>
               </View>
@@ -350,7 +343,7 @@ const makeStyles = createStyles((theme) => ({
       flexDirection: "row",
       alignItems: "center",
       gap: 8,
-      backgroundColor: theme.colors.creamTint,
+      backgroundColor: theme.colors.surfaceSoft,
       borderRadius: 14,
       paddingHorizontal: 14,
       paddingVertical: 8,
@@ -358,7 +351,7 @@ const makeStyles = createStyles((theme) => ({
     longestText: {
       fontSize: 13,
       ...fontFaces.heavy,
-      color: "#E67E22",
+      color: "#C2410C",
     },
     sectionHeading: {
       fontSize: 18,
@@ -396,7 +389,7 @@ const makeStyles = createStyles((theme) => ({
     },
     dayDotToday: {
       borderWidth: 2,
-      borderColor: "#E67E22",
+      borderColor: "#C2410C",
     },
     dayLabel: {
       fontSize: 12,
@@ -404,7 +397,7 @@ const makeStyles = createStyles((theme) => ({
       color: theme.colors.textMuted,
     },
     dayLabelToday: {
-      color: "#E67E22",
+      color: "#C2410C",
       ...fontFaces.bold,
     },
     weekHint: {
@@ -425,7 +418,7 @@ const makeStyles = createStyles((theme) => ({
       width: 34,
       height: 34,
       borderRadius: 17,
-      backgroundColor: theme.colors.creamTint,
+      backgroundColor: theme.colors.surfaceSoft,
       alignItems: "center",
       justifyContent: "center",
     },

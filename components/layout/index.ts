@@ -13,9 +13,12 @@ export type { PressableIconButtonProps } from "./pressable-icon-button";
 export {
     TabBarInsetProvider,
     useTabBarInset,
+    useTabBarMetrics,
     useTabBarHeightReporter,
     useTabBarVisible,
     useHideTabBar,
     useBottomInset,
 } from "./tab-bar-inset";
 export type { TabBarInsetValue } from "./tab-bar-inset";
+
+export { PageBackground } from "./page-background";

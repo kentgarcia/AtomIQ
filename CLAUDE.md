@@ -45,7 +45,7 @@ Commit both `content/database/content.db` and `assets/database/content.db`. The 
 
 ### Screens and navigation
 
-`app/` is Expo Router. `(tabs)/` holds Home, Discovery/community, Guide (`chat.tsx`), Games, Profile, awards and leaderboard. Flows live in `lesson/`, `quiz/`, `mythbuster/`, `explorer/` (journeys, encyclopedia, Atom Maze), `lab/` and `periodic-table/`. `app/_layout.tsx` is the root: it wires the theme provider, `StorageProvider`, Android back policy, media lifecycle, UI SFX and content seeding. Lessons render through `components/lesson/LessonRenderer.tsx`, which dispatches on step type (briefing, micro-learn, lab, mythbuster, assessment, debrief). Visual blocks are documented in `docs/VISUAL_LESSON_BLOCKS.md`.
+`app/` is Expo Router. `(tabs)/` holds Home, Discovery/community, Guide (`chat.tsx`), Games, Profile, awards and leaderboard. Flows live in `lesson/`, `quiz/`, `mythbuster/`, `explorer/` (journeys, encyclopedia, Atom Maze), `lab/` and `periodic-table/`. `app/_layout.tsx` is the root: it wires the theme provider, `StorageProvider`, Android back policy, media lifecycle, UI SFX and content seeding. Lessons render through `components/lesson/LessonRenderer.tsx`, which dispatches on step type (briefing, micro-learn, lab, mythbuster, assessment, debrief). Visual blocks are documented in `docs/completed/VISUAL_LESSON_BLOCKS.md`.
 
 ### Guide (Shrodi)
 

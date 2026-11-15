@@ -100,3 +100,15 @@ When adding a new intentional fixed color:
 2. If a literal is genuinely required, add `// theme-allow: <short reason>` on the line.
 3. Add a row to §3 or §4 with the file:line, reason, owner, and a concrete visual test.
 4. Re-run the four commands above and include the exception in review.
+
+---
+
+## Retired roles (no exceptions)
+
+Per [`NEUTRAL_THEME_ORANGE_ACCENT_SPEC.md`](./completed/NEUTRAL_THEME_ORANGE_ACCENT_SPEC.md) the
+following are removed and `check:theme-colors` fails on them in `app/` and `components/`:
+`pageGradientTop/Bottom`, `creamTint`, `creamBorder`, `amber*` roles, `palettes.amber`,
+`accents.indigo`, and the indigo / warm-header / navy literals listed in the script.
+There are no indigo exceptions: the Guide character is bitmap artwork, not a themed color.
+Page backgrounds must use `theme.colors.background`; remaining `LinearGradient` uses
+are artwork, medals and celebration effects only.

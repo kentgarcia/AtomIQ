@@ -89,7 +89,7 @@ export function DifficultyPanel({
                 {
                     key: "radiation-shield",
                     title: "Radiation Shield Lab",
-                    color: "#FF8C00",
+                    color: "#EA580C",
                     icon: "ShieldTick",
                     delay: 50,
                     onPress: () => router.push("/lab?exp=radiation-shield"),
@@ -105,7 +105,7 @@ export function DifficultyPanel({
                 {
                     key: "decay-lab",
                     title: "Radioactive Decay Lab",
-                    color: "#2ECC71",
+                    color: "#58CC02",
                     icon: "Timer1",
                     delay: 150,
                     onPress: () => router.push("/lab?exp=decay-lab"),

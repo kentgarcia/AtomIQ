@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
 import { createStyles, fontFaces, radius, spacing, useTheme } from "@/theme";
 import React, { useMemo } from "react";
@@ -5,7 +6,6 @@ import {
   Modal,
   ScrollView,
   Text,
-  TouchableOpacity,
   useWindowDimensions,
   View,
 } from "react-native";
@@ -15,9 +15,6 @@ import Animated, {
   useReducedMotion,
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-
-const ACCENT = "#FF8C00";
-const ACCENT_LIP = "#E67E22";
 
 type BetaNoticeModalProps = {
   visible: boolean;
@@ -77,7 +74,7 @@ export function BetaNoticeModal({
 
             <View style={styles.callout}>
               <View style={styles.calloutIcon}>
-                <Icon name="Mobile" size={18} color={ACCENT} variant="Bold" />
+                <Icon name="Mobile" size={18} color={theme.colors.primaryLight} variant="Bold" />
               </View>
               <View style={styles.calloutTextWrap}>
                 <Text style={styles.calloutTitle}>Optimized for iPhone</Text>
@@ -96,26 +93,21 @@ export function BetaNoticeModal({
             </Text>
           </ScrollView>
 
-          <TouchableOpacity
-            style={styles.primaryBtn}
-            activeOpacity={0.85}
-            onPress={onOpenFeedback}
-            accessibilityRole="button"
-            accessibilityLabel="Share beta feedback"
-          >
-            <Icon name="Send" size={17} color="#FFFFFF" variant="Bold" />
-            <Text style={styles.primaryBtnText}>Share Feedback</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.secondaryBtn}
-            activeOpacity={0.7}
-            onPress={onDismiss}
-            accessibilityRole="button"
-            accessibilityLabel="Dismiss beta notice"
-          >
-            <Text style={styles.secondaryBtnText}>Got it</Text>
-          </TouchableOpacity>
+          <View style={styles.actions}>
+            <Button
+              label="Share Feedback"
+              onPress={onOpenFeedback}
+              renderIcon={(color) => (
+                <Icon name="Send" size={17} color={color} variant="Bold" />
+              )}
+            />
+            <Button
+              label="Got it"
+              variant="secondary"
+              onPress={onDismiss}
+              accessibilityLabel="Dismiss beta notice"
+            />
+          </View>
 
           <Text style={styles.footnote}>
             You can find the feedback form anytime in Settings → Beta Feedback.
@@ -185,7 +177,7 @@ const makeStyles = createStyles((theme) => ({
       borderRadius: 16,
       alignItems: "center",
       justifyContent: "center",
-      backgroundColor: theme.colors.creamTint,
+      backgroundColor: theme.colors.surfaceSoft,
     },
     calloutTextWrap: {
       flex: 1,
@@ -202,35 +194,10 @@ const makeStyles = createStyles((theme) => ({
       color: theme.colors.textSecondary,
       lineHeight: 18,
     },
-    primaryBtn: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "center",
-      gap: 8,
-      backgroundColor: ACCENT,
-      borderBottomWidth: 4,
-      borderBottomColor: ACCENT_LIP,
-      borderRadius: radius.lg,
-      paddingVertical: 13,
-      minHeight: 48,
-      marginTop: 4,
-    },
-    primaryBtnText: {
-      fontSize: 15,
-      ...fontFaces.heavy,
-      color: "#FFFFFF",
-    },
-    secondaryBtn: {
-      alignItems: "center",
-      justifyContent: "center",
-      paddingVertical: 11,
-      minHeight: 48,
-      marginTop: 6,
-    },
-    secondaryBtnText: {
-      fontSize: 14,
-      ...fontFaces.semibold,
-      color: theme.colors.textMuted,
+    actions: {
+      gap: spacing.sm,
+      marginTop: spacing.xs,
+      marginBottom: spacing.sm,
     },
     footnote: {
       fontSize: 11,

@@ -4,14 +4,12 @@ import type { EncyclopediaEntry } from "@/content/explorer";
 import { useTheme, fontFaces, useResponsiveLayout, createStyles, withAlpha } from "@/theme";
 import { impactLight, impactMedium } from "@/services/haptics";
 import { Image as ExpoImage } from "expo-image";
-import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import { ReadAloudButton } from "@/components/ui/read-aloud-button";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   ScrollView,
   type ScrollViewInstance,
-  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
@@ -105,8 +103,7 @@ export default function EncyclopediaScreen() {
   const insets = useSafeAreaInsets();
   const { contentMaxWidth, gutter } = useResponsiveLayout();
   const { theme } = useTheme();
-  const bgTop = theme.colors.pageGradientTop;
-  const bgBottom = theme.colors.pageGradientBottom;
+  const bgTop = theme.colors.background;
 
   const styles = useMemo(() => makeStyles(theme), [theme]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -281,13 +278,6 @@ export default function EncyclopediaScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: bgTop }]}>
-      <LinearGradient
-        colors={[bgTop, bgBottom]}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 0, y: 1 }}
-        style={StyleSheet.absoluteFill}
-        pointerEvents="none"
-      />
 
       {/* Amber vault header — floating like Home's headerBar */}
       <View
@@ -318,7 +308,7 @@ export default function EncyclopediaScreen() {
               <Icon
                 name={hasActiveFilter ? "CloseCircle" : "ArrowLeft2"}
                 size={20}
-                color={theme.colors.amberText}
+                color={theme.colors.primaryLight}
                 variant="Bold"
               />
             </TouchableOpacity>
@@ -347,7 +337,7 @@ export default function EncyclopediaScreen() {
               accessibilityRole="button"
               accessibilityLabel="Open the periodic table"
             >
-              <Icon name="Element4" size={20} color={theme.colors.amberText} variant="Bold" />
+              <Icon name="Element4" size={20} color={theme.colors.primaryLight} variant="Bold" />
             </TouchableOpacity>
           </View>
 
@@ -400,7 +390,7 @@ export default function EncyclopediaScreen() {
                     accessibilityRole="button"
                     accessibilityLabel={`Remove letter ${selectedLetter} filter`}
                   >
-                    <Icon name="CloseCircle" size={14} color={theme.colors.amberText} />
+                    <Icon name="CloseCircle" size={14} color={theme.colors.primaryLight} />
                   </TouchableOpacity>
                 </View>
               )}
@@ -492,7 +482,7 @@ export default function EncyclopediaScreen() {
           {hasActiveFilter && (
             <Animated.View entering={FadeIn.duration(200)} style={styles.resultsBar}>
               <View style={styles.resultsLeft}>
-                <Icon name="Book" size={14} color={theme.colors.amberText} variant="Bold" />
+                <Icon name="Book" size={14} color={theme.colors.primaryLight} variant="Bold" />
                 <Text style={styles.resultsText}>
                   {filteredEntries.length} {filteredEntries.length === 1 ? "result" : "results"}
                   {selectedCategories.length > 0
@@ -572,7 +562,7 @@ export default function EncyclopediaScreen() {
                                   text={() => `${entry.term}. ${entry.definition}`}
                                 />
                                 <View style={styles.goCircle}>
-                                  <Icon name="ArrowRight2" size={16} color={theme.colors.amberText} variant="Bold" />
+                                  <Icon name="ArrowRight2" size={16} color={theme.colors.primaryLight} variant="Bold" />
                                 </View>
                               </View>
                             </View>
@@ -630,7 +620,7 @@ const makeStyles = createStyles((theme) => ({
     zIndex: 10,
   },
   headerBar: {
-    backgroundColor: theme.colors.amberSurface,
+    backgroundColor: theme.colors.surfaceSoft,
     borderRadius: 26,
     padding: 12,
     gap: 12,
@@ -640,7 +630,7 @@ const makeStyles = createStyles((theme) => ({
     shadowOpacity: 0.12,
     shadowRadius: 10,
     borderWidth: 2,
-    borderColor: withAlpha(theme.colors.amberText, 0.08),
+    borderColor: withAlpha(theme.colors.primaryLight, 0.08),
     borderBottomWidth: 4,
   },
   headerRow: {
@@ -656,20 +646,20 @@ const makeStyles = createStyles((theme) => ({
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 2,
-    borderColor: theme.colors.amberBorder,
+    borderColor: theme.colors.border,
     borderBottomWidth: 4,
   },
   headerCopy: { flex: 1 },
   headerTitle: {
     fontSize: 18,
     ...fontFaces.heavy,
-    color: theme.colors.amberText,
+    color: theme.colors.primaryLight,
     letterSpacing: -0.4,
   },
   headerSubtitle: {
     fontSize: 12,
     ...fontFaces.semibold,
-    color: theme.colors.amberText,
+    color: theme.colors.primaryLight,
     marginTop: 1,
   },
   headerRight: {
@@ -682,7 +672,7 @@ const makeStyles = createStyles((theme) => ({
     width: 38,
     height: 38,
     borderRadius: 19,
-    backgroundColor: theme.colors.amberSurfaceStrong,
+    backgroundColor: theme.colors.primarySurface,
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 2,
@@ -698,7 +688,7 @@ const makeStyles = createStyles((theme) => ({
     paddingVertical: 12,
     gap: 10,
     borderWidth: 2,
-    borderColor: theme.colors.amberBorder,
+    borderColor: theme.colors.border,
     borderBottomWidth: 4,
     elevation: 2,
     shadowColor: theme.colors.shadow,
@@ -714,14 +704,14 @@ const makeStyles = createStyles((theme) => ({
     paddingVertical: 0,
   },
   kbdHint: {
-    backgroundColor: theme.colors.creamTint,
+    backgroundColor: theme.colors.surfaceSoft,
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: theme.colors.amberBorder,
+    borderColor: theme.colors.border,
   },
-  kbdText: { fontSize: 11, ...fontFaces.heavy, color: theme.colors.amberText },
+  kbdText: { fontSize: 11, ...fontFaces.heavy, color: theme.colors.primaryLight },
   activeFilterRow: {
     flexDirection: "row",
     alignItems: "center",
@@ -756,14 +746,14 @@ const makeStyles = createStyles((theme) => ({
     paddingVertical: 7,
     borderRadius: 20,
     borderWidth: 2,
-    borderColor: theme.colors.amberBorder,
+    borderColor: theme.colors.border,
   },
-  activeChipLetterText: { fontSize: 12, ...fontFaces.heavy, color: theme.colors.amberText },
+  activeChipLetterText: { fontSize: 12, ...fontFaces.heavy, color: theme.colors.primaryLight },
   clearLink: {
     paddingHorizontal: 8,
     paddingVertical: 6,
   },
-  clearLinkText: { fontSize: 12, ...fontFaces.heavy, color: theme.colors.amberText, textDecorationLine: "underline" },
+  clearLinkText: { fontSize: 12, ...fontFaces.heavy, color: theme.colors.primaryLight, textDecorationLine: "underline" },
   pillsRow: { },
   pillsContent: { paddingHorizontal: 4, gap: 8, paddingVertical: 2 },
   pill: {
@@ -793,7 +783,7 @@ const makeStyles = createStyles((theme) => ({
   pillText: { fontSize: 13, ...fontFaces.bold, color: theme.colors.textSecondary },
   pillTextActive: { color: theme.colors.onPrimary },
   pillCount: {
-    backgroundColor: theme.colors.creamTint,
+    backgroundColor: theme.colors.surfaceSoft,
     paddingHorizontal: 7,
     paddingVertical: 2,
     borderRadius: 10,
@@ -801,7 +791,7 @@ const makeStyles = createStyles((theme) => ({
     alignItems: "center",
   },
   pillCountActive: { backgroundColor: withAlpha(theme.colors.onPrimary, 0.22) },
-  pillCountText: { fontSize: 11, ...fontFaces.heavy, color: theme.colors.amberText },
+  pillCountText: { fontSize: 11, ...fontFaces.heavy, color: theme.colors.primaryLight },
   pillCountTextActive: { color: theme.colors.onPrimary },
   body: { flex: 1, flexDirection: "row" },
   scrollContent: { paddingHorizontal: 16, paddingTop: 8, paddingBottom: 36, gap: 14, flexGrow: 1 },
@@ -873,7 +863,7 @@ const makeStyles = createStyles((theme) => ({
     shadowRadius: 6,
   },
   statCard: { flex: 1, alignItems: "center", gap: 2 },
-  statValue: { fontSize: 20, ...fontFaces.heavy, color: theme.colors.amberText },
+  statValue: { fontSize: 20, ...fontFaces.heavy, color: theme.colors.primaryLight },
   statLabel: { fontSize: 11, ...fontFaces.heavy, color: theme.colors.textFaint, textTransform: "uppercase", letterSpacing: 0.6 },
   statDivider: { width: 1, height: 32, backgroundColor: theme.colors.borderSubtle, marginHorizontal: 8 },
   azRow: { flexDirection: "row", alignItems: "center", gap: 10, paddingHorizontal: 2 },
@@ -913,14 +903,14 @@ const makeStyles = createStyles((theme) => ({
     width: 32,
     height: 32,
     borderRadius: 12,
-    backgroundColor: theme.colors.amberSurfaceStrong,
+    backgroundColor: theme.colors.primarySurface,
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 2,
-    borderColor: theme.colors.amberBorder,
+    borderColor: theme.colors.border,
     borderBottomWidth: 3,
   },
-  letterText: { fontSize: 14, ...fontFaces.heavy, color: theme.colors.amberText },
+  letterText: { fontSize: 14, ...fontFaces.heavy, color: theme.colors.primaryLight },
   letterLine: { flex: 1, height: 2, backgroundColor: theme.colors.borderSubtle, borderRadius: 1 },
   letterCount: { fontSize: 11, ...fontFaces.heavy, color: theme.colors.textFaint, minWidth: 22, textAlign: "right" },
   cardsCol: { gap: 10 },
@@ -990,11 +980,11 @@ const makeStyles = createStyles((theme) => ({
     width: 34,
     height: 34,
     borderRadius: 17,
-    backgroundColor: theme.colors.amberSurface,
+    backgroundColor: theme.colors.surfaceSoft,
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 2,
-    borderColor: theme.colors.amberBorder,
+    borderColor: theme.colors.border,
     borderBottomWidth: 4,
   },
   emptyState: {
@@ -1074,7 +1064,7 @@ const makeStyles = createStyles((theme) => ({
     opacity: 0.9,
   },
   railTrackActive: {
-    backgroundColor: theme.colors.amberBorder,
+    backgroundColor: theme.colors.border,
     width: 2,
   },
   railCell: {
@@ -1113,7 +1103,7 @@ const makeStyles = createStyles((theme) => ({
   },
   railCardScrubbing: {
     backgroundColor: theme.colors.card,
-    borderColor: theme.colors.amberBorder,
+    borderColor: theme.colors.border,
     shadowOpacity: 0.16,
     shadowRadius: 10,
     transform: [{ scale: 1.04 }],
@@ -1140,7 +1130,7 @@ const makeStyles = createStyles((theme) => ({
     shadowOpacity: 0.24,
     shadowRadius: 12,
     borderWidth: 2,
-    borderColor: theme.colors.amberBorder,
+    borderColor: theme.colors.border,
   },
   railPreviewText: { fontSize: 44, ...fontFaces.heavy, color: theme.colors.inverseText, lineHeight: 48 },
 }));

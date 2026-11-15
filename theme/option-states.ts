@@ -15,11 +15,10 @@ export interface OptionColorRoles {
   card: string;
   text: string;
   border: string;
-  creamTint: string;
-  amberSurface: string;
-  amberSurfaceStrong: string;
-  amberText: string;
-  amberBorder: string;
+  borderStrong: string;
+  primarySurface: string;
+  primaryBorder: string;
+  primaryLight: string;
   surfaceSoft: string;
   textSecondary: string;
 }
@@ -44,17 +43,17 @@ export const getOptionColors = (
   switch (state) {
     case "selected":
       return {
-        background: colors.amberSurfaceStrong,
-        border: colors.amberText,
-        text: colors.amberText,
-        icon: colors.amberText,
+        background: colors.primarySurface,
+        border: colors.primaryBorder,
+        text: colors.primaryLight,
+        icon: colors.primaryLight,
         borderWidth: 2,
         showCheck: true,
       };
     case "pressed":
       return {
-        background: colors.creamTint,
-        border: colors.amberBorder,
+        background: colors.surfaceSoft,
+        border: colors.borderStrong,
         text: colors.text,
         icon: colors.text,
         borderWidth: 1,
@@ -85,16 +84,17 @@ export const getOptionColors = (
 
 /**
  * Primary "intent" pill (Guide landing phrases: "I want to learn…").
- * Uses the amber surface pair instead of white-on-orange (2.3:1).
+ * Uses the orange tint pair (orange text on `primarySurface`) instead of
+ * white-on-orange.
  */
 export const getIntentPillColors = (
   colors: OptionColorRoles,
   pressed: boolean,
 ): OptionColors => ({
-  background: pressed ? colors.amberSurface : colors.amberSurfaceStrong,
-  border: colors.amberText,
-  text: colors.amberText,
-  icon: colors.amberText,
+  background: pressed ? colors.surfaceSoft : colors.primarySurface,
+  border: colors.primaryBorder,
+  text: colors.primaryLight,
+  icon: colors.primaryLight,
   borderWidth: 1,
   showCheck: false,
 });

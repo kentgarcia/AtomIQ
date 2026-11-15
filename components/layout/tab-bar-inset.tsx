@@ -23,10 +23,13 @@ import {
     useMemo,
     useState,
 } from "react";
-import { Keyboard, Platform } from "react-native";
+import { Keyboard, Platform, useWindowDimensions } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { layout } from "@/theme/layout";
+import {
+    resolveTabBarMetrics,
+    type TabBarMetrics,
+} from "@/theme/tab-bar-metrics";
 
 export interface TabBarInsetValue {
     /** Measured bar content height (excludes the safe-area inset and gap). */
@@ -35,6 +38,8 @@ export interface TabBarInsetValue {
     total: number;
     /** True while the bar is rendered (not hidden by a screen or the keyboard). */
     visible: boolean;
+    /** Resolved position/size for the current window and insets. */
+    metrics: TabBarMetrics;
     reportHeight: (height: number) => void;
     /** Register/unregister an immersive screen that wants the bar hidden. */
     setHiddenBy: (owner: string, hidden: boolean) => void;
@@ -42,8 +47,29 @@ export interface TabBarInsetValue {
 
 const TabBarInsetContext = createContext<TabBarInsetValue | null>(null);
 
+/**
+ * Resolves the bar metrics from the live window size and safe-area insets, so
+ * they follow split-screen, fold/unfold, display-size and navigation-mode
+ * changes without a reload (spec §5.6).
+ */
+function useResolvedTabBarMetrics(): TabBarMetrics {
+    const { width, height } = useWindowDimensions();
+    const insets = useSafeAreaInsets();
+    const { top, bottom, left, right } = insets;
+    return useMemo(
+        () =>
+            resolveTabBarMetrics({
+                windowWidth: width,
+                windowHeight: height,
+                insets: { top, bottom, left, right },
+            }),
+        [width, height, top, bottom, left, right],
+    );
+}
+
 export function TabBarInsetProvider({ children }: { children: React.ReactNode }) {
     const insets = useSafeAreaInsets();
+    const metrics = useResolvedTabBarMetrics();
     const [measuredHeight, setMeasuredHeight] = useState(0);
     const [hiders, setHiders] = useState<readonly string[]>([]);
     const [keyboardOpen, setKeyboardOpen] = useState(false);
@@ -79,18 +105,16 @@ export function TabBarInsetProvider({ children }: { children: React.ReactNode })
     const visible = hiders.length === 0 && !keyboardOpen;
 
     const value = useMemo<TabBarInsetValue>(() => {
-        const height =
-            measuredHeight > 0 ? measuredHeight : layout.tabBar.contentHeight;
+        const height = measuredHeight > 0 ? measuredHeight : metrics.contentHeight;
         return {
             height,
             visible,
-            total: visible
-                ? height + layout.tabBar.gap + insets.bottom
-                : insets.bottom,
+            metrics,
+            total: visible ? height + metrics.bottomOffset : insets.bottom,
             reportHeight,
             setHiddenBy,
         };
-    }, [measuredHeight, insets.bottom, reportHeight, setHiddenBy, visible]);
+    }, [measuredHeight, metrics, insets.bottom, reportHeight, setHiddenBy, visible]);
 
     return (
         <TabBarInsetContext.Provider value={value}>
@@ -102,13 +126,17 @@ export function TabBarInsetProvider({ children }: { children: React.ReactNode })
 /** Total bottom space occupied by the floating tab bar (or just the system inset when hidden). */
 export function useTabBarInset(): number {
     const context = useContext(TabBarInsetContext);
-    const insets = useSafeAreaInsets();
+    const fallback = useResolvedTabBarMetrics();
 
-    if (context) {
-        return context.total;
-    }
+    return context ? context.total : fallback.reservedHeight;
+}
 
-    return layout.tabBar.contentHeight + layout.tabBar.gap + insets.bottom;
+/** Resolved bar position and size (see theme/tab-bar-metrics.ts). */
+export function useTabBarMetrics(): TabBarMetrics {
+    const context = useContext(TabBarInsetContext);
+    const fallback = useResolvedTabBarMetrics();
+
+    return context ? context.metrics : fallback;
 }
 
 /** Used by the tab bar itself to publish its measured height. */

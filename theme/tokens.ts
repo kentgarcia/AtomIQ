@@ -16,7 +16,7 @@ import type { TextStyle } from "react-native";
 
 const base = {
   light: {
-    /** Page-level background (near-white neutral). */
+    /** Page-level background (plain white). */
     background: "#FFFFFF",
     /** Card / raised surface. */
     surface: "#FFFFFF",
@@ -24,38 +24,38 @@ const base = {
     surfaceRaised: "#FFFFFF",
     /** Higher-contrast surface used for inverses and selected panels. */
     surfaceStrong: "#FFFFFF",
-    /** Hard-edged separator lines. */
-    border: "#E5E7EB",
-    /** Stronger outline used for inputs and focused controls. */
-    borderStrong: "#D1D5DB",
+    /** Hard-edged separator lines (2px card/control borders). */
+    border: "#E5E5E5",
+    /** Stronger outline used for inputs, control lips and focused controls. */
+    borderStrong: "#CFCFCF",
     /* Strong foreground text. */
-    text: "#32325D",
-    /* Muted foreground text. */
-    textMuted: "#8898AA",
+    text: "#3C3C3C",
+    /* Muted foreground text (4.7:1 on white). */
+    textMuted: "#737373",
     /* Disabled / de-emphasized foreground text. */
-    textFaint: "#9CA3AF",
-    /** Lightly tinted fill (soft panels, hover states). */
-    surfaceSoft: "#F4F5F7",
+    textFaint: "#9A9A9A",
+    /** Quiet panels, icon wells, stat tiles. */
+    surfaceSoft: "#F7F7F7",
     /** Editable field fill. */
-    input: "#F9FAFB",
+    input: "#F7F7F7",
     /** Inverse surface (snackbars, tooltips) and its foreground. */
-    inverseSurface: "#1F2937",
+    inverseSurface: "#3C3C3C",
     inverseText: "#FFFFFF",
   },
   dark: {
-    background: "#172B4D",
-    surface: "#213356",
-    surfaceRaised: "#26365A",
-    surfaceStrong: "#213356",
-    border: "#2D3A56",
-    borderStrong: "#334A70",
-    text: "#F6F9FC",
-    textMuted: "#8898AA",
-    textFaint: "#667799",
-    surfaceSoft: "#1A2D4A",
-    input: "#1A2D4A",
-    inverseSurface: "#F6F9FC",
-    inverseText: "#172B4D",
+    background: "#131F24",
+    surface: "#1F2C33",
+    surfaceRaised: "#27363E",
+    surfaceStrong: "#1F2C33",
+    border: "#3C4D57",
+    borderStrong: "#4A5A64",
+    text: "#F1F7FB",
+    textMuted: "#8FA3AD",
+    textFaint: "#667985",
+    surfaceSoft: "#1A262C",
+    input: "#1A262C",
+    inverseSurface: "#F1F7FB",
+    inverseText: "#131F24",
   },
 } as const;
 
@@ -77,6 +77,9 @@ const brand = {
     500: "#EA580C",
     600: "#C2410C",
     700: "#9A3412",
+    /** Opaque selected/soft-highlight fills (text on them uses 600 / 400). */
+    surfaceLight: "#FFF1E8",
+    surfaceDark: "#3A2A20",
   },
   amber: {
     300: "#FFCA28",
@@ -97,36 +100,39 @@ const brand = {
 /* Colors: semantic roles (shared across light & dark)                 */
 /* ------------------------------------------------------------------ */
 
-/* Warm brand family used by the home/profile/guide header treatment. */
+/* Deprecated warm aliases. Every key now resolves to a neutral or the orange
+   tint so any un-migrated call site renders on plain light/dark surfaces.
+   Prefer `surfaceSoft`, `border`, `primarySurface` and `primaryBorder`. */
 const warm = {
   light: {
-    header: "#FFCA5F",
-    headerText: "#724D06",
-    chipBorder: "#FFDD8D",
-    chipActive: "#FFE0B2",
-    cream: "#FFF3E0",
-    creamStrong: "#FFE0B2",
-    gradientTop: "#FFF3E0",
-    gradientBottom: "#FFFFFF",
+    header: base.light.surface,
+    headerText: base.light.text,
+    chipBorder: base.light.border,
+    chipActive: "#FFF1E8",
+    cream: base.light.surfaceSoft,
+    creamStrong: base.light.border,
+    gradientTop: base.light.background,
+    gradientBottom: base.light.background,
   },
   dark: {
-    header: "#3A2C12",
-    headerText: "#FFD98A",
-    chipBorder: "#6B5320",
-    chipActive: "#4A381B",
-    cream: "#4A381B",
-    creamStrong: "#5A4620",
-    gradientTop: "#172B4D",
-    gradientBottom: "#172B4D",
+    header: base.dark.surface,
+    headerText: base.dark.text,
+    chipBorder: base.dark.border,
+    chipActive: "#3A2A20",
+    cream: base.dark.surfaceSoft,
+    creamStrong: base.dark.border,
+    gradientTop: base.dark.background,
+    gradientBottom: base.dark.background,
   },
 } as const;
 
 const role = {
-  success: "#2ECC71",
-  successDark: "#10B981",
+  success: "#58CC02",
+  successDark: "#46A302",
   warning: "#FFC107",
   warningDark: "#FFA000",
   info: "#1CB0F6",
+  infoDark: "#1899D6",
   error: "#EF4444",
   danger: "#FF4B4B",
   dangerDark: "#DC2626",
@@ -158,6 +164,19 @@ export const spacing = {
 } as const;
 
 export type Spacing = keyof typeof spacing;
+
+/* ------------------------------------------------------------------ */
+/* Control anatomy (Duolingo-style chunky controls)                    */
+/* ------------------------------------------------------------------ */
+
+export const controls = {
+  /** Height of the darker bottom "lip" under buttons and selectable cards. */
+  lip: 4,
+  /** Border width on cards, chips, inputs and the sides/top of controls. */
+  border: 2,
+  /** How far a control sinks when pressed (equals the lip). */
+  pressTravel: 4,
+} as const;
 
 /* ------------------------------------------------------------------ */
 /* Border radius                                                       */

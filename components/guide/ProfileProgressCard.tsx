@@ -10,7 +10,7 @@ const makeStyles = createStyles((theme) => {
   const c = theme.colors;
   return {
     outer: {
-      backgroundColor: c.amberSurface,
+      backgroundColor: c.surfaceSoft,
       borderRadius: 26,
       padding: 10,
       gap: 10,
@@ -51,7 +51,7 @@ const makeStyles = createStyles((theme) => {
       paddingVertical: 6,
       borderRadius: 999,
       borderWidth: 1,
-      borderColor: c.amberBorder,
+      borderColor: c.border,
     },
     viewProfileText: {
       fontSize: 12,
@@ -85,9 +85,9 @@ const makeStyles = createStyles((theme) => {
       width: 72,
       height: 72,
       borderRadius: 36,
-      backgroundColor: c.creamTint,
+      backgroundColor: c.surfaceSoft,
       borderWidth: 3,
-      borderColor: c.creamTint,
+      borderColor: c.surfaceSoft,
     },
     levelBadge: {
       position: "absolute",
@@ -132,7 +132,7 @@ const makeStyles = createStyles((theme) => {
     levelBarBg: {
       height: 10,
       borderRadius: 5,
-      backgroundColor: c.creamTint,
+      backgroundColor: c.surfaceSoft,
       overflow: "hidden",
     },
     levelBarFill: {
@@ -151,7 +151,7 @@ const makeStyles = createStyles((theme) => {
       ...fontFaces.medium,
     },
     loadingOuter: {
-      backgroundColor: c.amberSurface,
+      backgroundColor: c.surfaceSoft,
       borderRadius: 26,
       padding: 16,
     },

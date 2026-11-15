@@ -17,8 +17,8 @@ import Animated, {
 import { createStyles, fontFaces, useTheme } from "@/theme";
 
 /* Autumn design tokens shared with the home map (reference design) */
-const BTN_COLOR = "#FF8C00";
-const BTN_LIP = "#E67E22";
+const BTN_COLOR = "#EA580C";
+const BTN_LIP = "#C2410C";
 const BTN_HEIGHT = 64;
 const BTN_RADIUS = 20;
 const BTN_BORDER = 5;
@@ -110,7 +110,7 @@ export function LessonPreview({
         >
           {isReplay && (
             <View style={styles.reviewPill}>
-              <Icon name="TickSquare" size={14} color="#E67E22" variant="Bold" />
+              <Icon name="TickSquare" size={14} color="#C2410C" variant="Bold" />
               <Text style={styles.reviewText}>Completed — review mode</Text>
             </View>
           )}
@@ -226,7 +226,7 @@ const makeStyles = createStyles((theme) => ({
     flexDirection: "row",
     alignItems: "center",
     gap: 6,
-    backgroundColor: theme.colors.creamTint,
+    backgroundColor: theme.colors.surfaceSoft,
     borderRadius: 14,
     paddingHorizontal: 12,
     paddingVertical: 6,
@@ -235,7 +235,7 @@ const makeStyles = createStyles((theme) => ({
   reviewText: {
     fontSize: 12,
     ...fontFaces.bold,
-    color: "#E67E22",
+    color: "#C2410C",
   },
   eyebrow: {
     fontSize: 11,
@@ -271,7 +271,7 @@ const makeStyles = createStyles((theme) => ({
     flexDirection: "row",
     alignItems: "center",
     gap: 5,
-    backgroundColor: theme.colors.creamTint,
+    backgroundColor: theme.colors.surfaceSoft,
     borderRadius: 14,
     paddingHorizontal: 12,
     paddingVertical: 7,

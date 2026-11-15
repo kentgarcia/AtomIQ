@@ -470,7 +470,7 @@ export default function SettingsScreen() {
             <View style={styles.modalHeader}>
               <View style={styles.modalHeaderLeft}>
                 <View style={styles.modalHeaderIcon}>
-                  <Icon name="InfoCircle" size={16} color="#FF8C00" variant="Bold" />
+                  <Icon name="InfoCircle" size={16} color="#EA580C" variant="Bold" />
                 </View>
                 <Text style={styles.modalTitle}>App Version</Text>
               </View>
@@ -494,7 +494,7 @@ export default function SettingsScreen() {
               />
               <Text style={styles.modalAppName}>AtomIQ</Text>
               <View style={styles.versionBadge}>
-                <Icon name="Crown1" size={13} color="#E67E22" variant="Bold" />
+                <Icon name="Crown1" size={13} color="#C2410C" variant="Bold" />
                 <Text style={styles.versionBadgeText}>Version {APP_VERSION}</Text>
               </View>
               <Text style={styles.modalSubtitle}>
@@ -541,7 +541,7 @@ export default function SettingsScreen() {
             </View>
 
             <View style={styles.creditRow}>
-              <Icon name="Cup" size={16} color="#FF8C00" variant="Bold" />
+              <Icon name="Cup" size={16} color="#EA580C" variant="Bold" />
               <View style={{ flex: 1 }}>
                 <Text style={styles.creditText}>
                   Made for the MythSmashers by the DOST-PNRI, representing the
@@ -833,7 +833,7 @@ const makeStyles = createStyles((theme) => {
       width: 32,
       height: 32,
       borderRadius: 16,
-      backgroundColor: theme.colors.creamTint,
+      backgroundColor: theme.colors.surfaceSoft,
       alignItems: "center",
       justifyContent: "center",
     },
@@ -865,7 +865,7 @@ const makeStyles = createStyles((theme) => {
       height: 56,
       borderRadius: 28,
       borderWidth: 2,
-      borderColor: theme.colors.creamBorder,
+      borderColor: theme.colors.border,
       marginBottom: 10,
     },
     modalAppName: {
@@ -885,7 +885,7 @@ const makeStyles = createStyles((theme) => {
       gap: 6,
       backgroundColor: theme.colors.card,
       borderWidth: 2,
-      borderColor: theme.colors.creamBorder,
+      borderColor: theme.colors.border,
       paddingHorizontal: 14,
       paddingVertical: 6,
       borderRadius: 999,
@@ -894,7 +894,7 @@ const makeStyles = createStyles((theme) => {
     versionBadgeText: {
       fontSize: 13,
       ...fontFaces.heavy,
-      color: "#E67E22",
+      color: "#C2410C",
     },
     modalSubtitle: {
       fontSize: 13,
@@ -924,7 +924,7 @@ const makeStyles = createStyles((theme) => {
     creditLink: {
       fontSize: 12,
       ...fontFaces.heavy,
-      color: "#FF8C00",
+      color: "#EA580C",
       marginTop: 4,
       textDecorationLine: "underline",
     },
@@ -978,8 +978,8 @@ const makeStyles = createStyles((theme) => {
       borderRadius: 16,
       borderWidth: 1,
       borderBottomWidth: 4,
-      borderColor: "#E67E22",
-      backgroundColor: "#FF8C00",
+      borderColor: "#C2410C",
+      backgroundColor: "#EA580C",
       shadowColor: theme.colors.shadow,
       shadowOffset: { width: 0, height: 4 },
       shadowOpacity: 0.12,

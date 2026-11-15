@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Adds structured visual lesson blocks (docs/VISUAL_LESSON_BLOCKS.md) to the
+ * Adds structured visual lesson blocks (docs/completed/VISUAL_LESSON_BLOCKS.md) to the
  * `micro_learn` steps of the master content database.
  *
  * - Idempotent: a block is matched by `id` inside `data.visuals`; re-running

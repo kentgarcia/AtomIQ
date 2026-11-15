@@ -28,12 +28,12 @@ const CARD_ICON: Record<GuideCard["kind"], string> = {
 };
 
 const CARD_ACCENT: Record<GuideCard["kind"], string> = {
-  lesson: "#FF8C00",
-  quiz: "#E67E22",
-  encyclopedia: "#5E72E4",
-  article: "#2ECC71",
+  lesson: "#EA580C",
+  quiz: "#C2410C",
+  encyclopedia: "#1CB0F6",
+  article: "#58CC02",
   game: "#8B5CF6",
-  "profile-summary": "#FF8C00",
+  "profile-summary": "#EA580C",
 };
 
 const makeStyles = createStyles((theme) => {
@@ -170,26 +170,26 @@ export function ContentCard({ card, onCta }: ContentCardProps) {
     }
   })();
 
-  const accent = CARD_ACCENT[card.kind] ?? "#FF8C00";
+  const accent = CARD_ACCENT[card.kind] ?? "#EA580C";
 
   // Badge — mirrors profile's countPill / badgeCircle language
   const badgeStyle = (() => {
     if (!card.badge) return null;
     if (isLocked) return { bg: c.surfaceSoft, text: c.textFaint };
     if (isCompleted) return { bg: withAlpha(c.success, 0.1), text: c.success };
-    if (isRecommended) return { bg: c.creamTint, text: c.amberText };
+    if (isRecommended) return { bg: c.surfaceSoft, text: c.primaryLight };
     return { bg: withAlpha(accent, 0.1), text: accent };
   })();
 
-  const ctaBg = isLocked ? c.border : "#FF8C00";
-  const ctaBorder = isLocked ? c.textFaint : "#E67E22";
+  const ctaBg = isLocked ? c.border : "#EA580C";
+  const ctaBorder = isLocked ? c.textFaint : "#C2410C";
   const ctaTextColor = isLocked ? c.textFaint : c.onPrimary;
 
   return (
     <Animated.View
       style={[
         styles.card,
-        { borderColor: isRecommended ? c.amberBorder : c.border },
+        { borderColor: isRecommended ? c.border : c.border },
         animated,
       ]}
       accessibilityLabel={`${typeLabel}: ${card.title}`}

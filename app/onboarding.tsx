@@ -11,16 +11,15 @@ import {
 import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
-    BackHandler,
-    Image,
-    KeyboardAvoidingView,
-    Platform,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  BackHandler,
+  Image,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import Animated, {
     FadeIn,
@@ -28,12 +27,11 @@ import Animated, {
     FadeInUp,
 } from "react-native-reanimated";
 import { impactLight } from "@/services/haptics";
-import { LinearGradient } from "expo-linear-gradient";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 /* Autumn action tokens — same as home screen */
-const BTN_COLOR = "#FF8C00";
-const BTN_LIP = "#E67E22";
+const BTN_COLOR = "#EA580C";
+const BTN_LIP = "#C2410C";
 
 const FEATURE_SHOWCASE = [
     {
@@ -42,7 +40,7 @@ const FEATURE_SHOWCASE = [
         description:
             "Follow a guided learning path with bite-sized lessons, quizzes, and an encyclopedia built for beginners.",
         icon: "Book",
-        color: "#FF8C00",
+        color: "#EA580C",
         mascot: require("@/assets/images/mascot/explain.png"),
         highlights: [
             "Guided lesson path with progress tracking",
@@ -70,7 +68,7 @@ const FEATURE_SHOWCASE = [
         description:
             "Not sure where to start? Shrodi routes you to the right lesson, entry, article, or game — no typing needed.",
         icon: "Star",
-        color: "#2ECC71",
+        color: "#58CC02",
         mascot: require("@/assets/images/mascot/thinking.png"),
         highlights: [
             "Tap-through navigation, no typing",
@@ -90,10 +88,6 @@ export default function Onboarding() {
     const { theme, toggleTheme } = useTheme();
     const isDark = theme.mode === "dark";
     const styles = React.useMemo(() => makeStyles(theme), [theme]);
-    const pageGradient: [string, string] = [
-        theme.colors.pageGradientTop,
-        theme.colors.pageGradientBottom,
-    ];
 
     /* Dark mode toggle — floating pill, top-right, on every step */
     const renderThemeToggle = () => (
@@ -215,9 +209,8 @@ export default function Onboarding() {
     /* ---------------- Splash ---------------- */
     if (step === "splash") {
         return (
-            <View style={[styles.container, { backgroundColor: theme.colors.pageGradientBottom }]}>
+            <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
                 {renderThemeToggle()}
-                <LinearGradient colors={pageGradient} style={StyleSheet.absoluteFill} />
                 <View
                     style={[
                         styles.splashContent,
@@ -244,7 +237,7 @@ export default function Onboarding() {
 
                         <View style={styles.splashPoints}>
                             <View style={styles.splashPointRow}>
-                                <Icon name="Book" size={16} color="#FF8C00" variant="Bold" />
+                                <Icon name="Book" size={16} color="#EA580C" variant="Bold" />
                                 <Text style={styles.splashPointText}>Learn nuclear science step by step</Text>
                             </View>
                             <View style={styles.splashPointRow}>
@@ -272,9 +265,8 @@ export default function Onboarding() {
         const isLast = currentFeatureIndex === FEATURE_SHOWCASE.length - 1;
 
         return (
-            <View style={[styles.container, { backgroundColor: theme.colors.pageGradientBottom }]}>
+            <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
                 {renderThemeToggle()}
-                <LinearGradient colors={pageGradient} style={StyleSheet.absoluteFill} />
                 <ScrollView
                     contentContainerStyle={[
                         styles.scrollContent,
@@ -370,9 +362,8 @@ export default function Onboarding() {
 
     /* ---------------- Profile setup ---------------- */
     return (
-        <View style={[styles.container, { backgroundColor: theme.colors.pageGradientBottom }]}>
+        <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
             {renderThemeToggle()}
-            <LinearGradient colors={pageGradient} style={StyleSheet.absoluteFill} />
             <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{ flex: 1 }}>
                 <ScrollView
                     contentContainerStyle={[

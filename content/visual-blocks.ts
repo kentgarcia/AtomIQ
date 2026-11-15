@@ -6,7 +6,7 @@
  * relative imports only, `import type` only, no enums, no path aliases,
  * no React / React Native.
  *
- * See docs/VISUAL_LESSON_BLOCKS.md.
+ * See docs/completed/VISUAL_LESSON_BLOCKS.md.
  */
 
 import type { VisualBlock } from "./types";

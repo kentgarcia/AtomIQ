@@ -54,7 +54,7 @@ for (const mode of ["light", "dark"]) {
   test(`${mode}: Read Aloud active fill keeps a readable glyph for every accent in use`, () => {
     const accents = [
       colors.primary, colors.gold, colors.success, colors.error, colors.link,
-      "#8B5CF6", "#FF8C00",
+      "#8B5CF6", "#EA580C",
     ];
     for (const accent of accents) {
       const fg = pickReadableText(accent, [colors.onPrimary, colors.text, "#000000", "#FFFFFF"]);
@@ -66,10 +66,52 @@ for (const mode of ["light", "dark"]) {
   });
 }
 
-test("the reported failure is real and fixed: white on #FF8C00 fails, new selected state passes", () => {
+test("the reported failure is real and fixed: white on the old #FF8C00 fails, new selected state passes", () => {
   assert.ok(contrastRatio("#FFFFFF", "#FF8C00") < AA_TEXT);
   for (const mode of ["light", "dark"]) {
     const o = getOptionColors(themes[mode].colors, "selected");
     assert.ok(contrastRatio(o.text, o.background) >= AA_TEXT);
   }
+});
+
+const { controls } = loadTs("theme/tokens.ts");
+
+for (const mode of ["light", "dark"]) {
+  const c = themes[mode].colors;
+
+  test(`${mode}: orange button face keeps a readable label (>= 3:1 for bold/large)`, () => {
+    assert.ok(contrastRatio(c.onPrimary, c.primary) >= AA_LARGE);
+  });
+
+  test(`${mode}: orange text roles reach 4.5:1 on neutral surfaces`, () => {
+    for (const bg of [c.background, c.card, c.surfaceSoft]) {
+      assert.ok(contrastRatio(c.primaryLight, bg) >= AA_TEXT, `primaryLight on ${bg}`);
+      assert.ok(contrastRatio(c.link, bg) >= AA_TEXT, `link on ${bg}`);
+    }
+    assert.ok(contrastRatio(c.primaryLight, c.primarySurface) >= AA_TEXT, "primaryLight on primarySurface");
+  });
+
+  test(`${mode}: orange face and selected border are visible on the card (>= 3:1)`, () => {
+    assert.ok(contrastRatio(c.primary, c.card) >= AA_LARGE);
+    assert.ok(contrastRatio(c.primaryBorder, c.card) >= AA_LARGE);
+  });
+
+  test(`${mode}: body and muted text reach 4.5:1 on background and card`, () => {
+    for (const bg of [c.background, c.card]) {
+      assert.ok(contrastRatio(c.text, bg) >= AA_TEXT);
+      assert.ok(contrastRatio(c.textSecondary, bg) >= AA_TEXT);
+      assert.ok(contrastRatio(c.textMuted, bg) >= AA_TEXT, `textMuted on ${bg}`);
+    }
+  });
+
+  test(`${mode}: card border is visible against the page in dark and defined in light`, () => {
+    const ratio = contrastRatio(c.border, c.card);
+    assert.ok(ratio >= (mode === "dark" ? 1.5 : 1.2), `border ${ratio.toFixed(2)}`);
+  });
+}
+
+test("control anatomy tokens: 4px lip, 2px border, press travel equals lip", () => {
+  assert.equal(controls.lip, 4);
+  assert.equal(controls.border, 2);
+  assert.equal(controls.pressTravel, controls.lip);
 });

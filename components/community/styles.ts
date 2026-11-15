@@ -11,7 +11,6 @@ export const createStyles = (theme: Theme) => {
     border: ui.border,
     softBorder: ui.softBorder,
     soft: ui.soft,
-    creamTint: ui.creamTint,
     text: ui.text,
     textSecondary: ui.textSecondary,
     muted: ui.muted,
@@ -117,7 +116,7 @@ export const createStyles = (theme: Theme) => {
       width: 36,
       height: 36,
       borderRadius: 12,
-      backgroundColor: P.creamTint,
+      backgroundColor: P.soft,
       alignItems: "center",
       justifyContent: "center",
     },
@@ -170,11 +169,11 @@ export const createStyles = (theme: Theme) => {
       paddingVertical: 10,
     },
     categoryChipActive: {
-      backgroundColor: "#FF8C00",
-      borderColor: "#E67E22",
+      backgroundColor: "#EA580C",
+      borderColor: "#C2410C",
       borderBottomColor: "#CC6A1A",
       elevation: 4,
-      shadowColor: "#FF8C00",
+      shadowColor: "#EA580C",
       shadowOffset: { width: 0, height: 4 },
       shadowOpacity: 0.28,
       shadowRadius: 8,
@@ -214,7 +213,7 @@ export const createStyles = (theme: Theme) => {
       position: "relative",
       width: "100%",
       height: 120,
-      backgroundColor: P.creamTint,
+      backgroundColor: P.soft,
     },
     galleryImage: {
       width: "100%",
@@ -224,7 +223,7 @@ export const createStyles = (theme: Theme) => {
       flex: 1,
       alignItems: "center",
       justifyContent: "center",
-      backgroundColor: P.creamTint,
+      backgroundColor: P.soft,
     },
     saveButton: {
       position: "absolute",
@@ -243,7 +242,7 @@ export const createStyles = (theme: Theme) => {
       shadowRadius: 4,
     },
     saveButtonActive: {
-      backgroundColor: "#FF8C00",
+      backgroundColor: "#EA580C",
     },
     galleryBody: {
       paddingHorizontal: 12,
@@ -252,7 +251,7 @@ export const createStyles = (theme: Theme) => {
     galleryCategory: {
       fontSize: 10,
       ...fontFaces.heavy,
-      color: "#E67E22",
+      color: "#C2410C",
       letterSpacing: 0.5,
       marginBottom: 4,
       textTransform: "uppercase",
@@ -561,7 +560,7 @@ export const createStyles = (theme: Theme) => {
       opacity: 0.9,
     },
     emptyBadge: {
-      backgroundColor: P.creamTint,
+      backgroundColor: P.soft,
       paddingHorizontal: 10,
       paddingVertical: 4,
       borderRadius: 8,
@@ -570,7 +569,7 @@ export const createStyles = (theme: Theme) => {
     emptyBadgeText: {
       fontSize: 10,
       ...fontFaces.heavy,
-      color: "#E67E22",
+      color: "#C2410C",
       letterSpacing: 0.6,
       textTransform: "uppercase",
     },
@@ -594,7 +593,7 @@ export const createStyles = (theme: Theme) => {
       flexDirection: "row",
       alignItems: "center",
       gap: 6,
-      backgroundColor: P.creamTint,
+      backgroundColor: P.soft,
       paddingHorizontal: 14,
       paddingVertical: 8,
       borderRadius: 12,
@@ -602,7 +601,7 @@ export const createStyles = (theme: Theme) => {
     emptyActionText: {
       fontSize: 12,
       ...fontFaces.heavy,
-      color: "#E67E22",
+      color: "#C2410C",
     },
 
     // Undo Snackbar
@@ -772,11 +771,11 @@ export const createStyles = (theme: Theme) => {
       marginTop: 8,
       paddingTop: 8,
       borderTopWidth: 1,
-      borderTopColor: "rgba(94, 114, 228, 0.2)",
+      borderTopColor: theme.colors.border,
     },
     aiNoticeText: {
       fontSize: 11,
-      color: "#5E72E4",
+      color: theme.colors.primaryLight,
       ...fontFaces.semibold,
       fontStyle: "italic",
     },
@@ -794,7 +793,7 @@ export const createStyles = (theme: Theme) => {
     },
     moderatingText: {
       fontSize: 13,
-      color: "#5E72E4",
+      color: theme.colors.primaryLight,
       ...fontFaces.semibold,
     },
     cooldownIndicator: {
@@ -1027,7 +1026,7 @@ export const createStyles = (theme: Theme) => {
       width: 52,
       height: 52,
       borderRadius: 26,
-      backgroundColor: P.creamTint,
+      backgroundColor: P.soft,
       alignItems: "center",
       justifyContent: "center",
       marginBottom: 12,
@@ -1050,7 +1049,7 @@ export const createStyles = (theme: Theme) => {
       width: 36,
       height: 3,
       borderRadius: 2,
-      backgroundColor: P.creamTint,
+      backgroundColor: P.soft,
       marginTop: 14,
     },
 
@@ -1107,7 +1106,7 @@ export const createStyles = (theme: Theme) => {
       ...fontFaces.bold,
     },
     guidelinesButton: {
-      backgroundColor: "#5E72E4",
+      backgroundColor: theme.colors.primary,
       borderRadius: 12,
       paddingVertical: 16,
       alignItems: "center",
