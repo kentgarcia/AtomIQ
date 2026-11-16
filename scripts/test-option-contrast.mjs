@@ -115,3 +115,48 @@ test("control anatomy tokens: 4px lip, 2px border, press travel equals lip", () 
   assert.equal(controls.border, 2);
   assert.equal(controls.pressTravel, controls.lip);
 });
+
+// ---- lesson redesign: option skins, run chips, MYTH / FACT buttons ---------
+// Several surface roles are translucent, so composite them over what they sit on first.
+const parse = (h) => (h.startsWith("rgba") ? h.match(/[\d.]+/g).map(Number) : [...[1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16)), 1]);
+const over = (fg, bg, alpha) => {
+  const [r, g, b, a0] = parse(fg);
+  const a = alpha ?? a0;
+  const [R, G, B] = parse(bg);
+  const mix = (x, y) => Math.round(x * a + y * (1 - a)).toString(16).padStart(2, "0");
+  return `#${mix(r, R)}${mix(g, G)}${mix(b, B)}`;
+};
+
+for (const mode of ["light", "dark"]) {
+  const c = themes[mode].colors;
+  const faces = {
+    idle: c.surface,
+    selected: over(c.primarySurface, c.surface),
+    correct: over(c.successSurface, c.surface),
+    wrong: over(c.errorSurface, c.surface),
+  };
+  for (const [state, face] of Object.entries(faces)) {
+    test(`${mode}: option label on the ${state} face is readable`, () => {
+      assert.ok(contrastRatio(c.text, face) >= AA_TEXT, `${state} ${contrastRatio(c.text, face).toFixed(2)}`);
+    });
+  }
+  test(`${mode}: selected badge letter (onPrimary) is readable on the primary fill`, () => {
+    assert.ok(contrastRatio(c.onPrimary, c.primary) >= AA_LARGE);
+  });
+  // MYTH / FACT are the shared `Button` (destructive / success). Idle, the label is the role colour
+  // on the card (FACT uses successDark: the bright green is only 2.1:1 on white). Filled, they keep
+  // Button's own `onPrimary` on role pairing, which is the app-wide convention and is not asserted here.
+  for (const [name, role] of [["MYTH", c.error], ["FACT", c.successDark]]) {
+    test(`${mode}: ${name} idle label (role on card) is readable at large size`, () => {
+      assert.ok(contrastRatio(role, c.surface) >= AA_LARGE, `${contrastRatio(role, c.surface).toFixed(2)}`);
+    });
+  }
+  // Run chips: label is the normal text colour on an 18% tint of the hue; gold keeps a text-coloured icon.
+  for (const [name, hue, icon] of [["gold", c.gold, c.text], ["info", c.info, c.info]]) {
+    test(`${mode}: ${name} run chip label and icon are visible on the tint`, () => {
+      const bg = over(hue, c.background, 0.18);
+      assert.ok(contrastRatio(c.text, bg) >= AA_TEXT, `label ${contrastRatio(c.text, bg).toFixed(2)}`);
+      assert.ok(contrastRatio(icon, bg) >= 1.5, `icon ${contrastRatio(icon, bg).toFixed(2)}`);
+    });
+  }
+}

@@ -1,0 +1,92 @@
+/**
+ * What happens when a path node is finished: save completion, award XP once, log
+ * activity, and update objective mastery. UI-free; the screen passes in the two
+ * storage-context actions it needs.
+ */
+
+import type { Lesson, PathNode } from "@/content/curriculum/types";
+import { recordActivity } from "@/services/activity-log";
+import { recordAnswers, markObjectivesFamiliar, type RecordedAnswer } from "@/services/curriculum-progress";
+import { getLevelProgress, getUserProfile, logDailyActivity, updateLevelProgress } from "@/services/database";
+import { toLocalIsoDate } from "@/services/utils";
+
+export interface CompleteOptions {
+  node: PathNode;
+  /** Set for lesson nodes. */
+  lesson?: Lesson;
+  stars: 1 | 2 | 3;
+  xp: number;
+  /** False for a checkpoint below its pass mark: answers are recorded, the node stays open. */
+  passed: boolean;
+  sessionId: string;
+  answers: RecordedAnswer[];
+  addXP: (amount: number) => Promise<void>;
+  updateUserProfile: (updates: { lessons_completed?: number }) => Promise<void>;
+}
+
+export interface CompleteResult {
+  /** True the first time this node was completed (XP was awarded). */
+  firstCompletion: boolean;
+  xpAwarded: number;
+}
+
+export async function completeNode(opts: CompleteOptions): Promise<CompleteResult> {
+  const { node, lesson, stars, xp, passed, sessionId, answers, addXP, updateUserProfile } = opts;
+
+  await recordAnswers(sessionId, answers);
+
+  if (!passed) return { firstCompletion: false, xpAwarded: 0 };
+
+  const existing = (await getLevelProgress(node.id)) as { status?: string; completed_at?: string; stars?: number; xp_earned?: number } | null;
+  const already = existing?.status === "completed";
+
+  await updateLevelProgress(node.id, {
+    status: "completed",
+    xp_earned: Math.max(existing?.xp_earned ?? 0, xp),
+    stars: Math.max(existing?.stars ?? 0, stars),
+    completed_at: existing?.completed_at || new Date().toISOString(),
+    unit_id: node.unitId,
+    type: node.kind,
+  });
+
+  if (lesson) {
+    await markObjectivesFamiliar(lesson.teaches);
+    recordActivity("lesson_complete", { id: node.id });
+  } else {
+    recordActivity("quiz_complete", { id: node.id });
+  }
+
+  if (already) return { firstCompletion: false, xpAwarded: 0 };
+
+  await addXP(xp);
+  if (lesson) {
+    const profile = (await getUserProfile()) as { lessons_completed?: number } | null;
+    if (profile) await updateUserProfile({ lessons_completed: (profile.lessons_completed ?? 0) + 1 });
+  }
+  await logDailyActivity(toLocalIsoDate(), {
+    xp_earned: xp,
+    lessons_completed: lesson ? 1 : 0,
+    time_spent_minutes: lesson?.estimatedMinutes ?? 4,
+  });
+  return { firstCompletion: true, xpAwarded: xp };
+}
+
+/** Record a unit test-out: the unit counts as complete and its objectives start as Familiar. */
+export async function completeTestOut(opts: {
+  unitId: string;
+  objectiveIds: string[];
+  sessionId: string;
+  answers: RecordedAnswer[];
+  passed: boolean;
+}): Promise<void> {
+  await recordAnswers(opts.sessionId, opts.answers);
+  if (!opts.passed) return;
+  await updateLevelProgress(`testout:${opts.unitId}`, {
+    status: "completed",
+    stars: 3,
+    completed_at: new Date().toISOString(),
+    unit_id: opts.unitId,
+    type: "testout",
+  });
+  await markObjectivesFamiliar(opts.objectiveIds);
+}

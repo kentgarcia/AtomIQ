@@ -1,0 +1,1470 @@
+{
+  "table": "myths",
+  "primaryKey": [
+    "id"
+  ],
+  "rows": [
+    {
+      "id": "all-radiation-manmade",
+      "title": "All Radiation is Man-Made",
+      "myth_statement": "All radiation is artificial and created by humans through nuclear technology",
+      "reality": "80% of radiation exposure comes from natural sources like the sun, rocks, and even food",
+      "explanation": "This is one of the most common misconceptions about radiation. The truth is that radiation has existed since the beginning of the universe, billions of years before humans appeared.\n\n**Natural Sources (80% of exposure):**\n- **Cosmic Radiation**: High-energy particles from space constantly bombard Earth\n- **Terrestrial Radiation**: Uranium, thorium, and radon in rocks and soil\n- **Internal Radiation**: Radioactive potassium-40 and carbon-14 in our bodies\n- **Radon Gas**: The largest single source of natural radiation exposure\n\n**Artificial Sources (20% of exposure):**\n- Medical procedures (X-rays, CT scans): ~15%\n- Nuclear power and testing: <1%\n- Consumer products: <1%\n\n**Fun Facts:**\n- Bananas contain potassium-40 (radioactive)\n- Brazil nuts are one of the most radioactive foods\n- Granite countertops emit low-level radiation\n- Flying increases cosmic ray exposure\n- Living in Denver (high altitude) = 2x more cosmic radiation\n\nAccording to UNSCEAR (United Nations Scientific Committee on the Effects of Atomic Radiation), the average person receives about 3 millisieverts (mSv) per year from natural sources and about 0.6 mSv from artificial sources.",
+      "category": "safety",
+      "difficulty": "easy",
+      "sources": [
+        {
+          "title": "Sources and Effects of Ionizing Radiation",
+          "url": "https://www.unscear.org/unscear/en/publications.html",
+          "author": "UNSCEAR",
+          "date": "2020",
+          "type": "official"
+        },
+        {
+          "title": "Radiation in Everyday Life",
+          "url": "https://www.iaea.org/topics/radiation-in-everyday-life",
+          "author": "IAEA",
+          "type": "official"
+        },
+        {
+          "title": "Background Radiation Fact Sheet",
+          "url": "https://www.epa.gov/radiation/radiation-sources-and-doses",
+          "author": "U.S. EPA",
+          "type": "official"
+        }
+      ],
+      "related_facts": [
+        "background-radiation-sources"
+      ],
+      "related_lessons": [],
+      "image": "https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?w=400",
+      "tags": [
+        "radiation",
+        "natural",
+        "background",
+        "safety",
+        "basics"
+      ],
+      "popularity": 10
+    },
+    {
+      "id": "fukushima-was-nuclear-explosion",
+      "title": "Fukushima Was a Nuclear Explosion",
+      "myth_statement": "The Fukushima Daiichi accident was a nuclear explosion like an atomic bomb",
+      "reality": "Fukushima was a tsunami-driven loss-of-cooling accident with hydrogen (chemical) explosions, not a nuclear detonation",
+      "explanation": "The Fukushima 2011 incident is often misunderstood. It was severe, but it was not a nuclear bomb-type explosion.\n\n**What actually happened:**\n- A 9.0 earthquake and tsunami disabled external power and backup generators\n- Reactor cooling systems failed after flooding\n- Fuel overheating produced hydrogen gas\n- Hydrogen accumulated and exploded in reactor buildings\n\n**Why this matters:**\n- Hydrogen explosions are chemical reactions, not nuclear yield\n- Reactor fuel enrichment is too low for bomb-like detonation\n- The core damage came from overheating and loss of cooling, not a nuclear blast\n\n**Debunk:**\nFukushima demonstrates emergency-cooling and backup-power risks during extreme disasters, but it does not support the myth that reactors can explode like atomic bombs.",
+      "category": "safety",
+      "difficulty": "medium",
+      "sources": [
+        {
+          "title": "Fukushima Daiichi Accident (Update)",
+          "url": "https://www.iaea.org/topics/fukushima-daiichi-nuclear-accident",
+          "author": "IAEA",
+          "type": "official"
+        },
+        {
+          "title": "Fukushima Daiichi Accident Information",
+          "url": "https://www.world-nuclear.org/information-library/safety-and-security/safety-of-plants/fukushima-daiichi-accident.aspx",
+          "author": "World Nuclear Association",
+          "type": "official"
+        },
+        {
+          "title": "The Fukushima Daiichi Accident Report",
+          "url": "https://www.oecd-nea.org/jcms/pl_14966/the-fukushima-daiichi-accident",
+          "author": "Nuclear Energy Agency (OECD/NEA)",
+          "type": "official"
+        }
+      ],
+      "related_facts": [],
+      "related_lessons": [],
+      "image": "https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?w=400",
+      "tags": [
+        "fukushima",
+        "safety",
+        "accident",
+        "reactors",
+        "debunk"
+      ],
+      "popularity": 9
+    },
+    {
+      "id": "living-near-plant-dangerous",
+      "title": "Living Near Nuclear Plants Causes Cancer",
+      "myth_statement": "Living near a nuclear power plant significantly increases your cancer risk",
+      "reality": "The radiation dose from living near a nuclear plant is less than eating a banana",
+      "explanation": "Multiple large-scale studies have found no increased cancer risk for people living near nuclear power plants.\n\n**The Numbers:**\n- **Annual dose from plant**: <0.01 mSv (millisieverts)\n- **Eating one banana**: 0.0001 mSv\n- **Chest X-ray**: 0.1 mSv\n- **Natural background**: 2-3 mSv per year\n- **Flying NYC to LA**: 0.04 mSv\n\n**Scientific Studies:**\n- **15-year study** by the National Cancer Institute: No increased cancer risk\n- **UK study** (1963-2006): No evidence of elevated childhood leukemia\n- **French study**: Cancer rates near plants were LOWER than national average\n\n**Why So Safe?**\n1. **Containment**: Multiple barriers prevent release\n2. **Monitoring**: Continuous radiation monitoring\n3. **Regulations**: Strict limits (100x lower than natural background)\n4. **Distance**: Radiation decreases rapidly with distance\n\n**Comparison:**\nLiving near a coal plant exposes you to MORE radiation (from fly ash) than living near a nuclear plant!\n\nAccording to UNSCEAR, the dose to the public from nuclear power operations is negligible compared to natural background radiation.",
+      "category": "safety",
+      "difficulty": "medium",
+      "sources": [
+        {
+          "title": "Cancer Risk Near Nuclear Plants",
+          "url": "https://www.cancer.gov/about-cancer/causes-prevention/risk/radiation/nuclear-facilities-fact-sheet",
+          "author": "National Cancer Institute",
+          "type": "official"
+        },
+        {
+          "title": "Radiation Doses",
+          "url": "https://www.unscear.org/unscear/en/publications.html",
+          "author": "UNSCEAR",
+          "date": "2020",
+          "type": "official"
+        }
+      ],
+      "related_facts": [],
+      "related_lessons": [],
+      "image": "https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?w=400",
+      "tags": [
+        "safety",
+        "health",
+        "cancer",
+        "misconceptions",
+        "public"
+      ],
+      "popularity": 10
+    },
+    {
+      "id": "myths-facts-01",
+      "title": "All radiation is man-made",
+      "myth_statement": "All radiation is man-made.",
+      "reality": "Most radiation comes from natural sources like the sun, soil, and food.",
+      "explanation": "This statement is a common myth in nuclear science.\n\n**Reality:** Most radiation comes from natural sources like the sun, soil, and food.",
+      "category": "basics",
+      "difficulty": "easy",
+      "sources": [
+        {
+          "title": "Sources and Effects of Ionizing Radiation",
+          "url": "https://www.unscear.org/unscear/en/publications.html",
+          "author": "UNSCEAR",
+          "type": "official"
+        },
+        {
+          "title": "Radiation in Everyday Life",
+          "url": "https://www.iaea.org/topics/radiation-in-everyday-life",
+          "author": "IAEA",
+          "type": "official"
+        },
+        {
+          "title": "Safety of Nuclear Power Reactors",
+          "url": "https://www.world-nuclear.org/information-library/safety-and-security/safety-of-plants/safety-of-nuclear-power-reactors.aspx",
+          "author": "World Nuclear Association",
+          "type": "official"
+        }
+      ],
+      "related_facts": [],
+      "related_lessons": [],
+      "image": null,
+      "tags": [
+        "mythbuster",
+        "nuclear",
+        "radiation",
+        "basics",
+        "easy"
+      ],
+      "popularity": 9
+    },
+    {
+      "id": "myths-facts-02",
+      "title": "Radiation always causes immediate death",
+      "myth_statement": "Radiation always causes immediate death.",
+      "reality": "Effects depend on dose; low levels are generally harmless.",
+      "explanation": "This statement is a common myth in nuclear science.\n\n**Reality:** Effects depend on dose; low levels are generally harmless.",
+      "category": "basics",
+      "difficulty": "easy",
+      "sources": [
+        {
+          "title": "Sources and Effects of Ionizing Radiation",
+          "url": "https://www.unscear.org/unscear/en/publications.html",
+          "author": "UNSCEAR",
+          "type": "official"
+        },
+        {
+          "title": "Radiation in Everyday Life",
+          "url": "https://www.iaea.org/topics/radiation-in-everyday-life",
+          "author": "IAEA",
+          "type": "official"
+        },
+        {
+          "title": "Safety of Nuclear Power Reactors",
+          "url": "https://www.world-nuclear.org/information-library/safety-and-security/safety-of-plants/safety-of-nuclear-power-reactors.aspx",
+          "author": "World Nuclear Association",
+          "type": "official"
+        }
+      ],
+      "related_facts": [],
+      "related_lessons": [],
+      "image": null,
+      "tags": [
+        "mythbuster",
+        "nuclear",
+        "radiation",
+        "basics",
+        "easy"
+      ],
+      "popularity": 9
+    },
+    {
+      "id": "myths-facts-03",
+      "title": "Nuclear power plants can explode like atomic bombs",
+      "myth_statement": "Nuclear power plants can explode like atomic bombs.",
+      "reality": "They use low-enriched fuel and cannot explode like bombs.",
+      "explanation": "This statement is a common myth in nuclear science.\n\n**Reality:** They use low-enriched fuel and cannot explode like bombs.",
+      "category": "basics",
+      "difficulty": "easy",
+      "sources": [
+        {
+          "title": "Sources and Effects of Ionizing Radiation",
+          "url": "https://www.unscear.org/unscear/en/publications.html",
+          "author": "UNSCEAR",
+          "type": "official"
+        },
+        {
+          "title": "Radiation in Everyday Life",
+          "url": "https://www.iaea.org/topics/radiation-in-everyday-life",
+          "author": "IAEA",
+          "type": "official"
+        },
+        {
+          "title": "Safety of Nuclear Power Reactors",
+          "url": "https://www.world-nuclear.org/information-library/safety-and-security/safety-of-plants/safety-of-nuclear-power-reactors.aspx",
+          "author": "World Nuclear Association",
+          "type": "official"
+        }
+      ],
+      "related_facts": [],
+      "related_lessons": [],
+      "image": null,
+      "tags": [
+        "mythbuster",
+        "nuclear",
+        "radiation",
+        "basics",
+        "easy"
+      ],
+      "popularity": 9
+    },
+    {
+      "id": "myths-facts-04",
+      "title": "All radioactive materials glow green",
+      "myth_statement": "All radioactive materials glow green.",
+      "reality": "Glowing is rare and due to specific conditions, not typical radiation.",
+      "explanation": "This statement is a common myth in nuclear science.\n\n**Reality:** Glowing is rare and due to specific conditions, not typical radiation.",
+      "category": "basics",
+      "difficulty": "easy",
+      "sources": [
+        {
+          "title": "Sources and Effects of Ionizing Radiation",
+          "url": "https://www.unscear.org/unscear/en/publications.html",
+          "author": "UNSCEAR",
+          "type": "official"
+        },
+        {
+          "title": "Radiation in Everyday Life",
+          "url": "https://www.iaea.org/topics/radiation-in-everyday-life",
+          "author": "IAEA",
+          "type": "official"
+        },
+        {
+          "title": "Safety of Nuclear Power Reactors",
+          "url": "https://www.world-nuclear.org/information-library/safety-and-security/safety-of-plants/safety-of-nuclear-power-reactors.aspx",
+          "author": "World Nuclear Association",
+          "type": "official"
+        }
+      ],
+      "related_facts": [],
+      "related_lessons": [],
+      "image": null,
+      "tags": [
+        "mythbuster",
+        "nuclear",
+        "radiation",
+        "basics",
+        "easy"
+      ],
+      "popularity": 9
+    },
+    {
+      "id": "myths-facts-05",
+      "title": "Radiation is always harmful",
+      "myth_statement": "Radiation is always harmful.",
+      "reality": "It has many beneficial uses in medicine, agriculture, and industry.",
+      "explanation": "This statement is a common myth in nuclear science.\n\n**Reality:** It has many beneficial uses in medicine, agriculture, and industry.",
+      "category": "basics",
+      "difficulty": "easy",
+      "sources": [
+        {
+          "title": "Sources and Effects of Ionizing Radiation",
+          "url": "https://www.unscear.org/unscear/en/publications.html",
+          "author": "UNSCEAR",
+          "type": "official"
+        },
+        {
+          "title": "Radiation in Everyday Life",
+          "url": "https://www.iaea.org/topics/radiation-in-everyday-life",
+          "author": "IAEA",
+          "type": "official"
+        },
+        {
+          "title": "Safety of Nuclear Power Reactors",
+          "url": "https://www.world-nuclear.org/information-library/safety-and-security/safety-of-plants/safety-of-nuclear-power-reactors.aspx",
+          "author": "World Nuclear Association",
+          "type": "official"
+        }
+      ],
+      "related_facts": [],
+      "related_lessons": [],
+      "image": null,
+      "tags": [
+        "mythbuster",
+        "nuclear",
+        "radiation",
+        "basics",
+        "easy"
+      ],
+      "popularity": 9
+    },
+    {
+      "id": "myths-facts-06",
+      "title": "Microwaves and phones are radioactive",
+      "myth_statement": "Microwaves and phones are radioactive.",
+      "reality": "They emit non-ionizing radiation, which is not harmful like ionizing radiation.",
+      "explanation": "This statement is a common myth in nuclear science.\n\n**Reality:** They emit non-ionizing radiation, which is not harmful like ionizing radiation.",
+      "category": "basics",
+      "difficulty": "easy",
+      "sources": [
+        {
+          "title": "Sources and Effects of Ionizing Radiation",
+          "url": "https://www.unscear.org/unscear/en/publications.html",
+          "author": "UNSCEAR",
+          "type": "official"
+        },
+        {
+          "title": "Radiation in Everyday Life",
+          "url": "https://www.iaea.org/topics/radiation-in-everyday-life",
+          "author": "IAEA",
+          "type": "official"
+        },
+        {
+          "title": "Safety of Nuclear Power Reactors",
+          "url": "https://www.world-nuclear.org/information-library/safety-and-security/safety-of-plants/safety-of-nuclear-power-reactors.aspx",
+          "author": "World Nuclear Association",
+          "type": "official"
+        }
+      ],
+      "related_facts": [],
+      "related_lessons": [],
+      "image": null,
+      "tags": [
+        "mythbuster",
+        "nuclear",
+        "radiation",
+        "basics",
+        "easy"
+      ],
+      "popularity": 9
+    },
+    {
+      "id": "myths-facts-07",
+      "title": "You become radioactive after an X-ray",
+      "myth_statement": "You become radioactive after an X-ray.",
+      "reality": "X-rays pass through the body; you do not become radioactive.",
+      "explanation": "This statement is a common myth in nuclear science.\n\n**Reality:** X-rays pass through the body; you do not become radioactive.",
+      "category": "basics",
+      "difficulty": "easy",
+      "sources": [
+        {
+          "title": "Sources and Effects of Ionizing Radiation",
+          "url": "https://www.unscear.org/unscear/en/publications.html",
+          "author": "UNSCEAR",
+          "type": "official"
+        },
+        {
+          "title": "Radiation in Everyday Life",
+          "url": "https://www.iaea.org/topics/radiation-in-everyday-life",
+          "author": "IAEA",
+          "type": "official"
+        },
+        {
+          "title": "Safety of Nuclear Power Reactors",
+          "url": "https://www.world-nuclear.org/information-library/safety-and-security/safety-of-plants/safety-of-nuclear-power-reactors.aspx",
+          "author": "World Nuclear Association",
+          "type": "official"
+        }
+      ],
+      "related_facts": [],
+      "related_lessons": [],
+      "image": null,
+      "tags": [
+        "mythbuster",
+        "nuclear",
+        "radiation",
+        "basics",
+        "easy"
+      ],
+      "popularity": 9
+    },
+    {
+      "id": "myths-facts-08",
+      "title": "Nuclear energy is the same as nuclear weapons",
+      "myth_statement": "Nuclear energy is the same as nuclear weapons.",
+      "reality": "They use different processes and materials.",
+      "explanation": "This statement is a common myth in nuclear science.\n\n**Reality:** They use different processes and materials.",
+      "category": "basics",
+      "difficulty": "easy",
+      "sources": [
+        {
+          "title": "Sources and Effects of Ionizing Radiation",
+          "url": "https://www.unscear.org/unscear/en/publications.html",
+          "author": "UNSCEAR",
+          "type": "official"
+        },
+        {
+          "title": "Radiation in Everyday Life",
+          "url": "https://www.iaea.org/topics/radiation-in-everyday-life",
+          "author": "IAEA",
+          "type": "official"
+        },
+        {
+          "title": "Safety of Nuclear Power Reactors",
+          "url": "https://www.world-nuclear.org/information-library/safety-and-security/safety-of-plants/safety-of-nuclear-power-reactors.aspx",
+          "author": "World Nuclear Association",
+          "type": "official"
+        }
+      ],
+      "related_facts": [],
+      "related_lessons": [],
+      "image": null,
+      "tags": [
+        "mythbuster",
+        "nuclear",
+        "radiation",
+        "basics",
+        "easy"
+      ],
+      "popularity": 9
+    },
+    {
+      "id": "myths-facts-09",
+      "title": "Bananas are not radioactive",
+      "myth_statement": "Bananas are not radioactive.",
+      "reality": "They contain potassium-40, a naturally radioactive isotope.",
+      "explanation": "This statement is a common myth in nuclear science.\n\n**Reality:** They contain potassium-40, a naturally radioactive isotope.",
+      "category": "basics",
+      "difficulty": "easy",
+      "sources": [
+        {
+          "title": "Sources and Effects of Ionizing Radiation",
+          "url": "https://www.unscear.org/unscear/en/publications.html",
+          "author": "UNSCEAR",
+          "type": "official"
+        },
+        {
+          "title": "Radiation in Everyday Life",
+          "url": "https://www.iaea.org/topics/radiation-in-everyday-life",
+          "author": "IAEA",
+          "type": "official"
+        },
+        {
+          "title": "Safety of Nuclear Power Reactors",
+          "url": "https://www.world-nuclear.org/information-library/safety-and-security/safety-of-plants/safety-of-nuclear-power-reactors.aspx",
+          "author": "World Nuclear Association",
+          "type": "official"
+        }
+      ],
+      "related_facts": [],
+      "related_lessons": [],
+      "image": null,
+      "tags": [
+        "mythbuster",
+        "nuclear",
+        "radiation",
+        "basics",
+        "easy"
+      ],
+      "popularity": 9
+    },
+    {
+      "id": "myths-facts-10",
+      "title": "Radiation can be completely eliminated",
+      "myth_statement": "Radiation can be completely eliminated.",
+      "reality": "It is naturally present; exposure can only be minimized.",
+      "explanation": "This statement is a common myth in nuclear science.\n\n**Reality:** It is naturally present; exposure can only be minimized.",
+      "category": "basics",
+      "difficulty": "easy",
+      "sources": [
+        {
+          "title": "Sources and Effects of Ionizing Radiation",
+          "url": "https://www.unscear.org/unscear/en/publications.html",
+          "author": "UNSCEAR",
+          "type": "official"
+        },
+        {
+          "title": "Radiation in Everyday Life",
+          "url": "https://www.iaea.org/topics/radiation-in-everyday-life",
+          "author": "IAEA",
+          "type": "official"
+        },
+        {
+          "title": "Safety of Nuclear Power Reactors",
+          "url": "https://www.world-nuclear.org/information-library/safety-and-security/safety-of-plants/safety-of-nuclear-power-reactors.aspx",
+          "author": "World Nuclear Association",
+          "type": "official"
+        }
+      ],
+      "related_facts": [],
+      "related_lessons": [],
+      "image": null,
+      "tags": [
+        "mythbuster",
+        "nuclear",
+        "radiation",
+        "basics",
+        "easy"
+      ],
+      "popularity": 9
+    },
+    {
+      "id": "myths-facts-11",
+      "title": "Nuclear waste cannot be managed safely",
+      "myth_statement": "Nuclear waste cannot be managed safely.",
+      "reality": "It is carefully stored and monitored using strict protocols.",
+      "explanation": "This statement is a common myth in nuclear science.\n\n**Reality:** It is carefully stored and monitored using strict protocols.",
+      "category": "safety",
+      "difficulty": "medium",
+      "sources": [
+        {
+          "title": "Sources and Effects of Ionizing Radiation",
+          "url": "https://www.unscear.org/unscear/en/publications.html",
+          "author": "UNSCEAR",
+          "type": "official"
+        },
+        {
+          "title": "Radiation in Everyday Life",
+          "url": "https://www.iaea.org/topics/radiation-in-everyday-life",
+          "author": "IAEA",
+          "type": "official"
+        },
+        {
+          "title": "Safety of Nuclear Power Reactors",
+          "url": "https://www.world-nuclear.org/information-library/safety-and-security/safety-of-plants/safety-of-nuclear-power-reactors.aspx",
+          "author": "World Nuclear Association",
+          "type": "official"
+        }
+      ],
+      "related_facts": [],
+      "related_lessons": [],
+      "image": null,
+      "tags": [
+        "mythbuster",
+        "nuclear",
+        "radiation",
+        "safety",
+        "medium"
+      ],
+      "popularity": 8
+    },
+    {
+      "id": "myths-facts-12",
+      "title": "Living near a nuclear plant is highly dangerous",
+      "myth_statement": "Living near a nuclear plant is highly dangerous.",
+      "reality": "Exposure levels are very low and often comparable to natural background.",
+      "explanation": "This statement is a common myth in nuclear science.\n\n**Reality:** Exposure levels are very low and often comparable to natural background.",
+      "category": "safety",
+      "difficulty": "medium",
+      "sources": [
+        {
+          "title": "Sources and Effects of Ionizing Radiation",
+          "url": "https://www.unscear.org/unscear/en/publications.html",
+          "author": "UNSCEAR",
+          "type": "official"
+        },
+        {
+          "title": "Radiation in Everyday Life",
+          "url": "https://www.iaea.org/topics/radiation-in-everyday-life",
+          "author": "IAEA",
+          "type": "official"
+        },
+        {
+          "title": "Safety of Nuclear Power Reactors",
+          "url": "https://www.world-nuclear.org/information-library/safety-and-security/safety-of-plants/safety-of-nuclear-power-reactors.aspx",
+          "author": "World Nuclear Association",
+          "type": "official"
+        }
+      ],
+      "related_facts": [],
+      "related_lessons": [],
+      "image": null,
+      "tags": [
+        "mythbuster",
+        "nuclear",
+        "radiation",
+        "safety",
+        "medium"
+      ],
+      "popularity": 8
+    },
+    {
+      "id": "myths-facts-13",
+      "title": "All radiation exposure leads to cancer",
+      "myth_statement": "All radiation exposure leads to cancer.",
+      "reality": "Only high doses significantly increase risk.",
+      "explanation": "This statement is a common myth in nuclear science.\n\n**Reality:** Only high doses significantly increase risk.",
+      "category": "safety",
+      "difficulty": "medium",
+      "sources": [
+        {
+          "title": "Sources and Effects of Ionizing Radiation",
+          "url": "https://www.unscear.org/unscear/en/publications.html",
+          "author": "UNSCEAR",
+          "type": "official"
+        },
+        {
+          "title": "Radiation in Everyday Life",
+          "url": "https://www.iaea.org/topics/radiation-in-everyday-life",
+          "author": "IAEA",
+          "type": "official"
+        },
+        {
+          "title": "Safety of Nuclear Power Reactors",
+          "url": "https://www.world-nuclear.org/information-library/safety-and-security/safety-of-plants/safety-of-nuclear-power-reactors.aspx",
+          "author": "World Nuclear Association",
+          "type": "official"
+        }
+      ],
+      "related_facts": [],
+      "related_lessons": [],
+      "image": null,
+      "tags": [
+        "mythbuster",
+        "nuclear",
+        "radiation",
+        "safety",
+        "medium"
+      ],
+      "popularity": 8
+    },
+    {
+      "id": "myths-facts-14",
+      "title": "Nuclear accidents happen frequently",
+      "myth_statement": "Nuclear accidents happen frequently.",
+      "reality": "Major accidents are extremely rare.",
+      "explanation": "This statement is a common myth in nuclear science.\n\n**Reality:** Major accidents are extremely rare.",
+      "category": "safety",
+      "difficulty": "medium",
+      "sources": [
+        {
+          "title": "Sources and Effects of Ionizing Radiation",
+          "url": "https://www.unscear.org/unscear/en/publications.html",
+          "author": "UNSCEAR",
+          "type": "official"
+        },
+        {
+          "title": "Radiation in Everyday Life",
+          "url": "https://www.iaea.org/topics/radiation-in-everyday-life",
+          "author": "IAEA",
+          "type": "official"
+        },
+        {
+          "title": "Safety of Nuclear Power Reactors",
+          "url": "https://www.world-nuclear.org/information-library/safety-and-security/safety-of-plants/safety-of-nuclear-power-reactors.aspx",
+          "author": "World Nuclear Association",
+          "type": "official"
+        }
+      ],
+      "related_facts": [],
+      "related_lessons": [],
+      "image": null,
+      "tags": [
+        "mythbuster",
+        "nuclear",
+        "radiation",
+        "safety",
+        "medium"
+      ],
+      "popularity": 8
+    },
+    {
+      "id": "myths-facts-15",
+      "title": "Food irradiation makes food radioactive",
+      "myth_statement": "Food irradiation makes food radioactive.",
+      "reality": "It does not make food radioactive; it kills bacteria.",
+      "explanation": "This statement is a common myth in nuclear science.\n\n**Reality:** It does not make food radioactive; it kills bacteria.",
+      "category": "safety",
+      "difficulty": "medium",
+      "sources": [
+        {
+          "title": "Sources and Effects of Ionizing Radiation",
+          "url": "https://www.unscear.org/unscear/en/publications.html",
+          "author": "UNSCEAR",
+          "type": "official"
+        },
+        {
+          "title": "Radiation in Everyday Life",
+          "url": "https://www.iaea.org/topics/radiation-in-everyday-life",
+          "author": "IAEA",
+          "type": "official"
+        },
+        {
+          "title": "Safety of Nuclear Power Reactors",
+          "url": "https://www.world-nuclear.org/information-library/safety-and-security/safety-of-plants/safety-of-nuclear-power-reactors.aspx",
+          "author": "World Nuclear Association",
+          "type": "official"
+        }
+      ],
+      "related_facts": [],
+      "related_lessons": [],
+      "image": null,
+      "tags": [
+        "mythbuster",
+        "nuclear",
+        "radiation",
+        "safety",
+        "medium"
+      ],
+      "popularity": 8
+    },
+    {
+      "id": "myths-facts-16",
+      "title": "Radiation only comes from nuclear plants",
+      "myth_statement": "Radiation only comes from nuclear plants.",
+      "reality": "It also comes from cosmic rays, soil, and our bodies.",
+      "explanation": "This statement is a common myth in nuclear science.\n\n**Reality:** It also comes from cosmic rays, soil, and our bodies.",
+      "category": "safety",
+      "difficulty": "medium",
+      "sources": [
+        {
+          "title": "Sources and Effects of Ionizing Radiation",
+          "url": "https://www.unscear.org/unscear/en/publications.html",
+          "author": "UNSCEAR",
+          "type": "official"
+        },
+        {
+          "title": "Radiation in Everyday Life",
+          "url": "https://www.iaea.org/topics/radiation-in-everyday-life",
+          "author": "IAEA",
+          "type": "official"
+        },
+        {
+          "title": "Safety of Nuclear Power Reactors",
+          "url": "https://www.world-nuclear.org/information-library/safety-and-security/safety-of-plants/safety-of-nuclear-power-reactors.aspx",
+          "author": "World Nuclear Association",
+          "type": "official"
+        }
+      ],
+      "related_facts": [],
+      "related_lessons": [],
+      "image": null,
+      "tags": [
+        "mythbuster",
+        "nuclear",
+        "radiation",
+        "safety",
+        "medium"
+      ],
+      "popularity": 8
+    },
+    {
+      "id": "myths-facts-17",
+      "title": "Protective suits block all radiation",
+      "myth_statement": "Protective suits block all radiation.",
+      "reality": "They mainly prevent contamination, not all radiation.",
+      "explanation": "This statement is a common myth in nuclear science.\n\n**Reality:** They mainly prevent contamination, not all radiation.",
+      "category": "safety",
+      "difficulty": "medium",
+      "sources": [
+        {
+          "title": "Sources and Effects of Ionizing Radiation",
+          "url": "https://www.unscear.org/unscear/en/publications.html",
+          "author": "UNSCEAR",
+          "type": "official"
+        },
+        {
+          "title": "Radiation in Everyday Life",
+          "url": "https://www.iaea.org/topics/radiation-in-everyday-life",
+          "author": "IAEA",
+          "type": "official"
+        },
+        {
+          "title": "Safety of Nuclear Power Reactors",
+          "url": "https://www.world-nuclear.org/information-library/safety-and-security/safety-of-plants/safety-of-nuclear-power-reactors.aspx",
+          "author": "World Nuclear Association",
+          "type": "official"
+        }
+      ],
+      "related_facts": [],
+      "related_lessons": [],
+      "image": null,
+      "tags": [
+        "mythbuster",
+        "nuclear",
+        "radiation",
+        "safety",
+        "medium"
+      ],
+      "popularity": 8
+    },
+    {
+      "id": "myths-facts-18",
+      "title": "All nuclear waste is highly dangerous forever",
+      "myth_statement": "All nuclear waste is highly dangerous forever.",
+      "reality": "Some waste has short half-lives.",
+      "explanation": "This statement is a common myth in nuclear science.\n\n**Reality:** Some waste has short half-lives.",
+      "category": "safety",
+      "difficulty": "medium",
+      "sources": [
+        {
+          "title": "Sources and Effects of Ionizing Radiation",
+          "url": "https://www.unscear.org/unscear/en/publications.html",
+          "author": "UNSCEAR",
+          "type": "official"
+        },
+        {
+          "title": "Radiation in Everyday Life",
+          "url": "https://www.iaea.org/topics/radiation-in-everyday-life",
+          "author": "IAEA",
+          "type": "official"
+        },
+        {
+          "title": "Safety of Nuclear Power Reactors",
+          "url": "https://www.world-nuclear.org/information-library/safety-and-security/safety-of-plants/safety-of-nuclear-power-reactors.aspx",
+          "author": "World Nuclear Association",
+          "type": "official"
+        }
+      ],
+      "related_facts": [],
+      "related_lessons": [],
+      "image": null,
+      "tags": [
+        "mythbuster",
+        "nuclear",
+        "radiation",
+        "safety",
+        "medium"
+      ],
+      "popularity": 8
+    },
+    {
+      "id": "myths-facts-19",
+      "title": "Nuclear energy produces the most pollution",
+      "myth_statement": "Nuclear energy produces the most pollution.",
+      "reality": "It produces very low carbon emissions.",
+      "explanation": "This statement is a common myth in nuclear science.\n\n**Reality:** It produces very low carbon emissions.",
+      "category": "safety",
+      "difficulty": "medium",
+      "sources": [
+        {
+          "title": "Sources and Effects of Ionizing Radiation",
+          "url": "https://www.unscear.org/unscear/en/publications.html",
+          "author": "UNSCEAR",
+          "type": "official"
+        },
+        {
+          "title": "Radiation in Everyday Life",
+          "url": "https://www.iaea.org/topics/radiation-in-everyday-life",
+          "author": "IAEA",
+          "type": "official"
+        },
+        {
+          "title": "Safety of Nuclear Power Reactors",
+          "url": "https://www.world-nuclear.org/information-library/safety-and-security/safety-of-plants/safety-of-nuclear-power-reactors.aspx",
+          "author": "World Nuclear Association",
+          "type": "official"
+        }
+      ],
+      "related_facts": [],
+      "related_lessons": [],
+      "image": null,
+      "tags": [
+        "mythbuster",
+        "nuclear",
+        "radiation",
+        "safety",
+        "medium"
+      ],
+      "popularity": 8
+    },
+    {
+      "id": "myths-facts-20",
+      "title": "Radiation can spread like a disease",
+      "myth_statement": "Radiation can spread like a disease.",
+      "reality": "Radiation itself does not spread; contamination can.",
+      "explanation": "This statement is a common myth in nuclear science.\n\n**Reality:** Radiation itself does not spread; contamination can.",
+      "category": "safety",
+      "difficulty": "medium",
+      "sources": [
+        {
+          "title": "Sources and Effects of Ionizing Radiation",
+          "url": "https://www.unscear.org/unscear/en/publications.html",
+          "author": "UNSCEAR",
+          "type": "official"
+        },
+        {
+          "title": "Radiation in Everyday Life",
+          "url": "https://www.iaea.org/topics/radiation-in-everyday-life",
+          "author": "IAEA",
+          "type": "official"
+        },
+        {
+          "title": "Safety of Nuclear Power Reactors",
+          "url": "https://www.world-nuclear.org/information-library/safety-and-security/safety-of-plants/safety-of-nuclear-power-reactors.aspx",
+          "author": "World Nuclear Association",
+          "type": "official"
+        }
+      ],
+      "related_facts": [],
+      "related_lessons": [],
+      "image": null,
+      "tags": [
+        "mythbuster",
+        "nuclear",
+        "radiation",
+        "safety",
+        "medium"
+      ],
+      "popularity": 8
+    },
+    {
+      "id": "myths-facts-21",
+      "title": "If something is radioactive, it is automatically dangerous",
+      "myth_statement": "If something is radioactive, it is automatically dangerous.",
+      "reality": "Risk depends on dose, type, and exposure.",
+      "explanation": "This statement is a common myth in nuclear science.\n\n**Reality:** Risk depends on dose, type, and exposure.",
+      "category": "reactors",
+      "difficulty": "hard",
+      "sources": [
+        {
+          "title": "Sources and Effects of Ionizing Radiation",
+          "url": "https://www.unscear.org/unscear/en/publications.html",
+          "author": "UNSCEAR",
+          "type": "official"
+        },
+        {
+          "title": "Radiation in Everyday Life",
+          "url": "https://www.iaea.org/topics/radiation-in-everyday-life",
+          "author": "IAEA",
+          "type": "official"
+        },
+        {
+          "title": "Safety of Nuclear Power Reactors",
+          "url": "https://www.world-nuclear.org/information-library/safety-and-security/safety-of-plants/safety-of-nuclear-power-reactors.aspx",
+          "author": "World Nuclear Association",
+          "type": "official"
+        }
+      ],
+      "related_facts": [],
+      "related_lessons": [],
+      "image": null,
+      "tags": [
+        "mythbuster",
+        "nuclear",
+        "radiation",
+        "reactors",
+        "hard"
+      ],
+      "popularity": 7
+    },
+    {
+      "id": "myths-facts-22",
+      "title": "Nuclear energy is outdated technology",
+      "myth_statement": "Nuclear energy is outdated technology.",
+      "reality": "New technologies like SMRs are advancing.",
+      "explanation": "This statement is a common myth in nuclear science.\n\n**Reality:** New technologies like SMRs are advancing.",
+      "category": "reactors",
+      "difficulty": "hard",
+      "sources": [
+        {
+          "title": "Sources and Effects of Ionizing Radiation",
+          "url": "https://www.unscear.org/unscear/en/publications.html",
+          "author": "UNSCEAR",
+          "type": "official"
+        },
+        {
+          "title": "Radiation in Everyday Life",
+          "url": "https://www.iaea.org/topics/radiation-in-everyday-life",
+          "author": "IAEA",
+          "type": "official"
+        },
+        {
+          "title": "Safety of Nuclear Power Reactors",
+          "url": "https://www.world-nuclear.org/information-library/safety-and-security/safety-of-plants/safety-of-nuclear-power-reactors.aspx",
+          "author": "World Nuclear Association",
+          "type": "official"
+        }
+      ],
+      "related_facts": [],
+      "related_lessons": [],
+      "image": null,
+      "tags": [
+        "mythbuster",
+        "nuclear",
+        "radiation",
+        "reactors",
+        "hard"
+      ],
+      "popularity": 7
+    },
+    {
+      "id": "myths-facts-23",
+      "title": "Radiation exposure is always detectable by humans",
+      "myth_statement": "Radiation exposure is always detectable by humans.",
+      "reality": "Radiation is invisible and requires instruments.",
+      "explanation": "This statement is a common myth in nuclear science.\n\n**Reality:** Radiation is invisible and requires instruments.",
+      "category": "reactors",
+      "difficulty": "hard",
+      "sources": [
+        {
+          "title": "Sources and Effects of Ionizing Radiation",
+          "url": "https://www.unscear.org/unscear/en/publications.html",
+          "author": "UNSCEAR",
+          "type": "official"
+        },
+        {
+          "title": "Radiation in Everyday Life",
+          "url": "https://www.iaea.org/topics/radiation-in-everyday-life",
+          "author": "IAEA",
+          "type": "official"
+        },
+        {
+          "title": "Safety of Nuclear Power Reactors",
+          "url": "https://www.world-nuclear.org/information-library/safety-and-security/safety-of-plants/safety-of-nuclear-power-reactors.aspx",
+          "author": "World Nuclear Association",
+          "type": "official"
+        }
+      ],
+      "related_facts": [],
+      "related_lessons": [],
+      "image": null,
+      "tags": [
+        "mythbuster",
+        "nuclear",
+        "radiation",
+        "reactors",
+        "hard"
+      ],
+      "popularity": 7
+    },
+    {
+      "id": "myths-facts-24",
+      "title": "Depleted uranium is useless waste",
+      "myth_statement": "Depleted uranium is useless waste.",
+      "reality": "It has industrial and defense uses.",
+      "explanation": "This statement is a common myth in nuclear science.\n\n**Reality:** It has industrial and defense uses.",
+      "category": "reactors",
+      "difficulty": "hard",
+      "sources": [
+        {
+          "title": "Sources and Effects of Ionizing Radiation",
+          "url": "https://www.unscear.org/unscear/en/publications.html",
+          "author": "UNSCEAR",
+          "type": "official"
+        },
+        {
+          "title": "Radiation in Everyday Life",
+          "url": "https://www.iaea.org/topics/radiation-in-everyday-life",
+          "author": "IAEA",
+          "type": "official"
+        },
+        {
+          "title": "Safety of Nuclear Power Reactors",
+          "url": "https://www.world-nuclear.org/information-library/safety-and-security/safety-of-plants/safety-of-nuclear-power-reactors.aspx",
+          "author": "World Nuclear Association",
+          "type": "official"
+        }
+      ],
+      "related_facts": [],
+      "related_lessons": [],
+      "image": null,
+      "tags": [
+        "mythbuster",
+        "nuclear",
+        "radiation",
+        "reactors",
+        "hard"
+      ],
+      "popularity": 7
+    },
+    {
+      "id": "myths-facts-25",
+      "title": "Fusion power is already widely used",
+      "myth_statement": "Fusion power is already widely used.",
+      "reality": "It is still under development.",
+      "explanation": "This statement is a common myth in nuclear science.\n\n**Reality:** It is still under development.",
+      "category": "reactors",
+      "difficulty": "hard",
+      "sources": [
+        {
+          "title": "Sources and Effects of Ionizing Radiation",
+          "url": "https://www.unscear.org/unscear/en/publications.html",
+          "author": "UNSCEAR",
+          "type": "official"
+        },
+        {
+          "title": "Radiation in Everyday Life",
+          "url": "https://www.iaea.org/topics/radiation-in-everyday-life",
+          "author": "IAEA",
+          "type": "official"
+        },
+        {
+          "title": "Safety of Nuclear Power Reactors",
+          "url": "https://www.world-nuclear.org/information-library/safety-and-security/safety-of-plants/safety-of-nuclear-power-reactors.aspx",
+          "author": "World Nuclear Association",
+          "type": "official"
+        }
+      ],
+      "related_facts": [],
+      "related_lessons": [],
+      "image": null,
+      "tags": [
+        "mythbuster",
+        "nuclear",
+        "radiation",
+        "reactors",
+        "hard"
+      ],
+      "popularity": 7
+    },
+    {
+      "id": "myths-facts-26",
+      "title": "Nuclear power plants emit greenhouse gases like coal plants",
+      "myth_statement": "Nuclear power plants emit greenhouse gases like coal plants.",
+      "reality": "They have near-zero emissions during operation.",
+      "explanation": "This statement is a common myth in nuclear science.\n\n**Reality:** They have near-zero emissions during operation.",
+      "category": "reactors",
+      "difficulty": "hard",
+      "sources": [
+        {
+          "title": "Sources and Effects of Ionizing Radiation",
+          "url": "https://www.unscear.org/unscear/en/publications.html",
+          "author": "UNSCEAR",
+          "type": "official"
+        },
+        {
+          "title": "Radiation in Everyday Life",
+          "url": "https://www.iaea.org/topics/radiation-in-everyday-life",
+          "author": "IAEA",
+          "type": "official"
+        },
+        {
+          "title": "Safety of Nuclear Power Reactors",
+          "url": "https://www.world-nuclear.org/information-library/safety-and-security/safety-of-plants/safety-of-nuclear-power-reactors.aspx",
+          "author": "World Nuclear Association",
+          "type": "official"
+        }
+      ],
+      "related_facts": [],
+      "related_lessons": [],
+      "image": null,
+      "tags": [
+        "mythbuster",
+        "nuclear",
+        "radiation",
+        "reactors",
+        "hard"
+      ],
+      "popularity": 7
+    },
+    {
+      "id": "myths-facts-27",
+      "title": "Radiation always accumulates in the body",
+      "myth_statement": "Radiation always accumulates in the body.",
+      "reality": "Some radionuclides are naturally eliminated.",
+      "explanation": "This statement is a common myth in nuclear science.\n\n**Reality:** Some radionuclides are naturally eliminated.",
+      "category": "reactors",
+      "difficulty": "hard",
+      "sources": [
+        {
+          "title": "Sources and Effects of Ionizing Radiation",
+          "url": "https://www.unscear.org/unscear/en/publications.html",
+          "author": "UNSCEAR",
+          "type": "official"
+        },
+        {
+          "title": "Radiation in Everyday Life",
+          "url": "https://www.iaea.org/topics/radiation-in-everyday-life",
+          "author": "IAEA",
+          "type": "official"
+        },
+        {
+          "title": "Safety of Nuclear Power Reactors",
+          "url": "https://www.world-nuclear.org/information-library/safety-and-security/safety-of-plants/safety-of-nuclear-power-reactors.aspx",
+          "author": "World Nuclear Association",
+          "type": "official"
+        }
+      ],
+      "related_facts": [],
+      "related_lessons": [],
+      "image": null,
+      "tags": [
+        "mythbuster",
+        "nuclear",
+        "radiation",
+        "reactors",
+        "hard"
+      ],
+      "popularity": 7
+    },
+    {
+      "id": "myths-facts-28",
+      "title": "All countries can easily build nuclear weapons",
+      "myth_statement": "All countries can easily build nuclear weapons.",
+      "reality": "It requires advanced technology and strict regulation.",
+      "explanation": "This statement is a common myth in nuclear science.\n\n**Reality:** It requires advanced technology and strict regulation.",
+      "category": "reactors",
+      "difficulty": "hard",
+      "sources": [
+        {
+          "title": "Sources and Effects of Ionizing Radiation",
+          "url": "https://www.unscear.org/unscear/en/publications.html",
+          "author": "UNSCEAR",
+          "type": "official"
+        },
+        {
+          "title": "Radiation in Everyday Life",
+          "url": "https://www.iaea.org/topics/radiation-in-everyday-life",
+          "author": "IAEA",
+          "type": "official"
+        },
+        {
+          "title": "Safety of Nuclear Power Reactors",
+          "url": "https://www.world-nuclear.org/information-library/safety-and-security/safety-of-plants/safety-of-nuclear-power-reactors.aspx",
+          "author": "World Nuclear Association",
+          "type": "official"
+        }
+      ],
+      "related_facts": [],
+      "related_lessons": [],
+      "image": null,
+      "tags": [
+        "mythbuster",
+        "nuclear",
+        "radiation",
+        "reactors",
+        "hard"
+      ],
+      "popularity": 7
+    },
+    {
+      "id": "myths-facts-29",
+      "title": "Radiation from medical procedures is extremely dangerous",
+      "myth_statement": "Radiation from medical procedures is extremely dangerous.",
+      "reality": "Benefits outweigh the small risks.",
+      "explanation": "This statement is a common myth in nuclear science.\n\n**Reality:** Benefits outweigh the small risks.",
+      "category": "reactors",
+      "difficulty": "hard",
+      "sources": [
+        {
+          "title": "Sources and Effects of Ionizing Radiation",
+          "url": "https://www.unscear.org/unscear/en/publications.html",
+          "author": "UNSCEAR",
+          "type": "official"
+        },
+        {
+          "title": "Radiation in Everyday Life",
+          "url": "https://www.iaea.org/topics/radiation-in-everyday-life",
+          "author": "IAEA",
+          "type": "official"
+        },
+        {
+          "title": "Safety of Nuclear Power Reactors",
+          "url": "https://www.world-nuclear.org/information-library/safety-and-security/safety-of-plants/safety-of-nuclear-power-reactors.aspx",
+          "author": "World Nuclear Association",
+          "type": "official"
+        }
+      ],
+      "related_facts": [],
+      "related_lessons": [],
+      "image": null,
+      "tags": [
+        "mythbuster",
+        "nuclear",
+        "radiation",
+        "reactors",
+        "hard"
+      ],
+      "popularity": 7
+    },
+    {
+      "id": "myths-facts-30",
+      "title": "Nuclear energy is the main source of radiation exposure",
+      "myth_statement": "Nuclear energy is the main source of radiation exposure.",
+      "reality": "Natural background radiation is the main source.",
+      "explanation": "This statement is a common myth in nuclear science.\n\n**Reality:** Natural background radiation is the main source.",
+      "category": "reactors",
+      "difficulty": "hard",
+      "sources": [
+        {
+          "title": "Sources and Effects of Ionizing Radiation",
+          "url": "https://www.unscear.org/unscear/en/publications.html",
+          "author": "UNSCEAR",
+          "type": "official"
+        },
+        {
+          "title": "Radiation in Everyday Life",
+          "url": "https://www.iaea.org/topics/radiation-in-everyday-life",
+          "author": "IAEA",
+          "type": "official"
+        },
+        {
+          "title": "Safety of Nuclear Power Reactors",
+          "url": "https://www.world-nuclear.org/information-library/safety-and-security/safety-of-plants/safety-of-nuclear-power-reactors.aspx",
+          "author": "World Nuclear Association",
+          "type": "official"
+        }
+      ],
+      "related_facts": [],
+      "related_lessons": [],
+      "image": null,
+      "tags": [
+        "mythbuster",
+        "nuclear",
+        "radiation",
+        "reactors",
+        "hard"
+      ],
+      "popularity": 7
+    },
+    {
+      "id": "nuclear-not-clean",
+      "title": "Nuclear Energy Is Not Clean",
+      "myth_statement": "Nuclear power plants pollute the environment and are not a clean energy source",
+      "reality": "Nuclear energy produces zero carbon emissions during operation and has one of the smallest environmental footprints",
+      "explanation": "Nuclear power is one of the cleanest energy sources available:\n\n**Zero Emissions During Operation:**\n- No CO2, methane, or other greenhouse gases\n- No air pollutants like SO2 or NOx\n- Only water vapor from cooling towers\n\n**Minimal Land Use:**\n- A nuclear plant on 1 square mile can power a city\n- Solar needs 75x more land for same power\n- Wind needs 360x more land\n\n**Lifecycle Emissions:**\n- 12g CO2/kWh (including construction)\n- Comparable to wind (11g) and solar (48g)\n- Far better than natural gas (490g) or coal (820g)\n\n**Waste Management:**\n- All waste is contained and monitored\n- Doesn't pollute air, water, or soil\n- Volume is tiny compared to other energy sources",
+      "category": "environment",
+      "difficulty": "easy",
+      "sources": [
+        {
+          "title": "Lifecycle Greenhouse Gas Emissions",
+          "url": "https://www.ipcc.ch/report/ar5/wg3/",
+          "author": "IPCC",
+          "type": "research"
+        },
+        {
+          "title": "Nuclear Energy and the Environment",
+          "url": "https://www.iaea.org/topics/nuclear-power-and-the-environment",
+          "author": "IAEA",
+          "type": "official"
+        },
+        {
+          "title": "Land Use of Energy Sources",
+          "url": "https://www.nei.org/advantages/land-use",
+          "author": "Nuclear Energy Institute",
+          "type": "official"
+        }
+      ],
+      "related_facts": [
+        "carbon-emissions",
+        "land-use-comparison"
+      ],
+      "related_lessons": [],
+      "image": "https://images.unsplash.com/photo-1497436072909-60f360e1d4b1?w=400",
+      "tags": [
+        "environment",
+        "clean-energy",
+        "emissions",
+        "climate"
+      ],
+      "popularity": 10
+    },
+    {
+      "id": "nuclear-plants-explode",
+      "title": "Nuclear Plants Can Explode Like Atomic Bombs",
+      "myth_statement": "Nuclear power plants can explode like nuclear bombs",
+      "reality": "Nuclear reactors cannot explode like bombs - the physics is completely different",
+      "explanation": "This is physically impossible. Nuclear weapons and nuclear reactors operate on fundamentally different principles.\n\n**Why Reactors Can't Explode Like Bombs:**\n- **Enrichment Level**: Reactor fuel is 3-5% enriched uranium; bombs need 90%+ enrichment\n- **Critical Mass**: Reactors are designed to prevent runaway reactions\n- **Geometry**: Bomb design requires precise implosion geometry that doesn't exist in reactors\n- **Control Systems**: Multiple redundant safety systems prevent criticality accidents\n\n**What CAN Happen:**\n- Steam explosions (like Chernobyl) - NOT a nuclear explosion\n- Hydrogen explosions (like Fukushima) - chemical, not nuclear\n- Meltdowns - serious but contained, not explosive\n\n**Historical Evidence:**\nEven in the worst accidents (Chernobyl, Fukushima, Three Mile Island), there was NO nuclear explosion. The Chernobyl explosion was a steam explosion that destroyed the building, not a nuclear yield.\n\nAccording to the Nuclear Energy Agency (NEA), the fundamental physics of nuclear reactors makes a bomb-like explosion impossible.",
+      "category": "safety",
+      "difficulty": "medium",
+      "sources": [
+        {
+          "title": "Nuclear Reactor Safety",
+          "url": "https://www.nei.org/fundamentals/safety",
+          "author": "Nuclear Energy Institute",
+          "type": "official"
+        },
+        {
+          "title": "Can Nuclear Reactors Explode?",
+          "url": "https://www.world-nuclear.org/information-library/safety-and-security/safety-of-plants/safety-of-nuclear-power-reactors.aspx",
+          "author": "World Nuclear Association",
+          "type": "official"
+        }
+      ],
+      "related_facts": [],
+      "related_lessons": [],
+      "image": "https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?w=400",
+      "tags": [
+        "safety",
+        "reactors",
+        "explosions",
+        "misconceptions"
+      ],
+      "popularity": 9
+    },
+    {
+      "id": "nuclear-waste-forever",
+      "title": "Nuclear Waste Lasts Forever",
+      "myth_statement": "Nuclear waste remains dangerous for millions of years and can never be safely disposed of",
+      "reality": "Most nuclear waste becomes safe within 300-500 years, and modern technology can reduce this further",
+      "explanation": "While it's true that some isotopes in nuclear waste have very long half-lives, the vast majority of radioactivity comes from short-lived isotopes that decay within decades. After about 300-500 years, nuclear waste is less radioactive than natural uranium ore.\n\nAdditionally:\n- 97% of \"waste\" can be recycled as fuel\n- Advanced reactors can use current waste as fuel\n- Deep geological storage provides safe isolation\n- Volume is incredibly small compared to other energy waste",
+      "category": "waste",
+      "difficulty": "medium",
+      "sources": [
+        {
+          "title": "Nuclear Waste Management",
+          "url": "https://world-nuclear.org/information-library/nuclear-fuel-cycle/nuclear-waste/radioactive-waste-management.aspx",
+          "author": "World Nuclear Association",
+          "type": "official"
+        },
+        {
+          "title": "The Truth About Nuclear Waste",
+          "url": "https://www.energy.gov/ne/articles/5-fast-facts-about-spent-nuclear-fuel",
+          "author": "U.S. Department of Energy",
+          "type": "official"
+        }
+      ],
+      "related_facts": [
+        "nuclear-waste-volume",
+        "waste-recycling"
+      ],
+      "related_lessons": [],
+      "image": "https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?w=400",
+      "tags": [
+        "waste",
+        "safety",
+        "environment",
+        "storage"
+      ],
+      "popularity": 9
+    },
+    {
+      "id": "radiation-glows-green",
+      "title": "Radiation Glows Green",
+      "myth_statement": "Radioactive materials glow green in the dark",
+      "reality": "Radiation is invisible - the green glow is a Hollywood invention",
+      "explanation": "This misconception comes entirely from movies and TV shows. Real radiation is completely invisible to the human eye.\n\n**The Truth About Radiation:**\n- **Invisible**: Alpha, beta, and gamma radiation cannot be seen\n- **No Color**: Radiation has no inherent color\n- **No Glow**: Radioactive materials don't naturally glow\n\n**Where the Myth Comes From:**\n1. **Radium Paint**: Early 1900s watch dials used radium mixed with phosphorescent paint (the paint glowed, not the radiation)\n2. **Cherenkov Radiation**: In nuclear reactors, water glows BLUE (not green) when particles move faster than light in water\n3. **Hollywood**: Movies use green for dramatic effect\n\n**Real Detection:**\n- Geiger counters detect radiation by sound/clicks\n- Dosimeters measure accumulated exposure\n- Special cameras can visualize radiation indirectly\n- But humans cannot see it directly\n\n**Fun Fact:**\nThe \"green glow\" trope became popular after radium watch dial painters in the 1920s (the \"Radium Girls\") suffered radiation poisoning. The paint glowed green, leading to the association.",
+      "category": "basics",
+      "difficulty": "easy",
+      "sources": [
+        {
+          "title": "Radiation Myths",
+          "url": "https://www.iaea.org/topics/radiation-myths",
+          "author": "IAEA",
+          "type": "official"
+        },
+        {
+          "title": "Cherenkov Radiation Explained",
+          "url": "https://www.aps.org/publications/apsnews/201511/cherenkov.cfm",
+          "author": "American Physical Society",
+          "type": "educational"
+        }
+      ],
+      "related_facts": [],
+      "related_lessons": [],
+      "image": "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=400",
+      "tags": [
+        "radiation",
+        "misconceptions",
+        "basics",
+        "visual"
+      ],
+      "popularity": 8
+    }
+  ]
+}

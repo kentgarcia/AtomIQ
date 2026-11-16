@@ -256,7 +256,7 @@ export default function ElementDetailScreen() {
   useEffect(() => {
     if (!element) return;
     let alive = true;
-    const lessonIds = [...element.relatedLessonIds, "what-is-isotope"];
+    const lessonIds = [...element.relatedLessonIds, "isotopes"];
     const termIds = [...element.relatedTerms, "isotope", "atomic-number"];
     Promise.all([
       Promise.all(
@@ -457,8 +457,8 @@ export default function ElementDetailScreen() {
             <View style={styles.pills}>
               <Pressable
                 accessibilityRole="link"
-                accessibilityLabel={`Read the lesson: ${lessonTitles["what-is-isotope"] ?? "What is an Isotope?"}`}
-                onPress={() => openLesson("what-is-isotope")}
+                accessibilityLabel={`Read the lesson: ${lessonTitles["isotopes"] ?? "What is an Isotope?"}`}
+                onPress={() => openLesson("isotopes")}
                 style={styles.pill}
               >
                 <Icon name="Book1" size={16} color={theme.colors.primary} variant="Bold" />

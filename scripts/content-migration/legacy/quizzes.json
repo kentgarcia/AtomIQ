@@ -1,0 +1,1315 @@
+[
+  {
+    "id": "atomic-basics-quiz",
+    "title": "Atomic Basics: The Safety Inspection",
+    "description": "Test your knowledge of atoms, isotopes, and natural radiation!",
+    "category": "",
+    "difficulty": "beginner",
+    "passing_score": 70,
+    "xp_reward": 100,
+    "time_limit": null,
+    "unit_id": "atomic-playground",
+    "estimated_minutes": 10,
+    "metadata": {
+      "category": "atomic-basics",
+      "tags": [
+        "atoms",
+        "isotopes",
+        "radiation",
+        "basics"
+      ],
+      "difficulty": "beginner",
+      "version": "1.0",
+      "author": "AtomIQ Team",
+      "lastUpdated": "2025-11-23"
+    },
+    "tags": [
+      "quiz",
+      "atoms",
+      "isotopes",
+      "radiation",
+      "unit1"
+    ],
+    "created_at": 1786792284,
+    "updated_at": 1786792284,
+    "questions": [
+      {
+        "quiz_id": "atomic-basics-quiz",
+        "id": "q1",
+        "position": 0,
+        "type": "multiple_choice",
+        "question": "What particle in an atom determines which element it is?",
+        "options": [
+          "Neutrons",
+          "Protons",
+          "Electrons",
+          "Quarks"
+        ],
+        "correct_answer": 1,
+        "explanation": "The number of protons (atomic number) determines the element. Carbon always has 6 protons, oxygen has 8, uranium has 92, etc. Change the proton count, and you have a different element!",
+        "difficulty": "easy",
+        "points": 10,
+        "image": null,
+        "time_limit": 30,
+        "created_at": 1786792284,
+        "updated_at": 1786792284
+      },
+      {
+        "quiz_id": "atomic-basics-quiz",
+        "id": "q2",
+        "position": 1,
+        "type": "multiple_choice",
+        "question": "What are isotopes?",
+        "options": [
+          "Atoms with different numbers of protons",
+          "Atoms with different numbers of neutrons",
+          "Atoms with different numbers of electrons",
+          "Atoms from different elements"
+        ],
+        "correct_answer": 1,
+        "explanation": "Isotopes are atoms of the same element (same protons) with different numbers of neutrons. For example, Carbon-12 and Carbon-14 are both carbon (6 protons) but have 6 and 8 neutrons respectively.",
+        "difficulty": "easy",
+        "points": 10,
+        "image": null,
+        "time_limit": 30,
+        "created_at": 1786792284,
+        "updated_at": 1786792284
+      },
+      {
+        "quiz_id": "atomic-basics-quiz",
+        "id": "q3",
+        "position": 2,
+        "type": "true_false",
+        "question": "All isotopes are radioactive and dangerous.",
+        "options": [
+          "True",
+          "False"
+        ],
+        "correct_answer": 1,
+        "explanation": "False! Most isotopes are completely stable. You're made mostly of stable isotopes like Carbon-12, Oxygen-16, and Nitrogen-14. Only isotopes with unstable neutron-to-proton ratios are radioactive.",
+        "difficulty": "easy",
+        "points": 10,
+        "image": null,
+        "time_limit": 20,
+        "created_at": 1786792284,
+        "updated_at": 1786792284
+      },
+      {
+        "quiz_id": "atomic-basics-quiz",
+        "id": "q4",
+        "position": 3,
+        "type": "multiple_choice",
+        "question": "An atom has 8 protons, 8 neutrons, and 10 electrons. What is it?",
+        "options": [
+          "A neutral oxygen atom",
+          "An oxygen ion (O²⁻)",
+          "A nitrogen atom",
+          "A neon atom"
+        ],
+        "correct_answer": 1,
+        "explanation": "8 protons = oxygen (atomic number 8). But it has 10 electrons (2 more than protons), making it negatively charged: O²⁻ ion. Neutral oxygen would have 8 electrons.",
+        "difficulty": "easy",
+        "points": 15,
+        "image": null,
+        "time_limit": 45,
+        "created_at": 1786792284,
+        "updated_at": 1786792284
+      },
+      {
+        "quiz_id": "atomic-basics-quiz",
+        "id": "q5",
+        "position": 4,
+        "type": "multiple_choice",
+        "question": "What percentage of average human radiation exposure comes from natural sources?",
+        "options": [
+          "20%",
+          "50%",
+          "80%",
+          "100%"
+        ],
+        "correct_answer": 2,
+        "explanation": "About 80% comes from natural sources: cosmic rays (space), terrestrial radiation (rocks/soil), radon gas, and internal sources (potassium-40 in our bodies). Only ~20% comes from human activities, mostly medical procedures.",
+        "difficulty": "easy",
+        "points": 10,
+        "image": null,
+        "time_limit": 30,
+        "created_at": 1786792284,
+        "updated_at": 1786792284
+      },
+      {
+        "quiz_id": "atomic-basics-quiz",
+        "id": "q6",
+        "position": 5,
+        "type": "multiple_choice",
+        "question": "Which is the LARGEST natural source of radiation exposure for most people?",
+        "options": [
+          "Cosmic rays from space",
+          "Radon gas",
+          "Bananas (potassium-40)",
+          "Granite countertops"
+        ],
+        "correct_answer": 1,
+        "explanation": "Radon gas is the largest single source of natural radiation exposure, contributing about 50% of our natural background dose. It comes from uranium decay in rocks and soil and can accumulate in basements.",
+        "difficulty": "easy",
+        "points": 10,
+        "image": null,
+        "time_limit": 30,
+        "created_at": 1786792284,
+        "updated_at": 1786792284
+      },
+      {
+        "quiz_id": "atomic-basics-quiz",
+        "id": "q7",
+        "position": 6,
+        "type": "true_false",
+        "question": "Living in Denver, Colorado exposes you to more cosmic radiation than living at sea level.",
+        "options": [
+          "True",
+          "False"
+        ],
+        "correct_answer": 0,
+        "explanation": "True! Denver is at high altitude (~1 mile above sea level), so there's less atmosphere to shield cosmic rays from space. People in Denver receive about 2x more cosmic radiation than people at sea level.",
+        "difficulty": "easy",
+        "points": 10,
+        "image": null,
+        "time_limit": 20,
+        "created_at": 1786792284,
+        "updated_at": 1786792284
+      },
+      {
+        "quiz_id": "atomic-basics-quiz",
+        "id": "q8",
+        "position": 7,
+        "type": "multiple_choice",
+        "question": "What makes an isotope unstable (radioactive)?",
+        "options": [
+          "Too many protons",
+          "Imbalanced neutron-to-proton ratio",
+          "Too many electrons",
+          "Exposure to radiation"
+        ],
+        "correct_answer": 1,
+        "explanation": "An imbalanced neutron-to-proton ratio makes isotopes unstable. Too many or too few neutrons causes the nucleus to decay, emitting radiation to reach a more stable configuration.",
+        "difficulty": "easy",
+        "points": 10,
+        "image": null,
+        "time_limit": 30,
+        "created_at": 1786792284,
+        "updated_at": 1786792284
+      },
+      {
+        "quiz_id": "atomic-basics-quiz",
+        "id": "q9",
+        "position": 8,
+        "type": "multiple_choice",
+        "question": "Where are protons and neutrons located in an atom?",
+        "options": [
+          "In the electron shells",
+          "In the nucleus (center)",
+          "Orbiting around the nucleus",
+          "Randomly distributed"
+        ],
+        "correct_answer": 1,
+        "explanation": "Protons and neutrons are in the nucleus at the center of the atom. The nucleus is incredibly dense and tiny - if an atom were the size of a football stadium, the nucleus would be the size of a marble at the center!",
+        "difficulty": "easy",
+        "points": 10,
+        "image": null,
+        "time_limit": 25,
+        "created_at": 1786792284,
+        "updated_at": 1786792284
+      },
+      {
+        "quiz_id": "atomic-basics-quiz",
+        "id": "q10",
+        "position": 9,
+        "type": "multiple_choice",
+        "question": "Carbon-14 is used in carbon dating. Why does it work?",
+        "options": [
+          "C-14 is stable forever",
+          "C-14 decays at a predictable rate (half-life)",
+          "C-14 glows in the dark",
+          "C-14 is magnetic"
+        ],
+        "correct_answer": 1,
+        "explanation": "Carbon-14 is radioactive and decays at a predictable rate (half-life of 5,730 years). Living things constantly replace C-14, but when they die, the C-14 starts decaying. By measuring how much C-14 remains, we can determine how long ago the organism died!",
+        "difficulty": "easy",
+        "points": 15,
+        "image": null,
+        "time_limit": 45,
+        "created_at": 1786792284,
+        "updated_at": 1786792284
+      }
+    ]
+  },
+  {
+    "id": "everyday-nuclear-quiz",
+    "title": "Nuclear in Everyday Life",
+    "description": "See how nuclear tech shows up in health, food, and industry.",
+    "category": "everyday-nuclear",
+    "difficulty": "medium",
+    "passing_score": 70,
+    "xp_reward": 80,
+    "time_limit": 420,
+    "unit_id": null,
+    "estimated_minutes": null,
+    "metadata": {},
+    "tags": [
+      "medicine",
+      "industry",
+      "environment",
+      "unit4"
+    ],
+    "created_at": 1786792285,
+    "updated_at": 1786792285,
+    "questions": [
+      {
+        "quiz_id": "everyday-nuclear-quiz",
+        "id": "q1",
+        "position": 0,
+        "type": "multiple_choice",
+        "question": "Which medical use relies on radiation to image inside the body?",
+        "options": [
+          "MRI",
+          "PET scan",
+          "Ultrasound",
+          "Stethoscope"
+        ],
+        "correct_answer": 1,
+        "explanation": "PET scans use positron-emitting tracers to produce detailed images.",
+        "difficulty": "easy",
+        "points": 12,
+        "image": null,
+        "time_limit": null,
+        "created_at": 1786792285,
+        "updated_at": 1786792285
+      },
+      {
+        "quiz_id": "everyday-nuclear-quiz",
+        "id": "q2",
+        "position": 1,
+        "type": "multiple_choice",
+        "question": "Food irradiation primarily helps with what?",
+        "options": [
+          "Adding flavor",
+          "Preserving freshness by killing microbes",
+          "Cooking food",
+          "Changing color"
+        ],
+        "correct_answer": 1,
+        "explanation": "Irradiation kills bacteria and pests to improve safety and shelf life.",
+        "difficulty": "easy",
+        "points": 10,
+        "image": null,
+        "time_limit": null,
+        "created_at": 1786792285,
+        "updated_at": 1786792285
+      },
+      {
+        "quiz_id": "everyday-nuclear-quiz",
+        "id": "q3",
+        "position": 2,
+        "type": "multiple_choice",
+        "question": "Which industrial use relies on radiation to gauge the thickness of a material?",
+        "options": [
+          "Construction cranes",
+          "Paper/steel rolling mills",
+          "Text editing",
+          "Cloud storage"
+        ],
+        "correct_answer": 1,
+        "explanation": "Beta/gamma gauges measure material thickness in paper and steel production.",
+        "difficulty": "medium",
+        "points": 14,
+        "image": null,
+        "time_limit": null,
+        "created_at": 1786792285,
+        "updated_at": 1794587927
+      },
+      {
+        "quiz_id": "everyday-nuclear-quiz",
+        "id": "q4",
+        "position": 3,
+        "type": "true_false",
+        "question": "Smoke detectors often use a tiny radioactive source to sense smoke.",
+        "options": [
+          "True",
+          "False"
+        ],
+        "correct_answer": 0,
+        "explanation": "Ionization smoke detectors use a minute americium-241 source to detect smoke particles.",
+        "difficulty": "easy",
+        "points": 10,
+        "image": null,
+        "time_limit": null,
+        "created_at": 1786792285,
+        "updated_at": 1786792285
+      },
+      {
+        "quiz_id": "everyday-nuclear-quiz",
+        "id": "q5",
+        "position": 4,
+        "type": "multiple_choice",
+        "question": "What is a key environmental benefit of nuclear power?",
+        "options": [
+          "Zero water use",
+          "Near-zero operational carbon emissions",
+          "Requires no mining",
+          "Runs without fuel"
+        ],
+        "correct_answer": 1,
+        "explanation": "Nuclear plants generate electricity with very low operational CO2 emissions.",
+        "difficulty": "medium",
+        "points": 14,
+        "image": null,
+        "time_limit": null,
+        "created_at": 1786792285,
+        "updated_at": 1786792285
+      }
+    ]
+  },
+  {
+    "id": "nuclear-reactions-quiz",
+    "title": "Nuclear Reactions Checkpoint",
+    "description": "Review fission, fusion, and radioactive decay before wrapping up Unit 2.",
+    "category": "nuclear-reactions",
+    "difficulty": "medium",
+    "passing_score": 70,
+    "xp_reward": 90,
+    "time_limit": 420,
+    "unit_id": null,
+    "estimated_minutes": null,
+    "metadata": {},
+    "tags": [
+      "fission",
+      "fusion",
+      "decay",
+      "unit2"
+    ],
+    "created_at": 1786792285,
+    "updated_at": 1786792285,
+    "questions": [
+      {
+        "quiz_id": "nuclear-reactions-quiz",
+        "id": "q1",
+        "position": 0,
+        "type": "multiple_choice",
+        "question": "What is the key difference between fission and fusion?",
+        "options": [
+          "Fission splits heavy nuclei; fusion joins light nuclei",
+          "Fission joins light nuclei; fusion splits heavy nuclei",
+          "Both split heavy nuclei",
+          "Both join light nuclei"
+        ],
+        "correct_answer": 0,
+        "explanation": "Fission splits heavy nuclei like U-235, releasing energy and neutrons. Fusion joins light nuclei like hydrogen isotopes, releasing even more energy per reaction.",
+        "difficulty": "easy",
+        "points": 12,
+        "image": null,
+        "time_limit": null,
+        "created_at": 1786792285,
+        "updated_at": 1786792285
+      },
+      {
+        "quiz_id": "nuclear-reactions-quiz",
+        "id": "q2",
+        "position": 1,
+        "type": "multiple_choice",
+        "question": "Why can a power reactor not explode like a nuclear bomb?",
+        "options": [
+          "Reactor fuel is not enriched enough and the design keeps the chain reaction controlled",
+          "Reactors have no neutrons",
+          "Reactors do not use uranium",
+          "Reactors operate in a vacuum"
+        ],
+        "correct_answer": 0,
+        "explanation": "Reactor fuel is only a few percent enriched and is moderated and controlled by control rods and coolant. Bombs need very high enrichment and a rapid, uncontrolled supercritical assembly.",
+        "difficulty": "medium",
+        "points": 14,
+        "image": null,
+        "time_limit": null,
+        "created_at": 1786792285,
+        "updated_at": 1786792285
+      },
+      {
+        "quiz_id": "nuclear-reactions-quiz",
+        "id": "q3",
+        "position": 2,
+        "type": "multiple_choice",
+        "question": "What do control rods do in a fission reactor?",
+        "options": [
+          "Create more fuel",
+          "Absorb neutrons to regulate the chain reaction",
+          "Increase coolant flow",
+          "Speed up fission with heat"
+        ],
+        "correct_answer": 1,
+        "explanation": "Control rods made from materials like boron or cadmium absorb excess neutrons, keeping the reactor at a steady, critical state.",
+        "difficulty": "easy",
+        "points": 10,
+        "image": null,
+        "time_limit": null,
+        "created_at": 1786792285,
+        "updated_at": 1786792285
+      },
+      {
+        "quiz_id": "nuclear-reactions-quiz",
+        "id": "q4",
+        "position": 3,
+        "type": "multiple_choice",
+        "question": "Which challenge makes fusion hard to achieve on Earth?",
+        "options": [
+          "Lack of hydrogen fuel",
+          "Need to overcome the repulsion between positively charged nuclei",
+          "Fusion produces no energy",
+          "Fusion requires enriched uranium"
+        ],
+        "correct_answer": 1,
+        "explanation": "Positively charged nuclei repel each other. Fusion needs extremely high temperatures and/or pressures plus good confinement to push them close enough to fuse.",
+        "difficulty": "medium",
+        "points": 14,
+        "image": null,
+        "time_limit": null,
+        "created_at": 1786792285,
+        "updated_at": 1786792285
+      },
+      {
+        "quiz_id": "nuclear-reactions-quiz",
+        "id": "q5",
+        "position": 4,
+        "type": "true_false",
+        "question": "Gamma decay changes an element into a different element.",
+        "options": [
+          "True",
+          "False"
+        ],
+        "correct_answer": 1,
+        "explanation": "Gamma decay only releases energy as photons. It leaves the proton and neutron counts unchanged, so the element stays the same.",
+        "difficulty": "easy",
+        "points": 10,
+        "image": null,
+        "time_limit": null,
+        "created_at": 1786792285,
+        "updated_at": 1786792285
+      },
+      {
+        "quiz_id": "nuclear-reactions-quiz",
+        "id": "q6",
+        "position": 5,
+        "type": "multiple_choice",
+        "question": "What does a half-life describe?",
+        "options": [
+          "Time for all radioactive atoms to decay",
+          "Time for half of a radioactive sample to decay",
+          "Time for radiation to become dangerous",
+          "Time for a reactor to reach full power"
+        ],
+        "correct_answer": 1,
+        "explanation": "Half-life is the predictable time it takes for half of the radioactive nuclei in a sample to decay.",
+        "difficulty": "easy",
+        "points": 10,
+        "image": null,
+        "time_limit": null,
+        "created_at": 1786792285,
+        "updated_at": 1786792285
+      },
+      {
+        "quiz_id": "nuclear-reactions-quiz",
+        "id": "q7",
+        "position": 6,
+        "type": "multiple_choice",
+        "question": "Which reaction powers the Sun?",
+        "options": [
+          "Uranium-235 fission",
+          "Hydrogen fusion",
+          "Plutonium fission",
+          "Alpha decay"
+        ],
+        "correct_answer": 1,
+        "explanation": "The Sun and all stars shine because of hydrogen fusion—mainly the fusion of hydrogen nuclei into helium.",
+        "difficulty": "easy",
+        "points": 10,
+        "image": null,
+        "time_limit": null,
+        "created_at": 1786792285,
+        "updated_at": 1786792285
+      }
+    ]
+  },
+  {
+    "id": "radiation-effects-quiz",
+    "title": "Radiation Effects Checkpoint",
+    "description": "Test how radiation interacts with people and matter.",
+    "category": "radiation-effects",
+    "difficulty": "medium",
+    "passing_score": 70,
+    "xp_reward": 80,
+    "time_limit": 420,
+    "unit_id": null,
+    "estimated_minutes": null,
+    "metadata": {},
+    "tags": [
+      "radiation",
+      "health",
+      "effects",
+      "unit3"
+    ],
+    "created_at": 1786792285,
+    "updated_at": 1786792285,
+    "questions": [
+      {
+        "quiz_id": "radiation-effects-quiz",
+        "id": "q1",
+        "position": 0,
+        "type": "multiple_choice",
+        "question": "Which type of radiation is most penetrating?",
+        "options": [
+          "Alpha",
+          "Beta",
+          "Gamma",
+          "Visible light"
+        ],
+        "correct_answer": 2,
+        "explanation": "Gamma rays are highly penetrating electromagnetic waves; alpha is the least penetrating.",
+        "difficulty": "easy",
+        "points": 12,
+        "image": null,
+        "time_limit": null,
+        "created_at": 1786792285,
+        "updated_at": 1786792285
+      },
+      {
+        "quiz_id": "radiation-effects-quiz",
+        "id": "q2",
+        "position": 1,
+        "type": "multiple_choice",
+        "question": "What does half-life describe?",
+        "options": [
+          "Time for all atoms to decay",
+          "Time for half of a sample to decay",
+          "Time until radiation is harmless",
+          "Time to double activity"
+        ],
+        "correct_answer": 1,
+        "explanation": "Half-life is the predictable time for 50% of a radioactive sample to decay.",
+        "difficulty": "easy",
+        "points": 10,
+        "image": null,
+        "time_limit": null,
+        "created_at": 1786792285,
+        "updated_at": 1786792285
+      },
+      {
+        "quiz_id": "radiation-effects-quiz",
+        "id": "q3",
+        "position": 2,
+        "type": "multiple_choice",
+        "question": "Which health effect is linked to high acute radiation dose?",
+        "options": [
+          "Sunburn",
+          "Acute radiation syndrome",
+          "Common cold",
+          "Allergy"
+        ],
+        "correct_answer": 1,
+        "explanation": "A large, short-term dose can cause acute radiation syndrome; lower doses spread over time generally do not.",
+        "difficulty": "medium",
+        "points": 14,
+        "image": null,
+        "time_limit": null,
+        "created_at": 1786792285,
+        "updated_at": 1786792285
+      },
+      {
+        "quiz_id": "radiation-effects-quiz",
+        "id": "q4",
+        "position": 3,
+        "type": "true_false",
+        "question": "Radiation from a medical X-ray makes you radioactive afterward.",
+        "options": [
+          "True",
+          "False"
+        ],
+        "correct_answer": 1,
+        "explanation": "Diagnostic X-rays pass through the body; they do not leave you radioactive.",
+        "difficulty": "easy",
+        "points": 10,
+        "image": null,
+        "time_limit": null,
+        "created_at": 1786792285,
+        "updated_at": 1786792285
+      },
+      {
+        "quiz_id": "radiation-effects-quiz",
+        "id": "q5",
+        "position": 4,
+        "type": "multiple_choice",
+        "question": "Which everyday source contributes the most natural background dose for most people?",
+        "options": [
+          "Cosmic rays",
+          "Radon gas",
+          "Food potassium-40",
+          "Air travel"
+        ],
+        "correct_answer": 1,
+        "explanation": "Radon gas from the ground is usually the largest contributor to natural background dose.",
+        "difficulty": "medium",
+        "points": 14,
+        "image": null,
+        "time_limit": null,
+        "created_at": 1786792285,
+        "updated_at": 1786792285
+      }
+    ]
+  },
+  {
+    "id": "radiation-safety-quiz",
+    "title": "Radiation Safety Basics",
+    "description": "Test your knowledge of radiation safety and protection measures",
+    "category": "safety",
+    "difficulty": "easy",
+    "passing_score": 70,
+    "xp_reward": 30,
+    "time_limit": 300,
+    "unit_id": null,
+    "estimated_minutes": null,
+    "metadata": {},
+    "tags": [
+      "safety",
+      "radiation",
+      "protection"
+    ],
+    "created_at": 1786792285,
+    "updated_at": 1786792285,
+    "questions": [
+      {
+        "quiz_id": "radiation-safety-quiz",
+        "id": "q1",
+        "position": 0,
+        "type": "multiple_choice",
+        "question": "Which type of radiation can be stopped by a sheet of paper?",
+        "options": [
+          "Alpha particles",
+          "Beta particles",
+          "Gamma rays",
+          "X-rays"
+        ],
+        "correct_answer": 0,
+        "explanation": "Alpha particles are the least penetrating form of radiation and can be stopped by a sheet of paper or even the outer layer of skin.",
+        "difficulty": "easy",
+        "points": 10,
+        "image": null,
+        "time_limit": null,
+        "created_at": 1786792285,
+        "updated_at": 1786792285
+      },
+      {
+        "quiz_id": "radiation-safety-quiz",
+        "id": "q2",
+        "position": 1,
+        "type": "multiple_choice",
+        "question": "What is the primary purpose of control rods in a nuclear reactor?",
+        "options": [
+          "To generate electricity",
+          "To absorb neutrons and control the reaction rate",
+          "To cool the reactor",
+          "To produce more fuel"
+        ],
+        "correct_answer": 1,
+        "explanation": "Control rods are made of neutron-absorbing materials like boron or cadmium. They regulate the nuclear chain reaction by absorbing neutrons.",
+        "difficulty": "medium",
+        "points": 15,
+        "image": null,
+        "time_limit": null,
+        "created_at": 1786792285,
+        "updated_at": 1786792285
+      },
+      {
+        "quiz_id": "radiation-safety-quiz",
+        "id": "q3",
+        "position": 2,
+        "type": "true_false",
+        "question": "Nuclear power plants can explode like nuclear bombs.",
+        "options": [
+          "True",
+          "False"
+        ],
+        "correct_answer": 1,
+        "explanation": "False. Nuclear power plants cannot explode like nuclear bombs. The fuel is not enriched enough, and the physics of the reactor design prevents such an explosion.",
+        "difficulty": "easy",
+        "points": 10,
+        "image": null,
+        "time_limit": null,
+        "created_at": 1786792285,
+        "updated_at": 1786792285
+      },
+      {
+        "quiz_id": "radiation-safety-quiz",
+        "id": "q4",
+        "position": 3,
+        "type": "multiple_choice",
+        "question": "What is the half-life of a radioactive substance?",
+        "options": [
+          "The time it takes to become completely safe",
+          "The time it takes for half of the atoms to decay",
+          "The time it takes to reach maximum radiation",
+          "The time it takes to double in size"
+        ],
+        "correct_answer": 1,
+        "explanation": "Half-life is the time required for half of the radioactive atoms in a sample to decay. After each half-life, the radioactivity is reduced by 50%.",
+        "difficulty": "medium",
+        "points": 15,
+        "image": "https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=400",
+        "time_limit": null,
+        "created_at": 1786792285,
+        "updated_at": 1786792285
+      },
+      {
+        "quiz_id": "radiation-safety-quiz",
+        "id": "q5",
+        "position": 4,
+        "type": "multiple_choice",
+        "question": "Which material is most commonly used for gamma radiation shielding?",
+        "options": [
+          "Wood",
+          "Plastic",
+          "Lead",
+          "Aluminum"
+        ],
+        "correct_answer": 2,
+        "explanation": "Lead is the most common material for gamma radiation shielding due to its high density and atomic number, which effectively absorbs gamma rays.",
+        "difficulty": "easy",
+        "points": 10,
+        "image": null,
+        "time_limit": null,
+        "created_at": 1786792285,
+        "updated_at": 1786792285
+      },
+      {
+        "quiz_id": "radiation-safety-quiz",
+        "id": "q6",
+        "position": 5,
+        "type": "multiple_choice",
+        "question": "What does ALARA stand for in radiation safety?",
+        "options": [
+          "Always Leave After Radiation Alert",
+          "As Low As Reasonably Achievable",
+          "Automatic Level Adjustment for Radiation Activity",
+          "Advanced Laboratory for Atomic Research Applications"
+        ],
+        "correct_answer": 1,
+        "explanation": "ALARA (As Low As Reasonably Achievable) is a radiation safety principle that aims to minimize radiation exposure to the lowest practical level.",
+        "difficulty": "hard",
+        "points": 20,
+        "image": null,
+        "time_limit": null,
+        "created_at": 1786792285,
+        "updated_at": 1786792285
+      }
+    ]
+  },
+  {
+    "id": "radiation-types-quiz",
+    "title": "Radiation Types & Shielding",
+    "description": "Identify alpha, beta, and gamma characteristics and how to shield them.",
+    "category": "radiation-types",
+    "difficulty": "easy",
+    "passing_score": 70,
+    "xp_reward": 70,
+    "time_limit": 360,
+    "unit_id": null,
+    "estimated_minutes": null,
+    "metadata": {},
+    "tags": [
+      "alpha",
+      "beta",
+      "gamma",
+      "shielding",
+      "unit6"
+    ],
+    "created_at": 1786792285,
+    "updated_at": 1786792285,
+    "questions": [
+      {
+        "quiz_id": "radiation-types-quiz",
+        "id": "q1",
+        "position": 0,
+        "type": "multiple_choice",
+        "question": "Which barrier is enough to stop alpha particles?",
+        "options": [
+          "Paper",
+          "Aluminum plate",
+          "Thick lead",
+          "No barrier"
+        ],
+        "correct_answer": 0,
+        "explanation": "A sheet of paper or skin stops alpha particles; they are not very penetrating.",
+        "difficulty": "easy",
+        "points": 10,
+        "image": null,
+        "time_limit": null,
+        "created_at": 1786792285,
+        "updated_at": 1794587927
+      },
+      {
+        "quiz_id": "radiation-types-quiz",
+        "id": "q2",
+        "position": 1,
+        "type": "multiple_choice",
+        "question": "Which material is best for shielding beta particles?",
+        "options": [
+          "Air only",
+          "Wood",
+          "Aluminum or plastic",
+          "Gold"
+        ],
+        "correct_answer": 2,
+        "explanation": "Low-density materials like aluminum or plastic effectively stop beta particles.",
+        "difficulty": "easy",
+        "points": 10,
+        "image": null,
+        "time_limit": null,
+        "created_at": 1786792285,
+        "updated_at": 1794587927
+      },
+      {
+        "quiz_id": "radiation-types-quiz",
+        "id": "q3",
+        "position": 2,
+        "type": "multiple_choice",
+        "question": "Which is pure electromagnetic radiation?",
+        "options": [
+          "Alpha",
+          "Beta",
+          "Gamma",
+          "Neutron"
+        ],
+        "correct_answer": 2,
+        "explanation": "Gamma rays are high-energy photons, unlike particle radiation.",
+        "difficulty": "easy",
+        "points": 10,
+        "image": null,
+        "time_limit": null,
+        "created_at": 1786792285,
+        "updated_at": 1786792285
+      },
+      {
+        "quiz_id": "radiation-types-quiz",
+        "id": "q4",
+        "position": 3,
+        "type": "true_false",
+        "question": "Gamma shielding often uses dense materials like lead or concrete.",
+        "options": [
+          "True",
+          "False"
+        ],
+        "correct_answer": 0,
+        "explanation": "Dense materials provide better attenuation for penetrating gamma rays.",
+        "difficulty": "easy",
+        "points": 10,
+        "image": null,
+        "time_limit": null,
+        "created_at": 1786792285,
+        "updated_at": 1786792285
+      },
+      {
+        "quiz_id": "radiation-types-quiz",
+        "id": "q5",
+        "position": 4,
+        "type": "multiple_choice",
+        "question": "Which statement is correct about exposure risk?",
+        "options": [
+          "Alpha is harmless in any situation",
+          "Beta is always more dangerous than gamma",
+          "Alpha is dangerous if inhaled/ingested despite weak penetration",
+          "Gamma cannot cause harm"
+        ],
+        "correct_answer": 2,
+        "explanation": "Alpha cannot penetrate skin but is hazardous if inside the body.",
+        "difficulty": "medium",
+        "points": 12,
+        "image": null,
+        "time_limit": null,
+        "created_at": 1786792285,
+        "updated_at": 1786792285
+      }
+    ]
+  },
+  {
+    "id": "reactor-mechanics-quiz",
+    "title": "Reactor Mechanics Check",
+    "description": "Confirm how reactors control fission and produce power.",
+    "category": "reactor-mechanics",
+    "difficulty": "medium",
+    "passing_score": 70,
+    "xp_reward": 80,
+    "time_limit": 420,
+    "unit_id": null,
+    "estimated_minutes": null,
+    "metadata": {},
+    "tags": [
+      "reactor",
+      "control-rods",
+      "cooling",
+      "unit8"
+    ],
+    "created_at": 1786792285,
+    "updated_at": 1786792285,
+    "questions": [
+      {
+        "quiz_id": "reactor-mechanics-quiz",
+        "id": "q1",
+        "position": 0,
+        "type": "multiple_choice",
+        "question": "What do control rods primarily do?",
+        "options": [
+          "Cool the core",
+          "Absorb neutrons to regulate the chain reaction",
+          "Enrich fuel",
+          "Start turbines"
+        ],
+        "correct_answer": 1,
+        "explanation": "Control rods absorb excess neutrons, keeping the reactor critical but controlled.",
+        "difficulty": "easy",
+        "points": 12,
+        "image": null,
+        "time_limit": null,
+        "created_at": 1786792285,
+        "updated_at": 1786792285
+      },
+      {
+        "quiz_id": "reactor-mechanics-quiz",
+        "id": "q2",
+        "position": 1,
+        "type": "multiple_choice",
+        "question": "Why is coolant flow important?",
+        "options": [
+          "It powers the grid directly",
+          "It removes heat and transfers it to make steam",
+          "It enriches uranium",
+          "It stops radiation"
+        ],
+        "correct_answer": 1,
+        "explanation": "Coolant carries heat from the core to steam generators or turbines for electricity.",
+        "difficulty": "easy",
+        "points": 12,
+        "image": null,
+        "time_limit": null,
+        "created_at": 1786792285,
+        "updated_at": 1786792285
+      },
+      {
+        "quiz_id": "reactor-mechanics-quiz",
+        "id": "q3",
+        "position": 2,
+        "type": "multiple_choice",
+        "question": "Which design feature slows down neutrons in many reactors?",
+        "options": [
+          "Moderator (like water or graphite)",
+          "Vacuum chamber",
+          "Solar panels",
+          "Concrete walls only"
+        ],
+        "correct_answer": 0,
+        "explanation": "Moderators slow neutrons to sustain a thermal fission chain reaction.",
+        "difficulty": "medium",
+        "points": 14,
+        "image": null,
+        "time_limit": null,
+        "created_at": 1786792285,
+        "updated_at": 1786792285
+      },
+      {
+        "quiz_id": "reactor-mechanics-quiz",
+        "id": "q4",
+        "position": 3,
+        "type": "true_false",
+        "question": "Commercial power reactors use weapons-grade highly enriched uranium.",
+        "options": [
+          "True",
+          "False"
+        ],
+        "correct_answer": 1,
+        "explanation": "Power reactors use low-enriched fuel (around 3–5% U-235), far below weapons levels.",
+        "difficulty": "easy",
+        "points": 10,
+        "image": null,
+        "time_limit": null,
+        "created_at": 1786792285,
+        "updated_at": 1786792285
+      },
+      {
+        "quiz_id": "reactor-mechanics-quiz",
+        "id": "q5",
+        "position": 4,
+        "type": "multiple_choice",
+        "question": "What starts the turbines to generate electricity?",
+        "options": [
+          "Direct radiation",
+          "Steam produced from reactor heat",
+          "Magnetic fields alone",
+          "Battery banks"
+        ],
+        "correct_answer": 1,
+        "explanation": "Heat from fission boils water to steam, which spins turbines connected to generators.",
+        "difficulty": "easy",
+        "points": 12,
+        "image": null,
+        "time_limit": null,
+        "created_at": 1786792285,
+        "updated_at": 1786792285
+      }
+    ]
+  },
+  {
+    "id": "safety-security-quiz",
+    "title": "Nuclear Safety & Security",
+    "description": "Check your understanding of reactor safety systems and safeguards.",
+    "category": "safety-security",
+    "difficulty": "medium",
+    "passing_score": 70,
+    "xp_reward": 90,
+    "time_limit": 480,
+    "unit_id": null,
+    "estimated_minutes": null,
+    "metadata": {},
+    "tags": [
+      "safety",
+      "security",
+      "regulation",
+      "unit5"
+    ],
+    "created_at": 1786792285,
+    "updated_at": 1786792285,
+    "questions": [
+      {
+        "quiz_id": "safety-security-quiz",
+        "id": "q1",
+        "position": 0,
+        "type": "multiple_choice",
+        "question": "What is the role of containment buildings?",
+        "options": [
+          "Decorative",
+          "Amplify power",
+          "Provide a barrier to keep radioactivity inside",
+          "Store spent fuel"
+        ],
+        "correct_answer": 2,
+        "explanation": "Containment is a reinforced barrier to prevent radioactive releases.",
+        "difficulty": "easy",
+        "points": 12,
+        "image": null,
+        "time_limit": null,
+        "created_at": 1786792285,
+        "updated_at": 1786792285
+      },
+      {
+        "quiz_id": "safety-security-quiz",
+        "id": "q2",
+        "position": 1,
+        "type": "multiple_choice",
+        "question": "Which international agency sets safety standards and shares best practices?",
+        "options": [
+          "UNICEF",
+          "IAEA",
+          "WHO",
+          "Interpol"
+        ],
+        "correct_answer": 1,
+        "explanation": "The IAEA develops safety standards and coordinates peer reviews among member states.",
+        "difficulty": "medium",
+        "points": 14,
+        "image": null,
+        "time_limit": null,
+        "created_at": 1786792285,
+        "updated_at": 1786792285
+      },
+      {
+        "quiz_id": "safety-security-quiz",
+        "id": "q3",
+        "position": 2,
+        "type": "multiple_choice",
+        "question": "What do physical protection systems guard against?",
+        "options": [
+          "Cyber spam",
+          "Theft or sabotage of nuclear material and facilities",
+          "Weather changes",
+          "Marketing emails"
+        ],
+        "correct_answer": 1,
+        "explanation": "Security systems deter and detect theft or sabotage of nuclear material and assets.",
+        "difficulty": "medium",
+        "points": 14,
+        "image": null,
+        "time_limit": null,
+        "created_at": 1786792285,
+        "updated_at": 1786792285
+      },
+      {
+        "quiz_id": "safety-security-quiz",
+        "id": "q4",
+        "position": 3,
+        "type": "true_false",
+        "question": "Defense-in-depth means relying on a single safety barrier.",
+        "options": [
+          "True",
+          "False"
+        ],
+        "correct_answer": 1,
+        "explanation": "Defense-in-depth uses multiple redundant and diverse safety layers, not just one.",
+        "difficulty": "easy",
+        "points": 10,
+        "image": null,
+        "time_limit": null,
+        "created_at": 1786792285,
+        "updated_at": 1786792285
+      },
+      {
+        "quiz_id": "safety-security-quiz",
+        "id": "q5",
+        "position": 4,
+        "type": "multiple_choice",
+        "question": "What is the main aim of nuclear safeguards?",
+        "options": [
+          "Improve plant efficiency",
+          "Verify nuclear material is not diverted to weapons",
+          "Reduce fuel costs",
+          "Increase reactor temperature"
+        ],
+        "correct_answer": 1,
+        "explanation": "IAEA safeguards include inspections and accounting to ensure peaceful use of nuclear material.",
+        "difficulty": "medium",
+        "points": 14,
+        "image": null,
+        "time_limit": null,
+        "created_at": 1786792285,
+        "updated_at": 1794587927
+      }
+    ]
+  },
+  {
+    "id": "sustainability-quiz",
+    "title": "Sustainability & Waste",
+    "description": "Gauge your grasp of nuclear energy’s environmental footprint and waste.",
+    "category": "sustainability",
+    "difficulty": "medium",
+    "passing_score": 70,
+    "xp_reward": 80,
+    "time_limit": 420,
+    "unit_id": null,
+    "estimated_minutes": null,
+    "metadata": {},
+    "tags": [
+      "environment",
+      "waste",
+      "carbon",
+      "unit9"
+    ],
+    "created_at": 1786792285,
+    "updated_at": 1786792285,
+    "questions": [
+      {
+        "quiz_id": "sustainability-quiz",
+        "id": "q1",
+        "position": 0,
+        "type": "multiple_choice",
+        "question": "Compared to coal, nuclear power emits how much CO₂ during operation?",
+        "options": [
+          "More",
+          "About the same",
+          "Less (near-zero operational emissions)",
+          "Unknown"
+        ],
+        "correct_answer": 2,
+        "explanation": "Nuclear plants have very low operational CO₂ emissions compared to fossil plants.",
+        "difficulty": "easy",
+        "points": 12,
+        "image": null,
+        "time_limit": null,
+        "created_at": 1786792285,
+        "updated_at": 1786792285
+      },
+      {
+        "quiz_id": "sustainability-quiz",
+        "id": "q2",
+        "position": 1,
+        "type": "multiple_choice",
+        "question": "What is the typical strategy for managing used nuclear fuel initially?",
+        "options": [
+          "Open burning",
+          "Deep ocean dumping",
+          "On-site pool cooling then dry cask storage",
+          "Immediate reprocessing only"
+        ],
+        "correct_answer": 2,
+        "explanation": "Fuel is cooled in spent fuel pools, then often moved to robust dry cask storage.",
+        "difficulty": "medium",
+        "points": 14,
+        "image": null,
+        "time_limit": null,
+        "created_at": 1786792285,
+        "updated_at": 1786792285
+      },
+      {
+        "quiz_id": "sustainability-quiz",
+        "id": "q3",
+        "position": 2,
+        "type": "multiple_choice",
+        "question": "Why is high energy density of nuclear fuel an environmental benefit?",
+        "options": [
+          "It reduces transmission losses",
+          "It means far less fuel volume and mining per kWh",
+          "It eliminates all waste",
+          "It increases ash production"
+        ],
+        "correct_answer": 1,
+        "explanation": "High energy density means small fuel amounts produce large energy, reducing mining and material throughput.",
+        "difficulty": "medium",
+        "points": 14,
+        "image": null,
+        "time_limit": null,
+        "created_at": 1786792285,
+        "updated_at": 1786792285
+      },
+      {
+        "quiz_id": "sustainability-quiz",
+        "id": "q4",
+        "position": 3,
+        "type": "true_false",
+        "question": "Long-lived nuclear waste cannot be contained safely.",
+        "options": [
+          "True",
+          "False"
+        ],
+        "correct_answer": 1,
+        "explanation": "Engineered barriers, dry casks, and deep geological repositories are designed to safely isolate long-lived waste.",
+        "difficulty": "easy",
+        "points": 10,
+        "image": null,
+        "time_limit": null,
+        "created_at": 1786792285,
+        "updated_at": 1786792285
+      },
+      {
+        "quiz_id": "sustainability-quiz",
+        "id": "q5",
+        "position": 4,
+        "type": "multiple_choice",
+        "question": "Which description best fits the role nuclear power plays in a clean electricity grid?",
+        "options": [
+          "Intermittent baseload",
+          "Firm low-carbon generation",
+          "High-emission peaker",
+          "Zero capacity factor"
+        ],
+        "correct_answer": 1,
+        "explanation": "Nuclear provides firm, dispatchable low-carbon power that complements variable renewables.",
+        "difficulty": "medium",
+        "points": 14,
+        "image": null,
+        "time_limit": null,
+        "created_at": 1786792285,
+        "updated_at": 1794587927
+      }
+    ]
+  }
+]

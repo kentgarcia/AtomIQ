@@ -19,6 +19,7 @@
  */
 
 import { DatabaseSync } from "node:sqlite";
+import { backupBeforeScript } from "../lib/backup.mjs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -165,6 +166,8 @@ for (const id of scienceDailyIds) {
 // ---------------------------------------------------------------------------
 // Apply
 // ---------------------------------------------------------------------------
+
+if (!dryRun) backupBeforeScript("add-article-pipeline", dbPath); // safety net: scripts/lib/backup.mjs
 
 const db = new DatabaseSync(dbPath);
 db.exec("PRAGMA busy_timeout = 10000");

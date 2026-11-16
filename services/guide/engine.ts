@@ -17,10 +17,11 @@ import type {
   EncyclopediaEntry,
   Journey,
 } from "@/content/explorer/types";
-import type { Lesson, Quiz } from "@/content/types";
+import type { Lesson } from "@/content/curriculum/types";
 
 import {
   type LoadedContent,
+  type PracticeEntry,
   type TopicContent,
   type TopicDef,
   getAvailableTopicIds,
@@ -230,18 +231,18 @@ const lessonCard = (lesson: Lesson, ctx: GuideContext, _content: LoadedContent):
     title: lesson.title,
     subtitle: locked
       ? `Locked • ${getUnitTitle(lesson.unitId) ?? "Lesson"}`
-      : `${getUnitTitle(lesson.unitId) ?? "Lesson"} • ${titleCase(lesson.difficulty ?? "beginner")}`,
+      : `${getUnitTitle(lesson.unitId) ?? "Lesson"} • ${lesson.estimatedMinutes} min`,
     body: lesson.description,
     destination: { screen: "lesson", id: lesson.id },
     ctaLabel: locked ? "Locked" : completed ? "Review Lesson" : "Start Lesson",
     badge: locked ? "Locked" : completed ? "Completed" : isRecommended ? "Recommended" : undefined,
     status: locked ? "locked" : completed ? "completed" : isRecommended ? "recommended" : "available",
-    reward: locked ? undefined : "+20 XP",
-    duration: "5 min",
+    reward: locked ? undefined : `+${lesson.xpReward} XP`,
+    duration: `${lesson.estimatedMinutes} min`,
   };
 };
 
-const quizCard = (quiz: Quiz, ctx: GuideContext, badge?: string): GuideCard => {
+const quizCard = (quiz: PracticeEntry, ctx: GuideContext, badge?: string): GuideCard => {
   const locked = isUnitLocked(quiz.unitId, ctx);
   const completed = ctx.completedIds.includes(quiz.id);
   const isRecommended = !locked && badge === "Needs Review";
@@ -249,11 +250,11 @@ const quizCard = (quiz: Quiz, ctx: GuideContext, badge?: string): GuideCard => {
     kind: "quiz",
     title: quiz.title,
     subtitle: locked
-      ? `Locked • ${getUnitTitle(quiz.unitId) ?? "Quiz"}`
-      : `${getUnitTitle(quiz.unitId) ?? "Quiz"} • ${titleCase(quiz.difficulty ?? "beginner")}`,
+      ? `Locked • ${getUnitTitle(quiz.unitId) ?? "Practice"}`
+      : `${getUnitTitle(quiz.unitId) ?? "Practice"} • ${titleCase(quiz.difficulty ?? "beginner")}`,
     body: quiz.description,
-    destination: { screen: "quiz", id: quiz.id },
-    ctaLabel: locked ? "Locked" : "Take Quiz",
+    destination: { screen: "practice", id: quiz.id },
+    ctaLabel: locked ? "Locked" : quiz.kind === "checkpoint" ? "Take Checkpoint" : "Start Practice",
     badge: locked ? "Locked" : badge ?? (completed ? "Completed" : undefined),
     status: locked ? "locked" : completed && !badge ? "completed" : isRecommended ? "recommended" : "available",
     reward: locked ? undefined : "+50 XP",
@@ -366,7 +367,7 @@ const incompleteLessonsFirst = <T extends { id: string }>(
     return ac - bc;
   });
 
-const topicForQuiz = (quiz: Quiz): TopicDef | undefined => {
+const topicForQuiz = (quiz: PracticeEntry): TopicDef | undefined => {
   const hay = `${quiz.title} ${quiz.description ?? ""} ${(
     quiz.tags ?? []
   ).join(" ")}`.toLowerCase();
@@ -507,7 +508,7 @@ const handleIntent = (
     case "review": {
       const weak = ctx.weakQuizIds
         .map((id) => content.quizzes.find((q) => q.id === id))
-        .filter(Boolean) as Quiz[];
+        .filter(Boolean) as PracticeEntry[];
       if (!weak.length) {
         return guideTurn("You're all caught up — nothing needs review yet!", [
           ...buildIntentPills(ctx),

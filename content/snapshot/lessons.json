@@ -1,0 +1,83 @@
+{
+  "table": "lessons",
+  "primaryKey": [
+    "id"
+  ],
+  "rows": [
+    {
+      "id": "atoms-are-everywhere",
+      "unit_id": "inside-the-atom",
+      "title": "Atoms are everywhere",
+      "description": "Everything you can touch, from your phone to your own hand, is built from atoms. They are far too small to see, so you will use comparisons to get a feel for just how tiny they are. You will also learn what counts as matter and what does not.",
+      "estimated_minutes": 4,
+      "xp_reward": 40,
+      "teaches": [
+        "u1-matter-is-atoms",
+        "u1-atom-scale"
+      ],
+      "relies_on": []
+    },
+    {
+      "id": "elements-and-the-periodic-table",
+      "unit_id": "inside-the-atom",
+      "title": "Elements and the periodic table",
+      "description": "One number decides which element an atom is: how many protons it has. You will learn how that atomic number works. Then you will practise finding an element's symbol and number on the periodic table.",
+      "estimated_minutes": 5,
+      "xp_reward": 50,
+      "teaches": [
+        "u1-atomic-number",
+        "u1-read-the-table"
+      ],
+      "relies_on": [
+        "u1-particles"
+      ]
+    },
+    {
+      "id": "isotopes",
+      "unit_id": "inside-the-atom",
+      "title": "Isotopes",
+      "description": "Atoms of one element always have the same number of protons, but they can have different numbers of neutrons. Those versions are called isotopes. You will work out the particles in an isotope and name it from its numbers.",
+      "estimated_minutes": 5,
+      "xp_reward": 50,
+      "teaches": [
+        "u1-isotope-definition",
+        "u1-mass-number"
+      ],
+      "relies_on": [
+        "u1-particles",
+        "u1-atomic-number"
+      ]
+    },
+    {
+      "id": "protons-neutrons-electrons",
+      "unit_id": "inside-the-atom",
+      "title": "Protons, neutrons, electrons",
+      "description": "Every atom is built from three kinds of particles: protons, neutrons and electrons. You will open one up to see what each particle carries and where it sits. You will also find out why the tiny nucleus holds nearly all of the atom's mass.",
+      "estimated_minutes": 5,
+      "xp_reward": 50,
+      "teaches": [
+        "u1-particles",
+        "u1-nucleus"
+      ],
+      "relies_on": [
+        "u1-matter-is-atoms"
+      ]
+    },
+    {
+      "id": "stable-and-unstable-nuclei",
+      "unit_id": "inside-the-atom",
+      "title": "Stable and unstable nuclei",
+      "description": "A nucleus packs positive protons close together, so something has to stop them from flying apart. You will see how the electric push and the strong force compete. Then you will learn why most nuclei are stable and what happens when one is not.",
+      "estimated_minutes": 5,
+      "xp_reward": 50,
+      "teaches": [
+        "u1-forces-in-nucleus",
+        "u1-stable-unstable"
+      ],
+      "relies_on": [
+        "u1-nucleus",
+        "u1-isotope-definition"
+      ]
+    }
+  ]
+}

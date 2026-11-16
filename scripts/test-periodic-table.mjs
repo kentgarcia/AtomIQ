@@ -239,12 +239,12 @@ test("relatedLessonIds reference real lessons in the content database", () => {
   const db = openDb();
   try {
     const ids = new Set(db.prepare("SELECT id FROM lessons").all().map((r) => r.id));
-    assert.ok(ids.size > 10);
+    assert.ok(ids.size >= 5);
     for (const e of ELEMENTS) {
       assert.equal(new Set(e.relatedLessonIds).size, e.relatedLessonIds.length, `${e.symbol} duplicate lesson links`);
       for (const id of e.relatedLessonIds) assert.ok(ids.has(id), `${e.symbol}: unknown lesson id "${id}"`);
     }
-    assert.ok(ids.has("what-is-isotope"), "detail screen links what-is-isotope");
+    assert.ok(ids.has("isotopes"), "detail screen links the isotopes lesson");
   } finally {
     db.close();
   }

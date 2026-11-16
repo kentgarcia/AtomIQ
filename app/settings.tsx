@@ -4,9 +4,15 @@ import { BETA_FEEDBACK_FORM_URL } from "@/constants/beta";
 import { openExternalUrl } from "@/services/open-url";
 import {useTheme, createStyles, fontFaces, useResponsiveLayout, withAlpha} from "@/theme";
 import { deleteAccountData, getUserProfile } from "@/services/database";
-import { contentRepository, getContentDbStatus } from "@/services/content-db";
+import {
+  contentRepository,
+  getContentDbStatus,
+  loadPreviewContent,
+  resetToBundledContent,
+} from "@/services/content-db";
 import { setHapticsGate } from "@/services/haptics";
 import { getHapticsEnabled, setHapticsEnabled } from "@/services/storage";
+import { setTeacherLines, useTeacherLines } from "@/components/npc/teacher-lines";
 import { setMediaPreference } from "@/services/media";
 import { useMediaPreferences } from "@/hooks/use-read-aloud";
 import { useStorage } from "@/services/StorageContext";
@@ -45,6 +51,7 @@ export default function SettingsScreen() {
   // Sound effects + Read Aloud come from the one shared media preference store.
   const { soundEffects, readAloud: readAloudEnabled } = useMediaPreferences();
   const [haptics, setHaptics] = useState(true);
+  const teacherLines = useTeacherLines();
   const [isDeletingAccount, setIsDeletingAccount] = useState(false);
   const [versionModalVisible, setVersionModalVisible] = useState(false);
   const { anchor: versionAnchor, origin: versionOrigin, capture: versionCapture } = useModalOrigin();
@@ -59,6 +66,27 @@ export default function SettingsScreen() {
   }
 
   const [dataStatus, setDataStatus] = useState<DataStatus | null>(null);
+
+  // Developer preview: pull the in-progress content from Content Studio (dev builds only).
+  const [studioUrl, setStudioUrl] = useState(() => {
+    const host = (Constants.expoConfig?.hostUri ?? "").split(":")[0];
+    return host ? `http://${host}:8787` : "";
+  });
+  const [studioCode, setStudioCode] = useState("");
+  const [studioMessage, setStudioMessage] = useState<string | null>(null);
+  const [studioBusy, setStudioBusy] = useState(false);
+
+  const runStudio = async (task: () => Promise<string>) => {
+    setStudioBusy(true);
+    setStudioMessage(null);
+    try {
+      setStudioMessage(await task());
+    } catch (error) {
+      setStudioMessage(error instanceof Error ? error.message : String(error));
+    } finally {
+      setStudioBusy(false);
+    }
+  };
 
   // On-device database diagnostics — lets testers confirm the bundled
   // content.db actually seeded without needing logcat/Metro access.
@@ -79,7 +107,9 @@ export default function SettingsScreen() {
         if (status.lastError) {
           contentLabel = `Failed: ${status.lastError}`;
         } else if (status.seeded && lessons > 0) {
-          contentLabel = `Ready — ${lessons} lessons (v${status.version})`;
+          const built = status.builtAt && status.builtAt !== "draft" && status.builtAt !== "preview" ? `, ${status.builtAt}` : "";
+          const note = status.preview ? " — Studio preview" : status.version.includes("+draft") ? " — draft" : "";
+          contentLabel = `Ready — ${lessons} lessons · content v${status.version}${built}${note}`;
           contentOk = true;
         } else {
           contentLabel = "Not seeded yet";
@@ -345,6 +375,29 @@ export default function SettingsScreen() {
                 thumbColor={theme.colors.onPrimary}
               />
             </View>
+
+            <View style={styles.settingRow}>
+              <View style={styles.settingInfo}>
+                <Icon
+                  name="Message"
+                  size={20}
+                  color={accent}
+                  variant="Bold"
+                />
+                <View>
+                  <Text style={styles.settingLabel}>Teacher lines</Text>
+                  <Text style={styles.settingDescription}>
+                    Show what your teachers say in lessons
+                  </Text>
+                </View>
+              </View>
+              <Switch
+                value={teacherLines}
+                onValueChange={setTeacherLines}
+                trackColor={{ false: theme.colors.switchTrack, true: accent }}
+                thumbColor={theme.colors.onPrimary}
+              />
+            </View>
           </View>
         </Animated.View>
 
@@ -539,6 +592,65 @@ export default function SettingsScreen() {
                 </Text>
               </View>
             </View>
+
+            {__DEV__ ? (
+              <View style={styles.dataStatusBlock}>
+                <Text style={styles.dataStatusTitle}>Developer: content from Studio</Text>
+                <TextInput
+                  style={styles.devInput}
+                  value={studioUrl}
+                  onChangeText={setStudioUrl}
+                  placeholder="http://192.168.1.20:8787"
+                  placeholderTextColor={theme.colors.textFaint}
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  keyboardType="url"
+                  accessibilityLabel="Content Studio address"
+                />
+                <TextInput
+                  style={styles.devInput}
+                  value={studioCode}
+                  onChangeText={setStudioCode}
+                  placeholder="Pairing code from Studio"
+                  placeholderTextColor={theme.colors.textFaint}
+                  keyboardType="number-pad"
+                  accessibilityLabel="Pairing code"
+                />
+                <View style={styles.devRow}>
+                  <TouchableOpacity
+                    style={styles.devButton}
+                    disabled={studioBusy || !studioUrl || !studioCode}
+                    onPress={() =>
+                      runStudio(async () => {
+                        const meta = await loadPreviewContent(studioUrl, studioCode);
+                        return `Loaded ${meta.content_version}. Reopen a lesson to see it.`;
+                      })
+                    }
+                    accessibilityRole="button"
+                  >
+                    {studioBusy ? (
+                      <ActivityIndicator size="small" color={theme.colors.onPrimary} />
+                    ) : (
+                      <Text style={styles.devButtonText}>Load preview</Text>
+                    )}
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.devButtonSecondary}
+                    disabled={studioBusy}
+                    onPress={() =>
+                      runStudio(async () => {
+                        await resetToBundledContent();
+                        return "Back to the content bundled with this build.";
+                      })
+                    }
+                    accessibilityRole="button"
+                  >
+                    <Text style={styles.devButtonSecondaryText}>Reset to bundled</Text>
+                  </TouchableOpacity>
+                </View>
+                {studioMessage ? <Text style={styles.dataStatusText}>{studioMessage}</Text> : null}
+              </View>
+            ) : null}
 
             <View style={styles.creditRow}>
               <Icon name="Cup" size={16} color="#EA580C" variant="Bold" />
@@ -967,6 +1079,48 @@ const makeStyles = createStyles((theme) => {
       ...fontFaces.medium,
       color: theme.colors.textSecondary,
       lineHeight: 17,
+    },
+    devInput: {
+      borderWidth: 1,
+      borderColor: theme.colors.borderSubtle,
+      borderRadius: 8,
+      paddingHorizontal: 10,
+      paddingVertical: 8,
+      fontSize: 13,
+      ...fontFaces.medium,
+      color: theme.colors.text,
+      backgroundColor: theme.colors.surface,
+    },
+    devRow: {
+      flexDirection: "row",
+      gap: 8,
+    },
+    devButton: {
+      flex: 1,
+      alignItems: "center",
+      justifyContent: "center",
+      paddingVertical: 9,
+      borderRadius: 8,
+      backgroundColor: theme.colors.primary,
+    },
+    devButtonText: {
+      fontSize: 13,
+      ...fontFaces.heavy,
+      color: theme.colors.onPrimary,
+    },
+    devButtonSecondary: {
+      flex: 1,
+      alignItems: "center",
+      justifyContent: "center",
+      paddingVertical: 9,
+      borderRadius: 8,
+      borderWidth: 1,
+      borderColor: theme.colors.borderStrong,
+    },
+    devButtonSecondaryText: {
+      fontSize: 13,
+      ...fontFaces.heavy,
+      color: theme.colors.text,
     },
     modalPrimaryBtn: {
       flexDirection: "row",

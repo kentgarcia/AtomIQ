@@ -1,0 +1,2408 @@
+{
+  "table": "mythbuster_questions",
+  "primaryKey": [
+    "id"
+  ],
+  "rows": [
+    {
+      "id": "mb-easy-q1",
+      "difficulty": "easy",
+      "type": "multiple_choice",
+      "question": "What is the smallest unit of matter?",
+      "options": [
+        "Molecule",
+        "Atom",
+        "Cell",
+        "Proton"
+      ],
+      "correct_answer": 1,
+      "explanation": "An atom is the smallest unit of matter that retains chemical properties.",
+      "points": 5,
+      "position": 0
+    },
+    {
+      "id": "mb-easy-q10",
+      "difficulty": "easy",
+      "type": "multiple_choice",
+      "question": "Which is a source of natural radiation?",
+      "options": [
+        "Television",
+        "Sun",
+        "Refrigerator",
+        "Phone"
+      ],
+      "correct_answer": 1,
+      "explanation": "The sun is a natural source of radiation.",
+      "points": 5,
+      "position": 9
+    },
+    {
+      "id": "mb-easy-q11",
+      "difficulty": "easy",
+      "type": "multiple_choice",
+      "question": "What type of radiation is a helium nucleus?",
+      "options": [
+        "Beta",
+        "Gamma",
+        "Alpha",
+        "X-ray"
+      ],
+      "correct_answer": 2,
+      "explanation": "Alpha radiation consists of helium nuclei.",
+      "points": 5,
+      "position": 10
+    },
+    {
+      "id": "mb-easy-q12",
+      "difficulty": "easy",
+      "type": "multiple_choice",
+      "question": "Which radiation can penetrate deeply?",
+      "options": [
+        "Alpha",
+        "Beta",
+        "Gamma",
+        "None"
+      ],
+      "correct_answer": 2,
+      "explanation": "Gamma rays are highly penetrating electromagnetic radiation.",
+      "points": 5,
+      "position": 11
+    },
+    {
+      "id": "mb-easy-q13",
+      "difficulty": "easy",
+      "type": "multiple_choice",
+      "question": "Which radiation is stopped by paper?",
+      "options": [
+        "Alpha",
+        "Beta",
+        "Gamma",
+        "X-ray"
+      ],
+      "correct_answer": 0,
+      "explanation": "Alpha particles are easily stopped by paper or skin.",
+      "points": 5,
+      "position": 12
+    },
+    {
+      "id": "mb-easy-q14",
+      "difficulty": "easy",
+      "type": "multiple_choice",
+      "question": "What is half-life?",
+      "options": [
+        "Time to double energy",
+        "Time for half to decay",
+        "Time to disappear",
+        "Time to grow"
+      ],
+      "correct_answer": 1,
+      "explanation": "Half-life is the time required for half of a radioactive sample to decay.",
+      "points": 5,
+      "position": 13
+    },
+    {
+      "id": "mb-easy-q15",
+      "difficulty": "easy",
+      "type": "multiple_choice",
+      "question": "What is radioactive decay?",
+      "options": [
+        "Growth of atoms",
+        "Breaking of nucleus",
+        "Formation of molecules",
+        "Movement of electrons"
+      ],
+      "correct_answer": 1,
+      "explanation": "Radioactive decay is when an unstable nucleus changes and emits radiation.",
+      "points": 5,
+      "position": 14
+    },
+    {
+      "id": "mb-easy-q16",
+      "difficulty": "easy",
+      "type": "multiple_choice",
+      "question": "What happens during nuclear fission?",
+      "options": [
+        "Nucleus splits",
+        "Nucleus combines",
+        "Electrons move",
+        "Atoms disappear"
+      ],
+      "correct_answer": 0,
+      "explanation": "Fission is the splitting of a heavy nucleus into smaller nuclei.",
+      "points": 5,
+      "position": 15
+    },
+    {
+      "id": "mb-easy-q17",
+      "difficulty": "easy",
+      "type": "multiple_choice",
+      "question": "What happens during nuclear fusion?",
+      "options": [
+        "Atoms break apart",
+        "Nuclei combine",
+        "Electrons merge",
+        "Protons vanish"
+      ],
+      "correct_answer": 1,
+      "explanation": "Fusion combines light nuclei to form a heavier nucleus.",
+      "points": 5,
+      "position": 16
+    },
+    {
+      "id": "mb-easy-q18",
+      "difficulty": "easy",
+      "type": "multiple_choice",
+      "question": "What is used as fuel in many nuclear reactors?",
+      "options": [
+        "Coal",
+        "Uranium",
+        "Oil",
+        "Wood"
+      ],
+      "correct_answer": 1,
+      "explanation": "Many reactors use uranium as fuel.",
+      "points": 5,
+      "position": 17
+    },
+    {
+      "id": "mb-easy-q19",
+      "difficulty": "easy",
+      "type": "multiple_choice",
+      "question": "Which process powers the Sun?",
+      "options": [
+        "Fission",
+        "Combustion",
+        "Fusion",
+        "Radiation"
+      ],
+      "correct_answer": 2,
+      "explanation": "The Sun is powered by nuclear fusion.",
+      "points": 5,
+      "position": 18
+    },
+    {
+      "id": "mb-easy-q2",
+      "difficulty": "easy",
+      "type": "multiple_choice",
+      "question": "What is found at the center of an atom?",
+      "options": [
+        "Electron",
+        "Nucleus",
+        "Shell",
+        "Orbit"
+      ],
+      "correct_answer": 1,
+      "explanation": "The nucleus is at the center of the atom and contains protons and neutrons.",
+      "points": 5,
+      "position": 1
+    },
+    {
+      "id": "mb-easy-q20",
+      "difficulty": "easy",
+      "type": "multiple_choice",
+      "question": "What is a nuclear reactor used for?",
+      "options": [
+        "Cooking food",
+        "Producing electricity",
+        "Storing water",
+        "Making plastic"
+      ],
+      "correct_answer": 1,
+      "explanation": "Nuclear reactors are commonly used to generate electricity.",
+      "points": 5,
+      "position": 19
+    },
+    {
+      "id": "mb-easy-q21",
+      "difficulty": "easy",
+      "type": "multiple_choice",
+      "question": "What controls the reaction in a nuclear reactor?",
+      "options": [
+        "Fuel rods",
+        "Control rods",
+        "Water",
+        "Turbines"
+      ],
+      "correct_answer": 1,
+      "explanation": "Control rods absorb neutrons and regulate the chain reaction.",
+      "points": 5,
+      "position": 20
+    },
+    {
+      "id": "mb-easy-q22",
+      "difficulty": "easy",
+      "type": "multiple_choice",
+      "question": "What is a common radiation detector?",
+      "options": [
+        "Thermometer",
+        "Geiger counter",
+        "Barometer",
+        "Microscope"
+      ],
+      "correct_answer": 1,
+      "explanation": "A Geiger counter detects and measures ionizing radiation.",
+      "points": 5,
+      "position": 21
+    },
+    {
+      "id": "mb-easy-q23",
+      "difficulty": "easy",
+      "type": "multiple_choice",
+      "question": "Which is a medical use of radiation?",
+      "options": [
+        "Cooking",
+        "Cancer treatment",
+        "Cleaning water",
+        "Making clothes"
+      ],
+      "correct_answer": 1,
+      "explanation": "Radiation is used in medicine for cancer treatment (radiotherapy).",
+      "points": 5,
+      "position": 22
+    },
+    {
+      "id": "mb-easy-q24",
+      "difficulty": "easy",
+      "type": "multiple_choice",
+      "question": "In radiation safety, what is shielding?",
+      "options": [
+        "Producing radiation",
+        "Blocking radiation",
+        "Measuring radiation",
+        "Creating atoms"
+      ],
+      "correct_answer": 1,
+      "explanation": "Shielding means using material to reduce radiation exposure.",
+      "points": 5,
+      "position": 23
+    },
+    {
+      "id": "mb-easy-q25",
+      "difficulty": "easy",
+      "type": "multiple_choice",
+      "question": "Which material can block gamma rays?",
+      "options": [
+        "Paper",
+        "Plastic",
+        "Lead",
+        "Cloth"
+      ],
+      "correct_answer": 2,
+      "explanation": "Dense materials like lead are used to shield gamma rays.",
+      "points": 5,
+      "position": 24
+    },
+    {
+      "id": "mb-easy-q26",
+      "difficulty": "easy",
+      "type": "multiple_choice",
+      "question": "What is nuclear waste?",
+      "options": [
+        "Food waste",
+        "Radioactive material",
+        "Plastic waste",
+        "Water waste"
+      ],
+      "correct_answer": 1,
+      "explanation": "Nuclear waste contains radioactive material from nuclear processes.",
+      "points": 5,
+      "position": 25
+    },
+    {
+      "id": "mb-easy-q27",
+      "difficulty": "easy",
+      "type": "multiple_choice",
+      "question": "What is the unit of radioactivity?",
+      "options": [
+        "Meter",
+        "Becquerel",
+        "Liter",
+        "Volt"
+      ],
+      "correct_answer": 1,
+      "explanation": "The becquerel (Bq) is the SI unit of radioactivity.",
+      "points": 5,
+      "position": 26
+    },
+    {
+      "id": "mb-easy-q28",
+      "difficulty": "easy",
+      "type": "multiple_choice",
+      "question": "What is ionizing radiation?",
+      "options": [
+        "Weak radiation",
+        "Radiation that removes electrons",
+        "Radiation that cools",
+        "Radiation that heats"
+      ],
+      "correct_answer": 1,
+      "explanation": "Ionizing radiation has enough energy to remove electrons from atoms.",
+      "points": 5,
+      "position": 27
+    },
+    {
+      "id": "mb-easy-q29",
+      "difficulty": "easy",
+      "type": "multiple_choice",
+      "question": "In radiation safety, what is contamination?",
+      "options": [
+        "Clean surface",
+        "Presence of radioactive material",
+        "Absence of radiation",
+        "Heat exposure"
+      ],
+      "correct_answer": 1,
+      "explanation": "Contamination means radioactive material is present where it should not be.",
+      "points": 5,
+      "position": 28
+    },
+    {
+      "id": "mb-easy-q3",
+      "difficulty": "easy",
+      "type": "multiple_choice",
+      "question": "Which particles are positively charged?",
+      "options": [
+        "Electrons",
+        "Neutrons",
+        "Protons",
+        "Photons"
+      ],
+      "correct_answer": 2,
+      "explanation": "Protons carry a positive electric charge.",
+      "points": 5,
+      "position": 2
+    },
+    {
+      "id": "mb-easy-q30",
+      "difficulty": "easy",
+      "type": "multiple_choice",
+      "question": "In radiation safety, what is radiation exposure?",
+      "options": [
+        "Contact with radiation",
+        "Eating food",
+        "Drinking water",
+        "Sleeping"
+      ],
+      "correct_answer": 0,
+      "explanation": "Exposure means being subjected to radiation.",
+      "points": 5,
+      "position": 29
+    },
+    {
+      "id": "mb-easy-q31",
+      "difficulty": "easy",
+      "type": "multiple_choice",
+      "question": "What does the ALARA principle mean in radiation safety?",
+      "options": [
+        "Use more radiation",
+        "Avoid all energy",
+        "As low as reasonably achievable",
+        "Always large radiation"
+      ],
+      "correct_answer": 2,
+      "explanation": "ALARA means keeping radiation doses As Low As Reasonably Achievable.",
+      "points": 5,
+      "position": 30
+    },
+    {
+      "id": "mb-easy-q32",
+      "difficulty": "easy",
+      "type": "multiple_choice",
+      "question": "What protects workers from radiation?",
+      "options": [
+        "Distance",
+        "Shielding",
+        "Time",
+        "All of these"
+      ],
+      "correct_answer": 3,
+      "explanation": "Time, distance, and shielding are all core radiation protection principles.",
+      "points": 5,
+      "position": 31
+    },
+    {
+      "id": "mb-easy-q33",
+      "difficulty": "easy",
+      "type": "multiple_choice",
+      "question": "What is a radioactive source?",
+      "options": [
+        "Light bulb",
+        "Material emitting radiation",
+        "Plastic",
+        "Wood"
+      ],
+      "correct_answer": 1,
+      "explanation": "A radioactive source is material that emits radiation.",
+      "points": 5,
+      "position": 32
+    },
+    {
+      "id": "mb-easy-q34",
+      "difficulty": "easy",
+      "type": "multiple_choice",
+      "question": "What is background radiation?",
+      "options": [
+        "Artificial radiation",
+        "Natural radiation in environment",
+        "Dangerous radiation",
+        "Controlled radiation"
+      ],
+      "correct_answer": 1,
+      "explanation": "Background radiation is naturally present in our environment.",
+      "points": 5,
+      "position": 33
+    },
+    {
+      "id": "mb-easy-q35",
+      "difficulty": "easy",
+      "type": "multiple_choice",
+      "question": "Which industry uses radiation gauges?",
+      "options": [
+        "Agriculture",
+        "Mining",
+        "Medicine",
+        "All of these"
+      ],
+      "correct_answer": 3,
+      "explanation": "Radiation gauges are used across many industries, including all listed options.",
+      "points": 5,
+      "position": 34
+    },
+    {
+      "id": "mb-easy-q36",
+      "difficulty": "easy",
+      "type": "multiple_choice",
+      "question": "What is radiotherapy used for?",
+      "options": [
+        "Cooking",
+        "Treating cancer",
+        "Lighting",
+        "Cooling"
+      ],
+      "correct_answer": 1,
+      "explanation": "Radiotherapy uses radiation to treat cancer.",
+      "points": 5,
+      "position": 35
+    },
+    {
+      "id": "mb-easy-q37",
+      "difficulty": "easy",
+      "type": "multiple_choice",
+      "question": "What is radiography used for?",
+      "options": [
+        "Imaging inside objects",
+        "Cooking food",
+        "Cleaning air",
+        "Making metals"
+      ],
+      "correct_answer": 0,
+      "explanation": "Radiography is used to image internal structures.",
+      "points": 5,
+      "position": 36
+    },
+    {
+      "id": "mb-easy-q38",
+      "difficulty": "easy",
+      "type": "multiple_choice",
+      "question": "What does sterilization using radiation do?",
+      "options": [
+        "Making food dirty",
+        "Killing bacteria",
+        "Heating food",
+        "Cooling food"
+      ],
+      "correct_answer": 1,
+      "explanation": "Radiation sterilization is used to kill microorganisms.",
+      "points": 5,
+      "position": 37
+    },
+    {
+      "id": "mb-easy-q39",
+      "difficulty": "easy",
+      "type": "multiple_choice",
+      "question": "What is a gamma ray?",
+      "options": [
+        "Particle",
+        "Wave of energy",
+        "Solid",
+        "Liquid"
+      ],
+      "correct_answer": 1,
+      "explanation": "Gamma rays are high-energy electromagnetic waves.",
+      "points": 5,
+      "position": 38
+    },
+    {
+      "id": "mb-easy-q4",
+      "difficulty": "easy",
+      "type": "multiple_choice",
+      "question": "Which particles have no charge?",
+      "options": [
+        "Electrons",
+        "Protons",
+        "Neutrons",
+        "Ions"
+      ],
+      "correct_answer": 2,
+      "explanation": "Neutrons are electrically neutral particles.",
+      "points": 5,
+      "position": 3
+    },
+    {
+      "id": "mb-easy-q40",
+      "difficulty": "easy",
+      "type": "multiple_choice",
+      "question": "What happens to unstable nuclei?",
+      "options": [
+        "Stay same",
+        "Decay",
+        "Grow",
+        "Multiply"
+      ],
+      "correct_answer": 1,
+      "explanation": "Unstable nuclei decay over time and emit radiation.",
+      "points": 5,
+      "position": 39
+    },
+    {
+      "id": "mb-easy-q41",
+      "difficulty": "easy",
+      "type": "multiple_choice",
+      "question": "What is nuclear energy?",
+      "options": [
+        "Energy from electrons",
+        "Energy from nucleus",
+        "Energy from heat",
+        "Energy from wind"
+      ],
+      "correct_answer": 1,
+      "explanation": "Nuclear energy comes from processes in the atomic nucleus.",
+      "points": 5,
+      "position": 40
+    },
+    {
+      "id": "mb-easy-q42",
+      "difficulty": "easy",
+      "type": "multiple_choice",
+      "question": "Which element is commonly used in smoke detectors?",
+      "options": [
+        "Oxygen",
+        "Carbon",
+        "Americium",
+        "Iron"
+      ],
+      "correct_answer": 2,
+      "explanation": "Americium-241 is commonly used in ionization smoke detectors.",
+      "points": 5,
+      "position": 41
+    },
+    {
+      "id": "mb-easy-q43",
+      "difficulty": "easy",
+      "type": "multiple_choice",
+      "question": "What is a nuclear chain reaction?",
+      "options": [
+        "Single reaction",
+        "Series of reactions",
+        "No reaction",
+        "Slow reaction"
+      ],
+      "correct_answer": 1,
+      "explanation": "A chain reaction is a self-sustaining series of reactions.",
+      "points": 5,
+      "position": 42
+    },
+    {
+      "id": "mb-easy-q44",
+      "difficulty": "easy",
+      "type": "multiple_choice",
+      "question": "What is a controlled chain reaction?",
+      "options": [
+        "Dangerous reaction",
+        "Managed reaction",
+        "Explosive reaction",
+        "No reaction"
+      ],
+      "correct_answer": 1,
+      "explanation": "A controlled chain reaction is carefully regulated, such as in a reactor.",
+      "points": 5,
+      "position": 43
+    },
+    {
+      "id": "mb-easy-q45",
+      "difficulty": "easy",
+      "type": "multiple_choice",
+      "question": "What is an uncontrolled chain reaction?",
+      "options": [
+        "Safe reaction",
+        "Explosion",
+        "Slow reaction",
+        "Cold reaction"
+      ],
+      "correct_answer": 1,
+      "explanation": "An uncontrolled chain reaction can release energy explosively.",
+      "points": 5,
+      "position": 44
+    },
+    {
+      "id": "mb-easy-q46",
+      "difficulty": "easy",
+      "type": "multiple_choice",
+      "question": "What is nuclear technology?",
+      "options": [
+        "Study of plants",
+        "Use of nuclear science",
+        "Study of animals",
+        "Use of electricity only"
+      ],
+      "correct_answer": 1,
+      "explanation": "Nuclear technology is the practical use of nuclear science.",
+      "points": 5,
+      "position": 45
+    },
+    {
+      "id": "mb-easy-q47",
+      "difficulty": "easy",
+      "type": "multiple_choice",
+      "question": "What is a benefit of nuclear energy?",
+      "options": [
+        "High pollution",
+        "Low carbon emission",
+        "No energy",
+        "No cost"
+      ],
+      "correct_answer": 1,
+      "explanation": "Nuclear power produces low carbon emissions during operation.",
+      "points": 5,
+      "position": 46
+    },
+    {
+      "id": "mb-easy-q48",
+      "difficulty": "easy",
+      "type": "multiple_choice",
+      "question": "What is a risk of high radiation exposure?",
+      "options": [
+        "Improves health always",
+        "Can damage cells",
+        "Makes water",
+        "Creates oxygen"
+      ],
+      "correct_answer": 1,
+      "explanation": "High or prolonged radiation exposure can damage living cells.",
+      "points": 5,
+      "position": 47
+    },
+    {
+      "id": "mb-easy-q49",
+      "difficulty": "easy",
+      "type": "multiple_choice",
+      "question": "What is a dosimeter?",
+      "options": [
+        "Measures weight",
+        "Measures radiation dose",
+        "Measures speed",
+        "Measures temperature"
+      ],
+      "correct_answer": 1,
+      "explanation": "A dosimeter measures accumulated radiation dose.",
+      "points": 5,
+      "position": 48
+    },
+    {
+      "id": "mb-easy-q5",
+      "difficulty": "easy",
+      "type": "multiple_choice",
+      "question": "What do electrons do in an atom?",
+      "options": [
+        "Stay in the nucleus",
+        "Orbit the nucleus",
+        "Combine with neutrons",
+        "Form protons"
+      ],
+      "correct_answer": 1,
+      "explanation": "Electrons move around the nucleus in electron clouds/energy levels.",
+      "points": 5,
+      "position": 4
+    },
+    {
+      "id": "mb-easy-q50",
+      "difficulty": "easy",
+      "type": "multiple_choice",
+      "question": "What is nuclear safety?",
+      "options": [
+        "Ignoring radiation",
+        "Protecting people from radiation",
+        "Increasing exposure",
+        "Avoiding electricity"
+      ],
+      "correct_answer": 1,
+      "explanation": "Nuclear safety means protecting people and the environment from radiation risks.",
+      "points": 5,
+      "position": 49
+    },
+    {
+      "id": "mb-easy-q6",
+      "difficulty": "easy",
+      "type": "multiple_choice",
+      "question": "What determines the identity of an element?",
+      "options": [
+        "Number of neutrons",
+        "Number of protons",
+        "Number of electrons",
+        "Size of atom"
+      ],
+      "correct_answer": 1,
+      "explanation": "An element is defined by its number of protons.",
+      "points": 5,
+      "position": 5
+    },
+    {
+      "id": "mb-easy-q7",
+      "difficulty": "easy",
+      "type": "multiple_choice",
+      "question": "What is the atomic number?",
+      "options": [
+        "Number of neutrons",
+        "Number of protons",
+        "Number of electrons",
+        "Total particles"
+      ],
+      "correct_answer": 1,
+      "explanation": "Atomic number equals the number of protons in the nucleus.",
+      "points": 5,
+      "position": 6
+    },
+    {
+      "id": "mb-easy-q8",
+      "difficulty": "easy",
+      "type": "multiple_choice",
+      "question": "What is an isotope?",
+      "options": [
+        "Atoms containing same number of protons, different number of neutrons",
+        "Atoms containing same number of neutrons, different number of protons",
+        "Atoms containing same number of electrons, different atoms",
+        "Different atoms entirely"
+      ],
+      "correct_answer": 0,
+      "explanation": "Isotopes are atoms of the same element with different neutron counts.",
+      "points": 5,
+      "position": 7
+    },
+    {
+      "id": "mb-easy-q9",
+      "difficulty": "easy",
+      "type": "multiple_choice",
+      "question": "What is radiation?",
+      "options": [
+        "Solid matter",
+        "Energy in motion",
+        "Liquid substance",
+        "Gas particle"
+      ],
+      "correct_answer": 1,
+      "explanation": "Radiation is energy traveling through space or a medium.",
+      "points": 5,
+      "position": 8
+    },
+    {
+      "id": "mb-hard-q1",
+      "difficulty": "hard",
+      "type": "multiple_choice",
+      "question": "Why does nuclear fission release energy?",
+      "options": [
+        "Electron transfer",
+        "Mass defect",
+        "Chemical reaction",
+        "Heat expansion"
+      ],
+      "correct_answer": 1,
+      "explanation": "The fission products have slightly less total mass than the original nucleus. That missing mass (the mass defect) is converted into energy, as described by E = mc².",
+      "points": 5,
+      "position": 0
+    },
+    {
+      "id": "mb-hard-q10",
+      "difficulty": "hard",
+      "type": "multiple_choice",
+      "question": "What does high LET (linear energy transfer) radiation imply?",
+      "options": [
+        "Low damage",
+        "High energy deposition",
+        "Low penetration",
+        "No effect"
+      ],
+      "correct_answer": 1,
+      "explanation": "LET (linear energy transfer) is how much energy radiation deposits per distance traveled. High-LET radiation, such as alpha particles, deposits a lot of energy along a short path, which can damage nearby cells more.",
+      "points": 5,
+      "position": 9
+    },
+    {
+      "id": "mb-hard-q11",
+      "difficulty": "hard",
+      "type": "multiple_choice",
+      "question": "Which radiation has the highest linear energy transfer (LET)?",
+      "options": [
+        "Gamma",
+        "Beta",
+        "Alpha",
+        "X-ray"
+      ],
+      "correct_answer": 2,
+      "explanation": "Alpha particles are heavy and carry a double positive charge, so they deposit their energy over a very short distance. That gives them the highest LET of these options.",
+      "points": 5,
+      "position": 10
+    },
+    {
+      "id": "mb-hard-q12",
+      "difficulty": "hard",
+      "type": "multiple_choice",
+      "question": "Why is alpha radiation dangerous internally?",
+      "options": [
+        "High penetration",
+        "High ionization",
+        "Low energy",
+        "No interaction"
+      ],
+      "correct_answer": 1,
+      "explanation": "Alpha particles cannot get through skin, but if an alpha emitter is inhaled or swallowed, its strong ionization damages nearby cells directly.",
+      "points": 5,
+      "position": 11
+    },
+    {
+      "id": "mb-hard-q13",
+      "difficulty": "hard",
+      "type": "multiple_choice",
+      "question": "What is a stochastic effect of radiation?",
+      "options": [
+        "Severity depends on dose",
+        "Probability depends on dose",
+        "No effect",
+        "Immediate effect"
+      ],
+      "correct_answer": 1,
+      "explanation": "Stochastic effects, such as cancer risk, happen by chance. A higher dose raises the probability of the effect, not how severe it is.",
+      "points": 5,
+      "position": 12
+    },
+    {
+      "id": "mb-hard-q14",
+      "difficulty": "hard",
+      "type": "multiple_choice",
+      "question": "What is a deterministic effect of radiation?",
+      "options": [
+        "Random",
+        "Threshold-based",
+        "No threshold",
+        "Rare"
+      ],
+      "correct_answer": 1,
+      "explanation": "Deterministic effects, such as skin burns, only occur above a threshold dose, and they get more severe as the dose rises.",
+      "points": 5,
+      "position": 13
+    },
+    {
+      "id": "mb-hard-q15",
+      "difficulty": "hard",
+      "type": "multiple_choice",
+      "question": "What is the function of boron in reactors?",
+      "options": [
+        "Fuel",
+        "Absorb neutrons",
+        "Coolant",
+        "Moderator"
+      ],
+      "correct_answer": 1,
+      "explanation": "Boron absorbs neutrons very well, so it is used in control rods and, dissolved in the coolant of some reactors, to help control the chain reaction.",
+      "points": 5,
+      "position": 14
+    },
+    {
+      "id": "mb-hard-q16",
+      "difficulty": "hard",
+      "type": "multiple_choice",
+      "question": "What is neutron flux?",
+      "options": [
+        "Energy level",
+        "Number of neutrons per area",
+        "Temperature",
+        "Pressure"
+      ],
+      "correct_answer": 1,
+      "explanation": "Neutron flux is the number of neutrons passing through a given area each second. It shows how intense the neutron population is inside the reactor core.",
+      "points": 5,
+      "position": 15
+    },
+    {
+      "id": "mb-hard-q17",
+      "difficulty": "hard",
+      "type": "multiple_choice",
+      "question": "Why is shielding thickness important?",
+      "options": [
+        "Cost only",
+        "Reduces exposure exponentially",
+        "Aesthetic",
+        "No effect"
+      ],
+      "correct_answer": 1,
+      "explanation": "Each layer of shielding removes a fraction of the radiation, so the intensity falls exponentially as the shield gets thicker.",
+      "points": 5,
+      "position": 16
+    },
+    {
+      "id": "mb-hard-q18",
+      "difficulty": "hard",
+      "type": "multiple_choice",
+      "question": "What does the radioactive decay constant describe?",
+      "options": [
+        "Rate of decay",
+        "Energy level",
+        "Mass",
+        "Temperature"
+      ],
+      "correct_answer": 0,
+      "explanation": "The decay constant is the probability per unit time that a nucleus will decay. A larger value means faster decay and a shorter half-life.",
+      "points": 5,
+      "position": 17
+    },
+    {
+      "id": "mb-hard-q19",
+      "difficulty": "hard",
+      "type": "multiple_choice",
+      "question": "What is secular equilibrium?",
+      "options": [
+        "Parent = daughter activity",
+        "No decay",
+        "Fast decay",
+        "Equal mass"
+      ],
+      "correct_answer": 0,
+      "explanation": "In secular equilibrium a very long-lived parent decays so slowly that its short-lived daughter settles at the same activity as the parent.",
+      "points": 5,
+      "position": 18
+    },
+    {
+      "id": "mb-hard-q2",
+      "difficulty": "hard",
+      "type": "multiple_choice",
+      "question": "What is the relationship between mass defect and binding energy?",
+      "options": [
+        "Directly proportional",
+        "Inversely proportional",
+        "Unrelated",
+        "Equal always"
+      ],
+      "correct_answer": 0,
+      "explanation": "Binding energy is the energy equivalent of the mass defect (E = mc²), so a larger mass defect means a larger binding energy. The two are directly proportional.",
+      "points": 5,
+      "position": 1
+    },
+    {
+      "id": "mb-hard-q20",
+      "difficulty": "hard",
+      "type": "multiple_choice",
+      "question": "Why is plutonium-239 used in reactors?",
+      "options": [
+        "Stable",
+        "Fissile",
+        "Low energy",
+        "Cheap"
+      ],
+      "correct_answer": 1,
+      "explanation": "Plutonium-239 is fissile: it splits when it absorbs neutrons. It forms inside reactors from uranium-238 and contributes to the energy a reactor produces.",
+      "points": 5,
+      "position": 19
+    },
+    {
+      "id": "mb-hard-q21",
+      "difficulty": "hard",
+      "type": "multiple_choice",
+      "question": "What is neutron capture?",
+      "options": [
+        "Neutron loss",
+        "Neutron absorption",
+        "Electron gain",
+        "Proton loss"
+      ],
+      "correct_answer": 1,
+      "explanation": "In neutron capture a nucleus absorbs a neutron and becomes a heavier isotope. This is how control rods absorb neutrons and how some radioisotopes are made.",
+      "points": 5,
+      "position": 20
+    },
+    {
+      "id": "mb-hard-q22",
+      "difficulty": "hard",
+      "type": "multiple_choice",
+      "question": "What is bremsstrahlung radiation?",
+      "options": [
+        "Nuclear radiation",
+        "Deceleration radiation",
+        "Fusion radiation",
+        "Thermal radiation"
+      ],
+      "correct_answer": 1,
+      "explanation": "Bremsstrahlung is German for \"braking radiation\": X-rays emitted when fast charged particles, such as electrons, slow down near atomic nuclei.",
+      "points": 5,
+      "position": 21
+    },
+    {
+      "id": "mb-hard-q23",
+      "difficulty": "hard",
+      "type": "multiple_choice",
+      "question": "What does the inverse square law say about radiation intensity?",
+      "options": [
+        "Intensity ∝ distance",
+        "Intensity ∝ 1/d²",
+        "Intensity constant",
+        "No relation"
+      ],
+      "correct_answer": 1,
+      "explanation": "Intensity falls with the square of the distance (1/d²). Doubling the distance from a source cuts the intensity to one quarter.",
+      "points": 5,
+      "position": 22
+    },
+    {
+      "id": "mb-hard-q24",
+      "difficulty": "hard",
+      "type": "multiple_choice",
+      "question": "Why are control rods inserted during shutdown?",
+      "options": [
+        "Increase energy",
+        "Absorb neutrons",
+        "Produce neutrons",
+        "Heat reactor"
+      ],
+      "correct_answer": 1,
+      "explanation": "Inserting control rods absorbs neutrons, which stops the chain reaction and shuts the reactor down.",
+      "points": 5,
+      "position": 23
+    },
+    {
+      "id": "mb-hard-q25",
+      "difficulty": "hard",
+      "type": "multiple_choice",
+      "question": "What is a reactor scram?",
+      "options": [
+        "Normal operation",
+        "Emergency shutdown",
+        "Fuel loading",
+        "Cooling"
+      ],
+      "correct_answer": 1,
+      "explanation": "A scram is an emergency shutdown in which the control rods are inserted quickly to stop the chain reaction.",
+      "points": 5,
+      "position": 24
+    },
+    {
+      "id": "mb-hard-q26",
+      "difficulty": "hard",
+      "type": "multiple_choice",
+      "question": "If a radioactive isotope has a half-life of 5 years, what fraction of it remains after 15 years?",
+      "options": [
+        "1/2",
+        "1/4",
+        "1/8",
+        "1/16"
+      ],
+      "correct_answer": 2,
+      "explanation": "15 years is three half-lives (15 ÷ 5 = 3). Each half-life halves the amount: 1/2, then 1/4, then 1/8.",
+      "points": 5,
+      "position": 25
+    },
+    {
+      "id": "mb-hard-q27",
+      "difficulty": "hard",
+      "type": "multiple_choice",
+      "question": "What increases the probability of fission?",
+      "options": [
+        "Fast neutrons",
+        "Thermal neutrons",
+        "No neutrons",
+        "Electrons"
+      ],
+      "correct_answer": 1,
+      "explanation": "Slow (thermal) neutrons are much more likely to be captured by uranium-235 and cause fission than fast neutrons.",
+      "points": 5,
+      "position": 26
+    },
+    {
+      "id": "mb-hard-q28",
+      "difficulty": "hard",
+      "type": "multiple_choice",
+      "question": "What is shielding effectiveness based on?",
+      "options": [
+        "Color",
+        "Density and thickness",
+        "Shape",
+        "Temperature"
+      ],
+      "correct_answer": 1,
+      "explanation": "Dense, thick materials have more atoms in the way to absorb or scatter radiation, so density and thickness decide how well a shield works. Color and shape do not matter.",
+      "points": 5,
+      "position": 27
+    },
+    {
+      "id": "mb-hard-q29",
+      "difficulty": "hard",
+      "type": "multiple_choice",
+      "question": "Why is water used as coolant?",
+      "options": [
+        "Cheap only",
+        "High heat capacity",
+        "Radioactive",
+        "Light"
+      ],
+      "correct_answer": 1,
+      "explanation": "Water absorbs a lot of heat per kilogram (high heat capacity), is cheap and plentiful, and in many reactors also acts as the moderator.",
+      "points": 5,
+      "position": 28
+    },
+    {
+      "id": "mb-hard-q3",
+      "difficulty": "hard",
+      "type": "multiple_choice",
+      "question": "Why are fast neutrons less effective in sustaining fission?",
+      "options": [
+        "Too slow",
+        "Less interaction probability",
+        "Too heavy",
+        "No energy"
+      ],
+      "correct_answer": 1,
+      "explanation": "Fast neutrons are less likely to interact with uranium-235 nuclei than slow (thermal) neutrons, so fewer of them cause new fissions. This is why most reactors slow neutrons down with a moderator.",
+      "points": 5,
+      "position": 2
+    },
+    {
+      "id": "mb-hard-q30",
+      "difficulty": "hard",
+      "type": "multiple_choice",
+      "question": "What is the main risk in a reactor meltdown?",
+      "options": [
+        "Heat loss",
+        "Core damage",
+        "Cooling increase",
+        "No reaction"
+      ],
+      "correct_answer": 1,
+      "explanation": "In a meltdown the fuel overheats and the reactor core is damaged. The main risk is that radioactive material could escape if the other barriers also fail.",
+      "points": 5,
+      "position": 29
+    },
+    {
+      "id": "mb-hard-q31",
+      "difficulty": "hard",
+      "type": "multiple_choice",
+      "question": "What is neutron moderation?",
+      "options": [
+        "Speed increase",
+        "Speed reduction",
+        "Absorption",
+        "Emission"
+      ],
+      "correct_answer": 1,
+      "explanation": "Neutron moderation slows fast neutrons down, using materials such as water or graphite, so they are more likely to cause fission.",
+      "points": 5,
+      "position": 30
+    },
+    {
+      "id": "mb-hard-q32",
+      "difficulty": "hard",
+      "type": "multiple_choice",
+      "question": "What does the radiation weighting factor represent?",
+      "options": [
+        "Energy",
+        "Biological impact",
+        "Mass",
+        "Density"
+      ],
+      "correct_answer": 1,
+      "explanation": "The radiation weighting factor adjusts absorbed dose for how biologically damaging each type of radiation is. For the same energy, alpha particles get a higher factor than gamma rays.",
+      "points": 5,
+      "position": 31
+    },
+    {
+      "id": "mb-hard-q33",
+      "difficulty": "hard",
+      "type": "multiple_choice",
+      "question": "What is effective dose measured in?",
+      "options": [
+        "Gray",
+        "Sievert",
+        "Becquerel",
+        "Joule"
+      ],
+      "correct_answer": 1,
+      "explanation": "Effective dose measures the overall biological risk from radiation and is given in sieverts (Sv). The gray (Gy) measures absorbed energy, and the becquerel (Bq) counts decays per second.",
+      "points": 5,
+      "position": 32
+    },
+    {
+      "id": "mb-hard-q34",
+      "difficulty": "hard",
+      "type": "multiple_choice",
+      "question": "What is linear energy transfer?",
+      "options": [
+        "Distance traveled",
+        "Energy per distance",
+        "Time",
+        "Speed"
+      ],
+      "correct_answer": 1,
+      "explanation": "Linear energy transfer is the amount of energy radiation deposits per unit of distance it travels through a material.",
+      "points": 5,
+      "position": 33
+    },
+    {
+      "id": "mb-hard-q35",
+      "difficulty": "hard",
+      "type": "multiple_choice",
+      "question": "Why is gamma radiation highly penetrating?",
+      "options": [
+        "Charged",
+        "No mass or charge",
+        "Heavy",
+        "Slow"
+      ],
+      "correct_answer": 1,
+      "explanation": "Gamma rays are photons with no mass and no electric charge, so they interact only rarely with matter and can travel far through materials.",
+      "points": 5,
+      "position": 34
+    },
+    {
+      "id": "mb-hard-q36",
+      "difficulty": "hard",
+      "type": "multiple_choice",
+      "question": "What is a decay series?",
+      "options": [
+        "Single decay",
+        "Multiple successive decays",
+        "No decay",
+        "Instant decay"
+      ],
+      "correct_answer": 1,
+      "explanation": "A decay series (or decay chain) is a sequence of successive decays in which each radioactive product decays again until a stable isotope is reached.",
+      "points": 5,
+      "position": 35
+    },
+    {
+      "id": "mb-hard-q37",
+      "difficulty": "hard",
+      "type": "multiple_choice",
+      "question": "Which method is commonly used to produce radioisotopes?",
+      "options": [
+        "Cooling",
+        "Neutron activation",
+        "Heating",
+        "Pressure"
+      ],
+      "correct_answer": 1,
+      "explanation": "In neutron activation, stable atoms are placed in a stream of neutrons (often in a research reactor), absorb neutrons, and become radioactive isotopes.",
+      "points": 5,
+      "position": 36
+    },
+    {
+      "id": "mb-hard-q38",
+      "difficulty": "hard",
+      "type": "multiple_choice",
+      "question": "What is a nuclear cross-section?",
+      "options": [
+        "Size of nucleus",
+        "Probability of interaction",
+        "Mass",
+        "Energy"
+      ],
+      "correct_answer": 1,
+      "explanation": "A nuclear cross-section measures the probability that a particular interaction, such as neutron capture or fission, will happen.",
+      "points": 5,
+      "position": 37
+    },
+    {
+      "id": "mb-hard-q39",
+      "difficulty": "hard",
+      "type": "multiple_choice",
+      "question": "What distinguishes a fast reactor from most other reactors?",
+      "options": [
+        "It reduces the number of neutrons",
+        "It uses fast neutrons to sustain the chain reaction",
+        "It stops fission reactions",
+        "It reduces energy output"
+      ],
+      "correct_answer": 1,
+      "explanation": "Fast reactors have no moderator, so fast neutrons sustain the chain reaction. This lets them use uranium more efficiently and potentially consume some long-lived waste.",
+      "points": 5,
+      "position": 38
+    },
+    {
+      "id": "mb-hard-q4",
+      "difficulty": "hard",
+      "type": "multiple_choice",
+      "question": "What happens to the reaction if a moderator is removed from a reactor?",
+      "options": [
+        "Reaction increases",
+        "Reaction decreases",
+        "No change",
+        "Explosion"
+      ],
+      "correct_answer": 1,
+      "explanation": "Without a moderator, neutrons stay fast and are less likely to cause fission in uranium-235, so the chain reaction weakens and the reaction decreases.",
+      "points": 5,
+      "position": 3
+    },
+    {
+      "id": "mb-hard-q40",
+      "difficulty": "hard",
+      "type": "multiple_choice",
+      "question": "What is a breeder reactor?",
+      "options": [
+        "Produces less fuel",
+        "Produces more fissile material",
+        "Stops reaction",
+        "No fuel"
+      ],
+      "correct_answer": 1,
+      "explanation": "A breeder reactor produces more fissile material, such as plutonium-239, than it consumes by converting non-fissile uranium-238.",
+      "points": 5,
+      "position": 39
+    },
+    {
+      "id": "mb-hard-q41",
+      "difficulty": "hard",
+      "type": "multiple_choice",
+      "question": "What is spent fuel?",
+      "options": [
+        "New fuel",
+        "Used nuclear fuel",
+        "No energy",
+        "Fresh uranium"
+      ],
+      "correct_answer": 1,
+      "explanation": "Spent fuel is nuclear fuel that has been used in a reactor. It is still radioactive and hot, so it is cooled and stored carefully.",
+      "points": 5,
+      "position": 40
+    },
+    {
+      "id": "mb-hard-q42",
+      "difficulty": "hard",
+      "type": "multiple_choice",
+      "question": "What is vitrification?",
+      "options": [
+        "Cooling",
+        "Converting waste to glass",
+        "Burning waste",
+        "Washing waste"
+      ],
+      "correct_answer": 1,
+      "explanation": "Vitrification mixes high-level radioactive waste into molten glass, which hardens into a durable solid that locks the radioactive material inside.",
+      "points": 5,
+      "position": 41
+    },
+    {
+      "id": "mb-hard-q43",
+      "difficulty": "hard",
+      "type": "multiple_choice",
+      "question": "What is nuclear proliferation?",
+      "options": [
+        "Energy production",
+        "Spread of nuclear weapons",
+        "Reactor building",
+        "Waste disposal"
+      ],
+      "correct_answer": 1,
+      "explanation": "Nuclear proliferation is the spread of nuclear weapons to more countries. Treaties such as the NPT and IAEA safeguards aim to prevent it.",
+      "points": 5,
+      "position": 42
+    },
+    {
+      "id": "mb-hard-q44",
+      "difficulty": "hard",
+      "type": "multiple_choice",
+      "question": "What is dose rate?",
+      "options": [
+        "Total dose",
+        "Dose per time",
+        "Energy",
+        "Mass"
+      ],
+      "correct_answer": 1,
+      "explanation": "Dose rate is how much dose is received per unit of time, for example microsieverts per hour. A given dose delivered slowly is generally less harmful than the same dose delivered all at once.",
+      "points": 5,
+      "position": 43
+    },
+    {
+      "id": "mb-hard-q45",
+      "difficulty": "hard",
+      "type": "multiple_choice",
+      "question": "What is shielding design based on?",
+      "options": [
+        "Color",
+        "Radiation type and energy",
+        "Shape",
+        "Cost only"
+      ],
+      "correct_answer": 1,
+      "explanation": "The right shield depends on the type and energy of the radiation: paper stops alpha, plastic or aluminum stops beta, and dense lead or concrete is needed for gamma rays.",
+      "points": 5,
+      "position": 44
+    },
+    {
+      "id": "mb-hard-q46",
+      "difficulty": "hard",
+      "type": "multiple_choice",
+      "question": "In radiation shielding, what is attenuation?",
+      "options": [
+        "Increase radiation",
+        "Decrease intensity",
+        "No change",
+        "Reflection"
+      ],
+      "correct_answer": 1,
+      "explanation": "Attenuation is the reduction in radiation intensity as it passes through a material.",
+      "points": 5,
+      "position": 45
+    },
+    {
+      "id": "mb-hard-q47",
+      "difficulty": "hard",
+      "type": "multiple_choice",
+      "question": "How does radioactive contamination differ from radiation exposure?",
+      "options": [
+        "They are the same thing",
+        "Contamination is radioactive material; exposure is energy received",
+        "Contamination is energy received; exposure is radioactive material",
+        "There is no difference"
+      ],
+      "correct_answer": 1,
+      "explanation": "Contamination means radioactive material is on or in something, such as skin or a surface. Exposure means receiving radiation. You can be exposed without being contaminated, for example during a medical X-ray.",
+      "points": 5,
+      "position": 46
+    },
+    {
+      "id": "mb-hard-q48",
+      "difficulty": "hard",
+      "type": "multiple_choice",
+      "question": "What is neutron economy?",
+      "options": [
+        "Cost of neutrons",
+        "Balance of neutron production and loss",
+        "Temperature",
+        "Pressure"
+      ],
+      "correct_answer": 1,
+      "explanation": "Neutron economy is the balance between neutrons produced by fission and neutrons lost to absorption or escape. A reactor stays critical only while that balance holds.",
+      "points": 5,
+      "position": 47
+    },
+    {
+      "id": "mb-hard-q49",
+      "difficulty": "hard",
+      "type": "multiple_choice",
+      "question": "How do prompt neutrons differ from delayed neutrons?",
+      "options": [
+        "When they are emitted after fission",
+        "Their electric charge",
+        "Their mass",
+        "Which element they come from"
+      ],
+      "correct_answer": 0,
+      "explanation": "Prompt neutrons are released almost instantly during fission, while delayed neutrons are emitted seconds to minutes later by decaying fission products. The delayed ones make reactors much easier to control.",
+      "points": 5,
+      "position": 48
+    },
+    {
+      "id": "mb-hard-q5",
+      "difficulty": "hard",
+      "type": "multiple_choice",
+      "question": "Why is uranium-235 fissile?",
+      "options": [
+        "Stable nucleus",
+        "Easily splits with neutrons",
+        "High electrons",
+        "Low energy"
+      ],
+      "correct_answer": 1,
+      "explanation": "A fissile nucleus can be split by slow neutrons. Uranium-235 easily absorbs a neutron and splits, releasing energy and more neutrons that can keep a chain reaction going.",
+      "points": 5,
+      "position": 4
+    },
+    {
+      "id": "mb-hard-q50",
+      "difficulty": "hard",
+      "type": "multiple_choice",
+      "question": "What is the biggest challenge in nuclear waste management?",
+      "options": [
+        "Color",
+        "Long half-life",
+        "Weight",
+        "Shape"
+      ],
+      "correct_answer": 1,
+      "explanation": "Some radioactive isotopes in waste have very long half-lives, so they stay radioactive for thousands of years and must be isolated for a very long time.",
+      "points": 5,
+      "position": 49
+    },
+    {
+      "id": "mb-hard-q6",
+      "difficulty": "hard",
+      "type": "multiple_choice",
+      "question": "What is critical mass?",
+      "options": [
+        "Minimum mass for sustained reaction",
+        "Maximum safe mass",
+        "Total fuel",
+        "Reactor size"
+      ],
+      "correct_answer": 0,
+      "explanation": "Critical mass is the smallest amount of fissile material that can sustain a chain reaction on its own. Below it, too many neutrons escape or are lost.",
+      "points": 5,
+      "position": 5
+    },
+    {
+      "id": "mb-hard-q7",
+      "difficulty": "hard",
+      "type": "multiple_choice",
+      "question": "What happens to the chain reaction when a reactor is subcritical?",
+      "options": [
+        "Increasing reaction",
+        "Decreasing reaction",
+        "Constant reaction",
+        "Explosion"
+      ],
+      "correct_answer": 1,
+      "explanation": "In a subcritical condition each fission causes, on average, fewer than one further fission, so the chain reaction dies away and the reaction decreases.",
+      "points": 5,
+      "position": 6
+    },
+    {
+      "id": "mb-hard-q8",
+      "difficulty": "hard",
+      "type": "multiple_choice",
+      "question": "Why is fusion difficult to achieve?",
+      "options": [
+        "Low temperature",
+        "Coulomb repulsion",
+        "Weak force",
+        "Low energy"
+      ],
+      "correct_answer": 1,
+      "explanation": "Atomic nuclei are positively charged and repel each other (Coulomb repulsion). Fusion needs extreme temperature and pressure to push nuclei close enough for the nuclear force to take over.",
+      "points": 5,
+      "position": 7
+    },
+    {
+      "id": "mb-hard-q9",
+      "difficulty": "hard",
+      "type": "multiple_choice",
+      "question": "What is the main advantage of fusion over fission?",
+      "options": [
+        "More waste",
+        "Less energy",
+        "Less radioactive waste",
+        "More danger"
+      ],
+      "correct_answer": 2,
+      "explanation": "Fusion produces much less long-lived radioactive waste than fission, because its main product, helium, is not radioactive.",
+      "points": 5,
+      "position": 8
+    },
+    {
+      "id": "mb-medium-q1",
+      "difficulty": "medium",
+      "type": "multiple_choice",
+      "question": "Which subatomic particles determine the mass number of an atom?",
+      "options": [
+        "Electron",
+        "Proton",
+        "Proton and neutron",
+        "Neutron only"
+      ],
+      "correct_answer": 2,
+      "explanation": "The mass number is the total number of protons and neutrons in the nucleus. Electrons are so light that they add almost no mass.",
+      "points": 5,
+      "position": 0
+    },
+    {
+      "id": "mb-medium-q10",
+      "difficulty": "medium",
+      "type": "multiple_choice",
+      "question": "Which material is best for shielding beta radiation?",
+      "options": [
+        "Paper",
+        "Plastic",
+        "Lead",
+        "Concrete"
+      ],
+      "correct_answer": 1,
+      "explanation": "Beta particles are stopped by light materials such as plastic or a thin sheet of aluminum. Paper is too thin, and dense materials like lead can produce secondary X-rays.",
+      "points": 5,
+      "position": 9
+    },
+    {
+      "id": "mb-medium-q11",
+      "difficulty": "medium",
+      "type": "multiple_choice",
+      "question": "What is the role of coolant in a reactor?",
+      "options": [
+        "Absorb neutrons",
+        "Transfer heat",
+        "Block radiation",
+        "Control reaction"
+      ],
+      "correct_answer": 1,
+      "explanation": "Coolant carries heat away from the reactor core so the fuel does not overheat. That heat is then used to make steam.",
+      "points": 5,
+      "position": 10
+    },
+    {
+      "id": "mb-medium-q12",
+      "difficulty": "medium",
+      "type": "multiple_choice",
+      "question": "What does “stable nucleus” mean?",
+      "options": [
+        "Always moving",
+        "Does not decay",
+        "Emits radiation",
+        "Splits easily"
+      ],
+      "correct_answer": 1,
+      "explanation": "A stable nucleus has a balanced mix of protons and neutrons, so it does not decay or emit radiation.",
+      "points": 5,
+      "position": 11
+    },
+    {
+      "id": "mb-medium-q13",
+      "difficulty": "medium",
+      "type": "multiple_choice",
+      "question": "What type of decay emits an electron?",
+      "options": [
+        "Alpha",
+        "Beta",
+        "Gamma",
+        "Fusion"
+      ],
+      "correct_answer": 1,
+      "explanation": "Beta decay emits a high-speed electron, called a beta particle, from the nucleus.",
+      "points": 5,
+      "position": 12
+    },
+    {
+      "id": "mb-medium-q14",
+      "difficulty": "medium",
+      "type": "multiple_choice",
+      "question": "What is a radionuclide?",
+      "options": [
+        "Stable atom",
+        "Radioactive atom",
+        "Neutral atom",
+        "Molecule"
+      ],
+      "correct_answer": 1,
+      "explanation": "A radionuclide is an unstable atom whose nucleus decays and emits radiation.",
+      "points": 5,
+      "position": 13
+    },
+    {
+      "id": "mb-medium-q15",
+      "difficulty": "medium",
+      "type": "multiple_choice",
+      "question": "What is the main use of iodine-131?",
+      "options": [
+        "Industrial gauges",
+        "Thyroid treatment",
+        "Agriculture",
+        "Food preservation"
+      ],
+      "correct_answer": 1,
+      "explanation": "Iodine-131 is taken up by the thyroid gland, so doctors use it to treat thyroid conditions such as an overactive thyroid and thyroid cancer.",
+      "points": 5,
+      "position": 14
+    },
+    {
+      "id": "mb-medium-q16",
+      "difficulty": "medium",
+      "type": "multiple_choice",
+      "question": "Which factor reduces radiation exposure?",
+      "options": [
+        "Less shielding",
+        "Less distance",
+        "Less time",
+        "More exposure"
+      ],
+      "correct_answer": 2,
+      "explanation": "Radiation protection relies on time, distance and shielding. Spending less time near a source lowers the dose, while less distance or less shielding would raise it.",
+      "points": 5,
+      "position": 15
+    },
+    {
+      "id": "mb-medium-q17",
+      "difficulty": "medium",
+      "type": "multiple_choice",
+      "question": "What is the function of control rods?",
+      "options": [
+        "Speed up reaction",
+        "Absorb neutrons",
+        "Produce neutrons",
+        "Emit radiation"
+      ],
+      "correct_answer": 1,
+      "explanation": "Control rods contain neutron-absorbing materials such as boron or cadmium. Inserting them absorbs neutrons and slows the chain reaction.",
+      "points": 5,
+      "position": 16
+    },
+    {
+      "id": "mb-medium-q18",
+      "difficulty": "medium",
+      "type": "multiple_choice",
+      "question": "Which radiation is most dangerous internally?",
+      "options": [
+        "Alpha",
+        "Beta",
+        "Gamma",
+        "X-ray"
+      ],
+      "correct_answer": 0,
+      "explanation": "Alpha particles are stopped by skin, but if an alpha emitter is swallowed or inhaled it deposits all its energy in nearby tissue, which makes it the most dangerous of these inside the body.",
+      "points": 5,
+      "position": 17
+    },
+    {
+      "id": "mb-medium-q19",
+      "difficulty": "medium",
+      "type": "multiple_choice",
+      "question": "What is nuclear binding energy?",
+      "options": [
+        "Energy of electrons",
+        "Energy holding nucleus together",
+        "Heat energy",
+        "Light energy"
+      ],
+      "correct_answer": 1,
+      "explanation": "Nuclear binding energy is the energy that holds the protons and neutrons together in the nucleus.",
+      "points": 5,
+      "position": 18
+    },
+    {
+      "id": "mb-medium-q2",
+      "difficulty": "medium",
+      "type": "multiple_choice",
+      "question": "What happens to an atom when it loses an electron?",
+      "options": [
+        "Becomes neutral",
+        "Becomes negatively charged",
+        "Becomes positively charged",
+        "Becomes unstable"
+      ],
+      "correct_answer": 2,
+      "explanation": "Losing a negatively charged electron leaves more protons than electrons, so the atom becomes a positively charged ion.",
+      "points": 5,
+      "position": 1
+    },
+    {
+      "id": "mb-medium-q20",
+      "difficulty": "medium",
+      "type": "multiple_choice",
+      "question": "What is nuclear transmutation?",
+      "options": [
+        "Splitting atom",
+        "Combining atoms",
+        "Changing one element to another",
+        "Creating molecules"
+      ],
+      "correct_answer": 2,
+      "explanation": "Transmutation is a nuclear change that turns one element into another by changing the number of protons, for example through radioactive decay or neutron capture.",
+      "points": 5,
+      "position": 19
+    },
+    {
+      "id": "mb-medium-q21",
+      "difficulty": "medium",
+      "type": "multiple_choice",
+      "question": "What is the main component of nuclear fuel rods?",
+      "options": [
+        "Uranium pellets",
+        "Steel rods",
+        "Water",
+        "Graphite"
+      ],
+      "correct_answer": 0,
+      "explanation": "Reactor fuel rods are metal tubes filled with small ceramic pellets of uranium dioxide.",
+      "points": 5,
+      "position": 20
+    },
+    {
+      "id": "mb-medium-q22",
+      "difficulty": "medium",
+      "type": "multiple_choice",
+      "question": "What is the purpose of containment structures?",
+      "options": [
+        "Generate energy",
+        "Prevent radiation release",
+        "Store fuel",
+        "Increase reactions"
+      ],
+      "correct_answer": 1,
+      "explanation": "A containment structure is a strong, sealed building around the reactor that is designed to stop radioactive material from escaping into the environment during an accident.",
+      "points": 5,
+      "position": 21
+    },
+    {
+      "id": "mb-medium-q23",
+      "difficulty": "medium",
+      "type": "multiple_choice",
+      "question": "What is a tracer in nuclear medicine?",
+      "options": [
+        "Detector",
+        "Radioactive substance used in diagnosis",
+        "Shield",
+        "Barrier"
+      ],
+      "correct_answer": 1,
+      "explanation": "A tracer is a small amount of radioactive substance given to a patient. Detectors follow its radiation to show how organs are working.",
+      "points": 5,
+      "position": 22
+    },
+    {
+      "id": "mb-medium-q24",
+      "difficulty": "medium",
+      "type": "multiple_choice",
+      "question": "What is radioactive equilibrium?",
+      "options": [
+        "No decay",
+        "Equal decay rates",
+        "Increasing radiation",
+        "Stopping radiation"
+      ],
+      "correct_answer": 1,
+      "explanation": "Radioactive equilibrium is reached when a radioactive parent and its daughter decay at the same rate, so the amount of daughter stays steady.",
+      "points": 5,
+      "position": 23
+    },
+    {
+      "id": "mb-medium-q25",
+      "difficulty": "medium",
+      "type": "multiple_choice",
+      "question": "What is the SI unit of absorbed dose?",
+      "options": [
+        "Becquerel",
+        "Gray",
+        "Sievert",
+        "Volt"
+      ],
+      "correct_answer": 1,
+      "explanation": "The gray (Gy) measures absorbed dose, the energy absorbed per kilogram of material. The sievert measures biological effect, and the becquerel counts decays per second.",
+      "points": 5,
+      "position": 24
+    },
+    {
+      "id": "mb-medium-q26",
+      "difficulty": "medium",
+      "type": "multiple_choice",
+      "question": "If half-life is 10 years, how much remains after 20 years?",
+      "options": [
+        "1/4",
+        "1/2",
+        "3/4",
+        "1/8"
+      ],
+      "correct_answer": 0,
+      "explanation": "20 years is two half-lives (20 ÷ 10 = 2). The sample halves twice, leaving 1/2 × 1/2 = 1/4.",
+      "points": 5,
+      "position": 25
+    },
+    {
+      "id": "mb-medium-q27",
+      "difficulty": "medium",
+      "type": "multiple_choice",
+      "question": "Which factor most affects radiation intensity?",
+      "options": [
+        "Color",
+        "Distance",
+        "Shape",
+        "Temperature"
+      ],
+      "correct_answer": 1,
+      "explanation": "Radiation intensity falls quickly as you move away from a source (the inverse square law), so distance changes it the most. Color, shape and temperature have no effect.",
+      "points": 5,
+      "position": 26
+    },
+    {
+      "id": "mb-medium-q28",
+      "difficulty": "medium",
+      "type": "multiple_choice",
+      "question": "Why is lead used for shielding?",
+      "options": [
+        "Lightweight",
+        "Dense",
+        "Cheap",
+        "Flexible"
+      ],
+      "correct_answer": 1,
+      "explanation": "Lead is very dense, so it packs many atoms into a small volume to absorb gamma rays and X-rays.",
+      "points": 5,
+      "position": 27
+    },
+    {
+      "id": "mb-medium-q29",
+      "difficulty": "medium",
+      "type": "multiple_choice",
+      "question": "What type of reaction is used in nuclear power plants?",
+      "options": [
+        "Fusion",
+        "Fission",
+        "Combustion",
+        "Chemical"
+      ],
+      "correct_answer": 1,
+      "explanation": "Nuclear power plants use fission, splitting heavy nuclei such as uranium-235 to release heat. Fusion is not yet used commercially, and combustion and chemical reactions are not nuclear.",
+      "points": 5,
+      "position": 28
+    },
+    {
+      "id": "mb-medium-q3",
+      "difficulty": "medium",
+      "type": "multiple_choice",
+      "question": "Which type of radiation has the lowest penetrating power?",
+      "options": [
+        "Gamma",
+        "Beta",
+        "Alpha",
+        "X-ray"
+      ],
+      "correct_answer": 2,
+      "explanation": "Alpha particles are large and heavy, so even a sheet of paper or the outer layer of skin stops them.",
+      "points": 5,
+      "position": 2
+    },
+    {
+      "id": "mb-medium-q30",
+      "difficulty": "medium",
+      "type": "multiple_choice",
+      "question": "What happens if control rods are removed completely?",
+      "options": [
+        "Reaction stops",
+        "Reaction slows",
+        "Reaction increases rapidly",
+        "Nothing happens"
+      ],
+      "correct_answer": 2,
+      "explanation": "Control rods absorb neutrons. With them completely removed, more neutrons cause fission and the chain reaction can increase rapidly. That is why rods are withdrawn slowly and safety systems can insert them again quickly.",
+      "points": 5,
+      "position": 29
+    },
+    {
+      "id": "mb-medium-q31",
+      "difficulty": "medium",
+      "type": "multiple_choice",
+      "question": "What is the main energy source in nuclear fission?",
+      "options": [
+        "Electron movement",
+        "Mass conversion to energy",
+        "Heat from fuel",
+        "Light emission"
+      ],
+      "correct_answer": 1,
+      "explanation": "A tiny amount of mass is lost in each fission and converted into energy (E = mc²), which is the main source of the energy released.",
+      "points": 5,
+      "position": 30
+    },
+    {
+      "id": "mb-medium-q32",
+      "difficulty": "medium",
+      "type": "multiple_choice",
+      "question": "Which radiation requires thick shielding?",
+      "options": [
+        "Alpha",
+        "Beta",
+        "Gamma",
+        "None"
+      ],
+      "correct_answer": 2,
+      "explanation": "Gamma rays are very penetrating, so they need thick, dense shielding such as lead or concrete. Alpha and beta radiation are stopped by much thinner materials.",
+      "points": 5,
+      "position": 31
+    },
+    {
+      "id": "mb-medium-q33",
+      "difficulty": "medium",
+      "type": "multiple_choice",
+      "question": "What is the role of a Geiger counter?",
+      "options": [
+        "Produce radiation",
+        "Detect radiation",
+        "Block radiation",
+        "Reduce radiation"
+      ],
+      "correct_answer": 1,
+      "explanation": "A Geiger counter detects ionizing radiation and clicks or shows a count rate when radiation passes through it.",
+      "points": 5,
+      "position": 32
+    },
+    {
+      "id": "mb-medium-q34",
+      "difficulty": "medium",
+      "type": "multiple_choice",
+      "question": "What happens during gamma decay?",
+      "options": [
+        "Particle emission",
+        "Energy release",
+        "Electron gain",
+        "Proton loss"
+      ],
+      "correct_answer": 1,
+      "explanation": "In gamma decay the nucleus releases extra energy as a gamma ray, without changing its number of protons or neutrons.",
+      "points": 5,
+      "position": 33
+    },
+    {
+      "id": "mb-medium-q35",
+      "difficulty": "medium",
+      "type": "multiple_choice",
+      "question": "Why are neutrons important in fission?",
+      "options": [
+        "They stop reaction",
+        "They initiate reactions",
+        "They absorb energy",
+        "They reduce heat"
+      ],
+      "correct_answer": 1,
+      "explanation": "A neutron strikes a uranium-235 nucleus and makes it split, which initiates fission. The split releases more neutrons that cause further fissions.",
+      "points": 5,
+      "position": 34
+    },
+    {
+      "id": "mb-medium-q36",
+      "difficulty": "medium",
+      "type": "multiple_choice",
+      "question": "What is the main use of cobalt-60?",
+      "options": [
+        "Cooking",
+        "Radiotherapy",
+        "Lighting",
+        "Cooling"
+      ],
+      "correct_answer": 1,
+      "explanation": "Cobalt-60 emits strong gamma rays, which are used in radiotherapy to destroy cancer cells.",
+      "points": 5,
+      "position": 35
+    },
+    {
+      "id": "mb-medium-q37",
+      "difficulty": "medium",
+      "type": "multiple_choice",
+      "question": "What is a nuclear chain reaction?",
+      "options": [
+        "Single reaction",
+        "Repeated reactions",
+        "No reaction",
+        "Slow reaction"
+      ],
+      "correct_answer": 1,
+      "explanation": "In a nuclear chain reaction, neutrons released by one fission cause further fissions, so the reactions repeat.",
+      "points": 5,
+      "position": 36
+    },
+    {
+      "id": "mb-medium-q38",
+      "difficulty": "medium",
+      "type": "multiple_choice",
+      "question": "Why is nuclear energy considered efficient?",
+      "options": [
+        "Low output",
+        "High energy density",
+        "High cost",
+        "Low safety"
+      ],
+      "correct_answer": 1,
+      "explanation": "Nuclear fuel holds a huge amount of energy for its mass, so a small amount of fuel can produce a lot of electricity. This is called high energy density.",
+      "points": 5,
+      "position": 37
+    },
+    {
+      "id": "mb-medium-q39",
+      "difficulty": "medium",
+      "type": "multiple_choice",
+      "question": "What is radiation sickness caused by?",
+      "options": [
+        "Low exposure",
+        "High exposure",
+        "No exposure",
+        "Cold temperature"
+      ],
+      "correct_answer": 1,
+      "explanation": "Radiation sickness (acute radiation syndrome) is caused by a high dose of radiation received in a short time, not by low exposure.",
+      "points": 5,
+      "position": 38
+    },
+    {
+      "id": "mb-medium-q4",
+      "difficulty": "medium",
+      "type": "multiple_choice",
+      "question": "What is the main purpose of a moderator in a nuclear reactor?",
+      "options": [
+        "Increase temperature",
+        "Slow down neutrons",
+        "Absorb radiation",
+        "Produce energy"
+      ],
+      "correct_answer": 1,
+      "explanation": "A moderator, such as water or graphite, slows neutrons down so they are more likely to cause fission.",
+      "points": 5,
+      "position": 3
+    },
+    {
+      "id": "mb-medium-q40",
+      "difficulty": "medium",
+      "type": "multiple_choice",
+      "question": "What is the function of a dosimeter?",
+      "options": [
+        "Measure temperature",
+        "Measure radiation exposure",
+        "Measure pressure",
+        "Measure energy"
+      ],
+      "correct_answer": 1,
+      "explanation": "A dosimeter measures how much radiation a person has been exposed to, which is why radiation workers wear one.",
+      "points": 5,
+      "position": 39
+    },
+    {
+      "id": "mb-medium-q41",
+      "difficulty": "medium",
+      "type": "multiple_choice",
+      "question": "What type of radiation is used in X-rays?",
+      "options": [
+        "Alpha",
+        "Beta",
+        "Electromagnetic waves (like gamma rays)",
+        "Neutron"
+      ],
+      "correct_answer": 2,
+      "explanation": "X-rays are electromagnetic waves like gamma rays, but they are produced by machines instead of by atomic nuclei.",
+      "points": 5,
+      "position": 40
+    },
+    {
+      "id": "mb-medium-q42",
+      "difficulty": "medium",
+      "type": "multiple_choice",
+      "question": "What is neutron activation?",
+      "options": [
+        "Neutron removal",
+        "Neutron absorption",
+        "Electron gain",
+        "Proton loss"
+      ],
+      "correct_answer": 1,
+      "explanation": "In neutron activation, a stable nucleus absorbs a neutron and becomes a radioactive isotope.",
+      "points": 5,
+      "position": 41
+    },
+    {
+      "id": "mb-medium-q43",
+      "difficulty": "medium",
+      "type": "multiple_choice",
+      "question": "What is radioactive dating used for?",
+      "options": [
+        "Cooking",
+        "Determining age of materials",
+        "Producing energy",
+        "Cleaning water"
+      ],
+      "correct_answer": 1,
+      "explanation": "Radioactive dating measures how much of a radioactive isotope, such as carbon-14, is left in a sample to work out how old it is.",
+      "points": 5,
+      "position": 42
+    },
+    {
+      "id": "mb-medium-q44",
+      "difficulty": "medium",
+      "type": "multiple_choice",
+      "question": "Which isotope is used in carbon dating?",
+      "options": [
+        "Carbon-12",
+        "Carbon-13",
+        "Carbon-14",
+        "Carbon-16"
+      ],
+      "correct_answer": 2,
+      "explanation": "Carbon-14 decays at a known rate (half-life about 5,730 years), so the amount left shows how long ago an organism died.",
+      "points": 5,
+      "position": 43
+    },
+    {
+      "id": "mb-medium-q45",
+      "difficulty": "medium",
+      "type": "multiple_choice",
+      "question": "What happens when shielding increases?",
+      "options": [
+        "Exposure increases",
+        "Exposure decreases",
+        "No effect",
+        "Reaction stops"
+      ],
+      "correct_answer": 1,
+      "explanation": "More shielding absorbs more radiation, so exposure decreases.",
+      "points": 5,
+      "position": 44
+    },
+    {
+      "id": "mb-medium-q46",
+      "difficulty": "medium",
+      "type": "multiple_choice",
+      "question": "What is the purpose of nuclear safeguards?",
+      "options": [
+        "Increase energy",
+        "Prevent misuse",
+        "Create weapons",
+        "Reduce cost"
+      ],
+      "correct_answer": 1,
+      "explanation": "Nuclear safeguards, such as IAEA inspections and material accounting, help make sure nuclear material and technology are not misused for weapons.",
+      "points": 5,
+      "position": 45
+    },
+    {
+      "id": "mb-medium-q47",
+      "difficulty": "medium",
+      "type": "multiple_choice",
+      "question": "What is the main hazard of nuclear waste?",
+      "options": [
+        "Smell",
+        "Radiation",
+        "Color",
+        "Weight"
+      ],
+      "correct_answer": 1,
+      "explanation": "The main hazard of nuclear waste is its radiation, which is why it is shielded and isolated.",
+      "points": 5,
+      "position": 46
+    },
+    {
+      "id": "mb-medium-q48",
+      "difficulty": "medium",
+      "type": "multiple_choice",
+      "question": "Which of these factors changes a radioactive isotope's half-life?",
+      "options": [
+        "Temperature",
+        "Pressure",
+        "Chemical state",
+        "None of these"
+      ],
+      "correct_answer": 3,
+      "explanation": "Half-life is a property of the nucleus. Ordinary changes in temperature, pressure or chemical state do not change it, so none of these factors affect it.",
+      "points": 5,
+      "position": 47
+    },
+    {
+      "id": "mb-medium-q49",
+      "difficulty": "medium",
+      "type": "multiple_choice",
+      "question": "What is induced radioactivity?",
+      "options": [
+        "Natural radiation",
+        "Artificially created radioactivity",
+        "No radiation",
+        "Weak radiation"
+      ],
+      "correct_answer": 1,
+      "explanation": "Induced radioactivity is created by bombarding stable atoms with particles, such as neutrons, to make them radioactive. It is artificial, not natural.",
+      "points": 5,
+      "position": 48
+    },
+    {
+      "id": "mb-medium-q5",
+      "difficulty": "medium",
+      "type": "multiple_choice",
+      "question": "Which of the following is NOT ionizing radiation?",
+      "options": [
+        "Alpha",
+        "Beta",
+        "Gamma",
+        "Radio waves"
+      ],
+      "correct_answer": 3,
+      "explanation": "Radio waves do not carry enough energy to knock electrons out of atoms, so they are non-ionizing. Alpha, beta and gamma radiation are ionizing.",
+      "points": 5,
+      "position": 4
+    },
+    {
+      "id": "mb-medium-q50",
+      "difficulty": "medium",
+      "type": "multiple_choice",
+      "question": "What is the main advantage of nuclear medicine?",
+      "options": [
+        "High cost",
+        "Precise diagnosis",
+        "Slow process",
+        "No effect"
+      ],
+      "correct_answer": 1,
+      "explanation": "Nuclear medicine uses small amounts of radioactive tracers to show how organs work, which allows precise diagnosis of many conditions.",
+      "points": 5,
+      "position": 49
+    },
+    {
+      "id": "mb-medium-q6",
+      "difficulty": "medium",
+      "type": "multiple_choice",
+      "question": "What is the mass number of an atom with 6 protons and 7 neutrons?",
+      "options": [
+        "6",
+        "7",
+        "13",
+        "1"
+      ],
+      "correct_answer": 2,
+      "explanation": "The mass number is protons plus neutrons: 6 + 7 = 13.",
+      "points": 5,
+      "position": 5
+    },
+    {
+      "id": "mb-medium-q7",
+      "difficulty": "medium",
+      "type": "multiple_choice",
+      "question": "Which particle is responsible for chemical bonding?",
+      "options": [
+        "Proton",
+        "Neutron",
+        "Electron",
+        "Nucleus"
+      ],
+      "correct_answer": 2,
+      "explanation": "Chemical bonds form when atoms share or transfer electrons, so electrons, especially the outer ones, are responsible for bonding.",
+      "points": 5,
+      "position": 6
+    },
+    {
+      "id": "mb-medium-q8",
+      "difficulty": "medium",
+      "type": "multiple_choice",
+      "question": "What is the main hazard of ionizing radiation?",
+      "options": [
+        "Heat production",
+        "Sound waves",
+        "Cell damage",
+        "Light emission"
+      ],
+      "correct_answer": 2,
+      "explanation": "Ionizing radiation can damage cells and their DNA, which is the main health hazard at high doses.",
+      "points": 5,
+      "position": 7
+    },
+    {
+      "id": "mb-medium-q9",
+      "difficulty": "medium",
+      "type": "multiple_choice",
+      "question": "What happens during beta decay?",
+      "options": [
+        "Proton becomes neutron",
+        "Neutron becomes proton",
+        "Nucleus splits",
+        "Nucleus combines"
+      ],
+      "correct_answer": 1,
+      "explanation": "In beta-minus decay a neutron turns into a proton and releases an electron (the beta particle), so the atomic number goes up by one.",
+      "points": 5,
+      "position": 8
+    }
+  ]
+}

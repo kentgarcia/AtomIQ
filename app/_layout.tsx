@@ -5,6 +5,7 @@ import {
     ThemeProvider as NavigationThemeProvider,
     usePathname,
 } from "expo-router";
+import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useMemo } from "react";
 import "react-native-reanimated";
@@ -12,8 +13,8 @@ import "react-native-reanimated";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { ThemeProvider, useTheme } from "@/theme";
 import { useAndroidBackPolicy } from "@/hooks/use-android-back";
+import { ContentGate } from "@/components/content/ContentGate";
 import { useAppFonts } from "@/hooks/use-app-fonts";
-import { ensureContentDatabase } from "@/services/content-db";
 import { StorageProvider } from "@/services/StorageContext";
 import { installMediaLifecycle, setMediaPathname } from "@/services/media";
 import {
@@ -21,6 +22,10 @@ import {
     installGlobalUiSfxHandlers,
     unloadUiSfx,
 } from "@/services/ui-sfx";
+
+// Keep the native splash up until fonts AND the content database are ready.
+// ContentGate hides it as soon as it has something real to show.
+SplashScreen.preventAutoHideAsync().catch(() => {});
 
 export const unstable_settings = {
   anchor: "(tabs)",
@@ -59,11 +64,6 @@ function AppContent() {
     // Preferences, AppState and screen-reader listeners for all media.
     const removeMediaLifecycle = installMediaLifecycle();
 
-    // Prime the bundled content database (lessons/quizzes/myths/facts/games).
-    void ensureContentDatabase().catch((e) => {
-      console.error("[content-db] Startup seeding failed:", e);
-    });
-
     return () => {
       removeMediaLifecycle();
       void unloadUiSfx();
@@ -78,11 +78,15 @@ function AppContent() {
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="lesson" options={{ headerShown: false }} />
         <Stack.Screen name="mythbuster" options={{ headerShown: false }} />
-        <Stack.Screen name="quiz" options={{ headerShown: false }} />
+        <Stack.Screen name="practice" options={{ headerShown: false }} />
         <Stack.Screen name="settings" options={{ headerShown: false }} />
         <Stack.Screen name="privacy-policy" options={{ headerShown: false }} />
         <Stack.Screen name="terms-of-service" options={{ headerShown: false }} />
         <Stack.Screen name="streak" options={{ headerShown: false }} />
+        <Stack.Screen
+          name="daily-streak"
+          options={{ headerShown: false, presentation: "fullScreenModal", animation: "fade" }}
+        />
         <Stack.Screen name="lab" options={{ headerShown: false }} />
         <Stack.Screen name="explorer" options={{ headerShown: false }} />
         <Stack.Screen name="encyclopedia" options={{ headerShown: false }} />
@@ -114,7 +118,9 @@ export default function RootLayout() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <StorageProvider>
         <ThemeProvider>
-          <AppContent />
+          <ContentGate>
+            <AppContent />
+          </ContentGate>
         </ThemeProvider>
       </StorageProvider>
     </GestureHandlerRootView>

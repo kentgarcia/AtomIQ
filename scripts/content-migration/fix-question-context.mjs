@@ -18,6 +18,7 @@
  */
 
 import { DatabaseSync } from "node:sqlite";
+import { backupBeforeScript } from "../lib/backup.mjs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -306,6 +307,8 @@ for (const [id, text] of Object.entries(explanations)) {
 // ---------------------------------------------------------------------------
 // Apply
 // ---------------------------------------------------------------------------
+
+if (!dryRun) backupBeforeScript("fix-question-context", dbPath); // safety net: scripts/lib/backup.mjs
 
 const db = new DatabaseSync(dbPath);
 db.exec("PRAGMA busy_timeout = 10000");

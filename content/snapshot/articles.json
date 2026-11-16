@@ -1,0 +1,575 @@
+{
+  "table": "articles",
+  "primaryKey": [
+    "id"
+  ],
+  "rows": [
+    {
+      "id": "food-irradiation-explained",
+      "type": "guide",
+      "category": "technology",
+      "title": "Food Irradiation: Safer Food Without Making It Radioactive",
+      "subtitle": "What the process does, how it is labeled, and what it cannot do",
+      "content": "# Food Irradiation\n\n**Food irradiation** means passing food through a controlled beam of ionizing radiation, much like a package passing through an airport scanner, but with more energy and a specific purpose.\n\n## What it does\n\nThe radiation damages the genetic material of germs and pests, so they cannot survive or multiply. Depending on the dose, irradiation can:\n\n- kill harmful bacteria such as Salmonella and E. coli\n- destroy insects and parasites, which helps when fruit and spices are shipped long distances\n- slow sprouting in potatoes and onions and delay ripening in fruit\n- extend shelf life by reducing spoilage organisms\n- sterilize food for patients with very weak immune systems\n\n## What it uses\n\nApproved sources are gamma rays from a sealed source such as cobalt-60, electron beams, and X-rays. The food never touches the radioactive source.\n\n## Does it make food radioactive?\n\nNo. The food is exposed to radiation, but it is not contaminated by radioactive material, and the energy used is too low to turn atoms in food radioactive. Think of a suitcase passing through an X-ray scanner: it comes out the same and is not radioactive.\n\n## Does it change the food?\n\nCooking, canning and freezing also change food. Irradiation can slightly reduce some vitamins, in about the same way heat does, and at the doses used it causes little change in taste, texture or appearance.\n\n## How to spot it\n\nIn many countries, irradiated food has to be labeled, often with a green **Radura** symbol and a statement such as \"treated with radiation\". Ingredients inside multi-ingredient products may not always be labeled.\n\n## What it cannot do\n\nIrradiation is not a substitute for clean handling. Food can still be contaminated after treatment, so refrigeration, washing hands and proper cooking still matter.\n\n## Key takeaways\n\n- Irradiation reduces germs and pests, and it does not make food radioactive.\n- It is one tool among many for food safety and shelf life.\n- Labels and rules vary by country, so check local guidance.",
+      "excerpt": "Irradiation exposes food to controlled radiation to kill germs and pests and extend shelf life. It does not make food radioactive. Here is how it works.",
+      "author": {
+        "name": "AtomIQ Editorial Team",
+        "avatar": "@/assets/images/mascot/profile.png",
+        "title": "Educational summary"
+      },
+      "published_date": "2026-11-14",
+      "read_time": 2,
+      "image": "@/assets/nuclear/feed-6.webp",
+      "tags": [
+        "food-safety",
+        "irradiation",
+        "agriculture",
+        "technology"
+      ],
+      "source": "US Food and Drug Administration (FDA)",
+      "source_url": "https://www.fda.gov/food/irradiation-food-packaging/food-irradiation-what-you-need-know",
+      "related_myths": [
+        "myths-facts-15"
+      ],
+      "related_facts": [],
+      "featured": 0,
+      "difficulty": "beginner",
+      "source_type": "government-agency",
+      "source_note": "The FDA's consumer page \"Food Irradiation: What You Need to Know\" explains the process, safety review and labeling in the United States. This article is an independent beginner summary. Rules differ between countries.",
+      "source_published_date": null,
+      "review_status": "needs-review",
+      "last_reviewed": "2026-11-14",
+      "reviewed_by": null,
+      "review_notes": "Automated link checking is blocked by the FDA website (HTTP 401 for scripts) on 2026-11-14, but the page appears in web search results. Open it manually to confirm. Drafted by the AtomIQ editorial team from well-established facts; claims have not yet been checked line by line against the source. Check the numbers, then set review_status to reviewed with a reviewer name.",
+      "summary_origin": "original",
+      "related_lessons": [],
+      "related_concepts": [
+        "ionizing-radiation",
+        "gamma-ray",
+        "x-ray"
+      ],
+      "related_elements": [
+        "Co",
+        "Cs"
+      ]
+    },
+    {
+      "id": "half-life-explained",
+      "type": "guide",
+      "category": "science",
+      "title": "Half-Life Explained: Why Some Atoms Fade Fast and Others Last",
+      "subtitle": "How scientists measure the pace of radioactive decay",
+      "content": "# Half-Life Explained\n\nAn unstable atom, called a **radionuclide**, eventually changes into a different atom and gives off radiation. You cannot predict when one particular atom will decay, but for a large group of identical atoms the pace is very regular. The **half-life** is the time it takes for half of them to decay.\n\n## How it works\n\nSay you start with 100 atoms of a radionuclide whose half-life is one day:\n\n- After 1 day, about 50 atoms are left.\n- After 2 days, about 25 are left.\n- After 3 days, about 12 or 13 are left.\n- After 4 days, about 6 are left.\n\nEach half-life cuts what remains in half. The amount never jumps to zero. It just keeps shrinking.\n\n## A huge range\n\nDifferent radionuclides have very different half-lives:\n\n- **Technetium-99m**, used in medical scans, has a half-life of about 6 hours.\n- **Iodine-131**, used to treat thyroid conditions, has a half-life of about 8 days.\n- **Carbon-14**, used to date ancient remains, has a half-life of about 5,730 years.\n- **Uranium-238** has a half-life of roughly 4.5 billion years.\n\n## Why it matters\n\n- **Medicine:** short half-lives mean a tracer does its job and then fades quickly.\n- **Dating:** measuring how much carbon-14 is left in a bone or piece of wood reveals how long ago the organism died.\n- **Waste:** materials with short half-lives become much less radioactive within days or years, while long-lived ones need to be isolated for a very long time.\n\n## A common mix-up\n\nA long half-life does not mean \"more dangerous\". A material that decays slowly gives off radiation slowly. A material that decays quickly gives off a lot of radiation in a short time but is soon gone. Risk depends on the type of radiation, the amount, and how a person is exposed.\n\n## Key takeaways\n\n- Half-life is the time for half of a sample to decay.\n- It is a fixed property of each radionuclide. Heat, pressure and chemistry do not change it.\n- After about 10 half-lives, less than one thousandth of the original amount remains.",
+      "excerpt": "A half-life is the time it takes for half of a radioactive sample to decay. See why it ranges from seconds to billions of years and why that matters.",
+      "author": {
+        "name": "AtomIQ Editorial Team",
+        "avatar": "@/assets/images/mascot/profile.png",
+        "title": "Educational summary"
+      },
+      "published_date": "2026-11-14",
+      "read_time": 2,
+      "image": "@/assets/nuclear/feed-3.webp",
+      "tags": [
+        "half-life",
+        "radioactive-decay",
+        "isotopes",
+        "basics"
+      ],
+      "source": "US Environmental Protection Agency (EPA)",
+      "source_url": "https://www.epa.gov/radiation/radioactive-decay",
+      "related_myths": [
+        "myths-facts-18"
+      ],
+      "related_facts": [],
+      "featured": 0,
+      "difficulty": "beginner",
+      "source_type": "government-agency",
+      "source_note": "The EPA's \"Radioactive Decay\" page defines decay, decay chains and half-life. This article builds a beginner-level explanation and worked example around those definitions.",
+      "source_published_date": null,
+      "review_status": "needs-review",
+      "last_reviewed": "2026-11-14",
+      "reviewed_by": null,
+      "review_notes": "Source link responded with HTTP 200 on 2026-11-14. Drafted by the AtomIQ editorial team from well-established facts; claims have not yet been checked line by line against the source. Check the numbers, then set review_status to reviewed with a reviewer name. Verify the example half-lives against a nuclear data table.",
+      "summary_origin": "original",
+      "related_lessons": [],
+      "related_concepts": [
+        "half-life",
+        "decay",
+        "radionuclide",
+        "becquerel",
+        "isotope"
+      ],
+      "related_elements": [
+        "C",
+        "I",
+        "Tc",
+        "U"
+      ]
+    },
+    {
+      "id": "how-nuclear-plants-stay-safe",
+      "type": "guide",
+      "category": "safety",
+      "title": "How Nuclear Power Plants Are Designed to Stay Safe",
+      "subtitle": "Layers of protection, from fuel pellets to containment",
+      "content": "# How Nuclear Power Plants Are Designed to Stay Safe\n\nA reactor makes heat by splitting uranium atoms, and that heat boils water to turn a turbine. Reactor designers assume things can go wrong, so they build in several layers of protection.\n\n## Defense in depth\n\nThe core idea is **defense in depth**: no single barrier or system is trusted to do everything. Several independent layers back each other up.\n\n- **The fuel itself:** uranium is formed into hard ceramic pellets that trap most radioactive by-products.\n- **Fuel cladding:** the pellets sit inside sealed metal tubes.\n- **The reactor vessel and cooling loop:** thick steel holds the core and the coolant.\n- **The containment building:** a strong, sealed structure, often steel and reinforced concrete, around the reactor.\n\n## Controlling the reaction\n\n**Control rods** soak up neutrons. Pushing them into the core slows the chain reaction, and they can be dropped in quickly to shut the reactor down. This emergency shutdown is called a **scram**.\n\n## Keeping the core cool\n\nEven after shutdown, fuel keeps producing some heat for a while, so cooling must continue. Plants have several cooling systems and backup power. Many newer designs add **passive safety features** that rely on gravity, natural circulation or pressure differences, so they keep working without pumps or electricity.\n\n## People and oversight\n\nSafety is not only hardware. Operators train on simulators, plants are inspected by independent national regulators, and international groups such as the IAEA run peer reviews so countries can share lessons.\n\n## What accidents taught\n\nThree accidents shaped modern practice: Three Mile Island in 1979, Chernobyl in 1986 and Fukushima Daiichi in 2011. The Fukushima accident started when an earthquake and tsunami cut power and cooling. After each event, designs, procedures and regulation were reviewed and strengthened.\n\n## Can a reactor explode like a bomb?\n\nNo. Reactor fuel is only slightly enriched, while a bomb needs highly enriched material in a very special arrangement. Reactors can still have serious accidents, such as overheating or hydrogen explosions, which is exactly why the layers above exist.\n\n## Key takeaways\n\n- Safety comes from many independent layers, not one perfect part.\n- Cooling the fuel after shutdown is as important as stopping the reaction.\n- Accidents are rare but taken seriously, and each one has led to changes.",
+      "excerpt": "Reactor safety relies on defense in depth: several independent barriers and backup systems. See how they work and what past accidents taught the industry.",
+      "author": {
+        "name": "AtomIQ Editorial Team",
+        "avatar": "@/assets/images/mascot/profile.png",
+        "title": "Educational summary"
+      },
+      "published_date": "2026-11-14",
+      "read_time": 2,
+      "image": "@/assets/nuclear/feed-4.webp",
+      "tags": [
+        "safety",
+        "defense-in-depth",
+        "reactors",
+        "containment"
+      ],
+      "source": "World Nuclear Association",
+      "source_url": "https://world-nuclear.org/information-library/safety-and-security/safety-of-plants/safety-of-nuclear-power-reactors",
+      "related_myths": [
+        "nuclear-plants-explode",
+        "fukushima-was-nuclear-explosion",
+        "myths-facts-03",
+        "myths-facts-14"
+      ],
+      "related_facts": [],
+      "featured": 0,
+      "difficulty": "beginner",
+      "source_type": "industry-association",
+      "source_note": "The World Nuclear Association's \"Safety of Nuclear Power Reactors\" page covers reactor safety design. The WNA represents the nuclear industry, so check its claims against a regulator or the IAEA. This article is an independent beginner summary.",
+      "source_published_date": null,
+      "review_status": "needs-review",
+      "last_reviewed": "2026-11-14",
+      "reviewed_by": null,
+      "review_notes": "Source link responded with HTTP 200 on 2026-11-14. Drafted by the AtomIQ editorial team from well-established facts; claims have not yet been checked line by line against the source. Check the numbers, then set review_status to reviewed with a reviewer name. Cross-check with an IAEA or national regulator page because the source is an industry body.",
+      "summary_origin": "original",
+      "related_lessons": [],
+      "related_concepts": [
+        "defense-in-depth",
+        "containment-building",
+        "control-rods",
+        "meltdown",
+        "nuclear-reactor"
+      ],
+      "related_elements": [
+        "U"
+      ]
+    },
+    {
+      "id": "how-reactors-work",
+      "type": "guide",
+      "category": "technology",
+      "title": "How Nuclear Reactors Actually Work",
+      "subtitle": "A simple explanation of nuclear fission and power generation",
+      "content": "\n# How Nuclear Reactors Work\n\nNuclear power plants generate electricity through a process called nuclear fission - splitting atoms to release energy. But how does this actually work?\n\n## The Basic Principle\n\nAt its core, a nuclear reactor is a sophisticated steam engine. The key difference? Instead of burning coal or gas, it uses nuclear fission to create heat.\n\n## The Fission Process\n\n**Step 1: Neutron Collision**\nA neutron strikes a Uranium-235 atom, causing it to split into two smaller atoms (fission products).\n\n**Step 2: Energy Release**\nThis splitting releases tremendous energy as heat, plus 2-3 more neutrons.\n\n**Step 3: Chain Reaction**\nThose neutrons go on to split more U-235 atoms, creating a self-sustaining chain reaction.\n\n## Key Components\n\n### 1. Fuel Rods\n- Contain uranium pellets (3-5% U-235)\n- Arranged in bundles\n- Replaced every 18-24 months\n\n### 2. Control Rods\n- Made of neutron-absorbing material (boron/cadmium)\n- Insert to slow reaction, withdraw to speed it up\n- The \"brakes\" of the reactor\n\n### 3. Moderator\n- Usually water\n- Slows down neutrons for better fission\n- Also acts as coolant\n\n### 4. Coolant System\n- Carries heat away from reactor core\n- Primary loop stays in containment\n- Secondary loop creates steam for turbines\n\n## Power Generation Steps\n\n1. **Fission** creates heat in reactor core\n2. **Coolant** (water) absorbs this heat\n3. **Heat exchanger** transfers heat to secondary loop\n4. **Steam** drives turbines\n5. **Turbines** spin generators\n6. **Electricity** is produced\n\n## Safety Systems\n\n**Multiple Barriers:**\n- Fuel pellet cladding\n- Reactor vessel (steel, 8-12 inches thick)\n- Containment building (concrete, 3-6 feet thick)\n\n**Passive Safety:**\n- Negative void coefficient: If coolant boils away, reaction slows\n- Gravity-fed emergency cooling\n- Multiple redundant systems\n\n## Why Can't Reactors Explode Like Bombs?\n\n**Nuclear bombs need:**\n- 90%+ enriched uranium\n- Rapid, uncontrolled reaction\n- Precise timing and compression\n\n**Reactors have:**\n- 3-5% enriched uranium\n- Controlled, sustained reaction\n- Multiple safety systems\n\nIt's physically impossible for a reactor to explode like a nuclear weapon.\n\n## Modern Reactor Types\n\n**Generation III+ Reactors:**\n- Enhanced safety features\n- Passive cooling systems\n- Longer operational life\n- Better fuel efficiency\n\n**Small Modular Reactors (SMRs):**\n- Factory-built, truck-delivered\n- Inherently safer designs\n- Lower upfront costs\n- Flexible deployment\n\n## Environmental Benefits\n\n- **Zero CO2 during operation**\n- **Small land footprint**\n- **Minimal waste volume**\n- **24/7 reliable power**\n\n## Key Takeaways\n\n1. Reactors use controlled fission, not explosions\n2. Multiple safety systems prevent accidents\n3. Can't explode like nuclear weapons\n4. Clean, reliable electricity generation\n5. Modern designs are even safer\n  ",
+      "excerpt": "Nuclear reactors are essentially sophisticated steam engines. Learn how controlled fission reactions produce the electricity that powers millions of homes.",
+      "author": {
+        "name": "AtomIQ Editorial Team",
+        "avatar": "@/assets/images/mascot/profile.png",
+        "title": "Educational summary"
+      },
+      "published_date": "2024-11-10",
+      "read_time": 8,
+      "image": "https://images.pexels.com/photos/9875414/pexels-photo-9875414.jpeg",
+      "tags": [
+        "reactors",
+        "technology",
+        "fission",
+        "energy",
+        "how-it-works"
+      ],
+      "source": "World Nuclear Association",
+      "source_url": "https://world-nuclear.org",
+      "related_myths": [
+        "nuclear-plants-explode"
+      ],
+      "related_facts": [],
+      "featured": 1,
+      "difficulty": "intermediate",
+      "source_type": "industry-association",
+      "source_note": "General nuclear-power background from the World Nuclear Association. AtomIQ's article is a plain-language summary written in its own words, not a copy of the source.",
+      "source_published_date": null,
+      "review_status": "needs-review",
+      "last_reviewed": "2026-11-14",
+      "reviewed_by": null,
+      "review_notes": "Source link is a site homepage, not the specific page the summary draws on. Find and link the exact page, re-check the facts, then mark reviewed. The previous byline (\"Prof. James Anderson, Nuclear Engineer\") was an unverified editorial persona and was replaced by the AtomIQ Editorial Team.",
+      "summary_origin": "original",
+      "related_lessons": [],
+      "related_concepts": [
+        "nuclear-reactor",
+        "control-rods",
+        "moderator",
+        "chain-reaction",
+        "nuclear-fission"
+      ],
+      "related_elements": [
+        "U"
+      ]
+    },
+    {
+      "id": "medical-isotopes-in-health",
+      "type": "guide",
+      "category": "health",
+      "title": "Medical Isotopes: How Radioactivity Helps Doctors See and Heal",
+      "subtitle": "Tracers for diagnosis, targeted radiation for treatment",
+      "content": "# Medical Isotopes\n\nSome atoms are radioactive on purpose. In **nuclear medicine**, doctors use small amounts of radioactive isotopes, called **radioisotopes**, to look inside the body and to treat disease.\n\n## Seeing inside the body: tracers\n\nA **tracer** is a radioactive substance attached to a molecule the body naturally uses. It is given to the patient, travels to certain organs or tissues, and the radiation it gives off is picked up by a special camera.\n\n- **Technetium-99m** is the most widely used diagnostic isotope. With a half-life of about 6 hours, it lets doctors image the heart, bones and other organs and then fades quickly.\n- **Fluorine-18**, attached to a sugar-like molecule, is used in **PET scans**. Active tissue such as many tumors takes up more sugar, so it shows up brightly. Its half-life is under two hours.\n\n## Treating disease\n\n- **Iodine-131** collects in the thyroid gland, so it is used to treat an overactive thyroid and some thyroid cancers.\n- **Radiotherapy** aims beams of high-energy radiation at a tumor to damage its cells. Some machines use gamma rays from cobalt-60, and others use X-rays made by accelerators.\n\n## Where isotopes come from\n\n- **Research reactors** make neutron-rich isotopes. Molybdenum-99 is produced this way and then decays into technetium-99m.\n- **Cyclotrons**, a kind of particle accelerator, make proton-rich isotopes such as fluorine-18.\n\nBecause many medical isotopes have short half-lives, they must be made close to where they will be used and delivered quickly.\n\n## Is it safe?\n\nThe doses are carefully chosen to be as low as reasonably achievable while still giving a clear image or an effective treatment. Short half-lives mean the radioactivity leaves the body within hours or days. A patient who has had a nuclear medicine scan may be given simple precautions for a short time.\n\n## X-rays versus nuclear medicine\n\nA standard X-ray sends radiation through your body from a machine and does not make you radioactive. Nuclear medicine puts a radioactive substance inside the body, which is why it is handled and timed so carefully.\n\n## Key takeaways\n\n- Tracers show how organs work, and some isotopes treat disease.\n- Short half-lives keep exposure low and brief.\n- Reactors and cyclotrons produce the isotopes hospitals rely on.",
+      "excerpt": "Hospitals use small amounts of radioactive isotopes to image organs and to treat disease. Find out how they are made, used and kept safe.",
+      "author": {
+        "name": "AtomIQ Editorial Team",
+        "avatar": "@/assets/images/mascot/profile.png",
+        "title": "Educational summary"
+      },
+      "published_date": "2026-11-14",
+      "read_time": 2,
+      "image": "@/assets/nuclear/feed-5.webp",
+      "tags": [
+        "medicine",
+        "isotopes",
+        "nuclear-medicine",
+        "imaging",
+        "radiotherapy"
+      ],
+      "source": "World Nuclear Association",
+      "source_url": "https://world-nuclear.org/information-library/non-power-nuclear-applications/radioisotopes-research/radioisotopes-in-medicine",
+      "related_myths": [
+        "myths-facts-07",
+        "myths-facts-29"
+      ],
+      "related_facts": [],
+      "featured": 0,
+      "difficulty": "beginner",
+      "source_type": "industry-association",
+      "source_note": "The World Nuclear Association's \"Radioisotopes in Medicine\" page surveys diagnostic and therapeutic uses. This article gives a beginner-level overview in AtomIQ's words. The WNA is an industry body, so confirm clinical statements with a medical or regulatory source.",
+      "source_published_date": null,
+      "review_status": "needs-review",
+      "last_reviewed": "2026-11-14",
+      "reviewed_by": null,
+      "review_notes": "Source link responded with HTTP 200 on 2026-11-14. Drafted by the AtomIQ editorial team from well-established facts; claims have not yet been checked line by line against the source. Check the numbers, then set review_status to reviewed with a reviewer name. Have a clinician or medical physicist confirm the clinical wording.",
+      "summary_origin": "original",
+      "related_lessons": [],
+      "related_concepts": [
+        "radionuclide",
+        "cyclotron",
+        "half-life",
+        "x-ray",
+        "isotope"
+      ],
+      "related_elements": [
+        "Tc",
+        "Mo",
+        "F",
+        "I",
+        "Co"
+      ]
+    },
+    {
+      "id": "nuclear-history",
+      "type": "article",
+      "category": "history",
+      "title": "The History of Nuclear Energy: From Discovery to Power",
+      "subtitle": "A journey through the milestones that shaped nuclear energy",
+      "content": "\n# The History of Nuclear Energy: From Discovery to Power\n\nThe story of nuclear energy spans over a century, from scientific curiosity to a major source of clean electricity.\n\n## The Early Years (1890s-1940s)\n\n**1896: Discovery of Radioactivity**\nHenri Becquerel discovered that uranium emits invisible rays. Marie and Pierre Curie later isolated radium and polonium, coining the term \"radioactivity.\"\n\n**1938: Nuclear Fission Discovered**\nGerman scientists Otto Hahn and Fritz Strassmann, with Lise Meitner, discovered that bombarding uranium with neutrons splits the atom, releasing enormous energy.\n\n**1942: First Controlled Chain Reaction**\nEnrico Fermi achieved the first self-sustaining nuclear chain reaction at the University of Chicago, proving controlled fission was possible.\n\n## The Atomic Age (1945-1950s)\n\n**1945: Trinity Test**\nThe first nuclear weapon test in New Mexico demonstrated the power of nuclear fission.\n\n**1951: First Electricity Generation**\nThe Experimental Breeder Reactor I (EBR-I) in Idaho became the first reactor to generate electricity, powering four light bulbs.\n\n**1954: First Nuclear Submarine**\nUSS Nautilus launched, proving nuclear power could work in confined spaces and operate for months without refueling.\n\n**1956: First Commercial Nuclear Power Plant**\nCalder Hall in the UK became the world's first commercial nuclear power station, generating electricity for the grid.\n\n## Global Expansion (1960s-1970s)\n\n**1960s: Rapid Growth**\nNuclear power plants began operating across the US, France, Germany, and Japan. The technology was seen as the future of clean energy.\n\n**1973: Oil Crisis**\nThe oil embargo accelerated nuclear power development as countries sought energy independence.\n\n**1979: Three Mile Island**\nA partial meltdown in Pennsylvania raised safety concerns, leading to stricter regulations and public skepticism.\n\n## Modern Era (1980s-Present)\n\n**1986: Chernobyl Accident**\nThe worst nuclear accident in history led to major safety improvements and design changes worldwide.\n\n**2011: Fukushima**\nA tsunami caused reactor meltdowns in Japan, prompting a global review of safety standards and emergency preparedness.\n\n**2020s: Nuclear Renaissance**\nGrowing climate concerns and improved reactor designs are driving renewed interest in nuclear energy as a clean power source.\n\n## Key Innovations\n\n**Pressurized Water Reactors (PWRs)**\nThe most common design, using water as both coolant and moderator.\n\n**Boiling Water Reactors (BWRs)**\nSimpler design where water boils directly in the reactor core.\n\n**Small Modular Reactors (SMRs)**\nNew generation of smaller, safer, factory-built reactors.\n\n**Generation IV Reactors**\nAdvanced designs promising better safety, efficiency, and waste management.\n\n## Impact on Society\n\nNuclear energy has:\n- Provided 10% of global electricity for decades\n- Prevented billions of tons of CO2 emissions\n- Enabled space exploration (nuclear batteries)\n- Revolutionized medicine (radiation therapy, medical imaging)\n- Powered naval vessels for decades\n\n## Lessons Learned\n\n1. **Safety First**: Every accident led to major safety improvements\n2. **Public Trust**: Communication and transparency are crucial\n3. **Regulation Matters**: Strong oversight prevents accidents\n4. **Innovation Continues**: New designs address past concerns\n5. **Climate Solution**: Nuclear is essential for decarbonization\n\n## The Future\n\nAs we face climate change, nuclear energy is experiencing a renaissance. New reactor designs promise:\n- Enhanced safety features\n- Reduced waste\n- Lower costs\n- Flexible deployment\n- Better integration with renewables\n\nThe history of nuclear energy shows both challenges and triumphs. The future looks bright as we learn from the past and innovate for tomorrow.\n  ",
+      "excerpt": "From the discovery of radioactivity to the first nuclear power plant, explore the fascinating history of how humanity harnessed the atom.",
+      "author": {
+        "name": "AtomIQ Editorial Team",
+        "avatar": "@/assets/images/mascot/profile.png",
+        "title": "Educational summary"
+      },
+      "published_date": "2024-11-18",
+      "read_time": 6,
+      "image": "https://images.pexels.com/photos/256514/pexels-photo-256514.jpeg",
+      "tags": [
+        "history",
+        "nuclear",
+        "timeline",
+        "discovery"
+      ],
+      "source": "World Nuclear Association",
+      "source_url": "https://world-nuclear.org",
+      "related_myths": [],
+      "related_facts": [],
+      "featured": 1,
+      "difficulty": "beginner",
+      "source_type": "industry-association",
+      "source_note": "Historical background from the World Nuclear Association. AtomIQ's timeline is a summary written in its own words.",
+      "source_published_date": null,
+      "review_status": "needs-review",
+      "last_reviewed": "2026-11-14",
+      "reviewed_by": null,
+      "review_notes": "Source link is a site homepage, not the specific page the summary draws on. Find and link the exact page, re-check the facts, then mark reviewed. The previous byline (\"Dr. Robert Kim, Nuclear Historian\") was an unverified editorial persona and was replaced. Check every date in the timeline against a primary or encyclopedic source.",
+      "summary_origin": "original",
+      "related_lessons": [],
+      "related_concepts": [
+        "henri-becquerel",
+        "marie-curie",
+        "enrico-fermi",
+        "otto-hahn",
+        "nuclear-fission"
+      ],
+      "related_elements": [
+        "U",
+        "Ra",
+        "Po"
+      ]
+    },
+    {
+      "id": "nuclear-vs-renewables",
+      "type": "article",
+      "category": "environment",
+      "title": "Nuclear vs Renewables: Partners, Not Rivals",
+      "subtitle": "Why we need both nuclear and renewable energy for a clean future",
+      "content": "\n# Nuclear vs Renewables: Partners, Not Rivals\n\nThe energy debate often pits nuclear against renewables. But this is a false choice. We need both to achieve our climate goals.\n\n## The Climate Challenge\n\nTo limit global warming to 1.5°C, we must reach net-zero emissions by 2050. This requires:\n- Tripling global electricity generation\n- Eliminating fossil fuels\n- Maintaining grid stability\n- Meeting 24/7 demand\n\n## Strengths of Each\n\n### Nuclear Energy\n**Advantages:**\n- 24/7 baseload power\n- Tiny land footprint\n- Weather-independent\n- 60+ year lifespan\n- Highest capacity factor (90%+)\n\n**Challenges:**\n- High upfront costs\n- Long construction times\n- Public perception\n- Waste management\n\n### Renewable Energy\n**Advantages:**\n- Falling costs\n- Rapid deployment\n- Distributed generation\n- Public support\n- No fuel needed\n\n**Challenges:**\n- Intermittency (sun/wind)\n- Large land requirements\n- Energy storage needs\n- Grid integration complexity\n\n## Why We Need Both\n\n### Complementary Strengths\n\n**Nuclear provides:**\n- Stable baseload\n- Grid frequency regulation\n- Backup for renewables\n- Industrial heat\n\n**Renewables provide:**\n- Peak demand coverage\n- Distributed generation\n- Rapid capacity addition\n- Cost-effective expansion\n\n### Real-World Examples\n\n**France:**\n- 70% nuclear baseload\n- Adding wind/solar for peaks\n- Lowest CO2 in Europe\n- Stable, affordable power\n\n**Denmark:**\n- 50% wind power\n- Imports nuclear from neighbors\n- High electricity prices\n- Grid stability challenges\n\n**Ontario, Canada:**\n- Nuclear + hydro baseload\n- Eliminated coal entirely\n- Stable grid\n- Clean electricity\n\n## The Math\n\n**To replace 1 GW coal plant:**\n\n**Nuclear:**\n- 1 reactor\n- 1 square mile\n- 90% capacity factor\n- 60-year lifespan\n\n**Solar:**\n- 3 GW capacity needed\n- 75 square miles\n- 25% capacity factor\n- 25-year lifespan\n\n**Wind:**\n- 3 GW capacity needed\n- 360 square miles\n- 35% capacity factor\n- 20-year lifespan\n\n## Storage Reality\n\n**Battery costs:**\n- $150-200/kWh today\n- Need TWh of storage for 100% renewables\n- $150-200 trillion globally\n- Lithium supply constraints\n\n**Nuclear alternative:**\n- Provides storage-free baseload\n- Reduces battery needs by 70%\n- More affordable path\n- Proven technology\n\n## Carbon Emissions\n\n**Lifecycle CO2 (g/kWh):**\n- Coal: 820\n- Gas: 490\n- Solar: 48\n- Wind: 11\n- Nuclear: 12\n- Hydro: 24\n\nNuclear and renewables are equally clean!\n\n## Land Use\n\n**For 1 TWh/year:**\n- Nuclear: 1 km²\n- Solar: 75 km²\n- Wind: 360 km²\n\nNuclear is 75-360x more land-efficient.\n\n## The Optimal Mix\n\n**Ideal grid composition:**\n- 40-50% Nuclear (baseload)\n- 30-40% Renewables (variable)\n- 10-20% Hydro (storage/flexibility)\n- <5% Gas (emergency backup)\n\n## Economic Reality\n\n**Levelized Cost ($/MWh):**\n- Nuclear: $70-90\n- Solar: $30-50\n- Wind: $30-60\n- + Storage: +$50-100\n\nWith storage, costs are comparable.\n\n## Key Takeaways\n\n1. Nuclear and renewables are complementary\n2. Both are essential for net-zero\n3. Nuclear provides stable baseload\n4. Renewables add flexibility\n5. Together, they beat fossil fuels\n6. We can't afford to exclude either\n\n## The Bottom Line\n\nThe question isn't \"nuclear OR renewables\" - it's \"how much of each?\" Every country needs a mix that works for their geography, resources, and needs.\n\nThe climate crisis is too urgent for energy tribalism. We need all clean energy technologies working together.\n  ",
+      "excerpt": "The debate between nuclear and renewables misses the point. Both are essential for achieving net-zero emissions and fighting climate change.",
+      "author": {
+        "name": "AtomIQ Editorial Team",
+        "avatar": "@/assets/images/mascot/profile.png",
+        "title": "Educational summary"
+      },
+      "published_date": "2024-11-20",
+      "read_time": 7,
+      "image": "https://images.pexels.com/photos/414837/pexels-photo-414837.jpeg",
+      "tags": [
+        "environment",
+        "renewables",
+        "climate",
+        "energy-policy",
+        "comparison"
+      ],
+      "source": "IPCC Special Report",
+      "source_url": "https://www.ipcc.ch",
+      "related_myths": [],
+      "related_facts": [
+        "carbon-emissions"
+      ],
+      "featured": 1,
+      "difficulty": "intermediate",
+      "source_type": "international-organization",
+      "source_note": "Climate-context reference: the Intergovernmental Panel on Climate Change (IPCC). The article is AtomIQ's own summary of the nuclear-and-renewables debate, not an IPCC text.",
+      "source_published_date": null,
+      "review_status": "needs-review",
+      "last_reviewed": "2026-11-14",
+      "reviewed_by": null,
+      "review_notes": "Source link is a site homepage, not the specific page the summary draws on. Find and link the exact page, re-check the facts, then mark reviewed. The article also takes an advocacy tone (\"false choice\", \"partners, not rivals\"); reword it neutrally or label it as opinion before release. Byline was an unverified persona (\"Dr. Maria Rodriguez\") and was replaced.",
+      "summary_origin": "original",
+      "related_lessons": [],
+      "related_concepts": [
+        "nuclear-reactor"
+      ],
+      "related_elements": [
+        "Li"
+      ]
+    },
+    {
+      "id": "nuclear-waste-management",
+      "type": "article",
+      "category": "energy",
+      "title": "Nuclear Waste Management: The Science and Solutions",
+      "subtitle": "Understanding how nuclear waste is safely stored and managed",
+      "content": "\n# Nuclear Waste Management: The Science and Solutions\n\nNuclear waste management is one of the most regulated and carefully managed processes in the world. Here's how it actually works.\n\n## Types of Nuclear Waste\n\n**Low-Level Waste (LLW)**\n- Gloves, tools, clothing from nuclear facilities\n- 90% of waste volume, <1% of radioactivity\n- Stored in near-surface facilities\n- Safe after 100-300 years\n\n**Intermediate-Level Waste (ILW)**\n- Reactor components, filters, resins\n- Requires shielding but not cooling\n- Stored in concrete containers\n- Safe after 1,000-10,000 years\n\n**High-Level Waste (HLW)**\n- Used nuclear fuel\n- <1% of volume, 95% of radioactivity\n- Requires cooling and shielding\n- Remains radioactive for 100,000+ years\n\n## Current Storage Methods\n\n### Spent Fuel Pools\n- Water-filled pools at reactor sites\n- Water provides cooling and shielding\n- Can store fuel for decades\n- Used worldwide safely for 60+ years\n\n### Dry Cask Storage\n- Steel and concrete containers\n- Air-cooled, passively safe\n- Can store fuel for 100+ years\n- Used at most US nuclear plants\n\n### Deep Geological Repositories\n- Underground storage in stable rock formations\n- Multiple barriers prevent release\n- Finland's Onkalo: first permanent repository\n- Designed to last 100,000+ years\n\n## The Volume Reality\n\n**Myth**: Nuclear waste is a huge problem\n**Reality**: All US nuclear waste fits in a single football field, 10 yards high\n\n**Annual US nuclear waste**: ~2,000 metric tons\n**Compare to coal ash**: 130 million tons/year\n**Compare to CO2**: 5 billion tons/year\n\n## Safety Record\n\n**Zero deaths** from nuclear waste storage in 60+ years\n**Zero environmental releases** from properly managed storage\n**Multiple layers** of protection prevent accidents\n\n## The Finnish Solution: Onkalo\n\nFinland is building the world's first permanent repository:\n- 500 meters underground\n- Stable bedrock for 1.8 billion years\n- Multiple engineered barriers\n- Will hold waste for 100,000 years\n- Cost: €3.5 billion (less than one year of fossil fuel subsidies)\n\n## Reprocessing\n\nSome countries reprocess used fuel:\n- Extracts reusable uranium and plutonium\n- Reduces waste volume by 90%\n- Creates new fuel from \"waste\"\n- Used in France, UK, Russia, Japan\n\n## Advanced Reactors\n\nNew reactor designs can:\n- Use existing waste as fuel\n- Reduce waste volume further\n- Shorten half-lives significantly\n- Generate electricity from \"waste\"\n\n## Regulations\n\nNuclear waste is regulated by:\n- International Atomic Energy Agency (IAEA)\n- National nuclear regulators\n- Environmental agencies\n- Multiple independent oversight bodies\n\n**Standards**: Stricter than any other industry\n**Monitoring**: Continuous for centuries\n**Transparency**: Public access to all data\n\n## Public Perception vs Reality\n\n**Perception**: Waste is dangerous and unmanageable\n**Reality**: Safely managed for 60+ years with zero incidents\n\n**Perception**: Waste lasts forever\n**Reality**: Radioactivity decreases over time (half-lives)\n\n**Perception**: Waste is everywhere\n**Reality**: Tiny volume, highly concentrated, carefully controlled\n\n## Key Takeaways\n\n1. Nuclear waste is tiny in volume\n2. Safely managed for 60+ years\n3. Multiple storage options exist\n4. Permanent solutions are being built\n5. Advanced reactors can use waste as fuel\n6. Highly regulated and monitored\n7. Zero deaths from storage\n\n## The Bottom Line\n\nNuclear waste is manageable, regulated, and safely stored. The technology exists, the facilities are being built, and the track record is excellent. As we address climate change, nuclear waste management is a solved problem with proven solutions.\n  ",
+      "excerpt": "Nuclear waste is often misunderstood. Learn how it's actually managed, stored, and why it's one of the most regulated substances on Earth.",
+      "author": {
+        "name": "AtomIQ Editorial Team",
+        "avatar": "@/assets/images/mascot/profile.png",
+        "title": "Educational summary"
+      },
+      "published_date": "2024-11-12",
+      "read_time": 7,
+      "image": "https://images.pexels.com/photos/2280547/pexels-photo-2280547.jpeg",
+      "tags": [
+        "waste",
+        "storage",
+        "safety",
+        "management"
+      ],
+      "source": "IAEA",
+      "source_url": "https://www.iaea.org",
+      "related_myths": [
+        "nuclear-waste-forever"
+      ],
+      "related_facts": [],
+      "featured": 1,
+      "difficulty": "intermediate",
+      "source_type": "international-organization",
+      "source_note": "Waste-management background from the International Atomic Energy Agency (IAEA). AtomIQ's summary is written in its own words.",
+      "source_published_date": null,
+      "review_status": "needs-review",
+      "last_reviewed": "2026-11-14",
+      "reviewed_by": null,
+      "review_notes": "Source link is a site homepage, not the specific page the summary draws on. Find and link the exact page, re-check the facts, then mark reviewed. Verify the waste-volume percentages quoted in the body. Byline was an unverified persona (\"Dr. Lisa Park\") and was replaced.",
+      "summary_origin": "original",
+      "related_lessons": [],
+      "related_concepts": [
+        "radioactive-waste",
+        "spent-fuel",
+        "low-level-waste",
+        "vitrification"
+      ],
+      "related_elements": [
+        "U",
+        "Pu"
+      ]
+    },
+    {
+      "id": "radiation-basics-explained",
+      "type": "guide",
+      "category": "science",
+      "title": "Radiation Basics: What It Is and Where It Comes From",
+      "subtitle": "A plain-language tour of ionizing and non-ionizing radiation",
+      "content": "# Radiation Basics\n\n**Radiation** is energy that moves from a source out into space or through a material. Light from a lamp, heat from a campfire and the signal from a radio tower are all radiation. Only some kinds are strong enough to be a health concern.\n\n## Two families\n\n- **Non-ionizing radiation** has too little energy to knock electrons out of atoms. Radio waves, microwaves, visible light and most of the heat you feel from the Sun belong here.\n- **Ionizing radiation** carries enough energy to strip electrons from atoms and molecules. That can damage living cells, which is why it is handled carefully.\n\n## Three common types of ionizing radiation\n\n- **Alpha particles** are heavy and slow. A sheet of paper or the outer layer of your skin stops them, but an alpha emitter that is swallowed or inhaled can harm tissue from the inside.\n- **Beta particles** are fast electrons. A thin sheet of plastic or aluminum stops them.\n- **Gamma rays and X-rays** are high-energy waves. They pass through a lot of material, so dense shielding such as lead or thick concrete is used.\n\n## Where everyday exposure comes from\n\nRadiation is part of the natural world. Most of the radiation people receive comes from:\n\n- **Radon**, a gas that seeps out of rock and soil and can build up indoors\n- **Cosmic rays** arriving from space, which are stronger at higher altitude\n- **Rocks and soil**, and even our own bodies, which contain tiny amounts of radioactive elements such as potassium-40\n- **Medical imaging**, the largest human-made source for most people\n\n## The three safety habits\n\nRadiation workers rely on **time, distance and shielding**: spend less time near a source, stay farther away, and put the right material in between. The guiding idea is **ALARA**: keep doses as low as reasonably achievable.\n\n## Key takeaways\n\n- Not all radiation is dangerous, and not all of it is man-made.\n- What matters most is the type of radiation and the dose received.\n- Instruments such as Geiger counters and dosimeters make an invisible hazard measurable.",
+      "excerpt": "Radiation is energy that travels from a source. Learn the difference between ionizing and non-ionizing radiation and where everyday exposure comes from.",
+      "author": {
+        "name": "AtomIQ Editorial Team",
+        "avatar": "@/assets/images/mascot/profile.png",
+        "title": "Educational summary"
+      },
+      "published_date": "2026-11-14",
+      "read_time": 2,
+      "image": "@/assets/nuclear/feed-2.webp",
+      "tags": [
+        "radiation",
+        "basics",
+        "ionizing-radiation",
+        "background-radiation"
+      ],
+      "source": "US Environmental Protection Agency (EPA)",
+      "source_url": "https://www.epa.gov/radiation/radiation-basics",
+      "related_myths": [
+        "myths-facts-05",
+        "myths-facts-06"
+      ],
+      "related_facts": [],
+      "featured": 0,
+      "difficulty": "beginner",
+      "source_type": "government-agency",
+      "source_note": "The EPA's \"Radiation Basics\" page is a short government explainer on radiation types and sources. This article restates the core ideas in AtomIQ's own words and adds lesson links.",
+      "source_published_date": null,
+      "review_status": "needs-review",
+      "last_reviewed": "2026-11-14",
+      "reviewed_by": null,
+      "review_notes": "Source link responded with HTTP 200 on 2026-11-14. Drafted by the AtomIQ editorial team from well-established facts; claims have not yet been checked line by line against the source. Check the numbers, then set review_status to reviewed with a reviewer name.",
+      "summary_origin": "original",
+      "related_lessons": [],
+      "related_concepts": [
+        "radiation",
+        "ionizing-radiation",
+        "alpha-particle",
+        "beta-particle",
+        "gamma-ray",
+        "x-ray",
+        "background-radiation"
+      ],
+      "related_elements": [
+        "Rn",
+        "U"
+      ]
+    },
+    {
+      "id": "radiation-in-daily-life",
+      "type": "article",
+      "category": "safety",
+      "title": "Radiation in Daily Life: What You Need to Know",
+      "subtitle": "Understanding natural background radiation and its impact on health",
+      "content": "\n# Radiation in Daily Life\n\nEvery day, we are exposed to radiation from natural sources. This is called background radiation, and it's been part of Earth's environment since the planet formed.\n\n## Natural Sources\n\n**Cosmic Radiation**: High-energy particles from space constantly bombard Earth. At sea level, you receive about 0.3 mSv per year. Flying increases this exposure - a round-trip flight from New York to Los Angeles adds about 0.04 mSv.\n\n**Terrestrial Radiation**: Radioactive elements in soil and rocks, like uranium and thorium, emit radiation. The amount varies by location - granite-rich areas have higher levels.\n\n**Internal Radiation**: Our bodies contain radioactive isotopes like Potassium-40 and Carbon-14. These contribute about 0.4 mSv annually.\n\n## Comparison with Other Sources\n\n- **Chest X-Ray**: 0.1 mSv\n- **Dental X-Ray**: 0.005 mSv\n- **CT Scan**: 7-10 mSv\n- **Annual Background**: 2-3 mSv (varies by location)\n\n## The Banana Equivalent Dose\n\nA fun way to understand radiation is the \"Banana Equivalent Dose\" (BED). Bananas contain Potassium-40, making them slightly radioactive. One banana = 0.0001 mSv. You'd need to eat 20,000 bananas at once to approach a dangerous dose!\n\n## Safety Perspective\n\nThe key to radiation safety is understanding dose and duration. Natural background radiation is unavoidable and harmless at normal levels. Medical procedures are carefully controlled to minimize exposure while maximizing diagnostic benefit.\n\n## Key Takeaways\n\n1. Background radiation is natural and unavoidable\n2. Location affects exposure levels\n3. Medical radiation is carefully controlled\n4. The dose makes the poison - small amounts are safe\n5. Understanding helps reduce unnecessary fear\n  ",
+      "excerpt": "We are constantly exposed to natural radiation from cosmic rays, soil, and even our own bodies. Learn how this compares to medical and industrial sources.",
+      "author": {
+        "name": "AtomIQ Editorial Team",
+        "avatar": "@/assets/images/mascot/profile.png",
+        "title": "Educational summary"
+      },
+      "published_date": "2024-11-15",
+      "read_time": 5,
+      "image": "https://images.pexels.com/photos/2280547/pexels-photo-2280547.jpeg",
+      "tags": [
+        "radiation",
+        "safety",
+        "health",
+        "background-radiation"
+      ],
+      "source": "UNSCEAR Report 2020",
+      "source_url": "https://www.unscear.org",
+      "related_myths": [
+        "all-radiation-manmade"
+      ],
+      "related_facts": [],
+      "featured": 1,
+      "difficulty": "beginner",
+      "source_type": "international-organization",
+      "source_note": "Background-radiation context from UNSCEAR (UN Scientific Committee on the Effects of Atomic Radiation). AtomIQ's article is its own summary; it does not reproduce the report.",
+      "source_published_date": null,
+      "review_status": "needs-review",
+      "last_reviewed": "2026-11-14",
+      "reviewed_by": null,
+      "review_notes": "Source link is a site homepage, not the specific page the summary draws on. Find and link the exact page, re-check the facts, then mark reviewed. The source name cites \"UNSCEAR Report 2020\"; confirm the exact report/chapter and the dose figures quoted. Byline was an unverified persona (\"Dr. Sarah Chen\") and was replaced.",
+      "summary_origin": "original",
+      "related_lessons": [],
+      "related_concepts": [
+        "background-radiation",
+        "cosmic-radiation",
+        "radon",
+        "ionizing-radiation"
+      ],
+      "related_elements": [
+        "U",
+        "K",
+        "Th"
+      ]
+    },
+    {
+      "id": "used-nuclear-fuel-explained",
+      "type": "guide",
+      "category": "environment",
+      "title": "What Happens to Used Nuclear Fuel?",
+      "subtitle": "From the reactor core to pools, dry casks and long-term disposal",
+      "content": "# What Happens to Used Nuclear Fuel?\n\nAfter several years in a reactor, nuclear fuel can no longer power the chain reaction efficiently and is removed. This **used**, or **spent**, fuel is still radioactive and still gives off heat, so it is handled with care.\n\n## It is a solid\n\nReactor fuel is made of small ceramic pellets sealed inside long metal tubes. It goes into the reactor as a solid and comes out as a solid. It is not a liquid or a glowing green goo.\n\n## Step 1: cool it in a pool\n\nUsed fuel is first stored for several years in deep pools of water at the plant. The water cools the fuel and blocks radiation.\n\n## Step 2: move it to dry storage\n\nOnce it has cooled enough, fuel can be sealed inside steel containers surrounded by thick concrete or steel. These **dry casks** need no pumps and no electricity to stay safe, and they are monitored.\n\n## How much is there?\n\nThe amount is small compared with the energy it helped produce. According to the US Department of Energy, the yearly output of the whole US nuclear fleet would take up less than half the volume of an Olympic swimming pool.\n\n## Recycle or dispose?\n\n- **Recycling:** much of the energy in used fuel is still unused. Some countries, such as France, separate and reuse part of it. Others store it without recycling.\n- **Long-term disposal:** many countries plan **deep geological repositories**, tunnels built deep underground in stable rock where engineered barriers and the rock itself keep the waste isolated.\n- **Vitrification:** some high-level liquid waste is mixed into glass so that it hardens into a durable solid.\n\n## Does waste stay dangerous forever?\n\nRadioactivity falls over time because isotopes decay. Short-lived isotopes fade within days or years, and the most hazardous radiation drops steeply in the first decades. A few isotopes last for thousands of years, which is why long-term isolation plans exist.\n\n## Key takeaways\n\n- Used fuel is a solid that is cooled, sealed and monitored.\n- Dry cask storage is safe for decades while permanent solutions are built.\n- Disposal and recycling choices differ by country and are still being developed.",
+      "excerpt": "Used nuclear fuel is a solid that is cooled, stored in strong containers and monitored. Learn the steps from reactor to storage and the options for the future.",
+      "author": {
+        "name": "AtomIQ Editorial Team",
+        "avatar": "@/assets/images/mascot/profile.png",
+        "title": "Educational summary"
+      },
+      "published_date": "2026-11-14",
+      "read_time": 2,
+      "image": "@/assets/nuclear/feed-1.webp",
+      "tags": [
+        "waste",
+        "spent-fuel",
+        "storage",
+        "environment"
+      ],
+      "source": "US Department of Energy, Office of Nuclear Energy",
+      "source_url": "https://www.energy.gov/ne/articles/5-fast-facts-about-spent-nuclear-fuel",
+      "related_myths": [
+        "nuclear-waste-forever",
+        "myths-facts-11",
+        "myths-facts-18"
+      ],
+      "related_facts": [],
+      "featured": 0,
+      "difficulty": "intermediate",
+      "source_type": "government-agency",
+      "source_note": "The DOE Office of Nuclear Energy article \"5 Fast Facts about Spent Nuclear Fuel\" gives US-focused facts on form, storage, transport and recycling. This article generalizes the ideas for beginners and avoids copying its text. Policies differ by country.",
+      "source_published_date": null,
+      "review_status": "needs-review",
+      "last_reviewed": "2026-11-14",
+      "reviewed_by": null,
+      "review_notes": "Source link responded with HTTP 200 on 2026-11-14. Drafted by the AtomIQ editorial team from well-established facts; claims have not yet been checked line by line against the source. Check the numbers, then set review_status to reviewed with a reviewer name. Statements about other countries (reprocessing, repositories) should be checked against an IAEA or national source.",
+      "summary_origin": "original",
+      "related_lessons": [],
+      "related_concepts": [
+        "spent-fuel",
+        "radioactive-waste",
+        "low-level-waste",
+        "vitrification",
+        "half-life"
+      ],
+      "related_elements": [
+        "U",
+        "Pu"
+      ]
+    }
+  ]
+}

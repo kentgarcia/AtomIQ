@@ -36,6 +36,11 @@ export const SOURCE_REQUIRED_KINDS: readonly string[] = [
   "real_life_example",
 ];
 
+/** One shared loop per figure. Every motion period divides it, so the loop closes without a jump. */
+export const SCENE_LOOP_MS = 60000;
+export const SCENE_MOTION_KINDS = ["orbit", "pulse", "float"] as const;
+export const SCENE_MOTION_LIMITS = { minPeriod: 2000, pulseMax: 0.12, pulseDefault: 0.06, floatMax: 2, floatDefault: 1 } as const;
+
 const SCENE_KINDS: readonly string[] = ["diagram", "model", "annotated_illustration"];
 const SCENE_WIDTH = 100;
 const MIN_PLAIN_TEXT = 40;
@@ -55,7 +60,40 @@ const isStr = (v: unknown): v is string => typeof v === "string" && v.trim().len
 const isNum = (v: unknown): v is number => typeof v === "number" && Number.isFinite(v);
 const norm = (s: string) => s.toLowerCase().replace(/\s+/g, " ").trim();
 
-function checkScene(scene: unknown, path: string, errors: string[]): void {
+function checkMotion(shape: Rec, p: string, errors: string[]): void {
+  const m = shape.motion;
+  if (m === undefined) return;
+  if (!isRec(m)) {
+    errors.push(`${p}.motion must be an object`);
+    return;
+  }
+  if (shape.t !== "circle" && shape.t !== "rect") errors.push(`${p}.motion is only allowed on a circle or rect`);
+  if (!(SCENE_MOTION_KINDS as readonly unknown[]).includes(m.kind)) {
+    errors.push(`${p}.motion.kind must be orbit, pulse or float`);
+    return;
+  }
+  const period = m.period;
+  if (!isNum(period) || period < SCENE_MOTION_LIMITS.minPeriod || SCENE_LOOP_MS % period !== 0) {
+    errors.push(`${p}.motion.period must be at least ${SCENE_MOTION_LIMITS.minPeriod} ms and divide ${SCENE_LOOP_MS} (e.g. 4000, 6000, 10000, 15000), so the loop closes`);
+  }
+  if (m.phase !== undefined) {
+    if (m.kind === "orbit") errors.push(`${p}.motion.phase is not used by orbit: place the shape where it should start`);
+    else if (!isNum(m.phase) || m.phase < 0 || m.phase > 1) errors.push(`${p}.motion.phase must be between 0 and 1`);
+  }
+  if (m.kind === "orbit") {
+    if (shape.t !== "circle") errors.push(`${p}.motion orbit is only allowed on a circle`);
+    if (!isNum(m.cx) || m.cx < 0 || m.cx > SCENE_WIDTH) errors.push(`${p}.motion.cx must be within 0-${SCENE_WIDTH}`);
+    if (!isNum(m.cy) || m.cy < 0) errors.push(`${p}.motion.cy must be a number inside the scene`);
+  }
+  if (m.kind === "pulse" && m.amount !== undefined && (!isNum(m.amount) || m.amount <= 0 || m.amount > SCENE_MOTION_LIMITS.pulseMax)) {
+    errors.push(`${p}.motion.amount must be above 0 and at most ${SCENE_MOTION_LIMITS.pulseMax}`);
+  }
+  if (m.kind === "float" && m.dy !== undefined && (!isNum(m.dy) || m.dy <= 0 || m.dy > SCENE_MOTION_LIMITS.floatMax)) {
+    errors.push(`${p}.motion.dy must be above 0 and at most ${SCENE_MOTION_LIMITS.floatMax} units`);
+  }
+}
+
+export function checkScene(scene: unknown, path: string, errors: string[]): void {
   if (!isRec(scene)) {
     errors.push(`${path} must be an object`);
     return;
@@ -92,13 +130,20 @@ function checkScene(scene: unknown, path: string, errors: string[]): void {
         need(["x", "y"]);
         if (!isStr(shape.text)) errors.push(`${p}.text must be a non-empty string`);
         break;
+      case "art":
+        // Whether the id is a known picture is checked where the art list is available (the curriculum rules).
+        need(["x", "y", "size"]);
+        if (!isStr(shape.id)) errors.push(`${p}.id must be a picture id`);
+        if (isNum(shape.size) && (shape.size < 4 || shape.size > SCENE_WIDTH)) errors.push(`${p}.size must be between 4 and ${SCENE_WIDTH}`);
+        break;
       default:
-        errors.push(`${p}.t must be rect, circle, line or text`);
+        errors.push(`${p}.t must be rect, circle, line, text or art`);
         return;
     }
     if (shape.tone !== undefined && !(VISUAL_TONES as readonly unknown[]).includes(shape.tone)) {
       errors.push(`${p}.tone "${String(shape.tone)}" is not a valid tone`);
     }
+    checkMotion(shape, p, errors);
     for (const k of ["x", "x1", "x2"]) {
       const v = shape[k];
       if (isNum(v) && (v < 0 || v > SCENE_WIDTH)) errors.push(`${p}.${k} is outside the 0-${SCENE_WIDTH} scene width`);

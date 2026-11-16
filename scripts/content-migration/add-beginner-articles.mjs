@@ -16,6 +16,7 @@
  */
 
 import { DatabaseSync } from "node:sqlite";
+import { backupBeforeScript } from "../lib/backup.mjs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -378,6 +379,8 @@ Radioactivity falls over time because isotopes decay. Short-lived isotopes fade 
 const wordCount = (text) => text.trim().split(/\s+/).length;
 const readTime = (text) => Math.max(1, Math.round(wordCount(text) / 200));
 const json = (v) => JSON.stringify(v ?? []);
+
+if (!dryRun) backupBeforeScript("add-beginner-articles", dbPath); // safety net: scripts/lib/backup.mjs
 
 const db = new DatabaseSync(dbPath);
 db.exec("PRAGMA busy_timeout = 10000");

@@ -1,8 +1,8 @@
 import { StyleSheet } from "react-native";
 
-import { fontFaces, withAlpha, type Theme } from "@/theme";
+import { fontFaces, type Theme } from "@/theme";
 
-export const createStyles = (theme: Theme) => {
+const buildStyles = (theme: Theme) => {
   const ui = theme.palettes.ui;
   const colors = theme.colors;
   /* Mode-aware neutral surfaces — brand accents stay identical */
@@ -29,67 +29,17 @@ export const createStyles = (theme: Theme) => {
       bottom: 0,
       left: 0,
     },
-    // Header — mascot is enlarged but laid behind text (absolute, no layout impact)
+    // Header — daily fact card + search bar
     header: {
-      paddingHorizontal: 20,
-      paddingBottom: 8,
-      position: "relative",
-      overflow: "visible",
+      paddingTop: 4,
     },
-    headerContent: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "center",
-      zIndex: 1,
+    // Spacing between the tab switch / search bar and the encyclopedia list
+    tabIntro: {
+      marginTop: 14,
     },
-    headerTextContainer: {
-      flex: 1,
-      paddingRight: 8,
-      zIndex: 1,
-    },
-    headerTitle: {
-      fontSize: 28,
-      ...fontFaces.heavy,
-      marginBottom: 4,
-      color: ui.text,
-      letterSpacing: -0.5,
-    },
-    headerSubtitle: {
-      fontSize: 14,
-      color: ui.muted,
-      ...fontFaces.semibold,
-    },
-    // Old inline mascot slot (kept for compat, not used in new header)
-    headerRight: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 10,
-    },
-    // Enlarged background mascot — absolute, behind text, does not consume layout
-    headerMascotWrap: {
-      position: "absolute",
-      top: -6,
-      right: -12,
-      width: 168,
-      height: 168,
-      alignItems: "center",
-      justifyContent: "center",
-      zIndex: 0,
-      pointerEvents: "none",
-      opacity: 1,
-    },
-    headerMascot: {
-      width: 168,
-      height: 168,
-    },
-    headerMascotShadow: {
-      position: "absolute",
-      bottom: 12,
+    vaultLink: {
       alignSelf: "center",
-      width: 72,
-      height: 12,
-      borderRadius: 6,
-      backgroundColor: withAlpha(colors.shadow, 0.08),
+      marginTop: 4,
     },
 
     // Search — premium white card with amber inner icon (matches profile/home input cards)
@@ -137,56 +87,6 @@ export const createStyles = (theme: Theme) => {
       borderWidth: 1,
       borderColor: P.border,
     },
-    // Category pills — white cards with bottom lip, active orange with lip (home/profile action style)
-    categoryRow: {
-      backgroundColor: "transparent",
-    },
-    categoryScrollContent: {
-      paddingHorizontal: 20,
-      paddingTop: 6,
-      paddingBottom: 10,
-      gap: 10,
-    },
-    categoryChip: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "center",
-      paddingHorizontal: 16,
-      paddingVertical: 10,
-      borderRadius: 14,
-      backgroundColor: P.card,
-      borderWidth: 2,
-      borderColor: P.border,
-      borderBottomWidth: 4,
-      elevation: 2,
-      shadowColor: colors.shadow,
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.05,
-      shadowRadius: 4,
-    },
-    categoryChipIcon: {
-      paddingHorizontal: 12,
-      paddingVertical: 10,
-    },
-    categoryChipActive: {
-      backgroundColor: "#EA580C",
-      borderColor: "#C2410C",
-      borderBottomColor: "#CC6A1A",
-      elevation: 4,
-      shadowColor: "#EA580C",
-      shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.28,
-      shadowRadius: 8,
-    },
-    categoryChipText: {
-      fontSize: 13,
-      ...fontFaces.heavy,
-      color: P.textSecondary,
-      letterSpacing: 0.1,
-    },
-    categoryChipTextActive: {
-      color: "#FFFFFF",
-    },
 
     // Gallery — original design (restored)
     galleryContent: {
@@ -195,7 +95,29 @@ export const createStyles = (theme: Theme) => {
       paddingBottom: 100,
     },
     galleryRow: {
+      flexDirection: "row",
       gap: 12,
+    },
+    galleryFiller: {
+      flex: 1,
+    },
+    // Pinned tab bar row: bleeds to the screen edges so scrolling content
+    // never shows in the gutters once it has an opaque strip behind it
+    stickyBar: {
+      marginHorizontal: -16,
+      paddingHorizontal: 16,
+      paddingBottom: 10,
+    },
+    // Opaque strip that fades in behind the pinned bar (opacity is animated)
+    stickyStrip: {
+      position: "absolute",
+      top: 0,
+      right: 0,
+      bottom: 0,
+      left: 0,
+      backgroundColor: colors.background,
+      borderBottomWidth: 1,
+      borderBottomColor: P.border,
     },
     galleryCard: {
       flex: 1,
@@ -1118,4 +1040,15 @@ export const createStyles = (theme: Theme) => {
       ...fontFaces.bold,
     },
   });
+};
+
+// One stylesheet per theme, shared by the screen and every card/row in it.
+const cache = new WeakMap<Theme, ReturnType<typeof buildStyles>>();
+export const createStyles = (theme: Theme) => {
+  let styles = cache.get(theme);
+  if (!styles) {
+    styles = buildStyles(theme);
+    cache.set(theme, styles);
+  }
+  return styles;
 };

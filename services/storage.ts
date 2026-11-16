@@ -15,6 +15,9 @@ export const STORAGE_KEYS = {
   MUSIC_ENABLED: '@atomiq:music_enabled',
   READ_ALOUD_ENABLED: '@atomiq:read_aloud_enabled',
   HAPTICS_ENABLED: '@atomiq:haptics_enabled',
+  TEACHER_LINES_ENABLED: '@atomiq:teacher_lines_enabled',
+  /** Ids of the teachers the learner has been introduced to (JSON array). */
+  MET_TEACHERS: '@atomiq:met_teachers',
   
   // Session Data
   LAST_ACTIVE_DATE: '@atomiq:last_active_date',
@@ -27,6 +30,9 @@ export const STORAGE_KEYS = {
 
   // Achievements
   ACHIEVEMENT_UNLOCKS: '@atomiq:achievement_unlocks',
+
+  // Discovery Hub
+  READ_ARTICLES: '@atomiq:read_articles',
 } as const;
 
 // Generic Storage Operations
@@ -152,6 +158,27 @@ export const setHapticsEnabled = async (enabled: boolean): Promise<void> => {
 export const getHapticsEnabled = async (): Promise<boolean> => {
   const value = await getItem<boolean>(STORAGE_KEYS.HAPTICS_ENABLED);
   return value ?? true;
+};
+
+// Teacher lines (NPC speech bubbles and chips). On by default.
+export const setTeacherLinesEnabled = async (enabled: boolean): Promise<void> => {
+  await setItem(STORAGE_KEYS.TEACHER_LINES_ENABLED, enabled);
+};
+
+export const getTeacherLinesEnabled = async (): Promise<boolean> => {
+  const value = await getItem<boolean>(STORAGE_KEYS.TEACHER_LINES_ENABLED);
+  return value ?? true;
+};
+
+// Teachers the learner has met (the introduction page shows once per teacher)
+export const getMetTeachers = async (): Promise<string[]> => {
+  const value = await getItem<string[]>(STORAGE_KEYS.MET_TEACHERS);
+  return Array.isArray(value) ? value : [];
+};
+
+export const markTeacherMet = async (npcId: string): Promise<void> => {
+  const met = await getMetTeachers();
+  if (!met.includes(npcId)) await setItem(STORAGE_KEYS.MET_TEACHERS, [...met, npcId]);
 };
 
 // Session Data

@@ -1,376 +1,215 @@
-import { Icon } from "@/components/ui/icon";
-import { getLessonById } from "@/content/lessons";
-import { UNITS } from "@/content/units";
-import type { Lesson } from "@/content/types";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
-import {
-    Alert,
-    BackHandler,
-    Platform,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    useWindowDimensions,
-    View,
-} from "react-native";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { ActivityIndicator, Text, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { SafeAreaView } from "react-native-safe-area-context";
 
-import { recordActivity } from "@/services/activity-log";
-import { getLevelProgress, updateLevelProgress } from "@/services/database";
-import {useTheme, fontFaces, useResponsiveLayout} from "@/theme";
-
-import { AssessmentView } from "@/components/lesson/AssessmentView";
-import { BriefingView } from "@/components/lesson/BriefingView";
-import { DebriefView } from "@/components/lesson/DebriefView";
-import { LabView } from "@/components/lesson/LabView";
+import { LessonFinish } from "@/components/lesson/LessonFinish";
 import { LessonPreview } from "@/components/lesson/LessonPreview";
-import { MicroLearnView } from "@/components/lesson/MicroLearnView";
-import { MythBusterView } from "@/components/lesson/MythBusterView";
-import { createStyles } from "@/components/lesson/styles";
-import {
-  LessonProgressFill,
-  LessonStepFrame,
-  type StepDirection,
-} from "@/components/lesson/StepTransition";
-import { DURATION } from "@/theme/motion";
-import Animated, { FadeIn, FadeOut, useReducedMotion } from "react-native-reanimated";
+import { TeacherIntro } from "@/components/lesson/TeacherIntro";
+import { useNpcForUnit, useNpcLine } from "@/components/npc/use-npc";
+import { LessonRun, type LessonRunResult } from "@/components/lesson/LessonRun";
+import { Button } from "@/components/ui/button";
+import { Icon } from "@/components/ui/icon";
+import type { LessonContent, Objective, PathNode, Unit } from "@/content/curriculum/types";
+import { completeNode, type CompleteResult } from "@/services/curriculum-complete";
+import { contentRepository } from "@/services/content-db";
+import { getLevelProgress, updateLevelProgress } from "@/services/database";
+import { getMetTeachers, markTeacherMet } from "@/services/storage";
+import { starsFor } from "@/services/lesson-core";
+import { useStorage } from "@/services/StorageContext";
+import { createStyles, fontFaces, fontSizes, spacing, useTheme } from "@/theme";
+
+const useStyles = createStyles((theme) => ({
+  center: { flex: 1, alignItems: "center", justifyContent: "center", gap: spacing.lg, padding: spacing["2xl"], backgroundColor: theme.colors.background },
+  message: { ...fontFaces.bold, fontSize: fontSizes["3xl"], color: theme.colors.text, textAlign: "center" },
+}));
+
+interface Loaded {
+  content: LessonContent;
+  node: PathNode | null;
+  unit: Unit | null;
+  objectives: Objective[];
+}
+
+type Stage = "preview" | "intro" | "run" | "finish";
+
+interface Outcome {
+  run: LessonRunResult;
+  stars: 1 | 2 | 3;
+  result: CompleteResult;
+}
 
 export default function LessonScreen() {
-  const { id } = useLocalSearchParams();
-  const [step, setStep] = useState(0);
-  const [direction, setDirection] = useState<StepDirection>("forward");
-  const reducedMotion = useReducedMotion();
-  const [isReplay, setIsReplay] = useState(false);
-  const [started, setStarted] = useState(false);
-  const [topBarHeight, setTopBarHeight] = useState(0);
+  const { id } = useLocalSearchParams<{ id: string }>();
+  const lessonId = typeof id === "string" ? id : "";
   const router = useRouter();
   const { theme } = useTheme();
-  const THEME = theme.palettes.lesson;
-  const { width } = useWindowDimensions();
-  const { contentMaxWidth } = useResponsiveLayout();
-  const styles = useMemo(() => createStyles(THEME, width), [THEME, width]);
-  const levelId = typeof id === "string" ? id : "radiation-shielding";
+  const styles = useStyles(theme);
+  const { addXP, updateUserProfile } = useStorage();
 
-  // Unit context is available synchronously for the preview screen
-  const unit = useMemo(
-    () => UNITS.find((u) => u.lessonIds.includes(levelId)),
-    [levelId],
-  );
-
-  // Load lesson from the on-device content database (async — SQLite read).
-  const [lesson, setLesson] = useState<Lesson | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [loaded, setLoaded] = useState<Loaded | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [stage, setStage] = useState<Stage>("preview");
+  const [isReplay, setIsReplay] = useState(false);
+  const [outcome, setOutcome] = useState<Outcome | null>(null);
+  const [runKey, setRunKey] = useState(0);
+  const sessionId = useRef(`lesson:${lessonId}`);
+  // The unit teacher signs off on the finish screen (hooks stay above the early returns).
+  const teacher = useNpcForUnit(loaded?.unit?.id);
+  const signOff = useNpcLine(teacher?.id, "sign_off");
 
   useEffect(() => {
     let cancelled = false;
-    setIsLoading(true);
-    getLessonById(levelId)
-      .then((loaded) => {
-        if (!cancelled) setLesson(loaded);
-      })
-      .catch((error) => {
+    setLoading(true);
+    (async () => {
+      try {
+        const content = await contentRepository.getLessonContent(lessonId);
+        if (!content) {
+          if (!cancelled) setLoaded(null);
+          return;
+        }
+        const [nodes, unit, objectives] = await Promise.all([
+          contentRepository.getPathNodes(content.lesson.unitId),
+          contentRepository.getUnitById(content.lesson.unitId),
+          contentRepository.getObjectives(content.lesson.unitId),
+        ]);
+        const node = nodes.find((n) => n.lessonId === lessonId) ?? null;
+        if (node) {
+          const progress = (await getLevelProgress(node.id)) as { status?: string } | null;
+          if (!cancelled) setIsReplay(progress?.status === "completed");
+        }
+        if (!cancelled) setLoaded({ content, node, unit, objectives });
+      } catch (error) {
         console.error("Error loading lesson:", error);
-        if (!cancelled) setLesson(null);
-      })
-      .finally(() => {
-        if (!cancelled) setIsLoading(false);
-      });
+        if (!cancelled) setLoaded(null);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
     return () => {
       cancelled = true;
     };
-  }, [levelId]);
+  }, [lessonId]);
 
-  // Check if this is a replay so the preview can show the review status
-  useEffect(() => {
-    const checkProgress = async () => {
+  const taught = useMemo(
+    () => (loaded ? loaded.objectives.filter((o) => loaded.content.lesson.teaches.includes(o.id)) : []),
+    [loaded],
+  );
+
+  const start = useCallback(async () => {
+    if (loaded?.node && !isReplay) {
       try {
-        const existingProgress = (await getLevelProgress(levelId)) as {
-          status?: string;
-        } | null;
-        setIsReplay(existingProgress?.status === "completed");
+        await updateLevelProgress(loaded.node.id, { status: "in_progress", unit_id: loaded.node.unitId, type: "lesson" });
       } catch (error) {
-        console.error("Error checking level progress:", error);
-      }
-    };
-
-    checkProgress();
-  }, [levelId]);
-
-  // Mark in_progress only when the learner actually starts (not on preview)
-  const handleProceed = useCallback(async () => {
-    if (!isReplay) {
-      try {
-        await updateLevelProgress(levelId, {
-          status: "in_progress",
-        });
-      } catch (error) {
-        console.error("Error marking level progress:", error);
+        console.error("Error marking lesson started:", error);
       }
     }
-    // The preview screen covers the briefing — jump to the first content step
-    const firstContentStep =
-      lesson?.steps.findIndex((s) => s.type !== "briefing") ?? 0;
-    setStep(firstContentStep > 0 ? firstContentStep : 0);
-    setStarted(true);
-  }, [isReplay, levelId, lesson]);
-
-  const totalSteps = lesson?.steps.length ?? 0;
-  const isFirstStep = step === 0;
-  const isLastStep = step === totalSteps - 1;
-  const shouldConfirmExit = started && !isLastStep;
-
-  const confirmExit = useCallback(() => {
-    Alert.alert(
-      "Leave this lesson?",
-      "Your progress in this lesson will be lost.",
-      [
-        { text: "Stay", style: "cancel" },
-        {
-          text: "Leave",
-          style: "destructive",
-          onPress: () => router.back(),
-        },
-      ],
-    );
-  }, [router]);
-
-  const handleClose = useCallback(() => {
-    if (shouldConfirmExit) {
-      confirmExit();
-      return;
+    sessionId.current = `lesson:${lessonId}:${Date.now()}`;
+    // The first lesson with a teacher opens with their introduction.
+    let met = true;
+    if (teacher) {
+      try {
+        met = (await getMetTeachers()).includes(teacher.id);
+      } catch {
+        met = true;
+      }
     }
-    router.back();
-  }, [confirmExit, router, shouldConfirmExit]);
+    setStage(teacher && !met ? "intro" : "run");
+  }, [isReplay, lessonId, loaded, teacher]);
 
-  useEffect(() => {
-    if (Platform.OS !== "android" || !shouldConfirmExit) {
-      return;
-    }
+  const meetTeacher = useCallback(() => {
+    if (teacher) void markTeacherMet(teacher.id).catch(() => undefined);
+    setStage("run");
+  }, [teacher]);
 
-    const subscription = BackHandler.addEventListener(
-      "hardwareBackPress",
-      () => {
-        confirmExit();
-        return true;
-      },
-    );
+  const finish = useCallback(
+    async (run: LessonRunResult) => {
+      if (!loaded) return;
+      const stars = starsFor(run.summary);
+      let result: CompleteResult = { firstCompletion: false, xpAwarded: 0 };
+      try {
+        if (loaded.node) {
+          result = await completeNode({
+            node: loaded.node,
+            lesson: loaded.content.lesson,
+            stars,
+            xp: loaded.content.lesson.xpReward,
+            passed: true,
+            sessionId: sessionId.current,
+            answers: run.answers,
+            addXP,
+            updateUserProfile,
+          });
+        }
+      } catch (error) {
+        console.error("Error saving lesson progress:", error);
+      }
+      setOutcome({ run, stars, result });
+      setStage("finish");
+    },
+    [addXP, loaded, updateUserProfile],
+  );
 
-    return () => subscription.remove();
-  }, [confirmExit, shouldConfirmExit]);
+  const exit = useCallback(() => router.back(), [router]);
 
-  // If lesson not found, show error
-  if (!isLoading && !lesson) {
+  if (loading) {
     return (
-      <View
-        style={{
-          flex: 1,
-          justifyContent: "center",
-          alignItems: "center",
-          backgroundColor: THEME.bg,
-        }}
-      >
-        <Icon name="Danger" size={64} color={THEME.error} />
-        <Text
-          style={{
-            fontSize: 18,
-            ...fontFaces.bold,
-            color: THEME.text,
-            marginTop: 16,
-          }}
-        >
-          Lesson not found
-        </Text>
-        <TouchableOpacity
-          style={{
-            marginTop: 24,
-            backgroundColor: THEME.primary,
-            paddingHorizontal: 24,
-            paddingVertical: 12,
-            borderRadius: 12,
-          }}
-          onPress={() => router.back()}
-          accessibilityRole="button"
-          accessibilityLabel="Go back"
-        >
-          <Text
-            style={{
-              color: "#FFFFFF",
-              ...fontFaces.heavy,
-              fontSize: 15,
-            }}
-          >
-            Go Back
-          </Text>
-        </TouchableOpacity>
+      <View style={styles.center}>
+        <ActivityIndicator color={theme.colors.primary} />
       </View>
     );
   }
 
-  // Simple step manager
-  const nextStep = () => {
-    recordActivity("lesson_step", { id: `${levelId}:${lesson?.steps[step]?.id ?? step}` });
-    setDirection("forward");
-    setStep((s) => s + 1);
-  };
-
-  // Get current step from lesson (undefined while still loading)
-  const currentStep = lesson?.steps[step];
-
-  // All steps completed — only once the lesson is actually running
-  if (started && lesson && !currentStep) {
-    router.back();
-    return null;
+  if (!loaded) {
+    return (
+      <View style={styles.center}>
+        <Icon name="Danger" size={64} color={theme.colors.error} />
+        <Text style={styles.message}>Lesson not found</Text>
+        <Button label="Go back" onPress={exit} fullWidth={false} />
+      </View>
+    );
   }
 
-  const renderStep = () => {
-    if (!currentStep) return null;
-    switch (currentStep.type) {
-      case "briefing":
-        return (
-          <BriefingView
-            key={step}
-            data={currentStep.data}
-            onComplete={nextStep}
-            theme={THEME}
-          />
-        );
-      case "myth_buster":
-        return (
-          <MythBusterView
-            key={step}
-            data={currentStep.data}
-            onComplete={nextStep}
-            topBarHeight={topBarHeight}
-            theme={THEME}
-          />
-        );
-      case "micro_learn":
-        return (
-          <MicroLearnView
-            key={step}
-            data={currentStep.data}
-            onComplete={nextStep}
-            theme={THEME}
-          />
-        );
-      case "lab":
-        return (
-          <LabView
-            key={step}
-            data={currentStep.data}
-            onComplete={nextStep}
-            onBack={
-              step > 0
-                ? () => {
-                    setDirection("back");
-                    setStep((s) => s - 1);
-                  }
-                : undefined
-            }
-            source={`lesson:${levelId} step:${currentStep.id}`}
-            theme={THEME}
-          />
-        );
-      case "assessment":
-        return (
-          <AssessmentView
-            key={step}
-            data={currentStep.data}
-            onComplete={nextStep}
-            theme={THEME}
-          />
-        );
-      case "debrief":
-        return (
-          <DebriefView
-            key={step}
-            data={currentStep.data}
-            levelId={levelId}
-            isReplay={isReplay}
-            theme={THEME}
-          />
-        );
-      default:
-        return (
-          <BriefingView
-            key={step}
-            data={currentStep.data}
-            onComplete={nextStep}
-            theme={THEME}
-          />
-        );
-    }
-  };
+  const { content, unit } = loaded;
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <View style={{ flex: 1, backgroundColor: THEME.bg }}>
-        {/* Lesson content — mounts when the preview proceeds */}
-        {started && (
-          <View style={{ flex: 1 }}>
-            <SafeAreaView style={{ flex: 1 }}>
-              {/* Progress Header - hidden on first and last steps */}
-              {!isFirstStep && !isLastStep && (
-                <Animated.View
-                  entering={FadeIn.duration(reducedMotion ? 150 : DURATION.small)}
-                  exiting={FadeOut.duration(reducedMotion ? 100 : DURATION.small)}
-                  style={[
-                    styles.topBar,
-                    {
-                      width: "100%",
-                      maxWidth: contentMaxWidth,
-                      alignSelf: "center",
-                    },
-                  ]}
-                  onLayout={(e) => setTopBarHeight(e.nativeEvent.layout.height)}
-                >
-                  <TouchableOpacity
-                    onPress={handleClose}
-                    style={{ padding: 8 }}
-                    hitSlop={4}
-                    accessibilityRole="button"
-                    accessibilityLabel="Close lesson"
-                  >
-                    <Icon name="Close" size={24} color={THEME.textMuted} />
-                  </TouchableOpacity>
-                  <View style={styles.progressBarBg}>
-                    <LessonProgressFill
-                      progress={(step + 1) / totalSteps}
-                      style={styles.progressBarFill}
-                    />
-                  </View>
-                </Animated.View>
-              )}
-
-              <View style={{ flex: 1 }}>
-                <LessonStepFrame key={step} direction={direction}>
-                  {renderStep()}
-                </LessonStepFrame>
-              </View>
-            </SafeAreaView>
-          </View>
-        )}
-
-        {/* Preview overlay — replaced instantly when the lesson starts */}
-        {!started && (
-          <View style={[StyleSheet.absoluteFill, { zIndex: 50, backgroundColor: theme.colors.background }]}>
-            <SafeAreaView style={{ flex: 1 }}>
-              <LessonPreview
-                lesson={lesson}
-                loading={isLoading}
-                isReplay={isReplay}
-                unitTitle={unit?.title ?? "Lesson"}
-                unitSubtitle={unit?.subtitle ?? "AtomIQ Lesson"}
-                fallbackDescription={unit?.description ?? ""}
-                onClose={() => router.back()}
-                onProceed={handleProceed}
-              />
-            </SafeAreaView>
-          </View>
-        )}
-      </View>
+      {stage === "preview" ? (
+        <LessonPreview
+          lesson={content.lesson}
+          unit={unit}
+          objectives={taught}
+          referenceCount={content.references.length}
+          cardCount={content.cards.filter((c) => c.tier === "core").length}
+          isReplay={isReplay}
+          onClose={exit}
+          onProceed={start}
+        />
+      ) : null}
+      {stage === "intro" && teacher ? <TeacherIntro npc={teacher} onClose={exit} onContinue={meetTeacher} /> : null}
+      {stage === "run" ? <LessonRun key={runKey} cards={content.cards} surface="lesson" teacher={teacher ? { name: teacher.name, spec: teacher.spec } : null} onExit={exit} onFinish={finish} /> : null}
+      {stage === "finish" && outcome ? (
+        <LessonFinish
+          title={isReplay ? "Practice complete!" : "Lesson complete!"}
+          message={outcome.run.summary.replayed > 0 ? "You fixed the ones you missed. That is how it sticks." : "Clean run. Nicely done."}
+          passed
+          stars={outcome.stars}
+          xp={outcome.result.xpAwarded}
+          accuracy={outcome.run.summary.accuracy}
+          durationMs={outcome.run.durationMs}
+          objectives={taught}
+          references={content.references}
+          teacher={teacher && signOff ? { name: teacher.name, spec: teacher.spec, text: signOff.text } : null}
+          onContinue={exit}
+          onRetry={() => {
+            setOutcome(null);
+            setIsReplay(true);
+            setRunKey((k) => k + 1);
+            sessionId.current = `lesson:${lessonId}:${Date.now()}`;
+            setStage("run");
+          }}
+        />
+      ) : null}
     </GestureHandlerRootView>
   );
 }

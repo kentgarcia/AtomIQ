@@ -22,3 +22,5 @@ export {
 export type { TabBarInsetValue } from "./tab-bar-inset";
 
 export { PageBackground } from "./page-background";
+
+export { TopRowHeader, TOP_ROW_HEADER_HEIGHT } from "./top-row-header";

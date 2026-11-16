@@ -8,9 +8,8 @@
  * "dynamic pill generation" / "no dead ends" rule from the product spec.
  */
 
-import { UNITS } from "@/content/units";
 import type { Article, ArticleCategory } from "@/content/articles/types";
-import type { Lesson, Quiz } from "@/content/types";
+import type { Lesson } from "@/content/curriculum/types";
 import type {
   AtomMazeChallenge,
   EncyclopediaEntry,
@@ -18,6 +17,20 @@ import type {
 } from "@/content/explorer/types";
 import { getAllJourneys } from "@/content/explorer";
 import { contentRepository } from "@/services/content-db";
+
+/**
+ * A practice node or checkpoint on the path. The Guide offers these where it used to
+ * offer unit quizzes. Ids are path node ids and open /practice/<id>.
+ */
+export interface PracticeEntry {
+  id: string;
+  title: string;
+  description: string;
+  unitId: string;
+  kind: "practice" | "checkpoint";
+  tags: string[];
+  difficulty: string;
+}
 
 export interface TopicDef {
   id: string;
@@ -36,14 +49,14 @@ export const TOPICS: TopicDef[] = [
     label: "Atoms",
     icon: "Atom",
     keywords: ["atom", "atomic", "isotope", "nucleus", "element"],
-    unitIds: ["atomic-playground"],
+    unitIds: ["inside-the-atom"],
   },
   {
     id: "nuclear-reactions",
     label: "Nuclear Reactions",
     icon: "Flash",
     keywords: ["fission", "fusion", "decay", "reaction", "chain"],
-    unitIds: ["nuclear-reactions"],
+    unitIds: ["radioactivity", "energy-from-the-nucleus"],
   },
   {
     id: "radiation",
@@ -58,7 +71,7 @@ export const TOPICS: TopicDef[] = [
       "dose",
       "sievert",
     ],
-    unitIds: ["radiation-effects", "invisible-rays", "dose-poison"],
+    unitIds: ["radiation-meets-matter", "radiation-and-the-body"],
   },
   {
     id: "everyday-nuclear",
@@ -73,21 +86,21 @@ export const TOPICS: TopicDef[] = [
       "environment",
       "diagnos",
     ],
-    unitIds: ["nuclear-everyday-life"],
+    unitIds: ["nuclear-technology-at-work"],
   },
   {
     id: "safety-security",
     label: "Safety & Security",
     icon: "ShieldSecurity",
     keywords: ["safety", "security", "policy", "regulation", "protection"],
-    unitIds: ["nuclear-safety-security"],
+    unitIds: ["safety-waste-society"],
   },
   {
     id: "reactors-energy",
     label: "Reactors & Energy",
     icon: "Setting2",
     keywords: ["reactor", "energy", "waste", "sustainability", "power", "green"],
-    unitIds: ["engine-room", "green-horizon"],
+    unitIds: ["energy-from-the-nucleus", "safety-waste-society"],
   },
 ];
 
@@ -97,21 +110,42 @@ export const getTopicById = (id: string): TopicDef | undefined =>
 /** All content catalogs, loaded once per Guide mount. */
 export interface LoadedContent {
   lessons: Lesson[];
-  quizzes: Quiz[];
+  /** Practice nodes and checkpoints (formerly unit quizzes). */
+  quizzes: PracticeEntry[];
   encyclopedia: EncyclopediaEntry[];
   articles: Article[];
   mazes: AtomMazeChallenge[];
   journeys: Journey[];
 }
 
+/** Unit titles for card subtitles, filled by `loadGuideContent`. */
+let unitTitles = new Map<string, string>();
+
 export const loadGuideContent = async (): Promise<LoadedContent> => {
-  const [lessons, quizzes, encyclopedia, articles, mazes] = await Promise.all([
-    contentRepository.getAllLessons(),
-    contentRepository.getAllQuizzes(),
+  const [units, nodes, lessons, encyclopedia, articles, mazes] = await Promise.all([
+    contentRepository.getUnits(),
+    contentRepository.getPathNodes(),
+    contentRepository.getLessons(),
     contentRepository.getAllEncyclopediaEntries(),
     contentRepository.getAllArticles(),
     contentRepository.getAllMazes(),
   ]);
+  unitTitles = new Map(units.map((u) => [u.id, u.title]));
+  const quizzes: PracticeEntry[] = nodes
+    .filter((n) => n.kind !== "lesson")
+    .map((n) => {
+      const unit = units.find((u) => u.id === n.unitId);
+      const checkpoint = n.kind === "checkpoint";
+      return {
+        id: n.id,
+        title: checkpoint ? `${unit?.title ?? "Unit"} checkpoint` : `${unit?.title ?? "Unit"} practice`,
+        description: checkpoint ? "Show what you learned in this unit." : "Mixed questions on what you have learned so far.",
+        unitId: n.unitId,
+        kind: n.kind as "practice" | "checkpoint",
+        tags: [],
+        difficulty: checkpoint ? "intermediate" : "beginner",
+      };
+    });
   const journeys = getAllJourneys();
   return { lessons, quizzes, encyclopedia, articles, mazes, journeys };
 };
@@ -126,7 +160,7 @@ const keywordHit = (keywords: string[], ...fields: (string | undefined | null)[]
 
 export interface TopicContent {
   lessons: Lesson[];
-  quizzes: Quiz[];
+  quizzes: PracticeEntry[];
   encyclopedia: EncyclopediaEntry[];
   articles: Article[];
   /** Global games (MythBuster) are always available; mazes match by keyword. */
@@ -145,7 +179,7 @@ export const getTopicContent = (
   const lessons = content.lessons.filter(
     (l) =>
       topic.unitIds.includes(l.unitId) ||
-      keywordHit(topic.keywords, ...l.tags, l.title, l.description),
+      keywordHit(topic.keywords, l.title, l.description),
   );
 
   const quizzes = content.quizzes.filter(
@@ -296,7 +330,7 @@ export const getDiscoverCategories = (
 /** Unit title lookup (for card subtitles). */
 export const getUnitTitle = (unitId: string | undefined): string | null => {
   if (!unitId) return null;
-  return UNITS.find((u) => u.id === unitId)?.title ?? null;
+  return unitTitles.get(unitId) ?? null;
 };
 
 /** Capitalize a difficulty / enum value for display. */

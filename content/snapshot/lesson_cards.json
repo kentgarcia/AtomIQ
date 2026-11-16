@@ -1,0 +1,3785 @@
+{
+  "table": "lesson_cards",
+  "primaryKey": [
+    "lesson_id",
+    "id"
+  ],
+  "rows": [
+    {
+      "lesson_id": "atoms-are-everywhere",
+      "id": "c02",
+      "position": 0,
+      "kind": "teach",
+      "type": "explain",
+      "tier": "core",
+      "item_id": null,
+      "scored": 0,
+      "data": {
+        "title": "Everything is made of atoms",
+        "body": "Your hand, the table and the water you drink are all made of [[atom|atoms]]. Zoom in far enough on anything you can touch and you reach these tiny building blocks. Different things are just different atoms, joined in different ways. A skin cell, a drop of water and a grain of salt all come down to atoms.",
+        "figure": {
+          "scene": {
+            "height": 44,
+            "shapes": [
+              {
+                "t": "art",
+                "id": "hand",
+                "x": 17,
+                "y": 17,
+                "size": 26
+              },
+              {
+                "t": "text",
+                "x": 17,
+                "y": 35,
+                "text": "Hand",
+                "size": 5.4
+              },
+              {
+                "t": "line",
+                "x1": 33,
+                "y1": 17,
+                "x2": 42,
+                "y2": 17,
+                "arrow": true,
+                "width": 1
+              },
+              {
+                "t": "art",
+                "id": "cell",
+                "x": 53,
+                "y": 17,
+                "size": 22
+              },
+              {
+                "t": "text",
+                "x": 53,
+                "y": 35,
+                "text": "Cell",
+                "size": 5.4
+              },
+              {
+                "t": "line",
+                "x1": 65,
+                "y1": 17,
+                "x2": 74,
+                "y2": 17,
+                "arrow": true,
+                "width": 1
+              },
+              {
+                "t": "art",
+                "id": "atom",
+                "x": 86,
+                "y": 17,
+                "size": 16
+              },
+              {
+                "t": "text",
+                "x": 86,
+                "y": 35,
+                "text": "Atom",
+                "size": 5.4
+              },
+              {
+                "t": "text",
+                "x": 53,
+                "y": 41.5,
+                "text": "each step down is far smaller than it looks",
+                "size": 4.6
+              }
+            ]
+          },
+          "altText": "A hand, then a cell inside it, then a single tiny atom, joined by arrows that point from big to small."
+        }
+      }
+    },
+    {
+      "lesson_id": "atoms-are-everywhere",
+      "id": "c12",
+      "position": 1,
+      "kind": "teach",
+      "type": "explain",
+      "tier": "core",
+      "item_id": null,
+      "scored": 0,
+      "data": {
+        "title": "What counts as matter?",
+        "body": "Matter is anything that has mass and takes up space. A phone, an apple and a glass of water all do. So does air: it has mass, and it fills a balloon. Everything made of matter is made of atoms. Light and heat are different. They are energy, not matter.",
+        "figure": {
+          "scene": {
+            "height": 44,
+            "shapes": [
+              {
+                "t": "art",
+                "id": "air",
+                "x": 14,
+                "y": 15,
+                "size": 18
+              },
+              {
+                "t": "text",
+                "x": 14,
+                "y": 31,
+                "text": "Air",
+                "size": 5
+              },
+              {
+                "t": "art",
+                "id": "water",
+                "x": 38,
+                "y": 15,
+                "size": 18
+              },
+              {
+                "t": "text",
+                "x": 38,
+                "y": 31,
+                "text": "Water",
+                "size": 5
+              },
+              {
+                "t": "art",
+                "id": "phone",
+                "x": 62,
+                "y": 15,
+                "size": 18
+              },
+              {
+                "t": "text",
+                "x": 62,
+                "y": 31,
+                "text": "Phone",
+                "size": 5
+              },
+              {
+                "t": "art",
+                "id": "apple",
+                "x": 86,
+                "y": 15,
+                "size": 18
+              },
+              {
+                "t": "text",
+                "x": 86,
+                "y": 31,
+                "text": "Apple",
+                "size": 5
+              },
+              {
+                "t": "text",
+                "x": 50,
+                "y": 40.5,
+                "text": "all matter: they have mass and take up space",
+                "size": 4.6
+              }
+            ]
+          },
+          "altText": "Pictures of air, water, a phone and an apple in a row, labelled as matter because they all have mass and take up space."
+        }
+      }
+    },
+    {
+      "lesson_id": "atoms-are-everywhere",
+      "id": "c03",
+      "position": 2,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u1-l1-sort-matter",
+      "scored": 1,
+      "data": {}
+    },
+    {
+      "lesson_id": "atoms-are-everywhere",
+      "id": "c04",
+      "position": 3,
+      "kind": "teach",
+      "type": "explain",
+      "tier": "core",
+      "item_id": null,
+      "scored": 0,
+      "data": {
+        "title": "Even air, but not light",
+        "body": "Air is made of atoms too, joined into tiny groups. But light and heat are not matter at all. They are forms of energy, so they are not made of atoms.",
+        "figure": {
+          "scene": {
+            "height": 44,
+            "shapes": [
+              {
+                "t": "text",
+                "x": 25,
+                "y": 7,
+                "text": "Made of atoms",
+                "size": 5.4
+              },
+              {
+                "t": "art",
+                "id": "air",
+                "x": 10,
+                "y": 21,
+                "size": 15
+              },
+              {
+                "t": "art",
+                "id": "water",
+                "x": 25,
+                "y": 21,
+                "size": 15
+              },
+              {
+                "t": "art",
+                "id": "hand",
+                "x": 40,
+                "y": 21,
+                "size": 15
+              },
+              {
+                "t": "text",
+                "x": 25,
+                "y": 38,
+                "text": "air, water, you",
+                "size": 5
+              },
+              {
+                "t": "line",
+                "x1": 50,
+                "y1": 4,
+                "x2": 50,
+                "y2": 40,
+                "dash": true
+              },
+              {
+                "t": "text",
+                "x": 75,
+                "y": 7,
+                "text": "Not matter",
+                "size": 5.4
+              },
+              {
+                "t": "art",
+                "id": "sun",
+                "x": 65,
+                "y": 21,
+                "size": 17
+              },
+              {
+                "t": "art",
+                "id": "flame",
+                "x": 86,
+                "y": 21,
+                "size": 17
+              },
+              {
+                "t": "text",
+                "x": 75,
+                "y": 38,
+                "text": "light and heat",
+                "size": 5
+              }
+            ]
+          },
+          "altText": "Two panels. On the left, pictures of air, water and a hand, labelled air, water and you, which are made of atoms. On the right, the sun and a flame, labelled light and heat, which are energy and not made of atoms."
+        }
+      }
+    },
+    {
+      "lesson_id": "atoms-are-everywhere",
+      "id": "c05",
+      "position": 4,
+      "kind": "sim",
+      "type": "scale-zoom",
+      "tier": "core",
+      "item_id": null,
+      "scored": 0,
+      "data": {
+        "task": "Zoom in from your hand down to a single atom. Tap each stop.",
+        "stops": [
+          {
+            "id": "hand",
+            "label": "A hand",
+            "meters": 0.1,
+            "sizeLabel": "about 10 cm",
+            "note": "You can see and hold this.",
+            "icon": "Pointer",
+            "art": "hand"
+          },
+          {
+            "id": "cell",
+            "label": "A skin cell",
+            "meters": 0.00003,
+            "sizeLabel": "about 0.03 mm",
+            "note": "Too small to see without a microscope.",
+            "icon": "Microscope",
+            "art": "cell"
+          },
+          {
+            "id": "virus",
+            "label": "A virus",
+            "meters": 1e-7,
+            "sizeLabel": "about 100 nm",
+            "note": "About 300 times smaller than the cell. It takes a strong microscope to see one.",
+            "icon": "Health",
+            "art": "virus"
+          },
+          {
+            "id": "atom",
+            "label": "An atom",
+            "meters": 3e-10,
+            "sizeLabel": "a few tenths of a nm",
+            "note": "About 300 times smaller again than a virus.",
+            "icon": "Atom",
+            "art": "atom"
+          }
+        ]
+      }
+    },
+    {
+      "lesson_id": "atoms-are-everywhere",
+      "id": "c06",
+      "position": 5,
+      "kind": "teach",
+      "type": "explain",
+      "tier": "core",
+      "item_id": null,
+      "scored": 0,
+      "data": {
+        "title": "How wide is a hair?",
+        "body": "Across one hair you could line up roughly a few hundred thousand atoms. A hair looks thin, yet it is hundreds of thousands of atoms wide.",
+        "figure": {
+          "scene": {
+            "height": 44,
+            "shapes": [
+              {
+                "t": "art",
+                "id": "hair",
+                "x": 18,
+                "y": 17,
+                "size": 26
+              },
+              {
+                "t": "text",
+                "x": 18,
+                "y": 35,
+                "text": "One hair",
+                "size": 5.2
+              },
+              {
+                "t": "line",
+                "x1": 33,
+                "y1": 17,
+                "x2": 64,
+                "y2": 17,
+                "arrow": true,
+                "width": 1
+              },
+              {
+                "t": "art",
+                "id": "atom",
+                "x": 82,
+                "y": 17,
+                "size": 16
+              },
+              {
+                "t": "text",
+                "x": 82,
+                "y": 35,
+                "text": "Atoms",
+                "size": 5.2
+              },
+              {
+                "t": "text",
+                "x": 50,
+                "y": 41.5,
+                "text": "hundreds of thousands fit across a hair",
+                "size": 4.6
+              }
+            ]
+          },
+          "altText": "A strand of hair on the left and an arrow pointing to a single atom on the right, showing that hundreds of thousands of atoms fit across the width of one hair."
+        }
+      }
+    },
+    {
+      "lesson_id": "atoms-are-everywhere",
+      "id": "c07",
+      "position": 6,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u1-l1-order-sizes",
+      "scored": 1,
+      "data": {}
+    },
+    {
+      "lesson_id": "atoms-are-everywhere",
+      "id": "c08",
+      "position": 7,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u1-l1-tom-microscope",
+      "scored": 1,
+      "data": {}
+    },
+    {
+      "lesson_id": "atoms-are-everywhere",
+      "id": "c09",
+      "position": 8,
+      "kind": "teach",
+      "type": "story",
+      "tier": "deeper",
+      "item_id": null,
+      "scored": 0,
+      "data": {
+        "title": "An idea before the proof",
+        "tag": "Ancient Greece",
+        "body": "About 2,400 years ago the Greek thinker Democritus asked what would happen if you kept cutting something in half. He imagined a smallest piece that could not be cut, and called it atomos. Seeing atoms took far longer.",
+        "figure": {
+          "scene": {
+            "height": 76,
+            "shapes": [
+              {
+                "t": "rect",
+                "x": 10,
+                "y": 6,
+                "w": 80,
+                "h": 8,
+                "tone": "accent",
+                "fill": "soft",
+                "rx": 1
+              },
+              {
+                "t": "rect",
+                "x": 10,
+                "y": 17,
+                "w": 40,
+                "h": 8,
+                "tone": "accent",
+                "fill": "soft",
+                "rx": 1
+              },
+              {
+                "t": "rect",
+                "x": 10,
+                "y": 28,
+                "w": 20,
+                "h": 8,
+                "tone": "accent",
+                "fill": "soft",
+                "rx": 1
+              },
+              {
+                "t": "rect",
+                "x": 10,
+                "y": 39,
+                "w": 10,
+                "h": 8,
+                "tone": "accent",
+                "fill": "soft",
+                "rx": 1
+              },
+              {
+                "t": "rect",
+                "x": 10,
+                "y": 50,
+                "w": 5,
+                "h": 8,
+                "tone": "danger",
+                "fill": "soft",
+                "rx": 1
+              },
+              {
+                "t": "text",
+                "x": 66,
+                "y": 62,
+                "text": "cut it again... and again...",
+                "size": 5
+              },
+              {
+                "t": "text",
+                "x": 66,
+                "y": 70,
+                "text": "where does it stop?",
+                "size": 5
+              }
+            ]
+          },
+          "altText": "A bar cut in half again and again, getting smaller each time, ending in a tiny red piece: the idea of an atom as the piece you cannot cut."
+        },
+        "speaker": "npc-ada"
+      }
+    },
+    {
+      "lesson_id": "atoms-are-everywhere",
+      "id": "c10",
+      "position": 9,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u1-l1-choice-made-of",
+      "scored": 1,
+      "data": {}
+    },
+    {
+      "lesson_id": "atoms-are-everywhere",
+      "id": "c11",
+      "position": 10,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u1-l1-fill-touch",
+      "scored": 1,
+      "data": {}
+    },
+    {
+      "lesson_id": "elements-and-the-periodic-table",
+      "id": "c01",
+      "position": 0,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u1-l3-predict-gold-oxygen",
+      "scored": 0,
+      "data": {}
+    },
+    {
+      "lesson_id": "elements-and-the-periodic-table",
+      "id": "c03",
+      "position": 1,
+      "kind": "teach",
+      "type": "explain",
+      "tier": "core",
+      "item_id": null,
+      "scored": 0,
+      "data": {
+        "title": "Protons decide the element",
+        "body": "The number of protons in an atom is its [[atomic-number|atomic number]]. One proton is always hydrogen. Two is always helium. Change the proton count and you have a different element.",
+        "figure": {
+          "scene": {
+            "height": 54,
+            "shapes": [
+              {
+                "t": "art",
+                "id": "balloon",
+                "x": 18,
+                "y": 20,
+                "size": 24
+              },
+              {
+                "t": "text",
+                "x": 18,
+                "y": 42,
+                "text": "2 protons",
+                "size": 4.8
+              },
+              {
+                "t": "text",
+                "x": 18,
+                "y": 49,
+                "text": "helium",
+                "size": 5.6
+              },
+              {
+                "t": "art",
+                "id": "diamond",
+                "x": 50,
+                "y": 20,
+                "size": 24
+              },
+              {
+                "t": "text",
+                "x": 50,
+                "y": 42,
+                "text": "6 protons",
+                "size": 4.8
+              },
+              {
+                "t": "text",
+                "x": 50,
+                "y": 49,
+                "text": "carbon",
+                "size": 5.6
+              },
+              {
+                "t": "art",
+                "id": "gold",
+                "x": 82,
+                "y": 20,
+                "size": 24
+              },
+              {
+                "t": "text",
+                "x": 82,
+                "y": 42,
+                "text": "79 protons",
+                "size": 4.8
+              },
+              {
+                "t": "text",
+                "x": 82,
+                "y": 49,
+                "text": "gold",
+                "size": 5.6
+              }
+            ]
+          },
+          "altText": "Three things and their proton counts: a balloon filled with helium has 2 protons per atom, a diamond is carbon with 6, and a gold bar has 79."
+        }
+      }
+    },
+    {
+      "lesson_id": "elements-and-the-periodic-table",
+      "id": "c02",
+      "position": 2,
+      "kind": "sim",
+      "type": "atom-builder",
+      "tier": "core",
+      "item_id": null,
+      "scored": 0,
+      "data": {
+        "mode": "element",
+        "task": "Build an atom of oxygen. Oxygen has 8 protons, so tap + until it says so.",
+        "goal": {
+          "protons": 8
+        },
+        "maxProtons": 10,
+        "hint": "Oxygen is element number 8. Watch the name change as you add protons.",
+        "objectives": [
+          "u1-atomic-number"
+        ]
+      }
+    },
+    {
+      "lesson_id": "elements-and-the-periodic-table",
+      "id": "c04",
+      "position": 3,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u1-l3-fill-six",
+      "scored": 1,
+      "data": {}
+    },
+    {
+      "lesson_id": "elements-and-the-periodic-table",
+      "id": "c05",
+      "position": 4,
+      "kind": "teach",
+      "type": "explain",
+      "tier": "core",
+      "item_id": null,
+      "scored": 0,
+      "data": {
+        "title": "The periodic table",
+        "body": "The periodic table lists every element in order of atomic number. Each box shows the atomic number, the symbol and the name. Carbon, for example, is element 6 with the symbol C.",
+        "figure": {
+          "scene": {
+            "height": 62,
+            "shapes": [
+              {
+                "t": "rect",
+                "x": 8,
+                "y": 6,
+                "w": 38,
+                "h": 46,
+                "tone": "accent",
+                "fill": "soft",
+                "rx": 2
+              },
+              {
+                "t": "text",
+                "x": 14,
+                "y": 16,
+                "text": "6",
+                "size": 7,
+                "anchor": "start"
+              },
+              {
+                "t": "text",
+                "x": 27,
+                "y": 36,
+                "text": "C",
+                "size": 16
+              },
+              {
+                "t": "text",
+                "x": 27,
+                "y": 48,
+                "text": "Carbon",
+                "size": 5.2
+              },
+              {
+                "t": "line",
+                "x1": 54,
+                "y1": 14,
+                "x2": 20,
+                "y2": 15,
+                "arrow": true,
+                "width": 0.7
+              },
+              {
+                "t": "text",
+                "x": 72,
+                "y": 16,
+                "text": "atomic number",
+                "size": 5.2
+              },
+              {
+                "t": "line",
+                "x1": 54,
+                "y1": 33,
+                "x2": 36,
+                "y2": 33,
+                "arrow": true,
+                "width": 0.7
+              },
+              {
+                "t": "text",
+                "x": 72,
+                "y": 35,
+                "text": "symbol",
+                "size": 5.2
+              },
+              {
+                "t": "line",
+                "x1": 54,
+                "y1": 48,
+                "x2": 38,
+                "y2": 48,
+                "arrow": true,
+                "width": 0.7
+              },
+              {
+                "t": "text",
+                "x": 72,
+                "y": 50,
+                "text": "name",
+                "size": 5.2
+              }
+            ]
+          },
+          "altText": "One box from the periodic table showing carbon: the atomic number 6 in the corner, the symbol C in the middle and the name Carbon underneath."
+        }
+      }
+    },
+    {
+      "lesson_id": "elements-and-the-periodic-table",
+      "id": "c06",
+      "position": 5,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u1-l3-hotspot-oxygen",
+      "scored": 1,
+      "data": {}
+    },
+    {
+      "lesson_id": "elements-and-the-periodic-table",
+      "id": "c07",
+      "position": 6,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u1-l3-match-symbols",
+      "scored": 1,
+      "data": {}
+    },
+    {
+      "lesson_id": "elements-and-the-periodic-table",
+      "id": "c08",
+      "position": 7,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u1-l3-tom-change-protons",
+      "scored": 1,
+      "data": {}
+    },
+    {
+      "lesson_id": "elements-and-the-periodic-table",
+      "id": "c09",
+      "position": 8,
+      "kind": "teach",
+      "type": "explain",
+      "tier": "deeper",
+      "item_id": null,
+      "scored": 0,
+      "data": {
+        "title": "Atoms and ions",
+        "body": "A neutral atom has as many electrons as protons. If an atom gains or loses electrons it becomes an ion with an electric charge. Its element does not change, because its protons did not change.",
+        "figure": {
+          "scene": {
+            "height": 70,
+            "shapes": [
+              {
+                "t": "circle",
+                "x": 25,
+                "y": 28,
+                "r": 11,
+                "fill": "none"
+              },
+              {
+                "t": "circle",
+                "x": 25,
+                "y": 17,
+                "r": 1.6,
+                "tone": "info",
+                "fill": "solid",
+                "motion": {
+                  "kind": "orbit",
+                  "cx": 25,
+                  "cy": 28,
+                  "period": 6000
+                }
+              },
+              {
+                "t": "circle",
+                "x": 25,
+                "y": 39,
+                "r": 1.6,
+                "tone": "info",
+                "fill": "solid",
+                "motion": {
+                  "kind": "orbit",
+                  "cx": 25,
+                  "cy": 28,
+                  "period": 6000
+                }
+              },
+              {
+                "t": "circle",
+                "x": 25,
+                "y": 28,
+                "r": 19,
+                "fill": "none"
+              },
+              {
+                "t": "circle",
+                "x": 31.5,
+                "y": 10.15,
+                "r": 1.6,
+                "tone": "info",
+                "fill": "solid",
+                "motion": {
+                  "kind": "orbit",
+                  "cx": 25,
+                  "cy": 28,
+                  "period": 10000
+                }
+              },
+              {
+                "t": "circle",
+                "x": 26.27,
+                "y": 28,
+                "r": 2,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 23.37,
+                "y": 29.49,
+                "r": 2,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 25.25,
+                "y": 25.16,
+                "r": 2,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 27.05,
+                "y": 30.67,
+                "r": 2,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 21.24,
+                "y": 27.33,
+                "r": 2,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 28.56,
+                "y": 25.73,
+                "r": 2,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 23.81,
+                "y": 32.43,
+                "r": 2,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "text",
+                "x": 25,
+                "y": 56,
+                "text": "atom: 3 protons, 3 electrons",
+                "size": 4.8
+              },
+              {
+                "t": "text",
+                "x": 25,
+                "y": 63,
+                "text": "no net charge",
+                "size": 4.8
+              },
+              {
+                "t": "circle",
+                "x": 75,
+                "y": 28,
+                "r": 11,
+                "fill": "none"
+              },
+              {
+                "t": "circle",
+                "x": 75,
+                "y": 17,
+                "r": 1.6,
+                "tone": "info",
+                "fill": "solid",
+                "motion": {
+                  "kind": "orbit",
+                  "cx": 75,
+                  "cy": 28,
+                  "period": 6000
+                }
+              },
+              {
+                "t": "circle",
+                "x": 75,
+                "y": 39,
+                "r": 1.6,
+                "tone": "info",
+                "fill": "solid",
+                "motion": {
+                  "kind": "orbit",
+                  "cx": 75,
+                  "cy": 28,
+                  "period": 6000
+                }
+              },
+              {
+                "t": "circle",
+                "x": 76.27,
+                "y": 28,
+                "r": 2,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 73.37,
+                "y": 29.49,
+                "r": 2,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 75.25,
+                "y": 25.16,
+                "r": 2,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 77.05,
+                "y": 30.67,
+                "r": 2,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 71.24,
+                "y": 27.33,
+                "r": 2,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 78.56,
+                "y": 25.73,
+                "r": 2,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 73.81,
+                "y": 32.43,
+                "r": 2,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "text",
+                "x": 75,
+                "y": 56,
+                "text": "ion: 3 protons, 2 electrons",
+                "size": 4.8
+              },
+              {
+                "t": "text",
+                "x": 75,
+                "y": 63,
+                "text": "net charge +1",
+                "size": 4.8
+              }
+            ]
+          },
+          "altText": "Two lithium particles side by side. A neutral atom with three protons and three electrons, and an ion that has lost one electron and so carries a positive charge."
+        }
+      }
+    },
+    {
+      "lesson_id": "elements-and-the-periodic-table",
+      "id": "c10",
+      "position": 9,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u1-l3-order-atomic-number",
+      "scored": 1,
+      "data": {}
+    },
+    {
+      "lesson_id": "elements-and-the-periodic-table",
+      "id": "c11",
+      "position": 10,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u1-l3-choice-gold-oxygen",
+      "scored": 1,
+      "data": {}
+    },
+    {
+      "lesson_id": "isotopes",
+      "id": "c01",
+      "position": 0,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u1-l4-predict-carbon-mass",
+      "scored": 0,
+      "data": {}
+    },
+    {
+      "lesson_id": "isotopes",
+      "id": "c03",
+      "position": 1,
+      "kind": "teach",
+      "type": "explain",
+      "tier": "core",
+      "item_id": null,
+      "scored": 0,
+      "data": {
+        "title": "Same element, different neutrons",
+        "body": "Atoms of one element can have different numbers of neutrons. These versions are called [[isotope|isotopes]]. Carbon-12 and carbon-14 are both carbon, because both have 6 protons.",
+        "figure": {
+          "scene": {
+            "height": 72,
+            "shapes": [
+              {
+                "t": "circle",
+                "x": 25,
+                "y": 30,
+                "r": 13,
+                "fill": "none"
+              },
+              {
+                "t": "circle",
+                "x": 25,
+                "y": 17,
+                "r": 1.6,
+                "tone": "info",
+                "fill": "solid",
+                "motion": {
+                  "kind": "orbit",
+                  "cx": 25,
+                  "cy": 30,
+                  "period": 6000
+                }
+              },
+              {
+                "t": "circle",
+                "x": 25,
+                "y": 43,
+                "r": 1.6,
+                "tone": "info",
+                "fill": "solid",
+                "motion": {
+                  "kind": "orbit",
+                  "cx": 25,
+                  "cy": 30,
+                  "period": 6000
+                }
+              },
+              {
+                "t": "circle",
+                "x": 25,
+                "y": 30,
+                "r": 22,
+                "fill": "none"
+              },
+              {
+                "t": "circle",
+                "x": 32.52,
+                "y": 9.33,
+                "r": 1.6,
+                "tone": "info",
+                "fill": "solid",
+                "motion": {
+                  "kind": "orbit",
+                  "cx": 25,
+                  "cy": 30,
+                  "period": 10000
+                }
+              },
+              {
+                "t": "circle",
+                "x": 45.67,
+                "y": 37.52,
+                "r": 1.6,
+                "tone": "info",
+                "fill": "solid",
+                "motion": {
+                  "kind": "orbit",
+                  "cx": 25,
+                  "cy": 30,
+                  "period": 10000
+                }
+              },
+              {
+                "t": "circle",
+                "x": 17.48,
+                "y": 50.67,
+                "r": 1.6,
+                "tone": "info",
+                "fill": "solid",
+                "motion": {
+                  "kind": "orbit",
+                  "cx": 25,
+                  "cy": 30,
+                  "period": 10000
+                }
+              },
+              {
+                "t": "circle",
+                "x": 4.33,
+                "y": 22.48,
+                "r": 1.6,
+                "tone": "info",
+                "fill": "solid",
+                "motion": {
+                  "kind": "orbit",
+                  "cx": 25,
+                  "cy": 30,
+                  "period": 10000
+                }
+              },
+              {
+                "t": "circle",
+                "x": 26.27,
+                "y": 30,
+                "r": 2,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 23.37,
+                "y": 31.49,
+                "r": 2,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 25.25,
+                "y": 27.16,
+                "r": 2,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 27.05,
+                "y": 32.67,
+                "r": 2,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 21.24,
+                "y": 29.33,
+                "r": 2,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 28.56,
+                "y": 27.73,
+                "r": 2,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 23.81,
+                "y": 34.43,
+                "r": 2,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 22.73,
+                "y": 25.63,
+                "r": 2,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 29.93,
+                "y": 31.8,
+                "r": 2,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 19.87,
+                "y": 32.12,
+                "r": 2,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 27.47,
+                "y": 24.72,
+                "r": 2,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 26.83,
+                "y": 35.82,
+                "r": 2,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "text",
+                "x": 25,
+                "y": 58,
+                "text": "carbon-12",
+                "size": 5.4
+              },
+              {
+                "t": "text",
+                "x": 25,
+                "y": 65,
+                "text": "6 protons, 6 neutrons",
+                "size": 4.8
+              },
+              {
+                "t": "circle",
+                "x": 75,
+                "y": 30,
+                "r": 13,
+                "fill": "none"
+              },
+              {
+                "t": "circle",
+                "x": 75,
+                "y": 17,
+                "r": 1.6,
+                "tone": "info",
+                "fill": "solid",
+                "motion": {
+                  "kind": "orbit",
+                  "cx": 75,
+                  "cy": 30,
+                  "period": 6000
+                }
+              },
+              {
+                "t": "circle",
+                "x": 75,
+                "y": 43,
+                "r": 1.6,
+                "tone": "info",
+                "fill": "solid",
+                "motion": {
+                  "kind": "orbit",
+                  "cx": 75,
+                  "cy": 30,
+                  "period": 6000
+                }
+              },
+              {
+                "t": "circle",
+                "x": 75,
+                "y": 30,
+                "r": 22,
+                "fill": "none"
+              },
+              {
+                "t": "circle",
+                "x": 82.52,
+                "y": 9.33,
+                "r": 1.6,
+                "tone": "info",
+                "fill": "solid",
+                "motion": {
+                  "kind": "orbit",
+                  "cx": 75,
+                  "cy": 30,
+                  "period": 10000
+                }
+              },
+              {
+                "t": "circle",
+                "x": 95.67,
+                "y": 37.52,
+                "r": 1.6,
+                "tone": "info",
+                "fill": "solid",
+                "motion": {
+                  "kind": "orbit",
+                  "cx": 75,
+                  "cy": 30,
+                  "period": 10000
+                }
+              },
+              {
+                "t": "circle",
+                "x": 67.48,
+                "y": 50.67,
+                "r": 1.6,
+                "tone": "info",
+                "fill": "solid",
+                "motion": {
+                  "kind": "orbit",
+                  "cx": 75,
+                  "cy": 30,
+                  "period": 10000
+                }
+              },
+              {
+                "t": "circle",
+                "x": 54.33,
+                "y": 22.48,
+                "r": 1.6,
+                "tone": "info",
+                "fill": "solid",
+                "motion": {
+                  "kind": "orbit",
+                  "cx": 75,
+                  "cy": 30,
+                  "period": 10000
+                }
+              },
+              {
+                "t": "circle",
+                "x": 76.27,
+                "y": 30,
+                "r": 2,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 73.37,
+                "y": 31.49,
+                "r": 2,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 75.25,
+                "y": 27.16,
+                "r": 2,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 77.05,
+                "y": 32.67,
+                "r": 2,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 71.24,
+                "y": 29.33,
+                "r": 2,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 78.56,
+                "y": 27.73,
+                "r": 2,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 73.81,
+                "y": 34.43,
+                "r": 2,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 72.73,
+                "y": 25.63,
+                "r": 2,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 79.93,
+                "y": 31.8,
+                "r": 2,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 69.87,
+                "y": 32.12,
+                "r": 2,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 77.47,
+                "y": 24.72,
+                "r": 2,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 76.83,
+                "y": 35.82,
+                "r": 2,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 69.49,
+                "y": 26.81,
+                "r": 2,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 81.46,
+                "y": 28.58,
+                "r": 2,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "text",
+                "x": 75,
+                "y": 58,
+                "text": "carbon-14",
+                "size": 5.4
+              },
+              {
+                "t": "text",
+                "x": 75,
+                "y": 65,
+                "text": "6 protons, 8 neutrons",
+                "size": 4.8
+              }
+            ]
+          },
+          "altText": "Two carbon atoms. Carbon-12 has six protons and six neutrons; carbon-14 has six protons and eight neutrons. Both have six electrons."
+        }
+      }
+    },
+    {
+      "lesson_id": "isotopes",
+      "id": "c02",
+      "position": 2,
+      "kind": "sim",
+      "type": "atom-builder",
+      "tier": "core",
+      "item_id": null,
+      "scored": 0,
+      "data": {
+        "mode": "isotope",
+        "task": "Make carbon-14 from carbon-12 by adding 2 neutrons.",
+        "goal": {
+          "neutrons": 8
+        },
+        "start": {
+          "protons": 6,
+          "neutrons": 6,
+          "electrons": 6
+        },
+        "lock": {
+          "protons": true,
+          "electrons": true
+        },
+        "maxNeutrons": 12,
+        "hint": "Carbon-12 has 6 neutrons. Tap + two times to reach 8. It is still carbon.",
+        "objectives": [
+          "u1-isotope-definition",
+          "u1-mass-number"
+        ]
+      }
+    },
+    {
+      "lesson_id": "isotopes",
+      "id": "c04",
+      "position": 3,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u1-l4-sort-carbon",
+      "scored": 1,
+      "data": {}
+    },
+    {
+      "lesson_id": "isotopes",
+      "id": "c05",
+      "position": 4,
+      "kind": "teach",
+      "type": "explain",
+      "tier": "core",
+      "item_id": null,
+      "scored": 0,
+      "data": {
+        "title": "Reading the name",
+        "body": "The number after the name is the mass number: protons plus neutrons. Carbon has 6 protons, so carbon-14 has 14 - 6 = 8 neutrons.",
+        "figure": {
+          "scene": {
+            "height": 56,
+            "shapes": [
+              {
+                "t": "circle",
+                "x": 16,
+                "y": 18,
+                "r": 7,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "text",
+                "x": 16,
+                "y": 20,
+                "text": "6",
+                "size": 7,
+                "keep": true
+              },
+              {
+                "t": "text",
+                "x": 16,
+                "y": 34,
+                "text": "protons",
+                "size": 5
+              },
+              {
+                "t": "text",
+                "x": 31,
+                "y": 20,
+                "text": "+",
+                "size": 9
+              },
+              {
+                "t": "circle",
+                "x": 46,
+                "y": 18,
+                "r": 7,
+                "tone": "neutral",
+                "fill": "soft"
+              },
+              {
+                "t": "text",
+                "x": 46,
+                "y": 20,
+                "text": "8",
+                "size": 7,
+                "keep": true
+              },
+              {
+                "t": "text",
+                "x": 46,
+                "y": 34,
+                "text": "neutrons",
+                "size": 5
+              },
+              {
+                "t": "text",
+                "x": 61,
+                "y": 20,
+                "text": "=",
+                "size": 9
+              },
+              {
+                "t": "rect",
+                "x": 68,
+                "y": 8,
+                "w": 26,
+                "h": 20,
+                "tone": "accent",
+                "fill": "soft",
+                "rx": 2
+              },
+              {
+                "t": "text",
+                "x": 81,
+                "y": 22,
+                "text": "14",
+                "size": 10,
+                "keep": true
+              },
+              {
+                "t": "text",
+                "x": 81,
+                "y": 34,
+                "text": "mass number",
+                "size": 5
+              },
+              {
+                "t": "text",
+                "x": 50,
+                "y": 50,
+                "text": "so this atom is carbon-14",
+                "size": 5.4
+              }
+            ]
+          },
+          "altText": "An equation: 6 protons plus 8 neutrons equals a mass number of 14, so the atom is called carbon-14."
+        }
+      }
+    },
+    {
+      "lesson_id": "isotopes",
+      "id": "c06",
+      "position": 5,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u1-l4-fill-c14",
+      "scored": 1,
+      "data": {}
+    },
+    {
+      "lesson_id": "isotopes",
+      "id": "c07",
+      "position": 6,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u1-l4-match-carbon",
+      "scored": 1,
+      "data": {}
+    },
+    {
+      "lesson_id": "isotopes",
+      "id": "c08",
+      "position": 7,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u1-l4-tom-all-radioactive",
+      "scored": 1,
+      "data": {}
+    },
+    {
+      "lesson_id": "isotopes",
+      "id": "c09",
+      "position": 8,
+      "kind": "teach",
+      "type": "explain",
+      "tier": "deeper",
+      "item_id": null,
+      "scored": 0,
+      "data": {
+        "title": "Why your body can't tell",
+        "body": "Chemistry is run by electrons, and isotopes of an element have the same electrons. So they behave almost identically in chemical reactions. That is why scientists can use a rare isotope as a tracer.",
+        "figure": {
+          "scene": {
+            "height": 80,
+            "shapes": [
+              {
+                "t": "circle",
+                "x": 25,
+                "y": 30,
+                "r": 13,
+                "fill": "none"
+              },
+              {
+                "t": "circle",
+                "x": 25,
+                "y": 17,
+                "r": 1.6,
+                "tone": "info",
+                "fill": "solid",
+                "motion": {
+                  "kind": "orbit",
+                  "cx": 25,
+                  "cy": 30,
+                  "period": 6000
+                }
+              },
+              {
+                "t": "circle",
+                "x": 25,
+                "y": 43,
+                "r": 1.6,
+                "tone": "info",
+                "fill": "solid",
+                "motion": {
+                  "kind": "orbit",
+                  "cx": 25,
+                  "cy": 30,
+                  "period": 6000
+                }
+              },
+              {
+                "t": "circle",
+                "x": 25,
+                "y": 30,
+                "r": 22,
+                "fill": "none"
+              },
+              {
+                "t": "circle",
+                "x": 32.52,
+                "y": 9.33,
+                "r": 1.6,
+                "tone": "info",
+                "fill": "solid",
+                "motion": {
+                  "kind": "orbit",
+                  "cx": 25,
+                  "cy": 30,
+                  "period": 10000
+                }
+              },
+              {
+                "t": "circle",
+                "x": 45.67,
+                "y": 37.52,
+                "r": 1.6,
+                "tone": "info",
+                "fill": "solid",
+                "motion": {
+                  "kind": "orbit",
+                  "cx": 25,
+                  "cy": 30,
+                  "period": 10000
+                }
+              },
+              {
+                "t": "circle",
+                "x": 17.48,
+                "y": 50.67,
+                "r": 1.6,
+                "tone": "info",
+                "fill": "solid",
+                "motion": {
+                  "kind": "orbit",
+                  "cx": 25,
+                  "cy": 30,
+                  "period": 10000
+                }
+              },
+              {
+                "t": "circle",
+                "x": 4.33,
+                "y": 22.48,
+                "r": 1.6,
+                "tone": "info",
+                "fill": "solid",
+                "motion": {
+                  "kind": "orbit",
+                  "cx": 25,
+                  "cy": 30,
+                  "period": 10000
+                }
+              },
+              {
+                "t": "circle",
+                "x": 26.27,
+                "y": 30,
+                "r": 2,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 23.37,
+                "y": 31.49,
+                "r": 2,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 25.25,
+                "y": 27.16,
+                "r": 2,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 27.05,
+                "y": 32.67,
+                "r": 2,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 21.24,
+                "y": 29.33,
+                "r": 2,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 28.56,
+                "y": 27.73,
+                "r": 2,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 23.81,
+                "y": 34.43,
+                "r": 2,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 22.73,
+                "y": 25.63,
+                "r": 2,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 29.93,
+                "y": 31.8,
+                "r": 2,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 19.87,
+                "y": 32.12,
+                "r": 2,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 27.47,
+                "y": 24.72,
+                "r": 2,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 26.83,
+                "y": 35.82,
+                "r": 2,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "text",
+                "x": 25,
+                "y": 58,
+                "text": "carbon-12",
+                "size": 5.4
+              },
+              {
+                "t": "text",
+                "x": 25,
+                "y": 65,
+                "text": "6 protons, 6 neutrons",
+                "size": 4.8
+              },
+              {
+                "t": "circle",
+                "x": 75,
+                "y": 30,
+                "r": 13,
+                "fill": "none"
+              },
+              {
+                "t": "circle",
+                "x": 75,
+                "y": 17,
+                "r": 1.6,
+                "tone": "info",
+                "fill": "solid",
+                "motion": {
+                  "kind": "orbit",
+                  "cx": 75,
+                  "cy": 30,
+                  "period": 6000
+                }
+              },
+              {
+                "t": "circle",
+                "x": 75,
+                "y": 43,
+                "r": 1.6,
+                "tone": "info",
+                "fill": "solid",
+                "motion": {
+                  "kind": "orbit",
+                  "cx": 75,
+                  "cy": 30,
+                  "period": 6000
+                }
+              },
+              {
+                "t": "circle",
+                "x": 75,
+                "y": 30,
+                "r": 22,
+                "fill": "none"
+              },
+              {
+                "t": "circle",
+                "x": 82.52,
+                "y": 9.33,
+                "r": 1.6,
+                "tone": "info",
+                "fill": "solid",
+                "motion": {
+                  "kind": "orbit",
+                  "cx": 75,
+                  "cy": 30,
+                  "period": 10000
+                }
+              },
+              {
+                "t": "circle",
+                "x": 95.67,
+                "y": 37.52,
+                "r": 1.6,
+                "tone": "info",
+                "fill": "solid",
+                "motion": {
+                  "kind": "orbit",
+                  "cx": 75,
+                  "cy": 30,
+                  "period": 10000
+                }
+              },
+              {
+                "t": "circle",
+                "x": 67.48,
+                "y": 50.67,
+                "r": 1.6,
+                "tone": "info",
+                "fill": "solid",
+                "motion": {
+                  "kind": "orbit",
+                  "cx": 75,
+                  "cy": 30,
+                  "period": 10000
+                }
+              },
+              {
+                "t": "circle",
+                "x": 54.33,
+                "y": 22.48,
+                "r": 1.6,
+                "tone": "info",
+                "fill": "solid",
+                "motion": {
+                  "kind": "orbit",
+                  "cx": 75,
+                  "cy": 30,
+                  "period": 10000
+                }
+              },
+              {
+                "t": "circle",
+                "x": 76.27,
+                "y": 30,
+                "r": 2,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 73.37,
+                "y": 31.49,
+                "r": 2,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 75.25,
+                "y": 27.16,
+                "r": 2,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 77.05,
+                "y": 32.67,
+                "r": 2,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 71.24,
+                "y": 29.33,
+                "r": 2,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 78.56,
+                "y": 27.73,
+                "r": 2,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 73.81,
+                "y": 34.43,
+                "r": 2,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 72.73,
+                "y": 25.63,
+                "r": 2,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 79.93,
+                "y": 31.8,
+                "r": 2,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 69.87,
+                "y": 32.12,
+                "r": 2,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 77.47,
+                "y": 24.72,
+                "r": 2,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 76.83,
+                "y": 35.82,
+                "r": 2,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 69.49,
+                "y": 26.81,
+                "r": 2,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 81.46,
+                "y": 28.58,
+                "r": 2,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "text",
+                "x": 75,
+                "y": 58,
+                "text": "carbon-14",
+                "size": 5.4
+              },
+              {
+                "t": "text",
+                "x": 75,
+                "y": 65,
+                "text": "6 protons, 8 neutrons",
+                "size": 4.8
+              },
+              {
+                "t": "text",
+                "x": 50,
+                "y": 74,
+                "text": "same 6 electrons, same chemistry",
+                "size": 5
+              }
+            ]
+          },
+          "altText": "Two carbon atoms. Carbon-12 has six protons and six neutrons; carbon-14 has six protons and eight neutrons. Both have six electrons."
+        }
+      }
+    },
+    {
+      "lesson_id": "isotopes",
+      "id": "c10",
+      "position": 9,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u1-l4-choice-share",
+      "scored": 1,
+      "data": {}
+    },
+    {
+      "lesson_id": "isotopes",
+      "id": "c11",
+      "position": 10,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u1-l4-fill-c13",
+      "scored": 1,
+      "data": {}
+    },
+    {
+      "lesson_id": "protons-neutrons-electrons",
+      "id": "c01",
+      "position": 0,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u1-l2-predict-stadium",
+      "scored": 0,
+      "data": {}
+    },
+    {
+      "lesson_id": "protons-neutrons-electrons",
+      "id": "c02",
+      "position": 1,
+      "kind": "teach",
+      "type": "explain",
+      "tier": "core",
+      "item_id": null,
+      "scored": 0,
+      "data": {
+        "title": "A centre and electrons",
+        "body": "Every atom has a tiny centre called the [[nucleus]]. Around it are [[electron|electrons]]. Almost everything about an atom, including nearly all its mass, comes from that small centre.",
+        "figure": {
+          "scene": {
+            "height": 76,
+            "shapes": [
+              {
+                "t": "circle",
+                "x": 50,
+                "y": 38,
+                "r": 19,
+                "fill": "none"
+              },
+              {
+                "t": "circle",
+                "x": 50,
+                "y": 19,
+                "r": 2,
+                "tone": "info",
+                "fill": "solid",
+                "motion": {
+                  "kind": "orbit",
+                  "cx": 50,
+                  "cy": 38,
+                  "period": 6000
+                }
+              },
+              {
+                "t": "circle",
+                "x": 50,
+                "y": 57,
+                "r": 2,
+                "tone": "info",
+                "fill": "solid",
+                "motion": {
+                  "kind": "orbit",
+                  "cx": 50,
+                  "cy": 38,
+                  "period": 6000
+                }
+              },
+              {
+                "t": "circle",
+                "x": 51.53,
+                "y": 38,
+                "r": 2.4,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 48.05,
+                "y": 39.79,
+                "r": 2.4,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 50.3,
+                "y": 34.6,
+                "r": 2.4,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 52.46,
+                "y": 41.21,
+                "r": 2.4,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "text",
+                "x": 14,
+                "y": 8,
+                "text": "electrons",
+                "size": 5.2
+              },
+              {
+                "t": "line",
+                "x1": 22,
+                "y1": 11,
+                "x2": 33,
+                "y2": 24,
+                "tone": "info",
+                "arrow": true,
+                "width": 0.8
+              },
+              {
+                "t": "text",
+                "x": 86,
+                "y": 8,
+                "text": "nucleus",
+                "size": 5.2
+              },
+              {
+                "t": "line",
+                "x1": 80,
+                "y1": 11,
+                "x2": 55,
+                "y2": 34,
+                "tone": "danger",
+                "arrow": true,
+                "width": 0.8
+              }
+            ]
+          },
+          "altText": "An atom with a tiny nucleus of 2 protons and 2 neutrons in the centre and 2 electrons on rings around it."
+        }
+      }
+    },
+    {
+      "lesson_id": "protons-neutrons-electrons",
+      "id": "c03",
+      "position": 2,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u1-l2-hotspot-nucleus",
+      "scored": 1,
+      "data": {}
+    },
+    {
+      "lesson_id": "protons-neutrons-electrons",
+      "id": "c04",
+      "position": 3,
+      "kind": "teach",
+      "type": "explain",
+      "tier": "core",
+      "item_id": null,
+      "scored": 0,
+      "data": {
+        "title": "Three particles",
+        "body": "The nucleus holds [[proton|protons]], which are positive, and [[neutron|neutrons]], which have no charge. Electrons are negative and sit outside the nucleus.",
+        "figure": {
+          "scene": {
+            "height": 54,
+            "shapes": [
+              {
+                "t": "circle",
+                "x": 18,
+                "y": 20,
+                "r": 10,
+                "tone": "danger",
+                "fill": "soft"
+              },
+              {
+                "t": "text",
+                "x": 18,
+                "y": 24,
+                "text": "+",
+                "size": 11,
+                "keep": true
+              },
+              {
+                "t": "text",
+                "x": 18,
+                "y": 40,
+                "text": "Proton",
+                "size": 5.4
+              },
+              {
+                "t": "text",
+                "x": 18,
+                "y": 47,
+                "text": "in the nucleus",
+                "size": 4.8
+              },
+              {
+                "t": "circle",
+                "x": 50,
+                "y": 20,
+                "r": 10,
+                "tone": "neutral",
+                "fill": "soft"
+              },
+              {
+                "t": "text",
+                "x": 50,
+                "y": 24,
+                "text": "0",
+                "size": 11,
+                "keep": true
+              },
+              {
+                "t": "text",
+                "x": 50,
+                "y": 40,
+                "text": "Neutron",
+                "size": 5.4
+              },
+              {
+                "t": "text",
+                "x": 50,
+                "y": 47,
+                "text": "in the nucleus",
+                "size": 4.8
+              },
+              {
+                "t": "circle",
+                "x": 82,
+                "y": 20,
+                "r": 10,
+                "tone": "info",
+                "fill": "soft"
+              },
+              {
+                "t": "text",
+                "x": 82,
+                "y": 24,
+                "text": "-",
+                "size": 11,
+                "keep": true
+              },
+              {
+                "t": "text",
+                "x": 82,
+                "y": 40,
+                "text": "Electron",
+                "size": 5.4
+              },
+              {
+                "t": "text",
+                "x": 82,
+                "y": 47,
+                "text": "outside it",
+                "size": 4.8
+              }
+            ]
+          },
+          "altText": "Three particles. A proton with a plus sign and a neutron with a zero, both in the nucleus, and an electron with a minus sign outside the nucleus."
+        }
+      }
+    },
+    {
+      "lesson_id": "protons-neutrons-electrons",
+      "id": "c05",
+      "position": 4,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u1-l2-match-particles",
+      "scored": 1,
+      "data": {}
+    },
+    {
+      "lesson_id": "protons-neutrons-electrons",
+      "id": "c06",
+      "position": 5,
+      "kind": "sim",
+      "type": "atom-builder",
+      "tier": "core",
+      "item_id": null,
+      "scored": 0,
+      "data": {
+        "mode": "build",
+        "task": "Build a helium atom: 2 protons, 2 neutrons and 2 electrons.",
+        "goal": {
+          "protons": 2,
+          "neutrons": 2,
+          "electrons": 2
+        },
+        "maxProtons": 6,
+        "maxNeutrons": 6,
+        "hint": "Add particles with the plus buttons. Helium has two of each.",
+        "objectives": [
+          "u1-particles"
+        ]
+      }
+    },
+    {
+      "lesson_id": "protons-neutrons-electrons",
+      "id": "c07",
+      "position": 6,
+      "kind": "teach",
+      "type": "story",
+      "tier": "deeper",
+      "item_id": null,
+      "scored": 0,
+      "data": {
+        "speaker": "npc-ada",
+        "title": "The gold foil surprise",
+        "tag": "1909-1911",
+        "body": "Ernest Rutherford's team fired tiny particles at thin gold foil. Most went straight through, but a few bounced back. That could only happen if each atom had a tiny, dense centre: the nucleus.",
+        "figure": {
+          "scene": {
+            "height": 76,
+            "shapes": [
+              {
+                "t": "rect",
+                "x": 6,
+                "y": 28,
+                "w": 12,
+                "h": 14,
+                "tone": "accent",
+                "fill": "soft",
+                "rx": 1
+              },
+              {
+                "t": "text",
+                "x": 12,
+                "y": 52,
+                "text": "source",
+                "size": 4.8
+              },
+              {
+                "t": "rect",
+                "x": 52,
+                "y": 8,
+                "w": 5,
+                "h": 54,
+                "tone": "warning",
+                "fill": "soft",
+                "rx": 0.5
+              },
+              {
+                "t": "text",
+                "x": 54,
+                "y": 70,
+                "text": "gold foil",
+                "size": 4.8
+              },
+              {
+                "t": "line",
+                "x1": 19,
+                "y1": 35,
+                "x2": 88,
+                "y2": 22,
+                "tone": "info",
+                "arrow": true,
+                "width": 0.6
+              },
+              {
+                "t": "line",
+                "x1": 19,
+                "y1": 35,
+                "x2": 88,
+                "y2": 30,
+                "tone": "info",
+                "arrow": true,
+                "width": 0.6
+              },
+              {
+                "t": "line",
+                "x1": 19,
+                "y1": 35,
+                "x2": 88,
+                "y2": 38,
+                "tone": "info",
+                "arrow": true,
+                "width": 0.6
+              },
+              {
+                "t": "line",
+                "x1": 19,
+                "y1": 35,
+                "x2": 88,
+                "y2": 46,
+                "tone": "info",
+                "arrow": true,
+                "width": 0.6
+              },
+              {
+                "t": "line",
+                "x1": 19,
+                "y1": 35,
+                "x2": 88,
+                "y2": 54,
+                "tone": "info",
+                "arrow": true,
+                "width": 0.6
+              },
+              {
+                "t": "line",
+                "x1": 19,
+                "y1": 35,
+                "x2": 51,
+                "y2": 36,
+                "tone": "danger",
+                "arrow": true,
+                "width": 1.1
+              },
+              {
+                "t": "line",
+                "x1": 51,
+                "y1": 36,
+                "x2": 36,
+                "y2": 16,
+                "tone": "danger",
+                "arrow": true,
+                "width": 1.1
+              },
+              {
+                "t": "text",
+                "x": 36,
+                "y": 12,
+                "text": "a few bounce back",
+                "size": 4.8
+              },
+              {
+                "t": "text",
+                "x": 80,
+                "y": 64,
+                "text": "most go straight through",
+                "size": 4.8,
+                "anchor": "middle"
+              }
+            ]
+          },
+          "altText": "Particles fired at a thin sheet of gold foil. Most pass straight through, but a few bounce back, showing there is something tiny and dense inside each atom.",
+          "caption": "Simplified and not to scale."
+        }
+      }
+    },
+    {
+      "lesson_id": "protons-neutrons-electrons",
+      "id": "c08",
+      "position": 7,
+      "kind": "teach",
+      "type": "reveal",
+      "tier": "core",
+      "item_id": null,
+      "scored": 0,
+      "data": {
+        "predictCardId": "c01",
+        "title": "The stadium, answered",
+        "body": "If an atom were a football stadium, its nucleus would be about the size of a marble in the middle. Yet that marble holds nearly all of the stadium's mass.",
+        "figure": {
+          "scene": {
+            "height": 62,
+            "shapes": [
+              {
+                "t": "art",
+                "id": "stadium",
+                "x": 25,
+                "y": 24,
+                "size": 40
+              },
+              {
+                "t": "art",
+                "id": "marble",
+                "x": 25,
+                "y": 24,
+                "size": 7
+              },
+              {
+                "t": "text",
+                "x": 25,
+                "y": 50,
+                "text": "atom: a stadium",
+                "size": 4.8
+              },
+              {
+                "t": "line",
+                "x1": 46,
+                "y1": 24,
+                "x2": 56,
+                "y2": 24,
+                "arrow": true,
+                "width": 1
+              },
+              {
+                "t": "art",
+                "id": "marble",
+                "x": 78,
+                "y": 24,
+                "size": 24
+              },
+              {
+                "t": "text",
+                "x": 78,
+                "y": 50,
+                "text": "nucleus: a marble",
+                "size": 4.8
+              },
+              {
+                "t": "text",
+                "x": 50,
+                "y": 58,
+                "text": "a marble that holds nearly all the mass",
+                "size": 4.6
+              }
+            ]
+          },
+          "altText": "A football stadium with a small marble at its centre, then an arrow to a marble: if an atom were a stadium, its nucleus would be a marble, which holds nearly all the mass."
+        }
+      }
+    },
+    {
+      "lesson_id": "protons-neutrons-electrons",
+      "id": "c10",
+      "position": 8,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u1-l2-tom-volume",
+      "scored": 1,
+      "data": {}
+    },
+    {
+      "lesson_id": "protons-neutrons-electrons",
+      "id": "c11",
+      "position": 9,
+      "kind": "teach",
+      "type": "explain",
+      "tier": "deeper",
+      "item_id": null,
+      "scored": 0,
+      "data": {
+        "title": "Not tiny planets",
+        "body": "Pictures often show electrons on neat rings, like planets. A better picture is a cloud: electrons are found in a region around the nucleus, and the cloud is where they are likely to be.",
+        "figure": {
+          "scene": {
+            "height": 80,
+            "shapes": [
+              {
+                "t": "circle",
+                "x": 50,
+                "y": 36,
+                "r": 30,
+                "tone": "info",
+                "fill": "soft"
+              },
+              {
+                "t": "circle",
+                "x": 50,
+                "y": 36,
+                "r": 20,
+                "tone": "info",
+                "fill": "soft"
+              },
+              {
+                "t": "circle",
+                "x": 50,
+                "y": 36,
+                "r": 1.6,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 56.93,
+                "y": 40,
+                "r": 1.2,
+                "tone": "info",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 52.6,
+                "y": 50.77,
+                "r": 1.2,
+                "tone": "info",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 33.15,
+                "y": 50.14,
+                "r": 1.2,
+                "tone": "info",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 41.54,
+                "y": 32.92,
+                "r": 1.2,
+                "tone": "info",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 44.53,
+                "y": 20.96,
+                "r": 1.2,
+                "tone": "info",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 64.78,
+                "y": 18.38,
+                "r": 1.2,
+                "tone": "info",
+                "fill": "solid"
+              },
+              {
+                "t": "text",
+                "x": 50,
+                "y": 74,
+                "text": "a cloud where electrons are likely to be found",
+                "size": 4.8
+              }
+            ]
+          },
+          "altText": "A soft cloud shaded darker toward the centre with a tiny nucleus in the middle, showing where electrons are likely to be found."
+        }
+      }
+    },
+    {
+      "lesson_id": "protons-neutrons-electrons",
+      "id": "c12",
+      "position": 10,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u1-l2-choice-mass",
+      "scored": 1,
+      "data": {}
+    },
+    {
+      "lesson_id": "protons-neutrons-electrons",
+      "id": "c13",
+      "position": 11,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u1-l2-sort-location",
+      "scored": 1,
+      "data": {}
+    },
+    {
+      "lesson_id": "stable-and-unstable-nuclei",
+      "id": "c01",
+      "position": 0,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u1-l5-predict-strong",
+      "scored": 0,
+      "data": {}
+    },
+    {
+      "lesson_id": "stable-and-unstable-nuclei",
+      "id": "c02",
+      "position": 1,
+      "kind": "teach",
+      "type": "explain",
+      "tier": "core",
+      "item_id": null,
+      "scored": 0,
+      "data": {
+        "title": "A tug of war inside the nucleus",
+        "body": "Protons push each other apart with an electric force. A stronger force, the strong force, pulls neighbouring particles together, but only at very short range. A nucleus lasts when the pull wins.",
+        "figure": {
+          "scene": {
+            "height": 76,
+            "shapes": [
+              {
+                "t": "circle",
+                "x": 51.65,
+                "y": 36,
+                "r": 2.6,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 47.89,
+                "y": 37.94,
+                "r": 2.6,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 50.32,
+                "y": 32.31,
+                "r": 2.6,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 52.66,
+                "y": 39.47,
+                "r": 2.6,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 45.11,
+                "y": 35.14,
+                "r": 2.6,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 54.63,
+                "y": 33.05,
+                "r": 2.6,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 48.45,
+                "y": 41.76,
+                "r": 2.6,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 47.05,
+                "y": 30.31,
+                "r": 2.6,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 56.41,
+                "y": 38.34,
+                "r": 2.6,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 43.33,
+                "y": 38.75,
+                "r": 2.6,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 53.21,
+                "y": 29.13,
+                "r": 2.6,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 52.37,
+                "y": 43.57,
+                "r": 2.6,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "line",
+                "x1": 62,
+                "y1": 36,
+                "x2": 72,
+                "y2": 36,
+                "tone": "danger",
+                "arrow": true,
+                "width": 1
+              },
+              {
+                "t": "line",
+                "x1": 50,
+                "y1": 48,
+                "x2": 50,
+                "y2": 58,
+                "tone": "danger",
+                "arrow": true,
+                "width": 1
+              },
+              {
+                "t": "line",
+                "x1": 38,
+                "y1": 36,
+                "x2": 28,
+                "y2": 36,
+                "tone": "danger",
+                "arrow": true,
+                "width": 1
+              },
+              {
+                "t": "line",
+                "x1": 50,
+                "y1": 24,
+                "x2": 50,
+                "y2": 14,
+                "tone": "danger",
+                "arrow": true,
+                "width": 1
+              },
+              {
+                "t": "line",
+                "x1": 66.97,
+                "y1": 52.97,
+                "x2": 59.9,
+                "y2": 45.9,
+                "tone": "info",
+                "arrow": true,
+                "width": 1
+              },
+              {
+                "t": "line",
+                "x1": 33.03,
+                "y1": 52.97,
+                "x2": 40.1,
+                "y2": 45.9,
+                "tone": "info",
+                "arrow": true,
+                "width": 1
+              },
+              {
+                "t": "line",
+                "x1": 33.03,
+                "y1": 19.03,
+                "x2": 40.1,
+                "y2": 26.1,
+                "tone": "info",
+                "arrow": true,
+                "width": 1
+              },
+              {
+                "t": "line",
+                "x1": 66.97,
+                "y1": 19.03,
+                "x2": 59.9,
+                "y2": 26.1,
+                "tone": "info",
+                "arrow": true,
+                "width": 1
+              },
+              {
+                "t": "art",
+                "id": "bolt",
+                "x": 10,
+                "y": 9,
+                "size": 13
+              },
+              {
+                "t": "text",
+                "x": 18,
+                "y": 10,
+                "text": "electric push",
+                "size": 5,
+                "anchor": "start"
+              },
+              {
+                "t": "line",
+                "x1": 32,
+                "y1": 13,
+                "x2": 41,
+                "y2": 22,
+                "tone": "danger",
+                "arrow": true,
+                "width": 0.7
+              },
+              {
+                "t": "art",
+                "id": "magnet",
+                "x": 90,
+                "y": 68,
+                "size": 13
+              },
+              {
+                "t": "text",
+                "x": 82,
+                "y": 70,
+                "text": "strong pull",
+                "size": 5,
+                "anchor": "end"
+              },
+              {
+                "t": "line",
+                "x1": 72,
+                "y1": 64,
+                "x2": 64,
+                "y2": 56,
+                "tone": "info",
+                "arrow": true,
+                "width": 0.7
+              }
+            ]
+          },
+          "altText": "A nucleus with red arrows pointing outward, the electric push between protons, and blue arrows pointing inward, the strong force pulling the particles together."
+        }
+      }
+    },
+    {
+      "lesson_id": "stable-and-unstable-nuclei",
+      "id": "c03",
+      "position": 2,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u1-l5-choice-push",
+      "scored": 1,
+      "data": {}
+    },
+    {
+      "lesson_id": "stable-and-unstable-nuclei",
+      "id": "c04",
+      "position": 3,
+      "kind": "sim",
+      "type": "atom-builder",
+      "tier": "core",
+      "item_id": null,
+      "scored": 0,
+      "data": {
+        "mode": "stability",
+        "task": "Carbon-14 is unstable. Change the neutrons until the carbon atom is stable.",
+        "goal": {
+          "stable": true
+        },
+        "start": {
+          "protons": 6,
+          "neutrons": 8,
+          "electrons": 6
+        },
+        "lock": {
+          "protons": true,
+          "electrons": true
+        },
+        "maxNeutrons": 12,
+        "hint": "Stable carbon has 6 or 7 neutrons. Tap - until the badge says Stable.",
+        "objectives": [
+          "u1-stable-unstable"
+        ]
+      }
+    },
+    {
+      "lesson_id": "stable-and-unstable-nuclei",
+      "id": "c05",
+      "position": 4,
+      "kind": "teach",
+      "type": "explain",
+      "tier": "core",
+      "item_id": null,
+      "scored": 0,
+      "data": {
+        "title": "Neutrons are glue",
+        "body": "Neutrons add pull from the strong force without adding any electric push. So a nucleus needs the right mix of protons and neutrons. Too few or too many neutrons and the nucleus is unstable.",
+        "figure": {
+          "scene": {
+            "height": 62,
+            "shapes": [
+              {
+                "t": "circle",
+                "x": 26.53,
+                "y": 28,
+                "r": 2.4,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 23.05,
+                "y": 29.79,
+                "r": 2.4,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 25.3,
+                "y": 24.6,
+                "r": 2.4,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 27.46,
+                "y": 31.21,
+                "r": 2.4,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 20.49,
+                "y": 27.2,
+                "r": 2.4,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 29.27,
+                "y": 25.28,
+                "r": 2.4,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 23.57,
+                "y": 33.32,
+                "r": 2.4,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 22.27,
+                "y": 22.75,
+                "r": 2.4,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 30.92,
+                "y": 30.16,
+                "r": 2.4,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 18.85,
+                "y": 30.54,
+                "r": 2.4,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 27.97,
+                "y": 21.66,
+                "r": 2.4,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 27.19,
+                "y": 34.99,
+                "r": 2.4,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "text",
+                "x": 25,
+                "y": 52,
+                "text": "carbon-12: balanced",
+                "size": 5
+              },
+              {
+                "t": "text",
+                "x": 25,
+                "y": 59,
+                "text": "stable",
+                "size": 5.4
+              },
+              {
+                "t": "circle",
+                "x": 76.53,
+                "y": 28,
+                "r": 2.4,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 73.05,
+                "y": 29.79,
+                "r": 2.4,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 75.3,
+                "y": 24.6,
+                "r": 2.4,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 77.46,
+                "y": 31.21,
+                "r": 2.4,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 70.49,
+                "y": 27.2,
+                "r": 2.4,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 79.27,
+                "y": 25.28,
+                "r": 2.4,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 73.57,
+                "y": 33.32,
+                "r": 2.4,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 72.27,
+                "y": 22.75,
+                "r": 2.4,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 80.92,
+                "y": 30.16,
+                "r": 2.4,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 68.85,
+                "y": 30.54,
+                "r": 2.4,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 77.97,
+                "y": 21.66,
+                "r": 2.4,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 77.19,
+                "y": 34.99,
+                "r": 2.4,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 68.39,
+                "y": 24.17,
+                "r": 2.4,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 82.75,
+                "y": 26.3,
+                "r": 2.4,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "text",
+                "x": 75,
+                "y": 52,
+                "text": "carbon-14: too many",
+                "size": 5
+              },
+              {
+                "t": "text",
+                "x": 75,
+                "y": 59,
+                "text": "neutrons, unstable",
+                "size": 5.4
+              }
+            ]
+          },
+          "altText": "Two carbon nuclei. Carbon-12 has six protons and six neutrons and is a balanced, stable nucleus. Carbon-14 has two extra neutrons and is out of balance, so it is unstable."
+        }
+      }
+    },
+    {
+      "lesson_id": "stable-and-unstable-nuclei",
+      "id": "c06",
+      "position": 5,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u1-l5-sort-stable",
+      "scored": 1,
+      "data": {}
+    },
+    {
+      "lesson_id": "stable-and-unstable-nuclei",
+      "id": "c07",
+      "position": 6,
+      "kind": "teach",
+      "type": "explain",
+      "tier": "core",
+      "item_id": null,
+      "scored": 0,
+      "data": {
+        "title": "Unstable means it will change",
+        "body": "An unstable nucleus does not last forever. At some moment it changes into a more stable nucleus and gives off [[radiation]]. A nucleus that does this is called radioactive.",
+        "figure": {
+          "scene": {
+            "height": 60,
+            "shapes": [
+              {
+                "t": "circle",
+                "x": 20,
+                "y": 28,
+                "r": 11,
+                "tone": "warning",
+                "fill": "none"
+              },
+              {
+                "t": "circle",
+                "x": 21.4,
+                "y": 28,
+                "r": 2.2,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 18.21,
+                "y": 29.64,
+                "r": 2.2,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 20.27,
+                "y": 24.88,
+                "r": 2.2,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 22.25,
+                "y": 30.94,
+                "r": 2.2,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 15.86,
+                "y": 27.27,
+                "r": 2.2,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 23.92,
+                "y": 25.51,
+                "r": 2.2,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 18.69,
+                "y": 32.87,
+                "r": 2.2,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 17.5,
+                "y": 23.19,
+                "r": 2.2,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 25.42,
+                "y": 29.98,
+                "r": 2.2,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 14.36,
+                "y": 30.33,
+                "r": 2.2,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "text",
+                "x": 20,
+                "y": 52,
+                "text": "unstable nucleus",
+                "size": 5
+              },
+              {
+                "t": "line",
+                "x1": 33,
+                "y1": 28,
+                "x2": 60,
+                "y2": 28,
+                "tone": "warning",
+                "arrow": true,
+                "width": 1.2
+              },
+              {
+                "t": "art",
+                "id": "radiation",
+                "x": 47,
+                "y": 15,
+                "size": 15
+              },
+              {
+                "t": "text",
+                "x": 47,
+                "y": 35,
+                "text": "radiation",
+                "size": 5
+              },
+              {
+                "t": "circle",
+                "x": 79.4,
+                "y": 28,
+                "r": 2.2,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 76.21,
+                "y": 29.64,
+                "r": 2.2,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 78.27,
+                "y": 24.88,
+                "r": 2.2,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 80.25,
+                "y": 30.94,
+                "r": 2.2,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 73.86,
+                "y": 27.27,
+                "r": 2.2,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 81.92,
+                "y": 25.51,
+                "r": 2.2,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 76.69,
+                "y": 32.87,
+                "r": 2.2,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 75.5,
+                "y": 23.19,
+                "r": 2.2,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 83.42,
+                "y": 29.98,
+                "r": 2.2,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 72.36,
+                "y": 30.33,
+                "r": 2.2,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "text",
+                "x": 78,
+                "y": 52,
+                "text": "more stable nucleus",
+                "size": 5
+              }
+            ]
+          },
+          "altText": "An unstable nucleus on the left gives off radiation, shown by an arrow, and becomes a more stable nucleus on the right."
+        }
+      }
+    },
+    {
+      "lesson_id": "stable-and-unstable-nuclei",
+      "id": "c08",
+      "position": 7,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u1-l5-tom-human-made",
+      "scored": 1,
+      "data": {}
+    },
+    {
+      "lesson_id": "stable-and-unstable-nuclei",
+      "id": "c09",
+      "position": 8,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u1-l5-tom-body-stable",
+      "scored": 1,
+      "data": {}
+    },
+    {
+      "lesson_id": "stable-and-unstable-nuclei",
+      "id": "c10",
+      "position": 9,
+      "kind": "teach",
+      "type": "story",
+      "tier": "deeper",
+      "item_id": null,
+      "scored": 0,
+      "data": {
+        "title": "Found in a rock",
+        "tag": "1896",
+        "body": "Henri Becquerel left a uranium mineral on a wrapped photographic plate and found it fogged, even with no light. Radioactivity was discovered in a natural mineral, long before people made any nuclear technology.",
+        "figure": {
+          "scene": {
+            "height": 62,
+            "shapes": [
+              {
+                "t": "rect",
+                "x": 30,
+                "y": 8,
+                "w": 40,
+                "h": 12,
+                "tone": "warning",
+                "fill": "soft",
+                "rx": 2
+              },
+              {
+                "t": "text",
+                "x": 50,
+                "y": 17,
+                "text": "uranium mineral",
+                "size": 5
+              },
+              {
+                "t": "line",
+                "x1": 40,
+                "y1": 21,
+                "x2": 36,
+                "y2": 38,
+                "tone": "warning",
+                "dash": true
+              },
+              {
+                "t": "line",
+                "x1": 50,
+                "y1": 21,
+                "x2": 50,
+                "y2": 38,
+                "tone": "warning",
+                "dash": true
+              },
+              {
+                "t": "line",
+                "x1": 60,
+                "y1": 21,
+                "x2": 64,
+                "y2": 38,
+                "tone": "warning",
+                "dash": true
+              },
+              {
+                "t": "rect",
+                "x": 24,
+                "y": 39,
+                "w": 52,
+                "h": 8,
+                "tone": "neutral",
+                "fill": "soft",
+                "rx": 1
+              },
+              {
+                "t": "text",
+                "x": 50,
+                "y": 55,
+                "text": "photographic plate: dark marks appear",
+                "size": 4.8
+              }
+            ]
+          },
+          "altText": "A uranium mineral sitting above a photographic plate with dashed lines running down to it, showing invisible rays that left dark marks on the plate."
+        },
+        "speaker": "npc-ada"
+      }
+    },
+    {
+      "lesson_id": "stable-and-unstable-nuclei",
+      "id": "c11",
+      "position": 10,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u1-l5-choice-unstable-does",
+      "scored": 1,
+      "data": {}
+    },
+    {
+      "lesson_id": "stable-and-unstable-nuclei",
+      "id": "c12",
+      "position": 11,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u1-l5-match-forces",
+      "scored": 1,
+      "data": {}
+    }
+  ]
+}

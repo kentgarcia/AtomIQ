@@ -1,0 +1,251 @@
+{
+  "table": "npcs",
+  "primaryKey": [
+    "id"
+  ],
+  "rows": [
+    {
+      "id": "npc-ada",
+      "name": "Ada",
+      "title": "Atom teacher",
+      "field": "atoms",
+      "bio": "Ada has asked what things are made of since she was small. She teaches the atom: what is inside it, and why that matters.",
+      "spec": {
+        "skin": {
+          "base": "#FFD9C2",
+          "shade": "#F8C2A4",
+          "feature": "#EBA17E"
+        },
+        "head": "tombstone",
+        "headWidth": 100,
+        "eyes": "pill",
+        "nose": "single",
+        "hair": {
+          "style": "curls",
+          "color": "#7C3F25",
+          "shade": "#64311D"
+        },
+        "outfit": {
+          "kind": "sweater",
+          "color": "#1CB0F6",
+          "shade": "#1899D6"
+        },
+        "accent": {
+          "kind": "marble",
+          "color": "#FF4B4B",
+          "shade": "#EA2B2B"
+        }
+      },
+      "position": 1
+    },
+    {
+      "id": "npc-hal",
+      "name": "Hal",
+      "title": "Radioactivity teacher",
+      "field": "radioactivity",
+      "bio": "Hal is patient and tells things slowly and exactly. He teaches why some atoms change, and how long that takes.",
+      "spec": {
+        "skin": {
+          "base": "#D9A066",
+          "shade": "#C4854F",
+          "feature": "#A8683A"
+        },
+        "head": "capsule",
+        "headWidth": 104,
+        "eyes": "round",
+        "nose": "double",
+        "hair": {
+          "style": "crop",
+          "color": "#EBE3E3",
+          "shade": "#D6C9C9"
+        },
+        "facialHair": "moustache",
+        "outfit": {
+          "kind": "vest",
+          "color": "#FFC800",
+          "shade": "#E7A601",
+          "collar": "#84D8FF"
+        },
+        "accent": {
+          "kind": "watch",
+          "color": "#2B70C9",
+          "shade": "#1453A3"
+        }
+      },
+      "position": 2
+    },
+    {
+      "id": "npc-kofi",
+      "name": "Kofi",
+      "title": "Nuclear energy teacher",
+      "field": "nuclear-energy",
+      "bio": "Kofi is an engineer who likes to see how things work. He teaches where nuclear energy comes from and how a reactor uses it.",
+      "spec": {
+        "skin": {
+          "base": "#F5B092",
+          "shade": "#E8946F",
+          "feature": "#D97856"
+        },
+        "head": "tombstone",
+        "headWidth": 104,
+        "eyes": "dots",
+        "nose": "double",
+        "hair": {
+          "style": "crop",
+          "color": "#3B2A24",
+          "shade": "#2B1E1A"
+        },
+        "facialHair": "beard",
+        "outfit": {
+          "kind": "shirt",
+          "color": "#FF9600",
+          "shade": "#CD7900"
+        },
+        "accent": {
+          "kind": "hardhat",
+          "color": "#FFC800",
+          "shade": "#E7A601"
+        }
+      },
+      "position": 5
+    },
+    {
+      "id": "npc-mina",
+      "name": "Mina",
+      "title": "Radiation and health teacher",
+      "field": "radiation-and-the-body",
+      "bio": "Mina is warm and calm about risk. She teaches what radiation does to the body, and how big the dose really is.",
+      "spec": {
+        "skin": {
+          "base": "#A56644",
+          "shade": "#8E5236",
+          "feature": "#753F28"
+        },
+        "head": "tombstone",
+        "headWidth": 100,
+        "eyes": "pill",
+        "nose": "single",
+        "hair": {
+          "style": "bun",
+          "color": "#2E2622",
+          "shade": "#211B18"
+        },
+        "outfit": {
+          "kind": "coat",
+          "color": "#58CC02",
+          "shade": "#58A700",
+          "collar": "#FFFFFF"
+        },
+        "accent": {
+          "kind": "stethoscope",
+          "color": "#1899D6",
+          "shade": "#1453A3"
+        }
+      },
+      "position": 4
+    },
+    {
+      "id": "npc-ray",
+      "name": "Ray",
+      "title": "Radiation teacher",
+      "field": "radiation-and-matter",
+      "bio": "Ray is practical and a little blunt. He teaches what radiation does when it meets things, and how to stop it.",
+      "spec": {
+        "skin": {
+          "base": "#7A4A33",
+          "shade": "#633A27",
+          "feature": "#4D2C1D"
+        },
+        "head": "tombstone",
+        "headWidth": 98,
+        "eyes": "glasses-square",
+        "nose": "double",
+        "hair": {
+          "style": "crop",
+          "color": "#2E2622",
+          "shade": "#211B18"
+        },
+        "outfit": {
+          "kind": "hoodie",
+          "color": "#CE82FF",
+          "shade": "#9069CD",
+          "collar": "#FFFFFF"
+        },
+        "accent": {
+          "kind": "clipboard",
+          "color": "#FF9600",
+          "shade": "#CD7900"
+        }
+      },
+      "position": 3
+    },
+    {
+      "id": "npc-sage",
+      "name": "Sage",
+      "title": "Safety and society teacher",
+      "field": "safety-waste-society",
+      "bio": "Sage weighs both sides before deciding. They teach how nuclear power is kept safe, what happens to waste, and the choices society makes.",
+      "spec": {
+        "skin": {
+          "base": "#E0B48A",
+          "shade": "#CB9A6D",
+          "feature": "#B07F52"
+        },
+        "head": "tombstone",
+        "headWidth": 100,
+        "eyes": "pill",
+        "nose": "single",
+        "hair": {
+          "style": "bob",
+          "color": "#3B2A24",
+          "shade": "#2B1E1A"
+        },
+        "outfit": {
+          "kind": "sweater",
+          "color": "#FF7878",
+          "shade": "#FF4B4B"
+        },
+        "accent": {
+          "kind": "notebook",
+          "color": "#2B70C9",
+          "shade": "#1453A3"
+        }
+      },
+      "position": 7
+    },
+    {
+      "id": "npc-tess",
+      "name": "Tess",
+      "title": "Nuclear technology teacher",
+      "field": "nuclear-technology",
+      "bio": "Tess is quick and loves gadgets. She teaches how nuclear tools help in hospitals, farms and factories.",
+      "spec": {
+        "skin": {
+          "base": "#FFCBA3",
+          "shade": "#F5B585",
+          "feature": "#E99B5F"
+        },
+        "head": "capsule",
+        "headWidth": 96,
+        "eyes": "round",
+        "nose": "single",
+        "hair": {
+          "style": "wrap",
+          "color": "#FFB2B2",
+          "shade": "#F5A4A4"
+        },
+        "outfit": {
+          "kind": "shirt",
+          "color": "#1899D6",
+          "shade": "#2B70C9"
+        },
+        "accent": {
+          "kind": "vial",
+          "color": "#7AF0F2",
+          "shade": "#84D8FF"
+        }
+      },
+      "position": 6
+    }
+  ]
+}

@@ -7,6 +7,8 @@
  */
 
 import { withAlpha, type Theme } from "@/theme";
+
+import { RIM_DARKEN, darken } from "./color-math";
 import type { VisualTone } from "@/content/types";
 
 export function toneColor(theme: Theme, tone: VisualTone | undefined): string {
@@ -27,6 +29,16 @@ export function toneColor(theme: Theme, tone: VisualTone | undefined): string {
     default:
       return c.textMuted;
   }
+}
+
+/**
+ * The edge of a flat shape, and the colour of toned lines: the tone itself, one shade
+ * step darker in light mode so even a yellow keeps a 3:1 edge on the figure's surface.
+ * In dark mode the bright fill already stands out, so the edge is the fill.
+ */
+export function toneRim(theme: Theme, tone: VisualTone | undefined): string {
+  const fill = toneColor(theme, tone);
+  return theme.mode === "dark" ? fill : darken(fill, RIM_DARKEN);
 }
 
 /** Soft (tinted) version of a tone, for backgrounds behind labels. */

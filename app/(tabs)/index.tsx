@@ -1,22 +1,26 @@
 import { BetaNoticeModal } from "@/components/ui/beta-notice-modal";
-import { PageBackground, useTabBarInset } from "@/components/layout";
+import { PageBackground, TopRowHeader, useTabBarInset } from "@/components/layout";
 import { Icon } from "@/components/ui/icon";
 import { BETA_FEEDBACK_FORM_URL, BETA_NOTICE_ID } from "@/constants/beta";
-import { UNITS } from "@/content/units";
-import { useAllLevels } from "@/hooks/use-storage";
+import { toneColor } from "@/components/lesson/visual/colors";
+import { UnitTeacher } from "@/components/npc/UnitTeacher";
+import type { Reference } from "@/content/curriculum/types";
+import { useCurriculumPath, type CurriculumData } from "@/hooks/use-curriculum";
+import type { PathState } from "@/services/path-core";
 import {
   useDailyMissions,
   type MissionView,
 } from "@/hooks/use-daily-missions";
 import { getDailyFact, type DailyFact } from "@/services/missions";
 import { openExternalUrl } from "@/services/open-url";
-import { getProfileAvatarSource } from "@/services/profile-avatars";
 import { getBetaNoticeSeen, setBetaNoticeSeen } from "@/services/storage";
 import { useStorage } from "@/services/StorageContext";
+import { useStreakCelebration } from "@/hooks/use-streak-celebration";
+import { renderRichText } from "@/components/community/rich-text";
 import { useTheme, createStyles, withAlpha, fontFaces, useResponsiveLayout } from "@/theme";
 import { notifySuccess } from "@/services/haptics";
 import { LinearGradient } from "expo-linear-gradient";
-import { useFocusEffect, useRouter } from "expo-router";
+import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
     Alert,
@@ -42,15 +46,10 @@ import Animated, {
     withTiming,
     ZoomIn,
 } from "react-native-reanimated";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Svg, { Path, Polygon, Polyline } from "react-native-svg";
 import { DURATION, EASE_OUT, PRESS_EASING } from "@/theme/motion";
 
-const FIRE_ICON = require("@/assets/images/icons/fire.png");
-const MEDAL_ICON = require("@/assets/images/icons/medal.png");
-const XP_ICON = require("@/assets/images/icons/xp.png");
 const INFO_ICON = require("@/assets/images/icons/info.png");
-const DIAMOND_ICON = require("@/assets/images/icons/diamond.png");
 
 const NODE_SIZE = 79;
 const NODE_ROW_GAP = 120;
@@ -101,6 +100,8 @@ type PathNode = {
   id: string;
   type: "star" | "book" | "chest" | "trophy";
   status: NodeStatus;
+  kind: "lesson" | "practice" | "checkpoint";
+  lessonId?: string;
 };
 
 type PathUnit = {
@@ -112,6 +113,11 @@ type PathUnit = {
   icon: string;
   levels: PathNode[];
   isLocked: boolean;
+  /** Guidebook summary shown in "About this unit". */
+  info: string;
+  references: Reference[];
+  /** True until the unit is complete: the learner may test out of it, even while it is locked. */
+  canTestOut: boolean;
 };
 
 type CardUnit = {
@@ -136,73 +142,49 @@ const computeNodeScrollY = (
   return Math.max(0, offset - (viewportHeight - NODE_SIZE) / 2);
 };
 
+const LESSON_NODE_TYPES = ["star", "book", "chest"] as const;
+
 const buildPath = (
-  completedLessonIds: string[],
+  curriculum: CurriculumData,
+  state: PathState,
   lockedColor: string,
-): PathUnit[] => {
-  return UNITS.map((unit, unitIndex) => {
-    // A unit only counts as finished when its lessons AND its final exam
-    // (quiz) are all completed — finishing the last lesson alone must not
-    // open the next unit.
-    const prevUnit = unitIndex > 0 ? UNITS[unitIndex - 1] : null;
-    const isPreviousUnitCompleted =
-      unitIndex === 0 ||
-      (prevUnit !== null &&
-        prevUnit.lessonIds.every((id) => completedLessonIds.includes(id)) &&
-        prevUnit.quizIds.every((id) => completedLessonIds.includes(id)));
-
-    const isUnitLocked = !isPreviousUnitCompleted;
-
-    const levels: PathNode[] = unit.lessonIds.map((lessonId, index) => {
-      const isCompleted = completedLessonIds.includes(lessonId);
-      const isFirst = index === 0;
-      const previousCompleted =
-        index === 0 || completedLessonIds.includes(unit.lessonIds[index - 1]);
-
-      let status: NodeStatus = "locked";
-      if (!isUnitLocked && isCompleted) {
-        status = "completed";
-      } else if (!isUnitLocked && (previousCompleted || isFirst)) {
-        status = "current";
-      }
-
-      const types = ["star", "book", "chest"] as const;
+  themeForTone: Parameters<typeof toneColor>[0],
+): PathUnit[] =>
+  [...curriculum.units]
+    .sort((a, b) => a.position - b.position)
+    .map((unit) => {
+      const unitState = state.units[unit.id];
+      const isLocked = !(unitState?.unlocked ?? false);
+      let lessonIndex = 0;
+      const levels: PathNode[] = curriculum.nodes
+        .filter((n) => n.unitId === unit.id)
+        .sort((a, b) => a.position - b.position)
+        .map((n) => {
+          const nodeStatus = state.nodes[n.id] ?? "locked";
+          // Replayable nodes in a finished unit look completed but stay tappable.
+          const status: NodeStatus = nodeStatus === "available" ? "completed" : nodeStatus;
+          const type =
+            n.kind === "checkpoint"
+              ? "trophy"
+              : n.kind === "practice"
+                ? "chest"
+                : LESSON_NODE_TYPES[lessonIndex++ % LESSON_NODE_TYPES.length];
+          return { id: n.id, type, status, kind: n.kind, ...(n.lessonId ? { lessonId: n.lessonId } : {}) };
+        });
       return {
-        id: lessonId,
-        type: types[index % types.length],
-        status,
+        id: unit.id,
+        title: unit.title,
+        subtitle: unit.subtitle,
+        description: unit.description,
+        color: isLocked ? lockedColor : toneColor(themeForTone, unit.tone),
+        icon: unit.icon,
+        levels,
+        isLocked,
+        info: unit.guidebook.summary ?? unit.description,
+        references: curriculum.unitReferences[unit.id] ?? [],
+        canTestOut: !(unitState?.completed ?? false),
       };
     });
-
-    if (unit.quizIds.length > 0) {
-      const quizId = unit.quizIds[0];
-      const isQuizCompleted = completedLessonIds.includes(quizId);
-      const allLessonsCompleted = unit.lessonIds.every((id) =>
-        completedLessonIds.includes(id),
-      );
-
-      let quizStatus: NodeStatus = "locked";
-      if (!isUnitLocked && isQuizCompleted) {
-        quizStatus = "completed";
-      } else if (!isUnitLocked && allLessonsCompleted) {
-        quizStatus = "current";
-      }
-
-      levels.push({ id: quizId, type: "trophy", status: quizStatus });
-    }
-
-    return {
-      id: unit.id,
-      title: unit.title,
-      subtitle: unit.subtitle,
-      description: unit.description,
-      color: isUnitLocked ? lockedColor : unit.color,
-      icon: unit.icon,
-      levels,
-      isLocked: isUnitLocked,
-    };
-  });
-};
 
 const getNodeX = (globalIndex: number, width: number) =>
   width / 2 + Math.sin(globalIndex * 0.8) * 80;
@@ -218,101 +200,11 @@ const shadeColor = (hex: string, amount: number): string => {
   )}${mix(parseInt(hex.slice(5, 7), 16))}`;
 };
 
-/* Daily-fact rich text: myth content ships with **bold** markers and "- "
-   list lines. Nested <Text> inherits the parent size/color/line-height, so
-   bold spans only override the family — base styling stays intact. */
-const renderRichText = (text: string): React.ReactNode[] => {
-  const normalized = text
-    .split("\n")
-    .map((line) => line.replace(/^\s*-\s+/, "\u2022 "))
-    .join("\n");
-  return normalized.split("**").map((part, i) =>
-    i % 2 === 1 ? (
-      <Text key={i} style={{ ...fontFaces.bold }}>
-        {part}
-      </Text>
-    ) : (
-      <Text key={i}>{part}</Text>
-    ),
-  );
-};
-
-const UNIT_INFO_DATA: Record<string, { info: string; references: string[] }> = {
-  "atomic-playground": {
-    info: "Explore the basics of nuclear science, including atoms, isotopes, and the energy contained within nuclei. You'll understand atomic structure, nuclear energy fundamentals, and recognize common misconceptions.",
-    references: [
-      "https://www.britannica.com/science/atom",
-      "https://openstax.org/books/anatomy-and-physiology/pages/2-1-elements-and-atoms-the-building-blocks-of-matter",
-      "https://www.iaea.org/newscenter/news/what-is-nuclear-energy-the-science-of-nuclear-power",
-    ],
-  },
-  "nuclear-reactions": {
-    info: "Explore the fundamental nuclear reactions that power stars, fuel nuclear power plants, and enable essential technologies. You'll gain foundational knowledge about how nuclear reactions work, how energy is released, and how these processes are safely controlled.",
-    references: [
-      "https://www.iaea.org/topics/nuclear-fission",
-      "https://www.britannica.com/science/nuclear-fusion",
-      "https://www.world-nuclear.org/information-library/nuclear-fuel-cycle/introduction/physics-of-nuclear-energy.aspx",
-    ],
-  },
-  "radiation-effects": {
-    info: "Learn about different types of radiation, how radiation interacts with matter, and the real science behind radiation effects on human health and the environment. This unit provides factual, science-based understanding of radiation.",
-    references: [
-      "https://www.iaea.org/topics/radiation-protection",
-      "https://www.epa.gov/radiation/radiation-basics",
-      "https://www.nrc.gov/about-nrc/radiation/health-effects.html",
-    ],
-  },
-  "nuclear-everyday-life": {
-    info: "Discover the many peaceful applications of nuclear technology in medicine, agriculture, industry, and environmental protection. Learn how nuclear science improves lives every day.",
-    references: [
-      "https://www.iaea.org/topics/nuclear-applications",
-      "https://www.world-nuclear.org/information-library/non-power-nuclear-applications.aspx",
-      "https://www.who.int/health-topics/ionizing-radiation",
-    ],
-  },
-  "nuclear-safety-security": {
-    info: "Focuses on how countries, scientists, and international organizations work together to ensure nuclear technology is used safely, securely, and responsibly. Learn about safety frameworks, regulations, and global cooperation.",
-    references: [
-      "https://www.iaea.org/topics/nuclear-safety-and-security",
-      "https://www.nrc.gov/about-nrc/regulatory/enforcement/safety-culture.html",
-      "https://www.world-nuclear.org/information-library/safety-and-security.aspx",
-    ],
-  },
-  "invisible-rays": {
-    info: 'Learn about different types of radiation and how to protect against them. Demystify "Radiation" by breaking it down into manageable types.',
-    references: [
-      "https://www.epa.gov/radiation/radiation-protection",
-      "https://www.nrc.gov/about-nrc/radiation/protects-you.html",
-    ],
-  },
-  "dose-poison": {
-    info: "Understand radiation doses, measurements, and health effects. Contextualize safety using radiation comparison and dose visualization.",
-    references: [
-      "https://www.iaea.org/topics/radiation-dosimetry",
-      "https://xkcd.com/radiation/",
-    ],
-  },
-  "engine-room": {
-    info: 'Discover how nuclear reactors generate clean, reliable energy. Explain the mechanics to debunk the "Explosion" myth.',
-    references: [
-      "https://www.world-nuclear.org/information-library/nuclear-fuel-cycle/nuclear-power-reactors.aspx",
-      "https://www.ucs.org/resources/how-nuclear-power-works",
-    ],
-  },
-  "green-horizon": {
-    info: "Explore nuclear energy's environmental benefits and waste management. Address environmental concerns using energy statistics visualizations.",
-    references: [
-      "https://www.world-nuclear.org/information-library/energy-and-the-environment.aspx",
-      "https://www.iaea.org/topics/waste-management",
-    ],
-  },
-};
-
 export default function HomeScreen() {
   const router = useRouter();
-  const insets = useSafeAreaInsets();
-  const { userProfile, levelUpLevel, dismissLevelUp } = useStorage();
-  const { levels, loading, refresh } = useAllLevels();
+  const { levelUpLevel, dismissLevelUp } = useStorage();
+  useStreakCelebration();
+  const { data: curriculum, state: pathState, loading, refresh } = useCurriculumPath();
   const {
     missions,
     claim,
@@ -346,6 +238,15 @@ export default function HomeScreen() {
   const [arrowDir, setArrowDir] = useState<"up" | "down" | null>(null);
   const [dailyPanel, setDailyPanel] = useState<"missions" | "fact" | null>(null);
   const [dailyFact, setDailyFact] = useState<DailyFact | null>(null);
+
+  /* Other tabs' header mission button lands here with ?panel=missions */
+  const { panel: panelParam } = useLocalSearchParams<{ panel?: string }>();
+  useEffect(() => {
+    if (panelParam !== "missions") return;
+    setInfoOpen(false);
+    setDailyPanel("missions");
+    router.setParams({ panel: undefined });
+  }, [panelParam, router]);
   const [betaNoticeVisible, setBetaNoticeVisible] = useState(false);
 
   useEffect(() => {
@@ -430,36 +331,12 @@ export default function HomeScreen() {
     }, [refresh, refreshMissions]),
   );
 
-  // Stable key so `units` (and everything depending on it) only rebuilds when
-  // progress actually changes — not on every render
-  const completedKey = useMemo(
-    () =>
-      levels
-        .filter((l) => l.status === "completed")
-        .map((l) => l.id)
-        .join("|"),
-    [levels],
-  );
-
+  // Rebuilt only when content or progress changes, not on every render
   const units = useMemo(
-    () => buildPath(completedKey ? completedKey.split("|") : [], c.textFaint),
-    [completedKey, c.textFaint],
+    () => buildPath(curriculum, pathState, c.textFaint, theme),
+    [curriculum, pathState, c.textFaint, theme],
   );
-
-  const diamonds = 0;
-
-  // Lessons only — unit quizzes (trophy nodes) are not counted
-  const completedLessons = useMemo(
-    () =>
-      units.reduce(
-        (n, u) =>
-          n +
-          u.levels.filter((l) => l.type !== "trophy" && l.status === "completed")
-            .length,
-        0,
-      ),
-    [units],
-  );
+  const completedKey = pathState.currentNodeId ?? "done";
 
   // Locate the first "current" (next up) node
   let firstCurrentId: string | null = null;
@@ -578,10 +455,10 @@ export default function HomeScreen() {
   }, [loading, units, completedKey, currentUnitIndex, currentRowIndex, mapContentPad]);
 
   const handleNodePress = (node: PathNode) => {
-    if (node.type === "trophy" || node.id.includes("-quiz")) {
-      router.push(`/quiz/${node.id}`);
+    if (node.kind === "lesson" && node.lessonId) {
+      router.push(`/lesson/${node.lessonId}`);
     } else {
-      router.push(`/lesson/${node.id}`);
+      router.push(`/practice/${node.id}`);
     }
   };
 
@@ -624,49 +501,12 @@ export default function HomeScreen() {
 
       {/* Top row — its own block above the map (the lesson card floats over
           the map below it) */}
-      <View style={[styles.header, { paddingTop: insets.top + 12 }]}>
-        <View
-          style={[
-            styles.headerStack,
-            { width: "100%", maxWidth: contentMaxWidth, alignSelf: "center" },
-          ]}
-        >
-        <Animated.View
-          layout={reducedMotion ? undefined : LinearTransition.duration(DURATION.medium).easing(EASE_OUT)}
-          style={styles.headerBar}
-        >
-          <View style={styles.headerRow}>
-            <View style={styles.avatarWrap}>
-              <Image
-                source={getProfileAvatarSource(userProfile?.avatar_url)}
-                style={styles.avatar}
-                resizeMode="cover"
-              />
-            </View>
-            <View style={{ flex: 1 }} />
-
-            {/* Streak, completed lessons, XP */}
-            <View style={styles.statsRow}>
-              {[
-                { key: "streak", icon: FIRE_ICON, value: userProfile?.current_streak || 0, label: "day streak" },
-                { key: "lessons", icon: MEDAL_ICON, value: completedLessons, label: "lessons completed" },
-                { key: "xp", icon: XP_ICON, value: userProfile?.total_xp || 0, label: "XP" },
-                // Currency — no balance is stored yet, so this reads 0 until diamonds are wired up
-                { key: "diamonds", icon: DIAMOND_ICON, value: diamonds, label: "diamonds" },
-              ].map((stat) => (
-                <View
-                  key={stat.key}
-                  style={styles.statItem}
-                  accessible
-                  accessibilityLabel={`${stat.value.toLocaleString()} ${stat.label}`}
-                >
-                  <Image source={stat.icon} style={styles.statIcon} resizeMode="contain" />
-                  <Text style={styles.statText}>{stat.value.toLocaleString()}</Text>
-                </View>
-              ))}
-            </View>
-          </View>
-
+      <TopRowHeader
+        onMissionsPress={() => {
+          setInfoOpen(false);
+          setDailyPanel((p) => (p === "missions" ? null : "missions"));
+        }}
+      >
           {/* Daily missions panel — claims happen right here */}
           {dailyPanel === "missions" && (
             <Animated.View
@@ -848,9 +688,7 @@ export default function HomeScreen() {
               </View>
             </Animated.View>
           )}
-        </Animated.View>
-        </View>
-      </View>
+      </TopRowHeader>
 
       {/* Map area: the map scrolls behind the floating lesson card */}
       <View style={styles.mapArea}>
@@ -954,10 +792,9 @@ export default function HomeScreen() {
               const activeUnit =
                 cardUnits.find((c) => c.id === cardUnit.id)?.unit ??
                 cardUnit.unit;
-              const unitInfo = UNIT_INFO_DATA[activeUnit.id];
-              // Lessons only — the unit quiz (trophy node) is not counted
+              // Lessons only: practice nodes and checkpoints are not counted
               const unitLessons = activeUnit.levels.filter(
-                (l) => l.type !== "trophy",
+                (l) => l.kind === "lesson",
               );
               const unitTotal = unitLessons.length;
               const unitCompleted = unitLessons.filter(
@@ -1001,15 +838,12 @@ export default function HomeScreen() {
                         !standaloneInfo && styles.infoBtnCircle,
                         infoOpen && styles.infoBtnActive,
                       ]}
-                      disabled={activeUnit.isLocked}
                       hitSlop={6}
                       accessibilityRole="button"
                       accessibilityLabel={
                         infoOpen ? "Hide unit details" : "Show unit details"
                       }
-                      accessibilityState={{ disabled: activeUnit.isLocked }}
                       onPress={() => {
-                        if (activeUnit.isLocked) return;
                         setDailyPanel(null);
                         setInfoOpen((o) => !o);
                       }}
@@ -1022,7 +856,7 @@ export default function HomeScreen() {
                         />
                       ) : (
                         <Icon
-                          name={activeUnit.isLocked ? "Lock" : "CloseCircle"}
+                          name={activeUnit.isLocked && !infoOpen ? "Lock" : "CloseCircle"}
                           size={18}
                           color={activeUnit.isLocked ? "#9CA3AF" : c.text}
                           variant="Bold"
@@ -1032,7 +866,7 @@ export default function HomeScreen() {
                   </View>
 
                   {/* Unit info expands inside the card — no modal */}
-                  {infoOpen && unitInfo?.info && (
+                  {infoOpen && activeUnit.info && (
                     <Animated.View
                       entering={reducedMotion ? FadeIn.duration(120) : FadeIn.duration(200)}
                       exiting={FadeOut.duration(160)}
@@ -1040,8 +874,14 @@ export default function HomeScreen() {
                     >
                       <View style={styles.infoDivider} />
                       <Text style={styles.infoLabel}>About this unit</Text>
-                      <Text style={styles.infoBody}>{unitInfo.info}</Text>
-                      {unitInfo.references.length > 0 && (
+                      <Text style={styles.infoBody}>{activeUnit.info}</Text>
+                      <UnitTeacher unitId={activeUnit.id} locked={activeUnit.isLocked} />
+                      {activeUnit.isLocked ? (
+                        <Text style={styles.infoBody}>
+                          This unit opens when you pass the checkpoint of the unit before it. Or skip ahead by testing out.
+                        </Text>
+                      ) : null}
+                      {activeUnit.references.length > 0 && (
                         <>
                           <Text style={styles.infoLabel}>
                             References & Resources
@@ -1050,12 +890,15 @@ export default function HomeScreen() {
                             showsVerticalScrollIndicator={false}
                             style={styles.infoRefs}
                           >
-                            {unitInfo.references.map((ref, index) => (
+                            {activeUnit.references.map((ref) => (
                               <TouchableOpacity
-                                key={index}
+                                key={ref.id}
                                 style={styles.referenceItem}
+                                disabled={!ref.url}
+                                accessibilityRole={ref.url ? "link" : "text"}
+                                accessibilityLabel={`${ref.title}, ${ref.publisher}`}
                                 onPress={async () => {
-                                  const opened = await openExternalUrl(ref);
+                                  const opened = await openExternalUrl(ref.url);
                                   if (!opened) {
                                     Alert.alert("Error", "Could not open link");
                                   }
@@ -1069,22 +912,34 @@ export default function HomeScreen() {
                                 />
                                 <Text
                                   style={styles.referenceText}
-                                  numberOfLines={1}
+                                  numberOfLines={2}
                                 >
-                                  {ref
-                                    .replace("https://", "")
-                                    .replace("http://", "")}
+                                  {ref.publisher}: {ref.title}
                                 </Text>
-                                <Icon
-                                  name="ArrowRight2"
-                                  size={14}
-                                  color={c.textMuted}
-                                />
+                                {ref.url ? (
+                                  <Icon
+                                    name="ArrowRight2"
+                                    size={14}
+                                    color={c.textMuted}
+                                  />
+                                ) : null}
                               </TouchableOpacity>
                             ))}
                           </ScrollView>
                         </>
                       )}
+                      {activeUnit.canTestOut ? (
+                        <TouchableOpacity
+                          style={styles.testOutBtn}
+                          accessibilityRole="button"
+                          accessibilityLabel={`Test out of ${activeUnit.title}`}
+                          accessibilityHint="Pass a short test to skip this unit"
+                          onPress={() => router.push(`/practice/testout:${activeUnit.id}`)}
+                        >
+                          <Icon name="Flash" size={16} color={c.primary} variant="Bold" />
+                          <Text style={styles.testOutText}>Already know this? Test out</Text>
+                        </TouchableOpacity>
+                      ) : null}
                     </Animated.View>
                   )}
                 </Animated.View>
@@ -1367,12 +1222,6 @@ const makeStyles = createStyles((theme) => {
       bottom: 0,
       left: 0,
     },
-    /* Top row sits above the map in normal flow */
-    header: {
-      paddingHorizontal: 16,
-      paddingBottom: 8,
-      zIndex: 100,
-    },
     mapArea: {
       flex: 1,
     },
@@ -1387,58 +1236,6 @@ const makeStyles = createStyles((theme) => {
       right: 0,
       paddingHorizontal: 16,
       zIndex: 90,
-    },
-    headerStack: {
-      gap: 12,
-    },
-    /* Top row (no container): profile, XP, daily buttons and the panels they open */
-    headerBar: {
-      gap: 12,
-    },
-    headerRow: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 12,
-    },
-    avatarWrap: {
-      width: 46,
-      height: 46,
-      borderRadius: 23,
-      backgroundColor: c.card,
-      borderWidth: 2,
-      borderColor: c.border,
-      borderBottomWidth: 4,
-    },
-    avatar: {
-      width: "100%",
-      height: "100%",
-      borderRadius: 23,
-    },
-    /* Right-aligned stats: streak, completed lessons, XP */
-    statsRow: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 6,
-    },
-    /* Flat, fully rounded pill — no border lip or elevation */
-    statItem: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 5,
-      height: 32,
-      paddingHorizontal: 10,
-      borderRadius: 999,
-      backgroundColor: c.card,
-    },
-    statIcon: {
-      width: 18,
-      height: 18,
-    },
-    statText: {
-      fontSize: 13,
-      ...fontFaces.heavy,
-      color: c.text,
-      fontVariant: ["tabular-nums"],
     },
     /* Lesson card — its own standalone card under the top row */
     nowCard: {
@@ -1957,6 +1754,23 @@ const makeStyles = createStyles((theme) => {
       fontSize: 13,
       color: c.primary,
       ...fontFaces.medium,
+    },
+    testOutBtn: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 8,
+      minHeight: 44,
+      marginTop: 12,
+      borderRadius: 12,
+      borderWidth: 2,
+      borderColor: c.primaryBorder,
+      backgroundColor: c.primarySurface,
+    },
+    testOutText: {
+      fontSize: 14,
+      color: c.primaryLight,
+      ...fontFaces.bold,
     },
     /* Level-up celebration overlay — must sit above the sticky header
        (zIndex 100) on iOS and above its elevation on Android, so the dim

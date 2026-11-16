@@ -9,9 +9,9 @@ Articles and feed posts are short **educational summaries** written by AtomIQ. T
 - Tables `articles` (long form) and `posts` (short feed items) in `content/database/content.db`.
 - Facade `content/articles` (types in `content/articles/types.ts`), mapping in `services/content-db.ts`.
 - Reader screen `app/article-detail.tsx`; Discovery feed `app/(tabs)/community.tsx`.
-- Edit with the Content Studio (`npm run content-studio`), then run `npm run validate:content` and `node scripts/sync-content.js`.
+- Edit with the Content Studio (`npm run content-studio`), then check Problems in Studio (or run `npm run validate:content`) and publish (Studio's Publish button or `npm run release:content -- --publish`).
 
-The bundle is copied over the on-device database whenever its content hash changes (`CONTENT_DB_VERSION` is derived by `sync-content.js`; never edit it by hand). User data (profile, progress, bookmarks, activity) lives in separate local stores and is not touched by a content update. Schema changes are therefore additive migrations applied to the master database: `scripts/content-migration/add-article-pipeline.mjs` (idempotent) and mirrored in `scripts/content-migration/schema.sql`.
+The bundle is copied over the on-device database whenever its version changes (`CONTENT_DB_VERSION` is written by publish; never edit it by hand). User data (profile, progress, bookmarks, activity) lives in separate local stores and is not touched by a content update. Schema changes are therefore additive migrations applied to the master database: `scripts/content-migration/add-article-pipeline.mjs` (idempotent) and mirrored in `scripts/content-migration/schema.sql`.
 
 ## Fields
 
@@ -57,7 +57,7 @@ Release gate: `node --no-warnings scripts/validate-content.mjs --strict-review` 
 5. Fill every metadata field above. Link lessons, concepts, myths and elements that genuinely help the learner.
 6. Add or edit the row in the Content Studio (or a migration script like `add-beginner-articles.mjs`), starting at `needs-review`.
 7. A second person compares summary and source, fixes errors, then sets `reviewed`, `reviewed_by`, `last_reviewed`.
-8. Run `npm run validate:content`, `npx tsc --noEmit`, then `node scripts/sync-content.js`.
+8. Run `npm run validate:content`, `npx tsc --noEmit`, then publish.
 9. Check the reader offline: summary and related links render; the source link shows a clear message when it cannot open; images show a placeholder.
 
 ## Cadence suggestion

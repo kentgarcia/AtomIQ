@@ -67,7 +67,7 @@ export type GuideAction =
  */
 export type GuideDestination =
   | { screen: "lesson"; id: string } // /lesson/${id}
-  | { screen: "quiz"; id: string } // /quiz/${id}
+  | { screen: "practice"; id: string } // /practice/${id}
   | { screen: "encyclopedia-entry"; id: string } // /explorer/encyclopedia-entry?id=${id}
   | { screen: "article"; id: string } // /article-detail?id=${id}
   | { screen: "maze"; id: string } // /explorer/atom-maze?id=${id}

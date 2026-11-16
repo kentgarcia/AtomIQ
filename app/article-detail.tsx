@@ -8,9 +8,10 @@ import type {
   SummaryOrigin,
 } from "@/content/articles";
 import { getEncyclopediaEntryById } from "@/content/explorer";
-import { getLessonById } from "@/content/lessons";
+import { contentRepository } from "@/services/content-db";
 import {useTheme, type Palette, fontFaces, useResponsiveLayout} from "@/theme";
 import { recordActivity } from "@/services/activity-log";
+import { markArticleRead } from "@/services/read-articles";
 import { openExternalUrl } from "@/services/open-url";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
@@ -122,6 +123,7 @@ export default function ArticleDetailScreen() {
     if (!article || !articleId) return;
     const timer = setTimeout(() => {
       recordActivity("article_read", { id: articleId });
+      void markArticleRead(articleId);
     }, 5000);
     return () => clearTimeout(timer);
   }, [article, articleId]);
@@ -159,7 +161,7 @@ export default function ArticleDetailScreen() {
       );
       return settled.filter((entry): entry is RelatedLabel => entry !== null);
     };
-    void resolveAll(article.relatedLessons, getLessonById, (l) => l.title).then(
+    void resolveAll(article.relatedLessons, (id) => contentRepository.getLessonById(id), (l) => l.title).then(
       (items) => alive && setRelatedLessons(items),
     );
     void resolveAll(article.relatedConcepts, getEncyclopediaEntryById, (e) => e.term).then(

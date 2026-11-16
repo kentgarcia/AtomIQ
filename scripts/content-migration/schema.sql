@@ -1,26 +1,12 @@
 -- ============================================================================
 -- AtomIQ content database schema
 --
--- Stores Lesson content (with nested Steps), Quizzes (with nested Questions),
--- the standalone Mythbuster question banks used by the atom-maze boss
+-- Stores the curriculum (units, objectives, lessons made of cards, the item bank
+-- and references; see "Curriculum v2" below), the standalone Mythbuster question banks used by the atom-maze boss
 -- battles, the Myths and Facts reference resources, the Atom Maze challenges
 -- (with nested Rooms and JSON-encoded Monsters + BattleQuestions), the
 -- Encyclopedia entries (with JSON-encoded flexible fields), and the Articles
--- + Posts powering the Learn & Explore feed (JSON-encoded author objects). The flexible `data` payload on
--- each lesson step is stored as a JSON document whose shape is dictated by
--- the step's `step_type`:
---
---   briefing   -> { topic, mission, icon }
---   myth_buster-> { myth, reality, explanation, image? }
---   micro_learn-> { title, content, keyPoints?, image? }
---   lab        -> { title, description, task, options[{ id, label, icon?, image? }], correctAnswer, explanation }
---   assessment -> { question, options[], correctIndex, explanation, image? }
---   debrief    -> { title, message, rewards{ xp, stars } }
---
--- Quiz question `correct_answer` is stored as JSON so the original runtime
--- type is preserved: numeric option index for multiple choice, or a JSON
--- boolean for true/false questions (matching the app's getCorrectAnswerIndex
--- which handles both).
+-- + Posts powering the Learn & Explore feed (JSON-encoded author objects).
 --
 -- JSON1 functions are used for validation (json_valid) and optional
 -- querying. better-sqlite3 bundles a JSON1-enabled SQLite build.
@@ -32,92 +18,186 @@
 PRAGMA foreign_keys = ON;
 
 -- ----------------------------------------------------------------------------
--- Lessons
+-- Curriculum v2 (docs/LESSON_RESTRUCTURE_SPEC.md §9)
+--
+-- Units -> path nodes -> lessons -> cards; objectives; one item bank; references.
+-- Correct answers refer to option ids (never text or position), and option lists
+-- are arrays of { id, ... } objects, so text can be translated or shuffled safely.
+-- scripts/content-migration/curriculum-cutover.mjs applies this block to an
+-- existing master database; keep the markers.
 -- ----------------------------------------------------------------------------
+-- BEGIN curriculum-v2
+CREATE TABLE IF NOT EXISTS units (
+  id          TEXT PRIMARY KEY,                -- 'inside-the-atom'
+  position    INTEGER NOT NULL UNIQUE,
+  title       TEXT NOT NULL,
+  subtitle    TEXT NOT NULL DEFAULT '',
+  description TEXT NOT NULL DEFAULT '',
+  goal        TEXT NOT NULL DEFAULT '',
+  guidebook   TEXT NOT NULL DEFAULT '{}'       -- JSON { summary, termIds[] }
+              CONSTRAINT units_guidebook_json CHECK (json_valid(guidebook)),
+  icon        TEXT NOT NULL DEFAULT '',
+  tone        TEXT NOT NULL DEFAULT 'primary'
+              CHECK (tone IN ('primary', 'accent', 'success', 'warning', 'danger', 'info')),
+  teacher_npc_id TEXT,                         -- npcs.id: the unit's teacher (docs/NPC_TEACHERS_SPEC.md)
+  created_at  INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
+  updated_at  INTEGER NOT NULL DEFAULT (strftime('%s', 'now'))
+);
+
+CREATE TABLE IF NOT EXISTS objectives (
+  id             TEXT PRIMARY KEY,             -- 'u1-isotope-definition'
+  unit_id        TEXT NOT NULL REFERENCES units(id),
+  position       INTEGER NOT NULL,
+  statement      TEXT NOT NULL,                -- "Explain what makes two atoms isotopes of one element"
+  misconception  TEXT,                         -- the wrong idea this objective confronts, if any
+  created_at     INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
+  updated_at     INTEGER NOT NULL DEFAULT (strftime('%s', 'now'))
+);
+
 CREATE TABLE IF NOT EXISTS lessons (
-  id                 TEXT PRIMARY KEY,                         -- lesson.id
+  id                 TEXT PRIMARY KEY,
+  unit_id            TEXT NOT NULL REFERENCES units(id),
   title              TEXT NOT NULL,
-  description        TEXT NOT NULL,
-  unit_id            TEXT NOT NULL,                            -- lesson.unitId (units table is optional)
-  difficulty         TEXT NOT NULL
-                     CHECK (difficulty IN ('beginner', 'intermediate', 'advanced')),
+  description        TEXT NOT NULL DEFAULT '',
   estimated_minutes  INTEGER NOT NULL CHECK (estimated_minutes > 0),
   xp_reward          INTEGER NOT NULL DEFAULT 0,
-  prerequisites      TEXT NOT NULL DEFAULT '[]'                -- JSON array of lesson ids
-                     CONSTRAINT lessons_prerequisites_json CHECK (json_valid(prerequisites)),
-  tags               TEXT NOT NULL DEFAULT '[]'                -- JSON array of strings
-                     CONSTRAINT lessons_tags_json CHECK (json_valid(tags)),
+  teaches            TEXT NOT NULL DEFAULT '[]'  -- JSON array of objective ids
+                     CONSTRAINT lessons_teaches_json CHECK (json_valid(teaches)),
+  relies_on          TEXT NOT NULL DEFAULT '[]'  -- JSON array of objective ids from earlier lessons
+                     CONSTRAINT lessons_relies_on_json CHECK (json_valid(relies_on)),
   created_at         INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
   updated_at         INTEGER NOT NULL DEFAULT (strftime('%s', 'now'))
 );
 
--- ----------------------------------------------------------------------------
--- Lesson steps (nested children of lessons)
--- ----------------------------------------------------------------------------
-CREATE TABLE IF NOT EXISTS lesson_steps (
-  lesson_id  TEXT NOT NULL REFERENCES lessons(id) ON DELETE CASCADE,
-  id         TEXT NOT NULL,          -- step.id (unique within its lesson)
-  step_type  TEXT NOT NULL CHECK (
-    step_type IN ('briefing', 'myth_buster', 'micro_learn', 'lab', 'assessment', 'debrief')
+CREATE TABLE IF NOT EXISTS path_nodes (
+  id         TEXT PRIMARY KEY,
+  unit_id    TEXT NOT NULL REFERENCES units(id),
+  position   INTEGER NOT NULL CHECK (position >= 0),
+  kind       TEXT NOT NULL CHECK (kind IN ('lesson', 'practice', 'checkpoint')),
+  lesson_id  TEXT REFERENCES lessons(id),            -- when kind = 'lesson'
+  config     TEXT NOT NULL DEFAULT '{}'              -- JSON { questionCount, earlierShare, passMark }
+             CONSTRAINT path_nodes_config_json CHECK (json_valid(config)),
+  created_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
+  updated_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
+  UNIQUE (unit_id, position)
+);
+
+-- The single question bank. Lessons, practice, checkpoints, review and games all draw from it.
+CREATE TABLE IF NOT EXISTS items (
+  id            TEXT PRIMARY KEY,
+  objective_id  TEXT NOT NULL REFERENCES objectives(id),
+  type          TEXT NOT NULL CHECK (
+    type IN ('choice', 'true_or_myth', 'order', 'match', 'sort', 'fill', 'estimate', 'hotspot', 'predict')
   ),
-  position   INTEGER NOT NULL CHECK (position >= 0),           -- 0-based order within the lesson
-  data       TEXT NOT NULL DEFAULT '{}'                        -- JSON; shape varies by step_type
-             CONSTRAINT lesson_steps_data_json CHECK (json_valid(data)),
+  data          TEXT NOT NULL DEFAULT '{}'
+                CONSTRAINT items_data_json CHECK (json_valid(data)),
+  difficulty    INTEGER NOT NULL DEFAULT 1 CHECK (difficulty BETWEEN 1 AND 3),
+  surfaces      TEXT NOT NULL DEFAULT '["lesson","practice","checkpoint"]'
+                CONSTRAINT items_surfaces_json CHECK (json_valid(surfaces)),
+  reference_ids TEXT NOT NULL DEFAULT '[]'
+                CONSTRAINT items_reference_ids_json CHECK (json_valid(reference_ids)),
+  created_at    INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
+  updated_at    INTEGER NOT NULL DEFAULT (strftime('%s', 'now'))
+);
+
+CREATE TABLE IF NOT EXISTS lesson_cards (
+  lesson_id  TEXT NOT NULL REFERENCES lessons(id) ON DELETE CASCADE,
+  id         TEXT NOT NULL,                          -- unique within its lesson
+  position   INTEGER NOT NULL CHECK (position >= 0),
+  kind       TEXT NOT NULL CHECK (kind IN ('teach', 'item', 'sim')),
+  type       TEXT NOT NULL,                          -- card type registry name
+  tier       TEXT NOT NULL DEFAULT 'core' CHECK (tier IN ('core', 'deeper')),
+  item_id    TEXT REFERENCES items(id),              -- when kind = 'item'
+  scored     INTEGER NOT NULL DEFAULT 1,             -- 0 for predictions
+  data       TEXT NOT NULL DEFAULT '{}'              -- teach and sim content
+             CONSTRAINT lesson_cards_data_json CHECK (json_valid(data)),
   created_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
   updated_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
   PRIMARY KEY (lesson_id, id),
   UNIQUE (lesson_id, position)
 );
 
--- ----------------------------------------------------------------------------
--- Quizzes
--- ----------------------------------------------------------------------------
-CREATE TABLE IF NOT EXISTS quizzes (
-  id                 TEXT PRIMARY KEY,                         -- quiz.id
-  title              TEXT NOT NULL,
-  description        TEXT NOT NULL DEFAULT '',
-  category           TEXT NOT NULL DEFAULT '',                 -- quiz.category
-  difficulty         TEXT NOT NULL DEFAULT 'easy'
-                     CHECK (difficulty IN ('easy', 'medium', 'hard', 'beginner')),
-  passing_score      INTEGER NOT NULL DEFAULT 70,              -- passing percentage
-  xp_reward          INTEGER NOT NULL DEFAULT 0,
-  time_limit         INTEGER,                                  -- seconds (quiz-level, nullable)
-  unit_id            TEXT,                                     -- nullable; legacy field (atomic-basics only)
-  estimated_minutes  INTEGER,                                  -- nullable; legacy field (atomic-basics only)
-  metadata           TEXT NOT NULL DEFAULT '{}'                -- JSON; legacy metadata blob (atomic-basics only)
-                     CONSTRAINT quizzes_metadata_json CHECK (json_valid(metadata)),
-  tags               TEXT NOT NULL DEFAULT '[]'                -- JSON array of strings
-                     CONSTRAINT quizzes_tags_json CHECK (json_valid(tags)),
-  created_at         INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
-  updated_at         INTEGER NOT NULL DEFAULT (strftime('%s', 'now'))
+CREATE TABLE IF NOT EXISTS content_references (
+  id         TEXT PRIMARY KEY,
+  kind       TEXT NOT NULL CHECK (kind IN ('official', 'textbook', 'research', 'article', 'video', 'book')),
+  publisher  TEXT NOT NULL,
+  title      TEXT NOT NULL,
+  authors    TEXT NOT NULL DEFAULT '',
+  year       TEXT NOT NULL DEFAULT '',
+  url        TEXT NOT NULL DEFAULT '',
+  accessed   TEXT NOT NULL DEFAULT '',               -- ISO date the source was last opened and checked
+  verified   INTEGER NOT NULL DEFAULT 0,             -- 1 once a person confirmed what it supports
+  note       TEXT NOT NULL DEFAULT '',
+  created_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
+  updated_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now'))
 );
 
--- ----------------------------------------------------------------------------
--- Quiz questions (nested children of quizzes)
--- ----------------------------------------------------------------------------
-CREATE TABLE IF NOT EXISTS quiz_questions (
-  quiz_id       TEXT NOT NULL REFERENCES quizzes(id) ON DELETE CASCADE,
-  id            TEXT NOT NULL,              -- question.id (unique within its quiz)
-  position      INTEGER NOT NULL CHECK (position >= 0),           -- 0-based order within the quiz
-  type          TEXT NOT NULL CHECK (
-    type IN ('multiple_choice', 'true_false', 'matching', 'fill_blank')
-  ),
-  question      TEXT NOT NULL DEFAULT '',
-  options       TEXT NOT NULL DEFAULT '[]'   -- JSON array of strings ([] when absent)
-                CONSTRAINT quiz_questions_options_json CHECK (json_valid(options)),
-  correct_answer TEXT NOT NULL DEFAULT '0'  -- JSON: numeric index OR boolean (preserves runtime type)
-                CONSTRAINT quiz_questions_answer_json CHECK (json_valid(correct_answer)),
-  explanation   TEXT NOT NULL DEFAULT '',
-  difficulty    TEXT NOT NULL DEFAULT 'easy'
-                CHECK (difficulty IN ('easy', 'medium', 'hard')),
-  points        INTEGER NOT NULL DEFAULT 10,
-  image         TEXT,                        -- nullable
-  time_limit    INTEGER,                     -- per-question seconds; nullable (atomic-basics only)
-  created_at    INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
-  updated_at    INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
-  PRIMARY KEY (quiz_id, id),
-  UNIQUE (quiz_id, position)
+CREATE TABLE IF NOT EXISTS unit_references (
+  unit_id      TEXT NOT NULL REFERENCES units(id) ON DELETE CASCADE,
+  reference_id TEXT NOT NULL REFERENCES content_references(id),
+  position     INTEGER NOT NULL DEFAULT 0,
+  created_at   INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
+  updated_at   INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
+  PRIMARY KEY (unit_id, reference_id)
 );
+
+CREATE TABLE IF NOT EXISTS lesson_references (
+  lesson_id    TEXT NOT NULL REFERENCES lessons(id) ON DELETE CASCADE,
+  reference_id TEXT NOT NULL REFERENCES content_references(id),
+  supports     TEXT NOT NULL DEFAULT '',             -- which claim or number this source backs
+  position     INTEGER NOT NULL DEFAULT 0,
+  created_at   INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
+  updated_at   INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
+  PRIMARY KEY (lesson_id, reference_id)
+);
+
+-- Empty until localization (spec §9.4).
+CREATE TABLE IF NOT EXISTS content_translations (
+  locale     TEXT NOT NULL,
+  entity     TEXT NOT NULL,                          -- table name
+  entity_id  TEXT NOT NULL,                          -- primary key ('lesson_id/id' for lesson_cards)
+  fields     TEXT NOT NULL CONSTRAINT content_translations_fields_json CHECK (json_valid(fields)),
+  created_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
+  updated_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
+  PRIMARY KEY (locale, entity, entity_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_objectives_unit     ON objectives(unit_id);
+CREATE INDEX IF NOT EXISTS idx_lessons_unit_id     ON lessons(unit_id);
+CREATE INDEX IF NOT EXISTS idx_path_nodes_unit     ON path_nodes(unit_id);
+CREATE INDEX IF NOT EXISTS idx_items_objective     ON items(objective_id);
+CREATE INDEX IF NOT EXISTS idx_lesson_cards_lesson ON lesson_cards(lesson_id);
+CREATE INDEX IF NOT EXISTS idx_lesson_cards_item   ON lesson_cards(item_id);
+-- END curriculum-v2
+
+-- BEGIN npcs
+-- NPC teachers (docs/NPC_TEACHERS_SPEC.md). The DB holds values only: `spec` is the NpcSpec JSON
+-- (colours and style choices); the drawing is code in components/npc/.
+CREATE TABLE IF NOT EXISTS npcs (
+  id         TEXT PRIMARY KEY,                 -- shipped id, e.g. 'npc-ada'
+  name       TEXT NOT NULL,
+  title      TEXT NOT NULL,
+  field      TEXT NOT NULL,
+  bio        TEXT NOT NULL,
+  spec       TEXT NOT NULL CONSTRAINT npcs_spec_json CHECK (json_valid(spec)),
+  position   INTEGER NOT NULL UNIQUE,
+  created_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
+  updated_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now'))
+);
+
+CREATE TABLE IF NOT EXISTS npc_lines (
+  id         TEXT PRIMARY KEY,
+  npc_id     TEXT NOT NULL REFERENCES npcs(id) ON DELETE CASCADE,
+  kind       TEXT NOT NULL CHECK (kind IN ('meet', 'lesson_intro', 'sign_off', 'tease', 'journey_intro')),
+  lesson_id  TEXT REFERENCES lessons(id) ON DELETE CASCADE,
+  journey_id TEXT,
+  text       TEXT NOT NULL,
+  pose       TEXT NOT NULL DEFAULT 'explain',
+  created_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
+  updated_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now'))
+);
+CREATE INDEX IF NOT EXISTS idx_npc_lines_npc ON npc_lines(npc_id);
+-- END npcs
 
 -- ----------------------------------------------------------------------------
 -- Mythbuster question banks (standalone pools used by the atom-maze boss)
@@ -340,18 +420,9 @@ CREATE TABLE IF NOT EXISTS posts (
 -- ----------------------------------------------------------------------------
 -- Indexes
 -- ----------------------------------------------------------------------------
-CREATE INDEX IF NOT EXISTS idx_lessons_unit_id     ON lessons(unit_id);
-CREATE INDEX IF NOT EXISTS idx_lessons_difficulty  ON lessons(difficulty);
-CREATE INDEX IF NOT EXISTS idx_lesson_steps_lesson ON lesson_steps(lesson_id);
-CREATE INDEX IF NOT EXISTS idx_lesson_steps_type   ON lesson_steps(step_type);
-CREATE INDEX IF NOT EXISTS idx_quizzes_category    ON quizzes(category);
-CREATE INDEX IF NOT EXISTS idx_quizzes_difficulty  ON quizzes(difficulty);
-CREATE INDEX IF NOT EXISTS idx_quiz_questions_quiz ON quiz_questions(quiz_id);
 CREATE INDEX IF NOT EXISTS idx_mythbuster_difficulty ON mythbuster_questions(difficulty);
 CREATE INDEX IF NOT EXISTS idx_myths_category      ON myths(category);
 CREATE INDEX IF NOT EXISTS idx_myths_difficulty    ON myths(difficulty);
-CREATE INDEX IF NOT EXISTS idx_facts_category      ON facts(category);
-CREATE INDEX IF NOT EXISTS idx_facts_importance    ON facts(importance);
 CREATE INDEX IF NOT EXISTS idx_maze_rooms_maze     ON maze_rooms(maze_id);
 CREATE INDEX IF NOT EXISTS idx_encyclopedia_category ON encyclopedia_entries(category);
 CREATE INDEX IF NOT EXISTS idx_encyclopedia_difficulty ON encyclopedia_entries(difficulty);

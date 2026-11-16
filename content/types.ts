@@ -115,12 +115,27 @@ interface VisualBlockBase {
   responsive?: VisualResponsiveHint;
 }
 
+/**
+ * Idle life for a scene shape. Frame 0 is always the authored drawing, so a still
+ * figure (reduced motion) reads correctly. `period` (ms) must divide
+ * SCENE_LOOP_MS so the figure's shared loop never jumps (see visual-blocks.ts).
+ */
+export type SceneMotion =
+  /** Revolves around (cx, cy), linear, starting from the authored position (so no phase). Circles only. */
+  | { kind: 'orbit'; cx: number; cy: number; period: number }
+  /** Scales about its own centre by up to `amount` (default 0.06, max 0.12). */
+  | { kind: 'pulse'; period: number; amount?: number; phase?: number }
+  /** Bobs up and down by `dy` units (default 1, max 2). */
+  | { kind: 'float'; period: number; dy?: number; phase?: number };
+
 /** A shape in a 100-unit-wide scene. Coordinates are scene units; y grows downward. */
 export type SceneShape =
-  | { t: 'rect'; x: number; y: number; w: number; h: number; tone?: VisualTone; fill?: 'solid' | 'soft' | 'none'; rx?: number }
-  | { t: 'circle'; x: number; y: number; r: number; tone?: VisualTone; fill?: 'solid' | 'soft' | 'none' }
+  | { t: 'rect'; x: number; y: number; w: number; h: number; tone?: VisualTone; fill?: 'solid' | 'soft' | 'none'; rx?: number; motion?: SceneMotion }
+  | { t: 'circle'; x: number; y: number; r: number; tone?: VisualTone; fill?: 'solid' | 'soft' | 'none'; motion?: SceneMotion }
   | { t: 'line'; x1: number; y1: number; x2: number; y2: number; tone?: VisualTone; dash?: boolean; arrow?: boolean; width?: number }
-  | { t: 'text'; x: number; y: number; text: string; size?: number; anchor?: 'start' | 'middle' | 'end'; tone?: VisualTone; keep?: boolean };
+  | { t: 'text'; x: number; y: number; text: string; size?: number; anchor?: 'start' | 'middle' | 'end'; tone?: VisualTone; keep?: boolean }
+  /** A picture from the lesson object art (components/lesson/visual/object-art.ts), centred on (x, y), `size` units square. */
+  | { t: 'art'; id: string; x: number; y: number; size: number };
 
 export interface VisualScene {
   /** Scene height in units (width is always 100). 20-120. */

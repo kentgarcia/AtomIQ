@@ -26,9 +26,21 @@
     "test:maze": "node --no-warnings --test scripts/test-atom-maze-progression.mjs",
     "sync-content": "node scripts/sync-content.js",
     "postinstall": "node scripts/sync-content.js",
-    "content-editor": "node scripts/content-editor.js",
     "content-studio": "node tools/studio/server.mjs",
-    "eas:preview:android": "npx eas-cli build --platform android --profile preview"
+    "release:content": "node --no-warnings scripts/release-content.mjs",
+    "check:content-published": "node --no-warnings scripts/check-content-published.mjs",
+    "test:curriculum": "node --no-warnings --test scripts/test-curriculum-core.mjs",
+    "test:curriculum-content": "node --no-warnings --test scripts/test-curriculum-content.mjs",
+    "test:content-db": "node --no-warnings --test scripts/test-content-db-core.mjs",
+    "test:releases": "node --no-warnings --test scripts/test-releases.mjs",
+    "test:backups": "node --no-warnings --test scripts/test-backups.mjs",
+    "test:studio": "node --no-warnings --test scripts/test-studio.mjs",
+    "eas-build-post-install": "npm run check:content-published",
+    "eas:preview:android": "npx eas-cli build --platform android --profile preview",
+    "test:mascot": "node --no-warnings --test scripts/test-mascot.mjs",
+    "test:npc": "node --no-warnings --test scripts/test-npc.mjs",
+    "test:conversation": "node --no-warnings --test scripts/test-conversation.mjs",
+    "test:object-art": "node --no-warnings --test scripts/test-object-art.mjs"
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "^2.2.0",

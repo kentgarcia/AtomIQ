@@ -1,0 +1,4018 @@
+[
+  {
+    "id": "background-radiation",
+    "title": "Natural vs. Artificial Radiation",
+    "description": "Discover that most radiation exposure comes from natural sources, not human activities.",
+    "unit_id": "atomic-playground",
+    "difficulty": "beginner",
+    "estimated_minutes": 8,
+    "xp_reward": 70,
+    "prerequisites": [
+      "what-is-isotope"
+    ],
+    "tags": [
+      "basics",
+      "radiation",
+      "natural",
+      "background",
+      "exposure"
+    ],
+    "created_at": 1786788157,
+    "updated_at": 1786788157,
+    "steps": [
+      {
+        "id": "briefing",
+        "step_type": "briefing",
+        "position": 0,
+        "data": {
+          "topic": "Background Radiation",
+          "mission": "Discover Natural Radiation!",
+          "icon": "Sun"
+        }
+      },
+      {
+        "id": "myth-buster",
+        "step_type": "myth_buster",
+        "position": 1,
+        "data": {
+          "myth": "All radiation is man-made and dangerous",
+          "reality": "80% of radiation exposure comes from natural sources like the sun, rocks, and even bananas",
+          "explanation": "We've been exposed to natural radiation since life began on Earth. Cosmic rays from space, radon gas from rocks, potassium-40 in bananas - radiation is everywhere in nature! Human-made sources (medical X-rays, nuclear power) contribute only about 20% of our total exposure.",
+          "image": "https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?w=400"
+        }
+      },
+      {
+        "id": "micro-learn",
+        "step_type": "micro_learn",
+        "position": 2,
+        "data": {
+          "title": "Sources of Natural Radiation",
+          "content": "Background radiation is the constant low-level radiation we're exposed to every day from natural sources. It varies by location - living at high altitude or in areas with granite rocks increases your exposure.",
+          "keyPoints": [
+            "Cosmic rays: From space, stronger at high altitudes",
+            "Terrestrial: From rocks and soil (radon, uranium)",
+            "Internal: Potassium-40 and Carbon-14 in our bodies",
+            "Average: 3 mSv/year from natural sources",
+            "Medical procedures: ~3 mSv/year average"
+          ],
+          "image": "https://images.unsplash.com/photo-1446776653964-20c1d3a81b06?w=400",
+          "visuals": [
+            {
+              "id": "visual-dose-comparison",
+              "kind": "comparison_cards",
+              "learningObjective": "Compare everyday and medical radiation doses and see that a year of natural background is far more than one X-ray.",
+              "title": "Everyday radiation doses compared",
+              "explanation": "Doses are measured in millisieverts (mSv). The cards are ordered from smallest to largest and the bars use a log scale, so each step to the right is many times bigger, not just a little bigger. The values are typical and rounded: your own dose depends on where you live, the equipment used and your body size.",
+              "altText": "Six cards in order of size, from eating a banana at about 0.0001 millisieverts up to a CT scan at about 2 to 10 millisieverts, each with a bar on a log scale.",
+              "plainText": "Typical radiation doses in millisieverts (mSv), smallest to largest. Eating a banana: about 0.0001 mSv. Dental X-ray: about 0.005 mSv. Long-haul flight: about 0.05 mSv. Chest X-ray: about 0.1 mSv. One year of natural background radiation: about 2.4 mSv worldwide average. CT scan: about 2 to 10 mSv depending on the body part. Values are approximate and vary by person, place and equipment; bars use a log scale.",
+              "source": {
+                "type": "reference",
+                "publisher": "UNSCEAR and NCRP",
+                "title": "UNSCEAR 2008 Report (global natural background average) and NCRP Report No. 160 (typical medical doses)",
+                "note": "Banana, flight and dental values are commonly quoted rounded estimates.",
+                "verify": true
+              },
+              "credit": "Illustration: AtomIQ",
+              "scale": "log",
+              "scaleNote": "Approximate typical values. Bars use a log scale and show the middle of any range.",
+              "items": [
+                {
+                  "label": "Eating a banana",
+                  "value": "about 0.0001 mSv",
+                  "numeric": 0.0001,
+                  "tone": "success",
+                  "detail": "Natural potassium-40 in the fruit. The body keeps its potassium level steady, so it does not build up."
+                },
+                {
+                  "label": "Dental X-ray",
+                  "value": "about 0.005 mSv",
+                  "numeric": 0.005,
+                  "tone": "info",
+                  "detail": "One small picture of the teeth."
+                },
+                {
+                  "label": "Long-haul flight",
+                  "value": "about 0.05 mSv",
+                  "numeric": 0.05,
+                  "tone": "info",
+                  "detail": "More cosmic rays reach you at cruising altitude. It varies with route and length."
+                },
+                {
+                  "label": "Chest X-ray",
+                  "value": "about 0.1 mSv",
+                  "numeric": 0.1,
+                  "tone": "info",
+                  "detail": "A single front-view image."
+                },
+                {
+                  "label": "One year of natural background",
+                  "value": "about 2.4 mSv",
+                  "numeric": 2.4,
+                  "tone": "primary",
+                  "detail": "World average from cosmic rays, rocks, radon and radioactive atoms in our own bodies. It varies by place."
+                },
+                {
+                  "label": "CT scan",
+                  "value": "about 2 to 10 mSv",
+                  "numeric": 5,
+                  "tone": "warning",
+                  "detail": "Many X-ray images combined into a 3D picture. Used when the medical benefit clearly outweighs the dose."
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "id": "lab",
+        "step_type": "lab",
+        "position": 3,
+        "data": {
+          "title": "Radiation Source Detector",
+          "description": "You're measuring radiation in different locations. Which gives you the HIGHEST natural dose?",
+          "task": "Select the location with the highest natural radiation exposure.",
+          "options": [
+            {
+              "id": "beach",
+              "label": "Beach (Sea Level)",
+              "icon": "Sun"
+            },
+            {
+              "id": "denver",
+              "label": "Denver, Colorado",
+              "icon": "Location"
+            },
+            {
+              "id": "basement",
+              "label": "Basement (Radon)",
+              "icon": "Home"
+            },
+            {
+              "id": "forest",
+              "label": "Forest",
+              "icon": "Tree"
+            }
+          ],
+          "correctAnswer": "basement",
+          "explanation": "Basements can have high radon concentrations! Radon is a radioactive gas from uranium decay in rocks. It's the second leading cause of lung cancer after smoking. Denver also has higher cosmic radiation due to altitude, but radon in poorly ventilated basements is typically higher."
+        }
+      },
+      {
+        "id": "assessment",
+        "step_type": "assessment",
+        "position": 4,
+        "data": {
+          "question": "According to UNSCEAR, what percentage of average human radiation exposure comes from natural sources?",
+          "options": [
+            "20%",
+            "50%",
+            "80%",
+            "100%"
+          ],
+          "correctIndex": 2,
+          "explanation": "About 80% of our radiation exposure comes from natural sources (cosmic rays, radon, terrestrial radiation, and internal sources like potassium-40). The remaining 20% comes primarily from medical procedures like X-rays and CT scans.",
+          "image": "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=400"
+        }
+      },
+      {
+        "id": "debrief",
+        "step_type": "debrief",
+        "position": 5,
+        "data": {
+          "title": "Radiation Reality Check!",
+          "message": "You now understand that radiation is a natural part of our environment!",
+          "rewards": {
+            "xp": 70,
+            "stars": 3
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "environmental-protection",
+    "title": "Nuclear Technology in Environmental Protection & Research",
+    "description": "Learners discover how nuclear technology helps monitor pollution, track climate change, preserve water quality, and support ecological research. This lesson corrects the myth that nuclear science only harms the environment — in many ways, it protects it.",
+    "unit_id": "nuclear-everyday-life",
+    "difficulty": "intermediate",
+    "estimated_minutes": 12,
+    "xp_reward": 90,
+    "prerequisites": [
+      "industrial-agricultural-uses"
+    ],
+    "tags": [
+      "environment",
+      "climate",
+      "conservation",
+      "ecology",
+      "pollution",
+      "research",
+      "sustainability"
+    ],
+    "created_at": 1786788157,
+    "updated_at": 1786788157,
+    "steps": [
+      {
+        "id": "briefing",
+        "step_type": "briefing",
+        "position": 0,
+        "data": {
+          "topic": "Environmental Protection & Research",
+          "mission": "Agent, nuclear science doesn't just help people — it helps the planet. Your mission: explore how radiation tools track pollution, study oceans, and protect ecosystems worldwide.",
+          "icon": "Global"
+        }
+      },
+      {
+        "id": "myth-buster",
+        "step_type": "myth_buster",
+        "position": 1,
+        "data": {
+          "myth": "Nuclear technology only harms the environment",
+          "reality": "Nuclear science is a powerful environmental tool — used to track climate change, clean water sources, study soil health, and protect ecosystems",
+          "explanation": "Nuclear technology is actually an environmental hero! Isotopic techniques track pollution sources, monitor groundwater, and reveal climate history through ice cores. Nuclear power produces zero air pollution and has the lowest carbon footprint of major energy sources. Scientists use radioactive tracers to protect endangered species and study ocean health.",
+          "image": "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=400"
+        }
+      },
+      {
+        "id": "micro-learn",
+        "step_type": "micro_learn",
+        "position": 2,
+        "data": {
+          "title": "Nuclear Technology for the Planet",
+          "content": "Nuclear science provides unique tools for environmental protection and research. From tracking pollution sources to studying ancient climate patterns, from monitoring ocean health to protecting endangered species - nuclear technology helps scientists understand and protect our planet.",
+          "keyPoints": [
+            "Environmental Monitoring:",
+            "  • Air Pollution Tracing: Identify sources via isotopic signatures",
+            "  • Track heavy metals and particulates",
+            "  • Water Quality: Detect contaminants, monitor groundwater",
+            "  • Study ocean acidification",
+            "  • Soil & Land: Measure erosion, improve fertility",
+            "  • Assess contamination patterns",
+            "Climate & Ecosystem Research:",
+            "  • Isotopic Climate Records: Ice cores reveal historical patterns",
+            "  • Predict future climate shifts",
+            "  • Marine Studies: Track fish migration, coral bleaching",
+            "  • Monitor ocean currents and temperature",
+            "  • Wildlife Protection: Radio-tracking for conservation",
+            "  • Determine animal diet and migration patterns",
+            "Clean Energy Benefits:",
+            "  • Nuclear power: Zero air pollution",
+            "  • Lowest carbon emissions among major energy sources",
+            "  • Helps combat climate change",
+            "  • Land-efficient energy production",
+            "Key Point: Nuclear tech both studies AND protects the environment"
+          ],
+          "image": "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=400",
+          "visuals": [
+            {
+              "id": "visual-water-isotope-tracers",
+              "kind": "real_life_example",
+              "learningObjective": "Describe how isotopes in water act as a natural fingerprint that shows where water came from and how old it is.",
+              "title": "Isotope tracers in water",
+              "headline": "Reading the fingerprint in a glass of water",
+              "explanation": "Scientists use isotopes in water to find out where it came from, how fast aquifers refill and whether pollution is spreading.",
+              "whatYouSee": "A scientist fills small bottles from a well, river or rain gauge, labels them and sends them to a laboratory. Weeks later there is a map showing where the water came from and roughly how old it is.",
+              "theScience": "A few water molecules contain heavier isotopes, such as oxygen-18 or hydrogen-2 (deuterium). Rain that falls in different places and seasons carries slightly different mixtures, so water has a natural fingerprint. Tritium (hydrogen-3), which has a half-life of about 12 years, shows how recently water entered the ground: less tritium means older water.",
+              "whyItMatters": "Communities can see whether their drinking-water aquifer is being refilled or used up faster than it recharges, protect recharge areas and trace the source of pollution. This helps plan water use more sustainably.",
+              "altText": "Text card in three parts about isotope tracers in water: sampling a well or river, how heavier isotopes and tritium act as a fingerprint and a clock, and how that helps manage water resources.",
+              "plainText": "Isotope tracers in water example. What you see: water samples collected from wells, rivers or rain gauges and analysed in a laboratory to map where the water came from and roughly how old it is. The science: oxygen-18 and hydrogen-2 (deuterium) make a natural fingerprint that differs with place and season, and tritium (half-life about 12 years) acts as a clock: less tritium means older water. Why it matters: it shows whether aquifers are refilling or being used up, helps protect recharge areas, traces pollution sources and supports sustainable water planning.",
+              "source": {
+                "type": "original",
+                "note": "Summarised from the standard principles of isotope hydrology (oxygen-18, deuterium, tritium half-life about 12 years). Check against IAEA isotope-hydrology pages before wider publication."
+              },
+              "credit": "Illustration: AtomIQ"
+            }
+          ]
+        }
+      },
+      {
+        "id": "lab",
+        "step_type": "lab",
+        "position": 3,
+        "data": {
+          "title": "Environmental Research Lab",
+          "description": "You're an environmental scientist investigating pollution in a river. You need to identify where the contamination is coming from.",
+          "task": "Which tool helps identify pollution sources by analyzing unique isotopic signatures?",
+          "options": [
+            {
+              "id": "chamber",
+              "label": "Ionization chamber",
+              "icon": "Box"
+            },
+            {
+              "id": "tracing",
+              "label": "Isotopic tracing",
+              "icon": "Discover"
+            },
+            {
+              "id": "pet",
+              "label": "PET scanner",
+              "icon": "Health"
+            },
+            {
+              "id": "dosimeter",
+              "label": "Dosimeter",
+              "icon": "ShieldTick"
+            }
+          ],
+          "correctAnswer": "tracing",
+          "explanation": "Isotopic tracing! Different pollution sources have unique isotopic \"fingerprints\" - like a chemical signature. Scientists can analyze isotope ratios to identify whether pollution comes from industrial runoff, agricultural fertilizers, or natural sources. This technique is also used to track water movement, study nutrient cycles, and monitor ecosystem health. It's detective work at the molecular level!"
+        }
+      },
+      {
+        "id": "assessment",
+        "step_type": "assessment",
+        "position": 4,
+        "data": {
+          "question": "What do ice cores help scientists study using isotopic analysis?",
+          "options": [
+            "Food safety",
+            "Climate history",
+            "Industrial welds",
+            "Medical imaging"
+          ],
+          "correctIndex": 1,
+          "explanation": "Climate history! Ice cores contain trapped air bubbles and isotopes that reveal atmospheric conditions from hundreds of thousands of years ago. By analyzing oxygen and hydrogen isotopes, scientists can determine ancient temperatures, atmospheric CO₂ levels, and precipitation patterns. This data is crucial for understanding current climate change and predicting future trends.",
+          "image": "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=400"
+        }
+      },
+      {
+        "id": "assessment-2",
+        "step_type": "assessment",
+        "position": 5,
+        "data": {
+          "question": "True or False: Nuclear technology helps protect marine and land ecosystems.",
+          "options": [
+            "True",
+            "False"
+          ],
+          "correctIndex": 0,
+          "explanation": "True! Nuclear technology is essential for conservation: radio-tracking helps protect endangered species by monitoring migration and behavior; isotopic analysis reveals food webs and ecosystem health; radioactive tracers track nutrient flows in oceans and forests; and nuclear-derived techniques help combat illegal fishing and poaching. Plus, nuclear energy's low carbon footprint helps fight climate change - the biggest threat to ecosystems.",
+          "image": "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=400"
+        }
+      },
+      {
+        "id": "debrief",
+        "step_type": "debrief",
+        "position": 6,
+        "data": {
+          "title": "Environmental Guardian!",
+          "message": "You now understand how nuclear technology protects our planet and helps scientists study and preserve ecosystems!",
+          "rewards": {
+            "xp": 90,
+            "stars": 3
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "history-of-nuclear-science",
+    "title": "History of Nuclear Science",
+    "description": "Explore the historical development of nuclear science, from early atomic theories to modern nuclear technology.",
+    "unit_id": "atomic-playground",
+    "difficulty": "beginner",
+    "estimated_minutes": 9,
+    "xp_reward": 70,
+    "prerequisites": [
+      "meet-the-atom",
+      "nuclear-energy-explained"
+    ],
+    "tags": [
+      "basics",
+      "history",
+      "scientists",
+      "discoveries",
+      "atomic-theory",
+      "radioactivity"
+    ],
+    "created_at": 1786788157,
+    "updated_at": 1786788157,
+    "steps": [
+      {
+        "id": "briefing",
+        "step_type": "briefing",
+        "position": 0,
+        "data": {
+          "topic": "History of Nuclear Science",
+          "mission": "Agent, travel back in time to uncover how humans discovered the secrets of the atom. Your mission: learn the key milestones that shaped nuclear science and its applications in energy, medicine, and technology.",
+          "icon": "Clock"
+        }
+      },
+      {
+        "id": "myth-buster",
+        "step_type": "myth_buster",
+        "position": 1,
+        "data": {
+          "myth": "Nuclear science started with bombs in the 20th century",
+          "reality": "Atomic theory and nuclear research began centuries ago, long before weapons existed",
+          "explanation": "Early scientists laid the groundwork for nuclear energy, medicine, and research. Democritus proposed the concept of atoms in 400 BCE! The scientific journey from ancient philosophy to modern nuclear technology spans over 2,400 years.",
+          "image": "https://images.unsplash.com/photo-1461360370896-922624d12aa1?w=400"
+        }
+      },
+      {
+        "id": "micro-learn",
+        "step_type": "micro_learn",
+        "position": 2,
+        "data": {
+          "title": "Timeline of Nuclear Science",
+          "content": "The discovery of nuclear science evolved through key milestones over millennia. From ancient Greek philosophy to modern reactors, each discovery built upon the last to create the nuclear technology we have today.",
+          "keyPoints": [
+            "400 BCE - Democritus: First idea of \"atomos\" (indivisible particles)",
+            "1803 - Dalton: Solid sphere model; each element has unique atoms",
+            "1897 - Thomson: Plum pudding model with electrons",
+            "1898 - Becquerel & Curie: Discovery of radioactivity",
+            "1911 - Rutherford: Gold foil experiment → discovered nucleus",
+            "1913 - Bohr: Quantized electron shells model",
+            "1938 - Hahn & Meitner: Discovery of nuclear fission",
+            "1940s-1950s: Early nuclear reactors and research",
+            "Modern: Power generation, medical imaging, industrial uses"
+          ],
+          "image": "https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=400"
+        }
+      },
+      {
+        "id": "lab",
+        "step_type": "lab",
+        "position": 3,
+        "data": {
+          "title": "Scientific Discovery Match",
+          "description": "Many brilliant scientists contributed to our understanding of nuclear science. Each discovery was crucial!",
+          "task": "Who discovered the nucleus of the atom?",
+          "options": [
+            {
+              "id": "dalton",
+              "label": "Dalton",
+              "icon": "Category"
+            },
+            {
+              "id": "thomson",
+              "label": "Thomson",
+              "icon": "Flash"
+            },
+            {
+              "id": "rutherford",
+              "label": "Rutherford",
+              "icon": "Discover"
+            },
+            {
+              "id": "bohr",
+              "label": "Bohr",
+              "icon": "Setting2"
+            }
+          ],
+          "correctAnswer": "rutherford",
+          "explanation": "Ernest Rutherford discovered the nucleus in 1911! His famous gold foil experiment showed that atoms have a dense, positive center with electrons orbiting around it. This revolutionized atomic theory and paved the way for nuclear physics."
+        }
+      },
+      {
+        "id": "assessment",
+        "step_type": "assessment",
+        "position": 4,
+        "data": {
+          "question": "Which scientist proposed the \"atomos\" concept?",
+          "options": [
+            "Democritus",
+            "Curie",
+            "Fermi",
+            "Einstein"
+          ],
+          "correctIndex": 0,
+          "explanation": "Democritus, an ancient Greek philosopher in 400 BCE, first proposed the concept of \"atomos\" - indivisible particles that make up all matter. While his ideas were philosophical rather than scientific, he was remarkably ahead of his time!",
+          "image": "https://images.unsplash.com/photo-1461360370896-922624d12aa1?w=400"
+        }
+      },
+      {
+        "id": "assessment-2",
+        "step_type": "assessment",
+        "position": 5,
+        "data": {
+          "question": "True or False: Nuclear science only began in the 20th century.",
+          "options": [
+            "True",
+            "False"
+          ],
+          "correctIndex": 1,
+          "explanation": "False! While nuclear fission was discovered in 1938, atomic theory began thousands of years ago with Democritus. Scientists like Dalton (1803), Thomson (1897), and Rutherford (1911) made crucial discoveries about atomic structure long before nuclear weapons or power plants existed.",
+          "image": "https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=400"
+        }
+      },
+      {
+        "id": "debrief",
+        "step_type": "debrief",
+        "position": 6,
+        "data": {
+          "title": "History Master!",
+          "message": "You now understand the fascinating historical journey of nuclear science from ancient philosophy to modern technology!",
+          "rewards": {
+            "xp": 70,
+            "stars": 3
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "industrial-agricultural-uses",
+    "title": "Industrial & Agricultural Uses of Nuclear Technology",
+    "description": "This lesson covers non-medical applications such as food irradiation, tracer techniques, industrial radiography, smoke detectors, and crop mutation breeding. It emphasizes how nuclear science improves safety, productivity, and sustainability.",
+    "unit_id": "nuclear-everyday-life",
+    "difficulty": "intermediate",
+    "estimated_minutes": 12,
+    "xp_reward": 90,
+    "prerequisites": [
+      "medical-applications"
+    ],
+    "tags": [
+      "industry",
+      "agriculture",
+      "food-irradiation",
+      "radiography",
+      "crop-breeding",
+      "safety"
+    ],
+    "created_at": 1786788157,
+    "updated_at": 1786788157,
+    "steps": [
+      {
+        "id": "briefing",
+        "step_type": "briefing",
+        "position": 0,
+        "data": {
+          "topic": "Industrial & Agricultural Uses",
+          "mission": "Agent, nuclear technology isn't just found in hospitals. It strengthens bridges, preserves food, improves crops, and keeps industries safe. Your mission: discover how these invisible tools support modern society.",
+          "icon": "Global"
+        }
+      },
+      {
+        "id": "myth-buster",
+        "step_type": "myth_buster",
+        "position": 1,
+        "data": {
+          "myth": "Food irradiation makes food radioactive",
+          "reality": "Food irradiation exposes food to controlled radiation to kill bacteria — it does NOT make the food radioactive",
+          "explanation": "Food irradiation is like using light to disinfect water - the radiation passes through, kills bacteria, but doesn't make the food radioactive. It's been used safely for decades and is approved by WHO, FDA, and NASA. Astronauts eat irradiated food in space! The process extends shelf life and prevents foodborne illnesses without chemicals.",
+          "image": "https://images.unsplash.com/photo-1488459716781-31db52582fe9?w=400"
+        }
+      },
+      {
+        "id": "micro-learn",
+        "step_type": "micro_learn",
+        "position": 2,
+        "data": {
+          "title": "Nuclear Technology in Action",
+          "content": "Nuclear technology quietly supports modern life in countless ways - from ensuring food safety to inspecting aircraft parts, improving crop yields to detecting leaks in pipelines. These applications are safe, regulated, and essential to our daily lives.",
+          "keyPoints": [
+            "Agricultural Applications:",
+            "  • Food Irradiation: Kills bacteria, extends shelf life (WHO-approved)",
+            "  • Does NOT make food radioactive",
+            "  • Mutation Breeding: Creates beneficial crop mutations",
+            "  • Higher yields, drought resistance, pest tolerance",
+            "  • Sterile Insect Technique (SIT): Releases sterile males",
+            "  • Reduces pest populations without pesticides",
+            "Industrial Applications:",
+            "  • Industrial Radiography: Inspects pipelines, aircraft, welds",
+            "  • Uses gamma rays/X-rays for structural safety",
+            "  • Tracer Techniques: Tracks leaks, water/oil flow",
+            "  • Smoke Detectors: Use tiny Americium-241 (safe)",
+            "  • Thickness Gauges: Quality control for paper, plastic, steel",
+            "Safety in Industry:",
+            "  • Strong shielding and remote handling",
+            "  • Controlled environments",
+            "  • IAEA international regulations",
+            "  • Protects workers and consumers",
+            "Key Point: Industrial radiation is designed for maximum safety"
+          ],
+          "image": "https://images.unsplash.com/photo-1488459716781-31db52582fe9?w=400",
+          "visuals": [
+            {
+              "id": "visual-sterile-insect-technique",
+              "kind": "real_life_example",
+              "learningObjective": "Explain how the sterile insect technique controls a pest without pesticides or making insects radioactive.",
+              "title": "Sterile insect technique",
+              "headline": "Beating a pest with sterile males",
+              "explanation": "The sterile insect technique (SIT) uses radiation to stop a pest species from reproducing.",
+              "whatYouSee": "Factory-raised male insects are released in large numbers over orchards or farmland, often from small boxes on aircraft. They look like the wild insects but cannot father young.",
+              "theScience": "The insects are exposed to a carefully chosen dose of radiation, usually gamma rays or X-rays, while still pupae. The dose damages their reproductive cells but does not kill them. When a sterile male mates with a wild female, her eggs do not hatch. Many pest females mate only once or twice, so each sterile mating removes a female from the breeding population.",
+              "whyItMatters": "Pest numbers fall without spraying chemicals over crops, and the method affects only the target species. It has been used against the Mediterranean fruit fly and the screwworm. Treated insects are not radioactive afterwards.",
+              "facts": [
+                "SIT is species-specific: releasing sterile fruit flies has no effect on other insects."
+              ],
+              "altText": "Text card in three parts about the sterile insect technique: releasing sterile male insects, the radiation dose that makes them sterile, and the benefit of reducing pests without pesticides.",
+              "plainText": "Sterile insect technique example. What you see: factory-raised male insects released over orchards or farmland. The science: pupae receive a radiation dose that makes them sterile without killing them; when they mate with wild females the eggs do not hatch, and females that mate only once or twice are removed from the breeding population. Why it matters: pests fall without pesticides, only the target species is affected, it has been used against the Mediterranean fruit fly and screwworm, and the insects are not radioactive afterwards.",
+              "source": {
+                "type": "original",
+                "note": "Summarised from the widely described sterile insect technique (IAEA/FAO programmes). Check against the IAEA/FAO Joint Centre pages before wider publication."
+              },
+              "credit": "Illustration: AtomIQ"
+            },
+            {
+              "id": "visual-food-irradiation",
+              "kind": "real_life_example",
+              "learningObjective": "Explain why irradiated food is safe to eat and not radioactive.",
+              "title": "Food irradiation",
+              "headline": "Radiation passes through, but nothing stays behind",
+              "explanation": "Food irradiation exposes food to a controlled amount of radiation to kill germs and pests and to slow spoilage.",
+              "whatYouSee": "Packaged food, such as spices, herbs or some fruit, rides on a conveyor belt through a shielded room and out the other side. It looks and feels the same. Some packages show a small symbol called the Radura.",
+              "theScience": "Gamma rays, X-rays or electron beams pass through the food and damage the DNA of bacteria, moulds and insects so they cannot multiply. The energy used is too low to make the food radioactive, and the radiation source never touches the food. It is similar to a luggage scanner: the beam goes through, and nothing is left behind.",
+              "whyItMatters": "It reduces the germs that cause food poisoning, controls pests in stored or exported produce and keeps food fresh for longer, which cuts waste. It does not replace clean handling and cooking.",
+              "altText": "Text card in three parts about food irradiation: packaged food on a conveyor through a shielded room, how radiation damages germs but leaves no radioactivity, and the benefits for food safety.",
+              "plainText": "Food irradiation example. What you see: packaged food riding a conveyor belt through a shielded room, looking the same afterwards, sometimes marked with the Radura symbol. The science: gamma rays, X-rays or electron beams damage the DNA of bacteria, moulds and insects so they cannot multiply; the energy is too low to make food radioactive and the source never touches the food. Why it matters: fewer food-poisoning germs, pest control for stored produce and longer freshness, but it does not replace clean handling and cooking.",
+              "source": {
+                "type": "reference",
+                "publisher": "Codex Alimentarius (FAO/WHO)",
+                "title": "General Standard for Irradiated Foods (CODEX STAN 106-1983)",
+                "note": "Summary written for AtomIQ.",
+                "verify": true
+              },
+              "credit": "Illustration: AtomIQ"
+            }
+          ]
+        }
+      },
+      {
+        "id": "lab",
+        "step_type": "lab",
+        "position": 3,
+        "data": {
+          "title": "Industrial Applications Lab",
+          "description": "You're an engineer inspecting critical infrastructure. You need to check for defects in a metal weld without damaging it.",
+          "task": "What tool inspects welds and pipelines for safety defects?",
+          "options": [
+            {
+              "id": "pet",
+              "label": "PET scan",
+              "icon": "Health"
+            },
+            {
+              "id": "radiography",
+              "label": "Industrial radiography",
+              "icon": "ShieldSearch"
+            },
+            {
+              "id": "mri",
+              "label": "MRI",
+              "icon": "Scan"
+            },
+            {
+              "id": "ultrasound",
+              "label": "Ultrasound",
+              "icon": "Sound"
+            }
+          ],
+          "correctAnswer": "radiography",
+          "explanation": "Industrial radiography! It uses gamma rays or X-rays to create images of the internal structure of welds, pipelines, and aircraft parts - like taking an X-ray of a building. This non-destructive testing reveals cracks, voids, and defects that could cause catastrophic failures. It's essential for ensuring the safety of bridges, planes, pipelines, and nuclear reactors themselves!"
+        }
+      },
+      {
+        "id": "assessment",
+        "step_type": "assessment",
+        "position": 4,
+        "data": {
+          "question": "What does food irradiation do?",
+          "options": [
+            "Makes food radioactive",
+            "Kills bacteria and extends shelf life",
+            "Adds chemicals to food",
+            "Removes nutrients from food"
+          ],
+          "correctIndex": 1,
+          "explanation": "Food irradiation kills bacteria and extends shelf life! It eliminates pathogens like E. coli, Salmonella, and parasites without making food radioactive or adding chemicals. The process is so safe that it's used for astronaut food and is recommended for immunocompromised patients. It preserves nutrients better than many traditional preservation methods.",
+          "image": "https://images.unsplash.com/photo-1488459716781-31db52582fe9?w=400"
+        }
+      },
+      {
+        "id": "assessment-2",
+        "step_type": "assessment",
+        "position": 5,
+        "data": {
+          "question": "True or False: Smoke detectors contain safe, regulated radioactive sources.",
+          "options": [
+            "True",
+            "False"
+          ],
+          "correctIndex": 0,
+          "explanation": "True! Most smoke detectors contain a tiny amount of Americium-241 (about 0.3 micrograms) - so small it's completely safe for home use. The radiation ionizes air molecules, creating a small current. When smoke enters, it disrupts this current, triggering the alarm. This technology has saved countless lives and poses no health risk to users.",
+          "image": "https://images.unsplash.com/photo-1568667256549-094345857637?w=400"
+        }
+      },
+      {
+        "id": "debrief",
+        "step_type": "debrief",
+        "position": 6,
+        "data": {
+          "title": "Industry & Agriculture Expert!",
+          "message": "You now understand how nuclear technology safely improves food safety, infrastructure, and crop production!",
+          "rewards": {
+            "xp": 90,
+            "stars": 3
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "measuring-radiation",
+    "title": "Measuring Radiation & Safety Standards",
+    "description": "Introduce radiation units (Becquerel, Gray, Sievert), detection tools (Geiger counter, dosimeters), and internationally recognized safety standards. Learners understand exposure limits, shielding, distance, and time principles.",
+    "unit_id": "radiation-effects",
+    "difficulty": "intermediate",
+    "estimated_minutes": 12,
+    "xp_reward": 90,
+    "prerequisites": [
+      "types-of-radiation",
+      "radiation-biological-effects"
+    ],
+    "tags": [
+      "radiation",
+      "measurement",
+      "safety",
+      "sievert",
+      "becquerel",
+      "gray",
+      "geiger-counter",
+      "dosimeter"
+    ],
+    "created_at": 1786788157,
+    "updated_at": 1786788157,
+    "steps": [
+      {
+        "id": "briefing",
+        "step_type": "briefing",
+        "position": 0,
+        "data": {
+          "topic": "Measuring Radiation & Safety Standards",
+          "mission": "Agent, radiation can't be seen — but with the right tools, you can measure it. Your mission: learn how scientists detect radiation and how safety standards protect people every day.",
+          "icon": "Setting2"
+        }
+      },
+      {
+        "id": "myth-buster",
+        "step_type": "myth_buster",
+        "position": 1,
+        "data": {
+          "myth": "There is no safe level of radiation",
+          "reality": "We are exposed to natural radiation 24/7. International guidelines define safe limits, and most radiation levels in daily life fall far below harmful thresholds",
+          "explanation": "Safe radiation levels absolutely exist! We've been exposed to background radiation since life began on Earth. International agencies like IAEA and WHO have established evidence-based safety standards. People living at high altitudes or in areas with granite rocks experience higher natural radiation with no health effects.",
+          "image": "https://images.unsplash.com/photo-1581093588401-fbb62a02f120?w=400"
+        }
+      },
+      {
+        "id": "micro-learn",
+        "step_type": "micro_learn",
+        "position": 2,
+        "data": {
+          "title": "Radiation Units & Measurement",
+          "content": "Scientists use different units to measure different aspects of radiation. Becquerel measures radioactivity (how many atoms decay), Gray measures absorbed dose (energy deposited), and Sievert measures biological impact (actual effect on the body). Each tells us something different about radiation exposure.",
+          "keyPoints": [
+            "Radiation Units:",
+            "  • Becquerel (Bq): Measures radioactivity (rate of decay)",
+            "  • Gray (Gy): Measures absorbed dose (energy per kg tissue)",
+            "  • Sievert (Sv): Measures effective dose (biological impact)",
+            "  • Analogy: Bq = bullets fired, Gy = bullets that hit, Sv = damage done",
+            "Measuring Devices:",
+            "  • Geiger counter: Detects ionizing radiation levels instantly",
+            "  • Dosimeter: Worn to track accumulated exposure over time",
+            "  • Scintillation detectors: High-sensitivity gamma detection",
+            "  • Ionization chambers: Accurate lab/industry measurements",
+            "Safety Principles (TDS):",
+            "  • Time: Minimize duration of exposure",
+            "  • Distance: Increase distance to reduce dose",
+            "  • Shielding: Use proper materials",
+            "    - Alpha → paper",
+            "    - Beta → plastic or aluminum",
+            "    - Gamma → lead or concrete",
+            "    - Neutrons → water or hydrogen-rich materials",
+            "Safety Standards Set By:",
+            "  • IAEA (International Atomic Energy Agency)",
+            "  • WHO (World Health Organization)",
+            "  • UNSCEAR",
+            "  • National nuclear regulatory agencies",
+            "Protected Uses: Medical imaging, industry, research, nuclear plants"
+          ],
+          "image": "https://images.unsplash.com/photo-1581093588401-fbb62a02f120?w=400"
+        }
+      },
+      {
+        "id": "lab",
+        "step_type": "lab",
+        "position": 3,
+        "data": {
+          "title": "Radiation Measurement Lab",
+          "description": "You're selecting the right measurement tools and units for different scenarios.",
+          "task": "Which unit measures the biological effect of radiation on the human body?",
+          "options": [
+            {
+              "id": "becquerel",
+              "label": "Becquerel (Bq)",
+              "icon": "Flash"
+            },
+            {
+              "id": "gray",
+              "label": "Gray (Gy)",
+              "icon": "Category"
+            },
+            {
+              "id": "sievert",
+              "label": "Sievert (Sv)",
+              "icon": "Health"
+            },
+            {
+              "id": "milliampere",
+              "label": "Milliampere (mA)",
+              "icon": "Setting2"
+            }
+          ],
+          "correctAnswer": "sievert",
+          "explanation": "Sievert (Sv) measures the biological effect of radiation! It accounts for the type of radiation and the sensitivity of different tissues. For context: average annual background radiation is ~3 mSv, a chest X-ray is ~0.1 mSv, and acute radiation sickness starts around 1,000 mSv (1 Sv). Most exposures are in millisieverts (mSv) or microsieverts (μSv)."
+        }
+      },
+      {
+        "id": "assessment",
+        "step_type": "assessment",
+        "position": 4,
+        "data": {
+          "question": "Which device is used to track personal radiation exposure over time?",
+          "options": [
+            "Scintillator",
+            "Dosimeter",
+            "Geiger tube",
+            "X-ray scanner"
+          ],
+          "correctIndex": 1,
+          "explanation": "A dosimeter is worn by workers in radiation environments to track accumulated exposure over time. It provides a cumulative record of exposure and alerts if safety limits are approached. Nuclear plant workers, radiologists, and radiation researchers wear dosimeters to ensure their exposure stays within safe limits.",
+          "image": "https://images.unsplash.com/photo-1581093588401-fbb62a02f120?w=400"
+        }
+      },
+      {
+        "id": "assessment-2",
+        "step_type": "assessment",
+        "position": 5,
+        "data": {
+          "question": "True or False: Distance reduces radiation exposure.",
+          "options": [
+            "True",
+            "False"
+          ],
+          "correctIndex": 0,
+          "explanation": "True! Radiation intensity decreases with distance following the inverse square law - doubling the distance reduces exposure to one-quarter. This is one of the three key safety principles: Time, Distance, and Shielding (TDS). Simply stepping back from a radiation source significantly reduces your exposure.",
+          "image": "https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=400"
+        }
+      },
+      {
+        "id": "debrief",
+        "step_type": "debrief",
+        "position": 6,
+        "data": {
+          "title": "Safety Expert!",
+          "message": "You now understand how to measure radiation and the safety principles that protect us every day!",
+          "rewards": {
+            "xp": 90,
+            "stars": 3
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "medical-applications",
+    "title": "Medical Applications of Nuclear Science",
+    "description": "Learners explore how radiation is used safely in diagnostics (like PET/CT scans) and in cancer treatment through radiotherapy. This lesson highlights how nuclear tech saves lives and clears up misconceptions about \"radioactive medicine.\"",
+    "unit_id": "nuclear-everyday-life",
+    "difficulty": "intermediate",
+    "estimated_minutes": 12,
+    "xp_reward": 90,
+    "prerequisites": [
+      "types-of-radiation",
+      "measuring-radiation"
+    ],
+    "tags": [
+      "medicine",
+      "healthcare",
+      "pet-scan",
+      "radiotherapy",
+      "cancer",
+      "diagnostics",
+      "nuclear-medicine"
+    ],
+    "created_at": 1786788157,
+    "updated_at": 1786788157,
+    "steps": [
+      {
+        "id": "briefing",
+        "step_type": "briefing",
+        "position": 0,
+        "data": {
+          "topic": "Medical Applications of Nuclear Science",
+          "mission": "Agent, hospitals use radiation every day — not to harm, but to heal. Your mission: uncover how nuclear medicine looks inside the human body and how radiotherapy targets cancer with precision.",
+          "icon": "Health"
+        }
+      },
+      {
+        "id": "myth-buster",
+        "step_type": "myth_buster",
+        "position": 1,
+        "data": {
+          "myth": "All radiation in hospitals is dangerous",
+          "reality": "Medical radiation is highly controlled, targeted, and delivered in safe amounts. Diagnostic scans use low doses, and radiotherapy focuses radiation only where it's needed",
+          "explanation": "Medical radiation saves millions of lives every year! Diagnostic scans use carefully calculated low doses - a PET scan is about 7 mSv, similar to 2-3 years of background radiation. Radiotherapy precisely targets cancer cells while protecting healthy tissue. The benefits far outweigh the minimal risks.",
+          "image": "https://images.unsplash.com/photo-1581093588401-fbb62a02f120?w=400"
+        }
+      },
+      {
+        "id": "micro-learn",
+        "step_type": "micro_learn",
+        "position": 2,
+        "data": {
+          "title": "Nuclear Medicine & Radiotherapy",
+          "content": "Nuclear medicine uses small amounts of radioactive materials (radiopharmaceuticals) to diagnose disease, monitor organ function, and detect abnormalities early. These materials leave the body quickly and do NOT make patients radioactive long-term. Radiotherapy uses high-energy radiation to destroy cancer cells while protecting healthy tissue.",
+          "keyPoints": [
+            "Nuclear Medicine: Uses radiopharmaceuticals for diagnosis",
+            "Diagnostic Tools:",
+            "  • PET Scan: Shows metabolic activity (cancer, brain, heart)",
+            "  • SPECT Scan: Shows blood flow and organ function",
+            "  • CT with Radiotracers: Combines X-ray with tracers",
+            "  • Analogy: Like GPS tracker showing exactly where problems are",
+            "Key Point: Materials leave body quickly, no long-term radioactivity",
+            "Radiotherapy: Destroys cancer cells with targeted radiation",
+            "Types of Radiotherapy:",
+            "  • External Beam (EBRT): Targeted beams from outside",
+            "  • Brachytherapy: Radioactive sources inside/near tumor",
+            "  • Gamma Knife/CyberKnife: Ultra-precise for brain tumors",
+            "Focused on tumors, protects healthy tissue",
+            "Safety in Medicine:",
+            "  • Highly trained professionals",
+            "  • Strict dose limits and monitoring",
+            "  • Advanced shielding and computerized planning",
+            "  • Benefits far outweigh risks"
+          ],
+          "image": "https://images.unsplash.com/photo-1581093588401-fbb62a02f120?w=400",
+          "visuals": [
+            {
+              "id": "visual-pet-scan",
+              "kind": "real_life_example",
+              "learningObjective": "Describe how a radioactive tracer lets a PET scan show how the body is working.",
+              "title": "A PET scan: sugar with a glowing tag",
+              "headline": "How a tiny radioactive tag lights up busy cells",
+              "explanation": "Nuclear medicine gives a very small amount of a short-lived radioactive tracer so doctors can see how organs and tumours behave, not just their shape.",
+              "whatYouSee": "You get a small injection, rest quietly while it spreads through the body, then lie still while a ring-shaped scanner slowly passes over you. A computer turns the signals into a coloured 3D picture.",
+              "theScience": "The tracer is a sugar-like molecule attached to fluorine-18, which has a half-life of about 110 minutes. Each fluorine-18 atom emits a positron. The positron meets an electron and both turn into two gamma rays that fly off in opposite directions. The ring of detectors records these pairs and works out where they came from. Cells that use a lot of sugar, such as many tumours, collect more tracer and show up brighter.",
+              "whyItMatters": "Doctors can find disease early and check whether a treatment is working. Because the half-life is short, most of the radioactivity has gone within a day, and the dose is chosen to be as low as reasonably achievable.",
+              "facts": [
+                "Technetium-99m, with a half-life of about 6 hours, gives off gamma rays and is used in bone, heart and thyroid scans.",
+                "Tracers are used in tiny amounts, far too small to change how your body works."
+              ],
+              "altText": "Text card in three parts describing a PET scan: what the patient experiences, the physics of a positron and an electron producing two gamma rays, and why the scan helps doctors.",
+              "plainText": "PET scan example. What you see: a small injection, a rest while the tracer spreads, then lying still in a ring-shaped scanner that produces a coloured 3D picture. The science: a sugar-like tracer carries fluorine-18 (half-life about 110 minutes), which emits positrons; each positron meets an electron and makes two gamma rays going in opposite directions, which the detector ring uses to locate the source; busy cells such as many tumours take up more sugar and look brighter. Why it matters: doctors can find disease early and check treatment, and the radioactivity is mostly gone within a day. Technetium-99m (half-life about 6 hours) is used in bone, heart and thyroid scans.",
+              "source": {
+                "type": "original",
+                "note": "Summarised from standard nuclear-medicine physics (fluorine-18 about 110 minutes, technetium-99m about 6 hours). Check against IAEA or NRC educational pages before wider publication."
+              },
+              "credit": "Illustration: AtomIQ"
+            },
+            {
+              "id": "visual-radiotherapy-beams",
+              "kind": "real_life_example",
+              "learningObjective": "Explain how radiotherapy targets a tumour while sparing most healthy tissue.",
+              "title": "Radiotherapy: beams that meet at the tumour",
+              "headline": "Many weak beams, one strong spot",
+              "explanation": "Radiotherapy uses high-energy radiation to damage the DNA of cancer cells so they cannot keep dividing.",
+              "scene": {
+                "height": 60,
+                "shapes": [
+                  {
+                    "t": "circle",
+                    "x": 50,
+                    "y": 30,
+                    "r": 25,
+                    "tone": "neutral",
+                    "fill": "soft"
+                  },
+                  {
+                    "t": "circle",
+                    "x": 50,
+                    "y": 30,
+                    "r": 5,
+                    "tone": "danger",
+                    "fill": "solid"
+                  },
+                  {
+                    "t": "line",
+                    "x1": 6,
+                    "y1": 30,
+                    "x2": 43,
+                    "y2": 30,
+                    "tone": "info",
+                    "width": 1.4,
+                    "arrow": true
+                  },
+                  {
+                    "t": "line",
+                    "x1": 90,
+                    "y1": 6,
+                    "x2": 54,
+                    "y2": 27,
+                    "tone": "info",
+                    "width": 1.4,
+                    "arrow": true
+                  },
+                  {
+                    "t": "line",
+                    "x1": 90,
+                    "y1": 54,
+                    "x2": 54,
+                    "y2": 33,
+                    "tone": "info",
+                    "width": 1.4,
+                    "arrow": true
+                  },
+                  {
+                    "t": "text",
+                    "x": 50,
+                    "y": 46,
+                    "text": "tumour",
+                    "size": 4.8
+                  }
+                ]
+              },
+              "whatYouSee": "You lie on a table while a large machine rotates around you and delivers short, painless pulses of radiation. The treatment is repeated over several days or weeks.",
+              "theScience": "Each beam alone carries a modest dose, so the healthy tissue it crosses receives little. The beams are aimed from different directions so that they all cross at the tumour, where the doses add up. A planning scan maps exactly where the tumour sits. Splitting the treatment into many small sessions gives healthy cells time to repair between them.",
+              "whyItMatters": "Radiotherapy can shrink or remove tumours without surgery, or help after surgery. Careful planning, shielding and dose checks keep the risk to healthy tissue as low as reasonably achievable.",
+              "facts": [
+                "The beams usually come from a machine called a linear accelerator that makes high-energy X-rays.",
+                "Brachytherapy is a different method: a small sealed radioactive source is placed inside or next to the tumour."
+              ],
+              "altText": "Diagram of a round body outline with a small red tumour in the middle and three blue arrows coming from different sides, all pointing at the tumour.",
+              "plainText": "Radiotherapy example. What you see: lying on a table while a machine rotates around you and gives short painless pulses of radiation over several days or weeks. The science: each beam gives a modest dose to healthy tissue it crosses, but beams from three or more directions all cross at the tumour so the dose adds up there; a planning scan locates the tumour and many small sessions let healthy cells repair. Why it matters: it can shrink or remove tumours, with planning and shielding keeping risk to healthy tissue as low as reasonably achievable.",
+              "source": {
+                "type": "original",
+                "note": "Summarised from standard external-beam radiotherapy principles (multiple beam angles, fractionation). Check against IAEA or national cancer-society pages before wider publication."
+              },
+              "credit": "Illustration: AtomIQ"
+            }
+          ]
+        }
+      },
+      {
+        "id": "lab",
+        "step_type": "lab",
+        "position": 3,
+        "data": {
+          "title": "Medical Imaging Lab",
+          "description": "You're a radiologist selecting the right diagnostic tool for different medical conditions.",
+          "task": "Which scan detects metabolic activity inside the body, useful for detecting cancer?",
+          "options": [
+            {
+              "id": "pet",
+              "label": "PET Scan",
+              "icon": "Discover"
+            },
+            {
+              "id": "ct",
+              "label": "CT Scan",
+              "icon": "Scan"
+            },
+            {
+              "id": "ultrasound",
+              "label": "Ultrasound",
+              "icon": "Sound"
+            },
+            {
+              "id": "xray",
+              "label": "X-ray",
+              "icon": "Document"
+            }
+          ],
+          "correctAnswer": "pet",
+          "explanation": "PET (Positron Emission Tomography) Scan! It uses a radioactive tracer (usually glucose-based) that cancer cells absorb more than healthy cells because they metabolize faster. The scan shows this metabolic activity, revealing tumors that might not be visible on other scans. It's revolutionary for early cancer detection, staging, and monitoring treatment effectiveness."
+        }
+      },
+      {
+        "id": "assessment",
+        "step_type": "assessment",
+        "position": 4,
+        "data": {
+          "question": "What is radiotherapy primarily used for?",
+          "options": [
+            "Diagnosing bone fractures",
+            "Treating cancer using high-energy radiation",
+            "Making food safer",
+            "Measuring radioactivity"
+          ],
+          "correctIndex": 1,
+          "explanation": "Radiotherapy is primarily used for treating cancer! It uses high-energy radiation (like X-rays or gamma rays) to damage cancer cell DNA, preventing them from growing and dividing. Modern radiotherapy is incredibly precise - techniques like IMRT (Intensity Modulated Radiation Therapy) can target tumors while sparing surrounding healthy tissue.",
+          "image": "https://images.unsplash.com/photo-1581093588401-fbb62a02f120?w=400"
+        }
+      },
+      {
+        "id": "assessment-2",
+        "step_type": "assessment",
+        "position": 5,
+        "data": {
+          "question": "True or False: Medical radiation is unsafe for patients at all levels.",
+          "options": [
+            "True",
+            "False"
+          ],
+          "correctIndex": 1,
+          "explanation": "False! Medical radiation is carefully controlled and safe when used appropriately. Doctors follow the ALARA principle (As Low As Reasonably Achievable) - using the minimum dose necessary for diagnosis or treatment. The benefits of detecting and treating diseases far outweigh the minimal risks. Millions of lives are saved annually through nuclear medicine.",
+          "image": "https://images.unsplash.com/photo-1576086213369-97a306d36557?w=400"
+        }
+      },
+      {
+        "id": "debrief",
+        "step_type": "debrief",
+        "position": 6,
+        "data": {
+          "title": "Medical Nuclear Expert!",
+          "message": "You now understand how nuclear science saves lives through advanced diagnostics and cancer treatment!",
+          "rewards": {
+            "xp": 90,
+            "stars": 3
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "meet-the-atom",
+    "title": "The Atom: Building Blocks of Matter",
+    "description": "Introduce what atoms are, their internal structure, and explain why atoms are considered the fundamental units of all matter.",
+    "unit_id": "atomic-playground",
+    "difficulty": "beginner",
+    "estimated_minutes": 8,
+    "xp_reward": 50,
+    "prerequisites": [],
+    "tags": [
+      "basics",
+      "atom",
+      "protons",
+      "neutrons",
+      "electrons",
+      "nucleus",
+      "atomic-structure"
+    ],
+    "created_at": 1786788157,
+    "updated_at": 1786788157,
+    "steps": [
+      {
+        "id": "briefing",
+        "step_type": "briefing",
+        "position": 0,
+        "data": {
+          "topic": "The Atom: Building Blocks of Matter",
+          "mission": "Agent, welcome to the tiniest world in the universe. Everything you see, touch, or feel is made of invisible building blocks called atoms. Your mission: explore the parts of an atom and understand why they are the foundation of all matter.",
+          "icon": "Atom"
+        }
+      },
+      {
+        "id": "myth-buster",
+        "step_type": "myth_buster",
+        "position": 1,
+        "data": {
+          "myth": "Atoms are solid, indivisible spheres",
+          "reality": "Atoms are made up of a nucleus (containing protons and neutrons) and electrons that orbit the nucleus",
+          "explanation": "Atoms are mostly empty space, and their structure allows for chemical reactions, electricity, and nuclear energy. The word \"atom\" comes from Greek \"atomos\" meaning \"uncuttable,\" but we now know atoms contain even smaller particles.",
+          "image": "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=400"
+        }
+      },
+      {
+        "id": "micro-learn",
+        "step_type": "micro_learn",
+        "position": 2,
+        "data": {
+          "title": "What is an Atom?",
+          "content": "The smallest unit of matter that retains the properties of an element. All matter, from air to water to metals, is made of atoms. An atom consists of a dense central nucleus containing protons (positively charged) and neutrons (neutral), surrounded by electrons (negatively charged).",
+          "keyPoints": [
+            "Nucleus: Dense central core with protons and neutrons",
+            "Protons: Positively charged particles in the nucleus",
+            "Neutrons: Neutral particles with similar mass to protons",
+            "Electrons: Negatively charged particles orbiting the nucleus",
+            "Atomic number: Number of protons (defines the element)",
+            "Mass number: Total protons + neutrons",
+            "Isotopes: Same element, different number of neutrons",
+            "Analogy: Nucleus = Sun, electrons = orbiting planets",
+            "Most of an atom is empty space"
+          ],
+          "image": "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=400",
+          "visuals": [
+            {
+              "id": "visual-atom-carbon-12",
+              "kind": "model",
+              "learningObjective": "Name the three particles in an atom and say where each one is found.",
+              "title": "Inside a carbon atom",
+              "explanation": "Every atom has a tiny nucleus made of protons and neutrons, with electrons moving around it. The number of protons decides the element: 6 protons always means carbon. In a neutral atom, the electrons balance the protons. This picture is a simplified model: real electrons are not tiny planets, and the nucleus is far smaller than the picture suggests.",
+              "altText": "Model of a carbon-12 atom: a cluster of 6 red protons and 6 grey neutrons in the centre, with 6 small blue electrons on two rings around it.",
+              "plainText": "Model of a carbon-12 atom. Nucleus: at the centre, made of 6 protons (positive charge) and 6 neutrons (no charge). Electron shells: two rings around the nucleus. Electrons: 6 tiny negative particles, 2 on the inner ring and 4 on the outer ring. In the picture a Proton is a solid red dot, a Neutron is a pale grey dot and an Electron is a small blue dot. The picture is simplified and not to scale: the nucleus is much smaller than shown, and most of an atom is empty space.",
+              "caption": "Simplified and not to scale.",
+              "source": {
+                "type": "original",
+                "note": "Created for AtomIQ from standard atomic structure; carbon has 6 protons and carbon-12 has 6 neutrons."
+              },
+              "credit": "Illustration: AtomIQ",
+              "scene": {
+                "height": 85,
+                "shapes": [
+                  {
+                    "t": "text",
+                    "x": 50,
+                    "y": 7,
+                    "text": "Carbon-12 atom",
+                    "size": 5.5
+                  },
+                  {
+                    "t": "circle",
+                    "x": 50,
+                    "y": 42,
+                    "r": 18,
+                    "fill": "none"
+                  },
+                  {
+                    "t": "circle",
+                    "x": 50,
+                    "y": 42,
+                    "r": 30,
+                    "fill": "none"
+                  },
+                  {
+                    "t": "circle",
+                    "x": 52.12,
+                    "y": 42,
+                    "r": 2.5,
+                    "tone": "danger",
+                    "fill": "solid"
+                  },
+                  {
+                    "t": "circle",
+                    "x": 47.29,
+                    "y": 44.48,
+                    "r": 2.5,
+                    "tone": "neutral",
+                    "fill": "soft"
+                  },
+                  {
+                    "t": "circle",
+                    "x": 50.41,
+                    "y": 37.27,
+                    "r": 2.5,
+                    "tone": "danger",
+                    "fill": "solid"
+                  },
+                  {
+                    "t": "circle",
+                    "x": 53.41,
+                    "y": 46.45,
+                    "r": 2.5,
+                    "tone": "neutral",
+                    "fill": "soft"
+                  },
+                  {
+                    "t": "circle",
+                    "x": 43.73,
+                    "y": 40.89,
+                    "r": 2.5,
+                    "tone": "danger",
+                    "fill": "solid"
+                  },
+                  {
+                    "t": "circle",
+                    "x": 55.94,
+                    "y": 38.22,
+                    "r": 2.5,
+                    "tone": "neutral",
+                    "fill": "soft"
+                  },
+                  {
+                    "t": "circle",
+                    "x": 48.01,
+                    "y": 49.39,
+                    "r": 2.5,
+                    "tone": "danger",
+                    "fill": "solid"
+                  },
+                  {
+                    "t": "circle",
+                    "x": 46.21,
+                    "y": 34.71,
+                    "r": 2.5,
+                    "tone": "neutral",
+                    "fill": "soft"
+                  },
+                  {
+                    "t": "circle",
+                    "x": 58.22,
+                    "y": 45,
+                    "r": 2.5,
+                    "tone": "danger",
+                    "fill": "solid"
+                  },
+                  {
+                    "t": "circle",
+                    "x": 41.45,
+                    "y": 45.53,
+                    "r": 2.5,
+                    "tone": "neutral",
+                    "fill": "soft"
+                  },
+                  {
+                    "t": "circle",
+                    "x": 54.12,
+                    "y": 33.2,
+                    "r": 2.5,
+                    "tone": "danger",
+                    "fill": "solid"
+                  },
+                  {
+                    "t": "circle",
+                    "x": 53.04,
+                    "y": 51.71,
+                    "r": 2.5,
+                    "tone": "neutral",
+                    "fill": "soft"
+                  },
+                  {
+                    "t": "circle",
+                    "x": 65.59,
+                    "y": 51,
+                    "r": 2,
+                    "tone": "info",
+                    "fill": "solid"
+                  },
+                  {
+                    "t": "circle",
+                    "x": 34.41,
+                    "y": 33,
+                    "r": 2,
+                    "tone": "info",
+                    "fill": "solid"
+                  },
+                  {
+                    "t": "circle",
+                    "x": 78.19,
+                    "y": 52.26,
+                    "r": 2,
+                    "tone": "info",
+                    "fill": "solid"
+                  },
+                  {
+                    "t": "circle",
+                    "x": 39.74,
+                    "y": 70.19,
+                    "r": 2,
+                    "tone": "info",
+                    "fill": "solid"
+                  },
+                  {
+                    "t": "circle",
+                    "x": 21.81,
+                    "y": 31.74,
+                    "r": 2,
+                    "tone": "info",
+                    "fill": "solid"
+                  },
+                  {
+                    "t": "circle",
+                    "x": 60.26,
+                    "y": 13.81,
+                    "r": 2,
+                    "tone": "info",
+                    "fill": "solid"
+                  },
+                  {
+                    "t": "text",
+                    "x": 50,
+                    "y": 81,
+                    "text": "6 protons, 6 neutrons, 6 electrons",
+                    "size": 4.6
+                  }
+                ]
+              },
+              "callouts": [
+                {
+                  "id": "1",
+                  "label": "Nucleus",
+                  "detail": "The tiny, dense centre. It holds the 6 protons and 6 neutrons and almost all of the atom's mass.",
+                  "x": 50,
+                  "y": 27
+                },
+                {
+                  "id": "2",
+                  "label": "Electron shells",
+                  "detail": "Electrons move around the nucleus in layers called shells: 2 in the inner shell, 4 in the outer shell.",
+                  "x": 37.32,
+                  "y": 14.81
+                },
+                {
+                  "id": "3",
+                  "label": "Electrons",
+                  "detail": "Very light particles with negative charge. A neutral atom has as many electrons as protons.",
+                  "x": 86.19,
+                  "y": 45.26
+                }
+              ],
+              "key": [
+                {
+                  "tone": "danger",
+                  "label": "Proton",
+                  "swatch": "circle"
+                },
+                {
+                  "tone": "neutral",
+                  "label": "Neutron",
+                  "swatch": "circle"
+                },
+                {
+                  "tone": "info",
+                  "label": "Electron",
+                  "swatch": "circle"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "id": "lab",
+        "step_type": "lab",
+        "position": 3,
+        "data": {
+          "title": "Atomic History Timeline",
+          "description": "The understanding of atoms evolved over thousands of years. Match the scientist to their discovery!",
+          "task": "Who discovered the nucleus of the atom?",
+          "options": [
+            {
+              "id": "democritus",
+              "label": "Democritus (400 BCE)",
+              "icon": "People"
+            },
+            {
+              "id": "dalton",
+              "label": "Dalton (1803)",
+              "icon": "Category"
+            },
+            {
+              "id": "thomson",
+              "label": "Thomson (1897)",
+              "icon": "Flash"
+            },
+            {
+              "id": "rutherford",
+              "label": "Rutherford (1911)",
+              "icon": "Discover"
+            }
+          ],
+          "correctAnswer": "rutherford",
+          "explanation": "Rutherford discovered the nucleus in 1911 through his famous gold foil experiment! He found that atoms have a dense, positive center (nucleus) with electrons orbiting around it. Democritus coined \"atomos,\" Dalton proposed the solid sphere model, and Thomson discovered electrons with his \"plum pudding\" model."
+        }
+      },
+      {
+        "id": "assessment",
+        "step_type": "assessment",
+        "position": 4,
+        "data": {
+          "question": "Which Sub-Atomic Particle in an atom has a positive charge?",
+          "options": [
+            "Electron",
+            "Proton",
+            "Neutron",
+            "Nucleus"
+          ],
+          "correctIndex": 1,
+          "explanation": "Protons have a positive charge (+1). Electrons have a negative charge (-1), and neutrons have no charge (neutral). The nucleus contains protons and neutrons, so it has an overall positive charge.",
+          "image": "https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=400"
+        }
+      },
+      {
+        "id": "assessment-2",
+        "step_type": "assessment",
+        "position": 5,
+        "data": {
+          "question": "What dictates the Atomic Number of an element?",
+          "options": [
+            "Number of neutrons",
+            "Number of electrons",
+            "Number of protons",
+            "Atomic mass"
+          ],
+          "correctIndex": 2,
+          "explanation": "The number of protons (atomic number) defines an element. All carbon atoms have 6 protons, all oxygen atoms have 8 protons, and so on. Neutrons can vary (creating isotopes), and electrons can be gained or lost (creating ions).",
+          "image": "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=400"
+        }
+      },
+      {
+        "id": "debrief",
+        "step_type": "debrief",
+        "position": 6,
+        "data": {
+          "title": "Mission Complete!",
+          "message": "You now understand the fundamental structure of atoms and their historical discovery!",
+          "rewards": {
+            "xp": 50,
+            "stars": 3
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "nuclear-energy-explained",
+    "title": "Nuclear Energy Explained",
+    "description": "Explore how energy is stored in the nucleus of an atom and how it can be released through nuclear reactions.",
+    "unit_id": "atomic-playground",
+    "difficulty": "beginner",
+    "estimated_minutes": 8,
+    "xp_reward": 60,
+    "prerequisites": [
+      "meet-the-atom"
+    ],
+    "tags": [
+      "basics",
+      "nuclear-energy",
+      "fission",
+      "fusion",
+      "energy",
+      "power-generation"
+    ],
+    "created_at": 1786788157,
+    "updated_at": 1786788157,
+    "steps": [
+      {
+        "id": "briefing",
+        "step_type": "briefing",
+        "position": 0,
+        "data": {
+          "topic": "Nuclear Energy Explained",
+          "mission": "Agent, energy is hidden inside every atom. Your mission: discover how the tiny nucleus stores immense power and how scientists can safely harness it for electricity.",
+          "icon": "Flash"
+        }
+      },
+      {
+        "id": "myth-buster",
+        "step_type": "myth_buster",
+        "position": 1,
+        "data": {
+          "myth": "Nuclear energy works like a giant bomb and is always unsafe",
+          "reality": "Nuclear energy can be controlled and used safely in reactors to generate electricity",
+          "explanation": "Nuclear bombs use extremely different reactions under uncontrolled conditions. Power plants rely on careful regulation and shielding. The processes are fundamentally different - reactors use controlled fission to produce steady heat for electricity.",
+          "image": "https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?w=400"
+        }
+      },
+      {
+        "id": "micro-learn",
+        "step_type": "micro_learn",
+        "position": 2,
+        "data": {
+          "title": "What is Nuclear Energy?",
+          "content": "Nuclear energy is energy stored in the nucleus of an atom due to the strong force binding protons and neutrons together. This energy can be released in nuclear reactions through fission (splitting) or fusion (joining). When released in a controlled way, this energy can generate electricity to power homes and cities.",
+          "keyPoints": [
+            "Nuclear energy: Energy stored in the atomic nucleus",
+            "Strong force: Binds protons and neutrons together",
+            "Nuclear fission: Heavy nucleus splits → releases large energy",
+            "Nuclear fusion: Light nuclei combine → releases enormous energy",
+            "Controlled fission = Nuclear Reactors:",
+            "Example: Uranium-235 in a reactor → energy for electricity",
+            "Applications: Electricity and Industry, Medical and Research",
+            "Analogy: Nucleus = compressed spring releasing energy"
+          ],
+          "image": "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=400",
+          "visuals": [
+            {
+              "id": "visual-simple-reactor",
+              "kind": "diagram",
+              "learningObjective": "Name the main parts of a simple nuclear reactor and say what each one does.",
+              "title": "A simple nuclear power plant",
+              "explanation": "Inside the reactor, uranium fuel splits (fission) and releases heat. Water takes that heat to a steam generator; the steam spins a turbine that makes electricity. Control rods set how fast the chain reaction runs, and a strong containment building surrounds the reactor. This is a simplified pressurised-water design: real plants have many extra systems.",
+              "altText": "Cutaway diagram: inside a large containment building, a water-filled reactor vessel holds upright fuel rods with control rods lowered between them; pipes carry hot and cooler water to a steam generator, and a steam pipe leads outside to a turbine.",
+              "plainText": "Simplified pressurised-water reactor. Fuel rods inside the reactor vessel make heat by fission. Control rods lowered between them absorb neutrons to slow or stop the reaction. Water around the fuel slows neutrons and carries heat away. Hot water flows to the steam generator and returns as cooler water; the two water loops stay separate. Steam from the steam generator spins the turbine, which drives a generator that makes electricity. A thick concrete and steel containment building surrounds the reactor. In the picture, Hot water is a red line, Cooler water is a blue line and Steam is an orange line.",
+              "caption": "Simplified. Real reactors differ and have many more safety systems.",
+              "source": {
+                "type": "original",
+                "note": "Created for AtomIQ from the standard layout of a pressurised-water reactor."
+              },
+              "credit": "Illustration: AtomIQ",
+              "scene": {
+                "height": 80,
+                "shapes": [
+                  {
+                    "t": "rect",
+                    "x": 4,
+                    "y": 6,
+                    "w": 62,
+                    "h": 70,
+                    "tone": "neutral",
+                    "fill": "soft",
+                    "rx": 5
+                  },
+                  {
+                    "t": "rect",
+                    "x": 14,
+                    "y": 30,
+                    "w": 30,
+                    "h": 40,
+                    "tone": "info",
+                    "fill": "soft",
+                    "rx": 2
+                  },
+                  {
+                    "t": "rect",
+                    "x": 17,
+                    "y": 44,
+                    "w": 2.6,
+                    "h": 24,
+                    "tone": "warning",
+                    "fill": "solid",
+                    "rx": 0.5
+                  },
+                  {
+                    "t": "rect",
+                    "x": 22.5,
+                    "y": 44,
+                    "w": 2.6,
+                    "h": 24,
+                    "tone": "warning",
+                    "fill": "solid",
+                    "rx": 0.5
+                  },
+                  {
+                    "t": "rect",
+                    "x": 28,
+                    "y": 44,
+                    "w": 2.6,
+                    "h": 24,
+                    "tone": "warning",
+                    "fill": "solid",
+                    "rx": 0.5
+                  },
+                  {
+                    "t": "rect",
+                    "x": 33.5,
+                    "y": 44,
+                    "w": 2.6,
+                    "h": 24,
+                    "tone": "warning",
+                    "fill": "solid",
+                    "rx": 0.5
+                  },
+                  {
+                    "t": "rect",
+                    "x": 39,
+                    "y": 44,
+                    "w": 2.6,
+                    "h": 24,
+                    "tone": "warning",
+                    "fill": "solid",
+                    "rx": 0.5
+                  },
+                  {
+                    "t": "rect",
+                    "x": 20.2,
+                    "y": 18,
+                    "w": 1.6,
+                    "h": 34,
+                    "tone": "primary",
+                    "fill": "solid",
+                    "rx": 0.4
+                  },
+                  {
+                    "t": "rect",
+                    "x": 25.7,
+                    "y": 18,
+                    "w": 1.6,
+                    "h": 34,
+                    "tone": "primary",
+                    "fill": "solid",
+                    "rx": 0.4
+                  },
+                  {
+                    "t": "rect",
+                    "x": 31.2,
+                    "y": 18,
+                    "w": 1.6,
+                    "h": 34,
+                    "tone": "primary",
+                    "fill": "solid",
+                    "rx": 0.4
+                  },
+                  {
+                    "t": "rect",
+                    "x": 36.7,
+                    "y": 18,
+                    "w": 1.6,
+                    "h": 34,
+                    "tone": "primary",
+                    "fill": "solid",
+                    "rx": 0.4
+                  },
+                  {
+                    "t": "rect",
+                    "x": 50,
+                    "y": 30,
+                    "w": 10,
+                    "h": 30,
+                    "tone": "info",
+                    "fill": "soft",
+                    "rx": 1.5
+                  },
+                  {
+                    "t": "line",
+                    "x1": 44,
+                    "y1": 38,
+                    "x2": 50,
+                    "y2": 38,
+                    "tone": "danger",
+                    "width": 1.2,
+                    "arrow": true
+                  },
+                  {
+                    "t": "line",
+                    "x1": 50,
+                    "y1": 56,
+                    "x2": 44,
+                    "y2": 56,
+                    "tone": "info",
+                    "width": 1.2,
+                    "arrow": true
+                  },
+                  {
+                    "t": "line",
+                    "x1": 55,
+                    "y1": 30,
+                    "x2": 55,
+                    "y2": 20,
+                    "tone": "accent",
+                    "width": 1.2
+                  },
+                  {
+                    "t": "line",
+                    "x1": 55,
+                    "y1": 20,
+                    "x2": 88,
+                    "y2": 20,
+                    "tone": "accent",
+                    "width": 1.2
+                  },
+                  {
+                    "t": "line",
+                    "x1": 88,
+                    "y1": 20,
+                    "x2": 88,
+                    "y2": 28,
+                    "tone": "accent",
+                    "width": 1.2,
+                    "arrow": true
+                  },
+                  {
+                    "t": "circle",
+                    "x": 88,
+                    "y": 38,
+                    "r": 9,
+                    "tone": "accent",
+                    "fill": "solid"
+                  }
+                ]
+              },
+              "callouts": [
+                {
+                  "id": "1",
+                  "label": "Fuel rods",
+                  "detail": "Sealed metal tubes packed with small ceramic pellets of enriched uranium. Fission in the fuel makes the heat.",
+                  "x": 28,
+                  "y": 73
+                },
+                {
+                  "id": "2",
+                  "label": "Control rods",
+                  "detail": "Rods that soak up neutrons. Lowering them slows the chain reaction; lowering them fully shuts it down.",
+                  "x": 28,
+                  "y": 15
+                },
+                {
+                  "id": "3",
+                  "label": "Water",
+                  "detail": "Water around the fuel does two jobs: it slows neutrons down so they cause more fission (moderator) and it carries the heat away (coolant).",
+                  "x": 9,
+                  "y": 50
+                },
+                {
+                  "id": "4",
+                  "label": "Steam generator",
+                  "detail": "Hot reactor water passes heat to a separate loop of water, which boils into steam. The two loops never mix.",
+                  "x": 55,
+                  "y": 66
+                },
+                {
+                  "id": "5",
+                  "label": "Turbine",
+                  "detail": "Steam spins the turbine, which turns a generator to make electricity.",
+                  "x": 88,
+                  "y": 51
+                },
+                {
+                  "id": "6",
+                  "label": "Containment building",
+                  "detail": "A thick concrete and steel shell around the reactor that keeps radioactive material in, even if something goes wrong inside.",
+                  "x": 61,
+                  "y": 10
+                }
+              ],
+              "key": [
+                {
+                  "tone": "danger",
+                  "label": "Hot water",
+                  "swatch": "line"
+                },
+                {
+                  "tone": "info",
+                  "label": "Cooler water",
+                  "swatch": "line"
+                },
+                {
+                  "tone": "accent",
+                  "label": "Steam",
+                  "swatch": "line"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "id": "lab",
+        "step_type": "lab",
+        "position": 3,
+        "data": {
+          "title": "Energy Sources Lab",
+          "description": "Nuclear fission splits heavy atoms like Uranium-235 to release energy. This controlled process heats water to create steam, which spins turbines to generate electricity.",
+          "task": "What part of the atom contains the energy used in nuclear reactions?",
+          "options": [
+            {
+              "id": "electron",
+              "label": "Electron",
+              "icon": "Flash"
+            },
+            {
+              "id": "proton",
+              "label": "Proton",
+              "icon": "Add"
+            },
+            {
+              "id": "neutron",
+              "label": "Neutron",
+              "icon": "Minus"
+            },
+            {
+              "id": "nucleus",
+              "label": "Nucleus",
+              "icon": "Discover"
+            }
+          ],
+          "correctAnswer": "nucleus",
+          "explanation": "The nucleus! Nuclear energy comes from the strong force holding protons and neutrons together in the nucleus. When the nucleus splits (fission) or combines (fusion), this energy is released. It's incredibly dense - a single uranium pellet the size of your fingertip contains as much energy as a ton of coal!"
+        }
+      },
+      {
+        "id": "assessment",
+        "step_type": "assessment",
+        "position": 4,
+        "data": {
+          "question": "What is nuclear fission?",
+          "options": [
+            "Joining of light nuclei",
+            "Splitting of heavy nuclei",
+            "Movement of electrons",
+            "Decay of neutrons"
+          ],
+          "correctIndex": 1,
+          "explanation": "Nuclear fission is the splitting of heavy nuclei (like Uranium-235) into smaller nuclei, releasing large amounts of energy. This is the process used in nuclear power plants to generate electricity. The energy released heats water to create steam, which drives turbines.",
+          "image": "https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?w=400"
+        }
+      },
+      {
+        "id": "assessment-2",
+        "step_type": "assessment",
+        "position": 5,
+        "data": {
+          "question": "True or False: Nuclear power plants and nuclear bombs both get their energy from atomic nuclei.",
+          "options": [
+            "True",
+            "False"
+          ],
+          "correctIndex": 0,
+          "explanation": "True. Both involve energy released from atomic nuclei (typically via fission). The key difference is control and safety: reactors use controlled chain reactions, lower-enriched fuel, and multiple safety systems to produce steady electricity, while bombs use highly enriched material and an uncontrolled rapid chain reaction.",
+          "image": "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=400"
+        }
+      },
+      {
+        "id": "debrief",
+        "step_type": "debrief",
+        "position": 6,
+        "data": {
+          "title": "Energy Expert!",
+          "message": "You now understand how nuclear energy works and its applications in modern society!",
+          "rewards": {
+            "xp": 60,
+            "stars": 3
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "nuclear-fission",
+    "title": "Nuclear Fission Basics",
+    "description": "Understand how nuclear fission works and powers nuclear reactors.",
+    "unit_id": "nuclear-basics",
+    "difficulty": "beginner",
+    "estimated_minutes": 7,
+    "xp_reward": 60,
+    "prerequisites": [],
+    "tags": [
+      "fission",
+      "energy",
+      "reactor",
+      "uranium"
+    ],
+    "created_at": 1786788157,
+    "updated_at": 1786788157,
+    "steps": [
+      {
+        "id": "briefing",
+        "step_type": "briefing",
+        "position": 0,
+        "data": {
+          "topic": "Nuclear Fission",
+          "mission": "Split the Atom!",
+          "icon": "Flash"
+        }
+      },
+      {
+        "id": "myth-buster",
+        "step_type": "myth_buster",
+        "position": 1,
+        "data": {
+          "myth": "Nuclear fission is the same as nuclear fusion",
+          "reality": "Fission splits atoms apart, while fusion combines them",
+          "explanation": "Nuclear fission splits heavy atoms (like uranium) into lighter ones, releasing energy. Fusion combines light atoms (like hydrogen) into heavier ones. Both release energy, but through opposite processes.",
+          "image": "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=400"
+        }
+      },
+      {
+        "id": "micro-learn",
+        "step_type": "micro_learn",
+        "position": 2,
+        "data": {
+          "title": "How Fission Works",
+          "content": "When a neutron strikes a uranium-235 atom, it splits into two smaller atoms, releasing 2-3 more neutrons and a large amount of energy. These neutrons can then split more atoms, creating a chain reaction.",
+          "keyPoints": [
+            "One neutron triggers the split",
+            "Atom splits into two smaller atoms",
+            "2-3 new neutrons are released",
+            "Energy is released as heat",
+            "Chain reaction can be controlled"
+          ],
+          "image": "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=400"
+        }
+      },
+      {
+        "id": "lab",
+        "step_type": "lab",
+        "position": 3,
+        "data": {
+          "title": "Chain Reaction Control",
+          "description": "Control the chain reaction by managing neutron flow.",
+          "task": "What controls the rate of fission in a nuclear reactor?",
+          "options": [
+            {
+              "id": "water",
+              "label": "Water",
+              "icon": "Drop"
+            },
+            {
+              "id": "control-rods",
+              "label": "Control Rods",
+              "icon": "Setting2"
+            },
+            {
+              "id": "fuel",
+              "label": "More Fuel",
+              "icon": "Candle"
+            },
+            {
+              "id": "temperature",
+              "label": "Temperature",
+              "icon": "Sun1"
+            }
+          ],
+          "correctAnswer": "control-rods",
+          "explanation": "Control rods made of materials like boron or cadmium absorb neutrons, slowing or stopping the chain reaction. Inserting them deeper slows the reaction, pulling them out speeds it up."
+        }
+      },
+      {
+        "id": "assessment",
+        "step_type": "assessment",
+        "position": 4,
+        "data": {
+          "question": "What happens when a uranium-235 atom undergoes fission?",
+          "options": [
+            "It combines with another atom",
+            "It splits into two smaller atoms and releases neutrons",
+            "It becomes heavier",
+            "It turns into lead"
+          ],
+          "correctIndex": 1,
+          "explanation": "During fission, a uranium-235 atom splits into two smaller atoms (fission products) and releases 2-3 neutrons plus a large amount of energy in the form of heat.",
+          "image": "https://images.unsplash.com/photo-1530587191325-3db32d826c18?w=400"
+        }
+      },
+      {
+        "id": "debrief",
+        "step_type": "debrief",
+        "position": 5,
+        "data": {
+          "title": "Fission Master!",
+          "message": "You now understand the basics of nuclear fission.",
+          "rewards": {
+            "xp": 60,
+            "stars": 3
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "nuclear-fusion",
+    "title": "Nuclear Fusion — Power of the Stars",
+    "description": "Explore how lighter nuclei combine to form heavier ones, releasing enormous energy. Understand how fusion powers the sun, the challenges of achieving controlled fusion on Earth, and why fusion is different from fission.",
+    "unit_id": "nuclear-reactions",
+    "difficulty": "intermediate",
+    "estimated_minutes": 10,
+    "xp_reward": 80,
+    "prerequisites": [
+      "nuclear-fission"
+    ],
+    "tags": [
+      "fusion",
+      "stars",
+      "energy",
+      "deuterium",
+      "tritium",
+      "iter",
+      "tokamak"
+    ],
+    "created_at": 1786788157,
+    "updated_at": 1786788157,
+    "steps": [
+      {
+        "id": "briefing",
+        "step_type": "briefing",
+        "position": 0,
+        "data": {
+          "topic": "Nuclear Fusion — Power of the Stars",
+          "mission": "Agent, the stars hold secrets to almost unlimited energy. Your mission: discover how fusing tiny nuclei releases massive energy and why scientists are racing to replicate it on Earth.",
+          "icon": "Sun"
+        }
+      },
+      {
+        "id": "myth-buster",
+        "step_type": "myth_buster",
+        "position": 1,
+        "data": {
+          "myth": "Fusion is already a common energy source on Earth",
+          "reality": "Controlled fusion is extremely difficult to maintain; current research reactors can create fusion reactions but not yet at a commercially viable scale",
+          "explanation": "While fusion powers every star in the universe naturally, achieving controlled fusion on Earth requires temperatures of 100+ million degrees and precise containment. Projects like ITER are making progress, but commercial fusion power is still years away.",
+          "image": "https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?w=400"
+        }
+      },
+      {
+        "id": "micro-learn",
+        "step_type": "micro_learn",
+        "position": 2,
+        "data": {
+          "title": "Nuclear Fusion Explained",
+          "content": "Nuclear fusion is the joining of two light nuclei (e.g., hydrogen isotopes) to form a heavier nucleus, releasing enormous amounts of energy. This is the process that powers the sun and all stars naturally. Fusion produces more energy than fission and creates minimal radioactive waste.",
+          "keyPoints": [
+            "Fusion: Joining light nuclei → heavier nucleus + massive energy",
+            "Powers the sun and stars naturally",
+            "Fission vs Fusion comparison:",
+            "  Fission: Splits heavy nuclei → high energy → radioactive waste",
+            "  Fusion: Joins light nuclei → extremely high energy → minimal waste",
+            "Common fuels: Deuterium & Tritium (hydrogen isotopes)",
+            "Challenges: Requires 100+ million degree temperatures",
+            "Must overcome repulsion between positively charged nuclei",
+            "Confinement methods: Magnetic (tokamak) or inertial (lasers)",
+            "Major projects: ITER (France), NIF (USA)",
+            "Future potential: Clean, almost unlimited energy",
+            "Analogy: Like pushing two magnets together until they snap with huge energy"
+          ],
+          "image": "https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?w=400"
+        }
+      },
+      {
+        "id": "lab",
+        "step_type": "lab",
+        "position": 3,
+        "data": {
+          "title": "Fusion vs Fission Lab",
+          "description": "You're comparing nuclear reactions. Each has different characteristics and applications.",
+          "task": "Compared with fission, how much energy does fusion release for the same mass of fuel?",
+          "options": [
+            {
+              "id": "less",
+              "label": "Less energy",
+              "icon": "Minus"
+            },
+            {
+              "id": "more",
+              "label": "More energy",
+              "icon": "Flash"
+            },
+            {
+              "id": "same",
+              "label": "Same energy",
+              "icon": "Math"
+            },
+            {
+              "id": "none",
+              "label": "No energy",
+              "icon": "CloseCircle"
+            }
+          ],
+          "correctAnswer": "more",
+          "explanation": "Fusion produces MORE energy than fission! Gram for gram, fusion releases about 4 times more energy than fission. The sun produces energy equivalent to 90 billion megatons of TNT per second through fusion. Plus, fusion produces minimal radioactive waste and uses abundant fuel sources like seawater!"
+        }
+      },
+      {
+        "id": "assessment",
+        "step_type": "assessment",
+        "position": 4,
+        "data": {
+          "question": "What does nuclear fusion involve?",
+          "options": [
+            "Splitting heavy nuclei",
+            "Joining light nuclei",
+            "Movement of electrons",
+            "Proton decay"
+          ],
+          "correctIndex": 1,
+          "explanation": "Nuclear fusion involves joining light nuclei (like hydrogen isotopes deuterium and tritium) to form heavier nuclei, releasing enormous energy in the process. This is the same process that makes stars shine!",
+          "image": "https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?w=400"
+        }
+      },
+      {
+        "id": "assessment-2",
+        "step_type": "assessment",
+        "position": 5,
+        "data": {
+          "question": "True or False: Fusion reactors currently provide electricity to homes.",
+          "options": [
+            "True",
+            "False"
+          ],
+          "correctIndex": 1,
+          "explanation": "False! While experimental fusion reactors exist and have achieved fusion reactions, no fusion reactor currently generates commercial electricity. The challenge is maintaining the reaction long enough and efficiently enough to produce net energy. ITER aims to achieve this milestone in the coming decades.",
+          "image": "https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=400"
+        }
+      },
+      {
+        "id": "assessment-3",
+        "step_type": "assessment",
+        "position": 6,
+        "data": {
+          "question": "Which element is commonly used in fusion experiments?",
+          "options": [
+            "Uranium",
+            "Hydrogen isotopes (Deuterium & Tritium)",
+            "Carbon",
+            "Plutonium"
+          ],
+          "correctIndex": 1,
+          "explanation": "Hydrogen isotopes - specifically Deuterium and Tritium (D-T fusion) - are commonly used in fusion experiments. Deuterium can be extracted from seawater, making it incredibly abundant. The D-T reaction is the easiest fusion reaction to achieve because it requires the \"lowest\" temperature (only 100 million degrees!).",
+          "image": "https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?w=400"
+        }
+      },
+      {
+        "id": "debrief",
+        "step_type": "debrief",
+        "position": 7,
+        "data": {
+          "title": "Fusion Expert!",
+          "message": "You now understand the incredible power of fusion and why it's the energy source of the future!",
+          "rewards": {
+            "xp": 80,
+            "stars": 3
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "nuclear-policy",
+    "title": "Nuclear Policy, Regulation & International Cooperation",
+    "description": "This lesson explains how nuclear activities are governed at national and international levels. It introduces regulatory bodies (IAEA, PNRI, NRC), licensing systems, safety audits, inspections, and the global networks ensuring the peaceful use of nuclear science.",
+    "unit_id": "nuclear-safety-security",
+    "difficulty": "advanced",
+    "estimated_minutes": 15,
+    "xp_reward": 100,
+    "prerequisites": [
+      "nuclear-security"
+    ],
+    "tags": [
+      "policy",
+      "regulation",
+      "iaea",
+      "nrc",
+      "licensing",
+      "cooperation",
+      "standards",
+      "treaties"
+    ],
+    "created_at": 1786788157,
+    "updated_at": 1786788157,
+    "steps": [
+      {
+        "id": "briefing",
+        "step_type": "briefing",
+        "position": 0,
+        "data": {
+          "topic": "Nuclear Policy, Regulation & International Cooperation",
+          "mission": "Agent, nuclear science is a global effort. Your mission: understand the policies, regulators, and agreements that keep nuclear technology peaceful worldwide.",
+          "icon": "Global"
+        }
+      },
+      {
+        "id": "myth-buster",
+        "step_type": "myth_buster",
+        "position": 1,
+        "data": {
+          "myth": "Nuclear technology is impossible to control",
+          "reality": "Nuclear activities are highly regulated by national authorities and international organizations. Every reactor, facility, shipment, and medical source is overseen through strict licensing, inspections, and laws",
+          "explanation": "Nuclear technology is actually one of the MOST controlled technologies on Earth. Every facility requires years of licensing, regular inspections, safety reviews, and operational approvals. National regulators (like the NRC in the US) work with the IAEA to ensure global standards. No facility operates without permission and oversight.",
+          "image": "https://images.unsplash.com/photo-1541872703-74c5e44368f9?w=400"
+        }
+      },
+      {
+        "id": "micro-learn",
+        "step_type": "micro_learn",
+        "position": 2,
+        "data": {
+          "title": "Global Nuclear Governance",
+          "content": "Nuclear activities are governed through a comprehensive system of national regulators, international standards, licensing processes, inspections, and treaties. This multi-layered governance ensures nuclear technology remains safe, secure, and beneficial.",
+          "keyPoints": [
+            "Why Regulation Matters:",
+            "  • Ensures safe design and operation",
+            "  • Controls activities through licensing",
+            "  • Requires transparent reporting",
+            "  • Protects environment",
+            "  • Ensures peaceful use",
+            "National Regulatory Bodies:",
+            "  • Philippines: PNRI (Philippine Nuclear Research Institute)",
+            "  • United States: NRC (Nuclear Regulatory Commission)",
+            "  • Japan: NRA, France: ASN",
+            "Regulator Responsibilities:",
+            "  • License facilities and operators",
+            "  • Review safety reports",
+            "  • Conduct inspections",
+            "  • Enforce laws",
+            "  • Investigate irregularities",
+            "Licensing Process (takes years):",
+            "  • Environmental Impact Assessment",
+            "  • Safety Analysis Report",
+            "  • Design review",
+            "  • Public consultation",
+            "  • Construction permit",
+            "  • Operational license",
+            "  • Periodic renewals",
+            "  • Decommissioning plans",
+            "IAEA Safety Standards:",
+            "  • Global guidelines for reactor safety",
+            "  • Radiation protection protocols",
+            "  • Transport rules, waste management",
+            "  • Emergency response procedures",
+            "Peer Reviews & Audits:",
+            "  • OSART: Operational Safety Review Teams",
+            "  • IRRS: Regulatory Review",
+            "  • EPREV: Emergency Preparedness",
+            "  • Countries invite international experts",
+            "Nuclear Agreements:",
+            "  • Joint Convention on Nuclear Safety",
+            "  • Convention on Early Notification",
+            "  • Emergency Assistance Convention",
+            "Three Pillars = Peaceful Global Use:",
+            "  Safety + Security + Policy = Controlled & Beneficial"
+          ],
+          "image": "https://images.unsplash.com/photo-1541872703-74c5e44368f9?w=400"
+        }
+      },
+      {
+        "id": "lab",
+        "step_type": "lab",
+        "position": 3,
+        "data": {
+          "title": "Regulatory Compliance System",
+          "description": "You're reviewing the approval process for a new nuclear facility. Understanding regulation is key to public trust.",
+          "task": "Before a nuclear reactor can operate, what must it obtain from the national regulator?",
+          "options": [
+            {
+              "id": "patent",
+              "label": "Technology patent",
+              "icon": "Document"
+            },
+            {
+              "id": "license",
+              "label": "Operational license",
+              "icon": "ShieldTick"
+            },
+            {
+              "id": "insurance",
+              "label": "Private insurance only",
+              "icon": "Security"
+            },
+            {
+              "id": "certification",
+              "label": "ISO certification",
+              "icon": "TickCircle"
+            }
+          ],
+          "correctAnswer": "license",
+          "explanation": "An operational license from the national nuclear regulator! This comes only after years of review: environmental assessments, safety analysis, design reviews, construction permits, and public consultation. The license includes strict conditions, regular inspections, and can be suspended if safety issues arise. No reactor operates without this approval."
+        }
+      },
+      {
+        "id": "assessment",
+        "step_type": "assessment",
+        "position": 4,
+        "data": {
+          "question": "What does OSART stand for in IAEA peer reviews?",
+          "options": [
+            "Operational Safety Review Team",
+            "Ongoing Security Assessment and Response Team",
+            "Organizational Structure And Regulatory Training",
+            "Optimized Safety and Radiation Technology"
+          ],
+          "correctIndex": 0,
+          "explanation": "OSART stands for Operational Safety Review Team. These are international expert teams invited by countries to review nuclear facility operations. The multi-week reviews examine operations, maintenance, training, safety culture, and emergency preparedness. OSART missions improve global nuclear safety by sharing best practices and identifying areas for improvement.",
+          "image": "https://images.unsplash.com/photo-1541872703-74c5e44368f9?w=400"
+        }
+      },
+      {
+        "id": "assessment-2",
+        "step_type": "assessment",
+        "position": 5,
+        "data": {
+          "question": "True or False: Nuclear regulation relies on laws, inspections, treaties, and international cooperation.",
+          "options": [
+            "True",
+            "False"
+          ],
+          "correctIndex": 0,
+          "explanation": "True! Nuclear regulation is a comprehensive global system combining national laws (enforced by regulators like NRC, PNRI), international standards (IAEA guidelines), bilateral and multilateral treaties (NPT, safety conventions), and regular inspections and peer reviews. This multi-layered approach makes nuclear technology one of the most tightly controlled technologies in human history.",
+          "image": "https://images.unsplash.com/photo-1541872703-74c5e44368f9?w=400"
+        }
+      },
+      {
+        "id": "debrief",
+        "step_type": "debrief",
+        "position": 6,
+        "data": {
+          "title": "Policy & Regulation Expert!",
+          "message": "You now understand how global cooperation and strict regulation make nuclear technology controllable and beneficial!",
+          "rewards": {
+            "xp": 100,
+            "stars": 3
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "nuclear-safety-systems",
+    "title": "Nuclear Safety Systems & Radiation Protection",
+    "description": "This lesson introduces the fundamental principles of nuclear safety, including defense-in-depth, radiation protection standards, safety culture, and emergency preparedness. Students learn how modern nuclear systems are designed to prevent accidents and minimize exposure.",
+    "unit_id": "nuclear-safety-security",
+    "difficulty": "advanced",
+    "estimated_minutes": 15,
+    "xp_reward": 100,
+    "prerequisites": [
+      "nuclear-fission",
+      "measuring-radiation"
+    ],
+    "tags": [
+      "safety",
+      "defense-in-depth",
+      "radiation-protection",
+      "alara",
+      "emergency",
+      "containment"
+    ],
+    "created_at": 1786788157,
+    "updated_at": 1786788157,
+    "steps": [
+      {
+        "id": "briefing",
+        "step_type": "briefing",
+        "position": 0,
+        "data": {
+          "topic": "Nuclear Safety Systems & Radiation Protection",
+          "mission": "Agent, you're entering one of the most secure technologies on Earth. Your mission: uncover how nuclear facilities stay safe, prevent accidents, and protect people from unnecessary radiation exposure.",
+          "icon": "ShieldTick"
+        }
+      },
+      {
+        "id": "myth-buster",
+        "step_type": "myth_buster",
+        "position": 1,
+        "data": {
+          "myth": "Nuclear power plants can explode like atomic bombs",
+          "reality": "Civilian reactors cannot explode like bombs. Their fuel is not enriched enough, and reactors are engineered with multiple safety barriers called defense-in-depth",
+          "explanation": "Reactor fuel is only 3-5% enriched uranium, while bombs need 90%+ enrichment. Reactors have 5+ layers of safety: fuel design, cladding, coolant systems, containment buildings, and automatic shutdown. Even if several layers fail, others protect against catastrophic failure. The physics simply doesn't allow a nuclear explosion.",
+          "image": "https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?w=400"
+        }
+      },
+      {
+        "id": "micro-learn",
+        "step_type": "micro_learn",
+        "position": 2,
+        "data": {
+          "title": "Nuclear Safety: Multiple Layers of Protection",
+          "content": "Nuclear safety is the system of technologies, rules, barriers, and behaviors designed to prevent accidents and protect people and the environment. Modern nuclear plants use defense-in-depth - multiple independent layers of protection so that even if one fails, others remain effective.",
+          "keyPoints": [
+            "Nuclear Safety: Prevents accidents, contains radiation, protects workers",
+            "Defense-in-Depth: Multiple safety layers",
+            "  Layer 1 - Fuel Design: Ceramic pellets stay stable under heat",
+            "  Layer 2 - Fuel Cladding: Metal tubes seal radioactive material",
+            "  Layer 3 - Reactor Coolant: Circulates water, prevents overheating",
+            "  Layer 4 - Containment Building: Thick concrete-steel dome",
+            "  Layer 5 - Emergency Shutdown (SCRAM): Control rods drop instantly",
+            "Radiation Protection Principles (TDS):",
+            "  • Time: Minimize exposure duration",
+            "  • Distance: Increase space from source (inverse square law)",
+            "  • Shielding: Alpha→paper, Beta→aluminum, Gamma→lead/concrete",
+            "ALARA Principle: \"As Low As Reasonably Achievable\"",
+            "  • Keep doses far below limits, even when safe",
+            "  • Used in hospitals, plants, labs, industry",
+            "Safety Culture:",
+            "  • Safety before productivity",
+            "  • Immediate incident reporting",
+            "  • Strict procedure following",
+            "  • Continuous training",
+            "  • Workers can stop unsafe operations",
+            "Emergency Preparedness: Drills, evacuation plans, backup power",
+            "Result: Nuclear reactors = aviation-level safety"
+          ],
+          "image": "https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?w=400",
+          "visuals": [
+            {
+              "id": "visual-defence-in-depth",
+              "kind": "process_flow",
+              "learningObjective": "Describe defence in depth as several independent layers, so that one failure does not lead to harm.",
+              "title": "Defence in depth: layers of protection",
+              "explanation": "No single part is trusted to do everything. Each layer is designed to work even if the one before it fails. Moving outward from the fuel, the layers below are the ones described in this lesson.",
+              "altText": "Five boxes joined by downward arrows, from the fuel pellets at the top to the emergency shutdown at the bottom, each describing one layer of nuclear plant safety.",
+              "plainText": "Layers of protection from the fuel outward. Fuel design: ceramic pellets stay stable even at high temperature. Fuel cladding: sealed metal tubes hold the fuel and its radioactive products inside. Reactor coolant: circulating water removes heat and prevents overheating. Containment building: a thick concrete and steel shell surrounds the reactor. Emergency shutdown (SCRAM): control rods drop in within seconds to stop the chain reaction. Each layer works even if another fails.",
+              "source": {
+                "type": "original",
+                "note": "Summarises the layers listed in this lesson; the defence-in-depth idea is a standard nuclear-safety principle."
+              },
+              "credit": "Illustration: AtomIQ",
+              "steps": [
+                {
+                  "label": "Fuel design",
+                  "detail": "Ceramic pellets stay stable even at high temperature."
+                },
+                {
+                  "label": "Fuel cladding",
+                  "detail": "Sealed metal tubes hold the fuel and its radioactive products inside."
+                },
+                {
+                  "label": "Reactor coolant",
+                  "detail": "Circulating water removes heat and prevents overheating."
+                },
+                {
+                  "label": "Containment building",
+                  "detail": "A thick concrete and steel shell surrounds the reactor."
+                },
+                {
+                  "label": "Emergency shutdown (SCRAM)",
+                  "detail": "Control rods drop in within seconds to stop the chain reaction."
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "id": "lab",
+        "step_type": "lab",
+        "position": 3,
+        "data": {
+          "title": "Defense-in-Depth Simulator",
+          "description": "You're analyzing a reactor's safety systems. Understanding the multiple layers is crucial for nuclear safety.",
+          "task": "Which layer is the final barrier preventing radioactive release to the environment?",
+          "options": [
+            {
+              "id": "fuel",
+              "label": "Fuel pellet design",
+              "icon": "Element3"
+            },
+            {
+              "id": "cladding",
+              "label": "Fuel cladding",
+              "icon": "Box"
+            },
+            {
+              "id": "coolant",
+              "label": "Coolant system",
+              "icon": "Drop"
+            },
+            {
+              "id": "containment",
+              "label": "Containment building",
+              "icon": "ShieldTick"
+            }
+          ],
+          "correctAnswer": "containment",
+          "explanation": "The containment building! This massive concrete-and-steel structure (often 3+ feet thick) is designed to withstand earthquakes, hurricanes, plane crashes, and internal accidents. It's the final physical barrier between the reactor and the environment. Even in the worst-case scenario like Fukushima, containment prevented the massive release that could have occurred without it."
+        }
+      },
+      {
+        "id": "assessment",
+        "step_type": "assessment",
+        "position": 4,
+        "data": {
+          "question": "What does ALARA stand for in radiation protection?",
+          "options": [
+            "Always Limit All Radiation Activities",
+            "As Low As Reasonably Achievable",
+            "Automatic Level Adjustment for Radiation Analysis",
+            "Advanced Laboratory And Research Association"
+          ],
+          "correctIndex": 1,
+          "explanation": "ALARA means \"As Low As Reasonably Achievable.\" This principle ensures radiation doses stay far below safety limits through careful planning, design, and procedures. It's not about zero radiation (which is impossible due to background radiation), but about minimizing exposure while still performing necessary work.",
+          "image": "https://images.unsplash.com/photo-1581093588401-fbb62a02f120?w=400"
+        }
+      },
+      {
+        "id": "assessment-2",
+        "step_type": "assessment",
+        "position": 5,
+        "data": {
+          "question": "True or False: Modern nuclear reactors have passive safety features that work without electricity or human intervention.",
+          "options": [
+            "True",
+            "False"
+          ],
+          "correctIndex": 0,
+          "explanation": "True! Modern reactors (Generation III+) have passive safety features that rely on natural forces like gravity, convection, and pressure differentials. For example, passive cooling systems use natural circulation to remove heat even if all power is lost. These features made designs like the AP1000 and EPR significantly safer than older reactors.",
+          "image": "https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?w=400"
+        }
+      },
+      {
+        "id": "debrief",
+        "step_type": "debrief",
+        "position": 6,
+        "data": {
+          "title": "Safety Systems Expert!",
+          "message": "You now understand the multiple layers of safety that make nuclear technology one of the safest energy sources!",
+          "rewards": {
+            "xp": 100,
+            "stars": 3
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "nuclear-security",
+    "title": "Nuclear Security & Non-Proliferation",
+    "description": "Students explore how countries prevent the theft, misuse, or illegal transport of nuclear materials. The lesson explains the Non-Proliferation Treaty (NPT), IAEA safeguards, nuclear material tracking, and global security frameworks.",
+    "unit_id": "nuclear-safety-security",
+    "difficulty": "advanced",
+    "estimated_minutes": 15,
+    "xp_reward": 100,
+    "prerequisites": [
+      "nuclear-safety-systems"
+    ],
+    "tags": [
+      "security",
+      "non-proliferation",
+      "iaea",
+      "npt",
+      "safeguards",
+      "tracking",
+      "cybersecurity"
+    ],
+    "created_at": 1786788157,
+    "updated_at": 1786788157,
+    "steps": [
+      {
+        "id": "briefing",
+        "step_type": "briefing",
+        "position": 0,
+        "data": {
+          "topic": "Nuclear Security & Non-Proliferation",
+          "mission": "Agent, sensitive materials are on the move. Your new mission: learn how global systems stop nuclear materials from falling into the wrong hands.",
+          "icon": "ShieldSearch"
+        }
+      },
+      {
+        "id": "myth-buster",
+        "step_type": "myth_buster",
+        "position": 1,
+        "data": {
+          "myth": "Nuclear materials can easily be stolen or smuggled",
+          "reality": "Nuclear materials are tracked, sealed, monitored, and inspected under strict international rules. The IAEA uses surveillance, sensors, audits, and real-time monitoring to prevent unauthorized use",
+          "explanation": "Every gram of nuclear material worldwide is accounted for through the IAEA safeguards system. Materials move with armed escorts, GPS tracking, tamper-resistant containers, and radiation detectors at borders. The tracking system is so precise that if even a small amount goes missing, alarms trigger immediately. Smuggling nuclear material is extremely difficult.",
+          "image": "https://images.unsplash.com/photo-1614064641938-3bbee52942c7?w=400"
+        }
+      },
+      {
+        "id": "micro-learn",
+        "step_type": "micro_learn",
+        "position": 2,
+        "data": {
+          "title": "Global Nuclear Security Systems",
+          "content": "Nuclear security protects nuclear materials, technology, and facilities from theft, sabotage, illegal trafficking, and misuse for weapons. Multiple international systems work together to ensure nuclear materials stay in peaceful, beneficial uses.",
+          "keyPoints": [
+            "Nuclear Security: Protects materials from theft, sabotage, misuse",
+            "Security vs Safety:",
+            "  • Safety: Protects people FROM nuclear facilities",
+            "  • Security: Protects nuclear facilities FROM people",
+            "IAEA Safeguards System:",
+            "  • 24/7 surveillance cameras",
+            "  • Remote monitoring sensors",
+            "  • Nuclear material seals",
+            "  • Surprise inspections",
+            "  • Global activity databases",
+            "  • Spent fuel and uranium audits",
+            "  • Confirms no weapons use",
+            "Non-Proliferation Treaty (NPT):",
+            "  • World's strongest anti-nuclear weapon agreement",
+            "  • Countries agree: NO weapons development",
+            "  • ONLY peaceful nuclear uses",
+            "  • Allow IAEA inspections",
+            "  • Promote safety and cooperation",
+            "Material Accountancy: Every gram tracked",
+            "  • Recorded, monitored, measured, reported, verified",
+            "Transport Security:",
+            "  • Armed escorts, GPS tracking",
+            "  • Tamper-resistant containers",
+            "  • Radiation detectors at borders/ports",
+            "Cybersecurity:",
+            "  • Isolated control networks",
+            "  • Strong encryption, firewalls",
+            "  • Intrusion monitoring",
+            "  • Regular cyber drills",
+            "Result: Nuclear material misuse is extremely rare"
+          ],
+          "image": "https://images.unsplash.com/photo-1614064641938-3bbee52942c7?w=400"
+        }
+      },
+      {
+        "id": "lab",
+        "step_type": "lab",
+        "position": 3,
+        "data": {
+          "title": "Material Tracking System",
+          "description": "You're monitoring the global nuclear material inventory. Understanding how tracking prevents misuse is essential.",
+          "task": "What international organization monitors nuclear materials worldwide to prevent weapons proliferation?",
+          "options": [
+            {
+              "id": "who",
+              "label": "WHO",
+              "icon": "Health"
+            },
+            {
+              "id": "iaea",
+              "label": "IAEA",
+              "icon": "ShieldTick"
+            },
+            {
+              "id": "un",
+              "label": "UN General Assembly",
+              "icon": "Global"
+            },
+            {
+              "id": "nato",
+              "label": "NATO",
+              "icon": "ShieldSecurity"
+            }
+          ],
+          "correctAnswer": "iaea",
+          "explanation": "The IAEA (International Atomic Energy Agency)! Often called the \"nuclear watchdog,\" the IAEA verifies that countries use nuclear materials only for peaceful purposes. With over 2,000 inspections annually and continuous monitoring of facilities worldwide, the IAEA ensures compliance with the Non-Proliferation Treaty. They've been instrumental in preventing nuclear weapons spread since 1957."
+        }
+      },
+      {
+        "id": "assessment",
+        "step_type": "assessment",
+        "position": 4,
+        "data": {
+          "question": "What is the main purpose of the Non-Proliferation Treaty (NPT)?",
+          "options": [
+            "To ban all nuclear technology",
+            "To prevent the spread of nuclear weapons",
+            "To promote nuclear power plants",
+            "To regulate medical radiation"
+          ],
+          "correctIndex": 1,
+          "explanation": "The NPT aims to prevent the spread of nuclear weapons while promoting peaceful uses of nuclear technology. Signed by 191 countries, it's one of the most successful arms control treaties. Countries with nuclear weapons agree not to help others acquire them, while non-weapon states commit to peaceful use only and accept IAEA inspections.",
+          "image": "https://images.unsplash.com/photo-1614064641938-3bbee52942c7?w=400"
+        }
+      },
+      {
+        "id": "assessment-2",
+        "step_type": "assessment",
+        "position": 5,
+        "data": {
+          "question": "True or False: Every gram of nuclear material worldwide is recorded and tracked.",
+          "options": [
+            "True",
+            "False"
+          ],
+          "correctIndex": 0,
+          "explanation": "True! Nuclear material accountancy is incredibly precise. Every facility maintains detailed records of all nuclear materials - when they arrive, how they're used, what waste is produced, and where they're stored. The IAEA verifies these records through inspections, seals, and monitoring. This system makes \"missing\" nuclear material essentially impossible without immediate detection.",
+          "image": "https://images.unsplash.com/photo-1614064641938-3bbee52942c7?w=400"
+        }
+      },
+      {
+        "id": "debrief",
+        "step_type": "debrief",
+        "position": 6,
+        "data": {
+          "title": "Security Expert!",
+          "message": "You now understand the global systems that prevent nuclear material theft and weapons proliferation!",
+          "rewards": {
+            "xp": 100,
+            "stars": 3
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "radiation-biological-effects",
+    "title": "Radiation Interaction & Biological Effects",
+    "description": "Explain how radiation interacts with the human body, the difference between acute and chronic exposure, deterministic vs stochastic effects, and how cells repair radiation damage.",
+    "unit_id": "radiation-effects",
+    "difficulty": "intermediate",
+    "estimated_minutes": 12,
+    "xp_reward": 90,
+    "prerequisites": [
+      "types-of-radiation"
+    ],
+    "tags": [
+      "radiation",
+      "biology",
+      "health",
+      "acute",
+      "chronic",
+      "deterministic",
+      "stochastic",
+      "dna-repair"
+    ],
+    "created_at": 1786788157,
+    "updated_at": 1786788157,
+    "steps": [
+      {
+        "id": "briefing",
+        "step_type": "briefing",
+        "position": 0,
+        "data": {
+          "topic": "Radiation Interaction & Biological Effects",
+          "mission": "Agent, radiation doesn't just hit the body — it interacts with cells in specific ways. Your mission: learn what radiation actually does inside the body and how our cells can repair most of the damage.",
+          "icon": "Health"
+        }
+      },
+      {
+        "id": "myth-buster",
+        "step_type": "myth_buster",
+        "position": 1,
+        "data": {
+          "myth": "Nuclear radiation instantly causes mutations",
+          "reality": "Most radiation exposure causes no immediate effects. Cells have repair mechanisms, and mutations only occur at high doses or prolonged exposure",
+          "explanation": "Your cells are incredibly resilient! They have sophisticated DNA repair mechanisms that fix most radiation damage. Everyday radiation levels do not cause instant or extreme effects. Even at Hiroshima, many survivors lived normal lifespans. The body is constantly repairing minor DNA damage from all sources.",
+          "image": "https://images.unsplash.com/photo-1576086213369-97a306d36557?w=400"
+        }
+      },
+      {
+        "id": "micro-learn",
+        "step_type": "micro_learn",
+        "position": 2,
+        "data": {
+          "title": "How Radiation Affects the Body",
+          "content": "When ionizing radiation enters the body, it can remove electrons (ionization), break molecular bonds, or create free radicals. However, our cells have remarkable repair systems, and most low-dose damage is fixed naturally. The biological effect depends on dose, duration, and the body's ability to repair.",
+          "keyPoints": [
+            "Radiation Interaction:",
+            "  • Removes electrons → ionization",
+            "  • Breaks molecular bonds",
+            "  • Creates free radicals",
+            "  • Analogy: Bumping dominoes - possible to knock one, not the whole line",
+            "Types of Exposure:",
+            "  • Acute: High dose in short time (rare, e.g., accidents)",
+            "  • Chronic: Low dose over long periods (normal, background radiation)",
+            "  • Most real-life exposure is chronic and low-dose (safe)",
+            "Deterministic Effects (Have Threshold):",
+            "  • Only happen if dose is high enough",
+            "  • Examples: Skin burns, ARS, organ damage",
+            "  • Below threshold → NO effects occur",
+            "Stochastic Effects (No Threshold):",
+            "  • Probability increases with dose, severity doesn't",
+            "  • Example: Cancer risk (very small at low doses)",
+            "  • Analogy: Raffle tickets - more tickets = higher chance, not bigger prize",
+            "Cell Repair Mechanisms:",
+            "  • Repair DNA damage",
+            "  • Replace damaged cells",
+            "  • Remove affected tissues",
+            "  • Most low-dose damage repaired naturally",
+            "Natural Sources: Food, cosmic rays, soil, radon, medical imaging"
+          ],
+          "image": "https://images.unsplash.com/photo-1576086213369-97a306d36557?w=400"
+        }
+      },
+      {
+        "id": "lab",
+        "step_type": "lab",
+        "position": 3,
+        "data": {
+          "title": "Biological Effects Analyzer",
+          "description": "You're studying different types of radiation effects. Some have thresholds, others are probabilistic.",
+          "task": "What type of biological effect only occurs after reaching a certain dose threshold?",
+          "options": [
+            {
+              "id": "stochastic",
+              "label": "Stochastic",
+              "icon": "Chart"
+            },
+            {
+              "id": "deterministic",
+              "label": "Deterministic",
+              "icon": "ShieldTick"
+            },
+            {
+              "id": "chronic",
+              "label": "Chronic",
+              "icon": "Clock"
+            },
+            {
+              "id": "acute",
+              "label": "Acute",
+              "icon": "Flash"
+            }
+          ],
+          "correctAnswer": "deterministic",
+          "explanation": "Deterministic effects! These only occur when you reach a specific dose threshold. Below that threshold, the effect simply doesn't happen. Examples include skin burns and acute radiation syndrome (ARS). It's like needing a minimum temperature to boil water - below 100°C (at sea level), water won't boil no matter how long you wait."
+        }
+      },
+      {
+        "id": "assessment",
+        "step_type": "assessment",
+        "position": 4,
+        "data": {
+          "question": "Which term describes radiation exposure that is long-term and low-dose?",
+          "options": [
+            "Acute",
+            "Chronic",
+            "Deterministic",
+            "Nuclear accident"
+          ],
+          "correctIndex": 1,
+          "explanation": "Chronic exposure is long-term, low-dose radiation exposure. This is what we experience daily from background radiation - cosmic rays, radon in soil, radioactive elements in food (like bananas!), and medical imaging. Our bodies have evolved to handle this chronic, low-level exposure effectively.",
+          "image": "https://images.unsplash.com/photo-1576086213369-97a306d36557?w=400"
+        }
+      },
+      {
+        "id": "assessment-2",
+        "step_type": "assessment",
+        "position": 5,
+        "data": {
+          "question": "True or False: The body can repair most low-level radiation damage.",
+          "options": [
+            "True",
+            "False"
+          ],
+          "correctIndex": 0,
+          "explanation": "True! Our cells have sophisticated DNA repair mechanisms that fix most radiation damage from low-level exposure. Your body repairs thousands of DNA breaks every day from various sources - not just radiation, but also normal metabolism and oxidative stress. This is why chronic, low-dose radiation (like background radiation) is generally safe.",
+          "image": "https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=400"
+        }
+      },
+      {
+        "id": "debrief",
+        "step_type": "debrief",
+        "position": 6,
+        "data": {
+          "title": "Biology Expert!",
+          "message": "You now understand how radiation interacts with the body and the remarkable repair mechanisms that protect us!",
+          "rewards": {
+            "xp": 90,
+            "stars": 3
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "radiation-shielding",
+    "title": "Radiation Shielding",
+    "description": "Learn how different materials protect against radiation and why lead is commonly used.",
+    "unit_id": "nuclear-safety",
+    "difficulty": "beginner",
+    "estimated_minutes": 5,
+    "xp_reward": 50,
+    "prerequisites": [],
+    "tags": [
+      "safety",
+      "radiation",
+      "shielding",
+      "protection"
+    ],
+    "created_at": 1786788157,
+    "updated_at": 1786788157,
+    "steps": [
+      {
+        "id": "briefing",
+        "step_type": "briefing",
+        "position": 0,
+        "data": {
+          "topic": "Radiation Shielding",
+          "mission": "Stop the Gamma Rays!",
+          "icon": "ShieldTick"
+        }
+      },
+      {
+        "id": "myth-buster",
+        "step_type": "myth_buster",
+        "position": 1,
+        "data": {
+          "myth": "Any thick material can block all types of radiation",
+          "reality": "Different types of radiation require different shielding materials",
+          "explanation": "Alpha particles can be stopped by paper, beta particles by aluminum, but gamma rays need dense materials like lead or concrete.",
+          "image": "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=400"
+        }
+      },
+      {
+        "id": "micro-learn",
+        "step_type": "micro_learn",
+        "position": 2,
+        "data": {
+          "title": "Types of Radiation Shielding",
+          "content": "Different types of radiation have different penetrating powers. Alpha particles are stopped by paper, beta particles by thin metal, and gamma rays require dense materials like lead.",
+          "keyPoints": [
+            "Alpha: Stopped by paper or skin",
+            "Beta: Stopped by aluminum or plastic",
+            "Gamma: Requires lead, concrete, or water",
+            "Neutrons: Require hydrogen-rich materials"
+          ],
+          "image": "https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=400",
+          "visuals": [
+            {
+              "id": "visual-penetration-alpha-beta-gamma",
+              "kind": "diagram",
+              "learningObjective": "Match alpha, beta and gamma radiation to the material that stops each one.",
+              "title": "What stops alpha, beta and gamma?",
+              "explanation": "The three rays start at the same source but travel different distances. Alpha particles are heavy and are stopped by paper. Beta particles are lighter and fast, and need a few millimetres of aluminium or plastic. Gamma rays are energy, not particles, and need dense material such as lead or thick concrete. Neutrons are different again and are slowed by water or other hydrogen-rich materials.",
+              "altText": "Diagram of three horizontal rays leaving a source and meeting three upright barriers: the alpha ray ends at paper, the beta ray ends at aluminium, and the gamma ray reaches the thick lead barrier, where it is greatly reduced.",
+              "plainText": "Three rays leave a radioactive source, in front of three barriers placed in order: paper, aluminium, lead. Alpha particles are stopped by the paper. Beta particles pass through the paper but are stopped by the aluminium. Gamma rays pass through paper and aluminium and are greatly reduced, but not completely removed, by thick lead.",
+              "caption": "Not to scale. Real shielding thickness depends on the radiation's energy.",
+              "source": {
+                "type": "original",
+                "note": "Created for AtomIQ from standard radiation-protection teaching; thicknesses are deliberately qualitative."
+              },
+              "credit": "Illustration: AtomIQ",
+              "scene": {
+                "height": 62,
+                "shapes": [
+                  {
+                    "t": "rect",
+                    "x": 3,
+                    "y": 8,
+                    "w": 6,
+                    "h": 44,
+                    "tone": "neutral",
+                    "fill": "solid",
+                    "rx": 1
+                  },
+                  {
+                    "t": "text",
+                    "x": 3,
+                    "y": 58.5,
+                    "text": "source",
+                    "size": 4.6,
+                    "anchor": "start"
+                  },
+                  {
+                    "t": "rect",
+                    "x": 30,
+                    "y": 8,
+                    "w": 1.6,
+                    "h": 44,
+                    "tone": "warning",
+                    "fill": "soft"
+                  },
+                  {
+                    "t": "rect",
+                    "x": 52,
+                    "y": 8,
+                    "w": 3.4,
+                    "h": 44,
+                    "tone": "neutral",
+                    "fill": "solid"
+                  },
+                  {
+                    "t": "rect",
+                    "x": 74,
+                    "y": 8,
+                    "w": 8,
+                    "h": 44,
+                    "tone": "primary",
+                    "fill": "solid"
+                  },
+                  {
+                    "t": "text",
+                    "x": 29,
+                    "y": 6,
+                    "text": "paper",
+                    "size": 4.6
+                  },
+                  {
+                    "t": "text",
+                    "x": 55,
+                    "y": 6,
+                    "text": "aluminium",
+                    "size": 4.6
+                  },
+                  {
+                    "t": "text",
+                    "x": 78,
+                    "y": 6,
+                    "text": "lead",
+                    "size": 4.6
+                  },
+                  {
+                    "t": "line",
+                    "x1": 9,
+                    "y1": 17,
+                    "x2": 28,
+                    "y2": 17,
+                    "tone": "danger",
+                    "width": 1.2,
+                    "arrow": true
+                  },
+                  {
+                    "t": "line",
+                    "x1": 9,
+                    "y1": 30,
+                    "x2": 50.5,
+                    "y2": 30,
+                    "tone": "warning",
+                    "width": 1.2,
+                    "arrow": true
+                  },
+                  {
+                    "t": "line",
+                    "x1": 9,
+                    "y1": 43,
+                    "x2": 72,
+                    "y2": 43,
+                    "tone": "info",
+                    "width": 1.2,
+                    "arrow": true
+                  },
+                  {
+                    "t": "line",
+                    "x1": 83,
+                    "y1": 43,
+                    "x2": 96,
+                    "y2": 43,
+                    "tone": "info",
+                    "width": 0.7,
+                    "dash": true
+                  },
+                  {
+                    "t": "text",
+                    "x": 12,
+                    "y": 14,
+                    "text": "alpha",
+                    "size": 4.6,
+                    "anchor": "start"
+                  },
+                  {
+                    "t": "text",
+                    "x": 12,
+                    "y": 27,
+                    "text": "beta",
+                    "size": 4.6,
+                    "anchor": "start"
+                  },
+                  {
+                    "t": "text",
+                    "x": 12,
+                    "y": 40,
+                    "text": "gamma",
+                    "size": 4.6,
+                    "anchor": "start"
+                  }
+                ]
+              },
+              "callouts": [
+                {
+                  "id": "1",
+                  "label": "Alpha particles",
+                  "detail": "Stopped by a sheet of paper or the outer layer of skin. Dangerous mainly if the source gets inside the body.",
+                  "x": 36,
+                  "y": 17
+                },
+                {
+                  "id": "2",
+                  "label": "Beta particles",
+                  "detail": "Pass through paper but are stopped by a few millimetres of aluminium or plastic.",
+                  "x": 61,
+                  "y": 30
+                },
+                {
+                  "id": "3",
+                  "label": "Gamma rays",
+                  "detail": "Pass through paper and aluminium. Dense lead or thick concrete cuts them down a lot, but never to exactly zero (the dashed line).",
+                  "x": 90,
+                  "y": 51
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "id": "lab",
+        "step_type": "lab",
+        "position": 3,
+        "data": {
+          "title": "Shield Selection Lab",
+          "description": "A gamma ray source is detected! Choose the right material to protect yourself.",
+          "task": "Select the most effective shield against gamma radiation.",
+          "options": [
+            {
+              "id": "paper",
+              "label": "Paper",
+              "icon": "Document"
+            },
+            {
+              "id": "aluminum",
+              "label": "Aluminum",
+              "icon": "Box"
+            },
+            {
+              "id": "lead",
+              "label": "Lead",
+              "icon": "ShieldTick"
+            },
+            {
+              "id": "plastic",
+              "label": "Plastic",
+              "icon": "Box"
+            }
+          ],
+          "correctAnswer": "lead",
+          "explanation": "Lead is the most effective shield against gamma radiation due to its high density and atomic number. It absorbs gamma rays through photoelectric effect and Compton scattering."
+        }
+      },
+      {
+        "id": "assessment",
+        "step_type": "assessment",
+        "position": 4,
+        "data": {
+          "question": "Which of these materials is best for shielding Gamma radiation?",
+          "options": [
+            "Wood",
+            "Aluminum",
+            "Lead",
+            "Water"
+          ],
+          "correctIndex": 2,
+          "explanation": "Lead is the most effective material for gamma radiation shielding due to its high density (11.34 g/cm³) and high atomic number (82), which allows it to effectively absorb gamma rays.",
+          "image": "https://images.unsplash.com/photo-1567427017947-545c5f8d16ad?w=400"
+        }
+      },
+      {
+        "id": "debrief",
+        "step_type": "debrief",
+        "position": 5,
+        "data": {
+          "title": "Mission Complete!",
+          "message": "You've mastered the basics of radiation shielding.",
+          "rewards": {
+            "xp": 50,
+            "stars": 3
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "radioactive-decay",
+    "title": "Radioactive Decay and Half-Life",
+    "description": "Learn how unstable nuclei transform into more stable forms through alpha, beta, and gamma decay. Understand half-life, decay chains, and how these predictable processes are used in medicine, dating, and industry.",
+    "unit_id": "nuclear-reactions",
+    "difficulty": "intermediate",
+    "estimated_minutes": 10,
+    "xp_reward": 80,
+    "prerequisites": [
+      "nuclear-fission"
+    ],
+    "tags": [
+      "decay",
+      "half-life",
+      "alpha",
+      "beta",
+      "gamma",
+      "radiometric-dating",
+      "medicine"
+    ],
+    "created_at": 1786788157,
+    "updated_at": 1786788157,
+    "steps": [
+      {
+        "id": "briefing",
+        "step_type": "briefing",
+        "position": 0,
+        "data": {
+          "topic": "Radioactive Decay and Half-Life",
+          "mission": "Agent, some atoms are naturally unstable. Your mission: uncover how these nuclei decay over time and how scientists use this process safely in medicine, industry, and research.",
+          "icon": "Clock"
+        }
+      },
+      {
+        "id": "myth-buster",
+        "step_type": "myth_buster",
+        "position": 1,
+        "data": {
+          "myth": "All radioactive materials are extremely dangerous and always harmful",
+          "reality": "While high doses of radiation are harmful, controlled use of radioactive isotopes is safe and essential in medicine (imaging, therapy), industry, and scientific research",
+          "explanation": "Radioactive materials are used safely every day in hospitals for cancer treatment and medical imaging. The key is controlled doses and proper handling. Carbon-14 in your body is radioactive, and you're perfectly fine! Dose and exposure time matter.",
+          "image": "https://images.unsplash.com/photo-1581093588401-fbb62a02f120?w=400"
+        }
+      },
+      {
+        "id": "micro-learn",
+        "step_type": "micro_learn",
+        "position": 2,
+        "data": {
+          "title": "Types of Radioactive Decay",
+          "content": "Radioactive decay is the process by which unstable atomic nuclei lose energy by emitting radiation. There are three main types of decay, each with different properties and penetrating power. Half-life is the predictable time required for half of the nuclei in a sample to decay.",
+          "keyPoints": [
+            "Alpha decay (α): Releases 2 protons + 2 neutrons → reduces atomic # by 2",
+            "Alpha particles: Stopped by paper, dangerous if ingested",
+            "Beta decay (β): Neutron → proton + electron → changes atomic # by ±1",
+            "Beta particles: Stopped by aluminum, moderate penetration",
+            "Gamma decay (γ): High-energy photons → no change in atomic # or mass",
+            "Gamma rays: Very penetrating, requires lead or concrete",
+            "Half-life: Time for half the sample to decay (predictable)",
+            "Decay chains: Isotopes decay into other radioactive isotopes",
+            "Example: Uranium-238 → Thorium-234 → ... → Lead-206 (stable)",
+            "Applications: Cancer radiotherapy, PET scans, carbon dating",
+            "Industry: Thickness measurement, sterilization",
+            "Analogy: Like sand trickling through hourglass - steady and measurable"
+          ],
+          "image": "https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=400",
+          "visuals": [
+            {
+              "id": "visual-half-life-decay",
+              "kind": "process_flow",
+              "learningObjective": "Use a half-life to work out how much of a radioactive sample is left after one, two or three half-lives.",
+              "title": "Half-life in four steps",
+              "explanation": "A half-life is the time it takes for half of the radioactive atoms in a sample to decay. After each half-life, half of what was left is left again: 100%, then 50%, then 25%, then 12.5%. The half-life of a given isotope is fixed; heat, pressure or chemistry do not change it. The example uses iodine-131, whose half-life is about 8 days.",
+              "altText": "Four boxes in a row joined by arrows, each with a bar that is half as long as the one before: 100%, 50%, 25% and 12.5% of the sample remaining.",
+              "plainText": "Start: 100% of the sample is still radioactive. After 1 half-life (day 8 for iodine-131): 50% remains. After 2 half-lives (day 16): 25% remains. After 3 half-lives (day 24): 12.5% remains. Each step halves the amount left.",
+              "source": {
+                "type": "original",
+                "note": "Created for AtomIQ; the iodine-131 half-life (about 8 days) is a standard value."
+              },
+              "credit": "Illustration: AtomIQ",
+              "steps": [
+                {
+                  "label": "Start",
+                  "value": "100%",
+                  "meter": 1,
+                  "detail": "All of the sample is still radioactive."
+                },
+                {
+                  "label": "After 1 half-life",
+                  "value": "50%",
+                  "meter": 0.5,
+                  "detail": "Day 8 for iodine-131. Half has decayed."
+                },
+                {
+                  "label": "After 2 half-lives",
+                  "value": "25%",
+                  "meter": 0.25,
+                  "detail": "Day 16. Half of the remaining half has decayed."
+                },
+                {
+                  "label": "After 3 half-lives",
+                  "value": "12.5%",
+                  "meter": 0.125,
+                  "detail": "Day 24. It never reaches exactly zero, but it keeps shrinking."
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "id": "lab",
+        "step_type": "lab",
+        "position": 3,
+        "data": {
+          "title": "Decay Type Identifier",
+          "description": "You've detected radiation from an unknown source. The particle has 2 protons and 2 neutrons and is stopped by a sheet of paper.",
+          "task": "Which type of decay emits a particle with 2 protons and 2 neutrons?",
+          "options": [
+            {
+              "id": "alpha",
+              "label": "Alpha decay",
+              "icon": "ShieldSecurity"
+            },
+            {
+              "id": "beta",
+              "label": "Beta decay",
+              "icon": "Flash"
+            },
+            {
+              "id": "gamma",
+              "label": "Gamma decay",
+              "icon": "Sun"
+            },
+            {
+              "id": "neutron",
+              "label": "Neutron decay",
+              "icon": "Element3"
+            }
+          ],
+          "correctAnswer": "alpha",
+          "explanation": "Alpha decay! Alpha particles consist of 2 protons and 2 neutrons (essentially a helium nucleus). They're the least penetrating form of radiation - stopped by paper or skin - but the most ionizing. They're dangerous only if alpha-emitting materials are ingested or inhaled."
+        }
+      },
+      {
+        "id": "assessment",
+        "step_type": "assessment",
+        "position": 4,
+        "data": {
+          "question": "True or False: Gamma decay changes the atomic number of an element.",
+          "options": [
+            "True",
+            "False"
+          ],
+          "correctIndex": 1,
+          "explanation": "False! Gamma decay only releases energy in the form of high-energy photons (electromagnetic radiation). It doesn't change the number of protons (atomic number) or neutrons (mass number). The nucleus just transitions to a lower energy state, like an electron dropping to a lower orbital.",
+          "image": "https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=400"
+        }
+      },
+      {
+        "id": "assessment-2",
+        "step_type": "assessment",
+        "position": 5,
+        "data": {
+          "question": "What does \"half-life\" measure?",
+          "options": [
+            "Time for all radioactive material to decay",
+            "Time for half of a radioactive sample to decay",
+            "Time for radiation to become dangerous",
+            "Time for a reactor to produce half its energy"
+          ],
+          "correctIndex": 1,
+          "explanation": "Half-life is the time required for half of the radioactive nuclei in a sample to decay. This value is constant and unique for each isotope. For example, Carbon-14 has a half-life of 5,730 years, which is why it's useful for dating ancient artifacts. After one half-life, 50% remains; after two half-lives, 25% remains, and so on.",
+          "image": "https://images.unsplash.com/photo-1461360370896-922624d12aa1?w=400"
+        }
+      },
+      {
+        "id": "assessment-3",
+        "step_type": "assessment",
+        "position": 6,
+        "data": {
+          "question": "Which of these is a medical application of radioactivity?",
+          "options": [
+            "PET scans for imaging",
+            "Powering pacemakers",
+            "Sterilizing surgical instruments",
+            "All of these"
+          ],
+          "correctIndex": 3,
+          "explanation": "All of these! Radioactive decay has many medical applications: PET (Positron Emission Tomography) scans use positron-emitting isotopes for detailed imaging; some pacemakers are powered by plutonium-238 decay; and radiation is used to sterilize surgical instruments and medical supplies by killing bacteria and viruses.",
+          "image": "https://images.unsplash.com/photo-1581093588401-fbb62a02f120?w=400"
+        }
+      },
+      {
+        "id": "debrief",
+        "step_type": "debrief",
+        "position": 7,
+        "data": {
+          "title": "Decay Expert!",
+          "message": "You now understand radioactive decay, half-life, and the beneficial applications of radioactivity!",
+          "rewards": {
+            "xp": 80,
+            "stars": 3
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "types-of-radiation",
+    "title": "Types of Radiation — Ionizing vs Non-Ionizing",
+    "description": "Introduce learners to the electromagnetic spectrum and nuclear radiation types (alpha, beta, gamma, neutron). Explain the difference between ionizing and non-ionizing radiation and why not all radiation is harmful.",
+    "unit_id": "radiation-effects",
+    "difficulty": "beginner",
+    "estimated_minutes": 10,
+    "xp_reward": 80,
+    "prerequisites": [
+      "meet-the-atom",
+      "nuclear-energy-explained"
+    ],
+    "tags": [
+      "radiation",
+      "ionizing",
+      "non-ionizing",
+      "alpha",
+      "beta",
+      "gamma",
+      "electromagnetic-spectrum"
+    ],
+    "created_at": 1786788157,
+    "updated_at": 1786788157,
+    "steps": [
+      {
+        "id": "briefing",
+        "step_type": "briefing",
+        "position": 0,
+        "data": {
+          "topic": "Types of Radiation — Ionizing vs Non-Ionizing",
+          "mission": "Agent, radiation is all around you, from sunlight to medical X-rays. Your mission: identify the different types of radiation and understand which are safe and which can be harmful.",
+          "icon": "Flash"
+        }
+      },
+      {
+        "id": "myth-buster",
+        "step_type": "myth_buster",
+        "position": 1,
+        "data": {
+          "myth": "All radiation is deadly",
+          "reality": "Radiation comes in many forms. Non-ionizing radiation (e.g., radio waves, microwaves, visible light) is generally safe, while ionizing radiation has enough energy to affect atoms",
+          "explanation": "Not all radiation is harmful! Non-ionizing radiation includes everyday things like sunlight, radio waves, and microwaves. Ionizing radiation (alpha, beta, gamma) has higher energy and requires safety measures, but safety depends on exposure type and dose. You're surrounded by safe radiation right now!",
+          "image": "https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?w=400"
+        }
+      },
+      {
+        "id": "micro-learn",
+        "step_type": "micro_learn",
+        "position": 2,
+        "data": {
+          "title": "Understanding Radiation Types",
+          "content": "Radiation is energy traveling through space as waves (electromagnetic) or particles (nuclear). Not all radiation is harmful - it depends on the type and energy level. The electromagnetic spectrum ranges from low-energy radio waves to high-energy gamma rays.",
+          "keyPoints": [
+            "Radiation: Energy traveling as waves or particles",
+            "Non-Ionizing Radiation (Low Energy):",
+            "  • Radio waves, microwaves, infrared, visible light",
+            "  • Cannot ionize atoms → mostly harmless",
+            "  • Used in everyday devices safely",
+            "  • Analogy: Gentle push, not enough to knock anything over",
+            "Ionizing Radiation (High Energy):",
+            "  • Alpha particles: Heavy, low penetration (stopped by paper)",
+            "  • Beta particles: Light, moderate penetration (stopped by aluminum)",
+            "  • Gamma rays: Highly penetrating waves (need lead/concrete)",
+            "  • Neutrons: Deeply penetrating particles",
+            "  • Has enough energy to remove electrons",
+            "  • Found in medical imaging, cosmic rays, natural sources",
+            "  • Analogy: Strong punch - powerful but controllable with protection"
+          ],
+          "image": "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=400"
+        }
+      },
+      {
+        "id": "lab",
+        "step_type": "lab",
+        "position": 3,
+        "data": {
+          "title": "Radiation Classification Lab",
+          "description": "You're identifying different types of radiation. Some are safe, others need protection.",
+          "task": "Which of the following is non-ionizing radiation?",
+          "options": [
+            {
+              "id": "gamma",
+              "label": "Gamma rays",
+              "icon": "Danger"
+            },
+            {
+              "id": "alpha",
+              "label": "Alpha particles",
+              "icon": "ShieldSecurity"
+            },
+            {
+              "id": "microwaves",
+              "label": "Microwaves",
+              "icon": "Sun"
+            },
+            {
+              "id": "neutrons",
+              "label": "Neutrons",
+              "icon": "Element3"
+            }
+          ],
+          "correctAnswer": "microwaves",
+          "explanation": "Microwaves are non-ionizing radiation! They don't have enough energy to remove electrons from atoms. That's why your microwave oven is safe to use - it uses non-ionizing electromagnetic waves to heat food. Gamma rays, alpha particles, and neutrons are all ionizing radiation that requires proper safety measures."
+        }
+      },
+      {
+        "id": "assessment",
+        "step_type": "assessment",
+        "position": 4,
+        "data": {
+          "question": "Which type of radiation has enough energy to remove electrons from atoms?",
+          "options": [
+            "Non-ionizing",
+            "Ionizing",
+            "Visible light",
+            "Radio waves"
+          ],
+          "correctIndex": 1,
+          "explanation": "Ionizing radiation has enough energy to remove electrons from atoms, creating ions. This includes alpha particles, beta particles, gamma rays, X-rays, and neutrons. Non-ionizing radiation (like radio waves, microwaves, visible light) doesn't have enough energy to ionize atoms.",
+          "image": "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=400"
+        }
+      },
+      {
+        "id": "assessment-2",
+        "step_type": "assessment",
+        "position": 5,
+        "data": {
+          "question": "True or False: All radiation is harmful.",
+          "options": [
+            "True",
+            "False"
+          ],
+          "correctIndex": 1,
+          "explanation": "False! Most radiation we encounter daily is non-ionizing and harmless - sunlight, radio waves, microwaves, WiFi signals. Even ionizing radiation is only harmful at high doses. The key factors are type, dose, and duration of exposure. We've evolved with natural background radiation for millions of years.",
+          "image": "https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?w=400"
+        }
+      },
+      {
+        "id": "debrief",
+        "step_type": "debrief",
+        "position": 6,
+        "data": {
+          "title": "Radiation Expert!",
+          "message": "You now understand the different types of radiation and can distinguish between safe and potentially harmful forms!",
+          "rewards": {
+            "xp": 80,
+            "stars": 3
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "what-is-isotope",
+    "title": "What is an Isotope?",
+    "description": "Learn about isotopes and the difference between stable and unstable atoms.",
+    "unit_id": "atomic-playground",
+    "difficulty": "beginner",
+    "estimated_minutes": 7,
+    "xp_reward": 60,
+    "prerequisites": [
+      "meet-the-atom"
+    ],
+    "tags": [
+      "basics",
+      "isotope",
+      "stability",
+      "radioactive"
+    ],
+    "created_at": 1786788157,
+    "updated_at": 1786788157,
+    "steps": [
+      {
+        "id": "briefing",
+        "step_type": "briefing",
+        "position": 0,
+        "data": {
+          "topic": "What is an Isotope?",
+          "mission": "Understand Atomic Twins!",
+          "icon": "Element3"
+        }
+      },
+      {
+        "id": "myth-buster",
+        "step_type": "myth_buster",
+        "position": 1,
+        "data": {
+          "myth": "All atoms of the same element are identical",
+          "reality": "Atoms of the same element can have different numbers of neutrons - these are called isotopes",
+          "explanation": "While all carbon atoms have 6 protons, they can have different numbers of neutrons. Carbon-12 (6 neutrons) is stable, while Carbon-14 (8 neutrons) is radioactive and used in carbon dating!",
+          "image": "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=400"
+        }
+      },
+      {
+        "id": "micro-learn",
+        "step_type": "micro_learn",
+        "position": 2,
+        "data": {
+          "title": "Isotopes: Atomic Siblings",
+          "content": "Isotopes are atoms of the same element with different numbers of neutrons. They have the same chemical properties but different masses. Some isotopes are stable, while others are unstable (radioactive) and decay over time.",
+          "keyPoints": [
+            "Same element = same protons, different neutrons",
+            "Notation: Element-Mass (e.g., Carbon-14)",
+            "Stable isotopes: balanced neutron-to-proton ratio",
+            "Unstable isotopes: radioactive, decay over time",
+            "Example: Uranium-235 (unstable) vs Uranium-238"
+          ],
+          "image": "https://images.unsplash.com/photo-1530587191325-3db32d826c18?w=400",
+          "visuals": [
+            {
+              "id": "visual-isotopes-c12-c14",
+              "kind": "model",
+              "learningObjective": "Explain that isotopes of one element have the same number of protons but different numbers of neutrons.",
+              "title": "Carbon-12 and carbon-14",
+              "explanation": "Both atoms are carbon because both have 6 protons. Carbon-14 has 8 neutrons instead of 6. The number in the name is the mass number, protons plus neutrons: 6 + 6 = 12 and 6 + 8 = 14. Carbon-12 is stable. The two extra neutrons make carbon-14 unstable, so it slowly decays, which is why it is used for radiocarbon dating.",
+              "altText": "Two atomic nuclei side by side: carbon-12 with 6 red protons and 6 grey neutrons, and carbon-14 with the same 6 protons plus 8 neutrons, two of them highlighted in yellow.",
+              "plainText": "Comparison of two isotopes of carbon. Carbon-12 has 6 protons and 6 neutrons and is stable. Carbon-14 has 6 protons and 8 neutrons and is radioactive. Both have 6 protons, so both are carbon. The Two extra neutrons are the only difference. In the picture a Proton is a solid red dot, a Neutron is a pale grey dot and an Extra neutron is a yellow dot.",
+              "caption": "Electrons are left out to keep the focus on the nucleus.",
+              "source": {
+                "type": "original",
+                "note": "Created for AtomIQ; nucleon counts follow the standard definition of carbon-12 and carbon-14."
+              },
+              "credit": "Illustration: AtomIQ",
+              "scene": {
+                "height": 69,
+                "shapes": [
+                  {
+                    "t": "text",
+                    "x": 27,
+                    "y": 8,
+                    "text": "Carbon-12",
+                    "size": 5.5
+                  },
+                  {
+                    "t": "text",
+                    "x": 73,
+                    "y": 8,
+                    "text": "Carbon-14",
+                    "size": 5.5
+                  },
+                  {
+                    "t": "circle",
+                    "x": 29.12,
+                    "y": 30,
+                    "r": 2.5,
+                    "tone": "danger",
+                    "fill": "solid"
+                  },
+                  {
+                    "t": "circle",
+                    "x": 24.29,
+                    "y": 32.48,
+                    "r": 2.5,
+                    "tone": "neutral",
+                    "fill": "soft"
+                  },
+                  {
+                    "t": "circle",
+                    "x": 27.41,
+                    "y": 25.27,
+                    "r": 2.5,
+                    "tone": "danger",
+                    "fill": "solid"
+                  },
+                  {
+                    "t": "circle",
+                    "x": 30.41,
+                    "y": 34.45,
+                    "r": 2.5,
+                    "tone": "neutral",
+                    "fill": "soft"
+                  },
+                  {
+                    "t": "circle",
+                    "x": 20.73,
+                    "y": 28.89,
+                    "r": 2.5,
+                    "tone": "danger",
+                    "fill": "solid"
+                  },
+                  {
+                    "t": "circle",
+                    "x": 32.94,
+                    "y": 26.22,
+                    "r": 2.5,
+                    "tone": "neutral",
+                    "fill": "soft"
+                  },
+                  {
+                    "t": "circle",
+                    "x": 25.01,
+                    "y": 37.39,
+                    "r": 2.5,
+                    "tone": "danger",
+                    "fill": "solid"
+                  },
+                  {
+                    "t": "circle",
+                    "x": 23.21,
+                    "y": 22.71,
+                    "r": 2.5,
+                    "tone": "neutral",
+                    "fill": "soft"
+                  },
+                  {
+                    "t": "circle",
+                    "x": 35.22,
+                    "y": 33,
+                    "r": 2.5,
+                    "tone": "danger",
+                    "fill": "solid"
+                  },
+                  {
+                    "t": "circle",
+                    "x": 18.45,
+                    "y": 33.53,
+                    "r": 2.5,
+                    "tone": "neutral",
+                    "fill": "soft"
+                  },
+                  {
+                    "t": "circle",
+                    "x": 31.12,
+                    "y": 21.2,
+                    "r": 2.5,
+                    "tone": "danger",
+                    "fill": "solid"
+                  },
+                  {
+                    "t": "circle",
+                    "x": 30.04,
+                    "y": 39.71,
+                    "r": 2.5,
+                    "tone": "neutral",
+                    "fill": "soft"
+                  },
+                  {
+                    "t": "circle",
+                    "x": 75.12,
+                    "y": 30,
+                    "r": 2.5,
+                    "tone": "danger",
+                    "fill": "solid"
+                  },
+                  {
+                    "t": "circle",
+                    "x": 70.29,
+                    "y": 32.48,
+                    "r": 2.5,
+                    "tone": "neutral",
+                    "fill": "soft"
+                  },
+                  {
+                    "t": "circle",
+                    "x": 73.41,
+                    "y": 25.27,
+                    "r": 2.5,
+                    "tone": "danger",
+                    "fill": "solid"
+                  },
+                  {
+                    "t": "circle",
+                    "x": 76.41,
+                    "y": 34.45,
+                    "r": 2.5,
+                    "tone": "neutral",
+                    "fill": "soft"
+                  },
+                  {
+                    "t": "circle",
+                    "x": 66.73,
+                    "y": 28.89,
+                    "r": 2.5,
+                    "tone": "danger",
+                    "fill": "solid"
+                  },
+                  {
+                    "t": "circle",
+                    "x": 78.94,
+                    "y": 26.22,
+                    "r": 2.5,
+                    "tone": "neutral",
+                    "fill": "soft"
+                  },
+                  {
+                    "t": "circle",
+                    "x": 71.01,
+                    "y": 37.39,
+                    "r": 2.5,
+                    "tone": "danger",
+                    "fill": "solid"
+                  },
+                  {
+                    "t": "circle",
+                    "x": 69.21,
+                    "y": 22.71,
+                    "r": 2.5,
+                    "tone": "neutral",
+                    "fill": "soft"
+                  },
+                  {
+                    "t": "circle",
+                    "x": 81.22,
+                    "y": 33,
+                    "r": 2.5,
+                    "tone": "danger",
+                    "fill": "solid"
+                  },
+                  {
+                    "t": "circle",
+                    "x": 64.45,
+                    "y": 33.53,
+                    "r": 2.5,
+                    "tone": "neutral",
+                    "fill": "soft"
+                  },
+                  {
+                    "t": "circle",
+                    "x": 77.12,
+                    "y": 21.2,
+                    "r": 2.5,
+                    "tone": "danger",
+                    "fill": "solid"
+                  },
+                  {
+                    "t": "circle",
+                    "x": 76.04,
+                    "y": 39.71,
+                    "r": 2.5,
+                    "tone": "neutral",
+                    "fill": "soft"
+                  },
+                  {
+                    "t": "circle",
+                    "x": 63.82,
+                    "y": 24.68,
+                    "r": 2.5,
+                    "tone": "warning",
+                    "fill": "solid"
+                  },
+                  {
+                    "t": "circle",
+                    "x": 83.77,
+                    "y": 27.63,
+                    "r": 2.5,
+                    "tone": "warning",
+                    "fill": "solid"
+                  },
+                  {
+                    "t": "text",
+                    "x": 27,
+                    "y": 51,
+                    "text": "6 protons",
+                    "size": 4.8
+                  },
+                  {
+                    "t": "text",
+                    "x": 27,
+                    "y": 56.5,
+                    "text": "6 neutrons",
+                    "size": 4.8
+                  },
+                  {
+                    "t": "text",
+                    "x": 73,
+                    "y": 51,
+                    "text": "6 protons",
+                    "size": 4.8
+                  },
+                  {
+                    "t": "text",
+                    "x": 73,
+                    "y": 56.5,
+                    "text": "8 neutrons",
+                    "size": 4.8
+                  },
+                  {
+                    "t": "text",
+                    "x": 27,
+                    "y": 64,
+                    "text": "stable",
+                    "size": 5.4
+                  },
+                  {
+                    "t": "text",
+                    "x": 73,
+                    "y": 64,
+                    "text": "radioactive",
+                    "size": 5.4
+                  }
+                ]
+              },
+              "callouts": [
+                {
+                  "id": "1",
+                  "label": "Carbon-12",
+                  "detail": "6 protons and 6 neutrons. Stable: it does not decay. About 99 out of every 100 carbon atoms are carbon-12.",
+                  "x": 12,
+                  "y": 20
+                },
+                {
+                  "id": "2",
+                  "label": "Carbon-14",
+                  "detail": "Still 6 protons, so it is still carbon, but with 8 neutrons. The extra neutrons make the nucleus unstable (radioactive).",
+                  "x": 58,
+                  "y": 20
+                },
+                {
+                  "id": "3",
+                  "label": "Two extra neutrons",
+                  "detail": "The only difference between the two atoms. Same protons means the same chemistry; different neutrons means a different mass.",
+                  "x": 88.77,
+                  "y": 32.63
+                }
+              ],
+              "key": [
+                {
+                  "tone": "danger",
+                  "label": "Proton",
+                  "swatch": "circle"
+                },
+                {
+                  "tone": "neutral",
+                  "label": "Neutron",
+                  "swatch": "circle"
+                },
+                {
+                  "tone": "warning",
+                  "label": "Extra neutron",
+                  "swatch": "circle"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "id": "lab",
+        "step_type": "lab",
+        "position": 3,
+        "data": {
+          "title": "Isotope Detective",
+          "description": "You found two carbon atoms. One has 6 neutrons, the other has 8 neutrons.",
+          "task": "Are these the same element?",
+          "options": [
+            {
+              "id": "yes-isotopes",
+              "label": "Yes - They're isotopes",
+              "icon": "TickCircle"
+            },
+            {
+              "id": "no-different",
+              "label": "No - Different elements",
+              "icon": "CloseCircle"
+            },
+            {
+              "id": "same-atom",
+              "label": "They're identical",
+              "icon": "Copy"
+            },
+            {
+              "id": "not-carbon",
+              "label": "Neither is carbon",
+              "icon": "Danger"
+            }
+          ],
+          "correctAnswer": "yes-isotopes",
+          "explanation": "Correct! Both have 6 protons (making them carbon), but different neutrons. They're isotopes: Carbon-12 (6+6) and Carbon-14 (6+8). Same element, different mass!"
+        }
+      },
+      {
+        "id": "assessment",
+        "step_type": "assessment",
+        "position": 4,
+        "data": {
+          "question": "What makes an isotope unstable (radioactive)?",
+          "options": [
+            "Too many protons",
+            "Too many or too few neutrons for stability",
+            "Too many electrons",
+            "Being exposed to radiation"
+          ],
+          "correctIndex": 1,
+          "explanation": "An unstable neutron-to-proton ratio makes isotopes radioactive. Too many or too few neutrons creates an imbalance, causing the nucleus to decay and emit radiation to reach a stable state.",
+          "image": "https://images.unsplash.com/photo-1567427017947-545c5f8d16ad?w=400"
+        }
+      },
+      {
+        "id": "debrief",
+        "step_type": "debrief",
+        "position": 5,
+        "data": {
+          "title": "Isotope Expert!",
+          "message": "You can now distinguish between stable and unstable isotopes!",
+          "rewards": {
+            "xp": 60,
+            "stars": 3
+          }
+        }
+      }
+    ]
+  }
+]

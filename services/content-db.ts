@@ -6,20 +6,16 @@
  * writable local storage, into the exact directory that expo-sqlite uses.
  * All subsequent sessions open that local copy.
  *
- * `ContentRepository` then provides typed, high-level queries — e.g.
- * `getLessonById` — which read a lesson row together with its ordered
- * `lesson_steps` rows and hydrate the flexible JSON string columns
- * (`tags`, `prerequisites`, step `data`) back into plain objects.
- *
- * The hydrated shape intentionally mirrors `Lesson` from `@/content/types`,
- * so screens can swap from the old hardcoded TS registry to this DB-backed
- * repository without changing their rendering code.
+ * `ContentRepository` then provides typed, high-level queries over the curriculum
+ * (units, path nodes, lessons made of cards, the shared item bank, references)
+ * and the other content (myths, mazes, encyclopedia, articles, posts). JSON
+ * columns are hydrated into plain objects by content/curriculum/hydrate.ts.
  *
  * USAGE (in a screen / hook):
  *   import { ensureContentDatabase, contentRepository } from "@/services/content-db";
  *
  *   await ensureContentDatabase();          // call once, near app startup
- *   const lesson = await contentRepository.getLessonById("background-radiation");
+ *   const lesson = await contentRepository.getLessonContent("isotopes");
  */
 
 import * as FileSystem from "expo-file-system/legacy";
@@ -36,14 +32,37 @@ import type {
   SummaryOrigin,
 } from "@/content/articles/types";
 
+import type { Myth, QuizQuestion, QuizType } from "@/content/types";
+
+import {
+  buildLessonContent,
+  mapItem,
+  mapLesson,
+  mapObjective,
+  mapPathNode,
+  mapReference,
+  mapUnit,
+  type ItemRow,
+  type LessonCardRow,
+  type LessonReferenceRow,
+  type LessonRow,
+  type ObjectiveRow,
+  type PathNodeRow,
+  type ReferenceRow,
+  type UnitRow,
+} from "@/content/curriculum/hydrate";
+
+import type { Npc, NpcLine } from "@/content/npcs/types";
 import type {
+  Item,
+  ItemSurface,
   Lesson,
-  LessonStep,
-  Myth,
-  Quiz,
-  QuizQuestion,
-  QuizType,
-} from "@/content/types";
+  LessonContent,
+  Objective,
+  PathNode,
+  Reference,
+  Unit,
+} from "@/content/curriculum/types";
 
 import type {
   AtomMazeChallenge,
@@ -54,6 +73,15 @@ import type {
   MonsterElement,
 } from "@/content/explorer/types";
 
+import {
+  REQUIRED_CONTENT_TABLES,
+  schemaMismatch,
+  decideSeedAction,
+  verifyCandidate,
+  type CandidateReport,
+  type ContentMeta,
+} from "@/services/content-db-core";
+
 // ---------------------------------------------------------------------------
 // Constants
 // ---------------------------------------------------------------------------
@@ -61,15 +89,31 @@ import type {
 /** Name of the bundled + on-device database file. Must match the asset name. */
 export const CONTENT_DB_NAME = "content.db";
 
-/**
- * Bump this whenever the bundled content.db schema/data changes. The marker
- * file lets us detect stale copies and re-copy the fresh bundle on the next
- * launch (otherwise the device would silently keep using old content forever).
- */
-export const CONTENT_DB_VERSION = 761032891;
+/** Scratch names used while a new database is copied in and verified before the swap. */
+const CONTENT_DB_NEXT_NAME = "content.next.db";
+const CONTENT_DB_PREV_NAME = "content.prev.db";
 
-/** Marker file stored next to the db, whose content is CONTENT_DB_VERSION. */
-const VERSION_MARKER = "content.db.version";
+/**
+ * Content version compiled into this build: "1.4.0" for a published release or
+ * "1.4.0+draft.a1b2c3" while there are unpublished edits.
+ *
+ * Rewritten ONLY by `scripts/sync-content.js` and `npm run release:content`
+ * from the release ledger (content/releases.json). Never edit it by hand.
+ * The same value is stamped into the bundled database's `content_meta` table,
+ * so a device always compares the version of the data it actually holds.
+ */
+export const CONTENT_DB_VERSION = "0.0.0+draft.6039dd";
+
+/**
+ * Shape of the content this build's repository reads (columns, step types,
+ * tables). Bump BY HAND when that shape changes. A release that changes it is a
+ * MAJOR content release. See docs/CONTENT_SQLITE_AND_STUDIO_SPEC.md §3.2.
+ */
+export const CONTENT_SCHEMA_VERSION = 3;
+
+/** Marker files from older builds / developer preview, stored next to the database. */
+const LEGACY_VERSION_MARKER = "content.db.version";
+const PREVIEW_MARKER = "content.preview";
 
 /**
  * URI helpers for the SQLite directory.
@@ -78,7 +122,7 @@ const VERSION_MARKER = "content.db.version";
  * (e.g. `/data/user/0/<pkg>/files/SQLite` — no `file://` scheme), while the
  * file-system APIs require a `file://` URI. Passing the raw path straight
  * into `File`/`Directory` breaks seeding on Android release builds, so every
- * marker/dir operation below goes through these normalized URIs via the
+ * file operation below goes through these normalized URIs via the
  * battle-tested legacy `expo-file-system` API. The actual database copy uses
  * expo-sqlite's own official primitive (the same one `SQLiteProvider`
  * uses for asset databases), which handles native paths internally.
@@ -89,66 +133,195 @@ const toFileUri = (path: string): string =>
 const dbDirUri = (): string =>
   toFileUri(SQLite.defaultDatabaseDirectory.replace(/\/*$/, ""));
 
-const dbFileUri = (): string => `${dbDirUri()}/${CONTENT_DB_NAME}`;
+const dbFileUri = (name: string = CONTENT_DB_NAME): string => `${dbDirUri()}/${name}`;
 
-const versionMarkerUri = (): string => `${dbDirUri()}/${VERSION_MARKER}`;
+/** Delete a database file together with its journal sidecars. */
+async function deleteDatabaseFiles(name: string): Promise<void> {
+  for (const ext of ["", "-wal", "-shm", "-journal"]) {
+    await FileSystem.deleteAsync(`${dbFileUri(name)}${ext}`, { idempotent: true });
+  }
+}
 
 // ---------------------------------------------------------------------------
-// Copy from the read-only bundle into writable local storage (first launch)
+// Seeding: bundled asset → verified scratch copy → atomic swap
 // ---------------------------------------------------------------------------
 
 let seeded = false;
 let seedPromise: Promise<void> | null = null;
 let lastSeedError: Error | null = null;
+/** `content_meta` of the database currently in use (null until known). */
+let activeMeta: ContentMeta | null = null;
+let previewActive = false;
 
 /**
- * Run a quick sanity query against the on-device content database to confirm
- * it actually contains data (catches "open succeeded but empty/corrupt file"
- * cases that otherwise look like a successful install).
+ * Open a database file in the SQLite directory and report what is in it.
+ * The file must exist: opening a missing name would silently create an empty one.
  */
-async function verifyContentDb(): Promise<boolean> {
+async function readContentReport(name: string): Promise<CandidateReport> {
+  const db = await SQLite.openDatabaseAsync(name);
   try {
-    const db = await SQLite.openDatabaseAsync(CONTENT_DB_NAME);
+    let meta: ContentMeta | null = null;
     try {
-      const row = await db.getFirstAsync<{ count: number }>(
-        "SELECT COUNT(*) AS count FROM lessons",
+      const rows = await db.getAllAsync<{ key: string; value: string }>(
+        "SELECT key, value FROM content_meta",
       );
-      const count = row?.count ?? 0;
-      console.log(`[content-db] Integrity check: ${count} lessons seeded`);
-      return count > 0;
-    } finally {
-      await db.closeAsync().catch(() => {});
+      meta = Object.fromEntries(rows.map((r) => [r.key, r.value])) as ContentMeta;
+    } catch {
+      meta = null; // table missing: database predates content_meta
     }
+
+    let quickCheck: string | null = null;
+    try {
+      const row = await db.getFirstAsync<Record<string, unknown>>("PRAGMA quick_check");
+      quickCheck = row ? String(Object.values(row)[0]) : null;
+    } catch {
+      quickCheck = null;
+    }
+
+    const tableCounts: Record<string, number | undefined> = {};
+    for (const table of REQUIRED_CONTENT_TABLES) {
+      try {
+        const row = await db.getFirstAsync<{ count: number }>(
+          `SELECT COUNT(*) AS count FROM ${table}`,
+        );
+        tableCounts[table] = row?.count ?? 0;
+      } catch {
+        tableCounts[table] = undefined;
+      }
+    }
+    return { meta, quickCheck, tableCounts };
+  } finally {
+    await db.closeAsync().catch(() => {});
+  }
+}
+
+/** Inspect the on-device database, if there is one. */
+async function readLocalState(): Promise<{
+  exists: boolean;
+  meta: ContentMeta | null;
+  integrityOk: boolean;
+}> {
+  const info = await FileSystem.getInfoAsync(dbFileUri());
+  if (!info.exists) return { exists: false, meta: null, integrityOk: false };
+  try {
+    const report = await readContentReport(CONTENT_DB_NAME);
+    const version = report.meta?.content_version ?? "";
+    return {
+      exists: true,
+      meta: report.meta,
+      integrityOk: verifyCandidate(report, version) === null,
+    };
   } catch (e) {
-    console.error("[content-db] Integrity check failed:", e);
-    return false;
+    console.warn("[content-db] Existing copy could not be read", e);
+    return { exists: true, meta: null, integrityOk: false };
+  }
+}
+
+async function readPreviewMarker(): Promise<string | null> {
+  const uri = `${dbDirUri()}/${PREVIEW_MARKER}`;
+  try {
+    const info = await FileSystem.getInfoAsync(uri);
+    if (!info.exists) return null;
+    return (await FileSystem.readAsStringAsync(uri)).trim() || null;
+  } catch {
+    return null;
+  }
+}
+
+/** Close and forget the cached read handle so files can be replaced safely. */
+async function releaseContentHandle(): Promise<void> {
+  const pending = dbPromise;
+  dbPromise = null;
+  if (!pending) return;
+  try {
+    const handle = await pending;
+    await handle.closeAsync();
+  } catch {
+    /* handle never opened, or already closed */
   }
 }
 
 /**
- * Copy the bundled content.db into writable SQLite storage using expo-sqlite's
- * official asset-import primitive (the same one `SQLiteProvider` uses for
- * `assetSource`). This resolves the bundled asset and performs the copy
- * natively, so it behaves identically on iOS and Android release builds.
+ * Replace the live database with the verified scratch copy.
+ *
+ * The previous file is moved aside first and only deleted once the new one is
+ * in place. If the final move fails, the old content is moved back instead of
+ * leaving the app with none. (If the process dies in between, the next launch
+ * finds no `content.db` and seeds from the bundle again.)
  */
-async function copyBundledDatabase(): Promise<void> {
-  await importDatabaseFromAssetAsync(CONTENT_DB_NAME, {
-    assetId: require("@/assets/database/content.db"),
-    forceOverwrite: true,
-  });
+async function swapInCandidate(): Promise<void> {
+  await releaseContentHandle();
+  await deleteDatabaseFiles(CONTENT_DB_PREV_NAME);
+
+  const hadLive = (await FileSystem.getInfoAsync(dbFileUri())).exists;
+  if (hadLive) {
+    // Sidecars belong to the old file; drop them before it is renamed.
+    for (const ext of ["-wal", "-shm", "-journal"]) {
+      await FileSystem.deleteAsync(`${dbFileUri()}${ext}`, { idempotent: true });
+    }
+    await FileSystem.moveAsync({ from: dbFileUri(), to: dbFileUri(CONTENT_DB_PREV_NAME) });
+  }
+  try {
+    await FileSystem.moveAsync({
+      from: dbFileUri(CONTENT_DB_NEXT_NAME),
+      to: dbFileUri(),
+    });
+  } catch (e) {
+    if (hadLive) {
+      await FileSystem.moveAsync({
+        from: dbFileUri(CONTENT_DB_PREV_NAME),
+        to: dbFileUri(),
+      }).catch(() => {});
+    }
+    throw e;
+  }
+  await deleteDatabaseFiles(CONTENT_DB_PREV_NAME);
 }
 
 /**
- * Ensure the bundled content.db is present in writable storage.
+ * Copy the bundled asset into a scratch file with expo-sqlite's official
+ * asset-import primitive (the one `SQLiteProvider` uses for `assetSource`),
+ * verify it, then swap it in. On any failure the existing `content.db` is untouched.
+ */
+async function installBundledDatabase(): Promise<void> {
+  await deleteDatabaseFiles(CONTENT_DB_NEXT_NAME);
+  await importDatabaseFromAssetAsync(CONTENT_DB_NEXT_NAME, {
+    assetId: require("@/assets/database/content.db"),
+    forceOverwrite: true,
+  });
+
+  const report = await readContentReport(CONTENT_DB_NEXT_NAME);
+  const problem = verifyCandidate(report, CONTENT_DB_VERSION);
+  if (problem) {
+    await deleteDatabaseFiles(CONTENT_DB_NEXT_NAME);
+    throw new Error(`[content-db] Bundled database failed verification: ${problem}`);
+  }
+  if (schemaMismatch(report.meta, CONTENT_SCHEMA_VERSION)) {
+    const message =
+      `[content-db] Bundled schema ${report.meta?.schema_version} does not match ` +
+      `this build (${CONTENT_SCHEMA_VERSION}). Re-run npm run sync-content.`;
+    if (__DEV__) {
+      await deleteDatabaseFiles(CONTENT_DB_NEXT_NAME);
+      throw new Error(message);
+    }
+    console.warn(message); // release builds keep the bundle: it is all we have
+  }
+
+  await swapInCandidate();
+  activeMeta = report.meta;
+}
+
+/**
+ * Ensure a verified content.db that matches this build is present in writable storage.
  *
- * Strategy:
- *   1. If a local copy already exists AND its version marker matches the
- *      bundled version, do nothing (fast path on every launch).
- *   2. Otherwise delete any stale copy, copy the freshly bundled asset into
- *      `SQLite.defaultDatabaseDirectory`, and write the version marker.
+ *   1. Read `content_meta` from the on-device copy. If its version equals
+ *      CONTENT_DB_VERSION and it passes the integrity check, it is ready.
+ *   2. Otherwise copy the bundle to `content.next.db`, verify it (version,
+ *      `PRAGMA quick_check`, every required table non-empty) and swap it in.
  *
- * This method is idempotent and safe to call multiple times (concurrent
- * callers share a single seeding run).
+ * Idempotent: concurrent callers share one run. Screens normally do not call
+ * this: `ContentGate` waits for it at startup. `getReadyContentDb()` keeps
+ * calling it as a safety net.
  */
 export function ensureContentDatabase(): Promise<void> {
   // Bundled-asset copying only applies to native platforms.
@@ -161,51 +334,38 @@ export function ensureContentDatabase(): Promise<void> {
 
   seedPromise = (async () => {
     try {
-      // The SQLite directory is created lazily by expo-sqlite; make sure it
-      // exists before the marker ops below touch it.
+      // The SQLite directory is created lazily by expo-sqlite; make sure it exists.
       const dirInfo = await FileSystem.getInfoAsync(dbDirUri());
       if (!dirInfo.exists) {
-        await FileSystem.makeDirectoryAsync(dbDirUri(), {
-          intermediates: true,
-        });
+        await FileSystem.makeDirectoryAsync(dbDirUri(), { intermediates: true });
       }
 
-      const markerInfo = await FileSystem.getInfoAsync(versionMarkerUri());
-      if (markerInfo.exists) {
-        let marker = "";
-        try {
-          marker = (await FileSystem.readAsStringAsync(versionMarkerUri())).trim();
-        } catch (e) {
-          console.warn("[content-db] Version marker unreadable; re-seeding", e);
-        }
+      const previewVersion = __DEV__ ? await readPreviewMarker() : null;
+      const local = await readLocalState();
+      const decision = decideSeedAction({
+        localExists: local.exists,
+        localVersion: local.meta?.content_version ?? null,
+        integrityOk: local.integrityOk,
+        bundledVersion: CONTENT_DB_VERSION,
+        previewVersion,
+      });
 
-        if (marker === String(CONTENT_DB_VERSION)) {
-          // Fast path: fresh copy present — but confirm it is not an empty shell.
-          if (await verifyContentDb()) {
-            seeded = true;
-            return;
-          }
-          console.warn("[content-db] Existing copy failed integrity check; re-seeding");
-        }
+      if (decision.action === "ready") {
+        activeMeta = local.meta;
+        previewActive = !!previewVersion && local.meta?.content_version === previewVersion;
+        seeded = true;
+        return;
       }
 
-      console.log("[content-db] Seeding bundled content database...");
+      console.log(`[content-db] Seeding bundled content ${CONTENT_DB_VERSION} (${decision.reason})…`);
+      await installBundledDatabase();
 
-      // Delete any stale/partial copy first so the import starts clean (this
-      // also clears leftover -shm/-wal sidecars from a previous version).
-      await FileSystem.deleteAsync(dbFileUri(), { idempotent: true });
+      // Clean up what older builds and developer preview left behind.
+      await FileSystem.deleteAsync(`${dbDirUri()}/${LEGACY_VERSION_MARKER}`, { idempotent: true });
+      await FileSystem.deleteAsync(`${dbDirUri()}/${PREVIEW_MARKER}`, { idempotent: true });
+      previewActive = false;
 
-      await copyBundledDatabase();
-      await FileSystem.writeAsStringAsync(
-        versionMarkerUri(),
-        String(CONTENT_DB_VERSION),
-      );
-
-      if (!(await verifyContentDb())) {
-        throw new Error("[content-db] Seeded copy failed integrity check (no lessons found).");
-      }
-
-      console.log(`[content-db] Seeded ${CONTENT_DB_NAME} (v${CONTENT_DB_VERSION})`);
+      console.log(`[content-db] Ready: ${CONTENT_DB_NAME} v${CONTENT_DB_VERSION}`);
       seeded = true;
     } catch (e) {
       lastSeedError = e instanceof Error ? e : new Error(String(e));
@@ -219,17 +379,91 @@ export function ensureContentDatabase(): Promise<void> {
   return seedPromise;
 }
 
-/** Status of the content database seeding — surfaced in the Settings screen. */
+/** Forget a failed run and try again (used by the Try again button). */
+export function retryContentDatabase(): Promise<void> {
+  lastSeedError = null;
+  seeded = false;
+  return ensureContentDatabase();
+}
+
+/** Status of the content database — surfaced in the Settings screen. */
 export function getContentDbStatus(): {
   seeded: boolean;
-  version: number;
+  /** Version of the data actually in use (falls back to the build's version until known). */
+  version: string;
+  /** Version compiled into this build. */
+  bundledVersion: string;
+  schemaVersion: string | null;
+  builtAt: string | null;
+  /** True while a Content Studio preview replaces the bundled content (dev builds only). */
+  preview: boolean;
   lastError: string | null;
 } {
   return {
     seeded,
-    version: CONTENT_DB_VERSION,
+    version: activeMeta?.content_version ?? CONTENT_DB_VERSION,
+    bundledVersion: CONTENT_DB_VERSION,
+    schemaVersion: activeMeta?.schema_version ?? null,
+    builtAt: activeMeta?.built_at ?? null,
+    preview: previewActive,
     lastError: lastSeedError ? lastSeedError.message : null,
   };
+}
+
+// ---------------------------------------------------------------------------
+// Developer preview: load the in-progress database from Content Studio
+// ---------------------------------------------------------------------------
+
+/**
+ * Download the working database from Content Studio (`STUDIO_PREVIEW=1`) and use
+ * it instead of the bundle, until `resetToBundledContent()` or a reinstall.
+ * Dev builds only. The download is verified exactly like the bundled copy.
+ *
+ * @param baseUrl e.g. `http://192.168.1.20:8787`
+ * @param code the short pairing code shown in Studio
+ */
+export async function loadPreviewContent(baseUrl: string, code: string): Promise<ContentMeta> {
+  if (!__DEV__) throw new Error("Content preview is only available in development builds.");
+  const root = baseUrl.replace(/\/+$/, "");
+  const url = `${root}/api/preview.db?code=${encodeURIComponent(code.trim())}`;
+
+  await ensureContentDatabase();
+  await deleteDatabaseFiles(CONTENT_DB_NEXT_NAME);
+  const result = await FileSystem.downloadAsync(url, dbFileUri(CONTENT_DB_NEXT_NAME));
+  if (result.status !== 200) {
+    await deleteDatabaseFiles(CONTENT_DB_NEXT_NAME);
+    throw new Error(
+      result.status === 403
+        ? "Studio refused the pairing code."
+        : `Studio answered HTTP ${result.status}.`,
+    );
+  }
+
+  const report = await readContentReport(CONTENT_DB_NEXT_NAME);
+  const version = report.meta?.content_version ?? "";
+  const problem = verifyCandidate(report, version);
+  if (problem || schemaMismatch(report.meta, CONTENT_SCHEMA_VERSION)) {
+    await deleteDatabaseFiles(CONTENT_DB_NEXT_NAME);
+    throw new Error(
+      problem ??
+        `Studio's schema (${report.meta?.schema_version}) does not match this build (${CONTENT_SCHEMA_VERSION}).`,
+    );
+  }
+
+  await swapInCandidate();
+  await FileSystem.writeAsStringAsync(`${dbDirUri()}/${PREVIEW_MARKER}`, version);
+  activeMeta = report.meta;
+  previewActive = true;
+  seeded = true;
+  return report.meta as ContentMeta;
+}
+
+/** Drop a developer preview and restore the content bundled with this build. */
+export async function resetToBundledContent(): Promise<void> {
+  await FileSystem.deleteAsync(`${dbDirUri()}/${PREVIEW_MARKER}`, { idempotent: true });
+  seeded = false;
+  previewActive = false;
+  await ensureContentDatabase();
 }
 
 // ---------------------------------------------------------------------------
@@ -268,27 +502,6 @@ export async function getReadyContentDb(): Promise<SQLite.SQLiteDatabase> {
 // Row → domain object mapping
 // ---------------------------------------------------------------------------
 
-/** Raw shape of a `lessons` row as returned by expo-sqlite. */
-interface LessonRow {
-  id: string;
-  title: string;
-  description: string;
-  unit_id: string;
-  difficulty: Lesson["difficulty"];
-  estimated_minutes: number;
-  xp_reward: number;
-  prerequisites: string; // JSON array of lesson ids
-  tags: string; // JSON array of strings
-}
-
-/** Raw shape of a `lesson_steps` row as returned by expo-sqlite. */
-interface LessonStepRow {
-  lesson_id: string;
-  id: string;
-  step_type: LessonStep["type"];
-  data: string; // JSON document, shape depends on step_type
-}
-
 /** Safely JSON.parse a column that may be null/empty. */
 function parseJsonArray(raw: string | null | undefined): string[] {
   if (!raw) return [];
@@ -322,16 +535,6 @@ function parseJsonObject<T>(raw: string | null | undefined): T | null {
   }
 }
 
-/** Parse the flexible step `data` JSON back into a plain object. */
-function parseStepData(raw: string): Record<string, unknown> {
-  if (!raw) return {};
-  try {
-    return JSON.parse(raw);
-  } catch {
-    return {};
-  }
-}
-
 /** Parse a JSON-encoded string/number/boolean back to its runtime value. */
 function parseScalarJson(raw: string | null | undefined): string | number | boolean {
   if (raw === null || raw === undefined || raw === "") return 0;
@@ -345,37 +548,6 @@ function parseScalarJson(raw: string | null | undefined): string | number | bool
 // ---------------------------------------------------------------------------
 // Quiz row mapping
 // ---------------------------------------------------------------------------
-
-/** Raw shape of a `quizzes` row as returned by expo-sqlite. */
-interface QuizRow {
-  id: string;
-  title: string;
-  description: string;
-  category: string;
-  difficulty: string;
-  passing_score: number;
-  xp_reward: number;
-  time_limit: number | null;
-  unit_id: string | null;
-  estimated_minutes: number | null;
-  metadata: string; // JSON object
-  tags: string; // JSON array of strings
-}
-
-/** Raw shape of a `quiz_questions` row as returned by expo-sqlite. */
-interface QuizQuestionRow {
-  quiz_id: string;
-  id: string;
-  type: QuizType;
-  question: string;
-  options: string; // JSON array of strings
-  correct_answer: string; // JSON-encoded number|boolean|string
-  explanation: string;
-  difficulty: string;
-  points: number;
-  image: string | null;
-  time_limit: number | null;
-}
 
 /** Raw shape of a `mythbuster_questions` row as returned by expo-sqlite. */
 interface MythBusterQuestionRow {
@@ -434,52 +606,6 @@ interface MazeRoomRow {
   unlock_condition: string | null; // JSON { type, value } when set
 }
 
-/** Parse the quizzes.metadata JSON back into a plain object. */
-function parseMetadata(raw: string | null | undefined): Record<string, unknown> {
-  if (!raw) return {};
-  try {
-    const parsed = JSON.parse(raw);
-    return typeof parsed === "object" && parsed !== null ? parsed : {};
-  } catch {
-    return {};
-  }
-}
-
-/** Flatten a quiz row + its questions into the domain `Quiz` shape. */
-function mapQuizRow(
-  row: QuizRow,
-  questions: QuizQuestionRow[],
-): Quiz {
-  const metadata = parseMetadata(row.metadata);
-  const hasMetadata = Object.keys(metadata).length > 0;
-  return {
-    id: row.id,
-    title: row.title,
-    description: row.description,
-    category: row.category,
-    difficulty: row.difficulty as Quiz["difficulty"],
-    passingScore: row.passing_score,
-    xpReward: row.xp_reward,
-    ...(row.time_limit != null ? { timeLimit: row.time_limit } : {}),
-    ...(row.unit_id ? { unitId: row.unit_id } : {}),
-    ...(row.estimated_minutes != null ? { estimatedMinutes: row.estimated_minutes } : {}),
-    ...(hasMetadata ? { metadata } : {}),
-    tags: parseJsonArray(row.tags),
-    questions: questions.map((q) => ({
-      id: q.id,
-      type: q.type,
-      question: q.question,
-      options: parseJsonArray(q.options),
-      correctAnswer: parseScalarJson(q.correct_answer) as QuizQuestion["correctAnswer"],
-      explanation: q.explanation,
-      difficulty: q.difficulty as QuizQuestion["difficulty"],
-      points: q.points,
-      ...(q.image ? { image: q.image } : {}),
-      ...(q.time_limit != null ? { timeLimit: q.time_limit } : {}),
-    })),
-  };
-}
-
 /** Flatten a mythbuster question row into the domain `QuizQuestion` shape. */
 function mapMythBusterQuestionRow(row: MythBusterQuestionRow): QuizQuestion {
   return {
@@ -510,22 +636,6 @@ function mapMythRow(row: MythRow): Myth {
     ...(row.image ? { image: row.image } : {}),
     tags: parseJsonArray(row.tags),
     popularity: row.popularity,
-  };
-}
-
-/** Flatten a lesson row into the domain `Lesson` shape, without steps yet. */
-function mapLessonRow(row: LessonRow) {
-  return {
-    id: row.id,
-    title: row.title,
-    description: row.description,
-    unitId: row.unit_id,
-    difficulty: row.difficulty,
-    estimatedMinutes: row.estimated_minutes,
-    xpReward: row.xp_reward,
-    prerequisites: parseJsonArray(row.prerequisites),
-    tags: parseJsonArray(row.tags),
-    steps: [] as LessonStep[],
   };
 }
 
@@ -773,157 +883,155 @@ function mapPostRow(row: PostRow): Post {
  * on-device db. Each method first ensures the bundled db was seeded.
  */
 export class ContentRepository {
-  /**
-   * Fetch a full lesson by ID: the `lessons` row plus its `lesson_steps` rows
-   * ordered by `position`, with every JSON string column parsed back into
-   * usable objects.
-   *
-   * Returns `null` when no lesson with that ID exists.
-   */
+  // -------------------------------------------------------------------------
+  // Curriculum: units, path, lessons made of cards, the item bank, references
+  // -------------------------------------------------------------------------
+
+  /** Units in path order. */
+  async getUnits(): Promise<Unit[]> {
+    const db = await getReadyContentDb();
+    const rows = await db.getAllAsync<UnitRow>("SELECT * FROM units ORDER BY position ASC");
+    return rows.map(mapUnit);
+  }
+
+  /** NPC teachers in cast order. Throws when the bundled database has no `npcs` table (the facade falls back). */
+  async getNpcs(): Promise<Npc[]> {
+    const db = await getReadyContentDb();
+    const rows = await db.getAllAsync<{ id: string; name: string; title: string; field: string; bio: string; spec: string; position: number }>(
+      "SELECT id, name, title, field, bio, spec, position FROM npcs ORDER BY position ASC",
+    );
+    return rows.map((r) => ({ id: r.id, name: r.name, title: r.title, field: r.field, bio: r.bio, spec: JSON.parse(r.spec), position: r.position }));
+  }
+
+  /** NPC voice lines. Throws when the bundled database has no `npc_lines` table. */
+  async getNpcLines(): Promise<NpcLine[]> {
+    const db = await getReadyContentDb();
+    const rows = await db.getAllAsync<{ id: string; npc_id: string; kind: string; lesson_id: string | null; journey_id: string | null; text: string; pose: string }>(
+      "SELECT id, npc_id, kind, lesson_id, journey_id, text, pose FROM npc_lines ORDER BY id ASC",
+    );
+    return rows.map((r) => ({ id: r.id, npcId: r.npc_id, kind: r.kind as NpcLine["kind"], lessonId: r.lesson_id, journeyId: r.journey_id, text: r.text, pose: r.pose as NpcLine["pose"] }));
+  }
+
+  /** One unit, or `null`. */
+  async getUnitById(id: string): Promise<Unit | null> {
+    const db = await getReadyContentDb();
+    const row = await db.getFirstAsync<UnitRow>("SELECT * FROM units WHERE id = ? LIMIT 1", [id]);
+    return row ? mapUnit(row) : null;
+  }
+
+  /** Objectives, optionally for one unit, in path order. */
+  async getObjectives(unitId?: string): Promise<Objective[]> {
+    const db = await getReadyContentDb();
+    const rows = unitId
+      ? await db.getAllAsync<ObjectiveRow>("SELECT * FROM objectives WHERE unit_id = ? ORDER BY position ASC", [unitId])
+      : await db.getAllAsync<ObjectiveRow>(
+          "SELECT o.* FROM objectives o JOIN units u ON u.id = o.unit_id ORDER BY u.position ASC, o.position ASC",
+        );
+    return rows.map(mapObjective);
+  }
+
+  /** Path nodes (lesson, practice, checkpoint), optionally for one unit, in path order. */
+  async getPathNodes(unitId?: string): Promise<PathNode[]> {
+    const db = await getReadyContentDb();
+    const rows = unitId
+      ? await db.getAllAsync<PathNodeRow>("SELECT * FROM path_nodes WHERE unit_id = ? ORDER BY position ASC", [unitId])
+      : await db.getAllAsync<PathNodeRow>(
+          "SELECT n.* FROM path_nodes n JOIN units u ON u.id = n.unit_id ORDER BY u.position ASC, n.position ASC",
+        );
+    return rows.map(mapPathNode);
+  }
+
+  /** Lesson metadata only (no cards), optionally for one unit. */
+  async getLessons(unitId?: string): Promise<Lesson[]> {
+    const db = await getReadyContentDb();
+    const rows = unitId
+      ? await db.getAllAsync<LessonRow>("SELECT * FROM lessons WHERE unit_id = ? ORDER BY id ASC", [unitId])
+      : await db.getAllAsync<LessonRow>("SELECT * FROM lessons ORDER BY id ASC");
+    return rows.map(mapLesson);
+  }
+
+  /** Lesson metadata for one id, or `null`. */
   async getLessonById(id: string): Promise<Lesson | null> {
     const db = await getReadyContentDb();
-
-    const row = await db.getFirstAsync<LessonRow>(
-      "SELECT * FROM lessons WHERE id = ? LIMIT 1",
-      [id],
-    );
-    if (!row) return null;
-
-    const stepRows = await db.getAllAsync<LessonStepRow>(
-      "SELECT id, step_type, data FROM lesson_steps WHERE lesson_id = ? ORDER BY position ASC",
-      [id],
-    );
-
-    return this.nodeToLesson(row, stepRows);
+    const row = await db.getFirstAsync<LessonRow>("SELECT * FROM lessons WHERE id = ? LIMIT 1", [id]);
+    return row ? mapLesson(row) : null;
   }
 
-  /**
-   * Every lesson, fully hydrated (steps + parsed JSON), ordered by id.
-   * Useful for search, menus, and any place that needs the whole catalog.
-   */
-  async getAllLessons(): Promise<Lesson[]> {
+  /** A playable lesson: ordered cards with their bank items attached, plus its references. */
+  async getLessonContent(id: string): Promise<LessonContent | null> {
     const db = await getReadyContentDb();
-
-    const rows = await db.getAllAsync<LessonRow>(
-      "SELECT * FROM lessons ORDER BY id",
+    const lessonRow = await db.getFirstAsync<LessonRow>("SELECT * FROM lessons WHERE id = ? LIMIT 1", [id]);
+    if (!lessonRow) return null;
+    const cardRows = await db.getAllAsync<LessonCardRow>(
+      "SELECT * FROM lesson_cards WHERE lesson_id = ? ORDER BY position ASC",
+      [id],
     );
-    const stepRows = await db.getAllAsync<LessonStepRow>(
-      "SELECT * FROM lesson_steps ORDER BY lesson_id ASC, position ASC",
+    const itemRows = await db.getAllAsync<ItemRow>(
+      "SELECT i.* FROM items i JOIN lesson_cards c ON c.item_id = i.id WHERE c.lesson_id = ?",
+      [id],
     );
-
-    // Group steps by lesson while preserving `position` order.
-    const stepsByLessonId = new Map<string, LessonStepRow[]>();
-    for (const stepRow of stepRows) {
-      const list = stepsByLessonId.get(stepRow.lesson_id);
-      if (list) list.push(stepRow);
-      else stepsByLessonId.set(stepRow.lesson_id, [stepRow]);
-    }
-
-    return rows.map((row) =>
-      this.nodeToLesson(row, stepsByLessonId.get(row.id) ?? []),
+    const referenceRows = await db.getAllAsync<LessonReferenceRow>(
+      `SELECT r.*, lr.supports FROM lesson_references lr
+         JOIN content_references r ON r.id = lr.reference_id
+        WHERE lr.lesson_id = ? ORDER BY lr.position ASC`,
+      [id],
     );
+    return buildLessonContent(lessonRow, cardRows, itemRows, referenceRows);
   }
 
-  /** Lessons belonging to a single unit, in the canonical id/position order. */
-  async getLessonsByUnit(unitId: string): Promise<Lesson[]> {
+  /** References for a unit, in display order. */
+  async getUnitReferences(unitId: string): Promise<Reference[]> {
     const db = await getReadyContentDb();
-
-    const rows = await db.getAllAsync<LessonRow>(
-      "SELECT * FROM lessons WHERE unit_id = ? ORDER BY id",
+    const rows = await db.getAllAsync<ReferenceRow>(
+      `SELECT r.* FROM unit_references ur
+         JOIN content_references r ON r.id = ur.reference_id
+        WHERE ur.unit_id = ? ORDER BY ur.position ASC`,
       [unitId],
     );
-    const stepRows = await db.getAllAsync<LessonStepRow>(
-      "SELECT * FROM lesson_steps ORDER BY lesson_id ASC, position ASC",
-    );
-
-    const stepsByLessonId = new Map<string, LessonStepRow[]>();
-    for (const stepRow of stepRows) {
-      const list = stepsByLessonId.get(stepRow.lesson_id);
-      if (list) list.push(stepRow);
-      else stepsByLessonId.set(stepRow.lesson_id, [stepRow]);
-    }
-
-    return rows.map((row) =>
-      this.nodeToLesson(row, stepsByLessonId.get(row.id) ?? []),
-    );
+    return rows.map(mapReference);
   }
 
-  /** Number of lessons seeded — handy for integrity checks on launch. */
+  /** Items from the bank, filtered by objective and/or surface. Predictions are never returned. */
+  async getItems(filter: { objectiveIds?: string[]; surface?: ItemSurface } = {}): Promise<Item[]> {
+    const db = await getReadyContentDb();
+    const where: string[] = ["type != 'predict'"];
+    const params: string[] = [];
+    if (filter.objectiveIds) {
+      if (filter.objectiveIds.length === 0) return [];
+      where.push(`objective_id IN (${filter.objectiveIds.map(() => "?").join(",")})`);
+      params.push(...filter.objectiveIds);
+    }
+    if (filter.surface) {
+      where.push("EXISTS (SELECT 1 FROM json_each(items.surfaces) WHERE json_each.value = ?)");
+      params.push(filter.surface);
+    }
+    const rows = await db.getAllAsync<ItemRow>(`SELECT * FROM items WHERE ${where.join(" AND ")} ORDER BY id ASC`, params);
+    return rows.map(mapItem);
+  }
+
+  /** References by id, in the order asked. Unknown ids are skipped. */
+  async getReferencesByIds(ids: string[]): Promise<Reference[]> {
+    if (ids.length === 0) return [];
+    const db = await getReadyContentDb();
+    const rows = await db.getAllAsync<ReferenceRow>(
+      `SELECT * FROM content_references WHERE id IN (${ids.map(() => "?").join(",")})`,
+      ids,
+    );
+    const byId = new Map(rows.map((r) => [r.id, mapReference(r)]));
+    return ids.map((id) => byId.get(id)).filter((r): r is Reference => !!r);
+  }
+
+  /** Number of lessons seeded: handy for integrity checks. */
   async getLessonCount(): Promise<number> {
     const db = await getReadyContentDb();
-    const { count } = (await db.getFirstAsync<{ count: number }>(
-      "SELECT COUNT(*) AS count FROM lessons",
-    )) as { count: number };
+    const { count } = (await db.getFirstAsync<{ count: number }>("SELECT COUNT(*) AS count FROM lessons")) as { count: number };
     return count;
   }
 
-  // -------------------------------------------------------------------------
-  // Quizzes
-  // -------------------------------------------------------------------------
-
-  /**
-   * Fetch a full quiz by ID: the `quizzes` row plus its `quiz_questions` rows
-   * ordered by `position`, with every JSON string column parsed back into
-   * usable objects. Returns `null` when no quiz matches.
-   */
-  async getQuizById(id: string): Promise<Quiz | null> {
+  /** Number of bank items seeded. */
+  async getItemCount(): Promise<number> {
     const db = await getReadyContentDb();
-
-    const row = await db.getFirstAsync<QuizRow>(
-      "SELECT * FROM quizzes WHERE id = ? LIMIT 1",
-      [id],
-    );
-    if (!row) return null;
-
-    const questionRows = await db.getAllAsync<QuizQuestionRow>(
-      "SELECT * FROM quiz_questions WHERE quiz_id = ? ORDER BY position ASC",
-      [id],
-    );
-
-    return mapQuizRow(row, questionRows);
-  }
-
-  /**
-   * Fetch full quizzes (questions + parsed JSON), optionally filtered by
-   * criterion. `filter` receives the hydrated quiz and returns true to keep.
-   */
-  private async getQuizzes(filter?: (quiz: Quiz) => boolean): Promise<Quiz[]> {
-    const db = await getReadyContentDb();
-
-    const quizRows = await db.getAllAsync<QuizRow>(
-      "SELECT * FROM quizzes ORDER BY id",
-    );
-    if (quizRows.length === 0) return [];
-
-    const questionRows = await db.getAllAsync<QuizQuestionRow>(
-      "SELECT * FROM quiz_questions ORDER BY quiz_id ASC, position ASC",
-    );
-
-    const questionsByQuiz = new Map<string, QuizQuestionRow[]>();
-    for (const row of questionRows) {
-      const list = questionsByQuiz.get(row.quiz_id);
-      if (list) list.push(row);
-      else questionsByQuiz.set(row.quiz_id, [row]);
-    }
-
-    const quizzes = quizRows.map((row) =>
-      mapQuizRow(row, questionsByQuiz.get(row.id) ?? []),
-    );
-
-    return filter ? quizzes.filter(filter) : quizzes;
-  }
-
-  /** Every quiz, fully hydrated, ordered by id. */
-  async getAllQuizzes(): Promise<Quiz[]> {
-    return this.getQuizzes();
-  }
-
-  /** Number of quizzes seeded — handy for integrity checks on launch. */
-  async getQuizCount(): Promise<number> {
-    const db = await getReadyContentDb();
-    const { count } = (await db.getFirstAsync<{ count: number }>(
-      "SELECT COUNT(*) AS count FROM quizzes",
-    )) as { count: number };
+    const { count } = (await db.getFirstAsync<{ count: number }>("SELECT COUNT(*) AS count FROM items")) as { count: number };
     return count;
   }
 
@@ -1169,20 +1277,6 @@ export class ContentRepository {
     return rows.map(mapPostRow);
   }
 
-  // -------------------------------------------------------------------------
-  // Lessons
-  // -------------------------------------------------------------------------
-
-  /** Combine a lesson row + its (already ordered) step rows into a `Lesson`. */
-  private nodeToLesson(row: LessonRow, stepRows: LessonStepRow[]): Lesson {
-    const lesson = mapLessonRow(row) as Lesson;
-    lesson.steps = stepRows.map((step) => ({
-      id: step.id,
-      type: step.step_type,
-      data: parseStepData(step.data),
-    }));
-    return lesson;
-  }
 }
 
 /** Default, app-wide instance. Create more if you need separate handles. */

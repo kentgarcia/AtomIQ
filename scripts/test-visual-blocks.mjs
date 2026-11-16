@@ -11,20 +11,31 @@ const DB_PATH = process.env.ATOMIQ_DB
   ? path.resolve(process.env.ATOMIQ_DB)
   : path.join(REPO, "content", "database", "content.db");
 const mod = await import(pathToFileURL(path.join(REPO, "content", "visual-blocks.ts")).href);
-const { validateVisualBlock, getStepVisuals, barFraction, VISUAL_BLOCK_KINDS, SOURCE_REQUIRED_KINDS } = mod;
+const colorMath = await import(pathToFileURL(path.join(REPO, "components", "lesson", "visual", "color-math.ts")).href);
+const { validateVisualBlock, getStepVisuals, barFraction, checkScene, SCENE_LOOP_MS, VISUAL_BLOCK_KINDS, SOURCE_REQUIRED_KINDS } = mod;
 
-// ---- read every authored block from the master db (read-only) -------------
+// ---- read every authored block -------------------------------------------
+// Blocks live in two places since curriculum v2: teaching cards in the content db
+// (`data.visual`) and the legacy lessons saved by the cutover, kept for reuse.
 const db = new DatabaseSync(DB_PATH, { readOnly: true });
-const rows = db.prepare("SELECT lesson_id, id, step_type, data FROM lesson_steps ORDER BY lesson_id, position").all();
+const cardRows = db.prepare("SELECT lesson_id, id, data FROM lesson_cards ORDER BY lesson_id, position").all();
 db.close();
+const legacyFile = path.join(REPO, "scripts", "content-migration", "legacy", "lessons.json");
+const legacyLessons = fs.existsSync(legacyFile) ? JSON.parse(fs.readFileSync(legacyFile, "utf8")) : [];
 const blocks = [];
-for (const row of rows) {
-  for (const block of getStepVisuals(JSON.parse(row.data))) {
-    blocks.push({ where: `${row.lesson_id}/${row.id}`, stepType: row.step_type, block });
+for (const row of cardRows) {
+  const data = JSON.parse(row.data);
+  if (data.visual) blocks.push({ where: `${row.lesson_id}/${row.id}`, stepType: "card", block: data.visual });
+}
+for (const lesson of legacyLessons) {
+  for (const step of lesson.steps) {
+    for (const block of getStepVisuals(step.data)) {
+      blocks.push({ where: `legacy ${lesson.id}/${step.id}`, stepType: step.step_type, block });
+    }
   }
 }
 
-test("content db has at least 7 visual blocks", () => {
+test("there are at least 7 authored visual blocks (cards plus the saved legacy lessons)", () => {
   assert.ok(blocks.length >= 7, `found ${blocks.length}`);
 });
 
@@ -45,8 +56,8 @@ test("block ids are unique", () => {
   }
 });
 
-test("visuals are only attached to micro_learn steps (the only step type that renders them)", () => {
-  for (const { where, stepType } of blocks) assert.equal(stepType, "micro_learn", where);
+test("visuals are only attached to teaching cards or legacy micro_learn steps", () => {
+  for (const { where, stepType } of blocks) assert.ok(stepType === "micro_learn" || stepType === "card", where);
 });
 
 test("required metadata is present and meaningful on every block", () => {
@@ -219,5 +230,96 @@ test("figure label roles meet 4.5:1 in light and dark", () => {
       ratio(grab(mode, "inverseText"), grab(mode, "inverseSurface")) >= 4.5,
       `${mode} inverse marker label`,
     );
+  }
+});
+
+// ---- scene motion (idle life as data) -------------------------------------
+
+const sceneWith = (shape) => ({ height: 50, shapes: [shape] });
+const motionErrors = (shape) => {
+  const errors = [];
+  checkScene(sceneWith(shape), "scene", errors);
+  return errors;
+};
+const dot = (motion) => ({ t: "circle", x: 60, y: 25, r: 2, tone: "info", motion });
+
+test("a scene without motion is unchanged", () => {
+  assert.deepEqual(motionErrors({ t: "circle", x: 60, y: 25, r: 2, tone: "info" }), []);
+});
+
+test("valid orbit, pulse and float pass", () => {
+  assert.deepEqual(motionErrors(dot({ kind: "orbit", cx: 50, cy: 25, period: 6000 })), []);
+  assert.deepEqual(motionErrors(dot({ kind: "pulse", period: 4000, amount: 0.08, phase: 0.25 })), []);
+  assert.deepEqual(motionErrors({ t: "rect", x: 10, y: 10, w: 20, h: 10, motion: { kind: "float", period: 5000, dy: 1.5 } }), []);
+});
+
+test("a period must divide the shared loop so it closes without a jump", () => {
+  assert.equal(SCENE_LOOP_MS, 60000);
+  assert.ok(motionErrors(dot({ kind: "pulse", period: 7000 })).some((e) => /divide/.test(e)));
+  assert.ok(motionErrors(dot({ kind: "pulse", period: 1000 })).some((e) => /at least/.test(e)), "too fast to read");
+  assert.deepEqual(motionErrors(dot({ kind: "pulse", period: 7500 })), []);
+});
+
+test("motion limits keep it small and calm", () => {
+  assert.ok(motionErrors(dot({ kind: "pulse", period: 4000, amount: 0.5 })).length > 0);
+  assert.ok(motionErrors(dot({ kind: "float", period: 4000, dy: 6 })).length > 0);
+  assert.ok(motionErrors(dot({ kind: "spin", period: 4000 })).length > 0);
+});
+
+test("orbit is circles only, needs its centre, and has no phase", () => {
+  assert.ok(motionErrors({ t: "rect", x: 10, y: 10, w: 8, h: 8, motion: { kind: "orbit", cx: 50, cy: 25, period: 6000 } }).length > 0);
+  assert.ok(motionErrors(dot({ kind: "orbit", period: 6000 })).length > 0);
+  assert.ok(motionErrors(dot({ kind: "orbit", cx: 50, cy: 25, period: 6000, phase: 0.5 })).some((e) => /phase/.test(e)));
+});
+
+test("motion is not allowed on lines or text", () => {
+  assert.ok(motionErrors({ t: "text", x: 10, y: 10, text: "hi", motion: { kind: "pulse", period: 4000 } }).some((e) => /circle or rect/.test(e)));
+});
+
+// ---- Duolingo-style figure palette (EX-11): a face over a darker lip per tone ------------
+
+test("every tone has a face and a darker lip; the lip stays visible on the card in light, the face in dark", async () => {
+  const palette = await import(pathToFileURL(path.join(REPO, "components", "lesson", "visual", "duo-palette.ts")).href);
+  const surfaces = { light: "#FFFFFF", dark: "#1F2C33" };
+  for (const mode of ["light", "dark"]) {
+    for (const tone of palette.DUO_TONES) {
+      const { face, lip } = palette.duoShade(tone, mode);
+      assert.ok(colorMath.luminanceOf(lip) < colorMath.luminanceOf(face), `${mode}/${tone}: the lip is darker than the face`);
+      const need = mode === "light" ? colorMath.contrastBetween(lip, surfaces.light) : colorMath.contrastBetween(face, surfaces.dark);
+      assert.ok(need >= (mode === "light" ? 2 : 3), `${mode}/${tone}: ${need.toFixed(2)}:1`);
+    }
+  }
+});
+
+test("the palette is flat hex colour only (no gradients, no alpha)", async () => {
+  const src = fs.readFileSync(path.join(REPO, "components", "lesson", "visual", "duo-palette.ts"), "utf8");
+  assert.ok(!/gradient|rgba?\(/i.test(src.replace(/\/\*[\s\S]*?\*\//g, "").replace(/\/\/.*$/gm, "")));
+  for (const m of src.matchAll(/"(#[0-9A-Fa-f]+)"/g)) assert.match(m[1], /^#[0-9A-Fa-f]{6}$/);
+});
+
+test("darken moves toward black and leaves non-hex colours alone", () => {
+  assert.equal(colorMath.darken("#FFFFFF", 0.5), "#808080");
+  assert.equal(colorMath.darken("#000000", 0.5), "#000000");
+  assert.equal(colorMath.darken("transparent", 0.5), "transparent");
+});
+
+// ---- lesson redesign (docs/LESSON_VISUAL_SPEC.md) --------------------------
+test("lesson, mascot and NPC code never draw SVG gradients or animate an SVG transform string", () => {
+  const roots = ["components/lesson", "components/mascot", "components/npc"];
+  const files = [];
+  const walk = (dir) => {
+    for (const e of fs.readdirSync(path.join(REPO, dir), { withFileTypes: true })) {
+      const rel = path.join(dir, e.name);
+      if (e.isDirectory()) walk(rel);
+      else if (/\.(tsx?|mjs)$/.test(e.name)) files.push(rel);
+    }
+  };
+  roots.forEach(walk);
+  const strip = (src) => src.replace(/\/\*[\s\S]*?\*\//g, "").replace(/(^|\s)\/\/.*$/gm, "$1");
+  for (const f of files) {
+    const src = strip(fs.readFileSync(path.join(REPO, f), "utf8"));
+    assert.ok(!/<(Linear|Radial)Gradient\b|<Stop\b/.test(src), `${f}: SVG gradient`);
+    assert.ok(!/import[^;]*\b(LinearGradient|RadialGradient|Stop)\b[^;]*from "react-native-svg"/.test(src), `${f}: imports an SVG gradient`);
+    assert.ok(!/useAnimatedProps[\s\S]{0,400}\btransform\s*:\s*`/.test(src), `${f}: animated SVG transform string`);
   }
 });

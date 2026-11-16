@@ -1,0 +1,71 @@
+{
+  "table": "path_nodes",
+  "primaryKey": [
+    "id"
+  ],
+  "rows": [
+    {
+      "id": "u1-n1",
+      "unit_id": "inside-the-atom",
+      "position": 0,
+      "kind": "lesson",
+      "lesson_id": "atoms-are-everywhere",
+      "config": {}
+    },
+    {
+      "id": "u1-n2",
+      "unit_id": "inside-the-atom",
+      "position": 1,
+      "kind": "lesson",
+      "lesson_id": "protons-neutrons-electrons",
+      "config": {}
+    },
+    {
+      "id": "u1-n3",
+      "unit_id": "inside-the-atom",
+      "position": 2,
+      "kind": "lesson",
+      "lesson_id": "elements-and-the-periodic-table",
+      "config": {}
+    },
+    {
+      "id": "u1-n4",
+      "unit_id": "inside-the-atom",
+      "position": 3,
+      "kind": "practice",
+      "lesson_id": null,
+      "config": {
+        "questionCount": 8,
+        "earlierShare": 0
+      }
+    },
+    {
+      "id": "u1-n5",
+      "unit_id": "inside-the-atom",
+      "position": 4,
+      "kind": "lesson",
+      "lesson_id": "isotopes",
+      "config": {}
+    },
+    {
+      "id": "u1-n6",
+      "unit_id": "inside-the-atom",
+      "position": 5,
+      "kind": "lesson",
+      "lesson_id": "stable-and-unstable-nuclei",
+      "config": {}
+    },
+    {
+      "id": "u1-n7",
+      "unit_id": "inside-the-atom",
+      "position": 6,
+      "kind": "checkpoint",
+      "lesson_id": null,
+      "config": {
+        "questionCount": 12,
+        "earlierShare": 0,
+        "passMark": 0.8
+      }
+    }
+  ]
+}

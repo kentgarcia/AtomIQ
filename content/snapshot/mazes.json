@@ -1,0 +1,88 @@
+{
+  "table": "mazes",
+  "primaryKey": [
+    "id"
+  ],
+  "rows": [
+    {
+      "id": "nuclear-history-maze",
+      "title": "Nuclear History Quest",
+      "description": "Battle through the history of nuclear science! Defeat monsters by answering questions about key discoveries and milestones.",
+      "theme": "Historical Nuclear Adventure",
+      "xp_reward": 300,
+      "time_limit": null,
+      "player_max_hp": 100,
+      "boss": {
+        "id": "history-king",
+        "name": "Nuclear History King",
+        "element": "nuclear",
+        "maxHp": 110,
+        "attackPower": 25,
+        "sprite": "👑",
+        "color": "#e94560",
+        "defeatMessage": "The History King crowns you as a nuclear scholar!",
+        "isBoss": true
+      }
+    },
+    {
+      "id": "radiation-basics-maze",
+      "title": "Radiation Discovery Maze",
+      "description": "Battle through radiation fundamentals! Defeat monsters by mastering the basics of atoms, isotopes, and radiation types.",
+      "theme": "Radiation Fundamentals Adventure",
+      "xp_reward": 200,
+      "time_limit": null,
+      "player_max_hp": 100,
+      "boss": {
+        "id": "radiation-lord",
+        "name": "Radiation Lord",
+        "element": "radiation",
+        "maxHp": 90,
+        "attackPower": 22,
+        "sprite": "☢️",
+        "color": "#e94560",
+        "defeatMessage": "The Radiation Lord bows to your atomic knowledge!",
+        "isBoss": true
+      }
+    },
+    {
+      "id": "reactor-tech-maze",
+      "title": "Reactor Technology Challenge",
+      "description": "Battle through reactor technology! Defeat monsters by mastering how nuclear reactors work, from fuel to safety systems.",
+      "theme": "Reactor Technology Adventure",
+      "xp_reward": 350,
+      "time_limit": null,
+      "player_max_hp": 100,
+      "boss": {
+        "id": "reactor-overlord",
+        "name": "Reactor Overlord",
+        "element": "fusion",
+        "maxHp": 120,
+        "attackPower": 28,
+        "sprite": "⚡",
+        "color": "#e94560",
+        "defeatMessage": "The Reactor Overlord powers down! You are a true nuclear engineer!",
+        "isBoss": true
+      }
+    },
+    {
+      "id": "safety-maze",
+      "title": "The Safety Labyrinth",
+      "description": "Battle through nuclear safety challenges! Defeat monsters by answering questions about reactor safety, containment, and emergency procedures.",
+      "theme": "Nuclear Safety Adventure",
+      "xp_reward": 250,
+      "time_limit": null,
+      "player_max_hp": 100,
+      "boss": {
+        "id": "safety-guardian",
+        "name": "Safety Guardian",
+        "element": "nuclear",
+        "maxHp": 100,
+        "attackPower": 25,
+        "sprite": "🛡️",
+        "color": "#f59e0b",
+        "defeatMessage": "The Safety Guardian bows to your nuclear knowledge!",
+        "isBoss": true
+      }
+    }
+  ]
+}

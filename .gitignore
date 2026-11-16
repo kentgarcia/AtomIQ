@@ -53,3 +53,10 @@ app-example
 # SQLite transient sidecars (regenerated automatically alongside *.db)
 *.db-shm
 *.db-wal
+
+# Content tooling: local-only state (see docs/CONTENT_SQLITE_AND_STUDIO_SPEC.md)
+content/backups/
+content/database/studio-history.db
+content/database/.studio.lock
+content/database/*.bak-*
+.opencode/studio-token

@@ -23,6 +23,9 @@ export type DailyFact = {
   kind: "myth";
   title: string;
   statement: string;
+  /** One-line "Did you know?" version for a quick read. */
+  short: string;
+  /** Full story (rich text: **bold** and "- " list lines). */
   explanation: string;
 };
 
@@ -124,6 +127,8 @@ const FALLBACK_FACT: DailyFact = {
   title: "Nuclear powers the stars",
   statement:
     "Nuclear fusion in the Sun's core releases the energy that lights our sky.",
+  short:
+    "The Sun shines because hydrogen nuclei fuse into helium in its core.",
   explanation:
     "In the Sun's core, hydrogen nuclei fuse into helium. This fusion releases an enormous amount of energy — the same process that powers a hydrogen bomb, but in a controlled, natural chain.",
 };
@@ -134,24 +139,42 @@ const dayOfYear = (date: Date): number => {
   return Math.floor(diff / 86400000);
 };
 
-export const getDailyFact = async (): Promise<DailyFact> => {
+const loadDailyFact = async (): Promise<{ fact: DailyFact; ok: boolean }> => {
   try {
-    const [myths] = await Promise.all([getAllMyths()]);
+    const myths = await getAllMyths();
 
     const items: DailyFact[] = myths.map((myth) => ({
       kind: "myth" as const,
       title: myth.title,
       statement: myth.mythStatement,
+      short: myth.reality?.trim() || myth.mythStatement,
       explanation: myth.explanation,
     }));
 
     if (items.length === 0) {
-      return FALLBACK_FACT;
+      return { fact: FALLBACK_FACT, ok: true };
     }
 
-    return items[dayOfYear(new Date()) % items.length];
+    return { fact: items[dayOfYear(new Date()) % items.length], ok: true };
   } catch (error) {
     console.error("Error loading daily fact:", error);
-    return FALLBACK_FACT;
+    return { fact: FALLBACK_FACT, ok: false };
   }
+};
+
+/* Home and the Discovery Hub both show the daily fact; load it once per day
+   and share the result instead of reading every myth from SQLite twice. A
+   failed load is not cached, so the next caller retries. */
+let dailyFactCache: { day: string; promise: Promise<DailyFact> } | null = null;
+
+export const getDailyFact = (): Promise<DailyFact> => {
+  const day = toIsoDate();
+  if (dailyFactCache && dailyFactCache.day === day) return dailyFactCache.promise;
+
+  const promise = loadDailyFact().then(({ fact, ok }) => {
+    if (!ok && dailyFactCache?.promise === promise) dailyFactCache = null;
+    return fact;
+  });
+  dailyFactCache = { day, promise };
+  return promise;
 };

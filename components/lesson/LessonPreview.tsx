@@ -1,327 +1,186 @@
+/**
+ * Preview shown before a lesson starts, on the plain lesson background. The unit's teacher (Shrodi
+ * when the unit has none) shows from the chest up, idling, on the left with a speech bubble on the
+ * right that introduces the lesson. Below: the unit name, title, quick facts,
+ * a short description and what the lesson teaches. The start button is pinned at the bottom with
+ * the XP it pays.
+ */
+
+import { ScrollView, Text, View } from "react-native";
+import Animated, { FadeInDown, useReducedMotion } from "react-native-reanimated";
+
+import { PressableIconButton, useBottomInset } from "@/components/layout";
+import { Shrodi } from "@/components/mascot/Shrodi";
+import { EASE_OUT } from "@/components/motion/motion";
+import { Npc } from "@/components/npc/Npc";
+import { LeftTail } from "@/components/npc/SpeechBubble";
+import { useTeacherLines } from "@/components/npc/teacher-lines";
+import { useTeacherMet } from "@/components/npc/met-teachers";
+import { useNpcForUnit, useNpcLine } from "@/components/npc/use-npc";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { Icon } from "@/components/ui/icon";
-import type { Lesson } from "@/content/types";
-import React, { useCallback, useMemo } from "react";
-import {
-    Image,
-    Text,
-    TouchableOpacity,
-    View,
-} from "react-native";
-import Animated, {
-    Easing,
-    FadeInDown,
-    useAnimatedStyle,
-    useSharedValue,
-    withTiming,
-} from "react-native-reanimated";
-import { createStyles, fontFaces, useTheme } from "@/theme";
+import type { Lesson, Objective, Unit } from "@/content/curriculum/types";
+import { createStyles, fontFaces, fontSizes, radius, spacing, useResponsiveLayout, useTheme } from "@/theme";
 
-/* Autumn design tokens shared with the home map (reference design) */
-const BTN_COLOR = "#EA580C";
-const BTN_LIP = "#C2410C";
-const BTN_HEIGHT = 64;
-const BTN_RADIUS = 20;
-const BTN_BORDER = 5;
-const BTN_INNER_RADIUS = BTN_RADIUS - BTN_BORDER;
-const BTN_LIP_DEPTH = 10;
-const BTN_LIP_PRESSED = 5;
-const BTN_PRESS_SHIFT = 6;
+import { LESSON_FRAME, LessonFrame } from "./LessonFrame";
 
-/* Reference press transition: 0.15s cubic-bezier(0.4, 0, 0.2, 1) */
-const PRESS_EASING = Easing.bezier(0.4, 0, 0.2, 1);
+const TEACHER = 130;
+const TEACHER_WIDTH = Math.round((TEACHER * 200) / 252);
+/** The idle breath is stronger than the default so it reads at this size; the figure sits this far low in a clip so its flat base stays put. */
+const LIVELY = 2.5;
+const BASE_SLACK = 3;
 
-interface LessonPreviewProps {
-  lesson: Lesson | null;
-  loading: boolean;
-  isReplay: boolean;
-  unitTitle: string;
-  unitSubtitle: string;
-  fallbackDescription: string;
-  onClose: () => void;
-  onProceed: () => void;
-}
+/** Side gutter on this screen: wider than the lesson default so the content can breathe. */
+const GUTTER = { paddingHorizontal: spacing.xl } as const;
+
+const useStyles = createStyles((theme) => ({
+  root: { flex: 1 },
+  header: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingBottom: spacing.xs },
+  headerSlot: { width: 48, alignItems: "flex-start" },
+  headerCenter: { flex: 1, alignItems: "center" },
+  scroll: { paddingBottom: spacing["3xl"] },
+  intro: { flexDirection: "row", alignItems: "center", gap: spacing.xl, justifyContent: "center", paddingTop: spacing.sm },
+  teacher: { width: TEACHER_WIDTH, height: TEACHER, alignItems: "center", overflow: "hidden" },
+  bubble: { flex: 1, maxWidth: 420 },
+  bubbleName: { ...fontFaces.bold, fontSize: fontSizes.md, letterSpacing: 0.6, textTransform: "uppercase", color: theme.colors.primaryLight },
+  bubbleText: { ...fontFaces.semibold, fontSize: fontSizes.xl, lineHeight: 24, color: theme.colors.text },
+  content: { gap: spacing["3xl"], paddingTop: spacing["2xl"] },
+  head: { alignItems: "center", gap: spacing.lg },
+  titleBlock: { alignItems: "center", gap: spacing.xs },
+  unit: { ...fontFaces.semibold, fontSize: fontSizes.xl, color: theme.colors.textMuted, textAlign: "center" },
+  title: { ...fontFaces.black, fontSize: fontSizes["7xl"], lineHeight: 38, color: theme.colors.text, textAlign: "center" },
+  facts: { flexDirection: "row", alignItems: "center", justifyContent: "center", flexWrap: "wrap", columnGap: spacing.xl, rowGap: spacing.sm },
+  fact: { flexDirection: "row", alignItems: "center", gap: spacing.xs },
+  factText: { ...fontFaces.semibold, fontSize: fontSizes.lg, color: theme.colors.textMuted },
+  review: { flexDirection: "row", alignItems: "center", gap: spacing.xs, paddingVertical: spacing.xs, paddingHorizontal: spacing.md, borderRadius: radius.full, backgroundColor: theme.colors.successSurface },
+  reviewText: { ...fontFaces.bold, fontSize: fontSizes.md, letterSpacing: 0.4, color: theme.colors.text },
+  description: { ...fontFaces.book, fontSize: fontSizes.xl, lineHeight: 26, color: theme.colors.textSecondary },
+  objectives: { gap: spacing.lg },
+  label: { ...fontFaces.bold, fontSize: fontSizes.md, letterSpacing: 0.6, textTransform: "uppercase", color: theme.colors.textMuted },
+  row: { flexDirection: "row", alignItems: "flex-start", gap: spacing.md },
+  rowText: { ...fontFaces.semibold, flex: 1, fontSize: fontSizes.xl, lineHeight: 24, color: theme.colors.text },
+  footer: { paddingTop: spacing.md },
+}));
 
 export function LessonPreview({
   lesson,
-  loading,
+  unit,
+  objectives,
+  referenceCount,
+  cardCount,
   isReplay,
-  unitTitle,
-  unitSubtitle,
-  fallbackDescription,
   onClose,
   onProceed,
-}: LessonPreviewProps) {
-  const pressed = useSharedValue(0);
+}: {
+  lesson: Lesson;
+  unit: Unit | null;
+  objectives: Objective[];
+  referenceCount: number;
+  cardCount: number;
+  isReplay: boolean;
+  onClose: () => void;
+  onProceed: () => void;
+}) {
   const { theme } = useTheme();
-  const LP = theme.palettes.lesson;
-  const styles = useMemo(() => makeStyles(theme), [theme]);
+  const styles = useStyles(theme);
+  const c = theme.colors;
+  const layout = useResponsiveLayout();
+  const bottom = useBottomInset();
+  const reduced = useReducedMotion();
+  const teacher = useNpcForUnit(unit?.id);
+  const intro = useNpcLine(teacher?.id, "lesson_intro", lesson.id);
+  const met = useTeacherMet(teacher?.id);
+  const linesOn = useTeacherLines();
+  const bubbleText = teacher && linesOn ? intro?.text : undefined;
 
-  // Reference :active — button sinks and the lip shallows
-  const handlePressIn = useCallback(() => {
-    pressed.value = withTiming(1, { duration: 150, easing: PRESS_EASING });
-  }, [pressed]);
-  const handlePressOut = useCallback(() => {
-    pressed.value = withTiming(0, { duration: 150, easing: PRESS_EASING });
-  }, [pressed]);
-
-  const btnStyle = useAnimatedStyle(() => ({
-    transform: [{ translateY: pressed.value * BTN_PRESS_SHIFT }],
-  }));
-  const faceStyle = useAnimatedStyle(() => ({
-    bottom: BTN_LIP_DEPTH - pressed.value * (BTN_LIP_DEPTH - BTN_LIP_PRESSED),
-  }));
-
-  const title = lesson?.title ?? unitTitle;
-  const description = lesson?.description ?? fallbackDescription;
-  const buttonLabel = loading
-    ? "Preparing…"
-    : isReplay
-      ? "Review Lesson"
-      : "Start Lesson";
+  const facts = [
+    { key: "time", icon: "Clock", text: `${lesson.estimatedMinutes} min` },
+    { key: "cards", icon: "Layer", text: `${cardCount} ${cardCount === 1 ? "card" : "cards"}` },
+    { key: "sources", icon: "Book", text: `${referenceCount} ${referenceCount === 1 ? "source" : "sources"}` },
+  ];
+  const showXp = !isReplay && lesson.xpReward > 0;
+  const action = isReplay ? "Review lesson" : showXp ? `Start +${lesson.xpReward} XP` : "Start lesson";
+  const actionLabel = isReplay ? "Review lesson" : showXp ? `Start lesson, earn ${lesson.xpReward} XP` : "Start lesson";
 
   return (
-    <View style={styles.root}>
-      {/* Close */}
-      <TouchableOpacity
-        style={[styles.closeBtn, { backgroundColor: LP.card }]}
-        onPress={onClose}
-        hitSlop={4}
-        accessibilityRole="button"
-        accessibilityLabel="Close lesson preview"
-      >
-        <Icon name="Close" size={22} color={theme.colors.textMuted} />
-      </TouchableOpacity>
+    <LessonFrame>
+      <View style={styles.root}>
+        <View style={[LESSON_FRAME, styles.header, { paddingTop: layout.insets.top + spacing.xs }]}>
+          <View style={styles.headerSlot}>
+            <PressableIconButton accessibilityLabel="Close lesson preview" onPress={onClose}>
+              <Icon name="Close" size={26} color={c.textSecondary} />
+            </PressableIconButton>
+          </View>
+          <View style={styles.headerCenter}>
+            {isReplay ? (
+              <View style={styles.review} accessible accessibilityLabel="Completed: review mode">
+                <Icon name="TickCircle" size={16} color={c.success} variant="Bold" />
+                <Text style={styles.reviewText}>Review mode</Text>
+              </View>
+            ) : null}
+          </View>
+          <View style={styles.headerSlot} />
+        </View>
 
-      <View style={styles.body}>
-        <Animated.View entering={FadeInDown.springify()} style={styles.heroWrap}>
-          <Image
-            source={require("@/assets/images/mascot/explain.png")}
-            style={styles.mascot}
-            resizeMode="contain"
-          />
-        </Animated.View>
-
-        <Animated.View
-          entering={FadeInDown.delay(100).springify()}
-          style={[
-            styles.card,
-            { opacity: loading ? 0.7 : 1, backgroundColor: LP.card },
-          ]}
-        >
-          {isReplay && (
-            <View style={styles.reviewPill}>
-              <Icon name="TickSquare" size={14} color="#C2410C" variant="Bold" />
-              <Text style={styles.reviewText}>Completed — review mode</Text>
+        <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+          <View style={[LESSON_FRAME, GUTTER, styles.intro]}>
+            <View style={styles.teacher} pointerEvents="none">
+              {teacher ? (
+                <Npc spec={teacher.spec} pose="idle" form="head" size={TEACHER} lively={LIVELY} style={{ marginTop: BASE_SLACK }} />
+              ) : (
+                <Shrodi mood="idle" size={TEACHER} />
+              )}
             </View>
-          )}
-          <Text style={[styles.eyebrow, { color: LP.textMuted }]} numberOfLines={1}>
-            {unitSubtitle}
-          </Text>
-          <Text style={[styles.title, { color: LP.text }]}>{title}</Text>
-          <Text style={[styles.description, { color: LP.textMuted }]}>
-            {description}
-          </Text>
+            {bubbleText ? (
+              <View style={styles.bubble}>
+                <Card padding={spacing.lg} gap={spacing.sm}>
+                  {met === false ? <Text style={styles.bubbleName}>{teacher?.name}</Text> : null}
+                  <Text style={styles.bubbleText} accessibilityLabel={`${teacher?.name} says: ${bubbleText}`}>{bubbleText}</Text>
+                </Card>
+                <LeftTail />
+              </View>
+            ) : null}
+          </View>
 
-          {lesson && (
-            <View style={styles.metaRow}>
-              <View style={styles.metaPill}>
-                <Icon name="Flash" size={14} color="#F59E0B" variant="Bold" />
-                <Text style={[styles.metaText, { color: LP.text }]}>
-                  {lesson.xpReward} XP
-                </Text>
-              </View>
-              <View style={styles.metaPill}>
-                <Icon name="Clock" size={14} color="#64B5F6" variant="Bold" />
-                <Text style={[styles.metaText, { color: LP.text }]}>
-                  ~{lesson.estimatedMinutes} min
-                </Text>
-              </View>
-              <View style={styles.metaPill}>
-                <Icon name="Book" size={14} color="#81C784" variant="Bold" />
-                <Text style={[styles.metaText, { color: LP.text }]}>
-                  {lesson.steps.length} steps
-                </Text>
-              </View>
-            </View>
-          )}
-        </Animated.View>
-
-        {/* Proceed button — reference button design */}
-        <Animated.View
-          entering={FadeInDown.delay(200).springify()}
-          style={[styles.btnWrap, btnStyle, { opacity: loading ? 0.6 : 1 }]}
-        >
-          <TouchableOpacity
-            activeOpacity={1}
-            disabled={loading}
-            onPress={onProceed}
-            onPressIn={handlePressIn}
-            onPressOut={handlePressOut}
-          >
-            <View style={[styles.btn, { borderColor: LP.card, backgroundColor: LP.card }]}>
-              <View style={[styles.btnInner, { backgroundColor: BTN_LIP }]}>
-                <Animated.View
-                  style={[styles.btnFace, faceStyle, { backgroundColor: BTN_COLOR }]}
-                />
-                <View style={styles.btnContent}>
-                  <Icon name="Play" size={20} color="#FFFFFF" variant="Bold" />
-                  <Text style={styles.btnText}>{buttonLabel}</Text>
+          <Animated.View entering={reduced ? undefined : FadeInDown.duration(250).easing(EASE_OUT)} style={[LESSON_FRAME, GUTTER, styles.content]}>
+              <View style={styles.head}>
+                <View style={styles.titleBlock}>
+                  {unit?.title ? <Text style={styles.unit}>{unit.title}</Text> : null}
+                  <Text accessibilityRole="header" style={styles.title}>{lesson.title}</Text>
+                </View>
+                <View style={styles.facts}>
+                  {facts.map((fact) => (
+                    <View key={fact.key} style={styles.fact}>
+                      <Icon name={fact.icon} size={18} color={c.textMuted} />
+                      <Text style={styles.factText}>{fact.text}</Text>
+                    </View>
+                  ))}
                 </View>
               </View>
-            </View>
-          </TouchableOpacity>
-        </Animated.View>
+
+              <Text style={styles.description}>{lesson.description}</Text>
+
+              {objectives.length ? (
+                <Card padding={spacing.xl}>
+                  <View style={styles.objectives}>
+                    <Text style={styles.label}>You will learn to</Text>
+                    {objectives.map((o) => (
+                      <View key={o.id} style={styles.row}>
+                        <Icon name="TickCircle" size={22} color={isReplay ? c.success : c.primary} variant="Bold" />
+                        <Text style={styles.rowText}>{o.statement}</Text>
+                      </View>
+                    ))}
+                  </View>
+                </Card>
+              ) : null}
+            </Animated.View>
+        </ScrollView>
+
+        <View style={[styles.footer, LESSON_FRAME, GUTTER, { paddingBottom: bottom + spacing.sm }]}>
+          <Button label={action} accessibilityLabel={actionLabel} onPress={onProceed} />
+        </View>
       </View>
-    </View>
+    </LessonFrame>
   );
 }
-
-const makeStyles = createStyles((theme) => ({
-  root: {
-    flex: 1,
-  },
-  closeBtn: {
-    position: "absolute",
-    top: 12,
-    left: 20,
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: theme.colors.card,
-    alignItems: "center",
-    justifyContent: "center",
-    zIndex: 10,
-    elevation: 3,
-    shadowColor: theme.colors.shadow,
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.08,
-    shadowRadius: 6,
-  },
-  body: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    paddingHorizontal: 24,
-  },
-  heroWrap: {
-    marginBottom: 18,
-  },
-  mascot: {
-    width: 120,
-    height: 120,
-  },
-  card: {
-    width: "100%",
-    backgroundColor: theme.colors.card,
-    borderRadius: 24,
-    padding: 24,
-    alignItems: "center",
-    elevation: 5,
-    shadowColor: theme.colors.shadow,
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.08,
-    shadowRadius: 10,
-  },
-  reviewPill: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-    backgroundColor: theme.colors.surfaceSoft,
-    borderRadius: 14,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    marginBottom: 12,
-  },
-  reviewText: {
-    fontSize: 12,
-    ...fontFaces.bold,
-    color: "#C2410C",
-  },
-  eyebrow: {
-    fontSize: 11,
-    ...fontFaces.semibold,
-    color: theme.colors.textFaint,
-    textTransform: "uppercase",
-    letterSpacing: 0.8,
-    textAlign: "center",
-    marginBottom: 4,
-  },
-  title: {
-    fontSize: 24,
-    ...fontFaces.heavy,
-    color: theme.colors.text,
-    textAlign: "center",
-  },
-  description: {
-    fontSize: 14,
-    ...fontFaces.regular,
-    color: theme.colors.textSecondary,
-    textAlign: "center",
-    lineHeight: 21,
-    marginTop: 10,
-  },
-  metaRow: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "center",
-    gap: 8,
-    marginTop: 18,
-  },
-  metaPill: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 5,
-    backgroundColor: theme.colors.surfaceSoft,
-    borderRadius: 14,
-    paddingHorizontal: 12,
-    paddingVertical: 7,
-  },
-  metaText: {
-    fontSize: 12,
-    ...fontFaces.bold,
-    color: theme.colors.textSecondary,
-  },
-  btnWrap: {
-    width: "100%",
-    marginTop: 28,
-  },
-  /* Reference button: card-colored border wrapping an orange face over a lip */
-  btn: {
-    height: BTN_HEIGHT,
-    borderRadius: BTN_RADIUS,
-    borderWidth: BTN_BORDER,
-    borderColor: theme.colors.card,
-    backgroundColor: theme.colors.card,
-    elevation: 8,
-    shadowColor: theme.colors.shadow,
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.12,
-    shadowRadius: 8,
-  },
-  btnInner: {
-    flex: 1,
-    alignSelf: "stretch",
-    borderRadius: BTN_INNER_RADIUS,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  btnFace: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: BTN_LIP_DEPTH,
-    borderRadius: BTN_INNER_RADIUS,
-  },
-  btnContent: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-    marginBottom: Math.round(BTN_LIP_DEPTH / 2),
-  },
-  btnText: {
-    fontSize: 17,
-    ...fontFaces.heavy,
-    color: theme.colors.onPrimary,
-  },
-}));

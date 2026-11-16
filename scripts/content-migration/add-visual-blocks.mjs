@@ -15,6 +15,7 @@
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { DatabaseSync } from "node:sqlite";
+import { backupBeforeScript } from "../lib/backup.mjs";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const REPO = path.resolve(HERE, "..", "..");
@@ -527,6 +528,8 @@ async function main() {
     console.error("Validation failed, nothing written:\n  " + problems.join("\n  "));
     process.exit(1);
   }
+
+  if (!dryRun) backupBeforeScript("add-visual-blocks", dbPath); // safety net: scripts/lib/backup.mjs
 
   const db = new DatabaseSync(dbPath);
   db.exec("PRAGMA busy_timeout = 5000");

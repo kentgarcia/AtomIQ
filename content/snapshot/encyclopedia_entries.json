@@ -1,0 +1,3073 @@
+{
+  "table": "encyclopedia_entries",
+  "primaryKey": [
+    "id"
+  ],
+  "rows": [
+    {
+      "id": "absorbed-dose",
+      "term": "Absorbed Dose",
+      "definition": "The amount of radiation energy deposited in matter per unit mass, measured in gray (Gy) — where 1 Gy equals 1 joule of energy absorbed by 1 kilogram of material. It applies to any absorbing material, but in health physics it usually describes energy absorbed by body tissue. It differs from equivalent dose (measured in sieverts), which weights each radiation type by its biological effect.",
+      "category": "science",
+      "related_terms": [
+        "gray",
+        "sievert",
+        "exposure",
+        "ionizing-radiation",
+        "dosimeter"
+      ],
+      "quick_facts": [
+        "1 Gy = 1 joule of energy per kilogram",
+        "Applies to any material, not just living tissue",
+        "Different from equivalent dose, which is measured in sieverts",
+        "A short whole-body dose of ~5 Gy is often fatal without medical care",
+        "Measured with dosimeters and ionization chambers"
+      ],
+      "sources": [
+        {
+          "organization": "IAEA",
+          "title": "Radiation Protection",
+          "url": "https://www.iaea.org/topics/radiation-protection"
+        }
+      ],
+      "image": "../../assets/images/terms/Absorbed dose.webp",
+      "debunking_snippet": "Absorbed dose alone doesn't tell you the biological risk. A gray of alpha radiation causes far more tissue damage than a gray of X-rays — that's why equivalent dose (sieverts) exists.",
+      "related_myths": [],
+      "related_articles": [],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "alpha-particle",
+      "term": "Alpha Particle (α)",
+      "definition": "A heavy, positively charged particle made of 2 protons and 2 neutrons — identical to a helium-4 nucleus — emitted by heavy, unstable nuclei such as uranium, radium, and radon during alpha decay. Alpha particles barely penetrate matter: paper or the outer layer of skin stops them. But they ionize intensely along their short path, making them among the most damaging radiations when alpha emitters are inhaled or ingested.",
+      "category": "science",
+      "related_terms": [
+        "beta-particle",
+        "gamma-ray",
+        "decay",
+        "radon",
+        "ionizing-radiation"
+      ],
+      "quick_facts": [
+        "Identical to a helium-4 nucleus: 2 protons + 2 neutrons",
+        "Stopped by a sheet of paper, skin, or a few centimeters of air",
+        "Cause dense ionization along their very short path",
+        "Most dangerous when inhaled or swallowed — e.g. radon gas in lungs",
+        "Emitted by heavy elements like uranium, radium, and radon"
+      ],
+      "sources": [
+        {
+          "organization": "EPA",
+          "title": "Radiation Basics",
+          "url": "https://www.epa.gov/radiation/radiation-basics"
+        }
+      ],
+      "image": "../../assets/images/terms/alpha particle.webp",
+      "debunking_snippet": "“Alpha radiation is harmless because it can't get through skin.” Outside the body, mostly true — but one alpha particle inside the lungs tears through countless cells. That's why inhaled radon is a leading cause of lung cancer among non-smokers.",
+      "related_myths": [],
+      "related_articles": [],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "alvin-weinberg",
+      "term": "Alvin Weinberg",
+      "definition": "American nuclear physicist (1915–2006) who co-invented the pressurized water reactor — the design used today in most naval vessels and about two-thirds of the world's power reactors — and later championed molten salt reactors at Oak Ridge National Laboratory (ORNL), leading its Molten Salt Reactor Experiment. He directed ORNL from 1955 to 1973 and became an early advocate of nuclear safety culture, arguing reactors should be inherently safe, not just engineered to be safe. He was dismissed in 1973 after clashing with Washington over reactor priorities.",
+      "category": "people",
+      "related_terms": [
+        "nuclear-reactor",
+        "reactor-core",
+        "chain-reaction",
+        "zero-power-reactor"
+      ],
+      "quick_facts": [
+        "Co-invented the pressurized water reactor (PWR)",
+        "Led ORNL's Molten Salt Reactor Experiment (first criticality 1965)",
+        "Directed Oak Ridge National Laboratory, 1955–1973",
+        "Advocated 'inherent safety' long before it was industry standard",
+        "Dismissed in 1973 after opposing the fast-breeder program"
+      ],
+      "sources": [
+        {
+          "organization": "ORNL",
+          "title": "Alvin Weinberg & the MSRE",
+          "url": "https://www.ornl.gov/blog/time-warp-molten-salt-reactor-experiment-alvin-weinbergs-magnum-opus"
+        }
+      ],
+      "image": null,
+      "debunking_snippet": null,
+      "related_myths": [],
+      "related_articles": [],
+      "difficulty": "advanced"
+    },
+    {
+      "id": "andrei-sakharov",
+      "term": "Andrei Sakharov",
+      "definition": "Soviet theoretical physicist (1921–1989), often called the father of the Soviet hydrogen bomb (first tested 1953). Horrified by the arms race he helped accelerate, he became the USSR's most prominent dissident, campaigning against nuclear testing and for human rights. He won the 1975 Nobel Peace Prize and was exiled to the closed city of Gorky from 1980 to 1986; the European Parliament's Sakharov Prize for Freedom of Thought is named in his honor.",
+      "category": "people",
+      "related_terms": [
+        "nuclear-fusion",
+        "atom",
+        "radiation"
+      ],
+      "quick_facts": [
+        "Key designer of the Soviet hydrogen bomb (tested 1953)",
+        "Awarded the 1975 Nobel Peace Prize",
+        "Exiled to Gorky (1980–1986) for his dissent",
+        "The EU's Sakharov Prize for Freedom of Thought honors him",
+        "His ideas influenced Gorbachev's reforms of the late 1980s"
+      ],
+      "sources": [
+        {
+          "organization": "Nobel Prize",
+          "title": "Andrei Sakharov Biography",
+          "url": "https://www.nobelprize.org/prizes/peace/1975/sakharov/biographical/"
+        }
+      ],
+      "image": "/assets/images/people/Andrei Sakhariv.webp",
+      "debunking_snippet": null,
+      "related_myths": [],
+      "related_articles": [],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "arthur-compton",
+      "term": "Arthur Compton",
+      "definition": "American physicist (1892–1962) who discovered the Compton effect in 1923: X-rays scattering off electrons transfer energy like colliding particles, proving that light behaves as particles (photons) as well as waves. He shared the 1927 Nobel Prize in Physics. During World War II he directed the Manhattan Project's Metallurgical Laboratory at the University of Chicago, where Enrico Fermi's team achieved Chicago Pile-1, the world's first self-sustaining chain reaction.",
+      "category": "people",
+      "related_terms": [
+        "gamma-ray",
+        "x-ray",
+        "chain-reaction",
+        "enrico-fermi",
+        "ionizing-radiation"
+      ],
+      "quick_facts": [
+        "Discovered the Compton effect (1923)",
+        "Shared the 1927 Nobel Prize in Physics with C.T.R. Wilson",
+        "Directed the Met Lab, Chicago (1942–1945)",
+        "Oversaw Chicago Pile-1 — the first controlled chain reaction",
+        "Later chancellor of Washington University (1945–1953)"
+      ],
+      "sources": [
+        {
+          "organization": "Nobel Prize",
+          "title": "Arthur Compton Biography",
+          "url": "https://www.nobelprize.org/prizes/physics/1927/compton/biographical/"
+        }
+      ],
+      "image": null,
+      "debunking_snippet": null,
+      "related_myths": [],
+      "related_articles": [],
+      "difficulty": "advanced"
+    },
+    {
+      "id": "atom",
+      "term": "Atom",
+      "definition": "The smallest unit of ordinary matter that keeps the identity of a chemical element. Every atom has a tiny, dense nucleus of protons and neutrons surrounded by electrons bound to it electromagnetically. Atoms are overwhelmingly empty space — nearly all the mass sits in the nucleus, yet the electron cloud spans roughly 100,000 times farther out.",
+      "category": "science",
+      "related_terms": [
+        "nucleus",
+        "proton",
+        "neutron",
+        "electron",
+        "atomic-number"
+      ],
+      "quick_facts": [
+        "Building block of all ordinary matter",
+        "Over 99.9% of an atom's mass is packed into its nucleus",
+        "Electrons occupy probability clouds (orbitals), not fixed orbits",
+        "About 10 million atoms lined up span just 1 millimeter",
+        "Number of protons fixes which element it is"
+      ],
+      "sources": [
+        {
+          "organization": "Britannica",
+          "title": "Atom",
+          "url": "https://www.britannica.com/science/atom"
+        }
+      ],
+      "image": "../../assets/images/terms/atom.webp",
+      "debunking_snippet": "“Atoms are tiny solid balls.” They're almost entirely empty space — the solid feel of matter comes from electromagnetic forces between electron clouds, not hard surfaces actually touching.",
+      "related_myths": [],
+      "related_articles": [],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "atomic-number",
+      "term": "Atomic Number",
+      "definition": "The number of protons in an atom's nucleus, symbolized Z. It uniquely defines a chemical element — every carbon atom has Z = 6, every uranium atom Z = 92 — and fixes the element's place in the periodic table. In a neutral atom it also equals the number of orbiting electrons, which is what governs chemistry.",
+      "category": "science",
+      "related_terms": [
+        "proton",
+        "atom",
+        "isotope",
+        "z-number",
+        "nucleus"
+      ],
+      "quick_facts": [
+        "Symbol: Z",
+        "Defines an atom's chemical element — unique per element",
+        "Equals proton count (and electron count when neutral)",
+        "Carbon: Z = 6 · Uranium: Z = 92",
+        "Changing Z requires a nuclear reaction — this is transmutation"
+      ],
+      "sources": [
+        {
+          "organization": "IUPAC",
+          "title": "Periodic Table of Elements",
+          "url": "https://iupac.org/what-we-do/periodic-table-of-elements/"
+        }
+      ],
+      "image": "../../assets/images/terms/atomic number.webp",
+      "debunking_snippet": null,
+      "related_myths": [],
+      "related_articles": [],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "background-radiation",
+      "term": "Background Radiation",
+      "definition": "The ionizing radiation present in the environment at all times: cosmic rays from space, radon gas seeping from soil and rock, naturally radioactive materials in the ground, food, and even our own bodies (potassium-40 and carbon-14), plus a small man-made share such as medical procedures and fallout. It varies widely by location — altitude increases the cosmic share, while some regions have uranium-rich soils.",
+      "category": "science",
+      "related_terms": [
+        "radiation",
+        "radon",
+        "cosmic-radiation",
+        "exposure",
+        "sievert"
+      ],
+      "quick_facts": [
+        "Everyone on Earth is exposed to it constantly",
+        "≈2.4 mSv per year worldwide from natural sources (UNSCEAR)",
+        "Radon gas is the largest single natural contributor",
+        "Flying raises your dose — more cosmic rays at altitude",
+        "Varies strongly by location, altitude, and local geology"
+      ],
+      "sources": [
+        {
+          "organization": "UNSCEAR",
+          "title": "Sources and Effects of Ionizing Radiation",
+          "url": "https://www.unscear.org/"
+        }
+      ],
+      "image": "../../assets/images/terms/background radiation.webp",
+      "debunking_snippet": "“All radiation is man-made.” Natural background accounts for the majority of human exposure — life evolved with it.",
+      "related_myths": [],
+      "related_articles": [],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "becquerel",
+      "term": "Becquerel (Bq)",
+      "definition": "The SI unit of radioactivity: one nuclear decay per second, named after French physicist Henri Becquerel, who discovered radioactivity in 1896. Because individual decays are rare events for large samples, real-world activities are often huge numbers — household smoke detectors hold about 30,000 Bq of americium-241. The older unit, the curie (Ci), equals 3.7×10¹⁰ Bq.",
+      "category": "science",
+      "related_terms": [
+        "half-life",
+        "decay",
+        "henri-becquerel",
+        "radionuclide",
+        "marie-curie"
+      ],
+      "quick_facts": [
+        "1 Bq = exactly one nuclear decay per second",
+        "Named after Henri Becquerel, discoverer of radioactivity (1896)",
+        "Activity tells you how many decays occur — not how much energy or danger",
+        "1 curie (Ci) = 37 billion Bq",
+        "Smoke detectors contain ~30 kBq americium-241"
+      ],
+      "sources": [
+        {
+          "organization": "BIPM",
+          "title": "SI Units – becquerel",
+          "url": "https://www.bipm.org/en/measurement-units"
+        }
+      ],
+      "image": "../../assets/images/terms/bq.webp",
+      "debunking_snippet": "“High activity means high danger.” Not necessarily — becquerels count decays, but dose depends on energy, radiation type, distance, and whether the source gets inside your body.",
+      "related_myths": [],
+      "related_articles": [],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "beta-particle",
+      "term": "Beta Particle (β)",
+      "definition": "A high-speed electron (β⁻) or positron (β⁺) thrown out of an unstable nucleus during beta decay — effectively a neutron converting into a proton (or vice versa) inside the nucleus. Beta particles are far more penetrating than alphas: they can slip through skin and paper but stop in a few millimeters of plastic or aluminum. Positron-emitting isotopes like carbon-11 and fluorine-18 power PET medical scans.",
+      "category": "science",
+      "related_terms": [
+        "alpha-particle",
+        "gamma-ray",
+        "decay",
+        "tritium",
+        "ionizing-radiation"
+      ],
+      "quick_facts": [
+        "An electron (β⁻) or positron (β⁺) from the nucleus",
+        "Stopped by a few mm of plastic or aluminum",
+        "Can penetrate slightly beyond dead skin layers",
+        "Positron emitters enable PET medical imaging",
+        "Emitted across the whole periodic table — e.g. carbon-14, tritium"
+      ],
+      "sources": [
+        {
+          "organization": "EPA",
+          "title": "Radiation Basics",
+          "url": "https://www.epa.gov/radiation/radiation-basics"
+        }
+      ],
+      "image": "../../assets/images/terms/beta particle.webp",
+      "debunking_snippet": "“Any metal shield makes beta radiation harmless.” Dense metals like lead can actually make things worse — betas striking them emit secondary X-rays (bremsstrahlung). Low-density plastic or acrylic is the right shield.",
+      "related_myths": [],
+      "related_articles": [],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "binding-energy",
+      "term": "Binding Energy",
+      "definition": "The energy needed to pull a nucleus apart into its separate protons and neutrons — equivalently, the energy released when those nucleons bind together. It comes from the mass converted to energy described by E = mc²: a bound nucleus weighs less than the sum of its parts (the mass defect). Binding energy per nucleon peaks near iron-56 (with nickel-62 holding the precise record), which is why energy is released by splitting heavy nuclei (fission) and fusing light ones (fusion) — both move toward the iron peak.",
+      "category": "science",
+      "related_terms": [
+        "nuclear-fission",
+        "nuclear-fusion",
+        "mass-defect",
+        "chain-reaction"
+      ],
+      "quick_facts": [
+        "Energy required to disassemble a nucleus completely",
+        "Explained by mass defect via E = mc²",
+        "Nickel-62 holds the record binding energy per nucleon; iron-56 is the classic reference",
+        "Fission and fusion both release energy by moving toward the iron peak",
+        "Determines which nuclei are stable vs. radioactive"
+      ],
+      "sources": [
+        {
+          "organization": "HyperPhysics",
+          "title": "Nuclear Binding Energy",
+          "url": "http://hyperphysics.phy-astr.gsu.edu/hbase/NucEne/nucbin.html"
+        }
+      ],
+      "image": "../../assets/images/terms/binding energy.webp",
+      "debunking_snippet": null,
+      "related_myths": [],
+      "related_articles": [],
+      "difficulty": "advanced"
+    },
+    {
+      "id": "chain-reaction",
+      "term": "Chain Reaction",
+      "definition": "A self-sustaining series of nuclear fission events: each fission splits a heavy nucleus and releases 2–3 fresh neutrons, which can go on to split further nuclei. If exactly one fission per generation goes on to cause another (k = 1), the chain is critical and steady — that's a reactor. More than one (k > 1) grows exponentially — that's a bomb or a supercritical accident. Reactors stay controllable thanks to delayed neutrons, which act as a slow-moving fraction of the chain.",
+      "category": "science",
+      "related_terms": [
+        "nuclear-fission",
+        "critical-mass",
+        "nuclear-reactor",
+        "control-rods",
+        "neutron"
+      ],
+      "quick_facts": [
+        "Each fission releases 2–3 neutrons",
+        "Critical (k = 1): steady power · supercritical: exponential growth",
+        "Delayed neutrons give reactors their controllability",
+        "Control rods tune the chain by absorbing neutrons",
+        "Requires enough fissile material and the right neutron energy"
+      ],
+      "sources": [
+        {
+          "organization": "World Nuclear",
+          "title": "Physics of Nuclear Energy",
+          "url": "https://world-nuclear.org/information-library/nuclear-fuel-cycle/introduction/physics-of-nuclear-energy.aspx"
+        }
+      ],
+      "image": "../../assets/images/terms/chain reaction.webp",
+      "debunking_snippet": "“A reactor can explode like an atomic bomb.” It can't — reactor fuel is far too dilute in fissile material (a few % U-235 vs >90% for weapons). Chernobyl's explosion was steam and chemical energy, never a nuclear blast.",
+      "related_myths": [],
+      "related_articles": [],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "chien-shiung-wu",
+      "term": "Chien-Shiung Wu",
+      "definition": "Chinese-American experimental physicist (1912–1997), called the 'First Lady of Physics'. During the Manhattan Project she improved gaseous-diffusion uranium enrichment. Her crowning achievement came in 1956: the Wu experiment confirmed that mirror symmetry (parity) is violated in beta decay — a discovery so fundamental it won Tsung-Dao Lee and Chen-Ning Yang the 1957 Nobel Prize while Wu herself was overlooked.",
+      "category": "people",
+      "related_terms": [
+        "beta-particle",
+        "decay",
+        "marie-curie",
+        "enrico-fermi"
+      ],
+      "quick_facts": [
+        "Ran the decisive 1956 parity-violation experiment",
+        "Lee & Yang won the Nobel; many argue Wu deserved it too",
+        "Improved gaseous-diffusion uranium enrichment (Manhattan Project)",
+        "Nicknamed the 'First Lady of Physics'",
+        "Awarded the inaugural Wolf Prize in Physics (1978)"
+      ],
+      "sources": [
+        {
+          "organization": "APS",
+          "title": "Chien-Shiung Wu",
+          "url": "https://www.aps.org/programs/outreach/history/historicsites/wu.cfm"
+        }
+      ],
+      "image": null,
+      "debunking_snippet": null,
+      "related_myths": [],
+      "related_articles": [],
+      "difficulty": "advanced"
+    },
+    {
+      "id": "containment-building",
+      "term": "Containment Building",
+      "definition": "The massive reinforced-concrete dome or box — typically about a meter thick with a steel liner — that encloses a reactor's primary system. It is the final barrier in the defense-in-depth strategy: built to hold steam pressure from a loss-of-coolant accident, withstand earthquakes and external impacts, and keep radioactive material sealed inside even during severe core damage. Containment did its job at Three Mile Island (1979); at Fukushima (2011) it largely contained the meltdowns despite hydrogen explosions damaging the buildings.",
+      "category": "safety",
+      "related_terms": [
+        "nuclear-reactor",
+        "defense-in-depth",
+        "meltdown",
+        "shielding",
+        "reactor-core"
+      ],
+      "quick_facts": [
+        "Final barrier between the reactor and the public",
+        "Reinforced concrete ~1 m thick with a steel liner",
+        "Designed against quakes, impacts, and internal pressure",
+        "Held firm at Three Mile Island (1979)",
+        "One layer of the defense-in-depth strategy"
+      ],
+      "sources": [
+        {
+          "organization": "IAEA",
+          "title": "Safety Standards",
+          "url": "https://www.iaea.org/topics/safety-standards"
+        }
+      ],
+      "image": null,
+      "debunking_snippet": null,
+      "related_myths": [],
+      "related_articles": [],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "control-rods",
+      "term": "Control Rods",
+      "definition": "Neutron-absorbing rods — boron carbide, cadmium, silver-indium-cadmium, or hafnium — moved in and out of a reactor core to regulate the chain reaction. Inserted deeper, they soak up more neutrons and power falls; withdrawn, power rises. On an emergency shutdown (scram) they slam fully in within seconds, stopping the fission chain. Because they rely on gravity or hydraulics rather than electronics, they fail safe.",
+      "category": "technology",
+      "related_terms": [
+        "nuclear-reactor",
+        "moderator",
+        "defense-in-depth",
+        "chain-reaction",
+        "reactor-core"
+      ],
+      "quick_facts": [
+        "Made of neutron absorbers: boron, cadmium, hafnium",
+        "Inserted deeper → less power; withdrawn → more power",
+        "SCRAM: full insertion in seconds stops the chain reaction",
+        "Designed to fail safe — gravity drops them on power loss",
+        "Absorb neutrons without themselves becoming dangerously unstable"
+      ],
+      "sources": [
+        {
+          "organization": "NEA",
+          "title": "Nuclear Safety",
+          "url": "https://www.oecd-nea.org/jcms/pl_13561/nuclear-safety"
+        }
+      ],
+      "image": "../../assets/images/terms/control rod.webp",
+      "debunking_snippet": "“Turning off a reactor is like switching off a light.” Control rods stop the fission chain almost instantly — but radioactive decay heat keeps the fuel hot for days, which is why cooling continues long after shutdown.",
+      "related_myths": [],
+      "related_articles": [],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "cosmic-radiation",
+      "term": "Cosmic Radiation",
+      "definition": "High-energy particles — mostly protons and atomic nuclei — arriving from outside the solar system (galactic cosmic rays, born in supernovae) plus bursts of solar particles from the Sun. When they smash into the atmosphere they trigger showers of secondary particles; those secondaries, not the originals, account for nearly all cosmic dose at ground level. Exposure roughly doubles every 2,000 meters of altitude, which is why airline crews receive among the highest occupational doses of any profession.",
+      "category": "science",
+      "related_terms": [
+        "background-radiation",
+        "ionizing-radiation",
+        "radiation",
+        "exposure"
+      ],
+      "quick_facts": [
+        "Origins: supernovae across the galaxy, plus solar storms",
+        "At ground level we're hit mainly by secondary shower particles",
+        "Dose roughly doubles every 2 km of altitude",
+        "Airline crews get the highest occupational doses in civilian work",
+        "Earth's atmosphere and magnetic field are our shields"
+      ],
+      "sources": [
+        {
+          "organization": "NASA",
+          "title": "Space Radiation Analysis Group",
+          "url": "https://srag.jsc.nasa.gov/"
+        }
+      ],
+      "image": "../../assets/images/terms/radiation.webp",
+      "debunking_snippet": "“Cosmic radiation is just sunlight.” It isn't light at all — it's charged particles, mostly from far beyond the solar system, moving at nearly light speed.",
+      "related_myths": [],
+      "related_articles": [],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "critical-mass",
+      "term": "Critical Mass",
+      "definition": "The smallest amount of fissile material that can sustain a chain reaction, given a particular shape, density, purity, and surroundings. A bare sphere needs about 52 kg of weapons-grade uranium-235 or about 10 kg of plutonium-239; surrounding the core with a reflector that bounces neutrons back can cut those figures dramatically. Squeeze a subcritical mass into a supercritical one fast enough — by implosion or gun assembly — and you have a weapon; arrange it just right in a lattice and you have a steady reactor.",
+      "category": "science",
+      "related_terms": [
+        "chain-reaction",
+        "nuclear-fission",
+        "uranium-235",
+        "plutonium-239"
+      ],
+      "quick_facts": [
+        "Bare sphere: ≈52 kg U-235, ≈10 kg Pu-239",
+        "Depends on shape, purity, density, and neutron reflection",
+        "A tamper/reflector can cut the required mass several-fold",
+        "Weapons achieve supercriticality via implosion or gun assembly",
+        "Reactors arrange fuel to run exactly critical, no more"
+      ],
+      "sources": [
+        {
+          "organization": "NRC",
+          "title": "Glossary: Critical Mass",
+          "url": "https://www.nrc.gov/reading-rm/basic-ref/glossary.html"
+        }
+      ],
+      "image": "../../assets/images/terms/critical mass.webp",
+      "debunking_snippet": null,
+      "related_myths": [],
+      "related_articles": [],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "cyclotron",
+      "term": "Cyclotron",
+      "definition": "A compact circular particle accelerator invented by Ernest O. Lawrence in 1930. Electric fields kick charged particles faster with each pass while a magnetic field bends them into a widening spiral until they exit at high energy. Cyclotrons are workhorses of nuclear medicine: hospital-based machines bombard targets to make short-lived positron emitters such as fluorine-18 for PET scans. (Technetium-99m, the most-used diagnostic isotope, comes mainly from reactors instead.) Lawrence won the 1939 Nobel Prize in Physics for the cyclotron.",
+      "category": "technology",
+      "related_terms": [
+        "isotope",
+        "ernest-lawrence",
+        "linear-accelerator",
+        "radionuclide"
+      ],
+      "quick_facts": [
+        "Invented by Ernest O. Lawrence (1930)",
+        "Accelerates particles in a spiral using electric + magnetic fields",
+        "Makes PET isotopes like fluorine-18 in hospitals",
+        "Compact next to kilometer-long linear accelerators",
+        "Lawrence won the 1939 Nobel Prize for it"
+      ],
+      "sources": [
+        {
+          "organization": "IAEA",
+          "title": "Cyclotrons for Radionuclide Production",
+          "url": "https://www.iaea.org/topics/cyclotrons"
+        }
+      ],
+      "image": "../../assets/images/terms/Cyclotron.webp",
+      "debunking_snippet": null,
+      "related_myths": [],
+      "related_articles": [],
+      "difficulty": "advanced"
+    },
+    {
+      "id": "decay",
+      "term": "Radioactive Decay",
+      "definition": "The spontaneous transformation of an unstable nucleus into a more stable configuration by emitting radiation — an alpha particle, beta electron or positron, gamma ray, or occasionally a whole neutron or split. Quantum mechanics makes each atom's timing unknowable yet the crowd's behavior perfectly predictable: exponential halving governed by half-life. Decay chains can run many steps — uranium-238 takes 14 transformations over billions of years before settling as stable lead-206.",
+      "category": "science",
+      "related_terms": [
+        "half-life",
+        "radionuclide",
+        "alpha-particle",
+        "beta-particle",
+        "transmutation"
+      ],
+      "quick_facts": [
+        "Random per atom, precisely predictable per sample",
+        "Main modes: alpha, beta (β⁻/β⁺), gamma, spontaneous fission",
+        "U-238 chain: 14 decays over 4.5 billion years → lead-206",
+        "Nothing humans do speeds it up meaningfully",
+        "Each step changes the element — transmutation in action"
+      ],
+      "sources": [
+        {
+          "organization": "EPA",
+          "title": "Radioactive Decay",
+          "url": "https://www.epa.gov/radiation/radioactive-decay"
+        }
+      ],
+      "image": "../../assets/images/terms/Decay.webp",
+      "debunking_snippet": "“We could neutralize waste if we heated or zapped it.” Decay rates are set inside the nucleus and shrug off temperature, pressure, chemistry, and ordinary radiation — only nuclear reactions change them.",
+      "related_myths": [],
+      "related_articles": [],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "defense-in-depth",
+      "term": "Defense-in-Depth",
+      "definition": "The central safety philosophy of nuclear engineering: never rely on a single barrier or system, because everything can fail. Safety is layered five ways — prevent abnormal operation, control accidents within systems, contain severe damage, manage core melt, and plan emergency response — wrapped around a chain of physical barriers: the ceramic fuel pellet itself, the metal cladding around it, the steel reactor vessel, and finally the containment building. Any one layer can fail; no plausible scenario fails them all at once.",
+      "category": "safety",
+      "related_terms": [
+        "containment-building",
+        "control-rods",
+        "nuclear-reactor",
+        "meltdown"
+      ],
+      "quick_facts": [
+        "Multiple independent layers — no single point of failure",
+        "Physical barriers: fuel pellet → cladding → reactor vessel → containment",
+        "Five operational levels from prevention to emergency response",
+        "Redundant + diverse safety systems that back each other up",
+        "Codified in IAEA safety principles worldwide"
+      ],
+      "sources": [
+        {
+          "organization": "IAEA",
+          "title": "Safety Fundamentals",
+          "url": "https://www.iaea.org/topics/nuclear-safety-and-security"
+        }
+      ],
+      "image": null,
+      "debunking_snippet": "“Nuclear plants are safe only if nothing ever goes wrong.” The design assumes things WILL go wrong — equipment failures, operator errors, even floods — and layers backup after backup on top of each failure.",
+      "related_myths": [],
+      "related_articles": [],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "dose-rate",
+      "term": "Dose Rate",
+      "definition": "How fast radiation dose accumulates — e.g. microsieverts per hour (μsv/h) or millisieverts per year (mSv/yr). Rate matters biologically: the body can repair low-intensity damage over hours and days, so the same total dose spread over a year is far less harmful than delivered all at once. Natural background averages roughly 0.27 μSv/h worldwide; regulatory limits for nuclear workers (20 mSv/yr averaged) are built entirely around dose-rate thinking.",
+      "category": "science",
+      "related_terms": [
+        "absorbed-dose",
+        "sievert",
+        "exposure",
+        "background-radiation",
+        "dosimeter"
+      ],
+      "quick_facts": [
+        "Dose per unit time: μSv/h, mSv/yr",
+        "Natural background ≈ 0.27 μSv/h averaged globally",
+        "Same total dose is safer when spread out — the body repairs damage",
+        "Drives occupational limits: 20 mSv/yr averaged over 5 years",
+        "What survey meters and area monitors actually display"
+      ],
+      "sources": [
+        {
+          "organization": "IAEA",
+          "title": "Radiation Protection",
+          "url": "https://www.iaea.org/topics/radiation-protection"
+        }
+      ],
+      "image": "../../assets/images/terms/Dose Rate.webp",
+      "debunking_snippet": "“A hot reading means immediate danger.” Not without the time dimension — 10 μSv/h for an hour-long visit is trivial; the same spot for a full year is a different story.",
+      "related_myths": [],
+      "related_articles": [],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "dosimeter",
+      "term": "Dosimeter",
+      "definition": "A device worn by radiation workers to record the cumulative ionizing-radiation dose they receive. Passive types — film badges, thermoluminescent (TLD), and optically stimulated luminescent (OSL) dosimeters — are read out periodically, typically monthly. Direct-reading electronic dosimeters show live dose and dose-rate with alarms. Legal limits make them mandatory for classified workers in medicine, nuclear power, research, and industry.",
+      "category": "technology",
+      "related_terms": [
+        "dose-rate",
+        "exposure",
+        "geiger-counter",
+        "absorbed-dose",
+        "ionizing-radiation"
+      ],
+      "quick_facts": [
+        "Records cumulative personal radiation dose",
+        "Passive types: film badge, TLD, OSL — read monthly or quarterly",
+        "Electronic types show real-time dose and dose-rate with alarms",
+        "Legally required for classified radiation workers",
+        "Worn on the torso; special versions for fingers (ring badges)"
+      ],
+      "sources": [
+        {
+          "organization": "NRC",
+          "title": "Occupational Radiation Protection",
+          "url": "https://www.nrc.gov/about-nrc/radiation/protects-you/protection-principles.html"
+        }
+      ],
+      "image": "../../assets/images/terms/dosimeter.webp",
+      "debunking_snippet": "“A Geiger counter and a dosimeter are the same thing.” They're not — a Geiger counter detects radiation instantly but forgets; a dosimeter remembers your accumulated dose over weeks and months.",
+      "related_myths": [],
+      "related_articles": [],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "edward-teller",
+      "term": "Edward Teller",
+      "definition": "Hungarian-American theoretical physicist (1908–2003), known as the 'father of the hydrogen bomb'. After fleeing Nazi Germany and working on the Manhattan Project's fission weapons, he drove the 1951 Ulam–Teller staged-compression idea that made thermonuclear weapons feasible — the Ivy Mike shot (1952) proved it. He co-founded Lawrence Livermore National Laboratory and championed nuclear weapons testing, rocket propulsion, and civil defense. His 1954 testimony that Robert Oppenheimer was a security risk split the scientific community and remains controversial.",
+      "category": "people",
+      "related_terms": [
+        "nuclear-fusion",
+        "stanislaw-ulam",
+        "j-robert-oppenheimer",
+        "ernest-lawrence"
+      ],
+      "quick_facts": [
+        "'Father of the hydrogen bomb' — Ulam–Teller design, tested 1952",
+        "Worked on the Manhattan Project's fission bombs",
+        "Co-founded Lawrence Livermore National Laboratory (1952)",
+        "Testified against Oppenheimer in 1954, dividing scientists",
+        "Lifelong advocate of nuclear deterrence and testing"
+      ],
+      "sources": [
+        {
+          "organization": "Britannica",
+          "title": "Edward Teller",
+          "url": "https://www.britannica.com/biography/Edward-Teller"
+        }
+      ],
+      "image": "/assets/images/people/Edward Teller.webp",
+      "debunking_snippet": "“The hydrogen bomb was one man's invention.” It took many hands — Stanisław Ulam's compression scheme was as essential as Teller's vision; both names are on the key 1951 paper.",
+      "related_myths": [],
+      "related_articles": [],
+      "difficulty": "advanced"
+    },
+    {
+      "id": "electron",
+      "term": "Electron",
+      "definition": "A fundamental subatomic particle carrying the smallest unit of negative electric charge, discovered by J.J. Thomson in 1897. Electrons aren't little balls circling the nucleus like planets — they exist as probability clouds (orbitals) whose shapes define chemistry. With just 1/1836 of a proton's mass, they're easily knocked loose, which is what electricity, chemical bonds, and beta radiation are all about.",
+      "category": "science",
+      "related_terms": [
+        "atom",
+        "proton",
+        "neutron",
+        "beta-particle"
+      ],
+      "quick_facts": [
+        "Discovered by J.J. Thomson (1897)",
+        "Charge: −1 · mass only 1/1836 of a proton",
+        "Occupy orbitals — probability clouds, not orbits",
+        "Their arrangement determines an element's chemistry",
+        "A free electron emitted from a nucleus is beta radiation"
+      ],
+      "sources": [
+        {
+          "organization": "Britannica",
+          "title": "Electron",
+          "url": "https://www.britannica.com/science/electron"
+        }
+      ],
+      "image": "../../assets/images/terms/electron.webp",
+      "debunking_snippet": "“Electrons spin around the nucleus like planets around the Sun.” That's a 100-year-old classroom picture. Quantum mechanics replaced it with orbitals: smeared-out probability clouds where an electron has no definite path.",
+      "related_myths": [],
+      "related_articles": [],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "enrichment",
+      "term": "Uranium Enrichment",
+      "definition": "Concentrating the fissile uranium-235 fraction above its stingy 0.7% natural abundance. Because isotopes share identical chemistry, separation exploits tiny mass differences: thousands of spinning gas centrifuges feed UF₆ through cascades, each stage nudging the ratio upward. Reactor fuel lands at 3–5%, research reactors may want 20%, and weapons-grade means >90%. The same machines serve both ends — which makes every centrifuge plant a proliferation question.",
+      "category": "technology",
+      "related_terms": [
+        "uranium-235",
+        "uranium-238",
+        "uranium-hexafluoride",
+        "critical-mass"
+      ],
+      "quick_facts": [
+        "Natural U-235: only 0.72%",
+        "Light-water reactor fuel: 3–5% enriched",
+        "Weapons-grade: >90% — a long technical leap beyond reactor fuel",
+        "Gas centrifuges replaced gaseous diffusion worldwide",
+        "Effort measured in Separative Work Units (SWU)"
+      ],
+      "sources": [
+        {
+          "organization": "World Nuclear",
+          "title": "Uranium Enrichment",
+          "url": "https://world-nuclear.org/information-library/nuclear-fuel-cycle/enrichment-and-conversion"
+        }
+      ],
+      "image": "../../assets/images/terms/Enrichment.webp",
+      "debunking_snippet": "“Any country with enrichment can quickly build a bomb.” Reactor-grade (3–5%) to weapons-grade (>90%) is an enormous engineering, energy, and detection challenge — that gap is exactly what IAEA inspectors police.",
+      "related_myths": [],
+      "related_articles": [],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "enrico-fermi",
+      "term": "Enrico Fermi",
+      "definition": "Italian-American physicist (1901–1954), arguably the last great physicist at home in both theory and experiment. He won the 1938 Nobel Prize for discovering nuclear reactions induced by slow neutrons, then — after fleeing fascist Italy's racial laws — directed the construction of Chicago Pile-1, the world's first self-sustaining chain reaction (December 2, 1942), under Arthur Compton's Met Lab. Fermions, fermium, Fermilab, and the Fermi paradox all carry his name.",
+      "category": "people",
+      "related_terms": [
+        "nuclear-reactor",
+        "chain-reaction",
+        "nuclear-fission",
+        "arthur-compton",
+        "leo-szilard"
+      ],
+      "quick_facts": [
+        "Built Chicago Pile-1, the first reactor (Dec 2, 1942)",
+        "Nobel Prize in Physics (1938) for slow-neutron work",
+        "Left Italy in 1938 over anti-Jewish laws affecting his wife",
+        "Element fermium, 'fermions', and Fermilab honor him",
+        "Co-designed the pile with Leo Szilard on the team"
+      ],
+      "sources": [
+        {
+          "organization": "DOE",
+          "title": "Enrico Fermi",
+          "url": "https://www.energy.gov/science/doe-explainsscientists/enrico-fermi"
+        }
+      ],
+      "image": "/assets/images/people/fermi.webp",
+      "debunking_snippet": null,
+      "related_myths": [],
+      "related_articles": [],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ernest-lawrence",
+      "term": "Ernest Lawrence",
+      "definition": "American physicist (1901–1958) who invented the cyclotron in 1930 — the first accelerator practical enough to smash atoms productively — winning the 1939 Nobel Prize in Physics. His Radiation Laboratory at Berkeley became the birthplace of accelerator-based science; it spun off the discovery of technetium, plutonium, and hundreds of radioisotopes, and later evolved into today's Lawrence Berkeley and Lawrence Livermore national laboratories. Element 103, lawrencium, is named for him.",
+      "category": "people",
+      "related_terms": [
+        "cyclotron",
+        "isotope",
+        "edward-teller",
+        "glenn-seaborg"
+      ],
+      "quick_facts": [
+        "Invented the cyclotron (1930)",
+        "Nobel Prize in Physics (1939)",
+        "His lab discovered technetium and helped isolate plutonium",
+        "Berkeley and Livermore national labs bear his name",
+        "Element 103 — lawrencium — honors him"
+      ],
+      "sources": [
+        {
+          "organization": "Nobel Prize",
+          "title": "Ernest Lawrence Biography",
+          "url": "https://www.nobelprize.org/prizes/physics/1939/lawrence/biographical/"
+        }
+      ],
+      "image": "/assets/images/people/ernest o lawrence.webp",
+      "debunking_snippet": null,
+      "related_myths": [],
+      "related_articles": [],
+      "difficulty": "advanced"
+    },
+    {
+      "id": "ernest-rutherford",
+      "term": "Ernest Rutherford",
+      "definition": "New Zealand-born British physicist (1871–1937), the father of nuclear physics. He identified alpha and beta radiation (and named gamma), won the 1908 Nobel Prize in Chemistry for radioactivity research, discovered the atomic nucleus with his 1911 gold-foil experiment, and in 1919 achieved the first artificial nuclear reaction — knocking protons out of nitrogen — which earned him credit as the first person to deliberately split the atom. He also named the proton.",
+      "category": "people",
+      "related_terms": [
+        "nucleus",
+        "alpha-particle",
+        "beta-particle",
+        "proton",
+        "decay"
+      ],
+      "quick_facts": [
+        "Discovered the atomic nucleus (gold foil, 1911)",
+        "Nobel Prize in Chemistry (1908) for radioactivity",
+        "Named alpha, beta, and gamma radiation",
+        "First artificial nuclear reaction: nitrogen + alpha (1919)",
+        "Coined the word 'proton'"
+      ],
+      "sources": [
+        {
+          "organization": "Nobel Prize",
+          "title": "Ernest Rutherford Biography",
+          "url": "https://www.nobelprize.org/prizes/chemistry/1908/rutherford/biographical/"
+        }
+      ],
+      "image": "/assets/images/people/ernest rutherford.webp",
+      "debunking_snippet": null,
+      "related_myths": [],
+      "related_articles": [],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ernest-walton",
+      "term": "Ernest Walton",
+      "definition": "Irish physicist (1903–1995) who, with John Cockcroft, built the first particle accelerator able to disintegrate atomic nuclei. In 1932 at Cambridge they fired protons at lithium and watched it split into two helium nuclei — the first deliberate splitting of the atom by artificially accelerated particles, and the first direct confirmation of E = mc² on a nuclear scale. The two shared the 1951 Nobel Prize in Physics; their Cockcroft–Walton voltage multiplier still serves as the front end of modern accelerators.",
+      "category": "people",
+      "related_terms": [
+        "john-cockcroft",
+        "proton",
+        "alpha-particle",
+        "binding-energy",
+        "cyclotron"
+      ],
+      "quick_facts": [
+        "Split lithium with protons — first artificial atom-splitting (1932)",
+        "Shared the 1951 Nobel Prize in Physics with Cockcroft",
+        "Cockcroft–Walton generator: still used to inject accelerators",
+        "First laboratory test of E = mc² in nuclear reactions",
+        "Ireland's only physics Nobel laureate"
+      ],
+      "sources": [
+        {
+          "organization": "Nobel Prize",
+          "title": "Ernest Walton Biography",
+          "url": "https://www.nobelprize.org/prizes/physics/1951/walton/biographical/"
+        }
+      ],
+      "image": null,
+      "debunking_snippet": null,
+      "related_myths": [],
+      "related_articles": [],
+      "difficulty": "advanced"
+    },
+    {
+      "id": "eugene-wigner",
+      "term": "Eugene Wigner",
+      "definition": "Hungarian-American theoretical physicist (1902–1995) who won the 1963 Nobel Prize in Physics for his work on the theory of the atomic nucleus and elementary particles, especially symmetry principles. A Manhattan Project veteran, he led the design team behind the Hanford plutonium-production reactors and co-invented the pressurized water reactor with Alvin Weinberg. He also described the 'Wigner effect' — neutron damage to graphite — and applied group theory so deeply to physics that colleagues called him 'the Silent Genius'.",
+      "category": "people",
+      "related_terms": [
+        "nuclear-reactor",
+        "alvin-weinberg",
+        "neutron",
+        "chain-reaction"
+      ],
+      "quick_facts": [
+        "Nobel Prize in Physics (1963) for nuclear & symmetry theory",
+        "Led the design of the Hanford production reactors",
+        "Co-patented the pressurized water reactor with Weinberg",
+        "Identified the Wigner effect: neutrons damaging graphite",
+        "Brought group theory into the heart of quantum physics"
+      ],
+      "sources": [
+        {
+          "organization": "Nobel Prize",
+          "title": "Eugene Wigner Biography",
+          "url": "https://www.nobelprize.org/prizes/physics/1963/wigner/biographical/"
+        }
+      ],
+      "image": "/assets/images/people/wigner.webp",
+      "debunking_snippet": null,
+      "related_myths": [],
+      "related_articles": [],
+      "difficulty": "advanced"
+    },
+    {
+      "id": "exposure",
+      "term": "Radiation Exposure",
+      "definition": "Being subjected to radiation — externally (sources outside the body: X-ray machines, cosmic rays) or internally (inhaled or ingested emitters like radon or iodine-131). Strictly speaking, 'exposure' is also a precise legacy unit: the roentgen measured ionization produced in air by X-rays. In everyday safety talk it just means dose received, minimized by the golden trio: time (less of it), distance (more of it), shielding (more of it).",
+      "category": "science",
+      "related_terms": [
+        "dose-rate",
+        "dosimeter",
+        "shielding",
+        "ionizing-radiation",
+        "radon"
+      ],
+      "quick_facts": [
+        "External: sources outside your body",
+        "Internal: breathed or eaten emitters — like radon",
+        "Strict definition: ionization in air (the old roentgen)",
+        "Reduce with time, distance, and shielding",
+        "Everyone gets some every day — background is unavoidable"
+      ],
+      "sources": [
+        {
+          "organization": "EPA",
+          "title": "Radiation Protection Basics",
+          "url": "https://www.epa.gov/radiation"
+        }
+      ],
+      "image": "../../assets/images/terms/exposure.webp",
+      "debunking_snippet": "“Standing near a source means you're contaminated.” No — external exposure leaves nothing behind. Contamination means actual radioactive material ON or IN you; a sunburn isn't a tan made of sunshine.",
+      "related_myths": [],
+      "related_articles": [],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "frederick-joliot-curie",
+      "term": "Frédéric Joliot-Curie",
+      "definition": "French physicist (1900–1958) who ran the laboratory alongside his wife — and fellow Nobel laureate — Irène Joliot-Curie, daughter of Marie and Pierre Curie. In 1934 the couple bombarded aluminum with alpha particles and produced phosphorus-30: the first artificially created radioactive material. It opened the door to making radioisotopes on demand for medicine and research, and earned both of them the 1935 Nobel Prize in Chemistry. Frédéric later founded France's Atomic Energy Commission (CEA) and filed some of the earliest nuclear-reactor patent concepts.",
+      "category": "people",
+      "related_terms": [
+        "irene-joliot-curie",
+        "marie-curie",
+        "alpha-particle",
+        "decay",
+        "radionuclide"
+      ],
+      "quick_facts": [
+        "Created the first artificial radioactivity (1934)",
+        "Shared the 1935 Nobel Prize in Chemistry with Irène",
+        "Their trick: alpha-bombard aluminum → radioactive phosphorus-30",
+        "Founded France's CEA after World War II",
+        "Trained in the lab of Marie Curie — whom he married into"
+      ],
+      "sources": [
+        {
+          "organization": "Nobel Prize",
+          "title": "Frédéric Joliot-Curie Biography",
+          "url": "https://www.nobelprize.org/prizes/chemistry/1935/joliot-fred/biographical/"
+        }
+      ],
+      "image": null,
+      "debunking_snippet": null,
+      "related_myths": [],
+      "related_articles": [],
+      "difficulty": "advanced"
+    },
+    {
+      "id": "fuel-rods",
+      "term": "Fuel Rods",
+      "definition": "Long sealed metal tubes — typically zirconium alloy — packed with ceramic pellets of enriched uranium dioxide, each about the size of a fingertip. The rods are bundled into fuel assemblies that stand inside the reactor core, where fission in the pellets generates heat. The ceramic pellet survives temperatures near 2,800 °C and traps most fission products inside it; the cladding tube around it is the second physical barrier in defense-in-depth, keeping radioactive material sealed away from the coolant.",
+      "category": "technology",
+      "related_terms": [
+        "nuclear-reactor",
+        "uranium-235",
+        "reactor-core",
+        "defense-in-depth"
+      ],
+      "quick_facts": [
+        "Ceramic uranium-dioxide pellets inside zircon-alloy tubes",
+        "Pellets melt only around 2,800 °C and retain fission products",
+        "Rods bundle into assemblies standing in the reactor core",
+        "Cladding = second barrier of defense-in-depth",
+        "Replaced roughly every 4–6 years as spent fuel"
+      ],
+      "sources": [
+        {
+          "organization": "World Nuclear",
+          "title": "Nuclear Fuel Cycle",
+          "url": "https://world-nuclear.org/information-library/nuclear-fuel-cycle.aspx"
+        }
+      ],
+      "image": "../../assets/images/terms/fuel rods.webp",
+      "debunking_snippet": "“Nuclear fuel rods are glowing green bars.” Real fuel looks like plain gray ceramic pellets stacked in metal tubes — it isn't even noticeably radioactive before it goes into the reactor.",
+      "related_myths": [],
+      "related_articles": [],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "gamma-ray",
+      "term": "Gamma Ray (γ)",
+      "definition": "The most penetrating form of radiation: a high-energy photon with no mass and no charge, traveling at the speed of light. Gamma rays pour out of unstable nuclei that still have excess energy after emitting an alpha or beta particle. They pass through the body easily, need centimeters of lead or meters of concrete for shielding, and ionize atoms along the way — which makes them both a hazard and a tool, from sterilizing medical equipment to treating tumors.",
+      "category": "science",
+      "related_terms": [
+        "alpha-particle",
+        "beta-particle",
+        "x-ray",
+        "decay",
+        "shielding"
+      ],
+      "quick_facts": [
+        "High-energy photons: no mass, no charge, speed of light",
+        "Emitted when a nucleus sheds leftover energy after decay",
+        "Shielded by lead or concrete — never fully 'stopped', only attenuated",
+        "Sterilizes ~40% of the world's single-use medical devices",
+        "Cobalt-60 gamma beams treat cancer (teletherapy)"
+      ],
+      "sources": [
+        {
+          "organization": "EPA",
+          "title": "Radiation Basics",
+          "url": "https://www.epa.gov/radiation/radiation-basics"
+        }
+      ],
+      "image": "../../assets/images/terms/gamma rays.webp",
+      "debunking_snippet": "“Gamma rays make things radioactive.” At normal energies they don't — gamma irradiation adds energy, not radioactivity. That's exactly why food can be irradiated safely: nothing becomes radioactive; microbes are simply killed.",
+      "related_myths": [
+        "myths-facts-15"
+      ],
+      "related_articles": [],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "geiger-counter",
+      "term": "Geiger Counter",
+      "definition": "A portable radiation detector built around a gas-filled tube: when ionizing radiation passes through, it triggers a brief electrical avalanche counted as one click or blip. Invented by Hans Geiger in 1908 and refined with Walther Müller in 1928 into the rugged Geiger–Müller tube used everywhere from power plants to prospecting. With the right window it detects alpha, beta, and gamma radiation — though it only counts events, never telling you their energy.",
+      "category": "technology",
+      "related_terms": [
+        "radiation",
+        "dosimeter",
+        "dose-rate",
+        "ionizing-radiation"
+      ],
+      "quick_facts": [
+        "Counts ionization pulses from a gas-filled tube",
+        "Geiger–Müller design dates to 1928",
+        "Detects alpha (thin window), beta, and gamma",
+        "Reports counts — not energy or full dose by itself",
+        "Cheap, rugged, and instantly readable"
+      ],
+      "sources": [
+        {
+          "organization": "EPA",
+          "title": "Radiation Detection and Measurement",
+          "url": "https://www.epa.gov/radiation"
+        }
+      ],
+      "image": "../../assets/images/terms/geiger counter.webp",
+      "debunking_snippet": "“If the clicking stops, it's safe.” Dangerous trap: in extreme fields a Geiger tube saturates and goes quiet while radiation is at its worst. Silence is not safety.",
+      "related_myths": [],
+      "related_articles": [],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "glenn-seaborg",
+      "term": "Glenn Seaborg",
+      "definition": "American chemist (1912–1999) who discovered plutonium in 1941 and went on to share in the identification of ten transuranium elements, work honored with the 1951 Nobel Prize in Chemistry (with Edwin McMillan). He proposed the actinide concept that reshaped the periodic table's bottom row, advised ten presidents — including chairing the AEC under Kennedy and Johnson — and remains the only person to have a chemical element (seaborgium) named after him while still alive.",
+      "category": "people",
+      "related_terms": [
+        "plutonium-239",
+        "glenn-seaborg-transuranium",
+        "ernest-lawrence",
+        "transmutation"
+      ],
+      "quick_facts": [
+        "Co-discovered plutonium (1941)",
+        "Nobel Prize in Chemistry (1951, with McMillan)",
+        "Credited with 10 transuranium elements",
+        "His actinide concept reshaped the periodic table",
+        "Only person with an element named after them in their lifetime"
+      ],
+      "sources": [
+        {
+          "organization": "Nobel Prize",
+          "title": "Glenn Seaborg Biography",
+          "url": "https://www.nobelprize.org/prizes/chemistry/1951/seaborg/biographical/"
+        }
+      ],
+      "image": "/assets/images/people/Glenn Seaborg.webp",
+      "debunking_snippet": null,
+      "related_myths": [],
+      "related_articles": [],
+      "difficulty": "advanced"
+    },
+    {
+      "id": "glenn-seaborg-transuranium",
+      "term": "Transuranium Elements",
+      "definition": "Elements heavier than uranium (Z > 93): neptunium through oganesson. All are radioactive, and none survive meaningfully from Earth's formation — they exist because stars, cosmic rays, reactors, and bombs keep making them. Seaborg's team synthesized plutonium and nine others between 1940 and 1974, and trace amounts arise naturally in ore bodies too (even the ancient Oklo reactor cooked up some plutonium). Their short lifetimes and rising instability with size mark chemistry's practical frontier.",
+      "category": "science",
+      "related_terms": [
+        "glenn-seaborg",
+        "plutonium-239",
+        "transmutation",
+        "atomic-number"
+      ],
+      "quick_facts": [
+        "All elements beyond Z = 92: neptunium → oganesson (118)",
+        "Every one is radioactive",
+        "Made by neutron bombardment followed by beta decay",
+        "Named for scientists, places, and planets",
+        "Trace amounts occur naturally — even Oklo's fossil reactor made some"
+      ],
+      "sources": [
+        {
+          "organization": "World Nuclear",
+          "title": "Transuranic Elements",
+          "url": "https://world-nuclear.org/information-library"
+        }
+      ],
+      "image": null,
+      "debunking_snippet": null,
+      "related_myths": [],
+      "related_articles": [],
+      "difficulty": "advanced"
+    },
+    {
+      "id": "gray",
+      "term": "Gray (Gy)",
+      "definition": "The SI unit of absorbed radiation dose: 1 Gy means one joule of radiation energy deposited per kilogram of material, adopted in 1975 and named after British physicist Louis Harold Gray, a pioneer of radiation dosimetry. It replaced the older rad (1 Gy = 100 rad). Gray measures pure physical energy absorption — to gauge biological harm, sieverts weight each radiation type by its effectiveness.",
+      "category": "science",
+      "related_terms": [
+        "absorbed-dose",
+        "sievert",
+        "dose-rate",
+        "dosimeter"
+      ],
+      "quick_facts": [
+        "1 Gy = 1 joule per kilogram",
+        "Adopted as an SI unit in 1975; replaces the rad (1 Gy = 100 rad)",
+        "Named after dosimetry pioneer Louis Harold Gray",
+        "Physical unit — biological risk needs sieverts",
+        "Medical doses quoted in Gy: e.g., ~2 Gy per radiotherapy fraction"
+      ],
+      "sources": [
+        {
+          "organization": "BIPM",
+          "title": "SI Units – gray",
+          "url": "https://www.bipm.org/en/measurement-units"
+        }
+      ],
+      "image": "../../assets/images/terms/gray gy.webp",
+      "debunking_snippet": null,
+      "related_myths": [],
+      "related_articles": [],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "half-life",
+      "term": "Half-Life",
+      "definition": "The time it takes for half of the atoms in a radioactive sample to decay — and then half of what's left in the next interval, and so on. Decay is a pure exponential: after two half-lives a quarter survives, after three an eighth. Every isotope has its own fixed value, from fractions of a second (polonium-212) to billions of years (uranium-238). It cannot practically be altered by temperature, pressure, or chemistry — which makes half-life a dependable clock for dating everything from ancient wood to Earth's oldest rocks.",
+      "category": "science",
+      "related_terms": [
+        "decay",
+        "isotope",
+        "becquerel",
+        "radionuclide",
+        "uranium-238"
+      ],
+      "quick_facts": [
+        "Time for half of a sample's atoms to decay",
+        "Exponential: 2 half-lives → ¼ left, 3 → ⅛",
+        "Ranges from milliseconds (Po-212) to billions of years (U-238)",
+        "Iodine-131: 8 days · Carbon-14: 5,700 years · U-238: 4.5 billion",
+        "Unchanged by heat, cold, pressure, or chemistry"
+      ],
+      "sources": [
+        {
+          "organization": "EPA",
+          "title": "Radioactive Decay",
+          "url": "https://www.epa.gov/radiation/radioactive-decay"
+        }
+      ],
+      "image": "../../assets/images/terms/Half-Life.webp",
+      "debunking_snippet": "“After two half-lives it's all gone.” After two half-lives a quarter remains, and it keeps halving forever — never quite zero. That's why waste storage is measured in many half-lives.",
+      "related_myths": [],
+      "related_articles": [],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "hans-bethe",
+      "term": "Hans Bethe",
+      "definition": "German-American physicist (1906–2005) who worked out how stars shine: in 1939 he described the proton–proton chain and CNO cycle that fuse hydrogen into helium in stellar cores, earning the 1967 Nobel Prize in Physics. During the Manhattan Project he headed the Theoretical Division at Los Alamos, and later became a measured voice for arms control — opposing the race for more exotic weapons while contributing to their underlying physics.",
+      "category": "people",
+      "related_terms": [
+        "nuclear-fusion",
+        "nuclear-fission",
+        "edward-teller",
+        "binding-energy"
+      ],
+      "quick_facts": [
+        "Explained how stars fuse hydrogen and shine (1939)",
+        "Nobel Prize in Physics (1967)",
+        "Headed the Theory Division at Los Alamos",
+        "Developed both the p-p chain and CNO cycle models",
+        "Later a prominent advocate of arms-control treaties"
+      ],
+      "sources": [
+        {
+          "organization": "Nobel Prize",
+          "title": "Hans Bethe Biography",
+          "url": "https://www.nobelprize.org/prizes/physics/1967/bethe/biographical/"
+        }
+      ],
+      "image": null,
+      "debunking_snippet": null,
+      "related_myths": [],
+      "related_articles": [],
+      "difficulty": "advanced"
+    },
+    {
+      "id": "heavy-water",
+      "term": "Heavy Water",
+      "definition": "Water whose hydrogen atoms are swapped for deuterium — hydrogen carrying an extra neutron (D₂O). Chemically almost identical to ordinary water but about 10% denser, it is prized as a reactor moderator because it barely absorbs neutrons at all. That neutron economy lets CANDU reactors run on natural, non-enriched uranium — trading expensive enrichment for expensive D₂O production.",
+      "category": "technology",
+      "related_terms": [
+        "moderator",
+        "nuclear-reactor",
+        "tritium",
+        "isotope"
+      ],
+      "quick_facts": [
+        "D₂O: hydrogen replaced by deuterium (one extra neutron each)",
+        "~10% denser than ordinary water",
+        "Absorbs far fewer neutrons than light water",
+        "Lets CANDU reactors use natural, un-enriched uranium",
+        "Costly: thousands of liters per reactor tonne of moderator"
+      ],
+      "sources": [
+        {
+          "organization": "World Nuclear",
+          "title": "Heavy Water Reactors",
+          "url": "https://world-nuclear.org/information-library/nuclear-fuel-cycle.aspx"
+        }
+      ],
+      "image": "../../assets/images/terms/heavy water.webp",
+      "debunking_snippet": "“Heavy water is radioactive.” It isn't — deuterium is stable. A sip is harmless (you drink trace amounts daily); it would only matter if it were most of your water for weeks.",
+      "related_myths": [],
+      "related_articles": [],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "henri-becquerel",
+      "term": "Henri Becquerel",
+      "definition": "French physicist (1852–1908) who discovered radioactivity by accident in 1896: investigating whether uranium salts glow after sunlight exposure, he found they fogged a photographic plate even in a drawer on a cloudy week — the uranium emitted penetrating rays all by itself. Marie and Pierre Curie chased down the phenomenon and coined 'radioactivity'; all three shared the 1903 Nobel Prize in Physics, and the SI activity unit bears his name.",
+      "category": "people",
+      "related_terms": [
+        "becquerel",
+        "marie-curie",
+        "pierre-curie",
+        "decay",
+        "uranium-235"
+      ],
+      "quick_facts": [
+        "Discovered radioactivity in 1896 — via a cloudy-week accident",
+        "Uranium salts fogged plates with no sunlight needed",
+        "Shared the 1903 Nobel Prize in Physics with the Curies",
+        "The becquerel (Bq) unit honors him",
+        "Came from a family dynasty of physicists — son and grandson too"
+      ],
+      "sources": [
+        {
+          "organization": "Nobel Prize",
+          "title": "Henri Becquerel Biography",
+          "url": "https://www.nobelprize.org/prizes/physics/1903/becquerel/biographical/"
+        }
+      ],
+      "image": "/assets/images/people/becquerel, henri.webp",
+      "debunking_snippet": null,
+      "related_myths": [],
+      "related_articles": [],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "hot-cell",
+      "term": "Hot Cell",
+      "definition": "A heavily shielded room for hands-off handling of intensely radioactive materials. Workers stay outside lead, steel, or thick concrete walls and manipulate equipment through master-slave mechanical arms while watching through lead-glass windows — dense panes up to a meter thick that still let light through. Hot cells are where spent fuel is examined, medical isotopes are processed, and vitrified waste is packed; nothing inside needs a human body anywhere near it.",
+      "category": "technology",
+      "related_terms": [
+        "shielding",
+        "spent-fuel",
+        "vitrification",
+        "dosimeter",
+        "dose-rate"
+      ],
+      "quick_facts": [
+        "Shielded rooms for highly radioactive work",
+        "Master-slave manipulator arms reach through walls",
+        "Lead-glass viewing windows up to ~1 m thick",
+        "Used for spent-fuel research, isotope processing, reprocessing R&D",
+        "Air pressure kept negative so nothing leaks outward"
+      ],
+      "sources": [
+        {
+          "organization": "IAEA",
+          "title": "Nuclear Fuel Cycle Facilities",
+          "url": "https://www.iaea.org/"
+        }
+      ],
+      "image": "../../assets/images/terms/hot cell.webp",
+      "debunking_snippet": null,
+      "related_myths": [],
+      "related_articles": [],
+      "difficulty": "advanced"
+    },
+    {
+      "id": "hyman-rickover",
+      "term": "Hyman Rickover",
+      "definition": "U.S. Navy admiral (1900–1986), the 'Father of the Nuclear Navy'. He drove the development of compact pressurized-water propulsion — building on the PWR concept from Weinberg and Wigner — culminating in USS Nautilus (1954), the first nuclear submarine, which sailed under the North Pole in 1958. His obsessive engineering culture, personal interviews of every officer candidate, and insistence on rigorous training shaped naval nuclear safety into one of the safest industries anywhere. He served 63 years — the longest of any U.S. naval officer — and his team later launched the first full-size civilian PWR power plant at Shippingport.",
+      "category": "people",
+      "related_terms": [
+        "nuclear-reactor",
+        "alvin-weinberg",
+        "eugene-wigner",
+        "reactor-core"
+      ],
+      "quick_facts": [
+        "'Father of the Nuclear Navy'",
+        "USS Nautilus: first nuclear submarine (1954), reached North Pole 1958",
+        "63 years of service — longest in U.S. Navy history",
+        "His safety program has run reactors without major release since the 1950s",
+        "Shippingport (1957): first U.S. full-scale civilian nuclear plant"
+      ],
+      "sources": [
+        {
+          "organization": "Naval History and Heritage Command",
+          "title": "Hyman G. Rickover",
+          "url": "https://www.history.navy.mil"
+        }
+      ],
+      "image": null,
+      "debunking_snippet": null,
+      "related_myths": [],
+      "related_articles": [],
+      "difficulty": "advanced"
+    },
+    {
+      "id": "igor-kurchatov",
+      "term": "Igor Kurchatov",
+      "definition": "Soviet physicist (1903–1960) who directed the Soviet atomic bomb project — the effort that detonated the USSR's first device, RDS-1, in 1949 and ended America's nuclear monopoly. His institute also delivered Obninsk (1954), the world's first nuclear power plant connected to an electricity grid, years before Britain's Calder Hall. Late in life he publicly urged an end to atmospheric weapons testing, and the Kurchatov Institute — Russia's leading nuclear research center — carries his name.",
+      "category": "people",
+      "related_terms": [
+        "nuclear-reactor",
+        "chain-reaction",
+        "andrei-sakharov",
+        "edward-teller"
+      ],
+      "quick_facts": [
+        "Directed the Soviet atomic project (RDS-1 tested 1949)",
+        "Delivered Obninsk (1954): first grid-connected nuclear power plant",
+        "'Father of Soviet atomic energy'",
+        "Late-career advocate against atmospheric testing",
+        "The Kurchatov Institute is named after him"
+      ],
+      "sources": [
+        {
+          "organization": "Kurchatov Institute",
+          "title": "Igor Kurchatov",
+          "url": "http://www.nrcki.ru/en/"
+        }
+      ],
+      "image": null,
+      "debunking_snippet": null,
+      "related_myths": [],
+      "related_articles": [],
+      "difficulty": "advanced"
+    },
+    {
+      "id": "ion-chamber",
+      "term": "Ion Chamber",
+      "definition": "A gas-filled radiation detector operating below the Geiger avalanche regime: radiation ionizes the gas and the resulting tiny current — collected between two electrodes — flows in proportion to dose rate. That proportionality makes ion chambers the reference instruments for accurate dosimetry, from calibrating hospital radiotherapy beams to monitoring reactor buildings. The humble household smoke detector runs on the same principle: smoke disrupts a tiny ion chamber's current and triggers the alarm.",
+      "category": "technology",
+      "related_terms": [
+        "geiger-counter",
+        "dosimeter",
+        "dose-rate",
+        "absorbed-dose"
+      ],
+      "quick_facts": [
+        "Current proportional to dose rate — unlike counting GM tubes",
+        "The accuracy standard for radiotherapy beam calibration",
+        "No avalanche: linear response across huge ranges",
+        "Same principle as household smoke detectors",
+        "Can measure energy deposited, not just count events"
+      ],
+      "sources": [
+        {
+          "organization": "IAEA",
+          "title": "Radiation Detection",
+          "url": "https://www.iaea.org/"
+        }
+      ],
+      "image": "../../assets/images/terms/ion chamber.webp",
+      "debunking_snippet": "“Geiger counters are the most accurate radiation meters.” They're the loudest, not the most precise — ion chambers are what hospitals and regulators use when the number has to be right.",
+      "related_myths": [],
+      "related_articles": [],
+      "difficulty": "advanced"
+    },
+    {
+      "id": "ionizing-radiation",
+      "term": "Ionizing Radiation",
+      "definition": "Radiation carrying enough energy — roughly above 10 electron-volts — to strip electrons from atoms or molecules, leaving charged ions behind. It covers particle radiations (alpha, beta, neutrons) and high-frequency electromagnetic waves (X-rays, gamma rays); visible light and radio fall below the line. In living tissue it damages DNA both directly and indirectly through reactive fragments of water molecules, which is why exposure limits, shielding, and monitoring exist everywhere it's used.",
+      "category": "science",
+      "related_terms": [
+        "radiation",
+        "alpha-particle",
+        "beta-particle",
+        "gamma-ray",
+        "x-ray"
+      ],
+      "quick_facts": [
+        "Threshold ~10 eV per interaction",
+        "Particle forms: alpha, beta, neutrons · EM forms: X-ray, gamma",
+        "Damages DNA directly and via water-derived free radicals",
+        "Non-ionizing means safe-ish: UV, light, radio can't break bonds",
+        "Basis of medical imaging, sterilization, and cancer therapy"
+      ],
+      "sources": [
+        {
+          "organization": "IAEA",
+          "title": "Radiation Protection",
+          "url": "https://www.iaea.org/topics/radiation-protection"
+        }
+      ],
+      "image": "../../assets/images/terms/Ionizing Radiation.webp",
+      "debunking_snippet": "“All radiation is dangerous.” Only ionizing radiation breaks chemical bonds. Your Wi-Fi, microwave, and heat lamp are non-ionizing — they lack the energy to rip electrons off atoms.",
+      "related_myths": [],
+      "related_articles": [],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "irene-joliot-curie",
+      "term": "Irène Joliot-Curie",
+      "definition": "French chemist and physicist (1897–1956), daughter of Marie and Pierre Curie and, with her husband Frédéric, discoverer of artificial radioactivity in 1934 — earning the 1935 Nobel Prize in Chemistry as only the second woman ever to win one. She served as Undersecretary of State for Scientific Research in post-war France and helped shape early French reactors. Like her mother, she died of a radiation-linked blood disease (leukemia), a consequence of working before protection standards existed.",
+      "category": "people",
+      "related_terms": [
+        "frederick-joliot-curie",
+        "marie-curie",
+        "pierre-curie",
+        "decay"
+      ],
+      "quick_facts": [
+        "Co-discovered artificial radioactivity (1934)",
+        "Nobel Prize in Chemistry (1935) — second woman so honored",
+        "Daughter of Marie and Pierre Curie",
+        "France's Undersecretary for Scientific Research (1936)",
+        "Died of leukemia linked to early unshielded lab work"
+      ],
+      "sources": [
+        {
+          "organization": "Nobel Prize",
+          "title": "Irène Joliot-Curie Biography",
+          "url": "https://www.nobelprize.org/prizes/chemistry/1935/joliot-curie/biographical/"
+        }
+      ],
+      "image": null,
+      "debunking_snippet": "“Radiation safety rules are bureaucratic overkill.” They were written in the blood of pioneers like Irène Joliot-Curie and her mother — brilliant scientists who handled sources bare-handed because nobody knew better yet.",
+      "related_myths": [],
+      "related_articles": [],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "isotope",
+      "term": "Isotope",
+      "definition": "One of the variants of a chemical element: same number of protons, different numbers of neutrons, so the same chemistry but a different mass. Chemist Frederick Soddy coined the name in 1913 — Greek for 'same place', since isotopes occupy the same spot on the periodic table. Every element has them; some are stable forever (carbon-12), others radioactive and decaying at fixed rates (carbon-14). Which isotope you have determines everything about its nuclear behavior while changing nothing about its chemistry.",
+      "category": "science",
+      "related_terms": [
+        "atom",
+        "atomic-number",
+        "decay",
+        "radionuclide",
+        "half-life"
+      ],
+      "quick_facts": [
+        "Same protons, different neutrons — same element, different mass",
+        "Name coined by Frederick Soddy (1913): 'same place' in Greek",
+        "Stable examples: carbon-12 · radioactive: carbon-14",
+        "Uranium-235 fissions easily; uranium-238 barely does",
+        "Radioisotopes power medicine, dating, and tracing"
+      ],
+      "sources": [
+        {
+          "organization": "Britannica",
+          "title": "Isotope",
+          "url": "https://www.britannica.com/science/isotope"
+        }
+      ],
+      "image": "../../assets/images/terms/isotope.webp",
+      "debunking_snippet": "“'Isotope' just means radioactive.” No — every element has several isotopes, and the majority are perfectly stable. Radioactive ones are called radionuclides.",
+      "related_myths": [],
+      "related_articles": [],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "j-robert-oppenheimer",
+      "term": "J. Robert Oppenheimer",
+      "definition": "American theoretical physicist (1904–1967), scientific director of the Los Alamos Laboratory where the Manhattan Project built the first atomic bombs — hence 'father of the atomic bomb'. After watching Trinity (1945) he recalled the Bhagavad Gita: 'Now I am become Death, the destroyer of worlds.' He later headed the Atomic Energy Commission's advisory committee and argued against a crash program for the hydrogen bomb — a stance, plus old associations, that cost him his security clearance in a sensational 1954 hearing. The government formally rehabilitated him with the Enrico Fermi Award in 1963.",
+      "category": "people",
+      "related_terms": [
+        "edward-teller",
+        "arthur-compton",
+        "enrico-fermi",
+        "chain-reaction",
+        "leo-szilard"
+      ],
+      "quick_facts": [
+        "Directed Los Alamos during the Manhattan Project",
+        "'Father of the atomic bomb' — Trinity test, July 16, 1945",
+        "Opposed the crash program for the hydrogen bomb",
+        "Security clearance revoked after the 1954 hearing",
+        "Received the Fermi Award in 1963 as rehabilitation"
+      ],
+      "sources": [
+        {
+          "organization": "DOE",
+          "title": "J. Robert Oppenheimer",
+          "url": "https://www.energy.gov/management/office-management/operational-management/history/j-robert-oppenheimer"
+        }
+      ],
+      "image": "/assets/images/people/Oppenheimer.webp",
+      "debunking_snippet": "“Oppenheimer invented the atomic bomb.” He didn't build or design it alone — he led and coordinated thousands of scientists. His genius was leadership and judgment as much as physics.",
+      "related_myths": [],
+      "related_articles": [],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "james-chadwick",
+      "term": "James Chadwick",
+      "definition": "British physicist (1891–1974), student of Ernest Rutherford, who discovered the neutron in 1932 by showing that beryllium bombarded with alpha particles ejected an uncharged particle about as heavy as a proton. Because it carries no charge, the neutron slips straight into nuclei without fighting electrical repulsion — the missing key that made induced fission and chain reactions thinkable within months. The discovery earned him the 1935 Nobel Prize in Physics, and during World War II he headed the British Mission to the Manhattan Project.",
+      "category": "people",
+      "related_terms": [
+        "neutron",
+        "nucleus",
+        "ernest-rutherford",
+        "chain-reaction",
+        "nuclear-fission"
+      ],
+      "quick_facts": [
+        "Discovered the neutron (1932)",
+        "Nobel Prize in Physics (1935)",
+        "The neutron's zero charge is what makes fission chains possible",
+        "Studied under, then worked alongside, Ernest Rutherford",
+        "Headed the British Mission to the Manhattan Project"
+      ],
+      "sources": [
+        {
+          "organization": "Nobel Prize",
+          "title": "James Chadwick Biography",
+          "url": "https://www.nobelprize.org/prizes/physics/1935/chadwick/biographical/"
+        }
+      ],
+      "image": "/assets/images/people/chadwick.webp",
+      "debunking_snippet": null,
+      "related_myths": [],
+      "related_articles": [],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "john-cockcroft",
+      "term": "John Cockcroft",
+      "definition": "British physicist (1897–1967) who, with Ernest Walton, built the voltage-multiplier accelerator that achieved the first deliberate splitting of atoms in 1932 — lithium struck by protons broke into two helium nuclei. The work shared the 1951 Nobel Prize in Physics. He went on to found and direct Britain's Harwell nuclear research establishment, contributed to the British atomic bomb, and famously insisted — against critics who called it 'Cockcroft's folly' — on installing filters in the Windscale pile chimneys. When the 1957 fire broke out, those filters caught much of the fallout and likely saved many lives.",
+      "category": "people",
+      "related_terms": [
+        "ernest-walton",
+        "transmutation",
+        "proton",
+        "gamma-ray"
+      ],
+      "quick_facts": [
+        "First artificial nuclear splitting with Walton (1932)",
+        "Nobel Prize in Physics (1951)",
+        "Founding director of the Harwell research establishment",
+        "Cockcroft–Walton multipliers still inject modern accelerators",
+        "His 'folly' chimney filters saved lives in the 1957 Windscale fire"
+      ],
+      "sources": [
+        {
+          "organization": "Nobel Prize",
+          "title": "John Cockcroft Biography",
+          "url": "https://www.nobelprize.org/prizes/physics/1951/cockcroft/biographical/"
+        }
+      ],
+      "image": null,
+      "debunking_snippet": null,
+      "related_myths": [],
+      "related_articles": [],
+      "difficulty": "advanced"
+    },
+    {
+      "id": "klaus-fuchs",
+      "term": "Klaus Fuchs",
+      "definition": "German-born theoretical physicist (1911–1988), a Communist who fled the Nazis for Britain — then became the most valuable Soviet spy inside the American bomb project. At Los Alamos he worked on the implosion calculations for Fat Man; at a now-famous 1947 meeting in London he handed Moscow not only full fission-bomb designs but sketches of early hydrogen-bomb thinking. Arrested in 1950 through decrypted Soviet cables (the VENONA effort) and confessed, he served 14 years in prison, then moved to East Germany to direct a physics institute.",
+      "category": "people",
+      "related_terms": [
+        "j-robert-oppenheimer",
+        "edward-teller",
+        "nuclear-fission"
+      ],
+      "quick_facts": [
+        "Manhattan Project physicist — worked on the implosion bomb",
+        "Passed fission-bomb designs and early H-bomb ideas to the USSR",
+        "Caught via decrypted Soviet cables (VENONA)",
+        "Arrested 1950; served 14 years",
+        "His espionage accelerated the first Soviet bomb by years"
+      ],
+      "sources": [
+        {
+          "organization": "Atomic Heritage Foundation",
+          "title": "Klaus Fuchs",
+          "url": "https://www.atomicheritage.org/profile/klaus-fuchs"
+        }
+      ],
+      "image": null,
+      "debunking_snippet": null,
+      "related_myths": [],
+      "related_articles": [],
+      "difficulty": "advanced"
+    },
+    {
+      "id": "leo-szilard",
+      "term": "Leo Szilard",
+      "definition": "Hungarian-American physicist (1898–1964) who dreamed up the nuclear chain reaction while crossing a London street in September 1933 — the day after Rutherford dismissed atomic energy as 'moonshine'. He kept the idea secret under a patent, co-invented the reactor concept with Enrico Fermi, and in August 1939 drafted the Einstein–Szilard letter that warned President Roosevelt of possible German bombs and launched what became the Manhattan Project. Horrified by the results, he organized the 1945 scientists' petition against bombing Japanese cities and spent his later years on arms control and molecular biology.",
+      "category": "people",
+      "related_terms": [
+        "chain-reaction",
+        "enrico-fermi",
+        "critical-mass",
+        "j-robert-oppenheimer"
+      ],
+      "quick_facts": [
+        "Conceived the chain reaction at a London crosswalk (1933)",
+        "Co-patented the nuclear reactor with Fermi",
+        "Drafted the Einstein–Szilard letter to Roosevelt (1939)",
+        "Circulated a 1945 petition against bombing Japanese cities",
+        "Switched careers to biology after the war"
+      ],
+      "sources": [
+        {
+          "organization": "APS",
+          "title": "Leo Szilard",
+          "url": "https://www.aps.org/programs/outreach/history/historicsites/szilard.cfm"
+        }
+      ],
+      "image": "/assets/images/people/leo szilard.webp",
+      "debunking_snippet": "“The Einstein letter was Einstein's idea.” It was Szilard's from start to finish — Einstein only signed, having barely heard of chain reactions before that morning.",
+      "related_myths": [],
+      "related_articles": [],
+      "difficulty": "advanced"
+    },
+    {
+      "id": "linear-accelerator",
+      "term": "Linear Accelerator (LINAC)",
+      "definition": "A particle accelerator that pushes charged particles down a straight tube using oscillating electromagnetic fields, adding a kick each segment. Medical LINACs accelerate electrons to millions of electron-volts and slam them into metal targets to produce precisely shaped X-ray beams for cancer radiotherapy — the machine behind most modern radiation oncology. In research, giant LINACs serve as injectors for synchrotrons and as precision probes of nuclear structure.",
+      "category": "technology",
+      "related_terms": [
+        "cyclotron",
+        "x-ray",
+        "gamma-ray",
+        "john-cockcroft"
+      ],
+      "quick_facts": [
+        "Accelerates particles in a straight line",
+        "The workhorse machine of modern cancer radiotherapy",
+        "Medical units: electrons at 6–25 MeV → therapeutic X-rays",
+        "Also serves as the injector front-end for big research machines",
+        "Microwave cavities give particles repeated energy kicks"
+      ],
+      "sources": [
+        {
+          "organization": "IAEA",
+          "title": "Radiotherapy",
+          "url": "https://www.iaea.org/topics/radiotherapy"
+        }
+      ],
+      "image": "../../assets/images/terms/linac.webp",
+      "debunking_snippet": "“Radiotherapy machines are experimental.” Modern LINACs deliver sub-millimeter-guided beams daily in thousands of hospitals — they're among the most precise routinely-used devices in medicine.",
+      "related_myths": [],
+      "related_articles": [],
+      "difficulty": "advanced"
+    },
+    {
+      "id": "lise-meitner",
+      "term": "Lise Meitner",
+      "definition": "Austrian-Swedish physicist (1878–1968) who explained nuclear fission. After fleeing Nazi Germany in July 1938, she received a letter from her longtime collaborator Otto Hahn describing baffling results: neutron-bombarded uranium seemed to produce barium. Walking a winter forest with her nephew Otto Frisch over Christmas, she worked out the physics — the nucleus had split — and Frisch named it 'fission' after biology. The 1944 Chemistry Nobel went to Hahn alone; Meitner's exclusion is science's most cited injustice. She refused to work on weapons: 'I will have nothing to do with a bomb!'",
+      "category": "people",
+      "related_terms": [
+        "otto-hahn",
+        "otto-frisch",
+        "nuclear-fission",
+        "ernest-rutherford",
+        "binding-energy"
+      ],
+      "quick_facts": [
+        "Gave fission its theoretical explanation (Dec 1938)",
+        "Coined the term 'fission' with her nephew Otto Frisch",
+        "Fled Nazi Germany in July 1938 after 30 years in Berlin",
+        "Excluded from the 1944 Nobel Prize given to Hahn alone",
+        "Element 109, meitnerium, honors her"
+      ],
+      "sources": [
+        {
+          "organization": "Atomic Heritage Foundation",
+          "title": "Lise Meitner",
+          "url": "https://www.atomicheritage.org/profile/lise-meitner"
+        }
+      ],
+      "image": "/assets/images/people/Lise_Meitner.webp",
+      "debunking_snippet": "“She was called the mother of the bomb because she built it.” She did the opposite — when invited to Los Alamos she answered: 'I will have nothing to do with a bomb.' Her contribution was understanding, not weaponry.",
+      "related_myths": [],
+      "related_articles": [],
+      "difficulty": "advanced"
+    },
+    {
+      "id": "low-level-waste",
+      "term": "Low-Level Waste (LLW)",
+      "definition": "The everyday side of radioactive waste: gloves, gowns, filters, tools, labware, and smoke-detector sources — lightly contaminated items from hospitals, research labs, industry, and power plants. It makes up roughly 90% of radioactive waste by volume but only about 1% of its total radioactivity. Most of it decays to background within hours to years and goes into engineered near-surface disposal cells with monitored caps and drains.",
+      "category": "environment",
+      "related_terms": [
+        "radioactive-waste",
+        "spent-fuel",
+        "shielding",
+        "half-life"
+      ],
+      "quick_facts": [
+        "~90% of radioactive waste volume, ~1% of its radioactivity",
+        "Includes hospital, laboratory, and industrial items",
+        "Often decays to background within hours or years",
+        "Disposed in engineered near-surface facilities",
+        "Segregated and tracked from cradle to grave"
+      ],
+      "sources": [
+        {
+          "organization": "World Nuclear",
+          "title": "Radioactive Waste Management",
+          "url": "https://world-nuclear.org/information-library/nuclear-fuel-cycle/nuclear-wastes.aspx"
+        }
+      ],
+      "image": "../../assets/images/terms/llw.webp",
+      "debunking_snippet": "“All nuclear waste is glowing drums destined for deep mountains.” The overwhelming majority by volume is low-level waste — contaminated paper, plastic, and filters — safely buried a few meters underground.",
+      "related_myths": [],
+      "related_articles": [],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "marie-curie",
+      "term": "Marie Curie",
+      "definition": "Polish-French physicist and chemist (1867–1934), pioneer of radioactivity — a word she herself coined. She discovered polonium and radium in 1898, shared the 1903 Nobel Prize in Physics with Pierre Curie and Henri Becquerel, and won the 1911 Nobel Prize in Chemistry alone — making her the first woman Nobel laureate, the only person to win Nobels in two different sciences, and mother of another laureate, Irène. She worked with vials of radium on her desk and died of aplastic anemia almost certainly caused by her exposure.",
+      "category": "people",
+      "related_terms": [
+        "pierre-curie",
+        "henri-becquerel",
+        "irene-joliot-curie",
+        "decay"
+      ],
+      "quick_facts": [
+        "Coined the term 'radioactivity'",
+        "Discovered polonium and radium (1898)",
+        "Nobel Prizes in two sciences: Physics (1903), Chemistry (1911)",
+        "Her notebooks are still radioactive — kept in lead-lined boxes",
+        "Died of aplastic anemia from decades of unprotected work"
+      ],
+      "sources": [
+        {
+          "organization": "Nobel Prize",
+          "title": "Marie Curie Biography",
+          "url": "https://www.nobelprize.org/prizes/physics/1903/marie-curie/biographical/"
+        }
+      ],
+      "image": "/assets/images/people/curie, marie.webp",
+      "debunking_snippet": "“Curie's own notes are dangerous.” True, literally: her century-old notebooks carry radium contamination and can only be viewed with signed waivers — a stark reminder that radiation safety was learned at great cost.",
+      "related_myths": [],
+      "related_articles": [],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "mass-defect",
+      "term": "Mass Defect",
+      "definition": "The measured shortfall between a nucleus's actual mass and the added-up masses of its free protons and neutrons. That missing mass didn't vanish — it became binding energy via E = mc² when the nucleus formed. A helium-4 nucleus is about 0.7% lighter than its parts, worth roughly 28 MeV. The bigger the defect per nucleon, the tighter the nucleus is bound and the more stable it is — which is exactly why fission and fusion release energy as they climb toward iron.",
+      "category": "science",
+      "related_terms": [
+        "binding-energy",
+        "nuclear-fission",
+        "nuclear-fusion",
+        "chain-reaction"
+      ],
+      "quick_facts": [
+        "Nucleus weighs less than its separated parts",
+        "Missing mass converted to binding energy via E = mc²",
+        "Helium-4: ~0.7% mass loss = ~28 MeV",
+        "Measured with mass spectrometers of extraordinary precision",
+        "Predicts stability — and which reactions release energy"
+      ],
+      "sources": [
+        {
+          "organization": "HyperPhysics",
+          "title": "Mass Defect",
+          "url": "http://hyperphysics.phy-astr.gsu.edu/hbase/NucEne/nucbin.html"
+        }
+      ],
+      "image": "../../assets/images/terms/Mass Defect.webp",
+      "debunking_snippet": "“Mass is always conserved.” Not quite — mass-energy is. Every nuclear reaction that powers stars, reactors, and bombs trades a sliver of mass for enormous energy.",
+      "related_myths": [],
+      "related_articles": [],
+      "difficulty": "advanced"
+    },
+    {
+      "id": "meltdown",
+      "term": "Meltdown",
+      "definition": "A severe accident in which reactor fuel overheats after cooling is lost and begins to melt. The sequence runs fast: if water flow stops, temperatures climb within seconds-to-minutes, zirconium cladding reacts with steam above ~1,200 °C producing hydrogen, and the ceramic fuel itself doesn't liquefy until near 2,800 °C. It has happened three times commercially — Three Mile Island (1979, half the core, zero deaths, fully contained), Chernobyl (1986, no full containment), Fukushima (2011, hydrogen explosions).",
+      "category": "safety",
+      "related_terms": [
+        "containment-building",
+        "defense-in-depth",
+        "control-rods",
+        "spent-fuel"
+      ],
+      "quick_facts": [
+        "Loss of cooling — not loss of control — drives most meltdown risk",
+        "Cladding fails ~1,200 °C; fuel melts near 2,800 °C",
+        "Zirconium + steam makes the hydrogen behind Fukushima's blasts",
+        "TMI's partial meltdown killed no one; containment held",
+        "Modern designs add passive cooling that works unpowered"
+      ],
+      "sources": [
+        {
+          "organization": "World Nuclear",
+          "title": "Safety of Nuclear Power Reactors",
+          "url": "https://world-nuclear.org/information-library/safety-and-security/safety-of-plants"
+        }
+      ],
+      "image": "../../assets/images/terms/meltdown.webp",
+      "debunking_snippet": "“A meltdown means thousands die instantly.” The worst-case isn't automatic: TMI's core half-melted and harmed no one — because containment did its job. Consequences depend entirely on barriers, not just the melting itself.",
+      "related_myths": [],
+      "related_articles": [],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "moderator",
+      "term": "Moderator",
+      "definition": "A material that slows the fast neutrons born from fission (speeds around 20,000 km/s) down to 'thermal' speeds of a couple of kilometers per second — the pace at which uranium-235 captures them billions of times more readily. Good moderators bounce neutrons without absorbing many: ordinary water (the most common), heavy water, and graphite. Water does double duty in most reactors, cooling the fuel while moderating the chain reaction.",
+      "category": "technology",
+      "related_terms": [
+        "nuclear-reactor",
+        "control-rods",
+        "heavy-water",
+        "thermal-neutron",
+        "neutron"
+      ],
+      "quick_facts": [
+        "Slows neutrons from ~20,000 km/s to ~2 km/s",
+        "Thermal neutrons split U-235 far more efficiently",
+        "Light water, heavy water, and graphite are the classics",
+        "Lose the moderator and most reactors simply stop — a safety feature",
+        "Chernobyl's RBMK was the rare design that could run un-moderated"
+      ],
+      "sources": [
+        {
+          "organization": "World Nuclear",
+          "title": "Nuclear Power Reactors",
+          "url": "https://world-nuclear.org/information-library/nuclear-fuel-cycle/nuclear-power-reactors.aspx"
+        }
+      ],
+      "image": "../../assets/images/terms/Moderator.webp",
+      "debunking_snippet": "“Reactors need everything to go right to stay running.” For most designs the opposite holds: lose the water moderator and the physics itself shuts the chain down — no operator required.",
+      "related_myths": [],
+      "related_articles": [],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "murray-gell-mann",
+      "term": "Murray Gell-Mann",
+      "definition": "American theoretical physicist (1929–2019) who brought order to the particle zoo. His 1961 'eightfold way' sorted hadrons into families by symmetry, then in 1964 he proposed that protons and neutrons are built from three fractionally-charged constituents he named quarks — a word he lifted from Joyce's Finnegans Wake ('Three quarks for Muster Mark!'). The quark model earned him the 1969 Nobel Prize in Physics and remains the backbone of our picture of matter's deepest layer.",
+      "category": "people",
+      "related_terms": [
+        "proton",
+        "neutron",
+        "electron",
+        "binding-energy"
+      ],
+      "quick_facts": [
+        "Proposed the quark model (1964)",
+        "Named 'quark' from James Joyce's Finnegans Wake",
+        "Nobel Prize in Physics (1969)",
+        "Earlier devised the 'eightfold way' classification of particles",
+        "Also co-founded complexity science at Santa Fe Institute"
+      ],
+      "sources": [
+        {
+          "organization": "Nobel Prize",
+          "title": "Murray Gell-Mann Biography",
+          "url": "https://www.nobelprize.org/prizes/physics/1969/gell-mann/biographical/"
+        }
+      ],
+      "image": null,
+      "debunking_snippet": null,
+      "related_myths": [],
+      "related_articles": [],
+      "difficulty": "advanced"
+    },
+    {
+      "id": "neutron",
+      "term": "Neutron",
+      "definition": "The neutral particle sharing the atomic nucleus with protons — almost exactly as heavy (1.67×10⁻²⁷ kg), just 0.14% heavier, and carrying no electric charge. That neutrality is its superpower: it slips through electron clouds and into nuclei without electrical resistance, which makes it both the trigger of fission chains and a deep-penetrating probe of matter. Freed from a nucleus a neutron survives about 15 minutes before decaying into a proton, an electron, and an antineutrino.",
+      "category": "science",
+      "related_terms": [
+        "proton",
+        "nucleus",
+        "james-chadwick",
+        "thermal-neutron",
+        "chain-reaction"
+      ],
+      "quick_facts": [
+        "Zero charge · mass 0.14% above the proton's",
+        "James Chadwick discovered it (1932)",
+        "Free neutrons decay in ~15 minutes",
+        "Only slow ('thermal') neutrons efficiently split U-235",
+        "Neutrons damage crystal lattices — the 'Wigner effect'"
+      ],
+      "sources": [
+        {
+          "organization": "Britannica",
+          "title": "Neutron",
+          "url": "https://www.britannica.com/science/neutron"
+        }
+      ],
+      "image": "../../assets/images/terms/neutron.webp",
+      "debunking_snippet": "“Neutrons are dangerous because they're charged.” The opposite — their danger comes from having no charge at all: nothing repels them, so they penetrate deeply and can even turn stable atoms radioactive.",
+      "related_myths": [],
+      "related_articles": [],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "niels-bohr",
+      "term": "Niels Bohr",
+      "definition": "Danish physicist (1885–1962) who in 1913 gave the atom its first workable quantum picture — electrons in fixed orbits jumping between energy levels — earning the 1922 Nobel Prize in Physics. His Copenhagen institute became the crossroads of quantum physics, and his liquid-droplet model of the nucleus was exactly what Lise Meitner used to explain fission in 1938. After fleeing occupied Denmark in 1943 he consulted on the Manhattan Project and later championed openness between nations about nuclear matters.",
+      "category": "people",
+      "related_terms": [
+        "atom",
+        "electron",
+        "nucleus",
+        "lise-meitner",
+        "j-robert-oppenheimer"
+      ],
+      "quick_facts": [
+        "Bohr model of the atom (1913)",
+        "Nobel Prize in Physics (1922)",
+        "Founded his Copenhagen institute in 1921",
+        "His droplet model explained how fission happens",
+        "Escaped Denmark by fishing boat in 1943"
+      ],
+      "sources": [
+        {
+          "organization": "Nobel Prize",
+          "title": "Niels Bohr Biography",
+          "url": "https://www.nobelprize.org/prizes/physics/1922/bohr/biographical/"
+        }
+      ],
+      "image": "/assets/images/people/bohr, niels.webp",
+      "debunking_snippet": "“Bohr's planetary atom is still the accepted model.” It was a stepping stone — replaced within a decade by full quantum mechanics and orbitals, though it remains the perfect first sketch.",
+      "related_myths": [],
+      "related_articles": [],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "nuclear-fission",
+      "term": "Nuclear Fission",
+      "definition": "The splitting of a heavy nucleus — uranium-235, plutonium-239 — into two unequal fragments plus 2–3 spare neutrons and about 200 million electron-volts of energy. Hahn and Strassmann spotted the barium evidence in late 1938; Meitner and Frisch explained it months later. Each released neutron can split another nucleus, enabling chain reactions that either simmer steadily in a reactor or multiply explosively in a weapon. The fragments themselves are intensely radioactive — which is where spent-fuel heat and waste come from.",
+      "category": "science",
+      "related_terms": [
+        "chain-reaction",
+        "uranium-235",
+        "lise-meitner",
+        "mass-defect",
+        "spent-fuel"
+      ],
+      "quick_facts": [
+        "~200 MeV released per U-235 fission",
+        "Typical split: one heavy fragment (~140 amu) + one lighter (~95 amu)",
+        "Discovered 1938; explained early 1939",
+        "Both fragments are radioactive — hence reactor waste",
+        "Runs reactors today and could burn waste tomorrow"
+      ],
+      "sources": [
+        {
+          "organization": "World Nuclear",
+          "title": "Physics of Nuclear Energy",
+          "url": "https://world-nuclear.org/information-library/nuclear-fuel-cycle/introduction/physics-of-nuclear-energy.aspx"
+        }
+      ],
+      "image": "../../assets/images/terms/fission.webp",
+      "debunking_snippet": null,
+      "related_myths": [],
+      "related_articles": [],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "nuclear-fusion",
+      "term": "Nuclear Fusion",
+      "definition": "Joining two light nuclei — usually hydrogen isotopes — into a heavier one, converting the mass difference to energy. Per kilogram of fuel, fusion releases roughly four times more energy than fission (though each single reaction carries less punch than one fission). It powers every star, including our Sun, whose core squeezes protons together at 15 million °C against their mutual repulsion. On Earth, magnetic bottles (tokamaks like ITER) and laser implosions chase net energy, with deuterium–tritium the easiest first target.",
+      "category": "science",
+      "related_terms": [
+        "nuclear-fission",
+        "binding-energy",
+        "hans-bethe",
+        "mass-defect",
+        "tritium"
+      ],
+      "quick_facts": [
+        "~4× more energy per kg of fuel than fission",
+        "Powers all stars — the Sun fuses 600 million tonnes of H every second",
+        "Needs stellar temperatures: millions of degrees minimum",
+        "D–T fusion: 17.6 MeV per reaction, mostly as a fast neutron",
+        "Main 'waste' is short-lived activated metal, not millennia-old fuel"
+      ],
+      "sources": [
+        {
+          "organization": "ITER",
+          "title": "What is Fusion?",
+          "url": "https://www.iter.org/sci/whatisfusion"
+        }
+      ],
+      "image": "../../assets/images/terms/fusion.webp",
+      "debunking_snippet": "“Each fusion reaction out-energizes each fission.” Individually it doesn't — 17.6 MeV versus ~200 MeV per event. Fusion's advantage is per kilogram of fuel, thanks to light nuclei packing more binding-energy gain.",
+      "related_myths": [],
+      "related_articles": [],
+      "difficulty": "advanced"
+    },
+    {
+      "id": "nuclear-reactor",
+      "term": "Nuclear Reactor",
+      "definition": "A machine holding a nuclear chain reaction at exactly critical — steady — power. Fuel assemblies of enriched uranium sit in a lattice with moderator and coolant while control rods trim reactivity; heat from fission boils water or gas to spin turbines. Around 440 power reactors supply roughly a tenth of world electricity with near-zero carbon, and specialized designs produce medical isotopes, research beams, and naval propulsion. Physics itself leans safe: most designs shut down if cooling or moderation is lost.",
+      "category": "technology",
+      "related_terms": [
+        "nuclear-fission",
+        "control-rods",
+        "containment-building",
+        "moderator",
+        "defense-in-depth"
+      ],
+      "quick_facts": [
+        "≈440 power reactors worldwide — ~10% of global electricity",
+        "Fuel: 3–5% enriched uranium — far below weapons grade",
+        "Control rods, moderator, and coolant keep k exactly 1",
+        "Also built for ships, research, and medical isotopes",
+        "Life-cycle carbon comparable to wind power"
+      ],
+      "sources": [
+        {
+          "organization": "IAEA",
+          "title": "Nuclear Power Reactors",
+          "url": "https://www.iaea.org/topics/nuclear-power-reactors"
+        }
+      ],
+      "image": "../../assets/images/terms/nuclear reactor.webp",
+      "debunking_snippet": "“A reactor can detonate like an atomic bomb.” Physically impossible — bomb fuel is >90% enriched and assembled supercritically in microseconds; reactor fuel is dilute ceramic that can't sustain that.",
+      "related_myths": [],
+      "related_articles": [],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "nucleus",
+      "term": "Atomic Nucleus",
+      "definition": "The positively charged core of an atom, made of protons and neutrons bound together by the strong nuclear force. It holds more than 99.9% of the atom's mass while spanning only about 1/100,000 of the atom's diameter — matter at this density would weigh hundreds of millions of tonnes per cubic centimeter. Ernest Rutherford discovered the nucleus in 1911 by firing alpha particles at gold foil and finding that a rare few bounced straight back.",
+      "category": "science",
+      "related_terms": [
+        "atom",
+        "proton",
+        "neutron",
+        "ernest-rutherford",
+        "decay"
+      ],
+      "quick_facts": [
+        "Discovered by Ernest Rutherford (1911, gold-foil experiment)",
+        "Diameter ~100,000 times smaller than the atom itself",
+        "Holds over 99.9% of the atom's mass",
+        "Protons and neutrons bound by the strong nuclear force",
+        "Home of radioactive decay and all nuclear reactions"
+      ],
+      "sources": [
+        {
+          "organization": "Britannica",
+          "title": "Atomic Nucleus",
+          "url": "https://www.britannica.com/science/atomic-nucleus"
+        }
+      ],
+      "image": "../../assets/images/terms/atom.webp",
+      "debunking_snippet": null,
+      "related_myths": [],
+      "related_articles": [],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "otto-frisch",
+      "term": "Otto Frisch",
+      "definition": "Austrian-British physicist (1904–1979), Lise Meitner's nephew and her partner in the Christmas 1938 forest walk where they worked out that Hahn's barium meant the nucleus had split — Frisch borrowed 'fission' from biology for the name. Weeks later he confirmed it experimentally with recoil bursts from neutron-blasted uranium. In 1940 his memorandum with Rudolf Peierls estimated a critical mass of pure U-235 at roughly kilograms, not tons — the calculation that first made atomic bombs seem buildable. He joined the British Mission at Los Alamos afterward.",
+      "category": "people",
+      "related_terms": [
+        "lise-meitner",
+        "nuclear-fission",
+        "critical-mass",
+        "niels-bohr",
+        "james-chadwick"
+      ],
+      "quick_facts": [
+        "Explained fission with Lise Meitner (Dec 1938)",
+        "Borrowed the word 'fission' from cell biology",
+        "Experimentally confirmed fission within weeks",
+        "Frisch–Peierls memo (1940): first serious bomb feasibility study",
+        "Worked at Los Alamos as part of the British Mission"
+      ],
+      "sources": [
+        {
+          "organization": "APS",
+          "title": "Otto Robert Frisch",
+          "url": "https://www.aps.org/programs/outreach/history/historicsites/frisch.cfm"
+        }
+      ],
+      "image": null,
+      "debunking_snippet": null,
+      "related_myths": [],
+      "related_articles": [],
+      "difficulty": "advanced"
+    },
+    {
+      "id": "otto-hahn",
+      "term": "Otto Hahn",
+      "definition": "German radiochemist (1879–1968) whose careful chemistry proved nuclear fission: in December 1938 he and Fritz Strassmann found barium — half an atom's worth of weight — inside neutron-bombarded uranium, a result so strange Hahn hesitated to publish. The discovery earned him the 1944 Nobel Prize in Chemistry (awarded in 1945). With Lise Meitner he had spent three decades discovering isotopes including protactinium, but she was barred by Nazi law from co-authorship and later from sharing credit — a controversy that shadows his legacy.",
+      "category": "people",
+      "related_terms": [
+        "nuclear-fission",
+        "lise-meitner",
+        "ernest-rutherford",
+        "decay"
+      ],
+      "quick_facts": [
+        "Proved nuclear fission with Strassmann (Dec 1938)",
+        "Nobel Prize in Chemistry 1944 (presented 1945)",
+        "Discovered protactinium and dozens of radioisotopes with Meitner",
+        "'Father of nuclear chemistry'",
+        "His exclusion of Meitner remains a famous scientific injustice"
+      ],
+      "sources": [
+        {
+          "organization": "Nobel Prize",
+          "title": "Otto Hahn Biography",
+          "url": "https://www.nobelprize.org/prizes/chemistry/1944/hahn/biographical/"
+        }
+      ],
+      "image": "/assets/images/people/Otto_Hahn.webp",
+      "debunking_snippet": "“Hahn invented the atomic bomb.” He identified barium atoms in a beaker — brilliant, purely scientific work done before the war, and he refused to work on German weapons research.",
+      "related_myths": [],
+      "related_articles": [],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "pierre-curie",
+      "term": "Pierre Curie",
+      "definition": "French physicist (1859–1906) who shared the 1903 Nobel Prize in Physics with Marie Curie and Henri Becquerel for radioactivity research. As a young man he and his brother Jacques discovered piezoelectricity — the crystal effect now found in quartz watches and ultrasound probes — and built the electrometer Marie used to measure ray intensity. His studies of magnetism gave science the 'Curie temperature', above which materials lose their magnetism. He died in 1906 when a horse-drawn wagon crushed his skull on a Paris street.",
+      "category": "people",
+      "related_terms": [
+        "marie-curie",
+        "henri-becquerel",
+        "decay",
+        "irene-joliot-curie"
+      ],
+      "quick_facts": [
+        "Nobel Prize in Physics (1903), shared with Marie and Becquerel",
+        "Co-discovered piezoelectricity with his brother Jacques",
+        "The Curie temperature marks loss of permanent magnetism",
+        "Built the precision instruments behind Marie's measurements",
+        "Died in a street accident in Paris (1906), not from radiation"
+      ],
+      "sources": [
+        {
+          "organization": "Nobel Prize",
+          "title": "Pierre Curie Biography",
+          "url": "https://www.nobelprize.org/prizes/physics/1903/pierre-curie/biographical/"
+        }
+      ],
+      "image": "/assets/images/people/curie, pierre.webp",
+      "debunking_snippet": "“Pierre Curie died of radiation exposure.” No — he was killed instantly by a horse-drawn cart on the rue Dauphine. Radiation took Marie decades later; Pierre simply ran out of luck on a rainy afternoon.",
+      "related_myths": [],
+      "related_articles": [],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "plutonium-239",
+      "term": "Plutonium-239",
+      "definition": "A man-made fissile metal: reactors breed it when uranium-238 captures a neutron and decays twice through neptunium. With a 24,100-year half-life and a bare critical mass near 10 kg, it powers both warheads and recycled reactor fuel (MOX). Chemically unlike anything natural — warm to the touch from its own decay heat — it was discovered by Glenn Seaborg's team in 1941 and sits at the center of both energy policy and non-proliferation politics.",
+      "category": "science",
+      "related_terms": [
+        "nuclear-fission",
+        "uranium-238",
+        "spent-fuel",
+        "glenn-seaborg",
+        "critical-mass"
+      ],
+      "quick_facts": [
+        "Bred from uranium-238 inside every uranium-fueled reactor",
+        "Half-life: 24,100 years",
+        "Bare critical mass: only about 10 kg",
+        "Recycled with uranium into MOX fuel rods",
+        "Discovered by Seaborg's team in 1941"
+      ],
+      "sources": [
+        {
+          "organization": "World Nuclear",
+          "title": "Plutonium",
+          "url": "https://world-nuclear.org/information-library/nuclear-fuel-cycle/fuel-recycling/plutonium"
+        }
+      ],
+      "image": null,
+      "debunking_snippet": "“Plutonium is the most toxic substance known.” Folklore. It's radiologically hazardous if inhaled and chemically like other heavy metals — but botulinum toxin and ricin are vastly more poisonous gram-for-gram.",
+      "related_myths": [],
+      "related_articles": [],
+      "difficulty": "advanced"
+    },
+    {
+      "id": "proton",
+      "term": "Proton",
+      "definition": "The positively charged particle anchoring every atomic nucleus — +1 charge balancing each electron's −1, and about 1,836 times heavier than an electron. An atom's proton count is its identity card: one makes hydrogen, six carbon, ninety-two uranium. Protons aren't fundamental: each packs three quarks (two 'up', one 'down') bound by gluons, with most of the proton's mass arising from that binding energy. Ernest Rutherford named the proton in 1920 after proving it exists inside nuclei.",
+      "category": "science",
+      "related_terms": [
+        "neutron",
+        "electron",
+        "atomic-number",
+        "murray-gell-mann",
+        "ernest-rutherford"
+      ],
+      "quick_facts": [
+        "+1 charge · ~1,836× electron mass",
+        "Count defines the element (Z)",
+        "Made of two up quarks + one down quark",
+        "Named by Ernest Rutherford (1920)",
+        "Experiments bound its lifetime beyond 10³⁴ years"
+      ],
+      "sources": [
+        {
+          "organization": "Britannica",
+          "title": "Proton",
+          "url": "https://www.britannica.com/science/proton-subatomic-particle"
+        }
+      ],
+      "image": "../../assets/images/terms/proton.webp",
+      "debunking_snippet": "“Protons are tiny hard balls.” They're seething bags of quarks and gluons — most of a proton's mass comes from the energy of that internal motion, not the quarks themselves.",
+      "related_myths": [],
+      "related_articles": [],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "radiation",
+      "term": "Radiation",
+      "definition": "Energy traveling outward from its source — either as electromagnetic waves (radio, infrared, light, UV, X-rays, gamma) or fast particles (alpha, beta, neutrons). The dividing line that matters biologically is energy per quantum: ionizing radiation can tear electrons off atoms and break DNA; non-ionizing radiation mostly just heats things. Radiation is everywhere and always has been — sunlight, rocks, bananas, outer space.",
+      "category": "science",
+      "related_terms": [
+        "ionizing-radiation",
+        "background-radiation",
+        "decay",
+        "x-ray"
+      ],
+      "quick_facts": [
+        "Two families: waves (EM) and particles",
+        "Ionizing vs non-ionizing is what matters for health",
+        "Bananas are mildly radioactive from potassium-40",
+        "Sunlight is radiation — so is Wi-Fi, at very different energies",
+        "Background radiation predates humanity by eons"
+      ],
+      "sources": [
+        {
+          "organization": "IAEA",
+          "title": "What is Radiation?",
+          "url": "https://www.iaea.org/topics/radiation"
+        }
+      ],
+      "image": "../../assets/images/terms/radiation.webp",
+      "debunking_snippet": "“Any amount of radiation is unsafe.” Life evolved amid constant natural radiation — every second, thousands of natural particles pass through you harmlessly. Risk depends on dose, and small doses carry vanishingly small risk.",
+      "related_myths": [],
+      "related_articles": [],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "radioactive-waste",
+      "term": "Radioactive Waste",
+      "definition": "Leftover materials carrying radioactive contamination or activation, sorted into classes by activity and lifetime: very-low-level (soil, rubble), low-level (gloves, filters — most of the volume), intermediate (reactor components), and high-level (spent fuel and reprocessing residues — most of the radioactivity, in a tiny package). High-level waste is hot and long-lived, managed by decades of on-site cooling followed by either deep geological disposal or recycling, since roughly 95% of spent fuel's potential energy remains unused.",
+      "category": "environment",
+      "related_terms": [
+        "low-level-waste",
+        "spent-fuel",
+        "vitrification",
+        "half-life",
+        "shielding"
+      ],
+      "quick_facts": [
+        "Four classes: VLLW → LLW → ILW → HLW",
+        "Volume is remarkably small — a country's lifetime HLW fits one facility",
+        "~95% of spent fuel's energy is still unused",
+        "Finland built the world's first permanent deep repository (Onkalo)",
+        "Managed under IAEA cradle-to-grave rules worldwide"
+      ],
+      "sources": [
+        {
+          "organization": "World Nuclear",
+          "title": "Radioactive Waste Management",
+          "url": "https://world-nuclear.org/information-library/nuclear-fuel-cycle/nuclear-wastes.aspx"
+        }
+      ],
+      "image": null,
+      "debunking_snippet": "“Nuclear waste stays lethal for millions of years.” The intensely radioactive isotopes burn out fastest — within centuries waste converges toward the radioactivity of the original uranium ore it came from.",
+      "related_myths": [],
+      "related_articles": [],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "radionuclide",
+      "term": "Radionuclide",
+      "definition": "An unstable isotope — a radioactive nuclide — that sheds excess energy by decaying until it reaches stability. Some are primordial leftovers from before Earth formed (uranium-238), some are continuously created by cosmic rays (carbon-14), and hundreds are manufactured in reactors and cyclotrons. Medicine leans on them heavily: technetium-99m lights up ~30 million diagnostic scans a year, iodine-131 treats thyroid disorders, cobalt-60 sterilizes equipment.",
+      "category": "science",
+      "related_terms": [
+        "isotope",
+        "decay",
+        "half-life",
+        "tritium",
+        "becquerel"
+      ],
+      "quick_facts": [
+        "Unstable nucleus → decays toward stability",
+        "Natural ones: U-238, C-14, K-40 · Man-made: Tc-99m, Co-60",
+        "Tc-99m: ~30 million medical scans yearly",
+        "Each carries a unique, unchangeable half-life signature",
+        "Identified by emitted energies like a fingerprint"
+      ],
+      "sources": [
+        {
+          "organization": "IAEA",
+          "title": "Radioisotopes in Medicine",
+          "url": "https://www.iaea.org/topics/radioisotopes"
+        }
+      ],
+      "image": "../../assets/images/terms/radionuclide.webp",
+      "debunking_snippet": null,
+      "related_myths": [],
+      "related_articles": [],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "radon",
+      "term": "Radon",
+      "definition": "A colorless, odorless radioactive gas seeping from trace uranium in soil, rock, and building materials — the heaviest gas and a noble one, so it drifts freely into basements and lower floors. Its short-lived daughter products stick in lungs and emit alpha particles there, making radon the leading cause of lung cancer among non-smokers and the single largest natural dose for most people. Cheap test kits and sub-slab ventilation fix problem buildings.",
+      "category": "science",
+      "related_terms": [
+        "background-radiation",
+        "decay",
+        "alpha-particle",
+        "exposure"
+      ],
+      "quick_facts": [
+        "Noble gas from uranium decay in the ground",
+        "#2 cause of lung cancer overall, #1 among non-smokers",
+        "Pool in basements — heavier than air",
+        "WHO action reference: ~300 Bq/m³ indoors",
+        "Fixed cheaply with sub-slab depressurization vents"
+      ],
+      "sources": [
+        {
+          "organization": "EPA",
+          "title": "Radon",
+          "url": "https://www.epa.gov/radon"
+        },
+        {
+          "organization": "WHO",
+          "title": "Radon and Health",
+          "url": "https://www.who.int/news-room/fact-sheets/detail/radon-and-health"
+        }
+      ],
+      "image": null,
+      "debunking_snippet": "“Radon is only a problem in uranium mines.” It's everywhere — the average home holds some, and tightly sealed modern houses can concentrate it. Testing costs less than a pizza.",
+      "related_myths": [],
+      "related_articles": [],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "reactor-core",
+      "term": "Reactor Core",
+      "definition": "The heart of the reactor: a carefully engineered lattice of fuel assemblies, moderator, coolant channels, and control elements where the chain reaction lives. Geometry is everything — spacing determines how neutrons bounce between fuel and moderator, keeping the reaction exactly critical. Cores hold tonnes of ceramic fuel at hundreds of degrees, transfer megawatts of heat to the coolant, and shut themselves down when control rods drop in. Everything else in the plant exists to serve or protect it.",
+      "category": "technology",
+      "related_terms": [
+        "nuclear-reactor",
+        "fuel-rods",
+        "control-rods",
+        "moderator",
+        "chain-reaction"
+      ],
+      "quick_facts": [
+        "Lattice of fuel assemblies + moderator + control rods",
+        "Runs at exactly k = 1 — self-sustaining but steady",
+        "Ceramic pellets reach service temperatures >500 °C",
+        "Refueled in thirds every 12–24 months",
+        "Wrapped in pressure vessel, shielding, containment"
+      ],
+      "sources": [
+        {
+          "organization": "World Nuclear",
+          "title": "Nuclear Power Reactors",
+          "url": "https://world-nuclear.org/information-library/nuclear-fuel-cycle/nuclear-power-reactors.aspx"
+        }
+      ],
+      "image": "../../assets/images/terms/Reactor Core.webp",
+      "debunking_snippet": null,
+      "related_myths": [],
+      "related_articles": [],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "roentgen",
+      "term": "Roentgen (R)",
+      "definition": "A legacy unit measuring radiation exposure — strictly, the ionization produced in dry air by X-rays or gamma rays: 1 R equals 2.58×10⁻⁴ coulombs of charge per kilogram of air. Named after Wilhelm Röntgen, discoverer of X-rays and winner of the first Nobel Prize in Physics (1901). It measures what radiation does to air, not to tissue, and has been superseded — though it lingers in old instruments, film badges, and disaster folklore.",
+      "category": "science",
+      "related_terms": [
+        "sievert",
+        "gray",
+        "exposure",
+        "x-ray",
+        "geiger-counter"
+      ],
+      "quick_facts": [
+        "Measures ionization in air, not dose to people",
+        "1 R = 2.58×10⁻⁴ C/kg of air",
+        "Honors Wilhelm Röntgen, first Physics Nobel (1901)",
+        "Roughly comparable to a rem for early gamma exposures",
+        "Still seen on vintage meters and in Chernobyl accounts"
+      ],
+      "sources": [
+        {
+          "organization": "BIPM",
+          "title": "SI Units",
+          "url": "https://www.bipm.org/en/measurement-units"
+        }
+      ],
+      "image": null,
+      "debunking_snippet": "“Roentgens and sieverts are interchangeable.” They measure different things: R counts ionization in air; sieverts weigh biological effect on tissue. Old meters read R — converting needs care and context.",
+      "related_myths": [],
+      "related_articles": [],
+      "difficulty": "advanced"
+    },
+    {
+      "id": "scintillation-detector",
+      "term": "Scintillation Detector",
+      "definition": "A radiation detector that turns invisible energy into visible light: incoming radiation makes a scintillator crystal or plastic flash, and a photomultiplier tube amplifies each flicker into a measurable electrical pulse. Unlike Geiger counters, which only count events, the pulse height carries the particle's energy — letting scintillators identify exactly which isotope they're looking at from its spectral fingerprint. They power airport portal monitors, PET scanners, and physics discoveries from neutrino telescopes to dark-matter searches.",
+      "category": "technology",
+      "related_terms": [
+        "geiger-counter",
+        "dosimeter",
+        "gamma-ray",
+        "radionuclide"
+      ],
+      "quick_facts": [
+        "Radiation in → light flash → amplified pulse",
+        "Measures energy, not just counts — identifies isotopes",
+        "NaI(Tl) crystals and plastics are classic scintillators",
+        "Inside every PET scanner",
+        "Used to sniff out smuggled nuclear material at borders"
+      ],
+      "sources": [
+        {
+          "organization": "IAEA",
+          "title": "Radiation Detection",
+          "url": "https://www.iaea.org/"
+        }
+      ],
+      "image": "../../assets/images/terms/scintillation detector.webp",
+      "debunking_snippet": "“All radiation detectors are basically Geiger counters.” Geiger-Müller tubes count clicks but stay blind to energy — scintillators read spectra and can name the isotope standing in front of them.",
+      "related_myths": [],
+      "related_articles": [],
+      "difficulty": "advanced"
+    },
+    {
+      "id": "shielding",
+      "term": "Radiation Shielding",
+      "definition": "Material placed between you and a radiation source to cut intensity. Each radiation type needs its own answer: alphas stop in paper or skin, betas in a few millimeters of plastic, gamma rays are only ever attenuated — halved by each layer of dense lead or concrete — while fast neutrons need hydrogen-rich material like water or polyethylene to slow down, plus boron to capture them. Pick the wrong shield and it can backfire: lead around betas manufactures X-rays.",
+      "category": "safety",
+      "related_terms": [
+        "defense-in-depth",
+        "containment-building",
+        "hot-cell",
+        "gamma-ray",
+        "neutron"
+      ],
+      "quick_facts": [
+        "Alpha: paper · Beta: plastic · Gamma: dense metal/concrete",
+        "Gammas are attenuated, never fully blocked",
+        "Neutrons want hydrogen-rich shields + boron capture",
+        "Time–distance–shielding: three levers, one goal",
+        "Wrong shield (lead on betas) creates secondary X-rays"
+      ],
+      "sources": [
+        {
+          "organization": "EPA",
+          "title": "Radiation Protection Basics",
+          "url": "https://www.epa.gov/radiation"
+        }
+      ],
+      "image": "../../assets/images/terms/radiation.webp",
+      "debunking_snippet": "“Lead stops everything.” Lead is useless against alpha (paper beats it), can worsen beta fields via secondary X-rays, and merely thins gamma beams — shielding is matched to the radiation, not bought off the shelf.",
+      "related_myths": [],
+      "related_articles": [],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "sievert",
+      "term": "Sievert (Sv)",
+      "definition": "The SI unit of dose in terms of biological effect, named after Swedish radiological-health pioneer Rolf Sievert. It starts from absorbed dose (grays) and applies two weightings: radiation type (alphas count 20× harder than gammas) and tissue sensitivity. Context makes it tangible: a transatlantic flight adds ~40 μSv, a chest X-ray ~0.1 mSv, a CT scan ~7 mSv, against ~2.4 mSv of natural background per year.",
+      "category": "science",
+      "related_terms": [
+        "gray",
+        "absorbed-dose",
+        "exposure",
+        "dose-rate",
+        "background-radiation"
+      ],
+      "quick_facts": [
+        "Weighted for biology: gray × radiation factor × tissue factor",
+        "Alphas weighted 20× more damaging than gammas per gray",
+        "Flight NYC→London: ~40 μSv · CT scan: ~7 mSv",
+        "Natural background: ~2.4 mSv/year average",
+        "Occupational limit: 20 mSv/year averaged over five years"
+      ],
+      "sources": [
+        {
+          "organization": "ICRP",
+          "title": "Dose Quantities",
+          "url": "https://www.icrp.org/"
+        },
+        {
+          "organization": "BIPM",
+          "title": "SI Units – sievert",
+          "url": "https://www.bipm.org/en/measurement-units"
+        }
+      ],
+      "image": "../../assets/images/terms/Sievert.webp",
+      "debunking_snippet": "“A sievert of any radiation feels the same.” The whole point of sieverts is that it doesn't — the same absorbed gray becomes twenty times riskier when it comes from alpha emitters inside your lungs.",
+      "related_myths": [],
+      "related_articles": [],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "spent-fuel",
+      "term": "Spent Nuclear Fuel",
+      "definition": "Fuel assemblies removed from a reactor after roughly 4–6 years, when fission products build up and efficiency drops. Far from empty, an assembly still holds about 93% uranium-238, ~1% plutonium, and ~5% split fragments — leaving most of its original energy unburned. Fresh out of the core it's fiercely radioactive and heat-generating, so it spends at least five years underwater, then decades in ventilated dry casks while nations debate deep repositories or recycling.",
+      "category": "environment",
+      "related_terms": [
+        "radioactive-waste",
+        "fuel-rods",
+        "low-level-waste",
+        "plutonium-239",
+        "reactor-core"
+      ],
+      "quick_facts": [
+        "Composition: ~93% uranium · ~5% fission products · ~1% plutonium",
+        "Water pools first (≥5 years), then sealed dry casks",
+        "Casks survive crashes, fires, and floods by design",
+        "~95% of its possible energy is still unused — recycling exists",
+        "Finland's Onkalo is the first permanent deep repository"
+      ],
+      "sources": [
+        {
+          "organization": "World Nuclear",
+          "title": "Storage and Disposal of Spent Nuclear Fuel",
+          "url": "https://world-nuclear.org/information-library/nuclear-fuel-cycle/nuclear-wastes.aspx"
+        }
+      ],
+      "image": null,
+      "debunking_snippet": "“Spent fuel is useless garbage.” It's mostly untouched uranium plus freshly made plutonium — countries like France reprocess it into new fuel rods rather than burying it.",
+      "related_myths": [],
+      "related_articles": [],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "stanislaw-ulam",
+      "term": "Stanislaw Ulam",
+      "definition": "Polish-American mathematician (1909–1984) who cracked the hydrogen bomb's central problem. In 1951 he proposed using radiation from a fission explosion itself to compress and ignite fusion fuel — the 'radiation implosion' insight that became the Teller–Ulam design behind every thermonuclear weapon since. A Manhattan Project veteran, he also co-invented the Monte Carlo method with John von Neumann over playing cards, pioneered early computing applications, and sketched nuclear-pulse propulsion for Project Orion.",
+      "category": "people",
+      "related_terms": [
+        "edward-teller",
+        "nuclear-fusion",
+        "j-robert-oppenheimer",
+        "yield"
+      ],
+      "quick_facts": [
+        "Idea man behind the Teller–Ulam H-bomb design (1951)",
+        "Co-invented the Monte Carlo method with von Neumann",
+        "Manhattan Project mathematician at Los Alamos",
+        "Designed Project Orion's nuclear-pulse propulsion concept",
+        "Survived leukemia thanks to one of the first chemotherapy successes"
+      ],
+      "sources": [
+        {
+          "organization": "Atomic Heritage Foundation",
+          "title": "Stanislaw Ulam",
+          "url": "https://www.atomicheritage.org/profile/stanislaw-ulam"
+        }
+      ],
+      "image": null,
+      "debunking_snippet": "“Teller alone invented the hydrogen bomb.” The breakthrough — compressing fusion fuel with X-rays from a fission trigger — came from Ulam's calculations; Teller ran with it. Both names belong on the design.",
+      "related_myths": [],
+      "related_articles": [],
+      "difficulty": "advanced"
+    },
+    {
+      "id": "thermal-neutron",
+      "term": "Thermal Neutron",
+      "definition": "A neutron slowed to thermal equilibrium with its surroundings — about 0.025 eV of energy and a leisurely 2.2 km/s, versus a newborn fission neutron's 20,000 km/s. The slowdown matters enormously: uranium-235's capture cross-section balloons from about 1 barn at high speed to roughly 585 barns at thermal energies, which is why almost every power reactor carries a moderator to provide them. Uranium-238, meanwhile, prefers to swallow faster neutrons — the reason moderation and enrichment go hand in hand.",
+      "category": "science",
+      "related_terms": [
+        "neutron",
+        "moderator",
+        "nuclear-fission",
+        "uranium-235"
+      ],
+      "quick_facts": [
+        "≈0.025 eV · ≈2.2 km/s — room temperature equilibrium",
+        "U-235 fission cross-section: ~585 barns thermal vs ~1 barn fast",
+        "Produced by bouncing fast neutrons off light nuclei",
+        "The design target of every moderated reactor",
+        "Cadmium and boron absorb them voraciously"
+      ],
+      "sources": [
+        {
+          "organization": "World Nuclear",
+          "title": "Physics of Nuclear Energy",
+          "url": "https://world-nuclear.org/information-library/nuclear-fuel-cycle/introduction/physics-of-nuclear-energy.aspx"
+        }
+      ],
+      "image": "../../assets/images/terms/Thermal Neutron.webp",
+      "debunking_snippet": null,
+      "related_myths": [],
+      "related_articles": [],
+      "difficulty": "advanced"
+    },
+    {
+      "id": "transmutation",
+      "term": "Nuclear Transmutation",
+      "definition": "Changing one element into another by altering the number of protons in its nucleus — through radioactive decay or deliberate bombardment. Rutherford achieved the first artificial transmutation in 1919 (nitrogen into oxygen), fulfilling the alchemists' dream by physics rather than philosophy. Every element heavier than iron was forged by transmutation inside stars or supernovae, reactors breed plutonium from uranium-238 by it, and proposed 'partitioning and transmutation' schemes would blast long-lived waste isotopes into shorter-lived ones.",
+      "category": "science",
+      "related_terms": [
+        "decay",
+        "nuclear-fission",
+        "isotope",
+        "ernest-rutherford",
+        "glenn-seaborg"
+      ],
+      "quick_facts": [
+        "Alchemy's goal, achieved via nuclear physics (Rutherford, 1919)",
+        "Decay chains are nature's own slow transmutation",
+        "Elements beyond iron were born in stars and supernovae",
+        "Reactors transmute U-238 into plutonium-239 routinely",
+        "Proposed as a way to shrink long-lived nuclear waste"
+      ],
+      "sources": [
+        {
+          "organization": "IAEA",
+          "title": "Nuclear Transmutation",
+          "url": "https://www.iaea.org/"
+        }
+      ],
+      "image": "../../assets/images/terms/Transmutation.webp",
+      "debunking_snippet": "“Chemistry can change one element into another.” No chemical process can — chemistry only rearranges electrons. Changing elements requires changing the nucleus itself.",
+      "related_myths": [],
+      "related_articles": [],
+      "difficulty": "advanced"
+    },
+    {
+      "id": "tritium",
+      "term": "Tritium",
+      "definition": "Hydrogen with two neutrons added (³H) — radioactive, with a 12.3-year half-life and a feeble beta particle that a sheet of paper stops. Nature makes only traces in the upper atmosphere, so commercial supplies come from heavy-water reactors and weapons programs. It's the fuel partner for deuterium in fusion experiments, boosts the yield of thermonuclear weapons, keeps watch dials glowing for decades, and serves as a biology tracer.",
+      "category": "science",
+      "related_terms": [
+        "isotope",
+        "heavy-water",
+        "radionuclide",
+        "nuclear-fusion"
+      ],
+      "quick_facts": [
+        "Hydrogen +2 neutrons · half-life 12.3 years",
+        "Weakest common beta emitter (~5.7 keV average)",
+        "D–T is fusion's easiest reaction — ITER runs on it",
+        "Boosts thermonuclear weapon yields",
+        "Glows in exit signs and watch faces via phosphor excitation"
+      ],
+      "sources": [
+        {
+          "organization": "World Nuclear",
+          "title": "Tritium",
+          "url": "https://world-nuclear.org/information-library"
+        }
+      ],
+      "image": "../../assets/images/terms/tritium.webp",
+      "debunking_snippet": "“Those glowing exit signs are radiation hazards.” Tritium's betas cannot escape the sealed glass tube — stand as close as you like for as long as you like; distance of millimeters protects you completely.",
+      "related_myths": [],
+      "related_articles": [],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "uranium-235",
+      "term": "Uranium-235",
+      "definition": "The fissile star of natural uranium — just 0.72% of the metal, yet the only isotope found in nature that sustains chain reactions easily. Its nucleus deforms and splits when it captures a slow neutron, releasing ~200 MeV plus fresh neutrons. With a 704-million-year half-life it still accounts for nearly all of Earth's remaining U-235; the Oklo deposit in Gabon burned some naturally two billion years ago when concentrations ran higher.",
+      "category": "science",
+      "related_terms": [
+        "uranium-238",
+        "nuclear-fission",
+        "enrichment",
+        "critical-mass",
+        "chain-reaction"
+      ],
+      "quick_facts": [
+        "0.72% of natural uranium",
+        "Fissile with slow (thermal) neutrons",
+        "~200 MeV per split · 2–3 neutrons out",
+        "Half-life: 704 million years",
+        "Gabon's Oklo went critical naturally ~1.7 billion years ago"
+      ],
+      "sources": [
+        {
+          "organization": "World Nuclear",
+          "title": "Uranium and Nuclear Power",
+          "url": "https://world-nuclear.org/information-library"
+        }
+      ],
+      "image": "../../assets/images/terms/Uranium-235.webp",
+      "debunking_snippet": null,
+      "related_myths": [],
+      "related_articles": [],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "uranium-238",
+      "term": "Uranium-238",
+      "definition": "Ninety-nine point three percent of natural uranium and the quiet majority of every fuel rod. It won't sustain chain reactions itself — thermal neutrons bounce off it — but fast neutrons occasionally split it, and captured neutrons transform it into plutonium-239 inside any running reactor. Its 4.47-billion-year half-life sets Earth's uranium clock, and its depleted form (left over after enrichment) balances tanks and shields gamma rays.",
+      "category": "science",
+      "related_terms": [
+        "uranium-235",
+        "plutonium-239",
+        "spent-fuel",
+        "decay",
+        "half-life"
+      ],
+      "quick_facts": [
+        "99.28% of natural uranium · half-life 4.47 billion years",
+        "Fertile: becomes fissile Pu-239 after capturing a neutron",
+        "Fast neutrons can split it — adding extra energy in reactors",
+        "Depleted uranium: tank armor and radiation shielding",
+        "Dating rocks by U-238 → lead-206 decay chains"
+      ],
+      "sources": [
+        {
+          "organization": "World Nuclear",
+          "title": "Uranium and Nuclear Power",
+          "url": "https://world-nuclear.org/information-library"
+        }
+      ],
+      "image": "../../assets/images/terms/Uranium-238.webp",
+      "debunking_snippet": null,
+      "related_myths": [],
+      "related_articles": [],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "uranium-hexafluoride",
+      "term": "Uranium Hexafluoride (UF₆)",
+      "definition": "One uranium atom bonded to six fluorines — the compound that makes enrichment practical. It sublimes directly from solid to gas at just 56 °C under normal pressure, letting centrifuge cascades work on a gas whose molecules differ only by the whisper of mass between U-235 and U-238. The trade-off: UF₆ is ferociously reactive with moisture, breaking down into corrosive hydrofluoric acid, so it travels in rugged cylinders under strict handling rules.",
+      "category": "technology",
+      "related_terms": [
+        "enrichment",
+        "uranium-235",
+        "yellowcake",
+        "uranium-238"
+      ],
+      "quick_facts": [
+        "Sublimes at 56 °C — the working gas of enrichment",
+        "Only volatile uranium compound suitable for centrifuges",
+        "Reacts violently with water → hydrofluoric acid",
+        "Shipped internationally in thick-walled steel cylinders",
+        "Fluorine comes back out unchanged — reused endlessly"
+      ],
+      "sources": [
+        {
+          "organization": "World Nuclear",
+          "title": "Conversion and Deconversion",
+          "url": "https://world-nuclear.org/information-library/nuclear-fuel-cycle/enrichment-and-conversion"
+        }
+      ],
+      "image": "../../assets/images/terms/Uranium Hexafluoride (UF₆).webp",
+      "debunking_snippet": null,
+      "related_myths": [],
+      "related_articles": [],
+      "difficulty": "advanced"
+    },
+    {
+      "id": "vitrification",
+      "term": "Vitrification",
+      "definition": "Locking high-level liquid waste inside glass — literally. Waste is calcined into powder, melted together with borosilicate glass formers at over 1,000 °C, and poured into stainless steel canisters where it solidifies into chemically inert logs. Glass resists leaching for many thousands of years, packs the waste densely, and tolerates radiation damage gracefully. France has run industrial-scale vitrification at La Hague since 1978; Hanford's massive treatment plant is finally doing the same for America's Cold War tank waste.",
+      "category": "technology",
+      "related_terms": [
+        "radioactive-waste",
+        "hot-cell",
+        "low-level-waste",
+        "spent-fuel"
+      ],
+      "quick_facts": [
+        "Waste dissolved into borosilicate glass at >1,000 °C",
+        "Glass logs resist leaching across geological timescales",
+        "France (La Hague) vitrifying industrially since 1978",
+        "Hanford's plant addresses Cold War-era tank waste",
+        "Canisters designed to cool for decades before disposal"
+      ],
+      "sources": [
+        {
+          "organization": "World Nuclear",
+          "title": "Synthetic Rock & Vitrification",
+          "url": "https://world-nuclear.org/information-library/nuclear-fuel-cycle/nuclear-wastes.aspx"
+        }
+      ],
+      "image": "../../assets/images/terms/Vitrification.webp",
+      "debunking_snippet": "“Waste is stored in leaky barrels.” High-level liquid waste is the dangerous legacy — and vitrification turns it into solid glass that geologists expect to outlast human civilization.",
+      "related_myths": [],
+      "related_articles": [],
+      "difficulty": "advanced"
+    },
+    {
+      "id": "watt",
+      "term": "Watt (W)",
+      "definition": "The SI unit of power — one joule per second — named for Scottish engineer James Watt, whose steam engines powered the first industrial revolution. Nuclear plants are rated two ways that matter: thermal megawatts describe heat from the core (a typical large unit: ~3,000 MWt), while electrical megawatts describe what reaches the grid (~1,000 MWe) — the gap being thermodynamic efficiency. A single large reactor thus powers around a million homes continuously, day and night.",
+      "category": "science",
+      "related_terms": [
+        "reactor-core",
+        "nuclear-reactor",
+        "binding-energy",
+        "mass-defect"
+      ],
+      "quick_facts": [
+        "1 W = 1 joule per second",
+        "Named after James Watt (honored 1889, formalized in SI)",
+        "Plants quote MWt (heat) and MWe (electricity)",
+        "Typical large unit: ~3,000 MWt → ~1,000 MWe",
+        "~33% efficiency set by steam-cycle thermodynamics"
+      ],
+      "sources": [
+        {
+          "organization": "BIPM",
+          "title": "SI Units – watt",
+          "url": "https://www.bipm.org/en/measurement-units"
+        }
+      ],
+      "image": null,
+      "debunking_snippet": null,
+      "related_myths": [],
+      "related_articles": [],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "x-ray",
+      "term": "X-ray",
+      "definition": "Electromagnetic radiation born when fast electrons slam into matter — decelerating violently (bremsstrahlung) or knocking inner-shell electrons loose. Wilhelm Röntgen discovered them accidentally in 1895 and photographed his wife's hand within weeks, launching medical imaging and winning the first Nobel Prize in Physics (1901). Energies overlap with gamma rays; the difference is origin — X-rays come from electron processes, gammas from nuclei. Hospitals fire LINAC-built beams through patients millions of times daily.",
+      "category": "science",
+      "related_terms": [
+        "gamma-ray",
+        "ionizing-radiation",
+        "linear-accelerator",
+        "roentgen"
+      ],
+      "quick_facts": [
+        "Discovered by Röntgen (1895) — first Nobel in Physics",
+        "Born from electron interactions, unlike nuclear gamma rays",
+        "Softer than most gammas but the ranges overlap",
+        "CT scans stack hundreds of X-ray slices",
+        "Lead aprons attenuate scattered rays during imaging"
+      ],
+      "sources": [
+        {
+          "organization": "Nobel Prize",
+          "title": "Wilhelm Röntgen Biography",
+          "url": "https://www.nobelprize.org/prizes/physics/1901/rontgen/biographical/"
+        }
+      ],
+      "image": "../../assets/images/terms/X-ray.webp",
+      "debunking_snippet": "“X-rays make you radioactive afterward.” Impossible — X-rays pass through and vanish at light speed. Only neutron bombardment activates materials, and hospital X-rays aren't neutrons.",
+      "related_myths": [],
+      "related_articles": [],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "yellowcake",
+      "term": "Yellowcake",
+      "definition": "Milled, concentrated uranium oxide — mostly U₃O₈ — named for its buttery color though modern versions run khaki to black. It's the checkpoint between mine and fuel cycle: leached from ore, precipitated, dried, packed into drums worth tens of thousands of dollars each. Chemically stable and only weakly radioactive, yellowcake still contains mostly uranium-238 — far from anything fissile until conversion and enrichment transform it.",
+      "category": "technology",
+      "related_terms": [
+        "enrichment",
+        "uranium-hexafluoride",
+        "fuel-rods",
+        "uranium-238"
+      ],
+      "quick_facts": [
+        "Mostly U₃O₈ — 70–90% uranium by weight",
+        "Color varies: yellow, khaki, brown, black",
+        "Weakly radioactive — alpha emitters, handled with gloves",
+        "Each drum holds roughly a tonne of uranium value",
+        "Cannot detonate or power anything without conversion + enrichment"
+      ],
+      "sources": [
+        {
+          "organization": "World Nuclear",
+          "title": "Mining of Uranium",
+          "url": "https://world-nuclear.org/information-library/nuclear-fuel-cycle/mining-of-uranium"
+        }
+      ],
+      "image": null,
+      "debunking_snippet": "“Yellowcake is a step toward building bombs.” As sold, it's overwhelmingly non-fissile U-238 — unusable in weapons without the entire industrial apparatus of conversion and enrichment on top.",
+      "related_myths": [],
+      "related_articles": [],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "yield",
+      "term": "Nuclear Yield",
+      "definition": "The explosive energy of a nuclear weapon, quoted in tons or megatons of TNT equivalent (1 kiloton = 4.184 trillion joules). Hiroshima's Little Boy delivered about 15 kilotons from a single fission stage; modern thermonuclear warheads reach hundreds of kilotons to megatons by wrapping a fission trigger around fusion fuel. Yield splits between blast, thermal pulse, prompt radiation, and fallout — whose severity depends on burst height and design choices.",
+      "category": "science",
+      "related_terms": [
+        "chain-reaction",
+        "critical-mass",
+        "edward-teller",
+        "nuclear-fusion"
+      ],
+      "quick_facts": [
+        "Measured in TNT equivalents: kt, Mt",
+        "Hiroshima: ~15 kt · largest ever tested: 50 Mt (Tsar Bomba)",
+        "Fission primary ignites the fusion secondary in modern weapons",
+        "Airbursts maximize blast; ground bursts maximize fallout",
+        "1 kt = 4.184 × 10¹² joules"
+      ],
+      "sources": [
+        {
+          "organization": "CTBTO",
+          "title": "Nuclear Testing",
+          "url": "https://www.ctbto.org/"
+        }
+      ],
+      "image": "../../assets/images/terms/Yield.webp",
+      "debunking_snippet": null,
+      "related_myths": [],
+      "related_articles": [],
+      "difficulty": "advanced"
+    },
+    {
+      "id": "z-number",
+      "term": "Z-Number",
+      "definition": "Shorthand for atomic number — Z stands for the German 'Zahl' (number), dating to pre-WWI physics papers written in German. Physically it counts protons and thereby fixes an atom's place in the periodic table: hydrogen Z = 1, carbon Z = 6, uranium Z = 92. In nuclear formulas Z tracks charge balance through reactions — sum the Z's before and after any decay or collision and the totals must match.",
+      "category": "science",
+      "related_terms": [
+        "atomic-number",
+        "proton",
+        "atom",
+        "transmutation"
+      ],
+      "quick_facts": [
+        "Z = German 'Zahl', meaning number",
+        "Counts protons — fixes the element",
+        "Conserved across every nuclear reaction",
+        "Beta-minus decay raises Z by one; alpha lowers it by two",
+        "Carbon: Z = 6 · Uranium: Z = 92"
+      ],
+      "sources": [
+        {
+          "organization": "IUPAC",
+          "title": "Periodic Table of Elements",
+          "url": "https://iupac.org/what-we-do/periodic-table-of-elements/"
+        }
+      ],
+      "image": "../../assets/images/terms/Z-number.webp",
+      "debunking_snippet": null,
+      "related_myths": [],
+      "related_articles": [],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "zero-power-reactor",
+      "term": "Zero Power Reactor",
+      "definition": "A research reactor deliberately run at microscopic power — watts to microwatts, sometimes dubbed 'zero-power'. At those levels the core barely warms, so no cooling systems, big shielding, or containment dome are required; universities and labs use them to teach reactor physics hands-on, test lattice configurations, and measure criticality safely. Students can pull rods themselves and watch reactivity respond in real time — impossible at full power.",
+      "category": "technology",
+      "related_terms": [
+        "nuclear-reactor",
+        "critical-mass",
+        "chain-reaction",
+        "moderator"
+      ],
+      "quick_facts": [
+        "Operates at watts to microwatts — effectively zero power",
+        "No meaningful heat → minimal cooling or shielding needed",
+        "Used for teaching, lattice tests, and criticality measurements",
+        "Students operate controls directly under supervision",
+        "Proves designs before full-power construction begins"
+      ],
+      "sources": [
+        {
+          "organization": "IAEA",
+          "title": "Research Reactors",
+          "url": "https://www.iaea.org/topics/research-reactors"
+        }
+      ],
+      "image": "../../assets/images/terms/Zero Power Reactor.webp",
+      "debunking_snippet": "“All reactors are industrial monsters.” Zero-power reactors fit in gymnasiums, hum along at flashlight-battery heating levels, and have trained generations of nuclear engineers safely.",
+      "related_myths": [],
+      "related_articles": [],
+      "difficulty": "advanced"
+    }
+  ]
+}

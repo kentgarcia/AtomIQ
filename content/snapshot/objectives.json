@@ -1,0 +1,78 @@
+{
+  "table": "objectives",
+  "primaryKey": [
+    "id"
+  ],
+  "rows": [
+    {
+      "id": "u1-atom-scale",
+      "unit_id": "inside-the-atom",
+      "position": 1,
+      "statement": "Describe how small atoms are using a comparison.",
+      "misconception": "Atoms are small enough to see with a good microscope."
+    },
+    {
+      "id": "u1-atomic-number",
+      "unit_id": "inside-the-atom",
+      "position": 4,
+      "statement": "State that the number of protons decides which element an atom is.",
+      "misconception": "Elements differ because their atoms are made of different stuff."
+    },
+    {
+      "id": "u1-forces-in-nucleus",
+      "unit_id": "inside-the-atom",
+      "position": 8,
+      "statement": "Describe the two competing forces in a nucleus: electric push and the strong force.",
+      "misconception": null
+    },
+    {
+      "id": "u1-isotope-definition",
+      "unit_id": "inside-the-atom",
+      "position": 6,
+      "statement": "Explain that isotopes of an element have the same protons and different neutrons.",
+      "misconception": "Isotope means radioactive or man-made."
+    },
+    {
+      "id": "u1-mass-number",
+      "unit_id": "inside-the-atom",
+      "position": 7,
+      "statement": "Work out protons, neutrons and the name of an isotope from its numbers.",
+      "misconception": null
+    },
+    {
+      "id": "u1-matter-is-atoms",
+      "unit_id": "inside-the-atom",
+      "position": 0,
+      "statement": "Recognise that all ordinary matter is made of atoms, and that light and heat are not.",
+      "misconception": "Air is nothing; atoms are just very small specks."
+    },
+    {
+      "id": "u1-nucleus",
+      "unit_id": "inside-the-atom",
+      "position": 3,
+      "statement": "Explain that the nucleus is tiny but holds nearly all the mass.",
+      "misconception": "Electrons circle the nucleus like planets, so an atom is mostly nucleus."
+    },
+    {
+      "id": "u1-particles",
+      "unit_id": "inside-the-atom",
+      "position": 2,
+      "statement": "Name the three particles of an atom, their charges and where they are.",
+      "misconception": "An atom is a solid ball."
+    },
+    {
+      "id": "u1-read-the-table",
+      "unit_id": "inside-the-atom",
+      "position": 5,
+      "statement": "Find an element's symbol and atomic number on the periodic table.",
+      "misconception": null
+    },
+    {
+      "id": "u1-stable-unstable",
+      "unit_id": "inside-the-atom",
+      "position": 9,
+      "statement": "Explain that most nuclei around us are stable, some are unstable, and unstable nuclei change and give off radiation.",
+      "misconception": "Anything nuclear is dangerous; radioactivity is something people do to atoms."
+    }
+  ]
+}

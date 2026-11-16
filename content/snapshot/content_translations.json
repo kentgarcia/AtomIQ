@@ -1,0 +1,9 @@
+{
+  "table": "content_translations",
+  "primaryKey": [
+    "locale",
+    "entity",
+    "entity_id"
+  ],
+  "rows": []
+}

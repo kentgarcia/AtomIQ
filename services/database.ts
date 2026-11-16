@@ -1,4 +1,3 @@
-import { UNITS } from "@/content/units";
 import * as SQLite from "expo-sqlite";
 import { initExplorerStorage } from "./explorer-storage";
 import { LOCAL_FIRST_SCHEMA } from "./local-first/schema";
@@ -58,6 +57,49 @@ const ensureTableColumns = async (
         error,
       );
     }
+  }
+};
+
+/**
+ * Path node progress lives in `levels`, keyed by content ids (curriculum v2).
+ * Older installs created it with a foreign key to the legacy `units` progress
+ * table, which no longer has rows for the content units, so every insert failed
+ * with "FOREIGN KEY constraint failed". SQLite cannot drop a constraint in
+ * place, so rebuild the table without it (rows are kept).
+ */
+const dropLevelsUnitForeignKey = async (database: SQLite.SQLiteDatabase): Promise<void> => {
+  const fks = await database.getAllAsync<{ table: string }>("PRAGMA foreign_key_list(levels)");
+  if (!fks.some((fk) => fk.table === "units")) return;
+  await database.execAsync("PRAGMA foreign_keys = OFF;");
+  try {
+    await database.execAsync(`
+      BEGIN;
+      CREATE TABLE levels_v2 (
+        id TEXT PRIMARY KEY,
+        unit_id TEXT NOT NULL,
+        type TEXT,
+        status TEXT DEFAULT 'locked',
+        xp_earned INTEGER DEFAULT 0,
+        stars INTEGER DEFAULT 0,
+        completed_at DATETIME,
+        attempts INTEGER DEFAULT 0
+      );
+      INSERT INTO levels_v2 (id, unit_id, type, status, xp_earned, stars, completed_at, attempts)
+        SELECT id, unit_id, type, status, xp_earned, stars, completed_at, attempts FROM levels;
+      DROP TABLE levels;
+      ALTER TABLE levels_v2 RENAME TO levels;
+      COMMIT;
+    `);
+    console.log("Migration: rebuilt levels without the legacy units foreign key");
+  } catch (error) {
+    try {
+      await database.execAsync("ROLLBACK;");
+    } catch {
+      /* no transaction open */
+    }
+    console.warn("Migration: could not rebuild levels:", error);
+  } finally {
+    await database.execAsync("PRAGMA foreign_keys = ON;");
   }
 };
 
@@ -146,10 +188,36 @@ export const initDatabase = async () => {
         xp_earned INTEGER DEFAULT 0,
         stars INTEGER DEFAULT 0,
         completed_at DATETIME,
-        attempts INTEGER DEFAULT 0,
-        FOREIGN KEY (unit_id) REFERENCES units(id)
+        attempts INTEGER DEFAULT 0
       );
       
+      -- Objective mastery (curriculum v2). One row per objective; see services/mastery-core.ts.
+      CREATE TABLE IF NOT EXISTS objective_mastery (
+        objective_id TEXT PRIMARY KEY,
+        level INTEGER NOT NULL DEFAULT 0,
+        box INTEGER NOT NULL DEFAULT 0,
+        due_at INTEGER,
+        correct INTEGER NOT NULL DEFAULT 0,
+        wrong INTEGER NOT NULL DEFAULT 0,
+        last_seen INTEGER,
+        practised_at INTEGER,
+        correct_sessions TEXT NOT NULL DEFAULT '[]',
+        updated_at INTEGER NOT NULL DEFAULT 0
+      );
+
+      -- Every scored answer, for review scheduling and (later) weak-spot insight.
+      CREATE TABLE IF NOT EXISTS item_attempts (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        item_id TEXT NOT NULL,
+        objective_id TEXT NOT NULL,
+        surface TEXT NOT NULL,
+        session_id TEXT NOT NULL,
+        correct INTEGER NOT NULL,
+        answered_at INTEGER NOT NULL
+      );
+      CREATE INDEX IF NOT EXISTS idx_item_attempts_objective ON item_attempts(objective_id);
+      CREATE INDEX IF NOT EXISTS idx_item_attempts_item ON item_attempts(item_id);
+
       -- Lesson Steps (for tracking individual step completion)
       CREATE TABLE IF NOT EXISTS lesson_steps (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -285,9 +353,7 @@ export const initDatabase = async () => {
 
     // Re-run safeguards after schema bootstrap for databases upgrading from older layouts.
     await ensureIdentityProfileColumns(db);
-
-    // Initialize levels from syllabus if database is empty
-    await initializeLevelsFromSyllabus();
+    await dropLevelsUnitForeignKey(db);
 
     // Initialize explorer storage
     await initExplorerStorage();
@@ -297,77 +363,6 @@ export const initDatabase = async () => {
   } catch (error) {
     console.error("Error initializing database:", error);
     throw error;
-  }
-};
-
-// Initialize levels from syllabus (only if database is empty)
-const initializeLevelsFromSyllabus = async () => {
-  try {
-    const database = db;
-    if (!database) return;
-
-    // Check if levels already exist
-    const existingLevels = await database.getFirstAsync(
-      "SELECT COUNT(*) as count FROM levels",
-    );
-    if (existingLevels && (existingLevels as any).count > 0) {
-      console.log("Levels already initialized, skipping...");
-      return;
-    }
-
-    console.log("Initializing levels from syllabus...");
-
-    // First, insert all units into the units table
-    for (const unit of UNITS) {
-      await database.runAsync(
-        `INSERT OR IGNORE INTO units (id, title, description, color, order_index, is_locked) 
-         VALUES (?, ?, ?, ?, ?, ?)`,
-        [
-          unit.id,
-          unit.title,
-          unit.description,
-          unit.color,
-          unit.order,
-          unit.order === 1 ? 0 : 1, // First unit is unlocked
-        ],
-      );
-    }
-
-    // Then, insert all lessons and quizzes from the syllabus
-    for (const unit of UNITS) {
-      // Insert lessons
-      for (let i = 0; i < unit.lessonIds.length; i++) {
-        const lessonId = unit.lessonIds[i];
-        const isFirstLesson = i === 0 && unit.order === 1; // First lesson of first unit
-
-        await database.runAsync(
-          `INSERT OR IGNORE INTO levels (id, unit_id, type, status, xp_earned, stars, attempts) 
-           VALUES (?, ?, ?, ?, ?, ?, ?)`,
-          [
-            lessonId,
-            unit.id,
-            "lesson",
-            isFirstLesson ? "current" : "locked",
-            0,
-            0,
-            0,
-          ],
-        );
-      }
-
-      // Insert quizzes
-      for (const quizId of unit.quizIds) {
-        await database.runAsync(
-          `INSERT OR IGNORE INTO levels (id, unit_id, type, status, xp_earned, stars, attempts) 
-           VALUES (?, ?, ?, ?, ?, ?, ?)`,
-          [quizId, unit.id, "quiz", "locked", 0, 0, 0],
-        );
-      }
-    }
-
-    console.log("Levels initialized from syllabus");
-  } catch (error) {
-    console.error("Error initializing levels:", error);
   }
 };
 
@@ -942,6 +937,10 @@ export const updateLevelProgress = async (
     xp_earned?: number;
     stars?: number;
     completed_at?: string;
+    /** Content unit the path node belongs to (recorded when the row is created). */
+    unit_id?: string;
+    /** Node kind: lesson, practice, checkpoint, or testout. */
+    type?: string;
   },
 ) => {
   const database = getDatabase();
@@ -965,40 +964,13 @@ export const updateLevelProgress = async (
       ],
     );
   } else {
-    // Find which unit this level belongs to
-    let unitId = "atomic-playground"; // Default to first unit
-    let unitData = UNITS[0];
-
-    for (const unit of UNITS) {
-      if (unit.lessonIds.includes(levelId) || unit.quizIds.includes(levelId)) {
-        unitId = unit.id;
-        unitData = unit;
-        break;
-      }
-    }
-
-    // Ensure the unit exists in the units table first
-    await database.runAsync(
-      `INSERT OR IGNORE INTO units (id, title, description, color, order_index, is_locked) 
-       VALUES (?, ?, ?, ?, ?, ?)`,
-      [
-        unitData.id,
-        unitData.title,
-        unitData.description,
-        unitData.color,
-        unitData.order,
-        unitData.order === 1 ? 0 : 1,
-      ],
-    );
-
-    // Now insert the level
     await database.runAsync(
       `INSERT INTO levels (id, unit_id, type, status, xp_earned, stars, completed_at, attempts)
        VALUES (?, ?, ?, ?, ?, ?, ?, 1)`,
       [
         levelId,
-        unitId,
-        levelId.includes("quiz") ? "quiz" : "lesson",
+        data.unit_id ?? "",
+        data.type ?? "lesson",
         data.status || "locked",
         data.xp_earned || 0,
         data.stars || 0,
@@ -1011,129 +983,6 @@ export const updateLevelProgress = async (
 export const getAllLevels = async () => {
   const database = getDatabase();
   return await database.getAllAsync("SELECT * FROM levels ORDER BY id");
-};
-
-// Unlock next lesson/quiz/unit after completing a level
-export const unlockNextLevel = async (completedLevelId: string) => {
-  const database = getDatabase();
-
-  try {
-    // Find which unit this level belongs to
-    let currentUnit = null;
-    let levelIndexInUnit = -1;
-    let isQuiz = false;
-
-    for (const unit of UNITS) {
-      const lessonIndex = unit.lessonIds.indexOf(completedLevelId);
-      if (lessonIndex !== -1) {
-        currentUnit = unit;
-        levelIndexInUnit = lessonIndex;
-        break;
-      }
-      const quizIndex = unit.quizIds.indexOf(completedLevelId);
-      if (quizIndex !== -1) {
-        currentUnit = unit;
-        levelIndexInUnit = quizIndex;
-        isQuiz = true;
-        break;
-      }
-    }
-
-    if (!currentUnit) {
-      console.log("Could not find unit for level:", completedLevelId);
-      return;
-    }
-
-    // If this was a quiz (last item in unit), unlock the first lesson of the next unit
-    if (isQuiz) {
-      const nextUnitIndex = UNITS.findIndex((u) => u.id === currentUnit.id) + 1;
-      if (nextUnitIndex < UNITS.length) {
-        const nextUnit = UNITS[nextUnitIndex];
-        if (nextUnit.lessonIds.length > 0) {
-          const nextLevelId = nextUnit.lessonIds[0];
-          console.log("Unlocking first lesson of next unit:", nextLevelId);
-
-          // Check if level exists, if not insert it
-          const existingLevel = await getLevelProgress(nextLevelId);
-          if (existingLevel) {
-            await database.runAsync(
-              "UPDATE levels SET status = ? WHERE id = ? AND status = ?",
-              ["current", nextLevelId, "locked"],
-            );
-          } else {
-            // Ensure unit exists
-            await database.runAsync(
-              `INSERT OR IGNORE INTO units (id, title, description, color, order_index, is_locked) 
-               VALUES (?, ?, ?, ?, ?, ?)`,
-              [
-                nextUnit.id,
-                nextUnit.title,
-                nextUnit.description,
-                nextUnit.color,
-                nextUnit.order,
-                0,
-              ],
-            );
-
-            // Insert the level as current
-            await database.runAsync(
-              `INSERT INTO levels (id, unit_id, type, status, xp_earned, stars, attempts)
-               VALUES (?, ?, ?, ?, ?, ?, 0)`,
-              [nextLevelId, nextUnit.id, "lesson", "current", 0, 0],
-            );
-          }
-
-          // Unlock the next unit
-          await database.runAsync(
-            "UPDATE units SET is_locked = 0 WHERE id = ?",
-            [nextUnit.id],
-          );
-        }
-      }
-    } else {
-      // If this was a lesson, unlock the next lesson or quiz in the same unit
-      const nextIndex = levelIndexInUnit + 1;
-      if (nextIndex < currentUnit.lessonIds.length) {
-        // Unlock next lesson
-        const nextLevelId = currentUnit.lessonIds[nextIndex];
-        console.log("Unlocking next lesson:", nextLevelId);
-
-        const existingLevel = await getLevelProgress(nextLevelId);
-        if (existingLevel) {
-          await database.runAsync(
-            "UPDATE levels SET status = ? WHERE id = ? AND status = ?",
-            ["current", nextLevelId, "locked"],
-          );
-        } else {
-          await database.runAsync(
-            `INSERT INTO levels (id, unit_id, type, status, xp_earned, stars, attempts)
-             VALUES (?, ?, ?, ?, ?, ?, 0)`,
-            [nextLevelId, currentUnit.id, "lesson", "current", 0, 0],
-          );
-        }
-      } else if (currentUnit.quizIds.length > 0) {
-        // All lessons done, unlock the quiz
-        const quizId = currentUnit.quizIds[0];
-        console.log("All lessons completed, unlocking quiz:", quizId);
-
-        const existingQuiz = await getLevelProgress(quizId);
-        if (existingQuiz) {
-          await database.runAsync(
-            "UPDATE levels SET status = ? WHERE id = ? AND status = ?",
-            ["current", quizId, "locked"],
-          );
-        } else {
-          await database.runAsync(
-            `INSERT INTO levels (id, unit_id, type, status, xp_earned, stars, attempts)
-             VALUES (?, ?, ?, ?, ?, ?, 0)`,
-            [quizId, currentUnit.id, "quiz", "current", 0, 0],
-          );
-        }
-      }
-    }
-  } catch (error) {
-    console.error("Error unlocking next level:", error);
-  }
 };
 
 // Daily Activity
@@ -1215,6 +1064,8 @@ export const clearAllData = async () => {
     DELETE FROM units;
     DELETE FROM levels;
     DELETE FROM lesson_steps;
+    DELETE FROM objective_mastery;
+    DELETE FROM item_attempts;
     DELETE FROM daily_activity;
     DELETE FROM achievements;
     DELETE FROM leaderboard;
@@ -1263,6 +1114,8 @@ export const deleteAccountData = async () => {
     "saved_notes",
     "user_profile",
     "lesson_steps",
+    "objective_mastery",
+    "item_attempts",
     "levels",
     "units",
     "daily_activity",
@@ -1287,7 +1140,6 @@ export default {
   getLevelProgress,
   updateLevelProgress,
   getAllLevels,
-  unlockNextLevel,
   logDailyActivity,
   getDailyActivity,
   saveGameScore,

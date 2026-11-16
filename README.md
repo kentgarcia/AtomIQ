@@ -111,11 +111,12 @@ app/                         Expo Router screens and flows
 ├── (tabs)/                  Home, Discovery, Guide, Games, Profile
 ├── explorer/                Journeys, encyclopedia, Atom Maze
 ├── lab/                     Dose Visualizer and Energy Showdown
-├── lesson/                  Lesson renderer and lesson flow
+├── lesson/                  Card-based lesson runner
+├── practice/                Practice, checkpoints, test-outs and review
 └── mythbuster/              MythBuster modes and results
 
 components/                  Shared UI, games, Guide, lessons, and markdown
-content/                     Typed lessons, quizzes, myths, facts, and articles
+content/                     Curriculum types and cores, myths, facts, and articles
 services/                    SQLite, storage, Guide engine, missions, media
 theme/                       Tokens, palettes, themes, layout, and motion
 scripts/                     Content editor, migration, and database tooling
@@ -165,12 +166,12 @@ The app works offline after installation. The `start`, `android`, `ios`, and `we
 | `npm run android` | Sync content and start Expo for Android |
 | `npm run ios` | Sync content and start Expo for iOS |
 | `npm run web` | Sync content and start Expo for web |
-| `npm run sync-content` | Rebuild the bundled SQLite content database |
+| `npm run sync-content` | Refresh the bundled content database if it is out of date |
 | `npm run typecheck` | Run TypeScript without emitting files |
 | `npm run lint` | Run the Expo ESLint configuration |
 | `npm run lint:fix` | Apply safe ESLint fixes |
-| `npm run content-editor` | Open the interactive content editor |
-| `npm run content-studio` | Start the browser-based content studio |
+| `npm run content-studio` | Start the browser-based content studio (edits are drafts) |
+| `npm run release:content` | Show content status; `--publish` creates a version |
 | `npm run eas:preview:android` | Build an internal Android preview APK with EAS |
 | `./build-apk.sh` | Run the project's interactive APK build helper |
 
@@ -224,12 +225,11 @@ services/content-db.ts
 
 Typical content workflow:
 
-1. Edit lessons, quizzes, myths, facts, articles, or journeys in `content/`.
-2. Run `npm run sync-content`.
-3. Launch the app and verify the updated content in the relevant flow.
-4. Include the regenerated database in the change when the content hash/version changes.
+1. Run `npm run content-studio` and edit units, lessons, the item bank, myths, MythBuster questions, mazes, the encyclopedia, articles or posts. Each save is validated and recorded; nothing is released yet.
+2. Check **Problems** and **Changes** in Studio, then press **Publish** (or run `npm run release:content -- --publish --notes "…"`). That creates the next version, refreshes the bundled database and writes the release record.
+3. Launch the app to verify, then commit the files the publish changed.
 
-The content tooling is also available through `npm run content-editor` and `npm run content-studio`.
+Backups are automatic (daily, before publish and restore) and live under Studio → Backups. See `docs/CONTENT_SQLITE_AND_STUDIO_SPEC.md` for the design.
 
 ## Documentation
 

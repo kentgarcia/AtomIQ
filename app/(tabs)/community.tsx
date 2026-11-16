@@ -1,7 +1,18 @@
-import { getContentImage } from "@/components/community/image-source";
-import { PageBackground, useTabBarInset } from "@/components/layout";
+import { ArticleCard } from "@/components/community/ArticleCard";
+import { DailyFactCard } from "@/components/community/DailyFactCard";
+import {
+  EncyclopediaRow,
+  PeriodicTableBanner,
+} from "@/components/community/EncyclopediaParts";
+import { HubBar } from "@/components/community/HubBar";
+import type { ArticleView, HubTab } from "@/components/community/HubTabs";
+import { createStyles } from "@/components/community/styles";
+import { PageBackground, TopRowHeader, useTabBarInset } from "@/components/layout";
 import { Icon } from "@/components/ui/icon";
 import { getAllArticles, getAllPosts } from "@/content/articles";
+import { getAllEncyclopediaEntries, type EncyclopediaEntry } from "@/content/explorer";
+import { impactLight } from "@/services/haptics";
+import { getReadArticleIds } from "@/services/read-articles";
 import {
   getColumnCount,
   layout,
@@ -9,138 +20,99 @@ import {
   useTheme,
 } from "@/theme";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Image as ExpoImage } from "expo-image";
-import { useRouter } from "expo-router";
-import { impactLight } from "@/services/haptics";
-import { SlidingHighlight, useSlidingHighlight } from "@/components/ui/sliding-highlight";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
-import Animated, {
-  Easing,
-  useAnimatedStyle,
-  useReducedMotion,
-  useSharedValue,
-  withRepeat,
-  withTiming,
-} from "react-native-reanimated";
+import { useFocusEffect, useRouter } from "expo-router";
+import React, {
+  useCallback,
+  useDeferredValue,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import {
   FlatList,
   Image,
-  ScrollView,
+  type NativeScrollEvent,
+  type NativeSyntheticEvent,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useSharedValue } from "react-native-reanimated";
 
-import { createStyles } from "@/components/community/styles";
+/**
+ * A feed item holds only what the cards and search need. The article body is
+ * deliberately left out (it is ~28 KB of text the grid never shows) and the
+ * search text and sort time are computed once instead of on every keystroke.
+ */
+type FeedItem = {
+  id: string;
+  title: string;
+  category?: string;
+  author?: { name?: string };
+  readTime?: number;
+  image?: string;
+  searchText: string;
+  time: number;
+};
+
+type EncyclopediaIndexEntry = { entry: EncyclopediaEntry; haystack: string };
+
+type ListRow =
+  | { kind: "bar"; id: string }
+  | { kind: "banner"; id: string }
+  | { kind: "empty"; id: string }
+  | { kind: "cards"; id: string; items: FeedItem[] }
+  | { kind: "entry"; id: string; entry: EncyclopediaEntry };
 
 // Storage keys
 const BOOKMARKS_KEY = "@atomiq_bookmarks";
 
-// Category pills (excluding the bookmark & "All" pills, which are rendered first)
-const CATEGORIES: { id: string; label: string }[] = [
-  { id: "facts", label: "Facts" },
-  { id: "stories", label: "Stories" },
-  { id: "real-life", label: "Real Life" },
-  { id: "discoveries", label: "Discoveries" },
-  { id: "safety", label: "Safety" },
-];
+const toFeedItem = (
+  prefix: string,
+  source: {
+    id: string;
+    title: string;
+    content?: string;
+    excerpt?: string;
+    category?: string;
+    author?: { name?: string };
+    readTime?: number;
+    image?: string;
+    tags?: string[];
+    publishedDate?: string;
+  },
+  searchBody: string | undefined,
+): FeedItem => ({
+  id: `${prefix}-${source.id}`,
+  title: source.title,
+  category: source.category,
+  author: source.author,
+  readTime: source.readTime,
+  image: source.image,
+  searchText: `${source.title} ${searchBody ?? ""} ${(source.tags ?? []).join(" ")}`.toLowerCase(),
+  time: source.publishedDate ? new Date(source.publishedDate).getTime() : -Infinity,
+});
 
-const CATEGORY_FILTERS: Record<string, (item: any) => boolean> = {
-  all: () => true,
-  facts: (it) =>
-    it.contentType === "did-you-know" ||
-    it.category === "science" ||
-    it.tags?.includes("science"),
-  stories: (it) => it.contentType === "article" || it.contentType === "guide",
-  "real-life": (it) =>
-    it.category === "environment" ||
-    it.category === "health" ||
-    it.tags?.some((t: string) =>
-      ["background-radiation", "agriculture", "education"].includes(t),
-    ),
-  discoveries: (it) =>
-    it.contentType === "news" ||
-    it.tags?.some((t: string) =>
-      ["research", "discovery", "innovation", "breakthrough"].includes(t),
-    ),
-  safety: (it) => it.category === "safety" || it.tags?.includes("safety"),
+// Articles and posts live in the content database (async). Newest first.
+const generateFeedItems = async (): Promise<FeedItem[]> => {
+  const [articles, posts] = await Promise.all([getAllArticles(), getAllPosts()]);
+  const items = [
+    ...articles.map((a) => toFeedItem("article", a, a.excerpt)),
+    ...posts.map((p) => toFeedItem("article", p, p.content)),
+  ];
+  return items.sort((a, b) => b.time - a.time);
 };
 
-// Helper to generate feed items from articles and posts only (DB-backed, async)
-const generateFeedItems = async () => {
-  const articles = await getAllArticles();
-  const posts = await getAllPosts();
-
-  const feedItems: any[] = [];
-
-  // Add articles as feed items
-  articles.forEach((article) => {
-    feedItems.push({
-      id: `article-${article.id}`,
-      type: "article",
-      contentType: article.type,
-      title: article.title,
-      subtitle: article.subtitle,
-      content: article.excerpt,
-      fullContent: article.content,
-      author: article.author,
-      publishedDate: article.publishedDate,
-      readTime: article.readTime,
-      source: article.source,
-      sourceUrl: article.sourceUrl,
-      category: article.category,
-      tags: article.tags,
-      image: article.image,
-      difficulty: article.difficulty,
-      featured: article.featured,
-    });
-  });
-
-  // Add posts as feed items
-  posts.forEach((post) => {
-    feedItems.push({
-      id: `article-${post.id}`,
-      type: "article",
-      contentType: post.type,
-      title: post.title,
-      content: post.content,
-      author: post.author,
-      publishedDate: post.publishedDate,
-      readTime: post.readTime,
-      difficulty: post.difficulty,
-      source: post.source,
-      sourceUrl: post.sourceUrl,
-      videoUrl: post.videoUrl,
-      category: post.category,
-      tags: post.tags,
-      image: post.image,
-    });
-  });
-
-  // Sort by published date (newest first)
-  return feedItems.sort((a, b) => {
-    if (a.publishedDate && b.publishedDate) {
-      return (
-        new Date(b.publishedDate).getTime() -
-        new Date(a.publishedDate).getTime()
-      );
-    }
-    if (a.publishedDate) return -1;
-    if (b.publishedDate) return 1;
-    return 0;
-  });
-};
+const sameIds = (a: string[], b: string[]) =>
+  a.length === b.length && a.every((id, i) => id === b[i]);
 
 export default function CommunityScreen() {
   const router = useRouter();
-  const insets = useSafeAreaInsets();
   const { theme } = useTheme();
-  const { contentWidth, contentMaxWidth, contentFrameStyle, gutter } =
-    useResponsiveLayout();
+  const { contentWidth, contentFrameStyle } = useResponsiveLayout();
   const tabBarInset = useTabBarInset();
-  const styles = useMemo(() => createStyles(theme), [theme]);
+  const styles = createStyles(theme);
 
   // Keep the gallery two-up only while each card keeps the minimum readable
   // width. Compact phones fall back to a single column.
@@ -155,46 +127,43 @@ export default function CommunityScreen() {
   );
 
   const [searchQuery, setSearchQuery] = useState("");
-  const [activeFilter, setActiveFilter] = useState<string>("all");
+  const [articleView, setArticleView] = useState<ArticleView>("all");
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [readIds, setReadIds] = useState<string[]>([]);
   const [bookmarkedIds, setBookmarkedIds] = useState<string[]>([]);
-  const [allFeedItems, setAllFeedItems] = useState<any[]>([]);
+  const [allFeedItems, setAllFeedItems] = useState<FeedItem[]>([]);
+  const [tab, setTab] = useState<HubTab>("articles");
+  const [encyclopedia, setEncyclopedia] = useState<EncyclopediaIndexEntry[]>([]);
 
-  const reducedMotion = useReducedMotion();
-  // One orange pill travels between category chips (docs/CONTINUITY_SPEC.md, C8).
-  const chipHighlight = useSlidingHighlight(activeFilter);
-  const restFilter = chipHighlight.restId;
-  const mascotY = useSharedValue(0);
-  const mascotRotate = useSharedValue(0);
+  // Typing stays responsive: the input uses `searchQuery`, list filtering
+  // follows `deferredQuery` and can lag a frame behind.
+  const deferredQuery = useDeferredValue(searchQuery);
+  const isSearching = searchQuery.trim().length > 0;
+  const isArticles = tab === "articles";
+
+  // Scroll offset and the scrolling header's height live in shared values, so
+  // scrolling never re-renders React; the pinned bar reads them on the UI thread.
+  const scrollY = useSharedValue(0);
+  const headerHeight = useSharedValue(0);
   useEffect(() => {
-    if (reducedMotion) {
-      mascotY.value = 0;
-      mascotRotate.value = 0;
-      return;
-    }
-    mascotY.value = withRepeat(
-      withTiming(-6, { duration: 2200, easing: Easing.inOut(Easing.sin) }),
-      -1,
-      true
-    );
-    mascotRotate.value = withRepeat(
-      withTiming(3, { duration: 2200, easing: Easing.inOut(Easing.sin) }),
-      -1,
-      true
-    );
-  }, [mascotY, mascotRotate, reducedMotion]);
-  const mascotStyle = useAnimatedStyle(() => ({
-    transform: [
-      { translateY: mascotY.value },
-      { rotate: `${mascotRotate.value}deg` },
-    ],
-  }));
+    if (isSearching) headerHeight.value = 0; // the daily-fact card is hidden
+  }, [isSearching, headerHeight]);
+  const onScroll = useCallback(
+    (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+      scrollY.value = e.nativeEvent.contentOffset.y;
+    },
+    [scrollY],
+  );
 
-  const SKY: [string, string] = [
-    theme.colors.background,
-    theme.colors.background,
-  ];
+  // Articles may have been read since this tab was last on screen
+  useFocusEffect(
+    useCallback(() => {
+      void getReadArticleIds().then((ids) =>
+        setReadIds((prev) => (sameIds(prev, ids) ? prev : ids)),
+      );
+    }, []),
+  );
 
-  // Generate feed items (articles + posts live in the content database)
   useEffect(() => {
     let alive = true;
     generateFeedItems().then((items) => {
@@ -205,351 +174,291 @@ export default function CommunityScreen() {
     };
   }, []);
 
-  // Get saved items
-  const savedItems = useMemo(() => {
-    return allFeedItems.filter((item) => bookmarkedIds.includes(item.id));
-  }, [allFeedItems, bookmarkedIds]);
-
-  // Filter feed items based on search
-  const filteredItems = useMemo(() => {
-    let items = allFeedItems;
-
-    // Filter by search query
-    if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase();
-      items = items.filter(
-        (item) =>
-          item.title?.toLowerCase().includes(query) ||
-          item.content?.toLowerCase().includes(query) ||
-          item.tags?.some((tag: string) => tag.toLowerCase().includes(query)),
-      );
-    }
-
-    return items;
-  }, [allFeedItems, searchQuery]);
-
-  // Items to render, based on the active category pill
-  const visibleItems = useMemo(() => {
-    if (activeFilter === "saved") {
-      return savedItems;
-    }
-    const match = CATEGORY_FILTERS[activeFilter] || CATEGORY_FILTERS.all;
-    return filteredItems.filter(match);
-  }, [activeFilter, filteredItems, savedItems]);
-
-  // Load bookmarks on mount
+  // The encyclopedia is only fetched the first time its tab opens
+  const encyclopediaRequested = useRef(false);
   useEffect(() => {
-    loadBookmarks();
+    if (tab !== "encyclopedia" || encyclopediaRequested.current) return;
+    encyclopediaRequested.current = true;
+    getAllEncyclopediaEntries()
+      .then((entries) =>
+        setEncyclopedia(
+          [...entries]
+            .sort((a, b) => a.term.localeCompare(b.term))
+            .map((entry) => ({
+              entry,
+              haystack: `${entry.term} ${entry.definition} ${entry.category}`.toLowerCase(),
+            })),
+        ),
+      )
+      .catch(() => {
+        encyclopediaRequested.current = false;
+      });
+  }, [tab]);
+
+  const query = deferredQuery.trim().toLowerCase();
+
+  // Encyclopedia tab: A–Z, filtered by the search box
+  const visibleEntries = useMemo(
+    () =>
+      (query ? encyclopedia.filter((e) => e.haystack.includes(query)) : encyclopedia).map(
+        (e) => e.entry,
+      ),
+    [encyclopedia, query],
+  );
+
+  // Articles tab: everything, only what's been read, or only what's saved.
+  // Bookmarks only matter to the filter while the Saved view is open.
+  const savedForFilter = articleView === "saved" ? bookmarkedIds : null;
+  const visibleItems = useMemo(() => {
+    let items = allFeedItems;
+    if (query) items = items.filter((item) => item.searchText.includes(query));
+    if (articleView === "read") {
+      const read = new Set(readIds);
+      items = items.filter((item) => read.has(item.id.replace("article-", "")));
+    } else if (savedForFilter) {
+      items = items.filter((item) => savedForFilter.includes(item.id));
+    }
+    return items;
+  }, [allFeedItems, query, articleView, readIds, savedForFilter]);
+
+  // Bookmarks load once; the handler is stable so cards are not re-rendered
+  // just because another card was saved.
+  const bookmarksRef = useRef<string[]>([]);
+  useEffect(() => {
+    let alive = true;
+    AsyncStorage.getItem(BOOKMARKS_KEY)
+      .then((saved) => {
+        if (!alive || !saved) return;
+        const ids = JSON.parse(saved);
+        bookmarksRef.current = ids;
+        setBookmarkedIds(ids);
+      })
+      .catch((error) => console.error("Error loading bookmarks:", error));
+    return () => {
+      alive = false;
+    };
   }, []);
 
-  const loadBookmarks = async () => {
-    try {
-      const saved = await AsyncStorage.getItem(BOOKMARKS_KEY);
-      if (saved) {
-        setBookmarkedIds(JSON.parse(saved));
-      }
-    } catch (error) {
-      console.error("Error loading bookmarks:", error);
-    }
-  };
+  const toggleBookmark = useCallback((itemId: string) => {
+    impactLight();
+    const current = bookmarksRef.current;
+    const next = current.includes(itemId)
+      ? current.filter((id) => id !== itemId)
+      : [...current, itemId];
+    bookmarksRef.current = next;
+    setBookmarkedIds(next);
+    AsyncStorage.setItem(BOOKMARKS_KEY, JSON.stringify(next)).catch((error) =>
+      console.error("Error saving bookmark:", error),
+    );
+  }, []);
 
-  const toggleBookmark = async (itemId: string) => {
-    try {
-      impactLight();
-      let newBookmarks: string[];
-      if (bookmarkedIds.includes(itemId)) {
-        newBookmarks = bookmarkedIds.filter((id) => id !== itemId);
-      } else {
-        newBookmarks = [...bookmarkedIds, itemId];
-      }
-      setBookmarkedIds(newBookmarks);
-      await AsyncStorage.setItem(BOOKMARKS_KEY, JSON.stringify(newBookmarks));
-    } catch (error) {
-      console.error("Error saving bookmark:", error);
-    }
-  };
+  const switchTab = useCallback((next: HubTab) => {
+    setTab(next);
+    setSearchQuery("");
+    setSearchOpen(false);
+  }, []);
 
-  const selectFilter = useCallback((id: string) => {
-    if (id !== activeFilter) {
-      impactLight();
-      setActiveFilter(id);
-    }
-  }, [activeFilter]);
+  const toggleSearch = useCallback(() => {
+    setSearchOpen((open) => {
+      if (open) setSearchQuery("");
+      return !open;
+    });
+  }, []);
 
   const openItem = useCallback(
-    (item: any) => {
+    (item: { id: string }) => {
       impactLight();
       router.push(`/article-detail?id=${item.id}`);
     },
     [router],
   );
 
-  const renderGalleryItem = ({ item }: { item: any }) => {
-    const isBookmarked = bookmarkedIds.includes(item.id);
-    const imageSource = getContentImage(item.image);
+  // The pinned bar is the first list row; cards are laid out in rows of
+  // `galleryColumns` so the list can keep a single column and pin that row.
+  const rows = useMemo<ListRow[]>(() => {
+    const out: ListRow[] = [{ kind: "bar", id: "bar" }];
+    if (isArticles) {
+      if (visibleItems.length === 0) out.push({ kind: "empty", id: "empty" });
+      for (let i = 0; i < visibleItems.length; i += galleryColumns) {
+        out.push({
+          kind: "cards",
+          id: `cards-${visibleItems[i].id}`,
+          items: visibleItems.slice(i, i + galleryColumns),
+        });
+      }
+    } else {
+      if (!isSearching) out.push({ kind: "banner", id: "banner" });
+      if (visibleEntries.length === 0 && encyclopedia.length > 0) {
+        out.push({ kind: "empty", id: "empty" });
+      }
+      visibleEntries.forEach((entry) => out.push({ kind: "entry", id: entry.id, entry }));
+    }
+    return out;
+  }, [isArticles, visibleItems, visibleEntries, encyclopedia.length, galleryColumns, isSearching]);
 
-    return (
-      <TouchableOpacity
-        activeOpacity={0.85}
-        style={styles.galleryCard}
-        onPress={() => openItem(item)}
-      >
-        <View style={styles.galleryImageWrap}>
-          {imageSource ? (
-            <Image
-              source={imageSource}
-              style={styles.galleryImage}
-              resizeMode="cover"
+  const emptyCopy = !isArticles
+    ? { badge: "No results", title: "No matching entries", body: "Try a different term or category" }
+    : isSearching
+      ? {
+          badge: "No results",
+          title: "Nothing here yet",
+          body: "Try a different search term to discover more stories",
+        }
+      : articleView === "read"
+        ? {
+            badge: "Nothing read",
+            title: "No articles read yet",
+            body: "Open an article and read it for a few seconds. It will show up here.",
+          }
+        : articleView === "saved"
+          ? {
+              badge: "Saved",
+              title: "No saved stories yet",
+              body: "Tap the bookmark on a story to add it to your collection",
+            }
+          : {
+              badge: "No results",
+              title: "Nothing here yet",
+              body: "Try a different search term to discover more stories",
+            };
+
+  const renderRow = useCallback(
+    ({ item }: { item: ListRow }) => {
+      switch (item.kind) {
+        case "bar":
+          return (
+            <HubBar
+              tab={tab}
+              onTabChange={switchTab}
+              articleView={articleView}
+              onArticleViewChange={setArticleView}
+              searchOpen={searchOpen}
+              onToggleSearch={toggleSearch}
+              searchQuery={searchQuery}
+              onSearchChange={setSearchQuery}
+              scrollY={scrollY}
+              headerHeight={headerHeight}
             />
-          ) : (
-            <View style={styles.galleryImagePlaceholder}>
-              <Icon name="Atom" size={32} color={theme.colors.textMuted} />
+          );
+        case "banner":
+          return (
+            <View style={styles.tabIntro}>
+              <PeriodicTableBanner />
             </View>
-          )}
-          <TouchableOpacity
-            style={[styles.saveButton, isBookmarked && styles.saveButtonActive]}
-            onPress={() => toggleBookmark(item.id)}
-            hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
-          >
-            <Icon
-              name={isBookmarked ? "Archive" : "ArchiveAdd"}
-              size={16}
-              color={isBookmarked ? "#FFFFFF" : theme.colors.textMuted}
-              variant="Bold"
-            />
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.galleryBody}>
-          <Text style={styles.galleryCategory}>
-            {(item.category || "News").toUpperCase()}
-          </Text>
-          <Text style={styles.galleryTitle}>
-            {item.title}
-          </Text>
-          <View style={styles.galleryMeta}>
-            {item.author?.name && (
-              <Text style={styles.galleryMetaText} numberOfLines={1}>
-                {item.author.name}
-              </Text>
-            )}
-            {item.readTime && (
-              <View style={styles.galleryMetaItem}>
-                <Icon name="Clock" size={12} color={theme.colors.textMuted} />
-                <Text style={styles.galleryMetaText}>{item.readTime}m</Text>
+          );
+        case "empty":
+          return (
+            <View style={styles.emptyState}>
+              <Image
+                source={require("@/assets/images/mascot/blink.png")}
+                style={styles.emptyMascot}
+                resizeMode="contain"
+              />
+              <View style={styles.emptyBadge}>
+                <Text style={styles.emptyBadgeText}>{emptyCopy.badge}</Text>
               </View>
-            )}
-          </View>
-        </View>
-      </TouchableOpacity>
-    );
-  };
+              <Text style={styles.emptyText}>{emptyCopy.title}</Text>
+              <Text style={styles.emptySubtext}>{emptyCopy.body}</Text>
+            </View>
+          );
+        case "entry":
+          return <EncyclopediaRow entry={item.entry} />;
+        case "cards": {
+          const filler = galleryColumns - item.items.length;
+          return (
+            <View style={styles.galleryRow}>
+              {item.items.map((card) => (
+                <ArticleCard
+                  key={card.id}
+                  item={card}
+                  bookmarked={bookmarkedIds.includes(card.id)}
+                  onOpen={openItem}
+                  onToggleBookmark={toggleBookmark}
+                />
+              ))}
+              {Array.from({ length: filler }, (_, i) => (
+                <View key={`filler-${i}`} style={styles.galleryFiller} />
+              ))}
+            </View>
+          );
+        }
+      }
+    },
+    [
+      tab,
+      switchTab,
+      articleView,
+      searchOpen,
+      toggleSearch,
+      searchQuery,
+      scrollY,
+      headerHeight,
+      styles,
+      emptyCopy.badge,
+      emptyCopy.title,
+      emptyCopy.body,
+      galleryColumns,
+      bookmarkedIds,
+      openItem,
+      toggleBookmark,
+    ],
+  );
 
   return (
-    <View style={[styles.container, { backgroundColor: SKY[0] }]}>
+    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
       <PageBackground />
 
-      {/* Header — enlarged mascot behind text (absolute, no layout) */}
-      <View style={[styles.header, contentFrameStyle, { paddingTop: insets.top + 16 }]}>
-        {/* Background mascot: 168px, behind text, still floating */}
-        <View style={styles.headerMascotWrap} pointerEvents="none">
-          <Animated.View style={mascotStyle}>
-            <ExpoImage
-              source={require("@/assets/images/mascot/discover.svg")}
-              style={styles.headerMascot}
-              contentFit="contain"
-            />
-          </Animated.View>
-        </View>
+      {/* Shared top row — avatar and stats */}
+      <TopRowHeader />
 
-        <View style={styles.headerContent}>
-          <View style={styles.headerTextContainer}>
-            <Text style={styles.headerTitle}>Discovery Hub</Text>
-            <Text style={styles.headerSubtitle}>
-              Explore stories, facts, and breakthroughs
-            </Text>
-          </View>
-        </View>
-
-        {/* Search Bar — premium card with amber icon pill */}
-        <View style={styles.searchContainer}>
-          <View style={styles.searchIconCircle}>
-            <Icon name="SearchNormal" size={18} color="#C2410C" variant="Bold" />
-          </View>
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Search stories, facts, and more..."
-            placeholderTextColor={theme.colors.textFaint}
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-            returnKeyType="search"
-          />
-          {searchQuery.length > 0 ? (
-            <TouchableOpacity
-              style={styles.searchClearButton}
-              onPress={() => setSearchQuery("")}
-              activeOpacity={0.85}
-              hitSlop={8}
-              accessibilityRole="button"
-              accessibilityLabel="Clear search"
-            >
-              <Icon name="CloseCircle" size={16} color={theme.colors.textFaint} variant="Bold" />
-            </TouchableOpacity>
-          ) : null}
-        </View>
-      </View>
-
-      {/* Category Pills — 3D lip cards */}
-      <View
-        style={[
-          styles.categoryRow,
-          { width: "100%", maxWidth: contentMaxWidth, alignSelf: "center" },
-        ]}
-      >
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={[
-            styles.categoryScrollContent,
-            { paddingHorizontal: gutter },
-          ]}
-        >
-          <TouchableOpacity
-            style={[
-              styles.categoryChip,
-              styles.categoryChipIcon,
-              restFilter === "saved" && styles.categoryChipActive,
-            ]}
-            onLayout={chipHighlight.onItemLayout("saved")}
-            activeOpacity={0.85}
-            hitSlop={6}
-            accessibilityRole="button"
-            accessibilityLabel="Saved stories"
-            accessibilityState={{ selected: activeFilter === "saved" }}
-            onPress={() => selectFilter("saved")}
-          >
-            <Icon
-              name="Star"
-              size={16}
-              color={restFilter === "saved" ? theme.colors.onPrimary : theme.colors.textMuted}
-              variant="Bold"
-            />
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[
-              styles.categoryChip,
-              restFilter === "all" && styles.categoryChipActive,
-            ]}
-            onLayout={chipHighlight.onItemLayout("all")}
-            activeOpacity={0.85}
-            hitSlop={6}
-            accessibilityRole="button"
-            accessibilityLabel="All categories"
-            accessibilityState={{ selected: activeFilter === "all" }}
-            onPress={() => selectFilter("all")}
-          >
-            <Text
-              style={[
-                styles.categoryChipText,
-                restFilter === "all" && styles.categoryChipTextActive,
-              ]}
-            >
-              All
-            </Text>
-          </TouchableOpacity>
-
-          {CATEGORIES.map((cat) => (
-            <TouchableOpacity
-              key={cat.id}
-              style={[
-                styles.categoryChip,
-                restFilter === cat.id && styles.categoryChipActive,
-              ]}
-              onLayout={chipHighlight.onItemLayout(cat.id)}
-              activeOpacity={0.85}
-              hitSlop={6}
-              accessibilityRole="button"
-              accessibilityLabel={cat.label}
-              accessibilityState={{ selected: activeFilter === cat.id }}
-              onPress={() => selectFilter(cat.id)}
-            >
-              <Text
-                style={[
-                  styles.categoryChipText,
-                  restFilter === cat.id && styles.categoryChipTextActive,
-                ]}
-              >
-                {cat.label}
-              </Text>
-            </TouchableOpacity>
-          ))}
-          <SlidingHighlight
-            state={chipHighlight}
-            style={[styles.categoryChip, styles.categoryChipActive]}
-            renderContent={(id) =>
-              id === "saved" ? (
-                <Icon name="Star" size={16} color={theme.colors.onPrimary} variant="Bold" />
-              ) : (
-                <Text style={[styles.categoryChipText, styles.categoryChipTextActive]}>
-                  {id === "all" ? "All" : (CATEGORIES.find((c) => c.id === id)?.label ?? "")}
-                </Text>
-              )
-            }
-          />
-        </ScrollView>
-      </View>
-
-      {/* Gallery */}
       <FlatList
-        key={`gallery-${galleryColumns}`}
-        data={visibleItems}
-        renderItem={renderGalleryItem}
+        data={rows}
+        renderItem={renderRow}
         keyExtractor={(item) => item.id}
-        numColumns={galleryColumns}
-        columnWrapperStyle={galleryColumns > 1 ? styles.galleryRow : undefined}
+        // Indices count the header component, so the bar row is 1 while the
+        // daily-fact card is shown and 0 once the card is hidden (searching).
+        stickyHeaderIndices={[isSearching ? 0 : 1]}
+        onScroll={onScroll}
+        scrollEventThrottle={16}
+        keyboardShouldPersistTaps="handled"
+        initialNumToRender={6}
+        maxToRenderPerBatch={6}
+        windowSize={7}
+        removeClippedSubviews={false}
         contentContainerStyle={[
           styles.galleryContent,
           contentFrameStyle,
           { paddingBottom: tabBarInset + 24 },
         ]}
         showsVerticalScrollIndicator={false}
-        ListEmptyComponent={
-          <View style={styles.emptyState}>
-            <Image
-              source={require("@/assets/images/mascot/blink.png")}
-              style={styles.emptyMascot}
-              resizeMode="contain"
-            />
-            <View style={styles.emptyBadge}>
-              <Text style={styles.emptyBadgeText}>
-                {activeFilter === "saved" ? "Saved" : "No results"}
-              </Text>
+        ListHeaderComponent={
+          isSearching ? undefined : (
+            <View
+              style={styles.header}
+              onLayout={(e) => {
+                headerHeight.value = e.nativeEvent.layout.height;
+              }}
+            >
+              <DailyFactCard />
             </View>
-            <Text style={styles.emptyText}>
-              {activeFilter === "saved"
-                ? "No saved stories yet"
-                : "Nothing here yet"}
-            </Text>
-            <Text style={styles.emptySubtext}>
-              {activeFilter === "saved"
-                ? "Tap the bookmark on a story to add it to your collection"
-                : "Try a different category or search term to discover more stories"}
-            </Text>
-            {activeFilter !== "all" && activeFilter !== "saved" && (
-              <TouchableOpacity
-                style={styles.emptyAction}
-                activeOpacity={0.85}
-                onPress={() => selectFilter("all")}
-              >
-                <Icon name="Refresh" size={14} color="#C2410C" variant="Bold" />
-                <Text style={styles.emptyActionText}>Show all stories</Text>
-              </TouchableOpacity>
-            )}
-          </View>
+          )
         }
         ListFooterComponent={
-          activeFilter !== "saved" && visibleItems.length > 0 ? (
+          !isArticles ? (
+            <TouchableOpacity
+              style={[styles.emptyAction, styles.vaultLink]}
+              activeOpacity={0.85}
+              accessibilityRole="button"
+              accessibilityLabel="Open the full encyclopedia with filters and A to Z index"
+              onPress={() => {
+                impactLight();
+                router.push("/encyclopedia");
+              }}
+            >
+              <Icon name="Book1" size={16} color={theme.colors.primaryLight} variant="Bold" />
+              <Text style={styles.emptyActionText}>Open full encyclopedia</Text>
+            </TouchableOpacity>
+          ) : articleView === "all" && visibleItems.length > 0 ? (
             <View style={styles.feedFooter}>
               <View style={styles.footerIconCircle}>
                 <Icon name="TickCircle" size={24} color="#C2410C" variant="Bold" />

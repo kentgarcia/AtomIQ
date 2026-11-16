@@ -47,6 +47,9 @@ interface StorageContextType {
   incrementStreak: () => Promise<void>;
   levelUpLevel: number | null;
   dismissLevelUp: () => void;
+  /** True once today's streak has gone up and the daily streak screen has not been shown yet. */
+  pendingStreakCelebration: boolean;
+  clearStreakCelebration: () => void;
   onboardingCompleted: boolean;
 }
 
@@ -58,6 +61,7 @@ export const StorageProvider = ({ children }: { children: ReactNode }) => {
   const [isDatabaseReady, setIsDatabaseReady] = useState(false);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [onboardingCompleted, setOnboardingCompletedState] = useState(false);
+  const [pendingStreakCelebration, setPendingStreakCelebration] = useState(false);
   const [levelUpLevel, setLevelUpLevel] = useState<number | null>(null);
 
   const generateLocalUserId = () =>
@@ -236,7 +240,10 @@ export const StorageProvider = ({ children }: { children: ReactNode }) => {
       dailyTrackingPromiseRef.current = (async () => {
         try {
           const profile = (await getUserProfile()) as UserProfile | null;
-          await checkDailyStreak(incrementStreak, updateUserProfile, profile);
+          const result = await checkDailyStreak(incrementStreak, updateUserProfile, profile);
+          // Today's streak went up: queue the daily streak screen (once per day,
+          // since this tracker only runs once per day)
+          if (result.streakIncremented) setPendingStreakCelebration(true);
         } catch (error) {
           // Keep the day unclaimed so the next foreground retries.
           console.error("Error running daily streak check:", error);
@@ -270,6 +277,10 @@ export const StorageProvider = ({ children }: { children: ReactNode }) => {
     setLevelUpLevel(null);
   }, []);
 
+  const clearStreakCelebration = useCallback(() => {
+    setPendingStreakCelebration(false);
+  }, []);
+
   return (
     <StorageContext.Provider
       value={{
@@ -282,6 +293,8 @@ export const StorageProvider = ({ children }: { children: ReactNode }) => {
         incrementStreak,
         levelUpLevel,
         dismissLevelUp,
+        pendingStreakCelebration,
+        clearStreakCelebration,
         onboardingCompleted,
       }}
     >

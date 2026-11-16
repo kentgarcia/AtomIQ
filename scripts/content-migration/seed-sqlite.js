@@ -38,7 +38,7 @@
  *
  *   NOTE: the one-time TS -> JSON migration is COMPLETE and the intermediate
  *   json/ folders were removed. The content database (content/lessons/
- *   content.db, edited via `npm run content-editor`) is now the source of
+ *   content.db, edited via `npm run content-studio`) is now the source of
  *   truth — this script + ts-to-json.js remain for future bulk migrations.
  *
  * DEFAULTS

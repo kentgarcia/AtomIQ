@@ -25,7 +25,17 @@ export type NamedStyles<T> = {
 export function createStyles<TStyles extends NamedStyles<TStyles>>(
     factory: StyleFn<TStyles>,
 ): (theme: Theme) => TStyles {
-    return (theme: Theme) => StyleSheet.create(factory(theme));
+    // One stylesheet per theme object, shared by every component using this
+    // factory (a list of 100 rows used to build 100 identical stylesheets).
+    const cache = new WeakMap<Theme, TStyles>();
+    return (theme: Theme) => {
+        let styles = cache.get(theme);
+        if (!styles) {
+            styles = StyleSheet.create(factory(theme));
+            cache.set(theme, styles);
+        }
+        return styles;
+    };
 }
 
 /** Resolve `theme.spacing` quickly inside factories. */

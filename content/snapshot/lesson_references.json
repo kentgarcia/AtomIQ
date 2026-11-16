@@ -1,0 +1,87 @@
+{
+  "table": "lesson_references",
+  "primaryKey": [
+    "lesson_id",
+    "reference_id"
+  ],
+  "rows": [
+    {
+      "lesson_id": "atoms-are-everywhere",
+      "reference_id": "ref-openstax-chem-ch2",
+      "supports": "Matter is made of atoms; light and heat are not matter.",
+      "position": 0
+    },
+    {
+      "lesson_id": "atoms-are-everywhere",
+      "reference_id": "ref-atom-hair-scale",
+      "supports": "Sizes of a hair, a cell and an atom.",
+      "position": 1
+    },
+    {
+      "lesson_id": "elements-and-the-periodic-table",
+      "reference_id": "ref-openstax-chem-ch2",
+      "supports": "Atomic number decides the element.",
+      "position": 0
+    },
+    {
+      "lesson_id": "elements-and-the-periodic-table",
+      "reference_id": "ref-iupac-table",
+      "supports": "Element names, symbols and atomic numbers.",
+      "position": 1
+    },
+    {
+      "lesson_id": "isotopes",
+      "reference_id": "ref-openstax-chem-ch2",
+      "supports": "Isotope definition and mass number.",
+      "position": 0
+    },
+    {
+      "lesson_id": "isotopes",
+      "reference_id": "ref-iaea-isotopes",
+      "supports": "Isotopes can be stable or radioactive.",
+      "position": 1
+    },
+    {
+      "lesson_id": "protons-neutrons-electrons",
+      "reference_id": "ref-openstax-chem-ch2",
+      "supports": "The three particles, their charges and positions.",
+      "position": 0
+    },
+    {
+      "lesson_id": "protons-neutrons-electrons",
+      "reference_id": "ref-openstax-up3-ch10",
+      "supports": "The size of the nucleus compared with the atom, and where the mass is.",
+      "position": 1
+    },
+    {
+      "lesson_id": "protons-neutrons-electrons",
+      "reference_id": "ref-rutherford-1911",
+      "supports": "The gold-foil experiment and the discovery of the nucleus.",
+      "position": 2
+    },
+    {
+      "lesson_id": "stable-and-unstable-nuclei",
+      "reference_id": "ref-openstax-up3-ch10",
+      "supports": "Nuclear forces and nuclear stability.",
+      "position": 0
+    },
+    {
+      "lesson_id": "stable-and-unstable-nuclei",
+      "reference_id": "ref-iaea-isotopes",
+      "supports": "Stable and unstable isotopes.",
+      "position": 1
+    },
+    {
+      "lesson_id": "stable-and-unstable-nuclei",
+      "reference_id": "ref-potassium-40",
+      "supports": "Natural unstable isotopes in food and the body.",
+      "position": 2
+    },
+    {
+      "lesson_id": "stable-and-unstable-nuclei",
+      "reference_id": "ref-becquerel-1896",
+      "supports": "The discovery of radioactivity in a natural mineral.",
+      "position": 3
+    }
+  ]
+}

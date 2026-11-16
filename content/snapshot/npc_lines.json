@@ -1,0 +1,80 @@
+{
+  "table": "npc_lines",
+  "primaryKey": [
+    "id"
+  ],
+  "rows": [
+    {
+      "id": "line-ada-intro-atoms-are-everywhere",
+      "npc_id": "npc-ada",
+      "kind": "lesson_intro",
+      "lesson_id": "atoms-are-everywhere",
+      "journey_id": null,
+      "text": "Today you'll see what everything around you is made of, and how small an atom really is.",
+      "pose": "greet"
+    },
+    {
+      "id": "line-ada-intro-elements-and-the-periodic-table",
+      "npc_id": "npc-ada",
+      "kind": "lesson_intro",
+      "lesson_id": "elements-and-the-periodic-table",
+      "journey_id": null,
+      "text": "You'll learn the one number that decides an element, then find it on the periodic table.",
+      "pose": "point"
+    },
+    {
+      "id": "line-ada-intro-isotopes",
+      "npc_id": "npc-ada",
+      "kind": "lesson_intro",
+      "lesson_id": "isotopes",
+      "journey_id": null,
+      "text": "Atoms of one element can differ a little. You'll learn what isotopes are and how to read them.",
+      "pose": "explain"
+    },
+    {
+      "id": "line-ada-intro-protons-neutrons-electrons",
+      "npc_id": "npc-ada",
+      "kind": "lesson_intro",
+      "lesson_id": "protons-neutrons-electrons",
+      "journey_id": null,
+      "text": "We'll open up an atom and meet its three particles. You'll learn what each one does.",
+      "pose": "explain"
+    },
+    {
+      "id": "line-ada-intro-stable-and-unstable-nuclei",
+      "npc_id": "npc-ada",
+      "kind": "lesson_intro",
+      "lesson_id": "stable-and-unstable-nuclei",
+      "journey_id": null,
+      "text": "You'll see what holds a nucleus together, and why some nuclei still change over time.",
+      "pose": "think"
+    },
+    {
+      "id": "line-ada-meet",
+      "npc_id": "npc-ada",
+      "kind": "meet",
+      "lesson_id": null,
+      "journey_id": null,
+      "text": "Hi, I'm Ada! Let's find out what everything is made of.",
+      "pose": "greet"
+    },
+    {
+      "id": "line-ada-sign-off",
+      "npc_id": "npc-ada",
+      "kind": "sign_off",
+      "lesson_id": null,
+      "journey_id": null,
+      "text": "Nice work. You now know what is inside an atom.",
+      "pose": "proud"
+    },
+    {
+      "id": "line-ada-tease",
+      "npc_id": "npc-ada",
+      "kind": "tease",
+      "lesson_id": null,
+      "journey_id": null,
+      "text": "Finish my unit first, and I'll show you the rest.",
+      "pose": "idle"
+    }
+  ]
+}

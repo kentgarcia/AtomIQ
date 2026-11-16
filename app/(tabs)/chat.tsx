@@ -9,7 +9,7 @@
 
 import { ContentCard } from "@/components/guide/ContentCard";
 import { ProfileProgressCard } from "@/components/guide/ProfileProgressCard";
-import { PageBackground, useHideTabBar, useTabBarInset } from "@/components/layout";
+import { PageBackground, TopRowHeader, useHideTabBar, useTabBarInset } from "@/components/layout";
 import { Icon } from "@/components/ui/icon";
 import { ReadAloudButton } from "@/components/ui/read-aloud-button";
 import { useStorage } from "@/services/StorageContext";
@@ -19,7 +19,6 @@ import { getTopicById } from "@/services/guide/topics";
 import { loadGuideContent, type LoadedContent } from "@/services/guide/topics";
 import { navigateDestination } from "@/services/guide/navigate";
 import type { GuideCard, GuideIntent, GuidePill, GuideState, GuideTurn, MascotMood } from "@/services/guide/types";
-import { getProfileAvatarSource } from "@/services/profile-avatars";
 import { createStyles, fontFaces, useResponsiveLayout, useTheme } from "@/theme";
 import { getIntentPillColors, getOptionColors } from "@/theme/option-states";
 import { useRouter } from "expo-router";
@@ -60,13 +59,6 @@ const QUICK_TILES: { intent: GuideIntent; icon: string; color: string; title: st
   { intent: "discover", icon: "DocumentText", color: "#58CC02", title: "Discover", desc: "Find facts, encyclopedia entries, and articles." },
   { intent: "practice", icon: "Game", color: "#C2410C", title: "Practice", desc: "Test knowledge through quizzes and games." },
 ];
-const getGreeting = () => {
-  const hour = new Date().getHours();
-  if (hour < 12) return "Good morning";
-  if (hour < 18) return "Good afternoon";
-  return "Good evening";
-};
-
 // ============================================================================
 export default function GuideScreen() {
   const { theme } = useTheme();
@@ -184,7 +176,7 @@ export default function GuideScreen() {
 
   // ---- landing ------------------------------------------------------------
   if (mode === "landing") {
-    return <LandingDashboard ctx={guideCtx} content={contentRef.current} userProfile={userProfile} onEnterChat={enterChat} onDirectNav={(card: GuideCard) => handleCardCta(card)} />;
+    return <LandingDashboard ctx={guideCtx} content={contentRef.current} onEnterChat={enterChat} onDirectNav={(card: GuideCard) => handleCardCta(card)} />;
   }
 
   // ---- Guide Mode (Immersive) --------------------------------------------------
@@ -405,10 +397,9 @@ export default function GuideScreen() {
 }
 
 // -- Landing dashboard (non-redundant) --------------------------------------
-function LandingDashboard({ ctx, content, userProfile, onEnterChat, onDirectNav }: { ctx: Awaited<ReturnType<typeof getGuideContext>>; content: LoadedContent; userProfile: any; onEnterChat: (intent?: GuideIntent) => void; onDirectNav: (card: GuideCard) => void; }) {
+function LandingDashboard({ ctx, content, onEnterChat, onDirectNav }: { ctx: Awaited<ReturnType<typeof getGuideContext>>; content: LoadedContent; onEnterChat: (intent?: GuideIntent) => void; onDirectNav: (card: GuideCard) => void; }) {
   const { theme } = useTheme();
   const c = theme.colors;
-  const insets = useSafeAreaInsets();
   const { contentMaxWidth } = useResponsiveLayout();
   const tabBarInset = useTabBarInset();
   const styles = React.useMemo(() => makeStyles(theme), [theme]);
@@ -417,6 +408,8 @@ function LandingDashboard({ ctx, content, userProfile, onEnterChat, onDirectNav 
   return (
     <View style={[styles.container, { backgroundColor: c.background }]}>
       <PageBackground />
+      {/* Shared top row — avatar and stats */}
+      <TopRowHeader />
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={[
@@ -425,7 +418,7 @@ function LandingDashboard({ ctx, content, userProfile, onEnterChat, onDirectNav 
             width: "100%",
             maxWidth: contentMaxWidth,
             alignSelf: "center",
-            paddingTop: insets.top + 12,
+            paddingTop: 4,
             paddingBottom: tabBarInset + 24,
           },
         ]}
@@ -433,19 +426,6 @@ function LandingDashboard({ ctx, content, userProfile, onEnterChat, onDirectNav 
         {/* overlapping header stack — amber on top, white behind */}
         <View style={styles.headerStack}>
           <View style={styles.homeHeaderBar}>
-            <View style={styles.homeHeaderRow}>
-              <View style={styles.homeAvatarWrap}>
-                <Image source={getProfileAvatarSource(userProfile?.avatar_url)} style={styles.homeAvatar} resizeMode="cover" />
-              </View>
-              <View style={{ flex: 1 }}>
-                <Text style={styles.homeGreetingLabel}>{getGreeting()}</Text>
-                <Text style={styles.homeGreetingName}>{userProfile?.display_name || userProfile?.username || "Atom Explorer"}</Text>
-              </View>
-              <View style={styles.homeXpPill}>
-                <Icon name="Flash" size={15} color="#FFA000" variant="Bold" />
-                <Text style={styles.homeXpText}>{(userProfile?.total_xp || 0).toLocaleString()}</Text>
-              </View>
-            </View>
             <View style={styles.shrodiCard}>
               <View style={{ flex: 1, gap: 6 }}>
                 <Text style={styles.shrodiTitle}>Meet Shrodi</Text>
@@ -733,21 +713,6 @@ const makeStyles = createStyles((theme) => {
     elevation: 4,
     zIndex: 2,
   },
-  homeHeaderRow: { flexDirection: "row", alignItems: "center", gap: 12 },
-  homeAvatarWrap: {
-    width: 46,
-    height: 46,
-    borderRadius: 23,
-    backgroundColor: c.card,
-    borderWidth: 2,
-    borderColor: c.border,
-    borderBottomWidth: 4,
-  },
-  homeAvatar: { width: "100%", height: "100%", borderRadius: 23 },
-  homeGreetingLabel: { fontSize: 11, ...fontFaces.semibold, color: c.primaryLight, textTransform: "uppercase", letterSpacing: 0.6, marginBottom: 1 },
-  homeGreetingName: { fontSize: 17, ...fontFaces.heavy, color: c.primaryLight },
-  homeXpPill: { flexDirection: "row", alignItems: "center", gap: 5, backgroundColor: c.inverseSurface, paddingHorizontal: 12, height: 40, borderRadius: 14 },
-  homeXpText: { fontSize: 13, ...fontFaces.heavy, color: c.inverseText },
   headerStack: { gap: 0 },
   whiteBehindWrapper: {
     backgroundColor: c.card,
@@ -845,7 +810,7 @@ const makeStyles = createStyles((theme) => {
     justifyContent: "center",
     gap: 8,
     backgroundColor: "#EA580C",
-    borderRadius: 16,
+    borderRadius: 999,
     paddingVertical: 16,
     paddingHorizontal: 20,
     borderWidth: 1,

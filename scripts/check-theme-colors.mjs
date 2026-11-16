@@ -26,6 +26,18 @@ const FILE_EXCEPTIONS = new Map([
     "components/atom-maze/styles.ts",
     "Atom Maze game artwork (sprites, Game Boy chrome, battle HUD) — invariant art treatment.",
   ],
+  [
+    "components/lesson/visual/duo-palette.ts",
+    "EX-11: lesson illustration palette (Duolingo-style face and lip per tone), same hues in light and dark.",
+  ],
+  [
+    "components/lesson/visual/object-art.ts",
+    "EX-13: lesson object art (flat Duolingo-style pictures of things, official palette families), same hues in light and dark.",
+  ],
+  [
+    "components/npc/npc-palette.ts",
+    "EX-12: NPC teacher palette (official Duolingo-style colours, skin and hair trios, muted ramp), same in light and dark.",
+  ],
 ]);
 
 /** Line-level reviewed exceptions. Key: repo-relative path -> reason. */

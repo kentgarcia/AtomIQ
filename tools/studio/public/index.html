@@ -4,63 +4,37 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>AtomIQ Content Studio</title>
+<link rel="icon" href="data:," />
 <link rel="stylesheet" href="./style.css" />
 </head>
 <body>
-<div id="app">
-  <aside id="sidebar">
-    <header>
-      <h1>AtomIQ <span>Studio</span></h1>
-      <p id="db-info">loading…</p>
-    </header>
-    <nav id="table-list" aria-label="Tables"></nav>
-    <footer>
-      <button id="btn-query" class="ghost">SQL</button>
-      <button id="btn-backup" class="ghost">Backup</button>
-      <button id="btn-bump">Bump version</button>
-    </footer>
-  </aside>
+<header id="topbar">
+  <a class="brand" href="#/">AtomIQ <span>Studio</span></a>
+  <span id="version" class="version" title="Content version">…</span>
+  <button id="changes-btn" class="ghost" type="button">Changes</button>
+  <div class="spacer"></div>
+  <input id="search" type="search" placeholder="Search all content  ( / )" autocomplete="off" aria-label="Search all content" />
+  <button id="publish-btn" class="primary" type="button">Publish…</button>
+</header>
 
-  <aside id="rows-sidebar" hidden>
-    <div class="toolbar">
-      <input id="search" type="search" placeholder="Search…" autocomplete="off" />
-    </div>
-    <div class="toolbar slim">
-      <span id="row-count"></span>
+<div id="shell">
+  <nav id="sidebar" aria-label="Content"></nav>
+
+  <aside id="listpane" hidden>
+    <div class="list-head">
+      <strong id="list-title"></strong>
+      <span id="list-count" class="hint"></span>
       <div class="spacer"></div>
-      <button id="btn-new">＋ New</button>
+      <button id="list-new" class="primary mini-btn" type="button">＋ New</button>
     </div>
-    <ul id="rows"></ul>
+    <div class="list-search"><input id="list-search" type="search" placeholder="Filter…" autocomplete="off" aria-label="Filter list" /></div>
+    <ul id="list-items"></ul>
   </aside>
 
-  <main id="main">
-    <!-- editor -->
-    <section id="editor-view">
-      <div class="toolbar">
-        <strong id="editor-title">Select a row</strong>
-        <div class="spacer"></div>
-        <span id="dirty" hidden>unsaved</span>
-        <button id="btn-delete" class="danger ghost">Delete</button>
-        <button id="btn-save" disabled>Save</button>
-      </div>
-      <form id="form"></form>
-    </section>
-
-    <!-- SQL console -->
-    <section id="query-view" hidden>
-      <div class="toolbar">
-        <strong>SQL console</strong><span class="hint">read-only · SELECT / WITH / PRAGMA · Ctrl+Enter to run</span>
-        <div class="spacer"></div>
-        <button id="btn-close-query" class="ghost">✕ Close</button>
-      </div>
-      <textarea id="sql-input" spellcheck="false" placeholder="SELECT id, title FROM lessons LIMIT 20;"></textarea>
-      <pre id="sql-output"></pre>
-    </section>
-  </main>
+  <main id="main"></main>
 </div>
 
-<template id="tpl-toast-zone"></template>
-<div id="toasts"></div>
-<script type="module" src="./app.js"></script>
+<div id="toasts" aria-live="polite"></div>
+<script type="module" src="./js/app.js"></script>
 </body>
 </html>

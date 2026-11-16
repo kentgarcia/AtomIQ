@@ -7,12 +7,11 @@
 
 import { DifficultyPanel } from "@/components/games/DifficultyPanel";
 import { StackCard } from "@/components/games/StackCard";
-import { PageBackground, useTabBarInset } from "@/components/layout";
+import { PageBackground, TOP_ROW_HEADER_HEIGHT, TopRowHeader, useTabBarInset } from "@/components/layout";
 import { GrowCard, GrowModal, useModalOrigin } from "@/components/ui/grow-modal";
 import { Icon } from "@/components/ui/icon";
 import { createStyles, fontFaces, useResponsiveLayout, useTheme } from "@/theme";
 import { impactLight, impactMedium } from "@/services/haptics";
-import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
   Pressable,
@@ -95,13 +94,6 @@ const GAMES = [
         icon: "Microscope",
         route: "/lab" as const,
     },
-    {
-        title: "Encyclopedia",
-        color: "#ff4d28",
-        delay: 200,
-        icon: "Book1",
-        route: "/encyclopedia" as const,
-    },
 ];
 
 /* ------------------------------------------------------------------ */
@@ -144,7 +136,6 @@ const RightArrow = ({ color = "#C7CBD4" }: { color?: string }) => (
 
 export function PickAGame() {
     const insets = useSafeAreaInsets();
-    const router = useRouter();
     const { height: windowHeight } = useWindowDimensions();
     const { contentMaxWidth } = useResponsiveLayout();
     const tabBarInset = useTabBarInset();
@@ -156,7 +147,7 @@ export function PickAGame() {
     // Stack area sits below the header and above the floating tab bar
     const bottomReserve = tabBarInset + 16;
     const stackH = Math.round(
-        windowHeight - insets.top - 18 - HEADER_H - bottomReserve,
+        windowHeight - insets.top - TOP_ROW_HEADER_HEIGHT - HEADER_H - bottomReserve,
     );
     const cardH = Math.round(stackH / GAMES.length);
 
@@ -235,22 +226,14 @@ export function PickAGame() {
         transform: [{ translateX: arrowX.value }],
     }));
 
+    // Every game opens the difficulty picker first.
     const handleSelect = (game: (typeof GAMES)[number], index: number) => {
-        if (
-            game.route === "/explorer/atom-maze" ||
-            game.route === "/mythbuster" ||
-            game.route === "/lab"
-        ) {
-            openDifficulty(
-                game.route === "/explorer/atom-maze"
-                    ? "atom-maze"
-                    : (game.route.slice(1) as "mythbuster" | "lab"),
-                index,
-            );
-            return;
-        }
-        impactMedium();
-        router.push(game.route);
+        openDifficulty(
+            game.route === "/explorer/atom-maze"
+                ? "atom-maze"
+                : (game.route.slice(1) as "mythbuster" | "lab"),
+            index,
+        );
     };
 
     const [guideVisible, setGuideVisible] = useState(false);
@@ -279,8 +262,11 @@ export function PickAGame() {
     ];
 
     return (
-        <View style={[styles.screen, { paddingTop: insets.top + 18, backgroundColor: theme.colors.background }]}>
+        <View style={[styles.screen, { backgroundColor: theme.colors.background }]}>
             <PageBackground />
+
+            {/* Shared top row — avatar and stats */}
+            <TopRowHeader />
 
             {/* Header */}
             <View

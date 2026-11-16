@@ -15,8 +15,8 @@ export const navigateDestination = (
     case "lesson":
       router.push(`/lesson/${destination.id}`);
       break;
-    case "quiz":
-      router.push(`/quiz/${destination.id}`);
+    case "practice":
+      router.push(`/practice/${destination.id}`);
       break;
     case "encyclopedia-entry":
       router.push(`/explorer/encyclopedia-entry?id=${destination.id}`);

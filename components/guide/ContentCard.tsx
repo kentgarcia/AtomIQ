@@ -161,7 +161,7 @@ export function ContentCard({ card, onCta }: ContentCardProps) {
   const typeLabel = (() => {
     switch (card.kind) {
       case "lesson": return "LESSON";
-      case "quiz": return "QUIZ";
+      case "quiz": return "PRACTICE";
       case "encyclopedia": return "ENCYCLOPEDIA";
       case "article": return "ARTICLE";
       case "game": return "GAME";
