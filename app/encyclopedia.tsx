@@ -1,3 +1,5 @@
+import { HeaderButton, ScreenHeader, useHeaderBorder } from "@/components/layout";
+import { FieldInput } from "@/components/ui/field-input";
 import { Icon } from "@/components/ui/icon";
 import { getAllEncyclopediaEntries } from "@/content/explorer";
 import type { EncyclopediaEntry } from "@/content/explorer";
@@ -8,13 +10,12 @@ import { useRouter } from "expo-router";
 import { ReadAloudButton } from "@/components/ui/read-aloud-button";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
-  ScrollView,
-  type ScrollViewInstance,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
+    ScrollView,
+    type ScrollViewInstance,
+    TouchableOpacity,
+    View,
 } from "react-native";
+import { Text } from "@/components/ui/text";
 import Animated, {
   Easing,
   FadeIn,
@@ -26,6 +27,7 @@ import Animated, {
 } from "react-native-reanimated";
 import { FastAlphabet } from "@/components/ui/fast-alphabet";
 import { PERIODIC_TABLE_HREF } from "@/services/periodic-table";
+import { PeriodicTableBanner } from "@/components/community/EncyclopediaParts";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 /* -------------------------------------------------------------------------------- */
@@ -104,6 +106,7 @@ export default function EncyclopediaScreen() {
   const { contentMaxWidth, gutter } = useResponsiveLayout();
   const { theme } = useTheme();
   const bgTop = theme.colors.background;
+  const { scrolled, onScroll: onHeaderScroll } = useHeaderBorder();
 
   const styles = useMemo(() => makeStyles(theme), [theme]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -175,6 +178,8 @@ export default function EncyclopediaScreen() {
 
   const scrollRef = useRef<ScrollViewInstance>(null);
   const sectionY = useRef<Record<string, number>>({});
+  /** Where the letter groups start inside the scroll content (section offsets are relative to them). */
+  const groupsY = useRef(0);
   const availableLetters = useMemo(() => new Set(letters), [letters]);
   const scrollToLetter = useCallback(
     (letter: string) => {
@@ -201,7 +206,7 @@ export default function EncyclopediaScreen() {
       if (!target) return;
       const y = sectionY.current[target];
       if (y !== undefined && scrollRef.current) {
-        scrollRef.current.scrollTo({ y: Math.max(0, y - 8), animated: true });
+        scrollRef.current.scrollTo({ y: Math.max(0, groupsY.current + y - 8), animated: true });
       }
     },
     []
@@ -276,173 +281,32 @@ export default function EncyclopediaScreen() {
     }
   }, [railPreview, canShowScroller, scrollerOpacity]);
 
+  const headerSubtitle =
+    selectedCategories.length > 0
+      ? selectedCategories.length === 1
+        ? `${filteredEntries.length} in ${getVaultCat(selectedCategories[0]!).label}`
+        : `${filteredEntries.length} in ${selectedCategories.length} archives`
+      : selectedLetter
+        ? `${filteredEntries.length} · Letter ${selectedLetter}`
+        : searchQuery
+          ? `${filteredEntries.length} results`
+          : `${totalEntries} terms · ${categoriesWithCounts.length} archives`;
+
   return (
     <View style={[styles.container, { backgroundColor: bgTop }]}>
-
-      {/* Amber vault header — floating like Home's headerBar */}
-      <View
-        style={[
-          styles.headerWrap,
-          {
-            paddingTop: insets.top + 12,
-            paddingHorizontal: gutter,
-            width: "100%",
-            maxWidth: contentMaxWidth,
-            alignSelf: "center",
-          },
-        ]}
-      >
-        <Animated.View
-          layout={LinearTransition.duration(240).easing(Easing.bezier(0.23, 1, 0.32, 1))}
-          style={styles.headerBar}
-        >
-          <View style={styles.headerRow}>
-            <TouchableOpacity
-              onPress={() => (hasActiveFilter ? clearFilters() : router.back())}
-              style={styles.backBtn}
-              activeOpacity={0.9}
-              hitSlop={5}
-              accessibilityRole="button"
-              accessibilityLabel={hasActiveFilter ? "Clear filters" : "Go back"}
-            >
-              <Icon
-                name={hasActiveFilter ? "CloseCircle" : "ArrowLeft2"}
-                size={20}
-                color={theme.colors.primaryLight}
-                variant="Bold"
-              />
-            </TouchableOpacity>
-
-            <View style={styles.headerCopy}>
-              <Text style={styles.headerTitle}>
-                Knowledge Vault
-              </Text>
-              <Text style={styles.headerSubtitle}>
-                {selectedCategories.length > 0
-                  ? selectedCategories.length === 1
-                    ? `${filteredEntries.length} in ${getVaultCat(selectedCategories[0]!).label}`
-                    : `${filteredEntries.length} in ${selectedCategories.length} archives`
-                  : selectedLetter
-                    ? `${filteredEntries.length} · Letter ${selectedLetter}`
-                    : searchQuery
-                      ? `${filteredEntries.length} results`
-                      : `${totalEntries} terms · ${categoriesWithCounts.length} archives`}
-              </Text>
-            </View>
-            <TouchableOpacity
-              onPress={() => router.push(PERIODIC_TABLE_HREF)}
-              style={styles.backBtn}
-              activeOpacity={0.9}
-              hitSlop={5}
-              accessibilityRole="button"
-              accessibilityLabel="Open the periodic table"
-            >
-              <Icon name="Element4" size={20} color={theme.colors.primaryLight} variant="Bold" />
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.searchCard}>
-            <Icon name="SearchNormal" size={18} color={theme.colors.textFaint} variant="Bold" />
-            <TextInput
-              style={styles.searchInput}
-              placeholder="Search terms, facts, people…"
-              placeholderTextColor={theme.colors.textFaint}
-              value={searchQuery}
-              onChangeText={(t) => {
-                setSearchQuery(t);
-                if (t) setSelectedLetter(null);
-              }}
-              returnKeyType="search"
-            />
-            {searchQuery.length > 0 && (
-              <TouchableOpacity
-                onPress={() => setSearchQuery("")}
-                hitSlop={8}
-                accessibilityRole="button"
-                accessibilityLabel="Clear search"
-              >
-                <Icon name="CloseCircle" size={18} color={theme.colors.textFaint} />
-              </TouchableOpacity>
-            )}
-          </View>
-
-          {(selectedCategories.length > 0 || selectedLetter) && (
-            <View style={styles.activeFilterRow}>
-              {selectedCategories.map((cat) => (
-                <View key={cat} style={[styles.activeChip, styles.activeChipSelected]}>
-                  <Text style={[styles.activeChipText, styles.activeChipTextSelected]}>{getVaultCat(cat).label}</Text>
-                  <TouchableOpacity
-                    onPress={() => setSelectedCategories((prev) => prev.filter((c) => c !== cat))}
-                    hitSlop={6}
-                    accessibilityRole="button"
-                    accessibilityLabel={`Remove ${getVaultCat(cat).label} filter`}
-                  >
-                    <Icon name="CloseCircle" size={14} color={theme.colors.onPrimary} />
-                  </TouchableOpacity>
-                </View>
-              ))}
-              {selectedLetter && (
-                <View style={styles.activeChipLetter}>
-                  <Text style={styles.activeChipLetterText}>{selectedLetter}</Text>
-                  <TouchableOpacity
-                    onPress={() => setSelectedLetter(null)}
-                    hitSlop={6}
-                    accessibilityRole="button"
-                    accessibilityLabel={`Remove letter ${selectedLetter} filter`}
-                  >
-                    <Icon name="CloseCircle" size={14} color={theme.colors.primaryLight} />
-                  </TouchableOpacity>
-                </View>
-              )}
-              <TouchableOpacity
-                style={styles.clearLink}
-                onPress={clearFilters}
-                hitSlop={8}
-                accessibilityRole="button"
-                accessibilityLabel="Clear all filters"
-              >
-                <Text style={styles.clearLinkText}>Clear</Text>
-              </TouchableOpacity>
-            </View>
-          )}
-        </Animated.View>
-
-        {/* Category pills — multi-select */}
-        <View style={styles.pillsRow}>
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.pillsContent}
-          >
-            <TouchableOpacity
-              style={[styles.pill, selectedCategories.length === 0 && styles.pillActive]}
-              onPress={clearFilters}
-              activeOpacity={0.9}
-              hitSlop={6}
-              accessibilityRole="button"
-              accessibilityState={{ selected: selectedCategories.length === 0 }}
-            >
-              <Text style={[styles.pillText, selectedCategories.length === 0 && styles.pillTextActive]}>All</Text>
-            </TouchableOpacity>
-            {categoriesWithCounts.map(({ category, cfg }) => {
-              const active = selectedCategories.includes(category);
-              return (
-                <TouchableOpacity
-                  key={category}
-                  style={[styles.pill, active && styles.pillActive]}
-                  onPress={() => handleCategorySelect(category)}
-                  activeOpacity={0.9}
-                  hitSlop={6}
-                  accessibilityRole="button"
-                  accessibilityState={{ selected: active }}
-                >
-                  <Text style={[styles.pillText, active && styles.pillTextActive]}>{cfg.label}</Text>
-                </TouchableOpacity>
-              );
-            })}
-          </ScrollView>
-        </View>
-      </View>
+      <ScreenHeader
+        title="Encyclopedia"
+        subtitle={headerSubtitle}
+        left={
+          <HeaderButton
+            icon={hasActiveFilter ? "CloseCircle" : "ArrowLeft2"}
+            label={hasActiveFilter ? "Clear filters" : "Go back"}
+            onPress={() => (hasActiveFilter ? clearFilters() : router.back())}
+          />
+        }
+        right={<HeaderButton icon="Element4" label="Open the periodic table" onPress={() => router.push(PERIODIC_TABLE_HREF)} />}
+        scrolled={scrolled}
+      />
 
       {/* Main content */}
       <View
@@ -462,7 +326,10 @@ export default function EncyclopediaScreen() {
             },
           ]}
           scrollEventThrottle={16}
-          onScroll={showScroller}
+          onScroll={(e) => {
+            onHeaderScroll(e);
+            showScroller();
+          }}
           onScrollBeginDrag={showScroller}
           onMomentumScrollBegin={showScroller}
           onScrollEndDrag={() => {
@@ -474,9 +341,113 @@ export default function EncyclopediaScreen() {
             }
           }}
         >
+          {/* Search, active filters and archive pills: they scroll away with the list */}
+          <Animated.View
+            layout={LinearTransition.duration(240).easing(Easing.bezier(0.23, 1, 0.32, 1))}
+            style={styles.controls}
+          >
+            <View style={styles.searchCard}>
+              <Icon name="SearchNormal" size={18} color={theme.colors.textFaint} variant="Bold" />
+              <FieldInput
+                style={styles.searchInput}
+                placeholder="Search terms, facts, people…"
+                value={searchQuery}
+                onChangeText={(t) => {
+                  setSearchQuery(t);
+                  if (t) setSelectedLetter(null);
+                }}
+                returnKeyType="search"
+              />
+              {searchQuery.length > 0 && (
+                <TouchableOpacity
+                  onPress={() => setSearchQuery("")}
+                  hitSlop={8}
+                  accessibilityRole="button"
+                  accessibilityLabel="Clear search"
+                >
+                  <Icon name="CloseCircle" size={18} color={theme.colors.textFaint} />
+                </TouchableOpacity>
+              )}
+            </View>
 
+            {(selectedCategories.length > 0 || selectedLetter) && (
+              <View style={styles.activeFilterRow}>
+                {selectedCategories.map((cat) => (
+                  <View key={cat} style={[styles.activeChip, styles.activeChipSelected]}>
+                    <Text style={[styles.activeChipText, styles.activeChipTextSelected]}>{getVaultCat(cat).label}</Text>
+                    <TouchableOpacity
+                      onPress={() => setSelectedCategories((prev) => prev.filter((c) => c !== cat))}
+                      hitSlop={6}
+                      accessibilityRole="button"
+                      accessibilityLabel={`Remove ${getVaultCat(cat).label} filter`}
+                    >
+                      <Icon name="CloseCircle" size={14} color={theme.colors.onPrimary} />
+                    </TouchableOpacity>
+                  </View>
+                ))}
+                {selectedLetter && (
+                  <View style={styles.activeChipLetter}>
+                    <Text style={styles.activeChipLetterText}>{selectedLetter}</Text>
+                    <TouchableOpacity
+                      onPress={() => setSelectedLetter(null)}
+                      hitSlop={6}
+                      accessibilityRole="button"
+                      accessibilityLabel={`Remove letter ${selectedLetter} filter`}
+                    >
+                      <Icon name="CloseCircle" size={14} color={theme.colors.primaryLight} />
+                    </TouchableOpacity>
+                  </View>
+                )}
+                <TouchableOpacity
+                  style={styles.clearLink}
+                  onPress={clearFilters}
+                  hitSlop={8}
+                  accessibilityRole="button"
+                  accessibilityLabel="Clear all filters"
+                >
+                  <Text style={styles.clearLinkText}>Clear</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+          {/* Category pills — multi-select */}
+          <View style={styles.pillsRow}>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.pillsContent}
+            >
+              <TouchableOpacity
+                style={[styles.pill, selectedCategories.length === 0 && styles.pillActive]}
+                onPress={clearFilters}
+                activeOpacity={0.9}
+                hitSlop={6}
+                accessibilityRole="button"
+                accessibilityState={{ selected: selectedCategories.length === 0 }}
+              >
+                <Text style={[styles.pillText, selectedCategories.length === 0 && styles.pillTextActive]}>All</Text>
+              </TouchableOpacity>
+              {categoriesWithCounts.map(({ category, cfg }) => {
+                const active = selectedCategories.includes(category);
+                return (
+                  <TouchableOpacity
+                    key={category}
+                    style={[styles.pill, active && styles.pillActive]}
+                    onPress={() => handleCategorySelect(category)}
+                    activeOpacity={0.9}
+                    hitSlop={6}
+                    accessibilityRole="button"
+                    accessibilityState={{ selected: active }}
+                  >
+                    <Text style={[styles.pillText, active && styles.pillTextActive]}>{cfg.label}</Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </ScrollView>
+          </View>
+          </Animated.View>
 
-
+          {/* The periodic table banner moved here from Discover (docs/NPC_FEED_SPEC.md §4.5) */}
+          {isBrowsing ? <PeriodicTableBanner /> : null}
 
           {/* Filtered header meta */}
           {hasActiveFilter && (
@@ -520,7 +491,12 @@ export default function EncyclopediaScreen() {
               )}
             </Animated.View>
           ) : (
-            <View style={styles.groupsWrap}>
+            <View
+              style={styles.groupsWrap}
+              onLayout={(e) => {
+                groupsY.current = e.nativeEvent.layout.y;
+              }}
+            >
               {groupedByLetter.map(([letter, entries]) => (
                 <View
                   key={letter}
@@ -613,94 +589,22 @@ export default function EncyclopediaScreen() {
 
 const makeStyles = createStyles((theme) => ({
   container: { flex: 1 },
-  headerWrap: {
-    paddingHorizontal: 16,
-    paddingBottom: 8,
-    gap: 10,
-    zIndex: 10,
-  },
-  headerBar: {
-    backgroundColor: theme.colors.surfaceSoft,
-    borderRadius: 26,
-    padding: 12,
-    gap: 12,
-    elevation: 6,
-    shadowColor: theme.colors.shadow,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.12,
-    shadowRadius: 10,
-    borderWidth: 2,
-    borderColor: withAlpha(theme.colors.primaryLight, 0.08),
-    borderBottomWidth: 4,
-  },
-  headerRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-  },
-  backBtn: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
-    backgroundColor: theme.colors.card,
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 2,
-    borderColor: theme.colors.border,
-    borderBottomWidth: 4,
-  },
-  headerCopy: { flex: 1 },
-  headerTitle: {
-    fontSize: 18,
-    ...fontFaces.heavy,
-    color: theme.colors.primaryLight,
-    letterSpacing: -0.4,
-  },
-  headerSubtitle: {
-    fontSize: 12,
-    ...fontFaces.semibold,
-    color: theme.colors.primaryLight,
-    marginTop: 1,
-  },
-  headerRight: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-  },
-  mascot: { width: 44, height: 44 },
-  vaultBadge: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
-    backgroundColor: theme.colors.primarySurface,
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 2,
-    borderColor: withAlpha(theme.colors.onPrimary, 0.5),
-    borderBottomWidth: 4,
-  },
+  controls: { gap: 12 },
   searchCard: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: theme.colors.card,
-    borderRadius: 20,
+    backgroundColor: theme.colors.field,
+    borderRadius: 16,
+    minHeight: 56,
     paddingHorizontal: 14,
     paddingVertical: 12,
     gap: 10,
-    borderWidth: 2,
-    borderColor: theme.colors.border,
-    borderBottomWidth: 4,
-    elevation: 2,
-    shadowColor: theme.colors.shadow,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 6,
   },
   searchInput: {
     flex: 1,
     fontSize: 15,
     ...fontFaces.semibold,
-    color: theme.colors.text,
+    color: theme.colors.fieldText,
     paddingVertical: 0,
   },
   kbdHint: {
@@ -794,7 +698,7 @@ const makeStyles = createStyles((theme) => ({
   pillCountText: { fontSize: 11, ...fontFaces.heavy, color: theme.colors.primaryLight },
   pillCountTextActive: { color: theme.colors.onPrimary },
   body: { flex: 1, flexDirection: "row" },
-  scrollContent: { paddingHorizontal: 16, paddingTop: 8, paddingBottom: 36, gap: 14, flexGrow: 1 },
+  scrollContent: { paddingHorizontal: 16, paddingTop: 16, paddingBottom: 36, gap: 14, flexGrow: 1 },
   gridSection: { gap: 14 },
   sectionHead: { gap: 2, paddingHorizontal: 2 },
   sectionTitle: { fontSize: 16, ...fontFaces.heavy, color: theme.colors.text },

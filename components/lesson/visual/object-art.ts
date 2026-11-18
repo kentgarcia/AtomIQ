@@ -347,6 +347,23 @@ export const OBJECT_ART = {
     circle(49, 49, 10, BEE[1]),
     circle(49, 49, 6, EEL[1]),
   ],
+  /** A banana: a curved yellow capsule with a brown stem and tip (it holds a little natural potassium-40). */
+  banana: [
+    line("M26 26Q30 78 80 74", BEE[2], 26),
+    line("M22 24Q26 72 76 70", BEE[1], 26),
+    line("M30 34Q34 60 54 66", BEE[0], 4),
+    line("M22 12L21 22", COFFEE[1], 9),
+    line("M78 70L86 70", COFFEE[1], 9),
+  ],
+
+  /** A rock: a grey lump with a lighter top, the right side one step darker (rocks contain natural uranium and thorium). */
+  rock: [
+    poly([[20, 72], [28, 40], [52, 22], [82, 30], [94, 60], [84, 88], [30, 90]], 12, EEL[0]),
+    poly([[14, 70], [22, 38], [46, 20], [76, 28], [88, 58], [78, 86], [24, 88]], 12, ANCHOVY[2]),
+    poly([[22, 38], [46, 20], [76, 28], [64, 46], [36, 52]], 6, ANCHOVY[1]),
+    pill(24, 60, 6, 14, ANCHOVY[0]),
+    line("M58 62L66 74", EEL[0], 3),
+  ],
 } as const satisfies Record<string, readonly ArtShape[]>;
 
 export type ArtId = keyof typeof OBJECT_ART;
@@ -386,4 +403,6 @@ export const ART_NAMES: Record<ArtId, string> = {
   bolt: "a lightning bolt",
   magnet: "a horseshoe magnet",
   radiation: "the radiation sign",
+  banana: "a banana",
+  rock: "a rock",
 };

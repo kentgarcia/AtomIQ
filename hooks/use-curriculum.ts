@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import type { Lesson, Objective, PathNode, Reference, Unit } from "@/content/curriculum/types";
 import { useAllLevels } from "@/hooks/use-storage";
 import { contentRepository } from "@/services/content-db";
+import { getLessonRunProgress } from "@/services/lesson-runs";
 import { computePathState, countCompletedLessons, type PathState } from "@/services/path-core";
 
 export interface CurriculumData {
@@ -62,7 +63,14 @@ interface LevelRow {
  */
 export function useCurriculumPath() {
   const { data, loaded } = useCurriculum();
-  const { levels, loading, refresh } = useAllLevels();
+  const { levels, loading, refresh: refreshLevels } = useAllLevels();
+  // How far through each lesson left half way (0 to 0.95), by path node id, for the unit ring
+  const [runProgress, setRunProgress] = useState<Record<string, number>>({});
+
+  const refresh = useCallback(() => {
+    refreshLevels();
+    void getLessonRunProgress().then(setRunProgress);
+  }, [refreshLevels]);
 
   useFocusEffect(
     useCallback(() => {
@@ -92,5 +100,5 @@ export function useCurriculumPath() {
 
   const completedLessons = useMemo(() => countCompletedLessons(data.nodes, state), [data.nodes, state]);
 
-  return { data, state, completedLessons, loading: loading || !loaded, refresh };
+  return { data, state, completedLessons, runProgress, loading: loading || !loaded, refresh };
 }

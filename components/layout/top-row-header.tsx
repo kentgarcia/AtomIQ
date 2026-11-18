@@ -1,47 +1,42 @@
 /**
- * TopRowHeader — the shared top row of the tab screens: the learner's avatar
- * on the left and flat stat pills (streak, lessons, XP, diamonds) on the right.
+ * TopRowHeader — the shared top row of the tab screens, justified edge to edge:
+ * the learner's avatar at the left edge and one row of stats (streak, lessons,
+ * diamonds) at the right edge, each an icon and a number in the icon's colour,
+ * with no container.
  *
  * It owns the safe-area top padding and the readable-width frame, so a screen
- * just renders it as the first block under `PageBackground`. `children` render
+ * just renders it as the first block of the screen. `children` render
  * directly under the row (Home uses this for its daily panels).
  */
 
 import { useRouter } from "expo-router";
 import { useMemo, type ReactNode } from "react";
-import { Image, Pressable, Text, View } from "react-native";
+import { Image, Pressable, View } from "react-native";
 import Animated, {
     LinearTransition,
     useReducedMotion,
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { Avatar } from "@/components/avatar/Avatar";
+import { Text } from "@/components/ui/text";
 import { useCompletedLessonCount } from "@/hooks/use-completed-lessons";
-import { getProfileAvatarSource } from "@/services/profile-avatars";
+import { useDiamonds } from "@/hooks/use-wallet";
 import { useStorage } from "@/services/StorageContext";
 import { createStyles, fontFaces, useResponsiveLayout, useTheme } from "@/theme";
 import { DURATION, EASE_OUT } from "@/theme/motion";
 
 const FIRE_ICON = require("@/assets/images/icons/fire.png");
 const MEDAL_ICON = require("@/assets/images/icons/medal.png");
-const XP_ICON = require("@/assets/images/icons/xp.png");
 const DIAMOND_ICON = require("@/assets/images/icons/diamond.png");
-const MISSION_ICON = require("@/assets/images/icons/mission.png");
 
 /** Space the block takes below the safe-area inset (top pad + avatar + bottom pad). */
 export const TOP_ROW_HEADER_HEIGHT = 12 + 46 + 8;
 
 export function TopRowHeader({
     children,
-    onMissionsPress,
 }: {
     children?: ReactNode;
-    /**
-     * Called when the daily-missions button is pressed. Screens that host the
-     * missions panel (Home) pass this; elsewhere the button opens Home with
-     * the panel expanded.
-     */
-    onMissionsPress?: () => void;
 }) {
     const insets = useSafeAreaInsets();
     const { theme } = useTheme();
@@ -52,14 +47,14 @@ export function TopRowHeader({
     const router = useRouter();
     const styles = useMemo(() => makeStyles(theme), [theme]);
 
-    // Currency — no balance is stored yet, so this reads 0 until diamonds are wired up
-    const diamonds = 0;
+    // Currency: earned from quest chests (services/wallet.ts)
+    const diamonds = useDiamonds();
 
+    const c = theme.colors;
     const stats = [
-        { key: "streak", icon: FIRE_ICON, value: userProfile?.current_streak || 0, label: "day streak" },
-        { key: "lessons", icon: MEDAL_ICON, value: completedLessons, label: "lessons completed" },
-        { key: "xp", icon: XP_ICON, value: userProfile?.total_xp || 0, label: "XP" },
-        { key: "diamonds", icon: DIAMOND_ICON, value: diamonds, label: "diamonds" },
+        { key: "streak", icon: FIRE_ICON, value: userProfile?.current_streak || 0, label: "day streak", color: c.error },
+        { key: "lessons", icon: MEDAL_ICON, value: completedLessons, label: "lessons completed", color: c.primaryLight },
+        { key: "diamonds", icon: DIAMOND_ICON, value: diamonds, label: "diamonds", color: c.info },
     ];
 
     return (
@@ -83,38 +78,17 @@ export function TopRowHeader({
                             hitSlop={6}
                             onPress={() => router.navigate("/(tabs)/profile")}
                         >
-                            <Image
-                                source={getProfileAvatarSource(userProfile?.avatar_url)}
-                                style={styles.avatar}
-                                resizeMode="cover"
-                            />
+                            <Avatar value={userProfile?.avatar_url} size={40} />
                         </Pressable>
-                        <Pressable
-                            style={styles.missionBtn}
-                            accessibilityRole="button"
-                            accessibilityLabel="Daily missions"
-                            hitSlop={8}
-                            onPress={
-                                onMissionsPress ??
-                                (() =>
-                                    router.navigate({
-                                        pathname: "/(tabs)",
-                                        params: { panel: "missions" },
-                                    }))
-                            }
-                        >
-                            <Image source={MISSION_ICON} style={styles.missionIcon} resizeMode="contain" />
-                        </Pressable>
-                        <View style={{ flex: 1 }} />
                         <View style={styles.statsRow}>
                             {stats.map((stat) => {
                                 const content = (
                                     <>
                                         <Image source={stat.icon} style={styles.statIcon} resizeMode="contain" />
-                                        <Text style={styles.statText}>{stat.value.toLocaleString()}</Text>
+                                        <Text style={[styles.statText, { color: stat.color }]}>{stat.value.toLocaleString()}</Text>
                                     </>
                                 );
-                                // The streak pill opens the daily streak screen
+                                // The streak stat opens the daily streak screen
                                 return stat.key === "streak" ? (
                                     <Pressable
                                         key={stat.key}
@@ -151,7 +125,7 @@ const makeStyles = createStyles((theme) => {
     return {
         /* zIndex keeps panels that open under the row above the content below */
         header: {
-            paddingHorizontal: 16,
+            paddingHorizontal: 24,
             paddingBottom: 8,
             zIndex: 100,
         },
@@ -161,53 +135,40 @@ const makeStyles = createStyles((theme) => {
         row: {
             flexDirection: "row",
             alignItems: "center",
-            gap: 12,
+            justifyContent: "space-between",
+            gap: 16,
         },
         avatarWrap: {
             width: 46,
             height: 46,
             borderRadius: 23,
-            backgroundColor: c.card,
+            backgroundColor: c.surfaceSoft,
             borderWidth: 2,
-            borderColor: c.card,
+            borderColor: c.border,
             borderBottomWidth: 4,
-        },
-        avatar: {
-            width: "100%",
-            height: "100%",
-            borderRadius: 23,
-        },
-        missionBtn: {
             alignItems: "center",
             justifyContent: "center",
         },
-        missionIcon: {
-            width: 30,
-            height: 30,
-        },
+        /* Spaced out, right-aligned by the row's space-between */
         statsRow: {
             flexDirection: "row",
             alignItems: "center",
-            gap: 6,
+            gap: 32,
         },
-        /* Flat, fully rounded pill — no border lip or elevation */
+        /* No container: the icon and its number sit directly on the page, in the icon's colour */
         statItem: {
             flexDirection: "row",
             alignItems: "center",
-            gap: 5,
-            height: 32,
-            paddingHorizontal: 10,
-            borderRadius: 999,
-            backgroundColor: c.card,
+            gap: 4,
+            height: 36,
         },
         statIcon: {
-            width: 18,
-            height: 18,
+            width: 24,
+            height: 24,
         },
         statText: {
-            fontSize: 13,
+            fontSize: 20,
             ...fontFaces.heavy,
-            color: c.text,
             fontVariant: ["tabular-nums"],
         },
     };

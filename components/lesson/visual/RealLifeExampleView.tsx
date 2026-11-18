@@ -1,5 +1,6 @@
 import { memo, useMemo } from "react";
-import { Text, View } from "react-native";
+import { View } from "react-native";
+import { Text } from "@/components/ui/text";
 
 import type { RealLifeExampleBlock, VisualTone } from "@/content/types";
 import { createStyles, useTheme } from "@/theme";

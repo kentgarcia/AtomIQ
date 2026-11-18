@@ -4,7 +4,8 @@
  * decorative. Hidden when the "Teacher lines" setting is off.
  */
 
-import { Text, View } from "react-native";
+import { View } from "react-native";
+import { Text } from "@/components/ui/text";
 import Svg, { Path } from "react-native-svg";
 
 import { Card } from "@/components/ui/card";

@@ -10,7 +10,6 @@
 export type GuideIntent =
   | "learn" // I want to learn about...
   | "explore" // I want to explore...
-  | "discover" // I want to discover...
   | "practice" // I want to test myself...
   | "review" // I want to review...
   | "continue" // I want to continue learning...
@@ -40,7 +39,6 @@ export interface GuidePill {
           | "topic-quiz"
           | "topic-game"
           | "topic-encyclopedia"
-          | "topic-articles"
           | "review-lesson"
           | "review-encyclopedia"
           | "retry-quiz"
@@ -55,7 +53,6 @@ export interface GuidePill {
 export type GuideAction =
   | "start_lesson"
   | "read_encyclopedia"
-  | "read_article"
   | "play_game"
   | "take_quiz"
   | "open_profile"
@@ -69,7 +66,6 @@ export type GuideDestination =
   | { screen: "lesson"; id: string } // /lesson/${id}
   | { screen: "practice"; id: string } // /practice/${id}
   | { screen: "encyclopedia-entry"; id: string } // /explorer/encyclopedia-entry?id=${id}
-  | { screen: "article"; id: string } // /article-detail?id=${id}
   | { screen: "maze"; id: string } // /explorer/atom-maze?id=${id}
   | { screen: "journey"; id: string } // /explorer/journey?id=${id}
   | { screen: "mythbuster" } // /mythbuster
@@ -79,7 +75,7 @@ export type GuideDestination =
   | { screen: "encyclopedia-list" }; // /encyclopedia
 
 export interface GuideCard {
-  kind: "lesson" | "quiz" | "encyclopedia" | "article" | "game" | "profile-summary";
+  kind: "lesson" | "quiz" | "encyclopedia" | "game" | "profile-summary";
   title: string;
   subtitle?: string; // e.g. "Unit 2 • Beginner"
   body?: string; // description / excerpt / summary lines

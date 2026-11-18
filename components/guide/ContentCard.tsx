@@ -1,11 +1,12 @@
 /**
  * Guide ContentCard — the rich result shown when a user commits to a pill.
- * Cards surface real content (lesson / quiz / encyclopedia / article / game /
+ * Cards surface real content (lesson / quiz / encyclopedia / game /
  * profile) and a single CTA that routes into the matching feature screen.
  */
 
 import React, { useMemo } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, View } from "react-native";
+import { Text } from "@/components/ui/text";
 import Animated, {
   useAnimatedStyle,
   useReducedMotion,
@@ -22,7 +23,6 @@ const CARD_ICON: Record<GuideCard["kind"], string> = {
   lesson: "Book",
   quiz: "Target",
   encyclopedia: "InfoCircle",
-  article: "DocumentText",
   game: "Game",
   "profile-summary": "Chart",
 };
@@ -31,7 +31,6 @@ const CARD_ACCENT: Record<GuideCard["kind"], string> = {
   lesson: "#EA580C",
   quiz: "#C2410C",
   encyclopedia: "#1CB0F6",
-  article: "#58CC02",
   game: "#8B5CF6",
   "profile-summary": "#EA580C",
 };
@@ -163,7 +162,6 @@ export function ContentCard({ card, onCta }: ContentCardProps) {
       case "lesson": return "LESSON";
       case "quiz": return "PRACTICE";
       case "encyclopedia": return "ENCYCLOPEDIA";
-      case "article": return "ARTICLE";
       case "game": return "GAME";
       case "profile-summary": return "PROFILE";
       default: return "CONTENT";

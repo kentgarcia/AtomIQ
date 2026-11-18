@@ -6,7 +6,7 @@ export default function PracticeLayout() {
   return (
     <ButtonDesignProvider design="standard">
       <Stack>
-        <Stack.Screen name="[id]" options={{ headerShown: false, animation: "slide_from_right" }} />
+        <Stack.Screen name="[id]" options={{ headerShown: false, animation: "fade" }} />
       </Stack>
     </ButtonDesignProvider>
   );

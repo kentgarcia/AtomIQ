@@ -1,10 +1,11 @@
 import { Icon } from "@/components/ui/icon";
-import { getProfileAvatarSource } from "@/services/profile-avatars";
+import { Avatar } from "@/components/avatar/Avatar";
 import { useStorage } from "@/services/StorageContext";
 import { createStyles, fontFaces, useTheme } from "@/theme";
 import { useRouter } from "expo-router";
 import React, { useMemo } from "react";
-import { Image, Pressable, Text, View } from "react-native";
+import { Pressable, View } from "react-native";
+import { Text } from "@/components/ui/text";
 
 const makeStyles = createStyles((theme) => {
   const c = theme.colors;
@@ -211,7 +212,7 @@ export function ProfileProgressCard() {
       <View style={styles.inner}>
         <View style={styles.profileRowCompact}>
           <View style={styles.avatarContainer}>
-            <Image source={getProfileAvatarSource(userProfile.avatar_url)} style={styles.avatar} resizeMode="cover" />
+            <Avatar value={userProfile.avatar_url} size={72} style={styles.avatar} />
             <View style={styles.levelBadge}>
               <Text style={styles.levelBadgeText}>{userLevel}</Text>
             </View>

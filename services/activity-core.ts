@@ -27,8 +27,8 @@ export const ACTIVITY_KINDS = [
   "quiz_complete",
   "lab_session",
   "game_session",
-  "article_read",
   "periodic_table_explore",
+  "blog_read",
 ] as const;
 
 export type ActivityKind = (typeof ACTIVITY_KINDS)[number];
@@ -55,8 +55,8 @@ export const KIND_POLICY: Record<ActivityKind, KindPolicy> = {
   quiz_complete: { weight: 2, maxPerId: 1, maxPerDay: 10, label: ["quiz completed", "quizzes completed"] },
   lab_session: { weight: 2, maxPerId: 1, maxPerDay: 10, label: ["lab session", "lab sessions"] },
   game_session: { weight: 2, maxPerId: 5, maxPerDay: 10, label: ["game session", "game sessions"] },
-  article_read: { weight: 1, maxPerId: 1, maxPerDay: 10, label: ["article read", "articles read"] },
   periodic_table_explore: { weight: 1, maxPerId: 1, maxPerDay: 10, label: ["periodic table exploration", "periodic table explorations"] },
+  blog_read: { weight: 1, maxPerId: 1, maxPerDay: 10, label: ["blog piece read", "blog pieces read"] },
 };
 
 export const isActivityKind = (value: unknown): value is ActivityKind =>

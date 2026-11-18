@@ -16,6 +16,7 @@ import { DatabaseSync } from "node:sqlite";
 import { validateDatabase } from "./content-validate.mjs";
 import {
   ENTITY_CHILDREN,
+  ENTITY_LINKS,
   PARENT_OF,
   SHIPPED_ID_TABLES,
   TIMESTAMP_COLS,
@@ -71,6 +72,12 @@ export function readEntity(db, ref) {
       .prepare(`SELECT * FROM ${ident(child.table)} WHERE ${ident(child.fk)} = ? ORDER BY ${order}`)
       .all(ref.pk[0]);
   }
+  const link = ENTITY_LINKS[ref.table];
+  if (link) {
+    entity.children[link.table] = db
+      .prepare(`SELECT * FROM ${ident(link.table)} WHERE ${ident(link.fk)} = ? ORDER BY ${ident(link.column)}`)
+      .all(ref.pk[0]);
+  }
   return entity;
 }
 
@@ -114,6 +121,14 @@ export function writeEntity(db, ref, entity) {
     const childNames = new Set(tableInfo(db, child.table).cols.map((c) => c.name));
     for (const r of entity.children[child.table] ?? []) {
       insertRow(db, child.table, Object.fromEntries(Object.entries(r).filter(([k]) => childNames.has(k))));
+    }
+  }
+  const link = ENTITY_LINKS[ref.table];
+  if (link) {
+    db.prepare(`DELETE FROM ${ident(link.table)} WHERE ${ident(link.fk)} = ?`).run(ref.pk[0]);
+    const linkNames = new Set(tableInfo(db, link.table).cols.map((c) => c.name));
+    for (const r of entity.children[link.table] ?? []) {
+      insertRow(db, link.table, Object.fromEntries(Object.entries(r).filter(([k]) => linkNames.has(k))));
     }
   }
 }
@@ -399,9 +414,11 @@ export function createStore({ db, history, paths }) {
      * Save a whole entity at once: the parent row and its ordered children.
      * `children` rows get their `position` assigned from array order.
      */
-    saveEntity({ table, pk, row, children, source }) {
+    saveEntity({ table, pk, row, children, links, source }) {
       const child = ENTITY_CHILDREN[table];
+      const link = ENTITY_LINKS[table];
       if (!child && children) throw new StoreError(`${table} has no child rows`);
+      if (!link && links) throw new StoreError(`${table} has no link rows`);
       const { pkCols } = tableInfo(db, table);
       const existing = pk ? readEntity(db, { table, pk }) : null;
       if (existing) {
@@ -421,8 +438,12 @@ export function createStore({ db, history, paths }) {
         work: () => {
           // Children go first: their FK has no ON UPDATE, so a renamed parent id would fail otherwise.
           const keep = existing?.children?.[child?.table] ?? [];
+          const keepLinks = existing?.children?.[link?.table] ?? [];
           if (child && existing) {
             db.prepare(`DELETE FROM ${ident(child.table)} WHERE ${ident(child.fk)} = ?`).run(pk[0]);
+          }
+          if (link && existing) {
+            db.prepare(`DELETE FROM ${ident(link.table)} WHERE ${ident(link.fk)} = ?`).run(pk[0]);
           }
           if (existing) {
             const sets = Object.keys(row).filter((c) => !TIMESTAMP_COLS.has(c));
@@ -444,6 +465,17 @@ export function createStore({ db, history, paths }) {
               if (!("created_at" in withMeta) && created.has(String(r.id))) withMeta.created_at = created.get(String(r.id));
               insertRow(db, child.table, withMeta);
             });
+          }
+          if (link) {
+            // Link rows are just ids: no position or timestamps. Without `links`, keep the existing ones.
+            const rows = links ?? keepLinks;
+            const seen = new Set();
+            for (const r of rows) {
+              const target = String(r[link.column]);
+              if (seen.has(target)) continue;
+              seen.add(target);
+              insertRow(db, link.table, { [link.fk]: newPk[0], [link.column]: target });
+            }
           }
           return [{ table, pk: newPk }];
         },

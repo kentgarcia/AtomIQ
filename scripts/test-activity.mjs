@@ -147,7 +147,7 @@ test("repeated actions can never push a day above level 4 or past the per-day ca
 test("dedupe: same id counts at most maxPerId times per day per kind", () => {
   const cases = {
     lesson_step: 1, lesson_complete: 1, quiz_attempt: 3, quiz_complete: 1,
-    lab_session: 1, game_session: 5, article_read: 1, periodic_table_explore: 1,
+    lab_session: 1, game_session: 5, periodic_table_explore: 1, blog_read: 1,
   };
   for (const [kind, max] of Object.entries(cases)) {
     assert.equal(KIND_POLICY[kind].maxPerId, max, `${kind} policy`);
@@ -157,8 +157,8 @@ test("dedupe: same id counts at most maxPerId times per day per kind", () => {
   }
   // distinct ids each count (up to the per-day cap)
   let day = emptyDay("2025-03-04");
-  for (let i = 0; i < 5; i++) day = applyEvent(day, "article_read", { id: `a${i}` }, at());
-  assert.equal(day.counts.article_read, 5);
+  for (let i = 0; i < 5; i++) day = applyEvent(day, "periodic_table_explore", { id: `a${i}` }, at());
+  assert.equal(day.counts.periodic_table_explore, 5);
   assert.equal(day.level, 3); // 5 points
   // id-less events share one bucket
   day = emptyDay("2025-03-04");
@@ -169,11 +169,11 @@ test("dedupe: same id counts at most maxPerId times per day per kind", () => {
   assert.equal(same, day);
 });
 
-test("weights: completions/labs/games are worth 2, steps/attempts/reads/explores 1", () => {
+test("weights: completions/labs/games are worth 2, steps/attempts/explores 1", () => {
   const w = Object.fromEntries(ACTIVITY_KINDS.map((k) => [k, KIND_POLICY[k].weight]));
   assert.deepEqual(w, {
     lesson_step: 1, lesson_complete: 2, quiz_attempt: 1, quiz_complete: 2,
-    lab_session: 2, game_session: 2, article_read: 1, periodic_table_explore: 1,
+    lab_session: 2, game_session: 2, periodic_table_explore: 1, blog_read: 1,
   });
   let day = emptyDay("2025-03-04");
   day = applyEvent(day, "lesson_complete", { id: "l1" }, at());
@@ -215,22 +215,22 @@ test("clock moved backwards: nothing deleted, nothing double counted, past days 
   const store = memoryStore();
   const clock = fixedClock(T("2025-03-10T12:00:00Z"), 0);
   const engine = createActivityEngine({ store, clock: clock.fn, debounceMs: 0 });
-  engine.record("article_read", { id: "x" });
+  engine.record("periodic_table_explore", { id: "x" });
   engine.record("lesson_complete", { id: "l1" });
   let before = await engine.getDays();
   const snapshot = JSON.stringify(before["2025-03-10"]);
 
   clock.c.ms = T("2025-03-07T12:00:00Z"); // device clock set 3 days back
-  engine.record("article_read", { id: "y" });
+  engine.record("periodic_table_explore", { id: "y" });
   engine.record("lesson_complete", { id: "l1" });
   let days = await engine.getDays();
   assert.equal(days["2025-03-10"] && JSON.stringify(days["2025-03-10"]), snapshot, "later day untouched");
   assert.equal(days["2025-03-07"].total, 2);
   assert.equal(Object.keys(days).length, 2);
 
-  // Clock returns to the correct time: the same article/lesson on the 10th is deduped, not doubled.
+  // Clock returns to the correct time: the same element/lesson on the 10th is deduped, not doubled.
   clock.c.ms = T("2025-03-10T18:00:00Z");
-  engine.record("article_read", { id: "x" });
+  engine.record("periodic_table_explore", { id: "x" });
   engine.record("lesson_complete", { id: "l1" });
   days = await engine.getDays();
   assert.equal(JSON.stringify(days["2025-03-10"]), snapshot);
@@ -313,6 +313,20 @@ test("sanitizeDay tolerates corrupt rows and recomputes totals/levels", () => {
   assert.equal(d.total, 3);
   assert.equal(d.points, 3);
   assert.equal(d.level, 2);
+});
+
+test("sanitizeDay ignores the removed article_read kind without losing other counts", () => {
+  const d = sanitizeDay({
+    date: "2025-03-04",
+    counts: { lesson_step: 2, article_read: 4 },
+    seen: { lesson_step: { a: 1, b: 1 }, article_read: { x: 1 } },
+    total: 6,
+    points: 6,
+  });
+  assert.deepEqual(d.counts, { lesson_step: 2 });
+  assert.equal(d.seen.article_read, undefined);
+  assert.equal(d.total, 2);
+  assert.equal(d.points, 2);
 });
 
 test("history import: real timestamps only, idempotent, labelled, no future/invalid", async () => {

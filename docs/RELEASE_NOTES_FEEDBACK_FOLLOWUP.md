@@ -19,14 +19,14 @@ Implements `ATOMIQ_FEEDBACK_SUMMARY_SPEC.md`. **Nothing here has been run on a d
 | Visual lesson blocks (§5.1) | Six block kinds, each requiring learning objective, alt text, plain-text equivalent, and source where it depends on external data. 12 blocks attached to the matching lessons: atom, isotope, penetration, half-life, dose comparison, medical imaging and treatment, reactor, defence in depth, agriculture, food irradiation, water tracers. | `docs/completed/VISUAL_LESSON_BLOCKS.md`, `npm run test:visuals` |
 | Periodic table (§5.2) | All 118 elements, grid plus list view, search and category filters, element detail with an element/isotope/ion explainer, links to lessons and encyclopedia entries, offline. | `npm run test:periodic` |
 | Activity tracker (§5.3) | Local-first day-level history, a 5-level scale that cannot be inflated by repeats, a heatmap with legend, text summary and day details, shown on the Streak screen with a strip on Profile. Streak numbers are the existing streak, unchanged. | `docs/ACTIVITY_TRACKER.md`, `npm run test:activity` |
-| Articles and research (§5.4) | Source and review metadata on every article and post, a labelled Summary vs Source layout, 6 new original beginner summaries, and a publishing process. | `docs/ARTICLE_PIPELINE.md` |
+| Articles and research (§5.4), since removed with the Articles feature | Source and review metadata on every article and post, a labelled Summary vs Source layout, 6 new original beginner summaries, and a publishing process. | (doc deleted) |
 
 ## Intentionally deferred / known gaps
 
 - **Music:** no music track is bundled. The policy, preference and channel exist, but there is no Music toggle and nothing plays until a track is registered.
 - **Periodic table:** no Discover or Guide quick-start link. Quizzes, Lab and lesson content do not use `ElementChip` or `openElement` yet. Zoom is by buttons, not pinch.
 - **Activity tracker:** after Delete Account, the in-memory activity cache is cleared only on restart. The Streak screen's existing "This Week" row still reads the older `daily_activity` table.
-- **Articles:** no article or post is marked `reviewed`. The 8 posts that read as copied source text need rewriting or permission. `nuclear-safety-stats` needs a working source link. The FDA link blocked automated checks and needs a manual open. The Content Studio shows the new enum columns as plain text inputs.
+- **Articles (feature since removed):** no article or post is marked `reviewed`. The 8 posts that read as copied source text need rewriting or permission. `nuclear-safety-stats` needs a working source link. The FDA link blocked automated checks and needs a manual open. The Content Studio shows the new enum columns as plain text inputs.
 - **Visual blocks:** the Content Studio has no editor for `visuals`; it preserves them on save.
 - **Content review needed before release:** the MythBuster explanations rewritten in this pass, some true/false claims, and the dose values and `verify: true` sources in the visual blocks all need a subject-matter read. `npm run validate:content -- --strict-review` fails while 31 articles/posts are unreviewed; that is the intended release gate.
 - **Content change to confirm:** 5 legacy article bylines (unverified personas) were replaced with "AtomIQ Editorial Team".

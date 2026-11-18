@@ -27,7 +27,7 @@ import { FACE, MUTE_CLOTHES_STEP, MUTE_DARK, MUTE_LIGHT, MUTE_SEPARATION } from 
 export type EyeStyle = "pill" | "round" | "glasses-round" | "glasses-square" | "dots";
 export type HairStyle = "bob" | "curls" | "crop" | "bun" | "wrap";
 export type OutfitKind = "sweater" | "hoodie" | "coat" | "vest" | "shirt";
-export type PropKind = "marble" | "watch" | "clipboard" | "stethoscope" | "hardhat" | "vial" | "notebook";
+export type PropKind = "none" | "marble" | "watch" | "clipboard" | "stethoscope" | "hardhat" | "vial" | "notebook";
 
 export type NpcSpec = {
   skin: { base: string; shade: string; feature: string };
@@ -56,6 +56,8 @@ export interface NpcTree {
   top: Part[];
   front: Part[];
   lids: Part[];
+  /** The `bust` only: the face in each of its expressions, faded in over the resting face (see `BUST_MOODS`). */
+  moods?: { face: Part[]; from: number; to: number }[];
 }
 
 // ── frame, proportions (head = 100) ──────────────────────────────────────────
@@ -77,8 +79,28 @@ const FEATURE_W = 5;
 export const NPC_VIEWBOX = {
   hero: { x: -175, y: -116, w: 350, h: 380 },
   head: { x: -100, y: -116, w: 200, h: 252 },
+  /**
+   * The lesson teacher, closer in than `head` (same 200:252 shape, so it drops in where `head` was): the head with just
+   * a strip of shirt, whose bottom corners are rounded and flush with the bottom edge. Drawn without arms and held still.
+   */
+  bust: { x: -88, y: -114, w: 176, h: 221.76 },
+  /** A square crop of head, neck and shoulders, for round and rounded-square avatar frames. */
+  avatar: { x: -110, y: -112, w: 220, h: 220 },
 } as const;
 export type NpcForm = keyof typeof NPC_VIEWBOX;
+
+/** Where the shirt of the `bust` form ends: the bottom edge of its crop (the bottom corners are rounded there). */
+export const BUST_BOTTOM = NPC_VIEWBOX.bust.y + NPC_VIEWBOX.bust.h;
+/** The radius of the bust shirt's rounded bottom corners. */
+export const BUST_CORNER = 24;
+
+/**
+ * The expressions a held-still `bust` plays, on top of its resting face: a glance, a grin, another glance.
+ * Each is faded in over `NPC_MOOD_FADE` ms at `from`, held, and faded out by `to + NPC_MOOD_FADE` (ms into
+ * the idle loop). They keep clear of the blinks (`NPC_BLINKS`).
+ */
+export const NPC_MOOD_FADE = 170;
+export type MoodDef = { expression: Expression; from: number; to: number };
 
 /** One idle loop. Every idle period divides it, so it closes without a jump. */
 export const NPC_LOOP_MS = 9000;
@@ -123,6 +145,24 @@ export function tomb(cx: number, top: number, w: number, h: number, r: number): 
   return (
     `M${f(cx - R)} ${f(top + R)}A${f(R)} ${f(R)} 0 0 1 ${f(cx + R)} ${f(top + R)}` +
     `V${f(yb - q)}A${f(q)} ${f(q)} 0 0 1 ${f(cx + R - q)} ${f(yb)}H${f(cx - R + q)}A${f(q)} ${f(q)} 0 0 1 ${f(cx - R)} ${f(yb - q)}Z`
+  );
+}
+
+/**
+ * The shirt of the `bust`: the shoulders are the top of a circle (like `tomb`), cut flat at `bottom`, and the two
+ * bottom corners are rounded with radius `r`. (`tomb` cannot do this: given so little height it becomes a plain cap.)
+ */
+export function bustShirt(cx: number, top: number, w: number, bottom: number, r: number): string {
+  const R = w / 2;
+  const cy = top + R;
+  const halfAt = (y: number) => Math.sqrt(Math.max(0, R * R - (cy - y) * (cy - y)));
+  const edge = halfAt(bottom);
+  // Where the rounding leaves the arc: a little above the corner
+  const y1 = bottom - r * 0.8;
+  const x1 = halfAt(y1);
+  return (
+    `M${f(cx - edge + r)} ${f(bottom)}H${f(cx + edge - r)}Q${f(cx + edge)} ${f(bottom)} ${f(cx + x1)} ${f(y1)}` +
+    `A${f(R)} ${f(R)} 0 0 0 ${f(cx - x1)} ${f(y1)}Q${f(cx - edge)} ${f(bottom)} ${f(cx - edge + r)} ${f(bottom)}Z`
   );
 }
 
@@ -218,7 +258,7 @@ export function mutedSpec(spec: NpcSpec): NpcSpec {
 
 // ── the face ─────────────────────────────────────────────────────────────────
 
-type Expression = { eyes: "open" | "worried" | "closedHappy"; mouth: "smile" | "grin" | "laugh" | "flat" | "sad" | "o"; look?: [number, number] };
+export type Expression = { eyes: "open" | "worried" | "closedHappy"; mouth: "smile" | "grin" | "laugh" | "flat" | "sad" | "o"; look?: [number, number] };
 
 const CUTS = { worried: { lid: [-9, -21] as [number, number], cheek: [15, 12] as [number, number] } };
 
@@ -408,9 +448,9 @@ function neckParts(p: Pal): Part[] {
   return [fillOf(rrect(-14, 40, NECK.w, 40, 6), p.skin), fillOf(rrect(-14, 40, NECK.w, 14, 6), p.feature)];
 }
 
-function torsoParts(spec: NpcSpec, p: Pal): Part[] {
+function torsoParts(spec: NpcSpec, p: Pal, bottom: number = TORSO.bottom, bust = false): Part[] {
   const top = TORSO.top;
-  const body = (w: number, color: string) => fillOf(tomb(0, top, w, TORSO.bottom - top, 30), color);
+  const body = (w: number, color: string) => fillOf(bust ? bustShirt(0, top, w, bottom, BUST_CORNER) : tomb(0, top, w, bottom - top, 30), color);
   const out: Part[] = [];
   switch (spec.outfit.kind) {
     case "sweater":
@@ -440,7 +480,8 @@ function torsoParts(spec: NpcSpec, p: Pal): Part[] {
   if (spec.accent.kind === "stethoscope") {
     out.push(lineOf("M-30 74Q-38 138 0 142Q38 138 30 74", p.accent, 7), fillOf(circle(0, 146, 11), p.accentShade));
   }
-  if (spec.accent.kind === "watch") {
+  // The watch is on the wrist, and the bust has no arms
+  if (spec.accent.kind === "watch" && !bust) {
     out.push(lineOf("M-26 96Q-14 126 26 122", p.accentShade, 3.4), fillOf(circle(30, 124, 12), p.accent), fillOf(circle(30, 124, 7.5), p.eyeWhite), lineOf("M30 124V119M30 124L34 126", p.pupil, 2.4));
   }
   return out;
@@ -593,19 +634,28 @@ export const POSES: Record<PoseId, PoseDef> = {
   },
 };
 
+/** What the held-still bust does besides blink: a glance aside, a grin, a glance up the other way. */
+export const BUST_MOODS: readonly MoodDef[] = [
+  { expression: { eyes: "open", mouth: "smile", look: [-4, 1] }, from: 1100, to: 2150 },
+  { expression: { eyes: "open", mouth: "grin" }, from: 3500, to: 5000 },
+  { expression: { eyes: "open", mouth: "smile", look: [4, -2] }, from: 6800, to: 7900 },
+];
+
 // ── build ────────────────────────────────────────────────────────────────────
 
-export function buildNpc(spec: NpcSpec, pose: PoseId = "idle"): NpcTree {
+export function buildNpc(spec: NpcSpec, pose: PoseId = "idle", form: NpcForm = "hero"): NpcTree {
   const p = paletteOf(spec);
   const def = POSES[pose];
-  const arms = def.arms;
+  const bust = form === "bust";
+  // The bust is the head and a strip of shirt: no arms, and the shirt ends in rounded corners at the bottom of the crop
+  const arms = bust ? [] : def.arms;
   const holdsProp = def.holds && ["marble", "clipboard", "vial", "notebook"].includes(spec.accent.kind);
   const handArm = arms.find((a) => a.handOver);
   const back: Part[] = [
     ...hairBack(spec, p),
     ...arms.filter((a) => !a.front).flatMap((a) => armParts(a, p)),
     ...neckParts(p),
-    ...torsoParts(spec, p),
+    ...(bust ? torsoParts(spec, p, BUST_BOTTOM, true) : torsoParts(spec, p)),
   ];
   const front: Part[] = [
     ...arms.filter((a) => a.front).flatMap((a) => armParts(a, p, a.handOver ? "sleeve" : undefined)),
@@ -618,6 +668,7 @@ export function buildNpc(spec: NpcSpec, pose: PoseId = "idle"): NpcTree {
     top: [...hairFront(spec, p), ...glassesParts(spec, p), ...hatParts(spec, p)],
     front,
     lids: lidParts(spec, p),
+    ...(bust ? { moods: BUST_MOODS.map((m) => ({ face: faceParts(spec, m.expression, p), from: m.from, to: m.to })) } : {}),
   };
 }
 

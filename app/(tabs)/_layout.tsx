@@ -1,104 +1,60 @@
 import {
-  useTabBarInset,
   useTabBarMetrics,
   TabBarInsetProvider,
   useTabBarHeightReporter,
   useTabBarVisible,
 } from "@/components/layout";
+import { ClaimCoinLayer } from "@/components/quests/ClaimCoinLayer";
+import { useFeedUnseenCount } from "@/hooks/use-feed";
 import { playButtonClickSfx } from "@/services/ui-sfx";
-import { layout, useTheme, withAlpha } from "@/theme";
+import { fontFaces, layout, useTheme } from "@/theme";
 import { TAB_BAR_CONSTANTS, TAB_BAR_TAB_COUNT } from "@/theme/tab-bar-metrics";
 import type { BottomTabBarProps } from "expo-router/js-tabs";
 import { Image } from "expo-image";
-import { LinearGradient } from "expo-linear-gradient";
 import { Tabs } from "expo-router/js-tabs";
 import React from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
+import { Text } from "@/components/ui/text";
 import Animated, {
   useAnimatedStyle,
   useReducedMotion,
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
-import { DURATION, EASE_DRAWER, EASE_OUT } from "@/theme/motion";
+import { EASE_OUT } from "@/theme/motion";
 
 const TAB_ICONS = {
   map: require("@/assets/images/icons/map.png"),
   discovery: require("@/assets/images/icons/community.png"),
+  quests: require("@/assets/images/icons/chest.png"),
   ai: require("@/assets/images/icons/ai.png"),
   games: require("@/assets/images/icons/games.png"),
   profile: require("@/assets/images/icons/profile.png"),
-};
-
-/* Active tab (Duolingo style): the icon sits in a rounded square with a tinted
-   fill and an accent border. One highlight serves the whole bar and slides to
-   the chosen tab (left to right or back). Position is derived from a
-   fractional tab index, so a width change (rotation, tablet resize,
-   split-screen) repositions it without animating. */
-const ACTIVE_RADIUS = 16;
-const ACTIVE_BORDER = 2;
-const ACTIVE_FILL_ALPHA = 0.14;
-
-const TabHighlight = ({
-  index,
-  tabWidth,
-  slotWidth,
-  slotHeight,
-  color,
-}: {
-  index: number;
-  tabWidth: number;
-  slotWidth: number;
-  slotHeight: number;
-  color: string;
-}) => {
-  const reducedMotion = useReducedMotion();
-  const position = useSharedValue(index);
-
-  React.useEffect(() => {
-    position.value = reducedMotion
-      ? index
-      : withTiming(index, { duration: DURATION.sheet, easing: EASE_DRAWER });
-  }, [index, reducedMotion, position]);
-
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [
-      { translateX: position.value * tabWidth + (tabWidth - slotWidth) / 2 },
-    ],
-  }));
-
-  return (
-    <Animated.View
-      pointerEvents="none"
-      style={[
-        styles.activeHighlight,
-        {
-          width: slotWidth,
-          height: slotHeight,
-          borderRadius: ACTIVE_RADIUS,
-          borderColor: color,
-          backgroundColor: withAlpha(color, ACTIVE_FILL_ALPHA),
-        },
-        animatedStyle,
-      ]}
-    />
-  );
 };
 
 const TabButton = ({
   tab,
   isFocused,
   onPress,
-  iconSlot,
-  iconSlotHeight,
   iconSize,
+  labelFontSize,
+  labelLineHeight,
+  labelGap,
+  activeColor,
+  inactiveColor,
+  dot,
 }: {
   tab: { name: string; icon: number; label: string };
   isFocused: boolean;
   onPress: () => void;
-  iconSlot: number;
-  iconSlotHeight: number;
   iconSize: number;
+  labelFontSize: number;
+  labelLineHeight: number;
+  labelGap: number;
+  activeColor: string;
+  inactiveColor: string;
+  /** A small dot on the icon (Feed while there are unseen posts), with what it means for a screen reader. */
+  dot?: { color: string; ring: string; label: string };
 }) => {
   const scale = useSharedValue(1);
   const reducedMotion = useReducedMotion();
@@ -130,55 +86,69 @@ const TabButton = ({
       onPress={handlePress}
       activeOpacity={1}
       accessibilityRole="tab"
-      accessibilityLabel={tab.label}
+      accessibilityLabel={dot ? dot.label : tab.label}
       accessibilityState={{ selected: isFocused }}
       style={styles.tabButton}
     >
-      <View style={styles.tabContent}>
-        <Animated.View style={animatedStyle}>
-          <View
-            style={[
-              styles.iconContainer,
-              {
-                width: iconSlot,
-                height: iconSlotHeight,
-                borderRadius: ACTIVE_RADIUS,
-              },
-            ]}
-          >
-            <Image
-              source={tab.icon}
-              style={{ width: iconSize, height: iconSize }}
-              contentFit="contain"
+      <Animated.View style={[styles.tabContent, animatedStyle]}>
+        <View style={{ width: iconSize, height: iconSize }}>
+          <Image
+            source={tab.icon}
+            style={{ width: iconSize, height: iconSize }}
+            contentFit="contain"
+          />
+          {/* The dot sits over the icon's corner, so the bar's height does not change */}
+          {dot ? (
+            <View
+              pointerEvents="none"
+              accessible={false}
+              style={[
+                styles.dot,
+                { backgroundColor: dot.color, borderColor: dot.ring },
+              ]}
             />
-          </View>
-        </Animated.View>
-      </View>
+          ) : null}
+        </View>
+        {/* Fixed line height and no font scaling keep the bar height equal to the metrics */}
+        <Text
+          numberOfLines={1}
+          allowFontScaling={false}
+          style={[
+            isFocused ? fontFaces.heavy : fontFaces.bold,
+            {
+              marginTop: labelGap,
+              fontSize: labelFontSize,
+              lineHeight: labelLineHeight,
+              color: isFocused ? activeColor : inactiveColor,
+            },
+          ]}
+        >
+          {tab.label}
+        </Text>
+      </Animated.View>
     </TouchableOpacity>
   );
 };
 
 function ModernTabBar({ state, emitter, navigateToTab }: BottomTabBarProps) {
   // Hooks must run before any early return (rules of hooks)
-  const tabBarInset = useTabBarInset();
   const metrics = useTabBarMetrics();
   const { theme } = useTheme();
   const reportTabBarHeight = useTabBarHeightReporter();
-  const [tabsWidth, setTabsWidth] = React.useState(0);
+  const tabsRowRef = React.useRef<React.ComponentRef<typeof View>>(null);
   // Immersive screens (Guide mode) and the soft keyboard hide the bar through
   // the inset provider, so screens and bar always agree about the reserved
   // space — see components/layout/tab-bar-inset.tsx.
   const barVisible = useTabBarVisible();
+  // Unseen posts in the NPC feed: a dot on the Feed tab (0 while the feed is muted)
+  const unseenPosts = useFeedUnseenCount();
   if (!barVisible) return null;
 
   const THEME = theme.palettes.tabBar;
-  // The fade may only cover the band the screens reserve for the bar. A taller
-  // fade washed out the last content row (Discover/Practice descriptions).
-  const fadeHeight = tabBarInset;
-
   const tabs = [
     { name: "index", icon: TAB_ICONS.map, label: "Home" },
-    { name: "community", icon: TAB_ICONS.discovery, label: "Discover" },
+    { name: "quests", icon: TAB_ICONS.quests, label: "Quests" },
+    { name: "community", icon: TAB_ICONS.discovery, label: "Feed" },
     { name: "chat", icon: TAB_ICONS.ai, label: "Guide" },
     { name: "awards", icon: TAB_ICONS.games, label: "Games" },
     { name: "profile", icon: TAB_ICONS.profile, label: "Profile" },
@@ -188,56 +158,31 @@ function ModernTabBar({ state, emitter, navigateToTab }: BottomTabBarProps) {
     console.warn("Tab bar: update TAB_BAR_TAB_COUNT in theme/tab-bar-metrics.ts");
   }
 
-  const activeTabIndex = tabs.findIndex(
-    (tab) => state.routes[state.index]?.name === tab.name,
-  );
-  const rowTabWidth = (tabsWidth > 0 ? tabsWidth : metrics.barWidth) / tabs.length;
-
   return (
     <View pointerEvents="box-none" style={StyleSheet.absoluteFill}>
-      <LinearGradient
-        pointerEvents="none"
-        colors={[withAlpha(THEME.bg, 0), withAlpha(THEME.bg, 0.96)]}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 0, y: 1 }}
-        style={[styles.fade, { height: fadeHeight }]}
-      />
+      {/* Docked: the bar is fixed to the bottom edge and runs the full width; its background
+          continues under the system inset. Screens reserve it through the inset provider. */}
       <View
+        onLayout={(event) =>
+          reportTabBarHeight?.(event.nativeEvent.layout.height - metrics.bottomOffset)
+        }
         style={[
           styles.tabBarLayer,
           {
-            bottom: metrics.bottomOffset,
+            backgroundColor: THEME.bg,
+            borderTopColor: THEME.border,
+            paddingBottom: metrics.bottomOffset,
             paddingHorizontal: metrics.horizontalMargin,
           },
         ]}
       >
         <View
-          onLayout={(event) =>
-            reportTabBarHeight?.(event.nativeEvent.layout.height)
-          }
           style={[
             styles.tabBar,
-            {
-              backgroundColor: THEME.bg,
-              borderColor: THEME.border,
-              shadowColor: THEME.shadow,
-              paddingVertical: metrics.verticalPadding,
-            },
+            { paddingVertical: metrics.verticalPadding },
           ]}
         >
-          <View
-            style={styles.tabsRow}
-            onLayout={(event) => setTabsWidth(event.nativeEvent.layout.width)}
-          >
-          {activeTabIndex !== -1 ? (
-            <TabHighlight
-              index={activeTabIndex}
-              tabWidth={rowTabWidth}
-              slotWidth={metrics.iconSlot}
-              slotHeight={metrics.iconSlotHeight}
-              color={THEME.active}
-            />
-          ) : null}
+          <View ref={tabsRowRef} collapsable={false} style={styles.tabsRow}>
           {tabs.map((tab) => {
             const routeIndex = state.routes.findIndex((r) => r.name === tab.name);
             if (routeIndex === -1) return null;
@@ -262,15 +207,26 @@ function ModernTabBar({ state, emitter, navigateToTab }: BottomTabBarProps) {
                 tab={tab}
                 isFocused={isFocused}
                 onPress={onPress}
-                iconSlot={metrics.iconSlot}
-                iconSlotHeight={metrics.iconSlotHeight}
                 iconSize={metrics.iconSize}
+                labelFontSize={metrics.labelFontSize}
+                labelLineHeight={metrics.labelLineHeight}
+                labelGap={metrics.labelGap}
+                activeColor={THEME.active}
+                inactiveColor={THEME.inactive}
+                dot={
+                  tab.name === "community" && unseenPosts > 0
+                    ? { color: theme.colors.error, ring: THEME.bg, label: "Feed, new posts" }
+                    : undefined
+                }
               />
             );
           })}
           </View>
         </View>
       </View>
+
+      {/* Above the bar and every screen: the XP coins of a quest claim land on the Profile tab */}
+      <ClaimCoinLayer tabsRowRef={tabsRowRef} tabCount={tabs.length} />
     </View>
   );
 }
@@ -294,9 +250,15 @@ export default function TabLayout() {
           }}
         />
         <Tabs.Screen
+          name="quests"
+          options={{
+            title: "Quests",
+          }}
+        />
+        <Tabs.Screen
           name="community"
           options={{
-            title: "Discovery Hub",
+            title: "Feed",
           }}
         />
         <Tabs.Screen
@@ -317,13 +279,6 @@ export default function TabLayout() {
             title: "Profile",
           }}
         />
-        <Tabs.Screen
-          name="leaderboard"
-          options={{
-            href: null,
-            title: "Leaderboard",
-          }}
-        />
       </Tabs>
     </TabBarInsetProvider>
   );
@@ -334,27 +289,16 @@ const styles = StyleSheet.create({
     position: "absolute",
     left: 0,
     right: 0,
+    bottom: 0,
     alignItems: "center",
+    borderTopWidth: TAB_BAR_CONSTANTS.barVerticalBorders,
   },
   tabBar: {
     width: "100%",
     maxWidth: TAB_BAR_CONSTANTS.maxWidth,
     flexDirection: "row",
     alignItems: "center",
-    borderRadius: 34,
-    borderWidth: TAB_BAR_CONSTANTS.barBorderWidth,
-    borderBottomWidth: 5,
     paddingHorizontal: TAB_BAR_CONSTANTS.barPaddingHorizontal,
-    elevation: 16,
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.18,
-    shadowRadius: 16,
-  },
-  fade: {
-    position: "absolute",
-    left: 0,
-    right: 0,
-    bottom: 0,
   },
   tabsRow: {
     flex: 1,
@@ -371,14 +315,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  activeHighlight: {
+  dot: {
     position: "absolute",
-    left: 0,
-    top: 0,
-    borderWidth: ACTIVE_BORDER,
-  },
-  iconContainer: {
-    alignItems: "center",
-    justifyContent: "center",
+    top: -2,
+    right: -4,
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    borderWidth: 2,
   },
 });

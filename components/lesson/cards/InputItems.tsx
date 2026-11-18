@@ -1,7 +1,9 @@
 /** Input-style interactions: fill in the blank, estimate on a slider, and the estimate flavour of predict. */
 
 import { useEffect, useMemo, useState } from "react";
-import { type AccessibilityActionEvent, type GestureResponderEvent, Text, TextInput, View, type LayoutChangeEvent } from "react-native";
+import { FieldInput } from "@/components/ui/field-input";
+import { type AccessibilityActionEvent, type GestureResponderEvent, View, type LayoutChangeEvent } from "react-native";
+import { Text } from "@/components/ui/text";
 
 import { seededShuffle } from "@/content/curriculum/evaluate";
 import { formatEstimate, fractionFromValue, valueFromFraction } from "@/content/curriculum/estimate";
@@ -9,10 +11,10 @@ import type { EstimateItemData, FillItemData, PredictItemData } from "@/content/
 import { Button } from "@/components/ui/button";
 import { createStyles, fontFaces, fontSizes, radius, spacing, useTheme } from "@/theme";
 
-import { FigureView, PromptHeader, TermText, useCardStyles, type InteractionProps } from "./shared";
+import { FigureView, OptionButton, OptionsArea, PromptHeader, TermText, useCardStyles, type InteractionProps, type OptionState } from "./shared";
 
 const useStyles = createStyles((theme) => ({
-  // The fill page: the statement is the star of it, big and in the middle of the room.
+  // The fill page: the statement is the star of it, big, with its answers, in the middle of the room.
   fillRoot: { flexGrow: 1, gap: spacing.lg },
   fillMiddle: { flexGrow: 1, alignItems: "center", justifyContent: "center", gap: spacing["2xl"], paddingVertical: spacing.lg },
   sentence: { ...fontFaces.heavy, fontSize: fontSizes["8xl"], lineHeight: 46, color: theme.colors.text, textAlign: "center" },
@@ -26,16 +28,14 @@ const useStyles = createStyles((theme) => ({
     ...fontFaces.bold,
     minHeight: 56,
     borderRadius: radius.lg,
-    borderWidth: 2,
-    borderColor: theme.colors.border,
-    backgroundColor: theme.colors.input,
-    color: theme.colors.text,
+    backgroundColor: theme.colors.field,
+    color: theme.colors.fieldText,
     fontSize: fontSizes["4xl"],
     paddingHorizontal: spacing.lg,
     textAlign: "center",
   },
-  inputOk: { borderColor: theme.colors.success, backgroundColor: theme.colors.successSurface },
-  inputBad: { borderColor: theme.colors.error, backgroundColor: theme.colors.errorSurface },
+  inputOk: { backgroundColor: theme.colors.successSurface, color: theme.colors.success },
+  inputBad: { backgroundColor: theme.colors.errorSurface, color: theme.colors.error },
   value: { ...fontFaces.heavy, fontSize: fontSizes["7xl"], color: theme.colors.text, textAlign: "center" },
   track: { height: 56, justifyContent: "center" },
   rail: { height: 12, borderRadius: radius.full, backgroundColor: theme.colors.surfaceStrong },
@@ -81,7 +81,7 @@ export function FillItem({ data, seed, locked, result, onChange, ownerId }: Inte
 
   return (
     <View style={styles.fillRoot}>
-      <PromptHeader ownerId={ownerId} text="Fill in the blank." />
+      <PromptHeader ownerId={ownerId} text={data.mode === "bank" ? "Pick the word that fits" : "Type the missing number"} />
       <View style={styles.fillMiddle}>
       <Text style={styles.sentence} accessibilityLabel={data.prompt.replace("___", "blank")}>
         {before}
@@ -92,20 +92,19 @@ export function FillItem({ data, seed, locked, result, onChange, ownerId }: Inte
         <View style={styles.bank}>
           {bank.map((b) => {
             const isPicked = picked === b.id;
-            const variant = locked ? (b.id === data.answer ? "success" : isPicked ? "destructive" : "secondary") : isPicked ? "primary" : "secondary";
-            return <Button key={b.id} label={b.label} fullWidth={false} variant={variant} onPress={() => (locked ? undefined : setPicked(b.id))} />;
+            const state: OptionState = locked ? (b.id === data.answer ? "correct" : isPicked ? "wrong" : "dim") : isPicked ? "selected" : "idle";
+            return <OptionButton key={b.id} label={b.label} state={state} fullWidth={false} disabled={locked} onPress={() => setPicked(b.id)} />;
           })}
         </View>
       ) : (
         <View style={{ alignSelf: "stretch" }}>
-          <TextInput
+          <FieldInput
             value={typed}
             editable={!locked}
             onChangeText={setTyped}
             keyboardType="numeric"
             inputMode="decimal"
             placeholder="Type a number"
-            placeholderTextColor={theme.colors.textFaint}
             accessibilityLabel="Your answer"
             style={[styles.input, locked && (result?.correct ? styles.inputOk : styles.inputBad)]}
           />
@@ -208,6 +207,7 @@ export function EstimateItem({ data, locked, onChange, ownerId }: InteractionPro
     <View style={card.stack}>
       <PromptHeader ownerId={ownerId} text={data.prompt} />
       {data.figure ? <FigureView figure={data.figure} /> : null}
+      <OptionsArea>
       <EstimateSlider
         range={{ min: data.min, max: data.max, scale: data.scale, step: data.step }}
         unit={data.unit}
@@ -215,6 +215,7 @@ export function EstimateItem({ data, locked, onChange, ownerId }: InteractionPro
         marker={data.answer}
         onValue={(value) => onChange({ type: "estimate", value })}
       />
+      </OptionsArea>
     </View>
   );
 }
@@ -224,7 +225,8 @@ export function PredictEstimateItem({ data, locked, onChange, ownerId }: Interac
   const card = useCardStyles(theme);
   return (
     <View style={card.stack}>
-      <PromptHeader ownerId={ownerId} text={data.prompt} hint="There is no wrong answer here. Your guess is not scored." />
+      <PromptHeader ownerId={ownerId} text={data.prompt} hint="Your guess, not scored" />
+      <OptionsArea>
       <EstimateSlider
         range={{ min: data.min ?? 0, max: data.max ?? 100, scale: data.scale, step: data.step }}
         unit={data.unit}
@@ -232,6 +234,7 @@ export function PredictEstimateItem({ data, locked, onChange, ownerId }: Interac
         onValue={(value) => onChange({ type: "predict", value })}
       />
       {data.explanation && locked ? <TermText text={data.explanation} style={card.hint} /> : null}
+      </OptionsArea>
     </View>
   );
 }

@@ -148,15 +148,23 @@ export const NPC_ROSTER: NpcRow[] = [
 
 /**
  * Voice lines. Plain text, 20 words or fewer, no fact that is not in the lesson (rule R3).
- * Only Unit 1 is authored today, so only Ada has lines; the others get theirs with their units.
+ * Units 1 and 2 are authored, so Ada and Hal have lines; the others get theirs with their units.
  */
 export const NPC_LINES: NpcLineRow[] = [
   { id: "line-ada-meet", npcId: "npc-ada", kind: "meet", text: "Hi, I'm Ada! Let's find out what everything is made of.", pose: "greet" },
   { id: "line-ada-sign-off", npcId: "npc-ada", kind: "sign_off", text: "Nice work. You now know what is inside an atom.", pose: "proud" },
   { id: "line-ada-intro-atoms-are-everywhere", npcId: "npc-ada", kind: "lesson_intro", lessonId: "atoms-are-everywhere", text: "Today you'll see what everything around you is made of, and how small an atom really is.", pose: "greet" },
   { id: "line-ada-intro-protons-neutrons-electrons", npcId: "npc-ada", kind: "lesson_intro", lessonId: "protons-neutrons-electrons", text: "We'll open up an atom and meet its three particles. You'll learn what each one does.", pose: "explain" },
-  { id: "line-ada-intro-elements-and-the-periodic-table", npcId: "npc-ada", kind: "lesson_intro", lessonId: "elements-and-the-periodic-table", text: "You'll learn the one number that decides an element, then find it on the periodic table.", pose: "point" },
-  { id: "line-ada-intro-isotopes", npcId: "npc-ada", kind: "lesson_intro", lessonId: "isotopes", text: "Atoms of one element can differ a little. You'll learn what isotopes are and how to read them.", pose: "explain" },
-  { id: "line-ada-intro-stable-and-unstable-nuclei", npcId: "npc-ada", kind: "lesson_intro", lessonId: "stable-and-unstable-nuclei", text: "You'll see what holds a nucleus together, and why some nuclei still change over time.", pose: "think" },
+  { id: "line-ada-intro-elements-and-the-periodic-table", npcId: "npc-ada", kind: "lesson_intro", lessonId: "elements-and-the-periodic-table", text: "The number of protons tells you which element an atom is. Let's build some.", pose: "point" },
+  { id: "line-ada-intro-isotopes", npcId: "npc-ada", kind: "lesson_intro", lessonId: "isotopes", text: "Atoms of one element can differ a little. You'll learn what isotopes are.", pose: "explain" },
+  { id: "line-ada-intro-stable-and-unstable-nuclei", npcId: "npc-ada", kind: "lesson_intro", lessonId: "stable-and-unstable-nuclei", text: "Some nuclei stay the same and some can change. You'll see why that matters.", pose: "think" },
   { id: "line-ada-tease", npcId: "npc-ada", kind: "tease", text: "Finish my unit first, and I'll show you the rest.", pose: "idle" },
+  { id: "line-hal-meet", npcId: "npc-hal", kind: "meet", text: "I'm Hal. Take your time. We'll watch how some atoms change, slowly and exactly.", pose: "greet" },
+  { id: "line-hal-sign-off", npcId: "npc-hal", kind: "sign_off", text: "Well done. Radioactivity is a natural part of the world, and now you know how it works.", pose: "proud" },
+  { id: "line-hal-intro-why-nuclei-decay", npcId: "npc-hal", kind: "lesson_intro", lessonId: "why-nuclei-decay", text: "Some nuclei change all by themselves, and nobody can say when. Let's find out why.", pose: "explain" },
+  { id: "line-hal-intro-alpha-beta-gamma", npcId: "npc-hal", kind: "lesson_intro", lessonId: "alpha-beta-gamma", text: "When a nucleus changes, something comes out. Let's meet the three things it can be.", pose: "point" },
+  { id: "line-hal-intro-half-life", npcId: "npc-hal", kind: "lesson_intro", lessonId: "half-life", text: "My pocket watch ticks for a whole crowd of atoms, not for one. Let's see how.", pose: "think" },
+  { id: "line-hal-intro-decay-chains", npcId: "npc-hal", kind: "lesson_intro", lessonId: "decay-chains", text: "One change is not always the end. Let's follow a nucleus all the way down.", pose: "explain" },
+  { id: "line-hal-intro-radioactivity-is-natural", npcId: "npc-hal", kind: "lesson_intro", lessonId: "radioactivity-is-natural", text: "Here is something nobody expects: radioactivity was always here. Let's find where.", pose: "greet" },
+  { id: "line-hal-tease", npcId: "npc-hal", kind: "tease", text: "Finish my unit first. There is more to learn about what radiation does.", pose: "idle" },
 ];

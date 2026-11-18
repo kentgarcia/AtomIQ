@@ -4,7 +4,8 @@
  * the teacher's bubbles carry no name. Reduced motion shows a still teacher.
  */
 
-import { ScrollView, Text, View } from "react-native";
+import { ScrollView, View } from "react-native";
+import { Text } from "@/components/ui/text";
 import Animated, { FadeInDown, useReducedMotion } from "react-native-reanimated";
 
 import { PressableIconButton, useBottomInset } from "@/components/layout";

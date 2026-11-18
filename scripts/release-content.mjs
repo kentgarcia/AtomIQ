@@ -8,12 +8,12 @@
  *   npm run release:content -- --restore 1.3.2      # load a past release into the master as a draft
  *   npm run release:content -- --record-update <eas-update-group-id> [--version 1.4.0]
  *
- * Publishing validates (strict review), typechecks, checks icons, takes a
+ * Publishing validates (strict: references must be verified), typechecks, checks icons, takes a
  * pre-publish backup, then writes the snapshot, archive, ledger entry, bundle
  * and CONTENT_DB_VERSION. It prints the git and `eas update` commands; running
  * them stays a deliberate human step.
  *
- * --allow-unreviewed skips the "every article/post is reviewed" part of the gate
+ * --allow-unreviewed skips the "every content reference is verified" part of the gate
  * (everything else still applies). The release entry records that it was used.
  */
 import { makePaths } from "./lib/content-paths.mjs";

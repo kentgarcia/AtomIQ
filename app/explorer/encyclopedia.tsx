@@ -1,12 +1,15 @@
+import { BandCard, BandCircle, LipCard } from "@/components/community/BandCard";
+import { FieldInput } from "@/components/ui/field-input";
 import { Icon } from "@/components/ui/icon";
 import { getAllEncyclopediaEntries } from "@/content/explorer";
 import type { EncyclopediaEntry } from "@/content/explorer";
 import { getEncyclopediaImage } from "@/content/explorer/images";
-import { useTheme, type Theme, fontFaces, useResponsiveLayout, withAlpha } from "@/theme";
+import { createStyles, fontFaces, useResponsiveLayout, useTheme, withAlpha } from "@/theme";
 import { Image as ExpoImage } from "expo-image";
 import { useRouter } from "expo-router";
 import React, { useEffect, useMemo, useState } from "react";
-import { Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { Image, ScrollView, TouchableOpacity, View } from "react-native";
+import { Text } from "@/components/ui/text";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -27,8 +30,6 @@ const CATS: Record<string, VaultCat> = {
 };
 const getCat = (c: string) => CATS[c?.toLowerCase()] ?? CATS.default;
 
-const AMBER_DEEP = "#EA580C";
-
 export default function EncyclopediaScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
@@ -36,7 +37,7 @@ export default function EncyclopediaScreen() {
   const { theme, isDark } = useTheme();
   const bgTop = theme.colors.background;
 
-  const styles = useMemo(() => makeStyles(theme), [theme]);
+  const styles = makeStyles(theme);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
@@ -93,32 +94,20 @@ export default function EncyclopediaScreen() {
           },
         ]}
       >
-        <View style={styles.headerBar}>
-          <View style={styles.headerRow}>
-            <TouchableOpacity
-              style={styles.backBtn}
-              onPress={() => router.back()}
-              activeOpacity={0.9}
-              hitSlop={5}
-              accessibilityRole="button"
-              accessibilityLabel="Go back"
-            >
-              <Icon name="ArrowLeft2" size={20} color={theme.colors.text} variant="Bold" />
-            </TouchableOpacity>
-            <View style={styles.headerCopy}>
-              <Text style={styles.headerTitle}>Explorer Vault</Text>
-              <Text style={styles.headerSub}>
-                {hasFilter ? `${filteredEntries.length} results` : `${allEntries.length} terms · Encarta-style archive`}
-              </Text>
-            </View>
-          </View>
+        <BandCard
+          title="Explorer Vault"
+          left={<BandCircle icon="ArrowLeft2" onPress={() => router.back()} label="Go back" />}
+          bodyStyle={styles.headerBody}
+        >
+          <Text style={styles.headerSub}>
+            {hasFilter ? `${filteredEntries.length} results` : `${allEntries.length} terms · Encarta-style archive`}
+          </Text>
 
           <View style={styles.searchCard}>
-            <Icon name="SearchNormal" size={18} color={theme.colors.textMuted} variant="Bold" />
-            <TextInput
+            <Icon name="SearchNormal" size={18} color={theme.colors.primary} variant="Bold" />
+            <FieldInput
               style={styles.searchInput}
               placeholder="Search terms, definitions, facts…"
-              placeholderTextColor={theme.colors.textMuted}
               value={searchQuery}
               onChangeText={setSearchQuery}
             />
@@ -133,9 +122,7 @@ export default function EncyclopediaScreen() {
               </TouchableOpacity>
             )}
           </View>
-        </View>
 
-        <View style={styles.pillsRow}>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.pillsContent}>
             <TouchableOpacity
               style={[styles.pill, !selectedCategory && styles.pillActive]}
@@ -162,7 +149,7 @@ export default function EncyclopediaScreen() {
               );
             })}
           </ScrollView>
-        </View>
+        </BandCard>
       </View>
 
       <ScrollView
@@ -179,21 +166,20 @@ export default function EncyclopediaScreen() {
         showsVerticalScrollIndicator={false}
       >
         {filteredEntries.length === 0 ? (
-          <View style={styles.empty}>
+          <BandCard title="No entries found" right={<BandCircle icon="SearchNormal" />} bodyStyle={styles.emptyBody}>
             <ExpoImage source={require("@/assets/images/mascot/blink.png")} style={styles.emptyMascot} contentFit="contain" />
-            <Text style={styles.emptyTitle}>No entries found</Text>
             <Text style={styles.emptySub}>Try a different search term or archive</Text>
-          </View>
+          </BandCard>
         ) : (
           filteredEntries.map((entry, index) => {
             const cfg = getCat(entry.category);
             const thumb = entry.image ? getEncyclopediaImage(entry.id) : null;
             return (
               <Animated.View key={entry.id} entering={FadeInDown.delay(index * 24).duration(260)}>
-                <TouchableOpacity
-                  activeOpacity={0.86}
-                  style={styles.card}
+                <LipCard
+                  faceStyle={styles.card}
                   onPress={() => router.push(`/explorer/encyclopedia-entry?id=${entry.id}`)}
+                  accessibilityLabel={`${entry.term}. ${cfg.label}. ${entry.definition}`}
                 >
                   {thumb ? (
                     <Image source={thumb} style={styles.thumb} resizeMode="cover" />
@@ -217,16 +203,16 @@ export default function EncyclopediaScreen() {
                     </Text>
                     {entry.quickFacts.length > 0 && (
                       <View style={styles.factsRow}>
-                        <Icon name="Flash" size={11} color="#F59E0B" variant="Bold" />
+                        <Icon name="Flash" size={11} color={theme.colors.warning} variant="Bold" />
                         <Text style={styles.factsText}>{entry.quickFacts.length} quick facts</Text>
                         {entry.debunkingSnippet && <Text style={styles.mythDot}>· Myth busted</Text>}
                       </View>
                     )}
                   </View>
                   <View style={styles.go}>
-                    <Icon name="ArrowRight2" size={16} color={theme.colors.textFaint} variant="Bold" />
+                    <Icon name="ArrowRight2" size={16} color={theme.colors.onPrimary} variant="Bold" />
                   </View>
-                </TouchableOpacity>
+                </LipCard>
               </Animated.View>
             );
           })
@@ -239,98 +225,43 @@ export default function EncyclopediaScreen() {
   );
 }
 
-const makeStyles = (theme: Theme) => {
+const makeStyles = createStyles((theme) => {
   const c = theme.colors;
-  return StyleSheet.create({
+  return {
     container: { flex: 1 },
     headerWrap: { paddingHorizontal: 16, paddingBottom: 8, gap: 10 },
-    headerBar: {
-      backgroundColor: c.card,
-      borderRadius: 26,
-      padding: 12,
-      gap: 12,
-      borderWidth: 2,
-      borderColor: c.border,
-      borderBottomWidth: 4,
-      elevation: 4,
-      shadowColor: c.shadow,
-      shadowOffset: { width: 0, height: 3 },
-      shadowOpacity: 0.1,
-      shadowRadius: 8,
-    },
-    headerRow: { flexDirection: "row", alignItems: "center", gap: 12 },
-    backBtn: {
-      width: 38,
-      height: 38,
-      borderRadius: 19,
-      backgroundColor: c.card,
-      alignItems: "center",
-      justifyContent: "center",
-      borderWidth: 2,
-      borderColor: c.border,
-      borderBottomWidth: 4,
-    },
-    headerCopy: { flex: 1 },
-    headerTitle: { fontSize: 18, ...fontFaces.heavy, color: theme.colors.text, letterSpacing: -0.3 },
-    headerSub: { fontSize: 12, ...fontFaces.semibold, color: c.textMuted, marginTop: 1 },
-    mascot: { width: 42, height: 42 },
+    headerBody: { gap: 12 },
+    headerSub: { fontSize: 13, ...fontFaces.semibold, color: c.textMuted },
     searchCard: {
       flexDirection: "row",
       alignItems: "center",
-      backgroundColor: c.card,
-      borderRadius: 20,
+      backgroundColor: c.field,
+      borderRadius: 16,
+      minHeight: 56,
       paddingHorizontal: 14,
       paddingVertical: 11,
       gap: 10,
-      borderWidth: 2,
-      borderColor: c.border,
-      borderBottomWidth: 4,
     },
-    searchInput: { flex: 1, fontSize: 14, ...fontFaces.semibold, color: c.text, paddingVertical: 0 },
-    pillsRow: {},
-    pillsContent: { gap: 8, paddingHorizontal: 4, paddingVertical: 2 },
+    searchInput: { flex: 1, fontSize: 14, ...fontFaces.semibold, color: c.fieldText, paddingVertical: 0 },
+    pillsContent: { gap: 8, paddingVertical: 2 },
     pill: {
       flexDirection: "row",
       alignItems: "center",
       gap: 6,
-      backgroundColor: c.card,
+      backgroundColor: c.surfaceSoft,
       paddingHorizontal: 14,
       paddingVertical: 9,
       borderRadius: 20,
       borderWidth: 2,
-      borderColor: c.borderSubtle,
+      borderColor: c.surfaceSoft,
     },
-    pillActive: { backgroundColor: AMBER_DEEP, borderColor: "#C2410C" },
-    pillEmoji: { fontSize: 12 },
+    pillActive: { backgroundColor: c.primary, borderColor: c.primaryDark },
     pillText: { fontSize: 13, ...fontFaces.bold, color: c.textSecondary },
     pillTextActive: { color: c.onPrimary },
-    scrollContent: { paddingHorizontal: 16, paddingTop: 8, paddingBottom: 40, gap: 10 },
-    card: {
-      flexDirection: "row",
-      alignItems: "center",
-      backgroundColor: c.card,
-      borderRadius: 20,
-      padding: 12,
-      gap: 12,
-      borderWidth: 2,
-      borderColor: c.borderSubtle,
-      borderBottomWidth: 4,
-      elevation: 2,
-      shadowColor: c.shadow,
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.05,
-      shadowRadius: 6,
-    },
+    scrollContent: { paddingHorizontal: 16, paddingTop: 8, paddingBottom: 40, gap: 12 },
+    card: { flexDirection: "row", alignItems: "center", backgroundColor: c.card, padding: 12, gap: 12 },
     thumb: { width: 56, height: 56, borderRadius: 14, backgroundColor: c.surfaceSoft },
-    thumbFallback: {
-      width: 56,
-      height: 56,
-      borderRadius: 14,
-      alignItems: "center",
-      justifyContent: "center",
-      borderWidth: 2,
-      gap: 1,
-    },
+    thumbFallback: { width: 56, height: 56, borderRadius: 14, alignItems: "center", justifyContent: "center", borderWidth: 2, gap: 1 },
     thumbIcon: { fontSize: 14 },
     thumbLetter: { fontSize: 13, ...fontFaces.heavy },
     cardMain: { flex: 1, gap: 4 },
@@ -340,14 +271,13 @@ const makeStyles = (theme: Theme) => {
     catPillText: { fontSize: 10, ...fontFaces.heavy, textTransform: "uppercase" },
     def: { fontSize: 13, ...fontFaces.medium, color: c.textMuted, lineHeight: 18 },
     factsRow: { flexDirection: "row", alignItems: "center", gap: 6, marginTop: 2 },
-    factsText: { fontSize: 11, ...fontFaces.heavy, color: "#92400E" },
-    mythDot: { fontSize: 11, ...fontFaces.bold, color: "#DC2626" },
-    go: { width: 28, height: 28, borderRadius: 14, backgroundColor: c.surfaceSoft, alignItems: "center", justifyContent: "center" },
-    empty: { alignItems: "center", justifyContent: "center", paddingVertical: 48, gap: 8, backgroundColor: c.card, borderRadius: 22, borderWidth: 2, borderColor: c.borderSubtle },
+    factsText: { fontSize: 11, ...fontFaces.heavy, color: c.warningDark },
+    mythDot: { fontSize: 11, ...fontFaces.bold, color: c.error },
+    go: { width: 28, height: 28, borderRadius: 14, backgroundColor: c.primary, alignItems: "center", justifyContent: "center" },
+    emptyBody: { alignItems: "center", gap: 8, paddingVertical: 24 },
     emptyMascot: { width: 90, height: 90 },
-    emptyTitle: { fontSize: 16, ...fontFaces.heavy, color: c.text },
-    emptySub: { fontSize: 13, ...fontFaces.medium, color: c.textFaint },
+    emptySub: { fontSize: 13, ...fontFaces.medium, color: c.textMuted },
     footer: { alignItems: "center", paddingVertical: 12 },
     footerText: { fontSize: 11, ...fontFaces.heavy, color: c.textFaint, textTransform: "uppercase", letterSpacing: 0.6 },
-  });
-};
+  };
+});

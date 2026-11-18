@@ -1,6 +1,8 @@
+import { AchievementBadge } from '@/components/achievements/AchievementBadge';
 import { PageHeader } from '@/components/ui/page-header';
 import { Icon } from '@/components/ui/icon';
-import { useStorage } from '@/services/StorageContext';
+import { useAchievementValues } from '@/hooks/use-achievement-values';
+import { achievementById, achievementValue, progressFor } from '@/services/achievements-core';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useMemo } from 'react';
@@ -8,66 +10,7 @@ import { ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { FadeIn, FadeInDown, useReducedMotion } from 'react-native-reanimated';
 
-import {createStyles, useTheme, AchievementPalette, fontFaces, useResponsiveLayout, withAlpha} from "@/theme";
-
-// Achievement thresholds - same as profile
-export const ACHIEVEMENTS = [
-  { 
-    id: 1, 
-    title: 'First Steps', 
-    requirement: 'Complete 1 lesson', 
-    threshold: 1, 
-    field: 'lessons_completed', 
-    icon: 'Award', 
-    color: '#FFC800',
-    description: 'Congratulations on taking your first step into the world of nuclear science! Complete your first lesson to unlock this achievement.',
-    tips: ['Start with Lesson 1: Meet the Atom', 'Read through the content carefully', 'Complete the lesson to earn XP']
-  },
-  { 
-    id: 2, 
-    title: 'Myth Buster', 
-    requirement: 'Bust 10 myths', 
-    threshold: 10, 
-    field: 'myths_busted', 
-    icon: 'TickCircle', 
-    color: AchievementPalette.green,
-    description: 'You\'re becoming an expert at separating fact from fiction! Bust 10 myths in the Myth Buster game to earn this achievement.',
-    tips: ['Play the Myth Buster game regularly', 'Read each myth carefully', 'Use your knowledge to identify false statements']
-  },
-  { 
-    id: 3, 
-    title: 'On Fire', 
-    requirement: 'Reach a 7 day streak', 
-    threshold: 7, 
-    field: 'longest_streak', 
-    icon: 'Flash', 
-    color: '#EA580C',
-    description: 'You\'re on fire! Reach a 7-day learning streak to show your dedication to mastering nuclear science.',
-    tips: ['Log in daily to maintain your streak', 'Open the app once a day — that alone counts', 'Don\'t break the chain!']
-  },
-  { 
-    id: 4, 
-    title: 'XP Master', 
-    requirement: 'Earn 1000 XP', 
-    threshold: 1000, 
-    field: 'total_xp', 
-    icon: 'Star', 
-    color: '#1CB0F6',
-    description: 'A true master of learning! Accumulate 1000 experience points through lessons, quizzes, and activities.',
-    tips: ['Complete lessons to earn XP', 'Take quizzes to boost your score', 'Participate in all activities']
-  },
-  { 
-    id: 5, 
-    title: 'Dedicated', 
-    requirement: '30 day streak', 
-    threshold: 30, 
-    field: 'longest_streak', 
-    icon: 'Crown', 
-    color: '#FFD700',
-    description: 'The ultimate dedication badge! Maintain a 30-day learning streak to prove your commitment to nuclear science education.',
-    tips: ['Consistency is key', 'Set a daily reminder', 'Make learning a daily habit']
-  },
-];
+import {createStyles, useTheme, fontFaces, useResponsiveLayout, withAlpha} from "@/theme";
 
 export default function AchievementDetailScreen() {
   const router = useRouter();
@@ -77,24 +20,14 @@ export default function AchievementDetailScreen() {
   const accent = theme.palettes.achievements.primary;
   const styles = useMemo(() => makeStyles(theme), [theme]);
   const { achievementId } = useLocalSearchParams<{ achievementId: string }>();
-  const { userProfile } = useStorage();
+  const values = useAchievementValues();
   const reducedMotion = useReducedMotion();
 
   const achievement = useMemo(() => {
-    const ach = ACHIEVEMENTS.find(a => a.id === parseInt(achievementId || '0'));
-    if (!ach || !userProfile) return null;
-
-    const currentValue = (userProfile as any)[ach.field] || 0;
-    const locked = currentValue < ach.threshold;
-    const progress = Math.min((currentValue / ach.threshold) * 100, 100);
-
-    return {
-      ...ach,
-      locked,
-      progress,
-      currentValue
-    };
-  }, [achievementId, userProfile]);
+    const track = achievementById(parseInt(achievementId || '0', 10));
+    if (!track || !values) return null;
+    return { track, progress: progressFor(track, achievementValue(track, values)) };
+  }, [achievementId, values]);
 
   if (!achievement) {
     return (
@@ -106,6 +39,10 @@ export default function AchievementDetailScreen() {
       </View>
     );
   }
+
+  const { track, progress } = achievement;
+  const goal = progress.next === null ? 'You reached the top level!' : track.requirement(progress.next);
+  const levelText = progress.earned ? `Level ${progress.level} of ${progress.maxLevel}` : 'Not started yet';
 
   return (
     <View style={styles.container}>
@@ -119,46 +56,26 @@ export default function AchievementDetailScreen() {
         ]}
         showsVerticalScrollIndicator={false}
       >
-        {/* Achievement Icon Card */}
+        {/* Current badge */}
         <Animated.View 
           entering={reducedMotion ? FadeIn.duration(120) : FadeInDown.delay(100).springify()}
           style={styles.iconCard}
         >
           <LinearGradient
-            colors={(achievement.locked 
-              ? [theme.colors.surfaceSoft, theme.colors.surfaceRaised]
-              : [achievement.color + '30', achievement.color + '15']) as readonly [string, string]
+            colors={(progress.earned
+              ? [withAlpha(accent, 0.19), withAlpha(accent, 0.08)]
+              : [theme.colors.surfaceSoft, theme.colors.surfaceRaised]) as readonly [string, string]
             }
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={styles.iconCardGradient}
           >
-            <View style={[
-              styles.largeIconCircle,
-              achievement.locked && styles.largeIconCircleLocked,
-              { borderColor: achievement.color }
-            ]}>
-              {achievement.locked ? (
-                <Icon 
-                  name="Lock1" 
-                  size={64} 
-                  color={theme.colors.textFaint}
-                  variant="Bold" 
-                />
-              ) : (
-                <Icon 
-                  name={achievement.icon as any} 
-                  size={72} 
-                  color={achievement.color} 
-                  variant="Bold" 
-                />
-              )}
-            </View>
-            {!achievement.locked && (
-              <View style={styles.largeBadge}>
-                <Icon name="TickCircle" size={28} color={theme.colors.success} variant="Bold" />
+            <AchievementBadge track={track} level={progress.badgeLevel} size={160} earned={progress.earned} />
+            {progress.earned ? (
+              <View style={styles.levelPill}>
+                <Text style={styles.levelPillText}>Level {progress.level}</Text>
               </View>
-            )}
+            ) : null}
           </LinearGradient>
         </Animated.View>
 
@@ -167,18 +84,11 @@ export default function AchievementDetailScreen() {
           entering={reducedMotion ? FadeIn.duration(120) : FadeInDown.delay(200).springify()}
           style={styles.infoCard}
         >
-          <Text style={[
-            styles.achievementTitle,
-            achievement.locked && styles.achievementTitleLocked
-          ]}>
-            {achievement.title}
+          <Text style={[styles.achievementTitle, !progress.earned && styles.achievementTitleLocked]}>
+            {track.title}
           </Text>
-          <Text style={styles.achievementRequirement}>
-            {achievement.requirement}
-          </Text>
-          <Text style={styles.achievementDescription}>
-            {achievement.description}
-          </Text>
+          <Text style={styles.achievementRequirement}>{levelText}</Text>
+          <Text style={styles.achievementDescription}>{track.description}</Text>
         </Animated.View>
 
         {/* Progress Card */}
@@ -187,48 +97,69 @@ export default function AchievementDetailScreen() {
           style={styles.progressCard}
         >
           <View style={styles.progressHeader}>
-            <Text style={styles.progressLabel}>Progress</Text>
-            <Text style={styles.progressPercentage}>
-              {Math.round(achievement.progress)}%
-            </Text>
+            <Text style={styles.progressLabel}>{progress.maxed ? 'Top level' : `Next: ${goal}`}</Text>
+            <Text style={styles.progressPercentage}>{Math.round(progress.ratio * 100)}%</Text>
           </View>
           
           <View style={styles.progressBarLarge}>
             <LinearGradient
-              colors={(achievement.locked 
-                ? [theme.colors.disabled, theme.colors.borderStrong]
-                : [achievement.color, achievement.color + 'CC']) as readonly [string, string]
+              colors={(progress.maxed
+                ? [theme.colors.success, theme.colors.success]
+                : [accent, withAlpha(accent, 0.8)]) as readonly [string, string]
               }
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
-              style={[
-                styles.progressFillLarge,
-                { width: `${achievement.progress}%` }
-              ]}
+              style={[styles.progressFillLarge, { width: `${progress.ratio * 100}%` }]}
             />
           </View>
           
           <View style={styles.progressStats}>
             <View style={styles.progressStat}>
               <Text style={styles.progressStatLabel}>Current</Text>
-              <Text style={[styles.progressStatValue, { color: achievement.color }]}>
-                {achievement.currentValue}
+              <Text style={[styles.progressStatValue, { color: accent }]}>
+                {progress.value.toLocaleString()}
               </Text>
             </View>
             <View style={styles.progressDivider} />
             <View style={styles.progressStat}>
-              <Text style={styles.progressStatLabel}>Target</Text>
+              <Text style={styles.progressStatLabel}>Next level</Text>
               <Text style={styles.progressStatValue}>
-                {achievement.threshold}
+                {progress.next === null ? 'Max' : progress.next.toLocaleString()}
               </Text>
             </View>
             <View style={styles.progressDivider} />
             <View style={styles.progressStat}>
-              <Text style={styles.progressStatLabel}>Remaining</Text>
-              <Text style={[styles.progressStatValue, { color: achievement.locked ? achievement.color : theme.colors.success }]}>
-                {Math.max(0, achievement.threshold - achievement.currentValue)}
+              <Text style={styles.progressStatLabel}>To go</Text>
+              <Text style={[styles.progressStatValue, { color: progress.maxed ? theme.colors.success : accent }]}>
+                {progress.next === null ? 0 : Math.max(0, progress.next - progress.value).toLocaleString()}
               </Text>
             </View>
+          </View>
+        </Animated.View>
+
+        {/* Every level */}
+        <Animated.View
+          entering={reducedMotion ? FadeIn.duration(120) : FadeInDown.delay(350).springify()}
+          style={styles.levelsCard}
+        >
+          <Text style={styles.tipsTitle}>All levels</Text>
+          <View style={styles.levelsGrid}>
+            {track.tiers.map((threshold, index) => {
+              const level = index + 1;
+              const earned = progress.level >= level;
+              return (
+                <View
+                  key={level}
+                  style={styles.levelCell}
+                  accessible
+                  accessibilityLabel={`Level ${level}, ${track.requirement(threshold)}, ${earned ? 'earned' : 'locked'}`}
+                >
+                  <AchievementBadge track={track} level={level} size={64} earned={earned} />
+                  <Text style={[styles.levelCellTitle, !earned && styles.levelCellLocked]}>Lv {level}</Text>
+                  <Text style={styles.levelCellGoal}>{threshold.toLocaleString()}</Text>
+                </View>
+              );
+            })}
           </View>
         </Animated.View>
 
@@ -239,9 +170,9 @@ export default function AchievementDetailScreen() {
         >
           <View style={styles.tipsHeader}>
             <Icon name="InfoCircle" size={20} color={accent} variant="Bold" />
-            <Text style={styles.tipsTitle}>How to Unlock</Text>
+            <Text style={styles.tipsTitle}>How to rank up</Text>
           </View>
-          {achievement.tips.map((tip, index) => (
+          {track.tips.map((tip, index) => (
             <View key={index} style={styles.tipItem}>
               <View style={styles.tipBullet}>
                 <Text style={styles.tipBulletText}>{index + 1}</Text>
@@ -309,38 +240,58 @@ const makeStyles = createStyles((theme) => {
     borderColor: theme.colors.border,
   },
   iconCardGradient: {
-    padding: 40,
+    padding: 32,
+    paddingBottom: 56,
     alignItems: 'center',
     justifyContent: 'center',
     position: 'relative',
   },
-  largeIconCircle: {
-    width: 140,
-    height: 140,
-    borderRadius: 70,
+  levelPill: {
+    position: 'absolute',
+    bottom: 16,
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 12,
     backgroundColor: theme.colors.card,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 4,
-    shadowColor: theme.colors.shadow,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
-    elevation: 5,
-  },
-  largeIconCircleLocked: {
-    backgroundColor: theme.colors.disabled,
+    borderWidth: 2,
     borderColor: theme.colors.border,
   },
-  largeBadge: {
-    position: 'absolute',
-    top: 20,
-    right: 20,
+  levelPillText: {
+    fontSize: 13,
+    ...fontFaces.heavy,
+    color: theme.colors.text,
+  },
+  levelsCard: {
     backgroundColor: theme.colors.card,
     borderRadius: 20,
-    borderWidth: 3,
-    borderColor: theme.colors.success,
-    padding: 4,
+    padding: 24,
+    marginBottom: 16,
+    borderWidth: 2,
+    borderColor: theme.colors.border,
+    gap: 16,
+  },
+  levelsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    rowGap: 16,
+  },
+  levelCell: {
+    width: '25%',
+    alignItems: 'center',
+    gap: 2,
+  },
+  levelCellTitle: {
+    fontSize: 12,
+    ...fontFaces.heavy,
+    color: theme.colors.text,
+  },
+  levelCellLocked: {
+    color: theme.colors.textFaint,
+  },
+  levelCellGoal: {
+    fontSize: 11,
+    ...fontFaces.semibold,
+    color: theme.colors.textMuted,
   },
   infoCard: {
     backgroundColor: theme.colors.card,

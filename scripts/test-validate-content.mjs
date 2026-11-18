@@ -7,9 +7,9 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
+import { DatabaseSync } from "node:sqlite";
 
 import {
-  checkArticle,
   checkOptions,
   checkPlaceholders,
   checkPunctuation,
@@ -19,6 +19,17 @@ import {
   findConflictingDuplicates,
   normalize,
 } from "./lib/content-rules.mjs";
+import { validateFeed, validateFeedData } from "./lib/feed-rules.mjs";
+import {
+  BLOCK_TYPES,
+  FEED_TEXT_MAX,
+  FEED_TRIGGER_KEYS,
+  TEMPLATE_TRIGGER_KEYS,
+  blogWordCount,
+  placeholdersIn,
+  readingMinutes,
+  renderFeedText,
+} from "./lib/feed-vocab.mjs";
 
 const rules = (findings) => findings.map((f) => f.rule);
 const errorRules = (findings) => findings.filter((f) => f.severity === "error").map((f) => f.rule);
@@ -286,67 +297,327 @@ test("normalize strips punctuation and case", () => {
 });
 
 // ---------------------------------------------------------------------------
-// Articles
+// NPC feed and mini blog (docs/NPC_FEED_SPEC.md §6): scripts/lib/feed-rules.mjs, feed-vocab.mjs
 // ---------------------------------------------------------------------------
 
-const goodArticle = () => ({
-  title: "Radiation basics for beginners",
-  excerpt: "A short, plain-language summary of what radiation is and where it comes from.",
-  category: "science",
-  difficulty: "beginner",
-  read_time: 4,
-  author: { name: "AtomIQ Editorial", title: "Educational summary" },
-  published_date: "2026-11-01",
-  source: "International Atomic Energy Agency",
-  source_url: "https://www.iaea.org/",
-  source_type: "international-organization",
-  source_note: "Background reading from the IAEA; this page summarizes ideas in original words.",
-  review_status: "reviewed",
-  reviewed_by: "AtomIQ content team",
-  last_reviewed: "2026-11-10",
-  content: "# Radiation basics\n\nRadiation is energy that travels from a source.",
-  related_lessons: ["types-of-radiation"],
-  related_myths: [],
-  related_concepts: [],
-  related_elements: ["U", "Pu"],
+const NPC_IDS = ["npc-ada", "npc-hal", "npc-ray", "npc-mina", "npc-kofi", "npc-tess"];
+const words = (n) => `${Array(n).fill("atom").join(" ")}.`;
+const piece = (n) => [{ t: "p", text: words(n) }, { t: "next", label: "Keep going", lessonId: "l1" }];
+
+const goodTemplate = (over = {}) => ({
+  id: "ft-test",
+  npc_id: "npc-ada",
+  poster_pool: [],
+  kind: "celebrate",
+  trigger: "lesson_complete",
+  condition: { unitId: "u1" },
+  text: "You finished “{lesson}”. Well done.",
+  chip: "lesson",
+  reactors: [],
+  weight: 1,
+  ...over,
 });
 
-test("a complete article passes", () => {
-  assert.deepEqual(errorRules(checkArticle(goodArticle(), { today: "2026-11-14" })), []);
+const COVERAGE_CONDITION = {
+  lesson_complete: { unitId: "u1" },
+  checkpoint_pass: { unitId: "u1" },
+  unit_complete: { unitId: "u1" },
+  testout_pass: { unitId: "u1" },
+  streak: { days: 3 },
+  chest_opened: {},
+  first_lesson: {},
+  comeback: {},
+  daily_quests_done: {},
+  rank_change: {},
+};
+
+/** One valid template for every template trigger: the coverage rules pass on this set. */
+const coverage = () =>
+  TEMPLATE_TRIGGER_KEYS.map((trigger) => goodTemplate({ id: `ft-${trigger}`, trigger, condition: COVERAGE_CONDITION[trigger], text: "A short valid line.", chip: null }));
+
+const goodPost = (over = {}) => ({
+  id: "b1",
+  npc_id: "npc-ada",
+  unit_id: "u1",
+  lesson_id: "l1",
+  position: 0,
+  title: "The smallest thing",
+  hook: "You have never seen one.",
+  cover: "atom",
+  read_min: readingMinutes(140),
+  unlock: { trigger: "none" },
+  blocks: piece(140),
+  reactors: [],
+  ...over,
+});
+const goodComment = (over = {}) => ({ id: "c1", blog_id: "b1", npc_id: "npc-hal", position: 0, text: "Plain words: a small extra detail.", chip: null, ...over });
+
+const feedData = ({ extraUnits = [], ...over } = {}) => ({
+  units: [{ id: "u1" }, ...extraUnits],
+  lessons: [{ id: "l1", unit_id: "u1" }, { id: "l2", unit_id: "u1" }, { id: "x1", unit_id: "u2" }],
+  npcs: NPC_IDS.map((id) => ({ id })),
+  references: [{ id: "r-ok", verified: 1 }, { id: "r-open", verified: 0 }],
+  entryIds: ["atom"],
+  templates: coverage(),
+  posts: [goodPost(), goodPost({ id: "b2", position: 1, unlock: { trigger: "unit_complete", unitId: "u1" } })],
+  comments: [],
+  blogRefs: [{ blog_id: "b1", reference_id: "r-ok" }, { blog_id: "b2", reference_id: "r-ok" }],
+  ...over,
 });
 
-test("articles missing pipeline metadata fail", () => {
-  const cases = [
-    ["source_url", { source_url: "" }],
-    ["source_url", { source_url: "http://insecure.example.org" }],
-    ["source_url", { source_url: "not a url" }],
-    ["source_type", { source_type: "" }],
-    ["source_type", { source_type: "blog" }],
-    ["review_status", { review_status: "maybe" }],
-    ["last_reviewed", { last_reviewed: "" }],
-    ["last_reviewed", { last_reviewed: "11/10/2026" }],
-    ["published_date", { published_date: "" }],
-    ["source", { source: "" }],
-    ["author", { author: { name: "" } }],
-    ["source_note", { source_note: "" }],
-    ["reviewed_by", { reviewed_by: "" }],
+/** Rules fired at a severity; `only` limits findings to one table. */
+const feedRules = (data, severity = "error", opts) =>
+  validateFeedData(data, opts).findings.filter((f) => f.severity === severity).map((f) => f.rule);
+/** The valid set with one template swapped in for the one that covers the same trigger. */
+const withTemplate = (over) => feedData({ templates: [...coverage().filter((t) => t.trigger !== (over.trigger ?? "lesson_complete")), goodTemplate(over)] });
+/** The valid set with one blog piece (and its source) swapped in; coverage hints are warnings, so they are ignored here. */
+const withPost = (over, extra = {}) => feedData({ posts: [goodPost(over)], blogRefs: [{ blog_id: "b1", reference_id: "r-ok" }], ...extra });
+
+test("feed: a complete, valid set has no findings", () => {
+  const r = validateFeedData(feedData());
+  assert.deepEqual(r.findings, []);
+  assert.deepEqual(r.checked, { feed_templates: coverage().length, blog_posts: 2, blog_comments: 0 });
+});
+
+test("feed vocab: the §5.1 triggers, the §6 block types and the placeholder helpers", () => {
+  assert.deepEqual(FEED_TRIGGER_KEYS, ["lesson_complete", "checkpoint_pass", "unit_complete", "testout_pass", "streak", "chest_opened", "first_lesson", "comeback", "daily_quests_done", "blog_unlocked", "rank_change"]);
+  assert.ok(!TEMPLATE_TRIGGER_KEYS.includes("blog_unlocked"));
+  assert.deepEqual(BLOCK_TYPES, ["p", "h", "quote", "fact", "figure", "list", "next"]);
+  assert.deepEqual(placeholdersIn("Hi {name}, {lesson} and {name}"), ["name", "lesson", "name"]);
+  assert.equal(renderFeedText("{rival} passed {name}", { rival: "Mina", name: "Alex" }), "Mina passed Alex");
+  assert.throws(() => renderFeedText("Hello {bogus}", { bogus: "x" }), /unknown placeholder/);
+  assert.throws(() => renderFeedText("Hello {rival}", {}), /no value for \{rival\}/);
+});
+
+test("feed vocab: word count covers p, quote, fact and list only; reading time is ceil(words / 200)", () => {
+  const blocks = [
+    { t: "p", text: "one two three" },
+    { t: "h", text: "not counted at all" },
+    { t: "quote", text: "four five" },
+    { t: "fact", text: "six" },
+    { t: "figure", ref: "atom", caption: "not counted either" },
+    { t: "list", items: ["seven eight", "nine"] },
+    { t: "next", label: "not counted", lessonId: "l1" },
   ];
-  for (const [field, patch] of cases) {
-    const findings = checkArticle({ ...goodArticle(), ...patch }, { today: "2026-11-14" });
-    assert.ok(findings.some((f) => f.field === field && f.severity === "error"), `expected ${field} error for ${JSON.stringify(patch)}`);
+  assert.equal(blogWordCount(blocks), 9);
+  assert.deepEqual([0, 1, 200, 201, 350].map(readingMinutes), [1, 1, 1, 2, 2]);
+});
+
+test("feed templates: trigger keys", () => {
+  assert.deepEqual(feedRules(withTemplate({ trigger: "lesson_complete" })), []);
+  assert.ok(feedRules(withTemplate({ trigger: "daily_login" })).includes("feed-trigger"));
+  assert.ok(feedRules(withTemplate({ trigger: "blog_unlocked", condition: { blogId: "b1" }, text: "A piece.", chip: null })).includes("feed-trigger"));
+});
+
+test("feed templates: condition fields and values", () => {
+  const ok = (trigger, condition) => feedRules(withTemplate({ trigger, condition, text: "A short line.", chip: null }));
+  assert.deepEqual(ok("lesson_complete", { unitId: "u1", lessonId: "l1", perfect: true }), []);
+  assert.deepEqual(ok("streak", { days: 14 }), []);
+  assert.deepEqual(ok("chest_opened", { period: "weekly" }), []);
+  assert.deepEqual(ok("comeback", { minDays: 3 }), []);
+  assert.deepEqual(ok("rank_change", { direction: "passed_by", npcId: "npc-ray" }), []);
+  assert.ok(ok("lesson_complete", { unitId: "u1", color: "red" }).includes("feed-condition"), "unknown field");
+  assert.ok(ok("lesson_complete", {}).includes("feed-condition"), "unitId is required");
+  assert.ok(ok("lesson_complete", { unitId: "nope" }).includes("feed-condition"), "unit must exist");
+  assert.ok(ok("lesson_complete", { unitId: "u1", lessonId: "x1" }).includes("feed-condition"), "lesson must be in the unit");
+  assert.ok(ok("lesson_complete", { unitId: "u1", perfect: "yes" }).includes("feed-condition"));
+  assert.ok(ok("streak", { days: 5 }).includes("feed-condition"), "only 3, 7, 14, 30, 60, 100");
+  assert.ok(ok("streak", {}).includes("feed-condition"), "days is required");
+  assert.ok(ok("chest_opened", { period: "monthly" }).includes("feed-condition"));
+  assert.ok(ok("comeback", { minDays: 2 }).includes("feed-condition"));
+  assert.ok(ok("rank_change", { direction: "sideways" }).includes("feed-condition"));
+  assert.ok(ok("rank_change", { npcId: "npc-nobody" }).includes("feed-condition"));
+  assert.ok(feedRules(withTemplate({ condition: "not an object" })).includes("feed-condition"));
+});
+
+test("feed templates: placeholders only the trigger supplies", () => {
+  const t = (trigger, text, condition = { unitId: "u1" }) => feedRules(withTemplate({ trigger, text, condition, chip: null }));
+  assert.deepEqual(t("lesson_complete", "Done: {lesson} in {unit}, {name}."), []);
+  assert.ok(t("lesson_complete", "{rival} passed you.").includes("feed-placeholder"));
+  assert.ok(t("lesson_complete", "{days} days.").includes("feed-placeholder"));
+  assert.ok(t("rank_change", "{lesson} is done.", {}).includes("feed-placeholder"));
+  assert.deepEqual(t("rank_change", "{rival} passed {name}.", {}), []);
+  assert.ok(t("streak", "{unit} again.", { days: 3 }).includes("feed-placeholder"));
+  assert.ok(t("lesson_complete", "Done: {lesson.").includes("feed-placeholder"), "unbalanced brace");
+});
+
+test("feed templates: text length and exclamation runs", () => {
+  const t = (text) => feedRules(withTemplate({ text, chip: null }));
+  assert.deepEqual(t("a".repeat(FEED_TEXT_MAX)), []);
+  assert.ok(t("a".repeat(FEED_TEXT_MAX + 1)).includes("feed-text"));
+  assert.ok(t("").includes("feed-text"));
+  assert.deepEqual(t("Well done!"), []);
+  assert.ok(t("Well done!!").includes("feed-text"));
+  assert.ok(t("Yes! Great! Done!").includes("feed-text"), "three exclamation marks read as shouting");
+});
+
+test("feed templates: chips depend on the trigger", () => {
+  assert.deepEqual(feedRules(withTemplate({ chip: "lesson" })), []);
+  assert.deepEqual(feedRules(withTemplate({ chip: null })), []);
+  assert.ok(feedRules(withTemplate({ chip: "ranks" })).includes("feed-chip"), "a lesson post cannot open the ranking");
+  assert.ok(feedRules(withTemplate({ chip: "phone" })).includes("feed-chip"));
+});
+
+test("feed templates: poster, pool and reactors must be NPCs", () => {
+  assert.deepEqual(feedRules(withTemplate({ npc_id: null, poster_pool: ["npc-ray", "npc-mina"] })), []);
+  assert.ok(feedRules(withTemplate({ npc_id: null, poster_pool: [] })).includes("feed-poster"), "needs a poster or a pool");
+  assert.ok(feedRules(withTemplate({ npc_id: "npc-nobody" })).includes("feed-poster"));
+  assert.ok(feedRules(withTemplate({ npc_id: null, poster_pool: ["npc-nobody"] })).includes("feed-poster"));
+  assert.deepEqual(feedRules(withTemplate({ reactors: ["npc-hal"] })), []);
+  assert.ok(feedRules(withTemplate({ reactors: ["npc-nobody"] })).includes("feed-reactors"));
+  assert.ok(feedRules(withTemplate({ reactors: ["npc-ada"] })).includes("feed-reactors"), "the poster cannot react to its own post");
+});
+
+test("feed templates: kind and weight", () => {
+  assert.ok(feedRules(withTemplate({ kind: "gossip" })).includes("feed-kind"));
+  assert.ok(feedRules(withTemplate({ weight: 0 })).includes("feed-weight"));
+  assert.ok(feedRules(withTemplate({ weight: 1.5 })).includes("feed-weight"));
+  assert.deepEqual(feedRules(withTemplate({ kind: "tease", weight: 3 })), []);
+});
+
+test("feed coverage: every unit has lesson_complete and unit_complete, every trigger has a template", () => {
+  assert.deepEqual(feedRules(feedData()), []);
+  const second = feedData({ extraUnits: [{ id: "u2" }] });
+  const gaps = validateFeedData(second).findings.filter((f) => f.rule === "feed-coverage");
+  assert.deepEqual(gaps.map((f) => `${f.table}:${f.id}`).sort(), ["units:u2", "units:u2"]);
+  for (const trigger of TEMPLATE_TRIGGER_KEYS) {
+    const missing = feedData({ templates: coverage().filter((t) => t.trigger !== trigger) });
+    const found = validateFeedData(missing).findings.filter((f) => f.rule === "feed-coverage");
+    assert.ok(found.some((f) => f.field === "trigger" || f.table === "units"), `${trigger} has no template`);
+  }
+  // blog_unlocked needs none.
+  assert.ok(!feedRules(feedData()).includes("feed-coverage"));
+});
+
+test("blog: word count 120 to 350 over p, quote, fact and list blocks", () => {
+  const at = (n, extra = []) => withPost({ blocks: [...piece(n).slice(0, -1), ...extra, piece(n).at(-1)], read_min: readingMinutes(n) });
+  assert.deepEqual(feedRules(at(120)), []);
+  assert.deepEqual(feedRules(at(350)), []);
+  assert.ok(feedRules(at(119)).includes("blog-words"));
+  assert.ok(feedRules(at(351)).includes("blog-words"));
+  // headings, captions and the next label are not counted
+  assert.ok(feedRules(at(100, [{ t: "h", text: words(80) }])).includes("blog-words"));
+  assert.deepEqual(feedRules(at(100, [{ t: "list", items: [words(20), words(5)] }])), []);
+});
+
+test("blog: read_min is computed from the words", () => {
+  assert.deepEqual(feedRules(withPost({ blocks: piece(250), read_min: 2 })), []);
+  assert.ok(feedRules(withPost({ blocks: piece(250), read_min: 1 })).includes("blog-read-min"));
+  assert.ok(feedRules(withPost({ read_min: "2 min" })).includes("blog-read-min"));
+});
+
+test("blog: hook up to 120 characters, title and author", () => {
+  assert.deepEqual(feedRules(withPost({ hook: "h".repeat(120) })), []);
+  assert.ok(feedRules(withPost({ hook: "h".repeat(121) })).includes("blog-hook"));
+  assert.ok(feedRules(withPost({ hook: "" })).includes("blog-hook"));
+  assert.ok(feedRules(withPost({ title: "" })).includes("blog-meta"));
+  assert.ok(feedRules(withPost({ npc_id: "npc-nobody" })).includes("blog-meta"));
+});
+
+test("blog: the cover must be a picture in the lesson art", () => {
+  assert.deepEqual(feedRules(withPost({ cover: "banana" })), []);
+  assert.ok(feedRules(withPost({ cover: "unicorn" })).includes("blog-cover"));
+});
+
+test("blog: unlock points at a real lesson or unit", () => {
+  assert.deepEqual(feedRules(withPost({ unlock: { trigger: "lesson_complete", lessonId: "l2" } })), []);
+  assert.deepEqual(feedRules(withPost({ unlock: { trigger: "unit_complete", unitId: "u1" } })), []);
+  assert.deepEqual(feedRules(withPost({ unlock: { trigger: "streak", days: 7 } })), []);
+  assert.ok(feedRules(withPost({ unlock: { trigger: "lesson_complete", lessonId: "nope" } })).includes("blog-unlock"));
+  assert.ok(feedRules(withPost({ unlock: { trigger: "unit_complete", unitId: "nope" } })).includes("blog-unlock"));
+  assert.ok(feedRules(withPost({ unlock: { trigger: "streak", days: 5 } })).includes("blog-unlock"));
+  assert.ok(feedRules(withPost({ unlock: { trigger: "chest_opened" } })).includes("blog-unlock"));
+  assert.ok(feedRules(withPost({ unlock: null })).includes("blog-unlock"));
+});
+
+test("blog: closes with exactly one next block that points at a lesson or unit", () => {
+  const body = piece(140).slice(0, -1);
+  assert.deepEqual(feedRules(withPost({ blocks: [...body, { t: "next", label: "Go", unitId: "u1" }] })), []);
+  assert.ok(feedRules(withPost({ blocks: body })).includes("blog-next"), "no closing block");
+  assert.ok(feedRules(withPost({ blocks: [{ t: "next", label: "Go", lessonId: "l1" }, ...body] })).includes("blog-next"), "next must be last");
+  assert.ok(feedRules(withPost({ blocks: [...body, { t: "next", label: "Go", lessonId: "l1", unitId: "u1" }] })).includes("blog-blocks"), "one target only");
+  assert.ok(feedRules(withPost({ blocks: [...body, { t: "next", label: "Go", lessonId: "nope" }] })).includes("blog-blocks"));
+  assert.ok(feedRules(withPost({ blocks: [...body, { t: "next", label: "", lessonId: "l1" }] })).includes("blog-blocks"));
+});
+
+test("blog: block types and their fields", () => {
+  const body = piece(140);
+  const withBlock = (b) => withPost({ blocks: [b, ...body] });
+  assert.deepEqual(feedRules(withBlock({ t: "figure", ref: "atom", caption: "An atom." })), []);
+  assert.deepEqual(feedRules(withBlock({ t: "list", items: ["a", "b"] })), []);
+  assert.deepEqual(feedRules(withBlock({ t: "h", text: "A heading" })), []);
+  assert.ok(feedRules(withBlock({ t: "video", src: "x" })).includes("blog-blocks"), "not in the vocabulary");
+  assert.ok(feedRules(withBlock({ t: "figure", ref: "unicorn", caption: "x" })).includes("blog-blocks"));
+  assert.ok(feedRules(withBlock({ t: "figure", ref: "atom" })).includes("blog-blocks"), "caption required");
+  assert.ok(feedRules(withBlock({ t: "list", items: [] })).includes("blog-blocks"));
+  assert.ok(feedRules(withBlock({ t: "p" })).includes("blog-blocks"), "text required");
+  assert.ok(feedRules(withPost({ blocks: [] })).includes("blog-blocks"));
+  assert.ok(feedRules(withBlock({ t: "p", text: "TODO write this" })).includes("placeholder"));
+});
+
+test("blog: sources are warnings in a draft and errors at the publish gate", () => {
+  const refs = (list) => withPost({}, { blogRefs: list.map((reference_id) => ({ blog_id: "b1", reference_id })) });
+  assert.deepEqual(feedRules(refs(["r-ok"]), "error", { strictReview: true }), [], "a verified source passes the gate");
+  assert.deepEqual(feedRules(refs(["r-ok", "r-open"]), "error", { strictReview: true }), [], "one verified source is enough");
+  for (const list of [["r-open"], []]) {
+    assert.deepEqual(feedRules(refs(list), "error"), [], "draft: not an error");
+    assert.ok(feedRules(refs(list), "warning").includes("blog-source"), "draft: a warning");
+    assert.ok(feedRules(refs(list), "error", { strictReview: true }).includes("blog-source"), "publish gate: an error");
   }
 });
 
-test("last_reviewed in the future and bad relations fail", () => {
-  assert.ok(checkArticle({ ...goodArticle(), last_reviewed: "2030-01-01" }, { today: "2026-11-14" }).some((f) => f.field === "last_reviewed"));
-  const lessonIds = new Set(["types-of-radiation"]);
-  assert.ok(checkArticle({ ...goodArticle(), related_lessons: ["nope"] }, { today: "2026-11-14", lessonIds }).some((f) => f.rule === "article-relation"));
-  assert.ok(checkArticle({ ...goodArticle(), related_elements: ["Xx"] }, { today: "2026-11-14" }).some((f) => f.rule === "article-relation"));
+test("blog: related lesson is in its unit, reactors exclude the author, units get a start and an end piece", () => {
+  assert.deepEqual(feedRules(withPost({ lesson_id: "l2" })), []);
+  assert.ok(feedRules(withPost({ lesson_id: "x1" })).includes("blog-unit"));
+  assert.ok(feedRules(withPost({ lesson_id: "nope" })).includes("blog-unit"));
+  assert.ok(feedRules(withPost({ unit_id: "nope", lesson_id: null })).includes("blog-unit"));
+  assert.deepEqual(feedRules(withPost({ reactors: ["npc-hal"] })), []);
+  assert.ok(feedRules(withPost({ reactors: ["npc-ada"] })).includes("blog-reactors"), "the author cannot react");
+  assert.ok(feedRules(withPost({ reactors: ["npc-nobody"] })).includes("blog-reactors"));
+  // a unit with a piece at its start and one at its end is covered; with only one of them it warns
+  assert.deepEqual(feedRules(feedData(), "warning"), []);
+  assert.ok(feedRules(withPost({}), "warning").includes("blog-coverage"), "nothing closes the unit");
+  assert.ok(feedRules(withPost({ unlock: { trigger: "unit_complete", unitId: "u1" } }), "warning").includes("blog-coverage"), "nothing opens the unit");
+  assert.deepEqual(feedRules(withPost({ unlock: { trigger: "lesson_complete", lessonId: "l1" } }, { posts: [goodPost({ unlock: { trigger: "lesson_complete", lessonId: "l1" } }), goodPost({ id: "b2", unlock: { trigger: "unit_complete", unitId: "u1" } })], blogRefs: [{ blog_id: "b1", reference_id: "r-ok" }, { blog_id: "b2", reference_id: "r-ok" }] }), "warning"), [], "a first-lesson piece opens the unit");
 });
 
-test("source material must stay out of the summary body", () => {
-  const withUrl = { ...goodArticle(), content: "Read more at https://www.iaea.org/ for the details." };
-  assert.ok(checkArticle(withUrl, { today: "2026-11-14" }).some((f) => f.rule === "source-separation"));
-  const copyright = { ...goodArticle(), content: "Text copied here. © 2024 Some Publisher" };
-  assert.ok(checkArticle(copyright, { today: "2026-11-14" }).some((f) => f.rule === "source-separation"));
+test("blog comments: up to 4, never the author, one each, 200 characters, real chip targets", () => {
+  const some = (comments) => feedData({ comments });
+  assert.deepEqual(feedRules(some([goodComment()])), []);
+  assert.deepEqual(feedRules(some([])), [], "a piece may have none");
+  assert.deepEqual(feedRules(some([goodComment({ id: "a", npc_id: "npc-hal" }), goodComment({ id: "b", npc_id: "npc-ray" }), goodComment({ id: "c", npc_id: "npc-mina" }), goodComment({ id: "d", npc_id: "npc-kofi" })])), [], "four is the limit");
+  assert.ok(feedRules(some([goodComment({ id: "a", npc_id: "npc-hal" }), goodComment({ id: "b", npc_id: "npc-ray" }), goodComment({ id: "c", npc_id: "npc-mina" }), goodComment({ id: "d", npc_id: "npc-kofi" }), goodComment({ id: "e", npc_id: "npc-tess" })])).includes("blog-comment-count"));
+  assert.ok(feedRules(some([goodComment({ npc_id: "npc-ada" })])).includes("blog-comment-author"));
+  assert.ok(feedRules(some([goodComment({ id: "a" }), goodComment({ id: "b" })])).includes("blog-comment-dup"));
+  assert.deepEqual(feedRules(some([goodComment({ text: "c".repeat(200) })])), []);
+  assert.ok(feedRules(some([goodComment({ text: "c".repeat(201) })])).includes("blog-comment-length"));
+  assert.ok(feedRules(some([goodComment({ text: "" })])).includes("blog-comment"));
+  assert.ok(feedRules(some([goodComment({ npc_id: "npc-nobody" })])).includes("blog-comment"));
+  assert.deepEqual(feedRules(some([goodComment({ chip: { lessonId: "l2" } })])), []);
+  assert.deepEqual(feedRules(some([goodComment({ chip: { entryId: "atom" } })])), []);
+  assert.ok(feedRules(some([goodComment({ chip: { lessonId: "nope" } })])).includes("blog-comment-chip"));
+  assert.ok(feedRules(some([goodComment({ chip: { entryId: "nope" } })])).includes("blog-comment-chip"));
+  assert.ok(feedRules(some([goodComment({ chip: { lessonId: "l1", entryId: "atom" } })])).includes("blog-comment-chip"));
+  assert.ok(feedRules(some([goodComment({ chip: { url: "https://example.org" } })])).includes("blog-comment-chip"));
+  assert.ok(feedRules(some([goodComment({ blog_id: "ghost" })])).includes("blog-comment"));
+});
+
+test("feed findings carry the ids Studio matches to an entity", () => {
+  const f = validateFeedData(feedData({ comments: [goodComment({ npc_id: "npc-ada" })] })).findings.find((x) => x.rule === "blog-comment-author");
+  assert.equal(f.table, "blog_comments");
+  assert.equal(f.id, "b1/c1", "comment findings are <blog id>/<comment id>");
+});
+
+test("the seeded master database validates and covers every unit", () => {
+  const db = new DatabaseSync(new URL("../content/database/content.db", import.meta.url).pathname, { readOnly: true });
+  try {
+    const r = validateFeed(db);
+    assert.deepEqual(r.findings.filter((f) => f.severity === "error").map((f) => `${f.table} ${f.id} ${f.rule}`), []);
+    assert.ok(r.checked.feed_templates >= 40 && r.checked.blog_posts >= 4);
+    // the publish gate only objects to the sources nobody has opened yet
+    const gate = validateFeed(db, { strictReview: true }).findings.filter((f) => f.severity === "error");
+    assert.ok(gate.every((f) => f.rule === "blog-source"));
+  } finally {
+    db.close();
+  }
 });

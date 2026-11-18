@@ -4,9 +4,8 @@
 -- Stores the curriculum (units, objectives, lessons made of cards, the item bank
 -- and references; see "Curriculum v2" below), the standalone Mythbuster question banks used by the atom-maze boss
 -- battles, the Myths and Facts reference resources, the Atom Maze challenges
--- (with nested Rooms and JSON-encoded Monsters + BattleQuestions), the
--- Encyclopedia entries (with JSON-encoded flexible fields), and the Articles
--- + Posts powering the Learn & Explore feed (JSON-encoded author objects).
+-- (with nested Rooms and JSON-encoded Monsters + BattleQuestions) and the
+-- Encyclopedia entries (with JSON-encoded flexible fields).
 --
 -- JSON1 functions are used for validation (json_valid) and optional
 -- querying. better-sqlite3 bundles a JSON1-enabled SQLite build.
@@ -199,6 +198,63 @@ CREATE TABLE IF NOT EXISTS npc_lines (
 CREATE INDEX IF NOT EXISTS idx_npc_lines_npc ON npc_lines(npc_id);
 -- END npcs
 
+-- BEGIN feed
+-- NPC feed and mini blog (docs/NPC_FEED_SPEC.md §6). Values only; the vocabulary (trigger keys, their
+-- condition fields and placeholders, block types) is scripts/lib/feed-vocab.mjs, enforced by
+-- scripts/lib/feed-rules.mjs on validate:content and on Studio saves.
+CREATE TABLE IF NOT EXISTS feed_templates (
+  id          TEXT PRIMARY KEY,              -- 'ft-ada-lesson-1' (shipped id once published)
+  npc_id      TEXT REFERENCES npcs(id),      -- poster; NULL = chosen from poster_pool
+  poster_pool TEXT NOT NULL DEFAULT '[]' CHECK (json_valid(poster_pool)),
+  kind        TEXT NOT NULL CHECK (kind IN ('celebrate','milestone','nudge','tease')),
+  trigger     TEXT NOT NULL,                 -- a trigger key from §5.1 (not blog_unlocked: a blog card's text is the piece's hook)
+  condition   TEXT NOT NULL DEFAULT '{}' CHECK (json_valid(condition)),
+  text        TEXT NOT NULL,                 -- {placeholders}: {lesson} {unit} {days} {rival} {name}
+  chip        TEXT CHECK (chip IN ('lesson','unit','quests','ranks') OR chip IS NULL),
+  reactors    TEXT NOT NULL DEFAULT '[]' CHECK (json_valid(reactors)),  -- npc ids that always react
+  weight      INTEGER NOT NULL DEFAULT 1,
+  created_at  INTEGER NOT NULL DEFAULT (strftime('%s','now')),
+  updated_at  INTEGER NOT NULL DEFAULT (strftime('%s','now'))
+);
+
+CREATE TABLE IF NOT EXISTS blog_posts (
+  id          TEXT PRIMARY KEY,              -- 'blog-the-smallest-thing' (shipped id)
+  npc_id      TEXT NOT NULL REFERENCES npcs(id),   -- author
+  unit_id     TEXT REFERENCES units(id),
+  lesson_id   TEXT REFERENCES lessons(id),
+  position    INTEGER NOT NULL,
+  title       TEXT NOT NULL,
+  hook        TEXT NOT NULL,                 -- one line, shown on the blog card
+  cover       TEXT NOT NULL,                 -- a lesson figure / object id from the existing art
+  read_min    INTEGER NOT NULL,
+  unlock      TEXT NOT NULL DEFAULT '{"trigger":"none"}' CHECK (json_valid(unlock)),
+  blocks      TEXT NOT NULL CHECK (json_valid(blocks)),  -- vocabulary below
+  reactors    TEXT NOT NULL DEFAULT '[]' CHECK (json_valid(reactors)),
+  created_at  INTEGER NOT NULL DEFAULT (strftime('%s','now')),
+  updated_at  INTEGER NOT NULL DEFAULT (strftime('%s','now'))
+);
+
+CREATE TABLE IF NOT EXISTS blog_comments (   -- authored with the piece; a piece may have none
+  id          TEXT PRIMARY KEY,
+  blog_id     TEXT NOT NULL REFERENCES blog_posts(id) ON DELETE CASCADE,
+  npc_id      TEXT NOT NULL REFERENCES npcs(id),   -- commenter, never the author
+  position    INTEGER NOT NULL,
+  text        TEXT NOT NULL,
+  chip        TEXT CHECK (chip IS NULL OR json_valid(chip)),  -- optional {"lessonId":..} / {"entryId":..}
+  created_at  INTEGER NOT NULL DEFAULT (strftime('%s','now')),
+  updated_at  INTEGER NOT NULL DEFAULT (strftime('%s','now'))
+);
+
+CREATE TABLE IF NOT EXISTS blog_references (   -- same shape as lesson_references
+  blog_id      TEXT NOT NULL REFERENCES blog_posts(id) ON DELETE CASCADE,
+  reference_id TEXT NOT NULL REFERENCES content_references(id),
+  PRIMARY KEY (blog_id, reference_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_blog_comments_blog ON blog_comments(blog_id);
+CREATE INDEX IF NOT EXISTS idx_blog_posts_unit    ON blog_posts(unit_id);
+-- END feed
+
 -- ----------------------------------------------------------------------------
 -- Mythbuster question banks (standalone pools used by the atom-maze boss)
 -- ----------------------------------------------------------------------------
@@ -221,7 +277,7 @@ CREATE TABLE IF NOT EXISTS mythbuster_questions (
 );
 
 -- ----------------------------------------------------------------------------
--- Myths (myth-busting resource articles)
+-- Myths (myth-busting reference resources)
 -- ----------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS myths (
   id             TEXT PRIMARY KEY,                -- myth.id
@@ -247,8 +303,8 @@ CREATE TABLE IF NOT EXISTS myths (
 );
 
 -- NOTE: the standalone `facts` table was retired — verified truths live in
--- each myth's `reality` field. The `related_facts` columns on myths/articles
--- remain as legacy (empty) JSON arrays.
+-- each myth's `reality` field. The `related_facts` column on myths
+-- remains as a legacy (empty) JSON array.
 
 -- ----------------------------------------------------------------------------
 -- Atom Mazes (Pokemon-style challenge levels)
@@ -310,111 +366,10 @@ CREATE TABLE IF NOT EXISTS encyclopedia_entries (
   debunking_snippet TEXT,                          -- nullable; short myth debunk
   related_myths  TEXT NOT NULL DEFAULT '[]'       -- JSON array of myth ids
                  CONSTRAINT encyclopedia_related_myths_json CHECK (json_valid(related_myths)),
-  related_articles TEXT NOT NULL DEFAULT '[]'     -- JSON array of article ids
-                 CONSTRAINT encyclopedia_related_articles_json CHECK (json_valid(related_articles)),
   difficulty     TEXT NOT NULL DEFAULT 'beginner'
                  CHECK (difficulty IN ('beginner', 'intermediate', 'advanced')),
   created_at     INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
   updated_at     INTEGER NOT NULL DEFAULT (strftime('%s', 'now'))
-);
-
--- ----------------------------------------------------------------------------
--- Articles (long-form Learn & Explore reading content)
--- ----------------------------------------------------------------------------
-CREATE TABLE IF NOT EXISTS articles (
-  id             TEXT PRIMARY KEY,                -- article.id
-  type           TEXT NOT NULL DEFAULT 'article'
-                 CHECK (type IN ('article', 'news', 'research', 'opinion', 'guide')),
-  category       TEXT NOT NULL DEFAULT '',
-  title          TEXT NOT NULL,
-  subtitle       TEXT,                            -- nullable
-  content        TEXT NOT NULL DEFAULT '',        -- markdown body
-  excerpt        TEXT NOT NULL DEFAULT '',        -- short summary for lists/feed
-  author         TEXT NOT NULL DEFAULT '{}'       -- JSON { name, avatar, title }
-                 CONSTRAINT articles_author_json CHECK (json_valid(author)),
-  published_date TEXT NOT NULL DEFAULT '',        -- ISO date string
-  read_time      INTEGER NOT NULL DEFAULT 0,      -- minutes
-  image          TEXT,                            -- nullable; asset path or URL
-  tags           TEXT NOT NULL DEFAULT '[]'       -- JSON array of strings
-                 CONSTRAINT articles_tags_json CHECK (json_valid(tags)),
-  source         TEXT,
-  source_url     TEXT,
-  related_myths  TEXT NOT NULL DEFAULT '[]'       -- JSON array of myth ids
-                 CONSTRAINT articles_related_myths_json CHECK (json_valid(related_myths)),
-  related_facts  TEXT NOT NULL DEFAULT '[]'       -- JSON array of fact ids
-                 CONSTRAINT articles_related_facts_json CHECK (json_valid(related_facts)),
-  featured       INTEGER NOT NULL DEFAULT 0,      -- 1 = featured in the feed
-  difficulty     TEXT
-                 CHECK (difficulty IS NULL OR difficulty IN ('beginner', 'intermediate', 'advanced')),
-  -- Research pipeline (docs/ARTICLE_PIPELINE.md). Added to existing databases by
-  -- scripts/content-migration/add-article-pipeline.mjs; kept in sync here for fresh seeds.
-  source_type    TEXT NOT NULL DEFAULT ''         -- kind of source publisher; '' = not yet classified
-                 CHECK (source_type IN ('', 'government-agency', 'international-organization', 'research-institution', 'university', 'industry-association', 'standards-body', 'news-media', 'encyclopedia', 'textbook', 'other')),
-  source_note    TEXT NOT NULL DEFAULT '',        -- what the source is / what the summary draws from it
-  source_published_date TEXT,                     -- ISO date of the source itself (nullable)
-  review_status  TEXT NOT NULL DEFAULT 'needs-review'
-                 CHECK (review_status IN ('draft', 'needs-review', 'in-review', 'reviewed', 'outdated')),
-  last_reviewed  TEXT NOT NULL DEFAULT '',        -- ISO date of the last editorial check
-  reviewed_by    TEXT,
-  review_notes   TEXT,                            -- editor-facing; never shown to learners
-  summary_origin TEXT NOT NULL DEFAULT 'unknown'
-                 CHECK (summary_origin IN ('unknown', 'original', 'adapted', 'excerpt')),
-  related_lessons  TEXT NOT NULL DEFAULT '[]'     -- JSON array of lesson ids
-                 CONSTRAINT articles_related_lessons_json CHECK (json_valid(related_lessons)),
-  related_concepts TEXT NOT NULL DEFAULT '[]'     -- JSON array of encyclopedia entry ids
-                 CONSTRAINT articles_related_concepts_json CHECK (json_valid(related_concepts)),
-  related_elements TEXT NOT NULL DEFAULT '[]'     -- JSON array of element symbols
-                 CONSTRAINT articles_related_elements_json CHECK (json_valid(related_elements)),
-  created_at     INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
-  updated_at     INTEGER NOT NULL DEFAULT (strftime('%s', 'now'))
-);
-
--- ----------------------------------------------------------------------------
--- Posts (short community-feed items)
--- ----------------------------------------------------------------------------
-CREATE TABLE IF NOT EXISTS posts (
-  id              TEXT PRIMARY KEY,               -- post.id
-  type            TEXT NOT NULL DEFAULT 'news',   -- article types + feed-only types
-  category        TEXT NOT NULL DEFAULT '',
-  title           TEXT NOT NULL,
-  content         TEXT NOT NULL DEFAULT '',
-  author          TEXT NOT NULL DEFAULT '{}'      -- JSON { name, avatar, title }
-                  CONSTRAINT posts_author_json CHECK (json_valid(author)),
-  published_date  TEXT NOT NULL DEFAULT '',       -- ISO date string
-  image           TEXT,                           -- nullable; asset path or URL
-  tags            TEXT NOT NULL DEFAULT '[]'      -- JSON array of strings
-                  CONSTRAINT posts_tags_json CHECK (json_valid(tags)),
-  source          TEXT,
-  source_url      TEXT,
-  video_url       TEXT,
-  related_content TEXT NOT NULL DEFAULT '[]'      -- JSON array of content ids
-                  CONSTRAINT posts_related_content_json CHECK (json_valid(related_content)),
-  -- Research pipeline (docs/ARTICLE_PIPELINE.md). Added to existing databases by
-  -- scripts/content-migration/add-article-pipeline.mjs; kept in sync here for fresh seeds.
-  source_type    TEXT NOT NULL DEFAULT ''         -- kind of source publisher; '' = not yet classified
-                 CHECK (source_type IN ('', 'government-agency', 'international-organization', 'research-institution', 'university', 'industry-association', 'standards-body', 'news-media', 'encyclopedia', 'textbook', 'other')),
-  source_note    TEXT NOT NULL DEFAULT '',        -- what the source is / what the summary draws from it
-  source_published_date TEXT,                     -- ISO date of the source itself (nullable)
-  review_status  TEXT NOT NULL DEFAULT 'needs-review'
-                 CHECK (review_status IN ('draft', 'needs-review', 'in-review', 'reviewed', 'outdated')),
-  last_reviewed  TEXT NOT NULL DEFAULT '',        -- ISO date of the last editorial check
-  reviewed_by    TEXT,
-  review_notes   TEXT,                            -- editor-facing; never shown to learners
-  summary_origin TEXT NOT NULL DEFAULT 'unknown'
-                 CHECK (summary_origin IN ('unknown', 'original', 'adapted', 'excerpt')),
-  related_lessons  TEXT NOT NULL DEFAULT '[]'     -- JSON array of lesson ids
-                 CONSTRAINT posts_related_lessons_json CHECK (json_valid(related_lessons)),
-  related_concepts TEXT NOT NULL DEFAULT '[]'     -- JSON array of encyclopedia entry ids
-                 CONSTRAINT posts_related_concepts_json CHECK (json_valid(related_concepts)),
-  related_elements TEXT NOT NULL DEFAULT '[]'     -- JSON array of element symbols
-                 CONSTRAINT posts_related_elements_json CHECK (json_valid(related_elements)),
-  read_time      INTEGER NOT NULL DEFAULT 0,      -- minutes
-  difficulty     TEXT
-                 CHECK (difficulty IS NULL OR difficulty IN ('beginner', 'intermediate', 'advanced')),
-  related_myths  TEXT NOT NULL DEFAULT '[]'       -- JSON array of myth ids
-                 CONSTRAINT posts_related_myths_json CHECK (json_valid(related_myths)),
-  created_at      INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
-  updated_at      INTEGER NOT NULL DEFAULT (strftime('%s', 'now'))
 );
 
 -- ----------------------------------------------------------------------------
@@ -426,11 +381,6 @@ CREATE INDEX IF NOT EXISTS idx_myths_difficulty    ON myths(difficulty);
 CREATE INDEX IF NOT EXISTS idx_maze_rooms_maze     ON maze_rooms(maze_id);
 CREATE INDEX IF NOT EXISTS idx_encyclopedia_category ON encyclopedia_entries(category);
 CREATE INDEX IF NOT EXISTS idx_encyclopedia_difficulty ON encyclopedia_entries(difficulty);
-CREATE INDEX IF NOT EXISTS idx_articles_category    ON articles(category);
-CREATE INDEX IF NOT EXISTS idx_articles_featured    ON articles(featured);
-CREATE INDEX IF NOT EXISTS idx_articles_published   ON articles(published_date);
-CREATE INDEX IF NOT EXISTS idx_posts_category       ON posts(category);
-CREATE INDEX IF NOT EXISTS idx_posts_published      ON posts(published_date);
 
 -- Optional JSON1 expression index example — makes `WHERE json_extract(tags,'$[0]') = 'basics'` fast
 -- CREATE INDEX IF NOT EXISTS idx_lessons_tags_json ON lessons(json_extract(tags, '$'));

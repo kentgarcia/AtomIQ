@@ -8,7 +8,6 @@
  */
 
 import {
-  checkArticle,
   checkPlaceholders,
   checkPunctuation,
   checkQuestion,
@@ -16,20 +15,20 @@ import {
   findConflictingDuplicates,
 } from "./content-rules.mjs";
 import { validateCurriculum } from "./curriculum-rules.mjs";
+import { validateFeed } from "./feed-rules.mjs";
 import { findInvalidIcons } from "./icon-names.mjs";
 import { getStepVisuals, validateVisualBlock } from "../../content/visual-blocks.ts";
 
 /**
  * @param {import("node:sqlite").DatabaseSync} db
  * @param {{ strictReview?: boolean, shipped?: Record<string,string[]>, retired?: Record<string,Record<string,string>> }} [options]
- *   strictReview: every article/post must be review_status = reviewed.
+ *   strictReview: unverified content references are errors (publish gate).
  *   shipped/retired: ids that have shipped to users and ids deliberately retired (spec §3.5).
  * @returns {{ checked: Record<string, number>, errors: any[], warnings: any[], findings: any[] }}
  */
 export function validateDatabase(db, { strictReview = false, shipped = {}, retired = {} } = {}) {
   const tableExists = (name) =>
     !!db.prepare("SELECT 1 FROM sqlite_master WHERE type='table' AND name=?").get(name);
-  const columnsOf = (table) => new Set(db.prepare(`PRAGMA table_info(${table})`).all().map((c) => c.name));
 
   const parseJson = (raw, fallback) => {
     try {
@@ -307,41 +306,6 @@ export function validateDatabase(db, { strictReview = false, shipped = {}, retir
     });
   }
 
-  // ---------------------------------------------------------------------------
-  // Articles / posts (research pipeline)
-  // ---------------------------------------------------------------------------
-  const lessonIds = new Set(tableExists("lessons") ? db.prepare("SELECT id FROM lessons").all().map((r) => r.id) : []);
-  const mythIds = new Set(tableExists("myths") ? db.prepare("SELECT id FROM myths").all().map((r) => r.id) : []);
-  const entryIds = new Set(tableExists("encyclopedia_entries") ? db.prepare("SELECT id FROM encyclopedia_entries").all().map((r) => r.id) : []);
-  // Local calendar date (UTC can lag a day behind for contributors east of Greenwich).
-  const nowLocal = new Date();
-  const today = `${nowLocal.getFullYear()}-${String(nowLocal.getMonth() + 1).padStart(2, "0")}-${String(nowLocal.getDate()).padStart(2, "0")}`;
-
-  for (const table of ["articles", "posts"]) {
-    if (!tableExists(table)) continue;
-    const cols = columnsOf(table);
-    for (const row of db.prepare(`SELECT * FROM ${table} ORDER BY id`).all()) {
-      bump(table);
-      const parsed = {
-        ...row,
-        author: parseJson(row.author, {}),
-        related_lessons: parseJson(row.related_lessons ?? "[]", "invalid"),
-        related_myths: parseJson(row.related_myths ?? "[]", "invalid"),
-        related_concepts: parseJson(row.related_concepts ?? "[]", "invalid"),
-        related_elements: parseJson(row.related_elements ?? "[]", "invalid"),
-      };
-      if (!cols.has("source_type")) {
-        record(table, row.id, [{ rule: "article-metadata", field: "source_type", severity: "error", message: "schema is missing the article pipeline columns (source_type, review_status, ...)" }]);
-        continue;
-      }
-      record(table, row.id, checkArticle(parsed, { today, lessonIds, mythIds, entryIds }), row.title);
-      if (strictReview && row.review_status !== "reviewed") {
-        record(table, row.id, [{ rule: "review-pending", field: "review_status", severity: "error", message: `status is "${row.review_status}"; --strict-review requires "reviewed"` }], row.title);
-      }
-    }
-  }
-
-
   // -------------------------------------------------------------------------
   // Curriculum v2: units, lessons made of cards, the item bank, references.
   // -------------------------------------------------------------------------
@@ -350,9 +314,16 @@ export function validateDatabase(db, { strictReview = false, shipped = {}, retir
   findings.push(...curriculum.findings);
 
   // -------------------------------------------------------------------------
+  // NPC feed and mini blog (docs/NPC_FEED_SPEC.md §6): templates, pieces, comments.
+  // -------------------------------------------------------------------------
+  const feed = validateFeed(db, { strictReview });
+  for (const [surface, n] of Object.entries(feed.checked)) checked.set(surface, (checked.get(surface) ?? 0) + n);
+  findings.push(...feed.findings);
+
+  // -------------------------------------------------------------------------
   // Icons: every icon name in content must be an installed Iconsax export.
   // -------------------------------------------------------------------------
-  const iconTables = ["lesson_steps", "mazes", "maze_rooms", "myths", "encyclopedia_entries", "articles", "posts", "quizzes", "quiz_questions", "lessons", "units", "lesson_cards", "items"].filter(tableExists);
+  const iconTables = ["lesson_steps", "mazes", "maze_rooms", "myths", "encyclopedia_entries", "quizzes", "quiz_questions", "lessons", "units", "lesson_cards", "items"].filter(tableExists);
   for (const hit of findInvalidIcons(db, iconTables)) {
     findings.push({ table: hit.table, id: hit.id, field: hit.field, rule: "invalid-icon", severity: "error", message: `"${hit.name}" is not an installed Iconsax icon` });
   }

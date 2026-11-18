@@ -28,18 +28,18 @@ import React, {
   useState,
 } from "react";
 import {
-  Alert,
-  BackHandler,
-  Dimensions,
-  Image,
-  Platform,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextProps,
-  TouchableOpacity,
-  View,
+    Alert,
+    BackHandler,
+    Dimensions,
+    Image,
+    Platform,
+    ScrollView,
+    StyleSheet,
+    TextProps,
+    TouchableOpacity,
+    View,
 } from "react-native";
+import { Text } from "@/components/ui/text";
 import {
   Gesture,
   GestureDetector,

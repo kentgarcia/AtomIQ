@@ -8,7 +8,8 @@
  */
 
 import React, { useMemo } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, View } from "react-native";
+import { Text } from "@/components/ui/text";
 
 import { ContentCard } from "@/components/guide/ContentCard";
 import { Pill } from "@/components/guide/Pill";

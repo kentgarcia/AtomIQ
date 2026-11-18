@@ -10,4 +10,9 @@ if (!config.resolver.assetExts.includes("wasm")) {
   config.resolver.assetExts.push("wasm");
 }
 
+// dotLottie animations (assets/lottie/*.lottie) are bundled as assets and played by lottie-react-native
+if (!config.resolver.assetExts.includes("lottie")) {
+  config.resolver.assetExts.push("lottie");
+}
+
 module.exports = config;

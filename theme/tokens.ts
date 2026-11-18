@@ -38,6 +38,9 @@ const base = {
     surfaceSoft: "#F7F7F7",
     /** Editable field fill. */
     input: "#F7F7F7",
+    /** Search and text fields: a plain rounded fill, no border; typed text is `fieldText`. */
+    field: "#F1F5F9",
+    fieldText: "#828B95",
     /** Inverse surface (snackbars, tooltips) and its foreground. */
     inverseSurface: "#3C3C3C",
     inverseText: "#FFFFFF",
@@ -54,6 +57,8 @@ const base = {
     textFaint: "#667985",
     surfaceSoft: "#1A262C",
     input: "#1A262C",
+    field: "#1A262C",
+    fieldText: "#8FA3AD",
     inverseSurface: "#F1F7FB",
     inverseText: "#131F24",
   },
@@ -86,6 +91,33 @@ const brand = {
     400: "#FFB300",
     500: "#FFA000",
     600: "#FF8F00",
+  },
+  /** Background of the Home lesson map: the mid purple of the reference (was sky blue #0388FF). */
+  sky: {
+    500: "#7F5AC2",
+    /** The darker lip under a card in the sky colour. */
+    700: "#5F42A0",
+  },
+  /** The Guide's blue (header band, Talk to Guide button): the Atom Maze tile's blue and its lip. */
+  guide: {
+    500: "#1CB0F6",
+    700: "#1899D6",
+  },
+  /** Primary button: yellow face and its darker lip (the label is white with a lip-colored shadow). */
+  button: {
+    face: "#F9B71F",
+    lip: "#D9981A",
+  },
+  /** The Home lesson card: a fully yellow face, a darker yellow lip under it, white title on the face. `lipLight`/`lipDark` are the lip of the white cards elsewhere. */
+  lessonCard: {
+    header: "#FABF24",
+    headerText: "#FFFFFF",
+    lip: "#D9981A",
+    lipLight: "#C0D7EC",
+    lipDark: "#2E4A5E",
+    /** A button on the yellow face: a lighter yellow face with a darker yellow label. */
+    buttonFace: "#FEEFC8",
+    buttonLabel: "#7A5A0E",
   },
   neon: {
     400: "#06FFA5",
@@ -220,7 +252,10 @@ export const fontWeights = {
   black: "900",
 } as const;
 
-type FontFace = { fontFamily: typeof fontFamily; fontWeight: (typeof fontWeights)[keyof typeof fontWeights] };
+type FontFace = {
+  fontFamily: typeof fontFamily;
+  fontWeight: (typeof fontWeights)[keyof typeof fontWeights];
+};
 
 /**
  * Ready-to-spread text faces. Always spread the whole face so family and weight

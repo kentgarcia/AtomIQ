@@ -11,7 +11,6 @@
  *   - `applySelection(state, pill, ctx, content)` — advance the conversation.
  */
 
-import type { Article, ArticleCategory } from "@/content/articles/types";
 import type {
   AtomMazeChallenge,
   EncyclopediaEntry,
@@ -25,7 +24,6 @@ import {
   type TopicContent,
   type TopicDef,
   getAvailableTopicIds,
-  getDiscoverCategories,
   getExploreCategories,
   getTopicById,
   getTopicContent,
@@ -65,7 +63,6 @@ const AGGREGATE_ACTION: Record<
   "retry-quiz": "take_quiz",
   "review-encyclopedia": "read_encyclopedia",
   "topic-encyclopedia": "read_encyclopedia",
-  "topic-articles": "read_article",
 };
 
 const intentPill = (intent: GuideIntent, label: string): GuidePill => ({
@@ -82,8 +79,6 @@ const intentIcon = (intent: GuideIntent): string => {
       return "Book";
     case "explore":
       return "SearchNormal";
-    case "discover":
-      return "InfoCircle";
     case "practice":
       return "Game";
     case "review":
@@ -166,8 +161,6 @@ const moodForIntent = (intent: GuideIntent): MascotMood => {
       return "thinking";
     case "explore":
       return "thinking";
-    case "discover":
-      return "thinking";
     case "practice":
       return "excited";
     case "review":
@@ -187,7 +180,6 @@ const moodForActionAggregate = (agg: string | undefined): MascotMood => {
     case "review-lesson":
     case "review-encyclopedia":
     case "topic-encyclopedia":
-    case "topic-articles":
       return "explaining";
     case "topic-quiz":
     case "retry-quiz":
@@ -272,18 +264,6 @@ const encyclopediaCard = (entry: EncyclopediaEntry): GuideCard => ({
   status: "available",
   reward: "+10 XP",
   duration: "2 min",
-});
-
-const articleCard = (article: Article): GuideCard => ({
-  kind: "article",
-  title: article.title,
-  subtitle: article.category,
-  body: article.excerpt,
-  destination: { screen: "article", id: article.id },
-  ctaLabel: "Read Article",
-  status: "available",
-  reward: "+15 XP",
-  duration: "4 min",
 });
 
 const mazeCard = (maze: AtomMazeChallenge, badge?: string): GuideCard => ({
@@ -473,13 +453,6 @@ const handleIntent = (
       }
       return guideTurn("What would you like to explore?", pills);
     }
-    case "discover": {
-      const cats = getDiscoverCategories(content);
-      return guideTurn(
-        "What would you like to discover?",
-        cats.map((c) => categoryPill(c.id, c.label, c.icon)),
-      );
-    }
     case "practice": {
       const pills: GuidePill[] = [];
       if (
@@ -531,7 +504,7 @@ const handleIntent = (
 };
 
 // ---------------------------------------------------------------------------
-// Category resolution (explore / discover)
+// Category resolution (explore)
 // ---------------------------------------------------------------------------
 
 const handleCategory = (
@@ -554,18 +527,6 @@ const handleCategory = (
       itemPill(`enc-${e.id}`, e.term, exploreCat.icon, e.id, "encyclopedia"),
     );
     return guideTurn(`Explore ${exploreCat.label}.`, pills);
-  }
-
-  const articleCats = getDiscoverCategories(content);
-  const bucket = articleCats.find((c) => c.id === categoryId);
-  if (bucket) {
-    const articles = content.articles
-      .filter((a) => a.category === (bucket.id as ArticleCategory))
-      .slice(0, 8);
-    const pills = articles.map((a) =>
-      itemPill(`art-${a.id}`, a.title, bucket.icon, a.id, "article"),
-    );
-    return guideTurn(`Discover ${bucket.label}.`, pills);
   }
 
   return guideTurn("Let me show you what's available.", undefined);
@@ -603,16 +564,6 @@ const handleTopic = (
         "Read Encyclopedia",
         "InfoCircle",
         "topic-encyclopedia",
-        topicId,
-      ),
-    );
-  if (tc.articles.length)
-    pills.push(
-      actionPill(
-        `art-${topicId}`,
-        "Read Articles",
-        "DocumentText",
-        "topic-articles",
         topicId,
       ),
     );
@@ -699,13 +650,6 @@ const resolveActionCards = (
       const effective = pool.length ? pool : content.encyclopedia.slice(0, 3);
       return effective.slice(0, 3).map((e) => encyclopediaCard(e));
     }
-    case "topic-articles": {
-      const topic = refId ? getTopicById(refId) : null;
-      const pool = topic ? getTopicContent(topic, content).articles : [];
-      // Ensure we pull from discovery hub (articles/stories) — fallback to all articles if topic has none
-      const effective = pool.length ? pool : content.articles.slice(0, 3);
-      return effective.slice(0, 3).map((a) => articleCard(a));
-    }
     case "retry-quiz": {
       const q = refId ? content.quizzes.find((q) => q.id === refId) : undefined;
       return q ? [quizCard(q, ctx)] : [];
@@ -766,12 +710,6 @@ const handleItem = (
       const item = content.encyclopedia.find((e) => e.id === itemId);
       return item
         ? guideTurnWithCard(item.term, encyclopediaCard(item))
-        : guideTurn("I couldn't find that item.", undefined);
-    }
-    case "article": {
-      const item = content.articles.find((a) => a.id === itemId);
-      return item
-        ? guideTurnWithCard(item.title, articleCard(item))
         : guideTurn("I couldn't find that item.", undefined);
     }
     case "game": {

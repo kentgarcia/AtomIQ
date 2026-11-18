@@ -8,7 +8,7 @@
  *
  * `ContentRepository` then provides typed, high-level queries over the curriculum
  * (units, path nodes, lessons made of cards, the shared item bank, references)
- * and the other content (myths, mazes, encyclopedia, articles, posts). JSON
+ * and the other content (myths, mazes, encyclopedia). JSON
  * columns are hydrated into plain objects by content/curriculum/hydrate.ts.
  *
  * USAGE (in a screen / hook):
@@ -24,15 +24,17 @@ import { importDatabaseFromAssetAsync } from "expo-sqlite";
 import { Platform } from "react-native";
 
 import type {
-  Article,
-  ArticleSourceMeta,
-  Post,
-  ReviewStatus,
-  SourceType,
-  SummaryOrigin,
-} from "@/content/articles/types";
-
-import type { Myth, QuizQuestion, QuizType } from "@/content/types";
+  BlogBlock,
+  BlogComment,
+  BlogPost,
+  BlogUnlock,
+  FeedChipKind,
+  FeedKind,
+  FeedTemplate,
+  Myth,
+  QuizQuestion,
+  QuizType,
+} from "@/content/types";
 
 import {
   buildLessonContent,
@@ -102,7 +104,7 @@ const CONTENT_DB_PREV_NAME = "content.prev.db";
  * The same value is stamped into the bundled database's `content_meta` table,
  * so a device always compares the version of the data it actually holds.
  */
-export const CONTENT_DB_VERSION = "0.0.0+draft.6039dd";
+export const CONTENT_DB_VERSION = "0.0.0+draft.65be05";
 
 /**
  * Shape of the content this build's repository reads (columns, step types,
@@ -704,7 +706,6 @@ interface EncyclopediaEntryRow {
   image: string | null;
   debunking_snippet: string | null;
   related_myths: string; // JSON array of myth ids
-  related_articles: string; // JSON array of article ids
   difficulty: string;
 }
 
@@ -721,155 +722,90 @@ function mapEncyclopediaEntryRow(row: EncyclopediaEntryRow): EncyclopediaEntry {
     ...(row.image ? { image: row.image } : {}),
     ...(row.debunking_snippet ? { debunkingSnippet: row.debunking_snippet } : {}),
     ...(row.related_myths ? { relatedMyths: parseJsonArray(row.related_myths) } : {}),
-    ...(row.related_articles ? { relatedArticles: parseJsonArray(row.related_articles) } : {}),
     difficulty: row.difficulty as EncyclopediaEntry["difficulty"],
   };
 }
 
-/** Raw shape of an `articles` row as returned by expo-sqlite. */
-interface ArticleRow {
+/** Raw shape of a `feed_templates` row. */
+interface FeedTemplateRow {
   id: string;
-  type: string;
-  category: string;
-  title: string;
-  subtitle: string | null;
-  content: string;
-  excerpt: string;
-  author: string; // JSON { name, avatar, title }
-  published_date: string;
-  read_time: number;
-  image: string | null;
-  tags: string; // JSON array of strings
-  source: string | null;
-  source_url: string | null;
-  related_myths: string; // JSON array of myth ids
-  related_facts: string; // JSON array of fact ids
-  featured: number; // 0 / 1
-  difficulty: string | null;
-  // Research-pipeline columns (docs/ARTICLE_PIPELINE.md). Optional so a bundle
-  // built before the pipeline migration still maps cleanly.
-  source_type?: string | null;
-  source_note?: string | null;
-  source_published_date?: string | null;
-  review_status?: string | null;
-  last_reviewed?: string | null;
-  reviewed_by?: string | null;
-  review_notes?: string | null;
-  summary_origin?: string | null;
-  related_lessons?: string | null; // JSON array of lesson ids
-  related_concepts?: string | null; // JSON array of encyclopedia entry ids
-  related_elements?: string | null; // JSON array of element symbols
+  npc_id: string | null;
+  poster_pool: string;
+  kind: string;
+  trigger: string;
+  condition: string;
+  text: string;
+  chip: string | null;
+  reactors: string;
+  weight: number;
 }
 
-/** Map the shared research-pipeline columns of an article/post row. */
-function mapSourceMeta(row: {
-  source_type?: string | null;
-  source_note?: string | null;
-  source_published_date?: string | null;
-  review_status?: string | null;
-  last_reviewed?: string | null;
-  reviewed_by?: string | null;
-  review_notes?: string | null;
-  summary_origin?: string | null;
-  related_lessons?: string | null;
-  related_concepts?: string | null;
-  related_elements?: string | null;
-}): ArticleSourceMeta {
-  const lessons = parseJsonArray(row.related_lessons);
-  const concepts = parseJsonArray(row.related_concepts);
-  const elements = parseJsonArray(row.related_elements);
+/** Raw shape of a `blog_posts` row. */
+interface BlogPostRow {
+  id: string;
+  npc_id: string;
+  unit_id: string | null;
+  lesson_id: string | null;
+  position: number;
+  title: string;
+  hook: string;
+  cover: string;
+  read_min: number;
+  unlock: string;
+  blocks: string;
+  reactors: string;
+}
+
+/** Raw shape of a `blog_comments` row. */
+interface BlogCommentRow {
+  id: string;
+  blog_id: string;
+  npc_id: string;
+  position: number;
+  text: string;
+  chip: string | null;
+}
+
+function mapFeedTemplateRow(row: FeedTemplateRow): FeedTemplate {
   return {
-    ...(row.source_type ? { sourceType: row.source_type as SourceType } : {}),
-    ...(row.source_note ? { sourceNote: row.source_note } : {}),
-    ...(row.source_published_date ? { sourcePublishedDate: row.source_published_date } : {}),
-    ...(row.review_status ? { reviewStatus: row.review_status as ReviewStatus } : {}),
-    ...(row.last_reviewed ? { lastReviewed: row.last_reviewed } : {}),
-    ...(row.reviewed_by ? { reviewedBy: row.reviewed_by } : {}),
-    ...(row.review_notes ? { reviewNotes: row.review_notes } : {}),
-    ...(row.summary_origin ? { summaryOrigin: row.summary_origin as SummaryOrigin } : {}),
-    ...(lessons.length ? { relatedLessons: lessons } : {}),
-    ...(concepts.length ? { relatedConcepts: concepts } : {}),
-    ...(elements.length ? { relatedElements: elements } : {}),
+    id: row.id,
+    npcId: row.npc_id,
+    posterPool: parseJsonArray(row.poster_pool),
+    kind: row.kind as FeedKind,
+    trigger: row.trigger as FeedTemplate["trigger"],
+    condition: parseJsonObject<Record<string, unknown>>(row.condition) ?? {},
+    text: row.text,
+    chip: (row.chip as FeedChipKind | null) ?? null,
+    reactors: parseJsonArray(row.reactors),
+    weight: row.weight,
   };
 }
 
-/** Flatten an article row into the domain `Article` shape. */
-function mapArticleRow(row: ArticleRow): Article {
+function mapBlogPostRow(row: BlogPostRow): BlogPost {
   return {
     id: row.id,
-    type: row.type as Article["type"],
-    category: row.category as Article["category"],
+    npcId: row.npc_id,
+    unitId: row.unit_id,
+    lessonId: row.lesson_id,
+    position: row.position,
     title: row.title,
-    ...(row.subtitle ? { subtitle: row.subtitle } : {}),
-    content: row.content,
-    excerpt: row.excerpt,
-    author:
-      parseJsonObject<Article["author"]>(row.author) ?? { name: "", avatar: "", title: "" },
-    publishedDate: row.published_date,
-    readTime: row.read_time,
-    ...(row.image ? { image: row.image } : {}),
-    tags: parseJsonArray(row.tags),
-    ...(row.source ? { source: row.source } : {}),
-    ...(row.source_url ? { sourceUrl: row.source_url } : {}),
-    ...(row.related_myths ? { relatedMyths: parseJsonArray(row.related_myths) } : {}),
-    ...(row.featured ? { featured: true } : {}),
-    ...(row.difficulty ? { difficulty: row.difficulty as Article["difficulty"] } : {}),
-    ...mapSourceMeta(row),
+    hook: row.hook,
+    cover: row.cover,
+    readMin: row.read_min,
+    unlock: parseJsonObject<BlogUnlock>(row.unlock) ?? { trigger: "none" },
+    blocks: parseJsonRecords<BlogBlock>(row.blocks),
+    reactors: parseJsonArray(row.reactors),
   };
 }
 
-/** Raw shape of a `posts` row as returned by expo-sqlite. */
-interface PostRow {
-  id: string;
-  type: string;
-  category: string;
-  title: string;
-  content: string;
-  author: string; // JSON { name, avatar, title }
-  published_date: string;
-  image: string | null;
-  tags: string; // JSON array of strings
-  source: string | null;
-  source_url: string | null;
-  video_url: string | null;
-  related_content: string; // JSON array of content ids
-  read_time?: number | null; // minutes (pipeline migration)
-  difficulty?: string | null;
-  related_myths?: string | null; // JSON array of myth ids
-  source_type?: string | null;
-  source_note?: string | null;
-  source_published_date?: string | null;
-  review_status?: string | null;
-  last_reviewed?: string | null;
-  reviewed_by?: string | null;
-  review_notes?: string | null;
-  summary_origin?: string | null;
-  related_lessons?: string | null;
-  related_concepts?: string | null;
-  related_elements?: string | null;
-}
-
-/** Flatten a post row into the domain `Post` shape. */
-function mapPostRow(row: PostRow): Post {
+function mapBlogCommentRow(row: BlogCommentRow): BlogComment {
   return {
     id: row.id,
-    type: row.type as Post["type"],
-    category: row.category as Post["category"],
-    title: row.title,
-    content: row.content,
-    author:
-      parseJsonObject<Post["author"]>(row.author) ?? { name: "", avatar: "" },
-    publishedDate: row.published_date,
-    ...(row.image ? { image: row.image } : {}),
-    tags: parseJsonArray(row.tags),
-    ...(row.source ? { source: row.source } : {}),
-    ...(row.source_url ? { sourceUrl: row.source_url } : {}),
-    ...(row.video_url ? { videoUrl: row.video_url } : {}),
-    ...(row.related_content ? { relatedContent: parseJsonArray(row.related_content) } : {}),
-    ...(row.read_time ? { readTime: row.read_time } : {}),
-    ...(row.difficulty ? { difficulty: row.difficulty as Post["difficulty"] } : {}),
-    ...(parseJsonArray(row.related_myths).length ? { relatedMyths: parseJsonArray(row.related_myths) } : {}),
-    ...mapSourceMeta(row),
+    blogId: row.blog_id,
+    npcId: row.npc_id,
+    position: row.position,
+    text: row.text,
+    chip: parseJsonObject<NonNullable<BlogComment["chip"]>>(row.chip),
   };
 }
 
@@ -910,6 +846,59 @@ export class ContentRepository {
       "SELECT id, npc_id, kind, lesson_id, journey_id, text, pose FROM npc_lines ORDER BY id ASC",
     );
     return rows.map((r) => ({ id: r.id, npcId: r.npc_id, kind: r.kind as NpcLine["kind"], lessonId: r.lesson_id, journeyId: r.journey_id, text: r.text, pose: r.pose as NpcLine["pose"] }));
+  }
+
+  // -------------------------------------------------------------------------
+  // NPC feed and mini blog (docs/NPC_FEED_SPEC.md §6). These throw when the bundled
+  // database predates the feed tables; `services/feed.ts` treats that as "no content".
+  // -------------------------------------------------------------------------
+
+  /** Feed post templates, in id order. */
+  async getFeedTemplates(): Promise<FeedTemplate[]> {
+    const db = await getReadyContentDb();
+    const rows = await db.getAllAsync<FeedTemplateRow>(
+      'SELECT id, npc_id, poster_pool, kind, "trigger" AS "trigger", condition, text, chip, reactors, weight FROM feed_templates ORDER BY id ASC',
+    );
+    return rows.map(mapFeedTemplateRow);
+  }
+
+  /** Blog pieces in reading order (unit order, then position within it). */
+  async getBlogPosts(): Promise<BlogPost[]> {
+    const db = await getReadyContentDb();
+    const rows = await db.getAllAsync<BlogPostRow>(
+      `SELECT b.* FROM blog_posts b LEFT JOIN units u ON u.id = b.unit_id
+        ORDER BY COALESCE(u.position, 0) ASC, b.position ASC, b.id ASC`,
+    );
+    return rows.map(mapBlogPostRow);
+  }
+
+  /** One blog piece, or `null`. */
+  async getBlogPost(id: string): Promise<BlogPost | null> {
+    const db = await getReadyContentDb();
+    const row = await db.getFirstAsync<BlogPostRow>("SELECT * FROM blog_posts WHERE id = ? LIMIT 1", [id]);
+    return row ? mapBlogPostRow(row) : null;
+  }
+
+  /** The NPC comments authored with a blog piece, in order (possibly none). */
+  async getBlogComments(blogId: string): Promise<BlogComment[]> {
+    const db = await getReadyContentDb();
+    const rows = await db.getAllAsync<BlogCommentRow>(
+      "SELECT * FROM blog_comments WHERE blog_id = ? ORDER BY position ASC, id ASC",
+      [blogId],
+    );
+    return rows.map(mapBlogCommentRow);
+  }
+
+  /** The sources of a blog piece (same shape and table as lesson references). */
+  async getBlogReferences(blogId: string): Promise<Reference[]> {
+    const db = await getReadyContentDb();
+    const rows = await db.getAllAsync<ReferenceRow>(
+      `SELECT r.* FROM blog_references br
+         JOIN content_references r ON r.id = br.reference_id
+        WHERE br.blog_id = ? ORDER BY r.id ASC`,
+      [blogId],
+    );
+    return rows.map(mapReference);
   }
 
   /** One unit, or `null`. */
@@ -1230,53 +1219,6 @@ export class ContentRepository {
     )) as { count: number };
     return count;
   }
-
-  // -------------------------------------------------------------------------
-  // Articles & Posts
-  // -------------------------------------------------------------------------
-
-  /** Fetch a single article by id, or `null`. */
-  async getArticleById(id: string): Promise<Article | null> {
-    const db = await getReadyContentDb();
-    const row = await db.getFirstAsync<ArticleRow>(
-      "SELECT * FROM articles WHERE id = ? LIMIT 1",
-      [id],
-    );
-    return row ? mapArticleRow(row) : null;
-  }
-
-  /**
-   * Every article, fully hydrated (JSON columns parsed), newest first.
-   */
-  async getAllArticles(): Promise<Article[]> {
-    const db = await getReadyContentDb();
-    const rows = await db.getAllAsync<ArticleRow>(
-      "SELECT * FROM articles ORDER BY published_date DESC, id",
-    );
-    return rows.map(mapArticleRow);
-  }
-
-  /** Fetch a single post by id, or `null`. */
-  async getPostById(id: string): Promise<Post | null> {
-    const db = await getReadyContentDb();
-    const row = await db.getFirstAsync<PostRow>(
-      "SELECT * FROM posts WHERE id = ? LIMIT 1",
-      [id],
-    );
-    return row ? mapPostRow(row) : null;
-  }
-
-  /**
-   * Every post, fully hydrated (JSON columns parsed), newest first.
-   */
-  async getAllPosts(): Promise<Post[]> {
-    const db = await getReadyContentDb();
-    const rows = await db.getAllAsync<PostRow>(
-      "SELECT * FROM posts ORDER BY published_date DESC, id",
-    );
-    return rows.map(mapPostRow);
-  }
-
 }
 
 /** Default, app-wide instance. Create more if you need separate handles. */

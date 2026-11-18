@@ -1,9 +1,9 @@
 /**
- * DailyFactCard — the "Did you know?" card of the Quests tab, in the lesson card's design: a face
+ * DailyFactCard — the "Did you know?" card of the Daily facts screen (opened from Discover), in the lesson card's design: a face
  * on a lip, a yellow header band with the title and a white circle icon, a white body.
  *
  * Body, left: the floating Discover mascot. Right: today's fact in its short form
- * plus a "Read more" button. Reading opens the full story and completes the
+ * plus a "Read more" button. Reading opens the full story (`FactStory`) and completes the
  * "Read Daily Fact" mission (XP is awarded once per day). The parent owns the
  * open state, so the mission row's "Read" button opens the same story.
  */
@@ -11,25 +11,23 @@
 import { Image as ExpoImage } from "expo-image";
 import { useIsFocused } from "expo-router";
 import React, { useEffect, useMemo, useState } from "react";
-import { Modal, ScrollView, Text, useWindowDimensions, View } from "react-native";
+import { View } from "react-native";
+import { Text } from "@/components/ui/text";
 import Animated, {
   cancelAnimation,
   Easing,
-  FadeIn,
-  FadeInDown,
   useAnimatedStyle,
   useReducedMotion,
   useSharedValue,
   withRepeat,
   withTiming,
 } from "react-native-reanimated";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { renderRichText } from "@/components/community/rich-text";
+import { FactStory } from "@/components/facts/FactStory";
 import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
 import { getDailyFact, type DailyFact } from "@/services/missions";
-import { createStyles, fontFaces, radius, spacing, useTheme } from "@/theme";
+import { createStyles, fontFaces, useTheme } from "@/theme";
 import { controls } from "@/theme/tokens";
 
 const MASCOT = require("@/assets/images/mascot/discover.svg");
@@ -53,8 +51,6 @@ export function DailyFactCard({
   const { theme } = useTheme();
   const styles = useMemo(() => makeStyles(theme), [theme]);
   const reducedMotion = useReducedMotion();
-  const { height } = useWindowDimensions();
-  const insets = useSafeAreaInsets();
 
   const [fact, setFact] = useState<DailyFact | null>(null);
 
@@ -73,8 +69,7 @@ export function DailyFactCard({
   // Gentle float, matching the other mascots; static with reduced motion.
   const y = useSharedValue(0);
   const rotate = useSharedValue(0);
-  // Tab screens stay mounted when you leave them, so stop the loop while the
-  // Quests tab is not the visible tab instead of animating off-screen.
+  // Stop the loop while the screen is not the visible one instead of animating off-screen.
   useEffect(() => {
     if (reducedMotion || !focused) {
       cancelAnimation(y);
@@ -149,50 +144,7 @@ export function DailyFactCard({
         </View>
       </View>
 
-      <Modal
-        visible={open}
-        transparent
-        animationType="fade"
-        statusBarTranslucent
-        onRequestClose={onClose}
-      >
-        <View
-          style={[
-            styles.overlay,
-            { paddingTop: insets.top + spacing.xl, paddingBottom: insets.bottom + spacing.xl },
-          ]}
-        >
-          <Animated.View
-            entering={
-              reducedMotion ? FadeIn.duration(120) : FadeInDown.duration(280).springify()
-            }
-            style={[styles.sheet, { maxHeight: Math.max(320, height * 0.85) }]}
-            accessibilityViewIsModal
-          >
-            <View style={styles.labelRow}>
-              <Icon name="Lamp" size={14} color={theme.colors.primaryLight} variant="Bold" />
-              <Text style={styles.label}>Did you know?</Text>
-            </View>
-            <Text style={styles.sheetTitle}>{fact?.title}</Text>
-
-            <ScrollView
-              style={styles.sheetScroll}
-              contentContainerStyle={styles.sheetScrollContent}
-              showsVerticalScrollIndicator={false}
-            >
-              {fact ? (
-                <>
-                  <Text style={styles.sheetShort}>{fact.short}</Text>
-                  <View style={styles.divider} />
-                  <Text style={styles.sheetBody}>{renderRichText(fact.explanation)}</Text>
-                </>
-              ) : null}
-            </ScrollView>
-
-            <Button label="Got it" onPress={onClose} />
-          </Animated.View>
-        </View>
-      </Modal>
+      <FactStory fact={fact} open={open} onClose={onClose} claimed={claimed} reward={reward} />
     </>
   );
 }
@@ -244,14 +196,6 @@ const makeStyles = createStyles((theme) => {
     },
     mascot: { width: 96, height: 112 },
     body: { flex: 1, gap: 6 },
-    labelRow: { flexDirection: "row", alignItems: "center", gap: 6 },
-    label: {
-      fontSize: 12,
-      letterSpacing: 0.6,
-      textTransform: "uppercase",
-      color: c.primaryLight,
-      ...fontFaces.heavy,
-    },
     short: {
       fontSize: 15,
       lineHeight: 21,
@@ -271,29 +215,5 @@ const makeStyles = createStyles((theme) => {
     donePill: { flexDirection: "row", alignItems: "center", gap: 4 },
     doneText: { fontSize: 13, color: c.success, ...fontFaces.heavy },
 
-    overlay: {
-      flex: 1,
-      backgroundColor: c.overlay,
-      alignItems: "center",
-      justifyContent: "center",
-      padding: spacing.xl,
-    },
-    sheet: {
-      width: "100%",
-      maxWidth: 440,
-      gap: spacing.md,
-      padding: spacing.lg,
-      borderRadius: radius["2xl"],
-      backgroundColor: c.card,
-      borderWidth: 2,
-      borderColor: c.border,
-      borderBottomWidth: 4,
-    },
-    sheetTitle: { fontSize: 22, lineHeight: 28, color: c.text, ...fontFaces.heavy },
-    sheetScroll: { flexGrow: 0 },
-    sheetScrollContent: { paddingVertical: 2 },
-    sheetShort: { fontSize: 16, lineHeight: 23, color: c.text, ...fontFaces.bold },
-    divider: { height: 2, backgroundColor: c.border, marginVertical: spacing.md },
-    sheetBody: { fontSize: 15, lineHeight: 23, color: c.textSecondary, ...fontFaces.regular },
   };
 });

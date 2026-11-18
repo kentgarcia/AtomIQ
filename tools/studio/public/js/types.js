@@ -3,30 +3,16 @@
 // the answer-options widget.
 
 import { el, miniBtn } from "./core.js";
+import { FEED_TYPES } from "./feed-types.js";
 
 const DIFFICULTY_LEVELS = ["beginner", "intermediate", "advanced"];
 const DIFFICULTY_EASY = ["easy", "medium", "hard"];
 const QUESTION_TYPES = ["multiple_choice", "true_false", "matching", "fill_blank"];
-const ARTICLE_TYPES = ["article", "news", "research", "opinion", "guide"];
-const SOURCE_TYPE_LABELS = {
-  "": "(not classified)",
-  "government-agency": "Government agency",
-  "international-organization": "International organization",
-  "research-institution": "Research institution",
-  university: "University",
-  "industry-association": "Industry association",
-  "standards-body": "Standards body",
-  "news-media": "News media",
-  encyclopedia: "Encyclopedia",
-  textbook: "Textbook",
-  other: "Other",
-};
 
 const sel = (key, label, options, extra = {}) => ({ key, label, type: "select", options, ...extra });
 const txt = (key, label, extra = {}) => ({ key, label, type: "text", ...extra });
 const area = (key, label, rows = 3, extra = {}) => ({ key, label, type: "textarea", rows, ...extra });
 const num = (key, label, extra = {}) => ({ key, label, type: "number", ...extra });
-const section = (label) => ({ type: "section", label });
 
 const idField = (isNew, hint) =>
   txt("id", "Id", {
@@ -184,7 +170,7 @@ const lessonCards = {
         {
           fields: (item) => [
             childIdField(item),
-            txt("type", "Card type", { required: true, hint: kind === "item" ? "Same as the item's type, e.g. choice, predict, order." : "e.g. fact, reveal, scale-zoom, atom-builder." }),
+            txt("type", "Card type", { required: true, hint: kind === "item" ? "Same as the item's type, e.g. choice, predict, order." : "e.g. fact, reveal, scale-zoom, atom-builder, decay-wait, decay-chain, radiation-id." }),
             sel("tier", "Tier", ["core", "deeper"]),
             ...(kind === "item" ? [txt("item_id", "Item id", { required: true, hint: "An id from the items table.", suggest: { table: "items", column: "id" } }), num("scored", "Scored (1 or 0)", { min: 0, max: 1, step: 1 })] : []),
             { key: "data", label: "Data", type: "json" },
@@ -303,34 +289,8 @@ const mazeRooms = {
 };
 
 // ---------------------------------------------------------------------------
-// article / post metadata shared fields
-// ---------------------------------------------------------------------------
-
-const reviewFields = () => [
-  section("Sourcing & review"),
-  sel("source_type", "Source type", Object.entries(SOURCE_TYPE_LABELS).map(([value, label]) => ({ value, label }))),
-  txt("source", "Source", { nullable: true }),
-  txt("source_url", "Source URL", { nullable: true }),
-  txt("source_note", "Source note", { hint: "What the source is and what the summary draws from it." }),
-  { key: "source_published_date", label: "Source published", type: "date", nullable: true },
-  sel("summary_origin", "Summary origin", ["unknown", "original", "adapted", "excerpt"]),
-  sel("review_status", "Review status", ["draft", "needs-review", "in-review", "reviewed", "outdated"]),
-  { key: "last_reviewed", label: "Last reviewed", type: "date" },
-  txt("reviewed_by", "Reviewed by", { nullable: true }),
-  area("review_notes", "Review notes (editors only — never shown to learners)", 3, { nullable: true }),
-];
-
-const relatedFields = () => [
-  { key: "related_lessons", label: "Related lessons", type: "refs", kinds: "lessons" },
-  { key: "related_concepts", label: "Related encyclopedia entries", type: "refs", kinds: "encyclopedia_entries" },
-  { key: "related_elements", label: "Related elements (symbols)", type: "strings" },
-];
-
-// ---------------------------------------------------------------------------
 // the registry
 // ---------------------------------------------------------------------------
-
-const today = () => new Date().toISOString().slice(0, 10);
 
 /** @type {Array<any>} */
 export const TYPES = [
@@ -446,7 +406,7 @@ export const TYPES = [
     icon: "📚",
     titleOf: (r) => r.term,
     subOf: (r) => `${r.category || "—"} · ${r.difficulty}`,
-    newRow: () => ({ id: "", term: "", definition: "", category: "", difficulty: "beginner", related_terms: [], quick_facts: [], sources: [], related_myths: [], related_articles: [] }),
+    newRow: () => ({ id: "", term: "", definition: "", category: "", difficulty: "beginner", related_terms: [], quick_facts: [], sources: [], related_myths: [] }),
     fields: (isNew) => [
       idField(isNew),
       txt("term", "Term", { required: true }),
@@ -469,71 +429,9 @@ export const TYPES = [
       },
       { key: "related_terms", label: "Related terms", type: "refs", kinds: "encyclopedia_entries" },
       { key: "related_myths", label: "Related myths", type: "refs", kinds: "myths" },
-      { key: "related_articles", label: "Related articles", type: "refs", kinds: "articles" },
     ],
   },
-  {
-    table: "articles",
-    label: "Articles",
-    singular: "article",
-    group: "Community",
-    icon: "📰",
-    review: true,
-    titleOf: (r) => r.title,
-    subOf: (r) => `${r.type} · ${r.published_date}`,
-    badgeOf: (r) => r.review_status,
-    newRow: () => ({ id: "", type: "article", category: "", title: "", content: "", excerpt: "", author: { name: "AtomIQ Editorial Team" }, published_date: today(), read_time: 3, tags: [], related_myths: [], related_facts: [], featured: 0, source_type: "", source_note: "", review_status: "draft", last_reviewed: "", summary_origin: "unknown", related_lessons: [], related_concepts: [], related_elements: [] }),
-    fields: (isNew) => [
-      idField(isNew),
-      sel("type", "Type", ARTICLE_TYPES),
-      txt("category", "Category", { suggest: { table: "articles", column: "category" } }),
-      txt("title", "Title", { required: true }),
-      txt("subtitle", "Subtitle", { nullable: true }),
-      area("excerpt", "Excerpt (shown in lists)", 2),
-      { key: "content", label: "Body (markdown)", type: "markdown", rows: 18 },
-      { key: "author", label: "Author", type: "author" },
-      { key: "published_date", label: "Published", type: "date" },
-      num("read_time", "Read time (minutes)", { min: 0 }),
-      txt("image", "Image", { nullable: true }),
-      sel("difficulty", "Difficulty", DIFFICULTY_LEVELS, { nullable: true }),
-      { key: "featured", label: "Featured", type: "checkbox", asInt: true, checkLabel: "Feature in the feed" },
-      { key: "tags", label: "Tags", type: "strings" },
-      { key: "related_myths", label: "Related myths", type: "refs", kinds: "myths" },
-      { key: "related_facts", label: "Related fact ids", type: "strings" },
-      ...relatedFields(),
-      ...reviewFields(),
-    ],
-  },
-  {
-    table: "posts",
-    label: "Posts",
-    singular: "post",
-    group: "Community",
-    icon: "💬",
-    review: true,
-    titleOf: (r) => r.title,
-    subOf: (r) => `${r.type} · ${r.published_date}`,
-    badgeOf: (r) => r.review_status,
-    newRow: () => ({ id: "", type: "news", category: "", title: "", content: "", author: { name: "AtomIQ Editorial Team" }, published_date: today(), tags: [], related_content: [], source_type: "", source_note: "", review_status: "draft", last_reviewed: "", summary_origin: "unknown", related_lessons: [], related_concepts: [], related_elements: [], read_time: 2, related_myths: [] }),
-    fields: (isNew) => [
-      idField(isNew),
-      txt("type", "Type", { required: true, suggest: { table: "posts", column: "type" }, hint: "Article types plus feed-only types such as news or video." }),
-      txt("category", "Category", { suggest: { table: "posts", column: "category" } }),
-      txt("title", "Title", { required: true }),
-      { key: "content", label: "Body", type: "markdown", rows: 10 },
-      { key: "author", label: "Author", type: "author" },
-      { key: "published_date", label: "Published", type: "date" },
-      num("read_time", "Read time (minutes)", { min: 0 }),
-      txt("image", "Image", { nullable: true }),
-      txt("video_url", "Video URL", { nullable: true }),
-      sel("difficulty", "Difficulty", DIFFICULTY_LEVELS, { nullable: true }),
-      { key: "tags", label: "Tags", type: "strings" },
-      { key: "related_content", label: "Related content", type: "refs", kinds: ["articles", "posts", "myths"] },
-      { key: "related_myths", label: "Related myths", type: "refs", kinds: "myths" },
-      ...relatedFields(),
-      ...reviewFields(),
-    ],
-  },
+  ...FEED_TYPES,
 ];
 
 export const TYPE_BY_TABLE = Object.fromEntries(TYPES.map((t) => [t.table, t]));

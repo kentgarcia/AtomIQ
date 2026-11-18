@@ -131,8 +131,9 @@ export async function openPublish(hooks) {
     toast("Nothing to publish: content matches the last release.");
     return;
   }
-  const unreviewed = problems.errors.filter((f) => f.rule === "review-pending");
-  const blocking = problems.errors.filter((f) => f.rule !== "review-pending");
+  // Unverified references are warnings in a draft but errors at the publish gate; the box below overrides that.
+  const unreviewed = problems.warnings.filter((f) => f.rule === "reference-unverified");
+  const blocking = problems.errors;
   const suggested = status.suggestion?.bump ?? "patch";
 
   let bump = suggested;
@@ -176,7 +177,7 @@ export async function openPublish(hooks) {
         const row = el("label", "checkline warnbox");
         allow = el("input");
         allow.type = "checkbox";
-        row.append(allow, document.createTextNode(` ${unreviewed.length} article/post${unreviewed.length === 1 ? " is" : "s are"} not reviewed yet. Publish anyway (recorded in the release).`));
+        row.append(allow, document.createTextNode(` ${unreviewed.length} reference${unreviewed.length === 1 ? " is" : "s are"} not verified yet. Publish anyway (recorded in the release).`));
         body.append(row);
       }
       log = el("pre", "log");
@@ -192,7 +193,7 @@ export async function openPublish(hooks) {
         close: false,
         onClick: async (d) => {
           if (!notes.value.trim()) return notes.focus();
-          if (unreviewed.length && !allow.checked) return toast("Review the pending items, or tick the box to publish anyway.", "err");
+          if (unreviewed.length && !allow.checked) return toast("Verify the pending references, or tick the box to publish anyway.", "err");
           if (blocking.length) return toast("Fix the errors first.", "err");
           publishBtn = d.buttons.publish;
           publishBtn.disabled = true;

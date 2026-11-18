@@ -10,7 +10,7 @@ One row per local calendar day in the SQLite progress database (`atomiq.db`,
 table `activity_days`, plus a small `activity_meta` table). The bundled content
 database is never touched, so content reseeds/updates cannot affect this data.
 Per day: counts per event kind, total, weighted points, level (0-4), a small
-dedupe ledger (`kind -> id -> times counted`, ids are lesson/quiz/article/
+dedupe ledger (`kind -> id -> times counted`, ids are lesson/quiz/
 element ids), the ISO timestamp of the last event and the timezone offset at
 that moment (diagnostics only). Nothing leaves the device: no network, no
 sharing/export UI, no leaderboard. "Delete Account" clears both tables.
@@ -25,8 +25,8 @@ sharing/export UI, no leaderboard. "Delete Account" clears both tables.
 | `quiz_complete` | same, when passed | 2 | once per quiz |
 | `lab_session` | `app/lab/index.tsx` when a lab challenge is solved | 2 | once per lab/challenge |
 | `game_session` | MythBuster `finishGame`; Atom Maze defeat/complete | 2 | max 5 per game, 10 total |
-| `article_read` | `app/article-detail.tsx` after 5 s with the article open | 1 | once per article |
 | `periodic_table_explore` | `recordActivity('periodic_table_explore', { id })` (called by the periodic-table feature) | 1 | once per element id |
+| `blog_read` | `services/feed.ts` `markBlogRead` when a mini blog piece is opened (docs/NPC_FEED_SPEC.md); reactions do not count | 1 | once per piece, max 10 |
 
 Opening the app is not learning activity (it only feeds the existing streak).
 
@@ -86,5 +86,5 @@ the explanation card says this.
 - `services/activity-core.ts` - pure logic and storage-agnostic engine.
 - `services/activity-log.ts` - SQLite store, `recordActivity`, history import.
 - `components/activity/` - `ContributionGraph`, `ActivityExplainer`,
-  `RecentActivityStrip`, `levels`, `use-activity-days`.
+  `levels`, `use-activity-days`.
 - `scripts/test-activity.mjs` - `npm run test:activity`.

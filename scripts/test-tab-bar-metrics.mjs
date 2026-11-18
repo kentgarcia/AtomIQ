@@ -23,26 +23,24 @@ describe("tab bar metrics", () => {
     for (let width = 320; width <= 1000; width += 4) {
       const m = resolve(width, 800);
       assert.ok(m.tabWidth >= 48 - 0.001, `${width}: tab ${m.tabWidth}`);
-      assert.ok(m.iconSlot <= m.tabWidth, `${width}: icon wider than tab`);
     }
   });
 
-  it("320 dp window: margin shrinks to 30 and tabs are exactly 48 dp", () => {
-    const m = resolve(320, 568);
-    assert.equal(m.horizontalMargin, 30);
-    assert.equal(m.tabWidth, 48);
-    assert.equal(m.iconSlot, 48);
-  });
-
-  it("keeps the iPhone reference bar unchanged (regular variant, margin 36)", () => {
-    for (const [w, h] of [[375, 667], [390, 844], [393, 852], [430, 932]]) {
+  it("is docked: no side margin, no gap above the system inset", () => {
+    for (const [w, h] of [[320, 568], [375, 667], [390, 844], [430, 932]]) {
       const m = resolve(w, h, 34);
-      assert.equal(m.variant, "regular", `${w}x${h}`);
-      assert.equal(m.horizontalMargin, 36);
-      assert.equal(m.contentHeight, 75);
-      assert.equal(m.gap, 16);
-      assert.equal(m.bottomOffset, 50);
+      assert.equal(m.horizontalMargin, 0, `${w}x${h}`);
+      assert.equal(m.gap, 0);
+      assert.equal(m.bottomOffset, 34);
+      assert.equal(m.barWidth, w);
     }
+  });
+
+  it("regular bar is 64 dp tall (icon, label, padding and the top border)", () => {
+    const m = resolve(390, 844, 34);
+    assert.equal(m.variant, "regular");
+    assert.equal(m.contentHeight, 64);
+    assert.equal(m.reservedHeight, 64 + 34);
   });
 
   it("dense variant triggers exactly for width < 360 or height <= 640", () => {
@@ -52,14 +50,13 @@ describe("tab bar metrics", () => {
     assert.equal(resolve(360, 641).variant, "regular");
   });
 
-  it("dense bar is 67 dp tall with a 12 dp gap", () => {
+  it("dense bar is 55 dp tall", () => {
     const m = resolve(360, 640, 48);
-    assert.equal(m.contentHeight, 67);
-    assert.equal(m.gap, 12);
-    assert.equal(m.reservedHeight, 67 + 48 + 12);
+    assert.equal(m.contentHeight, 55);
+    assert.equal(m.reservedHeight, 55 + 48);
   });
 
-  it("sits at insets.bottom + gap for every navigation mode", () => {
+  it("fills the system inset for every navigation mode", () => {
     for (const bottom of [0, 24, 34, 48, 64]) {
       const m = resolve(412, 915, bottom);
       assert.equal(m.bottomOffset, bottom + m.gap);
@@ -73,7 +70,7 @@ describe("tab bar metrics", () => {
     );
   });
 
-  it("caps the bar at 520 dp and centres it on tablets", () => {
+  it("caps the tabs at 600 dp and centres them on tablets (the bar itself spans the window)", () => {
     const m = resolve(800, 1280, 64);
     assert.equal(m.barWidth, TAB_BAR_CONSTANTS.maxWidth);
     assert.ok(2 * m.horizontalMargin + m.barWidth <= 800);
@@ -81,7 +78,7 @@ describe("tab bar metrics", () => {
 
   it("respects side insets (cutout / side navigation bar)", () => {
     const m = resolve(720, 360, 0, { left: 0, right: 48 });
-    assert.ok(m.horizontalMargin >= 48 + TAB_BAR_CONSTANTS.sideInsetGap);
+    assert.equal(m.horizontalMargin, 48);
   });
 
   it("reserved band stays under 25% of the window on all phones", () => {

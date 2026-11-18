@@ -4,7 +4,8 @@
  * never grey), as a tease.
  */
 
-import { Text, View } from "react-native";
+import { View } from "react-native";
+import { Text } from "@/components/ui/text";
 
 import { Card } from "@/components/ui/card";
 import { Icon } from "@/components/ui/icon";

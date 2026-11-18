@@ -1,6 +1,7 @@
 import { useIsFocused } from "expo-router";
 import { memo, useMemo } from "react";
-import { Text, View } from "react-native";
+import { View } from "react-native";
+import { Text } from "@/components/ui/text";
 import Animated, { useAnimatedProps, useReducedMotion, type SharedValue } from "react-native-reanimated";
 import Svg, {
   Circle,

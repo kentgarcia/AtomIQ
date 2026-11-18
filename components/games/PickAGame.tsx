@@ -1,24 +1,26 @@
 /**
  * Games — "Pick a Game" springy picker (replaces the Awards page).
  *
- * Fixed light surface. Cards link to AtomIQ's actual games: the Atom
+ * Sits on the same page background as the Home map (`mapBackground`): the standard `ScreenHeader` sits on top
+ * (a back arrow while a difficulty panel is open), the game cards keep their own surface. Cards link to AtomIQ's actual games: the Atom
  * Maze, unit quizzes, the Lab, and Myth Buster.
  */
 
 import { DifficultyPanel } from "@/components/games/DifficultyPanel";
 import { StackCard } from "@/components/games/StackCard";
-import { PageBackground, TOP_ROW_HEADER_HEIGHT, TopRowHeader, useTabBarInset } from "@/components/layout";
-import { GrowCard, GrowModal, useModalOrigin } from "@/components/ui/grow-modal";
+import { HeaderButton, ScreenHeader, useTabBarInset } from "@/components/layout";
+import { useModalOrigin } from "@/components/ui/grow-modal";
+import { ModalButton } from "@/components/ui/modal-card";
+import { ModalDialog } from "@/components/ui/modal-dialog";
 import { Icon } from "@/components/ui/icon";
 import { createStyles, fontFaces, useResponsiveLayout, useTheme } from "@/theme";
 import { impactLight, impactMedium } from "@/services/haptics";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
-  Pressable,
-  Text,
-  useWindowDimensions,
-  View,
+    useWindowDimensions,
+    View,
 } from "react-native";
+import { Text } from "@/components/ui/text";
 import Animated, {
     Extrapolation,
     interpolate,
@@ -27,15 +29,13 @@ import Animated, {
     useReducedMotion,
     useSharedValue,
     type SharedValue,
-    withRepeat,
-    withSpring,
     withTiming,
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { DURATION, EASE_DRAWER } from "@/theme/motion";
-import Svg, { Path } from "react-native-svg";
 
-const HEADER_H = 200;
+/** Height of `ScreenHeader` below the status-bar inset (12 top + 50 row + 8 bottom + 2 border); only the first-frame estimate. */
+const HEADER_BELOW_INSET = 72;
 
 type DifficultyGame = "atom-maze" | "mythbuster" | "lab";
 
@@ -75,60 +75,29 @@ function GameSlot({
 const GAMES = [
     {
         title: "Myth Buster",
-        color: "#b984ff",
+        subtitle: "Fact or myth? Swipe to bust it",
+        color: "#A66CFF",
         delay: 50,
         icon: "Judge",
         route: "/mythbuster" as const,
     },
     {
         title: "Atom Maze",
-        color: "#1ee2e6",
+        subtitle: "Find your way through the atom",
+        color: "#1CB0F6",
         delay: 100,
         icon: "Grid9",
         route: "/explorer/atom-maze" as const,
     },
     {
         title: "Lab Experiment",
-        color: "#90ea6c",
+        subtitle: "Build, shield and decay for real",
+        color: "#58CC02",
         delay: 150,
         icon: "Microscope",
         route: "/lab" as const,
     },
 ];
-
-/* ------------------------------------------------------------------ */
-/* Header                                                              */
-/* ------------------------------------------------------------------ */
-
-const QuestionMark = ({ color }: { color: string }) => (
-    <Svg width={44} height={44} viewBox="0 0 24 24">
-        <Path
-            d="M9.2 8.3C9.2 6.4 10.5 5 12.4 5C14.3 5 15.6 6.4 15.6 8.3C15.6 9.8 14.8 10.8 13.4 11.5C12.4 12 12 12.6 12 13.6V14.2"
-            stroke={color}
-            strokeWidth={2}
-            strokeLinecap="round"
-            fill="none"
-        />
-        <Path
-            d="M12 18.4h.01"
-            stroke={color}
-            strokeWidth={3.2}
-            strokeLinecap="round"
-        />
-    </Svg>
-);
-
-const RightArrow = ({ color = "#C7CBD4" }: { color?: string }) => (
-    <Svg width={60} height={18} viewBox="0 0 60 18">
-        <Path
-            d="M2 9H54M54 9L44 2M54 9L44 16"
-            stroke={color}
-            strokeWidth={3}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-        />
-    </Svg>
-);
 
 /* ------------------------------------------------------------------ */
 /* Screen                                                              */
@@ -140,16 +109,12 @@ export function PickAGame() {
     const { contentMaxWidth } = useResponsiveLayout();
     const tabBarInset = useTabBarInset();
     const { theme } = useTheme();
-    const tab = theme.palettes.tab;
+    const c = theme.colors;
     const styles = React.useMemo(() => makeStyles(theme), [theme]);
 
 
-    // Stack area sits below the header and above the floating tab bar
+    // Stack area sits below the header and above the docked tab bar
     const bottomReserve = tabBarInset + 16;
-    const stackH = Math.round(
-        windowHeight - insets.top - TOP_ROW_HEADER_HEIGHT - HEADER_H - bottomReserve,
-    );
-    const cardH = Math.round(stackH / GAMES.length);
 
     // Games with difficulty selection stay on this page: the difficulty stack
     // grows out of the tapped card's slot (and folds back into it). `activeGame`
@@ -159,6 +124,11 @@ export function PickAGame() {
     const [activeGame, setActiveGame] = useState<DifficultyGame | null>(null);
     const [panelGame, setPanelGame] = useState<DifficultyGame | null>(null);
     const [stageH, setStageH] = useState(0);
+    // The stage fills the space under the header; measured once laid out, estimated for the first frame.
+    const stackH = Math.round(
+        (stageH > 0 ? stageH : windowHeight - insets.top - HEADER_BELOW_INSET) - bottomReserve,
+    );
+    const cardH = Math.max(0, Math.round(stackH / GAMES.length));
     const t = useSharedValue(0);
     const selected = useSharedValue(-1);
     const timing = reducedMotion ? { duration: 150 } : EXPAND;
@@ -195,37 +165,6 @@ export function PickAGame() {
         });
     };
 
-    // Header arrow: nudges while picking, rotates 180° and darkens to
-    // become the active back button while a difficulty panel is open.
-    const flip = useSharedValue(0);
-    useEffect(() => {
-        flip.value = withSpring(activeGame === null ? 0 : 1, {
-            damping: 20,
-            stiffness: 220,
-        });
-    }, [activeGame, flip]);
-
-    const arrowIdleStyle = useAnimatedStyle(() => ({
-        opacity: 1 - flip.value,
-    }));
-    const arrowBackStyle = useAnimatedStyle(() => ({
-        opacity: flip.value,
-        transform: [{ rotate: `${flip.value * 180}deg` }],
-    }));
-
-    const arrowX = useSharedValue(0);
-    useEffect(() => {
-        arrowX.value = withRepeat(
-            withSpring(12, { damping: 16, stiffness: 200 }),
-            -1,
-            true,
-        );
-    }, [arrowX]);
-
-    const arrowStyle = useAnimatedStyle(() => ({
-        transform: [{ translateX: arrowX.value }],
-    }));
-
     // Every game opens the difficulty picker first.
     const handleSelect = (game: (typeof GAMES)[number], index: number) => {
         openDifficulty(
@@ -235,6 +174,11 @@ export function PickAGame() {
             index,
         );
     };
+
+    const activeGameTitle =
+        activeGame === null
+            ? null
+            : GAMES.find((g) => g.route.endsWith(activeGame === "atom-maze" ? "atom-maze" : activeGame))?.title ?? null;
 
     const [guideVisible, setGuideVisible] = useState(false);
     const { anchor: guideAnchor, origin: guideOrigin, capture: guideCapture } = useModalOrigin();
@@ -257,58 +201,26 @@ export function PickAGame() {
         {
             icon: "ArrowLeft2",
             title: "Back",
-            desc: "Tap the header arrow to return to the games list.",
+            desc: "Tap the back arrow in the header to return to the games list.",
         },
     ];
 
     return (
-        <View style={[styles.screen, { backgroundColor: theme.colors.background }]}>
-            <PageBackground />
-
-            {/* Shared top row — avatar and stats */}
-            <TopRowHeader />
-
-            {/* Header */}
-            <View
-                style={[
-                    styles.header,
-                    { width: "100%", maxWidth: contentMaxWidth, alignSelf: "center" },
-                ]}
-            >
-                <Pressable
-                    ref={guideAnchor}
-                    onPress={openGuide}
-                    style={({ pressed }) => [
-                        styles.logoContainer,
-                        pressed && styles.logoPressed,
-                    ]}
-                >
-                    <QuestionMark color="#C2410C" />
-                </Pressable>
-
-                <View style={styles.titleGroup}>
-                    <Text style={[styles.titlePick, { color: tab.text }]}>Pick</Text>
-                    <View style={styles.titleBottomRow}>
-                        <Text style={[styles.titleA, { color: tab.text }]}>a</Text>
-                        <Text style={[styles.titleGame, { color: "#EA580C" }]}>Game</Text>
+        <View style={[styles.screen, { backgroundColor: c.mapBackground }]}>
+            <ScreenHeader
+                title={activeGameTitle ?? "Games"}
+                subtitle={activeGameTitle ? "Choose a level" : undefined}
+                onBack={activeGame !== null ? closeDifficulty : undefined}
+                backLabel="Back to games"
+                right={
+                    <View ref={guideAnchor} collapsable={false}>
+                        <HeaderButton icon="MessageQuestion" label="How to play" onPress={openGuide} />
                     </View>
-                    <Pressable onPress={closeDifficulty} hitSlop={12}>
-                        <Animated.View
-                            style={[styles.arrow, activeGame === null ? arrowStyle : null]}
-                        >
-                            <Animated.View style={[styles.arrowAbs, arrowIdleStyle]}>
-                                <RightArrow color={tab.textMuted} />
-                            </Animated.View>
-                            <Animated.View style={[styles.arrowAbs, arrowBackStyle]}>
-                                <RightArrow color={tab.text} />
-                            </Animated.View>
-                        </Animated.View>
-                    </Pressable>
-                </View>
-            </View>
+                }
+            />
 
             {/* Sliding layers — picker vs difficulty panel. Both transparent;
-                the base gradient covers the full screen behind them. */}
+                the blue screen background shows behind them. */}
             <View
                 style={[
                     styles.stage,
@@ -320,7 +232,7 @@ export function PickAGame() {
                     style={styles.layer}
                     pointerEvents={activeGame === null ? "auto" : "none"}
                 >
-                    {/* Full-bleed slanted card stack */}
+                    {/* Game cards */}
                     <View style={[styles.cardsList, { paddingBottom: bottomReserve }]}>
                         {GAMES.map((game, index) => (
                             <GameSlot
@@ -332,6 +244,7 @@ export function PickAGame() {
                             >
                                 <StackCard
                                     title={game.title}
+                                    subtitle={game.subtitle}
                                     color={game.color}
                                     icon={game.icon}
                                     delay={game.delay}
@@ -348,78 +261,32 @@ export function PickAGame() {
                         style={[styles.layer, panelStyle]}
                         pointerEvents={activeGame !== null ? "auto" : "none"}
                     >
-                        <DifficultyPanel game={panelGame} />
+                        <DifficultyPanel game={panelGame} stackHeight={stackH} />
                     </Animated.View>
                 )}
             </View>
 
             {/* How to Play guide */}
-            <GrowModal
+            <ModalDialog
                 visible={guideVisible}
                 origin={guideOrigin}
-                onRequestClose={() => setGuideVisible(false)}
+                onClose={() => setGuideVisible(false)}
+                title="How to Play"
+                closeLabel="Close how to play"
+                footer={<ModalButton label="Got it" onPress={() => setGuideVisible(false)} />}
             >
-                <View style={styles.modalOverlay}>
-                    <GrowCard style={styles.modalContent}>
-                        <View style={styles.dragHandle} />
-
-                        <View style={styles.modalHeader}>
-                            <View style={styles.modalHeaderLeft}>
-                                <View style={styles.modalHeaderIcon}>
-                                    <Icon name="MessageQuestion" size={16} color="#EA580C" variant="Bold" />
-                                </View>
-                                <Text style={styles.modalTitle}>How to Play</Text>
-                            </View>
-                            <Pressable
-                                onPress={() => setGuideVisible(false)}
-                                style={({ pressed }) => [styles.modalCloseBtn, pressed && { opacity: 0.8 }]}
-                                hitSlop={6}
-                                accessibilityRole="button"
-                                accessibilityLabel="Close how to play"
-                            >
-                                <Icon
-                                    name="CloseCircle"
-                                    size={20}
-                                    color={theme.colors.textFaint}
-                                    variant="Bold"
-                                />
-                            </Pressable>
+                {GUIDE_ROWS.map((row) => (
+                    <View key={row.title} style={styles.guideRow}>
+                        <View style={styles.guideRowIcon}>
+                            <Icon name={row.icon} size={20} color={theme.colors.primaryLight} variant="Bold" />
                         </View>
-
-                        {GUIDE_ROWS.map((row) => (
-                            <View key={row.title} style={styles.guideRow}>
-                                <View style={styles.guideRowIcon}>
-                                    <Icon
-                                        name={row.icon}
-                                        size={20}
-                                        color="#EA580C"
-                                        variant="Bold"
-                                    />
-                                </View>
-                                <View style={styles.guideRowText}>
-                                    <Text style={styles.guideRowTitle}>
-                                        {row.title}
-                                    </Text>
-                                    <Text style={styles.guideRowDesc}>
-                                        {row.desc}
-                                    </Text>
-                                </View>
-                            </View>
-                        ))}
-
-                        <Pressable
-                            style={({ pressed }) => [
-                                styles.guideActionBtn,
-                                pressed && { transform: [{ scale: 0.97 }], opacity: 0.96 },
-                            ]}
-                            onPress={() => setGuideVisible(false)}
-                        >
-                            <Icon name="TickCircle" size={18} color="#FFFFFF" variant="Bold" />
-                            <Text style={styles.guideActionText}>Got it</Text>
-                        </Pressable>
-                    </GrowCard>
-                </View>
-            </GrowModal>
+                        <View style={styles.guideRowText}>
+                            <Text style={styles.guideRowTitle}>{row.title}</Text>
+                            <Text style={styles.guideRowDesc}>{row.desc}</Text>
+                        </View>
+                    </View>
+                ))}
+            </ModalDialog>
         </View>
     );
 }
@@ -429,60 +296,6 @@ const makeStyles = createStyles((theme) => {
   return {
     screen: {
         flex: 1,
-    },
-    header: {
-        height: 200,
-        paddingHorizontal: 24,
-        paddingBottom: 15,
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "flex-start",
-    },
-    logoContainer: {
-        marginTop: 15,
-    },
-    logoPressed: {
-        transform: [{ scale: 0.8 }, { rotate: "-10deg" }],
-    },
-    titleGroup: {
-        alignItems: "flex-end",
-        paddingTop: 5,
-        lineHeight: 0,
-    },
-    titlePick: {
-        fontSize: 84,
-        ...fontFaces.heavy,
-        letterSpacing: -4,
-        lineHeight: 78,
-    },
-    titleBottomRow: {
-        flexDirection: "row",
-        alignItems: "baseline",
-    },
-    titleGame: {
-        fontSize: 84,
-        ...fontFaces.heavy,
-        letterSpacing: -4,
-        lineHeight: 78,
-    },
-    titleA: {
-        fontSize: 34,
-        ...fontFaces.heavy,
-        letterSpacing: -1.5,
-        marginLeft: 4,
-    },
-    arrow: {
-        marginTop: 8,
-        width: 60,
-        height: 18,
-        position: "relative",
-    },
-    arrowAbs: {
-        position: "absolute",
-        top: 0,
-        right: 0,
-        bottom: 0,
-        left: 0,
     },
     stage: {
         flex: 1,
@@ -496,76 +309,8 @@ const makeStyles = createStyles((theme) => {
     },
     cardsList: {
         flex: 1,
-        marginHorizontal: -14,
     },
-    /* Guide modal — profile edit-modal design */
-    modalOverlay: {
-        flex: 1,
-        backgroundColor: theme.colors.overlay,
-        justifyContent: "center",
-        alignItems: "center",
-        padding: 20,
-    },
-    modalContent: {
-        borderRadius: 26,
-        width: "100%",
-        maxWidth: 380,
-        maxHeight: "82%",
-        padding: 16,
-        paddingTop: 12,
-        borderWidth: 2,
-        borderBottomWidth: 4,
-        borderColor: ui.border,
-        backgroundColor: ui.card,
-        elevation: 10,
-        shadowColor: theme.colors.shadow,
-        shadowOffset: { width: 0, height: 8 },
-        shadowOpacity: 0.12,
-        shadowRadius: 16,
-    },
-    dragHandle: {
-        width: 36,
-        height: 4,
-        borderRadius: 2,
-        backgroundColor: ui.softBorder,
-        alignSelf: "center",
-        marginBottom: 8,
-    },
-    modalHeader: {
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "center",
-        marginBottom: 14,
-        gap: 12,
-    },
-    modalHeaderLeft: {
-        flexDirection: "row",
-        alignItems: "center",
-        gap: 10,
-    },
-    modalHeaderIcon: {
-        width: 32,
-        height: 32,
-        borderRadius: 16,
-        backgroundColor: ui.soft,
-        alignItems: "center",
-        justifyContent: "center",
-    },
-    modalTitle: {
-        fontSize: 18,
-        ...fontFaces.heavy,
-        color: ui.text,
-    },
-    modalCloseBtn: {
-        width: 36,
-        height: 36,
-        borderRadius: 18,
-        alignItems: "center",
-        justifyContent: "center",
-        backgroundColor: ui.soft,
-        borderWidth: 1,
-        borderColor: ui.border,
-    },
+    /* How to Play (ModalDialog contents) */
     guideRow: {
         flexDirection: "row",
         alignItems: "center",
@@ -573,7 +318,6 @@ const makeStyles = createStyles((theme) => {
         paddingVertical: 10,
         paddingHorizontal: 12,
         borderRadius: 12,
-        marginBottom: 8,
         backgroundColor: ui.soft,
         borderWidth: 1,
         borderColor: ui.softBorder,
@@ -601,29 +345,6 @@ const makeStyles = createStyles((theme) => {
         ...fontFaces.semibold,
         color: ui.muted,
         lineHeight: 18,
-    },
-    guideActionBtn: {
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "center",
-        gap: 6,
-        marginTop: 6,
-        paddingVertical: 14,
-        borderRadius: 16,
-        borderWidth: 1,
-        borderBottomWidth: 4,
-        borderColor: "#C2410C",
-        backgroundColor: "#EA580C",
-        shadowColor: theme.colors.shadow,
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.12,
-        shadowRadius: 8,
-        elevation: 4,
-    },
-    guideActionText: {
-        fontSize: 15,
-        ...fontFaces.heavy,
-        color: "#FFFFFF",
     },
   };
 });

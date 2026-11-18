@@ -1,15 +1,16 @@
 import React, { useCallback, useMemo, useRef, useState } from "react";
 import {
-  Pressable,
-  ScrollView,
-  Text,
-  View,
-  type LayoutChangeEvent,
-  type ScrollViewInstance,
+    Pressable,
+    ScrollView,
+    View,
+    type LayoutChangeEvent,
+    type ScrollViewInstance,
 } from "react-native";
-import Animated, { FadeIn, useReducedMotion } from "react-native-reanimated";
+import { Text } from "@/components/ui/text";
+import { FadeIn, useReducedMotion } from "react-native-reanimated";
 
 import { Icon } from "@/components/ui/icon";
+import { ActivityCard } from "./ActivityCard";
 import {
   ACTIVITY_KINDS,
   LEVEL_DESCRIPTIONS,
@@ -103,14 +104,16 @@ export function ContributionGraph({ days, todayKey, currentStreak }: Contributio
 
   return (
     <View>
-      <Text style={styles.summary} accessibilityRole="summary">
-        {text}
-      </Text>
-
-      <View
-        style={styles.card}
-        onLayout={(e: LayoutChangeEvent) => setMeasured(e.nativeEvent.layout.width - 32)}
+      <ActivityCard
+        title="Learning activity"
+        icon="Calendar"
+        onBodyLayout={(e: LayoutChangeEvent) => setMeasured(e.nativeEvent.layout.width - 32)}
+        bodyStyle={styles.graphBody}
       >
+        <Text style={styles.summary} accessibilityRole="summary">
+          {text}
+        </Text>
+
         <View style={styles.graphRow}>
           {/* Weekday rail (Sunday-first; alternate rows labelled) */}
           <View style={[styles.rail, { width: RAIL_WIDTH, paddingTop: 18 }]} accessible={false}
@@ -231,14 +234,16 @@ export function ContributionGraph({ days, todayKey, currentStreak }: Contributio
           0 none · 1 light · 2 some · 3 busy · 4 very busy. The top level is a ceiling — doing more in a day
           never goes beyond it.
         </Text>
-      </View>
+      </ActivityCard>
 
       {/* Exact day details */}
-      <Animated.View
+      <ActivityCard
         key={selectedKey}
+        title="Day details"
+        icon="CalendarTick"
         entering={reducedMotion ? undefined : FadeIn.duration(150)}
-        style={styles.card}
         accessibilityLiveRegion="polite"
+        bodyStyle={styles.detailBody}
       >
         <View style={styles.detailHeader}>
           <Pressable
@@ -273,7 +278,7 @@ export function ContributionGraph({ days, todayKey, currentStreak }: Contributio
           <View style={styles.detailList}>
             {parts.map((p) => (
               <View key={p} style={styles.detailRow}>
-                <Icon name="TickCircle" size={14} color={theme.accents.orange.primaryDark} variant="Bold" />
+                <Icon name="TickCircle" size={14} color={theme.colors.primaryDark} variant="Bold" />
                 <Text style={styles.detailText}>{p}</Text>
               </View>
             ))}
@@ -288,7 +293,7 @@ export function ContributionGraph({ days, todayKey, currentStreak }: Contributio
             Includes lessons, quizzes or games recovered from your existing progress history on this device.
           </Text>
         ) : null}
-      </Animated.View>
+      </ActivityCard>
     </View>
   );
 }
@@ -300,8 +305,8 @@ const KIND_EXPLANATIONS: Record<(typeof ACTIVITY_KINDS)[number], string> = {
   quiz_complete: "Finishing a quiz",
   lab_session: "Completing a Lab experiment",
   game_session: "Finishing a game round (MythBuster, Atom Maze)",
-  article_read: "Reading an article for a few moments",
   periodic_table_explore: "Exploring an element in the periodic table",
+  blog_read: "Reading a mini blog piece",
 };
 
 /** "What counts as activity" card, with the privacy and no-pressure promise. */
@@ -309,14 +314,15 @@ export function ActivityExplainer() {
   const { theme } = useTheme();
   const styles = useMemo(() => makeStyles(theme), [theme]);
   return (
-    <View style={styles.card}>
-      <Text style={styles.explainTitle}>What counts as activity</Text>
-      {ACTIVITY_KINDS.map((kind) => (
-        <View key={kind} style={styles.detailRow}>
-          <Icon name="TickCircle" size={14} color={theme.accents.orange.primaryDark} variant="Bold" />
-          <Text style={styles.detailText}>{KIND_EXPLANATIONS[kind]}</Text>
-        </View>
-      ))}
+    <ActivityCard title="What counts as activity" icon="InfoCircle" bodyStyle={styles.explainBodyWrap}>
+      <View style={styles.kindList}>
+        {ACTIVITY_KINDS.map((kind, i) => (
+          <View key={kind} style={[styles.kindRow, i > 0 && styles.kindDivided]}>
+            <Icon name="TickCircle" size={14} color={theme.colors.primaryDark} variant="Bold" />
+            <Text style={styles.detailText}>{KIND_EXPLANATIONS[kind]}</Text>
+          </View>
+        ))}
+      </View>
       <Text style={styles.explainBody}>
         Doing the same thing again in a day is only counted a few times, so a day&apos;s colour reflects real
         variety. Level 4 (7 points or more) is the top of the scale. Each action is worth 1 point; finishing a
@@ -330,7 +336,7 @@ export function ActivityExplainer() {
           Skipping a day is okay — you can use AtomIQ without a streak.
         </Text>
       </View>
-    </View>
+    </ActivityCard>
   );
 }
 
@@ -340,21 +346,11 @@ const makeStyles = createStyles((theme) => ({
     ...fontFaces.semibold,
     color: theme.colors.textSecondary,
     lineHeight: 19,
-    marginBottom: 12,
     textAlign: "left",
   },
-  card: {
-    backgroundColor: theme.colors.card,
-    borderRadius: 24,
-    padding: 16,
-    marginBottom: 20,
-    alignSelf: "stretch",
-    elevation: 5,
-    shadowColor: theme.colors.shadow,
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.08,
-    shadowRadius: 10,
-  },
+  /* The card bodies: the graph and details keep a tighter gap than the default */
+  graphBody: { gap: 12 },
+  detailBody: { gap: 4 },
   graphRow: { flexDirection: "row", alignItems: "flex-start" },
   rail: { alignItems: "flex-start" },
   railText: { fontSize: 10, ...fontFaces.semibold, color: theme.colors.textMuted },
@@ -376,7 +372,6 @@ const makeStyles = createStyles((theme) => ({
     alignItems: "center",
     justifyContent: "flex-end",
     gap: 6,
-    marginTop: 14,
   },
   legendItem: { alignItems: "center" },
   legendEnd: { fontSize: 11, ...fontFaces.semibold, color: theme.colors.textMuted },
@@ -385,7 +380,7 @@ const makeStyles = createStyles((theme) => ({
     ...fontFaces.regular,
     color: theme.colors.textMuted,
     lineHeight: 16,
-    marginTop: 8,
+    marginTop: -4,
     textAlign: "right",
   },
   detailHeader: { flexDirection: "row", alignItems: "center", gap: 8 },
@@ -407,24 +402,33 @@ const makeStyles = createStyles((theme) => ({
     backgroundColor: theme.colors.surfaceSoft,
   },
   stepBtnDisabled: { opacity: 0.4 },
-  detailList: { marginTop: 12, gap: 8 },
-  detailRow: { flexDirection: "row", alignItems: "center", gap: 8, marginTop: 6 },
+  detailList: { marginTop: 8, gap: 8 },
+  detailRow: { flexDirection: "row", alignItems: "center", gap: 8 },
   detailText: { flex: 1, fontSize: 13, ...fontFaces.regular, color: theme.colors.text, lineHeight: 19 },
   detailEmpty: {
-    marginTop: 12,
+    marginTop: 8,
     fontSize: 13,
     ...fontFaces.regular,
     color: theme.colors.textSecondary,
     lineHeight: 19,
   },
   detailNote: {
-    marginTop: 10,
+    marginTop: 8,
     fontSize: 11,
     ...fontFaces.regular,
     color: theme.colors.textMuted,
     lineHeight: 16,
   },
-  explainTitle: { fontSize: 16, ...fontFaces.heavy, color: theme.colors.text, marginBottom: 6 },
+  explainBodyWrap: { gap: 0 },
+  /* The activity kinds: one per line, split by soft dividers like the Settings rows */
+  kindList: { gap: 0 },
+  kindRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    paddingVertical: 9,
+  },
+  kindDivided: { borderTopWidth: 1, borderColor: theme.colors.borderSubtle },
   explainBody: {
     fontSize: 12,
     ...fontFaces.regular,

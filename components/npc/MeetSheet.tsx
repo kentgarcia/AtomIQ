@@ -3,7 +3,8 @@
  * A plain modal over the screen; reduced motion shows a still teacher.
  */
 
-import { Modal, Pressable, ScrollView, Text, View } from "react-native";
+import { Modal, Pressable, ScrollView, View } from "react-native";
+import { Text } from "@/components/ui/text";
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";

@@ -1,18 +1,20 @@
 /**
  * The panel that takes the footer's place after an answer is checked, like Duolingo's: a full-width
- * tinted sheet (green when right, red when not) with a check or cross, a short title, the
+ * tinted sheet with square top corners (green when right, red when not) with a check or cross, a short title, the
  * explanation and the Continue button inside it. Flat, no mascot; the colours settle in with a short
  * ease-out rise. The sheet's colours come from the theme's success and error roles.
  */
 
-import { Text, View } from "react-native";
+import { View } from "react-native";
+import { Text } from "@/components/ui/text";
 import Animated, { FadeInDown, useReducedMotion } from "react-native-reanimated";
 
 import { EASE_OUT } from "@/components/motion/motion";
+import { FooterRow } from "@/components/lesson/FooterRow";
 import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
 import type { ItemResult } from "@/content/curriculum/types";
-import { createStyles, fontFaces, fontSizes, radius, spacing, useTheme, withAlpha } from "@/theme";
+import { createStyles, fontFaces, fontSizes, spacing, useTheme, withAlpha } from "@/theme";
 
 /** Said when the answer is right; one is picked from the card, so a card always says the same thing. */
 export const CORRECT_TITLES = ["Nicely done!", "Great job!", "That's right!", "Well done!", "Spot on!"] as const;
@@ -27,14 +29,13 @@ export function correctTitleFor(seed: string): string {
 
 const useStyles = createStyles(() => ({
   sheet: {
-    borderTopLeftRadius: radius.xl,
-    borderTopRightRadius: radius.xl,
     paddingTop: spacing.lg,
     gap: spacing.md,
   },
   head: { flexDirection: "row", alignItems: "center", gap: spacing.sm },
   title: { ...fontFaces.heavy, flex: 1, fontSize: fontSizes["4xl"] },
   body: { ...fontFaces.medium, fontSize: fontSizes.xl, lineHeight: 22 },
+  note: { ...fontFaces.bold, fontSize: fontSizes.xl, lineHeight: 22 },
 }));
 
 export function FeedbackDock({
@@ -42,6 +43,7 @@ export function FeedbackDock({
   explanation,
   seed,
   onContinue,
+  onBack,
   paddingHorizontal,
   paddingBottom,
 }: {
@@ -50,6 +52,8 @@ export function FeedbackDock({
   /** Picks the title for a right answer (the card id). */
   seed: string;
   onContinue: () => void;
+  /** Steps back to the previous card; the Back button shows beside Continue when given. */
+  onBack?: (() => void) | null;
   paddingHorizontal: number;
   paddingBottom: number;
 }) {
@@ -73,8 +77,12 @@ export function FeedbackDock({
           {ok ? correctTitleFor(seed) : WRONG_TITLE}
         </Text>
       </View>
+      {/* Why the picked option is not the answer (a choice's per-option note): said here, not inside the option, so the option never changes size */}
+      {!ok && result.note ? <Text style={[styles.note, { color: ink }]}>{result.note}</Text> : null}
       {explanation ? <Text style={[styles.body, { color: ink }]}>{explanation}</Text> : null}
-      <Button label="Continue" variant={ok ? "success" : "destructive"} onPress={onContinue} />
+      <FooterRow onBack={onBack}>
+        <Button label="Continue" variant={ok ? "success" : "destructive"} onPress={onContinue} />
+      </FooterRow>
     </Animated.View>
   );
 }

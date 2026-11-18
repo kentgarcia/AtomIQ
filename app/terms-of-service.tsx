@@ -4,10 +4,10 @@ import { useRouter } from "expo-router";
 import React from "react";
 import {
     ScrollView,
-    Text,
     TouchableOpacity,
     View,
 } from "react-native";
+import { Text } from "@/components/ui/text";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -22,7 +22,7 @@ const SECTIONS: Section[] = [
   },
   {
     title: "2. What AtomIQ Provides",
-    body: "AtomIQ is a local-first nuclear science learning app. It offers a guided learning path of lessons and quizzes; the MythBuster game (Quick Play, Challenge, and Endless modes); Shrodi, a tap-based pill guide that routes you to lessons, encyclopedia entries, articles, journeys, and games without typing; a discovery feed with bookmarks; explorer journeys, a searchable encyclopedia, and the Atom Maze; interactive labs such as the Dose Visualizer and Energy Showdown; daily facts, missions, and streak tracking; and XP, levels, achievements, personal-best scores, and an on-device leaderboard alongside profile and settings customization.",
+    body: "AtomIQ is a local-first nuclear science learning app. It offers a guided learning path of lessons and quizzes; the MythBuster game (Quick Play, Challenge, and Endless modes); Shrodi, a tap-based pill guide that routes you to lessons, encyclopedia entries, journeys, and games without typing; a Discover tab that opens the encyclopedia; explorer journeys, a searchable encyclopedia, and the Atom Maze; interactive labs such as the Dose Visualizer and Energy Showdown; daily facts, missions, and streak tracking; and XP, levels, achievements, personal-best scores, and an on-device leaderboard alongside profile and settings customization.",
   },
   {
     title: "3. Eligibility and Children",

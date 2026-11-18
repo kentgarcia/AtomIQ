@@ -1,5 +1,5 @@
 /**
- * Measured floating tab-bar inset + visibility.
+ * Measured docked tab-bar inset + visibility.
  *
  * The tab bar reports its rendered height so screens reserve exactly the
  * space it occupies instead of guessing with magic padding values. The
@@ -123,7 +123,7 @@ export function TabBarInsetProvider({ children }: { children: React.ReactNode })
     );
 }
 
-/** Total bottom space occupied by the floating tab bar (or just the system inset when hidden). */
+/** Total bottom space occupied by the docked tab bar (or just the system inset when hidden). */
 export function useTabBarInset(): number {
     const context = useContext(TabBarInsetContext);
     const fallback = useResolvedTabBarMetrics();
@@ -166,7 +166,7 @@ export function useHideTabBar(hidden: boolean, owner = "screen"): void {
 }
 
 /**
- * Bottom padding for a screen. `tabBar` reserves the floating bar; otherwise
+ * Bottom padding for a screen. `tabBar` reserves the docked bar; otherwise
  * only the system safe-area inset is reserved. `extra` adds a control that sits
  * above the bar (composer, CTA, answer row).
  */

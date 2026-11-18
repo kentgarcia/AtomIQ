@@ -1,3 +1,4 @@
+import { ActivityCard, ActivityRule } from "@/components/activity/ActivityCard";
 import { Icon } from "@/components/ui/icon";
 import { ActivityExplainer, ContributionGraph } from "@/components/activity/ContributionGraph";
 import { useActivityDays } from "@/components/activity/use-activity-days";
@@ -9,20 +10,14 @@ import {
   fontFaces,
   useResponsiveLayout,
   createStyles,
+  withAlpha,
 } from "@/theme";
 import { useRouter } from "expo-router";
 import React, { useEffect, useMemo, useState } from "react";
-import {
-  ScrollView,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import { Pressable, ScrollView, View } from "react-native";
+import { Text } from "@/components/ui/text";
+import { FadeIn, FadeInDown, useReducedMotion } from "react-native-reanimated";
 
-/* Autumn design tokens shared with the profile + home screens */
-const BTN_COLOR = "#EA580C";
-const BTN_LIP = "#C2410C";
 const DAY_LABELS = ["S", "M", "T", "W", "T", "F", "S"];
 
 type WeekDay = {
@@ -62,15 +57,14 @@ const buildWeek = (): WeekDay[] => {
 
 export default function StreakScreen() {
   const router = useRouter();
-  const { width, contentMaxWidth, gutter } = useResponsiveLayout();
-  const frameLeft = Math.max(gutter, (width - contentMaxWidth) / 2 + gutter);
+  const { contentMaxWidth, gutter } = useResponsiveLayout();
   const { theme } = useTheme();
   const { userProfile } = useStorage();
-  const bgColors: [string, string] = [
-    theme.colors.background,
-    theme.colors.background,
-  ];
+  const reducedMotion = useReducedMotion();
   const styles = useMemo(() => makeStyles(theme), [theme]);
+  const c = theme.colors;
+  // Cards come in one after another; a calm fade with reduced motion
+  const enter = (delay: number) => (reducedMotion ? FadeIn.duration(120) : FadeInDown.delay(delay).springify());
 
   const [week, setWeek] = useState<WeekDay[]>(() => buildWeek());
   const activity = useActivityDays();
@@ -107,67 +101,64 @@ export default function StreakScreen() {
   }, []);
 
   return (
-    <View style={[styles.container, { backgroundColor: bgColors[0] }]}>
-
+    // The Profile's blue: this page opens from the streak card there
+    <View style={[styles.container, { backgroundColor: c.mapBackground }]}>
       <SafeAreaView style={{ flex: 1 }}>
-        <TouchableOpacity
-          style={[styles.closeBtn, { top: 10, left: frameLeft }]}
-          onPress={() => router.back()}
-          hitSlop={4}
-          accessibilityRole="button"
-          accessibilityLabel="Close streak details"
-        >
-          <Icon name="Close" size={22} color={theme.colors.textMuted} />
-        </TouchableOpacity>
-
         <ScrollView
           showsVerticalScrollIndicator={false}
           contentContainerStyle={[
             styles.scrollContent,
             {
-              paddingTop: 10,
               paddingHorizontal: gutter,
-              paddingBottom: 40,
               width: "100%",
               maxWidth: contentMaxWidth,
               alignSelf: "center",
             },
           ]}
         >
-          {/* Hero card */}
-          <Animated.View
-            entering={FadeInDown.springify()}
-            style={styles.card}
+          {/* Hero card: the streak, with the way out on its band */}
+          <ActivityCard
+            title="Daily Streak"
+            entering={enter(0)}
+            headerRight={
+              <Pressable
+                style={styles.closeBtn}
+                onPress={() => router.back()}
+                hitSlop={8}
+                accessibilityRole="button"
+                accessibilityLabel="Close streak details"
+              >
+                <Icon name="Close" size={22} color={c.lessonHeader} variant="Bold" />
+              </Pressable>
+            }
           >
-            <View style={styles.tape} />
-            {/* Reference-style button with the sun on it */}
-            <View style={styles.sunButton}>
-              <View style={[styles.sunInner, { backgroundColor: BTN_LIP }]}>
-                <View style={[styles.sunFace, { backgroundColor: BTN_COLOR }]}>
-                  <Icon name="Sun" size={34} color={theme.colors.onPrimary} variant="Bold" />
-                </View>
+            <View style={styles.hero}>
+              <View style={styles.sun}>
+                <Icon name="Sun" size={30} color={c.primary} variant="Bold" />
+              </View>
+              <View style={styles.heroText}>
+                <Text style={styles.heroValue}>{currentStreak} day streak</Text>
+                <Text style={styles.heroSub}>
+                  {currentStreak > 0
+                    ? "You're on fire! Open AtomIQ every day to keep it growing."
+                    : "Open AtomIQ today to start a new streak!"}
+                </Text>
               </View>
             </View>
-            <Text style={styles.heroValue}>{currentStreak} day streak</Text>
-            <Text style={styles.heroSub}>
-              {currentStreak > 0
-                ? "You're on fire! Open AtomIQ every day to keep it growing."
-                : "Open AtomIQ today to start a new streak!"}
-            </Text>
-            <View style={styles.longestPill}>
-              <Icon name="Cup" size={16} color="#C2410C" variant="Bold" />
-              <Text style={styles.longestText}>
-                Longest streak: {longestStreak} {longestStreak === 1 ? "day" : "days"}
+            <ActivityRule />
+            <View style={styles.statRow}>
+              <View style={styles.statIcon}>
+                <Icon name="Cup" size={16} color={c.primaryDark} variant="Bold" />
+              </View>
+              <Text style={styles.statLabel}>Longest streak</Text>
+              <Text style={styles.statValue}>
+                {longestStreak} {longestStreak === 1 ? "day" : "days"}
               </Text>
             </View>
-          </Animated.View>
+          </ActivityCard>
 
           {/* This week */}
-          <Animated.View
-            entering={FadeInDown.delay(100).springify()}
-            style={styles.card}
-          >
-            <Text style={styles.cardTitle}>This Week</Text>
+          <ActivityCard title="This Week" icon="CalendarTick" entering={enter(100)}>
             <View style={styles.weekRow}>
               {week.map((day) => (
                 <View key={day.date} style={styles.dayColumn}>
@@ -179,7 +170,7 @@ export default function StreakScreen() {
                     ]}
                   >
                     {day.active ? (
-                      <Icon name="TickCircle" size={16} color={theme.colors.onPrimary} variant="Bold" />
+                      <Icon name="TickCircle" size={16} color={c.onPrimary} variant="Bold" />
                     ) : null}
                   </View>
                   <Text
@@ -193,14 +184,10 @@ export default function StreakScreen() {
             <Text style={styles.weekHint}>
               Filled days are the ones where you earned XP or finished a lesson.
             </Text>
-          </Animated.View>
+          </ActivityCard>
 
           {/* Tips */}
-          <Animated.View
-            entering={FadeInDown.delay(200).springify()}
-            style={styles.card}
-          >
-            <Text style={styles.cardTitle}>How to Keep Your Streak</Text>
+          <ActivityCard title="How to Keep Your Streak" icon="Lamp" entering={enter(200)} bodyStyle={styles.tipsBody}>
             {[
               {
                 icon: "Book",
@@ -215,20 +202,17 @@ export default function StreakScreen() {
                 text: "Miss a day and the streak resets — but your longest streak is saved forever!",
               },
             ].map((tip, index) => (
-              <View key={index} style={styles.tipRow}>
+              <View key={index} style={[styles.tipRow, index > 0 && styles.tipDivided]}>
                 <View style={styles.tipIconCircle}>
-                  <Icon name={tip.icon} size={16} color="#C2410C" variant="Bold" />
+                  <Icon name={tip.icon} size={16} color={c.primaryDark} variant="Bold" />
                 </View>
                 <Text style={styles.tipText}>{tip.text}</Text>
               </View>
             ))}
-          </Animated.View>
+          </ActivityCard>
 
           {/* Learning activity history (on-device). The streak shown is the
               same profile value as the hero card above. */}
-          <Text style={styles.sectionHeading} accessibilityRole="header">
-            Learning activity
-          </Text>
           <ContributionGraph
             days={activity.days}
             todayKey={activity.todayKey}
@@ -241,192 +225,76 @@ export default function StreakScreen() {
   );
 }
 
-const makeStyles = createStyles((theme) => ({
-    container: {
-      flex: 1,
-    },
+const makeStyles = createStyles((theme) => {
+  const c = theme.colors;
+  return {
+    container: { flex: 1 },
+    scrollContent: { paddingTop: 12, paddingBottom: 40 },
+
+    /* White circle on the yellow band, holding the close icon */
     closeBtn: {
-      position: "absolute",
-      left: 20,
-      width: 40,
-      height: 40,
-      borderRadius: 20,
-      backgroundColor: theme.colors.card,
+      width: 36,
+      height: 36,
+      borderRadius: 18,
       alignItems: "center",
       justifyContent: "center",
-      zIndex: 10,
-      elevation: 3,
-      shadowColor: theme.colors.shadow,
-      shadowOffset: { width: 0, height: 3 },
-      shadowOpacity: 0.08,
-      shadowRadius: 6,
+      backgroundColor: c.onPrimary,
     },
-    scrollContent: {
-      paddingHorizontal: 20,
-      paddingBottom: 40,
-      paddingTop: 56,
-    },
-    /* Shared rounded card, like the profile cards */
-    card: {
-      backgroundColor: theme.colors.card,
-      borderRadius: 24,
-      padding: 24,
-      paddingTop: 28,
-      alignItems: "center",
-      marginBottom: 20,
-      elevation: 5,
-      shadowColor: theme.colors.shadow,
-      shadowOffset: { width: 0, height: 6 },
-      shadowOpacity: 0.08,
-      shadowRadius: 10,
-    },
-    tape: {
-      position: "absolute",
-      top: -11,
-      alignSelf: "center",
-      width: 84,
-      height: 22,
-      borderRadius: 3,
-      backgroundColor: "rgba(255,140,0,0.30)",
-      borderColor: "rgba(255,140,0,0.35)",
-      borderWidth: 1,
-      transform: [{ rotate: "-4deg" }],
-    },
-    /* Reference button structure: white border + orange face over a lip */
-    sunButton: {
-      width: 92,
-      height: 92,
+
+    hero: { flexDirection: "row", alignItems: "center", gap: 14 },
+    sun: {
+      width: 56,
+      height: 56,
       borderRadius: 28,
-      borderWidth: 5,
-      borderColor: theme.colors.border,
-      backgroundColor: theme.colors.card,
-      marginBottom: 6,
-      elevation: 6,
-      shadowColor: theme.colors.shadow,
-      shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.15,
-      shadowRadius: 6,
-    },
-    sunInner: {
-      flex: 1,
-      alignSelf: "stretch",
-      borderRadius: 23,
       alignItems: "center",
       justifyContent: "center",
+      backgroundColor: withAlpha(c.primary, 0.12),
     },
-    sunFace: {
-      position: "absolute",
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 12,
-      borderRadius: 23,
-      alignItems: "center",
-      justifyContent: "center",
-    },
-    heroValue: {
-      fontSize: 24,
-      ...fontFaces.heavy,
-      color: theme.colors.text,
-      marginTop: 10,
-    },
-    heroSub: {
-      fontSize: 13,
-      ...fontFaces.regular,
-      color: theme.colors.textMuted,
-      textAlign: "center",
-      lineHeight: 19,
-      marginTop: 6,
-      marginBottom: 14,
-    },
-    longestPill: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 8,
-      backgroundColor: theme.colors.surfaceSoft,
+    heroText: { flex: 1, gap: 2 },
+    heroValue: { fontSize: 22, ...fontFaces.heavy, color: c.text, fontVariant: ["tabular-nums"] },
+    heroSub: { fontSize: 13, ...fontFaces.semibold, color: c.textMuted, lineHeight: 19 },
+
+    /* Label on the left, value on the right, like the passport rows */
+    statRow: { flexDirection: "row", alignItems: "center", gap: 12 },
+    statIcon: {
+      width: 28,
+      height: 28,
       borderRadius: 14,
-      paddingHorizontal: 14,
-      paddingVertical: 8,
-    },
-    longestText: {
-      fontSize: 13,
-      ...fontFaces.heavy,
-      color: "#C2410C",
-    },
-    sectionHeading: {
-      fontSize: 18,
-      ...fontFaces.heavy,
-      color: theme.colors.text,
-      marginBottom: 10,
-      marginTop: 4,
-    },
-    cardTitle: {
-      fontSize: 16,
-      ...fontFaces.heavy,
-      color: theme.colors.text,
-      alignSelf: "flex-start",
-      marginBottom: 16,
-    },
-    weekRow: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-      alignSelf: "stretch",
-    },
-    dayColumn: {
       alignItems: "center",
-      gap: 8,
+      justifyContent: "center",
+      backgroundColor: withAlpha(c.primary, 0.12),
     },
+    statLabel: { flex: 1, fontSize: 13, ...fontFaces.semibold, color: c.textMuted },
+    statValue: { fontSize: 15, ...fontFaces.heavy, color: c.text },
+
+    weekRow: { flexDirection: "row", justifyContent: "space-between", alignSelf: "stretch" },
+    dayColumn: { alignItems: "center", gap: 8 },
     dayDot: {
       width: 36,
       height: 36,
       borderRadius: 18,
-      backgroundColor: theme.colors.surfaceSoft,
+      backgroundColor: c.surfaceSoft,
       alignItems: "center",
       justifyContent: "center",
     },
-    dayDotActive: {
-      backgroundColor: BTN_COLOR,
-    },
-    dayDotToday: {
-      borderWidth: 2,
-      borderColor: "#C2410C",
-    },
-    dayLabel: {
-      fontSize: 12,
-      ...fontFaces.semibold,
-      color: theme.colors.textMuted,
-    },
-    dayLabelToday: {
-      color: "#C2410C",
-      ...fontFaces.bold,
-    },
-    weekHint: {
-      fontSize: 11,
-      ...fontFaces.regular,
-      color: theme.colors.textFaint,
-      textAlign: "center",
-      marginTop: 16,
-    },
-    tipRow: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 12,
-      alignSelf: "stretch",
-      marginBottom: 14,
-    },
+    dayDotActive: { backgroundColor: c.primary },
+    dayDotToday: { borderWidth: 2, borderColor: c.primaryDark },
+    dayLabel: { fontSize: 12, ...fontFaces.semibold, color: c.textMuted },
+    dayLabelToday: { color: c.primaryDark, ...fontFaces.bold },
+    weekHint: { fontSize: 12, ...fontFaces.semibold, color: c.textMuted, textAlign: "center" },
+
+    /* Tips: one per row, split by the soft line the Settings rows use */
+    tipsBody: { gap: 0 },
+    tipRow: { flexDirection: "row", alignItems: "center", gap: 12, paddingVertical: 10 },
+    tipDivided: { borderTopWidth: 1, borderColor: c.borderSubtle },
     tipIconCircle: {
       width: 34,
       height: 34,
       borderRadius: 17,
-      backgroundColor: theme.colors.surfaceSoft,
+      backgroundColor: withAlpha(c.primary, 0.12),
       alignItems: "center",
       justifyContent: "center",
     },
-    tipText: {
-      flex: 1,
-      fontSize: 13,
-      ...fontFaces.regular,
-      color: theme.colors.textSecondary,
-      lineHeight: 19,
-    },
-  }));
+    tipText: { flex: 1, fontSize: 13, ...fontFaces.semibold, color: c.textSecondary, lineHeight: 19 },
+  };
+});

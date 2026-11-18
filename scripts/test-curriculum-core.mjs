@@ -11,6 +11,7 @@ import { pickItems, pickReviewItems } from "../services/session-core.ts";
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
+import { checkModeOf } from "../content/curriculum/check-mode.ts";
 import { evaluateItem, seededShuffle, shuffleNotSame, withinTolerance } from "../content/curriculum/evaluate.ts";
 import {
   acceptDeeper,
@@ -249,6 +250,102 @@ describe("lesson run", () => {
 });
 
 const T0 = Date.UTC(2026, 0, 1);
+
+describe("how each item type is checked", () => {
+  it("single taps are graded at once", () => {
+    for (const t of ["choice", "true_or_myth", "hotspot"]) assert.equal(checkModeOf(t, {}), "instant");
+    assert.equal(checkModeOf("fill", { mode: "bank" }), "instant");
+  });
+  it("match, order and sort are graded when complete and retried in place", () => {
+    for (const t of ["match", "order", "sort"]) assert.equal(checkModeOf(t, {}), "retry");
+  });
+  it("typed numbers, sliders and predictions keep an explicit button", () => {
+    assert.equal(checkModeOf("fill", { mode: "number" }), "manual");
+    assert.equal(checkModeOf("estimate", {}), "manual");
+    assert.equal(checkModeOf("predict", {}), "manual");
+    assert.equal(checkModeOf("something-new", {}), "manual");
+  });
+});
+
+describe("trying again in place (match, order and sort)", () => {
+  it("a right answer after a wrong one lets the learner move on, but the card still comes back at the end", () => {
+    let run = createRun([card("q1"), card("q2")]);
+    run = submitAnswer(run, "q1", false); // wrong, the card resets and the learner tries again
+    run = submitAnswer(run, "q1", true); // right on the retry
+    assert.equal(run.records.q1.solved, false, "not solved: a wrong answer came first on this visit");
+    assert.equal(run.records.q1.firstTryCorrect, false);
+    assert.deepEqual(run.missed, ["q1"]);
+    run = advance(run);
+    assert.equal(currentCard(run).id, "q2");
+    run = submitAnswer(run, "q2", true);
+    run = advance(run); // end of the pass
+    assert.equal(run.phase, "replay");
+    assert.equal(currentCard(run).id, "q1");
+  });
+
+  it("in the replay it must be right with no wrong answer first; otherwise it is queued again", () => {
+    let run = createRun([card("q1")]);
+    run = submitAnswer(run, "q1", false);
+    run = submitAnswer(run, "q1", true);
+    run = advance(run);
+    assert.equal(run.phase, "replay");
+    run = submitAnswer(run, "q1", false); // wrong again in the replay
+    run = submitAnswer(run, "q1", true); // then right on the retry
+    run = advance(run);
+    assert.equal(run.phase, "replay", "still not clean, so it comes round again");
+    assert.equal(currentCard(run).id, "q1");
+    run = submitAnswer(run, "q1", true); // a clean visit at last
+    assert.equal(run.records.q1.solved, true);
+    assert.deepEqual(run.missed, []);
+    run = advance(run);
+    assert.equal(run.phase, "done");
+  });
+
+  it("several wrong tries on one visit still count as one miss in the summary", () => {
+    let run = createRun([card("q1"), card("q2")]);
+    run = submitAnswer(run, "q1", false);
+    run = submitAnswer(run, "q1", false);
+    run = submitAnswer(run, "q1", true);
+    run = advance(run);
+    run = submitAnswer(run, "q2", true);
+    run = advance(run);
+    run = submitAnswer(run, "q1", true);
+    run = advance(run);
+    assert.equal(run.phase, "done");
+    const s = summarize(run);
+    assert.equal(s.scoredTotal, 2);
+    assert.equal(s.firstTryCorrect, 1);
+    assert.equal(s.replayed, 1);
+    assert.equal(s.accuracy, 0.5);
+  });
+
+  it("the wrong flag belongs to one visit: a new card starts clean, and so does stepping back", () => {
+    let run = createRun([card("q1"), card("q2")]);
+    run = submitAnswer(run, "q1", false);
+    assert.equal(run.visitWrong, true);
+    run = advance(run);
+    assert.equal(run.visitWrong, false);
+    run = submitAnswer(run, "q2", true);
+    assert.equal(run.records.q2.solved, true, "a clean first try is solved at once");
+    run = goBack(run);
+    assert.equal(run.visitWrong, false);
+  });
+
+  it("unscored cards never count as wrong", () => {
+    let run = createRun([card("p1", { scored: false })]);
+    run = submitAnswer(run, "p1", false);
+    assert.equal(run.visitWrong, false);
+    assert.equal(run.records.p1.solved, true);
+    assert.deepEqual(run.missed, []);
+  });
+
+  it("a run saved before this existed (no flag) behaves as if clean", () => {
+    let run = createRun([card("q1")]);
+    delete run.visitWrong;
+    run = submitAnswer(run, "q1", true);
+    assert.equal(run.records.q1.solved, true);
+  });
+});
 
 describe("stepping back", () => {
   it("cannot go back on the first card, can afterwards, and lowers progress", () => {

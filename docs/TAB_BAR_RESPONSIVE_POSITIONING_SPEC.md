@@ -4,11 +4,13 @@
 **Date:** 2026-11-16
 **Owner:** AtomIQ engineering
 **Applies to:** `app/(tabs)/_layout.tsx`, `components/layout/tab-bar-inset.tsx`, `theme/layout.ts`, `scripts/check-tab-bar-clearance.mjs`, and any screen that anchors a control above the tab bar
+
+> **Update: the bar is now docked.** It is fixed to the bottom edge, spans the full window width (the tabs themselves stop at `maxWidth` and stay centred on tablets), has a top border only, and its background continues under the system inset. Each tab is an icon with a label under it (active label in the active colour). There is no gap (`gap: 0`), no side margin (`horizontalMargin` is only the side system inset), no highlight square and no bottom fade. Sections below that describe a floating pill, a margin, a gap or the fade are historical; `theme/tab-bar-metrics.ts` and `test:tab-bar` are the current truth.
 **Extends:** `ANDROID_RESPONSIVE_UI_UX_SPEC.md` (§4.2, §6.1), `ANDROID_UI_UX_UAT_CHECKLIST.md`
 
 ## 1. Goal
 
-The floating tab bar must look the same and clear the same things on every phone: small and large, Android gesture navigation, Android three-button navigation, tablets with a taskbar, and iPhones with or without a home indicator.
+The tab bar must look the same and clear the same things on every phone: small and large, Android gesture navigation, Android three-button navigation, tablets with a taskbar, and iPhones with or without a home indicator.
 
 "Looks great" is defined by four measurable rules:
 
@@ -23,9 +25,9 @@ Layout never branches on device model, brand or OS version. It branches only on 
 
 What exists today (all verified in the repo):
 
-- `app/(tabs)/_layout.tsx` positions the bar with `bottom: insets.bottom + layout.tabBar.gap` and `paddingHorizontal: layout.tabBar.horizontalMargin` (36).
+- `app/(tabs)/_layout.tsx` positions the bar with `bottom: insets.bottom + layout.tabBar.gap` and `paddingHorizontal: layout.tabBar.horizontalMargin` (20).
 - `components/layout/tab-bar-inset.tsx` measures the bar via `onLayout` and exposes `useTabBarInset()` (`measured height + gap + insets.bottom`, or `insets.bottom` when hidden). Hiding goes through `useHideTabBar()` and keyboard events.
-- `theme/layout.ts` holds `layout.tabBar = { contentHeight: 79, gap: 16, horizontalMargin: 36, maxWidth: 520 }`.
+- `theme/layout.ts` holds `layout.tabBar = { contentHeight: 79, gap: 10, horizontalMargin: 20, maxWidth: 600 }`.
 - `npm run check:tab-bar` proves clearance for five viewports × three navigation modes.
 
 Problems this spec fixes:
@@ -102,19 +104,19 @@ Rationale for the trigger: dense is for genuinely small Android windows (360 × 
 ### 4.3 Horizontal rules
 
 ```
-horizontalMargin = clamp((windowWidth − tabCount × 48 − 20) / 2, 12, 36)
+horizontalMargin = clamp((windowWidth − tabCount × 48 − 20) / 2, 6, 20)
 horizontalMargin = max(horizontalMargin, insets.left + 8, insets.right + 8)
-barWidth         = min(windowWidth − 2 × horizontalMargin, 520)
+barWidth         = min(windowWidth − 2 × horizontalMargin, 600)
 tabWidth         = (barWidth − 2 × 8 − 2 × 2) / tabCount     // padding 8, border 2
 iconSlot         = min(variant.iconSlot, floor(tabWidth))
 ```
 
 Properties this guarantees:
 
-- `tabWidth ≥ 48` for every window width from 320 dp up (at 320 dp the margin becomes 30 instead of 36, so tabs are 48 dp).
+- `tabWidth ≥ 48` for every window width from 320 dp up (with six tabs, at 320 dp the margin becomes 10 instead of 12, so tabs are 48 dp).
 - `iconSlot ≤ tabWidth`, so icon circles never overlap neighbours.
-- At 360 dp and wider the margin stays 36 and the look is unchanged from today.
-- On tablets the bar stays centred at 520 dp max and is never stretched edge to edge.
+- At 360 dp and wider the margin stays 20 (36 originally, 12 for a while); the regular gap is 10 dp (was 16) and the dense gap 8 dp (was 12).
+- On tablets the bar stays centred at 600 dp max and is never stretched edge to edge.
 
 ### 4.4 Vertical rule
 
@@ -123,7 +125,7 @@ bottomOffset   = insets.bottom + gap
 reservedHeight = contentHeight + bottomOffset
 ```
 
-This keeps today's behavior, which already gives a consistent visual margin across modes: 3-button 48 + 16 = 64 dp from the screen bottom, gesture ~24 + 16 = 40 dp, iPhone 34 + 16 = 50 dp, no inset 16 dp. The bar always sits *above* the system navigation area, never inside it.
+This keeps today's behavior, which already gives a consistent visual margin across modes: 3-button 48 + 10 = 58 dp from the screen bottom, gesture ~24 + 10 = 34 dp, iPhone 34 + 10 = 44 dp, no inset 10 dp. The bar always sits *above* the system navigation area, never inside it.
 
 The bar must not be moved by animation when the inset changes. It repositions through layout, so the sliding active highlight, whose position is derived from the tab index and tab width, follows with no extra animation.
 
@@ -135,7 +137,7 @@ The bar must not be moved by animation when the inset changes. It repositions th
 - The bar is centred, `barWidth` wide, with the margins in §4.3.
 - The bar reports its measured height through `onLayout` as it does today. The provider uses `resolveTabBarMetrics().contentHeight` as the fallback **before** the first measurement, so the first frame does not jump.
 - Elevation and shadow stay inside the bar layer. Elevation 16 on Android must not be clipped by a parent, and the shadow must remain visible in dark mode (see `completed/NEUTRAL_THEME_ORANGE_ACCENT_SPEC.md` for border and lip rules).
-- The gradient fade covers `reservedHeight` exactly (current behavior, `fadeHeight = tabBarInset`) and never receives touches.
+- Behind the bar, every tab fades into the page colour (`background` on Home, `mapBackground` on the other tabs) with a gradient drawn by the tab bar layer (`bottomFade` in `app/(tabs)/_layout.tsx`): it spans the reserved height plus 12 dp, so it stays under the 16 dp that floating buttons keep above the bar. Content scrolls under it to the screen bottom, and screens keep their last row clear of the bar with the reserved inset. The fade is not drawn while the bar is hidden.
 
 ### 5.2 Reserved space for screens
 
@@ -237,7 +239,7 @@ A `__DEV__`-only readout (window size, `insets`, variant, `reservedHeight`) togg
 
 The app is portrait-only (`app.json`). Per current Android guidance, newer targets stop honoring orientation locks on displays 600 dp and wider, so tablets and foldables may show the app in landscape regardless. This should be verified against the SDK 58 build's target API before relying on the lock.
 
-Bar behavior if landscape does occur: the bar stays centred at 520 dp max, side margins respect `insets.left` / `insets.right` (§4.3), and the reserved band uses the landscape bottom inset. Full landscape layout for screens remains out of scope.
+Bar behavior if landscape does occur: the bar stays centred at 600 dp max, side margins respect `insets.left` / `insets.right` (§4.3), and the reserved band uses the landscape bottom inset. Full landscape layout for screens remains out of scope.
 
 ## 9. Acceptance criteria
 

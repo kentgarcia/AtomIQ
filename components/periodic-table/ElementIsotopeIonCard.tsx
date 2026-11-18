@@ -5,7 +5,8 @@
  */
 
 import React, { memo, useMemo } from "react";
-import { Text, View } from "react-native";
+import { View } from "react-native";
+import { Text } from "@/components/ui/text";
 
 import { ELEMENT_ISOTOPE_ION, type PeriodicElement } from "@/content/periodic-table/elements";
 import { createStyles, fontFaces, useTheme, withAlpha } from "@/theme";

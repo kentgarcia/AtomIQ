@@ -11,7 +11,11 @@ import { checkScene } from "../../content/visual-blocks.ts";
 import { FORBIDDEN_NAMES } from "../../components/npc/npc-palette.ts";
 import { NPC_POSES } from "../../components/npc/npc-art.ts";
 import { isArtId } from "../../components/lesson/visual/object-art.ts";
+import { bubblesFor } from "../../components/lesson/conversation-core.ts";
 import { ITEM_TYPES, NON_CHOICE_ITEM_TYPES, SIM_TYPES, TEACH_TYPES } from "../../content/curriculum/types.ts";
+import { checkDecayWaitData } from "../../content/curriculum/decay-wait-core.ts";
+import { checkDecayChainData } from "../../content/curriculum/decay-chain-core.ts";
+import { checkRadiationIdData } from "../../content/curriculum/radiation-id-core.ts";
 
 export const LIMITS = {
   cardsMin: 8,
@@ -190,6 +194,14 @@ export function validateCurriculum(db, { strictReview = false } = {}) {
     if (item.type !== "true_or_myth" && !isStr(d.prompt)) e("prompt", "is required");
     if (item.type !== "predict" && !isStr(d.explanation)) e("explanation", "is required: say why the answer is right");
     for (const f of ["prompt", "statement", "explanation"]) checkText("items", id, f, d[f], { allowBlank: item.type === "fill" && f === "prompt" });
+    // A figure on a question (a reminder strip, a table to read) is held to the same rules as a teaching card's.
+    if (d.figure !== undefined) {
+      if (!isRec(d.figure) || !isStr(d.figure.altText) || d.figure.altText.trim().length < 20) e("figure.altText", "a figure needs alt text (at least 20 characters)");
+      const figErrs = [];
+      checkScene(d.figure?.scene, "scene", figErrs);
+      for (const m of figErrs) e("figure.scene", m);
+      for (const sh of d.figure?.scene?.shapes ?? []) if (sh?.t === "art" && !isArtId(sh.id)) e("figure.scene", `"${String(sh.id)}" is not a picture in the lesson object art`);
+    }
     const ids = (list, field) => {
       if (!Array.isArray(list) || !list.every((x) => isRec(x) && isStr(x.id))) return e(field, "must be a list of objects with an id"), false;
       if (!unique(list.map((x) => x.id))) return e(field, "ids must be unique"), false;
@@ -236,6 +248,10 @@ export function validateCurriculum(db, { strictReview = false } = {}) {
         art(d.items, "items");
         if (ids(d.buckets, "buckets") && ids(d.items, "items")) {
           if (d.buckets.length < 2 || d.buckets.length > 3) e("buckets", "needs 2 or 3 buckets");
+          const icons = d.buckets.map((x) => x.icon);
+          if (icons.some((i) => i !== undefined && !isStr(i))) e("buckets", "a group icon must be an icon name");
+          else if (icons.some((i) => i === undefined)) warn("items", id, "buckets", "sort-icons", `${icons.filter((i) => i === undefined).length} of ${d.buckets.length} groups have no icon; the lesson shows a legend of icons`);
+          else if (!unique(icons)) e("buckets", "two groups share an icon, so the legend could not tell them apart");
           if (d.items.length < 3) e("items", "needs at least 3 things to sort");
           const b = new Set(d.buckets.map((x) => x.id));
           if (!d.items.every((x) => b.has(x.bucket))) e("items", "every item must name an existing bucket");
@@ -374,6 +390,11 @@ export function validateCurriculum(db, { strictReview = false } = {}) {
           for (const m of errs) ce("data.figure.scene", "card-figure", m);
           for (const sh of d.figure.scene?.shapes ?? []) if (sh?.t === "art" && !isArtId(sh.id)) ce("data.figure.scene", "card-figure", `"${String(sh.id)}" is not a picture in the lesson object art`);
         }
+        if (d.figureAt !== undefined) {
+          const bubbles = isStr(d.body) ? bubblesFor(d.body, 3).length : 0;
+          if (!Number.isInteger(d.figureAt) || d.figureAt < 0 || d.figureAt > bubbles) ce("data.figureAt", "card-figure-at", `must be a whole number from 0 to ${bubbles} (the number of speech bubbles before the figure)`);
+          else if (!d.figure) ce("data.figureAt", "card-figure-at", "the card has no figure to place");
+        }
         if (c.type === "reveal") {
           const target = lc.find((x) => x.id === d.predictCardId);
           if (!target) ce("data.predictCardId", "card-reveal", "must name a card in this lesson");
@@ -390,6 +411,11 @@ export function validateCurriculum(db, { strictReview = false } = {}) {
           if (!item.surfaces.includes("lesson")) ce("item_id", "card-item", 'the item does not list "lesson" in surfaces');
           if (!teaches.includes(item.objective_id) && !reliesOn.includes(item.objective_id)) warn("lesson_cards", cid, "item_id", "card-objective", `item tests "${item.objective_id}", which this lesson neither teaches nor relies on`);
           if (item.type === "true_or_myth") trueMyth.push(item.data.answer);
+        }
+        if (c.data.connected !== undefined) {
+          const before = lc[lc.findIndex((x) => x.id === c.id) - 1];
+          if (typeof c.data.connected !== "boolean") ce("data.connected", "card-connected", "must be true or false");
+          else if (c.data.connected && before?.kind !== "teach") warn("lesson_cards", cid, "data.connected", "card-connected", "joins the lecture before it, but no teaching card comes right before; it will stand alone");
         }
       } else if (c.kind === "sim") {
         if (!SIM_TYPES.includes(c.type)) ce("type", "card-type", `unknown simulation "${c.type}"`);
@@ -413,6 +439,16 @@ export function validateCurriculum(db, { strictReview = false } = {}) {
       checkText("lesson_cards", cid, "data.task", d.task);
       checkText("lesson_cards", cid, "data.hint", d.hint);
       if (!isRec(d.goal) || Object.keys(d.goal).length === 0) ce("data.goal", "sim-shape", "goal is required so completion can be checked");
+      for (const o of d.objectives ?? []) if (!objectiveById.has(o)) ce("data.objectives", "sim-shape", `objective "${o}" does not exist`);
+    } else if (c.type === "decay-wait" || c.type === "decay-chain" || c.type === "radiation-id") {
+      // The unit 2 simulations keep their own shape rules next to their logic (content/curriculum/*-core.ts).
+      const problems = c.type === "decay-wait" ? checkDecayWaitData(d) : c.type === "decay-chain" ? checkDecayChainData(d) : checkRadiationIdData(d);
+      for (const m of problems) ce("data", "sim-shape", m);
+      checkText("lesson_cards", cid, "data.task", d.task);
+      checkText("lesson_cards", cid, "data.hint", d.hint);
+      if (d.hint !== undefined && !isStr(d.hint)) ce("data.hint", "sim-shape", "hint must be text when given");
+      if (c.type === "decay-chain") for (const n of d.nodes ?? []) checkText("lesson_cards", cid, "data.nodes.label", n?.label);
+      if (c.type === "radiation-id") for (const k of d.cases ?? []) checkText("lesson_cards", cid, "data.cases.clue", k?.clue);
       for (const o of d.objectives ?? []) if (!objectiveById.has(o)) ce("data.objectives", "sim-shape", `objective "${o}" does not exist`);
     } else if (c.type === "scale-zoom") {
       if (!isStr(d.task)) ce("data.task", "sim-shape", "task is required");

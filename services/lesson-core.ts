@@ -4,7 +4,12 @@
  * A run plays an ordered list of cards. Core cards play in order; "deeper" cards
  * attached to a core card are offered after it and only played if accepted.
  * Scored items answered wrongly come back in a mistakes replay at the end, until
- * each has been answered correctly. Predictions (unscored) never replay.
+ * each has been answered correctly without a wrong answer on that visit. Predictions
+ * (unscored) never replay.
+ *
+ * An item can be answered wrongly more than once on one visit (match, order and sort let the
+ * learner try again in place). Passing it after a wrong attempt lets the learner move on, but it
+ * does not count as solved: it stays in the replay until a visit with no wrong answer.
  *
  * The same machine runs lessons, practice nodes, checkpoints and the daily review:
  * only the card list differs. Screens hold a `LessonRun` in state and call these
@@ -47,6 +52,8 @@ export interface LessonRun {
   missed: string[];
   /** Cards (by id) the replay needs, to look the card up again. */
   byId: Record<string, RunCard>;
+  /** True once the current card has been answered wrongly on this visit. Cleared whenever the current card changes. */
+  visitWrong?: boolean;
 }
 
 export interface RunSummary {
@@ -85,6 +92,7 @@ export function createRun(cards: RunCard[]): LessonRun {
     records: {},
     missed: [],
     byId,
+    visitWrong: false,
   };
 }
 
@@ -98,25 +106,31 @@ const emptyRecord = (): CardRecord => ({ tries: 0, firstTryCorrect: null, solved
  * Record an answer for the current card. Unscored cards (predictions) are only
  * marked as seen. Ignored when `cardId` is not the current card, so a double tap
  * or a late animation callback cannot score twice.
+ *
+ * A correct answer after a wrong one on the same visit lets the learner move on but does not
+ * solve the card: it stays missed (and in the replay) until it is answered correctly on a visit
+ * with no wrong answer.
  */
 export function submitAnswer(run: LessonRun, cardId: string, correct: boolean): LessonRun {
   const card = currentCard(run);
   if (!card || card.id !== cardId) return run;
 
   const prev = run.records[cardId] ?? emptyRecord();
+  const wrongBefore = run.visitWrong ?? false;
+  const clean = correct && !wrongBefore;
   const record: CardRecord = {
     tries: prev.tries + 1,
     firstTryCorrect: prev.firstTryCorrect ?? (card.scored ? correct : null),
-    solved: prev.solved || correct || !card.scored,
+    solved: prev.solved || clean || !card.scored,
   };
   const records = { ...run.records, [cardId]: record };
 
   let missed = run.missed;
   if (card.scored) {
-    if (correct) missed = missed.filter((id) => id !== cardId);
-    else if (!missed.includes(cardId)) missed = [...missed, cardId];
+    if (clean) missed = missed.filter((id) => id !== cardId);
+    else if (!correct && !missed.includes(cardId)) missed = [...missed, cardId];
   }
-  return { ...run, records, missed };
+  return { ...run, records, missed, visitWrong: wrongBefore || (card.scored && !correct) };
 }
 
 /**
@@ -159,7 +173,7 @@ export function canGoBack(run: LessonRun): boolean {
 export function goBack(run: LessonRun): LessonRun {
   if (!canGoBack(run)) return run;
   if (run.offer) return { ...run, offer: null };
-  return { ...run, index: run.index - 1 };
+  return { ...run, index: run.index - 1, visitWrong: false };
 }
 
 /** True when the current card was already answered in the first pass, so its answer must not be recorded again. */
@@ -169,11 +183,11 @@ export function isRevisit(run: LessonRun, cardId: string): boolean {
 
 function moveOn(run: LessonRun): LessonRun {
   const next = run.index + 1;
-  if (next < run.queue.length) return { ...run, index: next, offer: null };
+  if (next < run.queue.length) return { ...run, index: next, offer: null, visitWrong: false };
 
   // End of the queue.
   const stillMissed = run.missed.filter((id) => !(run.records[id]?.solved ?? false));
-  if (stillMissed.length === 0) return { ...run, index: next, phase: "done", offer: null };
+  if (stillMissed.length === 0) return { ...run, index: next, phase: "done", offer: null, visitWrong: false };
 
   const replay = stillMissed.map((id) => run.byId[id]).filter(Boolean);
   return {
@@ -183,6 +197,7 @@ function moveOn(run: LessonRun): LessonRun {
     phase: "replay",
     offer: null,
     missed: stillMissed,
+    visitWrong: false,
   };
 }
 
@@ -191,7 +206,7 @@ export function acceptDeeper(run: LessonRun): LessonRun {
   if (!run.offer) return run;
   const inserted = run.offer;
   const queue = [...run.queue.slice(0, run.index + 1), ...inserted, ...run.queue.slice(run.index + 1)];
-  return { ...run, queue, index: run.index + 1, offer: null };
+  return { ...run, queue, index: run.index + 1, offer: null, visitWrong: false };
 }
 
 /** Decline the offered deeper cards and carry on. */
@@ -209,7 +224,7 @@ function advanceInReplay(run: LessonRun): LessonRun {
   if (!card) return run;
   const solved = run.records[card.id]?.solved ?? false;
   if (!solved) {
-    return { ...run, queue: [...run.queue, card], index: run.index + 1 };
+    return { ...run, queue: [...run.queue, card], index: run.index + 1, visitWrong: false };
   }
   return moveOn(run);
 }

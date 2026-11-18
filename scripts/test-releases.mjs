@@ -32,7 +32,7 @@ const fixture = () => {
 };
 after(() => fixtures.forEach((f) => f.cleanup()));
 
-// Real articles are not all reviewed yet; the review gate has its own test below.
+// Content references are not all verified yet; the review gate has its own test below.
 const publish = (paths, opts = {}) =>
   publishRelease(paths, { runChecks: noChecks, strictReview: false, now: new Date("2026-11-16T10:00:00"), ...opts });
 
@@ -219,7 +219,7 @@ describe("publish", () => {
 
   it("enforces the review gate unless explicitly allowed", () => {
     const { paths } = fixture();
-    assert.throws(() => publishRelease(paths, { runChecks: noChecks, strictReview: true }), /review-pending|Validation failed/);
+    assert.throws(() => publishRelease(paths, { runChecks: noChecks, strictReview: true }), /reference-unverified|Validation failed/);
     assert.equal(readLedger(paths).releases.length, 0);
   });
 

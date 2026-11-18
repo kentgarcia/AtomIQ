@@ -1,7 +1,5 @@
 import { PageHeader } from '@/components/ui/page-header';
 import { Icon } from '@/components/ui/icon';
-import { getArticleById } from '@/content/articles';
-import type { Article } from '@/content/articles/types';
 import { getJourneyById } from '@/content/explorer';
 import { getMythById } from '@/content/myths';
 import type { Myth } from '@/content/types';
@@ -28,9 +26,8 @@ export default function JourneyScreen() {
     return getJourneyById(id);
   }, [id]);
 
-  // Myth and article node content is DB-backed (async) — resolve once per journey.
+  // Myth node content is DB-backed (async) — resolve once per journey.
   const [mythContents, setMythContents] = useState<Record<string, Myth | undefined>>({});
-  const [articleContents, setArticleContents] = useState<Record<string, Article | undefined>>({});
   useEffect(() => {
     if (!journey) return;
     let alive = true;
@@ -44,17 +41,6 @@ export default function JourneyScreen() {
         map[cid] = results[i] ?? undefined;
       });
       setMythContents(map);
-    });
-    const articleIds = journey.nodes
-      .filter((n) => n.type === "article")
-      .map((n) => n.contentId);
-    Promise.all(articleIds.map((cid) => getArticleById(cid))).then((results) => {
-      if (!alive) return;
-      const map: Record<string, Article | undefined> = {};
-      articleIds.forEach((cid, i) => {
-        map[cid] = results[i] ?? undefined;
-      });
-      setArticleContents(map);
     });
     return () => {
       alive = false;
@@ -73,8 +59,6 @@ export default function JourneyScreen() {
     switch (node.type) {
       case "myth":
         return mythContents[node.contentId] ?? undefined;
-      case "article":
-        return articleContents[node.contentId] ?? undefined;
       default:
         return null;
     }
@@ -143,7 +127,6 @@ export default function JourneyScreen() {
                   <Icon
                     name={
                       node.type === 'myth' ? 'Danger' :
-                      node.type === 'article' ? 'Book' :
                       node.type === 'quiz' ? 'Game' :
                       'Document'
                     }

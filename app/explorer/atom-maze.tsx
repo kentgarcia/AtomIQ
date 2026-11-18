@@ -41,11 +41,11 @@ import {
     Platform,
     ScrollView,
     StyleSheet,
-    Text,
     TouchableOpacity,
     useWindowDimensions,
     View,
 } from "react-native";
+import { Text } from "@/components/ui/text";
 import Animated, {
     FadeIn,
     FadeInDown,

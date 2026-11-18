@@ -1,26 +1,21 @@
 import { Icon } from "@/components/ui/icon";
+import { FieldInput } from "@/components/ui/field-input";
 import { useStorage } from "@/services/StorageContext";
 import { fontFaces, useResponsiveLayout, useTheme, createStyles } from "@/theme";
 import { setOnboardingCompleted } from "@/services/storage";
-import {
-    DEFAULT_PROFILE_AVATAR_KEY,
-    PROFILE_AVATAR_OPTIONS,
-    type ProfileAvatarKey,
-    getProfileAvatarSource,
-} from "@/services/profile-avatars";
+import { Avatar } from "@/components/avatar/Avatar";
 import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
-  BackHandler,
-  Image,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
+    BackHandler,
+    Image,
+    KeyboardAvoidingView,
+    Platform,
+    ScrollView,
+    TouchableOpacity,
+    View,
 } from "react-native";
+import { Text } from "@/components/ui/text";
 import Animated, {
     FadeIn,
     FadeInDown,
@@ -59,14 +54,14 @@ const FEATURE_SHOWCASE = [
         highlights: [
             "Myth Buster: swipe fact vs. fiction",
             "Atom Maze: quiz-powered maze runs",
-            "Earn XP and climb the leaderboard",
+            "Earn XP and unlock achievements",
         ],
     },
     {
         id: "guide",
         title: "Shrodi, Your Guide",
         description:
-            "Not sure where to start? Shrodi routes you to the right lesson, entry, article, or game — no typing needed.",
+            "Not sure where to start? Shrodi routes you to the right lesson, entry, or game — no typing needed.",
         icon: "Star",
         color: "#58CC02",
         mascot: require("@/assets/images/mascot/thinking.png"),
@@ -114,9 +109,6 @@ export default function Onboarding() {
     const [step, setStep] = useState<OnboardingStep>("splash");
     const [currentFeatureIndex, setCurrentFeatureIndex] = useState(0);
     const [username, setUsername] = useState("");
-    const [avatarKey, setAvatarKey] = useState<ProfileAvatarKey>(
-        DEFAULT_PROFILE_AVATAR_KEY,
-    );
     const [isFinishing, setIsFinishing] = useState(false);
     const [agreed, setAgreed] = useState(false);
 
@@ -193,7 +185,6 @@ export default function Onboarding() {
                 user_id: fallbackUserId,
                 username: username.trim() || "Scientist",
                 display_name: username.trim() || "Scientist",
-                avatar_url: avatarKey,
             });
 
             await setOnboardingCompleted(true);
@@ -379,11 +370,7 @@ export default function Onboarding() {
 
                         {/* Preview card — avatar + name */}
                         <View style={styles.previewInner}>
-                            <Image
-                                source={getProfileAvatarSource(avatarKey)}
-                                style={styles.previewAvatar}
-                                resizeMode="cover"
-                            />
+                            <Avatar value={userProfile?.avatar_url} size={64} />
                             <View style={{ flex: 1 }}>
                                 <Text style={styles.profileName}>
                                     {username.trim() || "Your name"}
@@ -397,10 +384,9 @@ export default function Onboarding() {
                     <Animated.View entering={FadeInDown.delay(100).springify()} style={styles.fieldSection}>
                         <Text style={styles.fieldLabel}>Display Name</Text>
                         <View style={styles.inputWrap}>
-                            <TextInput
+                            <FieldInput
                                 style={styles.input}
                                 placeholder="Your display name"
-                                placeholderTextColor={theme.colors.textFaint}
                                 value={username}
                                 onChangeText={(text) => setUsername(text.slice(0, 24))}
                                 autoCapitalize="none"
@@ -422,48 +408,6 @@ export default function Onboarding() {
                             )}
                         </View>
                         <Text style={styles.charCount}>{username.length}/24</Text>
-                    </Animated.View>
-
-                    {/* Avatar picker */}
-                    <Animated.View entering={FadeInDown.delay(180).springify()} style={styles.fieldSection}>
-                        <View style={styles.avatarSectionHeader}>
-                            <Text style={styles.fieldLabel}>Choose Avatar</Text>
-                            <Text style={styles.avatarCount}>{PROFILE_AVATAR_OPTIONS.length} options</Text>
-                        </View>
-                        <ScrollView
-                            horizontal
-                            showsHorizontalScrollIndicator={false}
-                            contentContainerStyle={styles.avatarOptionsWrap}
-                        >
-                            {PROFILE_AVATAR_OPTIONS.map((option) => {
-                                const isSelected = avatarKey === option.key;
-                                return (
-                                    <TouchableOpacity
-                                        key={option.key}
-                                        style={[styles.avatarOption, isSelected && styles.avatarOptionSelected]}
-                                        activeOpacity={0.85}
-                                        accessibilityRole="button"
-                                        accessibilityLabel={`Choose avatar ${option.key}`}
-                                        accessibilityState={{ selected: isSelected }}
-                                        onPress={() => {
-                                            impactLight();
-                                            setAvatarKey(option.key);
-                                        }}
-                                    >
-                                        <Image
-                                            source={option.source}
-                                            style={styles.avatarOptionImage}
-                                            resizeMode="cover"
-                                        />
-                                        {isSelected && (
-                                            <View style={styles.avatarCheck}>
-                                                <Icon name="TickCircle" size={16} color="#FFFFFF" variant="Bold" />
-                                            </View>
-                                        )}
-                                    </TouchableOpacity>
-                                );
-                            })}
-                        </ScrollView>
                     </Animated.View>
 
                     {/* Terms & Privacy consent */}
@@ -814,14 +758,6 @@ const makeStyles = createStyles((theme) => {
         alignItems: "center",
         gap: 12,
     },
-    previewAvatar: {
-        width: 64,
-        height: 64,
-        borderRadius: 32,
-        backgroundColor: theme.colors.surfaceSoft,
-        borderWidth: 3,
-        borderColor: theme.colors.surfaceSoft,
-    },
     profileName: {
         fontSize: 18,
         ...fontFaces.heavy,
@@ -845,17 +781,15 @@ const makeStyles = createStyles((theme) => {
         position: "relative",
     },
     input: {
-        backgroundColor: theme.colors.input,
-        borderWidth: 2,
-        borderBottomWidth: 4,
-        borderColor: theme.colors.border,
+        backgroundColor: theme.colors.field,
         borderRadius: 14,
+        minHeight: 56,
         paddingHorizontal: 14,
         paddingVertical: 14,
         paddingRight: 44,
         fontSize: 15,
         ...fontFaces.semibold,
-        color: theme.colors.text,
+        color: theme.colors.fieldText,
     },
     clearBtn: {
         position: "absolute",
@@ -869,50 +803,6 @@ const makeStyles = createStyles((theme) => {
         fontSize: 11,
         ...fontFaces.semibold,
         color: theme.colors.textFaint,
-    },
-    avatarSectionHeader: {
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "space-between",
-    },
-    avatarCount: {
-        fontSize: 11,
-        ...fontFaces.semibold,
-        color: theme.colors.textFaint,
-    },
-    avatarOptionsWrap: {
-        gap: 10,
-        paddingVertical: 2,
-    },
-    avatarOption: {
-        width: 64,
-        height: 64,
-        borderRadius: 32,
-        borderWidth: 2,
-        borderColor: theme.colors.border,
-        backgroundColor: theme.colors.surfaceSoft,
-    },
-    avatarOptionSelected: {
-        borderWidth: 3,
-        borderColor: BTN_COLOR,
-    },
-    avatarOptionImage: {
-        width: "100%",
-        height: "100%",
-        borderRadius: 30,
-    },
-    avatarCheck: {
-        position: "absolute",
-        bottom: -2,
-        right: -2,
-        backgroundColor: BTN_COLOR,
-        width: 22,
-        height: 22,
-        borderRadius: 11,
-        alignItems: "center",
-        justifyContent: "center",
-        borderWidth: 2,
-        borderColor: theme.colors.onPrimary,
     },
     /* Terms & Privacy consent */
     consentRow: {

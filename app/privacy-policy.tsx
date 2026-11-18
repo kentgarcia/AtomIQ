@@ -4,10 +4,10 @@ import { useRouter } from "expo-router";
 import React from "react";
 import {
     ScrollView,
-    Text,
     TouchableOpacity,
     View,
 } from "react-native";
+import { Text } from "@/components/ui/text";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -18,11 +18,11 @@ const LAST_UPDATED = "September 21, 2026";
 const SECTIONS: Section[] = [
   {
     title: "1. Introduction",
-    body: "AtomIQ (\"we\", \"us\", or \"our\") is a local-first educational app for learning nuclear science — including lessons and quizzes, the MythBuster game, the Shrodi guide, discovery feed, explorer journeys and encyclopedia, interactive labs, daily facts and missions, and XP, streaks, achievements, and leaderboards. This Privacy Policy explains what information the app handles, how it is stored, and the choices you have. By using AtomIQ, you agree to the practices described below.",
+    body: "AtomIQ (\"we\", \"us\", or \"our\") is a local-first educational app for learning nuclear science — including lessons and quizzes, the MythBuster game, the Shrodi guide, the Discover tab, explorer journeys and encyclopedia, interactive labs, daily facts and missions, and XP, streaks, achievements, and leaderboards. This Privacy Policy explains what information the app handles, how it is stored, and the choices you have. By using AtomIQ, you agree to the practices described below.",
   },
   {
     title: "2. Data We Collect",
-    body: "We collect only the minimum needed for your learning experience, and you provide it directly in the app: your display name or username, avatar choice, onboarding selections, learning progress (completed lessons, quizzes, journeys, nodes, and mazes), XP, levels, stars, streaks, missions, achievements and awards, game scores, a day-by-day learning-activity history (counts of lesson steps, quizzes, labs, games, articles, and periodic-table explorations per calendar day, shown in the activity graph and never shared), bookmarks, and app preferences (theme, sound effects, haptics, notification and unit/level state). We do not require an online account, email, phone number, or any government identifier.",
+    body: "We collect only the minimum needed for your learning experience, and you provide it directly in the app: your display name or username, avatar choice, onboarding selections, learning progress (completed lessons, quizzes, journeys, nodes, and mazes), XP, levels, stars, streaks, missions, achievements and awards, game scores, a day-by-day learning-activity history (counts of lesson steps, quizzes, labs, games, and periodic-table explorations per calendar day, shown in the activity graph and never shared), bookmarks, and app preferences (theme, sound effects, haptics, notification and unit/level state). We do not require an online account, email, phone number, or any government identifier.",
   },
   {
     title: "3. How We Store Your Data",

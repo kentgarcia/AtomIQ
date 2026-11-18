@@ -12,7 +12,15 @@ import { evaluateItem } from "../content/curriculum/evaluate.ts";
 import { validateCurriculum, wordCount, plainText } from "./lib/curriculum-rules.mjs";
 import { curriculumDdl, insertUnit, loadUnitModules, npcsDdl, seedNpcs } from "./lib/curriculum-load.mjs";
 
-const TERMS = ["atom", "proton", "neutron", "electron", "nucleus", "atomic-number", "isotope", "radiation"];
+// Every [[term|shown]] marker and guidebook term id in Unit 1 must be an encyclopedia entry (the real ones live in the master db).
+const TERMS = [
+  "atom", "proton", "neutron", "electron", "nucleus", "atomic-number", "isotope", "radiation",
+  "matter", "element", "periodic-table", "mass-number", "ion", "strong-force", "electric-force", "radioactivity", "nuclear-stability", "electron-cloud",
+  "background-radiation", "ernest-rutherford", "henri-becquerel",
+  // Unit 2
+  "decay", "radionuclide", "alpha-particle", "beta-particle", "gamma-ray", "half-life", "radon", "cosmic-radiation", "ionizing-radiation", "marie-curie",
+  "parent-nuclide", "daughter-nuclide", "electromagnetic-radiation", "decay-chain", "potassium-40", "alpha-decay", "beta-decay", "gamma-radiation",
+];
 
 let modules;
 before(async () => {
@@ -73,17 +81,21 @@ describe("Unit 1 content", () => {
     }
   });
 
-  it("the unit has at least 12 checkpoint items covering all ten objectives", () => {
+  it("each unit has at least 12 checkpoint items covering all of its objectives", () => {
     const db = build();
-    const cp = db.prepare("SELECT objective_id FROM items WHERE surfaces LIKE '%checkpoint%'").all();
-    assert.ok(cp.length >= 12);
-    assert.equal(new Set(cp.map((r) => r.objective_id)).size, 10);
+    for (const [unitId, objectives] of [["inside-the-atom", 10], ["radioactivity", 12]]) {
+      const cp = db.prepare("SELECT i.objective_id FROM items i JOIN objectives o ON o.id = i.objective_id WHERE o.unit_id = ? AND i.surfaces LIKE '%checkpoint%'").all(unitId);
+      assert.ok(cp.length >= 12, `${unitId} has ${cp.length} checkpoint items`);
+      assert.equal(new Set(cp.map((r) => r.objective_id)).size, objectives, unitId);
+    }
   });
 
   it("practice nodes can draw their question count from lesson-surface items of earlier objectives", () => {
     const db = build();
-    const n = db.prepare("SELECT COUNT(*) AS n FROM items WHERE surfaces LIKE '%practice%' AND type != 'predict'").get().n;
-    assert.ok(n >= 8);
+    for (const unitId of ["inside-the-atom", "radioactivity"]) {
+      const n = db.prepare("SELECT COUNT(*) AS n FROM items i JOIN objectives o ON o.id = i.objective_id WHERE o.unit_id = ? AND i.surfaces LIKE '%practice%' AND i.type != 'predict'").get(unitId).n;
+      assert.ok(n >= 8, `${unitId} has ${n} practice items`);
+    }
   });
 
   it("answers: the correct response scores correct and a wrong one does not, for every item", () => {
@@ -164,22 +176,36 @@ describe("curriculum rules reject broken content", () => {
   };
 
   it("a teaching card over 80 words", () => {
-    const db = withData(build(), "isotopes", "c03", (d) => (d.body = Array(85).fill("word").join(" ")));
+    const db = withData(build(), "isotopes", "c02", (d) => (d.body = Array(85).fill("word").join(" ")));
     assert.ok(rules(db).has("card-words"));
   });
 
   it("a teaching card without a figure", () => {
-    const db = withData(build(), "isotopes", "c03", (d) => delete d.figure);
+    const db = withData(build(), "isotopes", "c02", (d) => delete d.figure);
     assert.ok(rules(db).has("card-figure"));
   });
 
   it("a figure with a shape outside the scene", () => {
-    const db = withData(build(), "isotopes", "c03", (d) => d.figure.scene.shapes.push({ t: "circle", x: 500, y: 10, r: 3 }));
+    const db = withData(build(), "isotopes", "c02", (d) => d.figure.scene.shapes.push({ t: "circle", x: 500, y: 10, r: 3 }));
     assert.ok(rules(db).has("card-figure"));
   });
 
+  it("a question figure with no alt text, or a shape outside the scene", () => {
+    const edit = (fn) => {
+      const db = build();
+      const d = JSON.parse(db.prepare("SELECT data FROM items WHERE id = 'u1-l3-choice-lose-proton'").get().data);
+      fn(d);
+      db.prepare("UPDATE items SET data = ? WHERE id = 'u1-l3-choice-lose-proton'").run(JSON.stringify(d));
+      return db;
+    };
+    assert.ok(rules(edit((d) => (d.figure.altText = "short"))).has("item-shape"));
+    assert.ok(rules(edit((d) => d.figure.scene.shapes.push({ t: "circle", x: 500, y: 10, r: 3 }))).has("item-shape"));
+    assert.ok(rules(edit((d) => d.figure.scene.shapes.push({ t: "art", id: "unicorn", x: 50, y: 10, size: 10 }))).has("item-shape"));
+    assert.ok(!rules(build()).has("item-shape"), "the figure as authored is fine");
+  });
+
   it("an unknown glossary term", () => {
-    const db = withData(build(), "isotopes", "c03", (d) => (d.body = "See [[nonexistent-term|this]] for more."));
+    const db = withData(build(), "isotopes", "c02", (d) => (d.body = "See [[nonexistent-term|this]] for more."));
     assert.ok(rules(db).has("glossary-term"));
   });
 
@@ -220,7 +246,7 @@ describe("curriculum rules reject broken content", () => {
   });
 
   it("a reveal that points before its prediction or at a non-prediction", () => {
-    const db = withData(build(), "protons-neutrons-electrons", "c08", (d) => (d.predictCardId = "c03"));
+    const db = withData(build(), "protons-neutrons-electrons", "c07", (d) => (d.predictCardId = "c03"));
     assert.ok(rules(db).has("card-reveal"));
   });
 
@@ -232,7 +258,7 @@ describe("curriculum rules reject broken content", () => {
   });
 
   it("an item that is not in any lesson-compatible surface but is used by a lesson card", () => {
-    const db = mutate("UPDATE items SET surfaces = '[\"practice\"]' WHERE id = 'u1-l4-fill-c14'");
+    const db = mutate("UPDATE items SET surfaces = '[\"practice\"]' WHERE id = 'u1-l4-sort-carbon'");
     assert.ok(rules(db).has("card-item"));
   });
 
@@ -258,6 +284,58 @@ describe("curriculum rules reject broken content", () => {
   });
 });
 
+describe("lecture flow fields (figureAt, connected)", () => {
+  const withData = (db, lessonId, cardId, fn) => {
+    const data = JSON.parse(db.prepare("SELECT data FROM lesson_cards WHERE lesson_id = ? AND id = ?").get(lessonId, cardId).data);
+    fn(data);
+    db.prepare("UPDATE lesson_cards SET data = ? WHERE lesson_id = ? AND id = ?").run(JSON.stringify(data), lessonId, cardId);
+    return db;
+  };
+
+  it("accepts a figureAt from 0 to the number of bubbles, and a connected flag on an activity after a lecture", () => {
+    for (const at of [0, 1, 3]) assert.deepEqual(errorsOf(withData(build(), "alpha-beta-gamma", "c02", (d) => (d.figureAt = at))).map((f) => f.rule), []);
+    assert.deepEqual(errorsOf(withData(build(), "alpha-beta-gamma", "c04", (d) => (d.connected = true))).map((f) => f.rule), []);
+  });
+
+  it("rejects a figureAt that is not a whole number within the bubbles, or has no figure to place", () => {
+    for (const at of [-1, 4, 1.5, "1"]) assert.ok(rules(withData(build(), "alpha-beta-gamma", "c02", (d) => (d.figureAt = at))).has("card-figure-at"), String(at));
+    assert.ok(rules(withData(build(), "isotopes", "c02", (d) => { d.figureAt = 1; d.visual = { type: "stat" }; delete d.figure; })).has("card-figure-at"));
+  });
+
+  it("rejects a connected flag that is not true or false", () => {
+    assert.ok(rules(withData(build(), "alpha-beta-gamma", "c04", (d) => (d.connected = "yes"))).has("card-connected"));
+  });
+
+  it("warns when a connected activity has no lecture right before it", () => {
+    const db = withData(build(), "alpha-beta-gamma", "c01", (d) => (d.connected = true));
+    assert.ok(validateCurriculum(db).findings.some((f) => f.rule === "card-connected" && f.severity === "warning"));
+  });
+});
+
+describe("sort group icons", () => {
+  const sortItem = (db, fn) => {
+    const row = db.prepare("SELECT id, data FROM items WHERE id = 'u1-l1-sort-matter'").get();
+    const data = JSON.parse(row.data);
+    fn(data);
+    db.prepare("UPDATE items SET data = ? WHERE id = ?").run(JSON.stringify(data), row.id);
+    return db;
+  };
+  it("the authored sort items give every group its own icon", () => {
+    const db = build();
+    for (const r of db.prepare("SELECT id, data FROM items WHERE type = 'sort'").all()) {
+      const icons = JSON.parse(r.data).buckets.map((b) => b.icon);
+      assert.ok(icons.every(Boolean) && new Set(icons).size === icons.length, r.id);
+    }
+  });
+  it("two groups with the same icon are an error; a group with none is a warning", () => {
+    assert.ok(rules(sortItem(build(), (d) => (d.buckets[1].icon = d.buckets[0].icon))).has("item-shape"));
+    assert.ok(rules(sortItem(build(), (d) => (d.buckets[0].icon = 5))).has("item-shape"));
+    const db = sortItem(build(), (d) => delete d.buckets[0].icon);
+    assert.deepEqual(errorsOf(db).map((f) => f.rule), []);
+    assert.ok(validateCurriculum(db).findings.some((f) => f.rule === "sort-icons" && f.severity === "warning"));
+  });
+});
+
 describe("text helpers", () => {
   it("counts the words learners see, not the markers", () => {
     assert.equal(plainText("About [[atom|atoms]] here."), "About atoms here.");
@@ -275,7 +353,7 @@ describe("NPC teachers (docs/NPC_TEACHERS_SPEC.md §7.3)", () => {
   }
   const ruleSet = (db) => new Set(errorsOf(db).map((f) => f.rule));
 
-  it("the seeded cast and Unit 1 validate with no errors", async () => {
+  it("the seeded cast and both units validate with no errors", async () => {
     const db = await buildWithNpcs();
     assert.deepEqual(errorsOf(db).map((f) => `${f.table} ${f.id} ${f.rule}: ${f.message}`), []);
   });
@@ -329,7 +407,7 @@ describe("NPC teachers (docs/NPC_TEACHERS_SPEC.md §7.3)", () => {
 
   it("R5: a story card's speaker must be the unit's teacher", async () => {
     const db = await buildWithNpcs();
-    const story = db.prepare("SELECT lesson_id, id, data FROM lesson_cards WHERE type = 'story' LIMIT 1").get();
+    const story = db.prepare("SELECT lesson_id, id, data FROM lesson_cards WHERE type = 'story' AND lesson_id = 'atoms-are-everywhere'").get();
     assert.ok(story, "Unit 1 has a story card");
     const set = (speaker) => db.prepare("UPDATE lesson_cards SET data = ? WHERE lesson_id = ? AND id = ?").run(JSON.stringify({ ...JSON.parse(story.data), speaker }), story.lesson_id, story.id);
     set("npc-ada");
@@ -338,5 +416,206 @@ describe("NPC teachers (docs/NPC_TEACHERS_SPEC.md §7.3)", () => {
     assert.ok(ruleSet(db).has("npc-speaker"));
     set("npc-nobody");
     assert.ok(ruleSet(db).has("npc-speaker"));
+  });
+});
+
+
+// ---------------------------------------------------------------------------
+// Unit 2: Radioactivity (docs/UNIT_2_RADIOACTIVITY_SPEC.md)
+// ---------------------------------------------------------------------------
+
+describe("Unit 2 content", () => {
+  const U2 = "radioactivity";
+  const lessonsOf = (db) => db.prepare("SELECT * FROM lessons WHERE unit_id = ? ORDER BY id").all(U2);
+  const cardsOf = (db, lessonId) => db.prepare("SELECT * FROM lesson_cards WHERE lesson_id = ? ORDER BY position").all(lessonId).map((c) => ({ ...c, data: JSON.parse(c.data) }));
+  const allCards = (db) => lessonsOf(db).flatMap((l) => cardsOf(db, l.id));
+  const unit2Items = (db) => db.prepare("SELECT i.* FROM items i JOIN objectives o ON o.id = i.objective_id WHERE o.unit_id = ?").all(U2).map((i) => ({ ...i, data: JSON.parse(i.data), surfaces: JSON.parse(i.surfaces) }));
+  const textOf = (v) => JSON.stringify(v);
+
+  it("has five lessons and twelve objectives, each objective taught by exactly one lesson", () => {
+    const db = build();
+    assert.equal(lessonsOf(db).length, 5);
+    const objectives = db.prepare("SELECT id FROM objectives WHERE unit_id = ?").all(U2).map((o) => o.id);
+    assert.equal(objectives.length, 12);
+    const taught = lessonsOf(db).flatMap((l) => JSON.parse(l.teaches));
+    assert.deepEqual([...taught].sort(), [...objectives].sort());
+  });
+
+  it("the path is L1, L2, L3, practice, L4, L5, checkpoint with ids u2-n1 to u2-n7", () => {
+    const db = build();
+    const nodes = db.prepare("SELECT id, kind, lesson_id FROM path_nodes WHERE unit_id = ? ORDER BY position").all(U2);
+    assert.deepEqual(nodes.map((n) => n.id), ["u2-n1", "u2-n2", "u2-n3", "u2-n4", "u2-n5", "u2-n6", "u2-n7"]);
+    assert.deepEqual(nodes.map((n) => n.kind), ["lesson", "lesson", "lesson", "practice", "lesson", "lesson", "checkpoint"]);
+    assert.deepEqual(nodes.filter((n) => n.lesson_id).map((n) => n.lesson_id), ["why-nuclei-decay", "alpha-beta-gamma", "half-life", "decay-chains", "radioactivity-is-natural"]);
+    const cp = JSON.parse(db.prepare("SELECT config FROM path_nodes WHERE id = 'u2-n7'").get().config);
+    assert.equal(cp.questionCount, 12);
+  });
+
+  it("every lesson has a predict card, a sim or non-choice interaction pair, and a deeper card that is never scored", () => {
+    const db = build();
+    for (const l of lessonsOf(db)) {
+      const cs = cardsOf(db, l.id);
+      assert.ok(cs.some((c) => c.kind === "item" && db.prepare("SELECT type FROM items WHERE id = ?").get(c.item_id).type === "predict"), `${l.id}: no predict card`);
+      for (const c of cs.filter((x) => x.tier === "deeper")) assert.equal(c.scored, 0, `${l.id}/${c.id}: a deeper card is never scored`);
+    }
+  });
+
+  it("the three new simulations are placed where the spec puts them", () => {
+    const db = build();
+    const sims = db.prepare("SELECT lesson_id, id, type, data FROM lesson_cards WHERE kind = 'sim' AND lesson_id IN (SELECT id FROM lessons WHERE unit_id = ?) ORDER BY lesson_id, position").all(U2).map((c) => ({ ...c, data: JSON.parse(c.data) }));
+    const by = (lesson) => sims.filter((c) => c.lesson_id === lesson).map((c) => `${c.type}${c.data.mode ? `:${c.data.mode}` : ""}`);
+    // The "Wait" step (decay-wait) was taken out of the lessons: it did not teach anything the cards did not.
+    assert.deepEqual(by("why-nuclei-decay"), []);
+    assert.deepEqual(by("alpha-beta-gamma"), ["radiation-id"]);
+    assert.deepEqual(by("half-life"), []);
+    assert.deepEqual(by("decay-chains"), ["decay-chain"]);
+    assert.ok(!sims.some((c) => c.type === "decay-wait"));
+  });
+
+  it("no Core card or scored item has a nuclear equation, formula, decay constant or isotope table", () => {
+    const db = build();
+    const bad = /(decay constant|exponential|equation|formula|\bλ\b|\bN\s*=|mass number|atomic number|→)/i;
+    for (const l of lessonsOf(db)) {
+      for (const c of cardsOf(db, l.id)) {
+        if (c.tier === "deeper") continue;
+        assert.ok(!bad.test(textOf(c.data)), `${l.id}/${c.id}: a core card has a Go deeper idea`);
+      }
+    }
+    for (const i of unit2Items(db)) assert.ok(!bad.test(textOf(i.data)), `${i.id}: a scored item has a Go deeper idea`);
+  });
+
+  it("L3 never uses an observed count as a teaching fact: only 100, 50, 25, about 12, about 6, always with about", () => {
+    const db = build();
+    const copy = cardsOf(db, "half-life").filter((c) => c.kind === "teach" && c.tier === "core").map((c) => c.data.body).join(" ");
+    for (const n of ["50", "25", "12", "6"]) assert.match(copy, new RegExp(`about ${n}\\b`), `"about ${n}" is in the numbers card`);
+    assert.doesNotMatch(copy, /\b(47|48|49|51|52|53|13|11)\b/, "no near-miss observed counts in teaching text");
+    // Half-life items that quote a count say about, or give the starting number.
+    for (const id of ["u2-l3-fill-pattern", "u2-l3-choice-eighty", "u2-x-hundred-left"]) {
+      const row = db.prepare("SELECT data FROM items WHERE id = ?").get(id);
+      assert.ok(row, id);
+    }
+  });
+
+  it("beta is never described as an electron that was orbiting the nucleus, nor as only an electron", () => {
+    const db = build();
+    const copy = textOf(cardsOf(db, "alpha-beta-gamma").map((c) => c.data)) + textOf(unit2Items(db).map((i) => i.data));
+    assert.doesNotMatch(copy, /orbit/i);
+    assert.doesNotMatch(copy, /already in the nucleus|inside the nucleus before|only an electron|just an electron/i);
+  });
+
+  it("no Unit 2 item re-asks the Unit 1 'humans invented radioactivity' myth", () => {
+    const db = build();
+    for (const i of unit2Items(db)) {
+      const t = textOf(i.data).toLowerCase();
+      assert.ok(!/(invented|only exist because people made|humans create|something people create)/.test(t), `${i.id} re-asks the Unit 1 myth`);
+    }
+  });
+
+  it("Unit 2 never teaches a Unit 3 or Unit 4 idea as new: the teasers are unscored and say 'later'", () => {
+    const db = build();
+    const tease = cardsOf(db, "radioactivity-is-natural").find((c) => c.id === "c14");
+    assert.match(tease.data.body, /Later/);
+    assert.equal(tease.scored, 0);
+    const other = textOf(allCards(db).filter((c) => !(c.lesson_id === "radioactivity-is-natural" && c.id === "c14")).map((c) => c.data));
+    assert.doesNotMatch(other, /irradiated|contaminat|non-ionizing|dose|shield|sievert|detector|geiger/i);
+  });
+
+  it("the Becquerel story is told once: in Unit 2 lesson 5 as a Core story by Hal, and no longer in Unit 1", () => {
+    const db = build();
+    const stories = db.prepare("SELECT lesson_id, id, tier, data FROM lesson_cards WHERE data LIKE '%Becquerel%' AND type = 'story'").all();
+    assert.equal(stories.length, 1);
+    assert.equal(stories[0].lesson_id, "radioactivity-is-natural");
+    assert.equal(stories[0].tier, "core");
+    assert.equal(JSON.parse(stories[0].data).speaker, "npc-hal");
+    assert.ok(db.prepare("SELECT 1 FROM content_references WHERE id = 'ref-becquerel-1896'").get(), "the reference is kept");
+  });
+
+  it("every item is answerable, and a hotspot that animates names its answer", () => {
+    const db = build();
+    for (const row of db.prepare("SELECT i.* FROM items i JOIN objectives o ON o.id = i.objective_id WHERE o.unit_id = ? AND i.type != 'predict'").all(U2)) {
+      const d = JSON.parse(row.data);
+      const { right, wrong } = responses(row.type, d);
+      assert.equal(evaluateItem(row.type, d, right).correct, true, `${row.id}: right answer rejected`);
+      assert.equal(evaluateItem(row.type, d, wrong).correct, false, `${row.id}: wrong answer accepted`);
+    }
+    const hot = JSON.parse(db.prepare("SELECT data FROM items WHERE id = 'u2-l1-hotspot-change'").get().data);
+    assert.equal(hot.animateOnCorrect, true);
+    assert.ok(hot.targets.some((t) => t.id === hot.answer));
+  });
+
+  it("the half-life items the spec asks for exist, and the myths are the spec's myths", () => {
+    const db = build();
+    const tom = (id) => JSON.parse(db.prepare("SELECT data FROM items WHERE id = ?").get(id).data);
+    assert.equal(tom("u2-l3-tom-gone").answer, "myth");
+    assert.equal(tom("u2-l3-tom-timer").answer, "myth");
+    assert.equal(tom("u2-l1-tom-person").answer, "myth");
+    assert.equal(tom("u2-l2-tom-same").answer, "myth");
+    assert.equal(tom("u2-l2-tom-pieces").answer, "myth");
+    assert.equal(tom("u2-l4-tom-stable").answer, "myth");
+    assert.equal(tom("u2-l4-tom-vanish").answer, "myth");
+  });
+});
+
+describe("curriculum rules reject broken Unit 2 simulations", () => {
+  const edit = (lessonId, cardId, fn) => {
+    const db = build();
+    const row = db.prepare("SELECT data FROM lesson_cards WHERE lesson_id = ? AND id = ?").get(lessonId, cardId);
+    const data = JSON.parse(row.data);
+    fn(data);
+    db.prepare("UPDATE lesson_cards SET data = ? WHERE lesson_id = ? AND id = ?").run(JSON.stringify(data), lessonId, cardId);
+    return db;
+  };
+
+  it("the sims as authored are fine", () => {
+    assert.ok(![...rules(build())].includes("sim-shape"));
+  });
+
+  // No lesson uses decay-wait now, but the type is still supported, so a card is added to check its rule.
+  const waitCard = (fn) => {
+    const db = build();
+    const data = { mode: "half-life", task: "Press Wait.", count: 100, goal: { presses: 3 } };
+    fn(data);
+    db.prepare("INSERT INTO lesson_cards (lesson_id, id, position, kind, type, tier, item_id, scored, data) VALUES ('half-life', 'c99', 99, 'sim', 'decay-wait', 'core', NULL, 0, ?)").run(JSON.stringify(data));
+    return db;
+  };
+
+  it("a decay-wait with an unknown mode, no goal or a count that cannot halve", () => {
+    assert.ok(![...rules(waitCard(() => {}))].includes("sim-shape"));
+    assert.ok(rules(waitCard((d) => (d.mode = "fast"))).has("sim-shape"));
+    assert.ok(rules(waitCard((d) => delete d.goal)).has("sim-shape"));
+    assert.ok(rules(waitCard((d) => (d.count = 30))).has("sim-shape"));
+    assert.ok(rules(waitCard((d) => (d.task = ""))).has("sim-shape"));
+  });
+
+  it("a decay-chain that does not end in a stable nucleus, or has duplicate ids", () => {
+    assert.ok(rules(edit("decay-chains", "c03", (d) => (d.nodes[3].state = "unstable"))).has("sim-shape"));
+    assert.ok(rules(edit("decay-chains", "c03", (d) => (d.nodes[1].state = "stable"))).has("sim-shape"));
+    assert.ok(rules(edit("decay-chains", "c03", (d) => (d.nodes[1].id = "parent"))).has("sim-shape"));
+    assert.ok(rules(edit("decay-chains", "c03", (d) => (d.goal.reach = "daughter"))).has("sim-shape"));
+  });
+
+  it("a radiation-id with a bad answer, a missing clue or no goal", () => {
+    assert.ok(rules(edit("alpha-beta-gamma", "c08", (d) => (d.cases[0].answer = "delta"))).has("sim-shape"));
+    assert.ok(rules(edit("alpha-beta-gamma", "c08", (d) => (d.cases[1].clue = ""))).has("sim-shape"));
+    assert.ok(rules(edit("alpha-beta-gamma", "c08", (d) => delete d.goal)).has("sim-shape"));
+    assert.ok(rules(edit("alpha-beta-gamma", "c08", (d) => (d.objectives = ["u2-nope"]))).has("sim-shape"));
+  });
+
+  it("a simulation type that does not exist", () => {
+    const db = build();
+    db.prepare("UPDATE lesson_cards SET type = 'decay-flip' WHERE lesson_id = 'alpha-beta-gamma' AND id = 'c08'").run();
+    assert.ok(rules(db).has("card-type"));
+  });
+});
+
+describe("Hal's lines (Unit 2 teacher)", () => {
+  it("Hal is the unit's teacher with a meet, a sign-off and an intro for each of the five lessons", async () => {
+    const db = build();
+    db.exec(npcsDdl());
+    await seedNpcs(db);
+    assert.equal(db.prepare("SELECT teacher_npc_id FROM units WHERE id = 'radioactivity'").get().teacher_npc_id, "npc-hal");
+    const kinds = db.prepare("SELECT kind, lesson_id FROM npc_lines WHERE npc_id = 'npc-hal'").all();
+    assert.ok(kinds.some((l) => l.kind === "meet") && kinds.some((l) => l.kind === "sign_off"));
+    assert.deepEqual(kinds.filter((l) => l.kind === "lesson_intro").map((l) => l.lesson_id).sort(), ["alpha-beta-gamma", "decay-chains", "half-life", "radioactivity-is-natural", "why-nuclei-decay"]);
   });
 });

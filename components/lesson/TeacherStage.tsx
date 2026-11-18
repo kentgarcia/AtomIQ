@@ -39,14 +39,14 @@ export function stageAvatarSize(tileWidth: number, tileHeight: number, bubbleHei
   return Math.round(Math.max(MIN_AVATAR, Math.min(MAX_AVATAR, byWidth, room)));
 }
 
-export function TeacherStage({ teller, children, minHeight = 460 }: { teller: Teller | null; children: ReactNode; minHeight?: number }) {
+export function TeacherStage({ teller, children, minHeight = 460, fill = true }: { teller: Teller | null; children: ReactNode; minHeight?: number; fill?: boolean }) {
   const { theme } = useTheme();
   const styles = useStyles(theme);
   const [tile, setTile] = useState({ w: 0, h: 0 });
   const [bubbleH, setBubbleH] = useState(0);
   const onTile = (e: LayoutChangeEvent) => setTile({ w: e.nativeEvent.layout.width, h: e.nativeEvent.layout.height });
   return (
-    <View style={[styles.tile, { minHeight }]} onLayout={onTile}>
+    <View style={[styles.tile, { minHeight }, fill ? null : { flexGrow: 0 }]} onLayout={onTile}>
       <View style={styles.bubble} onLayout={(e: LayoutChangeEvent) => setBubbleH(e.nativeEvent.layout.height)}>
         <Card padding={spacing.lg} gap={spacing.sm}>
           {children}

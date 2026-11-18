@@ -42,6 +42,7 @@ import {
 } from "../../scripts/lib/content-store.mjs";
 import {
   ENTITY_CHILDREN,
+  ENTITY_LINKS,
   PARENT_OF,
   hydrateRow,
   ident,
@@ -50,8 +51,9 @@ import {
   pkKey,
   tableInfo,
 } from "../../scripts/lib/content-tables.mjs";
-import { REVIEW_STATUSES, SOURCE_TYPES } from "../../scripts/lib/content-rules.mjs";
 import { validateDatabase } from "../../scripts/lib/content-validate.mjs";
+import * as FEED_VOCAB from "../../scripts/lib/feed-vocab.mjs";
+import { ART_IDS, ART_NAMES } from "../../components/lesson/visual/object-art.ts";
 import { listIcons } from "../../scripts/lib/icon-names.mjs";
 import { makePaths } from "../../scripts/lib/content-paths.mjs";
 import {
@@ -104,6 +106,17 @@ function dehydrate(values, jsonCols) {
     else out[k] = v;
   }
   return out;
+}
+
+/** The feed vocabulary for the editor panels (one source: scripts/lib/feed-vocab.mjs) plus the art ids a cover can use. */
+function feedVocab() {
+  const { FEED_TRIGGERS, FEED_KINDS, FEED_CHIPS, STREAK_DAYS, CHEST_PERIODS, RANK_DIRECTIONS, COMEBACK_MIN_DAYS, BLOCK_TYPES, COUNTED_BLOCK_TYPES, BLOG_UNLOCK_TRIGGERS, BLOG_LIMITS, FEED_TEXT_MAX, FEED_PLACEHOLDERS, TEMPLATE_TRIGGER_KEYS } = FEED_VOCAB;
+  return { FEED_TRIGGERS, FEED_KINDS, FEED_CHIPS, STREAK_DAYS, CHEST_PERIODS, RANK_DIRECTIONS, COMEBACK_MIN_DAYS, BLOCK_TYPES, COUNTED_BLOCK_TYPES, BLOG_UNLOCK_TRIGGERS, BLOG_LIMITS, FEED_TEXT_MAX, FEED_PLACEHOLDERS, TEMPLATE_TRIGGER_KEYS, artIds: ART_IDS, artNames: ART_NAMES };
+}
+
+function linkTableFor(table) {
+  if (!ENTITY_LINKS[table]) throw new HttpError(400, `${table} has no link rows`);
+  return ENTITY_LINKS[table].table;
 }
 
 const decodePk = (s) => String(s).split("~").map(decodeURIComponent);
@@ -252,14 +265,11 @@ export async function createStudio(options = {}) {
     return {
       tables,
       entityChildren: ENTITY_CHILDREN,
+      entityLinks: ENTITY_LINKS,
+      feedVocab: feedVocab(),
       dbPath: paths.master,
       schemaVersion: readSchemaVersion(paths),
       preview: preview ? { enabled: true } : { enabled: false },
-      enums: {
-        sourceTypes: SOURCE_TYPES,
-        reviewStatuses: REVIEW_STATUSES,
-        summaryOrigins: ["original", "adapted", "excerpt", "unknown"],
-      },
     };
   }
 
@@ -418,6 +428,7 @@ export async function createStudio(options = {}) {
           pk: null,
           row: dehydrateRowFor(name, body.row),
           children: body.children ? body.children.map((r) => dehydrateRowFor(ENTITY_CHILDREN[name].table, r)) : undefined,
+          links: body.links ? body.links.map((r) => dehydrateRowFor(linkTableFor(name), r)) : undefined,
           source: auth.source,
         }),
       );
@@ -439,6 +450,7 @@ export async function createStudio(options = {}) {
             pk,
             row: dehydrateRowFor(name, body.row),
             children: body.children ? body.children.map((r) => dehydrateRowFor(ENTITY_CHILDREN[name].table, r)) : undefined,
+            links: body.links ? body.links.map((r) => dehydrateRowFor(linkTableFor(name), r)) : undefined,
             source: auth.source,
           }),
         );
@@ -529,7 +541,8 @@ export async function createStudio(options = {}) {
       // id + label pairs for reference pickers
       const table = tableInfo(db, searchParams.get("table") ?? "").name;
       const { cols } = tableInfo(db, table);
-      const label = ["title", "term", "name"].find((c) => cols.some((x) => x.name === c)) ?? "id";
+      // An NPC's `title` is its job ("Atom teacher"); the picker wants the name.
+      const label = (table === "npcs" ? ["name"] : ["title", "term", "name"]).find((c) => cols.some((x) => x.name === c)) ?? "id";
       const rows = db.prepare(`SELECT id, ${ident(label)} AS label FROM ${ident(table)} ORDER BY id`).all();
       return send(res, 200, { items: rows });
     }

@@ -7,20 +7,17 @@
  */
 
 import { LinearGradient } from "expo-linear-gradient";
+import LottieView from "lottie-react-native";
 import { useRouter } from "expo-router";
 import React, { useEffect, useMemo } from "react";
-import { Image, ScrollView, Text, View } from "react-native";
+import { Image, ScrollView, View } from "react-native";
+import { Text } from "@/components/ui/text";
 import Animated, {
-  cancelAnimation,
   Easing,
   FadeIn,
   FadeInDown,
   Keyframe,
-  useAnimatedStyle,
   useReducedMotion,
-  useSharedValue,
-  withRepeat,
-  withTiming,
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -47,8 +44,19 @@ const MASCOT_ENTER = new Keyframe({
 })
   .delay(120)
   .duration(420);
-const MASCOT_WIDTH = 210;
+const MASCOT_WIDTH = 180;
 const FLAME_WIDTH = 104;
+// eslint-disable-next-line @typescript-eslint/no-require-imports -- Metro bundles the .lottie file as an asset
+const FIRE = require("@/assets/lottie/Fire.lottie");
+// Fire.lottie is 500 x 690
+const FIRE_WIDTH = 170;
+const FIRE_HEIGHT = FIRE_WIDTH * (690 / 500);
+// How far the fire and the mascot tuck into each other
+const HERO_OVERLAP = 56;
+// The number sits on the fire artwork, so its colours are fixed: white with a hard black shadow
+const COUNT_FILL = "#FFFFFF"; // theme-allow: number on the fire artwork, same in light and dark
+const COUNT_SHADOW = "#000000"; // theme-allow: number on the fire artwork, same in light and dark
+const COUNT_SHADOW_DROP = 3;
 
 /** Today plus the next six days, like a "streak week" that starts now. */
 const buildWeek = () => {
@@ -77,24 +85,6 @@ export default function DailyStreakScreen() {
   useEffect(() => {
     notifySuccess();
   }, []);
-
-  // The flame breathes; the mascot hops in once
-  const flicker = useSharedValue(1);
-  useEffect(() => {
-    if (reducedMotion || !active) {
-      flicker.value = 1;
-      return;
-    }
-    flicker.value = withRepeat(
-      withTiming(1.07, { duration: 650, easing: Easing.inOut(Easing.sin) }),
-      -1,
-      true,
-    );
-    return () => cancelAnimation(flicker);
-  }, [flicker, reducedMotion, active]);
-  const flameStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: flicker.value }],
-  }));
 
   const enter = (delay: number) =>
     reducedMotion ? FadeIn.duration(150) : FadeInDown.delay(delay).duration(380);
@@ -133,22 +123,40 @@ export default function DailyStreakScreen() {
             accessible
             accessibilityLabel={`${streak} day streak`}
           >
-            <Animated.View entering={reducedMotion ? FadeIn.duration(150) : MASCOT_ENTER}>
+            <View style={styles.flameWrap}>
+              {active ? (
+                // Decorative. With reduced motion it holds one frame and does not play.
+                <View accessible={false} importantForAccessibility="no-hide-descendants">
+                  <LottieView
+                    source={FIRE}
+                    autoPlay={!reducedMotion}
+                    loop
+                    progress={reducedMotion ? 0.5 : undefined}
+                    style={{ width: FIRE_WIDTH, height: FIRE_HEIGHT }}
+                  />
+                </View>
+              ) : (
+                <Flame
+                  size={FLAME_WIDTH}
+                  top={c.surfaceStrong}
+                  bottom={c.borderStrong}
+                  inner={c.surfaceSoft}
+                />
+              )}
+              <View
+                pointerEvents="none"
+                style={[styles.countWrap, active && styles.countWrapLit]}
+              >
+                <Text style={styles.count}>{streak}</Text>
+              </View>
+            </View>
+            <Animated.View style={styles.mascotWrap} entering={reducedMotion ? FadeIn.duration(150) : MASCOT_ENTER}>
               <Image
                 source={MASCOT}
                 style={styles.mascot}
                 resizeMode="contain"
                 accessibilityIgnoresInvertColors
               />
-            </Animated.View>
-            <Animated.View style={[styles.flameWrap, flameStyle]}>
-              <Flame
-                size={FLAME_WIDTH}
-                top={active ? c.primaryLight : c.surfaceStrong}
-                bottom={active ? c.primaryDark : c.borderStrong}
-                inner={active ? c.gold : c.surfaceSoft}
-              />
-              <Text style={styles.flameCount}>{streak}</Text>
             </Animated.View>
           </View>
 
@@ -228,18 +236,29 @@ const makeStyles = createStyles((theme) => {
       marginBottom: 24,
     },
     mascot: { width: MASCOT_WIDTH, height: MASCOT_WIDTH * (887 / 804) },
+    // In front of the fire
+    mascotWrap: { marginLeft: -HERO_OVERLAP, zIndex: 2 },
+    // On the left, in front of Shrodi
     flameWrap: {
-      marginLeft: -22,
+      zIndex: 1,
       marginBottom: 6,
       alignItems: "center",
       justifyContent: "center",
-      transformOrigin: "bottom",
     },
-    flameCount: {
+    countWrap: {
       position: "absolute",
       bottom: FLAME_WIDTH * 0.2,
-      fontSize: 34,
-      color: c.onPrimary,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    countWrapLit: { bottom: FIRE_HEIGHT * 0.12 },
+    count: {
+      fontSize: 44,
+      lineHeight: 52,
+      color: COUNT_FILL,
+      textShadowColor: COUNT_SHADOW,
+      textShadowOffset: { width: 0, height: COUNT_SHADOW_DROP },
+      textShadowRadius: 0,
       ...fontFaces.heavy,
     },
     card: {

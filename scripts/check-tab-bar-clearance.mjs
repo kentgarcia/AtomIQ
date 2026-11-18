@@ -5,7 +5,8 @@
  * Static + computed proof that the floating tab bar can never cover content:
  *  1. every tab screen reserves the bar through useTabBarInset (no magic
  *     numbers) and adds >= the minimum clearance below its last item;
- *  2. the bar's gradient fade is bounded by the reserved band;
+ *  2. the fade behind the bar never takes touches and never reaches higher above the
+ *     bar than the clearance floating buttons keep (so it cannot veil them);
  *  3. visibility goes through the inset provider (no navigation params);
  *  4. computed from theme/tab-bar-metrics.ts for phone/tablet viewports and
  *     none/gesture/iPhone/three-button/taskbar insets: tabs >= 48 dp, bar fits,
@@ -31,7 +32,7 @@ const TAB_SCREENS = {
   "app/(tabs)/community.tsx": /paddingBottom:\s*tabBarInset\s*\+\s*(\d+)/,
   "app/(tabs)/chat.tsx": /paddingBottom:\s*tabBarInset\s*\+\s*(\d+)/,
   "app/(tabs)/profile.tsx": /paddingBottom:\s*tabBarInset\s*\+\s*(\d+)/,
-  "app/(tabs)/leaderboard.tsx": /paddingBottom:\s*tabBarInset\s*\+\s*(\d+)/,
+  "app/(tabs)/quests.tsx": /paddingBottom:\s*tabBarInset\s*\+\s*(\d+)/,
   "components/games/PickAGame.tsx": /bottomReserve\s*=\s*tabBarInset\s*\+\s*(\d+)/,
   "components/games/DifficultyPanel.tsx": /paddingBottom:\s*tabBarInset\s*\+\s*(\d+)/,
 };
@@ -49,11 +50,14 @@ for (const [file, pattern] of Object.entries(TAB_SCREENS)) {
 
 /* ---- 2/3. layout wiring ---------------------------------------------- */
 const tabLayout = read("app/(tabs)/_layout.tsx");
-if (/height:\s*\d{3,}/.test(tabLayout.split("const styles")[1] ?? "") &&
-    /fade:\s*{[^}]*height:\s*\d+/.test(tabLayout))
-  fail("app/(tabs)/_layout.tsx: fade has a hard-coded height");
-if (!/fadeHeight\s*=\s*tabBarInset/.test(tabLayout))
-  fail("app/(tabs)/_layout.tsx: fade height must equal the reserved inset");
+if (/LinearGradient/.test(tabLayout)) {
+  if (!/<LinearGradient[^>]*pointerEvents="none"/s.test(tabLayout))
+    fail('app/(tabs)/_layout.tsx: the fade behind the bar must be pointerEvents="none"');
+  const reach = /FADE_ABOVE_BAR\s*=\s*(\d+)/.exec(tabLayout);
+  if (!reach) fail("app/(tabs)/_layout.tsx: the fade needs a FADE_ABOVE_BAR constant");
+  else if (Number(reach[1]) > MIN_CLEARANCE)
+    fail(`app/(tabs)/_layout.tsx: the fade reaches ${reach[1]} dp above the bar, more than the ${MIN_CLEARANCE} dp floating buttons keep clear`);
+}
 if (!/useTabBarVisible\(\)/.test(tabLayout))
   fail("app/(tabs)/_layout.tsx: bar must read visibility from the inset provider");
 if (/hideTabBar/.test(tabLayout) || /hideTabBar/.test(read("app/(tabs)/chat.tsx")))
@@ -104,16 +108,15 @@ for (const [vpName, width, height] of viewports) {
     const lastItemBottom = m.reservedHeight + MIN_CLEARANCE;
     if (m.tabWidth < TAB_BAR_CONSTANTS.minTabWidth - 0.001)
       fail(`${label}: tab ${m.tabWidth.toFixed(1)} dp < ${TAB_BAR_CONSTANTS.minTabWidth} dp touch target`);
-    if (m.iconSlot > m.tabWidth + 0.001) fail(`${label}: icon slot wider than its tab`);
     if (m.barWidth > TAB_BAR_CONSTANTS.maxWidth) fail(`${label}: bar wider than max`);
     if (2 * m.horizontalMargin + m.barWidth > width + 0.001)
       fail(`${label}: bar does not fit the window`);
-    if (m.bottomOffset !== bottom + m.gap) fail(`${label}: bar is not at inset + gap`);
+    if (m.gap !== 0 || m.bottomOffset !== bottom) fail(`${label}: bar is not docked at the inset`);
     if (m.reservedHeight !== m.contentHeight + m.bottomOffset)
       fail(`${label}: reserved height != bar + offset`);
     if (m.reservedHeight >= height * 0.25)
       fail(`${label}: reserved band ${m.reservedHeight} >= 25% of ${height}`);
-    if (m.reservedHeight > lastItemBottom) fail(`${label}: fade reaches last item`);
+    if (m.reservedHeight > lastItemBottom) fail(`${label}: the reserved band reaches the last item`);
   }
 }
 

@@ -106,8 +106,10 @@ export function GrowCard({
   const animated = useAnimatedStyle(() => {
     if (!ctx) return {};
     const p = ctx.progress.value;
-    if (reducedMotion || !ctx.origin || !box) {
-      return { opacity: reducedMotion || box ? p : 0 };
+    if (reducedMotion) return { opacity: p };
+    // No control to grow from: a small scale up from the centre
+    if (!ctx.origin || !box) {
+      return { opacity: box ? p : 0, transform: [{ scale: 0.94 + 0.06 * p }] };
     }
     const o = ctx.origin;
     const startScale = Math.min(1, Math.max(0.12, Math.max(o.width / box.width, o.height / box.height)));

@@ -1,7 +1,9 @@
 import * as IconsaxReactNative from "iconsax-react-native";
 import React, { useEffect, useMemo } from "react";
-import { Text } from "react-native";
+import Svg, { Path } from "react-native-svg";
+import { Text } from "@/components/ui/text";
 
+import { CUSTOM_ICONS, isCustomIconName } from "./custom-icons";
 import { reportIconDiagnostic } from "./icon-diagnostics";
 import {
   FALLBACK_ICON_NAME,
@@ -59,6 +61,18 @@ export function Icon({
       reportIconDiagnostic({ ...resolution, source });
     }
   }, [resolution, source]);
+
+  // AtomIQ's own icons (custom-icons.ts) are drawn here, in the Iconsax Bold look; any variant draws Bold
+  if (resolution.valid && isCustomIconName(resolution.resolved)) {
+    const custom = CUSTOM_ICONS[resolution.resolved];
+    return (
+      <Svg width={size} height={size} viewBox="0 0 24 24" style={style}>
+        {custom.shapes.map((shape, i) => (
+          <Path key={i} d={shape.d} fill={color} fillOpacity={shape.opacity ?? 1} fillRule={shape.evenOdd ? "evenodd" : "nonzero"} />
+        ))}
+      </Svg>
+    );
+  }
 
   const componentName = resolution.valid
     ? resolution.resolved

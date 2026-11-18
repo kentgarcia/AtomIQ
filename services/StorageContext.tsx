@@ -14,9 +14,10 @@ import {
     initDatabase,
 } from "./database";
 import {
-    DEFAULT_PROFILE_AVATAR_KEY,
-    normalizeProfileAvatarKey,
-} from "./profile-avatars";
+    DEFAULT_AVATAR_VALUE,
+    normalizeAvatarValue,
+} from "@/components/avatar/avatar-core";
+import { checkFeedOnAppOpen, emitRankCheck, emitStreak } from "./feed";
 import { getOnboardingCompleted, setLastActiveDate } from "./storage";
 import { recordMissionEvent } from "./missions";
 import { checkDailyStreak, toLocalIsoDate } from "./utils";
@@ -74,7 +75,7 @@ export const StorageProvider = ({ children }: { children: ReactNode }) => {
       return;
     }
 
-    const normalizedAvatar = normalizeProfileAvatarKey(profile.avatar_url);
+    const normalizedAvatar = normalizeAvatarValue(profile.avatar_url);
     if (profile.avatar_url !== normalizedAvatar) {
       await createOrUpdateUserProfile({ avatar_url: normalizedAvatar });
       const refreshedProfile = (await getUserProfile()) as UserProfile | null;
@@ -116,7 +117,7 @@ export const StorageProvider = ({ children }: { children: ReactNode }) => {
         }
 
         if (activeProfile) {
-          const normalizedAvatar = normalizeProfileAvatarKey(
+          const normalizedAvatar = normalizeAvatarValue(
             activeProfile.avatar_url,
           );
           if (activeProfile.avatar_url !== normalizedAvatar) {
@@ -135,7 +136,7 @@ export const StorageProvider = ({ children }: { children: ReactNode }) => {
           user_id: generateLocalUserId(),
           username: "Scientist",
           display_name: "Scientist",
-          avatar_url: DEFAULT_PROFILE_AVATAR_KEY,
+          avatar_url: DEFAULT_AVATAR_VALUE,
           total_xp: 0,
           current_streak: 0,
           longest_streak: 0,
@@ -170,7 +171,7 @@ export const StorageProvider = ({ children }: { children: ReactNode }) => {
         const normalizedUpdates: Partial<UserProfile> = {
           ...updates,
           ...(updates.avatar_url !== undefined
-            ? { avatar_url: normalizeProfileAvatarKey(updates.avatar_url) }
+            ? { avatar_url: normalizeAvatarValue(updates.avatar_url) }
             : {}),
         };
 
@@ -196,6 +197,7 @@ export const StorageProvider = ({ children }: { children: ReactNode }) => {
       const newTotalXP = prevTotalXP + Math.max(0, Math.round(amount));
 
       await updateUserProfile({ total_xp: newTotalXP });
+      emitRankCheck(); // the NPC feed may notice a rank change (fire-and-forget)
 
       // Level-up detection — every 100 XP bumps the displayed level
       const prevLevel = Math.floor(prevTotalXP / 100) + 1;
@@ -221,6 +223,7 @@ export const StorageProvider = ({ children }: { children: ReactNode }) => {
       current_streak: newStreak,
       longest_streak: newLongest,
     });
+    emitStreak(newStreak); // the NPC feed posts at 3, 7, 14, 30, 60 and 100 days (fire-and-forget)
   }, [updateUserProfile]);
 
   // Idempotent per-day tracker: runs the streak check, marks the day as
@@ -254,6 +257,7 @@ export const StorageProvider = ({ children }: { children: ReactNode }) => {
         await setLastActiveDate(today);
         await recordMissionEvent("login", 1);
         dailyTrackedDateRef.current = today;
+        void checkFeedOnAppOpen(); // comeback post and feed retention; never rejects
       })().finally(() => {
         dailyTrackingPromiseRef.current = null;
       });

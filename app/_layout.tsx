@@ -76,9 +76,13 @@ function AppContent() {
         <Stack.Screen name="index" options={{ headerShown: false }} />
         <Stack.Screen name="onboarding" options={{ headerShown: false }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="lesson" options={{ headerShown: false }} />
+        {/* A lesson (and practice) fades in over the map: the node bubble zooms away first, then the preview fades up */}
+        <Stack.Screen name="lesson" options={{ headerShown: false, animation: "fade" }} />
         <Stack.Screen name="mythbuster" options={{ headerShown: false }} />
-        <Stack.Screen name="practice" options={{ headerShown: false }} />
+        <Stack.Screen name="practice" options={{ headerShown: false, animation: "fade" }} />
+        <Stack.Screen name="blog" options={{ headerShown: false }} />
+        <Stack.Screen name="ranks" options={{ headerShown: false }} />
+        <Stack.Screen name="daily-facts" options={{ headerShown: false }} />
         <Stack.Screen name="settings" options={{ headerShown: false }} />
         <Stack.Screen name="privacy-policy" options={{ headerShown: false }} />
         <Stack.Screen name="terms-of-service" options={{ headerShown: false }} />
@@ -91,11 +95,12 @@ function AppContent() {
         <Stack.Screen name="explorer" options={{ headerShown: false }} />
         <Stack.Screen name="encyclopedia" options={{ headerShown: false }} />
         <Stack.Screen name="periodic-table" options={{ headerShown: false }} />
+        <Stack.Screen name="achievements" options={{ headerShown: false }} />
+        <Stack.Screen name="shop" options={{ headerShown: false }} />
         <Stack.Screen
           name="achievement-detail"
           options={{ headerShown: false, presentation: "modal" }}
         />
-        <Stack.Screen name="article-detail" options={{ headerShown: false }} />
         <Stack.Screen
           name="modal"
           options={{ presentation: "modal", title: "Modal" }}

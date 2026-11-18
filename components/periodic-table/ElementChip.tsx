@@ -10,7 +10,8 @@
 
 import { useRouter } from "expo-router";
 import React, { memo, useCallback, useMemo } from "react";
-import { Pressable, Text, type StyleProp, type ViewStyle } from "react-native";
+import { Pressable, type StyleProp, type ViewStyle } from "react-native";
+import { Text } from "@/components/ui/text";
 
 import { useCategoryColors } from "@/components/periodic-table/use-category-colors";
 import { findElement, openElement } from "@/services/periodic-table";

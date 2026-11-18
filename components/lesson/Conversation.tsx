@@ -1,19 +1,19 @@
 /**
  * The teacher, teaching. A run provides the lesson's teacher (`TeacherProvider`); cards then speak
  * through them: a question is asked by the teacher in a speech bubble, and a teaching card is told as a
- * short chat (`Conversation`), with the learner's own guess as a reply on the right. The teacher
- * stands beside the first bubble from the chest up and idles. Bubbles hold only what is said, and no
+ * lecture (components/lesson/LecturePage.tsx) of bubbles (`TeacherBubble`), with the learner's own guess as
+ * a reply on the right (`LearnerBubble`). The teacher stands beside the first bubble from the chest up and idles. Bubbles hold only what is said, and no
  * name: the teacher is introduced once, on their own page (TeacherIntro), before the first lesson. With no teacher the unit's mascot,
- * Shrodi, tells it instead. Bubbles arrive one after another (a short fade and nudge), or all at once
- * with reduced motion. Decorative figure; the words are real text.
+ * Shrodi, tells it instead. Bubbles arrive one after another (a short fade and nudge) when the
+ * lecture reveals them. Decorative figure; the words are real text.
  */
 
-import { createContext, useContext, type ReactNode } from "react";
-import { Text, View } from "react-native";
-import Animated, { FadeInDown, useReducedMotion } from "react-native-reanimated";
+import { createContext, useContext, type ComponentProps, type ReactNode } from "react";
+import { View } from "react-native";
+import { Text } from "@/components/ui/text";
+import Animated from "react-native-reanimated";
 
 import { Shrodi } from "@/components/mascot/Shrodi";
-import { EASE_OUT } from "@/components/motion/motion";
 import { Npc } from "@/components/npc/Npc";
 import type { NpcSpec } from "@/components/npc/npc-art";
 import { LeftTail, SideTail } from "@/components/npc/SpeechBubble";
@@ -36,15 +36,12 @@ export function useLessonTeacher(): Teller | null {
   return useContext(TeacherContext);
 }
 
-/** Head, neck and chest only: flat base, idle breathing. Shrodi stands in when there is no teacher. */
-const LIVELY = 2;
-const BASE_SLACK = 2;
-
+/** Head and a strip of shirt, close in and held still (only the face moves). Shrodi stands in when there is no teacher. */
 export function TeacherAvatar({ size, teller }: { size: number; teller: Teller | null }) {
   const width = teller ? Math.round((size * 200) / 252) : size;
   return (
     <View style={{ width, height: size, alignItems: "center", overflow: "hidden" }} pointerEvents="none">
-      {teller ? <Npc spec={teller.spec} pose="idle" form="head" size={size} lively={LIVELY} style={{ marginTop: BASE_SLACK }} /> : <Shrodi mood="idle" size={size} />}
+      {teller ? <Npc spec={teller.spec} pose="idle" form="bust" size={size} /> : <Shrodi mood="idle" size={size} />}
     </View>
   );
 }
@@ -76,47 +73,61 @@ export function TeacherSays({ children, teller, avatarSize = 72 }: { children: R
   );
 }
 
-export type Message = { from: "teacher" | "learner"; render: () => ReactNode };
+/** Width the teacher's avatar takes beside a bubble, so later bubbles of a run line up with the first. */
+function avatarWidthOf(who: Teller | null, size: number): number {
+  return who ? Math.round((size * 200) / 252) : size;
+}
 
-/** Messages one after another: the teacher on the left (avatar beside the first of a run), the learner on the right. */
-export function Conversation({ messages, teller, avatarSize = 84 }: { messages: Message[]; teller?: Teller | null; avatarSize?: number }) {
+/**
+ * One of the teacher's bubbles. The first of a run has the teacher beside it (from the chest up); the
+ * ones after it are indented to line up. `entering` plays when it appears (a lecture reveals bubbles
+ * one at a time); leave it out for a bubble that is simply there.
+ */
+export function TeacherBubble({
+  children,
+  first,
+  teller,
+  avatarSize = 84,
+  entering,
+  gapBefore = 0,
+}: {
+  children: ReactNode;
+  first: boolean;
+  teller?: Teller | null;
+  avatarSize?: number;
+  entering?: ComponentProps<typeof Animated.View>["entering"];
+  gapBefore?: number;
+}) {
   const { theme } = useTheme();
   const styles = useStyles(theme);
-  const reduced = useReducedMotion();
   const lesson = useLessonTeacher();
   const who = teller === undefined ? lesson : teller;
-  const avatarWidth = who ? Math.round((avatarSize * 200) / 252) : avatarSize;
   return (
-    <View style={{ gap: spacing.md }}>
-      {messages.map((m, i) => {
-        const first = m.from === "teacher" && messages[i - 1]?.from !== "teacher";
-        const enter = reduced ? undefined : FadeInDown.duration(220).delay(i * 380).easing(EASE_OUT);
-        const gapBefore = i > 0 && messages[i - 1].from !== m.from ? spacing.sm : 0;
-        if (m.from === "learner") {
-          return (
-            <Animated.View key={i} entering={enter} style={[styles.learnerRow, { marginTop: gapBefore }]}>
-              <View style={styles.learnerBubble}>
-                <Card padding={spacing.lg} gap={spacing.xs}>
-                  <Text style={styles.you}>You</Text>
-                  {m.render()}
-                </Card>
-                <SideTail />
-              </View>
-            </Animated.View>
-          );
-        }
-        return (
-          <Animated.View key={i} entering={enter} style={[styles.row, { marginTop: gapBefore, alignItems: first ? "center" : "flex-start" }]}>
-            {first ? <TeacherAvatar size={avatarSize} teller={who} /> : <View style={{ width: avatarWidth }} />}
-            <View style={styles.bubble}>
-              <Card padding={spacing.lg} gap={spacing.sm}>
-                {m.render()}
-              </Card>
-              {first ? <LeftTail /> : null}
-            </View>
-          </Animated.View>
-        );
-      })}
-    </View>
+    <Animated.View entering={entering} style={[styles.row, { marginTop: gapBefore, alignItems: first ? "center" : "flex-start" }]}>
+      {first ? <TeacherAvatar size={avatarSize} teller={who} /> : <View style={{ width: avatarWidthOf(who, avatarSize) }} />}
+      <View style={styles.bubble}>
+        <Card padding={spacing.lg} gap={spacing.sm}>
+          {children}
+        </Card>
+        {first ? <LeftTail /> : null}
+      </View>
+    </Animated.View>
+  );
+}
+
+/** The learner's own reply, on the right. */
+export function LearnerBubble({ children, entering, gapBefore = 0 }: { children: ReactNode; entering?: ComponentProps<typeof Animated.View>["entering"]; gapBefore?: number }) {
+  const { theme } = useTheme();
+  const styles = useStyles(theme);
+  return (
+    <Animated.View entering={entering} style={[styles.learnerRow, { marginTop: gapBefore }]}>
+      <View style={styles.learnerBubble}>
+        <Card padding={spacing.lg} gap={spacing.xs}>
+          <Text style={styles.you}>You</Text>
+          {children}
+        </Card>
+        <SideTail />
+      </View>
+    </Animated.View>
   );
 }

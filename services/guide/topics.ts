@@ -8,7 +8,6 @@
  * "dynamic pill generation" / "no dead ends" rule from the product spec.
  */
 
-import type { Article, ArticleCategory } from "@/content/articles/types";
 import type { Lesson } from "@/content/curriculum/types";
 import type {
   AtomMazeChallenge,
@@ -113,7 +112,6 @@ export interface LoadedContent {
   /** Practice nodes and checkpoints (formerly unit quizzes). */
   quizzes: PracticeEntry[];
   encyclopedia: EncyclopediaEntry[];
-  articles: Article[];
   mazes: AtomMazeChallenge[];
   journeys: Journey[];
 }
@@ -122,12 +120,11 @@ export interface LoadedContent {
 let unitTitles = new Map<string, string>();
 
 export const loadGuideContent = async (): Promise<LoadedContent> => {
-  const [units, nodes, lessons, encyclopedia, articles, mazes] = await Promise.all([
+  const [units, nodes, lessons, encyclopedia, mazes] = await Promise.all([
     contentRepository.getUnits(),
     contentRepository.getPathNodes(),
     contentRepository.getLessons(),
     contentRepository.getAllEncyclopediaEntries(),
-    contentRepository.getAllArticles(),
     contentRepository.getAllMazes(),
   ]);
   unitTitles = new Map(units.map((u) => [u.id, u.title]));
@@ -147,7 +144,7 @@ export const loadGuideContent = async (): Promise<LoadedContent> => {
       };
     });
   const journeys = getAllJourneys();
-  return { lessons, quizzes, encyclopedia, articles, mazes, journeys };
+  return { lessons, quizzes, encyclopedia, mazes, journeys };
 };
 
 const lower = (v: string | undefined | null): string =>
@@ -162,7 +159,6 @@ export interface TopicContent {
   lessons: Lesson[];
   quizzes: PracticeEntry[];
   encyclopedia: EncyclopediaEntry[];
-  articles: Article[];
   /** Global games (MythBuster) are always available; mazes match by keyword. */
   mazes: AtomMazeChallenge[];
   hasMythBuster: boolean;
@@ -192,10 +188,6 @@ export const getTopicContent = (
     keywordHit(topic.keywords, e.term, e.definition, e.category),
   );
 
-  const articles = content.articles.filter((a) =>
-    keywordHit(topic.keywords, ...a.tags, a.title, a.excerpt, a.category),
-  );
-
   const mazes = content.mazes.filter((m) =>
     keywordHit(topic.keywords, m.title, m.description, m.theme),
   );
@@ -204,7 +196,6 @@ export const getTopicContent = (
     lessons,
     quizzes,
     encyclopedia,
-    articles,
     mazes,
     hasMythBuster: true,
   };
@@ -220,7 +211,6 @@ export const getAvailableTopicIds = (
       c.lessons.length > 0 ||
       c.quizzes.length > 0 ||
       c.encyclopedia.length > 0 ||
-      c.articles.length > 0 ||
       c.mazes.length > 0
     );
   }).map((t) => t.id);
@@ -284,48 +274,6 @@ export const getExploreCategories = (
   ALL_EXPLORE_CATEGORIES.filter((cat) =>
     content.encyclopedia.some((e) => cat.matches(e)),
   );
-
-const ARTICLE_CATEGORY_LABELS: Record<ArticleCategory, string> = {
-  safety: "Safety",
-  history: "History",
-  technology: "Technology",
-  environment: "Environment",
-  health: "Health",
-  energy: "Energy",
-  science: "Science",
-  myths: "Myths & Facts",
-};
-
-export interface ArticleCategoryBucket {
-  id: ArticleCategory;
-  label: string;
-  icon: string;
-}
-
-const ARTICLE_ICONS: Record<ArticleCategory, string> = {
-  safety: "ShieldSecurity",
-  history: "Chart",
-  technology: "Setting2",
-  environment: "Heart",
-  health: "Heart",
-  energy: "Flash",
-  science: "DocumentText",
-  myths: "InfoCircle",
-};
-
-/** Article categories that have at least one article in the DB. */
-export const getDiscoverCategories = (
-  content: LoadedContent,
-): ArticleCategoryBucket[] => {
-  const present = new Set(content.articles.map((a) => a.category));
-  return (Object.keys(ARTICLE_CATEGORY_LABELS) as ArticleCategory[])
-    .filter((c) => present.has(c))
-    .map((c) => ({
-      id: c,
-      label: ARTICLE_CATEGORY_LABELS[c],
-      icon: ARTICLE_ICONS[c],
-    }));
-};
 
 /** Unit title lookup (for card subtitles). */
 export const getUnitTitle = (unitId: string | undefined): string | null => {

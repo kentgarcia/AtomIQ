@@ -7,7 +7,7 @@
 
 ## 1. Goal
 
-Content (lessons, quizzes, myths, MythBuster pools, mazes, encyclopedia, articles, posts) should be:
+Content (lessons, quizzes, myths, MythBuster pools, mazes, encyclopedia) should be:
 
 1. **Simple:** one source of truth (the SQLite master DB), one editor (Content Studio), one release command.
 2. **Reliable on device:** the app never shows a half-seeded or empty content database, and a failed seed is visible and recoverable.
@@ -44,7 +44,7 @@ Size: 11 tables, ~560 rows, 720 KB.
 | P3 | Seeding deletes the live DB first, then copies, then writes a separate marker file. These steps are not atomic. | `services/content-db.ts:196-202` |
 | P4 | Seeding is fired and forgotten at startup. Each screen's first query blocks on it, and a failure appears as scattered per-screen errors (only Settings shows status). | `app/_layout.tsx:63`, `getReadyContentDb()` |
 | P5 | The integrity check only counts `lessons`. | `verifyContentDb()` |
-| P6 | User state (bookmarks, explorer journey/node progress, article `related_*`) refers to content by string id. Nothing stops a shipped id from being renamed or deleted, which silently orphans user progress. | `services/local-first/schema.ts`, `services/explorer-storage.ts` |
+| P6 | User state (bookmarks, explorer journey/node progress) refers to content by string id. Nothing stops a shipped id from being renamed or deleted, which silently orphans user progress. | `services/local-first/schema.ts`, `services/explorer-storage.ts` |
 | P7 | The DB is binary, so content changes cannot be reviewed in a git diff or PR, and history grows by ~720 KB per content commit (×2 copies). | `content/database/`, `assets/database/` |
 | P8 | Versioning is implicit. Every byte-level change produces a new opaque 9-digit number: no release notes, no "what changed since the last release", no way to name or restore a past release, and nothing separates work in progress from something ready to publish. | `scripts/sync-content.js` |
 | P9 | The only backup is one button that copies the live DB file next to the master (`content.db.bak-<stamp>`). It does not checkpoint the WAL first, so a copy can miss recent writes. There is no list, restore, retention or per-entity undo, and scripted fixes (`scripts/content-migration/*.mjs`) and the OpenCode plugin write with no safety net. | `server.mjs` `/api/backup` |
@@ -131,7 +131,7 @@ Add `components/content/ContentGate.tsx` and wrap the router in `app/_layout.tsx
 
 ### 3.5 Content id stability (fixes P6)
 
-- `content/shipped-ids.json`: for each id-bearing table (`lessons`, `quizzes`, `myths`, `mazes`, `encyclopedia_entries`, `articles`, `posts`, journeys/nodes), the ids that have shipped. `npm run release:content` regenerates it (union with the previous file, so ids are never dropped).
+- `content/shipped-ids.json`: for each id-bearing table (`lessons`, `quizzes`, `myths`, `mazes`, `encyclopedia_entries`, journeys/nodes), the ids that have shipped. `npm run release:content` regenerates it (union with the previous file, so ids are never dropped).
 - `content/retired-ids.json`: `{ "<table>": { "<id>": "<reason, date>" } }`.
 - `validate:content` errors when an id in `shipped-ids.json` is missing from the DB and not listed in `retired-ids.json`.
 - Renames are not allowed. Create the new id and retire the old one.
@@ -157,7 +157,7 @@ Content ships as part of an over-the-air JS update. The bundled DB is an asset, 
 | Bump | When | Examples |
 |---|---|---|
 | PATCH | Wording changes only. No entity added, removed or retired. | Typo, clearer explanation, fixed distractor, reordered steps |
-| MINOR | Entities added, or new optional fields filled. | New lesson, six new quiz questions, a new article |
+| MINOR | Entities added, or new optional fields filled. | New lesson, six new quiz questions, a new myth |
 | MAJOR | An id is retired (§3.5) or `schema_version` changes. | Removed myth, new lesson step type |
 
 The author may raise the bump but not go below the suggestion.
@@ -270,7 +270,8 @@ Replace the table list with a sidebar of **content types**. Each opens a purpose
 | Myths | Single form. |
 | Mazes | Maze fields, an ordered room list, and per room: monsters and battle questions as forms, not JSON. Boss questions use the question widget. |
 | Encyclopedia | Single form with reference pickers for related entries/elements. |
-| Articles / Posts | Existing source and author widgets, plus the review workflow from `docs/ARTICLE_PIPELINE.md` (status, reviewer, last reviewed). |
+| Feed templates | Listed by trigger, then NPC. The condition fields follow the chosen trigger (unit and lesson pickers, streak days, chest period, rank direction); a live post preview fills the placeholders with the real lesson and unit titles and shows the character count. See `docs/NPC_FEED_SPEC.md` §6. |
+| Blog pieces | Listed by unit. Fields, an unlock editor, an ordered block list (p, h, quote, fact, figure, list, next), the NPC comments as child rows (an entity child, like lesson cards) and the cited sources as link rows (`blog_references`, an `ENTITY_LINKS` entry saved with the piece). A reader-style preview shows the word count (120 to 350), the reading time and the comments; `read_min` is recomputed on every save. |
 
 Shared widgets:
 
@@ -306,7 +307,7 @@ Studio never runs `eas update`, pushes to git, or creates tags itself. It prints
 ### 4.6 Cleanup (S7)
 
 - Delete `tools/content-sql.html`, `scripts/content-editor.js` and the `content-editor` npm script.
-- Update `CLAUDE.md`, `README.md`, `content/README.md` and `docs/ARTICLE_PIPELINE.md` to describe Studio + `release:content` as the only workflow, and drop the stale `content/*.ts → seed-sqlite` description.
+- Update `CLAUDE.md`, `README.md`, and `content/README.md` to describe Studio + `release:content` as the only workflow, and drop the stale `content/*.ts → seed-sqlite` description.
 
 ## 5. Testing
 
@@ -356,6 +357,7 @@ Everything in §3 (except §3.6) and §4 is implemented. Where the code differs 
 - **`built_at`** in `content_meta` is a release date, or the literal `draft` / `preview` for the working copy and developer previews.
 - **`shipped-ids.json` covers database tables only.** Journeys are still TypeScript and are not tracked.
 - **Device preview** is paired with a 6-digit code typed in Settings → Developer (with attempt lockout), not a QR code.
-- **First publish needs `--allow-unreviewed`** (the "Publish anyway" box in Studio) while articles and posts are still `needs-review`; the release records `unreviewedAllowed: true`.
+- **First publish needs `--allow-unreviewed`** (the "Publish anyway" box in Studio) while content references are still unverified; the release records `unreviewedAllowed: true`.
 - **Frontend**: plain ES modules under `tools/studio/public/js/` (`form.js` is the spec-driven widget builder, `types.js` the per-type field specs, `entity.js` the editor, `panels.js` the Problems / Changes / Publish / Releases / Backups / Search / SQL views). The visual-block SVG preview is not built; the Problems view enforces the block rules instead.
 - **Verification**: `test:content-db`, `test:releases`, `test:backups` and `test:studio` cover the backend. The frontend was smoke-tested in headless Chromium, including a round trip that opens and saves all 346 existing items and confirms the content hash is unchanged.
+- **NPC feed tables** (`feed_templates`, `blog_posts`, `blog_comments`, `blog_references`, between the `feed` markers of `schema.sql`, seeded by `scripts/content-migration/feed-content.mjs`). `feed_templates` and `blog_posts` are shipped-id tables. Entities can now have a link table next to their child table (`ENTITY_LINKS` in `content-tables.mjs`; `saveEntity` takes `links`, history and restore include them). The vocabulary (triggers, condition fields, placeholders, block types, limits) is one framework-free module, `scripts/lib/feed-vocab.mjs`; the rules are `scripts/lib/feed-rules.mjs`, run by `validateDatabase`. The Studio serves the vocabulary in `/api/meta` (`feedVocab`) so the panels cannot drift from the rules. Tests: `test-validate-content.mjs` (rules, one passing and one failing case each) and `test-studio.mjs` (the panels' saves).

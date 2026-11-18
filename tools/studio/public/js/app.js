@@ -278,6 +278,22 @@ function renderList(cfg) {
         ul.append(makeItem(r, move));
       });
     }
+  } else if (cfg.groupBy) {
+    // Grouped list (feed templates by trigger, blog pieces by unit); the order comes from the type.
+    const groups = new Map();
+    for (const r of listRows) {
+      const g = cfg.groupBy(r);
+      if (!groups.has(g)) groups.set(g, []);
+      groups.get(g).push(r);
+    }
+    const order = [...(cfg.groupOrder?.() ?? []), ...[...groups.keys()].sort()];
+    for (const g of [...new Set(order)]) {
+      const rows = groups.get(g);
+      if (!rows) continue;
+      ul.append(el("li", "list-group", `${g} · ${rows.length}`));
+      const key = cfg.sortBy ?? ((r) => String(r.id));
+      for (const r of [...rows].sort((x, y) => (key(x) < key(y) ? -1 : key(x) > key(y) ? 1 : 0))) ul.append(makeItem(r));
+    }
   } else {
     for (const r of listRows) ul.append(makeItem(r));
   }

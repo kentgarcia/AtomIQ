@@ -27,7 +27,7 @@ export interface ScreenFrameProps {
     scroll?: boolean;
     /** Apply the top safe-area inset to the body. */
     topInset?: boolean;
-    /** Reserve the floating tab bar instead of only the system bottom inset. */
+    /** Reserve the docked tab bar instead of only the system bottom inset. */
     reserveTabBar?: boolean;
     /** Extra bottom space for a fixed control (composer, CTA, answer row). */
     bottomExtra?: number;

@@ -1,6 +1,6 @@
 /**
  * DifficultyPanel — in-page selection for Atom Maze, Myth Buster and the
- * Lab. Renders the same full-bleed slanted stack design as the game
+ * Lab. Renders the same card stack as the game
  * picker; slides in on the Games tab after the picker slides away.
  */
 
@@ -44,8 +44,11 @@ const getMazeColor = (theme: string | undefined) => {
 
 export function DifficultyPanel({
     game,
+    stackHeight,
 }: {
     game: "atom-maze" | "mythbuster" | "lab";
+    /** Height of the card stack (without the tab-bar clearance); the picker passes its own so both match. */
+    stackHeight?: number;
 }) {
     const router = useRouter();
     const insets = useSafeAreaInsets();
@@ -68,16 +71,16 @@ export function DifficultyPanel({
     }, []);
 
     // Same stacking math as the game picker: stack fills the area below
-    // the header and above the floating tab bar.
-    const stackH = Math.round(
-        windowHeight - insets.top - 18 - HEADER_H - tabBarInset - 16,
-    );
+    // the header and above the docked tab bar.
+    const stackH =
+        stackHeight ?? Math.round(windowHeight - insets.top - 18 - HEADER_H - tabBarInset - 16);
 
     const items = useMemo(() => {
         if (game === "mythbuster") {
             return GAME_MODES.map((mode, i) => ({
                 key: mode.id,
                 title: mode.title,
+                subtitle: mode.description,
                 color: mode.color,
                 icon: mode.icon,
                 delay: 50 + i * 50,
@@ -89,6 +92,7 @@ export function DifficultyPanel({
                 {
                     key: "radiation-shield",
                     title: "Radiation Shield Lab",
+                    subtitle: "Pick the right shield for each source",
                     color: "#EA580C",
                     icon: "ShieldTick",
                     delay: 50,
@@ -97,6 +101,7 @@ export function DifficultyPanel({
                 {
                     key: "build-atom",
                     title: "Build an Atom",
+                    subtitle: "Add protons, neutrons and electrons",
                     color: "#1CB0F6",
                     icon: "Atom",
                     delay: 100,
@@ -105,6 +110,7 @@ export function DifficultyPanel({
                 {
                     key: "decay-lab",
                     title: "Radioactive Decay Lab",
+                    subtitle: "Watch half-lives play out",
                     color: "#58CC02",
                     icon: "Timer1",
                     delay: 150,
@@ -116,6 +122,7 @@ export function DifficultyPanel({
             {
                 key: "endless",
                 title: "Endless Maze",
+                subtitle: "Keep going as long as you can",
                 color: "#7C3AED",
                 icon: "Unlimited",
                 delay: 50,
@@ -124,6 +131,7 @@ export function DifficultyPanel({
             ...mazes.map((maze, i) => ({
                 key: maze.id,
                 title: maze.title,
+                subtitle: "Reach the exit to finish",
                 color: getMazeColor(maze.theme),
                 icon: "Grid9",
                 delay: 100 + i * 50,
@@ -147,6 +155,7 @@ export function DifficultyPanel({
                     <StackCard
                         key={item.key}
                         title={item.title}
+                        subtitle={item.subtitle}
                         color={item.color}
                         icon={item.icon}
                         delay={item.delay}
@@ -168,6 +177,5 @@ const styles = StyleSheet.create({
     },
     stack: {
         flex: 1,
-        marginHorizontal: -14,
     },
 });

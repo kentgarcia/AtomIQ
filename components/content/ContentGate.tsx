@@ -13,7 +13,8 @@
 
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
-import { ActivityIndicator, ScrollView, Text, View } from "react-native";
+import { ActivityIndicator, ScrollView, View } from "react-native";
+import { Text } from "@/components/ui/text";
 
 import { Button } from "@/components/ui/button";
 import { ensureContentDatabase, retryContentDatabase } from "@/services/content-db";

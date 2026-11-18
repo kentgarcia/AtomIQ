@@ -5,7 +5,8 @@
  */
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, View } from "react-native";
+import { Text } from "@/components/ui/text";
 import Svg, { Circle, G } from "react-native-svg";
 
 import { Button } from "@/components/ui/button";

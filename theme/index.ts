@@ -29,8 +29,6 @@ export {
     LessonDark,
     QuizLight,
     QuizDark,
-    ArticleLight,
-    ArticleDark,
     ExplorerLight,
     ExplorerDark,
     MazeLight,

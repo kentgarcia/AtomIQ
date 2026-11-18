@@ -33,7 +33,7 @@ Also test with **Settings → Appearance: Follow system** and flip the OS scheme
 | 3 | `app/(tabs)/index.tsx` (Home) | Path/units, locked/current/completed nodes, XP pill, level-up modal, lesson preview overlay | Locked node face/icon must be readable in both modes. |
 | 4 | `app/(tabs)/awards.tsx` (Games) | Pick-a-Game cards, How-to-Play card, difficulty panel | Game cards, chips, and highlights. |
 | 5 | `app/(tabs)/chat.tsx` | Empty state, message list, input bar, suggestion pills, beta notice modal | Input and bubbles must not stay light on dark. |
-| 6 | `app/(tabs)/leaderboard.tsx` | Podium 1/2/3, list rows, refresh, loading/error, “You” highlight | Silver medal is an approved exception (EX-02). |
+| 6 | `app/(tabs)/quests.tsx` | Daily fact card, daily quest rows and chests, achievements list with progress bars | Progress fill and label stay legible in both modes. |
 | 7 | `app/(tabs)/community.tsx` | Filter pills, search, feed, saved list, comments sheet, report modal, guidelines modal, undo snackbar | Feed/card/modals all use `theme.palettes.ui`. |
 | 8 | `app/(tabs)/profile.tsx` | Front/back flip, stats, title progress, achievements, avatar picker, share, celebration modal | Card flip must preserve state across theme changes. |
 | 9 | `app/settings.tsx` | Sections, switches (dark mode, sound, haptics), delete-account modal | Toggle here is the primary live-switch test. |

@@ -8,6 +8,8 @@ import type { Lesson, PathNode } from "@/content/curriculum/types";
 import { recordActivity } from "@/services/activity-log";
 import { recordAnswers, markObjectivesFamiliar, type RecordedAnswer } from "@/services/curriculum-progress";
 import { getLevelProgress, getUserProfile, logDailyActivity, updateLevelProgress } from "@/services/database";
+import { emitFeedEvent, emitNodeCompleted } from "@/services/feed";
+import { recordMissionEvent } from "@/services/missions";
 import { toLocalIsoDate } from "@/services/utils";
 
 export interface CompleteOptions {
@@ -52,6 +54,8 @@ export async function completeNode(opts: CompleteOptions): Promise<CompleteResul
   if (lesson) {
     await markObjectivesFamiliar(lesson.teaches);
     recordActivity("lesson_complete", { id: node.id });
+    // Counts toward the weekly "Finish lessons" quest (a replay counts too)
+    void recordMissionEvent("lesson", 1);
   } else {
     recordActivity("quiz_complete", { id: node.id });
   }
@@ -68,6 +72,8 @@ export async function completeNode(opts: CompleteOptions): Promise<CompleteResul
     lessons_completed: lesson ? 1 : 0,
     time_spent_minutes: lesson?.estimatedMinutes ?? 4,
   });
+  // The NPC feed hears about it last (fire-and-forget: it can never fail or delay the completion).
+  emitNodeCompleted({ nodeId: node.id, unitId: node.unitId, kind: node.kind, lessonId: lesson?.id, perfect: stars === 3 });
   return { firstCompletion: true, xpAwarded: xp };
 }
 
@@ -89,4 +95,5 @@ export async function completeTestOut(opts: {
     type: "testout",
   });
   await markObjectivesFamiliar(opts.objectiveIds);
+  emitFeedEvent({ type: "testout_pass", unitId: opts.unitId });
 }

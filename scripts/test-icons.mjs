@@ -21,6 +21,7 @@ for (const m of fs.readFileSync(entry, "utf8").matchAll(/^exports\.([\w$]+)\s*=/
 // cannot resolve; load a copy with explicit extensions.
 const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "icon-test-"));
 fs.copyFileSync(path.join(UI, "icon-registry.ts"), path.join(tmp, "icon-registry.ts"));
+fs.copyFileSync(path.join(UI, "custom-icons.ts"), path.join(tmp, "custom-icons.ts")); // the registry imports it
 fs.writeFileSync(
   path.join(tmp, "icon-diagnostics.ts"),
   fs.readFileSync(path.join(UI, "icon-diagnostics.ts"), "utf8").replace('"./icon-registry"', '"./icon-registry.ts"'),

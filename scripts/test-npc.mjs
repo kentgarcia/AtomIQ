@@ -18,7 +18,7 @@ const art = loadTs("components/npc/npc-art.ts");
 const { ALLOWED_COLORS, FORBIDDEN_NAMES, MUTE_DARK, MUTE_LIGHT } = loadTs("components/npc/npc-palette.ts");
 const { NPC_ROSTER, NPC_LINES } = loadTs("components/npc/npc-roster.ts");
 const { contrastRatio } = loadTs("theme/contrast.ts");
-const { ARM, EYE, FINGER_W, HEAD, NECK, NPC_BLINKS, NPC_IDLE_PERIODS, NPC_LOOP_MS, NPC_POSES, NPC_VIEWBOX, POSES, SHOULDER, TORSO, buildNpc, hairSideBottom, mutedSpec, armPoints } = art;
+const { ARM, BUST_BOTTOM, BUST_MOODS, NPC_MOOD_FADE, EYE, FINGER_W, HEAD, NECK, NPC_BLINKS, NPC_IDLE_PERIODS, NPC_LOOP_MS, NPC_POSES, NPC_VIEWBOX, POSES, SHOULDER, TORSO, buildNpc, hairSideBottom, mutedSpec, armPoints } = art;
 
 const HEX = /^#[0-9A-Fa-f]{6}$/;
 const partsOf = (tree) => [...tree.back, ...tree.face, ...tree.top, ...tree.front, ...tree.lids];
@@ -239,6 +239,34 @@ test("at the smallest ship sizes the hands and pupils still read", () => {
   assert.ok(2 * ARM.hand * scale("hero", 150) >= 18, "hand at hero size");
   assert.ok(13 * scale("head", 80) >= 2, "pupil at banner size");
   assert.ok(13 * scale("head", 48) >= 2, "pupil at chip size");
+});
+
+test("the bust is the head form's shape, closer in, with no arms and a shirt that ends at the bottom edge", () => {
+  const bust = NPC_VIEWBOX.bust;
+  const head = NPC_VIEWBOX.head;
+  assert.ok(Math.abs(bust.w / bust.h - head.w / head.h) < 1e-9, "same shape as the head form, so it drops in where it was");
+  assert.ok(bust.w < head.w, "closer in");
+  assert.ok(BUST_BOTTOM > TORSO.top + 20, "some shirt shows");
+  for (const n of NPC_ROSTER) {
+    const tree = buildNpc(n.spec, "idle", "bust");
+    const full = buildNpc(n.spec, "idle");
+    assert.ok(tree.back.length < full.back.length, `${n.name}: no arms in the bust`);
+    // the shirt body ends exactly at the crop's bottom edge, with rounded corners (an arc, not a straight cut)
+    const shirt = tree.back.find((p) => "fill" in p && p.d.includes("H") && p.d.includes("Q") && p.d.includes(`${Math.round(BUST_BOTTOM * 100) / 100}`));
+    assert.ok(shirt, `${n.name}: shirt ends at the bottom edge`);
+    assert.equal((shirt.d.match(/Q/g) ?? []).length, 2, `${n.name}: both bottom corners are rounded`);
+  }
+});
+
+test("the bust only plays expressions: they stay clear of the blinks and close the loop", () => {
+  for (const m of BUST_MOODS) {
+    assert.ok(m.from > 0 && m.to > m.from && m.to + NPC_MOOD_FADE < NPC_LOOP_MS);
+    for (const b of NPC_BLINKS) assert.ok(m.to + NPC_MOOD_FADE < b || m.from > b + 300, `mood ${m.from} overlaps a blink at ${b}`);
+  }
+  for (let i = 1; i < BUST_MOODS.length; i++) assert.ok(BUST_MOODS[i].from > BUST_MOODS[i - 1].to + NPC_MOOD_FADE, "moods do not overlap");
+  const n = NPC_ROSTER[0];
+  assert.equal(buildNpc(n.spec, "idle", "bust").moods.length, BUST_MOODS.length);
+  assert.equal(buildNpc(n.spec, "idle").moods, undefined, "other forms have none");
 });
 
 // ── lines ───────────────────────────────────────────────────────────────────

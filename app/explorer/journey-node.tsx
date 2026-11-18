@@ -2,8 +2,6 @@ import { MarkdownText } from '@/components/markdown-text';
 import { PageHeader } from '@/components/ui/page-header';
 import { SectionHeader } from '@/components/ui/section-header';
 import { Icon } from '@/components/ui/icon';
-import { getArticleById } from '@/content/articles';
-import type { Article } from '@/content/articles/types';
 import { getJourneyById } from '@/content/explorer';
 import { getMythById } from '@/content/myths';
 import type { Myth } from '@/content/types';
@@ -35,11 +33,9 @@ export default function JourneyNodeScreen() {
     return journey.nodes.find(n => n.id === nodeId);
   }, [journey, nodeId]);
 
-  // Myth and article content is DB-backed (async) — resolve it once per node.
+  // Myth content is DB-backed (async) — resolve it once per node.
   const [myth, setMyth] = useState<Myth | null>(null);
   const [mythRead, setMythRead] = useState(false);
-  const [article, setArticle] = useState<Article | null>(null);
-  const [articleRead, setArticleRead] = useState(false);
   useEffect(() => {
     let alive = true;
     if (node && node.type === 'myth') {
@@ -54,18 +50,6 @@ export default function JourneyNodeScreen() {
       setMythRead(true);
       setMyth(null);
     }
-    if (node && node.type === 'article') {
-      setArticleRead(false);
-      setArticle(null);
-      getArticleById(node.contentId).then((a) => {
-        if (!alive) return;
-        setArticle(a);
-        setArticleRead(true);
-      });
-    } else {
-      setArticleRead(true);
-      setArticle(null);
-    }
     return () => {
       alive = false;
     };
@@ -76,12 +60,10 @@ export default function JourneyNodeScreen() {
     switch (node.type) {
       case 'myth':
         return myth;
-      case 'article':
-        return article;
       default:
         return null;
     }
-  }, [node, myth, article]);
+  }, [node, myth]);
 
   if (!journey || !node) {
     return (
@@ -92,14 +74,6 @@ export default function JourneyNodeScreen() {
   }
 
   if (node.type === 'myth' && !mythRead) {
-    return (
-      <View style={styles.container}>
-        <Text>Loading content…</Text>
-      </View>
-    );
-  }
-
-  if (node.type === 'article' && !articleRead) {
     return (
       <View style={styles.container}>
         <Text>Loading content…</Text>
@@ -213,18 +187,7 @@ export default function JourneyNodeScreen() {
               </LinearGradient>
             </Animated.View>
           </>
-        ) : (
-          /* Article or Other Content */
-          <Animated.View entering={FadeInDown.delay(100)} style={styles.articleCard}>
-            <Text style={styles.articleTitle}>{content.title}</Text>
-            {'excerpt' in content && content.excerpt && (
-              <Text style={styles.articleExcerpt}>{content.excerpt}</Text>
-            )}
-            {'content' in content && (
-              <MarkdownText text={content.content} style={styles.articleContent} />
-            )}
-          </Animated.View>
-        )}
+        ) : null}
 
         {/* Navigation */}
         <View style={styles.navigationContainer}>
@@ -365,34 +328,6 @@ const makeStyles = (THEME: Palette) => StyleSheet.create({
     fontSize: 11,
     ...fontFaces.regular,
     color: withAlpha(THEME.white, 0.8),
-  },
-  articleCard: {
-    backgroundColor: THEME.card,
-    borderRadius: 20,
-    padding: 20,
-    marginTop: 16,
-    borderWidth: 2,
-    borderColor: THEME.border,
-    borderBottomWidth: 4,
-  },
-  articleTitle: {
-    fontSize: 24,
-    ...fontFaces.heavy,
-    color: THEME.text,
-    marginBottom: 12,
-  },
-  articleExcerpt: {
-    fontSize: 15,
-    ...fontFaces.regular,
-    color: THEME.textMuted,
-    lineHeight: 22,
-    marginBottom: 16,
-  },
-  articleContent: {
-    fontSize: 15,
-    ...fontFaces.regular,
-    color: THEME.text,
-    lineHeight: 24,
   },
   navigationContainer: {
     flexDirection: 'row',

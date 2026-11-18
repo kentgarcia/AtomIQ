@@ -1,31 +1,77 @@
 /**
- * Button — the shared chunky control (Duolingo-style): flat face, 2px border,
- * 4px darker bottom "lip", and the face sinks onto the lip when pressed.
+ * Button — the shared chunky control. Two constructions, both with a lip that only shows along
+ * the bottom edge and a face that sinks onto it when pressed:
+ *
+ *   bezeled   (primary, success, destructive; default and large sizes) a thin white bezel, with no
+ *             border and only a gray lip along its bottom edge, holds the colored face, which has
+ *             a darker lip inside it
+ *   flat      (secondary, and every compact button) just the face and its lip, since a bezel
+ *             inside a card or around an outlined button would be one frame too many
  *
  * Variants (all colors come from theme roles, never literals):
- *   primary     orange face / `primaryDark` lip / `onPrimary` label
+ *   primary     `buttonFace` yellow / `buttonLip` / `onPrimary` label
  *   secondary   surface face / `borderStrong` lip / orange label
+ *   lesson      (flat, all caps) lighter yellow face / `lessonCardLip` lip / darker yellow label: for a button on the yellow lesson card or node bubble
+ *   modal       `lessonHeader` face / `lessonCardLip` lip / white label: the main button of a modal (bezeled, same yellow as its header)
+ *   guide       `guide` blue face / `guideLip` / `onPrimary` label: the Guide's and the Quests card's blue (bezeled)
  *   destructive `error` face / `dangerDark` lip / `onPrimary` label
  *   success     `success` face / `successDark` lip / `onPrimary` label
  *
- * Labels are bold 16px so white on the orange face meets the 3:1 large-text
- * bar enforced by `npm run test:contrast`.
+ * Labels on a colored face are white with a hard shadow (no blur) in the lip color. The bezel is
+ * fixed per variant and size, and a disabled button keeps its lip (a gray one) and the exact height
+ * of an enabled one, so nothing shifts when it becomes available.
  */
 
 import { createContext, useContext, type ReactNode } from "react";
 import {
     Pressable,
     StyleSheet,
-    Text,
     View,
     type StyleProp,
     type ViewStyle,
 } from "react-native";
+import { Text } from "@/components/ui/text";
 
 import { playButtonClickSfx } from "@/services/ui-sfx";
+import { stretchStyle } from "@/theme/text-stretch";
 import { fontFaces, fontSizes, radius, useTheme } from "@/theme";
 import { controls } from "@/theme/tokens";
 import { layout } from "@/theme/layout";
+
+/** The white frame around a bezeled button. */
+export const BEZEL = { padding: 3, lip: 3, innerLip: 6, innerRadius: radius.lg } as const;
+const BEZEL_OUTER_RADIUS = BEZEL.innerRadius + BEZEL.padding;
+
+/** Face and lip colors of the white bezel (theme roles, so dark mode follows). */
+export function useBezelColors() {
+    const c = useTheme().theme.colors;
+    return { face: c.card, lip: c.borderStrong };
+}
+
+/**
+ * The bezel around any colored face: `children` is the face with its inner lip. Renders only the
+ * frame; the caller owns press handling.
+ */
+export function Bezel({ children }: { children: ReactNode }) {
+    const b = useBezelColors();
+    return (
+        <View style={{ paddingBottom: BEZEL.lip }}>
+            <View
+                pointerEvents="none"
+                style={[styles.lipLayer, { top: BEZEL.lip, backgroundColor: b.lip, borderRadius: BEZEL_OUTER_RADIUS }]}
+            />
+            <View
+                style={{
+                    backgroundColor: b.face,
+                    borderRadius: BEZEL_OUTER_RADIUS,
+                    padding: BEZEL.padding,
+                }}
+            >
+                {children}
+            </View>
+        </View>
+    );
+}
 
 /**
  * `classic` is the original rounded-rectangle button. `standard` is the new house design: fully
@@ -42,7 +88,8 @@ export function ButtonDesignProvider({ design, children }: { design: ButtonDesig
     return <ButtonDesignContext.Provider value={design}>{children}</ButtonDesignContext.Provider>;
 }
 
-export type ButtonVariant = "primary" | "secondary" | "destructive" | "success";
+/** `modal` is the main button of a ModalCard: the exact face and lip of the modal's header band. */
+export type ButtonVariant = "primary" | "secondary" | "destructive" | "success" | "lesson" | "modal" | "guide";
 /** `compact` is a smaller inline button (36px tall, 14px label) for use inside cards. `large` is a taller call-to-action (60px). */
 export type ButtonSize = "default" | "compact" | "large";
 
@@ -60,6 +107,8 @@ export interface ButtonProps {
     fullWidth?: boolean;
     /** Let a long label wrap onto a second line instead of being cut off (for narrow buttons). */
     wrap?: boolean;
+    /** Draw the label taller (theme/text-stretch.ts), for screens that use the stretched text. */
+    stretch?: boolean;
     accessibilityLabel?: string;
     testID?: string;
     style?: StyleProp<ViewStyle>;
@@ -75,6 +124,7 @@ export function Button({
     renderIcon,
     fullWidth = true,
     wrap = false,
+    stretch = false,
     accessibilityLabel,
     testID,
     style,
@@ -83,22 +133,92 @@ export function Button({
     const c = theme.colors;
 
     const palette = disabled
-        ? { face: c.disabled, lip: c.disabled, label: c.disabledText, border: c.disabled }
+        ? { face: c.disabled, lip: c.borderStrong, label: c.disabledText, border: c.disabled, shadow: undefined }
         : variant === "secondary"
-          ? { face: c.surface, lip: c.borderStrong, label: c.primaryLight, border: c.border }
+          ? { face: c.surface, lip: c.borderStrong, label: c.primaryLight, border: c.border, shadow: undefined }
+          : variant === "lesson"
+            ? { face: c.lessonButtonFace, lip: c.lessonCardLip, label: c.lessonButtonLabel, border: c.lessonButtonFace, shadow: undefined }
+          : variant === "modal"
+            ? { face: c.lessonHeader, lip: c.lessonCardLip, label: c.lessonHeaderText, border: c.lessonHeader, shadow: c.lessonCardLip }
+          : variant === "guide"
+            ? { face: c.guide, lip: c.guideLip, label: c.onPrimary, border: c.guide, shadow: c.guideLip }
           : variant === "destructive"
-            ? { face: c.error, lip: c.dangerDark, label: c.onPrimary, border: c.error }
+            ? { face: c.error, lip: c.dangerDark, label: c.onPrimary, border: c.error, shadow: c.dangerDark }
             : variant === "success"
-              ? { face: c.success, lip: c.successDark, label: c.onPrimary, border: c.success }
-              : { face: c.primary, lip: c.primaryDark, label: c.onPrimary, border: c.primary };
+              ? { face: c.success, lip: c.successDark, label: c.onPrimary, border: c.success, shadow: c.successDark }
+              : { face: c.buttonFace, lip: c.buttonLip, label: c.onPrimary, border: c.buttonFace, shadow: c.buttonLip };
 
-    const lip = disabled ? 0 : controls.lip;
     const compact = size === "compact";
     const inherited = useContext(ButtonDesignContext);
     const standard = (designProp ?? inherited) === "standard";
     const large = size === "large" || (standard && !compact);
-    const uppercase = standard && !compact;
-    const round = standard ? radius.full : compact ? radius.md : radius.lg;
+    const uppercase = (standard && !compact) || variant === "lesson";
+    const bezeled = variant !== "secondary" && variant !== "lesson" && !compact;
+    // A bezeled button is a rounded square whatever the design; a flat one keeps the pill / classic shape
+    const round = bezeled ? BEZEL.innerRadius : standard ? radius.full : compact ? radius.md : radius.lg;
+    // The lip is always there (gray when disabled): a flat disabled face looked unfinished
+    const lip = bezeled ? BEZEL.innerLip : controls.lip;
+
+    // Inner height (face + lip). The bezel adds its own frame around it.
+    const innerMin = bezeled
+        ? large
+            ? 52
+            : 44
+        : compact
+          ? 36
+          : large
+            ? 60
+            : layout.minTouchTarget;
+    const faceMin = bezeled ? innerMin - BEZEL.innerLip : innerMin - controls.lip;
+
+    const renderFace = (pressed: boolean) => (
+        <View style={[styles.inner, { minHeight: innerMin, borderRadius: round, paddingBottom: bezeled ? BEZEL.innerLip : controls.lip }]}>
+            {/* The lip is its own layer, exactly where the face lands when pressed, so nothing darker shows above it. */}
+            {lip > 0 ? (
+                <View
+                    pointerEvents="none"
+                    style={[styles.lipLayer, { top: lip, backgroundColor: palette.lip, borderRadius: round }]}
+                />
+            ) : null}
+            <View
+                style={[
+                    styles.face,
+                    compact && styles.faceCompact,
+                    large && !compact && styles.faceLarge,
+                    {
+                        minHeight: faceMin,
+                        backgroundColor: palette.face,
+                        borderRadius: round,
+                        borderWidth: bezeled ? 0 : controls.border,
+                        borderColor: palette.border,
+                        transform: [{ translateY: pressed && !disabled ? lip : 0 }],
+                    },
+                ]}
+            >
+                {renderIcon ? renderIcon(palette.label) : null}
+                <Text
+                    style={[
+                        styles.label,
+                        compact && styles.labelCompact,
+                        uppercase && styles.labelUpper,
+                        stretch && stretchStyle,
+                        { color: palette.label },
+                        // Hard shadow, no blur, in the lip color
+                        palette.shadow
+                            ? {
+                                  textShadowColor: palette.shadow,
+                                  textShadowOffset: { width: 0, height: compact ? 1 : 2 },
+                                  textShadowRadius: 0,
+                              }
+                            : null,
+                    ]}
+                    numberOfLines={wrap ? 2 : 1}
+                >
+                    {label}
+                </Text>
+            </View>
+        </View>
+    );
 
     return (
         <Pressable
@@ -113,60 +233,16 @@ export function Button({
                 void playButtonClickSfx();
                 onPress();
             }}
-            style={[
-                styles.lip,
-                compact && styles.lipCompact,
-                large && styles.lipLarge,
-                fullWidth ? styles.fullWidth : styles.hug,
-                { paddingBottom: lip, borderRadius: round },
-                style,
-            ]}
+            style={[fullWidth ? styles.fullWidth : styles.hug, style]}
         >
-            {({ pressed }) => (
-                <>
-                {/* The lip is its own layer, exactly where the face lands when pressed, so nothing darker shows above it. */}
-                {lip > 0 ? (
-                    <View
-                        pointerEvents="none"
-                        style={[styles.lipLayer, { top: lip, backgroundColor: palette.lip, borderRadius: round }]}
-                    />
-                ) : null}
-                <View
-                    style={[
-                        styles.face,
-                        compact && styles.faceCompact,
-                        large && styles.faceLarge,
-                        {
-                            backgroundColor: palette.face,
-                            borderRadius: round,
-                            borderColor: palette.border,
-                            transform: [{ translateY: pressed && !disabled ? controls.pressTravel : 0 }],
-                        },
-                    ]}
-                >
-                    {renderIcon ? renderIcon(palette.label) : null}
-                    <Text
-                        style={[styles.label, compact && styles.labelCompact, uppercase && styles.labelUpper, { color: palette.label }]}
-                        numberOfLines={wrap ? 2 : 1}
-                    >
-                        {label}
-                    </Text>
-                </View>
-                </>
-            )}
+            {({ pressed }) => (bezeled ? <Bezel>{renderFace(pressed)}</Bezel> : renderFace(pressed))}
         </Pressable>
     );
 }
 
 const styles = StyleSheet.create({
-    lip: {
-        borderRadius: radius.lg,
+    inner: {
         overflow: "hidden",
-        minHeight: layout.minTouchTarget,
-    },
-    lipCompact: {
-        minHeight: 36,
-        borderRadius: radius.md,
     },
     lipLayer: {
         position: "absolute",
@@ -174,15 +250,10 @@ const styles = StyleSheet.create({
         right: 0,
         bottom: 0,
     },
-    lipLarge: {
-        minHeight: 60,
-    },
     faceLarge: {
-        minHeight: 60 - controls.lip,
-        paddingVertical: 16,
+        paddingVertical: 14,
     },
     faceCompact: {
-        minHeight: 36 - controls.lip,
         borderRadius: radius.md,
         paddingHorizontal: 14,
         paddingVertical: 4,
@@ -204,11 +275,8 @@ const styles = StyleSheet.create({
         alignSelf: "flex-start",
     },
     face: {
-        minHeight: layout.minTouchTarget - controls.lip,
-        borderRadius: radius.lg,
-        borderWidth: controls.border,
         paddingHorizontal: 20,
-        paddingVertical: 12,
+        paddingVertical: 10,
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "center",

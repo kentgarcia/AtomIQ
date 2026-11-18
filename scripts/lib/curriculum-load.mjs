@@ -9,7 +9,7 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 export const MIGRATION_DIR = path.resolve(HERE, "..", "content-migration");
-export const UNIT_FILES = ["unit-1.mjs"];
+export const UNIT_FILES = ["unit-1.mjs", "unit-2.mjs"];
 
 const json = (v) => JSON.stringify(v);
 

@@ -5,11 +5,11 @@
 
 import React, { useMemo } from "react";
 import {
-  Pressable,
-  Text,
-  type StyleProp,
-  type ViewStyle,
+    Pressable,
+    type StyleProp,
+    type ViewStyle,
 } from "react-native";
+import { Text } from "@/components/ui/text";
 import Animated, {
   useAnimatedStyle,
   useReducedMotion,

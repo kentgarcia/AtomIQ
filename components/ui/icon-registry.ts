@@ -7,10 +7,13 @@
  *
  * Rules:
  * - Aliases are applied before lookup.
- * - A name is valid only when it maps to an export on the installed surface.
+ * - A name is valid only when it maps to an export on the installed surface, or is one of
+ *   AtomIQ's own icons (`custom-icons.ts`, names start with `Aq`).
  * - Invalid names resolve to `FALLBACK_ICON_NAME` (a known installed icon) so
  *   the UI never renders a blank slot.
  */
+
+import { isCustomIconName } from "./custom-icons.ts";
 
 export type IconVariant =
   | "Linear"
@@ -83,10 +86,11 @@ export function resolveIconName(
 ): IconResolution {
   const requested = name ?? "";
   const resolved = applyIconAlias(requested);
+  // AtomIQ's own icons (`Aq…`, custom-icons.ts) are valid names too: they are drawn by `Icon` itself
   const valid =
     requested.length > 0 &&
-    Object.prototype.hasOwnProperty.call(surface, resolved) &&
-    Boolean(surface[resolved]);
+    (isCustomIconName(resolved) ||
+      (Object.prototype.hasOwnProperty.call(surface, resolved) && Boolean(surface[resolved])));
 
   return {
     requested,

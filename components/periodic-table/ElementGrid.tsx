@@ -5,7 +5,8 @@
  */
 
 import React, { memo, useMemo } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, View } from "react-native";
+import { Text } from "@/components/ui/text";
 
 import { ElementCell } from "@/components/periodic-table/ElementCell";
 import type { CategoryColorMap } from "@/components/periodic-table/use-category-colors";

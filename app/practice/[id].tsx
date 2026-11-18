@@ -7,7 +7,8 @@
 
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { ActivityIndicator, Text, View } from "react-native";
+import { ActivityIndicator, View } from "react-native";
+import { Text } from "@/components/ui/text";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 import { LessonFinish } from "@/components/lesson/LessonFinish";

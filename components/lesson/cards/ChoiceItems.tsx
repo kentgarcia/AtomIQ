@@ -1,7 +1,8 @@
 /** Pick-one interactions: choice, true-or-myth, and the choice flavour of predict. */
 
 import { useEffect, useMemo, useState } from "react";
-import { Text, View } from "react-native";
+import { View } from "react-native";
+import { Text } from "@/components/ui/text";
 
 import { seededShuffle } from "@/content/curriculum/evaluate";
 import type {
@@ -9,16 +10,13 @@ import type {
   PredictItemData,
   TrueOrMythItemData,
 } from "@/content/curriculum/types";
-import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { isArtId } from "@/components/lesson/visual/object-art";
-import { Icon } from "@/components/ui/icon";
-import { select } from "@/services/haptics";
 import { createStyles, fontFaces, fontSizes, spacing, useTheme } from "@/theme";
 import { useLessonTeacher } from "@/components/lesson/Conversation";
 import { TeacherStage } from "@/components/lesson/TeacherStage";
 
-import { FigureView, OptionRow, PictureOption, PromptHeader, TermText, useCardStyles, type InteractionProps, type OptionState } from "./shared";
+import { FigureView, OptionButton, OptionRow, OptionsArea, PictureOption, PromptHeader, TermText, useCardStyles, type InteractionProps, type OptionState } from "./shared";
 
 export function ChoiceItem({ data, seed, locked, result, onChange, ownerId }: InteractionProps<ChoiceItemData, { type: "choice"; optionId: string }> & { ownerId: string }) {
   const { theme } = useTheme();
@@ -43,6 +41,7 @@ export function ChoiceItem({ data, seed, locked, result, onChange, ownerId }: In
     <View style={styles.stack}>
       <PromptHeader ownerId={ownerId} text={data.prompt} />
       {data.figure ? <FigureView figure={data.figure} /> : null}
+      <OptionsArea>
       {pictured ? (
         // Every option has a picture: two picture cards per row.
         <View style={styles.pictureGrid}>
@@ -54,7 +53,6 @@ export function ChoiceItem({ data, seed, locked, result, onChange, ownerId }: In
               state={stateOf(o.id)}
               disabled={locked}
               onPress={() => setPicked(o.id)}
-              note={locked && o.id === picked && o.id !== data.answer ? (result?.note ?? o.note) : undefined}
             />
           ))}
         </View>
@@ -68,10 +66,10 @@ export function ChoiceItem({ data, seed, locked, result, onChange, ownerId }: In
             state={stateOf(o.id)}
             disabled={locked}
             onPress={() => setPicked(o.id)}
-            note={locked && o.id === picked && o.id !== data.answer ? (result?.note ?? o.note) : undefined}
           />
         ))
       )}
+      </OptionsArea>
     </View>
   );
 }
@@ -96,18 +94,19 @@ export function TrueOrMythItem({ data, locked, onChange, ownerId }: InteractionP
   };
 
   const buttons = (
-    <View style={mf.row}>
-      <MythFactButton kind="myth" state={stateOf("myth")} locked={locked} onPress={() => setPicked("myth")} />
-      <MythFactButton kind="true" state={stateOf("true")} locked={locked} onPress={() => setPicked("true")} />
-    </View>
+    <OptionsArea>
+      <View style={mf.row}>
+        <OptionButton label="MYTH" accessibilityLabel="Myth" icon="CloseCircle" state={stateOf("myth")} disabled={locked} onPress={() => setPicked("myth")} />
+        <OptionButton label="FACT" accessibilityLabel="Fact" icon="TickCircle" state={stateOf("true")} disabled={locked} onPress={() => setPicked("true")} />
+      </View>
+    </OptionsArea>
   );
 
-  // With a teacher it is a video call: the statement in a bubble on top, the teacher big in the
-  // middle, the two buttons at the bottom.
+  // With a teacher the statement is in their bubble on top, and the two buttons sit in the middle of the room under it.
   if (teacher) {
     return (
       <View style={mf.call}>
-        <TeacherStage teller={teacher}>
+        <TeacherStage teller={teacher} minHeight={320} fill={false}>
           <TermText text={data.statement} style={styles.ask} />
         </TeacherStage>
         {buttons}
@@ -131,37 +130,9 @@ export function TrueOrMythItem({ data, locked, onChange, ownerId }: InteractionP
 const useMythFactStyles = createStyles((theme) => ({
   mark: { ...fontFaces.black, fontSize: fontSizes["10xl"], lineHeight: 40, color: theme.colors.primary },
   row: { flexDirection: "row", gap: spacing.md },
-  // The call: everything above the buttons shares the room, the buttons sit at the bottom.
+  // The statement on top; the buttons share what is left and sit in the middle of it.
   call: { flexGrow: 1, gap: spacing.lg },
 }));
-
-/**
- * MYTH or FACT: two 3D buttons. Idle is the plain button; a pick is filled in its colour (red for
- * myth, green for fact); once checked the right one is green, a wrong pick red, and the other fades.
- */
-function MythFactButton({ kind, state, onPress, locked }: { kind: "myth" | "true"; state: OptionState; onPress: () => void; locked: boolean }) {
-  const { theme } = useTheme();
-  const c = theme.colors;
-  const variant = state === "correct" ? "success" : state === "wrong" ? "destructive" : state === "selected" ? (kind === "myth" ? "destructive" : "success") : "secondary";
-  const label = kind === "myth" ? "MYTH" : "FACT";
-  const ink = variant === "secondary" ? (kind === "myth" ? c.error : c.successDark) : c.onPrimary;
-  const icon = state === "correct" ? "TickCircle" : state === "wrong" ? "CloseCircle" : kind === "myth" ? "CloseCircle" : "TickCircle";
-  return (
-    <View style={{ flex: 1, opacity: state === "dim" ? 0.45 : 1 }}>
-      <Button
-        label={label}
-        accessibilityLabel={kind === "myth" ? "Myth" : "Fact"}
-        variant={variant}
-        renderIcon={() => <Icon name={icon} size={24} color={ink} />}
-        onPress={() => {
-          if (locked) return;
-          select();
-          onPress();
-        }}
-      />
-    </View>
-  );
-}
 
 /** Predict, choice flavour. Never marked right or wrong. */
 export function PredictChoiceItem({ data, seed, locked, onChange, ownerId }: InteractionProps<PredictItemData, { type: "predict"; value: string }> & { ownerId: string }) {
@@ -179,7 +150,8 @@ export function PredictChoiceItem({ data, seed, locked, onChange, ownerId }: Int
 
   return (
     <View style={styles.stack}>
-      <PromptHeader ownerId={ownerId} text={data.prompt} hint="There is no wrong answer here. Your guess is not scored." />
+      <PromptHeader ownerId={ownerId} text={data.prompt} hint="Your guess, not scored" />
+      <OptionsArea>
       {pictured ? (
         <View style={styles.pictureGrid}>
           {options.map((o) => (
@@ -192,6 +164,7 @@ export function PredictChoiceItem({ data, seed, locked, onChange, ownerId }: Int
         ))
       )}
       {data.explanation && locked ? <TermText text={data.explanation} style={styles.hint} /> : null}
+      </OptionsArea>
     </View>
   );
 }

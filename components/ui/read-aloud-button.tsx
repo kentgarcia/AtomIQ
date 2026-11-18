@@ -16,10 +16,10 @@ import {
     ActivityIndicator,
     Pressable,
     StyleSheet,
-    Text,
     type StyleProp,
     type ViewStyle,
 } from "react-native";
+import { Text } from "@/components/ui/text";
 
 import { Icon } from "@/components/ui/icon";
 import { useReadAloud } from "@/hooks/use-read-aloud";

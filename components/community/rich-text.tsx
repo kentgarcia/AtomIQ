@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Text } from "react-native";
+import { Text } from "@/components/ui/text";
 
 import { fontFaces } from "@/theme";
 

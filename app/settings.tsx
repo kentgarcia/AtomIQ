@@ -1,5 +1,11 @@
+import { SettingsCard, SettingsRow } from "@/components/settings/SettingsCard";
+import { FieldInput } from "@/components/ui/field-input";
+import { ScreenHeader, useHeaderBorder } from "@/components/layout";
 import { Icon } from "@/components/ui/icon";
-import { GrowCard, GrowModal, useModalOrigin } from "@/components/ui/grow-modal";
+import { useModalOrigin } from "@/components/ui/grow-modal";
+import { Button } from "@/components/ui/button";
+import { ModalButton } from "@/components/ui/modal-card";
+import { ModalDialog } from "@/components/ui/modal-dialog";
 import { BETA_FEEDBACK_FORM_URL } from "@/constants/beta";
 import { openExternalUrl } from "@/services/open-url";
 import {useTheme, createStyles, fontFaces, useResponsiveLayout, withAlpha} from "@/theme";
@@ -11,7 +17,7 @@ import {
   resetToBundledContent,
 } from "@/services/content-db";
 import { setHapticsGate } from "@/services/haptics";
-import { getHapticsEnabled, setHapticsEnabled } from "@/services/storage";
+import { getFeedPostsEnabled, getHapticsEnabled, setFeedPostsEnabled, setHapticsEnabled, subscribeFeedPostsEnabled } from "@/services/storage";
 import { setTeacherLines, useTeacherLines } from "@/components/npc/teacher-lines";
 import { setMediaPreference } from "@/services/media";
 import { useMediaPreferences } from "@/hooks/use-read-aloud";
@@ -21,21 +27,15 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 import React, { useEffect, useMemo, useState } from "react";
 import {
-    ActivityIndicator,
     Alert,
     Image,
-    KeyboardAvoidingView,
     Linking,
-    Modal,
-    Platform,
     ScrollView,
-    Switch,
-    Text,
-    TextInput,
     TouchableOpacity,
     View,
     type ImageStyle,
 } from "react-native";
+import { Text } from "@/components/ui/text";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -47,10 +47,10 @@ export default function SettingsScreen() {
   const insets = useSafeAreaInsets();
   const { userProfile } = useStorage();
   const { theme, isDark, toggleTheme } = useTheme();
-  const accent = theme.palettes.settings.primary;
   // Sound effects + Read Aloud come from the one shared media preference store.
   const { soundEffects, readAloud: readAloudEnabled } = useMediaPreferences();
   const [haptics, setHaptics] = useState(true);
+  const [feedPosts, setFeedPosts] = useState(true);
   const teacherLines = useTeacherLines();
   const [isDeletingAccount, setIsDeletingAccount] = useState(false);
   const [versionModalVisible, setVersionModalVisible] = useState(false);
@@ -170,6 +170,24 @@ export default function SettingsScreen() {
     };
   }, []);
 
+  // "Feed posts": the NPC feed on Discover (docs/NPC_FEED_SPEC.md §8). Kept in step with the one store.
+  useEffect(() => {
+    let mounted = true;
+    void getFeedPostsEnabled()
+      .then((on) => mounted && setFeedPosts(on))
+      .catch(() => undefined);
+    const stop = subscribeFeedPostsEnabled((on) => mounted && setFeedPosts(on));
+    return () => {
+      mounted = false;
+      stop();
+    };
+  }, []);
+
+  const handleFeedPostsToggle = (next: boolean) => {
+    setFeedPosts(next);
+    void setFeedPostsEnabled(next).catch((error) => console.error("Error saving feed posts preference:", error));
+  };
+
   useEffect(() => {
     setConfirmText("");
   }, [deleteModalVisible]);
@@ -238,739 +256,285 @@ export default function SettingsScreen() {
 
   const styles = useMemo(() => makeStyles(theme), [theme]);
   const { contentMaxWidth, gutter } = useResponsiveLayout();
+  const { scrolled, onScroll, scrollEventThrottle } = useHeaderBorder();
 
   return (
-    <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
-      {/* Header */}
-      <View
-        style={[
-          styles.header,
-          {
-            paddingTop: insets.top + 12,
-            paddingHorizontal: gutter,
-            width: "100%",
-            maxWidth: contentMaxWidth,
-            alignSelf: "center",
-          },
-        ]}
-      >
-        <TouchableOpacity
-          onPress={() => router.back()}
-          style={styles.backBtn}
-          hitSlop={4}
-          accessibilityRole="button"
-          accessibilityLabel="Go back"
-        >
-          <Icon name="ArrowLeft2" size={24} color={theme.colors.text} />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Settings</Text>
-        <View style={{ width: 40 }} />
-      </View>
+    <View style={{ flex: 1, backgroundColor: theme.colors.mapBackground }}>
+      <ScreenHeader title="Settings" onBack={() => router.back()} scrolled={scrolled} />
 
       <ScrollView
+        onScroll={onScroll}
+        scrollEventThrottle={scrollEventThrottle}
         contentContainerStyle={[
           styles.content,
           {
             width: "100%",
             maxWidth: contentMaxWidth,
             alignSelf: "center",
-            padding: gutter,
+            paddingHorizontal: gutter,
+            paddingTop: 16,
             paddingBottom: insets.bottom + 24,
           },
         ]}
         showsVerticalScrollIndicator={false}
       >
-        {/* Preferences Section */}
         <Animated.View entering={FadeInDown.delay(100).springify()}>
-          <Text style={styles.sectionTitle}>Preferences</Text>
-          <View style={styles.settingsCard}>
-            <View style={styles.settingRow}>
-              <View style={styles.settingInfo}>
-                <Icon
-                  name="Moon"
-                  size={20}
-                  color={accent}
-                  variant="Bold"
-                />
-                <View>
-                  <Text style={styles.settingLabel}>Dark Mode</Text>
-                  <Text style={styles.settingDescription}>
-                    Switch between light and dark theme
-                  </Text>
-                </View>
-              </View>
-              <Switch
-                value={isDark}
-                onValueChange={toggleTheme}
-                trackColor={{ false: theme.colors.switchTrack, true: accent }}
-                thumbColor={theme.colors.onPrimary}
-              />
-            </View>
-
-            <View style={[styles.settingRow, styles.settingRowBorder]}>
-              <View style={styles.settingInfo}>
-                <Icon
-                  name="VolumeHigh"
-                  size={20}
-                  color={accent}
-                  variant="Bold"
-                />
-                <View>
-                  <Text style={styles.settingLabel}>Sound Effects</Text>
-                  <Text style={styles.settingDescription}>
-                    Play sounds for actions
-                  </Text>
-                </View>
-              </View>
-              <Switch
-                value={soundEffects}
-                onValueChange={handleSoundEffectsToggle}
-                trackColor={{ false: theme.colors.switchTrack, true: accent }}
-                thumbColor={theme.colors.onPrimary}
-              />
-            </View>
-
-            <View style={[styles.settingRow, styles.settingRowBorder]}>
-              <View style={styles.settingInfo}>
-                <Icon
-                  name="Microphone2"
-                  size={20}
-                  color={accent}
-                  variant="Bold"
-                />
-                <View>
-                  <Text style={styles.settingLabel}>Read Aloud</Text>
-                  <Text style={styles.settingDescription}>
-                    Show speaker buttons that read questions and lessons
-                  </Text>
-                </View>
-              </View>
-              <Switch
-                value={readAloudEnabled}
-                onValueChange={handleReadAloudToggle}
-                trackColor={{ false: theme.colors.switchTrack, true: accent }}
-                thumbColor={theme.colors.onPrimary}
-              />
-            </View>
-
-            <View style={styles.settingRow}>
-              <View style={styles.settingInfo}>
-                <Icon
-                  name="Vibe"
-                  size={20}
-                  color={accent}
-                  variant="Bold"
-                />
-                <View>
-                  <Text style={styles.settingLabel}>Haptics</Text>
-                  <Text style={styles.settingDescription}>
-                    Vibrate on actions and game events
-                  </Text>
-                </View>
-              </View>
-              <Switch
-                value={haptics}
-                onValueChange={handleHapticsToggle}
-                trackColor={{ false: theme.colors.switchTrack, true: accent }}
-                thumbColor={theme.colors.onPrimary}
-              />
-            </View>
-
-            <View style={styles.settingRow}>
-              <View style={styles.settingInfo}>
-                <Icon
-                  name="Message"
-                  size={20}
-                  color={accent}
-                  variant="Bold"
-                />
-                <View>
-                  <Text style={styles.settingLabel}>Teacher lines</Text>
-                  <Text style={styles.settingDescription}>
-                    Show what your teachers say in lessons
-                  </Text>
-                </View>
-              </View>
-              <Switch
-                value={teacherLines}
-                onValueChange={setTeacherLines}
-                trackColor={{ false: theme.colors.switchTrack, true: accent }}
-                thumbColor={theme.colors.onPrimary}
-              />
-            </View>
-          </View>
+          <SettingsCard title="Preferences">
+            <SettingsRow icon="Moon" color="#8B5CF6" label="Dark Mode" toggle={{ value: isDark, onChange: toggleTheme }} />
+            <SettingsRow icon="VolumeHigh" color="#3B82F6" label="Sound Effects" toggle={{ value: soundEffects, onChange: handleSoundEffectsToggle }} />
+            <SettingsRow icon="Microphone2" color="#14B8A6" label="Read Aloud" toggle={{ value: readAloudEnabled, onChange: handleReadAloudToggle }} />
+            <SettingsRow icon="Vibe" color="#EC4899" label="Haptics" toggle={{ value: haptics, onChange: handleHapticsToggle }} />
+            <SettingsRow icon="Message" color="#F59E0B" label="Teacher lines" toggle={{ value: teacherLines, onChange: setTeacherLines }} />
+            <SettingsRow
+              icon="Notification"
+              color={theme.colors.primary}
+              label="Feed posts"
+              note="NPCs post about your progress. Blog pieces still unlock when this is off."
+              toggle={{ value: feedPosts, onChange: handleFeedPostsToggle }}
+            />
+          </SettingsCard>
         </Animated.View>
 
-        {/* About Section */}
-        <Animated.View entering={FadeInDown.delay(400).springify()}>
-          <Text style={styles.sectionTitle}>About</Text>
-          <View style={styles.settingsCard}>
-            <TouchableOpacity
-              style={[styles.settingRow, styles.settingRowBorder]}
-              onPress={() => void handleBetaFeedback()}
-            >
-              <View style={styles.settingInfo}>
-                <Icon
-                  name="Message"
-                  size={20}
-                  color={accent}
-                  variant="Bold"
-                />
-                <View>
-                  <Text style={styles.settingLabel}>Beta Feedback</Text>
-                  <Text style={styles.settingDescription}>
-                    Help us improve AtomIQ
-                  </Text>
-                </View>
-              </View>
-              <Icon name="ArrowRight2" size={18} color={theme.colors.textMuted} />
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[styles.settingRow, styles.settingRowBorder]}
-              ref={versionAnchor}
+        <Animated.View entering={FadeInDown.delay(250).springify()}>
+          <SettingsCard title="About">
+            <SettingsRow icon="Message" color="#EA580C" label="Beta Feedback" arrow hint="Opens the feedback form" onPress={() => void handleBetaFeedback()} />
+            <SettingsRow
+              icon="InfoCircle"
+              color="#3B82F6"
+              label="App Version"
+              value={APP_VERSION}
+              arrow
+              anchor={versionAnchor}
               onPress={() => versionCapture(() => setVersionModalVisible(true))}
-            >
-              <View style={styles.settingInfo}>
-                <Icon
-                  name="InfoCircle"
-                  size={20}
-                  color={accent}
-                  variant="Bold"
-                />
-                <Text style={styles.settingLabel}>App Version</Text>
-              </View>
-              <View style={styles.valueRow}>
-                <Text style={styles.settingValue}>{APP_VERSION}</Text>
-                <Icon name="ArrowRight2" size={18} color={theme.colors.textMuted} />
-              </View>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[styles.settingRow, styles.settingRowBorder]}
-              onPress={handlePrivacyPolicy}
-            >
-              <View style={styles.settingInfo}>
-                <Icon
-                  name="DocumentText"
-                  size={20}
-                  color={accent}
-                  variant="Bold"
-                />
-                <Text style={styles.settingLabel}>Privacy Policy</Text>
-              </View>
-              <Icon name="ArrowRight2" size={18} color={theme.colors.textMuted} />
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[styles.settingRow, styles.settingRowBorder]}
-              onPress={handleTermsOfService}
-            >
-              <View style={styles.settingInfo}>
-                <Icon
-                  name="Shield"
-                  size={20}
-                  color={accent}
-                  variant="Bold"
-                />
-                <Text style={styles.settingLabel}>Terms of Service</Text>
-              </View>
-              <Icon name="ArrowRight2" size={18} color={theme.colors.textMuted} />
-            </TouchableOpacity>
-          </View>
+            />
+            <SettingsRow icon="DocumentText" color="#14B8A6" label="Privacy Policy" arrow onPress={handlePrivacyPolicy} />
+            <SettingsRow icon="Shield" color="#8B5CF6" label="Terms of Service" arrow onPress={handleTermsOfService} />
+          </SettingsCard>
         </Animated.View>
 
-        {/* Danger Zone */}
-        <Animated.View entering={FadeInDown.delay(500).springify()}>
-          <Text style={styles.sectionTitle}>Danger Zone</Text>
-          <View style={styles.settingsCard}>
-            <TouchableOpacity
-              style={styles.settingRow}
+        <Animated.View entering={FadeInDown.delay(400).springify()}>
+          <SettingsCard title="Danger zone">
+            <SettingsRow
+              icon="Trash"
+              color={theme.colors.error}
+              label="Delete Account"
+              destructive
+              arrow
+              busy={isDeletingAccount}
+              hint="Permanently removes your account and data"
               onPress={handleDeleteAccount}
-              disabled={isDeletingAccount}
-            >
-              <View style={styles.settingInfo}>
-                <Icon name="Trash" size={20} color={theme.colors.error} variant="Bold" />
-                <View>
-                  <Text style={styles.destructiveLabel}>Delete Account</Text>
-                  <Text style={styles.settingDescription}>
-                    Permanently remove your account and data
-                  </Text>
-                </View>
-              </View>
-              {isDeletingAccount ? (
-                <ActivityIndicator color={theme.colors.error} size="small" />
-              ) : (
-                <Icon name="ArrowRight2" size={18} color={theme.colors.error} />
-              )}
-            </TouchableOpacity>
-          </View>
+            />
+          </SettingsCard>
         </Animated.View>
 
         <View style={{ height: 100 }} />
       </ScrollView>
 
-      {/* App Version Modal */}
-      <GrowModal
+      {/* App Version */}
+      <ModalDialog
         visible={versionModalVisible}
         origin={versionOrigin}
-        onRequestClose={() => setVersionModalVisible(false)}
+        onClose={() => setVersionModalVisible(false)}
+        title="App Version"
+        closeLabel="Close app version"
+        footer={<ModalButton label="Got it" onPress={() => setVersionModalVisible(false)} />}
       >
-        <View style={styles.modalOverlay}>
-          <GrowCard style={styles.modalCard}>
-            <View style={styles.dragHandle} />
-
-            <View style={styles.modalHeader}>
-              <View style={styles.modalHeaderLeft}>
-                <View style={styles.modalHeaderIcon}>
-                  <Icon name="InfoCircle" size={16} color="#EA580C" variant="Bold" />
-                </View>
-                <Text style={styles.modalTitle}>App Version</Text>
-              </View>
-              <TouchableOpacity
-                onPress={() => setVersionModalVisible(false)}
-                style={styles.modalCloseBtn}
-                activeOpacity={0.85}
-                hitSlop={6}
-                accessibilityRole="button"
-                accessibilityLabel="Close app version"
-              >
-                <Icon name="CloseCircle" size={20} color={theme.colors.textFaint} variant="Bold" />
-              </TouchableOpacity>
-            </View>
-
-            <View style={styles.modalHero}>
-              <Image
-                source={require("@/assets/images/icon.png")}
-                style={styles.modalIcon as ImageStyle}
-                resizeMode="contain"
-              />
-              <Text style={styles.modalAppName}>AtomIQ</Text>
-              <View style={styles.versionBadge}>
-                <Icon name="Crown1" size={13} color="#C2410C" variant="Bold" />
-                <Text style={styles.versionBadgeText}>Version {APP_VERSION}</Text>
-              </View>
-              <Text style={styles.modalSubtitle}>
-                Learn nuclear science one atom at a time.
-              </Text>
-            </View>
-
-            <View style={styles.dataStatusBlock}>
-              <Text style={styles.dataStatusTitle}>Data status</Text>
-              <View style={styles.dataStatusRow}>
-                <View
-                  style={[
-                    styles.dataStatusDot,
-                    {
-                      backgroundColor: dataStatus
-                        ? dataStatus.contentOk
-                          ? theme.colors.success
-                          : theme.colors.error
-                        : theme.colors.borderStrong,
-                    },
-                  ]}
-                />
-                <Text style={styles.dataStatusText} numberOfLines={3}>
-                  Content DB: {dataStatus ? dataStatus.contentLabel : "Checking…"}
-                </Text>
-              </View>
-              <View style={styles.dataStatusRow}>
-                <View
-                  style={[
-                    styles.dataStatusDot,
-                    {
-                      backgroundColor: dataStatus
-                        ? dataStatus.storageOk
-                          ? theme.colors.success
-                          : theme.colors.error
-                        : theme.colors.borderStrong,
-                    },
-                  ]}
-                />
-                <Text style={styles.dataStatusText} numberOfLines={2}>
-                  Progress DB: {dataStatus ? dataStatus.storageLabel : "Checking…"}
-                </Text>
-              </View>
-            </View>
-
-            {__DEV__ ? (
-              <View style={styles.dataStatusBlock}>
-                <Text style={styles.dataStatusTitle}>Developer: content from Studio</Text>
-                <TextInput
-                  style={styles.devInput}
-                  value={studioUrl}
-                  onChangeText={setStudioUrl}
-                  placeholder="http://192.168.1.20:8787"
-                  placeholderTextColor={theme.colors.textFaint}
-                  autoCapitalize="none"
-                  autoCorrect={false}
-                  keyboardType="url"
-                  accessibilityLabel="Content Studio address"
-                />
-                <TextInput
-                  style={styles.devInput}
-                  value={studioCode}
-                  onChangeText={setStudioCode}
-                  placeholder="Pairing code from Studio"
-                  placeholderTextColor={theme.colors.textFaint}
-                  keyboardType="number-pad"
-                  accessibilityLabel="Pairing code"
-                />
-                <View style={styles.devRow}>
-                  <TouchableOpacity
-                    style={styles.devButton}
-                    disabled={studioBusy || !studioUrl || !studioCode}
-                    onPress={() =>
-                      runStudio(async () => {
-                        const meta = await loadPreviewContent(studioUrl, studioCode);
-                        return `Loaded ${meta.content_version}. Reopen a lesson to see it.`;
-                      })
-                    }
-                    accessibilityRole="button"
-                  >
-                    {studioBusy ? (
-                      <ActivityIndicator size="small" color={theme.colors.onPrimary} />
-                    ) : (
-                      <Text style={styles.devButtonText}>Load preview</Text>
-                    )}
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={styles.devButtonSecondary}
-                    disabled={studioBusy}
-                    onPress={() =>
-                      runStudio(async () => {
-                        await resetToBundledContent();
-                        return "Back to the content bundled with this build.";
-                      })
-                    }
-                    accessibilityRole="button"
-                  >
-                    <Text style={styles.devButtonSecondaryText}>Reset to bundled</Text>
-                  </TouchableOpacity>
-                </View>
-                {studioMessage ? <Text style={styles.dataStatusText}>{studioMessage}</Text> : null}
-              </View>
-            ) : null}
-
-            <View style={styles.creditRow}>
-              <Icon name="Cup" size={16} color="#EA580C" variant="Bold" />
-              <View style={{ flex: 1 }}>
-                <Text style={styles.creditText}>
-                  Made for the MythSmashers by the DOST-PNRI, representing the
-                  Philippines in international competition.
-                </Text>
-                <TouchableOpacity
-                  onPress={() => Linking.openURL("https://www.linkedin.com/in/kentgarcia").catch(() => {})}
-                  activeOpacity={0.7}
-                >
-                  <Text style={styles.creditLink}>Developed by Kent Garcia</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-
-            <TouchableOpacity
-              style={styles.modalPrimaryBtn}
-              activeOpacity={0.85}
-              onPress={() => setVersionModalVisible(false)}
-            >
-              <Icon name="TickCircle" size={18} color={theme.colors.onPrimary} variant="Bold" />
-              <Text style={styles.modalPrimaryBtnText}>Got it</Text>
-            </TouchableOpacity>
-
-            <Text style={styles.modalCopyright}>
-              © 2026 AtomIQ. All rights reserved.
-            </Text>
-          </GrowCard>
+        <View style={styles.modalHero}>
+          <Image
+            source={require("@/assets/images/icon.png")}
+            style={styles.modalIcon as ImageStyle}
+            resizeMode="contain"
+          />
+          <Text style={styles.modalAppName}>AtomIQ</Text>
+          <View style={styles.versionBadge}>
+            <Icon name="Crown1" size={13} color={theme.colors.primaryDark} variant="Bold" />
+            <Text style={styles.versionBadgeText}>Version {APP_VERSION}</Text>
+          </View>
+          <Text style={styles.modalSubtitle}>
+            Learn nuclear science one atom at a time.
+          </Text>
         </View>
-      </GrowModal>
 
-      {/* Delete Account Modal */}
-      <Modal
-        visible={deleteModalVisible}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setDeleteModalVisible(false)}
-      >
-        <KeyboardAvoidingView
-          style={{ flex: 1 }}
-          behavior={Platform.OS === "ios" ? "padding" : "height"}
-        >
-          <View style={styles.modalOverlay}>
-            <Animated.View
-              entering={FadeInDown.duration(300).springify()}
-              style={styles.modalCard}
-            >
-            <View style={styles.dragHandle} />
-
-            <View style={styles.modalHeader}>
-              <View style={styles.modalHeaderLeft}>
-                <View style={styles.deleteModalHeaderIcon}>
-                  <Icon name="Trash" size={16} color={theme.colors.error} variant="Bold" />
-                </View>
-                <Text style={styles.modalTitle}>Delete Account</Text>
-              </View>
-              <TouchableOpacity
-                onPress={() => setDeleteModalVisible(false)}
-                style={styles.modalCloseBtn}
-                activeOpacity={0.85}
-                disabled={isDeletingAccount}
-                hitSlop={6}
-                accessibilityRole="button"
-                accessibilityLabel="Close delete account"
-              >
-                <Icon name="CloseCircle" size={20} color={theme.colors.textFaint} variant="Bold" />
-              </TouchableOpacity>
-            </View>
-
-            <View style={styles.deleteModalWarning}>
-              <Icon name="Danger" size={18} color={theme.colors.error} variant="Bold" />
-              <Text style={styles.deleteModalWarningText}>
-                This will permanently delete your account and all local data.
-                This action cannot be undone.
-              </Text>
-            </View>
-
-            <Text style={styles.deleteModalText}>
-              Type{" "}
-              <Text style={styles.deleteModalPhrase}>
-                {deleteConfirmationPhrase}
-              </Text>{" "}
-              to confirm.
+        <View style={styles.dataStatusBlock}>
+          <Text style={styles.dataStatusTitle}>Data status</Text>
+          <View style={styles.dataStatusRow}>
+            <View
+              style={[
+                styles.dataStatusDot,
+                {
+                  backgroundColor: dataStatus
+                    ? dataStatus.contentOk
+                      ? theme.colors.success
+                      : theme.colors.error
+                    : theme.colors.borderStrong,
+                },
+              ]}
+            />
+            <Text style={styles.dataStatusText} numberOfLines={3}>
+              Content DB: {dataStatus ? dataStatus.contentLabel : "Checking…"}
             </Text>
+          </View>
+          <View style={styles.dataStatusRow}>
+            <View
+              style={[
+                styles.dataStatusDot,
+                {
+                  backgroundColor: dataStatus
+                    ? dataStatus.storageOk
+                      ? theme.colors.success
+                      : theme.colors.error
+                    : theme.colors.borderStrong,
+                },
+              ]}
+            />
+            <Text style={styles.dataStatusText} numberOfLines={2}>
+              Progress DB: {dataStatus ? dataStatus.storageLabel : "Checking…"}
+            </Text>
+          </View>
+        </View>
 
-            <TextInput
-              style={styles.input}
-              value={confirmText}
-              onChangeText={setConfirmText}
-              placeholder={deleteConfirmationPhrase}
-              placeholderTextColor={theme.colors.textFaint}
+        {__DEV__ ? (
+          <View style={styles.dataStatusBlock}>
+            <Text style={styles.dataStatusTitle}>Developer: content from Studio</Text>
+            <FieldInput
+              style={styles.devInput}
+              value={studioUrl}
+              onChangeText={setStudioUrl}
+              placeholder="http://192.168.1.20:8787"
               autoCapitalize="none"
               autoCorrect={false}
+              keyboardType="url"
+              accessibilityLabel="Content Studio address"
             />
-
-            <View style={styles.deleteModalActions}>
-              <TouchableOpacity
-                onPress={() => setDeleteModalVisible(false)}
-                style={styles.deleteModalCancelBtn}
-                activeOpacity={0.85}
-                disabled={isDeletingAccount}
-              >
-                <Text style={styles.deleteModalCancelText}>Cancel</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => {
-                  setDeleteModalVisible(false);
-                  void executeDeleteAccount();
-                }}
-                style={[
-                  styles.deleteModalConfirmBtn,
-                  !canConfirmDelete && styles.deleteModalConfirmBtnDisabled,
-                ]}
-                activeOpacity={0.85}
-                disabled={!canConfirmDelete || isDeletingAccount}
-              >
-                {isDeletingAccount ? (
-                  <ActivityIndicator color={theme.colors.onPrimary} size="small" />
-                ) : (
-                  <>
-                    <Icon name="Trash" size={16} color={theme.colors.onPrimary} variant="Bold" />
-                    <Text style={styles.deleteModalConfirmText}>Delete Forever</Text>
-                  </>
-                )}
-              </TouchableOpacity>
+            <FieldInput
+              style={styles.devInput}
+              value={studioCode}
+              onChangeText={setStudioCode}
+              placeholder="Pairing code from Studio"
+              keyboardType="number-pad"
+              accessibilityLabel="Pairing code"
+            />
+            <View style={styles.devRow}>
+              <View style={styles.devCell}>
+                <Button
+                  size="compact"
+                  label={studioBusy ? "Loading…" : "Load preview"}
+                  disabled={studioBusy || !studioUrl || !studioCode}
+                  onPress={() =>
+                    void runStudio(async () => {
+                      const meta = await loadPreviewContent(studioUrl, studioCode);
+                      return `Loaded ${meta.content_version}. Reopen a lesson to see it.`;
+                    })
+                  }
+                />
+              </View>
+              <View style={styles.devCell}>
+                <Button
+                  size="compact"
+                  variant="secondary"
+                  label="Reset to bundled"
+                  disabled={studioBusy}
+                  onPress={() =>
+                    void runStudio(async () => {
+                      await resetToBundledContent();
+                      return "Back to the content bundled with this build.";
+                    })
+                  }
+                />
+              </View>
             </View>
-            </Animated.View>
+            {studioMessage ? <Text style={styles.dataStatusText}>{studioMessage}</Text> : null}
           </View>
-        </KeyboardAvoidingView>
-      </Modal>
+        ) : null}
+
+        <View style={styles.creditRow}>
+          <Icon name="Cup" size={16} color={theme.colors.primaryLight} variant="Bold" />
+          <View style={{ flex: 1 }}>
+            <Text style={styles.creditText}>
+              Made for the MythSmashers by the DOST-PNRI, representing the
+              Philippines in international competition.
+            </Text>
+            <TouchableOpacity
+              onPress={() => Linking.openURL("https://www.linkedin.com/in/kentgarcia").catch(() => {})}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.creditLink}>Developed by Kent Garcia</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        <Text style={styles.modalCopyright}>© 2026 AtomIQ. All rights reserved.</Text>
+      </ModalDialog>
+
+      {/* Delete Account: the main action is red; Cancel keeps the yellow main button */}
+      <ModalDialog
+        visible={deleteModalVisible}
+        onClose={() => {
+          if (!isDeletingAccount) setDeleteModalVisible(false);
+        }}
+        title="Delete Account"
+        closeLabel="Close delete account"
+        footer={
+          <>
+            <ModalButton
+              variant="destructive"
+              label={isDeletingAccount ? "Deleting…" : "Delete Forever"}
+              disabled={!canConfirmDelete || isDeletingAccount}
+              onPress={() => {
+                setDeleteModalVisible(false);
+                void executeDeleteAccount();
+              }}
+            />
+            <ModalButton label="Cancel" disabled={isDeletingAccount} onPress={() => setDeleteModalVisible(false)} />
+          </>
+        }
+      >
+        <View style={styles.deleteModalWarning}>
+          <Icon name="Danger" size={18} color={theme.colors.error} variant="Bold" />
+          <Text style={styles.deleteModalWarningText}>
+            This will permanently delete your account and all local data.
+            This action cannot be undone.
+          </Text>
+        </View>
+
+        <Text style={styles.deleteModalText}>
+          Type <Text style={styles.deleteModalPhrase}>{deleteConfirmationPhrase}</Text> to confirm.
+        </Text>
+
+        <FieldInput
+          style={styles.input}
+          value={confirmText}
+          onChangeText={setConfirmText}
+          placeholder={deleteConfirmationPhrase}
+          autoCapitalize="none"
+          autoCorrect={false}
+        />
+      </ModalDialog>
     </View>
   );
 }
 
 const makeStyles = createStyles((theme) => {
   return {
-    header: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "space-between",
-      paddingHorizontal: 20,
-      paddingBottom: 16,
-      backgroundColor: theme.colors.card,
-      borderBottomWidth: 1,
-      borderBottomColor: theme.colors.border,
-    },
-    backBtn: {
-      width: 40,
-      height: 40,
-      alignItems: "center",
-      justifyContent: "center",
-      borderRadius: 20,
-    },
-    headerTitle: {
-      fontSize: 18,
-      ...fontFaces.bold,
-      color: theme.colors.text,
-    },
     content: {
       padding: 20,
     },
-    sectionTitle: {
-      fontSize: 14,
-      ...fontFaces.bold,
-      color: theme.colors.textMuted,
-      marginBottom: 12,
-      marginTop: 8,
-      textTransform: "uppercase",
-      letterSpacing: 0.5,
-    },
-    settingsCard: {
-      backgroundColor: theme.colors.card,
-      borderRadius: 16,
-      marginBottom: 24,
-      overflow: "hidden",
-      // Modern shadow
-      shadowColor: theme.colors.shadow,
-      shadowOffset: {
-        width: 0,
-        height: 2,
-      },
-      shadowOpacity: 0.05,
-      shadowRadius: 10,
-      elevation: 2,
-      borderWidth: 1,
-      borderColor: theme.colors.border,
-    },
-    settingRow: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "space-between",
-      padding: 16,
-      minHeight: 60,
-    },
-    settingRowBorder: {
-      borderTopWidth: 1,
-      borderTopColor: theme.colors.border,
-    },
-    settingInfo: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 16,
-      flex: 1,
-    },
-    settingLabel: {
-      fontSize: 16,
-      ...fontFaces.semibold,
-      color: theme.colors.text,
-    },
-    settingDescription: {
-      fontSize: 13,
-      ...fontFaces.regular,
-      color: theme.colors.textMuted,
-      marginTop: 2,
-    },
-    settingValue: {
-      fontSize: 15,
-      ...fontFaces.medium,
-      color: theme.colors.textMuted,
-      marginRight: 8,
-    },
-    valueRow: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 8,
-    },
     input: {
       alignSelf: "stretch",
-      backgroundColor: theme.colors.input,
-      borderWidth: 2,
-      borderColor: theme.colors.border,
-      borderBottomWidth: 4,
+      backgroundColor: theme.colors.field,
       borderRadius: 14,
+      minHeight: 56,
       paddingHorizontal: 14,
       paddingVertical: 12,
       fontSize: 15,
       ...fontFaces.semibold,
-      color: theme.colors.text,
-      marginTop: 12,
+      color: theme.colors.fieldText,
     },
-    destructiveLabel: {
-      fontSize: 16,
-      ...fontFaces.semibold,
-      color: theme.colors.error,
-    },
-    /* App Version + Delete modals — profile edit-modal design */
-    modalOverlay: {
-      flex: 1,
-      backgroundColor: theme.colors.overlay,
-      justifyContent: "center",
-      alignItems: "center",
-      padding: 20,
-    },
-    modalCard: {
-      width: "100%",
-      maxWidth: 380,
-      backgroundColor: theme.colors.card,
-      borderRadius: 26,
-      padding: 16,
-      paddingTop: 12,
-      borderWidth: 2,
-      borderColor: theme.colors.border,
-      borderBottomWidth: 4,
-      shadowColor: theme.colors.shadow,
-      shadowOffset: { width: 0, height: 8 },
-      shadowOpacity: 0.12,
-      shadowRadius: 16,
-      elevation: 10,
-    },
-    dragHandle: {
-      width: 36,
-      height: 4,
-      borderRadius: 2,
-      backgroundColor: theme.colors.border,
-      alignSelf: "center",
-      marginBottom: 8,
-    },
-    modalHeader: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "center",
-      marginBottom: 14,
-    },
-    modalHeaderLeft: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 10,
-    },
-    modalHeaderIcon: {
-      width: 32,
-      height: 32,
-      borderRadius: 16,
-      backgroundColor: theme.colors.surfaceSoft,
-      alignItems: "center",
-      justifyContent: "center",
-    },
-    deleteModalHeaderIcon: {
-      width: 32,
-      height: 32,
-      borderRadius: 16,
-      backgroundColor: theme.colors.errorSurface,
-      alignItems: "center",
-      justifyContent: "center",
-    },
-    modalCloseBtn: {
-      width: 36,
-      height: 36,
-      borderRadius: 18,
-      backgroundColor: theme.colors.input,
-      alignItems: "center",
-      justifyContent: "center",
-      borderWidth: 1,
-      borderColor: theme.colors.border,
-    },
+    /* App Version + Delete modals (ModalDialog contents) */
+    devCell: { flex: 1 },
     modalHero: {
       alignItems: "center",
       paddingVertical: 8,
-      marginBottom: 14,
     },
     modalIcon: {
       width: 56,
@@ -985,11 +549,6 @@ const makeStyles = createStyles((theme) => {
       ...fontFaces.heavy,
       color: theme.colors.text,
       marginBottom: 8,
-    },
-    modalTitle: {
-      fontSize: 18,
-      ...fontFaces.heavy,
-      color: theme.colors.text,
     },
     versionBadge: {
       flexDirection: "row",
@@ -1006,7 +565,7 @@ const makeStyles = createStyles((theme) => {
     versionBadgeText: {
       fontSize: 13,
       ...fontFaces.heavy,
-      color: "#C2410C",
+      color: theme.colors.primaryDark,
     },
     modalSubtitle: {
       fontSize: 13,
@@ -1014,7 +573,6 @@ const makeStyles = createStyles((theme) => {
       color: theme.colors.textMuted,
       textAlign: "center",
       lineHeight: 18,
-      marginBottom: 14,
     },
     creditRow: {
       flexDirection: "row",
@@ -1036,7 +594,7 @@ const makeStyles = createStyles((theme) => {
     creditLink: {
       fontSize: 12,
       ...fontFaces.heavy,
-      color: "#EA580C",
+      color: theme.colors.primaryLight,
       marginTop: 4,
       textDecorationLine: "underline",
     },
@@ -1044,7 +602,6 @@ const makeStyles = createStyles((theme) => {
       fontSize: 11,
       ...fontFaces.regular,
       color: theme.colors.textFaint,
-      marginTop: 12,
       textAlign: "center",
     },
     dataStatusBlock: {
@@ -1054,7 +611,6 @@ const makeStyles = createStyles((theme) => {
       borderRadius: 12,
       paddingHorizontal: 12,
       paddingVertical: 10,
-      marginBottom: 10,
       gap: 8,
     },
     dataStatusTitle: {
@@ -1081,69 +637,18 @@ const makeStyles = createStyles((theme) => {
       lineHeight: 17,
     },
     devInput: {
-      borderWidth: 1,
-      borderColor: theme.colors.borderSubtle,
       borderRadius: 8,
+      minHeight: 44,
       paddingHorizontal: 10,
       paddingVertical: 8,
       fontSize: 13,
       ...fontFaces.medium,
-      color: theme.colors.text,
-      backgroundColor: theme.colors.surface,
+      color: theme.colors.fieldText,
+      backgroundColor: theme.colors.field,
     },
     devRow: {
       flexDirection: "row",
       gap: 8,
-    },
-    devButton: {
-      flex: 1,
-      alignItems: "center",
-      justifyContent: "center",
-      paddingVertical: 9,
-      borderRadius: 8,
-      backgroundColor: theme.colors.primary,
-    },
-    devButtonText: {
-      fontSize: 13,
-      ...fontFaces.heavy,
-      color: theme.colors.onPrimary,
-    },
-    devButtonSecondary: {
-      flex: 1,
-      alignItems: "center",
-      justifyContent: "center",
-      paddingVertical: 9,
-      borderRadius: 8,
-      borderWidth: 1,
-      borderColor: theme.colors.borderStrong,
-    },
-    devButtonSecondaryText: {
-      fontSize: 13,
-      ...fontFaces.heavy,
-      color: theme.colors.text,
-    },
-    modalPrimaryBtn: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "center",
-      gap: 6,
-      marginTop: 6,
-      paddingVertical: 14,
-      borderRadius: 16,
-      borderWidth: 1,
-      borderBottomWidth: 4,
-      borderColor: "#C2410C",
-      backgroundColor: "#EA580C",
-      shadowColor: theme.colors.shadow,
-      shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.12,
-      shadowRadius: 8,
-      elevation: 4,
-    },
-    modalPrimaryBtnText: {
-      fontSize: 15,
-      ...fontFaces.heavy,
-      color: theme.colors.onPrimary,
     },
     /* Delete Account Modal */
     deleteModalWarning: {
@@ -1155,7 +660,6 @@ const makeStyles = createStyles((theme) => {
       borderColor: withAlpha(theme.colors.error, 0.35),
       borderRadius: 12,
       padding: 12,
-      marginBottom: 12,
     },
     deleteModalWarningText: {
       flex: 1,
@@ -1169,60 +673,11 @@ const makeStyles = createStyles((theme) => {
       ...fontFaces.medium,
       color: theme.colors.textSecondary,
       lineHeight: 18,
-      marginBottom: 4,
     },
     deleteModalPhrase: {
       ...fontFaces.heavy,
       color: theme.colors.error,
       textTransform: "uppercase",
-    },
-    deleteModalActions: {
-      flexDirection: "row",
-      gap: 10,
-      marginTop: 16,
-    },
-    deleteModalCancelBtn: {
-      flex: 1,
-      paddingVertical: 14,
-      borderRadius: 16,
-      alignItems: "center",
-      borderWidth: 1,
-      borderBottomWidth: 3,
-      borderColor: theme.colors.border,
-      backgroundColor: theme.colors.card,
-    },
-    deleteModalCancelText: {
-      fontSize: 14,
-      ...fontFaces.heavy,
-      color: theme.colors.textMuted,
-    },
-    deleteModalConfirmBtn: {
-      flex: 1.4,
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "center",
-      gap: 6,
-      paddingVertical: 14,
-      borderRadius: 16,
-      borderWidth: 1,
-      borderBottomWidth: 4,
-      borderColor: theme.colors.dangerDark,
-      backgroundColor: theme.colors.error,
-      shadowColor: theme.colors.shadow,
-      shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.12,
-      shadowRadius: 8,
-      elevation: 4,
-    },
-    deleteModalConfirmBtnDisabled: {
-      opacity: 0.4,
-      shadowOpacity: 0,
-      elevation: 0,
-    },
-    deleteModalConfirmText: {
-      fontSize: 14,
-      ...fontFaces.heavy,
-      color: theme.colors.onPrimary,
     },
   };
 });

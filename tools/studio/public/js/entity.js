@@ -4,7 +4,7 @@ import { ApiError, api, button, confirmDialog, diffObjects, diffTable, el, fmtTi
 import { buildForm, clearRefCache } from "./form.js";
 
 const CHILD_KEY = "__children";
-const today = () => new Date().toISOString().slice(0, 10);
+const LINK_KEY = "__links";
 
 /** Findings from a 422 response, shaped for form.markErrors. */
 const tag = (list, severity) => (list ?? []).map((f) => ({ severity, ...f }));
@@ -48,16 +48,29 @@ export async function renderEditor(cfg, pk, host, hooks) {
   }
 
   const childTable = cfg.children?.table;
+  const linkTable = cfg.links?.table;
   const initial = { ...entity.row };
   if (childTable) initial[CHILD_KEY] = entity.children[childTable] ?? [];
+  // Link rows (a blog piece's sources) are plain ids: the form edits a list of them.
+  if (linkTable) initial[LINK_KEY] = (entity.children[linkTable] ?? []).map((r) => r[cfg.links.column]);
   const original = { ...entity.row };
 
   const fieldDefs = () => {
     const base = cfg.fields(isNew);
-    return childTable ? [...base, { ...cfg.children.field, key: CHILD_KEY }] : base;
+    const extra = [];
+    if (childTable) extra.push({ ...cfg.children.field, key: CHILD_KEY });
+    if (linkTable) extra.push({ ...cfg.links.field, key: LINK_KEY });
+    return [...base, ...extra];
   };
 
-  const ctx = { fail: (m) => toast(m, "err"), isNew, original, rows: hooks.rows };
+  // `live()` is the form as it is right now, for previews that redraw while you type.
+  const ctx = {
+    fail: (m) => toast(m, "err"),
+    isNew,
+    original,
+    rows: hooks.rows,
+    live: () => form.get(),
+  };
   let form = buildForm(fieldDefs(), initial, { notify: () => markDirty(true), preserve: true, ctx });
 
   // --- chrome ----------------------------------------------------------------
@@ -74,7 +87,6 @@ export async function renderEditor(cfg, pk, host, hooks) {
   delBtn.hidden = isNew;
   const actions = el("div", "editor-actions");
   actions.append(dirtyBadge);
-  if (cfg.review && !isNew) actions.append(button("Mark reviewed", () => markReviewed(), "ghost"));
   actions.append(delBtn, saveBtn);
   head.append(titleBox, actions);
 
@@ -121,12 +133,14 @@ export async function renderEditor(cfg, pk, host, hooks) {
     const values = form.get();
     const children = childTable ? values[CHILD_KEY] : undefined;
     delete values[CHILD_KEY];
+    const links = linkTable ? (values[LINK_KEY] ?? []).map((id) => ({ [cfg.links.column]: id })) : undefined;
+    delete values[LINK_KEY];
     if (isNew) {
       delete values.created_at;
       delete values.updated_at;
     }
     cfg.beforeSave?.(values, ctx);
-    return { row: values, children };
+    return { row: values, children, links };
   }
 
   function showFindings(errors, warnings) {
@@ -182,20 +196,6 @@ export async function renderEditor(cfg, pk, host, hooks) {
   }
 
   const pkOf = (row) => (cfg.raw && hooks.pkCols ? pkKey(row, hooks.pkCols) : encodeURIComponent(String(row.id)));
-
-  async function markReviewed() {
-    const by = await promptDialog("Who reviewed it? (shown in the review record, never to learners)", { okLabel: "Mark reviewed", initial: localStorage.getItem("studio:reviewer") ?? "", title: "Mark as reviewed" });
-    if (by === null) return;
-    try {
-      localStorage.setItem("studio:reviewer", by);
-    } catch {
-      /* not essential */
-    }
-    const values = form.get();
-    form.set({ ...values, review_status: "reviewed", last_reviewed: today(), reviewed_by: by });
-    markDirty(true);
-    toast("Review fields updated — save to keep them");
-  }
 
   // --- delete ----------------------------------------------------------------
   async function remove() {

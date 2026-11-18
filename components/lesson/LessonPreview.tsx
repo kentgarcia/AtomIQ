@@ -6,8 +6,9 @@
  * the XP it pays.
  */
 
-import { ScrollView, Text, View } from "react-native";
-import Animated, { FadeInDown, useReducedMotion } from "react-native-reanimated";
+import { ScrollView, View } from "react-native";
+import { Text } from "@/components/ui/text";
+import Animated, { FadeIn, useReducedMotion } from "react-native-reanimated";
 
 import { PressableIconButton, useBottomInset } from "@/components/layout";
 import { Shrodi } from "@/components/mascot/Shrodi";
@@ -27,9 +28,6 @@ import { LESSON_FRAME, LessonFrame } from "./LessonFrame";
 
 const TEACHER = 130;
 const TEACHER_WIDTH = Math.round((TEACHER * 200) / 252);
-/** The idle breath is stronger than the default so it reads at this size; the figure sits this far low in a clip so its flat base stays put. */
-const LIVELY = 2.5;
-const BASE_SLACK = 3;
 
 /** Side gutter on this screen: wider than the lesson default so the content can breathe. */
 const GUTTER = { paddingHorizontal: spacing.xl } as const;
@@ -127,7 +125,7 @@ export function LessonPreview({
           <View style={[LESSON_FRAME, GUTTER, styles.intro]}>
             <View style={styles.teacher} pointerEvents="none">
               {teacher ? (
-                <Npc spec={teacher.spec} pose="idle" form="head" size={TEACHER} lively={LIVELY} style={{ marginTop: BASE_SLACK }} />
+                <Npc spec={teacher.spec} pose="idle" form="bust" size={TEACHER} />
               ) : (
                 <Shrodi mood="idle" size={TEACHER} />
               )}
@@ -143,7 +141,7 @@ export function LessonPreview({
             ) : null}
           </View>
 
-          <Animated.View entering={reduced ? undefined : FadeInDown.duration(250).easing(EASE_OUT)} style={[LESSON_FRAME, GUTTER, styles.content]}>
+          <Animated.View entering={reduced ? undefined : FadeIn.duration(300).easing(EASE_OUT)} style={[LESSON_FRAME, GUTTER, styles.content]}>
               <View style={styles.head}>
                 <View style={styles.titleBlock}>
                   {unit?.title ? <Text style={styles.unit}>{unit.title}</Text> : null}

@@ -4,7 +4,8 @@
  */
 
 import React, { memo, useMemo } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, View } from "react-native";
+import { Text } from "@/components/ui/text";
 
 import type { CategoryChipColors } from "@/components/periodic-table/category-colors";
 import { CATEGORY_LABELS, type PeriodicElement } from "@/content/periodic-table/elements";

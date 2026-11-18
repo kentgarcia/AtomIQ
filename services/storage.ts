@@ -24,15 +24,18 @@ export const STORAGE_KEYS = {
   CURRENT_UNIT: '@atomiq:current_unit',
   CURRENT_LEVEL: '@atomiq:current_level',
   
-  // Cache
-  LEADERBOARD_CACHE: '@atomiq:leaderboard_cache',
-  FEED_CACHE: '@atomiq:feed_cache',
+  /** The NPC feed's "Feed posts" switch (default on): when off, no new chatter posts are created. */
+  FEED_POSTS_ENABLED: '@atomiq:feed_posts_enabled',
+  /** Local day (YYYY-MM-DD) of the last app open the feed saw, for the comeback post. */
+  FEED_LAST_OPEN: '@atomiq:feed_last_open',
+  /** The weekly ranking's order at the last rank check, for the rank-change post. */
+  FEED_RANK_STATE: '@atomiq:feed_rank_state',
 
   // Achievements
   ACHIEVEMENT_UNLOCKS: '@atomiq:achievement_unlocks',
-
-  // Discovery Hub
-  READ_ARTICLES: '@atomiq:read_articles',
+  ACHIEVEMENT_LEVELS: '@atomiq:achievement_levels',
+  PROFILE_SHOWCASE_BADGES: '@atomiq:profile_showcase_badges',
+  QUESTS_CLAIMED_TOTAL: '@atomiq:quests_claimed_total',
 } as const;
 
 // Generic Storage Operations
@@ -170,6 +173,34 @@ export const getTeacherLinesEnabled = async (): Promise<boolean> => {
   return value ?? true;
 };
 
+// Feed posts (the NPC feed in Discover). On by default; off stops new chatter posts, blog cards still unlock.
+type FeedPostsListener = (enabled: boolean) => void;
+const feedPostsListeners = new Set<FeedPostsListener>();
+
+export const getFeedPostsEnabled = async (): Promise<boolean> => {
+  const value = await getItem<boolean>(STORAGE_KEYS.FEED_POSTS_ENABLED);
+  return value ?? true;
+};
+
+export const setFeedPostsEnabled = async (enabled: boolean): Promise<void> => {
+  await setItem(STORAGE_KEYS.FEED_POSTS_ENABLED, enabled);
+  feedPostsListeners.forEach((listener) => {
+    try {
+      listener(enabled);
+    } catch {
+      // A listener's failure never undoes the setting.
+    }
+  });
+};
+
+/** Called with the new value whenever the switch changes; returns the way to stop listening. */
+export const subscribeFeedPostsEnabled = (listener: FeedPostsListener): (() => void) => {
+  feedPostsListeners.add(listener);
+  return () => {
+    feedPostsListeners.delete(listener);
+  };
+};
+
 // Teachers the learner has met (the introduction page shows once per teacher)
 export const getMetTeachers = async (): Promise<string[]> => {
   const value = await getItem<string[]>(STORAGE_KEYS.MET_TEACHERS);
@@ -233,6 +264,24 @@ export const setUnlockedAchievementIds = async (ids: number[]): Promise<void> =>
   await setItem(STORAGE_KEYS.ACHIEVEMENT_UNLOCKS, ids);
 };
 
+// Achievement levels (id -> level reached and already celebrated)
+export const getAchievementLevels = async (): Promise<Record<string, number> | null> => {
+  return await getItem<Record<string, number>>(STORAGE_KEYS.ACHIEVEMENT_LEVELS);
+};
+
+export const setAchievementLevels = async (levels: Record<string, number>): Promise<void> => {
+  await setItem(STORAGE_KEYS.ACHIEVEMENT_LEVELS, levels);
+};
+
+// Badges the explorer chose to show on the passport (achievement ids; null = never chosen)
+export const getShowcaseBadgeIds = async (): Promise<number[] | null> => {
+  return await getItem<number[]>(STORAGE_KEYS.PROFILE_SHOWCASE_BADGES);
+};
+
+export const setShowcaseBadgeIds = async (ids: number[]): Promise<void> => {
+  await setItem(STORAGE_KEYS.PROFILE_SHOWCASE_BADGES, ids);
+};
+
 // Batch Operations
 export const setMultiple = async (items: [string, any][]): Promise<void> => {
   try {
@@ -291,5 +340,9 @@ export default {
   getMultiple,
   getUnlockedAchievementIds,
   setUnlockedAchievementIds,
+  getAchievementLevels,
+  setAchievementLevels,
+  getShowcaseBadgeIds,
+  setShowcaseBadgeIds,
 };
 

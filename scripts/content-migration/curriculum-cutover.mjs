@@ -100,7 +100,7 @@ function clearNew(db) {
 /** Other content pointed at old lesson ids; those links no longer resolve. */
 function clearOldLinks(db) {
   let cleared = 0;
-  for (const table of ["myths", "articles", "posts"]) {
+  for (const table of ["myths"]) {
     if (!tableExists(db, table)) continue;
     const cols = db.prepare(`PRAGMA table_info(${table})`).all().map((c) => c.name);
     if (!cols.includes("related_lessons")) continue;

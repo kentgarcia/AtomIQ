@@ -191,6 +191,22 @@ export const initDatabase = async () => {
         attempts INTEGER DEFAULT 0
       );
       
+      -- The learner's diamonds (services/wallet.ts): one row.
+      CREATE TABLE IF NOT EXISTS wallet (
+        id INTEGER PRIMARY KEY CHECK (id = 1),
+        diamonds INTEGER NOT NULL DEFAULT 0,
+        updated_at INTEGER NOT NULL DEFAULT 0
+      );
+
+      -- A lesson left half way: the saved run, so it can be resumed (services/lesson-runs.ts).
+      CREATE TABLE IF NOT EXISTS lesson_runs (
+        node_id TEXT PRIMARY KEY,
+        lesson_id TEXT NOT NULL,
+        snapshot TEXT NOT NULL,
+        progress REAL NOT NULL DEFAULT 0,
+        updated_at INTEGER NOT NULL DEFAULT 0
+      );
+
       -- Objective mastery (curriculum v2). One row per objective; see services/mastery-core.ts.
       CREATE TABLE IF NOT EXISTS objective_mastery (
         objective_id TEXT PRIMARY KEY,
@@ -251,18 +267,6 @@ export const initDatabase = async () => {
         unlocked_at DATETIME
       );
       
-      -- Leaderboard Cache
-      CREATE TABLE IF NOT EXISTS leaderboard (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        user_id TEXT,
-        username TEXT,
-        avatar_url TEXT,
-        xp INTEGER,
-        is_npc INTEGER DEFAULT 0,
-        rank INTEGER,
-        cached_at DATETIME DEFAULT CURRENT_TIMESTAMP
-      );
-
       -- Personal game leaderboard (best scores per game)
       CREATE TABLE IF NOT EXISTS game_scores (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -325,14 +329,11 @@ export const initDatabase = async () => {
       // Column already exists or table doesn't exist yet, ignore
     }
 
-    // Add is_npc to leaderboard cache for offline leaderboard fidelity.
+    // The old leaderboard snapshot cache is gone (the weekly ranking is computed, see services/rank-core.ts).
     try {
-      await db.execAsync(`
-        ALTER TABLE leaderboard ADD COLUMN is_npc INTEGER DEFAULT 0;
-      `);
-      console.log("Migration: Added is_npc column to leaderboard");
+      await db.execAsync("DROP TABLE IF EXISTS leaderboard;");
     } catch (error) {
-      // Column already exists, ignore.
+      // Nothing to drop, or the table is busy: either way it is unused.
     }
 
     // Generate user_id for existing users without one
@@ -859,69 +860,6 @@ export const createOrUpdateUserProfile = async (profile: {
   }
 };
 
-export type LocalLeaderboardUser = {
-  user_id: string;
-  username: string;
-  avatar_url: string | null;
-  total_xp: number;
-  is_npc: boolean;
-};
-
-/**
- * Save remote leaderboard rows into the local snapshot table.
- */
-/**
- * Read leaderboard snapshot from local database.
- */
-export const getLeaderboardSnapshot = async (
-  limit: number = 100,
-): Promise<LocalLeaderboardUser[]> => {
-  const database = await getDatabaseReady();
-
-  const rows = await database.getAllAsync<{
-    user_id: string | null;
-    username: string | null;
-    avatar_url: string | null;
-    xp: number | null;
-    is_npc: number | null;
-  }>(
-    `SELECT user_id, username, avatar_url, xp, is_npc
-     FROM leaderboard
-     ORDER BY rank ASC, xp DESC
-     LIMIT ?`,
-    [limit],
-  );
-
-  return rows
-    .filter((row) => row.user_id && row.username)
-    .map((row) => ({
-      user_id: row.user_id as string,
-      username: row.username as string,
-      avatar_url: row.avatar_url,
-      total_xp: Number(row.xp || 0),
-      is_npc: Boolean(row.is_npc),
-    }));
-};
-
-/**
- * Latest local cache timestamp for freshness display.
- */
-export const getLeaderboardSnapshotUpdatedAt = async (): Promise<
-  number | null
-> => {
-  const database = await getDatabaseReady();
-  const row = await database.getFirstAsync<{ cached_at: string | null }>(
-    "SELECT cached_at FROM leaderboard ORDER BY cached_at DESC LIMIT 1",
-  );
-
-  if (!row?.cached_at) {
-    return null;
-  }
-
-  const timestamp = Date.parse(row.cached_at);
-  return Number.isNaN(timestamp) ? null : timestamp;
-};
-
 // Level Operations
 export const getLevelProgress = async (levelId: string) => {
   const database = getDatabase();
@@ -1062,14 +1000,19 @@ export const clearAllData = async () => {
   await database.execAsync(`
     DELETE FROM user_profile;
     DELETE FROM units;
+    DELETE FROM lesson_runs;
+    DELETE FROM wallet;
     DELETE FROM levels;
     DELETE FROM lesson_steps;
     DELETE FROM objective_mastery;
     DELETE FROM item_attempts;
     DELETE FROM daily_activity;
     DELETE FROM achievements;
-    DELETE FROM leaderboard;
     DELETE FROM game_scores;
+    DELETE FROM reactions;
+    DELETE FROM feed_posts;
+    DELETE FROM blog_reads;
+    DELETE FROM daily_facts_read;
   `);
 };
 
@@ -1116,14 +1059,19 @@ export const deleteAccountData = async () => {
     "lesson_steps",
     "objective_mastery",
     "item_attempts",
+    "lesson_runs",
+    "wallet",
     "levels",
     "units",
     "daily_activity",
     "activity_days",
     "activity_meta",
     "achievements",
-    "leaderboard",
     "game_scores",
+    "reactions",
+    "feed_posts",
+    "blog_reads",
+    "daily_facts_read",
   ] as const;
 
   for (const tableName of tableDeletionOrder) {

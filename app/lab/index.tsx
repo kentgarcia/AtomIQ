@@ -4,7 +4,8 @@ import { Icon } from "@/components/ui/icon";
 import { recordActivity } from "@/services/activity-log";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
+import { Text } from "@/components/ui/text";
 import {
   impactLight,
   impactMedium,

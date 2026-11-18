@@ -15,11 +15,11 @@
 import React from "react";
 import {
     StyleSheet,
-    Text,
     View,
     type StyleProp,
     type ViewStyle,
 } from "react-native";
+import { Text } from "@/components/ui/text";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Icon } from "@/components/ui/icon";

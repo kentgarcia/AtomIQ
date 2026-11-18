@@ -37,7 +37,7 @@ The repository already contains several patterns that can leave light-mode resid
 | `theme/themes.ts` | `myth`, `achievement`, and `lab` palettes contain mode-independent surfaces/text; each must be converted to mode-aware values or explicitly approved as a documented visual exception. |
 | Onboarding palette | Some background, card, and text values are fixed light colors even though other onboarding values branch by mode. |
 | Guide components | `components/guide/ProfileProgressCard.tsx` and `components/guide/Pill.tsx` contain fixed white, cream, gray, and dark text values. |
-| Community and games | `components/community/styles.ts`, `components/games/HowToPlayCard.tsx`, and `components/games/StackCard.tsx` mix theme-aware branches with fixed light surfaces. |
+| Community and games | `components/community/hub-styles.ts`, `components/games/HowToPlayCard.tsx`, and `components/games/StackCard.tsx` mix theme-aware branches with fixed light surfaces. |
 | Maze and utility UI | `components/atom-maze/styles.ts`, `components/ui/fast-alphabet.tsx`, `components/markdown-text.tsx`, and the legacy `ThemedText` link style contain hardcoded colors that require contrast review in both modes. |
 | Controls and feedback | Ripple colors, modal scrims, pressed states, disabled states, gradients, and inline icon colors can remain light-only even when the surrounding card changes. |
 

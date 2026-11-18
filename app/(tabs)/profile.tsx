@@ -1,58 +1,53 @@
+import { Avatar } from "@/components/avatar/Avatar";
+import { FieldInput } from "@/components/ui/field-input";
 import { Icon } from "@/components/ui/icon";
-import { RecentActivityStrip } from "@/components/activity/RecentActivityStrip";
-import { PageBackground, useTabBarInset } from "@/components/layout";
+import { HeaderButton, ScreenHeader, useHeaderBorder, useTabBarInset } from "@/components/layout";
 import {useTheme, type Theme, fontFaces, useResponsiveLayout} from "@/theme";
-import { ACHIEVEMENTS } from "@/app/achievement-detail";
-import { NPC_CHARACTERS } from "@/app/(tabs)/leaderboard";
+import { AchievementBadge } from "@/components/achievements/AchievementBadge";
+import { ModalButton } from "@/components/ui/modal-card";
+import { ModalDialog } from "@/components/ui/modal-dialog";
+import { BadgePicker } from "@/components/profile/BadgePicker";
+import { AchievementsSection } from "@/components/profile/AchievementsSection";
+import { PassportCard } from "@/components/profile/PassportCard";
+import { StreakCard } from "@/components/profile/StreakCard";
+import { passportNumber, resolveShowcase } from "@/components/profile/passport-core";
+import { useAchievementValues } from "@/hooks/use-achievement-values";
 import {
-    DEFAULT_PROFILE_AVATAR_KEY,
-    PROFILE_AVATAR_OPTIONS,
-    type ProfileAvatarKey,
-    getProfileAvatarSource,
-    normalizeProfileAvatarKey,
-} from "@/services/profile-avatars";
-import { getBestGameScores, type GameBestScore } from "@/services/database";
-import { getUnlockedAchievementIds, setUnlockedAchievementIds } from "@/services/storage";
+  ACHIEVEMENTS,
+  achievementById,
+  achievementValue,
+  levelUps,
+  levelsFromProfile,
+  mergeLevels,
+  progressFor,
+  type LevelUp,
+} from "@/services/achievements-core";
+import { getAchievementLevels, getShowcaseBadgeIds, setAchievementLevels, setShowcaseBadgeIds } from "@/services/storage";
 import { useStorage } from "@/services/StorageContext";
 import { useFocusEffect, useRouter } from "expo-router";
 import React, { useCallback, useMemo, useState } from "react";
 import {
-    ActivityIndicator,
     Alert,
-    Image,
-    KeyboardAvoidingView,
-    Modal,
-    Platform,
     ScrollView,
-    Share,
     StyleSheet,
-    Text,
-    TextInput,
     TouchableOpacity,
     View,
 } from "react-native";
-import { impactLight } from "@/services/haptics";
+import { Text } from "@/components/ui/text";
 import Animated, {
     FadeIn,
-    FadeInDown,
     FadeOut,
     LinearTransition,
-    ZoomIn,
-    interpolate,
-    useAnimatedStyle,
     useReducedMotion,
-    useSharedValue,
-    withTiming,
 } from "react-native-reanimated";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { DURATION, EASE_OUT } from "@/theme/motion";
 
 export default function ProfileScreen() {
   const router = useRouter();
-  const insets = useSafeAreaInsets();
   const { contentMaxWidth } = useResponsiveLayout();
   const tabBarInset = useTabBarInset();
   const reducedMotion = useReducedMotion();
+  const { scrolled, onScroll, scrollEventThrottle } = useHeaderBorder();
   const {
     userProfile,
     updateUserProfile,
@@ -63,19 +58,9 @@ export default function ProfileScreen() {
   const [isSavingProfile, setIsSavingProfile] = useState(false);
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [profileName, setProfileName] = useState("");
-  const [pendingAvatarKey, setPendingAvatarKey] =
-    useState<ProfileAvatarKey>(DEFAULT_PROFILE_AVATAR_KEY);
 
-  // Card flip (profile ⇄ stats)
-  const flipped = useSharedValue(0);
-  const [frontHeight, setFrontHeight] = useState(0);
-  const [backHeight, setBackHeight] = useState(0);
-
-  // Autumn gradient background, matching the home screen
-  const bgColors: [string, string] =
-    theme.mode === "dark"
-      ? [theme.colors.background, theme.colors.background]
-      : [theme.colors.background, theme.colors.background];
+  // Same page background as the Home map: text placed straight on it uses the normal text colours
+  const bgColor = theme.colors.mapBackground;
 
   // Calculate user level
   const userLevel = useMemo(() => {
@@ -92,6 +77,10 @@ export default function ProfileScreen() {
   }, [userLevel]);
 
   const levelProgress = Math.min(((userProfile?.total_xp || 0) % 100) / 100, 1);
+  const passportNo = useMemo(
+    () => passportNumber(userProfile?.friend_code, userProfile?.user_id ?? ""),
+    [userProfile?.friend_code, userProfile?.user_id],
+  );
 
   // Title milestones — tap the title pill to see progress
   const [showTitleProgress, setShowTitleProgress] = useState(false);
@@ -149,86 +138,69 @@ export default function ProfileScreen() {
     ];
   }, [userProfile]);
 
-  // Personal game leaderboard — best scores per game
-  const GAME_LEADERBOARD_META = [
-    { id: "myth-buster", title: "Myth Buster", icon: "Judge", color: "#B984FF" },
-    { id: "atom-maze", title: "Atom Maze", icon: "Grid9", color: "#1EE2E6" },
-  ];
-  const [bestScores, setBestScores] = useState<GameBestScore[]>([]);
+  const achievementValues = useAchievementValues();
 
-  const refreshBestScores = useCallback(() => {
-    getBestGameScores()
-      .then(setBestScores)
-      .catch((error) => console.error("Failed to load game scores:", error));
+  // Achievements that ranked up, celebrated once via overlay on this screen
+  const [celebrationAwards, setCelebrationAwards] = useState<LevelUp[] | null>(null);
+
+  // Awards: every achievement's level, from the profile's numbers
+  const awards = useMemo(() => {
+    return ACHIEVEMENTS.map((track) => ({ track, progress: progressFor(track, achievementValue(track, achievementValues)) }));
+  }, [achievementValues]);
+  // Badges on the passport: what the explorer picked, else their three best (see resolveShowcase)
+  const [showcaseIds, setShowcaseIds] = useState<number[] | null>(null);
+  const [badgePickerOpen, setBadgePickerOpen] = useState(false);
+  const showcase = useMemo(() => {
+    const earned = awards.filter((a) => a.progress.earned).map((a) => ({ id: a.track.id, level: a.progress.level }));
+    const ids = resolveShowcase(showcaseIds, earned);
+    return ids.flatMap((id) => {
+      const a = awards.find((x) => x.track.id === id);
+      return a ? [{ track: a.track, level: a.progress.badgeLevel }] : [];
+    });
+  }, [awards, showcaseIds]);
+  const saveShowcase = useCallback((ids: number[]) => {
+    setShowcaseIds(ids);
+    setBadgePickerOpen(false);
+    setShowcaseBadgeIds(ids).catch((error) => console.error("Failed to save showcased badges:", error));
   }, []);
 
-  // Newly unlocked achievements, celebrated once via overlay on this screen
-  const [celebrationAwards, setCelebrationAwards] =
-    useState<(typeof ACHIEVEMENTS)[number][] | null>(null);
-
-  // Awards — achievements unlocked from the profile's numbers
-  const awards = useMemo(() => {
-    return ACHIEVEMENTS.map((achievement) => {
-      const current = Number((userProfile as any)?.[achievement.field] ?? 0);
-      return { ...achievement, unlocked: current >= achievement.threshold };
-    });
-  }, [userProfile]);
-  const unlockedCount = awards.filter((a) => a.unlocked).length;
-
   const checkAchievementUnlocks = useCallback(async () => {
-    if (!userProfile) return;
-    const unlocked = awards.filter((a) => a.unlocked);
-    const unlockedIds = unlocked.map((a) => a.id);
-    const stored = await getUnlockedAchievementIds();
+    if (!achievementValues) return;
+    const now = levelsFromProfile(achievementValues);
+    const stored = await getAchievementLevels();
 
-    // First run ever — treat current state as the baseline, no retroactive party.
+    // First run ever: treat the current levels as the baseline, no retroactive party.
     if (stored === null) {
-      await setUnlockedAchievementIds(unlockedIds);
+      await setAchievementLevels(now);
       return;
     }
 
-    const newlyUnlocked = unlocked.filter((a) => !stored.includes(a.id));
-    if (newlyUnlocked.length === 0) return;
+    const ups = levelUps(stored, now);
+    if (ups.length === 0) return;
 
-    setCelebrationAwards(newlyUnlocked);
-    await setUnlockedAchievementIds([
-      ...new Set([...stored, ...newlyUnlocked.map((a) => a.id)]),
-    ]);
-  }, [awards, userProfile]);
-
-  // Global rank vs the NPC rivals (the only "opponents" on the local board)
-  const leaderboardRank = useMemo(() => {
-    const xp = userProfile?.total_xp ?? 0;
-    return 1 + NPC_CHARACTERS.filter((npc) => npc.baseXP > xp).length;
-  }, [userProfile]);
+    setCelebrationAwards(ups);
+    await setAchievementLevels(mergeLevels(stored, now));
+  }, [achievementValues]);
 
   // Refresh when returning to the tab (e.g. after finishing a game)
   useFocusEffect(
     useCallback(() => {
-      refreshBestScores();
       void checkAchievementUnlocks();
-    }, [refreshBestScores, checkAchievementUnlocks]),
+      getShowcaseBadgeIds()
+        .then(setShowcaseIds)
+        .catch(() => {});
+    }, [checkAchievementUnlocks]),
   );
 
-  const handleShare = () => {
-    Share.share({
-      message: `Join me learning nuclear science on AtomIQ! 🚀`,
-    }).catch(() => {});
-  };
-
-  const selectedAvatarKey = normalizeProfileAvatarKey(userProfile?.avatar_url);
   const hasChanges = useMemo(() => {
     if (!userProfile) return false;
     const trimmed = profileName.trim();
-    const nameChanged = trimmed !== (userProfile.display_name || userProfile.username || "");
-    const avatarChanged = pendingAvatarKey !== selectedAvatarKey;
-    return (nameChanged || avatarChanged) && !!trimmed;
-  }, [profileName, pendingAvatarKey, selectedAvatarKey, userProfile]);
+    return !!trimmed && trimmed !== (userProfile.display_name || userProfile.username || "");
+  }, [profileName, userProfile]);
 
   const openEditModal = () => {
     if (!userProfile) return;
     setProfileName(userProfile.display_name || userProfile.username || "");
-    setPendingAvatarKey(selectedAvatarKey);
     setEditModalVisible(true);
   };
 
@@ -240,27 +212,12 @@ export default function ProfileScreen() {
 
     try {
       setIsSavingProfile(true);
-      await updateUserProfile({
-        display_name: trimmedName,
-        ...(pendingAvatarKey !== selectedAvatarKey
-          ? { avatar_url: pendingAvatarKey }
-          : {}),
-      });
+      await updateUserProfile({ display_name: trimmedName });
       setEditModalVisible(false);
     } catch (error) {
-      // Display names are rate-limited to one change per 7 days — surface
-      // that instead of a generic failure, and still persist an avatar-only
-      // change so the save isn't a total loss.
+      // Display names are rate-limited to one change per 7 days: say so instead of a generic failure.
       const cooldown = error as { code?: string; nextAllowedAt?: number };
       if (cooldown?.code === "DISPLAY_NAME_COOLDOWN") {
-        if (pendingAvatarKey !== selectedAvatarKey) {
-          try {
-            await updateUserProfile({ avatar_url: pendingAvatarKey });
-            setEditModalVisible(false);
-          } catch {
-            // Avatar save also failed; the alert below covers it.
-          }
-        }
         const nextDate = cooldown.nextAllowedAt
           ? new Date(cooldown.nextAllowedAt).toLocaleDateString()
           : null;
@@ -278,52 +235,37 @@ export default function ProfileScreen() {
     }
   };
 
-  const toggleFlip = useCallback(() => {
-    flipped.value = withTiming(flipped.value === 1 ? 0 : 1, { duration: DURATION.flip });
-  }, [flipped]);
-
-  const frontStyle = useAnimatedStyle(() => ({
-    transform: [
-      { perspective: 800 },
-      { rotateY: `${flipped.value * (reducedMotion ? 0 : 180)}deg` },
-    ],
-    // Opacity guard — backfaceVisibility alone is unreliable on Android
-    opacity: flipped.value < 0.5 ? 1 : 0,
-  }));
-  const backStyle = useAnimatedStyle(() => ({
-    transform: [
-      { perspective: 800 },
-      { rotateY: `${-180 + flipped.value * (reducedMotion ? 0 : 180)}deg` },
-    ],
-    opacity: flipped.value < 0.5 ? 0 : 1,
-  }));
-  const cardHeightStyle = useAnimatedStyle(() => ({
-    height: interpolate(
-      flipped.value,
-      [0, 1],
-      [frontHeight || 240, backHeight || 240],
-    ),
-  }));
-
   if (!userProfile) {
     return (
       <View
         style={{
           flex: 1,
-          backgroundColor: bgColors[0],
+          backgroundColor: bgColor,
           alignItems: "center",
           justifyContent: "center",
         }}
       >
-        <Text style={{ color: theme.colors.textMuted }}>Loading profile...</Text>
+        <Text style={{ color: theme.colors.text, fontSize: 16, ...fontFaces.heavy }}>Loading profile...</Text>
       </View>
     );
   }
 
   return (
-    <View style={[styles.container, { backgroundColor: bgColors[0] }]}>
-      <PageBackground />
+    <View style={[styles.container, { backgroundColor: bgColor }]}>
+      <ScreenHeader
+        title="Profile"
+        scrolled={scrolled}
+        right={
+          <View style={styles.headerActions}>
+            <HeaderButton icon="Shop" label="Shop" onPress={() => router.push("/shop")} />
+            <HeaderButton icon="Edit2" label="Edit profile" onPress={openEditModal} />
+            <HeaderButton icon="Setting" label="Settings" onPress={() => router.push("/settings")} />
+          </View>
+        }
+      />
       <ScrollView
+        onScroll={onScroll}
+        scrollEventThrottle={scrollEventThrottle}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={[
           styles.scrollContent,
@@ -334,153 +276,28 @@ export default function ProfileScreen() {
           { paddingBottom: tabBarInset + 16 },
         ]}
       >
-        {/* Header: Share / Edit / Settings */}
-        <View style={[styles.headerRow, { paddingTop: insets.top + 12 }]}>
-          <TouchableOpacity
-            style={styles.iconButton}
-            onPress={handleShare}
-            hitSlop={8}
-            accessibilityRole="button"
-            accessibilityLabel="Share profile"
-          >
-            <Icon name="Share" size={20} color={theme.colors.textSecondary} variant="Bold" />
-          </TouchableOpacity>
-          <View style={{ flex: 1 }} />
-          <TouchableOpacity
-            style={styles.iconButton}
-            onPress={openEditModal}
-            hitSlop={8}
-            accessibilityRole="button"
-            accessibilityLabel="Edit profile"
-          >
-            <Icon name="Edit2" size={20} color={theme.colors.textSecondary} variant="Bold" />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.iconButton}
-            onPress={() => router.push("/settings")}
-            hitSlop={8}
-            accessibilityRole="button"
-            accessibilityLabel="Open settings"
-          >
-            <Icon name="Setting" size={20} color={theme.colors.textSecondary} variant="Bold" />
-          </TouchableOpacity>
-        </View>
+        {/* Edit and Settings are on the passport; the header above adds the safe-area inset */}
+        <View style={{ height: 8 }} />
 
-        {/* Profile Card — amber outer wrapper (same as home headerBar) */}
-        <Animated.View
-          entering={reducedMotion ? FadeIn.duration(120) : FadeInDown.springify()}
-          layout={reducedMotion ? undefined : LinearTransition.duration(DURATION.medium).easing(EASE_OUT)}
-          style={styles.profileCard}
-        >
-          {/* First row: title pill (tap for progress) + stats button — same as home header */}
-          <View style={styles.profileCardHeader}>
-            <TouchableOpacity
-              style={styles.levelPill}
-              activeOpacity={0.85}
-              hitSlop={4}
-              accessibilityRole="button"
-              accessibilityLabel={showTitleProgress ? "Hide title progress" : "Show title progress"}
-              accessibilityState={{ expanded: showTitleProgress }}
-              onPress={() => setShowTitleProgress((v) => !v)}
-            >
-              <Icon name="Crown" size={14} color="#FFFFFF" variant="Bold" />
-              <Text style={styles.levelPillText}>{userTitle}</Text>
-              <Icon
-                name={showTitleProgress ? "ArrowUp2" : "ArrowDown2"}
-                size={12}
-                color="#FFFFFF"
-                variant="Bold"
-              />
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.flipCornerBtn}
-              onPress={toggleFlip}
-              activeOpacity={0.85}
-              hitSlop={4}
-              accessibilityRole="button"
-              accessibilityLabel="Flip profile card"
-            >
-              <Icon name="ChartSquare" size={19} color="#EA580C" variant="Bold" />
-            </TouchableOpacity>
-          </View>
+        {/* Explorer passport (front: profile, back: stats) */}
+        <PassportCard
+          name={userProfile.display_name || userProfile.username}
+          title={userTitle}
+          level={userLevel}
+          xp={userProfile.total_xp}
+          levelProgress={levelProgress}
+          streak={userProfile.current_streak}
+          passportNo={passportNo}
+          avatar={userProfile.avatar_url}
+          badges={showcase}
+          stats={stats}
+          titleOpen={showTitleProgress}
+          onToggleTitle={() => setShowTitleProgress((v) => !v)}
+          onEdit={openEditModal}
+          onPickBadges={() => setBadgePickerOpen(true)}
+        />
 
-          {/* Inner white card — flips between profile and stats (profile first) */}
-          <Animated.View style={cardHeightStyle}>
-            {/* Front face — avatar left, lvl + XP on the right */}
-            <Animated.View
-              onLayout={(e) => setFrontHeight(e.nativeEvent.layout.height)}
-              style={[styles.cardFace, frontStyle]}
-            >
-              <View style={styles.profileRowCompact}>
-                <TouchableOpacity
-                  activeOpacity={0.85}
-                  onPress={openEditModal}
-                >
-                  <View style={styles.avatarContainer}>
-                    <Image
-                      source={getProfileAvatarSource(userProfile.avatar_url)}
-                      style={styles.avatar}
-                      resizeMode="cover"
-                    />
-                    <View style={styles.levelBadge}>
-                      <Text style={styles.levelBadgeText}>{userLevel}</Text>
-                    </View>
-                  </View>
-                </TouchableOpacity>
-                <View style={styles.profileInfo}>
-                  <Text style={styles.name}>
-                    {userProfile.display_name || userProfile.username}
-                  </Text>
-                  <View style={styles.levelSectionCompact}>
-                    <View style={styles.levelMetaRow}>
-                      <Text style={styles.levelLabel}>Level {userLevel}</Text>
-                      <Text style={styles.levelXp}>
-                        {userProfile.total_xp.toLocaleString()} XP
-                      </Text>
-                    </View>
-                    <View style={styles.levelBarBg}>
-                      <View
-                        style={[
-                          styles.levelBarFill,
-                          { width: `${levelProgress * 100}%` },
-                        ]}
-                      />
-                    </View>
-                    <Text style={styles.levelHint}>
-                      {100 - (userProfile.total_xp % 100)} XP until Level{" "}
-                      {userLevel + 1}
-                    </Text>
-                  </View>
-                </View>
-              </View>
-            </Animated.View>
-
-            {/* Back face — stats */}
-            <Animated.View
-              onLayout={(e) => setBackHeight(e.nativeEvent.layout.height)}
-              style={[styles.cardFace, backStyle]}
-            >
-              <Text style={styles.statsTitle}>Your Stats</Text>
-              <View style={styles.statsGrid}>
-                {stats.map((stat) => (
-                  <View key={stat.label} style={styles.statTile}>
-                    <View style={[styles.statIconCircle, { backgroundColor: `${stat.color}1A` }]}>
-                      <Icon
-                        name={stat.icon}
-                        size={20}
-                        color={stat.color}
-                        variant="Bold"
-                      />
-                    </View>
-                    <Text style={styles.statValue}>{stat.value}</Text>
-                    <Text style={styles.statLabel}>{stat.label}</Text>
-                  </View>
-                ))}
-              </View>
-            </Animated.View>
-            </Animated.View>
-
-          {/* Title milestone progress — below the profile card, inside same amber wrapper */}
+          {/* Rank progress — opens under the passport when the rank is tapped */}
           {showTitleProgress && (
             <Animated.View
               entering={reducedMotion ? FadeIn.duration(120) : FadeIn.duration(DURATION.small)}
@@ -568,428 +385,125 @@ export default function ProfileScreen() {
               </View>
             </Animated.View>
           )}
-        </Animated.View>
 
-        {/* Streak card */}
-        <Animated.View entering={reducedMotion ? FadeIn.duration(120) : FadeInDown.delay(100).springify()}>
-          <TouchableOpacity
-            style={styles.streakCard}
-            activeOpacity={0.85}
-            onPress={() => router.push("/streak")}
-          >
-            <View style={styles.streakIconCircle}>
-              <Icon name="Sun" size={26} color="#C2410C" variant="Bold" />
-            </View>
-            <View style={{ flex: 1 }}>
-              <Text style={styles.streakValue}>
-                {userProfile.current_streak} day streak
-              </Text>
-              <Text style={styles.streakSub}>
-                Longest: {userProfile.longest_streak || 0} days
-              </Text>
-            </View>
-            <View style={styles.streakArrow}>
-              <Icon name="ArrowRight2" size={18} color="#C2410C" variant="Bold" />
-            </View>
-          </TouchableOpacity>
-        </Animated.View>
+        {/* Streak and the last 14 days, in one widget */}
+        <StreakCard streak={userProfile.current_streak} longest={userProfile.longest_streak || 0} />
 
-        <RecentActivityStrip />
-
-        {/* Awards — badges & certificates */}
-        <Animated.View
-          entering={reducedMotion ? FadeIn.duration(120) : FadeInDown.delay(200).springify()}
-          style={styles.sectionCard}
-        >
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Awards</Text>
-            <View style={styles.countPill}>
-              <Text style={styles.countPillText}>
-                {unlockedCount}/{awards.length} unlocked
-              </Text>
-            </View>
-          </View>
-          <View style={styles.badgesRow}>
-            {awards.map((award) => (
-              <TouchableOpacity
-                key={award.id}
-                style={styles.badgeItem}
-                activeOpacity={0.8}
-                onPress={() =>
-                  router.push(`/achievement-detail?achievementId=${award.id}`)
-                }
-              >
-                <View
-                  style={[
-                    styles.badgeCircle,
-                    !award.unlocked && styles.badgeLocked,
-                    award.unlocked && { backgroundColor: `${award.color}22` },
-                  ]}
-                >
-                  <Icon
-                    name={award.icon}
-                    size={24}
-                    color={award.unlocked ? award.color : theme.colors.textFaint}
-                    variant="Bold"
-                  />
-                </View>
-                <Text
-                  style={[
-                    styles.badgeLabel,
-                    !award.unlocked && styles.badgeLabelLocked,
-                  ]}
-                >
-                  {award.title}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-        </Animated.View>
-
-        {/* Personal game leaderboard */}
-        <Animated.View
-          entering={reducedMotion ? FadeIn.duration(120) : FadeInDown.delay(250).springify()}
-          style={styles.sectionCard}
-        >
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Game Leaderboard</Text>
-            <View style={styles.countPill}>
-              <Icon name="Cup" size={13} color="#C2410C" variant="Bold" />
-              <Text style={styles.countPillText}>Personal bests</Text>
-            </View>
-          </View>
-          {/* Global ranking — merged from separate card */}
-          <TouchableOpacity
-            style={[styles.leaderRow, styles.leaderRowDivider]}
-            activeOpacity={0.85}
-            onPress={() => router.push("/leaderboard")}
-          >
-            <View style={[styles.leaderIconCircle, { backgroundColor: theme.colors.surfaceSoft }]}>
-              <Icon name="Cup" size={20} color="#C2410C" variant="Bold" />
-            </View>
-            <View style={{ flex: 1 }}>
-              <Text style={styles.leaderTitle}>Ranking</Text>
-              <Text style={styles.leaderPlays}>
-                Rank #{leaderboardRank} of {NPC_CHARACTERS.length + 1} • Tap to view
-              </Text>
-            </View>
-            <View style={styles.streakArrow}>
-              <Icon name="ArrowRight2" size={16} color="#C2410C" variant="Bold" />
-            </View>
-          </TouchableOpacity>
-          {GAME_LEADERBOARD_META.map((game, index) => {
-            const best = bestScores.find((s) => s.game_id === game.id);
-            const isTop = bestScores[0]?.game_id === game.id && !!best;
-            return (
-              <View
-                key={game.id}
-                style={[
-                  styles.leaderRow,
-                  index < GAME_LEADERBOARD_META.length - 1 &&
-                    styles.leaderRowDivider,
-                ]}
-              >
-                <View style={styles.leaderRank}>
-                  <Text style={styles.leaderRankText}>{index + 1}</Text>
-                </View>
-                <View
-                  style={[
-                    styles.leaderIconCircle,
-                    { backgroundColor: `${game.color}22` },
-                  ]}
-                >
-                  <Icon name={game.icon} size={20} color={game.color} variant="Bold" />
-                </View>
-                <View style={{ flex: 1 }}>
-                  <Text style={styles.leaderTitle}>{game.title}</Text>
-                  {best ? (
-                    <Text style={styles.leaderPlays}>
-                      {best.plays} {best.plays === 1 ? "run" : "runs"} played
-                    </Text>
-                  ) : (
-                    <Text style={styles.leaderPlays}>Not played yet</Text>
-                  )}
-                </View>
-                {best ? (
-                  <View
-                    style={[
-                      styles.leaderScorePill,
-                      isTop && styles.leaderScorePillTop,
-                    ]}
-                  >
-                    {isTop ? (
-                      <Icon name="Crown1" size={13} color="#FFC107" variant="Bold" />
-                    ) : null}
-                    <Text
-                      style={[
-                        styles.leaderScoreText,
-                        isTop && styles.leaderScoreTextTop,
-                      ]}
-                    >
-                      {best.best.toLocaleString()}
-                    </Text>
-                  </View>
-                ) : (
-                  <Text style={styles.leaderNoScore}>—</Text>
-                )}
-              </View>
-            );
-          })}
-        </Animated.View>
+        {/* Every achievement, flat on the page */}
+        <View style={styles.achievements}>
+          <AchievementsSection />
+        </View>
       </ScrollView>
 
-      {/* Edit Profile Modal — beautiful */}
-      <Modal
+      <BadgePicker
+        visible={badgePickerOpen}
+        badges={awards}
+        selected={showcase.map((b) => b.track.id)}
+        onSave={saveShowcase}
+        onClose={() => setBadgePickerOpen(false)}
+      />
+
+      {/* Edit Profile: a ModalDialog (the house modal design, see components/ui/modal-card.tsx) */}
+      <ModalDialog
         visible={editModalVisible}
-        animationType="fade"
-        transparent={true}
-        onRequestClose={() => setEditModalVisible(false)}
+        onClose={() => setEditModalVisible(false)}
+        title="Edit Profile"
+        closeLabel="Close edit profile"
+        footer={
+          <ModalButton
+            label={isSavingProfile ? "Saving…" : hasChanges ? "Save changes" : "No changes yet"}
+            disabled={!hasChanges || isSavingProfile}
+            onPress={() => void handleSaveProfile()}
+          />
+        }
       >
-        <Animated.View
-          entering={FadeIn.duration(180)}
-          exiting={FadeOut.duration(150)}
-          style={styles.avatarModalOverlay}
-        >
-          <KeyboardAvoidingView
-            behavior={Platform.OS === "ios" ? "padding" : "height"}
-            style={styles.keyboardAvoidingView}
-            keyboardVerticalOffset={insets.top + 12}
-          >
-            <Animated.View
-              entering={reducedMotion ? FadeIn.duration(200) : ZoomIn.duration(260).easing(EASE_OUT)}
-              exiting={FadeOut.duration(150)}
-              style={styles.avatarModalContent}
-            >
-            {/* Scrollable so every field stays reachable while the Android
-                keyboard is open (no height-shrink squeezing like KAV "height"
-                behavior does — that buried the Save button). */}
-            <ScrollView
-              style={styles.avatarModalScroll}
-              contentContainerStyle={styles.avatarModalScrollContent}
-              showsVerticalScrollIndicator={false}
-              bounces={false}
-              keyboardShouldPersistTaps="handled"
-              keyboardDismissMode="on-drag"
-            >
-            <View style={styles.dragHandle} />
-            <View style={styles.avatarModalHeader}>
-              <View style={styles.editHeaderLeft}>
-                <View style={styles.editHeaderIcon}>
-                  <Icon name="Edit2" size={16} color="#EA580C" variant="Bold" />
-                </View>
-                <Text style={styles.avatarModalTitle}>Edit Profile</Text>
-              </View>
-              <TouchableOpacity
-                onPress={() => setEditModalVisible(false)}
-                style={styles.closeButtonNew}
-                activeOpacity={0.85}
-                hitSlop={6}
-                accessibilityRole="button"
-                accessibilityLabel="Close edit profile"
-              >
-                <Icon name="CloseCircle" size={20} color={theme.colors.textFaint} variant="Bold" />
-              </TouchableOpacity>
+        {/* Live preview: the passport's photo and name, as they will look */}
+        <View style={styles.preview}>
+          <View style={styles.previewPhotoWrap}>
+            <View style={styles.previewPhotoFrame}>
+              <Avatar value={userProfile.avatar_url} size={60} radius={17} />
             </View>
-
-            {/* Live preview — amber outer like profile card */}
-            <View style={styles.previewCard}>
-              <Text style={styles.previewLabel}>Preview</Text>
-              <View style={styles.previewInner}>
-                <View style={styles.previewAvatarWrap}>
-                  <Image
-                    source={getProfileAvatarSource(pendingAvatarKey)}
-                    style={styles.previewAvatar}
-                    resizeMode="cover"
-                  />
-                  <View style={styles.previewLevelBadge}>
-                    <Text style={styles.previewLevelText}>{userLevel}</Text>
-                  </View>
-                </View>
-                <View style={{ flex: 1 }}>
-                  <Text style={styles.previewName}>
-                    {profileName.trim() || "Your name"}
-                  </Text>
-                  <Text style={styles.previewTitle}>{userTitle}</Text>
-                  <View style={styles.previewXpRow}>
-                    <Icon name="Flash" size={12} color="#C2410C" variant="Bold" />
-                    <Text style={styles.previewXp}>{(userProfile?.total_xp || 0).toLocaleString()} XP</Text>
-                  </View>
-                </View>
-                <View style={styles.previewCheck}>
-                  <Icon name="Eye" size={16} color="#EA580C" variant="Bold" />
-                </View>
-              </View>
+            <View style={styles.previewLevelBadge}>
+              <Text style={styles.previewLevelText}>{userLevel}</Text>
             </View>
-
-            <View style={styles.nameFieldSection}>
-              <View style={styles.nameFieldHeader}>
-                <Text style={styles.nameFieldLabel}>Display Name</Text>
-                <Text style={styles.charCount}>{profileName.length}/24</Text>
-              </View>
-              <View style={styles.nameInputWrap}>
-                <TextInput
-                  style={styles.nameInput}
-                  value={profileName}
-                  onChangeText={setProfileName}
-                  placeholder="Your display name"
-                  placeholderTextColor={theme.colors.textFaint}
-                  maxLength={24}
-                  autoCorrect={false}
-                  returnKeyType="done"
-                />
-                {profileName.length > 0 && (
-                  <TouchableOpacity
-                    onPress={() => setProfileName("")}
-                    style={styles.clearButton}
-                    activeOpacity={0.7}
-                    hitSlop={8}
-                    accessibilityRole="button"
-                    accessibilityLabel="Clear display name"
-                  >
-                    <Icon name="CloseCircle" size={18} color={theme.colors.textFaint} variant="Bold" />
-                  </TouchableOpacity>
-                )}
-              </View>
-              {userProfile?.next_display_name_change_at &&
-              // eslint-disable-next-line react-hooks/purity -- cooldown is compared to the current clock at render time
-              userProfile.next_display_name_change_at > Date.now() ? (
-                <Text style={styles.nameCooldownHint}>
-                  Name can be changed again on{" "}
-                  {new Date(
-                    userProfile.next_display_name_change_at,
-                  ).toLocaleDateString()}
-                </Text>
-              ) : null}
-            </View>
-
-            <View style={styles.avatarSectionHeader}>
-              <Text style={styles.nameFieldLabel}>Choose Avatar</Text>
-              <Text style={styles.avatarCount}>{PROFILE_AVATAR_OPTIONS.length} options</Text>
-            </View>
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.avatarOptionsWrap}
-              style={styles.avatarScroll}
-            >
-              {PROFILE_AVATAR_OPTIONS.map((avatarOption, index) => {
-                const isSelected = pendingAvatarKey === avatarOption.key;
-
-                return (
-                  <Animated.View
-                    key={avatarOption.key}
-                    entering={reducedMotion ? FadeIn.duration(120) : FadeInDown.delay(index * 24).springify()}
-                    layout={reducedMotion ? undefined : LinearTransition.duration(DURATION.small).easing(EASE_OUT)}
-                    style={styles.avatarOptionWrapper}
-                  >
-                    <TouchableOpacity
-                      style={[
-                        styles.avatarModalOption,
-                        isSelected && styles.avatarModalOptionSelected,
-                        isSavingProfile && styles.avatarModalOptionDisabled,
-                      ]}
-                      accessibilityRole="button"
-                      accessibilityLabel={`Avatar option ${index + 1}`}
-                      accessibilityState={{ selected: isSelected, disabled: isSavingProfile }}
-                      onPress={() => {
-                        impactLight();
-                        setPendingAvatarKey(avatarOption.key);
-                      }}
-                      activeOpacity={0.85}
-                      disabled={isSavingProfile}
-                    >
-                      <Image
-                        source={avatarOption.source}
-                        style={styles.avatarModalOptionImage}
-                        resizeMode="cover"
-                      />
-                    </TouchableOpacity>
-                    {isSelected && (
-                      <Animated.View
-                        entering={ZoomIn.springify()}
-                        style={styles.avatarModalCheck}
-                      >
-                        <Icon name="TickCircle" size={16} color="#FFFFFF" variant="Bold" />
-                      </Animated.View>
-                    )}
-                  </Animated.View>
-                );
-              })}
-            </ScrollView>
-
-            <TouchableOpacity
-              style={[
-                styles.saveButton,
-                (!hasChanges || isSavingProfile) && styles.saveButtonDisabled,
-              ]}
-              onPress={() => void handleSaveProfile()}
-              activeOpacity={0.85}
-              disabled={!hasChanges || isSavingProfile}
-            >
-              {isSavingProfile ? (
-                <ActivityIndicator color="#FFFFFF" size="small" />
-              ) : (
-                <View style={styles.saveButtonContent}>
-                  <Icon
-                    name={hasChanges ? "TickCircle" : "InfoCircle"}
-                    size={18}
-                    color="#FFFFFF"
-                    variant="Bold"
-                  />
-                  <Text style={styles.saveButtonText}>{hasChanges ? "Save Changes" : "No changes yet"}</Text>
-                </View>
-              )}
-            </TouchableOpacity>
-            </ScrollView>
-          </Animated.View>
-          </KeyboardAvoidingView>
-        </Animated.View>
-      </Modal>
-
-      {/* Achievement unlocked celebration */}
-      {celebrationAwards != null && celebrationAwards.length > 0 && (
-        <View style={styles.celebrationOverlay}>
-          <Animated.View
-            entering={reducedMotion ? FadeIn.duration(120) : FadeInDown.springify().delay(80)}
-            style={styles.celebrationCard}
-          >
-            <View style={styles.celebrationIconWrap}>
-              <Icon name="Award" size={34} color="#FFC800" variant="Bold" />
-            </View>
-            <Text style={styles.celebrationTitle}>Achievement Unlocked!</Text>
-            {celebrationAwards.map((badge) => (
-              <View key={badge.id} style={styles.celebrationRow}>
-                <View
-                  style={[
-                    styles.celebrationBadge,
-                    { backgroundColor: `${badge.color}22` },
-                  ]}
-                >
-                  <Icon
-                    name={badge.icon}
-                    size={24}
-                    color={badge.color}
-                    variant="Bold"
-                  />
-                </View>
-                <View style={{ flex: 1 }}>
-                  <Text style={styles.celebrationBadgeTitle}>{badge.title}</Text>
-                  <Text style={styles.celebrationBadgeReq}>
-                    {badge.requirement}
-                  </Text>
-                </View>
-              </View>
-            ))}
-            <TouchableOpacity
-              style={styles.celebrationButton}
-              activeOpacity={0.85}
-              onPress={() => setCelebrationAwards(null)}
-            >
-              <Text style={styles.celebrationButtonText}>Awesome!</Text>
-            </TouchableOpacity>
-          </Animated.View>
+          </View>
+          <View style={styles.previewText}>
+            <Text style={styles.previewName} numberOfLines={1}>
+              {profileName.trim() || "Your name"}
+            </Text>
+            <Text style={styles.previewTitle}>{userTitle}</Text>
+            <Text style={styles.previewXp}>{(userProfile?.total_xp || 0).toLocaleString()} XP</Text>
+          </View>
         </View>
-      )}
+
+        <View style={styles.nameFieldSection}>
+          <View style={styles.nameFieldHeader}>
+            <Text style={styles.nameFieldLabel}>Display name</Text>
+            <Text style={styles.charCount}>{profileName.length}/24</Text>
+          </View>
+          <View style={styles.nameInputWrap}>
+            <FieldInput
+              style={styles.nameInput}
+              value={profileName}
+              onChangeText={setProfileName}
+              placeholder="Your display name"
+              maxLength={24}
+              autoCorrect={false}
+              returnKeyType="done"
+              accessibilityLabel="Display name"
+            />
+            {profileName.length > 0 && (
+              <TouchableOpacity
+                onPress={() => setProfileName("")}
+                style={styles.clearButton}
+                activeOpacity={0.7}
+                hitSlop={8}
+                accessibilityRole="button"
+                accessibilityLabel="Clear display name"
+              >
+                <Icon name="CloseCircle" size={18} color={theme.colors.textFaint} variant="Bold" />
+              </TouchableOpacity>
+            )}
+          </View>
+          {userProfile?.next_display_name_change_at &&
+          // eslint-disable-next-line react-hooks/purity -- cooldown is compared to the current clock at render time
+          userProfile.next_display_name_change_at > Date.now() ? (
+            <Text style={styles.nameCooldownHint}>
+              Name can be changed again on{" "}
+              {new Date(
+                userProfile.next_display_name_change_at,
+              ).toLocaleDateString()}
+            </Text>
+          ) : null}
+        </View>
+      </ModalDialog>
+
+      {/* Badge ranked up: the house modal */}
+      <ModalDialog
+        visible={celebrationAwards != null && celebrationAwards.length > 0}
+        onClose={() => setCelebrationAwards(null)}
+        title={celebrationAwards != null && celebrationAwards.length > 1 ? "Badges ranked up!" : "Badge ranked up!"}
+        closeLabel="Awesome"
+        footer={<ModalButton label="Awesome!" onPress={() => setCelebrationAwards(null)} />}
+      >
+        {(celebrationAwards ?? []).map((up) => {
+          const track = achievementById(up.id);
+          if (!track) return null;
+          return (
+            <View key={up.id} style={styles.celebrationRow}>
+              <AchievementBadge track={track} level={up.to} size={56} />
+              <View style={{ flex: 1 }}>
+                <Text style={styles.celebrationBadgeTitle}>
+                  {track.title} · Level {up.to}
+                </Text>
+                <Text style={styles.celebrationBadgeReq}>
+                  {track.requirement(track.tiers[up.to - 1])}
+                </Text>
+              </View>
+            </View>
+          );
+        })}
+      </ModalDialog>
     </View>
   );
 }
@@ -1000,7 +514,7 @@ const createStyles = (theme: Theme) => {
   return StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: P.background,
+      backgroundColor: theme.colors.mapBackground,
     },
     bgGradient: {
       position: "absolute",
@@ -1009,70 +523,14 @@ const createStyles = (theme: Theme) => {
       bottom: 0,
       left: 0,
     },
+    achievements: { marginHorizontal: 24, marginTop: 32 },
+    headerActions: { flexDirection: "row", alignItems: "center" },
     scrollContent: {
       paddingBottom: 40,
     },
-    /* Header icon row — Share left, Edit + Settings right */
-    headerRow: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 10,
-      paddingHorizontal: 20,
-      paddingBottom: 16,
-      zIndex: 10,
-    },
-    iconButton: {
-      width: 40,
-      height: 40,
-      borderRadius: 20,
-      backgroundColor: P.card,
-      alignItems: "center",
-      justifyContent: "center",
-      elevation: 3,
-      shadowColor: theme.colors.shadow,
-      shadowOffset: { width: 0, height: 3 },
-      shadowOpacity: 0.08,
-      shadowRadius: 6,
-    },
-    /* Flip card shell — amber outer like home's headerBar */
-    profileCard: {
-      marginHorizontal: 20,
-      backgroundColor: theme.colors.card,
-      borderWidth: 2,
-      borderColor: theme.colors.border,
-      borderBottomWidth: 4,
-      borderRadius: 26,
-      padding: 10,
-      gap: 10,
-      elevation: 4,
-      shadowColor: theme.colors.shadow,
-      shadowOffset: { width: 0, height: 3 },
-      shadowOpacity: 0.1,
-      shadowRadius: 6,
-    },
-    profileCardHeader: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "space-between",
-      paddingHorizontal: 4,
-      paddingTop: 2,
-      paddingBottom: 2,
-    },
-    levelPill: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 5,
-      backgroundColor: theme.colors.inverseSurface,
-      paddingHorizontal: 12,
-      height: 40,
-      borderRadius: 14,
-    },
-    levelPillText: {
-      fontSize: 13,
-      ...fontFaces.heavy,
-      color: theme.colors.inverseText,
-    },
     titleProgressPanel: {
+      marginHorizontal: 20,
+      marginTop: 16,
       backgroundColor: P.card,
       borderRadius: 16,
       padding: 14,
@@ -1149,394 +607,7 @@ const createStyles = (theme: Theme) => {
       color: P.faint,
       marginTop: 1,
     },
-    flipClip: {
-      position: "relative",
-      minHeight: 240,
-    },
-    cardFace: {
-      position: "absolute",
-      top: 0,
-      left: 0,
-      right: 0,
-      backgroundColor: P.card,
-      borderRadius: 20,
-      padding: 16,
-      borderWidth: 2,
-      borderColor: P.border,
-      borderBottomWidth: 4,
-      backfaceVisibility: "hidden",
-    },
-    profileRow: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 16,
-    },
-    profileRowCompact: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 14,
-    },
-    profileInfo: {
-      flex: 1,
-      gap: 2,
-    },
-    levelSectionCompact: {
-      marginTop: 8,
-    },
-    avatarContainer: {
-      position: "relative",
-    },
-    avatar: {
-      width: 84,
-      height: 84,
-      borderRadius: 42,
-      backgroundColor: P.soft,
-      borderWidth: 3,
-      borderColor: P.soft,
-    },
-    levelBadge: {
-      position: "absolute",
-      bottom: -2,
-      right: -2,
-      backgroundColor: "#EA580C",
-      width: 30,
-      height: 30,
-      borderRadius: 15,
-      alignItems: "center",
-      justifyContent: "center",
-      borderWidth: 3,
-      borderColor: theme.colors.card,
-    },
-    levelBadgeText: {
-      color: "#FFF",
-      ...fontFaces.heavy,
-      fontSize: 12,
-    },
-    name: {
-      fontSize: 20,
-      ...fontFaces.heavy,
-      color: P.text,
-      marginBottom: 2,
-    },
-    title: {
-      fontSize: 13,
-      color: P.muted,
-      ...fontFaces.semibold,
-      marginBottom: 8,
-    },
-    /* Level progress, inside the profile card */
-    levelSection: {
-      marginTop: 18,
-    },
-    levelMetaRow: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "center",
-      marginBottom: 8,
-    },
-    levelLabel: {
-      fontSize: 13,
-      ...fontFaces.heavy,
-      color: P.text,
-    },
-    levelXp: {
-      fontSize: 12,
-      ...fontFaces.bold,
-      color: "#C2410C",
-    },
-    levelBarBg: {
-      height: 10,
-      borderRadius: 5,
-      backgroundColor: P.soft,
-      overflow: "hidden",
-    },
-    levelBarFill: {
-      height: "100%",
-      borderRadius: 5,
-      backgroundColor: "#EA580C",
-    },
-    levelHint: {
-      fontSize: 11,
-      ...fontFaces.semibold,
-      color: P.muted,
-      marginTop: 6,
-    },
-    flipCornerBtn: {
-      width: 40,
-      height: 40,
-      borderRadius: 14,
-      backgroundColor: P.card,
-      alignItems: "center",
-      justifyContent: "center",
-      borderWidth: 2,
-      borderColor: theme.colors.border,
-      borderBottomWidth: 4,
-    },
-    profileTextCol: {
-      flex: 1,
-      paddingRight: 36,
-    },
-    /* Stats (back face) */
-    statsTitle: {
-      fontSize: 16,
-      ...fontFaces.heavy,
-      color: P.text,
-      alignSelf: "center",
-      marginBottom: 16,
-    },
-    statsGrid: {
-      flexDirection: "row",
-      flexWrap: "wrap",
-      justifyContent: "space-between",
-    },
-    statTile: {
-      width: "48.5%",
-      alignItems: "center",
-      paddingVertical: 14,
-      borderRadius: 18,
-      backgroundColor: P.soft,
-      marginBottom: 10,
-    },
-    statIconCircle: {
-      width: 40,
-      height: 40,
-      borderRadius: 20,
-      alignItems: "center",
-      justifyContent: "center",
-      marginBottom: 8,
-    },
-    statValue: {
-      fontSize: 22,
-      ...fontFaces.heavy,
-      color: P.text,
-    },
-    statLabel: {
-      fontSize: 12,
-      ...fontFaces.semibold,
-      color: P.muted,
-      marginTop: 2,
-    },
-    /* Streak card */
-    streakCard: {
-      marginHorizontal: 20,
-      marginTop: 20,
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 14,
-      backgroundColor: P.card,
-      borderRadius: 24,
-      padding: 18,
-      elevation: 5,
-      shadowColor: theme.colors.shadow,
-      shadowOffset: { width: 0, height: 6 },
-      shadowOpacity: 0.08,
-      shadowRadius: 10,
-    },
-    streakIconCircle: {
-      width: 52,
-      height: 52,
-      borderRadius: 26,
-      backgroundColor: P.soft,
-      alignItems: "center",
-      justifyContent: "center",
-    },
-    streakValue: {
-      fontSize: 16,
-      ...fontFaces.heavy,
-      color: P.text,
-      fontVariant: ["tabular-nums"],
-    },
-    streakSub: {
-      fontSize: 12,
-      ...fontFaces.semibold,
-      color: P.muted,
-      marginTop: 2,
-    },
-    streakArrow: {
-      width: 34,
-      height: 34,
-      borderRadius: 17,
-      backgroundColor: P.soft,
-      alignItems: "center",
-      justifyContent: "center",
-    },
-    /* Shared section card (Awards / Leaderboard) */
-    sectionCard: {
-      marginHorizontal: 20,
-      marginTop: 20,
-      backgroundColor: P.card,
-      borderRadius: 24,
-      padding: 20,
-      elevation: 5,
-      shadowColor: theme.colors.shadow,
-      shadowOffset: { width: 0, height: 6 },
-      shadowOpacity: 0.08,
-      shadowRadius: 10,
-    },
-    sectionHeader: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "space-between",
-      marginBottom: 16,
-    },
-    sectionTitle: {
-      fontSize: 16,
-      ...fontFaces.heavy,
-      color: P.text,
-    },
-    countPill: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 5,
-      backgroundColor: P.soft,
-      borderRadius: 12,
-      paddingHorizontal: 10,
-      paddingVertical: 5,
-    },
-    countPillText: {
-      fontSize: 11,
-      ...fontFaces.heavy,
-      color: "#C2410C",
-    },
-    /* Awards badges */
-    badgesRow: {
-      flexDirection: "row",
-      flexWrap: "wrap",
-      justifyContent: "space-between",
-    },
-    badgeItem: {
-      alignItems: "center",
-      width: "19%",
-      gap: 6,
-    },
-    badgeCircle: {
-      width: 48,
-      height: 48,
-      borderRadius: 24,
-      alignItems: "center",
-      justifyContent: "center",
-    },
-    badgeLocked: {
-      backgroundColor: P.soft,
-    },
-    badgeLabel: {
-      fontSize: 10,
-      ...fontFaces.bold,
-      color: P.textSecondary,
-      textAlign: "center",
-    },
-    badgeLabelLocked: {
-      color: P.faint,
-    },
-    /* Personal game leaderboard rows */
-    leaderRow: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 12,
-      paddingVertical: 10,
-    },
-    leaderRowDivider: {
-      borderBottomWidth: 1,
-      borderBottomColor: P.softBorder,
-    },
-    leaderRank: {
-      width: 22,
-      height: 22,
-      borderRadius: 11,
-      backgroundColor: P.soft,
-      alignItems: "center",
-      justifyContent: "center",
-    },
-    leaderRankText: {
-      fontSize: 11,
-      ...fontFaces.heavy,
-      color: "#C2410C",
-    },
-    leaderIconCircle: {
-      width: 40,
-      height: 40,
-      borderRadius: 20,
-      alignItems: "center",
-      justifyContent: "center",
-    },
-    leaderTitle: {
-      fontSize: 14,
-      ...fontFaces.heavy,
-      color: P.text,
-    },
-    leaderPlays: {
-      fontSize: 11,
-      ...fontFaces.semibold,
-      color: P.muted,
-      marginTop: 1,
-    },
-    leaderScorePill: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 5,
-      backgroundColor: P.soft,
-      borderRadius: 12,
-      paddingHorizontal: 12,
-      paddingVertical: 7,
-    },
-    leaderScorePillTop: {
-      backgroundColor: P.soft,
-    },
-    leaderScoreText: {
-      fontSize: 13,
-      ...fontFaces.heavy,
-      color: P.textSecondary,
-    },
-    leaderScoreTextTop: {
-      color: "#C2410C",
-    },
-    leaderNoScore: {
-      fontSize: 14,
-      ...fontFaces.heavy,
-      color: P.faint,
-    },
-
-    /* Achievement unlocked celebration */
-    celebrationOverlay: {
-      position: "absolute",
-      top: 0,
-      right: 0,
-      bottom: 0,
-      left: 0,
-      backgroundColor: theme.colors.overlay,
-      alignItems: "center",
-      justifyContent: "center",
-      paddingHorizontal: 24,
-      zIndex: 50,
-    },
-    celebrationCard: {
-      width: "100%",
-      maxWidth: 340,
-      backgroundColor: P.card,
-      borderRadius: 24,
-      padding: 24,
-      alignItems: "center",
-      elevation: 10,
-      shadowColor: theme.colors.shadow,
-      shadowOffset: { width: 0, height: 8 },
-      shadowOpacity: 0.2,
-      shadowRadius: 16,
-    },
-    celebrationIconWrap: {
-      width: 64,
-      height: 64,
-      borderRadius: 32,
-      backgroundColor: P.soft,
-      alignItems: "center",
-      justifyContent: "center",
-      marginBottom: 12,
-    },
-    celebrationTitle: {
-      fontSize: 18,
-      ...fontFaces.heavy,
-      color: P.text,
-      marginBottom: 16,
-    },
+    /* Badge ranked-up modal content (the card, header and button are the house ModalDialog) */
     celebrationRow: {
       flexDirection: "row",
       alignItems: "center",
@@ -1545,14 +616,6 @@ const createStyles = (theme: Theme) => {
       backgroundColor: P.soft,
       borderRadius: 14,
       padding: 12,
-      marginBottom: 10,
-    },
-    celebrationBadge: {
-      width: 44,
-      height: 44,
-      borderRadius: 22,
-      alignItems: "center",
-      justifyContent: "center",
     },
     celebrationBadgeTitle: {
       fontSize: 14,
@@ -1565,198 +628,48 @@ const createStyles = (theme: Theme) => {
       color: P.muted,
       marginTop: 1,
     },
-    celebrationButton: {
-      width: "100%",
-      backgroundColor: "#EA580C",
-      borderRadius: 16,
-      paddingVertical: 14,
-      alignItems: "center",
-      marginTop: 6,
-    },
-    celebrationButtonText: {
-      fontSize: 15,
-      ...fontFaces.heavy,
-      color: "#FFFFFF",
-    },
 
-    /* Avatar picker modal — beautiful */
-    avatarModalOverlay: {
-      flex: 1,
-      backgroundColor: theme.colors.overlay,
-      alignItems: "center",
-      justifyContent: "center",
-      paddingHorizontal: 20,
-    },
-    keyboardAvoidingView: {
-      flex: 1,
-      width: "100%",
-      justifyContent: "center",
-      alignItems: "center",
-    },
-    avatarModalContent: {
-      width: "100%",
-      maxWidth: 380,
-      maxHeight: "82%",
-      backgroundColor: P.card,
-      borderRadius: 26,
-      padding: 16,
-      paddingTop: 12,
-      borderWidth: 2,
-      borderColor: P.border,
-      borderBottomWidth: 4,
-      shadowColor: theme.colors.shadow,
-      shadowOffset: { width: 0, height: 8 },
-      shadowOpacity: 0.12,
-      shadowRadius: 16,
-      elevation: 10,
-      overflow: "hidden",
-      flexShrink: 1,
-    },
-    avatarModalScroll: {
-      width: "100%",
-      flexGrow: 1,
-      flexShrink: 1,
-    },
-    avatarModalScrollContent: {
-      paddingBottom: 4,
-    },
-    dragHandle: {
-      width: 36,
-      height: 4,
-      borderRadius: 2,
-      backgroundColor: P.border,
-      alignSelf: "center",
-      marginBottom: 8,
-    },
-    avatarModalHeader: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "center",
-      marginBottom: 8,
-    },
-    editHeaderLeft: {
+    /* Edit profile modal (a ModalDialog; these are its content) */
+
+    preview: {
       flexDirection: "row",
       alignItems: "center",
-      gap: 10,
-    },
-    editHeaderIcon: {
-      width: 32,
-      height: 32,
-      borderRadius: 16,
-      backgroundColor: P.soft,
-      alignItems: "center",
-      justifyContent: "center",
-    },
-    avatarModalTitle: {
-      fontSize: 18,
-      ...fontFaces.heavy,
-      color: P.text,
-    },
-    closeButton: {
-      padding: 4,
-    },
-    closeButtonNew: {
-      width: 36,
-      height: 36,
-      borderRadius: 18,
-      backgroundColor: P.soft,
-      alignItems: "center",
-      justifyContent: "center",
-      borderWidth: 1,
-      borderColor: P.border,
-    },
-    previewCard: {
-      backgroundColor: theme.colors.surfaceSoft,
-      borderRadius: 20,
-      padding: 10,
-      gap: 6,
-      marginBottom: 12,
-    },
-    previewLabel: {
-      fontSize: 10,
-      ...fontFaces.heavy,
-      color: theme.colors.textMuted,
-      textTransform: "uppercase",
-      letterSpacing: 0.7,
-      paddingHorizontal: 4,
-    },
-    previewInner: {
-      backgroundColor: P.card,
-      borderRadius: 16,
+      gap: 14,
       padding: 12,
-      borderWidth: 2,
-      borderColor: P.border,
-      borderBottomWidth: 4,
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 12,
+      borderRadius: 16,
+      backgroundColor: theme.colors.surfaceSoft,
     },
-    previewAvatarWrap: {
-      position: "relative",
-    },
-    previewAvatar: {
-      width: 56,
-      height: 56,
-      borderRadius: 28,
-      backgroundColor: P.soft,
+    previewPhotoWrap: { padding: 3 },
+    /* The same tilted white frame as the passport's photo */
+    previewPhotoFrame: {
+      padding: 3,
+      borderRadius: 22,
+      backgroundColor: theme.colors.card,
       borderWidth: 2,
-      borderColor: P.soft,
+      borderColor: theme.colors.border,
+      transform: [{ rotate: "-6deg" }],
     },
     previewLevelBadge: {
       position: "absolute",
-      bottom: -4,
-      right: -4,
-      backgroundColor: "#EA580C",
-      width: 22,
-      height: 22,
-      borderRadius: 11,
+      bottom: -3,
+      right: -3,
+      minWidth: 24,
+      height: 24,
+      paddingHorizontal: 4,
+      borderRadius: 12,
       alignItems: "center",
       justifyContent: "center",
+      backgroundColor: theme.colors.primary,
       borderWidth: 2,
-      borderColor: theme.colors.card,
+      borderColor: theme.colors.surfaceSoft,
     },
-    previewLevelText: {
-      color: "#FFFFFF",
-      fontSize: 10,
-      ...fontFaces.heavy,
-    },
-    previewName: {
-      fontSize: 16,
-      ...fontFaces.heavy,
-      color: P.text,
-      marginBottom: 2,
-    },
-    previewTitle: {
-      fontSize: 12,
-      ...fontFaces.semibold,
-      color: P.muted,
-    },
-    previewXpRow: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 4,
-      marginTop: 4,
-    },
-    previewXp: {
-      fontSize: 11,
-      ...fontFaces.bold,
-      color: "#C2410C",
-    },
-    previewCheck: {
-      width: 28,
-      height: 28,
-      borderRadius: 14,
-      backgroundColor: P.soft,
-      alignItems: "center",
-      justifyContent: "center",
-    },
-    avatarModalGrid: {
-      paddingTop: 4,
-      paddingBottom: 8,
-    },
-    nameFieldSection: {
-      marginBottom: 14,
-    },
+    previewLevelText: { color: theme.colors.onPrimary, fontSize: 11, ...fontFaces.heavy },
+    previewText: { flex: 1, gap: 1 },
+    previewName: { fontSize: 18, ...fontFaces.heavy, color: theme.colors.text },
+    previewTitle: { fontSize: 13, ...fontFaces.bold, color: theme.colors.textMuted },
+    previewXp: { fontSize: 12, ...fontFaces.bold, color: theme.colors.primaryDark },
+
+    nameFieldSection: {},
     nameFieldHeader: {
       flexDirection: "row",
       justifyContent: "space-between",
@@ -1764,24 +677,22 @@ const createStyles = (theme: Theme) => {
       marginBottom: 8,
     },
     nameFieldLabel: {
-      fontSize: 12,
-      ...fontFaces.heavy,
-      color: P.faint,
-      textTransform: "uppercase",
-      letterSpacing: 0.4,
+      fontSize: 13,
+      ...fontFaces.semibold,
+      color: theme.colors.textMuted,
     },
     charCount: {
-      fontSize: 11,
+      fontSize: 12,
       ...fontFaces.semibold,
-      color: P.faint,
+      color: theme.colors.textFaint,
     },
+    /* A plain rounded field, no border */
     nameInputWrap: {
       flexDirection: "row",
       alignItems: "center",
-      backgroundColor: P.card,
-      borderWidth: 1,
-      borderColor: P.border,
-      borderRadius: 12,
+      backgroundColor: theme.colors.field,
+      borderRadius: 14,
+      minHeight: 56,
       paddingRight: 8,
     },
     nameInput: {
@@ -1792,115 +703,16 @@ const createStyles = (theme: Theme) => {
       paddingVertical: 12,
       fontSize: 15,
       ...fontFaces.semibold,
-      color: P.text,
+      color: theme.colors.fieldText,
     },
     clearButton: {
       padding: 6,
     },
     nameCooldownHint: {
-      fontSize: 11,
+      fontSize: 12,
       ...fontFaces.medium,
-      color: P.faint,
+      color: theme.colors.textFaint,
       marginTop: 6,
-    },
-    avatarSectionHeader: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "center",
-      marginBottom: 8,
-      marginTop: 4,
-    },
-    avatarCount: {
-      fontSize: 11,
-      ...fontFaces.semibold,
-      color: P.faint,
-    },
-    avatarOptionsWrap: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 12,
-      paddingHorizontal: 4,
-      paddingVertical: 8,
-      paddingRight: 16,
-    },
-    avatarScroll: {
-      height: 88,
-      flexGrow: 0,
-      flexShrink: 0,
-      marginTop: 4,
-    },
-    avatarOptionWrapper: {
-      position: "relative",
-      width: 72,
-      height: 72,
-    },
-    saveButton: {
-      marginTop: 12,
-      alignSelf: "stretch",
-      backgroundColor: "#EA580C",
-      borderRadius: 14,
-      paddingVertical: 14,
-      alignItems: "center",
-      justifyContent: "center",
-      shadowColor: "#EA580C",
-      shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.3,
-      shadowRadius: 8,
-      elevation: 4,
-      flexShrink: 0,
-    },
-    saveButtonDisabled: {
-      opacity: 0.4,
-      shadowOpacity: 0,
-      elevation: 0,
-    },
-    saveButtonContent: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 8,
-    },
-    saveButtonText: {
-      fontSize: 16,
-      ...fontFaces.heavy,
-      color: "#FFFFFF",
-    },
-    avatarModalOption: {
-      width: 72,
-      height: 72,
-      borderRadius: 36,
-      overflow: "hidden",
-      borderWidth: 2,
-      borderColor: P.border,
-      backgroundColor: P.card,
-    },
-    avatarModalOptionSelected: {
-      borderColor: "#EA580C",
-      borderWidth: 3,
-      shadowColor: "#EA580C",
-      shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.15,
-      shadowRadius: 8,
-      elevation: 3,
-    },
-    avatarModalOptionDisabled: {
-      opacity: 0.65,
-    },
-    avatarModalOptionImage: {
-      width: "100%",
-      height: "100%",
-    },
-    avatarModalCheck: {
-      position: "absolute",
-      bottom: -2,
-      right: -2,
-      width: 22,
-      height: 22,
-      borderRadius: 11,
-      backgroundColor: "#22C55E",
-      alignItems: "center",
-      justifyContent: "center",
-      borderWidth: 2,
-      borderColor: theme.colors.card,
     },
   });
 };

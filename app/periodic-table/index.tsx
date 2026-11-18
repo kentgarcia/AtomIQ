@@ -7,23 +7,23 @@
  */
 
 import { useRouter } from "expo-router";
+import { FieldInput } from "@/components/ui/field-input";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
-  AccessibilityInfo,
-  FlatList,
-  Pressable,
-  ScrollView,
-  Text,
-  TextInput,
-  View,
+    AccessibilityInfo,
+    FlatList,
+    Pressable,
+    ScrollView,
+    View,
 } from "react-native";
+import { Text } from "@/components/ui/text";
 import { useReducedMotion } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { ElementGrid } from "@/components/periodic-table/ElementGrid";
 import { ElementListRow } from "@/components/periodic-table/ElementListRow";
 import { useCategoryColors } from "@/components/periodic-table/use-category-colors";
-import { PageHeader } from "@/components/ui/page-header";
+import { ScreenHeader, useHeaderBorder } from "@/components/layout";
 import { Icon } from "@/components/ui/icon";
 import {
   CATEGORY_BLURBS,
@@ -43,24 +43,22 @@ const DEFAULT_ZOOM = 1;
 
 const makeStyles = createStyles((theme) => ({
   root: { flex: 1, backgroundColor: theme.colors.background },
-  controls: { gap: 10, paddingBottom: 8 },
+  controls: { gap: 10, paddingTop: 12, paddingBottom: 8 },
   searchRow: {
     flexDirection: "row",
     alignItems: "center",
     gap: 10,
-    minHeight: layout.minTouchTarget,
+    minHeight: 56,
     paddingHorizontal: 14,
     borderRadius: 16,
-    backgroundColor: theme.colors.input,
-    borderWidth: 1.5,
-    borderColor: theme.colors.borderStrong,
+    backgroundColor: theme.colors.field,
   },
   searchInput: {
     flex: 1,
-    minHeight: layout.minTouchTarget,
+    minHeight: 56,
     fontSize: 15,
     ...fontFaces.semibold,
-    color: theme.colors.text,
+    color: theme.colors.fieldText,
     paddingVertical: 0,
   },
   clearBtn: {
@@ -207,6 +205,7 @@ function useScreenReaderEnabled(): boolean {
 export default function PeriodicTableScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const { scrolled, onScroll, scrollEventThrottle } = useHeaderBorder();
   const { theme } = useTheme();
   const styles = useMemo(() => makeStyles(theme), [theme]);
   const colors = useCategoryColors();
@@ -278,12 +277,11 @@ export default function PeriodicTableScreen() {
     <View style={[mode === "grid" ? contentFrameStyle : null, styles.controls]}>
       <View style={styles.searchRow}>
         <Icon name="SearchNormal" size={18} color={theme.colors.textSecondary} variant="Bold" />
-        <TextInput
+        <FieldInput
           style={styles.searchInput}
           value={query}
           onChangeText={setQuery}
           placeholder="Search name, symbol or number"
-          placeholderTextColor={theme.colors.textSecondary}
           accessibilityLabel="Search elements by name, symbol or atomic number"
           autoCapitalize="none"
           autoCorrect={false}
@@ -397,10 +395,11 @@ export default function PeriodicTableScreen() {
 
   return (
     <View style={styles.root}>
-      <PageHeader
+      <ScreenHeader
         title="Periodic Table"
         subtitle="Tap an element to learn more"
         onBack={onBack}
+        scrolled={scrolled}
       />
       {mode === "list" ? (
         <FlatList
@@ -410,6 +409,8 @@ export default function PeriodicTableScreen() {
           ListHeaderComponent={controls}
           ListEmptyComponent={empty}
           ItemSeparatorComponent={RowSeparator}
+          onScroll={onScroll}
+          scrollEventThrottle={scrollEventThrottle}
           keyboardShouldPersistTaps="handled"
           initialNumToRender={14}
           maxToRenderPerBatch={14}
@@ -422,6 +423,8 @@ export default function PeriodicTableScreen() {
         />
       ) : (
         <ScrollView
+          onScroll={onScroll}
+          scrollEventThrottle={scrollEventThrottle}
           keyboardShouldPersistTaps="handled"
           contentContainerStyle={{ paddingBottom: insets.bottom + 24 }}
           showsVerticalScrollIndicator={false}

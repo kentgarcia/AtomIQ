@@ -8,6 +8,8 @@
  *   - the head layers sway about the neck (not while a hand is on the face),
  *   - a blink fades the lids layer in and out,
  *   - a new pose cross-fades from the old one (a short fade, never a hard swap).
+ * The `bust` form (the lesson teacher) holds still instead: no bob, no sway, so its rounded shirt edge stays
+ * put against the frame; only expressions move (blinks, a glance, a grin, each cross-faded over the resting face).
  * One loop clock drives all of it. Still (frame 0) with reduced motion, when the screen is not in
  * front, when `live` is false, or at chip size. See components/motion/MOTION.md.
  */
@@ -25,6 +27,7 @@ import {
   NPC_BLINK_MS,
   NPC_IDLE_PERIODS,
   NPC_LOOP_MS,
+  NPC_MOOD_FADE,
   NPC_VIEWBOX,
   POSES,
   buildNpc,
@@ -54,18 +57,41 @@ const BOB_UNITS = 1.6;
 const SWAY_DEG = 1.3;
 const FADE_MS = 220;
 
+/** A mood's opacity over the loop: 0, up over the fade, held, down over the fade, 0. */
+function moodKeys(from: number, to: number): Keys {
+  return [
+    [0, 0],
+    [from, 0],
+    [from + NPC_MOOD_FADE, 1],
+    [to, 1],
+    [to + NPC_MOOD_FADE, 0],
+    [NPC_LOOP_MS, 0],
+  ];
+}
+
+/** One expression of the bust, faded in over the resting face and out again. */
+function MoodLayer({ parts, from, to, form, width, height, clock }: { parts: Part[]; from: number; to: number; form: NpcForm; width: number; height: number; clock: SharedValue<number> }) {
+  const keys = useMemo(() => moodKeys(from, to), [from, to]);
+  const style = useAnimatedStyle(() => ({ opacity: track(clock.value, keys) }));
+  return (
+    <Animated.View style={[StyleSheet.absoluteFill, style]}>
+      <Layer parts={parts} form={form} width={width} height={height} />
+    </Animated.View>
+  );
+}
+
 export interface NpcProps {
   spec: NpcSpec;
   pose?: PoseId;
   /** Rendered height in dp. */
   size?: number;
-  /** `hero`: the bust with arms. `head`: head and shoulders (chips, banners). */
+  /** `hero`: the bust with arms. `head`: head and shoulders (chips, banners). `bust`: the lesson teacher, close in and held still. */
   form?: NpcForm;
   /** Idle life. False draws one still frame. Chips pass false. */
   live?: boolean;
   /** The locked ("before") version: cool pastels, never grey. */
   muted?: boolean;
-  /** Scales the idle breathing and head sway (default 1). For a figure shown large and still for a while. */
+  /** Scales the idle breathing and head sway (default 1). For a figure shown large and still for a while. The `bust` ignores it: it never moves. */
   lively?: number;
   style?: StyleProp<ViewStyle>;
 }
@@ -107,7 +133,7 @@ const Figure = memo(function Figure({
   clock: SharedValue<number> | null;
   lively: number;
 }) {
-  const tree = useMemo(() => buildNpc(spec, pose), [spec, pose]);
+  const tree = useMemo(() => buildNpc(spec, pose, form), [spec, pose, form]);
   const vb = NPC_VIEWBOX[form];
   const scale = height / vb.h;
   const sway = POSES[pose].sway;
@@ -122,6 +148,23 @@ const Figure = memo(function Figure({
   const lidStyle = useAnimatedStyle(() => ({ opacity: clock ? track(clock.value, BLINK) : 0 }));
 
   if (!clock) return <Layer parts={treeParts(tree)} form={form} width={width} height={height} />;
+  if (tree.moods) {
+    // Held still: nothing translates or rotates, only expressions change
+    return (
+      <Animated.View style={StyleSheet.absoluteFill}>
+        <Layer parts={tree.back} form={form} width={width} height={height} />
+        <Layer parts={tree.face} form={form} width={width} height={height} />
+        {tree.moods.map((m, i) => (
+          <MoodLayer key={i} parts={m.face} from={m.from} to={m.to} form={form} width={width} height={height} clock={clock} />
+        ))}
+        <Animated.View style={[StyleSheet.absoluteFill, lidStyle]}>
+          <Layer parts={tree.lids} form={form} width={width} height={height} />
+        </Animated.View>
+        <Layer parts={tree.top} form={form} width={width} height={height} />
+        <Layer parts={tree.front} form={form} width={width} height={height} />
+      </Animated.View>
+    );
+  }
   return (
     <Animated.View style={[StyleSheet.absoluteFill, bodyStyle]}>
       <Layer parts={tree.back} form={form} width={width} height={height} />

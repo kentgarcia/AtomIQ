@@ -8,7 +8,7 @@ Every learner-facing question must read as a complete, understandable thought fr
 
 | Command | What it does |
 | --- | --- |
-| `npm run validate:content` | Read-only check of `content/database/content.db`. Exit code 1 on any error. Add `--warnings` to list warnings, `--json` for machine output, `--db <path>` to check another file (for example `assets/database/content.db`), `--strict-review` for the release gate that also requires every article and post to be `reviewed`. |
+| `npm run validate:content` | Read-only check of `content/database/content.db`. Exit code 1 on any error. Add `--warnings` to list warnings, `--json` for machine output, `--db <path>` to check another file (for example `assets/database/content.db`), `--strict-review` for the release gate that also makes unverified content references errors. |
 | `npm run test:content` | Unit tests for the rule engine (`scripts/test-validate-content.mjs`). No database needed. |
 | `node --no-warnings scripts/content-migration/fix-question-context.mjs [--dry-run]` | Repeatable migration that lists every question fix as `id: old -> new`, checks the old text still matches, re-checks that the correct answer is unchanged, and applies all changes in one transaction. |
 
@@ -21,7 +21,7 @@ Rules live in `scripts/lib/content-rules.mjs`. The validator is `scripts/validat
 - `lesson_steps` of type `assessment`, `lab` (task and scenario), `myth_buster`, plus placeholder checks on `micro_learn`, `briefing`, `debrief`
 - `maze_rooms.questions` and any inline `mazes.boss.questions` (scramble clues get structural checks only; the game does not currently render them)
 - `myths` (the Myth-or-Fact statements and realities)
-- `articles` and `posts` (see `ARTICLE_PIPELINE.md`)
+- curriculum v2: `items`, `lesson_cards` and `content_references` (rules in `scripts/lib/curriculum-rules.mjs`)
 
 ## Rules
 

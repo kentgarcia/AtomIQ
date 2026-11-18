@@ -117,7 +117,7 @@ All values are defaults. Phone is the target; on a wide tablet or web window, sc
 
 ### C7. Profile: award badge and activity strip open their details
 
-- **Where:** `app/(tabs)/profile.tsx` (award badges → `achievement-detail`, a `presentation: "modal"` screen), `components/activity/RecentActivityStrip.tsx` → `app/streak.tsx` (shows `ContributionGraph`).
+- **Where:** `app/(tabs)/profile.tsx` (award badges → `achievement-detail`, a `presentation: "modal"` screen), `components/profile/StreakCard.tsx` → `app/streak.tsx` (shows `ContributionGraph`).
 - **Now:** Badge: modal slide-up, then a staggered `FadeInDown`. The strip (the last 14 days as small squares) opens the streak screen, where the full contribution graph is drawn fresh.
 - **Pattern:** b for the badge; e for the strip (small marks become the large marks).
 - **Change:** badge circle and icon grow into the detail hero, rest fades in after about 50%, drag-down on the modal returns it to the badge. Strip: the 14 cells should be the same cells as the most recent 14 in the graph, scaled up with their level colours, with the label moving into the title. Reduced motion: `FadeIn.duration(120)` (`achievement-detail` already does this).

@@ -11,7 +11,7 @@
 //     merge: true }                // custom widget returns several keys
 //
 // Types: text number textarea markdown select checkbox date strings refs icon
-//        objects author json group list custom section
+//        objects json group list custom section
 //
 // group:  { fields | (values) => fields, optional?, preserve? }
 // list:   { item: { fields } | variants: { typeKey, types: { name: { fields } } },
@@ -339,32 +339,6 @@ function objectsWidget(def, value, env) {
   };
 }
 
-function authorWidget(_def, value, env) {
-  const a = value && typeof value === "object" ? value : {};
-  const box = el("div", "author");
-  const mk = (key, ph) => {
-    const i = el("input");
-    i.type = "text";
-    i.placeholder = ph;
-    i.value = a[key] ?? "";
-    i.addEventListener("input", () => env.notify());
-    return i;
-  };
-  const name = mk("name", "Name (e.g. AtomIQ Editorial Team)");
-  const title = mk("title", "Title (optional)");
-  const avatar = mk("avatar", "Avatar: @/assets/… path or https://…");
-  box.append(name, title, avatar);
-  return {
-    el: box,
-    get: () => ({
-      ...a,
-      name: name.value,
-      ...(title.value ? { title: title.value } : {}),
-      ...(avatar.value ? { avatar: avatar.value } : {}),
-    }),
-  };
-}
-
 function jsonWidget(def, value, env) {
   const t = el("textarea", "tall mono");
   t.rows = def.rows ?? 8;
@@ -672,7 +646,6 @@ const WIDGETS = {
   refs: refsWidget,
   icon: iconWidget,
   objects: objectsWidget,
-  author: authorWidget,
   json: jsonWidget,
   group: groupWidget,
   list: listWidget,

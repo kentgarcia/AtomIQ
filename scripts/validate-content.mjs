@@ -6,15 +6,14 @@
  *   node --no-warnings scripts/validate-content.mjs --db assets/database/content.db
  *   node --no-warnings scripts/validate-content.mjs --warnings   # also print warnings
  *   node --no-warnings scripts/validate-content.mjs --json       # machine-readable output
- *   node --no-warnings scripts/validate-content.mjs --strict-review  # release gate: all articles must be reviewed
+ *   node --no-warnings scripts/validate-content.mjs --strict-review  # release gate: unverified references become errors
  *
  * Read-only. Exits 1 when any error-severity finding exists.
  *
  * Surfaces covered (every learner-facing question):
  *   items + lesson_cards (curriculum v2: item bank, card text, scenes, references; rules in
  *   scripts/lib/curriculum-rules.mjs), mythbuster_questions (also the Atom Maze boss + endless pool),
- *   maze_rooms.questions + mazes.boss.questions, myths (Myth-or-Fact statements),
- *   and articles/posts (research pipeline metadata, see docs/ARTICLE_PIPELINE.md).
+ *   maze_rooms.questions + mazes.boss.questions and myths (Myth-or-Fact statements).
  *
  * Rules live in scripts/lib/content-rules.mjs; see docs/CONTENT_QUESTION_QUALITY.md.
  */
@@ -37,7 +36,7 @@ const option = (name, fallback) => {
 const dbPath = path.resolve(ROOT, option("--db", "content/database/content.db"));
 const showWarnings = flag("--warnings");
 const asJson = flag("--json");
-const strictReview = flag("--strict-review"); // release gate: every article/post must be review_status = reviewed
+const strictReview = flag("--strict-review"); // release gate: every content reference must be verified
 
 const db = new DatabaseSync(dbPath, { readOnly: true });
 const { checked, errors, warnings } = validateDatabase(db, { strictReview });

@@ -141,7 +141,7 @@ describe("access control", () => {
       assert.match(r.headers["content-type"], /javascript/);
       for (const m of r.raw.toString().matchAll(/from "\.\/([a-z-]+\.js)"/g)) queue.push(`js/${m[1]}`);
     }
-    assert.equal(seen.size, 6, `loaded ${[...seen].join(", ")}`);
+    assert.equal(seen.size, 7, `loaded ${[...seen].join(", ")}`);
   });
 });
 
@@ -189,15 +189,221 @@ describe("validation on save", () => {
   });
 
   it("blocks a lesson save that breaks the curriculum rules", async () => {
-    const lessonId = query(fx.paths, "SELECT id FROM lessons ORDER BY id LIMIT 1")[0].id;
+    // A lesson with a reveal card that answers a prediction (not every lesson has one).
+    const lessonId = query(fx.paths, "SELECT lesson_id AS id FROM lesson_cards WHERE type = 'reveal' ORDER BY lesson_id LIMIT 1")[0].id;
     const { json } = await call("GET", `/api/entities/lessons/${lessonId}`);
     const { row, children } = json.entity;
-    // Remove every prediction: the lesson rules require one.
+    // Remove every prediction: a reveal card that points at it then breaks the lesson rules.
     const items = new Set(query(fx.paths, "SELECT id FROM items WHERE type = 'predict'").map((r) => r.id));
     const stripped = children.lesson_cards.filter((c) => !items.has(c.item_id)).map(({ position, ...c }) => c);
     const r = await call("PUT", `/api/entities/lessons/${lessonId}`, { body: { row: { title: row.title }, children: stripped } });
     assert.equal(r.status, 422);
     assert.ok(r.json.errors.some((e) => e.rule === "lesson-predict" || e.rule === "card-reveal"), JSON.stringify(r.json.errors?.slice(0, 3)));
+  });
+});
+
+describe("feed templates and blog pieces (docs/NPC_FEED_SPEC.md §6)", () => {
+  const BLOG = "blog-the-smallest-thing";
+  const entity = async (table, id) => (await call("GET", `/api/entities/${table}/${id}`)).json.entity;
+  const count = (sql, ...params) => query(fx.paths, sql, ...params)[0].n;
+  /** A save body from the stored entity: comments and links as the editor sends them. */
+  const bodyFor = async (changes = {}) => {
+    const { row, children } = await entity("blog_posts", BLOG);
+    const comments = children.blog_comments.map(({ position, blog_id, ...c }) => c);
+    const links = children.blog_references.map((r) => ({ reference_id: r.reference_id }));
+    return { row: { title: row.title, ...changes.row }, children: changes.children ?? comments, links: changes.links ?? links };
+  };
+  const ruleOf = (r) => (r.json?.errors ?? []).map((e) => e.rule);
+  const template = (over = {}) => ({
+    id: "ft-test-new",
+    npc_id: "npc-ada",
+    poster_pool: [],
+    kind: "celebrate",
+    trigger: "lesson_complete",
+    condition: { unitId: "inside-the-atom", lessonId: "isotopes" },
+    text: "You finished “{lesson}”. Well done.",
+    chip: "lesson",
+    reactors: ["npc-hal"],
+    weight: 1,
+    ...over,
+  });
+
+  it("serves the vocabulary and the entity wiring to the panels", async () => {
+    const meta = (await call("GET", "/api/meta")).json;
+    assert.equal(meta.entityChildren.blog_posts.table, "blog_comments");
+    assert.equal(meta.entityLinks.blog_posts.table, "blog_references");
+    assert.ok(meta.tables.find((t) => t.name === "feed_templates").jsonColumns.includes("condition"));
+    assert.ok(meta.tables.find((t) => t.name === "blog_comments").jsonColumns.includes("chip"));
+    assert.deepEqual(meta.feedVocab.TEMPLATE_TRIGGER_KEYS.includes("blog_unlocked"), false);
+    assert.ok(meta.feedVocab.artIds.includes("atom"));
+    assert.deepEqual(meta.feedVocab.FEED_TRIGGERS.streak.placeholders, ["days", "name"]);
+    // NPC pickers show names, not job titles
+    const refs = (await call("GET", "/api/refs?table=npcs")).json.items;
+    assert.equal(refs.find((r) => r.id === "npc-ada").label, "Ada");
+  });
+
+  it("has the seeded templates and pieces, and the problems list counts them", async () => {
+    assert.ok(count("SELECT COUNT(*) n FROM feed_templates") >= 40);
+    assert.equal(count("SELECT COUNT(*) n FROM blog_posts"), 4);
+    const problems = (await call("GET", "/api/problems")).json;
+    assert.ok(problems.checked.feed_templates >= 40 && problems.checked.blog_posts === 4 && problems.checked.blog_comments === 4);
+    assert.equal(problems.errors.filter((e) => /^(feed|blog)/.test(e.rule)).length, 0);
+  });
+
+  it("creates, edits and deletes a feed template", async () => {
+    const made = await call("POST", "/api/entities/feed_templates", { body: { row: template() } });
+    assert.equal(made.status, 201, JSON.stringify(made.json));
+    assert.deepEqual(made.json.entity.row.condition, { unitId: "inside-the-atom", lessonId: "isotopes" }, "JSON columns come back parsed");
+    assert.deepEqual(made.json.entity.row.reactors, ["npc-hal"]);
+
+    const edited = await call("PUT", "/api/entities/feed_templates/ft-test-new", { body: { row: { text: "“{lesson}” is done. Nice work." } } });
+    assert.equal(edited.status, 200, JSON.stringify(edited.json));
+    assert.equal(query(fx.paths, "SELECT text FROM feed_templates WHERE id = 'ft-test-new'")[0].text, "“{lesson}” is done. Nice work.");
+
+    const del = await call("DELETE", "/api/entities/feed_templates/ft-test-new");
+    assert.equal(del.status, 200);
+    assert.equal(count("SELECT COUNT(*) n FROM feed_templates WHERE id = 'ft-test-new'"), 0);
+  });
+
+  it("rejects an invalid feed template with the rule and changes nothing", async () => {
+    const bad = {
+      "feed-placeholder": template({ id: "ft-bad-1", text: "{rival} passed you." }),
+      "feed-text": template({ id: "ft-bad-2", text: "x".repeat(221) }),
+      "feed-condition": template({ id: "ft-bad-3", condition: { unitId: "nope" } }),
+      "feed-trigger": template({ id: "ft-bad-4", trigger: "daily_login" }),
+      "feed-chip": template({ id: "ft-bad-5", chip: "ranks" }),
+      "feed-reactors": template({ id: "ft-bad-6", reactors: ["npc-ada"] }),
+      "feed-poster": template({ id: "ft-bad-7", npc_id: null, poster_pool: [] }),
+    };
+    for (const [rule, row] of Object.entries(bad)) {
+      const r = await call("POST", "/api/entities/feed_templates", { body: { row } });
+      assert.equal(r.status, 422, `${rule}: ${JSON.stringify(r.json)}`);
+      assert.ok(ruleOf(r).includes(rule), `${rule} expected, got ${ruleOf(r)}`);
+      assert.equal(count("SELECT COUNT(*) n FROM feed_templates WHERE id = ?", row.id), 0);
+    }
+    // the raw row route validates too
+    const first = query(fx.paths, "SELECT id, text FROM feed_templates LIMIT 1")[0];
+    const long = await call("PUT", `/api/rows/feed_templates/${first.id}`, { body: { text: "x".repeat(300) } });
+    assert.equal(long.status, 422);
+    assert.equal(query(fx.paths, "SELECT text FROM feed_templates WHERE id = ?", first.id)[0].text, first.text);
+    // a CHECK failure is a 422, not a 500
+    assert.equal((await call("PUT", `/api/rows/feed_templates/${first.id}`, { body: { kind: "gossip" } })).status, 422);
+  });
+
+  it("reads a blog piece with its comments and sources", async () => {
+    const { row, children } = await entity("blog_posts", BLOG);
+    assert.ok(Array.isArray(row.blocks) && row.blocks.at(-1).t === "next", "blocks arrive parsed");
+    assert.deepEqual(row.unlock, { trigger: "none" });
+    assert.equal(children.blog_comments.length, 2);
+    assert.deepEqual(children.blog_comments.map((c) => c.position), [0, 1]);
+    assert.equal(typeof children.blog_comments[0].chip, "object", "comment chips arrive parsed");
+    assert.deepEqual(children.blog_references.map((r) => r.reference_id), ["ref-openstax-chem-ch1", "ref-openstax-chem-ch2"]);
+  });
+
+  it("saves a piece with its comments and sources atomically, and keeps sources when none are sent", async () => {
+    const base = await bodyFor();
+    const added = [...base.children, { id: "bc-test-tess", npc_id: "npc-tess", text: "A third, short comment.", chip: { lessonId: "isotopes" } }];
+    const ok = await call("PUT", `/api/entities/blog_posts/${BLOG}`, { body: { ...base, children: added, links: [{ reference_id: "ref-openstax-chem-ch1" }] } });
+    assert.equal(ok.status, 200, JSON.stringify(ok.json));
+    assert.deepEqual(query(fx.paths, "SELECT id FROM blog_comments WHERE blog_id = ? ORDER BY position", BLOG).map((r) => r.id), ["bc-the-smallest-thing-ray", "bc-the-smallest-thing-hal", "bc-test-tess"]);
+    assert.deepEqual(query(fx.paths, "SELECT reference_id FROM blog_references WHERE blog_id = ?", BLOG).map((r) => r.reference_id), ["ref-openstax-chem-ch1"]);
+
+    // no `links` in the body: the sources stay
+    const { links: _skip, ...noLinks } = await bodyFor();
+    const keep = await call("PUT", `/api/entities/blog_posts/${BLOG}`, { body: noLinks });
+    assert.equal(keep.status, 200, JSON.stringify(keep.json));
+    assert.equal(count("SELECT COUNT(*) n FROM blog_references WHERE blog_id = ?", BLOG), 1);
+
+    // history keeps the links and comments, so a save can be undone
+    const h = (await call("GET", `/api/entities/blog_posts/${BLOG}/history`)).json.revisions;
+    const rev = (await call("GET", `/api/history/${h[0].id}`)).json.revision;
+    assert.ok(rev.before.children.blog_references.length >= 1 && rev.after.children.blog_comments.length >= 2);
+  });
+
+  it("rejects invalid comments with the rule and changes nothing", async () => {
+    const base = await bodyFor();
+    const comments = (extra) => [...base.children, { id: "bc-test-bad", text: "A comment.", ...extra }];
+    const cases = {
+      "blog-comment-author": comments({ npc_id: "npc-ada" }),
+      "blog-comment-dup": comments({ npc_id: "npc-ray" }),
+      "blog-comment-length": comments({ npc_id: "npc-mina", text: "c".repeat(201) }),
+      "blog-comment-chip": comments({ npc_id: "npc-mina", chip: { lessonId: "no-such-lesson" } }),
+      "blog-comment-count": [...comments({ npc_id: "npc-mina" }), { id: "bc-t2", npc_id: "npc-kofi", text: "Four." }, { id: "bc-t3", npc_id: "npc-tess", text: "Five." }],
+    };
+    for (const [rule, children] of Object.entries(cases)) {
+      const r = await call("PUT", `/api/entities/blog_posts/${BLOG}`, { body: { ...base, children } });
+      assert.equal(r.status, 422, `${rule}: ${JSON.stringify(r.json)}`);
+      assert.ok(ruleOf(r).includes(rule), `${rule} expected, got ${ruleOf(r)}`);
+    }
+    assert.equal(count("SELECT COUNT(*) n FROM blog_comments WHERE blog_id = ?", BLOG), 3, "the failed saves rolled back");
+    // a single comment row through the raw route is validated against its piece
+    const raw = await call("PUT", "/api/rows/blog_comments/bc-the-smallest-thing-ray", { body: { npc_id: "npc-ada" } });
+    assert.equal(raw.status, 422);
+    assert.ok(ruleOf(raw).includes("blog-comment-author"));
+  });
+
+  it("rejects an invalid blog piece with the rule and changes nothing", async () => {
+    const { row } = await entity("blog_posts", BLOG);
+    const body = (changes) => bodyFor({ row: changes });
+    const noNext = row.blocks.slice(0, -1);
+    const cases = {
+      "blog-next": { blocks: noNext },
+      "blog-hook": { hook: "h".repeat(121) },
+      "blog-cover": { cover: "unicorn" },
+      "blog-words": { blocks: [{ t: "p", text: "Too short." }, row.blocks.at(-1)], read_min: 1 },
+      "blog-read-min": { read_min: 9 },
+      "blog-unlock": { unlock: { trigger: "lesson_complete", lessonId: "no-such-lesson" } },
+      "blog-blocks": { blocks: [{ t: "video", text: "x" }, ...row.blocks] },
+      "blog-meta": { title: "" },
+      constraint: { npc_id: "npc-nobody" },
+    };
+    for (const [rule, changes] of Object.entries(cases)) {
+      const r = await call("PUT", `/api/entities/blog_posts/${BLOG}`, { body: await body(changes) });
+      assert.ok([409, 422].includes(r.status), `${rule}: ${r.status} ${JSON.stringify(r.json)}`);
+      if (r.status === 422) assert.ok(ruleOf(r).includes(rule), `${rule} expected, got ${ruleOf(r)}`);
+    }
+    assert.equal(query(fx.paths, "SELECT hook FROM blog_posts WHERE id = ?", BLOG)[0].hook, row.hook);
+  });
+
+  it("creates a piece, then deleting it removes its comments and sources and a restore brings them back", async () => {
+    const source = await entity("blog_posts", "blog-the-banana-on-your-counter");
+    const row = { ...source.row, id: "blog-test-piece", title: "A test piece" };
+    delete row.created_at;
+    delete row.updated_at;
+    const made = await call("POST", "/api/entities/blog_posts", {
+      body: { row, children: [{ id: "bc-test-piece-ray", npc_id: "npc-ray", text: "A comment on the test piece." }], links: [{ reference_id: "ref-potassium-40" }, { reference_id: "ref-potassium-40" }] },
+    });
+    assert.equal(made.status, 201, JSON.stringify(made.json));
+    assert.equal(count("SELECT COUNT(*) n FROM blog_references WHERE blog_id = 'blog-test-piece'"), 1, "a source linked twice is stored once");
+
+    assert.equal((await call("DELETE", "/api/entities/blog_posts/blog-test-piece")).status, 200);
+    assert.equal(count("SELECT COUNT(*) n FROM blog_comments WHERE blog_id = 'blog-test-piece'"), 0);
+    assert.equal(count("SELECT COUNT(*) n FROM blog_references WHERE blog_id = 'blog-test-piece'"), 0);
+
+    const item = (await call("GET", "/api/deleted")).json.items.find((d) => d.pk === "blog-test-piece");
+    assert.deepEqual(item.childCounts, { blog_comments: 1, blog_references: 1 });
+    const back = await call("POST", `/api/history/${item.id}/restore`, { body: { side: "before" } });
+    assert.equal(back.status, 200, JSON.stringify(back.json));
+    assert.equal(count("SELECT COUNT(*) n FROM blog_comments WHERE blog_id = 'blog-test-piece'"), 1);
+    assert.equal(count("SELECT COUNT(*) n FROM blog_references WHERE blog_id = 'blog-test-piece'"), 1);
+    assert.equal((await call("DELETE", "/api/entities/blog_posts/blog-test-piece")).status, 200);
+  });
+
+  it("refuses links on a table that has none", async () => {
+    const r = await call("POST", "/api/entities/feed_templates", { body: { row: template({ id: "ft-links" }), links: [{ reference_id: "x" }] } });
+    assert.equal(r.status, 400);
+  });
+
+  it("protects shipped feed ids like the other content", async () => {
+    fs.writeFileSync(fx.paths.shippedIds, JSON.stringify({ feed_templates: ["ft-ada-checkpoint-inside-the-atom"], blog_posts: ["blog-three-kinds-of-carbon"] }));
+    const t = await call("DELETE", "/api/entities/feed_templates/ft-ada-checkpoint-inside-the-atom");
+    assert.equal(t.status, 409);
+    assert.equal(t.json.needsReason, true);
+    const rename = await call("PUT", "/api/entities/blog_posts/blog-three-kinds-of-carbon", { body: { row: { id: "blog-renamed" } } });
+    assert.equal(rename.status, 409);
+    const del = await call("DELETE", "/api/entities/blog_posts/blog-three-kinds-of-carbon");
+    assert.equal(del.status, 409);
+    fs.writeFileSync(fx.paths.shippedIds, "{}");
   });
 });
 
@@ -400,10 +606,10 @@ describe("editor support endpoints", () => {
     assert.ok(r.json.errors.some((e) => e.rule === "invalid-icon"));
   });
 
-  it("offers enums and distinct values for suggestions", async () => {
+  it("offers distinct values for suggestions", async () => {
     const meta = await call("GET", "/api/meta");
-    assert.ok(meta.json.enums.sourceTypes.includes("government-agency"));
-    assert.ok(meta.json.enums.reviewStatuses.includes("reviewed"));
+    assert.ok(meta.json.tables.some((t) => t.name === "myths"));
+    assert.ok(!meta.json.tables.some((t) => t.name === "articles" || t.name === "posts"));
     const d = await call("GET", "/api/distinct?table=myths&column=category");
     assert.ok(d.json.values.length > 1);
     assert.equal((await call("GET", "/api/distinct?table=myths&column=nope")).status, 400);

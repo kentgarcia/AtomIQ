@@ -22,16 +22,25 @@ export const SHIPPED_ID_TABLES = [
   "myths",
   "mazes",
   "encyclopedia_entries",
-  "articles",
-  "posts",
   "npcs",
   "npc_lines",
+  "feed_templates",
+  "blog_posts",
 ];
 
 /** Parent entity → child table that is edited and versioned together with it. */
 export const ENTITY_CHILDREN = {
   lessons: { table: "lesson_cards", fk: "lesson_id" },
   mazes: { table: "maze_rooms", fk: "maze_id" },
+  blog_posts: { table: "blog_comments", fk: "blog_id" },
+};
+
+/**
+ * Parent entity → link table (plain rows of ids, no position) that is saved and versioned with it:
+ * a blog piece and the sources it cites.
+ */
+export const ENTITY_LINKS = {
+  blog_posts: { table: "blog_references", fk: "blog_id", column: "reference_id" },
 };
 
 /** Child table → { parent, fk } (inverse of ENTITY_CHILDREN). */

@@ -316,6 +316,78 @@ CREATE INDEX IF NOT EXISTS idx_followed_topics_user ON followed_topics(user_id);
 CREATE INDEX IF NOT EXISTS idx_followed_topics_topic ON followed_topics(topic);
 CREATE INDEX IF NOT EXISTS idx_followed_topics_dirty ON followed_topics(is_dirty) WHERE is_dirty = 1;
 
+-- ==================== NPC FEED TABLES ====================
+-- The learner's feed (docs/NPC_FEED_SPEC.md section 7.1). Generated on the device by services/feed.ts:
+-- there is no author account, and no table here for a learner comment (comments are content).
+
+-- Feed posts. text is rendered once, when the post is created. A blog card has blog_id set.
+CREATE TABLE IF NOT EXISTS feed_posts (
+  id TEXT PRIMARY KEY,
+  dedupe_key TEXT NOT NULL UNIQUE,
+  template_id TEXT,
+  npc_id TEXT NOT NULL,
+  kind TEXT NOT NULL,
+  trigger TEXT NOT NULL,
+  text TEXT NOT NULL,
+  chip_kind TEXT,
+  chip_target TEXT,
+  blog_id TEXT,
+  created_at INTEGER NOT NULL,
+  seen_at INTEGER,
+  updated_at INTEGER NOT NULL DEFAULT 0,
+  synced_at INTEGER,
+  is_dirty INTEGER DEFAULT 1,
+  deleted_at INTEGER,
+  version INTEGER DEFAULT 1
+);
+
+CREATE INDEX IF NOT EXISTS idx_feed_posts_created ON feed_posts(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_feed_posts_unseen ON feed_posts(seen_at) WHERE seen_at IS NULL;
+CREATE INDEX IF NOT EXISTS idx_feed_posts_blog ON feed_posts(blog_id) WHERE blog_id IS NOT NULL;
+
+-- Reactions to a post or a blog piece, by an NPC or by the learner (one per actor per target).
+CREATE TABLE IF NOT EXISTS reactions (
+  id TEXT PRIMARY KEY,
+  target_type TEXT NOT NULL CHECK(target_type IN ('post', 'blog')),
+  target_id TEXT NOT NULL,
+  actor_type TEXT NOT NULL CHECK(actor_type IN ('npc', 'user')),
+  actor_id TEXT NOT NULL,
+  reaction TEXT NOT NULL CHECK(reaction IN ('like', 'love', 'clap', 'wow')),
+  created_at INTEGER NOT NULL,
+  updated_at INTEGER NOT NULL DEFAULT 0,
+  synced_at INTEGER,
+  is_dirty INTEGER DEFAULT 1,
+  deleted_at INTEGER,
+  version INTEGER DEFAULT 1,
+  UNIQUE(target_type, target_id, actor_type, actor_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_reactions_target ON reactions(target_type, target_id);
+
+-- Blog pieces the learner has opened.
+CREATE TABLE IF NOT EXISTS blog_reads (
+  blog_id TEXT PRIMARY KEY,
+  read_at INTEGER NOT NULL,
+  updated_at INTEGER NOT NULL DEFAULT 0,
+  synced_at INTEGER,
+  is_dirty INTEGER DEFAULT 1,
+  deleted_at INTEGER,
+  version INTEGER DEFAULT 1
+);
+
+-- Daily facts the learner has read (one row per fact, the day it was first read).
+CREATE TABLE IF NOT EXISTS daily_facts_read (
+  fact_id TEXT PRIMARY KEY,
+  title TEXT NOT NULL,
+  read_on TEXT NOT NULL,
+  read_at INTEGER NOT NULL,
+  updated_at INTEGER NOT NULL DEFAULT 0,
+  synced_at INTEGER,
+  is_dirty INTEGER DEFAULT 1,
+  deleted_at INTEGER,
+  version INTEGER DEFAULT 1
+);
+
 -- ==================== SETTINGS TABLES ====================
 
 -- User Settings (local-only by default)

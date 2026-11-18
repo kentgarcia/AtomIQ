@@ -2,6 +2,10 @@
  * The 3D card: a surface with a 2 px border and a 4 px darker lip under it, the same anatomy as
  * `Button`. Pass `onPress` and it sinks 4 px when pressed. `tone` swaps the colours for a state
  * (correct, wrong, selected); the default is the neutral card.
+ *
+ * The tinted faces (success, error, info, primary) are see-through colours, so the face is an opaque
+ * surface with the tint laid over it, exactly like an option button. Painted straight on the face,
+ * the tint would let the darker lip show through and the card would look muddier than the options.
  */
 
 import type { ReactNode } from "react";
@@ -46,9 +50,11 @@ export function useCardColors(tone: CardTone) {
 
 export function Card({ children, tone = "neutral", padding = spacing.md, gap, onPress, accessibilityLabel, style, faceStyle }: CardProps) {
   const colors = useCardColors(tone);
+  const base = useTheme().theme.colors.surface;
+  const tint = colors.face !== base ? <View pointerEvents="none" style={[styles.tint, { backgroundColor: colors.face }]} /> : null;
   const face = (pressed: boolean) => [
     styles.face,
-    { backgroundColor: colors.face, borderColor: colors.border, padding, gap },
+    { backgroundColor: base, borderColor: colors.border, padding, gap },
     onPress && pressed ? { transform: [{ translateY: controls.pressTravel }] } : null,
     faceStyle,
   ];
@@ -56,7 +62,10 @@ export function Card({ children, tone = "neutral", padding = spacing.md, gap, on
   if (!onPress) {
     return (
       <View style={lip}>
-        <View style={face(false)}>{children}</View>
+        <View style={face(false)}>
+          {tint}
+          {children}
+        </View>
       </View>
     );
   }
@@ -66,7 +75,10 @@ export function Card({ children, tone = "neutral", padding = spacing.md, gap, on
       {({ pressed }) => (
         <>
           <View pointerEvents="none" style={[styles.lipLayer, { top: controls.lip, backgroundColor: colors.lip }]} />
-          <View style={face(pressed)}>{children}</View>
+          <View style={face(pressed)}>
+            {tint}
+            {children}
+          </View>
         </>
       )}
     </Pressable>
@@ -77,4 +89,6 @@ const styles = StyleSheet.create({
   lip: { borderRadius: radius.xl, overflow: "hidden" },
   lipLayer: { position: "absolute", left: 0, right: 0, bottom: 0, borderRadius: radius.xl },
   face: { borderRadius: radius.xl, borderWidth: controls.border },
+  /** The tint, laid over the face's opaque surface (inside its border). */
+  tint: { position: "absolute", top: 0, left: 0, right: 0, bottom: 0, borderRadius: radius.xl - controls.border },
 });

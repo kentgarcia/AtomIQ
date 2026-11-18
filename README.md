@@ -33,7 +33,7 @@ An offline-first nuclear science learning app for curious minds — built around
 
 | Learn | Explore | Play |
 | --- | --- | --- |
-| Follow lessons, quizzes, micro-learning cards, and lab prompts. | Search the encyclopedia, browse science stories, and follow guided journeys. | Bust myths, run challenges, chase streaks, and navigate the Atom Maze. |
+| Follow lessons, quizzes, micro-learning cards, and lab prompts. | Search the encyclopedia and follow guided journeys. | Bust myths, run challenges, chase streaks, and navigate the Atom Maze. |
 
 ### A learning loop with momentum
 
@@ -65,7 +65,7 @@ Put nuclear-science assumptions to the test in three modes:
 
 ### AtomIQ Guide
 
-Meet **Shrodi**, the mascot-powered guide. Pill-based prompts make it easy to jump from a question to the right lesson, article, encyclopedia entry, journey, or game — no typing required.
+Meet **Shrodi**, the mascot-powered guide. Pill-based prompts make it easy to jump from a question to the right lesson, encyclopedia entry, journey, or game — no typing required.
 
 ### Explorer and Lab
 
@@ -73,7 +73,7 @@ Follow guided journeys such as *Nuclear Safety* and *Radiation Reality*, then ex
 
 ### Discovery and progress
 
-Browse a category-filtered feed of facts and stories, save bookmarks locally, complete daily missions, build a streak, collect awards, and compare personal bests on the leaderboard.
+Browse the encyclopedia and the periodic table from the Discover tab, complete daily missions, build a streak, collect awards, and compare personal bests per game.
 
 ### Your app, your pace
 
@@ -108,7 +108,7 @@ Customize your avatar and display name, choose light/dark/system themes, control
 
 ```text
 app/                         Expo Router screens and flows
-├── (tabs)/                  Home, Discovery, Guide, Games, Profile
+├── (tabs)/                  Home, Discover, Guide, Games, Profile
 ├── explorer/                Journeys, encyclopedia, Atom Maze
 ├── lab/                     Dose Visualizer and Energy Showdown
 ├── lesson/                  Card-based lesson runner
@@ -116,7 +116,7 @@ app/                         Expo Router screens and flows
 └── mythbuster/              MythBuster modes and results
 
 components/                  Shared UI, games, Guide, lessons, and markdown
-content/                     Curriculum types and cores, myths, facts, and articles
+content/                     Curriculum types and cores, myths, and facts
 services/                    SQLite, storage, Guide engine, missions, media
 theme/                       Tokens, palettes, themes, layout, and motion
 scripts/                     Content editor, migration, and database tooling
@@ -225,7 +225,7 @@ services/content-db.ts
 
 Typical content workflow:
 
-1. Run `npm run content-studio` and edit units, lessons, the item bank, myths, MythBuster questions, mazes, the encyclopedia, articles or posts. Each save is validated and recorded; nothing is released yet.
+1. Run `npm run content-studio` and edit units, lessons, the item bank, myths, MythBuster questions, mazes or the encyclopedia. Each save is validated and recorded; nothing is released yet.
 2. Check **Problems** and **Changes** in Studio, then press **Publish** (or run `npm run release:content -- --publish --notes "…"`). That creates the next version, refreshes the bundled database and writes the release record.
 3. Launch the app to verify, then commit the files the publish changed.
 

@@ -10,7 +10,8 @@
  */
 
 import React from "react";
-import { StyleSheet, Text, View, type StyleProp, type ViewStyle } from "react-native";
+import { StyleSheet, View, type StyleProp, type ViewStyle } from "react-native";
+import { Text } from "@/components/ui/text";
 
 import { Icon } from "@/components/ui/icon";
 import { fontFaces } from "@/theme";

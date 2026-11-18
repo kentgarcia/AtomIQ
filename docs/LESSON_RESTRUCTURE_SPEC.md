@@ -64,7 +64,7 @@ Seven units, 35 lessons. Each unit ends in a checkpoint that also samples earlie
 | # | Unit id | Unit | Lessons | Misconceptions targeted | Builds on |
 |---|---|---|---|---|---|
 | 1 | `inside-the-atom` | Inside the Atom | Atoms are everywhere · Protons, neutrons, electrons · Elements and the periodic table · Isotopes · Stable and unstable nuclei | "Atoms are tiny solid balls"; "isotope means radioactive"; "nuclear always means dangerous" | — |
-| 2 | `radioactivity` | Radioactivity | Why nuclei decay · Alpha, beta, gamma · Half-life · Decay chains · Radiation is natural | "A nucleus is half gone after one half-life"; "radioactive forever"; "radioactivity is only man-made" | 1 |
+| 2 | `radioactivity` | Radioactivity | Why nuclei decay · Alpha, beta and gamma · Half-life · Decay chains · Radioactivity is natural | "A nucleus is half gone after one half-life"; "radioactive forever"; "radioactivity is only man-made" | 1 |
 | 3 | `radiation-meets-matter` | Radiation Meets Matter | Ionizing vs non-ionizing · Penetration and shielding · Irradiated vs contaminated · Detecting radiation · Becquerel, gray, sievert | "Irradiated things become radioactive"; "all radiation is the same" | 1, 2 |
 | 4 | `radiation-and-the-body` | Radiation and the Body | The dose scale · What radiation does to cells · Short vs long exposure · Time, distance, shielding · Risk in perspective | "Any dose is deadly"; "radiation glows green" | 2, 3 |
 | 5 | `energy-from-the-nucleus` | Energy from the Nucleus | Where the energy comes from · Fission and chain reactions · Fusion and the stars · How a reactor works · Reactor vs bomb | "Reactors can explode like bombs"; fission and fusion confused | 1, 2 |
@@ -375,7 +375,7 @@ Added to the user-state database (`services/database.ts`), with the columns the 
 These refer to lesson, unit or quiz ids and must be re-pointed or cleared when the old content is retired. Validation gains a rule that every such link resolves.
 
 - `services/guide/topics.ts`, `services/guide/context.ts`, `services/guide/navigate.ts`
-- `myths.related_lessons`, `articles.related_lessons`, `posts.related_lessons`
+- `myths.related_lessons` (the `articles` and `posts` tables were removed later, with the Articles feature)
 - `hooks/use-completed-lessons.ts`, `services/missions.ts`, achievements that count lessons
 - Bookmarks of type `lesson`
 - `app/quiz/[id].tsx` and any entry point that opens a unit quiz
@@ -415,7 +415,7 @@ Unverified references (`verified = 0`) produce a warning in draft and block **pu
 - **Unit references** are the core sources the unit rests on. They appear in the unit Guidebook.
 - **Lesson references** are the specific sources for that lesson's facts and numbers, each with a `supports` note. They appear under **Sources** on the lesson's finish screen and on its preview.
 - **Item references** back individual numeric or factual claims and appear in the "Why?" explanation.
-- Source policy follows `docs/ARTICLE_PIPELINE.md` and the visual-block rules: prefer IAEA, UNSCEAR, WHO, national regulators, standard textbooks and primary papers; never cite a source that has not been opened and checked; use "about" and ranges for approximate values.
+- Source policy follows the visual-block rules: prefer IAEA, UNSCEAR, WHO, national regulators, standard textbooks and primary papers; never cite a source that has not been opened and checked; use "about" and ranges for approximate values.
 
 ## 12. Unit 1 pilot: Inside the Atom
 
@@ -425,101 +425,50 @@ Facts and figures below are the intended content. Each number is confirmed again
 
 ### 12.1 Objectives
 
+Unit 1 is deliberately simple: **one core idea per lesson**, in short plain sentences. Anything harder is an optional "Go deeper" card (tier `deeper`) that is never required and never scored. The authoring source is `scripts/content-migration/curriculum/unit-1.mjs`; `unit-1-concept-pass.mjs` copies it onto the master db.
+
+| Lesson | The one idea | Goal |
+|---|---|---|
+| L1 Atoms are everywhere | Ordinary matter is made of atoms. Air is matter too. Atoms are far too small to see. | "I understand what atoms are and how tiny they are." |
+| L2 Meet the atom | An atom has a tiny centre, the nucleus, with electrons around it. Proton positive, neutron no charge, electron negative. | "I know the basic parts of an atom." |
+| L3 Elements | The number of protons tells you the element. Change it and the element changes. | "I see why the proton count matters." |
+| L4 Isotopes | Same protons, same element. Different neutrons, different isotope. Not automatically radioactive. | "Same protons = same element; different neutrons = different isotope." |
+| L5 Stable and unstable nuclei | Some nuclei are stable, others are unstable. An unstable nucleus can change and give off radiation. | Ready for Unit 2. |
+
 | Id | Objective | Lesson |
 |---|---|---|
-| `u1-matter-is-atoms` | Recognise that all ordinary matter (solids, liquids, gases, living things) is made of atoms, and that light and heat are not | L1 |
-| `u1-atom-scale` | Describe how small atoms are using a comparison | L1 |
-| `u1-particles` | Name the three particles of an atom, their charges and where they are | L2 |
-| `u1-nucleus` | Explain that the nucleus is tiny but holds nearly all the mass, and that the atom is mostly empty space | L2 |
-| `u1-atomic-number` | State that the number of protons decides which element an atom is | L3 |
-| `u1-read-the-table` | Find an element's symbol and atomic number on the periodic table | L3 |
-| `u1-isotope-definition` | Explain that isotopes of an element have the same protons and different neutrons | L4 |
-| `u1-mass-number` | Work out protons, neutrons and the name of an isotope from its numbers (for example carbon-14) | L4 |
-| `u1-forces-in-nucleus` | Describe the two competing forces in a nucleus: electric repulsion and the strong force | L5 |
-| `u1-stable-unstable` | Explain that most nuclei around us are stable, some are unstable, and unstable nuclei change and give off radiation | L5 |
+| `u1-matter-is-atoms` | Know that ordinary matter, including air, is made of atoms, and that light and heat are not | L1 |
+| `u1-atom-scale` | Know that atoms are far too small to see, even with an ordinary microscope | L1 |
+| `u1-particles` | Name the three particles and say whether each is positive, negative or has no charge | L2 |
+| `u1-nucleus` | Know that the tiny nucleus holds almost all of the mass and that the rest of the atom is mostly empty space | L2 |
+| `u1-atomic-number` | Know that the number of protons tells you the element | L3 |
+| `u1-change-protons` | Know that changing the number of protons changes the element | L3 |
+| `u1-isotope-definition` | Know that isotopes of an element have the same protons and different neutrons | L4 |
+| `u1-isotope-not-radioactive` | Know that an isotope is not automatically radioactive | L4 |
+| `u1-stable-unstable` | Know that some nuclei are stable and others unstable | L5 |
+| `u1-unstable-changes` | Know that an unstable nucleus can change and give off radiation, and that this happens in nature | L5 |
+
+Not required in Unit 1 (Go deeper only, or left to later units): precise atom sizes, particle masses, electron configurations, quantum ideas, memorising the periodic table or symbols, calculating atomic numbers, mass number (protons plus neutrons), and the competing forces in a nucleus. The strong force is one optional card at the end of L5.
+
+Misconceptions confronted on purpose: air is not "nothing" (L1); atoms are mostly empty space (L2); changing the protons changes the element (L3); isotopes are not automatically radioactive (L4); radioactivity is not something people create (L5).
+
+Language rule for this unit: short, plain sentences. Example: not "Two forces compete: electric repulsion between protons, and the strong force that glues neighbouring particles together at very short range", but "Protons push away from each other. A very strong force inside the nucleus helps hold the nucleus together." Hard terms are linked with `[[id|shown]]` markers to an encyclopedia entry; entries were added for matter, element, periodic table, mass number, ion, strong force, electric force, radioactivity, nuclear stability and electron cloud (`add-unit-1-glossary.mjs`).
 
 ### 12.2 Lessons
 
-**L1 — Atoms are everywhere** (`atoms-are-everywhere`)
-Misconception: air is "nothing"; atoms are just very small specks you could see with a good microscope.
+Each teaching card has a figure. Final questions ask the learner to use the idea (a scenario, a new case) rather than repeat a line. Cards marked (deeper) are optional.
 
-1. `predict` — "How many atoms would fit side by side across one human hair?" (slider from a thousand to a billion)
-2. `explain` — Everything you can touch is made of atoms. Visual: a hand, then skin, then cells, then atoms.
-3. `sort` — Made of atoms / not made of atoms: water, air, your phone, a cat, light, heat.
-4. `explain` — Air is made of atoms too; light and heat are energy, not matter.
-5. `scale-zoom` — Zoom from a hand down to a single atom, with a size label at each stop.
-6. `reveal` — The hair prediction answered (hundreds of thousands, order of a million).
-7. `estimate` — Place an atom, a cell, a grain of sand and a hair on a size scale.
-8. `true_or_myth` — "Atoms are too small to see with an ordinary light microscope." (true)
-9. `story` — Democritus guessed at atoms; people only imaged individual atoms in the twentieth century. (deeper)
-10. `choice` — Recall: which of these is not made of atoms?
-11. `fill` — Recall: "Everything you can touch is made of ___."
+**L1 — Atoms are everywhere** (`atoms-are-everywhere`): matter and energy, a sort, "air is matter too" with a myth question, "far too small to see", the `scale-zoom` sim (hand, skin cell, virus, atom; no exact atom diameter is taught), an order-by-size question, a true-or-myth on microscopes, a "which is made of atoms?" question. Democritus (deeper).
 
-**L2 — Protons, neutrons, electrons** (`protons-neutrons-electrons`)
-Misconception: the atom is a solid ball; electrons circle like planets.
+**L2 — Meet the atom** (`protons-neutrons-electrons`): a stadium prediction, "a tiny centre" (nucleus, electrons, almost all the mass in the nucleus), tap the nucleus, the three particles and their charges, match particle to charge, build helium, the stadium answered (a marble), "an atom is a solid ball" myth, where the mass is, sort particles by location. Rutherford's gold foil as a short story (deeper), electron cloud (deeper).
 
-1. `predict` — "If an atom were the size of a football stadium, how big would its nucleus be?" (options from a marble to the whole pitch)
-2. `explain` — An atom has a centre, the nucleus, and electrons around it. Visual: labelled model.
-3. `hotspot` — Tap the nucleus.
-4. `explain` — Protons are positive, neutrons are neutral, electrons are negative. Visual: three particle cards.
-5. `match` — Particle to charge and to location.
-6. `atom-builder` (build mode) — Build helium: 2 protons, 2 neutrons, 2 electrons.
-7. `story` — Rutherford's gold foil: most particles went straight through, a few bounced back.
-8. `reveal` — The stadium prediction answered: about the size of a marble at the centre, yet nearly all the mass.
-9. `true_or_myth` — "Atoms are mostly empty space." (true)
-10. `explain` — Electrons are better pictured as a cloud than as planets on tracks. (deeper)
-11. `choice` — Recall: where is almost all of an atom's mass?
-12. `sort` — Recall: sort the three particles into "in the nucleus" and "outside the nucleus".
-
-**L3 — Elements and the periodic table** (`elements-and-the-periodic-table`)
-Misconception: elements differ because their atoms are made of different stuff.
-
-1. `predict` — "What is the difference between an atom of gold and an atom of oxygen?"
-2. `atom-builder` (element mode) — Add protons one at a time and watch the element name change: hydrogen, helium, lithium…
-3. `explain` — The number of protons is the atomic number, and it alone decides the element.
-4. `fill` — "An atom with 6 protons is always ___." (word bank)
-5. `explain` — The periodic table lists the elements in order of atomic number. Visual: annotated table cell (symbol, name, atomic number).
-6. `hotspot` — Find element 8 on a simplified table.
-7. `match` — Symbol to name for six common elements.
-8. `true_or_myth` — "If you changed the number of protons in an atom, it would become a different element." (true)
-9. `explain` — In a neutral atom, electrons equal protons; atoms that gain or lose electrons are ions. (deeper)
-10. `order` — Recall: put hydrogen, carbon, oxygen and uranium in order of atomic number.
-11. `choice` — Recall: the opening prediction asked again.
-
-The lesson finish screen links to the in-app periodic table.
+**L3 — Elements** (`elements-and-the-periodic-table`): predict, "protons tell you the element" (6 carbon, 7 nitrogen, 8 oxygen), `atom-builder` carbon to nitrogen, fill "6 protons is always ___", "change the protons, change the element", `atom-builder` nitrogen to oxygen, a "gains one proton" myth, then use-it questions (an oxygen atom loses a proton; gold versus oxygen). The periodic table is a single optional card (deeper); no table is tested.
 
 **Practice node** — 8 items drawn from L1–L3 objectives.
 
-**L4 — Isotopes** (`isotopes`)
-Misconception: "isotope" means radioactive or artificial.
+**L4 — Isotopes** (`isotopes`): predict, "same element, different neutrons" (carbon-12 and carbon-14), `atom-builder` isotope (make carbon-14 from carbon-12), sort which atoms are carbon, "isotope does not mean radioactive", two true-or-myth questions, a sort of isotope pairs versus different elements, a use-it choice (17 protons with 18 or 20 neutrons). "Reading the name" and mass number are one optional card (deeper); nothing is calculated.
 
-1. `predict` — "Two atoms are both carbon. Can they have different weights?"
-2. `atom-builder` (isotope mode) — Start with carbon-12. Add neutrons: the element stays carbon, the mass number changes.
-3. `explain` — Atoms of one element with different numbers of neutrons are isotopes. Visual: carbon-12 beside carbon-14 (existing block `visual-isotopes-c12-c14`, reviewed).
-4. `sort` — Same element / different element: pairs of atoms described by proton and neutron counts.
-5. `explain` — The number after the name is protons plus neutrons: the mass number.
-6. `fill` — "Carbon-14 has 6 protons and ___ neutrons." (number pad)
-7. `match` — Hydrogen-1, hydrogen-2 and hydrogen-3 to their neutron counts.
-8. `true_or_myth` — "All isotopes are radioactive." (myth) with the explanation that most atoms around us are stable isotopes.
-9. `explain` — Isotopes of an element behave almost identically in chemistry, which is why your body cannot tell them apart. (deeper; sets up tracers in Unit 6)
-10. `choice` — Recall: what do isotopes of the same element share?
-11. `fill` — Recall: name the isotope with 92 protons and 146 neutrons.
-
-**L5 — Stable and unstable nuclei** (`stable-and-unstable-nuclei`)
-Misconception: anything "nuclear" is dangerous; radioactivity is something done to atoms by people.
-
-1. `predict` — "Protons all have positive charge, and like charges push apart. So why doesn't the nucleus fly apart?"
-2. `explain` — Two forces compete: electric repulsion between protons, and the strong force that glues neighbouring particles together at very short range. Visual: two arrows on a nucleus.
-3. `choice` — Which force pushes protons apart?
-4. `atom-builder` (stability mode) — Try different neutron counts for a light element and see which combinations are stable.
-5. `explain` — Neutrons add glue without adding repulsion, so the right balance of neutrons and protons makes a stable nucleus.
-6. `sort` — Stable / unstable: carbon-12, carbon-14, hydrogen-1, hydrogen-3, potassium-40, oxygen-16.
-7. `explain` — An unstable nucleus eventually changes into a more stable one and gives off radiation. That is radioactivity.
-8. `true_or_myth` — "Unstable atoms only exist where humans have made them." (myth) with potassium-40 in food and in your own body as the example.
-9. `true_or_myth` — "Most of the atoms in your body are stable." (true)
-10. `story` — Becquerel's photographic plate: radioactivity was found in a natural mineral. (deeper; leads into Unit 2)
-11. `choice` — Recall: what does an unstable nucleus do over time?
-12. `match` — Recall: force to its effect.
+**L5 — Stable and unstable nuclei** (`stable-and-unstable-nuclei`): predict, "stable and unstable", `atom-builder` stability (make carbon-14 stable), sort stable or unstable, "unstable nuclei can change" (radioactivity), "radioactivity is natural" (rocks, bananas, your body), myth and true-or-myth questions, a "what can happen to an unstable nucleus?" choice, a sort of natural versus man-made. "What holds a nucleus together" (the strong force) and Becquerel's plate are optional (deeper).
 
 **Checkpoint** — 12 items covering all ten objectives. As the first unit, it has no earlier units to sample.
 
@@ -530,12 +479,12 @@ These are candidates. Each must be opened, checked and entered with its exact ti
 | Level | Candidate source | Supports |
 |---|---|---|
 | Unit | OpenStax, *Chemistry 2e*, chapter 2 "Atoms, Molecules, and Ions" | Atomic structure, atomic number, isotopes, periodic table |
-| Unit | OpenStax, *University Physics Volume 3*, chapter 10 "Nuclear Physics" | Nuclear forces, stability, radioactivity |
-| Unit | IAEA explainers on atoms and isotopes ("What are Isotopes?") | Isotope definition, stable and unstable isotopes |
-| L2 | E. Rutherford (1911), "The Scattering of α and β Particles by Matter and the Structure of the Atom", *Philosophical Magazine* | Gold-foil story, existence of the nucleus |
-| L1, L2 | A source for the size of atoms and nuclei (textbook table) | Hair comparison, stadium analogy, mass in the nucleus |
-| L3 | IUPAC Periodic Table of the Elements | Symbols, names, atomic numbers |
-| L5 | US Department of Energy "DOE Explains" pages on nuclei and isotopes; a source for potassium-40 in the body | Stability, natural radioactivity |
+| Unit | OpenStax, *University Physics Volume 3*, chapter 10 "Nuclear Physics" | Nuclear size, stability, radioactivity |
+| Unit | IAEA explainers on isotopes | Isotope definition, stable and unstable isotopes |
+| L1 | OpenStax *Chemistry 2e* section 1.2 | Matter, air is matter |
+| L2 | E. Rutherford (1911), *Philosophical Magazine* | Gold-foil story (optional) |
+| L3 | IUPAC Periodic Table of the Elements | Element names and atomic numbers |
+| L5 | A source for potassium-40 in food and the body; Becquerel (1896) | Natural radioactivity |
 
 ## 13. Authoring workflow
 

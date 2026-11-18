@@ -55,6 +55,9 @@ export interface SemanticColors {
     surfaceSoft: string;
     card: string;
     input: string;
+    /** Search/text field fill (rounded, no border) and the colour of the typed value. */
+    field: string;
+    fieldText: string;
     primary: string;
     primaryDark: string;
     primaryLight: string;
@@ -97,6 +100,26 @@ export interface SemanticColors {
     switchTrack: string;
     successSurface: string;
     warningSurface: string;
+    /** Background of every tab page, the Home lesson map included (the plain page background: white in light mode). */
+    mapBackground: string;
+    /** Primary button face and its lip. */
+    buttonFace: string;
+    buttonLip: string;
+    /** Home lesson card: face colour and the text on it; `lessonLip` is the lip of the white cards. */
+    lessonHeader: string;
+    lessonHeaderText: string;
+    lessonLip: string;
+    /** The darker yellow lip under the Home lesson card's yellow face. */
+    lessonCardLip: string;
+    /** The sky (purple) colour: face and lip of the Quests page's info card. */
+    sky: string;
+    skyLip: string;
+    /** The Guide landing's info card (bright blue): face and lip. */
+    guide: string;
+    guideLip: string;
+    /** A button sitting on the yellow lesson card / node bubble: lighter face, darker label. */
+    lessonButtonFace: string;
+    lessonButtonLabel: string;
     errorSurface: string;
     infoSurface: string;
     cyan: string;
@@ -156,6 +179,8 @@ const semantic = (mode: ThemeMode): SemanticColors => {
         surfaceSoft: base.surfaceSoft,
         card: base.surface,
         input: base.input,
+        field: base.field,
+        fieldText: base.fieldText,
         /* Orange is the only brand accent. `primaryLight` is the orange used
            for text/icons on a neutral surface (AA on white / on dark). */
         primary: colors.brand.orange[500],
@@ -198,6 +223,19 @@ const semantic = (mode: ThemeMode): SemanticColors => {
         switchTrack: isLight ? "#E5E5E5" : "#3C4D57",
         successSurface: isLight ? "rgba(88, 204, 2, 0.12)" : "rgba(88, 204, 2, 0.18)",
         warningSurface: isLight ? "rgba(255, 193, 7, 0.14)" : "rgba(255, 193, 7, 0.2)",
+        mapBackground: base.background,
+        buttonFace: colors.brand.button.face,
+        buttonLip: colors.brand.button.lip,
+        lessonHeader: colors.brand.lessonCard.header,
+        lessonHeaderText: colors.brand.lessonCard.headerText,
+        lessonLip: isLight ? colors.brand.lessonCard.lipLight : colors.brand.lessonCard.lipDark,
+        lessonCardLip: colors.brand.lessonCard.lip,
+        sky: colors.brand.sky[500],
+        skyLip: colors.brand.sky[700],
+        guide: colors.brand.guide[500],
+        guideLip: colors.brand.guide[700],
+        lessonButtonFace: colors.brand.lessonCard.buttonFace,
+        lessonButtonLabel: colors.brand.lessonCard.buttonLabel,
         errorSurface: isLight ? "rgba(239, 68, 68, 0.1)" : "rgba(239, 68, 68, 0.18)",
         infoSurface: isLight ? "rgba(28, 176, 246, 0.1)" : "rgba(28, 176, 246, 0.18)",
         cyan: colors.role.cyan,
@@ -247,7 +285,7 @@ const entry = (mode: ThemeMode) => {
     };
 };
 
-/* Orange identity — learning, quiz, article, explorer, myth, settings. */
+/* Orange identity — learning, quiz, explorer, myth, settings. */
 const orangeBase = (mode: ThemeMode) => ({
     bg: colors.base[mode].background,
     card: colors.base[mode].surface,
@@ -268,16 +306,6 @@ const quiz = (mode: ThemeMode) => ({
     ...orangeBase(mode),
     primaryLight:
         mode === "light" ? "#FF8534" : colors.brand.orange[400],
-});
-
-const article = (mode: ThemeMode) => ({
-    bg: colors.base[mode].background,
-    card: colors.base[mode].surface,
-    text: colors.base[mode].text,
-    textMuted: mode === "light" ? "#9CA3AF" : colors.base[mode].textMuted,
-    primary: colors.brand.orange[500],
-    primaryDark: colors.brand.orange[600],
-    border: borderFor(mode),
 });
 
 const explorer = (mode: ThemeMode) => ({
@@ -471,7 +499,6 @@ export interface Theme {
         entry: Palette;
         lesson: Palette;
         quiz: Palette;
-        article: Palette;
         explorer: Palette;
         settings: Palette;
         maze: Palette;
@@ -518,7 +545,6 @@ const buildTheme = (mode: ThemeMode): Theme => ({
         entry: withShadow(mode, entry(mode)),
         lesson: withShadow(mode, lesson(mode)),
         quiz: withShadow(mode, quiz(mode)),
-        article: withShadow(mode, article(mode)),
         explorer: withShadow(mode, explorer(mode)),
         settings: withShadow(mode, orangeBase(mode)),
         maze: withShadow(mode, maze(mode)),
@@ -568,8 +594,6 @@ export const LessonLight = lesson("light");
 export const LessonDark = lesson("dark");
 export const QuizLight = quiz("light");
 export const QuizDark = quiz("dark");
-export const ArticleLight = article("light");
-export const ArticleDark = article("dark");
 export const ExplorerLight = explorer("light");
 export const ExplorerDark = explorer("dark");
 export const MazeLight = maze("light");

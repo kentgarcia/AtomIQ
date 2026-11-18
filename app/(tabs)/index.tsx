@@ -1,60 +1,57 @@
 import { BetaNoticeModal } from "@/components/ui/beta-notice-modal";
-import { PageBackground, TopRowHeader, useTabBarInset } from "@/components/layout";
+import { ModalButton } from "@/components/ui/modal-card";
+import { ModalDialog } from "@/components/ui/modal-dialog";
+import { TopRowHeader, useTabBarInset } from "@/components/layout";
+import { Text } from "@/components/ui/text";
 import { Icon } from "@/components/ui/icon";
 import { BETA_FEEDBACK_FORM_URL, BETA_NOTICE_ID } from "@/constants/beta";
 import { toneColor } from "@/components/lesson/visual/colors";
 import { UnitTeacher } from "@/components/npc/UnitTeacher";
 import type { Reference } from "@/content/curriculum/types";
 import { useCurriculumPath, type CurriculumData } from "@/hooks/use-curriculum";
+import { unitRingProgress } from "@/services/lesson-progress-core";
 import type { PathState } from "@/services/path-core";
-import {
-  useDailyMissions,
-  type MissionView,
-} from "@/hooks/use-daily-missions";
-import { getDailyFact, type DailyFact } from "@/services/missions";
 import { openExternalUrl } from "@/services/open-url";
 import { getBetaNoticeSeen, setBetaNoticeSeen } from "@/services/storage";
 import { useStorage } from "@/services/StorageContext";
 import { useStreakCelebration } from "@/hooks/use-streak-celebration";
-import { renderRichText } from "@/components/community/rich-text";
 import { useTheme, createStyles, withAlpha, fontFaces, useResponsiveLayout } from "@/theme";
-import { notifySuccess } from "@/services/haptics";
-import { LinearGradient } from "expo-linear-gradient";
-import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
+import { useFocusEffect, useRouter } from "expo-router";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
     Alert,
-    Image,
+    Pressable,
     ScrollView,
     type ScrollViewInstance,
-    Text,
+    StyleSheet,
     TouchableOpacity,
     useWindowDimensions,
     View,
 } from "react-native";
 import Animated, {
-    cancelAnimation,
     FadeIn,
     FadeInDown,
     FadeOut,
     FadeOutDown,
     LinearTransition,
-    useAnimatedStyle,
     useReducedMotion,
-    useSharedValue,
-    withRepeat,
-    withTiming,
-    ZoomIn,
 } from "react-native-reanimated";
-import Svg, { Path, Polygon, Polyline } from "react-native-svg";
-import { DURATION, EASE_OUT, PRESS_EASING } from "@/theme/motion";
+import { DURATION, EASE_OUT } from "@/theme/motion";
+import { LessonNode, type NodeStatus } from "@/components/path/LessonNode";
+import { NodeBubble } from "@/components/path/NodeBubble";
+import { LessonPreviewLayer } from "@/components/lesson/LessonPreviewLayer";
+import { UnitDivider } from "@/components/path/UnitDivider";
+import { loadLessonPreview, type LessonPreviewData } from "@/services/lesson-preview";
+import { unitPalette, type UnitPalette } from "@/components/path/unit-theme";
+import { BUBBLE, bubbleHeight, chooseBubbleSide, type BubbleSide } from "@/components/path/node-bubble-core";
+import { NODE } from "@/components/path/node-geometry";
+import { glyphForNode, type GlyphId } from "@/components/path/node-glyphs";
 
-const INFO_ICON = require("@/assets/images/icons/info.png");
-
-const NODE_SIZE = 79;
-const NODE_ROW_GAP = 120;
+const NODE_SIZE = NODE.box;
+const NODE_ROW_GAP = 100;
 const NODE_TOP = 88;
-const SECTION_PAD = 48;
+/* Room after a unit: the divider with the next unit's title sits in the gap between the last node and the next unit's first */
+const SECTION_PAD = 60;
 /* Floating lesson card: gap above it and below it, inside the map area */
 const MAP_CARD_TOP = 8;
 const MAP_CARD_GAP = 12;
@@ -63,42 +60,12 @@ const DEFAULT_CARD_HEIGHT = 104;
 /* How far past the card's bottom edge a unit start must travel to switch the card */
 const UNIT_SWITCH_OFFSET = 40;
 
-/* Node look taken from the reference button design — square button, the lip
-   is interior depth at the bottom like the reference's inset shadow */
-const NODE_RADIUS = 23;
-const NODE_BORDER = 5;
-const NODE_INNER_RADIUS = NODE_RADIUS - NODE_BORDER;
-const NODE_LIP = 10; /* 3D lip band (reference 14px inset shadow at 110px) */
-const NODE_LIP_PRESSED = 5; /* lip shallows out when pressed (reference 14 → 7) */
-const NODE_PRESS_SHIFT = 6; /* button sinks 6px when pressed (reference :active) */
-const BADGE_SIZE = 26;
-
-/* Diagonal glass-stripe overlay (reference button ::before) */
-const GLASS_COLORS = [
-  "rgba(255,255,255,0)",
-  "rgba(255,255,255,0.2)",
-  "rgba(255,255,255,0.2)",
-  "rgba(255,255,255,0)",
-  "rgba(255,255,255,0)",
-  "rgba(255,255,255,0.1)",
-  "rgba(255,255,255,0.1)",
-  "rgba(255,255,255,0)",
-] as const;
-const GLASS_LOCATIONS = [0, 0.25, 0.48, 0.481, 0.58, 0.581, 0.75, 0.751] as const;
-
-/* Autumn action tokens, shared with the missions + daily-fact screens */
-const BTN_COLOR = "#EA580C";
-const BTN_LIP = "#C2410C";
-
-/* Flat-top hexagon for the per-mission icon (46x46 viewBox), inset so the
-   thicker rounding stroke stays inside the canvas */
-const HEX_POINTS = "23,6.3 37.72,14.5 37.72,31.5 23,39.7 8.28,31.5 8.28,14.5";
-
-type NodeStatus = "locked" | "current" | "completed";
 
 type PathNode = {
   id: string;
-  type: "star" | "book" | "chest" | "trophy";
+  glyph: GlyphId;
+  /** Spoken label: the lesson title, or "Practice" / "Checkpoint". */
+  title: string;
   status: NodeStatus;
   kind: "lesson" | "practice" | "checkpoint";
   lessonId?: string;
@@ -106,6 +73,8 @@ type PathNode = {
 
 type PathUnit = {
   id: string;
+  /** 1-based place of the unit in the path ("Unit 2"). */
+  position: number;
   title: string;
   subtitle: string;
   description: string;
@@ -142,20 +111,18 @@ const computeNodeScrollY = (
   return Math.max(0, offset - (viewportHeight - NODE_SIZE) / 2);
 };
 
-const LESSON_NODE_TYPES = ["star", "book", "chest"] as const;
-
 const buildPath = (
   curriculum: CurriculumData,
   state: PathState,
   lockedColor: string,
   themeForTone: Parameters<typeof toneColor>[0],
-): PathUnit[] =>
-  [...curriculum.units]
+): PathUnit[] => {
+  const lessonsById = new Map(curriculum.lessons.map((l) => [l.id, l]));
+  return [...curriculum.units]
     .sort((a, b) => a.position - b.position)
     .map((unit) => {
       const unitState = state.units[unit.id];
       const isLocked = !(unitState?.unlocked ?? false);
-      let lessonIndex = 0;
       const levels: PathNode[] = curriculum.nodes
         .filter((n) => n.unitId === unit.id)
         .sort((a, b) => a.position - b.position)
@@ -163,16 +130,14 @@ const buildPath = (
           const nodeStatus = state.nodes[n.id] ?? "locked";
           // Replayable nodes in a finished unit look completed but stay tappable.
           const status: NodeStatus = nodeStatus === "available" ? "completed" : nodeStatus;
-          const type =
-            n.kind === "checkpoint"
-              ? "trophy"
-              : n.kind === "practice"
-                ? "chest"
-                : LESSON_NODE_TYPES[lessonIndex++ % LESSON_NODE_TYPES.length];
-          return { id: n.id, type, status, kind: n.kind, ...(n.lessonId ? { lessonId: n.lessonId } : {}) };
+          const lesson = n.lessonId ? lessonsById.get(n.lessonId) : undefined;
+          const title = lesson?.title ?? (n.kind === "checkpoint" ? "Checkpoint" : "Practice");
+          const glyph = glyphForNode({ kind: n.kind, lessonId: n.lessonId, title: lesson?.title });
+          return { id: n.id, glyph, title, status, kind: n.kind, ...(n.lessonId ? { lessonId: n.lessonId } : {}) };
         });
       return {
         id: unit.id,
+        position: unit.position,
         title: unit.title,
         subtitle: unit.subtitle,
         description: unit.description,
@@ -185,34 +150,17 @@ const buildPath = (
         canTestOut: !(unitState?.completed ?? false),
       };
     });
+};
 
 const getNodeX = (globalIndex: number, width: number) =>
   width / 2 + Math.sin(globalIndex * 0.8) * 80;
-
-/* Darken (negative amount) or lighten a hex color, used for the node 3D lip */
-const shadeColor = (hex: string, amount: number): string => {
-  const mix = (v: number) =>
-    Math.max(0, Math.min(255, Math.round(v + 255 * amount)))
-      .toString(16)
-      .padStart(2, "0");
-  return `#${mix(parseInt(hex.slice(1, 3), 16))}${mix(
-    parseInt(hex.slice(3, 5), 16),
-  )}${mix(parseInt(hex.slice(5, 7), 16))}`;
-};
 
 export default function HomeScreen() {
   const router = useRouter();
   const { levelUpLevel, dismissLevelUp } = useStorage();
   useStreakCelebration();
-  const { data: curriculum, state: pathState, loading, refresh } = useCurriculumPath();
-  const {
-    missions,
-    claim,
-    completedCount,
-    markFactRead,
-    refresh: refreshMissions,
-  } = useDailyMissions();
-  const { theme } = useTheme();
+  const { data: curriculum, state: pathState, runProgress, loading, refresh } = useCurriculumPath();
+  const { theme, isDark } = useTheme();
   const c = theme.colors;
   const { width, height: windowHeight } = useWindowDimensions();
   const { contentMaxWidth } = useResponsiveLayout();
@@ -220,38 +168,21 @@ export default function HomeScreen() {
   // The winding map is laid out inside the readable frame, not the raw
   // viewport, so tablet nodes do not spread edge-to-edge.
   const mapWidth = Math.min(width, contentMaxWidth);
-  const isDark = theme.mode === "dark";
   const styles = useMemo(() => makeStyles(theme), [theme]);
   const reducedMotion = useReducedMotion();
 
-  // Autumn gradient background (cream → white, like the reference design)
+  // The lesson map sits on the plain page background (white in light mode)
   const bgTop = c.background;
   // Page-gradient color at the header backdrop's bottom edge so the backdrop
   // blends seamlessly into the background
-
-  // Winding path stroke (subtle, visible on the plain background)
-  const pathStroke = withAlpha(c.text, isDark ? 0.25 : 0.18);
 
   const scrollViewRef = useRef<ScrollViewInstance>(null);
   const [infoOpen, setInfoOpen] = useState(false);
   const [cardUnit, setCardUnit] = useState<CardUnit | null>(null);
   const [arrowDir, setArrowDir] = useState<"up" | "down" | null>(null);
-  const [dailyPanel, setDailyPanel] = useState<"missions" | "fact" | null>(null);
-  const [dailyFact, setDailyFact] = useState<DailyFact | null>(null);
-
-  /* Other tabs' header mission button lands here with ?panel=missions */
-  const { panel: panelParam } = useLocalSearchParams<{ panel?: string }>();
-  useEffect(() => {
-    if (panelParam !== "missions") return;
-    setInfoOpen(false);
-    setDailyPanel("missions");
-    router.setParams({ panel: undefined });
-  }, [panelParam, router]);
   const [betaNoticeVisible, setBetaNoticeVisible] = useState(false);
-
-  useEffect(() => {
-    void getDailyFact().then(setDailyFact);
-  }, []);
+  // The unit whose references and resources are open in their modal
+  const [refsUnitId, setRefsUnitId] = useState<string | null>(null);
 
   /* Public-beta notice — shown once per notice id (see constants/beta.ts) */
   useEffect(() => {
@@ -283,52 +214,10 @@ export default function HomeScreen() {
     dismissBetaNotice();
   }, [dismissBetaNotice]);
 
-  /* Today's fact is claimed once the "fact" mission flips to claimed */
-  const factClaimed = missions.some((m) => m.type === "fact" && m.isClaimed);
-  const remainingReward = missions
-    .filter((m) => !m.isClaimed)
-    .reduce((sum, m) => sum + m.reward, 0);
-
-  /* Missions progress fill — grows left-to-right when a claim lands */
-  const fill = useSharedValue(0);
-  const fillStyle = useAnimatedStyle(() => ({
-    transformOrigin: "left",
-    transform: [{ scaleX: Math.max(0.08, fill.get()) }],
-  }));
-  useEffect(() => {
-    const target = missions.length ? completedCount / missions.length : 0;
-    if (reducedMotion) {
-      fill.set(target);
-    } else {
-      fill.set(
-        withTiming(target, {
-          duration: 300,
-          easing: EASE_OUT,
-        }),
-      );
-    }
-  }, [fill, missions.length, completedCount, reducedMotion]);
-
-  const claimMission = useCallback(
-    async (mission: MissionView) => {
-      if (!mission.isComplete || mission.isClaimed) return;
-      await claim(mission);
-      notifySuccess();
-    },
-    [claim],
-  );
-
-  const handleMarkFactRead = useCallback(async () => {
-    if (factClaimed) return;
-    await markFactRead();
-    notifySuccess();
-  }, [markFactRead, factClaimed]);
-
   useFocusEffect(
     useCallback(() => {
       refresh();
-      refreshMissions();
-    }, [refresh, refreshMissions]),
+    }, [refresh]),
   );
 
   // Rebuilt only when content or progress changes, not on every render
@@ -336,16 +225,20 @@ export default function HomeScreen() {
     () => buildPath(curriculum, pathState, c.textFaint, theme),
     [curriculum, pathState, c.textFaint, theme],
   );
+  // Each unit has its own colours (nodes, bubble, divider, the card on top)
+  const palettes = useMemo(() => {
+    const map = new Map<string, UnitPalette>();
+    for (const u of units) map.set(u.id, unitPalette(c, u.position, isDark));
+    return map;
+  }, [units, c, isDark]);
   const completedKey = pathState.currentNodeId ?? "done";
 
   // Locate the first "current" (next up) node
-  let firstCurrentId: string | null = null;
   let currentUnitIndex = -1;
   let currentRowIndex = -1;
   for (let u = 0; u < units.length; u++) {
     const idx = units[u].levels.findIndex((l) => l.status === "current");
     if (idx !== -1) {
-      firstCurrentId = units[u].levels[idx].id;
       currentUnitIndex = u;
       currentRowIndex = idx;
       break;
@@ -383,12 +276,15 @@ export default function HomeScreen() {
   // Height of the scroll viewport (the map area under the top row)
   const viewportHeightRef = useRef(windowHeight - 320);
 
+  // Where the map is scrolled to, for placing the node bubble
+  const scrollYRef = useRef(0);
+
   const handleScroll = useCallback(
     (e: { nativeEvent: { contentOffset: { y: number } } }) => {
       const scrollY = e.nativeEvent.contentOffset.y;
-      // The expanded panels are a peek, not a screen — dismiss them as
-      // soon as the map moves so they never cover the path
-      setDailyPanel(null);
+      scrollYRef.current = scrollY;
+      // The info panel is a peek, not a screen: dismiss it as soon as the
+      // map moves so it never covers the path
       setInfoOpen(false);
       // The active unit is the one containing a line just under the card
       const target = scrollY + UNIT_SWITCH_OFFSET;
@@ -454,42 +350,101 @@ export default function HomeScreen() {
     }
   }, [loading, units, completedKey, currentUnitIndex, currentRowIndex, mapContentPad]);
 
-  const handleNodePress = (node: PathNode) => {
-    if (node.kind === "lesson" && node.lessonId) {
-      router.push(`/lesson/${node.lessonId}`);
-    } else {
-      router.push(`/practice/${node.id}`);
+  // Tapping a node opens a bubble with its title and status; the bubble's button opens it
+  const [selected, setSelected] = useState<{ id: string; side: BubbleSide } | null>(null);
+  const selectedNodeId = selected?.id ?? null;
+  const dismissBubble = useCallback(() => setSelected(null), []);
+
+  // The bubble opens under its node, or above it when there is no room below: the part of the map
+  // that can be seen is under the lesson card and above the navbar. When neither side has room the
+  // map is scrolled a little so the bubble can be seen.
+  const selectNode = (node: { id: string; title: string; status: string }, unitTop: number, y: number) => {
+    if (selected?.id === node.id) {
+      setSelected(null);
+      return;
+    }
+    const screenY = mapTopPad + unitTop + y - scrollYRef.current;
+    const bandTop = MAP_CARD_TOP + cardHeight + BUBBLE.margin / 2;
+    const bandBottom = viewportHeightRef.current + mapClipTop - tabBarInset - BUBBLE.margin / 2;
+    const width = Math.min(BUBBLE.maxWidth, mapWidth - BUBBLE.margin * 2);
+    const choice = chooseBubbleSide({
+      y: screenY,
+      current: node.status === "current",
+      height: bubbleHeight({ title: node.title, width, locked: node.status === "locked" }),
+      bandTop,
+      bandBottom,
+    });
+    setSelected({ id: node.id, side: choice.side });
+    // Start loading the preview now, while the learner reads the bubble
+    const picked = units.flatMap((u) => u.levels).find((n) => n.id === node.id);
+    if (picked?.kind === "lesson" && picked.lessonId) void prefetchPreview(picked.lessonId);
+    if (choice.scrollBy !== 0) {
+      scrollViewRef.current?.scrollTo({ y: Math.max(0, scrollYRef.current + choice.scrollBy), animated: true });
     }
   };
 
-  /* Action button with a rounded bottom lip (missions row action) */
-  const ActionButton = ({
-    color,
-    lipColor,
-    icon,
-    label,
-    onPress,
-  }: {
-    color: string;
-    lipColor: string;
-    icon: string;
-    label: string;
-    onPress: () => void;
-  }) => (
-    <View style={[styles.actionBtnClip, { backgroundColor: color }]}>
-      <TouchableOpacity
-        style={[styles.actionBtnFace, { backgroundColor: color }]}
-        activeOpacity={0.85}
-        accessibilityRole="button"
-        accessibilityLabel={label}
-        onPress={onPress}
-      >
-        <Icon name={icon} size={15} color="#FFFFFF" variant="Bold" />
-        <Text style={styles.actionBtnText}>{label}</Text>
-      </TouchableOpacity>
-      <View style={[styles.actionBtnLip, { backgroundColor: lipColor }]} />
-    </View>
+  // The lesson preview lives on this screen (a layer over the map), so the bubble's zoom and the page
+  // arriving are one animation. It is loaded when the bubble opens, and cleared whenever the map
+  // regains focus, because finishing a lesson changes what it says ("Review lesson").
+  const previewCache = useRef(new Map<string, Promise<LessonPreviewData | null>>());
+  const [preview, setPreview] = useState<{ lessonId: string; data: LessonPreviewData } | null>(null);
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const prefetchPreview = useCallback((lessonId: string) => {
+    let pending = previewCache.current.get(lessonId);
+    if (!pending) {
+      pending = loadLessonPreview(lessonId).catch(() => null);
+      previewCache.current.set(lessonId, pending);
+    }
+    return pending;
+  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      previewCache.current.clear();
+    }, []),
   );
+
+  // The bubble's button was released: a lesson's preview starts arriving over the zoom
+  const launchNode = (node: PathNode) => {
+    if (node.kind !== "lesson" || !node.lessonId) return;
+    const lessonId = node.lessonId;
+    void prefetchPreview(lessonId).then((data) => {
+      if (data) {
+        setPreview({ lessonId, data });
+        setPreviewOpen(true);
+      } else {
+        // No preview to show (should not happen): the lesson screen has its own
+        router.push(`/lesson/${lessonId}`);
+      }
+    });
+  };
+
+  // The bubble has dissolved. A lesson's preview is already up; the other kinds open their screen
+  const handleNodePress = (node: PathNode) => {
+    setSelected(null);
+    if (node.kind === "lesson" && node.lessonId) return;
+    router.push(`/practice/${node.id}`);
+  };
+
+  // Start / Review on the preview: the lesson screen opens straight into the lesson (no second preview),
+  // and the preview fades away over it once it is under way
+  // A lesson left half way is asked about here, drawn inside the preview's own modal (a second modal over
+  // it would not reliably show), so the lesson screen never has to open a dialog while the preview leaves.
+  const [resumeAsk, setResumeAsk] = useState(false);
+  const openLesson = useCallback(
+    (resume?: "continue" | "again") => {
+      if (!preview) return;
+      router.push({ pathname: "/lesson/[id]", params: resume ? { id: preview.lessonId, autostart: "1", resume } : { id: preview.lessonId, autostart: "1" } });
+      setTimeout(() => setPreviewOpen(false), 150);
+    },
+    [preview, router],
+  );
+  const proceedFromPreview = useCallback(() => {
+    if (!preview) return;
+    if (preview.data.savedPercent !== null) setResumeAsk(true);
+    else openLesson();
+  }, [preview, openLesson, setResumeAsk]);
+  const closePreview = useCallback(() => setPreviewOpen(false), []);
+  const previewGone = useCallback(() => setPreview(null), []);
 
   // Global index across all units (for the winding path)
   let globalCounter = 0;
@@ -497,200 +452,12 @@ export default function HomeScreen() {
   return (
     <View style={[styles.container, { backgroundColor: bgTop }]}>
       {/* Shared pale-orange page background */}
-      <PageBackground />
-
       {/* Top row — its own block above the map (the lesson card floats over
           the map below it) */}
-      <TopRowHeader
-        onMissionsPress={() => {
-          setInfoOpen(false);
-          setDailyPanel((p) => (p === "missions" ? null : "missions"));
-        }}
-      >
-          {/* Daily missions panel — claims happen right here */}
-          {dailyPanel === "missions" && (
-            <Animated.View
-              entering={reducedMotion ? FadeIn.duration(120) : FadeIn.duration(200)}
-              exiting={FadeOut.duration(160)}
-              style={styles.dailyPanel}
-            >
-              <View style={styles.panelHeader}>
-                <Text style={styles.panelTitle}>Daily Missions</Text>
-                <Text style={styles.panelMeta}>
-                  {completedCount}/{missions.length} · {remainingReward} XP left
-                </Text>
-              </View>
-              <View style={styles.panelProgressTrack}>
-                <Animated.View style={[styles.panelProgressFill, fillStyle]} />
-              </View>
-              {missions.map((mission) => {
-                const showClaim = mission.isComplete && !mission.isClaimed;
-                return (
-                  <View key={mission.id} style={styles.panelRow}>
-                    <View style={styles.missionIconBox}>
-                      <Svg width={40} height={40} viewBox="0 0 46 46">
-                        <Polygon
-                          points={HEX_POINTS}
-                          fill={mission.isComplete ? BTN_COLOR : c.surfaceSoft}
-                          stroke={mission.isComplete ? BTN_COLOR : c.surfaceSoft}
-                          strokeWidth={12}
-                          strokeLinejoin="round"
-                        />
-                      </Svg>
-                      <Icon
-                        name={mission.icon}
-                        size={19}
-                        color={mission.isComplete ? "#FFFFFF" : BTN_COLOR}
-                        variant="Bold"
-                        style={styles.missionIconOverlay}
-                      />
-                    </View>
-                    <View style={styles.missionInfo}>
-                      <Text style={styles.missionTitle}>
-                        {mission.title}
-                      </Text>
-                      <Text style={styles.missionDesc}>
-                        {mission.description}
-                      </Text>
-                    </View>
-                    {mission.isClaimed ? (
-                      <Animated.View
-                        entering={reducedMotion ? FadeIn.duration(120) : ZoomIn.duration(200)}
-                        style={styles.claimedPill}
-                      >
-                        <Icon
-                          name="TickCircle"
-                          size={14}
-                          color="#FFFFFF"
-                          variant="Bold"
-                        />
-                        <Text style={styles.claimedText}>Claimed</Text>
-                      </Animated.View>
-                    ) : showClaim ? (
-                      <ActionButton
-                        color={BTN_COLOR}
-                        lipColor={BTN_LIP}
-                        icon="TickCircle"
-                        label="Claim"
-                        onPress={() => void claimMission(mission)}
-                      />
-                    ) : mission.type === "mythbuster" ? (
-                      <ActionButton
-                        color="#8B5CF6"
-                        lipColor="#6D28D9"
-                        icon="Play"
-                        label="Play"
-                        onPress={() => router.push("/mythbuster")}
-                      />
-                    ) : mission.type === "fact" ? (
-                      <ActionButton
-                        color="#58CC02"
-                        lipColor="#27AE60"
-                        icon="Book"
-                        label="Read"
-                        onPress={() => setDailyPanel("fact")}
-                      />
-                    ) : (
-                      <View style={styles.lockedPill}>
-                        <Text style={styles.lockedText}>In progress</Text>
-                      </View>
-                    )}
-                  </View>
-                );
-              })}
-            </Animated.View>
-          )}
+      <TopRowHeader />
 
-          {/* Daily fact panel — today's myth or fact, read in place */}
-          {dailyPanel === "fact" && (
-            <Animated.View
-              entering={FadeIn.duration(200)}
-              exiting={FadeOut.duration(160)}
-              style={styles.dailyPanel}
-            >
-              <View style={styles.factHeader}>
-                <View style={styles.factHeaderLeft}>
-                  <View
-                    style={[
-                      styles.factBadge,
-                      dailyFact?.kind === "myth" && styles.factBadgeMyth,
-                    ]}
-                  >
-                    <Icon
-                      name={
-                        dailyFact?.kind === "myth" ? "CloseCircle" : "TickCircle"
-                      }
-                      size={12}
-                      color="#FFFFFF"
-                      variant="Bold"
-                    />
-                    <Text style={styles.factBadgeText}>
-                      {dailyFact?.kind === "myth" ? "MYTH" : "DAILY FACT"}
-                    </Text>
-                  </View>
-                  <Text style={styles.factTitle}>
-                    {dailyFact?.title ?? "Loading today's fact..."}
-                  </Text>
-                </View>
-                <View style={styles.rewardPill}>
-                  <Icon name="Flash" size={13} color="#FFA000" variant="Bold" />
-                  <Text style={styles.rewardText}>+50 XP</Text>
-                </View>
-              </View>
-              <ScrollView
-                showsVerticalScrollIndicator={false}
-                style={styles.panelScroll}
-              >
-                <View style={styles.panelScrollInner}>
-                  {dailyFact ? (
-                    <>
-                      <Text style={styles.factStatement}>
-                        {"\u201C"}{renderRichText(dailyFact.statement)}{"\u201D"}
-                      </Text>
-                      <View style={styles.factDivider} />
-                      <Text style={styles.factExplainLabel}>Why it matters</Text>
-                      <Text style={styles.factExplain}>
-                        {renderRichText(dailyFact.explanation)}
-                      </Text>
-                    </>
-                  ) : (
-                    <Text style={styles.factExplain}>Loading...</Text>
-                  )}
-                </View>
-              </ScrollView>
-              <View style={styles.factAction}>
-                {factClaimed ? (
-                  <Animated.View
-                    entering={reducedMotion ? FadeIn.duration(120) : ZoomIn.duration(200)}
-                    style={styles.factReadPill}
-                  >
-                    <Icon
-                      name="TickCircle"
-                      size={15}
-                      color="#FFFFFF"
-                      variant="Bold"
-                    />
-                    <Text style={styles.factReadText}>Read & Claimed</Text>
-                  </Animated.View>
-                ) : (
-                  <TouchableOpacity
-                    style={styles.factReadBtn}
-                    activeOpacity={0.85}
-                    hitSlop={4}
-                    accessibilityRole="button"
-                    accessibilityLabel="Read and claim daily fact"
-                    onPress={() => void handleMarkFactRead()}
-                  >
-                    <Icon name="Book" size={17} color="#FFFFFF" variant="Bold" />
-                    <Text style={styles.factReadBtnText}>Read & Claim</Text>
-                  </TouchableOpacity>
-                )}
-              </View>
-            </Animated.View>
-          )}
-      </TopRowHeader>
-
-      {/* Map area: the map scrolls behind the floating lesson card */}
+      {/* Map area: the map scrolls behind the floating lesson card, and runs to the bottom of the
+          screen so it shows around and under the docked tab bar */}
       <View style={styles.mapArea}>
       <ScrollView
         ref={scrollViewRef}
@@ -699,6 +466,7 @@ export default function HomeScreen() {
           viewportHeightRef.current = e.nativeEvent.layout.height;
         }}
         onScroll={handleScroll}
+        onScrollBeginDrag={dismissBubble}
         scrollEventThrottle={16}
         contentContainerStyle={{
           width: "100%",
@@ -709,9 +477,12 @@ export default function HomeScreen() {
         }}
         showsVerticalScrollIndicator={false}
       >
-        {units.map((unit) => {
+        {units.map((unit, unitIndex) => {
+          const palette = palettes.get(unit.id);
           const sectionHeight =
             unit.levels.length * NODE_ROW_GAP + SECTION_PAD;
+          // Where this unit's section starts in the map (for placing a node's bubble)
+          const unitTop = cardUnits.find((n) => n.id === unit.id)?.y ?? 0;
 
           // Position nodes (natural order, level 0 on top)
           const nextGlobal = globalCounter;
@@ -722,59 +493,67 @@ export default function HomeScreen() {
             y: NODE_TOP + i * NODE_ROW_GAP,
           }));
 
-          const pathD = pathPoints
-            .map((p, i) => `${i === 0 ? "M" : "L"} ${p.x} ${p.y}`)
-            .join(" ");
-
           return (
-            <View key={unit.id} style={{ height: sectionHeight }}>
-              {/* Winding path */}
-              <Svg
-                width={mapWidth}
-                height={sectionHeight}
-                style={styles.pathLayer}
-              >
-                <Path
-                  d={pathD}
-                  stroke={pathStroke}
-                  strokeWidth={5}
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeDasharray="6 12"
-                  fill="none"
-                />
-              </Svg>
+            <View
+              key={unit.id}
+              style={{ height: sectionHeight, zIndex: unit.levels.some((l) => l.id === selectedNodeId) ? 5 : 0 }}
+            >
+              {/* Between units: a dotted line with the unit's title in the middle, in its colour (grey while locked) */}
+              {unitIndex > 0 ? (
+                <UnitDivider title={`Unit ${unit.position}: ${unit.title}`} color={c.textMuted} top={-4} horizontalPadding={24} />
+              ) : null}
+
+              {/* A tap on empty map closes the bubble */}
+              {selectedNodeId ? (
+                <Pressable style={StyleSheet.absoluteFill} onPress={dismissBubble} accessible={false} />
+              ) : null}
 
               {/* Nodes */}
               {unit.levels.map((node, i) => (
                 <LessonNode
                   key={node.id}
-                  node={node}
                   x={pathPoints[i].x}
                   y={pathPoints[i].y}
-                  unitColor={unit.color}
-                  firstId={firstCurrentId}
-                  lockedFaceColor={theme.colors.borderStrong}
-                  lockedIconColor={theme.colors.textMuted}
-                  onNodeIconColor={theme.colors.onPrimary}
-                  shadowColor={theme.colors.shadow}
-                  onPress={() => handleNodePress(node)}
-                  styles={styles}
+                  status={node.status}
+                  glyph={node.glyph}
+                  palette={palette}
+                  progress={
+                    node.status === "current"
+                      ? unitRingProgress(
+                          unit.levels.filter((l) => l.status === "completed").length,
+                          unit.levels.length,
+                          runProgress[node.id] ?? 0,
+                        )
+                      : 0
+                  }
+                  accessibilityLabel={`${node.title}, ${
+                    node.status === "locked" ? "locked" : node.status === "completed" ? "completed" : "next up"
+                  }`}
+                  onPress={() => selectNode(node, unitTop, pathPoints[i].y)}
                 />
               ))}
 
-              {/* Unit divider */}
-              <View style={styles.unitDivider}>
-                <View
-                  style={[styles.unitDividerLine, { backgroundColor: pathStroke }]}
-                />
-                <Text style={styles.unitDividerText}>
-                  {unit.title}
-                </Text>
-                <View
-                  style={[styles.unitDividerLine, { backgroundColor: pathStroke }]}
-                />
-              </View>
+              {/* The speech bubble of the tapped node */}
+              {unit.levels.map((node, i) =>
+                node.id === selectedNodeId ? (
+                  <NodeBubble
+                    key={node.id}
+                    x={pathPoints[i].x}
+                    y={pathPoints[i].y}
+                    mapWidth={mapWidth}
+                    side={selected?.side ?? "below"}
+                    sectionHeight={sectionHeight}
+                    title={node.title}
+                    kind={node.kind}
+                    status={node.status}
+                    index={i}
+                    total={unit.levels.length}
+                    palette={palette}
+                    onLaunch={() => launchNode(node)}
+                    onAction={() => handleNodePress(node)}
+                  />
+                ) : null,
+              )}
             </View>
           );
         })}
@@ -792,16 +571,10 @@ export default function HomeScreen() {
               const activeUnit =
                 cardUnits.find((c) => c.id === cardUnit.id)?.unit ??
                 cardUnit.unit;
-              // Lessons only: practice nodes and checkpoints are not counted
-              const unitLessons = activeUnit.levels.filter(
-                (l) => l.kind === "lesson",
-              );
-              const unitTotal = unitLessons.length;
-              const unitCompleted = unitLessons.filter(
-                (l) => l.status === "completed",
-              ).length;
-              const standaloneInfo = !activeUnit.isLocked && !infoOpen;
-
+              // The card wears the colours of the unit it shows
+              const cardPalette = palettes.get(activeUnit.id);
+              const cardFace = cardPalette?.face ?? c.lessonHeader;
+              const cardInk = cardPalette?.ink ?? c.lessonHeaderText;
               return (
                 <Animated.View
                   layout={reducedMotion ? undefined : LinearTransition.duration(DURATION.medium).easing(EASE_OUT)}
@@ -812,7 +585,10 @@ export default function HomeScreen() {
                     if (!infoOpen) setCardHeight(Math.round(e.nativeEvent.layout.height));
                   }}
                 >
-                  <View style={styles.nowCardRow}>
+                  {/* The lip: its own layer, exactly where the face lands, so it shows only under the bottom edge */}
+                  <View pointerEvents="none" style={[styles.nowCardLip, cardPalette ? { backgroundColor: cardPalette.lip } : null]} />
+                  <View style={[styles.nowCardFace, { backgroundColor: cardFace }]}>
+                  <View style={styles.nowCardHeader}>
                     {/* Keyed by unit so a section change crossfades the
                         title/subtitle instead of snapping */}
                     <View style={styles.nowCardText} key={activeUnit.id}>
@@ -820,128 +596,92 @@ export default function HomeScreen() {
                         entering={reducedMotion ? FadeIn.duration(120) : FadeIn.duration(200)}
                         exiting={FadeOut.duration(150)}
                       >
-                        <Text style={styles.unitSubtitle}>
+                        <Text style={[styles.unitKicker, { color: withAlpha(cardInk, 0.75) }]} numberOfLines={1}>
+                          {`Unit ${activeUnit.position}: ${activeUnit.title}`}
+                        </Text>
+                        <Text style={[styles.unitSubtitle, { color: cardInk }]} numberOfLines={2}>
                           {activeUnit.subtitle}
-                        </Text>
-                        <Text style={styles.unitTitle}>
-                          {activeUnit.title}
-                        </Text>
-                        <Text style={styles.unitProgress}>
-                          {unitCompleted}/{unitTotal} lessons completed
                         </Text>
                       </Animated.View>
                     </View>
                     <TouchableOpacity
-                      style={[
-                        styles.infoBtn,
-                        // info.png carries its own container; lock/close keep the circle
-                        !standaloneInfo && styles.infoBtnCircle,
-                        infoOpen && styles.infoBtnActive,
-                      ]}
+                      style={styles.infoBtn}
                       hitSlop={6}
                       accessibilityRole="button"
                       accessibilityLabel={
                         infoOpen ? "Hide unit details" : "Show unit details"
                       }
-                      onPress={() => {
-                        setDailyPanel(null);
-                        setInfoOpen((o) => !o);
-                      }}
+                      onPress={() => setInfoOpen((o) => !o)}
                     >
-                      {standaloneInfo ? (
-                        <Image
-                          source={INFO_ICON}
-                          style={styles.infoImage}
-                          resizeMode="contain"
-                        />
-                      ) : (
-                        <Icon
-                          name={activeUnit.isLocked && !infoOpen ? "Lock" : "CloseCircle"}
-                          size={18}
-                          color={activeUnit.isLocked ? "#9CA3AF" : c.text}
-                          variant="Bold"
-                        />
-                      )}
+                      <Icon
+                        name={infoOpen ? "ArrowUp2" : activeUnit.isLocked ? "Lock" : "Book1"}
+                        size={22}
+                        color={cardFace}
+                        variant="Bold"
+                      />
                     </TouchableOpacity>
                   </View>
 
-                  {/* Unit info expands inside the card — no modal */}
-                  {infoOpen && activeUnit.info && (
-                    <Animated.View
-                      entering={reducedMotion ? FadeIn.duration(120) : FadeIn.duration(200)}
-                      exiting={FadeOut.duration(160)}
-                      style={styles.infoSection}
-                    >
-                      <View style={styles.infoDivider} />
-                      <Text style={styles.infoLabel}>About this unit</Text>
-                      <Text style={styles.infoBody}>{activeUnit.info}</Text>
-                      <UnitTeacher unitId={activeUnit.id} locked={activeUnit.isLocked} />
-                      {activeUnit.isLocked ? (
-                        <Text style={styles.infoBody}>
-                          This unit opens when you pass the checkpoint of the unit before it. Or skip ahead by testing out.
-                        </Text>
-                      ) : null}
-                      {activeUnit.references.length > 0 && (
-                        <>
-                          <Text style={styles.infoLabel}>
-                            References & Resources
-                          </Text>
-                          <ScrollView
-                            showsVerticalScrollIndicator={false}
-                            style={styles.infoRefs}
-                          >
-                            {activeUnit.references.map((ref) => (
-                              <TouchableOpacity
-                                key={ref.id}
-                                style={styles.referenceItem}
-                                disabled={!ref.url}
-                                accessibilityRole={ref.url ? "link" : "text"}
-                                accessibilityLabel={`${ref.title}, ${ref.publisher}`}
-                                onPress={async () => {
-                                  const opened = await openExternalUrl(ref.url);
-                                  if (!opened) {
-                                    Alert.alert("Error", "Could not open link");
-                                  }
-                                }}
-                              >
-                                <Icon
-                                  name="Link"
-                                  size={14}
-                                  color={c.primary}
-                                  variant="Bold"
-                                />
-                                <Text
-                                  style={styles.referenceText}
-                                  numberOfLines={2}
-                                >
-                                  {ref.publisher}: {ref.title}
-                                </Text>
-                                {ref.url ? (
-                                  <Icon
-                                    name="ArrowRight2"
-                                    size={14}
-                                    color={c.textMuted}
-                                  />
-                                ) : null}
-                              </TouchableOpacity>
-                            ))}
-                          </ScrollView>
-                        </>
-                      )}
-                      {activeUnit.canTestOut ? (
-                        <TouchableOpacity
-                          style={styles.testOutBtn}
-                          accessibilityRole="button"
-                          accessibilityLabel={`Test out of ${activeUnit.title}`}
-                          accessibilityHint="Pass a short test to skip this unit"
-                          onPress={() => router.push(`/practice/testout:${activeUnit.id}`)}
+                  {/* Unit info expands inside the card, no modal */}
+                  <View style={styles.nowCardBody}>
+                    {infoOpen && activeUnit.info && (
+                      <Animated.View
+                        entering={reducedMotion ? FadeIn.duration(120) : FadeIn.duration(200)}
+                        exiting={FadeOut.duration(160)}
+                        style={styles.infoSection}
+                      >
+                        <ScrollView
+                          style={{ maxHeight: windowHeight * 0.5 }}
+                          contentContainerStyle={styles.infoContent}
+                          showsVerticalScrollIndicator={false}
+                          nestedScrollEnabled
                         >
-                          <Icon name="Flash" size={16} color={c.primary} variant="Bold" />
-                          <Text style={styles.testOutText}>Already know this? Test out</Text>
-                        </TouchableOpacity>
-                      ) : null}
-                    </Animated.View>
-                  )}
+                          <View style={styles.infoBlock}>
+                            <Text style={styles.infoLabel}>About this unit</Text>
+                            <Text style={styles.infoBody}>{activeUnit.info}</Text>
+                          </View>
+
+                          <UnitTeacher unitId={activeUnit.id} locked={activeUnit.isLocked} />
+
+                          {activeUnit.isLocked ? (
+                            <View style={styles.infoNotice}>
+                              <Icon name="Lock" size={18} color={c.textMuted} variant="Bold" />
+                              <Text style={styles.infoNoticeText}>
+                                This unit opens when you pass the checkpoint of the unit before it. Or skip ahead by testing out.
+                              </Text>
+                            </View>
+                          ) : null}
+
+                          {activeUnit.references.length > 0 && (
+                            <TouchableOpacity
+                              style={styles.refsBtn}
+                              accessibilityRole="button"
+                              accessibilityLabel={`References and resources for ${activeUnit.title}`}
+                              onPress={() => setRefsUnitId(activeUnit.id)}
+                            >
+                              <Icon name="Link" size={16} color={c.primary} variant="Bold" />
+                              <Text style={styles.refsBtnText}>References & resources</Text>
+                              <Icon name="ArrowRight2" size={14} color={c.textMuted} />
+                            </TouchableOpacity>
+                          )}
+
+                          {activeUnit.canTestOut ? (
+                            <TouchableOpacity
+                              style={styles.testOutBtn}
+                              accessibilityRole="button"
+                              accessibilityLabel={`Test out of ${activeUnit.title}`}
+                              accessibilityHint="Pass a short test to skip this unit"
+                              onPress={() => router.push(`/practice/testout:${activeUnit.id}`)}
+                            >
+                              <Icon name="Flash" size={16} color={c.primary} variant="Bold" />
+                              <Text style={styles.testOutText}>Already know this? Test out</Text>
+                            </TouchableOpacity>
+                          ) : null}
+                        </ScrollView>
+                      </Animated.View>
+                    )}
+                  </View>
+                  </View>
                 </Animated.View>
               );
             })()}
@@ -989,33 +729,80 @@ export default function HomeScreen() {
           </Animated.View>
         )}
 
-      {/* Level-up celebration — pops once when XP crosses a level boundary */}
-      {levelUpLevel !== null && (
-        <View style={styles.levelUpOverlay}>
-          <Animated.View
-            entering={reducedMotion ? FadeIn.duration(120) : ZoomIn.duration(250)}
-            exiting={FadeOut.duration(180)}
-            style={styles.levelUpCard}
+      {/* The lesson preview, a layer over the whole screen */}
+      <LessonPreviewLayer
+        data={preview?.data ?? null}
+        open={previewOpen}
+        onClose={closePreview}
+        onProceed={proceedFromPreview}
+        resume={
+          resumeAsk
+            ? {
+                percent: preview?.data.savedPercent ?? 0,
+                onContinue: () => {
+                  setResumeAsk(false);
+                  openLesson("continue");
+                },
+                onStartAgain: () => {
+                  setResumeAsk(false);
+                  openLesson("again");
+                },
+                onCancel: () => setResumeAsk(false),
+              }
+            : null
+        }
+        onGone={previewGone}
+      />
+
+      {/* References and resources of a unit, one tap away from the card on top */}
+      <ModalDialog
+        visible={refsUnitId !== null}
+        onClose={() => setRefsUnitId(null)}
+        title="References & resources"
+        dismissOnScrim
+        footer={<ModalButton label="Close" onPress={() => setRefsUnitId(null)} />}
+      >
+        {(units.find((u) => u.id === refsUnitId)?.references ?? []).map((ref) => (
+          <TouchableOpacity
+            key={ref.id}
+            style={styles.referenceItem}
+            disabled={!ref.url}
+            accessibilityRole={ref.url ? "link" : "text"}
+            accessibilityLabel={`${ref.title}, ${ref.publisher}`}
+            onPress={async () => {
+              const opened = await openExternalUrl(ref.url);
+              if (!opened) {
+                Alert.alert("Error", "Could not open link");
+              }
+            }}
           >
-            <View style={styles.levelUpCrown}>
-              <Icon name="Crown1" size={30} color="#FFC107" variant="Bold" />
-            </View>
-            <Text style={styles.levelUpLabel}>LEVEL UP!</Text>
-            <Text style={styles.levelUpValue}>Level {levelUpLevel}</Text>
-<Text style={styles.levelUpSub}>
-            You&apos;ve reached a new tier of nuclear mastery. Keep earning XP
-            to level up again!
+            <Icon name="Link" size={16} color={c.primary} variant="Bold" />
+            <Text style={styles.referenceText} numberOfLines={3}>
+              {ref.publisher}: {ref.title}
+            </Text>
+            {ref.url ? <Icon name="ArrowRight2" size={14} color={c.textMuted} /> : null}
+          </TouchableOpacity>
+        ))}
+      </ModalDialog>
+
+      {/* Level-up celebration: the house modal, shown once when XP crosses a level boundary */}
+      <ModalDialog
+        visible={levelUpLevel !== null}
+        onClose={dismissLevelUp}
+        title="Level up!"
+        closeLabel="Keep going"
+        footer={<ModalButton label="Keep going" onPress={dismissLevelUp} />}
+      >
+        <View style={styles.levelUpBody}>
+          <View style={styles.levelUpCrown}>
+            <Icon name="Crown1" size={34} color={c.gold} variant="Bold" />
+          </View>
+          <Text style={styles.levelUpValue}>Level {levelUpLevel}</Text>
+          <Text style={styles.levelUpSub}>
+            You&apos;ve reached a new tier of nuclear mastery. Keep earning XP to level up again!
           </Text>
-            <TouchableOpacity
-              style={styles.levelUpBtn}
-              activeOpacity={0.85}
-              onPress={dismissLevelUp}
-            >
-              <Text style={styles.levelUpBtnText}>Keep Going</Text>
-            </TouchableOpacity>
-          </Animated.View>
         </View>
-      )}
+      </ModalDialog>
 
       {/* Public beta notice — shown on startup so testers know what to expect */}
       <BetaNoticeModal
@@ -1027,179 +814,9 @@ export default function HomeScreen() {
   );
 }
 
-const LessonNode = ({
-  node,
-  x,
-  y,
-  unitColor,
-  firstId,
-  onPress,
-  styles,
-  lockedFaceColor,
-  lockedIconColor,
-  onNodeIconColor,
-  shadowColor,
-}: {
-  node: PathNode;
-  x: number;
-  y: number;
-  unitColor: string;
-  firstId: string | null;
-  onPress: () => void;
-  styles: any;
-  lockedFaceColor: string;
-  lockedIconColor: string;
-  onNodeIconColor: string;
-  shadowColor: string;
-}) => {
-  const isLocked = node.status === "locked";
-  const isCurrent = node.status === "current";
-  const isCompleted = node.status === "completed";
-  const isFirst = firstId === node.id;
 
-  const pulse = useSharedValue(1);
-  const pressed = useSharedValue(0);
-  const reducedMotion = useReducedMotion();
-
-  useEffect(() => {
-    if (reducedMotion) {
-      cancelAnimation(pulse);
-      pulse.set(1);
-      return;
-    }
-    if (isCurrent) {
-      // Loop the "next up" pulse while this node is the current lesson
-      pulse.value = withRepeat(withTiming(1.12, { duration: 800 }), -1, true);
-    } else {
-      // The infinite loop only stops when it's cancelled — otherwise a node
-      // that was current keeps pulsing forever after it's completed
-      cancelAnimation(pulse);
-      pulse.set(1);
-    }
-  }, [isCurrent, reducedMotion]);
-
-  // Reference :active — button sinks, lip shallows, badge follows it down
-  const handlePressIn = useCallback(() => {
-    if (reducedMotion) {
-      pressed.value = withTiming(0.4, { duration: 120, easing: PRESS_EASING });
-    } else {
-      pressed.value = withTiming(1, { duration: DURATION.press, easing: PRESS_EASING });
-    }
-  }, [pressed, reducedMotion]);
-  const handlePressOut = useCallback(() => {
-    if (reducedMotion) {
-      pressed.value = withTiming(0, { duration: 120, easing: PRESS_EASING });
-    } else {
-      pressed.value = withTiming(0, { duration: DURATION.press, easing: PRESS_EASING });
-    }
-  }, [pressed, reducedMotion]);
-
-  const nodeStyle = useAnimatedStyle(() => ({
-    transform: [
-      { translateY: pressed.value * NODE_PRESS_SHIFT },
-      { scale: pulse.value },
-    ],
-  }));
-  /* Face recedes upward when pressed, shallowing the lip below it */
-  const faceStyle = useAnimatedStyle(() => ({
-    bottom: NODE_LIP - pressed.value * (NODE_LIP - NODE_LIP_PRESSED),
-  }));
-  const badgeStyle = useAnimatedStyle(() => ({
-    transform: [{ translateY: pressed.value * NODE_PRESS_SHIFT }],
-  }));
-
-  let iconName = "Star";
-  if (node.type === "book") iconName = "Book";
-  if (node.type === "chest") iconName = "Box";
-  if (node.type === "trophy") iconName = "Cup";
-
-  const lockedFace = lockedFaceColor;
-  const faceColor = isLocked ? lockedFace : unitColor;
-  const lipColor = isLocked
-    ? shadeColor(lockedFace, -0.12)
-    : shadeColor(unitColor, -0.14);
-  const iconColor = isLocked ? lockedIconColor : onNodeIconColor;
-
-  return (
-    <View
-      style={[
-        styles.nodeWrap,
-        { left: x - NODE_SIZE / 2, top: y - NODE_SIZE / 2 },
-      ]}
-    >
-      <TouchableOpacity
-        activeOpacity={1}
-        disabled={isLocked}
-        onPress={onPress}
-        onPressIn={handlePressIn}
-        onPressOut={handlePressOut}
-      >
-        <Animated.View
-          style={[
-            styles.node,
-            nodeStyle,
-            { shadowColor: isLocked ? shadowColor : `${unitColor}80` },
-          ]}
-        >
-          {/* Inner rounded rect in lip color — its own painted corners */}
-          <View style={[styles.nodeInner, { backgroundColor: lipColor }]}>
-            {/* Face on top, leaving the rounded lip strip exposed below */}
-            <Animated.View
-              style={[styles.nodeFace, faceStyle, { backgroundColor: faceColor }]}
-            >
-              {/* Diagonal glass stripes (reference button ::before) */}
-              <LinearGradient
-                colors={GLASS_COLORS}
-                locations={GLASS_LOCATIONS}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={styles.nodeGlass}
-              />
-            </Animated.View>
-            <Icon
-              name={iconName}
-              size={isCurrent || node.type === "trophy" ? 32 : 26}
-              color={iconColor}
-              variant="Bold"
-              style={{ marginBottom: Math.round(NODE_LIP / 2) }}
-            />
-          </View>
-        </Animated.View>
-      </TouchableOpacity>
-
-      {/* Completed check badge */}
-      {isCompleted && (
-        <Animated.View style={[styles.completedBadge, badgeStyle]}>
-          <LinearGradient
-            colors={["#FFBC00", "#FF7B00"]}
-            style={styles.completedBadgeFill}
-          >
-            <Svg width={11} height={11} viewBox="0 0 24 24">
-              <Polyline
-                points="20 6 9 17 4 12"
-                stroke="#333333"
-                strokeWidth={4.5}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                fill="none"
-              />
-            </Svg>
-          </LinearGradient>
-        </Animated.View>
-      )}
-
-      {isFirst && (
-        <Animated.View
-          entering={reducedMotion ? FadeIn.duration(120) : FadeInDown.delay(300)}
-          style={styles.startBubble}
-        >
-          <Text style={styles.startText}>START</Text>
-          <View style={styles.bubbleArrow} />
-        </Animated.View>
-      )}
-    </View>
-  );
-};
+/* Depth of the lesson card's lip (the shared control lip is 4) */
+const CARD_LIP = 6;
 
 const makeStyles = createStyles((theme) => {
   const c = theme.colors;
@@ -1207,20 +824,6 @@ const makeStyles = createStyles((theme) => {
     container: {
       flex: 1,
       backgroundColor: c.background,
-    },
-    bgGradient: {
-      position: "absolute",
-      top: 0,
-      right: 0,
-      bottom: 0,
-      left: 0,
-    },
-    pathLayer: {
-      position: "absolute",
-      top: 0,
-      right: 0,
-      bottom: 0,
-      left: 0,
     },
     mapArea: {
       flex: 1,
@@ -1234,40 +837,82 @@ const makeStyles = createStyles((theme) => {
       top: MAP_CARD_TOP,
       left: 0,
       right: 0,
-      paddingHorizontal: 16,
+      paddingHorizontal: 24,
       zIndex: 90,
     },
-    /* Lesson card — its own standalone card under the top row */
+    /* Lesson card: a face on a lip, like <Button>. The lip layer sits under
+       the face from `lip` down, so it only shows along the bottom edge. */
     nowCard: {
-      backgroundColor: c.card,
-      borderRadius: 20,
-      padding: 16,
-      borderWidth: 2,
-      borderColor: c.border,
-      borderBottomWidth: 4,
+      paddingBottom: CARD_LIP,
     },
-    nowCardRow: {
+    nowCardLip: {
+      position: "absolute",
+      top: CARD_LIP,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      borderRadius: 20,
+      backgroundColor: c.lessonCardLip,
+    },
+    /* The whole face is the lesson colour: header and body share it */
+    nowCardFace: {
+      borderRadius: 20,
+      overflow: "hidden",
+      backgroundColor: c.lessonHeader,
+    },
+    /* Unit title and subtitle on the left, the info button on the right */
+    nowCardHeader: {
       flexDirection: "row",
       alignItems: "center",
       gap: 12,
+      paddingHorizontal: 16,
+      paddingVertical: 30,
+    },
+    /* Only holds the expanded unit info, so it takes no space while closed */
+    nowCardBody: {
+      paddingHorizontal: 16,
     },
     nowCardText: {
       flex: 1,
       overflow: "hidden",
     },
     /* Unit info expands inside the lesson card */
+    /* A white panel inside the coloured card, so the text stays readable */
     infoSection: {
-      marginTop: 12,
+      marginTop: 14,
+      padding: 14,
+      borderRadius: 14,
+      backgroundColor: c.card,
+      marginBottom: 14,
     },
-    infoDivider: {
-      height: 1,
-      backgroundColor: c.borderSubtle,
-      marginBottom: 12,
+    infoContent: {
+      gap: 20,
+    },
+    infoBlock: {
+      gap: 8,
+    },
+    refList: {
+      gap: 8,
+    },
+    infoNotice: {
+      flexDirection: "row",
+      alignItems: "flex-start",
+      gap: 10,
+      padding: 12,
+      borderRadius: 14,
+      backgroundColor: c.surfaceSoft,
+    },
+    infoNoticeText: {
+      flex: 1,
+      fontSize: 13,
+      lineHeight: 19,
+      color: c.textSecondary,
+      ...fontFaces.medium,
     },
     infoLabel: {
       fontSize: 10,
       ...fontFaces.heavy,
-      color: c.textFaint,
+      color: c.textMuted,
       textTransform: "uppercase",
       letterSpacing: 0.8,
       marginBottom: 5,
@@ -1278,174 +923,32 @@ const makeStyles = createStyles((theme) => {
       color: c.textSecondary,
       lineHeight: 20,
     },
-    infoRefs: {
-      maxHeight: 172,
-      marginTop: 2,
-    },
-    infoBtnActive: {
-      backgroundColor: c.primarySurface,
-    },
-    /* Nodes */
-    nodeWrap: {
-      position: "absolute",
-      width: NODE_SIZE,
-      height: NODE_SIZE,
-      alignItems: "center",
-      justifyContent: "center",
-      zIndex: 10,
-    },
-    /* Reference "button" node: square with white border wrapping the face */
-    node: {
-      width: NODE_SIZE,
-      height: NODE_SIZE,
-      borderRadius: NODE_RADIUS,
-      borderWidth: NODE_BORDER,
-      borderColor: c.border,
-      backgroundColor: c.card,
-      elevation: 6,
-      shadowColor: c.shadow,
-      shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.15,
-      shadowRadius: 6,
-    },
-    /* Fills the area inside the border; painted in the lip color */
-    nodeInner: {
-      flex: 1,
-      alignSelf: "stretch",
-      borderRadius: NODE_INNER_RADIUS,
-      alignItems: "center",
-      justifyContent: "center",
-    },
-    /* Face covering everything except the bottom lip strip — the exposed
-       inner rect below it is the lip, rounded by its own painted corners */
-    nodeFace: {
-      position: "absolute",
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: NODE_LIP,
-      borderRadius: NODE_INNER_RADIUS,
-    },
-    nodeGlass: {
-      position: "absolute",
-      top: 0,
-      right: 0,
-      bottom: 0,
-      left: 0,
-      borderRadius: NODE_INNER_RADIUS,
-    },
-    completedBadge: {
-      position: "absolute",
-      bottom: -8,
-      alignSelf: "center",
-      width: BADGE_SIZE,
-      height: BADGE_SIZE,
-      borderRadius: BADGE_SIZE / 2,
-      borderWidth: 4,
-      borderColor: c.card,
-      backgroundColor: "#FF7B00",
-      zIndex: 20,
-      elevation: 3,
-      shadowColor: c.shadow,
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.15,
-      shadowRadius: 3,
-    },
-    completedBadgeFill: {
-      flex: 1,
-      borderRadius: 9,
-      alignItems: "center",
-      justifyContent: "center",
-    },
-    startBubble: {
-      position: "absolute",
-      top: -40,
-      alignSelf: "center",
-      backgroundColor: c.card,
-      paddingHorizontal: 12,
-      paddingVertical: 7,
-      borderRadius: 12,
-      borderWidth: 2,
-      borderColor: c.border,
-      zIndex: 20,
-      elevation: 4,
-      shadowColor: c.shadow,
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.1,
-      shadowRadius: 4,
-    },
-    startText: {
+    /* "UNIT 1: TITLE": small, all caps, lighter than the subtitle */
+    unitKicker: {
+      fontSize: 15,
+      lineHeight: 20,
       ...fontFaces.heavy,
-      color: c.primary,
-      fontSize: 13,
-    },
-    bubbleArrow: {
-      position: "absolute",
-      bottom: -7,
-      left: "50%",
-      marginLeft: -6,
-      width: 12,
-      height: 12,
-      backgroundColor: c.card,
-      borderBottomWidth: 2,
-      borderRightWidth: 2,
-      borderColor: c.border,
-      transform: [{ rotate: "45deg" }],
-    },
-    unitDivider: {
-      position: "absolute",
-      top: 10,
-      left: 20,
-      right: 20,
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 14,
-    },
-    unitDividerLine: {
-      flex: 1,
-      height: 2,
-      borderRadius: 1,
-    },
-    unitDividerText: {
-      fontSize: 13,
-      ...fontFaces.heavy,
-      color: c.textMuted,
-      textTransform: "uppercase",
-      letterSpacing: 1,
-    },
-    unitSubtitle: {
-      fontSize: 11,
-      ...fontFaces.semibold,
-      color: c.textMuted,
+      color: withAlpha(c.lessonHeaderText, 0.75),
       textTransform: "uppercase",
       letterSpacing: 0.8,
-      marginBottom: 3,
     },
-    unitTitle: {
-      fontSize: 20,
-      ...fontFaces.heavy,
-      color: c.text,
-    },
-    unitProgress: {
-      fontSize: 13,
-      ...fontFaces.semibold,
-      color: c.textMuted,
+    /* The subtitle is the headline of the card: one line when it fits, two at most */
+    unitSubtitle: {
       marginTop: 2,
+      fontSize: 22,
+      lineHeight: 28,
+      ...fontFaces.heavy,
+      color: c.lessonHeaderText,
     },
+    /* White circle on the yellow band; the icon takes the band color. The glyphs
+       have no circle of their own, so there is only one circle. */
     infoBtn: {
       width: 36,
       height: 36,
+      borderRadius: 18,
       alignItems: "center",
       justifyContent: "center",
-    },
-    /* Circle container for the lock / close states */
-    infoBtnCircle: {
-      backgroundColor: c.surfaceSoft,
-      borderRadius: 18,
-    },
-    infoImage: {
-      width: 36,
-      height: 36,
+      backgroundColor: c.onPrimary,
     },
     /* Floating "jump to current lesson" arrow */
     /* Persistent beta / feedback shortcut (bottom-left, above the tab bar) */
@@ -1496,246 +999,6 @@ const makeStyles = createStyles((theme) => {
       height: 4,
       backgroundColor: withAlpha(c.text, 0.15),
     },
-    /* Expanded daily panel — a white card floating under the header bar */
-    dailyPanel: {
-      backgroundColor: c.card,
-      borderRadius: 20,
-      padding: 14,
-      gap: 12,
-      borderWidth: 2,
-      borderColor: c.border,
-      borderBottomWidth: 4,
-      elevation: 6,
-      shadowColor: c.shadow,
-      shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.12,
-      shadowRadius: 8,
-    },
-    panelHeader: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "space-between",
-      gap: 12,
-    },
-    panelTitle: {
-      fontSize: 15,
-      ...fontFaces.heavy,
-      color: c.text,
-    },
-    panelMeta: {
-      fontSize: 12,
-      ...fontFaces.semibold,
-      color: c.textFaint,
-    },
-    panelProgressTrack: {
-      height: 8,
-      borderRadius: 4,
-      backgroundColor: c.surfaceSoft,
-      overflow: "hidden",
-    },
-    panelProgressFill: {
-      width: "100%",
-      height: "100%",
-      borderRadius: 4,
-      backgroundColor: BTN_COLOR,
-    },
-    panelRow: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 12,
-    },
-    missionIconBox: {
-      width: 40,
-      height: 40,
-      alignItems: "center",
-      justifyContent: "center",
-    },
-    missionIconOverlay: {
-      position: "absolute",
-    },
-    missionInfo: {
-      flex: 1,
-    },
-    missionTitle: {
-      fontSize: 13,
-      ...fontFaces.heavy,
-      color: c.text,
-    },
-    missionDesc: {
-      fontSize: 11,
-      ...fontFaces.regular,
-      color: c.textFaint,
-      marginTop: 1,
-    },
-    /* Mission row actions */
-    actionBtnClip: {
-      height: 36,
-      borderRadius: 13,
-      overflow: "hidden",
-    },
-    actionBtnFace: {
-      flex: 1,
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "center",
-      gap: 5,
-      paddingHorizontal: 12,
-    },
-    actionBtnText: {
-      fontSize: 12,
-      ...fontFaces.heavy,
-      color: "#FFFFFF",
-    },
-    actionBtnLip: {
-      position: "absolute",
-      left: 0,
-      right: 0,
-      bottom: 0,
-      height: 4,
-    },
-    claimedPill: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 5,
-      backgroundColor: "#58CC02",
-      borderRadius: 12,
-      paddingHorizontal: 11,
-      height: 32,
-    },
-    claimedText: {
-      fontSize: 12,
-      ...fontFaces.heavy,
-      color: "#FFFFFF",
-    },
-    lockedPill: {
-      backgroundColor: c.surfaceSoft,
-      borderRadius: 12,
-      paddingHorizontal: 11,
-      height: 32,
-      alignItems: "center",
-      justifyContent: "center",
-    },
-    lockedText: {
-      fontSize: 12,
-      ...fontFaces.semibold,
-      color: c.textFaint,
-    },
-    /* Daily fact panel */
-    factHeader: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "space-between",
-      gap: 12,
-    },
-    factHeaderLeft: {
-      flex: 1,
-      alignItems: "flex-start",
-      gap: 6,
-    },
-    factBadge: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 5,
-      backgroundColor: "#58CC02",
-      borderRadius: 8,
-      paddingHorizontal: 7,
-      paddingVertical: 3,
-    },
-    factBadgeMyth: {
-      backgroundColor: "#E74C3C",
-    },
-    factBadgeText: {
-      fontSize: 10,
-      ...fontFaces.heavy,
-      color: "#FFFFFF",
-      letterSpacing: 0.6,
-    },
-    factTitle: {
-      fontSize: 14,
-      ...fontFaces.heavy,
-      color: c.text,
-    },
-    rewardPill: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 4,
-      backgroundColor: c.surfaceSoft,
-      borderRadius: 10,
-      paddingHorizontal: 9,
-      paddingVertical: 5,
-    },
-    rewardText: {
-      fontSize: 11,
-      ...fontFaces.heavy,
-      color: c.primaryLight,
-    },
-    factStatement: {
-      fontSize: 15,
-      ...fontFaces.bold,
-      color: c.text,
-      lineHeight: 23,
-    },
-    factDivider: {
-      height: 1,
-      backgroundColor: c.borderSubtle,
-      marginVertical: 12,
-    },
-    factExplainLabel: {
-      fontSize: 10,
-      ...fontFaces.heavy,
-      color: c.textFaint,
-      textTransform: "uppercase",
-      letterSpacing: 0.8,
-      marginBottom: 5,
-    },
-    factExplain: {
-      fontSize: 13,
-      ...fontFaces.regular,
-      color: c.textSecondary,
-      lineHeight: 20,
-    },
-    factAction: {
-      flexDirection: "row",
-      justifyContent: "flex-start",
-    },
-    factReadBtn: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "center",
-      gap: 6,
-      paddingHorizontal: 16,
-      height: 40,
-      borderRadius: 13,
-      backgroundColor: BTN_COLOR,
-      borderBottomWidth: 4,
-      borderBottomColor: BTN_LIP,
-    },
-    factReadBtnText: {
-      fontSize: 13,
-      ...fontFaces.heavy,
-      color: "#FFFFFF",
-    },
-    factReadPill: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 6,
-      backgroundColor: "#58CC02",
-      borderRadius: 13,
-      paddingHorizontal: 15,
-      height: 40,
-    },
-    factReadText: {
-      fontSize: 13,
-      ...fontFaces.heavy,
-      color: "#FFFFFF",
-    },
-    /* Long fact content scrolls within the panel */
-    panelScroll: {
-      maxHeight: 280,
-    },
-    panelScrollInner: {
-      paddingVertical: 2,
-    },
     referenceItem: {
       flexDirection: "row",
       alignItems: "center",
@@ -1744,7 +1007,6 @@ const makeStyles = createStyles((theme) => {
       paddingHorizontal: 16,
       backgroundColor: c.surfaceSoft,
       borderRadius: 14,
-      marginBottom: 8,
       borderWidth: 2,
       borderColor: c.border,
       borderBottomWidth: 4,
@@ -1760,9 +1022,8 @@ const makeStyles = createStyles((theme) => {
       alignItems: "center",
       justifyContent: "center",
       gap: 8,
-      minHeight: 44,
-      marginTop: 12,
-      borderRadius: 12,
+      minHeight: 48,
+      borderRadius: 14,
       borderWidth: 2,
       borderColor: c.primaryBorder,
       backgroundColor: c.primarySurface,
@@ -1772,35 +1033,29 @@ const makeStyles = createStyles((theme) => {
       color: c.primaryLight,
       ...fontFaces.bold,
     },
-    /* Level-up celebration overlay — must sit above the sticky header
-       (zIndex 100) on iOS and above its elevation on Android, so the dim
-       covers the header too and the card is never buried under it. */
-    levelUpOverlay: {
-      position: "absolute",
-      top: 0,
-      right: 0,
-      bottom: 0,
-      left: 0,
-      backgroundColor: c.overlay,
+    /* The "References & resources" button inside the unit info */
+    refsBtn: {
+      flexDirection: "row",
       alignItems: "center",
       justifyContent: "center",
-      paddingHorizontal: 28,
-      zIndex: 200,
-      elevation: 24,
+      gap: 8,
+      minHeight: 48,
+      borderRadius: 14,
+      borderWidth: 2,
+      borderColor: c.border,
+      borderBottomWidth: 4,
+      backgroundColor: c.surfaceSoft,
     },
-    levelUpCard: {
-      width: "100%",
-      maxWidth: 340,
-      backgroundColor: c.card,
-      borderRadius: 26,
-      paddingVertical: 30,
-      paddingHorizontal: 26,
+    refsBtnText: {
+      flexShrink: 1,
+      fontSize: 14,
+      color: c.text,
+      ...fontFaces.bold,
+    },
+    /* Level-up modal content (the card, header and button are the house ModalDialog) */
+    levelUpBody: {
       alignItems: "center",
-      elevation: 12,
-      shadowColor: c.shadow,
-      shadowOffset: { width: 0, height: 10 },
-      shadowOpacity: 0.25,
-      shadowRadius: 24,
+      gap: 8,
     },
     levelUpCrown: {
       width: 72,
@@ -1811,43 +1066,18 @@ const makeStyles = createStyles((theme) => {
       borderColor: c.border,
       alignItems: "center",
       justifyContent: "center",
-      marginBottom: 14,
-    },
-    levelUpLabel: {
-      fontSize: 13,
-      ...fontFaces.heavy,
-      color: "#C2410C",
-      letterSpacing: 2,
-      textTransform: "uppercase",
-      marginBottom: 6,
     },
     levelUpValue: {
       fontSize: 30,
       ...fontFaces.heavy,
       color: c.text,
-      marginBottom: 10,
     },
     levelUpSub: {
-      fontSize: 13,
+      fontSize: 14,
       ...fontFaces.regular,
-      color: c.textMuted,
+      color: c.textSecondary,
       textAlign: "center",
-      lineHeight: 20,
-      marginBottom: 20,
-    },
-    levelUpBtn: {
-      alignSelf: "stretch",
-      alignItems: "center",
-      paddingVertical: 13,
-      borderRadius: 15,
-      backgroundColor: BTN_COLOR,
-      borderBottomWidth: 4,
-      borderBottomColor: BTN_LIP,
-    },
-    levelUpBtnText: {
-      fontSize: 15,
-      ...fontFaces.heavy,
-      color: "#FFFFFF",
+      lineHeight: 21,
     },
   };
 });

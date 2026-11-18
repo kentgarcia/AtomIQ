@@ -1,7 +1,8 @@
 import { createStyles, fontFaces, useTheme } from "@/theme";
 import { openExternalUrl } from "@/services/open-url";
 import React, { useMemo } from "react";
-import { Alert, Text, View } from "react-native";
+import { Alert, View } from "react-native";
+import { Text } from "@/components/ui/text";
 
 interface MarkdownTextProps {
   text: string;

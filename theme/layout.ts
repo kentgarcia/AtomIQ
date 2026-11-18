@@ -42,7 +42,7 @@ export const layout = {
      */
     tabBar: {
         gap: TAB_BAR_CONSTANTS.regular.gap,
-        horizontalMargin: TAB_BAR_CONSTANTS.maxMargin,
+        horizontalMargin: 0,
         maxWidth: TAB_BAR_CONSTANTS.maxWidth,
     },
 } as const;
@@ -125,7 +125,7 @@ export interface ResponsiveLayout {
     contentMaxWidth: number;
     /** Usable width inside the gutters. */
     contentWidth: number;
-    /** Height reserved by the floating tab bar, including the safe-area inset. */
+    /** Height reserved by the docked tab bar, including the safe-area inset. */
     tabBarReservedHeight: number;
     /** Style for a centered, gutter-padded content frame. */
     contentFrameStyle: ViewStyle;
