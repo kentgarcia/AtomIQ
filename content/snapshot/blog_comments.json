@@ -1,0 +1,48 @@
+{
+  "table": "blog_comments",
+  "primaryKey": [
+    "id"
+  ],
+  "rows": [
+    {
+      "id": "bc-nobody-knows-when-ray",
+      "blog_id": "blog-nobody-knows-when",
+      "npc_id": "npc-ray",
+      "position": 0,
+      "text": "Plain words: a group follows a pattern even though one nucleus does not. You will see exactly how in the half-life lesson.",
+      "chip": {
+        "lessonId": "half-life"
+      }
+    },
+    {
+      "id": "bc-the-smallest-thing-hal",
+      "blog_id": "blog-the-smallest-thing",
+      "npc_id": "npc-hal",
+      "position": 1,
+      "text": "Atoms are tiny, and the nucleus inside one can change all by itself. That is what my lessons are about.",
+      "chip": {
+        "lessonId": "why-nuclei-decay"
+      }
+    },
+    {
+      "id": "bc-the-smallest-thing-ray",
+      "blog_id": "blog-the-smallest-thing",
+      "npc_id": "npc-ray",
+      "position": 0,
+      "text": "Plain words: matter is anything that has mass and takes up space. Light and heat do not, so they are not matter.",
+      "chip": {
+        "entryId": "atom"
+      }
+    },
+    {
+      "id": "bc-three-kinds-of-carbon-mina",
+      "blog_id": "blog-three-kinds-of-carbon",
+      "npc_id": "npc-mina",
+      "position": 0,
+      "text": "Calm note: unstable does not mean dangerous. Your own body holds a little natural potassium-40, and that is normal.",
+      "chip": {
+        "lessonId": "stable-and-unstable-nuclei"
+      }
+    }
+  ]
+}

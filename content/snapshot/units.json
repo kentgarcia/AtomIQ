@@ -9,23 +9,50 @@
       "position": 1,
       "title": "Inside the Atom",
       "subtitle": "What everything is made of",
-      "description": "Start with the smallest pieces of matter. See what atoms are made of, what makes one element different from another, and why some nuclei are stable and others are not.",
-      "goal": "Describe the structure of an atom, tell elements and isotopes apart, and explain in plain words why some nuclei change.",
+      "description": "Start with the smallest pieces of matter. See what atoms are made of, what makes one element different from another, and why some nuclei stay the same while others change.",
+      "goal": "Describe what an atom is made of, tell elements and isotopes apart, and explain in plain words why some nuclei can change.",
       "guidebook": {
-        "summary": "Everything you can touch is made of atoms. Each atom has a tiny nucleus of protons and neutrons with electrons around it. The number of protons decides the element. Atoms of one element can differ in neutrons: those are isotopes. Some nuclei are stable; others are unstable and change, giving off radiation.",
+        "summary": "Everything you can touch, and the air too, is made of atoms. Atoms are far too small to see. An atom has a tiny nucleus of protons and neutrons, with electrons around it. The number of protons tells you the element. Atoms of one element can have different numbers of neutrons: those are isotopes, and most are not radioactive. Some nuclei are stable. An unstable nucleus can change and give off radiation, and this happens in nature too.",
         "termIds": [
           "atom",
+          "matter",
           "proton",
           "neutron",
           "electron",
           "nucleus",
-          "atomic-number",
-          "isotope"
+          "element",
+          "isotope",
+          "radioactivity"
         ]
       },
       "icon": "Atom",
       "tone": "accent",
       "teacher_npc_id": "npc-ada"
+    },
+    {
+      "id": "radioactivity",
+      "position": 2,
+      "title": "Radioactivity",
+      "subtitle": "How unstable nuclei change",
+      "description": "Find out why some nuclei change all by themselves. See what comes out, why nobody can say when one nucleus will change, how a big group follows a pattern, and why radioactivity is a natural part of the world.",
+      "goal": "Explain in your own words that radioactivity is a natural process in which an unstable nucleus changes into a more stable state and releases radiation.",
+      "guidebook": {
+        "summary": "Radioactivity is a natural process in which an unstable nucleus changes into a more stable state and releases radiation. It happens by itself, and you cannot predict when one particular nucleus will change. What comes out can be alpha particles, beta particles or gamma rays: three different things. A big group of nuclei follows a pattern called half-life. A new nucleus can be unstable too, which makes a decay chain. Radioactivity is found in rocks, air, food, the body and space, and radioactive does not automatically mean dangerous.",
+        "termIds": [
+          "radioactivity",
+          "decay",
+          "alpha-particle",
+          "beta-particle",
+          "gamma-ray",
+          "half-life",
+          "decay-chain",
+          "radon",
+          "background-radiation"
+        ]
+      },
+      "icon": "Radar",
+      "tone": "warning",
+      "teacher_npc_id": "npc-hal"
     }
   ]
 }

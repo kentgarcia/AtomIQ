@@ -5,10 +5,25 @@
   ],
   "rows": [
     {
+      "id": "alpha-beta-gamma",
+      "unit_id": "radioactivity",
+      "title": "Alpha, beta and gamma",
+      "description": "When a nucleus changes, something comes out. You will meet the three kinds, alpha, beta and gamma, and learn that they are three different things.",
+      "estimated_minutes": 5,
+      "xp_reward": 50,
+      "teaches": [
+        "u2-particle-or-wave",
+        "u2-recognise-radiation"
+      ],
+      "relies_on": [
+        "u2-parent-daughter"
+      ]
+    },
+    {
       "id": "atoms-are-everywhere",
       "unit_id": "inside-the-atom",
       "title": "Atoms are everywhere",
-      "description": "Everything you can touch, from your phone to your own hand, is built from atoms. They are far too small to see, so you will use comparisons to get a feel for just how tiny they are. You will also learn what counts as matter and what does not.",
+      "description": "Everything you can touch, and the air around you, is made of atoms. You will see what counts as matter and what does not. Then you will feel how small an atom is.",
       "estimated_minutes": 4,
       "xp_reward": 40,
       "teaches": [
@@ -18,30 +33,61 @@
       "relies_on": []
     },
     {
+      "id": "decay-chains",
+      "unit_id": "radioactivity",
+      "title": "Decay chains",
+      "description": "One decay is not always the end. You will follow a nucleus that changes again and again, and see that every change makes a different nucleus and nothing simply vanishes.",
+      "estimated_minutes": 4,
+      "xp_reward": 50,
+      "teaches": [
+        "u2-decay-chain",
+        "u2-decay-changes-not-vanishes"
+      ],
+      "relies_on": [
+        "u2-parent-daughter"
+      ]
+    },
+    {
       "id": "elements-and-the-periodic-table",
       "unit_id": "inside-the-atom",
-      "title": "Elements and the periodic table",
-      "description": "One number decides which element an atom is: how many protons it has. You will learn how that atomic number works. Then you will practise finding an element's symbol and number on the periodic table.",
-      "estimated_minutes": 5,
+      "title": "Elements",
+      "description": "One number tells you which element an atom is: how many protons it has. You will build atoms and watch what happens to the element when you change that number.",
+      "estimated_minutes": 4,
       "xp_reward": 50,
       "teaches": [
         "u1-atomic-number",
-        "u1-read-the-table"
+        "u1-change-protons"
       ],
       "relies_on": [
         "u1-particles"
       ]
     },
     {
+      "id": "half-life",
+      "unit_id": "radioactivity",
+      "title": "Half-life",
+      "description": "How fast does a group of radioactive nuclei fade? You will look at 100 unstable nuclei, find the pattern, and see why half-life is about a crowd and not a timer inside each atom.",
+      "estimated_minutes": 6,
+      "xp_reward": 60,
+      "teaches": [
+        "u2-half-life-meaning",
+        "u2-half-life-pattern",
+        "u2-half-life-group"
+      ],
+      "relies_on": [
+        "u2-random-single"
+      ]
+    },
+    {
       "id": "isotopes",
       "unit_id": "inside-the-atom",
       "title": "Isotopes",
-      "description": "Atoms of one element always have the same number of protons, but they can have different numbers of neutrons. Those versions are called isotopes. You will work out the particles in an isotope and name it from its numbers.",
-      "estimated_minutes": 5,
+      "description": "Atoms of one element always have the same number of protons, but they can have different numbers of neutrons. Those versions are called isotopes. You will see that an isotope is not automatically radioactive.",
+      "estimated_minutes": 4,
       "xp_reward": 50,
       "teaches": [
         "u1-isotope-definition",
-        "u1-mass-number"
+        "u1-isotope-not-radioactive"
       ],
       "relies_on": [
         "u1-particles",
@@ -51,9 +97,9 @@
     {
       "id": "protons-neutrons-electrons",
       "unit_id": "inside-the-atom",
-      "title": "Protons, neutrons, electrons",
-      "description": "Every atom is built from three kinds of particles: protons, neutrons and electrons. You will open one up to see what each particle carries and where it sits. You will also find out why the tiny nucleus holds nearly all of the atom's mass.",
-      "estimated_minutes": 5,
+      "title": "Meet the atom",
+      "description": "Every atom has a tiny centre called the nucleus, with electrons around it. You will meet the three particles of an atom and see which are positive, which are negative and which have no charge.",
+      "estimated_minutes": 4,
       "xp_reward": 50,
       "teaches": [
         "u1-particles",
@@ -64,19 +110,52 @@
       ]
     },
     {
-      "id": "stable-and-unstable-nuclei",
-      "unit_id": "inside-the-atom",
-      "title": "Stable and unstable nuclei",
-      "description": "A nucleus packs positive protons close together, so something has to stop them from flying apart. You will see how the electric push and the strong force compete. Then you will learn why most nuclei are stable and what happens when one is not.",
+      "id": "radioactivity-is-natural",
+      "unit_id": "radioactivity",
+      "title": "Radioactivity is natural",
+      "description": "Radioactivity was here long before people. You will find it in rocks, air, food, your own body and space, hear how it was discovered, and see why radioactive does not automatically mean dangerous.",
       "estimated_minutes": 5,
       "xp_reward": 50,
       "teaches": [
-        "u1-forces-in-nucleus",
-        "u1-stable-unstable"
+        "u2-natural-sources",
+        "u2-not-always-dangerous"
+      ],
+      "relies_on": [
+        "u1-unstable-changes",
+        "u2-decay-chain"
+      ]
+    },
+    {
+      "id": "stable-and-unstable-nuclei",
+      "unit_id": "inside-the-atom",
+      "title": "Stable and unstable nuclei",
+      "description": "Some nuclei stay the same for ever. Others are unstable and can change. You will see the difference, learn what radioactivity is, and find out that it is a natural thing.",
+      "estimated_minutes": 4,
+      "xp_reward": 50,
+      "teaches": [
+        "u1-stable-unstable",
+        "u1-unstable-changes"
       ],
       "relies_on": [
         "u1-nucleus",
         "u1-isotope-definition"
+      ]
+    },
+    {
+      "id": "why-nuclei-decay",
+      "unit_id": "radioactivity",
+      "title": "Why do nuclei decay?",
+      "description": "Some nuclei change all by themselves, and nobody can say when. You will meet the parent and the daughter, and find out why this is a natural process.",
+      "estimated_minutes": 5,
+      "xp_reward": 50,
+      "teaches": [
+        "u2-spontaneous",
+        "u2-random-single",
+        "u2-parent-daughter"
+      ],
+      "relies_on": [
+        "u1-stable-unstable",
+        "u1-unstable-changes"
       ]
     }
   ]

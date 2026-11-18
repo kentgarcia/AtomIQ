@@ -5,16 +5,16 @@
   ],
   "rows": [
     {
-      "id": "ref-atom-hair-scale",
-      "kind": "textbook",
-      "publisher": "To be identified",
-      "title": "Source for the width of a human hair and of a typical atom",
+      "id": "ref-background-radiation",
+      "kind": "official",
+      "publisher": "IAEA and UNSCEAR",
+      "title": "Background radiation explainers (IAEA, UNSCEAR)",
       "authors": "",
       "year": "",
       "url": "",
       "accessed": "",
       "verified": 0,
-      "note": "Hair about 0.07 mm; atom a few tenths of a nanometre. Confirm in a measurement reference."
+      "note": "Candidate. Natural radionuclides, cosmic radiation and radon. The spec also lists INIS record 111v8-1e515. Open each, record titles and URLs, then mark verified."
     },
     {
       "id": "ref-becquerel-1896",
@@ -29,6 +29,30 @@
       "note": "Discovery that uranium salts darken photographic plates."
     },
     {
+      "id": "ref-iaea-decay",
+      "kind": "official",
+      "publisher": "IAEA",
+      "title": "IAEA material on radioactive decay and half-life",
+      "authors": "",
+      "year": "",
+      "url": "",
+      "accessed": "",
+      "verified": 0,
+      "note": "Candidate. Definition of radioactive decay and half-life; alpha as two protons and two neutrons. The spec names IAEA-TECDOC-1363 (te_1363_web.pdf) but that came from a search summary: open it, confirm it covers radioactive decay, record the exact title and URL, then mark verified."
+    },
+    {
+      "id": "ref-iaea-glossary",
+      "kind": "official",
+      "publisher": "IAEA",
+      "title": "IAEA Nuclear Safety and Security Glossary",
+      "authors": "",
+      "year": "",
+      "url": "",
+      "accessed": "",
+      "verified": 0,
+      "note": "Candidate. Definitions of beta-minus, gamma and radionuclide. Open the glossary, record the entries used and the URL, then mark verified."
+    },
+    {
       "id": "ref-iaea-isotopes",
       "kind": "official",
       "publisher": "IAEA",
@@ -41,6 +65,18 @@
       "note": "Candidate. Open the IAEA page, record its exact title and URL, then mark verified."
     },
     {
+      "id": "ref-iaea-radiation-types",
+      "kind": "official",
+      "publisher": "IAEA",
+      "title": "IAEA material on alpha, beta and gamma radiation",
+      "authors": "",
+      "year": "",
+      "url": "",
+      "accessed": "",
+      "verified": 0,
+      "note": "Candidate. Particulate versus electromagnetic radiation. Open the page, record its exact title and URL, then mark verified."
+    },
+    {
       "id": "ref-iupac-table",
       "kind": "official",
       "publisher": "IUPAC",
@@ -50,7 +86,31 @@
       "url": "https://iupac.org/what-we-do/periodic-table-of-elements/",
       "accessed": "",
       "verified": 0,
-      "note": "Element symbols, names and atomic numbers."
+      "note": "Element names and atomic numbers."
+    },
+    {
+      "id": "ref-nrc-decay-series",
+      "kind": "official",
+      "publisher": "U.S. Nuclear Regulatory Commission",
+      "title": "NRC material on natural decay series and natural radionuclides",
+      "authors": "",
+      "year": "",
+      "url": "",
+      "accessed": "",
+      "verified": 0,
+      "note": "Candidate. The spec names NUREG/SR-1501 (number from a search summary). Check that the uranium-238 series ends in lead-206, the thorium-232 series in lead-208, and that potassium-40 is a natural radionuclide."
+    },
+    {
+      "id": "ref-openstax-chem-ch1",
+      "kind": "textbook",
+      "publisher": "OpenStax",
+      "title": "Chemistry 2e, section 1.2: Phases and Classification of Matter",
+      "authors": "Flowers, Theopold, Langley, Robinson",
+      "year": "2019",
+      "url": "https://openstax.org/books/chemistry-2e/pages/1-2-phases-and-classification-of-matter",
+      "accessed": "",
+      "verified": 0,
+      "note": "Matter has mass and takes up space; gases such as air are matter."
     },
     {
       "id": "ref-openstax-chem-ch2",
@@ -98,7 +158,7 @@
       "url": "https://doi.org/10.1080/14786440508637080",
       "accessed": "",
       "verified": 0,
-      "note": "Gold-foil interpretation: a small dense nucleus."
+      "note": "Gold-foil interpretation: a small dense nucleus, and an atom that is mostly empty space."
     }
   ]
 }

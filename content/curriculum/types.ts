@@ -125,7 +125,7 @@ export const ITEM_TYPES = [
 ] as const;
 export type ItemType = (typeof ITEM_TYPES)[number];
 
-export const SIM_TYPES = ["atom-builder", "scale-zoom"] as const;
+export const SIM_TYPES = ["atom-builder", "scale-zoom", "decay-wait", "decay-chain", "radiation-id"] as const;
 export type SimType = (typeof SIM_TYPES)[number];
 
 /** Item types that are not a plain pick-one question (the §6.2 "non-choice" count). */
@@ -153,6 +153,11 @@ interface TeachBase {
   /** Teaching text. At most 60 words (80 hard limit). May contain [[term-id|shown text]] markers. */
   body: string;
   figure?: CardFigure;
+  /**
+   * Where the figure comes in the lecture: how many of the teacher's bubbles (at most 3) are said before it.
+   * 0 = the picture leads, left out = after the first bubble.
+   */
+  figureAt?: number;
   /** An existing structured visual block (docs/completed/VISUAL_LESSON_BLOCKS.md). */
   visual?: VisualBlock;
 }
@@ -211,7 +216,8 @@ export interface MatchItemData extends ItemBase {
 }
 
 export interface SortItemData extends ItemBase {
-  buckets: { id: string; label: string }[];
+  /** `icon` is an Iconsax name: the group's button and its entry in the legend. Give every group one, each different. */
+  buckets: { id: string; label: string; icon?: string }[];
   items: { id: string; label: string; bucket: string; art?: string }[];
 }
 
@@ -241,6 +247,8 @@ export interface HotspotItemData extends ItemBase {
   /** Tappable targets in scene units. */
   targets: { id: string; label: string; x: number; y: number; r: number }[];
   answer: string;
+  /** On the correct tap, the circles inside the answer target tremble (a short scene motion). Still with reduced motion. */
+  animateOnCorrect?: boolean;
 }
 
 /** A prediction: unscored, committed before the lesson explains the answer. */
@@ -306,7 +314,56 @@ export interface ScaleZoomData {
   stops: ScaleZoomStop[];
 }
 
-export type SimData = AtomBuilderData | ScaleZoomData;
+/** Unit 2: nuclei that change by themselves (docs/UNIT_2_RADIOACTIVITY_SPEC.md §8). */
+export type DecayWaitMode = "single" | "half-life";
+
+export interface DecayWaitData {
+  /** `single`: genuinely random, each nucleus changes on its own. `half-life`: guided random, about half change per press. */
+  mode: DecayWaitMode;
+  task: string;
+  /** How many unstable nuclei the card starts with. */
+  count: number;
+  /** Complete after this many presses of the wait button. */
+  goal: { presses: number };
+  hint?: string;
+  objectives?: string[];
+}
+
+export interface DecayChainNode {
+  id: string;
+  label: string;
+  state: "unstable" | "stable";
+}
+
+export interface DecayChainData {
+  task: string;
+  /** In order, from the parent to the stable end. Every node but the last is unstable. */
+  nodes: DecayChainNode[];
+  /** Complete when this node (the stable end) is reached. */
+  goal: { reach: string };
+  hint?: string;
+  objectives?: string[];
+}
+
+export type RadiationKind = "alpha" | "beta" | "gamma";
+
+export interface RadiationIdCase {
+  id: string;
+  answer: RadiationKind;
+  /** What the learner is told about what leaves the nucleus. The animation plays after the guess. */
+  clue: string;
+}
+
+export interface RadiationIdData {
+  task: string;
+  cases: RadiationIdCase[];
+  /** Complete when every case has been identified (a wrong guess is allowed and re-tried). */
+  goal: { all: true };
+  hint?: string;
+  objectives?: string[];
+}
+
+export type SimData = AtomBuilderData | ScaleZoomData | DecayWaitData | DecayChainData | RadiationIdData;
 
 // -- Card -------------------------------------------------------------------------
 
@@ -321,7 +378,10 @@ export interface LessonCard {
   itemId?: string;
   /** Items are scored unless this is false (predictions). */
   scored: boolean;
-  /** Teach and sim content; empty for item cards. */
+  /**
+   * Teach and sim content. For item cards it is empty, or `{ connected: true }`: the activity belongs to the
+   * lecture right before it and is played on the same page.
+   */
   data: Record<string, unknown>;
 }
 

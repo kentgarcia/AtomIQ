@@ -10,9 +10,9 @@
 
 export interface JourneyNode {
   id: string;
-  type: 'myth' | 'article' | 'fact' | 'interactive' | 'quiz';
+  type: 'myth' | 'fact' | 'interactive' | 'quiz';
   title: string;
-  contentId: string; // References myth, article, or quiz ID
+  contentId: string; // References myth or quiz ID
   position: number; // Order in the journey
   description?: string;
   unlockCondition?: {
@@ -183,7 +183,6 @@ export interface EncyclopediaEntry {
     url: string;
   }[];
   relatedMyths?: string[]; // Myth IDs
-  relatedArticles?: string[]; // Article IDs
   difficulty: 'beginner' | 'intermediate' | 'advanced';
 }
 

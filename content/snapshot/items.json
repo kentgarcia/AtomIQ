@@ -24,19 +24,19 @@
             "art": "shadow"
           },
           {
-            "id": "salt",
-            "label": "A grain of salt",
-            "art": "salt"
+            "id": "air",
+            "label": "The air in a room",
+            "art": "air"
           },
           {
             "id": "sound",
             "label": "A sound",
-            "note": "Sound is a wave moving through matter; it is not matter itself.",
+            "note": "Sound is a wave moving through matter. It is not matter itself.",
             "art": "sound"
           }
         ],
-        "answer": "salt",
-        "explanation": "A grain of salt is matter, so it is made of atoms. Light, shadows and sounds are not matter."
+        "answer": "air",
+        "explanation": "Air is matter, so it is made of atoms. Light, shadows and sounds are not matter."
       },
       "difficulty": 1,
       "surfaces": [
@@ -44,46 +44,50 @@
         "practice",
         "review"
       ],
-      "reference_ids": []
+      "reference_ids": [
+        "ref-openstax-chem-ch1"
+      ]
     },
     {
-      "id": "u1-l1-fill-touch",
+      "id": "u1-l1-fill-air",
       "objective_id": "u1-matter-is-atoms",
       "type": "fill",
       "data": {
         "mode": "bank",
-        "prompt": "Everything you can touch is made of ___.",
+        "prompt": "A pumped-up ball weighs more than a flat one because air is made of ___.",
         "bank": [
           {
             "id": "atoms",
             "label": "atoms"
           },
           {
-            "id": "energy",
-            "label": "energy"
+            "id": "nothing",
+            "label": "nothing"
           },
           {
-            "id": "light",
-            "label": "light"
+            "id": "energy",
+            "label": "energy"
           }
         ],
         "answer": "atoms",
-        "explanation": "Everything you can touch is made of atoms."
+        "explanation": "Air is matter, and atoms have weight. More air inside the ball means more atoms, so it weighs more."
       },
       "difficulty": 1,
       "surfaces": [
-        "lesson",
         "practice",
+        "checkpoint",
         "review"
       ],
-      "reference_ids": []
+      "reference_ids": [
+        "ref-openstax-chem-ch1"
+      ]
     },
     {
       "id": "u1-l1-order-sizes",
       "objective_id": "u1-atom-scale",
       "type": "order",
       "data": {
-        "prompt": "Put these in order from smallest to largest.",
+        "prompt": "Put these in order from smallest to biggest.",
         "items": [
           {
             "id": "atom",
@@ -91,31 +95,31 @@
             "art": "atom"
           },
           {
-            "id": "rbc",
-            "label": "A red blood cell",
-            "art": "rbc"
+            "id": "virus",
+            "label": "A virus",
+            "art": "virus"
           },
           {
-            "id": "hair",
-            "label": "The width of a human hair",
-            "art": "hair"
+            "id": "cell",
+            "label": "A skin cell",
+            "art": "cell"
           },
           {
-            "id": "rice",
-            "label": "A grain of rice",
-            "art": "rice"
+            "id": "hand",
+            "label": "A hand",
+            "art": "hand"
           }
         ],
-        "explanation": "An atom is far smaller than even a single cell. A red blood cell is a few thousandths of a millimetre across, a hair is about 0.07 mm wide and a grain of rice is a few millimetres long."
+        "explanation": "An atom is the smallest. A virus is bigger, a skin cell is bigger still, and a hand is the biggest."
       },
-      "difficulty": 2,
+      "difficulty": 1,
       "surfaces": [
         "lesson",
         "practice",
         "review"
       ],
       "reference_ids": [
-        "ref-atom-hair-scale"
+        "ref-openstax-chem-ch2"
       ]
     },
     {
@@ -127,11 +131,13 @@
         "buckets": [
           {
             "id": "atoms",
-            "label": "Made of atoms"
+            "label": "Made of atoms",
+            "icon": "AqAtom"
           },
           {
             "id": "not",
-            "label": "Not made of atoms"
+            "label": "Not made of atoms",
+            "icon": "AqAtomOff"
           }
         ],
         "items": [
@@ -160,7 +166,45 @@
             "art": "flame"
           }
         ],
-        "explanation": "Phones and apples are matter, and matter is made of atoms. Light and heat are forms of energy, not matter."
+        "explanation": "Phones and apples are matter, and all matter is made of atoms. Light and heat are energy, not matter."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-openstax-chem-ch1"
+      ]
+    },
+    {
+      "id": "u1-l1-tom-air-empty",
+      "objective_id": "u1-matter-is-atoms",
+      "type": "true_or_myth",
+      "data": {
+        "statement": "A bottle with only air in it is empty.",
+        "answer": "myth",
+        "explanation": "Myth. Air is matter, so the bottle is full of atoms. Only a vacuum, where the air has been pumped out, comes close to empty."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-openstax-chem-ch1"
+      ]
+    },
+    {
+      "id": "u1-l1-tom-microscope",
+      "objective_id": "u1-atom-scale",
+      "type": "true_or_myth",
+      "data": {
+        "statement": "Atoms are too small to be seen with an ordinary microscope.",
+        "answer": "true",
+        "explanation": "True. An ordinary microscope uses light, and light waves are too big to show something as small as an atom. Special instruments can, but a classroom microscope cannot."
       },
       "difficulty": 1,
       "surfaces": [
@@ -173,22 +217,22 @@
       ]
     },
     {
-      "id": "u1-l1-tom-microscope",
+      "id": "u1-l1-tom-see-atoms",
       "objective_id": "u1-atom-scale",
       "type": "true_or_myth",
       "data": {
-        "statement": "Atoms are too small to be seen with an ordinary light microscope.",
-        "answer": "true",
-        "explanation": "True. An ordinary microscope uses visible light, whose waves are far longer than an atom is wide. Special instruments can image atoms, but a classroom microscope cannot."
+        "statement": "With a good ordinary microscope you can see a single atom.",
+        "answer": "myth",
+        "explanation": "Myth. Atoms are far too small. Even the best ordinary microscope cannot show one."
       },
       "difficulty": 1,
       "surfaces": [
-        "lesson",
         "practice",
+        "checkpoint",
         "review"
       ],
       "reference_ids": [
-        "ref-atom-hair-scale"
+        "ref-openstax-chem-ch2"
       ]
     },
     {
@@ -200,26 +244,21 @@
         "options": [
           {
             "id": "nucleus",
-            "label": "In the nucleus"
+            "label": "In the tiny nucleus"
           },
           {
             "id": "electrons",
             "label": "In the electrons",
-            "note": "Electrons are incredibly light: a proton is about 1,800 times heavier."
+            "note": "Electrons are very light. Almost all of the mass is in the nucleus."
           },
           {
             "id": "even",
             "label": "Spread evenly through the atom",
-            "note": "The mass is not spread out: it is packed into the nucleus."
-          },
-          {
-            "id": "none",
-            "label": "An atom has hardly any mass",
-            "note": "Atoms are tiny, but they do have mass, and nearly all of it is in the nucleus."
+            "note": "The mass is not spread out. It is packed into the nucleus."
           }
         ],
         "answer": "nucleus",
-        "explanation": "The nucleus holds almost all of the mass. A proton or neutron is about 1,800 times heavier than an electron."
+        "explanation": "Almost all of an atom's mass is packed into its tiny nucleus."
       },
       "difficulty": 1,
       "surfaces": [
@@ -333,7 +372,7 @@
           }
         ],
         "answer": "nucleus",
-        "explanation": "The nucleus is the tiny centre of the atom. Protons and neutrons live there. The electrons are outside it."
+        "explanation": "The nucleus is the tiny centre of the atom. Protons and neutrons are in it. The electrons are outside."
       },
       "difficulty": 1,
       "surfaces": [
@@ -410,7 +449,7 @@
           }
         ],
         "answer": "marble",
-        "explanation": "Your guess is not scored. The reveal comes later in the lesson."
+        "explanation": "Your guess is not scored. The answer comes later in the lesson."
       },
       "difficulty": 1,
       "surfaces": [
@@ -427,11 +466,13 @@
         "buckets": [
           {
             "id": "in",
-            "label": "In the nucleus"
+            "label": "In the nucleus",
+            "icon": "AqNucleus"
           },
           {
             "id": "out",
-            "label": "Outside the nucleus"
+            "label": "Outside the nucleus",
+            "icon": "AqOrbit"
           }
         ],
         "items": [
@@ -459,16 +500,18 @@
         "practice",
         "review"
       ],
-      "reference_ids": []
+      "reference_ids": [
+        "ref-openstax-chem-ch2"
+      ]
     },
     {
-      "id": "u1-l2-tom-volume",
+      "id": "u1-l2-tom-solid",
       "objective_id": "u1-nucleus",
       "type": "true_or_myth",
       "data": {
-        "statement": "The nucleus takes up most of the space in an atom.",
+        "statement": "An atom is a solid ball, packed full of stuff.",
         "answer": "myth",
-        "explanation": "Myth. The nucleus is a tiny speck at the centre. Nearly all of the atom's size is the region where its electrons are found."
+        "explanation": "Myth. An atom is mostly empty space. The nucleus is a tiny speck in the middle, and the electrons are far from it."
       },
       "difficulty": 1,
       "surfaces": [
@@ -478,6 +521,446 @@
       ],
       "reference_ids": [
         "ref-openstax-up3-ch10"
+      ]
+    },
+    {
+      "id": "u1-l2-tom-volume",
+      "objective_id": "u1-nucleus",
+      "type": "true_or_myth",
+      "data": {
+        "statement": "The nucleus takes up most of the space in an atom.",
+        "answer": "myth",
+        "explanation": "Myth. The nucleus is a tiny speck at the centre. Most of the atom is empty space around it."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "practice",
+        "checkpoint",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-openstax-up3-ch10"
+      ]
+    },
+    {
+      "id": "u1-l3-choice-gain-two",
+      "objective_id": "u1-change-protons",
+      "type": "choice",
+      "data": {
+        "prompt": "A carbon atom gains 2 protons. What is it now?",
+        "figure": {
+          "scene": {
+            "height": 58,
+            "shapes": [
+              {
+                "t": "circle",
+                "x": 18.34,
+                "y": 24,
+                "r": 2.1,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 15.29,
+                "y": 25.56,
+                "r": 2.1,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 17.26,
+                "y": 21.02,
+                "r": 2.1,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 19.15,
+                "y": 26.81,
+                "r": 2.1,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 13.05,
+                "y": 23.3,
+                "r": 2.1,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 20.74,
+                "y": 21.62,
+                "r": 2.1,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 15.75,
+                "y": 28.65,
+                "r": 2.1,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 14.61,
+                "y": 19.41,
+                "r": 2.1,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 22.18,
+                "y": 25.89,
+                "r": 2.1,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 11.62,
+                "y": 26.22,
+                "r": 2.1,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 19.6,
+                "y": 18.45,
+                "r": 2.1,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 18.92,
+                "y": 30.12,
+                "r": 2.1,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "text",
+                "x": 17,
+                "y": 44,
+                "text": "6 protons",
+                "size": 5
+              },
+              {
+                "t": "text",
+                "x": 17,
+                "y": 51,
+                "text": "carbon",
+                "size": 6
+              },
+              {
+                "t": "circle",
+                "x": 51.34,
+                "y": 24,
+                "r": 2.1,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 48.29,
+                "y": 25.56,
+                "r": 2.1,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 50.26,
+                "y": 21.02,
+                "r": 2.1,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 52.15,
+                "y": 26.81,
+                "r": 2.1,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 46.05,
+                "y": 23.3,
+                "r": 2.1,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 53.74,
+                "y": 21.62,
+                "r": 2.1,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 48.75,
+                "y": 28.65,
+                "r": 2.1,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 47.61,
+                "y": 19.41,
+                "r": 2.1,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 55.18,
+                "y": 25.89,
+                "r": 2.1,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 44.62,
+                "y": 26.22,
+                "r": 2.1,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 52.6,
+                "y": 18.45,
+                "r": 2.1,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 51.92,
+                "y": 30.12,
+                "r": 2.1,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 44.22,
+                "y": 20.65,
+                "r": 2.1,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 56.78,
+                "y": 22.51,
+                "r": 2.1,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "text",
+                "x": 50,
+                "y": 44,
+                "text": "7 protons",
+                "size": 5
+              },
+              {
+                "t": "text",
+                "x": 50,
+                "y": 51,
+                "text": "nitrogen",
+                "size": 6
+              },
+              {
+                "t": "circle",
+                "x": 84.34,
+                "y": 24,
+                "r": 2.1,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 81.29,
+                "y": 25.56,
+                "r": 2.1,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 83.26,
+                "y": 21.02,
+                "r": 2.1,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 85.15,
+                "y": 26.81,
+                "r": 2.1,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 79.05,
+                "y": 23.3,
+                "r": 2.1,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 86.74,
+                "y": 21.62,
+                "r": 2.1,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 81.75,
+                "y": 28.65,
+                "r": 2.1,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 80.61,
+                "y": 19.41,
+                "r": 2.1,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 88.18,
+                "y": 25.89,
+                "r": 2.1,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 77.62,
+                "y": 26.22,
+                "r": 2.1,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 85.6,
+                "y": 18.45,
+                "r": 2.1,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 84.92,
+                "y": 30.12,
+                "r": 2.1,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 77.22,
+                "y": 20.65,
+                "r": 2.1,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 89.78,
+                "y": 22.51,
+                "r": 2.1,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 78.86,
+                "y": 29.89,
+                "r": 2.1,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 82.04,
+                "y": 16.62,
+                "r": 2.1,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "text",
+                "x": 83,
+                "y": 44,
+                "text": "8 protons",
+                "size": 5
+              },
+              {
+                "t": "text",
+                "x": 83,
+                "y": 51,
+                "text": "oxygen",
+                "size": 6
+              }
+            ]
+          },
+          "altText": "Three atom centres side by side. An atom with 6 protons is carbon, an atom with 7 protons is nitrogen, and an atom with 8 protons is oxygen. The number of protons tells you the element."
+        },
+        "options": [
+          {
+            "id": "oxygen",
+            "label": "Oxygen"
+          },
+          {
+            "id": "carbon",
+            "label": "Still carbon",
+            "note": "Carbon has 6 protons. With 8 it is a different element."
+          },
+          {
+            "id": "nitrogen",
+            "label": "Nitrogen",
+            "note": "Nitrogen has 7 protons. That is only one more."
+          }
+        ],
+        "answer": "oxygen",
+        "explanation": "6 protons plus 2 is 8 protons, and 8 protons is oxygen."
+      },
+      "difficulty": 2,
+      "surfaces": [
+        "practice",
+        "checkpoint",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-openstax-chem-ch2"
       ]
     },
     {
@@ -494,23 +977,439 @@
           {
             "id": "stuff",
             "label": "They are made of different kinds of stuff",
-            "note": "Every atom is built from the same three particles. Only the numbers differ."
+            "note": "Every atom is built from the same three particles. Only the numbers are different."
           },
           {
             "id": "solid",
             "label": "Gold atoms are solid and oxygen atoms are hollow",
-            "note": "Atoms of every element are mostly empty space around a tiny nucleus."
-          },
-          {
-            "id": "colour",
-            "label": "Gold atoms are yellow",
-            "note": "Single atoms do not have a colour in this sense. The difference is the proton count."
+            "note": "Atoms of every element are mostly empty space."
           }
         ],
         "answer": "protons",
-        "explanation": "Gold atoms have 79 protons and oxygen atoms have 8. The particles are the same kinds; the number of protons is what differs."
+        "explanation": "Gold atoms have 79 protons and oxygen atoms have 8. The particles are the same kinds. The number of protons is what is different."
       },
       "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-openstax-chem-ch2"
+      ]
+    },
+    {
+      "id": "u1-l3-choice-lose-proton",
+      "objective_id": "u1-change-protons",
+      "type": "choice",
+      "data": {
+        "prompt": "An oxygen atom has 8 protons. It loses one proton. What is it now?",
+        "figure": {
+          "scene": {
+            "height": 58,
+            "shapes": [
+              {
+                "t": "circle",
+                "x": 18.34,
+                "y": 24,
+                "r": 2.1,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 15.29,
+                "y": 25.56,
+                "r": 2.1,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 17.26,
+                "y": 21.02,
+                "r": 2.1,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 19.15,
+                "y": 26.81,
+                "r": 2.1,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 13.05,
+                "y": 23.3,
+                "r": 2.1,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 20.74,
+                "y": 21.62,
+                "r": 2.1,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 15.75,
+                "y": 28.65,
+                "r": 2.1,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 14.61,
+                "y": 19.41,
+                "r": 2.1,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 22.18,
+                "y": 25.89,
+                "r": 2.1,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 11.62,
+                "y": 26.22,
+                "r": 2.1,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 19.6,
+                "y": 18.45,
+                "r": 2.1,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 18.92,
+                "y": 30.12,
+                "r": 2.1,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "text",
+                "x": 17,
+                "y": 44,
+                "text": "6 protons",
+                "size": 5
+              },
+              {
+                "t": "text",
+                "x": 17,
+                "y": 51,
+                "text": "carbon",
+                "size": 6
+              },
+              {
+                "t": "circle",
+                "x": 51.34,
+                "y": 24,
+                "r": 2.1,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 48.29,
+                "y": 25.56,
+                "r": 2.1,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 50.26,
+                "y": 21.02,
+                "r": 2.1,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 52.15,
+                "y": 26.81,
+                "r": 2.1,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 46.05,
+                "y": 23.3,
+                "r": 2.1,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 53.74,
+                "y": 21.62,
+                "r": 2.1,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 48.75,
+                "y": 28.65,
+                "r": 2.1,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 47.61,
+                "y": 19.41,
+                "r": 2.1,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 55.18,
+                "y": 25.89,
+                "r": 2.1,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 44.62,
+                "y": 26.22,
+                "r": 2.1,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 52.6,
+                "y": 18.45,
+                "r": 2.1,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 51.92,
+                "y": 30.12,
+                "r": 2.1,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 44.22,
+                "y": 20.65,
+                "r": 2.1,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 56.78,
+                "y": 22.51,
+                "r": 2.1,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "text",
+                "x": 50,
+                "y": 44,
+                "text": "7 protons",
+                "size": 5
+              },
+              {
+                "t": "text",
+                "x": 50,
+                "y": 51,
+                "text": "nitrogen",
+                "size": 6
+              },
+              {
+                "t": "circle",
+                "x": 84.34,
+                "y": 24,
+                "r": 2.1,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 81.29,
+                "y": 25.56,
+                "r": 2.1,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 83.26,
+                "y": 21.02,
+                "r": 2.1,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 85.15,
+                "y": 26.81,
+                "r": 2.1,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 79.05,
+                "y": 23.3,
+                "r": 2.1,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 86.74,
+                "y": 21.62,
+                "r": 2.1,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 81.75,
+                "y": 28.65,
+                "r": 2.1,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 80.61,
+                "y": 19.41,
+                "r": 2.1,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 88.18,
+                "y": 25.89,
+                "r": 2.1,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 77.62,
+                "y": 26.22,
+                "r": 2.1,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 85.6,
+                "y": 18.45,
+                "r": 2.1,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 84.92,
+                "y": 30.12,
+                "r": 2.1,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 77.22,
+                "y": 20.65,
+                "r": 2.1,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 89.78,
+                "y": 22.51,
+                "r": 2.1,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 78.86,
+                "y": 29.89,
+                "r": 2.1,
+                "tone": "danger",
+                "fill": "solid"
+              },
+              {
+                "t": "circle",
+                "x": 82.04,
+                "y": 16.62,
+                "r": 2.1,
+                "tone": "neutral",
+                "fill": "solid"
+              },
+              {
+                "t": "text",
+                "x": 83,
+                "y": 44,
+                "text": "8 protons",
+                "size": 5
+              },
+              {
+                "t": "text",
+                "x": 83,
+                "y": 51,
+                "text": "oxygen",
+                "size": 6
+              }
+            ]
+          },
+          "altText": "Three atom centres side by side. An atom with 6 protons is carbon, an atom with 7 protons is nitrogen, and an atom with 8 protons is oxygen. The number of protons tells you the element."
+        },
+        "options": [
+          {
+            "id": "nitrogen",
+            "label": "Nitrogen"
+          },
+          {
+            "id": "oxygen",
+            "label": "Still oxygen",
+            "note": "Oxygen has 8 protons. With 7, the atom is a different element."
+          },
+          {
+            "id": "carbon",
+            "label": "Carbon",
+            "note": "Carbon has 6 protons. That would mean losing two."
+          }
+        ],
+        "answer": "nitrogen",
+        "explanation": "8 protons take away 1 is 7 protons, and 7 protons is nitrogen."
+      },
+      "difficulty": 2,
       "surfaces": [
         "lesson",
         "practice",
@@ -533,20 +1432,16 @@
             "label": "carbon"
           },
           {
+            "id": "nitrogen",
+            "label": "nitrogen"
+          },
+          {
             "id": "oxygen",
             "label": "oxygen"
-          },
-          {
-            "id": "helium",
-            "label": "helium"
-          },
-          {
-            "id": "gold",
-            "label": "gold"
           }
         ],
         "answer": "carbon",
-        "explanation": "Carbon is the element with 6 protons. Its atomic number is 6."
+        "explanation": "6 protons is always carbon. 7 is always nitrogen, and 8 is always oxygen."
       },
       "difficulty": 1,
       "surfaces": [
@@ -555,436 +1450,7 @@
         "review"
       ],
       "reference_ids": [
-        "ref-openstax-chem-ch2",
-        "ref-iupac-table"
-      ]
-    },
-    {
-      "id": "u1-l3-hotspot-oxygen",
-      "objective_id": "u1-read-the-table",
-      "type": "hotspot",
-      "data": {
-        "prompt": "Tap element number 8.",
-        "scene": {
-          "height": 54,
-          "shapes": [
-            {
-              "t": "rect",
-              "x": 4,
-              "y": 4,
-              "w": 17,
-              "h": 21,
-              "tone": "accent",
-              "fill": "soft",
-              "rx": 1.5
-            },
-            {
-              "t": "text",
-              "x": 6,
-              "y": 10,
-              "text": "1",
-              "size": 5,
-              "anchor": "start"
-            },
-            {
-              "t": "text",
-              "x": 12.5,
-              "y": 19,
-              "text": "H",
-              "size": 9,
-              "keep": true
-            },
-            {
-              "t": "rect",
-              "x": 23,
-              "y": 4,
-              "w": 17,
-              "h": 21,
-              "tone": "accent",
-              "fill": "soft",
-              "rx": 1.5
-            },
-            {
-              "t": "text",
-              "x": 25,
-              "y": 10,
-              "text": "2",
-              "size": 5,
-              "anchor": "start"
-            },
-            {
-              "t": "text",
-              "x": 31.5,
-              "y": 19,
-              "text": "He",
-              "size": 9,
-              "keep": true
-            },
-            {
-              "t": "rect",
-              "x": 42,
-              "y": 4,
-              "w": 17,
-              "h": 21,
-              "tone": "accent",
-              "fill": "soft",
-              "rx": 1.5
-            },
-            {
-              "t": "text",
-              "x": 44,
-              "y": 10,
-              "text": "3",
-              "size": 5,
-              "anchor": "start"
-            },
-            {
-              "t": "text",
-              "x": 50.5,
-              "y": 19,
-              "text": "Li",
-              "size": 9,
-              "keep": true
-            },
-            {
-              "t": "rect",
-              "x": 61,
-              "y": 4,
-              "w": 17,
-              "h": 21,
-              "tone": "accent",
-              "fill": "soft",
-              "rx": 1.5
-            },
-            {
-              "t": "text",
-              "x": 63,
-              "y": 10,
-              "text": "4",
-              "size": 5,
-              "anchor": "start"
-            },
-            {
-              "t": "text",
-              "x": 69.5,
-              "y": 19,
-              "text": "Be",
-              "size": 9,
-              "keep": true
-            },
-            {
-              "t": "rect",
-              "x": 80,
-              "y": 4,
-              "w": 17,
-              "h": 21,
-              "tone": "accent",
-              "fill": "soft",
-              "rx": 1.5
-            },
-            {
-              "t": "text",
-              "x": 82,
-              "y": 10,
-              "text": "5",
-              "size": 5,
-              "anchor": "start"
-            },
-            {
-              "t": "text",
-              "x": 88.5,
-              "y": 19,
-              "text": "B",
-              "size": 9,
-              "keep": true
-            },
-            {
-              "t": "rect",
-              "x": 4,
-              "y": 28,
-              "w": 17,
-              "h": 21,
-              "tone": "accent",
-              "fill": "soft",
-              "rx": 1.5
-            },
-            {
-              "t": "text",
-              "x": 6,
-              "y": 34,
-              "text": "6",
-              "size": 5,
-              "anchor": "start"
-            },
-            {
-              "t": "text",
-              "x": 12.5,
-              "y": 43,
-              "text": "C",
-              "size": 9,
-              "keep": true
-            },
-            {
-              "t": "rect",
-              "x": 23,
-              "y": 28,
-              "w": 17,
-              "h": 21,
-              "tone": "accent",
-              "fill": "soft",
-              "rx": 1.5
-            },
-            {
-              "t": "text",
-              "x": 25,
-              "y": 34,
-              "text": "7",
-              "size": 5,
-              "anchor": "start"
-            },
-            {
-              "t": "text",
-              "x": 31.5,
-              "y": 43,
-              "text": "N",
-              "size": 9,
-              "keep": true
-            },
-            {
-              "t": "rect",
-              "x": 42,
-              "y": 28,
-              "w": 17,
-              "h": 21,
-              "tone": "accent",
-              "fill": "soft",
-              "rx": 1.5
-            },
-            {
-              "t": "text",
-              "x": 44,
-              "y": 34,
-              "text": "8",
-              "size": 5,
-              "anchor": "start"
-            },
-            {
-              "t": "text",
-              "x": 50.5,
-              "y": 43,
-              "text": "O",
-              "size": 9,
-              "keep": true
-            },
-            {
-              "t": "rect",
-              "x": 61,
-              "y": 28,
-              "w": 17,
-              "h": 21,
-              "tone": "accent",
-              "fill": "soft",
-              "rx": 1.5
-            },
-            {
-              "t": "text",
-              "x": 63,
-              "y": 34,
-              "text": "9",
-              "size": 5,
-              "anchor": "start"
-            },
-            {
-              "t": "text",
-              "x": 69.5,
-              "y": 43,
-              "text": "F",
-              "size": 9,
-              "keep": true
-            },
-            {
-              "t": "rect",
-              "x": 80,
-              "y": 28,
-              "w": 17,
-              "h": 21,
-              "tone": "accent",
-              "fill": "soft",
-              "rx": 1.5
-            },
-            {
-              "t": "text",
-              "x": 82,
-              "y": 34,
-              "text": "10",
-              "size": 5,
-              "anchor": "start"
-            },
-            {
-              "t": "text",
-              "x": 88.5,
-              "y": 43,
-              "text": "Ne",
-              "size": 9,
-              "keep": true
-            }
-          ]
-        },
-        "targets": [
-          {
-            "id": "el-h",
-            "label": "Hydrogen",
-            "x": 12.5,
-            "y": 14.5,
-            "r": 10
-          },
-          {
-            "id": "el-he",
-            "label": "Helium",
-            "x": 31.5,
-            "y": 14.5,
-            "r": 10
-          },
-          {
-            "id": "el-li",
-            "label": "Lithium",
-            "x": 50.5,
-            "y": 14.5,
-            "r": 10
-          },
-          {
-            "id": "el-be",
-            "label": "Beryllium",
-            "x": 69.5,
-            "y": 14.5,
-            "r": 10
-          },
-          {
-            "id": "el-b",
-            "label": "Boron",
-            "x": 88.5,
-            "y": 14.5,
-            "r": 10
-          },
-          {
-            "id": "el-c",
-            "label": "Carbon",
-            "x": 12.5,
-            "y": 38.5,
-            "r": 10
-          },
-          {
-            "id": "el-n",
-            "label": "Nitrogen",
-            "x": 31.5,
-            "y": 38.5,
-            "r": 10
-          },
-          {
-            "id": "el-o",
-            "label": "Oxygen",
-            "x": 50.5,
-            "y": 38.5,
-            "r": 10
-          },
-          {
-            "id": "el-f",
-            "label": "Fluorine",
-            "x": 69.5,
-            "y": 38.5,
-            "r": 10
-          },
-          {
-            "id": "el-ne",
-            "label": "Neon",
-            "x": 88.5,
-            "y": 38.5,
-            "r": 10
-          }
-        ],
-        "answer": "el-o",
-        "explanation": "Element 8 is oxygen (symbol O). Its atomic number is 8, so every oxygen atom has 8 protons."
-      },
-      "difficulty": 1,
-      "surfaces": [
-        "lesson",
-        "practice",
-        "review"
-      ],
-      "reference_ids": [
-        "ref-iupac-table"
-      ]
-    },
-    {
-      "id": "u1-l3-match-symbols",
-      "objective_id": "u1-read-the-table",
-      "type": "match",
-      "data": {
-        "prompt": "Match each symbol to its element.",
-        "pairs": [
-          {
-            "id": "c",
-            "left": "C",
-            "right": "Carbon"
-          },
-          {
-            "id": "o",
-            "left": "O",
-            "right": "Oxygen"
-          },
-          {
-            "id": "h",
-            "left": "H",
-            "right": "Hydrogen"
-          },
-          {
-            "id": "he",
-            "left": "He",
-            "right": "Helium"
-          }
-        ],
-        "explanation": "Symbols are short names for elements, usually the first one or two letters of the name: C for carbon, O for oxygen, H for hydrogen and He for helium."
-      },
-      "difficulty": 1,
-      "surfaces": [
-        "lesson",
-        "practice",
-        "review"
-      ],
-      "reference_ids": [
-        "ref-iupac-table"
-      ]
-    },
-    {
-      "id": "u1-l3-order-atomic-number",
-      "objective_id": "u1-read-the-table",
-      "type": "order",
-      "data": {
-        "prompt": "Put these elements in order of atomic number, lowest first.",
-        "items": [
-          {
-            "id": "hydrogen",
-            "label": "Hydrogen"
-          },
-          {
-            "id": "carbon",
-            "label": "Carbon"
-          },
-          {
-            "id": "oxygen",
-            "label": "Oxygen"
-          }
-        ],
-        "explanation": "Hydrogen is 1, carbon is 6 and oxygen is 8. The periodic table lists the elements in this order."
-      },
-      "difficulty": 1,
-      "surfaces": [
-        "lesson",
-        "practice",
-        "review"
-      ],
-      "reference_ids": [
-        "ref-iupac-table"
+        "ref-openstax-chem-ch2"
       ]
     },
     {
@@ -1006,10 +1472,6 @@
           {
             "id": "size",
             "label": "Gold atoms are solid balls and oxygen atoms are hollow"
-          },
-          {
-            "id": "colour",
-            "label": "Gold atoms are yellow"
           }
         ],
         "answer": "protons",
@@ -1022,15 +1484,50 @@
       "reference_ids": []
     },
     {
-      "id": "u1-l3-tom-change-protons",
-      "objective_id": "u1-atomic-number",
+      "id": "u1-l3-tom-gain-proton",
+      "objective_id": "u1-change-protons",
       "type": "true_or_myth",
       "data": {
-        "statement": "If you changed the number of protons in an atom, it would become a different element.",
-        "answer": "true",
-        "explanation": "True. The number of protons is the atomic number, and it alone decides which element an atom is."
+        "statement": "A carbon atom that gains one proton is still carbon.",
+        "answer": "myth",
+        "explanation": "Myth. Carbon has 6 protons. With one more it has 7, and 7 protons is nitrogen. Change the protons and you change the element."
       },
       "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-openstax-chem-ch2"
+      ]
+    },
+    {
+      "id": "u1-l4-choice-pair",
+      "objective_id": "u1-isotope-definition",
+      "type": "choice",
+      "data": {
+        "prompt": "Atom X has 17 protons and 18 neutrons. Atom Y has 17 protons and 20 neutrons. What are X and Y?",
+        "options": [
+          {
+            "id": "iso",
+            "label": "Isotopes of the same element"
+          },
+          {
+            "id": "diff",
+            "label": "Two different elements",
+            "note": "They have the same number of protons, so they are the same element."
+          },
+          {
+            "id": "same",
+            "label": "Exactly the same kind of atom",
+            "note": "Their neutrons are different, so they are different isotopes."
+          }
+        ],
+        "answer": "iso",
+        "explanation": "Same protons (17) means the same element. Different neutrons (18 and 20) mean different isotopes."
+      },
+      "difficulty": 2,
       "surfaces": [
         "lesson",
         "practice",
@@ -1054,141 +1551,25 @@
           {
             "id": "neutrons",
             "label": "The same number of neutrons",
-            "note": "Different neutron counts are exactly what makes them different isotopes."
-          },
-          {
-            "id": "mass",
-            "label": "The same mass",
-            "note": "Different neutron counts give different masses."
+            "note": "Different neutrons are exactly what makes them different isotopes."
           },
           {
             "id": "nothing",
             "label": "Nothing: they are different elements",
-            "note": "Isotopes of one element are the same element. They share their proton count."
+            "note": "Isotopes of one element are the same element."
           }
         ],
         "answer": "protons",
-        "explanation": "Isotopes of an element all have the same number of protons, which is why they are the same element. They differ in neutrons."
+        "explanation": "Isotopes of an element all have the same number of protons, which is why they are the same element. They have different numbers of neutrons."
       },
       "difficulty": 1,
       "surfaces": [
-        "lesson",
         "practice",
+        "checkpoint",
         "review"
       ],
       "reference_ids": [
         "ref-iaea-isotopes"
-      ]
-    },
-    {
-      "id": "u1-l4-fill-c13",
-      "objective_id": "u1-mass-number",
-      "type": "fill",
-      "data": {
-        "mode": "bank",
-        "prompt": "A carbon atom with 6 protons and 7 neutrons is called carbon-___.",
-        "bank": [
-          {
-            "id": "n13",
-            "label": "13"
-          },
-          {
-            "id": "n12",
-            "label": "12"
-          },
-          {
-            "id": "n7",
-            "label": "7"
-          },
-          {
-            "id": "n1",
-            "label": "1"
-          }
-        ],
-        "answer": "n13",
-        "explanation": "Add the protons and neutrons: 6 + 7 = 13. So this is carbon-13."
-      },
-      "difficulty": 1,
-      "surfaces": [
-        "lesson",
-        "practice",
-        "review"
-      ],
-      "reference_ids": [
-        "ref-openstax-chem-ch2"
-      ]
-    },
-    {
-      "id": "u1-l4-fill-c14",
-      "objective_id": "u1-mass-number",
-      "type": "fill",
-      "data": {
-        "mode": "bank",
-        "prompt": "Carbon-14 has 6 protons and ___ neutrons.",
-        "bank": [
-          {
-            "id": "n8",
-            "label": "8"
-          },
-          {
-            "id": "n6",
-            "label": "6"
-          },
-          {
-            "id": "n14",
-            "label": "14"
-          },
-          {
-            "id": "n20",
-            "label": "20"
-          }
-        ],
-        "answer": "n8",
-        "explanation": "The 14 is the mass number: protons plus neutrons. Carbon has 6 protons, so 14 - 6 = 8 neutrons."
-      },
-      "difficulty": 1,
-      "surfaces": [
-        "lesson",
-        "practice",
-        "review"
-      ],
-      "reference_ids": [
-        "ref-openstax-chem-ch2"
-      ]
-    },
-    {
-      "id": "u1-l4-match-carbon",
-      "objective_id": "u1-mass-number",
-      "type": "match",
-      "data": {
-        "prompt": "Match each carbon atom to its name. The number in the name is protons plus neutrons.",
-        "pairs": [
-          {
-            "id": "c12",
-            "left": "6 protons, 6 neutrons",
-            "right": "Carbon-12"
-          },
-          {
-            "id": "c13",
-            "left": "6 protons, 7 neutrons",
-            "right": "Carbon-13"
-          },
-          {
-            "id": "c14",
-            "left": "6 protons, 8 neutrons",
-            "right": "Carbon-14"
-          }
-        ],
-        "explanation": "Add them up: 6 + 6 = 12, 6 + 7 = 13 and 6 + 8 = 14."
-      },
-      "difficulty": 1,
-      "surfaces": [
-        "lesson",
-        "practice",
-        "review"
-      ],
-      "reference_ids": [
-        "ref-openstax-chem-ch2"
       ]
     },
     {
@@ -1201,7 +1582,7 @@
         "options": [
           {
             "id": "yes",
-            "label": "Yes, they can have different masses"
+            "label": "Yes, they can have different weights"
           },
           {
             "id": "no",
@@ -1226,11 +1607,13 @@
         "buckets": [
           {
             "id": "carbon",
-            "label": "Carbon"
+            "label": "Carbon",
+            "icon": "AqCarbon"
           },
           {
             "id": "other",
-            "label": "Not carbon"
+            "label": "Not carbon",
+            "icon": "AqCarbonOff"
           }
         ],
         "items": [
@@ -1255,7 +1638,7 @@
             "bucket": "other"
           }
         ],
-        "explanation": "Only the number of protons matters for the element. Any atom with 6 protons is carbon, whatever its neutrons. Those carbon atoms are isotopes of carbon."
+        "explanation": "Only the protons decide the element. Any atom with 6 protons is carbon, whatever its neutrons. The two carbon atoms with different neutrons are isotopes of carbon."
       },
       "difficulty": 1,
       "surfaces": [
@@ -1268,13 +1651,107 @@
       ]
     },
     {
-      "id": "u1-l4-tom-all-radioactive",
+      "id": "u1-l4-sort-pairs",
       "objective_id": "u1-isotope-definition",
+      "type": "sort",
+      "data": {
+        "prompt": "Each card shows two atoms. Are they isotopes of one element, or different elements?",
+        "figure": {
+          "scene": {
+            "height": 30,
+            "shapes": [
+              {
+                "t": "rect",
+                "x": 4,
+                "y": 2,
+                "w": 92,
+                "h": 12,
+                "tone": "danger",
+                "fill": "soft",
+                "rx": 3
+              },
+              {
+                "t": "text",
+                "x": 50,
+                "y": 10.4,
+                "text": "Same protons: same element",
+                "size": 5.2
+              },
+              {
+                "t": "rect",
+                "x": 4,
+                "y": 16,
+                "w": 92,
+                "h": 12,
+                "tone": "neutral",
+                "fill": "soft",
+                "rx": 3
+              },
+              {
+                "t": "text",
+                "x": 50,
+                "y": 24.4,
+                "text": "Different neutrons: different isotope",
+                "size": 4.8
+              }
+            ]
+          },
+          "altText": "The rule for this lesson. Same number of protons means the same element. Different numbers of neutrons mean different isotopes of that element."
+        },
+        "buckets": [
+          {
+            "id": "iso",
+            "label": "Isotopes of one element",
+            "icon": "AqSameElement"
+          },
+          {
+            "id": "diff",
+            "label": "Different elements",
+            "icon": "AqDiffElement"
+          }
+        ],
+        "items": [
+          {
+            "id": "a",
+            "label": "6 protons, 6 neutrons and 6 protons, 8 neutrons",
+            "bucket": "iso"
+          },
+          {
+            "id": "b",
+            "label": "6 protons, 6 neutrons and 7 protons, 6 neutrons",
+            "bucket": "diff"
+          },
+          {
+            "id": "c",
+            "label": "1 proton, 0 neutrons and 1 proton, 1 neutron",
+            "bucket": "iso"
+          },
+          {
+            "id": "d",
+            "label": "8 protons, 8 neutrons and 7 protons, 8 neutrons",
+            "bucket": "diff"
+          }
+        ],
+        "explanation": "Check the protons first. Same protons means the same element, so different neutrons make isotopes. Different protons means different elements."
+      },
+      "difficulty": 2,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-openstax-chem-ch2"
+      ]
+    },
+    {
+      "id": "u1-l4-tom-all-radioactive",
+      "objective_id": "u1-isotope-not-radioactive",
       "type": "true_or_myth",
       "data": {
         "statement": "All isotopes are radioactive.",
         "answer": "myth",
-        "explanation": "Myth. Isotope just means a version of an element with a certain number of neutrons. Most of the atoms around you, including carbon-12, are stable isotopes. Only some isotopes are radioactive."
+        "explanation": "Myth. Isotope just means a version of an element. Most of the atoms around you are stable isotopes. Only some isotopes are radioactive."
       },
       "difficulty": 1,
       "surfaces": [
@@ -1287,32 +1764,13 @@
       ]
     },
     {
-      "id": "u1-l5-choice-push",
-      "objective_id": "u1-forces-in-nucleus",
-      "type": "choice",
+      "id": "u1-l4-tom-c13-stable",
+      "objective_id": "u1-isotope-not-radioactive",
+      "type": "true_or_myth",
       "data": {
-        "prompt": "Which force pushes the protons in a nucleus apart?",
-        "options": [
-          {
-            "id": "electric",
-            "label": "Electric push",
-            "art": "bolt"
-          },
-          {
-            "id": "strong",
-            "label": "Strong force",
-            "note": "The strong force pulls particles together, not apart.",
-            "art": "magnet"
-          },
-          {
-            "id": "gravity",
-            "label": "Gravity",
-            "note": "Gravity is far too weak to matter between particles this small.",
-            "art": "apple"
-          }
-        ],
-        "answer": "electric",
-        "explanation": "Positive charges push each other apart. The strong force pulls neighbouring particles together and, over the tiny distances inside a nucleus, it wins when the nucleus is stable."
+        "statement": "Carbon-13 is an isotope of carbon, and it is not radioactive.",
+        "answer": "true",
+        "explanation": "True. Carbon-13 is a stable isotope. Being an isotope does not make an atom radioactive."
       },
       "difficulty": 1,
       "surfaces": [
@@ -1321,38 +1779,33 @@
         "review"
       ],
       "reference_ids": [
-        "ref-openstax-up3-ch10"
+        "ref-iaea-isotopes"
       ]
     },
     {
       "id": "u1-l5-choice-unstable-does",
-      "objective_id": "u1-stable-unstable",
+      "objective_id": "u1-unstable-changes",
       "type": "choice",
       "data": {
-        "prompt": "What does an unstable nucleus do over time?",
+        "prompt": "An atom has an unstable nucleus. What can happen to it?",
         "options": [
           {
             "id": "change",
-            "label": "It changes into a more stable nucleus and gives off radiation"
+            "label": "The nucleus can change and give off radiation"
           },
           {
-            "id": "grow",
-            "label": "It slowly grows heavier",
-            "note": "Unstable nuclei change by giving something off, they do not keep growing."
-          },
-          {
-            "id": "nothing",
-            "label": "Nothing: unstable just means rare",
-            "note": "Unstable means the nucleus will eventually change."
+            "id": "same",
+            "label": "Nothing: it stays exactly as it is for ever",
+            "note": "Unstable means it can change."
           },
           {
             "id": "vanish",
-            "label": "It disappears completely",
+            "label": "The whole atom disappears",
             "note": "The nucleus changes into a different nucleus. Nothing vanishes."
           }
         ],
         "answer": "change",
-        "explanation": "An unstable nucleus eventually changes into a more stable one and gives off radiation. That process is radioactivity."
+        "explanation": "An unstable nucleus can change and give off radiation. That is radioactivity."
       },
       "difficulty": 1,
       "surfaces": [
@@ -1365,73 +1818,83 @@
       ]
     },
     {
-      "id": "u1-l5-match-forces",
-      "objective_id": "u1-forces-in-nucleus",
-      "type": "match",
-      "data": {
-        "prompt": "Match each to its effect in the nucleus.",
-        "pairs": [
-          {
-            "id": "electric",
-            "left": "Electric push",
-            "right": "Pushes protons apart"
-          },
-          {
-            "id": "strong",
-            "left": "Strong force",
-            "right": "Holds neighbouring particles together"
-          },
-          {
-            "id": "neutrons",
-            "left": "Extra neutrons",
-            "right": "Add pull without adding push"
-          }
-        ],
-        "explanation": "Protons push each other apart. The strong force holds particles together over very short distances. Neutrons feel the strong force but have no charge, so they add glue without adding push."
-      },
-      "difficulty": 1,
-      "surfaces": [
-        "lesson",
-        "practice",
-        "review"
-      ],
-      "reference_ids": [
-        "ref-openstax-up3-ch10"
-      ]
-    },
-    {
-      "id": "u1-l5-predict-strong",
-      "objective_id": "u1-forces-in-nucleus",
+      "id": "u1-l5-predict-stable",
+      "objective_id": "u1-stable-unstable",
       "type": "predict",
       "data": {
         "input": "choice",
-        "prompt": "Protons all carry positive charge, and like charges push apart. So why doesn't the nucleus fly apart?",
+        "prompt": "Does every atom stay exactly the same for ever?",
         "options": [
           {
-            "id": "strong",
-            "label": "Another, stronger force holds the particles together"
+            "id": "yes",
+            "label": "Yes, every atom stays the same"
           },
           {
-            "id": "electrons",
-            "label": "The electrons glue it together"
-          },
-          {
-            "id": "gravity",
-            "label": "Gravity holds it together"
-          },
-          {
-            "id": "apart",
-            "label": "Nuclei do fly apart all the time"
+            "id": "no",
+            "label": "No, some atoms can change"
           }
         ],
-        "answer": "strong",
-        "explanation": "Your guess is not scored. The next card shows what holds a nucleus together."
+        "answer": "no",
+        "explanation": "Your guess is not scored. Find out in the next cards."
       },
       "difficulty": 1,
       "surfaces": [
         "lesson"
       ],
       "reference_ids": []
+    },
+    {
+      "id": "u1-l5-sort-source",
+      "objective_id": "u1-unstable-changes",
+      "type": "sort",
+      "data": {
+        "prompt": "Where do these radioactive atoms come from? Sort each one.",
+        "buckets": [
+          {
+            "id": "nature",
+            "label": "Found in nature",
+            "icon": "AqLeaf"
+          },
+          {
+            "id": "people",
+            "label": "Made by people",
+            "icon": "AqFlask"
+          }
+        ],
+        "items": [
+          {
+            "id": "k40",
+            "label": "Potassium-40 in a banana",
+            "bucket": "nature"
+          },
+          {
+            "id": "u",
+            "label": "Uranium in a rock",
+            "bucket": "nature"
+          },
+          {
+            "id": "c14",
+            "label": "Carbon-14 made high in the air",
+            "bucket": "nature"
+          },
+          {
+            "id": "hosp",
+            "label": "An isotope made in a reactor for a hospital",
+            "bucket": "people"
+          }
+        ],
+        "explanation": "People can make radioactive atoms, but most radioactivity around us is natural: in rocks, in the air, in food and even in you."
+      },
+      "difficulty": 2,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-potassium-40",
+        "ref-iaea-isotopes"
+      ]
     },
     {
       "id": "u1-l5-sort-stable",
@@ -1442,11 +1905,13 @@
         "buckets": [
           {
             "id": "stable",
-            "label": "Stable"
+            "label": "Stable",
+            "icon": "AqStable"
           },
           {
             "id": "unstable",
-            "label": "Unstable"
+            "label": "Unstable",
+            "icon": "AqUnstable"
           }
         ],
         "items": [
@@ -1484,13 +1949,32 @@
       ]
     },
     {
+      "id": "u1-l5-tom-all-stable",
+      "objective_id": "u1-stable-unstable",
+      "type": "true_or_myth",
+      "data": {
+        "statement": "Every atom stays the same for ever.",
+        "answer": "myth",
+        "explanation": "Myth. Most atoms around us do stay the same, but an unstable nucleus can change."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "practice",
+        "checkpoint",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-iaea-isotopes"
+      ]
+    },
+    {
       "id": "u1-l5-tom-body-stable",
       "objective_id": "u1-stable-unstable",
       "type": "true_or_myth",
       "data": {
         "statement": "Most of the atoms in your body are stable.",
         "answer": "true",
-        "explanation": "True. Almost all of your atoms are stable isotopes of hydrogen, oxygen, carbon and nitrogen. A tiny number are naturally unstable, such as potassium-40."
+        "explanation": "True. Almost all of your atoms are stable. A tiny number are naturally unstable, such as potassium-40."
       },
       "difficulty": 1,
       "surfaces": [
@@ -1504,12 +1988,12 @@
     },
     {
       "id": "u1-l5-tom-human-made",
-      "objective_id": "u1-stable-unstable",
+      "objective_id": "u1-unstable-changes",
       "type": "true_or_myth",
       "data": {
-        "statement": "Unstable atoms only exist where humans have made them.",
+        "statement": "Radioactive atoms only exist because people made them.",
         "answer": "myth",
-        "explanation": "Myth. Unstable atoms occur in nature. Potassium-40 is in bananas and in your own body, and carbon-14 is made in the upper atmosphere."
+        "explanation": "Myth. Radioactive atoms occur in nature. Potassium-40 is in bananas and in your own body, and carbon-14 is made high in the air."
       },
       "difficulty": 1,
       "surfaces": [
@@ -1522,34 +2006,29 @@
       ]
     },
     {
-      "id": "u1-x-atom-width",
-      "objective_id": "u1-atom-scale",
+      "id": "u1-x-balloon-weight",
+      "objective_id": "u1-matter-is-atoms",
       "type": "choice",
       "data": {
-        "prompt": "Roughly how wide is a single atom?",
+        "prompt": "You pump air into a flat ball and it gets heavier. What does that tell you?",
         "options": [
           {
-            "id": "nm",
-            "label": "A few tenths of a nanometre"
+            "id": "matter",
+            "label": "Air is matter, so it has weight"
           },
           {
-            "id": "um",
-            "label": "A few tenths of a micrometre",
-            "note": "That is about the size of a bacterium, thousands of atoms across."
+            "id": "nothing",
+            "label": "Air is nothing, so the ball only looks heavier",
+            "note": "If air were nothing, adding it could not change the weight."
           },
           {
-            "id": "mm",
-            "label": "A few tenths of a millimetre",
-            "note": "That is about the width of a hair, hundreds of thousands of atoms across."
-          },
-          {
-            "id": "m",
-            "label": "A few tenths of a metre",
-            "note": "That is about the size of a loaf of bread."
+            "id": "energy",
+            "label": "Air is energy, not matter",
+            "note": "Energy such as light and heat is not made of atoms. Air is."
           }
         ],
-        "answer": "nm",
-        "explanation": "An atom is about a few tenths of a nanometre across: a nanometre is a billionth of a metre."
+        "answer": "matter",
+        "explanation": "The ball gets heavier because air is made of atoms, and atoms have weight."
       },
       "difficulty": 2,
       "surfaces": [
@@ -1558,42 +2037,7 @@
         "review"
       ],
       "reference_ids": [
-        "ref-atom-hair-scale"
-      ]
-    },
-    {
-      "id": "u1-x-corner-number",
-      "objective_id": "u1-read-the-table",
-      "type": "choice",
-      "data": {
-        "prompt": "On the periodic table, what is the whole number in the corner of an element's box?",
-        "options": [
-          {
-            "id": "z",
-            "label": "The atomic number, which is the number of protons"
-          },
-          {
-            "id": "mass",
-            "label": "Number of neutrons",
-            "note": "The corner number counts protons, not neutrons."
-          },
-          {
-            "id": "year",
-            "label": "Year of discovery",
-            "note": "That is not shown on the table."
-          }
-        ],
-        "answer": "z",
-        "explanation": "The number in the corner is the atomic number: how many protons each atom of that element has."
-      },
-      "difficulty": 1,
-      "surfaces": [
-        "practice",
-        "checkpoint",
-        "review"
-      ],
-      "reference_ids": [
-        "ref-iupac-table"
+        "ref-openstax-chem-ch1"
       ]
     },
     {
@@ -1603,7 +2047,7 @@
       "data": {
         "statement": "The electrons of an atom are packed inside the nucleus.",
         "answer": "myth",
-        "explanation": "Myth. The nucleus holds the protons and neutrons. Electrons are found outside it, in a region far larger than the nucleus."
+        "explanation": "Myth. The nucleus holds the protons and neutrons. Electrons are outside it."
       },
       "difficulty": 1,
       "surfaces": [
@@ -1616,350 +2060,29 @@
       ]
     },
     {
-      "id": "u1-x-find-carbon",
-      "objective_id": "u1-read-the-table",
-      "type": "hotspot",
+      "id": "u1-x-empty-space",
+      "objective_id": "u1-nucleus",
+      "type": "choice",
       "data": {
-        "prompt": "Tap carbon (symbol C).",
-        "scene": {
-          "height": 54,
-          "shapes": [
-            {
-              "t": "rect",
-              "x": 4,
-              "y": 4,
-              "w": 17,
-              "h": 21,
-              "tone": "accent",
-              "fill": "soft",
-              "rx": 1.5
-            },
-            {
-              "t": "text",
-              "x": 6,
-              "y": 10,
-              "text": "1",
-              "size": 5,
-              "anchor": "start"
-            },
-            {
-              "t": "text",
-              "x": 12.5,
-              "y": 19,
-              "text": "H",
-              "size": 9,
-              "keep": true
-            },
-            {
-              "t": "rect",
-              "x": 23,
-              "y": 4,
-              "w": 17,
-              "h": 21,
-              "tone": "accent",
-              "fill": "soft",
-              "rx": 1.5
-            },
-            {
-              "t": "text",
-              "x": 25,
-              "y": 10,
-              "text": "2",
-              "size": 5,
-              "anchor": "start"
-            },
-            {
-              "t": "text",
-              "x": 31.5,
-              "y": 19,
-              "text": "He",
-              "size": 9,
-              "keep": true
-            },
-            {
-              "t": "rect",
-              "x": 42,
-              "y": 4,
-              "w": 17,
-              "h": 21,
-              "tone": "accent",
-              "fill": "soft",
-              "rx": 1.5
-            },
-            {
-              "t": "text",
-              "x": 44,
-              "y": 10,
-              "text": "3",
-              "size": 5,
-              "anchor": "start"
-            },
-            {
-              "t": "text",
-              "x": 50.5,
-              "y": 19,
-              "text": "Li",
-              "size": 9,
-              "keep": true
-            },
-            {
-              "t": "rect",
-              "x": 61,
-              "y": 4,
-              "w": 17,
-              "h": 21,
-              "tone": "accent",
-              "fill": "soft",
-              "rx": 1.5
-            },
-            {
-              "t": "text",
-              "x": 63,
-              "y": 10,
-              "text": "4",
-              "size": 5,
-              "anchor": "start"
-            },
-            {
-              "t": "text",
-              "x": 69.5,
-              "y": 19,
-              "text": "Be",
-              "size": 9,
-              "keep": true
-            },
-            {
-              "t": "rect",
-              "x": 80,
-              "y": 4,
-              "w": 17,
-              "h": 21,
-              "tone": "accent",
-              "fill": "soft",
-              "rx": 1.5
-            },
-            {
-              "t": "text",
-              "x": 82,
-              "y": 10,
-              "text": "5",
-              "size": 5,
-              "anchor": "start"
-            },
-            {
-              "t": "text",
-              "x": 88.5,
-              "y": 19,
-              "text": "B",
-              "size": 9,
-              "keep": true
-            },
-            {
-              "t": "rect",
-              "x": 4,
-              "y": 28,
-              "w": 17,
-              "h": 21,
-              "tone": "accent",
-              "fill": "soft",
-              "rx": 1.5
-            },
-            {
-              "t": "text",
-              "x": 6,
-              "y": 34,
-              "text": "6",
-              "size": 5,
-              "anchor": "start"
-            },
-            {
-              "t": "text",
-              "x": 12.5,
-              "y": 43,
-              "text": "C",
-              "size": 9,
-              "keep": true
-            },
-            {
-              "t": "rect",
-              "x": 23,
-              "y": 28,
-              "w": 17,
-              "h": 21,
-              "tone": "accent",
-              "fill": "soft",
-              "rx": 1.5
-            },
-            {
-              "t": "text",
-              "x": 25,
-              "y": 34,
-              "text": "7",
-              "size": 5,
-              "anchor": "start"
-            },
-            {
-              "t": "text",
-              "x": 31.5,
-              "y": 43,
-              "text": "N",
-              "size": 9,
-              "keep": true
-            },
-            {
-              "t": "rect",
-              "x": 42,
-              "y": 28,
-              "w": 17,
-              "h": 21,
-              "tone": "accent",
-              "fill": "soft",
-              "rx": 1.5
-            },
-            {
-              "t": "text",
-              "x": 44,
-              "y": 34,
-              "text": "8",
-              "size": 5,
-              "anchor": "start"
-            },
-            {
-              "t": "text",
-              "x": 50.5,
-              "y": 43,
-              "text": "O",
-              "size": 9,
-              "keep": true
-            },
-            {
-              "t": "rect",
-              "x": 61,
-              "y": 28,
-              "w": 17,
-              "h": 21,
-              "tone": "accent",
-              "fill": "soft",
-              "rx": 1.5
-            },
-            {
-              "t": "text",
-              "x": 63,
-              "y": 34,
-              "text": "9",
-              "size": 5,
-              "anchor": "start"
-            },
-            {
-              "t": "text",
-              "x": 69.5,
-              "y": 43,
-              "text": "F",
-              "size": 9,
-              "keep": true
-            },
-            {
-              "t": "rect",
-              "x": 80,
-              "y": 28,
-              "w": 17,
-              "h": 21,
-              "tone": "accent",
-              "fill": "soft",
-              "rx": 1.5
-            },
-            {
-              "t": "text",
-              "x": 82,
-              "y": 34,
-              "text": "10",
-              "size": 5,
-              "anchor": "start"
-            },
-            {
-              "t": "text",
-              "x": 88.5,
-              "y": 43,
-              "text": "Ne",
-              "size": 9,
-              "keep": true
-            }
-          ]
-        },
-        "targets": [
+        "prompt": "If you could shrink down and look inside an atom, what would you mostly see?",
+        "options": [
           {
-            "id": "el-h",
-            "label": "Hydrogen",
-            "x": 12.5,
-            "y": 14.5,
-            "r": 10
+            "id": "empty",
+            "label": "Empty space"
           },
           {
-            "id": "el-he",
-            "label": "Helium",
-            "x": 31.5,
-            "y": 14.5,
-            "r": 10
+            "id": "solid",
+            "label": "Solid stuff packed tightly",
+            "note": "An atom is mostly empty space."
           },
           {
-            "id": "el-li",
-            "label": "Lithium",
-            "x": 50.5,
-            "y": 14.5,
-            "r": 10
-          },
-          {
-            "id": "el-be",
-            "label": "Beryllium",
-            "x": 69.5,
-            "y": 14.5,
-            "r": 10
-          },
-          {
-            "id": "el-b",
-            "label": "Boron",
-            "x": 88.5,
-            "y": 14.5,
-            "r": 10
-          },
-          {
-            "id": "el-c",
-            "label": "Carbon",
-            "x": 12.5,
-            "y": 38.5,
-            "r": 10
-          },
-          {
-            "id": "el-n",
-            "label": "Nitrogen",
-            "x": 31.5,
-            "y": 38.5,
-            "r": 10
-          },
-          {
-            "id": "el-o",
-            "label": "Oxygen",
-            "x": 50.5,
-            "y": 38.5,
-            "r": 10
-          },
-          {
-            "id": "el-f",
-            "label": "Fluorine",
-            "x": 69.5,
-            "y": 38.5,
-            "r": 10
-          },
-          {
-            "id": "el-ne",
-            "label": "Neon",
-            "x": 88.5,
-            "y": 38.5,
-            "r": 10
+            "id": "electrons",
+            "label": "A crowd of electrons",
+            "note": "An atom has only a few electrons, and they are far apart."
           }
         ],
-        "answer": "el-c",
-        "explanation": "Carbon is element 6, with the symbol C."
+        "answer": "empty",
+        "explanation": "Most of an atom is empty space. The nucleus is a tiny speck, and the electrons are far from it."
       },
       "difficulty": 1,
       "surfaces": [
@@ -1968,47 +2091,7 @@
         "review"
       ],
       "reference_ids": [
-        "ref-iupac-table"
-      ]
-    },
-    {
-      "id": "u1-x-hair-choice",
-      "objective_id": "u1-atom-scale",
-      "type": "choice",
-      "data": {
-        "prompt": "About how many atoms would fit side by side across the width of one human hair?",
-        "options": [
-          {
-            "id": "hundreds",
-            "label": "A few hundred",
-            "note": "That is far too few. Atoms are much smaller than that."
-          },
-          {
-            "id": "thousands",
-            "label": "A few thousand",
-            "note": "Still too few: a hair is far wider than a few thousand atoms."
-          },
-          {
-            "id": "hundredk",
-            "label": "A few hundred thousand"
-          },
-          {
-            "id": "billions",
-            "label": "A few billion",
-            "note": "That is too many. A hair is wide, but not that wide."
-          }
-        ],
-        "answer": "hundredk",
-        "explanation": "A hair is about 0.07 mm wide and an atom a few tenths of a nanometre, so a few hundred thousand atoms fit across it."
-      },
-      "difficulty": 2,
-      "surfaces": [
-        "practice",
-        "checkpoint",
-        "review"
-      ],
-      "reference_ids": [
-        "ref-atom-hair-scale"
+        "ref-openstax-up3-ch10"
       ]
     },
     {
@@ -2031,6 +2114,60 @@
       ]
     },
     {
+      "id": "u1-x-isotope-radioactive",
+      "objective_id": "u1-isotope-not-radioactive",
+      "type": "choice",
+      "data": {
+        "prompt": "Which statement about isotopes is true?",
+        "options": [
+          {
+            "id": "some",
+            "label": "Some are stable and some are radioactive"
+          },
+          {
+            "id": "all",
+            "label": "All of them are radioactive",
+            "note": "Most of the atoms around you are stable isotopes."
+          },
+          {
+            "id": "none",
+            "label": "None of them are radioactive",
+            "note": "Some isotopes, such as carbon-14, are radioactive."
+          }
+        ],
+        "answer": "some",
+        "explanation": "Isotopes can be stable or radioactive. Carbon-12 is stable and carbon-14 is radioactive."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "practice",
+        "checkpoint",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-iaea-isotopes"
+      ]
+    },
+    {
+      "id": "u1-x-isotope-stable-true",
+      "objective_id": "u1-isotope-not-radioactive",
+      "type": "true_or_myth",
+      "data": {
+        "statement": "Carbon-12 is an isotope, and it is stable.",
+        "answer": "true",
+        "explanation": "True. Carbon-12 is a stable isotope of carbon."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "practice",
+        "checkpoint",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-iaea-isotopes"
+      ]
+    },
+    {
       "id": "u1-x-isotopes-of",
       "objective_id": "u1-isotope-definition",
       "type": "choice",
@@ -2045,11 +2182,6 @@
             "id": "diff",
             "label": "Two different elements",
             "note": "Both have 6 protons, so both are carbon."
-          },
-          {
-            "id": "ions",
-            "label": "Ions of carbon",
-            "note": "Ions differ in electrons. These differ in neutrons."
           }
         ],
         "answer": "iso",
@@ -2156,7 +2288,7 @@
         "review"
       ],
       "reference_ids": [
-        "ref-openstax-chem-ch2"
+        "ref-openstax-chem-ch1"
       ]
     },
     {
@@ -2173,16 +2305,16 @@
           {
             "id": "half",
             "label": "About half the width of the atom",
-            "note": "The nucleus is vastly smaller than that."
+            "note": "The nucleus is much, much smaller than that."
           },
           {
             "id": "same",
             "label": "About the same size as the atom",
-            "note": "The atom is many thousands of times wider than its nucleus."
+            "note": "The atom is far bigger than its nucleus."
           }
         ],
         "answer": "tiny",
-        "explanation": "The nucleus is a tiny speck. The atom is roughly a hundred thousand times wider."
+        "explanation": "The nucleus is a tiny speck at the centre of the atom."
       },
       "difficulty": 1,
       "surfaces": [
@@ -2195,17 +2327,40 @@
       ]
     },
     {
-      "id": "u1-x-oxygen-17",
-      "objective_id": "u1-mass-number",
-      "type": "fill",
+      "id": "u1-x-order-cell",
+      "objective_id": "u1-atom-scale",
+      "type": "choice",
       "data": {
-        "mode": "number",
-        "prompt": "Oxygen-17 has 8 protons and ___ neutrons.",
-        "answer": 9,
-        "tolerance": 0,
-        "explanation": "The mass number 17 is protons plus neutrons. 17 - 8 = 9 neutrons."
+        "prompt": "Which of these is the smallest?",
+        "options": [
+          {
+            "id": "atom",
+            "label": "An atom",
+            "art": "atom"
+          },
+          {
+            "id": "virus",
+            "label": "A virus",
+            "note": "A virus is much bigger than an atom.",
+            "art": "virus"
+          },
+          {
+            "id": "cell",
+            "label": "A skin cell",
+            "note": "A skin cell is far bigger than an atom.",
+            "art": "cell"
+          },
+          {
+            "id": "hand",
+            "label": "A hand",
+            "note": "A hand is the biggest of these.",
+            "art": "hand"
+          }
+        ],
+        "answer": "atom",
+        "explanation": "An atom is far smaller than a virus, a cell or a hand."
       },
-      "difficulty": 2,
+      "difficulty": 1,
       "surfaces": [
         "practice",
         "checkpoint",
@@ -2229,23 +2384,18 @@
           {
             "id": "6",
             "label": "6",
-            "note": "Six protons would make it carbon."
+            "note": "6 protons would make it carbon."
           },
           {
-            "id": "16",
-            "label": "16",
-            "note": "16 is oxygen-16's mass number, not its proton count."
-          },
-          {
-            "id": "2",
-            "label": "2",
-            "note": "Two protons would make it helium."
+            "id": "7",
+            "label": "7",
+            "note": "7 protons would make it nitrogen."
           }
         ],
         "answer": "8",
-        "explanation": "Oxygen is element 8, so every oxygen atom has 8 protons."
+        "explanation": "Every oxygen atom has 8 protons."
       },
-      "difficulty": 2,
+      "difficulty": 1,
       "surfaces": [
         "practice",
         "checkpoint",
@@ -2257,12 +2407,12 @@
     },
     {
       "id": "u1-x-potassium",
-      "objective_id": "u1-stable-unstable",
+      "objective_id": "u1-unstable-changes",
       "type": "true_or_myth",
       "data": {
-        "statement": "Natural potassium, like the potassium in a banana, includes a small amount of a radioactive isotope.",
+        "statement": "A banana contains a tiny amount of natural radioactive potassium.",
         "answer": "true",
-        "explanation": "True. Roughly 1 in every 10,000 potassium atoms is potassium-40, which is radioactive."
+        "explanation": "True. A small share of the potassium in a banana is potassium-40, which is radioactive."
       },
       "difficulty": 2,
       "surfaces": [
@@ -2275,13 +2425,79 @@
       ]
     },
     {
+      "id": "u1-x-proton-change",
+      "objective_id": "u1-change-protons",
+      "type": "choice",
+      "data": {
+        "prompt": "A nitrogen atom has 7 protons. It gains one proton. What happens?",
+        "options": [
+          {
+            "id": "oxygen",
+            "label": "It becomes oxygen, a different element"
+          },
+          {
+            "id": "nitrogen",
+            "label": "It is still nitrogen, just heavier",
+            "note": "The protons decide the element, so adding one changes the element."
+          },
+          {
+            "id": "carbon",
+            "label": "It becomes carbon",
+            "note": "Carbon has fewer protons, not more."
+          }
+        ],
+        "answer": "oxygen",
+        "explanation": "7 protons plus 1 is 8 protons, and 8 protons is oxygen."
+      },
+      "difficulty": 2,
+      "surfaces": [
+        "practice",
+        "checkpoint",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-openstax-chem-ch2"
+      ]
+    },
+    {
+      "id": "u1-x-rock-natural",
+      "objective_id": "u1-unstable-changes",
+      "type": "choice",
+      "data": {
+        "prompt": "A rock from the ground gives off a little radiation. How can that be?",
+        "options": [
+          {
+            "id": "natural",
+            "label": "Some atoms in it are naturally unstable"
+          },
+          {
+            "id": "people",
+            "label": "Someone must have made it radioactive",
+            "note": "Radioactivity is natural. Many rocks contain unstable atoms."
+          }
+        ],
+        "answer": "natural",
+        "explanation": "Some atoms in the rock, such as uranium, are naturally unstable, so it gives off a little radiation."
+      },
+      "difficulty": 2,
+      "surfaces": [
+        "practice",
+        "checkpoint",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-becquerel-1896",
+        "ref-iaea-isotopes"
+      ]
+    },
+    {
       "id": "u1-x-same-element",
       "objective_id": "u1-atomic-number",
       "type": "true_or_myth",
       "data": {
         "statement": "Two atoms with different numbers of protons can be the same element.",
         "answer": "myth",
-        "explanation": "Myth. The number of protons decides the element. Different proton counts mean different elements."
+        "explanation": "Myth. The number of protons tells you the element. Different numbers of protons mean different elements."
       },
       "difficulty": 1,
       "surfaces": [
@@ -2294,29 +2510,29 @@
       ]
     },
     {
-      "id": "u1-x-strong-does",
-      "objective_id": "u1-forces-in-nucleus",
+      "id": "u1-x-see-atom",
+      "objective_id": "u1-atom-scale",
       "type": "choice",
       "data": {
-        "prompt": "What does the strong force do in a nucleus?",
+        "prompt": "Why can't you see atoms with an ordinary microscope?",
         "options": [
           {
-            "id": "hold",
-            "label": "Holds neighbouring protons and neutrons together"
+            "id": "small",
+            "label": "They are far too small"
           },
           {
-            "id": "push",
-            "label": "Pushes protons apart",
-            "note": "That is the electric force between positive charges."
+            "id": "few",
+            "label": "There are not enough of them",
+            "note": "There are enormous numbers of atoms in everything."
           },
           {
-            "id": "spin",
-            "label": "Spins the electrons",
-            "note": "The strong force acts inside the nucleus, not on electrons."
+            "id": "energy",
+            "label": "They are made of energy",
+            "note": "Atoms are matter, not energy."
           }
         ],
-        "answer": "hold",
-        "explanation": "The strong force pulls neighbouring protons and neutrons together, but only over very short distances."
+        "answer": "small",
+        "explanation": "Atoms are far too small for an ordinary microscope to show."
       },
       "difficulty": 1,
       "surfaces": [
@@ -2325,54 +2541,54 @@
         "review"
       ],
       "reference_ids": [
-        "ref-openstax-up3-ch10"
+        "ref-openstax-chem-ch2"
       ]
     },
     {
-      "id": "u1-x-strong-range",
-      "objective_id": "u1-forces-in-nucleus",
-      "type": "true_or_myth",
+      "id": "u1-x-stable-meaning",
+      "objective_id": "u1-stable-unstable",
+      "type": "choice",
       "data": {
-        "statement": "The strong force reaches across long distances, like gravity.",
-        "answer": "myth",
-        "explanation": "Myth. The strong force only works over a very short range, about the size of a nucleus. Beyond that it drops to almost nothing."
+        "prompt": "What does it mean for a nucleus to be stable?",
+        "options": [
+          {
+            "id": "stays",
+            "label": "It stays the same"
+          },
+          {
+            "id": "changes",
+            "label": "It is likely to change",
+            "note": "That describes an unstable nucleus."
+          },
+          {
+            "id": "gone",
+            "label": "It has no protons",
+            "note": "Every nucleus has protons."
+          }
+        ],
+        "answer": "stays",
+        "explanation": "A stable nucleus stays the same. An unstable nucleus can change."
       },
-      "difficulty": 2,
+      "difficulty": 1,
       "surfaces": [
         "practice",
         "checkpoint",
         "review"
       ],
       "reference_ids": [
-        "ref-openstax-up3-ch10"
+        "ref-iaea-isotopes"
       ]
     },
     {
-      "id": "u1-x-u235",
-      "objective_id": "u1-mass-number",
-      "type": "choice",
+      "id": "u1-x-true-change-protons",
+      "objective_id": "u1-change-protons",
+      "type": "true_or_myth",
       "data": {
-        "prompt": "In the name uranium-235, what does 235 tell you?",
-        "options": [
-          {
-            "id": "sum",
-            "label": "The number of protons plus neutrons"
-          },
-          {
-            "id": "protons",
-            "label": "The number of protons",
-            "note": "Uranium always has 92 protons. The 235 counts protons and neutrons together."
-          },
-          {
-            "id": "neutrons",
-            "label": "The number of neutrons",
-            "note": "235 is protons plus neutrons. Uranium-235 has 143 neutrons."
-          }
-        ],
-        "answer": "sum",
-        "explanation": "The number is the mass number, protons plus neutrons. Uranium has 92 protons, so uranium-235 has 143 neutrons."
+        "statement": "If you change the number of protons in an atom, it becomes a different element.",
+        "answer": "true",
+        "explanation": "True. The number of protons tells you the element, so changing it changes the element."
       },
-      "difficulty": 2,
+      "difficulty": 1,
       "surfaces": [
         "practice",
         "checkpoint",
@@ -2399,18 +2615,13 @@
             "note": "Carbon-12 is stable."
           },
           {
-            "id": "h1",
-            "label": "Hydrogen-1",
-            "note": "Hydrogen-1 is stable."
-          },
-          {
             "id": "o16",
             "label": "Oxygen-16",
             "note": "Oxygen-16 is stable."
           }
         ],
         "answer": "c14",
-        "explanation": "Carbon-14 has too many neutrons for a stable nucleus, so it is radioactive."
+        "explanation": "Carbon-14 is unstable, which means radioactive."
       },
       "difficulty": 1,
       "surfaces": [
@@ -2429,7 +2640,7 @@
       "data": {
         "statement": "A glass of water is made of atoms.",
         "answer": "true",
-        "explanation": "True. Water is matter, and all matter is made of atoms (joined together as molecules of water)."
+        "explanation": "True. Water is matter, and all matter is made of atoms."
       },
       "difficulty": 1,
       "surfaces": [
@@ -2438,7 +2649,2446 @@
         "review"
       ],
       "reference_ids": [
-        "ref-openstax-chem-ch2"
+        "ref-openstax-chem-ch1"
+      ]
+    },
+    {
+      "id": "u2-l1-choice-next",
+      "objective_id": "u2-random-single",
+      "type": "choice",
+      "data": {
+        "prompt": "Look at a group of unstable nuclei. Could you tell in advance which one will change next?",
+        "options": [
+          {
+            "id": "no",
+            "label": "No: it is random for each nucleus"
+          },
+          {
+            "id": "first",
+            "label": "Yes: the one at the front always goes first",
+            "note": "Position does not matter. Each unstable nucleus has the same chance."
+          },
+          {
+            "id": "oldest",
+            "label": "Yes: the oldest one goes first",
+            "note": "A nucleus does not get older or due. It has the same chance every time."
+          }
+        ],
+        "answer": "no",
+        "explanation": "No. When one particular nucleus changes cannot be predicted. Each unstable nucleus has the same chance, so you cannot call the next one."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-iaea-decay"
+      ]
+    },
+    {
+      "id": "u2-l1-choice-why",
+      "objective_id": "u2-spontaneous",
+      "type": "choice",
+      "data": {
+        "prompt": "Why can a radioactive nucleus change even when nobody does anything to it?",
+        "options": [
+          {
+            "id": "unstable",
+            "label": "It is unstable, so it can change on its own"
+          },
+          {
+            "id": "trigger",
+            "label": "Someone must trigger it",
+            "note": "Nobody has to trigger it. Unstable nuclei change by themselves."
+          },
+          {
+            "id": "heat",
+            "label": "It needs heat first",
+            "note": "Heating and cooling hardly affect radioactive decay."
+          },
+          {
+            "id": "used",
+            "label": "It is being used up",
+            "note": "Nothing is used up. The nucleus changes into another nucleus."
+          }
+        ],
+        "answer": "unstable",
+        "explanation": "An unstable nucleus can change on its own. That is what radioactive means."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-iaea-decay"
+      ]
+    },
+    {
+      "id": "u2-l1-fill-parent",
+      "objective_id": "u2-parent-daughter",
+      "type": "fill",
+      "data": {
+        "mode": "bank",
+        "prompt": "The nucleus that decays is the ___.",
+        "bank": [
+          {
+            "id": "parent",
+            "label": "parent"
+          },
+          {
+            "id": "daughter",
+            "label": "daughter"
+          },
+          {
+            "id": "radiation",
+            "label": "radiation"
+          }
+        ],
+        "answer": "parent",
+        "explanation": "The nucleus that decays is the parent. The nucleus it becomes is the daughter."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-iaea-decay"
+      ]
+    },
+    {
+      "id": "u2-l1-hotspot-change",
+      "objective_id": "u2-spontaneous",
+      "type": "hotspot",
+      "data": {
+        "prompt": "Which nucleus can change by itself? Tap it.",
+        "scene": {
+          "height": 54,
+          "shapes": [
+            {
+              "t": "circle",
+              "x": 21.46,
+              "y": 24,
+              "r": 2.3,
+              "tone": "danger",
+              "fill": "solid"
+            },
+            {
+              "t": "circle",
+              "x": 18.13,
+              "y": 25.71,
+              "r": 2.3,
+              "tone": "neutral",
+              "fill": "solid"
+            },
+            {
+              "t": "circle",
+              "x": 20.29,
+              "y": 20.74,
+              "r": 2.3,
+              "tone": "danger",
+              "fill": "solid"
+            },
+            {
+              "t": "circle",
+              "x": 22.36,
+              "y": 27.07,
+              "r": 2.3,
+              "tone": "neutral",
+              "fill": "solid"
+            },
+            {
+              "t": "circle",
+              "x": 15.68,
+              "y": 23.24,
+              "r": 2.3,
+              "tone": "danger",
+              "fill": "solid"
+            },
+            {
+              "t": "circle",
+              "x": 24.1,
+              "y": 21.39,
+              "r": 2.3,
+              "tone": "neutral",
+              "fill": "solid"
+            },
+            {
+              "t": "circle",
+              "x": 18.63,
+              "y": 29.1,
+              "r": 2.3,
+              "tone": "danger",
+              "fill": "solid"
+            },
+            {
+              "t": "circle",
+              "x": 17.39,
+              "y": 18.97,
+              "r": 2.3,
+              "tone": "neutral",
+              "fill": "solid"
+            },
+            {
+              "t": "circle",
+              "x": 25.67,
+              "y": 26.07,
+              "r": 2.3,
+              "tone": "danger",
+              "fill": "solid"
+            },
+            {
+              "t": "circle",
+              "x": 14.1,
+              "y": 26.43,
+              "r": 2.3,
+              "tone": "neutral",
+              "fill": "solid"
+            },
+            {
+              "t": "circle",
+              "x": 22.84,
+              "y": 17.92,
+              "r": 2.3,
+              "tone": "danger",
+              "fill": "solid"
+            },
+            {
+              "t": "circle",
+              "x": 22.1,
+              "y": 30.7,
+              "r": 2.3,
+              "tone": "neutral",
+              "fill": "solid"
+            },
+            {
+              "t": "text",
+              "x": 20,
+              "y": 46,
+              "text": "carbon-12",
+              "size": 4.8
+            },
+            {
+              "t": "circle",
+              "x": 51.46,
+              "y": 24,
+              "r": 2.3,
+              "tone": "danger",
+              "fill": "solid"
+            },
+            {
+              "t": "circle",
+              "x": 48.13,
+              "y": 25.71,
+              "r": 2.3,
+              "tone": "neutral",
+              "fill": "solid"
+            },
+            {
+              "t": "circle",
+              "x": 50.29,
+              "y": 20.74,
+              "r": 2.3,
+              "tone": "danger",
+              "fill": "solid"
+            },
+            {
+              "t": "circle",
+              "x": 52.36,
+              "y": 27.07,
+              "r": 2.3,
+              "tone": "neutral",
+              "fill": "solid"
+            },
+            {
+              "t": "circle",
+              "x": 45.68,
+              "y": 23.24,
+              "r": 2.3,
+              "tone": "danger",
+              "fill": "solid"
+            },
+            {
+              "t": "circle",
+              "x": 54.1,
+              "y": 21.39,
+              "r": 2.3,
+              "tone": "neutral",
+              "fill": "solid"
+            },
+            {
+              "t": "circle",
+              "x": 48.63,
+              "y": 29.1,
+              "r": 2.3,
+              "tone": "danger",
+              "fill": "solid"
+            },
+            {
+              "t": "circle",
+              "x": 47.39,
+              "y": 18.97,
+              "r": 2.3,
+              "tone": "neutral",
+              "fill": "solid"
+            },
+            {
+              "t": "circle",
+              "x": 55.67,
+              "y": 26.07,
+              "r": 2.3,
+              "tone": "danger",
+              "fill": "solid"
+            },
+            {
+              "t": "circle",
+              "x": 44.1,
+              "y": 26.43,
+              "r": 2.3,
+              "tone": "neutral",
+              "fill": "solid"
+            },
+            {
+              "t": "circle",
+              "x": 52.84,
+              "y": 17.92,
+              "r": 2.3,
+              "tone": "danger",
+              "fill": "solid"
+            },
+            {
+              "t": "circle",
+              "x": 52.1,
+              "y": 30.7,
+              "r": 2.3,
+              "tone": "neutral",
+              "fill": "solid"
+            },
+            {
+              "t": "circle",
+              "x": 43.67,
+              "y": 20.33,
+              "r": 2.3,
+              "tone": "neutral",
+              "fill": "solid"
+            },
+            {
+              "t": "circle",
+              "x": 57.43,
+              "y": 22.37,
+              "r": 2.3,
+              "tone": "neutral",
+              "fill": "solid"
+            },
+            {
+              "t": "text",
+              "x": 50,
+              "y": 46,
+              "text": "carbon-14",
+              "size": 4.8
+            },
+            {
+              "t": "circle",
+              "x": 81.46,
+              "y": 24,
+              "r": 2.3,
+              "tone": "danger",
+              "fill": "solid"
+            },
+            {
+              "t": "circle",
+              "x": 78.13,
+              "y": 25.71,
+              "r": 2.3,
+              "tone": "neutral",
+              "fill": "solid"
+            },
+            {
+              "t": "circle",
+              "x": 80.29,
+              "y": 20.74,
+              "r": 2.3,
+              "tone": "danger",
+              "fill": "solid"
+            },
+            {
+              "t": "circle",
+              "x": 82.36,
+              "y": 27.07,
+              "r": 2.3,
+              "tone": "neutral",
+              "fill": "solid"
+            },
+            {
+              "t": "circle",
+              "x": 75.68,
+              "y": 23.24,
+              "r": 2.3,
+              "tone": "danger",
+              "fill": "solid"
+            },
+            {
+              "t": "circle",
+              "x": 84.1,
+              "y": 21.39,
+              "r": 2.3,
+              "tone": "neutral",
+              "fill": "solid"
+            },
+            {
+              "t": "circle",
+              "x": 78.63,
+              "y": 29.1,
+              "r": 2.3,
+              "tone": "danger",
+              "fill": "solid"
+            },
+            {
+              "t": "circle",
+              "x": 77.39,
+              "y": 18.97,
+              "r": 2.3,
+              "tone": "neutral",
+              "fill": "solid"
+            },
+            {
+              "t": "circle",
+              "x": 85.67,
+              "y": 26.07,
+              "r": 2.3,
+              "tone": "danger",
+              "fill": "solid"
+            },
+            {
+              "t": "circle",
+              "x": 74.1,
+              "y": 26.43,
+              "r": 2.3,
+              "tone": "neutral",
+              "fill": "solid"
+            },
+            {
+              "t": "circle",
+              "x": 82.84,
+              "y": 17.92,
+              "r": 2.3,
+              "tone": "danger",
+              "fill": "solid"
+            },
+            {
+              "t": "circle",
+              "x": 82.1,
+              "y": 30.7,
+              "r": 2.3,
+              "tone": "neutral",
+              "fill": "solid"
+            },
+            {
+              "t": "circle",
+              "x": 73.67,
+              "y": 20.33,
+              "r": 2.3,
+              "tone": "danger",
+              "fill": "solid"
+            },
+            {
+              "t": "circle",
+              "x": 87.43,
+              "y": 22.37,
+              "r": 2.3,
+              "tone": "neutral",
+              "fill": "solid"
+            },
+            {
+              "t": "circle",
+              "x": 75.47,
+              "y": 30.45,
+              "r": 2.3,
+              "tone": "danger",
+              "fill": "solid"
+            },
+            {
+              "t": "circle",
+              "x": 78.95,
+              "y": 15.92,
+              "r": 2.3,
+              "tone": "neutral",
+              "fill": "solid"
+            },
+            {
+              "t": "text",
+              "x": 80,
+              "y": 46,
+              "text": "oxygen-16",
+              "size": 4.8
+            }
+          ]
+        },
+        "targets": [
+          {
+            "id": "c12",
+            "label": "Carbon-12 nucleus",
+            "x": 20,
+            "y": 24,
+            "r": 13
+          },
+          {
+            "id": "c14",
+            "label": "Carbon-14 nucleus",
+            "x": 50,
+            "y": 24,
+            "r": 13
+          },
+          {
+            "id": "o16",
+            "label": "Oxygen-16 nucleus",
+            "x": 80,
+            "y": 24,
+            "r": 13
+          }
+        ],
+        "answer": "c14",
+        "animateOnCorrect": true,
+        "explanation": "Carbon-14 is unstable, so it can change by itself. Carbon-12 and oxygen-16 are stable and stay as they are."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-iaea-decay"
+      ]
+    },
+    {
+      "id": "u2-l1-match-names",
+      "objective_id": "u2-parent-daughter",
+      "type": "match",
+      "data": {
+        "prompt": "Match each name to what it means.",
+        "pairs": [
+          {
+            "id": "parent",
+            "left": "Parent",
+            "right": "The nucleus that decays"
+          },
+          {
+            "id": "daughter",
+            "left": "Daughter",
+            "right": "The nucleus it becomes"
+          },
+          {
+            "id": "radiation",
+            "left": "Radiation",
+            "right": "What comes out when it changes"
+          }
+        ],
+        "explanation": "The parent is the nucleus that decays. The daughter is the nucleus it becomes. Radiation is what comes out."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-iaea-decay"
+      ]
+    },
+    {
+      "id": "u2-l1-predict-alone",
+      "objective_id": "u2-spontaneous",
+      "type": "predict",
+      "data": {
+        "input": "choice",
+        "prompt": "An unstable nucleus is left alone for a very long time. What happens?",
+        "options": [
+          {
+            "id": "same",
+            "label": "It stays the same for ever"
+          },
+          {
+            "id": "itself",
+            "label": "It can change by itself"
+          },
+          {
+            "id": "trigger",
+            "label": "Someone has to trigger it"
+          },
+          {
+            "id": "gone",
+            "label": "It disappears at once"
+          }
+        ],
+        "answer": "itself",
+        "explanation": "Your guess is not scored. The answer comes later in the lesson."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson"
+      ],
+      "reference_ids": []
+    },
+    {
+      "id": "u2-l1-tom-chance",
+      "objective_id": "u2-random-single",
+      "type": "true_or_myth",
+      "data": {
+        "statement": "You can say how likely a nucleus is to change, but not exactly when it will.",
+        "answer": "true",
+        "explanation": "True. An unstable nucleus has a chance of changing, but when one particular nucleus changes cannot be predicted."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-iaea-decay"
+      ]
+    },
+    {
+      "id": "u2-l1-tom-person",
+      "objective_id": "u2-spontaneous",
+      "type": "true_or_myth",
+      "data": {
+        "statement": "A radioactive atom needs a person to make it decay.",
+        "answer": "myth",
+        "explanation": "Myth. Nobody has to make an unstable nucleus change. It changes by itself."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-iaea-decay"
+      ]
+    },
+    {
+      "id": "u2-l2-choice-alpha",
+      "objective_id": "u2-recognise-radiation",
+      "type": "choice",
+      "data": {
+        "prompt": "Which kind of radiation is made of 2 protons and 2 neutrons?",
+        "options": [
+          {
+            "id": "alpha",
+            "label": "Alpha"
+          },
+          {
+            "id": "beta",
+            "label": "Beta",
+            "note": "A beta particle is a fast electron."
+          },
+          {
+            "id": "gamma",
+            "label": "Gamma",
+            "note": "Gamma is electromagnetic radiation. It is not made of protons and neutrons."
+          }
+        ],
+        "answer": "alpha",
+        "explanation": "An alpha particle is 2 protons and 2 neutrons stuck together, the nucleus of a helium atom."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-iaea-radiation-types"
+      ]
+    },
+    {
+      "id": "u2-l2-choice-electron",
+      "objective_id": "u2-recognise-radiation",
+      "type": "choice",
+      "data": {
+        "prompt": "A fast electron is released from a nucleus. What is this radiation called?",
+        "options": [
+          {
+            "id": "beta",
+            "label": "Beta"
+          },
+          {
+            "id": "alpha",
+            "label": "Alpha",
+            "note": "Alpha is 2 protons and 2 neutrons, not an electron."
+          },
+          {
+            "id": "gamma",
+            "label": "Gamma",
+            "note": "Gamma is electromagnetic radiation, not a particle."
+          }
+        ],
+        "answer": "beta",
+        "explanation": "A fast electron released from a nucleus is a beta particle."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-iaea-radiation-types"
+      ]
+    },
+    {
+      "id": "u2-l2-choice-gamma-element",
+      "objective_id": "u2-particle-or-wave",
+      "type": "choice",
+      "data": {
+        "prompt": "A gamma ray leaves a nucleus. Does the nucleus turn into a different element?",
+        "options": [
+          {
+            "id": "no",
+            "label": "No: a gamma ray is not a particle, so no protons leave"
+          },
+          {
+            "id": "yes-protons",
+            "label": "Yes: it loses protons",
+            "note": "Gamma is electromagnetic radiation. No protons or neutrons leave."
+          },
+          {
+            "id": "yes-always",
+            "label": "Yes: every decay changes the element",
+            "note": "Gamma carries energy away and does not change the number of protons."
+          }
+        ],
+        "answer": "no",
+        "explanation": "No. Gamma is electromagnetic radiation, not a particle, so no protons or neutrons leave. The nucleus stays the same element."
+      },
+      "difficulty": 2,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-iaea-radiation-types"
+      ]
+    },
+    {
+      "id": "u2-l2-match-kinds",
+      "objective_id": "u2-recognise-radiation",
+      "type": "match",
+      "data": {
+        "prompt": "Match each kind of radiation to what it is.",
+        "pairs": [
+          {
+            "id": "alpha",
+            "left": "Alpha",
+            "right": "2 protons and 2 neutrons"
+          },
+          {
+            "id": "beta",
+            "left": "Beta",
+            "right": "A fast electron"
+          },
+          {
+            "id": "gamma",
+            "left": "Gamma",
+            "right": "High-energy electromagnetic radiation"
+          }
+        ],
+        "explanation": "Alpha is 2 protons and 2 neutrons. Beta is a fast electron. Gamma is high-energy electromagnetic radiation."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-iaea-radiation-types"
+      ]
+    },
+    {
+      "id": "u2-l2-predict-release",
+      "objective_id": "u2-recognise-radiation",
+      "type": "predict",
+      "data": {
+        "input": "choice",
+        "prompt": "When a radioactive nucleus changes, what can it release?",
+        "options": [
+          {
+            "id": "particle",
+            "label": "Only a particle"
+          },
+          {
+            "id": "energy",
+            "label": "Only energy"
+          },
+          {
+            "id": "both",
+            "label": "A particle, energy, or both"
+          },
+          {
+            "id": "nothing",
+            "label": "Nothing at all"
+          }
+        ],
+        "answer": "both",
+        "explanation": "Your guess is not scored. The answer comes later in the lesson."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson"
+      ],
+      "reference_ids": []
+    },
+    {
+      "id": "u2-l2-sort-kind",
+      "objective_id": "u2-particle-or-wave",
+      "type": "sort",
+      "data": {
+        "prompt": "Is it a particle, or electromagnetic radiation? Sort each one.",
+        "buckets": [
+          {
+            "id": "particle",
+            "label": "A particle",
+            "icon": "AqParticle"
+          },
+          {
+            "id": "em",
+            "label": "Electromagnetic radiation",
+            "icon": "AqWave"
+          }
+        ],
+        "items": [
+          {
+            "id": "alpha",
+            "label": "Alpha",
+            "bucket": "particle"
+          },
+          {
+            "id": "beta",
+            "label": "Beta",
+            "bucket": "particle"
+          },
+          {
+            "id": "gamma",
+            "label": "Gamma",
+            "bucket": "em"
+          },
+          {
+            "id": "light",
+            "label": "Visible light",
+            "bucket": "em"
+          }
+        ],
+        "explanation": "Alpha and beta are particles. Gamma and visible light are electromagnetic radiation, and gamma carries far more energy."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-iaea-radiation-types"
+      ]
+    },
+    {
+      "id": "u2-l2-tom-light",
+      "objective_id": "u2-particle-or-wave",
+      "type": "true_or_myth",
+      "data": {
+        "statement": "Visible light is electromagnetic radiation, just like gamma rays.",
+        "answer": "true",
+        "explanation": "True. Light and gamma rays are both electromagnetic radiation. Gamma rays carry far more energy."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-iaea-radiation-types"
+      ]
+    },
+    {
+      "id": "u2-l2-tom-pieces",
+      "objective_id": "u2-particle-or-wave",
+      "type": "true_or_myth",
+      "data": {
+        "statement": "Gamma radiation is made of tiny pieces of the nucleus.",
+        "answer": "myth",
+        "explanation": "Myth. Gamma is electromagnetic radiation, like light but far more energetic. It is not made of pieces of the nucleus."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-iaea-radiation-types"
+      ]
+    },
+    {
+      "id": "u2-l2-tom-same",
+      "objective_id": "u2-particle-or-wave",
+      "type": "true_or_myth",
+      "data": {
+        "statement": "Alpha, beta and gamma are three versions of the same thing.",
+        "answer": "myth",
+        "explanation": "Myth. Alpha and beta are different particles, and gamma is electromagnetic radiation, not a particle. They are three different things."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-iaea-radiation-types"
+      ]
+    },
+    {
+      "id": "u2-l3-choice-buster",
+      "objective_id": "u2-half-life-group",
+      "type": "choice",
+      "data": {
+        "prompt": "Which statement about half-life is true?",
+        "options": [
+          {
+            "id": "group",
+            "label": "It describes how a group of nuclei decreases over time"
+          },
+          {
+            "id": "timer",
+            "label": "It is a timer that runs inside each atom",
+            "note": "Half-life describes a group, not a timer in each atom."
+          },
+          {
+            "id": "gone",
+            "label": "After one half-life the radioactivity is completely gone",
+            "note": "About half of the nuclei are still unstable."
+          },
+          {
+            "id": "forever",
+            "label": "A radioactive material stays radioactive for ever",
+            "note": "Each radioactive material fades. Some do it fast and some very slowly."
+          }
+        ],
+        "answer": "group",
+        "explanation": "Half-life describes how quickly a group of radioactive nuclei decreases. It is not a timer in each atom, and the radioactivity fades without being gone after one half-life."
+      },
+      "difficulty": 2,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-iaea-decay"
+      ]
+    },
+    {
+      "id": "u2-l3-choice-eighty",
+      "objective_id": "u2-half-life-pattern",
+      "type": "choice",
+      "data": {
+        "prompt": "A sample starts with 80 nuclei. After two half-lives, about how many have not changed?",
+        "options": [
+          {
+            "id": "10",
+            "label": "About 10",
+            "note": "Two half-lives is two halvings: 80, 40, 20."
+          },
+          {
+            "id": "20",
+            "label": "About 20"
+          },
+          {
+            "id": "40",
+            "label": "About 40",
+            "note": "About 40 are left after one half-life, not two."
+          },
+          {
+            "id": "60",
+            "label": "About 60",
+            "note": "That is far more than half of 80 after even one half-life."
+          }
+        ],
+        "answer": "20",
+        "explanation": "80 becomes about 40 after one half-life and about 20 after two."
+      },
+      "difficulty": 2,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-iaea-decay"
+      ]
+    },
+    {
+      "id": "u2-l3-choice-left",
+      "objective_id": "u2-half-life-meaning",
+      "type": "choice",
+      "data": {
+        "prompt": "A sample has gone through one half-life. Which statement is true?",
+        "options": [
+          {
+            "id": "about",
+            "label": "About half of the nuclei have decayed, and the rest were not cut in half"
+          },
+          {
+            "id": "each",
+            "label": "Every nucleus has lost half of itself",
+            "note": "Nuclei are not cut in half. About half of them have decayed and the others have not changed."
+          },
+          {
+            "id": "weaker",
+            "label": "Every nucleus is now half as radioactive",
+            "note": "Each nucleus is either still unstable or has already changed."
+          }
+        ],
+        "answer": "about",
+        "explanation": "About half of the nuclei have decayed. The rest were not cut in half."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-iaea-decay"
+      ]
+    },
+    {
+      "id": "u2-l3-choice-meaning",
+      "objective_id": "u2-half-life-meaning",
+      "type": "choice",
+      "data": {
+        "prompt": "What does half-life mean?",
+        "options": [
+          {
+            "id": "group",
+            "label": "The time for about half of a large group of nuclei to decay"
+          },
+          {
+            "id": "one",
+            "label": "The time for one atom to decay",
+            "note": "Half-life describes a group, not one atom."
+          },
+          {
+            "id": "half",
+            "label": "The time for each atom to lose half of itself",
+            "note": "Atoms are not cut in half. About half of the nuclei have decayed."
+          },
+          {
+            "id": "gone",
+            "label": "The time until the sample is no longer radioactive",
+            "note": "Some radioactivity is still there after one half-life."
+          }
+        ],
+        "answer": "group",
+        "explanation": "Half-life is the time for about half of a large group of radioactive nuclei to decay."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-iaea-decay"
+      ]
+    },
+    {
+      "id": "u2-l3-fill-pattern",
+      "objective_id": "u2-half-life-pattern",
+      "type": "fill",
+      "data": {
+        "mode": "bank",
+        "prompt": "The pattern is 100, 50, 25, and then about ___.",
+        "bank": [
+          {
+            "id": "12",
+            "label": "12"
+          },
+          {
+            "id": "20",
+            "label": "20"
+          },
+          {
+            "id": "0",
+            "label": "0"
+          }
+        ],
+        "answer": "12",
+        "explanation": "Each half-life takes about half of what is left. Half of 25 is about 12."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-iaea-decay"
+      ]
+    },
+    {
+      "id": "u2-l3-match-halves",
+      "objective_id": "u2-half-life-pattern",
+      "type": "match",
+      "data": {
+        "prompt": "Start with 100 nuclei. Match the number of half-lives to about how many are left.",
+        "pairs": [
+          {
+            "id": "one",
+            "left": "1 half-life",
+            "right": "About 50"
+          },
+          {
+            "id": "two",
+            "left": "2 half-lives",
+            "right": "About 25"
+          },
+          {
+            "id": "three",
+            "left": "3 half-lives",
+            "right": "About 12"
+          }
+        ],
+        "explanation": "Each half-life takes about half of what is left: about 50, then about 25, then about 12."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-iaea-decay"
+      ]
+    },
+    {
+      "id": "u2-l3-predict-hundred",
+      "objective_id": "u2-half-life-meaning",
+      "type": "predict",
+      "data": {
+        "input": "choice",
+        "prompt": "There are 100 radioactive nuclei. After one half-life, what happens?",
+        "options": [
+          {
+            "id": "one",
+            "label": "One nucleus disappears"
+          },
+          {
+            "id": "half",
+            "label": "Every atom becomes half as radioactive"
+          },
+          {
+            "id": "about-half",
+            "label": "About half of the nuclei have decayed"
+          },
+          {
+            "id": "gone",
+            "label": "All the radioactivity is gone"
+          }
+        ],
+        "answer": "about-half",
+        "explanation": "Your guess is not scored. The answer comes later in the lesson."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson"
+      ],
+      "reference_ids": []
+    },
+    {
+      "id": "u2-l3-tom-crowd",
+      "objective_id": "u2-half-life-group",
+      "type": "true_or_myth",
+      "data": {
+        "statement": "In a large group of nuclei, you can predict that about half will change in one half-life.",
+        "answer": "true",
+        "explanation": "True. One nucleus is unpredictable, but a large group follows a pattern."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-iaea-decay"
+      ]
+    },
+    {
+      "id": "u2-l3-tom-gone",
+      "objective_id": "u2-half-life-pattern",
+      "type": "true_or_myth",
+      "data": {
+        "statement": "After one half-life, the radioactivity is gone.",
+        "answer": "myth",
+        "explanation": "Myth. After one half-life, about half of the nuclei are still unstable. 100 becomes about 50, then about 25, and so on. It fades, but it is not gone after one half-life."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-iaea-decay"
+      ]
+    },
+    {
+      "id": "u2-l3-tom-timer",
+      "objective_id": "u2-half-life-group",
+      "type": "true_or_myth",
+      "data": {
+        "statement": "A radioactive atom always waits exactly one half-life before it decays.",
+        "answer": "myth",
+        "explanation": "Myth. Half-life describes a group, not a timer in each atom. One nucleus might change soon or much later. Only the group follows the pattern."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-iaea-decay"
+      ]
+    },
+    {
+      "id": "u2-l4-choice-finished",
+      "objective_id": "u2-decay-chain",
+      "type": "choice",
+      "data": {
+        "prompt": "A sample has a nucleus whose daughter is also unstable. After the first decay, is the sample finished changing?",
+        "options": [
+          {
+            "id": "no",
+            "label": "No: the daughter can decay too"
+          },
+          {
+            "id": "yes-stable",
+            "label": "Yes: a decay always ends in a stable nucleus",
+            "note": "The daughter is unstable, so it can decay again."
+          },
+          {
+            "id": "yes-gone",
+            "label": "Yes: the atom has disappeared",
+            "note": "Nothing vanishes. The nucleus changed into another nucleus."
+          }
+        ],
+        "answer": "no",
+        "explanation": "No. The daughter is unstable, so the sample can keep changing along the chain."
+      },
+      "difficulty": 2,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-iaea-decay"
+      ]
+    },
+    {
+      "id": "u2-l4-choice-next",
+      "objective_id": "u2-decay-chain",
+      "type": "choice",
+      "data": {
+        "prompt": "A chain goes Parent, then Daughter. What comes next if the daughter is unstable?",
+        "options": [
+          {
+            "id": "next",
+            "label": "The next generation, another nucleus"
+          },
+          {
+            "id": "stable",
+            "label": "Always a stable nucleus",
+            "note": "The next nucleus can be unstable too. The chain only ends at a stable one."
+          },
+          {
+            "id": "parent",
+            "label": "The parent again",
+            "note": "A decay does not run backwards."
+          }
+        ],
+        "answer": "next",
+        "explanation": "An unstable daughter decays again into the next generation. The chain goes on until a stable nucleus is reached."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-iaea-decay"
+      ]
+    },
+    {
+      "id": "u2-l4-order-chain",
+      "objective_id": "u2-decay-chain",
+      "type": "order",
+      "data": {
+        "prompt": "Put the chain in order, from the start to the end.",
+        "items": [
+          {
+            "id": "parent",
+            "label": "Parent"
+          },
+          {
+            "id": "daughter",
+            "label": "Daughter"
+          },
+          {
+            "id": "next",
+            "label": "Next generation"
+          },
+          {
+            "id": "stable",
+            "label": "Stable"
+          }
+        ],
+        "explanation": "A chain starts with the parent, goes through the daughter and the next generation, and ends at a stable nucleus."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-iaea-decay"
+      ]
+    },
+    {
+      "id": "u2-l4-predict-daughter",
+      "objective_id": "u2-decay-chain",
+      "type": "predict",
+      "data": {
+        "input": "choice",
+        "prompt": "A nucleus decays into a daughter. Is the daughter always stable?",
+        "options": [
+          {
+            "id": "yes",
+            "label": "Yes, every time"
+          },
+          {
+            "id": "no",
+            "label": "No, sometimes it can be unstable too"
+          }
+        ],
+        "answer": "no",
+        "explanation": "Your guess is not scored. The answer comes later in the lesson."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson"
+      ],
+      "reference_ids": []
+    },
+    {
+      "id": "u2-l4-tom-different",
+      "objective_id": "u2-decay-changes-not-vanishes",
+      "type": "true_or_myth",
+      "data": {
+        "statement": "When a nucleus decays, it changes into a different nucleus.",
+        "answer": "true",
+        "explanation": "True. The parent changes into a daughter, which is a different nucleus."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-iaea-decay"
+      ]
+    },
+    {
+      "id": "u2-l4-tom-stable",
+      "objective_id": "u2-decay-chain",
+      "type": "true_or_myth",
+      "data": {
+        "statement": "Every radioactive decay immediately creates a stable atom.",
+        "answer": "myth",
+        "explanation": "Myth. The daughter can be unstable too, and then it decays again. A chain only ends at a stable nucleus."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-iaea-decay"
+      ]
+    },
+    {
+      "id": "u2-l4-tom-vanish",
+      "objective_id": "u2-decay-changes-not-vanishes",
+      "type": "true_or_myth",
+      "data": {
+        "statement": "Radioactive decay means the atom just disappears.",
+        "answer": "myth",
+        "explanation": "Myth. The nucleus changes into a different nucleus. Nothing simply vanishes."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-iaea-decay"
+      ]
+    },
+    {
+      "id": "u2-l5-choice-dangerous",
+      "objective_id": "u2-not-always-dangerous",
+      "type": "choice",
+      "data": {
+        "prompt": "If something is radioactive, is it automatically dangerous?",
+        "options": [
+          {
+            "id": "not",
+            "label": "Not necessarily"
+          },
+          {
+            "id": "always",
+            "label": "Yes: anything radioactive is dangerous",
+            "note": "Bananas and your body are radioactive. It depends on the type, the amount and how it reaches the body."
+          },
+          {
+            "id": "never",
+            "label": "No: radioactive things are always harmless",
+            "note": "Some radioactive things can be harmful. It depends."
+          }
+        ],
+        "answer": "not",
+        "explanation": "Radioactive does not automatically mean dangerous. It depends on the type of radiation, the amount and how it reaches the body."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-background-radiation"
+      ]
+    },
+    {
+      "id": "u2-l5-choice-decides",
+      "objective_id": "u2-not-always-dangerous",
+      "type": "choice",
+      "data": {
+        "prompt": "What helps decide whether radiation matters?",
+        "options": [
+          {
+            "id": "three",
+            "label": "The type, the amount and how it reaches the body"
+          },
+          {
+            "id": "only-radioactive",
+            "label": "Only whether the material is radioactive",
+            "note": "That is not enough. It depends on more than that."
+          },
+          {
+            "id": "only-old",
+            "label": "Only how old the material is",
+            "note": "Age alone does not decide it."
+          }
+        ],
+        "answer": "three",
+        "explanation": "The type of radiation, how much there is and how it reaches the body all matter. Radioactive alone does not tell you."
+      },
+      "difficulty": 2,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-background-radiation"
+      ]
+    },
+    {
+      "id": "u2-l5-choice-radon",
+      "objective_id": "u2-natural-sources",
+      "type": "choice",
+      "data": {
+        "prompt": "Where does radon come from?",
+        "options": [
+          {
+            "id": "ground",
+            "label": "From radioactive materials in the ground"
+          },
+          {
+            "id": "plants",
+            "label": "Only from nuclear power plants",
+            "note": "Radon is made naturally in the ground. It is in the air everywhere."
+          },
+          {
+            "id": "people",
+            "label": "From a gas that people make and sell",
+            "note": "Radon is natural. It comes from decay in rocks and soil."
+          }
+        ],
+        "answer": "ground",
+        "explanation": "Radioactive materials in the ground, such as uranium and thorium, produce radon. It is natural."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-background-radiation"
+      ]
+    },
+    {
+      "id": "u2-l5-choice-space",
+      "objective_id": "u2-natural-sources",
+      "type": "choice",
+      "data": {
+        "prompt": "Which of these arrives on Earth from space?",
+        "options": [
+          {
+            "id": "cosmic",
+            "label": "Cosmic radiation"
+          },
+          {
+            "id": "radon",
+            "label": "Radon gas",
+            "note": "Radon comes from the ground."
+          },
+          {
+            "id": "k40",
+            "label": "Potassium-40 in food",
+            "note": "Potassium-40 is in food and in the body."
+          }
+        ],
+        "answer": "cosmic",
+        "explanation": "Cosmic radiation arrives from space all the time."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-background-radiation"
+      ]
+    },
+    {
+      "id": "u2-l5-order-first",
+      "objective_id": "u2-natural-sources",
+      "type": "order",
+      "data": {
+        "prompt": "Put these in order, from first to last.",
+        "items": [
+          {
+            "id": "nature",
+            "label": "Radioactive materials are in the ground"
+          },
+          {
+            "id": "found",
+            "label": "Becquerel notices a fogged photographic plate"
+          },
+          {
+            "id": "made",
+            "label": "People learn to make radioactive materials"
+          }
+        ],
+        "explanation": "Radioactivity was in nature first. Becquerel found it in 1896, and only later did people learn to make radioactive materials."
+      },
+      "difficulty": 2,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-becquerel-1896",
+        "ref-iaea-decay"
+      ]
+    },
+    {
+      "id": "u2-l5-predict-where",
+      "objective_id": "u2-natural-sources",
+      "type": "predict",
+      "data": {
+        "input": "choice",
+        "prompt": "Which of these can have radioactive material in it?",
+        "options": [
+          {
+            "id": "plant",
+            "label": "A nuclear power plant"
+          },
+          {
+            "id": "hospital",
+            "label": "A hospital"
+          },
+          {
+            "id": "rocks",
+            "label": "Rocks and food"
+          },
+          {
+            "id": "body",
+            "label": "Your own body"
+          },
+          {
+            "id": "all",
+            "label": "All of these"
+          }
+        ],
+        "answer": "all",
+        "explanation": "Your guess is not scored. The answer comes later in the lesson."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson"
+      ],
+      "reference_ids": []
+    },
+    {
+      "id": "u2-l5-sort-world",
+      "objective_id": "u2-natural-sources",
+      "type": "sort",
+      "data": {
+        "prompt": "Which kind is it? Natural radioactivity, cosmic radiation, or made by people? Sort each one.",
+        "buckets": [
+          {
+            "id": "natural",
+            "label": "Natural radioactivity",
+            "icon": "AqMountain"
+          },
+          {
+            "id": "cosmic",
+            "label": "Cosmic radiation",
+            "icon": "AqCosmic"
+          },
+          {
+            "id": "people",
+            "label": "Made by people",
+            "icon": "AqFlask"
+          }
+        ],
+        "items": [
+          {
+            "id": "banana",
+            "label": "A banana",
+            "bucket": "natural"
+          },
+          {
+            "id": "rock",
+            "label": "A rock",
+            "bucket": "natural"
+          },
+          {
+            "id": "body",
+            "label": "The human body",
+            "bucket": "natural"
+          },
+          {
+            "id": "plane",
+            "label": "An airplane at high altitude",
+            "bucket": "cosmic"
+          },
+          {
+            "id": "reactor",
+            "label": "A nuclear reactor",
+            "bucket": "people"
+          },
+          {
+            "id": "hospital",
+            "label": "A hospital radiation source",
+            "bucket": "people"
+          }
+        ],
+        "explanation": "A banana, a rock and your body hold natural radioactivity. High up, an airplane gets more cosmic radiation. Reactors and hospital sources are made by people. Radiation is part of the world, not only inside nuclear facilities."
+      },
+      "difficulty": 2,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-background-radiation"
+      ]
+    },
+    {
+      "id": "u2-l5-tom-facilities",
+      "objective_id": "u2-natural-sources",
+      "type": "true_or_myth",
+      "data": {
+        "statement": "Radioactive materials are only found in nuclear facilities.",
+        "answer": "myth",
+        "explanation": "Myth. Radioactive materials are in rocks, soil, air, food and your own body. Nuclear facilities are only one place."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-background-radiation"
+      ]
+    },
+    {
+      "id": "u2-x-banana-says",
+      "objective_id": "u2-not-always-dangerous",
+      "type": "choice",
+      "data": {
+        "prompt": "A banana holds a little radioactive potassium. What does that tell you?",
+        "options": [
+          {
+            "id": "not",
+            "label": "Radioactive does not automatically mean dangerous"
+          },
+          {
+            "id": "hazard",
+            "label": "Bananas are a nuclear hazard",
+            "note": "A tiny natural amount is normal."
+          },
+          {
+            "id": "made",
+            "label": "Bananas were made by people",
+            "note": "Potassium-40 is natural."
+          }
+        ],
+        "answer": "not",
+        "explanation": "Bananas are a little radioactive, and that is normal. Radioactive does not automatically mean dangerous."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "practice",
+        "checkpoint",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-background-radiation"
+      ]
+    },
+    {
+      "id": "u2-x-chain-end",
+      "objective_id": "u2-decay-chain",
+      "type": "choice",
+      "data": {
+        "prompt": "What ends a decay chain?",
+        "options": [
+          {
+            "id": "stable",
+            "label": "A stable nucleus"
+          },
+          {
+            "id": "first",
+            "label": "The first decay",
+            "note": "A daughter can be unstable and decay again."
+          },
+          {
+            "id": "radiation",
+            "label": "The radiation running out",
+            "note": "The chain ends only when the nucleus is stable."
+          }
+        ],
+        "answer": "stable",
+        "explanation": "A decay chain ends when a stable nucleus is reached."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "practice",
+        "checkpoint",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-iaea-decay"
+      ]
+    },
+    {
+      "id": "u2-x-daughter-name",
+      "objective_id": "u2-parent-daughter",
+      "type": "choice",
+      "data": {
+        "prompt": "A nucleus decays into a new nucleus. What is the new nucleus called?",
+        "options": [
+          {
+            "id": "daughter",
+            "label": "The daughter"
+          },
+          {
+            "id": "parent",
+            "label": "The parent",
+            "note": "The parent is the nucleus that decays."
+          },
+          {
+            "id": "radiation",
+            "label": "The radiation",
+            "note": "Radiation is what comes out, not the new nucleus."
+          }
+        ],
+        "answer": "daughter",
+        "explanation": "The new nucleus is the daughter. The one that decayed is the parent."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "practice",
+        "checkpoint",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-iaea-decay"
+      ]
+    },
+    {
+      "id": "u2-x-em-burst",
+      "objective_id": "u2-recognise-radiation",
+      "type": "choice",
+      "data": {
+        "prompt": "A burst of high-energy electromagnetic radiation leaves a nucleus. What is it?",
+        "options": [
+          {
+            "id": "gamma",
+            "label": "Gamma"
+          },
+          {
+            "id": "alpha",
+            "label": "Alpha",
+            "note": "Alpha is a particle of 2 protons and 2 neutrons."
+          },
+          {
+            "id": "beta",
+            "label": "Beta",
+            "note": "Beta is a fast electron."
+          }
+        ],
+        "answer": "gamma",
+        "explanation": "High-energy electromagnetic radiation from a nucleus is gamma radiation."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "practice",
+        "checkpoint",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-iaea-radiation-types"
+      ]
+    },
+    {
+      "id": "u2-x-fill-chain",
+      "objective_id": "u2-decay-chain",
+      "type": "fill",
+      "data": {
+        "mode": "bank",
+        "prompt": "A sequence of decays in which one nucleus changes into another is called a decay ___.",
+        "bank": [
+          {
+            "id": "chain",
+            "label": "chain"
+          },
+          {
+            "id": "stop",
+            "label": "stop"
+          },
+          {
+            "id": "clock",
+            "label": "clock"
+          }
+        ],
+        "answer": "chain",
+        "explanation": "It is called a decay chain."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "practice",
+        "checkpoint",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-iaea-decay"
+      ]
+    },
+    {
+      "id": "u2-x-fill-daughter",
+      "objective_id": "u2-parent-daughter",
+      "type": "fill",
+      "data": {
+        "mode": "bank",
+        "prompt": "The parent decays, and the nucleus it becomes is the ___.",
+        "bank": [
+          {
+            "id": "daughter",
+            "label": "daughter"
+          },
+          {
+            "id": "parent",
+            "label": "parent"
+          },
+          {
+            "id": "stable",
+            "label": "stable one"
+          }
+        ],
+        "answer": "daughter",
+        "explanation": "The nucleus that decays is the parent, and the nucleus it becomes is the daughter."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "practice",
+        "checkpoint",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-iaea-decay"
+      ]
+    },
+    {
+      "id": "u2-x-fill-half",
+      "objective_id": "u2-half-life-meaning",
+      "type": "fill",
+      "data": {
+        "mode": "bank",
+        "prompt": "Half-life is the time for about ___ of a large group of nuclei to decay.",
+        "bank": [
+          {
+            "id": "half",
+            "label": "half"
+          },
+          {
+            "id": "all",
+            "label": "all"
+          },
+          {
+            "id": "tenth",
+            "label": "a tenth"
+          }
+        ],
+        "answer": "half",
+        "explanation": "Half-life is the time for about half of a large group of radioactive nuclei to decay."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "practice",
+        "checkpoint",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-iaea-decay"
+      ]
+    },
+    {
+      "id": "u2-x-half-best",
+      "objective_id": "u2-half-life-meaning",
+      "type": "choice",
+      "data": {
+        "prompt": "Which describes half-life best?",
+        "options": [
+          {
+            "id": "fall",
+            "label": "The time for a group to fall to about half"
+          },
+          {
+            "id": "atom",
+            "label": "The time one atom takes to be cut in half",
+            "note": "Atoms are not cut in half."
+          },
+          {
+            "id": "end",
+            "label": "The time until nothing is radioactive",
+            "note": "Some radioactivity is left after one half-life."
+          }
+        ],
+        "answer": "fall",
+        "explanation": "Half-life is the time it takes for a group of radioactive nuclei to fall to about half."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "practice",
+        "checkpoint",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-iaea-decay"
+      ]
+    },
+    {
+      "id": "u2-x-helium-nucleus",
+      "objective_id": "u2-recognise-radiation",
+      "type": "choice",
+      "data": {
+        "prompt": "Which kind of radiation is the same as the nucleus of a helium atom?",
+        "options": [
+          {
+            "id": "alpha",
+            "label": "Alpha"
+          },
+          {
+            "id": "beta",
+            "label": "Beta",
+            "note": "Beta is a fast electron."
+          },
+          {
+            "id": "gamma",
+            "label": "Gamma",
+            "note": "Gamma is electromagnetic radiation."
+          }
+        ],
+        "answer": "alpha",
+        "explanation": "An alpha particle, 2 protons and 2 neutrons, is the nucleus of a helium atom."
+      },
+      "difficulty": 2,
+      "surfaces": [
+        "practice",
+        "checkpoint",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-iaea-radiation-types"
+      ]
+    },
+    {
+      "id": "u2-x-hundred-left",
+      "objective_id": "u2-half-life-pattern",
+      "type": "choice",
+      "data": {
+        "prompt": "A sample has 100 nuclei. After one half-life, about how many have not yet changed?",
+        "options": [
+          {
+            "id": "10",
+            "label": "About 10"
+          },
+          {
+            "id": "25",
+            "label": "About 25",
+            "note": "That would be after two half-lives."
+          },
+          {
+            "id": "50",
+            "label": "About 50"
+          },
+          {
+            "id": "90",
+            "label": "About 90",
+            "note": "That is too few to have changed."
+          }
+        ],
+        "answer": "50",
+        "explanation": "After one half-life, about half of the 100 nuclei are left: about 50."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "practice",
+        "checkpoint",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-iaea-decay"
+      ]
+    },
+    {
+      "id": "u2-x-natural-source",
+      "objective_id": "u2-natural-sources",
+      "type": "choice",
+      "data": {
+        "prompt": "Which of these is a natural source of radioactivity?",
+        "options": [
+          {
+            "id": "k40",
+            "label": "Potassium-40 in food"
+          },
+          {
+            "id": "reactor",
+            "label": "A radioactive source made in a reactor",
+            "note": "That one is made by people."
+          },
+          {
+            "id": "nowhere",
+            "label": "Nothing: it only comes from nuclear plants",
+            "note": "Radioactivity is in rocks, air, food, bodies and space."
+          }
+        ],
+        "answer": "k40",
+        "explanation": "Potassium-40 is a natural radioactive material found in food and in the body."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "practice",
+        "checkpoint",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-background-radiation"
+      ]
+    },
+    {
+      "id": "u2-x-not-particle",
+      "objective_id": "u2-particle-or-wave",
+      "type": "choice",
+      "data": {
+        "prompt": "Which of these is not a particle?",
+        "options": [
+          {
+            "id": "gamma",
+            "label": "Gamma radiation"
+          },
+          {
+            "id": "alpha",
+            "label": "An alpha particle",
+            "note": "Alpha is a particle."
+          },
+          {
+            "id": "beta",
+            "label": "A beta particle",
+            "note": "Beta is a particle."
+          }
+        ],
+        "answer": "gamma",
+        "explanation": "Gamma radiation is electromagnetic radiation, not a particle."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "practice",
+        "checkpoint",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-iaea-radiation-types"
+      ]
+    },
+    {
+      "id": "u2-x-rock-alone",
+      "objective_id": "u2-spontaneous",
+      "type": "choice",
+      "data": {
+        "prompt": "A rock contains unstable nuclei. Nobody touches it. What happens to those nuclei?",
+        "options": [
+          {
+            "id": "some",
+            "label": "Some change on their own, now and then"
+          },
+          {
+            "id": "wait",
+            "label": "Nothing: they wait for someone to trigger them",
+            "note": "Unstable nuclei do not need a trigger."
+          },
+          {
+            "id": "all",
+            "label": "They all change at the same moment",
+            "note": "Each nucleus changes at its own random moment."
+          }
+        ],
+        "answer": "some",
+        "explanation": "Unstable nuclei change by themselves. Some change now and then, and nobody can say which one is next."
+      },
+      "difficulty": 2,
+      "surfaces": [
+        "practice",
+        "checkpoint",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-iaea-decay"
+      ]
+    },
+    {
+      "id": "u2-x-still-there",
+      "objective_id": "u2-decay-changes-not-vanishes",
+      "type": "true_or_myth",
+      "data": {
+        "statement": "After a decay there is still a nucleus. It is a different one.",
+        "answer": "true",
+        "explanation": "True. A decay changes a nucleus into a different nucleus."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "practice",
+        "checkpoint",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-iaea-decay"
+      ]
+    },
+    {
+      "id": "u2-x-three-half-lives",
+      "objective_id": "u2-half-life-pattern",
+      "type": "choice",
+      "data": {
+        "prompt": "After three half-lives, about how much of the original group is left?",
+        "options": [
+          {
+            "id": "half",
+            "label": "About a half",
+            "note": "That is after one half-life."
+          },
+          {
+            "id": "quarter",
+            "label": "About a quarter",
+            "note": "That is after two half-lives."
+          },
+          {
+            "id": "eighth",
+            "label": "About an eighth"
+          },
+          {
+            "id": "none",
+            "label": "None of it",
+            "note": "It keeps halving but is not gone."
+          }
+        ],
+        "answer": "eighth",
+        "explanation": "Each half-life halves what is left: a half, then a quarter, then about an eighth."
+      },
+      "difficulty": 2,
+      "surfaces": [
+        "practice",
+        "checkpoint",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-iaea-decay"
+      ]
+    },
+    {
+      "id": "u2-x-tom-by-itself",
+      "objective_id": "u2-spontaneous",
+      "type": "true_or_myth",
+      "data": {
+        "statement": "An unstable nucleus changes by itself, without anyone starting it.",
+        "answer": "true",
+        "explanation": "True. Radioactive decay is spontaneous: nobody has to trigger it."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "practice",
+        "checkpoint",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-iaea-decay"
+      ]
+    },
+    {
+      "id": "u2-x-tom-dangerous",
+      "objective_id": "u2-not-always-dangerous",
+      "type": "true_or_myth",
+      "data": {
+        "statement": "Anything radioactive is automatically dangerous.",
+        "answer": "myth",
+        "explanation": "Myth. It depends on the type of radiation, the amount and how it reaches the body."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "practice",
+        "checkpoint",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-background-radiation"
+      ]
+    },
+    {
+      "id": "u2-x-tom-exact",
+      "objective_id": "u2-random-single",
+      "type": "true_or_myth",
+      "data": {
+        "statement": "If you watch one unstable nucleus closely, you can tell the exact second it will change.",
+        "answer": "myth",
+        "explanation": "Myth. When one particular nucleus changes cannot be predicted."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "practice",
+        "checkpoint",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-iaea-decay"
+      ]
+    },
+    {
+      "id": "u2-x-tom-exact-one",
+      "objective_id": "u2-half-life-group",
+      "type": "true_or_myth",
+      "data": {
+        "statement": "Half-life tells you exactly when one particular nucleus will decay.",
+        "answer": "myth",
+        "explanation": "Myth. Half-life describes a group. It cannot tell you when one nucleus will decay."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "practice",
+        "checkpoint",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-iaea-decay"
+      ]
+    },
+    {
+      "id": "u2-x-tom-particles",
+      "objective_id": "u2-particle-or-wave",
+      "type": "true_or_myth",
+      "data": {
+        "statement": "Alpha and beta are particles.",
+        "answer": "true",
+        "explanation": "True. Alpha is 2 protons and 2 neutrons and beta is a fast electron. Gamma is the one that is not a particle."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "practice",
+        "checkpoint",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-iaea-radiation-types"
+      ]
+    },
+    {
+      "id": "u2-x-tom-radon",
+      "objective_id": "u2-natural-sources",
+      "type": "true_or_myth",
+      "data": {
+        "statement": "Radon is a radioactive gas that comes from the ground.",
+        "answer": "true",
+        "explanation": "True. Radioactive materials in the ground produce radon, a natural radioactive gas."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "practice",
+        "checkpoint",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-background-radiation"
+      ]
+    },
+    {
+      "id": "u2-x-two-nuclei",
+      "objective_id": "u2-random-single",
+      "type": "choice",
+      "data": {
+        "prompt": "In a sample, one nucleus changed today. What can you say about another unstable nucleus in the same sample?",
+        "options": [
+          {
+            "id": "unknown",
+            "label": "It could change today, tomorrow or much later: you cannot tell"
+          },
+          {
+            "id": "tomorrow",
+            "label": "It will change tomorrow",
+            "note": "Nothing fixes the moment for one nucleus."
+          },
+          {
+            "id": "together",
+            "label": "It changes at the same moment as the first",
+            "note": "Each nucleus changes at its own random moment."
+          }
+        ],
+        "answer": "unknown",
+        "explanation": "You cannot say when another particular nucleus will change. Only a large group follows a pattern."
+      },
+      "difficulty": 2,
+      "surfaces": [
+        "practice",
+        "checkpoint",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-iaea-decay"
+      ]
+    },
+    {
+      "id": "u2-x-what-happened",
+      "objective_id": "u2-decay-changes-not-vanishes",
+      "type": "choice",
+      "data": {
+        "prompt": "A nucleus decays. What has happened to it?",
+        "options": [
+          {
+            "id": "changed",
+            "label": "It has changed into a different nucleus"
+          },
+          {
+            "id": "vanished",
+            "label": "It has vanished",
+            "note": "Nothing simply vanishes."
+          },
+          {
+            "id": "halved",
+            "label": "It has been cut in half",
+            "note": "A decay does not cut a nucleus in half."
+          }
+        ],
+        "answer": "changed",
+        "explanation": "The nucleus changed into a different nucleus. Nothing simply vanishes."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "practice",
+        "checkpoint",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-iaea-decay"
+      ]
+    },
+    {
+      "id": "u2-x-why-group",
+      "objective_id": "u2-half-life-group",
+      "type": "choice",
+      "data": {
+        "prompt": "Why can half-life describe a group but not one nucleus?",
+        "options": [
+          {
+            "id": "pattern",
+            "label": "Each nucleus changes at a random moment, but a big group follows a pattern"
+          },
+          {
+            "id": "timer",
+            "label": "Each nucleus has its own timer that is set to one half-life",
+            "note": "Half-life is not a timer in each atom."
+          },
+          {
+            "id": "fewer",
+            "label": "A group has fewer nuclei, so it is easier to predict",
+            "note": "A larger group follows the pattern better, not a smaller one."
+          }
+        ],
+        "answer": "pattern",
+        "explanation": "One nucleus is random, but a large group follows a pattern. That pattern is what half-life describes."
+      },
+      "difficulty": 2,
+      "surfaces": [
+        "practice",
+        "checkpoint",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-iaea-decay"
       ]
     }
   ]

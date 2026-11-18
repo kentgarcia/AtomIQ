@@ -19,6 +19,21 @@
       "unit_id": "inside-the-atom",
       "reference_id": "ref-iaea-isotopes",
       "position": 2
+    },
+    {
+      "unit_id": "radioactivity",
+      "reference_id": "ref-openstax-up3-ch10",
+      "position": 0
+    },
+    {
+      "unit_id": "radioactivity",
+      "reference_id": "ref-iaea-decay",
+      "position": 1
+    },
+    {
+      "unit_id": "radioactivity",
+      "reference_id": "ref-iaea-glossary",
+      "position": 2
     }
   ]
 }

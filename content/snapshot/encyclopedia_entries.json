@@ -33,8 +33,38 @@
       "image": "../../assets/images/terms/Absorbed dose.webp",
       "debunking_snippet": "Absorbed dose alone doesn't tell you the biological risk. A gray of alpha radiation causes far more tissue damage than a gray of X-rays — that's why equivalent dose (sieverts) exists.",
       "related_myths": [],
-      "related_articles": [],
       "difficulty": "intermediate"
+    },
+    {
+      "id": "alpha-decay",
+      "term": "Alpha Decay",
+      "definition": "A kind of radioactive decay in which a nucleus gives off an alpha particle: 2 protons and 2 neutrons stuck together, the nucleus of a helium atom. The nucleus that is left has 2 fewer protons and 2 fewer neutrons, so it is a different element. Alpha decay is common in very heavy nuclei such as uranium.",
+      "category": "science",
+      "related_terms": [
+        "alpha-particle",
+        "decay",
+        "radioactivity",
+        "parent-nuclide",
+        "daughter-nuclide"
+      ],
+      "quick_facts": [
+        "An alpha particle is 2 protons and 2 neutrons",
+        "It is the nucleus of a helium atom",
+        "The daughter has 2 fewer protons, so it is a different element",
+        "It is common in very heavy nuclei",
+        "Alpha is a particle, not electromagnetic radiation"
+      ],
+      "sources": [
+        {
+          "organization": "OpenStax",
+          "title": "University Physics Volume 3: Radioactive Decay",
+          "url": "https://openstax.org/books/university-physics-volume-3/pages/10-3-radioactive-decay"
+        }
+      ],
+      "image": null,
+      "debunking_snippet": null,
+      "related_myths": [],
+      "difficulty": "beginner"
     },
     {
       "id": "alpha-particle",
@@ -65,7 +95,6 @@
       "image": "../../assets/images/terms/alpha particle.webp",
       "debunking_snippet": "“Alpha radiation is harmless because it can't get through skin.” Outside the body, mostly true — but one alpha particle inside the lungs tears through countless cells. That's why inhaled radon is a leading cause of lung cancer among non-smokers.",
       "related_myths": [],
-      "related_articles": [],
       "difficulty": "beginner"
     },
     {
@@ -96,7 +125,6 @@
       "image": null,
       "debunking_snippet": null,
       "related_myths": [],
-      "related_articles": [],
       "difficulty": "advanced"
     },
     {
@@ -126,7 +154,6 @@
       "image": "/assets/images/people/Andrei Sakhariv.webp",
       "debunking_snippet": null,
       "related_myths": [],
-      "related_articles": [],
       "difficulty": "intermediate"
     },
     {
@@ -158,7 +185,6 @@
       "image": null,
       "debunking_snippet": null,
       "related_myths": [],
-      "related_articles": [],
       "difficulty": "advanced"
     },
     {
@@ -190,7 +216,6 @@
       "image": "../../assets/images/terms/atom.webp",
       "debunking_snippet": "“Atoms are tiny solid balls.” They're almost entirely empty space — the solid feel of matter comes from electromagnetic forces between electron clouds, not hard surfaces actually touching.",
       "related_myths": [],
-      "related_articles": [],
       "difficulty": "beginner"
     },
     {
@@ -222,7 +247,6 @@
       "image": "../../assets/images/terms/atomic number.webp",
       "debunking_snippet": null,
       "related_myths": [],
-      "related_articles": [],
       "difficulty": "beginner"
     },
     {
@@ -254,7 +278,6 @@
       "image": "../../assets/images/terms/background radiation.webp",
       "debunking_snippet": "“All radiation is man-made.” Natural background accounts for the majority of human exposure — life evolved with it.",
       "related_myths": [],
-      "related_articles": [],
       "difficulty": "beginner"
     },
     {
@@ -286,8 +309,39 @@
       "image": "../../assets/images/terms/bq.webp",
       "debunking_snippet": "“High activity means high danger.” Not necessarily — becquerels count decays, but dose depends on energy, radiation type, distance, and whether the source gets inside your body.",
       "related_myths": [],
-      "related_articles": [],
       "difficulty": "intermediate"
+    },
+    {
+      "id": "beta-decay",
+      "term": "Beta Decay",
+      "definition": "A kind of radioactive decay in which a nucleus gives off a beta particle, a fast electron. In the usual kind, beta-minus decay, a neutron in the nucleus changes into a proton and an electron is emitted, along with a tiny particle called an antineutrino. The number of protons goes up by one, so the nucleus becomes a different element.",
+      "category": "science",
+      "related_terms": [
+        "beta-particle",
+        "decay",
+        "radioactivity",
+        "neutron",
+        "proton",
+        "electron"
+      ],
+      "quick_facts": [
+        "A beta particle is a fast electron",
+        "A neutron changes into a proton and an electron is emitted",
+        "The electron was not orbiting the nucleus before",
+        "A tiny antineutrino comes out too",
+        "The number of protons goes up by one, so the element changes"
+      ],
+      "sources": [
+        {
+          "organization": "OpenStax",
+          "title": "University Physics Volume 3: Radioactive Decay",
+          "url": "https://openstax.org/books/university-physics-volume-3/pages/10-3-radioactive-decay"
+        }
+      ],
+      "image": null,
+      "debunking_snippet": "“The beta electron was one of the atom's orbiting electrons.” It is made in the decay itself, when a neutron changes into a proton.",
+      "related_myths": [],
+      "difficulty": "beginner"
     },
     {
       "id": "beta-particle",
@@ -318,7 +372,6 @@
       "image": "../../assets/images/terms/beta particle.webp",
       "debunking_snippet": "“Any metal shield makes beta radiation harmless.” Dense metals like lead can actually make things worse — betas striking them emit secondary X-rays (bremsstrahlung). Low-density plastic or acrylic is the right shield.",
       "related_myths": [],
-      "related_articles": [],
       "difficulty": "beginner"
     },
     {
@@ -349,7 +402,6 @@
       "image": "../../assets/images/terms/binding energy.webp",
       "debunking_snippet": null,
       "related_myths": [],
-      "related_articles": [],
       "difficulty": "advanced"
     },
     {
@@ -381,7 +433,6 @@
       "image": "../../assets/images/terms/chain reaction.webp",
       "debunking_snippet": "“A reactor can explode like an atomic bomb.” It can't — reactor fuel is far too dilute in fissile material (a few % U-235 vs >90% for weapons). Chernobyl's explosion was steam and chemical energy, never a nuclear blast.",
       "related_myths": [],
-      "related_articles": [],
       "difficulty": "intermediate"
     },
     {
@@ -412,7 +463,6 @@
       "image": null,
       "debunking_snippet": null,
       "related_myths": [],
-      "related_articles": [],
       "difficulty": "advanced"
     },
     {
@@ -444,7 +494,6 @@
       "image": null,
       "debunking_snippet": null,
       "related_myths": [],
-      "related_articles": [],
       "difficulty": "beginner"
     },
     {
@@ -476,7 +525,6 @@
       "image": "../../assets/images/terms/control rod.webp",
       "debunking_snippet": "“Turning off a reactor is like switching off a light.” Control rods stop the fission chain almost instantly — but radioactive decay heat keeps the fuel hot for days, which is why cooling continues long after shutdown.",
       "related_myths": [],
-      "related_articles": [],
       "difficulty": "beginner"
     },
     {
@@ -507,7 +555,6 @@
       "image": "../../assets/images/terms/radiation.webp",
       "debunking_snippet": "“Cosmic radiation is just sunlight.” It isn't light at all — it's charged particles, mostly from far beyond the solar system, moving at nearly light speed.",
       "related_myths": [],
-      "related_articles": [],
       "difficulty": "beginner"
     },
     {
@@ -538,7 +585,6 @@
       "image": "../../assets/images/terms/critical mass.webp",
       "debunking_snippet": null,
       "related_myths": [],
-      "related_articles": [],
       "difficulty": "intermediate"
     },
     {
@@ -569,8 +615,38 @@
       "image": "../../assets/images/terms/Cyclotron.webp",
       "debunking_snippet": null,
       "related_myths": [],
-      "related_articles": [],
       "difficulty": "advanced"
+    },
+    {
+      "id": "daughter-nuclide",
+      "term": "Daughter Nuclide",
+      "definition": "The nucleus that is left after a radioactive decay. It is a different nucleus from the parent. The daughter can be stable, and then the changing stops, or it can be unstable too, and then it decays again. A run of decays like this is a decay chain.",
+      "category": "science",
+      "related_terms": [
+        "parent-nuclide",
+        "decay",
+        "decay-chain",
+        "radioactivity",
+        "radionuclide"
+      ],
+      "quick_facts": [
+        "The daughter is the nucleus the parent becomes",
+        "It is a different nucleus, so nothing simply vanishes",
+        "It can be stable or unstable",
+        "An unstable daughter decays again",
+        "A chain ends at a stable daughter"
+      ],
+      "sources": [
+        {
+          "organization": "OpenStax",
+          "title": "University Physics Volume 3: Radioactive Decay",
+          "url": "https://openstax.org/books/university-physics-volume-3/pages/10-3-radioactive-decay"
+        }
+      ],
+      "image": null,
+      "debunking_snippet": "“Every decay makes a stable atom.” The daughter can be unstable too, and then it decays again.",
+      "related_myths": [],
+      "difficulty": "beginner"
     },
     {
       "id": "decay",
@@ -601,7 +677,43 @@
       "image": "../../assets/images/terms/Decay.webp",
       "debunking_snippet": "“We could neutralize waste if we heated or zapped it.” Decay rates are set inside the nucleus and shrug off temperature, pressure, chemistry, and ordinary radiation — only nuclear reactions change them.",
       "related_myths": [],
-      "related_articles": [],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "decay-chain",
+      "term": "Decay Chain",
+      "definition": "A sequence of radioactive decays in which one nucleus changes into another, which may decay again, and so on until a stable nucleus is reached. Every step makes a different nucleus. Nature has several long chains, for example the uranium-238 chain, which ends in stable lead-206, and the thorium-232 chain, which ends in stable lead-208. Radon is one link in the uranium chain.",
+      "category": "science",
+      "related_terms": [
+        "decay",
+        "parent-nuclide",
+        "daughter-nuclide",
+        "radon",
+        "radioactivity",
+        "half-life"
+      ],
+      "quick_facts": [
+        "One unstable nucleus can start a whole chain",
+        "Each step makes a different nucleus",
+        "The chain ends at a stable nucleus",
+        "The uranium-238 chain ends in stable lead-206",
+        "The thorium-232 chain ends in stable lead-208"
+      ],
+      "sources": [
+        {
+          "organization": "OpenStax",
+          "title": "University Physics Volume 3: Radioactive Decay",
+          "url": "https://openstax.org/books/university-physics-volume-3/pages/10-3-radioactive-decay"
+        },
+        {
+          "organization": "U.S. Nuclear Regulatory Commission",
+          "title": "Natural decay series (candidate source: open and confirm before publish)",
+          "url": ""
+        }
+      ],
+      "image": null,
+      "debunking_snippet": "“Every decay makes a stable atom.” Many decays only make another unstable nucleus, so the chain goes on.",
+      "related_myths": [],
       "difficulty": "beginner"
     },
     {
@@ -632,7 +744,6 @@
       "image": null,
       "debunking_snippet": "“Nuclear plants are safe only if nothing ever goes wrong.” The design assumes things WILL go wrong — equipment failures, operator errors, even floods — and layers backup after backup on top of each failure.",
       "related_myths": [],
-      "related_articles": [],
       "difficulty": "intermediate"
     },
     {
@@ -664,7 +775,6 @@
       "image": "../../assets/images/terms/Dose Rate.webp",
       "debunking_snippet": "“A hot reading means immediate danger.” Not without the time dimension — 10 μSv/h for an hour-long visit is trivial; the same spot for a full year is a different story.",
       "related_myths": [],
-      "related_articles": [],
       "difficulty": "intermediate"
     },
     {
@@ -696,7 +806,6 @@
       "image": "../../assets/images/terms/dosimeter.webp",
       "debunking_snippet": "“A Geiger counter and a dosimeter are the same thing.” They're not — a Geiger counter detects radiation instantly but forgets; a dosimeter remembers your accumulated dose over weeks and months.",
       "related_myths": [],
-      "related_articles": [],
       "difficulty": "intermediate"
     },
     {
@@ -727,8 +836,67 @@
       "image": "/assets/images/people/Edward Teller.webp",
       "debunking_snippet": "“The hydrogen bomb was one man's invention.” It took many hands — Stanisław Ulam's compression scheme was as essential as Teller's vision; both names are on the key 1951 paper.",
       "related_myths": [],
-      "related_articles": [],
       "difficulty": "advanced"
+    },
+    {
+      "id": "electric-force",
+      "term": "Electric Force",
+      "definition": "The force between electric charges. Opposite charges pull together and like charges push apart. In an atom it pulls the electrons toward the nucleus. Inside the nucleus it pushes the positive protons away from each other, and the strong force has to hold them together.",
+      "category": "science",
+      "related_terms": [
+        "proton",
+        "electron",
+        "strong-force",
+        "atom"
+      ],
+      "quick_facts": [
+        "Like charges push apart and opposite charges pull together",
+        "It keeps electrons around the nucleus",
+        "It pushes the protons in a nucleus apart",
+        "Between particles it is far stronger than gravity",
+        "It is also called the Coulomb force"
+      ],
+      "sources": [
+        {
+          "organization": "OpenStax",
+          "title": "University Physics Volume 2: Electric Charge",
+          "url": "https://openstax.org/books/university-physics-volume-2/pages/5-1-electric-charge"
+        }
+      ],
+      "image": null,
+      "debunking_snippet": null,
+      "related_myths": [],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "electromagnetic-radiation",
+      "term": "Electromagnetic Radiation",
+      "definition": "Energy that travels as waves of electric and magnetic fields. It is not made of matter. Radio waves, microwaves, infrared, visible light, ultraviolet, X-rays and gamma rays are all electromagnetic radiation. They differ in how much energy they carry. Gamma rays carry far more energy than visible light.",
+      "category": "science",
+      "related_terms": [
+        "gamma-ray",
+        "radiation",
+        "gamma-radiation",
+        "ionizing-radiation"
+      ],
+      "quick_facts": [
+        "Light is electromagnetic radiation",
+        "Gamma rays are electromagnetic radiation too",
+        "It is energy, not matter",
+        "Different kinds carry different amounts of energy",
+        "Alpha and beta are particles, not electromagnetic radiation"
+      ],
+      "sources": [
+        {
+          "organization": "OpenStax",
+          "title": "University Physics Volume 2: Electromagnetic Waves",
+          "url": "https://openstax.org/books/university-physics-volume-2/pages/16-introduction"
+        }
+      ],
+      "image": null,
+      "debunking_snippet": "“Radiation always means nuclear radiation.” Light is radiation too. Only some radiation comes from nuclei.",
+      "related_myths": [],
+      "difficulty": "beginner"
     },
     {
       "id": "electron",
@@ -758,7 +926,65 @@
       "image": "../../assets/images/terms/electron.webp",
       "debunking_snippet": "“Electrons spin around the nucleus like planets around the Sun.” That's a 100-year-old classroom picture. Quantum mechanics replaced it with orbitals: smeared-out probability clouds where an electron has no definite path.",
       "related_myths": [],
-      "related_articles": [],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "electron-cloud",
+      "term": "Electron Cloud",
+      "definition": "A picture of where the electrons of an atom are found. Instead of racing around the nucleus on neat rings, the electrons are somewhere in a fuzzy region around it. The cloud is darker where an electron is more likely to be. The cloud is huge compared with the nucleus, so most of an atom is empty space.",
+      "category": "science",
+      "related_terms": [
+        "electron",
+        "atom",
+        "nucleus"
+      ],
+      "quick_facts": [
+        "It replaces the old picture of electrons as tiny planets",
+        "Darker parts show where an electron is more likely to be",
+        "The cloud is about 100,000 times wider than the nucleus",
+        "Each shape of cloud is called an orbital"
+      ],
+      "sources": [
+        {
+          "organization": "Britannica",
+          "title": "Electron",
+          "url": "https://www.britannica.com/science/electron"
+        }
+      ],
+      "image": null,
+      "debunking_snippet": "“Electrons circle the nucleus like planets.” They have no fixed path. The cloud shows where they are likely to be.",
+      "related_myths": [],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "element",
+      "term": "Element",
+      "definition": "A pure substance made of only one kind of atom: every atom of an element has the same number of protons. Hydrogen, carbon, oxygen and gold are elements. About 118 elements are known, and the periodic table lists them in order of atomic number.",
+      "category": "science",
+      "related_terms": [
+        "atom",
+        "atomic-number",
+        "periodic-table",
+        "isotope",
+        "proton"
+      ],
+      "quick_facts": [
+        "Every atom of an element has the same number of protons",
+        "About 118 elements are known",
+        "The periodic table lists them in order of atomic number",
+        "Atoms of one element can differ in neutrons: those are isotopes",
+        "Change the number of protons and you change the element"
+      ],
+      "sources": [
+        {
+          "organization": "OpenStax",
+          "title": "Chemistry 2e: The Periodic Table",
+          "url": "https://openstax.org/books/chemistry-2e/pages/2-5-the-periodic-table"
+        }
+      ],
+      "image": null,
+      "debunking_snippet": "“Elements are made of different kinds of stuff.” Every atom is built from the same three particles. Only the number of protons is different.",
+      "related_myths": [],
       "difficulty": "beginner"
     },
     {
@@ -789,7 +1015,6 @@
       "image": "../../assets/images/terms/Enrichment.webp",
       "debunking_snippet": "“Any country with enrichment can quickly build a bomb.” Reactor-grade (3–5%) to weapons-grade (>90%) is an enormous engineering, energy, and detection challenge — that gap is exactly what IAEA inspectors police.",
       "related_myths": [],
-      "related_articles": [],
       "difficulty": "intermediate"
     },
     {
@@ -821,7 +1046,6 @@
       "image": "/assets/images/people/fermi.webp",
       "debunking_snippet": null,
       "related_myths": [],
-      "related_articles": [],
       "difficulty": "intermediate"
     },
     {
@@ -852,7 +1076,6 @@
       "image": "/assets/images/people/ernest o lawrence.webp",
       "debunking_snippet": null,
       "related_myths": [],
-      "related_articles": [],
       "difficulty": "advanced"
     },
     {
@@ -884,7 +1107,6 @@
       "image": "/assets/images/people/ernest rutherford.webp",
       "debunking_snippet": null,
       "related_myths": [],
-      "related_articles": [],
       "difficulty": "beginner"
     },
     {
@@ -916,7 +1138,6 @@
       "image": null,
       "debunking_snippet": null,
       "related_myths": [],
-      "related_articles": [],
       "difficulty": "advanced"
     },
     {
@@ -947,7 +1168,6 @@
       "image": "/assets/images/people/wigner.webp",
       "debunking_snippet": null,
       "related_myths": [],
-      "related_articles": [],
       "difficulty": "advanced"
     },
     {
@@ -979,7 +1199,6 @@
       "image": "../../assets/images/terms/exposure.webp",
       "debunking_snippet": "“Standing near a source means you're contaminated.” No — external exposure leaves nothing behind. Contamination means actual radioactive material ON or IN you; a sunburn isn't a tan made of sunshine.",
       "related_myths": [],
-      "related_articles": [],
       "difficulty": "beginner"
     },
     {
@@ -1011,7 +1230,6 @@
       "image": null,
       "debunking_snippet": null,
       "related_myths": [],
-      "related_articles": [],
       "difficulty": "advanced"
     },
     {
@@ -1042,7 +1260,37 @@
       "image": "../../assets/images/terms/fuel rods.webp",
       "debunking_snippet": "“Nuclear fuel rods are glowing green bars.” Real fuel looks like plain gray ceramic pellets stacked in metal tubes — it isn't even noticeably radioactive before it goes into the reactor.",
       "related_myths": [],
-      "related_articles": [],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "gamma-radiation",
+      "term": "Gamma Radiation",
+      "definition": "High-energy electromagnetic radiation given off by a nucleus, usually right after an alpha or beta decay leaves it with extra energy. Gamma radiation is not a particle and is not made of pieces of the nucleus. It is like light, but far more energetic. Giving off gamma radiation changes neither the number of protons nor the number of neutrons.",
+      "category": "science",
+      "related_terms": [
+        "gamma-ray",
+        "electromagnetic-radiation",
+        "decay",
+        "radioactivity",
+        "radiation"
+      ],
+      "quick_facts": [
+        "It is electromagnetic radiation, not a particle",
+        "It is like light, but far more energetic",
+        "It carries away extra energy from the nucleus",
+        "The nucleus keeps the same protons and neutrons",
+        "It is not made of tiny pieces of the nucleus"
+      ],
+      "sources": [
+        {
+          "organization": "OpenStax",
+          "title": "University Physics Volume 3: Radioactive Decay",
+          "url": "https://openstax.org/books/university-physics-volume-3/pages/10-3-radioactive-decay"
+        }
+      ],
+      "image": null,
+      "debunking_snippet": "“Gamma radiation is made of tiny pieces of the nucleus.” It is electromagnetic radiation, like light but far more energetic.",
+      "related_myths": [],
       "difficulty": "beginner"
     },
     {
@@ -1076,7 +1324,6 @@
       "related_myths": [
         "myths-facts-15"
       ],
-      "related_articles": [],
       "difficulty": "beginner"
     },
     {
@@ -1107,7 +1354,6 @@
       "image": "../../assets/images/terms/geiger counter.webp",
       "debunking_snippet": "“If the clicking stops, it's safe.” Dangerous trap: in extreme fields a Geiger tube saturates and goes quiet while radiation is at its worst. Silence is not safety.",
       "related_myths": [],
-      "related_articles": [],
       "difficulty": "beginner"
     },
     {
@@ -1138,7 +1384,6 @@
       "image": "/assets/images/people/Glenn Seaborg.webp",
       "debunking_snippet": null,
       "related_myths": [],
-      "related_articles": [],
       "difficulty": "advanced"
     },
     {
@@ -1169,7 +1414,6 @@
       "image": null,
       "debunking_snippet": null,
       "related_myths": [],
-      "related_articles": [],
       "difficulty": "advanced"
     },
     {
@@ -1200,7 +1444,6 @@
       "image": "../../assets/images/terms/gray gy.webp",
       "debunking_snippet": null,
       "related_myths": [],
-      "related_articles": [],
       "difficulty": "intermediate"
     },
     {
@@ -1232,7 +1475,6 @@
       "image": "../../assets/images/terms/Half-Life.webp",
       "debunking_snippet": "“After two half-lives it's all gone.” After two half-lives a quarter remains, and it keeps halving forever — never quite zero. That's why waste storage is measured in many half-lives.",
       "related_myths": [],
-      "related_articles": [],
       "difficulty": "beginner"
     },
     {
@@ -1263,7 +1505,6 @@
       "image": null,
       "debunking_snippet": null,
       "related_myths": [],
-      "related_articles": [],
       "difficulty": "advanced"
     },
     {
@@ -1294,7 +1535,6 @@
       "image": "../../assets/images/terms/heavy water.webp",
       "debunking_snippet": "“Heavy water is radioactive.” It isn't — deuterium is stable. A sip is harmless (you drink trace amounts daily); it would only matter if it were most of your water for weeks.",
       "related_myths": [],
-      "related_articles": [],
       "difficulty": "intermediate"
     },
     {
@@ -1326,7 +1566,6 @@
       "image": "/assets/images/people/becquerel, henri.webp",
       "debunking_snippet": null,
       "related_myths": [],
-      "related_articles": [],
       "difficulty": "beginner"
     },
     {
@@ -1358,7 +1597,6 @@
       "image": "../../assets/images/terms/hot cell.webp",
       "debunking_snippet": null,
       "related_myths": [],
-      "related_articles": [],
       "difficulty": "advanced"
     },
     {
@@ -1389,7 +1627,6 @@
       "image": null,
       "debunking_snippet": null,
       "related_myths": [],
-      "related_articles": [],
       "difficulty": "advanced"
     },
     {
@@ -1420,8 +1657,37 @@
       "image": null,
       "debunking_snippet": null,
       "related_myths": [],
-      "related_articles": [],
       "difficulty": "advanced"
+    },
+    {
+      "id": "ion",
+      "term": "Ion",
+      "definition": "An atom, or a group of atoms, that has gained or lost electrons, so it carries an electric charge. Losing an electron makes a positive ion and gaining one makes a negative ion. The element does not change, because the number of protons stays the same. Table salt is made of sodium ions and chloride ions.",
+      "category": "science",
+      "related_terms": [
+        "atom",
+        "electron",
+        "proton",
+        "ionizing-radiation"
+      ],
+      "quick_facts": [
+        "An ion has a charge because its protons and electrons no longer match",
+        "Losing electrons makes a positive ion",
+        "Gaining electrons makes a negative ion",
+        "The element stays the same: only electrons moved",
+        "Ionizing radiation can knock electrons off atoms and make ions"
+      ],
+      "sources": [
+        {
+          "organization": "OpenStax",
+          "title": "Chemistry 2e: Molecular and Ionic Compounds",
+          "url": "https://openstax.org/books/chemistry-2e/pages/2-6-molecular-and-ionic-compounds"
+        }
+      ],
+      "image": null,
+      "debunking_snippet": "“Gaining or losing electrons changes the element.” Protons decide the element, so an ion is still the same element.",
+      "related_myths": [],
+      "difficulty": "beginner"
     },
     {
       "id": "ion-chamber",
@@ -1451,7 +1717,6 @@
       "image": "../../assets/images/terms/ion chamber.webp",
       "debunking_snippet": "“Geiger counters are the most accurate radiation meters.” They're the loudest, not the most precise — ion chambers are what hospitals and regulators use when the number has to be right.",
       "related_myths": [],
-      "related_articles": [],
       "difficulty": "advanced"
     },
     {
@@ -1483,7 +1748,6 @@
       "image": "../../assets/images/terms/Ionizing Radiation.webp",
       "debunking_snippet": "“All radiation is dangerous.” Only ionizing radiation breaks chemical bonds. Your Wi-Fi, microwave, and heat lamp are non-ionizing — they lack the energy to rip electrons off atoms.",
       "related_myths": [],
-      "related_articles": [],
       "difficulty": "intermediate"
     },
     {
@@ -1514,7 +1778,6 @@
       "image": null,
       "debunking_snippet": "“Radiation safety rules are bureaucratic overkill.” They were written in the blood of pioneers like Irène Joliot-Curie and her mother — brilliant scientists who handled sources bare-handed because nobody knew better yet.",
       "related_myths": [],
-      "related_articles": [],
       "difficulty": "intermediate"
     },
     {
@@ -1546,7 +1809,6 @@
       "image": "../../assets/images/terms/isotope.webp",
       "debunking_snippet": "“'Isotope' just means radioactive.” No — every element has several isotopes, and the majority are perfectly stable. Radioactive ones are called radionuclides.",
       "related_myths": [],
-      "related_articles": [],
       "difficulty": "beginner"
     },
     {
@@ -1578,7 +1840,6 @@
       "image": "/assets/images/people/Oppenheimer.webp",
       "debunking_snippet": "“Oppenheimer invented the atomic bomb.” He didn't build or design it alone — he led and coordinated thousands of scientists. His genius was leadership and judgment as much as physics.",
       "related_myths": [],
-      "related_articles": [],
       "difficulty": "intermediate"
     },
     {
@@ -1610,7 +1871,6 @@
       "image": "/assets/images/people/chadwick.webp",
       "debunking_snippet": null,
       "related_myths": [],
-      "related_articles": [],
       "difficulty": "intermediate"
     },
     {
@@ -1641,7 +1901,6 @@
       "image": null,
       "debunking_snippet": null,
       "related_myths": [],
-      "related_articles": [],
       "difficulty": "advanced"
     },
     {
@@ -1671,7 +1930,6 @@
       "image": null,
       "debunking_snippet": null,
       "related_myths": [],
-      "related_articles": [],
       "difficulty": "advanced"
     },
     {
@@ -1702,7 +1960,6 @@
       "image": "/assets/images/people/leo szilard.webp",
       "debunking_snippet": "“The Einstein letter was Einstein's idea.” It was Szilard's from start to finish — Einstein only signed, having barely heard of chain reactions before that morning.",
       "related_myths": [],
-      "related_articles": [],
       "difficulty": "advanced"
     },
     {
@@ -1733,7 +1990,6 @@
       "image": "../../assets/images/terms/linac.webp",
       "debunking_snippet": "“Radiotherapy machines are experimental.” Modern LINACs deliver sub-millimeter-guided beams daily in thousands of hospitals — they're among the most precise routinely-used devices in medicine.",
       "related_myths": [],
-      "related_articles": [],
       "difficulty": "advanced"
     },
     {
@@ -1765,7 +2021,6 @@
       "image": "/assets/images/people/Lise_Meitner.webp",
       "debunking_snippet": "“She was called the mother of the bomb because she built it.” She did the opposite — when invited to Los Alamos she answered: 'I will have nothing to do with a bomb.' Her contribution was understanding, not weaponry.",
       "related_myths": [],
-      "related_articles": [],
       "difficulty": "advanced"
     },
     {
@@ -1796,7 +2051,6 @@
       "image": "../../assets/images/terms/llw.webp",
       "debunking_snippet": "“All nuclear waste is glowing drums destined for deep mountains.” The overwhelming majority by volume is low-level waste — contaminated paper, plastic, and filters — safely buried a few meters underground.",
       "related_myths": [],
-      "related_articles": [],
       "difficulty": "intermediate"
     },
     {
@@ -1827,7 +2081,6 @@
       "image": "/assets/images/people/curie, marie.webp",
       "debunking_snippet": "“Curie's own notes are dangerous.” True, literally: her century-old notebooks carry radium contamination and can only be viewed with signed waivers — a stark reminder that radiation safety was learned at great cost.",
       "related_myths": [],
-      "related_articles": [],
       "difficulty": "beginner"
     },
     {
@@ -1858,8 +2111,67 @@
       "image": "../../assets/images/terms/Mass Defect.webp",
       "debunking_snippet": "“Mass is always conserved.” Not quite — mass-energy is. Every nuclear reaction that powers stars, reactors, and bombs trades a sliver of mass for enormous energy.",
       "related_myths": [],
-      "related_articles": [],
       "difficulty": "advanced"
+    },
+    {
+      "id": "mass-number",
+      "term": "Mass Number",
+      "definition": "The total number of protons and neutrons in a nucleus. It is the number written after an element's name: carbon-14 has a mass number of 14. To find the neutrons, take away the protons. Carbon has 6 protons, so carbon-14 has 8 neutrons. The mass number is not the same as the atomic number, which counts only protons.",
+      "category": "science",
+      "related_terms": [
+        "isotope",
+        "atomic-number",
+        "proton",
+        "neutron",
+        "nucleus"
+      ],
+      "quick_facts": [
+        "Mass number = protons + neutrons",
+        "It is written after the name, as in uranium-235",
+        "Neutrons = mass number minus atomic number",
+        "Isotopes of one element have different mass numbers",
+        "Electrons weigh so little that they are not counted"
+      ],
+      "sources": [
+        {
+          "organization": "OpenStax",
+          "title": "Chemistry 2e: Atomic Structure and Symbolism",
+          "url": "https://openstax.org/books/chemistry-2e/pages/2-3-atomic-structure-and-symbolism"
+        }
+      ],
+      "image": null,
+      "debunking_snippet": "“The number in carbon-14 is the number of neutrons.” It counts protons and neutrons together. Carbon always has 6 protons, so carbon-14 has 8 neutrons.",
+      "related_myths": [],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "matter",
+      "term": "Matter",
+      "definition": "Anything that has mass and takes up space. Solids, liquids and gases are all matter, and so is air. All matter is made of atoms. Light and heat are not matter: they are forms of energy. Sound is not matter either, but a wave that travels through matter.",
+      "category": "science",
+      "related_terms": [
+        "atom",
+        "element",
+        "proton"
+      ],
+      "quick_facts": [
+        "Matter has mass and takes up space",
+        "Solids, liquids and gases are all matter",
+        "Air is matter: a pumped-up ball weighs more than a flat one",
+        "Light and heat are energy, not matter",
+        "All matter is made of atoms"
+      ],
+      "sources": [
+        {
+          "organization": "OpenStax",
+          "title": "Chemistry 2e: Phases and Classification of Matter",
+          "url": "https://openstax.org/books/chemistry-2e/pages/1-2-phases-and-classification-of-matter"
+        }
+      ],
+      "image": null,
+      "debunking_snippet": "“Air is nothing.” Air is matter. It is made of atoms joined in tiny groups, it has mass, and it takes up space.",
+      "related_myths": [],
+      "difficulty": "beginner"
     },
     {
       "id": "meltdown",
@@ -1889,7 +2201,6 @@
       "image": "../../assets/images/terms/meltdown.webp",
       "debunking_snippet": "“A meltdown means thousands die instantly.” The worst-case isn't automatic: TMI's core half-melted and harmed no one — because containment did its job. Consequences depend entirely on barriers, not just the melting itself.",
       "related_myths": [],
-      "related_articles": [],
       "difficulty": "intermediate"
     },
     {
@@ -1921,7 +2232,6 @@
       "image": "../../assets/images/terms/Moderator.webp",
       "debunking_snippet": "“Reactors need everything to go right to stay running.” For most designs the opposite holds: lose the water moderator and the physics itself shuts the chain down — no operator required.",
       "related_myths": [],
-      "related_articles": [],
       "difficulty": "intermediate"
     },
     {
@@ -1952,7 +2262,6 @@
       "image": null,
       "debunking_snippet": null,
       "related_myths": [],
-      "related_articles": [],
       "difficulty": "advanced"
     },
     {
@@ -1984,7 +2293,6 @@
       "image": "../../assets/images/terms/neutron.webp",
       "debunking_snippet": "“Neutrons are dangerous because they're charged.” The opposite — their danger comes from having no charge at all: nothing repels them, so they penetrate deeply and can even turn stable atoms radioactive.",
       "related_myths": [],
-      "related_articles": [],
       "difficulty": "beginner"
     },
     {
@@ -2016,7 +2324,6 @@
       "image": "/assets/images/people/bohr, niels.webp",
       "debunking_snippet": "“Bohr's planetary atom is still the accepted model.” It was a stepping stone — replaced within a decade by full quantum mechanics and orbitals, though it remains the perfect first sketch.",
       "related_myths": [],
-      "related_articles": [],
       "difficulty": "intermediate"
     },
     {
@@ -2048,7 +2355,6 @@
       "image": "../../assets/images/terms/fission.webp",
       "debunking_snippet": null,
       "related_myths": [],
-      "related_articles": [],
       "difficulty": "intermediate"
     },
     {
@@ -2080,7 +2386,6 @@
       "image": "../../assets/images/terms/fusion.webp",
       "debunking_snippet": "“Each fusion reaction out-energizes each fission.” Individually it doesn't — 17.6 MeV versus ~200 MeV per event. Fusion's advantage is per kilogram of fuel, thanks to light nuclei packing more binding-energy gain.",
       "related_myths": [],
-      "related_articles": [],
       "difficulty": "advanced"
     },
     {
@@ -2112,8 +2417,39 @@
       "image": "../../assets/images/terms/nuclear reactor.webp",
       "debunking_snippet": "“A reactor can detonate like an atomic bomb.” Physically impossible — bomb fuel is >90% enriched and assembled supercritically in microseconds; reactor fuel is dilute ceramic that can't sustain that.",
       "related_myths": [],
-      "related_articles": [],
       "difficulty": "intermediate"
+    },
+    {
+      "id": "nuclear-stability",
+      "term": "Nuclear Stability",
+      "definition": "Whether a nucleus stays as it is or will change one day. A nucleus is stable when the strong force that holds it together balances the electric push between its protons. Stability depends on the mix of protons and neutrons: each element has only a few neutron counts that give a stable nucleus. Most atoms around us are stable. The others are unstable, which means radioactive.",
+      "category": "science",
+      "related_terms": [
+        "nucleus",
+        "strong-force",
+        "electric-force",
+        "radioactivity",
+        "radionuclide",
+        "isotope"
+      ],
+      "quick_facts": [
+        "Stable: the nucleus stays as it is",
+        "Unstable: the nucleus will change and give off radiation",
+        "It depends on the mix of protons and neutrons",
+        "Carbon-12 and carbon-13 are stable, but carbon-14 is not",
+        "Most atoms around us are stable"
+      ],
+      "sources": [
+        {
+          "organization": "OpenStax",
+          "title": "University Physics Volume 3: Nuclear Binding Energy",
+          "url": "https://openstax.org/books/university-physics-volume-3/pages/10-2-nuclear-binding-energy"
+        }
+      ],
+      "image": null,
+      "debunking_snippet": "“More neutrons always make a nucleus safer.” Too many neutrons can unbalance a nucleus too, as in carbon-14.",
+      "related_myths": [],
+      "difficulty": "beginner"
     },
     {
       "id": "nucleus",
@@ -2144,7 +2480,6 @@
       "image": "../../assets/images/terms/atom.webp",
       "debunking_snippet": null,
       "related_myths": [],
-      "related_articles": [],
       "difficulty": "beginner"
     },
     {
@@ -2176,7 +2511,6 @@
       "image": null,
       "debunking_snippet": null,
       "related_myths": [],
-      "related_articles": [],
       "difficulty": "advanced"
     },
     {
@@ -2207,8 +2541,73 @@
       "image": "/assets/images/people/Otto_Hahn.webp",
       "debunking_snippet": "“Hahn invented the atomic bomb.” He identified barium atoms in a beaker — brilliant, purely scientific work done before the war, and he refused to work on German weapons research.",
       "related_myths": [],
-      "related_articles": [],
       "difficulty": "intermediate"
+    },
+    {
+      "id": "parent-nuclide",
+      "term": "Parent Nuclide",
+      "definition": "The nucleus that decays in a radioactive decay. It is unstable. When it changes, it turns into a different nucleus, called the daughter, and gives off radiation. Nobody has to start the change: the parent changes by itself, at a moment nobody can predict for one nucleus.",
+      "category": "science",
+      "related_terms": [
+        "daughter-nuclide",
+        "decay",
+        "radioactivity",
+        "radionuclide",
+        "decay-chain"
+      ],
+      "quick_facts": [
+        "The parent is the nucleus that decays",
+        "It is unstable",
+        "It changes into the daughter and gives off radiation",
+        "It changes by itself",
+        "In a decay chain, each daughter becomes the next parent"
+      ],
+      "sources": [
+        {
+          "organization": "OpenStax",
+          "title": "University Physics Volume 3: Radioactive Decay",
+          "url": "https://openstax.org/books/university-physics-volume-3/pages/10-3-radioactive-decay"
+        }
+      ],
+      "image": null,
+      "debunking_snippet": "“A radioactive atom needs a person to make it decay.” The parent changes by itself. Nobody has to trigger it.",
+      "related_myths": [],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "periodic-table",
+      "term": "Periodic Table",
+      "definition": "A chart of all the known elements, in order of atomic number. Each box shows an element's atomic number, its symbol and its name. To use it, start with the number of protons and find that box: it names the element. Elements in the same column behave in similar ways, which is where the name comes from.",
+      "category": "science",
+      "related_terms": [
+        "element",
+        "atomic-number",
+        "proton",
+        "isotope"
+      ],
+      "quick_facts": [
+        "Elements are listed in order of atomic number",
+        "The big number in a box is the atomic number: the number of protons",
+        "The letters are a short symbol, such as C for carbon",
+        "Elements in the same column behave alike",
+        "Dmitri Mendeleev published an early version in 1869"
+      ],
+      "sources": [
+        {
+          "organization": "IUPAC",
+          "title": "Periodic Table of Elements",
+          "url": "https://iupac.org/what-we-do/periodic-table-of-elements/"
+        },
+        {
+          "organization": "OpenStax",
+          "title": "Chemistry 2e: The Periodic Table",
+          "url": "https://openstax.org/books/chemistry-2e/pages/2-5-the-periodic-table"
+        }
+      ],
+      "image": null,
+      "debunking_snippet": null,
+      "related_myths": [],
+      "difficulty": "beginner"
     },
     {
       "id": "pierre-curie",
@@ -2238,7 +2637,6 @@
       "image": "/assets/images/people/curie, pierre.webp",
       "debunking_snippet": "“Pierre Curie died of radiation exposure.” No — he was killed instantly by a horse-drawn cart on the rue Dauphine. Radiation took Marie decades later; Pierre simply ran out of luck on a rainy afternoon.",
       "related_myths": [],
-      "related_articles": [],
       "difficulty": "beginner"
     },
     {
@@ -2270,8 +2668,38 @@
       "image": null,
       "debunking_snippet": "“Plutonium is the most toxic substance known.” Folklore. It's radiologically hazardous if inhaled and chemically like other heavy metals — but botulinum toxin and ricin are vastly more poisonous gram-for-gram.",
       "related_myths": [],
-      "related_articles": [],
       "difficulty": "advanced"
+    },
+    {
+      "id": "potassium-40",
+      "term": "Potassium-40",
+      "definition": "A natural radioactive form of potassium. Only a tiny share of the potassium in nature is potassium-40, but because food and living things contain potassium, a little potassium-40 is in many foods, such as bananas, and in the human body. It has a very long half-life, over a billion years, which is one reason it is still around.",
+      "category": "science",
+      "related_terms": [
+        "radioactivity",
+        "radionuclide",
+        "isotope",
+        "half-life",
+        "background-radiation"
+      ],
+      "quick_facts": [
+        "It is a natural radioactive isotope of potassium",
+        "A tiny share of all potassium is potassium-40",
+        "It is in bananas and other foods",
+        "Your own body contains a little",
+        "Its half-life is over a billion years"
+      ],
+      "sources": [
+        {
+          "organization": "U.S. EPA",
+          "title": "Radionuclide Basics: Potassium-40 (candidate source: open and confirm before publish)",
+          "url": "https://www.epa.gov/radiation/radionuclide-basics-potassium-40"
+        }
+      ],
+      "image": null,
+      "debunking_snippet": "“Radioactive means dangerous, so bananas are a hazard.” Bananas hold a tiny natural amount, and that is normal. Radioactive does not automatically mean dangerous.",
+      "related_myths": [],
+      "difficulty": "beginner"
     },
     {
       "id": "proton",
@@ -2302,7 +2730,6 @@
       "image": "../../assets/images/terms/proton.webp",
       "debunking_snippet": "“Protons are tiny hard balls.” They're seething bags of quarks and gluons — most of a proton's mass comes from the energy of that internal motion, not the quarks themselves.",
       "related_myths": [],
-      "related_articles": [],
       "difficulty": "beginner"
     },
     {
@@ -2333,7 +2760,6 @@
       "image": "../../assets/images/terms/radiation.webp",
       "debunking_snippet": "“Any amount of radiation is unsafe.” Life evolved amid constant natural radiation — every second, thousands of natural particles pass through you harmlessly. Risk depends on dose, and small doses carry vanishingly small risk.",
       "related_myths": [],
-      "related_articles": [],
       "difficulty": "beginner"
     },
     {
@@ -2365,8 +2791,45 @@
       "image": null,
       "debunking_snippet": "“Nuclear waste stays lethal for millions of years.” The intensely radioactive isotopes burn out fastest — within centuries waste converges toward the radioactivity of the original uranium ore it came from.",
       "related_myths": [],
-      "related_articles": [],
       "difficulty": "intermediate"
+    },
+    {
+      "id": "radioactivity",
+      "term": "Radioactivity",
+      "definition": "What happens when an unstable nucleus changes into a steadier one and gives off radiation. It happens by itself, and heating a material or changing it chemically hardly affects it. Radioactivity is natural: it is found in rocks, in the air, in food, in space and in your own body. Henri Becquerel discovered it in 1896 in a uranium mineral.",
+      "category": "science",
+      "related_terms": [
+        "radiation",
+        "decay",
+        "radionuclide",
+        "background-radiation",
+        "henri-becquerel",
+        "isotope",
+        "nuclear-stability"
+      ],
+      "quick_facts": [
+        "It comes from an unstable nucleus",
+        "It happens on its own, without anyone starting it",
+        "Natural sources: rocks, air, food, space and the human body",
+        "Henri Becquerel discovered it in 1896",
+        "People can make radioactive atoms, but most radioactivity is natural"
+      ],
+      "sources": [
+        {
+          "organization": "IAEA",
+          "title": "What is Radiation?",
+          "url": "https://www.iaea.org/topics/radiation"
+        },
+        {
+          "organization": "OpenStax",
+          "title": "University Physics Volume 3: Radioactive Decay",
+          "url": "https://openstax.org/books/university-physics-volume-3/pages/10-3-radioactive-decay"
+        }
+      ],
+      "image": null,
+      "debunking_snippet": "“Radioactivity is something humans created.” It is as old as the Earth. People only learned to find it, measure it and use it.",
+      "related_myths": [],
+      "difficulty": "beginner"
     },
     {
       "id": "radionuclide",
@@ -2397,7 +2860,6 @@
       "image": "../../assets/images/terms/radionuclide.webp",
       "debunking_snippet": null,
       "related_myths": [],
-      "related_articles": [],
       "difficulty": "intermediate"
     },
     {
@@ -2433,7 +2895,6 @@
       "image": null,
       "debunking_snippet": "“Radon is only a problem in uranium mines.” It's everywhere — the average home holds some, and tightly sealed modern houses can concentrate it. Testing costs less than a pizza.",
       "related_myths": [],
-      "related_articles": [],
       "difficulty": "beginner"
     },
     {
@@ -2465,7 +2926,6 @@
       "image": "../../assets/images/terms/Reactor Core.webp",
       "debunking_snippet": null,
       "related_myths": [],
-      "related_articles": [],
       "difficulty": "intermediate"
     },
     {
@@ -2497,7 +2957,6 @@
       "image": null,
       "debunking_snippet": "“Roentgens and sieverts are interchangeable.” They measure different things: R counts ionization in air; sieverts weigh biological effect on tissue. Old meters read R — converting needs care and context.",
       "related_myths": [],
-      "related_articles": [],
       "difficulty": "advanced"
     },
     {
@@ -2528,7 +2987,6 @@
       "image": "../../assets/images/terms/scintillation detector.webp",
       "debunking_snippet": "“All radiation detectors are basically Geiger counters.” Geiger-Müller tubes count clicks but stay blind to energy — scintillators read spectra and can name the isotope standing in front of them.",
       "related_myths": [],
-      "related_articles": [],
       "difficulty": "advanced"
     },
     {
@@ -2560,7 +3018,6 @@
       "image": "../../assets/images/terms/radiation.webp",
       "debunking_snippet": "“Lead stops everything.” Lead is useless against alpha (paper beats it), can worsen beta fields via secondary X-rays, and merely thins gamma beams — shielding is matched to the radiation, not bought off the shelf.",
       "related_myths": [],
-      "related_articles": [],
       "difficulty": "beginner"
     },
     {
@@ -2597,7 +3054,6 @@
       "image": "../../assets/images/terms/Sievert.webp",
       "debunking_snippet": "“A sievert of any radiation feels the same.” The whole point of sieverts is that it doesn't — the same absorbed gray becomes twenty times riskier when it comes from alpha emitters inside your lungs.",
       "related_myths": [],
-      "related_articles": [],
       "difficulty": "intermediate"
     },
     {
@@ -2629,7 +3085,6 @@
       "image": null,
       "debunking_snippet": "“Spent fuel is useless garbage.” It's mostly untouched uranium plus freshly made plutonium — countries like France reprocess it into new fuel rods rather than burying it.",
       "related_myths": [],
-      "related_articles": [],
       "difficulty": "intermediate"
     },
     {
@@ -2660,8 +3115,39 @@
       "image": null,
       "debunking_snippet": "“Teller alone invented the hydrogen bomb.” The breakthrough — compressing fusion fuel with X-rays from a fission trigger — came from Ulam's calculations; Teller ran with it. Both names belong on the design.",
       "related_myths": [],
-      "related_articles": [],
       "difficulty": "advanced"
+    },
+    {
+      "id": "strong-force",
+      "term": "Strong Force",
+      "definition": "The force that holds the protons and neutrons together inside a nucleus. It is much stronger than the electric push between protons, but it only works over a very short distance, about the size of a nucleus. In a stable nucleus the strong force wins over the push. If the balance is wrong, the nucleus is unstable.",
+      "category": "science",
+      "related_terms": [
+        "nucleus",
+        "proton",
+        "neutron",
+        "electric-force",
+        "nuclear-stability",
+        "binding-energy"
+      ],
+      "quick_facts": [
+        "It holds the nucleus together",
+        "It is much stronger than the electric push between protons",
+        "It only works over about the size of a nucleus",
+        "Neutrons feel it too, but they have no charge, so they do not push",
+        "It is one of the four basic forces of nature"
+      ],
+      "sources": [
+        {
+          "organization": "OpenStax",
+          "title": "University Physics Volume 3: Nuclear Binding Energy",
+          "url": "https://openstax.org/books/university-physics-volume-3/pages/10-2-nuclear-binding-energy"
+        }
+      ],
+      "image": null,
+      "debunking_snippet": "“Neutrons are just glue.” Neutrons feel the strong force and have no charge, so they change the balance in a nucleus. But the balance depends on the whole mix of protons and neutrons, not on neutrons alone.",
+      "related_myths": [],
+      "difficulty": "beginner"
     },
     {
       "id": "thermal-neutron",
@@ -2691,7 +3177,6 @@
       "image": "../../assets/images/terms/Thermal Neutron.webp",
       "debunking_snippet": null,
       "related_myths": [],
-      "related_articles": [],
       "difficulty": "advanced"
     },
     {
@@ -2723,7 +3208,6 @@
       "image": "../../assets/images/terms/Transmutation.webp",
       "debunking_snippet": "“Chemistry can change one element into another.” No chemical process can — chemistry only rearranges electrons. Changing elements requires changing the nucleus itself.",
       "related_myths": [],
-      "related_articles": [],
       "difficulty": "advanced"
     },
     {
@@ -2754,7 +3238,6 @@
       "image": "../../assets/images/terms/tritium.webp",
       "debunking_snippet": "“Those glowing exit signs are radiation hazards.” Tritium's betas cannot escape the sealed glass tube — stand as close as you like for as long as you like; distance of millimeters protects you completely.",
       "related_myths": [],
-      "related_articles": [],
       "difficulty": "intermediate"
     },
     {
@@ -2786,7 +3269,6 @@
       "image": "../../assets/images/terms/Uranium-235.webp",
       "debunking_snippet": null,
       "related_myths": [],
-      "related_articles": [],
       "difficulty": "intermediate"
     },
     {
@@ -2818,7 +3300,6 @@
       "image": "../../assets/images/terms/Uranium-238.webp",
       "debunking_snippet": null,
       "related_myths": [],
-      "related_articles": [],
       "difficulty": "intermediate"
     },
     {
@@ -2849,7 +3330,6 @@
       "image": "../../assets/images/terms/Uranium Hexafluoride (UF₆).webp",
       "debunking_snippet": null,
       "related_myths": [],
-      "related_articles": [],
       "difficulty": "advanced"
     },
     {
@@ -2880,7 +3360,6 @@
       "image": "../../assets/images/terms/Vitrification.webp",
       "debunking_snippet": "“Waste is stored in leaky barrels.” High-level liquid waste is the dangerous legacy — and vitrification turns it into solid glass that geologists expect to outlast human civilization.",
       "related_myths": [],
-      "related_articles": [],
       "difficulty": "advanced"
     },
     {
@@ -2911,7 +3390,6 @@
       "image": null,
       "debunking_snippet": null,
       "related_myths": [],
-      "related_articles": [],
       "difficulty": "beginner"
     },
     {
@@ -2942,7 +3420,6 @@
       "image": "../../assets/images/terms/X-ray.webp",
       "debunking_snippet": "“X-rays make you radioactive afterward.” Impossible — X-rays pass through and vanish at light speed. Only neutron bombardment activates materials, and hospital X-rays aren't neutrons.",
       "related_myths": [],
-      "related_articles": [],
       "difficulty": "beginner"
     },
     {
@@ -2973,7 +3450,6 @@
       "image": null,
       "debunking_snippet": "“Yellowcake is a step toward building bombs.” As sold, it's overwhelmingly non-fissile U-238 — unusable in weapons without the entire industrial apparatus of conversion and enrichment on top.",
       "related_myths": [],
-      "related_articles": [],
       "difficulty": "intermediate"
     },
     {
@@ -3004,7 +3480,6 @@
       "image": "../../assets/images/terms/Yield.webp",
       "debunking_snippet": null,
       "related_myths": [],
-      "related_articles": [],
       "difficulty": "advanced"
     },
     {
@@ -3035,7 +3510,6 @@
       "image": "../../assets/images/terms/Z-number.webp",
       "debunking_snippet": null,
       "related_myths": [],
-      "related_articles": [],
       "difficulty": "beginner"
     },
     {
@@ -3066,7 +3540,6 @@
       "image": "../../assets/images/terms/Zero Power Reactor.webp",
       "debunking_snippet": "“All reactors are industrial monsters.” Zero-power reactors fit in gymnasiums, hum along at flashlight-battery heating levels, and have trained generations of nuclear engineers safely.",
       "related_myths": [],
-      "related_articles": [],
       "difficulty": "advanced"
     }
   ]

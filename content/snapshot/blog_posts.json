@@ -1,0 +1,290 @@
+{
+  "table": "blog_posts",
+  "primaryKey": [
+    "id"
+  ],
+  "rows": [
+    {
+      "id": "blog-nobody-knows-when",
+      "npc_id": "npc-hal",
+      "unit_id": "radioactivity",
+      "lesson_id": "why-nuclei-decay",
+      "position": 0,
+      "title": "Nobody knows when",
+      "hook": "Look at one unstable nucleus and its moment is a surprise. Look at a crowd and it is a pattern.",
+      "cover": "radiation",
+      "read_min": 1,
+      "unlock": {
+        "trigger": "lesson_complete",
+        "lessonId": "why-nuclei-decay"
+      },
+      "blocks": [
+        {
+          "t": "p",
+          "text": "Take one unstable nucleus. Leave it alone. It has a chance of changing, and nobody can say when."
+        },
+        {
+          "t": "p",
+          "text": "Nobody pushes it. The nucleus that changes is the parent. The nucleus it becomes is the daughter. The change gives off radiation."
+        },
+        {
+          "t": "quote",
+          "text": "My pocket watch ticks for a crowd of atoms, never for one."
+        },
+        {
+          "t": "h",
+          "text": "Think of a die"
+        },
+        {
+          "t": "p",
+          "text": "Roll a die once and you cannot say whether it will show a six. Roll it 600 times and you can say that about 100 of the rolls will."
+        },
+        {
+          "t": "p",
+          "text": "A nucleus is like that. One is a surprise. A big group follows a pattern, and in the half-life lesson you will see the pattern for yourself."
+        },
+        {
+          "t": "figure",
+          "ref": "radiation",
+          "caption": "The radiation sign, used to mark a source of radiation."
+        },
+        {
+          "t": "fact",
+          "text": "Heating, cooling and chemistry hardly change how fast an unstable nucleus changes. In a flame or in ice, it is still unstable."
+        },
+        {
+          "t": "list",
+          "items": [
+            "One nucleus: you cannot say when",
+            "A big group: it follows a pattern"
+          ]
+        },
+        {
+          "t": "p",
+          "text": "So when someone asks you when an atom will change, you can answer slowly and exactly: you cannot know. A crowd of them, though, you can know."
+        },
+        {
+          "t": "next",
+          "label": "See what comes out of a decay",
+          "lessonId": "alpha-beta-gamma"
+        }
+      ],
+      "reactors": [
+        "npc-ada"
+      ]
+    },
+    {
+      "id": "blog-the-banana-on-your-counter",
+      "npc_id": "npc-hal",
+      "unit_id": "radioactivity",
+      "lesson_id": "radioactivity-is-natural",
+      "position": 1,
+      "title": "The banana on your counter",
+      "hook": "A banana is a little bit radioactive. So are you. That is normal, and here is why.",
+      "cover": "banana",
+      "read_min": 1,
+      "unlock": {
+        "trigger": "unit_complete",
+        "unitId": "radioactivity"
+      },
+      "blocks": [
+        {
+          "t": "p",
+          "text": "Here is something nobody expects. The banana on your counter is a little bit radioactive."
+        },
+        {
+          "t": "p",
+          "text": "It holds potassium, and a tiny share of that potassium is potassium-40, which is unstable. You carry some too, in your own body."
+        },
+        {
+          "t": "h",
+          "text": "It was here first"
+        },
+        {
+          "t": "p",
+          "text": "Radioactivity was not invented. It was here long before people were. You can find it in four places."
+        },
+        {
+          "t": "list",
+          "items": [
+            "Rocks and soil: uranium and thorium",
+            "The air: radon, a radioactive gas from the ground",
+            "Food and your body: potassium-40",
+            "Space: cosmic radiation, all the time"
+          ]
+        },
+        {
+          "t": "figure",
+          "ref": "banana",
+          "caption": "A banana holds a little natural potassium-40."
+        },
+        {
+          "t": "quote",
+          "text": "Radioactivity was always here. We only learned to see it."
+        },
+        {
+          "t": "fact",
+          "text": "In 1896 Henri Becquerel left a uranium mineral on a wrapped photographic plate. The plate fogged, even with no sunlight. Radioactivity was found in a natural mineral, long before anyone made nuclear technology."
+        },
+        {
+          "t": "h",
+          "text": "Is it dangerous?"
+        },
+        {
+          "t": "p",
+          "text": "Radioactive does not automatically mean dangerous. What matters is the type of radiation, how much there is, and how it reaches the body."
+        },
+        {
+          "t": "p",
+          "text": "A banana and your own body are radioactive, and that is normal. Later, you will learn why being exposed to radiation is not the same as becoming radioactive."
+        },
+        {
+          "t": "next",
+          "label": "Find where radioactivity hides around you",
+          "lessonId": "radioactivity-is-natural"
+        }
+      ],
+      "reactors": [
+        "npc-ada",
+        "npc-mina"
+      ]
+    },
+    {
+      "id": "blog-the-smallest-thing",
+      "npc_id": "npc-ada",
+      "unit_id": "inside-the-atom",
+      "lesson_id": "atoms-are-everywhere",
+      "position": 0,
+      "title": "The smallest thing you will ever meet",
+      "hook": "You have never seen one, yet you are made of them. Here is how small they really are.",
+      "cover": "atom",
+      "read_min": 1,
+      "unlock": {
+        "trigger": "none"
+      },
+      "blocks": [
+        {
+          "t": "p",
+          "text": "Look at your hand. Now look at the air around it. Both are matter, and all matter is made of atoms."
+        },
+        {
+          "t": "p",
+          "text": "Yes, even the air, which feels like nothing. That is why a pumped-up ball weighs more than a flat one: the air inside it is matter too."
+        },
+        {
+          "t": "quote",
+          "text": "I have asked what things are made of since I was small. I still ask it every day."
+        },
+        {
+          "t": "h",
+          "text": "How small is small?"
+        },
+        {
+          "t": "p",
+          "text": "Take a skin cell. You need a microscope to see it. A virus is about 300 times smaller than that cell. And an atom is about 300 times smaller again."
+        },
+        {
+          "t": "figure",
+          "ref": "atom",
+          "caption": "An atom: far too small to see, even with an ordinary microscope."
+        },
+        {
+          "t": "list",
+          "items": [
+            "Your hand: about 10 cm",
+            "A skin cell: about 0.03 mm",
+            "A virus: about 100 nm",
+            "An atom: a few tenths of a nm"
+          ]
+        },
+        {
+          "t": "fact",
+          "text": "About 2,400 years ago the Greek thinker Democritus imagined cutting something in half again and again, until he reached a piece that could not be cut. He called it atomos. Seeing atoms took far longer."
+        },
+        {
+          "t": "p",
+          "text": "Light and heat are different. They are energy, not matter, so they are not made of atoms."
+        },
+        {
+          "t": "p",
+          "text": "So the next time you pick something up, remember that you are holding a huge crowd of atoms you can never see."
+        },
+        {
+          "t": "next",
+          "label": "Zoom in on an atom yourself",
+          "lessonId": "atoms-are-everywhere"
+        }
+      ],
+      "reactors": []
+    },
+    {
+      "id": "blog-three-kinds-of-carbon",
+      "npc_id": "npc-ada",
+      "unit_id": "inside-the-atom",
+      "lesson_id": "isotopes",
+      "position": 1,
+      "title": "Three kinds of carbon",
+      "hook": "Carbon-12, carbon-13 and carbon-14 are all carbon. One of them is not like the others.",
+      "cover": "diamond",
+      "read_min": 1,
+      "unlock": {
+        "trigger": "unit_complete",
+        "unitId": "inside-the-atom"
+      },
+      "blocks": [
+        {
+          "t": "p",
+          "text": "Here is a puzzle. Three atoms are all carbon, yet they are not the same. How can that be?"
+        },
+        {
+          "t": "p",
+          "text": "Count the protons. Every carbon atom has 6, and that number is what makes it carbon. Change it and you get a different element."
+        },
+        {
+          "t": "h",
+          "text": "The neutrons are the difference"
+        },
+        {
+          "t": "p",
+          "text": "The number after the name is the mass number: protons plus neutrons. Carbon has 6 protons, so carbon-14 has 14 - 6 = 8 neutrons."
+        },
+        {
+          "t": "list",
+          "items": [
+            "Carbon-12: 6 protons, 6 neutrons, stable",
+            "Carbon-13: 6 protons, 7 neutrons, stable",
+            "Carbon-14: 6 protons, 8 neutrons, unstable"
+          ]
+        },
+        {
+          "t": "p",
+          "text": "These versions of one element are called isotopes. Most of the atoms around you are stable isotopes."
+        },
+        {
+          "t": "quote",
+          "text": "Isotope does not mean radioactive. It only means a different number of neutrons."
+        },
+        {
+          "t": "fact",
+          "text": "Carbon-14 is the unstable one. An unstable nucleus can change, and when it does it gives off radiation. That is called radioactivity."
+        },
+        {
+          "t": "p",
+          "text": "Even so, nothing here is strange or new. Unstable atoms are in rocks, in the air and in food, and they were here long before us."
+        },
+        {
+          "t": "p",
+          "text": "Which brings a question. What exactly comes out when a nucleus changes? Hal knows, and he tells it slowly."
+        },
+        {
+          "t": "next",
+          "label": "Meet Hal and radioactivity",
+          "unitId": "radioactivity"
+        }
+      ],
+      "reactors": [
+        "npc-hal"
+      ]
+    }
+  ]
+}

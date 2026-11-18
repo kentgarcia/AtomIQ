@@ -6,7 +6,6 @@ Source-of-truth content shipped inside the app.
 content/
 ├── database/
 │   └── content.db      ← master SQLite database (edit via `npm run content-studio`)
-├── articles/           # facade + types for articles/posts
 ├── explorer/           # journeys, encyclopedia images, maze helpers
 ├── curriculum/         # units, path nodes, lessons, cards, item bank: types,
 │                       #   hydration, answer evaluation (framework-free, tested)
@@ -31,6 +30,20 @@ every Studio save. References must be verified by a person before publish
 (unverified ones are warnings in a draft and errors at the publish gate). The
 old lessons and quizzes are saved under `scripts/content-migration/legacy/`.
 
+## NPC feed and mini blog
+
+Discover is a feed in which the NPC cast posts about what the learner did
+(`docs/NPC_FEED_SPEC.md`). Its content tables are `feed_templates` (a post's
+text per trigger, with placeholders), `blog_posts` (the short pieces, written in
+blocks), `blog_comments` (NPC comments, authored with the piece) and
+`blog_references` (a piece's sources). Seed rows live in
+`scripts/content-migration/feed-content.mjs` (it adds only missing rows, so
+Studio edits survive; `--overwrite` resets them); edit them afterwards in Studio
+(Feed group). The trigger keys, their condition fields and placeholders and the
+block types are in `scripts/lib/feed-vocab.mjs`; the rules in
+`scripts/lib/feed-rules.mjs` run in `validate:content` and on every Studio
+save. A piece needs a verified source before publish, like a lesson.
+
 ## How content flows
 
 1. **Author** — edit `database/content.db` with the Content Studio
@@ -52,11 +65,10 @@ gitignored and safe to delete when no process has the database open.
 ## Quality gates
 
 - `npm run validate:content` checks every learner-facing question and the
-  article/research metadata (see `docs/CONTENT_QUESTION_QUALITY.md` and
-  `docs/ARTICLE_PIPELINE.md`). Run it before `sync-content`.
+  curriculum and reference rules (see `docs/CONTENT_QUESTION_QUALITY.md`). Run
+  it before `sync-content`.
 - `npm run test:content` unit-tests the rules; `npm run test:curriculum` and
   `npm run test:curriculum-content` cover the lesson/path/mastery cores and the
   Unit 1 content.
 - Repeatable content migrations live in `scripts/content-migration/`
-  (`fix-question-context.mjs`, `add-article-pipeline.mjs`,
-  `add-beginner-articles.mjs`).
+  (`fix-question-context.mjs`, `remove-articles.mjs`).

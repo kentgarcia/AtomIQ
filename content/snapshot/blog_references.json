@@ -1,0 +1,45 @@
+{
+  "table": "blog_references",
+  "primaryKey": [
+    "blog_id",
+    "reference_id"
+  ],
+  "rows": [
+    {
+      "blog_id": "blog-nobody-knows-when",
+      "reference_id": "ref-iaea-decay"
+    },
+    {
+      "blog_id": "blog-nobody-knows-when",
+      "reference_id": "ref-openstax-up3-ch10"
+    },
+    {
+      "blog_id": "blog-the-banana-on-your-counter",
+      "reference_id": "ref-background-radiation"
+    },
+    {
+      "blog_id": "blog-the-banana-on-your-counter",
+      "reference_id": "ref-becquerel-1896"
+    },
+    {
+      "blog_id": "blog-the-banana-on-your-counter",
+      "reference_id": "ref-potassium-40"
+    },
+    {
+      "blog_id": "blog-the-smallest-thing",
+      "reference_id": "ref-openstax-chem-ch1"
+    },
+    {
+      "blog_id": "blog-the-smallest-thing",
+      "reference_id": "ref-openstax-chem-ch2"
+    },
+    {
+      "blog_id": "blog-three-kinds-of-carbon",
+      "reference_id": "ref-iaea-isotopes"
+    },
+    {
+      "blog_id": "blog-three-kinds-of-carbon",
+      "reference_id": "ref-openstax-chem-ch2"
+    }
+  ]
+}

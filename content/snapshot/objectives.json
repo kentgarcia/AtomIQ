@@ -8,71 +8,155 @@
       "id": "u1-atom-scale",
       "unit_id": "inside-the-atom",
       "position": 1,
-      "statement": "Describe how small atoms are using a comparison.",
-      "misconception": "Atoms are small enough to see with a good microscope."
+      "statement": "Know that atoms are far too small to see, even with an ordinary microscope.",
+      "misconception": "A good microscope can show an atom."
     },
     {
       "id": "u1-atomic-number",
       "unit_id": "inside-the-atom",
       "position": 4,
-      "statement": "State that the number of protons decides which element an atom is.",
-      "misconception": "Elements differ because their atoms are made of different stuff."
+      "statement": "Know that the number of protons tells you which element an atom is.",
+      "misconception": "Elements are made of different kinds of stuff."
     },
     {
-      "id": "u1-forces-in-nucleus",
+      "id": "u1-change-protons",
       "unit_id": "inside-the-atom",
-      "position": 8,
-      "statement": "Describe the two competing forces in a nucleus: electric push and the strong force.",
-      "misconception": null
+      "position": 5,
+      "statement": "Know that changing the number of protons changes the element.",
+      "misconception": "An atom stays the same element when it gains or loses a proton."
     },
     {
       "id": "u1-isotope-definition",
       "unit_id": "inside-the-atom",
       "position": 6,
-      "statement": "Explain that isotopes of an element have the same protons and different neutrons.",
-      "misconception": "Isotope means radioactive or man-made."
+      "statement": "Know that atoms of one element have the same protons but can have different neutrons, and that these are called isotopes.",
+      "misconception": "Atoms of one element are all identical."
     },
     {
-      "id": "u1-mass-number",
+      "id": "u1-isotope-not-radioactive",
       "unit_id": "inside-the-atom",
       "position": 7,
-      "statement": "Work out protons, neutrons and the name of an isotope from its numbers.",
-      "misconception": null
+      "statement": "Know that an isotope is not automatically radioactive: most of the atoms around us are stable isotopes.",
+      "misconception": "Isotope means radioactive or man-made."
     },
     {
       "id": "u1-matter-is-atoms",
       "unit_id": "inside-the-atom",
       "position": 0,
-      "statement": "Recognise that all ordinary matter is made of atoms, and that light and heat are not.",
-      "misconception": "Air is nothing; atoms are just very small specks."
+      "statement": "Know that ordinary matter, including air, is made of atoms, and that light and heat are not.",
+      "misconception": "Air is nothing, so only solid things are made of atoms."
     },
     {
       "id": "u1-nucleus",
       "unit_id": "inside-the-atom",
       "position": 3,
-      "statement": "Explain that the nucleus is tiny but holds nearly all the mass.",
-      "misconception": "Electrons circle the nucleus like planets, so an atom is mostly nucleus."
+      "statement": "Know that the tiny nucleus at the centre holds almost all of an atom's mass, and that the rest of the atom is mostly empty space.",
+      "misconception": "An atom is a solid ball."
     },
     {
       "id": "u1-particles",
       "unit_id": "inside-the-atom",
       "position": 2,
-      "statement": "Name the three particles of an atom, their charges and where they are.",
-      "misconception": "An atom is a solid ball."
-    },
-    {
-      "id": "u1-read-the-table",
-      "unit_id": "inside-the-atom",
-      "position": 5,
-      "statement": "Find an element's symbol and atomic number on the periodic table.",
-      "misconception": null
+      "statement": "Name the three particles of an atom and say whether each is positive, negative or has no charge.",
+      "misconception": "Every atom is made of its own kind of stuff."
     },
     {
       "id": "u1-stable-unstable",
       "unit_id": "inside-the-atom",
+      "position": 8,
+      "statement": "Know that some combinations of protons and neutrons make a stable nucleus and others make an unstable one.",
+      "misconception": "Every atom stays the same for ever."
+    },
+    {
+      "id": "u1-unstable-changes",
+      "unit_id": "inside-the-atom",
       "position": 9,
-      "statement": "Explain that most nuclei around us are stable, some are unstable, and unstable nuclei change and give off radiation.",
-      "misconception": "Anything nuclear is dangerous; radioactivity is something people do to atoms."
+      "statement": "Know that an unstable nucleus can change and give off radiation, and that this happens naturally.",
+      "misconception": "Radioactivity is something people create, and anything nuclear is dangerous."
+    },
+    {
+      "id": "u2-decay-chain",
+      "unit_id": "radioactivity",
+      "position": 8,
+      "statement": "Know that a daughter can be unstable and decay again, until a stable nucleus is reached (a decay chain).",
+      "misconception": "Every decay makes a stable atom."
+    },
+    {
+      "id": "u2-decay-changes-not-vanishes",
+      "unit_id": "radioactivity",
+      "position": 9,
+      "statement": "Know that a decay changes a nucleus into a different one; nothing simply vanishes.",
+      "misconception": "Decay means the atom disappears."
+    },
+    {
+      "id": "u2-half-life-group",
+      "unit_id": "radioactivity",
+      "position": 7,
+      "statement": "Know that half-life describes a group, not a timer in each nucleus.",
+      "misconception": "A radioactive atom waits exactly one half-life before it decays."
+    },
+    {
+      "id": "u2-half-life-meaning",
+      "unit_id": "radioactivity",
+      "position": 5,
+      "statement": "Know that half-life is the time for about half of a large group of radioactive nuclei to decay.",
+      "misconception": "A radioactive atom is half gone after one half-life."
+    },
+    {
+      "id": "u2-half-life-pattern",
+      "unit_id": "radioactivity",
+      "position": 6,
+      "statement": "Read the pattern 100, 50, 25, 12 and know that radioactivity fades but is not gone after one half-life.",
+      "misconception": "After one half-life the radioactivity is gone, and radioactive material stays radioactive for ever."
+    },
+    {
+      "id": "u2-natural-sources",
+      "unit_id": "radioactivity",
+      "position": 10,
+      "statement": "Name natural places radioactivity and radiation come from: rocks and soil, radon in air, food and the body, space.",
+      "misconception": "Radioactivity is something humans created, and it only exists in nuclear facilities."
+    },
+    {
+      "id": "u2-not-always-dangerous",
+      "unit_id": "radioactivity",
+      "position": 11,
+      "statement": "Know that radioactive does not automatically mean dangerous; it depends on the type, the amount and how it reaches the body.",
+      "misconception": "Radioactive means automatically dangerous."
+    },
+    {
+      "id": "u2-parent-daughter",
+      "unit_id": "radioactivity",
+      "position": 2,
+      "statement": "Name the nucleus that decays (parent) and the nucleus it becomes (daughter).",
+      "misconception": null
+    },
+    {
+      "id": "u2-particle-or-wave",
+      "unit_id": "radioactivity",
+      "position": 3,
+      "statement": "Know that alpha and beta are particles and gamma is electromagnetic radiation, so the three are different.",
+      "misconception": "Alpha, beta and gamma are the same thing, and gamma is made of tiny pieces of the nucleus."
+    },
+    {
+      "id": "u2-random-single",
+      "unit_id": "radioactivity",
+      "position": 1,
+      "statement": "Know that you cannot predict when one particular nucleus will decay, although a large group follows a pattern.",
+      "misconception": "If you watch a nucleus closely you can tell when it will change."
+    },
+    {
+      "id": "u2-recognise-radiation",
+      "unit_id": "radioactivity",
+      "position": 4,
+      "statement": "Say what each one is: alpha is 2 protons and 2 neutrons, beta is a fast electron, gamma is high-energy electromagnetic radiation.",
+      "misconception": "The electron of a beta particle was orbiting the nucleus."
+    },
+    {
+      "id": "u2-spontaneous",
+      "unit_id": "radioactivity",
+      "position": 0,
+      "statement": "Know that an unstable nucleus changes by itself: nobody has to trigger it.",
+      "misconception": "Decay can be switched on and off, or a person has to make an atom decay."
     }
   ]
 }

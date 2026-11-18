@@ -379,3 +379,96 @@ export interface ContentMetadata {
   lastUpdated: string;
 }
 
+
+// ============================================
+// NPC FEED AND MINI BLOG (docs/NPC_FEED_SPEC.md)
+// ============================================
+
+/** What a feed post is about (spec §5.1). `blog_unlocked` creates a blog card and has no template. */
+export type FeedTrigger =
+  | 'lesson_complete'
+  | 'checkpoint_pass'
+  | 'unit_complete'
+  | 'testout_pass'
+  | 'streak'
+  | 'chest_opened'
+  | 'first_lesson'
+  | 'comeback'
+  | 'daily_quests_done'
+  | 'blog_unlocked'
+  | 'rank_change';
+
+/** Tone of a template; it also skews which reactions the NPCs pick. */
+export type FeedKind = 'celebrate' | 'milestone' | 'nudge' | 'tease';
+
+/** What a post's chip opens. */
+export type FeedChipKind = 'lesson' | 'unit' | 'quests' | 'ranks';
+
+export type Reaction = 'like' | 'love' | 'clap' | 'wow';
+
+/** Placeholders a template's text may use. Which a trigger can supply is in `services/feed-core.ts`. */
+export type FeedPlaceholder = 'lesson' | 'unit' | 'days' | 'rival' | 'name';
+
+/** A row of `feed_templates`, JSON columns hydrated. */
+export interface FeedTemplate {
+  id: string;
+  /** The poster; `null` means one is chosen from `posterPool`. */
+  npcId: string | null;
+  posterPool: string[];
+  kind: FeedKind;
+  trigger: Exclude<FeedTrigger, 'blog_unlocked'>;
+  /** Fields of the event that must match (`unitId`, `lessonId`, `perfect`, `days`, `period`, `direction`, `minDays`). */
+  condition: Record<string, unknown>;
+  text: string;
+  chip: FeedChipKind | null;
+  /** NPC ids that always react. */
+  reactors: string[];
+  weight: number;
+}
+
+/** How a blog piece unlocks (spec §5.2). Derived from progress, never stored. */
+export type BlogUnlock =
+  | { trigger: 'none' }
+  | { trigger: 'lesson_complete'; lessonId: string }
+  | { trigger: 'unit_complete'; unitId: string }
+  | { trigger: 'streak'; days: number };
+
+/** The closed set of blog body blocks; each is a hardcoded component. */
+export type BlogBlock =
+  | { t: 'p'; text: string }
+  | { t: 'h'; text: string }
+  | { t: 'quote'; text: string }
+  | { t: 'fact'; text: string }
+  | { t: 'figure'; ref: string; caption: string }
+  | { t: 'list'; items: string[] }
+  | { t: 'next'; label: string; lessonId?: string; unitId?: string };
+
+/** A row of `blog_posts`, JSON columns hydrated. */
+export interface BlogPost {
+  id: string;
+  /** The author (`npcs.id`). */
+  npcId: string;
+  unitId: string | null;
+  lessonId: string | null;
+  position: number;
+  title: string;
+  hook: string;
+  /** A lesson figure or object id from the existing art. */
+  cover: string;
+  readMin: number;
+  unlock: BlogUnlock;
+  blocks: BlogBlock[];
+  /** NPC ids that always react to the card. */
+  reactors: string[];
+}
+
+/** A row of `blog_comments`: written with the piece, by an NPC other than the author. */
+export interface BlogComment {
+  id: string;
+  blogId: string;
+  npcId: string;
+  position: number;
+  text: string;
+  /** Optional pointer: a lesson or an encyclopedia entry. */
+  chip: { lessonId?: string; entryId?: string } | null;
+}
