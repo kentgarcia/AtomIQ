@@ -9,7 +9,7 @@ import {
   setMediaPathname,
 } from "./media";
 
-const buttonClickSource = require("../assets/sfx/button-click.mp3");
+const buttonClickSource = require("../assets/sfx/ui/press.wav");
 
 let audioModeConfigured = false;
 let clickPlayer: AudioPlayer | null = null;

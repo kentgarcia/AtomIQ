@@ -14,6 +14,8 @@ Implements `ATOMIQ_FEEDBACK_SUMMARY_SPEC.md` §4.1 (shared media behaviour), §4
 | UI click / game effects (gated by the policy) | `services/ui-sfx.ts`, `services/game-sfx.ts` |
 | Tests | `npm run test:media` |
 
+The sound library (`assets/sfx/<group>/*.wav`), the cue catalog and where each cue plays are specified in `docs/SFX_SPEC.md`. Until its phase 1 lands, `ui-sfx.ts` and `game-sfx.ts` play the new files through the old five names.
+
 ## 1. Preferences (single source of truth)
 
 `soundEffects` (existing `SOUND_ENABLED` key), `music`, `readAloud` live in one in-memory store hydrated from AsyncStorage. Settings, lessons, quizzes, Guide and games all read it. UI clicks, game effects, music and Read Aloud consult it through the gates in `media-core.ts`, so they cannot drift.

@@ -60,3 +60,6 @@ content/database/studio-history.db
 content/database/.studio.lock
 content/database/*.bak-*
 .opencode/studio-token
+
+# Unused remainder of the licensed SFX library (see docs/SFX_SPEC.md §3, §4.2)
+assets/sfx/kent-sfx/

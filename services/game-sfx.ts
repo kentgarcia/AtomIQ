@@ -9,10 +9,11 @@ import {
 export type GameSfx = "punch" | "correct" | "wrong" | "gameover";
 
 const sfxSources: Record<GameSfx, number> = {
-  punch: require("../assets/sfx/punch.mp3"),
-  correct: require("../assets/sfx/correct.mp3"),
-  wrong: require("../assets/sfx/wrong.mp3"),
-  gameover: require("../assets/sfx/gameover.mp3"),
+  // Interim mapping to the new library; docs/SFX_SPEC.md replaces this file with the cue catalog.
+  punch: require("../assets/sfx/ui/lock.wav"),
+  correct: require("../assets/sfx/lesson/answer-correct.wav"),
+  wrong: require("../assets/sfx/lesson/answer-wrong.wav"),
+  gameover: require("../assets/sfx/game/over.wav"),
 };
 
 const soundCache: Partial<Record<GameSfx, AudioPlayer>> = {};
