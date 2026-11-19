@@ -18,10 +18,10 @@ import { useAppFonts } from "@/hooks/use-app-fonts";
 import { StorageProvider } from "@/services/StorageContext";
 import { installMediaLifecycle, setMediaPathname } from "@/services/media";
 import {
-    initializeUiSfx,
+    initializeSfx,
     installGlobalUiSfxHandlers,
-    unloadUiSfx,
-} from "@/services/ui-sfx";
+    unloadSfx,
+} from "@/services/sfx";
 
 // Keep the native splash up until fonts AND the content database are ready.
 // ContentGate hides it as soon as it has something real to show.
@@ -60,13 +60,13 @@ function AppContent() {
 
   useEffect(() => {
     installGlobalUiSfxHandlers();
-    void initializeUiSfx();
+    void initializeSfx();
     // Preferences, AppState and screen-reader listeners for all media.
     const removeMediaLifecycle = installMediaLifecycle();
 
     return () => {
       removeMediaLifecycle();
-      void unloadUiSfx();
+      void unloadSfx();
     };
   }, []);
 
@@ -74,13 +74,16 @@ function AppContent() {
     <NavigationThemeProvider value={navigationTheme}>
       <Stack>
         <Stack.Screen name="index" options={{ headerShown: false }} />
-        <Stack.Screen name="onboarding" options={{ headerShown: false }} />
+        {/* Nothing to go back to from onboarding: no swipe, no back gesture (the Android key is handled by the screen) */}
+        <Stack.Screen name="onboarding" options={{ headerShown: false, gestureEnabled: false }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         {/* A lesson (and practice) fades in over the map: the node bubble zooms away first, then the preview fades up */}
         <Stack.Screen name="lesson" options={{ headerShown: false, animation: "fade" }} />
         <Stack.Screen name="mythbuster" options={{ headerShown: false }} />
         <Stack.Screen name="practice" options={{ headerShown: false, animation: "fade" }} />
         <Stack.Screen name="blog" options={{ headerShown: false }} />
+        <Stack.Screen name="blogs" options={{ headerShown: false }} />
+        <Stack.Screen name="npc" options={{ headerShown: false }} />
         <Stack.Screen name="ranks" options={{ headerShown: false }} />
         <Stack.Screen name="daily-facts" options={{ headerShown: false }} />
         <Stack.Screen name="settings" options={{ headerShown: false }} />

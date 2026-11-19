@@ -15,8 +15,15 @@ import {
   type ElementCategory,
   type PeriodicElement,
 } from "@/content/periodic-table/elements";
+import {
+  ALIASES,
+  filterElementList,
+  matchesFilter,
+  matchesQuery,
+  type ElementFilter,
+} from "@/content/periodic-table/search";
 
-export { ELEMENTS, CATEGORY_LABELS };
+export { ELEMENTS, CATEGORY_LABELS, ALIASES, matchesFilter, matchesQuery };
 export type { ElementCategory, PeriodicElement };
 
 const BY_SYMBOL = new Map<string, PeriodicElement>();
@@ -28,16 +35,6 @@ for (const element of ELEMENTS) {
   BY_NAME.set(element.name.toLowerCase(), element);
   BY_NUMBER.set(element.atomicNumber, element);
 }
-
-/** Alternate spellings and isotope names people (and the encyclopedia) use. */
-const ALIASES: Record<string, string> = {
-  aluminium: "Al",
-  caesium: "Cs",
-  sulphur: "S",
-  deuterium: "H",
-  tritium: "H",
-  protium: "H",
-};
 
 export const TOTAL_ELEMENTS = ELEMENTS.length;
 
@@ -133,23 +130,6 @@ export const elementAccessibilityLabel = (element: PeriodicElement): string =>
 export const formatAtomicMass = (element: PeriodicElement): string =>
   element.massIsMassNumber ? `[${element.atomicMass}]` : String(element.atomicMass);
 
-export interface ElementFilter {
-  query?: string;
-  category?: ElementCategory | null;
-}
+export type { ElementFilter };
 
-export const matchesQuery = (element: PeriodicElement, rawQuery: string): boolean => {
-  const query = rawQuery.trim().toLowerCase();
-  if (!query) return true;
-  if (/^\d+$/.test(query)) return element.atomicNumber === Number(query);
-  if (element.name.toLowerCase().includes(query)) return true;
-  return query.length <= 3 && element.symbol.toLowerCase().startsWith(query);
-};
-
-export const matchesFilter = (element: PeriodicElement, filter: ElementFilter): boolean => {
-  if (filter.category && element.category !== filter.category) return false;
-  return matchesQuery(element, filter.query ?? "");
-};
-
-export const filterElements = (filter: ElementFilter): PeriodicElement[] =>
-  ELEMENTS.filter((element) => matchesFilter(element, filter));
+export const filterElements = (filter: ElementFilter): PeriodicElement[] => filterElementList(ELEMENTS, filter);

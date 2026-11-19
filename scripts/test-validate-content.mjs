@@ -462,6 +462,8 @@ test("feed templates: poster, pool and reactors must be NPCs", () => {
   assert.deepEqual(feedRules(withTemplate({ npc_id: null, poster_pool: ["npc-ray", "npc-mina"] })), []);
   assert.ok(feedRules(withTemplate({ npc_id: null, poster_pool: [] })).includes("feed-poster"), "needs a poster or a pool");
   assert.ok(feedRules(withTemplate({ npc_id: "npc-nobody" })).includes("feed-poster"));
+  assert.ok(!feedRules(withTemplate({ npc_id: null, poster_pool: ["learner"] })).includes("feed-poster"), "the learner's own voice is a valid poster");
+  assert.ok(feedRules(withTemplate({ npc_id: null, poster_pool: ["learner", "npc-ada"] })).includes("feed-poster"), "the learner cannot share a pool");
   assert.ok(feedRules(withTemplate({ npc_id: null, poster_pool: ["npc-nobody"] })).includes("feed-poster"));
   assert.deepEqual(feedRules(withTemplate({ reactors: ["npc-hal"] })), []);
   assert.ok(feedRules(withTemplate({ reactors: ["npc-nobody"] })).includes("feed-reactors"));

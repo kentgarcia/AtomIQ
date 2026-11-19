@@ -8,10 +8,15 @@
  */
 
 import React, { memo, useCallback, useMemo } from "react";
-import { TouchableOpacity, View } from "react-native";
-import Animated, { useAnimatedStyle, useReducedMotion, useSharedValue, withTiming } from "react-native-reanimated";
+import { TouchableOpacity, View, type StyleProp, type ViewStyle } from "react-native";
+import Animated, { useAnimatedStyle, useReducedMotion, useSharedValue, withTiming, type SharedValue } from "react-native-reanimated";
 import Svg, { Circle, Ellipse, G, Path, Polyline, Rect } from "react-native-svg";
 
+import { NODE_REVEAL } from "@/components/celebration/celebration-core";
+import { POP_TOTAL, faceFrame } from "@/components/lesson/cards/option-pop-core";
+import { STAMP_TOTAL, stampFrame } from "@/components/lesson/stamp-core";
+import { PopSparkle } from "@/components/motion/PopOnce";
+import { useDelayedClock } from "@/components/motion/use-delayed-clock";
 import { darken } from "@/components/lesson/visual/color-math";
 import { GLYPHS, GLYPH_VIEWBOX, type GlyphId } from "@/components/path/node-glyphs";
 import { Fireflies } from "@/components/path/Fireflies";
@@ -32,12 +37,39 @@ export interface LessonNodeProps {
   progress?: number;
   /** The unit's colours (face, ring, fireflies, check badge). Left out, the app's lesson yellow. Locked nodes ignore it. */
   palette?: UnitPalette;
+  /**
+   * The map just learned this node changed because a lesson was finished (the duolingo-motion-style skill, tier C):
+   * "completed" stamps its check badge on, "unlocked" pops its face (it squashes, springs, hangs, lands, hops) with two
+   * sparkles. It plays once, `NODE_REVEAL.wait` ms after `revealKey` changes; with reduced motion nothing plays.
+   */
+  reveal?: "completed" | "unlocked";
+  revealKey?: number;
   accessibilityLabel: string;
   /** Opens the details bubble (every node, locked ones too: the bubble says why). */
   onPress: () => void;
 }
 
 const SWIRLS = swirlArcs();
+
+/**
+ * The check badge of a completed node. It has its own clock, created with the badge, so a badge that is
+ * about to be stamped on is invisible from its very first frame (a clock shared with the node would show the
+ * finished badge for a frame before it started).
+ */
+function CheckBadge({ stamp, revealKey, pressed, color, ink, style }: { stamp: boolean; revealKey?: number; pressed: SharedValue<number>; color: string; ink: string; style: StyleProp<ViewStyle> }) {
+  const clock = useDelayedClock(STAMP_TOTAL, NODE_REVEAL.wait + NODE_REVEAL.check, stamp, revealKey);
+  const anim = useAnimatedStyle(() => {
+    const f = stampFrame(clock.get(), 1);
+    return { opacity: f.opacity, transform: [{ translateY: pressed.get() * NODE.press }, { rotate: `${f.rotate}deg` }, { scale: f.scale }] };
+  });
+  return (
+    <Animated.View pointerEvents="none" style={[style, { backgroundColor: color }, anim]}>
+      <Svg width={12} height={12} viewBox="0 0 24 24">
+        <Polyline points="20 6 9 17 4 12" stroke={ink} strokeWidth={4.5} strokeLinecap="round" strokeLinejoin="round" fill="none" />
+      </Svg>
+    </Animated.View>
+  );
+}
 
 function LessonNodeBase({
   x,
@@ -46,6 +78,8 @@ function LessonNodeBase({
   glyph,
   progress = 0,
   palette,
+  reveal,
+  revealKey,
   accessibilityLabel,
   onPress,
 }: LessonNodeProps) {
@@ -74,8 +108,15 @@ function LessonNodeBase({
     pressed.set(withTiming(0, { duration: reducedMotion ? 120 : DURATION.press, easing: PRESS_EASING }));
   }, [pressed, reducedMotion]);
 
-  const faceStyle = useAnimatedStyle(() => ({ transform: [{ translateY: pressed.get() * NODE.press }] }));
-  const badgeStyle = useAnimatedStyle(() => ({ transform: [{ translateY: pressed.get() * NODE.press }] }));
+  // The reveal: one clock (ms), resting on its last frame when there is nothing to show
+  const clock = useDelayedClock(NODE_REVEAL.total, NODE_REVEAL.wait, reveal !== undefined, revealKey);
+  const popping = reveal === "unlocked";
+
+  // The pop lifts the face off its lip (fractions of the face's height) and squashes it; the side band stays put
+  const faceStyle = useAnimatedStyle(() => {
+    const f = faceFrame(popping ? clock.get() - NODE_REVEAL.pop : POP_TOTAL, 0);
+    return { transform: [{ translateY: pressed.get() * NODE.press + f.y * NODE.faceH }, { scaleX: f.sx }, { scaleY: f.sy }] };
+  });
 
   const shape = GLYPHS[glyph] as { shapes: { d: string; sw?: number; fill?: boolean; evenOdd?: boolean }[]; rotate?: number };
   const glyphScale = NODE.glyph / GLYPH_VIEWBOX;
@@ -189,20 +230,17 @@ function LessonNodeBase({
         </TouchableOpacity>
       </View>
 
-      {/* Completed: a check badge on the lip, following the face down when pressed */}
+      {/* The unlocked node's pop: two sparkles twinkle on the face's corners */}
+      {popping && !reducedMotion ? (
+        <>
+          <PopSparkle i={0} clock={clock} at={NODE_REVEAL.pop} color={unitColor} place={{ left: DISC_LEFT - 6, top: -8 }} />
+          <PopSparkle i={1} clock={clock} at={NODE_REVEAL.pop} color={unitColor} place={{ right: DISC_LEFT - 4, top: NODE.faceH - 14 }} />
+        </>
+      ) : null}
+
+      {/* Completed: a check badge on the lip, following the face down when pressed (stamped on when a lesson was just finished) */}
       {completed ? (
-        <Animated.View pointerEvents="none" style={[styles.badge, { backgroundColor: unitColor }, badgeStyle]}>
-          <Svg width={12} height={12} viewBox="0 0 24 24">
-            <Polyline
-              points="20 6 9 17 4 12"
-              stroke={c.text}
-              strokeWidth={4.5}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              fill="none"
-            />
-          </Svg>
-        </Animated.View>
+        <CheckBadge stamp={reveal === "completed"} revealKey={revealKey} pressed={pressed} color={unitColor} ink={c.text} style={styles.badge} />
       ) : null}
     </View>
   );

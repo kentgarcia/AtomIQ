@@ -9,7 +9,7 @@ import { View } from "react-native";
 import { Text } from "@/components/ui/text";
 
 import { ELEMENT_ISOTOPE_ION, type PeriodicElement } from "@/content/periodic-table/elements";
-import { createStyles, fontFaces, useTheme, withAlpha } from "@/theme";
+import { createStyles, fontFaces, useTheme } from "@/theme";
 
 export interface ElementIsotopeIonCardProps {
   /** When given, adds a one-line "for this element" summary. */
@@ -19,14 +19,7 @@ export interface ElementIsotopeIonCardProps {
 }
 
 const makeStyles = createStyles((theme) => ({
-  card: {
-    gap: 12,
-    padding: 16,
-    borderRadius: 20,
-    backgroundColor: theme.colors.surface,
-    borderWidth: 1.5,
-    borderColor: theme.colors.border,
-  },
+  wrap: { gap: 12 },
   title: {
     fontSize: 18,
     lineHeight: 24,
@@ -36,14 +29,12 @@ const makeStyles = createStyles((theme) => ({
   intro: {
     fontSize: 14,
     lineHeight: 21,
-    ...fontFaces.book,
-    color: theme.colors.textSecondary,
+    ...fontFaces.medium,
+    color: theme.colors.textMuted,
   },
   item: {
     gap: 4,
-    padding: 12,
-    borderRadius: 14,
-    backgroundColor: withAlpha(theme.colors.primary, 0.08),
+    paddingLeft: 12,
     borderLeftWidth: 4,
     borderLeftColor: theme.colors.primary,
   },
@@ -56,8 +47,8 @@ const makeStyles = createStyles((theme) => ({
   body: {
     fontSize: 14,
     lineHeight: 21,
-    ...fontFaces.book,
-    color: theme.colors.text,
+    ...fontFaces.medium,
+    color: theme.colors.textSecondary,
   },
   example: {
     fontSize: 14,
@@ -78,7 +69,7 @@ function ElementIsotopeIonCardBase({ element, footer }: ElementIsotopeIonCardPro
   const styles = useMemo(() => makeStyles(theme), [theme]);
 
   return (
-    <View style={styles.card}>
+    <View style={styles.wrap}>
       <Text style={styles.title} accessibilityRole="header">
         Element vs isotope vs ion
       </Text>

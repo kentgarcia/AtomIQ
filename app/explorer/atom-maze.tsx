@@ -1,3 +1,7 @@
+import { RESULT_FX, resultActionsAt, resultStatAt } from "@/components/celebration/celebration-core";
+import { Stamp } from "@/components/lesson/Stamp";
+import { CountUp } from "@/components/motion/CountUp";
+import { Reveal } from "@/components/motion/Reveal";
 import { Icon } from "@/components/ui/icon";
 import type {
     AtomMazeChallenge,
@@ -27,7 +31,7 @@ import {
 } from "@/services/atom-maze-progression";
 import { recordActivity } from "@/services/activity-log";
 import { saveGameScore } from "@/services/database";
-import { playGameSfx, preloadGameSfx } from "@/services/game-sfx";
+import { playSfx, warmSfxGroup } from "@/services/sfx";
 import { ReadAloudButton } from "@/components/ui/read-aloud-button";
 import { readAloud } from "@/services/media";
 import { buildQuestionSpeech } from "@/services/media-core";
@@ -63,7 +67,6 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTheme, useResponsiveLayout } from "@/theme";
 import { EASE_OUT } from "@/theme/motion";
 import { vibrate } from "@/services/haptics";
-import { HowToPlayCard } from "@/components/games/HowToPlayCard";
 import { MAZE_BATTLE_ART, MonsterIcon, PlayerIcon } from "@/components/atom-maze/icons";
 import { styles } from "@/components/atom-maze/styles";
 
@@ -87,36 +90,6 @@ const ENDLESS_TIMING = {
   roomExitDelayMs: 0,
   walkOutMs: 0,
   walkInMs: 90,
-};
-
-/* Maze stage colors (mirrors the DifficultyPanel on the games tab). */
-const MAZE_COLORS: Record<string, string> = {
-  safety: "#FFB300",
-  radiation: "#FFA000",
-  history: "#FF8F00",
-  reactor: "#FFD54F",
-  default: "#FFB300",
-};
-
-const getMazeColor = (themeName: string | undefined): string => {
-  if (!themeName) return MAZE_COLORS.default;
-  const lowerTheme = themeName.toLowerCase();
-  if (lowerTheme.includes("safety")) return MAZE_COLORS.safety;
-  if (lowerTheme.includes("radiation")) return MAZE_COLORS.radiation;
-  if (lowerTheme.includes("history")) return MAZE_COLORS.history;
-  if (lowerTheme.includes("reactor")) return MAZE_COLORS.reactor;
-  return MAZE_COLORS.default;
-};
-
-/* Darken a hex color for the badge's 3D lip. */
-const darkenHex = (hex: string, amount: number): string => {
-  const mix = (v: number) =>
-    Math.max(0, Math.round(v * (1 - amount)))
-      .toString(16)
-      .padStart(2, "0");
-  return `#${mix(parseInt(hex.slice(1, 3), 16))}${mix(
-    parseInt(hex.slice(3, 5), 16),
-  )}${mix(parseInt(hex.slice(5, 7), 16))}`;
 };
 
 type AtomMazeStageDifficulty = "easy" | "average" | "difficult";
@@ -154,40 +127,6 @@ const STAGE_TO_REPOSITORY_DIFFICULTY: Record<
   average: "medium",
   difficult: "hard",
 };
-
-interface IntroHowToPlayStep {
-  id: string;
-  icon: string;
-  title: string;
-  hint: string;
-}
-
-const INTRO_HOW_TO_PLAY_STEPS: IntroHowToPlayStep[] = [
-  {
-    id: "quiz",
-    icon: "MessageQuestion",
-    title: "Answer Quiz",
-    hint: "Choose the best answer to keep advancing.",
-  },
-  {
-    id: "combo",
-    icon: "Activity",
-    title: "Build Combo",
-    hint: "Consecutive correct picks keep your momentum high.",
-  },
-  {
-    id: "focus",
-    icon: "Eye",
-    title: "Keep Focus",
-    hint: "Wrong answers reset your combo streak.",
-  },
-  {
-    id: "stage",
-    icon: "Map",
-    title: "Clear Stage",
-    hint: "Complete each stage to move to the next one.",
-  },
-];
 
 const getRoomStageDifficulty = (
   roomIndex: number,
@@ -714,7 +653,6 @@ export default function AtomMazeBattleScreen() {
   const arenaHeight = Math.min(Math.max(height * 0.42, 270), 360);
   const sceneTopPadding = Math.max(insets.top + 4, 10);
   const questionBottomPadding = Math.max(insets.bottom + 12, 18);
-  const introBottomPadding = Math.max(insets.bottom + 28, 36);
   const shouldConfirmExit =
     gameState.phase === "battle" ||
     gameState.phase === "victory" ||
@@ -722,12 +660,12 @@ export default function AtomMazeBattleScreen() {
     gameState.phase === "boss";
 
   useEffect(() => {
-    void preloadGameSfx();
+    warmSfxGroup("game");
   }, []);
 
   useEffect(() => {
     if (gameState.phase === "defeat") {
-      void playGameSfx("gameover");
+      void playSfx("game.over");
     }
     if (gameState.phase === "defeat" || gameState.phase === "complete") recordActivity("game_session", { id: "atom-maze" });
   }, [gameState.phase]);
@@ -969,6 +907,13 @@ export default function AtomMazeBattleScreen() {
     resetRunUi(maze, startRoomIndex);
   }, [maze]);
 
+  // Start the battle as soon as a run is ready: no instruction page in between (declared after the init effect so a
+  // fresh run is already set up when this fires)
+  useEffect(() => {
+    if (gameState.phase === "intro" && maze) handleStartGame();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [gameState.phase, maze]);
+
   // Get current room and question
   const currentRoom = maze?.rooms[gameState.currentRoomIndex];
   const isBossBattle = gameState.phase === "boss";
@@ -1079,6 +1024,7 @@ export default function AtomMazeBattleScreen() {
   }, []);
 
   const triggerAttackAnimation = useCallback((isPlayer: boolean) => {
+    void playSfx("lesson.whoosh");
     arenaPulse.value = withSequence(
       withTiming(1, { duration: 80 }),
       withTiming(0, { duration: 180 }),
@@ -1191,7 +1137,7 @@ export default function AtomMazeBattleScreen() {
 
     setIsAnswering(true);
     const isCorrect = selectedAnswer === served.question.correctAnswer;
-    void playGameSfx(isCorrect ? "correct" : "wrong");
+    void playSfx(isCorrect ? "lesson.answer-correct" : "lesson.answer-wrong");
 
     setShowResult(isCorrect ? "correct" : "wrong");
 
@@ -1202,7 +1148,7 @@ export default function AtomMazeBattleScreen() {
       // Player attacks monster
       triggerAttackAnimation(true);
       schedule(() => {
-        void playGameSfx("punch");
+        void playSfx("game.hit");
         triggerMonsterShake();
         triggerMonsterHurtPose();
       }, BATTLE_TIMING.impactMs);
@@ -1261,7 +1207,7 @@ export default function AtomMazeBattleScreen() {
       // Monster attacks player - wrong answer deals damage but stays on same question
       triggerAttackAnimation(false);
       schedule(() => {
-        void playGameSfx("punch");
+        void playSfx("game.hit");
         triggerPlayerShake();
         triggerPlayerHurtPose();
       }, BATTLE_TIMING.impactMs);
@@ -1693,148 +1639,9 @@ export default function AtomMazeBattleScreen() {
     );
   }
 
-  // Render intro screen
+  // A run starts on its own (the instructions live in the Games tab's header): an empty page until it does
   if (gameState.phase === "intro") {
-    const mazeColor = getMazeColor(maze.theme);
-    return (
-      <View style={[styles.container, { backgroundColor: introPalette.background }]}>
-        <View
-          style={[
-            styles.introHeader,
-            {
-              paddingTop: insets.top + 16,
-              paddingHorizontal: gutter,
-              width: "100%",
-              maxWidth: contentMaxWidth,
-              alignSelf: "center",
-            },
-          ]}
-        >
-          <TouchableOpacity
-            onPress={handleExit}
-            style={[
-              styles.introBackBtn,
-              {
-                backgroundColor: introPalette.backBtnBg,
-                borderColor: introPalette.backBtnBorder,
-              },
-            ]}
-            hitSlop={2}
-            accessibilityRole="button"
-            accessibilityLabel="Go back"
-          >
-            <Icon name="ArrowLeft2" size={20} color={introPalette.primaryText} />
-          </TouchableOpacity>
-          <View
-            style={[
-              styles.introBadge,
-              {
-                backgroundColor: mazeColor,
-                borderBottomColor: darkenHex(mazeColor, 0.18),
-              },
-            ]}
-          >
-            <Icon name="Game" size={18} color="#FFF" variant="Bold" />
-            <Text style={styles.introBadgeText}>AtomMaze</Text>
-          </View>
-          <View style={{ width: 44 }} />
-        </View>
-
-        <ScrollView
-          style={styles.introScrollView}
-          contentContainerStyle={[
-            styles.introScrollContent,
-            {
-              paddingBottom: introBottomPadding,
-              paddingHorizontal: gutter,
-              width: "100%",
-              maxWidth: contentMaxWidth,
-              alignSelf: "center",
-            },
-          ]}
-          showsVerticalScrollIndicator={false}
-          bounces
-        >
-          <Animated.View
-            entering={FadeInDown.delay(200)}
-            style={styles.introContainer}
-          >
-            {/* Title Card */}
-            <View
-              style={[
-                styles.introCard,
-                {
-                  backgroundColor: introPalette.cardBg,
-                  borderColor: introPalette.cardBorder,
-                },
-              ]}
-            >
-              <View style={styles.introModeRow}>
-                <View
-                  style={[
-                    styles.introModeIcon,
-                    { backgroundColor: `${mazeColor}1A` },
-                  ]}
-                >
-                  <Icon name="Grid9" size={22} color={mazeColor} variant="Bold" />
-                </View>
-                <Text style={[styles.introTagline, { color: mazeColor }]}>
-                  {maze.theme}
-                </Text>
-              </View>
-              <Text
-                style={[styles.introTitle, { color: introPalette.primaryText }]}
-              >
-                {maze.title}
-              </Text>
-              <Text
-                style={[
-                  styles.introSubtitle,
-                  { color: introPalette.mutedText },
-                ]}
-              >
-                {isEndlessMode
-                  ? "Endless waves · No boss"
-                  : `${maze.rooms.length} rooms · Boss: ${maze.boss.name}`}
-              </Text>
-              <Text
-                style={[
-                  styles.introDescription,
-                  { color: introPalette.mutedText },
-                ]}
-              >
-                {maze.description}
-              </Text>
-            </View>
-
-            {/* How to Play */}
-            <HowToPlayCard
-                steps={INTRO_HOW_TO_PLAY_STEPS}
-                palette={introPalette}
-                accentColor={mazeColor}
-            />
-
-            {/* Start Button */}
-            <TouchableOpacity
-              style={[
-                styles.startButtonCard,
-                {
-                  backgroundColor: introPalette.cardBg,
-                  borderColor: introPalette.cardBorder,
-                },
-              ]}
-              onPress={handleStartGame}
-              activeOpacity={0.9}
-            >
-              <Icon name="Play" size={26} color={mazeColor} variant="Bold" />
-              <Text style={[styles.startButtonCardText, { color: mazeColor }]}>
-                START BATTLE
-              </Text>
-            </TouchableOpacity>
-          </Animated.View>
-        </ScrollView>
-      </View>
-    );
+    return <View style={[styles.container, { backgroundColor: introPalette.background }]} />;
   }
 
   // Render defeat screen
@@ -2360,26 +2167,31 @@ export default function AtomMazeBattleScreen() {
                 style={styles.resultSprite}
               />
             </View>
-            <Text
-              style={[
-                styles.completeTitle,
-                { color: resultPalette.completeAccent },
-              ]}
-            >
-              VICTORY!
-            </Text>
-            <Text
-              style={[
-                styles.completeSubtitle,
-                { color: resultPalette.mutedText },
-              ]}
-            >
-              {isEndlessMode
-                ? "You answered every question in the bank."
-                : "You defeated the boss and cleared this run."}
-            </Text>
+            <Stamp at={RESULT_FX.title}>
+              <Text
+                style={[
+                  styles.completeTitle,
+                  { color: resultPalette.completeAccent },
+                ]}
+              >
+                VICTORY!
+              </Text>
+            </Stamp>
+            <Reveal at={RESULT_FX.message}>
+              <Text
+                style={[
+                  styles.completeSubtitle,
+                  { color: resultPalette.mutedText },
+                ]}
+              >
+                {isEndlessMode
+                  ? "You answered every question in the bank."
+                  : "You defeated the boss and cleared this run."}
+              </Text>
+            </Reveal>
 
-            <View
+            <Reveal
+              at={RESULT_FX.message + 100}
               style={[
                 styles.rewardCard,
                 {
@@ -2403,7 +2215,7 @@ export default function AtomMazeBattleScreen() {
                     ? `${scoreRef.current} points saved!`
                     : "Could not save score"}
               </Text>
-            </View>
+            </Reveal>
 
             <View
               style={[
@@ -2414,7 +2226,8 @@ export default function AtomMazeBattleScreen() {
                 },
               ]}
             >
-              <View
+              <Reveal
+                at={resultStatAt(0)}
                 style={[
                   styles.resultStatRow,
                   { borderBottomColor: resultPalette.statDivider },
@@ -2428,16 +2241,19 @@ export default function AtomMazeBattleScreen() {
                 >
                   Monsters Defeated
                 </Text>
-                <Text
+                <CountUp
+                  from={0}
+                  to={gameState.defeatedMonsters}
+                  at={resultStatAt(0)}
+                  duration={RESULT_FX.countMs}
                   style={[
                     styles.resultStatValue,
                     { color: resultPalette.primaryText },
                   ]}
-                >
-                  {gameState.defeatedMonsters}
-                </Text>
-              </View>
-              <View
+                />
+              </Reveal>
+              <Reveal
+                at={resultStatAt(1)}
                 style={[
                   styles.resultStatRow,
                   { borderBottomColor: resultPalette.statDivider },
@@ -2451,16 +2267,19 @@ export default function AtomMazeBattleScreen() {
                 >
                   Final Score
                 </Text>
-                <Text
+                <CountUp
+                  from={0}
+                  to={gameState.score}
+                  at={resultStatAt(1)}
+                  duration={RESULT_FX.countMs}
                   style={[
                     styles.resultStatValue,
                     { color: resultPalette.primaryText },
                   ]}
-                >
-                  {gameState.score}
-                </Text>
-              </View>
-              <View
+                />
+              </Reveal>
+              <Reveal
+                at={resultStatAt(2)}
                 style={[
                   styles.resultStatRow,
                   {
@@ -2477,17 +2296,21 @@ export default function AtomMazeBattleScreen() {
                 >
                   HP Remaining
                 </Text>
-                <Text
+                <CountUp
+                  from={0}
+                  to={gameState.playerHp}
+                  at={resultStatAt(2)}
+                  duration={RESULT_FX.countMs}
+                  format={(v) => `${v}/${gameState.playerMaxHp}`}
                   style={[styles.resultStatValue, { color: theme.success }]}
-                >
-                  {gameState.playerHp}/{gameState.playerMaxHp}
-                </Text>
-              </View>
+                />
+              </Reveal>
             </View>
           </View>
 
           {renderExhaustionNotice()}
 
+          <Reveal at={resultActionsAt(3)}>
           <TouchableOpacity
             style={styles.completeButton}
             onPress={handleExit}
@@ -2509,6 +2332,7 @@ export default function AtomMazeBattleScreen() {
               <Text style={styles.completeButtonText}>CLAIM REWARD</Text>
             </View>
           </TouchableOpacity>
+          </Reveal>
         </Animated.View>
       </LinearGradient>
     );

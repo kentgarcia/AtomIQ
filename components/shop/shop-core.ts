@@ -3,13 +3,14 @@
  * previews on the avatar.
  *
  * An item is one choice of the avatar (`components/avatar/avatar-core.ts`), for example the paint
- * "mint" or the pattern "p042", with a price in diamonds. Only paints and patterns are for sale so far:
+ * "mint" or the pattern "atomlab", with a price in diamonds. Only paints and patterns are for sale so far:
  * every one except the defaults every learner starts with (the `sky` paint and no pattern). Hair, eyes,
  * outfits and skin have no items yet. Previewing an item on the avatar works; buying and owning are not
  * built (they need a table in the user-state DB and a way to spend diamonds).
  */
 
 import { AVATAR_OPTIONS, DEFAULT_AVATAR, type AvatarConfig } from "../avatar/avatar-core.ts";
+import { patternDef } from "../avatar/pattern-art.ts";
 
 /** A tab of the shop: which choice of the avatar it sells. */
 export type ShopCategoryId = "hair" | "eyes" | "outfit" | "skin" | "paint" | "pattern";
@@ -36,7 +37,7 @@ export const SHOP_CATEGORIES: readonly ShopCategory[] = [
 export interface ShopItem {
   /** A shipped id, never reused. */
   id: string;
-  /** What a screen reader says: "Mint", "Pattern 43". */
+  /** What a screen reader says: "Mint", "Atom lab". */
   name: string;
   category: ShopCategoryId;
   /** The value the category's avatar choice takes (an id from `AVATAR_OPTIONS`). */
@@ -56,10 +57,10 @@ const PAINTS: ShopItem[] = AVATAR_OPTIONS.background
   .filter((id) => id !== DEFAULT_AVATAR.background)
   .map((id) => ({ id: `paint-${id}`, name: titleCase(id), category: "paint", value: id, price: PAINT_PRICE }));
 
-/** Every pattern tile but "none", numbered from 1 for the learner. */
+/** Every pattern but "none", named as `pattern-art.ts` names it. */
 const PATTERNS: ShopItem[] = AVATAR_OPTIONS.pattern
   .filter((id) => id !== DEFAULT_AVATAR.pattern)
-  .map((id, i) => ({ id: `pattern-${id}`, name: `Pattern ${i + 1}`, category: "pattern", value: id, price: PATTERN_PRICE }));
+  .map((id) => ({ id: `pattern-${id}`, name: patternDef(id)?.name ?? id, category: "pattern", value: id, price: PATTERN_PRICE }));
 
 export const SHOP_ITEMS: readonly ShopItem[] = [...PAINTS, ...PATTERNS];
 

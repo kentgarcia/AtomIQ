@@ -34,6 +34,8 @@ export interface ReadAloudButtonProps {
     /** Lowercase noun for labels: "question", "explanation", "message". */
     subject?: string;
     variant?: "icon" | "pill";
+    /** `flat`: no border, a soft tint of the accent at rest and the solid accent while reading. */
+    appearance?: "default" | "flat";
     /** Visual diameter/height of the icon variant (hit target stays >= 48). */
     size?: number;
     /** Feature colour for the active fill and idle icon. Defaults to theme.primary. */
@@ -49,6 +51,7 @@ export function ReadAloudButton({
     text,
     subject = "text",
     variant = "icon",
+    appearance = "default",
     size = 40,
     accent,
     onStart,
@@ -71,21 +74,26 @@ export function ReadAloudButton({
     const tint = accent ?? colors.primary;
     const readableOnTint = pickReadableText(tint, [colors.onPrimary, colors.text]);
 
+    const flat = appearance === "flat";
     const backgroundColor = model.failed
         ? colors.errorSurface
         : isActive
           ? tint
-          : colors.surfaceSoft;
-    const borderColor = model.failed
-        ? colors.error
-        : isActive
-          ? tint
-          : colors.border;
+          : flat
+            ? withAlpha(tint, 0.14)
+            : colors.surfaceSoft;
+    const borderColor = flat
+        ? "transparent"
+        : model.failed
+          ? colors.error
+          : isActive
+            ? tint
+            : colors.border;
     const foreground = model.failed
         ? colors.error
         : isActive
           ? readableOnTint
-          : tint === colors.primary
+          : tint === colors.primary && !flat
             ? colors.text
             : tint;
 

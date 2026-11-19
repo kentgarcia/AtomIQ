@@ -24,7 +24,8 @@ import { createStyles, fontFaces, fontSizes, radius, spacing, useTheme } from "@
 import { LESSON_FRAME, LessonFrame } from "./LessonFrame";
 import { Stamp } from "./Stamp";
 import { FINISH_STAMPS, STAMP_LANDS } from "./stamp-core";
-import { shineStart, statStart } from "./stat-reveal-core";
+import { STAT_FX, shineStart, statStart } from "./stat-reveal-core";
+import { SfxOnMount } from "@/components/ui/sfx-on-mount";
 import { StatTile } from "./StatTile";
 import { TextButton } from "./TextButton";
 
@@ -120,8 +121,30 @@ export function LessonFinish({ title, message, passed, stars, xp, accuracy, dura
     return { revealAt: statStart(n), shineAt: shineStart(n, tileCount) };
   };
 
+  // Sound (docs/SFX_SPEC.md §6.4), on the screen's own clock: the fanfare is the bed, and the stamp
+  // thud, the rising stars and each tile's landing sit under it at the frames they land. Reduced
+  // motion shows everything at once, so only the fanfare plays. A checkpoint below its pass mark
+  // gets the soft "wrong" cue, not a fanfare.
+  const sounds = (
+    <>
+      <SfxOnMount cue={passed ? "reward.finish-jingle" : "lesson.answer-wrong"} />
+      {!reduced && passed ? (
+        <>
+          <SfxOnMount cue="lesson.stamp" delay={FINISH_STAMPS.title + STAMP_LANDS} />
+          {[0, 1, 2].filter((i) => i < stars).map((i) => (
+            <SfxOnMount key={`star-${i}`} cue="lesson.star" index={i} delay={FINISH_STAMPS.stars + i * FINISH_STAMPS.starStep + STAMP_LANDS} />
+          ))}
+          {Array.from({ length: tileCount }, (_, n) => (
+            <SfxOnMount key={`tile-${n}`} cue="ui.select" volume={0.5} delay={statStart(n) + STAT_FX.gatherEnd} />
+          ))}
+        </>
+      ) : null}
+    </>
+  );
+
   return (
     <LessonFrame>
+      {sounds}
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         <View style={[LESSON_FRAME, styles.content]}>
           <View style={styles.hero}>
@@ -176,7 +199,7 @@ export function LessonFinish({ title, message, passed, stars, xp, accuracy, dura
             {time ? (
               <StatTile {...reveal()} tone={c.info} label="Time" value={time} countTo={Math.round((durationMs ?? 0) / 1000)} format={(n) => formatDuration(n * 1000)} icon={<Icon name="Clock" size={26} color={c.info} variant="Bold" />} accessibilityLabel={`Finished in ${time}`} />
             ) : null}
-            <StatTile {...reveal()} tone={c.success} label="First try" value={`${percent}%`} countTo={percent} format={(n) => `${n}%`} icon={<Icon name="Target" size={26} color={c.success} variant="Bold" />} accessibilityLabel={`${percent} percent right on the first try`} />
+            <StatTile {...reveal()} tone={c.success} label="Accuracy" value={`${percent}%`} countTo={percent} format={(n) => `${n}%`} icon={<Icon name="Target" size={26} color={c.success} variant="Bold" />} accessibilityLabel={`${percent} percent accuracy`} />
           </View>
           {hasDetails ? (
             <View>

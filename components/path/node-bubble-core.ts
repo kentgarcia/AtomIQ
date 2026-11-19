@@ -59,11 +59,12 @@ export function bubblePlacement(args: { x: number; y: number; mapWidth: number; 
  * (wrapping at about 11 px a letter) and the button or the locked hint. Used to decide which side
  * has room, so it errs a little tall.
  */
-export function bubbleHeight(args: { title: string; width: number; locked: boolean }): number {
+export function bubbleHeight(args: { title: string; width: number; locked: boolean; /** A sentence under the title (about 7.5 px a letter, 20 px a line). */ detail?: string; /** Lines the locked note takes when it is not the usual three. */ hintLines?: number }): number {
   const perLine = Math.max(8, Math.floor((args.width - 32) / 11));
   const titleLines = Math.min(3, Math.max(1, Math.ceil(args.title.length / perLine)));
-  const action = args.locked ? 8 + 3 * 19 : 12 + 62;
-  return 14 + 16 + 14 + 4 + titleLines * 26 + action + 4;
+  const action = args.locked ? 8 + (args.hintLines ?? 3) * 19 : 12 + 62;
+  const detailLines = args.detail ? Math.min(5, Math.ceil(args.detail.length / Math.max(8, Math.floor((args.width - 32) / 7.5)))) : 0;
+  return 14 + 16 + 14 + 4 + titleLines * 26 + (detailLines ? 4 + detailLines * 20 : 0) + action + 4;
 }
 
 export interface BubbleChoice {

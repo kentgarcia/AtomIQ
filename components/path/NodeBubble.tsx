@@ -41,6 +41,8 @@ export interface NodeBubbleProps {
   total: number;
   /** The unit's colours. Left out, the app's lesson yellow. A locked node's bubble is the locked grey whatever this is. */
   palette?: UnitPalette;
+  /** Wording that replaces the lesson map's own (the Atom Maze map speaks of levels): the small line, a sentence under the title, the button of an open stop and the note of a shut one. */
+  copy?: { eyebrow?: string; detail?: string; actionLabel?: string; hint?: string };
   /** Called the moment its button is released: the screen starts whatever arrives behind the zoom (the lesson preview). */
   onLaunch?: () => void;
   /** Called once the bubble has zoomed and dissolved away after its button was pressed. */
@@ -78,14 +80,19 @@ function BurstBit({ i, clock, size, color }: { i: number; clock: SharedValue<num
   );
 }
 
-function NodeBubbleBase({ x, y, mapWidth, side, sectionHeight, title, kind, status, index, total, palette, onLaunch, onAction }: NodeBubbleProps) {
+function NodeBubbleBase({ x, y, mapWidth, side, sectionHeight, title, kind, status, index, total, palette, copy: words, onLaunch, onAction }: NodeBubbleProps) {
   const { theme } = useTheme();
   const styles = useMemo(() => makeStyles(theme), [theme]);
   const reducedMotion = useReducedMotion();
   const c = theme.colors;
 
   const place = bubblePlacement({ x, y, mapWidth, current: status === "current" });
-  const copy = bubbleCopy({ kind, status, index, total });
+  const base = bubbleCopy({ kind, status, index, total });
+  const copy = {
+    eyebrow: words?.eyebrow ?? base.eyebrow,
+    actionLabel: base.actionLabel === null ? null : (words?.actionLabel ?? base.actionLabel),
+    hint: words?.hint ?? base.hint,
+  };
   const above = side === "above";
 
   // A locked node's bubble is the locked grey (the node's own); the others wear their unit's colours
@@ -181,6 +188,7 @@ function NodeBubbleBase({ x, y, mapWidth, side, sectionHeight, title, kind, stat
             <Text style={[styles.title, { color: ink }]} accessibilityRole="header">
               {title}
             </Text>
+            {words?.detail ? <Text style={[styles.detail, { color: withAlpha(ink, 0.9) }]}>{words.detail}</Text> : null}
           </Animated.View>
           {copy.actionLabel ? (
             <Pressable
@@ -278,6 +286,11 @@ const makeStyles = createStyles(() => {
       ...fontFaces.heavy,
       fontSize: 20,
       lineHeight: 26,
+    },
+    detail: {
+      ...fontFaces.semibold,
+      fontSize: 14,
+      lineHeight: 20,
     },
     /** The button: a white face on a lip in the unit's dark colour, sinking onto it when pressed. */
     actionLip: {

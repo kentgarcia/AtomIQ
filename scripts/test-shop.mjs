@@ -34,7 +34,7 @@ test("paints and patterns are for sale, every one except the defaults; nothing e
   const patterns = itemsIn("pattern");
   assert.deepEqual(paints.map((i) => i.value), AVATAR_OPTIONS.background.filter((id) => id !== DEFAULT_AVATAR.background));
   assert.deepEqual(patterns.map((i) => i.value), AVATAR_OPTIONS.pattern.filter((id) => id !== DEFAULT_AVATAR.pattern));
-  assert.ok(paints.length >= 10 && patterns.length === 84);
+  assert.ok(paints.length >= 10 && patterns.length === AVATAR_OPTIONS.pattern.length - 1);
   assert.ok(paints.every((i) => i.price === PAINT_PRICE) && patterns.every((i) => i.price === PATTERN_PRICE));
   assert.ok(!paints.some((i) => i.value === DEFAULT_AVATAR.background), "the starting paint is not sold");
   assert.ok(!patterns.some((i) => i.value === "none"), "no pattern is not sold");

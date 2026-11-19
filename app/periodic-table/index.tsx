@@ -1,30 +1,26 @@
 /**
  * Periodic Table — reference and guided learning (spec §5.2).
  *
- * Grid view for sighted users on roomy screens; a text-first list view is the
- * default for screen readers, compact widths and large font scales. Search and
- * category chips work in both. All data is bundled, so it works offline.
+ * Flat like the rest of the app: a search field, light chips, no cards, dashed dividers between list
+ * rows. Grid view for sighted users on roomy screens; a text-first list is the default for screen
+ * readers, compact widths and large font scales. Search and category chips work in both. All data is
+ * bundled, so it works offline.
  */
 
 import { useRouter } from "expo-router";
-import { FieldInput } from "@/components/ui/field-input";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import {
-    AccessibilityInfo,
-    FlatList,
-    Pressable,
-    ScrollView,
-    View,
-} from "react-native";
-import { Text } from "@/components/ui/text";
-import { useReducedMotion } from "react-native-reanimated";
+import { AccessibilityInfo, FlatList, Pressable, ScrollView, View } from "react-native";
+import Animated, { useReducedMotion } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { ScreenHeader, useHeaderBorder } from "@/components/layout";
+import { settle } from "@/components/motion/settle";
 import { ElementGrid } from "@/components/periodic-table/ElementGrid";
 import { ElementListRow } from "@/components/periodic-table/ElementListRow";
 import { useCategoryColors } from "@/components/periodic-table/use-category-colors";
-import { ScreenHeader, useHeaderBorder } from "@/components/layout";
+import { FieldInput } from "@/components/ui/field-input";
 import { Icon } from "@/components/ui/icon";
+import { Text } from "@/components/ui/text";
 import {
   CATEGORY_BLURBS,
   CATEGORY_LABELS,
@@ -32,6 +28,7 @@ import {
   type ElementCategory,
   type PeriodicElement,
 } from "@/content/periodic-table/elements";
+import { impactLight } from "@/services/haptics";
 import { elementRoute, filterElements, TOTAL_ELEMENTS } from "@/services/periodic-table";
 import { createStyles, fontFaces, layout, useResponsiveLayout, useTheme, withAlpha } from "@/theme";
 
@@ -41,21 +38,21 @@ type ViewMode = "grid" | "list";
 const ZOOM_STEPS = [48, 60, 72, 84] as const;
 const DEFAULT_ZOOM = 1;
 
-const makeStyles = createStyles((theme) => ({
-  root: { flex: 1, backgroundColor: theme.colors.background },
-  controls: { gap: 10, paddingTop: 12, paddingBottom: 8 },
+const useStyles = createStyles((theme) => ({
+  root: { flex: 1, backgroundColor: theme.colors.mapBackground },
+  controls: { gap: 10, paddingTop: 6, paddingBottom: 8 },
   searchRow: {
     flexDirection: "row",
     alignItems: "center",
     gap: 10,
-    minHeight: 56,
+    minHeight: 52,
     paddingHorizontal: 14,
     borderRadius: 16,
     backgroundColor: theme.colors.field,
   },
   searchInput: {
     flex: 1,
-    minHeight: 56,
+    minHeight: 52,
     fontSize: 15,
     ...fontFaces.semibold,
     color: theme.colors.fieldText,
@@ -66,123 +63,46 @@ const makeStyles = createStyles((theme) => ({
     height: layout.minTouchTarget,
     alignItems: "center",
     justifyContent: "center",
-    marginRight: -10,
+    marginRight: -12,
   },
-  toolRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    flexWrap: "wrap",
-    gap: 8,
-  },
-  segment: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-    minHeight: layout.minTouchTarget,
-    paddingHorizontal: 14,
-    borderRadius: 24,
-    borderWidth: 1.5,
-    borderColor: theme.colors.borderStrong,
-    backgroundColor: theme.colors.surface,
-  },
-  segmentSelected: {
-    borderWidth: 3,
-    borderColor: theme.colors.primary,
-    backgroundColor: withAlpha(theme.colors.primary, 0.12),
-  },
-  segmentText: {
-    fontSize: 14,
-    ...fontFaces.semibold,
-    color: theme.colors.text,
-  },
-  segmentTextSelected: { ...fontFaces.heavy },
-  zoomGroup: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-    marginLeft: "auto",
-  },
-  zoomBtn: {
-    width: layout.minTouchTarget,
-    height: layout.minTouchTarget,
-    borderRadius: layout.minTouchTarget / 2,
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 1.5,
-    borderColor: theme.colors.borderStrong,
-    backgroundColor: theme.colors.surface,
-  },
-  zoomBtnDisabled: { opacity: 0.4 },
-  chipsContent: { gap: 8, paddingRight: 16 },
+  toolRow: { flexDirection: "row", alignItems: "center", gap: 6 },
   chip: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 8,
-    minHeight: layout.minTouchTarget,
-    paddingHorizontal: 14,
-    borderRadius: 24,
+    gap: 6,
+    minHeight: 36,
+    paddingHorizontal: 12,
+    borderRadius: 12,
     borderWidth: 1.5,
+    borderColor: theme.colors.border,
+    backgroundColor: theme.colors.surface,
   },
-  chipSelected: { borderWidth: 3 },
-  chipDot: { width: 12, height: 12, borderRadius: 6 },
-  chipText: {
-    fontSize: 14,
-    lineHeight: 19,
-    ...fontFaces.semibold,
-    color: theme.colors.text,
-  },
-  chipTextSelected: { ...fontFaces.heavy },
-  summary: {
-    fontSize: 13,
-    lineHeight: 18,
-    ...fontFaces.semibold,
-    color: theme.colors.textSecondary,
-  },
-  blurb: {
-    fontSize: 13,
-    lineHeight: 19,
-    ...fontFaces.book,
-    color: theme.colors.textSecondary,
-  },
-  hint: {
-    marginTop: 12,
-    fontSize: 13,
-    lineHeight: 19,
-    ...fontFaces.book,
-    color: theme.colors.textSecondary,
-  },
-  empty: {
-    alignItems: "center",
-    gap: 10,
-    paddingVertical: 28,
-    paddingHorizontal: 16,
-  },
-  emptyTitle: {
-    fontSize: 16,
-    lineHeight: 22,
-    ...fontFaces.heavy,
-    color: theme.colors.text,
-    textAlign: "center",
-  },
-  emptyBtn: {
-    minHeight: layout.minTouchTarget,
-    paddingHorizontal: 20,
-    borderRadius: 24,
+  chipActive: { backgroundColor: theme.colors.primarySurface, borderColor: theme.colors.primaryBorder },
+  chipPressed: { opacity: 0.7 },
+  chipText: { fontSize: 13, ...fontFaces.bold, color: theme.colors.textSecondary },
+  chipTextActive: { color: theme.colors.text },
+  zoomGroup: { flexDirection: "row", alignItems: "center", gap: 6, marginLeft: "auto" },
+  zoomBtn: {
+    width: 36,
+    height: 36,
+    borderRadius: 12,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: theme.colors.primary,
+    borderWidth: 1.5,
+    borderColor: theme.colors.border,
+    backgroundColor: theme.colors.surface,
   },
-  emptyBtnText: {
-    fontSize: 14,
-    ...fontFaces.heavy,
-    color: theme.colors.onPrimary,
-  },
+  zoomBtnDisabled: { opacity: 0.4 },
+  chipsContent: { gap: 6, paddingRight: 16 },
+  catDot: { width: 10, height: 10, borderRadius: 5 },
+  summary: { fontSize: 13, lineHeight: 18, ...fontFaces.semibold, color: theme.colors.textMuted },
+  blurb: { fontSize: 13, lineHeight: 19, ...fontFaces.medium, color: theme.colors.textMuted },
+  hint: { marginTop: 12, fontSize: 13, lineHeight: 19, ...fontFaces.medium, color: theme.colors.textMuted },
+  divider: { height: 0, borderTopWidth: 1, borderStyle: "dashed", borderColor: theme.colors.border },
+  empty: { alignItems: "center", gap: 12, paddingVertical: 28, paddingHorizontal: 16 },
+  emptyTitle: { fontSize: 16, lineHeight: 22, ...fontFaces.heavy, color: theme.colors.text, textAlign: "center" },
+  emptyText: { fontSize: 14, lineHeight: 20, ...fontFaces.medium, color: theme.colors.textMuted, textAlign: "center" },
 }));
-
-function RowSeparator() {
-  return <View style={rowSeparatorStyle} />;
-}
-const rowSeparatorStyle = { height: 8 } as const;
 
 function useScreenReaderEnabled(): boolean {
   const [enabled, setEnabled] = useState(false);
@@ -202,12 +122,19 @@ function useScreenReaderEnabled(): boolean {
   return enabled;
 }
 
+/** Declared once: an inline component would be a new type every render and remount each divider. */
+function Divider() {
+  const { theme } = useTheme();
+  const styles = useStyles(theme);
+  return <View style={styles.divider} />;
+}
+
 export default function PeriodicTableScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { scrolled, onScroll, scrollEventThrottle } = useHeaderBorder();
   const { theme } = useTheme();
-  const styles = useMemo(() => makeStyles(theme), [theme]);
+  const styles = useStyles(theme);
   const colors = useCategoryColors();
   const reduceMotion = useReducedMotion();
   const screenReader = useScreenReaderEnabled();
@@ -261,22 +188,23 @@ export default function PeriodicTableScreen() {
   const empty =
     filtered.length === 0 ? (
       <View style={styles.empty}>
-        <Text style={styles.emptyTitle}>No elements match your search.</Text>
+        <Text style={styles.emptyTitle}>No elements match.</Text>
+        <Text style={styles.emptyText}>Try a name, a symbol like “Fe”, or an atomic number.</Text>
         <Pressable
           accessibilityRole="button"
           accessibilityLabel="Clear search and filters"
           onPress={clearFilters}
-          style={styles.emptyBtn}
+          style={({ pressed }) => [styles.chip, styles.chipActive, pressed && styles.chipPressed]}
         >
-          <Text style={styles.emptyBtnText}>Clear filters</Text>
+          <Text style={[styles.chipText, styles.chipTextActive]}>Clear filters</Text>
         </Pressable>
       </View>
     ) : undefined;
 
   const controls = (
-    <View style={[mode === "grid" ? contentFrameStyle : null, styles.controls]}>
+    <Animated.View entering={settle()} style={[mode === "grid" ? contentFrameStyle : null, styles.controls]}>
       <View style={styles.searchRow}>
-        <Icon name="SearchNormal" size={18} color={theme.colors.textSecondary} variant="Bold" />
+        <Icon name="SearchNormal" size={18} color={theme.colors.textFaint} variant="Bold" />
         <FieldInput
           style={styles.searchInput}
           value={query}
@@ -289,13 +217,8 @@ export default function PeriodicTableScreen() {
           maxFontSizeMultiplier={1.6}
         />
         {query.length > 0 ? (
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel="Clear search"
-            onPress={() => setQuery("")}
-            style={styles.clearBtn}
-          >
-            <Icon name="CloseCircle" size={20} color={theme.colors.textSecondary} variant="Bold" />
+          <Pressable accessibilityRole="button" accessibilityLabel="Clear search" onPress={() => setQuery("")} style={styles.clearBtn}>
+            <Icon name="CloseCircle" size={20} color={theme.colors.textFaint} variant="Bold" />
           </Pressable>
         ) : null}
       </View>
@@ -303,27 +226,26 @@ export default function PeriodicTableScreen() {
       <View style={styles.toolRow}>
         {(["grid", "list"] as const).map((value) => {
           const selected = mode === value;
-          const label = value === "grid" ? "Grid" : "List";
           return (
             <Pressable
               key={value}
               accessibilityRole="button"
               accessibilityLabel={value === "grid" ? "Grid view" : "List view"}
-              accessibilityHint={
-                value === "list" ? "A simple list that is easier with a screen reader or large text" : undefined
-              }
+              accessibilityHint={value === "list" ? "A simple list that is easier with a screen reader or large text" : undefined}
               accessibilityState={{ selected }}
-              onPress={() => setUserMode(value)}
-              style={[styles.segment, selected && styles.segmentSelected]}
+              onPress={() => {
+                impactLight();
+                setUserMode(value);
+              }}
+              style={({ pressed }) => [styles.chip, selected && styles.chipActive, pressed && styles.chipPressed]}
             >
               <Icon
                 name={value === "grid" ? "Grid1" : "TextalignLeft"}
-                size={18}
-                color={selected ? theme.colors.primary : theme.colors.textSecondary}
+                size={16}
+                color={selected ? theme.colors.text : theme.colors.textMuted}
                 variant="Bold"
               />
-              <Text style={[styles.segmentText, selected && styles.segmentTextSelected]}>{label}</Text>
-              {selected ? <Icon name="TickCircle" size={16} color={theme.colors.primary} variant="Bold" /> : null}
+              <Text style={[styles.chipText, selected && styles.chipTextActive]}>{value === "grid" ? "Grid" : "List"}</Text>
             </Pressable>
           );
         })}
@@ -338,7 +260,7 @@ export default function PeriodicTableScreen() {
               onPress={() => setZoom((z) => Math.max(0, z - 1))}
               style={[styles.zoomBtn, zoom === 0 && styles.zoomBtnDisabled]}
             >
-              <Icon name="Minus" size={20} color={theme.colors.text} variant="Linear" />
+              <Icon name="Minus" size={18} color={theme.colors.text} variant="Linear" />
             </Pressable>
             <Pressable
               accessibilityRole="button"
@@ -348,7 +270,7 @@ export default function PeriodicTableScreen() {
               onPress={() => setZoom((z) => Math.min(ZOOM_STEPS.length - 1, z + 1))}
               style={[styles.zoomBtn, zoom === ZOOM_STEPS.length - 1 && styles.zoomBtnDisabled]}
             >
-              <Icon name="Add" size={20} color={theme.colors.text} variant="Linear" />
+              <Icon name="Add" size={18} color={theme.colors.text} variant="Linear" />
             </Pressable>
           </View>
         ) : null}
@@ -372,15 +294,14 @@ export default function PeriodicTableScreen() {
               accessibilityHint={CATEGORY_BLURBS[key]}
               accessibilityState={{ selected }}
               onPress={() => toggleCategory(key)}
-              style={[
+              style={({ pressed }) => [
                 styles.chip,
-                { backgroundColor: c.fill, borderColor: selected ? c.text : c.accent },
-                selected && styles.chipSelected,
+                selected && { backgroundColor: withAlpha(c.accent, 0.16), borderColor: c.accent },
+                pressed && styles.chipPressed,
               ]}
             >
-              <View style={[styles.chipDot, { backgroundColor: c.accent }]} />
-              <Text style={[styles.chipText, selected && styles.chipTextSelected]}>{CATEGORY_LABELS[key]}</Text>
-              {selected ? <Icon name="TickCircle" size={16} color={c.text} variant="Bold" /> : null}
+              <View style={[styles.catDot, { backgroundColor: c.accent }]} />
+              <Text style={[styles.chipText, selected && styles.chipTextActive]}>{CATEGORY_LABELS[key]}</Text>
             </Pressable>
           );
         })}
@@ -390,17 +311,12 @@ export default function PeriodicTableScreen() {
         {summary}
       </Text>
       {category ? <Text style={styles.blurb}>{CATEGORY_BLURBS[category]}</Text> : null}
-    </View>
+    </Animated.View>
   );
 
   return (
     <View style={styles.root}>
-      <ScreenHeader
-        title="Periodic Table"
-        subtitle="Tap an element to learn more"
-        onBack={onBack}
-        scrolled={scrolled}
-      />
+      <ScreenHeader title="Periodic Table" subtitle="Tap an element to learn more" onBack={onBack} scrolled={scrolled} />
       {mode === "list" ? (
         <FlatList
           data={filtered}
@@ -408,17 +324,14 @@ export default function PeriodicTableScreen() {
           renderItem={renderRow}
           ListHeaderComponent={controls}
           ListEmptyComponent={empty}
-          ItemSeparatorComponent={RowSeparator}
+          ItemSeparatorComponent={Divider}
           onScroll={onScroll}
           scrollEventThrottle={scrollEventThrottle}
           keyboardShouldPersistTaps="handled"
           initialNumToRender={14}
           maxToRenderPerBatch={14}
           windowSize={7}
-          contentContainerStyle={[
-            contentFrameStyle,
-            { paddingBottom: insets.bottom + 24 },
-          ]}
+          contentContainerStyle={[contentFrameStyle, { paddingBottom: insets.bottom + 24 }]}
           showsVerticalScrollIndicator={false}
         />
       ) : (
@@ -442,11 +355,10 @@ export default function PeriodicTableScreen() {
             />
           </View>
           {empty}
-          <View style={[contentFrameStyle]}>
+          <View style={contentFrameStyle}>
             <Text style={styles.hint}>
               Scroll sideways to see all 18 groups. Use the zoom buttons to resize the cells.
-              {hasFilter ? " Faded elements do not match your search or filter." : ""} Prefer text?
-              Switch to List view.
+              {hasFilter ? " Faded elements do not match your search or filter." : ""} Prefer text? Switch to List view.
             </Text>
           </View>
         </ScrollView>

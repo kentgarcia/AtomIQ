@@ -321,6 +321,18 @@ export interface Myth {
   popularity: number; // How common this myth is (1-10)
 }
 
+/** One myth-or-fact statement of a unit's deck (Myth Buster, Quick Play). */
+export interface UnitStatement {
+  id: string;
+  unitId: string;
+  /** 0-based order within its unit. */
+  position: number;
+  statement: string;
+  /** `myth`: the statement is false. `fact`: it is true. */
+  verdict: 'myth' | 'fact';
+  explanation: string;
+}
+
 // ============================================
 // COMMON TYPES
 // ============================================

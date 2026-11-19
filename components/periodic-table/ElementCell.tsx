@@ -50,7 +50,9 @@ function ElementCellBase({ element, size, colors, dimmed, reduceMotion, onPress 
           // a small scale; never by colour alone.
           borderWidth: pressed ? 3 : 1.5,
           opacity: dimmed ? 0.28 : 1,
-          transform: pressed && !reduceMotion ? [{ scale: 0.94 }] : undefined,
+          // Always an array: going from [{ scale }] to undefined makes React Native process a null
+          // transform, which throws in development ("forEach of null" in processTransform).
+          transform: [{ scale: pressed && !reduceMotion ? 0.94 : 1 }],
         },
       ]}
     >

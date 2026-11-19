@@ -384,3 +384,20 @@ CREATE INDEX IF NOT EXISTS idx_encyclopedia_difficulty ON encyclopedia_entries(d
 
 -- Optional JSON1 expression index example — makes `WHERE json_extract(tags,'$[0]') = 'basics'` fast
 -- CREATE INDEX IF NOT EXISTS idx_lessons_tags_json ON lessons(json_extract(tags, '$'));
+
+-- BEGIN unit-statements
+-- Myth Buster, Quick Play: each unit is a theme with a short deck of myth-or-fact statements. `verdict` is
+-- 'myth' (the statement is false) or 'fact' (it is true). The DB holds values only; the game is code.
+CREATE TABLE IF NOT EXISTS unit_statements (
+  id          TEXT PRIMARY KEY,                -- e.g. 'inside-the-atom-s01'
+  unit_id     TEXT NOT NULL REFERENCES units(id),
+  position    INTEGER NOT NULL DEFAULT 0,      -- 0-based order within its unit
+  statement   TEXT NOT NULL,
+  verdict     TEXT NOT NULL CHECK (verdict IN ('myth', 'fact')),
+  explanation TEXT NOT NULL DEFAULT '',
+  created_at  INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
+  updated_at  INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
+  UNIQUE (unit_id, position)
+);
+CREATE INDEX IF NOT EXISTS idx_unit_statements_unit ON unit_statements(unit_id);
+-- END unit-statements

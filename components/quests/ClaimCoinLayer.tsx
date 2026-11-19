@@ -14,8 +14,9 @@ import { View } from "react-native";
 import Animated, { useAnimatedStyle, type SharedValue } from "react-native-reanimated";
 
 import { useOneShotClock } from "@/components/motion/motion";
-import { getClaimTarget, subscribeClaimFlights, type ClaimFlight, type FlightKind } from "@/components/quests/claim-fx-bus";
-import { coinFrame, coinSpec, flightTotal, landingRing, SKIP_FILL, type Point } from "@/components/quests/claim-fx-core";
+import { emitClaimLanding, getClaimTarget, subscribeClaimFlights, type ClaimFlight, type FlightKind } from "@/components/quests/claim-fx-bus";
+import { CLAIM_FX, coinFrame, coinSpec, flightTotal, landingRing, SKIP_FILL, type Point } from "@/components/quests/claim-fx-core";
+import { playSfx } from "@/services/sfx";
 import { createStyles, useTheme } from "@/theme";
 
 const XP_ICON = require("@/assets/images/icons/xp.png");
@@ -30,14 +31,15 @@ interface Flight {
   target: Point;
   kind: FlightKind;
   count: number;
+  skipFill: boolean;
 }
 
-function Coin({ index, count, kind, clock, origin, target }: { index: number; count: number; kind: FlightKind; clock: SharedValue<number>; origin: Point; target: Point }) {
+function Coin({ index, count, kind, skipFill, clock, origin, target }: { index: number; count: number; kind: FlightKind; skipFill: boolean; clock: SharedValue<number>; origin: Point; target: Point }) {
   const { theme } = useTheme();
   const styles = useMemo(() => makeStyles(theme), [theme]);
   const spec = useMemo(() => coinSpec(index, count), [index, count]);
-  // A chest's diamonds have no bar fill to wait for
-  const skip = kind === "diamond" ? SKIP_FILL : 0;
+  // A chest's diamonds (or a fact's XP) have no bar fill to wait for
+  const skip = skipFill ? SKIP_FILL : 0;
   const rel = useMemo(() => ({ x: target.x - origin.x, y: target.y - origin.y }), [origin, target]);
   const style = useAnimatedStyle(() => {
     const f = coinFrame(spec, clock.get() + skip, rel);
@@ -56,7 +58,7 @@ function Coin({ index, count, kind, clock, origin, target }: { index: number; co
 function FlightView({ flight, onDone }: { flight: Flight; onDone: (id: number) => void }) {
   const { theme } = useTheme();
   const styles = useMemo(() => makeStyles(theme), [theme]);
-  const skip = flight.kind === "diamond" ? SKIP_FILL : 0;
+  const skip = flight.skipFill ? SKIP_FILL : 0;
   const total = flightTotal(flight.count) - skip;
   const clock = useOneShotClock(total, true, false);
 
@@ -64,6 +66,27 @@ function FlightView({ flight, onDone }: { flight: Flight; onDone: (id: number) =
     const id = setTimeout(() => onDone(flight.id), total);
     return () => clearTimeout(id);
   }, [flight.id, total, onDone]);
+
+  // Sound (docs/SFX_SPEC.md §6.5), in the order the flight plays: the coins pop out of the bar (or the
+  // chest) with one pop, then a tick as each one lands, a step higher than the last. A chest's
+  // diamonds end on the coin cue; an XP claim's coin cue is played by the quest row at CLAIM_AT.
+  useEffect(() => {
+    const appear = setTimeout(() => void playSfx("reward.appear"), Math.max(0, CLAIM_FX.scatterStart - skip));
+    const timers = Array.from({ length: flight.count }, (_, i) => {
+      const lands = CLAIM_FX.magnetStart + i * CLAIM_FX.magnetStagger + CLAIM_FX.magnetDuration - skip;
+      const last = i === flight.count - 1;
+      return setTimeout(() => {
+        if (flight.kind === "diamond" && last) void playSfx("reward.coin");
+        else void playSfx("ui.tick", { index: i });
+        // The counter that shows the total takes this coin's share now (counter-core.ts)
+        emitClaimLanding({ kind: flight.kind, index: i, count: flight.count });
+      }, Math.max(0, lands));
+    });
+    return () => {
+      clearTimeout(appear);
+      timers.forEach(clearTimeout);
+    };
+  }, [flight.count, flight.kind, skip]);
 
   const ringStyle = useAnimatedStyle(() => {
     const r = landingRing(clock.get() + skip, flight.count);
@@ -77,7 +100,7 @@ function FlightView({ flight, onDone }: { flight: Flight; onDone: (id: number) =
         style={[styles.ring, { left: flight.target.x - RING / 2, top: flight.target.y - RING / 2, opacity: 0 }, ringStyle]}
       />
       {Array.from({ length: flight.count }, (_, i) => (
-        <Coin key={i} index={i} count={flight.count} kind={flight.kind} clock={clock} origin={flight.origin} target={flight.target} />
+        <Coin key={i} index={i} count={flight.count} kind={flight.kind} skipFill={flight.skipFill} clock={clock} origin={flight.origin} target={flight.target} />
       ))}
     </>
   );
@@ -103,7 +126,7 @@ function ClaimCoinLayerBase({ tabsRowRef, tabCount }: ClaimCoinLayerProps) {
       layer.measureInWindow((lx: number, ly: number) => {
         const origin = { x: announced.origin.x - lx, y: announced.origin.y - ly };
         const fly = (target: Point) =>
-          setFlights((cur) => [...cur, { id: announced.id, origin, target, kind: announced.kind, count: announced.count }]);
+          setFlights((cur) => [...cur, { id: announced.id, origin, target, kind: announced.kind, count: announced.count, skipFill: announced.skipFill }]);
         const toTab = () =>
           row.measureInWindow((rx: number, ry: number, rw: number, rh: number) => {
             const tabWidth = rw / Math.max(1, tabCount);

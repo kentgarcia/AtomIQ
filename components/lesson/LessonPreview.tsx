@@ -176,7 +176,7 @@ export function LessonPreview({
         </ScrollView>
 
         <View style={[styles.footer, LESSON_FRAME, GUTTER, { paddingBottom: bottom + spacing.sm }]}>
-          <Button label={action} accessibilityLabel={actionLabel} onPress={onProceed} />
+          <Button label={action} accessibilityLabel={actionLabel} shine onPress={onProceed} />
         </View>
       </View>
     </LessonFrame>

@@ -7,6 +7,7 @@ import React, { useEffect } from "react";
 import { Pressable, StyleSheet } from "react-native";
 import Animated, { useAnimatedStyle, useReducedMotion, useSharedValue, withTiming } from "react-native-reanimated";
 
+import { playSfx } from "@/services/sfx";
 import { useTheme } from "@/theme";
 import { DURATION, EASE_OUT } from "@/theme/motion";
 
@@ -36,7 +37,12 @@ export function Toggle({
 
   return (
     <Pressable
-      onPress={() => onValueChange(!value)}
+      onPress={() => {
+        // Off sounds before the change so turning Sound Effects off is heard; the Settings row plays
+        // its own preview for turning them on.
+        void playSfx(value ? "ui.toggle-off" : "ui.toggle-on");
+        onValueChange(!value);
+      }}
       hitSlop={8}
       accessibilityRole="switch"
       accessibilityLabel={accessibilityLabel}

@@ -14,7 +14,7 @@ import { Pressable, StyleSheet, View, type StyleProp, type ViewStyle } from "rea
 import { darken } from "@/components/lesson/visual/color-math";
 import { BEZEL, Bezel } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
-import { playButtonClickSfx } from "@/services/ui-sfx";
+import { playSfx } from "@/services/sfx";
 import { useTheme } from "@/theme";
 
 export type IconButtonVariant = "primary" | "success" | "destructive" | "neutral";
@@ -66,7 +66,7 @@ export function IconButton({
             disabled={disabled}
             testID={testID}
             onPress={() => {
-                void playButtonClickSfx();
+                void playSfx("ui.press");
                 onPress();
             }}
             style={[styles.root, style]}

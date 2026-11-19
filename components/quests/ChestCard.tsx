@@ -26,6 +26,7 @@ import { emitClaimFlight } from "@/components/quests/claim-fx-bus";
 import { CHEST_LOOP, CHEST_OPEN } from "@/components/quests/chest-sheets";
 import { SpriteSheet } from "@/components/ui/SpriteSheet";
 import { impactLight, notifySuccess } from "@/services/haptics";
+import { playSfx } from "@/services/sfx";
 import type { ChestStatus, MissionPeriod } from "@/services/missions-core";
 import { createStyles, fontFaces, useTheme } from "@/theme";
 
@@ -95,9 +96,22 @@ export function ChestCard({ period, status, reward, size = DEFAULT_CHEST_SIZE, o
     setOpening(false);
   }, [onOpen, reduced, float]);
 
+  // The chest becomes ready while this screen is showing (the last quest was just claimed): once,
+  // on the change only, never when the screen mounts with a chest already ready.
+  const lastStatus = useRef(status);
+  useEffect(() => {
+    if (lastStatus.current === "locked" && status === "ready") void playSfx("reward.chest-ready");
+    lastStatus.current = status;
+  }, [status]);
+
   const startOpening = () => {
+    if (status === "locked") {
+      void playSfx("ui.lock");
+      return;
+    }
     if (opening || status !== "ready") return;
     impactLight();
+    void playSfx("reward.chest-open");
     if (reduced) {
       void finishOpening();
       return;
@@ -110,7 +124,7 @@ export function ChestCard({ period, status, reward, size = DEFAULT_CHEST_SIZE, o
       ref={chestRef}
       collapsable={false}
       onPress={startOpening}
-      disabled={status !== "ready" || opening}
+      disabled={status === "opened" || opening}
       accessibilityRole="button"
       accessibilityLabel={status === "ready" ? `Open the ${name.toLowerCase()}` : status === "opened" ? `${name}, opened` : `${name}, locked`}
       accessibilityState={{ disabled: status !== "ready" || opening }}

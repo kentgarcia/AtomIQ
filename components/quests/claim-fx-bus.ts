@@ -15,6 +15,8 @@ export interface ClaimFlight {
   kind: FlightKind;
   /** How many coins fly. */
   count: number;
+  /** The flight does not follow a bar's fill (a chest's diamonds, a fact's XP): its coins pop out at once. */
+  skipFill: boolean;
 }
 
 type Listener = (flight: ClaimFlight) => void;
@@ -31,10 +33,38 @@ export function subscribeClaimFlights(listener: Listener): () => void {
 }
 
 /** Announce a claim that starts now, coming out of `origin` (window coordinates). */
-export function emitClaimFlight(origin: { x: number; y: number }, options: { kind?: FlightKind; count?: number } = {}): void {
+export function emitClaimFlight(origin: { x: number; y: number }, options: { kind?: FlightKind; count?: number; skipFill?: boolean } = {}): void {
   const kind = options.kind ?? "xp";
-  const flight: ClaimFlight = { id: nextId++, origin, kind, count: options.count ?? (kind === "xp" ? 8 : 5) };
+  const flight: ClaimFlight = { id: nextId++, origin, kind, count: options.count ?? (kind === "xp" ? 8 : 5), skipFill: options.skipFill ?? kind === "diamond" };
   listeners.forEach((l) => l(flight));
+}
+
+/* ------------------------------------------------------------------ */
+/* Landings                                                             */
+/* ------------------------------------------------------------------ */
+
+/** One coin has landed on its target: the counter that shows the total takes its share of the gain. */
+export interface ClaimLanding {
+  kind: FlightKind;
+  /** Which coin of the flight (0-based). */
+  index: number;
+  count: number;
+}
+
+type LandingListener = (landing: ClaimLanding) => void;
+const landingListeners = new Set<LandingListener>();
+
+/** Listen for coins landing. Returns the unsubscribe function. */
+export function subscribeClaimLandings(listener: LandingListener): () => void {
+  landingListeners.add(listener);
+  return () => {
+    landingListeners.delete(listener);
+  };
+}
+
+/** Announce that a coin has just landed (the coin layer does, on each landing's own time). */
+export function emitClaimLanding(landing: ClaimLanding): void {
+  landingListeners.forEach((l) => l(landing));
 }
 
 /* ------------------------------------------------------------------ */

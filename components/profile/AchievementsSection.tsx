@@ -1,7 +1,7 @@
 /**
  * AchievementsSection — the Profile tab's achievements, flat on the page (no card): the first
  * four as round badges in one row, under a heading whose arrow opens the full list
- * (`app/achievements.tsx`, which uses `AchievementsGrid` below). A ring around the badge fills toward the next level; the title and level sit
+ * (`app/achievements.tsx`). A ring around the badge fills toward the next level; the title and level sit
  * under it. Each achievement ranks up through levels, one badge picture per level. Tapping one
  * opens its detail screen. Progress comes from the profile's numbers (plus the quests-claimed
  * counter), the same ones the passport's badge picker reads.
@@ -17,7 +17,7 @@ import { AchievementBadge } from "@/components/achievements/AchievementBadge";
 import { Icon } from "@/components/ui/icon";
 import { useAchievementValues } from "@/hooks/use-achievement-values";
 import { ACHIEVEMENTS, achievementValue, progressFor, type AchievementProgress, type AchievementTrack } from "@/services/achievements-core";
-import { createStyles, fontFaces, useResponsiveLayout, useTheme } from "@/theme";
+import { createStyles, fontFaces, useTheme } from "@/theme";
 
 const RING_WIDTH = 7;
 const MAX_DIAMETER = 124;
@@ -111,24 +111,6 @@ export function useAwards() {
 }
 
 const GAP = 12;
-
-/** All the achievements, wrapped in columns inside `gutter` dp of space on each side. */
-export function AchievementsGrid({ gutter }: { gutter: number }) {
-  const router = useRouter();
-  const { awards } = useAwards();
-  const { contentWidth } = useResponsiveLayout();
-  const columns = contentWidth >= 600 ? 4 : 3;
-  const itemWidth = Math.max(0, Math.floor((contentWidth - gutter * 2 - GAP * (columns - 1)) / columns));
-  return (
-    <View style={{ flexDirection: "row", flexWrap: "wrap", gap: GAP }}>
-      {awards.map(({ track, progress }) => (
-        <View key={track.id} style={{ width: itemWidth }}>
-          <RoundTile track={track} progress={progress} onPress={() => router.push(`/achievement-detail?achievementId=${track.id}`)} />
-        </View>
-      ))}
-    </View>
-  );
-}
 
 export function AchievementsSection({ limit = 4 }: { limit?: number }) {
   const router = useRouter();

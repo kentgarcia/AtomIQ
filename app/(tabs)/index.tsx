@@ -13,10 +13,12 @@ import { unitRingProgress } from "@/services/lesson-progress-core";
 import type { PathState } from "@/services/path-core";
 import { openExternalUrl } from "@/services/open-url";
 import { getBetaNoticeSeen, setBetaNoticeSeen } from "@/services/storage";
-import { useStorage } from "@/services/StorageContext";
 import { useStreakCelebration } from "@/hooks/use-streak-celebration";
 import { useTheme, createStyles, withAlpha, fontFaces, useResponsiveLayout } from "@/theme";
-import { useFocusEffect, useRouter } from "expo-router";
+import { useFocusEffect, useIsFocused, useRouter } from "expo-router";
+import { playSfx } from "@/services/sfx";
+import { impactLight } from "@/services/haptics";
+import { NODE_REVEAL } from "@/components/celebration/celebration-core";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
     Alert,
@@ -155,9 +157,11 @@ const buildPath = (
 const getNodeX = (globalIndex: number, width: number) =>
   width / 2 + Math.sin(globalIndex * 0.8) * 80;
 
+// dev-admin: development-only controls (components/dev); Metro drops this in a release build. Remove with the folder.
+const DevAdminFab: typeof import("@/components/dev/DevAdminFab").DevAdminFab | null = __DEV__ ? require("@/components/dev/DevAdminFab").DevAdminFab : null;
+
 export default function HomeScreen() {
   const router = useRouter();
-  const { levelUpLevel, dismissLevelUp } = useStorage();
   useStreakCelebration();
   const { data: curriculum, state: pathState, runProgress, loading, refresh } = useCurriculumPath();
   const { theme, isDark } = useTheme();
@@ -232,6 +236,44 @@ export default function HomeScreen() {
     return map;
   }, [units, c, isDark]);
   const completedKey = pathState.currentNodeId ?? "done";
+
+  // Finishing a lesson moves "next up" on, and the map announces it (docs/SFX_SPEC.md §6.2, and the duolingo-motion-style
+  // skill): the node just completed stamps its check badge on, the next one pops, with the sound and a haptic on the pop.
+  // It plays when the map is in front: a change that comes in while a lesson is still on top waits for the map to return.
+  // The first value after loading (from nothing) is not an unlock.
+  const focused = useIsFocused();
+  // The reveal is worked out while rendering, in the same render that draws the new statuses, so the node that
+  // is about to be stamped or popped never shows its finished look for a frame first.
+  const currentNodeId = pathState.currentNodeId ?? null;
+  const [trackedNode, setTrackedNode] = useState<string | null>(null);
+  const [pendingReveal, setPendingReveal] = useState<{ completedId: string; unlockedId: string | null } | null>(null);
+  const [revealSeq, setRevealSeq] = useState(0);
+  const [reveal, setReveal] = useState<{ completedId: string; unlockedId: string | null; key: number } | null>(null);
+  let due = pendingReveal;
+  if (currentNodeId !== trackedNode) {
+    setTrackedNode(currentNodeId);
+    if (trackedNode !== null) due = { completedId: trackedNode, unlockedId: currentNodeId };
+  }
+  if (due && focused) {
+    setPendingReveal(null);
+    setRevealSeq(revealSeq + 1);
+    setReveal({ ...due, key: revealSeq + 1 });
+  } else if (due !== pendingReveal) {
+    setPendingReveal(due);
+  }
+  const revealKey = reveal?.key;
+  const revealUnlocks = reveal?.unlockedId != null;
+  useEffect(() => {
+    if (revealKey === undefined) return;
+    const timers: ReturnType<typeof setTimeout>[] = [];
+    const wait = reducedMotion ? 0 : NODE_REVEAL.wait;
+    if (revealUnlocks) {
+      timers.push(setTimeout(() => void playSfx("lesson.unlock"), wait + (reducedMotion ? 0 : NODE_REVEAL.sound)));
+      timers.push(setTimeout(impactLight, wait + (reducedMotion ? 0 : NODE_REVEAL.haptic)));
+    }
+    timers.push(setTimeout(() => setReveal(null), wait + NODE_REVEAL.total + 200));
+    return () => timers.forEach(clearTimeout);
+  }, [revealKey, revealUnlocks, reducedMotion]);
 
   // Locate the first "current" (next up) node
   let currentUnitIndex = -1;
@@ -375,6 +417,8 @@ export default function HomeScreen() {
       bandBottom,
     });
     setSelected({ id: node.id, side: choice.side });
+    // A locked node says "not yet"; any other opens with a small pop
+    void (node.status === "locked" ? playSfx("ui.lock") : playSfx("reward.pop", { volume: 0.7 }));
     // Start loading the preview now, while the learner reads the bubble
     const picked = units.flatMap((u) => u.levels).find((n) => n.id === node.id);
     if (picked?.kind === "lesson" && picked.lessonId) void prefetchPreview(picked.lessonId);
@@ -407,6 +451,7 @@ export default function HomeScreen() {
   const launchNode = (node: PathNode) => {
     if (node.kind !== "lesson" || !node.lessonId) return;
     const lessonId = node.lessonId;
+    void playSfx("lesson.zoom-in");
     void prefetchPreview(lessonId).then((data) => {
       if (data) {
         setPreview({ lessonId, data });
@@ -443,7 +488,10 @@ export default function HomeScreen() {
     if (preview.data.savedPercent !== null) setResumeAsk(true);
     else openLesson();
   }, [preview, openLesson, setResumeAsk]);
-  const closePreview = useCallback(() => setPreviewOpen(false), []);
+  const closePreview = useCallback(() => {
+    void playSfx("lesson.zoom-out");
+    setPreviewOpen(false);
+  }, []);
   const previewGone = useCallback(() => setPreview(null), []);
 
   // Global index across all units (for the winding path)
@@ -517,6 +565,8 @@ export default function HomeScreen() {
                   status={node.status}
                   glyph={node.glyph}
                   palette={palette}
+                  reveal={reveal?.completedId === node.id ? "completed" : reveal?.unlockedId === node.id ? "unlocked" : undefined}
+                  revealKey={reveal?.key}
                   progress={
                     node.status === "current"
                       ? unitRingProgress(
@@ -701,6 +751,9 @@ export default function HomeScreen() {
         <Icon name="InfoCircle" size={20} color="#EA580C" variant="Bold" />
       </TouchableOpacity>
 
+      {/* dev-admin */}
+      {DevAdminFab ? <DevAdminFab bottom={tabBarInset + 16} onChanged={refresh} /> : null}
+
       {/* Floating "jump to current lesson" arrow */}
       {arrowDir && currentUnitIndex !== -1 && (
         <Animated.View
@@ -783,25 +836,6 @@ export default function HomeScreen() {
             {ref.url ? <Icon name="ArrowRight2" size={14} color={c.textMuted} /> : null}
           </TouchableOpacity>
         ))}
-      </ModalDialog>
-
-      {/* Level-up celebration: the house modal, shown once when XP crosses a level boundary */}
-      <ModalDialog
-        visible={levelUpLevel !== null}
-        onClose={dismissLevelUp}
-        title="Level up!"
-        closeLabel="Keep going"
-        footer={<ModalButton label="Keep going" onPress={dismissLevelUp} />}
-      >
-        <View style={styles.levelUpBody}>
-          <View style={styles.levelUpCrown}>
-            <Icon name="Crown1" size={34} color={c.gold} variant="Bold" />
-          </View>
-          <Text style={styles.levelUpValue}>Level {levelUpLevel}</Text>
-          <Text style={styles.levelUpSub}>
-            You&apos;ve reached a new tier of nuclear mastery. Keep earning XP to level up again!
-          </Text>
-        </View>
       </ModalDialog>
 
       {/* Public beta notice — shown on startup so testers know what to expect */}
@@ -1051,33 +1085,6 @@ const makeStyles = createStyles((theme) => {
       fontSize: 14,
       color: c.text,
       ...fontFaces.bold,
-    },
-    /* Level-up modal content (the card, header and button are the house ModalDialog) */
-    levelUpBody: {
-      alignItems: "center",
-      gap: 8,
-    },
-    levelUpCrown: {
-      width: 72,
-      height: 72,
-      borderRadius: 36,
-      backgroundColor: c.surfaceSoft,
-      borderWidth: 3,
-      borderColor: c.border,
-      alignItems: "center",
-      justifyContent: "center",
-    },
-    levelUpValue: {
-      fontSize: 30,
-      ...fontFaces.heavy,
-      color: c.text,
-    },
-    levelUpSub: {
-      fontSize: 14,
-      ...fontFaces.regular,
-      color: c.textSecondary,
-      textAlign: "center",
-      lineHeight: 21,
     },
   };
 });

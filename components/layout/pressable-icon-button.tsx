@@ -14,7 +14,7 @@ import {
     type ViewStyle,
 } from "react-native";
 
-import { playButtonClickSfx } from "@/services/ui-sfx";
+import { playSfx } from "@/services/sfx";
 import { useTheme, withAlpha } from "@/theme";
 import { layout } from "@/theme/layout";
 
@@ -55,7 +55,7 @@ export function PressableIconButton({
                 if (disabled) {
                     return;
                 }
-                void playButtonClickSfx();
+                void playSfx("ui.press");
                 onPress();
             }}
             style={({ pressed }) => [

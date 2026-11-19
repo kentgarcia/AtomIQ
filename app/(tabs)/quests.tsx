@@ -7,8 +7,9 @@
  */
 
 import { useFocusEffect } from "expo-router";
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useMemo } from "react";
 import { RefreshControl, ScrollView, View } from "react-native";
+import { usePullRefresh } from "@/hooks/use-pull-refresh";
 
 import { ScreenHeader, useHeaderBorder, useTabBarInset } from "@/components/layout";
 import { HeaderCurrency } from "@/components/quests/HeaderCurrency";
@@ -26,7 +27,6 @@ export default function QuestsScreen() {
 
   const { daily, weekly, claim, openPeriodChest, refresh: refreshMissions } = useMissions();
 
-  const [refreshing, setRefreshing] = useState(false);
 
   // Progress is earned elsewhere (Myth Buster, the daily fact), so re-read on focus
   useFocusEffect(
@@ -35,11 +35,7 @@ export default function QuestsScreen() {
     }, [refreshMissions]),
   );
 
-  const onRefresh = useCallback(async () => {
-    setRefreshing(true);
-    await refreshMissions();
-    setRefreshing(false);
-  }, [refreshMissions]);
+  const { refreshing, onRefresh, spinner } = usePullRefresh(refreshMissions);
 
   const claimMission = useCallback((mission: MissionView) => claim(mission), [claim]);
 
@@ -56,11 +52,7 @@ export default function QuestsScreen() {
         ]}
         showsVerticalScrollIndicator={false}
         refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={() => void onRefresh()}
-            tintColor={theme.colors.textMuted}
-          />
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} {...spinner} />
         }
       >
         <View style={styles.stack}>

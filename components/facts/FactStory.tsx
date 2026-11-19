@@ -6,7 +6,7 @@
  */
 
 import { Image as ExpoImage } from "expo-image";
-import React, { useMemo } from "react";
+import React, { useCallback, useMemo, useRef } from "react";
 import { View } from "react-native";
 
 import { renderRichText } from "@/components/community/rich-text";
@@ -27,21 +27,39 @@ export function FactStory({
 }: {
   fact: DailyFact | null;
   open: boolean;
-  onClose: () => void;
+  /**
+   * The learner is done. When today's XP is still to be claimed, `origin` is the middle of the "Got it" button in
+   * window coordinates: the XP coins fly from there (the screen plays them).
+   */
+  onClose: (origin?: { x: number; y: number }) => void;
   /** Today's fact mission is claimed (or this is an old fact): the button shows no XP. */
   claimed?: boolean;
   reward?: number;
 }) {
   const { theme } = useTheme();
   const styles = useMemo(() => makeStyles(theme), [theme]);
+  const buttonRef = useRef<React.ComponentRef<typeof View>>(null);
+  // Every way out (the button, the X, the scrim, back) says where the button is, so unclaimed XP can fly from it
+  const close = useCallback(() => {
+    const button = buttonRef.current;
+    if (claimed || !button) {
+      onClose();
+      return;
+    }
+    button.measureInWindow((x, y, w, h) => onClose(w > 0 && h > 0 ? { x: x + w / 2, y: y + h / 2 } : undefined));
+  }, [claimed, onClose]);
   return (
     <ModalDialog
       visible={open}
-      onClose={onClose}
+      onClose={close}
       title="Did you know?"
       closeLabel="Close daily fact"
       maxWidth={440}
-      footer={<ModalButton label={claimed ? "Got it" : `Got it · +${reward} XP`} onPress={onClose} />}
+      footer={
+        <View ref={buttonRef} collapsable={false}>
+          <ModalButton label={claimed ? "Got it" : `Got it · +${reward} XP`} onPress={close} />
+        </View>
+      }
     >
       <View style={styles.sheetHead}>
         <ExpoImage source={MASCOT} style={styles.sheetMascot} contentFit="contain" />

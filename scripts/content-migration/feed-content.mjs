@@ -22,7 +22,7 @@ import { fileURLToPath } from "node:url";
 import { DatabaseSync } from "node:sqlite";
 
 import { backupBeforeScript } from "../lib/backup.mjs";
-import { BLOG_LIMITS, blogWordCount, readingMinutes } from "../lib/feed-vocab.mjs";
+import { BLOG_LIMITS, LEARNER_POSTER, blogWordCount, readingMinutes } from "../lib/feed-vocab.mjs";
 import { validateFeed } from "../lib/feed-rules.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
@@ -38,6 +38,8 @@ const MINA = "npc-mina";
 const KOFI = "npc-kofi";
 const TESS = "npc-tess";
 const SAGE = "npc-sage";
+/** The learner as poster: a template with this as its whole pool is written in the learner's voice. */
+const LEARNER = LEARNER_POSTER;
 
 /**
  * Per unit: who teaches it, who else posts about it, the lessons (two variants each: `a` for any
@@ -118,9 +120,13 @@ const short = (npcId) => npcId.replace(/^npc-/, "");
 
 /** Templates that belong to no unit: the poster is picked from `pool` when the post is made. */
 const SHARED = [
-  { id: "ft-streak-3", pool: [TESS, MINA], kind: "milestone", trigger: "streak", condition: { days: 3 }, text: "{days} days in a row. That is how a habit starts. Come back tomorrow and make it four.", chip: "quests" },
-  { id: "ft-streak-7", pool: [RAY, KOFI], kind: "milestone", trigger: "streak", condition: { days: 7 }, text: "Someone has come back {days} days in a row. A full week of steady work, and it shows.", chip: "quests" },
-  { id: "ft-streak-30", pool: [SAGE, ADA, HAL], kind: "milestone", trigger: "streak", condition: { days: 30 }, text: "{days} days. A month of showing up for atoms. That takes real patience, and you have it.", chip: null },
+  // Streak posts are the learner's own voice (pool ["learner"]): "I kept a 7 day streak", with their avatar. Friends react.
+  { id: "ft-streak-3", pool: [LEARNER], kind: "milestone", trigger: "streak", condition: { days: 3 }, text: "{days} days in a row. A habit is starting, and I want to see it through.", chip: "quests", reactors: [TESS] },
+  { id: "ft-streak-7", pool: [LEARNER], kind: "milestone", trigger: "streak", condition: { days: 7 }, text: "A full week: {days} days in a row. I keep showing up for atoms.", chip: "quests", reactors: [RAY] },
+  { id: "ft-streak-14", pool: [LEARNER], kind: "milestone", trigger: "streak", condition: { days: 14 }, text: "{days} days in a row. Two weeks of learning something every single day.", chip: "quests", reactors: [MINA] },
+  { id: "ft-streak-30", pool: [LEARNER], kind: "milestone", trigger: "streak", condition: { days: 30 }, text: "{days} days. A whole month of showing up for atoms. I am proud of that.", chip: null, reactors: [SAGE] },
+  { id: "ft-streak-60", pool: [LEARNER], kind: "milestone", trigger: "streak", condition: { days: 60 }, text: "{days} days in a row. Two months of steady learning, one day at a time.", chip: "quests", reactors: [KOFI] },
+  { id: "ft-streak-100", pool: [LEARNER], kind: "milestone", trigger: "streak", condition: { days: 100 }, text: "{days} days in a row. One hundred days! I did not think I would make it this far.", chip: null, reactors: [ADA] },
   { id: "ft-chest-daily", pool: [TESS, KOFI], kind: "celebrate", trigger: "chest_opened", condition: { period: "daily" }, text: "A daily chest, opened. Small reward, steady habit.", chip: "quests" },
   { id: "ft-chest-weekly", pool: [ADA, MINA], kind: "celebrate", trigger: "chest_opened", condition: { period: "weekly" }, text: "The weekly chest is open. Every quest of the week is done. That was a lot of small steps.", chip: "quests" },
   { id: "ft-chest-any", pool: [RAY, SAGE], kind: "celebrate", trigger: "chest_opened", condition: {}, text: "Someone just opened a chest on Quests. Nice and steady.", chip: "quests" },
@@ -129,8 +135,12 @@ const SHARED = [
   { id: "ft-rank-any", pool: [RAY, MINA, KOFI, SAGE], kind: "nudge", trigger: "rank_change", condition: {}, text: "The weekly ranking moved: you and {rival} traded places. Take a look.", chip: "ranks" },
   { id: "ft-first-lesson-1", pool: [ADA, SAGE], kind: "celebrate", trigger: "first_lesson", condition: {}, text: "Someone just finished a very first lesson, “{lesson}”. Everyone starts somewhere.", chip: "lesson" },
   { id: "ft-first-lesson-2", pool: [ADA, KOFI], kind: "celebrate", trigger: "first_lesson", condition: {}, text: "Your first lesson is done: “{lesson}”. That is one lesson closer to knowing what everything is made of.", chip: "lesson" },
-  { id: "ft-comeback-3", pool: [TESS, MINA], kind: "nudge", trigger: "comeback", condition: { minDays: 3 }, text: "Welcome back. Pick up where you left off. The atoms waited.", chip: null },
-  { id: "ft-comeback-7", pool: [HAL, SAGE], kind: "nudge", trigger: "comeback", condition: { minDays: 7 }, text: "It has been a while. No rush. One lesson is enough to start again.", chip: null },
+  // Comeback posts are a teacher welcoming the learner back.
+  { id: "ft-comeback-3", pool: [TESS, MINA], kind: "nudge", trigger: "comeback", condition: { minDays: 3 }, text: "Welcome back, {name}. Pick up where you left off. The atoms waited.", chip: null },
+  { id: "ft-comeback-3b", pool: [ADA, KOFI], kind: "nudge", trigger: "comeback", condition: { minDays: 3 }, text: "There you are, {name}. We saved your seat. Ready for one more lesson?", chip: null },
+  { id: "ft-comeback-7", pool: [HAL, SAGE], kind: "nudge", trigger: "comeback", condition: { minDays: 7 }, text: "It has been a while, {name}. No rush. One lesson is enough to start again.", chip: null },
+  { id: "ft-comeback-7b", pool: [MINA, RAY], kind: "nudge", trigger: "comeback", condition: { minDays: 7 }, text: "{name}, you are back, and we missed you. Start small. One lesson is plenty.", chip: null },
+  { id: "ft-comeback-14", pool: [ADA, HAL, SAGE], kind: "nudge", trigger: "comeback", condition: { minDays: 14 }, text: "Welcome back, {name}. The door was open the whole time. Let's find where you stopped.", chip: null },
   { id: "ft-quests-1", pool: [KOFI, TESS], kind: "celebrate", trigger: "daily_quests_done", condition: {}, text: "Every daily quest is claimed. That was a full day's work, and the chest is waiting.", chip: "quests" },
   { id: "ft-quests-2", pool: [RAY, MINA], kind: "celebrate", trigger: "daily_quests_done", condition: {}, text: "All the daily quests are done. Go and open the chest.", chip: "quests" },
 ];
@@ -262,7 +272,7 @@ const BLOGS = [
 // Build rows
 // ---------------------------------------------------------------------------
 
-function buildTemplates(unitIds, lessonIds) {
+export function buildTemplates(unitIds, lessonIds) {
   const rows = [];
   const push = (r) => rows.push({ pool: [], chip: null, reactors: [], weight: 1, ...r });
   for (const [unitId, u] of Object.entries(UNITS)) {
@@ -327,7 +337,7 @@ export function seedFeed(db, { overwrite = false } = {}) {
   const verb = overwrite ? "INSERT OR REPLACE" : "INSERT OR IGNORE";
   const insT = db.prepare(`${verb} INTO feed_templates (id, npc_id, poster_pool, kind, trigger, condition, text, chip, reactors, weight) VALUES (?,?,?,?,?,?,?,?,?,?)`);
   for (const t of buildTemplates(unitIds, lessonIds)) {
-    for (const n of [t.npc, ...t.pool, ...t.reactors].filter(Boolean)) if (!npcIds.has(n)) throw new Error(`${t.id}: unknown NPC ${n}`);
+    for (const n of [t.npc, ...t.pool, ...t.reactors].filter((x) => x && x !== LEARNER_POSTER)) if (!npcIds.has(n)) throw new Error(`${t.id}: unknown NPC ${n}`);
     stats.templates += Number(insT.run(t.id, t.npc, json(t.pool), t.kind, t.trigger, json(t.condition), t.text, t.chip, json(t.reactors), t.weight).changes);
   }
 

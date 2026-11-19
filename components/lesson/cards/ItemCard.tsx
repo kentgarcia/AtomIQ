@@ -18,6 +18,8 @@ import type {
 import { View } from "react-native";
 import { Text } from "@/components/ui/text";
 
+import { CascadeIn } from "@/components/motion/cascade-context";
+import { PAGE_FX } from "@/components/motion/cascade-fx";
 import { Icon } from "@/components/ui/icon";
 import { createStyles, fontFaces, fontSizes, radius, spacing, useTheme, withAlpha, type Theme } from "@/theme";
 
@@ -84,7 +86,9 @@ export function ItemCard(props: ItemCardProps) {
   const { theme } = useTheme();
   return (
     <View style={{ flexGrow: 1, gap: spacing.lg }}>
-      <ItemTitle type={props.item.type} theme={theme} />
+      <CascadeIn at={PAGE_FX.title}>
+        <ItemTitle type={props.item.type} theme={theme} />
+      </CascadeIn>
       <ItemBody {...props} />
     </View>
   );

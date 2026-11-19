@@ -6,13 +6,15 @@ import {
 } from "@/components/layout";
 import { ClaimCoinLayer } from "@/components/quests/ClaimCoinLayer";
 import { useFeedUnseenCount } from "@/hooks/use-feed";
-import { playButtonClickSfx } from "@/services/ui-sfx";
+import { playSfx } from "@/services/sfx";
 import { fontFaces, layout, useTheme } from "@/theme";
 import { TAB_BAR_CONSTANTS, TAB_BAR_TAB_COUNT } from "@/theme/tab-bar-metrics";
 import type { BottomTabBarProps } from "expo-router/js-tabs";
 import { Image } from "expo-image";
+import { Redirect } from "expo-router";
 import { Tabs } from "expo-router/js-tabs";
-import React from "react";
+import { useStorage } from "@/services/StorageContext";
+import React, { useEffect } from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { Text } from "@/components/ui/text";
 import Animated, {
@@ -59,6 +61,19 @@ const TabButton = ({
   const scale = useSharedValue(1);
   const reducedMotion = useReducedMotion();
 
+  // The dot pops in (from 85%, 180 ms, ease-out) when it appears while the bar is showing; a dot that is already there when
+  // the bar mounts is simply there. The dot is out of the layout, so nothing moves.
+  const hasDot = dot !== undefined;
+  const dotIn = useSharedValue(hasDot ? 1 : 0);
+  useEffect(() => {
+    if (!hasDot) {
+      dotIn.set(0);
+      return;
+    }
+    dotIn.set(reducedMotion ? 1 : withTiming(1, { duration: 180, easing: EASE_OUT }));
+  }, [hasDot, reducedMotion, dotIn]);
+  const dotStyle = useAnimatedStyle(() => ({ opacity: dotIn.get(), transform: [{ scale: 0.85 + 0.15 * dotIn.get() }] }));
+
   const animatedStyle = useAnimatedStyle(() => {
     return {
       transform: [{ scale: reducedMotion ? 1 : scale.value }],
@@ -66,7 +81,7 @@ const TabButton = ({
   });
 
   const handlePress = () => {
-    void playButtonClickSfx();
+    void playSfx("ui.tab");
     if (reducedMotion) {
       scale.value = withTiming(0.99, { duration: 100, easing: EASE_OUT });
       setTimeout(() => {
@@ -99,12 +114,13 @@ const TabButton = ({
           />
           {/* The dot sits over the icon's corner, so the bar's height does not change */}
           {dot ? (
-            <View
+            <Animated.View
               pointerEvents="none"
               accessible={false}
               style={[
                 styles.dot,
                 { backgroundColor: dot.color, borderColor: dot.ring },
+                dotStyle,
               ]}
             />
           ) : null}
@@ -232,6 +248,9 @@ function ModernTabBar({ state, emitter, navigateToTab }: BottomTabBarProps) {
 }
 
 export default function TabLayout() {
+  const { isLoading, onboardingCompleted } = useStorage();
+  // Onboarding always comes first: if the tabs are ever reached without it (a back gesture, a restored screen), go through it
+  if (!isLoading && !onboardingCompleted) return <Redirect href="/onboarding" />;
   return (
     <TabBarInsetProvider>
       <Tabs

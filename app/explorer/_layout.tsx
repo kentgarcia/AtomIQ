@@ -9,6 +9,8 @@ export default function ExplorerLayout() {
       <Stack.Screen name="encyclopedia" options={{ headerShown: false }} />
       <Stack.Screen name="encyclopedia-entry" options={{ headerShown: false }} />
       <Stack.Screen name="atom-maze" options={{ headerShown: false }} />
+      <Stack.Screen name="story" options={{ headerShown: false }} />
+      <Stack.Screen name="platformer" options={{ headerShown: false }} />
     </Stack>
   );
 }

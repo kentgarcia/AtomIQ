@@ -11,7 +11,8 @@
  *   1. a screen that lets the learner pick an id from each catalog (`AVATAR_OPTIONS` lists them),
  *   2. `updateUserProfile({ avatar_url: serializeAvatar(config) })` to save it,
  *   3. new catalog rows for anything unlocked later (a hat, a new hair colour).
- * For now there is one fixed design, `DEFAULT_AVATAR`, and nothing in the app lets it change.
+ * For now there are two starting designs (`STARTER_AVATARS`: `DEFAULT_AVATAR` and a version with her hair in a bun), chosen
+ * once on onboarding's profile step; nothing else in the app lets the design change yet.
  *
  * Storage: the existing `user_profile.avatar_url` text column holds `serializeAvatar(config)`, i.e.
  * `avatar:v1:{...ids}`. Anything else in that column (the old photo file names, an empty string) reads as
@@ -19,8 +20,8 @@
  * app can read a newer value and a newer app can read an older one.
  *
  * The picture behind the figure is a paint (a solid colour, `background`) with an optional `pattern` over
- * it: tiles baked into masks (`scripts/bake-pattern-masks.mjs`), tinted white and drawn at 50%
- * (`PatternLayer.tsx`), so the shapes are a lighter tone of the paint and the paint still sets the colour.
+ * it: a wallpaper of small flat pictures (`pattern-art.ts`), drawn white at 50% (`PatternLayer.tsx`), so the
+ * shapes are a lighter tone of the paint and the paint still sets the colour.
  *
  * Colours are fixed (theme exception EX-12, like the teachers): the same in light and dark mode. They are
  * taken from `npc-palette.ts` by name, so this file has no colour literals. No imports beyond types and
@@ -29,6 +30,7 @@
 
 import type { EyeStyle, HairStyle, NpcSpec, OutfitKind } from "../npc/npc-art.ts";
 import { CUSTOM, OFFICIAL as O } from "../npc/npc-palette.ts";
+import { PATTERN_COUNT, PATTERN_IDS } from "./pattern-art.ts";
 
 const trio = (t: readonly string[]) => ({ base: t[0], shade: t[1], feature: t[2] });
 
@@ -82,16 +84,15 @@ export const BACKGROUNDS = {
   stone: O.anchovy,
 } as const;
 
-/** How many pattern tiles there are (assets/images/pattern, `pattern_000.png` and up; baked into assets/images/pattern-mask). Their ids are `p000`, `p001`... */
-export const PATTERN_COUNT = 84;
-export const PATTERN_IDS: readonly string[] = Array.from({ length: PATTERN_COUNT }, (_, i) => `p${String(i).padStart(3, "0")}`);
+/** The patterns (`PATTERN_DEFS` in `pattern-art.ts`): ids are words, `atomlab`, `polka`... */
+export { PATTERN_COUNT, PATTERN_IDS };
 
 export type SkinId = keyof typeof SKIN_TONES;
 export type HairColorId = keyof typeof HAIR_COLORS;
 export type OutfitColorId = keyof typeof OUTFIT_COLORS;
 export type BackgroundId = keyof typeof BACKGROUNDS;
-/** A pattern tile id, or `none` for a plain paint. */
-export type PatternId = "none" | `p${number}`;
+/** A pattern id (a word from `PATTERN_IDS`), or `none` for a plain paint. */
+export type PatternId = string;
 export type HeadId = "tombstone" | "capsule";
 export type NoseId = "single" | "double";
 export type FacialHairId = "none" | "moustache" | "beard";
@@ -142,6 +143,25 @@ export const DEFAULT_AVATAR: AvatarConfig = {
   background: "sky",
   pattern: "none",
 };
+
+/** The second starting design: hair in a bun, round eyes, a single nose, a pink sweater on a blush paint. */
+export const BUN_AVATAR: AvatarConfig = {
+  ...DEFAULT_AVATAR,
+  eyes: "round",
+  nose: "single",
+  hairStyle: "bun",
+  hairColor: "dark",
+  outfit: "sweater",
+  outfitColor: "pink",
+  background: "blush",
+};
+
+/** The two designs the learner picks from when they make their profile. `label` is what a screen reader says. */
+export const STARTER_AVATARS = [
+  { id: "classic", label: "Avatar with short hair", config: DEFAULT_AVATAR },
+  { id: "bun", label: "Avatar with hair in a bun", config: BUN_AVATAR },
+] as const;
+export type StarterId = (typeof STARTER_AVATARS)[number]["id"];
 
 // ── storage format ───────────────────────────────────────────────────────────
 

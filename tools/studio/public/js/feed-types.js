@@ -194,7 +194,7 @@ const FEED_TEMPLATES = {
     conditionField,
     sel("kind", "Kind", vocab().FEED_KINDS, { hint: "celebrate and milestone skew reactions to clap and love, tease to wow." }),
     txt("npc_id", "Poster", { nullable: true, suggest: { table: "npcs", column: "id" }, hint: "An NPC id. Leave empty to choose from the pool below." }),
-    { key: "poster_pool", label: "Poster pool (when there is no poster)", type: "refs", kinds: "npcs" },
+    { key: "poster_pool", label: "Poster pool (when there is no poster)", type: "refs", kinds: "npcs", hint: 'Or just "learner": the post is written in the learner\'s own voice (streaks), with their avatar.' },
     area("text", "Text", 3, { required: true, hint: `Up to ${vocab().FEED_TEXT_MAX} characters. Write it speaking to the learner (“You finished…”) or about them (“Someone just…”). Put a lesson title in quotes: “{lesson}”.` }),
     sel("chip", "Button", vocab().FEED_CHIPS, { nullable: true, hint: "What the post's chip opens. Allowed chips depend on the trigger." }),
     { key: "reactors", label: "Always reacts", type: "refs", kinds: "npcs", hint: "For a unit milestone, the unit's teacher. Never the poster." },

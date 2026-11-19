@@ -9,10 +9,10 @@
 import { useRouter } from "expo-router";
 import { memo } from "react";
 import { Pressable, View } from "react-native";
-import Animated, { FadeIn, useReducedMotion } from "react-native-reanimated";
+import Animated, { useReducedMotion } from "react-native-reanimated";
 
 import { BlogCover } from "@/components/feed/BlogCover";
-import { NpcHead } from "@/components/feed/NpcHead";
+import { HeadLink } from "@/components/feed/HeadLink";
 import { ReactionRow } from "@/components/feed/ReactionRow";
 import { actionPhrase, blogHref, blogSpokenLabel, metaLine, reactionSpoken, readTimeLabel, relativeTime, relativeTimeSpoken } from "@/components/feed/feed-ui-core";
 import { pushHref } from "@/components/feed/navigate";
@@ -22,7 +22,7 @@ import type { Npc } from "@/content/npcs";
 import type { FeedItem } from "@/services/feed";
 import { impactLight } from "@/services/haptics";
 import { createStyles, fontFaces, useTheme } from "@/theme";
-import { EASE_OUT } from "@/theme/motion";
+import { settle } from "@/components/motion/settle";
 
 const COVER = 92;
 
@@ -56,9 +56,11 @@ export interface BlogCardProps {
   cast: ReadonlyMap<string, Npc>;
   now: number;
   fresh?: boolean;
+  /** The author's avatar opens their profile (default). Off on that teacher's own page. */
+  linkHead?: boolean;
 }
 
-export const BlogCard = memo(function BlogCard({ item, npc, cast, now, fresh = false }: BlogCardProps) {
+export const BlogCard = memo(function BlogCard({ item, npc, cast, now, fresh = false, linkHead = true }: BlogCardProps) {
   const router = useRouter();
   const { theme } = useTheme();
   const styles = useStyles(theme);
@@ -73,12 +75,14 @@ export const BlogCard = memo(function BlogCard({ item, npc, cast, now, fresh = f
   };
 
   return (
-    <Animated.View entering={fresh && !reduced ? FadeIn.duration(200).easing(EASE_OUT) : undefined}>
+    <Animated.View entering={fresh && !reduced ? settle(0) : undefined}>
       <View style={styles.post}>
-        <View
-          style={styles.head}
-          accessible
-          accessibilityLabel={blogSpokenLabel({
+        <View style={styles.head}>
+          <HeadLink npc={npc} size={44} plain={!linkHead} />
+          <View
+            style={styles.who}
+            accessible
+            accessibilityLabel={blogSpokenLabel({
             name,
             when: relativeTimeSpoken(item.createdAt, now),
             title: blog.title,
@@ -86,9 +90,7 @@ export const BlogCard = memo(function BlogCard({ item, npc, cast, now, fresh = f
             readMin: blog.readMin,
             reactions: reactionSpoken(item.reactions),
           })}
-        >
-          <NpcHead npc={npc} size={44} />
-          <View style={styles.who}>
+          >
             <Text style={styles.line1} numberOfLines={2}>
               <Text style={styles.name}>{name}</Text> {action}
             </Text>
@@ -105,7 +107,7 @@ export const BlogCard = memo(function BlogCard({ item, npc, cast, now, fresh = f
           accessibilityLabel={`Read ${blog.title}`}
         >
           <View style={styles.cover}>
-            <BlogCover cover={blog.cover} height={COVER} art={64} />
+            <BlogCover cover={blog.cover} width={COVER} height={COVER} art={64} />
           </View>
           <View style={styles.body} accessible={false} importantForAccessibility="no-hide-descendants">
             <Text style={styles.title} numberOfLines={2}>

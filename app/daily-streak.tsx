@@ -15,17 +15,25 @@ import { Text } from "@/components/ui/text";
 import Animated, {
   Easing,
   FadeIn,
-  FadeInDown,
   Keyframe,
   useReducedMotion,
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { STREAK_FX, STREAK_TICK_CONTACT, STREAK_TOTAL, isMilestoneStreak } from "@/components/celebration/celebration-core";
+import { STAMP_LANDS } from "@/components/lesson/stamp-core";
+import { Stamp } from "@/components/lesson/Stamp";
+import { Burst } from "@/components/motion/Burst";
+import { CountUp } from "@/components/motion/CountUp";
+import { PopOnce } from "@/components/motion/PopOnce";
+import { Reveal } from "@/components/motion/Reveal";
+import { useDelayedClock } from "@/components/motion/use-delayed-clock";
 import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
 import { Flame } from "@/components/streak/Flame";
-import { notifySuccess } from "@/services/haptics";
+import { impactLight, notifySuccess } from "@/services/haptics";
 import { useStorage } from "@/services/StorageContext";
+import { playSfx } from "@/services/sfx";
 import {
   createStyles,
   fontFaces,
@@ -57,6 +65,8 @@ const HERO_OVERLAP = 56;
 const COUNT_FILL = "#FFFFFF"; // theme-allow: number on the fire artwork, same in light and dark
 const COUNT_SHADOW = "#000000"; // theme-allow: number on the fire artwork, same in light and dark
 const COUNT_SHADOW_DROP = 3;
+/** The page's own transition runs first: the streak moment (STREAK_FX) starts this long after it mounts. */
+const START = 150;
 
 /** Today plus the next six days, like a "streak week" that starts now. */
 const buildWeek = () => {
@@ -82,12 +92,26 @@ export default function DailyStreakScreen() {
   const active = streak > 0;
   const week = useMemo(() => buildWeek(), []);
 
+  // The flame lands (STAMP_LANDS into its drop): the fanfare and the haptic belong there, today's tick has its own haptic
   useEffect(() => {
-    notifySuccess();
-  }, []);
+    if (reducedMotion) {
+      notifySuccess();
+      void playSfx("reward.achievement");
+      return;
+    }
+    const lands = setTimeout(() => {
+      notifySuccess();
+      void playSfx("reward.achievement");
+    }, START + STREAK_FX.flame + STAMP_LANDS);
+    const tick = setTimeout(impactLight, START + STREAK_TICK_CONTACT);
+    return () => {
+      clearTimeout(lands);
+      clearTimeout(tick);
+    };
+  }, [reducedMotion]);
 
-  const enter = (delay: number) =>
-    reducedMotion ? FadeIn.duration(150) : FadeInDown.delay(delay).duration(380);
+  // One clock for the burst round the flame on a milestone streak
+  const clock = useDelayedClock(STREAK_TOTAL, START);
 
   const close = () => {
     if (router.canGoBack()) router.back();
@@ -111,12 +135,16 @@ export default function DailyStreakScreen() {
         showsVerticalScrollIndicator={false}
       >
         <View style={[styles.column, { maxWidth: contentMaxWidth }]}>
-          <Animated.View entering={enter(0)}>
-            <Text style={styles.headline} accessibilityRole="header">
-              {headline}
-            </Text>
-            <Text style={styles.headline}>{subline}</Text>
-          </Animated.View>
+          <View>
+            <Stamp at={START + STREAK_FX.headline} tilt={-1}>
+              <Text style={styles.headline} accessibilityRole="header">
+                {headline}
+              </Text>
+            </Stamp>
+            <Reveal at={START + STREAK_FX.sub}>
+              <Text style={styles.headline}>{subline}</Text>
+            </Reveal>
+          </View>
 
           <View
             style={styles.hero}
@@ -124,31 +152,43 @@ export default function DailyStreakScreen() {
             accessibilityLabel={`${streak} day streak`}
           >
             <View style={styles.flameWrap}>
-              {active ? (
-                // Decorative. With reduced motion it holds one frame and does not play.
-                <View accessible={false} importantForAccessibility="no-hide-descendants">
-                  <LottieView
-                    source={FIRE}
-                    autoPlay={!reducedMotion}
-                    loop
-                    progress={reducedMotion ? 0.5 : undefined}
-                    style={{ width: FIRE_WIDTH, height: FIRE_HEIGHT }}
+              {/* The flame and its number drop in together and the number counts up to today's streak */}
+              <Stamp at={START + STREAK_FX.flame} style={styles.flameStamp}>
+                {active ? (
+                  // Decorative. With reduced motion it holds one frame and does not play.
+                  <View accessible={false} importantForAccessibility="no-hide-descendants">
+                    <LottieView
+                      source={FIRE}
+                      autoPlay={!reducedMotion}
+                      loop
+                      progress={reducedMotion ? 0.5 : undefined}
+                      style={{ width: FIRE_WIDTH, height: FIRE_HEIGHT }}
+                    />
+                  </View>
+                ) : (
+                  <Flame
+                    size={FLAME_WIDTH}
+                    top={c.surfaceStrong}
+                    bottom={c.borderStrong}
+                    inner={c.surfaceSoft}
+                  />
+                )}
+                <View
+                  pointerEvents="none"
+                  style={[styles.countWrap, active && styles.countWrapLit]}
+                >
+                  <CountUp
+                    from={Math.max(0, streak - 1)}
+                    to={streak}
+                    at={START + STREAK_FX.count}
+                    duration={STREAK_FX.countMs}
+                    style={styles.count}
                   />
                 </View>
-              ) : (
-                <Flame
-                  size={FLAME_WIDTH}
-                  top={c.surfaceStrong}
-                  bottom={c.borderStrong}
-                  inner={c.surfaceSoft}
-                />
-              )}
-              <View
-                pointerEvents="none"
-                style={[styles.countWrap, active && styles.countWrapLit]}
-              >
-                <Text style={styles.count}>{streak}</Text>
-              </View>
+              </Stamp>
+              {active && isMilestoneStreak(streak) ? (
+                <Burst clock={clock} at={STREAK_FX.count} diameter={FLAME_WIDTH} color={c.lessonHeader} reach={86} />
+              ) : null}
             </View>
             <Animated.View style={styles.mascotWrap} entering={reducedMotion ? FadeIn.duration(150) : MASCOT_ENTER}>
               <Image
@@ -160,15 +200,18 @@ export default function DailyStreakScreen() {
             </Animated.View>
           </View>
 
-          <Animated.View entering={enter(220)} style={styles.card}>
+          <Reveal at={START + STREAK_FX.card} style={styles.card}>
             <View style={styles.daysRow}>
               {week.map((label, i) => (
-                <View key={i} style={styles.day}>
+                <Reveal key={i} at={START + STREAK_FX.days + i * STREAK_FX.dayStep} style={styles.day}>
                   <Text style={[styles.dayLabel, i === 0 && styles.dayLabelToday]}>
                     {label}
                   </Text>
                   {i === 0 && active ? (
-                    <Icon name="TickCircle" size={34} color={c.success} variant="Bold" />
+                    // Today's tick is the one main action of the card: it pops
+                    <PopOnce at={START + STREAK_FX.tick} sparkleColor={c.success}>
+                      <Icon name="TickCircle" size={34} color={c.success} variant="Bold" />
+                    </PopOnce>
                   ) : i === 0 || i === 1 ? (
                     <View style={[styles.dayRing, i === 1 && { borderColor: c.primary }]} />
                   ) : (
@@ -181,7 +224,7 @@ export default function DailyStreakScreen() {
                       />
                     </View>
                   )}
-                </View>
+                </Reveal>
               ))}
             </View>
 
@@ -191,18 +234,16 @@ export default function DailyStreakScreen() {
                 Tip: Come back tomorrow so your streak doesn&apos;t reset
               </Text>
             </View>
-          </Animated.View>
+          </Reveal>
         </View>
       </ScrollView>
 
-      <Animated.View
-        entering={enter(340)}
-        style={[styles.footer, { paddingBottom: insets.bottom + 16 }]}
-      >
+      {/* Continue arrives last, and cannot be tapped before it can be seen */}
+      <Reveal at={START + STREAK_FX.button} blockUntilShown style={[styles.footer, { paddingBottom: insets.bottom + 16 }]}>
         <View style={[styles.column, { maxWidth: contentMaxWidth }]}>
           <Button label="CONTINUE" onPress={close} accessibilityLabel="Continue" />
         </View>
-      </Animated.View>
+      </Reveal>
     </View>
   );
 }
@@ -245,6 +286,8 @@ const makeStyles = createStyles((theme) => {
       alignItems: "center",
       justifyContent: "center",
     },
+    // The stamp wraps the flame and its number: it centres them like the flame's own box did
+    flameStamp: { alignItems: "center", justifyContent: "center" },
     countWrap: {
       position: "absolute",
       bottom: FLAME_WIDTH * 0.2,

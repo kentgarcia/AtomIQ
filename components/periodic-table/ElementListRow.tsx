@@ -24,19 +24,16 @@ const makeStyles = createStyles((theme) => ({
     flexDirection: "row",
     alignItems: "center",
     gap: 12,
-    minHeight: layout.minTouchTarget + 16,
+    minHeight: layout.minTouchTarget + 14,
     paddingVertical: 8,
-    paddingHorizontal: 10,
-    borderRadius: 16,
-    backgroundColor: theme.colors.surface,
-    borderWidth: 1.5,
-    borderColor: theme.colors.border,
+    paddingHorizontal: 4,
   },
   badge: {
     width: 52,
     height: 52,
-    borderRadius: 12,
+    borderRadius: 14,
     borderWidth: 2,
+    borderBottomWidth: 4,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -62,7 +59,7 @@ const makeStyles = createStyles((theme) => ({
     fontSize: 13,
     lineHeight: 18,
     ...fontFaces.semibold,
-    color: theme.colors.textSecondary,
+    color: theme.colors.textMuted,
   },
 }));
 
@@ -76,11 +73,10 @@ function ElementListRowBase({ element, colors, onPress }: ElementListRowProps) {
       accessibilityLabel={elementAccessibilityLabel(element)}
       accessibilityHint="Opens the element details"
       onPress={() => onPress(element.symbol)}
-      android_ripple={{ color: colors.accent }}
-      style={({ pressed }) => [
+            style={({ pressed }) => [
         styles.row,
-        // Pressed: thicker, high-contrast border plus a dip in opacity.
-        pressed && { borderColor: theme.colors.text, borderWidth: 3, opacity: 0.9 },
+        // Pressed: the whole row dips; the dashed divider between rows stays.
+        pressed && { opacity: 0.6 },
       ]}
     >
       <View style={[styles.badge, { backgroundColor: colors.fill, borderColor: colors.accent }]}>

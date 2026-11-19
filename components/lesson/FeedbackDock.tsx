@@ -12,6 +12,7 @@ import Animated, { FadeInDown, useReducedMotion } from "react-native-reanimated"
 import { EASE_OUT } from "@/components/motion/motion";
 import { FooterRow } from "@/components/lesson/FooterRow";
 import { Button } from "@/components/ui/button";
+import { PopOnce } from "@/components/motion/PopOnce";
 import { Icon } from "@/components/ui/icon";
 import type { ItemResult } from "@/content/curriculum/types";
 import { createStyles, fontFaces, fontSizes, spacing, useTheme, withAlpha } from "@/theme";
@@ -72,7 +73,14 @@ export function FeedbackDock({
       style={[styles.sheet, { backgroundColor: tint, paddingHorizontal, paddingBottom }]}
     >
       <View style={styles.head}>
-        <Icon name={ok ? "TickCircle" : "CloseCircle"} size={28} color={ink} />
+        {/* A right answer's tick pops once the sheet has come up (a wrong one stays quiet: the option already shook) */}
+        {ok ? (
+          <PopOnce at={120} sparkleColor={ink} intensity={0.8}>
+            <Icon name="TickCircle" size={28} color={ink} />
+          </PopOnce>
+        ) : (
+          <Icon name="CloseCircle" size={28} color={ink} />
+        )}
         <Text accessibilityRole="header" style={[styles.title, { color: ink }]}>
           {ok ? correctTitleFor(seed) : WRONG_TITLE}
         </Text>

@@ -7,16 +7,19 @@
  */
 
 import { DifficultyPanel } from "@/components/games/DifficultyPanel";
+import { GAME_GUIDES, guideById, initialGuide, type GuideId } from "@/components/games/game-instructions";
 import { StackCard } from "@/components/games/StackCard";
 import { HeaderButton, ScreenHeader, useTabBarInset } from "@/components/layout";
 import { useModalOrigin } from "@/components/ui/grow-modal";
 import { ModalButton } from "@/components/ui/modal-card";
 import { ModalDialog } from "@/components/ui/modal-dialog";
 import { Icon } from "@/components/ui/icon";
-import { createStyles, fontFaces, useResponsiveLayout, useTheme } from "@/theme";
+import { createStyles, fontFaces, useResponsiveLayout, useTheme, withAlpha } from "@/theme";
 import { impactLight, impactMedium } from "@/services/haptics";
+import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
+    Pressable,
     useWindowDimensions,
     View,
 } from "react-native";
@@ -104,6 +107,7 @@ const GAMES = [
 /* ------------------------------------------------------------------ */
 
 export function PickAGame() {
+    const router = useRouter();
     const insets = useSafeAreaInsets();
     const { height: windowHeight } = useWindowDimensions();
     const { contentMaxWidth } = useResponsiveLayout();
@@ -167,12 +171,13 @@ export function PickAGame() {
 
     // Every game opens the difficulty picker first.
     const handleSelect = (game: (typeof GAMES)[number], index: number) => {
-        openDifficulty(
-            game.route === "/explorer/atom-maze"
-                ? "atom-maze"
-                : (game.route.slice(1) as "mythbuster" | "lab"),
-            index,
-        );
+        // Atom Maze is story mode now: its level map opens instead of a difficulty picker
+        if (game.route === "/explorer/atom-maze") {
+            impactLight();
+            router.push("/explorer/story");
+            return;
+        }
+        openDifficulty(game.route.slice(1) as "mythbuster" | "lab", index);
     };
 
     const activeGameTitle =
@@ -180,30 +185,16 @@ export function PickAGame() {
             ? null
             : GAMES.find((g) => g.route.endsWith(activeGame === "atom-maze" ? "atom-maze" : activeGame))?.title ?? null;
 
+    // The instructions: they open on the game whose levels are showing (or the overview) and can switch to another game's
     const [guideVisible, setGuideVisible] = useState(false);
+    const [guideId, setGuideId] = useState<GuideId>("overview");
     const { anchor: guideAnchor, origin: guideOrigin, capture: guideCapture } = useModalOrigin();
     const openGuide = () => {
         impactLight();
+        setGuideId(initialGuide(activeGame));
         guideCapture(() => setGuideVisible(true));
     };
-
-    const GUIDE_ROWS = [
-        {
-            icon: "Game",
-            title: "Pick a Game",
-            desc: "Tap a card to choose — games with levels open their options right here.",
-        },
-        {
-            icon: "Layer",
-            title: "Choose Your Level",
-            desc: "Tap a difficulty card to start playing.",
-        },
-        {
-            icon: "ArrowLeft2",
-            title: "Back",
-            desc: "Tap the back arrow in the header to return to the games list.",
-        },
-    ];
+    const guide = guideById(guideId);
 
     return (
         <View style={[styles.screen, { backgroundColor: c.mapBackground }]}>
@@ -214,7 +205,7 @@ export function PickAGame() {
                 backLabel="Back to games"
                 right={
                     <View ref={guideAnchor} collapsable={false}>
-                        <HeaderButton icon="MessageQuestion" label="How to play" onPress={openGuide} />
+                        <HeaderButton icon="MessageQuestion" label="Instructions" onPress={openGuide} />
                     </View>
                 }
             />
@@ -266,33 +257,58 @@ export function PickAGame() {
                 )}
             </View>
 
-            {/* How to Play guide */}
+            {/* Instructions: pick which game's to read */}
             <ModalDialog
                 visible={guideVisible}
                 origin={guideOrigin}
                 onClose={() => setGuideVisible(false)}
-                title="How to Play"
-                closeLabel="Close how to play"
+                title="Instructions"
+                closeLabel="Close instructions"
                 footer={<ModalButton label="Got it" onPress={() => setGuideVisible(false)} />}
             >
-                {GUIDE_ROWS.map((row) => (
-                    <View key={row.title} style={styles.guideRow}>
-                        <View style={styles.guideRowIcon}>
-                            <Icon name={row.icon} size={20} color={theme.colors.primaryLight} variant="Bold" />
+                <View style={styles.guideChips}>
+                    {GAME_GUIDES.map((g) => {
+                        const active = g.id === guideId;
+                        return (
+                            <Pressable
+                                key={g.id}
+                                onPress={() => {
+                                    impactLight();
+                                    setGuideId(g.id);
+                                }}
+                                accessibilityRole="button"
+                                accessibilityLabel={`${g.label} instructions`}
+                                accessibilityState={{ selected: active }}
+                                style={({ pressed }) => [styles.guideChip, active && styles.guideChipActive, pressed && styles.guideChipPressed]}
+                            >
+                                <Icon name={g.icon} size={16} color={g.color} variant="Bold" />
+                                <Text style={[styles.guideChipText, active && styles.guideChipTextActive]}>{g.label}</Text>
+                            </Pressable>
+                        );
+                    })}
+                </View>
+
+                <Text style={styles.guideSummary}>{guide.summary}</Text>
+
+                <View>
+                    {guide.steps.map((step, i) => (
+                        <View key={step.title} style={[styles.guideRow, i > 0 && styles.guideDivided]}>
+                            <View style={[styles.guideRowIcon, { backgroundColor: withAlpha(guide.color, 0.14) }]}>
+                                <Icon name={step.icon} size={20} color={guide.color} variant="Bold" />
+                            </View>
+                            <View style={styles.guideRowText}>
+                                <Text style={styles.guideRowTitle}>{step.title}</Text>
+                                <Text style={styles.guideRowDesc}>{step.hint}</Text>
+                            </View>
                         </View>
-                        <View style={styles.guideRowText}>
-                            <Text style={styles.guideRowTitle}>{row.title}</Text>
-                            <Text style={styles.guideRowDesc}>{row.desc}</Text>
-                        </View>
-                    </View>
-                ))}
+                    ))}
+                </View>
             </ModalDialog>
         </View>
     );
 }
 
 const makeStyles = createStyles((theme) => {
-  const ui = theme.palettes.ui;
   return {
     screen: {
         flex: 1,
@@ -310,42 +326,30 @@ const makeStyles = createStyles((theme) => {
     cardsList: {
         flex: 1,
     },
-    /* How to Play (ModalDialog contents) */
-    guideRow: {
+    /* Instructions (ModalDialog contents) */
+    guideChips: { flexDirection: "row", flexWrap: "wrap", gap: 6 },
+    guideChip: {
         flexDirection: "row",
         alignItems: "center",
-        gap: 12,
-        paddingVertical: 10,
+        gap: 6,
+        height: 34,
         paddingHorizontal: 12,
         borderRadius: 12,
-        backgroundColor: ui.soft,
-        borderWidth: 1,
-        borderColor: ui.softBorder,
+        borderWidth: 1.5,
+        borderColor: theme.colors.border,
+        backgroundColor: theme.colors.surface,
     },
-    guideRowIcon: {
-        width: 40,
-        height: 40,
-        borderRadius: 20,
-        alignItems: "center",
-        justifyContent: "center",
-        flexShrink: 0,
-        backgroundColor: ui.soft,
-    },
-    guideRowText: {
-        flex: 1,
-    },
-    guideRowTitle: {
-        fontSize: 14,
-        ...fontFaces.heavy,
-        color: ui.text,
-        marginBottom: 2,
-    },
-    guideRowDesc: {
-        fontSize: 13,
-        ...fontFaces.semibold,
-        color: ui.muted,
-        lineHeight: 18,
-    },
+    guideChipActive: { backgroundColor: theme.colors.primarySurface, borderColor: theme.colors.primaryBorder },
+    guideChipPressed: { opacity: 0.7 },
+    guideChipText: { fontSize: 13, ...fontFaces.bold, color: theme.colors.textSecondary },
+    guideChipTextActive: { color: theme.colors.text },
+    guideSummary: { fontSize: 15, lineHeight: 22, ...fontFaces.semibold, color: theme.colors.textMuted },
+    guideRow: { flexDirection: "row", alignItems: "center", gap: 12, paddingVertical: 10 },
+    guideDivided: { borderTopWidth: 1, borderStyle: "dashed", borderColor: theme.colors.border },
+    guideRowIcon: { width: 36, height: 36, borderRadius: 18, alignItems: "center", justifyContent: "center", flexShrink: 0 },
+    guideRowText: { flex: 1, gap: 2 },
+    guideRowTitle: { fontSize: 15, ...fontFaces.heavy, color: theme.colors.text },
+    guideRowDesc: { fontSize: 13, lineHeight: 18, ...fontFaces.medium, color: theme.colors.textMuted },
   };
 });
 

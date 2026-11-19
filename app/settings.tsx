@@ -1,3 +1,4 @@
+import { settle } from "@/components/motion/settle";
 import { SettingsCard, SettingsRow } from "@/components/settings/SettingsCard";
 import { FieldInput } from "@/components/ui/field-input";
 import { ScreenHeader, useHeaderBorder } from "@/components/layout";
@@ -20,6 +21,7 @@ import { setHapticsGate } from "@/services/haptics";
 import { getFeedPostsEnabled, getHapticsEnabled, setFeedPostsEnabled, setHapticsEnabled, subscribeFeedPostsEnabled } from "@/services/storage";
 import { setTeacherLines, useTeacherLines } from "@/components/npc/teacher-lines";
 import { setMediaPreference } from "@/services/media";
+import { playSfx } from "@/services/sfx";
 import { useMediaPreferences } from "@/hooks/use-read-aloud";
 import { useStorage } from "@/services/StorageContext";
 import Constants from "expo-constants";
@@ -36,7 +38,7 @@ import {
     type ImageStyle,
 } from "react-native";
 import { Text } from "@/components/ui/text";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const APP_VERSION =
@@ -45,7 +47,7 @@ const APP_VERSION =
 export default function SettingsScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { userProfile } = useStorage();
+  const { userProfile, setOnboardingDone } = useStorage();
   const { theme, isDark, toggleTheme } = useTheme();
   // Sound effects + Read Aloud come from the one shared media preference store.
   const { soundEffects, readAloud: readAloudEnabled } = useMediaPreferences();
@@ -57,6 +59,8 @@ export default function SettingsScreen() {
   const { anchor: versionAnchor, origin: versionOrigin, capture: versionCapture } = useModalOrigin();
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [confirmText, setConfirmText] = useState("");
+  // The delete dialog is one dialog in three stages: type the name, "are you sure?", then "account deleted"
+  const [deleteStage, setDeleteStage] = useState<"type" | "sure" | "done">("type");
 
   interface DataStatus {
     contentLabel: string;
@@ -188,12 +192,11 @@ export default function SettingsScreen() {
     void setFeedPostsEnabled(next).catch((error) => console.error("Error saving feed posts preference:", error));
   };
 
-  useEffect(() => {
-    setConfirmText("");
-  }, [deleteModalVisible]);
-
+  // The switch itself plays the "off" cue while effects are still on, so turning them off is heard
+  // once; turning them on is silent until the preference flips, so the preview plays after it.
   const handleSoundEffectsToggle = (enabled: boolean) => {
     setMediaPreference("soundEffects", enabled);
+    if (enabled) void playSfx("ui.select");
   };
 
   const handleReadAloudToggle = (enabled: boolean) => {
@@ -217,18 +220,22 @@ export default function SettingsScreen() {
       await deleteAccountData();
       await AsyncStorage.clear();
 
-      Alert.alert("Account Deleted", "Your account has been deleted.", [
-        {
-          text: "OK",
-          onPress: () => router.replace("/onboarding"),
-        },
-      ]);
+      // The dialog now says it is done; OK takes them back to the very start
+      setDeleteStage("done");
     } catch (error) {
       console.error("Error deleting account:", error);
+      setDeleteStage("type");
       Alert.alert("Error", "Failed to delete account. Please try again.");
     } finally {
       setIsDeletingAccount(false);
     }
+  };
+
+  // After "Account deleted": onboarding is needed again, so the app forgets it was finished and starts from the first screen
+  const finishDeleteAccount = () => {
+    setDeleteModalVisible(false);
+    void setOnboardingDone(false).catch(() => {});
+    router.replace("/onboarding");
   };
 
   const handleBetaFeedback = async () => {
@@ -251,6 +258,8 @@ export default function SettingsScreen() {
 
 
   const handleDeleteAccount = () => {
+    setConfirmText("");
+    setDeleteStage("type");
     setDeleteModalVisible(true);
   };
 
@@ -278,7 +287,7 @@ export default function SettingsScreen() {
         ]}
         showsVerticalScrollIndicator={false}
       >
-        <Animated.View entering={FadeInDown.delay(100).springify()}>
+        <Animated.View entering={settle(100)}>
           <SettingsCard title="Preferences">
             <SettingsRow icon="Moon" color="#8B5CF6" label="Dark Mode" toggle={{ value: isDark, onChange: toggleTheme }} />
             <SettingsRow icon="VolumeHigh" color="#3B82F6" label="Sound Effects" toggle={{ value: soundEffects, onChange: handleSoundEffectsToggle }} />
@@ -295,7 +304,7 @@ export default function SettingsScreen() {
           </SettingsCard>
         </Animated.View>
 
-        <Animated.View entering={FadeInDown.delay(250).springify()}>
+        <Animated.View entering={settle(250)}>
           <SettingsCard title="About">
             <SettingsRow icon="Message" color="#EA580C" label="Beta Feedback" arrow hint="Opens the feedback form" onPress={() => void handleBetaFeedback()} />
             <SettingsRow
@@ -312,7 +321,7 @@ export default function SettingsScreen() {
           </SettingsCard>
         </Animated.View>
 
-        <Animated.View entering={FadeInDown.delay(400).springify()}>
+        <Animated.View entering={settle(400)}>
           <SettingsCard title="Danger zone">
             <SettingsRow
               icon="Trash"
@@ -466,49 +475,80 @@ export default function SettingsScreen() {
         <Text style={styles.modalCopyright}>© 2026 AtomIQ. All rights reserved.</Text>
       </ModalDialog>
 
-      {/* Delete Account: the main action is red; Cancel keeps the yellow main button */}
+      {/* Delete Account: one dialog in three stages. The main action is red until the account is gone; Cancel keeps the yellow main button */}
       <ModalDialog
         visible={deleteModalVisible}
+        warning={deleteStage !== "done"}
         onClose={() => {
-          if (!isDeletingAccount) setDeleteModalVisible(false);
+          if (deleteStage === "done") finishDeleteAccount();
+          else if (!isDeletingAccount) setDeleteModalVisible(false);
         }}
-        title="Delete Account"
-        closeLabel="Close delete account"
+        title={deleteStage === "done" ? "Account deleted" : deleteStage === "sure" ? "Are you sure?" : "Delete Account"}
+        closeLabel={deleteStage === "done" ? "Close" : "Close delete account"}
         footer={
-          <>
-            <ModalButton
-              variant="destructive"
-              label={isDeletingAccount ? "Deleting…" : "Delete Forever"}
-              disabled={!canConfirmDelete || isDeletingAccount}
-              onPress={() => {
-                setDeleteModalVisible(false);
-                void executeDeleteAccount();
-              }}
-            />
-            <ModalButton label="Cancel" disabled={isDeletingAccount} onPress={() => setDeleteModalVisible(false)} />
-          </>
+          deleteStage === "done" ? (
+            <ModalButton label="OK" onPress={finishDeleteAccount} />
+          ) : deleteStage === "sure" ? (
+            <>
+              <ModalButton
+                variant="destructive"
+                label={isDeletingAccount ? "Deleting…" : "Yes, delete everything"}
+                disabled={isDeletingAccount}
+                onPress={() => void executeDeleteAccount()}
+              />
+              <ModalButton label="Keep my account" disabled={isDeletingAccount} onPress={() => setDeleteModalVisible(false)} />
+            </>
+          ) : (
+            <>
+              <ModalButton
+                variant="destructive"
+                label="Delete Forever"
+                disabled={!canConfirmDelete}
+                onPress={() => setDeleteStage("sure")}
+              />
+              <ModalButton label="Cancel" onPress={() => setDeleteModalVisible(false)} />
+            </>
+          )
         }
       >
-        <View style={styles.deleteModalWarning}>
-          <Icon name="Danger" size={18} color={theme.colors.error} variant="Bold" />
-          <Text style={styles.deleteModalWarningText}>
-            This will permanently delete your account and all local data.
-            This action cannot be undone.
-          </Text>
-        </View>
+        {deleteStage === "done" ? (
+          <View style={styles.deleteModalWarning}>
+            <Icon name="TickCircle" size={18} color={theme.colors.success} variant="Bold" />
+            <Text style={styles.deleteModalWarningText}>
+              Your account and all your data on this device have been deleted. You will start again from the beginning.
+            </Text>
+          </View>
+        ) : deleteStage === "sure" ? (
+          <View style={styles.deleteModalWarning}>
+            <Icon name="Danger" size={18} color={theme.colors.error} variant="Bold" />
+            <Text style={styles.deleteModalWarningText}>
+              Last chance. Your progress, XP, diamonds and streak will be gone for good. This cannot be undone.
+            </Text>
+          </View>
+        ) : (
+          <>
+            <View style={styles.deleteModalWarning}>
+              <Icon name="Danger" size={18} color={theme.colors.error} variant="Bold" />
+              <Text style={styles.deleteModalWarningText}>
+                This will permanently delete your account and all local data.
+                This action cannot be undone.
+              </Text>
+            </View>
 
-        <Text style={styles.deleteModalText}>
-          Type <Text style={styles.deleteModalPhrase}>{deleteConfirmationPhrase}</Text> to confirm.
-        </Text>
+            <Text style={styles.deleteModalText}>
+              Type <Text style={styles.deleteModalPhrase}>{deleteConfirmationPhrase}</Text> to confirm.
+            </Text>
 
-        <FieldInput
-          style={styles.input}
-          value={confirmText}
-          onChangeText={setConfirmText}
-          placeholder={deleteConfirmationPhrase}
-          autoCapitalize="none"
-          autoCorrect={false}
-        />
+            <FieldInput
+              style={styles.input}
+              value={confirmText}
+              onChangeText={setConfirmText}
+              placeholder={deleteConfirmationPhrase}
+              autoCapitalize="none"
+              autoCorrect={false}
+            />
+          </>
+        )}
       </ModalDialog>
     </View>
   );
@@ -554,9 +594,7 @@ const makeStyles = createStyles((theme) => {
       flexDirection: "row",
       alignItems: "center",
       gap: 6,
-      backgroundColor: theme.colors.card,
-      borderWidth: 2,
-      borderColor: theme.colors.border,
+      backgroundColor: theme.colors.primarySurface,
       paddingHorizontal: 14,
       paddingVertical: 6,
       borderRadius: 999,
@@ -578,12 +616,10 @@ const makeStyles = createStyles((theme) => {
       flexDirection: "row",
       alignItems: "flex-start",
       gap: 10,
-      backgroundColor: theme.colors.surfaceSoft,
-      borderWidth: 1,
-      borderColor: theme.colors.borderSubtle,
-      borderRadius: 12,
-      paddingHorizontal: 12,
-      paddingVertical: 10,
+      paddingTop: 14,
+      borderTopWidth: 1,
+      borderStyle: "dashed",
+      borderColor: theme.colors.border,
     },
     creditText: {
       fontSize: 12,
@@ -605,16 +641,14 @@ const makeStyles = createStyles((theme) => {
       textAlign: "center",
     },
     dataStatusBlock: {
-      backgroundColor: theme.colors.surfaceSoft,
-      borderWidth: 1,
-      borderColor: theme.colors.borderSubtle,
-      borderRadius: 12,
-      paddingHorizontal: 12,
-      paddingVertical: 10,
+      paddingTop: 14,
+      borderTopWidth: 1,
+      borderStyle: "dashed",
+      borderColor: theme.colors.border,
       gap: 8,
     },
     dataStatusTitle: {
-      fontSize: 12,
+      fontSize: 13,
       ...fontFaces.heavy,
       color: theme.colors.text,
     },

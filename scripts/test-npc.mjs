@@ -18,7 +18,7 @@ const art = loadTs("components/npc/npc-art.ts");
 const { ALLOWED_COLORS, FORBIDDEN_NAMES, MUTE_DARK, MUTE_LIGHT } = loadTs("components/npc/npc-palette.ts");
 const { NPC_ROSTER, NPC_LINES } = loadTs("components/npc/npc-roster.ts");
 const { contrastRatio } = loadTs("theme/contrast.ts");
-const { ARM, BUST_BOTTOM, BUST_MOODS, NPC_MOOD_FADE, EYE, FINGER_W, HEAD, NECK, NPC_BLINKS, NPC_IDLE_PERIODS, NPC_LOOP_MS, NPC_POSES, NPC_VIEWBOX, POSES, SHOULDER, TORSO, buildNpc, hairSideBottom, mutedSpec, armPoints } = art;
+const { POP_CIRCLE, popClipPath, popLayout, ARM, BUST_BOTTOM, BUST_MOODS, NPC_MOOD_FADE, EYE, FINGER_W, HEAD, NECK, NPC_BLINKS, NPC_IDLE_PERIODS, NPC_LOOP_MS, NPC_POSES, NPC_VIEWBOX, POSES, SHOULDER, TORSO, buildNpc, hairSideBottom, mutedSpec, armPoints } = art;
 
 const HEX = /^#[0-9A-Fa-f]{6}$/;
 const partsOf = (tree) => [...tree.back, ...tree.face, ...tree.top, ...tree.front, ...tree.lids];
@@ -280,4 +280,22 @@ test("lines are plain text of 20 words or fewer from a known teacher", () => {
     assert.ok(NPC_POSES.includes(l.pose), `${l.id}: pose ${l.pose}`);
   }
   assert.equal(new Set(NPC_LINES.map((l) => l.id)).size, NPC_LINES.length);
+});
+
+// ── pop-out avatars ─────────────────────────────────────────────────────────
+
+test("a pop-out avatar: the circle fits the crop, the head tops it, only the lower half is clipped", () => {
+  const vb = NPC_VIEWBOX.pop;
+  const { cx, cy, r } = POP_CIRCLE;
+  assert.ok(cx - r >= vb.x && cx + r <= vb.x + vb.w, "the circle fits the crop sideways");
+  assert.ok(cy + r <= vb.y + vb.h, "and at the bottom");
+  assert.ok(HEAD.top < cy - r, "the top of the head rises past the circle's edge");
+  assert.ok(cy - r > vb.y, "with room above the circle in the crop");
+  assert.ok(!/NaN|undefined/.test(popClipPath()));
+  assert.ok(popClipPath().startsWith(`M${vb.x} ${vb.y}`), "the clip starts at the crop's top corner: nothing is cut above the circle's middle");
+  // layout for a 100 dp circle: the figure box is 100/(2r) times the crop, its top above the circle, centred on it
+  const L = popLayout(100);
+  const k = 100 / (2 * r);
+  assert.ok(Math.abs(L.height - vb.h * k) < 1e-9 && Math.abs(L.width - vb.w * k) < 1e-9);
+  assert.ok(L.top < 0 && Math.abs(L.left + L.width / 2 - 50) < 1e-9);
 });

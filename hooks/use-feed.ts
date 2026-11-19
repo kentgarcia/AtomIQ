@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { playSfx } from "@/services/sfx";
 
 import {
-  ensureBlogCards,
+  reconcileFeed,
   getFeed,
   getFeedPostsEnabled,
   getUnseenCount,
@@ -20,7 +21,7 @@ export interface FeedState {
   unseenCount: number;
   /** The Settings "Feed posts" switch. */
   enabled: boolean;
-  /** Unlocks any blog pieces, then reloads (pull to refresh, and when Discover gains focus). */
+  /** Posts anything progress says is missing and unlocks blog pieces, then reloads (pull to refresh, and when Discover gains focus). */
   refresh: () => Promise<void>;
   /** Mark items as seen as they scroll into view (ignores ids already seen). */
   markSeen: (ids: readonly string[]) => void;
@@ -55,7 +56,8 @@ export function useFeed(): FeedState {
   );
 
   const refresh = useCallback(async () => {
-    await ensureBlogCards();
+    // Make any post that progress says is missing (a trigger that did not fire), then blog cards, then read the list.
+    await reconcileFeed();
     await load();
   }, [load]);
 
@@ -82,11 +84,22 @@ export function useFeed(): FeedState {
 /** Just the number for the dot on the Feed tab icon (0 while muted). Cheap: no list is loaded. */
 export function useFeedUnseenCount(): number {
   const [count, setCount] = useState(0);
+  // Sound (docs/SFX_SPEC.md §6.6): new posts arriving while the app is open ring once, at most once a
+  // minute. The first load is not an arrival.
+  const lastCount = useRef<number | null>(null);
+  const lastRang = useRef(0);
   useEffect(() => {
     let cancelled = false;
     const load = () => {
       void getUnseenCount().then((n) => {
-        if (!cancelled) setCount(n);
+        if (cancelled) return;
+        const before = lastCount.current;
+        lastCount.current = n;
+        if (before !== null && n > before && Date.now() - lastRang.current > 60_000) {
+          lastRang.current = Date.now();
+          void playSfx("social.notification");
+        }
+        setCount(n);
       });
     };
     load();

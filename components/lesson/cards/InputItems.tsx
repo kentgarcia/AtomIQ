@@ -1,6 +1,6 @@
 /** Input-style interactions: fill in the blank, estimate on a slider, and the estimate flavour of predict. */
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { FieldInput } from "@/components/ui/field-input";
 import { type AccessibilityActionEvent, type GestureResponderEvent, View, type LayoutChangeEvent } from "react-native";
 import { Text } from "@/components/ui/text";
@@ -11,6 +11,7 @@ import type { EstimateItemData, FillItemData, PredictItemData } from "@/content/
 import { Button } from "@/components/ui/button";
 import { createStyles, fontFaces, fontSizes, radius, spacing, useTheme } from "@/theme";
 
+import { playSfx } from "@/services/sfx";
 import { FigureView, OptionButton, OptionsArea, PromptHeader, TermText, useCardStyles, type InteractionProps, type OptionState } from "./shared";
 
 const useStyles = createStyles((theme) => ({
@@ -147,10 +148,21 @@ function EstimateSlider({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [touched, value]);
 
+  // Sound (docs/SFX_SPEC.md §6.3): a select when the thumb is first touched, then a soft tick each
+  // time it passes a notch (every 5 percent of the rail), so a drag has a texture and a stop is heard.
+  const lastNotch = useRef<number | null>(null);
+  const grab = (e: GestureResponderEvent) => {
+    lastNotch.current = null;
+    void playSfx("ui.select");
+    move(e);
+  };
   const move = (e: GestureResponderEvent) => {
     if (locked || width <= 0) return;
-    const f = (e.nativeEvent.locationX - THUMB / 2) / Math.max(1, width - THUMB);
-    setFraction(Math.min(1, Math.max(0, f)));
+    const f = Math.min(1, Math.max(0, (e.nativeEvent.locationX - THUMB / 2) / Math.max(1, width - THUMB)));
+    const notch = Math.round(f * 20);
+    if (lastNotch.current !== null && notch !== lastNotch.current) void playSfx("ui.tick");
+    lastNotch.current = notch;
+    setFraction(f);
     setTouched(true);
   };
   const nudge = (delta: number) => {
@@ -170,7 +182,7 @@ function EstimateSlider({
         onLayout={(e: LayoutChangeEvent) => setWidth(e.nativeEvent.layout.width)}
         onStartShouldSetResponder={() => !locked}
         onMoveShouldSetResponder={() => !locked}
-        onResponderGrant={move}
+        onResponderGrant={grab}
         onResponderMove={move}
         accessible
         accessibilityRole="adjustable"

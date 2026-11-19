@@ -1,6 +1,6 @@
 /**
  * The NPC feed, the framework-free part (docs/NPC_FEED_SPEC.md §5, §7.2, §8): which template an
- * event picks, how its text is rendered, and which posts the pacing rules let through.
+ * event picks and how its text is rendered. There are no pacing rules: every event that has a template posts.
  * No storage and no React, so `scripts/test-feed.mjs` runs it under Node. `services/feed.ts` adds
  * the storage and the hooks into the app.
  *
@@ -16,7 +16,6 @@ import type {
   BlogPost,
   Reaction,
 } from "../content/types.ts";
-import { dayKeyFromInstant } from "./activity-core.ts";
 import { pickWeighted, type Rng } from "./rng-core.ts";
 import { planReactions, type PlannedReaction } from "./social-core.ts";
 
@@ -41,6 +40,12 @@ export const FEED_TRIGGERS = [
 
 /** The triggers a template can have (a blog card's text is the piece's hook, so `blog_unlocked` has none). */
 export const TEMPLATE_TRIGGERS = FEED_TRIGGERS.filter((t) => t !== "blog_unlocked") as Exclude<FeedTrigger, "blog_unlocked">[];
+
+/**
+ * A template whose poster pool is `["learner"]` is written from the learner's point of view ("I kept a
+ * 7 day streak"): the post carries this id as its poster and the feed draws the learner's own avatar and name.
+ */
+export const LEARNER_POSTER = "learner";
 
 export const FEED_KINDS = ["celebrate", "milestone", "nudge", "tease"] as const satisfies readonly FeedKind[];
 export const FEED_CHIPS = ["lesson", "unit", "quests", "ranks"] as const satisfies readonly FeedChipKind[];
@@ -82,7 +87,7 @@ export type FeedEvent =
   | { type: "first_lesson"; unitId?: string; lessonId?: string }
   | { type: "comeback"; days: number }
   | { type: "daily_quests_done" }
-  | { type: "rank_change"; direction: RankDirection; npcId: string };
+  | { type: "rank_change"; direction: RankDirection; npcId: string; /** When the change was noticed: each change is its own post. */ at?: number };
 
 /** `passed`: the learner overtook the rival. `passed_by`: the rival overtook the learner. */
 export type RankDirection = "passed" | "passed_by";
@@ -135,7 +140,7 @@ export function eventDedupeKey(event: FeedEvent, dayKey: string): string {
     case "daily_quests_done":
       return `quests:${dayKey}`;
     case "rank_change":
-      return `rank:${dayKey}`;
+      return `rank:${event.npcId}:${event.direction}:${event.at ?? dayKey}`;
   }
 }
 
@@ -254,58 +259,6 @@ export function pickTemplate(
 }
 
 /* ------------------------------------------------------------------ */
-/* Limits (spec §8)                                                    */
-/* ------------------------------------------------------------------ */
-
-/** At most this many top-level posts per local day. */
-export const DAILY_POST_CAP = 4;
-/** A milestone, a unit completion or a blog card may be one over the cap. */
-export const CAP_BONUS = 1;
-/** Two top-level posts from the same NPC are at least this far apart. */
-export const NPC_SPACING_MS = 30 * 60 * 1000;
-
-export interface LimitPost {
-  npcId: string;
-  createdAt: number;
-  /** Set for a blog card. */
-  blogId?: string | null;
-}
-
-export interface LimitCandidate {
-  npcId: string;
-  kind: FeedKind | "blog";
-  trigger: FeedTrigger;
-}
-
-export type LimitResult = { ok: true } | { ok: false; reason: "cap" | "spacing" };
-
-const exceedsCap = (c: LimitCandidate): boolean => c.kind === "milestone" || c.trigger === "unit_complete" || c.trigger === "blog_unlocked";
-
-/**
- * Decide whether a candidate post is allowed now, given the existing top-level posts.
- * - A blog card is never dropped.
- * - Otherwise the day (local, from `offsetMin`) holds at most 4 posts, blog cards included;
- *   a `milestone`, a `unit_complete` or a blog card may make a fifth. Over the cap the candidate
- *   is dropped (there is no queue).
- * - The same NPC (blog cards aside) never posts twice within 30 minutes.
- */
-export function applyLimits(
-  now: number,
-  existing: readonly LimitPost[],
-  candidate: LimitCandidate,
-  offsetMin: number = new Date(now).getTimezoneOffset(),
-): LimitResult {
-  if (candidate.trigger === "blog_unlocked") return { ok: true };
-  const today = dayKeyFromInstant(now, offsetMin);
-  const todayCount = existing.filter((p) => dayKeyFromInstant(p.createdAt, offsetMin) === today).length;
-  const limit = DAILY_POST_CAP + (exceedsCap(candidate) ? CAP_BONUS : 0);
-  if (todayCount >= limit) return { ok: false, reason: "cap" };
-  const tooSoon = existing.some((p) => !p.blogId && p.npcId === candidate.npcId && Math.abs(now - p.createdAt) < NPC_SPACING_MS);
-  if (tooSoon) return { ok: false, reason: "spacing" };
-  return { ok: true };
-}
-
-/* ------------------------------------------------------------------ */
 /* Planning a post                                                     */
 /* ------------------------------------------------------------------ */
 
@@ -328,7 +281,7 @@ export interface PlannedPost {
 
 export type PlanResult =
   | { ok: true; post: PlannedPost; reactions: PlannedReaction[]; /** Reactions target `{ type, id }`. */ target: { type: "post" | "blog"; id: string } }
-  | { ok: false; reason: "duplicate" | "no_template" | "cap" | "spacing" | "render" };
+  | { ok: false; reason: "duplicate" | "no_template" | "render" };
 
 export interface PlanInput {
   /** Id of the new post (also seeds its reactions). */
@@ -337,25 +290,20 @@ export interface PlanInput {
   now: number;
   templates: readonly FeedTemplate[];
   history: FeedHistory;
-  /** Top-level posts already stored (any age; only today's and the same NPC's recent ones matter). */
-  existing: readonly LimitPost[];
   /** The cast. */
   npcs: readonly { id: string }[];
   values: FeedValues;
   rng: Rng;
-  offsetMin?: number;
 }
 
-/** Pick, render, limit and give reactions to one event's post. Pure: nothing is stored here. */
+/** Pick, render and give reactions to one event's post. Nothing limits how many posts there are: the system writes them. Pure: nothing is stored here. */
 export function planPost(input: PlanInput): PlanResult {
-  const { postId, event, now, templates, history, existing, npcs, values, rng, offsetMin } = input;
+  const { postId, event, now, templates, history, npcs, values, rng } = input;
   const key = eventDedupeKey(event, history.dayKey);
   if (hasKey(history.dedupeKeys, key)) return { ok: false, reason: "duplicate" };
   const picked = pickTemplate(event, templates, history, rng);
   if (!picked) return { ok: false, reason: "no_template" };
   const { template, posterId } = picked;
-  const limit = applyLimits(now, existing, { npcId: posterId, kind: template.kind, trigger: event.type }, offsetMin);
-  if (!limit.ok) return limit;
   let text: string;
   try {
     text = renderText(template, values);
@@ -381,7 +329,7 @@ export interface PlanBlogCardInput {
   npcs: readonly { id: string }[];
 }
 
-/** The blog card for an unlocked piece: its text is the hook, it is never limited, and it dedupes on `blog:<id>`. */
+/** The blog card for an unlocked piece: its text is the hook, and it dedupes on `blog:<id>`. */
 export function planBlogCard(input: PlanBlogCardInput): PlanResult {
   const { postId, blog, now, history, npcs } = input;
   const key = `blog:${blog.id}`;
@@ -392,6 +340,94 @@ export function planBlogCard(input: PlanBlogCardInput): PlanResult {
     reactions: planReactions({ type: "blog", id: blog.id, kind: "blog", posterId: blog.npcId }, blog.reactors, npcs),
     target: { type: "blog", id: blog.id },
   };
+}
+
+/* ------------------------------------------------------------------ */
+/* Reconciling: the posts progress says should exist                    */
+/* ------------------------------------------------------------------ */
+
+export interface ReconcileNode {
+  id: string;
+  unitId: string;
+  kind: string;
+  position: number;
+  lessonId?: string | null;
+}
+
+export interface ReconcileInput {
+  /** Unit ids in path order. */
+  unitIds: readonly string[];
+  nodes: readonly ReconcileNode[];
+  /** Completed path node ids. */
+  completed: ReadonlySet<string>;
+  /** Units the learner tested out of. */
+  testedOut: ReadonlySet<string>;
+  /** Units whose path is complete. */
+  completedUnits: ReadonlySet<string>;
+  /** Stars per node id (3 is a perfect lesson). */
+  stars: ReadonlyMap<string, number>;
+  /** When a node (or `testout:<unit>`) was completed, in ms. */
+  completedAt: ReadonlyMap<string, number>;
+  /** The best streak the learner has reached. */
+  streak: number;
+}
+
+export interface ReconcileItem {
+  event: FeedEvent;
+  /** Used instead of `event` when the event has no template (the very first lesson says hello, or is an ordinary lesson post). */
+  fallback?: FeedEvent;
+  /** When it happened, or `null` when that is not known (the caller uses the clock). */
+  at: number | null;
+}
+
+/**
+ * The events that real progress says happened but that have no post yet, oldest first. The feed calls
+ * this when Discover opens, so a post is never lost to a trigger that did not fire (a failed write, a
+ * lesson finished before the feed existed). Replays are harmless: an event whose dedupe key is stored
+ * is left out here, and `planPost` would drop it anyway.
+ */
+export function reconcileEvents(input: ReconcileInput, existingKeys: ReadonlySet<string> | readonly string[], dayKey: string): ReconcileItem[] {
+  const out: ReconcileItem[] = [];
+  const keys: FeedHistory["dedupeKeys"] = existingKeys;
+  const missing = (e: FeedEvent) => !hasKey(keys, eventDedupeKey(e, dayKey));
+  let lessonsSeen = 0;
+  for (const unitId of input.unitIds) {
+    const nodes = input.nodes.filter((n) => n.unitId === unitId).sort((a, b) => a.position - b.position);
+    let lastAt: number | null = null;
+    for (const node of nodes) {
+      if (!input.completed.has(node.id)) continue;
+      const at = input.completedAt.get(node.id) ?? null;
+      lastAt = at ?? lastAt;
+      if (node.kind === "lesson" && node.lessonId) {
+        lessonsSeen += 1;
+        const lesson: FeedEvent = { type: "lesson_complete", unitId, lessonId: node.lessonId, perfect: input.stars.get(node.id) === 3 };
+        if (lessonsSeen === 1) {
+          const first: FeedEvent = { type: "first_lesson", unitId, lessonId: node.lessonId };
+          // Said hello already, or already posted as an ordinary lesson: nothing to add.
+          if (missing(first) && missing(lesson)) out.push({ event: first, fallback: lesson, at });
+        } else if (missing(lesson)) {
+          out.push({ event: lesson, at });
+        }
+      } else if (node.kind === "checkpoint") {
+        const e: FeedEvent = { type: "checkpoint_pass", unitId };
+        if (missing(e)) out.push({ event: e, at });
+      }
+    }
+    if (input.testedOut.has(unitId)) {
+      const e: FeedEvent = { type: "testout_pass", unitId };
+      if (missing(e)) out.push({ event: e, at: input.completedAt.get(`testout:${unitId}`) ?? null });
+    }
+    if (input.completedUnits.has(unitId)) {
+      const e: FeedEvent = { type: "unit_complete", unitId };
+      if (missing(e)) out.push({ event: e, at: lastAt });
+    }
+  }
+  for (const days of STREAK_THRESHOLDS) {
+    if (days > input.streak) break;
+    const e: FeedEvent = { type: "streak", days };
+    if (missing(e)) out.push({ event: e, at: null });
+  }
+  return out;
 }
 
 export type { PlannedReaction, Reaction };

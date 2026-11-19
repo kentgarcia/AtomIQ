@@ -18,6 +18,7 @@ import { createStyles, fontFaces, fontSizes, radius, spacing, useTheme } from "@
 
 import { NucleusArt } from "./NucleusArt";
 import { TermText, useCardStyles } from "./shared";
+import { playSfx } from "@/services/sfx";
 
 const useStyles = createStyles((theme) => ({
   goalHead: { ...fontFaces.bold, fontSize: fontSizes.md, letterSpacing: 0.6, textTransform: "uppercase", color: theme.colors.textMuted },
@@ -66,7 +67,11 @@ export function DecayChainSim({ data, onComplete }: { data: DecayChainData; onCo
   const total = Math.max(8, 20 - 2 * state.index);
   const protons = Math.round(total * 0.45);
   const summary = `${here.label}. ${stable ? "Stable." : "Unstable. Tap to make it change."}`;
-  const tap = () => setState((s) => step(data.nodes, s));
+  const tap = () => {
+    // A little pop for each decay, a step higher than the last (docs/SFX_SPEC.md §6.3).
+    void playSfx("reward.pop", { index: state.index, volume: 0.8 });
+    setState((s) => step(data.nodes, s));
+  };
   const reset = () => {
     completed.current = false;
     setState(createChain());

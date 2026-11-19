@@ -63,7 +63,12 @@ test("dedupe keys follow spec section 5.1", () => {
   assert.equal(feed.eventDedupeKey({ type: "first_lesson" }, d), "first-lesson");
   assert.equal(feed.eventDedupeKey({ type: "comeback", days: 5 }, d), `comeback:${d}`);
   assert.equal(feed.eventDedupeKey({ type: "daily_quests_done" }, d), `quests:${d}`);
-  assert.equal(feed.eventDedupeKey({ type: "rank_change", direction: "passed", npcId: "npc-hal" }, d), `rank:${d}`);
+  assert.equal(feed.eventDedupeKey({ type: "rank_change", direction: "passed", npcId: "npc-hal" }, d), `rank:npc-hal:passed:${d}`);
+  // every noticed change is its own post, even for the same rival on the same day
+  assert.notEqual(
+    feed.eventDedupeKey({ type: "rank_change", direction: "passed", npcId: "npc-hal", at: 1 }, d),
+    feed.eventDedupeKey({ type: "rank_change", direction: "passed", npcId: "npc-hal", at: 2 }, d),
+  );
 });
 
 test("the app's vocabulary mirrors scripts/lib/feed-vocab.mjs exactly", async () => {
@@ -219,51 +224,13 @@ test("renderText fills known placeholders and refuses unknown or empty ones", ()
 });
 
 /* ------------------------------------------------------------------ */
-/* applyLimits                                                         */
+/* No limits                                                           */
 /* ------------------------------------------------------------------ */
 
-const post = (hoursAgo, npcId, extra = {}) => ({ npcId, createdAt: NOON - hoursAgo * 60 * MIN, ...extra });
-const cand = (over = {}) => ({ npcId: "npc-ada", kind: "celebrate", trigger: "lesson_complete", ...over });
-
-test("limits: 4 posts a day, over the cap is dropped", () => {
-  const four = ["npc-hal", "npc-ray", "npc-mina", "npc-kofi"].map((n, i) => post(5 - i, n));
-  assert.deepEqual(feed.applyLimits(NOON, four.slice(0, 3), cand(), OFFSET), { ok: true });
-  assert.deepEqual(feed.applyLimits(NOON, four, cand(), OFFSET), { ok: false, reason: "cap" });
-  assert.equal(feed.DAILY_POST_CAP, 4);
-});
-
-test("limits: a milestone, a unit completion or a blog card may be a fifth, nothing is a sixth", () => {
-  const four = ["npc-hal", "npc-ray", "npc-mina", "npc-kofi"].map((n, i) => post(5 - i, n));
-  assert.deepEqual(feed.applyLimits(NOON, four, cand({ kind: "milestone", trigger: "streak" }), OFFSET), { ok: true });
-  assert.deepEqual(feed.applyLimits(NOON, four, cand({ trigger: "unit_complete" }), OFFSET), { ok: true });
-  assert.deepEqual(feed.applyLimits(NOON, four, cand({ kind: "blog", trigger: "blog_unlocked" }), OFFSET), { ok: true });
-  const five = [...four, post(0.9, "npc-tess")];
-  assert.deepEqual(feed.applyLimits(NOON, five, cand({ kind: "milestone", trigger: "streak" }), OFFSET), { ok: false, reason: "cap" });
-  assert.deepEqual(feed.applyLimits(NOON, five, cand({ trigger: "unit_complete" }), OFFSET), { ok: false, reason: "cap" });
-});
-
-test("limits: blog cards are never dropped, whatever the day looks like", () => {
-  const many = Array.from({ length: 12 }, (_, i) => post(i / 4, "npc-ada"));
-  assert.deepEqual(feed.applyLimits(NOON, many, cand({ kind: "blog", trigger: "blog_unlocked" }), OFFSET), { ok: true });
-});
-
-test("limits: yesterday's posts do not count against today (local day)", () => {
-  const yesterday = Array.from({ length: 6 }, (_, i) => ({ npcId: `npc-x${i}`, createdAt: Date.parse("2026-11-17T20:00:00Z") + i }));
-  assert.deepEqual(feed.applyLimits(NOON, yesterday, cand(), OFFSET), { ok: true });
-  // the same instants are today in a timezone 8 hours behind UTC... and not in UTC+? check the offset is used
-  const late = Date.parse("2026-11-18T03:00:00Z");
-  const posts = Array.from({ length: 4 }, (_, i) => ({ npcId: `npc-x${i}`, createdAt: late + i }));
-  assert.deepEqual(feed.applyLimits(late + 10 * MIN, posts, cand(), OFFSET), { ok: false, reason: "cap" });
-  // New York (offset +300): 03:00Z on the 18th is still the 17th, a different local day from 12:00Z on the 18th
-  assert.deepEqual(feed.applyLimits(NOON, posts, cand(), 300), { ok: true });
-});
-
-test("limits: 30 minutes between posts of the same NPC", () => {
-  assert.deepEqual(feed.applyLimits(NOON, [{ npcId: "npc-ada", createdAt: NOON - 29 * MIN }], cand(), OFFSET), { ok: false, reason: "spacing" });
-  assert.deepEqual(feed.applyLimits(NOON, [{ npcId: "npc-ada", createdAt: NOON - 30 * MIN }], cand(), OFFSET), { ok: true });
-  assert.deepEqual(feed.applyLimits(NOON, [{ npcId: "npc-hal", createdAt: NOON - 1 * MIN }], cand(), OFFSET), { ok: true }, "other NPC");
-  // a blog card does not block its author's next post
-  assert.deepEqual(feed.applyLimits(NOON, [{ npcId: "npc-ada", createdAt: NOON - MIN, blogId: "b" }], cand(), OFFSET), { ok: true });
+test("nothing limits how many posts there are: the limits are gone", () => {
+  assert.equal(feed.applyLimits, undefined);
+  assert.equal(feed.DAILY_POST_CAP, undefined);
+  assert.equal(feed.NPC_SPACING_MS, undefined);
 });
 
 /* ------------------------------------------------------------------ */
@@ -271,8 +238,8 @@ test("limits: 30 minutes between posts of the same NPC", () => {
 /* ------------------------------------------------------------------ */
 
 const planInput = (over = {}) => ({
-  postId: "fp_1", event: lessonEvent(), now: NOON, templates: [tpl({ reactors: ["npc-hal"] })], history: history(), existing: [],
-  npcs: CAST, values: { lesson: "What is an atom?", name: "Sam" }, rng: mulberry32(3), offsetMin: OFFSET, ...over,
+  postId: "fp_1", event: lessonEvent(), now: NOON, templates: [tpl({ reactors: ["npc-hal"] })], history: history(),
+  npcs: CAST, values: { lesson: "What is an atom?", name: "Sam" }, rng: mulberry32(3), ...over,
 });
 
 test("planPost renders once, chooses a chip, plans reactions and applies the rules", () => {
@@ -287,13 +254,49 @@ test("planPost renders once, chooses a chip, plans reactions and applies the rul
 
   assert.deepEqual(feed.planPost(planInput({ history: history({ dedupeKeys: ["lesson:what-is-an-atom"] }) })), { ok: false, reason: "duplicate" });
   assert.deepEqual(feed.planPost(planInput({ templates: [] })), { ok: false, reason: "no_template" });
-  assert.deepEqual(feed.planPost(planInput({ existing: [{ npcId: "npc-ada", createdAt: NOON - MIN }] })), { ok: false, reason: "spacing" });
+  // the same teacher posting again straight away is fine: there is no spacing rule
+  assert.equal(feed.planPost(planInput({ now: NOON + 1000, history: history({ dedupeKeys: ["lesson:other"] }) })).ok, true);
   assert.deepEqual(feed.planPost(planInput({ values: { name: "Sam" } })), { ok: false, reason: "render" });
   // a chip that has no target on this event is dropped; quests and ranks chips need none
   const noLessonChip = feed.planPost(planInput({ event: { type: "checkpoint_pass", unitId: "u" }, templates: [tpl({ trigger: "checkpoint_pass", text: "Checkpoint in {unit}.", chip: "lesson" })], values: { unit: "U" } }));
   assert.equal(noLessonChip.post.chipKind, null);
   const quests = feed.planPost(planInput({ event: { type: "daily_quests_done" }, templates: [tpl({ trigger: "daily_quests_done", text: "All done.", chip: "quests" })] }));
   assert.deepEqual([quests.post.chipKind, quests.post.chipTarget], ["quests", null]);
+});
+
+test("a streak post is the learner's own voice: the poster is the learner, a friend reacts", () => {
+  const streak = tpl({ id: "ft-streak-7", npcId: null, posterPool: ["learner"], kind: "milestone", trigger: "streak", condition: { days: 7 }, text: "{days} days in a row.", chip: null, reactors: ["npc-ray"] });
+  const r = feed.planPost(planInput({ event: { type: "streak", days: 7 }, templates: [streak], values: { days: 7, name: "Sam" } }));
+  assert.equal(r.ok, true);
+  assert.equal(r.post.npcId, feed.LEARNER_POSTER);
+  assert.equal(r.post.text, "7 days in a row.");
+  assert.ok(r.reactions.some((x) => x.actorId === "npc-ray"));
+});
+
+test("reconcileEvents lists the posts progress says are missing, oldest first, and nothing already posted", () => {
+  const nodes = [
+    { id: "n1", unitId: "u1", kind: "lesson", position: 1, lessonId: "l1" },
+    { id: "n2", unitId: "u1", kind: "lesson", position: 2, lessonId: "l2" },
+    { id: "n3", unitId: "u1", kind: "checkpoint", position: 3 },
+    { id: "n4", unitId: "u2", kind: "lesson", position: 1, lessonId: "l3" },
+  ];
+  const input = {
+    unitIds: ["u1", "u2"], nodes,
+    completed: new Set(["n1", "n2", "n3"]), testedOut: new Set(), completedUnits: new Set(["u1"]),
+    stars: new Map([["n2", 3]]), completedAt: new Map([["n1", 10], ["n2", 20], ["n3", 30]]), streak: 7,
+  };
+  const types = (items) => items.map((i) => `${i.event.type}:${i.event.lessonId ?? i.event.unitId ?? i.event.days}`);
+  const all = feed.reconcileEvents(input, new Set(), "2026-11-18");
+  assert.deepEqual(types(all), ["first_lesson:l1", "lesson_complete:l2", "checkpoint_pass:u1", "unit_complete:u1", "streak:3", "streak:7"]);
+  assert.equal(all[0].fallback.type, "lesson_complete");
+  assert.equal(all[1].event.perfect, true);
+  assert.deepEqual(all.map((i) => i.at), [10, 20, 30, 30, null, null]);
+  // Posted already: left out. The hello may have fallen back to a lesson post: still not repeated.
+  assert.deepEqual(types(feed.reconcileEvents(input, new Set(["first-lesson", "lesson:l2", "checkpoint:u1", "unit:u1", "streak:3", "streak:7"]), "2026-11-18")), []);
+  assert.deepEqual(types(feed.reconcileEvents(input, new Set(["lesson:l1", "lesson:l2", "checkpoint:u1", "unit:u1", "streak:3", "streak:7"]), "2026-11-18")), []);
+  // Nothing done, nothing to post; a test-out posts for its unit.
+  assert.deepEqual(feed.reconcileEvents({ ...input, completed: new Set(), completedUnits: new Set(), streak: 0 }, [], "d"), []);
+  assert.deepEqual(types(feed.reconcileEvents({ ...input, completed: new Set(), completedUnits: new Set(), streak: 0, testedOut: new Set(["u2"]) }, [], "d")), ["testout_pass:u2"]);
 });
 
 test("planPost is stable: same inputs, same post and reactions", () => {

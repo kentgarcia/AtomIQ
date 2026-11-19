@@ -11,7 +11,10 @@ import { View } from "react-native";
 import { Text } from "@/components/ui/text";
 import Animated, { FadeInDown, useReducedMotion } from "react-native-reanimated";
 
-import { LearnerBubble, TeacherBubble, useLessonTeacher } from "@/components/lesson/Conversation";
+import { SfxOnMount } from "@/components/ui/sfx-on-mount";
+import { LearnerBubble, TeacherBubble, bubbleTypeAt, useLessonTeacher } from "@/components/lesson/Conversation";
+import { CascadeIn, useCascadeDirection } from "@/components/motion/cascade-context";
+import { PAGE_FX, popIn } from "@/components/motion/cascade-fx";
 import { EASE_OUT } from "@/components/motion/motion";
 import { useNpc } from "@/components/npc/use-npc";
 import type { ResolvedCard, StoryData } from "@/content/curriculum/types";
@@ -64,18 +67,20 @@ function LectureBlock({ info }: { info: LectureBlockInfo }) {
   const shown = Math.max(1, Math.min(info.shown, steps.length));
   const kicker = info.card.type === "story" ? data.tag : undefined;
   const enter = reduced ? undefined : FadeInDown.duration(220).easing(EASE_OUT);
+  // In a lesson the page builds itself like the onboarding's: the title rises, then the teacher pops, his bubble pops and types
+  const direction = useCascadeDirection();
 
   return (
     <View style={styles.block}>
       {kicker || data.title ? (
-        <View style={styles.head}>
+        <CascadeIn at={PAGE_FX.title} style={styles.head}>
           {kicker ? <Text style={styles.tag}>{kicker}</Text> : null}
           {data.title ? (
             <Text accessibilityRole="header" style={styles.title}>
               {data.title}
             </Text>
           ) : null}
-        </View>
+        </CascadeIn>
       ) : null}
       {info.guess ? (
         <LearnerBubble>
@@ -86,15 +91,17 @@ function LectureBlock({ info }: { info: LectureBlockInfo }) {
         const latest = info.animateLast && i === shown - 1;
         if (step.kind === "figure") {
           return data.figure ? (
-            <Animated.View key={i} entering={latest ? enter : undefined}>
+            <Animated.View key={i} entering={latest ? (direction ? popIn(direction, i === 0 ? PAGE_FX.fox : 0) : enter) : undefined}>
+              {latest ? <SfxOnMount cue="reward.pop" volume={0.5} /> : null}
               <FigureView figure={data.figure} />
             </Animated.View>
           ) : null;
         }
         const first = steps[i - 1]?.kind !== "bubble";
         return (
-          <TeacherBubble key={i} first={first} teller={teller} entering={latest ? enter : undefined}>
-            <TypedTermText text={step.text} style={card.body} typing={latest} />
+          <TeacherBubble key={i} first={first} teller={teller} entering={latest ? enter : undefined} arriving={latest && direction ? (i === 0 ? "page" : "step") : undefined}>
+            {latest && !direction ? <SfxOnMount cue="lesson.bubble" /> : null}
+            <TypedTermText text={step.text} style={card.body} typing={latest} startAt={latest && direction ? bubbleTypeAt(i === 0 ? "page" : "step", first) : 0} />
           </TeacherBubble>
         );
       })}

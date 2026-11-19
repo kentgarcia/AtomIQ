@@ -16,6 +16,7 @@ import { Pressable, View } from "react-native";
 import { Avatar } from "@/components/avatar/Avatar";
 import { avatarBackground, serializeAvatar, type AvatarConfig } from "@/components/avatar/avatar-core";
 import { PatternLayer } from "@/components/avatar/PatternLayer";
+import { PopWhen } from "@/components/motion/PopOnce";
 import { Text } from "@/components/ui/text";
 import { createStyles, fontFaces, useTheme } from "@/theme";
 import { controls } from "@/theme/tokens";
@@ -30,7 +31,8 @@ const useStyles = createStyles((theme) => {
     tile: { alignItems: "center", gap: 6, paddingTop: 10, paddingBottom: 8, borderRadius: 18, backgroundColor: c.surfaceSoft, borderWidth: controls.border, borderColor: "transparent" },
     tileOn: { backgroundColor: c.primarySurface, borderColor: c.primaryBorder },
     swatch: { alignSelf: "stretch", height: 64, marginHorizontal: 10, borderRadius: 14, overflow: "hidden" },
-    pressed: { opacity: 0.7 },
+    // The press sinks the tile like every other 3D control (no fading)
+    pressed: { transform: [{ translateY: controls.pressTravel }] },
     price: { flexDirection: "row", alignItems: "center", gap: 4 },
     diamond: { width: 16, height: 16 },
     priceText: { fontSize: 14, ...fontFaces.heavy, color: c.text, fontVariant: ["tabular-nums"] },
@@ -48,24 +50,28 @@ export const ItemTile = memo(function ItemTile({
   /** The avatar the learner has now; the item is tried on a copy of it. */
   base: AvatarConfig;
   selected: boolean;
-  onPress: () => void;
+  /** Gets the item back, so one stable function can serve every tile (an inline one would re-render them all). */
+  onPress: (item: ShopItem) => void;
   /** What a screen reader says (the item's name). */
   label: string;
 }) {
-  const styles = useStyles(useTheme().theme);
+  const { theme } = useTheme();
+  const styles = useStyles(theme);
   const look = useMemo(() => previewConfig(base, item), [base, item]);
   const flat = item.category === "paint" || item.category === "pattern";
   return (
+    // A tile that becomes the one being tried on pops (it flips its colour at once); putting it down does not
+    <PopWhen trigger={selected} active={selected} intensity={0.7} sparkleColor={theme.colors.primary}>
     <Pressable
-      onPress={onPress}
+      onPress={() => onPress(item)}
       accessibilityRole="button"
       accessibilityLabel={`${label}, ${item.price} diamonds`}
       accessibilityState={{ selected }}
-      style={({ pressed }) => [styles.tile, selected && styles.tileOn, pressed && !selected && styles.pressed]}
+      style={({ pressed }) => [styles.tile, selected && styles.tileOn, pressed && styles.pressed]}
     >
       {flat ? (
         <View style={[styles.swatch, { backgroundColor: avatarBackground(look) }]}>
-          <PatternLayer pattern={look.pattern} tile={32} />
+          <PatternLayer pattern={look.pattern} tile={48} />
         </View>
       ) : (
         <Avatar value={serializeAvatar(look)} size={64} radius={16} />
@@ -75,5 +81,6 @@ export const ItemTile = memo(function ItemTile({
         <Text style={styles.priceText}>{item.price}</Text>
       </View>
     </Pressable>
+    </PopWhen>
   );
 });

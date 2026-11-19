@@ -87,6 +87,10 @@ test("comment chips and next blocks open a lesson, an entry or the map", () => {
   assert.equal(ui.commentChipTarget(null), null);
   assert.equal(ui.commentChipTarget({}), null);
   assert.equal(ui.commentChipTarget({ lessonId: "l1" }).target.href, "/lesson/l1");
+  assert.equal(ui.commentChipTarget({ lessonId: "l1" }).locked, false);
+  assert.equal(ui.commentChipTarget({ lessonId: "l1" }, new Set(["l1"])).locked, true);
+  assert.equal(ui.commentChipTarget({ lessonId: "l1" }, ["l2"]).locked, false);
+  assert.equal(ui.commentChipTarget({ entryId: "proton" }, ["proton"]).locked, false);
   assert.equal(ui.commentChipTarget({ entryId: "proton" }).target.href, "/explorer/encyclopedia-entry?id=proton");
   assert.equal(ui.nextTarget({ lessonId: "l1" }).href, "/lesson/l1");
   assert.deepEqual(ui.nextTarget({ unitId: "u1" }), { href: "/(tabs)", how: "tab" });
@@ -128,7 +132,16 @@ test("newItemIds: nothing is new on the first load, then only the arrivals", () 
   assert.deepEqual(ui.newItemIds(new Set(["a", "b", "c"]), items), []);
 });
 
+test("dripPlan: first load shows all, arrivals queue oldest first, a flood shows the old ones at once", () => {
+  const items = ["f", "e", "d", "c", "b", "a"].map((id) => ({ id })); // newest first
+  assert.deepEqual(ui.dripPlan(null, items), { instant: ["f", "e", "d", "c", "b", "a"], queued: [] });
+  assert.deepEqual(ui.dripPlan(new Set(["a", "b", "c"]), items), { instant: [], queued: ["d", "e", "f"] });
+  assert.deepEqual(ui.dripPlan(new Set(["a", "b", "c", "d", "e", "f"]), items), { instant: [], queued: [] });
+  assert.deepEqual(ui.dripPlan(new Set(), items, 2), { instant: ["a", "b", "c", "d"], queued: ["e", "f"] });
+});
+
 test("action phrase by kind, with the chip standing in until items carry a kind", () => {
+  assert.equal(ui.actionPhrase({ kind: "milestone", learner: true }), "reached a milestone");
   assert.equal(ui.actionPhrase({ kind: "celebrate" }), "cheered you on");
   assert.equal(ui.actionPhrase({ kind: "milestone" }), "shared a milestone");
   assert.equal(ui.actionPhrase({ kind: "nudge" }), "has a nudge");
@@ -179,13 +192,19 @@ test("reaction pill label and the ranking banner lines", () => {
 });
 
 test("the shortcut circles are the four the design names", () => {
-  assert.deepEqual(ui.SHORTCUTS.map((s) => s.href), ["/encyclopedia", "/periodic-table", "/daily-facts", "/lab"]);
-  assert.deepEqual(ui.SHORTCUTS.map((s) => s.label), ["Encyclopedia", "Periodic table", "Daily facts", "Lab"]);
+  assert.deepEqual(ui.SHORTCUTS.map((s) => s.href), ["/encyclopedia", "/periodic-table", "/daily-facts", "/blogs"]);
+  assert.deepEqual(ui.SHORTCUTS.map((s) => s.label), ["Encyclopedia", "Periodic table", "Daily facts", "Blogs"]);
 });
 
 /* ------------------------------------------------------------------ */
 /* check:feed catches a learner comment path                           */
 /* ------------------------------------------------------------------ */
+
+test("a teacher's avatar opens their profile; the learner's own opens the Profile tab", () => {
+  assert.equal(ui.npcHref("npc-ada"), "/npc/npc-ada");
+  assert.equal(ui.npcHref("a b"), "/npc/a%20b");
+  assert.equal(ui.PROFILE_HREF, "/(tabs)/profile");
+});
 
 test("commentsLabel: a button label for blog comments, none for zero", () => {
   assert.equal(ui.commentsLabel(0), null);

@@ -4,19 +4,21 @@
  */
 
 import { useRouter } from "expo-router";
-import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { Children, isValidElement, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { Pressable, View, type LayoutChangeEvent, type StyleProp, type TextStyle, type ViewStyle } from "react-native";
 import { Text } from "@/components/ui/text";
 import Animated, { Easing, cancelAnimation, interpolateColor, useAnimatedStyle, useReducedMotion, useSharedValue, withTiming, type SharedValue } from "react-native-reanimated";
 
 import { TeacherSays, useLessonTeacher } from "@/components/lesson/Conversation";
+import { CascadeIn, useCascadeDirection } from "@/components/motion/cascade-context";
+import { PAGE_FX } from "@/components/motion/cascade-fx";
+import { useCascadeSfx } from "@/components/motion/use-cascade-sfx";
 import { Sparkle } from "@/components/lesson/Sparkle";
 import { useShakeClock } from "@/components/lesson/Shake";
 import { ObjectArt } from "@/components/lesson/visual/ObjectArt";
 import { isArtId } from "@/components/lesson/visual/object-art";
 import { SceneSvg } from "@/components/lesson/visual/SceneFigure";
 import { EASE_OUT } from "@/components/motion/motion";
-import { Card } from "@/components/ui/card";
 import { Icon } from "@/components/ui/icon";
 import type { CardFigure, ItemResponse, ItemResult } from "@/content/curriculum/types";
 import { splitTerms } from "@/content/curriculum/terms";
@@ -75,7 +77,7 @@ export const useCardStyles = (() => {
     },
     markBadge: { width: 30, height: 30, borderRadius: radius.full, alignItems: "center", justifyContent: "center" },
     markText: { ...fontFaces.heavy, fontSize: fontSizes.xl, color: theme.colors.onPrimary },
-    badgeOn: { backgroundColor: theme.colors.primary, borderColor: theme.colors.primary },
+    badgeOn: { backgroundColor: theme.colors.guide, borderColor: theme.colors.guide },
     badgeText: { ...fontFaces.bold, fontSize: fontSizes.lg, color: theme.colors.textSecondary },
     badgeTextOn: { color: theme.colors.onPrimary },
     stack: { flexGrow: 1, gap: spacing.md },
@@ -84,6 +86,10 @@ export const useCardStyles = (() => {
     optionsArea: { flexGrow: 1, justifyContent: "center", gap: spacing.md },
     optionButton: { minHeight: 52, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: spacing.sm, paddingVertical: spacing.sm, paddingHorizontal: spacing.lg, borderRadius: radius.lg, borderWidth: controls.border },
     optionButtonLabel: { ...fontFaces.heavy, fontSize: fontSizes["2xl"], lineHeight: 24, color: theme.colors.text, textAlign: "center" },
+    verdict: { minHeight: 84, flexDirection: "row", alignItems: "center", gap: spacing.md, paddingVertical: spacing.md, paddingHorizontal: spacing.md, borderRadius: radius.lg, borderWidth: controls.border },
+    verdictTile: { width: 52, height: 52, borderRadius: radius.lg, alignItems: "center", justifyContent: "center" },
+    verdictLabel: { ...fontFaces.black, fontSize: fontSizes["3xl"], lineHeight: 30, letterSpacing: 0.4, color: theme.colors.text },
+    verdictHint: { ...fontFaces.medium, fontSize: fontSizes.lg, lineHeight: 20, color: theme.colors.textSecondary },
     sectionLabel: {
       ...fontFaces.bold,
       fontSize: fontSizes.md,
@@ -190,13 +196,9 @@ export function TermText({ text, style }: { text: string; style?: StyleProp<Text
   );
 }
 
-/** The 3D card a figure or simulation stands on. */
+/** Where a figure or simulation stands: no card, the drawing sits straight on the page. */
 export function FigureStage({ children }: { children: ReactNode }) {
-  return (
-    <Card tone="soft" padding={spacing.sm} style={{ width: "100%" }} faceStyle={{ alignItems: "center" }}>
-      {children}
-    </Card>
-  );
+  return <View style={{ width: "100%", alignItems: "center" }}>{children}</View>;
 }
 
 /** A card figure: a drawn scene on its stage, with alt text for screen readers and an optional caption. */
@@ -205,9 +207,8 @@ export function FigureView({ figure, maxWidth }: { figure: CardFigure; maxWidth?
   const styles = useCardStyles(theme);
   const [width, setWidth] = useState(0);
   const onLayout = (e: LayoutChangeEvent) => setWidth(Math.floor(e.nativeEvent.layout.width));
-  // The stage pads and borders the scene, so the scene is narrower than the space we are given.
-  const inner = Math.max(0, width - 2 * (spacing.sm + controls.border));
-  const w = maxWidth ? Math.min(inner, maxWidth) : inner;
+  // No card around the scene, so it takes the whole width it is given.
+  const w = maxWidth ? Math.min(width, maxWidth) : width;
   return (
     <View style={styles.figureWrap} onLayout={onLayout}>
       <FigureStage>
@@ -238,14 +239,14 @@ export function PromptHeader({ ownerId, text, hint }: { ownerId: string; text: s
     );
   }
   return (
-    <View>
+    <CascadeIn at={PAGE_FX.title + 50}>
       <View style={styles.promptRow}>
         <View style={styles.promptText}>
           <TermText text={text} style={styles.prompt} />
         </View>
       </View>
       {hint ? <Text style={styles.hint}>{hint}</Text> : null}
-    </View>
+    </CascadeIn>
   );
 }
 
@@ -257,17 +258,31 @@ type Skin = { background: string; border: string; lip: string };
 export function optionSkins(c: Theme["colors"]): Record<"idle" | "selected" | "correct" | "wrong", Skin> {
   return {
     idle: { background: c.surface, border: c.border, lip: c.borderStrong },
-    selected: { background: c.primarySurface, border: c.primaryBorder, lip: c.primaryDark },
+    // Selecting is the app's blue (the Guide's), the same colour the onboarding is built on
+    selected: { background: c.infoSurface, border: c.guide, lip: c.guideLip },
     correct: { background: c.successSurface, border: c.success, lip: c.successDark },
     wrong: { background: c.errorSurface, border: c.error, lip: c.dangerDark },
   };
 }
 
+/** The colour a row wears when it is selected, and its darker lip. */
+export interface OptionTone {
+  color: string;
+  dark: string;
+}
+
 /** The colours of an option for a state, cross-fading from the previous state (in 160 ms; 50 ms into selected or correct). */
-function useOptionSkin(state: OptionState) {
+function useOptionSkin(state: OptionState, tone?: OptionTone) {
   const { theme } = useTheme();
   const reduced = useReducedMotion();
-  const skins = useMemo(() => optionSkins(theme.colors), [theme]);
+  const toneColor = tone?.color;
+  const toneDark = tone?.dark;
+  // A toned row (onboarding's questions) is selected in its own colour instead of the blue
+  const skins = useMemo(() => {
+    const base = optionSkins(theme.colors);
+    if (toneColor && toneDark) base.selected = { background: withAlpha(toneColor, 0.14), border: toneColor, lip: toneDark };
+    return base;
+  }, [theme, toneColor, toneDark]);
   const key = state === "dim" ? "idle" : state;
 
   // Cross-fade from the previous skin to the new one (a state change, so it is shown).
@@ -341,12 +356,16 @@ function PopStar({ i, clock, color, place }: { i: 0 | 1; clock: SharedValue<numb
  * band of light sweeps across it and two sparkles twinkle, falls stretched, lands squashed, hops a little
  * and settles. A wrong option shakes as a whole (lip included, so the face never leaves its base). Reduced motion keeps only the colour change.
  */
-function OptionSurface({ state, pressed, disabled, faceStyle, children }: { state: OptionState; pressed: boolean; disabled?: boolean; faceStyle: StyleProp<ViewStyle>; children: ReactNode }) {
+function OptionSurface({ state, pressed, disabled, faceStyle, tone, children }: { state: OptionState; pressed: boolean; disabled?: boolean; faceStyle: StyleProp<ViewStyle>; tone?: OptionTone; children: ReactNode }) {
   const { theme } = useTheme();
   const styles = useCardStyles(theme);
   const reduced = useReducedMotion();
-  const { skinStyle, lipStyle } = useOptionSkin(state);
-  const skins = useMemo(() => optionSkins(theme.colors), [theme]);
+  const { skinStyle, lipStyle } = useOptionSkin(state, tone);
+  const skins = useMemo(() => {
+    const base = optionSkins(theme.colors);
+    if (tone) base.selected = { background: withAlpha(tone.color, 0.14), border: tone.color, lip: tone.dark };
+    return base;
+  }, [theme, tone]);
   const [width, setWidth] = useState(0);
   // The pop clock: POP_TOTAL means "not popping". A state that is already there when the row appears does not pop.
   const pop = useSharedValue(POP_TOTAL);
@@ -408,6 +427,12 @@ function OptionSurface({ state, pressed, disabled, faceStyle, children }: { stat
   );
 }
 
+/**
+ * Text that sits in the middle of its row: no fixed line height (where the extra of a taller line box lands differs
+ * between Android and iOS, and it pushed the glyphs toward the top) and no extra font padding.
+ */
+const CENTERED_TEXT = { textAlignVertical: "center", includeFontPadding: false } as const;
+
 /** The room the right/wrong mark takes: always reserved, so an option is the same size in every state. */
 const STATE_ICON = 22;
 
@@ -420,18 +445,31 @@ function StateIcon({ state }: { state: OptionState }) {
 /** The room under a question, with its options in the middle of it. */
 export function OptionsArea({ children }: { children: ReactNode }) {
   const { theme } = useTheme();
-  return <View style={useCardStyles(theme).optionsArea}>{children}</View>;
+  const items = Children.toArray(children);
+  // The options arrive like the onboarding's: one by one, a soft tick for each (the count is the one at arrival, so an explanation
+  // that appears under them later does not tick again)
+  const [arrived] = useState(items.length);
+  useCascadeSfx(useCascadeDirection(), "ui.tick", PAGE_FX.options + 120, PAGE_FX.optionStep, Math.min(arrived, 6));
+  return (
+    <View style={useCardStyles(theme).optionsArea}>
+      {items.map((child, i) => (
+        <CascadeIn key={isValidElement(child) && child.key !== null ? child.key : i} at={PAGE_FX.options + Math.min(i, 5) * PAGE_FX.optionStep} from={0.96}>
+          {child}
+        </CascadeIn>
+      ))}
+    </View>
+  );
 }
 
 /**
  * A centred answer button (myth or fact, a word-bank word): the same face as an option row, so it
  * has the same pressed, selected, correct and wrong looks and the same pop.
  */
-export function OptionButton({ label, state = "idle", icon, iconOnly, accessibilityLabel, fullWidth = true, disabled, onPress }: { label: string; state?: OptionState; icon?: string; /** Show only the icon (its name is the accessibility label); a legend explains it. */ iconOnly?: boolean; accessibilityLabel?: string; fullWidth?: boolean; disabled?: boolean; onPress?: () => void }) {
+export function OptionButton({ label, state = "idle", icon, iconOnly, iconColor, accessibilityLabel, fullWidth = true, disabled, onPress }: { label: string; state?: OptionState; icon?: string; /** Colour of the icon in every state (default: follows the state). */ iconColor?: string; /** Show only the icon (its name is the accessibility label); a legend explains it. */ iconOnly?: boolean; accessibilityLabel?: string; fullWidth?: boolean; disabled?: boolean; onPress?: () => void }) {
   const { theme } = useTheme();
   const styles = useCardStyles(theme);
   const c = theme.colors;
-  const ink = state === "correct" ? c.success : state === "wrong" ? c.error : state === "selected" ? c.primaryLight : c.textSecondary;
+  const ink = state === "correct" ? c.success : state === "wrong" ? c.error : state === "selected" ? c.guide : c.textSecondary;
   return (
     <Pressable
       style={fullWidth ? { flex: 1 } : undefined}
@@ -446,8 +484,43 @@ export function OptionButton({ label, state = "idle", icon, iconOnly, accessibil
     >
       {({ pressed }) => (
         <OptionSurface state={state} pressed={pressed} disabled={disabled} faceStyle={styles.optionButton}>
-          {icon ? <Icon name={icon} size={24} color={ink} /> : null}
+          {icon ? <Icon name={icon} size={24} color={iconColor ?? ink} /> : null}
           {iconOnly && icon ? null : <Text style={styles.optionButtonLabel}>{label}</Text>}
+        </OptionSurface>
+      )}
+    </Pressable>
+  );
+}
+
+/**
+ * One of the two answers of a myth-or-fact card: a tall row with a tinted icon tile (green tick, red
+ * cross), the verdict in big letters and a few words under it. Same face, pressed state and pop as
+ * every option row.
+ */
+export function VerdictOption({ label, hint, icon, hue, state = "idle", disabled, onPress }: { label: string; hint: string; icon: string; hue: string; state?: OptionState; disabled?: boolean; onPress?: () => void }) {
+  const { theme } = useTheme();
+  const styles = useCardStyles(theme);
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={`${label}. ${hint}`}
+      accessibilityState={{ selected: state === "selected", disabled: !!disabled }}
+      disabled={disabled}
+      onPress={() => {
+        select();
+        onPress?.();
+      }}
+    >
+      {({ pressed }) => (
+        <OptionSurface state={state} pressed={pressed} disabled={disabled} faceStyle={styles.verdict}>
+          <View style={[styles.verdictTile, { backgroundColor: withAlpha(hue, 0.18) }]}>
+            <Icon name={icon} size={30} color={hue} variant="Bold" />
+          </View>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.verdictLabel}>{label}</Text>
+            <Text style={styles.verdictHint}>{hint}</Text>
+          </View>
+          <StateIcon state={state} />
         </OptionSurface>
       )}
     </Pressable>
@@ -465,9 +538,21 @@ export function OptionRow({
   onPress,
   accessibilityHint,
   right,
+  icon,
+  hint,
+  centerText,
+  tone,
 }: {
   label: string;
   state?: OptionState;
+  /** An icon in a tinted tile before the label (onboarding's questions). */
+  icon?: string;
+  /** A second, quieter line under the label. */
+  hint?: string;
+  /** The row's own colour: its icon tile, and its face, border and lip once selected. */
+  tone?: OptionTone;
+  /** A taller row with the label (and hint) centred vertically, font padding off so it sits in the middle (onboarding's questions). */
+  centerText?: boolean;
   badge?: string;
   /** A coloured number badge that identifies the row (match pairs). */
   mark?: { color: string; label: string };
@@ -494,7 +579,7 @@ export function OptionRow({
       }}
     >
       {({ pressed }) => (
-        <OptionSurface state={state} pressed={pressed} disabled={disabled} faceStyle={styles.option}>
+        <OptionSurface state={state} pressed={pressed} disabled={disabled} faceStyle={centerText ? [styles.option, { minHeight: 64 }] : styles.option} tone={tone}>
           {mark ? (
             <View style={[styles.markBadge, { backgroundColor: mark.color }]}>
               <Text style={styles.markText}>{mark.label}</Text>
@@ -505,8 +590,14 @@ export function OptionRow({
             </View>
           ) : null}
           {isArtId(art) ? <ObjectArt id={art} size={44} /> : null}
-          <View style={{ flex: 1 }}>
-            <Text style={styles.optionLabel}>{label}</Text>
+          {icon ? (
+            <View style={{ width: 44, height: 44, borderRadius: radius.md, alignItems: "center", justifyContent: "center", backgroundColor: withAlpha(tone?.color ?? theme.colors.guide, on ? 0.28 : 0.16) }}>
+              <Icon name={icon} size={26} color={tone?.color ?? (on ? theme.colors.guide : theme.colors.textSecondary)} variant="Bold" />
+            </View>
+          ) : null}
+          <View style={centerText ? { flex: 1, justifyContent: "center" } : { flex: 1 }}>
+            <Text style={centerText ? [{ ...fontFaces.semibold, fontSize: fontSizes.xl, color: theme.colors.text }, CENTERED_TEXT] : styles.optionLabel}>{label}</Text>
+            {hint ? <Text style={centerText ? [styles.hint, CENTERED_TEXT] : styles.hint}>{hint}</Text> : null}
           </View>
           {right}
           <StateIcon state={state} />

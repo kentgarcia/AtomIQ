@@ -98,8 +98,12 @@ export const HOME_HREF = "/(tabs)";
 export const QUESTS_HREF = "/(tabs)/quests";
 export const RANKS_HREF = "/ranks";
 export const ENCYCLOPEDIA_HREF = "/encyclopedia";
+export const BLOGS_HREF = "/blogs";
+export const PROFILE_HREF = "/(tabs)/profile";
 
 export const lessonHref = (lessonId: string): string => `/lesson/${encodeURIComponent(lessonId)}`;
+/** A teacher's profile page. */
+export const npcHref = (npcId: string): string => `/npc/${encodeURIComponent(npcId)}`;
 export const blogHref = (blogId: string): string => `/blog/${encodeURIComponent(blogId)}`;
 export const entryHref = (entryId: string): string => `/explorer/encyclopedia-entry?id=${encodeURIComponent(entryId)}`;
 
@@ -126,11 +130,20 @@ export const CHIP_LABELS: Record<FeedChipKind, string> = {
   ranks: "See the ranking",
 };
 
-/** What a comment's chip opens: a lesson or an encyclopedia entry. */
-export function commentChipTarget(chip: { lessonId?: string; entryId?: string } | null): { target: FeedTarget; label: string } | null {
+/**
+ * What a comment's chip opens: a lesson or an encyclopedia entry. A lesson the learner has not
+ * unlocked yet (`lockedLessonIds`) comes back with `locked: true`, and the screen shows it shut.
+ */
+export function commentChipTarget(
+  chip: { lessonId?: string; entryId?: string } | null,
+  lockedLessonIds: ReadonlySet<string> | readonly string[] = [],
+): { target: FeedTarget; label: string; locked: boolean } | null {
   if (!chip) return null;
-  if (chip.lessonId) return { target: { href: lessonHref(chip.lessonId), how: "push" }, label: "Open lesson" };
-  if (chip.entryId) return { target: { href: entryHref(chip.entryId), how: "push" }, label: "Open entry" };
+  if (chip.lessonId) {
+    const locked = Array.isArray(lockedLessonIds) ? lockedLessonIds.includes(chip.lessonId) : (lockedLessonIds as ReadonlySet<string>).has(chip.lessonId);
+    return { target: { href: lessonHref(chip.lessonId), how: "push" }, label: locked ? "Lesson locked" : "Open lesson", locked };
+  }
+  if (chip.entryId) return { target: { href: entryHref(chip.entryId), how: "push" }, label: "Open entry", locked: false };
   return null;
 }
 
@@ -218,6 +231,23 @@ export function newItemIds(known: ReadonlySet<string> | null, items: readonly { 
   return items.filter((i) => !known.has(i.id)).map((i) => i.id);
 }
 
+/** Wait before each new post lands, so they arrive one by one. */
+export const DRIP_MS = 520;
+/** More than this many arrivals at once: the older ones are just there, only the newest few land one by one. */
+export const DRIP_MAX = 5;
+
+/**
+ * Arrivals the list has not shown yet, as a plan: `instant` appear at once (the overflow, oldest first),
+ * `queued` land one by one, oldest first, so the newest post ends on top. `shown` is `null` on the first
+ * load, when everything is simply there.
+ */
+export function dripPlan(shown: ReadonlySet<string> | null, items: readonly { id: string }[], max: number = DRIP_MAX): { instant: string[]; queued: string[] } {
+  if (!shown) return { instant: items.map((i) => i.id), queued: [] };
+  const pending = items.filter((i) => !shown.has(i.id)).map((i) => i.id).reverse();
+  const cut = Math.max(0, pending.length - max);
+  return { instant: pending.slice(0, cut), queued: pending.slice(cut) };
+}
+
 /* ------------------------------------------------------------------ */
 /* The flat post layout: action phrase, figure pose, "Liked by" line   */
 /* ------------------------------------------------------------------ */
@@ -248,9 +278,18 @@ export function resolveKind(p: { kind?: FeedKindName | null; chipKind?: string |
   return (p.chipKind && KIND_FROM_CHIP[p.chipKind]) || "celebrate";
 }
 
-/** "cheered you on" etc.; a blog card is "wrote a blog piece". */
-export function actionPhrase(p: { blog?: boolean; kind?: FeedKindName | null; chipKind?: string | null }): string {
-  return p.blog ? "wrote a blog piece" : KIND_ACTIONS[resolveKind(p)];
+/** The phrase after "You" for a post written from the learner's own point of view. */
+export const LEARNER_ACTIONS: Record<FeedKindName, string> = {
+  celebrate: "celebrated",
+  milestone: "reached a milestone",
+  nudge: "left a note",
+  tease: "left a note",
+};
+
+/** "cheered you on" etc.; a blog card is "wrote a blog piece"; the learner's own post is "reached a milestone" etc. */
+export function actionPhrase(p: { blog?: boolean; kind?: FeedKindName | null; chipKind?: string | null; learner?: boolean }): string {
+  if (p.blog) return "wrote a blog piece";
+  return p.learner ? LEARNER_ACTIONS[resolveKind(p)] : KIND_ACTIONS[resolveKind(p)];
 }
 
 export const figurePose = (p: { kind?: FeedKindName | null; chipKind?: string | null }): FigurePose => KIND_POSES[resolveKind(p)];
@@ -310,12 +349,12 @@ export function rankBannerLines(
   return { title, sub: above ? `Pass ${above} to climb` : "Keep going to climb" };
 }
 
-/** The shortcut circles at the top of Discover (the Feed tab), in order. */
+/** The shortcut circles at the top of Discover (the Feed tab), in order. Blogs lists every unlocked blog piece. */
 export const SHORTCUTS = [
   { key: "encyclopedia", label: "Encyclopedia", icon: "Book", href: "/encyclopedia" },
   { key: "periodic", label: "Periodic table", icon: "Element4", href: "/periodic-table" },
   { key: "facts", label: "Daily facts", icon: "Lamp", href: "/daily-facts" },
-  { key: "lab", label: "Lab", icon: "Microscope", href: "/lab" },
+  { key: "blogs", label: "Blogs", icon: "DocumentText", href: BLOGS_HREF },
 ] as const;
 
 /** The button beside the reaction pill on a blog card: "View 2 comments", "View 1 comment"; `null` when there are none. */

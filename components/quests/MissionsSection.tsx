@@ -64,6 +64,7 @@ export function MissionsSection({
           {...base}
           label={`Claim +${mission.reward}`}
           disabled={busy}
+          shine
           onPress={startClaim}
         />
       );

@@ -16,6 +16,7 @@ import type { ScaleZoomData } from "@/content/curriculum/types";
 import { createStyles, fontFaces, fontSizes, radius, spacing, useTheme } from "@/theme";
 
 import { TermText, useCardStyles } from "./shared";
+import { playSfx } from "@/services/sfx";
 
 const useStyles = createStyles((theme) => ({
   iconWrap: {
@@ -46,6 +47,7 @@ export function ScaleZoomSim({ data, onComplete }: { data: ScaleZoomData; onComp
 
   const go = (to: number) => {
     const clamped = Math.min(last, Math.max(0, to));
+    if (clamped !== index) void playSfx(clamped > index ? "lesson.zoom-in" : "lesson.zoom-out");
     setIndex(clamped);
     setSeen((s) => Math.max(s, clamped));
     if (clamped === last) onComplete();

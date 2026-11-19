@@ -14,6 +14,9 @@ import { Text } from "@/components/ui/text";
 import Animated from "react-native-reanimated";
 
 import { Shrodi } from "@/components/mascot/Shrodi";
+import { useCascadeDirection } from "@/components/motion/cascade-context";
+import { PAGE_FX, bubbleInAt } from "@/components/motion/cascade-fx";
+import { useCascadeSfx } from "@/components/motion/use-cascade-sfx";
 import { Npc } from "@/components/npc/Npc";
 import type { NpcSpec } from "@/components/npc/npc-art";
 import { LeftTail, SideTail } from "@/components/npc/SpeechBubble";
@@ -60,15 +63,19 @@ export function TeacherSays({ children, teller, avatarSize = 72 }: { children: R
   const styles = useStyles(theme);
   const lesson = useLessonTeacher();
   const who = teller === undefined ? lesson : teller;
+  // In a lesson his bubble pops like Shrodi's in the onboarding, with its sound (what he says is not typed: a question has to be
+  // readable at once). The teacher himself just stands there. Anywhere else (no cascade) it is simply there.
+  const direction = useCascadeDirection();
+  useCascadeSfx(direction, "lesson.bubble", PAGE_FX.bubble, 0, 1);
   return (
     <View style={styles.row}>
       <TeacherAvatar size={avatarSize} teller={who} />
-      <View style={styles.bubble}>
+      <Animated.View entering={direction ? bubbleInAt(direction, PAGE_FX.bubble) : undefined} style={styles.bubble}>
         <Card padding={spacing.lg} gap={spacing.sm}>
           {children}
         </Card>
         <LeftTail />
-      </View>
+      </Animated.View>
     </View>
   );
 }
@@ -89,6 +96,7 @@ export function TeacherBubble({
   teller,
   avatarSize = 84,
   entering,
+  arriving,
   gapBefore = 0,
 }: {
   children: ReactNode;
@@ -96,23 +104,42 @@ export function TeacherBubble({
   teller?: Teller | null;
   avatarSize?: number;
   entering?: ComponentProps<typeof Animated.View>["entering"];
+  /**
+   * The bubble that has just appeared in a lecture, as the onboarding's Shrodi does: the bubble pops, with its sound (the teacher
+   * himself does not animate). `"page"` is the first bubble of a page (it waits for the title), `"step"`
+   * a later one (it follows at once). Needs a cascade; without one `entering` is used.
+   */
+  arriving?: "page" | "step";
   gapBefore?: number;
 }) {
   const { theme } = useTheme();
   const styles = useStyles(theme);
   const lesson = useLessonTeacher();
   const who = teller === undefined ? lesson : teller;
+  const direction = useCascadeDirection();
+  const live = arriving && direction ? direction : null;
+  const bubbleAt = arriving === "page" ? PAGE_FX.bubble : first ? 140 : 0;
+  useCascadeSfx(live, "lesson.bubble", bubbleAt, 0, 1);
   return (
-    <Animated.View entering={entering} style={[styles.row, { marginTop: gapBefore, alignItems: first ? "center" : "flex-start" }]}>
-      {first ? <TeacherAvatar size={avatarSize} teller={who} /> : <View style={{ width: avatarWidthOf(who, avatarSize) }} />}
-      <View style={styles.bubble}>
+    <Animated.View entering={live ? undefined : entering} style={[styles.row, { marginTop: gapBefore, alignItems: first ? "center" : "flex-start" }]}>
+      {first ? (
+        <TeacherAvatar size={avatarSize} teller={who} />
+      ) : (
+        <View style={{ width: avatarWidthOf(who, avatarSize) }} />
+      )}
+      <Animated.View entering={live ? bubbleInAt(live, bubbleAt) : undefined} style={styles.bubble}>
         <Card padding={spacing.lg} gap={spacing.sm}>
           {children}
         </Card>
         {first ? <LeftTail /> : null}
-      </View>
+      </Animated.View>
     </Animated.View>
   );
+}
+
+/** When a lecture bubble's first letter appears, ms after its page (or step) starts: after the teacher and the bubble have popped. */
+export function bubbleTypeAt(arriving: "page" | "step", first: boolean): number {
+  return (arriving === "page" ? PAGE_FX.bubble : first ? 140 : 0) + 200;
 }
 
 /** The learner's own reply, on the right. */

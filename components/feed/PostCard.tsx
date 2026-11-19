@@ -20,10 +20,11 @@
 import { useRouter } from "expo-router";
 import { memo } from "react";
 import { Pressable, View } from "react-native";
-import Animated, { FadeIn, useReducedMotion } from "react-native-reanimated";
+import Animated, { useReducedMotion } from "react-native-reanimated";
 import Svg, { Path } from "react-native-svg";
 
-import { NpcHead } from "@/components/feed/NpcHead";
+import { HeadLink } from "@/components/feed/HeadLink";
+import { RankAvatar } from "@/components/feed/RankAvatar";
 import { ReactionRow } from "@/components/feed/ReactionRow";
 import { Npc as NpcFigure } from "@/components/npc/Npc";
 import { rtri } from "@/components/npc/npc-art";
@@ -33,9 +34,10 @@ import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
 import type { Npc } from "@/content/npcs";
 import type { FeedItem } from "@/services/feed";
+import { LEARNER_POSTER } from "@/services/feed-core";
 import { impactLight } from "@/services/haptics";
 import { createStyles, fontFaces, useTheme } from "@/theme";
-import { EASE_OUT } from "@/theme/motion";
+import { settle } from "@/components/motion/settle";
 
 const TAIL_W = 14;
 const TAIL_H = 28;
@@ -82,37 +84,41 @@ export interface PostCardProps {
   now: number;
   /** Arrived since the screen was last shown: fades in (200 ms ease-out, none with reduced motion). */
   fresh?: boolean;
+  /** The poster's avatar opens their profile (default). Off on that teacher's own page. */
+  linkHead?: boolean;
 }
 
 const kindOf = (k: string) => (k === "celebrate" || k === "milestone" || k === "nudge" || k === "tease" ? k : null);
 
-export const PostCard = memo(function PostCard({ item, npc, cast, now, fresh = false }: PostCardProps) {
+export const PostCard = memo(function PostCard({ item, npc, cast, now, fresh = false, linkHead = true }: PostCardProps) {
   const router = useRouter();
   const { theme } = useTheme();
   const styles = useStyles(theme);
   const reduced = useReducedMotion();
-  const name = npc?.name ?? "A teacher";
-  const title = npc?.title ?? "";
+  /* A post written from the learner's own point of view (a streak): their avatar, "You" */
+  const mine = item.npcId === LEARNER_POSTER;
+  const name = mine ? "You" : (npc?.name ?? "A teacher");
+  const title = mine ? "" : (npc?.title ?? "");
   const chipKind = item.chip?.kind ?? null;
-  const action = actionPhrase({ kind: kindOf(item.kind), chipKind });
+  const action = actionPhrase({ kind: kindOf(item.kind), chipKind, learner: mine });
   const chip = item.chip ? chipTarget(item.chip) : null;
 
   return (
-    <Animated.View entering={fresh && !reduced ? FadeIn.duration(200).easing(EASE_OUT) : undefined}>
+    <Animated.View entering={fresh && !reduced ? settle(0) : undefined}>
       <View style={styles.post}>
-        <View
-          style={styles.head}
-          accessible
-          accessibilityLabel={postSpokenLabel({
+        <View style={styles.head}>
+          <HeadLink npc={npc} size={44} mine={mine} plain={!linkHead} />
+          <View
+            style={styles.who}
+            accessible
+            accessibilityLabel={postSpokenLabel({
             name: `${name} ${action}`,
             title: title || "Teacher",
             when: relativeTimeSpoken(item.createdAt, now),
             text: item.text,
             reactions: reactionSpoken(item.reactions),
           })}
-        >
-          <NpcHead npc={npc} size={44} />
-          <View style={styles.who}>
+          >
             <Text style={styles.line1} numberOfLines={2}>
               <Text style={styles.name}>{name}</Text> {action}
             </Text>
@@ -148,7 +154,7 @@ export const PostCard = memo(function PostCard({ item, npc, cast, now, fresh = f
             <BubbleSideTail color={theme.colors.surfaceSoft} />
           </View>
           <View style={styles.figure}>
-            {npc ? <NpcFigure spec={npc.spec} form="hero" pose={figurePose({ kind: kindOf(item.kind), chipKind })} size={FIGURE} live={false} /> : null}
+            {mine ? <RankAvatar npc={null} isLearner size={FIGURE} /> : npc ? <NpcFigure spec={npc.spec} form="hero" pose={figurePose({ kind: kindOf(item.kind), chipKind })} size={FIGURE} live={false} /> : null}
           </View>
         </View>
 

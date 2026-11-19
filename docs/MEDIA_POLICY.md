@@ -11,10 +11,10 @@ Implements `ATOMIQ_FEEDBACK_SUMMARY_SPEC.md` §4.1 (shared media behaviour), §4
 | expo-speech adapter (never called from screens) | `services/speech.ts` |
 | Hooks | `hooks/use-read-aloud.ts` (`useReadAloud`, `useMediaPreferences`) |
 | The one Read Aloud control | `components/ui/read-aloud-button.tsx` |
-| UI click / game effects (gated by the policy) | `services/ui-sfx.ts`, `services/game-sfx.ts` |
-| Tests | `npm run test:media` |
+| Sound effects: the cue catalog and scheduling (framework-free) / the runtime | `services/sfx-core.ts` / `services/sfx.ts` |
+| Tests | `npm run test:media`, `npm run test:sfx`, `npm run check:sfx` |
 
-The sound library (`assets/sfx/<group>/*.wav`), the cue catalog and where each cue plays are specified in `docs/SFX_SPEC.md`. Until its phase 1 lands, `ui-sfx.ts` and `game-sfx.ts` play the new files through the old five names.
+The sound library (`assets/sfx/<group>/*.wav`), the cue catalog and where each cue plays are specified in `docs/SFX_SPEC.md`. Screens call `playSfx("group.name")`; `check:sfx` keeps `require`s of effect files and `expo-audio` imports inside `services/sfx.ts` and `services/media.ts`. `canPlayCue` in `media-core.ts` is the one gate (it generalises `canPlayUiClick` / `canPlayGameSfx`).
 
 ## 1. Preferences (single source of truth)
 
@@ -66,7 +66,8 @@ State is never colour-only (icon, spinner and caption change). The glyph colour 
 | Surface | UI click | Correct/wrong/game-over |
 | --- | --- | --- |
 | Tabs, Guide, Encyclopedia, other | yes | n/a |
-| Lesson, quiz, MythBuster, Lab, Atom Maze | no (they play their own feedback) | yes |
+| Lesson | yes for buttons (option rows stay silent and play the answer cue) | yes |
+| Quiz, MythBuster, Lab, Atom Maze | no (they play their own feedback) | yes |
 
 Lesson assessments, Lab steps and lesson myth cards now play the same correct/wrong cue as the standalone quiz (previously they were silent). Effects play only while the app is in the foreground. While a screen reader is active, redundant UI clicks are suppressed; feedback effects still play. Reduced-motion does not change audio.
 

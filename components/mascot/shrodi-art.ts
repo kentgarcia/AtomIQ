@@ -46,8 +46,8 @@ const C = SHRODI_COLORS;
 /* Poses                                                               */
 /* ------------------------------------------------------------------ */
 
-export type Mood = "idle" | "wave" | "happy" | "cheer" | "think" | "oops";
-export const MOODS: readonly Mood[] = ["idle", "wave", "happy", "cheer", "think", "oops"];
+export type Mood = "idle" | "wave" | "happy" | "cheer" | "think" | "oops" | "wow" | "smile";
+export const MOODS: readonly Mood[] = ["idle", "wave", "happy", "cheer", "think", "oops", "wow", "smile"];
 
 /** The resting values of a mood. All numbers, so poses blend by `withTiming`. */
 // A type alias, not an interface: Reanimated animates plain objects of numbers, which need an implicit index signature.
@@ -72,18 +72,26 @@ export type Pose = {
   lid: number;
   /** Mouth open depth, 0..1. */
   mouth: number;
+  /** Mouth width, 1 is the resting width: about 0.45 is a small round "o", above 1 a broad grin. */
+  mouthW: number;
+  /** Mouth corners, -1 (a frown) .. 0 (flat) .. 1 (a broad smile). */
+  mouthCurve: number;
   earL: number;
   earR: number;
   tail: number;
 };
 
 export const POSES: Record<Mood, Pose> = {
-  idle: { lift: 0, hop: 0, lean: 0, tilt: 0, armLa: 12, armLe: 8, armRa: 14, armRe: 10, waveAmp: 0, lookX: 0, lookY: 0, lid: 0, mouth: 0.6, earL: 0, earR: 0, tail: 0 },
-  wave: { lift: 0, hop: 0, lean: -2, tilt: -3, armLa: 14, armLe: 6, armRa: 62, armRe: 112, waveAmp: 1, lookX: 0.2, lookY: -0.1, lid: 0, mouth: 0.65, earL: 3, earR: -2, tail: 6 },
-  happy: { lift: 0, hop: 0, lean: 0, tilt: 3, armLa: 52, armLe: 70, armRa: 58, armRe: 62, waveAmp: 0, lookX: 0, lookY: -0.05, lid: 0, mouth: 0.75, earL: 2, earR: 2, tail: 8 },
-  cheer: { lift: -2, hop: 1, lean: 0, tilt: 0, armLa: 150, armLe: 8, armRa: 146, armRe: 4, waveAmp: 0, lookX: 0, lookY: 0, lid: 0, mouth: 1, earL: 5, earR: 4, tail: 12 },
-  think: { lift: 0, hop: 0, lean: 3, tilt: 7, armLa: -80, armLe: -76, armRa: 10, armRe: 24, waveAmp: 0, lookX: 0.8, lookY: -0.7, lid: 0.08, mouth: 0.05, earL: -3, earR: 4, tail: -4 },
-  oops: { lift: 1, hop: 0, lean: 0, tilt: -4, armLa: 14, armLe: 20, armRa: 16, armRe: 26, waveAmp: 0, lookX: -0.2, lookY: 0.35, lid: 0.28, mouth: 0.1, earL: -9, earR: 9, tail: -10 },
+  idle: { lift: 0, hop: 0, lean: 0, tilt: 0, armLa: 12, armLe: 8, armRa: 14, armRe: 10, waveAmp: 0, lookX: 0, lookY: 0, lid: 0, mouth: 0.55, mouthW: 1, mouthCurve: 0.35, earL: 0, earR: 0, tail: 0 },
+  wave: { lift: 0, hop: 0, lean: -2, tilt: -3, armLa: 14, armLe: 6, armRa: 62, armRe: 112, waveAmp: 1, lookX: 0.2, lookY: -0.1, lid: 0, mouth: 0.65, mouthW: 1.05, mouthCurve: 0.6, earL: 3, earR: -2, tail: 6 },
+  happy: { lift: 0, hop: 0, lean: 0, tilt: 3, armLa: 52, armLe: 70, armRa: 58, armRe: 62, waveAmp: 0, lookX: 0, lookY: -0.05, lid: 0, mouth: 0.75, mouthW: 1.08, mouthCurve: 0.8, earL: 2, earR: 2, tail: 8 },
+  cheer: { lift: -2, hop: 1, lean: 0, tilt: 0, armLa: 150, armLe: 8, armRa: 146, armRe: 4, waveAmp: 0, lookX: 0, lookY: 0, lid: 0, mouth: 1, mouthW: 1.12, mouthCurve: 1, earL: 5, earR: 4, tail: 12 },
+  think: { lift: 0, hop: 0, lean: 3, tilt: 7, armLa: -80, armLe: -76, armRa: 10, armRe: 24, waveAmp: 0, lookX: 0.8, lookY: -0.7, lid: 0.08, mouth: 0.05, mouthW: 0.62, mouthCurve: -0.15, earL: -3, earR: 4, tail: -4 },
+  oops: { lift: 1, hop: 0, lean: 0, tilt: -4, armLa: 14, armLe: 20, armRa: 16, armRe: 26, waveAmp: 0, lookX: -0.2, lookY: 0.35, lid: 0.28, mouth: 0.12, mouthW: 0.85, mouthCurve: -0.85, earL: -9, earR: 9, tail: -10 },
+  /** Surprised: a small round "o", eyes up, ears and arms lifted. */
+  wow: { lift: -1, hop: 0, lean: -1, tilt: 0, armLa: 50, armLe: 30, armRa: 50, armRe: 30, waveAmp: 0, lookX: 0, lookY: -0.3, lid: 0, mouth: 0.7, mouthW: 0.45, mouthCurve: 0, earL: 6, earR: 6, tail: 6 },
+  /** Calm and pleased: a closed, gentle smile, eyes a touch soft. */
+  smile: { lift: 0, hop: 0, lean: 0, tilt: 2, armLa: 12, armLe: 8, armRa: 14, armRe: 10, waveAmp: 0, lookX: 0.1, lookY: 0, lid: 0.1, mouth: 0, mouthW: 1.06, mouthCurve: 1, earL: 1, earR: 1, tail: 3 },
 };
 
 /* ------------------------------------------------------------------ */
@@ -103,9 +111,14 @@ export interface Frame {
   armRe: number;
   pupilX: number;
   pupilY: number;
+  /** The upper lids: only the resting droop of a mood (oops, think). A blink does not use them. */
   lidL: number;
   lidR: number;
+  /** A blink, 0 open .. 1 shut: only the black pupil closes (squashes flat), the glasses and the white stay. */
+  blink: number;
   mouth: number;
+  mouthW: number;
+  mouthCurve: number;
 }
 
 /** One idle loop. Every idle period divides it, so it closes without a jump. */
@@ -151,6 +164,38 @@ const GLANCE_Y = [
   [9000, 0],
 ] as const;
 
+/**
+ * The mouth's own idle (0..1 each, always back to 0 at the loop's ends): it widens into a smile, presses
+ * into a small "hm", and rounds into a quiet "oh", at different moments from the blinks and glances so
+ * the face is never doing two things at once. Breathing (below) moves it a little between them.
+ */
+const MOUTH_SMILE = [
+  [0, 0],
+  [1500, 0],
+  [1900, 1, "out"],
+  [2700, 1],
+  [3200, 0],
+  [9000, 0],
+] as const;
+
+const MOUTH_HM = [
+  [0, 0],
+  [4600, 0],
+  [4850, 1, "out"],
+  [5300, 1],
+  [5650, 0],
+  [9000, 0],
+] as const;
+
+const MOUTH_OH = [
+  [0, 0],
+  [7700, 0],
+  [7900, 1, "out"],
+  [8250, 1],
+  [8600, 0],
+  [9000, 0],
+] as const;
+
 const EAR_TWITCH_L = [
   [0, 0],
   [4200, 0],
@@ -174,7 +219,11 @@ const PUPIL_MAX = 6;
 export function frameOf(p: Pose, t: number): Frame {
   "worklet";
   const blink = track(t, BLINK);
-  const lid = p.lid + (1 - p.lid) * blink;
+  // Mouth: breathing, then the three small expressions on top. A mood with its mouth already wide open (cheer) keeps them small.
+  const calm = 1 - 0.6 * p.mouth;
+  const smile = track(t, MOUTH_SMILE) * calm;
+  const hm = track(t, MOUTH_HM) * calm;
+  const oh = track(t, MOUTH_OH) * calm;
   const hop = p.hop * Math.abs(Math.sin((t / 600) * Math.PI));
   let gx = (p.lookX + track(t, GLANCE_X) * 0.55) * PUPIL_TRAVEL;
   let gy = (p.lookY + track(t, GLANCE_Y) * 0.55) * PUPIL_TRAVEL;
@@ -198,9 +247,12 @@ export function frameOf(p: Pose, t: number): Frame {
     armRe: p.armRe + 4 * wave(t, 2250, 0.2) + p.waveAmp * 13 * wave(t, 750),
     pupilX: gx,
     pupilY: gy,
-    lidL: lid,
-    lidR: lid,
-    mouth: p.mouth,
+    lidL: p.lid,
+    lidR: p.lid,
+    blink,
+    mouth: Math.min(1, Math.max(0, p.mouth + 0.035 * wave(t, 3000) + 0.22 * smile - 0.8 * hm + 0.2 * oh)),
+    mouthW: Math.min(1.3, Math.max(0.4, p.mouthW + 0.14 * smile - 0.12 * hm - 0.3 * oh)),
+    mouthCurve: Math.min(1, Math.max(-1, p.mouthCurve + 0.45 * smile + 0.3 * hm - 0.25 * oh)),
   };
 }
 
@@ -317,20 +369,22 @@ function eye(side: -1 | 1, id: string): Node[] {
   return [
     n("defs", undefined, [n("clipPath", undefined, [path(cubicPath(white), "#000")], { id: clip })]),
     n("g", { clipPath: `url(#${clip})` }, [
-      // Big oval pupil and its shine slide with the gaze, never swap.
+      // Big oval pupil and its shine slide with the gaze, never swap. A blink closes ONLY the pupil: it
+      // squashes flat (wider as it flattens, so it keeps its weight) while the white of the eye and the
+      // glasses stay exactly as they are; the shine goes out as it shuts.
       n("ellipse", { rx: 8, ry: 10.4, fill: C.ink, cx: box.cx, cy: box.cy }, undefined, {
         dyn: (f) => {
           "worklet";
-          return { cx: box.cx + f.pupilX, cy: box.cy + f.pupilY + 1 };
+          return { cx: box.cx + f.pupilX, cy: box.cy + f.pupilY + 1, rx: 8 + 1.6 * f.blink, ry: Math.max(1.1, 10.4 * (1 - f.blink)) };
         },
       }),
       n("circle", { r: 3.2, fill: C.shine, cx: box.cx, cy: box.cy }, undefined, {
         dyn: (f) => {
           "worklet";
-          return { cx: box.cx + f.pupilX + 2.6, cy: box.cy + f.pupilY - 3.2 };
+          return { cx: box.cx + f.pupilX + 2.6, cy: box.cy + f.pupilY - 3.2, opacity: Math.min(1, Math.max(0, 1 - f.blink * 1.6)) };
         },
       }),
-      // Upper lid: fur sliding down (blinks, and the droop of "oops"). Nothing rises from below.
+      // Upper lid: fur sliding down, only for the droop of "oops" and "think" (a mood's resting lid). Not the blink.
       n("rect", { x: box.cx - box.w, width: box.w * 2, fill: C.fur, y: top, height: 0 }, undefined, {
         dyn: (f) => {
           "worklet";
@@ -475,21 +529,37 @@ export function buildShrodi(id: string): Layers {
     // Glasses bridge between the two rings.
     n("path", { d: `M${EYE_BOX_L.cx + GLASS_R - 1} ${EYE_BOX_L.cy - 1} Q0 ${(EYE_BOX_L.cy + EYE_BOX_R.cy) / 2 - 6} ${EYE_BOX_R.cx - GLASS_R + 1} ${EYE_BOX_R.cy - 1}`, stroke: C.ink, strokeWidth: 3, strokeLinecap: "round", fill: "none" }),
     circle(0, 9, 4, C.nose),
-    // mouth: a D that opens with `mouth`; the tongue shows once it is open enough
-    n("path", { d: `M-9 ${MOUTH_Y} Q0 ${MOUTH_Y + 1.5} 9 ${MOUTH_Y} Q0 ${MOUTH_Y + 4} -9 ${MOUTH_Y} Z`, fill: C.mouth }, undefined, {
+    // mouth: a D that opens with `mouth`, as wide as `mouthW`, its corners lifted into a smile or dropped into a frown by `mouthCurve`.
+    // Closing never leaves two lips side by side: as it shuts, the lower lip is drawn onto the upper one until the mouth is ONE
+    // curve (the shape has no area left, and the round stroke is the line), like a ")" turned on its side.
+    n("path", { d: `M-9 ${MOUTH_Y} Q0 ${MOUTH_Y + 1.5} 9 ${MOUTH_Y} Q0 ${MOUTH_Y + 4} -9 ${MOUTH_Y} Z`, fill: C.mouth, stroke: C.mouth, strokeWidth: 2.8, strokeLinejoin: "round", strokeLinecap: "round" }, undefined, {
       dyn: (f) => {
         "worklet";
-        const h = 2.5 + f.mouth * 15;
-        const b = MOUTH_Y + h;
-        return { d: `M-11.5 ${MOUTH_Y - 0.5} Q0 ${MOUTH_Y + 1.5} 11.5 ${MOUTH_Y - 0.5} C11.5 ${MOUTH_Y + h * 0.75} 6 ${b} 0 ${b} C-6 ${b} -11.5 ${MOUTH_Y + h * 0.75} -11.5 ${MOUTH_Y - 0.5} Z` };
+        const hw = 11.5 * f.mouthW;
+        const corner = MOUTH_Y - 0.5 - 3 * f.mouthCurve;
+        const ctrl = MOUTH_Y + 1.5 + 2 * f.mouthCurve;
+        // How open: nothing until `mouth` passes 0.12, so the resting closed mouths are a single line
+        const h = Math.max(0, (f.mouth - 0.12) / 0.88) * 17;
+        const mid = (corner + ctrl) / 2;
+        const b = mid + h;
+        // The lower lip is two cubic halves from the right corner to the bottom middle and on to the left corner. Shut, they are the
+        // top curve cut at its middle (controls 2/3 and 1/3 of the way in), so the two lips are the same line; open, a rounded D.
+        const open = Math.min(1, h / 4);
+        const c1x = hw * (2 / 3 + (1 / 3) * open);
+        const c1y = corner + (ctrl - corner) / 3 + (corner + (b - corner) * 0.75 - (corner + (ctrl - corner) / 3)) * open;
+        const c2x = hw * (1 / 3 + (0.52 - 1 / 3) * open);
+        const c2y = mid + (b - mid) * open;
+        return { d: `M${-hw} ${corner} Q0 ${ctrl} ${hw} ${corner} C${c1x} ${c1y} ${c2x} ${c2y} 0 ${b} C${-c2x} ${c2y} ${-c1x} ${c1y} ${-hw} ${corner} Z`, strokeWidth: 2.8 - 1.4 * open };
       },
     }),
     n("ellipse", { cx: 0, cy: MOUTH_Y + 9, rx: 6.5, ry: 0.1, fill: C.tongue, opacity: 0 }, undefined, {
       dyn: (f) => {
         "worklet";
-        const h = 2.5 + f.mouth * 15;
+        const h = Math.max(0, (f.mouth - 0.12) / 0.88) * 17;
         const ry = Math.max(0.1, h * 0.26);
-        return { cy: MOUTH_Y + h - ry - 0.6, ry, opacity: Math.min(1, Math.max(0, (f.mouth - 0.4) / 0.2)) };
+        const corner = MOUTH_Y - 0.5 - 3 * f.mouthCurve;
+        const mid = (corner + MOUTH_Y + 1.5 + 2 * f.mouthCurve) / 2;
+        return { cy: mid + h - ry - 0.6, rx: 6.5 * Math.min(1, f.mouthW), ry, opacity: Math.min(1, Math.max(0, (f.mouth - 0.4) / 0.2)) };
       },
     }),
   ];

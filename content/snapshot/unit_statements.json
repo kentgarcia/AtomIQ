@@ -1,0 +1,168 @@
+{
+  "table": "unit_statements",
+  "primaryKey": [
+    "id"
+  ],
+  "rows": [
+    {
+      "id": "inside-the-atom-s01",
+      "unit_id": "inside-the-atom",
+      "position": 0,
+      "statement": "Everything you can touch, and the air around you, is made of atoms.",
+      "verdict": "fact",
+      "explanation": "Solids, liquids and gases are all made of atoms. Even air is."
+    },
+    {
+      "id": "inside-the-atom-s02",
+      "unit_id": "inside-the-atom",
+      "position": 1,
+      "statement": "Light and heat are made of atoms, just like a rock is.",
+      "verdict": "myth",
+      "explanation": "Light and heat are not matter. They are not made of atoms."
+    },
+    {
+      "id": "inside-the-atom-s03",
+      "unit_id": "inside-the-atom",
+      "position": 2,
+      "statement": "Every atom has a tiny centre called the nucleus, with electrons around it.",
+      "verdict": "fact",
+      "explanation": "The nucleus sits in the middle and the electrons are around it."
+    },
+    {
+      "id": "inside-the-atom-s04",
+      "unit_id": "inside-the-atom",
+      "position": 3,
+      "statement": "Neutrons have a negative charge.",
+      "verdict": "myth",
+      "explanation": "Neutrons have no charge. Electrons are the negative ones."
+    },
+    {
+      "id": "inside-the-atom-s05",
+      "unit_id": "inside-the-atom",
+      "position": 4,
+      "statement": "Protons are positive, electrons are negative, and neutrons have no charge.",
+      "verdict": "fact",
+      "explanation": "These three charges are what each particle of an atom is like."
+    },
+    {
+      "id": "inside-the-atom-s06",
+      "unit_id": "inside-the-atom",
+      "position": 5,
+      "statement": "If an atom gains a neutron, it becomes a different element.",
+      "verdict": "myth",
+      "explanation": "The number of protons decides the element. A different number of neutrons only makes a different isotope."
+    },
+    {
+      "id": "inside-the-atom-s07",
+      "unit_id": "inside-the-atom",
+      "position": 6,
+      "statement": "The number of protons in an atom tells you which element it is.",
+      "verdict": "fact",
+      "explanation": "Every carbon atom has 6 protons and every oxygen atom has 8."
+    },
+    {
+      "id": "inside-the-atom-s08",
+      "unit_id": "inside-the-atom",
+      "position": 7,
+      "statement": "An isotope is always radioactive.",
+      "verdict": "myth",
+      "explanation": "Many isotopes are perfectly stable. An isotope is not automatically radioactive."
+    },
+    {
+      "id": "inside-the-atom-s09",
+      "unit_id": "inside-the-atom",
+      "position": 8,
+      "statement": "Isotopes of one element have the same number of protons but different numbers of neutrons.",
+      "verdict": "fact",
+      "explanation": "Same protons means same element. Different neutrons means a different isotope."
+    },
+    {
+      "id": "inside-the-atom-s10",
+      "unit_id": "inside-the-atom",
+      "position": 9,
+      "statement": "Every nucleus is unstable and will change one day.",
+      "verdict": "myth",
+      "explanation": "Some nuclei stay the same for ever. Only unstable ones can change."
+    },
+    {
+      "id": "radioactivity-s01",
+      "unit_id": "radioactivity",
+      "position": 0,
+      "statement": "Radioactivity is something people invented in the last hundred years.",
+      "verdict": "myth",
+      "explanation": "Radioactivity was here long before people. It is a natural process."
+    },
+    {
+      "id": "radioactivity-s02",
+      "unit_id": "radioactivity",
+      "position": 1,
+      "statement": "Rocks, air, food and even your own body contain a little natural radioactivity.",
+      "verdict": "fact",
+      "explanation": "Natural radioactivity is all around us, and inside us."
+    },
+    {
+      "id": "radioactivity-s03",
+      "unit_id": "radioactivity",
+      "position": 2,
+      "statement": "Radioactive always means dangerous.",
+      "verdict": "myth",
+      "explanation": "It depends on the kind and the amount. Radioactive does not automatically mean dangerous."
+    },
+    {
+      "id": "radioactivity-s04",
+      "unit_id": "radioactivity",
+      "position": 3,
+      "statement": "An unstable nucleus changes all by itself, and nobody can say exactly when one nucleus will change.",
+      "verdict": "fact",
+      "explanation": "The change is natural and unpredictable for a single nucleus."
+    },
+    {
+      "id": "radioactivity-s05",
+      "unit_id": "radioactivity",
+      "position": 4,
+      "statement": "An unstable nucleus has to be hit by something before it can decay.",
+      "verdict": "myth",
+      "explanation": "Natural decay needs no push. The nucleus changes on its own."
+    },
+    {
+      "id": "radioactivity-s06",
+      "unit_id": "radioactivity",
+      "position": 5,
+      "statement": "Alpha, beta and gamma are three different kinds of radiation.",
+      "verdict": "fact",
+      "explanation": "They come out of a changing nucleus, but they are three different things."
+    },
+    {
+      "id": "radioactivity-s07",
+      "unit_id": "radioactivity",
+      "position": 6,
+      "statement": "Alpha, beta and gamma are just three names for the same thing.",
+      "verdict": "myth",
+      "explanation": "They are different from each other. That is why they have different names."
+    },
+    {
+      "id": "radioactivity-s08",
+      "unit_id": "radioactivity",
+      "position": 7,
+      "statement": "Half-life is about a crowd of nuclei, not a timer inside each atom.",
+      "verdict": "fact",
+      "explanation": "In a big group, half of the unstable nuclei change in one half-life. You cannot say which ones."
+    },
+    {
+      "id": "radioactivity-s09",
+      "unit_id": "radioactivity",
+      "position": 8,
+      "statement": "After one half-life, all the radioactive nuclei in a sample are gone.",
+      "verdict": "myth",
+      "explanation": "After one half-life, half of them are left, not none."
+    },
+    {
+      "id": "radioactivity-s10",
+      "unit_id": "radioactivity",
+      "position": 9,
+      "statement": "In a decay chain, every change makes a different nucleus, and nothing simply vanishes.",
+      "verdict": "fact",
+      "explanation": "One decay is not always the end. The new nucleus can change again."
+    }
+  ]
+}

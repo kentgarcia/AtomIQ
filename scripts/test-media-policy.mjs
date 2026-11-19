@@ -284,7 +284,7 @@ describe("Read Aloud controller", () => {
 
 describe("route media policy", () => {
   const cases = [
-    ["/lesson/atomic-basics-1", "lesson", false, true, false],
+    ["/lesson/atomic-basics-1", "lesson", true, true, false],
     ["/quiz/atomic-basics", "quiz", false, true, false],
     ["/(tabs)/chat", "guide", true, false, false],
     ["/chat", "guide", true, false, false],
@@ -317,9 +317,11 @@ describe("effect and music gates share one preference source", () => {
   });
 
   it("game surfaces play game sfx but not generic clicks", () => {
-    const lesson = getRouteMediaPolicy("/lesson/x");
+    const quiz = getRouteMediaPolicy("/quiz/x");
     assert.equal(canPlayGameSfx(prefs, env), true);
-    assert.equal(canPlayUiClick(prefs, env, lesson), false);
+    assert.equal(canPlayUiClick(prefs, env, quiz), false);
+    // Lesson footer buttons do click (their option rows play answer cues instead)
+    assert.equal(canPlayUiClick(prefs, env, getRouteMediaPolicy("/lesson/x")), true);
   });
 
   it("backgrounded app plays nothing", () => {

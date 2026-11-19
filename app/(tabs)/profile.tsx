@@ -3,7 +3,10 @@ import { FieldInput } from "@/components/ui/field-input";
 import { Icon } from "@/components/ui/icon";
 import { HeaderButton, ScreenHeader, useHeaderBorder, useTabBarInset } from "@/components/layout";
 import {useTheme, type Theme, fontFaces, useResponsiveLayout} from "@/theme";
-import { AchievementBadge } from "@/components/achievements/AchievementBadge";
+import { DIALOG_SETTLE_MS, RANK_UP, rankUpStart } from "@/components/celebration/celebration-core";
+import { LEVEL_UP_BODY_STYLE, LevelUpBody, LevelUpButton } from "@/components/celebration/LevelUpBody";
+import { RankUpBadge } from "@/components/celebration/RankUpBadge";
+import { Reveal } from "@/components/motion/Reveal";
 import { ModalButton } from "@/components/ui/modal-card";
 import { ModalDialog } from "@/components/ui/modal-dialog";
 import { BadgePicker } from "@/components/profile/BadgePicker";
@@ -24,8 +27,8 @@ import {
 } from "@/services/achievements-core";
 import { getAchievementLevels, getShowcaseBadgeIds, setAchievementLevels, setShowcaseBadgeIds } from "@/services/storage";
 import { useStorage } from "@/services/StorageContext";
-import { useFocusEffect, useRouter } from "expo-router";
-import React, { useCallback, useMemo, useState } from "react";
+import { useFocusEffect, useIsFocused, useRouter } from "expo-router";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
     Alert,
     ScrollView,
@@ -41,6 +44,7 @@ import Animated, {
     useReducedMotion,
 } from "react-native-reanimated";
 import { DURATION, EASE_OUT } from "@/theme/motion";
+import { playSfx } from "@/services/sfx";
 
 export default function ProfileScreen() {
   const router = useRouter();
@@ -51,6 +55,9 @@ export default function ProfileScreen() {
   const {
     userProfile,
     updateUserProfile,
+    levelUpLevel,
+    levelUpFrom,
+    dismissLevelUp,
   } = useStorage();
   const { theme } = useTheme();
   const styles = useMemo(() => createStyles(theme), [theme]);
@@ -142,6 +149,27 @@ export default function ProfileScreen() {
 
   // Achievements that ranked up, celebrated once via overlay on this screen
   const [celebrationAwards, setCelebrationAwards] = useState<LevelUp[] | null>(null);
+  // One celebration at a time: the level-up dialog goes first, the badges wait until it has closed
+  // (and had a moment to shrink away, so two modals are never on screen together)
+  const [levelUpGone, setLevelUpGone] = useState(levelUpLevel === null);
+  if (levelUpLevel !== null && levelUpGone) setLevelUpGone(false);
+  useEffect(() => {
+    if (levelUpLevel !== null) return;
+    const id = setTimeout(() => setLevelUpGone(true), 450);
+    return () => clearTimeout(id);
+  }, [levelUpLevel]);
+  // The dialog opens only while Profile is on screen, so its show (which starts when it mounts)
+  // is seen from the first frame instead of playing out behind another tab
+  const focused = useIsFocused();
+  const levelUpOpen = levelUpLevel !== null && focused;
+  const badgesOpen = celebrationAwards != null && celebrationAwards.length > 0 && focused && levelUpLevel === null && levelUpGone;
+  // The fanfares when each dialog opens (the dialog adds its own opening sound)
+  useEffect(() => {
+    if (levelUpOpen) void playSfx("reward.level-up");
+  }, [levelUpOpen]);
+  useEffect(() => {
+    if (badgesOpen) void playSfx("reward.rank-up");
+  }, [badgesOpen]);
 
   // Awards: every achievement's level, from the profile's numbers
   const awards = useMemo(() => {
@@ -478,28 +506,47 @@ export default function ProfileScreen() {
         </View>
       </ModalDialog>
 
+      {/* Level up: the house modal, shown once when XP crosses a level boundary (before any badge dialog) */}
+      <ModalDialog
+        visible={levelUpOpen}
+        onClose={dismissLevelUp}
+        title="Level up!"
+        closeLabel="Keep going"
+        bodyStyle={LEVEL_UP_BODY_STYLE}
+        footer={
+          <LevelUpButton>
+            <ModalButton label="Keep going" onPress={dismissLevelUp} />
+          </LevelUpButton>
+        }
+      >
+        <LevelUpBody level={levelUpLevel ?? 0} from={levelUpFrom ?? undefined} xpIntoLevel={(userProfile?.total_xp ?? 0) % 100} />
+      </ModalDialog>
+
       {/* Badge ranked up: the house modal */}
       <ModalDialog
-        visible={celebrationAwards != null && celebrationAwards.length > 0}
+        visible={badgesOpen}
         onClose={() => setCelebrationAwards(null)}
         title={celebrationAwards != null && celebrationAwards.length > 1 ? "Badges ranked up!" : "Badge ranked up!"}
         closeLabel="Awesome"
+        bodyStyle={{ paddingTop: 32 }}
         footer={<ModalButton label="Awesome!" onPress={() => setCelebrationAwards(null)} />}
       >
-        {(celebrationAwards ?? []).map((up) => {
+        {(celebrationAwards ?? []).map((up, i) => {
           const track = achievementById(up.id);
           if (!track) return null;
+          // The first few badges play their rank-up one after another; the rest are plain
+          const textAt = i < RANK_UP.maxAnimated ? DIALOG_SETTLE_MS + rankUpStart(i) + RANK_UP.text : 0;
           return (
             <View key={up.id} style={styles.celebrationRow}>
-              <AchievementBadge track={track} level={up.to} size={56} />
-              <View style={{ flex: 1 }}>
+              <RankUpBadge track={track} from={up.from} to={up.to} index={i} size={56} />
+              <Reveal at={textAt} style={{ flex: 1 }}>
                 <Text style={styles.celebrationBadgeTitle}>
                   {track.title} · Level {up.to}
                 </Text>
                 <Text style={styles.celebrationBadgeReq}>
                   {track.requirement(track.tiers[up.to - 1])}
                 </Text>
-              </View>
+              </Reveal>
             </View>
           );
         })}

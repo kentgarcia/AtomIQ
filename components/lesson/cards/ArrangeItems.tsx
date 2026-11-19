@@ -18,6 +18,7 @@ import type { MatchItemData, OrderItemData, SortItemData } from "@/content/curri
 import { Icon } from "@/components/ui/icon";
 import { createStyles, fontFaces, fontSizes, radius, spacing, useTheme } from "@/theme";
 import { controls } from "@/theme/tokens";
+import { playSfx } from "@/services/sfx";
 
 import { ObjectArt } from "@/components/lesson/visual/ObjectArt";
 import { isArtId } from "@/components/lesson/visual/object-art";
@@ -65,6 +66,16 @@ const useStyles = createStyles((theme) => ({
 // Order
 // ---------------------------------------------------------------------------
 
+/**
+ * A sound for every press that builds an answer piece by piece (docs/SFX_SPEC.md §6.3), so changing
+ * your mind sounds as often as choosing: `ui.select` for a piece placed or moved, `ui.unequip` for one
+ * taken back. The press that completes the set plays nothing here: it is graded at once and the
+ * result cue plays instead.
+ */
+const placedSfx = (completes: boolean) => {
+  if (!completes) void playSfx("ui.select");
+};
+
 export function OrderItem({ data, seed, locked, onChange, ownerId, rejection }: InteractionProps<OrderItemData, { type: "order"; orderedIds: string[] }> & { ownerId: string }) {
   const { theme } = useTheme();
   const card = useCardStyles(theme);
@@ -101,7 +112,10 @@ export function OrderItem({ data, seed, locked, onChange, ownerId, rejection }: 
               state={frozen ? (correctAt(index) ? "correct" : "wrong") : "selected"}
               disabled={frozen}
               accessibilityHint="Removes this item"
-              onPress={() => setPlaced((p) => p.filter((x) => x !== id))}
+              onPress={() => {
+                void playSfx("ui.unequip");
+                setPlaced((p) => p.filter((x) => x !== id));
+              }}
             />
           ) : (
             <View key={`slot-${index}`} style={styles.slot} accessible accessibilityLabel={`Position ${index + 1}, empty`}>
@@ -114,7 +128,10 @@ export function OrderItem({ data, seed, locked, onChange, ownerId, rejection }: 
         <View style={card.list}>
           <Text style={card.sectionLabel}>Items</Text>
           {remaining.map((i) => (
-            <OptionRow key={i.id} label={i.label} art={i.art} onPress={() => setPlaced((p) => [...p, i.id])} accessibilityHint="Adds to the next position" />
+            <OptionRow key={i.id} label={i.label} art={i.art} onPress={() => {
+              placedSfx(placed.length + 1 >= data.items.length);
+              setPlaced((p) => [...p, i.id]);
+            }} accessibilityHint="Adds to the next position" />
           ))}
         </View>
       ) : null}
@@ -157,13 +174,16 @@ export function MatchItem({ data, seed, locked, onChange, ownerId, onMiss }: Int
 
   const pressLeft = (leftId: string) => {
     if (frozen || matches[leftId]) return;
+    void playSfx("ui.select");
     setSelected(leftId === selected ? null : leftId);
   };
   const pressRight = (rightId: string) => {
     if (frozen || !selected || Object.values(matches).includes(rightId)) return;
     // A pair's two cards share its id, so a right match is the same id
-    if (selected === rightId) setMatches((m) => ({ ...m, [selected]: rightId }));
-    else {
+    if (selected === rightId) {
+      placedSfx(Object.keys(matches).length + 1 >= data.pairs.length);
+      setMatches((m) => ({ ...m, [selected]: rightId }));
+    } else {
       setMiss({ left: selected, right: rightId });
       onMiss?.();
     }
@@ -267,7 +287,12 @@ export function SortItem({ data, seed, locked, result, onChange, ownerId, reject
             const chosen = placements[item.id];
             const bad = frozen && wrong.has(item.id);
             const tone = frozen ? (bad ? "error" : "success") : "neutral";
-            const pick = (bucketId: string) => (frozen ? undefined : setPlacements((p) => ({ ...p, [item.id]: bucketId })));
+            const pick = (bucketId: string) => {
+              if (frozen) return;
+              // Moving an item to another group counts as a new set: it sounds even though nothing was added
+              placedSfx(!(item.id in placements) && Object.keys(placements).length + 1 >= data.items.length);
+              setPlacements((p) => ({ ...p, [item.id]: bucketId }));
+            };
             return (
               <View key={item.id} style={pictured ? styles.sortCell : undefined}>
                 <Shake active={bad} style={pictured ? { flex: 1 } : undefined}>

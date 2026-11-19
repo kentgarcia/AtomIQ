@@ -7,8 +7,10 @@
 import { Image } from "expo-image";
 import React, { useEffect, useMemo, useRef } from "react";
 import { View } from "react-native";
+import Animated from "react-native-reanimated";
 
 import { registerClaimTarget } from "@/components/quests/claim-fx-bus";
+import { useCounterPulse } from "@/components/quests/use-counter-pulse";
 import { Text } from "@/components/ui/text";
 import { useDiamonds } from "@/hooks/use-wallet";
 import { useStorage } from "@/services/StorageContext";
@@ -23,7 +25,9 @@ export function HeaderCurrency() {
   const styles = useMemo(() => makeStyles(theme), [theme]);
   const { userProfile } = useStorage();
   const diamonds = useDiamonds();
-  const xp = userProfile?.total_xp ?? 0;
+  // The numbers wait for the coins: each one that lands adds its share and the counter pulses
+  const xp = useCounterPulse("xp", userProfile?.total_xp ?? 0);
+  const diamondCount = useCounterPulse("diamond", diamonds);
 
   const xpRef = useRef<React.ComponentRef<typeof View>>(null);
   const diamondRef = useRef<React.ComponentRef<typeof View>>(null);
@@ -38,17 +42,21 @@ export function HeaderCurrency() {
 
   return (
     <View style={styles.row}>
-      <View style={styles.item} accessible accessibilityLabel={`${xp} XP`}>
-        <View ref={xpRef} collapsable={false} style={styles.icon}>
-          <Image source={XP_ICON} style={styles.image} contentFit="contain" />
-        </View>
-        <Text style={[styles.value, { color: theme.colors.primaryLight }]}>{xp}</Text>
+      <View style={styles.item} accessible accessibilityLabel={`${xp.shown} XP`}>
+        <Animated.View style={[styles.item, xp.pulseStyle]}>
+          <View ref={xpRef} collapsable={false} style={styles.icon}>
+            <Image source={XP_ICON} style={styles.image} contentFit="contain" />
+          </View>
+          <Text style={[styles.value, { color: theme.colors.primaryLight }]}>{xp.shown}</Text>
+        </Animated.View>
       </View>
-      <View style={styles.item} accessible accessibilityLabel={`${diamonds} diamonds`}>
-        <View ref={diamondRef} collapsable={false} style={styles.icon}>
-          <Image source={DIAMOND_ICON} style={styles.image} contentFit="contain" />
-        </View>
-        <Text style={[styles.value, { color: theme.colors.info }]}>{diamonds}</Text>
+      <View style={styles.item} accessible accessibilityLabel={`${diamondCount.shown} diamonds`}>
+        <Animated.View style={[styles.item, diamondCount.pulseStyle]}>
+          <View ref={diamondRef} collapsable={false} style={styles.icon}>
+            <Image source={DIAMOND_ICON} style={styles.image} contentFit="contain" />
+          </View>
+          <Text style={[styles.value, { color: theme.colors.info }]}>{diamondCount.shown}</Text>
+        </Animated.View>
       </View>
     </View>
   );

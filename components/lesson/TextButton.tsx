@@ -7,7 +7,7 @@
 import { Pressable } from "react-native";
 import { Text } from "@/components/ui/text";
 
-import { playButtonClickSfx } from "@/services/ui-sfx";
+import { playSfx } from "@/services/sfx";
 import { createStyles, fontFaces, fontSizes, useTheme } from "@/theme";
 
 const useStyles = createStyles((theme) => ({
@@ -24,7 +24,7 @@ export function TextButton({ label, onPress, accessibilityLabel }: { label: stri
       accessibilityLabel={accessibilityLabel ?? label}
       hitSlop={8}
       onPress={() => {
-        void playButtonClickSfx();
+        void playSfx("ui.press");
         onPress();
       }}
       style={({ pressed }) => [styles.root, pressed && { opacity: 0.6 }]}

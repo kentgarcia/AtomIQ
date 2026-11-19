@@ -24,31 +24,31 @@ export type ArtShape =
   | { t: "line"; d: string; stroke: string; width: number };
 
 // ── palette: [light, base, dark] families from the official Duolingo-style colours ───────────────
-const SNOW = "#FFFFFF";
-const EEL = ["#767676", "#4B4B4B", "#413D3D"] as const;
-const GLASS = ["#DDF8FE", "#BAF2FE", "#7AE1FE"] as const;
-const ANCHOVY = ["#E8F1F4", "#D2E4E8", "#B8CDD3"] as const;
-const BEE = ["#FFE070", "#FFC800", "#E6A800"] as const;
-const FOX = ["#FFB650", "#FF9600", "#DA7C00"] as const;
-const CRUMB = ["#FFE0B2", "#FECC8D", "#F2B66F"] as const;
-const COFFEE = ["#8A4B0C", "#733C00", "#522A01"] as const;
-const SEA = ["#7AE1FE", "#1CB0F6", "#1899D6"] as const;
-const LEAF = ["#A5ED6E", "#58CC02", "#46A302"] as const;
-const RED = ["#FF7878", "#FF4B4B", "#D93B3B"] as const;
-const PLUM = ["#CE82FF", "#9069CD", "#6F4EA1"] as const;
-const PINK = ["#FFDFE0", "#FFB2B2", "#F5A4A4"] as const;
-const SKIN = ["#FFCBA3", "#F5B092", "#E8946F"] as const;
+export const SNOW = "#FFFFFF";
+export const EEL = ["#767676", "#4B4B4B", "#413D3D"] as const;
+export const GLASS = ["#DDF8FE", "#BAF2FE", "#7AE1FE"] as const;
+export const ANCHOVY = ["#E8F1F4", "#D2E4E8", "#B8CDD3"] as const;
+export const BEE = ["#FFE070", "#FFC800", "#E6A800"] as const;
+export const FOX = ["#FFB650", "#FF9600", "#DA7C00"] as const;
+export const CRUMB = ["#FFE0B2", "#FECC8D", "#F2B66F"] as const;
+export const COFFEE = ["#8A4B0C", "#733C00", "#522A01"] as const;
+export const SEA = ["#7AE1FE", "#1CB0F6", "#1899D6"] as const;
+export const LEAF = ["#A5ED6E", "#58CC02", "#46A302"] as const;
+export const RED = ["#FF7878", "#FF4B4B", "#D93B3B"] as const;
+export const PLUM = ["#CE82FF", "#9069CD", "#6F4EA1"] as const;
+export const PINK = ["#FFDFE0", "#FFB2B2", "#F5A4A4"] as const;
+export const SKIN = ["#FFCBA3", "#F5B092", "#E8946F"] as const;
 
 // ── constructors ─────────────────────────────────────────────────────────────────────────────────
-const rect = (x: number, y: number, w: number, h: number, r: number, fill: string, opacity?: number): ArtShape => ({ t: "rect", x, y, w, h, r: Math.min(r, w / 2, h / 2), fill, ...(opacity === undefined ? {} : { opacity }) });
-const pill = (x: number, y: number, w: number, h: number, fill: string, opacity?: number) => rect(x, y, w, h, Math.min(w, h) / 2, fill, opacity);
-const circle = (cx: number, cy: number, r: number, fill: string, opacity?: number): ArtShape => ({ t: "circle", cx, cy, r, fill, ...(opacity === undefined ? {} : { opacity }) });
-const path = (d: string, fill: string, opacity?: number): ArtShape => ({ t: "path", d, fill, ...(opacity === undefined ? {} : { opacity }) });
-const line = (d: string, stroke: string, width: number): ArtShape => ({ t: "line", d, stroke, width });
+export const rect = (x: number, y: number, w: number, h: number, r: number, fill: string, opacity?: number): ArtShape => ({ t: "rect", x, y, w, h, r: Math.min(r, w / 2, h / 2), fill, ...(opacity === undefined ? {} : { opacity }) });
+export const pill = (x: number, y: number, w: number, h: number, fill: string, opacity?: number) => rect(x, y, w, h, Math.min(w, h) / 2, fill, opacity);
+export const circle = (cx: number, cy: number, r: number, fill: string, opacity?: number): ArtShape => ({ t: "circle", cx, cy, r, fill, ...(opacity === undefined ? {} : { opacity }) });
+export const path = (d: string, fill: string, opacity?: number): ArtShape => ({ t: "path", d, fill, ...(opacity === undefined ? {} : { opacity }) });
+export const line = (d: string, stroke: string, width: number): ArtShape => ({ t: "line", d, stroke, width });
 
 const f = (n: number) => Math.round(n * 100) / 100;
 /** A polygon with rounded corners (radius r), as path data. */
-function poly(points: [number, number][], r: number, fill: string): ArtShape {
+export function poly(points: [number, number][], r: number, fill: string): ArtShape {
   const n = points.length;
   let d = "";
   for (let i = 0; i < n; i++) {
@@ -66,20 +66,20 @@ function poly(points: [number, number][], r: number, fill: string): ArtShape {
 }
 
 /** Points on a circle: degrees clockwise from 12 o'clock. */
-const on = (cx: number, cy: number, r: number, deg: number): [number, number] => {
+export const on = (cx: number, cy: number, r: number, deg: number): [number, number] => {
   const a = ((deg - 90) * Math.PI) / 180;
   return [f(cx + r * Math.cos(a)), f(cy + r * Math.sin(a))];
 };
 
 // ── the pictures ─────────────────────────────────────────────────────────────────────────────────
-const spokes = (cx: number, cy: number, r0: number, r1: number, count: number, offset: number, stroke: string, width: number): ArtShape[] =>
+export const spokes = (cx: number, cy: number, r0: number, r1: number, count: number, offset: number, stroke: string, width: number): ArtShape[] =>
   Array.from({ length: count }, (_, i) => {
     const a = on(cx, cy, r0, offset + (360 / count) * i);
     const b = on(cx, cy, r1, offset + (360 / count) * i);
     return line(`M${a[0]} ${a[1]}L${b[0]} ${b[1]}`, stroke, width);
   });
 
-const ring = (cx: number, cy: number, r: number) => `M${cx - r} ${cy}A${r} ${r} 0 1 0 ${cx + r} ${cy}A${r} ${r} 0 1 0 ${cx - r} ${cy}Z`;
+export const ring = (cx: number, cy: number, r: number) => `M${cx - r} ${cy}A${r} ${r} 0 1 0 ${cx + r} ${cy}A${r} ${r} 0 1 0 ${cx - r} ${cy}Z`;
 
 export const OBJECT_ART = {
   /** A flat open hand: a palm, four fingers and a thumb, the far side one step darker. */

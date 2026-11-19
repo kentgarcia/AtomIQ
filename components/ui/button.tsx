@@ -23,6 +23,7 @@
  */
 
 import { createContext, useContext, type ReactNode } from "react";
+import { ShineSweep } from "@/components/motion/ShineSweep";
 import {
     Pressable,
     StyleSheet,
@@ -32,7 +33,7 @@ import {
 } from "react-native";
 import { Text } from "@/components/ui/text";
 
-import { playButtonClickSfx } from "@/services/ui-sfx";
+import { playSfx } from "@/services/sfx";
 import { stretchStyle } from "@/theme/text-stretch";
 import { fontFaces, fontSizes, radius, useTheme } from "@/theme";
 import { controls } from "@/theme/tokens";
@@ -109,6 +110,11 @@ export interface ButtonProps {
     wrap?: boolean;
     /** Draw the label taller (theme/text-stretch.ts), for screens that use the stretched text. */
     stretch?: boolean;
+    /**
+     * A band of light sweeps across the face now and then: only for the one button that is waiting to be
+     * pressed (the duolingo-motion-style skill, tier A idle). Quiet, stops off screen and with reduced motion.
+     */
+    shine?: boolean;
     accessibilityLabel?: string;
     testID?: string;
     style?: StyleProp<ViewStyle>;
@@ -125,6 +131,7 @@ export function Button({
     fullWidth = true,
     wrap = false,
     stretch = false,
+    shine = false,
     accessibilityLabel,
     testID,
     style,
@@ -193,8 +200,10 @@ export function Button({
                         borderColor: palette.border,
                         transform: [{ translateY: pressed && !disabled ? lip : 0 }],
                     },
+                    shine ? { overflow: "hidden" } : null,
                 ]}
             >
+                {shine ? <ShineSweep radius={round} enabled={!disabled && !pressed} /> : null}
                 {renderIcon ? renderIcon(palette.label) : null}
                 <Text
                     style={[
@@ -230,7 +239,7 @@ export function Button({
             hitSlop={compact ? 6 : undefined}
             testID={testID}
             onPress={() => {
-                void playButtonClickSfx();
+                void playSfx("ui.press");
                 onPress();
             }}
             style={[fullWidth ? styles.fullWidth : styles.hug, style]}

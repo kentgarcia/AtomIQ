@@ -12,6 +12,9 @@ import { useReducedMotion } from "react-native-reanimated";
 
 import { plainText, splitTerms } from "@/content/curriculum/terms";
 
+import { playSfx } from "@/services/sfx";
+import { BLIP_EVERY, blipRate } from "@/services/sfx-core";
+
 import { TermText, useCardStyles } from "./cards/shared";
 import { clipSegments, totalChars, visibleCount } from "./typewriter-core";
 import { useTheme } from "@/theme";
@@ -20,29 +23,40 @@ import { useTheme } from "@/theme";
 const TICK_MS = 33;
 
 /** The number of characters showing: counts up while `active`, the whole text otherwise. */
-function useTypedCount(total: number, active: boolean): number {
+function useTypedCount(total: number, active: boolean, blips: boolean, startAt: number): number {
   const [count, setCount] = useState(0);
   useEffect(() => {
     if (!active) return;
-    const start = Date.now();
+    // `startAt` ms from now: nothing shows until then (the text keeps its room)
+    const start = Date.now() + startAt;
+    let blipped = 0;
     const id = setInterval(() => {
       const n = visibleCount(Date.now() - start, total);
+      // A soft blip for every third character shown (docs/SFX_SPEC.md §6.3); the cue's own gap
+      // keeps a fast tick from stacking them. It stops with the typing: this interval is cleared.
+      const group = Math.floor(n / BLIP_EVERY);
+      if (blips && group > blipped && n < total) void playSfx("lesson.blip", { rate: blipRate(Math.random()) });
+      blipped = group;
       setCount(n);
       if (n >= total) clearInterval(id);
     }, TICK_MS);
     return () => clearInterval(id);
-  }, [active, total]);
+  }, [active, total, blips, startAt]);
   return active ? count : total;
 }
 
-export function TypedTermText({ text, style, typing }: { text: string; style?: StyleProp<TextStyle>; typing: boolean }) {
+/**
+ * `blips` plays the soft talking blip as characters appear. Off for lessons (they are read, not
+ * spoken); it is for a character who talks, such as the Shrodi mascot (docs/SFX_SPEC.md §6.3).
+ */
+export function TypedTermText({ text, style, typing, blips = false, startAt = 0 }: { text: string; style?: StyleProp<TextStyle>; typing: boolean; blips?: boolean; /** Wait this long (ms) before the first character. */ startAt?: number }) {
   const { theme } = useTheme();
   const styles = useCardStyles(theme);
   const reduced = useReducedMotion();
   const segments = useMemo(() => splitTerms(text), [text]);
   const total = useMemo(() => totalChars(segments), [segments]);
   const active = typing && !reduced;
-  const count = useTypedCount(total, active);
+  const count = useTypedCount(total, active, blips, startAt);
   // Finished (or never typed): the normal text, with its tappable terms
   if (!active || count >= total) return <TermText text={text} style={style ?? styles.body} />;
   const clipped = clipSegments(segments, count);

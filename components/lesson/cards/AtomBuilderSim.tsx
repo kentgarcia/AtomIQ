@@ -10,19 +10,29 @@ import { Text } from "@/components/ui/text";
 import Svg, { Circle, G } from "react-native-svg";
 
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { Icon } from "@/components/ui/icon";
 import { atomGoalMet, builderRows, describeAtom, goalChecklist, shellFilling, type ParticleKind } from "@/content/curriculum/elements";
 import type { AtomBuilderData } from "@/content/curriculum/types";
-import { createStyles, fontFaces, fontSizes, radius, spacing, useTheme } from "@/theme";
+import { createStyles, fontFaces, fontSizes, radius, spacing, useTheme, withAlpha } from "@/theme";
 
 import { duoShade, lipFor } from "../visual/duo-palette";
 import { TermText, useCardStyles } from "./shared";
+import { playSfx } from "@/services/sfx";
 
 const GOLDEN = 2.39996;
+const STAGE = 260;
 
 const useStyles = createStyles((theme) => ({
   goalHead: { ...fontFaces.bold, fontSize: fontSizes.md, letterSpacing: 0.6, textTransform: "uppercase", color: theme.colors.textMuted },
+  goalBlock: { gap: spacing.sm },
+  stageWrap: { alignItems: "center" },
+  tile: { position: "absolute", left: 0, top: 0, width: 58, paddingVertical: 6, borderRadius: 14, borderWidth: 2, borderBottomWidth: 4, alignItems: "center", backgroundColor: theme.colors.card, borderColor: theme.colors.borderStrong },
+  tileNumber: { fontSize: 12, ...fontFaces.heavy, color: theme.colors.textMuted },
+  tileSymbol: { fontSize: 26, lineHeight: 30, ...fontFaces.black, color: theme.colors.text },
+  badge: { position: "absolute", right: 0, top: 0, minWidth: 44, height: 44, borderRadius: 22, paddingHorizontal: 8, alignItems: "center", justifyContent: "center", borderWidth: 2, borderBottomWidth: 4 },
+  badgeText: { fontSize: 18, ...fontFaces.black, color: theme.colors.text },
+  badgeLabel: { fontSize: 9, ...fontFaces.heavy, letterSpacing: 0.5, textTransform: "uppercase", color: theme.colors.textMuted, marginTop: -2 },
+  counter: { flexDirection: "row", alignItems: "center", gap: spacing.md, paddingVertical: spacing.md },
   goalRow: { flexDirection: "row", flexWrap: "wrap", gap: spacing.sm },
   chip: { flexDirection: "row", alignItems: "center", gap: spacing.xs, paddingVertical: spacing.xs, paddingHorizontal: spacing.md, borderRadius: radius.full, backgroundColor: theme.colors.surfaceStrong },
   chipMet: { backgroundColor: theme.colors.successSurface },
@@ -33,7 +43,7 @@ const useStyles = createStyles((theme) => ({
   pillStable: { backgroundColor: theme.colors.successSurface },
   pillUnstable: { backgroundColor: theme.colors.warningSurface },
   pillText: { ...fontFaces.heavy, fontSize: fontSizes["2xl"], color: theme.colors.text },
-  swatch: { width: 26, height: 26, borderRadius: radius.full },
+  swatch: { width: 32, height: 32, borderRadius: radius.full },
   counterText: { flex: 1, gap: 1 },
   counterLabel: { ...fontFaces.heavy, fontSize: fontSizes["2xl"], color: theme.colors.text },
   counterGoal: { ...fontFaces.semibold, fontSize: fontSizes.lg, color: theme.colors.textMuted },
@@ -84,8 +94,10 @@ export function AtomBuilderSim({ data, onComplete }: { data: AtomBuilderData; on
   }, [met, onComplete]);
 
   const limit = (kind: Kind) => (kind === "protons" ? maxProtons : kind === "neutrons" ? maxNeutrons : maxProtons + 2);
-  const change = (kind: Kind, delta: number) =>
+  const change = (kind: Kind, delta: number) => {
+    if (Math.min(limit(kind), Math.max(0, counts[kind] + delta)) !== counts[kind]) void playSfx(delta > 0 ? "ui.select" : "ui.unequip");
     setCounts((prev) => ({ ...prev, [kind]: Math.min(limit(kind), Math.max(0, prev[kind] + delta)) }));
+  };
   const changed = counts.protons !== initial.protons || counts.neutrons !== initial.neutrons || counts.electrons !== initial.electrons;
 
   const showStability = data.mode === "isotope" || data.mode === "stability";
@@ -96,15 +108,17 @@ export function AtomBuilderSim({ data, onComplete }: { data: AtomBuilderData; on
         : `${description.element.name} (${description.element.symbol})`
       : "Add a proton to begin";
 
-  const swatch: Record<Kind, string> = {
-    protons: duoShade("danger", theme.mode).face,
-    neutrons: duoShade("neutral", theme.mode).face,
-    electrons: duoShade("info", theme.mode).face,
+  const swatch = {
+    protons: duoShade("danger", theme.mode),
+    neutrons: duoShade("neutral", theme.mode),
+    electrons: duoShade("info", theme.mode),
   };
   // What cannot be changed on this card, said once instead of as a dead counter.
   const fixed = (["protons", "neutrons", "electrons"] as const).filter((k) => !rows.includes(k) && data.lock?.[k] && counts[k] > 0);
   const factBits = [rows.includes("neutrons") || data.lock?.neutrons ? `Mass number ${description.massNumber}` : null, rows.includes("electrons") ? `charge ${description.charge > 0 ? `+${description.charge}` : description.charge}` : null].filter(Boolean);
 
+  const chargeText = description.charge > 0 ? `+${description.charge}` : `${description.charge}`;
+  const chargeTone = description.charge === 0 ? c.success : c.warning;
   const summary = `${title}. ${counts.protons} protons, ${counts.neutrons} neutrons, ${counts.electrons} electrons. Mass number ${description.massNumber}.`;
 
   return (
@@ -113,7 +127,7 @@ export function AtomBuilderSim({ data, onComplete }: { data: AtomBuilderData; on
       <TermText text={data.task} style={card.prompt} />
 
       {/* The goal as a checklist: each line ticks as it becomes true. */}
-      <Card tone="soft" padding={spacing.md} gap={spacing.sm}>
+      <View style={styles.goalBlock}>
         <Text style={styles.goalHead}>Your goal</Text>
         <View style={styles.goalRow} accessibilityLiveRegion="polite">
           {checklist.map((part) => (
@@ -123,12 +137,21 @@ export function AtomBuilderSim({ data, onComplete }: { data: AtomBuilderData; on
             </View>
           ))}
         </View>
-      </Card>
+      </View>
 
-      <View accessible accessibilityRole="image" accessibilityLabel={summary}>
-        <Card tone="soft" padding={spacing.sm} faceStyle={{ alignItems: "center" }}>
-          <AtomDrawing counts={counts} size={210} />
-        </Card>
+      {/* The atom sits straight on the page, with its element tile and charge like the Build an Atom lab. */}
+      <View style={styles.stageWrap} accessible accessibilityRole="image" accessibilityLabel={summary}>
+        <View style={{ width: STAGE, height: STAGE }}>
+          <AtomDrawing counts={counts} size={STAGE} />
+          <View pointerEvents="none" style={styles.tile}>
+            <Text style={styles.tileNumber}>{counts.protons || ""}</Text>
+            <Text style={styles.tileSymbol}>{description.element?.symbol ?? "?"}</Text>
+          </View>
+          <View pointerEvents="none" style={[styles.badge, { backgroundColor: withAlpha(chargeTone, 0.16), borderColor: chargeTone }]}>
+            <Text style={styles.badgeText}>{chargeText}</Text>
+            <Text style={styles.badgeLabel}>charge</Text>
+          </View>
+        </View>
       </View>
       <View accessibilityLiveRegion="polite" style={{ gap: spacing.xs }}>
         <Text style={styles.readout}>{title}</Text>
@@ -140,15 +163,16 @@ export function AtomBuilderSim({ data, onComplete }: { data: AtomBuilderData; on
         ) : null}
       </View>
 
-      {rows.map((kind) => {
+      <View>
+      {rows.map((kind, i) => {
         const locked = !!data.lock?.[kind];
         const atMin = counts[kind] <= 0 || locked;
         const atMax = counts[kind] >= limit(kind) || locked;
         const target = data.goal[kind];
         const here = target !== undefined && counts[kind] === target;
         return (
-          <Card key={kind} padding={spacing.sm} gap={spacing.md} tone={here ? "success" : "neutral"} faceStyle={{ flexDirection: "row", alignItems: "center" }}>
-            <View style={[styles.swatch, { backgroundColor: swatch[kind] }]} />
+          <View key={kind} style={[styles.counter, i > 0 && { borderTopWidth: 1, borderStyle: "dashed", borderColor: c.border }]}>
+            <View style={[styles.swatch, { backgroundColor: swatch[kind].face, borderBottomWidth: 4, borderBottomColor: swatch[kind].lip }]} />
             <View style={styles.counterText}>
               <Text style={styles.counterLabel}>{NAMES[kind].plural}</Text>
               {target !== undefined ? <Text style={styles.counterGoal}>Goal: {target}</Text> : null}
@@ -158,9 +182,10 @@ export function AtomBuilderSim({ data, onComplete }: { data: AtomBuilderData; on
               {counts[kind]}
             </Text>
             <Button label="+" accessibilityLabel={`Add a ${NAMES[kind].singular}`} variant="secondary" fullWidth={false} disabled={atMax} style={{ minWidth: 60 }} onPress={() => change(kind, 1)} />
-          </Card>
+          </View>
         );
       })}
+      </View>
       {fixed.length ? <Text style={styles.fixed}>These stay the same: {fixed.map((k) => `${counts[k]} ${counts[k] === 1 ? NAMES[k].singular : NAMES[k].plural.toLowerCase()}`).join(" · ")}</Text> : null}
 
       {met ? (
@@ -204,9 +229,10 @@ function AtomDrawing({ counts, size }: { counts: Counts; size: number }) {
   const neutron = duoShade("neutral", theme.mode);
   const electron = duoShade("info", theme.mode);
   // Every particle is a token: a lip circle drawn a little lower, then the face (see duo-palette).
-  const token = (key: string, x: number, y: number, r: number, paint: { face: string; lip: string }) => (
+  // Protons are flat: no lip under them.
+  const token = (key: string, x: number, y: number, r: number, paint: { face: string; lip: string }, flat = false) => (
     <G key={key}>
-      <Circle cx={x} cy={y + lipFor(r)} r={r} fill={paint.lip} />
+      {flat ? null : <Circle cx={x} cy={y + lipFor(r)} r={r} fill={paint.lip} />}
       <Circle cx={x} cy={y} r={r} fill={paint.face} />
     </G>
   );
@@ -222,7 +248,7 @@ function AtomDrawing({ counts, size }: { counts: Counts; size: number }) {
           return token(`e-${shell}-${k}`, 50 + radii[shell] * Math.cos(a), 50 + radii[shell] * Math.sin(a), 2.5, electron);
         }),
       )}
-      {nucleus.map((p, i) => token(`n-${i}`, p.x, p.y, 4.2, p.proton ? proton : neutron))}
+      {nucleus.map((p, i) => token(`n-${i}`, p.x, p.y, 4.2, p.proton ? proton : neutron, p.proton))}
     </Svg>
   );
 }

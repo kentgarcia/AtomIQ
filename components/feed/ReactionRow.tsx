@@ -14,14 +14,16 @@
  * list re-reads by itself.
  */
 
-import { memo, useEffect, useRef, useState } from "react";
+import { memo, useState } from "react";
 import { Pressable, View } from "react-native";
-import Animated, { FadeIn, useAnimatedStyle, useReducedMotion, useSharedValue, withSequence, withTiming } from "react-native-reanimated";
+import Animated, { FadeIn, useReducedMotion } from "react-native-reanimated";
 
 import { HeadStack } from "@/components/feed/NpcHead";
 import { ReactionGlyph, useReactionColors } from "@/components/feed/ReactionGlyph";
 import { ReactorsSheet } from "@/components/feed/ReactorsSheet";
 import { commentsLabel, likedBySegments, likedBySpoken, pickerButtonLabel, REACTION_ORDER, reactPillLabel } from "@/components/feed/feed-ui-core";
+import { FloatUp } from "@/components/motion/FloatUp";
+import { PopWhen } from "@/components/motion/PopOnce";
 import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
 import type { Npc } from "@/content/npcs";
@@ -31,6 +33,8 @@ import { select } from "@/services/haptics";
 import { createStyles, fontFaces, useTheme, withAlpha } from "@/theme";
 import { EASE_OUT } from "@/theme/motion";
 import { controls } from "@/theme/tokens";
+import { playSfx } from "@/services/sfx";
+import { REACTION_RATE } from "@/services/sfx-core";
 
 const POP_MS = 150;
 
@@ -86,18 +90,11 @@ export const ReactionRow = memo(function ReactionRow({ target, summary, cast, co
   const [pickerOpen, setPickerOpen] = useState(false);
   const [sheetOpen, setSheetOpen] = useState(false);
 
-  const scale = useSharedValue(1);
-  const popStyle = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
-  const previous = useRef(summary.mine);
-  useEffect(() => {
-    if (previous.current === summary.mine) return;
-    previous.current = summary.mine;
-    if (reduced || !summary.mine) return;
-    scale.value = withSequence(withTiming(1.2, { duration: POP_MS / 2, easing: EASE_OUT }), withTiming(1, { duration: POP_MS / 2, easing: EASE_OUT }));
-  }, [summary.mine, reduced, scale]);
-
   const choose = (reaction: Reaction) => {
     select();
+    // Picking a new reaction pops (pitched by which one); picking your own again takes it back
+    if (summary.mine === reaction) void playSfx("ui.unequip");
+    else void playSfx("reward.pop", { rate: REACTION_RATE[reaction] ?? 1 });
     setPickerOpen(false);
     void toggleReaction(target.type, target.id, reaction).catch((error) => console.warn("[feed] react", error));
   };
@@ -123,13 +120,22 @@ export const ReactionRow = memo(function ReactionRow({ target, summary, cast, co
         accessibilityHint="Opens the four reactions"
         style={({ pressed }) => [styles.pill, summary.mine ? styles.pillOn : null, pressed ? styles.pillPressed : null]}
       >
-        <Animated.View style={popStyle} accessible={false}>
-          {summary.mine ? (
-            <ReactionGlyph reaction={summary.mine} size={22} />
-          ) : (
-            <Icon name="Heart" size={22} color={theme.colors.textSecondary} variant="Linear" />
-          )}
-        </Animated.View>
+        {/* Choosing a reaction pops the pill's glyph (a small version of the option pop) and three of them float up */}
+        <PopWhen trigger={summary.mine} active={summary.mine !== null} intensity={0.6} sparkles={false}>
+          <View accessible={false}>
+            {summary.mine ? (
+              <ReactionGlyph reaction={summary.mine} size={22} />
+            ) : (
+              <Icon name="Heart" size={22} color={theme.colors.textSecondary} variant="Linear" />
+            )}
+          </View>
+          <FloatUp
+            trigger={summary.mine}
+            active={summary.mine !== null}
+            size={14}
+            render={() => (summary.mine ? <ReactionGlyph reaction={summary.mine} size={14} /> : null)}
+          />
+        </PopWhen>
         {summary.total > 0 ? <Text style={styles.count}>{summary.total}</Text> : null}
       </Pressable>
 

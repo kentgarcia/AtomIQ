@@ -35,6 +35,14 @@ const FILE_EXCEPTIONS = new Map([
     "EX-13: lesson object art (flat Duolingo-style pictures of things, official palette families), same hues in light and dark.",
   ],
   [
+    "components/feed/blog-art.ts",
+    "EX-13: blog illustrations (flat scenes composed of the lesson object art and its official palette families), same hues in light and dark.",
+  ],
+  [
+    "components/lab/shield-art.ts",
+    "EX-15: Radiation Shield Lab picture (shield materials and the three kinds of radiation, flat face and lip), same hues in light and dark.",
+  ],
+  [
     "components/npc/npc-palette.ts",
     "EX-12: NPC teacher palette (official Duolingo-style colours, skin and hair trios, muted ramp), same in light and dark.",
   ],

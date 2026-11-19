@@ -34,6 +34,7 @@ import type {
   Myth,
   QuizQuestion,
   QuizType,
+  UnitStatement,
 } from "@/content/types";
 
 import {
@@ -104,14 +105,14 @@ const CONTENT_DB_PREV_NAME = "content.prev.db";
  * The same value is stamped into the bundled database's `content_meta` table,
  * so a device always compares the version of the data it actually holds.
  */
-export const CONTENT_DB_VERSION = "0.0.0+draft.65be05";
+export const CONTENT_DB_VERSION = "0.0.0+draft.c55251";
 
 /**
  * Shape of the content this build's repository reads (columns, step types,
  * tables). Bump BY HAND when that shape changes. A release that changes it is a
  * MAJOR content release. See docs/CONTENT_SQLITE_AND_STUDIO_SPEC.md §3.2.
  */
-export const CONTENT_SCHEMA_VERSION = 3;
+export const CONTENT_SCHEMA_VERSION = 4;
 
 /** Marker files from older builds / developer preview, stored next to the database. */
 const LEGACY_VERSION_MARKER = "content.db.version";
@@ -998,6 +999,15 @@ export class ContentRepository {
     return rows.map(mapItem);
   }
 
+  /** Bank items by id, in the order asked. Unknown ids are skipped. */
+  async getItemsByIds(ids: string[]): Promise<Item[]> {
+    if (ids.length === 0) return [];
+    const db = await getReadyContentDb();
+    const rows = await db.getAllAsync<ItemRow>(`SELECT * FROM items WHERE id IN (${ids.map(() => "?").join(",")})`, ids);
+    const byId = new Map(rows.map((r) => [r.id, mapItem(r)]));
+    return ids.map((id) => byId.get(id)).filter((i): i is Item => !!i);
+  }
+
   /** References by id, in the order asked. Unknown ids are skipped. */
   async getReferencesByIds(ids: string[]): Promise<Reference[]> {
     if (ids.length === 0) return [];
@@ -1067,6 +1077,39 @@ export class ContentRepository {
     const db = await getReadyContentDb();
     const rows = await db.getAllAsync<MythRow>("SELECT * FROM myths ORDER BY id");
     return rows.map(mapMythRow);
+  }
+
+  /**
+   * The myth-or-fact decks of the units (Myth Buster, Quick Play), in unit then deck order. Pass a unit id for its deck only.
+   * A content database from before the table existed has none: that is an empty list, not an error.
+   */
+  async getUnitStatements(unitId?: string): Promise<UnitStatement[]> {
+    const db = await getReadyContentDb();
+    try {
+      const rows = await db.getAllAsync<{
+        id: string;
+        unit_id: string;
+        position: number;
+        statement: string;
+        verdict: string;
+        explanation: string;
+      }>(
+        unitId
+          ? "SELECT * FROM unit_statements WHERE unit_id = ? ORDER BY position"
+          : "SELECT * FROM unit_statements ORDER BY unit_id, position",
+        unitId ? [unitId] : [],
+      );
+      return rows.map((r) => ({
+        id: r.id,
+        unitId: r.unit_id,
+        position: r.position,
+        statement: r.statement,
+        verdict: r.verdict === "fact" ? "fact" : "myth",
+        explanation: r.explanation,
+      }));
+    } catch {
+      return [];
+    }
   }
 
   /** Number of myths seeded — handy for integrity checks on launch. */

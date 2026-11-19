@@ -28,6 +28,7 @@ import { ActivityIndicator, Image, Pressable, ScrollView, View } from "react-nat
 import { Text } from "@/components/ui/text";
 import Animated, { FadeIn, FadeInUp, useAnimatedStyle, useReducedMotion, useSharedValue, withRepeat, withTiming } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { playSfx } from "@/services/sfx";
 
 // -- phrase map ---------------------------------------------------------------
 const INTENT_PHRASE: Record<GuideIntent, string> = {
@@ -113,10 +114,13 @@ export default function GuideScreen() {
       return;
     }
     if (pill.payload.type === "utility" && pill.payload.utility === "change-topic") return;
+    // The pill is the learner's message; Shrodi's answer lands when the new turn is set
+    void playSfx("social.message-send");
     (async () => {
       const ctx = await getGuideContext(userProfile);
       setGuideCtx(ctx);
       setState((prev) => (prev ? applySelection(prev, pill, ctx, contentRef.current!) : prev));
+      void playSfx("social.message-receive");
     })();
   };
   const handleCardCta = (card: GuideCard) => navigateDestination(router, card.destination);

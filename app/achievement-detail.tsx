@@ -1,38 +1,76 @@
-import { AchievementBadge } from '@/components/achievements/AchievementBadge';
-import { PageHeader } from '@/components/ui/page-header';
-import { Icon } from '@/components/ui/icon';
-import { useAchievementValues } from '@/hooks/use-achievement-values';
-import { achievementById, achievementValue, progressFor } from '@/services/achievements-core';
-import { LinearGradient } from 'expo-linear-gradient';
-import { useLocalSearchParams, useRouter } from 'expo-router';
-import React, { useMemo } from 'react';
-import { ScrollView, Text, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Animated, { FadeIn, FadeInDown, useReducedMotion } from 'react-native-reanimated';
+/**
+ * Achievement info, opened from the list or the Profile. Flat like the rest of the app: the badge
+ * stamped onto a soft disc (a burst only when this level was reached since the learner last looked),
+ * the title and what it is, then sections split by dashed lines: progress to the next level, every
+ * level, and how to rank up.
+ */
 
-import {createStyles, useTheme, fontFaces, useResponsiveLayout, withAlpha} from "@/theme";
+import { AchievementBadge } from "@/components/achievements/AchievementBadge";
+import { ACHIEVEMENT_FX } from "@/components/celebration/celebration-core";
+import { ScreenHeader, useHeaderBorder } from "@/components/layout";
+import { Stamp } from "@/components/lesson/Stamp";
+import { Burst } from "@/components/motion/Burst";
+import { BURST } from "@/components/motion/burst-core";
+import { settle } from "@/components/motion/settle";
+import { settleDelay } from "@/components/motion/settle-core";
+import { useDelayedClock } from "@/components/motion/use-delayed-clock";
+import { ProgressBar } from "@/components/quests/ProgressBar";
+import { Text } from "@/components/ui/text";
+import { useAchievementValues } from "@/hooks/use-achievement-values";
+import { achievementById, achievementValue, progressFor } from "@/services/achievements-core";
+import { playSfx } from "@/services/sfx";
+import { getAchievementLevels } from "@/services/storage";
+import { createStyles, fontFaces, useResponsiveLayout, useTheme, withAlpha } from "@/theme";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import React, { useEffect, useMemo, useState } from "react";
+import { ScrollView, View } from "react-native";
+import Animated from "react-native-reanimated";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+
+const BADGE = 150;
+const DISC = 208;
+const BURST_CLOCK_TOTAL = ACHIEVEMENT_FX.burst + BURST.total;
 
 export default function AchievementDetailScreen() {
+  useEffect(() => {
+    void playSfx("social.achievement-scroll");
+  }, []);
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { contentMaxWidth } = useResponsiveLayout();
+  const { contentMaxWidth, gutter } = useResponsiveLayout();
+  const { scrolled, onScroll, scrollEventThrottle } = useHeaderBorder();
   const { theme } = useTheme();
+  const styles = useStyles(theme);
+  const c = theme.colors;
   const accent = theme.palettes.achievements.primary;
-  const styles = useMemo(() => makeStyles(theme), [theme]);
   const { achievementId } = useLocalSearchParams<{ achievementId: string }>();
   const values = useAchievementValues();
-  const reducedMotion = useReducedMotion();
+
+  // Has this level been reached since the learner last looked? (read only: Profile owns the baseline)
+  const [seenLevels, setSeenLevels] = useState<Record<string, number> | null | undefined>(undefined);
+  useEffect(() => {
+    let alive = true;
+    getAchievementLevels()
+      .then((levels) => alive && setSeenLevels(levels))
+      .catch(() => alive && setSeenLevels(null));
+    return () => {
+      alive = false;
+    };
+  }, []);
 
   const achievement = useMemo(() => {
-    const track = achievementById(parseInt(achievementId || '0', 10));
+    const track = achievementById(parseInt(achievementId || "0", 10));
     if (!track || !values) return null;
     return { track, progress: progressFor(track, achievementValue(track, values)) };
   }, [achievementId, values]);
 
+  const justEarned = !!achievement && !!seenLevels && achievement.progress.level > (seenLevels[String(achievement.track.id)] ?? 0);
+  const burstClock = useDelayedClock(BURST_CLOCK_TOTAL, 0, justEarned);
+
   if (!achievement) {
     return (
       <View style={styles.container}>
-        <PageHeader title="Achievement" onBack={() => router.back()} palette={theme.palettes.achievements} centered />
+        <ScreenHeader title="Achievement" onBack={() => router.back()} />
         <View style={styles.errorContainer}>
           <Text style={styles.errorText}>Achievement not found</Text>
         </View>
@@ -41,108 +79,69 @@ export default function AchievementDetailScreen() {
   }
 
   const { track, progress } = achievement;
-  const goal = progress.next === null ? 'You reached the top level!' : track.requirement(progress.next);
-  const levelText = progress.earned ? `Level ${progress.level} of ${progress.maxLevel}` : 'Not started yet';
+  const goal = progress.next === null ? "You reached the top level!" : track.requirement(progress.next);
+  const levelText = progress.earned ? `Level ${progress.level} of ${progress.maxLevel}` : "Not started yet";
+  const toGo = progress.next === null ? 0 : Math.max(0, progress.next - progress.value);
+  const stats: { label: string; value: string; color?: string }[] = [
+    { label: "Current", value: progress.value.toLocaleString(), color: accent },
+    { label: "Next level", value: progress.next === null ? "Max" : progress.next.toLocaleString() },
+    { label: "To go", value: toGo.toLocaleString(), color: progress.maxed ? c.success : accent },
+  ];
 
   return (
     <View style={styles.container}>
-      {/* Header */}
-      <PageHeader title="Achievement" onBack={() => router.back()} palette={theme.palettes.achievements} centered />
-
+      <ScreenHeader title={track.title} subtitle={levelText} onBack={() => router.back()} scrolled={scrolled} />
       <ScrollView
-        contentContainerStyle={[
-          styles.content,
-          { width: "100%", maxWidth: contentMaxWidth, alignSelf: "center", paddingBottom: insets.bottom + 24 },
-        ]}
+        onScroll={onScroll}
+        scrollEventThrottle={scrollEventThrottle}
         showsVerticalScrollIndicator={false}
+        contentContainerStyle={[styles.content, { width: "100%", maxWidth: contentMaxWidth, alignSelf: "center", paddingHorizontal: gutter, paddingBottom: insets.bottom + 32 }]}
       >
-        {/* Current badge */}
-        <Animated.View 
-          entering={reducedMotion ? FadeIn.duration(120) : FadeInDown.delay(100).springify()}
-          style={styles.iconCard}
-        >
-          <LinearGradient
-            colors={(progress.earned
-              ? [withAlpha(accent, 0.19), withAlpha(accent, 0.08)]
-              : [theme.colors.surfaceSoft, theme.colors.surfaceRaised]) as readonly [string, string]
-            }
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={styles.iconCardGradient}
-          >
-            <AchievementBadge track={track} level={progress.badgeLevel} size={160} earned={progress.earned} />
-            {progress.earned ? (
-              <View style={styles.levelPill}>
-                <Text style={styles.levelPillText}>Level {progress.level}</Text>
-              </View>
-            ) : null}
-          </LinearGradient>
+        {/* The badge, stamped in once on a soft disc, with what the achievement is */}
+        <Animated.View entering={settle(settleDelay(0))} style={styles.hero}>
+          <View style={[styles.disc, { backgroundColor: progress.earned ? withAlpha(accent, 0.14) : c.surfaceSoft }]}>
+            <View style={styles.badgeWrap}>
+              <Stamp at={ACHIEVEMENT_FX.badge}>
+                <AchievementBadge track={track} level={progress.badgeLevel} size={BADGE} earned={progress.earned} />
+              </Stamp>
+              <Burst clock={burstClock} at={ACHIEVEMENT_FX.burst} diameter={BADGE} color={accent} reach={30} />
+            </View>
+          </View>
+          {progress.earned ? (
+            <View style={styles.levelPill}>
+              <Text style={styles.levelPillText}>Level {progress.level}</Text>
+            </View>
+          ) : null}
+          <Text style={[styles.title, !progress.earned && styles.titleLocked]}>{track.title}</Text>
+          <Text style={styles.description}>{track.description}</Text>
         </Animated.View>
 
-        {/* Achievement Info */}
-        <Animated.View 
-          entering={reducedMotion ? FadeIn.duration(120) : FadeInDown.delay(200).springify()}
-          style={styles.infoCard}
-        >
-          <Text style={[styles.achievementTitle, !progress.earned && styles.achievementTitleLocked]}>
-            {track.title}
-          </Text>
-          <Text style={styles.achievementRequirement}>{levelText}</Text>
-          <Text style={styles.achievementDescription}>{track.description}</Text>
-        </Animated.View>
-
-        {/* Progress Card */}
-        <Animated.View 
-          entering={reducedMotion ? FadeIn.duration(120) : FadeInDown.delay(300).springify()}
-          style={styles.progressCard}
-        >
+        {/* Progress to the next level */}
+        <Animated.View entering={settle(settleDelay(1))} style={[styles.section, styles.divided]}>
           <View style={styles.progressHeader}>
-            <Text style={styles.progressLabel}>{progress.maxed ? 'Top level' : `Next: ${goal}`}</Text>
-            <Text style={styles.progressPercentage}>{Math.round(progress.ratio * 100)}%</Text>
+            <Text style={styles.sectionTitle}>{progress.maxed ? "Top level" : "Next level"}</Text>
+            <Text style={[styles.percent, { color: progress.maxed ? c.success : accent }]}>{Math.round(progress.ratio * 100)}%</Text>
           </View>
-          
-          <View style={styles.progressBarLarge}>
-            <LinearGradient
-              colors={(progress.maxed
-                ? [theme.colors.success, theme.colors.success]
-                : [accent, withAlpha(accent, 0.8)]) as readonly [string, string]
-              }
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-              style={[styles.progressFillLarge, { width: `${progress.ratio * 100}%` }]}
-            />
-          </View>
-          
-          <View style={styles.progressStats}>
-            <View style={styles.progressStat}>
-              <Text style={styles.progressStatLabel}>Current</Text>
-              <Text style={[styles.progressStatValue, { color: accent }]}>
-                {progress.value.toLocaleString()}
-              </Text>
-            </View>
-            <View style={styles.progressDivider} />
-            <View style={styles.progressStat}>
-              <Text style={styles.progressStatLabel}>Next level</Text>
-              <Text style={styles.progressStatValue}>
-                {progress.next === null ? 'Max' : progress.next.toLocaleString()}
-              </Text>
-            </View>
-            <View style={styles.progressDivider} />
-            <View style={styles.progressStat}>
-              <Text style={styles.progressStatLabel}>To go</Text>
-              <Text style={[styles.progressStatValue, { color: progress.maxed ? theme.colors.success : accent }]}>
-                {progress.next === null ? 0 : Math.max(0, progress.next - progress.value).toLocaleString()}
-              </Text>
-            </View>
+          <Text style={styles.goal}>{goal}</Text>
+          <ProgressBar
+            ratio={progress.ratio}
+            label={progress.next === null ? "Done" : `${progress.value.toLocaleString()} / ${progress.next.toLocaleString()}`}
+            done={progress.maxed}
+            tint={accent}
+          />
+          <View style={styles.stats}>
+            {stats.map((s, i) => (
+              <View key={s.label} style={[styles.stat, i > 0 && styles.statDivided]}>
+                <Text style={styles.statLabel}>{s.label}</Text>
+                <Text style={[styles.statValue, s.color ? { color: s.color } : null]}>{s.value}</Text>
+              </View>
+            ))}
           </View>
         </Animated.View>
 
         {/* Every level */}
-        <Animated.View
-          entering={reducedMotion ? FadeIn.duration(120) : FadeInDown.delay(350).springify()}
-          style={styles.levelsCard}
-        >
-          <Text style={styles.tipsTitle}>All levels</Text>
+        <Animated.View entering={settle(settleDelay(2))} style={[styles.section, styles.divided]}>
+          <Text style={styles.sectionTitle}>All levels</Text>
           <View style={styles.levelsGrid}>
             {track.tiers.map((threshold, index) => {
               const level = index + 1;
@@ -152,7 +151,7 @@ export default function AchievementDetailScreen() {
                   key={level}
                   style={styles.levelCell}
                   accessible
-                  accessibilityLabel={`Level ${level}, ${track.requirement(threshold)}, ${earned ? 'earned' : 'locked'}`}
+                  accessibilityLabel={`Level ${level}, ${track.requirement(threshold)}, ${earned ? "earned" : "locked"}`}
                 >
                   <AchievementBadge track={track} level={level} size={64} earned={earned} />
                   <Text style={[styles.levelCellTitle, !earned && styles.levelCellLocked]}>Lv {level}</Text>
@@ -163,271 +162,64 @@ export default function AchievementDetailScreen() {
           </View>
         </Animated.View>
 
-        {/* Tips Card */}
-        <Animated.View 
-          entering={reducedMotion ? FadeIn.duration(120) : FadeInDown.delay(400).springify()}
-          style={styles.tipsCard}
-        >
-          <View style={styles.tipsHeader}>
-            <Icon name="InfoCircle" size={20} color={accent} variant="Bold" />
-            <Text style={styles.tipsTitle}>How to rank up</Text>
-          </View>
-          {track.tips.map((tip, index) => (
-            <View key={index} style={styles.tipItem}>
-              <View style={styles.tipBullet}>
-                <Text style={styles.tipBulletText}>{index + 1}</Text>
+        {/* Tips */}
+        <Animated.View entering={settle(settleDelay(3))} style={[styles.section, styles.divided]}>
+          <Text style={styles.sectionTitle}>How to rank up</Text>
+          <View>
+            {track.tips.map((tip, index) => (
+              <View key={tip} style={[styles.tipItem, index > 0 && styles.tipDivided]}>
+                <View style={styles.tipBullet}>
+                  <Text style={[styles.tipBulletText, { color: accent }]}>{index + 1}</Text>
+                </View>
+                <Text style={styles.tipText}>{tip}</Text>
               </View>
-              <Text style={styles.tipText}>{tip}</Text>
-            </View>
-          ))}
+            ))}
+          </View>
         </Animated.View>
-
-        <View style={{ height: 40 }} />
       </ScrollView>
     </View>
   );
 }
 
-const makeStyles = createStyles((theme) => {
-  const accent = theme.palettes.achievements.primary;
+const useStyles = createStyles((theme) => {
+  const c = theme.colors;
   return {
-  container: {
-    flex: 1,
-    backgroundColor: theme.colors.background,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 24,
-    paddingBottom: 16,
-    backgroundColor: theme.colors.background,
-  },
-  backButton: {
-    width: 40,
-    height: 40,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: theme.colors.card,
-    borderRadius: 12,
-    borderWidth: 2,
-    borderColor: theme.colors.border,
-  },
-  headerTitle: {
-    fontSize: 20,
-    ...fontFaces.heavy,
-    color: theme.colors.text,
-  },
-  errorContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  errorText: {
-    fontSize: 16,
-    ...fontFaces.regular,
-    color: theme.colors.textMuted,
-  },
-  content: {
-    padding: 24,
-    paddingTop: 0,
-  },
-  iconCard: {
-    borderRadius: 24,
-    overflow: 'hidden',
-    marginBottom: 24,
-    borderWidth: 2,
-    borderColor: theme.colors.border,
-  },
-  iconCardGradient: {
-    padding: 32,
-    paddingBottom: 56,
-    alignItems: 'center',
-    justifyContent: 'center',
-    position: 'relative',
-  },
-  levelPill: {
-    position: 'absolute',
-    bottom: 16,
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: 12,
-    backgroundColor: theme.colors.card,
-    borderWidth: 2,
-    borderColor: theme.colors.border,
-  },
-  levelPillText: {
-    fontSize: 13,
-    ...fontFaces.heavy,
-    color: theme.colors.text,
-  },
-  levelsCard: {
-    backgroundColor: theme.colors.card,
-    borderRadius: 20,
-    padding: 24,
-    marginBottom: 16,
-    borderWidth: 2,
-    borderColor: theme.colors.border,
-    gap: 16,
-  },
-  levelsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    rowGap: 16,
-  },
-  levelCell: {
-    width: '25%',
-    alignItems: 'center',
-    gap: 2,
-  },
-  levelCellTitle: {
-    fontSize: 12,
-    ...fontFaces.heavy,
-    color: theme.colors.text,
-  },
-  levelCellLocked: {
-    color: theme.colors.textFaint,
-  },
-  levelCellGoal: {
-    fontSize: 11,
-    ...fontFaces.semibold,
-    color: theme.colors.textMuted,
-  },
-  infoCard: {
-    backgroundColor: theme.colors.card,
-    borderRadius: 20,
-    padding: 24,
-    marginBottom: 16,
-    borderWidth: 2,
-    borderColor: theme.colors.border,
-  },
-  achievementTitle: {
-    fontSize: 28,
-    ...fontFaces.heavy,
-    color: theme.colors.text,
-    marginBottom: 8,
-  },
-  achievementTitleLocked: {
-    color: theme.colors.textMuted,
-  },
-  achievementRequirement: {
-    fontSize: 16,
-    ...fontFaces.bold,
-    color: accent,
-    marginBottom: 16,
-  },
-  achievementDescription: {
-    fontSize: 15,
-    ...fontFaces.regular,
-    color: theme.colors.textMuted,
-    lineHeight: 24,
-  },
-  progressCard: {
-    backgroundColor: theme.colors.card,
-    borderRadius: 20,
-    padding: 24,
-    marginBottom: 16,
-    borderWidth: 2,
-    borderColor: theme.colors.border,
-  },
-  progressHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  progressLabel: {
-    fontSize: 16,
-    ...fontFaces.bold,
-    color: theme.colors.text,
-  },
-  progressPercentage: {
-    fontSize: 20,
-    ...fontFaces.heavy,
-    color: accent,
-  },
-  progressBarLarge: {
-    width: '100%',
-    height: 16,
-    backgroundColor: theme.colors.disabled,
-    borderRadius: 8,
-    overflow: 'hidden',
-    marginBottom: 20,
-  },
-  progressFillLarge: {
-    height: '100%',
-    borderRadius: 8,
-  },
-  progressStats: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'center',
-  },
-  progressStat: {
-    alignItems: 'center',
-    flex: 1,
-  },
-  progressStatLabel: {
-    fontSize: 12,
-    color: theme.colors.textMuted,
-    ...fontFaces.semibold,
-    marginBottom: 4,
-  },
-  progressStatValue: {
-    fontSize: 20,
-    ...fontFaces.heavy,
-    color: theme.colors.text,
-  },
-  progressDivider: {
-    width: 1,
-    height: 40,
-    backgroundColor: theme.colors.border,
-  },
-  tipsCard: {
-    backgroundColor: theme.colors.card,
-    borderRadius: 20,
-    padding: 24,
-    borderWidth: 2,
-    borderColor: theme.colors.border,
-  },
-  tipsHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 20,
-    gap: 8,
-  },
-  tipsTitle: {
-    fontSize: 18,
-    ...fontFaces.heavy,
-    color: theme.colors.text,
-  },
-  tipItem: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    marginBottom: 16,
-  },
-  tipBullet: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    backgroundColor: withAlpha(accent, 0.13),
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 12,
-    marginTop: 2,
-  },
-  tipBulletText: {
-    fontSize: 14,
-    ...fontFaces.heavy,
-    color: accent,
-  },
-  tipText: {
-    flex: 1,
-    fontSize: 15,
-    color: theme.colors.text,
-    lineHeight: 22,
-    ...fontFaces.medium,
-  },
+    container: { flex: 1, backgroundColor: c.mapBackground },
+    errorContainer: { flex: 1, alignItems: "center", justifyContent: "center" },
+    errorText: { fontSize: 16, ...fontFaces.medium, color: c.textMuted },
+    content: { paddingTop: 8, gap: 20 },
+
+    hero: { alignItems: "center", gap: 10 },
+    disc: { width: DISC, height: DISC, borderRadius: DISC / 2, alignItems: "center", justifyContent: "center" },
+    badgeWrap: { width: BADGE, height: BADGE, alignItems: "center", justifyContent: "center" },
+    levelPill: { paddingHorizontal: 12, paddingVertical: 3, borderRadius: 12, backgroundColor: c.primarySurface },
+    levelPillText: { fontSize: 13, ...fontFaces.heavy, color: c.primaryDark },
+    title: { fontSize: 28, lineHeight: 34, textAlign: "center", ...fontFaces.black, color: c.text },
+    titleLocked: { color: c.textMuted },
+    description: { fontSize: 15, lineHeight: 23, textAlign: "center", ...fontFaces.medium, color: c.textMuted },
+
+    section: { gap: 12 },
+    divided: { paddingTop: 20, borderTopWidth: 1, borderStyle: "dashed", borderColor: c.border },
+    sectionTitle: { fontSize: 18, ...fontFaces.heavy, color: c.text },
+    progressHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
+    percent: { fontSize: 20, ...fontFaces.black, fontVariant: ["tabular-nums"] },
+    goal: { fontSize: 15, ...fontFaces.semibold, color: c.textSecondary },
+    stats: { flexDirection: "row", alignItems: "stretch", marginTop: 4 },
+    stat: { flex: 1, alignItems: "center", gap: 2 },
+    statDivided: { borderLeftWidth: 1, borderStyle: "dashed", borderColor: c.border },
+    statLabel: { fontSize: 12, ...fontFaces.semibold, color: c.textMuted },
+    statValue: { fontSize: 20, ...fontFaces.black, color: c.text, fontVariant: ["tabular-nums"] },
+
+    levelsGrid: { flexDirection: "row", flexWrap: "wrap", rowGap: 16 },
+    levelCell: { width: "25%", alignItems: "center", gap: 2 },
+    levelCellTitle: { fontSize: 12, ...fontFaces.heavy, color: c.text },
+    levelCellLocked: { color: c.textFaint },
+    levelCellGoal: { fontSize: 11, ...fontFaces.semibold, color: c.textMuted },
+
+    tipItem: { flexDirection: "row", alignItems: "flex-start", gap: 12, paddingVertical: 12 },
+    tipDivided: { borderTopWidth: 1, borderStyle: "dashed", borderColor: c.border },
+    tipBullet: { width: 28, height: 28, borderRadius: 10, backgroundColor: withAlpha(theme.palettes.achievements.primary, 0.14), alignItems: "center", justifyContent: "center" },
+    tipBulletText: { fontSize: 14, ...fontFaces.heavy },
+    tipText: { flex: 1, fontSize: 15, lineHeight: 22, ...fontFaces.medium, color: c.text },
   };
 });
-

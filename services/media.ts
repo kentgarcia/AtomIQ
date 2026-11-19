@@ -63,6 +63,11 @@ const applyPreferenceSideEffects = () => {
   syncMusic();
 };
 
+let preferencesLoaded = false;
+
+/** True once the stored preferences are in memory, so a gate can be read without awaiting. */
+export const areMediaPreferencesLoaded = (): boolean => preferencesLoaded;
+
 /** Load persisted preferences once. Safe to call from many places. */
 export const ensureMediaPreferencesLoaded = (): Promise<MediaPreferences> => {
   if (!hydration) {
@@ -78,6 +83,7 @@ export const ensureMediaPreferencesLoaded = (): Promise<MediaPreferences> => {
         console.warn("[media] Could not load preferences, using defaults:", error);
       }
       applyPreferenceSideEffects();
+      preferencesLoaded = true;
       notifyPreferences();
       return preferences;
     })();

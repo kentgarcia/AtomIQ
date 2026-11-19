@@ -86,8 +86,37 @@ export const NPC_VIEWBOX = {
   bust: { x: -88, y: -114, w: 176, h: 221.76 },
   /** A square crop of head, neck and shoulders, for round and rounded-square avatar frames. */
   avatar: { x: -110, y: -112, w: 220, h: 220 },
+  /**
+   * For round avatars that pop out of their circle: head and shoulders at a larger scale, with room above the circle
+   * (`POP_CIRCLE`) so the top of the head can rise past its edge. Drawn with `popClipPath()` so only the lower half
+   * is cut to the circle.
+   */
+  pop: { x: -100, y: -112, w: 200, h: 228 },
 } as const;
 export type NpcForm = keyof typeof NPC_VIEWBOX;
+
+/** The circle of a `pop` avatar, in drawing units. The head (top at HEAD.top) and its hair reach above it. */
+export const POP_CIRCLE = { cx: 0, cy: 28, r: 88 } as const;
+
+/**
+ * The clip of a `pop` figure: everything above the circle's middle line (so the head is free to rise out of
+ * the top), and below it the circle itself (so the shoulders stay inside). One path, a rectangle over a half disc.
+ */
+export function popClipPath(): string {
+  const { cy, r } = POP_CIRCLE;
+  const { x, y, w } = NPC_VIEWBOX.pop;
+  return `M${x} ${y}H${x + w}V${cy}H${r}A${r} ${r} 0 0 1 ${-r} ${cy}H${x}Z`;
+}
+
+/**
+ * Where a `pop` figure sits for a circle of diameter `size` dp: the figure's box (relative to the circle's top
+ * left corner, so the top is negative) and its size. Put the circle in a view of `size` x `size` that does not clip.
+ */
+export function popLayout(size: number): { width: number; height: number; left: number; top: number } {
+  const k = size / (POP_CIRCLE.r * 2);
+  const vb = NPC_VIEWBOX.pop;
+  return { width: vb.w * k, height: vb.h * k, left: (vb.x + POP_CIRCLE.r - POP_CIRCLE.cx) * k, top: (vb.y - (POP_CIRCLE.cy - POP_CIRCLE.r)) * k };
+}
 
 /** Where the shirt of the `bust` form ends: the bottom edge of its crop (the bottom corners are rounded there). */
 export const BUST_BOTTOM = NPC_VIEWBOX.bust.y + NPC_VIEWBOX.bust.h;
@@ -532,7 +561,8 @@ function handParts(a: ArmSpec, p: Pal): Part[] {
     parts.push(lineOf(`M${f(tx)} ${f(hy)}V${f(hy - r - THUMB_OUT + FINGER_W / 2)}`, skin, FINGER_W));
   }
   if (a.hand === "point") {
-    parts.push(lineOf(`M${f(hx)} ${f(hy - 4)}V${f(hy - r * 1.6 + 7)}`, skin, 14));
+    // The finger points sideways, toward the speech bubble. Straight up, a lone finger reads as a rude gesture.
+    parts.push(lineOf(`M${f(hx)} ${f(hy)}H${f(hx - a.side * (r + 22))}`, skin, FINGER_W));
   }
   return parts;
 }

@@ -7,13 +7,14 @@
 
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FlatList, Pressable, View, useWindowDimensions, type LayoutChangeEvent } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Avatar } from "@/components/avatar/Avatar";
 import { avatarBackground, normalizeAvatar, serializeAvatar } from "@/components/avatar/avatar-core";
 import { PatternLayer } from "@/components/avatar/PatternLayer";
+import { PopWhen } from "@/components/motion/PopOnce";
 import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
 import { AWNING_BAND, AWNING_LIP, Awning } from "@/components/shop/Awning";
@@ -25,6 +26,8 @@ import { useDiamonds } from "@/hooks/use-wallet";
 import { useStorage } from "@/services/StorageContext";
 import { createStyles, fontFaces, useResponsiveLayout, useTheme } from "@/theme";
 import { controls } from "@/theme/tokens";
+import { select } from "@/services/haptics";
+import { playSfx, stopSfx } from "@/services/sfx";
 
 const DIAMOND_ICON = require("@/assets/images/icons/diamond.png");
 const SIDE = 20;
@@ -63,12 +66,29 @@ export default function ShopScreen() {
   const { userProfile } = useStorage();
   const diamonds = useDiamonds();
 
+  // The shop jingle plays as it opens and is cut when the learner leaves (docs/SFX_SPEC.md §6.5)
+  useEffect(() => {
+    void playSfx("ui.shop-open");
+    return () => stopSfx("ui.shop-open");
+  }, []);
+
   const base = useMemo(() => normalizeAvatar(userProfile?.avatar_url), [userProfile?.avatar_url]);
   const [category, setCategory] = useState<ShopCategoryId>(SHOP_CATEGORIES[0].id);
   const [trying, setTrying] = useState<ShopItem | null>(null);
   const [shelfWidth, setShelfWidth] = useState(0);
   const [topHeight, setTopHeight] = useState(0);
 
+  // Tapping an item must not re-render every tile: the handler is stable and reads the current pick from a ref
+  const tryingRef = useRef<ShopItem | null>(null);
+  useEffect(() => {
+    tryingRef.current = trying;
+  }, [trying]);
+  const onTry = useCallback((item: ShopItem) => {
+    const putDown = tryingRef.current?.id === item.id;
+    select();
+    void playSfx(putDown ? "ui.unequip" : "ui.equip");
+    setTrying(putDown ? null : item);
+  }, []);
   const items = useMemo(() => itemsIn(category), [category]);
   const label = categoryById(category).label;
   // The avatar shown big: the one the learner has, with the item they tapped tried on.
@@ -84,7 +104,10 @@ export default function ShopScreen() {
     <View style={[styles.root, { backgroundColor: avatarBackground(look) }]}>
       <PatternLayer pattern={look.pattern} tile={120} />
       <View style={styles.top} onLayout={(e: LayoutChangeEvent) => setTopHeight(e.nativeEvent.layout.height)}>
-        <Avatar value={shown} size={avatarSize} bare live />
+        {/* Trying something on: the avatar squashes and pops as the new look appears; putting it down does not */}
+        <PopWhen trigger={trying?.id ?? null} active={trying !== null} intensity={0.45} sparkleColor={theme.colors.lessonHeader}>
+          <Avatar value={shown} size={avatarSize} bare live />
+        </PopWhen>
         <View style={[styles.bar, { top: roof + 10 }]}>
           <Pressable onPress={() => router.back()} hitSlop={6} accessibilityRole="button" accessibilityLabel="Go back" style={({ pressed }) => [styles.round, pressed && { opacity: 0.6 }]}>
             <Icon name="ArrowLeft2" size={22} color={theme.colors.text} variant="Bold" />
@@ -114,11 +137,14 @@ export default function ShopScreen() {
             columnWrapperStyle={styles.gridRow}
             contentContainerStyle={styles.shelfContent}
             showsVerticalScrollIndicator={false}
-            initialNumToRender={12}
-            windowSize={7}
+            initialNumToRender={9}
+            maxToRenderPerBatch={6}
+            windowSize={5}
+            extraData={trying?.id}
+            removeClippedSubviews
             renderItem={({ item }) => (
               <View style={{ width: itemWidth }}>
-                <ItemTile item={item} base={base} selected={trying?.id === item.id} onPress={() => setTrying(trying?.id === item.id ? null : item)} label={item.name} />
+                <ItemTile item={item} base={base} selected={trying?.id === item.id} onPress={onTry} label={item.name} />
               </View>
             )}
             ListEmptyComponent={

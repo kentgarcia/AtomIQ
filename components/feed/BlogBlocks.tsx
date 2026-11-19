@@ -1,7 +1,7 @@
 /**
  * The body of a blog piece (docs/NPC_FEED_SPEC.md §4.3, §6): a small fixed set of blocks, each a
  * hardcoded component like the lesson cards. `p` paragraph, `h` heading, `quote` (set large, with the
- * author's head), `fact` ("Did you know?" callout), `figure` (a lesson object picture and a caption),
+ * author's head), `fact` ("Did you know?" callout), `figure` (a full scene, or a lesson object picture, and a caption),
  * `list`, and `next` (the closing teaser with a button that opens a lesson or the unit).
  * One calm column; it reads at large text sizes because nothing has a fixed height.
  */
@@ -10,6 +10,8 @@ import { useRouter } from "expo-router";
 import { memo } from "react";
 import { View } from "react-native";
 
+import { BlogArt } from "@/components/feed/BlogArt";
+import { isBlogSceneId } from "@/components/feed/blog-art";
 import { NpcHead } from "@/components/feed/NpcHead";
 import { nextTarget } from "@/components/feed/feed-ui-core";
 import { openFeedTarget } from "@/components/feed/navigate";
@@ -28,21 +30,23 @@ const useStyles = createStyles((theme) => {
   const c = theme.colors;
   return {
     column: { gap: 18 },
-    p: { fontSize: 17, lineHeight: 27, ...fontFaces.book, color: c.text },
-    h: { fontSize: 22, lineHeight: 28, marginTop: 6, ...fontFaces.heavy, color: c.text },
-    quote: { flexDirection: "row", alignItems: "center", gap: 14, paddingVertical: 4 },
-    quoteBar: { alignSelf: "stretch", width: 4, borderRadius: 2, backgroundColor: c.primary },
-    quoteText: { flex: 1, fontSize: 23, lineHeight: 31, ...fontFaces.heavy, color: c.text },
+    p: { fontSize: 18, lineHeight: 29, ...fontFaces.book, color: c.text },
+    h: { fontSize: 24, lineHeight: 30, marginTop: 10, ...fontFaces.heavy, color: c.text },
+    /* The author's line is said in a soft bubble, like a feed post */
+    quote: { flexDirection: "row", alignItems: "center", gap: 14, paddingHorizontal: 16, paddingVertical: 16, borderRadius: 24, backgroundColor: withAlpha(c.primary, 0.12) },
+    quoteText: { flex: 1, fontSize: 21, lineHeight: 29, ...fontFaces.heavy, color: c.text },
     factTitle: { flexDirection: "row", alignItems: "center", gap: 8 },
     factLabel: { fontSize: 13, letterSpacing: 0.6, textTransform: "uppercase", ...fontFaces.heavy, color: c.info },
     factText: { fontSize: 16, lineHeight: 24, ...fontFaces.medium, color: c.text },
     figure: { alignItems: "center", gap: 8 },
     figurePlate: { width: "100%", alignItems: "center", justifyContent: "center", paddingVertical: 20, borderRadius: 20, backgroundColor: withAlpha(c.primary, 0.12) },
+    /* The scene is drawn 5:3, so the whole of it shows at any width */
+    figureScene: { width: "100%", aspectRatio: 5 / 3, borderRadius: 20, overflow: "hidden" },
     caption: { fontSize: 14, lineHeight: 20, textAlign: "center", ...fontFaces.medium, color: c.textMuted },
     list: { gap: 10 },
     item: { flexDirection: "row", alignItems: "flex-start", gap: 12 },
     bullet: { width: 8, height: 8, borderRadius: 4, marginTop: 10, backgroundColor: c.primary },
-    itemText: { flex: 1, fontSize: 17, lineHeight: 26, ...fontFaces.book, color: c.text },
+    itemText: { flex: 1, fontSize: 18, lineHeight: 28, ...fontFaces.book, color: c.text },
     next: { gap: 12 },
     nextText: { fontSize: 17, lineHeight: 25, ...fontFaces.bold, color: c.text },
   };
@@ -78,7 +82,6 @@ export const BlogBlocks = memo(function BlogBlocks({ blocks, author }: BlogBlock
           case "quote":
             return (
               <View key={i} style={styles.quote} accessible accessibilityLabel={`${author?.name ?? "The author"} says: ${block.text}`}>
-                <View style={styles.quoteBar} />
                 <NpcHead npc={author} size={48} />
                 <Text style={styles.quoteText}>{block.text}</Text>
               </View>
@@ -98,7 +101,11 @@ export const BlogBlocks = memo(function BlogBlocks({ blocks, author }: BlogBlock
           case "figure":
             return (
               <View key={i} style={styles.figure} accessible accessibilityRole="image" accessibilityLabel={block.caption}>
-                {isArtId(block.ref) ? (
+                {isBlogSceneId(block.ref) ? (
+                  <View style={styles.figureScene}>
+                    <BlogArt id={block.ref} height="fill" />
+                  </View>
+                ) : isArtId(block.ref) ? (
                   <View style={styles.figurePlate}>
                     <ObjectArt id={block.ref} size={150} />
                   </View>

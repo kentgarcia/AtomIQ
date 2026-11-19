@@ -285,6 +285,24 @@
       "weight": 1
     },
     {
+      "id": "ft-comeback-14",
+      "npc_id": null,
+      "poster_pool": [
+        "npc-ada",
+        "npc-hal",
+        "npc-sage"
+      ],
+      "kind": "nudge",
+      "trigger": "comeback",
+      "condition": {
+        "minDays": 14
+      },
+      "text": "Welcome back, {name}. The door was open the whole time. Let's find where you stopped.",
+      "chip": null,
+      "reactors": [],
+      "weight": 1
+    },
+    {
       "id": "ft-comeback-3",
       "npc_id": null,
       "poster_pool": [
@@ -296,7 +314,24 @@
       "condition": {
         "minDays": 3
       },
-      "text": "Welcome back. Pick up where you left off. The atoms waited.",
+      "text": "Welcome back, {name}. Pick up where you left off. The atoms waited.",
+      "chip": null,
+      "reactors": [],
+      "weight": 1
+    },
+    {
+      "id": "ft-comeback-3b",
+      "npc_id": null,
+      "poster_pool": [
+        "npc-ada",
+        "npc-kofi"
+      ],
+      "kind": "nudge",
+      "trigger": "comeback",
+      "condition": {
+        "minDays": 3
+      },
+      "text": "There you are, {name}. We saved your seat. Ready for one more lesson?",
       "chip": null,
       "reactors": [],
       "weight": 1
@@ -313,7 +348,24 @@
       "condition": {
         "minDays": 7
       },
-      "text": "It has been a while. No rush. One lesson is enough to start again.",
+      "text": "It has been a while, {name}. No rush. One lesson is enough to start again.",
+      "chip": null,
+      "reactors": [],
+      "weight": 1
+    },
+    {
+      "id": "ft-comeback-7b",
+      "npc_id": null,
+      "poster_pool": [
+        "npc-mina",
+        "npc-ray"
+      ],
+      "kind": "nudge",
+      "trigger": "comeback",
+      "condition": {
+        "minDays": 7
+      },
+      "text": "{name}, you are back, and we missed you. Start small. One lesson is plenty.",
       "chip": null,
       "reactors": [],
       "weight": 1
@@ -667,55 +719,111 @@
       "weight": 1
     },
     {
+      "id": "ft-streak-100",
+      "npc_id": null,
+      "poster_pool": [
+        "learner"
+      ],
+      "kind": "milestone",
+      "trigger": "streak",
+      "condition": {
+        "days": 100
+      },
+      "text": "{days} days in a row. One hundred days! I did not think I would make it this far.",
+      "chip": null,
+      "reactors": [
+        "npc-ada"
+      ],
+      "weight": 1
+    },
+    {
+      "id": "ft-streak-14",
+      "npc_id": null,
+      "poster_pool": [
+        "learner"
+      ],
+      "kind": "milestone",
+      "trigger": "streak",
+      "condition": {
+        "days": 14
+      },
+      "text": "{days} days in a row. Two weeks of learning something every single day.",
+      "chip": "quests",
+      "reactors": [
+        "npc-mina"
+      ],
+      "weight": 1
+    },
+    {
       "id": "ft-streak-3",
       "npc_id": null,
       "poster_pool": [
-        "npc-tess",
-        "npc-mina"
+        "learner"
       ],
       "kind": "milestone",
       "trigger": "streak",
       "condition": {
         "days": 3
       },
-      "text": "{days} days in a row. That is how a habit starts. Come back tomorrow and make it four.",
+      "text": "{days} days in a row. A habit is starting, and I want to see it through.",
       "chip": "quests",
-      "reactors": [],
+      "reactors": [
+        "npc-tess"
+      ],
       "weight": 1
     },
     {
       "id": "ft-streak-30",
       "npc_id": null,
       "poster_pool": [
-        "npc-sage",
-        "npc-ada",
-        "npc-hal"
+        "learner"
       ],
       "kind": "milestone",
       "trigger": "streak",
       "condition": {
         "days": 30
       },
-      "text": "{days} days. A month of showing up for atoms. That takes real patience, and you have it.",
+      "text": "{days} days. A whole month of showing up for atoms. I am proud of that.",
       "chip": null,
-      "reactors": [],
+      "reactors": [
+        "npc-sage"
+      ],
+      "weight": 1
+    },
+    {
+      "id": "ft-streak-60",
+      "npc_id": null,
+      "poster_pool": [
+        "learner"
+      ],
+      "kind": "milestone",
+      "trigger": "streak",
+      "condition": {
+        "days": 60
+      },
+      "text": "{days} days in a row. Two months of steady learning, one day at a time.",
+      "chip": "quests",
+      "reactors": [
+        "npc-kofi"
+      ],
       "weight": 1
     },
     {
       "id": "ft-streak-7",
       "npc_id": null,
       "poster_pool": [
-        "npc-ray",
-        "npc-kofi"
+        "learner"
       ],
       "kind": "milestone",
       "trigger": "streak",
       "condition": {
         "days": 7
       },
-      "text": "Someone has come back {days} days in a row. A full week of steady work, and it shows.",
+      "text": "A full week: {days} days in a row. I keep showing up for atoms.",
       "chip": "quests",
-      "reactors": [],
+      "reactors": [
+        "npc-ray"
+      ],
       "weight": 1
     }
   ]

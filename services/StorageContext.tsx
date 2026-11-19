@@ -18,7 +18,7 @@ import {
     normalizeAvatarValue,
 } from "@/components/avatar/avatar-core";
 import { checkFeedOnAppOpen, emitRankCheck, emitStreak } from "./feed";
-import { getOnboardingCompleted, setLastActiveDate } from "./storage";
+import { getOnboardingCompleted, setLastActiveDate, setOnboardingCompleted } from "./storage";
 import { recordMissionEvent } from "./missions";
 import { checkDailyStreak, toLocalIsoDate } from "./utils";
 
@@ -47,11 +47,15 @@ interface StorageContextType {
   addXP: (amount: number) => Promise<void>;
   incrementStreak: () => Promise<void>;
   levelUpLevel: number | null;
+  /** The level the learner was on before the first of the levels not yet celebrated (several level-ups are one celebration). */
+  levelUpFrom: number | null;
   dismissLevelUp: () => void;
   /** True once today's streak has gone up and the daily streak screen has not been shown yet. */
   pendingStreakCelebration: boolean;
   clearStreakCelebration: () => void;
   onboardingCompleted: boolean;
+  /** Saves whether onboarding is finished and updates what the rest of the app sees (the delete-account flow turns it off again). */
+  setOnboardingDone: (done: boolean) => Promise<void>;
 }
 
 const StorageContext = createContext<StorageContextType | undefined>(undefined);
@@ -63,7 +67,9 @@ export const StorageProvider = ({ children }: { children: ReactNode }) => {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [onboardingCompleted, setOnboardingCompletedState] = useState(false);
   const [pendingStreakCelebration, setPendingStreakCelebration] = useState(false);
-  const [levelUpLevel, setLevelUpLevel] = useState<number | null>(null);
+  const [levelUp, setLevelUp] = useState<{ from: number; to: number } | null>(null);
+  const levelUpLevel = levelUp?.to ?? null;
+  const levelUpFrom = levelUp?.from ?? null;
 
   const generateLocalUserId = () =>
     `user_${Date.now()}_${Math.random().toString(36).substring(2, 15)}`;
@@ -203,7 +209,8 @@ export const StorageProvider = ({ children }: { children: ReactNode }) => {
       const prevLevel = Math.floor(prevTotalXP / 100) + 1;
       const newLevel = Math.floor(newTotalXP / 100) + 1;
       if (newLevel > prevLevel) {
-        setLevelUpLevel(newLevel);
+        // A level-up not yet celebrated keeps its starting level, so 1 to 5 is one celebration, not five
+        setLevelUp((pending) => ({ from: pending ? pending.from : prevLevel, to: newLevel }));
       }
     },
     [updateUserProfile],
@@ -278,7 +285,12 @@ export const StorageProvider = ({ children }: { children: ReactNode }) => {
   }, [ensureDailyTracking]);
 
   const dismissLevelUp = useCallback(() => {
-    setLevelUpLevel(null);
+    setLevelUp(null);
+  }, []);
+
+  const setOnboardingDone = useCallback(async (done: boolean) => {
+    await setOnboardingCompleted(done);
+    setOnboardingCompletedState(done);
   }, []);
 
   const clearStreakCelebration = useCallback(() => {
@@ -296,10 +308,12 @@ export const StorageProvider = ({ children }: { children: ReactNode }) => {
         addXP,
         incrementStreak,
         levelUpLevel,
+        levelUpFrom,
         dismissLevelUp,
         pendingStreakCelebration,
         clearStreakCelebration,
         onboardingCompleted,
+        setOnboardingDone,
       }}
     >
       {children}

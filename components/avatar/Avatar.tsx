@@ -9,10 +9,10 @@
  */
 
 import { memo, useMemo } from "react";
-import { View, type StyleProp, type ViewStyle } from "react-native";
+import { StyleSheet, View, type StyleProp, type ViewStyle } from "react-native";
 
 import { Npc } from "@/components/npc/Npc";
-import type { PoseId } from "@/components/npc/npc-art";
+import { popLayout, type PoseId } from "@/components/npc/npc-art";
 
 import { avatarBackground, avatarSpec, normalizeAvatar } from "./avatar-core";
 import { PatternLayer } from "./PatternLayer";
@@ -22,7 +22,7 @@ export interface AvatarProps {
   value?: string | null;
   /** Width and height in dp. */
   size?: number;
-  /** Corner radius in dp. Default: a circle. */
+  /** Corner radius in dp. Default: a circle whose figure pops out at the top; give a radius for a cropped rounded square. */
   radius?: number;
   pose?: PoseId;
   /** Idle life (breathing, blinking). Default off. */
@@ -35,6 +35,19 @@ export interface AvatarProps {
 export const Avatar = memo(function Avatar({ value, size = 44, radius, pose = "idle", live = false, bare = false, style }: AvatarProps) {
   const config = useMemo(() => normalizeAvatar(value), [value]);
   const spec = useMemo(() => avatarSpec(config), [config]);
+  // A circle (no radius given) lets the top of the head pop out past its edge; a rounded square or a bare figure stays cropped.
+  const pops = !bare && radius === undefined;
+  if (pops) {
+    const pop = popLayout(size);
+    return (
+      <View style={[{ width: size, height: size }, style]} accessible={false} importantForAccessibility="no-hide-descendants">
+        <View style={[StyleSheet.absoluteFill, { borderRadius: size / 2, overflow: "hidden", backgroundColor: avatarBackground(config) }]}>
+          <PatternLayer pattern={config.pattern} tile={Math.max(24, Math.round(size / 2.2))} />
+        </View>
+        <Npc spec={spec} form="pop" size={pop.height} pose={pose} live={live} style={{ position: "absolute", left: pop.left, top: pop.top }} />
+      </View>
+    );
+  }
   return (
     <View
       style={[

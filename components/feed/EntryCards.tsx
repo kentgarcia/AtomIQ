@@ -1,6 +1,6 @@
 /**
  * The top of Discover below the title (docs/NPC_FEED_SPEC.md §3), both scroll away with the feed:
- *   ShortcutsRow  four round shortcuts (Encyclopedia, Periodic table, Daily facts, Lab): a soft circle
+ *   ShortcutsRow  four round shortcuts (Encyclopedia, Periodic table, Daily facts, Blogs): a soft circle
  *                 inside a dashed ring, an icon and a small label.
  *   RanksBanner   a soft rounded panel with the learner's weekly rank and a trophy; opens Ranks.
  * They are labelled buttons, not posts.

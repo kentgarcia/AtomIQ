@@ -65,7 +65,7 @@ test("wave, loop, bell and seeded stay in range and are stable", () => {
 
 test("every mood defines the same numeric channels", () => {
   const keys = Object.keys(POSES.idle).sort();
-  assert.equal(MOODS.length, 6);
+  assert.equal(MOODS.length, 8);
   for (const mood of MOODS) {
     assert.deepEqual(Object.keys(POSES[mood]).sort(), keys, mood);
     for (const v of Object.values(POSES[mood])) assert.ok(Number.isFinite(v), mood);
@@ -103,7 +103,7 @@ test("blinks last long enough to read at 30 fps and the eyes close fully", () =>
   let closedFrames = 0;
   let max = 0;
   for (let t = 0; t < SHRODI_LOOP_MS; t += 1000 / 60) {
-    const lid = frameOf(POSES.idle, t).lidL;
+    const lid = frameOf(POSES.idle, t).blink;
     max = Math.max(max, lid);
     if (lid > 0.5) closedFrames++;
   }

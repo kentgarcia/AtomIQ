@@ -13,6 +13,12 @@ export const FEED_KINDS = ["celebrate", "milestone", "nudge", "tease"];
 /** `feed_templates.chip` (also the CHECK in schema.sql): what a post's button opens. */
 export const FEED_CHIPS = ["lesson", "unit", "quests", "ranks"];
 
+/**
+ * The poster id of a post written from the learner's own point of view ("I kept a 7 day streak"). A
+ * template with this as its whole `poster_pool` is the learner's voice; it is not an NPC.
+ */
+export const LEARNER_POSTER = "learner";
+
 /** Streak lengths that fire a `streak` post (§5.1). */
 export const STREAK_DAYS = [3, 7, 14, 30, 60, 100];
 

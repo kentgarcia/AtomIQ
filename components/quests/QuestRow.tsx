@@ -21,7 +21,9 @@ import Animated, {
 } from "react-native-reanimated";
 
 import { useOneShotClock } from "@/components/motion/motion";
+import { PopWhen } from "@/components/motion/PopOnce";
 import { ClaimFx } from "@/components/quests/ClaimFx";
+import { playSfx } from "@/services/sfx";
 import { emitClaimFlight } from "@/components/quests/claim-fx-bus";
 import { CLAIM_AT, CLAIM_TOTAL, fillAmount } from "@/components/quests/claim-fx-core";
 import type { MissionView } from "@/hooks/use-missions";
@@ -70,20 +72,27 @@ function QuestRowBase({ mission, renderAction, onClaim }: QuestRowProps) {
   const startClaim = useCallback(() => {
     if (playing) return;
     if (reducedMotion) {
+      void playSfx("reward.coin");
       void finish();
       return;
     }
     setPlaying(true);
     impactLight();
+    // The bar fills, then the claim lands with the first coin (docs/SFX_SPEC.md §6.5)
+    void playSfx("reward.fill");
     // The coins fly above the tab bar and land on its Profile tab: tell that layer where they start
     pillRef.current?.measureInWindow((x: number, y: number, w: number, h: number) => {
       emitClaimFlight({ x: x + w / 2, y: y + h / 2 });
     });
-    timers.current.push(setTimeout(() => void finish(), CLAIM_AT));
+    timers.current.push(setTimeout(() => {
+      void playSfx("reward.coin");
+      void finish();
+    }, CLAIM_AT));
     timers.current.push(setTimeout(() => setPlaying(false), CLAIM_TOTAL));
   }, [playing, reducedMotion, finish]);
 
   const busy = playing;
+  const claimable = mission.isComplete && !mission.isClaimed;
 
   return (
     <View style={[styles.row, busy && styles.rowPlaying]}>
@@ -114,7 +123,10 @@ function QuestRowBase({ mission, renderAction, onClaim }: QuestRowProps) {
         {playing ? <ClaimFx clock={clock} bar={bar} /> : null}
       </View>
 
-      {renderAction(busy, startClaim)}
+      {/* When the quest's last bit of progress comes in, the button flips to "Claim" at once and pops (never on mount) */}
+      <PopWhen trigger={claimable} active={claimable} intensity={0.8} sparkleColor={c.lessonHeader}>
+        {renderAction(busy, startClaim)}
+      </PopWhen>
     </View>
   );
 }

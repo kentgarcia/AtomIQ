@@ -3,6 +3,8 @@
  * A plain modal over the screen; reduced motion shows a still teacher.
  */
 
+import { useEffect } from "react";
+import { playSfx } from "@/services/sfx";
 import { Modal, Pressable, ScrollView, View } from "react-native";
 import { Text } from "@/components/ui/text";
 
@@ -30,6 +32,11 @@ const useStyles = createStyles((theme) => ({
 }));
 
 export function MeetSheet({ npc, visible, lessons = [], locked = false, onClose }: { npc: Npc | null; visible: boolean; lessons?: string[]; locked?: boolean; onClose: () => void }) {
+  // Meeting a teacher is the "new friend" moment (docs/SFX_SPEC.md §6.1); a locked one only shows a silhouette
+  useEffect(() => {
+    if (visible && npc && !locked) void playSfx("social.new-friend");
+  }, [visible, npc, locked]);
+
   const { theme } = useTheme();
   const styles = useStyles(theme);
   const meet = useNpcLine(npc?.id, "meet");

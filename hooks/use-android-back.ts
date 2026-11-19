@@ -75,7 +75,11 @@ export function useAndroidBackPolicy(): void {
         if (TAB_ROOTS.has(route)) {
           const now = Date.now();
           if (now - lastRootBackAt.current < DOUBLE_TAP_EXIT_MS) {
-            // Second tap: let the OS exit.
+            // Second tap: leave. Onboarding has nothing underneath to go back to, so it exits the app itself.
+            if (route === "/onboarding") {
+              BackHandler.exitApp();
+              return true;
+            }
             return false;
           }
           lastRootBackAt.current = now;

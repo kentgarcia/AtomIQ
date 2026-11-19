@@ -126,6 +126,7 @@
 
 ### The owner's rules
 - 2026-11: use `rossark-motion-skill` and `duolingo-character-style` for the lesson animations and visuals.
+- 2026-11: micro-interactions, transitions and reward animations (press and selection pops, bubbles, finish stamps, stat reveals, quest claims, chests) follow `duolingo-motion-style`, whose base is the option pop, node bubble, finish screen and claim animation already in the app. Routine interface moves (tier A there) keep the under-300 ms, no-overshoot rule; earned moments (tiers B to D) are the exception and use the measured keyframe stories with a landing.
 
 ### Rig limits
 - Shrodi is an outline-free drawing in flat colour (EX-10). No SVG gradients: they rendered black on a device (cause not found), so `test:mascot` forbids them. Depth, if wanted, comes from extra flat shade shapes. His idle life (breathing, blinks, glances, ears, tail) never stops; a mood is a pose the body glides into (450 ms), not a swap. Every idle period divides `SHRODI_LOOP_MS` (9000) so the loop closes; `test:mascot` checks it. He is decorative on lesson screens (hidden from screen readers); meaning is always also in text.

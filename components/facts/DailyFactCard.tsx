@@ -1,9 +1,7 @@
 /**
- * DailyFactCard — the "Did you know?" card of the Daily facts screen (opened from Discover), in the lesson card's design: a face
- * on a lip, a yellow header band with the title and a white circle icon, a white body.
- *
- * Body, left: the floating Discover mascot. Right: today's fact in its short form
- * plus a "Read more" button. Reading opens the full story (`FactStory`) and completes the
+ * DailyFactCard — today's "Did you know?" on the Daily facts screen (opened from Discover): a flat section, no card, like
+ * the Settings list: a round tinted icon, the title and the XP (or Done) on the right, then the floating Discover mascot
+ * on the left and today's fact in its short form with a "Read more" button on the right. Reading opens the full story (`FactStory`) and completes the
  * "Read Daily Fact" mission (XP is awarded once per day). The parent owns the
  * open state, so the mission row's "Read" button opens the same story.
  */
@@ -27,8 +25,8 @@ import { FactStory } from "@/components/facts/FactStory";
 import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
 import { getDailyFact, type DailyFact } from "@/services/missions";
-import { createStyles, fontFaces, useTheme } from "@/theme";
-import { controls } from "@/theme/tokens";
+import { createStyles, fontFaces, useTheme, withAlpha } from "@/theme";
+import { playSfx } from "@/services/sfx";
 
 const MASCOT = require("@/assets/images/mascot/discover.svg");
 const XP_ICON = require("@/assets/images/icons/xp.png");
@@ -46,7 +44,8 @@ export function DailyFactCard({
   open: boolean;
   /** Open the story (and claim the mission if it is not claimed yet). */
   onRead: () => void;
-  onClose: () => void;
+  /** The story was closed; `origin` is where the "Got it" button is while today's XP is still to be claimed. */
+  onClose: (origin?: { x: number; y: number }) => void;
 }) {
   const { theme } = useTheme();
   const styles = useMemo(() => makeStyles(theme), [theme]);
@@ -65,6 +64,11 @@ export function DailyFactCard({
   }, []);
 
   const focused = useIsFocused();
+
+  // The story opening is a small sparkle moment; the XP claim sounds through the claim effect
+  useEffect(() => {
+    if (open) void playSfx("reward.sparkle");
+  }, [open]);
 
   // Gentle float, matching the other mascots; static with reduced motion.
   const y = useSharedValue(0);
@@ -92,54 +96,44 @@ export function DailyFactCard({
 
   return (
     <>
-      <View style={styles.card}>
-        {/* The lip: its own layer under the face, so it shows only along the bottom edge */}
-        <View pointerEvents="none" style={styles.cardLip} />
-        <View style={styles.cardFace}>
-          <View style={styles.header}>
-            <Text style={styles.headerTitle} accessibilityRole="header">
-              Did you know?
-            </Text>
-            <View style={styles.headerIcon}>
-              <Icon name="Lamp" size={22} color={theme.colors.lessonHeader} variant="Bold" />
-            </View>
+      <View style={styles.section}>
+        <View style={styles.titleRow}>
+          <View style={styles.titleIcon}>
+            <Icon name="Lamp" size={20} color={AMBER} variant="Bold" />
           </View>
-
-          <View style={styles.cardBody}>
-            <Animated.View style={[styles.mascotWrap, mascotStyle]} pointerEvents="none">
-              <ExpoImage source={MASCOT} style={styles.mascot} contentFit="contain" />
-            </Animated.View>
-
-            <View style={styles.body}>
-              <Text style={styles.short} numberOfLines={4}>
-                {fact?.short ?? "Loading today's fact..."}
-              </Text>
-              <View style={styles.actionRow}>
-                <Button
-                  label="Read more"
-                  fullWidth={false}
-                  disabled={!fact}
-                  onPress={onRead}
-                  accessibilityLabel={
-                    claimed
-                      ? "Read the full daily fact again"
-                      : `Read the full daily fact and earn ${reward} XP`
-                  }
-                  style={styles.button}
-                />
-                {claimed ? (
-                  <View style={styles.donePill}>
-                    <Icon name="TickCircle" size={14} color={theme.colors.success} variant="Bold" />
-                    <Text style={styles.doneText}>Done</Text>
-                  </View>
-                ) : (
-                  <View style={styles.rewardPill}>
-                    <ExpoImage source={XP_ICON} style={styles.rewardIcon} contentFit="contain" />
-                    <Text style={styles.rewardText}>+{reward} XP</Text>
-                  </View>
-                )}
-              </View>
+          <Text style={styles.title} accessibilityRole="header">
+            Did you know?
+          </Text>
+          {claimed ? (
+            <View style={styles.donePill}>
+              <Icon name="TickCircle" size={16} color={theme.colors.success} variant="Bold" />
+              <Text style={styles.doneText}>Done</Text>
             </View>
+          ) : (
+            <View style={styles.rewardPill}>
+              <ExpoImage source={XP_ICON} style={styles.rewardIcon} contentFit="contain" />
+              <Text style={styles.rewardText}>+{reward} XP</Text>
+            </View>
+          )}
+        </View>
+
+        <View style={styles.body}>
+          <Animated.View style={[styles.mascotWrap, mascotStyle]} pointerEvents="none">
+            <ExpoImage source={MASCOT} style={styles.mascot} contentFit="contain" />
+          </Animated.View>
+
+          <View style={styles.copy}>
+            <Text style={styles.short} numberOfLines={5}>
+              {fact?.short ?? "Loading today's fact..."}
+            </Text>
+            <Button
+              label="Read more"
+              fullWidth={false}
+              disabled={!fact}
+              onPress={onRead}
+              accessibilityLabel={claimed ? "Read the full daily fact again" : `Read the full daily fact and earn ${reward} XP`}
+              style={styles.button}
+            />
           </View>
         </View>
       </View>
@@ -149,71 +143,26 @@ export function DailyFactCard({
   );
 }
 
+/** The lamp's amber (the Daily facts icon colour). */
+const AMBER = "#F59E0B";
+
 const makeStyles = createStyles((theme) => {
   const c = theme.colors;
   return {
-    /* The lesson card's construction: the lip layer starts `lip` down, so it only shows along the bottom */
-    card: { paddingBottom: controls.lip },
-    cardLip: {
-      position: "absolute",
-      top: controls.lip,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      borderRadius: 20,
-      backgroundColor: c.lessonLip,
-    },
-    cardFace: { borderRadius: 20, overflow: "hidden", backgroundColor: c.card },
-    header: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 12,
-      paddingHorizontal: 16,
-      paddingVertical: 12,
-      backgroundColor: c.lessonHeader,
-    },
-    headerTitle: {
-      flex: 1,
-      fontSize: 22,
-      ...fontFaces.heavy,
-      color: c.lessonHeaderText,
-    },
-    /* White circle on the yellow band; the icon takes the band's colour */
-    headerIcon: {
-      width: 36,
-      height: 36,
-      borderRadius: 18,
-      alignItems: "center",
-      justifyContent: "center",
-      backgroundColor: c.onPrimary,
-    },
-    cardBody: { flexDirection: "row", alignItems: "center", gap: 12, padding: 14 },
-    mascotWrap: {
-      width: 96,
-      height: 112,
-      alignItems: "center",
-      justifyContent: "center",
-    },
+    section: { gap: 12 },
+    titleRow: { flexDirection: "row", alignItems: "center", gap: 12, minHeight: 40 },
+    titleIcon: { width: 36, height: 36, borderRadius: 18, alignItems: "center", justifyContent: "center", backgroundColor: withAlpha(AMBER, 0.14) },
+    title: { flex: 1, fontSize: 20, ...fontFaces.heavy, color: c.text },
+    body: { flexDirection: "row", alignItems: "center", gap: 14 },
+    mascotWrap: { width: 96, height: 112, alignItems: "center", justifyContent: "center" },
     mascot: { width: 96, height: 112 },
-    body: { flex: 1, gap: 6 },
-    short: {
-      fontSize: 15,
-      lineHeight: 21,
-      color: c.text,
-      ...fontFaces.bold,
-    },
-    actionRow: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 10,
-      marginTop: 4,
-    },
+    copy: { flex: 1, gap: 12 },
+    short: { fontSize: 16, lineHeight: 23, color: c.text, ...fontFaces.semibold },
     button: { alignSelf: "flex-start" },
     rewardIcon: { width: 18, height: 18 },
     rewardPill: { flexDirection: "row", alignItems: "center", gap: 4 },
-    rewardText: { fontSize: 13, color: c.primaryLight, ...fontFaces.heavy },
+    rewardText: { fontSize: 14, color: c.primaryLight, ...fontFaces.heavy },
     donePill: { flexDirection: "row", alignItems: "center", gap: 4 },
-    doneText: { fontSize: 13, color: c.success, ...fontFaces.heavy },
-
+    doneText: { fontSize: 14, color: c.success, ...fontFaces.heavy },
   };
 });

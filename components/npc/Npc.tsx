@@ -18,7 +18,7 @@ import { useIsFocused } from "expo-router";
 import { memo, useMemo } from "react";
 import { StyleSheet, type StyleProp, type ViewStyle } from "react-native";
 import Animated, { FadeIn, FadeOut, useAnimatedStyle, useReducedMotion, type SharedValue } from "react-native-reanimated";
-import Svg, { Path } from "react-native-svg";
+import Svg, { ClipPath, Defs, G, Path } from "react-native-svg";
 
 import { EASE_OUT, track, useLoopClock, wave, type Keys } from "@/components/motion/motion";
 
@@ -32,6 +32,7 @@ import {
   POSES,
   buildNpc,
   mutedSpec,
+  popClipPath,
   treeParts,
   type NpcForm,
   type NpcSpec,
@@ -108,9 +109,22 @@ const Layer = memo(function Layer({ parts, form, width, height }: { parts: Part[
   const vb = NPC_VIEWBOX[form];
   return (
     <Svg width={width} height={height} viewBox={`${vb.x} ${vb.y} ${vb.w} ${vb.h}`} style={StyleSheet.absoluteFill}>
-      {parts.map((p, i) => (
-        <PartView key={i} part={p} />
-      ))}
+      {form === "pop" ? (
+        <>
+          <Defs>
+            <ClipPath id="pop-clip">
+              <Path d={popClipPath()} />
+            </ClipPath>
+          </Defs>
+          <G clipPath="url(#pop-clip)">
+            {parts.map((p, i) => (
+              <PartView key={i} part={p} />
+            ))}
+          </G>
+        </>
+      ) : (
+        parts.map((p, i) => <PartView key={i} part={p} />)
+      )}
     </Svg>
   );
 });

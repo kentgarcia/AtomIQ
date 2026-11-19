@@ -17,6 +17,7 @@ import { useNpcForUnit } from "@/components/npc/use-npc";
 import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
 import type { Objective, PathNode, ResolvedCard, Item } from "@/content/curriculum/types";
+import { pinSfx } from "@/services/sfx";
 import { completeNode, completeTestOut } from "@/services/curriculum-complete";
 import { loadDueObjectives, recordAnswers } from "@/services/curriculum-progress";
 import { contentRepository } from "@/services/content-db";
@@ -123,6 +124,10 @@ export default function PracticeScreen() {
   const sessionId = useRef("");
   // The unit's teacher asks the questions (a review across units has none, so cards stay plain).
   const teacher = useNpcForUnit(session?.unitId);
+
+  useEffect(() => {
+    pinSfx("reward.finish-jingle");
+  }, []);
 
   useEffect(() => {
     let cancelled = false;

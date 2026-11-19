@@ -20,6 +20,13 @@ export function darken(hex: string, amount: number): string {
   return `#${toHex(rgb[0] * k)}${toHex(rgb[1] * k)}${toHex(rgb[2] * k)}`;
 }
 
+/** Move `hex` toward white by `amount` (0 to 1). Anything that is not #RRGGBB comes back unchanged. */
+export function lighten(hex: string, amount: number): string {
+  const rgb = parse(hex);
+  if (!rgb) return hex;
+  return `#${toHex(rgb[0] + (255 - rgb[0]) * amount)}${toHex(rgb[1] + (255 - rgb[1]) * amount)}${toHex(rgb[2] + (255 - rgb[2]) * amount)}`;
+}
+
 function channel(v: number): number {
   const s = v / 255;
   return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);

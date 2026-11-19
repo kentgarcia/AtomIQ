@@ -97,27 +97,59 @@ test("the avatar crop is square and holds the whole head with its hair", () => {
   assert.ok(vb.x <= -62 && vb.x + vb.w >= 62, "ears");
 });
 
-test("the pattern ids match the tiles, their baked masks and the generated source map", () => {
+test("the pattern ids are the patterns of pattern-art.ts: words, unique, and every one resolves to real pictures", () => {
   const { PATTERN_COUNT, PATTERN_IDS } = core;
-  const list = (dir) => fs.readdirSync(dir).filter((f) => f.endsWith(".png")).sort();
-  const tiles = list("assets/images/pattern");
-  const masks = list("assets/images/pattern-mask");
-  assert.equal(tiles.length, PATTERN_COUNT, "one tile per id");
-  assert.deepEqual(tiles, PATTERN_IDS.map((id) => `pattern_${id.slice(1)}.png`));
-  assert.deepEqual(masks, tiles, "run node scripts/bake-pattern-masks.mjs");
-  const map = fs.readFileSync("components/avatar/avatar-patterns.ts", "utf8");
-  for (const [i, id] of PATTERN_IDS.entries()) assert.ok(map.includes(`${id}: require("@/assets/images/pattern-mask/${masks[i]}")`), id);
-  assert.equal((map.match(/require\(/g) ?? []).length, PATTERN_COUNT);
+  const { PATTERN_DEFS, PATTERN_GLYPHS, TILE, dealStep, patternDef, tilePlacements } = loadTs("components/avatar/pattern-art.ts");
+  assert.equal(PATTERN_COUNT, PATTERN_DEFS.length);
+  assert.ok(PATTERN_COUNT >= 30, "a shop worth opening");
+  assert.deepEqual(PATTERN_IDS, PATTERN_DEFS.map((d) => d.id));
+  assert.equal(new Set(PATTERN_IDS).size, PATTERN_COUNT, "ids are unique");
+  assert.equal(new Set(PATTERN_DEFS.map((d) => d.name)).size, PATTERN_COUNT, "names are unique");
   assert.deepEqual(AVATAR_OPTIONS.pattern, ["none", ...PATTERN_IDS]);
   assert.equal(DEFAULT_AVATAR.pattern, "none");
+  assert.ok(!PATTERN_IDS.includes("none"));
+  for (const d of PATTERN_DEFS) {
+    assert.match(d.id, /^[a-z]{3,}$/, `${d.id}: a lower-case word`);
+    assert.ok(d.name.length > 2 && d.glyphs.length >= 1, d.id);
+    for (const g of d.glyphs) assert.ok(PATTERN_GLYPHS[g], `${d.id}: unknown picture ${g}`);
+    assert.equal(patternDef(d.id), d);
+  }
+  assert.equal(patternDef("p042"), undefined);
+
+  // The glyph dealt to neighbouring points differs whenever the set has more than one picture
+  for (const n of [2, 3, 4, 5, 6, 7, 10]) assert.ok(n === 2 || (dealStep(n) * 1) % n !== 0, `step for ${n}`);
+  for (const d of PATTERN_DEFS.filter((x) => x.glyphs.length > 1 && x.layout === "dense")) {
+    const g = tilePlacements(d).filter((t) => t.y >= 0 && t.y < TILE && t.x >= 0 && t.x < TILE);
+    assert.equal(g.length, 12, d.id);
+    for (let i = 0; i < 11; i++) if (i % 3 !== 2) assert.notEqual(g[i].glyph, g[i + 1].glyph, `${d.id}: neighbours at ${i}`);
+  }
 });
 
-test("every mask is a transparent png: shapes opaque, background clear", () => {
-  for (const f of fs.readdirSync("assets/images/pattern-mask").filter((n) => n.endsWith(".png"))) {
-    const png = fs.readFileSync(`assets/images/pattern-mask/${f}`);
-    assert.equal(png.readUInt32BE(16), 256, `${f} width`);
-    assert.equal(png.readUInt32BE(20), 256, `${f} height`);
-    assert.equal(png[25], 6, `${f} should be RGBA (colour type 6)`);
+test("a pattern tiles without a seam: whatever crosses an edge is drawn again on the other side", () => {
+  const { PATTERN_DEFS, TILE, tilePlacements } = loadTs("components/avatar/pattern-art.ts");
+  for (const d of PATTERN_DEFS) {
+    const all = tilePlacements(d);
+    assert.ok(all.length >= 4, d.id);
+    const inside = all.filter((t) => t.x >= 0 && t.x < TILE && t.y >= 0 && t.y < TILE);
+    for (const t of inside) {
+      const half = t.size * 0.62;
+      const copies = all.filter((o) => o.glyph === t.glyph && o.size === t.size && o.rotate === t.rotate);
+      assert.ok(copies.some((o) => t.x - half < 0 ? o.x === t.x + TILE : t.x + half > TILE ? o.x === t.x - TILE : true), `${d.id}: no copy for ${t.glyph} at ${t.x}`);
+    }
+    for (const t of all) assert.ok(t.size >= 16 && t.size <= 40, `${d.id}: size ${t.size}`);
+  }
+});
+
+test("every picture is flat: solid fills and round strokes, inside its 24 box, strokes readable", () => {
+  const { PATTERN_GLYPHS } = loadTs("components/avatar/pattern-art.ts");
+  for (const [id, shapes] of Object.entries(PATTERN_GLYPHS)) {
+    assert.ok(shapes.length >= 1, id);
+    for (const s of shapes) {
+      assert.ok(["p", "l", "c", "r"].includes(s.t), `${id}: ${s.t}`);
+      if (s.t === "p" || s.t === "l") assert.ok(/^M/.test(s.d) && !s.d.includes("url("), id);
+      if (s.t === "l" || s.t === "r") assert.ok(s.w >= 1.7 && s.w <= 4.8, `${id}: stroke ${s.w}`);
+      if (s.t === "c") assert.ok(s.cx - s.r >= 0 && s.cx + s.r <= 24 && s.cy - s.r >= 0 && s.cy + s.r <= 24, `${id}: circle out of the box`);
+    }
   }
 });
 
@@ -126,7 +158,10 @@ test("an avatar saved before patterns existed reads with no pattern, and a patte
   const read = normalizeAvatar(old);
   assert.equal(read.pattern, "none");
   assert.equal(read.background, "mint");
-  const patterned = { ...DEFAULT_AVATAR, pattern: "p042" };
+  const patterned = { ...DEFAULT_AVATAR, pattern: "atomlab" };
   assert.deepEqual(normalizeAvatar(serializeAvatar(patterned)), patterned);
   assert.equal(normalizeAvatar('avatar:v1:{"pattern":"p999"}').pattern, "none");
+  // An avatar saved with one of the old picture tiles (p000 to p083) reads as no pattern
+  assert.equal(normalizeAvatar('avatar:v1:{"pattern":"p042","background":"mint"}').pattern, "none");
+  assert.equal(normalizeAvatar('avatar:v1:{"pattern":"atomlab","background":"mint"}').pattern, "atomlab");
 });

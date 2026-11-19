@@ -22,6 +22,7 @@ import {
   FEED_KINDS,
   FEED_TEXT_MAX,
   FEED_TRIGGERS,
+  LEARNER_POSTER,
   RANK_DIRECTIONS,
   STREAK_DAYS,
   TEMPLATE_TRIGGER_KEYS,
@@ -100,7 +101,10 @@ export function validateFeedData(data, { strictReview = false } = {}) {
     if (!isInt(t.weight) || t.weight < 1) err(T, id, "weight", "feed-weight", "weight must be a whole number of 1 or more");
 
     // poster and reactors
-    const pool = Array.isArray(t.poster_pool) ? npcList(t.poster_pool, T, id, "poster_pool", "feed-poster") : (err(T, id, "poster_pool", "feed-poster", "poster_pool must be a list of NPC ids"), []);
+    // A pool of just "learner" is the learner's own voice (a streak post); it cannot be mixed with NPCs.
+    const learnerVoice = Array.isArray(t.poster_pool) && t.poster_pool.length === 1 && t.poster_pool[0] === LEARNER_POSTER && !t.npc_id;
+    if (!learnerVoice && Array.isArray(t.poster_pool) && t.poster_pool.includes(LEARNER_POSTER)) err(T, id, "poster_pool", "feed-poster", `"${LEARNER_POSTER}" must be the only entry of the pool`);
+    const pool = learnerVoice ? [LEARNER_POSTER] : Array.isArray(t.poster_pool) ? npcList(t.poster_pool.filter((x) => x !== LEARNER_POSTER), T, id, "poster_pool", "feed-poster") : (err(T, id, "poster_pool", "feed-poster", "poster_pool must be a list of NPC ids"), []);
     if (t.npc_id !== null && t.npc_id !== undefined && t.npc_id !== "") {
       if (!npcIds.has(t.npc_id)) err(T, id, "npc_id", "feed-poster", `"${t.npc_id}" is not an NPC`);
     } else if (pool.length === 0) {

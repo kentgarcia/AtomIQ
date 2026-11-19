@@ -1,27 +1,28 @@
 /**
- * ActivityCard — the card of the streak page, in the Profile cards' construction: a face on a lip, a
- * yellow header band with the title and a white circle (an icon, or a button such as "close"), and
- * a white body. The streak screen, the contribution graph, the day details and the explainer all use
- * it, so the page reads as the full-size sibling of the Profile's StreakCard.
+ * ActivityCard — one section of the streak page, flat on the page like the Profile's StreakCard: a
+ * heading (a small tinted icon tile and the title) over its body, with a dashed divider above it when
+ * it follows another section. No card, no band. The streak screen, the contribution graph, the day
+ * details and the explainer all use it. (The name is kept; it is a section now.)
  */
 
 import React from "react";
 import { View, type LayoutChangeEvent, type StyleProp, type ViewStyle } from "react-native";
-import { Text } from "@/components/ui/text";
 import Animated from "react-native-reanimated";
 
 import { Icon } from "@/components/ui/icon";
-import { createStyles, fontFaces, useTheme } from "@/theme";
-import { controls } from "@/theme/tokens";
+import { Text } from "@/components/ui/text";
+import { createStyles, fontFaces, useTheme, withAlpha } from "@/theme";
 
 export interface ActivityCardProps {
   title: string;
-  /** Icon in the white circle on the band (ignored when `headerRight` is given). */
+  /** Icon in the tile left of the title. */
   icon?: string;
-  /** Replaces the icon circle, e.g. a close button (a 36 px white circle, like the icon one). */
+  /** A control on the right of the heading. */
   headerRight?: React.ReactNode;
   children: React.ReactNode;
-  /** Reanimated entering animation of the whole card. */
+  /** A dashed line above the section, for one that follows another. */
+  divided?: boolean;
+  /** Reanimated entering animation of the whole section. */
   entering?: React.ComponentProps<typeof Animated.View>["entering"];
   onBodyLayout?: (event: LayoutChangeEvent) => void;
   accessibilityLiveRegion?: "none" | "polite" | "assertive";
@@ -34,6 +35,7 @@ export function ActivityCard({
   icon,
   headerRight,
   children,
+  divided = true,
   entering,
   onBodyLayout,
   accessibilityLiveRegion,
@@ -41,72 +43,49 @@ export function ActivityCard({
   bodyStyle,
 }: ActivityCardProps) {
   const { theme } = useTheme();
-  const styles = makeStyles(theme);
-  const c = theme.colors;
+  const styles = useStyles(theme);
   return (
-    <Animated.View entering={entering} style={[styles.card, style]} accessibilityLiveRegion={accessibilityLiveRegion}>
-      {/* The lip: its own layer under the face, so it shows only along the bottom edge */}
-      <View pointerEvents="none" style={styles.lip} />
-      <View style={styles.face}>
-        <View style={styles.header}>
-          <Text style={styles.title} accessibilityRole="header" numberOfLines={2}>
-            {title}
-          </Text>
-          {headerRight ??
-            (icon ? (
-              <View style={styles.circle} accessible={false} importantForAccessibility="no-hide-descendants">
-                <Icon name={icon} size={20} color={c.lessonHeader} variant="Bold" />
-              </View>
-            ) : null)}
-        </View>
-        <View style={[styles.body, bodyStyle]} onLayout={onBodyLayout}>
-          {children}
-        </View>
+    <Animated.View entering={entering} style={[styles.section, divided && styles.divided, style]} accessibilityLiveRegion={accessibilityLiveRegion}>
+      <View style={styles.heading}>
+        {icon ? (
+          <View style={styles.tile} accessible={false} importantForAccessibility="no-hide-descendants">
+            <Icon name={icon} size={18} color={theme.colors.primary} variant="Bold" />
+          </View>
+        ) : null}
+        <Text style={styles.title} accessibilityRole="header" numberOfLines={2}>
+          {title}
+        </Text>
+        {headerRight}
+      </View>
+      <View style={[styles.body, bodyStyle]} onLayout={onBodyLayout}>
+        {children}
       </View>
     </Animated.View>
   );
 }
 
-/** A soft divider between rows, the same line the Profile and Settings cards use. */
+/** A dashed divider between rows. */
 export function ActivityRule() {
-  const styles = makeStyles(useTheme().theme);
+  const styles = useStyles(useTheme().theme);
   return <View style={styles.rule} />;
 }
 
-const makeStyles = createStyles((theme) => {
+const useStyles = createStyles((theme) => {
   const c = theme.colors;
   return {
-    card: { alignSelf: "stretch", marginBottom: 20, paddingBottom: controls.lip },
-    lip: {
-      position: "absolute",
-      top: controls.lip,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      borderRadius: 20,
-      backgroundColor: c.lessonLip,
-    },
-    face: { borderRadius: 20, overflow: "hidden", backgroundColor: c.card },
-    header: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 12,
-      paddingHorizontal: 16,
-      paddingVertical: 10,
-      minHeight: 56,
-      backgroundColor: c.lessonHeader,
-    },
-    title: { flex: 1, fontSize: 20, ...fontFaces.heavy, color: c.lessonHeaderText },
-    /* White circle on the yellow band; the icon takes the band's colour */
-    circle: {
-      width: 36,
-      height: 36,
-      borderRadius: 18,
+    section: { alignSelf: "stretch", gap: 12 },
+    divided: { paddingTop: 20, borderTopWidth: 1, borderStyle: "dashed", borderColor: c.border },
+    heading: { flexDirection: "row", alignItems: "center", gap: 10, minHeight: 32 },
+    tile: {
+      width: 32,
+      height: 32,
+      borderRadius: 10,
       alignItems: "center",
       justifyContent: "center",
-      backgroundColor: c.onPrimary,
+      backgroundColor: withAlpha(c.primary, 0.14),
     },
-    body: { padding: 16, gap: 14 },
-    rule: { height: 1, backgroundColor: c.borderSubtle },
+    title: { flex: 1, fontSize: 18, ...fontFaces.heavy, color: c.text },
+    body: { gap: 14 },
+    rule: { height: 0, borderTopWidth: 1, borderStyle: "dashed", borderColor: c.border },
   };
 });

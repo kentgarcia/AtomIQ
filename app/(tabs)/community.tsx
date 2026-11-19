@@ -1,7 +1,7 @@
 import { BlogCard } from "@/components/feed/BlogCard";
 import { RanksBanner, ShortcutsRow } from "@/components/feed/EntryCards";
 import { PostCard } from "@/components/feed/PostCard";
-import { newItemIds } from "@/components/feed/feed-ui-core";
+import { useDrippedFeed } from "@/components/feed/use-drip";
 import { useCast } from "@/components/feed/use-cast";
 import { useWeeklyRanking } from "@/components/feed/use-ranking";
 import { ScreenHeader, useHeaderBorder, useTabBarInset } from "@/components/layout";
@@ -11,8 +11,10 @@ import { useFeed } from "@/hooks/use-feed";
 import { checkRankChange, type FeedItem } from "@/services/feed";
 import { createStyles, fontFaces, useResponsiveLayout, useTheme } from "@/theme";
 import { useFocusEffect } from "expo-router";
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { FlatList, RefreshControl, View } from "react-native";
+import { usePullRefresh } from "@/hooks/use-pull-refresh";
+import { useReducedMotion } from "react-native-reanimated";
 
 /**
  * Discover: the NPC feed (docs/NPC_FEED_SPEC.md §3). The cast posts about what the learner really
@@ -48,17 +50,14 @@ export default function CommunityScreen() {
   const { items, loading, enabled, refresh, markSeen } = useFeed();
   const cast = useCast();
   const { ranking, reload: reloadRanking } = useWeeklyRanking();
-  const [refreshing, setRefreshing] = useState(false);
   const [now, setNow] = useState(() => Date.now());
 
   const { scrolled, onScroll, scrollEventThrottle } = useHeaderBorder();
 
-  /* Items that arrived since the list was last shown fade in; the first load does not animate. */
-  const [known, setKnown] = useState<Set<string> | null>(null);
-  const fresh = useMemo(() => new Set(newItemIds(known, items)), [known, items]);
-  useEffect(() => {
-    if (!loading) setKnown(new Set(items.map((i) => i.id)));
-  }, [items, loading]);
+  /* Posts that arrive while this page is in front land one by one; the first load is not animated. */
+  const [isFocused, setIsFocused] = useState(false);
+  const reduced = useReducedMotion();
+  const { shown, fresh } = useDrippedFeed(items, loading, isFocused, reduced);
 
   /* Seen marks only count while Discover is in front. */
   const focused = useRef(false);
@@ -75,6 +74,7 @@ export default function CommunityScreen() {
   useFocusEffect(
     useCallback(() => {
       focused.current = true;
+      setIsFocused(true);
       setNow(Date.now());
       void refresh();
       void reloadRanking();
@@ -82,20 +82,18 @@ export default function CommunityScreen() {
       const tick = setInterval(() => setNow(Date.now()), MINUTE);
       return () => {
         focused.current = false;
+        setIsFocused(false);
         clearInterval(tick);
       };
     }, [refresh, reloadRanking]),
   );
 
-  const onRefresh = useCallback(async () => {
-    setRefreshing(true);
-    setNow(Date.now());
-    try {
-      await Promise.all([refresh(), reloadRanking()]);
-    } finally {
-      setRefreshing(false);
-    }
-  }, [refresh, reloadRanking]);
+  const { refreshing, onRefresh, spinner } = usePullRefresh(
+    useCallback(() => {
+      setNow(Date.now());
+      return Promise.all([refresh(), reloadRanking()]);
+    }, [refresh, reloadRanking]),
+  );
 
   const renderItem = useCallback(
     ({ item }: { item: FeedItem }) =>
@@ -111,7 +109,7 @@ export default function CommunityScreen() {
     <View style={styles.container}>
       <ScreenHeader title="Feed" scrolled={scrolled} />
       <FlatList
-        data={items}
+        data={shown}
         renderItem={renderItem}
         keyExtractor={(item) => item.id}
         onViewableItemsChanged={onViewable}
@@ -123,7 +121,7 @@ export default function CommunityScreen() {
         windowSize={7}
         removeClippedSubviews={false}
         showsVerticalScrollIndicator={false}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={theme.colors.primary} colors={[theme.colors.primary]} />}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} {...spinner} />}
         contentContainerStyle={[
           styles.list,
           { width: "100%", maxWidth: contentMaxWidth, alignSelf: "center", paddingBottom: tabBarInset + 24 },
@@ -135,7 +133,7 @@ export default function CommunityScreen() {
           </View>
         }
         ListEmptyComponent={
-          loading ? undefined : (
+          loading || items.length > 0 ? undefined : (
             <View style={styles.empty}>
               <Shrodi mood="idle" size={120} accessibilityLabel="Shrodi" />
               <Text style={styles.emptyText}>Finish a lesson and your teachers will start posting.</Text>

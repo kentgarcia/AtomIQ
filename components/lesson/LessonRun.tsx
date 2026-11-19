@@ -26,8 +26,9 @@ import { Card } from "@/components/ui/card";
 import { Icon } from "@/components/ui/icon";
 import { PressableIconButton, useBottomInset } from "@/components/layout";
 import { ProgressSparkle } from "@/components/lesson/ProgressSparkle";
+import { CascadeProvider } from "@/components/motion/cascade-context";
 import { CardBadge, type BadgeTone } from "@/components/lesson/CardBadge";
-import { TeacherAvatar, TeacherProvider, type Teller } from "@/components/lesson/Conversation";
+import { TeacherAvatar, TeacherProvider, TeacherSays, type Teller } from "@/components/lesson/Conversation";
 import { FeedbackDock } from "@/components/lesson/FeedbackDock";
 import { ScrollCue } from "@/components/lesson/ScrollCue";
 import { moreBelow, scrollTarget, type ScrollMetrics } from "@/components/lesson/scroll-cue-core";
@@ -35,7 +36,6 @@ import { LeaveLessonDialog } from "@/components/lesson/LessonDialogs";
 import { FOOTER_BUTTON_HEIGHT, FooterRow } from "@/components/lesson/FooterRow";
 import { TextButton } from "@/components/lesson/TextButton";
 import { canSaveProgress, isResumable, type RunState } from "@/services/lesson-progress-core";
-import { TeacherStage } from "@/components/lesson/TeacherStage";
 import { LESSON_FRAME, LessonFrame } from "@/components/lesson/LessonFrame";
 import { checkModeOf } from "@/content/curriculum/check-mode";
 import { evaluateItem } from "@/content/curriculum/evaluate";
@@ -58,6 +58,8 @@ import {
 } from "@/services/lesson-core";
 import type { RecordedAnswer } from "@/services/curriculum-progress";
 import { notifyError, notifySuccess } from "@/services/haptics";
+import { playSfx } from "@/services/sfx";
+import { SfxOnMount } from "@/components/ui/sfx-on-mount";
 import type { MasterySurface } from "@/services/mastery-core";
 import { createStyles, fontFaces, fontSizes, radius, spacing, useResponsiveLayout, useTheme, withAlpha } from "@/theme";
 
@@ -96,10 +98,15 @@ const useStyles = createStyles((theme) => ({
   correctRow: { flexDirection: "row", alignItems: "center", gap: spacing.xl },
   correctBubble: { flex: 1 },
   correctText: { ...fontFaces.semibold, fontSize: fontSizes["4xl"], lineHeight: 32, color: theme.colors.text },
-  offerFill: { flex: 1, paddingVertical: spacing.sm },
-  offerBadge: { alignItems: "center" },
-  offerTitle: { ...fontFaces.heavy, fontSize: fontSizes["7xl"], lineHeight: 38, textAlign: "center", color: theme.colors.text },
-  offerBody: { ...fontFaces.medium, fontSize: fontSizes["2xl"], lineHeight: 26, textAlign: "center", color: theme.colors.textSecondary },
+  offerFill: { flex: 1, paddingVertical: spacing.sm, justifyContent: "center" },
+  offerPage: { flex: 1, justifyContent: "center", alignItems: "center", gap: spacing.xl },
+  offerHead: { flexDirection: "row", alignItems: "center", justifyContent: "center", alignSelf: "center", gap: spacing.sm },
+  offerTile: { width: 32, height: 32, borderRadius: radius.md, alignItems: "center", justifyContent: "center", backgroundColor: withAlpha(theme.colors.gold, 0.18) },
+  offerHeadText: { ...fontFaces.heavy, fontSize: fontSizes.xl, letterSpacing: 0.6, textTransform: "uppercase", color: theme.colors.text },
+  offerTitle: { ...fontFaces.heavy, fontSize: fontSizes["4xl"], lineHeight: 32, color: theme.colors.text },
+  offerBody: { ...fontFaces.medium, fontSize: fontSizes.xl, lineHeight: 24, color: theme.colors.textSecondary },
+  offerNote: { alignSelf: "stretch", flexDirection: "row", alignItems: "center", justifyContent: "center", gap: spacing.sm, paddingTop: spacing.md, borderTopWidth: 1, borderStyle: "dashed", borderColor: theme.colors.border },
+  offerNoteText: { ...fontFaces.medium, flexShrink: 1, textAlign: "center", fontSize: fontSizes.lg, lineHeight: 22, color: theme.colors.textMuted },
 }));
 
 /** What kind of run this is. A lesson and a checkpoint show no chip; the others tell the learner where they are. */
@@ -197,6 +204,8 @@ export function LessonRun({ cards, surface, onExit, onFinish, label, kind = "les
   }, []);
   // Changes on every card change so interactions remount fresh (and shuffle anew on replay).
   const [instance, setInstance] = useState(0);
+  // Which way the next card arrives from (1 on, -1 stepped back): the cards build themselves like the onboarding's pages (`components/motion/cascade-fx.ts`)
+  const direction = useSharedValue(1);
   // The lecture: how many steps of the current teaching card are showing (ALL_STEPS: every one, after stepping back),
   // and the first card of the current stretch of pages (a "go deeper" offer starts a new page).
   const [lectureStep, setLectureStep] = useState(1);
@@ -263,6 +272,7 @@ export function LessonRun({ cards, surface, onExit, onFinish, label, kind = "les
     />
   );
   const stepBack = useCallback(() => {
+    direction.set(-1);
     settled.current = false;
     setLectureStep(ALL_STEPS);
     setInstance((i) => i + 1);
@@ -271,7 +281,7 @@ export function LessonRun({ cards, surface, onExit, onFinish, label, kind = "les
     setRejection(null);
     setSimDone(false);
     setRun((r) => goBack(r));
-  }, []);
+  }, [direction]);
   const backable = canGoBack(run);
   // The top-left control is always a close button; stepping back is the Back button beside the main button.
   // The Android back key steps back when there is a previous step, and asks to leave on the first one.
@@ -287,6 +297,7 @@ export function LessonRun({ cards, surface, onExit, onFinish, label, kind = "les
   }, [onHeaderPress]);
 
   const next = useCallback(() => {
+    direction.set(1);
     settled.current = false;
     setLectureStep(1);
     setInstance((i) => i + 1);
@@ -295,7 +306,7 @@ export function LessonRun({ cards, surface, onExit, onFinish, label, kind = "les
     setRejection(null);
     setSimDone(false);
     setRun((r) => advance(r));
-  }, []);
+  }, [direction]);
 
   // Continue on a lecture: the next step of this card, or (when it has no more) the next card.
   // A bubble still typing is finished by the same tap: it is no longer the newest step.
@@ -316,6 +327,7 @@ export function LessonRun({ cards, surface, onExit, onFinish, label, kind = "les
       };
       if (!evaluated.correct && checkModeOf(item.type, item.data as Record<string, unknown>) === "retry") {
         notifyError();
+        void playSfx("lesson.answer-wrong");
         setRun((r) => submitAnswer(r, card.id, false));
         record();
         rejections.current += 1;
@@ -324,8 +336,13 @@ export function LessonRun({ cards, surface, onExit, onFinish, label, kind = "les
       }
       settled.current = true;
       setResult(evaluated);
-      if (evaluated.correct) notifySuccess();
-      else notifyError();
+      if (evaluated.correct) {
+        notifySuccess();
+        void playSfx("lesson.answer-correct");
+      } else {
+        notifyError();
+        void playSfx("lesson.answer-wrong");
+      }
       setRun((r) => submitAnswer(r, card.id, evaluated.correct));
       record();
     },
@@ -337,6 +354,7 @@ export function LessonRun({ cards, surface, onExit, onFinish, label, kind = "les
     if (!card?.item || settled.current) return;
     const item = card.item;
     notifyError();
+    void playSfx("lesson.answer-wrong", { volume: 0.75 });
     setRun((r) => submitAnswer(r, card.id, false));
     if (!isRevisit(run, card.id)) answers.current.push({ itemId: item.id, objectiveId: item.objectiveId, surface, correct: false });
   }, [card, surface, run]);
@@ -365,25 +383,48 @@ export function LessonRun({ cards, surface, onExit, onFinish, label, kind = "les
 
   // A card is seen hundreds of times: a short ease-out, no travel beyond a nudge.
   const enter = reduced ? undefined : FadeInDown.duration(200).easing(EASE_OUT);
+  // Pages that build themselves (an item, a lecture) have no entrance of their own for the whole page; the rest keep the plain one
+  const cascades = onLecture || !!card?.item;
   // A little more side room than the app default, so cards breathe without leaving dead margins.
   const frame = { ...LESSON_FRAME, paddingHorizontal: spacing.lg };
 
   // Deeper offer
   if (run.offer) {
+    const offerCount = run.offer.length;
+    const offerTitle = (() => {
+      const t = cardById.get(run.offer[0]!.id)?.data?.title;
+      return typeof t === "string" && t.trim() ? t.trim() : null;
+    })();
     return (
       <LessonFrame>
         {leaveDialog}
         <Header progress={progressOf(run)} onPress={confirmExit} styles={styles} frame={frame} topInset={layout.insets.top} kind={kind} />
         <View style={[frame, styles.offerFill]}>
           <Animated.View entering={reduced ? undefined : FadeIn.duration(200)} style={styles.offerFill}>
-            {/* The teacher fills the page and asks, in a bubble right above their head. */}
-            <TeacherStage teller={teacher} minHeight={380}>
-              <View style={styles.offerBadge}>
-                <CardBadge icon="Star1" label="Bonus card" tone="gold" />
+            <SfxOnMount cue="lesson.bubble" />
+            {/* Like every lesson page: a title top-left, then the teacher asking in a bubble beside them. */}
+            <View style={styles.offerPage}>
+              <View style={styles.offerHead}>
+                <View style={styles.offerTile}>
+                  <Icon name="Star1" size={20} color={theme.colors.gold} variant="Bold" />
+                </View>
+                <Text accessibilityRole="header" style={styles.offerHeadText}>Bonus {offerCount === 1 ? "card" : "cards"}</Text>
               </View>
-              <Text accessibilityRole="header" style={styles.offerTitle}>Want to go deeper?</Text>
-              <Text style={styles.offerBody}>There is a bonus card here for the curious. It is optional.</Text>
-            </TeacherStage>
+              <View style={{ alignSelf: "stretch" }}>
+              <TeacherSays teller={teacher} avatarSize={96}>
+                <Text style={styles.offerTitle}>Want to go deeper?</Text>
+                <Text style={styles.offerBody}>
+                  {offerTitle ? `Up next: \u201c${offerTitle}\u201d. It is just for the curious.` : "There is something extra here for the curious."}
+                </Text>
+              </TeacherSays>
+              </View>
+              <View style={styles.offerNote}>
+                <Icon name="Lamp" size={20} color={theme.colors.warning} variant="Bold" />
+                <Text style={styles.offerNoteText}>
+                  {offerCount === 1 ? "One short bonus card." : `${offerCount} short bonus cards.`} Skip it any time and the lesson goes on.
+                </Text>
+              </View>
+            </View>
           </Animated.View>
         </View>
         <View style={[styles.footer, frame, { paddingBottom: bottomInset + spacing.sm }]}>
@@ -405,6 +446,7 @@ export function LessonRun({ cards, surface, onExit, onFinish, label, kind = "les
         <Header progress={progressOf(run)} onPress={confirmExit} styles={styles} frame={frame} topInset={layout.insets.top} kind={kind} />
         <View style={[frame, styles.correct]}>
           <Animated.View entering={reduced ? undefined : FadeIn.duration(200)} style={styles.correctRow}>
+            <SfxOnMount cue="lesson.bubble" />
             <View style={styles.correctBubble}>
               <Card padding={spacing.lg} gap={spacing.sm}>
                 <Text accessibilityRole="header" style={styles.correctText}>{line}</Text>
@@ -492,13 +534,14 @@ export function LessonRun({ cards, surface, onExit, onFinish, label, kind = "les
 
   return (
     <TeacherProvider teacher={teacher}>
+    <CascadeProvider value={reduced ? null : direction}>
     <LessonFrame>
       {leaveDialog}
       <Header progress={progressOf(run)} onPress={confirmExit} styles={styles} frame={frame} topInset={layout.insets.top} kind={kind} replay={run.phase === "replay"} label={label} />
       <View style={{ flex: 1 }}>
         <ScrollView ref={scroller} onContentSizeChange={onContentSize} onLayout={onViewportChange} onScroll={onScroll} scrollEventThrottle={32} contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
           {/* Every page starts at the top-left and grows downwards. */}
-          <Animated.View key={pageId} entering={enter} style={[frame, styles.cardWrap]}>
+          <Animated.View key={pageId} entering={cascades ? undefined : enter} style={[frame, styles.cardWrap]}>
             {pageBody}
           </Animated.View>
         </ScrollView>
@@ -539,6 +582,7 @@ export function LessonRun({ cards, surface, onExit, onFinish, label, kind = "les
       </View>
       )}
     </LessonFrame>
+    </CascadeProvider>
     </TeacherProvider>
   );
 }

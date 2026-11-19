@@ -57,7 +57,7 @@ export function ContributionGraph({ days, todayKey, currentStreak }: Contributio
   const selectedKey = pickedKey > todayKey ? todayKey : pickedKey;
   const scrollRef = useRef<ScrollViewInstance>(null);
 
-  const available = Math.max(160, (measured ?? contentWidth - 48) - RAIL_WIDTH);
+  const available = Math.max(160, (measured ?? contentWidth - 32) - RAIL_WIDTH);
   const cell = Math.max(
     MIN_CELL,
     Math.min(MAX_CELL, Math.floor((available + GAP) / TARGET_VISIBLE_WEEKS - GAP)),
@@ -103,11 +103,11 @@ export function ContributionGraph({ days, todayKey, currentStreak }: Contributio
   const gridWidth = grid.columns.length * columnWidth - GAP;
 
   return (
-    <View>
+    <>
       <ActivityCard
         title="Learning activity"
         icon="Calendar"
-        onBodyLayout={(e: LayoutChangeEvent) => setMeasured(e.nativeEvent.layout.width - 32)}
+        onBodyLayout={(e: LayoutChangeEvent) => setMeasured(e.nativeEvent.layout.width)}
         bodyStyle={styles.graphBody}
       >
         <Text style={styles.summary} accessibilityRole="summary">
@@ -294,7 +294,7 @@ export function ContributionGraph({ days, todayKey, currentStreak }: Contributio
           </Text>
         ) : null}
       </ActivityCard>
-    </View>
+    </>
   );
 }
 
@@ -332,8 +332,8 @@ export function ActivityExplainer() {
       <View style={styles.privacyBox}>
         <Icon name="Lock" size={16} color={theme.colors.textSecondary} variant="Bold" />
         <Text style={styles.privacyText}>
-          Stays on this device. Nothing is public, there is no leaderboard, and no one else can see it.
-          Skipping a day is okay — you can use AtomIQ without a streak.
+          Stays on this device. Nothing here is public and no one else can see it. Skipping a day is okay —
+          you can use AtomIQ without a streak.
         </Text>
       </View>
     </ActivityCard>
@@ -399,7 +399,9 @@ const makeStyles = createStyles((theme) => ({
     borderRadius: layout.minTouchTarget / 2,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: theme.colors.surfaceSoft,
+    borderWidth: 1.5,
+    borderColor: theme.colors.border,
+    backgroundColor: theme.colors.surface,
   },
   stepBtnDisabled: { opacity: 0.4 },
   detailList: { marginTop: 8, gap: 8 },
@@ -428,7 +430,7 @@ const makeStyles = createStyles((theme) => ({
     gap: 10,
     paddingVertical: 9,
   },
-  kindDivided: { borderTopWidth: 1, borderColor: theme.colors.borderSubtle },
+  kindDivided: { borderTopWidth: 1, borderStyle: "dashed", borderColor: theme.colors.border },
   explainBody: {
     fontSize: 12,
     ...fontFaces.regular,
@@ -441,9 +443,10 @@ const makeStyles = createStyles((theme) => ({
     alignItems: "flex-start",
     gap: 10,
     marginTop: 14,
-    padding: 12,
-    borderRadius: 14,
-    backgroundColor: theme.colors.surfaceSoft,
+    paddingTop: 14,
+    borderTopWidth: 1,
+    borderStyle: "dashed",
+    borderColor: theme.colors.border,
   },
   privacyText: {
     flex: 1,

@@ -4,16 +4,18 @@
  * decorative. Hidden when the "Teacher lines" setting is off.
  */
 
+import { useMemo, useState } from "react";
 import { View } from "react-native";
 import { Text } from "@/components/ui/text";
 import Svg, { Path } from "react-native-svg";
 
 import { Card } from "@/components/ui/card";
 import { ReadAloudButton } from "@/components/ui/read-aloud-button";
-import { createStyles, fontFaces, fontSizes, spacing, useTheme } from "@/theme";
+import { createStyles, fontFaces, fontSizes, radius, spacing, useTheme } from "@/theme";
 import { controls } from "@/theme/tokens";
 
 import { rtri } from "./npc-art";
+import { sideTailGeometry, tailHeightFor } from "./speech-tail-core";
 import { useTeacherLines } from "./teacher-lines";
 
 const useStyles = createStyles((theme) => ({
@@ -27,11 +29,11 @@ const TAIL_W = 30;
 const TAIL_H = 16;
 const TRI = rtri([0, 0], [TAIL_W, 0], [TAIL_W / 2, TAIL_H], 3);
 
-/** The tail under a bubble, pointing down at the speaker: border colour, then the face inset over it. */
+/** The tail under a bubble, pointing down at the speaker: border colour, then the face inset over it. It starts above the card's bottom border (lip plus border), so it opens the whole border, not all but a hairline of it. */
 export function BubbleTail({ align = "center" }: { align?: "center" | "start" }) {
   const { theme } = useTheme();
   return (
-    <View style={{ alignSelf: align === "center" ? "center" : "flex-start", marginLeft: align === "start" ? spacing.xl : 0, marginTop: -(controls.lip + 1), height: TAIL_H, width: TAIL_W }} importantForAccessibility="no-hide-descendants">
+    <View style={{ alignSelf: align === "center" ? "center" : "flex-start", marginLeft: align === "start" ? spacing.xl : 0, marginTop: -(controls.lip + controls.border), height: TAIL_H, width: TAIL_W }} importantForAccessibility="no-hide-descendants">
       <Svg width={TAIL_W} height={TAIL_H} viewBox={`0 0 ${TAIL_W} ${TAIL_H}`}>
         <Path d={TRI} fill={theme.colors.borderStrong} />
         <Path d={rtri([4, 0], [TAIL_W - 4, 0], [TAIL_W / 2, TAIL_H - 6], 2)} fill={theme.colors.surface} />
@@ -40,33 +42,40 @@ export function BubbleTail({ align = "center" }: { align?: "center" | "start" })
   );
 }
 
-const SIDE_W = 16;
-const SIDE_H = 30;
-
 /**
- * Side tail geometry: an outline as thick as the card's border (`controls.border`) in the card's own
- * border colour, with the face colour inset by exactly that thickness, so the tail reads as the
- * bubble's border carried out to a point. The insets are the border width measured across the
- * slanted edges (not along the axes), so the outline stays even all the way round.
+ * Side tail: the bubble's border carried out to a rounded point (geometry and the rules that keep it
+ * clean are in `speech-tail-core.ts`). It measures the card it sits on and shrinks to fit the straight
+ * part of the card's edge, so a one-line bubble gets a smaller tail instead of one that pokes out over
+ * the curved corner and into the bottom border.
  */
-const HALF = SIDE_H / 2;
-const SLANT = Math.atan2(HALF, SIDE_W);
-const INSET_Y = controls.border / Math.cos(SLANT);
-const INSET_X = controls.border / Math.sin(SLANT);
-
 function SideTailShape({ side }: { side: "left" | "right" }) {
   const { theme } = useTheme();
-  const flip = (x: number) => (side === "left" ? SIDE_W - x : x);
-  // Drawn pointing right (a tail on the right edge); mirrored for the left edge.
-  const outer = rtri([flip(0), 0], [flip(0), SIDE_H], [flip(SIDE_W), HALF], 3);
-  const inner = rtri([flip(0), INSET_Y], [flip(0), SIDE_H - INSET_Y], [flip(SIDE_W - INSET_X), HALF], 1.5);
-  const edge = side === "left" ? { left: -(SIDE_W - controls.border - 1) } : { right: -(SIDE_W - controls.border - 1) };
+  const [faceHeight, setFaceHeight] = useState<number | null>(null);
+  const g = useMemo(() => sideTailGeometry(faceHeight === null ? 26 : tailHeightFor(faceHeight, radius.xl), controls.border), [faceHeight]);
+  // The overlay spans the card's face (everything above the lip) and is only there to be measured and to centre the tail on it
   return (
-    <View style={{ position: "absolute", ...edge, top: "50%", marginTop: -SIDE_H / 2 - controls.lip / 2, width: SIDE_W, height: SIDE_H }} importantForAccessibility="no-hide-descendants">
-      <Svg width={SIDE_W} height={SIDE_H} viewBox={`0 0 ${SIDE_W} ${SIDE_H}`}>
-        <Path d={outer} fill={theme.colors.border} />
-        <Path d={inner} fill={theme.colors.surface} />
-      </Svg>
+    <View
+      pointerEvents="none"
+      style={{ position: "absolute", top: 0, bottom: controls.lip, left: 0, right: 0 }}
+      onLayout={(e) => setFaceHeight(Math.round(e.nativeEvent.layout.height))}
+      importantForAccessibility="no-hide-descendants"
+    >
+      <View
+        style={{
+          position: "absolute",
+          top: "50%",
+          marginTop: -g.h / 2,
+          width: g.drawW,
+          height: g.h,
+          // The base meets the border's inner edge; the right-hand tail is the left one mirrored
+          ...(side === "left" ? { left: -g.protrude } : { right: -g.protrude, transform: [{ scaleX: -1 }] }),
+        }}
+      >
+        <Svg width={g.drawW} height={g.h} viewBox={`0 0 ${g.drawW} ${g.h}`}>
+          <Path d={g.outer} fill={theme.colors.border} />
+          <Path d={g.inner} fill={theme.colors.surface} />
+        </Svg>
+      </View>
     </View>
   );
 }

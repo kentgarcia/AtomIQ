@@ -32,6 +32,7 @@ import {
   eventDedupeKey,
   planBlogCard,
   planPost,
+  reconcileEvents,
   type FeedEvent,
   type FeedValues,
   type PlanResult,
@@ -80,12 +81,14 @@ function enqueue<T>(what: string, task: () => Promise<T>): Promise<T | undefined
   });
 }
 
-/** Run `task` soon, off the caller's stack, without waiting for it. Never throws. */
+/**
+ * Run `task` now (right behind whatever is queued), without waiting for it. Never throws. A post is
+ * stored the moment its event happens; the Feed list reads it through `subscribeFeed` and so shows it
+ * as soon as the learner is on that page, with nothing shown anywhere else.
+ */
 function defer(what: string, task: () => Promise<unknown>): void {
   try {
-    setTimeout(() => {
-      void enqueue(what, task);
-    }, 0);
+    void enqueue(what, task);
   } catch (error) {
     warn(what, error);
   }
@@ -149,6 +152,8 @@ interface LevelRow {
   unit_id?: string | null;
   type?: string | null;
   status?: string | null;
+  stars?: number | null;
+  completed_at?: string | null;
 }
 
 async function loadProgress() {
@@ -156,7 +161,7 @@ async function loadProgress() {
     contentRepository.getUnits(),
     contentRepository.getPathNodes(),
     getAllLevels() as Promise<LevelRow[]>,
-    getUserProfile() as Promise<{ current_streak?: number; longest_streak?: number; display_name?: string; username?: string } | null>,
+    getUserProfile() as Promise<{ total_xp?: number; current_streak?: number; longest_streak?: number; display_name?: string; username?: string } | null>,
   ]);
   const completed = new Set<string>();
   const testedOut = new Set<string>();
@@ -171,7 +176,7 @@ async function loadProgress() {
     completedUnitIds: new Set(units.filter((u) => state.units[u.id]?.completed).map((u) => u.id)),
     streak: Math.max(profile?.current_streak ?? 0, profile?.longest_streak ?? 0),
   };
-  return { units, nodes, completed, state, unlock, profile };
+  return { units, nodes, levels, completed, testedOut, state, unlock, profile };
 }
 
 /* ------------------------------------------------------------------ */
@@ -211,7 +216,6 @@ async function processEvent(event: FeedEvent, options: PostOptions = {}): Promis
       now,
       templates,
       history: { dayKey, dedupeKeys: new Set(keys), recentTemplateIds: metas.flatMap((m) => (m.templateId ? [m.templateId] : [])) },
-      existing: metas,
       npcs,
       values: await buildValues(event, npcs),
       rng: options.rng ?? Math.random,
@@ -303,17 +307,65 @@ export function emitNodeCompleted(info: NodeCompletedInfo): void {
           await processEvent(lesson);
         }
       }
-      if (info.kind === "checkpoint" || closesUnit) {
-        // A unit's last checkpoint is the milestone; a plain checkpoint pass is the fallback.
-        if (!(closesUnit && (await processEvent({ type: "unit_complete", unitId: info.unitId })))) {
-          if (info.kind === "checkpoint") await processEvent({ type: "checkpoint_pass", unitId: info.unitId });
-        }
-      }
+      // Passing a checkpoint posts, and so does closing the unit (usually the same moment): each is its own post.
+      if (info.kind === "checkpoint") await processEvent({ type: "checkpoint_pass", unitId: info.unitId });
+      if (closesUnit) await processEvent({ type: "unit_complete", unitId: info.unitId });
     } catch (error) {
       warn("node completed", error);
     }
     await createBlogCards();
   });
+}
+
+/**
+ * Post whatever real progress says happened but has no post yet (a trigger that did not fire, a write
+ * that failed, lessons finished before the feed existed). Safe to call as often as you like: events
+ * already posted are skipped by their dedupe key. Posts are dated when the thing happened, oldest
+ * first, so the list reads in order. Resolves with how many posts were made; never rejects. Respects
+ * the Settings switch like every other post, and (re)creates blog cards at the end.
+ */
+export function reconcileFeed(): Promise<number> {
+  return enqueue("reconcile", async () => {
+    const now = Date.now();
+    let made = 0;
+    if (await getFeedPostsEnabled()) {
+      const progress = await loadProgress();
+      const keys = await store.listDedupeKeys();
+      const stars = new Map<string, number>();
+      const completedAt = new Map<string, number>();
+      for (const l of progress.levels) {
+        if (l.status !== "completed") continue;
+        stars.set(l.id, l.stars ?? 0);
+        const t = l.completed_at ? Date.parse(l.completed_at) : NaN;
+        if (Number.isFinite(t) && t <= now) completedAt.set(l.id, t);
+      }
+      const items = reconcileEvents(
+        {
+          unitIds: progress.units.map((u) => u.id),
+          nodes: progress.nodes.map((n) => ({ id: n.id, unitId: n.unitId, kind: n.kind, position: n.position, lessonId: n.lessonId })),
+          completed: progress.completed,
+          testedOut: progress.testedOut,
+          completedUnits: new Set(progress.unlock.completedUnitIds),
+          stars,
+          completedAt,
+          streak: progress.unlock.streak,
+        },
+        keys,
+        dayKeyOf(now),
+      );
+      // Strictly increasing times keep the order; an unknown time is "just now", after everything dated.
+      let last = 0;
+      for (const item of items) {
+        const at = Math.max(item.at ?? now - items.length, last + 1);
+        last = at;
+        let created = await processEvent(item.event, { now: at });
+        if (!created && item.fallback) created = await processEvent(item.fallback, { now: at });
+        if (created) made += 1;
+      }
+    }
+    made += await createBlogCards();
+    return made;
+  }).then((n) => n ?? 0);
 }
 
 /** The learner's streak changed (called where `current_streak` is updated). Only 3, 7, 14, 30, 60 and 100 post. */
@@ -334,8 +386,9 @@ export function checkFeedOnAppOpen(): Promise<void> {
     if (typeof last !== "string" || !isDayKey(last)) return;
     const away = daysBetween(last, today);
     if (away < COMEBACK_MIN_DAYS) return;
-    const profile = (await getUserProfile()) as { lessons_completed?: number } | null;
-    if ((profile?.lessons_completed ?? 0) > 0) await processEvent({ type: "comeback", days: away });
+    // Someone who has learned something before. (The profile's `lessons_completed` is never raised by the app, so the saved path nodes and XP say it instead.)
+    const progress = await loadProgress();
+    if (progress.completed.size > 0 || progress.profile?.total_xp) await processEvent({ type: "comeback", days: away });
   }).then(() => undefined);
 }
 
@@ -395,25 +448,23 @@ export async function getWeeklyRanking(now: number = Date.now()): Promise<Weekly
 interface RankState {
   weekKey: string;
   order: string[];
-  postedDay?: string;
 }
 
 /**
  * Compare the ranking with the last check and post a `rank_change` when the learner passed a rival or
- * was passed (at most one post a day). Never rejects. Call after XP changes (`emitRankCheck`) or when
+ * was passed. Every change is its own post. Never rejects. Call after XP changes (`emitRankCheck`) or when
  * Discover opens.
  */
 export function checkRankChange(): Promise<void> {
   return enqueue("rank change", async () => {
     if (!(await getFeedPostsEnabled())) return;
     const now = Date.now();
-    const dayKey = dayKeyOf(now);
     const ranking = await getWeeklyRanking(now);
     if (ranking.learner.xp <= 0) return; // nothing to celebrate or to lose yet
     const order = ranking.rows.map((r) => r.id);
     const saved = await getItem<RankState>(STORAGE_KEYS.FEED_RANK_STATE);
     if (!saved || saved.weekKey !== ranking.weekKey || !Array.isArray(saved.order)) {
-      await setItem(STORAGE_KEYS.FEED_RANK_STATE, { weekKey: ranking.weekKey, order, postedDay: saved?.postedDay } satisfies RankState);
+      await setItem(STORAGE_KEYS.FEED_RANK_STATE, { weekKey: ranking.weekKey, order } satisfies RankState);
       return;
     }
     const change = rankChange(saved.order.map((id) => ({ id })), ranking.rows);
@@ -421,9 +472,8 @@ export function checkRankChange(): Promise<void> {
       await setItem(STORAGE_KEYS.FEED_RANK_STATE, { ...saved, order } satisfies RankState);
       return;
     }
-    if (saved.postedDay === dayKey) return; // already posted today: keep the old order, the change shows tomorrow
-    const created = await processEvent({ type: "rank_change", direction: change.direction as RankDirection, npcId: change.npcId });
-    await setItem(STORAGE_KEYS.FEED_RANK_STATE, { weekKey: ranking.weekKey, order, postedDay: created ? dayKey : saved.postedDay } satisfies RankState);
+    await processEvent({ type: "rank_change", direction: change.direction as RankDirection, npcId: change.npcId, at: now });
+    await setItem(STORAGE_KEYS.FEED_RANK_STATE, { weekKey: ranking.weekKey, order } satisfies RankState);
   }).then(() => undefined);
 }
 
@@ -570,6 +620,8 @@ export interface BlogView {
   /** NPC comments authored with the piece, in order; empty for a piece without any. Read-only. */
   comments: BlogComment[];
   references: Reference[];
+  /** Ids of lessons whose path node is still locked for this learner (a comment's lesson link stays shut for these). */
+  lockedLessonIds: string[];
   /** False if the learner has not unlocked it (the reader should not show it). */
   unlocked: boolean;
   /** When it was first opened, or `null` (not yet recorded). */
@@ -592,10 +644,36 @@ export async function getBlogView(blogId: string): Promise<BlogView | null> {
     blog,
     comments,
     references,
+    lockedLessonIds: progress.nodes
+      .filter((n) => n.kind === "lesson" && n.lessonId && progress.state.nodes[n.id] === "locked")
+      .map((n) => n.lessonId as string),
     unlocked: isUnlocked(blog, progress.unlock),
     readAt: reads.find((r) => r.blogId === blogId)?.readAt ?? null,
     reactions,
   };
+}
+
+/** One unlocked piece in the Blogs list. */
+export interface UnlockedBlog {
+  id: string;
+  title: string;
+  hook: string;
+  cover: string;
+  readMin: number;
+  /** The author. */
+  npcId: string;
+  /** False until the learner has opened it. */
+  read: boolean;
+}
+
+/** Every piece the learner has unlocked, in reading order, for the Blogs list (so a card that scrolled away is never lost). Rejects only if the content or database cannot be read. */
+export async function getUnlockedBlogs(): Promise<UnlockedBlog[]> {
+  const [blogs, progress, reads] = await Promise.all([orEmpty(() => loadBlogs()), loadProgress(), store.listBlogReads()]);
+  const read = new Set(reads.map((r) => r.blogId));
+  return blogs
+    .filter((b) => isUnlocked(b, progress.unlock))
+    .sort((a, b) => a.position - b.position)
+    .map((b) => ({ id: b.id, title: b.title, hook: b.hook, cover: b.cover, readMin: b.readMin, npcId: b.npcId, read: read.has(b.id) }));
 }
 
 /** The learner opened a piece: remember it and record a `blog_read` activity. Resolves `true` the first time. Never rejects. */

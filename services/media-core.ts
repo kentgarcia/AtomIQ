@@ -73,7 +73,9 @@ export const getRouteMediaPolicy = (
   const route = normalizeMediaPathname(pathname);
 
   if (matches(route, "/lesson")) {
-    return { surface: "lesson", uiClicks: false, gameSfx: true, music: false };
+    // Footer buttons (Check, Continue, Skip) click in a lesson; its option rows stay silent and play
+    // the answer cues instead (docs/SFX_SPEC.md §6.3).
+    return { surface: "lesson", uiClicks: true, gameSfx: true, music: false };
   }
   if (matches(route, "/quiz") || matches(route, "/quiz-results")) {
     return { surface: "quiz", uiClicks: false, gameSfx: true, music: false };
@@ -142,6 +144,34 @@ export const canPlayGameSfx = (
   prefs: MediaPreferences,
   env: MediaEnvironment,
 ): boolean => prefs.soundEffects && env.appActive;
+
+/** How a sound effect is gated (docs/SFX_SPEC.md §7.2). */
+export type SfxCategory = "tap" | "panel" | "feedback" | "reward" | "stinger" | "voice";
+
+/**
+ * One gate for every cue in the SFX catalog. Every category needs the Sound Effects
+ * preference and the app in the foreground; the rest depends on what the sound is:
+ * - tap: a generic press, so the route policy and screen readers apply (as canPlayUiClick);
+ * - panel / feedback / reward / stinger: information or a reward, so they always play;
+ * - voice: decorative (blips, sparkles), so no screen reader and never over Read Aloud.
+ */
+export const canPlayCue = (
+  category: SfxCategory,
+  prefs: MediaPreferences,
+  env: MediaEnvironment,
+  policy: RouteMediaPolicy,
+  readAloudSpeaking: boolean = false,
+): boolean => {
+  if (!prefs.soundEffects || !env.appActive) return false;
+  switch (category) {
+    case "tap":
+      return !env.screenReaderActive && policy.uiClicks;
+    case "voice":
+      return !env.screenReaderActive && !readAloudSpeaking;
+    default:
+      return true;
+  }
+};
 
 export const canPlayMusic = (
   prefs: MediaPreferences,

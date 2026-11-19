@@ -20,6 +20,7 @@ import { getMetTeachers, markTeacherMet } from "@/services/storage";
 import { starsFor } from "@/services/lesson-core";
 import { contentKeyOf, runProgress, type RunState } from "@/services/lesson-progress-core";
 import { clearLessonRun, loadLessonRun, saveLessonRun } from "@/services/lesson-runs";
+import { pinSfx, playSfx } from "@/services/sfx";
 import { useStorage } from "@/services/StorageContext";
 import { createStyles, fontFaces, fontSizes, spacing, useTheme } from "@/theme";
 
@@ -57,6 +58,14 @@ export default function LessonScreen() {
   // Opened from the preview on the Home map (autostart): straight into the lesson, no second preview
   const autostarted = autostart === "1";
   const [stage, setStage] = useState<Stage>(autostarted ? "boot" : "preview");
+  // The finish jingle is loaded and kept for the end of the lesson, whatever else is played before it
+  useEffect(() => {
+    pinSfx("reward.finish-jingle");
+  }, []);
+  // The lesson begins (docs/SFX_SPEC.md §6.2): the cue plays each time the run starts, including "practice again".
+  useEffect(() => {
+    if (stage === "run") void playSfx("lesson.start");
+  }, [stage]);
   const [isReplay, setIsReplay] = useState(false);
   const [outcome, setOutcome] = useState<Outcome | null>(null);
   const [runKey, setRunKey] = useState(0);

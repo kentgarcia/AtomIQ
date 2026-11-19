@@ -278,3 +278,46 @@ test("category chip colors meet WCAG AA in light and dark", async () => {
   assert.ok(s.minSecondary >= TEXT_TARGET, `secondary text ${s.minSecondary}`);
   assert.ok(s.minAccent >= NON_TEXT_TARGET, `accent ${s.minAccent}`);
 });
+
+/* ---------------- search --------------------------------------------- */
+
+const search = await import(pathToFileURL(path.join(REPO, "content", "periodic-table", "search.ts")).href);
+const find = (query, category = null) => search.filterElementList(ELEMENTS, { query, category }).map((e) => e.symbol);
+
+test("search: a short query is a prefix, not a substring", () => {
+  // Names or symbols that start with "n", in atomic-number order. Silicon, Tin and the rest merely contain one.
+  assert.deepEqual(find("n"), ["N", "Ne", "Na", "Ni", "Nb", "Nd", "Np", "No", "Nh"]);
+  assert.deepEqual(find("fe"), ["Fe", "Fm"]);
+});
+
+test("search: three letters or more may match inside a name", () => {
+  assert.ok(find("oxy").includes("O"));
+  assert.ok(find("ium").includes("Li"));
+  assert.ok(!find("ium").includes("Fe"));
+});
+
+test("search: number, name, case and category work together", () => {
+  assert.deepEqual(find("26"), ["Fe"]);
+  assert.deepEqual(find("  URANIUM "), ["U"]);
+  assert.deepEqual(find("", "noble-gas"), ["He", "Ne", "Ar", "Kr", "Xe", "Rn"]);
+  assert.deepEqual(find("ne", "noble-gas"), ["Ne"]);
+  assert.deepEqual(find("u", "noble-gas"), []);
+  assert.equal(find("").length, 118);
+});
+
+test("search: alternate spellings find their element", () => {
+  assert.deepEqual(find("aluminium"), ["Al"]);
+  assert.deepEqual(find("sulphur"), ["S"]);
+  assert.deepEqual(find("caesium"), ["Cs"]);
+  assert.deepEqual(find("deut"), ["H"]);
+  assert.deepEqual(find("zzz"), []);
+});
+
+test("route param: a malformed link does not throw", () => {
+  assert.equal(search.symbolFromParam("Fe"), "Fe");
+  assert.equal(search.symbolFromParam("%46e"), "Fe");
+  assert.equal(search.symbolFromParam(["Au", "x"]), "Au");
+  assert.equal(search.symbolFromParam("%E0%A4%A"), "%E0%A4%A");
+  assert.equal(search.symbolFromParam(undefined), undefined);
+  assert.equal(search.symbolFromParam(""), undefined);
+});

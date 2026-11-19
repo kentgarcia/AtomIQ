@@ -7,6 +7,8 @@ export const STORAGE_KEYS = {
   FIRST_LAUNCH: '@atomiq:first_launch',
   APP_VERSION: '@atomiq:app_version',
   BETA_NOTICE_SEEN: '@atomiq:beta_notice_seen',
+  /** What the learner picked in onboarding: why they came, how much they know, their daily goal (JSON, see `services/onboarding-core.ts`). */
+  ONBOARDING_ANSWERS: '@atomiq:onboarding_answers',
   
   // User Preferences
   THEME: '@atomiq:theme',
@@ -36,6 +38,8 @@ export const STORAGE_KEYS = {
   ACHIEVEMENT_LEVELS: '@atomiq:achievement_levels',
   PROFILE_SHOWCASE_BADGES: '@atomiq:profile_showcase_badges',
   QUESTS_CLAIMED_TOTAL: '@atomiq:quests_claimed_total',
+  /** The learner's place on the Ranks screen the last time they looked (a number), to show whether it moved. */
+  RANKS_LAST_SEEN: '@atomiq:ranks_last_seen',
 } as const;
 
 // Generic Storage Operations
@@ -87,6 +91,15 @@ export const setOnboardingCompleted = async (completed: boolean): Promise<void> 
 export const getOnboardingCompleted = async (): Promise<boolean> => {
   const value = await getItem<boolean>(STORAGE_KEYS.ONBOARDING_COMPLETED);
   return value ?? false;
+};
+
+export const setOnboardingAnswers = async (json: string): Promise<void> => {
+  await setItem(STORAGE_KEYS.ONBOARDING_ANSWERS, json);
+};
+
+/** The stored answers as written (parse with `parseAnswers`), or null before onboarding is done. */
+export const getOnboardingAnswers = async (): Promise<string | null> => {
+  return (await getItem<string>(STORAGE_KEYS.ONBOARDING_ANSWERS)) ?? null;
 };
 
 // First Launch
@@ -269,6 +282,15 @@ export const getAchievementLevels = async (): Promise<Record<string, number> | n
   return await getItem<Record<string, number>>(STORAGE_KEYS.ACHIEVEMENT_LEVELS);
 };
 
+export const getRanksLastSeen = async (): Promise<number | null> => {
+  const value = await getItem<number>(STORAGE_KEYS.RANKS_LAST_SEEN);
+  return typeof value === 'number' && Number.isFinite(value) ? value : null;
+};
+
+export const setRanksLastSeen = async (rank: number): Promise<void> => {
+  await setItem(STORAGE_KEYS.RANKS_LAST_SEEN, rank);
+};
+
 export const setAchievementLevels = async (levels: Record<string, number>): Promise<void> => {
   await setItem(STORAGE_KEYS.ACHIEVEMENT_LEVELS, levels);
 };
@@ -322,6 +344,8 @@ export default {
   clearAll,
   setOnboardingCompleted,
   getOnboardingCompleted,
+  setOnboardingAnswers,
+  getOnboardingAnswers,
   setFirstLaunch,
   getFirstLaunch,
   setNotificationsEnabled,

@@ -378,6 +378,31 @@ export const TYPES = [
     ],
   },
   {
+    table: "unit_statements",
+    label: "Unit statements",
+    singular: "statement",
+    group: "Learn",
+    icon: "🧪",
+    groupBy: (r) => r.unit_id,
+    sortBy: (r) => String(r.position).padStart(4, "0"),
+    titleOf: (r) => r.statement || r.id,
+    subOf: (r) => `${r.verdict} · #${r.position + 1}`,
+    newRow: () => ({ id: "", unit_id: "", statement: "", verdict: "myth", explanation: "" }),
+    fields: (isNew) => [
+      idField(isNew, "e.g. inside-the-atom-s11"),
+      txt("unit_id", "Unit (the theme)", { required: true, suggest: { table: "units", column: "id" } }),
+      area("statement", "Statement", 2, { required: true, hint: "One sentence that fits on a swipe card (160 characters or fewer)." }),
+      sel("verdict", "Is it a myth or a fact?", ["myth", "fact"], { hint: "Myth: the statement is false. Fact: it is true." }),
+      area("explanation", "Why", 3, { hint: "Shown after the answer." }),
+    ],
+    beforeSave(row, ctx) {
+      // A new statement, or one moved to another unit, goes to the end of that unit's deck
+      const deck = ctx.rows.filter((r) => r.unit_id === row.unit_id && String(r.id) !== String(row.id));
+      const prior = ctx.original;
+      if (!prior || prior.unit_id !== row.unit_id) row.position = deck.reduce((m, r) => Math.max(m, r.position), -1) + 1;
+    },
+  },
+  {
     table: "mazes",
     label: "Atom Maze",
     singular: "maze",

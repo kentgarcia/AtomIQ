@@ -13,7 +13,7 @@ type TableColumnDefinition = Record<string, string>;
 
 const getTableColumns = async (
   database: SQLite.SQLiteDatabase,
-  tableName: "user_profile" | "user_profiles",
+  tableName: "user_profile" | "user_profiles" | "story_progress",
 ): Promise<Set<string>> => {
   const table = await database.getFirstAsync<{ name: string }>(
     "SELECT name FROM sqlite_master WHERE type = 'table' AND name = ? LIMIT 1",
@@ -33,7 +33,7 @@ const getTableColumns = async (
 
 const ensureTableColumns = async (
   database: SQLite.SQLiteDatabase,
-  tableName: "user_profile" | "user_profiles",
+  tableName: "user_profile" | "user_profiles" | "story_progress",
   definitions: TableColumnDefinition,
 ): Promise<void> => {
   const existingColumns = await getTableColumns(database, tableName);
@@ -198,6 +198,16 @@ export const initDatabase = async () => {
         updated_at INTEGER NOT NULL DEFAULT 0
       );
 
+      -- Atom Maze story mode (services/story-progress.ts): the best result of each level.
+      CREATE TABLE IF NOT EXISTS story_progress (
+        level_id TEXT PRIMARY KEY,
+        stars INTEGER NOT NULL DEFAULT 0,
+        best_score INTEGER NOT NULL DEFAULT 0,
+        best_time REAL,
+        plays INTEGER NOT NULL DEFAULT 0,
+        updated_at INTEGER NOT NULL DEFAULT 0
+      );
+
       -- A lesson left half way: the saved run, so it can be resumed (services/lesson-runs.ts).
       CREATE TABLE IF NOT EXISTS lesson_runs (
         node_id TEXT PRIMARY KEY,
@@ -278,6 +288,8 @@ export const initDatabase = async () => {
 
     // Ensure legacy/local-first identity columns exist before any queries use them.
     await ensureIdentityProfileColumns(db);
+    // A story_progress table made before the best time was kept
+    await ensureTableColumns(db, "story_progress", { best_time: "REAL" });
 
     // Migrate existing databases - add user_id column if it doesn't exist
     try {
@@ -1002,6 +1014,7 @@ export const clearAllData = async () => {
     DELETE FROM units;
     DELETE FROM lesson_runs;
     DELETE FROM wallet;
+    DELETE FROM story_progress;
     DELETE FROM levels;
     DELETE FROM lesson_steps;
     DELETE FROM objective_mastery;
@@ -1061,6 +1074,7 @@ export const deleteAccountData = async () => {
     "item_attempts",
     "lesson_runs",
     "wallet",
+    "story_progress",
     "levels",
     "units",
     "daily_activity",

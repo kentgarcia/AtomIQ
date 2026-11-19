@@ -321,6 +321,33 @@ export function validateDatabase(db, { strictReview = false, shipped = {}, retir
   findings.push(...feed.findings);
 
   // -------------------------------------------------------------------------
+  // unit_statements (Myth Buster, Quick Play): a unit's deck of myth-or-fact statements.
+  // -------------------------------------------------------------------------
+  if (tableExists("unit_statements")) {
+    const QUICK_PLAY_DECK = 10; // Quick Play asks the whole deck
+    const unitIds = new Set(tableExists("units") ? db.prepare("SELECT id FROM units").all().map((r) => r.id) : []);
+    const perUnit = new Map();
+    const stmt = (row, field, rule, severity, message) => findings.push({ table: "unit_statements", id: row.id, field, rule, severity, message, text: row.statement });
+    for (const row of db.prepare("SELECT * FROM unit_statements ORDER BY unit_id, position").all()) {
+      bump("unit_statements");
+      perUnit.set(row.unit_id, (perUnit.get(row.unit_id) ?? []).concat(row));
+      if (!unitIds.has(row.unit_id)) stmt(row, "unit_id", "statement-unit", "error", "the unit does not exist");
+      const text = String(row.statement ?? "").trim();
+      if (!text) stmt(row, "statement", "statement-text", "error", "the statement is required");
+      else if (text.length > 160) stmt(row, "statement", "statement-length", "warning", `a statement fits on a swipe card: 160 characters or fewer (this is ${text.length})`);
+      if (!String(row.explanation ?? "").trim()) stmt(row, "explanation", "statement-explanation", "warning", "say why it is a myth or a fact");
+    }
+    for (const unitId of unitIds) {
+      const rows = perUnit.get(unitId) ?? [];
+      const id = rows[0]?.id ?? unitId;
+      const unit = (field, rule, severity, message) => findings.push({ table: "unit_statements", id, field, rule, severity, message });
+      if (rows.length !== QUICK_PLAY_DECK) unit("unit_id", "unit-deck-size", "warning", `unit "${unitId}" has ${rows.length} statement(s); Quick Play asks ${QUICK_PLAY_DECK}`);
+      if (rows.length > 0 && !rows.some((r) => r.verdict === "myth")) unit("verdict", "unit-deck-mix", "warning", `unit "${unitId}" has no myth`);
+      if (rows.length > 0 && !rows.some((r) => r.verdict === "fact")) unit("verdict", "unit-deck-mix", "warning", `unit "${unitId}" has no fact`);
+    }
+  }
+
+  // -------------------------------------------------------------------------
   // Icons: every icon name in content must be an installed Iconsax export.
   // -------------------------------------------------------------------------
   const iconTables = ["lesson_steps", "mazes", "maze_rooms", "myths", "encyclopedia_entries", "quizzes", "quiz_questions", "lessons", "units", "lesson_cards", "items"].filter(tableExists);

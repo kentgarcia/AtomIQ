@@ -13,7 +13,7 @@ const MIN_HIT = 44;
 
 const useStyles = createStyles((theme) => ({
   ring: { position: "absolute", borderRadius: radius.full, borderWidth: 3, borderColor: "transparent" },
-  ringSelected: { borderColor: theme.colors.primary, backgroundColor: theme.colors.primarySurface },
+  ringSelected: { borderColor: theme.colors.guide, backgroundColor: theme.colors.infoSurface },
   ringCorrect: { borderColor: theme.colors.success, backgroundColor: theme.colors.successSurface },
   ringWrong: { borderColor: theme.colors.error, backgroundColor: theme.colors.errorSurface },
 }));
