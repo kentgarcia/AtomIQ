@@ -66,8 +66,7 @@ export async function completeNode(opts: CompleteOptions): Promise<CompleteResul
     // A replay: only a very small share of the XP, no new lesson count and no feed post
     const repeat = repeatXp(xp);
     if (repeat > 0) {
-      await addXP(repeat);
-      await logDailyActivity(toLocalIsoDate(), { xp_earned: repeat });
+      await addXP(repeat); // addXP also adds it to today's activity
     }
     return { firstCompletion: false, xpAwarded: repeat };
   }
@@ -78,7 +77,6 @@ export async function completeNode(opts: CompleteOptions): Promise<CompleteResul
     if (profile) await updateUserProfile({ lessons_completed: (profile.lessons_completed ?? 0) + 1 });
   }
   await logDailyActivity(toLocalIsoDate(), {
-    xp_earned: xp,
     lessons_completed: lesson ? 1 : 0,
     time_spent_minutes: lesson?.estimatedMinutes ?? 4,
   });

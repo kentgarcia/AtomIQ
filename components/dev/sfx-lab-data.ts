@@ -1,5 +1,5 @@
 /**
- * The SFX lab's content (docs/SFX_EXPANSION_SPEC.md): every moment the spec proposes a new sound for,
+ * The SFX lab's content (docs/features/SFX_EXPANSION_SPEC.md): every moment the spec proposes a new sound for,
  * with the candidate files from `assets/sfx/kent-sfx/` to audition for it.
  *
  * Pure data, framework-free (erasable syntax, `.ts` import extensions) so the prepare script and the
@@ -47,7 +47,7 @@ export interface LabMoment {
   title: string;
   /** Where it would play: the component or screen that owns the moment. */
   where: string;
-  /** The gate it would sit behind (docs/SFX_SPEC.md §7.2). */
+  /** The gate it would sit behind (docs/features/SFX_SPEC.md §7.2). */
   category: SfxCategory;
   /** Proposed runtime volume, 0 to 1, on top of the levelled file. */
   volume: number;
@@ -182,7 +182,7 @@ export const LAB_MOMENTS: readonly LabMoment[] = [
     id: "phone.start",
     area: "Phone",
     title: "The phone is handed over (first open)",
-    where: "app/(tabs)/phone.tsx, the intro line from Shrodi (PHONE_INTRO_SEEN)",
+    where: "app/(tabs)/phone.tsx, the first-open hand-over (the intro line was removed; unused)",
     category: "stinger",
     volume: 0.7,
     today: "reward.pop",

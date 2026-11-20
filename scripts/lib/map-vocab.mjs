@@ -1,5 +1,5 @@
 /**
- * The Nuclear Map vocabulary (docs/PHONE_SPEC.md §5.8 and §7.1), as plain data. Framework-free, so the validator
+ * The Nuclear Map vocabulary (docs/features/PHONE_SPEC.md §5.8 and §7.1), as plain data. Framework-free, so the validator
  * (scripts/lib/map-rules.mjs), the Content Studio and the app read the same names.
  */
 

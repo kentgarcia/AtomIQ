@@ -1,6 +1,6 @@
 /**
  * The first screen of the app: one promise and one button, laid out like the best first screens
- * (see docs/ONBOARDING_SPEC.md): a coloured hero on top with the character, a
+ * (see docs/features/ONBOARDING_SPEC.md): a coloured hero on top with the character, a
  * scalloped cloud edge, and a white sheet under it with the AtomIQ name, one line under it (the tagline), and at the bottom a small
  * footnote right above the main button. The hero is the primary button's yellow (`buttonFace`) with flat blobs in its lip colour behind Shrodi,
  * so the first screen already looks like the app.

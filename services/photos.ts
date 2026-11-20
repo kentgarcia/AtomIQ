@@ -1,5 +1,5 @@
 /**
- * The Camera's runtime (docs/PHONE_SPEC.md §9): binds `photos` to the user-state database and tells listeners when the gallery changed.
+ * The Camera's runtime (docs/features/PHONE_SPEC.md §9): binds `photos` to the user-state database and tells listeners when the gallery changed.
  * The rules are in `components/camera/photo-core.ts`. Nothing here uses the device camera or a permission, and nothing throws into a screen.
  */
 

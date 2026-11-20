@@ -1,5 +1,5 @@
 /**
- * The Nuclear Map's rules (docs/PHONE_SPEC.md §5.8): the site shape, each kind's name and colour, where a site's pin sits on the flat
+ * The Nuclear Map's rules (docs/features/PHONE_SPEC.md §5.8): the site shape, each kind's name and colour, where a site's pin sits on the flat
  * world map (`world-art.ts`, a Robinson projection) and the pan and zoom maths. Framework-free and tested (`test:map`). The view maths are
  * worklets so the screen's gestures run them on the UI thread. The kinds mirror `scripts/lib/map-vocab.mjs`.
  */

@@ -1,6 +1,6 @@
 /**
  * The SFX lab's data (components/dev/sfx-lab-data.ts) against the files, the catalog and the spec
- * (docs/SFX_EXPANSION_SPEC.md). Run: npm run test:sfx-lab
+ * (docs/features/SFX_EXPANSION_SPEC.md). Run: npm run test:sfx-lab
  */
 import assert from "node:assert/strict";
 import fs from "node:fs";
@@ -12,7 +12,7 @@ import { CUES, SFX_FILES } from "../services/sfx-core.ts";
 
 const ROOT = process.cwd();
 const AUDITION = path.join(ROOT, "assets", "sfx", "audition");
-const SPEC = fs.readFileSync(path.join(ROOT, "docs", "SFX_EXPANSION_SPEC.md"), "utf8");
+const SPEC = fs.readFileSync(path.join(ROOT, "docs", "features", "SFX_EXPANSION_SPEC.md"), "utf8");
 const SOURCES = fs.readFileSync(path.join(ROOT, "components", "dev", "sfx-lab-sources.ts"), "utf8");
 
 /** Milliseconds of a 16-bit mono WAV. */
@@ -64,7 +64,7 @@ describe("moments", () => {
   });
 
   it("have a spec entry each", () => {
-    for (const m of LAB_MOMENTS) assert.ok(SPEC.includes(`\`${m.id}\``), `docs/SFX_EXPANSION_SPEC.md never mentions \`${m.id}\``);
+    for (const m of LAB_MOMENTS) assert.ok(SPEC.includes(`\`${m.id}\``), `docs/features/SFX_EXPANSION_SPEC.md never mentions \`${m.id}\``);
   });
 });
 

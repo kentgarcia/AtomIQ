@@ -2,7 +2,7 @@
  * Onboarding, the framework-free part: the order of the steps, what each question offers, what
  * Shrodi says back, and how the answers turn into the recap lines. No React and no storage, so
  * `scripts/test-onboarding.mjs` runs it under Node. The screens are in `components/onboarding/`
- * and the step machine in `app/onboarding.tsx`; the plan is `docs/ONBOARDING_SPEC.md`.
+ * and the step machine in `app/onboarding.tsx`; the plan is `docs/features/ONBOARDING_SPEC.md`.
  *
  * Nothing here is saved until the learner has given a name and accepted the Terms: the answers
  * live in component state and `serializeAnswers` is called once, at the very end.

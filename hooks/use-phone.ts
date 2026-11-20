@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { deliverPendingChat, subscribeChats } from "@/services/chats";
 import { subscribeFactsRead } from "@/services/daily-facts";
@@ -24,6 +24,8 @@ export interface PhoneState {
   loaded: boolean;
   /** The apps the learner has, in grid order. */
   apps: PhoneApp[];
+  /** What the unlock rules read (for the conditions a locked icon shows). */
+  progress: PhoneProgress;
   /** Unlocked apps whose install moment has not played yet. */
   newApps: PhoneApp[];
   /** The corner mark of an app (null with the Settings switch off). */
@@ -58,11 +60,17 @@ export function usePhone(refreshKey?: unknown): PhoneState {
   const [badgesOn, setBadgesOn] = useState(true);
   const [version, setVersion] = useState(0);
 
+  // Only the read that started last may land: an older one still in flight when the learner comes back (progress was
+  // made elsewhere) would otherwise finish after it, count as the fresh read, and show the old progress
+  const latest = useRef(0);
   const load = useCallback(async () => {
+    const mine = ++latest.current;
     const [p, seenApps, on] = await Promise.all([loadPhoneProgress(), loadSeenApps(), getPhoneBadgesEnabled().catch(() => true)]);
+    if (mine !== latest.current) return;
     // A teacher's message may be earned by what was just read; deliver it first so the unread count below includes it
     await deliverPendingChat({ progress: p, seen: seenApps });
     const s = await loadPhoneSignals();
+    if (mine !== latest.current) return;
     setProgress(p);
     setSignals(s);
     setSeen(seenApps);
@@ -97,6 +105,7 @@ export function usePhone(refreshKey?: unknown): PhoneState {
 
   return {
     loaded,
+    progress,
     apps,
     newApps,
     badgeOf,

@@ -1,5 +1,5 @@
 /**
- * The phone's wallpapers (docs/PHONE_SPEC.md §4): the learner's own avatar paint and pattern (`mine`, what a new phone wears), the app's plain
+ * The phone's wallpapers (docs/features/PHONE_SPEC.md §4): the learner's own avatar paint and pattern (`mine`, what a new phone wears), the app's plain
  * page colour (`plain`) or one of five illustrated wallpapers (`wallpaper-art.ts`). Which one is a preference. Framework-free and tested (`test:wallpaper`).
  */
 

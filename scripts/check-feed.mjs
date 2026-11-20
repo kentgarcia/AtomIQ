@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Feed source gate (docs/NPC_FEED_SPEC.md §14). The learner only reacts: there must be no way for
+ * Feed source gate (docs/features/NPC_FEED_SPEC.md §14). The learner only reacts: there must be no way for
  * them to write a comment. This greps the feed's screens and services for
  *   - a TextInput (an import, a `<TextInput` element or any use of the name),
  *   - a function named comment / insertComment / addComment / postComment (any spelling of "comment"

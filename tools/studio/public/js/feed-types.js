@@ -1,4 +1,4 @@
-// Editors for the NPC feed (docs/NPC_FEED_SPEC.md §6): feed templates and blog pieces.
+// Editors for the NPC feed (docs/features/NPC_FEED_SPEC.md §6): feed templates and blog pieces.
 // The vocabulary (triggers, their condition fields and placeholders, block types, limits) comes from
 // the server (state.meta.feedVocab, from scripts/lib/feed-vocab.mjs), so the panels and the
 // validator can never disagree. The previews redraw while you type.
@@ -428,7 +428,7 @@ const BLOG_POSTS = {
 export const FEED_TYPES = [FEED_TEMPLATES, BLOG_POSTS];
 
 // ---------------------------------------------------------------------------
-// chat nodes (docs/PHONE_SPEC.md section 5.2): what a teacher says on the phone and the replies that follow
+// chat nodes (docs/features/PHONE_SPEC.md section 5.2): what a teacher says on the phone and the replies that follow
 // ---------------------------------------------------------------------------
 
 const chatVocab = () => state.meta.chatVocab;
@@ -488,7 +488,7 @@ const CHAT_NODES = {
 };
 
 // ---------------------------------------------------------------------------
-// scan targets (docs/PHONE_SPEC.md section 8): what the Atom Scanner can scan, its elements and its sources
+// scan targets (docs/features/PHONE_SPEC.md section 8): what the Atom Scanner can scan, its elements and its sources
 // ---------------------------------------------------------------------------
 
 const scanVocab = () => state.meta.scanVocab;
@@ -540,7 +540,7 @@ const SCAN_TARGETS = {
 };
 
 // ---------------------------------------------------------------------------
-// safety cards (docs/PHONE_SPEC.md section 5.9) and map sites (section 5.8): sourced, and every source checked by a person before publishing
+// safety cards (docs/features/PHONE_SPEC.md section 5.9) and map sites (section 5.8): sourced, and every source checked by a person before publishing
 // ---------------------------------------------------------------------------
 
 const safetyVocab = () => state.meta.safetyVocab;

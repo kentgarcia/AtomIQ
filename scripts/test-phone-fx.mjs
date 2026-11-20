@@ -68,11 +68,6 @@ test("installs in a batch start 0.5 s apart, and the batch lasts until the last 
   assert.equal(fx.batchTotal(5), 2000 + INSTALL.total);
 });
 
-test("the intro line arrives after the last icon has popped in", () => {
-  assert.equal(fx.introLineAt(0), 0);
-  assert.equal(fx.introLineAt(5), 2000 + INSTALL.popEnd);
-});
-
 test("the press sinks to 92%", () => {
   assert.equal(fx.PRESS.scale, 0.92);
 });

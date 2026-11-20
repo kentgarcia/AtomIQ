@@ -42,6 +42,9 @@ import { DURATION, EASE_OUT } from "@/theme/motion";
 import { LessonNode, type NodeStatus } from "@/components/path/LessonNode";
 import { NodeBubble } from "@/components/path/NodeBubble";
 import { LessonPreviewLayer } from "@/components/lesson/LessonPreviewLayer";
+import { useTutorialTarget } from "@/components/tutorial/use-tutorial-target";
+import { useTourOver, useTutorialBusy } from "@/hooks/use-tutorial";
+import { emitTutorial } from "@/services/tutorial";
 import { UnitDivider } from "@/components/path/UnitDivider";
 import { loadLessonPreview, type LessonPreviewData } from "@/services/lesson-preview";
 import { unitPalette, type UnitPalette } from "@/components/path/unit-theme";
@@ -160,7 +163,9 @@ const getNodeX = (globalIndex: number, width: number) =>
 // dev-admin: development-only controls (components/dev); Metro drops this in a release build. Remove with the folder.
 const DevAdminFab: typeof import("@/components/dev/DevAdminFab").DevAdminFab | null = __DEV__ ? require("@/components/dev/DevAdminFab").DevAdminFab : null;
 // dev-sfx: the button beside it that opens the sound effects lab (components/dev/SfxLab.tsx); also development only.
-const SfxLabFab: typeof import("@/components/dev/SfxLabFab").SfxLabFab | null = __DEV__ ? require("@/components/dev/SfxLabFab").SfxLabFab : null;
+// Hidden for now: set SHOW_SFX_LAB to true to bring the button back.
+const SHOW_SFX_LAB = false;
+const SfxLabFab: typeof import("@/components/dev/SfxLabFab").SfxLabFab | null = __DEV__ && SHOW_SFX_LAB ? require("@/components/dev/SfxLabFab").SfxLabFab : null;
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -190,8 +195,11 @@ export default function HomeScreen() {
   // The unit whose references and resources are open in their modal
   const [refsUnitId, setRefsUnitId] = useState<string | null>(null);
 
-  /* Public-beta notice — shown once per notice id (see constants/beta.ts) */
+  /* Public-beta notice — shown once per notice id (see constants/beta.ts), and only once Shrodi's tour is over: a new learner
+     meets Shrodi first, and the notice would otherwise cover the tour's first beat */
+  const tourOver = useTourOver();
   useEffect(() => {
+    if (!tourOver) return;
     let cancelled = false;
     void getBetaNoticeSeen().then((seenId) => {
       if (!cancelled && seenId !== BETA_NOTICE_ID) {
@@ -201,7 +209,7 @@ export default function HomeScreen() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [tourOver]);
 
   const dismissBetaNotice = useCallback(() => {
     setBetaNoticeVisible(false);
@@ -239,7 +247,7 @@ export default function HomeScreen() {
   }, [units, c, isDark]);
   const completedKey = pathState.currentNodeId ?? "done";
 
-  // Finishing a lesson moves "next up" on, and the map announces it (docs/SFX_SPEC.md §6.2, and the duolingo-motion-style
+  // Finishing a lesson moves "next up" on, and the map announces it (docs/features/SFX_SPEC.md §6.2, and the duolingo-motion-style
   // skill): the node just completed stamps its check badge on, the next one pops, with the sound and a haptic on the pop.
   // It plays when the map is in front: a change that comes in while a lesson is still on top waits for the map to return.
   // The first value after loading (from nothing) is not an unlock.
@@ -402,6 +410,10 @@ export default function HomeScreen() {
   // The bubble opens under its node, or above it when there is no room below: the part of the map
   // that can be seen is under the lesson card and above the navbar. When neither side has room the
   // map is scrolled a little so the bubble can be seen.
+  // Shrodi's tour lights the current node and its bubble's button (docs/features/TUTORIAL_SPEC.md)
+  const nodeLit = useTutorialTarget("home.node.current", { radius: "round" });
+  const bubbleLit = useTutorialTarget("home.bubble.button", { radius: 20 });
+
   const selectNode = (node: { id: string; title: string; status: string }, unitTop: number, y: number) => {
     if (selected?.id === node.id) {
       setSelected(null);
@@ -419,6 +431,7 @@ export default function HomeScreen() {
       bandBottom,
     });
     setSelected({ id: node.id, side: choice.side });
+    if (node.status === "current") emitTutorial("node-bubble-opened");
     // A locked node says "not yet"; any other opens with a small pop
     void (node.status === "locked" ? playSfx("ui.lock") : playSfx("reward.pop", { volume: 0.7 }));
     // Start loading the preview now, while the learner reads the bubble
@@ -458,6 +471,7 @@ export default function HomeScreen() {
       if (data) {
         setPreview({ lessonId, data });
         setPreviewOpen(true);
+        emitTutorial("preview-opened");
       } else {
         // No preview to show (should not happen): the lesson screen has its own
         router.push(`/lesson/${lessonId}`);
@@ -477,9 +491,12 @@ export default function HomeScreen() {
   // A lesson left half way is asked about here, drawn inside the preview's own modal (a second modal over
   // it would not reliably show), so the lesson screen never has to open a dialog while the preview leaves.
   const [resumeAsk, setResumeAsk] = useState(false);
+  // The tour waits while "Continue or start again?" is up
+  useTutorialBusy(resumeAsk, "resume-lesson question");
   const openLesson = useCallback(
     (resume?: "continue" | "again") => {
       if (!preview) return;
+      emitTutorial("lesson-started");
       router.push({ pathname: "/lesson/[id]", params: resume ? { id: preview.lessonId, autostart: "1", resume } : { id: preview.lessonId, autostart: "1" } });
       setTimeout(() => setPreviewOpen(false), 150);
     },
@@ -569,6 +586,7 @@ export default function HomeScreen() {
                   palette={palette}
                   reveal={reveal?.completedId === node.id ? "completed" : reveal?.unlockedId === node.id ? "unlocked" : undefined}
                   revealKey={reveal?.key}
+                  litRef={node.status === "current" ? nodeLit.ref : undefined}
                   progress={
                     node.status === "current"
                       ? unitRingProgress(
@@ -601,6 +619,7 @@ export default function HomeScreen() {
                     index={i}
                     total={unit.levels.length}
                     palette={palette}
+                    buttonRef={bubbleLit.ref}
                     onLaunch={() => launchNode(node)}
                     onAction={() => handleNodePress(node)}
                   />
@@ -664,7 +683,7 @@ export default function HomeScreen() {
                         infoOpen ? "Hide unit details" : "Show unit details"
                       }
                       onPress={() => {
-                        // A panel that is not a dialog: its own open and close sounds (docs/SFX_EXPANSION_SPEC.md §6.3)
+                        // A panel that is not a dialog: its own open and close sounds (docs/features/SFX_EXPANSION_SPEC.md §6.3)
                         void playSfx(infoOpen ? "ui.panel-close" : "ui.panel-open");
                         setInfoOpen((o) => !o);
                       }}

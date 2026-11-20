@@ -1,5 +1,5 @@
 /**
- * Field Notes: the learner's private notebook on the phone (docs/PHONE_SPEC.md §10). Framework-free so
+ * Field Notes: the learner's private notebook on the phone (docs/features/PHONE_SPEC.md §10). Framework-free so
  * `scripts/test-field-notes.mjs` runs it on in-memory SQLite: the limits, the SQL over `field_notes`, and the
  * pure helpers the screens use (titles, previews, the source a clipping points back to, the character counter).
  *

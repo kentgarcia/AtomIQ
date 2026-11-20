@@ -15,6 +15,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { GrowCard, GrowModal, type Origin } from "@/components/ui/grow-modal";
 import { MODAL_MARGIN, ModalCard, type ModalCardProps } from "@/components/ui/modal-card";
+import { useTutorialBusy } from "@/hooks/use-tutorial";
 import { playSfx } from "@/services/sfx";
 import { useTheme } from "@/theme";
 
@@ -42,8 +43,10 @@ export function ModalDialog({
 }: ModalDialogProps) {
   const { theme } = useTheme();
   const insets = useSafeAreaInsets();
+  // Shrodi's tour stays out of the way of any open dialog (a level-up, a badge, a confirmation)
+  useTutorialBusy(visible, `dialog: ${typeof card.title === "string" ? card.title : "untitled"}`);
 
-  // Sound (docs/SFX_SPEC.md §6.1): opening, the X, and every other way out. `soundedClose` keeps a
+  // Sound (docs/features/SFX_SPEC.md §6.1): opening, the X, and every other way out. `soundedClose` keeps a
   // close that already played its own sound (the X) from playing a second one when `visible` flips.
   const wasVisible = useRef(visible);
   const soundedClose = useRef(false);

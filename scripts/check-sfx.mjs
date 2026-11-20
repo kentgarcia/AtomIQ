@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * SFX gate (docs/SFX_SPEC.md §9). Fails when:
+ * SFX gate (docs/features/SFX_SPEC.md §9). Fails when:
  *  - a bundled file has no cue, or a catalog file is missing on disk;
  *  - a WAV is not 16-bit PCM, mono, 44.1 kHz, carries a chunk over 1 KB besides its audio
  *    (a cover image sneaking back in), or its length differs from the catalog's `ms`;

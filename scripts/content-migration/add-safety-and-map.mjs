@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Safety Guide and Nuclear Map migration (docs/PHONE_SPEC.md §5.8, §5.9, §7.1). Idempotent and additive:
+ * Safety Guide and Nuclear Map migration (docs/features/PHONE_SPEC.md §5.8, §5.9, §7.1). Idempotent and additive:
  *
  *   1. Creates `safety_cards`, `safety_card_references`, `map_sites` and `map_site_references` (the `phone` block of schema.sql) when they are missing.
  *   2. Adds the sources the cards and sites stand on to `content_references` (only the missing ones), then seeds the cards and sites from

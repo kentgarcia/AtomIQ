@@ -5,7 +5,11 @@ import {
   useTabBarVisible,
 } from "@/components/layout";
 import { ClaimCoinLayer } from "@/components/quests/ClaimCoinLayer";
+import { measureViewRect, registerLockHit } from "@/components/tutorial/lock-hits";
+import { useTutorialTarget, type ViewRef } from "@/components/tutorial/use-tutorial-target";
+import { LockedDialog } from "@/components/ui/locked-dialog";
 import { useFeedUnseenCount } from "@/hooks/use-feed";
+import { useTabLocks } from "@/hooks/use-tutorial";
 import { usePhone } from "@/hooks/use-phone";
 import { playSfx } from "@/services/sfx";
 import { fontFaces, layout, useTheme } from "@/theme";
@@ -15,8 +19,10 @@ import { Image } from "expo-image";
 import { Redirect } from "expo-router";
 import { Tabs } from "expo-router/js-tabs";
 import { useStorage } from "@/services/StorageContext";
-import React, { useEffect } from "react";
+import type { TabName } from "@/services/tutorial-core";
+import React, { useEffect, useState } from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
+import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
 import Animated, {
   useAnimatedStyle,
@@ -46,7 +52,16 @@ const TabButton = ({
   activeColor,
   inactiveColor,
   dot,
+  lit,
+  locked,
+  wrapRef,
 }: {
+  /** The tab's wrapper view, for the tour's "press a locked tab" lookup (`lock-hits.ts`). */
+  wrapRef?: (node: ViewRef | null) => void;
+  /** Not open yet (Shrodi's tour opens the tabs one by one): dimmed, with a lock, and pressing it says why. */
+  locked?: boolean;
+  /** Shrodi's tour lights this tab through this ref (docs/features/TUTORIAL_SPEC.md). */
+  lit?: React.RefObject<ViewRef | null>;
   tab: { name: string; icon: number; label: string };
   isFocused: boolean;
   onPress: () => void;
@@ -82,7 +97,7 @@ const TabButton = ({
   });
 
   const handlePress = () => {
-    void playSfx("ui.tab");
+    void playSfx(locked ? "ui.invalid" : "ui.tab");
     if (reducedMotion) {
       scale.value = withTiming(0.99, { duration: 100, easing: EASE_OUT });
       setTimeout(() => {
@@ -98,23 +113,37 @@ const TabButton = ({
   };
 
   return (
+    <View
+      ref={(node) => {
+        if (lit) lit.current = node;
+        wrapRef?.(node);
+      }}
+      collapsable={false}
+      style={styles.tabButtonWrap}
+    >
     <TouchableOpacity
       onPress={handlePress}
       activeOpacity={1}
       accessibilityRole="tab"
-      accessibilityLabel={dot ? dot.label : tab.label}
+      accessibilityLabel={locked ? `${tab.label}, locked` : dot ? dot.label : tab.label}
+      // Not `disabled`: TouchableOpacity reads that as "ignore presses", and a locked tab must still answer with its dialog
       accessibilityState={{ selected: isFocused }}
       style={styles.tabButton}
     >
-      <Animated.View style={[styles.tabContent, animatedStyle]}>
+      <Animated.View style={[styles.tabContent, animatedStyle, locked ? styles.tabLocked : null]}>
         <View style={{ width: iconSize, height: iconSize }}>
           <Image
             source={tab.icon}
             style={{ width: iconSize, height: iconSize }}
             contentFit="contain"
           />
+          {locked ? (
+            <View pointerEvents="none" accessible={false} style={[styles.lockBadge, { backgroundColor: activeColor }]}>
+              <Icon name="Lock" size={10} color={inactiveColor} variant="Bold" />
+            </View>
+          ) : null}
           {/* The dot sits over the icon's corner, so the bar's height does not change */}
-          {dot ? (
+          {dot && !locked ? (
             <Animated.View
               pointerEvents="none"
               accessible={false}
@@ -144,8 +173,12 @@ const TabButton = ({
         </Text>
       </Animated.View>
     </TouchableOpacity>
+    </View>
   );
 };
+
+/** The tabs' names, for the dialog a locked tab opens. */
+const TAB_LABELS: Record<string, string> = { index: "Home", quests: "Quests", community: "Feed", phone: "Phone", awards: "Games", profile: "Profile" };
 
 function ModernTabBar({ state, emitter, navigateToTab }: BottomTabBarProps) {
   // Hooks must run before any early return (rules of hooks)
@@ -162,6 +195,37 @@ function ModernTabBar({ state, emitter, navigateToTab }: BottomTabBarProps) {
   // Anything new on the phone (an app waiting, an unread chat, an unread daily fact): a dot on the Phone tab.
   // The focused tab re-reads it, since progress made on another tab is what puts an app on the phone.
   const phone = usePhone(state.index);
+  // The tour lights the Feed and Phone tabs (hooks stay above the early return)
+  const feedTab = useTutorialTarget("tab.feed");
+  const phoneTab = useTutorialTarget("tab.phone");
+  // Shrodi's tour opens the tabs one by one (docs/features/TUTORIAL_SPEC.md §15)
+  const locks = useTabLocks();
+  const [lockedName, setLockedName] = useState<string | null>(null);
+  // A locked tab still answers a press while the tour's dim is up: the layer asks these for the tab under a tap
+  const tabViews = React.useRef<Record<string, ViewRef | null>>({});
+  const locksRef = React.useRef(locks);
+  locksRef.current = locks;
+  useEffect(() => {
+    const offs = Object.keys(TAB_LABELS)
+      .filter((name) => name !== "index")
+      .map((name) =>
+        registerLockHit(`tab:${name}`, {
+          rect: () => measureViewRect(tabViews.current[name]),
+          open: () => setLockedName(TAB_LABELS[name]),
+          active: () => locksRef.current.isLocked(name as TabName),
+        }),
+      );
+    return () => offs.forEach((off) => off());
+  }, []);
+  const focusedName = state.routes[state.index]?.name;
+  const homeKey = state.routes.find((r) => r.name === "index")?.key;
+  // Whatever put the learner on a locked tab (a link, a restored screen) is sent back to Home
+  useEffect(() => {
+    if (focusedName && focusedName !== "index" && locks.isLocked(focusedName as TabName) && homeKey) {
+      setLockedName(TAB_LABELS[focusedName] ?? focusedName);
+      navigateToTab(homeKey);
+    }
+  }, [focusedName, locks, homeKey, navigateToTab]);
   if (!barVisible) return null;
 
   const THEME = theme.palettes.tabBar;
@@ -216,6 +280,11 @@ function ModernTabBar({ state, emitter, navigateToTab }: BottomTabBarProps) {
                 canPreventDefault: true,
               });
 
+              if (locks.blocks(tab.name as TabName)) {
+                // Locked: say why. (Before the tour has been read nothing is shown as locked, and a press just waits.)
+                if (locks.isLocked(tab.name as TabName)) setLockedName(tab.label);
+                return;
+              }
               if (!isFocused && !event.defaultPrevented) {
                 navigateToTab(state.routes[routeIndex].key);
               }
@@ -233,6 +302,11 @@ function ModernTabBar({ state, emitter, navigateToTab }: BottomTabBarProps) {
                 labelGap={metrics.labelGap}
                 activeColor={THEME.active}
                 inactiveColor={THEME.inactive}
+                locked={locks.isLocked(tab.name as TabName)}
+                wrapRef={(node) => {
+                  tabViews.current[tab.name] = node;
+                }}
+                lit={tab.name === "community" ? feedTab.ref : tab.name === "phone" ? phoneTab.ref : undefined}
                 dot={
                   tab.name === "community" && unseenPosts > 0
                     ? { color: theme.colors.error, ring: THEME.bg, label: "Feed, new posts" }
@@ -246,6 +320,8 @@ function ModernTabBar({ state, emitter, navigateToTab }: BottomTabBarProps) {
           </View>
         </View>
       </View>
+
+      <LockedDialog visible={lockedName !== null} title={lockedName ?? ""} text={locks.hint} onClose={() => setLockedName(null)} />
 
       {/* Above the bar and every screen: the XP coins of a quest claim land on the Profile tab */}
       <ClaimCoinLayer tabsRowRef={tabsRowRef} tabCount={tabs.length} />
@@ -330,6 +406,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
   },
+  tabButtonWrap: { flex: 1 },
   tabButton: {
     flex: 1,
     minHeight: layout.minTouchTarget,
@@ -337,6 +414,17 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   tabContent: {
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  tabLocked: { opacity: 0.45 },
+  lockBadge: {
+    position: "absolute",
+    right: -6,
+    bottom: -4,
+    width: 16,
+    height: 16,
+    borderRadius: 8,
     alignItems: "center",
     justifyContent: "center",
   },

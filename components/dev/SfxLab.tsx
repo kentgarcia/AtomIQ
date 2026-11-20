@@ -1,5 +1,5 @@
 /**
- * The SFX lab (development only): every moment docs/SFX_EXPANSION_SPEC.md proposes a sound for, with
+ * The SFX lab (development only): every moment docs/features/SFX_EXPANSION_SPEC.md proposes a sound for, with
  * the candidate sounds to tap and listen to. The first candidate of an undecided moment is the
  * recommended pick (a star); a green tick marks what the owner chose (`LAB_DECISIONS`, with the pitch
  * they liked already applied); the grey "Today" button plays what the app does there now.
@@ -277,7 +277,7 @@ export function SfxLab() {
       >
         {moments.map(renderMoment)}
         <Text style={styles.foot}>
-          Tick = chosen, star = recommended where nothing is chosen yet. "Today" and "before wiring" are what played before the chosen sounds went into the app. The files come from the uploaded library, converted and levelled the way the bundled sounds are. Nothing here is wired into the app yet.
+          Tick = chosen, star = recommended where nothing is chosen yet. &quot;Today&quot; and &quot;before wiring&quot; are what played before the chosen sounds went into the app. The files come from the uploaded library, converted and levelled the way the bundled sounds are. Nothing here is wired into the app yet.
         </Text>
       </ScrollView>
     </View>

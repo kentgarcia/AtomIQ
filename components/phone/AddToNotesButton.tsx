@@ -1,6 +1,6 @@
 /**
  * "Add to Field Notes": clips a line from an AtomDex entry or a daily fact into the learner's notebook and opens the
- * note to edit (docs/PHONE_SPEC.md §10). It only shows once the Field Notes app is installed on the phone, and a source
+ * note to edit (docs/features/PHONE_SPEC.md §10). It only shows once the Field Notes app is installed on the phone, and a source
  * is clipped once: when it already is, the button says "In Field Notes" and opens that note instead.
  */
 

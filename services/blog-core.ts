@@ -1,5 +1,5 @@
 /**
- * Mini blog pieces, the framework-free part (docs/NPC_FEED_SPEC.md §4.3, §5.2): whether a piece is
+ * Mini blog pieces, the framework-free part (docs/features/NPC_FEED_SPEC.md §4.3, §5.2): whether a piece is
  * unlocked and how long it takes to read. The validator uses `wordCount` and `readingMinutes` too.
  */
 

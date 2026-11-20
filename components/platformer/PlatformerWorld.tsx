@@ -1,5 +1,5 @@
 /**
- * Draws the platformer world (docs/PLATFORMER_SPEC.md §5). Nothing here decides anything: the screen
+ * Draws the platformer world (docs/features/PLATFORMER_SPEC.md §5). Nothing here decides anything: the screen
  * steps `platformer-core`, writes one array of pixel numbers per frame into `frame` (see `fillFrame`
  * in platformer-view.ts) and every moving thing reads its own slice of it on the UI thread, so a
  * frame is one write however many things move. The ground is built in chunks of columns and only

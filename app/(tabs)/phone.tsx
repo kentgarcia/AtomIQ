@@ -1,5 +1,5 @@
 /**
- * Phone: the learner's own fictional smartphone (docs/PHONE_SPEC.md). A home screen of apps on the learner's
+ * Phone: the learner's own fictional smartphone (docs/features/PHONE_SPEC.md). A home screen of apps on the learner's
  * paint and pattern. Apps are pushed routes above the tabs, so the tab bar is hidden inside them and back is the
  * home button. The phone starts with a few apps and installs more as the learner progresses (`services/phone-core.ts`);
  * each arrival plays an install moment here, and the very first open hands the phone over with a line from Shrodi.
@@ -12,21 +12,29 @@ import {
 import { PatternLayer } from "@/components/avatar/PatternLayer";
 import { HeaderButton, ScreenHeader, useTabBarInset } from "@/components/layout";
 import { contrastBetween } from "@/components/lesson/visual/color-math";
-import { settle } from "@/components/motion/settle";
 import { AppIcon } from "@/components/phone/AppIcon";
-import { INSTALL, installStart, introLineAt } from "@/components/phone/phone-fx-core";
+import { installStart } from "@/components/phone/phone-fx-core";
 import { WALLPAPERS } from "@/components/phone/wallpaper-art";
 import { OWN_WALLPAPER, isIllustrated } from "@/components/phone/wallpaper-core";
 import { WallpaperLayer } from "@/components/phone/WallpaperLayer";
+import { Icon } from "@/components/ui/icon";
+import { ModalButton } from "@/components/ui/modal-card";
+import { ModalDialog } from "@/components/ui/modal-dialog";
 import { Text } from "@/components/ui/text";
+import { useTutorialTarget } from "@/components/tutorial/use-tutorial-target";
+import { useTutorialBusy } from "@/hooks/use-tutorial";
+import { emitTutorial } from "@/services/tutorial";
 import { usePhone } from "@/hooks/use-phone";
 import { usePhoneWallpaper } from "@/hooks/use-phone-wallpaper";
 import { useStorage } from "@/services/StorageContext";
+import { contentRepository } from "@/services/content-db";
 import {
   APPS_PER_PAGE,
   INSTALLS_PER_VISIT,
+  PHONE_APPS,
   gridColumns,
   pagesOf,
+  unlockRequirement,
   type PhoneApp,
 } from "@/services/phone-core";
 import { playSfx, playSfxSequence, warmSfxGroup } from "@/services/sfx";
@@ -47,15 +55,12 @@ import React, {
   useState,
 } from "react";
 import {
-  Image,
   ScrollView,
   View,
   type NativeScrollEvent,
   type NativeSyntheticEvent,
 } from "react-native";
-import Animated, { useReducedMotion } from "react-native-reanimated";
 
-const SHRODI = require("@/assets/images/mascot/happy.png");
 
 /** The hand-over brings all five starting apps in; later visits bring in at most `INSTALLS_PER_VISIT`. */
 const INTRO_APPS = 5;
@@ -90,6 +95,9 @@ export default function PhoneScreen() {
   // Progress made on another tab is what puts an app on the phone, so each visit reads again and waits for that
   // read before choosing what to install (a read that started before the tab gained focus may be stale)
   const [minVersion, setMinVersion] = useState(0);
+  // A batch is only chosen while the tab is in front: the tab stays mounted under other pages, and a batch picked
+  // behind them would play its sound and its install moment where the learner cannot see it
+  const [focused, setFocused] = useState(false);
   const versionRef = useRef(0);
   useEffect(() => {
     versionRef.current = phone.version;
@@ -98,8 +106,10 @@ export default function PhoneScreen() {
   useFocusEffect(
     useCallback(() => {
       setMinVersion(versionRef.current + 1);
+      setFocused(true);
       refresh();
       return () => {
+        setFocused(false);
         setBatch(null);
         // The hand-over has played: the next visit is an ordinary one
         if (introFinished.current) setIntro(false);
@@ -109,6 +119,7 @@ export default function PhoneScreen() {
   useEffect(() => {
     if (
       batch !== null ||
+      !focused ||
       !phone.loaded ||
       phone.version < minVersion ||
       intro === null
@@ -119,13 +130,11 @@ export default function PhoneScreen() {
         .slice(0, intro ? INTRO_APPS : INSTALLS_PER_VISIT)
         .map((a) => a.id),
     );
-  }, [batch, phone.loaded, phone.version, minVersion, phone.newApps, intro]);
+  }, [batch, focused, phone.loaded, phone.version, minVersion, phone.newApps, intro]);
 
   const batchApps = batch ?? [];
-  const reduced = useReducedMotion();
-  // The sounds of a batch, once per batch: the hand-over is one short run of three; a later arrival is the install at
-  // the pop of `reward.pop` as it lands (the same clock as AppIcon's install moment). Reduced motion has no moment, so
-  // one pop plays.
+  // The hand-over's opening chime, once per batch. Every install, the hand-over's too, pops with `reward.pop` as its icon
+  // lands, played by AppIcon on its own install clock.
   const soundedBatch = useRef<string[] | null>(null);
   useEffect(() => {
     warmSfxGroup("phone");
@@ -140,18 +149,17 @@ export default function PhoneScreen() {
         { cue: "phone.start-3", at: 460 },
       ]);
     }
-    if (reduced) {
-      void playSfx("reward.pop");
-      return;
-    }
-    const timers = batch.map((_, i) => setTimeout(() => void playSfx("reward.pop"), installStart(i) + INSTALL.popAt));
-    return () => timers.forEach(clearTimeout);
-  }, [batch, intro, reduced]);
+    // A later arrival's pops are played by each icon as it installs (AppIcon), not here
+  }, [batch, intro]);
   const done = useRef(new Set<string>());
+  // Shrodi's tour waits for the apps of this visit to finish installing, then lights Chats (docs/features/TUTORIAL_SPEC.md §5.3)
+  const [installsDone, setInstallsDone] = useState(false);
+  const chatsLit = useTutorialTarget("phone.app.chats", { radius: 22 });
   const finished = useCallback(
     (app: PhoneApp, isIntro: boolean) => {
       if (done.current.has(app.id)) return;
       done.current.add(app.id);
+      if (batchApps.every((id) => done.current.has(id))) setInstallsDone(true);
       // The starting apps arrive already opened (no "New" dot on five icons at once)
       phone.markSeen(app.id, isIntro);
       if (isIntro && batchApps.every((id) => done.current.has(id))) {
@@ -163,20 +171,48 @@ export default function PhoneScreen() {
   );
   // A visit's `done` is for that visit's batch only
   useEffect(() => {
-    if (batch === null) done.current = new Set();
+    if (batch === null) {
+      done.current = new Set();
+      setInstallsDone(false);
+    }
   }, [batch]);
+  useTutorialBusy(focused && (!phone.loaded || (batchApps.length > 0 && !installsDone)), "phone installs");
 
-  // What shows: installed apps and the ones installing now. Apps waiting for a later visit stay off the grid.
+  // What shows: every live app, in catalog order. Installed apps and the ones installing now are open; all the
+  // rest (not unlocked yet, or unlocked and waiting for a later visit to install) sit behind a lock.
   const visible = useMemo(() => {
     if (batch === null) return [] as PhoneApp[];
-    const inBatch = new Set(batch);
-    const seenNow = new Set(
-      phone.apps
-        .filter((a) => !phone.newApps.some((n) => n.id === a.id))
-        .map((a) => a.id),
-    );
-    return phone.apps.filter((a) => inBatch.has(a.id) || seenNow.has(a.id));
+    return PHONE_APPS.filter((a) => a.status === "live");
+  }, [batch]);
+  const installedIds = useMemo(() => {
+    const inBatch = new Set(batch ?? []);
+    const seenNow = phone.apps.filter((a) => !phone.newApps.some((n) => n.id === a.id));
+    return new Set([...inBatch, ...seenNow.map((a) => a.id)]);
   }, [batch, phone.apps, phone.newApps]);
+
+  // Unit names for "Finish the unit ..." in a locked app's dialog
+  const [unitTitles, setUnitTitles] = useState<Record<string, string>>({});
+  useEffect(() => {
+    let alive = true;
+    void contentRepository
+      .getUnits()
+      .then((units) => {
+        if (alive) setUnitTitles(Object.fromEntries(units.map((u) => [u.id, u.title])));
+      })
+      .catch(() => {});
+    return () => {
+      alive = false;
+    };
+  }, []);
+  const [lockedApp, setLockedApp] = useState<PhoneApp | null>(null);
+  const lockedInfo = useMemo(() => {
+    if (!lockedApp) return null;
+    // Unlocked already, only waiting for its arrival on the next visit
+    if (phone.apps.some((a) => a.id === lockedApp.id)) {
+      return { text: "You've unlocked this app! It arrives the next time you open your phone.", progress: null };
+    }
+    return unlockRequirement(lockedApp.unlock, phone.progress, (id) => unitTitles[id]);
+  }, [lockedApp, phone.apps, phone.progress, unitTitles]);
 
   const cols = gridColumns(width);
   const pages = useMemo(() => pagesOf(visible, APPS_PER_PAGE), [visible]);
@@ -198,8 +234,13 @@ export default function PhoneScreen() {
   );
 
   const open = (app: PhoneApp) => {
+    if (!installedIds.has(app.id)) {
+      setLockedApp(app);
+      return;
+    }
     void playSfx("phone.app-open");
     phone.markOpened(app.id);
+    if (app.id === "chats") emitTutorial("app-opened:chats");
     router.push(app.route as never);
   };
 
@@ -215,8 +256,6 @@ export default function PhoneScreen() {
         ? c.text
         : c.mapBackground
       : c.text);
-
-  const showIntroLine = intro === true && batchApps.length > 0;
 
   return (
     <View style={[styles.container, { backgroundColor: paint }]}>
@@ -244,7 +283,7 @@ export default function PhoneScreen() {
         }
       />
 
-      <View style={styles.wallpaper}>
+      <View style={[styles.wallpaper, { paddingBottom: tabBarInset + 16 }]}>
         <View style={[styles.frame, { maxWidth: contentMaxWidth }]}>
           {/* Nothing is drawn until the phone knows what is installing, so no finished icon shows for a frame first */}
           {batch !== null ? (
@@ -261,9 +300,12 @@ export default function PhoneScreen() {
                   <View style={[styles.grid, { paddingHorizontal: gutter }]}>
                     {pageApps.map((app) => {
                       const batchIndex = batchApps.indexOf(app.id);
+                      const locked = !installedIds.has(app.id);
                       return (
                         <View
                           key={app.id}
+                          ref={app.id === "chats" ? chatsLit.ref : undefined}
+                          collapsable={false}
                           style={{
                             width: `${100 / cols}%`,
                             alignItems: "center",
@@ -273,8 +315,9 @@ export default function PhoneScreen() {
                           <AppIcon
                             app={app}
                             size={tile}
-                            badge={phone.badgeOf(app)}
-                            label={phone.labelOf(app)}
+                            badge={locked ? null : phone.badgeOf(app)}
+                            label={locked ? `${app.name}, locked` : phone.labelOf(app)}
+                            locked={locked}
                             onPress={() => open(app)}
                             install={
                               batchIndex >= 0
@@ -318,46 +361,29 @@ export default function PhoneScreen() {
           ) : null}
         </View>
 
-        {showIntroLine ? (
-          <View
-            style={[
-              styles.introWrap,
-              { paddingBottom: tabBarInset + 16, maxWidth: contentMaxWidth },
-            ]}
-            pointerEvents="none"
-          >
-            {/* The line arrives once the last icon has popped in */}
-            <IntroLine delay={introLineAt(batchApps.length)} />
-          </View>
-        ) : null}
       </View>
-    </View>
-  );
-}
 
-function IntroLine({ delay }: { delay: number }) {
-  const { theme } = useTheme();
-  const styles = useMemo(() => makeStyles(theme), [theme]);
-  const c = theme.colors;
-  return (
-    <Animated.View entering={settle(delay)} style={styles.introRow}>
-      <Image
-        source={SHRODI}
-        style={styles.shrodi}
-        resizeMode="contain"
-        accessible={false}
-      />
-      <View
-        style={[
-          styles.bubble,
-          { backgroundColor: c.card, borderColor: c.border },
-        ]}
+      <ModalDialog
+        visible={lockedApp !== null}
+        onClose={() => setLockedApp(null)}
+        title={lockedApp?.name ?? ""}
+        dismissOnScrim
+        footer={<ModalButton label="Got it" onPress={() => setLockedApp(null)} />}
       >
-        <Text style={[styles.bubbleText, { color: c.text }]}>
-          This is your phone. New apps arrive as you learn.
-        </Text>
-      </View>
-    </Animated.View>
+        <View style={styles.lockRow}>
+          <View style={[styles.lockBadge, { backgroundColor: withAlpha(c.textMuted, 0.18) }]}>
+            <Icon name="Lock" size={26} color={c.textMuted} variant="Bold" />
+          </View>
+          <View style={styles.lockText}>
+            <Text style={[styles.lockHeading, { color: c.text }]}>Locked</Text>
+            <Text style={[styles.lockBody, { color: c.text }]}>{lockedInfo?.text}</Text>
+          </View>
+        </View>
+        {lockedInfo?.progress ? (
+          <Text style={[styles.lockProgress, { color: c.textMuted }]}>{lockedInfo.progress}</Text>
+        ) : null}
+      </ModalDialog>
+    </View>
   );
 }
 
@@ -365,9 +391,11 @@ const makeStyles = createStyles((theme) => {
   return {
     container: { flex: 1, overflow: "hidden" },
     wallpaper: { flex: 1 },
-    frame: { flex: 1, width: "100%", alignSelf: "center", paddingTop: 24 },
+    frame: { flex: 1, width: "100%", alignSelf: "center", paddingTop: 8 },
     pager: { flexGrow: 0 },
-    page: {},
+    // The pager is a horizontal ScrollView, which clips whatever pokes out of the first row (the badge sits 5 dp
+    // above its tile and the install pop swells past it), so that room is padding inside the page
+    page: { paddingTop: 16 },
     grid: { flexDirection: "row", flexWrap: "wrap", rowGap: 0 },
     dots: {
       flexDirection: "row",
@@ -376,26 +404,17 @@ const makeStyles = createStyles((theme) => {
       marginTop: 4,
     },
     pageDot: { width: 8, height: 8, borderRadius: 4 },
-    introWrap: {
-      position: "absolute",
-      left: 0,
-      right: 0,
-      bottom: 0,
-      alignSelf: "center",
-      width: "100%",
-      paddingHorizontal: 16,
+    lockRow: { flexDirection: "row", alignItems: "center", gap: 14 },
+    lockBadge: {
+      width: 52,
+      height: 52,
+      borderRadius: 26,
+      alignItems: "center",
+      justifyContent: "center",
     },
-    introRow: { flexDirection: "row", alignItems: "flex-end", gap: 8 },
-    shrodi: { width: 72, height: 72 },
-    bubble: {
-      flex: 1,
-      borderRadius: 18,
-      borderWidth: 2,
-      borderBottomWidth: 4,
-      paddingHorizontal: 14,
-      paddingVertical: 12,
-      marginBottom: 12,
-    },
-    bubbleText: { fontSize: 15, lineHeight: 21, ...fontFaces.bold },
+    lockText: { flex: 1, gap: 2 },
+    lockHeading: { fontSize: 13, lineHeight: 18, ...fontFaces.heavy },
+    lockBody: { fontSize: 16, lineHeight: 22, ...fontFaces.bold },
+    lockProgress: { fontSize: 14, lineHeight: 20, ...fontFaces.bold },
   };
 });

@@ -1,5 +1,5 @@
 /**
- * Field Notes (docs/PHONE_SPEC.md §10): the learner's private notebook. The header is the top of a yellow legal pad (a binding
+ * Field Notes (docs/features/PHONE_SPEC.md §10): the learner's private notebook. The header is the top of a yellow legal pad (a binding
  * strip with a perforated edge, `NotepadFrame.tsx`); under it is a plain page: a search, the tabs (all, written by me, clipped)
  * with a highlighter mark under the chosen one, and a list of notes, each with a small coloured face for what it is (written,
  * AtomDex, daily fact, scan, lesson), its title, a line of what is written and the date. A round pen button starts a new note.

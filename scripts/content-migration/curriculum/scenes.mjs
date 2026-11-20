@@ -676,7 +676,7 @@ export function atomHotspot() {
 }
 
 // ---------------------------------------------------------------------------
-// Unit 2: Radioactivity (docs/UNIT_2_RADIOACTIVITY_SPEC.md)
+// Unit 2: Radioactivity (docs/features/UNIT_2_RADIOACTIVITY_SPEC.md)
 // ---------------------------------------------------------------------------
 
 /** A trembling copy of some circles: the picture of an unstable nucleus. */

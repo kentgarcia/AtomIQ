@@ -925,14 +925,136 @@
       "position": 8
     },
     {
+      "id": "chat-shrodi-tour-end",
+      "npc_id": "shrodi",
+      "kind": "sign_off",
+      "trigger": null,
+      "title": null,
+      "text": "That is the tour. Now it is your turn to explore.\n\nI am right here in your phone if you need me.",
+      "pose": "proud",
+      "replies": [],
+      "position": 17
+    },
+    {
+      "id": "chat-shrodi-tour-games",
+      "npc_id": "shrodi",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "Games is where you practise. In Atom Maze you run and jump, and answer questions to beat enemies.\n\n[[pic:tour-games]]\n\nMyth Buster is a quick round of fact or myth.",
+      "pose": "cheer",
+      "replies": [
+        {
+          "label": "Next",
+          "next": "chat-shrodi-tour-profile"
+        },
+        {
+          "label": "Skip the rest",
+          "next": "chat-shrodi-tour-end"
+        }
+      ],
+      "position": 14
+    },
+    {
+      "id": "chat-shrodi-tour-map",
+      "npc_id": "shrodi",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "Home is your map. Each circle is a lesson.\n\n[[pic:tour-map]]\n\nFinish one and the next circle opens. After a few lessons a new unit begins, with a new teacher.",
+      "pose": "point",
+      "replies": [
+        {
+          "label": "Next",
+          "next": "chat-shrodi-tour-quests"
+        },
+        {
+          "label": "Skip the rest",
+          "next": "chat-shrodi-tour-end"
+        }
+      ],
+      "position": 12
+    },
+    {
+      "id": "chat-shrodi-tour-phone",
+      "npc_id": "shrodi",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "And this is your phone. Teachers write to you in Chats, AtomDex is the encyclopedia, and new apps arrive as you learn.\n\n[[pic:tour-phone]]\n\nThere is a lot to find. Take your time.",
+      "pose": "point",
+      "replies": [
+        {
+          "label": "Open AtomDex",
+          "action": {
+            "screen": "app",
+            "id": "atomdex"
+          }
+        },
+        {
+          "label": "Got it",
+          "next": "chat-shrodi-tour-end"
+        },
+        {
+          "label": "Tell me again",
+          "next": "chat-shrodi-tour-map"
+        }
+      ],
+      "position": 16
+    },
+    {
+      "id": "chat-shrodi-tour-profile",
+      "npc_id": "shrodi",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "Profile is your explorer passport: your level, your badges and your streak.\n\n[[pic:tour-profile]]\n\nAfter your second lesson the Shop opens: spend diamonds on hair, outfits and more.",
+      "pose": "explain",
+      "replies": [
+        {
+          "label": "Next",
+          "next": "chat-shrodi-tour-phone"
+        },
+        {
+          "label": "Skip the rest",
+          "next": "chat-shrodi-tour-end"
+        }
+      ],
+      "position": 15
+    },
+    {
+      "id": "chat-shrodi-tour-quests",
+      "npc_id": "shrodi",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "Quests are small goals for the day and the week.\n\n[[pic:tour-quests]]\n\nFinish them to claim XP, then open the chest for diamonds.",
+      "pose": "point",
+      "replies": [
+        {
+          "label": "Next",
+          "next": "chat-shrodi-tour-games"
+        },
+        {
+          "label": "Skip the rest",
+          "next": "chat-shrodi-tour-end"
+        }
+      ],
+      "position": 13
+    },
+    {
       "id": "chat-shrodi-up-first",
       "npc_id": "shrodi",
       "kind": "unprompted",
       "trigger": "lessons_completed:1",
       "title": "Your first lesson!",
-      "text": "You finished your first lesson!\n\nThat is how every scientist starts: one question at a time.\n\nThe map has more waiting for you.",
+      "text": "You finished your first lesson!\n\nThat is how every scientist starts: one question at a time.\n\nWant a quick tour of AtomIQ? It takes about a minute.",
       "pose": "cheer",
       "replies": [
+        {
+          "label": "Show me around",
+          "next": "chat-shrodi-tour-map"
+        },
         {
           "label": "What should I do next?",
           "next": "chat-shrodi-next"

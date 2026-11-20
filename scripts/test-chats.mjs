@@ -100,7 +100,8 @@ test("an action must point at something that exists and is built", () => {
   assert.ok(withAction({ screen: "practice", id: "u9-n9" }).includes("chat-action-id"));
   assert.deepEqual(withAction({ screen: "mythbuster", id: "u1" }), []);
   assert.ok(withAction({ screen: "mythbuster", id: "u9" }).includes("chat-action-id"));
-  assert.ok(withAction({ screen: "app", id: "camera" }).includes("chat-action-app"));
+  // Every catalog app is live now, so a real app id is accepted (the "not built yet" rule fires only for a planned one)
+  assert.deepEqual(withAction({ screen: "app", id: "camera" }), []);
   assert.ok(withAction({ screen: "app", id: "nope" }).includes("chat-action-id"));
 });
 
@@ -336,6 +337,35 @@ test("the bubbles of one message are one unread letter", () => {
   assert.equal(core.totalUnread(ms), 3);
 });
 
+test("tour pictures: the markers are read whole, the content vocabulary lists the same ids, every scene is drawn in its frame", async () => {
+  const tour = await import(pathToFileURL(path.resolve("components/phone/tour-art.ts")).href);
+  const vocab = await import(pathToFileURL(path.resolve("scripts/lib/chat-vocab.mjs")).href);
+  assert.deepEqual([...tour.TOUR_PICTURE_IDS], vocab.CHAT_PICTURES);
+  for (const id of tour.TOUR_PICTURE_IDS) {
+    assert.ok(tour.tourArt(id)?.length > 5, `${id} has a picture`);
+    assert.ok(tour.tourArtName(id) !== id, `${id} has a name`);
+    assert.equal(core.pictureOf(`[[pic:${id}]]`), id);
+    for (const sh of tour.tourArt(id)) {
+      const box = sh.t === "rect" ? [sh.x, sh.y, sh.x + sh.w, sh.y + sh.h] : sh.t === "circle" ? [sh.cx - sh.r, sh.cy - sh.r, sh.cx + sh.r, sh.cy + sh.r] : null;
+      if (box) assert.ok(box[0] >= -1 && box[1] >= -1 && box[2] <= 201 && box[3] <= 121, `${id} stays in its frame`);
+    }
+  }
+  assert.equal(core.pictureOf("  [[pic:tour-map]]  "), "tour-map");
+  assert.equal(core.pictureOf("[[pic:nope]]"), null, "an unknown id is plain text");
+  assert.equal(core.pictureOf("See [[pic:tour-map]]"), null, "a marker inside a sentence is plain text");
+  const msg = { id: "m", threadId: "t", nodeId: "n", sender: "npc:shrodi", text: "[[pic:tour-map]]", kind: "text", targetId: null, at: 1, read: true };
+  assert.match(core.lastLine(msg), /picture/i);
+});
+
+test("the content rules read picture markers: a good one passes, a typo, an unknown id and an opening picture are errors", () => {
+  const pic = (text) => goodNodes().map((x) => (x.id === "npc-ada-a" ? { ...x, text } : x));
+  const bad = (text) => errors(pic(text)).filter((r) => r.startsWith("chat-picture"));
+  assert.deepEqual(bad("Hello.\n\n[[pic:tour-map]]"), []);
+  assert.deepEqual(bad("Hello.\n\n[[pic:nope]]"), ["chat-picture-id"]);
+  assert.deepEqual(bad("Hello.\n\n[[pic: tour-map]]"), ["chat-picture-marker"]);
+  assert.deepEqual(bad("[[pic:tour-map]]\n\nHello."), ["chat-picture-first"]);
+});
+
 test("the reactions and stickers are drawn, named, and the content vocabulary lists the same ids", async () => {
   const art = await import(pathToFileURL(path.resolve("components/phone/chat-art.ts")).href);
   const vocab = await import(pathToFileURL(path.resolve("scripts/lib/chat-vocab.mjs")).href);
@@ -501,4 +531,27 @@ test("Shrodi, the mascot, chats like a teacher without being in the cast", () =>
   const input = base({ lessonsCompleted: 1 });
   assert.deepEqual(core.earnedStories(story, input, ["shrodi"], []).map((u) => u.event), ["lessons_completed:1"]);
   assert.equal(core.earnedStories(story, input, [], []).length, 0, "only from a sender in Contacts");
+});
+
+test("a conversation's colours come from the teacher's outfit, with text that reads on it", async () => {
+  const { chatPalette } = await import(pathToFileURL(path.resolve("components/phone/chat-palette.ts")).href);
+  const { contrastBetween } = await import(pathToFileURL(path.resolve("components/lesson/visual/color-math.ts")).href);
+  const bee = chatPalette({ color: "#FFC800", shade: "#E6A800" });
+  const whale = chatPalette({ color: "#1B7FB5", shade: "#14597F" });
+  assert.equal(bee.base, "#FFC800");
+  assert.equal(bee.onIsLight, false, "dark ink on the yellow");
+  assert.equal(whale.onIsLight, true, "white on a deep blue");
+  for (const p of [bee, whale]) assert.ok(contrastBetween(p.base, p.on) >= 3);
+});
+
+test("every teacher's bubble face and link button read at 4.5:1, Ada's bright blue included", async () => {
+  const { chatPalette, READABLE } = await import(pathToFileURL(path.resolve("components/phone/chat-palette.ts")).href);
+  const { contrastBetween } = await import(pathToFileURL(path.resolve("components/lesson/visual/color-math.ts")).href);
+  const { NPC_ROSTER } = await import(pathToFileURL(path.resolve("components/npc/npc-roster.ts")).href);
+  assert.ok(NPC_ROSTER.length >= 7);
+  for (const n of NPC_ROSTER) {
+    const p = chatPalette(n.spec.outfit);
+    assert.ok(contrastBetween(p.face, p.faceOn) >= READABLE, `${n.name} face ${p.face} on ${p.faceOn}`);
+    assert.ok(contrastBetween(p.base, p.on) >= 3, `${n.name} header`);
+  }
 });

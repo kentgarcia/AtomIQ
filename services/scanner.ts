@@ -1,5 +1,5 @@
 /**
- * The Atom Scanner's runtime (docs/PHONE_SPEC.md §8): loads the targets from the content database, binds `scans` to
+ * The Atom Scanner's runtime (docs/features/PHONE_SPEC.md §8): loads the targets from the content database, binds `scans` to
  * the user-state database, and tells listeners when a scan was recorded. The rules are in
  * `components/scanner/scanner-core.ts`. Nothing here needs a camera or a permission, and nothing throws into a screen.
  */

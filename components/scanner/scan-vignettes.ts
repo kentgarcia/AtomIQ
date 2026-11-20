@@ -1,5 +1,5 @@
 /**
- * The Atom Scanner's little scenes (docs/PHONE_SPEC.md §8): each scannable thing is drawn as a small scene of its own, not as a
+ * The Atom Scanner's little scenes (docs/features/PHONE_SPEC.md §8): each scannable thing is drawn as a small scene of its own, not as a
  * lone picture on a plate: a glass of water with a drop beside it, a shaker with a pile of salt, a bowl of rice and chopsticks, a hand
  * under a tap, a blood vessel with its cells. Pure data with no framework imports, like `scan-scenes.ts`, so Node tests can check it and
  * `scripts/render-scan-scenes.mjs` can draw it. Every vignette lives in the lesson object art's 100 x 100 frame (flat colour, no

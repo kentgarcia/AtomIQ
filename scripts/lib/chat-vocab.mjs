@@ -1,5 +1,5 @@
 /**
- * The NPC chat vocabulary (docs/PHONE_SPEC.md §5.2 and §7), as plain data and a few pure helpers.
+ * The NPC chat vocabulary (docs/features/PHONE_SPEC.md §5.2 and §7), as plain data and a few pure helpers.
  *
  * Framework-free and dependency-free on purpose: the validator (scripts/lib/chat-rules.mjs), the Content
  * Studio and the app's chat core (services/chat-core.ts) all read the same names, so the app mirrors this
@@ -51,6 +51,14 @@ export const CHAT_TRIGGER_KINDS = {
 export const CHAT_REPLY_TYPES = ["text", "emoji", "react"];
 export const CHAT_REACTIONS = ["like", "love", "haha", "wow", "think", "clap"];
 export const CHAT_STICKERS = ["mind-blown", "party", "atom", "banana", "radiation", "sleepy", "nerd", "star"];
+
+/**
+ * A part of a node's text that is only `[[pic:<id>]]` is drawn as a picture (Shrodi's tour: what each screen looks like). The ids
+ * are the scenes of `components/phone/tour-art.ts` (a test keeps them equal). A picture needs a bubble of text before it, so it
+ * never opens a message on its own.
+ */
+export const CHAT_PICTURES = ["tour-map", "tour-quests", "tour-games", "tour-profile", "tour-phone"];
+export const CHAT_PICTURE_RE = /^\[\[pic:([a-z0-9-]+)\]\]$/;
 
 /** A story's subject line fits the list row. */
 export const CHAT_TITLE_MAX = 40;

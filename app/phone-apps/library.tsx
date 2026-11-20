@@ -1,5 +1,5 @@
 /**
- * Reference Library (docs/PHONE_SPEC.md §5.10): every source the app cites, in one place, drawn as a library: a wood header
+ * Reference Library (docs/features/PHONE_SPEC.md §5.10): every source the app cites, in one place, drawn as a library: a wood header
  * with books on a shelf, and each source a book on its unit's shelf. A switch picks "By unit" or
  * "All"; a book says who published it, whether a person has checked it ("Verified" or "Unchecked", never hidden) and
  * what cites it, and opens the source in the browser. No search yet: it appears once the list passes about forty

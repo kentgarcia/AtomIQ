@@ -1,5 +1,5 @@
 /**
- * SFX catalog and scheduling tests (docs/SFX_SPEC.md §5, §7).
+ * SFX catalog and scheduling tests (docs/features/SFX_SPEC.md §5, §7).
  *
  * Run: npm run test:sfx
  */

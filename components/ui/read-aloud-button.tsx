@@ -3,7 +3,7 @@
  * (lessons, random quizzes, Schrodi/Guide, MythBuster, Atom Maze, Lab,
  * encyclopedia). It shares a single speech channel and a single visible
  * state model (idle / starting / speaking / failed) — see
- * docs/MEDIA_POLICY.md.
+ * docs/critical/MEDIA_POLICY.md.
  *
  * Active and failed states are never colour-only: the icon changes
  * (speaker → stop → warning), the busy state shows a spinner, and the pill

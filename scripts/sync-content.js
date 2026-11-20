@@ -11,7 +11,7 @@
 //      services/content-db.ts.
 //
 // Editing never creates a version. Only `npm run release:content` (or Content
-// Studio's Publish button) does. See docs/CONTENT_SQLITE_AND_STUDIO_SPEC.md.
+// Studio's Publish button) does. See docs/critical/CONTENT_SQLITE_AND_STUDIO_SPEC.md.
 
 "use strict";
 

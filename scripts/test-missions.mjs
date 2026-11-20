@@ -57,7 +57,7 @@ test("reset timer: hours for the day, days for the week, hours again in the last
 test("a stored state of the same period is kept, with missing counters filled in", () => {
   const { state, fresh } = resolveState({ date: "2026-11-16", progress: { login: 2, mythbuster: 1 }, claimed: ["weekly_login"] }, "2026-11-16");
   assert.equal(fresh, false);
-  assert.deepEqual(state.progress, { login: 2, mythbuster: 1, fact: 0, lesson: 0 });
+  assert.deepEqual(state.progress, { login: 2, mythbuster: 1, fact: 0, lesson: 0, maze: 0 });
   assert.deepEqual(state.claimed, ["weekly_login"]);
 });
 
@@ -125,6 +125,18 @@ test("the chest is locked until every quest is claimed, ready, then opened once"
   assert.equal(CHEST_REWARD.daily, 5);
   assert.equal(CHEST_REWARD.weekly, 25);
   assert.ok(!ids.includes(CHEST_ID));
+});
+
+test("the weekly chest needs any 3 claimed quests, the daily chest all of them", () => {
+  const { CHEST_ID, chestStatus, chestNeeded } = core;
+  const week = ["l", "m", "g", "f", "x"];
+  assert.equal(chestNeeded("weekly", week.length), 3);
+  assert.equal(chestNeeded("daily", 4), 4);
+  assert.equal(chestNeeded("weekly", 2), 2, "never more than the quests there are");
+  assert.equal(chestStatus(week, ["l", "m"], 3), "locked");
+  assert.equal(chestStatus(week, ["x", "m", "f"], 3), "ready", "any three");
+  assert.equal(chestStatus(week, ["l", "m", "g", CHEST_ID], 3), "opened");
+  assert.equal(chestStatus(week, ["l", "m", "g", "f", "x"], 3), "ready", "more than three is still ready");
 });
 
 test("the chest mark survives a reload of the stored state and ends with the period", () => {

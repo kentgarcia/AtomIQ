@@ -182,7 +182,7 @@ export function LevelUpBody({ level, from, xpIntoLevel = 0, unlocked = [], look 
           <Animated.View style={[styles.fill, fillStyle]} />
         </View>
       </Reveal>
-      {/* One sweep as the bar fills (docs/SFX_EXPANSION_SPEC.md §6.2); reduced motion shows it full */}
+      {/* One sweep as the bar fills (docs/features/SFX_EXPANSION_SPEC.md §6.2); reduced motion shows it full */}
       {!reduced && progress > 0 ? <SfxOnMount cue="count.run" delay={DIALOG_SETTLE_MS + LEVEL_UP.bar} /> : null}
 
       {items.length > 0 && look ? <UnlockedItems items={items} base={look} at={DIALOG_SETTLE_MS + LEVEL_UNLOCKS.unlocked} /> : null}

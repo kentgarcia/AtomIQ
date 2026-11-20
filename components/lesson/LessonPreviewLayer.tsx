@@ -16,6 +16,7 @@ import Animated, { Easing, cancelAnimation, runOnJS, useAnimatedStyle, useReduce
 import { ResumeLessonOverlay } from "@/components/lesson/LessonDialogs";
 import { LessonPreview } from "@/components/lesson/LessonPreview";
 import { PREVIEW_FX, previewInFrame, previewOutFrame } from "@/components/path/bubble-motion-core";
+import { TutorialLayer } from "@/components/tutorial/TutorialLayer";
 import type { LessonPreviewData } from "@/services/lesson-preview";
 
 export interface LessonPreviewLayerProps {
@@ -95,6 +96,8 @@ export function LessonPreviewLayer({ data, open, onClose, onProceed, resume = nu
           onProceed={onProceed}
         />
       </Animated.View>
+      {/* The tour's second layer: this modal sits over the root one, so the Start button is lit from in here (docs/features/TUTORIAL_SPEC.md §4.4) */}
+      <TutorialLayer host="preview" />
       {resume ? <ResumeLessonOverlay percent={resume.percent} onContinue={resume.onContinue} onStartAgain={resume.onStartAgain} onCancel={resume.onCancel} /> : null}
     </Modal>
   );

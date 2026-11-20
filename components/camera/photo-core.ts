@@ -1,5 +1,5 @@
 /**
- * The phone's Camera (docs/PHONE_SPEC.md §9): a photo mode for the learner's own character. No device camera is used. A photo is
+ * The phone's Camera (docs/features/PHONE_SPEC.md §9): a photo mode for the learner's own character. No device camera is used. A photo is
  * saved as its COMPOSITION (a scene, who stands beside the learner, the poses, a frame and the avatar's saved string), not as
  * pixels, so it stays tiny, private on the device and crisp at any size. Framework-free and tested (`test:photo`).
  */
@@ -88,9 +88,16 @@ export function parsePhotoConfig(raw: unknown): PhotoConfig | null {
     ),
     frame: pick(PHOTO_FRAMES, r.frame, DEFAULT_PHOTO.frame),
     avatar:
-      typeof r.avatar === "string" && r.avatar.length <= 400 ? r.avatar : "",
+      typeof r.avatar === "string" && r.avatar.length <= AVATAR_MAX_LENGTH ? r.avatar : "",
   };
 }
+
+/**
+ * The longest saved avatar string a photo keeps. The avatar's text (`avatar:v1:{...}`) is over 400 characters
+ * even for the default design and grows with every worn item, so a small cap silently turned every photo back
+ * into the default look. It is a sanity bound, not a design limit.
+ */
+export const AVATAR_MAX_LENGTH = 2000;
 
 export const serializePhotoConfig = (c: PhotoConfig): string =>
   JSON.stringify(c);

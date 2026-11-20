@@ -1,5 +1,5 @@
 /**
- * The Safety Guide's rules (docs/PHONE_SPEC.md §5.9): the cards' shape, their three sections in order, and the words that frame them.
+ * The Safety Guide's rules (docs/features/PHONE_SPEC.md §5.9): the cards' shape, their three sections in order, and the words that frame them.
  * This is an educational reference, not an emergency service: the first thing the list says and the last line of every card say so.
  * Framework-free and tested (`test:safety`). The section names mirror `scripts/lib/safety-vocab.mjs`.
  */

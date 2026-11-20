@@ -265,3 +265,39 @@ export const WELCOME_FX = {
   button: 900,
 } as const;
 export const WELCOME_TOTAL = Math.max(WELCOME_FX.mascot + STAMP_TOTAL, WELCOME_FX.burst + BURST.total, WELCOME_FX.button + REVEAL.ms);
+
+/**
+ * Shrodi's tour is over and pays its diamonds (the closing moment of `components/tutorial/`, tier D, once in the app's life):
+ * Shrodi is stamped in with a burst as he lands, "Tour complete!" is stamped, the diamond pops with its own burst and the
+ * amount counts up beside it, a line follows and the button arrives last. The diamonds then fly to the counter when the
+ * learner presses the button (or the moment times out), so the number rises as they land.
+ *
+ *       0 ..  ~400   Shrodi drops (stamp), burst on his landing (`burst`)
+ *     300 ..  ~700   "Tour complete!" is stamped
+ *     650 .. ~1220   the diamond pops (option pop), a burst at its hang
+ *     750 .. 1250    the amount counts up from 0 (`countMs`), the number pulses as it lands
+ *    1300           the line arrives
+ *    1550           the button arrives
+ */
+export const TOUR_REWARD_FX = {
+  mascot: 0,
+  burst: STAMP_LANDS,
+  title: 300,
+  gem: 650,
+  gemBurst: 650 + POP_HANG,
+  count: 750,
+  countMs: 500,
+  line: 1300,
+  button: 1550,
+} as const;
+export const TOUR_REWARD_TOTAL = Math.max(
+  TOUR_REWARD_FX.mascot + STAMP_TOTAL,
+  TOUR_REWARD_FX.title + STAMP_TOTAL,
+  TOUR_REWARD_FX.burst + BURST.total,
+  TOUR_REWARD_FX.gem + POP_LENGTH,
+  TOUR_REWARD_FX.gemBurst + BURST.total,
+  TOUR_REWARD_FX.count + TOUR_REWARD_FX.countMs,
+  TOUR_REWARD_FX.button + REVEAL.ms,
+);
+/** The moment closes itself after this long if the learner does nothing (the diamonds then fly as if they pressed the button). */
+export const TOUR_REWARD_TIMEOUT_MS = 10000;

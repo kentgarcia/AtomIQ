@@ -317,7 +317,7 @@ CREATE INDEX IF NOT EXISTS idx_followed_topics_topic ON followed_topics(topic);
 CREATE INDEX IF NOT EXISTS idx_followed_topics_dirty ON followed_topics(is_dirty) WHERE is_dirty = 1;
 
 -- ==================== NPC FEED TABLES ====================
--- The learner's feed (docs/NPC_FEED_SPEC.md section 7.1). Generated on the device by services/feed.ts:
+-- The learner's feed (docs/features/NPC_FEED_SPEC.md section 7.1). Generated on the device by services/feed.ts:
 -- there is no author account, and no table here for a learner comment (comments are content).
 
 -- Feed posts. text is rendered once, when the post is created. A blog card has blog_id set.
@@ -388,7 +388,7 @@ CREATE TABLE IF NOT EXISTS daily_facts_read (
   version INTEGER DEFAULT 1
 );
 
--- Phone apps whose install moment has played (docs/PHONE_SPEC.md section 7.2). Which apps are
+-- Phone apps whose install moment has played (docs/features/PHONE_SPEC.md section 7.2). Which apps are
 -- unlocked is derived from progress and never stored.
 CREATE TABLE IF NOT EXISTS phone_seen (
   app_id TEXT PRIMARY KEY,
@@ -401,7 +401,20 @@ CREATE TABLE IF NOT EXISTS phone_seen (
   version INTEGER DEFAULT 1
 );
 
--- Field Notes: the learner's private notebook on the phone (docs/PHONE_SPEC.md section 10). Never shown to
+-- Shrodi's tour: the steps the learner has done or skipped (docs/features/TUTORIAL_SPEC.md section 6). The current beat is
+-- derived from these and from progress, never stored. Wiped by Delete Account.
+CREATE TABLE IF NOT EXISTS tutorial_steps (
+  step_id TEXT PRIMARY KEY,
+  status TEXT NOT NULL,
+  at INTEGER NOT NULL,
+  updated_at INTEGER NOT NULL DEFAULT 0,
+  synced_at INTEGER,
+  is_dirty INTEGER DEFAULT 1,
+  deleted_at INTEGER,
+  version INTEGER DEFAULT 1
+);
+
+-- Field Notes: the learner's private notebook on the phone (docs/features/PHONE_SPEC.md section 10). Never shown to
 -- anyone, never posted, wiped by Delete Account. A clipping keeps where it was cut from and a quoted line.
 CREATE TABLE IF NOT EXISTS field_notes (
   id TEXT PRIMARY KEY,
@@ -421,10 +434,10 @@ CREATE TABLE IF NOT EXISTS field_notes (
 CREATE INDEX IF NOT EXISTS idx_field_notes_updated ON field_notes(updated_at DESC);
 CREATE INDEX IF NOT EXISTS idx_field_notes_source ON field_notes(source_type, source_id);
 
--- Chats: the learner's conversations with the teachers on the phone (docs/PHONE_SPEC.md section 5.2). The teacher's
+-- Chats: the learner's conversations with the teachers on the phone (docs/features/PHONE_SPEC.md section 5.2). The teacher's
 -- lines and the replies the learner tapped, on the device only; wiped by Delete Account. 'event' marks an unprompted
 -- message (what earned it), so it is never sent twice.
--- Chat threads (docs/PHONE_SPEC.md section 5.2): a free chat the learner started, or a story a trigger unlocked ('event' is
+-- Chat threads (docs/features/PHONE_SPEC.md section 5.2): a free chat the learner started, or a story a trigger unlocked ('event' is
 -- its unlock key, so the story is never unlocked twice, and a replay keeps it). 'ended' is set when a reply with nowhere to go
 -- (a sticker, a reaction) closed the story; 'archived' puts it away from the Chats list (a swipe); 'plays' counts replays. On the device only; wiped by Delete Account.
 CREATE TABLE IF NOT EXISTS chat_threads (
@@ -465,7 +478,7 @@ CREATE TABLE IF NOT EXISTS chat_messages (
 
 CREATE INDEX IF NOT EXISTS idx_chat_messages_thread ON chat_messages(thread_id, at);
 
--- Scans: what the learner has pointed the phone's Atom Scanner at (docs/PHONE_SPEC.md section 8): the first time and how
+-- Scans: what the learner has pointed the phone's Atom Scanner at (docs/features/PHONE_SPEC.md section 8): the first time and how
 -- many times, per target. A collection, not a score. On the device only; wiped by Delete Account.
 CREATE TABLE IF NOT EXISTS scans (
   target_id TEXT PRIMARY KEY,
@@ -479,7 +492,7 @@ CREATE TABLE IF NOT EXISTS scans (
   version INTEGER DEFAULT 1
 );
 
--- Photos: what the phone's Camera took (docs/PHONE_SPEC.md section 9), saved as the composition (scene, companion, poses, frame and the
+-- Photos: what the phone's Camera took (docs/features/PHONE_SPEC.md section 9), saved as the composition (scene, companion, poses, frame and the
 -- avatar's saved string), not as pixels. On the device only; wiped by Delete Account.
 CREATE TABLE IF NOT EXISTS photos (
   id TEXT PRIMARY KEY,

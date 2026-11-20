@@ -1,5 +1,5 @@
 /**
- * The pictures a learner can send in a chat (docs/PHONE_SPEC.md §5.2): six reactions (put on a teacher's letter) and eight
+ * The pictures a learner can send in a chat (docs/features/PHONE_SPEC.md §5.2): six reactions (put on a teacher's letter) and eight
  * stickers (sent as a big picture). They are AtomIQ's own, drawn in the lesson object style (project skill
  * `duolingo-object-style`, with the faces after `duolingo-character-style`): flat colour, no outlines or gradients, rounded
  * shapes, light from the upper left and the side facing away one step darker, pill eyes. Pure data with no framework imports, so

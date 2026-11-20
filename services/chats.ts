@@ -1,5 +1,5 @@
 /**
- * The runtime of the phone's Chats (docs/PHONE_SPEC.md §5.2): binds `chat_threads` and `chat_messages` to the user-state
+ * The runtime of the phone's Chats (docs/features/PHONE_SPEC.md §5.2): binds `chat_threads` and `chat_messages` to the user-state
  * database, loads the teachers' nodes from the content database, starts a free chat, unlocks a story thread when the learner's
  * progress earns one, opens a thread, answers a tapped reply (a chip, a sticker or a reaction), replays a thread, and turns a
  * reply's action into a route. The rules are in `services/chat-core.ts`. Nothing here sends anything anywhere, and nothing
@@ -192,7 +192,7 @@ const START_APPS = PHONE_APPS.filter((a) => a.unlock.kind === "start").map((a) =
 let delivering: Promise<void> = Promise.resolve();
 
 /**
- * Unlock every story thread the learner's progress has earned and that is not in Chats yet (docs/PHONE_SPEC.md §5.2): each
+ * Unlock every story thread the learner's progress has earned and that is not in Chats yet (docs/features/PHONE_SPEC.md §5.2): each
  * one is a new thread with its first message waiting, unread. Calls are queued one after another, so two screens asking at once
  * cannot both unlock the same story. Never rejects.
  */

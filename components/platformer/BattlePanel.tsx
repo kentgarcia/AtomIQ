@@ -1,5 +1,5 @@
 /**
- * The question of a battle (docs/PLATFORMER_SPEC.md §6), drawn over the bottom of the map while the
+ * The question of a battle (docs/features/PLATFORMER_SPEC.md §6), drawn over the bottom of the map while the
  * view is zoomed in on the two fighters: the enemy's name and life, the question, and TWO options.
  * Every answer is graded the moment it is tapped, like the lessons' single-tap items, and the options
  * are the lessons' `OptionRow`s (same pop, same shake). The fight itself plays in the world above

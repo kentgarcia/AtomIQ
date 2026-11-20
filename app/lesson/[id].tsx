@@ -8,7 +8,7 @@ import { LessonFinish } from "@/components/lesson/LessonFinish";
 import { ResumeLessonDialog } from "@/components/lesson/LessonDialogs";
 import { LessonPreview } from "@/components/lesson/LessonPreview";
 import { TeacherIntro } from "@/components/lesson/TeacherIntro";
-import { useNpcForUnit, useNpcLine } from "@/components/npc/use-npc";
+import { useNpcForUnitState, useNpcLine } from "@/components/npc/use-npc";
 import { LessonRun, type LessonRunResult } from "@/components/lesson/LessonRun";
 import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
@@ -62,7 +62,7 @@ export default function LessonScreen() {
   useEffect(() => {
     pinSfx("reward.finish-jingle");
   }, []);
-  // The lesson begins (docs/SFX_SPEC.md §6.2): the cue plays each time the run starts, including "practice again".
+  // The lesson begins (docs/features/SFX_SPEC.md §6.2): the cue plays each time the run starts, including "practice again".
   useEffect(() => {
     if (stage === "run") void playSfx("lesson.start");
   }, [stage]);
@@ -74,7 +74,7 @@ export default function LessonScreen() {
   const [resume, setResume] = useState<RunState | null>(null);
   const sessionId = useRef(`lesson:${lessonId}`);
   // The unit teacher signs off on the finish screen (hooks stay above the early returns).
-  const teacher = useNpcForUnit(loaded?.unit?.id);
+  const { npc: teacher, ready: teacherReady } = useNpcForUnitState(loaded?.unit?.id);
   const signOff = useNpcLine(teacher?.id, "sign_off");
 
   useEffect(() => {
@@ -271,7 +271,7 @@ export default function LessonScreen() {
         />
       ) : null}
       {stage === "intro" && teacher ? <TeacherIntro npc={teacher} onClose={exit} onContinue={meetTeacher} /> : null}
-      {stage === "run" ? <LessonRun key={runKey} cards={content.cards} surface="lesson" teacher={teacher ? { name: teacher.name, spec: teacher.spec } : null} onExit={exit} onFinish={finish} resume={resume} onProgress={nodeId ? onProgress : undefined} /> : null}
+      {stage === "run" && teacherReady ? <LessonRun key={runKey} cards={content.cards} surface="lesson" teacher={teacher ? { name: teacher.name, spec: teacher.spec } : null} onExit={exit} onFinish={finish} resume={resume} onProgress={nodeId ? onProgress : undefined} /> : null}
       {stage === "finish" && outcome ? (
         <LessonFinish
           title={isReplay ? "Practice complete!" : "Lesson complete!"}

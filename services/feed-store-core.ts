@@ -1,5 +1,5 @@
 /**
- * Storage for the learner's feed (docs/NPC_FEED_SPEC.md §7.1), written against a small database
+ * Storage for the learner's feed (docs/features/NPC_FEED_SPEC.md §7.1), written against a small database
  * interface so `scripts/test-feed.mjs` can run the real SQL on an in-memory SQLite. The app binds it
  * to the user-state database in `services/feed-store.ts`.
  *

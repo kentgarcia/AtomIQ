@@ -18,6 +18,7 @@ import { Pressable, View } from "react-native";
 import Animated, { Easing, cancelAnimation, runOnJS, useAnimatedStyle, useReducedMotion, useSharedValue, withTiming, type SharedValue } from "react-native-reanimated";
 
 import { Sparkle } from "@/components/lesson/Sparkle";
+import type { ViewRef } from "@/components/tutorial/use-tutorial-target";
 import { BUBBLE_FX, bandFrame, launchFrame, particleFrame, popFrame, pressScale, twinkleFrame } from "@/components/path/bubble-motion-core";
 import { BUBBLE, bubbleCopy, bubblePlacement, type BubbleKind, type BubbleSide, type BubbleStatus } from "@/components/path/node-bubble-core";
 import type { UnitPalette } from "@/components/path/unit-theme";
@@ -43,6 +44,8 @@ export interface NodeBubbleProps {
   palette?: UnitPalette;
   /** Wording that replaces the lesson map's own (the Atom Maze map speaks of levels): the small line, a sentence under the title, the button of an open stop and the note of a shut one. */
   copy?: { eyebrow?: string; detail?: string; actionLabel?: string; hint?: string };
+  /** Shrodi's tour lights the bubble's button through this ref (docs/features/TUTORIAL_SPEC.md). */
+  buttonRef?: React.Ref<ViewRef>;
   /** Called the moment its button is released: the screen starts whatever arrives behind the zoom (the lesson preview). */
   onLaunch?: () => void;
   /** Called once the bubble has zoomed and dissolved away after its button was pressed. */
@@ -80,7 +83,7 @@ function BurstBit({ i, clock, size, color }: { i: number; clock: SharedValue<num
   );
 }
 
-function NodeBubbleBase({ x, y, mapWidth, side, sectionHeight, title, kind, status, index, total, palette, copy: words, onLaunch, onAction }: NodeBubbleProps) {
+function NodeBubbleBase({ x, y, mapWidth, side, sectionHeight, title, kind, status, index, total, palette, copy: words, buttonRef, onLaunch, onAction }: NodeBubbleProps) {
   const { theme } = useTheme();
   const styles = useMemo(() => makeStyles(theme), [theme]);
   const reducedMotion = useReducedMotion();
@@ -192,6 +195,8 @@ function NodeBubbleBase({ x, y, mapWidth, side, sectionHeight, title, kind, stat
           </Animated.View>
           {copy.actionLabel ? (
             <Pressable
+              ref={buttonRef}
+              collapsable={false}
               accessibilityRole="button"
               accessibilityLabel={`${copy.actionLabel}: ${title}`}
               onPressIn={pressIn}

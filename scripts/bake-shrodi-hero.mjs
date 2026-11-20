@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Shrodi as the platformer's hero: ONE sprite sheet of 256 px frames (docs/PLATFORMER_SPEC.md §1b).
+ * Shrodi as the platformer's hero: ONE sprite sheet of 256 px frames (docs/features/PLATFORMER_SPEC.md §1b).
  *
  * The BODY is the Kenney character's own (tools/platformer-art/Vector/Characters/character_yellow_*.svg):
  * its arms, legs and torso are copied from the poses idle, walk_a, walk_b, jump, hit, front and duck,

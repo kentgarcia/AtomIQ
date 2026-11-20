@@ -1,6 +1,6 @@
 /**
  * Onboarding: nine short steps in the order the best first-run flows use (plan and sources:
- * docs/ONBOARDING_SPEC.md). One promise (hello), three questions with Shrodi answering back (why,
+ * docs/features/ONBOARDING_SPEC.md). One promise (hello), three questions with Shrodi answering back (why,
  * level, goal) around a pitch written from the answers (how), a short "building your path" moment
  * (plan), two real questions from lesson 1 before any form (taste), then the name and the Terms
  * (profile) and a welcome on a peak. This file is only the step machine, Android back and the

@@ -13,11 +13,12 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 import { LessonFinish } from "@/components/lesson/LessonFinish";
 import { LessonRun, type LessonRunResult } from "@/components/lesson/LessonRun";
-import { useNpcForUnit } from "@/components/npc/use-npc";
+import { useNpcForUnitState } from "@/components/npc/use-npc";
 import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
 import type { Objective, PathNode, ResolvedCard, Item } from "@/content/curriculum/types";
 import { pinSfx } from "@/services/sfx";
+import { recordMissionEvent } from "@/services/missions";
 import { completeNode, completeTestOut } from "@/services/curriculum-complete";
 import { loadDueObjectives, recordAnswers } from "@/services/curriculum-progress";
 import { contentRepository } from "@/services/content-db";
@@ -123,7 +124,7 @@ export default function PracticeScreen() {
   const [done, setDone] = useState<{ run: LessonRunResult; passed: boolean; xp: number } | null>(null);
   const sessionId = useRef("");
   // The unit's teacher asks the questions (a review across units has none, so cards stay plain).
-  const teacher = useNpcForUnit(session?.unitId);
+  const { npc: teacher, ready: teacherReady } = useNpcForUnitState(session?.unitId);
 
   useEffect(() => {
     pinSfx("reward.finish-jingle");
@@ -180,6 +181,8 @@ export default function PracticeScreen() {
       } catch (error) {
         console.error("Error saving session:", error);
       }
+      // A passed practice or checkpoint finishes a lesson as far as the quests go (a test-out and a review do not)
+      if (passed && (session.kind === "practice" || session.kind === "checkpoint")) void recordMissionEvent("lesson", 1);
       setDone({ run, passed, xp });
     },
     [addXP, session, updateUserProfile],
@@ -213,6 +216,9 @@ export default function PracticeScreen() {
       </View>
     );
   }
+
+  // The teacher's answer is nearly instant (cached after the map): hold the page back rather than show Shrodi for a moment
+  if (!done && !teacherReady) return <View style={styles.center} />;
 
   if (done) {
     const passed = done.passed;

@@ -27,7 +27,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { playSfx } from "@/services/sfx";
 
 /**
- * The blog reader (docs/NPC_FEED_SPEC.md §4.3): one piece in one calm column. The cover, the title,
+ * The blog reader (docs/features/NPC_FEED_SPEC.md §4.3): one piece in one calm column. The cover, the title,
  * "by Ada" and the reading time, the body blocks, Read Aloud, the sources, the reaction row, and under
  * it the NPC comments once the piece has been opened. The thread is read only: there is no text input
  * anywhere in this feature (`npm run check:feed`). A piece that is not unlocked (a deep link) shows a

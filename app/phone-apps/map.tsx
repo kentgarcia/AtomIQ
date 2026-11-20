@@ -1,5 +1,5 @@
 /**
- * Nuclear Map (docs/PHONE_SPEC.md §5.8): a flat world map in the app's own look (ocean and rounded land, `components/map/world-art.ts`,
+ * Nuclear Map (docs/features/PHONE_SPEC.md §5.8): a flat world map in the app's own look (ocean and rounded land, `components/map/world-art.ts`,
  * Natural Earth data, public domain) with a pin for each place that matters in nuclear science: where things were discovered, researched,
  * powered and where accidents happened. Drag to pan, pinch or double-tap to zoom (the plus and minus buttons do the same), tap a pin for
  * its card. Offline: no tiles, no location, no network. The places are content (`map_sites`), worded from their cited pages and checked

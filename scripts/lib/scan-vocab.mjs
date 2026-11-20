@@ -1,5 +1,5 @@
 /**
- * The Atom Scanner vocabulary (docs/PHONE_SPEC.md §8 and §7.1), as plain data. Framework-free, so the validator
+ * The Atom Scanner vocabulary (docs/features/PHONE_SPEC.md §8 and §7.1), as plain data. Framework-free, so the validator
  * (scripts/lib/scan-rules.mjs), the Content Studio and the app's scanner core read the same names.
  */
 

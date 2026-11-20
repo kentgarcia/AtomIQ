@@ -4,7 +4,7 @@
  * Teachers are fixed-colour characters, like Shrodi (EX-10): the same in light and dark. The
  * official names and values are from Duolingo's public illustration guide, as transcribed in
  * the project skill `duolingo-character-style`. Skin trios and a few hair colours the guide
- * lacks are "custom" and were tuned by eye (docs/NPC_TEACHERS_SPEC.md §4.6).
+ * lacks are "custom" and were tuned by eye (docs/features/NPC_TEACHERS_SPEC.md §4.6).
  *
  * Pure data with no imports, so Node tests can read it. Flat #RRGGBB only: no gradients, no alpha.
  */

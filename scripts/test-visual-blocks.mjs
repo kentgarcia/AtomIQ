@@ -303,7 +303,7 @@ test("darken moves toward black and leaves non-hex colours alone", () => {
   assert.equal(colorMath.darken("transparent", 0.5), "transparent");
 });
 
-// ---- lesson redesign (docs/LESSON_VISUAL_SPEC.md) --------------------------
+// ---- lesson redesign (docs/features/LESSON_VISUAL_SPEC.md) --------------------------
 test("lesson, mascot and NPC code never draw SVG gradients or animate an SVG transform string", () => {
   const roots = ["components/lesson", "components/mascot", "components/npc"];
   const files = [];
@@ -318,7 +318,14 @@ test("lesson, mascot and NPC code never draw SVG gradients or animate an SVG tra
   const strip = (src) => src.replace(/\/\*[\s\S]*?\*\//g, "").replace(/(^|\s)\/\/.*$/gm, "$1");
   for (const f of files) {
     const src = strip(fs.readFileSync(path.join(REPO, f), "utf8"));
-    assert.ok(!/<(Linear|Radial)Gradient\b|<Stop\b/.test(src), `${f}: SVG gradient`);
+    // expo-linear-gradient's native <LinearGradient> is fine; only react-native-svg's gradients render black on device
+    const svgImports = (src.match(/import\s*\{[^}]*\}\s*from\s*"react-native-svg"/g) ?? []).join(" ");
+    const nativeGradient = /from\s*"expo-linear-gradient"/.test(src);
+    const usesSvgGradient =
+      /\b(LinearGradient|RadialGradient|Stop)\b/.test(svgImports) ||
+      /<RadialGradient\b|<Stop\b/.test(src) ||
+      (!nativeGradient && /<LinearGradient\b/.test(src));
+    assert.ok(!usesSvgGradient, `${f}: SVG gradient`);
     assert.ok(!/import[^;]*\b(LinearGradient|RadialGradient|Stop)\b[^;]*from "react-native-svg"/.test(src), `${f}: imports an SVG gradient`);
     assert.ok(!/useAnimatedProps[\s\S]{0,400}\btransform\s*:\s*`/.test(src), `${f}: animated SVG transform string`);
   }

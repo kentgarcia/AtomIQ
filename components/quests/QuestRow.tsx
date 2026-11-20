@@ -78,7 +78,7 @@ function QuestRowBase({ mission, renderAction, onClaim }: QuestRowProps) {
     }
     setPlaying(true);
     impactLight();
-    // The bar fills, then the claim lands with the first coin (docs/SFX_SPEC.md §6.5)
+    // The bar fills, then the claim lands with the first coin (docs/features/SFX_SPEC.md §6.5)
     void playSfx("reward.fill");
     // The coins fly above the tab bar and land on its Profile tab: tell that layer where they start
     pillRef.current?.measureInWindow((x: number, y: number, w: number, h: number) => {

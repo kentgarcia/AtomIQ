@@ -1,6 +1,6 @@
 /**
  * Tab bar metrics — the single source of truth for where the docked tab bar
- * sits and how much space it occupies (docs/TAB_BAR_RESPONSIVE_POSITIONING_SPEC.md).
+ * sits and how much space it occupies (docs/qa/TAB_BAR_RESPONSIVE_POSITIONING_SPEC.md).
  *
  * Framework-free on purpose (no React / React Native imports) so
  * `scripts/test-tab-bar-metrics.mjs` and `scripts/check-tab-bar-clearance.mjs`

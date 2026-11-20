@@ -1,5 +1,5 @@
 /**
- * New chat (docs/PHONE_SPEC.md §5.2), laid out like choosing a contact on a phone: a short "Recent" section of the teachers the
+ * New chat (docs/features/PHONE_SPEC.md §5.2), laid out like choosing a contact on a phone: a short "Recent" section of the teachers the
  * learner wrote to last, then everyone in A to Z sections with sticky letter headings, a round picture, the name, what they do and, when
  * the learner already has chats with them, how many; a letter rail down the right edge jumps between sections once there are enough
  * of them. Tapping a contact starts a fresh free chat with them at once (a teacher greets with their menu, so there is nothing to

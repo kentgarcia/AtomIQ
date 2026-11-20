@@ -1,6 +1,6 @@
 /**
  * Media runtime — the single place that owns Read Aloud, sound-effect and
- * music state for the whole app. See docs/MEDIA_POLICY.md.
+ * music state for the whole app. See docs/critical/MEDIA_POLICY.md.
  *
  * - One Read Aloud controller (one utterance at a time, app-wide).
  * - One preference store (`soundEffects`, `music`, `readAloud`) read by

@@ -1,6 +1,6 @@
 /**
  * Unit 1 — Inside the Atom. Authored content for the curriculum cutover
- * (docs/LESSON_RESTRUCTURE_SPEC.md §12).
+ * (docs/features/LESSON_RESTRUCTURE_SPEC.md §12).
  *
  * Deliberately simple: one core idea per lesson, in short plain sentences.
  *   L1  Ordinary matter is made of atoms. Air is matter too. Atoms are far too small to see.

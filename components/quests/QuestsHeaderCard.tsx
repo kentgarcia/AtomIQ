@@ -1,14 +1,15 @@
 /**
  * QuestsHeaderCard — the info card at the top of the Quests page: the sky (purple) colour on a
  * darker lip, white text on the left (what the page is, and how many quests are left) and the two
- * chests on the right, daily and weekly. A chest is the control: dimmed until every quest of its
- * period is claimed, then normal and tappable (see `ChestCard`).
+ * chests on the right, daily and weekly. A chest is the control: dimmed until enough quests of its
+ * period are claimed (all daily, any 3 weekly), then normal and tappable (see `ChestCard`).
  */
 
 import React, { useMemo } from "react";
 import { View } from "react-native";
 
 import { ChestCard } from "@/components/quests/ChestCard";
+import { useTutorialTarget } from "@/components/tutorial/use-tutorial-target";
 import { Text } from "@/components/ui/text";
 import type { PeriodMissions } from "@/hooks/use-missions";
 import type { MissionPeriod } from "@/services/missions-core";
@@ -31,6 +32,8 @@ const questsLeft = (data: PeriodMissions) => Math.max(0, data.missions.length - 
 export function QuestsHeaderCard({ daily, weekly, onOpenChest }: QuestsHeaderCardProps) {
   const { theme } = useTheme();
   const styles = useMemo(() => makeStyles(theme), [theme]);
+  // Shrodi's first visit lights the daily chest (docs/features/TUTORIAL_SPEC.md §5.4)
+  const chestLit = useTutorialTarget("quests.chest.daily", { radius: 20 });
 
   const anyReady = daily.chest.status === "ready" || weekly.chest.status === "ready";
   const headline = anyReady ? "A chest is ready!" : "Open your chests";
@@ -57,7 +60,7 @@ export function QuestsHeaderCard({ daily, weekly, onOpenChest }: QuestsHeaderCar
         </View>
         <View style={styles.chests}>
           {chests.map(({ period, label, data }) => (
-            <View key={period} style={styles.chest}>
+            <View key={period} ref={period === "daily" ? chestLit.ref : undefined} collapsable={false} style={styles.chest}>
               <ChestCard
                 period={period}
                 status={data.chest.status}

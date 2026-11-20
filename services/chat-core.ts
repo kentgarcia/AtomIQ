@@ -1,5 +1,5 @@
 /**
- * NPC chats on the phone (docs/PHONE_SPEC.md §5.2 and §7.3). Framework-free so `scripts/test-chats.mjs` runs it on
+ * NPC chats on the phone (docs/features/PHONE_SPEC.md §5.2 and §7.3). Framework-free so `scripts/test-chats.mjs` runs it on
  * plain Node and on in-memory SQLite: the node graph rules (where a tapped reply goes), the story threads a learner's
  * progress unlocks, the list summaries, and the SQL over `chat_threads` and `chat_messages`.
  *
@@ -12,6 +12,7 @@
  */
 
 import { chatArtName } from "../components/phone/chat-art.ts";
+import { tourArt, tourArtName } from "../components/phone/tour-art.ts";
 import { dayKeyFromLocalDate } from "./activity-core.ts";
 
 export type ChatKind = "greeting" | "reply" | "unprompted" | "sign_off";
@@ -62,6 +63,16 @@ export const WELCOME_BACK_MIN_DAYS = 3;
 export function splitParts(text: string): string[] {
   const parts = text.split(/\n\s*\n/).map((p) => p.trim()).filter((p) => p !== "");
   return parts.length > 0 ? parts : [text.trim()];
+}
+
+/**
+ * A part of a node's text that is only `[[pic:<id>]]` is a picture, not a bubble (Shrodi's tour shows what each screen looks like,
+ * `components/phone/tour-art.ts`). Returns the id when the whole part is a marker for a picture that exists, otherwise null, so a
+ * mistyped marker is shown as the plain text it is and the content rules catch it before it ships.
+ */
+export function pictureOf(text: string): string | null {
+  const m = /^\[\[pic:([a-z0-9-]+)\]\]$/.exec(text.trim());
+  return m && tourArt(m[1]) ? m[1] : null;
 }
 
 /** Shrodi, the mascot, chats like a teacher (his nodes carry this npc id) but is not in the cast of teachers. Mirrors `CHAT_MASCOT_ID` in `scripts/lib/chat-vocab.mjs`. */
@@ -189,6 +200,8 @@ export function reactionsOf(messages: readonly ChatMessage[]): Map<string, strin
 export function lastLine(message: ChatMessage): string {
   if (message.kind === "react") return `You reacted: ${chatArtName(message.text)}`;
   if (message.kind === "emoji") return `You sent a sticker: ${chatArtName(message.text)}`;
+  const picture = pictureOf(message.text);
+  if (picture) return `Sent a picture: ${tourArtName(picture)}`;
   return message.text;
 }
 
@@ -210,6 +223,8 @@ export interface ThreadSummary {
   npcId: string;
   title: string;
   origin: ThreadOrigin;
+  /** A story's unlock key (null for a free chat). */
+  event: string | null;
   /** The last message's text, or null when nothing has been said. */
   last: string | null;
   lastAt: number | null;
@@ -231,6 +246,7 @@ export function summarizeThreads(threads: readonly ChatThread[], messages: reado
       npcId: t.npcId,
       title: t.title,
       origin: t.origin,
+      event: t.event,
       last: last ? lastLine(last) : null,
       lastAt: last?.at ?? null,
       lastFromMe: last?.sender === "me",

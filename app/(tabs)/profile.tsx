@@ -47,6 +47,10 @@ import Animated, {
 } from "react-native-reanimated";
 import { DURATION, EASE_OUT } from "@/theme/motion";
 import { playSfx } from "@/services/sfx";
+import { useTutorialTarget } from "@/components/tutorial/use-tutorial-target";
+import { LockedDialog } from "@/components/ui/locked-dialog";
+import { loadPhoneProgress } from "@/services/phone";
+import { PHONE_APPS, isUnlocked, unlockRequirement, type PhoneProgress } from "@/services/phone-core";
 
 export default function ProfileScreen() {
   const router = useRouter();
@@ -62,6 +66,28 @@ export default function ProfileScreen() {
     dismissLevelUp,
   } = useStorage();
   const { theme } = useTheme();
+  // Shrodi's first visit lights the passport, its badges and its flip button (docs/features/TUTORIAL_SPEC.md §5.4)
+  const passportLit = useTutorialTarget("profile.passport", { radius: 24 });
+  const badgesLit = useTutorialTarget("profile.badges", { radius: 20 });
+  const flipLit = useTutorialTarget("profile.flip", { radius: "round" });
+
+  // The Shop button is locked until the Shop is on the phone (the same rule as its app icon)
+  const shopApp = PHONE_APPS.find((a) => a.id === "shop");
+  const [phoneProgress, setPhoneProgress] = useState<PhoneProgress | null>(null);
+  const [shopLockOpen, setShopLockOpen] = useState(false);
+  useFocusEffect(
+    useCallback(() => {
+      let alive = true;
+      void loadPhoneProgress()
+        .then((p) => alive && setPhoneProgress(p))
+        .catch(() => undefined);
+      return () => {
+        alive = false;
+      };
+    }, []),
+  );
+  const shopLocked = !!shopApp && !!phoneProgress && !isUnlocked(shopApp.unlock, phoneProgress);
+  const shopRequirement = shopApp && phoneProgress ? unlockRequirement(shopApp.unlock, phoneProgress) : null;
   const styles = useMemo(() => createStyles(theme), [theme]);
 
   const [isSavingProfile, setIsSavingProfile] = useState(false);
@@ -293,7 +319,16 @@ export default function ProfileScreen() {
         scrolled={scrolled}
         right={
           <View style={styles.headerActions}>
-            <HeaderButton icon="Shop" label="Shop" onPress={() => router.push("/shop")} />
+            {shopLocked ? (
+              <View>
+                <HeaderButton icon="Shop" label="Shop, locked" color={theme.colors.textFaint} onPress={() => setShopLockOpen(true)} />
+                <View pointerEvents="none" style={styles.shopLockBadge}>
+                  <Icon name="Lock" size={10} color={theme.colors.textMuted} variant="Bold" />
+                </View>
+              </View>
+            ) : (
+              <HeaderButton icon="Shop" label="Shop" onPress={() => router.push("/shop")} />
+            )}
             <HeaderButton icon="Edit2" label="Edit profile" onPress={openEditModal} />
             <HeaderButton icon="Setting" label="Settings" onPress={() => router.push("/settings")} />
           </View>
@@ -316,6 +351,7 @@ export default function ProfileScreen() {
         <View style={{ height: 8 }} />
 
         {/* Explorer passport (front: profile, back: stats) */}
+        <View ref={passportLit.ref} collapsable={false}>
         <PassportCard
           name={userProfile.display_name || userProfile.username}
           title={userTitle}
@@ -326,12 +362,15 @@ export default function ProfileScreen() {
           passportNo={passportNo}
           avatar={userProfile.avatar_url}
           badges={showcase}
+          badgesRef={badgesLit.ref}
+          flipRef={flipLit.ref}
           stats={stats}
           titleOpen={showTitleProgress}
           onToggleTitle={() => setShowTitleProgress((v) => !v)}
           onEdit={openEditModal}
           onPickBadges={() => setBadgePickerOpen(true)}
         />
+        </View>
 
           {/* Rank progress — opens under the passport when the rank is tapped */}
           {showTitleProgress && (
@@ -431,6 +470,8 @@ export default function ProfileScreen() {
         </View>
       </ScrollView>
 
+      <LockedDialog visible={shopLockOpen} title="Shop" text={shopRequirement?.text ?? "Finish your first lesson."} progress={shopRequirement?.progress} onClose={() => setShopLockOpen(false)} />
+
       <BadgePicker
         visible={badgePickerOpen}
         badges={awards}
@@ -524,7 +565,7 @@ export default function ProfileScreen() {
         footer={
           <LevelUpButton tiles={unlockedTiles}>
             <ModalButton label="Keep going" onPress={dismissLevelUp} />
-            {unlockedItems.length > 0 ? (
+            {unlockedItems.length > 0 && !shopLocked ? (
               <ModalSecondaryButton
                 label="See them in the shop"
                 onPress={() => {
@@ -589,6 +630,19 @@ const createStyles = (theme: Theme) => {
     },
     achievements: { marginHorizontal: 24, marginTop: 32 },
     headerActions: { flexDirection: "row", alignItems: "center" },
+    shopLockBadge: {
+      position: "absolute",
+      right: 2,
+      bottom: 2,
+      width: 16,
+      height: 16,
+      borderRadius: 8,
+      alignItems: "center",
+      justifyContent: "center",
+      backgroundColor: theme.colors.card,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+    },
     scrollContent: {
       paddingBottom: 40,
     },

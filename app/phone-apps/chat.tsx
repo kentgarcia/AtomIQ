@@ -1,27 +1,31 @@
 /**
- * One thread (docs/PHONE_SPEC.md §5.2): a teacher's lines on the left, the replies the learner tapped on the right. A long message
+ * One thread (docs/features/PHONE_SPEC.md §5.2): a teacher's lines on the left, the replies the learner tapped on the right. A long message
  * is several short bubbles that arrive one after another, each after a beat of typing dots, as if they were chatting. The replies
  * sit under the last message, centered: tapping one sends it (it flies in as a blue bubble, a sticker pops, a reaction lands on
  * the teacher's last bubble) and the teacher answers with the next authored node. There is no text box: a chip, a sticker or a
  * reaction (AtomIQ's own pictures, `chat-art.ts`). When a thread ends, a divider says so, with "No more replies" and a Replay
  * button. A reply can also open something (the next lesson, a Myth Buster round, an AtomDex entry, a phone app). The history is
- * kept on the device. Drawn like a messenger under the red Chats header (white title): the teacher's name over their first bubble
+ * kept on the device. Drawn like a messenger under a header that is the teacher's own cover fading into the page, with bubbles and reply buttons in its colours: the teacher's name over their first bubble
  * and their round picture beside the last, filled bubbles, the learner's replies as blue bubbles, and the subject line of a story
  * across the top.
  */
 
+import { chatPalette } from "@/components/phone/chat-palette";
 import { ChatButton, ChatFrame, ChatTitle } from "@/components/phone/ChatFrame";
 import { speakerFor } from "@/components/phone/ChatHead";
-import { LinkButton, MeBubble, NpcBubble, ReactButton, ReplyPill, StickerBubble, StickerButton, TypingBubble } from "@/components/phone/ChatBubble";
+import { ChatPaletteProvider, LinkButton, MeBubble, NpcBubble, ReactButton, ReplyPill, StickerBubble, StickerButton, TypingBubble } from "@/components/phone/ChatBubble";
 import { settle } from "@/components/motion/settle";
 import { Button } from "@/components/ui/button";
 import { useCast } from "@/components/feed/use-cast";
 import { Shrodi } from "@/components/mascot/Shrodi";
+import { SHRODI_COLORS } from "@/components/mascot/shrodi-art";
 import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
-import { isLinkReply, linkInfo, pillsOf, reactionsOf, replyTypeOf, type ChatMessage } from "@/services/chat-core";
+import { CHAT_MASCOT_ID, isLinkReply, linkInfo, pillsOf, reactionsOf, replyTypeOf, type ChatMessage } from "@/services/chat-core";
 import { openThread, restartThread, routeForAction, sendReply, subscribeChats, type ThreadView } from "@/services/chats";
 import { playSfx } from "@/services/sfx";
+import { emitTutorial } from "@/services/tutorial";
+import { TOUR_STORY_EVENT } from "@/services/tutorial-core";
 import { createStyles, fontFaces, useResponsiveLayout, useTheme } from "@/theme";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -55,6 +59,9 @@ export default function ChatThreadScreen() {
   const scroller = useRef<ScrollViewInstance>(null);
 
   const speaker = useMemo(() => speakerFor(view?.thread.npcId, cast), [view?.thread.npcId, cast]);
+  // The conversation's colours are the teacher's cover (Shrodi has the app's blue)
+  const cover = useMemo(() => (speaker ? { npcId: speaker.npc?.id ?? CHAT_MASCOT_ID, outfit: speaker.npc?.spec.outfit ?? { color: SHRODI_COLORS.fur, shade: SHRODI_COLORS.furShade } } : undefined), [speaker]);
+  const palette = useMemo(() => (cover ? chatPalette(cover.outfit) : null), [cover]);
 
   const load = useCallback(async () => {
     if (!threadId) return;
@@ -71,6 +78,12 @@ export default function ChatThreadScreen() {
     void load();
     return subscribeChats(() => void load());
   }, [load]);
+
+  // Shrodi's first story is the tour's last stop, however the learner got here (the list, Contacts, a link)
+  const tourStory = view?.thread.npcId === CHAT_MASCOT_ID && view.thread.event === TOUR_STORY_EVENT;
+  useEffect(() => {
+    if (tourStory) emitTutorial("story-thread-opened");
+  }, [tourStory]);
 
   // Reveal the next waiting bubble after its typing beat
   useEffect(() => {
@@ -182,8 +195,10 @@ export default function ChatThreadScreen() {
   return (
     <ChatFrame
       left={left}
+      cover={cover}
       center={<ChatTitle subtitle={sent === 1 ? "1 letter" : `${sent} letters`}>{speaker?.name ?? "Chat"}</ChatTitle>}
     >
+      <ChatPaletteProvider value={palette}>
       <ScrollView
         ref={scroller}
         onContentSizeChange={() => scroller.current?.scrollToEnd({ animated: freshFrom !== null })}
@@ -258,6 +273,7 @@ export default function ChatThreadScreen() {
           </Animated.View>
         ) : null}
       </ScrollView>
+      </ChatPaletteProvider>
     </ChatFrame>
   );
 }

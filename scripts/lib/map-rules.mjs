@@ -1,5 +1,5 @@
 /**
- * Nuclear Map validation (docs/PHONE_SPEC.md §5.8).
+ * Nuclear Map validation (docs/features/PHONE_SPEC.md §5.8).
  *
  * `validateMapData` is pure; `validateMap` reads the content database. `validateDatabase` runs it, so `npm run validate:content`, Studio
  * saves and the publish gate enforce it. A site needs real coordinates and a kind, and is sourced: at least one reference, and at the publish

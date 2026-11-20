@@ -12,6 +12,7 @@ import {
     createOrUpdateUserProfile,
     getUserProfile,
     initDatabase,
+    logDailyActivity,
 } from "./database";
 import {
     DEFAULT_AVATAR_VALUE,
@@ -19,7 +20,7 @@ import {
 } from "@/components/avatar/avatar-core";
 import { recordChatAppOpen } from "./chats";
 import { checkFeedOnAppOpen, emitRankCheck, emitStreak } from "./feed";
-import { getOnboardingCompleted, setLastActiveDate, setOnboardingCompleted } from "./storage";
+import { getLastActiveDate, getOnboardingCompleted, setLastActiveDate, setOnboardingCompleted } from "./storage";
 import { recordMissionEvent } from "./missions";
 import { checkDailyStreak, toLocalIsoDate } from "./utils";
 
@@ -204,6 +205,10 @@ export const StorageProvider = ({ children }: { children: ReactNode }) => {
       const newTotalXP = prevTotalXP + Math.max(0, Math.round(amount));
 
       await updateUserProfile({ total_xp: newTotalXP });
+      // Every source of XP (lessons, games, quests, facts, the tour) passes here, so this is the one place
+      // that counts it in today's activity, which is what the weekly ranking adds up.
+      const gained = newTotalXP - prevTotalXP;
+      if (gained > 0) await logDailyActivity(toLocalIsoDate(), { xp_earned: gained }).catch(() => {});
       emitRankCheck(); // the NPC feed may notice a rank change (fire-and-forget)
 
       // Level-up detection — every 100 XP bumps the displayed level
@@ -269,8 +274,11 @@ export const StorageProvider = ({ children }: { children: ReactNode }) => {
         }
 
         // A successful app open today counts as a daily login
+        // The tracker's own "already done today" flag lives in memory, so every cold start gets here again.
+        // The saved last-active date is what makes a login count once per calendar day.
+        const alreadyLoggedToday = (await getLastActiveDate()) === today;
         await setLastActiveDate(today);
-        await recordMissionEvent("login", 1);
+        if (!alreadyLoggedToday) await recordMissionEvent("login", 1);
         dailyTrackedDateRef.current = today;
         void checkFeedOnAppOpen(); // comeback post and feed retention; never rejects
         void recordChatAppOpen(); // a teacher may welcome the learner back; never rejects

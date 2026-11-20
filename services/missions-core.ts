@@ -4,13 +4,13 @@
  * `scripts/test-missions.mjs` runs it under Node. `services/missions.ts` adds the storage.
  *
  * Both periods count the same events (a log-in, a Myth Buster round, a daily fact, a finished
- * lesson); a period only differs in its target, its reward and when its counters start again.
+ * lesson or a passed practice or checkpoint (both are "lesson" events), a cleared Atom Maze level); a period only differs in its target, its reward and when its counters start again.
  */
 
-export type MissionType = "login" | "mythbuster" | "fact" | "lesson";
+export type MissionType = "login" | "mythbuster" | "fact" | "lesson" | "maze";
 export type MissionPeriod = "daily" | "weekly";
 
-export const MISSION_TYPES: readonly MissionType[] = ["login", "mythbuster", "fact", "lesson"];
+export const MISSION_TYPES: readonly MissionType[] = ["login", "mythbuster", "fact", "lesson", "maze"];
 
 export interface MissionsState {
   /** The period this state belongs to: today's date (daily) or the date of the week's Monday (weekly). */
@@ -19,7 +19,7 @@ export interface MissionsState {
   claimed: string[];
 }
 
-export const emptyProgress = (): Record<MissionType, number> => ({ login: 0, mythbuster: 0, fact: 0, lesson: 0 });
+export const emptyProgress = (): Record<MissionType, number> => ({ login: 0, mythbuster: 0, fact: 0, lesson: 0, maze: 0 });
 
 export const toIsoDate = (date: Date = new Date()): string =>
   `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
@@ -80,13 +80,24 @@ export function resolveState(stored: unknown, key: string): { state: MissionsSta
 /** Stored in a period's `claimed` list once its chest is opened (a mission id never has this name). */
 export const CHEST_ID = "chest";
 
-/** Diamonds in the chest of each period: opened once every quest of the period is claimed. */
+/** Diamonds in the chest of each period. */
 export const CHEST_REWARD: Record<MissionPeriod, number> = { daily: 5, weekly: 25 };
+
+/**
+ * How many quests of a period must be claimed to unlock its chest. Daily: every one. Weekly: any 3 of them
+ * (the week has more quests than most weeks have time for, so the chest does not wait for all).
+ */
+export const CHEST_QUESTS_NEEDED: Partial<Record<MissionPeriod, number>> = { weekly: 3 };
+
+/** `needed` for `chestStatus`: the period's rule, never more than the quests there are. */
+export const chestNeeded = (period: MissionPeriod, questCount: number): number =>
+  Math.min(questCount, CHEST_QUESTS_NEEDED[period] ?? questCount);
 
 export type ChestStatus = "locked" | "ready" | "opened";
 
-/** Locked until every quest is claimed, then ready until it is opened. */
-export function chestStatus(missionIds: readonly string[], claimed: readonly string[]): ChestStatus {
+/** Locked until `needed` quests (default: every one) are claimed, then ready until it is opened. */
+export function chestStatus(missionIds: readonly string[], claimed: readonly string[], needed: number = missionIds.length): ChestStatus {
   if (claimed.includes(CHEST_ID)) return "opened";
-  return missionIds.length > 0 && missionIds.every((id) => claimed.includes(id)) ? "ready" : "locked";
+  if (missionIds.length === 0 || needed < 1) return "locked";
+  return missionIds.filter((id) => claimed.includes(id)).length >= needed ? "ready" : "locked";
 }

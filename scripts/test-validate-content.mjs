@@ -297,7 +297,7 @@ test("normalize strips punctuation and case", () => {
 });
 
 // ---------------------------------------------------------------------------
-// NPC feed and mini blog (docs/NPC_FEED_SPEC.md §6): scripts/lib/feed-rules.mjs, feed-vocab.mjs
+// NPC feed and mini blog (docs/features/NPC_FEED_SPEC.md §6): scripts/lib/feed-rules.mjs, feed-vocab.mjs
 // ---------------------------------------------------------------------------
 
 const NPC_IDS = ["npc-ada", "npc-hal", "npc-ray", "npc-mina", "npc-kofi", "npc-tess"];

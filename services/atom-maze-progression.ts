@@ -1,5 +1,5 @@
 /**
- * Atom Maze question progression (docs/ATOMIQ_FEEDBACK_SUMMARY_SPEC.md §4.4).
+ * Atom Maze question progression (docs/qa/ATOMIQ_FEEDBACK_SUMMARY_SPEC.md §4.4).
  *
  * Pure, framework-free state machine. It deliberately has no React / Expo
  * imports so it can run under plain `node --test` (Node 22 type stripping):

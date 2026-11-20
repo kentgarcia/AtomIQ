@@ -1,5 +1,5 @@
 /**
- * Shrodi's chat (docs/PHONE_SPEC.md §5.2): the Guide, now a conversation opened from the phone's Chats app.
+ * Shrodi's chat (docs/features/PHONE_SPEC.md §5.2): the Guide, now a conversation opened from the phone's Chats app.
  * Shrodi in the middle with a speech bubble over them, and a response dock of pills (no typing).
  *   "I want to learn about ___" -> [ Radiation ] [ Atoms ] -> Shrodi's answer
  * The rule engine is `services/guide/engine.ts`, unchanged. Back goes to Chats.

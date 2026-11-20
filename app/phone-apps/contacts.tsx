@@ -1,5 +1,5 @@
 /**
- * Contacts (docs/PHONE_SPEC.md §5.1), under the app's usual header. The page is built like the profiles in the rest of the app: a
+ * Contacts (docs/features/PHONE_SPEC.md §5.1), under the app's usual header. The page is built like the profiles in the rest of the app: a
  * short list of compact filled cards. The cover is whole at the card's right edge and fades into the card on the left, so the head, the
  * name and the title sit on the plain filled card. The learner's own card has their paint and pattern (as on the Phone's wallpaper) with
  * their avatar; every other card has the cover of that teacher's profile (their outfit colour with a wallpaper of what they teach).

@@ -4,5 +4,5 @@ export { SpeechBubble, BubbleTail, SideTail } from "./SpeechBubble";
 export { TeacherBanner } from "./TeacherBanner";
 export { MeetSheet } from "./MeetSheet";
 export { useTeacherLines, setTeacherLines } from "./teacher-lines";
-export { useNpc, useNpcForUnit, useNpcLine } from "./use-npc";
+export { useNpc, useNpcForUnit, useNpcForUnitState, useNpcLine } from "./use-npc";
 export { UnitTeacher } from "./UnitTeacher";

@@ -16,7 +16,7 @@ content/
 
 ## Curriculum
 
-Lessons are a layered path (`docs/LESSON_RESTRUCTURE_SPEC.md`): units contain
+Lessons are a layered path (`docs/features/LESSON_RESTRUCTURE_SPEC.md`): units contain
 path nodes (lesson, practice, checkpoint); a lesson is an ordered list of cards;
 interactive cards point at items in a shared bank that also feeds practice,
 review and games. The database stores values only. Every interaction is a
@@ -33,7 +33,7 @@ old lessons and quizzes are saved under `scripts/content-migration/legacy/`.
 ## NPC feed and mini blog
 
 Discover is a feed in which the NPC cast posts about what the learner did
-(`docs/NPC_FEED_SPEC.md`). Its content tables are `feed_templates` (a post's
+(`docs/features/NPC_FEED_SPEC.md`). Its content tables are `feed_templates` (a post's
 text per trigger, with placeholders), `blog_posts` (the short pieces, written in
 blocks), `blog_comments` (NPC comments, authored with the piece) and
 `blog_references` (a piece's sources). Seed rows live in
@@ -65,7 +65,7 @@ gitignored and safe to delete when no process has the database open.
 ## Quality gates
 
 - `npm run validate:content` checks every learner-facing question and the
-  curriculum and reference rules (see `docs/CONTENT_QUESTION_QUALITY.md`). Run
+  curriculum and reference rules (see `docs/critical/CONTENT_QUESTION_QUALITY.md`). Run
   it before `sync-content`.
 - `npm run test:content` unit-tests the rules; `npm run test:curriculum` and
   `npm run test:curriculum-content` cover the lesson/path/mastery cores and the

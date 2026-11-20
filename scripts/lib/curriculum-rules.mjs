@@ -1,5 +1,5 @@
 /**
- * Curriculum v2 validation (docs/LESSON_RESTRUCTURE_SPEC.md §6.2 and §10.6).
+ * Curriculum v2 validation (docs/features/LESSON_RESTRUCTURE_SPEC.md §6.2 and §10.6).
  *
  * Read-only against the database handed in. Returns findings in the same shape as
  * content-validate.mjs; `validateDatabase` calls it, so `npm run validate:content`,
@@ -471,7 +471,7 @@ export function validateCurriculum(db, { strictReview = false } = {}) {
   }
 
   // -------------------------------------------------------------------------
-  // NPC teachers (docs/NPC_TEACHERS_SPEC.md §7.3, rules R1 to R6)
+  // NPC teachers (docs/features/NPC_TEACHERS_SPEC.md §7.3, rules R1 to R6)
   // -------------------------------------------------------------------------
   if (has("npcs") && has("npc_lines")) {
     const unitCols = db.prepare("PRAGMA table_info(units)").all().map((c) => c.name);

@@ -1,7 +1,7 @@
 /**
  * ChestCard — the chest of a period's quests, shown at the right of the Quests page's info card.
- * There is no button: the chest itself is the control. It is dimmed until every quest of the period
- * is claimed; then it is normal, nudges now and then, and a tap opens it once for diamonds
+ * There is no button: the chest itself is the control. It is dimmed until enough quests of the period
+ * are claimed (every daily one, any 3 weekly ones); then it is normal, nudges now and then, and a tap opens it once for diamonds
  * (5 a day, 25 a week).
  *
  *   locked   the closed chest, dimmed (not tappable)

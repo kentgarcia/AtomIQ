@@ -14,7 +14,7 @@
  *   items + lesson_cards (curriculum v2: item bank, card text, scenes, references; rules in
  *   scripts/lib/curriculum-rules.mjs), mythbuster_questions and myths (Myth-or-Fact statements).
  *
- * Rules live in scripts/lib/content-rules.mjs; see docs/CONTENT_QUESTION_QUALITY.md.
+ * Rules live in scripts/lib/content-rules.mjs; see docs/critical/CONTENT_QUESTION_QUALITY.md.
  */
 
 import { DatabaseSync } from "node:sqlite";

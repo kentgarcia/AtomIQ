@@ -1,5 +1,5 @@
 /**
- * Sound effects runtime (docs/SFX_SPEC.md §7): the one place that requires an audio file or
+ * Sound effects runtime (docs/features/SFX_SPEC.md §7): the one place that requires an audio file or
  * touches expo-audio for effects. Screens call `playSfx("group.name")`; the catalog, gates
  * and scheduling rules are in `sfx-core.ts` and `media-core.ts`.
  */

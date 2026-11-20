@@ -1,6 +1,6 @@
 /**
  * SlidingHighlight — one "selected" pill that travels from the old option to
- * the new one (docs/CONTINUITY_SPEC.md, C8).
+ * the new one (docs/features/CONTINUITY_SPEC.md, C8).
  *
  * Usage:
  *   const hl = useSlidingHighlight(activeId);

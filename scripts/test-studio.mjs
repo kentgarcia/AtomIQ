@@ -202,7 +202,7 @@ describe("validation on save", () => {
   });
 });
 
-describe("feed templates and blog pieces (docs/NPC_FEED_SPEC.md §6)", () => {
+describe("feed templates and blog pieces (docs/features/NPC_FEED_SPEC.md §6)", () => {
   const BLOG = "blog-the-smallest-thing";
   const entity = async (table, id) => (await call("GET", `/api/entities/${table}/${id}`)).json.entity;
   const count = (sql, ...params) => query(fx.paths, sql, ...params)[0].n;

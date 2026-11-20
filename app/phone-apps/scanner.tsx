@@ -1,5 +1,5 @@
 /**
- * Atom Scanner (docs/PHONE_SPEC.md §8): a simulation, not a camera, drawn like a camera app. The scene fills the screen as the
+ * Atom Scanner (docs/features/PHONE_SPEC.md §8): a simulation, not a camera, drawn like a camera app. The scene fills the screen as the
  * viewfinder; the learner drags it under a fixed reticle, and when a thing is in the frame it locks on, the round shutter button
  * runs a 1.2 s scan (its ring fills) and the result rises as a sheet. Over the viewfinder: a dark translucent top bar (back, title) and
  * a status pill; under it a dark panel with the things in the scene, the scene strip (like a camera's modes) and the shutter between

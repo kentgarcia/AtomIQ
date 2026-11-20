@@ -1,5 +1,5 @@
 /**
- * The phone's runtime (docs/PHONE_SPEC.md): gathers the learner's progress from the stores the app
+ * The phone's runtime (docs/features/PHONE_SPEC.md): gathers the learner's progress from the stores the app
  * already has, binds `phone_seen` to the user-state database, and tells listeners when something
  * changed. Rules are in `services/phone-core.ts`. Nothing here throws: a failed read gives the
  * starting apps and no badges.

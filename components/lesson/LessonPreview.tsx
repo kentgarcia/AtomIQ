@@ -17,7 +17,8 @@ import { Npc } from "@/components/npc/Npc";
 import { LeftTail } from "@/components/npc/SpeechBubble";
 import { useTeacherLines } from "@/components/npc/teacher-lines";
 import { useTeacherMet } from "@/components/npc/met-teachers";
-import { useNpcForUnit, useNpcLine } from "@/components/npc/use-npc";
+import { useNpcForUnitState, useNpcLine } from "@/components/npc/use-npc";
+import { useTutorialTarget } from "@/components/tutorial/use-tutorial-target";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Icon } from "@/components/ui/icon";
@@ -86,7 +87,9 @@ export function LessonPreview({
   const layout = useResponsiveLayout();
   const bottom = useBottomInset();
   const reduced = useReducedMotion();
-  const teacher = useNpcForUnit(unit?.id);
+  // Shrodi's tour lights the Start button of the first lesson's preview
+  const { ref: startRef } = useTutorialTarget("home.preview.start", { radius: 22 });
+  const { npc: teacher, ready: teacherReady } = useNpcForUnitState(unit?.id);
   const intro = useNpcLine(teacher?.id, "lesson_intro", lesson.id);
   const met = useTeacherMet(teacher?.id);
   const linesOn = useTeacherLines();
@@ -124,7 +127,7 @@ export function LessonPreview({
         <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
           <View style={[LESSON_FRAME, GUTTER, styles.intro]}>
             <View style={styles.teacher} pointerEvents="none">
-              {teacher ? (
+              {!teacherReady ? null : teacher ? (
                 <Npc spec={teacher.spec} pose="idle" form="bust" size={TEACHER} />
               ) : (
                 <Shrodi mood="idle" size={TEACHER} />
@@ -176,7 +179,9 @@ export function LessonPreview({
         </ScrollView>
 
         <View style={[styles.footer, LESSON_FRAME, GUTTER, { paddingBottom: bottom + spacing.sm }]}>
-          <Button label={action} accessibilityLabel={actionLabel} shine onPress={onProceed} />
+          <View ref={startRef} collapsable={false}>
+            <Button label={action} accessibilityLabel={actionLabel} shine onPress={onProceed} />
+          </View>
         </View>
       </View>
     </LessonFrame>

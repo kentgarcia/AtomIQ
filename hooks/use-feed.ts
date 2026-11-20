@@ -84,7 +84,7 @@ export function useFeed(): FeedState {
 /** Just the number for the dot on the Feed tab icon (0 while muted). Cheap: no list is loaded. */
 export function useFeedUnseenCount(): number {
   const [count, setCount] = useState(0);
-  // Sound (docs/SFX_SPEC.md §6.6): new posts arriving while the app is open ring once, at most once a
+  // Sound (docs/features/SFX_SPEC.md §6.6): new posts arriving while the app is open ring once, at most once a
   // minute. The first load is not an arrival.
   const lastCount = useRef<number | null>(null);
   const lastRang = useRef(0);

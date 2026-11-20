@@ -1,5 +1,5 @@
 /**
- * Activity tracker — framework-free core (docs/ACTIVITY_TRACKER.md).
+ * Activity tracker — framework-free core (docs/features/ACTIVITY_TRACKER.md).
  *
  * Pure date-key math, the intensity scale, dedupe rules, heat-map grid layout,
  * summaries, a model of the existing app-open streak, and a storage-agnostic

@@ -1,5 +1,5 @@
 /**
- * NPC feed and mini blog validation (docs/NPC_FEED_SPEC.md §6 rules).
+ * NPC feed and mini blog validation (docs/features/NPC_FEED_SPEC.md §6 rules).
  *
  * `validateFeedData` is pure (plain objects in, findings out) so tests can feed it fixtures;
  * `validateFeed` reads the content database and calls it. `validateDatabase` runs it, so

@@ -1,4 +1,4 @@
-// Safety Guide cards (docs/PHONE_SPEC.md 5.9). Data only: nothing here runs.
+// Safety Guide cards (docs/features/PHONE_SPEC.md 5.9). Data only: nothing here runs.
 // Every card is worded from the official page(s) listed in its `refs`, which
 // were opened and read on ACCESSED. Safety wording follows those pages; do not
 // add numbers or advice that the cited pages do not give.

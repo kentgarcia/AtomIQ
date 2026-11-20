@@ -34,6 +34,7 @@ import { useDelayedClock } from "@/components/motion/use-delayed-clock";
 import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
 import type { Badge, PhoneApp } from "@/services/phone-core";
+import { playSfx } from "@/services/sfx";
 import { createStyles, fontFaces, useTheme, withAlpha } from "@/theme";
 import { EASE_OUT } from "@/theme/motion";
 
@@ -49,6 +50,8 @@ export interface AppIconProps {
   /** The accessibility label, badge included. */
   label: string;
   onPress: () => void;
+  /** Not on the phone yet: a grey tile with a lock, no picture and no badge. Pressing it explains how to get it. */
+  locked?: boolean;
   /** Play the install moment, `delay` ms from mount. Keep it set for the whole visit: it plays once. */
   install?: {
     delay: number;
@@ -63,15 +66,20 @@ function AppIconBase({
   badge,
   label,
   onPress,
+  locked = false,
   install,
 }: AppIconProps) {
   const { theme } = useTheme();
   const styles = useStyles(theme);
   const c = theme.colors;
   const reduced = useReducedMotion();
-  // A white or a dark tile where the picture wants one (iOS-like), else the catalog colour
+  // A white or a dark tile where the picture wants one (iOS-like), else the catalog colour; a locked app is grey
   const own = APP_ICON_TILE[app.id];
-  const tile = own ? ICON_TILES[own] : phoneTile(c, app.color);
+  const tile = locked
+    ? phoneTile(c, "grey")
+    : own
+      ? ICON_TILES[own]
+      : phoneTile(c, app.color);
   const radius = Math.round(size * 0.27);
 
   const pressed = useSharedValue(0);
@@ -83,6 +91,13 @@ function AppIconBase({
   });
   const installing = !!install;
   const delay = install?.delay ?? 0;
+  // The pop's sound is the icon's own, on the install clock (the moment the icon lands), so it can never drift from the picture or
+  // be cancelled by the screen re-rendering. Reduced motion has no moment, so one pop plays at once.
+  useEffect(() => {
+    if (!installing) return;
+    const timer = setTimeout(() => void playSfx("reward.pop"), reduced ? 0 : delay + INSTALL.popAt);
+    return () => clearTimeout(timer);
+  }, [installing, delay, reduced]);
   useEffect(() => {
     if (!installing) return;
     // Reduced motion: no moment, the icon is simply there
@@ -121,9 +136,11 @@ function AppIconBase({
     strokeDashoffset: perimeter * (1 - installFrame(clock.get()).ring),
   }));
 
-  const showBadge = installing
-    ? install?.newDot === true || badge !== null
-    : badge !== null;
+  const showBadge = locked
+    ? false
+    : installing
+      ? install?.newDot === true || badge !== null
+      : badge !== null;
 
   return (
     <View style={[styles.cell, { width: size + 20 }]}>
@@ -207,7 +224,14 @@ function AppIconBase({
               faceStyle,
             ]}
           >
-            {hasGlyph(app.id) ? (
+            {locked ? (
+              <Icon
+                name="Lock"
+                size={Math.round(size * 0.46)}
+                color={tile.ink}
+                variant="Bold"
+              />
+            ) : hasGlyph(app.id) ? (
               <AppGlyph
                 id={app.id}
                 size={size}

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * One-off loudness pass for the bundled effects (docs/SFX_SPEC.md §7.4).
+ * One-off loudness pass for the bundled effects (docs/features/SFX_SPEC.md §7.4).
  *
  * expo-audio volume only goes down, so a quiet file cannot be raised at runtime. This brings each
  * file's mean level to a target by role, then keeps the peak at or under -1 dBFS (a file that cannot

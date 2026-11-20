@@ -1,4 +1,4 @@
-// NPC feed tests (docs/NPC_FEED_SPEC.md §14).  Run: npm run test:feed
+// NPC feed tests (docs/features/NPC_FEED_SPEC.md §14).  Run: npm run test:feed
 //
 // The rules live in framework-free cores: services/feed-core.ts, social-core.ts, blog-core.ts,
 // rank-core.ts (and the seeded RNG in rng-core.ts). The store's SQL is run on an in-memory SQLite.
@@ -462,7 +462,7 @@ test("simulateRivalXp is deterministic per NPC and week and varies by both", () 
   // rivals are beatable: nobody is wildly out of reach of the learner's own pace
   for (const n of CAST) for (let w = 0; w < 30; w++) {
     const xp = rank.simulateRivalXp(n.id, rank.previousWeekKeys("2026-11-16", 30)[w], 500);
-    assert.ok(xp <= 500 * 1.6 && xp >= 500 * 0.35, `${n.id} week ${w}: ${xp}`);
+    assert.ok(xp <= 500 * 1.9 && xp >= 500 * 0.55, `${n.id} week ${w}: ${xp}`);
   }
 });
 

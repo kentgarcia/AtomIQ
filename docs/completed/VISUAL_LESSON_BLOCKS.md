@@ -1,7 +1,7 @@
 # Visual Lesson Blocks
 
 **Status:** Implemented (first release)  
-**Spec:** `docs/ATOMIQ_FEEDBACK_SUMMARY_SPEC.md` section 5.1  
+**Spec:** `docs/qa/ATOMIQ_FEEDBACK_SUMMARY_SPEC.md` section 5.1  
 **Code:** `content/types.ts`, `content/visual-blocks.ts`, `components/lesson/visual/*`  
 **Authoring script:** `scripts/content-migration/add-visual-blocks.mjs`  
 **Tests:** `npm run test:visuals`

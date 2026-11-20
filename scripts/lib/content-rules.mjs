@@ -10,7 +10,7 @@
  * Errors fail `npm run validate:content`; warnings are reported for human
  * review but do not fail the run. The rules are intentionally conservative:
  * a rule should only fire when a beginner would plausibly be confused.
- * See docs/CONTENT_QUESTION_QUALITY.md for the rule list and rationale.
+ * See docs/critical/CONTENT_QUESTION_QUALITY.md for the rule list and rationale.
  */
 
 // ---------------------------------------------------------------------------

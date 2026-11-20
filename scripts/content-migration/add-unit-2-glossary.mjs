@@ -5,7 +5,7 @@
  * nuclide, alpha decay, beta decay, gamma radiation, decay chain, potassium-40 and electromagnetic
  * radiation. Written in plain words for beginners. Missing entries are added; an existing entry is
  * never overwritten. Sources are textbook sections and agency pages, to be opened and checked by a
- * person before publish (docs/UNIT_2_RADIOACTIVITY_SPEC.md section 9). Draft edit of the master db;
+ * person before publish (docs/features/UNIT_2_RADIOACTIVITY_SPEC.md section 9). Draft edit of the master db;
  * publish to ship.
  *
  *   node --no-warnings scripts/content-migration/add-unit-2-glossary.mjs [--dry-run] [--db <path>]

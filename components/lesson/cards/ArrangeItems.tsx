@@ -67,7 +67,7 @@ const useStyles = createStyles((theme) => ({
 // ---------------------------------------------------------------------------
 
 /**
- * A sound for every press that builds an answer piece by piece (docs/SFX_SPEC.md §6.3), so changing
+ * A sound for every press that builds an answer piece by piece (docs/features/SFX_SPEC.md §6.3), so changing
  * your mind sounds as often as choosing: `lesson.drop` for a piece put down or moved (`lesson.pair-ok`
  * for a right pair locking, `lesson.pick` for a match card picked up), `ui.unequip` for one taken back.
  * The press that completes the set plays nothing here: it is graded at once and the result cue plays

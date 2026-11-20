@@ -6,6 +6,7 @@
  * Maze, unit quizzes, the Lab, and Myth Buster.
  */
 
+import { useTutorialTarget } from "@/components/tutorial/use-tutorial-target";
 import { DifficultyPanel } from "@/components/games/DifficultyPanel";
 import { GAME_GUIDES, guideById, initialGuide, type GuideId } from "@/components/games/game-instructions";
 import { StackCard } from "@/components/games/StackCard";
@@ -42,7 +43,7 @@ const HEADER_BELOW_INSET = 72;
 
 type DifficultyGame = "mythbuster" | "lab";
 
-/** Picker ⇄ difficulty panel (docs/CONTINUITY_SPEC.md, C3). */
+/** Picker ⇄ difficulty panel (docs/features/CONTINUITY_SPEC.md, C3). */
 const EXPAND = { duration: DURATION.expand - 50, easing: EASE_DRAWER };
 
 /**
@@ -170,6 +171,10 @@ export function PickAGame() {
     };
 
     // Every game opens the difficulty picker first.
+    // Shrodi's first visit lights the Atom Maze and Myth Buster cards (docs/features/TUTORIAL_SPEC.md §5.4)
+    const mazeLit = useTutorialTarget("games.atom-maze", { radius: 20 });
+    const mythLit = useTutorialTarget("games.mythbuster", { radius: 20 });
+    const labLit = useTutorialTarget("games.lab", { radius: 20 });
     const handleSelect = (game: (typeof GAMES)[number], index: number) => {
         // Atom Maze is story mode: its level map opens instead of a difficulty picker
         if (game.route === "/explorer/story") {
@@ -233,6 +238,7 @@ export function PickAGame() {
                                 selected={selected}
                                 reducedMotion={reducedMotion}
                             >
+                                <View ref={game.route === "/explorer/story" ? mazeLit.ref : game.route === "/mythbuster" ? mythLit.ref : game.route === "/lab" ? labLit.ref : undefined} collapsable={false}>
                                 <StackCard
                                     title={game.title}
                                     subtitle={game.subtitle}
@@ -242,6 +248,7 @@ export function PickAGame() {
                                     height={cardH}
                                     onPress={() => handleSelect(game, index)}
                                 />
+                                </View>
                             </GameSlot>
                         ))}
                     </View>

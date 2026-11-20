@@ -43,6 +43,7 @@ import { createStyles, fontFaces, useResponsiveLayout, useTheme } from "@/theme"
 import { controls } from "@/theme/tokens";
 import { notifyError, notifySuccess, select } from "@/services/haptics";
 import { playSfx, stopSfx } from "@/services/sfx";
+import { useTutorialTarget } from "@/components/tutorial/use-tutorial-target";
 
 const DIAMOND_ICON = require("@/assets/images/icons/diamond.png");
 const SIDE = 20;
@@ -80,6 +81,8 @@ export default function ShopScreen() {
   const { theme } = useTheme();
   const styles = useStyles(theme);
   const insets = useSafeAreaInsets();
+  // Shrodi's first visit lights the item grid (docs/features/TUTORIAL_SPEC.md §5.4)
+  const gridLit = useTutorialTarget("shop.grid", { radius: 16 });
   const { height: windowHeight, width: windowWidth } = useWindowDimensions();
   const { contentMaxWidth } = useResponsiveLayout();
   const { userProfile, updateUserProfile } = useStorage();
@@ -102,7 +105,7 @@ export default function ShopScreen() {
     return () => timers.forEach(clearTimeout);
   }, []);
 
-  // The shop jingle plays as it opens and is cut when the learner leaves (docs/SFX_SPEC.md §6.5)
+  // The shop jingle plays as it opens and is cut when the learner leaves (docs/features/SFX_SPEC.md §6.5)
   useEffect(() => {
     void playSfx("ui.shop-open");
     return () => stopSfx("ui.shop-open");
@@ -171,7 +174,7 @@ export default function ShopScreen() {
       if (result.ok) {
         notifySuccess();
         // The diamonds fly to the avatar, a tick as each leaves the balance and a landing with the last
-        // (docs/SFX_EXPANSION_SPEC.md §6.2); a free item or reduced motion has the landing only
+        // (docs/features/SFX_EXPANSION_SPEC.md §6.2); a free item or reduced motion has the landing only
         const flying = reduced ? 0 : coinCount(trying.price);
         for (let i = 0; i < flying; i += 1) sfxTimers.current.push(setTimeout(() => void playSfx("shop.coin-tick", { index: i }), i * PURCHASE.step));
         sfxTimers.current.push(setTimeout(() => void playSfx("shop.coin-land"), landMs(flying)));
@@ -297,6 +300,7 @@ export default function ShopScreen() {
             />
           ) : null}
           {/* Keyed by category, so each starts at the top. A list, not a scroll view: there are dozens of items. */}
+          <View ref={gridLit.ref} collapsable={false} style={styles.grid}>
           <FlatList
             key={category}
             style={styles.grid}
@@ -326,6 +330,7 @@ export default function ShopScreen() {
               </View>
             }
           />
+          </View>
         </View>
       </View>
       <Awning width={windowWidth} topInset={insets.top} />

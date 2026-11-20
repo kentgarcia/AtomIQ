@@ -1,6 +1,6 @@
 /**
  * The cover of a teacher's profile: a wallpaper of small flat pictures that speak about them, in the
- * teacher's own outfit colour (docs/NPC_TEACHERS_SPEC.md). Ada's is atoms and questions, Hal's clocks
+ * teacher's own outfit colour (docs/features/NPC_TEACHERS_SPEC.md). Ada's is atoms and questions, Hal's clocks
  * and decay curves, Ray's shields and rays, Mina's hearts and drops, Kofi's gears and cooling towers,
  * Tess's sprouts and gadgets, Sage's scales and leaves.
  *

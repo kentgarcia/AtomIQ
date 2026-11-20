@@ -1,5 +1,5 @@
 /**
- * Wallpapers (docs/PHONE_SPEC.md §4): the Phone tab's header button opens this. The first choice is the learner's own avatar paint and pattern
+ * Wallpapers (docs/features/PHONE_SPEC.md §4): the Phone tab's header button opens this. The first choice is the learner's own avatar paint and pattern
  * (what a new phone wears), then the plain page colour, then five calm illustrated wallpapers. Each is shown as a little phone
  * with a ghost grid of app icons on it; a tap puts it on the phone at once (the choice is a preference, saved on the device).
  */

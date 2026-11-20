@@ -1,5 +1,5 @@
 /**
- * Chats (docs/PHONE_SPEC.md §5.2): the conversations on the phone, under a plain red header. Every thread, Shrodi's too, is one of two things: a story a trigger unlocked (it has a subject line and can be replayed), or a
+ * Chats (docs/features/PHONE_SPEC.md §5.2): the conversations on the phone, under a plain red header. Every thread, Shrodi's too, is one of two things: a story a trigger unlocked (it has a subject line and can be replayed), or a
  * free chat the learner started with the pen button. A teacher can have many of them, the latest message first. Every thread is
  * a filled card, like the cards on Contacts: the sender's round picture, the name, the subject, the last line and the day, and a
  * blue dot (with the line in bold) while it is unread. Swipe a thread to the left to show its blue Archive action (swiping only shows
@@ -12,10 +12,14 @@ import { useCast } from "@/components/feed/use-cast";
 import { settle } from "@/components/motion/settle";
 import { ChatButton, ChatFrame, ChatTitle } from "@/components/phone/ChatFrame";
 import { ChatHead, speakerFor } from "@/components/phone/ChatHead";
+import { useTutorialTarget } from "@/components/tutorial/use-tutorial-target";
 import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
 import { useChatList } from "@/hooks/use-chats";
 import { setThreadArchived } from "@/services/chats";
+import { emitTutorial } from "@/services/tutorial";
+import { TOUR_STORY_EVENT } from "@/services/tutorial-core";
+import { CHAT_MASCOT_ID } from "@/services/chat-core";
 import { noteDateLabel } from "@/services/field-notes";
 import { createStyles, fontFaces, useResponsiveLayout, useTheme } from "@/theme";
 import { useFocusEffect, useRouter } from "expo-router";
@@ -63,6 +67,16 @@ function SwipeCard({ children, name, archived, onToggle, actionStyle, textStyle 
     >
       {children}
     </ReanimatedSwipeable>
+  );
+}
+
+/** The tour lights Shrodi's first story through this wrapper (one `useTutorialTarget`, so only that row has it). */
+function TourRow({ children }: { children: ReactNode }) {
+  const lit = useTutorialTarget("chats.story", { radius: 16 });
+  return (
+    <View ref={lit.ref} collapsable={false}>
+      {children}
+    </View>
   );
 }
 
@@ -164,7 +178,8 @@ export default function ChatsScreen() {
           const unread = row.unread > 0;
           // A story shows its subject; a free chat is just the name
           const subject = row.origin === "event" ? row.title : null;
-          return letter(
+          const toured = row.npcId === CHAT_MASCOT_ID && row.event === TOUR_STORY_EVENT;
+          const element = letter(
             row.threadId,
             <ChatHead speaker={speaker} size={FACE} />,
             name,
@@ -173,10 +188,14 @@ export default function ChatsScreen() {
             row.lastAt !== null ? noteDateLabel(row.lastAt, now) : null,
             unread,
             `${name}. ${subject ? `${subject}. ` : ""}${line}.${unread ? ` ${row.unread} unread.` : ""} Opens the chat.`,
-            () => router.push(`/phone-apps/chat?thread=${encodeURIComponent(row.threadId)}`),
+            () => {
+              if (toured) emitTutorial("story-thread-opened");
+              router.push(`/phone-apps/chat?thread=${encodeURIComponent(row.threadId)}`);
+            },
             60 * (i + 1),
             { archived: row.archived, onToggle: () => archive(row.threadId, !row.archived) },
           );
+          return toured && !row.archived ? <TourRow key={row.threadId}>{element}</TourRow> : element;
         })}
         {loaded && !showArchived && active.length === 0 ? <Text style={styles.note}>Finish a lesson and its teacher will message you here. You can also start a chat with the pen button.</Text> : null}
         {showArchived && archivedRows.length === 0 ? <Text style={styles.note}>Nothing is archived. Swipe a chat to the left and tap Archive to put it here.</Text> : null}

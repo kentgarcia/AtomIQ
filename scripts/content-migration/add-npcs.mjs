@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * NPC teachers migration (docs/NPC_TEACHERS_SPEC.md §7.1). Idempotent and additive:
+ * NPC teachers migration (docs/features/NPC_TEACHERS_SPEC.md §7.1). Idempotent and additive:
  *
  *   1. Creates `npcs` and `npc_lines` (the `npcs` block of schema.sql) and adds `units.teacher_npc_id`.
  *   2. Seeds the cast and the voice lines from components/npc/npc-roster.ts. Existing rows are left

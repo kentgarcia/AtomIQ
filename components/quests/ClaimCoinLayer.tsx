@@ -67,7 +67,7 @@ function FlightView({ flight, onDone }: { flight: Flight; onDone: (id: number) =
     return () => clearTimeout(id);
   }, [flight.id, total, onDone]);
 
-  // Sound (docs/SFX_SPEC.md §6.5), in the order the flight plays: the coins pop out of the bar (or the
+  // Sound (docs/features/SFX_SPEC.md §6.5), in the order the flight plays: the coins pop out of the bar (or the
   // chest) with one pop, then a tick as each one lands, a step higher than the last. A chest's
   // diamonds end on the coin cue; an XP claim's coin cue is played by the quest row at CLAIM_AT.
   useEffect(() => {

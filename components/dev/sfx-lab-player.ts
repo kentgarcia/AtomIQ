@@ -84,7 +84,7 @@ export const playSteps = (steps: readonly PlayStep[], onEnd?: () => void): PlayH
           setTimeout(() => {
             try {
               player.volume = Math.min(1, Math.max(0, step.volume));
-              // A higher rate is a higher pitch only with pitch correction off (docs/SFX_SPEC.md §7.5).
+              // A higher rate is a higher pitch only with pitch correction off (docs/features/SFX_SPEC.md §7.5).
               player.shouldCorrectPitch = step.rate === 1;
               player.setPlaybackRate(step.rate);
               player.play();

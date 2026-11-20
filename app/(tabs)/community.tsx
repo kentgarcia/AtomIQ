@@ -1,6 +1,7 @@
 import { BlogCard } from "@/components/feed/BlogCard";
 import { RanksBanner, ShortcutsRow } from "@/components/feed/EntryCards";
 import { PostCard } from "@/components/feed/PostCard";
+import { useTutorialTarget } from "@/components/tutorial/use-tutorial-target";
 import { useDrippedFeed } from "@/components/feed/use-drip";
 import { useCast } from "@/components/feed/use-cast";
 import { useWeeklyRanking } from "@/components/feed/use-ranking";
@@ -11,17 +12,17 @@ import { useFeed } from "@/hooks/use-feed";
 import { checkRankChange, type FeedItem } from "@/services/feed";
 import { createStyles, fontFaces, useResponsiveLayout, useTheme } from "@/theme";
 import { useFocusEffect } from "expo-router";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { FlatList, RefreshControl, View } from "react-native";
 import { usePullRefresh } from "@/hooks/use-pull-refresh";
 import { useReducedMotion } from "react-native-reanimated";
 
 /**
- * Discover: the NPC feed (docs/NPC_FEED_SPEC.md §3). The cast posts about what the learner really
+ * Discover: the NPC feed (docs/features/NPC_FEED_SPEC.md §3). The cast posts about what the learner really
  * did, blog pieces appear as blog cards, newest first. The learner can only react.
  *
  * Under the "Feed" title, a row of four round shortcuts and the weekly ranking banner sit at the top
- * of the list and scroll away with it. Posts are flat on the page (no cards). Posts are marked seen as they scroll into view, which clears the dot on the tab.
+ * of the list and scroll away with it. Posts are flat on the page (no cards). Opening the page marks every post seen, which clears the dot on the tab.
  * Everything is simulated and offline; an empty feed (no posts yet, or a bundle without the feed
  * tables) shows Shrodi and one line.
  */
@@ -40,8 +41,6 @@ const useStyles = createStyles((theme) => {
   };
 });
 
-const VIEWABILITY = { itemVisiblePercentThreshold: 60, minimumViewTime: 300 } as const;
-
 export default function CommunityScreen() {
   const { theme } = useTheme();
   const styles = useStyles(theme);
@@ -59,21 +58,16 @@ export default function CommunityScreen() {
   const reduced = useReducedMotion();
   const { shown, fresh } = useDrippedFeed(items, loading, isFocused, reduced);
 
-  /* Seen marks only count while Discover is in front. */
-  const focused = useRef(false);
-  const markSeenRef = useRef(markSeen);
+  /* Opening Discover is what clears the dot on the tab: every post in the list counts as seen at once
+     (not only the ones scrolled into view), and so does one that lands while the page is in front. */
   useEffect(() => {
-    markSeenRef.current = markSeen;
-  }, [markSeen]);
-  const [onViewable] = useState(() => ({ viewableItems }: { viewableItems: readonly { item?: FeedItem | null }[] }) => {
-    if (!focused.current) return;
-    const ids = viewableItems.flatMap((v) => (v.item ? [v.item.id] : []));
-    if (ids.length) markSeenRef.current(ids);
-  });
+    if (!isFocused || loading) return;
+    const ids = items.filter((i) => !i.seen).map((i) => i.id);
+    if (ids.length) markSeen(ids);
+  }, [isFocused, loading, items, markSeen]);
 
   useFocusEffect(
     useCallback(() => {
-      focused.current = true;
       setIsFocused(true);
       setNow(Date.now());
       void refresh();
@@ -81,7 +75,6 @@ export default function CommunityScreen() {
       void checkRankChange(); // a passed rival may become a post; the list re-reads by itself
       const tick = setInterval(() => setNow(Date.now()), MINUTE);
       return () => {
-        focused.current = false;
         setIsFocused(false);
         clearInterval(tick);
       };
@@ -95,14 +88,17 @@ export default function CommunityScreen() {
     }, [refresh, reloadRanking]),
   );
 
+  // Shrodi's tour lights the first card's reaction pill (docs/features/TUTORIAL_SPEC.md)
+  const reactionLit = useTutorialTarget("feed.reaction", { radius: "round" });
+  const firstId = shown[0]?.id;
   const renderItem = useCallback(
     ({ item }: { item: FeedItem }) =>
       item.blog ? (
-        <BlogCard item={item} npc={cast.get(item.npcId) ?? null} cast={cast} now={now} fresh={fresh.has(item.id)} />
+        <BlogCard item={item} npc={cast.get(item.npcId) ?? null} cast={cast} now={now} fresh={fresh.has(item.id)} reactionRef={item.id === firstId ? reactionLit.ref : undefined} />
       ) : (
-        <PostCard item={item} npc={cast.get(item.npcId) ?? null} cast={cast} now={now} fresh={fresh.has(item.id)} />
+        <PostCard item={item} npc={cast.get(item.npcId) ?? null} cast={cast} now={now} fresh={fresh.has(item.id)} reactionRef={item.id === firstId ? reactionLit.ref : undefined} />
       ),
-    [cast, now, fresh],
+    [cast, now, fresh, firstId, reactionLit.ref],
   );
 
   return (
@@ -112,10 +108,8 @@ export default function CommunityScreen() {
         data={shown}
         renderItem={renderItem}
         keyExtractor={(item) => item.id}
-        onViewableItemsChanged={onViewable}
         onScroll={onScroll}
         scrollEventThrottle={scrollEventThrottle}
-        viewabilityConfig={VIEWABILITY}
         initialNumToRender={5}
         maxToRenderPerBatch={5}
         windowSize={7}

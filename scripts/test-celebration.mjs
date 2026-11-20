@@ -15,6 +15,7 @@ import { loadTs } from "./lib/ts-require.mjs";
 const C = loadTs("components/celebration/celebration-core.ts");
 const { FINISH_STAMPS, STAMP_LANDS, STAMP_TOTAL } = loadTs("components/lesson/stamp-core.ts");
 const { BURST } = loadTs("components/motion/burst-core.ts");
+const { REVEAL } = loadTs("components/motion/reveal-core.ts");
 const { POP_TOTAL } = loadTs("components/lesson/cards/option-pop-core.ts");
 
 test("the pop constants are the option pop's own", () => {
@@ -203,4 +204,16 @@ test("level-up unlocked items: the tiles come after the line, the button after t
     last = at;
   }
   assert.ok(last < 2500, "never a long wait to leave");
+});
+
+test("tour reward: Shrodi lands, the title is stamped, the diamond pops, the count runs, then the line and the button, all in time", () => {
+  const T = C.TOUR_REWARD_FX;
+  assert.equal(T.burst, STAMP_LANDS);
+  assert.ok(T.mascot < T.burst && T.burst < T.title && T.title < T.gem, "in the order they are seen");
+  assert.ok(T.gem < T.gemBurst && T.gemBurst - T.gem === C.POP_HANG, "the diamond's burst is at its hang");
+  assert.ok(T.count >= T.gem && T.count + T.countMs <= T.line, "the number has landed before the line arrives");
+  assert.ok(T.line < T.button);
+  assert.ok(C.TOUR_REWARD_TOTAL >= T.button + REVEAL.ms && C.TOUR_REWARD_TOTAL >= T.gem + C.POP_LENGTH);
+  assert.ok(C.TOUR_REWARD_TOTAL < 2200, "the button is there within about two seconds");
+  assert.ok(C.TOUR_REWARD_TIMEOUT_MS > C.TOUR_REWARD_TOTAL + 3000, "long enough to read");
 });

@@ -1,5 +1,5 @@
 /**
- * The Camera's flat backdrops (docs/PHONE_SPEC.md §9), in the lesson object art's look (project skill `duolingo-object-style`: flat colour, no
+ * The Camera's flat backdrops (docs/features/PHONE_SPEC.md §9), in the lesson object art's look (project skill `duolingo-object-style`: flat colour, no
  * outlines, rounded shapes, the side facing away a step darker). Pure data with no framework imports, so Node tests can check it. Every
  * scene is one 100 x 125 frame (4:5); the figures stand on the ground line `GROUND` and are drawn over it. Colours are fixed hues, the same in
  * light and dark (theme exception EX-13).

@@ -1,4 +1,4 @@
-/** NPC teachers (docs/NPC_TEACHERS_SPEC.md). */
+/** NPC teachers (docs/features/NPC_TEACHERS_SPEC.md). */
 
 import type { NpcSpec, PoseId } from "../../components/npc/npc-art.ts";
 import type { NpcLineKind } from "../../components/npc/npc-roster.ts";

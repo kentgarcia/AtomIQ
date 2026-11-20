@@ -11,6 +11,7 @@ import { View } from "react-native";
 import { Text } from "@/components/ui/text";
 
 import { QuestRow } from "@/components/quests/QuestRow";
+import { useTutorialTarget } from "@/components/tutorial/use-tutorial-target";
 import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
 import type { MissionView, PeriodMissions } from "@/hooks/use-missions";
@@ -91,7 +92,10 @@ export function MissionsSection({
         />
       );
     }
-    if (mission.period === "weekly" && mission.type === "lesson") {
+    if (mission.type === "maze") {
+      return <Button {...base} label="Play" onPress={() => router.push("/explorer/story")} />;
+    }
+    if (mission.type === "lesson") {
       return (
         <Button
           {...base}
@@ -105,6 +109,9 @@ export function MissionsSection({
     );
   };
 
+  // ...and the first daily quest
+  const rowLit = useTutorialTarget("quests.first-row", { radius: 16 });
+
   const section = (period: MissionPeriod, title: string, data: PeriodMissions) => (
     <View style={styles.section}>
       <View style={styles.sectionHead}>
@@ -112,13 +119,10 @@ export function MissionsSection({
         <ResetTimer period={period} />
       </View>
       <View style={styles.list}>
-        {data.missions.map((mission) => (
-          <QuestRow
-            key={mission.id}
-            mission={mission}
-            onClaim={claim}
-            renderAction={(busy, startClaim) => action(mission, busy, startClaim)}
-          />
+        {data.missions.map((mission, i) => (
+          <View key={mission.id} ref={period === "daily" && i === 0 ? rowLit.ref : undefined} collapsable={false}>
+            <QuestRow mission={mission} onClaim={claim} renderAction={(busy, startClaim) => action(mission, busy, startClaim)} />
+          </View>
         ))}
       </View>
     </View>

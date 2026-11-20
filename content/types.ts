@@ -393,7 +393,7 @@ export interface ContentMetadata {
 
 
 // ============================================
-// NPC FEED AND MINI BLOG (docs/NPC_FEED_SPEC.md)
+// NPC FEED AND MINI BLOG (docs/features/NPC_FEED_SPEC.md)
 // ============================================
 
 /** What a feed post is about (spec §5.1). `blog_unlocked` creates a blog card and has no template. */

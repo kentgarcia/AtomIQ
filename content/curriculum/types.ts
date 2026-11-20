@@ -2,7 +2,7 @@
  * Curriculum v2 types: units, objectives, lessons made of cards, and the item bank.
  *
  * Framework-free and erasable-syntax only (no enums, `import type` only), so Node
- * tests and content scripts can load it directly. See docs/LESSON_RESTRUCTURE_SPEC.md.
+ * tests and content scripts can load it directly. See docs/features/LESSON_RESTRUCTURE_SPEC.md.
  *
  * Rules that make the data safe to localize and shuffle:
  *  - correct answers always refer to option ids, never to text or array position;
@@ -166,7 +166,7 @@ export type ExplainData = TeachBase;
 export interface StoryData extends TeachBase {
   /** Short label such as "1911" or "Rutherford". */
   tag?: string;
-  /** The NPC teacher telling the story (`npcs.id`): the unit's teacher (docs/NPC_TEACHERS_SPEC.md). */
+  /** The NPC teacher telling the story (`npcs.id`): the unit's teacher (docs/features/NPC_TEACHERS_SPEC.md). */
   speaker?: string;
 }
 export interface RevealData extends TeachBase {
@@ -314,7 +314,7 @@ export interface ScaleZoomData {
   stops: ScaleZoomStop[];
 }
 
-/** Unit 2: nuclei that change by themselves (docs/UNIT_2_RADIOACTIVITY_SPEC.md §8). */
+/** Unit 2: nuclei that change by themselves (docs/features/UNIT_2_RADIOACTIVITY_SPEC.md §8). */
 export type DecayWaitMode = "single" | "half-life";
 
 export interface DecayWaitData {

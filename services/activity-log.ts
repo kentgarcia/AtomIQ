@@ -10,7 +10,7 @@
  * file only wires the SQLite store, the device clock, AppState flushing and
  * the one-time import of real historical completion timestamps.
  *
- * See docs/ACTIVITY_TRACKER.md.
+ * See docs/features/ACTIVITY_TRACKER.md.
  */
 
 import { AppState } from "react-native";

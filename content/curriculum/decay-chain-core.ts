@@ -1,6 +1,6 @@
 /**
  * Decay chain: tap the unstable nucleus and it changes into the next one, until a stable
- * nucleus ends the chain (docs/UNIT_2_RADIOACTIVITY_SPEC.md §8). Generic labels only
+ * nucleus ends the chain (docs/features/UNIT_2_RADIOACTIVITY_SPEC.md §8). Generic labels only
  * (Parent, Daughter, Next generation), never real isotopes.
  */
 

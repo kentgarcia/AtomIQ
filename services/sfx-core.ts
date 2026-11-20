@@ -1,5 +1,5 @@
 /**
- * The SFX cue catalog and its scheduling rules (docs/SFX_SPEC.md §5 and §7).
+ * The SFX cue catalog and its scheduling rules (docs/features/SFX_SPEC.md §5 and §7).
  *
  * Framework-free and unit-tested (`npm run test:sfx`): no expo-audio, no React. A cue is a
  * meaning ("lesson.answer-correct"); a file is a detail. Screens call `playSfx(cue)` in
@@ -66,7 +66,7 @@ export const SFX_FILES = {
   "game/platformer-hurt": 180,
   "game/platformer-defeat": 582,
   "game/platformer-battle": 278,
-  // Platformer: footsteps, jumps and landings by ground (docs/PLATFORMER_SPEC.md, "Sounds"), a lie-down thud, the checkpoint and fireworks
+  // Platformer: footsteps, jumps and landings by ground (docs/features/PLATFORMER_SPEC.md, "Sounds"), a lie-down thud, the checkpoint and fireworks
   "game/step-grass-left": 365,
   "game/step-grass-right": 346,
   "game/land-grass": 224,
@@ -90,7 +90,7 @@ export const SFX_FILES = {
   "game/checkpoint": 2000,
   "game/fireworks-launch": 2200,
   "game/fireworks-burst": 2600,
-  // docs/SFX_EXPANSION_SPEC.md: the second upload, chosen in the SFX lab
+  // docs/features/SFX_EXPANSION_SPEC.md: the second upload, chosen in the SFX lab
   "ui/page-next": 72,
   "ui/page-back": 69,
   "ui/panel-open": 219,
@@ -239,7 +239,7 @@ export const CUES = {
   "game.time-up": cue("game/time-up", "feedback", 0.8, 400),
   // The BOOM that ends a Myth Buster round (out of lives, or out of time after the time-up beat)
   "game.explosion": cue("game/explosion", "stinger", 0.85, 800),
-  // Atom Maze platformer: hop, pick up a coin, get hurt, an enemy goes poof, and a battle starts (docs/SFX_SPEC.md)
+  // Atom Maze platformer: hop, pick up a coin, get hurt, an enemy goes poof, and a battle starts (docs/features/SFX_SPEC.md)
   "game.platformer-jump": cue("game/platformer-jump", "feedback", 0.6, 90, 2),
   "game.platformer-coin": cue("game/platformer-coin", "reward", 0.7, 60, 3),
   "game.platformer-hurt": cue("game/platformer-hurt", "feedback", 0.8, 300),
@@ -271,7 +271,7 @@ export const CUES = {
   // Fireworks over the finished level: the launch whistle, then the burst
   "game.fireworks-launch": cue("game/fireworks-launch", "reward", 0.7, 500),
   "game.fireworks-burst": cue("game/fireworks-burst", "reward", 0.8, 500),
-  // The second upload (docs/SFX_EXPANSION_SPEC.md §5): the Phone and its apps, the shop, counts and ranks, lesson pieces, small games moments
+  // The second upload (docs/features/SFX_EXPANSION_SPEC.md §5): the Phone and its apps, the shop, counts and ranks, lesson pieces, small games moments
   "nav.page-next": cue("ui/page-next", "feedback", 0.6, 150, 1),
   "nav.page-back": cue("ui/page-back", "feedback", 0.55, 150, 1),
   "ui.panel-open": cue("ui/panel-open", "panel", 0.55, 120, 1),

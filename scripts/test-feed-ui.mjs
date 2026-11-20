@@ -192,8 +192,8 @@ test("reaction pill label and the ranking banner lines", () => {
 });
 
 test("the shortcut circles are the four the design names", () => {
-  assert.deepEqual(ui.SHORTCUTS.map((s) => s.href), ["/encyclopedia", "/periodic-table", "/daily-facts", "/blogs"]);
-  assert.deepEqual(ui.SHORTCUTS.map((s) => s.label), ["AtomDex", "Periodic table", "Daily facts", "Blogs"]);
+  assert.deepEqual(ui.SHORTCUTS.map((s) => s.href), ["/encyclopedia", "/periodic-table", "/reacted", "/blogs"]);
+  assert.deepEqual(ui.SHORTCUTS.map((s) => s.label), ["AtomDex", "Periodic table", "Reacted", "Blogs"]);
 });
 
 /* ------------------------------------------------------------------ */

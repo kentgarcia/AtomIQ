@@ -1,5 +1,5 @@
 /**
- * The NPC feed vocabulary (docs/NPC_FEED_SPEC.md §5 and §6), as plain data and a few pure helpers.
+ * The NPC feed vocabulary (docs/features/NPC_FEED_SPEC.md §5 and §6), as plain data and a few pure helpers.
  *
  * Framework-free and dependency-free on purpose: the validator (scripts/lib/feed-rules.mjs), the
  * Content Studio and the app's cores (services/feed-core.ts, services/blog-core.ts) all read the

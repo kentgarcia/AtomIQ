@@ -5,7 +5,7 @@ import { ScreenHeader, useHeaderBorder } from "@/components/layout";
 import { Icon } from "@/components/ui/icon";
 import { useModalOrigin } from "@/components/ui/grow-modal";
 import { Button } from "@/components/ui/button";
-import { ModalButton } from "@/components/ui/modal-card";
+import { ModalButton, ModalSecondaryButton } from "@/components/ui/modal-card";
 import { ModalDialog } from "@/components/ui/modal-dialog";
 import { BETA_FEEDBACK_FORM_URL } from "@/constants/beta";
 import { openExternalUrl } from "@/services/open-url";
@@ -22,9 +22,11 @@ import {
   getFeedPostsEnabled,
   getHapticsEnabled,
   getPhoneBadgesEnabled,
+  getTutorialEnabled,
   setFeedPostsEnabled,
   setHapticsEnabled,
   setPhoneBadgesEnabled,
+  setTutorialEnabled,
   subscribeFeedPostsEnabled,
   subscribePhoneBadgesEnabled,
 } from "@/services/storage";
@@ -33,6 +35,7 @@ import { setMediaPreference } from "@/services/media";
 import { playSfx } from "@/services/sfx";
 import { useMediaPreferences } from "@/hooks/use-read-aloud";
 import { useStorage } from "@/services/StorageContext";
+import { replayIntros, replayTour, resetTutorial } from "@/services/tutorial";
 import Constants from "expo-constants";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
@@ -63,6 +66,9 @@ export default function SettingsScreen() {
   const [haptics, setHaptics] = useState(true);
   const [feedPosts, setFeedPosts] = useState(true);
   const [phoneBadges, setPhoneBadges] = useState(true);
+  // "Tips from Shrodi" and "Replay the tour" (docs/features/TUTORIAL_SPEC.md §9)
+  const [tips, setTips] = useState(true);
+  const [replayAsk, setReplayAsk] = useState(false);
   const teacherLines = useTeacherLines();
   const [isDeletingAccount, setIsDeletingAccount] = useState(false);
   const [versionModalVisible, setVersionModalVisible] = useState(false);
@@ -184,7 +190,7 @@ export default function SettingsScreen() {
     };
   }, []);
 
-  // "Feed posts": the NPC feed on Discover (docs/NPC_FEED_SPEC.md §8). Kept in step with the one store.
+  // "Feed posts": the NPC feed on Discover (docs/features/NPC_FEED_SPEC.md §8). Kept in step with the one store.
   useEffect(() => {
     let mounted = true;
     void getFeedPostsEnabled()
@@ -202,7 +208,30 @@ export default function SettingsScreen() {
     void setFeedPostsEnabled(next).catch((error) => console.error("Error saving feed posts preference:", error));
   };
 
-  // "App badges": the counts and dots on the phone's icons and on the Phone tab (docs/PHONE_SPEC.md §5.3).
+  useEffect(() => {
+    let mounted = true;
+    void getTutorialEnabled()
+      .then((on) => mounted && setTips(on))
+      .catch(() => undefined);
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const handleTipsToggle = (next: boolean) => {
+    setTips(next);
+    void setTutorialEnabled(next).catch((error) => console.error("Error saving tips preference:", error));
+  };
+
+  // The tour starts again from its first chapter, and every screen intro shows again
+  const handleReplay = async () => {
+    setReplayAsk(false);
+    await replayTour();
+    await replayIntros();
+    router.replace("/(tabs)");
+  };
+
+  // "App badges": the counts and dots on the phone's icons and on the Phone tab (docs/features/PHONE_SPEC.md §5.3).
   useEffect(() => {
     let mounted = true;
     void getPhoneBadgesEnabled()
@@ -247,6 +276,8 @@ export default function SettingsScreen() {
 
       await deleteAccountData();
       await AsyncStorage.clear();
+      // The tour starts again with the next onboarding
+      resetTutorial();
 
       // The dialog now says it is done; OK takes them back to the very start
       setDeleteStage("done");
@@ -340,6 +371,19 @@ export default function SettingsScreen() {
           </SettingsCard>
         </Animated.View>
 
+        <Animated.View entering={settle(180)}>
+          <SettingsCard title="Tutorial">
+            <SettingsRow
+              icon="Lamp"
+              color={theme.colors.primary}
+              label="Tips from Shrodi"
+              note="A short tour, and a hint the first time you open a screen."
+              toggle={{ value: tips, onChange: handleTipsToggle }}
+            />
+            <SettingsRow icon="Refresh" color={theme.colors.sky} label="Replay the tour" arrow hint="Shrodi shows you around again" onPress={() => setReplayAsk(true)} />
+          </SettingsCard>
+        </Animated.View>
+
         <Animated.View entering={settle(250)}>
           <SettingsCard title="About">
             <SettingsRow icon="Message" color="#EA580C" label="Beta Feedback" arrow hint="Opens the feedback form" onPress={() => void handleBetaFeedback()} />
@@ -376,6 +420,21 @@ export default function SettingsScreen() {
       </ScrollView>
 
       {/* App Version */}
+      <ModalDialog
+        visible={replayAsk}
+        onClose={() => setReplayAsk(false)}
+        title="Replay the tour?"
+        dismissOnScrim
+        footer={
+          <>
+            <ModalButton label="Replay" onPress={() => void handleReplay()} />
+            <ModalSecondaryButton label="Not now" onPress={() => setReplayAsk(false)} />
+          </>
+        }
+      >
+        <Text style={{ color: theme.colors.textSecondary }}>Shrodi will start from your first lesson again, and show the hint on each screen once more. Your progress is not touched.</Text>
+      </ModalDialog>
+
       <ModalDialog
         visible={versionModalVisible}
         origin={versionOrigin}

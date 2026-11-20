@@ -1,5 +1,5 @@
 /**
- * The NPC feed at runtime (docs/NPC_FEED_SPEC.md §7.3). The cast posts about what the learner really
+ * The NPC feed at runtime (docs/features/NPC_FEED_SPEC.md §7.3). The cast posts about what the learner really
  * did; mini blog pieces appear as blog cards when they unlock; the learner can only react.
  * Nothing here is sent anywhere. The rules are in the framework-free cores (`feed-core`,
  * `social-core`, `blog-core`, `rank-core`); the SQL is in `feed-store-core`; this file is the glue.

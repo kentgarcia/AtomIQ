@@ -1,5 +1,5 @@
 /**
- * The weekly ranking, the framework-free part (docs/NPC_FEED_SPEC.md §4.4): the learner against
+ * The weekly ranking, the framework-free part (docs/features/NPC_FEED_SPEC.md §4.4): the learner against
  * the NPC cast as rivals. Rivals' XP is simulated deterministically from the NPC id, the week and
  * the learner's own pace, so the table is the same on every open, rivals are beatable and the
  * table moves a little each week.
@@ -12,8 +12,14 @@ import type { RankDirection } from "./feed-core.ts";
 /** The learner's id in a ranking. No NPC has it. */
 export const LEARNER_ID = "me";
 
-/** Rivals scale from the learner's weekly pace, but never below this (a new learner still has rivals to race). */
-export const MIN_RIVAL_PACE = 120;
+/**
+ * Rivals scale from the learner's weekly pace, but never below this (a new learner still has rivals to race).
+ * A week of the quests plus a few lessons is about this much, so a first week is a real race, not a walkover.
+ */
+export const MIN_RIVAL_PACE = 300;
+
+/** The rivals work a little harder than the learner's usual week: keeping the usual pace lands mid-table, a push wins. */
+export const RIVAL_PACE_FACTOR = 1.1;
 
 /* ------------------------------------------------------------------ */
 /* Week keys: the Monday of the week, local, like `missions-core`      */
@@ -42,9 +48,9 @@ export const previousWeekKeys = (weekKey: string, n: number): string[] => Array.
 
 /** A rival's weekly total, before the week unfolds: base pace scaled by a per-week luck and a per-NPC habit. */
 function weeklyTotal(npcId: string, weekKey: string, learnerPace: number): number {
-  const base = Math.max(MIN_RIVAL_PACE, Number.isFinite(learnerPace) ? learnerPace : 0);
-  const habit = 0.85 + 0.3 * rngFromSeed(`habit|${npcId}`)(); // 0.85 to 1.15, the same every week
-  const luck = 0.45 + 0.9 * rngFromSeed(`week|${npcId}|${weekKey}`)(); // 0.45 to 1.35
+  const base = Math.max(MIN_RIVAL_PACE, Number.isFinite(learnerPace) ? learnerPace : 0) * RIVAL_PACE_FACTOR;
+  const habit = 0.8 + 0.5 * rngFromSeed(`habit|${npcId}`)(); // 0.8 to 1.3, the same every week: some rivals are steady grinders
+  const luck = 0.7 + 0.6 * rngFromSeed(`week|${npcId}|${weekKey}`)(); // 0.7 to 1.3
   return Math.round((base * habit * luck) / 5) * 5;
 }
 

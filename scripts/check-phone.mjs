@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Phone source gate (docs/PHONE_SPEC.md §10). The phone is offline and has no device sensors:
+ * Phone source gate (docs/features/PHONE_SPEC.md §10). The phone is offline and has no device sensors:
  *   - no import of a camera, photo-library, location, contacts or notifications package (app permissions stay INTERNET only),
  *   - no `fetch(` in the phone's services,
  *   - the only text input under the phone is Field Notes (`app/phone-apps/field-note*`, `components/phone/notes/*`).

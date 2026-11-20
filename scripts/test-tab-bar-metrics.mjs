@@ -1,5 +1,5 @@
 /**
- * Tab bar metrics tests (docs/TAB_BAR_RESPONSIVE_POSITIONING_SPEC.md §4, §7.1).
+ * Tab bar metrics tests (docs/qa/TAB_BAR_RESPONSIVE_POSITIONING_SPEC.md §4, §7.1).
  *
  * Run: npm run test:tab-bar
  */

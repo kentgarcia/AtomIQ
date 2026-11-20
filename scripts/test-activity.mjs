@@ -1,4 +1,4 @@
-// Activity tracker tests (docs/ACTIVITY_TRACKER.md).  Run: npm run test:activity
+// Activity tracker tests (docs/features/ACTIVITY_TRACKER.md).  Run: npm run test:activity
 //
 // The pure logic lives in services/activity-core.ts (framework-free). Timezones
 // are simulated by injecting `offsetMin` (Date#getTimezoneOffset convention);

@@ -1,5 +1,5 @@
 /**
- * Unit 2: Radioactivity. Authored content (docs/UNIT_2_RADIOACTIVITY_SPEC.md).
+ * Unit 2: Radioactivity. Authored content (docs/features/UNIT_2_RADIOACTIVITY_SPEC.md).
  *
  * One core idea per lesson, in short plain sentences:
  *   L1  An unstable nucleus can change by itself. When one particular nucleus changes cannot be predicted.

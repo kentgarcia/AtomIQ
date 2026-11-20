@@ -21,6 +21,14 @@ test("a stored composition reads back; unknown parts fall back; anything else is
   assert.equal(core.parsePhotoConfig(null), null);
 });
 
+test("a photo keeps the full avatar the learner wore (the default design's text alone is over 400 characters)", async () => {
+  const { DEFAULT_AVATAR_VALUE } = await imp("components/avatar/avatar-core.ts");
+  assert.ok(DEFAULT_AVATAR_VALUE.length > 400);
+  const kept = core.parsePhotoConfig({ ...sample, avatar: DEFAULT_AVATAR_VALUE });
+  assert.equal(kept.avatar, DEFAULT_AVATAR_VALUE);
+  assert.equal(core.parsePhotoConfig({ ...sample, avatar: "x".repeat(core.AVATAR_MAX_LENGTH + 1) }).avatar, "");
+});
+
 test("every scene, pose and frame the camera offers is drawn", () => {
   assert.deepEqual(scenes.PHOTO_SCENE_LIST.map((s) => s.id), [...core.PHOTO_SCENES]);
   for (const s of scenes.PHOTO_SCENE_LIST) {

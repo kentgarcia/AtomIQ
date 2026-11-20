@@ -3,7 +3,7 @@
  * a stable (non-radioactive) nucleus. Framework-free, erasable syntax only.
  *
  * "Stable" here means the combination occurs in nature as a stable isotope.
- * Source to confirm before publish: IUPAC/IAEA nuclide tables (docs/LESSON_RESTRUCTURE_SPEC.md §13).
+ * Source to confirm before publish: IUPAC/IAEA nuclide tables (docs/features/LESSON_RESTRUCTURE_SPEC.md §13).
  */
 
 export interface ElementInfo {

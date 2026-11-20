@@ -1,5 +1,5 @@
 /**
- * The Safety Guide vocabulary (docs/PHONE_SPEC.md §5.9 and §7.1), as plain data. Framework-free, so the validator
+ * The Safety Guide vocabulary (docs/features/PHONE_SPEC.md §5.9 and §7.1), as plain data. Framework-free, so the validator
  * (scripts/lib/safety-rules.mjs), the Content Studio and the app read the same names.
  */
 

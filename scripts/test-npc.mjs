@@ -1,6 +1,6 @@
 /**
  * NPC teachers: the Duolingo character skill's measurable rules, the cast's variety, the muted
- * version and the roster data (docs/NPC_TEACHERS_SPEC.md §9).
+ * version and the roster data (docs/features/NPC_TEACHERS_SPEC.md §9).
  *
  * Run: npm run test:npc
  * Whether the characters LOOK good is a person looking at `node scripts/render-npcs.mjs <dir>`.

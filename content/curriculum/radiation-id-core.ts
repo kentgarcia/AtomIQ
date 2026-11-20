@@ -1,7 +1,7 @@
 /**
  * Radiation id: three nuclear changes, one at a time. The learner names what leaves the
  * nucleus (alpha, beta or gamma) and only then does the animation play and confirm
- * (docs/UNIT_2_RADIOACTIVITY_SPEC.md §8). A wrong guess is allowed and re-tried.
+ * (docs/features/UNIT_2_RADIOACTIVITY_SPEC.md §8). A wrong guess is allowed and re-tried.
  */
 
 import type { RadiationIdCase, RadiationIdData, RadiationKind } from "./types.ts";

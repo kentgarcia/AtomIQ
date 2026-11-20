@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Curriculum v2 cutover (docs/LESSON_RESTRUCTURE_SPEC.md §10.4).
+ * Curriculum v2 cutover (docs/features/LESSON_RESTRUCTURE_SPEC.md §10.4).
  *
  * Replaces the old lessons / lesson_steps / quizzes / quiz_questions with the v2
  * curriculum tables and loads the authored units. Repeatable: units already

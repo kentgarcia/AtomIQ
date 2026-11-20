@@ -1,5 +1,5 @@
 /**
- * A blog card in the feed (docs/NPC_FEED_SPEC.md §3): the same flat pattern as a post, kept compact. The
+ * A blog card in the feed (docs/features/NPC_FEED_SPEC.md §3): the same flat pattern as a post, kept compact. The
  * header row ("Ada wrote a blog piece", the time), then one soft row (a small cover picture, the title,
  * the hook and the reading time; the whole row opens the reader), then the reaction pill with the
  * "Liked by" line beside it and a divider. The cover is the figure, so there is no character beside it.
@@ -14,6 +14,7 @@ import Animated, { useReducedMotion } from "react-native-reanimated";
 import { BlogCover } from "@/components/feed/BlogCover";
 import { HeadLink } from "@/components/feed/HeadLink";
 import { ReactionRow } from "@/components/feed/ReactionRow";
+import type { ViewRef } from "@/components/tutorial/use-tutorial-target";
 import { actionPhrase, blogHref, blogSpokenLabel, metaLine, reactionSpoken, readTimeLabel, relativeTime, relativeTimeSpoken } from "@/components/feed/feed-ui-core";
 import { pushHref } from "@/components/feed/navigate";
 import { Icon } from "@/components/ui/icon";
@@ -58,9 +59,11 @@ export interface BlogCardProps {
   fresh?: boolean;
   /** The author's avatar opens their profile (default). Off on that teacher's own page. */
   linkHead?: boolean;
+  /** Shrodi's tour lights this card's reaction pill (the first card on the Feed). */
+  reactionRef?: React.Ref<ViewRef>;
 }
 
-export const BlogCard = memo(function BlogCard({ item, npc, cast, now, fresh = false, linkHead = true }: BlogCardProps) {
+export const BlogCard = memo(function BlogCard({ item, npc, cast, now, fresh = false, linkHead = true, reactionRef }: BlogCardProps) {
   const router = useRouter();
   const { theme } = useTheme();
   const styles = useStyles(theme);
@@ -123,7 +126,7 @@ export const BlogCard = memo(function BlogCard({ item, npc, cast, now, fresh = f
           </View>
         </Pressable>
 
-        <ReactionRow target={item.target} summary={item.reactions} cast={cast} commentCount={blog.commentCount} onViewComments={open} />
+        <ReactionRow target={item.target} summary={item.reactions} cast={cast} commentCount={blog.commentCount} onViewComments={open} pillRef={reactionRef} />
         <View style={styles.divider} accessible={false} importantForAccessibility="no-hide-descendants" />
       </View>
     </Animated.View>

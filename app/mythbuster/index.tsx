@@ -49,7 +49,6 @@ import React, {
   useState,
 } from "react";
 import {
-    Alert,
     BackHandler,
     Dimensions,
     Image,
@@ -63,6 +62,7 @@ import { Button } from "@/components/ui/button";
 import { Explosion, useExplosionShake } from "@/components/games/Explosion";
 import { EXPLOSION } from "@/components/games/explosion-core";
 import { OptionButton } from "@/components/lesson/cards/shared";
+import { LeaveLessonDialog } from "@/components/lesson/LessonDialogs";
 import { HeaderButton, ScreenHeader } from "@/components/layout";
 import {
   Gesture,
@@ -150,6 +150,7 @@ export default function MythBusterScreen() {
   const [countStep, setCountStep] = useState<number | null>(null);
   const reducedMotion = useReducedMotion();
   // The button just answered shows right or wrong (the lesson buttons' pop and shake) while its card leaves
+  const [leaveOpen, setLeaveOpen] = useState(false);
   const [picked, setPicked] = useState<{ side: "myth" | "truth"; ok: boolean } | null>(null);
 
   const translateX = useSharedValue(0);
@@ -210,10 +211,10 @@ export default function MythBusterScreen() {
   const clock = selectedMode.clock;
   const endingRef = useRef(false);
   useEffect(() => {
-    if (gameState !== "playing" || !clock || countStep !== null) return;
+    if (gameState !== "playing" || !clock || countStep !== null || leaveOpen) return;
     const timer = setInterval(() => setTimeLeft((prev) => (prev === null ? prev : clockTick(prev))), 1000);
     return () => clearInterval(timer);
-  }, [gameState, clock, countStep]);
+  }, [gameState, clock, countStep, leaveOpen]);
 
   // The countdown: each step plays its sound and holds for its time; after GO the round and its clock begin
   useEffect(() => {
@@ -357,7 +358,7 @@ export default function MythBusterScreen() {
       (direction === "truth" && currentMyth.isTrue);
     setPicked({ side: direction, ok: isCorrect });
 
-    // The card is swept away, then the verdict (docs/SFX_SPEC.md §6.7)
+    // The card is swept away, then the verdict (docs/features/SFX_SPEC.md §6.7)
     void playSfx("lesson.whoosh");
     void playSfx(isCorrect ? "lesson.answer-correct" : "lesson.answer-wrong");
 
@@ -520,20 +521,8 @@ export default function MythBusterScreen() {
     router.back();
   };
 
-  const confirmExit = useCallback(() => {
-    Alert.alert(
-      "Leave this game?",
-      "Your current run and score will be lost.",
-      [
-        { text: "Stay", style: "cancel" },
-        {
-          text: "Leave",
-          style: "destructive",
-          onPress: () => router.back(),
-        },
-      ],
-    );
-  }, [router]);
+  // The close button and Android back ask first (the house dialog, never a system alert); Endless's clock waits meanwhile
+  const confirmExit = useCallback(() => setLeaveOpen(true), []);
 
   const handleExit = useCallback(() => {
     if (gameState === "playing") {
@@ -544,7 +533,7 @@ export default function MythBusterScreen() {
   }, [confirmExit, gameState, router]);
 
   useEffect(() => {
-    if (Platform.OS !== "android" || gameState !== "playing") {
+    if (Platform.OS !== "android" || gameState !== "playing" || leaveOpen) {
       return;
     }
 
@@ -557,7 +546,7 @@ export default function MythBusterScreen() {
     );
 
     return () => subscription.remove();
-  }, [confirmExit, gameState]);
+  }, [confirmExit, gameState, leaveOpen]);
 
   const gesture = Gesture.Pan()
     .onUpdate((event) => {
@@ -952,6 +941,16 @@ export default function MythBusterScreen() {
 
         {isLoseExplosionVisible && <Explosion clock={explosionClock} />}
       </Animated.View>
+      <LeaveLessonDialog
+        visible={leaveOpen}
+        saves={false}
+        noun="game"
+        onStay={() => setLeaveOpen(false)}
+        onLeave={() => {
+          setLeaveOpen(false);
+          router.back();
+        }}
+      />
     </GestureHandlerRootView>
   );
 }

@@ -1,5 +1,5 @@
 /**
- * Which picture of Shrodi to show (docs/PLATFORMER_SPEC.md §1b). Framework-free and unit-tested
+ * Which picture of Shrodi to show (docs/features/PLATFORMER_SPEC.md §1b). Framework-free and unit-tested
  * (`npm run test:platformer`). The pictures are ONE sprite sheet of 256 px frames baked by
  * `scripts/bake-shrodi-hero.mjs`; this module owns the table of clips (how many frames each has and
  * how fast it plays), and the bake script reads the same table, so the sheet and the game cannot

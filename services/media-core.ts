@@ -3,7 +3,7 @@
  *
  * One contract for Read Aloud (speech), sound effects and background music,
  * used by lessons, random quizzes, Schrodi/Shrodi (Guide), MythBuster,
- * Atom Maze, the Lab and the encyclopedia. See docs/MEDIA_POLICY.md.
+ * Atom Maze, the Lab and the encyclopedia. See docs/critical/MEDIA_POLICY.md.
  *
  * This module has NO React Native / Expo imports on purpose so the whole
  * state machine runs under plain `node --test` (scripts/test-media-policy.mjs).
@@ -73,7 +73,7 @@ export const getRouteMediaPolicy = (
 
   if (matches(route, "/lesson")) {
     // Footer buttons (Check, Continue, Skip) click in a lesson; its option rows stay silent and play
-    // the answer cues instead (docs/SFX_SPEC.md §6.3).
+    // the answer cues instead (docs/features/SFX_SPEC.md §6.3).
     return { surface: "lesson", uiClicks: true, gameSfx: true, music: false };
   }
   if (matches(route, "/quiz") || matches(route, "/quiz-results")) {
@@ -140,7 +140,7 @@ export const canPlayGameSfx = (
   env: MediaEnvironment,
 ): boolean => prefs.soundEffects && env.appActive;
 
-/** How a sound effect is gated (docs/SFX_SPEC.md §7.2). */
+/** How a sound effect is gated (docs/features/SFX_SPEC.md §7.2). */
 export type SfxCategory = "tap" | "panel" | "feedback" | "reward" | "stinger" | "voice";
 
 /**

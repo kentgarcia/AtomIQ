@@ -1,5 +1,5 @@
 /**
- * The NPC feed, the framework-free part (docs/NPC_FEED_SPEC.md §5, §7.2, §8): which template an
+ * The NPC feed, the framework-free part (docs/features/NPC_FEED_SPEC.md §5, §7.2, §8): which template an
  * event picks and how its text is rendered. There are no pacing rules: every event that has a template posts.
  * No storage and no React, so `scripts/test-feed.mjs` runs it under Node. `services/feed.ts` adds
  * the storage and the hooks into the app.

@@ -1,5 +1,5 @@
 /**
- * Safety Guide (docs/PHONE_SPEC.md §5.9): calm, sourced reference cards on radiation and nuclear safety, under the app's usual header. The
+ * Safety Guide (docs/features/PHONE_SPEC.md §5.9): calm, sourced reference cards on radiation and nuclear safety, under the app's usual header. The
  * list opens with what this is and is not (an educational reference, not an emergency service), then three sections (Radiation basics, If
  * something happens, Myths that cost people), each card a filled row that opens a one-screen read (`safety-card.tsx`). Cards are content
  * (`safety_cards`), worded from their cited official pages and checked by a person before publishing.

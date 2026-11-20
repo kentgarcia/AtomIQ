@@ -148,7 +148,7 @@ function EstimateSlider({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [touched, value]);
 
-  // Sound (docs/SFX_SPEC.md §6.3): a select when the thumb is first touched, then a soft tick each
+  // Sound (docs/features/SFX_SPEC.md §6.3): a select when the thumb is first touched, then a soft tick each
   // time it passes a notch (every 5 percent of the rail), so a drag has a texture and a stop is heard.
   const lastNotch = useRef<number | null>(null);
   const grab = (e: GestureResponderEvent) => {

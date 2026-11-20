@@ -1,5 +1,5 @@
 /**
- * Atom Maze, platformer prototype (docs/PLATFORMER_SPEC.md): run and jump through a level, touch an
+ * Atom Maze, platformer prototype (docs/features/PLATFORMER_SPEC.md): run and jump through a level, touch an
  * enemy to battle it with a question, reach the flag. The rules are in components/platformer/
  * platformer-core.ts (steps the world), battle-core.ts (questions) and platformer-view.ts (what to
  * draw); this screen runs the clock, turns events into sounds, hearts and the battle, and saves the
@@ -67,6 +67,7 @@ import { Text } from "@/components/ui/text";
 import { recordActivity } from "@/services/activity-log";
 import { saveGameScore } from "@/services/database";
 import { loadStoryQuestions } from "@/services/story-questions";
+import { recordMissionEvent } from "@/services/missions";
 import { saveStoryResult, type SavedResult } from "@/services/story-progress";
 import { awardGameXp } from "@/services/game-xp";
 import { useStorage } from "@/services/StorageContext";
@@ -401,6 +402,7 @@ function PlatformerScreen() {
       const summary = summarize(world);
       void saveGameScore("platformer", summary.score).catch(() => undefined);
       if (summary.won) {
+        void recordMissionEvent("maze", 1); // the weekly "clear Atom Maze levels" quest
         saveStoryResult(story.id, summary.stars, summary.score, summary.time)
           .then(async (result) => {
             setSaved(result);

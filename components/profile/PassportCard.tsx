@@ -38,6 +38,8 @@ import { Card } from "@/components/ui/card";
 import { Icon } from "@/components/ui/icon";
 import type { AchievementTrack } from "@/services/achievements-core";
 import { createStyles, fontFaces, useTheme, withAlpha } from "@/theme";
+import type { ViewRef } from "@/components/tutorial/use-tutorial-target";
+import { emitTutorial } from "@/services/tutorial";
 import { DURATION } from "@/theme/motion";
 import { controls } from "@/theme/tokens";
 
@@ -69,6 +71,10 @@ export interface PassportCardProps {
   avatar: string | null | undefined;
   /** The badges shown under the name (the caller picks the best earned ones). */
   badges: PassportBadge[];
+  /** Shrodi's tour lights the badge strip through this ref (docs/features/TUTORIAL_SPEC.md). */
+  badgesRef?: React.Ref<ViewRef>;
+  /** ...and the flip button, which the tour asks the learner to press. */
+  flipRef?: React.Ref<ViewRef>;
   /** The stats page, on the back. */
   stats: PassportStat[];
   /** Whether the rank's progress panel (owned by the screen) is open. */
@@ -120,6 +126,8 @@ export function PassportCard({
   passportNo,
   avatar,
   badges,
+  badgesRef,
+  flipRef,
   stats,
   titleOpen,
   onToggleTitle,
@@ -138,6 +146,7 @@ export function PassportCard({
 
   const toggleFlip = useCallback(() => {
     const next = flipped.value === 1 ? 0 : 1;
+    if (next === 1) emitTutorial("passport-flipped");
     setIsBack(next === 1);
     flipped.value = withTiming(next, { duration: DURATION.flip });
   }, [flipped]);
@@ -174,6 +183,8 @@ export function PassportCard({
             <Avatar value={avatar} size={HERO} bare live />
           </Pressable>
           <Pressable
+            ref={flipRef}
+            collapsable={false}
             style={[styles.bannerButton, styles.flipButton]}
             onPress={toggleFlip}
             hitSlop={6}
@@ -210,6 +221,8 @@ export function PassportCard({
                 </Pressable>
               </View>
               <Pressable
+                ref={badgesRef}
+                collapsable={false}
                 onPress={onPickBadges}
                 hitSlop={6}
                 style={styles.badgeStrip}

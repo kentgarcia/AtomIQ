@@ -1,5 +1,5 @@
 /**
- * The reaction part of a post, a blog card and a blog piece (docs/NPC_FEED_SPEC.md §3, §4.2):
+ * The reaction part of a post, a blog card and a blog piece (docs/features/NPC_FEED_SPEC.md §3, §4.2):
  *
  *   [heart  6]            the learner's reaction pill: a chunky outlined pill (2 dp border, 4 dp
  *                         bottom edge). Tapping opens the picker of the four reactions; tapping the
@@ -28,6 +28,8 @@ import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
 import type { Npc } from "@/content/npcs";
 import type { Reaction } from "@/content/types";
+import { useTutorialTarget, type ViewRef } from "@/components/tutorial/use-tutorial-target";
+import { emitTutorial } from "@/services/tutorial";
 import { toggleReaction, type ReactionSummary, type ReactionTargetType } from "@/services/feed";
 import { select } from "@/services/haptics";
 import { createStyles, fontFaces, useTheme, withAlpha } from "@/theme";
@@ -62,6 +64,7 @@ const useStyles = createStyles((theme) => {
     pillOn: { borderColor: withAlpha(c.primary, 0.5), borderBottomColor: c.primary, backgroundColor: withAlpha(c.primary, 0.08) },
     pillPressed: { transform: [{ translateY: 2 }] },
     count: { fontSize: 18, ...fontFaces.heavy, color: c.text },
+    pickerWrap: { alignSelf: "flex-start" },
     picker: { alignSelf: "flex-start", flexDirection: "row", alignItems: "center", gap: 2, paddingHorizontal: 4, borderRadius: 28, backgroundColor: c.surfaceSoft },
     pick: { width: 48, height: 48, borderRadius: 24, alignItems: "center", justifyContent: "center" },
     pickOn: { backgroundColor: withAlpha(c.primary, 0.18) },
@@ -73,6 +76,17 @@ const useStyles = createStyles((theme) => {
   };
 });
 
+/** The open picker of the card the tour is on: it lights the four reactions (one `useTutorialTarget`, so only that card has it). */
+function LitPicker({ children }: { children: (ref: React.Ref<ViewRef>) => React.ReactNode }) {
+  const lit = useTutorialTarget("feed.picker", { radius: 28 });
+  return <>{children(lit.ref)}</>;
+}
+
+/** The picker's wrapper view: lit for the tour's card, plain for every other. */
+function PickerFrame({ lit, children }: { lit: boolean; children: (ref: React.Ref<ViewRef> | undefined) => React.ReactNode }) {
+  return lit ? <LitPicker>{children}</LitPicker> : <>{children(undefined)}</>;
+}
+
 export interface ReactionRowProps {
   target: { type: ReactionTargetType; id: string };
   summary: ReactionSummary;
@@ -80,9 +94,11 @@ export interface ReactionRowProps {
   /** A blog card: how many NPC comments the piece has; a "View N comments" button shows beside the pill when above 0. */
   commentCount?: number;
   onViewComments?: () => void;
+  /** Shrodi's tour lights the reaction pill through this ref (docs/features/TUTORIAL_SPEC.md): only the first card on the page gets one. */
+  pillRef?: React.Ref<ViewRef>;
 }
 
-export const ReactionRow = memo(function ReactionRow({ target, summary, cast, commentCount = 0, onViewComments }: ReactionRowProps) {
+export const ReactionRow = memo(function ReactionRow({ target, summary, cast, commentCount = 0, onViewComments, pillRef }: ReactionRowProps) {
   const { theme } = useTheme();
   const styles = useStyles(theme);
   const colors = useReactionColors();
@@ -91,6 +107,7 @@ export const ReactionRow = memo(function ReactionRow({ target, summary, cast, co
   const [sheetOpen, setSheetOpen] = useState(false);
 
   const choose = (reaction: Reaction) => {
+    emitTutorial("reacted");
     select();
     // Picking a new reaction pops (pitched by which one); picking your own again takes it back
     if (summary.mine === reaction) void playSfx("ui.unequip");
@@ -110,7 +127,10 @@ export const ReactionRow = memo(function ReactionRow({ target, summary, cast, co
     <View style={styles.wrap}>
       <View style={styles.line}>
       <Pressable
+        ref={pillRef}
+        collapsable={false}
         onPress={() => {
+          emitTutorial("reaction-opened");
           select();
           void playSfx(pickerOpen ? "ui.panel-close" : "ui.panel-open");
           setPickerOpen((open) => !open);
@@ -148,20 +168,26 @@ export const ReactionRow = memo(function ReactionRow({ target, summary, cast, co
       </View>
 
       {pickerOpen ? (
-        <Animated.View entering={reduced ? undefined : FadeIn.duration(POP_MS).easing(EASE_OUT)} style={styles.picker} accessibilityRole="toolbar" accessibilityLabel="Choose a reaction">
-          {REACTION_ORDER.map((r) => (
-            <Pressable
-              key={r}
-              onPress={() => choose(r)}
-              style={[styles.pick, summary.mine === r ? styles.pickOn : null]}
-              accessibilityRole="button"
-              accessibilityLabel={pickerButtonLabel(r, summary.mine)}
-              accessibilityState={{ selected: summary.mine === r }}
-            >
-              <ReactionGlyph reaction={r} size={26} color={colors[r]} />
-            </Pressable>
-          ))}
-        </Animated.View>
+        <PickerFrame lit={pillRef !== undefined}>
+          {(ref) => (
+            <View ref={ref} collapsable={false} style={styles.pickerWrap}>
+              <Animated.View entering={reduced ? undefined : FadeIn.duration(POP_MS).easing(EASE_OUT)} style={styles.picker} accessibilityRole="toolbar" accessibilityLabel="Choose a reaction">
+                {REACTION_ORDER.map((r) => (
+                  <Pressable
+                    key={r}
+                    onPress={() => choose(r)}
+                    style={[styles.pick, summary.mine === r ? styles.pickOn : null]}
+                    accessibilityRole="button"
+                    accessibilityLabel={pickerButtonLabel(r, summary.mine)}
+                    accessibilityState={{ selected: summary.mine === r }}
+                  >
+                    <ReactionGlyph reaction={r} size={26} color={colors[r]} />
+                  </Pressable>
+                ))}
+              </Animated.View>
+            </View>
+          )}
+        </PickerFrame>
       ) : null}
 
       {segments.length > 0 ? (

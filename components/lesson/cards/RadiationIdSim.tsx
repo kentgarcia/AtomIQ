@@ -1,6 +1,6 @@
 /**
  * Radiation id: read a clue, pick alpha, beta or gamma, then watch it leave the nucleus
- * (docs/UNIT_2_RADIOACTIVITY_SPEC.md §8). A wrong guess is allowed and re-tried.
+ * (docs/features/UNIT_2_RADIOACTIVITY_SPEC.md §8). A wrong guess is allowed and re-tried.
  *
  * The emission is a short ease-out move (a few hundred milliseconds) of a plain view, not an
  * animated SVG transform. With reduced motion it simply appears at its final position.

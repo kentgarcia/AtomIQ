@@ -1,5 +1,5 @@
 /**
- * Reactions, the framework-free part (docs/NPC_FEED_SPEC.md §4.1, §4.2): which NPCs react to a
+ * Reactions, the framework-free part (docs/features/NPC_FEED_SPEC.md §4.1, §4.2): which NPCs react to a
  * post or a blog piece and with what, and what happens when the learner taps a reaction.
  * The learner can only react; there is no comment anywhere in this feature.
  */

@@ -8,12 +8,14 @@ import {
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useMemo } from "react";
+import { View } from "react-native";
 import "react-native-reanimated";
 
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { ThemeProvider, useTheme } from "@/theme";
 import { useAndroidBackPolicy } from "@/hooks/use-android-back";
 import { ContentGate } from "@/components/content/ContentGate";
+import { TutorialLayer } from "@/components/tutorial/TutorialLayer";
 import { useAppFonts } from "@/hooks/use-app-fonts";
 import { StorageProvider } from "@/services/StorageContext";
 import { installMediaLifecycle, setMediaPathname } from "@/services/media";
@@ -72,6 +74,7 @@ function AppContent() {
 
   return (
     <NavigationThemeProvider value={navigationTheme}>
+      <View style={{ flex: 1 }}>
       <Stack>
         <Stack.Screen name="index" options={{ headerShown: false }} />
         {/* Nothing to go back to from onboarding: no swipe, no back gesture (the Android key is handled by the screen) */}
@@ -83,6 +86,7 @@ function AppContent() {
         <Stack.Screen name="practice" options={{ headerShown: false, animation: "fade" }} />
         <Stack.Screen name="blog" options={{ headerShown: false }} />
         <Stack.Screen name="blogs" options={{ headerShown: false }} />
+        <Stack.Screen name="reacted" options={{ headerShown: false }} />
         <Stack.Screen name="npc" options={{ headerShown: false }} />
         <Stack.Screen name="phone-apps" options={{ headerShown: false }} />
         <Stack.Screen name="ranks" options={{ headerShown: false }} />
@@ -112,6 +116,9 @@ function AppContent() {
           options={{ presentation: "modal", title: "Modal" }}
         />
       </Stack>
+      {/* Shrodi's tour: above every screen, so it can dim them and light one control (docs/features/TUTORIAL_SPEC.md) */}
+      <TutorialLayer host="root" />
+      </View>
       <StatusBar style={isDark ? "light" : "dark"} />
     </NavigationThemeProvider>
   );

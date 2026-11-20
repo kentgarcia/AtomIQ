@@ -275,7 +275,7 @@ export const HUD_DIGITS: readonly ImageSourcePropType[] = [
 ];
 export const HUD_MULTIPLY: ImageSourcePropType = require("../../assets/images/platformer/hud/hud_character_multiply.png");
 
-/** The pause icon's stroke: white over the game's sky and ground in light and dark alike (game art, EX-16 in docs/THEME_EXCEPTION_REGISTER.md). */
+/** The pause icon's stroke: white over the game's sky and ground in light and dark alike (game art, EX-16 in docs/critical/THEME_EXCEPTION_REGISTER.md). */
 export const HUD_SHADOW_COLOR = "#00000099"; // theme-allow: the HUD text's shadow over the game picture (EX-16)
 export const HUD_ICON_COLOR = "#FFFFFF"; // theme-allow: drawn over the game picture, not the app surface (EX-16)
 

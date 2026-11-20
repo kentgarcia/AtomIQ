@@ -1,5 +1,5 @@
 /**
- * The Reference Library (docs/PHONE_SPEC.md §5.10): every source the app cites in one list. Framework-free so
+ * The Reference Library (docs/features/PHONE_SPEC.md §5.10): every source the app cites in one list. Framework-free so
  * `scripts/test-library.mjs` runs it with plain Node. It turns the content database's references, the places that
  * cite them and the sources written on AtomDex entries into one de-duplicated list, and groups it two ways
  * (by unit, or all of them A to Z). Unverified sources are shown as such, never hidden.

@@ -1,5 +1,5 @@
 /**
- * Plays one sound effect when it mounts (docs/SFX_SPEC.md §6) and renders nothing. Mount it only for
+ * Plays one sound effect when it mounts (docs/features/SFX_SPEC.md §6) and renders nothing. Mount it only for
  * the moment the sound belongs to: `{latest ? <SfxOnMount cue="lesson.bubble" /> : null}`. With
  * `delay` it plays that many ms later (cancelled if it unmounts first), for a cue that belongs to a
  * point on an animation's own clock.

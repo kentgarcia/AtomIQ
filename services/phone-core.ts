@@ -1,5 +1,5 @@
 /**
- * The phone's rules (docs/PHONE_SPEC.md §4 to §6), framework-free so `scripts/test-phone.mjs` can run
+ * The phone's rules (docs/features/PHONE_SPEC.md §4 to §6), framework-free so `scripts/test-phone.mjs` can run
  * them with plain Node.
  *
  *   PHONE_APPS     the catalog: every app, its colour role, glyph, route and when it installs
@@ -61,7 +61,7 @@ export const PHONE_APPS: readonly PhoneApp[] = [
   { id: "atomdex", name: "AtomDex", icon: "Book", color: "purple", route: "/encyclopedia", status: "live", unlock: { kind: "start" } },
   { id: "daily-fact", name: "Daily Fact", icon: "Lamp", color: "yellow", route: "/daily-facts", status: "live", unlock: { kind: "start" } },
   { id: "settings", name: "Settings", icon: "Setting", color: "grey", route: "/settings", status: "live", unlock: { kind: "start" } },
-  { id: "shop", name: "Shop", icon: "Shop", color: "orange", route: "/shop", status: "live", unlock: { kind: "lessons", count: 1 } },
+  { id: "shop", name: "Shop", icon: "Shop", color: "orange", route: "/shop", status: "live", unlock: { kind: "lessons", count: 2 } },
   { id: "field-notes", name: "Field Notes", icon: "Note", color: "green", route: "/phone-apps/field-notes", status: "live", unlock: { kind: "lessons", count: 2 } },
   { id: "scanner", name: "Atom Scanner", icon: "Scan", color: "cyan", route: "/phone-apps/scanner", status: "live", unlock: { kind: "unit", unitId: "inside-the-atom" } },
   { id: "library", name: "Reference Library", icon: "Book1", color: "purple", route: "/phone-apps/library", status: "live", unlock: { kind: "level", level: 3 } },
@@ -110,6 +110,43 @@ export function isUnlocked(unlock: PhoneUnlock, p: PhoneProgress): boolean {
 /** The apps the learner has, in catalog order. Planned apps are never in it. */
 export function unlockedApps(p: PhoneProgress, catalog: readonly PhoneApp[] = PHONE_APPS): PhoneApp[] {
   return catalog.filter((app) => app.status === "live" && isUnlocked(app.unlock, p));
+}
+
+/** The live apps the learner does not have yet, in catalog order (shown on the home screen behind a lock). */
+export function lockedApps(p: PhoneProgress, catalog: readonly PhoneApp[] = PHONE_APPS): PhoneApp[] {
+  return catalog.filter((app) => app.status === "live" && !isUnlocked(app.unlock, p));
+}
+
+/** What a locked app asks for: the condition, and where the learner stands on it (null when there is no count). */
+export interface UnlockRequirement {
+  text: string;
+  progress: string | null;
+}
+
+/** The words of an unlock condition for the dialog a locked icon opens. `unitTitleOf` names a unit by its id. */
+export function unlockRequirement(
+  unlock: PhoneUnlock,
+  p: PhoneProgress,
+  unitTitleOf: (unitId: string) => string | undefined = () => undefined,
+): UnlockRequirement {
+  switch (unlock.kind) {
+    case "start":
+      return { text: "This app is already on your phone.", progress: null };
+    case "lessons": {
+      const text = unlock.count === 1 ? "Finish your first lesson." : `Finish ${unlock.count} lessons.`;
+      return { text, progress: `${Math.min(p.lessonsCompleted, unlock.count)} of ${unlock.count} lessons finished` };
+    }
+    case "unit": {
+      const title = unitTitleOf(unlock.unitId);
+      return { text: title ? `Finish the unit "${title}".` : "Finish a certain unit.", progress: null };
+    }
+    case "level":
+      return { text: `Reach level ${unlock.level}.`, progress: `You are level ${p.level}` };
+    case "owns-shop-item":
+      return { text: "Get any item from the Shop.", progress: null };
+    case "never":
+      return { text: "This app is coming in a later update.", progress: null };
+  }
 }
 
 /** The unlocked apps whose install moment has not played. */

@@ -1,5 +1,5 @@
 /**
- * The body of a blog piece (docs/NPC_FEED_SPEC.md §4.3, §6): a small fixed set of blocks, each a
+ * The body of a blog piece (docs/features/NPC_FEED_SPEC.md §4.3, §6): a small fixed set of blocks, each a
  * hardcoded component like the lesson cards. `p` paragraph, `h` heading, `quote` (set large, with the
  * author's head), `fact` ("Did you know?" callout), `figure` (a full scene, or a lesson object picture, and a caption),
  * `list`, and `next` (the closing teaser with a button that opens a lesson or the unit).

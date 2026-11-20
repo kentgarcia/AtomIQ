@@ -32,7 +32,7 @@ function useTypedCount(total: number, active: boolean, blips: boolean, startAt: 
     let blipped = 0;
     const id = setInterval(() => {
       const n = visibleCount(Date.now() - start, total);
-      // A soft blip for every third character shown (docs/SFX_SPEC.md §6.3); the cue's own gap
+      // A soft blip for every third character shown (docs/features/SFX_SPEC.md §6.3); the cue's own gap
       // keeps a fast tick from stacking them. It stops with the typing: this interval is cleared.
       const group = Math.floor(n / BLIP_EVERY);
       if (blips && group > blipped && n < total) void playSfx("lesson.blip", { rate: blipRate(Math.random()) });
@@ -47,7 +47,7 @@ function useTypedCount(total: number, active: boolean, blips: boolean, startAt: 
 
 /**
  * `blips` plays the soft talking blip as characters appear. Off for lessons (they are read, not
- * spoken); it is for a character who talks, such as the Shrodi mascot (docs/SFX_SPEC.md §6.3).
+ * spoken); it is for a character who talks, such as the Shrodi mascot (docs/features/SFX_SPEC.md §6.3).
  */
 export function TypedTermText({ text, style, typing, blips = false, startAt = 0 }: { text: string; style?: StyleProp<TextStyle>; typing: boolean; blips?: boolean; /** Wait this long (ms) before the first character. */ startAt?: number }) {
   const { theme } = useTheme();

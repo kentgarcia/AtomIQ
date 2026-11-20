@@ -133,7 +133,7 @@
 - Left arm: positive rotation is outward. The right arm takes the negative (tested).
 - Scenes are flat shapes with a same-hue rim one shade darker (`toneRim`), not black outlines. Every tone's rim reaches 3:1 on the figure surface in light mode (`test:visuals`). Dark mode uses the bright fill itself.
 - Interface moves (card enter, feedback, progress) stay under 300 ms, ease-out. A lesson card is seen hundreds of times, so it barely moves.
-- Lesson redesign (docs/LESSON_VISUAL_SPEC.md): option rows cross-fade face/border/lip in 160 ms; the progress bar glides 300 ms; the feedback dock rises 180 ms; finish stars settle 320 ms with a 280 ms ring flash. All ease-out, all skipped (frame 0 / final value) with reduced motion.
+- Lesson redesign (docs/features/LESSON_VISUAL_SPEC.md): option rows cross-fade face/border/lip in 160 ms; the progress bar glides 300 ms; the feedback dock rises 180 ms; finish stars settle 320 ms with a 280 ms ring flash. All ease-out, all skipped (frame 0 / final value) with reduced motion.
 
 ### How changes are checked
 - `npx tsc --noEmit`, `npm run lint`, `npm run check:theme-colors`, `npm run test:mascot`, `npm run test:visuals`, `npm run test:curriculum-content`, `npm run validate:content`.

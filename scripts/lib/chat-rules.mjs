@@ -1,5 +1,5 @@
 /**
- * NPC chat validation (docs/PHONE_SPEC.md §5.2, §7.1 and §7.3).
+ * NPC chat validation (docs/features/PHONE_SPEC.md §5.2, §7.1 and §7.3).
  *
  * `validateChatData` is pure (plain objects in, findings out) so tests can feed it fixtures; `validateChat` reads the
  * content database and calls it. `validateDatabase` runs it, so `npm run validate:content`, Content Studio saves and
@@ -18,7 +18,7 @@
 import { PHONE_APPS } from "../../services/phone-core.ts";
 import { NPC_POSES } from "../../components/npc/npc-art.ts";
 import { hasExclamationRun } from "./feed-rules.mjs";
-import { CHAT_ACTIONS, CHAT_KINDS, CHAT_MASCOT_ID, CHAT_LIMITS, CHAT_MIN_BODY_NODES, CHAT_REACTIONS, CHAT_REPLY_TYPES, CHAT_STICKERS, CHAT_TITLE_MAX, CHAT_TRIGGER_KINDS, hasBraces, parseTrigger } from "./chat-vocab.mjs";
+import { CHAT_ACTIONS, CHAT_KINDS, CHAT_MASCOT_ID, CHAT_LIMITS, CHAT_PICTURES, CHAT_PICTURE_RE, CHAT_MIN_BODY_NODES, CHAT_REACTIONS, CHAT_REPLY_TYPES, CHAT_STICKERS, CHAT_TITLE_MAX, CHAT_TRIGGER_KINDS, hasBraces, parseTrigger } from "./chat-vocab.mjs";
 
 const isRec = (v) => typeof v === "object" && v !== null && !Array.isArray(v);
 const isStr = (v) => typeof v === "string" && v.trim().length > 0;
@@ -78,6 +78,13 @@ export function validateChatData(data) {
     else {
       // A blank line splits the text into bubbles that arrive one after another
       const parts = text.split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean);
+      parts.forEach((p, i) => {
+        if (!p.startsWith("[[pic:") && !p.includes("[[pic:")) return;
+        const m = CHAT_PICTURE_RE.exec(p);
+        if (!m) add(row, "text", "chat-picture-marker", "error", `a picture is a part of its own, written exactly [[pic:id]] (found: ${p.slice(0, 40)})`);
+        else if (!CHAT_PICTURES.includes(m[1])) add(row, "text", "chat-picture-id", "error", `no picture "${m[1]}": use one of ${CHAT_PICTURES.join(", ")}`);
+        else if (i === 0) add(row, "text", "chat-picture-first", "error", "a picture follows a bubble of text, it does not open the message");
+      });
       if (parts.length > CHAT_LIMITS.parts) add(row, "text", "chat-text-parts", "warning", `a message is at most ${CHAT_LIMITS.parts} bubbles (this is ${parts.length}); split it across nodes`);
       const longest = Math.max(...parts.map((p) => p.length));
       if (longest > CHAT_LIMITS.text) add(row, "text", "chat-text-length", "warning", `a bubble fits ${CHAT_LIMITS.text} characters or fewer (the longest here is ${longest}); a blank line starts a new bubble`);

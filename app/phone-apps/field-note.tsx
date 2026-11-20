@@ -1,5 +1,5 @@
 /**
- * One note (docs/PHONE_SPEC.md §10): a title, a body and, for a clipping, the quoted line with a way back to where
+ * One note (docs/features/PHONE_SPEC.md §10): a title, a body and, for a clipping, the quoted line with a way back to where
  * it was cut from. It saves itself: 800 ms after the learner stops typing, when the app goes to the background and
  * when they leave. A note left with nothing in it and no clipping is not kept. The note is private and on the device.
  */

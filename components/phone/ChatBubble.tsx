@@ -1,13 +1,13 @@
 /**
- * The pieces of a chat thread (docs/PHONE_SPEC.md §5.2), drawn like a messenger: a teacher's bubbles are filled cards on the left
+ * The pieces of a chat thread (docs/features/PHONE_SPEC.md §5.2), drawn like a messenger: a teacher's bubbles are filled cards on the left
  * with their round picture beside the last bubble of a run (and their name over the first), the learner's replies are blue bubbles
  * on the right, a bubble's corner nearest its speaker is squarer where the run ends, a sticker is one of AtomIQ's own big
  * pictures with no bubble, a reaction is a small one stuck on the bubble it answers (`chat-art.ts`), a typing bubble sits in the
  * beat before a teacher answers, and "write back", sticker and reaction buttons are the replies. A bubble the learner sends flies
- * in as if just sent (`sendIn`), a teacher's one rises quietly (`settle`). Flat, no borders; the page behind is plain.
+ * in as if just sent (`sendIn`), a teacher's one rises quietly (`settle`). Flat, no borders; the page behind is plain. In a conversation the bubbles and reply buttons wear the teacher's cover colours (`ChatPaletteProvider`).
  */
 
-import { memo, useEffect } from "react";
+import { createContext, memo, useContext, useEffect } from "react";
 import { Pressable, View } from "react-native";
 import Animated, { ReduceMotion, useAnimatedStyle, useReducedMotion, useSharedValue, withDelay, withRepeat, withSequence, withTiming, type EntryExitAnimationFunction } from "react-native-reanimated";
 
@@ -15,14 +15,42 @@ import { ChatHead, type ChatSpeaker } from "@/components/phone/ChatHead";
 import { settle } from "@/components/motion/settle";
 import { ChatArt } from "@/components/phone/ChatArt";
 import { chatArtName } from "@/components/phone/chat-art";
+import { tourArtName } from "@/components/phone/tour-art";
+import { TourArt } from "@/components/phone/TourArt";
+import { pictureOf } from "@/services/chat-core";
 import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
 import { createStyles, fontFaces, useTheme, withAlpha } from "@/theme";
+import type { ChatPalette } from "@/components/phone/chat-palette";
 import { EASE_OUT } from "@/theme/motion";
+
+/**
+ * The colours of the conversation (the teacher's cover, `chat-palette.ts`). Without one the pieces wear the app's own blue.
+ * Every piece reads it here, so the screen only has to wrap the thread in the provider.
+ */
+const PaletteContext = createContext<ChatPalette | null>(null);
+export const ChatPaletteProvider = PaletteContext.Provider;
+
+/** What a piece wears: the learner's bubble and button edge, the lip, the text on the bubble, and the wash behind a teacher's bubble. */
+function useLook() {
+  const c = useTheme().theme.colors;
+  const p = useContext(PaletteContext);
+  return {
+    base: p?.face ?? c.guideLip,
+    shade: p?.lip ?? c.guideLip,
+    on: p?.faceOn ?? c.lessonHeaderText,
+    linkFace: p?.face ?? c.guide,
+    linkOn: p?.faceOn ?? c.onPrimary,
+    wash: p ? withAlpha(p.base, 0.2) : c.field,
+    edge: p?.base ?? c.guide,
+    tinted: p !== null,
+  };
+}
 
 const FACE = 36;
 const REACTION = 26;
 const STICKER = 104;
+const PICTURE = 232;
 const ROUND = 18;
 const SQUARE = 6;
 
@@ -65,6 +93,19 @@ export interface RunPosition {
 
 export const NpcBubble = memo(function NpcBubble({ speaker, text, fresh = false, first = true, last = true, reaction }: { speaker: ChatSpeaker | null | undefined; text: string; fresh?: boolean; reaction?: string } & RunPosition) {
   const styles = useStyles(useTheme().theme);
+  const look = useLook();
+  const picture = pictureOf(text);
+  if (picture) {
+    // A picture, not a bubble: the scene on its own, rounded, beside the speaker like any other letter of the run
+    return (
+      <Animated.View entering={fresh ? settle(0) : undefined} style={[styles.npcRow, { marginBottom: last ? 14 : 4 }]}>
+        <View style={styles.faceSlot}>{last ? <ChatHead speaker={speaker} size={FACE} /> : null}</View>
+        <View style={styles.pictureFrame} accessible accessibilityRole="image" accessibilityLabel={`${speaker?.name ?? "Teacher"} shows a picture: ${tourArtName(picture)}`}>
+          <TourArt id={picture} width={PICTURE} />
+        </View>
+      </Animated.View>
+    );
+  }
   return (
     <Animated.View entering={fresh ? settle(0) : undefined} style={[styles.npcRow, { marginBottom: reaction ? 24 : last ? 14 : 4 }]}>
       {/* The picture sits beside the last bubble of a run; the others keep its room */}
@@ -75,7 +116,7 @@ export const NpcBubble = memo(function NpcBubble({ speaker, text, fresh = false,
             {speaker.name}
           </Text>
         ) : null}
-        <View style={[styles.npcBubble, last && styles.npcTail]} accessible accessibilityLabel={`${speaker?.name ?? "Teacher"} says: ${text}`}>
+        <View style={[styles.npcBubble, { backgroundColor: look.wash }, last && styles.npcTail]} accessible accessibilityLabel={`${speaker?.name ?? "Teacher"} says: ${text}`}>
           <Text style={styles.npcText}>{text}</Text>
           {reaction ? (
             <Animated.View key={reaction} entering={popIn()} style={styles.reaction} accessible accessibilityLabel={`You reacted: ${chatArtName(reaction)}`}>
@@ -90,10 +131,11 @@ export const NpcBubble = memo(function NpcBubble({ speaker, text, fresh = false,
 
 export const MeBubble = memo(function MeBubble({ text, fresh = false, last = true }: { text: string; fresh?: boolean } & RunPosition) {
   const styles = useStyles(useTheme().theme);
+  const look = useLook();
   return (
     <Animated.View entering={fresh ? sendIn() : undefined} style={[styles.meRow, { marginBottom: last ? 14 : 6 }]}>
-      <View style={[styles.meBubble, last && styles.meTail]} accessible accessibilityLabel={`You said: ${text}`}>
-        <Text style={styles.meText}>{text}</Text>
+      <View style={[styles.meBubble, { backgroundColor: look.base }, last && styles.meTail]} accessible accessibilityLabel={`You said: ${text}`}>
+        <Text style={[styles.meText, { color: look.on }]}>{text}</Text>
       </View>
     </Animated.View>
   );
@@ -112,12 +154,13 @@ export const StickerBubble = memo(function StickerBubble({ id, fresh = false, la
 /** Three dots that rise one after another, while a teacher "types". Still with reduced motion. */
 export const TypingBubble = memo(function TypingBubble({ speaker }: { speaker: ChatSpeaker | null | undefined }) {
   const styles = useStyles(useTheme().theme);
+  const look = useLook();
   return (
     <View style={[styles.npcRow, { marginBottom: 14 }]} accessible accessibilityLabel={`${speaker?.name ?? "Teacher"} is writing`} accessibilityLiveRegion="polite">
       <View style={styles.faceSlot}>
         <ChatHead speaker={speaker} size={FACE} />
       </View>
-      <View style={[styles.npcBubble, styles.npcTail, styles.typing]}>
+      <View style={[styles.npcBubble, { backgroundColor: look.wash }, styles.npcTail, styles.typing]}>
         {[0, 1, 2].map((i) => (
           <Dot key={i} delay={i * 140} />
         ))}
@@ -141,9 +184,10 @@ function Dot({ delay }: { delay: number }) {
 /** A reply chip under the thread: a chunky blue-edged button (a face on a lip that it sinks onto when pressed), like the app's other buttons. */
 export const ReplyPill = memo(function ReplyPill({ label, onPress, disabled = false }: { label: string; onPress: () => void; disabled?: boolean }) {
   const styles = useStyles(useTheme().theme);
+  const look = useLook();
   return (
-    <Pressable onPress={onPress} disabled={disabled} accessibilityRole="button" accessibilityLabel={label} style={({ pressed }) => [styles.pill, pressed && styles.pillPressed]}>
-      <Text style={styles.pillText}>{label}</Text>
+    <Pressable onPress={onPress} disabled={disabled} accessibilityRole="button" accessibilityLabel={label} style={({ pressed }) => [styles.pill, { borderColor: look.edge }, pressed && styles.pillPressed]}>
+      <Text style={[styles.pillText, look.tinted && styles.pillTextTinted]}>{label}</Text>
     </Pressable>
   );
 });
@@ -155,21 +199,21 @@ export const ReplyPill = memo(function ReplyPill({ label, onPress, disabled = fa
  */
 export const LinkButton = memo(function LinkButton({ label, icon, caption, onPress }: { label: string; icon: string; caption: string; onPress: () => void }) {
   const styles = useStyles(useTheme().theme);
-  const c = useTheme().theme.colors;
+  const look = useLook();
   return (
-    <Pressable onPress={onPress} accessibilityRole="link" accessibilityLabel={`${label}. ${caption}.`} style={({ pressed }) => [styles.link, pressed && styles.linkPressed]}>
+    <Pressable onPress={onPress} accessibilityRole="link" accessibilityLabel={`${label}. ${caption}.`} style={({ pressed }) => [styles.link, { backgroundColor: look.linkFace, borderColor: look.shade }, pressed && styles.linkPressed]}>
       <View style={styles.linkIcon} accessible={false}>
-        <Icon name={icon} size={22} color={c.guideLip} variant="Bold" />
+        <Icon name={icon} size={22} color={look.shade} variant="Bold" />
       </View>
       <View style={styles.linkCopy}>
-        <Text style={styles.linkLabel} numberOfLines={2}>
+        <Text style={[styles.linkLabel, { color: look.linkOn }]} numberOfLines={2}>
           {label}
         </Text>
-        <Text style={styles.linkCaption} numberOfLines={1}>
+        <Text style={[styles.linkCaption, { color: withAlpha(look.linkOn, 0.92) }]} numberOfLines={1}>
           {caption}
         </Text>
       </View>
-      <Icon name="ArrowRight2" size={20} color={c.onPrimary} variant="Linear" />
+      <Icon name="ArrowRight2" size={20} color={look.linkOn} variant="Linear" />
     </Pressable>
   );
 });
@@ -177,8 +221,9 @@ export const LinkButton = memo(function LinkButton({ label, icon, caption, onPre
 /** A sticker to send: its picture on a chunky square button. */
 export const StickerButton = memo(function StickerButton({ id, onPress }: { id: string; onPress: () => void }) {
   const styles = useStyles(useTheme().theme);
+  const look = useLook();
   return (
-    <Pressable onPress={onPress} accessibilityRole="button" accessibilityLabel={`Send the sticker: ${chatArtName(id)}`} style={({ pressed }) => [styles.stickerButton, pressed && styles.lipPressed]}>
+    <Pressable onPress={onPress} accessibilityRole="button" accessibilityLabel={`Send the sticker: ${chatArtName(id)}`} style={({ pressed }) => [styles.stickerButton, look.tinted && { borderColor: look.edge }, pressed && styles.lipPressed]}>
       <ChatArt id={id} size={50} />
     </Pressable>
   );
@@ -187,8 +232,9 @@ export const StickerButton = memo(function StickerButton({ id, onPress }: { id: 
 /** A reaction to put on the teacher's last bubble: its picture on a chunky round button. */
 export const ReactButton = memo(function ReactButton({ id, onPress }: { id: string; onPress: () => void }) {
   const styles = useStyles(useTheme().theme);
+  const look = useLook();
   return (
-    <Pressable onPress={onPress} accessibilityRole="button" accessibilityLabel={`React: ${chatArtName(id)}`} style={({ pressed }) => [styles.reactButton, pressed && styles.lipPressed]}>
+    <Pressable onPress={onPress} accessibilityRole="button" accessibilityLabel={`React: ${chatArtName(id)}`} style={({ pressed }) => [styles.reactButton, look.tinted && { borderColor: look.edge }, pressed && styles.lipPressed]}>
       <ChatArt id={id} size={36} />
     </Pressable>
   );
@@ -200,6 +246,7 @@ const useStyles = createStyles((theme) => {
     npcRow: { flexDirection: "row", alignItems: "flex-end", gap: 8, paddingRight: 40 },
     faceSlot: { width: FACE, height: FACE },
     npcCol: { flexShrink: 1, gap: 3 },
+    pictureFrame: { width: PICTURE, borderRadius: ROUND, overflow: "hidden" },
     sender: { marginLeft: 4, fontSize: 12, lineHeight: 16, ...fontFaces.heavy, color: c.textMuted },
     npcBubble: { flexShrink: 1, backgroundColor: c.field, borderRadius: ROUND, paddingVertical: 10, paddingHorizontal: 14 },
     // the run's last bubble is squarer on the side of its speaker
@@ -225,5 +272,7 @@ const useStyles = createStyles((theme) => {
     pill: { minHeight: 50, alignItems: "center", justifyContent: "center", paddingTop: 8, paddingBottom: 6, paddingHorizontal: 20, borderRadius: 16, borderWidth: 2, borderBottomWidth: 5, borderColor: c.guide, backgroundColor: c.card },
     pillPressed: { borderBottomWidth: 2, marginTop: 3, backgroundColor: c.surfaceSoft },
     pillText: { flexShrink: 1, fontSize: 16, lineHeight: 21, textAlign: "center", ...fontFaces.heavy, color: c.guideLip },
+    // in a teacher's colours the edge says whose it is; the words stay the theme's own so they read on any outfit
+    pillTextTinted: { color: c.text },
   };
 });

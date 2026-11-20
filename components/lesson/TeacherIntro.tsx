@@ -1,6 +1,6 @@
 /**
- * The introduction page, shown once before the learner's first lesson with a teacher: the teacher at
- * hero size, waving, with a greeting, their name and title, and a line about who they are. After it,
+ * The introduction page, shown once before the learner's first lesson with a teacher: the teacher on their own
+ * cover (the wallpaper of their profile), waving, with a greeting, their name and title, and a line about who they are. After it,
  * the teacher's bubbles carry no name. Reduced motion shows a still teacher.
  */
 
@@ -11,6 +11,7 @@ import Animated, { FadeInDown, useReducedMotion } from "react-native-reanimated"
 import { PressableIconButton, useBottomInset } from "@/components/layout";
 import { EASE_OUT } from "@/components/motion/motion";
 import { Npc as NpcView } from "@/components/npc/Npc";
+import { NpcCover } from "@/components/npc/NpcCover";
 import { BubbleTail } from "@/components/npc/SpeechBubble";
 import { useTeacherLines } from "@/components/npc/teacher-lines";
 import { useNpcLine } from "@/components/npc/use-npc";
@@ -22,11 +23,17 @@ import { createStyles, fontFaces, fontSizes, spacing, useResponsiveLayout, useTh
 
 import { LESSON_FRAME, LessonFrame } from "./LessonFrame";
 
+const STAGE_H = 230;
+const BUST = 200;
+const BUST_W = Math.round((BUST * 200) / 252);
+
 const useStyles = createStyles((theme) => ({
   header: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
   scroll: { flexGrow: 1, justifyContent: "center", paddingVertical: spacing.lg },
   content: { alignItems: "center", gap: spacing.lg },
   kicker: { ...fontFaces.bold, fontSize: fontSizes.md, letterSpacing: 0.8, textTransform: "uppercase", color: theme.colors.textMuted },
+  stage: { alignSelf: "stretch", height: STAGE_H },
+  bust: { position: "absolute", bottom: 0, alignSelf: "center", width: BUST_W, height: BUST, overflow: "hidden" },
   bubbleWrap: { alignSelf: "stretch", alignItems: "center" },
   greeting: { ...fontFaces.semibold, fontSize: fontSizes["3xl"], lineHeight: 28, color: theme.colors.text, textAlign: "center" },
   who: { alignItems: "center", gap: spacing.xs },
@@ -65,7 +72,12 @@ export function TeacherIntro({ npc, onClose, onContinue }: { npc: Npc; onClose: 
               <BubbleTail />
             </View>
           ) : null}
-          <NpcView spec={npc.spec} pose="greet" size={230} />
+          <View style={styles.stage}>
+            <NpcCover npcId={npc.id} outfit={npc.spec.outfit} height={STAGE_H} radius={28} />
+            <View style={styles.bust} pointerEvents="none">
+              <NpcView spec={npc.spec} pose="greet" form="bust" size={BUST} />
+            </View>
+          </View>
           <View style={styles.who}>
             <Text accessibilityRole="header" style={styles.name}>{npc.name}</Text>
             <Text style={styles.title}>{npc.title}</Text>

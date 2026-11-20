@@ -1,5 +1,5 @@
 /**
- * One Safety Guide card (docs/PHONE_SPEC.md §5.9): a one-screen read. A big icon, the title and its one line, then the card's lines (a myth
+ * One Safety Guide card (docs/features/PHONE_SPEC.md §5.9): a one-screen read. A big icon, the title and its one line, then the card's lines (a myth
  * card's lines are labelled "Myth" and "What is true"), a "See in AtomDex" button when the card has an entry, the sources it stands on, and
  * the line every card ends with: this is for learning, not an emergency service.
  */

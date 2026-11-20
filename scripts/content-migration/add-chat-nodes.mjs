@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * NPC chat migration (docs/PHONE_SPEC.md §5.2, §7.1). Idempotent and additive:
+ * NPC chat migration (docs/features/PHONE_SPEC.md §5.2, §7.1). Idempotent and additive:
  *
  *   1. Creates `chat_nodes` (the `phone` block of schema.sql) when it is missing.
  *   2. Seeds the chats below for Ada (Inside the Atom) and Hal (Radioactivity): the free chat (a greeting, a menu,
@@ -90,7 +90,7 @@ const ADA = [
   ], "welcome_back", "Welcome back"),
 ];
 
-// Story threads, unlocked by what the learner does (docs/PHONE_SPEC.md §5.2). A blank line in a text starts a new bubble, so a
+// Story threads, unlocked by what the learner does (docs/features/PHONE_SPEC.md §5.2). A blank line in a text starts a new bubble, so a
 // long message arrives as several short ones, one after another.
 ADA.push(
   node("chat-ada-up-stadium", "npc-ada", "unprompted", "explain", "Hi! Ada here. I have to tell you something that still surprises me.\n\nPicture an atom blown up until it is as big as a football stadium.\n\nHow big would its nucleus be, right in the middle? About the size of a marble.", [

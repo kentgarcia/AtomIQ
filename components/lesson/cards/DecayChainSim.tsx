@@ -1,6 +1,6 @@
 /**
  * Decay chain: tap the unstable nucleus and it changes into the next one, until a stable
- * nucleus ends the chain (docs/UNIT_2_RADIOACTIVITY_SPEC.md §8). Generic labels only.
+ * nucleus ends the chain (docs/features/UNIT_2_RADIOACTIVITY_SPEC.md §8). Generic labels only.
  * The nucleus is itself the button; there is also a text control, so it is tap-only with a text
  * equivalent. Static drawing: nothing animates.
  */
@@ -68,7 +68,7 @@ export function DecayChainSim({ data, onComplete }: { data: DecayChainData; onCo
   const protons = Math.round(total * 0.45);
   const summary = `${here.label}. ${stable ? "Stable." : "Unstable. Tap to make it change."}`;
   const tap = () => {
-    // A little pop for each decay, a step higher than the last (docs/SFX_SPEC.md §6.3).
+    // A little pop for each decay, a step higher than the last (docs/features/SFX_SPEC.md §6.3).
     void playSfx("reward.pop", { index: state.index, volume: 0.8 });
     setState((s) => step(data.nodes, s));
   };

@@ -1,5 +1,5 @@
 /**
- * Decay wait: a grid of unstable nuclei and a Wait button (docs/UNIT_2_RADIOACTIVITY_SPEC.md §8).
+ * Decay wait: a grid of unstable nuclei and a Wait button (docs/features/UNIT_2_RADIOACTIVITY_SPEC.md §8).
  * Single mode is genuinely random; half-life mode is guided random. The count is always shown as
  * text as well as in the grid, and the card is complete after the goal number of presses.
  * Tap-only, static drawing (no animated SVG), so reduced motion needs nothing special.

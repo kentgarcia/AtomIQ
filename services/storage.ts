@@ -30,6 +30,8 @@ export const STORAGE_KEYS = {
   
   /** The NPC feed's "Feed posts" switch (default on): when off, no new chatter posts are created. */
   FEED_POSTS_ENABLED: '@atomiq:feed_posts_enabled',
+  /** Shrodi's tour and tips (default on, docs/features/TUTORIAL_SPEC.md section 9). */
+  TUTORIAL_ENABLED: '@atomiq:tutorial_enabled',
   PHONE_INTRO_SEEN: '@atomiq:phone_intro_seen',
   PHONE_BADGES: '@atomiq:phone_badges',
   PHONE_WALLPAPER: '@atomiq:phone_wallpaper',
@@ -193,6 +195,33 @@ export const getTeacherLinesEnabled = async (): Promise<boolean> => {
   return value ?? true;
 };
 
+// Shrodi's tour and tips: on by default; off hides the overlay and every screen intro, and keeps the tour's place.
+type TutorialListener = (enabled: boolean) => void;
+const tutorialListeners = new Set<TutorialListener>();
+
+export const getTutorialEnabled = async (): Promise<boolean> => {
+  const value = await getItem<boolean>(STORAGE_KEYS.TUTORIAL_ENABLED);
+  return value ?? true;
+};
+
+export const setTutorialEnabled = async (enabled: boolean): Promise<void> => {
+  await setItem(STORAGE_KEYS.TUTORIAL_ENABLED, enabled);
+  tutorialListeners.forEach((listener) => {
+    try {
+      listener(enabled);
+    } catch {
+      // A listener's failure never undoes the setting.
+    }
+  });
+};
+
+export const subscribeTutorialEnabled = (listener: TutorialListener): (() => void) => {
+  tutorialListeners.add(listener);
+  return () => {
+    tutorialListeners.delete(listener);
+  };
+};
+
 // Feed posts (the NPC feed in Discover). On by default; off stops new chatter posts, blog cards still unlock.
 type FeedPostsListener = (enabled: boolean) => void;
 const feedPostsListeners = new Set<FeedPostsListener>();
@@ -221,11 +250,11 @@ export const subscribeFeedPostsEnabled = (listener: FeedPostsListener): (() => v
   };
 };
 
-// Phone (docs/PHONE_SPEC.md): the one-time "Your phone" hand-over, and the Settings "App badges" switch (on by default).
+// Phone (docs/features/PHONE_SPEC.md): the one-time "Your phone" hand-over, and the Settings "App badges" switch (on by default).
 export const getPhoneIntroSeen = async (): Promise<boolean> => (await getItem<boolean>(STORAGE_KEYS.PHONE_INTRO_SEEN)) ?? false;
 export const setPhoneIntroSeen = async (): Promise<void> => setItem(STORAGE_KEYS.PHONE_INTRO_SEEN, true);
 
-// The phone's wallpaper (docs/PHONE_SPEC.md section 4): an illustrated wallpaper's id, or "mine" (the learner's avatar paint and pattern)
+// The phone's wallpaper (docs/features/PHONE_SPEC.md section 4): an illustrated wallpaper's id, or "mine" (the learner's avatar paint and pattern)
 type PhoneWallpaperListener = (choice: WallpaperChoice) => void;
 const phoneWallpaperListeners = new Set<PhoneWallpaperListener>();
 

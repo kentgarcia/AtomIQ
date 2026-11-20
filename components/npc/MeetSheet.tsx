@@ -1,89 +1,103 @@
 /**
- * The Meet sheet: the teacher at hero size with a greeting, who they are, and what they teach.
- * A plain modal over the screen; reduced motion shows a still teacher.
+ * The Meet dialog (opened from the teacher banner on a unit card): the house `ModalDialog` with the
+ * teacher on their own cover (the small flat pictures of what they teach, on their outfit colour, the same
+ * wallpaper as their profile), their name and title, a greeting, who they are and what they teach.
+ * A locked unit shows a muted teacher and no greeting. The footer opens the full profile.
  */
 
-import { useEffect, useRef } from "react";
-import { playSfx } from "@/services/sfx";
-import { Modal, Pressable, ScrollView, View } from "react-native";
-import { Text } from "@/components/ui/text";
+import { useRouter } from "expo-router";
+import { View } from "react-native";
 
-import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Icon } from "@/components/ui/icon";
+import { ModalButton, ModalSecondaryButton } from "@/components/ui/modal-card";
+import { ModalDialog } from "@/components/ui/modal-dialog";
+import { Text } from "@/components/ui/text";
 import type { Npc } from "@/content/npcs";
-import { createStyles, fontFaces, fontSizes, spacing, useTheme, withAlpha } from "@/theme";
+import { createStyles, fontFaces, fontSizes, spacing, useTheme } from "@/theme";
 
 import { Npc as NpcView } from "./Npc";
-import { BubbleTail, SpeechBubble } from "./SpeechBubble";
+import { NpcCover } from "./NpcCover";
+import { SpeechBubble } from "./SpeechBubble";
 import { useNpcLine } from "./use-npc";
 
+const COVER_HEIGHT = 140;
+const BUST = 124;
+const BUST_WIDTH = Math.round((BUST * 200) / 252);
+
 const useStyles = createStyles((theme) => ({
-  scrim: { flex: 1, justifyContent: "flex-end", backgroundColor: withAlpha(theme.colors.shadow, 0.5) },
-  sheet: { maxHeight: "92%", backgroundColor: theme.colors.background, borderTopLeftRadius: 28, borderTopRightRadius: 28, paddingHorizontal: spacing.md, paddingTop: spacing.md },
-  body: { gap: spacing.md, paddingBottom: spacing.md },
-  hero: { alignItems: "center", gap: spacing.xs },
-  name: { ...fontFaces.black, fontSize: fontSizes["7xl"], color: theme.colors.text, textAlign: "center" },
+  body: { gap: spacing.lg },
+  cover: { height: COVER_HEIGHT, alignSelf: "stretch" },
+  bust: { position: "absolute", bottom: 0, alignSelf: "center", width: BUST_WIDTH, height: BUST, overflow: "hidden" },
+  who: { alignItems: "center", gap: 2 },
+  name: { ...fontFaces.black, fontSize: fontSizes["7xl"], lineHeight: 36, color: theme.colors.text, textAlign: "center" },
   title: { ...fontFaces.bold, fontSize: fontSizes.xl, color: theme.colors.primaryLight, textAlign: "center" },
-  bio: { ...fontFaces.book, fontSize: fontSizes["2xl"], lineHeight: 26, color: theme.colors.textSecondary },
+  bio: { ...fontFaces.book, fontSize: fontSizes.xl, lineHeight: 25, color: theme.colors.textSecondary, textAlign: "center" },
   label: { ...fontFaces.bold, fontSize: fontSizes.md, letterSpacing: 0.6, textTransform: "uppercase", color: theme.colors.textMuted },
   row: { flexDirection: "row", alignItems: "center", gap: spacing.sm },
   rowText: { ...fontFaces.semibold, flex: 1, fontSize: fontSizes.xl, color: theme.colors.text },
 }));
 
 export function MeetSheet({ npc, visible, lessons = [], locked = false, onClose }: { npc: Npc | null; visible: boolean; lessons?: string[]; locked?: boolean; onClose: () => void }) {
-  // Meeting a teacher is the "new friend" moment (docs/SFX_SPEC.md §6.1); a locked one only shows a silhouette,
-  // so it gets the plain panel sounds, and the sheet's close is the panel's close
-  useEffect(() => {
-    if (visible && npc) void playSfx(locked ? "ui.panel-open" : "social.new-friend");
-  }, [visible, npc, locked]);
-  const wasVisible = useRef(visible);
-  useEffect(() => {
-    if (wasVisible.current && !visible) void playSfx("ui.panel-close");
-    wasVisible.current = visible;
-  }, [visible]);
-
   const { theme } = useTheme();
   const styles = useStyles(theme);
+  const router = useRouter();
   const meet = useNpcLine(npc?.id, "meet");
   if (!npc) return null;
+  const stage = (
+    <View style={styles.cover}>
+      <NpcCover npcId={npc.id} outfit={npc.spec.outfit} height={COVER_HEIGHT} radius={20} />
+      <View style={styles.bust} pointerEvents="none">
+        <NpcView spec={npc.spec} pose={locked ? "idle" : "greet"} form="bust" size={BUST} muted={locked} />
+      </View>
+    </View>
+  );
   return (
-    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose} statusBarTranslucent>
-      <Pressable style={styles.scrim} onPress={onClose} accessibilityLabel={`Close ${npc.name}'s profile`}>
-        <Pressable style={styles.sheet} onPress={() => undefined} accessible={false}>
-          <ScrollView contentContainerStyle={styles.body} showsVerticalScrollIndicator={false}>
-            <View style={styles.hero}>
-              {meet && !locked ? (
-                <SpeechBubble name={npc.name} text={meet.text} ownerId={`npc-meet:${npc.id}`}>
-                  <NpcView spec={npc.spec} pose={(meet.pose as never) ?? "greet"} size={170} />
-                </SpeechBubble>
-              ) : (
-                <>
-                  <BubbleTail />
-                  <NpcView spec={npc.spec} pose="greet" size={170} muted={locked} />
-                </>
-              )}
-              <Text accessibilityRole="header" style={styles.name}>{npc.name}</Text>
-              <Text style={styles.title}>{npc.title}</Text>
-            </View>
-            <Text style={styles.bio}>{npc.bio}</Text>
-            {lessons.length ? (
-              <Card gap={spacing.sm}>
-                <Text style={styles.label}>Teaches</Text>
-                {lessons.map((t) => (
-                  <View key={t} style={styles.row}>
-                    <Icon name="TickCircle" size={20} color={theme.colors.primary} />
-                    <Text style={styles.rowText}>{t}</Text>
-                  </View>
-                ))}
-              </Card>
-            ) : null}
-          </ScrollView>
-          <View style={{ paddingBottom: spacing.md }}>
-            <Button label="Close" onPress={onClose} />
-          </View>
-        </Pressable>
-      </Pressable>
-    </Modal>
+    <ModalDialog
+      visible={visible}
+      onClose={onClose}
+      title={locked ? "Your next teacher" : "Meet your teacher"}
+      closeLabel={`Close ${npc.name}'s profile`}
+      footer={
+        <>
+          {locked ? null : (
+            <ModalButton
+              label="See profile"
+              onPress={() => {
+                onClose();
+                router.push(`/npc/${encodeURIComponent(npc.id)}` as never);
+              }}
+            />
+          )}
+          <ModalSecondaryButton label="Close" onPress={onClose} />
+        </>
+      }
+    >
+      <View style={styles.body}>
+        {meet && !locked ? (
+          <SpeechBubble name={npc.name} text={meet.text} ownerId={`npc-meet:${npc.id}`}>
+            {stage}
+          </SpeechBubble>
+        ) : (
+          stage
+        )}
+        <View style={styles.who}>
+          <Text accessibilityRole="header" style={styles.name}>{npc.name}</Text>
+          <Text style={styles.title}>{npc.title}</Text>
+        </View>
+        <Text style={styles.bio}>{npc.bio}</Text>
+        {lessons.length ? (
+          <Card gap={spacing.sm}>
+            <Text style={styles.label}>Teaches</Text>
+            {lessons.map((t) => (
+              <View key={t} style={styles.row}>
+                <Icon name="TickCircle" size={20} color={theme.colors.primary} />
+                <Text style={styles.rowText}>{t}</Text>
+              </View>
+            ))}
+          </Card>
+        ) : null}
+      </View>
+    </ModalDialog>
   );
 }

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * NPC feed and mini blog migration (docs/NPC_FEED_SPEC.md §6 and §9). Idempotent and additive:
+ * NPC feed and mini blog migration (docs/features/NPC_FEED_SPEC.md §6 and §9). Idempotent and additive:
  *
  *   1. Creates `feed_templates`, `blog_posts`, `blog_comments` and `blog_references` (the `feed`
  *      block of schema.sql) when they are missing.
@@ -147,7 +147,7 @@ const SHARED = [
 
 /**
  * Mini blog pieces. `read_min` is computed from the words. Blocks: p h quote fact figure list next.
- * Every fact here is in the unit's lessons (docs/NPC_FEED_SPEC.md §4.3) or is repeated from them.
+ * Every fact here is in the unit's lessons (docs/features/NPC_FEED_SPEC.md §4.3) or is repeated from them.
  */
 const BLOGS = [
   {

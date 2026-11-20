@@ -1,5 +1,5 @@
 /**
- * The Atom Scanner's rules (docs/PHONE_SPEC.md §8) as pure functions, no React, tested in `scripts/test-scanner.mjs`.
+ * The Atom Scanner's rules (docs/features/PHONE_SPEC.md §8) as pure functions, no React, tested in `scripts/test-scanner.mjs`.
  *
  * The learner drags a drawn scene under a fixed reticle. We keep one thing, the world point under the reticle
  * (`Pan`), clamped so the view never leaves the scene. When that point is inside a target's box (with a little

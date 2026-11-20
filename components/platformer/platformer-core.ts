@@ -1,5 +1,5 @@
 /**
- * Atom Maze platformer: the world, its physics and its rules (docs/PLATFORMER_SPEC.md).
+ * Atom Maze platformer: the world, its physics and its rules (docs/features/PLATFORMER_SPEC.md).
  *
  * Framework-free and unit-tested (`npm run test:platformer`): no React, no Reanimated, no images.
  * Everything is in TILES (one tile = 1 unit, y points down), so the same level plays the same on

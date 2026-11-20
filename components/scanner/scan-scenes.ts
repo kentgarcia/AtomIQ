@@ -1,5 +1,5 @@
 /**
- * The Atom Scanner's drawn scenes (docs/PHONE_SPEC.md §8): flat backdrops in the lesson object art's look (project skill
+ * The Atom Scanner's drawn scenes (docs/features/PHONE_SPEC.md §8): flat backdrops in the lesson object art's look (project skill
  * `duolingo-object-style`: flat colour, no outlines, rounded shapes, light from the upper left, the side facing away one
  * step darker) with the scannable things standing on them, each as a small scene of its own (`scan-vignettes.ts`: a glass of
  * water on the counter, a bowl of rice, a hand under a tap). Pure data with no framework imports, so Node tests can check it

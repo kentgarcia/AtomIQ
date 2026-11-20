@@ -1,5 +1,5 @@
 /**
- * Safety Guide validation (docs/PHONE_SPEC.md §5.9).
+ * Safety Guide validation (docs/features/PHONE_SPEC.md §5.9).
  *
  * `validateSafetyData` is pure; `validateSafety` reads the content database. `validateDatabase` runs it, so
  * `npm run validate:content`, Studio saves and the publish gate enforce it. This is safety advice: every card needs at least one source, and at

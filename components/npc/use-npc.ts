@@ -9,23 +9,41 @@ import { getNpcById, getNpcForUnit, getNpcLines, type Npc, type NpcLine, type Np
 
 const unitCache = new Map<string, Npc | null>();
 
-/** The teacher of a unit. */
-export function useNpcForUnit(unitId: string | null | undefined): Npc | null {
-  const [npc, setNpc] = useState<Npc | null>(unitId ? (unitCache.get(unitId) ?? null) : null);
+/**
+ * The teacher of a unit, and whether the answer is known yet. A screen that stands someone in front of
+ * the learner (Shrodi stands in when a unit has no teacher) waits for `ready`, so he never shows for a
+ * moment until the real teacher replaces him. `ready` is true at once when there is no unit to ask about.
+ */
+export function useNpcForUnitState(unitId: string | null | undefined): { npc: Npc | null; ready: boolean } {
+  const [state, setState] = useState<{ unitId: string | null | undefined; npc: Npc | null; ready: boolean }>(() => ({
+    unitId,
+    npc: unitId ? (unitCache.get(unitId) ?? null) : null,
+    ready: !unitId || unitCache.has(unitId),
+  }));
   useEffect(() => {
     if (!unitId) return;
     let alive = true;
     void getNpcForUnit(unitId)
       .then((n) => {
         unitCache.set(unitId, n);
-        if (alive) setNpc(n);
+        if (alive) setState({ unitId, npc: n, ready: true });
       })
-      .catch(() => undefined);
+      .catch(() => {
+        if (alive) setState({ unitId, npc: null, ready: true });
+      });
     return () => {
       alive = false;
     };
   }, [unitId]);
-  return unitId ? npc : null;
+  if (!unitId) return { npc: null, ready: true };
+  // The unit changed since the state was written: the answer is not known for this one yet (unless cached)
+  if (state.unitId !== unitId) return unitCache.has(unitId) ? { npc: unitCache.get(unitId) ?? null, ready: true } : { npc: null, ready: false };
+  return { npc: state.npc, ready: state.ready };
+}
+
+/** The teacher of a unit. */
+export function useNpcForUnit(unitId: string | null | undefined): Npc | null {
+  return useNpcForUnitState(unitId).npc;
 }
 
 export function useNpc(id: string | null | undefined): Npc | null {

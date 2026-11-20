@@ -1,5 +1,5 @@
 /**
- * The phone's small moments as pure timelines (docs/PHONE_SPEC.md §11), no React, tested in
+ * The phone's small moments as pure timelines (docs/features/PHONE_SPEC.md §11), no React, tested in
  * `scripts/test-phone-fx.mjs`. One linear clock in ms drives each; `AppIcon.tsx` draws them.
  *
  * Install (an app arriving on the grid), clock 0 to `INSTALL_TOTAL`:
@@ -88,9 +88,4 @@ export function installStart(i: number): number {
 /** How long a batch of `count` installs takes from start to the last one's end. */
 export function batchTotal(count: number): number {
   return count <= 0 ? 0 : installStart(count - 1) + INSTALL.total;
-}
-
-/** The first-open hand-over: its line arrives after the last icon has popped in (ms after the batch begins). */
-export function introLineAt(count: number): number {
-  return count <= 0 ? 0 : installStart(count - 1) + INSTALL.popEnd;
 }

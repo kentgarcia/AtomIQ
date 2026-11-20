@@ -1,5 +1,5 @@
 /**
- * The flat world under the Nuclear Map's pins (docs/PHONE_SPEC.md §5.8): ocean and rounded land from `world-art.ts` in the lesson object
+ * The flat world under the Nuclear Map's pins (docs/features/PHONE_SPEC.md §5.8): ocean and rounded land from `world-art.ts` in the lesson object
  * style (flat colour, the land's far side one step darker, no outlines). One Svg whose viewBox is the part of the world the view shows, so
  * it stays sharp at every zoom; it only redraws when a gesture ends. Fixed hues from the object art (theme exception EX-13).
  */

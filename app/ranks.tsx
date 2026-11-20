@@ -25,7 +25,7 @@ import Animated, { useAnimatedStyle, useReducedMotion } from "react-native-reani
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 /**
- * Ranks (docs/NPC_FEED_SPEC.md §4.4): this week's ranking of the learner among the NPC cast. A podium
+ * Ranks (docs/features/NPC_FEED_SPEC.md §4.4): this week's ranking of the learner among the NPC cast. A podium
  * for the top three drawn with their heads, then the rest as rows, the learner's row highlighted in
  * the lesson colour. Flat like the rest of the app: no cards, dashed dividers between rows. The learner's
  * number is their real XP this week; the rivals' come from `services/rank-core.ts`. Pull to refresh.
@@ -117,7 +117,7 @@ function PodiumPlace({
   const avatar = <RankAvatar npc={npc} isLearner={r.isLearner} size={head} />;
   return (
     <View style={styles.place} accessible accessibilityLabel={accessibilityLabel}>
-      {/* A chime as each place lands, third then second then first, each a little higher (docs/SFX_EXPANSION_SPEC.md §6.2) */}
+      {/* A chime as each place lands, third then second then first, each a little higher (docs/features/SFX_EXPANSION_SPEC.md §6.2) */}
       {!reduced ? <SfxOnMount cue="rank.podium" rate={PODIUM_RATE[r.rank] ?? 1} delay={podiumStart(r.rank) + PODIUM.rise} /> : null}
       <Animated.View style={[styles.placeTop, r.isLearner && styles.placeMe, top]}>
         <View>

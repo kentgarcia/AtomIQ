@@ -1,4 +1,4 @@
-// Atom Maze progression tests (docs/ATOMIQ_FEEDBACK_SUMMARY_SPEC.md §4.4).
+// Atom Maze progression tests (docs/qa/ATOMIQ_FEEDBACK_SUMMARY_SPEC.md §4.4).
 // Run: npm run test:maze
 import test from "node:test";
 import assert from "node:assert/strict";

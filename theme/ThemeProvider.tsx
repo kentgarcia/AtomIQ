@@ -1,10 +1,10 @@
 /**
  * Global ThemeProvider.
  *
- * - Seeds from the OS color scheme and keeps following it while no user
- *   override is saved.
- * - A persisted user override wins over the OS scheme, including after a
- *   cold start.
+ * - Light is the default. The OS color scheme is not followed, so a device in
+ *   dark mode still starts the app light until the learner picks dark.
+ * - The saved choice is read before anything is drawn (the native splash is
+ *   still up), so a saved dark theme never flashes light on a cold start.
  * - Context value is stable and memoized.
  * - Use `useTheme()` from `../useTheme` to consume `theme`, `colorScheme`,
  *   `isDark`, `toggleTheme` and `setColorScheme`.
@@ -19,7 +19,6 @@ import React, {
     useState,
     type ReactNode,
 } from "react";
-import { useColorScheme as useRNColorScheme } from "react-native";
 
 import { getTheme, setTheme as saveTheme } from "@/services/storage";
 
@@ -38,30 +37,30 @@ export const ThemeContext = createContext<ThemeContextValue | undefined>(
 );
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-    // The OS scheme is the live fallback; a saved user choice overrides it.
-    const systemScheme: ThemeMode =
-        useRNColorScheme() === "dark" ? "dark" : "light";
-    const [override, setOverride] = useState<ThemeMode | null>(null);
+    const [saved, setSaved] = useState<ThemeMode>("light");
+    const [loaded, setLoaded] = useState(false);
 
     useEffect(() => {
         let cancelled = false;
-        void getTheme().then((saved) => {
-            if (cancelled) return;
-            if (saved === "light" || saved === "dark") {
-                setOverride(saved);
-            }
-            // A null/missing saved value means "follow the system".
-        });
+        void getTheme()
+            .then((value) => {
+                if (cancelled) return;
+                if (value === "light" || value === "dark") setSaved(value);
+            })
+            .catch(() => {})
+            .finally(() => {
+                if (!cancelled) setLoaded(true);
+            });
         return () => {
             cancelled = true;
         };
     }, []);
 
-    const colorScheme = override ?? systemScheme;
+    const colorScheme = saved;
 
     const setColorScheme = useCallback(async (scheme: ThemeMode) => {
         // Update the mounted tree immediately, then persist.
-        setOverride(scheme);
+        setSaved(scheme);
         await saveTheme(scheme);
     }, []);
 
@@ -81,6 +80,9 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         }),
         [theme, colorScheme, toggleTheme, setColorScheme],
     );
+
+    // Draw nothing until the saved choice is known (the splash covers this).
+    if (!loaded) return null;
 
     return (
         <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>

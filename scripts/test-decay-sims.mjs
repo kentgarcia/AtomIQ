@@ -1,6 +1,6 @@
 /**
  * Unit 2 simulation cores: decay wait, decay chain and radiation id
- * (docs/UNIT_2_RADIOACTIVITY_SPEC.md §8).
+ * (docs/features/UNIT_2_RADIOACTIVITY_SPEC.md §8).
  *
  * Run: npm run test:decay-sims
  */

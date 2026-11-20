@@ -4,7 +4,7 @@
  * Read-only against the database handed in. Studio calls this inside an open
  * transaction so it validates an edit before it is committed.
  *
- * Rules live in scripts/lib/content-rules.mjs; see docs/CONTENT_QUESTION_QUALITY.md.
+ * Rules live in scripts/lib/content-rules.mjs; see docs/critical/CONTENT_QUESTION_QUALITY.md.
  */
 
 import {
@@ -257,27 +257,27 @@ export function validateDatabase(db, { strictReview = false, shipped = {}, retir
   findings.push(...curriculum.findings);
 
   // -------------------------------------------------------------------------
-  // NPC feed and mini blog (docs/NPC_FEED_SPEC.md §6): templates, pieces, comments.
+  // NPC feed and mini blog (docs/features/NPC_FEED_SPEC.md §6): templates, pieces, comments.
   // -------------------------------------------------------------------------
   const feed = validateFeed(db, { strictReview });
   for (const [surface, n] of Object.entries(feed.checked)) checked.set(surface, (checked.get(surface) ?? 0) + n);
   findings.push(...feed.findings);
 
   // -------------------------------------------------------------------------
-  // NPC chats (docs/PHONE_SPEC.md §5.2): the teachers' threads on the phone.
+  // NPC chats (docs/features/PHONE_SPEC.md §5.2): the teachers' threads on the phone.
   // -------------------------------------------------------------------------
   const chat = validateChat(db);
   for (const [surface, n] of Object.entries(chat.checked)) checked.set(surface, (checked.get(surface) ?? 0) + n);
   findings.push(...chat.findings);
 
   // -------------------------------------------------------------------------
-  // Atom Scanner (docs/PHONE_SPEC.md §8): targets, their elements and their sources.
+  // Atom Scanner (docs/features/PHONE_SPEC.md §8): targets, their elements and their sources.
   // -------------------------------------------------------------------------
   const scan = validateScan(db, { strictReview });
   for (const [surface, n] of Object.entries(scan.checked)) checked.set(surface, (checked.get(surface) ?? 0) + n);
   findings.push(...scan.findings);
 
-  // Safety Guide cards and Nuclear Map sites (docs/PHONE_SPEC.md §5.9, §5.8): sourced, and every source checked by a person at the publish gate.
+  // Safety Guide cards and Nuclear Map sites (docs/features/PHONE_SPEC.md §5.9, §5.8): sourced, and every source checked by a person at the publish gate.
   for (const part of [validateSafety(db, { strictReview }), validateMap(db, { strictReview })]) {
     for (const [surface, n] of Object.entries(part.checked)) checked.set(surface, (checked.get(surface) ?? 0) + n);
     findings.push(...part.findings);

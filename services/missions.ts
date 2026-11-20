@@ -2,6 +2,7 @@ import { getAllMyths } from "@/content/myths";
 import {
   CHEST_ID,
   CHEST_REWARD,
+  chestNeeded,
   chestStatus,
   periodKey,
   resolveState,
@@ -52,6 +53,16 @@ export const DAILY_MISSIONS: DailyMission[] = [
     reward: 30,
   },
   {
+    id: "daily_lesson",
+    period: "daily",
+    type: "lesson",
+    title: "Finish a Lesson",
+    description: "Complete a lesson or a practice",
+    icon: "Book1",
+    target: 1,
+    reward: 40,
+  },
+  {
     id: "daily_mythbuster",
     period: "daily",
     type: "mythbuster",
@@ -89,7 +100,7 @@ export const WEEKLY_MISSIONS: DailyMission[] = [
     type: "lesson",
     period: "weekly",
     title: "Finish 5 lessons",
-    description: "Complete five lessons this week",
+    description: "Complete lessons or practices five times this week",
     icon: "Book1",
     target: 5,
     reward: 200,
@@ -102,6 +113,16 @@ export const WEEKLY_MISSIONS: DailyMission[] = [
     description: "Play five rounds this week",
     icon: "Game",
     target: 5,
+    reward: 150,
+  },
+  {
+    id: "weekly_maze",
+    type: "maze",
+    period: "weekly",
+    title: "Clear 3 Atom Maze levels",
+    description: "Reach the door in three Atom Maze levels this week",
+    icon: "Game",
+    target: 3,
     reward: 150,
   },
   {
@@ -136,7 +157,7 @@ export const getMissionsState = async (period: MissionPeriod): Promise<MissionsS
 
 export const getDailyMissionsState = (): Promise<MissionsState> => getMissionsState("daily");
 
-/** Something happened (a log-in, a Myth Buster round, a daily fact, a lesson): count it for today and this week. */
+/** Something happened (a log-in, a Myth Buster round, a daily fact, a lesson, a passed practice or checkpoint, a cleared maze level): count it for today and this week. */
 export const recordMissionEvent = async (type: MissionType, amount: number): Promise<void> => {
   for (const period of ["daily", "weekly"] as const) {
     try {
@@ -179,7 +200,7 @@ export const openChest = async (period: MissionPeriod): Promise<number> => {
   try {
     const state = await getMissionsState(period);
     const ids = MISSIONS_BY_PERIOD[period].map((m) => m.id);
-    if (chestStatus(ids, state.claimed) !== "ready") return 0;
+    if (chestStatus(ids, state.claimed, chestNeeded(period, ids.length)) !== "ready") return 0;
     state.claimed.push(CHEST_ID);
     await setItem(STORAGE_KEYS[period], state);
     try {

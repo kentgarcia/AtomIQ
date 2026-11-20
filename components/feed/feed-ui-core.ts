@@ -1,5 +1,5 @@
 /**
- * The pure parts of the feed screens (docs/NPC_FEED_SPEC.md §3, §4, §11): relative times, the words
+ * The pure parts of the feed screens (docs/features/NPC_FEED_SPEC.md §3, §4, §11): relative times, the words
  * a screen reader hears, where a chip leads, the Ranks captions and which items are new. No React,
  * no theme: erasable syntax and `.ts` import extensions so `node --test` runs it
  * (`scripts/test-feed-ui.mjs`).
@@ -99,6 +99,8 @@ export const QUESTS_HREF = "/(tabs)/quests";
 export const RANKS_HREF = "/ranks";
 export const ENCYCLOPEDIA_HREF = "/encyclopedia";
 export const BLOGS_HREF = "/blogs";
+/** The posts the learner has reacted to (the third Discover shortcut). */
+export const REACTED_HREF = "/reacted";
 export const PROFILE_HREF = "/(tabs)/profile";
 
 export const lessonHref = (lessonId: string): string => `/lesson/${encodeURIComponent(lessonId)}`;
@@ -353,7 +355,7 @@ export function rankBannerLines(
 export const SHORTCUTS = [
   { key: "encyclopedia", label: "AtomDex", icon: "Book", href: "/encyclopedia" },
   { key: "periodic", label: "Periodic table", icon: "Element4", href: "/periodic-table" },
-  { key: "facts", label: "Daily facts", icon: "Lamp", href: "/daily-facts" },
+  { key: "reacted", label: "Reacted", icon: "Heart", href: REACTED_HREF },
   { key: "blogs", label: "Blogs", icon: "DocumentText", href: BLOGS_HREF },
 ] as const;
 

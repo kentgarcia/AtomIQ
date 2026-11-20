@@ -15,8 +15,11 @@ test("a new learner has the five starting apps, in catalog order", () => {
 
 test("apps install from progress the app already tracks", () => {
   const one = { ...NO_PROGRESS, lessonsCompleted: 1 };
-  assert.ok(ids(core.unlockedApps(one)).includes("shop"));
+  assert.ok(!ids(core.unlockedApps(one)).includes("shop"), "the Shop waits for the second lesson");
   assert.ok(!ids(core.unlockedApps(one)).includes("field-notes"));
+  const two = { ...NO_PROGRESS, lessonsCompleted: 2 };
+  assert.ok(ids(core.unlockedApps(two)).includes("shop"));
+  assert.ok(ids(core.unlockedApps(two)).includes("field-notes"));
 });
 
 test("planned apps are never returned, whatever the progress", () => {
@@ -74,8 +77,8 @@ test("an app's unit unlock names a unit that exists", async () => {
 });
 
 test("new apps are the unlocked ones not yet seen", () => {
-  const unlocked = core.unlockedApps({ ...NO_PROGRESS, lessonsCompleted: 1 });
-  assert.deepEqual(ids(core.newApps(unlocked, new Set(["chats", "contacts"]))), ["atomdex", "daily-fact", "settings", "shop"]);
+  const unlocked = core.unlockedApps({ ...NO_PROGRESS, lessonsCompleted: 2 });
+  assert.deepEqual(ids(core.newApps(unlocked, new Set(["chats", "contacts"]))), ["atomdex", "daily-fact", "settings", "shop", "field-notes"]);
   assert.deepEqual(core.newApps(unlocked, new Set(ids(unlocked))), []);
 });
 
@@ -149,4 +152,20 @@ test("an installed app is new until it is opened, and a starter is opened from t
   // opening an app whose install never played still records it, as opened
   await store.markOpened("camera", 30);
   assert.deepEqual(await read(), { shop: true, chats: true, camera: true });
+});
+
+test("locked apps are the live ones the learner does not have, and each says what it needs", () => {
+  const lockedIds = (p) => ids(core.lockedApps(p));
+  assert.deepEqual(lockedIds(NO_PROGRESS), ["shop", "field-notes", "scanner", "library", "camera", "safety", "map"]);
+  const all = { lessonsCompleted: 9, unitsCompleted: ["inside-the-atom", "radioactivity"], level: 9, shopItemsOwned: 1 };
+  assert.deepEqual(lockedIds(all), []);
+  // every app is either unlocked or locked, never both
+  for (const p of [NO_PROGRESS, all]) assert.equal(core.unlockedApps(p).length + core.lockedApps(p).length, PHONE_APPS.length);
+
+  const title = (id) => (id === "radioactivity" ? "Radioactivity" : undefined);
+  assert.deepEqual(core.unlockRequirement({ kind: "lessons", count: 1 }, NO_PROGRESS, title), { text: "Finish your first lesson.", progress: "0 of 1 lessons finished" });
+  assert.equal(core.unlockRequirement({ kind: "lessons", count: 2 }, { ...NO_PROGRESS, lessonsCompleted: 1 }, title).progress, "1 of 2 lessons finished");
+  assert.equal(core.unlockRequirement({ kind: "unit", unitId: "radioactivity" }, NO_PROGRESS, title).text, 'Finish the unit "Radioactivity".');
+  assert.deepEqual(core.unlockRequirement({ kind: "level", level: 5 }, { ...NO_PROGRESS, level: 2 }, title), { text: "Reach level 5.", progress: "You are level 2" });
+  assert.equal(core.unlockRequirement({ kind: "owns-shop-item" }, NO_PROGRESS, title).text, "Get any item from the Shop.");
 });

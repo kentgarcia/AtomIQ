@@ -8,7 +8,7 @@ import type { ReadAloudEngine } from "./media-core";
  *
  * Do NOT call expo-speech from screens. Use `useReadAloud` /
  * `<ReadAloudButton />`, which route through the single controller so every
- * surface shares one state machine (spec §4.1, docs/MEDIA_POLICY.md).
+ * surface shares one state machine (spec §4.1, docs/critical/MEDIA_POLICY.md).
  *
  * Android TTS engines vary (Google vs Samsung vs none installed, voice data
  * missing, OEM rate clamping) and report failures through `onError`; the

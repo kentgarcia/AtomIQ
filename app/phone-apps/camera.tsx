@@ -1,5 +1,5 @@
 /**
- * Camera (docs/PHONE_SPEC.md §9): a photo mode for the learner's own character; the device camera is never used. Drawn like a camera
+ * Camera (docs/features/PHONE_SPEC.md §9): a photo mode for the learner's own character; the device camera is never used. Drawn like a camera
  * app, dark and full screen like the Atom Scanner: the viewfinder shows the learner's avatar standing in a flat scene (the preview is
  * live), a dark panel under it picks the scene, who stands beside them (nobody, Shrodi or a teacher from Contacts), the pose and a frame,
  * and the round shutter takes the photo: a flash, a click, and the picture shrinks into the gallery button. A photo is saved as its

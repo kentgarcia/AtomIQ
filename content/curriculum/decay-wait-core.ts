@@ -1,5 +1,5 @@
 /**
- * Decay wait: a grid of unstable nuclei and a Wait button (docs/UNIT_2_RADIOACTIVITY_SPEC.md §8.1).
+ * Decay wait: a grid of unstable nuclei and a Wait button (docs/features/UNIT_2_RADIOACTIVITY_SPEC.md §8.1).
  *
  * Framework-free and deterministic for a given seed, so Node tests can check it. Two modes:
  *  - `single` is genuinely random. Each press, every remaining nucleus has the same chance to

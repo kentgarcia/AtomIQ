@@ -1,5 +1,5 @@
 /**
- * Atom Scanner validation (docs/PHONE_SPEC.md §8 accuracy rules).
+ * Atom Scanner validation (docs/features/PHONE_SPEC.md §8 accuracy rules).
  *
  * `validateScanData` is pure; `validateScan` reads the content database. `validateDatabase` runs it, so
  * `npm run validate:content`, Studio saves and the publish gate enforce it. A target must name elements that exist,

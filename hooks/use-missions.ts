@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { CHEST_REWARD, chestStatus, type ChestStatus } from "@/services/missions-core";
+import { CHEST_REWARD, chestNeeded, chestStatus, type ChestStatus } from "@/services/missions-core";
 import { useStorage } from "@/services/StorageContext";
 import {
   claimMission,
@@ -21,7 +21,7 @@ export type MissionView = DailyMission & {
 
 export interface PeriodMissions {
   missions: MissionView[];
-  /** The chest of the period: opens (for diamonds) once every quest is claimed. */
+  /** The chest of the period: opens (for diamonds) once enough quests are claimed (every daily one, any 3 weekly ones). */
   chest: { status: ChestStatus; reward: number };
   /** Done but not claimed yet, plus the chest when it is ready to open. */
   claimableCount: number;
@@ -38,7 +38,7 @@ const viewsFor = (period: MissionPeriod, state: MissionsState | null): PeriodMis
     const isClaimed = state?.claimed.includes(mission.id) || false;
     return { ...mission, progress, isComplete, isClaimed };
   });
-  const chest = { status: chestStatus(missions.map((m) => m.id), state?.claimed ?? []), reward: CHEST_REWARD[period] };
+  const chest = { status: chestStatus(missions.map((m) => m.id), state?.claimed ?? [], chestNeeded(period, missions.length)), reward: CHEST_REWARD[period] };
   return {
     missions,
     chest,

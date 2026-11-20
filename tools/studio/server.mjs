@@ -11,7 +11,7 @@
 //
 // The master database is the working draft. Edits are validated, recorded in
 // history and saved straight to it; they only become a version when you press
-// Publish (or run `npm run release:content`). See docs/CONTENT_SQLITE_AND_STUDIO_SPEC.md.
+// Publish (or run `npm run release:content`). See docs/critical/CONTENT_SQLITE_AND_STUDIO_SPEC.md.
 
 import { spawn } from "node:child_process";
 

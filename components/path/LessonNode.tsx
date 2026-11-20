@@ -22,6 +22,7 @@ import { GLYPHS, GLYPH_VIEWBOX, type GlyphId } from "@/components/path/node-glyp
 import { Fireflies } from "@/components/path/Fireflies";
 import { DISC_LEFT, FIREFLY_AREA, NODE, PUCK_CENTER_Y, ringGeometry, swirlArcs } from "@/components/path/node-geometry";
 import type { UnitPalette } from "@/components/path/unit-theme";
+import type { ViewRef } from "@/components/tutorial/use-tutorial-target";
 import { createStyles, useTheme, withAlpha } from "@/theme";
 import { DURATION, PRESS_EASING } from "@/theme/motion";
 
@@ -44,6 +45,8 @@ export interface LessonNodeProps {
    */
   reveal?: "completed" | "unlocked";
   revealKey?: number;
+  /** Shrodi's tour lights the puck through this ref (docs/features/TUTORIAL_SPEC.md); only the node it points at gets one. */
+  litRef?: React.Ref<ViewRef>;
   accessibilityLabel: string;
   /** Opens the details bubble (every node, locked ones too: the bubble says why). */
   onPress: () => void;
@@ -80,6 +83,7 @@ function LessonNodeBase({
   palette,
   reveal,
   revealKey,
+  litRef,
   accessibilityLabel,
   onPress,
 }: LessonNodeProps) {
@@ -180,7 +184,7 @@ function LessonNodeBase({
         </Svg>
       ) : null}
 
-      <View style={styles.disc}>
+      <View ref={litRef} collapsable={false} style={styles.disc}>
         <TouchableOpacity
           activeOpacity={1}
           onPress={onPress}

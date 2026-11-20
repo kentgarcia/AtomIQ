@@ -112,12 +112,12 @@ const CONTENT_DB_PREV_NAME = "content.prev.db";
  * The same value is stamped into the bundled database's `content_meta` table,
  * so a device always compares the version of the data it actually holds.
  */
-export const CONTENT_DB_VERSION = "0.0.0+draft.449b85";
+export const CONTENT_DB_VERSION = "0.0.0+draft.37c177";
 
 /**
  * Shape of the content this build's repository reads (columns, step types,
  * tables). Bump BY HAND when that shape changes. A release that changes it is a
- * MAJOR content release. See docs/CONTENT_SQLITE_AND_STUDIO_SPEC.md §3.2.
+ * MAJOR content release. See docs/critical/CONTENT_SQLITE_AND_STUDIO_SPEC.md §3.2.
  */
 export const CONTENT_SCHEMA_VERSION = 4;
 
@@ -775,7 +775,7 @@ export class ContentRepository {
     return rows.map((r) => ({ id: r.id, npcId: r.npc_id, kind: r.kind as NpcLine["kind"], lessonId: r.lesson_id, journeyId: r.journey_id, text: r.text, pose: r.pose as NpcLine["pose"] }));
   }
 
-  /** The teachers' chat nodes (docs/PHONE_SPEC.md §7.1). Throws when the bundled database predates the `chat_nodes` table. */
+  /** The teachers' chat nodes (docs/features/PHONE_SPEC.md §7.1). Throws when the bundled database predates the `chat_nodes` table. */
   async getChatNodes(): Promise<ChatNode[]> {
     const db = await getReadyContentDb();
     const rows = await db.getAllAsync<{
@@ -813,7 +813,7 @@ export class ContentRepository {
     });
   }
 
-  /** The Atom Scanner's targets, by scene then position (docs/PHONE_SPEC.md §8). Throws when the bundled database predates `scan_targets`. */
+  /** The Atom Scanner's targets, by scene then position (docs/features/PHONE_SPEC.md §8). Throws when the bundled database predates `scan_targets`. */
   async getScanTargets(): Promise<ScanTarget[]> {
     const db = await getReadyContentDb();
     const rows = await db.getAllAsync<{
@@ -866,7 +866,7 @@ export class ContentRepository {
     });
   }
 
-  /** The Safety Guide's cards, by section then position (docs/PHONE_SPEC.md §5.9). Throws when the bundled database predates `safety_cards`. */
+  /** The Safety Guide's cards, by section then position (docs/features/PHONE_SPEC.md §5.9). Throws when the bundled database predates `safety_cards`. */
   async getSafetyCards(): Promise<SafetyCard[]> {
     const db = await getReadyContentDb();
     const rows = await db.getAllAsync<{
@@ -920,7 +920,7 @@ export class ContentRepository {
     return cards;
   }
 
-  /** The Nuclear Map's sites in reading order (docs/PHONE_SPEC.md §5.8). Throws when the bundled database predates `map_sites`. */
+  /** The Nuclear Map's sites in reading order (docs/features/PHONE_SPEC.md §5.8). Throws when the bundled database predates `map_sites`. */
   async getMapSites(): Promise<MapSite[]> {
     const db = await getReadyContentDb();
     const rows = await db.getAllAsync<{
@@ -968,7 +968,7 @@ export class ContentRepository {
   }
 
   // -------------------------------------------------------------------------
-  // NPC feed and mini blog (docs/NPC_FEED_SPEC.md §6). These throw when the bundled
+  // NPC feed and mini blog (docs/features/NPC_FEED_SPEC.md §6). These throw when the bundled
   // database predates the feed tables; `services/feed.ts` treats that as "no content".
   // -------------------------------------------------------------------------
 

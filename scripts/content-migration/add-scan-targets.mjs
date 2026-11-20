@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Atom Scanner migration (docs/PHONE_SPEC.md §8, §7.1). Idempotent and additive:
+ * Atom Scanner migration (docs/features/PHONE_SPEC.md §8, §7.1). Idempotent and additive:
  *
  *   1. Creates `scan_targets` and `scan_target_references` (the `phone` block of schema.sql) when they are missing.
  *   2. Adds the sources the targets stand on to `content_references` (only the missing ones) and seeds the targets.

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Double-size copies of the Kenney pictures the platformer uses (docs/PLATFORMER_SPEC.md), drawn from
+ * Double-size copies of the Kenney pictures the platformer uses (docs/features/PLATFORMER_SPEC.md), drawn from
  * the pack's own SVGs. The pack stays in tools/platformer-art as the library (License, Vector, Sprites;
  * the rest of the pack was removed); what the game USES lives in assets/images/platformer/<group>/ (backgrounds, enemies,
  * tiles, props, hud, characters). The pack's 64 px PNGs were soft at 3x density and blurry when a battle

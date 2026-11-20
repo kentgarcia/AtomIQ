@@ -344,7 +344,7 @@ describe("text helpers", () => {
 });
 
 
-describe("NPC teachers (docs/NPC_TEACHERS_SPEC.md §7.3)", () => {
+describe("NPC teachers (docs/features/NPC_TEACHERS_SPEC.md §7.3)", () => {
   async function buildWithNpcs() {
     const db = build();
     db.exec(npcsDdl());
@@ -421,7 +421,7 @@ describe("NPC teachers (docs/NPC_TEACHERS_SPEC.md §7.3)", () => {
 
 
 // ---------------------------------------------------------------------------
-// Unit 2: Radioactivity (docs/UNIT_2_RADIOACTIVITY_SPEC.md)
+// Unit 2: Radioactivity (docs/features/UNIT_2_RADIOACTIVITY_SPEC.md)
 // ---------------------------------------------------------------------------
 
 describe("Unit 2 content", () => {

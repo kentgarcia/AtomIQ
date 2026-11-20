@@ -1057,6 +1057,7 @@ export const clearAllData = async () => {
     DELETE FROM blog_reads;
     DELETE FROM daily_facts_read;
     DELETE FROM phone_seen;
+    DELETE FROM tutorial_steps;
     DELETE FROM field_notes;
     DELETE FROM chat_messages;
     DELETE FROM chat_threads;
@@ -1124,6 +1125,7 @@ export const deleteAccountData = async () => {
     "blog_reads",
     "daily_facts_read",
     "phone_seen",
+    "tutorial_steps",
     "field_notes",
     "chat_messages",
     "chat_threads",

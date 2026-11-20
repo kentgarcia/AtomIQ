@@ -10,7 +10,7 @@
  */
 
 import { useRouter } from "expo-router";
-import { useMemo, type ReactNode } from "react";
+import { useEffect, useId, useMemo, useRef, useState, type ReactNode } from "react";
 import { Image, Pressable, View } from "react-native";
 import Animated, {
     LinearTransition,
@@ -20,8 +20,13 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Avatar } from "@/components/avatar/Avatar";
 import { HeaderStat } from "@/components/layout/HeaderStat";
+import { Icon } from "@/components/ui/icon";
+import { measureViewRect, registerLockHit } from "@/components/tutorial/lock-hits";
+import type { ViewRef } from "@/components/tutorial/use-tutorial-target";
+import { LockedDialog } from "@/components/ui/locked-dialog";
 import { Text } from "@/components/ui/text";
 import { useCompletedLessonCount } from "@/hooks/use-completed-lessons";
+import { useTabLocks } from "@/hooks/use-tutorial";
 import { useDiamonds } from "@/hooks/use-wallet";
 import { useStorage } from "@/services/StorageContext";
 import { createStyles, fontFaces, useResponsiveLayout, useTheme } from "@/theme";
@@ -47,6 +52,24 @@ export function TopRowHeader({
     const reducedMotion = useReducedMotion();
     const router = useRouter();
     const styles = useMemo(() => makeStyles(theme), [theme]);
+    // The avatar opens the Profile tab, which Shrodi's tour keeps locked at first
+    const locks = useTabLocks();
+    const profileLocked = locks.isLocked("profile");
+    const [lockOpen, setLockOpen] = useState(false);
+    // While the tour's dim is up the avatar still answers a press with its dialog (`lock-hits.ts`)
+    const avatarRef = useRef<ViewRef>(null);
+    const instance = useId();
+    const profileLockedRef = useRef(profileLocked);
+    profileLockedRef.current = profileLocked;
+    useEffect(
+        () =>
+            registerLockHit(`header:profile:${instance}`, {
+                rect: () => measureViewRect(avatarRef.current),
+                open: () => setLockOpen(true),
+                active: () => profileLockedRef.current,
+            }),
+        [instance],
+    );
 
     // Currency: earned from quest chests (services/wallet.ts)
     const diamonds = useDiamonds();
@@ -73,13 +96,22 @@ export function TopRowHeader({
                 >
                     <View style={styles.row}>
                         <Pressable
+                            ref={avatarRef}
+                            collapsable={false}
                             style={styles.avatarWrap}
                             accessibilityRole="button"
-                            accessibilityLabel="Open profile"
+                            accessibilityLabel={profileLocked ? "Profile, locked" : "Open profile"}
                             hitSlop={6}
-                            onPress={() => router.navigate("/(tabs)/profile")}
+                            onPress={() => (profileLocked ? setLockOpen(true) : router.navigate("/(tabs)/profile"))}
                         >
-                            <Avatar value={userProfile?.avatar_url} size={40} />
+                            <View style={profileLocked ? styles.avatarLocked : undefined}>
+                                <Avatar value={userProfile?.avatar_url} size={40} />
+                            </View>
+                            {profileLocked ? (
+                                <View pointerEvents="none" style={styles.lockBadge}>
+                                    <Icon name="Lock" size={11} color={c.textMuted} variant="Bold" />
+                                </View>
+                            ) : null}
                         </Pressable>
                         <View style={styles.statsRow}>
                             {stats.map((stat) => {
@@ -118,6 +150,7 @@ export function TopRowHeader({
                     {children}
                 </Animated.View>
             </View>
+            <LockedDialog visible={lockOpen} title="Profile" text={locks.hint} onClose={() => setLockOpen(false)} />
         </View>
     );
 }
@@ -139,6 +172,20 @@ const makeStyles = createStyles((theme) => {
             alignItems: "center",
             justifyContent: "space-between",
             gap: 16,
+        },
+        avatarLocked: { opacity: 0.45 },
+        lockBadge: {
+            position: "absolute",
+            right: -4,
+            bottom: -4,
+            width: 18,
+            height: 18,
+            borderRadius: 9,
+            alignItems: "center",
+            justifyContent: "center",
+            backgroundColor: c.card,
+            borderWidth: 1,
+            borderColor: c.border,
         },
         avatarWrap: {
             width: 46,
