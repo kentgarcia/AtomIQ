@@ -1,0 +1,948 @@
+{
+  "table": "chat_nodes",
+  "primaryKey": [
+    "id"
+  ],
+  "rows": [
+    {
+      "id": "chat-ada-bye",
+      "npc_id": "npc-ada",
+      "kind": "sign_off",
+      "trigger": null,
+      "title": null,
+      "text": "Any time. I'm here whenever you're curious.",
+      "pose": "proud",
+      "replies": [],
+      "position": 7
+    },
+    {
+      "id": "chat-ada-greeting",
+      "npc_id": "npc-ada",
+      "kind": "greeting",
+      "trigger": null,
+      "title": "Chat",
+      "text": "Hi, it's Ada. Ask me about atoms any time. What would you like?",
+      "pose": "greet",
+      "replies": [
+        {
+          "label": "What's next?",
+          "next": "chat-ada-next"
+        },
+        {
+          "label": "Quiz me",
+          "next": "chat-ada-quiz"
+        },
+        {
+          "label": "Remind me of something",
+          "next": "chat-ada-remind"
+        },
+        {
+          "label": "Bye for now",
+          "next": "chat-ada-bye"
+        }
+      ],
+      "position": 0
+    },
+    {
+      "id": "chat-ada-isotope",
+      "npc_id": "npc-ada",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "Isotopes are atoms of one element with different numbers of neutrons. The protons stay the same, so the element does too.",
+      "pose": "explain",
+      "replies": [
+        {
+          "label": "Open it in AtomDex",
+          "action": {
+            "screen": "entry",
+            "id": "isotope"
+          }
+        },
+        {
+          "label": "Back",
+          "next": "chat-ada-menu"
+        }
+      ],
+      "position": 6
+    },
+    {
+      "id": "chat-ada-menu",
+      "npc_id": "npc-ada",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "What else can I help with?",
+      "pose": "idle",
+      "replies": [
+        {
+          "label": "What's next?",
+          "next": "chat-ada-next"
+        },
+        {
+          "label": "Quiz me",
+          "next": "chat-ada-quiz"
+        },
+        {
+          "label": "Remind me of something",
+          "next": "chat-ada-remind"
+        },
+        {
+          "label": "Bye for now",
+          "next": "chat-ada-bye"
+        }
+      ],
+      "position": 1
+    },
+    {
+      "id": "chat-ada-next",
+      "npc_id": "npc-ada",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "There is always a next lesson waiting on your map. Shall I take you there?",
+      "pose": "point",
+      "replies": [
+        {
+          "label": "Take me there",
+          "action": {
+            "screen": "next-lesson"
+          }
+        },
+        {
+          "label": "Maybe later",
+          "next": "chat-ada-menu"
+        }
+      ],
+      "position": 2
+    },
+    {
+      "id": "chat-ada-nucleus",
+      "npc_id": "npc-ada",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "The nucleus is the tiny core of an atom. It holds the protons and the neutrons, and nearly all of the atom's mass.",
+      "pose": "explain",
+      "replies": [
+        {
+          "label": "Open it in AtomDex",
+          "action": {
+            "screen": "entry",
+            "id": "nucleus"
+          }
+        },
+        {
+          "label": "Back",
+          "next": "chat-ada-menu"
+        }
+      ],
+      "position": 5
+    },
+    {
+      "id": "chat-ada-quiz",
+      "npc_id": "npc-ada",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "A quick round of Myth Buster on atoms will show what stuck. Ready?",
+      "pose": "explain",
+      "replies": [
+        {
+          "label": "Start the round",
+          "action": {
+            "screen": "mythbuster",
+            "id": "inside-the-atom"
+          }
+        },
+        {
+          "label": "Not now",
+          "next": "chat-ada-menu"
+        }
+      ],
+      "position": 3
+    },
+    {
+      "id": "chat-ada-remind",
+      "npc_id": "npc-ada",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "Of course. Which one shall we look at again?",
+      "pose": "think",
+      "replies": [
+        {
+          "label": "The nucleus",
+          "next": "chat-ada-nucleus"
+        },
+        {
+          "label": "Isotopes",
+          "next": "chat-ada-isotope"
+        },
+        {
+          "label": "Never mind",
+          "next": "chat-ada-menu"
+        }
+      ],
+      "position": 4
+    },
+    {
+      "id": "chat-ada-stadium-empty",
+      "npc_id": "npc-ada",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "Empty space. Mostly just empty space!\n\nThat is why an atom is so much bigger than its nucleus.\n\nThings still feel solid, because the electrons in them push back on the electrons in your hand.",
+      "pose": "proud",
+      "replies": [
+        {
+          "label": "mind-blown",
+          "type": "emoji",
+          "next": "chat-ada-stadium-end"
+        },
+        {
+          "label": "star",
+          "type": "emoji"
+        }
+      ],
+      "position": 13
+    },
+    {
+      "id": "chat-ada-stadium-end",
+      "npc_id": "npc-ada",
+      "kind": "sign_off",
+      "trigger": null,
+      "title": null,
+      "text": "That was the marble in the stadium.\n\nCome back to it any time. I will tell it again.",
+      "pose": "proud",
+      "replies": [],
+      "position": 14
+    },
+    {
+      "id": "chat-ada-stadium-why",
+      "npc_id": "npc-ada",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "Good thing to wonder about.\n\nThe nucleus is made of protons and neutrons, packed tightly together.\n\nThe electrons are tiny and fast, and they keep their distance from it.",
+      "pose": "explain",
+      "replies": [
+        {
+          "label": "So what is between?",
+          "next": "chat-ada-stadium-empty"
+        },
+        {
+          "label": "Open the nucleus in AtomDex",
+          "action": {
+            "screen": "entry",
+            "id": "nucleus"
+          }
+        }
+      ],
+      "position": 12
+    },
+    {
+      "id": "chat-ada-stadium-wow",
+      "npc_id": "npc-ada",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "Really. Almost all of the atom's mass is packed into that marble.\n\nThe electrons are far lighter, and they are out near the seats.\n\nSo what is in between?",
+      "pose": "proud",
+      "replies": [
+        {
+          "label": "Nothing at all?",
+          "next": "chat-ada-stadium-empty"
+        },
+        {
+          "label": "Where are the electrons?",
+          "next": "chat-ada-stadium-why"
+        }
+      ],
+      "position": 11
+    },
+    {
+      "id": "chat-ada-up-stadium",
+      "npc_id": "npc-ada",
+      "kind": "unprompted",
+      "trigger": "lessons_completed:3",
+      "title": "A marble in a stadium",
+      "text": "Hi! Ada here. I have to tell you something that still surprises me.\n\nPicture an atom blown up until it is as big as a football stadium.\n\nHow big would its nucleus be, right in the middle? About the size of a marble.",
+      "pose": "explain",
+      "replies": [
+        {
+          "label": "wow",
+          "type": "react",
+          "next": "chat-ada-stadium-wow"
+        },
+        {
+          "label": "think",
+          "type": "react",
+          "next": "chat-ada-stadium-why"
+        }
+      ],
+      "position": 10
+    },
+    {
+      "id": "chat-ada-up-unit",
+      "npc_id": "npc-ada",
+      "kind": "unprompted",
+      "trigger": "unit_complete:inside-the-atom",
+      "title": "Inside the Atom: done!",
+      "text": "You did it. That was the last lesson of my unit.\n\nYou can say what is inside an atom now, and why the number of protons matters so much.\n\nHal is next, with atoms that change.",
+      "pose": "proud",
+      "replies": [
+        {
+          "label": "What's next?",
+          "next": "chat-ada-next"
+        },
+        {
+          "label": "Thanks, Ada",
+          "next": "chat-ada-bye"
+        }
+      ],
+      "position": 8
+    },
+    {
+      "id": "chat-ada-up-welcome-back",
+      "npc_id": "npc-ada",
+      "kind": "unprompted",
+      "trigger": "welcome_back",
+      "title": "Welcome back",
+      "text": "Hello again!\n\nThe atoms waited for you. They are patient like that.\n\nWant a quick round to warm up?",
+      "pose": "greet",
+      "replies": [
+        {
+          "label": "A quick round",
+          "action": {
+            "screen": "mythbuster",
+            "id": "inside-the-atom"
+          }
+        },
+        {
+          "label": "Maybe later",
+          "next": "chat-ada-bye"
+        }
+      ],
+      "position": 9
+    },
+    {
+      "id": "chat-hal-banana-end",
+      "npc_id": "npc-hal",
+      "kind": "sign_off",
+      "trigger": null,
+      "title": null,
+      "text": "Good talking.\n\nNow you have something to say at the fruit stand. Come back and read this again whenever you like.",
+      "pose": "proud",
+      "replies": [],
+      "position": 14
+    },
+    {
+      "id": "chat-hal-banana-k",
+      "npc_id": "npc-hal",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "A banana holds potassium, and a tiny part of all potassium is a radioactive isotope called potassium-40.\n\nIt is in bananas, in nuts, in the soil, and in you.",
+      "pose": "explain",
+      "replies": [
+        {
+          "label": "In me?",
+          "next": "chat-hal-banana-me"
+        },
+        {
+          "label": "Is it safe?",
+          "next": "chat-hal-banana-safe"
+        },
+        {
+          "label": "Open half-life in AtomDex",
+          "action": {
+            "screen": "entry",
+            "id": "half-life"
+          }
+        }
+      ],
+      "position": 11
+    },
+    {
+      "id": "chat-hal-banana-me",
+      "npc_id": "npc-hal",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "Yes. Every person carries some potassium-40, and a few of its atoms decay every second.\n\nIt decays very slowly. Its half-life is more than a billion years, which is why it is still around.",
+      "pose": "proud",
+      "replies": [
+        {
+          "label": "mind-blown",
+          "type": "emoji",
+          "next": "chat-hal-banana-end"
+        },
+        {
+          "label": "banana",
+          "type": "emoji"
+        }
+      ],
+      "position": 13
+    },
+    {
+      "id": "chat-hal-banana-safe",
+      "npc_id": "npc-hal",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "Completely safe. The amount is far too small to matter.\n\nYour own body holds the same kind of atom, and you are fine.\n\nEating bananas is good for you.",
+      "pose": "explain",
+      "replies": [
+        {
+          "label": "In me?",
+          "next": "chat-hal-banana-me"
+        },
+        {
+          "label": "Thanks, Hal",
+          "next": "chat-hal-banana-end"
+        }
+      ],
+      "position": 12
+    },
+    {
+      "id": "chat-hal-bye",
+      "npc_id": "npc-hal",
+      "kind": "sign_off",
+      "trigger": null,
+      "title": null,
+      "text": "Take care. I'll be here when you want to talk about decay.",
+      "pose": "proud",
+      "replies": [],
+      "position": 7
+    },
+    {
+      "id": "chat-hal-decay",
+      "npc_id": "npc-hal",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "Decay is an unstable nucleus changing by itself into a steadier one, and giving off radiation as it does.",
+      "pose": "explain",
+      "replies": [
+        {
+          "label": "Open it in AtomDex",
+          "action": {
+            "screen": "entry",
+            "id": "decay"
+          }
+        },
+        {
+          "label": "Back",
+          "next": "chat-hal-menu"
+        }
+      ],
+      "position": 6
+    },
+    {
+      "id": "chat-hal-greeting",
+      "npc_id": "npc-hal",
+      "kind": "greeting",
+      "trigger": null,
+      "title": "Chat",
+      "text": "Hello. I'm Hal. Ask me about atoms that change whenever you like. There is no hurry.",
+      "pose": "greet",
+      "replies": [
+        {
+          "label": "What's next?",
+          "next": "chat-hal-next"
+        },
+        {
+          "label": "Quiz me",
+          "next": "chat-hal-quiz"
+        },
+        {
+          "label": "Remind me of something",
+          "next": "chat-hal-remind"
+        },
+        {
+          "label": "Goodbye",
+          "next": "chat-hal-bye"
+        }
+      ],
+      "position": 0
+    },
+    {
+      "id": "chat-hal-half-life",
+      "npc_id": "npc-hal",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "Half-life is the time it takes for half of the atoms in a sample to decay. Not one atom: a whole crowd of them.",
+      "pose": "explain",
+      "replies": [
+        {
+          "label": "Open it in AtomDex",
+          "action": {
+            "screen": "entry",
+            "id": "half-life"
+          }
+        },
+        {
+          "label": "Back",
+          "next": "chat-hal-menu"
+        }
+      ],
+      "position": 5
+    },
+    {
+      "id": "chat-hal-menu",
+      "npc_id": "npc-hal",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "What would you like to look at?",
+      "pose": "idle",
+      "replies": [
+        {
+          "label": "What's next?",
+          "next": "chat-hal-next"
+        },
+        {
+          "label": "Quiz me",
+          "next": "chat-hal-quiz"
+        },
+        {
+          "label": "Remind me of something",
+          "next": "chat-hal-remind"
+        },
+        {
+          "label": "Goodbye",
+          "next": "chat-hal-bye"
+        }
+      ],
+      "position": 1
+    },
+    {
+      "id": "chat-hal-next",
+      "npc_id": "npc-hal",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "When you are ready, the next lesson is on your map. I can take you there.",
+      "pose": "point",
+      "replies": [
+        {
+          "label": "Take me there",
+          "action": {
+            "screen": "next-lesson"
+          }
+        },
+        {
+          "label": "Not yet",
+          "next": "chat-hal-menu"
+        }
+      ],
+      "position": 2
+    },
+    {
+      "id": "chat-hal-quiz",
+      "npc_id": "npc-hal",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "A short round of Myth Buster on radioactivity will show what you remember. Shall we?",
+      "pose": "explain",
+      "replies": [
+        {
+          "label": "Start the round",
+          "action": {
+            "screen": "mythbuster",
+            "id": "radioactivity"
+          }
+        },
+        {
+          "label": "Not now",
+          "next": "chat-hal-menu"
+        }
+      ],
+      "position": 3
+    },
+    {
+      "id": "chat-hal-remind",
+      "npc_id": "npc-hal",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "Certainly. Which one shall I remind you of?",
+      "pose": "think",
+      "replies": [
+        {
+          "label": "Half-life",
+          "next": "chat-hal-half-life"
+        },
+        {
+          "label": "Decay",
+          "next": "chat-hal-decay"
+        },
+        {
+          "label": "Never mind",
+          "next": "chat-hal-menu"
+        }
+      ],
+      "position": 4
+    },
+    {
+      "id": "chat-hal-up-banana",
+      "npc_id": "npc-hal",
+      "kind": "unprompted",
+      "trigger": "level_reached:4",
+      "title": "Is a banana radioactive?",
+      "text": "Hello, Hal here. A small thing, for fun.\n\nDid you know a banana is a little bit radioactive?\n\nIt is true, and it is nothing to worry about.",
+      "pose": "think",
+      "replies": [
+        {
+          "label": "wow",
+          "type": "react",
+          "next": "chat-hal-banana-k"
+        },
+        {
+          "label": "think",
+          "type": "react",
+          "next": "chat-hal-banana-safe"
+        }
+      ],
+      "position": 10
+    },
+    {
+      "id": "chat-hal-up-unit",
+      "npc_id": "npc-hal",
+      "kind": "unprompted",
+      "trigger": "unit_complete:radioactivity",
+      "title": "Radioactivity: done!",
+      "text": "That was the end of my unit.\n\nRadioactivity is part of the natural world, and now you know how it behaves.\n\nGood work. Truly.",
+      "pose": "proud",
+      "replies": [
+        {
+          "label": "Remind me of something",
+          "next": "chat-hal-remind"
+        },
+        {
+          "label": "Thanks, Hal",
+          "next": "chat-hal-bye"
+        }
+      ],
+      "position": 8
+    },
+    {
+      "id": "chat-hal-up-welcome-back",
+      "npc_id": "npc-hal",
+      "kind": "unprompted",
+      "trigger": "welcome_back",
+      "title": "Welcome back",
+      "text": "Welcome back.\n\nEverything waited exactly as you left it.\n\nShall we pick up where you stopped?",
+      "pose": "greet",
+      "replies": [
+        {
+          "label": "Take me there",
+          "action": {
+            "screen": "next-lesson"
+          }
+        },
+        {
+          "label": "Not today",
+          "next": "chat-hal-bye"
+        }
+      ],
+      "position": 9
+    },
+    {
+      "id": "chat-shrodi-around",
+      "npc_id": "shrodi",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "This is your phone.\n\nChats is where your teachers write to you, AtomDex is the encyclopedia, and new apps arrive as you learn.",
+      "pose": "point",
+      "replies": [
+        {
+          "label": "Open AtomDex",
+          "action": {
+            "screen": "app",
+            "id": "atomdex"
+          }
+        },
+        {
+          "label": "Open Field Notes",
+          "action": {
+            "screen": "app",
+            "id": "field-notes"
+          }
+        },
+        {
+          "label": "Back",
+          "next": "chat-shrodi-menu"
+        }
+      ],
+      "position": 9
+    },
+    {
+      "id": "chat-shrodi-atom",
+      "npc_id": "shrodi",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "Everything is made of atoms.\n\nAt the middle of each is a tiny nucleus of protons and neutrons, with electrons far outside it.",
+      "pose": "explain",
+      "replies": [
+        {
+          "label": "Open the nucleus in AtomDex",
+          "action": {
+            "screen": "entry",
+            "id": "nucleus"
+          }
+        },
+        {
+          "label": "Back",
+          "next": "chat-shrodi-explain"
+        }
+      ],
+      "position": 4
+    },
+    {
+      "id": "chat-shrodi-bye",
+      "npc_id": "shrodi",
+      "kind": "sign_off",
+      "trigger": null,
+      "title": null,
+      "text": "Any time. I'm right here in your phone.",
+      "pose": "proud",
+      "replies": [],
+      "position": 10
+    },
+    {
+      "id": "chat-shrodi-decay",
+      "npc_id": "shrodi",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "Some nuclei are unstable, so they change on their own and give off radiation.\n\nThat change is called decay.",
+      "pose": "explain",
+      "replies": [
+        {
+          "label": "Open decay in AtomDex",
+          "action": {
+            "screen": "entry",
+            "id": "decay"
+          }
+        },
+        {
+          "label": "Back",
+          "next": "chat-shrodi-explain"
+        }
+      ],
+      "position": 6
+    },
+    {
+      "id": "chat-shrodi-explain",
+      "npc_id": "shrodi",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "Sure! Pick something and I'll show you where to read about it.",
+      "pose": "explain",
+      "replies": [
+        {
+          "label": "The atom",
+          "next": "chat-shrodi-atom"
+        },
+        {
+          "label": "Isotopes",
+          "next": "chat-shrodi-isotope"
+        },
+        {
+          "label": "Radioactive decay",
+          "next": "chat-shrodi-decay"
+        },
+        {
+          "label": "Half-life",
+          "next": "chat-shrodi-half-life"
+        },
+        {
+          "label": "Something else",
+          "next": "chat-shrodi-menu"
+        }
+      ],
+      "position": 3
+    },
+    {
+      "id": "chat-shrodi-greeting",
+      "npc_id": "shrodi",
+      "kind": "greeting",
+      "trigger": null,
+      "title": "Chat",
+      "text": "Hi, I'm Shrodi, your guide in AtomIQ!\n\nAsk me what to learn next, how something works, or for a quick quiz.",
+      "pose": "greet",
+      "replies": [
+        {
+          "label": "What should I do next?",
+          "next": "chat-shrodi-next"
+        },
+        {
+          "label": "Explain something",
+          "next": "chat-shrodi-explain"
+        },
+        {
+          "label": "Quiz me",
+          "next": "chat-shrodi-quiz"
+        },
+        {
+          "label": "Show me around",
+          "next": "chat-shrodi-around"
+        },
+        {
+          "label": "Bye for now",
+          "next": "chat-shrodi-bye"
+        }
+      ],
+      "position": 0
+    },
+    {
+      "id": "chat-shrodi-half-life",
+      "npc_id": "shrodi",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "A half-life is how long it takes for half of a radioactive sample to decay.\n\nIt can be a fraction of a second or billions of years.",
+      "pose": "explain",
+      "replies": [
+        {
+          "label": "Open half-life in AtomDex",
+          "action": {
+            "screen": "entry",
+            "id": "half-life"
+          }
+        },
+        {
+          "label": "Back",
+          "next": "chat-shrodi-explain"
+        }
+      ],
+      "position": 7
+    },
+    {
+      "id": "chat-shrodi-isotope",
+      "npc_id": "shrodi",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "Isotopes are atoms of one element with different numbers of neutrons.\n\nSame protons, so the same element. A different mass.",
+      "pose": "explain",
+      "replies": [
+        {
+          "label": "Open isotopes in AtomDex",
+          "action": {
+            "screen": "entry",
+            "id": "isotope"
+          }
+        },
+        {
+          "label": "Back",
+          "next": "chat-shrodi-explain"
+        }
+      ],
+      "position": 5
+    },
+    {
+      "id": "chat-shrodi-menu",
+      "npc_id": "shrodi",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "What else can I help with?",
+      "pose": "idle",
+      "replies": [
+        {
+          "label": "What should I do next?",
+          "next": "chat-shrodi-next"
+        },
+        {
+          "label": "Explain something",
+          "next": "chat-shrodi-explain"
+        },
+        {
+          "label": "Quiz me",
+          "next": "chat-shrodi-quiz"
+        },
+        {
+          "label": "Show me around",
+          "next": "chat-shrodi-around"
+        },
+        {
+          "label": "Bye for now",
+          "next": "chat-shrodi-bye"
+        }
+      ],
+      "position": 1
+    },
+    {
+      "id": "chat-shrodi-next",
+      "npc_id": "shrodi",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "Your next lesson is waiting on the map.\n\nShall I take you there?",
+      "pose": "point",
+      "replies": [
+        {
+          "label": "Take me there",
+          "action": {
+            "screen": "next-lesson"
+          }
+        },
+        {
+          "label": "Maybe later",
+          "next": "chat-shrodi-menu"
+        }
+      ],
+      "position": 2
+    },
+    {
+      "id": "chat-shrodi-quiz",
+      "npc_id": "shrodi",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "Ready for a quick round? Myth Buster is a fast one.",
+      "pose": "cheer",
+      "replies": [
+        {
+          "label": "Start the round",
+          "action": {
+            "screen": "mythbuster"
+          }
+        },
+        {
+          "label": "Not now",
+          "next": "chat-shrodi-menu"
+        }
+      ],
+      "position": 8
+    },
+    {
+      "id": "chat-shrodi-up-first",
+      "npc_id": "shrodi",
+      "kind": "unprompted",
+      "trigger": "lessons_completed:1",
+      "title": "Your first lesson!",
+      "text": "You finished your first lesson!\n\nThat is how every scientist starts: one question at a time.\n\nThe map has more waiting for you.",
+      "pose": "cheer",
+      "replies": [
+        {
+          "label": "What should I do next?",
+          "next": "chat-shrodi-next"
+        },
+        {
+          "label": "Thanks, Shrodi",
+          "next": "chat-shrodi-bye"
+        }
+      ],
+      "position": 11
+    }
+  ]
+}

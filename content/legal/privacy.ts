@@ -49,7 +49,11 @@ export const PRIVACY_SECTIONS: readonly LegalSection[] = [
       "• Game and lab results: Myth Buster and Atom Maze scores and settings, and the labs you have completed.\n" +
       "• Activity history: counts per calendar day of what you did (shown in your streak graph), the daily facts and blog pieces you have read, and the periodic-table elements you have explored.\n" +
       "• Feed activity: the reactions you give to posts and blog pieces, and your place in the weekly ranking.\n" +
-      "• Preferences: theme, sound effects, haptics, Read Aloud, the Feed posts switch, and that you accepted the Terms and this policy.\n" +
+      "• Field Notes: the notes you write in the notebook on your phone (titles, text, and the lines you clip from the AtomDex, a daily fact or the Atom Scanner). Notes are private: they are never shown to anyone, never posted, and never leave your device.\n" +
+      "• Phone: which of the phone's apps have arrived and been opened, and your chats with your teachers (what they said and the replies you tapped). Chats are prepared in advance; you never type to a teacher, and nothing you do in a chat is sent to anyone.\n" +
+      "• Atom Scanner: which things you have scanned and how many times. The scanner is a drawn simulation: it does not use your camera, microphone or location, and nothing you scan is sent to anyone.\n" +
+      "• Camera photos: the photos you take in the phone's Camera app. The Camera is a drawn simulation too: it does not use your device camera, microphone, photo library or location. A photo is saved on your device only as a small description of the picture (the scene, your avatar and its pose), up to 100 of them, and is never sent to anyone. The Safety Guide and the Nuclear Map are read-only and collect nothing.\n" +
+      "• Preferences: theme, sound effects, haptics, Read Aloud, the Feed posts switch, the phone's wallpaper, and that you accepted the Terms and this policy.\n" +
       "None of this needs your real name, your email address or any identity document.",
   },
   {
@@ -77,7 +81,7 @@ export const PRIVACY_SECTIONS: readonly LegalSection[] = [
     title: "6. Storage, Retention and Deletion",
     body:
       "Your information is kept in the app's private storage on your device (a local database and the app's settings storage), protected by the operating system's app sandbox. It is kept until you remove it:\n" +
-      "• Settings > Delete Account erases your profile, progress, rewards, history and preferences, and returns the app to its first-run setup. It cannot be undone.\n" +
+      "• Settings > Delete Account erases your profile, progress, rewards, history, notes, chats, scans, photos and preferences, and returns the app to its first-run setup. It cannot be undone.\n" +
       "• Uninstalling the app, or clearing its storage in your device settings, removes it as well.\n" +
       "The lessons and other learning content are part of the app and stay until you uninstall it.\n" +
       "Because we hold no copy, we cannot restore data that was deleted or lost. Your phone's own backup service (for example the backup built into Android) may copy app data depending on your device settings; that is managed by your device maker or operating-system provider under their policies.",
@@ -90,7 +94,7 @@ export const PRIVACY_SECTIONS: readonly LegalSection[] = [
   {
     title: "8. Internet Use and Third Parties",
     body:
-      "Lessons, games, labs, the encyclopedia, the periodic table and your progress all work offline. The app asks for internet access only for these things, and other sites and services follow their own privacy policies:\n" +
+      "Lessons, games, labs, the AtomDex, the periodic table and your progress all work offline. The app asks for internet access only for these things, and other sites and services follow their own privacy policies:\n" +
       "• Source links: when you open a reference (for example IAEA, UNSCEAR, World Nuclear Association, EPA, Britannica, the Nobel Prize or OpenStax) it opens in your browser. That website can see your IP address and device details, as with any website. We add nothing from your profile.\n" +
       "• Pictures: a few pictures in Myth Buster and the explorer journeys are loaded from the Unsplash image service when shown. Unsplash receives your IP address and basic device details to deliver them.\n" +
       "• Beta Feedback: the form in Settings opens a Google Forms page. What you type is sent to us and processed by Google under Google's privacy policy. Please do not put sensitive personal information in it. We use responses only to fix and improve the app.\n" +
@@ -123,7 +127,7 @@ export const PRIVACY_SECTIONS: readonly LegalSection[] = [
       "• receive a copy of it in a usable form, where it applies;\n" +
       "• claim damages for a violation of your rights;\n" +
       "• complain to the National Privacy Commission of the Philippines (privacy.gov.ph).\n" +
-      "Because your information lives only on your device, most of these you can do yourself: see and change your name, avatar and preferences in Profile and Settings, and erase everything with Settings > Delete Account. We have no copy to send you, and the app does not currently export your data to a file. For anything we do hold, such as a feedback-form response, contact us (Section 15) and we will help.",
+      "Because your information lives only on your device, most of these you can do yourself: see and change your name, avatar, notes and preferences in Profile, Field Notes and Settings, and erase everything with Settings > Delete Account. We have no copy to send you, and the app does not currently export your data to a file. For anything we do hold, such as a feedback-form response, contact us (Section 15) and we will help.",
   },
   {
     title: "12. Security",

@@ -69,25 +69,28 @@ const earned = [
   { id: 2, level: 5 },
   { id: 3, level: 5 },
   { id: 4, level: 1 },
+  { id: 5, level: 3 },
+  { id: 6, level: 1 },
+  { id: 7, level: 4 },
 ];
 
 test("without a pick the best earned badges show, highest level first", () => {
-  assert.deepEqual(resolveShowcase(null, earned), [2, 3, 1]);
+  assert.deepEqual(resolveShowcase(null, earned), [2, 3, 7, 5, 1]);
   assert.deepEqual(resolveShowcase(undefined, []), []);
 });
 
 test("a pick is kept in order, drops what is not earned, and is capped", () => {
   assert.deepEqual(resolveShowcase([4, 1], earned), [4, 1]);
   assert.deepEqual(resolveShowcase([9, 4, 4, 1], earned), [4, 1]);
-  assert.deepEqual(resolveShowcase([1, 2, 3, 4], earned), [1, 2, 3]);
+  assert.deepEqual(resolveShowcase([1, 2, 3, 4, 5, 6, 7], earned), [1, 2, 3, 4, 5]);
   assert.deepEqual(resolveShowcase([], earned), []);
 });
 
 test("toggling adds to the end, removes, and stops at the cap", () => {
   assert.deepEqual(toggleShowcase([], 2), [2]);
   assert.deepEqual(toggleShowcase([2, 3], 3), [2]);
-  const full = [1, 2, 3];
+  const full = [1, 2, 3, 4, 5];
   assert.equal(full.length, MAX_SHOWCASE);
-  assert.deepEqual(toggleShowcase(full, 4), full);
-  assert.notEqual(toggleShowcase(full, 4), full);
+  assert.deepEqual(toggleShowcase(full, 6), full);
+  assert.notEqual(toggleShowcase(full, 6), full);
 });

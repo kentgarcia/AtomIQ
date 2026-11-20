@@ -56,6 +56,9 @@ export interface ResultPanelProps {
   /** This run is the fastest win of the level so far, and the fastest win (seconds, once saved). */
   newBestTime?: boolean;
   bestTime?: number | null;
+  /** XP this win paid (0 until saved, or for a lost run), and whether it was the level's first win. */
+  xp?: number;
+  firstWin?: boolean;
   /** Room under the panel for the home indicator, and the most it may grow (its body scrolls past that). */
   bottomInset: number;
   maxHeight: number;
@@ -66,7 +69,7 @@ export interface ResultPanelProps {
   onLesson?: (lessonId: string) => void;
 }
 
-export function ResultPanel({ summary, stats, hearts, recommendations = [], newBestTime = false, bestTime = null, bottomInset, maxHeight, onAgain, onBack, onNext, onLesson }: ResultPanelProps) {
+export function ResultPanel({ summary, stats, hearts, recommendations = [], newBestTime = false, bestTime = null, xp = 0, firstWin = false, bottomInset, maxHeight, onAgain, onBack, onNext, onLesson }: ResultPanelProps) {
   const { theme } = useTheme();
   const styles = useStyles(theme);
   const rows: { label: string; value?: number; text?: string }[] = [
@@ -93,6 +96,7 @@ export function ResultPanel({ summary, stats, hearts, recommendations = [], newB
           <Text style={styles.score}>Score {summary.score}</Text>
           {more !== null ? <Text style={styles.lead}>{more} more points for the next star</Text> : null}
           {summary.won && bestTime !== null ? <Text style={[styles.lead, newBestTime && styles.best]}>{newBestTime ? `New best time: ${formatTime(bestTime, true)}` : `Best time: ${formatTime(bestTime, true)}`}</Text> : null}
+          {summary.won && xp > 0 ? <Text style={[styles.lead, firstWin && styles.best]}>{firstWin ? `First win: +${xp} XP` : `+${xp} XP`}</Text> : null}
           {!summary.won ? <Text style={styles.lead}>Every question you met is behind you now. Try again, you know more.</Text> : null}
         </Reveal>
         {recommendations.length > 0 ? (

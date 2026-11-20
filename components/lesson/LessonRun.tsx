@@ -572,7 +572,7 @@ export function LessonRun({ cards, surface, onExit, onFinish, label, kind = "les
             <FooterRow onBack={onBack}><Button label="Continue" disabled={!simDone} onPress={next} /></FooterRow>
           </>
         ) : isPredict ? (
-          <FooterRow onBack={onBack}><Button label="Lock in my guess" disabled={!response} onPress={lockInGuess} /></FooterRow>
+          <FooterRow onBack={onBack}><Button label="Lock in my guess" pressSfx="lesson.lock-in" disabled={!response} onPress={lockInGuess} /></FooterRow>
         ) : mode === "manual" ? (
           <FooterRow onBack={onBack}><Button label="Check" disabled={!response} onPress={check} /></FooterRow>
         ) : (

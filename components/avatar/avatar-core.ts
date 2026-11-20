@@ -28,8 +28,11 @@
  * the palette, so Node tests can read it.
  */
 
+import { BROW_STYLES, EAR_STYLES, MOUTH_STYLES, NOSE_STYLES, type BrowStyle, type EarStyle, type MouthStyle, type NoseStyle } from "../npc/face-art.ts";
+import { EXTRA_OUTFITS } from "../npc/outfit-art.ts";
+import { EARWEAR_STYLES, EYEWEAR_STYLES, HEADWEAR_STYLES, type EarwearStyle, type EyewearStyle, type HeadwearStyle } from "../npc/wear-art.ts";
 import type { EyeStyle, HairStyle, NpcSpec, OutfitKind } from "../npc/npc-art.ts";
-import { CUSTOM, OFFICIAL as O } from "../npc/npc-palette.ts";
+import { CUSTOM, FACE, OFFICIAL as O } from "../npc/npc-palette.ts";
 import { PATTERN_COUNT, PATTERN_IDS } from "./pattern-art.ts";
 
 const trio = (t: readonly string[]) => ({ base: t[0], shade: t[1], feature: t[2] });
@@ -44,6 +47,15 @@ export const SKIN_TONES = {
   tan: trio(CUSTOM.skinTan),
   brown: trio(CUSTOM.skinBrown),
   deep: trio(CUSTOM.skinDeep),
+  // Colourful skin, free in the shop: a face, a shade a step darker, and the feature colour (nose, cheeks, lips)
+  blue: trio([O.blueJay, O.macaw, O.whale]),
+  aqua: trio(CUSTOM.skinAqua),
+  green: trio([O.turtle, O.maskGreen, O.treeFrog]),
+  yellow: trio([O.duck, O.bee, O.camel]),
+  orange: trio([O.lion, O.fox, O.guineaPig]),
+  red: trio([O.crab, O.cardinal, O.fireAnt]),
+  bubblegum: trio(CUSTOM.skinBubblegum),
+  purple: trio([O.beetle, O.betta, O.butterfly]),
 } as const;
 
 export const HAIR_COLORS = {
@@ -53,6 +65,36 @@ export const HAIR_COLORS = {
   white: { color: CUSTOM.hairWhite[0], shade: CUSTOM.hairWhite[1] },
   pink: { color: O.flamingo, shade: O.pig },
   blue: { color: O.blueJay, shade: O.macaw },
+  // Colourful and natural hair for the shop
+  blonde: { color: CUSTOM.hairBlonde[0], shade: CUSTOM.hairBlonde[1] },
+  ginger: { color: CUSTOM.hairGinger[0], shade: CUSTOM.hairGinger[1] },
+  red: { color: O.cardinal, shade: O.fireAnt },
+  green: { color: O.maskGreen, shade: O.treeFrog },
+  purple: { color: O.beetle, shade: O.betta },
+} as const;
+
+/** Pupil colours; `ink` is the one every face has. */
+export const PUPIL_COLORS = {
+  ink: { color: FACE.pupil },
+  brown: { color: CUSTOM.hairBrown[0] },
+  blue: { color: O.humpback },
+  green: { color: O.treeFrog },
+  amber: { color: O.guineaPig },
+  grey: { color: O.wolf },
+  purple: { color: O.betta },
+  red: { color: O.fireAnt },
+} as const;
+
+/** Nose colours besides `natural` (the skin's own feature colour). */
+export const NOSE_COLORS = {
+  pink: { color: O.pig },
+  red: { color: O.crab },
+  brown: { color: O.grizzly },
+  orange: { color: O.fox },
+  plum: { color: O.beetle },
+  blue: { color: O.macaw },
+  green: { color: O.featherGreen },
+  dark: { color: O.eel },
 } as const;
 
 /** Outfit colours: the clothes and the one-step-darker shade. */
@@ -65,6 +107,22 @@ export const OUTFIT_COLORS = {
   pink: { color: O.starfish, shade: O.beetle },
   red: { color: O.crab, shade: O.cardinal },
   teal: { color: O.featherGreen, shade: O.treeFrog },
+} as const;
+
+/** Colours for the head, eye and ear accessories: the colour and the one-step-darker shade (`main` and `shade` in `wear-art.ts`). */
+export const WEAR_COLORS = {
+  red: { color: O.cardinal, shade: O.fireAnt },
+  orange: { color: O.fox, shade: O.guineaPig },
+  yellow: { color: O.bee, shade: O.camel },
+  green: { color: O.maskGreen, shade: O.treeFrog },
+  teal: { color: O.featherGreen, shade: O.treeFrog },
+  blue: { color: O.macaw, shade: O.whale },
+  navy: { color: O.humpback, shade: O.narwhal },
+  purple: { color: O.beetle, shade: O.betta },
+  pink: { color: O.starfish, shade: O.beetle },
+  white: { color: O.snow, shade: O.swan },
+  grey: { color: O.hare, shade: O.wolf },
+  black: { color: O.eel, shade: FACE.pupil },
 } as const;
 
 /** The paints for the picture behind the head: light and fixed, so the figure reads on any page. `sky` is the one everyone starts with. */
@@ -90,11 +148,16 @@ export { PATTERN_COUNT, PATTERN_IDS };
 export type SkinId = keyof typeof SKIN_TONES;
 export type HairColorId = keyof typeof HAIR_COLORS;
 export type OutfitColorId = keyof typeof OUTFIT_COLORS;
+export type WearColorId = keyof typeof WEAR_COLORS;
+/** `natural` follows the hair (brows) or the skin (nose); the rest are fixed. */
+export type BrowColorId = "natural" | HairColorId;
+export type PupilColorId = keyof typeof PUPIL_COLORS;
+export type NoseColorId = "natural" | keyof typeof NOSE_COLORS;
 export type BackgroundId = keyof typeof BACKGROUNDS;
 /** A pattern id (a word from `PATTERN_IDS`), or `none` for a plain paint. */
 export type PatternId = string;
 export type HeadId = "tombstone" | "capsule";
-export type NoseId = "single" | "double";
+export type NoseId = NoseStyle;
 export type FacialHairId = "none" | "moustache" | "beard";
 
 /** Every choice an avatar has. Only ids: the colours and shapes live in the catalogs. */
@@ -102,12 +165,25 @@ export interface AvatarConfig {
   skin: SkinId;
   head: HeadId;
   eyes: EyeStyle;
-  nose: NoseId;
+  eyebrows: BrowStyle;
+  browColor: BrowColorId;
+  pupilColor: PupilColorId;
+  nose: NoseStyle;
+  noseColor: NoseColorId;
+  mouth: MouthStyle;
+  ears: EarStyle;
   hairStyle: HairStyle;
   hairColor: HairColorId;
   facialHair: FacialHairId;
   outfit: OutfitKind;
   outfitColor: OutfitColorId;
+  /** Worn on the head, over the eyes and on the ears (`none` is bare), each with its own colour. */
+  headwear: HeadwearStyle;
+  headwearColor: WearColorId;
+  eyewear: EyewearStyle;
+  eyewearColor: WearColorId;
+  earwear: EarwearStyle;
+  earwearColor: WearColorId;
   /** The paint behind the figure (a solid colour). */
   background: BackgroundId;
   /** A faint pattern drawn over the paint. */
@@ -118,13 +194,26 @@ export interface AvatarConfig {
 export const AVATAR_OPTIONS: { [K in keyof AvatarConfig]: readonly AvatarConfig[K][] } = {
   skin: Object.keys(SKIN_TONES) as SkinId[],
   head: ["tombstone", "capsule"],
-  eyes: ["pill", "round", "dots", "glasses-round", "glasses-square"],
-  nose: ["single", "double"],
-  hairStyle: ["crop", "curls", "bun", "bob", "wrap"],
+  // No glasses: the teachers wear them, an avatar does not
+  eyes: ["pill", "round", "dots", "wide", "sparkle", "lashes", "sleepy", "arches"],
+  eyebrows: [...BROW_STYLES],
+  browColor: ["natural", ...(Object.keys(HAIR_COLORS) as HairColorId[])],
+  pupilColor: Object.keys(PUPIL_COLORS) as PupilColorId[],
+  nose: [...NOSE_STYLES],
+  noseColor: ["natural", ...(Object.keys(NOSE_COLORS) as (keyof typeof NOSE_COLORS)[])],
+  mouth: [...MOUTH_STYLES],
+  ears: [...EAR_STYLES],
+  hairStyle: ["crop", "buzzcut", "classic", "messy", "sidepart", "curtain", "bowl", "spiky", "wavy", "undercut", "longer", "longstraight", "shortbob", "medium", "highpony", "lowpony", "twintails", "bigbun", "halfup", "longwavy", "curtainbangs", "curls", "bun", "bob", "wrap"],
   hairColor: Object.keys(HAIR_COLORS) as HairColorId[],
   facialHair: ["none", "moustache", "beard"],
-  outfit: ["hoodie", "sweater", "coat", "vest", "shirt"],
+  outfit: ["hoodie", "sweater", "coat", "vest", "shirt", ...EXTRA_OUTFITS],
   outfitColor: Object.keys(OUTFIT_COLORS) as OutfitColorId[],
+  headwear: [...HEADWEAR_STYLES],
+  headwearColor: Object.keys(WEAR_COLORS) as WearColorId[],
+  eyewear: [...EYEWEAR_STYLES],
+  eyewearColor: Object.keys(WEAR_COLORS) as WearColorId[],
+  earwear: [...EARWEAR_STYLES],
+  earwearColor: Object.keys(WEAR_COLORS) as WearColorId[],
   background: Object.keys(BACKGROUNDS) as BackgroundId[],
   pattern: ["none", ...PATTERN_IDS] as PatternId[],
 };
@@ -134,12 +223,24 @@ export const DEFAULT_AVATAR: AvatarConfig = {
   skin: "warm",
   head: "tombstone",
   eyes: "pill",
+  eyebrows: "none",
+  browColor: "natural",
+  pupilColor: "ink",
   nose: "double",
+  noseColor: "natural",
+  mouth: "smile",
+  ears: "round",
   hairStyle: "crop",
   hairColor: "brown",
   facialHair: "none",
   outfit: "hoodie",
   outfitColor: "green",
+  headwear: "none",
+  headwearColor: "red",
+  eyewear: "none",
+  eyewearColor: "black",
+  earwear: "none",
+  earwearColor: "yellow",
   background: "sky",
   pattern: "none",
 };
@@ -211,10 +312,19 @@ export function avatarSpec(config: AvatarConfig): NpcSpec {
     headWidth: 100,
     eyes: config.eyes,
     nose: config.nose,
+    brows: config.eyebrows,
+    ...(config.browColor === "natural" ? {} : { browColor: HAIR_COLORS[config.browColor].color }),
+    ...(config.pupilColor === "ink" ? {} : { pupilColor: PUPIL_COLORS[config.pupilColor].color }),
+    ...(config.noseColor === "natural" ? {} : { noseColor: NOSE_COLORS[config.noseColor].color }),
+    mouth: config.mouth,
+    ears: config.ears,
     hair: { style: config.hairStyle, color: hair.color, shade: hair.shade },
     ...(config.facialHair === "none" ? {} : { facialHair: config.facialHair }),
     // A vest hangs over a shirt, so its sleeves are the shirt's colour: never white, which would vanish on a light page.
     outfit: { kind: config.outfit, color: clothes.color, shade: clothes.shade, collar: config.outfit === "vest" ? O.blueJay : O.snow },
+    ...(config.headwear === "none" ? {} : { headwear: { style: config.headwear, ...WEAR_COLORS[config.headwearColor] } }),
+    ...(config.eyewear === "none" ? {} : { eyewear: { style: config.eyewear, ...WEAR_COLORS[config.eyewearColor] } }),
+    ...(config.earwear === "none" ? {} : { earwear: { style: config.earwear, ...WEAR_COLORS[config.earwearColor] } }),
     // No held or worn prop: the avatar is a person, not a teacher of a field.
     accent: { kind: "none", color: O.swan, shade: O.hare },
   };

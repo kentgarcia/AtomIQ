@@ -36,6 +36,12 @@ export const CUSTOM = {
   skinBrown: ["#A56644", "#8E5236", "#753F28"],
   skinOlive: ["#E0B48A", "#CB9A6D", "#B07F52"],
   skinDeep: ["#7A4A33", "#633A27", "#4D2C1D"],
+  // Colourful skin for the shop: the official colours cover most of them, these two are between names
+  skinBubblegum: ["#FFAADE", "#F58BC7", "#D96AAE"],
+  skinAqua: ["#7AF0F2", "#4FD8DB", "#2DB8BC"],
+  // Hair colours for the shop that are between official names
+  hairBlonde: ["#E8B24A", "#CE9632"],
+  hairGinger: ["#D9692A", "#B8501C"],
   hairDark: ["#3B2A24", "#2B1E1A"],
   hairBrown: ["#7C3F25", "#64311D"],
   hairBlack: ["#2E2622", "#211B18"],

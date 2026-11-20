@@ -21,8 +21,8 @@ export const navigateDestination = (
     case "encyclopedia-entry":
       router.push(`/explorer/encyclopedia-entry?id=${destination.id}`);
       break;
-    case "maze":
-      router.push(`/explorer/atom-maze?id=${destination.id}`);
+    case "story":
+      router.push("/explorer/story");
       break;
     case "journey":
       router.push(`/explorer/journey?id=${destination.id}`);

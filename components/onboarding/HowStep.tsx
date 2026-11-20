@@ -21,7 +21,7 @@ const TAB_PICTURES: Record<HowRow["tab"], number> = {
   map: require("@/assets/images/icons/map.png"),
   games: require("@/assets/images/icons/games.png"),
   quests: require("@/assets/images/icons/chest.png"),
-  ai: require("@/assets/images/icons/ai.png"),
+  phone: require("@/assets/images/icons/phone.png"),
 };
 
 const PICTURE = 52;

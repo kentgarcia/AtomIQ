@@ -231,31 +231,31 @@ describe("history and the validated store", () => {
 
   it("refuses to delete or rename a shipped id, and retires it with a reason", () => {
     const { paths, db, history, store } = setup();
-    const mazeId = query(paths, "SELECT id FROM mazes ORDER BY id LIMIT 1")[0].id;
-    fs.writeFileSync(paths.shippedIds, JSON.stringify({ mazes: [mazeId] }));
+    const postId = query(paths, "SELECT b.id FROM blog_posts b WHERE EXISTS (SELECT 1 FROM blog_comments c WHERE c.blog_id = b.id) ORDER BY b.id LIMIT 1")[0].id;
+    fs.writeFileSync(paths.shippedIds, JSON.stringify({ blog_posts: [postId] }));
 
     assert.throws(
-      () => store.deleteRow({ table: "mazes", pk: [mazeId], source: "studio" }),
+      () => store.deleteRow({ table: "blog_posts", pk: [postId], source: "studio" }),
       (e) => e.status === 409 && e.needsReason === true,
     );
     assert.throws(
-      () => store.updateRow({ table: "mazes", pk: [mazeId], values: { id: "renamed" }, source: "studio" }),
+      () => store.updateRow({ table: "blog_posts", pk: [postId], values: { id: "renamed" }, source: "studio" }),
       (e) => e.status === 409 && /shipped/.test(e.message),
     );
-    assert.equal(count(paths.master, "mazes"), query(paths, "SELECT COUNT(*) n FROM mazes")[0].n);
+    assert.equal(count(paths.master, "blog_posts"), query(paths, "SELECT COUNT(*) n FROM blog_posts")[0].n);
 
-    const roomsBefore = count(paths.master, "maze_rooms");
-    store.deleteRow({ table: "mazes", pk: [mazeId], source: "studio", retireReason: "merged into another maze" });
-    assert.match(JSON.parse(fs.readFileSync(paths.retiredIds, "utf8")).mazes[mazeId], /merged into another maze/);
-    assert.ok(count(paths.master, "maze_rooms") < roomsBefore);
+    const commentsBefore = count(paths.master, "blog_comments");
+    store.deleteRow({ table: "blog_posts", pk: [postId], source: "studio", retireReason: "merged into another piece" });
+    assert.match(JSON.parse(fs.readFileSync(paths.retiredIds, "utf8")).blog_posts[postId], /merged into another piece/);
+    assert.ok(count(paths.master, "blog_comments") < commentsBefore);
 
-    // It shows up as deleted, and restoring brings back the maze with its rooms.
+    // It shows up as deleted, and restoring brings back the piece with its comments.
     const deleted = listDeleted(history, db);
-    assert.ok(deleted.some((d) => d.entity_table === "mazes" && d.entity_pk === mazeId));
-    const rev = deleted.find((d) => d.entity_pk === mazeId);
+    assert.ok(deleted.some((d) => d.entity_table === "blog_posts" && d.entity_pk === postId));
+    const rev = deleted.find((d) => d.entity_pk === postId);
     store.restoreRevision({ id: rev.id, side: "before" });
-    assert.equal(count(paths.master, "maze_rooms"), roomsBefore);
-    assert.equal(listDeleted(history, db).some((d) => d.entity_pk === mazeId), false);
+    assert.equal(count(paths.master, "blog_comments"), commentsBefore);
+    assert.equal(listDeleted(history, db).some((d) => d.entity_pk === postId), false);
     db.close();
   });
 

@@ -1,5 +1,5 @@
 /**
- * DifficultyPanel — in-page selection for Atom Maze, Myth Buster and the
+ * DifficultyPanel — in-page selection for Myth Buster and the
  * Lab. Renders the same card stack as the game
  * picker; slides in on the Games tab after the picker slides away.
  */
@@ -10,7 +10,6 @@ import { unitPalette } from "@/components/path/unit-theme";
 import { Icon } from "@/components/ui/icon";
 import { ModalDialog } from "@/components/ui/modal-dialog";
 import { Text } from "@/components/ui/text";
-import { getAllMazes } from "@/content/explorer";
 import { getUnitStatements } from "@/content/myths/unit-statements";
 import type { Unit } from "@/content/curriculum/types";
 import { contentRepository } from "@/services/content-db";
@@ -24,28 +23,6 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 const HEADER_H = 200;
 
 /* ------------------------------------------------------------------ */
-/* Maze stage colors (mirrors app/atom-maze.tsx)                       */
-/* ------------------------------------------------------------------ */
-
-const MAZE_COLORS: Record<string, string> = {
-  safety: "#FFB300",
-  radiation: "#FFA000",
-  history: "#FF8F00",
-  reactor: "#FFD54F",
-  default: "#FFB300",
-};
-
-const getMazeColor = (theme: string | undefined) => {
-  if (!theme) return MAZE_COLORS.default;
-  const lowerTheme = theme.toLowerCase();
-  if (lowerTheme.includes("safety")) return MAZE_COLORS.safety;
-  if (lowerTheme.includes("radiation")) return MAZE_COLORS.radiation;
-  if (lowerTheme.includes("history")) return MAZE_COLORS.history;
-  if (lowerTheme.includes("reactor")) return MAZE_COLORS.reactor;
-  return MAZE_COLORS.default;
-};
-
-/* ------------------------------------------------------------------ */
 /* Panel                                                               */
 /* ------------------------------------------------------------------ */
 
@@ -53,7 +30,7 @@ export function DifficultyPanel({
     game,
     stackHeight,
 }: {
-    game: "atom-maze" | "mythbuster" | "lab";
+    game: "mythbuster" | "lab";
     /** Height of the card stack (without the tab-bar clearance); the picker passes its own so both match. */
     stackHeight?: number;
 }) {
@@ -63,20 +40,6 @@ export function DifficultyPanel({
     const tabBarInset = useTabBarInset();
     const { theme, isDark } = useTheme();
     const modal = useMemo(() => makeModalStyles(theme), [theme]);
-
-    // Mazes live in the SQLite content database and load async.
-    const [mazes, setMazes] = useState<
-        { id: string; title: string; theme?: string }[]
-    >([]);
-    useEffect(() => {
-        let cancelled = false;
-        void getAllMazes().then((all) => {
-            if (!cancelled) setMazes(all);
-        });
-        return () => {
-            cancelled = true;
-        };
-    }, []);
 
     // Quick Play asks for a unit (its theme): the units and how many statements each has
     const [units, setUnits] = useState<Unit[]>([]);
@@ -114,67 +77,36 @@ export function DifficultyPanel({
                 onPress: () => (mode.byUnit ? setThemeOpen(true) : router.push(`/mythbuster?mode=${mode.id}`)),
             }));
         }
-        if (game === "lab") {
-            return [
-                {
-                    key: "radiation-shield",
-                    title: "Radiation Shield Lab",
-                    subtitle: "Pick the right shield for each source",
-                    color: "#EA580C",
-                    icon: "ShieldTick",
-                    delay: 50,
-                    onPress: () => router.push("/lab?exp=radiation-shield"),
-                },
-                {
-                    key: "build-atom",
-                    title: "Build an Atom",
-                    subtitle: "Add protons, neutrons and electrons",
-                    color: "#1CB0F6",
-                    icon: "Atom",
-                    delay: 100,
-                    onPress: () => router.push("/lab?exp=build-atom"),
-                },
-                {
-                    key: "decay-lab",
-                    title: "Radioactive Decay Lab",
-                    subtitle: "Watch half-lives play out",
-                    color: "#58CC02",
-                    icon: "Timer1",
-                    delay: 150,
-                    onPress: () => router.push("/lab?exp=decay-lab"),
-                },
-            ];
-        }
         return [
             {
-                key: "platformer",
-                title: "Reactor Trail",
-                subtitle: "New: run, jump and battle with questions",
-                color: "#58CC02",
-                icon: "Gameboy",
-                delay: 0,
-                onPress: () => router.push("/explorer/platformer"),
+                key: "radiation-shield",
+                title: "Radiation Shield Lab",
+                subtitle: "Pick the right shield for each source",
+                color: "#EA580C",
+                icon: "ShieldTick",
+                delay: 50,
+                onPress: () => router.push("/lab?exp=radiation-shield"),
             },
             {
-                key: "endless",
-                title: "Endless Maze",
-                subtitle: "Keep going as long as you can",
-                color: "#7C3AED",
-                icon: "Unlimited",
-                delay: 50,
-                onPress: () => router.push("/explorer/atom-maze?id=endless"),
+                key: "build-atom",
+                title: "Build an Atom",
+                subtitle: "Add protons, neutrons and electrons",
+                color: "#1CB0F6",
+                icon: "Atom",
+                delay: 100,
+                onPress: () => router.push("/lab?exp=build-atom"),
             },
-            ...mazes.map((maze, i) => ({
-                key: maze.id,
-                title: maze.title,
-                subtitle: "Reach the exit to finish",
-                color: getMazeColor(maze.theme),
-                icon: "Grid9",
-                delay: 100 + i * 50,
-                onPress: () => router.push(`/explorer/atom-maze?id=${maze.id}`),
-            })),
+            {
+                key: "decay-lab",
+                title: "Radioactive Decay Lab",
+                subtitle: "Watch half-lives play out",
+                color: "#58CC02",
+                icon: "Timer1",
+                delay: 150,
+                onPress: () => router.push("/lab?exp=decay-lab"),
+            },
         ];
-    }, [game, router, mazes]);
+    }, [game, router]);
 
     const cardH = Math.round(stackH / Math.max(items.length, 1));
 

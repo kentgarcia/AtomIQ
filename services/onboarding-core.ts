@@ -151,8 +151,8 @@ export function canContinue(step: OnboardingStep, s: FlowState): boolean {
 
 export interface HowRow {
   id: "learn" | "play" | "keep" | "ask";
-  /** Which navbar icon draws it (the Home map, Games, the Quests chest, the Guide): the screen maps this to the picture. */
-  tab: "map" | "games" | "quests" | "ai";
+  /** Which navbar icon draws it (the Home map, Games, the Quests chest, the Phone): the screen maps this to the picture. */
+  tab: "map" | "games" | "quests" | "phone";
   /** The bold opening phrase. */
   title: string;
   /** Carries on from the title in the same sentence: "Tiny lessons" + "where a teacher explains...". */
@@ -162,7 +162,7 @@ export interface HowRow {
 const HOW: Record<HowRow["id"], HowRow> = {
   learn: { id: "learn", tab: "map", title: "Tiny lessons", body: "where a teacher explains each idea, then you try it" },
   play: { id: "play", tab: "games", title: "Games that make it stick", body: "like Myth Buster and Atom Maze, to turn what you learned into play" },
-  ask: { id: "ask", tab: "ai", title: "Shrodi, your guide", body: "answers your questions and points you to the right lesson" },
+  ask: { id: "ask", tab: "phone", title: "A phone of your own", body: "with Shrodi and your teachers, and apps that arrive as you learn" },
   keep: { id: "keep", tab: "quests", title: "A streak to keep", body: "with daily quests that bring you back for a little each day" },
 };
 

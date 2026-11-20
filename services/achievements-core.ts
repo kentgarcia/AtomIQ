@@ -8,20 +8,22 @@
  * The same ids as before (1 to 4) are kept (5 and 6 are new) so saved links to the detail screen still work.
  */
 
-/** Where a track's number comes from: a profile column, the quest counter, or the level (from XP). */
+/** Where a track's number comes from: a profile column, the quest counter, the level (from XP), or the shop (items got, diamonds spent). */
 export type AchievementField =
   | "lessons_completed"
   | "myths_busted"
   | "longest_streak"
   | "total_xp"
   | "quests_claimed"
-  | "level";
+  | "level"
+  | "cosmetics_owned"
+  | "diamonds_spent";
 
 /** XP per level, the same rule the level-up pop-up uses (`StorageContext`). */
 export const XP_PER_LEVEL = 100;
 export const levelFromXp = (xp: number): number => Math.floor(Math.max(0, xp) / XP_PER_LEVEL) + 1;
 
-/** The numbers the tracks read: the profile plus `quests_claimed`. */
+/** The numbers the tracks read: the profile plus `quests_claimed`, `cosmetics_owned` and `diamonds_spent`. */
 export type AchievementSource = Record<string, unknown> | null | undefined;
 
 /** The current number for a track. */
@@ -39,7 +41,7 @@ export interface AchievementTrack {
   title: string;
   field: AchievementField;
   /** Folder of the badge pictures under `assets/images/badge/`. */
-  badgeDir: "lessons-learned" | "myth-buster" | "streak" | "xp" | "quests-claimed" | "level-reached";
+  badgeDir: "lessons-learned" | "myth-buster" | "streak" | "xp" | "quests-claimed" | "level-reached" | "cosmetics-owned" | "diamonds-spent";
   /** Value needed for each level, ascending. Level n needs `tiers[n - 1]`. */
   tiers: readonly number[];
   /** Plain-words requirement for reaching a threshold, e.g. "Complete 5 lessons". */
@@ -116,6 +118,28 @@ export const ACHIEVEMENTS: readonly AchievementTrack[] = [
     description:
       "Your level goes up every 100 XP. Reach new levels to rank this badge up.",
     tips: ["Finish lessons to earn XP", "Claim quests for bonus XP", "Play the games to top up your XP"],
+  },
+  {
+    id: 7,
+    title: "Style Collector",
+    field: "cosmetics_owned",
+    badgeDir: "cosmetics-owned",
+    tiers: [1, 3, 5, 10, 20, 35, 50, 75, 100, 125, 150, 160],
+    requirement: (n) => `Own ${n} shop ${plural(n, "item", "items")}`,
+    description:
+      "Hair, faces, hats, glasses, clothes, skins and paints from the shop all count, free ones too once you have got them. What your avatar starts with is not counted.",
+    tips: ["Open the Shop from your Profile", "Free items count: get a new skin for nothing", "Level up to unlock more items"],
+  },
+  {
+    id: 8,
+    title: "Big Spender",
+    field: "diamonds_spent",
+    badgeDir: "diamonds-spent",
+    tiers: [25, 75, 150, 300, 500, 800, 1200, 1800, 2500, 3500, 4500, 6000],
+    requirement: (n) => `Spend ${n.toLocaleString("en-US")} diamonds`,
+    description:
+      "Every diamond you spend in the shop counts, whatever you buy. Diamonds you spent are never taken back off this badge.",
+    tips: ["Claim the daily and weekly chests for diamonds", "Open the Shop from your Profile", "Save up for the fancy clothes"],
   },
 ];
 

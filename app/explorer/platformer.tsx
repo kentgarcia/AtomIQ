@@ -8,7 +8,6 @@
  * A level starts with a loading screen (pictures and questions loaded, the world built under it), then
  * Shrodi walks in from the left, gets ready, and the mission shows at the top (entrance-core.ts). Stars
  * come from the points and the timer is for the best run (platformer-core.ts `summarize`).
- * The old maze (atom-maze.tsx) stays for now.
  */
 
 import { useIsFocused, useLocalSearchParams, useRouter } from "expo-router";
@@ -69,6 +68,9 @@ import { recordActivity } from "@/services/activity-log";
 import { saveGameScore } from "@/services/database";
 import { loadStoryQuestions } from "@/services/story-questions";
 import { saveStoryResult, type SavedResult } from "@/services/story-progress";
+import { awardGameXp } from "@/services/game-xp";
+import { useStorage } from "@/services/StorageContext";
+import { atomMazeXp } from "@/services/xp-core";
 import { vibrate } from "@/services/haptics";
 import { playSfx, warmSfxCues } from "@/services/sfx";
 import { JUMP_CUE, cuesFor, fallCue, footstepDue, landCue, stepCue } from "@/components/platformer/platformer-sfx-core";
@@ -147,6 +149,7 @@ function PlatformerScreen() {
   const { theme } = useTheme();
   const styles = useStyles(theme);
   const focused = useIsFocused();
+  const { addXP } = useStorage();
   const params = useLocalSearchParams<{ level?: string }>();
   const story = useMemo(() => storyLevelById(params.level) ?? STORY_LEVELS[0], [params.level]);
   const nextStory = STORY_LEVELS[story.number] ?? null;
@@ -205,6 +208,8 @@ function PlatformerScreen() {
   const [seconds, setSeconds] = useState(0);
   const [mission, setMission] = useState(false);
   const [saved, setSaved] = useState<SavedResult | null>(null);
+  /** XP this run paid: the full amount on a level's first win, a small repeat after (null until saved). */
+  const [xpPaid, setXpPaid] = useState<{ xp: number; first: boolean } | null>(null);
   const entranceRef = useRef<{ start: number; plan: EntrancePlan } | null>(null);
   const [hearts, setHearts] = useState(MAX_HEARTS);
   const [coins, setCoins] = useState(0);
@@ -395,13 +400,22 @@ function PlatformerScreen() {
       const world = worldRef.current;
       const summary = summarize(world);
       void saveGameScore("platformer", summary.score).catch(() => undefined);
-      if (summary.won) saveStoryResult(story.id, summary.stars, summary.score, summary.time).then(setSaved).catch(() => undefined);
+      if (summary.won) {
+        saveStoryResult(story.id, summary.stars, summary.score, summary.time)
+          .then(async (result) => {
+            setSaved(result);
+            const earned = atomMazeXp(true, result.firstWin);
+            const paid = await awardGameXp(addXP, earned.xp);
+            setXpPaid({ xp: paid, first: earned.first });
+          })
+          .catch(() => undefined);
+      }
       const recommendations = recommendLessons(battlesRef.current?.missed ?? [], lessonsRef.current);
       recordActivity("game_session", { id: "platformer" });
       pendingEndRef.current = { summary, stats: { ...world.stats }, hearts: world.hearts, recommendations };
       beginExit(won, summary.stars);
     },
-    [beginExit, story.id],
+    [addXP, beginExit, story.id],
   );
 
   /* -------------------------------------- events -------------------------------------- */
@@ -518,7 +532,7 @@ function PlatformerScreen() {
             askFor(e.enemy);
             break;
           case "block":
-            void playSfx(e.reward === "heart" || e.reward === "gem" ? "reward.sparkle" : e.reward === "break" ? "game.hit" : "game.platformer-coin");
+            void playSfx(e.reward === "heart" ? "game.heart" : e.reward === "gem" ? "reward.sparkle" : e.reward === "break" ? "game.hit" : "game.platformer-coin");
             setBlockUsed(world.blockUsed.slice());
             setCoins(world.stats.coins);
             setHearts(world.hearts);
@@ -1000,6 +1014,7 @@ function PlatformerScreen() {
       cinePunch.set(0);
       setSeconds(0);
       setSaved(null);
+      setXpPaid(null);
       setMission(false);
       setEnemyAlive(level.enemies.map(() => true));
       cancelAnimation(zoom);
@@ -1021,7 +1036,7 @@ function PlatformerScreen() {
         setPhase("entrance");
       } else {
         entranceRef.current = null;
-        void playSfx("lesson.start");
+        void playSfx("game.get-ready");
         setPhase("playing");
         if (walkIn) {
           setMission(true);
@@ -1035,7 +1050,7 @@ function PlatformerScreen() {
 
   /** The walk-in is over: play begins and the mission shows at the top for a few seconds. */
   const beginPlay = useCallback(() => {
-    void playSfx("lesson.start");
+    void playSfx("game.get-ready");
     setPhase("playing");
     setMission(true);
     later(() => setMission(false), MISSION_MS);
@@ -1308,6 +1323,8 @@ function PlatformerScreen() {
                 recommendations={ended.recommendations}
                 newBestTime={saved?.newBestTime ?? false}
                 bestTime={saved?.record.bestTime ?? null}
+                xp={xpPaid?.xp ?? 0}
+                firstWin={xpPaid?.first ?? false}
                 bottomInset={bottomPad}
                 maxHeight={Math.min(PANEL_H + 72, area.h * 0.6)}
                 onAgain={start}

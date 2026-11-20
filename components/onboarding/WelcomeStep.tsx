@@ -64,7 +64,7 @@ export function WelcomeStep({ name, answers, onGo }: { name: string; answers: An
   }, [count]);
 
   return (
-    <StepLayout center footer={<Reveal at={welcomeButtonAt(tiles.length)} blockUntilShown><ContinueFooter label="Let's go" onPress={onGo} /></Reveal>}>
+    <StepLayout center footer={<Reveal at={welcomeButtonAt(tiles.length)} blockUntilShown><ContinueFooter label="Let's go" onPress={() => { void playSfx("onboard.go"); onGo(); }} /></Reveal>}>
       <View style={styles.hero}>
         <View style={styles.foxWrap}>
           <Stamp at={WELCOME_FX.mascot}>

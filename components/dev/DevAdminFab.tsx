@@ -30,7 +30,7 @@ import { ModalDialog } from "@/components/ui/modal-dialog";
 import { Text } from "@/components/ui/text";
 import { useDiamonds } from "@/hooks/use-wallet";
 import { contentRepository } from "@/services/content-db";
-import { emitStreak } from "@/services/feed";
+import { emitStreak, reconcileFeedSoon } from "@/services/feed";
 import { useStorage } from "@/services/StorageContext";
 import { addDiamonds } from "@/services/wallet";
 import { createStyles, fontFaces, useTheme } from "@/theme";
@@ -91,6 +91,8 @@ export function DevAdminFab({ bottom, onChanged }: DevAdminFabProps) {
         const detail = await task();
         setNote(detail ? `${what}: ${detail}` : what);
         onChanged?.();
+        // Dev edits write progress directly (no lesson-complete event), so the feed reads it again, like chats do.
+        void reconcileFeedSoon(true);
       } catch (error) {
         setNote(`${what} failed: ${error instanceof Error ? error.message : String(error)}`);
       } finally {

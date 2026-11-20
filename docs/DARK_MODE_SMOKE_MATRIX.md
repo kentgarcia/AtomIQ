@@ -44,7 +44,6 @@ Also test with **Settings → Appearance: Follow system** and flip the OS scheme
 | 14 | `app/explorer/index.tsx` | Explorer hub cards and CTAs | `palettes.explorer`. |
 | 15 | `app/explorer/journey.tsx` | Journey list, node states | `palettes.explorer`. |
 | 16 | `app/explorer/journey-node.tsx` | Node gradients and labels | Node art gradients are brand art. |
-| 17 | `app/explorer/atom-maze.tsx` | Intro, battle, quiz, HUD, defeat/victory/complete results | Maze board is an approved art exception (EX-01/EX-04/EX-05). |
 | 18 | `app/lesson/[id].tsx` + `components/lesson/*` | Preview, briefing, micro-learn, mythbuster, assessment, lab, debrief | Check step cards, progress bar, feedback, and rewards. |
 | 19 | `app/quiz/[id].tsx` | Question, selected/correct/wrong, results | Answer feedback tints must survive dark mode. |
 | 20 | `app/mythbuster/index.tsx` | Intro, question, reveal, score | Orange identity, mode-aware surfaces. |

@@ -13,7 +13,7 @@ type TableColumnDefinition = Record<string, string>;
 
 const getTableColumns = async (
   database: SQLite.SQLiteDatabase,
-  tableName: "user_profile" | "user_profiles" | "story_progress",
+  tableName: string,
 ): Promise<Set<string>> => {
   const table = await database.getFirstAsync<{ name: string }>(
     "SELECT name FROM sqlite_master WHERE type = 'table' AND name = ? LIMIT 1",
@@ -33,7 +33,7 @@ const getTableColumns = async (
 
 const ensureTableColumns = async (
   database: SQLite.SQLiteDatabase,
-  tableName: "user_profile" | "user_profiles" | "story_progress",
+  tableName: "user_profile" | "user_profiles" | "story_progress" | "chat_threads",
   definitions: TableColumnDefinition,
 ): Promise<void> => {
   const existingColumns = await getTableColumns(database, tableName);
@@ -58,6 +58,23 @@ const ensureTableColumns = async (
       );
     }
   }
+};
+
+/**
+ * The phone's chat history (`chat_messages`) was laid out differently in an earlier build, and `CREATE TABLE IF NOT
+ * EXISTS` leaves such a table alone, so the schema's index on `thread_id` then failed with "no such column" and the
+ * whole database (and with it onboarding and the shop) could not start. The table only holds lines teachers said and
+ * replies tapped, and unprompted messages are derived again from progress, so a table with the wrong columns is
+ * dropped and the schema recreates it.
+ */
+const CHAT_MESSAGE_COLUMNS = ["id", "thread_id", "node_id", "sender", "text", "kind", "target_id", "at", "read", "created_at", "updated_at", "synced_at", "is_dirty", "deleted_at", "version"];
+
+const repairChatMessages = async (database: SQLite.SQLiteDatabase): Promise<void> => {
+  const existing = await getTableColumns(database, "chat_messages");
+  if (existing.size === 0) return;
+  if (CHAT_MESSAGE_COLUMNS.every((name) => existing.has(name))) return;
+  console.log("Migration: chat_messages has an older layout, recreating it");
+  await database.execAsync("DROP TABLE IF EXISTS chat_messages;");
 };
 
 /**
@@ -196,6 +213,13 @@ export const initDatabase = async () => {
         id INTEGER PRIMARY KEY CHECK (id = 1),
         diamonds INTEGER NOT NULL DEFAULT 0,
         updated_at INTEGER NOT NULL DEFAULT 0
+      );
+
+      -- The shop items the learner has bought (services/shop.ts); free items are owned without a row.
+      CREATE TABLE IF NOT EXISTS shop_owned (
+        item_id TEXT PRIMARY KEY,
+        bought_at INTEGER NOT NULL DEFAULT 0,
+        price INTEGER NOT NULL DEFAULT 0
       );
 
       -- Atom Maze story mode (services/story-progress.ts): the best result of each level.
@@ -361,8 +385,13 @@ export const initDatabase = async () => {
       console.log("Migration: Generated user_id for existing user");
     }
 
+    // A table from an older build must not break the schema below
+    await repairChatMessages(db);
+
     // Initialize local-first database schema (for social features and sync)
     await db.execAsync(LOCAL_FIRST_SCHEMA);
+    // A chat_threads table made before threads could be archived
+    await ensureTableColumns(db, "chat_threads", { archived: "INTEGER NOT NULL DEFAULT 0" });
 
     // Re-run safeguards after schema bootstrap for databases upgrading from older layouts.
     await ensureIdentityProfileColumns(db);
@@ -1014,6 +1043,7 @@ export const clearAllData = async () => {
     DELETE FROM units;
     DELETE FROM lesson_runs;
     DELETE FROM wallet;
+    DELETE FROM shop_owned;
     DELETE FROM story_progress;
     DELETE FROM levels;
     DELETE FROM lesson_steps;
@@ -1026,6 +1056,12 @@ export const clearAllData = async () => {
     DELETE FROM feed_posts;
     DELETE FROM blog_reads;
     DELETE FROM daily_facts_read;
+    DELETE FROM phone_seen;
+    DELETE FROM field_notes;
+    DELETE FROM chat_messages;
+    DELETE FROM chat_threads;
+    DELETE FROM scans;
+    DELETE FROM photos;
   `);
 };
 
@@ -1065,7 +1101,7 @@ export const deleteAccountData = async () => {
     "user_settings",
     "user_profiles",
     "explorer_nodes",
-    "explorer_mazes",
+    "explorer_mazes", // legacy table of the removed room-by-room maze; still cleared on devices that have it
     "explorer_journeys",
     "saved_notes",
     "user_profile",
@@ -1074,6 +1110,7 @@ export const deleteAccountData = async () => {
     "item_attempts",
     "lesson_runs",
     "wallet",
+    "shop_owned",
     "story_progress",
     "levels",
     "units",
@@ -1086,6 +1123,12 @@ export const deleteAccountData = async () => {
     "feed_posts",
     "blog_reads",
     "daily_facts_read",
+    "phone_seen",
+    "field_notes",
+    "chat_messages",
+    "chat_threads",
+    "scans",
+    "photos",
   ] as const;
 
   for (const tableName of tableDeletionOrder) {

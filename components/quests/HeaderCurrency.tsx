@@ -9,6 +9,7 @@ import React, { useEffect, useMemo, useRef } from "react";
 import { View } from "react-native";
 import Animated from "react-native-reanimated";
 
+import { HeaderStat } from "@/components/layout/HeaderStat";
 import { registerClaimTarget } from "@/components/quests/claim-fx-bus";
 import { useCounterPulse } from "@/components/quests/use-counter-pulse";
 import { Text } from "@/components/ui/text";
@@ -42,22 +43,22 @@ export function HeaderCurrency() {
 
   return (
     <View style={styles.row}>
-      <View style={styles.item} accessible accessibilityLabel={`${xp.shown} XP`}>
+      <HeaderStat kind="xp" amount={userProfile?.total_xp ?? 0} style={styles.item} accessibilityLabel={`${xp.shown} XP`}>
         <Animated.View style={[styles.item, xp.pulseStyle]}>
           <View ref={xpRef} collapsable={false} style={styles.icon}>
             <Image source={XP_ICON} style={styles.image} contentFit="contain" />
           </View>
           <Text style={[styles.value, { color: theme.colors.primaryLight }]}>{xp.shown}</Text>
         </Animated.View>
-      </View>
-      <View style={styles.item} accessible accessibilityLabel={`${diamondCount.shown} diamonds`}>
+      </HeaderStat>
+      <HeaderStat kind="diamonds" amount={diamonds} style={styles.item} accessibilityLabel={`${diamondCount.shown} diamonds`}>
         <Animated.View style={[styles.item, diamondCount.pulseStyle]}>
           <View ref={diamondRef} collapsable={false} style={styles.icon}>
             <Image source={DIAMOND_ICON} style={styles.image} contentFit="contain" />
           </View>
           <Text style={[styles.value, { color: theme.colors.info }]}>{diamondCount.shown}</Text>
         </Animated.View>
-      </View>
+      </HeaderStat>
     </View>
   );
 }

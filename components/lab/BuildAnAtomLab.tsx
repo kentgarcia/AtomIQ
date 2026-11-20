@@ -288,7 +288,7 @@ export function BuildAnAtomLab({ onBack, onPeriodicTable }: { onBack: () => void
     if (result === "correct" || demo) return;
     const have = kind === "protons" ? protons : kind === "neutrons" ? neutrons : electrons;
     if (have >= LIMITS[kind]) {
-      void playSfx("ui.disable");
+      void playSfx("ui.invalid");
       return;
     }
     impactLight();

@@ -34,6 +34,7 @@ import {
   type Reason,
 } from "@/services/onboarding-core";
 import { setOnboardingAnswers } from "@/services/storage";
+import { playSfx } from "@/services/sfx";
 import { useStorage } from "@/services/StorageContext";
 import { useRouter } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
@@ -190,7 +191,7 @@ export default function Onboarding() {
           />
         );
       case "welcome":
-        return <WelcomeStep name={name.trim()} answers={answers} onGo={() => router.replace("/(tabs)")} />;
+        return <WelcomeStep name={name.trim()} answers={answers} onGo={() => { setTimeout(() => void playSfx("transition.wipe"), 250); router.replace("/(tabs)"); }} />;
     }
   })();
 

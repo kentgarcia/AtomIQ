@@ -1,0 +1,89 @@
+{
+  "table": "map_site_references",
+  "primaryKey": [
+    "site_id",
+    "reference_id"
+  ],
+  "rows": [
+    {
+      "site_id": "site-berlin-dahlem",
+      "reference_id": "ref-mpic-fission"
+    },
+    {
+      "site_id": "site-calder-hall",
+      "reference_id": "ref-gov-uk-calder-hall"
+    },
+    {
+      "site_id": "site-cern",
+      "reference_id": "ref-cern-about"
+    },
+    {
+      "site_id": "site-chernobyl",
+      "reference_id": "ref-wna-chernobyl"
+    },
+    {
+      "site_id": "site-chicago-pile-1",
+      "reference_id": "ref-osti-cp1"
+    },
+    {
+      "site_id": "site-fukushima-daiichi",
+      "reference_id": "ref-wna-fukushima"
+    },
+    {
+      "site_id": "site-hanford",
+      "reference_id": "ref-nps-mapr-hanford"
+    },
+    {
+      "site_id": "site-hiroshima",
+      "reference_id": "ref-hiroshima-museum"
+    },
+    {
+      "site_id": "site-hiroshima",
+      "reference_id": "ref-hiroshima-pref-bombing"
+    },
+    {
+      "site_id": "site-iter",
+      "reference_id": "ref-iter-home"
+    },
+    {
+      "site_id": "site-los-alamos",
+      "reference_id": "ref-nps-mapr-losalamos"
+    },
+    {
+      "site_id": "site-manchester",
+      "reference_id": "ref-aip-rutherford-alpha"
+    },
+    {
+      "site_id": "site-nagasaki",
+      "reference_id": "ref-nagasaki-museum"
+    },
+    {
+      "site_id": "site-oak-ridge",
+      "reference_id": "ref-nps-mapr-oakridge"
+    },
+    {
+      "site_id": "site-obninsk",
+      "reference_id": "ref-wna-russia"
+    },
+    {
+      "site_id": "site-oklo",
+      "reference_id": "ref-grs-oklo"
+    },
+    {
+      "site_id": "site-oklo",
+      "reference_id": "ref-wna-radwaste"
+    },
+    {
+      "site_id": "site-paris-curie",
+      "reference_id": "ref-aip-curie-separations"
+    },
+    {
+      "site_id": "site-three-mile-island",
+      "reference_id": "ref-nrc-tmi"
+    },
+    {
+      "site_id": "site-trinity",
+      "reference_id": "ref-nps-mapr-trinity"
+    }
+  ]
+}

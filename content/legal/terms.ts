@@ -24,7 +24,7 @@ export const TERMS_SECTIONS: readonly LegalSection[] = [
   {
     title: "1. Agreement to These Terms",
     body:
-      "These Terms of Service (“Terms”) are an agreement between you and the AtomIQ team named in the Privacy Policy (“we”, “us”). They cover the AtomIQ app and everything bundled in it: lessons, quizzes, games, labs, the encyclopedia, the periodic table and other content (together, the “App”).\n" +
+      "These Terms of Service (“Terms”) are an agreement between you and the AtomIQ team named in the Privacy Policy (“we”, “us”). They cover the AtomIQ app and everything bundled in it: lessons, quizzes, games, labs, the AtomDex, the periodic table and other content (together, the “App”).\n" +
       "By tapping “I agree” when you set up the App, or by using it, you accept these Terms and the Privacy Policy. If you do not agree, do not use the App; uninstall it. If you accept for a school or another organization, you confirm you have the authority to do so.",
   },
   {
@@ -34,10 +34,10 @@ export const TERMS_SECTIONS: readonly LegalSection[] = [
       "• a guided path of units and lessons led by teacher characters, with practice, checkpoints and reviews;\n" +
       "• quests, XP, levels, streaks, diamonds, chests and achievements;\n" +
       "• the Myth Buster game, the Atom Maze and explorer journeys;\n" +
-      "• an encyclopedia, a periodic table, and daily facts;\n" +
+      "• the AtomDex (an encyclopedia), a periodic table, and daily facts;\n" +
       "• labs: Radiation Shield, Build an Atom and Radioactive Decay;\n" +
       "• a Discover feed of character posts and mini blog pieces, and a weekly ranking;\n" +
-      "• Shrodi, a tap-to-navigate guide, and a shop and avatar for personalizing your profile;\n" +
+      "• a phone with Shrodi, a tap-to-navigate guide, your teachers and chats with them, a private notebook (Field Notes), an Atom Scanner that shows what everyday things are made of, a Camera for drawn photos of you and your guide, a Safety Guide of radiation facts for learning, a Nuclear Map of places in the history of nuclear science, a reference library of the sources the app cites, and apps that arrive as you learn; and a shop and avatar for personalizing your profile;\n" +
       "• Read Aloud, sound and haptics.\n" +
       "Features can change over time (Section 15).",
   },

@@ -20,18 +20,20 @@ export const SHIPPED_ID_TABLES = [
   "path_nodes",
   "items",
   "myths",
-  "mazes",
   "encyclopedia_entries",
   "npcs",
   "npc_lines",
   "feed_templates",
   "blog_posts",
+  "chat_nodes",
+  "scan_targets",
+  "safety_cards",
+  "map_sites",
 ];
 
 /** Parent entity → child table that is edited and versioned together with it. */
 export const ENTITY_CHILDREN = {
   lessons: { table: "lesson_cards", fk: "lesson_id" },
-  mazes: { table: "maze_rooms", fk: "maze_id" },
   blog_posts: { table: "blog_comments", fk: "blog_id" },
 };
 
@@ -41,6 +43,9 @@ export const ENTITY_CHILDREN = {
  */
 export const ENTITY_LINKS = {
   blog_posts: { table: "blog_references", fk: "blog_id", column: "reference_id" },
+  scan_targets: { table: "scan_target_references", fk: "target_id", column: "reference_id" },
+  safety_cards: { table: "safety_card_references", fk: "card_id", column: "reference_id" },
+  map_sites: { table: "map_site_references", fk: "site_id", column: "reference_id" },
 };
 
 /** Child table → { parent, fk } (inverse of ENTITY_CHILDREN). */

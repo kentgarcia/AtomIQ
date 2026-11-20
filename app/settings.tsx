@@ -18,7 +18,16 @@ import {
   resetToBundledContent,
 } from "@/services/content-db";
 import { setHapticsGate } from "@/services/haptics";
-import { getFeedPostsEnabled, getHapticsEnabled, setFeedPostsEnabled, setHapticsEnabled, subscribeFeedPostsEnabled } from "@/services/storage";
+import {
+  getFeedPostsEnabled,
+  getHapticsEnabled,
+  getPhoneBadgesEnabled,
+  setFeedPostsEnabled,
+  setHapticsEnabled,
+  setPhoneBadgesEnabled,
+  subscribeFeedPostsEnabled,
+  subscribePhoneBadgesEnabled,
+} from "@/services/storage";
 import { setTeacherLines, useTeacherLines } from "@/components/npc/teacher-lines";
 import { setMediaPreference } from "@/services/media";
 import { playSfx } from "@/services/sfx";
@@ -53,6 +62,7 @@ export default function SettingsScreen() {
   const { soundEffects, readAloud: readAloudEnabled } = useMediaPreferences();
   const [haptics, setHaptics] = useState(true);
   const [feedPosts, setFeedPosts] = useState(true);
+  const [phoneBadges, setPhoneBadges] = useState(true);
   const teacherLines = useTeacherLines();
   const [isDeletingAccount, setIsDeletingAccount] = useState(false);
   const [versionModalVisible, setVersionModalVisible] = useState(false);
@@ -192,6 +202,24 @@ export default function SettingsScreen() {
     void setFeedPostsEnabled(next).catch((error) => console.error("Error saving feed posts preference:", error));
   };
 
+  // "App badges": the counts and dots on the phone's icons and on the Phone tab (docs/PHONE_SPEC.md §5.3).
+  useEffect(() => {
+    let mounted = true;
+    void getPhoneBadgesEnabled()
+      .then((on) => mounted && setPhoneBadges(on))
+      .catch(() => undefined);
+    const stop = subscribePhoneBadgesEnabled((on) => mounted && setPhoneBadges(on));
+    return () => {
+      mounted = false;
+      stop();
+    };
+  }, []);
+
+  const handlePhoneBadgesToggle = (next: boolean) => {
+    setPhoneBadges(next);
+    void setPhoneBadgesEnabled(next).catch((error) => console.error("Error saving app badges preference:", error));
+  };
+
   // The switch itself plays the "off" cue while effects are still on, so turning them off is heard
   // once; turning them on is silent until the preference flips, so the preview plays after it.
   const handleSoundEffectsToggle = (enabled: boolean) => {
@@ -234,6 +262,7 @@ export default function SettingsScreen() {
   // After "Account deleted": onboarding is needed again, so the app forgets it was finished and starts from the first screen
   const finishDeleteAccount = () => {
     setDeleteModalVisible(false);
+    void playSfx("transition.wipe");
     void setOnboardingDone(false).catch(() => {});
     router.replace("/onboarding");
   };
@@ -300,6 +329,13 @@ export default function SettingsScreen() {
               label="Feed posts"
               note="NPCs post about your progress. Blog pieces still unlock when this is off."
               toggle={{ value: feedPosts, onChange: handleFeedPostsToggle }}
+            />
+            <SettingsRow
+              icon="Mobile"
+              color={theme.colors.sky}
+              label="App badges"
+              note="The counts and dots on the Phone tab and its apps."
+              toggle={{ value: phoneBadges, onChange: handlePhoneBadgesToggle }}
             />
           </SettingsCard>
         </Animated.View>

@@ -15,10 +15,23 @@ const todayKey = (): string => {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 };
 
+type ReadListener = () => void;
+const readListeners = new Set<ReadListener>();
+
+/** Called when a fact is read for the first time (the phone's Daily Fact badge follows it). */
+export function subscribeFactsRead(listener: ReadListener): () => void {
+  readListeners.add(listener);
+  return () => {
+    readListeners.delete(listener);
+  };
+}
+
 /** Record a fact as read today (first time only). Never rejects; `true` when it was new. */
 export async function recordFactRead(factId: string, title: string): Promise<boolean> {
   try {
-    return await store.recordRead(factId, title, todayKey(), Date.now());
+    const isNew = await store.recordRead(factId, title, todayKey(), Date.now());
+    if (isNew) readListeners.forEach((l) => l());
+    return isNew;
   } catch (error) {
     console.warn("[daily-facts] record read", error);
     return false;

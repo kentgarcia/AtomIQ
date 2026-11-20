@@ -12,7 +12,7 @@ import { memo, useMemo } from "react";
 import { StyleSheet, View, type StyleProp, type ViewStyle } from "react-native";
 
 import { Npc } from "@/components/npc/Npc";
-import { popLayout, type PoseId } from "@/components/npc/npc-art";
+import { NPC_VIEWBOX, popLayout, type PoseId } from "@/components/npc/npc-art";
 
 import { avatarBackground, avatarSpec, normalizeAvatar } from "./avatar-core";
 import { PatternLayer } from "./PatternLayer";
@@ -27,16 +27,20 @@ export interface AvatarProps {
   pose?: PoseId;
   /** Idle life (breathing, blinking). Default off. */
   live?: boolean;
+  /** A close-up instead of head and shoulders: the face (eyebrows, eyes, nose, mouth, ears, glasses), the ears (earrings) or the chest (clothes). Needs a `radius`. */
+  zoom?: "face" | "ears" | "chest" | "preview";
   /** No frame: transparent and unclipped, for a figure standing on a banner that has its own background. */
   bare?: boolean;
   style?: StyleProp<ViewStyle>;
 }
 
-export const Avatar = memo(function Avatar({ value, size = 44, radius, pose = "idle", live = false, bare = false, style }: AvatarProps) {
+export const Avatar = memo(function Avatar({ value, size = 44, radius, pose = "idle", live = false, bare = false, zoom, style }: AvatarProps) {
   const config = useMemo(() => normalizeAvatar(value), [value]);
   const spec = useMemo(() => avatarSpec(config), [config]);
   // A circle (no radius given) lets the top of the head pop out past its edge; a rounded square or a bare figure stays cropped.
   const pops = !bare && radius === undefined;
+  // The preview is taller than wide (the avatar crop plus more body underneath): `size` is its width
+  const height = zoom === "preview" ? (size * NPC_VIEWBOX.preview.h) / NPC_VIEWBOX.preview.w : size;
   if (pops) {
     const pop = popLayout(size);
     return (
@@ -51,14 +55,14 @@ export const Avatar = memo(function Avatar({ value, size = 44, radius, pose = "i
   return (
     <View
       style={[
-        bare ? { width: size, height: size } : { width: size, height: size, borderRadius: radius ?? size / 2, overflow: "hidden", backgroundColor: avatarBackground(config) },
+        bare ? { width: size, height } : { width: size, height, borderRadius: radius ?? size / 2, overflow: "hidden", backgroundColor: avatarBackground(config) },
         style,
       ]}
       accessible={false}
       importantForAccessibility="no-hide-descendants"
     >
       {bare ? null : <PatternLayer pattern={config.pattern} tile={Math.max(24, Math.round(size / 2.2))} />}
-      <Npc spec={spec} form="avatar" size={size} pose={pose} live={live} />
+      <Npc spec={spec} form={zoom ?? "avatar"} size={height} pose={pose} live={live} />
     </View>
   );
 });

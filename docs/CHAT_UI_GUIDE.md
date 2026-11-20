@@ -1,3 +1,5 @@
+> **Superseded (2026-11-20):** the Guide tab is now the Phone tab (`docs/PHONE_SPEC.md`). This conversation lives at `app/phone-apps/shrodi.tsx`, opened from the Chats app; the landing page described below is gone. The rule engine, pills and cards are unchanged.
+
 # AtomIQ Guide — Chat UI Full Explanation & Process
 
 > **Location:** `app/(tabs)/chat.tsx` (Tab route `chat` → Guide) + `services/guide/*` + `components/guide/*`

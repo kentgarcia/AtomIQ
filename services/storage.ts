@@ -1,5 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+import { normalizeWallpaper, type WallpaperChoice } from '@/components/phone/wallpaper-core';
+
 // Storage Keys
 export const STORAGE_KEYS = {
   // App State
@@ -28,6 +30,11 @@ export const STORAGE_KEYS = {
   
   /** The NPC feed's "Feed posts" switch (default on): when off, no new chatter posts are created. */
   FEED_POSTS_ENABLED: '@atomiq:feed_posts_enabled',
+  PHONE_INTRO_SEEN: '@atomiq:phone_intro_seen',
+  PHONE_BADGES: '@atomiq:phone_badges',
+  PHONE_WALLPAPER: '@atomiq:phone_wallpaper',
+  CHAT_LAST_OPEN: '@atomiq:chat_last_open',
+  CHAT_RETURNED: '@atomiq:chat_returned',
   /** Local day (YYYY-MM-DD) of the last app open the feed saw, for the comeback post. */
   FEED_LAST_OPEN: '@atomiq:feed_last_open',
   /** The weekly ranking's order at the last rank check, for the rank-change post. */
@@ -213,6 +220,64 @@ export const subscribeFeedPostsEnabled = (listener: FeedPostsListener): (() => v
     feedPostsListeners.delete(listener);
   };
 };
+
+// Phone (docs/PHONE_SPEC.md): the one-time "Your phone" hand-over, and the Settings "App badges" switch (on by default).
+export const getPhoneIntroSeen = async (): Promise<boolean> => (await getItem<boolean>(STORAGE_KEYS.PHONE_INTRO_SEEN)) ?? false;
+export const setPhoneIntroSeen = async (): Promise<void> => setItem(STORAGE_KEYS.PHONE_INTRO_SEEN, true);
+
+// The phone's wallpaper (docs/PHONE_SPEC.md section 4): an illustrated wallpaper's id, or "mine" (the learner's avatar paint and pattern)
+type PhoneWallpaperListener = (choice: WallpaperChoice) => void;
+const phoneWallpaperListeners = new Set<PhoneWallpaperListener>();
+
+export const getPhoneWallpaper = async (): Promise<WallpaperChoice> => normalizeWallpaper(await getItem<string>(STORAGE_KEYS.PHONE_WALLPAPER));
+
+export const setPhoneWallpaper = async (choice: WallpaperChoice): Promise<void> => {
+  await setItem(STORAGE_KEYS.PHONE_WALLPAPER, choice);
+  phoneWallpaperListeners.forEach((listener) => {
+    try {
+      listener(choice);
+    } catch {
+      // A listener's failure never undoes the choice.
+    }
+  });
+};
+
+export const subscribePhoneWallpaper = (listener: PhoneWallpaperListener): (() => void) => {
+  phoneWallpaperListeners.add(listener);
+  return () => {
+    phoneWallpaperListeners.delete(listener);
+  };
+};
+
+type PhoneBadgesListener = (enabled: boolean) => void;
+const phoneBadgesListeners = new Set<PhoneBadgesListener>();
+
+export const getPhoneBadgesEnabled = async (): Promise<boolean> => (await getItem<boolean>(STORAGE_KEYS.PHONE_BADGES)) ?? true;
+
+export const setPhoneBadgesEnabled = async (enabled: boolean): Promise<void> => {
+  await setItem(STORAGE_KEYS.PHONE_BADGES, enabled);
+  phoneBadgesListeners.forEach((listener) => {
+    try {
+      listener(enabled);
+    } catch {
+      // A listener's failure never undoes the setting.
+    }
+  });
+};
+
+export const subscribePhoneBadgesEnabled = (listener: PhoneBadgesListener): (() => void) => {
+  phoneBadgesListeners.add(listener);
+  return () => {
+    phoneBadgesListeners.delete(listener);
+  };
+};
+
+// Chats: the day the app was last opened, and the day the learner came back after a few days away (a teacher's
+// welcome-back message belongs to that day)
+export const getChatLastOpen = async (): Promise<string | null> => (await getItem<string>(STORAGE_KEYS.CHAT_LAST_OPEN)) ?? null;
+export const setChatLastOpen = async (day: string): Promise<void> => setItem(STORAGE_KEYS.CHAT_LAST_OPEN, day);
+export const getChatReturned = async (): Promise<string | null> => (await getItem<string>(STORAGE_KEYS.CHAT_RETURNED)) ?? null;
+export const setChatReturned = async (day: string): Promise<void> => setItem(STORAGE_KEYS.CHAT_RETURNED, day);
 
 // Teachers the learner has met (the introduction page shows once per teacher)
 export const getMetTeachers = async (): Promise<string[]> => {

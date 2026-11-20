@@ -3,11 +3,13 @@ import { FieldInput } from "@/components/ui/field-input";
 import { Icon } from "@/components/ui/icon";
 import { HeaderButton, ScreenHeader, useHeaderBorder, useTabBarInset } from "@/components/layout";
 import {useTheme, type Theme, fontFaces, useResponsiveLayout} from "@/theme";
-import { DIALOG_SETTLE_MS, RANK_UP, rankUpStart } from "@/components/celebration/celebration-core";
+import { DIALOG_SETTLE_MS, LEVEL_UNLOCKS, RANK_UP, rankUpStart } from "@/components/celebration/celebration-core";
 import { LEVEL_UP_BODY_STYLE, LevelUpBody, LevelUpButton } from "@/components/celebration/LevelUpBody";
+import { normalizeAvatar } from "@/components/avatar/avatar-core";
+import { itemsUnlockedBetween } from "@/components/shop/shop-core";
 import { RankUpBadge } from "@/components/celebration/RankUpBadge";
 import { Reveal } from "@/components/motion/Reveal";
-import { ModalButton } from "@/components/ui/modal-card";
+import { ModalButton, ModalSecondaryButton } from "@/components/ui/modal-card";
 import { ModalDialog } from "@/components/ui/modal-dialog";
 import { BadgePicker } from "@/components/profile/BadgePicker";
 import { AchievementsSection } from "@/components/profile/AchievementsSection";
@@ -162,6 +164,12 @@ export default function ProfileScreen() {
   // is seen from the first frame instead of playing out behind another tab
   const focused = useIsFocused();
   const levelUpOpen = levelUpLevel !== null && focused;
+  // What the level(s) just gained opened in the shop; held while the dialog closes so it does not change as it shrinks
+  const opened = useMemo(() => (levelUpLevel === null ? null : itemsUnlockedBetween(levelUpFrom ?? levelUpLevel - 1, levelUpLevel)), [levelUpLevel, levelUpFrom]);
+  const [unlockedItems, setUnlockedItems] = useState(opened ?? []);
+  if (opened !== null && opened !== unlockedItems) setUnlockedItems(opened);
+  const unlockedTiles = Math.min(LEVEL_UNLOCKS.max, unlockedItems.length);
+  const avatarLook = useMemo(() => normalizeAvatar(userProfile?.avatar_url), [userProfile?.avatar_url]);
   const badgesOpen = celebrationAwards != null && celebrationAwards.length > 0 && focused && levelUpLevel === null && levelUpGone;
   // The fanfares when each dialog opens (the dialog adds its own opening sound)
   useEffect(() => {
@@ -514,12 +522,21 @@ export default function ProfileScreen() {
         closeLabel="Keep going"
         bodyStyle={LEVEL_UP_BODY_STYLE}
         footer={
-          <LevelUpButton>
+          <LevelUpButton tiles={unlockedTiles}>
             <ModalButton label="Keep going" onPress={dismissLevelUp} />
+            {unlockedItems.length > 0 ? (
+              <ModalSecondaryButton
+                label="See them in the shop"
+                onPress={() => {
+                  dismissLevelUp();
+                  router.push("/shop");
+                }}
+              />
+            ) : null}
           </LevelUpButton>
         }
       >
-        <LevelUpBody level={levelUpLevel ?? 0} from={levelUpFrom ?? undefined} xpIntoLevel={(userProfile?.total_xp ?? 0) % 100} />
+        <LevelUpBody level={levelUpLevel ?? 0} from={levelUpFrom ?? undefined} xpIntoLevel={(userProfile?.total_xp ?? 0) % 100} unlocked={unlockedItems} look={avatarLook} />
       </ModalDialog>
 
       {/* Badge ranked up: the house modal */}

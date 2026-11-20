@@ -8,6 +8,7 @@ import { burstTwinkle, BURST } from "@/components/motion/burst-core";
 import { PopOnce } from "@/components/motion/PopOnce";
 import { Reveal } from "@/components/motion/Reveal";
 import { settle } from "@/components/motion/settle";
+import { SfxOnMount } from "@/components/ui/sfx-on-mount";
 import { settleDelay } from "@/components/motion/settle-core";
 import { useDelayedClock } from "@/components/motion/use-delayed-clock";
 import { ScreenHeader, useHeaderBorder } from "@/components/layout";
@@ -32,6 +33,8 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const PODIUM_HEIGHT: Record<number, number> = { 1: 96, 2: 72, 3: 52 };
 const PODIUM_HEAD: Record<number, number> = { 1: 68, 2: 56, 3: 56 };
+/** The chime's pitch by place: third lowest, first highest. */
+const PODIUM_RATE: Record<number, number> = { 1: 1.15, 2: 1, 3: 0.9 };
 
 const useStyles = createStyles((theme) => {
   const c = theme.colors;
@@ -114,6 +117,8 @@ function PodiumPlace({
   const avatar = <RankAvatar npc={npc} isLearner={r.isLearner} size={head} />;
   return (
     <View style={styles.place} accessible accessibilityLabel={accessibilityLabel}>
+      {/* A chime as each place lands, third then second then first, each a little higher (docs/SFX_EXPANSION_SPEC.md §6.2) */}
+      {!reduced ? <SfxOnMount cue="rank.podium" rate={PODIUM_RATE[r.rank] ?? 1} delay={podiumStart(r.rank) + PODIUM.rise} /> : null}
       <Animated.View style={[styles.placeTop, r.isLearner && styles.placeMe, top]}>
         <View>
           <Animated.View style={headStyle}>
@@ -162,6 +167,7 @@ export default function RanksScreen() {
   const { scrolled, onScroll, scrollEventThrottle } = useHeaderBorder();
   const cast = useCast();
   const { ranking, reload } = useWeeklyRanking();
+  const reduced = useReducedMotion();
 
   // Did the learner's place change since the last time they looked? Read once per visit; the place is saved for the next one
   const [move, setMove] = useState<"up" | "down" | null>(null);
@@ -195,6 +201,8 @@ export default function RanksScreen() {
 
   return (
     <View style={styles.container}>
+      {/* The learner's place moved: a sound with the arrow, which arrives with the learner's pop */}
+      {move && !reduced ? <SfxOnMount cue={move === "up" ? "rank.up" : "rank.down"} delay={PODIUM.learnerPop} /> : null}
       <ScreenHeader title="Weekly ranking" subtitle={ranking ? weekCaption(ranking.weekKey) : undefined} onBack={() => router.back()} scrolled={scrolled} />
 
       <ScrollView

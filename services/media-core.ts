@@ -39,8 +39,7 @@ export type MediaSurface =
   | "quiz"
   | "mythbuster"
   | "lab"
-  | "atom-maze"
-  | "guide"
+  | "phone"
   | "encyclopedia"
   | "other";
 
@@ -91,16 +90,12 @@ export const getRouteMediaPolicy = (
   if (matches(route, "/lab")) {
     return { surface: "lab", uiClicks: false, gameSfx: true, music: false };
   }
-  if (matches(route, "/explorer/atom-maze") || matches(route, "/atom-maze")) {
-    return {
-      surface: "atom-maze",
-      uiClicks: false,
-      gameSfx: true,
-      music: true,
-    };
+  if (matches(route, "/dev-sfx")) {
+    // The development SFX lab: its own taps stay silent so they do not sound over the candidates.
+    return { surface: "other", uiClicks: false, gameSfx: false, music: false };
   }
-  if (matches(route, "/chat")) {
-    return { surface: "guide", uiClicks: true, gameSfx: false, music: false };
+  if (matches(route, "/phone") || matches(route, "/phone-apps")) {
+    return { surface: "phone", uiClicks: true, gameSfx: false, music: false };
   }
   if (matches(route, "/encyclopedia") || matches(route, "/explorer/encyclopedia")) {
     return {

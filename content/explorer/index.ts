@@ -1,13 +1,13 @@
 /**
  * AtomIQ Explorer Content Registry
- * Central hub for all Explorer journeys, mazes, and encyclopedia entries.
+ * Central hub for all Explorer journeys and encyclopedia entries.
  *
- * Mazes and encyclopedia entries are stored in the SQLite content database
+ * Encyclopedia entries are stored in the SQLite content database
  * (see @/services/content-db) and fetched through the async repository;
  * journeys remain in-repo data registries below.
  */
 
-import { AtomMazeChallenge, EncyclopediaEntry, Journey } from './types';
+import { EncyclopediaEntry, Journey } from './types';
 
 import { contentRepository } from '@/services/content-db';
 
@@ -39,15 +39,6 @@ export const getJourneysByDifficulty = (difficulty: 'beginner' | 'intermediate' 
   return Object.values(journeys).filter(journey => journey.difficulty === difficulty);
 };
 
-export const getMazeById = async (id: string): Promise<AtomMazeChallenge | undefined> => {
-  const maze = await contentRepository.getMazeById(id);
-  return maze ?? undefined;
-};
-
-export const getAllMazes = async (): Promise<AtomMazeChallenge[]> => {
-  return contentRepository.getAllMazes();
-};
-
 export const getEncyclopediaEntryById = async (id: string): Promise<EncyclopediaEntry | undefined> => {
   const entry = await contentRepository.getEncyclopediaEntryById(id);
   return entry ?? undefined;
@@ -73,8 +64,8 @@ export const getEncyclopediaByDifficulty = async (
 
 // Export types
 export type {
-  AtomMazeChallenge, AtomMazeRoom, BattleQuestion, EncyclopediaEntry, Journey, JourneyNode, Monster,
-  MonsterElement, MultimediaPopUp, MythNodeContent, QuestionType,
+  BattleQuestion, EncyclopediaEntry, Journey, JourneyNode,
+  MultimediaPopUp, MythNodeContent, QuestionType,
   QuizQuestion,
   ScrambleQuestion
 } from './types';

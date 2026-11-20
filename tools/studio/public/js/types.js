@@ -3,7 +3,7 @@
 // the answer-options widget.
 
 import { el, miniBtn } from "./core.js";
-import { FEED_TYPES } from "./feed-types.js";
+import { CHAT_TYPES, FEED_TYPES } from "./feed-types.js";
 
 const DIFFICULTY_LEVELS = ["beginner", "intermediate", "advanced"];
 const DIFFICULTY_EASY = ["easy", "medium", "hard"];
@@ -202,93 +202,6 @@ const lessonCards = {
 // ---------------------------------------------------------------------------
 
 // ---------------------------------------------------------------------------
-// mazes
-// ---------------------------------------------------------------------------
-
-const monsterFields = (boss) => [
-  txt("id", "Id", { required: true }),
-  txt("name", "Name", { required: true }),
-  sel("element", "Element", ["radiation", "nuclear", "atomic", "fusion", "fission", "plasma"]),
-  num("maxHp", "Max HP", { min: 1 }),
-  num("attackPower", "Attack power", { min: 0 }),
-  txt("sprite", "Sprite (emoji)"),
-  txt("color", "Colour", { hint: "Hex colour used in the maze artwork." }),
-  txt("defeatMessage", "Defeat message"),
-  ...(boss ? [{ key: "isBoss", label: "Boss", type: "checkbox", checkLabel: "This is the boss" }] : []),
-];
-
-const battleQuestions = {
-  key: "questions",
-  label: "Battle questions",
-  type: "list",
-  itemName: "Question",
-  variants: {
-    typeKey: "type",
-    typeLabel: "Kind",
-    labels: { quiz: "Quiz", scramble: "Word scramble" },
-    types: {
-      quiz: {
-        fields: [
-          area("question", "Question", 2, { required: true }),
-          choiceField({ optionsKey: "options", answerKey: "correctAnswer", forceType: "multiple_choice" }),
-        ],
-      },
-      scramble: {
-        fields: [area("question", "Clue", 2, { required: true }), txt("answer", "Answer (the word)", { required: true }), txt("hint", "Hint")],
-      },
-    },
-  },
-  itemLabel: (q) => q.question || "question",
-  newItem: (type) => (type === "scramble" ? { type, question: "", answer: "", hint: "" } : { type: "quiz", question: "", options: ["", "", "", ""], correctAnswer: 0 }),
-  addLabel: "＋ Add battle question",
-};
-
-const mazeRooms = {
-  key: "__children",
-  label: "Rooms",
-  type: "list",
-  matchKey: "id",
-  itemName: "Room",
-  item: {
-    fields: (item) => [
-      childIdField(item),
-      txt("title", "Title", { required: true }),
-      area("description", "Description", 2, { required: true }),
-      { key: "monster", label: "Monster", type: "group", fields: monsterFields(false) },
-      battleQuestions,
-      num("damage_per_correct", "Damage per correct answer", { min: 0 }),
-      area("explanation", "Explanation (after the monster is defeated)", 2),
-      txt("next_room_id", "Next room id", { nullable: true }),
-      txt("alternative_path_id", "Alternative path room id", { nullable: true }),
-      {
-        key: "unlock_condition",
-        label: "Unlock condition",
-        type: "group",
-        optional: true,
-        enableLabel: "Room needs an unlock condition",
-        fields: [sel("type", "Type", ["score_threshold", "time_limit"]), num("value", "Value")],
-      },
-    ],
-  },
-  itemLabel: (r) => r.title || r.id || "room",
-  newItem: (_t, all) => ({
-    id: `room-${all.length + 1}`,
-    title: "",
-    description: "",
-    monster: { id: "", name: "", element: "radiation", maxHp: 50, attackPower: 10, sprite: "👾", color: "#9b59b6", defeatMessage: "" },
-    questions: [],
-    damage_per_correct: 25,
-    explanation: "",
-  }),
-  onDuplicate: (copy) => {
-    copy.id = `${copy.id}-copy`;
-    delete copy.created_at;
-    delete copy.updated_at;
-  },
-  addLabel: "＋ Add room",
-};
-
-// ---------------------------------------------------------------------------
 // the registry
 // ---------------------------------------------------------------------------
 
@@ -403,27 +316,6 @@ export const TYPES = [
     },
   },
   {
-    table: "mazes",
-    label: "Atom Maze",
-    singular: "maze",
-    group: "Explore",
-    icon: "🌀",
-    titleOf: (r) => r.title,
-    subOf: (r) => r.theme,
-    newRow: () => ({ id: "", title: "", description: "", theme: "", xp_reward: 200, player_max_hp: 100, boss: { id: "", name: "", element: "nuclear", maxHp: 100, attackPower: 20, sprite: "👑", color: "#e94560", defeatMessage: "", isBoss: true } }),
-    children: { table: "maze_rooms", field: mazeRooms },
-    fields: (isNew) => [
-      idField(isNew),
-      txt("title", "Title", { required: true }),
-      area("description", "Description", 2, { required: true }),
-      txt("theme", "Theme"),
-      num("xp_reward", "XP reward", { min: 0 }),
-      num("time_limit", "Time limit (seconds)", { nullable: true }),
-      num("player_max_hp", "Player HP", { min: 1 }),
-      { key: "boss", label: "Final boss", type: "group", fields: monsterFields(true) },
-    ],
-  },
-  {
     table: "encyclopedia_entries",
     label: "Encyclopedia",
     singular: "entry",
@@ -457,6 +349,7 @@ export const TYPES = [
     ],
   },
   ...FEED_TYPES,
+  ...CHAT_TYPES,
 ];
 
 export const TYPE_BY_TABLE = Object.fromEntries(TYPES.map((t) => [t.table, t]));

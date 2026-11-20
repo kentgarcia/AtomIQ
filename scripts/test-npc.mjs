@@ -6,14 +6,10 @@
  * Whether the characters LOOK good is a person looking at `node scripts/render-npcs.mjs <dir>`.
  */
 import assert from "node:assert/strict";
-import fs from "node:fs";
-import path from "node:path";
 import test from "node:test";
-import { fileURLToPath } from "node:url";
 
 import { loadTs } from "./lib/ts-require.mjs";
 
-const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const art = loadTs("components/npc/npc-art.ts");
 const { ALLOWED_COLORS, FORBIDDEN_NAMES, MUTE_DARK, MUTE_LIGHT } = loadTs("components/npc/npc-palette.ts");
 const { NPC_ROSTER, NPC_LINES } = loadTs("components/npc/npc-roster.ts");
@@ -118,18 +114,21 @@ test("a wave is four fingers at most; every gesture uses at most four digits", (
 
 // ── face ────────────────────────────────────────────────────────────────────
 
-test("eyes are standing pills with the pupil in the upper half; there are no eyebrows", () => {
+test("eyes are standing pills with the pupil in the upper half; the teachers have no eyebrows (only an avatar can choose them)", () => {
   assert.ok(EYE.h > EYE.w, "taller than wide");
   const pupilCentre = EYE.y - EYE.h / 2 + 7 + 20 / 2;
   assert.ok(pupilCentre < EYE.y, "upper half");
   assert.ok(Math.abs(2 * EYE.x - 39) <= 1, "close together");
-  const src = fs.readFileSync(path.join(REPO, "components/npc/npc-art.ts"), "utf8");
-  assert.ok(!/brow/i.test(src.replace(/\/\*[\s\S]*?\*\//g, "").replace(/\/\/.*$/gm, "")));
+  // A spec that does not ask for brows (every teacher) draws exactly what "none" draws
+  const teacher = NPC_ROSTER[0].spec;
+  const bare = buildNpc(teacher, "idle");
+  assert.deepEqual(buildNpc({ ...teacher, brows: "none" }, "idle"), bare);
+  assert.notDeepEqual(buildNpc({ ...teacher, brows: "arched" }, "idle").face, bare.face, "a brow style does draw something");
 });
 
 test("every hair style reaches the top of the ear (hair above the ear)", () => {
   const earTop = 2 - 11;
-  for (const style of ["bob", "curls", "crop", "bun", "wrap"]) assert.ok(hairSideBottom(style) >= earTop - 2, style);
+  for (const style of ["bob", "curls", "crop", "bun", "wrap", "buzzcut", "classic", "messy", "sidepart", "curtain", "bowl", "spiky", "wavy", "longer", "undercut", "longstraight", "shortbob", "medium", "highpony", "lowpony", "twintails", "bigbun", "halfup", "longwavy", "curtainbangs"]) assert.ok(hairSideBottom(style) >= earTop - 2, style);
 });
 
 /** Highest y (largest value) any command of an absolute path ends on. Enough for the flat bottoms of our shapes. */

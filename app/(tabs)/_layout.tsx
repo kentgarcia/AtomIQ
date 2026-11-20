@@ -6,6 +6,7 @@ import {
 } from "@/components/layout";
 import { ClaimCoinLayer } from "@/components/quests/ClaimCoinLayer";
 import { useFeedUnseenCount } from "@/hooks/use-feed";
+import { usePhone } from "@/hooks/use-phone";
 import { playSfx } from "@/services/sfx";
 import { fontFaces, layout, useTheme } from "@/theme";
 import { TAB_BAR_CONSTANTS, TAB_BAR_TAB_COUNT } from "@/theme/tab-bar-metrics";
@@ -29,7 +30,7 @@ const TAB_ICONS = {
   map: require("@/assets/images/icons/map.png"),
   discovery: require("@/assets/images/icons/community.png"),
   quests: require("@/assets/images/icons/chest.png"),
-  ai: require("@/assets/images/icons/ai.png"),
+  phone: require("@/assets/images/icons/phone.png"),
   games: require("@/assets/images/icons/games.png"),
   profile: require("@/assets/images/icons/profile.png"),
 };
@@ -158,6 +159,9 @@ function ModernTabBar({ state, emitter, navigateToTab }: BottomTabBarProps) {
   const barVisible = useTabBarVisible();
   // Unseen posts in the NPC feed: a dot on the Feed tab (0 while the feed is muted)
   const unseenPosts = useFeedUnseenCount();
+  // Anything new on the phone (an app waiting, an unread chat, an unread daily fact): a dot on the Phone tab.
+  // The focused tab re-reads it, since progress made on another tab is what puts an app on the phone.
+  const phone = usePhone(state.index);
   if (!barVisible) return null;
 
   const THEME = theme.palettes.tabBar;
@@ -165,7 +169,7 @@ function ModernTabBar({ state, emitter, navigateToTab }: BottomTabBarProps) {
     { name: "index", icon: TAB_ICONS.map, label: "Home" },
     { name: "quests", icon: TAB_ICONS.quests, label: "Quests" },
     { name: "community", icon: TAB_ICONS.discovery, label: "Feed" },
-    { name: "chat", icon: TAB_ICONS.ai, label: "Guide" },
+    { name: "phone", icon: TAB_ICONS.phone, label: "Phone" },
     { name: "awards", icon: TAB_ICONS.games, label: "Games" },
     { name: "profile", icon: TAB_ICONS.profile, label: "Profile" },
   ] as const;
@@ -232,7 +236,9 @@ function ModernTabBar({ state, emitter, navigateToTab }: BottomTabBarProps) {
                 dot={
                   tab.name === "community" && unseenPosts > 0
                     ? { color: theme.colors.error, ring: THEME.bg, label: "Feed, new posts" }
-                    : undefined
+                    : tab.name === "phone" && phone.tabDot
+                      ? { color: theme.colors.error, ring: THEME.bg, label: "Phone, something new" }
+                      : undefined
                 }
               />
             );
@@ -281,9 +287,9 @@ export default function TabLayout() {
           }}
         />
         <Tabs.Screen
-          name="chat"
+          name="phone"
           options={{
-            title: "Guide",
+            title: "Phone",
           }}
         />
         <Tabs.Screen

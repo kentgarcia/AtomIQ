@@ -30,7 +30,7 @@ const MIN_CLEARANCE = 16;
 const TAB_SCREENS = {
   "app/(tabs)/index.tsx": /paddingBottom:\s*tabBarInset\s*\+\s*(\d+)/,
   "app/(tabs)/community.tsx": /paddingBottom:\s*tabBarInset\s*\+\s*(\d+)/,
-  "app/(tabs)/chat.tsx": /paddingBottom:\s*tabBarInset\s*\+\s*(\d+)/,
+  "app/(tabs)/phone.tsx": /paddingBottom:\s*tabBarInset\s*\+\s*(\d+)/,
   "app/(tabs)/profile.tsx": /paddingBottom:\s*tabBarInset\s*\+\s*(\d+)/,
   "app/(tabs)/quests.tsx": /paddingBottom:\s*tabBarInset\s*\+\s*(\d+)/,
   "components/games/PickAGame.tsx": /bottomReserve\s*=\s*tabBarInset\s*\+\s*(\d+)/,
@@ -60,10 +60,8 @@ if (/LinearGradient/.test(tabLayout)) {
 }
 if (!/useTabBarVisible\(\)/.test(tabLayout))
   fail("app/(tabs)/_layout.tsx: bar must read visibility from the inset provider");
-if (/hideTabBar/.test(tabLayout) || /hideTabBar/.test(read("app/(tabs)/chat.tsx")))
+if (/hideTabBar/.test(tabLayout) || /hideTabBar/.test(read("app/(tabs)/phone.tsx")))
   fail("hideTabBar navigation params are back — use useHideTabBar()");
-if (!/useHideTabBar\(/.test(read("app/(tabs)/chat.tsx")))
-  fail("app/(tabs)/chat.tsx: Guide mode must hide the bar via useHideTabBar()");
 const provider = read("components/layout/tab-bar-inset.tsx");
 if (!/Keyboard\.addListener/.test(provider))
   fail("tab-bar-inset.tsx: bar must hide while the keyboard is open");

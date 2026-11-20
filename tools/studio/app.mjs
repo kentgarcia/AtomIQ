@@ -52,7 +52,13 @@ import {
   tableInfo,
 } from "../../scripts/lib/content-tables.mjs";
 import { validateDatabase } from "../../scripts/lib/content-validate.mjs";
+import * as CHAT_VOCAB from "../../scripts/lib/chat-vocab.mjs";
+import * as SCAN_VOCAB from "../../scripts/lib/scan-vocab.mjs";
+import * as SAFETY_VOCAB from "../../scripts/lib/safety-vocab.mjs";
+import * as MAP_VOCAB from "../../scripts/lib/map-vocab.mjs";
 import * as FEED_VOCAB from "../../scripts/lib/feed-vocab.mjs";
+import { NPC_POSES } from "../../components/npc/npc-art.ts";
+import { PHONE_APPS } from "../../services/phone-core.ts";
 import { ART_IDS, ART_NAMES } from "../../components/lesson/visual/object-art.ts";
 import { listIcons } from "../../scripts/lib/icon-names.mjs";
 import { makePaths } from "../../scripts/lib/content-paths.mjs";
@@ -112,6 +118,25 @@ function dehydrate(values, jsonCols) {
 function feedVocab() {
   const { FEED_TRIGGERS, FEED_KINDS, FEED_CHIPS, STREAK_DAYS, CHEST_PERIODS, RANK_DIRECTIONS, COMEBACK_MIN_DAYS, BLOCK_TYPES, COUNTED_BLOCK_TYPES, BLOG_UNLOCK_TRIGGERS, BLOG_LIMITS, FEED_TEXT_MAX, FEED_PLACEHOLDERS, TEMPLATE_TRIGGER_KEYS } = FEED_VOCAB;
   return { FEED_TRIGGERS, FEED_KINDS, FEED_CHIPS, STREAK_DAYS, CHEST_PERIODS, RANK_DIRECTIONS, COMEBACK_MIN_DAYS, BLOCK_TYPES, COUNTED_BLOCK_TYPES, BLOG_UNLOCK_TRIGGERS, BLOG_LIMITS, FEED_TEXT_MAX, FEED_PLACEHOLDERS, TEMPLATE_TRIGGER_KEYS, artIds: ART_IDS, artNames: ART_NAMES };
+}
+
+/** The chat vocabulary for the Phone editor (one source: scripts/lib/chat-vocab.mjs): kinds, triggers, actions, limits, poses and the live phone apps. */
+function chatVocab() {
+  const { CHAT_KINDS, CHAT_ACTIONS, CHAT_LIMITS, CHAT_TRIGGER_KINDS, CHAT_REPLY_TYPES, CHAT_REACTIONS, CHAT_STICKERS, CHAT_TITLE_MAX } = CHAT_VOCAB;
+  return { CHAT_KINDS, CHAT_ACTIONS, CHAT_LIMITS, CHAT_TRIGGER_KINDS, CHAT_REPLY_TYPES, CHAT_REACTIONS, CHAT_STICKERS, CHAT_TITLE_MAX, poses: NPC_POSES, apps: PHONE_APPS.filter((a) => a.status === "live").map((a) => a.id) };
+}
+
+/** The scanner vocabulary for the Phone editor (one source: scripts/lib/scan-vocab.mjs): scenes, limits, the object pictures and every element symbol. */
+function scanVocab() {
+  return { SCAN_SCENES: SCAN_VOCAB.SCAN_SCENES, SCAN_LIMITS: SCAN_VOCAB.SCAN_LIMITS, artIds: ART_IDS, artNames: ART_NAMES };
+}
+
+/** The Safety Guide's and the Nuclear Map's vocabularies for the Phone editor (scripts/lib/safety-vocab.mjs, map-vocab.mjs). */
+function safetyVocab() {
+  return { SAFETY_SECTIONS: SAFETY_VOCAB.SAFETY_SECTIONS, SAFETY_LIMITS: SAFETY_VOCAB.SAFETY_LIMITS };
+}
+function mapVocab() {
+  return { MAP_KINDS: MAP_VOCAB.MAP_KINDS, MAP_LIMITS: MAP_VOCAB.MAP_LIMITS };
 }
 
 function linkTableFor(table) {
@@ -267,6 +292,10 @@ export async function createStudio(options = {}) {
       entityChildren: ENTITY_CHILDREN,
       entityLinks: ENTITY_LINKS,
       feedVocab: feedVocab(),
+      chatVocab: chatVocab(),
+      scanVocab: scanVocab(),
+      safetyVocab: safetyVocab(),
+      mapVocab: mapVocab(),
       dbPath: paths.master,
       schemaVersion: readSchemaVersion(paths),
       preview: preview ? { enabled: true } : { enabled: false },

@@ -426,3 +426,177 @@ const BLOG_POSTS = {
 };
 
 export const FEED_TYPES = [FEED_TEMPLATES, BLOG_POSTS];
+
+// ---------------------------------------------------------------------------
+// chat nodes (docs/PHONE_SPEC.md section 5.2): what a teacher says on the phone and the replies that follow
+// ---------------------------------------------------------------------------
+
+const chatVocab = () => state.meta.chatVocab;
+
+const chatReplies = {
+  key: "replies",
+  label: "Replies (the pills under the message)",
+  type: "list",
+  itemName: "Reply",
+  hint: "Two to six, all of the same Type (chips, or reactions, or stickers, never a mix). A reply with an action and no next node is a link: it opens that page, sends nothing and is drawn as its own kind of button (keep at least one real reply beside it). Each goes to another node of this teacher (next), opens something (action), or both. A sign-off has none.",
+  item: {
+    fields: () => [
+      sel("type", "Type", chatVocab().CHAT_REPLY_TYPES, { hint: `text: a chip with the label (the default). emoji: a sticker, the label is one of ${chatVocab().CHAT_STICKERS.join(", ")}. react: a reaction on the teacher's last message, the label is one of ${chatVocab().CHAT_REACTIONS.join(", ")}. A sticker or a reaction can end the story (no next, no action).` }),
+      txt("label", "Label", { required: true, hint: `Text: up to ${chatVocab().CHAT_LIMITS.label} characters, as a phrase: "What's next?". Sticker or reaction: its id.` }),
+      txt("next", "Goes to node", { nullable: true, suggest: { table: "chat_nodes", column: "id" }, hint: "A node of the same teacher (not an unprompted one)." }),
+      {
+        key: "action",
+        label: "Action",
+        type: "group",
+        optional: true,
+        enableLabel: "Opens something",
+        preserve: false,
+        fields: [
+          sel("screen", "Opens", Object.keys(chatVocab().CHAT_ACTIONS), { required: true, hint: "next-lesson: the next lesson of the teacher's unit. mythbuster: a Quick Play round (id = a unit, empty = the teacher's own)." }),
+          txt("id", "Id", { nullable: true, hint: "A lesson, path node, AtomDex entry or unit id; the app id for 'app'. Leave empty for next-lesson." }),
+        ],
+      },
+    ],
+  },
+  itemLabel: (r) => `${r.label ?? ""} ${r.next ? `→ ${r.next.replace(/^chat-/, "")}` : r.action ? `→ opens ${r.action.screen}` : ""}`,
+  newItem: () => ({ label: "" }),
+  addLabel: "＋ Add reply",
+};
+
+const CHAT_NODES = {
+  table: "chat_nodes",
+  label: "Chat nodes",
+  singular: "chat node",
+  group: "Phone",
+  icon: "📱",
+  titleOf: (r) => truncate(r.text, 70),
+  subOf: (r) => `${String(r.npc_id).replace(/^npc-/, "")} · ${r.kind}${r.trigger ? ` · ${r.trigger}` : ""}`,
+  groupBy: (r) => r.npc_id,
+  sortBy: (r) => String(r.position).padStart(4, "0"),
+  newRow: () => ({ id: "", npc_id: "", kind: "reply", trigger: null, title: null, text: "", pose: "idle", replies: [], position: 0 }),
+  fields: (isNew) => [
+    idField(isNew, "e.g. chat-ada-isotope. Once published it can't be renamed."),
+    txt("npc_id", "Teacher", { required: true, suggest: { table: "npcs", column: "id" } }),
+    sel("kind", "Kind", chatVocab().CHAT_KINDS, { required: true, affects: true, hint: "greeting: opens the free chat (one per teacher; the learner can start any number of them). reply: an answer. unprompted: opens a story thread when its trigger happens. sign_off: ends the thread." }),
+    txt("title", "Story title", { nullable: true, hint: `A story's first node only (unprompted needs one): the subject line of the thread in Chats, up to ${chatVocab().CHAT_TITLE_MAX} characters.` }),
+    txt("trigger", "Trigger", { nullable: true, hint: "Unprompted only, what unlocks the story: app_installed:<app id>, unit_complete:<unit id>, lessons_completed:<n>, level_reached:<n> or welcome_back. Each unlocks once; the learner can replay it." }),
+    area("text", "What the teacher says", 6, { required: true, hint: `Plain text, in the teacher's voice. A blank line starts a new bubble: a long message is several short ones (up to ${chatVocab().CHAT_LIMITS.parts}) that arrive one after another, each up to ${chatVocab().CHAT_LIMITS.text} characters. Nothing is filled in, so no {braces}.` }),
+    sel("pose", "Pose", chatVocab().poses, { hint: "Used when the teacher is drawn beside the message." }),
+    num("position", "Order within the teacher", { min: 0, step: 1 }),
+    chatReplies,
+  ],
+};
+
+// ---------------------------------------------------------------------------
+// scan targets (docs/PHONE_SPEC.md section 8): what the Atom Scanner can scan, its elements and its sources
+// ---------------------------------------------------------------------------
+
+const scanVocab = () => state.meta.scanVocab;
+
+const scanComposition = {
+  key: "composition",
+  label: "Made of (main elements first)",
+  type: "list",
+  itemName: "Element",
+  hint: "Which elements are present, never how much: no percentages. Each symbol must be on the periodic table.",
+  item: {
+    fields: () => [
+      txt("symbol", "Symbol", { required: true, hint: "e.g. Na" }),
+      txt("note", "Note", { nullable: true, hint: `Up to ${scanVocab().SCAN_LIMITS.note} characters, e.g. "in sugars". No amounts.` }),
+    ],
+  },
+  itemLabel: (r) => `${r.symbol ?? ""}${r.note ? ` · ${r.note}` : ""}`,
+  newItem: () => ({ symbol: "" }),
+  addLabel: "＋ Add element",
+};
+
+const SCAN_TARGETS = {
+  table: "scan_targets",
+  label: "Scan targets",
+  singular: "scan target",
+  group: "Phone",
+  icon: "🔬",
+  titleOf: (r) => r.name,
+  subOf: (r) => `${r.scene} · ${parse(r.composition, []).map((c) => c.symbol).join(" ")}`,
+  groupBy: (r) => r.scene,
+  sortBy: (r) => String(r.position).padStart(4, "0"),
+  newRow: () => ({ id: "", name: "", scene: "kitchen", object: "water", blurb: "", composition: [{ symbol: "" }], fun_fact: "", atomdex_entry_id: null, position: 0 }),
+  links: {
+    table: "scan_target_references",
+    column: "reference_id",
+    field: { type: "refs", kinds: "content_references", label: "Sources", hint: "At least one. Open each on Content references and mark it verified once you have checked it supports the claim; unverified sources block publishing." },
+  },
+  fields: (isNew) => [
+    idField(isNew, "e.g. scan-banana. Once published it can't be renamed."),
+    txt("name", "Name", { required: true, hint: `Up to ${scanVocab().SCAN_LIMITS.name} characters, e.g. "A banana".` }),
+    sel("scene", "Scene", scanVocab().SCAN_SCENES, { required: true, hint: "Where it stands. The scene's picture and the thing's place in it are code (scan-scenes.ts); a new target also needs a place there (test:scanner checks)." }),
+    sel("object", "Picture", scanVocab().artIds.map((id) => ({ value: id, label: `${id} · ${scanVocab().artNames[id] ?? ""}` })), { required: true, hint: "A picture from the lesson object art." }),
+    area("blurb", "One line under the name", 2, { required: true, hint: `Up to ${scanVocab().SCAN_LIMITS.blurb} characters.` }),
+    scanComposition,
+    area("fun_fact", "Fun fact", 3, { required: true, hint: `Up to ${scanVocab().SCAN_LIMITS.funFact} characters. Only what the sources support; no percentages.` }),
+    txt("atomdex_entry_id", "AtomDex entry", { nullable: true, suggest: { table: "encyclopedia_entries", column: "id" }, hint: "Optional: shows a See in AtomDex button. Leave empty when there is no matching entry." }),
+    num("position", "Order within the scene", { min: 0, step: 1 }),
+  ],
+};
+
+// ---------------------------------------------------------------------------
+// safety cards (docs/PHONE_SPEC.md section 5.9) and map sites (section 5.8): sourced, and every source checked by a person before publishing
+// ---------------------------------------------------------------------------
+
+const safetyVocab = () => state.meta.safetyVocab;
+const mapVocab = () => state.meta.mapVocab;
+
+const SOURCES_LINK = (table, column, hint) => ({ table, column, field: { type: "refs", kinds: "content_references", label: "Sources", hint } });
+
+const SAFETY_CARDS = {
+  table: "safety_cards",
+  label: "Safety cards",
+  singular: "safety card",
+  group: "Phone",
+  icon: "🛟",
+  titleOf: (r) => r.title,
+  subOf: (r) => `${r.section} · ${parse(r.steps, []).length} lines`,
+  groupBy: (r) => r.section,
+  sortBy: (r) => String(r.position).padStart(4, "0"),
+  newRow: () => ({ id: "", section: "basics", title: "", summary: "", steps: [""], icon: "ShieldTick", entry_id: null, position: 0 }),
+  links: SOURCES_LINK("safety_card_references", "reference_id", "At least one. This is safety advice: word every line from the source, then open it on Content references and mark it verified once you have checked it says so. Unverified sources block publishing."),
+  fields: (isNew) => [
+    idField(isNew, "e.g. safety-time-distance-shielding. Once published it can't be renamed."),
+    sel("section", "Section", safetyVocab().SAFETY_SECTIONS, { required: true, hint: "basics, happens (if something happens) or myths." }),
+    txt("title", "Title", { required: true, hint: `Up to ${safetyVocab().SAFETY_LIMITS.title} characters.` }),
+    txt("summary", "One line on the list", { required: true, hint: `Up to ${safetyVocab().SAFETY_LIMITS.summary} characters.` }),
+    { key: "steps", label: "Lines on the card", type: "strings", hint: `${safetyVocab().SAFETY_LIMITS.minSteps} to ${safetyVocab().SAFETY_LIMITS.steps} short lines, each up to ${safetyVocab().SAFETY_LIMITS.step} characters. Plain sentences that follow the source.` },
+    txt("icon", "Icon", { required: true, hint: "An icon name from the app's icon set, e.g. ShieldTick." }),
+    txt("entry_id", "AtomDex entry", { nullable: true, suggest: { table: "encyclopedia_entries", column: "id" }, hint: "Optional: shows a See in AtomDex button." }),
+    num("position", "Order within the section", { min: 0, step: 1 }),
+  ],
+};
+
+const MAP_SITES = {
+  table: "map_sites",
+  label: "Map sites",
+  singular: "map site",
+  group: "Phone",
+  icon: "🗺️",
+  titleOf: (r) => r.name,
+  subOf: (r) => `${r.kind} · ${r.place} · ${r.year}`,
+  groupBy: (r) => r.kind,
+  sortBy: (r) => String(r.position).padStart(4, "0"),
+  newRow: () => ({ id: "", name: "", place: "", kind: "history", year: "", lat: 0, lon: 0, blurb: "", fact: "", entry_id: null, position: 0 }),
+  links: SOURCES_LINK("map_site_references", "reference_id", "At least one. Open each on Content references and mark it verified once you have checked it supports the claim; unverified sources block publishing."),
+  fields: (isNew) => [
+    idField(isNew, "e.g. site-chernobyl. Once published it can't be renamed."),
+    txt("name", "Name", { required: true, hint: `Up to ${mapVocab().MAP_LIMITS.name} characters.` }),
+    txt("place", "Place", { required: true, hint: `City or region and country, up to ${mapVocab().MAP_LIMITS.place} characters.` }),
+    sel("kind", "Kind", mapVocab().MAP_KINDS, { required: true, hint: "Sets the pin's colour." }),
+    txt("year", "Year", { required: true, hint: `Text, up to ${mapVocab().MAP_LIMITS.year} characters, e.g. 1986 or 1938 to 1942.` }),
+    num("lat", "Latitude", { step: 0.01, hint: "Decimal degrees, -90 to 90 (south is negative)." }),
+    num("lon", "Longitude", { step: 0.01, hint: "Decimal degrees, -180 to 180 (west is negative)." }),
+    area("blurb", "One line under the name", 2, { required: true, hint: `Up to ${mapVocab().MAP_LIMITS.blurb} characters.` }),
+    area("fact", "Fact", 3, { required: true, hint: `Up to ${mapVocab().MAP_LIMITS.fact} characters. Only what the sources support; sober for accidents and the 1945 bombings, no graphic detail.` }),
+    txt("entry_id", "AtomDex entry", { nullable: true, suggest: { table: "encyclopedia_entries", column: "id" }, hint: "Optional: shows a See in AtomDex button." }),
+    num("position", "Order", { min: 0, step: 1 }),
+  ],
+};
+
+export const CHAT_TYPES = [CHAT_NODES, SCAN_TARGETS, SAFETY_CARDS, MAP_SITES];

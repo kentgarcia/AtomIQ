@@ -1,0 +1,77 @@
+{
+  "table": "scan_target_references",
+  "primaryKey": [
+    "target_id",
+    "reference_id"
+  ],
+  "rows": [
+    {
+      "target_id": "scan-air",
+      "reference_id": "ref-noaa-atmosphere"
+    },
+    {
+      "target_id": "scan-banana",
+      "reference_id": "ref-epa-radiation-sources"
+    },
+    {
+      "target_id": "scan-banana",
+      "reference_id": "ref-medlineplus-potassium"
+    },
+    {
+      "target_id": "scan-diamond",
+      "reference_id": "ref-openstax-chem-10-5"
+    },
+    {
+      "target_id": "scan-gold",
+      "reference_id": "ref-iupac-table"
+    },
+    {
+      "target_id": "scan-gold",
+      "reference_id": "ref-openstax-ap-elements"
+    },
+    {
+      "target_id": "scan-grass",
+      "reference_id": "ref-openstax-bio-photosynthesis"
+    },
+    {
+      "target_id": "scan-hair",
+      "reference_id": "ref-openstax-ap-hair"
+    },
+    {
+      "target_id": "scan-hair",
+      "reference_id": "ref-openstax-ap-organic"
+    },
+    {
+      "target_id": "scan-hand",
+      "reference_id": "ref-openstax-ap-elements"
+    },
+    {
+      "target_id": "scan-red-blood-cell",
+      "reference_id": "ref-openstax-ap-erythrocytes"
+    },
+    {
+      "target_id": "scan-red-blood-cell",
+      "reference_id": "ref-openstax-ap-organic"
+    },
+    {
+      "target_id": "scan-rice",
+      "reference_id": "ref-openstax-ap-elements"
+    },
+    {
+      "target_id": "scan-rice",
+      "reference_id": "ref-openstax-bio-carbs"
+    },
+    {
+      "target_id": "scan-salt",
+      "reference_id": "ref-openstax-chem-2-4"
+    },
+    {
+      "target_id": "scan-sun",
+      "reference_id": "ref-nasa-sun-facts"
+    },
+    {
+      "target_id": "scan-water",
+      "reference_id": "ref-openstax-chem-2-4"
+    }
+  ]
+}

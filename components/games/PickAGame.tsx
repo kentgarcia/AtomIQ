@@ -40,7 +40,7 @@ import { DURATION, EASE_DRAWER } from "@/theme/motion";
 /** Height of `ScreenHeader` below the status-bar inset (12 top + 50 row + 8 bottom + 2 border); only the first-frame estimate. */
 const HEADER_BELOW_INSET = 72;
 
-type DifficultyGame = "atom-maze" | "mythbuster" | "lab";
+type DifficultyGame = "mythbuster" | "lab";
 
 /** Picker ⇄ difficulty panel (docs/CONTINUITY_SPEC.md, C3). */
 const EXPAND = { duration: DURATION.expand - 50, easing: EASE_DRAWER };
@@ -90,7 +90,7 @@ const GAMES = [
         color: "#1CB0F6",
         delay: 100,
         icon: "Grid9",
-        route: "/explorer/atom-maze" as const,
+        route: "/explorer/story" as const,
     },
     {
         title: "Lab Experiment",
@@ -171,8 +171,8 @@ export function PickAGame() {
 
     // Every game opens the difficulty picker first.
     const handleSelect = (game: (typeof GAMES)[number], index: number) => {
-        // Atom Maze is story mode now: its level map opens instead of a difficulty picker
-        if (game.route === "/explorer/atom-maze") {
+        // Atom Maze is story mode: its level map opens instead of a difficulty picker
+        if (game.route === "/explorer/story") {
             impactLight();
             router.push("/explorer/story");
             return;
@@ -183,7 +183,7 @@ export function PickAGame() {
     const activeGameTitle =
         activeGame === null
             ? null
-            : GAMES.find((g) => g.route.endsWith(activeGame === "atom-maze" ? "atom-maze" : activeGame))?.title ?? null;
+            : GAMES.find((g) => g.route.endsWith(activeGame))?.title ?? null;
 
     // The instructions: they open on the game whose levels are showing (or the overview) and can switch to another game's
     const [guideVisible, setGuideVisible] = useState(false);

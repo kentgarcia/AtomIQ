@@ -101,22 +101,8 @@ export interface MultimediaPopUp {
 }
 
 // ============================================
-// ATOMMAZE BATTLE TYPES (Pokemon-Style)
+// QUESTION TYPES
 // ============================================
-
-export type MonsterElement = 'radiation' | 'nuclear' | 'atomic' | 'fusion' | 'fission' | 'plasma';
-
-export interface Monster {
-  id: string;
-  name: string;
-  element: MonsterElement;
-  maxHp: number;
-  attackPower: number; // Damage dealt to player on wrong answer
-  sprite: string; // Emoji or icon name for now
-  color: string; // Theme color for the monster
-  defeatMessage: string;
-  isBoss?: boolean;
-}
 
 export type QuestionType = 'quiz' | 'scramble';
 
@@ -135,34 +121,6 @@ export interface ScrambleQuestion {
 }
 
 export type BattleQuestion = QuizQuestion | ScrambleQuestion;
-
-export interface AtomMazeChallenge {
-  id: string;
-  title: string;
-  description: string;
-  theme: string; // e.g., "Nuclear Safety Adventure"
-  rooms: AtomMazeRoom[];
-  xpReward: number;
-  timeLimit?: number; // seconds
-  playerMaxHp: number; // Player's maximum HP for this maze
-  boss: Monster; // Final boss monster
-}
-
-export interface AtomMazeRoom {
-  id: string;
-  title: string;
-  description: string;
-  monster: Monster; // Monster to fight in this room
-  questions: BattleQuestion[]; // Multiple questions to defeat the monster
-  damagePerCorrect: number; // Damage dealt to monster per correct answer
-  explanation: string; // Shown after defeating the monster
-  nextRoomId?: string; // Path through the maze
-  alternativePathId?: string; // Branching paths
-  unlockCondition?: {
-    type: 'score_threshold' | 'time_limit';
-    value: number;
-  };
-}
 
 // ============================================
 // ENCYCLOPEDIA TYPES
@@ -202,7 +160,7 @@ export interface ExplorerProgress {
 
 export interface ExplorerSession {
   currentJourneyId?: string;
-  currentMode: 'journey' | 'encyclopedia' | 'maze';
+  currentMode: 'journey' | 'encyclopedia';
   searchQuery?: string;
   filters?: {
     category?: string;

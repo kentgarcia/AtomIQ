@@ -20,23 +20,27 @@ import { EAR_INNER_L, EAR_INNER_R, EAR_OUTER_L, EAR_OUTER_R, EAR_PIVOT_R, EYE_BO
 
 /* ------------------------------------------------------------------ */
 /* Palette: invariant character colours (registered in the theme       */
-/* exception register, EX-10). Fur matches brand orange 400 / 500.     */
+/* exception register, EX-10). The same flat Duolingo-guide colours    */
+/* the NPC teachers wear (`components/npc/npc-palette.ts`): Fox for    */
+/* the fur and the back of the ears and the tail, Cheetah for the tail tip,        */
+/* Flamingo inside the ears, Iguana and Blue Jay for the lab coat and  */
+/* the face colours of the guide. Flat #RRGGBB, no gradients.          */
 /* ------------------------------------------------------------------ */
 
 export const SHRODI_COLORS = {
-  fur: "#FB923C",
-  furShade: "#EA580C",
-  tailTip: "#FDBA74",
+  fur: "#FF9600", // Fox
+  furShade: "#FF9600", // the back of the ears and the base of the tail: the same Fox as the fur
+  tailTip: "#FFCE8E", // Cheetah
   muzzle: "#FFFFFF",
-  earInner: "#FF9E85",
-  coat: "#DCE8FF",
-  coatLight: "#F1F6FF",
-  coatShade: "#B7CCF2",
-  coatDetail: "#8FA8E6",
-  ink: "#3C3C3C",
-  nose: "#D9541E",
-  mouth: "#C8361C",
-  tongue: "#FF9A8B",
+  earInner: "#FFB2B2", // Flamingo
+  coat: "#DDF4FF", // Iguana
+  coatLight: "#F2FBFF",
+  coatShade: "#B8E4FA",
+  coatDetail: "#84D8FF", // Blue Jay
+  ink: "#3C3C3C", // the guide's pupil
+  nose: "#B03A3A", // the guide's mouth
+  mouth: "#B03A3A",
+  tongue: "#F15A5A", // the guide's tongue
   shine: "#FFFFFF",
 } as const;
 

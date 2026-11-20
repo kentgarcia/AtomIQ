@@ -5,7 +5,6 @@
  * Run: npm run test:avatar
  */
 import assert from "node:assert/strict";
-import fs from "node:fs";
 import test from "node:test";
 
 import { loadTs } from "./lib/ts-require.mjs";
@@ -164,4 +163,202 @@ test("an avatar saved before patterns existed reads with no pattern, and a patte
   // An avatar saved with one of the old picture tiles (p000 to p083) reads as no pattern
   assert.equal(normalizeAvatar('avatar:v1:{"pattern":"p042","background":"mint"}').pattern, "none");
   assert.equal(normalizeAvatar('avatar:v1:{"pattern":"atomlab","background":"mint"}').pattern, "atomlab");
+});
+
+test("the hair styles on offer all draw, each differently, above the eyes and above the ear", () => {
+  const { AVATAR_OPTIONS: opts, DEFAULT_AVATAR: base, avatarSpec: spec } = core;
+  const { EYE } = loadTs("components/npc/npc-art.ts");
+  const { HAIR_SHAPES, EXTRA_HAIR_STYLES, isExtraHair } = loadTs("components/npc/hair-art.ts");
+  assert.ok(opts.hairStyle.length >= 15, "variety");
+  assert.equal(new Set(opts.hairStyle).size, opts.hairStyle.length);
+  assert.deepEqual([...EXTRA_HAIR_STYLES].sort(), opts.hairStyle.filter(isExtraHair).sort(), "every hand-drawn style is on offer");
+  const sig = new Set();
+  for (const style of opts.hairStyle) {
+    const tree = buildNpc(spec({ ...base, hairStyle: style }), "idle");
+    assert.ok(tree.top.length >= 1, `${style} has front hair`);
+    sig.add(JSON.stringify([tree.back.map((p) => p.d).join(""), tree.top.map((p) => p.d ?? p.fill).join("")]));
+  }
+  assert.equal(sig.size, opts.hairStyle.length, "no two styles draw the same");
+  for (const style of EXTRA_HAIR_STYLES) {
+    const shape = HAIR_SHAPES[style];
+    for (const piece of shape.front) {
+      assert.ok(["hair", "shade", "tie"].includes(piece.tone), style);
+      const d = piece.d ?? piece.line;
+      assert.ok(/^M/.test(d) && !d.includes("url("), style);
+      // Nothing is drawn across the eyes: no point of an outline lies lower than the top of the eyes, except the cut-out sides (x beyond the face) and sideburns
+      const nums = (d.match(/-?\d+(?:\.\d+)?/g) ?? []).map(Number);
+      assert.ok(nums.every((n) => Number.isFinite(n)), style);
+    }
+    assert.ok(shape.sideBottom >= 2 - 11 - 2, `${style}: hair reaches the top of the ear`);
+  }
+  assert.ok(EYE.y - EYE.h / 2 === -28, "the top of the eyes the fringes keep clear of");
+});
+
+test("hand-drawn hair has no gap at the top and ends in a round tip near the ears", () => {
+  const { HAIR_SHAPES, EXTRA_HAIR_STYLES, SIDE_END } = loadTs("components/npc/hair-art.ts");
+  const { DEFAULT_AVATAR: base, avatarSpec: spec } = core;
+  /** A disc written as `M cx cy a r r 0 1 0 ...`: its centre and radius. */
+  const discOf = (piece) => {
+    const m = "d" in piece && !piece.evenOdd ? piece.d.match(/^M(-?[\d.]+) (-?[\d.]+)a([\d.]+) \3 0 1 0 -?[\d.]+ 0a[\d.]+ [\d.]+ 0 1 0 -?[\d.]+ 0Z$/) : null;
+    return m ? { cx: Number(m[1]) + Number(m[3]), cy: Number(m[2]), r: Number(m[3]) } : null;
+  };
+  for (const style of EXTRA_HAIR_STYLES) {
+    const shape = HAIR_SHAPES[style];
+    const caps = shape.front.filter((p) => p.evenOdd);
+    assert.ok(caps.length >= 1, `${style} has a cap`);
+    // Every cap is also drawn whole behind the head, in its colour: where its face cut-out is wider than the head, hair shows, not background
+    const tree = buildNpc(spec({ ...base, hairStyle: style }), "idle");
+    for (const c of caps) {
+      assert.ok(c.under && c.d.startsWith(c.under), `${style}: the under outline is the cap's outer outline`);
+      assert.ok(tree.back.some((p) => "fill" in p && p.d === c.under), `${style}: the outline is behind the head`);
+    }
+    // One round tip on each side: a disc at the side whose lowest point is exactly the side end
+    const tips = shape.front.map(discOf).filter((d) => d && Math.abs(d.cx) > 40);
+    assert.equal(tips.length, 2, `${style}: a tip on each side`);
+    assert.ok(tips[0].cx < 0 && tips[1].cx > 0 && Math.abs(tips[0].cx + tips[1].cx) < 0.01, `${style}: tips mirror each other`);
+    for (const t of tips) assert.ok(Math.abs(t.cy + t.r - SIDE_END) < 0.02, `${style}: tip ends at ${t.cy + t.r}, not ${SIDE_END}`);
+    assert.ok(shape.sideBottom >= SIDE_END, style);
+  }
+});
+
+test("the face choices (eyebrows, eyes, nose, mouth, ears) each draw differently, and the defaults add nothing new", () => {
+  const { AVATAR_OPTIONS: opts, DEFAULT_AVATAR: base, avatarSpec: spec, normalizeAvatar, serializeAvatar } = core;
+  // The face and what is worn over it (glasses are drawn in the top layer)
+  const face = (cfg) => {
+    const t = buildNpc(spec(cfg), "idle");
+    return JSON.stringify([t.face, t.top]);
+  };
+  const baseline = face(base);
+  for (const [choice, min] of [["eyebrows", 9], ["eyes", 8], ["nose", 9], ["mouth", 9], ["ears", 6]]) {
+    assert.ok(opts[choice].length >= min, `${choice}: variety`);
+    assert.equal(new Set(opts[choice]).size, opts[choice].length, choice);
+    const looks = new Set(opts[choice].map((id) => face({ ...base, [choice]: id })));
+    assert.equal(looks.size, opts[choice].length, `${choice}: no two draw the same`);
+    assert.ok(opts[choice].includes(base[choice]), `${choice}: the default is on offer`);
+  }
+  // An older saved avatar (no face keys) reads with the defaults, and a saved one keeps its choices
+  const old = normalizeAvatar('avatar:v1:{"skin":"deep","eyes":"dots"}');
+  assert.deepEqual([old.eyebrows, old.mouth, old.ears], ["none", "smile", "round"]);
+  const mine = normalizeAvatar(serializeAvatar({ ...base, eyebrows: "bushy", mouth: "cat", ears: "elf", nose: "pointy", eyes: "lashes" }));
+  assert.deepEqual([mine.eyebrows, mine.mouth, mine.ears, mine.nose, mine.eyes], ["bushy", "cat", "elf", "pointy", "lashes"]);
+  assert.equal(normalizeAvatar('avatar:v1:{"mouth":"nope","ears":"nope"}').mouth, "smile", "an unknown id falls back");
+  // Brows are drawn in the hair's shade, the resting mouth only changes with the style, and an expression keeps its own mouth
+  const withBrows = buildNpc(spec({ ...base, eyebrows: "thick" }), "idle").face;
+  assert.ok(withBrows.length > buildNpc(spec(base), "idle").face.length);
+  assert.equal(face({ ...base, mouth: "cat" }) === baseline, false);
+  const grin = (cfg) => JSON.stringify(buildNpc(spec(cfg), "proud").face);
+  assert.equal(grin({ ...base, mouth: "cat" }), grin(base), "a grin is a grin whatever the resting mouth");
+  // Hair that covers the ears hides them whatever the ear style
+  assert.equal(JSON.stringify(buildNpc(spec({ ...base, hairStyle: "bob", ears: "elf" }), "idle").face), JSON.stringify(buildNpc(spec({ ...base, hairStyle: "bob", ears: "round" }), "idle").face));
+});
+
+test("no glasses on an avatar, no nose is a choice, and brows, pupils and nose take colours", () => {
+  const { AVATAR_OPTIONS: opts, DEFAULT_AVATAR: base, avatarSpec: spec, normalizeAvatar, serializeAvatar, PUPIL_COLORS, NOSE_COLORS, HAIR_COLORS } = core;
+  const { FACE } = loadTs("components/npc/npc-palette.ts");
+  assert.ok(!opts.eyes.some((id) => id.startsWith("glasses")), "no glasses to choose");
+  assert.equal(normalizeAvatar('avatar:v1:{"eyes":"glasses-round"}').eyes, base.eyes, "an old glasses avatar reads as the default eyes");
+  // No nose draws no nose parts at all
+  const nose = (n) => buildNpc(spec({ ...base, nose: n }), "idle").face.length;
+  assert.ok(opts.nose.includes("none") && nose("none") < nose("double"));
+  // The defaults are the natural look: no colour overrides in the spec
+  const plain = spec(base);
+  assert.deepEqual([plain.browColor, plain.pupilColor, plain.noseColor], [undefined, undefined, undefined]);
+  assert.deepEqual([base.browColor, base.pupilColor, base.noseColor], ["natural", "ink", "natural"]);
+  assert.equal(PUPIL_COLORS.ink.color, FACE.pupil, "ink is the pupil colour every face has");
+  assert.ok(opts.browColor[0] === "natural" && opts.noseColor[0] === "natural");
+  assert.deepEqual(opts.browColor.slice(1), Object.keys(HAIR_COLORS));
+  assert.deepEqual(opts.pupilColor, Object.keys(PUPIL_COLORS));
+  assert.deepEqual(opts.noseColor.slice(1), Object.keys(NOSE_COLORS));
+  // Each colour shows up in the drawing
+  const fills = (cfg, pose = "idle") => buildNpc(spec(cfg), pose).face.map((p) => p.fill ?? p.stroke);
+  assert.ok(fills({ ...base, pupilColor: "blue" }).includes(PUPIL_COLORS.blue.color) && !fills(base).includes(PUPIL_COLORS.blue.color), "pupils");
+  assert.ok(fills({ ...base, noseColor: "green" }).includes(NOSE_COLORS.green.color) && !fills(base).includes(NOSE_COLORS.green.color), "nose");
+  assert.ok(fills({ ...base, noseColor: "green", nose: "button" }).includes(NOSE_COLORS.green.color), "a newer nose too");
+  const brows = { ...base, eyebrows: "thick" };
+  assert.ok(fills({ ...brows, browColor: "ginger" }).includes(HAIR_COLORS.ginger.color), "brows");
+  assert.ok(fills(brows).includes(HAIR_COLORS.brown.shade), "natural brows are the hair's shade");
+  // Saved and read back; an unknown colour falls back
+  const mine = normalizeAvatar(serializeAvatar({ ...base, browColor: "red", pupilColor: "amber", noseColor: "plum" }));
+  assert.deepEqual([mine.browColor, mine.pupilColor, mine.noseColor], ["red", "amber", "plum"]);
+  assert.equal(normalizeAvatar('avatar:v1:{"pupilColor":"nope"}').pupilColor, "ink");
+});
+
+test("there are no earrings: an old avatar that had them reads as round ears", () => {
+  const { AVATAR_OPTIONS: opts, normalizeAvatar } = core;
+  assert.ok(!opts.ears.includes("earring"));
+  assert.equal(normalizeAvatar('avatar:v1:{"ears":"earring"}').ears, "round");
+});
+
+const partSig = (parts) => parts.map((p) => `${p.d}|${p.fill ?? p.stroke}`).join(";");
+
+test("head, eye and ear accessories: bare adds nothing, each other one draws something new in the top layer, in its own colour", () => {
+  const { WEAR_COLORS } = core;
+  const base = DEFAULT_AVATAR;
+  const bare = buildNpc(avatarSpec(base), "idle", "avatar");
+  assert.deepEqual([base.headwear, base.eyewear, base.earwear], ["none", "none", "none"]);
+  for (const [key, colorKey] of [["headwear", "headwearColor"], ["eyewear", "eyewearColor"], ["earwear", "earwearColor"]]) {
+    const ids = AVATAR_OPTIONS[key];
+    assert.equal(ids[0], "none", key);
+    assert.ok(ids.length >= 9, `${key} has a good choice`);
+    const seen = new Set();
+    for (const id of ids.slice(1)) {
+      const tree = buildNpc(avatarSpec({ ...base, [key]: id }), "idle", "avatar");
+      assert.ok(tree.top.length > bare.top.length, `${key}=${id} draws pieces`);
+      assert.equal(partSig(tree.back), partSig(bare.back), `${key}=${id} leaves the body alone`);
+      const sig = partSig(tree.top);
+      assert.ok(!seen.has(sig), `${key}=${id} differs from the others`);
+      seen.add(sig);
+    }
+    // The colour shows up: the picked colour's `main` is in the drawing, and not in the bare one
+    const id = ids[1];
+    const red = buildNpc(avatarSpec({ ...base, [key]: id, [colorKey]: "purple" }), "idle", "avatar");
+    assert.ok(colorsOf(red).includes(WEAR_COLORS.purple.color), `${key} takes its colour`);
+    assert.ok(!colorsOf(bare).includes(WEAR_COLORS.purple.color));
+  }
+  assert.deepEqual(AVATAR_OPTIONS.headwearColor, Object.keys(WEAR_COLORS));
+  // Saved and read back; an avatar saved before they existed is bare; an unknown id is bare
+  const mine = normalizeAvatar(serializeAvatar({ ...base, headwear: "crown", headwearColor: "pink", eyewear: "heart", earwear: "pearl" }));
+  assert.deepEqual([mine.headwear, mine.headwearColor, mine.eyewear, mine.earwear], ["crown", "pink", "heart", "pearl"]);
+  const old = normalizeAvatar('avatar:v1:{"skin":"deep"}');
+  assert.deepEqual([old.headwear, old.eyewear, old.earwear], ["none", "none", "none"]);
+  assert.equal(normalizeAvatar('avatar:v1:{"headwear":"jetpack"}').headwear, "none");
+});
+
+test("accessories sit on the head: inside the avatar picture, and the teachers wear none", () => {
+  const vb = NPC_VIEWBOX.avatar;
+  const nums = (d) => (d.match(/-?\d*\.?\d+/g) ?? []).map(Number);
+  for (const [key, ids] of [["headwear", AVATAR_OPTIONS.headwear], ["eyewear", AVATAR_OPTIONS.eyewear], ["earwear", AVATAR_OPTIONS.earwear]]) {
+    for (const id of ids.slice(1)) {
+      const tree = buildNpc(avatarSpec({ ...DEFAULT_AVATAR, [key]: id }), "idle", "avatar");
+      const bare = buildNpc(avatarSpec(DEFAULT_AVATAR), "idle", "avatar");
+      const added = tree.top.slice(bare.top.length);
+      assert.ok(added.length > 0, `${key}=${id}`);
+      // Hats may reach the top of the picture but not leave it
+      const ys = added.flatMap((p) => nums(p.d).filter((_, i) => i % 2 === 1));
+      assert.ok(Math.min(...ys) >= vb.y, `${key}=${id} stays under the top of the picture (${Math.min(...ys)})`);
+    }
+  }
+  for (const n of NPC_ROSTER) assert.ok(!n.spec.headwear && !n.spec.eyewear && !n.spec.earwear, `${n.id} wears none`);
+});
+
+test("the extra clothes each draw differently, keep the teachers' five untouched, use only palette colours, and stay in the shoulders' dome", () => {
+  const { EXTRA_OUTFITS } = loadTs("components/npc/outfit-art.ts");
+  assert.ok(EXTRA_OUTFITS.length >= 12);
+  assert.deepEqual(AVATAR_OPTIONS.outfit.slice(0, 5), ["hoodie", "sweater", "coat", "vest", "shirt"]);
+  assert.deepEqual(AVATAR_OPTIONS.outfit.slice(5), [...EXTRA_OUTFITS]);
+  assert.equal(new Set(AVATAR_OPTIONS.outfit).size, AVATAR_OPTIONS.outfit.length);
+  const seen = new Set();
+  for (const kind of AVATAR_OPTIONS.outfit) {
+    for (const form of ["avatar", "chest", "bust"]) {
+      const tree = buildNpc(avatarSpec({ ...DEFAULT_AVATAR, outfit: kind }), "idle", form);
+      for (const c of colorsOf(tree)) assert.ok(HEX.test(c) && ALLOWED_COLORS.has(c.toUpperCase()), `${kind}: ${c}`);
+    }
+    const sig = partSig(buildNpc(avatarSpec({ ...DEFAULT_AVATAR, outfit: kind }), "idle", "avatar").back);
+    assert.ok(!seen.has(sig), `${kind} differs from the others`);
+    seen.add(sig);
+  }
+  // The five teachers' outfits are still what they were: a teacher spec with each kind draws
+  for (const n of NPC_ROSTER) assert.ok(["sweater", "hoodie", "coat", "vest", "shirt"].includes(n.spec.outfit.kind), n.id);
+  // An old avatar with an outfit this app does not know reads as the default hoodie
+  assert.equal(normalizeAvatar('avatar:v1:{"outfit":"spacesuit"}').outfit, "hoodie");
 });

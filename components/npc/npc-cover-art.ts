@@ -114,6 +114,8 @@ export const NPC_COVER_GLYPHS: Record<string, readonly GlyphId[]> = {
   "npc-kofi": ["gear", "tower", "bolt", "steam", "wrench", "gauge"],
   "npc-tess": ["sprout", "chip", "factory", "sparkle", "hospital", "phone"],
   "npc-sage": ["scale", "leaf", "people", "drum", "check", "loop"],
+  // Shrodi, the guide (not a row of npcs): his glasses, a spark of an idea and the atom he starts everyone on
+  shrodi: ["glasses", "atom", "sparkle", "question", "bolt", "orbit"],
 };
 
 /** Used for a teacher that has no set of their own, so a profile never has a bare banner. */

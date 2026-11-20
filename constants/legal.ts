@@ -4,8 +4,8 @@
  */
 
 /** Bump when either document changes in a way that matters, and move the date with it. */
-export const LEGAL_VERSION = "2.0";
-export const LEGAL_LAST_UPDATED = "November 19, 2026";
+export const LEGAL_VERSION = "2.5";
+export const LEGAL_LAST_UPDATED = "November 20, 2026";
 
 /**
  * Where people can reach the team about privacy and the terms. Set this to a monitored address

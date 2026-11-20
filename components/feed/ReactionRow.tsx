@@ -112,6 +112,7 @@ export const ReactionRow = memo(function ReactionRow({ target, summary, cast, co
       <Pressable
         onPress={() => {
           select();
+          void playSfx(pickerOpen ? "ui.panel-close" : "ui.panel-open");
           setPickerOpen((open) => !open);
         }}
         accessibilityRole="button"

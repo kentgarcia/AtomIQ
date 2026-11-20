@@ -15,7 +15,12 @@ export const useStreakCelebration = () => {
 
   useEffect(() => {
     if (!pendingStreakCelebration || !focused) return;
-    clearStreakCelebration();
-    router.push("/daily-streak");
+    // A moment after Home is in front: pushing a full-screen modal while another screen is still
+    // replacing itself (onboarding handing over, a lesson closing) can leave an invisible layer over the map.
+    const timer = setTimeout(() => {
+      clearStreakCelebration();
+      router.push("/daily-streak");
+    }, 700);
+    return () => clearTimeout(timer);
   }, [pendingStreakCelebration, focused, clearStreakCelebration, router]);
 };

@@ -20,13 +20,17 @@
  *   lids  the blink: skin over the eyes. Not part of the still drawing; the renderer fades it in.
  */
 
-import { FACE, MUTE_CLOTHES_STEP, MUTE_DARK, MUTE_LIGHT, MUTE_SEPARATION } from "./npc-palette.ts";
+import { MOUTHS, NOSES, browPieces, earPieces, type BrowStyle, type EarStyle, type FacePiece, type MouthStyle, type NoseStyle } from "./face-art.ts";
+import { EXTRA_OUTFIT_ART, isExtraOutfit, type ExtraOutfit, type OutfitTone } from "./outfit-art.ts";
+import { EARWEAR, EYEWEAR, HEADWEAR, type WearPiece, type WearTone } from "./wear-art.ts";
+import { HAIR_SHAPES, isExtraHair, type ExtraHairStyle, type HairPiece } from "./hair-art.ts";
+import { FACE, MUTE_CLOTHES_STEP, MUTE_DARK, MUTE_LIGHT, MUTE_SEPARATION, OFFICIAL } from "./npc-palette.ts";
 
 // ── spec ─────────────────────────────────────────────────────────────────────
 
-export type EyeStyle = "pill" | "round" | "glasses-round" | "glasses-square" | "dots";
-export type HairStyle = "bob" | "curls" | "crop" | "bun" | "wrap";
-export type OutfitKind = "sweater" | "hoodie" | "coat" | "vest" | "shirt";
+export type EyeStyle = "pill" | "round" | "glasses-round" | "glasses-square" | "dots" | "wide" | "sparkle" | "lashes" | "sleepy" | "arches";
+export type HairStyle = "bob" | "curls" | "crop" | "bun" | "wrap" | ExtraHairStyle;
+export type OutfitKind = "sweater" | "hoodie" | "coat" | "vest" | "shirt" | ExtraOutfit;
 export type PropKind = "none" | "marble" | "watch" | "clipboard" | "stethoscope" | "hardhat" | "vial" | "notebook";
 
 export type NpcSpec = {
@@ -35,8 +39,20 @@ export type NpcSpec = {
   /** 92 to 108 (variety). */
   headWidth: number;
   eyes: EyeStyle;
-  nose: "single" | "double";
+  nose: NoseStyle;
+  /** Optional face parts (the avatar sets them; the teachers keep the defaults: no brows, the resting smile, round ears). */
+  brows?: BrowStyle;
+  mouth?: MouthStyle;
+  ears?: EarStyle;
+  /** Optional colours (hex) the avatar sets: the brows (else the hair's shade), the pupils (else the face ink) and the nose (else the skin's feature colour). */
+  browColor?: string;
+  pupilColor?: string;
+  noseColor?: string;
   hair: { style: HairStyle; color: string; shade: string };
+  /** Worn on the head, over the eyes and on the ears (the avatar sets them, the teachers wear none): a style from `wear-art.ts` and its colour. */
+  headwear?: WearSpec;
+  eyewear?: WearSpec;
+  earwear?: WearSpec;
   facialHair?: "moustache" | "beard";
   outfit: { kind: OutfitKind; color: string; shade: string; /** shirt or inner colour (coat, vest, shirt) */ collar?: string };
   /** The prop and its colours. */
@@ -44,6 +60,9 @@ export type NpcSpec = {
   /** Set by `mutedSpec`: the face colours (pupil, mouth, tongue) are muted too. */
   muted?: boolean;
 };
+
+/** An accessory: the style id (a key of `HEADWEAR`, `EYEWEAR` or `EARWEAR`) and the colour of its `main` and `shade` pieces. */
+export type WearSpec = { style: string; color: string; shade: string };
 
 export type PoseId = "idle" | "greet" | "explain" | "point" | "think" | "proud" | "cheer" | "sorry";
 export const NPC_POSES: readonly PoseId[] = ["idle", "greet", "explain", "point", "think", "proud", "cheer", "sorry"];
@@ -92,6 +111,14 @@ export const NPC_VIEWBOX = {
    * is cut to the circle.
    */
   pop: { x: -100, y: -112, w: 200, h: 228 },
+  /** The face close up, for the shop tiles of eyebrows, eyes, nose, mouth and ears. */
+  face: { x: -68, y: -64, w: 136, h: 136 },
+  /** The ears and the side of the head, for the shop tiles of earrings and earmuffs. */
+  ears: { x: -80, y: -48, w: 160, h: 160 },
+  /** Neck, shoulders and the top of the arms, for the shop tiles of clothes. */
+  chest: { x: -84, y: 30, w: 168, h: 168 },
+  /** The `avatar` crop with more body under it (same width and scale), for the shop's big preview: it continues behind the panel, so when it squashes and bounces no cut-off shirt shows. */
+  preview: { x: -110, y: -112, w: 220, h: 280 },
 } as const;
 export type NpcForm = keyof typeof NPC_VIEWBOX;
 
@@ -235,7 +262,7 @@ export type Pal = {
 export function paletteOf(spec: NpcSpec): Pal {
   const o = spec.outfit;
   // A vest hangs over a shirt: the sleeves are the shirt's. Everything else has sleeves of its own colour.
-  const sleeve = o.kind === "vest" ? o.collar ?? FACE.teeth : o.color;
+  const sleeve = o.kind === "vest" || (isExtraOutfit(o.kind) && EXTRA_OUTFIT_ART[o.kind].sleeve === "collar") ? o.collar ?? FACE.teeth : o.color;
   return {
     skin: spec.skin.base, skinShade: spec.skin.shade, feature: spec.skin.feature,
     hair: spec.hair.color, hairShade: spec.hair.shade,
@@ -243,7 +270,7 @@ export function paletteOf(spec: NpcSpec): Pal {
     accent: spec.accent.color, accentShade: spec.accent.shade,
     glasses: spec.muted ? muteColor(FACE.pupil) : FACE.pupil,
     eyeWhite: FACE.eyeWhite,
-    pupil: spec.muted ? muteColor(FACE.pupil) : FACE.pupil,
+    pupil: spec.muted ? muteColor(spec.pupilColor ?? FACE.pupil) : (spec.pupilColor ?? FACE.pupil),
     mouth: spec.muted ? muteColor(FACE.mouth) : FACE.mouth,
     tongue: spec.muted ? muteColor(FACE.tongue) : FACE.tongue,
     teeth: FACE.teeth,
@@ -282,6 +309,11 @@ export function mutedSpec(spec: NpcSpec): NpcSpec {
     hair: { ...spec.hair, color: m(spec.hair.color), shade: m(spec.hair.shade) },
     outfit: { ...spec.outfit, color: m(spec.outfit.color, s), shade: m(spec.outfit.shade, s), collar: spec.outfit.collar ? m(spec.outfit.collar, s) : undefined },
     accent: { ...spec.accent, color: m(spec.accent.color), shade: m(spec.accent.shade) },
+    ...(spec.headwear ? { headwear: { ...spec.headwear, color: m(spec.headwear.color), shade: m(spec.headwear.shade) } } : {}),
+    ...(spec.eyewear ? { eyewear: { ...spec.eyewear, color: m(spec.eyewear.color), shade: m(spec.eyewear.shade) } } : {}),
+    ...(spec.earwear ? { earwear: { ...spec.earwear, color: m(spec.earwear.color), shade: m(spec.earwear.shade) } } : {}),
+    ...(spec.browColor ? { browColor: m(spec.browColor) } : {}),
+    ...(spec.noseColor ? { noseColor: m(spec.noseColor) } : {}),
   };
 }
 
@@ -298,21 +330,31 @@ function eyeParts(side: -1 | 1, e: Expression, p: Pal, style: EyeStyle, happy: b
   const kx = noseX + side * EYE.x;
   if (e.eyes === "closedHappy") return [lineOf(`M${kx - 11} ${cy + 5}Q${kx} ${cy - 10} ${kx + 11} ${cy + 5}`, p.feature, FEATURE_W)];
   const out: Part[] = [];
+  if (style === "arches") return [lineOf(`M${kx - 11} ${cy + 5}Q${kx} ${cy - 10} ${kx + 11} ${cy + 5}`, p.feature, FEATURE_W)];
   if (style === "dots") {
     out.push(fillOf(pill(cx + lx * 0.6, cy + 2 + ly * 0.6, 14, 22), p.pupil));
     out.push(fillOf(circle(cx + lx * 0.6 - 2, cy - 4 + ly * 0.6, 2.6), p.eyeWhite));
     return out;
   }
-  if (style === "round") {
-    out.push(fillOf(circle(cx, cy + 2, 18), p.eyeWhite));
-    out.push(fillOf(circle(cx - side * 2 + lx, cy - 3 + ly, 8), p.pupil));
+  if (style === "round" || style === "wide" || style === "sparkle") {
+    const R = style === "wide" ? 21 : 18;
+    const pr = style === "wide" ? 10.5 : style === "sparkle" ? 9.5 : 8;
+    out.push(fillOf(circle(cx, cy + 2, R), p.eyeWhite));
+    out.push(fillOf(circle(cx - side * 2 + lx, cy - 3 + ly, pr), p.pupil));
     out.push(fillOf(circle(cx - side * 2 + lx - 2.6, cy - 6 + ly, 2.6), p.eyeWhite));
+    if (style === "sparkle") out.push(fillOf(circle(cx - side * 2 + lx + 3.6, cy + 1.8 + ly, 1.5), p.eyeWhite));
   } else {
     out.push(fillOf(pill(cx, cy, EYE.w, EYE.h), p.eyeWhite));
     const top = cy - EYE.h / 2 + 7 + ly;
     const px = cx + lx - side * 2.5;
     out.push(fillOf(pill(px, top + EYE.ph / 2, EYE.pw, EYE.ph), p.pupil));
     out.push(fillOf(circle(px - EYE.pw * 0.22, top + EYE.shine + 1.6, EYE.shine), p.eyeWhite));
+    if (style === "lashes") {
+      for (const [x1, y1, x2, y2] of [[13, -14, 22, -19], [15, -7, 24.5, -9], [13, -21, 18.5, -29]] as const) out.push(lineOf(`M${f(cx + side * x1)} ${cy + y1}L${f(cx + side * x2)} ${cy + y2}`, p.feature, 3));
+    }
+    if (style === "sleepy") {
+      out.push(fillOf(`M${cx - 18} ${cy - 22}H${cx + 18}V${cy - 3}H${cx - 18}Z`, p.skin), lineOf(`M${cx - 15} ${cy - 3}H${cx + 15}`, p.feature, FEATURE_W));
+    }
   }
   const cut: { lid?: [number, number]; cheek?: [number, number] } = { ...(e.eyes === "worried" ? CUTS.worried : {}), ...(happy ? { cheek: [10, 15] as [number, number] } : {}) };
   const half = EYE.w / 2;
@@ -329,11 +371,20 @@ function eyeParts(side: -1 | 1, e: Expression, p: Pal, style: EyeStyle, happy: b
   return out;
 }
 
-function mouthParts(e: Expression, p: Pal, stroke: string): Part[] {
+/** A piece of the face (face-art.ts) in the palette's colour for its tone. */
+/** The brow and nose colours of a face: the avatar's own, or the hair's shade and the skin's feature colour. */
+type FaceColors = { brow: string; nose: string };
+
+function facePart(piece: FacePiece, p: Pal, stroke: string, cols: FaceColors = { brow: p.hairShade, nose: p.feature }): Part {
+  const color = { skin: p.skin, nose: cols.nose, feature: p.feature, stroke, mouth: p.mouth, teeth: p.teeth, tongue: p.tongue, brow: cols.brow }[piece.tone];
+  return "line" in piece ? lineOf(piece.line, color, piece.w ?? FEATURE_W) : fillOf(piece.d, color);
+}
+
+function mouthParts(e: Expression, p: Pal, stroke: string, style: MouthStyle = "smile"): Part[] {
   const out: Part[] = [];
   switch (e.mouth) {
     case "smile":
-      out.push(lineOf("M-8 28Q3 37 15 24", stroke, FEATURE_W));
+      out.push(...MOUTHS[style].map((piece) => facePart(piece, p, stroke)));
       break;
     case "grin":
       out.push(fillOf("M-13 24L17 18Q19 40 3 40Q-10 39 -13 24Z", p.teeth));
@@ -361,9 +412,12 @@ function mouthParts(e: Expression, p: Pal, stroke: string): Part[] {
 }
 
 function noseParts(spec: NpcSpec, p: Pal): Part[] {
+  const color = spec.noseColor ?? p.feature;
+  const own = NOSES[spec.nose];
+  if (own) return own.map((piece) => facePart(piece, p, p.feature, { brow: p.hairShade, nose: color }));
   return spec.nose === "single"
-    ? [fillOf(pill(2, -2, 8, 22), p.feature), fillOf(circle(2, 9, 6.5), p.feature)]
-    : [fillOf(pill(1, -3, 10, 22), p.feature), fillOf(rrect(-7, 4, 16, 10, 5), p.feature)];
+    ? [fillOf(pill(2, -2, 8, 22), color), fillOf(circle(2, 9, 6.5), color)]
+    : [fillOf(pill(1, -3, 10, 22), color), fillOf(rrect(-7, 4, 16, 10, 5), color)];
 }
 
 function headPath(spec: NpcSpec): string {
@@ -371,11 +425,15 @@ function headPath(spec: NpcSpec): string {
   return spec.head === "capsule" ? rrect(-w / 2, HEAD.top, w, HEAD.height, w / 2) : tomb(0, HEAD.top, w, HEAD.height, 26);
 }
 
-const hasEars = (spec: NpcSpec) => spec.hair.style !== "bob" && spec.hair.style !== "wrap";
+const hasEars = (spec: NpcSpec) => {
+  const style = spec.hair.style;
+  if (isExtraHair(style)) return HAIR_SHAPES[style].ears !== false;
+  return style !== "bob" && style !== "wrap";
+};
 
 function faceParts(spec: NpcSpec, e: Expression, p: Pal): Part[] {
   const out: Part[] = [];
-  if (hasEars(spec)) out.push(fillOf(circle(-spec.headWidth / 2, 2, 11), p.skin), fillOf(circle(spec.headWidth / 2, 2, 11), p.skin));
+  if (hasEars(spec)) for (const side of [-1, 1] as const) out.push(...earPieces(spec.ears ?? "round", spec.headWidth / 2, side).map((piece) => facePart(piece, p, p.feature)));
   out.push(fillOf(headPath(spec), p.skin));
   const glasses = spec.eyes === "glasses-round" || spec.eyes === "glasses-square";
   const style: EyeStyle = glasses ? "pill" : spec.eyes;
@@ -385,7 +443,8 @@ function faceParts(spec: NpcSpec, e: Expression, p: Pal): Part[] {
   out.push(...eyeParts(-1, e, p, style, happy, noseX), ...eyeParts(1, e, p, style, happy, noseX), ...noseParts(spec, p));
   if (spec.facialHair === "moustache") out.push(fillOf(pill(1, 18, 38, 11), p.hair));
   // On a beard the mouth is drawn in the skin tone, or it would vanish into the hair.
-  out.push(...mouthParts(e, p, spec.facialHair === "beard" ? p.skin : p.feature));
+  out.push(...mouthParts(e, p, spec.facialHair === "beard" ? p.skin : p.feature, spec.mouth));
+  out.push(...browPieces(spec.brows ?? "none").map((piece) => facePart(piece, p, p.feature, { brow: spec.browColor ?? p.hairShade, nose: p.feature })));
   return out;
 }
 
@@ -396,7 +455,7 @@ function lidParts(spec: NpcSpec, p: Pal): Part[] {
     const cx = side * EYE.x;
     const cy = EYE.y;
     if (spec.eyes === "dots") out.push(fillOf(pill(cx, cy + 2, 18, 26), p.skin));
-    else if (spec.eyes === "round") out.push(fillOf(circle(cx, cy + 2, 20), p.skin));
+    else if (spec.eyes === "round" || spec.eyes === "wide" || spec.eyes === "sparkle") out.push(fillOf(circle(cx, cy + 2, 20), p.skin));
     else out.push(fillOf(pill(cx, cy, EYE.w + 6, EYE.h + 6), p.skin));
     out.push(lineOf(`M${cx - 10} ${cy + 3}Q${cx} ${cy + 9} ${cx + 10} ${cy + 3}`, p.feature, FEATURE_W));
   }
@@ -412,8 +471,21 @@ const CURLS: [number, number, number][] = [
   [42, -60, 20],
 ];
 
+/** A hand-drawn piece (hair-art.ts) in the hair colour or its shade. */
+const hairPiece = (piece: HairPiece, p: Pal): Part => {
+  const color = piece.tone === "hair" ? p.hair : piece.tone === "tie" ? p.top : p.hairShade;
+  return "line" in piece ? lineOf(piece.line, color, piece.w) : fillOf(piece.d, color, piece.evenOdd);
+};
+
 function hairBack(spec: NpcSpec, p: Pal): Part[] {
-  return spec.hair.style === "bob" ? [fillOf(tomb(0, -80, 128, 146, 20), p.hair)] : [];
+  const style = spec.hair.style;
+  if (isExtraHair(style)) {
+    const shape = HAIR_SHAPES[style];
+    // Behind the head: each cap's whole outline in its colour, so no gap can show where its face cut-out is wider than the head
+    const unders = shape.front.flatMap((piece): Part[] => ("under" in piece && piece.under ? [fillOf(piece.under, piece.tone === "hair" ? p.hair : piece.tone === "tie" ? p.top : p.hairShade)] : []));
+    return [...(shape.back ?? []).map((piece) => hairPiece(piece, p)), ...unders];
+  }
+  return style === "bob" ? [fillOf(tomb(0, -80, 128, 146, 20), p.hair)] : [];
 }
 
 /** The fringe: an outer cap (top, height) with the face cut out of it. Its sides end at the top of the ear. */
@@ -422,11 +494,14 @@ const HAIR_WRAP = { top: -76, height: 66 } as const;
 
 /** Where the hair on the side of the head ends (y). The ear is centred at y 2, so its top is at -9: hair always reaches it. */
 export function hairSideBottom(style: HairStyle): number {
+  if (isExtraHair(style)) return HAIR_SHAPES[style].sideBottom;
   if (style === "bob") return -80 + 146;
   return style === "wrap" ? HAIR_WRAP.top + HAIR_WRAP.height : HAIR_BASE.top + HAIR_BASE.height;
 }
 
 function hairFront(spec: NpcSpec, p: Pal): Part[] {
+  const own = spec.hair.style;
+  if (isExtraHair(own)) return HAIR_SHAPES[own].front.map((piece) => hairPiece(piece, p));
   const base = fillOf(tomb(0, HAIR_BASE.top, 110, HAIR_BASE.height, 8) + topRound(-39, -42, 78, 32, 18), p.hair, true);
   switch (spec.hair.style) {
     case "bob":
@@ -461,6 +536,19 @@ function glassesParts(spec: NpcSpec, p: Pal): Part[] {
   return [];
 }
 
+/** The fixed colours of an accessory's own details (a gem, a pearl, a lens). */
+const WEAR_FIXED: Record<Exclude<WearTone, "main" | "shade">, string> = { white: FACE.eyeWhite, swan: OFFICIAL.swan, ink: FACE.pupil, gold: OFFICIAL.bee, red: OFFICIAL.cardinal, blue: OFFICIAL.macaw, green: OFFICIAL.featherGreen, pink: OFFICIAL.flamingo };
+
+function wearParts(table: Record<string, WearPiece[]>, wear: WearSpec | undefined, spec: NpcSpec): Part[] {
+  const pieces = wear ? table[wear.style] : undefined;
+  if (!wear || !pieces) return [];
+  const colorOf = (tone: WearTone) => {
+    const c = tone === "main" ? wear.color : tone === "shade" ? wear.shade : WEAR_FIXED[tone];
+    return spec.muted && tone !== "main" && tone !== "shade" ? muteColor(c) : c;
+  };
+  return pieces.map((piece): Part => ("line" in piece ? lineOf(piece.line, colorOf(piece.tone), piece.w) : fillOf(piece.d, colorOf(piece.tone), piece.evenOdd)));
+}
+
 function hatParts(spec: NpcSpec, p: Pal): Part[] {
   if (spec.accent.kind !== "hardhat") return [];
   return [
@@ -479,8 +567,27 @@ function neckParts(p: Pal): Part[] {
 
 function torsoParts(spec: NpcSpec, p: Pal, bottom: number = TORSO.bottom, bust = false): Part[] {
   const top = TORSO.top;
+  const bodyColor = isExtraOutfit(spec.outfit.kind) && EXTRA_OUTFIT_ART[spec.outfit.kind].body === "collar" ? p.collar : p.top;
   const body = (w: number, color: string) => fillOf(bust ? bustShirt(0, top, w, bottom, BUST_CORNER) : tomb(0, top, w, bottom - top, 30), color);
   const out: Part[] = [];
+  if (isExtraOutfit(spec.outfit.kind)) {
+    out.push(body(TORSO.width, bodyColor));
+    const outfitColor = (tone: OutfitTone) => {
+      switch (tone) {
+        case "main": return p.top;
+        case "shade": return p.topShade;
+        case "collar": return p.collar;
+        case "skin": return p.skin;
+        case "white": return FACE.eyeWhite;
+        case "swan": return OFFICIAL.swan;
+        case "gold": return OFFICIAL.bee;
+        case "red": return OFFICIAL.cardinal;
+        case "pink": return OFFICIAL.flamingo;
+      }
+    };
+    for (const piece of EXTRA_OUTFIT_ART[spec.outfit.kind].pieces) out.push("line" in piece ? lineOf(piece.line, outfitColor(piece.tone), piece.w) : fillOf(piece.d, outfitColor(piece.tone), piece.evenOdd));
+    return out;
+  }
   switch (spec.outfit.kind) {
     case "sweater":
       out.push(body(TORSO.width, p.top), fillOf(pill(0, 70, 40, 14), p.topShade));
@@ -695,7 +802,14 @@ export function buildNpc(spec: NpcSpec, pose: PoseId = "idle", form: NpcForm = "
   return {
     back,
     face: faceParts(spec, def.expression, p),
-    top: [...hairFront(spec, p), ...glassesParts(spec, p), ...hatParts(spec, p)],
+    top: [
+      ...hairFront(spec, p),
+      ...wearParts(EARWEAR, spec.earwear, spec),
+      ...glassesParts(spec, p),
+      ...wearParts(EYEWEAR, spec.eyewear, spec),
+      ...hatParts(spec, p),
+      ...wearParts(HEADWEAR, spec.headwear, spec),
+    ],
     front,
     lids: lidParts(spec, p),
     ...(bust ? { moods: BUST_MOODS.map((m) => ({ face: faceParts(spec, m.expression, p), from: m.from, to: m.to })) } : {}),

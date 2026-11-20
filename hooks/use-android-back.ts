@@ -6,15 +6,15 @@ import { usePathname, useRouter } from "expo-router";
  * Global Android hardware-back policy (Google Play readiness).
  *
  * iPhone has no system back button, so every hardware-back path was
- * untested. Only Atom Maze handled it (`app/explorer/atom-maze.tsx`).
+ * untested. Only the Atom Maze platformer handled it (`app/explorer/platformer.tsx`).
  * This hook owns the policy for every other route:
  *
  * - Tab roots / onboarding → double-tap-to-exit (first press toasts,
  *   second press within 2 s lets the OS exit). Prevents instant,
  *   accidental app exits.
  * - Active flows (lesson, quiz, mythbuster) → exit-confirmation dialog,
- *   mirroring the Atom Maze behavior. Prevents silent progress loss.
- * - Atom Maze → untouched; the screen's own handler decides.
+ *   mirroring the Atom Maze platformer's behavior. Prevents silent progress loss.
+ * - Atom Maze platformer → untouched; the screen's own handler decides.
  * - Everything else → system default (expo-router pops the stack).
  */
 
@@ -22,7 +22,7 @@ const TAB_ROOTS = new Set([
   "",
   "/",
   "/community",
-  "/chat",
+  "/phone",
   "/awards",
   "/profile",
   "/onboarding",
@@ -32,7 +32,7 @@ const TAB_ROOTS = new Set([
 const CONFIRM_PREFIXES = ["/lesson", "/quiz", "/mythbuster"];
 
 /** Routes with their own BackHandler (must not double-handle). */
-const OWN_HANDLER_PREFIXES = ["/explorer/atom-maze"];
+const OWN_HANDLER_PREFIXES = ["/explorer/platformer"];
 
 const DOUBLE_TAP_EXIT_MS = 2000;
 

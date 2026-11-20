@@ -183,7 +183,7 @@ export function TermText({ text, style }: { text: string; style?: StyleProp<Text
             key={i}
             style={styles.term}
             accessibilityRole="link"
-            accessibilityHint="Opens the encyclopedia entry"
+            accessibilityHint="Opens the AtomDex entry"
             onPress={() => router.push(`/explorer/encyclopedia-entry?id=${s.termId}`)}
           >
             {s.text}

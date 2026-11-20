@@ -9,7 +9,7 @@ import type { SfxCategory } from "./media-core.ts";
 
 export type { SfxCategory } from "./media-core.ts";
 
-export type SfxGroup = "ui" | "lesson" | "reward" | "social" | "game";
+export type SfxGroup = "ui" | "lesson" | "reward" | "social" | "game" | "phone";
 
 /** Every bundled file: its length in ms (checked against the WAV header by `check:sfx`). */
 export const SFX_FILES = {
@@ -32,6 +32,7 @@ export const SFX_FILES = {
   "lesson/blip": 77,
   "lesson/zoom-in": 520,
   "lesson/zoom-out": 526,
+  "lesson/node-zoom": 1075,
   "lesson/start": 956,
   "lesson/complete": 2381,
   "lesson/finish": 885,
@@ -45,7 +46,7 @@ export const SFX_FILES = {
   "reward/rank-up": 2500,
   "reward/achievement": 2115,
   "reward/requirements-met": 1764,
-  "reward/chest-open": 1673,
+  "reward/chest-open": 2000,
   "reward/purchase": 932,
   "reward/sparkle": 761,
   "social/message-send": 338,
@@ -89,6 +90,58 @@ export const SFX_FILES = {
   "game/checkpoint": 2000,
   "game/fireworks-launch": 2200,
   "game/fireworks-burst": 2600,
+  // docs/SFX_EXPANSION_SPEC.md: the second upload, chosen in the SFX lab
+  "ui/page-next": 72,
+  "ui/page-back": 69,
+  "ui/panel-open": 219,
+  "ui/panel-close": 73,
+  "ui/invalid": 46,
+  "ui/announce": 662,
+  "ui/delete": 586,
+  "ui/tab-right": 25,
+  "ui/equip-confirm": 651,
+  "ui/try-on": 24,
+  "ui/tab-left": 34,
+  "ui/swatch": 40,
+  "ui/geiger": 38,
+  "ui/go": 2003,
+  "ui/wipe": 2557,
+  "phone/start-1": 185,
+  "phone/start-2": 180,
+  "phone/start-3": 210,
+  "phone/app-open": 98,
+  "phone/app-close": 102,
+  "phone/wallpaper": 946,
+  "phone/typing": 20,
+  "phone/send": 70,
+  "phone/sticker": 533,
+  "phone/end": 1500,
+  "phone/archive": 321,
+  "phone/note-new": 82,
+  "phone/note-clip": 594,
+  "phone/shutter": 204,
+  "phone/photo-saved": 150,
+  "phone/camera-option": 26,
+  "phone/scan-lock": 67,
+  "phone/scan-miss": 24,
+  "phone/map-open": 365,
+  "phone/map-close": 262,
+  "phone/map-pin": 160,
+  "phone/map-limit": 11,
+  "phone/book": 121,
+  "reward/coin-tick": 28,
+  "reward/coin-land": 711,
+  "reward/count-up": 471,
+  "reward/stat-up": 770,
+  "reward/stat-down": 332,
+  "reward/podium": 533,
+  "reward/item-tick": 26,
+  "lesson/pick": 173,
+  "lesson/drop": 209,
+  "lesson/pair-ok": 185,
+  "lesson/lock-in": 72,
+  "game/get-ready": 624,
+  "game/timer-tick": 226,
 } as const;
 
 export type SfxFile = keyof typeof SFX_FILES;
@@ -143,6 +196,8 @@ export const CUES = {
   "lesson.bubble": cue("reward/pop", "voice", 0.5, 120, 1, 0.85),
   "lesson.zoom-in": cue("lesson/zoom-in", "feedback", 0.7, 150),
   "lesson.zoom-out": cue("lesson/zoom-out", "feedback", 0.6, 150),
+  // A node's bubble zooms into its preview (the Home map and the Atom Maze level map): a swoosh that lasts as long as the zoom
+  "lesson.node-zoom": cue("lesson/node-zoom", "feedback", 0.75, 300),
   "lesson.start": cue("lesson/start", "feedback", 0.8, 300),
   "lesson.complete": cue("lesson/complete", "stinger", 0.9, 500),
   "lesson.finish": cue("lesson/finish", "stinger", 0.85, 500),
@@ -216,6 +271,65 @@ export const CUES = {
   // Fireworks over the finished level: the launch whistle, then the burst
   "game.fireworks-launch": cue("game/fireworks-launch", "reward", 0.7, 500),
   "game.fireworks-burst": cue("game/fireworks-burst", "reward", 0.8, 500),
+  // The second upload (docs/SFX_EXPANSION_SPEC.md §5): the Phone and its apps, the shop, counts and ranks, lesson pieces, small games moments
+  "nav.page-next": cue("ui/page-next", "feedback", 0.6, 150, 1),
+  "nav.page-back": cue("ui/page-back", "feedback", 0.55, 150, 1),
+  "ui.panel-open": cue("ui/panel-open", "panel", 0.55, 120, 1),
+  "ui.panel-close": cue("ui/panel-close", "panel", 0.55, 120, 1),
+  "ui.invalid": cue("ui/invalid", "feedback", 0.6, 120, 1),
+  "ui.announce": cue("ui/announce", "feedback", 0.7, 300, 1),
+  "ui.delete": cue("ui/delete", "feedback", 0.7, 200, 1),
+  "ui.tab-right": cue("ui/tab-right", "feedback", 0.6, 60, 2),
+  "ui.tab-left": cue("ui/tab-left", "feedback", 0.6, 60, 2),
+  // Equip is pressed on something already owned (Closet_In); trying it on keeps ui.equip
+  "shop.equip-confirm": cue("ui/equip-confirm", "feedback", 0.7, 80, 1),
+  // An item is tried on in the shop (taking it off again keeps ui.unequip)
+  "shop.try": cue("ui/try-on", "feedback", 0.7, 80, 2),
+  "shop.swatch": cue("ui/swatch", "feedback", 0.6, 60, 2),
+  "lab.geiger": cue("ui/geiger", "feedback", 0.5, 30, 3),
+  "onboard.go": cue("ui/go", "feedback", 0.75, 500, 1),
+  "transition.wipe": cue("ui/wipe", "stinger", 0.6, 1000, 1),
+  "phone.start-1": cue("phone/start-1", "reward", 0.7, 800, 1),
+  "phone.start-2": cue("phone/start-2", "reward", 0.7, 100, 1),
+  "phone.start-3": cue("phone/start-3", "reward", 0.7, 100, 1),
+  "phone.app-open": cue("phone/app-open", "feedback", 0.6, 150, 1),
+  "phone.app-close": cue("phone/app-close", "feedback", 0.55, 150, 1),
+  "phone.wallpaper": cue("phone/wallpaper", "feedback", 0.6, 300, 1),
+  "chat.typing": cue("phone/typing", "voice", 0.4, 120, 1),
+  "chat.send": cue("phone/send", "feedback", 0.6, 150, 1),
+  "chat.sticker": cue("phone/sticker", "feedback", 0.65, 150, 1),
+  "chat.end": cue("phone/end", "feedback", 0.55, 500, 1),
+  "chat.archive": cue("phone/archive", "feedback", 0.6, 300, 1),
+  "notes.new": cue("phone/note-new", "feedback", 0.55, 200, 1),
+  "notes.clip": cue("phone/note-clip", "feedback", 0.7, 200, 1),
+  "camera.shutter": cue("phone/shutter", "feedback", 0.8, 400, 1),
+  "camera.saved": cue("phone/photo-saved", "feedback", 0.6, 400, 1),
+  "camera.option": cue("phone/camera-option", "feedback", 0.6, 80, 2),
+  // One rising sweep (the count-up file) as the scanner ring starts to fill
+  "scanner.scan": cue("reward/count-up", "feedback", 0.6, 500, 1),
+  "scanner.lock": cue("phone/scan-lock", "feedback", 0.65, 300, 1),
+  "scanner.miss": cue("phone/scan-miss", "feedback", 0.6, 300, 1),
+  "map.open": cue("phone/map-open", "feedback", 0.6, 500, 1),
+  "map.close": cue("phone/map-close", "feedback", 0.5, 500, 1),
+  "map.pin": cue("phone/map-pin", "feedback", 0.65, 100, 1),
+  "map.limit": cue("phone/map-limit", "feedback", 0.5, 200, 1),
+  "library.book": cue("phone/book", "feedback", 0.55, 200, 1),
+  "shop.coin-tick": cue("reward/coin-tick", "reward", 0.7, 45, 3),
+  "shop.coin-land": cue("reward/coin-land", "reward", 0.7, 300, 1),
+  "count.run": cue("reward/count-up", "reward", 0.55, 150, 1),
+  "rank.up": cue("reward/stat-up", "reward", 0.7, 500, 1),
+  "game.heart": cue("reward/stat-up", "reward", 0.7, 300, 1),
+  "rank.down": cue("reward/stat-down", "feedback", 0.55, 500, 1),
+  "rank.podium": cue("reward/podium", "reward", 0.65, 300, 2),
+  "levelup.item": cue("reward/item-tick", "reward", 0.55, 40, 3),
+  "lesson.pick": cue("lesson/pick", "feedback", 0.6, 60, 2),
+  "lesson.drop": cue("lesson/drop", "feedback", 0.6, 60, 2),
+  "lesson.pair-ok": cue("lesson/pair-ok", "feedback", 0.65, 100, 1),
+  "lesson.lock-in": cue("lesson/lock-in", "feedback", 0.7, 200, 1),
+  "game.get-ready": cue("game/get-ready", "feedback", 0.7, 500, 1),
+  "game.timer-tick": cue("game/timer-tick", "feedback", 0.6, 500, 1),
+  // Teachers' chat bubbles reuse the message-receive file, a third higher and shorter, so a letter of six bubbles is not long
+  "chat.incoming": cue("social/message-receive", "feedback", 0.6, 200, 1, 1.5),
 } as const satisfies Record<string, CueDef>;
 
 export type SfxCue = keyof typeof CUES;
@@ -231,6 +345,33 @@ export const filesOfGroup = (group: SfxGroup): SfxFile[] =>
 /** Biggest pool any cue asks for on a file. */
 export const poolSizeOf = (file: SfxFile): number =>
   Math.max(1, ...CUE_IDS.filter((id) => CUES[id].file === file).map((id) => CUES[id].pool));
+
+/** What `pickSlot` needs to know of a player. */
+export interface SlotState {
+  fresh: boolean;
+  rewound: boolean;
+  /** Reserved by a play until this time (ms). */
+  busyUntil: number;
+}
+
+/**
+ * Which player of a file's pool the next play takes: a free one that is already at the start, any free one,
+ * a new one while the pool may still grow, else the one that has been reserved the longest (that play is cut off).
+ * A player reserved by a play that has not started yet is never given to a second play.
+ */
+export const pickSlot = (slots: readonly SlotState[], poolSize: number, now: number): number | "new" => {
+  let free = -1;
+  for (let i = 0; i < slots.length; i += 1) {
+    if (now < slots[i].busyUntil) continue;
+    if (slots[i].fresh || slots[i].rewound) return i;
+    if (free < 0) free = i;
+  }
+  if (free >= 0) return free;
+  if (slots.length < poolSize) return "new";
+  let oldest = 0;
+  for (let i = 1; i < slots.length; i += 1) if (slots[i].busyUntil < slots[oldest].busyUntil) oldest = i;
+  return oldest;
+};
 
 /* ------------------------------------------------------------------ */
 /* Pitch ladders (§7.5)                                                */

@@ -7,6 +7,7 @@ import { getMythById } from '@/content/myths';
 import type { Myth } from '@/content/types';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
+import { playSfx } from '@/services/sfx';
 import React, { useEffect, useMemo, useState } from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
@@ -195,6 +196,7 @@ export default function JourneyNodeScreen() {
             <TouchableOpacity
               style={styles.navButton}
               onPress={() => {
+                void playSfx('nav.page-back');
                 const prevNode = journey.nodes[node.position - 1];
                 router.replace(`/explorer/journey-node?journeyId=${journeyId}&nodeId=${prevNode.id}`);
               }}
@@ -208,6 +210,7 @@ export default function JourneyNodeScreen() {
             <TouchableOpacity
               style={[styles.navButton, styles.navButtonPrimary]}
               onPress={() => {
+                void playSfx('nav.page-next');
                 const nextNode = journey.nodes[node.position + 1];
                 router.replace(`/explorer/journey-node?journeyId=${journeyId}&nodeId=${nextNode.id}`);
               }}

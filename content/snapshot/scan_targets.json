@@ -1,0 +1,282 @@
+{
+  "table": "scan_targets",
+  "primaryKey": [
+    "id"
+  ],
+  "rows": [
+    {
+      "id": "scan-air",
+      "name": "Air",
+      "scene": "outside",
+      "object": "air",
+      "blurb": "Invisible, but made of atoms and molecules.",
+      "composition": [
+        {
+          "symbol": "N",
+          "note": "by far the most common gas"
+        },
+        {
+          "symbol": "O",
+          "note": "the gas you breathe"
+        },
+        {
+          "symbol": "Ar",
+          "note": "a noble gas"
+        },
+        {
+          "symbol": "C",
+          "note": "in carbon dioxide"
+        }
+      ],
+      "fun_fact": "Most of the air is nitrogen, not oxygen. Nitrogen also dilutes oxygen, which slows burning.",
+      "atomdex_entry_id": null,
+      "position": 2
+    },
+    {
+      "id": "scan-banana",
+      "name": "A banana",
+      "scene": "kitchen",
+      "object": "banana",
+      "blurb": "Sweet, soft and a good source of potassium.",
+      "composition": [
+        {
+          "symbol": "O"
+        },
+        {
+          "symbol": "C",
+          "note": "in sugars and starch"
+        },
+        {
+          "symbol": "H"
+        },
+        {
+          "symbol": "K",
+          "note": "a mineral found in many foods"
+        }
+      ],
+      "fun_fact": "A tiny part of all natural potassium is radioactive potassium-40, so food with potassium holds a trace of it. So does your own body.",
+      "atomdex_entry_id": "potassium-40",
+      "position": 2
+    },
+    {
+      "id": "scan-diamond",
+      "name": "A diamond",
+      "scene": "treasure",
+      "object": "diamond",
+      "blurb": "A crystal made of carbon atoms.",
+      "composition": [
+        {
+          "symbol": "C",
+          "note": "the only element in a diamond"
+        }
+      ],
+      "fun_fact": "In a diamond, every carbon atom is bonded to its neighbours in one giant network. Chemists call that a covalent network solid.",
+      "atomdex_entry_id": null,
+      "position": 1
+    },
+    {
+      "id": "scan-gold",
+      "name": "A gold bar",
+      "scene": "treasure",
+      "object": "gold",
+      "blurb": "Pure gold is just one kind of atom.",
+      "composition": [
+        {
+          "symbol": "Au",
+          "note": "the only element in pure gold"
+        }
+      ],
+      "fun_fact": "Gold is an element, so it cannot be broken down into anything simpler. A bar of pure gold holds nothing but gold atoms.",
+      "atomdex_entry_id": "element",
+      "position": 0
+    },
+    {
+      "id": "scan-grass",
+      "name": "A blade of grass",
+      "scene": "outside",
+      "object": "grass",
+      "blurb": "Grass makes its own food from sunlight, air and water.",
+      "composition": [
+        {
+          "symbol": "O",
+          "note": "from water and carbon dioxide"
+        },
+        {
+          "symbol": "C",
+          "note": "from carbon dioxide in the air"
+        },
+        {
+          "symbol": "H",
+          "note": "from water"
+        }
+      ],
+      "fun_fact": "A plant builds sugar out of carbon dioxide and water. Much of the carbon in a blade of grass was once part of the air.",
+      "atomdex_entry_id": null,
+      "position": 0
+    },
+    {
+      "id": "scan-hair",
+      "name": "A strand of hair",
+      "scene": "body",
+      "object": "hair",
+      "blurb": "Hair is a filament of keratin, a protein.",
+      "composition": [
+        {
+          "symbol": "C"
+        },
+        {
+          "symbol": "O"
+        },
+        {
+          "symbol": "N",
+          "note": "in every protein"
+        },
+        {
+          "symbol": "H"
+        },
+        {
+          "symbol": "S",
+          "note": "found in many proteins"
+        }
+      ],
+      "fun_fact": "Every protein contains nitrogen, and many contain sulfur, together with carbon, hydrogen and oxygen. Keratin is a protein.",
+      "atomdex_entry_id": null,
+      "position": 1
+    },
+    {
+      "id": "scan-hand",
+      "name": "Your hand",
+      "scene": "body",
+      "object": "hand",
+      "blurb": "Your body is made of the same elements as everything else.",
+      "composition": [
+        {
+          "symbol": "O"
+        },
+        {
+          "symbol": "C"
+        },
+        {
+          "symbol": "H"
+        },
+        {
+          "symbol": "N"
+        }
+      ],
+      "fun_fact": "Oxygen, carbon, hydrogen and nitrogen are the four most abundant elements in the human body.",
+      "atomdex_entry_id": "element",
+      "position": 0
+    },
+    {
+      "id": "scan-red-blood-cell",
+      "name": "A red blood cell",
+      "scene": "body",
+      "object": "rbc",
+      "blurb": "A cell that carries oxygen around your body.",
+      "composition": [
+        {
+          "symbol": "O",
+          "note": "the gas it carries"
+        },
+        {
+          "symbol": "C"
+        },
+        {
+          "symbol": "H"
+        },
+        {
+          "symbol": "N"
+        },
+        {
+          "symbol": "Fe",
+          "note": "in hemoglobin"
+        }
+      ],
+      "fun_fact": "Hemoglobin, the molecule that carries oxygen in your blood, is made of proteins and iron.",
+      "atomdex_entry_id": null,
+      "position": 2
+    },
+    {
+      "id": "scan-rice",
+      "name": "A grain of rice",
+      "scene": "kitchen",
+      "object": "rice",
+      "blurb": "Mostly starch, a long chain of sugar molecules.",
+      "composition": [
+        {
+          "symbol": "O"
+        },
+        {
+          "symbol": "C",
+          "note": "in the sugar chains of starch"
+        },
+        {
+          "symbol": "H"
+        }
+      ],
+      "fun_fact": "Glucose, a sugar your body uses for fuel, is made of just carbon, hydrogen and oxygen. Starch is glucose joined in long chains.",
+      "atomdex_entry_id": null,
+      "position": 3
+    },
+    {
+      "id": "scan-salt",
+      "name": "Table salt",
+      "scene": "kitchen",
+      "object": "salt",
+      "blurb": "A shake of salt from the kitchen.",
+      "composition": [
+        {
+          "symbol": "Na",
+          "note": "joined to chlorine as ions"
+        },
+        {
+          "symbol": "Cl",
+          "note": "joined to sodium as ions"
+        }
+      ],
+      "fun_fact": "Sodium and chlorine can react to form table salt. Joined together they are nothing like what they were on their own.",
+      "atomdex_entry_id": "ion",
+      "position": 1
+    },
+    {
+      "id": "scan-sun",
+      "name": "The Sun",
+      "scene": "outside",
+      "object": "sun",
+      "blurb": "A hot, glowing ball of gas: our nearest star.",
+      "composition": [
+        {
+          "symbol": "H",
+          "note": "fused into helium in the core"
+        },
+        {
+          "symbol": "He",
+          "note": "made from hydrogen in the core"
+        }
+      ],
+      "fun_fact": "In the Sun's core, hydrogen is fused into helium. Those nuclear reactions power its heat and light.",
+      "atomdex_entry_id": "nuclear-fusion",
+      "position": 1
+    },
+    {
+      "id": "scan-water",
+      "name": "A glass of water",
+      "scene": "kitchen",
+      "object": "water",
+      "blurb": "Every drop is made of the same tiny molecules.",
+      "composition": [
+        {
+          "symbol": "H",
+          "note": "two atoms in each molecule"
+        },
+        {
+          "symbol": "O",
+          "note": "one atom in each molecule"
+        }
+      ],
+      "fun_fact": "Water is always two hydrogen atoms for every oxygen atom, in a glass, a lake or a cloud.",
+      "atomdex_entry_id": null,
+      "position": 0
+    }
+  ]
+}

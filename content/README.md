@@ -6,7 +6,7 @@ Source-of-truth content shipped inside the app.
 content/
 ├── database/
 │   └── content.db      ← master SQLite database (edit via `npm run content-studio`)
-├── explorer/           # journeys, encyclopedia images, maze helpers
+├── explorer/           # journeys, encyclopedia images
 ├── curriculum/         # units, path nodes, lessons, cards, item bank: types,
 │                       #   hydration, answer evaluation (framework-free, tested)
 ├── myths/              # facade over the myths table

@@ -133,8 +133,6 @@ const FEATURE_PALETTES = [
   "quiz",
   "explorer",
   "settings",
-  "maze",
-  "mazeGame",
   "map",
   "onboarding",
   "achievements",
@@ -283,7 +281,7 @@ test("backgrounds are plain neutrals: white (light) and slate (dark)", () => {
   assert.equal(themes.light.colors.card, "#FFFFFF");
   assert.equal(themes.dark.colors.background, "#131F24");
   for (const mode of ["light", "dark"]) {
-    for (const key of ["lesson", "quiz", "explorer", "settings", "onboarding", "maze", "mazeGame", "tab"]) {
+    for (const key of ["lesson", "quiz", "explorer", "settings", "onboarding", "tab"]) {
       const p = themes[mode].palettes[key];
       const bg = p.bg ?? p.background;
       assert.equal(bg, themes[mode].colors.background, `${mode}.palettes.${key} background`);

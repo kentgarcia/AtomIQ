@@ -50,7 +50,7 @@ export function QuestionFlow({
         <OnboardingBar
           progress={stepProgress(step)}
           onBack={() => {
-            void playSfx("ui.tab");
+            void playSfx("nav.page-back");
             onBack();
           }}
         />
@@ -71,7 +71,7 @@ export function QuestionFlow({
         <ContinueFooter
           disabled={picked === null}
           onPress={() => {
-            void playSfx("lesson.whoosh");
+            void playSfx("nav.page-next");
             onContinue();
           }}
         />

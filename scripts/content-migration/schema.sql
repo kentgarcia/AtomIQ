@@ -2,10 +2,8 @@
 -- AtomIQ content database schema
 --
 -- Stores the curriculum (units, objectives, lessons made of cards, the item bank
--- and references; see "Curriculum v2" below), the standalone Mythbuster question banks used by the atom-maze boss
--- battles, the Myths and Facts reference resources, the Atom Maze challenges
--- (with nested Rooms and JSON-encoded Monsters + BattleQuestions) and the
--- Encyclopedia entries (with JSON-encoded flexible fields).
+-- and references; see "Curriculum v2" below), the standalone Mythbuster question banks, the Myths and Facts
+-- reference resources and the Encyclopedia entries (with JSON-encoded flexible fields).
 --
 -- JSON1 functions are used for validation (json_valid) and optional
 -- querying. better-sqlite3 bundles a JSON1-enabled SQLite build.
@@ -255,8 +253,99 @@ CREATE INDEX IF NOT EXISTS idx_blog_comments_blog ON blog_comments(blog_id);
 CREATE INDEX IF NOT EXISTS idx_blog_posts_unit    ON blog_posts(unit_id);
 -- END feed
 
+-- BEGIN phone
+-- NPC chats on the phone (docs/PHONE_SPEC.md §5.2 and §7.1). Values only; the vocabulary (kinds, triggers, actions)
+-- is scripts/lib/chat-vocab.mjs, enforced by scripts/lib/chat-rules.mjs on validate:content and on Studio saves.
+-- Shrodi's thread is the Guide engine and has no rows here.
+CREATE TABLE IF NOT EXISTS chat_nodes (
+  id          TEXT PRIMARY KEY,              -- 'chat-ada-greeting' (shipped id once published)
+  npc_id      TEXT NOT NULL,                 -- a teacher (npcs.id) or "shrodi", the mascot, who is not in npcs
+  kind        TEXT NOT NULL CHECK (kind IN ('greeting','reply','unprompted','sign_off')),
+  trigger     TEXT,                          -- unprompted only: what unlocks the story (see chat-vocab.mjs)
+  title       TEXT,                          -- a story's first node (greeting, unprompted): the thread's subject line
+  text        TEXT NOT NULL,                 -- plain text, what the teacher says
+  pose        TEXT NOT NULL DEFAULT 'idle',  -- one of NPC_POSES
+  replies     TEXT NOT NULL DEFAULT '[]' CHECK (json_valid(replies)),  -- [{ "label", "type"?: text|emoji|react, "next"?: node id, "action"?: {screen, id?} }]
+  position    INTEGER NOT NULL,
+  created_at  INTEGER NOT NULL DEFAULT (strftime('%s','now')),
+  updated_at  INTEGER NOT NULL DEFAULT (strftime('%s','now'))
+);
+CREATE INDEX IF NOT EXISTS idx_chat_nodes_npc ON chat_nodes(npc_id);
+
+-- Atom Scanner targets (docs/PHONE_SPEC.md section 8 and 7.1): what the learner can scan, which elements are in it
+-- and where that is sourced. The drawn scenes and where each target sits in them are code (components/scanner/
+-- scan-scenes.ts); a test requires every row to have a place and every place a row. Vocabulary and rules:
+-- scripts/lib/scan-vocab.mjs and scan-rules.mjs.
+CREATE TABLE IF NOT EXISTS scan_targets (
+  id               TEXT PRIMARY KEY,         -- 'scan-banana' (shipped id once published)
+  name             TEXT NOT NULL,
+  scene            TEXT NOT NULL,            -- one of SCAN_SCENES
+  object           TEXT NOT NULL,            -- a lesson object picture id (object-art.ts)
+  blurb            TEXT NOT NULL,            -- one line under the name
+  composition      TEXT NOT NULL CHECK (json_valid(composition)),  -- [{ "symbol": "K", "note"?: "..." }], main elements first, no amounts
+  fun_fact         TEXT NOT NULL,
+  atomdex_entry_id TEXT REFERENCES encyclopedia_entries(id),
+  position         INTEGER NOT NULL,
+  created_at       INTEGER NOT NULL DEFAULT (strftime('%s','now')),
+  updated_at       INTEGER NOT NULL DEFAULT (strftime('%s','now'))
+);
+
+CREATE TABLE IF NOT EXISTS scan_target_references (   -- same idea as blog_references: the sources a target stands on
+  target_id    TEXT NOT NULL REFERENCES scan_targets(id) ON DELETE CASCADE,
+  reference_id TEXT NOT NULL REFERENCES content_references(id),
+  PRIMARY KEY (target_id, reference_id)
+);
+CREATE INDEX IF NOT EXISTS idx_scan_targets_scene ON scan_targets(scene);
+
+-- Safety Guide (docs/PHONE_SPEC.md section 5.9): calm, sourced reference cards on radiation safety. Section names and limits:
+-- scripts/lib/safety-vocab.mjs; rules: safety-rules.mjs (a card needs a source, and every source is checked by a person before publishing).
+CREATE TABLE IF NOT EXISTS safety_cards (
+  id         TEXT PRIMARY KEY,                -- 'safety-time-distance-shielding' (shipped id once published)
+  section    TEXT NOT NULL,                   -- one of SAFETY_SECTIONS
+  title      TEXT NOT NULL,
+  summary    TEXT NOT NULL,                   -- one line on the list
+  steps      TEXT NOT NULL CHECK (json_valid(steps)),  -- ["short line", ...], 2 to 5
+  icon       TEXT NOT NULL,                   -- an Icon name (components/ui/icon.tsx)
+  entry_id   TEXT REFERENCES encyclopedia_entries(id),
+  position   INTEGER NOT NULL,
+  created_at INTEGER NOT NULL DEFAULT (strftime('%s','now')),
+  updated_at INTEGER NOT NULL DEFAULT (strftime('%s','now'))
+);
+
+CREATE TABLE IF NOT EXISTS safety_card_references (   -- the sources a card stands on
+  card_id      TEXT NOT NULL REFERENCES safety_cards(id) ON DELETE CASCADE,
+  reference_id TEXT NOT NULL REFERENCES content_references(id),
+  PRIMARY KEY (card_id, reference_id)
+);
+CREATE INDEX IF NOT EXISTS idx_safety_cards_section ON safety_cards(section);
+
+-- Nuclear Map (docs/PHONE_SPEC.md section 5.8): places that matter in nuclear science, as pins on a flat world map (components/map/world-art.ts).
+-- Kinds and limits: scripts/lib/map-vocab.mjs; rules: map-rules.mjs.
+CREATE TABLE IF NOT EXISTS map_sites (
+  id         TEXT PRIMARY KEY,                -- 'site-chernobyl' (shipped id once published)
+  name       TEXT NOT NULL,
+  place      TEXT NOT NULL,                   -- 'Pripyat, Ukraine'
+  kind       TEXT NOT NULL,                   -- one of MAP_KINDS
+  year       TEXT NOT NULL,                   -- text: '1986', '1938 to 1942'
+  lat        REAL NOT NULL,
+  lon        REAL NOT NULL,
+  blurb      TEXT NOT NULL,                   -- one line under the name
+  fact       TEXT NOT NULL,                   -- one or two sentences on the card
+  entry_id   TEXT REFERENCES encyclopedia_entries(id),
+  position   INTEGER NOT NULL,
+  created_at INTEGER NOT NULL DEFAULT (strftime('%s','now')),
+  updated_at INTEGER NOT NULL DEFAULT (strftime('%s','now'))
+);
+
+CREATE TABLE IF NOT EXISTS map_site_references (   -- the sources a site stands on
+  site_id      TEXT NOT NULL REFERENCES map_sites(id) ON DELETE CASCADE,
+  reference_id TEXT NOT NULL REFERENCES content_references(id),
+  PRIMARY KEY (site_id, reference_id)
+);
+-- END phone
+
 -- ----------------------------------------------------------------------------
--- Mythbuster question banks (standalone pools used by the atom-maze boss)
+-- Mythbuster question banks (standalone pools)
 -- ----------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS mythbuster_questions (
   id            TEXT PRIMARY KEY,            -- e.g. 'mb-easy-q1'
@@ -307,48 +396,6 @@ CREATE TABLE IF NOT EXISTS myths (
 -- remains as a legacy (empty) JSON array.
 
 -- ----------------------------------------------------------------------------
--- Atom Mazes (Pokemon-style challenge levels)
--- ----------------------------------------------------------------------------
-CREATE TABLE IF NOT EXISTS mazes (
-  id              TEXT PRIMARY KEY,                -- maze.id (e.g. 'safety-maze')
-  title           TEXT NOT NULL,
-  description     TEXT NOT NULL,
-  theme           TEXT NOT NULL DEFAULT '',        -- maze.theme
-  xp_reward       INTEGER NOT NULL DEFAULT 0,
-  time_limit      INTEGER,                         -- seconds; nullable
-  player_max_hp   INTEGER NOT NULL DEFAULT 100,    -- player HP for this maze
-  boss            TEXT NOT NULL DEFAULT '{}'       -- JSON Monster object (final boss)
-                  CONSTRAINT mazes_boss_json CHECK (json_valid(boss)),
-  created_at      INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
-  updated_at      INTEGER NOT NULL DEFAULT (strftime('%s', 'now'))
-);
-
--- ----------------------------------------------------------------------------
--- Maze rooms (nested children of mazes)
--- ----------------------------------------------------------------------------
-CREATE TABLE IF NOT EXISTS maze_rooms (
-  maze_id           TEXT NOT NULL REFERENCES mazes(id) ON DELETE CASCADE,
-  id                TEXT NOT NULL,                 -- room.id (unique within its maze)
-  position          INTEGER NOT NULL CHECK (position >= 0),   -- 0-based order within the maze
-  title             TEXT NOT NULL,
-  description       TEXT NOT NULL,
-  monster           TEXT NOT NULL DEFAULT '{}'     -- JSON Monster object to fight
-                    CONSTRAINT maze_rooms_monster_json CHECK (json_valid(monster)),
-  questions         TEXT NOT NULL DEFAULT '[]'     -- JSON array of BattleQuestions
-                    CONSTRAINT maze_rooms_questions_json CHECK (json_valid(questions)),
-  damage_per_correct INTEGER NOT NULL DEFAULT 0,   -- damage dealt per correct answer
-  explanation       TEXT NOT NULL DEFAULT '',      -- shown after defeating the monster
-  next_room_id      TEXT,                           -- path through the maze; nullable
-  alternative_path_id TEXT,                          -- branching path; nullable
-  unlock_condition  TEXT                            -- JSON { type, value }; nullable
-                    CHECK (unlock_condition IS NULL OR json_valid(unlock_condition)),
-  created_at        INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
-  updated_at        INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
-  PRIMARY KEY (maze_id, id),
-  UNIQUE (maze_id, position)
-);
-
--- ----------------------------------------------------------------------------
 -- Encyclopedia entries (A-Z terms and notable people)
 -- ----------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS encyclopedia_entries (
@@ -378,7 +425,6 @@ CREATE TABLE IF NOT EXISTS encyclopedia_entries (
 CREATE INDEX IF NOT EXISTS idx_mythbuster_difficulty ON mythbuster_questions(difficulty);
 CREATE INDEX IF NOT EXISTS idx_myths_category      ON myths(category);
 CREATE INDEX IF NOT EXISTS idx_myths_difficulty    ON myths(difficulty);
-CREATE INDEX IF NOT EXISTS idx_maze_rooms_maze     ON maze_rooms(maze_id);
 CREATE INDEX IF NOT EXISTS idx_encyclopedia_category ON encyclopedia_entries(category);
 CREATE INDEX IF NOT EXISTS idx_encyclopedia_difficulty ON encyclopedia_entries(difficulty);
 

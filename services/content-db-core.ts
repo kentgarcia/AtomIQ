@@ -17,8 +17,6 @@ export const REQUIRED_CONTENT_TABLES = [
   "content_references",
   "mythbuster_questions",
   "myths",
-  "mazes",
-  "maze_rooms",
   "encyclopedia_entries",
 ] as const;
 

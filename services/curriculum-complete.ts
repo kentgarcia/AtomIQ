@@ -1,6 +1,6 @@
 /**
- * What happens when a path node is finished: save completion, award XP once, log
- * activity, and update objective mastery. UI-free; the screen passes in the two
+ * What happens when a path node is finished: save completion, award XP (in full the first time, a
+ * very small repeat amount after, `repeatXp`), log activity, and update objective mastery. UI-free; the screen passes in the two
  * storage-context actions it needs.
  */
 
@@ -11,6 +11,7 @@ import { getLevelProgress, getUserProfile, logDailyActivity, updateLevelProgress
 import { emitFeedEvent, emitNodeCompleted } from "@/services/feed";
 import { recordMissionEvent } from "@/services/missions";
 import { toLocalIsoDate } from "@/services/utils";
+import { repeatXp } from "@/services/xp-core";
 
 export interface CompleteOptions {
   node: PathNode;
@@ -27,8 +28,9 @@ export interface CompleteOptions {
 }
 
 export interface CompleteResult {
-  /** True the first time this node was completed (XP was awarded). */
+  /** True the first time this node was completed (the full XP was awarded). */
   firstCompletion: boolean;
+  /** What was paid: the full amount the first time, the small repeat amount on a replay, 0 when not passed. */
   xpAwarded: number;
 }
 
@@ -60,7 +62,15 @@ export async function completeNode(opts: CompleteOptions): Promise<CompleteResul
     recordActivity("quiz_complete", { id: node.id });
   }
 
-  if (already) return { firstCompletion: false, xpAwarded: 0 };
+  if (already) {
+    // A replay: only a very small share of the XP, no new lesson count and no feed post
+    const repeat = repeatXp(xp);
+    if (repeat > 0) {
+      await addXP(repeat);
+      await logDailyActivity(toLocalIsoDate(), { xp_earned: repeat });
+    }
+    return { firstCompletion: false, xpAwarded: repeat };
+  }
 
   await addXP(xp);
   if (lesson) {

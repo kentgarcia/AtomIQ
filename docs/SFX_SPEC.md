@@ -1,6 +1,7 @@
 # AtomIQ: Sound Effects Specification
 
 **Status:** Implemented in part (2026-11-18). Done: phase 0 (library moved), phase 1 (`sfx-core.ts` + `sfx.ts`, loudness pass, `test:sfx`, `check:sfx`, every old caller moved) and the wiring of phases 2 to 4 (§12 lists what is wired and the few rows left out). Not done: phase 5, the device pass. Nothing here has been heard on a device: the picks in §4 were made from file names, durations and measured levels, so every pick is a default to audition, and each can be swapped in one table (§5).
+**Next:** `docs/SFX_EXPANSION_SPEC.md` (the second upload, the SFX lab, and the moments still to be given a sound).
 **Owner:** AtomIQ product, design and engineering
 **Applies to:** `assets/sfx/**`, `services/ui-sfx.ts` and `services/game-sfx.ts` (replaced by `services/sfx-core.ts` + `services/sfx.ts`), `services/media-core.ts` (gates), `docs/MEDIA_POLICY.md`, and the call sites in §6
 **Builds on:** `docs/MEDIA_POLICY.md` (preferences, route policy, gates; this spec adds cues to it, it does not replace it), `services/haptics.ts` (sound and haptic fire together), `components/motion/MOTION.md` (reduced motion)
@@ -164,6 +165,7 @@ A cue is `group.name`. `Category` decides the gate (§7.2). `Vol` is the runtime
 | `lesson.bubble` | `reward/pop.wav` at rate 0.85 | voice | .50 | 120 | 1 | A speech bubble pops in. It was a dialogue sound (`Dialogue_Expression`, too close to the blip); it is now the soft pop of the node bubble, a little lower so it is not the star's. A cue can carry its own default `rate` (§7.5). |
 | `lesson.zoom-in` | `lesson/zoom-in.wav` | feedback | .70 | 150 | 1 | The node bubble zooms into the lesson preview; one step of `ScaleZoomSim` toward the atom. |
 | `lesson.zoom-out` | `lesson/zoom-out.wav` | feedback | .60 | 150 | 1 | The preview leaves; one step back out. |
+| `lesson.node-zoom` | `lesson/node-zoom.wav` | feedback | .75 | 300 | 1 | A map node's bubble zooms into the lesson preview (Home and the Atom Maze level map). 1.1 s swoosh (`UI_Phone_Start_1`); replaced `lesson.zoom-in` there (`docs/SFX_EXPANSION_SPEC.md` §12). |
 | `lesson.start` | `lesson/start.wav` | feedback | .80 | 300 | 1 | A lesson (or journey node) begins. |
 | `lesson.complete` | `lesson/complete.wav` | stinger | .90 | 500 | 1 | Lesson, checkpoint or test-out finished. |
 | `lesson.finish` | `lesson/finish.wav` | stinger | .85 | 500 | 1 | Practice or review finished; journey node done. |

@@ -29,6 +29,8 @@ import {
   type GameStatement,
 } from "@/services/mythbuster-core";
 import { useStorage } from "@/services/StorageContext";
+import { awardGameXp } from "@/services/game-xp";
+import { mythBusterXp } from "@/services/xp-core";
 import { recordActivity } from "@/services/activity-log";
 import { logDailyActivity, saveGameScore } from "@/services/database";
 import { toLocalIsoDate } from "@/services/utils";
@@ -111,7 +113,7 @@ const COUNTDOWN: readonly { label: string; cue: SfxCue; ms: number }[] = [
 export default function MythBusterScreen() {
   const router = useRouter();
   const { mode: modeParam, unit: unitParam } = useLocalSearchParams<{ mode?: string; unit?: string }>();
-  const { updateUserProfile, userProfile } = useStorage();
+  const { updateUserProfile, userProfile, addXP } = useStorage();
   const insets = useSafeAreaInsets();
   const {
     width: windowWidth,
@@ -192,6 +194,17 @@ export default function MythBusterScreen() {
     if (gameState !== "playing") readAloud.stop("screen-exit");
   }, [gameState]);
 
+  // The round's repeat XP (never a first-time reward, rules in services/xp-core.ts) is paid once, when the results
+  // appear: from here, so it reads the finished round's score and answers, not the ones finishGame's closure saw.
+  const [xpEarned, setXpEarned] = useState(0);
+  const xpPaidRef = useRef(false);
+  useEffect(() => {
+    if (gameState !== "results" || xpPaidRef.current) return;
+    xpPaidRef.current = true;
+    const earned = mythBusterXp({ mode: selectedMode.id, correct: answers.filter(Boolean).length, rounds: selectedMode.rounds, score });
+    void awardGameXp(addXP, earned).then(setXpEarned);
+  }, [gameState, selectedMode, answers, score, addXP]);
+
   // Endless: one clock for the whole round. It ticks every second; a right answer adds time and a wrong one takes it
   // away (handleSwipe); at 0 the round is over.
   const clock = selectedMode.clock;
@@ -229,6 +242,11 @@ export default function MythBusterScreen() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [gameState, clock, timeLeft]);
 
+  // Endless: a tick each second of the last five
+  useEffect(() => {
+    if (gameState === "playing" && clock && timeLeft !== null && timeLeft > 0 && timeLeft <= 5) void playSfx("game.timer-tick");
+  }, [gameState, clock, timeLeft]);
+
   useEffect(() => {
     // Endless: the bar is the clock, draining as it ticks; other modes: how far through the deck
     if (clock) {
@@ -258,6 +276,8 @@ export default function MythBusterScreen() {
   };
 
   const resetRoundState = () => {
+    xpPaidRef.current = false;
+    setXpEarned(0);
     setCurrentIndex(0);
     setScore(0);
     setStreak(0);
@@ -449,7 +469,7 @@ export default function MythBusterScreen() {
     setGameState("results");
     const bustedCount = answers.filter((a) => a).length;
 
-    // Games award leaderboard points instead of XP
+    // Leaderboard points here; the round's small repeat XP is paid by the effect on the results screen
     void saveGameScore("myth-buster", score).catch((error) => {
       console.error("Failed to save game score:", error);
     });
@@ -649,7 +669,7 @@ export default function MythBusterScreen() {
               <Text style={[styles.resultHeroTitle, { color: textColor }]}>{performance}</Text>
             </Stamp>
             <Text style={[styles.resultHeroSub, { color: mutedText }]}>
-              {correctAnswers} of {totalAnswered} right
+              {correctAnswers} of {totalAnswered} right{xpEarned > 0 ? ` · +${xpEarned} XP` : ""}
             </Text>
           </View>
 

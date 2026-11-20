@@ -142,12 +142,16 @@ test("clip ids are unique per instance (SVG ids are global on a screen)", () => 
   for (const id of a) assert.ok(!b.includes(id), `${id} shared between instances`);
 });
 
-test("the fur matches the brand orange tokens", () => {
-  const tokens = fs.readFileSync(path.join(REPO, "theme", "tokens.ts"), "utf8");
-  const orange = tokens.slice(tokens.indexOf("  orange: {"));
-  const grab = (k) => orange.match(new RegExp(`${k}: "(#[0-9A-Fa-f]{6})"`))[1].toLowerCase();
-  assert.equal(SHRODI_COLORS.fur.toLowerCase(), grab("400"), "fur = brand orange 400");
-  assert.equal(SHRODI_COLORS.furShade.toLowerCase(), grab("500"), "fur shade = brand orange 500");
+test("Shrodi wears the same flat guide colours as the NPC teachers", async () => {
+  const { OFFICIAL, FACE } = await import(pathToFileURL(path.join(REPO, "components", "npc", "npc-palette.ts")).href);
+  assert.equal(SHRODI_COLORS.fur, OFFICIAL.fox, "fur = Fox");
+  assert.equal(SHRODI_COLORS.furShade, SHRODI_COLORS.fur, "the back of the ears and the base of the tail are the fur's colour");
+  assert.equal(SHRODI_COLORS.tailTip, OFFICIAL.cheetah, "tail tip = Cheetah");
+  assert.equal(SHRODI_COLORS.earInner, OFFICIAL.flamingo, "inside of the ears = Flamingo");
+  assert.equal(SHRODI_COLORS.ink, FACE.pupil, "glasses and pupils = the guide's pupil");
+  assert.equal(SHRODI_COLORS.mouth, FACE.mouth, "mouth = the guide's mouth");
+  assert.equal(SHRODI_COLORS.tongue, FACE.tongue, "tongue = the guide's tongue");
+  for (const [name, value] of Object.entries(SHRODI_COLORS)) assert.match(value, /^#[0-9A-F]{6}$/, `${name} is flat #RRGGBB`);
 });
 
 test("the arms hang outward, not inward", () => {

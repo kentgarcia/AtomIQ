@@ -23,10 +23,6 @@ const SKIP_DIRS = new Set(["node_modules", ".git", ".expo", "dist"]);
 /** File-level reviewed exceptions: invariant artwork / brand treatments. */
 const FILE_EXCEPTIONS = new Map([
   [
-    "components/atom-maze/styles.ts",
-    "Atom Maze game artwork (sprites, Game Boy chrome, battle HUD) — invariant art treatment.",
-  ],
-  [
     "components/lesson/visual/duo-palette.ts",
     "EX-11: lesson illustration palette (Duolingo-style face and lip per tone), same hues in light and dark.",
   ],

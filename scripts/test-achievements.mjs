@@ -63,10 +63,10 @@ test("requirement wording", () => {
 
 test("level-ups compare saved to now and never go down", () => {
   const now = levelsFromProfile({ lessons_completed: 5, myths_busted: 0, longest_streak: 3, total_xp: 120, quests_claimed: 4 });
-  assert.deepEqual(now, { 1: 3, 2: 0, 3: 2, 4: 2, 5: 2, 6: 1 });
-  assert.deepEqual(levelUps({ 1: 1, 2: 0, 3: 2, 4: 2, 5: 2, 6: 1 }, now), [{ id: 1, from: 1, to: 3 }]);
+  assert.deepEqual(now, { 1: 3, 2: 0, 3: 2, 4: 2, 5: 2, 6: 1, 7: 0, 8: 0 });
+  assert.deepEqual(levelUps({ 1: 1, 2: 0, 3: 2, 4: 2, 5: 2, 6: 1, 7: 0, 8: 0 }, now), [{ id: 1, from: 1, to: 3 }]);
   assert.deepEqual(levelUps(now, now), []);
-  assert.deepEqual(levelUps({}, { 1: 1, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0 }), [{ id: 1, from: 0, to: 1 }]);
+  assert.deepEqual(levelUps({}, { 1: 1, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0 }), [{ id: 1, from: 0, to: 1 }]);
   assert.deepEqual(mergeLevels({ 1: 4 }, { 1: 3, 2: 1 }), { 1: 4, 2: 1 });
 });
 
@@ -80,4 +80,28 @@ test("level reached follows XP (100 per level) and quests read the counter", () 
   assert.equal(levelFor(level, 2), 1);
   assert.equal(achievementValue(achievementById(5), { quests_claimed: 7 }), 7);
   assert.equal(achievementValue(achievementById(5), null), 0);
+});
+
+test("shop badges: items owned and diamonds spent, read from the shop's totals", () => {
+  const cosmetics = achievementById(7);
+  const spent = achievementById(8);
+  assert.deepEqual([cosmetics.field, spent.field], ["cosmetics_owned", "diamonds_spent"]);
+  assert.equal(achievementValue(cosmetics, { cosmetics_owned: 12 }), 12);
+  assert.equal(achievementValue(spent, { diamonds_spent: 340 }), 340);
+  assert.equal(achievementValue(spent, null), 0);
+  assert.equal(achievementValue(cosmetics, { cosmetics_owned: -3 }), 0);
+  assert.equal(cosmetics.requirement(1), "Own 1 shop item");
+  assert.equal(cosmetics.requirement(20), "Own 20 shop items");
+  assert.equal(spent.requirement(1200), "Spend 1,200 diamonds");
+  // The first buy earns the first level; the levels count up from the totals
+  assert.deepEqual(levelsFromProfile({ cosmetics_owned: 3, diamonds_spent: 80 }), { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 2, 8: 2 });
+  assert.deepEqual(levelUps({ 7: 2, 8: 2 }, levelsFromProfile({ cosmetics_owned: 5, diamonds_spent: 80 })).map((u) => u.id), [7]);
+});
+
+test("the shop badges can all be reached: the top level is within what the shop sells", () => {
+  const { SHOP_ITEMS } = loadTs("components/shop/shop-core.ts");
+  const gettable = SHOP_ITEMS.filter((i) => !i.starter);
+  const worth = gettable.reduce((sum, i) => sum + i.price, 0);
+  assert.ok(achievementById(7).tiers.at(-1) <= gettable.length, `${achievementById(7).tiers.at(-1)} items of ${gettable.length}`);
+  assert.ok(achievementById(8).tiers.at(-1) <= worth, `${achievementById(8).tiers.at(-1)} diamonds of ${worth}`);
 });

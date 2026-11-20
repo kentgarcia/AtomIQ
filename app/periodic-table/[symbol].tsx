@@ -337,7 +337,7 @@ export default function ElementDetailScreen() {
                   </Pressable>
                   <Pressable
                     accessibilityRole="link"
-                    accessibilityLabel="Read the encyclopedia entry for isotope"
+                    accessibilityLabel="Read the AtomDex entry for isotope"
                     onPress={() => openTerm("isotope")}
                     style={({ pressed }) => [styles.pill, pressed && { opacity: 0.7 }]}
                   >
@@ -346,7 +346,7 @@ export default function ElementDetailScreen() {
                   </Pressable>
                   <Pressable
                     accessibilityRole="link"
-                    accessibilityLabel="Read the encyclopedia entry for atomic number"
+                    accessibilityLabel="Read the AtomDex entry for atomic number"
                     onPress={() => openTerm("atomic-number")}
                     style={({ pressed }) => [styles.pill, pressed && { opacity: 0.7 }]}
                   >
@@ -384,13 +384,13 @@ export default function ElementDetailScreen() {
           ) : null}
 
           {element.relatedTerms.length > 0 ? (
-            <Section title="Learn more in the encyclopedia">
+            <Section title="Learn more in the AtomDex">
               <View style={styles.pills}>
                 {element.relatedTerms.map((id) => (
                   <Pressable
                     key={id}
                     accessibilityRole="link"
-                    accessibilityLabel={`Open encyclopedia entry: ${termTitles[id] ?? prettify(id)}`}
+                    accessibilityLabel={`Open AtomDex entry: ${termTitles[id] ?? prettify(id)}`}
                     onPress={() => openTerm(id)}
                     style={({ pressed }) => [styles.pill, pressed && { opacity: 0.7 }]}
                   >

@@ -17,6 +17,7 @@ import {
     DEFAULT_AVATAR_VALUE,
     normalizeAvatarValue,
 } from "@/components/avatar/avatar-core";
+import { recordChatAppOpen } from "./chats";
 import { checkFeedOnAppOpen, emitRankCheck, emitStreak } from "./feed";
 import { getOnboardingCompleted, setLastActiveDate, setOnboardingCompleted } from "./storage";
 import { recordMissionEvent } from "./missions";
@@ -238,6 +239,9 @@ export const StorageProvider = ({ children }: { children: ReactNode }) => {
   // A promise lock serializes concurrent invocations (cold-start init can
   // race AppState "active") so the streak can never double-increment.
   const dailyTrackedDateRef = useRef<string | null>(null);
+  // Set while onboarding hands over a brand-new account: the day still counts, but the streak screen is not queued
+  // (the welcome moment just played, and a day-1 streak is not news).
+  const skipStreakScreenRef = useRef(false);
   const dailyTrackingPromiseRef = useRef<Promise<void> | null>(null);
 
   const ensureDailyTracking = useCallback((): Promise<void> => {
@@ -250,10 +254,14 @@ export const StorageProvider = ({ children }: { children: ReactNode }) => {
       dailyTrackingPromiseRef.current = (async () => {
         try {
           const profile = (await getUserProfile()) as UserProfile | null;
+          // No profile: the account was just deleted and onboarding has not made the new one yet.
+          // Leave the day unclaimed (the streak would be dropped and the day marked as done); the tracker
+          // runs again when onboarding finishes (`setOnboardingDone(true)`).
+          if (!profile) return;
           const result = await checkDailyStreak(incrementStreak, updateUserProfile, profile);
           // Today's streak went up: queue the daily streak screen (once per day,
           // since this tracker only runs once per day)
-          if (result.streakIncremented) setPendingStreakCelebration(true);
+          if (result.streakIncremented && !skipStreakScreenRef.current) setPendingStreakCelebration(true);
         } catch (error) {
           // Keep the day unclaimed so the next foreground retries.
           console.error("Error running daily streak check:", error);
@@ -265,6 +273,7 @@ export const StorageProvider = ({ children }: { children: ReactNode }) => {
         await recordMissionEvent("login", 1);
         dailyTrackedDateRef.current = today;
         void checkFeedOnAppOpen(); // comeback post and feed retention; never rejects
+        void recordChatAppOpen(); // a teacher may welcome the learner back; never rejects
       })().finally(() => {
         dailyTrackingPromiseRef.current = null;
       });
@@ -288,10 +297,29 @@ export const StorageProvider = ({ children }: { children: ReactNode }) => {
     setLevelUp(null);
   }, []);
 
-  const setOnboardingDone = useCallback(async (done: boolean) => {
-    await setOnboardingCompleted(done);
-    setOnboardingCompletedState(done);
-  }, []);
+  const setOnboardingDone = useCallback(
+    async (done: boolean) => {
+      await setOnboardingCompleted(done);
+      setOnboardingCompletedState(done);
+      if (!done) {
+        // Delete Account wipes the streak, last-active date and missions, so "today was tracked" is no
+        // longer true: forget it, or a new account gets no login, streak or feed check until a restart.
+        dailyTrackedDateRef.current = null;
+        setPendingStreakCelebration(false);
+        return;
+      }
+      // The new profile exists now. A normal first launch has already been tracked today, so this is a no-op there.
+      skipStreakScreenRef.current = true;
+      try {
+        await ensureDailyTracking();
+      } catch (error) {
+        console.error("Error running daily tracking after onboarding:", error);
+      } finally {
+        skipStreakScreenRef.current = false;
+      }
+    },
+    [ensureDailyTracking],
+  );
 
   const clearStreakCelebration = useCallback(() => {
     setPendingStreakCelebration(false);

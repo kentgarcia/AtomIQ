@@ -24,12 +24,22 @@
  */
 
 import { useCallback, useState, type ReactNode } from "react";
-import { Pressable, View, type NativeScrollEvent, type NativeSyntheticEvent } from "react-native";
+import {
+  Pressable,
+  View,
+  type NativeScrollEvent,
+  type NativeSyntheticEvent,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
-import { createStyles, fontFaces, useResponsiveLayout, useTheme } from "@/theme";
+import {
+  createStyles,
+  fontFaces,
+  useResponsiveLayout,
+  useTheme,
+} from "@/theme";
 
 const SIDE = 24;
 const SLOT = 48;
@@ -45,7 +55,18 @@ export function useHeaderBorder() {
 }
 
 /** A 48 dp icon button for the header's slots (back, search, a shortcut). */
-export function HeaderButton({ icon, label, onPress }: { icon: string; label: string; onPress: () => void }) {
+export function HeaderButton({
+  icon,
+  label,
+  onPress,
+  color,
+}: {
+  icon: string;
+  label: string;
+  onPress: () => void;
+  /** The icon's colour, for a page whose paint is not the theme's. */
+  color?: string;
+}) {
   const { theme } = useTheme();
   const styles = useStyles(theme);
   return (
@@ -56,7 +77,7 @@ export function HeaderButton({ icon, label, onPress }: { icon: string; label: st
       accessibilityLabel={label}
       style={({ pressed }) => [styles.button, pressed && styles.pressed]}
     >
-      <Icon name={icon} size={24} color={theme.colors.text} variant="Bold" />
+      <Icon name={icon} size={24} color={color ?? theme.colors.text} variant="Bold" />
     </Pressable>
   );
 }
@@ -73,28 +94,60 @@ export interface ScreenHeaderProps {
   right?: ReactNode;
   /** The body has scrolled: show the bottom border. */
   scrolled?: boolean;
+  /** Paint nothing of its own: the page behind (a wallpaper) shows through the header. */
+  transparent?: boolean;
+  /** The colour of the title and subtitle, for a page whose paint is not the theme's (with `transparent`). */
+  color?: string;
 }
 
-export function ScreenHeader({ title, subtitle, onBack, backLabel = "Go back", left, right, scrolled = false }: ScreenHeaderProps) {
+export function ScreenHeader({
+  title,
+  subtitle,
+  onBack,
+  backLabel = "Go back",
+  left,
+  right,
+  scrolled = false,
+  transparent = false,
+  color,
+}: ScreenHeaderProps) {
   const { theme } = useTheme();
   const styles = useStyles(theme);
   const { contentMaxWidth } = useResponsiveLayout();
   const insets = useSafeAreaInsets();
-  const leftNode = left ?? (onBack ? <HeaderButton icon="ArrowLeft2" label={backLabel} onPress={onBack} /> : null);
+  const leftNode =
+    left ??
+    (onBack ? (
+      <HeaderButton icon="ArrowLeft2" label={backLabel} onPress={onBack} />
+    ) : null);
   const centered = leftNode !== null;
 
   return (
-    <View style={[styles.wrap, { paddingTop: insets.top + 12 }, scrolled && { borderBottomColor: theme.palettes.tabBar.border }]}>
+    <View
+      style={[
+        styles.wrap,
+        { paddingTop: insets.top + 12 },
+        transparent && { backgroundColor: "transparent" },
+        scrolled && { borderBottomColor: theme.palettes.tabBar.border },
+      ]}
+    >
       <View style={[styles.frame, { maxWidth: contentMaxWidth }]}>
         {centered ? (
           <View style={styles.centerRow}>
             <View style={styles.slot}>{leftNode}</View>
             <View style={styles.centerCopy}>
-              <Text style={styles.centerTitle} numberOfLines={1} accessibilityRole="header">
+              <Text
+                style={[styles.centerTitle, color ? { color } : null]}
+                numberOfLines={1}
+                accessibilityRole="header"
+              >
                 {title}
               </Text>
               {subtitle ? (
-                <Text style={styles.centerSub} numberOfLines={1}>
+                <Text
+                  style={[styles.centerSub, color ? { color } : null]}
+                  numberOfLines={1}
+                >
                   {subtitle}
                 </Text>
               ) : null}
@@ -104,11 +157,18 @@ export function ScreenHeader({ title, subtitle, onBack, backLabel = "Go back", l
         ) : (
           <View style={styles.titleRow}>
             <View style={styles.titleCopy}>
-              <Text style={styles.title} numberOfLines={1} accessibilityRole="header">
+              <Text
+                style={[styles.title, color ? { color } : null]}
+                numberOfLines={1}
+                accessibilityRole="header"
+              >
                 {title}
               </Text>
               {subtitle ? (
-                <Text style={styles.sub} numberOfLines={1}>
+                <Text
+                  style={[styles.sub, color ? { color } : null]}
+                  numberOfLines={1}
+                >
                   {subtitle}
                 </Text>
               ) : null}
@@ -124,19 +184,56 @@ export function ScreenHeader({ title, subtitle, onBack, backLabel = "Go back", l
 const useStyles = createStyles((theme) => {
   const c = theme.colors;
   return {
-    wrap: { backgroundColor: c.mapBackground, borderBottomWidth: 2, borderBottomColor: "transparent" },
-    frame: { width: "100%", alignSelf: "center", paddingHorizontal: SIDE, paddingBottom: 8 },
-    titleRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", minHeight: 50 },
+    wrap: {
+      backgroundColor: c.mapBackground,
+      borderBottomWidth: 2,
+      borderBottomColor: "transparent",
+    },
+    frame: {
+      width: "100%",
+      alignSelf: "center",
+      paddingHorizontal: SIDE,
+      paddingBottom: 8,
+    },
+    titleRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      minHeight: 50,
+    },
     titleCopy: { flex: 1 },
     title: { fontSize: 34, lineHeight: 42, ...fontFaces.black, color: c.text },
-    sub: { fontSize: 14, lineHeight: 20, ...fontFaces.medium, color: c.textMuted },
+    sub: {
+      fontSize: 14,
+      lineHeight: 20,
+      ...fontFaces.medium,
+      color: c.textMuted,
+    },
     centerRow: { flexDirection: "row", alignItems: "center", minHeight: 50 },
     centerCopy: { flex: 1, alignItems: "center" },
-    centerTitle: { fontSize: 22, lineHeight: 28, textAlign: "center", ...fontFaces.heavy, color: c.text },
-    centerSub: { fontSize: 13, lineHeight: 18, textAlign: "center", ...fontFaces.medium, color: c.textMuted },
+    centerTitle: {
+      fontSize: 22,
+      lineHeight: 28,
+      textAlign: "center",
+      ...fontFaces.heavy,
+      color: c.text,
+    },
+    centerSub: {
+      fontSize: 13,
+      lineHeight: 18,
+      textAlign: "center",
+      ...fontFaces.medium,
+      color: c.textMuted,
+    },
     slot: { width: SLOT, height: SLOT, justifyContent: "center" },
     slotRight: { alignItems: "flex-end", justifyContent: "center" },
-    button: { width: SLOT, height: SLOT, alignItems: "center", justifyContent: "center", borderRadius: SLOT / 2 },
+    button: {
+      width: SLOT,
+      height: SLOT,
+      alignItems: "center",
+      justifyContent: "center",
+      borderRadius: SLOT / 2,
+    },
     pressed: { opacity: 0.6 },
   };
 });

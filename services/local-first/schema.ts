@@ -388,6 +388,113 @@ CREATE TABLE IF NOT EXISTS daily_facts_read (
   version INTEGER DEFAULT 1
 );
 
+-- Phone apps whose install moment has played (docs/PHONE_SPEC.md section 7.2). Which apps are
+-- unlocked is derived from progress and never stored.
+CREATE TABLE IF NOT EXISTS phone_seen (
+  app_id TEXT PRIMARY KEY,
+  seen_at INTEGER NOT NULL,
+  opened_at INTEGER,
+  updated_at INTEGER NOT NULL DEFAULT 0,
+  synced_at INTEGER,
+  is_dirty INTEGER DEFAULT 1,
+  deleted_at INTEGER,
+  version INTEGER DEFAULT 1
+);
+
+-- Field Notes: the learner's private notebook on the phone (docs/PHONE_SPEC.md section 10). Never shown to
+-- anyone, never posted, wiped by Delete Account. A clipping keeps where it was cut from and a quoted line.
+CREATE TABLE IF NOT EXISTS field_notes (
+  id TEXT PRIMARY KEY,
+  title TEXT NOT NULL DEFAULT '',
+  body TEXT NOT NULL DEFAULT '',
+  source_type TEXT,
+  source_id TEXT,
+  snippet TEXT,
+  created_at INTEGER NOT NULL,
+  updated_at INTEGER NOT NULL DEFAULT 0,
+  synced_at INTEGER,
+  is_dirty INTEGER DEFAULT 1,
+  deleted_at INTEGER,
+  version INTEGER DEFAULT 1
+);
+
+CREATE INDEX IF NOT EXISTS idx_field_notes_updated ON field_notes(updated_at DESC);
+CREATE INDEX IF NOT EXISTS idx_field_notes_source ON field_notes(source_type, source_id);
+
+-- Chats: the learner's conversations with the teachers on the phone (docs/PHONE_SPEC.md section 5.2). The teacher's
+-- lines and the replies the learner tapped, on the device only; wiped by Delete Account. 'event' marks an unprompted
+-- message (what earned it), so it is never sent twice.
+-- Chat threads (docs/PHONE_SPEC.md section 5.2): a free chat the learner started, or a story a trigger unlocked ('event' is
+-- its unlock key, so the story is never unlocked twice, and a replay keeps it). 'ended' is set when a reply with nowhere to go
+-- (a sticker, a reaction) closed the story; 'archived' puts it away from the Chats list (a swipe); 'plays' counts replays. On the device only; wiped by Delete Account.
+CREATE TABLE IF NOT EXISTS chat_threads (
+  id TEXT PRIMARY KEY,
+  npc_id TEXT NOT NULL,
+  entry_node_id TEXT NOT NULL,
+  title TEXT NOT NULL,
+  origin TEXT NOT NULL DEFAULT 'free',
+  event TEXT,
+  ended INTEGER NOT NULL DEFAULT 0,
+  archived INTEGER NOT NULL DEFAULT 0,
+  plays INTEGER NOT NULL DEFAULT 1,
+  created_at INTEGER NOT NULL DEFAULT 0,
+  updated_at INTEGER NOT NULL DEFAULT 0,
+  synced_at INTEGER,
+  is_dirty INTEGER DEFAULT 1,
+  deleted_at INTEGER,
+  version INTEGER DEFAULT 1
+);
+
+CREATE TABLE IF NOT EXISTS chat_messages (
+  id TEXT PRIMARY KEY,
+  thread_id TEXT NOT NULL,
+  node_id TEXT,
+  sender TEXT NOT NULL,
+  text TEXT NOT NULL,
+  kind TEXT NOT NULL DEFAULT 'text',
+  target_id TEXT,
+  at INTEGER NOT NULL,
+  "read" INTEGER NOT NULL DEFAULT 0,
+  created_at INTEGER NOT NULL DEFAULT 0,
+  updated_at INTEGER NOT NULL DEFAULT 0,
+  synced_at INTEGER,
+  is_dirty INTEGER DEFAULT 1,
+  deleted_at INTEGER,
+  version INTEGER DEFAULT 1
+);
+
+CREATE INDEX IF NOT EXISTS idx_chat_messages_thread ON chat_messages(thread_id, at);
+
+-- Scans: what the learner has pointed the phone's Atom Scanner at (docs/PHONE_SPEC.md section 8): the first time and how
+-- many times, per target. A collection, not a score. On the device only; wiped by Delete Account.
+CREATE TABLE IF NOT EXISTS scans (
+  target_id TEXT PRIMARY KEY,
+  first_at INTEGER NOT NULL,
+  count INTEGER NOT NULL DEFAULT 1,
+  created_at INTEGER NOT NULL DEFAULT 0,
+  updated_at INTEGER NOT NULL DEFAULT 0,
+  synced_at INTEGER,
+  is_dirty INTEGER DEFAULT 1,
+  deleted_at INTEGER,
+  version INTEGER DEFAULT 1
+);
+
+-- Photos: what the phone's Camera took (docs/PHONE_SPEC.md section 9), saved as the composition (scene, companion, poses, frame and the
+-- avatar's saved string), not as pixels. On the device only; wiped by Delete Account.
+CREATE TABLE IF NOT EXISTS photos (
+  id TEXT PRIMARY KEY,
+  config TEXT NOT NULL,
+  taken_at INTEGER NOT NULL,
+  created_at INTEGER NOT NULL DEFAULT 0,
+  updated_at INTEGER NOT NULL DEFAULT 0,
+  synced_at INTEGER,
+  is_dirty INTEGER DEFAULT 1,
+  deleted_at INTEGER,
+  version INTEGER DEFAULT 1
+);
+
+CREATE INDEX IF NOT EXISTS idx_photos_taken ON photos(taken_at);
+
 -- ==================== SETTINGS TABLES ====================
 
 -- User Settings (local-only by default)

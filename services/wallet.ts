@@ -21,6 +21,13 @@ export async function getDiamonds(): Promise<number> {
   return Math.max(0, Math.round(row?.diamonds ?? 0));
 }
 
+/** Tell every listener the balance as it is now (after a spend that was done in SQL elsewhere). */
+export async function refreshDiamonds(): Promise<number> {
+  const balance = await getDiamonds();
+  listeners.forEach((l) => l(balance));
+  return balance;
+}
+
 /** Add `amount` (whole diamonds, never negative) and return the new balance. */
 export async function addDiamonds(amount: number): Promise<number> {
   const add = Math.max(0, Math.round(Number.isFinite(amount) ? amount : 0));

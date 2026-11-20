@@ -330,43 +330,6 @@ const myth = (mode: ThemeMode) => {
     };
 };
 
-/* Atom Maze — neutral surfaces, orange accent (artwork keeps its own hues). */
-const maze = (mode: ThemeMode) => {
-    return {
-        bg: colors.base[mode].background,
-        card: colors.base[mode].surface,
-        text: colors.base[mode].text,
-        textMuted: colors.base[mode].textMuted,
-        primary: colors.brand.orange[500],
-        primaryDark: colors.brand.orange[600],
-        primaryLight: colors.brand.orange[400],
-        success: colors.role.success,
-        error: colors.role.error,
-        gold: colors.brand.amber[300],
-        border: colors.base[mode].border,
-    };
-};
-
-/* Maze widget palette (player/monster colors are game-neutral). */
-const mazeGame = (mode: ThemeMode) => {
-    const isLight = mode === "light";
-    return {
-        bg: colors.base[mode].background,
-        card: colors.base[mode].surfaceSoft,
-        text: colors.base[mode].text,
-        textMuted: colors.base[mode].textMuted,
-        primary: colors.brand.orange[500],
-        primaryDark: colors.brand.orange[600],
-        success: colors.role.success,
-        error: colors.role.error,
-        warning: colors.role.warning,
-        playerColor: colors.role.info,
-        monsterColor: colors.role.error,
-        border: colors.base[mode].border,
-        shadow: isLight ? "rgba(0, 0, 0, 0.1)" : "rgba(0, 0, 0, 0.3)",
-    };
-};
-
 /* Map — grass terrain, custom by design. */
 const map = (mode: ThemeMode) => ({
     bg: mode === "light" ? "#8BC34A" : "#558B2F",
@@ -501,8 +464,6 @@ export interface Theme {
         quiz: Palette;
         explorer: Palette;
         settings: Palette;
-        maze: Palette;
-        mazeGame: Palette;
         map: Palette;
         onboarding: Palette;
         achievements: Palette;
@@ -547,8 +508,6 @@ const buildTheme = (mode: ThemeMode): Theme => ({
         quiz: withShadow(mode, quiz(mode)),
         explorer: withShadow(mode, explorer(mode)),
         settings: withShadow(mode, orangeBase(mode)),
-        maze: withShadow(mode, maze(mode)),
-        mazeGame: withShadow(mode, mazeGame(mode)),
         map: withShadow(mode, map(mode)),
         onboarding: withShadow(mode, onboarding(mode)),
         achievements: { ...achievement(mode), shadow: colors.role.black },
@@ -596,10 +555,6 @@ export const QuizLight = quiz("light");
 export const QuizDark = quiz("dark");
 export const ExplorerLight = explorer("light");
 export const ExplorerDark = explorer("dark");
-export const MazeLight = maze("light");
-export const MazeDark = maze("dark");
-export const MazeTheme = { light: MazeLight, dark: MazeDark };
-export const MazeGamePalette = { light: mazeGame("light"), dark: mazeGame("dark") };
 export const MapLight = map("light");
 export const MapDark = map("dark");
 export const OnboardingLight = onboarding("light");

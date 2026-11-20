@@ -66,7 +66,7 @@ export type GuideDestination =
   | { screen: "lesson"; id: string } // /lesson/${id}
   | { screen: "practice"; id: string } // /practice/${id}
   | { screen: "encyclopedia-entry"; id: string } // /explorer/encyclopedia-entry?id=${id}
-  | { screen: "maze"; id: string } // /explorer/atom-maze?id=${id}
+  | { screen: "story" } // /explorer/story (Atom Maze level map)
   | { screen: "journey"; id: string } // /explorer/journey?id=${id}
   | { screen: "mythbuster" } // /mythbuster
   | { screen: "tab-discover" } // /(tabs)/community

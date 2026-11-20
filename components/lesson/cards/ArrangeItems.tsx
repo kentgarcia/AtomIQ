@@ -68,12 +68,13 @@ const useStyles = createStyles((theme) => ({
 
 /**
  * A sound for every press that builds an answer piece by piece (docs/SFX_SPEC.md §6.3), so changing
- * your mind sounds as often as choosing: `ui.select` for a piece placed or moved, `ui.unequip` for one
- * taken back. The press that completes the set plays nothing here: it is graded at once and the
- * result cue plays instead.
+ * your mind sounds as often as choosing: `lesson.drop` for a piece put down or moved (`lesson.pair-ok`
+ * for a right pair locking, `lesson.pick` for a match card picked up), `ui.unequip` for one taken back.
+ * The press that completes the set plays nothing here: it is graded at once and the result cue plays
+ * instead.
  */
-const placedSfx = (completes: boolean) => {
-  if (!completes) void playSfx("ui.select");
+const placedSfx = (completes: boolean, cue: "lesson.drop" | "lesson.pair-ok" = "lesson.drop") => {
+  if (!completes) void playSfx(cue);
 };
 
 export function OrderItem({ data, seed, locked, onChange, ownerId, rejection }: InteractionProps<OrderItemData, { type: "order"; orderedIds: string[] }> & { ownerId: string }) {
@@ -174,14 +175,14 @@ export function MatchItem({ data, seed, locked, onChange, ownerId, onMiss }: Int
 
   const pressLeft = (leftId: string) => {
     if (frozen || matches[leftId]) return;
-    void playSfx("ui.select");
+    void playSfx("lesson.pick");
     setSelected(leftId === selected ? null : leftId);
   };
   const pressRight = (rightId: string) => {
     if (frozen || !selected || Object.values(matches).includes(rightId)) return;
     // A pair's two cards share its id, so a right match is the same id
     if (selected === rightId) {
-      placedSfx(Object.keys(matches).length + 1 >= data.pairs.length);
+      placedSfx(Object.keys(matches).length + 1 >= data.pairs.length, "lesson.pair-ok");
       setMatches((m) => ({ ...m, [selected]: rightId }));
     } else {
       setMiss({ left: selected, right: rightId });

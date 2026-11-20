@@ -10,7 +10,6 @@
 
 import type { Lesson } from "@/content/curriculum/types";
 import type {
-  AtomMazeChallenge,
   EncyclopediaEntry,
   Journey,
 } from "@/content/explorer/types";
@@ -112,7 +111,6 @@ export interface LoadedContent {
   /** Practice nodes and checkpoints (formerly unit quizzes). */
   quizzes: PracticeEntry[];
   encyclopedia: EncyclopediaEntry[];
-  mazes: AtomMazeChallenge[];
   journeys: Journey[];
 }
 
@@ -120,12 +118,11 @@ export interface LoadedContent {
 let unitTitles = new Map<string, string>();
 
 export const loadGuideContent = async (): Promise<LoadedContent> => {
-  const [units, nodes, lessons, encyclopedia, mazes] = await Promise.all([
+  const [units, nodes, lessons, encyclopedia] = await Promise.all([
     contentRepository.getUnits(),
     contentRepository.getPathNodes(),
     contentRepository.getLessons(),
     contentRepository.getAllEncyclopediaEntries(),
-    contentRepository.getAllMazes(),
   ]);
   unitTitles = new Map(units.map((u) => [u.id, u.title]));
   const quizzes: PracticeEntry[] = nodes
@@ -144,7 +141,7 @@ export const loadGuideContent = async (): Promise<LoadedContent> => {
       };
     });
   const journeys = getAllJourneys();
-  return { lessons, quizzes, encyclopedia, mazes, journeys };
+  return { lessons, quizzes, encyclopedia, journeys };
 };
 
 const lower = (v: string | undefined | null): string =>
@@ -159,8 +156,7 @@ export interface TopicContent {
   lessons: Lesson[];
   quizzes: PracticeEntry[];
   encyclopedia: EncyclopediaEntry[];
-  /** Global games (MythBuster) are always available; mazes match by keyword. */
-  mazes: AtomMazeChallenge[];
+  /** Global games (MythBuster, Atom Maze) are always available. */
   hasMythBuster: boolean;
 }
 
@@ -188,15 +184,10 @@ export const getTopicContent = (
     keywordHit(topic.keywords, e.term, e.definition, e.category),
   );
 
-  const mazes = content.mazes.filter((m) =>
-    keywordHit(topic.keywords, m.title, m.description, m.theme),
-  );
-
   return {
     lessons,
     quizzes,
     encyclopedia,
-    mazes,
     hasMythBuster: true,
   };
 };
@@ -210,8 +201,7 @@ export const getAvailableTopicIds = (
     return (
       c.lessons.length > 0 ||
       c.quizzes.length > 0 ||
-      c.encyclopedia.length > 0 ||
-      c.mazes.length > 0
+      c.encyclopedia.length > 0
     );
   }).map((t) => t.id);
 

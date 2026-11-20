@@ -529,7 +529,7 @@ export function RadiationShieldLab({ onBack }: { onBack: () => void }) {
           if (q.kind === "launch") void playSfx("lesson.whoosh");
           else if (q.kind === "emit") void playSfx("ui.tick", { volume: 0.5, rate: emitRate });
           else if (q.kind === "hit") void playSfx("game.hit", { volume: 0.45, rate: 0.85 });
-          else void playSfx("ui.tick", { volume: 2, rate: 2 });
+          else void playSfx("lab.geiger");
         }, q.at),
       );
     clock.set(

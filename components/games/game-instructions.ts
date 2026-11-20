@@ -58,13 +58,12 @@ export const GAME_GUIDES: readonly GameGuide[] = [
     label: "Atom Maze",
     icon: "Grid9",
     color: "#1CB0F6",
-    summary: "Answer questions to fight your way through the atom.",
+    summary: "Run, jump and answer your way through each level.",
     steps: [
-      { icon: "MessageQuestion", title: "Answer quiz", hint: "Choose the best answer to keep advancing." },
-      { icon: "Activity", title: "Build combo", hint: "Consecutive correct picks keep your momentum high." },
-      { icon: "Eye", title: "Keep focus", hint: "Wrong answers reset your combo streak." },
-      { icon: "Map", title: "Clear stage", hint: "Complete each stage to move to the next one." },
-      { icon: "Unlimited", title: "Endless Maze", hint: "No boss: keep going as long as you can." },
+      { icon: "Map", title: "Pick a level", hint: "Levels open one after another. Beat one to unlock the next." },
+      { icon: "MessageQuestion", title: "Battle with questions", hint: "Touch an enemy and answer its question. A right answer attacks, a wrong one costs a heart." },
+      { icon: "Heart", title: "Mind your hearts", hint: "Run out of hearts and the level starts over." },
+      { icon: "Star", title: "Reach the door", hint: "Collect coins for a better score: up to three stars a level." },
     ],
   },
   {
@@ -84,4 +83,4 @@ export const GAME_GUIDES: readonly GameGuide[] = [
 export const guideById = (id: GuideId): GameGuide => GAME_GUIDES.find((g) => g.id === id) ?? GAME_GUIDES[0]!;
 
 /** The guide to open on: the game whose levels are open (the picker's `DifficultyGame` ids), else the overview. */
-export const initialGuide = (activeGame: "atom-maze" | "mythbuster" | "lab" | null): GuideId => activeGame ?? "overview";
+export const initialGuide = (activeGame: "mythbuster" | "lab" | null): GuideId => activeGame ?? "overview";

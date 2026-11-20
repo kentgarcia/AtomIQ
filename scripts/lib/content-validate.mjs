@@ -15,6 +15,10 @@ import {
   findConflictingDuplicates,
 } from "./content-rules.mjs";
 import { validateCurriculum } from "./curriculum-rules.mjs";
+import { validateChat } from "./chat-rules.mjs";
+import { validateScan } from "./scan-rules.mjs";
+import { validateSafety } from "./safety-rules.mjs";
+import { validateMap } from "./map-rules.mjs";
 import { validateFeed } from "./feed-rules.mjs";
 import { findInvalidIcons } from "./icon-names.mjs";
 import { getStepVisuals, validateVisualBlock } from "../../content/visual-blocks.ts";
@@ -91,7 +95,7 @@ export function validateDatabase(db, { strictReview = false, shipped = {}, retir
   }
 
   // ---------------------------------------------------------------------------
-  // mythbuster_questions (also feeds Atom Maze boss + endless mode, which shuffle options)
+  // mythbuster_questions (options are shuffled at runtime)
   // ---------------------------------------------------------------------------
   if (tableExists("mythbuster_questions")) {
     for (const row of db.prepare("SELECT * FROM mythbuster_questions ORDER BY difficulty, position").all()) {
@@ -218,67 +222,6 @@ export function validateDatabase(db, { strictReview = false, shipped = {}, retir
   }
 
   // ---------------------------------------------------------------------------
-  // Atom Maze: rooms + boss
-  // ---------------------------------------------------------------------------
-  function checkBattleQuestion(table, id, q, index) {
-    const field = `questions[${index}]`;
-    if (!q || typeof q !== "object") {
-      record(table, id, [{ rule: "options-shape", field, severity: "error", message: "is not an object" }]);
-      return;
-    }
-    const prefix = (results) => results.map((r) => ({ ...r, field: `${field}.${r.field}` }));
-    if (q.type === "scramble") {
-      record(table, id, prefix(checkQuestion({ kind: "scramble", text: q.question, correct: q.answer, textField: "question" })), q.question);
-      return;
-    }
-    if (q.type !== "quiz") {
-      record(table, id, [{ rule: "options-shape", field: `${field}.type`, severity: "error", message: `unknown question type ${JSON.stringify(q.type)}` }]);
-      return;
-    }
-    // Maze quiz questions have no stored explanation (the room explanation is shown after the fight).
-    record(
-      table,
-      id,
-      prefix(
-        checkQuestion({
-          kind: "multiple_choice",
-          text: q.question,
-          options: q.options,
-          correct: q.correctAnswer,
-          explanationOptional: true,
-          shuffled: true,
-        }),
-      ),
-      q.question,
-    );
-    addConflictCandidate(`${table}:${id}:${index}`, q.question, q.options, q.correctAnswer);
-  }
-
-  if (tableExists("maze_rooms")) {
-    for (const row of db.prepare("SELECT * FROM maze_rooms ORDER BY maze_id, position").all()) {
-      const id = `${row.maze_id}/${row.id}`;
-      bump("maze_rooms");
-      const questions = parseJson(row.questions, []);
-      if (!Array.isArray(questions) || questions.length === 0) {
-        record("maze_rooms", id, [{ rule: "options-shape", field: "questions", severity: "error", message: "room has no questions" }]);
-      }
-      (Array.isArray(questions) ? questions : []).forEach((q, i) => checkBattleQuestion("maze_rooms", id, q, i));
-      // Post-fight explanation is learner-facing text too.
-      record("maze_rooms", id, [...checkPlaceholders(row.explanation, "explanation"), ...checkPunctuation(row.explanation, "explanation")], row.explanation);
-    }
-  }
-
-  if (tableExists("mazes")) {
-    for (const row of db.prepare("SELECT * FROM mazes ORDER BY id").all()) {
-      bump("mazes");
-      const boss = parseJson(row.boss, {});
-      // Boss questions are drawn from mythbuster_questions at runtime; validate any inline ones too.
-      if (Array.isArray(boss.questions)) boss.questions.forEach((q, i) => checkBattleQuestion("mazes", `${row.id}/boss`, q, i));
-      record("mazes", row.id, [...checkPlaceholders(row.description, "description"), ...checkPunctuation(row.description, "description")], row.description);
-    }
-  }
-
-  // ---------------------------------------------------------------------------
   // myths (Myth-or-Fact statements)
   // ---------------------------------------------------------------------------
   if (tableExists("myths")) {
@@ -321,6 +264,26 @@ export function validateDatabase(db, { strictReview = false, shipped = {}, retir
   findings.push(...feed.findings);
 
   // -------------------------------------------------------------------------
+  // NPC chats (docs/PHONE_SPEC.md §5.2): the teachers' threads on the phone.
+  // -------------------------------------------------------------------------
+  const chat = validateChat(db);
+  for (const [surface, n] of Object.entries(chat.checked)) checked.set(surface, (checked.get(surface) ?? 0) + n);
+  findings.push(...chat.findings);
+
+  // -------------------------------------------------------------------------
+  // Atom Scanner (docs/PHONE_SPEC.md §8): targets, their elements and their sources.
+  // -------------------------------------------------------------------------
+  const scan = validateScan(db, { strictReview });
+  for (const [surface, n] of Object.entries(scan.checked)) checked.set(surface, (checked.get(surface) ?? 0) + n);
+  findings.push(...scan.findings);
+
+  // Safety Guide cards and Nuclear Map sites (docs/PHONE_SPEC.md §5.9, §5.8): sourced, and every source checked by a person at the publish gate.
+  for (const part of [validateSafety(db, { strictReview }), validateMap(db, { strictReview })]) {
+    for (const [surface, n] of Object.entries(part.checked)) checked.set(surface, (checked.get(surface) ?? 0) + n);
+    findings.push(...part.findings);
+  }
+
+  // -------------------------------------------------------------------------
   // unit_statements (Myth Buster, Quick Play): a unit's deck of myth-or-fact statements.
   // -------------------------------------------------------------------------
   if (tableExists("unit_statements")) {
@@ -350,7 +313,7 @@ export function validateDatabase(db, { strictReview = false, shipped = {}, retir
   // -------------------------------------------------------------------------
   // Icons: every icon name in content must be an installed Iconsax export.
   // -------------------------------------------------------------------------
-  const iconTables = ["lesson_steps", "mazes", "maze_rooms", "myths", "encyclopedia_entries", "quizzes", "quiz_questions", "lessons", "units", "lesson_cards", "items"].filter(tableExists);
+  const iconTables = ["lesson_steps", "myths", "encyclopedia_entries", "quizzes", "quiz_questions", "lessons", "units", "lesson_cards", "items"].filter(tableExists);
   for (const hit of findInvalidIcons(db, iconTables)) {
     findings.push({ table: hit.table, id: hit.id, field: hit.field, rule: "invalid-icon", severity: "error", message: `"${hit.name}" is not an installed Iconsax icon` });
   }

@@ -1,6 +1,6 @@
 /**
  * Explorer Storage System
- * Manages progress tracking for AtomIQ Explorer journeys, nodes, and mazes
+ * Manages progress tracking for AtomIQ Explorer journeys and nodes
  */
 
 import * as SQLite from 'expo-sqlite';
@@ -18,17 +18,6 @@ export interface JourneyProgress {
   lastAccessedAt: string;
 }
 
-export interface MazeProgress {
-  mazeId: string;
-  currentRoomId: string;
-  completedRooms: string[];
-  score: number;
-  startedAt: string;
-  completedAt?: string;
-  bestScore?: number;
-  attempts: number;
-}
-
 // Initialize Explorer tables
 export const initExplorerStorage = async () => {
   const db = getDatabase();
@@ -43,19 +32,6 @@ export const initExplorerStorage = async () => {
       started_at DATETIME,
       completed_at DATETIME,
       xp_earned INTEGER DEFAULT 0,
-      last_accessed_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    );
-    
-    -- Maze Progress
-    CREATE TABLE IF NOT EXISTS explorer_mazes (
-      maze_id TEXT PRIMARY KEY,
-      current_room_id TEXT,
-      completed_rooms TEXT, -- JSON array of room IDs
-      score INTEGER DEFAULT 0,
-      started_at DATETIME,
-      completed_at DATETIME,
-      best_score INTEGER DEFAULT 0,
-      attempts INTEGER DEFAULT 0,
       last_accessed_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
     
@@ -226,137 +202,6 @@ export const getAllJourneyProgress = async (): Promise<JourneyProgress[]> => {
   }));
 };
 
-// Maze Progress Operations
-
-export const getMazeProgress = async (mazeId: string): Promise<MazeProgress | null> => {
-  const db = getDatabase();
-  const result = await db.getFirstAsync<{
-    maze_id: string;
-    current_room_id: string;
-    completed_rooms: string;
-    score: number;
-    started_at: string;
-    completed_at: string | null;
-    best_score: number;
-    attempts: number;
-    last_accessed_at: string;
-  }>(
-    'SELECT * FROM explorer_mazes WHERE maze_id = ?',
-    [mazeId]
-  );
-  
-  if (!result) return null;
-  
-  return {
-    mazeId: result.maze_id,
-    currentRoomId: result.current_room_id,
-    completedRooms: JSON.parse(result.completed_rooms || '[]'),
-    score: result.score,
-    startedAt: result.started_at,
-    completedAt: result.completed_at || undefined,
-    bestScore: result.best_score || undefined,
-    attempts: result.attempts,
-  };
-};
-
-export const startMaze = async (mazeId: string, firstRoomId: string): Promise<void> => {
-  const db = getDatabase();
-  const existing = await getMazeProgress(mazeId);
-  
-  if (!existing) {
-    await db.runAsync(
-      `INSERT INTO explorer_mazes 
-       (maze_id, current_room_id, completed_rooms, score, started_at, attempts, last_accessed_at)
-       VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP)`,
-      [
-        mazeId,
-        firstRoomId,
-        JSON.stringify([]),
-        0,
-      ]
-    );
-  } else {
-    await db.runAsync(
-      `UPDATE explorer_mazes 
-       SET current_room_id = ?,
-           score = 0,
-           completed_rooms = ?,
-           started_at = CURRENT_TIMESTAMP,
-           attempts = attempts + 1,
-           last_accessed_at = CURRENT_TIMESTAMP
-       WHERE maze_id = ?`,
-      [firstRoomId, JSON.stringify([]), mazeId]
-    );
-  }
-};
-
-export const updateMazeProgress = async (
-  mazeId: string,
-  roomId: string,
-  score: number,
-  completedRooms: string[]
-): Promise<void> => {
-  const db = getDatabase();
-  await db.runAsync(
-    `UPDATE explorer_mazes 
-     SET current_room_id = ?,
-         score = ?,
-         completed_rooms = ?,
-         last_accessed_at = CURRENT_TIMESTAMP
-     WHERE maze_id = ?`,
-    [roomId, score, JSON.stringify(completedRooms), mazeId]
-  );
-};
-
-export const completeMaze = async (
-  mazeId: string,
-  finalScore: number
-): Promise<void> => {
-  const db = getDatabase();
-  const progress = await getMazeProgress(mazeId);
-  const bestScore = progress?.bestScore || 0;
-  
-  await db.runAsync(
-    `UPDATE explorer_mazes 
-     SET completed_at = CURRENT_TIMESTAMP,
-         score = ?,
-         best_score = ?,
-         last_accessed_at = CURRENT_TIMESTAMP
-     WHERE maze_id = ?`,
-    [
-      finalScore,
-      Math.max(bestScore, finalScore),
-      mazeId
-    ]
-  );
-};
-
-export const getAllMazeProgress = async (): Promise<MazeProgress[]> => {
-  const db = getDatabase();
-  const results = await db.getAllAsync<{
-    maze_id: string;
-    current_room_id: string;
-    completed_rooms: string;
-    score: number;
-    started_at: string;
-    completed_at: string | null;
-    best_score: number;
-    attempts: number;
-    last_accessed_at: string;
-  }>('SELECT * FROM explorer_mazes ORDER BY last_accessed_at DESC');
-  
-  return results.map(result => ({
-    mazeId: result.maze_id,
-    currentRoomId: result.current_room_id,
-    completedRooms: JSON.parse(result.completed_rooms || '[]'),
-    score: result.score,
-    startedAt: result.started_at,
-    completedAt: result.completed_at || undefined,
-    bestScore: result.best_score || undefined,
-    attempts: result.attempts,
-  }));
-};
-
 // Helper: Check if node is unlocked
 export const isNodeUnlocked = async (
   journeyId: string,
@@ -391,11 +236,6 @@ export default {
   updateJourneyCurrentNode,
   completeJourney,
   getAllJourneyProgress,
-  getMazeProgress,
-  startMaze,
-  updateMazeProgress,
-  completeMaze,
-  getAllMazeProgress,
   isNodeUnlocked,
   isJourneyCompleted,
   getJourneyCompletionPercentage,

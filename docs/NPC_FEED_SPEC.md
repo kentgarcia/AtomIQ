@@ -16,7 +16,7 @@ Discover used to be a list of articles. Articles are gone. Discover becomes **a 
 | **Ranks** | an entry card at the top of Discover | The leaderboard, with the NPC cast as the rivals. |
 | **Encyclopedia** | an entry card at the top of Discover | The existing encyclopedia, moved here from being Discover's whole content. |
 
-There is no phone, home screen or app grid.
+The phone, its home screen and its app grid are a separate feature (`docs/PHONE_SPEC.md`); Discover itself stays a feed with no app grid.
 
 Principles:
 
@@ -32,7 +32,7 @@ Principles:
 - Real social features (friends, real comments, real users). `community_posts` and `comments` in the local-first schema stay for a future sync; this feature does not use them (§7.1).
 - Generated or network text (no LLM). Fixed, reviewed content only.
 - Anything a learner must do to progress. This feature celebrates and teaches; it never gates.
-- Comments under feed posts, and any phone or app metaphor.
+- Comments under feed posts, and any phone or app metaphor inside the feed (the phone is `docs/PHONE_SPEC.md`).
 
 ## 2. Current baseline
 

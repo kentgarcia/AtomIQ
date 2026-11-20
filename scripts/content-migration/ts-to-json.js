@@ -19,9 +19,8 @@
  *   property assignments referencing other bindings) is skipped with a warning
  *   while the remaining serilaizable exports are still written.
  *
- *   References to other top-level consts inside the same file (e.g. a Maze
- *   object whose `boss`/`monster` property points at a Monster const defined
- *   earlier in the file) are resolved inline: the referenced const's object
+ *   References to other top-level consts inside the same file (e.g. an
+ *   object whose property points at a const defined earlier in the file) are resolved inline: the referenced const's object
  *   literal is inlined into the output. Cyclic references are rejected.
  *
  * HOW TO RUN
@@ -184,8 +183,7 @@ function extractExportedObjects(fileName, contents) {
 
   // Collect every top-level const whose initializer is a serializable literal
   // (object, array, or plain string/number/boolean — exported or not) so that
-  // identifiers inside exported values — e.g. a maze whose `boss`/`monster`
-  // points at a Monster const, or an author `avatar` alias for a shared path —
+  // identifiers inside exported values — e.g. an author `avatar` alias for a shared path —
   // can be resolved to their literal value.
   const refs = new Map();
   for (const stmt of sourceFile.statements) {

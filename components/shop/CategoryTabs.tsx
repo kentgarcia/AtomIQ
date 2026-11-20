@@ -7,10 +7,11 @@ import { Pressable, View } from "react-native";
 
 import { Icon } from "@/components/ui/icon";
 import { impactLight } from "@/services/haptics";
+import { playSfx } from "@/services/sfx";
 import { createStyles, useTheme } from "@/theme";
 import { controls } from "@/theme/tokens";
 
-import { SHOP_CATEGORIES, type ShopCategoryId } from "./shop-core";
+import { SHOP_TABS, type ShopTabId } from "./shop-core";
 
 const useStyles = createStyles((theme) => {
   const c = theme.colors;
@@ -22,12 +23,12 @@ const useStyles = createStyles((theme) => {
   };
 });
 
-export function CategoryTabs({ value, onChange }: { value: ShopCategoryId; onChange: (id: ShopCategoryId) => void }) {
+export function CategoryTabs({ value, onChange }: { value: ShopTabId; onChange: (id: ShopTabId) => void }) {
   const { theme } = useTheme();
   const styles = useStyles(theme);
   return (
     <View style={styles.strip} accessibilityRole="tablist">
-      {SHOP_CATEGORIES.map((cat) => {
+      {SHOP_TABS.map((cat) => {
         const on = cat.id === value;
         return (
           <Pressable
@@ -35,6 +36,8 @@ export function CategoryTabs({ value, onChange }: { value: ShopCategoryId; onCha
             onPress={() => {
               if (on) return;
               impactLight();
+              // Right for a tab after the current one, left for one before it
+              void playSfx(SHOP_TABS.findIndex((t) => t.id === cat.id) > SHOP_TABS.findIndex((t) => t.id === value) ? "ui.tab-right" : "ui.tab-left");
               onChange(cat.id);
             }}
             accessibilityRole="tab"

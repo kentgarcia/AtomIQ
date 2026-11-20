@@ -11,7 +11,7 @@ import { useEffect } from "react";
 import Animated, { Easing, cancelAnimation, useAnimatedStyle, useSharedValue, withTiming, type SharedValue } from "react-native-reanimated";
 
 import { TypedTermText } from "@/components/lesson/TypedText";
-import { stopSfx } from "@/services/sfx";
+import { playSfx, stopSfx } from "@/services/sfx";
 import { createStyles, fontFaces, fontSizes, useTheme } from "@/theme";
 
 import type { SignTile } from "./platformer-core";
@@ -45,6 +45,11 @@ export function SignBubble({ sign, open, tile, viewW, frame }: { sign: SignTile;
     clock.set(withTiming(open ? WORLD_FX.bubbleIn : WORLD_FX.bubbleOut, { duration: open ? WORLD_FX.bubbleIn : WORLD_FX.bubbleOut, easing: Easing.linear }));
     return () => cancelAnimation(clock);
   }, [open, isOpen, clock]);
+
+  // A sign's speech bubble pops open: the same soft pop as the lessons' bubbles
+  useEffect(() => {
+    if (open) void playSfx("lesson.bubble");
+  }, [open]);
 
   // The talking blips end with the bubble: closed, or gone, any that is still sounding is cut off
   useEffect(() => {

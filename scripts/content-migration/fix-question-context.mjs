@@ -116,14 +116,7 @@ add("lesson_steps", "nuclear-energy-explained/assessment-2", {
   answer: 0,
 });
 
-// --- maze_rooms: position-dependent option (options are shuffled at runtime) ----
-add("maze_rooms", "reactor-tech-maze/room-4", {
-  mazeQuestion: 0,
-  options: { 3: ["Both B and C", "Both to remove heat and to create steam"] },
-  answer: 3,
-});
-
-// --- mythbuster_questions: stems (also the Atom Maze boss + endless pool) --------
+// --- mythbuster_questions: stems --------
 const mb = (id, from, to, extra = {}) => add("mythbuster_questions", id, { question: [from, to], ...extra });
 
 mb("mb-easy-q24", "What is shielding?", "In radiation safety, what is shielding?");
@@ -423,26 +416,6 @@ try {
       }
       if (touched) {
         db.prepare("UPDATE lesson_steps SET data = ?, updated_at = ? WHERE lesson_id = ? AND id = ?").run(JSON.stringify(data), now, lessonId, stepId);
-      }
-    } else if (change.table === "maze_rooms") {
-      const [mazeId, roomId] = change.id.split("/");
-      const sel = db.prepare("SELECT questions FROM maze_rooms WHERE maze_id = ? AND id = ?").get(mazeId, roomId);
-      if (!sel) throw new Error(`${label}: row not found`);
-      const questions = parse(sel.questions);
-      const q = questions[change.mazeQuestion];
-      if (change.answer !== undefined && q.correctAnswer !== change.answer) {
-        throw new Error(`${label}: stored answer ${q.correctAnswer} != expected ${change.answer}`);
-      }
-      if (change.options) {
-        const before = JSON.stringify(q.options);
-        q.options = applyOptionEdits(q.options, change.options, label);
-        if (JSON.stringify(q.options) !== before) {
-          recordChange(label, `questions[${change.mazeQuestion}].options`, before, JSON.stringify(q.options));
-          touched = true;
-        }
-      }
-      if (touched) {
-        db.prepare("UPDATE maze_rooms SET questions = ?, updated_at = ? WHERE maze_id = ? AND id = ?").run(JSON.stringify(questions), now, mazeId, roomId);
       }
     } else {
       throw new Error(`${label}: unsupported table`);

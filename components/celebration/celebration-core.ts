@@ -64,6 +64,16 @@ export const LEVEL_UP = {
   barMs: 500,
   button: 900,
 } as const;
+/** Items the level-up shows it opened in the shop: the tiles arrive one after another from `unlocked` ms, `unlockedStep` apart. */
+export const LEVEL_UNLOCKS = { max: 8, unlocked: 1000, unlockedStep: 90, settle: 260 } as const;
+
+/** When the dialog's button arrives: with the line, or after the last tile of the unlocked items when there are some. */
+export function levelUpButtonAt(shownTiles: number): number {
+  if (shownTiles <= 0) return LEVEL_UP.button;
+  const { unlocked, unlockedStep, settle } = LEVEL_UNLOCKS;
+  return unlocked + (shownTiles - 1) * unlockedStep + settle;
+}
+
 export const LEVEL_UP_TOTAL = Math.max(
   LEVEL_UP.medal + STAMP_TOTAL,
   LEVEL_UP.burst + BURST.total,

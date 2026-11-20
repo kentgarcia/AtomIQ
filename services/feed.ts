@@ -38,6 +38,7 @@ import {
   type PlanResult,
   type RankDirection,
 } from "@/services/feed-core";
+import { createFeedQueue } from "@/services/feed-queue-core";
 import * as store from "@/services/feed-store";
 import type { StoredFeedPost, StoredReaction } from "@/services/feed-store";
 import { computePathState } from "@/services/path-core";
@@ -69,30 +70,7 @@ const warn = (what: string, error: unknown) => {
   console.warn(`[feed] ${what}`, error);
 };
 
-let chain: Promise<unknown> = Promise.resolve();
-
-/** Run `task` after everything queued before it. Never rejects: a failure is logged and gives `undefined`. */
-function enqueue<T>(what: string, task: () => Promise<T>): Promise<T | undefined> {
-  const next = chain.then(task);
-  chain = next.catch(() => undefined);
-  return next.catch((error) => {
-    warn(what, error);
-    return undefined;
-  });
-}
-
-/**
- * Run `task` now (right behind whatever is queued), without waiting for it. Never throws. A post is
- * stored the moment its event happens; the Feed list reads it through `subscribeFeed` and so shows it
- * as soon as the learner is on that page, with nothing shown anywhere else.
- */
-function defer(what: string, task: () => Promise<unknown>): void {
-  try {
-    void enqueue(what, task);
-  } catch (error) {
-    warn(what, error);
-  }
-}
+const { enqueue, defer } = createFeedQueue({ warn });
 
 const listeners = new Set<() => void>();
 
@@ -104,7 +82,15 @@ export function subscribeFeed(listener: () => void): () => void {
   };
 }
 
+/** While > 0 (a reconcile making many posts), changes are counted and announced once at the end. */
+let quiet = 0;
+let missed = false;
+
 const notify = () => {
+  if (quiet > 0) {
+    missed = true;
+    return;
+  }
   listeners.forEach((l) => {
     try {
       l();
@@ -313,7 +299,8 @@ export function emitNodeCompleted(info: NodeCompletedInfo): void {
     } catch (error) {
       warn("node completed", error);
     }
-    await createBlogCards();
+    // Anything the live events above missed (a failed write) is made from progress, the way chats are.
+    await reconcileNow().catch((error) => warn("reconcile after node", error));
   });
 }
 
@@ -325,47 +312,79 @@ export function emitNodeCompleted(info: NodeCompletedInfo): void {
  * the Settings switch like every other post, and (re)creates blog cards at the end.
  */
 export function reconcileFeed(): Promise<number> {
-  return enqueue("reconcile", async () => {
-    const now = Date.now();
-    let made = 0;
-    if (await getFeedPostsEnabled()) {
-      const progress = await loadProgress();
-      const keys = await store.listDedupeKeys();
-      const stars = new Map<string, number>();
-      const completedAt = new Map<string, number>();
-      for (const l of progress.levels) {
-        if (l.status !== "completed") continue;
-        stars.set(l.id, l.stars ?? 0);
-        const t = l.completed_at ? Date.parse(l.completed_at) : NaN;
-        if (Number.isFinite(t) && t <= now) completedAt.set(l.id, t);
-      }
-      const items = reconcileEvents(
-        {
-          unitIds: progress.units.map((u) => u.id),
-          nodes: progress.nodes.map((n) => ({ id: n.id, unitId: n.unitId, kind: n.kind, position: n.position, lessonId: n.lessonId })),
-          completed: progress.completed,
-          testedOut: progress.testedOut,
-          completedUnits: new Set(progress.unlock.completedUnitIds),
-          stars,
-          completedAt,
-          streak: progress.unlock.streak,
-        },
-        keys,
-        dayKeyOf(now),
-      );
-      // Strictly increasing times keep the order; an unknown time is "just now", after everything dated.
-      let last = 0;
-      for (const item of items) {
-        const at = Math.max(item.at ?? now - items.length, last + 1);
-        last = at;
-        let created = await processEvent(item.event, { now: at });
-        if (!created && item.fallback) created = await processEvent(item.fallback, { now: at });
-        if (created) made += 1;
-      }
+  return enqueue("reconcile", reconcileNow).then((n) => n ?? 0);
+}
+
+/** The body of `reconcileFeed`, for code that is already inside the queue (awaiting `reconcileFeed` from there would wait on itself). */
+async function reconcileNow(): Promise<number> {
+  quiet += 1;
+  try {
+    return await reconcileBody();
+  } finally {
+    quiet -= 1;
+    if (quiet === 0 && missed) {
+      missed = false;
+      notify(); // one announcement for however many posts were made, so lists reload once
     }
-    made += await createBlogCards();
-    return made;
-  }).then((n) => n ?? 0);
+  }
+}
+
+async function reconcileBody(): Promise<number> {
+  const now = Date.now();
+  let made = 0;
+  if (await getFeedPostsEnabled()) {
+    const progress = await loadProgress();
+    const keys = await store.listDedupeKeys();
+    const stars = new Map<string, number>();
+    const completedAt = new Map<string, number>();
+    for (const l of progress.levels) {
+      if (l.status !== "completed") continue;
+      stars.set(l.id, l.stars ?? 0);
+      const t = l.completed_at ? Date.parse(l.completed_at) : NaN;
+      if (Number.isFinite(t) && t <= now) completedAt.set(l.id, t);
+    }
+    const items = reconcileEvents(
+      {
+        unitIds: progress.units.map((u) => u.id),
+        nodes: progress.nodes.map((n) => ({ id: n.id, unitId: n.unitId, kind: n.kind, position: n.position, lessonId: n.lessonId })),
+        completed: progress.completed,
+        testedOut: progress.testedOut,
+        completedUnits: new Set(progress.unlock.completedUnitIds),
+        stars,
+        completedAt,
+        streak: progress.unlock.streak,
+      },
+      keys,
+      dayKeyOf(now),
+    );
+    // Strictly increasing times keep the order; an unknown time is "just now", after everything dated.
+    let last = 0;
+    for (const item of items) {
+      const at = Math.max(item.at ?? now - items.length, last + 1);
+      last = at;
+      let created = await processEvent(item.event, { now: at });
+      if (!created && item.fallback) created = await processEvent(item.fallback, { now: at });
+      if (created) made += 1;
+    }
+  }
+  made += await createBlogCards();
+  return made;
+}
+
+const RECONCILE_MIN_GAP_MS = 20_000;
+let lastReconcileAt = 0;
+
+/**
+ * `reconcileFeed`, at most once every 20 s unless `force`: the feed fills itself from progress the way chats
+ * do (lessons, units, checkpoints, streaks), so a post whose live event was lost still appears without the
+ * learner opening Discover. Call it where progress may have changed: app open, returning to the foreground,
+ * the tab bar loading. Never rejects.
+ */
+export function reconcileFeedSoon(force = false): Promise<number> {
+  const now = Date.now();
+  if (!force && now - lastReconcileAt < RECONCILE_MIN_GAP_MS) return Promise.resolve(0);
+  lastReconcileAt = now;
+  return reconcileFeed();
 }
 
 /** The learner's streak changed (called where `current_streak` is updated). Only 3, 7, 14, 30, 60 and 100 post. */
@@ -456,30 +475,33 @@ interface RankState {
  * Discover opens.
  */
 export function checkRankChange(): Promise<void> {
-  return enqueue("rank change", async () => {
-    if (!(await getFeedPostsEnabled())) return;
-    const now = Date.now();
-    const ranking = await getWeeklyRanking(now);
-    if (ranking.learner.xp <= 0) return; // nothing to celebrate or to lose yet
-    const order = ranking.rows.map((r) => r.id);
-    const saved = await getItem<RankState>(STORAGE_KEYS.FEED_RANK_STATE);
-    if (!saved || saved.weekKey !== ranking.weekKey || !Array.isArray(saved.order)) {
-      await setItem(STORAGE_KEYS.FEED_RANK_STATE, { weekKey: ranking.weekKey, order } satisfies RankState);
-      return;
-    }
-    const change = rankChange(saved.order.map((id) => ({ id })), ranking.rows);
-    if (change.type === "none") {
-      await setItem(STORAGE_KEYS.FEED_RANK_STATE, { ...saved, order } satisfies RankState);
-      return;
-    }
-    await processEvent({ type: "rank_change", direction: change.direction as RankDirection, npcId: change.npcId, at: now });
+  return enqueue("rank change", rankCheckNow).then(() => undefined);
+}
+
+/** The body of `checkRankChange`, for code already inside the queue (`emitRankCheck` is: queueing again from there waits behind itself and wedges the whole feed). */
+async function rankCheckNow(): Promise<void> {
+  if (!(await getFeedPostsEnabled())) return;
+  const now = Date.now();
+  const ranking = await getWeeklyRanking(now);
+  if (ranking.learner.xp <= 0) return; // nothing to celebrate or to lose yet
+  const order = ranking.rows.map((r) => r.id);
+  const saved = await getItem<RankState>(STORAGE_KEYS.FEED_RANK_STATE);
+  if (!saved || saved.weekKey !== ranking.weekKey || !Array.isArray(saved.order)) {
     await setItem(STORAGE_KEYS.FEED_RANK_STATE, { weekKey: ranking.weekKey, order } satisfies RankState);
-  }).then(() => undefined);
+    return;
+  }
+  const change = rankChange(saved.order.map((id) => ({ id })), ranking.rows);
+  if (change.type === "none") {
+    await setItem(STORAGE_KEYS.FEED_RANK_STATE, { ...saved, order } satisfies RankState);
+    return;
+  }
+  await processEvent({ type: "rank_change", direction: change.direction as RankDirection, npcId: change.npcId, at: now });
+  await setItem(STORAGE_KEYS.FEED_RANK_STATE, { weekKey: ranking.weekKey, order } satisfies RankState);
 }
 
 /** Fire-and-forget `checkRankChange` for the XP choke point. */
 export function emitRankCheck(): void {
-  defer("rank check", () => checkRankChange());
+  defer("rank check", rankCheckNow);
 }
 
 /* ------------------------------------------------------------------ */

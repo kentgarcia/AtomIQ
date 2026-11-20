@@ -8,7 +8,7 @@
  *
  * `ContentRepository` then provides typed, high-level queries over the curriculum
  * (units, path nodes, lessons made of cards, the shared item bank, references)
- * and the other content (myths, mazes, encyclopedia). JSON
+ * and the other content (myths, encyclopedia). JSON
  * columns are hydrated into plain objects by content/curriculum/hydrate.ts.
  *
  * USAGE (in a screen / hook):
@@ -67,14 +67,21 @@ import type {
   Unit,
 } from "@/content/curriculum/types";
 
+import type { EncyclopediaEntry } from "@/content/explorer/types";
+import { kindOf, type MapSite } from "@/components/map/map-core";
+import {
+  SAFETY_SECTIONS,
+  type SafetyCard,
+  type SafetySection,
+} from "@/components/safety/safety-core";
+import type { ScanTarget } from "@/components/scanner/scanner-core";
+import type { ChatNode } from "@/services/chat-core";
 import type {
-  AtomMazeChallenge,
-  AtomMazeRoom,
-  BattleQuestion,
-  EncyclopediaEntry,
-  Monster,
-  MonsterElement,
-} from "@/content/explorer/types";
+  EntrySourceRow,
+  LibraryLink,
+  LibraryReferenceRow,
+  LibraryUnit,
+} from "@/services/library-core";
 
 import {
   REQUIRED_CONTENT_TABLES,
@@ -105,7 +112,7 @@ const CONTENT_DB_PREV_NAME = "content.prev.db";
  * The same value is stamped into the bundled database's `content_meta` table,
  * so a device always compares the version of the data it actually holds.
  */
-export const CONTENT_DB_VERSION = "0.0.0+draft.c55251";
+export const CONTENT_DB_VERSION = "0.0.0+draft.449b85";
 
 /**
  * Shape of the content this build's repository reads (columns, step types,
@@ -527,7 +534,7 @@ function parseJsonRecords<T>(raw: string | null | undefined): T[] {
   }
 }
 
-/** Safely JSON.parse a column that holds a single JSON object (e.g. a maze `boss`). */
+/** Safely JSON.parse a column that holds a single JSON object. */
 function parseJsonObject<T>(raw: string | null | undefined): T | null {
   if (!raw) return null;
   try {
@@ -581,34 +588,6 @@ interface MythRow {
   popularity: number;
 }
 
-
-/** Raw shape of a `mazes` row as returned by expo-sqlite. */
-interface MazeRow {
-  id: string;
-  title: string;
-  description: string;
-  theme: string;
-  xp_reward: number;
-  time_limit: number | null;
-  player_max_hp: number;
-  boss: string; // JSON Monster object (final boss)
-}
-
-/** Raw shape of a `maze_rooms` row as returned by expo-sqlite. */
-interface MazeRoomRow {
-  maze_id: string;
-  id: string;
-  title: string;
-  description: string;
-  monster: string; // JSON Monster object
-  questions: string; // JSON array of BattleQuestions
-  damage_per_correct: number;
-  explanation: string;
-  next_room_id: string | null;
-  alternative_path_id: string | null;
-  unlock_condition: string | null; // JSON { type, value } when set
-}
-
 /** Flatten a mythbuster question row into the domain `QuizQuestion` shape. */
 function mapMythBusterQuestionRow(row: MythBusterQuestionRow): QuizQuestion {
   return {
@@ -639,59 +618,6 @@ function mapMythRow(row: MythRow): Myth {
     ...(row.image ? { image: row.image } : {}),
     tags: parseJsonArray(row.tags),
     popularity: row.popularity,
-  };
-}
-
-/** Parse an embedded monster object, falling back to an empty monster. */
-function parseMonster(raw: string | null | undefined): Monster {
-  return (
-    parseJsonObject<Monster>(raw) ?? {
-      id: "",
-      name: "",
-      element: "nuclear" as MonsterElement,
-      maxHp: 0,
-      attackPower: 0,
-      sprite: "",
-      color: "",
-      defeatMessage: "",
-    }
-  );
-}
-
-/** Flatten a maze room row into the domain `AtomMazeRoom` shape. */
-function mapMazeRoomRow(row: MazeRoomRow): AtomMazeRoom {
-  return {
-    id: row.id,
-    title: row.title,
-    description: row.description,
-    monster: parseMonster(row.monster),
-    questions: parseJsonRecords<BattleQuestion>(row.questions),
-    damagePerCorrect: row.damage_per_correct,
-    explanation: row.explanation,
-    ...(row.next_room_id ? { nextRoomId: row.next_room_id } : {}),
-    ...(row.alternative_path_id ? { alternativePathId: row.alternative_path_id } : {}),
-    ...(row.unlock_condition
-      ? {
-          unlockCondition: parseJsonObject<NonNullable<AtomMazeRoom["unlockCondition"]>>(
-            row.unlock_condition,
-          ) ?? undefined,
-        }
-      : {}),
-  };
-}
-
-/** Flatten a maze row + its (already ordered) room rows into `AtomMazeChallenge`. */
-function mapMazeRow(row: MazeRow, rooms: MazeRoomRow[]): AtomMazeChallenge {
-  return {
-    id: row.id,
-    title: row.title,
-    description: row.description,
-    theme: row.theme,
-    rooms: rooms.map(mapMazeRoomRow),
-    xpReward: row.xp_reward,
-    ...(row.time_limit != null ? { timeLimit: row.time_limit } : {}),
-    playerMaxHp: row.player_max_hp,
-    boss: parseMonster(row.boss),
   };
 }
 
@@ -847,6 +773,198 @@ export class ContentRepository {
       "SELECT id, npc_id, kind, lesson_id, journey_id, text, pose FROM npc_lines ORDER BY id ASC",
     );
     return rows.map((r) => ({ id: r.id, npcId: r.npc_id, kind: r.kind as NpcLine["kind"], lessonId: r.lesson_id, journeyId: r.journey_id, text: r.text, pose: r.pose as NpcLine["pose"] }));
+  }
+
+  /** The teachers' chat nodes (docs/PHONE_SPEC.md §7.1). Throws when the bundled database predates the `chat_nodes` table. */
+  async getChatNodes(): Promise<ChatNode[]> {
+    const db = await getReadyContentDb();
+    const rows = await db.getAllAsync<{
+      id: string;
+      npc_id: string;
+      kind: string;
+      trigger: string | null;
+      title: string | null;
+      text: string;
+      pose: string;
+      replies: string;
+      position: number;
+    }>(
+      'SELECT id, npc_id, kind, "trigger" AS "trigger", title, text, pose, replies, position FROM chat_nodes ORDER BY npc_id ASC, position ASC, id ASC',
+    );
+    return rows.map((r) => {
+      let replies: ChatNode["replies"] = [];
+      try {
+        const parsed: unknown = JSON.parse(r.replies);
+        if (Array.isArray(parsed)) replies = parsed as ChatNode["replies"];
+      } catch {
+        // A row with unreadable replies has no pills rather than breaking the thread.
+      }
+      return {
+        id: r.id,
+        npcId: r.npc_id,
+        kind: r.kind as ChatNode["kind"],
+        trigger: r.trigger,
+        title: r.title,
+        text: r.text,
+        pose: r.pose,
+        replies,
+        position: r.position,
+      };
+    });
+  }
+
+  /** The Atom Scanner's targets, by scene then position (docs/PHONE_SPEC.md §8). Throws when the bundled database predates `scan_targets`. */
+  async getScanTargets(): Promise<ScanTarget[]> {
+    const db = await getReadyContentDb();
+    const rows = await db.getAllAsync<{
+      id: string;
+      name: string;
+      scene: string;
+      object: string;
+      blurb: string;
+      composition: string;
+      fun_fact: string;
+      atomdex_entry_id: string | null;
+      position: number;
+    }>(
+      "SELECT id, name, scene, object, blurb, composition, fun_fact, atomdex_entry_id, position FROM scan_targets ORDER BY scene ASC, position ASC, id ASC",
+    );
+    const sourceRows = await db.getAllAsync<{
+      target_id: string;
+      publisher: string;
+      title: string;
+    }>(
+      "SELECT l.target_id, r.publisher, r.title FROM scan_target_references l JOIN content_references r ON r.id = l.reference_id ORDER BY l.target_id, r.id",
+    );
+    const sources = new Map<string, string[]>();
+    for (const s of sourceRows)
+      sources.set(s.target_id, [
+        ...(sources.get(s.target_id) ?? []),
+        `${s.publisher}, ${s.title}`,
+      ]);
+    return rows.map((r) => {
+      let composition: ScanTarget["composition"] = [];
+      try {
+        const parsed: unknown = JSON.parse(r.composition);
+        if (Array.isArray(parsed))
+          composition = parsed as ScanTarget["composition"];
+      } catch {
+        // A row with unreadable elements shows no chips rather than breaking the scanner.
+      }
+      return {
+        id: r.id,
+        name: r.name,
+        scene: r.scene,
+        object: r.object,
+        blurb: r.blurb,
+        composition,
+        funFact: r.fun_fact,
+        atomdexEntryId: r.atomdex_entry_id,
+        position: r.position,
+        sources: sources.get(r.id) ?? [],
+      };
+    });
+  }
+
+  /** The Safety Guide's cards, by section then position (docs/PHONE_SPEC.md §5.9). Throws when the bundled database predates `safety_cards`. */
+  async getSafetyCards(): Promise<SafetyCard[]> {
+    const db = await getReadyContentDb();
+    const rows = await db.getAllAsync<{
+      id: string;
+      section: string;
+      title: string;
+      summary: string;
+      steps: string;
+      icon: string;
+      entry_id: string | null;
+      position: number;
+    }>(
+      "SELECT id, section, title, summary, steps, icon, entry_id, position FROM safety_cards ORDER BY section ASC, position ASC, id ASC",
+    );
+    const sourceRows = await db.getAllAsync<{
+      card_id: string;
+      publisher: string;
+      title: string;
+    }>(
+      "SELECT l.card_id, r.publisher, r.title FROM safety_card_references l JOIN content_references r ON r.id = l.reference_id ORDER BY l.card_id, r.id",
+    );
+    const sources = new Map<string, string[]>();
+    for (const s of sourceRows)
+      sources.set(s.card_id, [
+        ...(sources.get(s.card_id) ?? []),
+        `${s.publisher}, ${s.title}`,
+      ]);
+    const cards: SafetyCard[] = [];
+    for (const r of rows) {
+      if (!(SAFETY_SECTIONS as readonly string[]).includes(r.section)) continue;
+      let steps: string[] = [];
+      try {
+        const parsed: unknown = JSON.parse(r.steps);
+        if (Array.isArray(parsed))
+          steps = parsed.filter((s): s is string => typeof s === "string");
+      } catch {
+        // A card whose lines cannot be read is left out below rather than shown empty.
+      }
+      cards.push({
+        id: r.id,
+        section: r.section as SafetySection,
+        title: r.title,
+        summary: r.summary,
+        steps,
+        icon: r.icon,
+        entryId: r.entry_id,
+        position: r.position,
+        sources: sources.get(r.id) ?? [],
+      });
+    }
+    return cards;
+  }
+
+  /** The Nuclear Map's sites in reading order (docs/PHONE_SPEC.md §5.8). Throws when the bundled database predates `map_sites`. */
+  async getMapSites(): Promise<MapSite[]> {
+    const db = await getReadyContentDb();
+    const rows = await db.getAllAsync<{
+      id: string;
+      name: string;
+      place: string;
+      kind: string;
+      year: string;
+      lat: number;
+      lon: number;
+      blurb: string;
+      fact: string;
+      entry_id: string | null;
+      position: number;
+    }>(
+      "SELECT id, name, place, kind, year, lat, lon, blurb, fact, entry_id, position FROM map_sites ORDER BY position ASC, id ASC",
+    );
+    const sourceRows = await db.getAllAsync<{
+      site_id: string;
+      publisher: string;
+      title: string;
+    }>(
+      "SELECT l.site_id, r.publisher, r.title FROM map_site_references l JOIN content_references r ON r.id = l.reference_id ORDER BY l.site_id, r.id",
+    );
+    const sources = new Map<string, string[]>();
+    for (const s of sourceRows)
+      sources.set(s.site_id, [
+        ...(sources.get(s.site_id) ?? []),
+        `${s.publisher}, ${s.title}`,
+      ]);
+    return rows.map((r) => ({
+      id: r.id,
+      name: r.name,
+      place: r.place,
+      kind: kindOf(r.kind),
+      year: r.year,
+      lat: r.lat,
+      lon: r.lon,
+      blurb: r.blurb,
+      fact: r.fact,
+      entryId: r.entry_id,
+      position: r.position,
+      sources: sources.get(r.id) ?? [],
+    }));
   }
 
   // -------------------------------------------------------------------------
@@ -1008,6 +1126,118 @@ export class ContentRepository {
     return ids.map((id) => byId.get(id)).filter((i): i is Item => !!i);
   }
 
+  /**
+   * Everything the Reference Library needs: every content reference, where each is cited (units, lessons, blog
+   * pieces, with the unit they belong to), the sources written on AtomDex entries, and the units in path order.
+   */
+  async getReferenceLibraryData(): Promise<{
+    references: LibraryReferenceRow[];
+    links: LibraryLink[];
+    entrySources: EntrySourceRow[];
+    units: LibraryUnit[];
+  }> {
+    const db = await getReadyContentDb();
+    const refRows = await db.getAllAsync<ReferenceRow>(
+      "SELECT * FROM content_references ORDER BY id ASC",
+    );
+    const unitLinks = await db.getAllAsync<{
+      reference_id: string;
+      unit_id: string;
+      title: string;
+    }>(
+      "SELECT ur.reference_id, u.id AS unit_id, u.title FROM unit_references ur JOIN units u ON u.id = ur.unit_id",
+    );
+    const lessonLinks = await db.getAllAsync<{
+      reference_id: string;
+      unit_id: string;
+      title: string;
+    }>(
+      "SELECT lr.reference_id, l.unit_id, l.title FROM lesson_references lr JOIN lessons l ON l.id = lr.lesson_id",
+    );
+    const blogLinks = await db.getAllAsync<{
+      reference_id: string;
+      unit_id: string | null;
+      title: string;
+    }>(
+      "SELECT br.reference_id, b.unit_id, b.title FROM blog_references br JOIN blog_posts b ON b.id = br.blog_id",
+    );
+    const entryRows = await db.getAllAsync<{
+      id: string;
+      term: string;
+      sources: string;
+    }>(
+      "SELECT id, term, sources FROM encyclopedia_entries WHERE sources != '[]'",
+    );
+    const unitRows = await db.getAllAsync<{
+      id: string;
+      title: string;
+      position: number;
+    }>("SELECT id, title, position FROM units ORDER BY position ASC");
+
+    const entrySources: EntrySourceRow[] = [];
+    for (const e of entryRows) {
+      let parsed: unknown;
+      try {
+        parsed = JSON.parse(e.sources);
+      } catch {
+        continue;
+      }
+      if (!Array.isArray(parsed)) continue;
+      for (const s of parsed as {
+        title?: string;
+        url?: string;
+        author?: string;
+        type?: string;
+      }[]) {
+        entrySources.push({
+          entryId: e.id,
+          entryTerm: e.term,
+          title: s.title ?? "",
+          url: s.url ?? "",
+          author: s.author ?? "",
+          type: s.type ?? "article",
+        });
+      }
+    }
+
+    return {
+      references: refRows.map((row) => {
+        const r = mapReference(row);
+        return {
+          id: r.id,
+          kind: r.kind,
+          publisher: r.publisher,
+          title: r.title,
+          year: r.year,
+          url: r.url,
+          verified: r.verified,
+        };
+      }),
+      links: [
+        ...unitLinks.map((l) => ({
+          refId: l.reference_id,
+          kind: "unit" as const,
+          label: l.title,
+          unitId: l.unit_id,
+        })),
+        ...lessonLinks.map((l) => ({
+          refId: l.reference_id,
+          kind: "lesson" as const,
+          label: l.title,
+          unitId: l.unit_id,
+        })),
+        ...blogLinks.map((l) => ({
+          refId: l.reference_id,
+          kind: "blog" as const,
+          label: l.title,
+          unitId: l.unit_id,
+        })),
+      ],
+      entrySources,
+      units: unitRows,
+    };
+  }
+
   /** References by id, in the order asked. Unknown ids are skipped. */
   async getReferencesByIds(ids: string[]): Promise<Reference[]> {
     if (ids.length === 0) return [];
@@ -1036,7 +1266,7 @@ export class ContentRepository {
 
   /**
    * Mythbuster question banks: every question for the given difficulty pool
-   * (easy/medium/hard), ordered by position. Used by the atom-maze boss.
+   * (easy/medium/hard), ordered by position.
    */
   async getMythBusterQuizQuestionsByDifficulty(
     difficulty: "easy" | "medium" | "hard",
@@ -1117,67 +1347,6 @@ export class ContentRepository {
     const db = await getReadyContentDb();
     const { count } = (await db.getFirstAsync<{ count: number }>(
       "SELECT COUNT(*) AS count FROM myths",
-    )) as { count: number };
-    return count;
-  }
-
-  // -------------------------------------------------------------------------
-  // Mazes
-  // -------------------------------------------------------------------------
-
-  /**
-   * Fetch a full maze by ID: the `mazes` row plus its `maze_rooms` rows
-   * ordered by `position`, with every embedded JSON column (boss, monsters,
-   * questions, unlock conditions) parsed back into usable objects. Returns
-   * `null` when no maze with that ID exists.
-   */
-  async getMazeById(id: string): Promise<AtomMazeChallenge | null> {
-    const db = await getReadyContentDb();
-
-    const row = await db.getFirstAsync<MazeRow>(
-      "SELECT * FROM mazes WHERE id = ? LIMIT 1",
-      [id],
-    );
-    if (!row) return null;
-
-    const roomRows = await db.getAllAsync<MazeRoomRow>(
-      "SELECT * FROM maze_rooms WHERE maze_id = ? ORDER BY position ASC",
-      [id],
-    );
-
-    return mapMazeRow(row, roomRows);
-  }
-
-  /**
-   * Every maze, fully hydrated (rooms + parsed monster/question JSON),
-   * ordered by id. Used by the game picker / difficulty panel.
-   */
-  async getAllMazes(): Promise<AtomMazeChallenge[]> {
-    const db = await getReadyContentDb();
-
-    const rows = await db.getAllAsync<MazeRow>("SELECT * FROM mazes ORDER BY id");
-    if (rows.length === 0) return [];
-
-    const roomRows = await db.getAllAsync<MazeRoomRow>(
-      "SELECT * FROM maze_rooms ORDER BY maze_id ASC, position ASC",
-    );
-
-    // Group rooms by maze while preserving `position` order.
-    const roomsByMazeId = new Map<string, MazeRoomRow[]>();
-    for (const roomRow of roomRows) {
-      const list = roomsByMazeId.get(roomRow.maze_id);
-      if (list) list.push(roomRow);
-      else roomsByMazeId.set(roomRow.maze_id, [roomRow]);
-    }
-
-    return rows.map((row) => mapMazeRow(row, roomsByMazeId.get(row.id) ?? []));
-  }
-
-  /** Number of mazes seeded — handy for integrity checks on launch. */
-  async getMazeCount(): Promise<number> {
-    const db = await getReadyContentDb();
-    const { count } = (await db.getFirstAsync<{ count: number }>(
-      "SELECT COUNT(*) AS count FROM mazes",
     )) as { count: number };
     return count;
   }

@@ -19,6 +19,7 @@ import Animated, {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Avatar } from "@/components/avatar/Avatar";
+import { HeaderStat } from "@/components/layout/HeaderStat";
 import { Text } from "@/components/ui/text";
 import { useCompletedLessonCount } from "@/hooks/use-completed-lessons";
 import { useDiamonds } from "@/hooks/use-wallet";
@@ -101,14 +102,15 @@ export function TopRowHeader({
                                         {content}
                                     </Pressable>
                                 ) : (
-                                    <View
+                                    <HeaderStat
                                         key={stat.key}
+                                        kind={stat.key === "lessons" ? "lessons" : "diamonds"}
+                                        amount={stat.value}
                                         style={styles.statItem}
-                                        accessible
                                         accessibilityLabel={`${stat.value.toLocaleString()} ${stat.label}`}
                                     >
                                         {content}
-                                    </View>
+                                    </HeaderStat>
                                 );
                             })}
                         </View>

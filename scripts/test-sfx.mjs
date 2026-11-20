@@ -24,6 +24,7 @@ import {
   fileGroup,
   filesOfGroup,
   ladderRate,
+  pickSlot,
   poolSizeOf,
   shouldBlip,
 } from "../services/sfx-core.ts";
@@ -37,7 +38,7 @@ describe("catalog", () => {
     for (const id of CUE_IDS) {
       const def = CUES[id];
       assert.ok(def.file in SFX_FILES, `${id}: unknown file ${def.file}`);
-      assert.match(id, /^(ui|lesson|reward|social|game)\.[a-z-]+$/);
+      assert.match(id, /^[a-z]+\.[a-z0-9-]+$/);
       assert.ok(def.volume > 0 && def.volume <= 1, `${id}: volume`);
       assert.ok(def.gap >= 0 && def.pool >= 1, `${id}: gap/pool`);
     }
@@ -49,7 +50,7 @@ describe("catalog", () => {
   });
 
   it("groups come from the folder and cover every file", () => {
-    const all = ["ui", "lesson", "reward", "social", "game"].flatMap((g) => filesOfGroup(g));
+    const all = ["ui", "lesson", "reward", "social", "game", "phone"].flatMap((g) => filesOfGroup(g));
     assert.equal(all.length, Object.keys(SFX_FILES).length);
     assert.equal(fileGroup("lesson/blip"), "lesson");
   });
@@ -206,5 +207,32 @@ describe("pitch and typing", () => {
 
   it("a bubble blips on every third visible character, not on the empty string", () => {
     assert.deepEqual([0, 1, 2, 3, 4, 5, 6].map(shouldBlip), [false, false, false, true, false, false, true]);
+  });
+});
+
+describe("player pool", () => {
+  const slot = (over = {}) => ({ fresh: false, rewound: false, busyUntil: 0, ...over });
+
+  it("prefers a free player that is already at the start", () => {
+    assert.equal(pickSlot([slot(), slot({ rewound: true })], 2, 1000), 1);
+    assert.equal(pickSlot([slot(), slot({ fresh: true })], 2, 1000), 1);
+  });
+
+  it("never gives a reserved player to a second play, even one that has not started", () => {
+    const reserved = slot({ fresh: true, busyUntil: 1200 });
+    assert.equal(pickSlot([reserved], 2, 1000), "new");
+    assert.equal(pickSlot([reserved, slot({ fresh: true })], 2, 1000), 1);
+  });
+
+  it("uses a free player that needs a rewind before making a new one", () => {
+    assert.equal(pickSlot([slot()], 2, 1000), 0);
+  });
+
+  it("cuts off the longest-reserved player when the pool is full", () => {
+    assert.equal(pickSlot([slot({ busyUntil: 1500 }), slot({ busyUntil: 1100 })], 2, 1000), 1);
+  });
+
+  it("frees a player once its time has passed", () => {
+    assert.equal(pickSlot([slot({ rewound: true, busyUntil: 1000 })], 1, 1000), 0);
   });
 });

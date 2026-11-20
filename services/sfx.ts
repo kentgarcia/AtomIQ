@@ -10,7 +10,9 @@ import {
   CUES,
   createSfxScheduler,
   filesOfGroup,
+  pickSlot,
   poolSizeOf,
+  SFX_FILES,
   type PlayOptions,
   type SfxCue,
   type SfxFile,
@@ -49,6 +51,7 @@ const SOURCES: Record<SfxFile, number> = {
   "lesson/blip": require("../assets/sfx/lesson/blip.wav"),
   "lesson/zoom-in": require("../assets/sfx/lesson/zoom-in.wav"),
   "lesson/zoom-out": require("../assets/sfx/lesson/zoom-out.wav"),
+  "lesson/node-zoom": require("../assets/sfx/lesson/node-zoom.wav"),
   "lesson/start": require("../assets/sfx/lesson/start.wav"),
   "lesson/complete": require("../assets/sfx/lesson/complete.wav"),
   "lesson/finish": require("../assets/sfx/lesson/finish.wav"),
@@ -105,20 +108,79 @@ const SOURCES: Record<SfxFile, number> = {
   "game/checkpoint": require("../assets/sfx/game/checkpoint.wav"),
   "game/fireworks-launch": require("../assets/sfx/game/fireworks-launch.wav"),
   "game/fireworks-burst": require("../assets/sfx/game/fireworks-burst.wav"),
+  "ui/page-next": require("../assets/sfx/ui/page-next.wav"),
+  "ui/page-back": require("../assets/sfx/ui/page-back.wav"),
+  "ui/panel-open": require("../assets/sfx/ui/panel-open.wav"),
+  "ui/panel-close": require("../assets/sfx/ui/panel-close.wav"),
+  "ui/invalid": require("../assets/sfx/ui/invalid.wav"),
+  "ui/announce": require("../assets/sfx/ui/announce.wav"),
+  "ui/delete": require("../assets/sfx/ui/delete.wav"),
+  "ui/tab-right": require("../assets/sfx/ui/tab-right.wav"),
+  "ui/equip-confirm": require("../assets/sfx/ui/equip-confirm.wav"),
+  "ui/try-on": require("../assets/sfx/ui/try-on.wav"),
+  "ui/tab-left": require("../assets/sfx/ui/tab-left.wav"),
+  "ui/swatch": require("../assets/sfx/ui/swatch.wav"),
+  "ui/geiger": require("../assets/sfx/ui/geiger.wav"),
+  "ui/go": require("../assets/sfx/ui/go.wav"),
+  "ui/wipe": require("../assets/sfx/ui/wipe.wav"),
+  "phone/start-1": require("../assets/sfx/phone/start-1.wav"),
+  "phone/start-2": require("../assets/sfx/phone/start-2.wav"),
+  "phone/start-3": require("../assets/sfx/phone/start-3.wav"),
+  "phone/app-open": require("../assets/sfx/phone/app-open.wav"),
+  "phone/app-close": require("../assets/sfx/phone/app-close.wav"),
+  "phone/wallpaper": require("../assets/sfx/phone/wallpaper.wav"),
+  "phone/typing": require("../assets/sfx/phone/typing.wav"),
+  "phone/send": require("../assets/sfx/phone/send.wav"),
+  "phone/sticker": require("../assets/sfx/phone/sticker.wav"),
+  "phone/end": require("../assets/sfx/phone/end.wav"),
+  "phone/archive": require("../assets/sfx/phone/archive.wav"),
+  "phone/note-new": require("../assets/sfx/phone/note-new.wav"),
+  "phone/note-clip": require("../assets/sfx/phone/note-clip.wav"),
+  "phone/shutter": require("../assets/sfx/phone/shutter.wav"),
+  "phone/photo-saved": require("../assets/sfx/phone/photo-saved.wav"),
+  "phone/camera-option": require("../assets/sfx/phone/camera-option.wav"),
+  "phone/scan-lock": require("../assets/sfx/phone/scan-lock.wav"),
+  "phone/scan-miss": require("../assets/sfx/phone/scan-miss.wav"),
+  "phone/map-open": require("../assets/sfx/phone/map-open.wav"),
+  "phone/map-close": require("../assets/sfx/phone/map-close.wav"),
+  "phone/map-pin": require("../assets/sfx/phone/map-pin.wav"),
+  "phone/map-limit": require("../assets/sfx/phone/map-limit.wav"),
+  "phone/book": require("../assets/sfx/phone/book.wav"),
+  "reward/coin-tick": require("../assets/sfx/reward/coin-tick.wav"),
+  "reward/coin-land": require("../assets/sfx/reward/coin-land.wav"),
+  "reward/count-up": require("../assets/sfx/reward/count-up.wav"),
+  "reward/stat-up": require("../assets/sfx/reward/stat-up.wav"),
+  "reward/stat-down": require("../assets/sfx/reward/stat-down.wav"),
+  "reward/podium": require("../assets/sfx/reward/podium.wav"),
+  "reward/item-tick": require("../assets/sfx/reward/item-tick.wav"),
+  "lesson/pick": require("../assets/sfx/lesson/pick.wav"),
+  "lesson/drop": require("../assets/sfx/lesson/drop.wav"),
+  "lesson/pair-ok": require("../assets/sfx/lesson/pair-ok.wav"),
+  "lesson/lock-in": require("../assets/sfx/lesson/lock-in.wav"),
+  "game/get-ready": require("../assets/sfx/game/get-ready.wav"),
+  "game/timer-tick": require("../assets/sfx/game/timer-tick.wav"),
 };
 
 /** A native player is not free: keep at most this many alive, least recently used out first. */
-const MAX_LIVE_PLAYERS = 40;
+const MAX_LIVE_PLAYERS = 64;
+
+/** A play is reserved on its player for the file's length plus this, so two plays never share one player by accident. */
+const BUSY_MARGIN_MS = 40;
 
 interface Slot {
   player: AudioPlayer;
   /** Not played yet, so it is still at 0 and needs no seek. */
   fresh: boolean;
+  /** Back at 0 after its last play (rewound in the background), so the next play needs no seek and no waiting. */
+  rewound: boolean;
+  /** Reserved until then (from the moment it is taken, before it has started): never given to a second play, never evicted. */
+  busyUntil: number;
+  /** Counts plays, so a late rewind knows it has been overtaken. */
+  gen: number;
 }
 
 /** Insertion order is recency order: a used file is re-inserted at the end. */
 const pools = new Map<SfxFile, Slot[]>();
-const nextSlot = new Map<SfxFile, number>();
 const scheduler = createSfxScheduler();
 let stingerPlayer: AudioPlayer | null = null;
 let audioModeConfigured = false;
@@ -150,35 +212,24 @@ const removeSlot = (slot: Slot) => {
   }
 };
 
-const isPlaying = (slots: Slot[]): boolean => {
-  try {
-    return slots.some((s) => s.player.playing);
-  } catch {
-    return false;
-  }
-};
-
 /** Files that are never evicted: the ones a screen needs at the end of a long stretch of other sounds. */
 const pinned = new Set<SfxFile>();
+
+/** Time-based, so judging a file costs no native call (a player's `playing` is one per slot). */
+const isBusy = (slots: Slot[], now: number): boolean => slots.some((s) => now < s.busyUntil);
 
 const evictIfNeeded = () => {
   let live = 0;
   for (const slots of pools.values()) live += slots.length;
-  while (live > MAX_LIVE_PLAYERS) {
-    // The least recently used file that is not sounding right now (cutting a playing one off is worse than a spare player)
-    let oldest: SfxFile | undefined;
-    for (const [file, list] of pools) {
-      if (!pinned.has(file) && !isPlaying(list)) {
-        oldest = file;
-        break;
-      }
-    }
-    if (oldest === undefined) return;
-    const slots = pools.get(oldest) ?? [];
-    live -= slots.length;
-    slots.forEach(removeSlot);
-    pools.delete(oldest);
-    nextSlot.delete(oldest);
+  if (live <= MAX_LIVE_PLAYERS) return;
+  const now = Date.now();
+  for (const [file, list] of [...pools]) {
+    if (live <= MAX_LIVE_PLAYERS) return;
+    // The least recently used file that is not reserved or sounding right now (cutting one off is worse than a spare player)
+    if (pinned.has(file) || isBusy(list, now)) continue;
+    list.forEach(removeSlot);
+    pools.delete(file);
+    live -= list.length;
   }
 };
 
@@ -187,54 +238,52 @@ const touch = (file: SfxFile, slots: Slot[]) => {
   pools.set(file, slots);
 };
 
-const createSlot = (file: SfxFile): Slot => ({ player: createAudioPlayer(SOURCES[file]), fresh: true });
+const createSlot = (file: SfxFile): Slot => ({ player: createAudioPlayer(SOURCES[file]), fresh: true, rewound: true, busyUntil: 0, gen: 0 });
 
-/** The player for the next play of `file`: a free one, or the next in rotation. */
-const takeSlot = (file: SfxFile): Slot => {
+/** The player for the next play of `file`: a free one (already at 0 first), a new one, or the one that has been busy the longest. */
+const takeSlot = (file: SfxFile, now: number): Slot => {
   const slots = pools.get(file) ?? [];
   const size = poolSizeOf(file);
-  let slot = slots.find((s) => !s.fresh && !s.player.playing);
-  if (!slot) slot = slots.find((s) => s.fresh);
-  if (!slot && slots.length < size) {
-    slot = createSlot(file);
-    slots.push(slot);
+  const pick = pickSlot(slots, size, now);
+  let created = false;
+  if (pick === "new") {
+    slots.push(createSlot(file));
+    created = true;
   }
-  if (!slot) {
-    const i = (nextSlot.get(file) ?? 0) % slots.length;
-    nextSlot.set(file, i + 1);
-    slot = slots[i];
-  }
+  const slot = pick === "new" ? slots[slots.length - 1] : slots[pick];
   touch(file, slots);
-  evictIfNeeded();
+  if (created || slots.length === 1) evictIfNeeded();
   return slot;
+};
+
+/** Create the first player of each file that has none yet, a few per turn, so warming a group never stalls the screen it opens with. */
+const WARM_CHUNK = 3;
+const warmFiles = (files: readonly SfxFile[]): void => {
+  const todo = files.filter((f) => (pools.get(f) ?? []).length === 0);
+  const step = () => {
+    for (const file of todo.splice(0, WARM_CHUNK)) {
+      try {
+        if ((pools.get(file) ?? []).length === 0) {
+          touch(file, [createSlot(file)]);
+          evictIfNeeded();
+        }
+      } catch (error) {
+        console.warn(`Unable to preload ${file} SFX:`, error);
+      }
+    }
+    if (todo.length > 0) setTimeout(step, 16);
+  };
+  step();
 };
 
 /** Create the first player of the files these cues use, so the first step or jump of a level is not the load. */
 export const warmSfxCues = (cues: readonly SfxCue[]): void => {
-  for (const id of new Set(cues.map((c) => CUES[c].file))) {
-    try {
-      if ((pools.get(id) ?? []).length === 0) {
-        touch(id, [createSlot(id)]);
-        evictIfNeeded();
-      }
-    } catch (error) {
-      console.warn(`Unable to preload ${id} SFX:`, error);
-    }
-  }
+  warmFiles([...new Set(cues.map((c) => CUES[c].file))]);
 };
 
 /** Create the first player of every file in a group, so the first play is not the load. */
 export const warmSfxGroup = (group: SfxGroup): void => {
-  for (const file of filesOfGroup(group)) {
-    try {
-      if ((pools.get(file) ?? []).length === 0) {
-        touch(file, [createSlot(file)]);
-        evictIfNeeded();
-      }
-    } catch (error) {
-      console.warn(`Unable to preload ${file} SFX:`, error);
-    }
-  }
+  warmFiles(filesOfGroup(group));
 };
 
 /**
@@ -279,14 +328,28 @@ const whenLoaded = (player: AudioPlayer, timeoutMs = 1500): Promise<void> =>
 export const pinSfx = (cueId: SfxCue): void => {
   const file = CUES[cueId].file;
   pinned.add(file);
-  try {
-    if ((pools.get(file) ?? []).length === 0) {
-      touch(file, [createSlot(file)]);
-      evictIfNeeded();
+  warmFiles([file]);
+};
+
+/** After a play has ended, put its player back at 0 in the background, so the next play starts at once instead of waiting for a seek. */
+const rewindLater = (slot: Slot, file: SfxFile, rate: number) => {
+  const gen = slot.gen;
+  const after = Math.ceil(SFX_FILES[file] / Math.max(rate, 0.25)) + BUSY_MARGIN_MS + 20;
+  setTimeout(() => {
+    if (slot.gen !== gen) return;
+    try {
+      // A finished player still wants to play (its play flag stays on), so a bare seek back to 0 would start it again: pause first.
+      slot.player.pause();
+      void slot.player
+        .seekTo(0)
+        .then(() => {
+          if (slot.gen === gen) slot.rewound = true;
+        })
+        .catch(() => {});
+    } catch {
+      // The player may already be gone.
     }
-  } catch (error) {
-    console.warn(`Unable to preload ${file} SFX:`, error);
-  }
+  }, after);
 };
 
 /** Play one cue. Never throws; safe to call with `void`. */
@@ -309,10 +372,11 @@ export const playSfx = async (cueId: SfxCue, options?: PlayOptions): Promise<voi
       return;
     }
 
-    const plan = scheduler.plan(cueId, Date.now(), options);
+    const now = Date.now();
+    const plan = scheduler.plan(cueId, now, options);
     if (!plan.play) return;
 
-    await configureAudioMode();
+    if (!audioModeConfigured) await configureAudioMode();
     if (plan.stopStinger && stingerPlayer) {
       try {
         stingerPlayer.pause();
@@ -321,14 +385,18 @@ export const playSfx = async (cueId: SfxCue, options?: PlayOptions): Promise<voi
       }
     }
 
-    const slot = takeSlot(def.file);
+    // Reserve the player before anything yields: a second play of this file in the same tick goes to another one.
+    const slot = takeSlot(def.file, now);
     const { player } = slot;
-    await whenLoaded(player);
+    slot.gen += 1;
+    slot.busyUntil = now + Math.ceil(SFX_FILES[def.file] / Math.max(plan.rate, 0.25)) + BUSY_MARGIN_MS;
+    if (!player.isLoaded) await whenLoaded(player);
     player.volume = plan.volume;
     // A higher rate is a higher pitch only when pitch correction is off (§7.5).
-    player.shouldCorrectPitch = plan.rate === 1;
+    const correct = plan.rate === 1;
+    if (player.shouldCorrectPitch !== correct) player.shouldCorrectPitch = correct;
     player.setPlaybackRate(plan.rate);
-    if (!slot.fresh) {
+    if (!slot.fresh && !slot.rewound) {
       try {
         await player.seekTo(0);
       } catch {
@@ -336,22 +404,44 @@ export const playSfx = async (cueId: SfxCue, options?: PlayOptions): Promise<voi
       }
     }
     slot.fresh = false;
+    slot.rewound = false;
     if (def.category === "stinger") stingerPlayer = player;
     player.play();
+    rewindLater(slot, def.file, plan.rate);
   } catch (error) {
     console.warn(`Unable to play ${cueId} SFX:`, error);
   }
 };
 
+/** A cue's file, catalog volume and default rate, with no gate or scheduling: for the dev SFX lab (components/dev), which plays old and new sounds side by side. */
+export const sfxAssetFor = (cueId: SfxCue): { source: number; volume: number; rate: number } => {
+  const def = CUES[cueId];
+  return { source: SOURCES[def.file], volume: def.volume, rate: def.rate ?? 1 };
+};
+
+/**
+ * Play a few cues on one clock: `at` is ms from now. For a moment made of several sounds that do not
+ * come from an animation (the phone's hand-over). Returns a function that cancels what has not played yet.
+ */
+export const playSfxSequence = (steps: readonly { cue: SfxCue; at: number; options?: PlayOptions }[]): (() => void) => {
+  const timers = steps.map((step) => setTimeout(() => void playSfx(step.cue, step.options), step.at));
+  return () => timers.forEach(clearTimeout);
+};
+
 /** Stop a cue that is still playing (a long one when its screen is left). Quietly does nothing if it is not. */
 export const stopSfx = (cueId: SfxCue): void => {
   const file = CUES[cueId].file;
+  const now = Date.now();
   for (const slot of pools.get(file) ?? []) {
+    if (now >= slot.busyUntil) continue;
     try {
-      if (slot.player.playing) slot.player.pause();
+      slot.player.pause();
     } catch {
       // The player may already be gone.
     }
+    slot.rewound = false;
+    slot.busyUntil = 0;
+    slot.gen += 1;
   }
 };
 
@@ -393,7 +483,6 @@ export const installGlobalUiSfxHandlers = (): void => {
 export const unloadSfx = async (): Promise<void> => {
   for (const slots of pools.values()) slots.forEach(removeSlot);
   pools.clear();
-  nextSlot.clear();
   stingerPlayer = null;
   scheduler.reset();
 };

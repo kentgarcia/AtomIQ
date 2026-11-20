@@ -12,7 +12,6 @@
  */
 
 import type {
-  AtomMazeChallenge,
   EncyclopediaEntry,
   Journey,
 } from "@/content/explorer/types";
@@ -266,13 +265,13 @@ const encyclopediaCard = (entry: EncyclopediaEntry): GuideCard => ({
   duration: "2 min",
 });
 
-const mazeCard = (maze: AtomMazeChallenge, badge?: string): GuideCard => ({
+const atomMazeCard = (badge?: string): GuideCard => ({
   kind: "game",
-  title: maze.title,
-  subtitle: maze.theme ?? "Atom Maze",
-  body: maze.description,
-  destination: { screen: "maze", id: maze.id },
-  ctaLabel: "Play Maze",
+  title: "Atom Maze",
+  subtitle: "Story mode",
+  body: "Run and jump through levels, and battle enemies with questions from the units.",
+  destination: { screen: "story" },
+  ctaLabel: "Play Atom Maze",
   badge,
   status: badge === "Recommended" ? "recommended" : "available",
   reward: "+30 XP",
@@ -455,24 +454,16 @@ const handleIntent = (
     }
     case "practice": {
       const pills: GuidePill[] = [];
-      if (
-        ctx.weakQuizIds.length > 0 ||
-        ctx.currentLevelId ||
-        content.mazes.length > 0
-      ) {
-        pills.push(
-          actionPill(
-            "recommended-game",
-            "Recommended for Me",
-            "Star",
-            "recommended-game",
-          ),
-        );
-      }
+      pills.push(
+        actionPill(
+          "recommended-game",
+          "Recommended for Me",
+          "Star",
+          "recommended-game",
+        ),
+      );
       pills.push(actionPill("mythbuster", "Myth Buster", "Flash", "topic-game"));
-      content.mazes.slice(0, 4).forEach((m) => {
-        pills.push(itemPill(`mazepick-${m.id}`, m.title, "Game", m.id, "game"));
-      });
+      pills.push(itemPill("atom-maze", "Atom Maze", "Game", "story", "game"));
       pills.push(
         actionPill("random-game", "Random Challenge", "Game", "random-game"),
       );
@@ -561,13 +552,13 @@ const handleTopic = (
     pills.push(
       actionPill(
         `learn-enc-${topicId}`,
-        "Read Encyclopedia",
+        "Read AtomDex",
         "InfoCircle",
         "topic-encyclopedia",
         topicId,
       ),
     );
-  if (tc.mazes.length || tc.hasMythBuster)
+  if (tc.hasMythBuster)
     pills.push(
       actionPill(`game-${topicId}`, "Play a Game", "Game", "topic-game", topicId),
     );
@@ -609,19 +600,14 @@ const resolveActionCards = (
         const q = content.quizzes.find((q) => q.unitId === ctx.currentUnitId);
         if (q) return [quizCard(q, ctx)];
       }
-      if (content.mazes.length)
-        return [mazeCard(content.mazes[0], "Recommended")];
-      return [mythBusterCard()];
+      return [atomMazeCard("Recommended")];
     }
     case "topic-quiz": {
       const pool = tc?.quizzes ?? [];
       return pool.slice(0, 3).map((q) => quizCard(q, ctx));
     }
     case "topic-game": {
-      const pool = tc?.mazes ?? [];
-      const cards = pool.slice(0, 2).map((m) => mazeCard(m));
-      cards.push(mythBusterCard());
-      return cards;
+      return [atomMazeCard(), mythBusterCard()];
     }
     case "review-lesson": {
       const unitId = refId
@@ -655,10 +641,9 @@ const resolveActionCards = (
       return q ? [quizCard(q, ctx)] : [];
     }
     case "random-game": {
-      const all = content.mazes;
-      if (!all.length) return [mythBusterCard()];
-      const pick = all[Math.floor(Math.random() * all.length)];
-      return [mazeCard(pick, "Random")];
+      return Math.random() < 0.5
+        ? [atomMazeCard("Random")]
+        : [mythBusterCard()];
     }
     default:
       return [profileSummaryCard(ctx)];
@@ -713,9 +698,8 @@ const handleItem = (
         : guideTurn("I couldn't find that item.", undefined);
     }
     case "game": {
-      const maze = content.mazes.find((m) => m.id === itemId);
-      return maze
-        ? guideTurnWithCard(maze.title, mazeCard(maze))
+      return itemId === "story"
+        ? guideTurnWithCard("Atom Maze", atomMazeCard())
         : guideTurn("I couldn't find that item.", undefined);
     }
     case "profile-summary":

@@ -8,6 +8,9 @@
  * at once are one show: `from` is the level before the first, and the number counts from it. The button is the dialog's own footer: wrap it in
  * `<LevelUpButton>` so it arrives with the line.
  *
+ * When the level opened items in the shop (`unlocked`), their pictures arrive under the bar one after another
+ * (`UnlockedItems`) and the button waits for the last (`levelUpButtonAt`).
+ *
  * The show starts when the dialog has finished growing. The sound (`reward.level-up`) is played by the
  * screen when the dialog opens; the haptic is here, on the medal's landing. Reduced motion shows the
  * finished dialog and no burst.
@@ -18,7 +21,7 @@ import { View } from "react-native";
 import Animated, { useAnimatedStyle, useReducedMotion } from "react-native-reanimated";
 import Svg, { Path } from "react-native-svg";
 
-import { DIALOG_SETTLE_MS, LEVEL_UP, LEVEL_UP_TOTAL, levelBar, levelRays, levelRaysLoop } from "@/components/celebration/celebration-core";
+import { DIALOG_SETTLE_MS, LEVEL_UNLOCKS, LEVEL_UP, LEVEL_UP_TOTAL, levelBar, levelRays, levelRaysLoop, levelUpButtonAt } from "@/components/celebration/celebration-core";
 import { STAMP_LANDS } from "@/components/lesson/stamp-core";
 import { Stamp } from "@/components/lesson/Stamp";
 import { Burst } from "@/components/motion/Burst";
@@ -29,6 +32,10 @@ import { Reveal } from "@/components/motion/Reveal";
 import { useLoopClock } from "@/components/motion/motion";
 import { useDelayedClock } from "@/components/motion/use-delayed-clock";
 import { shadeColor } from "@/components/path/firefly-core";
+import { UnlockedItems } from "@/components/shop/UnlockedItems";
+import type { ShopItem } from "@/components/shop/shop-core";
+import type { AvatarConfig } from "@/components/avatar/avatar-core";
+import { SfxOnMount } from "@/components/ui/sfx-on-mount";
 import { Text } from "@/components/ui/text";
 import { notifySuccess } from "@/services/haptics";
 import { createStyles, fontFaces, useTheme, withAlpha } from "@/theme";
@@ -95,7 +102,7 @@ const useStyles = createStyles((theme) => {
 /** The dialog's body needs the card's top padding raised so the burst is not clipped by the scrolling body. */
 export const LEVEL_UP_BODY_STYLE = { paddingTop: 16 } as const;
 
-export function LevelUpBody({ level, from, xpIntoLevel = 0 }: { level: number; /** The level before the first one gained (1 to 5: from 1); one level back when left out. */ from?: number; /** XP the learner has earned toward the next level, 0 to 99. */ xpIntoLevel?: number }) {
+export function LevelUpBody({ level, from, xpIntoLevel = 0, unlocked = [], look }: { level: number; /** The level before the first one gained (1 to 5: from 1); one level back when left out. */ from?: number; /** XP the learner has earned toward the next level, 0 to 99. */ xpIntoLevel?: number; /** The shop items these levels opened. */ unlocked?: readonly ShopItem[]; /** The avatar they are shown on. */ look?: AvatarConfig }) {
   const { theme } = useTheme();
   const styles = useStyles(theme);
   const c = theme.colors;
@@ -105,6 +112,8 @@ export function LevelUpBody({ level, from, xpIntoLevel = 0 }: { level: number; /
   if (level > 0 && level !== now) setNow(level);
   const [start, setStart] = useState(from ?? level - 1);
   if (from != null && level > 0 && from !== start) setStart(from);
+  const [items, setItems] = useState(unlocked);
+  if (level > 0 && unlocked !== items) setItems(unlocked);
 
   const clock = useDelayedClock(LEVEL_UP_TOTAL, DIALOG_SETTLE_MS);
   const barClock = useDelayedClock(LEVEL_UP.barMs, DIALOG_SETTLE_MS + LEVEL_UP.bar);
@@ -173,14 +182,18 @@ export function LevelUpBody({ level, from, xpIntoLevel = 0 }: { level: number; /
           <Animated.View style={[styles.fill, fillStyle]} />
         </View>
       </Reveal>
+      {/* One sweep as the bar fills (docs/SFX_EXPANSION_SPEC.md §6.2); reduced motion shows it full */}
+      {!reduced && progress > 0 ? <SfxOnMount cue="count.run" delay={DIALOG_SETTLE_MS + LEVEL_UP.bar} /> : null}
+
+      {items.length > 0 && look ? <UnlockedItems items={items} base={look} at={DIALOG_SETTLE_MS + LEVEL_UNLOCKS.unlocked} /> : null}
     </View>
   );
 }
 
 /** The dialog's button: it arrives with the line and cannot be tapped before it can be seen. */
-export function LevelUpButton({ children }: { children: ReactNode }) {
+export function LevelUpButton({ children, tiles = 0 }: { children: ReactNode; /** How many unlocked-item tiles the body shows: the button waits for the last one. */ tiles?: number }) {
   return (
-    <Reveal at={DIALOG_SETTLE_MS + LEVEL_UP.button} blockUntilShown>
+    <Reveal at={DIALOG_SETTLE_MS + levelUpButtonAt(tiles)} blockUntilShown>
       {children}
     </Reveal>
   );

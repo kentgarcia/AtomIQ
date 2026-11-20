@@ -351,7 +351,7 @@ export function rankBannerLines(
 
 /** The shortcut circles at the top of Discover (the Feed tab), in order. Blogs lists every unlocked blog piece. */
 export const SHORTCUTS = [
-  { key: "encyclopedia", label: "Encyclopedia", icon: "Book", href: "/encyclopedia" },
+  { key: "encyclopedia", label: "AtomDex", icon: "Book", href: "/encyclopedia" },
   { key: "periodic", label: "Periodic table", icon: "Element4", href: "/periodic-table" },
   { key: "facts", label: "Daily facts", icon: "Lamp", href: "/daily-facts" },
   { key: "blogs", label: "Blogs", icon: "DocumentText", href: BLOGS_HREF },

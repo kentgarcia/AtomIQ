@@ -99,7 +99,7 @@ export function filledSegments(progress: number, count: number = LEVEL_SEGMENTS)
   return Math.min(count, Math.floor(p * count));
 }
 
-export const MAX_SHOWCASE = 3;
+export const MAX_SHOWCASE = 5;
 
 export interface EarnedBadge {
   id: number;

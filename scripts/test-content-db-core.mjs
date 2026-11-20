@@ -78,10 +78,10 @@ describe("verifyCandidate", () => {
   });
 
   it("names every empty or missing required table", () => {
-    const counts = { ...goodCounts, myths: 0, mazes: undefined };
+    const counts = { ...goodCounts, myths: 0, encyclopedia_entries: undefined };
     const message = verifyCandidate({ ...good, tableCounts: counts }, "1.2.0");
     assert.match(message, /myths/);
-    assert.match(message, /mazes/);
+    assert.match(message, /encyclopedia_entries/);
   });
 });
 

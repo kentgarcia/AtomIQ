@@ -33,7 +33,7 @@ import {
 } from "react-native";
 import { Text } from "@/components/ui/text";
 
-import { playSfx } from "@/services/sfx";
+import { playSfx, type SfxCue } from "@/services/sfx";
 import { stretchStyle } from "@/theme/text-stretch";
 import { fontFaces, fontSizes, radius, useTheme } from "@/theme";
 import { controls } from "@/theme/tokens";
@@ -115,6 +115,8 @@ export interface ButtonProps {
      * pressed (the duolingo-motion-style skill, tier A idle). Quiet, stops off screen and with reduced motion.
      */
     shine?: boolean;
+    /** The sound of the press: `ui.press` unless this button has a sound of its own (a cue id) or none (`null`). */
+    pressSfx?: SfxCue | null;
     accessibilityLabel?: string;
     testID?: string;
     style?: StyleProp<ViewStyle>;
@@ -132,6 +134,7 @@ export function Button({
     wrap = false,
     stretch = false,
     shine = false,
+    pressSfx = "ui.press",
     accessibilityLabel,
     testID,
     style,
@@ -239,7 +242,7 @@ export function Button({
             hitSlop={compact ? 6 : undefined}
             testID={testID}
             onPress={() => {
-                void playSfx("ui.press");
+                if (pressSfx) void playSfx(pressSfx);
                 onPress();
             }}
             style={[fullWidth ? styles.fullWidth : styles.hug, style]}

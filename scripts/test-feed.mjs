@@ -676,3 +676,53 @@ test("there is no function, table or column for a learner comment", () => {
   const exported = Object.keys(storeCore.createFeedStore(() => db));
   assert.ok(!exported.some((n) => /comment/i.test(n)));
 });
+
+/* ------------------------------------------------------------------ */
+/* The work queue: one at a time, never wedged                          */
+/* ------------------------------------------------------------------ */
+
+test("the queue runs tasks one at a time, in order, and a failure does not stop the next", async () => {
+  const { createFeedQueue } = await load("services/feed-queue-core.ts");
+  const warnings = [];
+  const q = createFeedQueue({ timeoutMs: 1000, warn: (what) => warnings.push(what) });
+  const log = [];
+  const slow = q.enqueue("a", async () => {
+    log.push("a:start");
+    await new Promise((r) => setTimeout(r, 20));
+    log.push("a:end");
+    return 1;
+  });
+  const bad = q.enqueue("bad", async () => {
+    throw new Error("boom");
+  });
+  const last = q.enqueue("c", async () => {
+    log.push("c");
+    return 3;
+  });
+  assert.equal(await slow, 1);
+  assert.equal(await bad, undefined);
+  assert.equal(await last, 3);
+  assert.deepEqual(log, ["a:start", "a:end", "c"]);
+  assert.deepEqual(warnings, ["bad"]);
+});
+
+test("a task that waits on the queue itself is let go of instead of wedging the feed for good", async () => {
+  const { createFeedQueue } = await load("services/feed-queue-core.ts");
+  const warnings = [];
+  const q = createFeedQueue({ timeoutMs: 40, warn: (what) => warnings.push(what) });
+  // The shape of the old `emitRankCheck`: a queued task awaits another queued call.
+  q.defer("outer", () => q.enqueue("inner", async () => 1));
+  const after = await q.enqueue("after", async () => "still works");
+  assert.equal(after, "still works");
+  assert.ok(warnings.includes("outer"), "the stuck task is reported");
+});
+
+test("no queued task in services/feed.ts awaits another queued call (it would wait behind itself)", () => {
+  const src = fs.readFileSync(path.join(REPO, "services/feed.ts"), "utf8").replace(/\/\*[\s\S]*?\*\/|\/\/.*$/gm, "");
+  // `defer(..., () => checkRankChange())` and similar: a task body that calls an exported, queueing function.
+  const queueing = ["checkRankChange", "reconcileFeed", "ensureBlogCards", "onFeedEvent", "markSeen", "recordBlogRead"];
+  for (const fn of queueing) {
+    assert.ok(!new RegExp(`defer\\([^)]*\\b${fn}\\(`).test(src), `a deferred task calls ${fn}()`);
+    assert.ok(!new RegExp(`await\\s+${fn}\\(`).test(src), `feed.ts awaits ${fn}() inside itself`);
+  }
+});

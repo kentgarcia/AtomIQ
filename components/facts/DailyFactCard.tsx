@@ -22,8 +22,10 @@ import Animated, {
 } from "react-native-reanimated";
 
 import { FactStory } from "@/components/facts/FactStory";
+import { AddToNotesButton } from "@/components/phone/AddToNotesButton";
 import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
+import { clipSnippet } from "@/services/field-notes";
 import { getDailyFact, type DailyFact } from "@/services/missions";
 import { createStyles, fontFaces, useTheme, withAlpha } from "@/theme";
 import { playSfx } from "@/services/sfx";
@@ -134,6 +136,7 @@ export function DailyFactCard({
               accessibilityLabel={claimed ? "Read the full daily fact again" : `Read the full daily fact and earn ${reward} XP`}
               style={styles.button}
             />
+            {fact ? <AddToNotesButton type="fact" sourceId={fact.id} title={fact.title} snippet={clipSnippet(fact.short)} style={styles.button} /> : null}
           </View>
         </View>
       </View>

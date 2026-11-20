@@ -409,25 +409,25 @@ describe("feed templates and blog pieces (docs/NPC_FEED_SPEC.md §6)", () => {
 
 describe("shipped ids", () => {
   it("refuses to delete a shipped id without a reason, then retires it", async () => {
-    const id = query(fx.paths, "SELECT id FROM mazes LIMIT 1")[0].id;
-    fs.writeFileSync(fx.paths.shippedIds, JSON.stringify({ mazes: [id] }));
+    const id = query(fx.paths, "SELECT b.id FROM blog_posts b WHERE EXISTS (SELECT 1 FROM blog_comments c WHERE c.blog_id = b.id) ORDER BY b.id LIMIT 1")[0].id;
+    fs.writeFileSync(fx.paths.shippedIds, JSON.stringify({ blog_posts: [id] }));
 
-    const refused = await call("DELETE", `/api/entities/mazes/${id}`);
+    const refused = await call("DELETE", `/api/entities/blog_posts/${id}`);
     assert.equal(refused.status, 409);
     assert.equal(refused.json.needsReason, true);
 
-    const ok = await call("DELETE", `/api/entities/mazes/${id}?reason=${encodeURIComponent("replaced by a better maze")}`);
+    const ok = await call("DELETE", `/api/entities/blog_posts/${id}?reason=${encodeURIComponent("replaced by a better piece")}`);
     assert.equal(ok.status, 200, JSON.stringify(ok.json));
-    assert.match(JSON.parse(fs.readFileSync(fx.paths.retiredIds, "utf8")).mazes[id], /replaced by a better maze/);
+    assert.match(JSON.parse(fs.readFileSync(fx.paths.retiredIds, "utf8")).blog_posts[id], /replaced by a better piece/);
 
     const deleted = await call("GET", "/api/deleted");
     const item = deleted.json.items.find((d) => d.pk === id);
-    assert.ok(item && item.childCounts.maze_rooms > 0);
+    assert.ok(item && item.childCounts.blog_comments > 0);
 
     const restored = await call("POST", `/api/history/${item.id}/restore`, { body: { side: "before" } });
     assert.equal(restored.status, 200, JSON.stringify(restored.json));
-    assert.equal(query(fx.paths, "SELECT COUNT(*) n FROM mazes WHERE id = ?", id)[0].n, 1);
-    assert.equal(query(fx.paths, "SELECT COUNT(*) n FROM maze_rooms WHERE maze_id = ?", id)[0].n, item.childCounts.maze_rooms);
+    assert.equal(query(fx.paths, "SELECT COUNT(*) n FROM blog_posts WHERE id = ?", id)[0].n, 1);
+    assert.equal(query(fx.paths, "SELECT COUNT(*) n FROM blog_comments WHERE blog_id = ?", id)[0].n, item.childCounts.blog_comments);
   });
 
   it("refuses to rename a shipped id", async () => {

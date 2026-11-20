@@ -122,7 +122,7 @@ export function LessonFinish({ title, message, passed, stars, xp, accuracy, dura
   };
 
   // Sound (docs/SFX_SPEC.md §6.4), on the screen's own clock: the fanfare is the bed, and the stamp
-  // thud, the rising stars and each tile's landing sit under it at the frames they land. Reduced
+  // thud, the rising stars and each tile's count-up (one sweep) sit under it at the frames they land. Reduced
   // motion shows everything at once, so only the fanfare plays. A checkpoint below its pass mark
   // gets the soft "wrong" cue, not a fanfare.
   const sounds = (
@@ -135,7 +135,7 @@ export function LessonFinish({ title, message, passed, stars, xp, accuracy, dura
             <SfxOnMount key={`star-${i}`} cue="lesson.star" index={i} delay={FINISH_STAMPS.stars + i * FINISH_STAMPS.starStep + STAMP_LANDS} />
           ))}
           {Array.from({ length: tileCount }, (_, n) => (
-            <SfxOnMount key={`tile-${n}`} cue="ui.select" volume={0.5} delay={statStart(n) + STAT_FX.gatherEnd} />
+            <SfxOnMount key={`tile-${n}`} cue="count.run" delay={statStart(n) + STAT_FX.countStart} />
           ))}
         </>
       ) : null}

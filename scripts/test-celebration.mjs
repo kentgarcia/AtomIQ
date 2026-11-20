@@ -189,3 +189,18 @@ test("welcome: the mascot lands, the burst is on the landing, the welcome is sta
   assert.ok(C.WELCOME_TOTAL >= W.mascot + STAMP_TOTAL && C.WELCOME_TOTAL >= W.burst + BURST.total);
   assert.ok(C.WELCOME_TOTAL < 1500);
 });
+
+test("level-up unlocked items: the tiles come after the line, the button after the last tile", () => {
+  const { LEVEL_UP, LEVEL_UNLOCKS, levelUpButtonAt } = C;
+  assert.ok(LEVEL_UNLOCKS.unlocked >= LEVEL_UP.line + 150, "after the line has arrived");
+  assert.equal(levelUpButtonAt(0), LEVEL_UP.button, "no items: the button is where it was");
+  assert.equal(levelUpButtonAt(-3), LEVEL_UP.button);
+  let last = levelUpButtonAt(1);
+  assert.ok(last > LEVEL_UNLOCKS.unlocked);
+  for (let n = 2; n <= LEVEL_UNLOCKS.max; n++) {
+    const at = levelUpButtonAt(n);
+    assert.equal(at - last, LEVEL_UNLOCKS.unlockedStep, "one step per tile");
+    last = at;
+  }
+  assert.ok(last < 2500, "never a long wait to leave");
+});

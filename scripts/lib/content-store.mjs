@@ -6,8 +6,8 @@
  * is validated with the same rules as `npm run validate:content`, and only then
  * is it committed and recorded in the history database.
  *
- * "Entity" = a top-level row plus its children (a lesson and its steps, a quiz
- * and its questions, a maze and its rooms). Standalone rows are their own entity.
+ * "Entity" = a top-level row plus its children (a lesson and its cards, a blog
+ * piece and its comments). Standalone rows are their own entity.
  */
 import fs from "node:fs";
 import path from "node:path";

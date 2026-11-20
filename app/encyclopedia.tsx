@@ -255,7 +255,7 @@ export default function EncyclopediaScreen() {
   return (
     <View style={[styles.container, { backgroundColor: bgTop }]}>
       <ScreenHeader
-        title="Encyclopedia"
+        title="AtomDex"
         subtitle={headerSubtitle}
         left={
           <HeaderButton

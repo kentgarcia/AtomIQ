@@ -12,7 +12,9 @@ import { createStyles, fontFaces, useResponsiveLayout, useTheme, withAlpha } fro
 import { openExternalUrl } from "@/services/open-url";
 import { impactLight, impactMedium } from "@/services/haptics";
 import { useLocalSearchParams, useRouter } from "expo-router";
+import { AddToNotesButton } from "@/components/phone/AddToNotesButton";
 import { ReadAloudButton } from "@/components/ui/read-aloud-button";
+import { clipSnippet } from "@/services/field-notes";
 import { readAloud } from "@/services/media";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Alert, Image, Pressable, ScrollView, TouchableOpacity, View } from "react-native";
@@ -115,12 +117,12 @@ export default function EncyclopediaEntryScreen() {
   if (!entry) {
     return (
       <View style={[styles.container, { backgroundColor: bgTop }]}>
-        <ScreenHeader title="Encyclopedia" onBack={() => router.back()} />
+        <ScreenHeader title="AtomDex" onBack={() => router.back()} />
         <View style={styles.notFoundWrap}>
           <Text style={styles.notFoundTitle}>{entryLoaded ? "Entry not found" : "Loading…"}</Text>
           {entryLoaded ? (
             <>
-              <Text style={styles.notFoundSub}>This term is not in the encyclopedia.</Text>
+              <Text style={styles.notFoundSub}>This term is not in the AtomDex.</Text>
               <Button label="Go Back" onPress={() => router.back()} />
             </>
           ) : null}
@@ -191,6 +193,7 @@ export default function EncyclopediaEntryScreen() {
             }
           />
           <Text style={styles.definition}>{entry.definition}</Text>
+          <AddToNotesButton type="atomdex" sourceId={entry.id} title={entry.term} snippet={clipSnippet(entry.definition)} style={{ alignSelf: "flex-start", marginTop: 4 }} />
         </Animated.View>
 
         {/* Quick Facts */}

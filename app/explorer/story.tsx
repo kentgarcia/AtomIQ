@@ -274,7 +274,7 @@ export default function StoryScreen() {
                         actionLabel: (records.find((r) => r.levelId === level.id)?.stars ?? 0) > 0 ? "Play again" : "Play",
                         hint: "Win the level before this one to unlock it.",
                       }}
-                      onLaunch={() => void playSfx("lesson.zoom-in")}
+                      onLaunch={() => void playSfx("lesson.node-zoom")}
                       onAction={() => {
                         setSelected(null);
                         router.push(`/explorer/platformer?level=${level.id}`);

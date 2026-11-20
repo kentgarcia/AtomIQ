@@ -24,6 +24,8 @@ export interface SavedResult {
   record: LevelRecord;
   newBestTime: boolean;
   newBestScore: boolean;
+  /** No win of this level was saved before this one (it pays the full first-time XP). */
+  firstWin: boolean;
 }
 
 /** Save a won run (stars from its points, its score and its time), keeping the best of each. */
@@ -41,5 +43,6 @@ export async function saveStoryResult(levelId: string, stars: number, score: num
     record,
     newBestTime: time > 0 && (previous?.bestTime == null || time < previous.bestTime),
     newBestScore: !previous || score > previous.bestScore,
+    firstWin: !previous,
   };
 }

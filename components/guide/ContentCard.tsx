@@ -161,7 +161,7 @@ export function ContentCard({ card, onCta }: ContentCardProps) {
     switch (card.kind) {
       case "lesson": return "LESSON";
       case "quiz": return "PRACTICE";
-      case "encyclopedia": return "ENCYCLOPEDIA";
+      case "encyclopedia": return "ATOMDEX";
       case "game": return "GAME";
       case "profile-summary": return "PROFILE";
       default: return "CONTENT";

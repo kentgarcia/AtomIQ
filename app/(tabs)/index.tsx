@@ -159,6 +159,8 @@ const getNodeX = (globalIndex: number, width: number) =>
 
 // dev-admin: development-only controls (components/dev); Metro drops this in a release build. Remove with the folder.
 const DevAdminFab: typeof import("@/components/dev/DevAdminFab").DevAdminFab | null = __DEV__ ? require("@/components/dev/DevAdminFab").DevAdminFab : null;
+// dev-sfx: the button beside it that opens the sound effects lab (components/dev/SfxLab.tsx); also development only.
+const SfxLabFab: typeof import("@/components/dev/SfxLabFab").SfxLabFab | null = __DEV__ ? require("@/components/dev/SfxLabFab").SfxLabFab : null;
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -451,7 +453,7 @@ export default function HomeScreen() {
   const launchNode = (node: PathNode) => {
     if (node.kind !== "lesson" || !node.lessonId) return;
     const lessonId = node.lessonId;
-    void playSfx("lesson.zoom-in");
+    void playSfx("lesson.node-zoom");
     void prefetchPreview(lessonId).then((data) => {
       if (data) {
         setPreview({ lessonId, data });
@@ -661,7 +663,11 @@ export default function HomeScreen() {
                       accessibilityLabel={
                         infoOpen ? "Hide unit details" : "Show unit details"
                       }
-                      onPress={() => setInfoOpen((o) => !o)}
+                      onPress={() => {
+                        // A panel that is not a dialog: its own open and close sounds (docs/SFX_EXPANSION_SPEC.md §6.3)
+                        void playSfx(infoOpen ? "ui.panel-close" : "ui.panel-open");
+                        setInfoOpen((o) => !o);
+                      }}
                     >
                       <Icon
                         name={infoOpen ? "ArrowUp2" : activeUnit.isLocked ? "Lock" : "Book1"}
@@ -753,6 +759,8 @@ export default function HomeScreen() {
 
       {/* dev-admin */}
       {DevAdminFab ? <DevAdminFab bottom={tabBarInset + 16} onChanged={refresh} /> : null}
+      {/* dev-sfx */}
+      {SfxLabFab ? <SfxLabFab bottom={tabBarInset + 16} /> : null}
 
       {/* Floating "jump to current lesson" arrow */}
       {arrowDir && currentUnitIndex !== -1 && (
@@ -998,12 +1006,7 @@ const makeStyles = createStyles((theme) => {
       borderWidth: 2,
       borderColor: c.border,
       borderBottomWidth: 4,
-      elevation: 2,
       zIndex: 95,
-      shadowColor: c.shadow,
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.12,
-      shadowRadius: 4,
     },
     nextBtn: {
       position: "absolute",

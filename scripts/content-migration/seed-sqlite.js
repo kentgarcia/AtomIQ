@@ -27,10 +27,9 @@
  *     - array with `mythStatement`/`reality` entries -> myths
  *     - object with `steps[]`     -> lessons + lesson_steps
  *     - object with `questions[]` -> quizzes + quiz_questions
- *     - object with `rooms[]`     -> mazes + maze_rooms (Atom Maze levels)
  *     - object with `mythStatement` -> a single myth
  *     - object with `statement`   -> a single fact
- *     - plain array              -> mythbuster_questions (atom-maze boss bank)
+ *     - plain array              -> mythbuster_questions (boss question bank)
  *   It is idempotent: re-running replaces existing rows (INSERT OR REPLACE)
  *   inside a single transaction, so you can safely re-seed after regenerating
  *   JSON. Run it once per content directory against the same dbPath; both
@@ -141,22 +140,6 @@ const insertFact = db.prepare(`
      @relatedMyths, @relatedLessons, @image, @tags, @dateAdded, @lastUpdated)
 `);
 
-const insertMaze = db.prepare(`
-  INSERT OR REPLACE INTO mazes
-    (id, title, description, theme, xp_reward, time_limit, player_max_hp, boss)
-  VALUES
-    (@id, @title, @description, @theme, @xpReward, @timeLimit, @playerMaxHp, @boss)
-`);
-
-const insertMazeRoom = db.prepare(`
-  INSERT OR REPLACE INTO maze_rooms
-    (maze_id, id, position, title, description, monster, questions,
-     damage_per_correct, explanation, next_room_id, alternative_path_id, unlock_condition)
-  VALUES
-    (@mazeId, @id, @position, @title, @description, @monster, @questions,
-     @damagePerCorrect, @explanation, @nextRoomId, @alternativePathId, @unlockCondition)
-`);
-
 // Wrapping each lesson (and its steps) in a transaction is what makes the
 // bulk insert fast; better-sqlite3 transactions also roll back on error.
 const insertLessonWithSteps = db.transaction((lesson) => {
@@ -222,7 +205,7 @@ const insertQuizWithQuestions = db.transaction((quiz) => {
 });
 
 // Mythbuster question banks arrive as plain arrays. Group by each question's
-// own `difficulty` so ordering is preserved within every atom-maze pool.
+// own `difficulty` so ordering is preserved within every pool.
 const insertMythBusterBank = db.transaction((questions) => {
   const positionByDifficulty = new Map();
   questions.forEach((question) => {
@@ -283,41 +266,6 @@ const insertFactResource = db.transaction((fact) => {
   });
 });
 
-// Insert an Atom Maze challenge + its ordered rooms. Monsters are embedded
-// JSON (the boss on the maze, a monster per room) and questions is a JSON
-// array of BattleQuestions, mirroring the domain AtomMazeChallenge shape.
-const insertMazeWithRooms = db.transaction((maze) => {
-  insertMaze.run({
-    id: maze.id,
-    title: maze.title,
-    description: maze.description,
-    theme: maze.theme ?? "",
-    xpReward: maze.xpReward ?? 0,
-    timeLimit: maze.timeLimit ?? null,
-    playerMaxHp: maze.playerMaxHp ?? 100,
-    boss: JSON.stringify(maze.boss || {}),
-  });
-
-  (maze.rooms || []).forEach((room, index) => {
-    insertMazeRoom.run({
-      mazeId: maze.id,
-      id: room.id,
-      position: index,
-      title: room.title,
-      description: room.description,
-      monster: JSON.stringify(room.monster || {}),
-      questions: JSON.stringify(room.questions || []),
-      damagePerCorrect: room.damagePerCorrect ?? 0,
-      explanation: room.explanation ?? "",
-      nextRoomId: room.nextRoomId ?? null,
-      alternativePathId: room.alternativePathId ?? null,
-      unlockCondition: room.unlockCondition
-        ? JSON.stringify(room.unlockCondition)
-        : null,
-    });
-  });
-});
-
 const insertEncyclopediaEntry = db.prepare(`
   INSERT OR REPLACE INTO encyclopedia_entries
     (id, term, definition, category, related_terms, quick_facts, sources,
@@ -366,8 +314,6 @@ let quizQuestionCount = 0;
 let mythBusterCount = 0;
 let mythCount = 0;
 let factCount = 0;
-let mazeCount = 0;
-let mazeRoomCount = 0;
 let encyclopediaCount = 0;
 
 for (const file of jsonFiles) {
@@ -389,20 +335,6 @@ for (const file of jsonFiles) {
       mythBusterCount += data.length;
       console.log(`  + ${data.length} mythbuster question(s) (${file})`);
     }
-    continue;
-  }
-
-  // Atom Maze challenge: an object with a `rooms` array.
-  if (Array.isArray(data?.rooms)) {
-    if (data.id && data.id !== path.basename(file, ".json")) {
-      console.warn(`  ! id "${data.id}" does not match filename "${file}"`);
-    }
-    insertMazeWithRooms(data);
-    mazeCount += 1;
-    mazeRoomCount += (data.rooms || []).length;
-    console.log(
-      `  + ${data.title} maze (${file}) — ${(data.rooms || []).length} room(s)`,
-    );
     continue;
   }
 
@@ -492,12 +424,6 @@ const { count: mythRows } = db
 const { count: factRows } = db
   .prepare(`SELECT COUNT(*) AS count FROM facts`)
   .get();
-const { count: mazeRows } = db
-  .prepare(`SELECT COUNT(*) AS count FROM mazes`)
-  .get();
-const { count: mazeRoomRows } = db
-  .prepare(`SELECT COUNT(*) AS count FROM maze_rooms`)
-  .get();
 const { count: encyclopediaRows } = db
   .prepare(`SELECT COUNT(*) AS count FROM encyclopedia_entries`)
   .get();
@@ -507,7 +433,6 @@ console.log(
     `${quizRows} quizzes / ${quizQuestionRows} questions · ` +
     `${mythBusterRows} mythbuster questions · ` +
     `${mythRows} myths · ${factRows} facts · ` +
-    `${mazeRows} mazes / ${mazeRoomRows} rooms · ` +
     `${encyclopediaRows} encyclopedia entries in ${dbPath}`,
 );
 db.close();

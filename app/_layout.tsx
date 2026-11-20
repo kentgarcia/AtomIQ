@@ -84,6 +84,7 @@ function AppContent() {
         <Stack.Screen name="blog" options={{ headerShown: false }} />
         <Stack.Screen name="blogs" options={{ headerShown: false }} />
         <Stack.Screen name="npc" options={{ headerShown: false }} />
+        <Stack.Screen name="phone-apps" options={{ headerShown: false }} />
         <Stack.Screen name="ranks" options={{ headerShown: false }} />
         <Stack.Screen name="daily-facts" options={{ headerShown: false }} />
         <Stack.Screen name="settings" options={{ headerShown: false }} />
@@ -100,6 +101,8 @@ function AppContent() {
         <Stack.Screen name="periodic-table" options={{ headerShown: false }} />
         <Stack.Screen name="achievements" options={{ headerShown: false }} />
         <Stack.Screen name="shop" options={{ headerShown: false }} />
+        {/* dev-sfx: development-only sound effects lab (components/dev/SfxLab.tsx) */}
+        <Stack.Screen name="dev-sfx" options={{ headerShown: false }} />
         <Stack.Screen
           name="achievement-detail"
           options={{ headerShown: false, presentation: "modal" }}

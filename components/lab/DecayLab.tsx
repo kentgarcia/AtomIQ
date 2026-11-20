@@ -293,7 +293,7 @@ export function DecayLab({ onBack }: { onBack: () => void }) {
     h.set(0);
     timers.current = decayCues(plan).map((q) =>
       setTimeout(() => {
-        if (q.kind === "click") void playSfx("ui.tick", { volume: 1.4, rate: 1.9 });
+        if (q.kind === "click") void playSfx("lab.geiger");
         else {
           const n = q.n ?? 1;
           void playSfx("reward.pop", { rate: 0.8 + n * 0.15 });
