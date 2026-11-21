@@ -5,15 +5,301 @@
   ],
   "rows": [
     {
+      "id": "chat-ada-back-beaker",
+      "npc_id": "npc-ada",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "his name is Gary. he's very tall and he doesn't say much. i love him. don't tell sparkle~",
+      "pose": "greet",
+      "replies": [
+        {
+          "label": "hahaha ok",
+          "next": "chat-ada-back-ready"
+        },
+        {
+          "label": "hi Gary",
+          "next": "chat-ada-back-ready"
+        }
+      ],
+      "position": 46
+    },
+    {
+      "id": "chat-ada-back-hi",
+      "npc_id": "npc-ada",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "hiii. you're here you're here\n\neverything's right where you left it. the atoms waited. i told them to. they were very good",
+      "pose": "cheer",
+      "replies": [
+        {
+          "label": "ok, let's go",
+          "next": "chat-ada-back-ready"
+        },
+        {
+          "label": "need a warm-up first",
+          "next": "chat-ada-back-ready"
+        }
+      ],
+      "position": 47
+    },
+    {
+      "id": "chat-ada-back-miss",
+      "npc_id": "npc-ada",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "sooo much. the beaker is a bad listener\n\nit just sits there. it does not say 'oh no' or 'wait really'. you say 'oh no' so nicely",
+      "pose": "sorry",
+      "replies": [
+        {
+          "label": "aw ada",
+          "next": "chat-ada-back-ready"
+        },
+        {
+          "label": "the beaker has a name?",
+          "next": "chat-ada-back-beaker"
+        }
+      ],
+      "position": 45
+    },
+    {
+      "id": "chat-ada-back-ready",
+      "npc_id": "npc-ada",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "so~ wanna pick up where you stopped?",
+      "pose": "point",
+      "replies": [
+        {
+          "label": "Take me there",
+          "action": {
+            "screen": "next-lesson"
+          }
+        },
+        {
+          "label": "A quick round first",
+          "action": {
+            "screen": "mythbuster",
+            "id": "radioactivity"
+          }
+        },
+        {
+          "label": "not today",
+          "next": "chat-ada-bye"
+        }
+      ],
+      "position": 49
+    },
+    {
+      "id": "chat-ada-back-sorry",
+      "npc_id": "npc-ada",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "no no no don't be sorry. life happens\n\nyou're here now, that's the only thing that counts. and i saved your seat~ (it's a stool. it's wobbly. but it's yours)",
+      "pose": "proud",
+      "replies": [
+        {
+          "label": "thanks ada",
+          "next": "chat-ada-back-ready"
+        },
+        {
+          "label": "ok let's go",
+          "next": "chat-ada-back-ready"
+        }
+      ],
+      "position": 48
+    },
+    {
+      "id": "chat-ada-banana-end",
+      "npc_id": "npc-ada",
+      "kind": "sign_off",
+      "trigger": null,
+      "title": null,
+      "text": "ok ok back to my banana\n\nnow you have a fun fact for the fruit stand hehe. go tell someone. watch their face~",
+      "pose": "greet",
+      "replies": [],
+      "position": 28
+    },
+    {
+      "id": "chat-ada-banana-me",
+      "npc_id": "npc-ada",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "yes. everybody has some. a few potassium-40 atoms in you decay every single second\n\nit's ok. it decays super slowly. its half-life is more than a billion years, which is why it's still around",
+      "pose": "cheer",
+      "replies": [
+        {
+          "label": "mind-blown",
+          "type": "emoji",
+          "next": "chat-ada-banana-end"
+        },
+        {
+          "label": "banana",
+          "type": "emoji"
+        }
+      ],
+      "position": 27
+    },
+    {
+      "id": "chat-ada-banana-no",
+      "npc_id": "npc-ada",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "ada yes. it's real. i'd never lie about bananas\n\nit's the potassium. a tiny share of potassium is potassium-40, which is unstable. so. banana. slightly radioactive. hehe",
+      "pose": "proud",
+      "replies": [
+        {
+          "label": "ok but is it safe?",
+          "next": "chat-ada-banana-safe"
+        },
+        {
+          "label": "wait, is that in ME?",
+          "next": "chat-ada-banana-me"
+        }
+      ],
+      "position": 25
+    },
+    {
+      "id": "chat-ada-banana-safe",
+      "npc_id": "npc-ada",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "completely safe. the amount is soooo small it doesn't matter\n\nyour own body has the same kind of atom and you're fine. i've been eating bananas this whole time and look at me. i'm fine (the glow is the flask)",
+      "pose": "proud",
+      "replies": [
+        {
+          "label": "in ME?",
+          "next": "chat-ada-banana-me"
+        },
+        {
+          "label": "ok going to eat a banana now",
+          "next": "chat-ada-banana-end"
+        }
+      ],
+      "position": 26
+    },
+    {
+      "id": "chat-ada-banana-what",
+      "npc_id": "npc-ada",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "yes. well. a tiny bit. a very tiny bit\n\nbananas have potassium. and a teeny part of ALL potassium is a radioactive kind called potassium-40\n\nit's in bananas, in nuts, in the soil. and in you~",
+      "pose": "cheer",
+      "replies": [
+        {
+          "label": "wait, in ME?",
+          "next": "chat-ada-banana-me"
+        },
+        {
+          "label": "is it safe??",
+          "next": "chat-ada-banana-safe"
+        }
+      ],
+      "position": 24
+    },
+    {
+      "id": "chat-ada-boom",
+      "npc_id": "npc-ada",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "tiny ones. like. poof. nobody's hurt (the bow's feelings are hurt)\n\ni always wear goggles, don't worry. safety first, glitter second~",
+      "pose": "sorry",
+      "replies": [
+        {
+          "label": "the bow has feelings??",
+          "next": "chat-ada-bow"
+        },
+        {
+          "label": "ok good, safety first",
+          "next": "chat-ada-menu"
+        }
+      ],
+      "position": 8
+    },
+    {
+      "id": "chat-ada-bow",
+      "npc_id": "npc-ada",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "my left bow. it fell in the flask. eep. it's fine. it's pink and also slightly green now\n\ni'm calling it 'a look'~",
+      "pose": "sorry",
+      "replies": [
+        {
+          "label": "love",
+          "type": "react",
+          "next": "chat-ada-menu"
+        },
+        {
+          "label": "haha",
+          "type": "react",
+          "next": "chat-ada-menu"
+        }
+      ],
+      "position": 9
+    },
+    {
       "id": "chat-ada-bye",
       "npc_id": "npc-ada",
       "kind": "sign_off",
       "trigger": null,
       "title": null,
-      "text": "Any time. I'm here whenever you're curious.",
-      "pose": "proud",
+      "text": "aww ok bye bye\n\ncome back soon?? i'll be here. probably with something bubbling~",
+      "pose": "greet",
       "replies": [],
-      "position": 7
+      "position": 12
+    },
+    {
+      "id": "chat-ada-decay",
+      "npc_id": "npc-ada",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "decay. ok so\n\nan unstable nucleus changes all by itself into a steadier one, and gives off radiation while it does\n\nit's like a nucleus tidying its room. except the room is, uh, itself",
+      "pose": "explain",
+      "replies": [
+        {
+          "label": "Open it in AtomDex",
+          "action": {
+            "screen": "entry",
+            "id": "decay"
+          }
+        },
+        {
+          "label": "ok thanks",
+          "next": "chat-ada-menu"
+        }
+      ],
+      "position": 6
+    },
+    {
+      "id": "chat-ada-flask",
+      "npc_id": "npc-ada",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "ooh she's called Sparkle. she's glowy and a little moody~\n\ni'm not telling you what's inside. it's a secret. ok it's mostly water and hope",
+      "pose": "greet",
+      "replies": [
+        {
+          "label": "SPARKLE?? love her",
+          "next": "chat-ada-menu"
+        },
+        {
+          "label": "is it safe tho",
+          "next": "chat-ada-safe"
+        }
+      ],
+      "position": 10
     },
     {
       "id": "chat-ada-greeting",
@@ -21,50 +307,412 @@
       "kind": "greeting",
       "trigger": null,
       "title": "Chat",
-      "text": "Hi, it's Ada. Ask me about atoms any time. What would you like?",
-      "pose": "greet",
+      "text": "heyyy. it's ada\n\nsorry sorry, my flask just made The Noise. ok it stopped. i think~ hi hi\n\nwhat's up?",
+      "pose": "cheer",
       "replies": [
         {
-          "label": "What's next?",
+          "label": "what are you doing?",
+          "next": "chat-ada-upto"
+        },
+        {
+          "label": "what should i do next?",
           "next": "chat-ada-next"
         },
         {
-          "label": "Quiz me",
+          "label": "quiz me",
           "next": "chat-ada-quiz"
         },
         {
-          "label": "Remind me of something",
+          "label": "can you remind me of something?",
           "next": "chat-ada-remind"
         },
         {
-          "label": "Bye for now",
+          "label": "what's in your flask?",
+          "next": "chat-ada-flask"
+        },
+        {
+          "label": "i have to go",
           "next": "chat-ada-bye"
         }
       ],
       "position": 0
     },
     {
-      "id": "chat-ada-isotope",
+      "id": "chat-ada-gummy-25",
       "npc_id": "npc-ada",
       "kind": "reply",
       "trigger": null,
       "title": null,
-      "text": "Isotopes are atoms of one element with different numbers of neutrons. The protons stay the same, so the element does too.",
+      "text": "25. yes. 100, then 50, then 25. every tick, half of what's left\n\nthat's a half-life. the time it takes for half to go. and then half of THAT. and then half of that again",
+      "pose": "cheer",
+      "replies": [
+        {
+          "label": "wow",
+          "type": "react",
+          "next": "chat-ada-gummy-end"
+        },
+        {
+          "label": "clap",
+          "type": "react",
+          "next": "chat-ada-gummy-end"
+        }
+      ],
+      "position": 37
+    },
+    {
+      "id": "chat-ada-gummy-50",
+      "npc_id": "npc-ada",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "50. yes. and with bears it's exactly 50\n\nwith real atoms it'd be about 50. a crowd follows a pattern but nobody gets exactly half. write that down~",
+      "pose": "proud",
+      "replies": [
+        {
+          "label": "ok tick two",
+          "next": "chat-ada-gummy-t2"
+        },
+        {
+          "label": "'about' is a great word",
+          "next": "chat-ada-gummy-t2"
+        }
+      ],
+      "position": 33
+    },
+    {
+      "id": "chat-ada-gummy-about",
+      "npc_id": "npc-ada",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "ooh you said ABOUT. i could cry\n\nwith bears it's exactly 50. with real atoms it's only about 50. that little word is the whole trick",
+      "pose": "cheer",
+      "replies": [
+        {
+          "label": "ok tick two",
+          "next": "chat-ada-gummy-t2"
+        },
+        {
+          "label": "i'm a genius",
+          "next": "chat-ada-gummy-t2"
+        }
+      ],
+      "position": 34
+    },
+    {
+      "id": "chat-ada-gummy-end",
+      "npc_id": "npc-ada",
+      "kind": "sign_off",
+      "trigger": null,
+      "title": null,
+      "text": "ok i have 25 gummy bears left and a stomachache\n\nthank you for helping with the science. i owe you one. (an imaginary bear)",
+      "pose": "greet",
+      "replies": [],
+      "position": 38
+    },
+    {
+      "id": "chat-ada-gummy-hint",
+      "npc_id": "npc-ada",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "so close. half of 50. 50, split in two",
+      "pose": "think",
+      "replies": [
+        {
+          "label": "25",
+          "next": "chat-ada-gummy-25"
+        },
+        {
+          "label": "ohh 25",
+          "next": "chat-ada-gummy-25"
+        }
+      ],
+      "position": 36
+    },
+    {
+      "id": "chat-ada-gummy-lol",
+      "npc_id": "npc-ada",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "nooo i can't eat them ALL. that's the whole point\n\nevery tick i only eat half. there's always some left. ok try again. how many after one tick?",
+      "pose": "sorry",
+      "replies": [
+        {
+          "label": "50",
+          "next": "chat-ada-gummy-50"
+        },
+        {
+          "label": "about 50",
+          "next": "chat-ada-gummy-about"
+        }
+      ],
+      "position": 32
+    },
+    {
+      "id": "chat-ada-gummy-q",
+      "npc_id": "npc-ada",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "tick one. i eat half\n\nhow many bears are left?",
+      "pose": "point",
+      "replies": [
+        {
+          "label": "50",
+          "next": "chat-ada-gummy-50"
+        },
+        {
+          "label": "about 50",
+          "next": "chat-ada-gummy-about"
+        },
+        {
+          "label": "none, you ate them all lol",
+          "next": "chat-ada-gummy-lol"
+        }
+      ],
+      "position": 31
+    },
+    {
+      "id": "chat-ada-gummy-share",
+      "npc_id": "npc-ada",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "no. they're for science. ... ok fine. one. i'm giving you one. imaginary. it's very good\n\nok now. serious. ready?",
+      "pose": "sorry",
+      "replies": [
+        {
+          "label": "ready",
+          "next": "chat-ada-gummy-q"
+        },
+        {
+          "label": "i can taste it",
+          "next": "chat-ada-gummy-q"
+        }
+      ],
+      "position": 30
+    },
+    {
+      "id": "chat-ada-gummy-t2",
+      "npc_id": "npc-ada",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "tick two. half of the 50 that are left\n\nhow many bears now?",
+      "pose": "point",
+      "replies": [
+        {
+          "label": "25",
+          "next": "chat-ada-gummy-25"
+        },
+        {
+          "label": "idk, 20?",
+          "next": "chat-ada-gummy-hint"
+        }
+      ],
+      "position": 35
+    },
+    {
+      "id": "chat-ada-half-life",
+      "npc_id": "npc-ada",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "ok ok half-life\n\nit's how long it takes for half of the atoms in a sample to decay. half of the CROWD, not one atom. one atom is a mystery, a crowd is a pattern\n\nlike popcorn~ (don't quote me on popcorn)",
       "pose": "explain",
       "replies": [
         {
           "label": "Open it in AtomDex",
           "action": {
             "screen": "entry",
-            "id": "isotope"
+            "id": "half-life"
           }
         },
         {
-          "label": "Back",
+          "label": "ok thanks",
           "next": "chat-ada-menu"
         }
       ],
-      "position": 6
+      "position": 5
+    },
+    {
+      "id": "chat-ada-hello-crowd",
+      "npc_id": "npc-ada",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "ooh. here's the magic part\n\none nucleus? mystery. a CROWD of them? pattern\n\nlike if i roll one die, no idea. but roll it 600 times and about 100 of them are sixes. same energy",
+      "pose": "cheer",
+      "replies": [
+        {
+          "label": "wow",
+          "type": "react",
+          "next": "chat-ada-hello-end"
+        },
+        {
+          "label": "haha",
+          "type": "react",
+          "next": "chat-ada-hello-end"
+        }
+      ],
+      "position": 21
+    },
+    {
+      "id": "chat-ada-hello-end",
+      "npc_id": "npc-ada",
+      "kind": "sign_off",
+      "trigger": null,
+      "title": null,
+      "text": "ok i have to go. sparkle's doing the noise again\n\nit was SO nice to meet you. come say hi any time. i'll be here. probably covered in glitter~",
+      "pose": "greet",
+      "replies": [],
+      "position": 22
+    },
+    {
+      "id": "chat-ada-hello-flask",
+      "npc_id": "npc-ada",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "ok so. it was sparkle. my flask. she slipped. she's fine. she's glass but she's brave\n\nanyway. hi",
+      "pose": "sorry",
+      "replies": [
+        {
+          "label": "aww poor sparkle",
+          "next": "chat-ada-hello-q"
+        },
+        {
+          "label": "ok hi ada",
+          "next": "chat-ada-hello-q"
+        }
+      ],
+      "position": 14
+    },
+    {
+      "id": "chat-ada-hello-hal",
+      "npc_id": "npc-ada",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "HAL TOLD YOU ABOUT ME??\n\nwhat did he say. no wait. don't tell me. he said i'm loud. he always says i'm loud\n\nhe's right. but he says it fondly. i think. it's hard to tell with hal",
+      "pose": "cheer",
+      "replies": [
+        {
+          "label": "he said you're 'a great deal'",
+          "next": "chat-ada-hello-q"
+        },
+        {
+          "label": "he said you're the best at it",
+          "next": "chat-ada-hello-q"
+        }
+      ],
+      "position": 15
+    },
+    {
+      "id": "chat-ada-hello-q",
+      "npc_id": "npc-ada",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "ok anyway\n\nquestion. i have ONE unstable nucleus. just one. sitting there\n\ncan you tell me the exact second it will change?",
+      "pose": "point",
+      "replies": [
+        {
+          "label": "no way to know",
+          "next": "chat-ada-hello-right"
+        },
+        {
+          "label": "yes, with math",
+          "next": "chat-ada-hello-wrong"
+        },
+        {
+          "label": "is this a trick question",
+          "next": "chat-ada-hello-trick"
+        }
+      ],
+      "position": 16
+    },
+    {
+      "id": "chat-ada-hello-right",
+      "npc_id": "npc-ada",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "YES. you got it, nobody can say when\n\nthe nucleus is just sitting there. then one day, poof. it changes. nobody pushes it. nobody knows when",
+      "pose": "cheer",
+      "replies": [
+        {
+          "label": "so nothing is predictable?",
+          "next": "chat-ada-hello-crowd"
+        },
+        {
+          "label": "that's kinda spooky",
+          "next": "chat-ada-hello-spooky"
+        }
+      ],
+      "position": 17
+    },
+    {
+      "id": "chat-ada-hello-spooky",
+      "npc_id": "npc-ada",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "a little. but i like it. it's like every atom has a secret clock and it won't tell anyone\n\n(not a REAL clock. don't put that in your notes. there's no timer inside)",
+      "pose": "think",
+      "replies": [
+        {
+          "label": "ok but what about a crowd?",
+          "next": "chat-ada-hello-crowd"
+        },
+        {
+          "label": "ok i get it, thanks ada",
+          "next": "chat-ada-hello-end"
+        }
+      ],
+      "position": 20
+    },
+    {
+      "id": "chat-ada-hello-trick",
+      "npc_id": "npc-ada",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "it's not a trick. it's a tiny trick. ok it's a trick\n\nthe answer is: you can't. nobody can say when one nucleus will change",
+      "pose": "greet",
+      "replies": [
+        {
+          "label": "ok so what CAN we know?",
+          "next": "chat-ada-hello-crowd"
+        },
+        {
+          "label": "that's kinda spooky",
+          "next": "chat-ada-hello-spooky"
+        }
+      ],
+      "position": 19
+    },
+    {
+      "id": "chat-ada-hello-wrong",
+      "npc_id": "npc-ada",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "ooh so close, hehe. it's a super common guess\n\nbut nope. for one nucleus, nobody can say when. not with math, not with a bigger computer, not with my fanciest flask",
+      "pose": "idle",
+      "replies": [
+        {
+          "label": "huh. so what CAN we know?",
+          "next": "chat-ada-hello-crowd"
+        },
+        {
+          "label": "that's kinda spooky",
+          "next": "chat-ada-hello-spooky"
+        }
+      ],
+      "position": 18
     },
     {
       "id": "chat-ada-menu",
@@ -72,23 +720,31 @@
       "kind": "reply",
       "trigger": null,
       "title": null,
-      "text": "What else can I help with?",
+      "text": "ooh ok. what else?\n\ni've got time. a little. i have a snack appointment at 3",
       "pose": "idle",
       "replies": [
         {
-          "label": "What's next?",
+          "label": "what are you doing?",
+          "next": "chat-ada-upto"
+        },
+        {
+          "label": "what should i do next?",
           "next": "chat-ada-next"
         },
         {
-          "label": "Quiz me",
+          "label": "quiz me",
           "next": "chat-ada-quiz"
         },
         {
-          "label": "Remind me of something",
+          "label": "can you remind me of something?",
           "next": "chat-ada-remind"
         },
         {
-          "label": "Bye for now",
+          "label": "what's in your flask?",
+          "next": "chat-ada-flask"
+        },
+        {
+          "label": "i have to go",
           "next": "chat-ada-bye"
         }
       ],
@@ -100,7 +756,7 @@
       "kind": "reply",
       "trigger": null,
       "title": null,
-      "text": "There is always a next lesson waiting on your map. Shall I take you there?",
+      "text": "your next lesson is waiting on the map\n\nwant me to take you there? i'll pretend i didn't see you procrastinate hehe~",
       "pose": "point",
       "replies": [
         {
@@ -110,34 +766,11 @@
           }
         },
         {
-          "label": "Maybe later",
+          "label": "maybe later",
           "next": "chat-ada-menu"
         }
       ],
       "position": 2
-    },
-    {
-      "id": "chat-ada-nucleus",
-      "npc_id": "npc-ada",
-      "kind": "reply",
-      "trigger": null,
-      "title": null,
-      "text": "The nucleus is the tiny core of an atom. It holds the protons and the neutrons, and nearly all of the atom's mass.",
-      "pose": "explain",
-      "replies": [
-        {
-          "label": "Open it in AtomDex",
-          "action": {
-            "screen": "entry",
-            "id": "nucleus"
-          }
-        },
-        {
-          "label": "Back",
-          "next": "chat-ada-menu"
-        }
-      ],
-      "position": 5
     },
     {
       "id": "chat-ada-quiz",
@@ -145,18 +778,18 @@
       "kind": "reply",
       "trigger": null,
       "title": null,
-      "text": "A quick round of Myth Buster on atoms will show what stuck. Ready?",
+      "text": "a lil round of myth buster?? on radioactivity??\n\nyes yes yes. i love these. no pressure. ok a little pressure. a cute amount~",
       "pose": "explain",
       "replies": [
         {
           "label": "Start the round",
           "action": {
             "screen": "mythbuster",
-            "id": "inside-the-atom"
+            "id": "radioactivity"
           }
         },
         {
-          "label": "Not now",
+          "label": "not now",
           "next": "chat-ada-menu"
         }
       ],
@@ -168,363 +801,304 @@
       "kind": "reply",
       "trigger": null,
       "title": null,
-      "text": "Of course. Which one shall we look at again?",
+      "text": "ofc~ which one?\n\ni'll try not to ramble. (i will ramble)",
       "pose": "think",
       "replies": [
         {
-          "label": "The nucleus",
-          "next": "chat-ada-nucleus"
+          "label": "half-life",
+          "next": "chat-ada-half-life"
         },
         {
-          "label": "Isotopes",
-          "next": "chat-ada-isotope"
+          "label": "decay",
+          "next": "chat-ada-decay"
         },
         {
-          "label": "Never mind",
+          "label": "nvm",
           "next": "chat-ada-menu"
         }
       ],
       "position": 4
     },
     {
-      "id": "chat-ada-stadium-empty",
+      "id": "chat-ada-safe",
       "npc_id": "npc-ada",
       "kind": "reply",
       "trigger": null,
       "title": null,
-      "text": "Empty space. Mostly just empty space!\n\nThat is why an atom is so much bigger than its nucleus.\n\nThings still feel solid, because the electrons in them push back on the electrons in your hand.",
+      "text": "yes yes. i promise. i have goggles and a very serious lab coat\n\nthe apron is tan. it looks like a sandwich. i love it",
       "pose": "proud",
       "replies": [
         {
-          "label": "mind-blown",
-          "type": "emoji",
-          "next": "chat-ada-stadium-end"
+          "label": "ok cute",
+          "next": "chat-ada-menu"
         },
         {
-          "label": "star",
-          "type": "emoji"
-        }
-      ],
-      "position": 13
-    },
-    {
-      "id": "chat-ada-stadium-end",
-      "npc_id": "npc-ada",
-      "kind": "sign_off",
-      "trigger": null,
-      "title": null,
-      "text": "That was the marble in the stadium.\n\nCome back to it any time. I will tell it again.",
-      "pose": "proud",
-      "replies": [],
-      "position": 14
-    },
-    {
-      "id": "chat-ada-stadium-why",
-      "npc_id": "npc-ada",
-      "kind": "reply",
-      "trigger": null,
-      "title": null,
-      "text": "Good thing to wonder about.\n\nThe nucleus is made of protons and neutrons, packed tightly together.\n\nThe electrons are tiny and fast, and they keep their distance from it.",
-      "pose": "explain",
-      "replies": [
-        {
-          "label": "So what is between?",
-          "next": "chat-ada-stadium-empty"
-        },
-        {
-          "label": "Open the nucleus in AtomDex",
-          "action": {
-            "screen": "entry",
-            "id": "nucleus"
-          }
-        }
-      ],
-      "position": 12
-    },
-    {
-      "id": "chat-ada-stadium-wow",
-      "npc_id": "npc-ada",
-      "kind": "reply",
-      "trigger": null,
-      "title": null,
-      "text": "Really. Almost all of the atom's mass is packed into that marble.\n\nThe electrons are far lighter, and they are out near the seats.\n\nSo what is in between?",
-      "pose": "proud",
-      "replies": [
-        {
-          "label": "Nothing at all?",
-          "next": "chat-ada-stadium-empty"
-        },
-        {
-          "label": "Where are the electrons?",
-          "next": "chat-ada-stadium-why"
+          "label": "i have to go",
+          "next": "chat-ada-bye"
         }
       ],
       "position": 11
     },
     {
-      "id": "chat-ada-up-stadium",
+      "id": "chat-ada-unit-cry",
       "npc_id": "npc-ada",
-      "kind": "unprompted",
-      "trigger": "lessons_completed:3",
-      "title": "A marble in a stadium",
-      "text": "Hi! Ada here. I have to tell you something that still surprises me.\n\nPicture an atom blown up until it is as big as a football stadium.\n\nHow big would its nucleus be, right in the middle? About the size of a marble.",
-      "pose": "explain",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "NO. ok yes. a little\n\ni just really love when someone gets it. you just. get it. it's my favourite feeling in the whole world",
+      "pose": "sorry",
       "replies": [
         {
-          "label": "wow",
-          "type": "react",
-          "next": "chat-ada-stadium-wow"
+          "label": "aww, come here",
+          "next": "chat-ada-unit-thanks"
         },
         {
-          "label": "think",
-          "type": "react",
-          "next": "chat-ada-stadium-why"
+          "label": "ok but what's your favourite part?",
+          "next": "chat-ada-unit-fav"
         }
       ],
-      "position": 10
+      "position": 40
+    },
+    {
+      "id": "chat-ada-unit-end",
+      "npc_id": "npc-ada",
+      "kind": "sign_off",
+      "trigger": null,
+      "title": null,
+      "text": "ok i have to go lie on the lab floor and feel things\n\ncome back any time. i mean it. even just to say hi\n\nbye bye, scientist~",
+      "pose": "greet",
+      "replies": [],
+      "position": 43
+    },
+    {
+      "id": "chat-ada-unit-fav",
+      "npc_id": "npc-ada",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "ooh ooh ooh. favourite favourite\n\nit's the banana. every time. nobody expects it. you tell someone a banana is radioactive and their face goes, like, ?????\n\nand it's completely normal. radioactivity was here long before people. i love that. a little bit of old magic~",
+      "pose": "cheer",
+      "replies": [
+        {
+          "label": "i love the banana too",
+          "next": "chat-ada-unit-thanks"
+        },
+        {
+          "label": "old magic, ok poet",
+          "next": "chat-ada-unit-end"
+        }
+      ],
+      "position": 41
+    },
+    {
+      "id": "chat-ada-unit-thanks",
+      "npc_id": "npc-ada",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "you're SO welcome\n\nand thank YOU for being so curious. you asked the best questions. i kept a list. it's on my fridge. it's very long\n\nhal's going to be so smug that he taught you first, hehe",
+      "pose": "proud",
+      "replies": [
+        {
+          "label": "party",
+          "type": "emoji",
+          "next": "chat-ada-unit-end"
+        },
+        {
+          "label": "star",
+          "type": "emoji",
+          "next": "chat-ada-unit-end"
+        }
+      ],
+      "position": 42
+    },
+    {
+      "id": "chat-ada-up-banana",
+      "npc_id": "npc-ada",
+      "kind": "unprompted",
+      "trigger": "level_reached:4",
+      "title": "i'm eating a banana",
+      "text": "ok so i'm eating a banana right now\n\nand i just realised something that is going to ruin it for you in a good way\n\nit's radioactive. a little. the banana. the one in my hand. hehe~",
+      "pose": "think",
+      "replies": [
+        {
+          "label": "WHAT",
+          "next": "chat-ada-banana-what"
+        },
+        {
+          "label": "lol ada no",
+          "next": "chat-ada-banana-no"
+        },
+        {
+          "label": "ok but is it safe to eat",
+          "next": "chat-ada-banana-safe"
+        }
+      ],
+      "position": 23
+    },
+    {
+      "id": "chat-ada-up-gummy",
+      "npc_id": "npc-ada",
+      "kind": "unprompted",
+      "trigger": "lessons_completed:8",
+      "title": "gummy bear half-life",
+      "text": "ok i need your help with something very serious\n\ni have 100 gummy bears. a whole bag. and i have a rule\n\nevery tick, i eat HALF of the ones that are left. only half. it's science~",
+      "pose": "cheer",
+      "replies": [
+        {
+          "label": "ok i'm in",
+          "next": "chat-ada-gummy-q"
+        },
+        {
+          "label": "can i have some?",
+          "next": "chat-ada-gummy-share"
+        }
+      ],
+      "position": 29
+    },
+    {
+      "id": "chat-ada-up-hello",
+      "npc_id": "npc-ada",
+      "kind": "unprompted",
+      "trigger": "lessons_completed:6",
+      "title": "hi hi hi. it's ada",
+      "text": "HELLO\n\n(sorry. i've been waiting to say that forever. i saw you finished a lesson in my unit and i dropped a flask)\n\ni'm ada. i teach the atoms that change. hehe. you'll see~",
+      "pose": "cheer",
+      "replies": [
+        {
+          "label": "hi ada",
+          "next": "chat-ada-hello-q"
+        },
+        {
+          "label": "you dropped a flask?",
+          "next": "chat-ada-hello-flask"
+        },
+        {
+          "label": "Hal told me about you",
+          "next": "chat-ada-hello-hal"
+        }
+      ],
+      "position": 13
     },
     {
       "id": "chat-ada-up-unit",
       "npc_id": "npc-ada",
       "kind": "unprompted",
-      "trigger": "unit_complete:inside-the-atom",
-      "title": "Inside the Atom: done!",
-      "text": "You did it. That was the last lesson of my unit.\n\nYou can say what is inside an atom now, and why the number of protons matters so much.\n\nHal is next, with atoms that change.",
-      "pose": "proud",
+      "trigger": "unit_complete:radioactivity",
+      "title": "Radioactivity: done",
+      "text": "YOU. DID. IT\n\ni'm not crying. i'm a little crying. it's the flask fumes\n\nyou finished my whole unit. you know why nuclei change, what comes out, and how a crowd follows a pattern. i'm so proud i could pop~",
+      "pose": "cheer",
       "replies": [
         {
-          "label": "What's next?",
-          "next": "chat-ada-next"
+          "label": "thank you ada",
+          "next": "chat-ada-unit-thanks"
         },
         {
-          "label": "Thanks, Ada",
-          "next": "chat-ada-bye"
+          "label": "you're crying??",
+          "next": "chat-ada-unit-cry"
+        },
+        {
+          "label": "what was your favourite part?",
+          "next": "chat-ada-unit-fav"
         }
       ],
-      "position": 8
+      "position": 39
     },
     {
       "id": "chat-ada-up-welcome-back",
       "npc_id": "npc-ada",
       "kind": "unprompted",
       "trigger": "welcome_back",
-      "title": "Welcome back",
-      "text": "Hello again!\n\nThe atoms waited for you. They are patient like that.\n\nWant a quick round to warm up?",
-      "pose": "greet",
+      "title": "welcome back",
+      "text": "YOU'RE BACK\n\nit's been so quiet. sparkle was sad. i talked to a beaker. it wasn't the same\n\nhi hi hi hi~",
+      "pose": "cheer",
       "replies": [
         {
-          "label": "A quick round",
-          "action": {
-            "screen": "mythbuster",
-            "id": "inside-the-atom"
-          }
+          "label": "aw, did you miss me?",
+          "next": "chat-ada-back-miss"
         },
         {
-          "label": "Maybe later",
-          "next": "chat-ada-bye"
+          "label": "lol hi ada",
+          "next": "chat-ada-back-hi"
+        },
+        {
+          "label": "sorry i was away",
+          "next": "chat-ada-back-sorry"
         }
       ],
-      "position": 9
+      "position": 44
     },
     {
-      "id": "chat-hal-banana-end",
-      "npc_id": "npc-hal",
-      "kind": "sign_off",
-      "trigger": null,
-      "title": null,
-      "text": "Good talking.\n\nNow you have something to say at the fruit stand. Come back and read this again whenever you like.",
-      "pose": "proud",
-      "replies": [],
-      "position": 14
-    },
-    {
-      "id": "chat-hal-banana-k",
-      "npc_id": "npc-hal",
+      "id": "chat-ada-upto",
+      "npc_id": "npc-ada",
       "kind": "reply",
       "trigger": null,
       "title": null,
-      "text": "A banana holds potassium, and a tiny part of all potassium is a radioactive isotope called potassium-40.\n\nIt is in bananas, in nuts, in the soil, and in you.",
-      "pose": "explain",
+      "text": "ahh you asked\n\nso i'm trying to make a flask glow on purpose, instead of by accident\n\nso far: 0 glows. 3 small explosions. 1 very sad bow~",
+      "pose": "cheer",
       "replies": [
         {
-          "label": "In me?",
-          "next": "chat-hal-banana-me"
+          "label": "explosions?!",
+          "next": "chat-ada-boom"
         },
         {
-          "label": "Is it safe?",
-          "next": "chat-hal-banana-safe"
+          "label": "is your bow ok",
+          "next": "chat-ada-bow"
         },
         {
-          "label": "Open half-life in AtomDex",
-          "action": {
-            "screen": "entry",
-            "id": "half-life"
-          }
+          "label": "ok lol anyway",
+          "next": "chat-ada-menu"
         }
       ],
-      "position": 11
-    },
-    {
-      "id": "chat-hal-banana-me",
-      "npc_id": "npc-hal",
-      "kind": "reply",
-      "trigger": null,
-      "title": null,
-      "text": "Yes. Every person carries some potassium-40, and a few of its atoms decay every second.\n\nIt decays very slowly. Its half-life is more than a billion years, which is why it is still around.",
-      "pose": "proud",
-      "replies": [
-        {
-          "label": "mind-blown",
-          "type": "emoji",
-          "next": "chat-hal-banana-end"
-        },
-        {
-          "label": "banana",
-          "type": "emoji"
-        }
-      ],
-      "position": 13
-    },
-    {
-      "id": "chat-hal-banana-safe",
-      "npc_id": "npc-hal",
-      "kind": "reply",
-      "trigger": null,
-      "title": null,
-      "text": "Completely safe. The amount is far too small to matter.\n\nYour own body holds the same kind of atom, and you are fine.\n\nEating bananas is good for you.",
-      "pose": "explain",
-      "replies": [
-        {
-          "label": "In me?",
-          "next": "chat-hal-banana-me"
-        },
-        {
-          "label": "Thanks, Hal",
-          "next": "chat-hal-banana-end"
-        }
-      ],
-      "position": 12
-    },
-    {
-      "id": "chat-hal-bye",
-      "npc_id": "npc-hal",
-      "kind": "sign_off",
-      "trigger": null,
-      "title": null,
-      "text": "Take care. I'll be here when you want to talk about decay.",
-      "pose": "proud",
-      "replies": [],
       "position": 7
     },
     {
-      "id": "chat-hal-decay",
+      "id": "chat-hal-back-here",
       "npc_id": "npc-hal",
       "kind": "reply",
       "trigger": null,
       "title": null,
-      "text": "Decay is an unstable nucleus changing by itself into a steadier one, and giving off radiation as it does.",
-      "pose": "explain",
+      "text": "You are. Good.\n\nEverything is where you left it. The atoms waited. They are patient. So am I.",
+      "pose": "proud",
       "replies": [
         {
-          "label": "Open it in AtomDex",
-          "action": {
-            "screen": "entry",
-            "id": "decay"
-          }
+          "label": "ok let's go",
+          "next": "chat-hal-back-ready"
         },
         {
-          "label": "Back",
-          "next": "chat-hal-menu"
+          "label": "I need a warm-up first",
+          "next": "chat-hal-back-ready"
         }
       ],
-      "position": 6
+      "position": 40
     },
     {
-      "id": "chat-hal-greeting",
+      "id": "chat-hal-back-miss",
       "npc_id": "npc-hal",
-      "kind": "greeting",
+      "kind": "reply",
       "trigger": null,
-      "title": "Chat",
-      "text": "Hello. I'm Hal. Ask me about atoms that change whenever you like. There is no hurry.",
+      "title": null,
+      "text": "I missed the questions. Most people ask very few. You ask good ones.\n\nAlso the satchel feels lighter without somebody to tell things to. Which is odd. I did not take anything out of it.",
       "pose": "greet",
       "replies": [
         {
-          "label": "What's next?",
-          "next": "chat-hal-next"
+          "label": "that's so sweet",
+          "next": "chat-hal-back-ready"
         },
         {
-          "label": "Quiz me",
-          "next": "chat-hal-quiz"
-        },
-        {
-          "label": "Remind me of something",
-          "next": "chat-hal-remind"
-        },
-        {
-          "label": "Goodbye",
-          "next": "chat-hal-bye"
+          "label": "ok I'm ready to learn",
+          "next": "chat-hal-back-ready"
         }
       ],
-      "position": 0
+      "position": 39
     },
     {
-      "id": "chat-hal-half-life",
+      "id": "chat-hal-back-ready",
       "npc_id": "npc-hal",
       "kind": "reply",
       "trigger": null,
       "title": null,
-      "text": "Half-life is the time it takes for half of the atoms in a sample to decay. Not one atom: a whole crowd of them.",
-      "pose": "explain",
-      "replies": [
-        {
-          "label": "Open it in AtomDex",
-          "action": {
-            "screen": "entry",
-            "id": "half-life"
-          }
-        },
-        {
-          "label": "Back",
-          "next": "chat-hal-menu"
-        }
-      ],
-      "position": 5
-    },
-    {
-      "id": "chat-hal-menu",
-      "npc_id": "npc-hal",
-      "kind": "reply",
-      "trigger": null,
-      "title": null,
-      "text": "What would you like to look at?",
-      "pose": "idle",
-      "replies": [
-        {
-          "label": "What's next?",
-          "next": "chat-hal-next"
-        },
-        {
-          "label": "Quiz me",
-          "next": "chat-hal-quiz"
-        },
-        {
-          "label": "Remind me of something",
-          "next": "chat-hal-remind"
-        },
-        {
-          "label": "Goodbye",
-          "next": "chat-hal-bye"
-        }
-      ],
-      "position": 1
-    },
-    {
-      "id": "chat-hal-next",
-      "npc_id": "npc-hal",
-      "kind": "reply",
-      "trigger": null,
-      "title": null,
-      "text": "When you are ready, the next lesson is on your map. I can take you there.",
+      "text": "Shall we pick up where you stopped?",
       "pose": "point",
       "replies": [
         {
@@ -534,11 +1108,417 @@
           }
         },
         {
-          "label": "Not yet",
+          "label": "A quick round first",
+          "action": {
+            "screen": "mythbuster",
+            "id": "inside-the-atom"
+          }
+        },
+        {
+          "label": "not today, sorry",
+          "next": "chat-hal-bye"
+        }
+      ],
+      "position": 42
+    },
+    {
+      "id": "chat-hal-back-rocks",
+      "npc_id": "npc-hal",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "Reginald fell. Doris rolled. Tuesday is, as ever, unaccounted for.\n\nI blame the floor. I suspect the floor is level in a way that offends me.",
+      "pose": "sorry",
+      "replies": [
+        {
+          "label": "hahaha poor Tuesday",
+          "next": "chat-hal-back-ready"
+        },
+        {
+          "label": "ok Hal",
+          "next": "chat-hal-back-ready"
+        }
+      ],
+      "position": 41
+    },
+    {
+      "id": "chat-hal-bye",
+      "npc_id": "npc-hal",
+      "kind": "sign_off",
+      "trigger": null,
+      "title": null,
+      "text": "Of course. Goodbye, then.\n\nGo gently. Come back when you are curious. I will be here, probably holding a rock.",
+      "pose": "proud",
+      "replies": [],
+      "position": 13
+    },
+    {
+      "id": "chat-hal-greeting",
+      "npc_id": "npc-hal",
+      "kind": "greeting",
+      "trigger": null,
+      "title": "Chat",
+      "text": "Ah. Hello.\n\nI was in the middle of weighing a rock, but it will keep. Rocks are good at that.\n\nWhat can I do for you?",
+      "pose": "greet",
+      "replies": [
+        {
+          "label": "what are you up to?",
+          "next": "chat-hal-upto"
+        },
+        {
+          "label": "what should I do next?",
+          "next": "chat-hal-next"
+        },
+        {
+          "label": "quiz me",
+          "next": "chat-hal-quiz"
+        },
+        {
+          "label": "can you remind me of something?",
+          "next": "chat-hal-remind"
+        },
+        {
+          "label": "what's in your satchel?",
+          "next": "chat-hal-satchel"
+        },
+        {
+          "label": "ok bye",
+          "next": "chat-hal-bye"
+        }
+      ],
+      "position": 0
+    },
+    {
+      "id": "chat-hal-hello-ball",
+      "npc_id": "npc-hal",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "Yes. Really.\n\nThe air inside is made of atoms, and atoms are matter, and matter has mass. It is not much. But it is not nothing.\n\nThat is your whole first lesson, in one ball. You had it already. You only needed a ball.",
+      "pose": "proud",
+      "replies": [
+        {
+          "label": "wow",
+          "type": "react",
+          "next": "chat-hal-hello-end"
+        },
+        {
+          "label": "clap",
+          "type": "react",
+          "next": "chat-hal-hello-end"
+        }
+      ],
+      "position": 18
+    },
+    {
+      "id": "chat-hal-hello-end",
+      "npc_id": "npc-hal",
+      "kind": "sign_off",
+      "trigger": null,
+      "title": null,
+      "text": "That is all for today.\n\nI must go and put a rock back where it lives.\n\nSlowly, then. Until the next lesson.",
+      "pose": "greet",
+      "replies": [],
+      "position": 19
+    },
+    {
+      "id": "chat-hal-hello-fingers",
+      "npc_id": "npc-hal",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "Eleven minutes. I counted.\n\nThe longest word was 'forgive'. It fought me.\n\nI could use the other eight fingers. I am afraid they would start having opinions.",
+      "pose": "think",
+      "replies": [
+        {
+          "label": "hahaha ok Hal",
+          "next": "chat-hal-hello-end"
+        },
+        {
+          "label": "ok so tell me something about atoms",
+          "next": "chat-hal-hello-ball"
+        }
+      ],
+      "position": 16
+    },
+    {
+      "id": "chat-hal-hello-thanks",
+      "npc_id": "npc-hal",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "You are welcome.\n\nI think it was the right thing to say. I rehearsed it.\n\nTwice. In the garden.",
+      "pose": "proud",
+      "replies": [
+        {
+          "label": "aw, that's sweet",
+          "next": "chat-hal-hello-end"
+        },
+        {
+          "label": "tell me something about atoms",
+          "next": "chat-hal-hello-ball"
+        }
+      ],
+      "position": 15
+    },
+    {
+      "id": "chat-hal-hello-who",
+      "npc_id": "npc-hal",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "Fair. Fair.\n\nI am Hal. I teach the atom: what is inside it, and why that matters. I keep rocks. I hold few opinions, but I have several about air.\n\nAir, for instance, is matter. It can be weighed. A pumped-up ball is heavier than a flat one. Try it.",
+      "pose": "explain",
+      "replies": [
+        {
+          "label": "no way, air weighs something?",
+          "next": "chat-hal-hello-ball"
+        },
+        {
+          "label": "ok cool",
+          "next": "chat-hal-hello-end"
+        }
+      ],
+      "position": 17
+    },
+    {
+      "id": "chat-hal-isotope",
+      "npc_id": "npc-hal",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "Isotopes.\n\nAtoms of one element with different numbers of neutrons. The protons stay the same, so the element stays the same.\n\nSame name, different weight. I have a cousin like that.",
+      "pose": "explain",
+      "replies": [
+        {
+          "label": "Open it in AtomDex",
+          "action": {
+            "screen": "entry",
+            "id": "isotope"
+          }
+        },
+        {
+          "label": "thanks, back",
+          "next": "chat-hal-menu"
+        }
+      ],
+      "position": 6
+    },
+    {
+      "id": "chat-hal-menu",
+      "npc_id": "npc-hal",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "Hm. Yes?\n\nTake your time. I am not going anywhere, and neither is the rock.",
+      "pose": "idle",
+      "replies": [
+        {
+          "label": "what are you up to?",
+          "next": "chat-hal-upto"
+        },
+        {
+          "label": "what should I do next?",
+          "next": "chat-hal-next"
+        },
+        {
+          "label": "quiz me",
+          "next": "chat-hal-quiz"
+        },
+        {
+          "label": "can you remind me of something?",
+          "next": "chat-hal-remind"
+        },
+        {
+          "label": "what's in your satchel?",
+          "next": "chat-hal-satchel"
+        },
+        {
+          "label": "ok bye",
+          "next": "chat-hal-bye"
+        }
+      ],
+      "position": 1
+    },
+    {
+      "id": "chat-hal-minutes",
+      "npc_id": "npc-hal",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "Ten minutes.\n\nFor the first three, nothing happens. At minute four you notice a scratch. By minute seven the scratch has a story.\n\nI do not recommend doing it before a meeting.",
+      "pose": "proud",
+      "replies": [
+        {
+          "label": "ok that's actually kind of cool",
+          "next": "chat-hal-menu"
+        },
+        {
+          "label": "you're a strange person, Hal",
+          "next": "chat-hal-strange"
+        }
+      ],
+      "position": 9
+    },
+    {
+      "id": "chat-hal-named",
+      "npc_id": "npc-hal",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "Of course. A sample with a name is a sample you do not lose.\n\nReginald. Doris. A flat one called Tuesday.\n\nI will not be taking questions about Tuesday.",
+      "pose": "proud",
+      "replies": [
+        {
+          "label": "nerd",
+          "type": "emoji",
+          "next": "chat-hal-menu"
+        },
+        {
+          "label": "star",
+          "type": "emoji",
+          "next": "chat-hal-menu"
+        }
+      ],
+      "position": 12
+    },
+    {
+      "id": "chat-hal-next",
+      "npc_id": "npc-hal",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "There is a next lesson waiting on your map.\n\nI would go now, while you are still warm. Warm is the right temperature for learning. I read that somewhere. Possibly I wrote it.",
+      "pose": "point",
+      "replies": [
+        {
+          "label": "Take me there",
+          "action": {
+            "screen": "next-lesson"
+          }
+        },
+        {
+          "label": "later, maybe",
           "next": "chat-hal-menu"
         }
       ],
       "position": 2
+    },
+    {
+      "id": "chat-hal-nucleus",
+      "npc_id": "npc-hal",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "The nucleus.\n\nThe tiny core of an atom. The protons and the neutrons live in it, and so does nearly all of the atom's mass.\n\nSmall. Dense. Rather like a good paperweight.",
+      "pose": "explain",
+      "replies": [
+        {
+          "label": "Open it in AtomDex",
+          "action": {
+            "screen": "entry",
+            "id": "nucleus"
+          }
+        },
+        {
+          "label": "thanks, back",
+          "next": "chat-hal-menu"
+        }
+      ],
+      "position": 5
+    },
+    {
+      "id": "chat-hal-pebbles-carbon",
+      "npc_id": "npc-hal",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "Exactly so. Carbon-12, carbon-13, carbon-14.\n\nAll three are carbon. Six protons each. The protons make it carbon, and the protons do not change.\n\nWhat changes is the neutrons. Six, seven, eight. That is the entire difference between my pebbles.",
+      "pose": "explain",
+      "replies": [
+        {
+          "label": "and 14 is the unstable one, right?",
+          "next": "chat-hal-pebbles-unstable"
+        },
+        {
+          "label": "ok but which pebble is which lol",
+          "next": "chat-hal-pebbles-heavy"
+        }
+      ],
+      "position": 29
+    },
+    {
+      "id": "chat-hal-pebbles-end",
+      "npc_id": "npc-hal",
+      "kind": "sign_off",
+      "trigger": null,
+      "title": null,
+      "text": "That is all I wished to say.\n\nI am going to sit with three pebbles and a very long afternoon. If I ever sort them correctly I shall let you know.\n\nIt may take a while.",
+      "pose": "idle",
+      "replies": [],
+      "position": 32
+    },
+    {
+      "id": "chat-hal-pebbles-heavy",
+      "npc_id": "npc-hal",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "I do not know.\n\nI put them in a bag together on Monday and I have lost the labels.\n\nThis is why I do not recommend naming things Twelve, Thirteen and Fourteen. They do not answer to their names. Neither does Tuesday.",
+      "pose": "sorry",
+      "replies": [
+        {
+          "label": "oh Hal",
+          "next": "chat-hal-pebbles-unstable"
+        },
+        {
+          "label": "ok but what about the real atoms",
+          "next": "chat-hal-pebbles-unstable"
+        }
+      ],
+      "position": 30
+    },
+    {
+      "id": "chat-hal-pebbles-nerdy",
+      "npc_id": "npc-hal",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "Yes. It is the highest compliment I know.\n\nBut there is a point to it. Look at them. All three pebbles look the same to me. Same shape. Same colour. And one of them, I cannot say which, is slightly heavier.",
+      "pose": "proud",
+      "replies": [
+        {
+          "label": "so they're like isotopes",
+          "next": "chat-hal-pebbles-carbon"
+        },
+        {
+          "label": "which one is the heavy one",
+          "next": "chat-hal-pebbles-heavy"
+        }
+      ],
+      "position": 28
+    },
+    {
+      "id": "chat-hal-pebbles-unstable",
+      "npc_id": "npc-hal",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "Ah. Fourteen. Yes.\n\nIt is the unstable one. An unstable nucleus can change, and when it does it gives off radiation.\n\nBut note this, because it matters: isotope does not mean radioactive. Carbon-12 and carbon-13 are perfectly stable. Only some isotopes change.",
+      "pose": "explain",
+      "replies": [
+        {
+          "label": "think",
+          "type": "react",
+          "next": "chat-hal-pebbles-end"
+        },
+        {
+          "label": "clap",
+          "type": "react",
+          "next": "chat-hal-pebbles-end"
+        }
+      ],
+      "position": 31
     },
     {
       "id": "chat-hal-quiz",
@@ -546,18 +1526,18 @@
       "kind": "reply",
       "trigger": null,
       "title": null,
-      "text": "A short round of Myth Buster on radioactivity will show what you remember. Shall we?",
+      "text": "A round of Myth Buster. On atoms.\n\nI will not say it is easy. I will say it is fair.",
       "pose": "explain",
       "replies": [
         {
           "label": "Start the round",
           "action": {
             "screen": "mythbuster",
-            "id": "radioactivity"
+            "id": "inside-the-atom"
           }
         },
         {
-          "label": "Not now",
+          "label": "not right now",
           "next": "chat-hal-menu"
         }
       ],
@@ -569,74 +1549,191 @@
       "kind": "reply",
       "trigger": null,
       "title": null,
-      "text": "Certainly. Which one shall I remind you of?",
+      "text": "Certainly. I keep my notes in order, as it happens.\n\nWhich page?",
       "pose": "think",
       "replies": [
         {
-          "label": "Half-life",
-          "next": "chat-hal-half-life"
+          "label": "the nucleus",
+          "next": "chat-hal-nucleus"
         },
         {
-          "label": "Decay",
-          "next": "chat-hal-decay"
+          "label": "isotopes",
+          "next": "chat-hal-isotope"
         },
         {
-          "label": "Never mind",
+          "label": "never mind",
           "next": "chat-hal-menu"
         }
       ],
       "position": 4
     },
     {
-      "id": "chat-hal-up-banana",
+      "id": "chat-hal-satchel",
       "npc_id": "npc-hal",
-      "kind": "unprompted",
-      "trigger": "level_reached:4",
-      "title": "Is a banana radioactive?",
-      "text": "Hello, Hal here. A small thing, for fun.\n\nDid you know a banana is a little bit radioactive?\n\nIt is true, and it is nothing to worry about.",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "The satchel.\n\nTwo pencils, one of them not sharp. A magnifying glass with a crack I prefer not to discuss. A sandwich, sometimes. And my samples, each wrapped, each named.\n\nThis morning I carried a rock called Reginald four miles. He is not heavy. I simply felt I should.",
+      "pose": "greet",
+      "replies": [
+        {
+          "label": "you NAMED your rocks??",
+          "next": "chat-hal-named"
+        },
+        {
+          "label": "ok anyway",
+          "next": "chat-hal-menu"
+        }
+      ],
+      "position": 11
+    },
+    {
+      "id": "chat-hal-stadium-electrons",
+      "npc_id": "npc-hal",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "Out near the seats. Far out.\n\nThey are tiny and fast, and they keep their distance from the middle. At this moment I can see none of them, which is accurate to the science and also a little lonely.",
+      "pose": "point",
+      "replies": [
+        {
+          "label": "so what's between them and the marble?",
+          "next": "chat-hal-stadium-empty"
+        },
+        {
+          "label": "that's a lot of space",
+          "next": "chat-hal-stadium-empty"
+        }
+      ],
+      "position": 24
+    },
+    {
+      "id": "chat-hal-stadium-empty",
+      "npc_id": "npc-hal",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "Empty space.\n\nMostly empty space. I have stood in the middle for some time and I can confirm it is a great deal of nothing.\n\nThings still feel solid, because the electrons in them push back on the electrons in your hand. A great deal of nothing, politely declining to be walked through.",
+      "pose": "proud",
+      "replies": [
+        {
+          "label": "mind-blown",
+          "type": "emoji",
+          "next": "chat-hal-stadium-end"
+        },
+        {
+          "label": "nerd",
+          "type": "emoji",
+          "next": "chat-hal-stadium-end"
+        }
+      ],
+      "position": 25
+    },
+    {
+      "id": "chat-hal-stadium-end",
+      "npc_id": "npc-hal",
+      "kind": "sign_off",
+      "trigger": null,
+      "title": null,
+      "text": "Someone is crossing the grass. I believe it is a groundskeeper.\n\nI will go. Slowly, but I will go.\n\nI am leaving the marble where it is. Think of it as yours.",
+      "pose": "greet",
+      "replies": [],
+      "position": 26
+    },
+    {
+      "id": "chat-hal-stadium-go",
+      "npc_id": "npc-hal",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "Good.\n\nImagine this stadium is an atom. All of it. The stands, the grass, the sky above.\n\nThe marble I have just set down is the nucleus.\n\nThat is its whole size.",
+      "pose": "explain",
+      "replies": [
+        {
+          "label": "wait, THAT small?",
+          "next": "chat-hal-stadium-small"
+        },
+        {
+          "label": "where are the electrons",
+          "next": "chat-hal-stadium-electrons"
+        },
+        {
+          "label": "so what's in the rest of it",
+          "next": "chat-hal-stadium-empty"
+        }
+      ],
+      "position": 22
+    },
+    {
+      "id": "chat-hal-stadium-small",
+      "npc_id": "npc-hal",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "That small. I measured the marble twice. I did not measure the stadium. It was too much.\n\nAlmost all of the atom's mass is in that marble. The electrons are far lighter than it is.",
+      "pose": "proud",
+      "replies": [
+        {
+          "label": "so where are the electrons?",
+          "next": "chat-hal-stadium-electrons"
+        },
+        {
+          "label": "so the rest is... nothing?",
+          "next": "chat-hal-stadium-empty"
+        }
+      ],
+      "position": 23
+    },
+    {
+      "id": "chat-hal-stadium-why",
+      "npc_id": "npc-hal",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "A fair question. It is for the lesson. Mostly.\n\nAlso the grass is very good.\n\nMay I continue?",
       "pose": "think",
       "replies": [
         {
-          "label": "wow",
-          "type": "react",
-          "next": "chat-hal-banana-k"
+          "label": "yes please",
+          "next": "chat-hal-stadium-go"
         },
         {
-          "label": "think",
+          "label": "you're so weird lol",
+          "next": "chat-hal-stadium-go"
+        }
+      ],
+      "position": 21
+    },
+    {
+      "id": "chat-hal-strange",
+      "npc_id": "npc-hal",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "Yes. Thank you.\n\nI have been told so by several people and one pigeon.",
+      "pose": "greet",
+      "replies": [
+        {
+          "label": "haha",
           "type": "react",
-          "next": "chat-hal-banana-safe"
+          "next": "chat-hal-menu"
+        },
+        {
+          "label": "love",
+          "type": "react",
+          "next": "chat-hal-menu"
         }
       ],
       "position": 10
     },
     {
-      "id": "chat-hal-up-unit",
+      "id": "chat-hal-unit-ada",
       "npc_id": "npc-hal",
-      "kind": "unprompted",
-      "trigger": "unit_complete:radioactivity",
-      "title": "Radioactivity: done!",
-      "text": "That was the end of my unit.\n\nRadioactivity is part of the natural world, and now you know how it behaves.\n\nGood work. Truly.",
-      "pose": "proud",
-      "replies": [
-        {
-          "label": "Remind me of something",
-          "next": "chat-hal-remind"
-        },
-        {
-          "label": "Thanks, Hal",
-          "next": "chat-hal-bye"
-        }
-      ],
-      "position": 8
-    },
-    {
-      "id": "chat-hal-up-welcome-back",
-      "npc_id": "npc-hal",
-      "kind": "unprompted",
-      "trigger": "welcome_back",
-      "title": "Welcome back",
-      "text": "Welcome back.\n\nEverything waited exactly as you left it.\n\nShall we pick up where you stopped?",
-      "pose": "greet",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "The next unit is Ada's. Radioactivity. Atoms that change.\n\nShe is... a great deal. She says 'hehe' aloud. She has named her flask. She has never once whispered.\n\nShe is also the best at what she does, and she will be kind to you. Go and meet her.",
+      "pose": "point",
       "replies": [
         {
           "label": "Take me there",
@@ -645,11 +1742,218 @@
           }
         },
         {
-          "label": "Not today",
-          "next": "chat-hal-bye"
+          "label": "ok I'm ready",
+          "next": "chat-hal-unit-end"
+        },
+        {
+          "label": "she sounds amazing",
+          "next": "chat-hal-unit-end"
         }
       ],
-      "position": 9
+      "position": 36
+    },
+    {
+      "id": "chat-hal-unit-end",
+      "npc_id": "npc-hal",
+      "kind": "sign_off",
+      "trigger": null,
+      "title": null,
+      "text": "Good. Go on.\n\nI will be here. The rocks keep me company. I think it was a good unit. I would do it again, slowly.",
+      "pose": "proud",
+      "replies": [],
+      "position": 37
+    },
+    {
+      "id": "chat-hal-unit-rock",
+      "npc_id": "npc-hal",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "A large one. I named it Gerald.\n\nIt said 'Well done' on one side and, on the other, 'Sorry about the rock.'",
+      "pose": "greet",
+      "replies": [
+        {
+          "label": "that's the best thing ever",
+          "next": "chat-hal-unit-thanks"
+        },
+        {
+          "label": "ok but what's next",
+          "next": "chat-hal-unit-ada"
+        }
+      ],
+      "position": 34
+    },
+    {
+      "id": "chat-hal-unit-thanks",
+      "npc_id": "npc-hal",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "You are welcome. And thank you for being a patient learner. I am a patient teacher. It is a good match.\n\nNow. I should warn you about something.",
+      "pose": "proud",
+      "replies": [
+        {
+          "label": "uh oh",
+          "next": "chat-hal-unit-ada"
+        },
+        {
+          "label": "what is it",
+          "next": "chat-hal-unit-ada"
+        }
+      ],
+      "position": 35
+    },
+    {
+      "id": "chat-hal-up-hello",
+      "npc_id": "npc-hal",
+      "kind": "unprompted",
+      "trigger": "lessons_completed:1",
+      "title": "A small hello",
+      "text": "Hello. This is Hal.\n\nI am told this is how one begins a message to a person. Forgive me if I do it wrong. I type with two fingers, and slowly.\n\nI saw that you finished your first lesson. I wanted to say: well done. Truly. Most people never look closely at the air. You did.",
+      "pose": "greet",
+      "replies": [
+        {
+          "label": "thanks, Hal",
+          "next": "chat-hal-hello-thanks"
+        },
+        {
+          "label": "you typed all that with two fingers??",
+          "next": "chat-hal-hello-fingers"
+        },
+        {
+          "label": "who are you again?",
+          "next": "chat-hal-hello-who"
+        }
+      ],
+      "position": 14
+    },
+    {
+      "id": "chat-hal-up-pebbles",
+      "npc_id": "npc-hal",
+      "kind": "unprompted",
+      "trigger": "lessons_completed:4",
+      "title": "Twelve, Thirteen, Fourteen",
+      "text": "I have a confession.\n\nThree pebbles in my satchel have been renamed. They are now called Twelve, Thirteen and Fourteen.\n\nI believe you finished the isotopes lesson recently. You will see why.",
+      "pose": "think",
+      "replies": [
+        {
+          "label": "carbon-12, 13 and 14??",
+          "next": "chat-hal-pebbles-carbon"
+        },
+        {
+          "label": "that's so nerdy",
+          "next": "chat-hal-pebbles-nerdy"
+        }
+      ],
+      "position": 27
+    },
+    {
+      "id": "chat-hal-up-stadium",
+      "npc_id": "npc-hal",
+      "kind": "unprompted",
+      "trigger": "lessons_completed:3",
+      "title": "A marble in a stadium",
+      "text": "I am sitting in a football stadium.\n\nEmpty. Very quiet. Someone left a gate open and I took it as an invitation.\n\nI have brought a marble. I am placing it on the centre spot. There. Now I would like to tell you something.",
+      "pose": "explain",
+      "replies": [
+        {
+          "label": "...okay?",
+          "next": "chat-hal-stadium-go"
+        },
+        {
+          "label": "Hal, why are you in a stadium",
+          "next": "chat-hal-stadium-why"
+        }
+      ],
+      "position": 20
+    },
+    {
+      "id": "chat-hal-up-unit",
+      "npc_id": "npc-hal",
+      "kind": "unprompted",
+      "trigger": "unit_complete:inside-the-atom",
+      "title": "Inside the Atom: done",
+      "text": "You finished the unit.\n\nI was not sure how to say what I wanted to say, so I wrote it on a rock. Then I could not carry the rock. So here is the short version.\n\nYou can say what is inside an atom, and why the number of protons matters so much. That is a real thing to be able to say.",
+      "pose": "proud",
+      "replies": [
+        {
+          "label": "thank you, Hal. really",
+          "next": "chat-hal-unit-thanks"
+        },
+        {
+          "label": "wait, you wrote it on a ROCK",
+          "next": "chat-hal-unit-rock"
+        },
+        {
+          "label": "so what's next?",
+          "next": "chat-hal-unit-ada"
+        }
+      ],
+      "position": 33
+    },
+    {
+      "id": "chat-hal-up-welcome-back",
+      "npc_id": "npc-hal",
+      "kind": "unprompted",
+      "trigger": "welcome_back",
+      "title": "Welcome back",
+      "text": "You are back.\n\nI did not count the days. That is a lie. I counted. It was a number. I will not say the number, because it was large and you are here now.\n\nI used the time to sort my samples. It went poorly. I lost count twice.",
+      "pose": "greet",
+      "replies": [
+        {
+          "label": "aw, did you miss me?",
+          "next": "chat-hal-back-miss"
+        },
+        {
+          "label": "lol I'm back now",
+          "next": "chat-hal-back-here"
+        },
+        {
+          "label": "what happened with the rocks?",
+          "next": "chat-hal-back-rocks"
+        }
+      ],
+      "position": 38
+    },
+    {
+      "id": "chat-hal-upto",
+      "npc_id": "npc-hal",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "At this moment?\n\nI am sorting samples by weight. Then I will sort them by colour. Then I will discover that the colour order disagrees with the weight order, and I will begin again.\n\nIt is going very well.",
+      "pose": "think",
+      "replies": [
+        {
+          "label": "that sounds exhausting",
+          "next": "chat-hal-upto2"
+        },
+        {
+          "label": "ok anyway",
+          "next": "chat-hal-menu"
+        }
+      ],
+      "position": 7
+    },
+    {
+      "id": "chat-hal-upto2",
+      "npc_id": "npc-hal",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "Exhausting is not the word I would choose. Satisfying, perhaps.\n\nSlowly, a rock becomes a rock you know. You should try it with anything. A button. A leaf.\n\nLook at one thing for ten whole minutes.",
+      "pose": "explain",
+      "replies": [
+        {
+          "label": "ten whole minutes??",
+          "next": "chat-hal-minutes"
+        },
+        {
+          "label": "maybe later lol",
+          "next": "chat-hal-menu"
+        }
+      ],
+      "position": 8
     },
     {
       "id": "chat-shrodi-around",

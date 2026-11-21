@@ -17,8 +17,11 @@ const { NODE, DISC_LEFT, FIREFLY_AREA, FACE_SQUASH, PUCK_CENTER_Y, arcPath, clam
 const { BLINK_PERIODS, DRIFT_PERIODS, FIREFLY_LOOP_MS, fireflyCount, fireflyFrame, fireflySpec, shadeColor } = loadTs("components/path/firefly-core.ts");
 
 const { BUBBLE_FX, PREVIEW_FX, bandFrame, launchFrame, particleFrame, popFrame, pressScale, previewInFrame, previewOutFrame, twinkleFrame } = loadTs("components/path/bubble-motion-core.ts");
-const { UNIT_PALETTE_COUNT, unitPalette } = loadTs("components/path/unit-theme.ts");
+const { UNIT_PALETTE_COUNT, unitPalette, teacherPalette } = loadTs("components/path/unit-theme.ts");
+const { NPC_ROSTER } = loadTs("components/npc/npc-roster.ts");
+const { coverColors } = loadTs("components/npc/npc-cover-art.ts");
 const { contrastBetween } = loadTs("components/lesson/visual/color-math.ts");
+const { WINDOW_BAND, nodeInWindow, windowBand, windowMargin } = loadTs("components/path/map-window-core.ts");
 const { BUBBLE, bubbleCopy, bubbleHeight, bubblePlacement, chooseBubbleSide } = loadTs("components/path/node-bubble-core.ts");
 
 const numbersIn = (d) => (d.match(/-?\d*\.?\d+(?:e-?\d+)?/g) ?? []).map(Number);
@@ -351,6 +354,23 @@ test("every unit's text is the same white, and it reads on the faces after the y
   }
 });
 
+test("a unit with a teacher wears the teacher's cover colour (face), its shade (lip) and the same white text", () => {
+  for (const npc of NPC_ROSTER) {
+    const brand = coverColors(npc.spec);
+    const light = teacherPalette(brand, COLORS.lessonHeaderText, false);
+    assert.equal(light.face, brand.color, npc.name);
+    assert.equal(light.lip, brand.shade, npc.name);
+    assert.equal(light.ink, "#FFFFFF");
+    // The plain-button text is darker than the face in light mode, and the face itself in dark mode
+    assert.ok(contrastBetween("#FFFFFF", light.accent) > contrastBetween("#FFFFFF", light.face), npc.name);
+    assert.equal(teacherPalette(brand, COLORS.lessonHeaderText, true).accent, brand.color);
+  }
+  // The first two units are Hal's yellow (Unit 1) and Ada's pink (Unit 2), and no two teachers share a face
+  assert.equal(coverColors(NPC_ROSTER[0].spec).color, "#FFC800");
+  assert.equal(coverColors(NPC_ROSTER[1].spec).color, "#FFAADE");
+  assert.equal(new Set(NPC_ROSTER.map((n) => coverColors(n.spec).color)).size, NPC_ROSTER.length);
+});
+
 test("the plain-button text is darker than the face in light mode and the face itself in dark mode", () => {
   for (let n = 1; n <= UNIT_PALETTE_COUNT; n++) {
     const p = unitPalette(COLORS, n, false);
@@ -472,4 +492,29 @@ test("the preview leaves by fading and shrinking a little, in under 300 ms", () 
   assert.equal(previewOutFrame(PREVIEW_FX.outMs).opacity, 0);
   assert.equal(previewOutFrame(PREVIEW_FX.outMs).scale, PREVIEW_FX.outScale);
   assert.ok(PREVIEW_FX.outMs < 300);
+});
+
+test("the map window: steps of scrolling, and a node is drawn when it is near the screen", () => {
+  assert.equal(windowBand(0), 0);
+  assert.equal(windowBand(WINDOW_BAND - 1), 0);
+  assert.equal(windowBand(WINDOW_BAND), 1);
+  assert.equal(windowBand(-50), 0, "an over-scroll at the top is step 0");
+  assert.equal(windowBand(NaN), 0);
+  const view = 700;
+  const box = NODE.box;
+  // wherever in step 0 the offset is (0 .. WINDOW_BAND-1), every node on the screen is inside the window
+  for (const scrollY of [0, 100, WINDOW_BAND - 1]) {
+    for (let y = scrollY - box + 1; y < scrollY + view; y += 20) assert.ok(nodeInWindow(y, box, windowBand(scrollY), view), `y ${y} at ${scrollY}`);
+  }
+  // and so is a screen and a half past it, so a fling does not reach an empty map before the next step
+  assert.ok(nodeInWindow(WINDOW_BAND + view + windowMargin(view) - 1, box, 0, view));
+  // a node far below or far above is not drawn
+  assert.equal(nodeInWindow(5000, box, 0, view), false);
+  assert.equal(nodeInWindow(-5000, box, 10, view), false);
+  // a long map draws a bounded number of nodes, however many units there are
+  const rowGap = 100;
+  const nodes = 400;
+  const drawn = Array.from({ length: nodes }, (_, i) => 88 + i * rowGap).filter((y) => nodeInWindow(y, box, windowBand(8000), view)).length;
+  assert.ok(drawn < 40, `${drawn} of ${nodes} nodes drawn`);
+  assert.ok(drawn >= 8, "the screen and its margins are never empty");
 });

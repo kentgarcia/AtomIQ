@@ -7,22 +7,26 @@ import { Shrodi } from "@/components/mascot/Shrodi";
 import { ChatHead, speakerFor } from "@/components/phone/ChatHead";
 import { SHRODI_COLORS } from "@/components/mascot/shrodi-art";
 import { NpcCover } from "@/components/npc/NpcCover";
+import { coverColors } from "@/components/npc/npc-cover-art";
 import { settle } from "@/components/motion/settle";
 import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
-import { useChatList } from "@/hooks/use-chats";
+import { useStories } from "@/hooks/use-chats";
 import { useFeed } from "@/hooks/use-feed";
 import { usePullRefresh } from "@/hooks/use-pull-refresh";
-import { CHAT_MASCOT_ID, type ThreadSummary } from "@/services/chat-core";
+import { CHAT_MASCOT_ID, type StoryEntry } from "@/services/chat-core";
 import { contentRepository } from "@/services/content-db";
 import { noteDateLabel } from "@/services/field-notes";
 import { impactLight } from "@/services/haptics";
 import {
   getContactTeacherIds,
   messageTeacher,
+  restartThread,
+  startStory,
   teacherHasThread,
 } from "@/services/chats";
+import { playSfx } from "@/services/sfx";
 import {
   createStyles,
   fontFaces,
@@ -30,7 +34,7 @@ import {
   useTheme,
 } from "@/theme";
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FlatList, Pressable, RefreshControl, View } from "react-native";
 import Animated from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -52,32 +56,48 @@ const SHRODI_BIO =
 
 type Tab = "posts" | "chats";
 
-/** One story thread: its subject, the last line, when, and whether it is unread or finished (it can be replayed from the thread). */
+/** What a story row says under its title, and the icon it wears, by where the story stands. */
+function storyLook(story: StoryEntry, now: number): { icon: string; status: string; hint: string | null } {
+  const when = story.lastAt !== null ? noteDateLabel(story.lastAt, now) : null;
+  switch (story.state) {
+    case "locked":
+      return { icon: "Lock", status: story.condition, hint: story.progress };
+    case "ready":
+      return { icon: "Play", status: "Unlocked · tap to start", hint: null };
+    case "new":
+      return { icon: "Sms", status: "New · tap to open", hint: null };
+    case "playing":
+      return { icon: "Messages2", status: "In progress · tap to open", hint: when };
+    case "finished":
+      return { icon: "Refresh", status: story.plays > 1 ? `Finished · played ${story.plays} times · tap to replay` : "Finished · tap to replay", hint: when };
+  }
+}
+
+/**
+ * One of the teacher's stories: a locked one says what unlocks it (and how far the learner is), an unlocked one starts the
+ * chat, opens it, or, once it is finished, plays it again.
+ */
 function StoryRow({
-  row,
+  story,
   now,
   onPress,
 }: {
-  row: ThreadSummary;
+  story: StoryEntry;
   now: number;
-  onPress: (row: ThreadSummary) => void;
+  onPress: (story: StoryEntry) => void;
 }) {
   const { theme } = useTheme();
   const c = theme.colors;
-  const unread = row.unread > 0;
-  const status = unread
-    ? "New"
-    : row.ended
-      ? row.plays > 1
-        ? `Finished · played ${row.plays} times`
-        : "Finished"
-      : "In progress";
-  const when = row.lastAt !== null ? noteDateLabel(row.lastAt, now) : null;
+  const locked = story.state === "locked";
+  const fresh = story.state === "new" || story.state === "ready";
+  const look = storyLook(story, now);
   return (
     <Pressable
-      onPress={() => onPress(row)}
+      onPress={() => onPress(story)}
       accessibilityRole="button"
-      accessibilityLabel={`${row.title}. ${status}.${when ? ` ${when}.` : ""} Opens the story.`}
+      accessibilityState={{ disabled: locked }}
+      accessibilityLabel={`${story.title}. ${look.status}.${look.hint ? ` ${look.hint}.` : ""}`}
+      accessibilityHint={locked ? "Locked" : story.state === "finished" ? "Plays the story again" : "Opens the story"}
       style={({ pressed }) => ({
         flexDirection: "row",
         alignItems: "center",
@@ -85,7 +105,7 @@ function StoryRow({
         padding: 14,
         borderRadius: 16,
         backgroundColor: c.field,
-        opacity: pressed ? 0.7 : 1,
+        opacity: locked ? 0.75 : pressed ? 0.7 : 1,
       })}
     >
       <View
@@ -95,15 +115,10 @@ function StoryRow({
           borderRadius: 20,
           alignItems: "center",
           justifyContent: "center",
-          backgroundColor: unread ? c.guide : c.surfaceSoft,
+          backgroundColor: fresh ? c.guide : c.surfaceSoft,
         }}
       >
-        <Icon
-          name={unread ? "Sms" : row.ended ? "TickCircle" : "Messages2"}
-          size={20}
-          color={unread ? c.onPrimary : c.textMuted}
-          variant="Bold"
-        />
+        <Icon name={look.icon} size={20} color={fresh ? c.onPrimary : c.textMuted} variant="Bold" />
       </View>
       <View style={{ flex: 1, gap: 2 }}>
         <Text
@@ -112,36 +127,35 @@ function StoryRow({
             fontSize: 16,
             lineHeight: 21,
             ...fontFaces.heavy,
-            color: c.text,
+            color: locked ? c.textSecondary : c.text,
           }}
         >
-          {row.title}
+          {story.title}
         </Text>
-        {row.last ? (
-          <Text
-            numberOfLines={1}
-            style={{
-              fontSize: 14,
-              lineHeight: 19,
-              ...fontFaces.medium,
-              color: c.textSecondary,
-            }}
-          >
-            {row.lastFromMe ? `You: ${row.last}` : row.last}
-          </Text>
-        ) : null}
         <Text
           style={{
-            fontSize: 12,
-            lineHeight: 16,
+            fontSize: 13,
+            lineHeight: 18,
             ...fontFaces.semibold,
-            color: unread ? c.guide : c.textMuted,
+            color: fresh ? c.guide : c.textMuted,
           }}
         >
-          {when ? `${status} · ${when}` : status}
+          {look.status}
         </Text>
+        {look.hint ? (
+          <Text
+            style={{
+              fontSize: 12,
+              lineHeight: 16,
+              ...fontFaces.medium,
+              color: c.textFaint,
+            }}
+          >
+            {look.hint}
+          </Text>
+        ) : null}
       </View>
-      <Icon name="ArrowRight2" size={18} color={c.textFaint} variant="Bold" />
+      {locked ? null : <Icon name="ArrowRight2" size={18} color={c.textFaint} variant="Bold" />}
     </Pressable>
   );
 }
@@ -246,7 +260,7 @@ const useStyles = createStyles((theme) => {
 });
 
 type FeedItem = ReturnType<typeof useFeed>["items"][number];
-type Item = FeedItem | ThreadSummary;
+type Item = FeedItem | StoryEntry;
 
 const StorySeparator = () => <View style={{ height: 10 }} />;
 
@@ -269,11 +283,28 @@ export default function NpcProfileScreen() {
   const [pickedTab, setTab] = useState<Tab>("posts");
   // Shrodi has no posts: his page is only his stories
   const tab: Tab = isShrodi ? "chats" : pickedTab;
-  const { rows: threadRows, loaded: threadsLoaded } = useChatList();
-  /* The story threads this teacher has sent (a free chat is private and not listed here) */
-  const stories = useMemo(
-    () => threadRows.filter((r) => r.npcId === npcId && r.origin === "event"),
-    [threadRows, npcId],
+  /* Every story this teacher has, unlocked or not (a free chat is private and not listed here) */
+  const { stories, loaded: storiesLoaded, refresh: refreshStories } = useStories(npcId);
+  const opening = useRef(false);
+  const openStory = useCallback(
+    async (story: StoryEntry) => {
+      // A locked story only says what unlocks it
+      if (story.state === "locked") {
+        void playSfx("ui.invalid");
+        return;
+      }
+      if (opening.current) return;
+      opening.current = true;
+      try {
+        let threadId = story.threadId;
+        if (story.state === "ready") threadId = await startStory(story.nodeId, story.event);
+        else if (story.state === "finished" && threadId) await restartThread(threadId);
+        if (threadId) router.push(`/phone-apps/chat?thread=${encodeURIComponent(threadId)}`);
+      } finally {
+        opening.current = false;
+      }
+    },
+    [router],
   );
 
   /* What this teacher teaches: the unit whose teacher they are. */
@@ -317,7 +348,8 @@ export default function NpcProfileScreen() {
     useCallback(() => {
       setNow(Date.now());
       void refresh();
-    }, [refresh]),
+      refreshStories();
+    }, [refresh, refreshStories]),
   );
   const { refreshing, onRefresh, spinner } = usePullRefresh(refresh);
 
@@ -357,7 +389,7 @@ export default function NpcProfileScreen() {
         outfit={
           isShrodi
             ? { color: SHRODI_COLORS.fur, shade: SHRODI_COLORS.furShade }
-            : (npc?.spec.outfit ?? {
+            : (npc ? coverColors(npc.spec) : {
                 color: theme.colors.primary,
                 shade: theme.colors.primary,
               })
@@ -524,20 +556,10 @@ export default function NpcProfileScreen() {
       />
       <FlatList<Item>
         data={tab === "posts" ? theirs : stories}
-        keyExtractor={(item) => ("threadId" in item ? item.threadId : item.id)}
+        keyExtractor={(item) => ("nodeId" in item ? item.nodeId : item.id)}
         renderItem={({ item }) => {
-          if ("threadId" in item)
-            return (
-              <StoryRow
-                row={item}
-                now={now}
-                onPress={(row) =>
-                  router.push(
-                    `/phone-apps/chat?thread=${encodeURIComponent(row.threadId)}`,
-                  )
-                }
-              />
-            );
+          if ("nodeId" in item)
+            return <StoryRow story={item} now={now} onPress={(story) => void openStory(story)} />;
           return item.blog ? (
             <BlogCard
               item={item}
@@ -574,11 +596,11 @@ export default function NpcProfileScreen() {
         ListHeaderComponent={header}
         ListEmptyComponent={
           tab === "chats" ? (
-            threadsLoaded ? (
+            storiesLoaded ? (
               <View style={styles.empty}>
                 <Text style={styles.emptyText}>
                   {personName
-                    ? `${personName} has not sent you a story yet. Keep learning and ${isShrodi ? "he" : "they"} will.`
+                    ? `${personName} has no stories to tell yet. ${isShrodi ? "He" : "They"} will have some soon.`
                     : ""}
                 </Text>
               </View>

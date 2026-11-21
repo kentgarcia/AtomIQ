@@ -10,11 +10,13 @@
 import { useEffect, useRef } from "react";
 import { View } from "react-native";
 import { Text } from "@/components/ui/text";
-import Animated, { useAnimatedStyle, useReducedMotion, type SharedValue } from "react-native-reanimated";
+import Animated, { useAnimatedStyle, useDerivedValue, type SharedValue } from "react-native-reanimated";
+import { useReducedMotion } from "@/components/motion/use-reduced-motion";
+import { useFillStyle } from "@/components/ui/progress-fill";
 
 import { Burst } from "@/components/motion/Burst";
 import { useDelayedClock } from "@/components/motion/use-delayed-clock";
-import { Shrodi } from "@/components/mascot/Shrodi";
+import { ShrodiStill } from "@/components/mascot/ShrodiStill";
 import { settle } from "@/components/motion/settle";
 import { StepLayout } from "@/components/onboarding/StepLayout";
 import { PLAN_FX, PLAN_REDUCED_HOLD, planBarFrame, planLineFrame, planTickFrame } from "@/components/onboarding/onboarding-fx-core";
@@ -35,9 +37,9 @@ const useStyles = createStyles((theme) => ({
   // The lesson's own bar (track, orange fill, a strip of shine along its top), narrower: it is a moment, not a header
   barWrap: { alignSelf: "center", width: "62%", maxWidth: BAR_MAX_WIDTH, height: 16 },
   bar: { position: "absolute", top: 0, bottom: 0, left: 0, right: 0, borderRadius: radius.full, backgroundColor: theme.colors.border, overflow: "hidden" },
-  fill: { height: "100%", borderRadius: radius.full, backgroundColor: theme.colors.primary },
+  fill: { width: "100%", height: "100%", borderRadius: radius.full, backgroundColor: theme.colors.primary },
   shine: { position: "absolute", top: 3, left: spacing.sm, right: spacing.sm, height: 4, borderRadius: radius.full, backgroundColor: withAlpha(theme.colors.onPrimary, 0.3) },
-  endAnchor: { position: "absolute", top: 0, bottom: 0, left: 0 },
+  endAnchor: { position: "absolute", top: 0, bottom: 0, left: 0, right: 0 },
   endPoint: { position: "absolute", right: 0, top: 8, width: 0, height: 0 },
   list: { alignSelf: "stretch", gap: spacing.lg, paddingTop: spacing.md },
   row: { flexDirection: "row", alignItems: "center", gap: spacing.md },
@@ -87,7 +89,8 @@ export function PlanStep({ answers, onDone }: { answers: Answers; onDone: () => 
     done.current = onDone;
   });
 
-  const fillStyle = useAnimatedStyle(() => ({ width: `${planBarFrame(clock.get()) * 100}%` }));
+  const barFill = useDerivedValue(() => planBarFrame(clock.get()));
+  const fillStyle = useFillStyle(barFill);
 
   // Sounds and the hand-off hang off the same constants as the picture; every timer is cleared on leaving
   useEffect(() => {
@@ -112,7 +115,7 @@ export function PlanStep({ answers, onDone }: { answers: Answers; onDone: () => 
   return (
     <StepLayout center>
       <Animated.View entering={settle()} style={styles.hero}>
-        <Shrodi mood="think" size={132} />
+        <ShrodiStill size={132} />
         <Text accessibilityRole="header" style={styles.title}>
           Building your path
         </Text>

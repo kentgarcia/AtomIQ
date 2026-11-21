@@ -1,7 +1,7 @@
 /**
  * The cover of a teacher's profile: a wallpaper of small flat pictures that speak about them, in the
- * teacher's own outfit colour (docs/features/NPC_TEACHERS_SPEC.md). Ada's is atoms and questions, Hal's clocks
- * and decay curves, Ray's shields and rays, Mina's hearts and drops, Kofi's gears and cooling towers,
+ * teacher's own outfit colour (docs/features/NPC_TEACHERS_SPEC.md). Hal's is atoms and questions, Ada's decay
+ * curves and trefoils, Ray's shields and rays, Mina's hearts and drops, Kofi's gears and cooling towers,
  * Tess's sprouts and gadgets, Sage's scales and leaves.
  *
  * Pure data with no framework imports, so Node tests can check it and `scripts/render-npc-covers.mjs`
@@ -36,15 +36,22 @@ const rounded = (x: number, y: number, w: number, h: number, rad: number) =>
 
 /** Every picture the covers use, by name. */
 export const GLYPHS = {
-  // Ada: what things are made of
+  // Hal: what things are made of
   atom: [r(12, 12, 8, 2), c(12, 12, 2.8), c(18.7, 7.6, 1.9), c(5.7, 16.9, 1.9)],
   nucleus: [c(9.5, 14, 4.2), c(15, 14, 4.2), c(12.3, 8.6, 4.2)],
   orbit: [r(12, 12, 8.5, 2), c(12, 3.5, 2.2), c(12, 20.5, 2.2), c(12, 12, 2)],
   proton: [r(12, 12, 9, 2.2), l("M12 7.8V16.2M7.8 12H16.2", 2.2)],
   question: [l("M8.5 8.8A3.7 3.7 0 1 1 12.8 12.2C12 12.7 12 13.4 12 14.8", 2.3), c(12, 19.3, 1.6)],
   sparkle: [sparkle],
+  // her flask and her bow
+  flask: [p("M9.2 3.2H14.8V4.6H13.6V9.4L19.3 18.4C20.2 19.9 19.2 21.4 17.5 21.4H6.5C4.8 21.4 3.8 19.9 4.7 18.4L10.4 9.4V4.6H9.2Z"), c(19.2, 6.2, 1.5), c(5.4, 8.2, 1.2), c(17.4, 10.8, 1)],
+  bow: [p("M12 12L3.5 6.2Q2.2 5.3 2.4 7.3L3.2 15.8Q3.4 17.8 5 16.7Z"), p("M12 12L20.5 6.2Q21.8 5.3 21.6 7.3L20.8 15.8Q20.6 17.8 19 16.7Z"), c(12, 12, 3.1)],
 
-  // Hal: slow and exact; time, decay
+  // Hal's test tube and his rock sample
+  tube: [p("M8.8 3.4H15.2V5H14.2V17.2A2.2 2.2 0 0 1 12 20.6A2.2 2.2 0 0 1 9.8 17.2V5H8.8Z"), c(18.6, 7.4, 1.4), c(5.6, 11, 1.1)],
+  rock: [c(12, 12, 7.6), ...Array.from({ length: 9 }, (_, i) => { const a = (i / 9) * Math.PI * 2 + 0.3; return c(f(12 + Math.cos(a) * 7.6), f(12 + Math.sin(a) * 7.6), 2.7); })],
+
+  // Ada: why atoms change; time, decay
   watch: [r(12, 13.5, 8, 2), l("M12 9.5V13.5L15 15.2", 2), l("M10 3.2H14", 2.4)],
   hourglass: [l("M7 3.5H17M7 20.5H17M8 3.5C8 9 16 10.5 16 12C16 13.5 8 15 8 20.5M16 3.5C16 9 8 10.5 8 12C8 13.5 16 15 16 20.5", 1.9)],
   decay: [l("M3.5 4.5C7 4.5 7.5 17.5 20.5 19.5", 2.2), c(4, 4.6, 1.9), c(8.4, 11.3, 1.9), c(20.5, 19.5, 1.9)],
@@ -107,8 +114,9 @@ export type GlyphId = keyof typeof GLYPHS;
 
 /** What each teacher's cover is made of, in the order the grid cycles through them. */
 export const NPC_COVER_GLYPHS: Record<string, readonly GlyphId[]> = {
-  "npc-ada": ["atom", "question", "nucleus", "sparkle", "proton", "orbit"],
-  "npc-hal": ["watch", "decay", "hourglass", "ticks", "trefoil", "halflife"],
+  // The first two teach each other's unit now (2026-11-22), so each keeps the pictures that are theirs (Ada's flask, bow and sparkle, Hal's tube and rock) and takes their unit's for the rest
+  "npc-hal": ["atom", "tube", "nucleus", "rock", "orbit", "question"],
+  "npc-ada": ["trefoil", "flask", "decay", "sparkle", "bow", "halflife"],
   "npc-ray": ["shield", "rays", "glasses", "zigzag", "layers", "crosshair"],
   "npc-mina": ["heart", "drop", "calm", "cross", "cell", "pulse"],
   "npc-kofi": ["gear", "tower", "bolt", "steam", "wrench", "gauge"],
@@ -176,7 +184,12 @@ export function coverLayout(glyphs: readonly GlyphId[]): { glyphs: CoverPlacemen
   return { glyphs: out, dots };
 }
 
-/** The two tones of a cover, from the teacher's outfit colour and its shade. */
+/** The colour and shade a teacher's cover (and their chat header) is made from: their own `cover` colour, else the outfit's. */
+export function coverColors(spec: { outfit: { color: string; shade: string }; cover?: { color: string; shade: string } }): { color: string; shade: string } {
+  return spec.cover ?? spec.outfit;
+}
+
+/** The two tones of a cover, from the teacher's cover colour (the outfit colour unless they have their own) and its shade. */
 export function coverTones(outfit: { color: string; shade: string }): { base: string; light: string; shade: string } {
   return { base: outfit.color, light: lighten(outfit.color, 0.42), shade: outfit.shade };
 }

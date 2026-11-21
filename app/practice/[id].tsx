@@ -5,6 +5,7 @@
  *   review             the daily review of objectives that are due
  */
 
+import { useSfxSet } from "@/components/motion/use-sfx-set";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ActivityIndicator, View } from "react-native";
@@ -111,6 +112,7 @@ async function loadSession(id: string, seed: string): Promise<Session | null> {
 }
 
 export default function PracticeScreen() {
+  useSfxSet("lesson-run");
   const { id } = useLocalSearchParams<{ id: string }>();
   const sessionKey = typeof id === "string" ? id : "";
   const router = useRouter();

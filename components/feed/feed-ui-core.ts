@@ -250,6 +250,43 @@ export function dripPlan(shown: ReadonlySet<string> | null, items: readonly { id
   return { instant: pending.slice(0, cut), queued: pending.slice(cut) };
 }
 
+/**
+ * Whether the list must be synced to everything (the first load, and reduced motion, show it whole): only when a post is
+ * missing from what is shown. An effect that depends on `shown` must never set a new copy of it when nothing is missing, or it
+ * re-runs itself for ever ("Maximum update depth exceeded").
+ */
+export const needsFullReveal = (shown: ReadonlySet<string> | null, items: readonly { id: string }[]): boolean => shown === null || items.some((i) => !shown.has(i.id));
+
+/**
+ * The list after a reload, with every item that did not change kept as the SAME object (and the same array when nothing changed at all).
+ * The Feed reloads each time its tab gains focus and after every reaction, and `getFeed` builds new objects every time; a card is a
+ * `memo` over its item, so new objects made every card re-render (an NPC figure each) for nothing. Items are plain data, so equal means
+ * the same JSON.
+ */
+export function reuseItems<T extends { id: string }>(prev: readonly T[], next: readonly T[]): readonly T[] {
+  const before = new Map(prev.map((item) => [item.id, item] as const));
+  let changed = prev.length !== next.length;
+  const merged = next.map((item, i) => {
+    const old = before.get(item.id);
+    const same = old !== undefined && (old === item || JSON.stringify(old) === JSON.stringify(item));
+    if (!same || prev[i] !== old) changed = true;
+    return same ? old : item;
+  });
+  return changed ? merged : prev;
+}
+
+/** A moment rounded down to the minute: what the cards use as "now", so a reload inside the same minute is not a change to any of them. */
+export const minuteOf = (ms: number, minute: number = MIN): number => Math.floor(ms / minute) * minute;
+
+/** How soon the page's own refresh (reconcile, ranking, rank check) may run again after it ran: live events and every node completion already keep the feed current, so a revisit inside this gap reads nothing. */
+export const FOCUS_WORK_GAP_MS = 20_000;
+/** Wait after the page is shown before that refresh starts, so the first frames after a tab switch are not spent on it. */
+export const FOCUS_WORK_DELAY_MS = 350;
+
+/** Whether the focus refresh is due: never run yet, or the gap has passed (a clock that went backwards counts as due). */
+export const focusWorkDue = (lastAt: number | null, now: number, gap: number = FOCUS_WORK_GAP_MS): boolean =>
+  lastAt === null || now < lastAt || now - lastAt >= gap;
+
 /* ------------------------------------------------------------------ */
 /* The flat post layout: action phrase, figure pose, "Liked by" line   */
 /* ------------------------------------------------------------------ */

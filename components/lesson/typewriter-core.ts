@@ -18,6 +18,15 @@ export function visibleCount(elapsedMs: number, total: number, cps: number = TYP
   return Math.min(total, Math.floor((elapsedMs / 1000) * cps));
 }
 
+/** How many characters appear at once: a bubble is laid out again at each step, so fewer, larger steps cost the JS thread and the text layout less (RENDER_COST_SPEC C4). */
+export const TYPE_STEP = 3;
+
+/** `count` rounded down to a whole step, except that the end is always reached. */
+export function stepped(count: number, total: number, step: number = TYPE_STEP): number {
+  if (count >= total) return total;
+  return Math.floor(Math.max(0, count) / step) * step;
+}
+
 /** How long typing `total` characters takes, ms. */
 export function typeDuration(total: number, cps: number = TYPE_CPS): number {
   return Math.ceil((total / cps) * 1000);

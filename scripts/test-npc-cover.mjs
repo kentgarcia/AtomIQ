@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
-import { COVER_H, COVER_W, DEFAULT_COVER_GLYPHS, GLYPHS, NPC_COVER_GLYPHS, coverLayout, coverTones, coverViewBox, glyphsFor } from "../components/npc/npc-cover-art.ts";
+import { COVER_H, COVER_W, DEFAULT_COVER_GLYPHS, GLYPHS, NPC_COVER_GLYPHS, coverColors, coverLayout, coverTones, coverViewBox, glyphsFor } from "../components/npc/npc-cover-art.ts";
 import { NPC_ROSTER } from "../components/npc/npc-roster.ts";
 
 const HEX = /^#[0-9A-F]{6}$/i;
@@ -63,12 +63,13 @@ describe("teacher profile covers", () => {
     }
   });
 
-  it("takes both tones from the outfit: the colour, a lighter tint, and the shade", () => {
+  it("takes both tones from the cover colour (the outfit's unless the teacher has their own): the colour, a lighter tint, and the shade", () => {
     for (const npc of NPC_ROSTER) {
-      const t = coverTones(npc.spec.outfit);
+      const t = coverTones(coverColors(npc.spec));
+      const source = npc.spec.cover ?? npc.spec.outfit;
       for (const v of Object.values(t)) assert.match(v, HEX);
-      assert.equal(t.base, npc.spec.outfit.color);
-      assert.equal(t.shade, npc.spec.outfit.shade);
+      assert.equal(t.base, source.color);
+      assert.equal(t.shade, source.shade);
       assert.notEqual(t.light, t.base);
     }
   });

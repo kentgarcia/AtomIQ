@@ -11,7 +11,6 @@ import { View } from "react-native";
 import { Text } from "@/components/ui/text";
 
 import { QuestRow } from "@/components/quests/QuestRow";
-import { useTutorialTarget } from "@/components/tutorial/use-tutorial-target";
 import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
 import type { MissionView, PeriodMissions } from "@/hooks/use-missions";
@@ -110,7 +109,6 @@ export function MissionsSection({
   };
 
   // ...and the first daily quest
-  const rowLit = useTutorialTarget("quests.first-row", { radius: 16 });
 
   const section = (period: MissionPeriod, title: string, data: PeriodMissions) => (
     <View style={styles.section}>
@@ -119,8 +117,8 @@ export function MissionsSection({
         <ResetTimer period={period} />
       </View>
       <View style={styles.list}>
-        {data.missions.map((mission, i) => (
-          <View key={mission.id} ref={period === "daily" && i === 0 ? rowLit.ref : undefined} collapsable={false}>
+        {data.missions.map((mission) => (
+          <View key={mission.id}>
             <QuestRow mission={mission} onClaim={claim} renderAction={(busy, startClaim) => action(mission, busy, startClaim)} />
           </View>
         ))}

@@ -12,7 +12,7 @@ import { impactLight } from "@/services/haptics";
 import { createStyles, fontFaces, useResponsiveLayout, useTheme, withAlpha } from "@/theme";
 import { useFocusEffect, useRouter } from "expo-router";
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { useReducedMotion } from "react-native-reanimated";
+import { useReducedMotion } from "@/components/motion/use-reduced-motion";
 import { Pressable, ScrollView, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 

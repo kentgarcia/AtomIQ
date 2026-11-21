@@ -7,7 +7,8 @@
 
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { View } from "react-native";
-import Animated, { FadeIn, FadeOut, useReducedMotion } from "react-native-reanimated";
+import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
+import { useReducedMotion } from "@/components/motion/use-reduced-motion";
 
 import { Text } from "@/components/ui/text";
 import { MODAL_MARGIN, ModalButton, ModalCard, ModalSecondaryButton } from "@/components/ui/modal-card";

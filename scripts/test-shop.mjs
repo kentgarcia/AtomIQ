@@ -295,7 +295,7 @@ test("prices are the base prices times 1.5, whole diamonds, and none ends in 3 o
   assert.equal(PRICE_SCALE, 1.5);
   assert.deepEqual([PAINT_PRICE, PATTERN_PRICE, HAIR_STYLE_PRICE], [30, 45, 40]);
   assert.deepEqual(FACES, { eyebrows: 25, eyes: 30, nose: 25, mouth: 25, ears: 30, headwear: 45, eyewear: 40, earwear: 30, outfit: 60 });
-  assert.deepEqual(Object.values(OUTFITS).sort((a, b) => a - b), [90, 90, 90, 90, 90, 120, 120, 120]);
+  assert.deepEqual(Object.values(OUTFITS).sort((a, b) => a - b), [90, 90, 90, 90, 90, 90, 90, 120, 120, 120]);
   // Every tier is a price on sale, so no price falls through to level 1
   for (const i of SHOP_ITEMS.filter((x) => x.price > 0)) assert.ok(TIER_LEVELS[i.price] !== undefined, `${i.id}: ${i.price} has a tier`);
   for (const i of SHOP_ITEMS) assert.ok(Number.isInteger(i.price) && ![3, 8].includes(i.price % 10), `${i.id}: ${i.price}`);

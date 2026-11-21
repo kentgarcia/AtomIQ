@@ -47,10 +47,10 @@ import Animated, {
   Easing,
   cancelAnimation,
   runOnJS,
-  useReducedMotion,
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
+import { useReducedMotion } from "@/components/motion/use-reduced-motion";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 // The camera chrome is dark and the same in light and dark mode, like a camera app: the dark is the object art's darkest Eel, the text its snow

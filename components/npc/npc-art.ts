@@ -23,15 +23,18 @@
 import { MOUTHS, NOSES, browPieces, earPieces, type BrowStyle, type EarStyle, type FacePiece, type MouthStyle, type NoseStyle } from "./face-art.ts";
 import { EXTRA_OUTFIT_ART, isExtraOutfit, type ExtraOutfit, type OutfitTone } from "./outfit-art.ts";
 import { EARWEAR, EYEWEAR, HEADWEAR, type WearPiece, type WearTone } from "./wear-art.ts";
-import { HAIR_SHAPES, isExtraHair, type ExtraHairStyle, type HairPiece } from "./hair-art.ts";
-import { FACE, MUTE_CLOTHES_STEP, MUTE_DARK, MUTE_LIGHT, MUTE_SEPARATION, OFFICIAL } from "./npc-palette.ts";
+import { shapedHair, type ExtraHairStyle, type HairPiece, type TeacherHairStyle } from "./hair-art.ts";
+import { APRON_PIECES, APRON_PUFFS, type ApronTone } from "./lab-apron-art.ts";
+import { SATCHEL_PIECES, samplePieces, type SatchelTone } from "./hal-art.ts";
+import { CUSTOM, FACE, MUTE_CLOTHES_STEP, MUTE_DARK, MUTE_LIGHT, MUTE_SEPARATION, OFFICIAL } from "./npc-palette.ts";
 
 // ── spec ─────────────────────────────────────────────────────────────────────
 
 export type EyeStyle = "pill" | "round" | "glasses-round" | "glasses-square" | "dots" | "wide" | "sparkle" | "lashes" | "sleepy" | "arches";
-export type HairStyle = "bob" | "curls" | "crop" | "bun" | "wrap" | ExtraHairStyle;
-export type OutfitKind = "sweater" | "hoodie" | "coat" | "vest" | "shirt" | ExtraOutfit;
-export type PropKind = "none" | "marble" | "watch" | "clipboard" | "stethoscope" | "hardhat" | "vial" | "notebook";
+export type HairStyle = "bob" | "curls" | "crop" | "bun" | "wrap" | ExtraHairStyle | TeacherHairStyle;
+/** `apron` is Ada's lab outfit (a teacher's own: the shop does not sell it). */
+export type OutfitKind = "sweater" | "hoodie" | "coat" | "vest" | "shirt" | "apron" | ExtraOutfit;
+export type PropKind = "none" | "marble" | "watch" | "clipboard" | "stethoscope" | "hardhat" | "vial" | "notebook" | "flask" | "sample";
 
 export type NpcSpec = {
   skin: { base: string; shade: string; feature: string };
@@ -48,6 +51,10 @@ export type NpcSpec = {
   browColor?: string;
   pupilColor?: string;
   noseColor?: string;
+  /** Round cheeks in this colour (Ada has them; the rest none). */
+  blush?: string;
+  /** The colour of the teacher's cover and chat header, when it should not be the outfit's (Hal's outfit is a white coat over a blue sweater, his brand is yellow). */
+  cover?: { color: string; shade: string };
   hair: { style: HairStyle; color: string; shade: string };
   /** Worn on the head, over the eyes and on the ears (the avatar sets them, the teachers wear none): a style from `wear-art.ts` and its colour. */
   headwear?: WearSpec;
@@ -427,7 +434,8 @@ function headPath(spec: NpcSpec): string {
 
 const hasEars = (spec: NpcSpec) => {
   const style = spec.hair.style;
-  if (isExtraHair(style)) return HAIR_SHAPES[style].ears !== false;
+  const shaped = shapedHair(style);
+  if (shaped) return shaped.ears !== false;
   return style !== "bob" && style !== "wrap";
 };
 
@@ -441,6 +449,8 @@ function faceParts(spec: NpcSpec, e: Expression, p: Pal): Part[] {
   const noseX = spec.nose === "single" ? 2 : 1;
   if (spec.facialHair === "beard") out.push(fillOf(rrect(-spec.headWidth / 2, 20, spec.headWidth, 36, 26), p.hair));
   out.push(...eyeParts(-1, e, p, style, happy, noseX), ...eyeParts(1, e, p, style, happy, noseX), ...noseParts(spec, p));
+  // After the eyes: their happy-cheek cut (skin over the bottom of the eye) reaches this far and would cover part of the cheeks
+  if (spec.blush) for (const side of [-1, 1] as const) out.push(fillOf(pill(side * 35, 24, 20, 13), spec.muted ? muteColor(spec.blush) : spec.blush));
   if (spec.facialHair === "moustache") out.push(fillOf(pill(1, 18, 38, 11), p.hair));
   // On a beard the mouth is drawn in the skin tone, or it would vanish into the hair.
   out.push(...mouthParts(e, p, spec.facialHair === "beard" ? p.skin : p.feature, spec.mouth));
@@ -472,17 +482,18 @@ const CURLS: [number, number, number][] = [
 ];
 
 /** A hand-drawn piece (hair-art.ts) in the hair colour or its shade. */
+const hairTone = (tone: HairPiece["tone"], p: Pal) => (tone === "hair" ? p.hair : tone === "tie" ? p.top : tone === "accent" ? p.accent : tone === "accentShade" ? p.accentShade : p.hairShade);
 const hairPiece = (piece: HairPiece, p: Pal): Part => {
-  const color = piece.tone === "hair" ? p.hair : piece.tone === "tie" ? p.top : p.hairShade;
+  const color = hairTone(piece.tone, p);
   return "line" in piece ? lineOf(piece.line, color, piece.w) : fillOf(piece.d, color, piece.evenOdd);
 };
 
 function hairBack(spec: NpcSpec, p: Pal): Part[] {
   const style = spec.hair.style;
-  if (isExtraHair(style)) {
-    const shape = HAIR_SHAPES[style];
+  const shape = shapedHair(style);
+  if (shape) {
     // Behind the head: each cap's whole outline in its colour, so no gap can show where its face cut-out is wider than the head
-    const unders = shape.front.flatMap((piece): Part[] => ("under" in piece && piece.under ? [fillOf(piece.under, piece.tone === "hair" ? p.hair : piece.tone === "tie" ? p.top : p.hairShade)] : []));
+    const unders = shape.front.flatMap((piece): Part[] => ("under" in piece && piece.under ? [fillOf(piece.under, hairTone(piece.tone, p))] : []));
     return [...(shape.back ?? []).map((piece) => hairPiece(piece, p)), ...unders];
   }
   return style === "bob" ? [fillOf(tomb(0, -80, 128, 146, 20), p.hair)] : [];
@@ -494,14 +505,15 @@ const HAIR_WRAP = { top: -76, height: 66 } as const;
 
 /** Where the hair on the side of the head ends (y). The ear is centred at y 2, so its top is at -9: hair always reaches it. */
 export function hairSideBottom(style: HairStyle): number {
-  if (isExtraHair(style)) return HAIR_SHAPES[style].sideBottom;
+  const shaped = shapedHair(style);
+  if (shaped) return shaped.sideBottom;
   if (style === "bob") return -80 + 146;
   return style === "wrap" ? HAIR_WRAP.top + HAIR_WRAP.height : HAIR_BASE.top + HAIR_BASE.height;
 }
 
 function hairFront(spec: NpcSpec, p: Pal): Part[] {
-  const own = spec.hair.style;
-  if (isExtraHair(own)) return HAIR_SHAPES[own].front.map((piece) => hairPiece(piece, p));
+  const shaped = shapedHair(spec.hair.style);
+  if (shaped) return shaped.front.map((piece) => hairPiece(piece, p));
   const base = fillOf(tomb(0, HAIR_BASE.top, 110, HAIR_BASE.height, 8) + topRound(-39, -42, 78, 32, 18), p.hair, true);
   switch (spec.hair.style) {
     case "bob":
@@ -565,6 +577,20 @@ function neckParts(p: Pal): Part[] {
   return [fillOf(rrect(-14, 40, NECK.w, 40, 6), p.skin), fillOf(rrect(-14, 40, NECK.w, 14, 6), p.feature)];
 }
 
+/** Hal's satchel (the kit that goes with his rock sample): the strap over the shoulder and the bag at the hip. The bust shows just the top of the strap. */
+function satchelParts(spec: NpcSpec): Part[] {
+  if (spec.accent.kind !== "sample") return [];
+  const fixed: Record<SatchelTone, string> = { strap: OFFICIAL.grizzly, bag: OFFICIAL.grizzly, bagShade: CUSTOM.skinBrown[1], badge: OFFICIAL.bee, ink: FACE.pupil };
+  return SATCHEL_PIECES.map((piece) => fillOf(piece.d, spec.muted ? muteColor(fixed[piece.tone]) : fixed[piece.tone]));
+}
+
+/** A cool, slightly darker step of a colour: the lapels and pockets of a pale coat (white goes to a pale blue, never grey). */
+function coolShade(hex: string): string {
+  const [r, g, b] = hexToRgb(hex);
+  const to = [122, 155, 176];
+  return rgbToHex([r, g, b].map((v, i) => v * 0.8 + to[i] * 0.2));
+}
+
 function torsoParts(spec: NpcSpec, p: Pal, bottom: number = TORSO.bottom, bust = false): Part[] {
   const top = TORSO.top;
   const bodyColor = isExtraOutfit(spec.outfit.kind) && EXTRA_OUTFIT_ART[spec.outfit.kind].body === "collar" ? p.collar : p.top;
@@ -583,9 +609,15 @@ function torsoParts(spec: NpcSpec, p: Pal, bottom: number = TORSO.bottom, bust =
         case "gold": return OFFICIAL.bee;
         case "red": return OFFICIAL.cardinal;
         case "pink": return OFFICIAL.flamingo;
+        case "collarShade": return coolShade(p.collar);
+        case "tan": return OFFICIAL.cheetah;
+        case "tanShade": return OFFICIAL.monkey;
+        case "violet": return OFFICIAL.beetle;
+        case "violetShade": return OFFICIAL.betta;
       }
     };
     for (const piece of EXTRA_OUTFIT_ART[spec.outfit.kind].pieces) out.push("line" in piece ? lineOf(piece.line, outfitColor(piece.tone), piece.w) : fillOf(piece.d, outfitColor(piece.tone), piece.evenOdd));
+    out.push(...satchelParts(spec));
     return out;
   }
   switch (spec.outfit.kind) {
@@ -608,6 +640,24 @@ function torsoParts(spec: NpcSpec, p: Pal, bottom: number = TORSO.bottom, bust =
     case "vest":
       out.push(body(TORSO.width, p.top), fillOf(rtri([-30, top - 2], [30, top - 2], [0, 122], 8), p.collar), fillOf(pill(0, 70, 34, 12), p.collar));
       break;
+    case "apron": {
+      // Ada's lab outfit: puffed shoulders behind the arms' sleeves, then the apron, collar and badge over a shirt in the outfit colour
+      const apronColor = (tone: ApronTone) => {
+        const fixed = { white: FACE.eyeWhite, mint: OFFICIAL.snow, apronShade: OFFICIAL.monkey } as const;
+        switch (tone) {
+          case "shirt": return p.top;
+          case "shirtShade": return p.topShade;
+          case "apron": return p.collar;
+          case "badge": return p.accent;
+          case "badgeInk": return p.accentShade;
+          default: return spec.muted ? muteColor(fixed[tone]) : fixed[tone];
+        }
+      };
+      out.push(body(TORSO.width, p.top));
+      if (!bust) for (const piece of APRON_PUFFS) out.push(fillOf(piece.d, apronColor(piece.tone)));
+      for (const piece of APRON_PIECES) out.push(fillOf(piece.d, apronColor(piece.tone)));
+      break;
+    }
     case "shirt":
       // A V-neck shirt (work shirt, scrubs): the V shows skin.
       out.push(body(TORSO.width, p.top), fillOf(rtri([-26, top - 2], [26, top - 2], [0, 112], 8), p.skin), fillOf(pill(0, 70, 34, 12), p.topShade));
@@ -616,6 +666,7 @@ function torsoParts(spec: NpcSpec, p: Pal, bottom: number = TORSO.bottom, bust =
   if (spec.accent.kind === "stethoscope") {
     out.push(lineOf("M-30 74Q-38 138 0 142Q38 138 30 74", p.accent, 7), fillOf(circle(0, 146, 11), p.accentShade));
   }
+  out.push(...satchelParts(spec));
   // The watch is on the wrist, and the bust has no arms
   if (spec.accent.kind === "watch" && !bust) {
     out.push(lineOf("M-26 96Q-14 126 26 122", p.accentShade, 3.4), fillOf(circle(30, 124, 12), p.accent), fillOf(circle(30, 124, 7.5), p.eyeWhite), lineOf("M30 124V119M30 124L34 126", p.pupil, 2.4));
@@ -703,6 +754,26 @@ function heldProp(kind: PropKind, hx: number, hy: number, p: Pal): Part[] {
         fillOf(rrect(hx - 11, hy - 32, 22, 26, 11), p.accent),
         fillOf(pill(hx, hy - 61, 18, 9), p.accentShade),
       ];
+    case "flask": {
+      // A round-bottomed flask with a glowing green liquid, sat on the raised hand: glass, liquid, a pale shine and a few sparks
+      const y = hy - 18;
+      return [
+        fillOf(rrect(hx - 10, y - 78, 20, 38, 6), OFFICIAL.iguana),
+        fillOf(pill(hx, y - 79, 30, 10), p.accentShade),
+        fillOf(`M${hx - 10} ${y - 46}H${hx + 10}L${hx + 33} ${y - 12}Q${hx + 38} ${y} ${hx + 22} ${y}H${hx - 22}Q${hx - 38} ${y} ${hx - 33} ${y - 12}Z`, OFFICIAL.iguana),
+        fillOf(`M${hx - 27} ${y - 24}Q${hx} ${y - 32} ${hx + 27} ${y - 24}L${hx + 33} ${y - 12}Q${hx + 38} ${y} ${hx + 22} ${y}H${hx - 22}Q${hx - 38} ${y} ${hx - 33} ${y - 12}Z`, p.accent),
+        fillOf(rrect(hx - 18, y - 40, 5, 14, 2.5), OFFICIAL.snow),
+        fillOf(circle(hx + 8, y - 13, 4.6), OFFICIAL.snow),
+        fillOf(circle(hx - 9, y - 8, 2.6), OFFICIAL.snow),
+        lineOf(`M${hx - 36} ${y - 64}L${hx - 43} ${y - 72}M${hx + 36} ${y - 64}L${hx + 43} ${y - 72}M${hx - 40} ${y - 50}H${hx - 50}M${hx + 40} ${y - 50}H${hx + 50}`, p.accent, 4),
+      ];
+    }
+    case "sample":
+      // A rock sample held up on the hand, with a few sparks off it
+      return [
+        ...samplePieces(hx, hy).map((piece) => fillOf(piece.d, piece.tone === "main" ? p.accent : p.accentShade)),
+        lineOf(`M${hx - 24} ${hy - 62}L${hx - 30} ${hy - 70}M${hx + 24} ${hy - 62}L${hx + 30} ${hy - 70}M${hx} ${hy - 68}V${hy - 77}`, OFFICIAL.bee, 4),
+      ];
     case "notebook":
       return [
         fillOf(rrect(hx - 25, hy - 62, 50, 64, 8), p.accentShade),
@@ -786,7 +857,7 @@ export function buildNpc(spec: NpcSpec, pose: PoseId = "idle", form: NpcForm = "
   const bust = form === "bust";
   // The bust is the head and a strip of shirt: no arms, and the shirt ends in rounded corners at the bottom of the crop
   const arms = bust ? [] : def.arms;
-  const holdsProp = def.holds && ["marble", "clipboard", "vial", "notebook"].includes(spec.accent.kind);
+  const holdsProp = def.holds && ["marble", "clipboard", "vial", "notebook", "flask", "sample"].includes(spec.accent.kind);
   const handArm = arms.find((a) => a.handOver);
   const back: Part[] = [
     ...hairBack(spec, p),

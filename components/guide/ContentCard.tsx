@@ -9,10 +9,10 @@ import { Pressable, View } from "react-native";
 import { Text } from "@/components/ui/text";
 import Animated, {
   useAnimatedStyle,
-  useReducedMotion,
   useSharedValue,
   withSpring,
 } from "react-native-reanimated";
+import { useReducedMotion } from "@/components/motion/use-reduced-motion";
 
 import { Icon } from "@/components/ui/icon";
 import { createStyles, fontFaces, useTheme, withAlpha } from "@/theme";

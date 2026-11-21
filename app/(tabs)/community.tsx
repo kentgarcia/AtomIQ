@@ -1,7 +1,8 @@
+import { useRenderTimer } from "@/components/dev/render-timer";
+import { useSfxSet } from "@/components/motion/use-sfx-set";
 import { BlogCard } from "@/components/feed/BlogCard";
 import { RanksBanner, ShortcutsRow } from "@/components/feed/EntryCards";
 import { PostCard } from "@/components/feed/PostCard";
-import { useTutorialTarget } from "@/components/tutorial/use-tutorial-target";
 import { useDrippedFeed } from "@/components/feed/use-drip";
 import { useCast } from "@/components/feed/use-cast";
 import { useWeeklyRanking } from "@/components/feed/use-ranking";
@@ -12,10 +13,11 @@ import { useFeed } from "@/hooks/use-feed";
 import { checkRankChange, type FeedItem } from "@/services/feed";
 import { createStyles, fontFaces, useResponsiveLayout, useTheme } from "@/theme";
 import { useFocusEffect } from "expo-router";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { FlatList, RefreshControl, View } from "react-native";
 import { usePullRefresh } from "@/hooks/use-pull-refresh";
-import { useReducedMotion } from "react-native-reanimated";
+import { useReducedMotion } from "@/components/motion/use-reduced-motion";
+import { FOCUS_WORK_DELAY_MS, focusWorkDue, minuteOf } from "@/components/feed/feed-ui-core";
 
 /**
  * Discover: the NPC feed (docs/features/NPC_FEED_SPEC.md §3). The cast posts about what the learner really
@@ -42,6 +44,8 @@ const useStyles = createStyles((theme) => {
 });
 
 export default function CommunityScreen() {
+  useRenderTimer("/community");
+  useSfxSet("feed");
   const { theme } = useTheme();
   const styles = useStyles(theme);
   const { contentMaxWidth } = useResponsiveLayout();
@@ -49,7 +53,8 @@ export default function CommunityScreen() {
   const { items, loading, enabled, refresh, markSeen } = useFeed();
   const cast = useCast();
   const { ranking, reload: reloadRanking } = useWeeklyRanking();
-  const [now, setNow] = useState(() => Date.now());
+  // Rounded to the minute (all the cards show is minutes): a refocus or a reload inside the same minute changes nothing
+  const [now, setNow] = useState(() => minuteOf(Date.now()));
 
   const { scrolled, onScroll, scrollEventThrottle } = useHeaderBorder();
 
@@ -66,39 +71,54 @@ export default function CommunityScreen() {
     if (ids.length) markSeen(ids);
   }, [isFocused, loading, items, markSeen]);
 
+  // The page's own refresh runs a moment after it is shown, when the thread is idle, and not again inside FOCUS_WORK_GAP_MS:
+  // every revisit used to cost a reconcile, a ranking read and a rank check, which showed as hitches on a tab that was already built.
+  const lastFocusWork = useRef<number | null>(null);
+
   useFocusEffect(
     useCallback(() => {
       setIsFocused(true);
-      setNow(Date.now());
-      void refresh();
-      void reloadRanking();
-      void checkRankChange(); // a passed rival may become a post; the list re-reads by itself
-      const tick = setInterval(() => setNow(Date.now()), MINUTE);
+      setNow(minuteOf(Date.now()));
+      let idle: number | null = null;
+      let timer: ReturnType<typeof setTimeout> | null = null;
+      if (focusWorkDue(lastFocusWork.current, Date.now())) {
+        timer = setTimeout(() => {
+          idle = requestIdleCallback(
+            () => {
+              lastFocusWork.current = Date.now();
+              void refresh();
+              void reloadRanking();
+              void checkRankChange(); // a passed rival may become a post; the list re-reads by itself
+            },
+            { timeout: 1500 },
+          );
+        }, FOCUS_WORK_DELAY_MS);
+      }
+      const tick = setInterval(() => setNow(minuteOf(Date.now())), MINUTE);
       return () => {
         setIsFocused(false);
         clearInterval(tick);
+        if (timer) clearTimeout(timer);
+        if (idle !== null) cancelIdleCallback(idle);
       };
     }, [refresh, reloadRanking]),
   );
 
   const { refreshing, onRefresh, spinner } = usePullRefresh(
     useCallback(() => {
-      setNow(Date.now());
+      setNow(minuteOf(Date.now()));
       return Promise.all([refresh(), reloadRanking()]);
     }, [refresh, reloadRanking]),
   );
 
-  // Shrodi's tour lights the first card's reaction pill (docs/features/TUTORIAL_SPEC.md)
-  const reactionLit = useTutorialTarget("feed.reaction", { radius: "round" });
-  const firstId = shown[0]?.id;
   const renderItem = useCallback(
     ({ item }: { item: FeedItem }) =>
       item.blog ? (
-        <BlogCard item={item} npc={cast.get(item.npcId) ?? null} cast={cast} now={now} fresh={fresh.has(item.id)} reactionRef={item.id === firstId ? reactionLit.ref : undefined} />
+        <BlogCard item={item} npc={cast.get(item.npcId) ?? null} cast={cast} now={now} fresh={fresh.has(item.id)} />
       ) : (
-        <PostCard item={item} npc={cast.get(item.npcId) ?? null} cast={cast} now={now} fresh={fresh.has(item.id)} reactionRef={item.id === firstId ? reactionLit.ref : undefined} />
+        <PostCard item={item} npc={cast.get(item.npcId) ?? null} cast={cast} now={now} fresh={fresh.has(item.id)} />
       ),
-    [cast, now, fresh, firstId, reactionLit.ref],
+    [cast, now, fresh],
   );
 
   return (

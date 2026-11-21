@@ -16,7 +16,7 @@ const fx = loadTs("components/onboarding/onboarding-fx-core.ts");
 const { PLAN_FX, planBarFrame, planLineFrame, planTickFrame } = fx;
 const {
   STEPS, BAR_STEPS, REASONS, LEVELS, GOALS, PROMPTS, TASTE_ITEM_IDS, EMPTY_ANSWERS,
-  stepProgress, hasBar, nextStep, previousStep, canContinue, rowsFor, planLines, recapFor, shrodiLine, choicesFor,
+  stepProgress, hasBar, speedAdvice, forcedSpeedAdvice, nextStep, previousStep, canContinue, rowsFor, planLines, recapFor, shrodiLine, choicesFor,
   serializeAnswers, parseAnswers,
 } = core;
 
@@ -35,8 +35,31 @@ test("the taste is skipped over when its questions could not be loaded", () => {
   assert.equal(nextStep("goal", { skipTaste: true }), "plan");
 });
 
+test("the speed page follows hello, and is stepped over when the phone is not slow", () => {
+  assert.equal(nextStep("hello"), "speed");
+  assert.equal(nextStep("speed"), "why");
+  assert.equal(nextStep("hello", { skipSpeed: true }), "why");
+  assert.equal(hasBar("speed"), false);
+  assert.equal(stepProgress("speed"), 0);
+});
+
+test("speedAdvice: only slow phones, Reduced for a middling one, Disabled for a weak one, nothing when animation is already off", () => {
+  assert.equal(speedAdvice("high", false), null);
+  assert.equal(speedAdvice("mid", false), "reduced");
+  assert.equal(speedAdvice("low", false), "off");
+  for (const tier of ["high", "mid", "low"]) assert.equal(speedAdvice(tier, true), null);
+});
+
+test("forcedSpeedAdvice: the diagnostics switch shows the page on any phone", () => {
+  assert.equal(forcedSpeedAdvice("high"), "reduced");
+  assert.equal(forcedSpeedAdvice("mid"), "reduced");
+  assert.equal(forcedSpeedAdvice("low"), "off");
+});
+
 test("back goes one step, never into the plan, and nowhere from hello, plan or welcome", () => {
-  assert.equal(previousStep("why"), "hello");
+  assert.equal(previousStep("why"), "speed");
+  assert.equal(previousStep("why", { skipSpeed: true }), "hello");
+  assert.equal(previousStep("speed"), "hello");
   assert.equal(previousStep("goal"), "how");
   assert.equal(previousStep("taste"), "goal");
   assert.equal(previousStep("profile"), "taste");

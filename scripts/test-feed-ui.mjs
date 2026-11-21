@@ -254,3 +254,49 @@ test("check:feed ignores words in comments and reading code", () => {
   });
   assert.deepEqual(checkFeed(root).failures, []);
 });
+
+test("needsFullReveal: false once everything is shown, so a reduced-motion sync cannot loop", () => {
+  const items = [{ id: "a" }, { id: "b" }];
+  assert.equal(ui.needsFullReveal(null, items), true);
+  assert.equal(ui.needsFullReveal(new Set(["a"]), items), true);
+  assert.equal(ui.needsFullReveal(new Set(["a", "b"]), items), false);
+  assert.equal(ui.needsFullReveal(new Set(["a", "b", "z"]), items), false);
+  assert.equal(ui.needsFullReveal(new Set(), []), false);
+});
+
+test("reuseItems: unchanged items stay the same objects, and nothing changed means the same array", () => {
+  const a = { id: "a", text: "one", reactions: { total: 1 } };
+  const b = { id: "b", text: "two", reactions: { total: 0 } };
+  const prev = [a, b];
+  const same = ui.reuseItems(prev, [{ ...a, reactions: { ...a.reactions } }, { ...b }]);
+  assert.equal(same, prev, "nothing changed: the very same array");
+  // one item changed: a new array, the other item is still the old object
+  const next = ui.reuseItems(prev, [{ ...a }, { ...b, reactions: { total: 1 } }]);
+  assert.notEqual(next, prev);
+  assert.equal(next[0], a);
+  assert.notEqual(next[1], b);
+  assert.equal(next[1].reactions.total, 1);
+  // a new post on top, an old one gone, or a reorder: a new array, survivors reused
+  const added = { id: "c", text: "three", reactions: { total: 0 } };
+  const grown = ui.reuseItems(prev, [added, { ...a }, { ...b }]);
+  assert.equal(grown.length, 3);
+  assert.equal(grown[1], a);
+  assert.equal(grown[2], b);
+  assert.notEqual(ui.reuseItems(prev, [{ ...b }, { ...a }]), prev, "a different order is a change");
+  assert.deepEqual(ui.reuseItems([], []), []);
+});
+
+test("minuteOf rounds down to the minute", () => {
+  const t = Date.parse("2026-11-21T15:11:51.850Z");
+  assert.equal(ui.minuteOf(t), Date.parse("2026-11-21T15:11:00.000Z"));
+  assert.equal(ui.minuteOf(ui.minuteOf(t)), ui.minuteOf(t));
+  assert.equal(ui.relativeTime(t - 30_000, ui.minuteOf(t)), "now", "a post from seconds ago still reads as now");
+});
+
+test("the page's own refresh runs the first time, then not again inside the gap", () => {
+  const gap = ui.FOCUS_WORK_GAP_MS;
+  assert.equal(ui.focusWorkDue(null, 1_000), true, "never run: due");
+  assert.equal(ui.focusWorkDue(1_000, 1_000 + gap - 1), false, "just ran: not due");
+  assert.equal(ui.focusWorkDue(1_000, 1_000 + gap), true, "the gap has passed: due");
+  assert.equal(ui.focusWorkDue(5_000, 1_000), true, "a clock that went back is due, not stuck");
+});

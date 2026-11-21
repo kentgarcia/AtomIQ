@@ -1,3 +1,4 @@
+import { useSfxSet } from "@/components/motion/use-sfx-set";
 import { PODIUM, podiumFrame, podiumStart, rankMove } from "@/components/celebration/celebration-core";
 import { RankAvatar } from "@/components/feed/RankAvatar";
 import { ordinal, rankRowSpoken, weekCaption, xpLabel } from "@/components/feed/feed-ui-core";
@@ -21,7 +22,8 @@ import { useFocusEffect, useRouter } from "expo-router";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { ActivityIndicator, RefreshControl, ScrollView, View } from "react-native";
 import { usePullRefresh } from "@/hooks/use-pull-refresh";
-import Animated, { useAnimatedStyle, useReducedMotion } from "react-native-reanimated";
+import Animated, { useAnimatedStyle } from "react-native-reanimated";
+import { useReducedMotion } from "@/components/motion/use-reduced-motion";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 /**
@@ -159,6 +161,7 @@ function PodiumPlace({
 }
 
 export default function RanksScreen() {
+  useSfxSet("feed");
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { theme } = useTheme();

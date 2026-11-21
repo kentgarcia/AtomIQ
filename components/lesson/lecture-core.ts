@@ -31,11 +31,10 @@ export function lectureSteps(body: string, hasFigure: boolean, figureAt?: number
 }
 
 /**
- * How long Continue stays hidden after a step appears, ms. A bubble is typing for that long (the
- * button comes even if typing is not done yet, and Continue then finishes it at once); a figure is
- * given a moment to be seen.
+ * How long Continue stays hidden after a step appears, ms: a beat, so a quick double tap does not skip a step before it has popped in.
+ * A bubble's text is there whole (nothing types itself out in a lesson); a figure is given a moment to be seen.
  */
-export const CONTINUE_DELAY = { bubble: 1200, figure: 700 } as const;
+export const CONTINUE_DELAY = { bubble: 500, figure: 700 } as const;
 
 export function continueDelay(step: LectureStep | undefined): number {
   if (!step) return 0;

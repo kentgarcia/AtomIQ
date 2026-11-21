@@ -22,7 +22,6 @@ import Animated, {
   runOnJS,
   useAnimatedReaction,
   useAnimatedStyle,
-  useReducedMotion,
   useSharedValue,
   withDelay,
   withRepeat,
@@ -30,6 +29,7 @@ import Animated, {
   withTiming,
   type SharedValue,
 } from "react-native-reanimated";
+import { useIdleStill, useReducedMotion } from "@/components/motion/use-reduced-motion";
 
 import { createStyles, fontFaces, fontSizes, pickReadableText, radius, spacing, useTheme, withAlpha } from "@/theme";
 
@@ -120,8 +120,10 @@ export function StatTile({ tone, label, value, icon, accessibilityLabel, revealA
   const styles = useStyles(theme);
   const c = theme.colors;
   const reduced = useReducedMotion();
+  const idleStill = useIdleStill();
   const animate = !reduced && revealAt !== undefined;
-  const shines = animate && shineAt !== undefined;
+  // The band of light that comes round again is a loop: only at the max animation level
+  const shines = animate && !idleStill && shineAt !== undefined;
   const counts = animate && countTo !== undefined && format !== undefined;
   const [width, setWidth] = useState(0);
   const [face, setFace] = useState<FaceBox | null>(null);

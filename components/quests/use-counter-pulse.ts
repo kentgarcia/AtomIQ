@@ -10,7 +10,8 @@
  */
 
 import { useEffect, useRef, useState } from "react";
-import { Easing, cancelAnimation, useAnimatedStyle, useReducedMotion, useSharedValue, withTiming } from "react-native-reanimated";
+import { Easing, cancelAnimation, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
+import { useReducedMotion } from "@/components/motion/use-reduced-motion";
 
 import { PULSE, pulseScale } from "@/components/motion/reveal-core";
 import { subscribeClaimFlights, subscribeClaimLandings, type FlightKind } from "@/components/quests/claim-fx-bus";

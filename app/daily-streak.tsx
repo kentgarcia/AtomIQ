@@ -16,8 +16,8 @@ import Animated, {
   Easing,
   FadeIn,
   Keyframe,
-  useReducedMotion,
 } from "react-native-reanimated";
+import { useReducedMotion } from "@/components/motion/use-reduced-motion";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { STREAK_FX, STREAK_TICK_CONTACT, STREAK_TOTAL, isMilestoneStreak } from "@/components/celebration/celebration-core";

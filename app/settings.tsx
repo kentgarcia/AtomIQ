@@ -1,5 +1,8 @@
 import { settle } from "@/components/motion/settle";
 import { SettingsCard, SettingsRow } from "@/components/settings/SettingsCard";
+import { MotionLevelDialog } from "@/components/settings/MotionLevelDialog";
+import { MOTION_LEVEL_LABEL } from "@/components/motion/motion-level-core";
+import { useMotionLevel } from "@/services/motion-level";
 import { FieldInput } from "@/components/ui/field-input";
 import { ScreenHeader, useHeaderBorder } from "@/components/layout";
 import { Icon } from "@/components/ui/icon";
@@ -69,6 +72,8 @@ export default function SettingsScreen() {
   // "Tips from Shrodi" and "Replay the tour" (docs/features/TUTORIAL_SPEC.md §9)
   const [tips, setTips] = useState(true);
   const [replayAsk, setReplayAsk] = useState(false);
+  const motionLevel = useMotionLevel();
+  const [motionAsk, setMotionAsk] = useState(false);
   const teacherLines = useTeacherLines();
   const [isDeletingAccount, setIsDeletingAccount] = useState(false);
   const [versionModalVisible, setVersionModalVisible] = useState(false);
@@ -352,6 +357,7 @@ export default function SettingsScreen() {
             <SettingsRow icon="Moon" color="#8B5CF6" label="Dark Mode" toggle={{ value: isDark, onChange: toggleTheme }} />
             <SettingsRow icon="VolumeHigh" color="#3B82F6" label="Sound Effects" toggle={{ value: soundEffects, onChange: handleSoundEffectsToggle }} />
             <SettingsRow icon="Microphone2" color="#14B8A6" label="Read Aloud" toggle={{ value: readAloudEnabled, onChange: handleReadAloudToggle }} />
+            <SettingsRow icon="Flash" color="#F97316" label="Animations" value={MOTION_LEVEL_LABEL[motionLevel]} arrow hint="Choose how much the app moves" onPress={() => setMotionAsk(true)} />
             <SettingsRow icon="Vibe" color="#EC4899" label="Haptics" toggle={{ value: haptics, onChange: handleHapticsToggle }} />
             <SettingsRow icon="Message" color="#F59E0B" label="Teacher lines" toggle={{ value: teacherLines, onChange: setTeacherLines }} />
             <SettingsRow
@@ -420,6 +426,8 @@ export default function SettingsScreen() {
       </ScrollView>
 
       {/* App Version */}
+      <MotionLevelDialog visible={motionAsk} onClose={() => setMotionAsk(false)} />
+
       <ModalDialog
         visible={replayAsk}
         onClose={() => setReplayAsk(false)}
@@ -445,7 +453,7 @@ export default function SettingsScreen() {
       >
         <View style={styles.modalHero}>
           <Image
-            source={require("@/assets/images/icon.png")}
+            source={require("@/assets/images/mascot/icon-256.png")}
             style={styles.modalIcon as ImageStyle}
             resizeMode="contain"
           />

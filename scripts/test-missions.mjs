@@ -150,3 +150,11 @@ test("no quest is called chest", () => {
   const src = fs.readFileSync("services/missions.ts", "utf8");
   assert.equal(/id:\s*"chest"/.test(src), false);
 });
+
+test("a first focus does not read the counters again while the mount's own read is still going; any other focus does", () => {
+  const { refreshOnFocus } = core;
+  assert.equal(refreshOnFocus(true, true), false, "first focus, read in flight");
+  assert.equal(refreshOnFocus(true, false), true, "first focus, the read already done");
+  assert.equal(refreshOnFocus(false, true), true, "a later focus always reads");
+  assert.equal(refreshOnFocus(false, false), true);
+});

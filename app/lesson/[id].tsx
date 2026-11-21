@@ -1,3 +1,5 @@
+import { useSfxSet } from "@/components/motion/use-sfx-set";
+import { useRenderTimer } from "@/components/dev/render-timer";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ActivityIndicator, View } from "react-native";
@@ -46,6 +48,8 @@ interface Outcome {
 }
 
 export default function LessonScreen() {
+  useRenderTimer("/lesson");
+  useSfxSet("lesson-run");
   const { id, autostart, resume: resumeChoice } = useLocalSearchParams<{ id: string; autostart?: string; resume?: string }>();
   const lessonId = typeof id === "string" ? id : "";
   const router = useRouter();

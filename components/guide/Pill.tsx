@@ -12,11 +12,11 @@ import {
 import { Text } from "@/components/ui/text";
 import Animated, {
   useAnimatedStyle,
-  useReducedMotion,
   useSharedValue,
   withSpring,
   withTiming,
 } from "react-native-reanimated";
+import { useReducedMotion } from "@/components/motion/use-reduced-motion";
 
 import { Icon } from "@/components/ui/icon";
 import { createStyles, DURATION, fontFaces, PRESS_EASING, useTheme } from "@/theme";

@@ -20,6 +20,7 @@ import {
   replyStep,
   replyTypeOf,
   splitParts,
+  storyList,
   summarizeThreads,
   WELCOME_BACK_MIN_DAYS,
   type ChatAction,
@@ -27,6 +28,7 @@ import {
   type ChatMessage,
   type ChatNode,
   type ChatThread,
+  type StoryEntry,
   type ThreadSummary,
 } from "@/services/chat-core";
 import { daysBetween, isDayKey } from "@/services/activity-core";
@@ -228,6 +230,70 @@ async function deliverNow({ progress, seen }: { progress: PhoneProgress; seen: r
     await sayNode(thread.id, node.npcId, node, at, false);
   }
   notifyChats();
+}
+
+/**
+ * Every story one teacher has for the Chats tab of their profile, unlocked or not, with what unlocks the ones that are not
+ * (docs/features/PHONE_SPEC.md §5.2). Never rejects: a failed read gives an empty list.
+ */
+export async function listStories(npcId: string, { progress, seen }: { progress: PhoneProgress; seen: readonly SeenApp[] }): Promise<StoryEntry[]> {
+  try {
+    const [nodes, threads, contacts, units, returnedOn] = await Promise.all([
+      loadChatNodes(),
+      listThreads(),
+      getContactTeacherIds(),
+      contentRepository.getUnits(),
+      getChatReturned(),
+    ]);
+    return storyList(
+      nodes,
+      npcId,
+      {
+        unitsCompleted: progress.unitsCompleted,
+        installedApps: seen.map((s) => s.appId),
+        startApps: START_APPS,
+        lessonsCompleted: progress.lessonsCompleted,
+        level: progress.level,
+        today: localDayKey(Date.now()),
+        returnedOn,
+      },
+      npcId === CHAT_MASCOT_ID || contacts.includes(npcId),
+      threads,
+      {
+        unitTitleOf: (id) => units.find((u) => u.id === id)?.title,
+        appNameOf: (id) => PHONE_APPS.find((a) => a.id === id)?.name,
+      },
+      units.find((u) => u.teacherNpcId === npcId)?.title,
+    );
+  } catch (error) {
+    console.warn("[chats] stories", error);
+    return [];
+  }
+}
+
+/**
+ * Start a story the learner has earned and has no thread for yet (the profile's Chats tab; normally progress has already put it in
+ * Chats, so this is the way in when it has not). Queued with the unlocking, so the same story is never started twice. Returns the
+ * thread's id, or null when it is not there. Never rejects.
+ */
+export function startStory(nodeId: string, event: string | null): Promise<string | null> {
+  const run = delivering.then(async () => {
+    const nodes = await loadChatNodes();
+    const node = nodes.find((n) => n.id === nodeId && n.kind === "unprompted");
+    if (!node) return null;
+    const existing = (await store.listThreads()).find((t) => t.entryNodeId === node.id);
+    if (existing) return existing.id;
+    const now = Date.now();
+    const thread = await store.createThread({ npcId: node.npcId, entryNodeId: node.id, title: node.title ?? "New message", origin: "event", event }, now);
+    await sayNode(thread.id, node.npcId, node, now, false);
+    notifyChats();
+    return thread.id;
+  });
+  delivering = run.then(() => undefined, () => undefined);
+  return run.catch((error) => {
+    console.warn("[chats] start story", error);
+    return null;
+  });
 }
 
 // ---------------------------------------------------------------------------

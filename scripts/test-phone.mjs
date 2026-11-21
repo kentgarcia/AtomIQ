@@ -169,3 +169,24 @@ test("locked apps are the live ones the learner does not have, and each says wha
   assert.deepEqual(core.unlockRequirement({ kind: "level", level: 5 }, { ...NO_PROGRESS, level: 2 }, title), { text: "Reach level 5.", progress: "You are level 2" });
   assert.equal(core.unlockRequirement({ kind: "owns-shop-item" }, NO_PROGRESS, title).text, "Get any item from the Shop.");
 });
+
+test("sameIconView: an icon skips a render that only brings new handlers, and redraws when anything drawn changes", () => {
+  const app = { id: "chats" };
+  const base = { app, size: 64, label: "Chats", badge: { kind: "count", count: 2 }, install: undefined };
+  // badgeOf builds a new object each call: same value, same icon
+  assert.equal(core.sameIconView(base, { ...base, badge: { kind: "count", count: 2 } }), true);
+  assert.equal(core.sameIconView({ ...base, badge: null }, { ...base, badge: null }), true);
+  assert.equal(core.sameIconView(base, { ...base, badge: { kind: "count", count: 3 } }), false);
+  assert.equal(core.sameIconView(base, { ...base, badge: { kind: "dot" } }), false);
+  assert.equal(core.sameIconView(base, { ...base, badge: null }), false);
+  assert.equal(core.sameIconView(base, { ...base, label: "Chats, 2 unread" }), false);
+  assert.equal(core.sameIconView(base, { ...base, size: 72 }), false);
+  assert.equal(core.sameIconView(base, { ...base, app: { id: "chats" } }), false, "another app object is another icon");
+  assert.equal(core.sameIconView(base, { ...base, locked: true }), false);
+  assert.equal(core.sameIconView(base, { ...base, locked: false }), true, "unset and false are the same");
+  const installing = { delay: 200, newDot: true };
+  assert.equal(core.sameIconView({ ...base, install: installing }, { ...base, install: { delay: 200, newDot: true } }), true);
+  assert.equal(core.sameIconView({ ...base, install: installing }, { ...base, install: { delay: 400, newDot: true } }), false);
+  assert.equal(core.sameIconView({ ...base, install: installing }, { ...base, install: { delay: 200, newDot: false } }), false);
+  assert.equal(core.sameIconView(base, { ...base, install: installing }), false, "the install moment starts or ends");
+});

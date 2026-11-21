@@ -8,7 +8,8 @@
 import { LinearGradient } from "expo-linear-gradient";
 import { useEffect } from "react";
 import { Pressable, View } from "react-native";
-import Animated, { Easing, FadeIn, FadeOut, cancelAnimation, useAnimatedStyle, useReducedMotion, useSharedValue, withRepeat, withSequence, withTiming } from "react-native-reanimated";
+import Animated, { Easing, FadeIn, FadeOut, cancelAnimation, useAnimatedStyle, useSharedValue, withRepeat, withSequence, withTiming } from "react-native-reanimated";
+import { useIdleStill } from "@/components/motion/use-reduced-motion";
 
 import { SCROLL_CUE } from "@/components/lesson/scroll-cue-core";
 import { Icon } from "@/components/ui/icon";
@@ -39,7 +40,8 @@ const useStyles = createStyles((theme) => ({
 export function ScrollCue({ visible, onPress }: { visible: boolean; onPress: () => void }) {
   const { theme } = useTheme();
   const styles = useStyles(theme);
-  const reduced = useReducedMotion();
+  // The bob is a loop: it runs only at the max animation level
+  const reduced = useIdleStill();
   const bob = useSharedValue(0);
 
   useEffect(() => {

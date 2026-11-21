@@ -25,7 +25,7 @@
 
 Shrodi is the mascot: he cheers, reacts and guides. The path itself has no people in it. This spec adds a cast of **NPC teachers**, one per field of nuclear science, so the journey through the units feels like walking between people who know their subject.
 
-1. **One teacher per field.** Ada teaches atoms, Hal teaches radioactivity, and so on (roster in §5). A unit has one teacher; a teacher can own several units later.
+1. **One teacher per field.** Hal teaches atoms, Ada teaches radioactivity (they swapped units on 2026-11-22: `scripts/content-migration/swap-unit-teachers.mjs`), and so on (roster in §5). A unit has one teacher; a teacher can own several units later.
 2. **The teacher is the voice of the teaching, Shrodi is the voice of the feedback.** Teachers introduce lessons, tell the story cards and sign off. Shrodi keeps correct, wrong, finish and the Guide. The two never swap jobs, so learners always know who is talking about what.
 3. **Drawn in one style.** Every teacher is built from the same few rounded shapes, flat colour and one shade step, following the Duolingo character skill (§4), and is data, not a bespoke drawing. Adding a teacher is adding a row of values.
 4. **The journey has a cast.** Teachers appear on the path (unit banners, locked units), in lessons (preview, story cards, sign-off) and in Explorer journeys, in the same style and the same size classes everywhere (§6).
@@ -140,8 +140,8 @@ Seven teachers, one per planned unit, so the cast grows with the curriculum: a t
 
 | # | Teacher | Field (unit) | Who they are | Signature prop (and what it carries) | Clothes (official palette) | Skin trio / hair | Eyes | Teaching voice and the idea they own |
 |---|---|---|---|---|---|---|---|---|
-| 1 | **Ada** | Atoms (Inside the Atom, Unit 1) | Young, curious, always mid-question | Marble in the hand that becomes an atom model (nucleus and shells) | Macaw `#1CB0F6`, shade Whale `#1899D6` sweater | Light-pink, curls Grizzly `#A56644` | Round glasses | Asks "what is it made of?". Owns *atoms are mostly empty space*, *isotope does not mean radioactive*. |
-| 2 | **Hal** | Radioactivity (Unit 2) | Older, patient, tells stories | Pocket watch (half-life) | Bee `#FFC800`, shade Camel `#E7A601` cardigan | Tan, hair Squid `#EBE3E3` (warm off-white, not grey), moustache | Round, small | Slow and exact. Owns *half-life is not half gone, then gone*, *radioactivity is natural*. |
+| 1 | **Hal** | Atoms (Inside the Atom, Unit 1; he taught Unit 2 until 2026-11-22) | Young, cheerful, always carrying a sample | A rock sample held up in the hand (redesigned 2026-11-22 from the owner's concept; the pocket watch is gone), a brown satchel with the radiation badge on his shoulder | A pale Anchovy `#D2E4E8` lab coat over an Humpback `#2B70C9` jumper, pens in the pocket; his cover stays Bee `#FFC800`, shade Camel `#E7A601` (a `cover` colour on the spec) | Light peach, an oval face, a big cloud of golden Lion `#FFB100` hair, no moustache | Round pill eyes, button nose | Slow and exact. Owns *atoms are mostly empty space*, *isotope does not mean radioactive*. Cover: atoms, test tubes, rock samples. |
+| 2 | **Ada** | Radioactivity (Unit 2; she taught Unit 1 until 2026-11-22) | Young, curious, always mid-question | A glowing violet flask (redesigned 2026-11-22 from the owner's concept; the marble is gone) | Starfish `#FFAADE` puff-sleeved shirt, shade `#F58BC7`, under a tan Cheetah `#FFCE8E` lab apron with a violet radiation badge, white round collar | Light-pink with round cheeks, fluffy brown pigtails (Grizzly-brown `#7C3F25`) tied with violet bows | Sparkle eyes | Asks "why does it change?". Owns *half-life is not half gone, then gone*, *radioactivity is natural*. Cover: trefoils, flasks, bows, decay curves. |
 | 3 | **Ray** | Radiation meets matter (Unit 3) | Practical, a little blunt | Lead-lined clipboard and a hand-held counter | Beetle `#CE82FF`, shade Betta `#9069CD` vest over a shirt | Deep, bald-sides with short crop | Square glasses | Owns *irradiated is not contaminated*, *not all radiation is the same*. |
 | 4 | **Mina** | The body (Unit 4) | Warm, reassuring, a clinician | Stethoscope round the neck | Feather Green `#58CC02`, shade Tree Frog `#58A700` coat | Brown, bun, Cardinal `#FF4B4B` pin as accent | Pill | Calm about risk. Owns *any dose is not deadly*, *radiation does not glow green*. |
 | 5 | **Kofi** | Energy from the nucleus (Unit 5) | Energetic engineer | Hard hat with a reactor-core sticker | Fox `#FF9600`, shade Guinea Pig `#CD7900` hoodie | Warm, short crop, beard | Dots | Builds things. Owns *a reactor is not a bomb*, *fission versus fusion*. |
@@ -150,7 +150,7 @@ Seven teachers, one per planned unit, so the cast grows with the curriculum: a t
 
 (Rows are a proposal. Open decision O5 covers names and look. Section 4.4's four-attribute rule has to hold for the final cast; the test enforces it.)
 
-Beyond the units, a field can get a teacher without a unit: the periodic table and the encyclopedia are covered by Ada until a better owner exists (O2).
+Beyond the units, a field can get a teacher without a unit: the periodic table and the encyclopedia are covered by Hal until a better owner exists (O2).
 
 ## 6. Where teachers appear (the journey)
 
@@ -184,7 +184,7 @@ Each form passes the skill's size test at its smallest ship size: hands, elbows 
 
 ### 6.3 Screens
 
-- **Path unit banner.** The unit title row gets the teacher's bust (Banner size) on the left, the unit title and "Taught by Ada" under it, and a 3D `Card` around it. Tapping opens the **Meet sheet** (Hero or Full body, two lines about them, what the unit covers). The unit's nodes stay as they are. The banner stays under `check:tab-bar`.
+- **Path unit banner.** The unit title row gets the teacher's bust (Banner size) on the left, the unit title and "Taught by Hal" under it, and a 3D `Card` around it. Tapping opens the **Meet sheet** (Hero or Full body, two lines about them, what the unit covers). The unit's nodes stay as they are. The banner stays under `check:tab-bar`.
 - **Lesson preview.** The teacher at Hero size beside a 3D speech bubble (a `Card` with a rounded-triangle tail, §7.2) holding one line: "Let's find out what's in a marble." This replaces Shrodi on this screen so only one character shows. A close button and the existing Start button are unchanged.
 - **Story cards.** The Chip-size teacher replaces the small Shrodi, the badge reads the tag as today, and the title stays. The body is unchanged (60 words or fewer).
 - **Finish.** Shrodi as built, plus under the stars a one-line sign-off chip with the teacher's Chip.
@@ -317,8 +317,8 @@ First pass: text only, with the existing `ReadAloudButton` on every line. Per-te
 |---|---|---|
 | **0 Design sheet** | `render-npcs.mjs` plus the kit from the skill (`reference/kit.mjs`) ported into `npc-art.ts`. Draw Ada and Hal, four sizes, light and dark, silhouettes, the muted version. Review against §4.4 and the brand guide's characters. Tune skin trios by eye. **Skin, faces and hands approved by the owner before any app code.** | A reviewed sheet exists and the owner signs off Ada and Hal. |
 | **1 Rig and cast of two** | `Npc.tsx` (idle life, poses, still mode), `buildNpc`, `frameOf`, `toSvg`, `test:npc`, EX-12. | `test:npc` passes; Ada and Hal render in a dev screen at all four sizes. |
-| **2 Data** | Schema bump, `npcs.mjs` seed, `content/npcs`, `units.teacher_npc_id`, `npc_lines`, rules R1 to R6, Studio JSON editing only. | Ada owns Unit 1 in the DB; `validate:content` enforces R1 to R6; a version can be published. |
-| **3 Surfaces** | Unit banner and Meet sheet, speech bubble, lesson preview, story card chip, finish sign-off. Settings switch. | Unit 1 shows Ada in every place of §6.3 except journeys. |
+| **2 Data** | Schema bump, `npcs.mjs` seed, `content/npcs`, `units.teacher_npc_id`, `npc_lines`, rules R1 to R6, Studio JSON editing only. | Hal owns Unit 1 in the DB; `validate:content` enforces R1 to R6; a version can be published. |
+| **3 Surfaces** | Unit banner and Meet sheet, speech bubble, lesson preview, story card chip, finish sign-off. Settings switch. | Unit 1 shows Hal in every place of §6.3 except journeys. |
 | **4 The rest of the cast** | Hal, Ray, Mina, Kofi, Tess, Sage, authored with their units; muted version on locked units; unit-complete screen. | A locked unit shows its muted teacher; the variety test passes for all seven. |
 | **5 Journeys and tools** | Explorer journey narrators, Studio NPC tab, a pass for dark mode, reduced motion, font scale and a11y. | Smoke matrix passes; reduced motion shows no movement; font scale 1.3 does not clip. |
 
@@ -337,9 +337,9 @@ Measured with the existing activity tracker; none is a target until a baseline e
 ## 12. Out of scope, parked for later
 
 - Per-teacher voices, lip sync, sound cues (O4).
-- Teachers in games (Atom Maze, MythBuster) and in the Guide's answers ("Ask Ada").
+- Teachers in games (Atom Maze, MythBuster) and in the Guide's answers ("Ask Hal").
 - Character customisation, unlocks or collectibles.
-- A teacher for the periodic table and the encyclopedia (Ada covers them for now).
+- A teacher for the periodic table and the encyclopedia (Hal covers them for now).
 - Guest characters for specific stories (a historical figure card) as real people. The skill forbids copying Duolingo characters; likenesses of real people are a separate legal and tone question.
 - Localised names and lines (the tables are ready, the work is not scheduled).
 
@@ -351,7 +351,7 @@ Measured with the existing activity tracker; none is a target until a baseline e
 | Too many characters on a screen (performance, clutter) | Hard cap of two instances; chips are still. |
 | Teachers add noise for learners who just want to practise | Lines are one short line each, optional by setting, never block a card. |
 | Teacher lines drift into unreferenced claims | Rule R3 and the review step. |
-| A seven-person cast feels like a lot to author for one unit today | Only Ada ships with Unit 1; the others arrive with their units (phase 4). |
+| A seven-person cast feels like a lot to author for one unit today | Only Hal ships with Unit 1; the others arrive with their units (phase 4). |
 | SVG features that fail on device (gradients, animated transform strings, clip paths) | Same constraints as Shrodi; the source scan; flat shapes with no clip paths in the first pass. |
 
 ## 14. Open decisions
@@ -361,7 +361,7 @@ Recommendations in bold. They are the defaults if the owner does not answer.
 | # | Decision | Options |
 |---|---|---|
 | O1 | What does "journey" mean here? | **Both: the learning path and Explorer journeys, with the teacher visible on each (§6).** / Path only. |
-| O2 | How many teachers? | **One per unit (7), authored with their units; Ada covers the periodic table and encyclopedia.** / Three field teachers (atoms, radiation, energy and society). |
+| O2 | How many teachers? | **One per unit (7), authored with their units; Hal covers the periodic table and encyclopedia.** / Three field teachers (atoms, radiation, energy and society). |
 | O3 | Does Shrodi leave the lesson preview? | **Yes, the teacher takes the preview (one character per screen); Shrodi stays for feedback and finish.** / Both side by side. |
 | O4 | Teacher voices? | **None in the first pass (text and Read Aloud only).** / Pitch and rate per teacher through the media runtime. |
 | O5 | Names and looks in §5 | **Approve as a starting point; tune by eye in phase 0.** / Supply your own. |

@@ -204,7 +204,7 @@ const lesson1 = {
     itemCard("c07", "u1-l1-order-sizes"),
     itemCard("c08", "u1-l1-tom-microscope"),
     itemCard("c10", "u1-l1-choice-made-of"),
-    teach("c09", "story", { speaker: "npc-ada", title: "An idea before the proof", tag: "Ancient Greece", body: "About 2,400 years ago the Greek thinker Democritus asked what would happen if you kept cutting something in half. He imagined a smallest piece that could not be cut, and called it atomos. Seeing atoms took far longer.", ...fig(halving()) }, "deeper"),
+    teach("c09", "story", { speaker: "npc-hal", title: "An idea before the proof", tag: "Ancient Greece", body: "About 2,400 years ago the Greek thinker Democritus asked what would happen if you kept cutting something in half. He imagined a smallest piece that could not be cut, and called it atomos. Seeing atoms took far longer.", ...fig(halving()) }, "deeper"),
   ],
 };
 
@@ -295,7 +295,7 @@ const lesson2 = {
     itemCard("c08", "u1-l2-tom-solid"),
     itemCard("c09", "u1-l2-choice-mass"),
     itemCard("c10", "u1-l2-sort-location"),
-    teach("c11", "story", { speaker: "npc-ada", title: "How do we know?", tag: "Go deeper", body: "[[ernest-rutherford|Ernest Rutherford]]'s team fired tiny particles at thin gold foil. Most went straight through, so atoms must be mostly empty. A few bounced straight back, so each atom must have a tiny, heavy centre.", ...fig(goldFoil()) }, "deeper"),
+    teach("c11", "story", { speaker: "npc-hal", title: "How do we know?", tag: "Go deeper", body: "[[ernest-rutherford|Ernest Rutherford]]'s team fired tiny particles at thin gold foil. Most went straight through, so atoms must be mostly empty. A few bounced straight back, so each atom must have a tiny, heavy centre.", ...fig(goldFoil()) }, "deeper"),
     teach("c12", "explain", { title: "Not tiny planets", body: "Pictures often show electrons on neat rings, like planets. A better picture is an [[electron-cloud|electron cloud]]: the electrons are somewhere in a fuzzy region around the nucleus.", ...fig(electronCloud()) }, "deeper"),
   ],
 };

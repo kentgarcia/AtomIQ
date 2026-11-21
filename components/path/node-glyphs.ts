@@ -165,7 +165,7 @@ export const GLYPHS = {
       { d: "M19 39L23.4 34L27.6 42L32 34L36.4 42L41 36", sw: 2.6, fill: false },
     ],
   },
-  /** Half-life: Hal's pocket watch. */
+  /** Half-life: a pocket watch. */
   clock: {
     shapes: [
       { d: circle(24, 26, 16), sw: 3 },

@@ -18,6 +18,11 @@
     "test:theme": "node --test scripts/test-theme-colors.mjs",
     "test:media": "node --no-warnings --test scripts/test-media-policy.mjs",
     "test:sfx": "node --no-warnings --test scripts/test-sfx.mjs",
+    "check:perf": "node --no-warnings scripts/check-perf.mjs",
+    "test:crash-guard": "node --no-warnings --test scripts/test-crash-guard.mjs",
+    "test:motion-level": "node --no-warnings --test scripts/test-motion-level.mjs",
+    "check:images": "node --no-warnings scripts/check-images.mjs",
+    "test:perf": "node --no-warnings --test scripts/test-perf.mjs",
     "test:sfx-lab": "node --no-warnings --test scripts/test-sfx-lab.mjs",
     "prepare:audition-sfx": "node --no-warnings scripts/prepare-audition-sfx.mjs",
     "test:contrast": "node --no-warnings --test scripts/test-option-contrast.mjs",
@@ -34,6 +39,7 @@
     "sync-content": "node scripts/sync-content.js",
     "postinstall": "node scripts/sync-content.js",
     "content-studio": "node tools/studio/server.mjs",
+    "publisher": "node tools/publisher/server.mjs",
     "release:content": "node --no-warnings scripts/release-content.mjs",
     "check:content-published": "node --no-warnings scripts/check-content-published.mjs",
     "test:curriculum": "node --no-warnings --test scripts/test-curriculum-core.mjs",
@@ -82,6 +88,7 @@
     "test:npc-cover": "node --no-warnings --test scripts/test-npc-cover.mjs",
     "test:feed": "node --no-warnings --test scripts/test-feed.mjs",
     "test:feed-ui": "node --no-warnings --test scripts/test-feed-ui.mjs",
+    "test:voice": "node --no-warnings --test scripts/test-npc-voice.mjs",
     "test:daily-facts": "node --no-warnings --test scripts/test-daily-facts.mjs",
     "test:phone": "node --no-warnings --test scripts/test-phone.mjs",
     "test:tutorial": "node --no-warnings --test scripts/test-tutorial.mjs",
@@ -97,6 +104,8 @@
     "test:wallpaper": "node --no-warnings --test scripts/test-wallpaper.mjs",
     "test:world-map": "node --no-warnings --test scripts/test-world-map.mjs",
     "test:phone-fx": "node --no-warnings --test scripts/test-phone-fx.mjs",
+    "test:shop-open": "node --no-warnings --test scripts/test-shop-open.mjs",
+    "test:phone-boot": "node --no-warnings --test scripts/test-phone-boot.mjs",
     "check:phone": "node --no-warnings scripts/check-phone.mjs",
     "check:feed": "node --no-warnings scripts/check-feed.mjs",
     "check:sfx": "node --no-warnings scripts/check-sfx.mjs",
@@ -108,6 +117,8 @@
     "expo-asset": "~58.0.20",
     "expo-audio": "~58.0.11",
     "expo-constants": "~58.0.15",
+    "expo-dev-client": "~58.0.21",
+    "expo-device": "~58.0.5",
     "expo-file-system": "~58.0.13",
     "expo-font": "~58.0.11",
     "expo-haptics": "~58.0.7",
@@ -126,6 +137,7 @@
     "react": "19.3.0",
     "react-dom": "19.3.0",
     "react-native": "0.88.1",
+    "react-native-audio-api": "1.0.1",
     "react-native-gesture-handler": "~3.3.0",
     "react-native-reanimated": "4.7.1",
     "react-native-safe-area-context": "~5.11.1",
@@ -142,6 +154,11 @@
     "typescript": "~6.0.3"
   },
   "private": true,
+  "reanimated": {
+    "staticFeatureFlags": {
+      "ANDROID_SYNCHRONOUSLY_UPDATE_UI_PROPS": true
+    }
+  },
   "engines": {
     "node": ">=22.13.0"
   }

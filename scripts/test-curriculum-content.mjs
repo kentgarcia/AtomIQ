@@ -375,19 +375,19 @@ describe("NPC teachers (docs/features/NPC_TEACHERS_SPEC.md §7.3)", () => {
     db2.exec("DELETE FROM npc_lines WHERE kind = 'sign_off'");
     assert.ok(ruleSet(db2).has("npc-lines"));
     const db3 = await buildWithNpcs();
-    db3.exec("UPDATE npc_lines SET npc_id = 'npc-hal' WHERE id = 'line-ada-intro-isotopes'");
+    db3.exec("UPDATE npc_lines SET npc_id = 'npc-ada' WHERE id = 'line-hal-intro-isotopes'");
     assert.ok(ruleSet(db3).has("npc-lines"));
   });
 
   it("R3: a line over 20 words, or with markup, is an error; a number the lesson lacks is a warning", async () => {
     const db = await buildWithNpcs();
-    db.prepare("UPDATE npc_lines SET text = ? WHERE id = 'line-ada-meet'").run("word ".repeat(21).trim());
+    db.prepare("UPDATE npc_lines SET text = ? WHERE id = 'line-hal-meet'").run("word ".repeat(21).trim());
     assert.ok(ruleSet(db).has("npc-line-length"));
     const db2 = await buildWithNpcs();
-    db2.prepare("UPDATE npc_lines SET text = ? WHERE id = 'line-ada-meet'").run("Hi <b>there</b>");
+    db2.prepare("UPDATE npc_lines SET text = ? WHERE id = 'line-hal-meet'").run("Hi <b>there</b>");
     assert.ok(ruleSet(db2).has("npc-line-plain"));
     const db3 = await buildWithNpcs();
-    db3.prepare("UPDATE npc_lines SET text = ? WHERE id = 'line-ada-intro-isotopes'").run("There are 4242 isotopes here.");
+    db3.prepare("UPDATE npc_lines SET text = ? WHERE id = 'line-hal-intro-isotopes'").run("There are 4242 isotopes here.");
     const f = validateCurriculum(db3).findings.find((x) => x.rule === "npc-line-facts");
     assert.ok(f && f.severity === "warning");
   });
@@ -410,9 +410,9 @@ describe("NPC teachers (docs/features/NPC_TEACHERS_SPEC.md §7.3)", () => {
     const story = db.prepare("SELECT lesson_id, id, data FROM lesson_cards WHERE type = 'story' AND lesson_id = 'atoms-are-everywhere'").get();
     assert.ok(story, "Unit 1 has a story card");
     const set = (speaker) => db.prepare("UPDATE lesson_cards SET data = ? WHERE lesson_id = ? AND id = ?").run(JSON.stringify({ ...JSON.parse(story.data), speaker }), story.lesson_id, story.id);
-    set("npc-ada");
-    assert.ok(!ruleSet(db).has("npc-speaker"));
     set("npc-hal");
+    assert.ok(!ruleSet(db).has("npc-speaker"));
+    set("npc-ada");
     assert.ok(ruleSet(db).has("npc-speaker"));
     set("npc-nobody");
     assert.ok(ruleSet(db).has("npc-speaker"));
@@ -520,13 +520,13 @@ describe("Unit 2 content", () => {
     assert.doesNotMatch(other, /irradiated|contaminat|non-ionizing|dose|shield|sievert|detector|geiger/i);
   });
 
-  it("the Becquerel story is told once: in Unit 2 lesson 5 as a Core story by Hal, and no longer in Unit 1", () => {
+  it("the Becquerel story is told once: in Unit 2 lesson 5 as a Core story by Ada, and no longer in Unit 1", () => {
     const db = build();
     const stories = db.prepare("SELECT lesson_id, id, tier, data FROM lesson_cards WHERE data LIKE '%Becquerel%' AND type = 'story'").all();
     assert.equal(stories.length, 1);
     assert.equal(stories[0].lesson_id, "radioactivity-is-natural");
     assert.equal(stories[0].tier, "core");
-    assert.equal(JSON.parse(stories[0].data).speaker, "npc-hal");
+    assert.equal(JSON.parse(stories[0].data).speaker, "npc-ada");
     assert.ok(db.prepare("SELECT 1 FROM content_references WHERE id = 'ref-becquerel-1896'").get(), "the reference is kept");
   });
 
@@ -608,13 +608,13 @@ describe("curriculum rules reject broken Unit 2 simulations", () => {
   });
 });
 
-describe("Hal's lines (Unit 2 teacher)", () => {
-  it("Hal is the unit's teacher with a meet, a sign-off and an intro for each of the five lessons", async () => {
+describe("Ada's lines (Unit 2 teacher)", () => {
+  it("Ada is the unit's teacher with a meet, a sign-off and an intro for each of the five lessons", async () => {
     const db = build();
     db.exec(npcsDdl());
     await seedNpcs(db);
-    assert.equal(db.prepare("SELECT teacher_npc_id FROM units WHERE id = 'radioactivity'").get().teacher_npc_id, "npc-hal");
-    const kinds = db.prepare("SELECT kind, lesson_id FROM npc_lines WHERE npc_id = 'npc-hal'").all();
+    assert.equal(db.prepare("SELECT teacher_npc_id FROM units WHERE id = 'radioactivity'").get().teacher_npc_id, "npc-ada");
+    const kinds = db.prepare("SELECT kind, lesson_id FROM npc_lines WHERE npc_id = 'npc-ada'").all();
     assert.ok(kinds.some((l) => l.kind === "meet") && kinds.some((l) => l.kind === "sign_off"));
     assert.deepEqual(kinds.filter((l) => l.kind === "lesson_intro").map((l) => l.lesson_id).sort(), ["alpha-beta-gamma", "decay-chains", "half-life", "radioactivity-is-natural", "why-nuclei-decay"]);
   });

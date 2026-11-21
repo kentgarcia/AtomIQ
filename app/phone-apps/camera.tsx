@@ -56,11 +56,11 @@ import Animated, {
   Easing,
   cancelAnimation,
   useAnimatedStyle,
-  useReducedMotion,
   useSharedValue,
   withSequence,
   withTiming,
 } from "react-native-reanimated";
+import { useReducedMotion } from "@/components/motion/use-reduced-motion";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const DARK = EEL[2];

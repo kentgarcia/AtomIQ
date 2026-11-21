@@ -39,6 +39,10 @@ const FILE_EXCEPTIONS = new Map([
     "EX-15: Radiation Shield Lab picture (shield materials and the three kinds of radiation, flat face and lip), same hues in light and dark.",
   ],
   [
+    "components/phone/phone-boot-art.ts",
+    "EX-18: the phone's power-on screen (a dark screen, white name, yellow bar), the same in light and dark like a real phone's boot.",
+  ],
+  [
     "components/npc/npc-palette.ts",
     "EX-12: NPC teacher palette (official Duolingo-style colours, skin and hair trios, muted ramp), same in light and dark.",
   ],

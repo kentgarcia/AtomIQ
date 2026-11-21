@@ -12,11 +12,11 @@ import Animated, {
   Easing,
   cancelAnimation,
   useAnimatedStyle,
-  useReducedMotion,
   useSharedValue,
   withTiming,
   type SharedValue,
 } from "react-native-reanimated";
+import { useReducedMotion } from "@/components/motion/use-reduced-motion";
 
 import { ENEMY_KINDS, type BlockTile, type EnemyKind, type Level } from "./platformer-core";
 import {

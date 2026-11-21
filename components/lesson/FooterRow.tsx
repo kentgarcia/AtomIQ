@@ -9,7 +9,8 @@
  */
 
 import type { ReactNode } from "react";
-import Animated, { FadeIn, FadeInDown, FadeOut, FadeOutDown, LinearTransition, useReducedMotion } from "react-native-reanimated";
+import Animated, { FadeIn, FadeInDown, FadeOut, FadeOutDown, LinearTransition } from "react-native-reanimated";
+import { useReducedMotion } from "@/components/motion/use-reduced-motion";
 
 import { EASE_OUT } from "@/components/motion/motion";
 import { IconButton } from "@/components/ui/icon-button";

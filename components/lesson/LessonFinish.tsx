@@ -9,7 +9,8 @@ import LottieView from "lottie-react-native";
 import { useState } from "react";
 import { Image, Linking, Pressable, ScrollView, View } from "react-native";
 import { Text } from "@/components/ui/text";
-import Animated, { FadeInDown, Keyframe, useReducedMotion } from "react-native-reanimated";
+import Animated, { FadeInDown, Keyframe } from "react-native-reanimated";
+import { useReducedMotion } from "@/components/motion/use-reduced-motion";
 
 import { useBottomInset } from "@/components/layout";
 import { EASE_OUT } from "@/components/motion/motion";

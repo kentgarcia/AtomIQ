@@ -63,3 +63,8 @@ content/database/*.bak-*
 
 # Unused remainder of the licensed SFX library (see docs/SFX_SPEC.md §3, §4.2)
 assets/sfx/kent-sfx/
+
+# Local tooling and private skills: never committed
+.claude/
+.opencode/
+.vscode/

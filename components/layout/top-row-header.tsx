@@ -13,9 +13,9 @@ import { useRouter } from "expo-router";
 import { useEffect, useId, useMemo, useRef, useState, type ReactNode } from "react";
 import { Image, Pressable, View } from "react-native";
 import Animated, {
-    LinearTransition,
-    useReducedMotion,
+  LinearTransition,
 } from "react-native-reanimated";
+import { useReducedMotion } from "@/components/motion/use-reduced-motion";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Avatar } from "@/components/avatar/Avatar";

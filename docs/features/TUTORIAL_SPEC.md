@@ -1,5 +1,8 @@
 # AtomIQ: Tutorial Specification (Shrodi's tour)
 
+> **Motion changed 2026-11-21 (supersedes §4.1 motion, §8 and everything below that glides, pulses, bobs, shakes, stamps or types):** the tour has no animation. The dim, the hole, the pointing hand (leaning, not bobbing) and Shrodi's still picture with the line already shown are simply there; the layer, the closing card and the bubble have no fade, pop or typing; a tap on the dim only plays a cue. Beats, targets, locks and rules are unchanged. Holds are short (150 ms on a screen, 400 ms on Home, 150 ms after a dialog) and a control that never holds still is lit after 800 ms. Reason: the owner asked for it to be "straightforward and fast", and the first Android reports showed it dropping frames.
+
+
 **Status:** First pass BUILT 2026-11-20 (phases 0 to 3: `test:tutorial`, `test:tutorial-fx`, `check:tutorial`, typecheck and the related gates pass; **never seen on a screen or a device**, so the device pass in §12 is still open). Built: the catalog and rules (`services/tutorial-core.ts`), the store and runtime (`services/tutorial.ts`), the overlay (`components/tutorial/`), both layer hosts, the three chapters and the five screen intros, the lesson redirect, the diamond reward (5), the Settings rows, the Delete Account wipe. Where the build differs from the draft, §14 says how.
 **Owner:** AtomIQ product, design and engineering
 **Applies to:** new `components/tutorial/` (`TutorialLayer`, `Spotlight`, `TutorialBubble`, `tutorial-fx-core.ts`, `use-tutorial-target.ts`), new `services/tutorial-core.ts` (framework-free: catalog, rules, SQL), `services/tutorial.ts` (runtime), `hooks/use-tutorial.ts`, a `tutorial_steps` table in `services/local-first/schema.ts`, `app/_layout.tsx` (the layer is mounted here), `app/(tabs)/_layout.tsx` (tab targets), `app/(tabs)/index.tsx` (Home targets), `components/lesson/LessonPreviewLayer.tsx` (a second layer host), `components/ui/modal-dialog.tsx` (the "busy" signal), `app/settings.tsx` (two rows), `services/database.ts` (Delete Account wipe), and a one-line `useTutorialTarget` in each screen that gets a beat.
@@ -93,7 +96,7 @@ const t = useTutorialTarget("home.node.current"); // { ref, onLayout }
 <Pressable ref={t.ref} onLayout={t.onLayout} ... />
 ```
 
-A target registers its view in a registry (`target-registry.ts`) keyed by `TargetId` (`home.node.current`, `tab.feed`, `tab.phone`, `feed.reaction`, `phone.app.chats`, `quests.chest.daily`, `profile.shop`...). While a beat is active the layer measures the view with `measureInWindow` every 100 ms (one view, cheap), so a node that is popping, a list that is still scrolling or a layout that moved is followed by the hole. When the target is not on screen (a scroll view), the layer asks the screen to scroll it in (`scrollIntoView` registered with the target) and waits.
+A target registers its view in a registry (`target-registry.ts`) keyed by `TargetId` (`home.node.current`, `tab.feed`, `tab.phone`, `phone.app.chats`, `quests.chest.daily`, `profile.shop`...). While a beat is active the layer measures the view with `measureInWindow` every 100 ms (one view, cheap), so a node that is popping, a list that is still scrolling or a layout that moved is followed by the hole. When the target is not on screen (a scroll view), the layer asks the screen to scroll it in (`scrollIntoView` registered with the target) and waits.
 
 **Lit in place by default, cloned only when it must be.** The real control is lit where it is, so nothing is duplicated and nothing drifts from the real UI. A target may opt in to a **clone** (`useTutorialTarget(id, { clone: () => <Thing .../> })`): the layer draws that element above the dim at the measured rectangle, and its press calls the real handler. Use it only where lighting in place cannot work: a control inside a moving scroll view that must hold still, or a transient piece (the Home bubble, a preview button) that would otherwise need its own host (§4.4). Every other target stays in place. The clone is a render prop of the real component with the same props, never a redrawn copy.
 
@@ -140,9 +143,9 @@ Waits for the map's own unlock moment (the node stamps, the next one pops) and a
 | # | Screen | Lit | Shrodi says | Completes when |
 |---|---|---|---|---|
 | 1 | Home | the Feed tab (it has its dot) | "Nice! Your teachers noticed. See what they posted." [happy] | `tab-feed-opened` |
-| 2 | Feed | the first post's reaction pill | "Tap the heart to react!" [smile] | `reaction-opened` |
+| 2 | Feed | nothing lit (Shrodi alone, "Got it") | "Teachers post here from time to time. Come back often!" [happy] | the learner presses Got it (`feed.new-posts`) |
 
-Feed posts are made the moment a lesson completes, so a post about the lesson is there. If the Feed is empty (the learner switched Feed posts off), beat 2 falls back to a `look` beat on the page.
+Feed posts are made the moment a lesson completes, so a post about the lesson is there. Beat 2 is a `look` beat on purpose: the earlier reaction steps lit a pill that lives inside the feed list, which on a small screen or with large text is below the fold, and the learner cannot scroll while only the lit control works. It needs nothing on screen, so it works with an empty feed too.
 
 ### 5.3 Chapter `phone` (trigger: `feed` done)
 
@@ -300,7 +303,7 @@ Before hand-off, as always: `sync-content` (nothing changes), `typecheck`, `lint
 
 ## 14. As built: where it differs from the draft
 
-- **Event `reaction-opened`, not `reacted`.** The lit pill only opens the picker; the four reactions are outside the hole, so waiting for a chosen reaction would have trapped the learner. The beat ends when the pill is pressed and the learner picks (or not) on their own.
+- **No reaction step (2026-11-21).** The tour used to light the first post's reaction pill and then the open picker (`feed.react`, `feed.pick`, events `reaction-opened`, `reacted`, targets `feed.reaction`, `feed.picker`). On a small screen or with large text the pill is off screen, and the learner cannot scroll while only the lit control works, so the steps were unreachable. They are gone, with their targets, events and the lit wrappers in the feed; ids are not reused. A learner who had recorded them keeps their rows; a learner mid-chapter simply sees the new look beat.
 - **The Phone hand-over is kept, not replaced.** The phone's own first-open hand-over and install moments still play; the Phone screen holds the tour (`useTutorialBusy`) until they have finished, then `phone.chats` lights Chats. This avoids touching the phone's intro code.
 - **Screen intros are recorded per beat,** not "seen or not" (a learner who leaves an intro half way resumes at its next beat). They still never repeat once finished.
 - **Resume is a step-back rule** (`resumeAdjust`): while the next beat of an unfinished chapter is unstable, the beat before it is forgotten until the next one is stable. It runs on the first read of a session and whenever a lit transient thing disappears (`missingAction` returns `step-back`).
@@ -311,7 +314,7 @@ Before hand-off, as always: `sync-content` (nothing changes), `typecheck`, `lint
 
 ## 15. Second pass: locked tabs, the story, a longer Feed beat
 
-- **Feed chapter is three beats.** `feed.react` (the pill, until `reaction-opened`), then `feed.pick` (the open picker's four reactions, until `reacted`; unstable, so a closed picker steps back to the pill). Only the first card registers `feed.picker`.
+- **Feed chapter is two beats.** `feed.tab` (the tab, until `tab-feed-opened`), then `feed.new-posts` (a `look` beat with no target: new posts arrive from time to time).
 - **Phone chapter is three beats.** After `phone.chats` the tour follows to the Chats list (`chats` is a screen now) and lights Shrodi's story `Your first lesson!` (`chats.story`, until `story-thread-opened`, also sent by the thread screen however it was opened). The story (`chat-shrodi-up-first` plus `chat-shrodi-tour-*`) is a short walk round the app; the migration is `scripts/content-migration/update-shrodi-tour-chat.mjs`.
 - **Tabs are locked** (§ rules in `tabLocked`): Home always open; Feed from its chapter; Phone from its chapter; Quests, Games, Profile and everything else when the tour ends. Ends = Skip tour, an existing learner, Tips off, a replay (it writes `MARK_FREE` first), or the last beat. A locked tab sounds `ui.invalid` and opens a dialog ("Finish your first lesson..." or "Follow Shrodi's tour..."); a locked tab reached any other way is sent Home.
 - **Profile intro** is about the profile: `profile.passport` (look), `profile.badges` (look), `profile.flip` (tap the flip button, until `passport-flipped`). The Shop beat is gone from it; the Shop intro (`shop.grid`) shows on visiting the Shop. The Profile's Shop button is locked until the Shop app is on the phone (finish the second lesson; the Shop used to open after the first).

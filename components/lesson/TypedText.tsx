@@ -8,7 +8,7 @@
 import { useEffect, useMemo, useState } from "react";
 import type { StyleProp, TextStyle } from "react-native";
 import { Text } from "@/components/ui/text";
-import { useReducedMotion } from "react-native-reanimated";
+import { useReducedMotion } from "@/components/motion/use-reduced-motion";
 
 import { plainText, splitTerms } from "@/content/curriculum/terms";
 
@@ -16,11 +16,11 @@ import { playSfx } from "@/services/sfx";
 import { BLIP_EVERY, blipRate } from "@/services/sfx-core";
 
 import { TermText, useCardStyles } from "./cards/shared";
-import { clipSegments, totalChars, visibleCount } from "./typewriter-core";
+import { clipSegments, stepped, totalChars, visibleCount } from "./typewriter-core";
 import { useTheme } from "@/theme";
 
-/** How often the typed length is refreshed, ms (the text is short; this keeps it smooth, not busy). */
-const TICK_MS = 33;
+/** How often the typed length is looked at, ms. It changes in steps of `TYPE_STEP` characters (about 16 times a second), not on every tick: each change re-lays-out the bubble. */
+const TICK_MS = 60;
 
 /** The number of characters showing: counts up while `active`, the whole text otherwise. */
 function useTypedCount(total: number, active: boolean, blips: boolean, startAt: number): number {
@@ -31,13 +31,13 @@ function useTypedCount(total: number, active: boolean, blips: boolean, startAt: 
     const start = Date.now() + startAt;
     let blipped = 0;
     const id = setInterval(() => {
-      const n = visibleCount(Date.now() - start, total);
+      const n = stepped(visibleCount(Date.now() - start, total), total);
       // A soft blip for every third character shown (docs/features/SFX_SPEC.md §6.3); the cue's own gap
       // keeps a fast tick from stacking them. It stops with the typing: this interval is cleared.
       const group = Math.floor(n / BLIP_EVERY);
       if (blips && group > blipped && n < total) void playSfx("lesson.blip", { rate: blipRate(Math.random()) });
       blipped = group;
-      setCount(n);
+      setCount((prev) => (prev === n ? prev : n));
       if (n >= total) clearInterval(id);
     }, TICK_MS);
     return () => clearInterval(id);

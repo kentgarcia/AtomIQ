@@ -1,7 +1,7 @@
 import { Component, memo, useMemo, useState, type ReactNode } from "react";
 import { Pressable, View, type LayoutChangeEvent } from "react-native";
 import { Text } from "@/components/ui/text";
-import { useReducedMotion } from "react-native-reanimated";
+import { useReducedMotion } from "@/components/motion/use-reduced-motion";
 
 import { Icon } from "@/components/ui/icon";
 import type { VisualBlock, VisualSource } from "@/content/types";

@@ -7,9 +7,9 @@
     {
       "id": "npc-ada",
       "name": "Ada",
-      "title": "Atom teacher",
-      "field": "atoms",
-      "bio": "Ada has asked what things are made of since she was small. She teaches the atom: what is inside it, and why that matters.",
+      "title": "Radioactivity teacher",
+      "field": "radioactivity",
+      "bio": "hi, i'm ada. i teach why some atoms change and how long it takes, which is my favourite thing in the whole world. i carry a flask called sparkle, and one of my bows is, um, slightly green now~",
       "spec": {
         "skin": {
           "base": "#FFD9C2",
@@ -17,69 +17,74 @@
           "feature": "#EBA17E"
         },
         "head": "tombstone",
-        "headWidth": 100,
-        "eyes": "pill",
+        "headWidth": 102,
+        "eyes": "sparkle",
         "nose": "single",
+        "blush": "#F5A4A4",
         "hair": {
-          "style": "curls",
+          "style": "pigtailbows",
           "color": "#7C3F25",
           "shade": "#64311D"
         },
         "outfit": {
-          "kind": "sweater",
-          "color": "#1CB0F6",
-          "shade": "#1899D6"
+          "kind": "apron",
+          "color": "#FFAADE",
+          "shade": "#F58BC7",
+          "collar": "#FFCE8E"
         },
         "accent": {
-          "kind": "marble",
-          "color": "#FF4B4B",
-          "shade": "#EA2B2B"
+          "kind": "flask",
+          "color": "#CE82FF",
+          "shade": "#9069CD"
         }
       },
-      "position": 1
+      "position": 2
     },
     {
       "id": "npc-hal",
       "name": "Hal",
-      "title": "Radioactivity teacher",
-      "field": "radioactivity",
-      "bio": "Hal is patient and tells things slowly and exactly. He teaches why some atoms change, and how long that takes.",
+      "title": "Atom teacher",
+      "field": "atoms",
+      "bio": "I am Hal. I teach what is inside the atom, slowly and exactly, because small things deserve it. I keep rocks on my desk and I have named every one. Reginald is in charge.",
       "spec": {
         "skin": {
-          "base": "#D9A066",
-          "shade": "#C4854F",
-          "feature": "#A8683A"
+          "base": "#FFCBA3",
+          "shade": "#F5B585",
+          "feature": "#E99B5F"
         },
         "head": "capsule",
-        "headWidth": 104,
-        "eyes": "round",
-        "nose": "double",
+        "headWidth": 106,
+        "eyes": "pill",
+        "nose": "button",
         "hair": {
-          "style": "crop",
-          "color": "#EBE3E3",
-          "shade": "#D6C9C9"
+          "style": "cloud",
+          "color": "#FFB100",
+          "shade": "#E7A601"
         },
-        "facialHair": "moustache",
         "outfit": {
-          "kind": "vest",
-          "color": "#FFC800",
-          "shade": "#E7A601",
-          "collar": "#84D8FF"
+          "kind": "whitecoat",
+          "color": "#2B70C9",
+          "shade": "#1453A3",
+          "collar": "#D2E4E8"
         },
         "accent": {
-          "kind": "watch",
-          "color": "#2B70C9",
-          "shade": "#1453A3"
+          "kind": "sample",
+          "color": "#E5A259",
+          "shade": "#A56644"
+        },
+        "cover": {
+          "color": "#FFC800",
+          "shade": "#E7A601"
         }
       },
-      "position": 2
+      "position": 1
     },
     {
       "id": "npc-kofi",
       "name": "Kofi",
       "title": "Nuclear energy teacher",
       "field": "nuclear-energy",
-      "bio": "Kofi is an engineer who likes to see how things work. He teaches where nuclear energy comes from and how a reactor uses it.",
+      "bio": "I'm Kofi, an engineer. I teach where nuclear energy comes from and how a reactor uses it. I like to see how things work, so we'll build the picture piece by piece. The hard hat is optional. Mine isn't!",
       "spec": {
         "skin": {
           "base": "#F5B092",
@@ -114,7 +119,7 @@
       "name": "Mina",
       "title": "Radiation and health teacher",
       "field": "radiation-and-the-body",
-      "bio": "Mina is warm and calm about risk. She teaches what radiation does to the body, and how big the dose really is.",
+      "bio": "I'm Mina. I teach what radiation does to the body, and how big a dose really is. A lot of people worry about it, and that's fair. I'll go through it with you, one calm step at a time, until it makes sense.",
       "spec": {
         "skin": {
           "base": "#A56644",
@@ -149,7 +154,7 @@
       "name": "Ray",
       "title": "Radiation teacher",
       "field": "radiation-and-matter",
-      "bio": "Ray is practical and a little blunt. He teaches what radiation does when it meets things, and how to stop it.",
+      "bio": "I'm Ray. I teach what radiation does when it meets things, and how to stop it. I'll tell you straight: no hype, no scare, just what the numbers say. Ask me anything. You'll get a short answer.",
       "spec": {
         "skin": {
           "base": "#7A4A33",
@@ -184,7 +189,7 @@
       "name": "Sage",
       "title": "Safety and society teacher",
       "field": "safety-waste-society",
-      "bio": "Sage weighs both sides before deciding. They teach how nuclear power is kept safe, what happens to waste, and the choices society makes.",
+      "bio": "I'm Sage. I teach how nuclear power is kept safe, what happens to waste, and the choices a society makes. I like to look at both sides before I decide. I'll show you both, and then it's your call.",
       "spec": {
         "skin": {
           "base": "#E0B48A",
@@ -218,7 +223,7 @@
       "name": "Tess",
       "title": "Nuclear technology teacher",
       "field": "nuclear-technology",
-      "bio": "Tess is quick and loves gadgets. She teaches how nuclear tools help in hospitals, farms and factories.",
+      "bio": "I'm Tess! I teach how nuclear tools help in hospitals, farms and factories. I love a good gadget. Short lessons, quick answers, and you can be on to the next one before I finish this sentence!",
       "spec": {
         "skin": {
           "base": "#FFCBA3",

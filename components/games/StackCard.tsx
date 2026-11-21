@@ -14,7 +14,8 @@ import { createStyles, fontFaces, useTheme } from "@/theme";
 import { controls } from "@/theme/tokens";
 import React from "react";
 import { View } from "react-native";
-import Animated, { FadeIn, ZoomIn, useReducedMotion } from "react-native-reanimated";
+import Animated, { FadeIn, ZoomIn } from "react-native-reanimated";
+import { useReducedMotion } from "@/components/motion/use-reduced-motion";
 
 const isHex = (value: string) => /^#[0-9a-fA-F]{6}$/.test(value);
 

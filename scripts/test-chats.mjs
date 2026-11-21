@@ -315,6 +315,72 @@ test("every earned story is unlocked at once, from a teacher in Contacts, once",
   assert.ok(core.earnedStories(storyNodes, base({ returnedOn: "2026-11-20" }), ["npc-ada"], old).some((u) => u.event === "welcome_back:2026-11-20"));
 });
 
+// ---- a teacher's profile: every story, unlocked or not ---------------------------------------
+
+const labels = { unitTitleOf: (id) => ({ u1: "Inside the Atom" })[id], appNameOf: (id) => ({ "field-notes": "Field Notes" })[id] };
+const stories = (input, contacts, threads = [], messages = [], npc = "npc-ada", unit = "Radioactivity") =>
+  core.storyList(storyNodes, npc, input, contacts, core.summarizeThreads(threads, messages), labels, unit);
+
+test("a trigger says what it asks of the learner, and how far they are", () => {
+  const input = base({ lessonsCompleted: 2, level: 3 });
+  assert.deepEqual(core.storyCondition("lessons_completed:3", input, labels), { text: "Finish 3 lessons.", progress: "2 of 3 lessons finished" });
+  assert.equal(core.storyCondition("lessons_completed:1", input, labels).text, "Finish your first lesson.");
+  assert.deepEqual(core.storyCondition("level_reached:4", input, labels), { text: "Reach level 4.", progress: "You are level 3" });
+  assert.equal(core.storyCondition("unit_complete:u1", input, labels).text, 'Finish the unit "Inside the Atom".');
+  assert.equal(core.storyCondition("unit_complete:nope", input, labels).text, "Finish a certain unit.");
+  assert.equal(core.storyCondition("app_installed:field-notes", input, labels).text, "Get the Field Notes app on your phone.");
+  assert.match(core.storyCondition("welcome_back", input, labels).text, /Come back after 3 days/);
+  // the count never goes past the goal
+  assert.equal(core.storyCondition("lessons_completed:3", base({ lessonsCompleted: 9 }), labels).progress, "3 of 3 lessons finished");
+});
+
+test("the profile lists every story of the teacher: locked ones with their condition, in the order written", () => {
+  const got = stories(base({ lessonsCompleted: 1 }), true);
+  assert.deepEqual(got.map((e) => e.nodeId), ["npc-ada-up1", "npc-ada-up2", "npc-ada-up3", "npc-ada-up4", "npc-ada-up5"]);
+  assert.ok(got.every((e) => e.state === "locked" && e.threadId === null && e.event === null));
+  assert.equal(got.find((e) => e.nodeId === "npc-ada-up3").condition, "Finish 3 lessons.");
+  assert.equal(got.find((e) => e.nodeId === "npc-ada-up4").progress, "You are level 1");
+  // another teacher's stories are not listed
+  assert.ok(stories(base(), true, [], [], "npc-hal").every((e) => e.npcId === "npc-hal"));
+  assert.deepEqual(stories(base(), true, [], [], "npc-nobody"), []);
+});
+
+test("an earned story with no thread is ready to start, with the key its thread will carry", () => {
+  const got = stories(base({ lessonsCompleted: 4 }), true);
+  const up3 = got.find((e) => e.nodeId === "npc-ada-up3");
+  assert.deepEqual([up3.state, up3.event], ["ready", "lessons_completed:3"]);
+  assert.equal(got.find((e) => e.nodeId === "npc-ada-up4").state, "locked");
+  // it is not ready for a teacher who is not in Contacts yet: they ask for a lesson of their unit first
+  const away = stories(base({ lessonsCompleted: 4 }), false);
+  assert.ok(away.every((e) => e.state === "locked"));
+  assert.equal(away[0].condition, 'Finish a lesson in "Radioactivity" first.');
+  assert.equal(away[0].progress, null);
+});
+
+test("a story with a thread is new, playing or finished, found by the node it opens at, and keeps its play count", () => {
+  const threads = [
+    thread({ id: "a", origin: "event", event: "lessons_completed:3", entryNodeId: "npc-ada-up3" }),
+    thread({ id: "b", origin: "event", event: "level_reached:4", entryNodeId: "npc-ada-up4", ended: true, plays: 3 }),
+    thread({ id: "c", origin: "event", event: "unit_complete:u1", entryNodeId: "npc-ada-up5" }),
+    thread({ id: "free" }),
+  ];
+  const messages = [msg({ id: "1", threadId: "a", read: false }), msg({ id: "2", threadId: "b", at: 9 }), msg({ id: "3", threadId: "c", at: 5 })];
+  const got = Object.fromEntries(stories(base({ lessonsCompleted: 4, level: 4, unitsCompleted: ["u1"] }), true, threads, messages).map((e) => [e.nodeId, e]));
+  assert.deepEqual([got["npc-ada-up3"].state, got["npc-ada-up3"].threadId], ["new", "a"]);
+  assert.deepEqual([got["npc-ada-up4"].state, got["npc-ada-up4"].plays, got["npc-ada-up4"].lastAt], ["finished", 3, 9]);
+  assert.equal(got["npc-ada-up5"].state, "playing");
+  // a story that was unlocked stays open when the learner no longer meets the trigger (a thread is never taken back)
+  assert.equal(stories(base(), true, threads, messages).find((e) => e.nodeId === "npc-ada-up3").state, "new");
+  // a story is ready only once per key: another story with the same key is not offered when one already has its thread
+  assert.equal(stories(base({ lessonsCompleted: 4 }), true, [threads[0]], messages).find((e) => e.nodeId === "npc-ada-up3").state, "new");
+});
+
+test("Shrodi's stories are listed like a teacher's, and he needs no unit", () => {
+  const nodes = toNodes([n("shrodi-up", "shrodi", "unprompted", [rep("Thanks", "shrodi-bye")], { trigger: "lessons_completed:1" }), n("shrodi-bye", "shrodi", "sign_off")]);
+  const got = core.storyList(nodes, "shrodi", base(), true, [], labels);
+  assert.deepEqual(got.map((e) => [e.nodeId, e.state, e.condition]), [["shrodi-up", "locked", "Finish your first lesson."]]);
+});
+
 // ---- bubbles, unread letters and the pictures ---------------------------------------------
 
 test("a long message is split into bubbles at a blank line", () => {
@@ -544,13 +610,13 @@ test("a conversation's colours come from the teacher's outfit, with text that re
   for (const p of [bee, whale]) assert.ok(contrastBetween(p.base, p.on) >= 3);
 });
 
-test("every teacher's bubble face and link button read at 4.5:1, Ada's bright blue included", async () => {
+test("every teacher's bubble face and link button read at 4.5:1, Tess's bright blue included", async () => {
   const { chatPalette, READABLE } = await import(pathToFileURL(path.resolve("components/phone/chat-palette.ts")).href);
   const { contrastBetween } = await import(pathToFileURL(path.resolve("components/lesson/visual/color-math.ts")).href);
   const { NPC_ROSTER } = await import(pathToFileURL(path.resolve("components/npc/npc-roster.ts")).href);
   assert.ok(NPC_ROSTER.length >= 7);
   for (const n of NPC_ROSTER) {
-    const p = chatPalette(n.spec.outfit);
+    const p = chatPalette(n.spec.cover ?? n.spec.outfit);
     assert.ok(contrastBetween(p.face, p.faceOn) >= READABLE, `${n.name} face ${p.face} on ${p.faceOn}`);
     assert.ok(contrastBetween(p.base, p.on) >= 3, `${n.name} header`);
   }

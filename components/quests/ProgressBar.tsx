@@ -8,10 +8,10 @@ import { View } from "react-native";
 import { Text } from "@/components/ui/text";
 import Animated, {
   useAnimatedStyle,
-  useReducedMotion,
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
+import { useReducedMotion } from "@/components/motion/use-reduced-motion";
 
 import { createStyles, fontFaces, useTheme } from "@/theme";
 import { EASE_OUT } from "@/theme/motion";

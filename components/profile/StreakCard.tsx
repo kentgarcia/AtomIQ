@@ -9,7 +9,8 @@ import { useRouter } from "expo-router";
 import React, { useMemo, useState } from "react";
 import { Pressable, View, type LayoutChangeEvent } from "react-native";
 import { Text } from "@/components/ui/text";
-import Animated, { FadeIn, FadeInDown, useReducedMotion } from "react-native-reanimated";
+import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
+import { useReducedMotion } from "@/components/motion/use-reduced-motion";
 
 import { levelStyleFor } from "@/components/activity/levels";
 import { useActivityDays } from "@/components/activity/use-activity-days";

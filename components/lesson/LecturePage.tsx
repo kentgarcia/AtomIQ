@@ -9,20 +9,20 @@
 import { useMemo } from "react";
 import { View } from "react-native";
 import { Text } from "@/components/ui/text";
-import Animated, { FadeInDown, useReducedMotion } from "react-native-reanimated";
+import Animated, { FadeInDown } from "react-native-reanimated";
+import { useReducedMotion } from "@/components/motion/use-reduced-motion";
 
 import { SfxOnMount } from "@/components/ui/sfx-on-mount";
-import { LearnerBubble, TeacherBubble, bubbleTypeAt, useLessonTeacher } from "@/components/lesson/Conversation";
-import { CascadeIn, useCascadeDirection } from "@/components/motion/cascade-context";
+import { LearnerBubble, TeacherBubble, useLessonTeacher } from "@/components/lesson/Conversation";
+import { useCascadeDirection } from "@/components/motion/cascade-context";
 import { PAGE_FX, popIn } from "@/components/motion/cascade-fx";
 import { EASE_OUT } from "@/components/motion/motion";
 import { useNpc } from "@/components/npc/use-npc";
 import type { ResolvedCard, StoryData } from "@/content/curriculum/types";
 import { createStyles, fontFaces, fontSizes, spacing, useTheme } from "@/theme";
 
-import { FigureView, useCardStyles } from "./cards/shared";
+import { FigureView, TermText, useCardStyles } from "./cards/shared";
 import { lectureSteps } from "./lecture-core";
-import { TypedTermText } from "./TypedText";
 
 const useStyles = createStyles((theme) => ({
   page: { gap: spacing["2xl"] },
@@ -73,14 +73,14 @@ function LectureBlock({ info }: { info: LectureBlockInfo }) {
   return (
     <View style={styles.block}>
       {kicker || data.title ? (
-        <CascadeIn at={PAGE_FX.title} style={styles.head}>
+        <View style={styles.head}>
           {kicker ? <Text style={styles.tag}>{kicker}</Text> : null}
           {data.title ? (
             <Text accessibilityRole="header" style={styles.title}>
               {data.title}
             </Text>
           ) : null}
-        </CascadeIn>
+        </View>
       ) : null}
       {info.guess ? (
         <LearnerBubble>
@@ -101,7 +101,7 @@ function LectureBlock({ info }: { info: LectureBlockInfo }) {
         return (
           <TeacherBubble key={i} first={first} teller={teller} entering={latest ? enter : undefined} arriving={latest && direction ? (i === 0 ? "page" : "step") : undefined}>
             {latest && !direction ? <SfxOnMount cue="lesson.bubble" /> : null}
-            <TypedTermText text={step.text} style={card.body} typing={latest} startAt={latest && direction ? bubbleTypeAt(i === 0 ? "page" : "step", first) : 0} />
+            <TermText text={step.text} style={card.body} />
           </TeacherBubble>
         );
       })}

@@ -5,6 +5,7 @@
  * each arrival plays an install moment here, and the very first open hands the phone over with a line from Shrodi.
  */
 
+import { useRenderTimer } from "@/components/dev/render-timer";
 import {
   avatarBackground,
   normalizeAvatar,
@@ -13,6 +14,7 @@ import { PatternLayer } from "@/components/avatar/PatternLayer";
 import { HeaderButton, ScreenHeader, useTabBarInset } from "@/components/layout";
 import { contrastBetween } from "@/components/lesson/visual/color-math";
 import { AppIcon } from "@/components/phone/AppIcon";
+import { PhoneBoot } from "@/components/phone/PhoneBoot";
 import { installStart } from "@/components/phone/phone-fx-core";
 import { WALLPAPERS } from "@/components/phone/wallpaper-art";
 import { OWN_WALLPAPER, isIllustrated } from "@/components/phone/wallpaper-core";
@@ -37,7 +39,9 @@ import {
   unlockRequirement,
   type PhoneApp,
 } from "@/services/phone-core";
-import { playSfx, playSfxSequence, warmSfxGroup } from "@/services/sfx";
+import { useSfxSet } from "@/components/motion/use-sfx-set";
+import { useReducedMotion } from "@/components/motion/use-reduced-motion";
+import { playSfx, playSfxSequence } from "@/services/sfx";
 import { getPhoneIntroSeen, setPhoneIntroSeen } from "@/services/storage";
 import {
   createStyles,
@@ -66,6 +70,7 @@ import {
 const INTRO_APPS = 5;
 
 export default function PhoneScreen() {
+  useRenderTimer("/phone");
   const { theme } = useTheme();
   const styles = useMemo(() => makeStyles(theme), [theme]);
   const c = theme.colors;
@@ -91,7 +96,19 @@ export default function PhoneScreen() {
   // The apps installing during this visit, fixed when the phone first has them so the batch does not shift as
   // each one lands. A new visit (the tab gaining focus again) takes a new batch.
   const [batch, setBatch] = useState<string[] | null>(null);
+  // The grid is drawn once the phone first knows what is installing, and then STAYS: it used to be torn down every time the tab lost focus
+  // (the batch went null and every icon unmounted) and built again on return, a 230 to 280 ms frame on every visit. A later visit only
+  // re-chooses the batch; an app waiting to install shows behind its lock until then, as it always did.
+  const [gridDrawn, setGridDrawn] = useState(false);
   const introFinished = useRef(false);
+  // The power-on screen (components/phone/PhoneBoot.tsx), only on the very first open and never with animation off. It is the phone's
+  // loading: stage 0 plays it, 1 mounts the icon grid behind it (the heavy frame, while nothing moves), 2 lifts it and starts the installs,
+  // 3 is over (and the value of every ordinary visit).
+  const reduced = useReducedMotion();
+  const [bootStage, setBootStage] = useState(0);
+  const booting = intro === true && !reduced && bootStage < 3;
+  const stage = booting ? bootStage : 3;
+  const [gridLaidOut, setGridLaidOut] = useState(false);
   // Progress made on another tab is what puts an app on the phone, so each visit reads again and waits for that
   // read before choosing what to install (a read that started before the tab gained focus may be stale)
   const [minVersion, setMinVersion] = useState(0);
@@ -111,38 +128,35 @@ export default function PhoneScreen() {
       return () => {
         setFocused(false);
         setBatch(null);
-        // The hand-over has played: the next visit is an ordinary one
+        // The hand-over has played: the next visit is an ordinary one; one left half way starts the power-on again
         if (introFinished.current) setIntro(false);
+        else setBootStage(0);
       };
     }, [refresh]),
   );
   useEffect(() => {
-    if (
-      batch !== null ||
-      !focused ||
-      !phone.loaded ||
-      phone.version < minVersion ||
-      intro === null
-    )
-      return;
-    setBatch(
-      phone.newApps
-        .slice(0, intro ? INTRO_APPS : INSTALLS_PER_VISIT)
-        .map((a) => a.id),
-    );
-  }, [batch, focused, phone.loaded, phone.version, minVersion, phone.newApps, intro]);
+    if (!focused || !phone.loaded || phone.version < minVersion || intro === null) return;
+    // During the power-on the grid waits for stage 1 and the installs for stage 2
+    if (stage >= 1 && !gridDrawn) setGridDrawn(true);
+    if (stage >= 2 && batch === null) {
+      setBatch(
+        phone.newApps
+          .slice(0, intro ? INTRO_APPS : INSTALLS_PER_VISIT)
+          .map((a) => a.id),
+      );
+    }
+  }, [batch, gridDrawn, stage, focused, phone.loaded, phone.version, minVersion, phone.newApps, intro]);
 
   const batchApps = batch ?? [];
   // The hand-over's opening chime, once per batch. Every install, the hand-over's too, pops with `reward.pop` as its icon
   // lands, played by AppIcon on its own install clock.
   const soundedBatch = useRef<string[] | null>(null);
-  useEffect(() => {
-    warmSfxGroup("phone");
-  }, []);
+  useSfxSet("phone");
   useEffect(() => {
     if (batch === null || batch.length === 0 || intro === null || soundedBatch.current === batch) return;
     soundedBatch.current = batch;
-    if (intro) {
+    // With the power-on, its own chime has played already
+    if (intro && !booting) {
       return playSfxSequence([
         { cue: "phone.start-1", at: 0 },
         { cue: "phone.start-2", at: 230 },
@@ -150,7 +164,7 @@ export default function PhoneScreen() {
       ]);
     }
     // A later arrival's pops are played by each icon as it installs (AppIcon), not here
-  }, [batch, intro]);
+  }, [batch, intro, booting]);
   const done = useRef(new Set<string>());
   // Shrodi's tour waits for the apps of this visit to finish installing, then lights Chats (docs/features/TUTORIAL_SPEC.md §5.3)
   const [installsDone, setInstallsDone] = useState(false);
@@ -176,14 +190,14 @@ export default function PhoneScreen() {
       setInstallsDone(false);
     }
   }, [batch]);
-  useTutorialBusy(focused && (!phone.loaded || (batchApps.length > 0 && !installsDone)), "phone installs");
+  useTutorialBusy(focused && (booting || !phone.loaded || (batchApps.length > 0 && !installsDone)), "phone installs");
 
   // What shows: every live app, in catalog order. Installed apps and the ones installing now are open; all the
   // rest (not unlocked yet, or unlocked and waiting for a later visit to install) sit behind a lock.
   const visible = useMemo(() => {
-    if (batch === null) return [] as PhoneApp[];
+    if (!gridDrawn) return [] as PhoneApp[];
     return PHONE_APPS.filter((a) => a.status === "live");
-  }, [batch]);
+  }, [gridDrawn]);
   const installedIds = useMemo(() => {
     const inBatch = new Set(batch ?? []);
     const seenNow = phone.apps.filter((a) => !phone.newApps.some((n) => n.id === a.id));
@@ -244,6 +258,15 @@ export default function PhoneScreen() {
     router.push(app.route as never);
   };
 
+  // The icons skip a render that only brings new handlers (`sameIconView`), so what they hold must never go stale: these two never change
+  // and always call the newest `open` and `finished`
+  const latest = useRef({ open, finished });
+  useEffect(() => {
+    latest.current = { open, finished };
+  });
+  const openApp = useCallback((app: PhoneApp) => latest.current.open(app), []);
+  const finishApp = useCallback((app: PhoneApp, isIntro: boolean) => latest.current.finished(app, isIntro), []);
+
   // The header's text sits on the wallpaper: on the learner's paint (the default) it is whichever of the theme's text and page colours
   // reads better; the plain wallpaper is the page colour with the theme's text; an illustrated one names its own ink
   const illustrated = isIllustrated(wallpaper) ? WALLPAPERS[wallpaper] : null;
@@ -286,13 +309,14 @@ export default function PhoneScreen() {
       <View style={[styles.wallpaper, { paddingBottom: tabBarInset + 16 }]}>
         <View style={[styles.frame, { maxWidth: contentMaxWidth }]}>
           {/* Nothing is drawn until the phone knows what is installing, so no finished icon shows for a frame first */}
-          {batch !== null ? (
+          {gridDrawn ? (
             <ScrollView
               horizontal
               pagingEnabled
               scrollEnabled={pages.length > 1}
               showsHorizontalScrollIndicator={false}
               onMomentumScrollEnd={onScrollEnd}
+              onLayout={() => setGridLaidOut(true)}
               style={styles.pager}
             >
               {pages.map((pageApps, p) => (
@@ -318,12 +342,12 @@ export default function PhoneScreen() {
                             badge={locked ? null : phone.badgeOf(app)}
                             label={locked ? `${app.name}, locked` : phone.labelOf(app)}
                             locked={locked}
-                            onPress={() => open(app)}
+                            onPress={() => openApp(app)}
                             install={
                               batchIndex >= 0
                                 ? {
                                     delay: installStart(batchIndex),
-                                    onDone: () => finished(app, intro === true),
+                                    onDone: () => finishApp(app, intro === true),
                                     newDot:
                                       intro !== true && !phone.openedOf(app),
                                   }
@@ -362,6 +386,17 @@ export default function PhoneScreen() {
         </View>
 
       </View>
+
+      {/* The power-on, over the whole tab (header too) on the very first open; it is gone, and unmounted, once the dark has lifted.
+          Only while the tab is in front, so a visit left half way starts it again. */}
+      {booting && focused ? (
+        <PhoneBoot
+          gridReady={gridDrawn && gridLaidOut}
+          onMountGrid={() => setBootStage((v) => Math.max(v, 1))}
+          onReveal={() => setBootStage((v) => Math.max(v, 2))}
+          onDone={() => setBootStage(3)}
+        />
+      ) : null}
 
       <ModalDialog
         visible={lockedApp !== null}

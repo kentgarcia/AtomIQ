@@ -9,7 +9,7 @@ import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useMemo } from "react";
 import { View } from "react-native";
-import "react-native-reanimated";
+import { ReduceMotion, ReducedMotionConfig } from "react-native-reanimated";
 
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { ThemeProvider, useTheme } from "@/theme";
@@ -19,11 +19,15 @@ import { TutorialLayer } from "@/components/tutorial/TutorialLayer";
 import { useAppFonts } from "@/hooks/use-app-fonts";
 import { StorageProvider } from "@/services/StorageContext";
 import { installMediaLifecycle, setMediaPathname } from "@/services/media";
-import {
-    initializeSfx,
-    installGlobalUiSfxHandlers,
-    unloadSfx,
-} from "@/services/sfx";
+import { initializeSfx, unloadSfx } from "@/services/sfx";
+import { initMotionLevel, useMotionLevel } from "@/services/motion-level";
+import { initCrashGuard } from "@/services/crash-guard";
+import { CrashPrompt } from "@/components/crash/CrashPrompt";
+import { PERF_PROBE_ON } from "@/components/dev/perf-flag";
+
+// dev-perf: the frame counter and its readout; present only when the probe is in this build (components/dev/perf-flag.ts)
+const PerfCollector: typeof import("@/components/dev/PerfCollector").PerfCollector | null = PERF_PROBE_ON ? require("@/components/dev/PerfCollector").PerfCollector : null;
+const PerfHud: typeof import("@/components/dev/PerfHud").PerfHud | null = PERF_PROBE_ON ? require("@/components/dev/PerfHud").PerfHud : null;
 
 // Keep the native splash up until fonts AND the content database are ready.
 // ContentGate hides it as soon as it has something real to show.
@@ -60,8 +64,16 @@ function AppContent() {
     setMediaPathname(pathname);
   }, [pathname]);
 
+  // The learner's animation level (Settings > Animations). At "Disabled" every Reanimated animation that follows the system's
+  // reduced-motion setting is switched off too, and `useReducedMotion` (components/motion/use-reduced-motion.ts) says so to the rest.
+  const motionLevel = useMotionLevel();
   useEffect(() => {
-    installGlobalUiSfxHandlers();
+    void initMotionLevel();
+    // Did the app die last time? (a flag kept while it is in front; the prompt below offers a lighter animation level)
+    void initCrashGuard();
+  }, []);
+
+  useEffect(() => {
     void initializeSfx();
     // Preferences, AppState and screen-reader listeners for all media.
     const removeMediaLifecycle = installMediaLifecycle();
@@ -92,6 +104,7 @@ function AppContent() {
         <Stack.Screen name="ranks" options={{ headerShown: false }} />
         <Stack.Screen name="daily-facts" options={{ headerShown: false }} />
         <Stack.Screen name="settings" options={{ headerShown: false }} />
+        <Stack.Screen name="beta" options={{ headerShown: false }} />
         <Stack.Screen name="privacy-policy" options={{ headerShown: false }} />
         <Stack.Screen name="terms-of-service" options={{ headerShown: false }} />
         <Stack.Screen name="streak" options={{ headerShown: false }} />
@@ -107,6 +120,8 @@ function AppContent() {
         <Stack.Screen name="shop" options={{ headerShown: false }} />
         {/* dev-sfx: development-only sound effects lab (components/dev/SfxLab.tsx) */}
         <Stack.Screen name="dev-sfx" options={{ headerShown: false }} />
+        {/* dev-perf: the performance probe (components/dev/PerfProbe.tsx), redirects home when it is not in the build */}
+        <Stack.Screen name="dev-perf" options={{ headerShown: false }} />
         <Stack.Screen
           name="achievement-detail"
           options={{ headerShown: false, presentation: "modal" }}
@@ -118,6 +133,11 @@ function AppContent() {
       </Stack>
       {/* Shrodi's tour: above every screen, so it can dim them and light one control (docs/features/TUTORIAL_SPEC.md) */}
       <TutorialLayer host="root" />
+      <CrashPrompt />
+      {motionLevel === "off" ? <ReducedMotionConfig mode={ReduceMotion.Always} /> : null}
+      {/* dev-perf */}
+      {PerfCollector ? <PerfCollector /> : null}
+      {PerfHud ? <PerfHud /> : null}
       </View>
       <StatusBar style={isDark ? "light" : "dark"} />
     </NavigationThemeProvider>

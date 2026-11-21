@@ -10,6 +10,7 @@
  * across the top.
  */
 
+import { coverColors } from "@/components/npc/npc-cover-art";
 import { chatPalette } from "@/components/phone/chat-palette";
 import { ChatButton, ChatFrame, ChatTitle } from "@/components/phone/ChatFrame";
 import { speakerFor } from "@/components/phone/ChatHead";
@@ -30,7 +31,8 @@ import { createStyles, fontFaces, useResponsiveLayout, useTheme } from "@/theme"
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AccessibilityInfo, ScrollView, View, type ScrollViewInstance } from "react-native";
-import Animated, { FadeOut, useReducedMotion } from "react-native-reanimated";
+import Animated, { FadeOut } from "react-native-reanimated";
+import { useReducedMotion } from "@/components/motion/use-reduced-motion";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 /** How long the typing dots show before a bubble: a beat, longer for a longer bubble (never a wait). */
@@ -60,7 +62,7 @@ export default function ChatThreadScreen() {
 
   const speaker = useMemo(() => speakerFor(view?.thread.npcId, cast), [view?.thread.npcId, cast]);
   // The conversation's colours are the teacher's cover (Shrodi has the app's blue)
-  const cover = useMemo(() => (speaker ? { npcId: speaker.npc?.id ?? CHAT_MASCOT_ID, outfit: speaker.npc?.spec.outfit ?? { color: SHRODI_COLORS.fur, shade: SHRODI_COLORS.furShade } } : undefined), [speaker]);
+  const cover = useMemo(() => (speaker ? { npcId: speaker.npc?.id ?? CHAT_MASCOT_ID, outfit: speaker.npc ? coverColors(speaker.npc.spec) : { color: SHRODI_COLORS.fur, shade: SHRODI_COLORS.furShade } } : undefined), [speaker]);
   const palette = useMemo(() => (cover ? chatPalette(cover.outfit) : null), [cover]);
 
   const load = useCallback(async () => {

@@ -18,9 +18,9 @@ const dbPath = path.join(ROOT, "content/database/content.db");
 const dryRun = process.argv.includes("--dry-run");
 
 const CHANGES = [
-  ["line-ada-intro-elements-and-the-periodic-table", "You'll learn the one number that decides an element, then find it on the periodic table.", "The number of protons tells you which element an atom is. Let's build some."],
-  ["line-ada-intro-isotopes", "Atoms of one element can differ a little. You'll learn what isotopes are and how to read them.", "Atoms of one element can differ a little. You'll learn what isotopes are."],
-  ["line-ada-intro-stable-and-unstable-nuclei", "You'll see what holds a nucleus together, and why some nuclei still change over time.", "Some nuclei stay the same and some can change. You'll see why that matters."],
+  ["line-hal-intro-elements-and-the-periodic-table", "You'll learn the one number that decides an element, then find it on the periodic table.", "The number of protons tells you which element an atom is. Let's build some."],
+  ["line-hal-intro-isotopes", "Atoms of one element can differ a little. You'll learn what isotopes are and how to read them.", "Atoms of one element can differ a little. You'll learn what isotopes are."],
+  ["line-hal-intro-stable-and-unstable-nuclei", "You'll see what holds a nucleus together, and why some nuclei still change over time.", "Some nuclei stay the same and some can change. You'll see why that matters."],
 ];
 
 const db = new DatabaseSync(dbPath);

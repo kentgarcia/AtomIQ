@@ -9,7 +9,7 @@
 export type WearTone = "main" | "shade" | "white" | "swan" | "ink" | "gold" | "red" | "blue" | "green" | "pink";
 export type WearPiece = { d: string; tone: WearTone; evenOdd?: boolean } | { line: string; tone: WearTone; w: number };
 
-export const HEADWEAR_STYLES = ["none", "beanie", "cap", "headband", "bow", "crown", "catears", "bunnyears", "flowers", "wizard", "party", "graduation", "hardhat"] as const;
+export const HEADWEAR_STYLES = ["none", "beanie", "cap", "headband", "bow", "crown", "catears", "bunnyears", "flowers", "wizard", "party", "graduation", "hardhat", "bows"] as const;
 export type HeadwearStyle = (typeof HEADWEAR_STYLES)[number];
 export const EYEWEAR_STYLES = ["none", "round", "square", "sunglasses", "heart", "star", "goggles", "eyepatch", "monocle", "cateye"] as const;
 export type EyewearStyle = (typeof EYEWEAR_STYLES)[number];
@@ -185,6 +185,13 @@ export const HEADWEAR: Record<Exclude<HeadwearStyle, "none">, WearPiece[]> = {
     fill(rrect(-9, -105, 18, 55, 8), "shade"),
     fill(circle(30, -78, 6), "white"),
   ],
+  // Ada's bows: one each side at the top of the head, two soft lobes round a knot, tilted up and out
+  bows: [-1, 1].flatMap((side): WearPiece[] => {
+    const a = (side * -14 * Math.PI) / 180;
+    const at = (x: number, y: number): [number, number] => [side * 52 + x * Math.cos(a) - y * Math.sin(a), -60 + x * Math.sin(a) + y * Math.cos(a)];
+    const lobe = (s: -1 | 1) => fill(roundPoly([at(0, 0), at(s * 30, -27), at(s * 40, -2), at(s * 28, 14)], 12), "main");
+    return [lobe(-1), lobe(1), fill(circle(...at(0, 0), 8.5), "shade")];
+  }),
 };
 
 // ── eye accessories ──────────────────────────────────────────────────────────

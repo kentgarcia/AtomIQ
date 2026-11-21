@@ -1,0 +1,334 @@
+/* A slide is exported to PNG as-is: everything it needs lives in this file (and the inline SVG in slides.js).
+   Slides are 1080 x 1080; the page scales them for preview. */
+
+@font-face {
+  font-family: "Intern";
+  src: url("/app-assets/fonts/Intern-Variable.ttf") format("truetype");
+  font-weight: 100 900;
+}
+
+.slide {
+  --yellow: #fabf24;
+  --lip: #d9981a;
+  --orange: #f59300;
+  position: relative;
+  width: 1080px;
+  height: 1080px;
+  overflow: hidden;
+  font-family: "Intern", system-ui, sans-serif;
+  background: var(--yellow);
+  color: #fff;
+}
+.slide, .slide * { box-sizing: border-box; }
+.slide .art { position: absolute; inset: 0; width: 1080px; height: 1080px; }
+
+/* Slide 1: cover */
+.cover .halo { position: absolute; left: 250px; top: 500px; width: 580px; height: 580px; border-radius: 50%; background: rgba(255, 255, 255, 0.4); }
+.cover .mascot { position: absolute; left: 50%; bottom: -60px; height: 650px; width: auto; transform: translateX(-50%); }
+.cover .label {
+  position: absolute; left: 50%; top: 74px; transform: translateX(-50%);
+  padding: 10px 30px; border-radius: 999px; background: #fff; color: var(--orange);
+  font-size: 30px; font-weight: 900; letter-spacing: 4px; text-transform: uppercase; white-space: nowrap;
+  box-shadow: 0 6px 0 rgba(160, 100, 0, 0.35);
+}
+.cover h2 {
+  position: absolute; left: 0; right: 0; top: 168px; margin: 0; text-align: center;
+  font-size: 128px; line-height: 1.02; font-weight: 900; letter-spacing: -2px; color: #fff;
+  text-shadow: 0 9px 0 var(--lip);
+}
+.cover .next {
+  position: absolute; right: 54px; bottom: 54px; width: 100px; height: 100px; border-radius: 50%;
+  background: #fff; box-shadow: 0 7px 0 rgba(160, 100, 0, 0.35); display: flex; align-items: center; justify-content: center;
+}
+.cover .next svg { width: 52px; height: 52px; }
+
+/* Slide 2+: light pages (the cover's yellow, lightened towards white) */
+.slide.page { background: #fff; color: #3a2a00; padding: 52px 52px 0; }
+.page .peek { position: absolute; right: 56px; top: 14px; height: 176px; width: auto; }
+.page h2 { margin: 0; font-size: 76px; line-height: 1; font-weight: 900; letter-spacing: -1px; color: #3a2a00; }
+.page h2 em { font-style: normal; color: var(--orange); }
+.page .group { margin: 26px 0 12px; font-size: 26px; font-weight: 900; letter-spacing: 3px; text-transform: uppercase; color: #b07a00; }
+.page .group:first-of-type { margin-top: 22px; }
+.page .card {
+  background: #fff; border: 3px solid #f4e4b0; border-bottom-width: 7px; border-radius: 28px; padding: 4px 26px;
+}
+.page .card .item { display: flex; align-items: center; gap: 18px; padding: 17px 0; min-width: 0; }
+.page .card .item + .item { border-top: 4px dotted #ecdca8; }
+.page .item b { display: block; font-size: 33px; line-height: 1.1; font-weight: 800; color: #3a2a00; }
+.page .item small { display: block; margin-top: 3px; font-size: 22px; line-height: 1.2; font-weight: 600; color: #8a6d1d; }
+.page .grid { display: grid; grid-template-columns: 1fr 1fr; column-gap: 0; }
+.page .grid .item { padding: 20px 0; gap: 14px; }
+.page .grid .item + .item { border-top: 0; }
+.page .grid .item:nth-child(n + 3) { border-top: 4px dotted #ecdca8; }
+.page .grid .item:nth-child(odd) { padding-right: 22px; border-right: 4px dotted #ecdca8; }
+.page .grid .item:nth-child(even) { padding-left: 24px; }
+.page .grid .item b { font-size: 28px; }
+.page .grid .item small { font-size: 19px; }
+.page .ic { flex: none; width: 68px; height: 68px; border-radius: 20px; background: var(--c); box-shadow: 0 5px 0 var(--l); display: flex; align-items: center; justify-content: center; }
+.page .ic svg { width: 40px; height: 40px; fill: #fff; }
+.page .grid .ic { width: 56px; height: 56px; border-radius: 17px; }
+.page .grid .ic svg { width: 33px; height: 33px; }
+
+/* Slide 3: teaser of the redesign (two phones) */
+.slide.teaser { background: #fff; color: #3a2a00; }
+.teaser .kicker { position: absolute; left: 0; right: 0; top: 46px; text-align: center; font-size: 25px; font-weight: 900; letter-spacing: 4px; text-transform: uppercase; color: #b07a00; }
+.teaser h2 { position: absolute; left: 52px; right: 52px; top: 60px; margin: 0; text-align: left; font-size: 88px; line-height: 1; font-weight: 900; letter-spacing: -1px; color: #3a2a00; }
+.teaser h2 em { font-style: normal; color: var(--t, var(--orange)); }
+.teaser .desc { position: absolute; left: 52px; right: 120px; top: 176px; margin: 0; text-align: left; font-size: 28px; line-height: 1.32; font-weight: 700; color: #6a5420; text-wrap: pretty; }
+.teaser .desc b { color: var(--orange); font-weight: 900; }
+
+.phone { position: absolute; width: 440px; height: 900px; padding: 12px; border-radius: 60px; background: #3a2a00; box-shadow: 0 18px 0 rgba(120, 80, 0, 0.18); }
+.phone .screen { position: relative; width: 416px; height: 876px; border-radius: 48px; overflow: hidden; background: #fff; }
+.phone .ui { position: absolute; left: 0; top: 0; width: 360px; height: 760px; transform: scale(1.1556); transform-origin: 0 0; background: #fff; }
+.phone .island { position: absolute; left: 50%; top: 14px; width: 104px; height: 28px; margin-left: -52px; border-radius: 14px; background: #3a2a00; z-index: 5; }
+
+/* Home screen: white page, flat stat pills, the unit card, the lesson map */
+.pills { position: absolute; left: 14px; right: 14px; top: 50px; display: flex; gap: 8px; }
+.pill { flex: 1; height: 36px; border-radius: 18px; background: #fff; border: 2px solid #ececec; display: flex; align-items: center; gap: 6px; padding: 0 9px; font-size: 15px; font-weight: 800; color: #3c3c3c; }
+.pill svg { width: 18px; height: 18px; flex: none; }
+.unitcard { position: absolute; left: 14px; right: 14px; top: 104px; border-radius: 20px; background: #fabf24; box-shadow: 0 6px 0 #d9981a; padding: 28px 16px; display: flex; align-items: center; gap: 12px; color: #fff; }
+.unitcard .txt { flex: 1; min-width: 0; }
+.unitcard small { display: block; font-size: 14px; line-height: 19px; font-weight: 900; letter-spacing: 0.8px; text-transform: uppercase; color: rgba(255, 255, 255, 0.78); white-space: nowrap; }
+.unitcard b { display: block; margin-top: 2px; font-size: 22px; line-height: 27px; font-weight: 900; }
+.unitcard .info { flex: none; width: 36px; height: 36px; border-radius: 50%; background: #fff; display: flex; align-items: center; justify-content: center; }
+.unitcard .info svg { width: 22px; height: 22px; fill: #fabf24; }
+.node { position: absolute; width: 80px; height: 80px; margin-left: -40px; }
+.node svg { width: 80px; height: 80px; overflow: visible; }
+.bubble { position: absolute; left: 70px; width: 220px; height: 96px; border-radius: 20px; background: #fabf24; box-shadow: 0 6px 0 #d9981a; padding: 11px 16px; color: #fff; }
+.bubble::before { content: ""; position: absolute; left: 50%; top: -9px; width: 20px; height: 20px; margin-left: -10px; background: #fabf24; border-radius: 4px; transform: rotate(45deg); }
+.bubble b { position: relative; display: block; font-size: 17px; font-weight: 900; }
+.bubble span { position: relative; display: block; margin-top: 8px; padding: 8px 0; border-radius: 14px; background: #feefc8; box-shadow: 0 4px 0 #e6c978; color: #7a5a0e; text-align: center; font-size: 15px; font-weight: 900; letter-spacing: 1px; }
+.divider { position: absolute; left: 14px; right: 14px; display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 800; color: #8a8a8a; white-space: nowrap; }
+.divider::before, .divider::after { content: ""; flex: 1; border-top: 3px dotted #d6d6d6; }
+
+/* Lesson screen: the real lecture layout. A close X and the progress bar, the page title top-left,
+   the teacher (bust) beside the first bubble with its tail, later bubbles indented to line up,
+   the figure, and the footer with Back and Continue. */
+.lesson .top { position: absolute; left: 12px; right: 12px; top: 46px; display: flex; align-items: center; gap: 10px; }
+.lesson .x { width: 26px; height: 26px; flex: none; }
+.lesson .track { position: relative; flex: 1; height: 16px; border-radius: 8px; background: #e5e5e5; overflow: hidden; }
+.lesson .track i { position: relative; display: block; width: 36%; height: 100%; border-radius: 8px; background: #fabf24; }
+.lesson .track i::after { content: ""; position: absolute; top: 3px; left: 8px; right: 8px; height: 4px; border-radius: 2px; background: rgba(255, 255, 255, 0.3); }
+.lesson .ttl { position: absolute; left: 12px; right: 12px; top: 92px; margin: 0; font-size: 24px; line-height: 30px; font-weight: 900; color: #3c3c3c; text-wrap: balance; }
+.lesson .row { position: absolute; left: 12px; right: 12px; display: flex; align-items: center; gap: 16px; }
+.lesson .row.later { align-items: flex-start; padding-left: 83px; }
+.lesson .bust { width: 67px; height: 84px; flex: none; display: block; }
+.lesson .bub { position: relative; flex: 1; padding: 14px 16px; border-radius: 16px; background: #fff; border: 2px solid #e5e5e5; box-shadow: 0 4px 0 #d2d2d2; font-size: 17px; line-height: 23px; font-weight: 600; color: #3c3c3c; }
+.lesson .row:not(.later) .bub::before { content: ""; position: absolute; left: -9px; top: 50%; width: 14px; height: 14px; margin-top: -7px; background: #fff; border-left: 2px solid #e5e5e5; border-bottom: 2px solid #e5e5e5; transform: rotate(45deg); border-bottom-left-radius: 3px; }
+.lesson .bub u { text-decoration: underline dotted #fabf24; text-decoration-thickness: 3px; text-underline-offset: 4px; font-weight: 800; }
+.lesson .fig { position: absolute; left: 12px; right: 12px; display: flex; padding: 12px 8px 10px; border-radius: 16px; background: #fff; border: 2px solid #e5e5e5; box-shadow: 0 4px 0 #d2d2d2; }
+.lesson .fig .col { flex: 1; text-align: center; }
+.lesson .fig .col + .col { border-left: 2px dashed #e0e0e0; }
+.lesson .fig h4 { margin: 0 0 6px; font-size: 13px; font-weight: 900; color: #4b4b4b; }
+.lesson .fig .objs { display: flex; justify-content: center; gap: 6px; }
+.lesson .fig .objs img { width: 46px; height: 46px; }
+.lesson .fig small { display: block; margin-top: 6px; font-size: 12px; font-weight: 700; color: #777; }
+.lesson .foot { position: absolute; left: 12px; right: 12px; top: 548px; display: flex; align-items: center; gap: 8px; }
+.lesson .back { flex: none; width: 58px; height: 58px; border-radius: 16px; background: #fff; border: 2px solid #e5e5e5; box-shadow: 0 4px 0 #d2d2d2; display: flex; align-items: center; justify-content: center; }
+.lesson .back svg { width: 26px; height: 26px; }
+.lesson .go { flex: 1; height: 58px; border-radius: 16px; background: #fabf24; box-shadow: 0 5px 0 #d9981a; color: #fff; text-align: center; line-height: 58px; font-size: 19px; font-weight: 900; letter-spacing: 1px; text-shadow: 0 2px 0 #d9981a; }
+
+/* floating feed post */
+.post { position: absolute; left: 330px; top: 922px; width: 420px; padding: 12px 18px; border-radius: 24px; background: #fff; border: 3px solid #f4e4b0; border-bottom-width: 8px; display: flex; gap: 14px; align-items: center; box-shadow: 0 12px 0 rgba(120, 80, 0, 0.12); }
+.post .who { width: 56px; height: 56px; flex: none; border-radius: 50%; overflow: hidden; background: #ffd9a8; }
+.post .who img { width: 100%; height: 100%; display: block; }
+.post .body { flex: 1; min-width: 0; }
+.post b { display: block; font-size: 20px; font-weight: 900; color: #3a2a00; }
+.post b small { font-size: 15px; font-weight: 700; color: #9a8a5c; margin-left: 6px; }
+.post p { margin: 2px 0 0; font-size: 19px; line-height: 1.2; font-weight: 700; color: #5a4a20; }
+.post .heart { flex: none; width: 34px; height: 34px; fill: #e0457b; }
+
+/* Slide 4: the phone */
+.applist { position: absolute; left: 36px; top: 336px; width: 540px; }
+.page .card.applist .item { padding: 13px 0; gap: 16px; }
+.page .card.applist .item b { font-size: 27px; }
+.page .card.applist .item small { font-size: 19px; }
+.appic { flex: none; width: 52px; height: 55px; display: block; }
+.phone .ui.homescreen { background: #ffe2b0; }
+.homescreen .wall i { position: absolute; border-radius: 50%; background: rgba(255, 255, 255, 0.35); }
+.grid4 { position: absolute; left: 21px; right: 21px; top: 72px; display: grid; grid-template-columns: repeat(4, 66px); justify-content: space-between; row-gap: 22px; }
+.grid4 .app { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.grid4 .app svg, .grid4 .app img { width: 66px; height: 69px; display: block; }
+.grid4 .app span { font-size: 12px; font-weight: 800; color: #3a2a00; white-space: nowrap; }
+
+/* Slide 5: rewards and style */
+.dia { width: 20px; height: 20px; vertical-align: -4px; margin: 0 2px; }
+.questcard { position: absolute; left: 36px; top: 336px; width: 540px; padding: 6px 24px 10px; }
+.page .card.questcard .item { padding: 0; }
+.chestrow { display: flex; align-items: center; gap: 14px; padding: 8px 0 12px; border-bottom: 4px dotted #ecdca8; }
+.chestrow .chest { width: 92px; height: 92px; flex: none; }
+.chestrow div { flex: 1; min-width: 0; }
+.chestrow b { display: block; font-size: 28px; font-weight: 900; color: #3a2a00; }
+.chestrow small { display: block; margin-top: 2px; font-size: 18px; line-height: 1.2; font-weight: 600; color: #8a6d1d; }
+.chestrow .reward { flex: none; font-size: 26px; font-weight: 900; color: #3a2a00; padding: 6px 14px; border-radius: 999px; background: #fff3d1; }
+.chestrow .reward .dia { width: 26px; height: 26px; vertical-align: -6px; }
+.quest { display: flex; align-items: center; gap: 16px; padding: 16px 0; }
+.quest + .quest { border-top: 4px dotted #ecdca8; }
+.quest .qmain { flex: 1; min-width: 0; }
+.quest b { display: block; font-size: 25px; font-weight: 800; color: #3a2a00; margin-bottom: 8px; }
+.qbar { position: relative; height: 26px; border-radius: 13px; background: #ece3cc; overflow: hidden; }
+.qbar i { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 13px; background: #fabf24; }
+.qbar span { position: absolute; inset: 0; text-align: center; line-height: 26px; font-size: 16px; font-weight: 900; color: #8a7a50; }
+.qbar span.full { color: #fff; text-shadow: 0 1px 0 #d9981a; }
+.qbtn { flex: none; width: 112px; height: 48px; border-radius: 15px; text-align: center; line-height: 48px; font-size: 20px; font-weight: 900; }
+.qbtn.claim { background: #fabf24; box-shadow: 0 5px 0 #d9981a; color: #fff; text-shadow: 0 2px 0 #d9981a; }
+.qbtn.go { background: #fff; border: 2px solid #ece3cc; box-shadow: 0 5px 0 #e0d4b0; color: #b07a00; line-height: 44px; }
+.badgecard { position: absolute; left: 36px; top: 790px; width: 540px; padding: 14px 24px; display: flex; align-items: center; gap: 18px; }
+.badgecard .badges { display: flex; gap: 8px; }
+.badgecard .badges img { width: 74px; height: 74px; }
+.badgecard .btxt b { display: block; font-size: 27px; font-weight: 900; color: #3a2a00; }
+.badgecard .btxt small { display: block; margin-top: 2px; font-size: 19px; font-weight: 600; color: #8a6d1d; }
+
+.phone .ui.shop { background: #fff; }
+.shop .bar { position: absolute; left: 12px; right: 12px; top: 48px; display: flex; align-items: center; gap: 10px; }
+.shop .bar .back { width: 26px; height: 26px; flex: none; }
+.shop .bar b { flex: 1; font-size: 22px; font-weight: 900; color: #3c3c3c; }
+.shop .bal { display: inline-flex; align-items: center; gap: 4px; height: 34px; padding: 0 12px; border-radius: 17px; border: 2px solid #ececec; font-size: 15px; font-weight: 800; color: #3c3c3c; }
+.shop .bal .dia { width: 18px; height: 18px; margin: 0; vertical-align: 0; }
+.shop .prev { position: absolute; left: 12px; right: 12px; top: 96px; height: 228px; border-radius: 22px; overflow: hidden; background: #1899d6; }
+.shop .prev > img { position: absolute; left: 0; top: 0; width: 100%; height: 100%; object-fit: cover; }
+.shop .buy { position: absolute; right: 10px; bottom: 10px; height: 38px; padding: 0 16px; display: flex; align-items: center; gap: 4px; border-radius: 13px; background: #fabf24; box-shadow: 0 4px 0 #d9981a; color: #fff; font-size: 16px; font-weight: 900; text-shadow: 0 2px 0 #d9981a; }
+.shop .buy .dia { width: 17px; height: 17px; margin: 0; vertical-align: 0; }
+.shop .tile img.dia { position: static; left: auto; top: auto; margin: 0; width: 15px; height: 15px; }
+.shop .tabs { position: absolute; left: 12px; right: 12px; top: 338px; display: flex; gap: 6px; }
+.shop .tabs span { flex: none; padding: 7px 12px; border-radius: 12px; border: 2px solid #e5e5e5; border-bottom-width: 4px; font-size: 14px; font-weight: 800; color: #777; }
+.shop .tabs span.on { background: #fabf24; border-color: #fabf24; border-bottom-color: #d9981a; color: #fff; }
+.shop .tiles { position: absolute; left: 12px; right: 12px; top: 392px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.shop .tile { position: relative; height: 122px; border-radius: 16px; border: 2px dashed #d6d6d6; background: #fff; overflow: hidden; }
+.shop .tile img { position: absolute; left: 50%; top: 4px; width: 84px; height: 84px; margin-left: -42px; }
+.shop .tile.on { border: 3px solid #58cc02; background: #f1fbe6; }
+.shop .tile.try { border: 3px solid #fabf24; background: #fff8e1; }
+.shop .tfoot { position: absolute; left: 0; right: 0; bottom: 7px; text-align: center; font-size: 13px; font-weight: 800; color: #6a6a6a; display: flex; align-items: center; justify-content: center; gap: 3px; }
+.shop .tfoot .dia { width: 15px; height: 15px; margin: 0; vertical-align: 0; }
+.shop .tfoot.ok { color: #46a302; }
+.shop .tfoot.lock svg { width: 14px; height: 14px; }
+.shop .tick { position: absolute; right: 5px; top: 5px; width: 22px; height: 22px; border-radius: 50%; background: #58cc02; display: flex; align-items: center; justify-content: center; }
+.shop .tick svg { width: 14px; height: 14px; }
+
+/* Slide 6: the feed, the ranking, blog pieces */
+.ch { display: inline-block; flex: none; border-radius: 50%; overflow: hidden; background: #ffd9a8; vertical-align: middle; }
+.ch img { width: 100%; height: 100%; display: block; }
+.phone .ui.feed { background: #fff; }
+.ftitle { position: absolute; left: 16px; top: 52px; margin: 0; font-size: 28px; font-weight: 900; color: #3c3c3c; }
+.fpost { position: relative; padding: 12px 16px 10px; border-bottom: 1px dashed #dcdcdc; }
+.ui.feed .fpost:nth-of-type(1) { position: absolute; left: 0; right: 0; top: 96px; }
+.ui.feed .fpost:nth-of-type(2) { position: absolute; left: 0; right: 0; top: 352px; }
+.fhead { display: flex; align-items: center; gap: 12px; }
+.fhead .l1 { font-size: 15px; line-height: 19px; color: #3c3c3c; }
+.fhead .l1 b { font-weight: 900; }
+.fhead .l2 { font-size: 13px; font-weight: 600; color: #8a8a8a; }
+.ftalk { display: flex; align-items: center; gap: 16px; margin-top: 8px; }
+.fbub { position: relative; width: 70%; flex: none; padding: 12px 14px; border-radius: 20px; background: #f3f3f3; }
+.fbub p { margin: 0; font-size: 16.5px; line-height: 22px; font-weight: 700; color: #3c3c3c; }
+.fbub .ftail { position: absolute; right: -12px; top: 24px; width: 0; height: 0; border-top: 14px solid transparent; border-bottom: 14px solid transparent; border-left: 14px solid #f3f3f3; }
+.ffig { flex: 1; min-width: 0; height: 84px; width: auto; object-fit: contain; }
+.freact { display: flex; align-items: center; gap: 12px; margin-top: 10px; }
+.fpill { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-width: 76px; height: 40px; padding: 0 14px; border-radius: 20px; border: 2px solid #e5e5e5; border-bottom-width: 4px; font-size: 16px; font-weight: 800; color: #e0457b; }
+.fpill svg { width: 20px; height: 20px; }
+.fliked { display: flex; align-items: center; font-size: 13px; color: #6a6a6a; }
+.fliked .ch + .ch { margin-left: -8px; box-shadow: 0 0 0 2px #fff; }
+.fliked small { margin-left: 8px; font-size: 13px; font-weight: 600; }
+.fliked small b { font-weight: 900; color: #3c3c3c; }
+
+.rankcard { position: absolute; left: 488px; top: 336px; width: 556px; padding: 16px 24px 10px; }
+.rhead { display: flex; align-items: center; justify-content: space-between; padding-bottom: 8px; }
+.rhead b { font-size: 28px; font-weight: 900; color: #3a2a00; }
+.rchip { padding: 5px 14px; border-radius: 999px; background: #e5f8d2; color: #46a302; font-size: 17px; font-weight: 900; }
+.podium { display: flex; align-items: flex-end; justify-content: center; gap: 12px; padding: 6px 0 14px; border-bottom: 4px dotted #ecdca8; }
+.pod { width: 150px; display: flex; flex-direction: column; align-items: center; }
+.pod b { margin-top: 6px; font-size: 21px; font-weight: 900; color: #3a2a00; }
+.pod small { font-size: 16px; font-weight: 700; color: #8a6d1d; }
+.pod .pw { position: relative; }
+.pod .up { position: absolute; right: -26px; top: -8px; padding: 2px 8px; border-radius: 999px; background: #58cc02; color: #fff; font-size: 14px; font-weight: 900; }
+.pod .blk { width: 100%; margin-top: 8px; border-radius: 14px 14px 0 0; display: flex; align-items: center; justify-content: center; font-size: 40px; font-weight: 900; color: #fff; }
+.pod.p1 .blk { height: 96px; background: #fabf24; }
+.pod.p2 .blk { height: 72px; background: #c9c9c9; }
+.pod.p3 .blk { height: 52px; background: #e0a06a; }
+.rrow { display: flex; align-items: center; gap: 14px; padding: 17px 0; }
+.rrow + .rrow { border-top: 4px dotted #ecdca8; }
+.rrow .rn { width: 28px; text-align: center; font-size: 24px; font-weight: 900; color: #b0a070; }
+.rrow b { flex: 1; font-size: 24px; font-weight: 800; color: #3a2a00; }
+.rrow small { font-size: 19px; font-weight: 700; color: #8a6d1d; }
+.blogcard { position: absolute; left: 488px; top: 842px; width: 556px; padding: 16px 20px; display: flex; align-items: center; gap: 18px; }
+.blogcard .bpic { flex: none; width: 104px; height: 104px; border-radius: 20px; background: #fff3d1; display: flex; align-items: center; justify-content: center; }
+.blogcard .bpic img { width: 76px; height: 76px; }
+.blogcard .btext { flex: 1; min-width: 0; }
+.blogcard .bmeta { display: flex; align-items: center; gap: 8px; font-size: 16px; font-weight: 700; color: #8a6d1d; }
+.blogcard b { display: block; margin-top: 6px; font-size: 26px; line-height: 1.15; font-weight: 900; color: #3a2a00; }
+.blogcard small { display: block; margin-top: 4px; font-size: 18px; line-height: 1.25; font-weight: 600; color: #6a5420; }
+
+/* Slide 7: play (Atom Maze and Myth Buster) */
+.phone .ui.maze { background: #8fd3f4; overflow: hidden; }
+.maze .sky { position: absolute; inset: 0 0 auto 0; height: 300px; background: #bfe9fb; }
+.maze .bgl { position: absolute; display: block; }
+.maze .tl { position: absolute; width: 80px; height: 80px; display: block; }
+.maze .mhud { position: absolute; left: 16px; right: 16px; top: 52px; display: flex; align-items: center; gap: 14px; }
+.maze .mbar { position: relative; flex: 1; height: 18px; border-radius: 9px; background: rgba(255, 255, 255, 0.75); }
+.maze .mbar i { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 9px; background: #fabf24; }
+.maze .mbar img { position: absolute; right: -6px; top: -12px; width: 40px; height: 40px; }
+.maze .pause { display: flex; gap: 5px; margin-right: 6px; }
+.maze .pause b { width: 7px; height: 22px; border-radius: 3px; background: #fff; }
+.maze .mhearts { position: absolute; left: 12px; top: 88px; display: flex; }
+.maze .mhearts img { width: 36px; height: 36px; }
+.maze .mcoins { position: absolute; left: 12px; top: 126px; display: flex; align-items: center; }
+.maze .mcoins img { width: 30px; height: 30px; }
+.maze .mcoins img.x { width: 20px; height: 20px; margin: 0 2px; }
+.maze .hero { position: absolute; left: 10px; top: 136px; width: 170px; height: 170px; }
+.maze .foe { position: absolute; left: 236px; top: 222px; width: 80px; height: 80px; transform: rotate(14deg); }
+.maze .burst { position: absolute; left: 150px; top: 180px; width: 130px; height: 130px; }
+.maze .bpanel { position: absolute; left: 0; right: 0; top: 340px; bottom: 0; background: #fff; border-top: 2px solid #e5e5e5; padding: 14px 16px 0; }
+.maze .bhead { display: flex; justify-content: space-between; align-items: center; font-size: 13px; font-weight: 900; letter-spacing: 0.6px; text-transform: uppercase; color: #8a8a8a; }
+.maze .pips { display: flex; gap: 4px; }
+.maze .pips i { width: 22px; height: 8px; border-radius: 4px; background: #58cc02; }
+.maze .pips i.off { background: #e5e5e5; }
+.maze .bq { margin: 8px 0 12px; font-size: 19px; line-height: 25px; font-weight: 900; color: #3c3c3c; }
+.maze .bopt { position: relative; height: 52px; margin-bottom: 10px; border-radius: 16px; border: 2px solid #e5e5e5; border-bottom-width: 5px; display: flex; align-items: center; padding: 0 16px; font-size: 16px; font-weight: 800; color: #3c3c3c; background: #fff; }
+.maze .bopt.good { background: #d7ffb8; border-color: #58cc02; color: #58a700; }
+.maze .bopt svg { position: absolute; right: 14px; top: 13px; width: 22px; height: 22px; }
+.maze .bverdict { margin-top: 12px; }
+.maze .bverdict b { display: block; font-size: 18px; font-weight: 900; color: #58a700; }
+.maze .bverdict small { display: block; margin-top: 2px; font-size: 14px; line-height: 19px; font-weight: 600; color: #6a6a6a; }
+
+.mythcard { position: absolute; left: 36px; top: 336px; width: 540px; padding: 22px 26px 24px; }
+.mythcard .mtop { display: flex; align-items: center; gap: 16px; }
+.mythcard .mtrack { flex: 1; height: 22px; border-radius: 11px; background: #ece3cc; position: relative; overflow: hidden; }
+.mythcard .mtrack i { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 11px; background: #fabf24; }
+.mythcard .lives { display: flex; }
+.mythcard .lives img { width: 40px; height: 40px; }
+.mythcard .mstate { margin-top: 18px; font-size: 19px; font-weight: 900; letter-spacing: 1px; text-transform: uppercase; color: #b07a00; }
+.mythcard .mstmt { margin-top: 6px; font-size: 35px; line-height: 1.18; font-weight: 900; color: #3a2a00; }
+.mythcard .mbtns { display: flex; gap: 14px; margin-top: 22px; }
+.mythcard .mbtns span { flex: 1; height: 64px; border-radius: 20px; border: 3px solid #ece3cc; border-bottom-width: 7px; text-align: center; line-height: 54px; font-size: 26px; font-weight: 900; color: #3a2a00; background: #fff; }
+.modecard { position: absolute; left: 36px; top: 660px; width: 540px; padding: 4px 24px; }
+.mode { display: flex; align-items: center; gap: 18px; padding: 15px 0; }
+.mode + .mode { border-top: 4px dotted #ecdca8; }
+.mode .mic { flex: none; width: 56px; height: 56px; border-radius: 18px; display: flex; align-items: center; justify-content: center; }
+.mode .mic svg { width: 32px; height: 32px; }
+.mode b { display: block; font-size: 26px; font-weight: 900; color: #3a2a00; }
+.mode small { display: block; margin-top: 1px; font-size: 18px; line-height: 1.2; font-weight: 600; color: #8a6d1d; }
+
+/* Slide 9: closing (the cover's look, no arrow) */
+.closing .ask { position: absolute; left: 0; right: 0; top: 446px; margin: 0; text-align: center; font-size: 33px; line-height: 1.36; font-weight: 800; color: #fff; text-shadow: 0 4px 0 var(--lip); }
+.closing .mascot { height: 560px; bottom: -40px; }
+.closing h2 { font-size: 104px; top: 176px; }
+.closing .mascot { bottom: -90px; }
+
+/* Slides 3 to 7: icon tile before the title */
+.teaser h2 { display: flex; align-items: center; gap: 22px; font-size: 80px; }
+.teaser h2 .ic { flex: none; width: 88px; height: 88px; border-radius: 26px; box-shadow: 0 7px 0 var(--l); }
+.teaser h2 .ic svg { width: 52px; height: 52px; }
+.teaser h2 .ic { background: var(--c); display: flex; align-items: center; justify-content: center; }
+.teaser h2 .ic svg { fill: #fff; }
+
+/* Slide 5: pieces of the Shop (no phone) */
+.shopcol { position: absolute; left: 600px; top: 336px; width: 444px; }
+.shopcol .shopcard { padding: 14px; margin-bottom: 20px; }
+.shopcol .shead { display: flex; align-items: center; justify-content: space-between; padding: 0 4px 12px; }
+.shopcol .shead b { font-size: 28px; font-weight: 900; color: #3a2a00; }
+.shopcol .sprev { position: relative; height: 250px; border-radius: 22px; overflow: hidden; background: #1899d6; }
+.shopcol .sprev > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.shopcol .stabs { display: flex; gap: 6px; padding-bottom: 12px; }
+.shopcol .stabs span { flex: none; padding: 7px 12px; border-radius: 12px; border: 2px solid #e5e5e5; border-bottom-width: 4px; font-size: 15px; font-weight: 800; color: #777; }
+.shopcol .stabs span.on { background: #fabf24; border-color: #fabf24; border-bottom-color: #d9981a; color: #fff; }
+.shopcol .stiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.shopcol .shop .tile, .shopcol .tile { height: 120px; }

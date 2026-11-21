@@ -7,7 +7,8 @@
 
 import { useState } from "react";
 import type { StyleProp, TextStyle } from "react-native";
-import Animated, { runOnJS, useAnimatedReaction, useAnimatedStyle, useReducedMotion } from "react-native-reanimated";
+import Animated, { runOnJS, useAnimatedReaction, useAnimatedStyle } from "react-native-reanimated";
+import { useReducedMotion } from "@/components/motion/use-reduced-motion";
 
 import { useDelayedClock } from "@/components/motion/use-delayed-clock";
 import { PULSE, countBetween, pulseScale } from "@/components/motion/reveal-core";

@@ -9,7 +9,8 @@
 
 import { useEffect } from "react";
 import { Image, View, type ImageSourcePropType } from "react-native";
-import Animated, { Easing, cancelAnimation, runOnJS, useAnimatedStyle, useReducedMotion, useSharedValue, withTiming, type SharedValue } from "react-native-reanimated";
+import Animated, { Easing, cancelAnimation, runOnJS, useAnimatedStyle, useSharedValue, withTiming, type SharedValue } from "react-native-reanimated";
+import { useReducedMotion } from "@/components/motion/use-reduced-motion";
 
 import { Burst } from "@/components/motion/Burst";
 import { BURST } from "@/components/motion/burst-core";

@@ -8,7 +8,8 @@
 import { Image } from "expo-image";
 import { memo } from "react";
 import { StyleSheet, View } from "react-native";
-import Animated, { useAnimatedStyle, useReducedMotion, type SharedValue } from "react-native-reanimated";
+import Animated, { useAnimatedStyle, type SharedValue } from "react-native-reanimated";
+import { useReducedMotion } from "@/components/motion/use-reduced-motion";
 
 import { Burst } from "@/components/motion/Burst";
 import { Text } from "@/components/ui/text";

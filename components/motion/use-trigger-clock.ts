@@ -7,7 +7,8 @@
  */
 
 import { useEffect, useRef } from "react";
-import { Easing, cancelAnimation, useReducedMotion, useSharedValue, withTiming, type SharedValue } from "react-native-reanimated";
+import { Easing, cancelAnimation, useSharedValue, withTiming, type SharedValue } from "react-native-reanimated";
+import { useReducedMotion } from "@/components/motion/use-reduced-motion";
 
 export function useTriggerClock(total: number, trigger: unknown, active: boolean = true): SharedValue<number> {
   const reduced = useReducedMotion();

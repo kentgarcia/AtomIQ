@@ -11,7 +11,8 @@
 
 import { useEffect, useRef } from "react";
 import { Modal } from "react-native";
-import Animated, { Easing, cancelAnimation, runOnJS, useAnimatedStyle, useReducedMotion, useSharedValue, withTiming } from "react-native-reanimated";
+import Animated, { Easing, cancelAnimation, runOnJS, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
+import { useReducedMotion } from "@/components/motion/use-reduced-motion";
 
 import { ResumeLessonOverlay } from "@/components/lesson/LessonDialogs";
 import { LessonPreview } from "@/components/lesson/LessonPreview";

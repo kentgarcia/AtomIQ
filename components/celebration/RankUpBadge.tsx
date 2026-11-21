@@ -11,7 +11,8 @@
 
 import { useEffect } from "react";
 import { View } from "react-native";
-import Animated, { useAnimatedProps, useAnimatedStyle, useReducedMotion } from "react-native-reanimated";
+import Animated, { useAnimatedProps, useAnimatedStyle } from "react-native-reanimated";
+import { useReducedMotion } from "@/components/motion/use-reduced-motion";
 import Svg, { Circle } from "react-native-svg";
 
 import { AchievementBadge } from "@/components/achievements/AchievementBadge";

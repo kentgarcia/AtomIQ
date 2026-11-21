@@ -5,7 +5,8 @@
 
 import React, { useEffect } from "react";
 import { Pressable, StyleSheet } from "react-native";
-import Animated, { useAnimatedStyle, useReducedMotion, useSharedValue, withTiming } from "react-native-reanimated";
+import Animated, { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
+import { useReducedMotion } from "@/components/motion/use-reduced-motion";
 
 import { playSfx } from "@/services/sfx";
 import { useTheme } from "@/theme";

@@ -15,7 +15,8 @@
 
 import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Pressable, View } from "react-native";
-import Animated, { Easing, cancelAnimation, runOnJS, useAnimatedStyle, useReducedMotion, useSharedValue, withTiming, type SharedValue } from "react-native-reanimated";
+import Animated, { Easing, cancelAnimation, runOnJS, useAnimatedStyle, useSharedValue, withTiming, type SharedValue } from "react-native-reanimated";
+import { useReducedMotion } from "@/components/motion/use-reduced-motion";
 
 import { Sparkle } from "@/components/lesson/Sparkle";
 import type { ViewRef } from "@/components/tutorial/use-tutorial-target";

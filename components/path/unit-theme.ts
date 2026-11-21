@@ -6,6 +6,9 @@
  * the yellow are the deeper blue, green, purple and red that white reads well on. Every colour comes
  * from a theme role, so dark mode follows.
  *
+ * A unit that has a teacher wears the teacher's colour instead (`teacherPalette`); the sequence above is what a unit without one
+ * (and the Atom Maze tutorial) falls back to.
+ *
  * The nodes, the node bubble, the unit card on top and the divider between units all read the same
  * palette; locked nodes ignore it and stay in the locked grey.
  */
@@ -43,6 +46,14 @@ export const UNIT_PALETTE_COUNT = 5;
 const LIP_DARKEN = 0.2;
 /** How much the face is darkened to read as text on a light page. */
 const ACCENT_DARKEN = 0.4;
+
+/**
+ * The palette of a unit that has a teacher: the teacher's own colour (their cover: pink for Ada, yellow for Hal...) for the face and
+ * its shade for the lip, so the lesson map wears the colours of whoever teaches that unit. Text is the same white as every unit's.
+ */
+export function teacherPalette(brand: { color: string; shade: string }, ink: string, dark: boolean): UnitPalette {
+  return { face: brand.color, lip: brand.shade, ink, accent: dark ? brand.color : darken(brand.color, ACCENT_DARKEN) };
+}
 
 /** The palette of the unit at `position` (1-based, as in "Unit 2"). `dark` is dark mode. */
 export function unitPalette(c: UnitPaletteColors, position: number, dark: boolean): UnitPalette {

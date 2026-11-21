@@ -71,19 +71,15 @@ test("finishing lesson 1 ends the chapter however the beats went, and the feed c
 test("chapters run in order: feed, then phone, and a chapter's beat wins whatever the screen", () => {
   const afterFeed = doneAll("first-lesson", "feed");
   assert.equal(core.pickBeat(afterFeed, lesson1, "home", true).beat.id, "phone.tab");
-  assert.equal(core.pickBeat(steps("feed.tab"), lesson1, "profile", true).beat.id, "feed.react");
+  assert.equal(core.pickBeat(steps("feed.tab"), lesson1, "profile", true).beat.id, "feed.new-posts");
 });
 
-test("screen intros wait for the first lesson and for any chapter in progress", () => {
-  assert.equal(core.pickBeat(steps(), onboarded, "quests", true).beat.id, "first-lesson.node", "chapter first");
-  // Lesson 1 done, feed chapter not started: the intro may show
+test("there are no screen intros: Quests, Profile, Shop, Games and the Atom Maze map show nothing once the chapters are done", () => {
+  assert.deepEqual(INTROS, []);
+  assert.equal(core.pickBeat(steps(), onboarded, "quests", true).beat.id, "first-lesson.node", "the chapters still lead");
   assert.equal(core.pickBeat(doneAll("first-lesson"), lesson1, "quests", true).beat.id, "feed.tab", "an unstarted chapter still leads");
-  // The chapters are done: intros show, one beat at a time
   const toured = doneAll("first-lesson", "feed", "phone");
-  assert.equal(core.pickBeat(toured, lesson1, "quests", true).beat.id, "quests.chest");
-  assert.equal(core.pickBeat(steps(...toured, "quests.chest"), lesson1, "quests", true).beat.id, "quests.row");
-  assert.equal(core.pickBeat(steps(...toured, "quests.chest", "quests.row"), lesson1, "quests", true), null, "an intro never repeats");
-  assert.equal(core.pickBeat(toured, lesson1, "home", true), null, "home has no intro");
+  for (const screen of ["home", "quests", "profile", "shop", "games", "story-map"]) assert.equal(core.pickBeat(toured, lesson1, screen, true), null, screen);
 });
 
 test("resume steps back from a transient beat to the last stable one", () => {
@@ -114,14 +110,14 @@ test("a lesson left half way redirects, once per session, and never after Skip o
   assert.equal(core.isNewSession(core.REDIRECT_AWAY_MS), true);
 });
 
-test("existing learners have the chapters skipped and keep the intros", () => {
+test("existing learners have the chapters skipped and are shown nothing", () => {
   const rows = core.legacyRows(steps(), { onboardingDone: true, lessonsCompleted: 3, firstLessonDone: true });
   assert.ok(rows.includes(MARK_LEGACY) && rows.includes(MARK_SKIPPED));
   for (const id of CHAPTERS.flatMap((c) => c.beats.map((b) => b.id))) assert.ok(rows.includes(id));
   assert.deepEqual(core.legacyRows(steps(), onboarded), [], "a new learner is not legacy");
   assert.deepEqual(core.legacyRows(steps("first-lesson.node"), lesson1), [], "a tour already under way is left alone");
   const seeded = steps(...rows.map((r) => [r, "skipped"]));
-  assert.equal(core.pickBeat(seeded, lesson1, "quests", true).beat.id, "quests.chest");
+  assert.equal(core.pickBeat(seeded, lesson1, "quests", true), null);
   assert.equal(core.rewardDue(seeded, lesson1), false, "a legacy learner is not paid");
 });
 
@@ -142,13 +138,12 @@ test("the reward is due once, after the whole tour was played", () => {
   assert.equal(core.rewardDue(steps(...played, MARK_REWARD), lesson1), false);
 });
 
-test("replay clears the chapters and the intros separately, and never the reward", () => {
+test("replay clears the chapter rows and never the reward", () => {
   const all = steps(...core.allBeats().map((b) => b.id), MARK_REWARD, MARK_SKIPPED);
   const chapterRows = core.replayChapterRows(all);
   assert.ok(chapterRows.includes("feed.tab") && chapterRows.includes(MARK_SKIPPED));
-  assert.ok(!chapterRows.includes(MARK_REWARD) && !chapterRows.includes("quests.chest"));
-  const introRows = core.replayIntroRows(all);
-  assert.ok(introRows.includes("quests.chest") && !introRows.includes("feed.tab"));
+  assert.ok(!chapterRows.includes(MARK_REWARD));
+  assert.deepEqual(core.replayIntroRows(all), [], "there are no intro rows to clear");
 });
 
 test("tutorial_steps: a step is recorded once, never downgraded, and forgotten on request", async () => {
@@ -186,9 +181,12 @@ test("routes are read the way the app reads them: groups dropped, the tab roots 
   for (const path of ["/", "/(tabs)", "/community", "/explorer/story", "/shop"]) assert.equal(core.isQuietPath(path), false, path);
 });
 
-test("the feed chapter asks for the reaction and then the pick, and the phone chapter ends on Shrodi's story", () => {
-  assert.deepEqual(idsOf("feed"), ["feed.tab", "feed.react", "feed.pick"]);
-  assert.equal(core.pickBeat(steps("feed.tab", "feed.react"), lesson1, "feed", true).beat.id, "feed.pick");
+test("the feed chapter opens the tab and then only says posts arrive over time (nothing to scroll to), and the phone chapter ends on Shrodi's story", () => {
+  assert.deepEqual(idsOf("feed"), ["feed.tab", "feed.new-posts"]);
+  const posts = core.pickBeat(steps("feed.tab"), lesson1, "feed", true).beat;
+  assert.equal(posts.mode, "look", "a look beat: the learner cannot scroll while only a lit control works");
+  assert.equal(posts.target, undefined, "no lit control, so nothing off screen to reach");
+  assert.equal(core.pickBeat(steps("feed.tab", "feed.new-posts"), lesson1, "feed", true).beat.id, "phone.tab");
   assert.deepEqual(idsOf("phone"), ["phone.tab", "phone.chats", "phone.story"]);
   const story = core.pickBeat(doneAllThrough("phone.chats"), lesson1, "chats", true);
   assert.equal(story.beat.id, "phone.story");
@@ -202,8 +200,8 @@ function doneAllThrough(lastId) {
   return steps(...ids);
 }
 
-test("a pick is a transient beat: it steps back to the reaction if the picker is gone", () => {
-  assert.deepEqual(core.resumeAdjust(steps(...idsOf("first-lesson"), "feed.tab", "feed.react"), lesson1), ["feed.react"]);
+test("a transient beat steps back: if the bubble is gone the tour returns to the node", () => {
+  assert.deepEqual(core.resumeAdjust(steps("first-lesson.node"), onboarded), ["first-lesson.node"]);
 });
 
 test("the tabs open one by one: only Home at first, the Feed with its chapter, the Phone with its chapter, all at the end", () => {
@@ -243,17 +241,15 @@ test("nothing is locked for a skipped tour, an existing learner, Tips off, a rep
 });
 
 test("a beat added to a chapter later does not reopen it for a learner who skipped or was let in", () => {
-  const old = steps(...CHAPTERS.flatMap((c) => c.beats.map((b) => b.id)).filter((id) => id !== "feed.pick" && id !== "phone.story"), MARK_SKIPPED);
+  const old = steps(...CHAPTERS.flatMap((c) => c.beats.map((b) => b.id)).filter((id) => id !== "feed.new-posts" && id !== "phone.story"), MARK_SKIPPED);
   for (const c of CHAPTERS) assert.equal(core.chapterState(c, old, lesson1), "done", c.id);
   assert.equal(core.pickBeat(old, lesson1, "feed", true), null);
 });
 
-test("the Profile intro is about the profile, and the Shop has its own intro on its own screen", () => {
-  const profile = INTROS.find((i) => i.id === "profile");
-  assert.deepEqual(profile.beats.map((b) => b.target), ["profile.passport", "profile.badges", "profile.flip"]);
-  assert.ok(!core.allBeats().some((b) => String(b.target).includes("shop") && b.screen === "profile"));
-  const shop = core.pickBeat(doneAll("first-lesson", "feed", "phone"), lesson1, "shop", true);
-  assert.equal(shop.beat.id, "shop.grid");
+test("no beat lights anything on Quests, Profile, the Shop, Games or the Atom Maze map, and the lock hints stay", () => {
+  const off = ["quests", "profile", "shop", "games", "story-map"];
+  assert.ok(!core.allBeats().some((b) => off.includes(b.screen)));
+  assert.equal(core.pickBeat(doneAll("first-lesson", "feed", "phone"), lesson1, "shop", true), null);
   assert.equal(core.tabLockHint(onboarded), "Complete your first lesson to unlock this tab.");
   assert.equal(core.tabLockHint(lesson1), "Follow Shrodi's tour to unlock this tab.");
 });

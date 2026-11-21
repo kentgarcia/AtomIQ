@@ -5,49 +5,49 @@
   ],
   "rows": [
     {
-      "id": "line-ada-intro-atoms-are-everywhere",
+      "id": "line-ada-intro-alpha-beta-gamma",
       "npc_id": "npc-ada",
       "kind": "lesson_intro",
-      "lesson_id": "atoms-are-everywhere",
+      "lesson_id": "alpha-beta-gamma",
       "journey_id": null,
-      "text": "Today you'll see what everything around you is made of, and how small an atom really is.",
-      "pose": "greet"
-    },
-    {
-      "id": "line-ada-intro-elements-and-the-periodic-table",
-      "npc_id": "npc-ada",
-      "kind": "lesson_intro",
-      "lesson_id": "elements-and-the-periodic-table",
-      "journey_id": null,
-      "text": "The number of protons tells you which element an atom is. Let's build some.",
+      "text": "When a nucleus changes, something comes out. Let's meet the three things it can be.",
       "pose": "point"
     },
     {
-      "id": "line-ada-intro-isotopes",
+      "id": "line-ada-intro-decay-chains",
       "npc_id": "npc-ada",
       "kind": "lesson_intro",
-      "lesson_id": "isotopes",
+      "lesson_id": "decay-chains",
       "journey_id": null,
-      "text": "Atoms of one element can differ a little. You'll learn what isotopes are.",
+      "text": "One change is not always the end. Let's follow a nucleus all the way down.",
       "pose": "explain"
     },
     {
-      "id": "line-ada-intro-protons-neutrons-electrons",
+      "id": "line-ada-intro-half-life",
       "npc_id": "npc-ada",
       "kind": "lesson_intro",
-      "lesson_id": "protons-neutrons-electrons",
+      "lesson_id": "half-life",
       "journey_id": null,
-      "text": "We'll open up an atom and meet its three particles. You'll learn what each one does.",
-      "pose": "explain"
-    },
-    {
-      "id": "line-ada-intro-stable-and-unstable-nuclei",
-      "npc_id": "npc-ada",
-      "kind": "lesson_intro",
-      "lesson_id": "stable-and-unstable-nuclei",
-      "journey_id": null,
-      "text": "Some nuclei stay the same and some can change. You'll see why that matters.",
+      "text": "A half-life ticks for a whole crowd of atoms, not for one. Let's see how.",
       "pose": "think"
+    },
+    {
+      "id": "line-ada-intro-radioactivity-is-natural",
+      "npc_id": "npc-ada",
+      "kind": "lesson_intro",
+      "lesson_id": "radioactivity-is-natural",
+      "journey_id": null,
+      "text": "Here is something nobody expects: radioactivity was always here. Let's find where.",
+      "pose": "greet"
+    },
+    {
+      "id": "line-ada-intro-why-nuclei-decay",
+      "npc_id": "npc-ada",
+      "kind": "lesson_intro",
+      "lesson_id": "why-nuclei-decay",
+      "journey_id": null,
+      "text": "Some nuclei change all by themselves, and nobody can say when. Let's find out why.",
+      "pose": "explain"
     },
     {
       "id": "line-ada-meet",
@@ -55,7 +55,7 @@
       "kind": "meet",
       "lesson_id": null,
       "journey_id": null,
-      "text": "Hi, I'm Ada! Let's find out what everything is made of.",
+      "text": "Hi, I'm Ada. Let's find out why some atoms change, and how long it takes.",
       "pose": "greet"
     },
     {
@@ -64,7 +64,7 @@
       "kind": "sign_off",
       "lesson_id": null,
       "journey_id": null,
-      "text": "Nice work. You now know what is inside an atom.",
+      "text": "Well done. Radioactivity is a natural part of the world, and now you know how it works.",
       "pose": "proud"
     },
     {
@@ -73,53 +73,53 @@
       "kind": "tease",
       "lesson_id": null,
       "journey_id": null,
-      "text": "Finish my unit first, and I'll show you the rest.",
+      "text": "Finish my unit first. There is more to learn about what radiation does.",
       "pose": "idle"
     },
     {
-      "id": "line-hal-intro-alpha-beta-gamma",
+      "id": "line-hal-intro-atoms-are-everywhere",
       "npc_id": "npc-hal",
       "kind": "lesson_intro",
-      "lesson_id": "alpha-beta-gamma",
+      "lesson_id": "atoms-are-everywhere",
       "journey_id": null,
-      "text": "When a nucleus changes, something comes out. Let's meet the three things it can be.",
-      "pose": "point"
-    },
-    {
-      "id": "line-hal-intro-decay-chains",
-      "npc_id": "npc-hal",
-      "kind": "lesson_intro",
-      "lesson_id": "decay-chains",
-      "journey_id": null,
-      "text": "One change is not always the end. Let's follow a nucleus all the way down.",
-      "pose": "explain"
-    },
-    {
-      "id": "line-hal-intro-half-life",
-      "npc_id": "npc-hal",
-      "kind": "lesson_intro",
-      "lesson_id": "half-life",
-      "journey_id": null,
-      "text": "My pocket watch ticks for a whole crowd of atoms, not for one. Let's see how.",
-      "pose": "think"
-    },
-    {
-      "id": "line-hal-intro-radioactivity-is-natural",
-      "npc_id": "npc-hal",
-      "kind": "lesson_intro",
-      "lesson_id": "radioactivity-is-natural",
-      "journey_id": null,
-      "text": "Here is something nobody expects: radioactivity was always here. Let's find where.",
+      "text": "Today you'll see what everything around you is made of, and how small an atom really is.",
       "pose": "greet"
     },
     {
-      "id": "line-hal-intro-why-nuclei-decay",
+      "id": "line-hal-intro-elements-and-the-periodic-table",
       "npc_id": "npc-hal",
       "kind": "lesson_intro",
-      "lesson_id": "why-nuclei-decay",
+      "lesson_id": "elements-and-the-periodic-table",
       "journey_id": null,
-      "text": "Some nuclei change all by themselves, and nobody can say when. Let's find out why.",
+      "text": "The number of protons tells you which element an atom is. Let's build some.",
+      "pose": "point"
+    },
+    {
+      "id": "line-hal-intro-isotopes",
+      "npc_id": "npc-hal",
+      "kind": "lesson_intro",
+      "lesson_id": "isotopes",
+      "journey_id": null,
+      "text": "Atoms of one element can differ a little. You'll learn what isotopes are.",
       "pose": "explain"
+    },
+    {
+      "id": "line-hal-intro-protons-neutrons-electrons",
+      "npc_id": "npc-hal",
+      "kind": "lesson_intro",
+      "lesson_id": "protons-neutrons-electrons",
+      "journey_id": null,
+      "text": "We'll open up an atom and meet its three particles. You'll learn what each one does.",
+      "pose": "explain"
+    },
+    {
+      "id": "line-hal-intro-stable-and-unstable-nuclei",
+      "npc_id": "npc-hal",
+      "kind": "lesson_intro",
+      "lesson_id": "stable-and-unstable-nuclei",
+      "journey_id": null,
+      "text": "Some nuclei stay the same and some can change. You'll see why that matters.",
+      "pose": "think"
     },
     {
       "id": "line-hal-meet",
@@ -127,7 +127,7 @@
       "kind": "meet",
       "lesson_id": null,
       "journey_id": null,
-      "text": "I'm Hal. Take your time. We'll watch how some atoms change, slowly and exactly.",
+      "text": "Hi, I'm Hal. Let's find out what everything is made of.",
       "pose": "greet"
     },
     {
@@ -136,7 +136,7 @@
       "kind": "sign_off",
       "lesson_id": null,
       "journey_id": null,
-      "text": "Well done. Radioactivity is a natural part of the world, and now you know how it works.",
+      "text": "Well done. Now you know what is inside an atom, and why that matters.",
       "pose": "proud"
     },
     {
@@ -145,7 +145,7 @@
       "kind": "tease",
       "lesson_id": null,
       "journey_id": null,
-      "text": "Finish my unit first. There is more to learn about what radiation does.",
+      "text": "Finish my unit first, and I'll show you the rest.",
       "pose": "idle"
     }
   ]

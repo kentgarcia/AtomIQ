@@ -1,3 +1,4 @@
+import { useRenderTimer } from "@/components/dev/render-timer";
 import { Avatar } from "@/components/avatar/Avatar";
 import { FieldInput } from "@/components/ui/field-input";
 import { Icon } from "@/components/ui/icon";
@@ -40,19 +41,19 @@ import {
 } from "react-native";
 import { Text } from "@/components/ui/text";
 import Animated, {
-    FadeIn,
-    FadeOut,
-    LinearTransition,
-    useReducedMotion,
+  FadeIn,
+  FadeOut,
+  LinearTransition,
 } from "react-native-reanimated";
+import { useReducedMotion } from "@/components/motion/use-reduced-motion";
 import { DURATION, EASE_OUT } from "@/theme/motion";
 import { playSfx } from "@/services/sfx";
-import { useTutorialTarget } from "@/components/tutorial/use-tutorial-target";
 import { LockedDialog } from "@/components/ui/locked-dialog";
 import { loadPhoneProgress } from "@/services/phone";
 import { PHONE_APPS, isUnlocked, unlockRequirement, type PhoneProgress } from "@/services/phone-core";
 
 export default function ProfileScreen() {
+  useRenderTimer("/profile");
   const router = useRouter();
   const { contentMaxWidth } = useResponsiveLayout();
   const tabBarInset = useTabBarInset();
@@ -66,10 +67,6 @@ export default function ProfileScreen() {
     dismissLevelUp,
   } = useStorage();
   const { theme } = useTheme();
-  // Shrodi's first visit lights the passport, its badges and its flip button (docs/features/TUTORIAL_SPEC.md §5.4)
-  const passportLit = useTutorialTarget("profile.passport", { radius: 24 });
-  const badgesLit = useTutorialTarget("profile.badges", { radius: 20 });
-  const flipLit = useTutorialTarget("profile.flip", { radius: "round" });
 
   // The Shop button is locked until the Shop is on the phone (the same rule as its app icon)
   const shopApp = PHONE_APPS.find((a) => a.id === "shop");
@@ -351,7 +348,7 @@ export default function ProfileScreen() {
         <View style={{ height: 8 }} />
 
         {/* Explorer passport (front: profile, back: stats) */}
-        <View ref={passportLit.ref} collapsable={false}>
+        <View>
         <PassportCard
           name={userProfile.display_name || userProfile.username}
           title={userTitle}
@@ -362,8 +359,6 @@ export default function ProfileScreen() {
           passportNo={passportNo}
           avatar={userProfile.avatar_url}
           badges={showcase}
-          badgesRef={badgesLit.ref}
-          flipRef={flipLit.ref}
           stats={stats}
           titleOpen={showTitleProgress}
           onToggleTitle={() => setShowTitleProgress((v) => !v)}

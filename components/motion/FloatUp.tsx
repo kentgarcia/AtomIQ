@@ -8,7 +8,8 @@
 
 import type { ReactNode } from "react";
 import { View } from "react-native";
-import Animated, { useAnimatedStyle, useReducedMotion, type SharedValue } from "react-native-reanimated";
+import Animated, { useAnimatedStyle, type SharedValue } from "react-native-reanimated";
+import { useReducedMotion } from "@/components/motion/use-reduced-motion";
 
 import { FLOAT, FLOAT_TOTAL, floatFrame } from "@/components/motion/float-up-core";
 import { useTriggerClock } from "@/components/motion/use-trigger-clock";

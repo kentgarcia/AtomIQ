@@ -9,7 +9,8 @@
 
 import { createContext, memo, useContext, useEffect } from "react";
 import { Pressable, View } from "react-native";
-import Animated, { ReduceMotion, useAnimatedStyle, useReducedMotion, useSharedValue, withDelay, withRepeat, withSequence, withTiming, type EntryExitAnimationFunction } from "react-native-reanimated";
+import Animated, { ReduceMotion, useAnimatedStyle, useSharedValue, withDelay, withRepeat, withSequence, withTiming, type EntryExitAnimationFunction } from "react-native-reanimated";
+import { useReducedMotion } from "@/components/motion/use-reduced-motion";
 
 import { ChatHead, type ChatSpeaker } from "@/components/phone/ChatHead";
 import { settle } from "@/components/motion/settle";

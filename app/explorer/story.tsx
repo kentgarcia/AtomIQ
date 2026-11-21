@@ -20,8 +20,9 @@ import { ScreenHeader, useHeaderBorder } from "@/components/layout";
 import { settle } from "@/components/motion/settle";
 import { LessonNode } from "@/components/path/LessonNode";
 import { NodeBubble } from "@/components/path/NodeBubble";
-import { unitPalette, type UnitPalette } from "@/components/path/unit-theme";
-import { levelsOfWorld, STORY_LEVELS, STORY_WORLDS, type StoryLevel, type StoryWorld } from "@/components/platformer/story-levels";
+import { unitPalette, teacherPalette, type UnitPalette } from "@/components/path/unit-theme";
+import { useUnitBrands } from "@/components/npc/use-unit-brands";
+import { levelsOfWorld, STORY_WORLDS, type StoryLevel, type StoryWorld } from "@/components/platformer/story-levels";
 import { MAP, decorFor, nextStop, pathHeight, roadSegments, scrollTarget, stopStatus, stopX, stopY, worldHeight, worldOpen, worldStars } from "@/components/platformer/story-map-core";
 import { BIOMES, SCENERY_SPRITES } from "@/components/platformer/sprites";
 import { Icon } from "@/components/ui/icon";
@@ -29,8 +30,6 @@ import { Text } from "@/components/ui/text";
 import { useStoryProgress } from "@/hooks/use-story-progress";
 import { impactLight } from "@/services/haptics";
 import { playSfx } from "@/services/sfx";
-import { useTutorialTarget } from "@/components/tutorial/use-tutorial-target";
-import { emitTutorial } from "@/services/tutorial";
 import { createStyles, fontFaces, fontSizes, pickReadableText, radius, useResponsiveLayout, useTheme, withAlpha } from "@/theme";
 
 /** How far the banner's lip shows under its face, dp (the lesson map's unit card, `CARD_LIP`). */
@@ -127,6 +126,7 @@ function WorldBanner({ world, palette, open, stars, left, right }: { world: Stor
 export default function StoryScreen() {
   const router = useRouter();
   const { theme, isDark } = useTheme();
+  const brands = useUnitBrands();
   const styles = useStyles(theme);
   const c = theme.colors;
   const insets = useSafeAreaInsets();
@@ -154,9 +154,6 @@ export default function StoryScreen() {
     if (y > 0) scrollRef.current?.scrollTo({ y, animated: false });
   }, [loaded, viewportH, counts, next]);
 
-  // Shrodi's first visit lights the first level's stop (docs/features/TUTORIAL_SPEC.md §5.4)
-  const firstLit = useTutorialTarget("story.level-1", { radius: "round" });
-
   const pick = (level: StoryLevel, status: "locked" | "current" | "completed") => {
     impactLight();
     if (selected?.id === level.id) {
@@ -164,7 +161,6 @@ export default function StoryScreen() {
       return;
     }
     setSelected({ id: level.id });
-    if (status === "current") emitTutorial("story-level-opened");
     void (status === "locked" ? playSfx("ui.lock") : playSfx("reward.pop", { volume: 0.7 }));
   };
 
@@ -184,7 +180,8 @@ export default function StoryScreen() {
         {worlds.map(({ world, levels }, wi) => {
           const base = globalBase;
           globalBase += levels.length;
-          const palette = unitPalette(c, world.paletteIndex, isDark);
+          const brand = world.unitPosition ? brands.get(world.unitPosition) : undefined;
+          const palette = brand ? teacherPalette(brand, c.lessonHeaderText, isDark) : unitPalette(c, world.paletteIndex, isDark);
           const open = worldOpen(base, ids, records);
           const stars = worldStars(world.levelIds, records);
           const statuses = levels.map((_, i) => stopStatus(base + i, ids, records));
@@ -246,7 +243,6 @@ export default function StoryScreen() {
                         status={status}
                         glyph={level.glyph}
                         palette={palette}
-                        litRef={level.id === STORY_LEVELS[0]?.id ? firstLit.ref : undefined}
                         progress={status === "current" ? winsHere / levels.length : 0}
                         accessibilityLabel={`Level ${level.number}, ${level.title}, ${status === "locked" ? "locked" : status === "completed" ? `${earned} of 3 stars` : "next up"}`}
                         onPress={() => pick(level, status)}

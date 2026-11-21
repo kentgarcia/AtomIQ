@@ -101,7 +101,7 @@ export function ProfileStep({
             </Text>
           </Animated.View>
           <Animated.View entering={settle(settleDelay(1))}>
-            <ShrodiSays text={hint} mood={ready ? "happy" : "idle"} typing={false} size={84} />
+            <ShrodiSays text={hint} still typing={false} size={84} />
           </Animated.View>
           <Animated.View entering={settle(settleDelay(2))} style={styles.who}>
             {/* The big avatar pops each time the learner picks the other one */}

@@ -13,12 +13,13 @@
 import React, { memo, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { View } from "react-native";
 import { Text } from "@/components/ui/text";
+import { useFillPxStyle } from "@/components/ui/progress-fill";
 import Animated, {
-  useAnimatedStyle,
-  useReducedMotion,
+  useDerivedValue,
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
+import { useReducedMotion } from "@/components/motion/use-reduced-motion";
 
 import { useOneShotClock } from "@/components/motion/motion";
 import { PopWhen } from "@/components/motion/PopOnce";
@@ -61,9 +62,11 @@ function QuestRowBase({ mission, renderAction, onClaim }: QuestRowProps) {
   }, [progressFill, ratio, reducedMotion]);
   // Widths are in px of the pill's full width: a percent would leave out its padding and stop short
   const barWidth = bar.width;
-  const progressStyle = useAnimatedStyle(() => ({ width: progressFill.get() * barWidth }));
+  // Both fills are the bar's full width, slid left by what is empty (a transform: no layout pass per frame, docs/features/PERFORMANCE_AND_SOUND_SPEC.md §5.3)
+  const progressStyle = useFillPxStyle(progressFill, barWidth);
   // The claim fill: the brand yellow sweeping across, driven by the claim clock
-  const claimStyle = useAnimatedStyle(() => ({ width: fillAmount(clock.get()) * barWidth }));
+  const claimAmount = useDerivedValue(() => fillAmount(clock.get()));
+  const claimStyle = useFillPxStyle(claimAmount, barWidth);
 
   const finish = useCallback(async () => {
     await onClaim(mission);
@@ -110,11 +113,11 @@ function QuestRowBase({ mission, renderAction, onClaim }: QuestRowProps) {
           style={styles.track}
           onLayout={(e) => setBar(e.nativeEvent.layout)}
         >
-          <Animated.View pointerEvents="none" style={[styles.fill, { backgroundColor: c.lessonHeader }, progressStyle]} />
+          <Animated.View pointerEvents="none" style={[styles.fill, { backgroundColor: c.lessonHeader, width: barWidth }, progressStyle]} />
           {mission.isClaimed ? (
             <View pointerEvents="none" style={[styles.fill, styles.fillFull, styles.fillClaimed]} />
           ) : (
-            <Animated.View pointerEvents="none" style={[styles.fill, styles.fillClaimed, claimStyle]} />
+            <Animated.View pointerEvents="none" style={[styles.fill, styles.fillClaimed, { width: barWidth }, claimStyle]} />
           )}
           <Text style={styles.count}>
             {mission.progress} / {mission.target}

@@ -17,7 +17,8 @@
 import { useIsFocused } from "expo-router";
 import { memo, useMemo } from "react";
 import { StyleSheet, type StyleProp, type ViewStyle } from "react-native";
-import Animated, { FadeIn, FadeOut, useAnimatedStyle, useReducedMotion, type SharedValue } from "react-native-reanimated";
+import Animated, { FadeIn, FadeOut, useAnimatedStyle, type SharedValue } from "react-native-reanimated";
+import { useReducedMotion } from "@/components/motion/use-reduced-motion";
 import Svg, { ClipPath, Defs, G, Path } from "react-native-svg";
 
 import { EASE_OUT, track, useLoopClock, wave, type Keys } from "@/components/motion/motion";
@@ -92,6 +93,11 @@ export interface NpcProps {
   live?: boolean;
   /** The locked ("before") version: cool pastels, never grey. */
   muted?: boolean;
+  /**
+   * Draws an outline of this colour round the whole figure (a flat ring, `OUTLINE_W` drawing units thick, behind it), so it stands out from a
+   * background of its own colour. The ring is a still silhouette: use it with the held-still `bust` or `live={false}`, not a breathing figure.
+   */
+  outline?: string;
   /** Scales the idle breathing and head sway (default 1). For a figure shown large and still for a while. The `bust` ignores it: it never moves. */
   lively?: number;
   style?: StyleProp<ViewStyle>;
@@ -129,6 +135,37 @@ const Layer = memo(function Layer({ parts, form, width, height }: { parts: Part[
   );
 });
 
+/** How thick an outline is, in drawing units, and how far the outline's picture reaches past the form's box (half the thickness, plus a little). */
+const OUTLINE_W = 6;
+const OUTLINE_PAD = OUTLINE_W / 2 + 1;
+
+/**
+ * The ring round a figure: every part of the drawing as one colour, fattened by a round-joined stroke, under the figure. Its picture is a few
+ * units larger than the form's box on the sides and the top (not the bottom: the bust's shirt ends flush there), so the ring is not cut off.
+ */
+const OutlineLayer = memo(function OutlineLayer({ spec, pose, form, width, height, color }: { spec: NpcSpec; pose: PoseId; form: NpcForm; width: number; height: number; color: string }) {
+  const parts = useMemo(() => treeParts(buildNpc(spec, pose, form)), [spec, pose, form]);
+  const vb = NPC_VIEWBOX[form];
+  const k = height / vb.h;
+  const pad = OUTLINE_PAD * k;
+  return (
+    <Svg
+      width={width + 2 * pad}
+      height={height + pad}
+      viewBox={`${vb.x - OUTLINE_PAD} ${vb.y - OUTLINE_PAD} ${vb.w + 2 * OUTLINE_PAD} ${vb.h + OUTLINE_PAD}`}
+      style={{ position: "absolute", left: -pad, top: -pad }}
+    >
+      {parts.map((p, i) =>
+        "fill" in p ? (
+          <Path key={i} d={p.d} fill={color} fillRule={p.evenOdd ? "evenodd" : undefined} stroke={color} strokeWidth={OUTLINE_W} strokeLinejoin="round" />
+        ) : (
+          <Path key={i} d={p.d} fill="none" stroke={color} strokeWidth={p.sw + OUTLINE_W} strokeLinecap="round" strokeLinejoin="round" />
+        ),
+      )}
+    </Svg>
+  );
+});
+
 /** One pose of the character: still (a single Svg) or live (layers on a shared clock). */
 const Figure = memo(function Figure({
   spec,
@@ -160,22 +197,24 @@ const Figure = memo(function Figure({
     transform: [{ rotate: `${clock && sway ? SWAY_DEG * lively * wave(clock.value, NPC_IDLE_PERIODS.sway, 0.25) : 0}deg` }],
   }));
   const lidStyle = useAnimatedStyle(() => ({ opacity: clock ? track(clock.value, BLINK) : 0 }));
+  // The held-still bust: what lies under the fading layers (back, face) and what lies over them (top, front) never moves, so each is ONE
+  // Svg instead of two (docs/features/RENDER_COST_SPEC.md C2: the lesson teacher was 8 Svg views, now 6)
+  const stillUnder = useMemo(() => [...tree.back, ...tree.face], [tree]);
+  const stillOver = useMemo(() => [...tree.top, ...tree.front], [tree]);
 
   if (!clock) return <Layer parts={treeParts(tree)} form={form} width={width} height={height} />;
   if (tree.moods) {
     // Held still: nothing translates or rotates, only expressions change
     return (
       <Animated.View style={StyleSheet.absoluteFill}>
-        <Layer parts={tree.back} form={form} width={width} height={height} />
-        <Layer parts={tree.face} form={form} width={width} height={height} />
+        <Layer parts={stillUnder} form={form} width={width} height={height} />
         {tree.moods.map((m, i) => (
           <MoodLayer key={i} parts={m.face} from={m.from} to={m.to} form={form} width={width} height={height} clock={clock} />
         ))}
         <Animated.View style={[StyleSheet.absoluteFill, lidStyle]}>
           <Layer parts={tree.lids} form={form} width={width} height={height} />
         </Animated.View>
-        <Layer parts={tree.top} form={form} width={width} height={height} />
-        <Layer parts={tree.front} form={form} width={width} height={height} />
+        <Layer parts={stillOver} form={form} width={width} height={height} />
       </Animated.View>
     );
   }
@@ -195,7 +234,7 @@ const Figure = memo(function Figure({
 });
 
 /** Decorative: hidden from screen readers. The words a teacher says are always real text beside it. */
-export const Npc = memo(function Npc({ spec, pose = "idle", size = 150, form = "hero", live = true, muted = false, lively = 1, style }: NpcProps) {
+export const Npc = memo(function Npc({ spec, pose = "idle", size = 150, form = "hero", live = true, muted = false, outline, lively = 1, style }: NpcProps) {
   const reduced = useReducedMotion();
   const focused = useIsFocused();
   const moving = live && focused && !reduced;
@@ -213,6 +252,7 @@ export const Npc = memo(function Npc({ spec, pose = "idle", size = 150, form = "
       importantForAccessibility="no-hide-descendants"
       pointerEvents="none"
     >
+      {outline ? <OutlineLayer spec={shown} pose={pose} form={form} width={width} height={size} color={outline} /> : null}
       {/* Keyed by pose: a new pose mounts a second figure that fades in while the old one fades out. */}
       <Animated.View key={pose} style={StyleSheet.absoluteFill} {...fade}>
         <Figure spec={shown} pose={pose} form={form} width={width} height={size} clock={moving ? clock : null} lively={lively} />

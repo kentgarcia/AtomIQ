@@ -5,7 +5,8 @@
  */
 
 import { View } from "react-native";
-import Animated, { FadeOut, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
+import Animated, { FadeOut, useSharedValue, withTiming } from "react-native-reanimated";
+import { useFillStyle } from "@/components/ui/progress-fill";
 import { useEffect } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -23,7 +24,7 @@ const useStyles = createStyles((theme) => {
     title: { ...fontFaces.heavy, fontSize: 28, lineHeight: 34, color: c.text, textAlign: "center" },
     note: { ...fontFaces.semibold, fontSize: fontSizes.md, lineHeight: 22, color: c.textSecondary, textAlign: "center" },
     bar: { width: "70%", maxWidth: 280, height: 16, borderRadius: radius.full, backgroundColor: withAlpha(c.border, 0.9), overflow: "hidden", marginTop: spacing.sm },
-    fill: { height: "100%", borderRadius: radius.full, backgroundColor: c.primary },
+    fill: { width: "100%", height: "100%", borderRadius: radius.full, backgroundColor: c.primary },
     shine: { position: "absolute", top: 3, left: spacing.sm, right: spacing.sm, height: 4, borderRadius: radius.full, backgroundColor: withAlpha(c.onPrimary, 0.3) },
     actions: { width: "100%", maxWidth: 280, paddingTop: spacing.sm },
   };
@@ -36,7 +37,7 @@ export function LoadingScreen({ title, levelNumber, progress, failed, onBack }: 
   useEffect(() => {
     shown.set(withTiming(Math.max(0.04, Math.min(1, progress)), { duration: 220, easing: EASE_OUT }));
   }, [progress, shown]);
-  const fill = useAnimatedStyle(() => ({ width: `${shown.get() * 100}%` }));
+  const fill = useFillStyle(shown);
   return (
     <Animated.View exiting={FadeOut.duration(260)} style={styles.screen} accessibilityLabel={`Loading level ${levelNumber}, ${title}`}>
       <HeroClip size={132} mode="idle" />

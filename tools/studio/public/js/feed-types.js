@@ -189,7 +189,7 @@ const FEED_TEMPLATES = {
   sortBy: (r) => `${r.npc_id ?? "~"}${r.id}`,
   newRow: () => ({ id: "", npc_id: null, poster_pool: [], kind: "celebrate", trigger: "lesson_complete", condition: {}, text: "", chip: null, reactors: [], weight: 1 }),
   fields: (isNew) => [
-    idField(isNew, "e.g. ft-ada-lesson-isotopes-1. Once published it can't be renamed."),
+    idField(isNew, "e.g. ft-hal-lesson-isotopes-1. Once published it can't be renamed."),
     sel("trigger", "Trigger", vocab().TEMPLATE_TRIGGER_KEYS, { required: true, affects: true, hint: "The event that creates this post." }),
     conditionField,
     sel("kind", "Kind", vocab().FEED_KINDS, { hint: "celebrate and milestone skew reactions to clap and love, tease to wow." }),
@@ -475,7 +475,7 @@ const CHAT_NODES = {
   sortBy: (r) => String(r.position).padStart(4, "0"),
   newRow: () => ({ id: "", npc_id: "", kind: "reply", trigger: null, title: null, text: "", pose: "idle", replies: [], position: 0 }),
   fields: (isNew) => [
-    idField(isNew, "e.g. chat-ada-isotope. Once published it can't be renamed."),
+    idField(isNew, "e.g. chat-hal-isotope. Once published it can't be renamed."),
     txt("npc_id", "Teacher", { required: true, suggest: { table: "npcs", column: "id" } }),
     sel("kind", "Kind", chatVocab().CHAT_KINDS, { required: true, affects: true, hint: "greeting: opens the free chat (one per teacher; the learner can start any number of them). reply: an answer. unprompted: opens a story thread when its trigger happens. sign_off: ends the thread." }),
     txt("title", "Story title", { nullable: true, hint: `A story's first node only (unprompted needs one): the subject line of the thread in Chats, up to ${chatVocab().CHAT_TITLE_MAX} characters.` }),

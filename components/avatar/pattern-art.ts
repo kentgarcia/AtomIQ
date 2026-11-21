@@ -113,6 +113,8 @@ export const PATTERN_DEFS: readonly PatternDef[] = [
   S("nightsky", "Night sky", ["star", "moon", "planet", "sparkle", "cloud"], "stagger"),
   S("labbench", "Lab bench", ["flask", "magnet", "bolt", "atom", "gauge", "drop"], "dense"),
   S("garden", "Garden", ["leaf", "sprout", "drop", "cloud", "sparkle"], "stagger"),
+  S("bowlab", "Bows & flasks", ["flask", "bow", "atom", "sparkle", "nucleus"], "stagger"),
+  S("samples", "Hot samples", ["trefoil", "tube", "rock", "decay", "sparkle"], "stagger"),
 ];
 
 export const PATTERN_IDS: readonly string[] = PATTERN_DEFS.map((d) => d.id);

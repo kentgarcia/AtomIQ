@@ -20,13 +20,9 @@ export type TutorialEvent =
   | "preview-opened"
   | "lesson-started"
   | "tab-feed-opened"
-  | "reaction-opened"
-  | "reacted"
   | "tab-phone-opened"
   | "app-opened:chats"
-  | "story-thread-opened"
-  | "passport-flipped"
-  | "story-level-opened";
+  | "story-thread-opened";
 
 /** A lit thing. Each is declared by one `useTutorialTarget` in source (`check:tutorial` keeps both lists equal). */
 export type TargetId =
@@ -35,20 +31,8 @@ export type TargetId =
   | "home.preview.start"
   | "tab.feed"
   | "tab.phone"
-  | "feed.reaction"
-  | "feed.picker"
   | "phone.app.chats"
-  | "chats.story"
-  | "quests.chest.daily"
-  | "quests.first-row"
-  | "profile.passport"
-  | "profile.badges"
-  | "profile.flip"
-  | "shop.grid"
-  | "games.atom-maze"
-  | "games.mythbuster"
-  | "games.lab"
-  | "story.level-1";
+  | "chats.story";
 
 export type TutorialMood = "idle" | "wave" | "happy" | "cheer" | "think" | "oops" | "wow" | "smile";
 
@@ -110,8 +94,9 @@ export const CHAPTERS: readonly Chapter[] = [
     after: "first-lesson",
     beats: [
       beat({ id: "feed.tab", screen: "home", host: "root", target: "tab.feed", say: "Nice! Your teachers noticed. See what they posted.", mood: "happy", mode: "tap", until: "tab-feed-opened", stable: true }),
-      beat({ id: "feed.react", screen: "feed", host: "root", target: "feed.reaction", say: "Tap the heart to react!", mood: "smile", mode: "tap", until: "reaction-opened", stable: true }),
-      beat({ id: "feed.pick", screen: "feed", host: "root", target: "feed.picker", say: "Now pick one!", mood: "happy", mode: "tap", until: "reacted", stable: false }),
+      // A look beat, not a tap: the reaction pill sits in the feed list, which has to be scrolled to on a small screen or large text, and
+      // the learner cannot scroll while only the lit control works. So the tour just says that posts arrive over time.
+      beat({ id: "feed.new-posts", screen: "feed", host: "root", say: "Teachers post here from time to time. Come back often!", mood: "happy", mode: "look", stable: true }),
     ],
   },
   {
@@ -125,47 +110,12 @@ export const CHAPTERS: readonly Chapter[] = [
   },
 ];
 
-export const INTROS: readonly Intro[] = [
-  {
-    id: "quests",
-    screen: "quests",
-    beats: [
-      beat({ id: "quests.chest", screen: "quests", host: "root", target: "quests.chest.daily", say: "Finish quests to open chests.", mood: "happy", mode: "look", stable: true }),
-      beat({ id: "quests.row", screen: "quests", host: "root", target: "quests.first-row", say: "Claim your XP here.", mood: "smile", mode: "look", stable: true }),
-    ],
-  },
-  {
-    id: "profile",
-    screen: "profile",
-    beats: [
-      beat({ id: "profile.passport", screen: "profile", host: "root", target: "profile.passport", say: "This is your explorer passport.", mood: "wow", mode: "look", stable: true }),
-      beat({ id: "profile.badges", screen: "profile", host: "root", target: "profile.badges", say: "Show off your best badges here.", mood: "smile", mode: "look", stable: true }),
-      beat({ id: "profile.flip", screen: "profile", host: "root", target: "profile.flip", say: "Flip it to see your stats!", mood: "happy", mode: "tap", until: "passport-flipped", stable: true }),
-    ],
-  },
-  {
-    id: "shop",
-    screen: "shop",
-    beats: [beat({ id: "shop.grid", screen: "shop", host: "root", target: "shop.grid", say: "Tap an item to try it on.", mood: "happy", mode: "look", stable: true })],
-  },
-  {
-    id: "games",
-    screen: "games",
-    beats: [
-      beat({ id: "games.maze", screen: "games", host: "root", target: "games.atom-maze", say: "Atom Maze: run, jump, and answer enemy questions to fight them.", mood: "cheer", mode: "look", stable: true }),
-      beat({ id: "games.myth", screen: "games", host: "root", target: "games.mythbuster", say: "Myth Buster: swipe each statement left for myth, right for fact.", mood: "think", mode: "look", stable: true }),
-      beat({ id: "games.lab", screen: "games", host: "root", target: "games.lab", say: "Lab: build atoms and shields, and watch decay.", mood: "wow", mode: "look", stable: true }),
-    ],
-  },
-  {
-    id: "story-map",
-    screen: "story-map",
-    beats: [
-      beat({ id: "story.how", screen: "story-map", host: "root", target: "story.level-1", say: "Beat enemies by answering. Wrong answers cost a heart.", mood: "think", mode: "look", stable: true }),
-      beat({ id: "story.start", screen: "story-map", host: "root", target: "story.level-1", say: "Tap level 1. Signs along the way teach the controls.", mood: "wave", mode: "tap", until: "story-level-opened", stable: true }),
-    ],
-  },
-];
+/**
+ * Screen intros (a few beats the first time a screen is opened). There are none now: Quests, Profile, the Shop, Games and the Atom Maze map
+ * had one each and were removed (2026-11-22); only the three chapters above guide the learner. The machinery stays (`introBeat`, `pickBeat`,
+ * the replay rows) so a screen can get one again by adding an entry here and one `useTutorialTarget` per beat.
+ */
+export const INTROS: readonly Intro[] = [];
 
 /* ---- what is recorded --------------------------------------------------------------------------- */
 

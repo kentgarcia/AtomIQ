@@ -2,7 +2,7 @@
  * The colours of one conversation, taken from the teacher's cover (their outfit colour and its shade). Two sets:
  *  - the cover's own (`base`, `on`): the header, where the picture is the outfit colour and the title sits on it;
  *  - the faces (`face`, `faceOn`, `lip`): the learner's bubbles and the link button, which carry reading text, so the face is the outfit
- *    colour only while white or the dark ink reads on it at 4.5:1, and is deepened until white does when neither does (Ada's bright blue).
+ *    colour only while white or the dark ink reads on it at 4.5:1, and is deepened until white does when neither does (Tess's bright blue).
  * Framework-free so `test:chats` can check it. A teacher's bubbles are a light wash of `base` made from the theme in the component, so
  * their text stays the theme's own and dark mode still works.
  */

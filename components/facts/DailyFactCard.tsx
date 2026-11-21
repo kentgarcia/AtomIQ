@@ -15,11 +15,11 @@ import Animated, {
   cancelAnimation,
   Easing,
   useAnimatedStyle,
-  useReducedMotion,
   useSharedValue,
   withRepeat,
   withTiming,
 } from "react-native-reanimated";
+import { useIdleStill } from "@/components/motion/use-reduced-motion";
 
 import { FactStory } from "@/components/facts/FactStory";
 import { AddToNotesButton } from "@/components/phone/AddToNotesButton";
@@ -51,7 +51,7 @@ export function DailyFactCard({
 }) {
   const { theme } = useTheme();
   const styles = useMemo(() => makeStyles(theme), [theme]);
-  const reducedMotion = useReducedMotion();
+  const reducedMotion = useIdleStill();
 
   const [fact, setFact] = useState<DailyFact | null>(null);
 

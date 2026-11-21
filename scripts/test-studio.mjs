@@ -305,7 +305,7 @@ describe("feed templates and blog pieces (docs/features/NPC_FEED_SPEC.md §6)", 
     const added = [...base.children, { id: "bc-test-tess", npc_id: "npc-tess", text: "A third, short comment.", chip: { lessonId: "isotopes" } }];
     const ok = await call("PUT", `/api/entities/blog_posts/${BLOG}`, { body: { ...base, children: added, links: [{ reference_id: "ref-openstax-chem-ch1" }] } });
     assert.equal(ok.status, 200, JSON.stringify(ok.json));
-    assert.deepEqual(query(fx.paths, "SELECT id FROM blog_comments WHERE blog_id = ? ORDER BY position", BLOG).map((r) => r.id), ["bc-the-smallest-thing-ray", "bc-the-smallest-thing-hal", "bc-test-tess"]);
+    assert.deepEqual(query(fx.paths, "SELECT id FROM blog_comments WHERE blog_id = ? ORDER BY position", BLOG).map((r) => r.id), ["bc-the-smallest-thing-ray", "bc-the-smallest-thing-ada", "bc-test-tess"]);
     assert.deepEqual(query(fx.paths, "SELECT reference_id FROM blog_references WHERE blog_id = ?", BLOG).map((r) => r.reference_id), ["ref-openstax-chem-ch1"]);
 
     // no `links` in the body: the sources stay
@@ -324,7 +324,7 @@ describe("feed templates and blog pieces (docs/features/NPC_FEED_SPEC.md §6)", 
     const base = await bodyFor();
     const comments = (extra) => [...base.children, { id: "bc-test-bad", text: "A comment.", ...extra }];
     const cases = {
-      "blog-comment-author": comments({ npc_id: "npc-ada" }),
+      "blog-comment-author": comments({ npc_id: "npc-hal" }),
       "blog-comment-dup": comments({ npc_id: "npc-ray" }),
       "blog-comment-length": comments({ npc_id: "npc-mina", text: "c".repeat(201) }),
       "blog-comment-chip": comments({ npc_id: "npc-mina", chip: { lessonId: "no-such-lesson" } }),
@@ -337,7 +337,7 @@ describe("feed templates and blog pieces (docs/features/NPC_FEED_SPEC.md §6)", 
     }
     assert.equal(count("SELECT COUNT(*) n FROM blog_comments WHERE blog_id = ?", BLOG), 3, "the failed saves rolled back");
     // a single comment row through the raw route is validated against its piece
-    const raw = await call("PUT", "/api/rows/blog_comments/bc-the-smallest-thing-ray", { body: { npc_id: "npc-ada" } });
+    const raw = await call("PUT", "/api/rows/blog_comments/bc-the-smallest-thing-ray", { body: { npc_id: "npc-hal" } });
     assert.equal(raw.status, 422);
     assert.ok(ruleOf(raw).includes("blog-comment-author"));
   });
@@ -395,8 +395,8 @@ describe("feed templates and blog pieces (docs/features/NPC_FEED_SPEC.md §6)", 
   });
 
   it("protects shipped feed ids like the other content", async () => {
-    fs.writeFileSync(fx.paths.shippedIds, JSON.stringify({ feed_templates: ["ft-ada-checkpoint-inside-the-atom"], blog_posts: ["blog-three-kinds-of-carbon"] }));
-    const t = await call("DELETE", "/api/entities/feed_templates/ft-ada-checkpoint-inside-the-atom");
+    fs.writeFileSync(fx.paths.shippedIds, JSON.stringify({ feed_templates: ["ft-hal-checkpoint-inside-the-atom"], blog_posts: ["blog-three-kinds-of-carbon"] }));
+    const t = await call("DELETE", "/api/entities/feed_templates/ft-hal-checkpoint-inside-the-atom");
     assert.equal(t.status, 409);
     assert.equal(t.json.needsReason, true);
     const rename = await call("PUT", "/api/entities/blog_posts/blog-three-kinds-of-carbon", { body: { row: { id: "blog-renamed" } } });

@@ -7,7 +7,7 @@
 
 import { useEffect, useState } from "react";
 
-import { DRIP_MS, dripPlan } from "@/components/feed/feed-ui-core";
+import { DRIP_MS, dripPlan, needsFullReveal } from "@/components/feed/feed-ui-core";
 import type { FeedItem } from "@/services/feed";
 
 export function useDrippedFeed(items: readonly FeedItem[], loading: boolean, active: boolean, reduced: boolean): { shown: FeedItem[]; fresh: ReadonlySet<string> } {
@@ -18,8 +18,11 @@ export function useDrippedFeed(items: readonly FeedItem[], loading: boolean, act
     if (loading) return;
     if (revealed === null || reduced) {
       // The first load (and reduced motion) is shown whole: synchronising with the loaded list is the point of this effect.
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setRevealed(new Set(items.map((i) => i.id)));
+      // Only when something is missing: `revealed` is a dependency, so a fresh Set every run would loop for ever.
+      if (needsFullReveal(revealed, items)) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setRevealed(new Set(items.map((i) => i.id)));
+      }
       return;
     }
     if (!active) return;

@@ -16,11 +16,11 @@ import Animated, {
   runOnJS,
   useAnimatedReaction,
   useAnimatedStyle,
-  useReducedMotion,
   useSharedValue,
   withTiming,
   type SharedValue,
 } from "react-native-reanimated";
+import { useReducedMotion } from "@/components/motion/use-reduced-motion";
 import Svg, { Circle, Line, Path } from "react-native-svg";
 
 import { HeaderButton, ScreenHeader, useHeaderBorder } from "@/components/layout";

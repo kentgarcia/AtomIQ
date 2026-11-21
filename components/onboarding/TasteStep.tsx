@@ -22,7 +22,7 @@ import { STAMP_LANDS, STAMP_TOTAL } from "@/components/lesson/stamp-core";
 import { STAT_FX, STAT_TOTAL } from "@/components/lesson/stat-reveal-core";
 import { StatTile } from "@/components/lesson/StatTile";
 import { TextButton } from "@/components/lesson/TextButton";
-import { Shrodi } from "@/components/mascot/Shrodi";
+import { ShrodiStill } from "@/components/mascot/ShrodiStill";
 import { Burst } from "@/components/motion/Burst";
 import { BURST } from "@/components/motion/burst-core";
 import { Reveal } from "@/components/motion/Reveal";
@@ -73,7 +73,7 @@ function Reward({ onContinue }: { onContinue: () => void }) {
       <View style={styles.hero}>
         <View style={styles.foxWrap}>
           <Stamp at={REWARD.fox}>
-            <Shrodi mood="cheer" size={150} />
+            <ShrodiStill size={150} />
           </Stamp>
           <Burst clock={clock} at={REWARD.fox + STAMP_LANDS} diameter={150} color={theme.colors.gold} ringColor={theme.colors.primary} reach={90} />
         </View>

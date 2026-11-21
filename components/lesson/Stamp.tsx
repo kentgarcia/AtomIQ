@@ -6,7 +6,8 @@
 
 import { useEffect, type ReactNode } from "react";
 import type { StyleProp, ViewStyle } from "react-native";
-import Animated, { Easing, cancelAnimation, useAnimatedStyle, useReducedMotion, useSharedValue, withDelay, withTiming } from "react-native-reanimated";
+import Animated, { Easing, cancelAnimation, useAnimatedStyle, useSharedValue, withDelay, withTiming } from "react-native-reanimated";
+import { useReducedMotion } from "@/components/motion/use-reduced-motion";
 
 import { STAMP_TOTAL, stampFrame } from "./stamp-core";
 

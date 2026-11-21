@@ -12,6 +12,13 @@ export type { SfxCategory } from "./media-core.ts";
 export type SfxGroup = "ui" | "lesson" | "reward" | "social" | "game" | "phone";
 
 /** Every bundled file: its length in ms (checked against the WAV header by `check:sfx`). */
+/**
+ * No bundled effect may be shorter than this (ms). `react-native-audio-api` failed to decode every file under about 30 ms
+ * ("Cannot decode audio data") on the first Android development build while a 43 ms one decoded, so shorter files are padded
+ * with silence (`node scripts/pad-short-sfx.mjs --apply`) and `check:sfx` fails on one that is not.
+ */
+export const MIN_SFX_MS = 50;
+
 export const SFX_FILES = {
   "ui/press": 53,
   "ui/release": 64,
@@ -24,8 +31,8 @@ export const SFX_FILES = {
   "ui/disable": 391,
   "ui/warning": 776,
   "ui/equip": 533,
-  "ui/unequip": 15,
-  "ui/tick": 46,
+  "ui/unequip": 50,
+  "ui/tick": 50,
   "ui/shop-open": 3864,
   "lesson/answer-correct": 791,
   "lesson/answer-wrong": 353,
@@ -95,15 +102,15 @@ export const SFX_FILES = {
   "ui/page-back": 69,
   "ui/panel-open": 219,
   "ui/panel-close": 73,
-  "ui/invalid": 46,
+  "ui/invalid": 50,
   "ui/announce": 662,
   "ui/delete": 586,
-  "ui/tab-right": 25,
+  "ui/tab-right": 50,
   "ui/equip-confirm": 651,
-  "ui/try-on": 24,
-  "ui/tab-left": 34,
-  "ui/swatch": 40,
-  "ui/geiger": 38,
+  "ui/try-on": 50,
+  "ui/tab-left": 50,
+  "ui/swatch": 50,
+  "ui/geiger": 50,
   "ui/go": 2003,
   "ui/wipe": 2557,
   "phone/start-1": 185,
@@ -112,7 +119,7 @@ export const SFX_FILES = {
   "phone/app-open": 98,
   "phone/app-close": 102,
   "phone/wallpaper": 946,
-  "phone/typing": 20,
+  "phone/typing": 50,
   "phone/send": 70,
   "phone/sticker": 533,
   "phone/end": 1500,
@@ -121,21 +128,21 @@ export const SFX_FILES = {
   "phone/note-clip": 594,
   "phone/shutter": 204,
   "phone/photo-saved": 150,
-  "phone/camera-option": 26,
+  "phone/camera-option": 50,
   "phone/scan-lock": 67,
-  "phone/scan-miss": 24,
+  "phone/scan-miss": 50,
   "phone/map-open": 365,
   "phone/map-close": 262,
   "phone/map-pin": 160,
-  "phone/map-limit": 11,
+  "phone/map-limit": 50,
   "phone/book": 121,
-  "reward/coin-tick": 28,
+  "reward/coin-tick": 50,
   "reward/coin-land": 711,
   "reward/count-up": 471,
   "reward/stat-up": 770,
   "reward/stat-down": 332,
   "reward/podium": 533,
-  "reward/item-tick": 26,
+  "reward/item-tick": 50,
   "lesson/pick": 173,
   "lesson/drop": 209,
   "lesson/pair-ok": 185,
@@ -345,6 +352,90 @@ export const filesOfGroup = (group: SfxGroup): SfxFile[] =>
 /** Biggest pool any cue asks for on a file. */
 export const poolSizeOf = (file: SfxFile): number =>
   Math.max(1, ...CUE_IDS.filter((id) => CUES[id].file === file).map((id) => CUES[id].pool));
+
+/* ------------------------------------------------------------------ */
+/* Sets: which cues a screen needs warm (docs/features/PERFORMANCE_AND_SOUND_SPEC.md §4.4 A) */
+/* ------------------------------------------------------------------ */
+
+/**
+ * A set is the cues a screen plays in its first seconds. `useSfxSet("lesson-run")` warms them on mount and lets them
+ * go on unmount; `core` is warmed once after the first frame and kept. A cue in no warm set loads on its first play
+ * (a little late, visible in the diag as `late`). Every cue must be listed somewhere, so a new cue is a decision:
+ * `test:sfx` fails on one that is not. `on-demand` is the decision "never warm this one".
+ */
+export const SFX_SETS = {
+  // Every screen: taps, answers, the pop, coins, the whoosh and the typed blip
+  core: [
+    "ui.press", "ui.tab", "ui.select", "ui.cancel", "ui.modal-open", "ui.modal-close", "ui.lock", "ui.tick",
+    "lesson.answer-correct", "lesson.answer-wrong", "lesson.blip", "lesson.bubble", "lesson.whoosh", "lesson.stamp", "lesson.star",
+    "reward.pop", "reward.appear", "reward.coin", "reward.sparkle",
+  ],
+  onboarding: ["onboard.go", "reward.fill", "transition.wipe", "reward.finish-jingle", "reward.level-up", "reward.achievement", "lesson.start"],
+  // The Home map: the node bubble, the preview, the unlock and the dialogs that come after a lesson
+  home: [
+    "lesson.node-zoom", "lesson.zoom-in", "lesson.zoom-out", "lesson.start", "lesson.unlock", "reward.level-up", "reward.achievement",
+    "reward.rank-up", "ui.invalid", "ui.warning", "ui.announce", "social.achievement-scroll",
+  ],
+  // A lesson, practice or review run and its finish screen
+  "lesson-run": [
+    "lesson.pick", "lesson.drop", "lesson.pair-ok", "lesson.lock-in", "lesson.complete", "lesson.finish", "reward.finish-jingle",
+    "count.run", "lesson.zoom-in", "lesson.zoom-out", "nav.page-next", "nav.page-back",
+  ],
+  quests: [
+    "reward.fill", "reward.chest-ready", "reward.chest-open", "reward.requirements-met", "count.run", "shop.coin-tick", "shop.coin-land",
+    "levelup.item", "reward.level-up",
+  ],
+  shop: [
+    "ui.shop-open", "shop.try", "shop.swatch", "shop.equip-confirm", "ui.equip", "ui.unequip", "reward.purchase", "shop.coin-tick",
+    "shop.coin-land", "levelup.item", "reward.level-up", "reward.achievement",
+  ],
+  // The Feed, Ranks and the Discover page
+  feed: ["rank.podium", "rank.up", "rank.down", "social.notification", "social.new-friend", "reward.rank-up", "ui.delete"],
+  // The phone's home screen, Chats and Contacts
+  phone: [
+    "phone.start-1", "phone.start-2", "phone.start-3", "phone.app-open", "phone.app-close", "phone.wallpaper", "chat.typing", "chat.send",
+    "chat.sticker", "chat.end", "chat.archive", "chat.incoming", "social.message-send", "social.message-receive", "ui.delete", "nav.page-next",
+    "nav.page-back",
+  ],
+  // The phone's tools: Field Notes, Camera, Scanner, Map, Library
+  "phone-tools": [
+    "notes.new", "notes.clip", "camera.shutter", "camera.saved", "camera.option", "scanner.scan", "scanner.lock", "scanner.miss", "map.open",
+    "map.close", "map.pin", "map.limit", "library.book", "ui.panel-open", "ui.panel-close", "reward.requirements-met",
+  ],
+  mythbuster: [
+    "game.count-one", "game.count-two", "game.count-three", "game.count-finish", "game.get-ready", "game.timer-tick", "game.time-up",
+    "game.explosion", "game.over", "game.hit", "game.heart", "reward.finish-jingle",
+  ],
+  // The Atom Maze: what every level uses, then each ground's feet and landings (a level warms its own ground: `warmSfxCues`)
+  platformer: [
+    "game.platformer-jump", "game.platformer-coin", "game.platformer-hurt", "game.platformer-defeat", "game.platformer-battle", "game.over",
+    "game.explosion", "game.hit", "game.jump", "game.checkpoint", "game.fireworks-launch", "game.fireworks-burst",
+  ],
+  "platformer-grass": ["game.step-grass-left", "game.step-grass-right", "game.land-grass", "game.fall-grass"],
+  "platformer-snow": ["game.step-snow-left", "game.step-snow-right", "game.land-snow"],
+  "platformer-sand": ["game.step-sand-left", "game.step-sand-right", "game.land-sand", "game.fall-sand"],
+  "platformer-stone": ["game.step-stone-left", "game.step-stone-right", "game.land-stone", "game.fall-stone"],
+  "platformer-soil": ["game.step-soil-left", "game.step-soil-right", "game.land-soil", "game.fall-soil"],
+  // Never warmed: rare moments that load on their first play
+  "on-demand": ["ui.tab-right", "ui.tab-left", "ui.toggle-on", "ui.toggle-off", "ui.disable", "ui.release", "lab.geiger"],
+} as const satisfies Record<string, readonly (keyof typeof CUES)[]>;
+
+export type SfxSetName = keyof typeof SFX_SETS;
+
+/** The sets a screen asks for by name; `on-demand` is a decision, not a screen. */
+export const WARMABLE_SETS = (Object.keys(SFX_SETS) as SfxSetName[]).filter((n) => n !== "on-demand");
+
+/** The files behind a list of cues, once each, in order. */
+export const filesOfCues = (cues: readonly SfxCue[]): SfxFile[] => [...new Set(cues.map((c) => CUES[c].file))];
+
+export const filesOfSet = (name: SfxSetName): SfxFile[] => filesOfCues(SFX_SETS[name] as readonly SfxCue[]);
+
+/** Cues that are in no set at all (a new cue must pick one). */
+export const cuesInNoSet = (): SfxCue[] => {
+  const listed = new Set<string>();
+  for (const cues of Object.values(SFX_SETS)) for (const c of cues) listed.add(c);
+  return CUE_IDS.filter((id) => !listed.has(id));
+};
 
 /** What `pickSlot` needs to know of a player. */
 export interface SlotState {

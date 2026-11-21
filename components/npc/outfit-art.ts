@@ -1,5 +1,5 @@
 /**
- * The extra clothes of the avatar, as pure data (no imports): twelve outfits beyond the five the teachers wear.
+ * The extra clothes of the avatar, as pure data (only `lab-apron-art.ts` is imported): fourteen outfits beyond the five the teachers wear.
  *
  * Only the top of the body shows in the avatar's picture (the shoulders' dome from y 68 down to about 108), so
  * what makes each outfit is up there: the neckline, the collar, a scarf, straps, bands and patterns cut to the
@@ -9,10 +9,12 @@
  * shade step, round-capped lines.
  */
 
-export type OutfitTone = "main" | "shade" | "collar" | "skin" | "white" | "swan" | "gold" | "red" | "pink";
+import { APRON_PIECES, APRON_PUFFS, type ApronTone } from "./lab-apron-art.ts";
+
+export type OutfitTone = "main" | "shade" | "collar" | "skin" | "white" | "swan" | "gold" | "red" | "pink" | "collarShade" | "tan" | "tanShade" | "violet" | "violetShade";
 export type OutfitPiece = { d: string; tone: OutfitTone; evenOdd?: boolean } | { line: string; tone: OutfitTone; w: number };
 
-export const EXTRA_OUTFITS = ["turtleneck", "striped", "overalls", "cardigan", "jacket", "polo", "sailor", "hawaiian", "puffer", "tuxedo", "knit", "scarf"] as const;
+export const EXTRA_OUTFITS = ["turtleneck", "striped", "overalls", "cardigan", "jacket", "polo", "sailor", "hawaiian", "puffer", "tuxedo", "knit", "scarf", "labapron", "whitecoat"] as const;
 export type ExtraOutfit = (typeof EXTRA_OUTFITS)[number];
 
 export interface OutfitArt {
@@ -83,6 +85,9 @@ function flower(cx: number, cy: number, r: number, petal: OutfitTone, centre: Ou
   out.push(fill(circle(cx, cy, r * 0.55), centre));
   return out;
 }
+
+/** The apron's own tones as the extra outfits' tones: the shirt is the learner's colour, the rest are fixed. */
+const APRON_TONES: Record<ApronTone, OutfitTone> = { shirt: "main", shirtShade: "shade", apron: "tan", apronShade: "tanShade", white: "white", mint: "white", badge: "violet", badgeInk: "violetShade" };
 
 // ── the outfits ──────────────────────────────────────────────────────────────
 
@@ -213,6 +218,23 @@ export const EXTRA_OUTFIT_ART: Record<ExtraOutfit, OutfitArt> = {
       fill(rrect(-28, 60, 56, 28, 13), "collar"),
       ...[-20, -3, 14].map((x) => fill(rrect(x, 62, 6, 24, 2), "main")),
     ],
+  },
+  // A white lab coat over a jumper in the learner's colour: the jumper shows in a V under a crew neck, the lapels and a chest pocket with two pens
+  whitecoat: {
+    body: "collar",
+    sleeve: "collar",
+    pieces: [
+      fill(roundPoly([[-34, 64], [34, 64], [0, 130]], 8), "main"),
+      fill(rrect(-22, 62, 44, 16, 8), "shade"),
+      ...pair([[-52, 86], [-34, 66], [0, 130], [-13, 130], [-34, 106]], 5, "collarShade"),
+      fill(rrect(20, 122, 34, 28, 6), "collarShade"),
+      fill(rrect(27, 108, 6, 18, 3), "red"),
+      fill(rrect(38, 111, 6, 15, 3), "main"),
+    ],
+  },
+  // Ada's lab outfit: a shirt in the learner's colour with puffed shoulders and a white round collar, under a tan apron with a violet radiation badge
+  labapron: {
+    pieces: [...APRON_PUFFS, ...APRON_PIECES].map((piece): OutfitPiece => ({ d: piece.d, tone: APRON_TONES[piece.tone] })),
   },
 };
 

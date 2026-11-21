@@ -6,8 +6,10 @@
  * just the quests (the Daily | Weekly switch lives inside `MissionsSection`).
  */
 
+import { useRenderTimer } from "@/components/dev/render-timer";
+import { useSfxSet } from "@/components/motion/use-sfx-set";
 import { useFocusEffect } from "expo-router";
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback, useEffect, useMemo, useRef } from "react";
 import { RefreshControl, ScrollView, View } from "react-native";
 import { usePullRefresh } from "@/hooks/use-pull-refresh";
 
@@ -16,22 +18,32 @@ import { HeaderCurrency } from "@/components/quests/HeaderCurrency";
 import { MissionsSection } from "@/components/quests/MissionsSection";
 import { QuestsHeaderCard } from "@/components/quests/QuestsHeaderCard";
 import { useMissions, type MissionView } from "@/hooks/use-missions";
+import { refreshOnFocus } from "@/services/missions-core";
 import { createStyles, useResponsiveLayout, useTheme } from "@/theme";
 
 export default function QuestsScreen() {
+  useRenderTimer("/quests");
+  useSfxSet("quests");
   const tabBarInset = useTabBarInset();
   const { scrolled, onScroll, scrollEventThrottle } = useHeaderBorder();
   const { contentMaxWidth } = useResponsiveLayout();
   const { theme } = useTheme();
   const styles = useMemo(() => makeStyles(theme), [theme]);
 
-  const { daily, weekly, claim, openPeriodChest, refresh: refreshMissions } = useMissions();
+  const { loading, daily, weekly, claim, openPeriodChest, refresh: refreshMissions } = useMissions();
 
-
-  // Progress is earned elsewhere (Myth Buster, the daily fact), so re-read on focus
+  // Progress is earned elsewhere (Myth Buster, the daily fact), so re-read on focus. The hook reads once as it mounts, so a first focus that
+  // finds that read still going does not start a second one (`refreshOnFocus`); every later focus reads as before.
+  const loadingRef = useRef(loading);
+  useEffect(() => {
+    loadingRef.current = loading;
+  }, [loading]);
+  const firstFocus = useRef(true);
   useFocusEffect(
     useCallback(() => {
-      void refreshMissions();
+      const first = firstFocus.current;
+      firstFocus.current = false;
+      if (refreshOnFocus(first, loadingRef.current)) void refreshMissions();
     }, [refreshMissions]),
   );
 
@@ -55,10 +67,14 @@ export default function QuestsScreen() {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} {...spinner} />
         }
       >
-        <View style={styles.stack}>
-          <QuestsHeaderCard daily={daily} weekly={weekly} onOpenChest={openPeriodChest} />
-          <MissionsSection daily={daily} weekly={weekly} onClaim={claimMission} />
-        </View>
+        {/* Not drawn until the counters have been read (a few ms): drawn first with nothing, every row and chest was built twice and the
+            bars animated up from empty. `loading` is true only for that first read; a later refresh never blanks the page. */}
+        {loading ? null : (
+          <View style={styles.stack}>
+            <QuestsHeaderCard daily={daily} weekly={weekly} onOpenChest={openPeriodChest} />
+            <MissionsSection daily={daily} weekly={weekly} onClaim={claimMission} />
+          </View>
+        )}
       </ScrollView>
     </View>
   );

@@ -40,7 +40,7 @@ const useStyles = createStyles((theme) => {
   return {
     fab: {
       position: "absolute",
-      left: 74,
+      left: 24,
       width: 40,
       height: 40,
       borderRadius: 14,

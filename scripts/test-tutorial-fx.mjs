@@ -49,38 +49,6 @@ test("the four strips and the hole tile the screen with no gap and no overlap", 
   assert.deepEqual(s.right, { x: 150, y: 100, w: 250, h: 50 });
 });
 
-test("the glide is monotonic, eased out, and lands exactly", () => {
-  const a = { x: 0, y: 0, w: 50, h: 50, r: 8 };
-  const b = { x: 200, y: 400, w: 100, h: 60, r: 16 };
-  assert.deepEqual(fx.glide(a, b, 0), a);
-  assert.deepEqual(fx.glide(a, b, 1), b);
-  let last = -1;
-  for (let p = 0; p <= 1.0001; p += 0.05) {
-    const x = fx.glide(a, b, p).x;
-    assert.ok(x >= last);
-    last = x;
-  }
-  assert.ok(fx.glide(a, b, 0.5).x > 100, "ease-out is past the middle at half time");
-  assert.ok(TUTORIAL_FX.glideMs <= 300, "interface moves stay under 300 ms");
-});
-
-test("the ring and the hand loop and start from rest", () => {
-  assert.equal(fx.ringFrame(0).scale, 1);
-  assert.equal(fx.ringFrame(0).opacity, 1);
-  assert.ok(Math.abs(fx.ringFrame(TUTORIAL_FX.ringMs).scale - 1) < 1e-9);
-  const peak = fx.ringFrame(TUTORIAL_FX.ringMs / 2);
-  assert.ok(peak.scale > 1 && peak.scale <= 1.06 + 1e-9 && peak.opacity < 1);
-  assert.equal(fx.handFrame(0).travel, 0);
-  assert.ok(Math.abs(fx.handFrame(TUTORIAL_FX.handMs / 2).travel - TUTORIAL_FX.handTravel) < 1e-9);
-  assert.equal(fx.handFrame(TUTORIAL_FX.handMs).travel < 1e-9, true);
-});
-
-test("the nudge ends at rest", () => {
-  assert.equal(fx.nudgeX(0), 0);
-  assert.equal(fx.nudgeX(TUTORIAL_FX.nudgeMs), 0);
-  assert.ok(Math.abs(fx.nudgeX(TUTORIAL_FX.nudgeMs * 0.12)) > 1);
-});
-
 test("the bubble goes below, else above, else in the middle, and stays on screen", () => {
   const opts = { top: 50, bottom: 90 };
   assert.equal(fx.bubbleSide({ x: 10, y: 100, w: 50, h: 50 }, screen, 120, opts), "below");
@@ -100,6 +68,16 @@ test("a rectangle must hold still before the hole goes to it", () => {
   assert.equal(fx.isSettled([[0, r], [100, r]]), false, "not long enough");
   assert.equal(fx.isSettled([[0, r], [100, r], [200, r]]), true);
   assert.equal(fx.isSettled([[0, { ...r, x: 40 }], [100, r], [200, r]]), false, "it was still moving");
+});
+
+test("a control that never holds still is lit anyway after a while, but not before", () => {
+  const r = { x: 10, y: 10, w: 50, h: 50 };
+  const pulsing = [[0, r], [60, { ...r, w: 53 }], [120, r], [180, { ...r, w: 53 }]];
+  assert.equal(fx.isSettled(pulsing), false);
+  assert.equal(fx.mayLight([], 0, 5000), false, "nothing measured, nothing to light");
+  assert.equal(fx.mayLight(pulsing, 0, 400), false, "still waiting for it to settle");
+  assert.equal(fx.mayLight(pulsing, 0, fx.TUTORIAL_FX.unsettledMs), true);
+  assert.equal(fx.mayLight([[0, r], [100, r], [200, r]], 0, 200), true, "a settled one is lit at once");
 });
 
 test("a missing target waits, then a stable beat falls back and a transient one steps back", () => {
@@ -137,16 +115,3 @@ test("a press on a locked thing under the dim opens its dialog, and only a locke
   assert.equal(await hits.openLockedAt(120, 720), false);
 });
 
-test("the move between holes is a crossfade: the new dim is in before the old one leaves, and the ends are clean", () => {
-  const { dimOpacities } = fx;
-  assert.deepEqual(dimOpacities(0), { prev: 1, next: 0 });
-  assert.deepEqual(dimOpacities(1), { prev: 0, next: 1 });
-  assert.deepEqual(dimOpacities(0.5), { prev: 1, next: 1 });
-  for (let i = 0; i <= 20; i++) {
-    const o = dimOpacities(i / 20);
-    assert.ok(o.prev >= 0 && o.prev <= 1 && o.next >= 0 && o.next <= 1);
-    assert.ok(Math.max(o.prev, o.next) === 1, "the scrim is never lighter than itself in between");
-  }
-  assert.deepEqual(dimOpacities(-3), { prev: 1, next: 0 });
-  assert.deepEqual(dimOpacities(9), { prev: 0, next: 1 });
-});

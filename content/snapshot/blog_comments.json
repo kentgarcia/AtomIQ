@@ -15,11 +15,11 @@
       }
     },
     {
-      "id": "bc-the-smallest-thing-hal",
+      "id": "bc-the-smallest-thing-ada",
       "blog_id": "blog-the-smallest-thing",
-      "npc_id": "npc-hal",
+      "npc_id": "npc-ada",
       "position": 1,
-      "text": "Atoms are tiny, and the nucleus inside one can change all by itself. That is what my lessons are about.",
+      "text": "ooh, tiny. and inside one, the nucleus can change all by itself. that's what my lessons are about~",
       "chip": {
         "lessonId": "why-nuclei-decay"
       }

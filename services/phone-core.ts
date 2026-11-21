@@ -156,6 +156,33 @@ export function newApps(unlocked: readonly PhoneApp[], seen: ReadonlySet<string>
 
 export type Badge = { kind: "count"; count: number } | { kind: "dot" } | null;
 
+/** What an icon looks like: everything that changes its picture, and nothing that is only a handler. */
+export interface IconView {
+  app: unknown;
+  size: number;
+  label: string;
+  locked?: boolean;
+  badge: Badge;
+  install?: { delay: number; newDot: boolean };
+}
+
+const sameBadge = (a: Badge, b: Badge): boolean => a === b || (a !== null && b !== null && a.kind === b.kind && (a.kind !== "count" || (b.kind === "count" && a.count === b.count)));
+
+/**
+ * Whether two renders of an icon look the same, so the second can be skipped. The Phone tab re-renders several times per visit (focus,
+ * the progress read, the install batch) and builds a new press handler each time; comparing only what is drawn keeps every icon (an SVG
+ * picture each) from re-rendering for nothing. The badge is compared by value: `badgeOf` builds a new object each call.
+ */
+export const sameIconView = (a: IconView, b: IconView): boolean =>
+  a.app === b.app &&
+  a.size === b.size &&
+  a.label === b.label &&
+  (a.locked ?? false) === (b.locked ?? false) &&
+  sameBadge(a.badge, b.badge) &&
+  (a.install === undefined) === (b.install === undefined) &&
+  a.install?.delay === b.install?.delay &&
+  a.install?.newDot === b.install?.newDot;
+
 /**
  * The corner mark on an icon. `isNew` is an app installed and not opened yet; `enabled` is the Settings
  * "App badges" switch.

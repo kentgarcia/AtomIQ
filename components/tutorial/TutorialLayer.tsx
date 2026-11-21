@@ -17,7 +17,6 @@
 import { usePathname, useRouter } from "expo-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Keyboard, Pressable, type GestureResponderEvent, StyleSheet, useWindowDimensions, View } from "react-native";
-import Animated, { FadeIn, FadeOut, useSharedValue } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { emitClaimFlight } from "@/components/quests/claim-fx-bus";
@@ -32,6 +31,7 @@ import {
   bubbleTop,
   holeFor,
   isSettled,
+  mayLight,
   mayShow,
   missingAction,
   strips,
@@ -60,7 +60,8 @@ import { spacing } from "@/theme";
 /** Switch on to log why the tour is (not) showing. */
 const TOUR_DEBUG = false;
 
-const sameRect = (a: Rect | null, b: Rect) => !!a && Math.abs(a.x - b.x) < 0.5 && Math.abs(a.y - b.y) < 0.5 && Math.abs(a.w - b.w) < 0.5 && Math.abs(a.h - b.h) < 0.5;
+/** Two rectangles within `tol` dp of each other on every side. */
+const sameRect = (a: Rect | null, b: Rect, tol = 0.5) => !!a && Math.abs(a.x - b.x) < tol && Math.abs(a.y - b.y) < tol && Math.abs(a.w - b.w) < tol && Math.abs(a.h - b.h) < tol;
 
 export function TutorialLayer({ host = "root" }: { host?: TutorialHost }) {
   const isRoot = host === "root";
@@ -71,7 +72,6 @@ export function TutorialLayer({ host = "root" }: { host?: TutorialHost }) {
   const { width, height } = useWindowDimensions();
   const insets = useSafeAreaInsets();
   const screenSize = useMemo(() => ({ w: width, h: height }), [width, height]);
-  const direction = useSharedValue(0);
   const screen = screenOfPath(pathname);
 
   /* ---- app-wide, root only -------------------------------------------------------------------- */
@@ -172,6 +172,7 @@ export function TutorialLayer({ host = "root" }: { host?: TutorialHost }) {
     let alive = true;
     const samples: (readonly [number, Rect])[] = [];
     let missingSince: number | null = null;
+    let firstSeenAt: number | null = null;
     let scrolled = false;
     const tick = async () => {
       const r = await measureTarget(target);
@@ -179,6 +180,7 @@ export function TutorialLayer({ host = "root" }: { host?: TutorialHost }) {
       const now = Date.now();
       if (!r) {
         samples.length = 0;
+        firstSeenAt = null;
         if (missingSince === null) {
           missingSince = now;
           if (!scrolled) {
@@ -192,10 +194,15 @@ export function TutorialLayer({ host = "root" }: { host?: TutorialHost }) {
         return;
       }
       missingSince = null;
+      if (firstSeenAt === null) firstSeenAt = now;
       setFallback(false);
       samples.push([now, r]);
       if (samples.length > 6) samples.shift();
-      if (isSettled(samples)) setSpot((prev) => (prev && prev.id === beatId && sameRect(prev.rect, r) ? prev : { id: beatId, rect: r }));
+      if (mayLight(samples, firstSeenAt, now)) {
+        // A control lit only because it never held still (it pulses) moves the hole only when it has really gone elsewhere, not on every sample
+        const tol = isSettled(samples) ? 0.5 : 4;
+        setSpot((prev) => (prev && prev.id === beatId && sameRect(prev.rect, r, tol) ? prev : { id: beatId, rect: r }));
+      }
     };
     // Quick while the control settles, relaxed once it has held still
     let timer: ReturnType<typeof setTimeout> | null = null;
@@ -218,22 +225,12 @@ export function TutorialLayer({ host = "root" }: { host?: TutorialHost }) {
   const hole = !fallback && target && rect ? holeFor(rect, { radius: getTarget(target)?.radius ?? 16 }) : null;
   const mode = beat ? (fallback ? "look" : beat.mode) : "look";
 
-  /* ---- motion state ------------------------------------------------------------------------------ */
+  /* ---- taps on the dim ---------------------------------------------------------------------------- */
 
-  // The strips follow the hole only once it has stopped; while it glides, one blocker covers the screen
-  const [gliding, setGliding] = useState(false);
-  const holeKey = hole ? `${Math.round(hole.x)}:${Math.round(hole.y)}:${Math.round(hole.w)}:${Math.round(hole.h)}` : "none";
-  useEffect(() => {
-    setGliding(true);
-    const t = setTimeout(() => setGliding(false), TUTORIAL_FX.glideMs + 40);
-    return () => clearTimeout(t);
-  }, [holeKey, visible]);
-
-  const [nudge, setNudge] = useState(0);
   const lastNudge = useRef(0);
   const onDimTap = useCallback((event?: GestureResponderEvent, originX = 0, originY = 0) => {
+    // A soft "not that" cue, no motion: at most one every 600 ms
     const nudgeBubble = () => {
-      setNudge((n) => n + 1);
       const now = Date.now();
       if (now - lastNudge.current > 600) void playSfx("ui.invalid");
       lastNudge.current = now;
@@ -247,19 +244,6 @@ export function TutorialLayer({ host = "root" }: { host?: TutorialHost }) {
       if (!opened) nudgeBubble();
     });
   }, []);
-
-  // A finished beat: a ring pops out of its hole and a soft cue plays
-  const [donePop, setDonePop] = useState(0);
-  const prevBeat = useRef<string | null>(null);
-  const wasVisible = useRef(false);
-  useEffect(() => {
-    if (prevBeat.current && prevBeat.current !== beatId && wasVisible.current) {
-      setDonePop((n) => n + 1);
-      void playSfx("reward.pop");
-    }
-    prevBeat.current = beatId;
-    wasVisible.current = visible;
-  }, [beatId, visible]);
 
   // "Skip this step" appears when a tap beat has waited; "Skip tour" asks twice
   const [waited, setWaited] = useState(false);
@@ -333,7 +317,7 @@ export function TutorialLayer({ host = "root" }: { host?: TutorialHost }) {
   /* ---- render ------------------------------------------------------------------------------------- */
 
   const showHand = lit && mode === "tap";
-  const blockAll = gliding || mode === "look" || !hole || !fresh;
+  const blockAll = mode === "look" || !hole || !fresh;
   const parts = hole && !blockAll ? strips(hole, screenSize) : null;
 
   const onGotIt = beat ? () => (beat.mode === "look" && !fallback ? finishLookBeat(beat.id) : skipBeat(beat.id)) : undefined;
@@ -342,8 +326,8 @@ export function TutorialLayer({ host = "root" }: { host?: TutorialHost }) {
   return (
     <>
       {visible && beat && pick ? (
-        <Animated.View key={host} entering={FadeIn.duration(TUTORIAL_FX.dimMs)} exiting={FadeOut.duration(TUTORIAL_FX.outMs)} style={StyleSheet.absoluteFill} pointerEvents="box-none">
-          <Spotlight hole={hole} screen={screenSize} ring={lit && mode === "tap"} hand={showHand} nudge={nudge} donePop={donePop} />
+        <View key={host} style={StyleSheet.absoluteFill} pointerEvents="box-none">
+          <Spotlight hole={hole} screen={screenSize} hand={showHand} />
 
           {/* The touch strips: everything except the lit control swallows taps (a tap is a nudge, never a dismiss) */}
           {blockAll ? (
@@ -363,16 +347,14 @@ export function TutorialLayer({ host = "root" }: { host?: TutorialHost }) {
               mood={beat.mood}
               index={pick.index}
               total={pick.total}
-              direction={direction}
               onGotIt={mode === "look" ? onGotIt : undefined}
               onSkipStep={mode === "tap" && waited ? onGotIt : undefined}
               onSkipTour={pick.kind === "chapter" ? () => (confirmSkip ? void skipTour() : setConfirmSkip(true)) : undefined}
               confirmSkip={confirmSkip}
-              nudge={nudge}
               onMeasure={setBubbleH}
             />
           </View>
-        </Animated.View>
+        </View>
       ) : null}
 
       {isRoot && closing !== null ? <TourReward amount={closing} onDone={finishClosing} /> : null}

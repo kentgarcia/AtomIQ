@@ -9,7 +9,10 @@
  *   opened   the open chest's glow, looping
  *
  * The chest is drawn from the baked sheets of Chest_open.lottie and Chest_loop.lottie
- * (`chest-sheets.ts`), so it is the imported chest, frame for frame, on every device.
+ * (`chest-sheets.ts`), so it is the imported chest, frame for frame, on every device. A chest that is only sitting
+ * there (locked or ready) is `CHEST_CLOSED`, frame 0 of the opening sheet as a small picture of its own, so the 4.5 MB
+ * sheet is decoded only when it is opened; the picture stays under the opening until the sheet is ready, so the chest
+ * never blinks out while the sheet loads.
  *
  * The diamonds are saved when the opening animation ends (so closing the app half way loses
  * nothing); they then burst out of the chest and are pulled to the Profile tab like a quest's XP
@@ -18,12 +21,14 @@
  */
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Image as StillImage } from "expo-image";
 import { Image, Pressable, View } from "react-native";
 import { Text } from "@/components/ui/text";
-import Animated, { Easing, useAnimatedStyle, useReducedMotion, useSharedValue, withDelay, withRepeat, withSequence, withTiming } from "react-native-reanimated";
+import Animated, { Easing, useAnimatedStyle, useSharedValue, withDelay, withRepeat, withSequence, withTiming } from "react-native-reanimated";
+import { useIdleStill, useReducedMotion } from "@/components/motion/use-reduced-motion";
 
 import { emitClaimFlight } from "@/components/quests/claim-fx-bus";
-import { CHEST_LOOP, CHEST_OPEN } from "@/components/quests/chest-sheets";
+import { CHEST_CLOSED, CHEST_LOOP, CHEST_OPEN } from "@/components/quests/chest-sheets";
 import { SpriteSheet } from "@/components/ui/SpriteSheet";
 import { impactLight, notifySuccess } from "@/services/haptics";
 import { playSfx } from "@/services/sfx";
@@ -50,7 +55,11 @@ export function ChestCard({ period, status, reward, size = DEFAULT_CHEST_SIZE, o
   const { theme } = useTheme();
   const styles = useMemo(() => makeStyles(theme), [theme]);
   const reduced = useReducedMotion();
+  const idleStill = useIdleStill();
   const [opening, setOpening] = useState(false);
+  // The opening sheet is decoded when the chest is tapped: it plays once it has loaded, and the still picture under it goes a moment later
+  const [sheetReady, setSheetReady] = useState(false);
+  const [stillShown, setStillShown] = useState(true);
   const [paid, setPaid] = useState(0);
   const chestRef = useRef<React.ComponentRef<typeof View>>(null);
 
@@ -68,13 +77,13 @@ export function ChestCard({ period, status, reward, size = DEFAULT_CHEST_SIZE, o
   // A ready chest nudges now and then: a small hop, then a rest
   const nudge = useSharedValue(0);
   useEffect(() => {
-    if (status !== "ready" || opening || reduced) {
+    if (status !== "ready" || opening || idleStill) {
       nudge.set(0);
       return;
     }
     const hop = withSequence(withTiming(1, { duration: 160, easing: Easing.out(Easing.quad) }), withTiming(0, { duration: 200, easing: Easing.in(Easing.quad) }));
     nudge.set(withDelay(900, withRepeat(withSequence(hop, hop, withTiming(0, { duration: 2200 })), -1, false)));
-  }, [status, opening, reduced, nudge]);
+  }, [status, opening, idleStill, nudge]);
   const nudgeStyle = useAnimatedStyle(() => ({ transform: [{ translateY: -5 * nudge.get() }] }));
 
   const finishOpening = useCallback(async () => {
@@ -104,6 +113,18 @@ export function ChestCard({ period, status, reward, size = DEFAULT_CHEST_SIZE, o
     lastStatus.current = status;
   }, [status]);
 
+  useEffect(() => {
+    if (!opening) return;
+    // If the sheet never reports in, play anyway rather than leave the chest standing
+    const fallback = setTimeout(() => setSheetReady(true), 700);
+    return () => clearTimeout(fallback);
+  }, [opening]);
+  useEffect(() => {
+    if (!opening || !sheetReady) return;
+    const gone = setTimeout(() => setStillShown(false), 80);
+    return () => clearTimeout(gone);
+  }, [opening, sheetReady]);
+
   const startOpening = () => {
     if (status === "locked") {
       void playSfx("ui.lock");
@@ -116,6 +137,8 @@ export function ChestCard({ period, status, reward, size = DEFAULT_CHEST_SIZE, o
       void finishOpening();
       return;
     }
+    setSheetReady(false);
+    setStillShown(true);
     setOpening(true);
   };
 
@@ -134,10 +157,22 @@ export function ChestCard({ period, status, reward, size = DEFAULT_CHEST_SIZE, o
       <Animated.View style={[{ width: size, height: size }, status === "locked" && styles.dim, nudgeStyle]}>
         {status === "opened" && !opening ? (
           <SpriteSheet key="loop" sheet={CHEST_LOOP} size={size} playing={!reduced} loop />
-        ) : opening ? (
-          <SpriteSheet key="open" sheet={CHEST_OPEN} size={size} playing onEnd={() => void finishOpening()} />
         ) : (
-          <SpriteSheet key="closed" sheet={CHEST_OPEN} size={size} />
+          <>
+            {/* The closed chest; kept under the opening until its sheet is up (and always shown when not opening) */}
+            {!opening || stillShown ? <StillImage source={CHEST_CLOSED} style={{ width: size, height: size }} contentFit="fill" /> : null}
+            {opening ? (
+              <SpriteSheet
+                key="open"
+                sheet={CHEST_OPEN}
+                size={size}
+                playing={sheetReady}
+                onLoad={() => setSheetReady(true)}
+                onEnd={() => void finishOpening()}
+                style={{ position: "absolute", left: 0, top: 0 }}
+              />
+            ) : null}
+          </>
         )}
       </Animated.View>
       <Animated.View pointerEvents="none" style={[styles.floating, floatStyle]}>

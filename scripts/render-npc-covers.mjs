@@ -11,7 +11,7 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 
 const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const url = (p) => pathToFileURL(path.join(REPO, p)).href;
-const { GLYPHS, glyphsFor, coverLayout, coverTones, coverViewBox, COVER_W, COVER_H } = await import(url("components/npc/npc-cover-art.ts"));
+const { GLYPHS, glyphsFor, coverColors, coverLayout, coverTones, coverViewBox, COVER_W, COVER_H } = await import(url("components/npc/npc-cover-art.ts"));
 const { NPC_ROSTER } = await import(url("components/npc/npc-roster.ts"));
 const out = path.resolve(process.argv[2] ?? ".");
 fs.mkdirSync(out, { recursive: true });
@@ -31,7 +31,7 @@ const H = 116;
 const pad = 14;
 let body = `<rect width="${W + 2 * pad}" height="${NPC_ROSTER.length * (H + 40) + pad}" fill="#FFFFFF"/>`;
 NPC_ROSTER.forEach((npc, i) => {
-  const tones = coverTones(npc.spec.outfit);
+  const tones = coverTones(coverColors(npc.spec));
   const lay = coverLayout(glyphsFor(npc.id));
   const vb = coverViewBox(W / H);
   const y = pad + i * (H + 40);

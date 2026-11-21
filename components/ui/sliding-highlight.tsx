@@ -20,11 +20,11 @@ import Animated, {
   interpolate,
   runOnJS,
   useAnimatedStyle,
-  useReducedMotion,
   useSharedValue,
   withTiming,
   type SharedValue,
 } from "react-native-reanimated";
+import { useReducedMotion } from "@/components/motion/use-reduced-motion";
 
 import { DURATION, EASE_DRAWER } from "@/theme/motion";
 

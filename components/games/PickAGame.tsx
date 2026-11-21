@@ -6,7 +6,6 @@
  * Maze, unit quizzes, the Lab, and Myth Buster.
  */
 
-import { useTutorialTarget } from "@/components/tutorial/use-tutorial-target";
 import { DifficultyPanel } from "@/components/games/DifficultyPanel";
 import { GAME_GUIDES, guideById, initialGuide, type GuideId } from "@/components/games/game-instructions";
 import { StackCard } from "@/components/games/StackCard";
@@ -26,15 +25,15 @@ import {
 } from "react-native";
 import { Text } from "@/components/ui/text";
 import Animated, {
-    Extrapolation,
-    interpolate,
-    runOnJS,
-    useAnimatedStyle,
-    useReducedMotion,
-    useSharedValue,
-    type SharedValue,
-    withTiming,
+  Extrapolation,
+  interpolate,
+  runOnJS,
+  useAnimatedStyle,
+  useSharedValue,
+  type SharedValue,
+  withTiming,
 } from "react-native-reanimated";
+import { useReducedMotion } from "@/components/motion/use-reduced-motion";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { DURATION, EASE_DRAWER } from "@/theme/motion";
 
@@ -171,10 +170,6 @@ export function PickAGame() {
     };
 
     // Every game opens the difficulty picker first.
-    // Shrodi's first visit lights the Atom Maze and Myth Buster cards (docs/features/TUTORIAL_SPEC.md §5.4)
-    const mazeLit = useTutorialTarget("games.atom-maze", { radius: 20 });
-    const mythLit = useTutorialTarget("games.mythbuster", { radius: 20 });
-    const labLit = useTutorialTarget("games.lab", { radius: 20 });
     const handleSelect = (game: (typeof GAMES)[number], index: number) => {
         // Atom Maze is story mode: its level map opens instead of a difficulty picker
         if (game.route === "/explorer/story") {
@@ -238,7 +233,7 @@ export function PickAGame() {
                                 selected={selected}
                                 reducedMotion={reducedMotion}
                             >
-                                <View ref={game.route === "/explorer/story" ? mazeLit.ref : game.route === "/mythbuster" ? mythLit.ref : game.route === "/lab" ? labLit.ref : undefined} collapsable={false}>
+                                <View>
                                 <StackCard
                                     title={game.title}
                                     subtitle={game.subtitle}
@@ -247,6 +242,7 @@ export function PickAGame() {
                                     delay={game.delay}
                                     height={cardH}
                                     onPress={() => handleSelect(game, index)}
+                                    animateIn={false}
                                 />
                                 </View>
                             </GameSlot>

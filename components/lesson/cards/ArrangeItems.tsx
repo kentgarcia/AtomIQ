@@ -250,15 +250,26 @@ export function MatchItem({ data, seed, locked, onChange, ownerId, onMiss }: Int
 /** Icons for groups that carry none (content authored before group icons), by position. */
 const FALLBACK_BUCKET_ICONS = ["Record", "Category", "Star1"] as const;
 
-export function SortItem({ data, seed, locked, result, onChange, ownerId, rejection }: InteractionProps<SortItemData, { type: "sort"; placements: Record<string, string> }> & { ownerId: string }) {
+/**
+ * Sort is checked item by item, like a match: the moment an item is put in a group it is graded. A right one locks green (the card and the
+ * group button it was put in); a wrong one shakes red for a moment and goes back to waiting, and `onMiss` tells the run, so the card comes
+ * back in the mistakes replay. When the last item is placed (every placement is right by then) the card is complete.
+ */
+export function SortItem({ data, seed, locked, onChange, ownerId, onMiss }: InteractionProps<SortItemData, { type: "sort"; placements: Record<string, string> }> & { ownerId: string }) {
   const { theme } = useTheme();
   const card = useCardStyles(theme);
   const styles = useStyles(theme);
   const items = useMemo(() => seededShuffle(data.items, seed), [data.items, seed]);
+  // `placements` holds only right placements: each one is checked the moment it is made
   const [placements, setPlacements] = useState<Record<string, string>>({});
-  const flash = useRejectFlash(rejection, () => setPlacements({}));
-  const frozen = locked || flash !== null;
-  const wrong = flash ?? new Set(result?.wrongIds ?? []);
+  // A wrong placement, shown red and shaking for a moment, then the item goes back to normal
+  const [miss, setMiss] = useState<{ itemId: string; bucketId: string } | null>(null);
+  useEffect(() => {
+    if (!miss) return;
+    const timer = setTimeout(() => setMiss(null), MISS_MS);
+    return () => clearTimeout(timer);
+  }, [miss]);
+  const frozen = locked || miss !== null;
   const pictured = data.items.length > 0 && data.items.every((i) => isArtId(i.art));
   const buckets = data.buckets.map((b, i) => ({ ...b, icon: b.icon ?? FALLBACK_BUCKET_ICONS[i % FALLBACK_BUCKET_ICONS.length] }));
 
@@ -286,17 +297,23 @@ export function SortItem({ data, seed, locked, result, onChange, ownerId, reject
         <View style={pictured ? styles.sortGrid : card.list}>
           {items.map((item) => {
             const chosen = placements[item.id];
-            const bad = frozen && wrong.has(item.id);
-            const tone = frozen ? (bad ? "error" : "success") : "neutral";
+            const placed = chosen !== undefined;
+            const missed = miss?.itemId === item.id ? miss.bucketId : null;
+            const tone = placed ? "success" : missed ? "error" : "neutral";
             const pick = (bucketId: string) => {
-              if (frozen) return;
-              // Moving an item to another group counts as a new set: it sounds even though nothing was added
-              placedSfx(!(item.id in placements) && Object.keys(placements).length + 1 >= data.items.length);
-              setPlacements((p) => ({ ...p, [item.id]: bucketId }));
+              if (frozen || placed) return;
+              if (bucketId === item.bucket) {
+                // The press that completes the set plays nothing here: it is graded at once and the result cue plays instead
+                placedSfx(Object.keys(placements).length + 1 >= data.items.length, "lesson.pair-ok");
+                setPlacements((p) => ({ ...p, [item.id]: bucketId }));
+              } else {
+                setMiss({ itemId: item.id, bucketId });
+                onMiss?.();
+              }
             };
             return (
               <View key={item.id} style={pictured ? styles.sortCell : undefined}>
-                <Shake active={bad} style={pictured ? { flex: 1 } : undefined}>
+                <Shake active={missed !== null} style={pictured ? { flex: 1 } : undefined}>
                   <Card tone={tone} gap={spacing.sm} faceStyle={pictured ? { flex: 1 } : undefined} style={pictured ? { flex: 1 } : undefined}>
                     {pictured ? (
                       // Two columns: the picture over its label, the group buttons underneath.
@@ -317,13 +334,12 @@ export function SortItem({ data, seed, locked, result, onChange, ownerId, reject
                           label={b.label}
                           icon={b.icon}
                           iconOnly
-                          state={chosen === b.id ? "selected" : "idle"}
-                          disabled={frozen}
+                          state={placed ? (chosen === b.id ? "correct" : "dim") : missed === b.id ? "wrong" : "idle"}
+                          disabled={frozen || placed}
                           onPress={() => pick(b.id)}
                         />
                       ))}
                     </View>
-                    {bad && locked ? <Text style={styles.sortNote}>Belongs in: {data.buckets.find((b) => b.id === item.bucket)?.label}</Text> : null}
                   </Card>
                 </Shake>
               </View>
@@ -331,7 +347,6 @@ export function SortItem({ data, seed, locked, result, onChange, ownerId, reject
           })}
         </View>
       </OptionsArea>
-      {flash ? <RetryNote /> : null}
     </View>
   );
 }

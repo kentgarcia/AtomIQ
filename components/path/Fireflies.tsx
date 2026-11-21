@@ -9,7 +9,8 @@
 import { useIsFocused } from "expo-router";
 import React, { memo, useMemo } from "react";
 import { View } from "react-native";
-import Animated, { useAnimatedStyle, useReducedMotion, type SharedValue } from "react-native-reanimated";
+import Animated, { useAnimatedStyle, type SharedValue } from "react-native-reanimated";
+import { useReducedMotion } from "@/components/motion/use-reduced-motion";
 
 import { useLoopClock } from "@/components/motion/motion";
 import {

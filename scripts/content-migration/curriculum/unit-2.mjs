@@ -667,7 +667,7 @@ const lesson5 = {
     teach("c06", "explain", { title: "From space", body: "Earth is hit by [[cosmic-radiation|cosmic radiation]] from space all the time. It is one more part of the [[background-radiation|radiation around us]].", ...fig(cosmicRays()) }),
     itemCard("c07", "u2-l5-choice-space"),
     itemCard("c08", "u2-l5-tom-facilities"),
-    teach("c09", "story", { speaker: "npc-hal", title: "A discovery that wasn't supposed to happen", tag: "1896", body: "[[henri-becquerel|Henri Becquerel]] left a uranium mineral on a wrapped photographic plate and found it fogged, even with no sunlight. Radioactivity was found in a natural mineral, long before people made any nuclear technology.", ...fig(becquerelPlate()) }),
+    teach("c09", "story", { speaker: "npc-ada", title: "A discovery that wasn't supposed to happen", tag: "1896", body: "[[henri-becquerel|Henri Becquerel]] left a uranium mineral on a wrapped photographic plate and found it fogged, even with no sunlight. Radioactivity was found in a natural mineral, long before people made any nuclear technology.", ...fig(becquerelPlate()) }),
     itemCard("c10", "u2-l5-order-first"),
     itemCard("c11", "u2-l5-choice-dangerous"),
     teach("c12", "explain", { title: "It depends", body: "Radioactive does not automatically mean dangerous. What matters is the type of radiation, how much there is, and how it reaches the body. A banana and your own body are radioactive, and that is normal.", ...fig(notAlwaysDangerous()) }),

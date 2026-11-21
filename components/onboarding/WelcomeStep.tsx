@@ -16,7 +16,7 @@ import { Stamp } from "@/components/lesson/Stamp";
 import { STAMP_LANDS } from "@/components/lesson/stamp-core";
 import { STAT_TOTAL } from "@/components/lesson/stat-reveal-core";
 import { StatTile } from "@/components/lesson/StatTile";
-import { Shrodi } from "@/components/mascot/Shrodi";
+import { ShrodiStill } from "@/components/mascot/ShrodiStill";
 import { Burst } from "@/components/motion/Burst";
 import { Reveal } from "@/components/motion/Reveal";
 import { useDelayedClock } from "@/components/motion/use-delayed-clock";
@@ -68,7 +68,7 @@ export function WelcomeStep({ name, answers, onGo }: { name: string; answers: An
       <View style={styles.hero}>
         <View style={styles.foxWrap}>
           <Stamp at={WELCOME_FX.mascot}>
-            <Shrodi mood="cheer" size={150} />
+            <ShrodiStill size={150} />
           </Stamp>
           <Burst clock={clock} at={WELCOME_FX.burst} diameter={150} color={c.gold} ringColor={c.primary} reach={90} />
         </View>

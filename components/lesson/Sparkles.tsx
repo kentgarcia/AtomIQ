@@ -8,7 +8,8 @@
 
 import { useEffect } from "react";
 import { StyleSheet, View } from "react-native";
-import Animated, { Easing, useAnimatedStyle, useReducedMotion, useSharedValue, withDelay, withRepeat, withTiming } from "react-native-reanimated";
+import Animated, { Easing, useAnimatedStyle, useSharedValue, withDelay, withRepeat, withTiming } from "react-native-reanimated";
+import { useIdleStill } from "@/components/motion/use-reduced-motion";
 import Svg, { Path } from "react-native-svg";
 
 import { useTheme } from "@/theme";
@@ -50,7 +51,7 @@ function easeOutCubic(x: number): number {
  * delays never go off in step. With reduced motion it shows its full frame and stays.
  */
 function Bloom({ rays, color, size, delay, period = 2400, style }: { rays: Ray[]; color: string; size: number; delay: number; period?: number; style: object }) {
-  const reduced = useReducedMotion();
+  const reduced = useIdleStill();
   const t = useSharedValue(reduced ? 0.4 : 0);
   useEffect(() => {
     if (reduced) {
@@ -81,7 +82,7 @@ function Bloom({ rays, color, size, delay, period = 2400, style }: { rays: Ray[]
 
 /** The wide arc behind the figure: blooms once, then breathes slowly (a little scale and glow). */
 function Halo({ rays, color, size, style }: { rays: Ray[]; color: string; size: number; style: object }) {
-  const reduced = useReducedMotion();
+  const reduced = useIdleStill();
   const intro = useSharedValue(reduced ? 1 : 0);
   const t = useSharedValue(0);
   useEffect(() => {

@@ -7,7 +7,8 @@ import { useRouter } from "expo-router";
 import { Children, isValidElement, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { Pressable, View, type LayoutChangeEvent, type StyleProp, type TextStyle, type ViewStyle } from "react-native";
 import { Text } from "@/components/ui/text";
-import Animated, { Easing, cancelAnimation, interpolateColor, useAnimatedStyle, useReducedMotion, useSharedValue, withTiming, type SharedValue } from "react-native-reanimated";
+import Animated, { Easing, cancelAnimation, interpolateColor, useAnimatedStyle, useSharedValue, withTiming, type SharedValue } from "react-native-reanimated";
+import { useReducedMotion } from "@/components/motion/use-reduced-motion";
 
 import { TeacherSays, useLessonTeacher } from "@/components/lesson/Conversation";
 import { CascadeIn, useCascadeDirection } from "@/components/motion/cascade-context";

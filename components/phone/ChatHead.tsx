@@ -26,8 +26,8 @@ export function speakerFor(npcId: string | undefined, cast: ReadonlyMap<string, 
   return npc ? { id: npcId, name: npc.name, npc, mascot: false } : null;
 }
 
-// Shrodi's picture is the app icon (his face close up, `assets/images/icon.png`) cropped to the circle.
-const SHRODI_FACE = require("@/assets/images/icon.png");
+// Shrodi's picture is the app icon (his face close up, `assets/images/mascot/icon-256.png`, a 256 px copy of icon.png) cropped to the circle.
+const SHRODI_FACE = require("@/assets/images/mascot/icon-256.png");
 
 /** A round head: the teacher's drawing, or Shrodi's own picture. Decorative: the name is real text beside it. */
 export const ChatHead = memo(function ChatHead({ speaker, size }: { speaker: ChatSpeaker | null | undefined; size: number }) {

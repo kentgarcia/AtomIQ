@@ -46,6 +46,8 @@ export const CUSTOM = {
   hairBrown: ["#7C3F25", "#64311D"],
   hairBlack: ["#2E2622", "#211B18"],
   hairWhite: ["#EBE3E3", "#D6C9C9"],
+  // The lapels and pockets of a pale coat (`coolShade` in npc-art.ts: the coat colour a fifth of the way to a cool blue): for a white coat, and for Hal's Anchovy one
+  coatShade: ["#E4EBEF", "#C0D5DD"],
 } as const;
 
 /** Every #RRGGBB the validator accepts: official + face + custom. */

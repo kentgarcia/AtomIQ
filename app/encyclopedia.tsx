@@ -1,4 +1,5 @@
 import { HeaderButton, ScreenHeader, useHeaderBorder } from "@/components/layout";
+import { useRenderTimer } from "@/components/dev/render-timer";
 import { FieldInput } from "@/components/ui/field-input";
 import { Icon } from "@/components/ui/icon";
 import { getAllEncyclopediaEntries } from "@/content/explorer";
@@ -54,6 +55,7 @@ function FilterChip({ label, icon, color, active, onPress }: { label: string; ic
 }
 
 export default function EncyclopediaScreen() {
+  useRenderTimer("/encyclopedia");
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { contentMaxWidth, gutter } = useResponsiveLayout();

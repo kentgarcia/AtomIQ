@@ -6,7 +6,8 @@
  */
 
 import { useEffect } from "react";
-import { Easing, cancelAnimation, useReducedMotion, useSharedValue, withDelay, withTiming, type SharedValue } from "react-native-reanimated";
+import { Easing, cancelAnimation, useSharedValue, withDelay, withTiming, type SharedValue } from "react-native-reanimated";
+import { useReducedMotion } from "@/components/motion/use-reduced-motion";
 
 export function useDelayedClock(total: number, delay: number, play: boolean = true, restart: unknown = 0): SharedValue<number> {
   const reduced = useReducedMotion();

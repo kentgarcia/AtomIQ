@@ -12,6 +12,7 @@ import Animated, { ReduceMotion, withTiming, type EntryExitAnimationFunction, ty
 
 import { TypedTermText } from "@/components/lesson/TypedText";
 import { Shrodi, type Mood } from "@/components/mascot/Shrodi";
+import { ShrodiStill } from "@/components/mascot/ShrodiStill";
 import { LeftTail } from "@/components/npc/SpeechBubble";
 import { Card } from "@/components/ui/card";
 import { PAGE_FX, bubbleInAt, leadFor, popIn } from "@/components/motion/cascade-fx";
@@ -49,7 +50,7 @@ const BUBBLE_POP = 200;
  * and, once it is up, types. Without it he is simply there on arrival, as on the steps that settle in as a whole.
  * His words type with no blips; the bubble's own pop is the only sound (`lesson.bubble`).
  */
-export function ShrodiSays({ text, mood = "idle", size = 96, typing = true, arrive }: { text: string; mood?: Mood; size?: number; typing?: boolean; arrive?: { direction: SharedValue<number>; at: number } }) {
+export function ShrodiSays({ text, mood = "idle", size = 96, typing = true, still = false, arrive }: { text: string; mood?: Mood; size?: number; typing?: boolean; /** One still picture instead of the moving drawing (onboarding); `mood` is then ignored. */ still?: boolean; arrive?: { direction: SharedValue<number>; at: number } }) {
   const { theme } = useTheme();
   const styles = useStyles(theme);
   // The line the bubble arrived with is the page's own entrance; any other one pops
@@ -71,7 +72,7 @@ export function ShrodiSays({ text, mood = "idle", size = 96, typing = true, arri
   return (
     <View style={styles.row} accessibilityLiveRegion="polite">
       <Animated.View entering={arrive ? popIn(arrive.direction, arrive.at) : undefined} pointerEvents="none" importantForAccessibility="no-hide-descendants" accessibilityElementsHidden>
-        <Shrodi mood={mood} size={size} />
+        {still ? <ShrodiStill size={size} /> : <Shrodi mood={mood} size={size} />}
       </Animated.View>
       <Animated.View key={text} entering={entering} style={styles.bubble}>
         <Card padding={spacing.lg}>

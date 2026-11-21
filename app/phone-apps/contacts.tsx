@@ -13,6 +13,7 @@ import { PatternLayer } from "@/components/avatar/PatternLayer";
 import { ChatHead } from "@/components/phone/ChatHead";
 import { settle } from "@/components/motion/settle";
 import { NpcCover } from "@/components/npc/NpcCover";
+import { coverColors } from "@/components/npc/npc-cover-art";
 import type { Npc } from "@/content/npcs";
 import { LinearGradient } from "expo-linear-gradient";
 import { ScreenHeader, useHeaderBorder } from "@/components/layout";
@@ -155,7 +156,7 @@ export default function ContactsScreen() {
                 >
                   <View style={styles.row}>
                     <View style={StyleSheet.absoluteFill}>
-                      <NpcCover npcId={p.npc?.id} outfit={p.npc?.spec.outfit ?? { color: c.guide, shade: c.guideLip }} height={ROW} radius={0} />
+                      <NpcCover npcId={p.npc?.id} outfit={p.npc ? coverColors(p.npc.spec) : { color: c.guide, shade: c.guideLip }} height={ROW} radius={0} />
                     </View>
                     <Fade color={c.field} />
                     <ChatHead speaker={{ id: p.id, name: p.name, npc: p.npc, mascot: isShrodi }} size={FACE} />

@@ -26,10 +26,10 @@ import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
 import Animated, {
   useAnimatedStyle,
-  useReducedMotion,
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
+import { useReducedMotion } from "@/components/motion/use-reduced-motion";
 import { EASE_OUT } from "@/theme/motion";
 
 const TAB_ICONS = {

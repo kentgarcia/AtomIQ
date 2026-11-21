@@ -15,7 +15,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { LinearGradient } from "expo-linear-gradient";
 import { BackHandler, Platform, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import Animated, { Easing, FadeInDown, FadeOut, cancelAnimation, useAnimatedStyle, useReducedMotion, useSharedValue, withTiming } from "react-native-reanimated";
+import Animated, { Easing, FadeInDown, FadeOut, cancelAnimation, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
+import { useReducedMotion } from "@/components/motion/use-reduced-motion";
 
 import { GameHud } from "@/components/platformer/GameHud";
 import { PauseDialog } from "@/components/platformer/PauseDialog";

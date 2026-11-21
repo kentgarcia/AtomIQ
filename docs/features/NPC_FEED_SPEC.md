@@ -37,7 +37,8 @@ Principles:
 ## 2. Current baseline
 
 - Articles and posts (content DB `articles` / `posts`, read tracking, article-detail, Guide links, the `article_read` activity kind) were removed in a separate step; this spec assumes they are gone. Discover currently shows only a search field, the periodic-table banner and the A to Z encyclopedia list.
-- The cast exists: Ada, Hal, Ray, Mina, Kofi, Tess and Sage, each owning one unit (`units.teacher_npc_id`), drawn by `components/npc/` as data. Their lines live in `npc_lines`.
+- Each character posts in their own voice (`docs/features/NPC_VOICE_SPEC.md`): their own templates, none pooled across several posters, while lessons share one tone.
+- The cast exists: Hal, Ada, Ray, Mina, Kofi, Tess and Sage, each owning one unit (`units.teacher_npc_id`), drawn by `components/npc/` as data. Their lines live in `npc_lines`.
 - Completion events have one choke point: `completeNode` / `completeTestOut` in `services/curriculum-complete.ts`. Activity events go through `recordActivity`. Chests open in `openChest` (`services/missions.ts`). Streaks are on the user profile (`current_streak`).
 - The old Leaderboard tab read a local snapshot (`getLeaderboardSnapshot`, `LocalLeaderboardUser`). Its tab file is removed; the data helpers remain in `services/database.ts`.
 - The user-state DB creates tables from `services/local-first/schema.ts` and migrates by adding columns in code (`ensureTableColumns`).
@@ -99,7 +100,7 @@ A mini blog piece is **an article, but engaging**: NPC-written, short, in a huma
 
 ### 4.4 Ranks (leaderboard)
 
-The removed leaderboard returns as its own screen (`app/ranks.tsx`), opened from the entry card: a weekly ranking of the learner among **the NPC cast as rivals** (Ada, Hal, Ray, Mina, Kofi, Tess, Sage), a podium for the top three drawn with their NPC heads, the learner's row highlighted, and pull to refresh. The learner's number is their real XP this week. Each rival's weekly XP is **simulated, deterministically**, in `services/rank-core.ts`: a function of the NPC id, the week key and the learner's own pace (so rivals are beatable and the table moves a little each week, and is identical on every open). It replaces the old snapshot rivals; `getLeaderboardSnapshot` and its helpers are removed in the same change. The Profile tab's personal-bests card (`GameLeaderboardCard`) stays where it is.
+The removed leaderboard returns as its own screen (`app/ranks.tsx`), opened from the entry card: a weekly ranking of the learner among **the NPC cast as rivals** (Hal, Ada, Ray, Mina, Kofi, Tess, Sage), a podium for the top three drawn with their NPC heads, the learner's row highlighted, and pull to refresh. The learner's number is their real XP this week. Each rival's weekly XP is **simulated, deterministically**, in `services/rank-core.ts`: a function of the NPC id, the week key and the learner's own pace (so rivals are beatable and the table moves a little each week, and is identical on every open). It replaces the old snapshot rivals; `getLeaderboardSnapshot` and its helpers are removed in the same change. The Profile tab's personal-bests card (`GameLeaderboardCard`) stays where it is.
 
 Rank changes are a feed trigger (§5.1, `rank_change`), so "Mina passed you this week" appears as a post.
 
@@ -141,7 +142,7 @@ Added between `feed` markers in `schema.sql`, seeded by `scripts/content-migrati
 
 ```sql
 CREATE TABLE IF NOT EXISTS feed_templates (
-  id          TEXT PRIMARY KEY,              -- 'ft-ada-lesson-1' (shipped id once published)
+  id          TEXT PRIMARY KEY,              -- 'ft-hal-lesson-1' (shipped id once published)
   npc_id      TEXT REFERENCES npcs(id),      -- poster; NULL = chosen from poster_pool
   poster_pool TEXT NOT NULL DEFAULT '[]' CHECK (json_valid(poster_pool)),
   kind        TEXT NOT NULL CHECK (kind IN ('celebrate','milestone','nudge','tease')),

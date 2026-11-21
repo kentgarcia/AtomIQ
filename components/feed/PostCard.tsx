@@ -20,13 +20,13 @@
 import { useRouter } from "expo-router";
 import { memo } from "react";
 import { Pressable, View } from "react-native";
-import Animated, { useReducedMotion } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
+import { useReducedMotion } from "@/components/motion/use-reduced-motion";
 import Svg, { Path } from "react-native-svg";
 
 import { HeadLink } from "@/components/feed/HeadLink";
 import { RankAvatar } from "@/components/feed/RankAvatar";
 import { ReactionRow } from "@/components/feed/ReactionRow";
-import type { ViewRef } from "@/components/tutorial/use-tutorial-target";
 import { Npc as NpcFigure } from "@/components/npc/Npc";
 import { rtri } from "@/components/npc/npc-art";
 import { CHIP_LABELS, actionPhrase, chipTarget, figurePose, metaLine, postSpokenLabel, reactionSpoken, relativeTime, relativeTimeSpoken } from "@/components/feed/feed-ui-core";
@@ -88,12 +88,11 @@ export interface PostCardProps {
   /** The poster's avatar opens their profile (default). Off on that teacher's own page. */
   linkHead?: boolean;
   /** Shrodi's tour lights this card's reaction pill (the first card on the Feed). */
-  reactionRef?: React.Ref<ViewRef>;
 }
 
 const kindOf = (k: string) => (k === "celebrate" || k === "milestone" || k === "nudge" || k === "tease" ? k : null);
 
-export const PostCard = memo(function PostCard({ item, npc, cast, now, fresh = false, linkHead = true, reactionRef }: PostCardProps) {
+export const PostCard = memo(function PostCard({ item, npc, cast, now, fresh = false, linkHead = true }: PostCardProps) {
   const router = useRouter();
   const { theme } = useTheme();
   const styles = useStyles(theme);
@@ -161,7 +160,7 @@ export const PostCard = memo(function PostCard({ item, npc, cast, now, fresh = f
           </View>
         </View>
 
-        <ReactionRow target={item.target} summary={item.reactions} cast={cast} pillRef={reactionRef} />
+        <ReactionRow target={item.target} summary={item.reactions} cast={cast} />
         <View style={styles.divider} accessible={false} importantForAccessibility="no-hide-descendants" />
       </View>
     </Animated.View>

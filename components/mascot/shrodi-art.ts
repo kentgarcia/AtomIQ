@@ -484,7 +484,9 @@ const TAIL_MAIN = shrinkTail([14, 96, 48, 104, 70, 88, 62, 56]);
 const TAIL_TIP = shrinkTail([64, 66, 62, 56]);
 const TAIL_W = 14;
 
-export function buildShrodi(id: string): Layers {
+/** `arms: false` leaves both arms and paws out (a picture where only the head and coat show, e.g. peeking from behind a label). */
+export function buildShrodi(id: string, opts: { arms?: boolean } = {}): Layers {
+  const arms = opts.arms !== false;
   const back: Node[] = [
     n("path", { d: `M${TAIL_MAIN[0]} ${TAIL_MAIN[1]} C${TAIL_MAIN[2]} ${TAIL_MAIN[3]} ${TAIL_MAIN[4]} ${TAIL_MAIN[5]} ${TAIL_MAIN[6]} ${TAIL_MAIN[7]}`, stroke: C.furShade, strokeWidth: TAIL_W, strokeLinecap: "round", fill: "none" }, undefined, {
       dyn: (f) => {
@@ -503,8 +505,7 @@ export function buildShrodi(id: string): Layers {
     n("ellipse", { cx: -15, cy: 106, rx: 12.5, ry: 8.5, fill: C.fur }),
     n("ellipse", { cx: 15, cy: 106, rx: 12.5, ry: 8.5, fill: C.fur }),
     // resting arms: behind the coat, so only a paw peeks out at the side
-    ...arm(-1, "behind"),
-    ...arm(1, "behind"),
+    ...(arms ? [...arm(-1, "behind"), ...arm(1, "behind")] : []),
     // short lab coat, chest fur at the collar, then the lapels over it
     path("M-23 40 Q-33 42 -34 56 L-36 96 Q-36 104 -28 104 L28 104 Q36 104 36 96 L34 56 Q33 42 23 40 Z", C.coat),
     path("M-11 42 L11 42 L0 62 Z", C.fur),
@@ -568,7 +569,7 @@ export function buildShrodi(id: string): Layers {
     }),
   ];
 
-  return { back, head, front: [...arm(-1, "front"), ...arm(1, "front")] };
+  return { back, head, front: arms ? [...arm(-1, "front"), ...arm(1, "front")] : [] };
 }
 
 /** viewBox that frames the whole character with room for the highest hop and the V cheer. */

@@ -9,10 +9,11 @@
  */
 
 import { Image, Pressable, View } from "react-native";
-import Animated, { useAnimatedStyle, type SharedValue } from "react-native-reanimated";
+import Animated, { useDerivedValue, type SharedValue } from "react-native-reanimated";
 
 import { PopWhen } from "@/components/motion/PopOnce";
 import { Icon } from "@/components/ui/icon";
+import { useFillStyle } from "@/components/ui/progress-fill";
 import { Text } from "@/components/ui/text";
 import { createStyles, fontFaces, radius, spacing, useTheme, withAlpha } from "@/theme";
 
@@ -35,7 +36,7 @@ const useStyles = createStyles((theme) => {
     top: { flexDirection: "row", alignItems: "center", gap: spacing.sm },
     barWrap: { flex: 1, height: 16, marginRight: spacing.xs },
     bar: { position: "absolute", top: 0, bottom: 0, left: 0, right: 0, borderRadius: radius.full, backgroundColor: withAlpha(c.border, 0.9), overflow: "hidden" },
-    barFill: { height: "100%", borderRadius: radius.full, backgroundColor: c.primary },
+    barFill: { width: "100%", height: "100%", borderRadius: radius.full, backgroundColor: c.primary },
     barShine: { position: "absolute", top: 3, left: spacing.sm, right: spacing.sm, height: 4, borderRadius: radius.full, backgroundColor: withAlpha(c.onPrimary, 0.3) },
     // icon only, no container
     pause: { width: 40, height: 40, alignItems: "center", justifyContent: "center" },
@@ -82,11 +83,11 @@ export function GameHud({ level, tile, top, frame, hearts, coins, keys = 0, seco
   const styles = useStyles(theme);
   const span = Math.max(1, level.cols - 1);
   const half = (HERO_DRAW * tile) / 2;
-  const fill = useAnimatedStyle(() => {
+  const progress = useDerivedValue(() => {
     const x = ((frame.get()[2] ?? 0) + half) / tile;
-    const p = Math.max(0.04, Math.min(1, x / span));
-    return { width: `${p * 100}%` };
+    return Math.max(0.04, Math.min(1, x / span));
   });
+  const fill = useFillStyle(progress);
   const hasFlag = level.decor.some((d) => d.kind === "flag");
   const checkpoints = level.decor.filter((d) => d.kind === "checkpoint");
 

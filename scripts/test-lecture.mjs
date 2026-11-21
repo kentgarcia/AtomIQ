@@ -11,7 +11,7 @@ import test from "node:test";
 import { loadTs } from "./lib/ts-require.mjs";
 
 const { lectureSteps, continueDelay, CONTINUE_DELAY, pageStart, MAX_BUBBLES } = loadTs("components/lesson/lecture-core.ts");
-const { TYPE_CPS, clipSegments, totalChars, typeDuration, visibleCount } = loadTs("components/lesson/typewriter-core.ts");
+const { TYPE_CPS, TYPE_STEP, clipSegments, stepped, totalChars, typeDuration, visibleCount } = loadTs("components/lesson/typewriter-core.ts");
 const { splitTerms } = loadTs("content/curriculum/terms.ts");
 
 const BODY = "One thing. Two things. Three things. Four things.";
@@ -51,8 +51,9 @@ test("the bubbles read in the card's own order, whole", () => {
 });
 
 test("Continue stays hidden 1 to 1.5 seconds after a bubble, a shorter moment after a figure", () => {
-  assert.ok(CONTINUE_DELAY.bubble >= 1000 && CONTINUE_DELAY.bubble <= 1500);
-  assert.ok(CONTINUE_DELAY.figure > 0 && CONTINUE_DELAY.figure < CONTINUE_DELAY.bubble);
+  // no typewriter in a lesson: only a short beat, and a figure is given a little longer to be seen
+  assert.ok(CONTINUE_DELAY.bubble > 0 && CONTINUE_DELAY.bubble <= 600);
+  assert.ok(CONTINUE_DELAY.figure >= CONTINUE_DELAY.bubble && CONTINUE_DELAY.figure <= 1000);
   assert.equal(continueDelay({ kind: "bubble", text: "x" }), CONTINUE_DELAY.bubble);
   assert.equal(continueDelay({ kind: "figure" }), CONTINUE_DELAY.figure);
   assert.equal(continueDelay(undefined), 0);
@@ -139,4 +140,20 @@ test("cutting at zero hides everything and at the end shows everything", () => {
   assert.ok(all.every((s) => s.hidden === "" && s.shown === s.text));
   assert.equal(all.map((s) => s.shown).join(""), "Hello world!");
   assert.ok(clipSegments(segments, -3).every((s) => s.shown === ""));
+});
+
+test("typing moves in whole steps and always reaches the end", () => {
+  assert.equal(TYPE_STEP, 3);
+  assert.equal(stepped(0, 100), 0);
+  assert.equal(stepped(2, 100), 0);
+  assert.equal(stepped(3, 100), 3);
+  assert.equal(stepped(8, 100), 6);
+  assert.equal(stepped(100, 100), 100, "the last characters are never held back");
+  assert.equal(stepped(99, 100), 99);
+  assert.equal(stepped(10, 10), 10, "a text shorter than a step still finishes");
+  assert.equal(stepped(-4, 10), 0);
+  // a whole typing run is at most total / step + 1 distinct counts: the commits the bubble costs
+  const seen = new Set();
+  for (let t = 0; t <= typeDuration(90) + 100; t += 5) seen.add(stepped(visibleCount(t, 90), 90));
+  assert.ok(seen.size <= 90 / TYPE_STEP + 1, `${seen.size} counts for 90 characters`);
 });

@@ -9,12 +9,12 @@
 import { useRouter } from "expo-router";
 import { memo } from "react";
 import { Pressable, View } from "react-native";
-import Animated, { useReducedMotion } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
+import { useReducedMotion } from "@/components/motion/use-reduced-motion";
 
 import { BlogCover } from "@/components/feed/BlogCover";
 import { HeadLink } from "@/components/feed/HeadLink";
 import { ReactionRow } from "@/components/feed/ReactionRow";
-import type { ViewRef } from "@/components/tutorial/use-tutorial-target";
 import { actionPhrase, blogHref, blogSpokenLabel, metaLine, reactionSpoken, readTimeLabel, relativeTime, relativeTimeSpoken } from "@/components/feed/feed-ui-core";
 import { pushHref } from "@/components/feed/navigate";
 import { Icon } from "@/components/ui/icon";
@@ -60,10 +60,9 @@ export interface BlogCardProps {
   /** The author's avatar opens their profile (default). Off on that teacher's own page. */
   linkHead?: boolean;
   /** Shrodi's tour lights this card's reaction pill (the first card on the Feed). */
-  reactionRef?: React.Ref<ViewRef>;
 }
 
-export const BlogCard = memo(function BlogCard({ item, npc, cast, now, fresh = false, linkHead = true, reactionRef }: BlogCardProps) {
+export const BlogCard = memo(function BlogCard({ item, npc, cast, now, fresh = false, linkHead = true }: BlogCardProps) {
   const router = useRouter();
   const { theme } = useTheme();
   const styles = useStyles(theme);
@@ -126,7 +125,7 @@ export const BlogCard = memo(function BlogCard({ item, npc, cast, now, fresh = f
           </View>
         </Pressable>
 
-        <ReactionRow target={item.target} summary={item.reactions} cast={cast} commentCount={blog.commentCount} onViewComments={open} pillRef={reactionRef} />
+        <ReactionRow target={item.target} summary={item.reactions} cast={cast} commentCount={blog.commentCount} onViewComments={open} />
         <View style={styles.divider} accessible={false} importantForAccessibility="no-hide-descendants" />
       </View>
     </Animated.View>

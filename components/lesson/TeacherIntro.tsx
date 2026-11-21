@@ -6,12 +6,14 @@
 
 import { ScrollView, View } from "react-native";
 import { Text } from "@/components/ui/text";
-import Animated, { FadeInDown, useReducedMotion } from "react-native-reanimated";
+import Animated, { FadeInDown } from "react-native-reanimated";
+import { useReducedMotion } from "@/components/motion/use-reduced-motion";
 
 import { PressableIconButton, useBottomInset } from "@/components/layout";
 import { EASE_OUT } from "@/components/motion/motion";
 import { Npc as NpcView } from "@/components/npc/Npc";
 import { NpcCover } from "@/components/npc/NpcCover";
+import { coverColors } from "@/components/npc/npc-cover-art";
 import { BubbleTail } from "@/components/npc/SpeechBubble";
 import { useTeacherLines } from "@/components/npc/teacher-lines";
 import { useNpcLine } from "@/components/npc/use-npc";
@@ -73,7 +75,7 @@ export function TeacherIntro({ npc, onClose, onContinue }: { npc: Npc; onClose: 
             </View>
           ) : null}
           <View style={styles.stage}>
-            <NpcCover npcId={npc.id} outfit={npc.spec.outfit} height={STAGE_H} radius={28} />
+            <NpcCover npcId={npc.id} outfit={coverColors(npc.spec)} height={STAGE_H} radius={28} />
             <View style={styles.bust} pointerEvents="none">
               <NpcView spec={npc.spec} pose="greet" form="bust" size={BUST} />
             </View>

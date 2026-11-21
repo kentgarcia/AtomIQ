@@ -9,11 +9,13 @@
  * brings a column of colour swatches down the left edge, under the back button. Opened from the Profile header.
  */
 
+import { useRenderTimer } from "@/components/dev/render-timer";
+import { useSfxSet } from "@/components/motion/use-sfx-set";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
 import { FlatList, Pressable, View, useWindowDimensions, type LayoutChangeEvent } from "react-native";
-import { useReducedMotion } from "react-native-reanimated";
+import { useReducedMotion } from "@/components/motion/use-reduced-motion";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Avatar } from "@/components/avatar/Avatar";
@@ -35,6 +37,9 @@ import { PurchaseFx } from "@/components/shop/PurchaseFx";
 import { PURCHASE, PURCHASE_TOTAL, coinCount, landMs } from "@/components/shop/purchase-fx-core";
 import { SHOP_TABS, buyBlock, categoryById, colorChoiceOf, colorOptions, isOwned, itemStatus, itemsIn, previewConfig, tabById, withColor, type ShopCategoryId, type ShopItem, type ShopTabId } from "@/components/shop/shop-core";
 import { useOwnedItems } from "@/hooks/use-owned-items";
+import { ShelfSkeleton } from "@/components/shop/ShelfSkeleton";
+import { ShopOpening } from "@/components/shop/ShopOpening";
+import { useTutorialBusy } from "@/hooks/use-tutorial";
 import { useDiamonds } from "@/hooks/use-wallet";
 import { levelFromXp } from "@/services/achievements-core";
 import { buyItem } from "@/services/shop";
@@ -43,7 +48,6 @@ import { createStyles, fontFaces, useResponsiveLayout, useTheme } from "@/theme"
 import { controls } from "@/theme/tokens";
 import { notifyError, notifySuccess, select } from "@/services/haptics";
 import { playSfx, stopSfx } from "@/services/sfx";
-import { useTutorialTarget } from "@/components/tutorial/use-tutorial-target";
 
 const DIAMOND_ICON = require("@/assets/images/icons/diamond.png");
 const SIDE = 20;
@@ -77,12 +81,12 @@ const useStyles = createStyles((theme) => {
 });
 
 export default function ShopScreen() {
+  useRenderTimer("/shop");
+  useSfxSet("shop");
   const router = useRouter();
   const { theme } = useTheme();
   const styles = useStyles(theme);
   const insets = useSafeAreaInsets();
-  // Shrodi's first visit lights the item grid (docs/features/TUTORIAL_SPEC.md §5.4)
-  const gridLit = useTutorialTarget("shop.grid", { radius: 16 });
   const { height: windowHeight, width: windowWidth } = useWindowDimensions();
   const { contentMaxWidth } = useResponsiveLayout();
   const { userProfile, updateUserProfile } = useStorage();
@@ -117,9 +121,21 @@ export default function ShopScreen() {
   const [category, setCategory] = useState<ShopCategoryId>(SHOP_TABS[0].categories[0]);
   const tab = tabById(tabId);
   const subTabs = tab.categories.length > 1;
+  // The shelf follows the tabs one render later (`useDeferredValue`): a tap on a tab updates the strip, the click and the haptic at once and
+  // the shelf of tiles, the costly part (every tile is a small drawn avatar), is built after, and dropped for the newer one if the learner
+  // taps on before it is done. `shelfSubTabs` is the shelf's own, so the grid keeps its width until its tiles change.
+  const shelfCategory = useDeferredValue(category);
+  const shelfSubTabs = useMemo(() => (SHOP_TABS.find((t) => t.categories.includes(shelfCategory)) ?? tab).categories.length > 1, [shelfCategory, tab]);
   const [trying, setTrying] = useState<ShopItem | null>(null);
   const [shelfWidth, setShelfWidth] = useState(0);
   const [topHeight, setTopHeight] = useState(0);
+  // The shop opens behind a closed shutter (components/shop/ShopOpening.tsx): the avatar, the shelves and the pattern are the heavy part of
+  // this screen, so they are mounted only once the shutter has been up a moment (`mounted`), while nothing on it moves, and it rolls up
+  // when they are laid out (`ready`). `opening` is true until it is gone.
+  const [mounted, setMounted] = useState(false);
+  const [opening, setOpening] = useState(true);
+  const ready = mounted && shelfWidth > 0 && topHeight > 0;
+  useTutorialBusy(opening, "shop opening");
 
   // Tapping an item must not re-render every tile: the handler is stable and reads the current pick from a ref
   const tryingRef = useRef<ShopItem | null>(null);
@@ -147,9 +163,12 @@ export default function ShopScreen() {
   const swatches = useMemo(() => (colorChoice ? colorOptions(colorChoice, { hairColor, skin }) : []), [colorChoice, hairColor, skin]);
   // The grid shows its tiles in the picked colour too
   const tileBase = useMemo(() => (colorChoice && tint ? withColor(base, colorChoice, tint) : base), [base, colorChoice, tint]);
-  const items = useMemo(() => itemsIn(category).filter((i) => !ownedOnly || isOwned(i, owned)), [category, ownedOnly, owned]);
+  const items = useMemo(() => itemsIn(shelfCategory).filter((i) => !ownedOnly || isOwned(i, owned)), [shelfCategory, ownedOnly, owned]);
   const shelfStatus = useCallback((item: ShopItem) => itemStatus(item, { owned, level, config: base }), [owned, level, base]);
-  const label = categoryById(category).label;
+  const label = categoryById(shelfCategory).label;
+  // A tab was tapped and the shelf has not caught up: grey placeholders in the place of the tiles until it does (`ShelfSkeleton`)
+  const pending = shelfCategory !== category;
+  const pendingCount = useMemo(() => (pending ? Math.min(9, itemsIn(category).filter((i) => !ownedOnly || isOwned(i, owned)).length) : 0), [pending, category, ownedOnly, owned]);
   // The avatar shown big: the one the learner has, with the item they tapped tried on.
   const look = useMemo(() => {
     if (!trying) return base;
@@ -204,7 +223,7 @@ export default function ShopScreen() {
     }
   }, [busy, wear]);
 
-  const gridWidth = shelfWidth - (subTabs ? SUB_TABS_WIDTH : 0);
+  const gridWidth = shelfWidth - (shelfSubTabs ? SUB_TABS_WIDTH : 0);
   const itemWidth = Math.max(0, Math.floor((gridWidth - 28 - GAP * (COLUMNS - 1)) / COLUMNS));
   const roof = awningHeight(insets.top + AWNING_BAND, AWNING_LIP);
   const avatarSize = Math.max(120, Math.min(260, topHeight - roof - 12));
@@ -220,6 +239,8 @@ export default function ShopScreen() {
 
   return (
     <View style={[styles.root, { backgroundColor: avatarBackground(look) }]}>
+      {mounted ? (
+        <>
       <PatternLayer pattern={look.pattern} tile={120} />
       <View style={styles.top} onLayout={(e: LayoutChangeEvent) => setTopHeight(e.nativeEvent.layout.height)}>
         {/* Trying something on: the avatar squashes and pops as the new look appears; putting it down does not */}
@@ -300,9 +321,12 @@ export default function ShopScreen() {
             />
           ) : null}
           {/* Keyed by category, so each starts at the top. A list, not a scroll view: there are dozens of items. */}
-          <View ref={gridLit.ref} collapsable={false} style={styles.grid}>
+          <View style={styles.grid}>
+          {pending ? (
+            <ShelfSkeleton count={pendingCount} columns={COLUMNS} itemWidth={itemWidth} contentStyle={styles.shelfContent} rowStyle={styles.gridRow} />
+          ) : (
           <FlatList
-            key={category}
+            key={shelfCategory}
             style={styles.grid}
             data={items}
             keyExtractor={(item) => item.id}
@@ -310,8 +334,10 @@ export default function ShopScreen() {
             columnWrapperStyle={styles.gridRow}
             contentContainerStyle={styles.shelfContent}
             showsVerticalScrollIndicator={false}
-            initialNumToRender={9}
-            maxToRenderPerBatch={6}
+            // One row on the first commit and one row per frame after, so a tab switch never builds nine drawn avatars in one frame
+            initialNumToRender={COLUMNS}
+            maxToRenderPerBatch={COLUMNS}
+            updateCellsBatchingPeriod={16}
             windowSize={5}
             extraData={`${trying?.id}|${colorChoice}|${tint}|${owned.size}|${level}|${serializeAvatar(base)}|${ownedOnly}`}
             removeClippedSubviews
@@ -330,9 +356,14 @@ export default function ShopScreen() {
               </View>
             }
           />
+          )}
           </View>
         </View>
       </View>
+        </>
+      ) : null}
+      {/* The closed shop over everything but the awning, which stays in front of it */}
+      {opening ? <ShopOpening ready={ready} onMountShop={() => setMounted(true)} onDone={() => setOpening(false)} /> : null}
       <Awning width={windowWidth} topInset={insets.top} />
     </View>
   );

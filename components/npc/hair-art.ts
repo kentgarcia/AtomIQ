@@ -14,12 +14,13 @@
  * `under` is the cap's whole outer outline, drawn behind the head in the same colour: wherever the face cut-out
  * is wider than the head (at a hairline corner) hair shows instead of a gap.
  */
-export type HairTone = "hair" | "shade" | "tie";
+/** `accent` and `accentShade` are the teacher's prop colours (Ada's bows); only a teacher's own hair uses them. */
+export type HairTone = "hair" | "shade" | "tie" | "accent" | "accentShade";
 export type HairPiece = { d: string; tone: HairTone; evenOdd?: boolean; under?: string } | { line: string; tone: HairTone; w: number };
 
 export type ExtraHairStyle =
   | "buzzcut" | "classic" | "messy" | "sidepart" | "curtain" | "bowl" | "spiky" | "wavy" | "longer" | "undercut"
-  | "longstraight" | "shortbob" | "medium" | "highpony" | "lowpony" | "twintails" | "bigbun" | "halfup" | "longwavy" | "curtainbangs";
+  | "longstraight" | "shortbob" | "medium" | "highpony" | "lowpony" | "twintails" | "bigbun" | "halfup" | "longwavy" | "curtainbangs" | "fluffy" | "cloud";
 
 const f = (n: number) => Math.round(n * 100) / 100;
 
@@ -102,6 +103,28 @@ const BEHIND = "M-58 4V90H58V4Z";
 
 /** The right tail of the twin tails (the left one is its mirror). */
 const TAIL = "M56 -30C74 -34 90 -16 94 14C98 44 92 62 82 66C72 68 68 50 66 32C64 14 60 4 54 -2Z";
+
+/** The right puff of Ada's pigtails: overlapping round tufts (x, y, r) stacked down the side of the head, so it reads fluffy, not a flat blob. They stay within x 88, the narrowest crop (the lesson bust), so no picture cuts them off. */
+const PUFF: [number, number, number][] = [
+  [50, -20, 28], [62, -42, 23], [63, -6, 23], [61, 30, 23], [54, 56, 16],
+];
+
+/** The puffs of both sides: a darker layer behind, a little lower and further out, then the hair colour on top, which gives them depth. */
+const puffs = (): HairPiece[] =>
+  ([-1, 1] as const).flatMap((side) => [
+    ...PUFF.map(([x, y, r]) => fill(disc(side * (x + 2), y + 5, r), "shade")),
+    ...PUFF.map(([x, y, r]) => fill(disc(side * x, y, r))),
+  ]);
+
+/** Hal's hair: seven round tufts piled over the top of the head (x, y, r), a darker layer behind them for depth. It stays inside the lesson bust's crop (x 88, y -114). */
+const CLOUD: [number, number, number][] = [[-58, -52, 19], [-44, -74, 22], [-18, -86, 22], [14, -88, 22], [42, -76, 22], [58, -52, 19], [0, -68, 34]];
+const cloud = (): HairPiece[] => [...CLOUD.map(([x, y, r]) => fill(disc(x + 2, y + 5, r), "shade")), ...CLOUD.map(([x, y, r]) => fill(disc(x, y, r)))];
+
+/** The head of Ada's pigtails: a tall cap, a middle part with soft bangs, and the sideburn tips. */
+const PIGTAIL_HEAD: HairPiece[] = [
+  cap(bell(56, OUT.hair.B, -96), `M-46 ${OUT.hair.B}V-30C-46 -38 -38 -40 -28 -44C-14 -49 -6 -54 0 -62C6 -54 14 -49 28 -44C38 -40 46 -38 46 -30V${OUT.hair.B}Z`),
+  ...OUT.hair.tips(),
+];
 
 export const HAIR_SHAPES: Record<ExtraHairStyle, { back?: HairPiece[]; front: HairPiece[]; /** Where the hair at the side of the head ends (y). */ sideBottom: number; /** False when the hair comes down over the ears. */ ears?: false }> = {
   // A short rounded cap with a straight hairline
@@ -341,8 +364,51 @@ export const HAIR_SHAPES: Record<ExtraHairStyle, { back?: HairPiece[]; front: Ha
     ],
     sideBottom: SIDE_END,
   },
+  // Ada's pigtails: a middle part with soft bangs and two big fluffy puffs, each held by a tie
+  fluffy: {
+    back: puffs(),
+    front: [...PIGTAIL_HEAD, fill(band(57, -50, 9, 22, 35), "tie"), fill(band(-57, -50, 9, 22, -35), "tie")],
+    sideBottom: SIDE_END,
+  },
+
+  // A big cloud of hair piled up on top, with a low fringe swept across the forehead
+  cloud: {
+    back: cloud(),
+    front: [
+      cap(bell(56, OUT.hair.B, -84), `M-46 ${OUT.hair.B}V-30C-46 -34 -38 -37 -24 -39C-8 -41 6 -44 16 -54C22 -44 36 -38 46 -32V${OUT.hair.B}Z`),
+      ...OUT.hair.tips(),
+    ],
+    sideBottom: SIDE_END,
+  },
 };
 
 export const EXTRA_HAIR_STYLES = Object.keys(HAIR_SHAPES) as ExtraHairStyle[];
 
 export const isExtraHair = (style: string): style is ExtraHairStyle => Object.prototype.hasOwnProperty.call(HAIR_SHAPES, style);
+
+// ── a teacher's own hair (not in the shop) ───────────────────────────────────
+
+/** Hair only a teacher wears, so the shop's lists and prices do not change. */
+export type TeacherHairStyle = "pigtailbows";
+
+/** A leaf-shaped bow: two soft lobes round a knot, centred at (cx, cy), the right one turned up by `deg` (the left is its mirror). */
+function bow(cx: number, cy: number, deg: number): HairPiece[] {
+  const a = (deg * Math.PI) / 180;
+  const at = (x: number, y: number): [number, number] => [cx + x * Math.cos(a) - y * Math.sin(a), cy + x * Math.sin(a) + y * Math.cos(a)];
+  const lobe = (side: -1 | 1) => fill(soft([at(0, 0), at(side * 30, -27), at(side * 40, -2), at(side * 28, 14)], 12), "accent");
+  return [lobe(-1), lobe(1), fill(disc(...at(0, 0), 8.5), "accentShade")];
+}
+
+export const TEACHER_HAIR_SHAPES: Record<TeacherHairStyle, (typeof HAIR_SHAPES)[ExtraHairStyle]> = {
+  // Ada: a middle part with soft bangs, and two high puffs, each tied with a bow
+  pigtailbows: {
+    back: puffs(),
+    front: [...PIGTAIL_HEAD, ...bow(52, -60, -14), ...bow(-52, -60, 14)],
+    sideBottom: SIDE_END,
+  },
+};
+
+export const isTeacherHair = (style: string): style is TeacherHairStyle => Object.prototype.hasOwnProperty.call(TEACHER_HAIR_SHAPES, style);
+
+/** The hand-drawn shape of a style that has one: a shop style or a teacher's own. */
+export const shapedHair = (style: string) => (isExtraHair(style) ? HAIR_SHAPES[style] : isTeacherHair(style) ? TEACHER_HAIR_SHAPES[style] : undefined);

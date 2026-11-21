@@ -9,7 +9,8 @@
 
 import React, { memo, useCallback, useMemo } from "react";
 import { TouchableOpacity, View, type StyleProp, type ViewStyle } from "react-native";
-import Animated, { useAnimatedStyle, useReducedMotion, useSharedValue, withTiming, type SharedValue } from "react-native-reanimated";
+import Animated, { useAnimatedStyle, useSharedValue, withTiming, type SharedValue } from "react-native-reanimated";
+import { useReducedMotion } from "@/components/motion/use-reduced-motion";
 import Svg, { Circle, Ellipse, G, Path, Polyline, Rect } from "react-native-svg";
 
 import { NODE_REVEAL } from "@/components/celebration/celebration-core";

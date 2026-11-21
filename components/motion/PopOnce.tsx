@@ -16,7 +16,8 @@
 
 import type { ReactNode } from "react";
 import { View, type StyleProp, type ViewStyle } from "react-native";
-import Animated, { useAnimatedStyle, useReducedMotion, useSharedValue, type SharedValue } from "react-native-reanimated";
+import Animated, { useAnimatedStyle, useSharedValue, type SharedValue } from "react-native-reanimated";
+import { useReducedMotion } from "@/components/motion/use-reduced-motion";
 
 import { Sparkle } from "@/components/lesson/Sparkle";
 import { POP_TOTAL, faceFrame, starFrame } from "@/components/lesson/cards/option-pop-core";

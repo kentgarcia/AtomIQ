@@ -6,6 +6,7 @@
 import { useEffect } from 'react';
 import { Easing, cancelAnimation, useSharedValue, withRepeat, withTiming, type SharedValue } from 'react-native-reanimated';
 
+import { useIdleStill } from './use-reduced-motion';
 import { easeIn, easeInOut, easeOut } from './motion-core';
 
 export * from './motion-core';
@@ -20,18 +21,21 @@ export const EASE_IN = easeIn;
 
 /**
  * A looping clock from 0 to `period` ms. Frozen at 0 when `live` is false
- * (reduced motion, off screen, hidden): frame 0 must be a good drawing.
+ * (reduced motion, off screen, hidden) or when the animation level is not max: frame 0 must be a good drawing.
  */
 export function useLoopClock(period: number, live: boolean): SharedValue<number> {
   const clock = useSharedValue(0);
+  // A loop runs on its own, so it runs only at the "max" animation level (not at "reduced" or "off", nor with the system's reduced motion)
+  const still = useIdleStill();
+  const run = live && !still;
   useEffect(() => {
     cancelAnimation(clock);
     // withRepeat restarts from the CURRENT value: always reset first.
     clock.value = 0;
-    if (!live) return;
+    if (!run) return;
     clock.value = withRepeat(withTiming(period, { duration: period, easing: Easing.linear }), -1);
     return () => cancelAnimation(clock);
-  }, [live, period, clock]);
+  }, [run, period, clock]);
   return clock;
 }
 

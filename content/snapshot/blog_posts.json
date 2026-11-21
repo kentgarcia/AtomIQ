@@ -6,12 +6,12 @@
   "rows": [
     {
       "id": "blog-nobody-knows-when",
-      "npc_id": "npc-hal",
+      "npc_id": "npc-ada",
       "unit_id": "radioactivity",
       "lesson_id": "why-nuclei-decay",
       "position": 0,
-      "title": "Nobody knows when",
-      "hook": "Look at one unstable nucleus and its moment is a surprise. Look at a crowd and it is a pattern.",
+      "title": "nobody knows when",
+      "hook": "one unstable nucleus is a surprise. a whole crowd of them follows a pattern. isn't that neat?",
       "cover": "radiation",
       "read_min": 1,
       "unlock": {
@@ -21,27 +21,27 @@
       "blocks": [
         {
           "t": "p",
-          "text": "Take one unstable nucleus. Leave it alone. It has a chance of changing, and nobody can say when."
+          "text": "ok so take one unstable nucleus. leave it alone. it has a chance of changing, and nobody can say when. eep, so mysterious~"
         },
         {
           "t": "p",
-          "text": "Nobody pushes it. The nucleus that changes is the parent. The nucleus it becomes is the daughter. The change gives off radiation."
+          "text": "nobody pushes it. the nucleus that changes is the parent. the nucleus it becomes is the daughter. the change gives off radiation"
         },
         {
           "t": "quote",
-          "text": "My pocket watch ticks for a crowd of atoms, never for one."
+          "text": "a half-life ticks for a crowd of atoms, never for one"
         },
         {
           "t": "h",
-          "text": "Think of a die"
+          "text": "think of a die"
         },
         {
           "t": "p",
-          "text": "Roll a die once and you cannot say whether it will show a six. Roll it 600 times and you can say that about 100 of the rolls will."
+          "text": "roll a die once and you can't say if it will show a six. roll it 600 times and you can say that about 100 of the rolls will. hehe"
         },
         {
           "t": "p",
-          "text": "A nucleus is like that. One is a surprise. A big group follows a pattern, and in the half-life lesson you will see the pattern for yourself."
+          "text": "a nucleus is like that. one is a surprise. a big group follows a pattern, and in the half-life lesson you'll see the pattern for yourself. it's so pretty~"
         },
         {
           "t": "figure",
@@ -55,32 +55,32 @@
         {
           "t": "list",
           "items": [
-            "One nucleus: you cannot say when",
+            "One nucleus: you can't say when",
             "A big group: it follows a pattern"
           ]
         },
         {
           "t": "p",
-          "text": "So when someone asks you when an atom will change, you can answer slowly and exactly: you cannot know. A crowd of them, though, you can know."
+          "text": "so when someone asks you when an atom will change, you can say: you can't know. a crowd of them, though, you can know. hehe, tiny mystery solved~"
         },
         {
           "t": "next",
-          "label": "See what comes out of a decay",
+          "label": "see what comes out of a decay",
           "lessonId": "alpha-beta-gamma"
         }
       ],
       "reactors": [
-        "npc-ada"
+        "npc-hal"
       ]
     },
     {
       "id": "blog-the-banana-on-your-counter",
-      "npc_id": "npc-hal",
+      "npc_id": "npc-ada",
       "unit_id": "radioactivity",
       "lesson_id": "radioactivity-is-natural",
       "position": 1,
-      "title": "The banana on your counter",
-      "hook": "A banana is a little bit radioactive. So are you. That is normal, and here is why.",
+      "title": "the banana on your counter",
+      "hook": "a banana is a little bit radioactive. so are you. that's normal, and here's why",
       "cover": "banana",
       "read_min": 1,
       "unlock": {
@@ -90,19 +90,19 @@
       "blocks": [
         {
           "t": "p",
-          "text": "Here is something nobody expects. The banana on your counter is a little bit radioactive."
+          "text": "ok here's something nobody expects. the banana on your counter is a little bit radioactive. surprise~"
         },
         {
           "t": "p",
-          "text": "It holds potassium, and a tiny share of that potassium is potassium-40, which is unstable. You carry some too, in your own body."
+          "text": "it holds potassium, and a tiny share of that potassium is potassium-40, which is unstable. you carry some too, in your own body"
         },
         {
           "t": "h",
-          "text": "It was here first"
+          "text": "it was here first"
         },
         {
           "t": "p",
-          "text": "Radioactivity was not invented. It was here long before people were. You can find it in four places."
+          "text": "radioactivity wasn't invented. it was here long before people were. you can find it in four places"
         },
         {
           "t": "list",
@@ -120,7 +120,7 @@
         },
         {
           "t": "quote",
-          "text": "Radioactivity was always here. We only learned to see it."
+          "text": "radioactivity was always here. we only learned to see it"
         },
         {
           "t": "fact",
@@ -128,37 +128,37 @@
         },
         {
           "t": "h",
-          "text": "Is it dangerous?"
+          "text": "is it dangerous?"
         },
         {
           "t": "p",
-          "text": "Radioactive does not automatically mean dangerous. What matters is the type of radiation, how much there is, and how it reaches the body."
+          "text": "radioactive doesn't automatically mean dangerous. what matters is the type of radiation, how much there is, and how it reaches the body."
         },
         {
           "t": "p",
-          "text": "A banana and your own body are radioactive, and that is normal. Later, you will learn why being exposed to radiation is not the same as becoming radioactive."
+          "text": "a banana and your own body are radioactive, and that's normal. later you'll learn why being exposed to radiation isn't the same as becoming radioactive."
         },
         {
           "t": "next",
-          "label": "Find where radioactivity hides around you",
+          "label": "find where radioactivity hides around you",
           "lessonId": "radioactivity-is-natural"
         }
       ],
       "reactors": [
-        "npc-ada",
+        "npc-hal",
         "npc-mina"
       ]
     },
     {
       "id": "blog-the-smallest-thing",
-      "npc_id": "npc-ada",
+      "npc_id": "npc-hal",
       "unit_id": "inside-the-atom",
       "lesson_id": "atoms-are-everywhere",
       "position": 0,
       "title": "The smallest thing you will ever meet",
-      "hook": "You have never seen one, yet you are made of them. Here is how small they really are.",
+      "hook": "You have never seen one, yet you are made of them. Let us look at how small they really are.",
       "cover": "atom",
-      "read_min": 1,
+      "read_min": 2,
       "unlock": {
         "trigger": "none"
       },
@@ -169,11 +169,11 @@
         },
         {
           "t": "p",
-          "text": "Yes, even the air, which feels like nothing. That is why a pumped-up ball weighs more than a flat one: the air inside it is matter too."
+          "text": "Yes, even the air, which gives every impression of being nothing. That is why a pumped-up ball is heavier than a flat one: the air inside it is matter too. I have weighed several balls to be certain. The neighbours have asked me to stop."
         },
         {
           "t": "quote",
-          "text": "I have asked what things are made of since I was small. I still ask it every day."
+          "text": "Small things are best looked at slowly. I still look at them every day."
         },
         {
           "t": "h",
@@ -207,7 +207,7 @@
         },
         {
           "t": "p",
-          "text": "So the next time you pick something up, remember that you are holding a huge crowd of atoms you can never see."
+          "text": "So the next time you pick something up, remember that you are holding a huge crowd of atoms you can never see. Take a moment with that. I will wait."
         },
         {
           "t": "next",
@@ -219,14 +219,14 @@
     },
     {
       "id": "blog-three-kinds-of-carbon",
-      "npc_id": "npc-ada",
+      "npc_id": "npc-hal",
       "unit_id": "inside-the-atom",
       "lesson_id": "isotopes",
       "position": 1,
       "title": "Three kinds of carbon",
-      "hook": "Carbon-12, carbon-13 and carbon-14 are all carbon. One of them is not like the others.",
+      "hook": "Carbon-12, carbon-13 and carbon-14 are all carbon. One of them is not like the others. Let us see which.",
       "cover": "diamond",
-      "read_min": 1,
+      "read_min": 2,
       "unlock": {
         "trigger": "unit_complete",
         "unitId": "inside-the-atom"
@@ -234,7 +234,7 @@
       "blocks": [
         {
           "t": "p",
-          "text": "Here is a puzzle. Three atoms are all carbon, yet they are not the same. How can that be?"
+          "text": "Here is a puzzle. Three atoms are all carbon, yet they are not the same. How can that be? Let us count."
         },
         {
           "t": "p",
@@ -246,7 +246,7 @@
         },
         {
           "t": "p",
-          "text": "The number after the name is the mass number: protons plus neutrons. Carbon has 6 protons, so carbon-14 has 14 - 6 = 8 neutrons."
+          "text": "The number after the name is the mass number: protons plus neutrons. Carbon has 6 protons, so carbon-14 has 14 - 6 = 8 neutrons. I checked the subtraction. Twice."
         },
         {
           "t": "list",
@@ -270,20 +270,20 @@
         },
         {
           "t": "p",
-          "text": "Even so, nothing here is strange or new. Unstable atoms are in rocks, in the air and in food, and they were here long before us."
+          "text": "Even so, nothing here is strange or new. Unstable atoms are in rocks, in the air and in food, and they were here long before us. The rocks have been very patient about it."
         },
         {
           "t": "p",
-          "text": "Which brings a question. What exactly comes out when a nucleus changes? Hal knows, and he tells it slowly."
+          "text": "Which brings a question. What exactly comes out when a nucleus changes? Ada knows. She tells it brightly. Please be prepared."
         },
         {
           "t": "next",
-          "label": "Meet Hal and radioactivity",
+          "label": "Meet Ada and radioactivity",
           "unitId": "radioactivity"
         }
       ],
       "reactors": [
-        "npc-hal"
+        "npc-ada"
       ]
     }
   ]

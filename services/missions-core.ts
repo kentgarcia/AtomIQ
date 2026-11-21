@@ -78,6 +78,13 @@ export function resolveState(stored: unknown, key: string): { state: MissionsSta
 /* ---- the chest -------------------------------------------------------------------------------- */
 
 /** Stored in a period's `claimed` list once its chest is opened (a mission id never has this name). */
+/**
+ * Whether a focus of the Quests tab should read the counters again. The tab reads them once as it mounts, and its first focus comes in the
+ * same breath: while that read is still going, a second one would read the same thing and draw the page twice. Any later focus reads (progress
+ * is earned on other tabs), and so does a first focus that finds the mount's read already done.
+ */
+export const refreshOnFocus = (firstFocus: boolean, loading: boolean): boolean => !(firstFocus && loading);
+
 export const CHEST_ID = "chest";
 
 /** Diamonds in the chest of each period. */

@@ -9,7 +9,8 @@
 import { useEffect, useRef, useState } from "react";
 import { Pressable, View, type LayoutChangeEvent } from "react-native";
 import { Text } from "@/components/ui/text";
-import Animated, { useAnimatedStyle, useReducedMotion, useSharedValue, withTiming } from "react-native-reanimated";
+import Animated, { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
+import { useReducedMotion } from "@/components/motion/use-reduced-motion";
 import Svg, { Polyline } from "react-native-svg";
 
 import { EASE_OUT } from "@/components/motion/motion";

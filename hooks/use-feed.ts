@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { reuseItems } from "@/components/feed/feed-ui-core";
 import { playSfx } from "@/services/sfx";
 
 import {
@@ -43,7 +44,8 @@ export function useFeed(): FeedState {
     (): Promise<void> =>
       Promise.all([getFeed(), getUnseenCount(), getFeedPostsEnabled()])
         .then(([list, count, on]) => {
-          setItems(list);
+          // Items that did not change stay the same objects (the list may be the very same array), so their cards do not re-render
+          setItems((prev) => reuseItems(prev, list) as FeedItem[]);
           setUnseenCount(count);
           setEnabled(on);
           list.forEach((i) => i.seen && seen.current.add(i.id));

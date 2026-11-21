@@ -8,7 +8,8 @@
 
 import { memo, useCallback, useEffect, useRef, useState } from "react";
 import { Pressable, ScrollView, View, type LayoutChangeEvent, type NativeScrollEvent, type NativeSyntheticEvent, type ScrollViewInstance } from "react-native";
-import Animated, { Easing, FadeIn, FadeOut, cancelAnimation, useAnimatedStyle, useReducedMotion, useSharedValue, withRepeat, withSequence, withTiming } from "react-native-reanimated";
+import Animated, { Easing, FadeIn, FadeOut, cancelAnimation, useAnimatedStyle, useSharedValue, withRepeat, withSequence, withTiming } from "react-native-reanimated";
+import { useIdleStill } from "@/components/motion/use-reduced-motion";
 import Svg, { Path } from "react-native-svg";
 
 import { PopWhen } from "@/components/motion/PopOnce";
@@ -59,7 +60,7 @@ const Swatch = memo(function Swatch({ option, selected, onPick }: { option: Colo
 function Chip({ dir, onPress, offset }: { dir: "up" | "down"; onPress: () => void; offset: number }) {
   const { theme } = useTheme();
   const styles = useStyles(theme);
-  const reduced = useReducedMotion();
+  const reduced = useIdleStill();
   const bob = useSharedValue(0);
   useEffect(() => {
     if (dir === "up" || reduced) return;

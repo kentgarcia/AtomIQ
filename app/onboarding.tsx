@@ -11,12 +11,15 @@
  * completed flag, in that order, then shows the welcome.
  */
 
+import { useRenderTimer } from "@/components/dev/render-timer";
+import { useSfxSet } from "@/components/motion/use-sfx-set";
 import { serializeAvatar, STARTER_AVATARS, type StarterId } from "@/components/avatar/avatar-core";
 import { LessonFrame } from "@/components/lesson/LessonFrame";
 import { skipSettle } from "@/components/motion/settle";
 import { EASE_OUT } from "@/theme/motion";
 import { HelloStep } from "@/components/onboarding/HelloStep";
 import { FLOW_STEPS, QuestionFlow } from "@/components/onboarding/QuestionFlow";
+import { SpeedStep } from "@/components/onboarding/SpeedStep";
 import { PlanStep } from "@/components/onboarding/PlanStep";
 import { ProfileStep } from "@/components/onboarding/ProfileStep";
 import { TasteStep } from "@/components/onboarding/TasteStep";
@@ -25,6 +28,8 @@ import {
   EMPTY_ANSWERS,
   nextStep,
   previousStep,
+  forcedSpeedAdvice,
+  speedAdvice,
   serializeAnswers,
   TASTE_XP,
   type Answers,
@@ -33,18 +38,38 @@ import {
   type OnboardingStep,
   type Reason,
 } from "@/services/onboarding-core";
+import { getDeviceTier } from "@/services/device-profile";
+import { getForceSpeedPage } from "@/services/speed-page-flag";
 import { setOnboardingAnswers } from "@/services/storage";
 import { playSfx } from "@/services/sfx";
 import { useStorage } from "@/services/StorageContext";
 import { useRouter } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
 import { BackHandler, Platform, View } from "react-native";
-import Animated, { runOnJS, useAnimatedStyle, useReducedMotion, useSharedValue, withTiming } from "react-native-reanimated";
+import Animated, { runOnJS, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
+import { useReducedMotion } from "@/components/motion/use-reduced-motion";
 
 export default function Onboarding() {
+  useRenderTimer("/onboarding");
+  useSfxSet("onboarding");
   const router = useRouter();
   const { updateUserProfile, userProfile, addXP, setOnboardingDone } = useStorage();
 
+  const reducedMotion = useReducedMotion();
+  // The animation page after Hello is for phones found slow only (never an iPhone, never when animation is already off). Decided
+  // once, from the phone and the setting as they were when onboarding opened, so choosing "Disabled" on it does not remove it.
+  const [speed, setSpeed] = useState(() => speedAdvice(getDeviceTier(), reducedMotion));
+  const skipSpeed = speed === null;
+  // The perf probe can force the page on any phone (diagnostics); read once, well before Get started is pressed
+  useEffect(() => {
+    let alive = true;
+    void getForceSpeedPage().then((on) => {
+      if (alive && on) setSpeed((prev) => prev ?? forcedSpeedAdvice(getDeviceTier()));
+    });
+    return () => {
+      alive = false;
+    };
+  }, []);
   const [step, setStep] = useState<OnboardingStep>("hello");
   // Which way the question pages slide (1 on, -1 back, 0 none: the first page arrives attached to hello). Set before the step changes.
   const direction = useSharedValue(0);
@@ -62,7 +87,6 @@ export default function Onboarding() {
   // in the same strip, already scrolled (the bottom screen), so nothing is remounted when the slide ends.
   const [frameHeight, setFrameHeight] = useState(0);
   const [helloLeaving, setHelloLeaving] = useState(false);
-  const reducedMotion = useReducedMotion();
   const strip = useSharedValue(0);
   const stripStyle = useAnimatedStyle(() => ({ transform: [{ translateY: strip.get() }] }));
   useEffect(() => {
@@ -90,18 +114,19 @@ export default function Onboarding() {
   const stepOverTaste = tasteDone || tasteSkipped;
 
   const forward = useCallback(() => {
-    const to = nextStep(step, { skipTaste: stepOverTaste });
+    const to = nextStep(step, { skipTaste: stepOverTaste, skipSpeed });
+    // Only the first page after Hello arrives attached to it (no motion of its own)
     direction.set(step === "hello" ? 0 : 1);
     if (to) setStep(to);
-  }, [step, stepOverTaste, direction]);
+  }, [step, stepOverTaste, skipSpeed, direction]);
 
   const back = useCallback(() => {
-    const to = previousStep(step);
+    const to = previousStep(step, { skipSpeed });
     if (!to) return;
     direction.set(-1);
     // The taste is a one-time thing: back from the profile goes over it
     setStep(to === "taste" && stepOverTaste ? "goal" : to);
-  }, [step, stepOverTaste, direction]);
+  }, [step, stepOverTaste, skipSpeed, direction]);
 
   // Android back walks onboarding backwards instead of leaving the flow and losing the answers
   useEffect(() => {
@@ -144,6 +169,8 @@ export default function Onboarding() {
     switch (step) {
       case "hello":
         return null; // drawn in the strip below
+      case "speed":
+        return speed ? <SpeedStep advice={speed} onContinue={forward} onBack={back} /> : null;
       case "why":
       case "level":
       case "how":

@@ -8,9 +8,12 @@
  * motion it is not drawn at all.
  */
 
+import { useMotionBudget } from "@/components/motion/use-motion-budget";
+import { particlesFor } from "@/services/device-profile-core";
 import { memo } from "react";
 import { View } from "react-native";
-import Animated, { useAnimatedStyle, useReducedMotion, type SharedValue } from "react-native-reanimated";
+import Animated, { useAnimatedStyle, type SharedValue } from "react-native-reanimated";
+import { useReducedMotion } from "@/components/motion/use-reduced-motion";
 
 import { Sparkle } from "@/components/lesson/Sparkle";
 import { BURST, burstRing, burstStar, burstTwinkle } from "@/components/motion/burst-core";
@@ -60,7 +63,9 @@ export interface BurstProps {
   count?: number;
 }
 
-function BurstBase({ clock, at, diameter, color, ringColor, reach = BURST.reach, count = BURST.count }: BurstProps) {
+function BurstBase({ clock, at, diameter, color, ringColor, reach = BURST.reach, count: wanted = BURST.count }: BurstProps) {
+  // A slower phone draws fewer stars (never fewer than four), docs/features/PERFORMANCE_AND_SOUND_SPEC.md §5.4
+  const count = particlesFor(wanted, useMotionBudget().particleShare);
   const reduced = useReducedMotion();
   const ring = useAnimatedStyle(() => {
     const r = burstRing(clock.get() - at);

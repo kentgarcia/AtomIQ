@@ -23,7 +23,8 @@ import { useRouter } from "expo-router";
 import React, { useEffect, useRef } from "react";
 import { ActivityIndicator, Image, Pressable, ScrollView, View } from "react-native";
 import { Text } from "@/components/ui/text";
-import Animated, { FadeIn, FadeInUp, useAnimatedStyle, useReducedMotion, useSharedValue, withRepeat, withTiming } from "react-native-reanimated";
+import Animated, { FadeIn, FadeInUp, useAnimatedStyle, useSharedValue, withRepeat, withTiming } from "react-native-reanimated";
+import { useReducedMotion } from "@/components/motion/use-reduced-motion";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { playSfx } from "@/services/sfx";
 

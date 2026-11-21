@@ -7,11 +7,13 @@
 
 import { useEffect, useRef } from "react";
 import { Pressable, View } from "react-native";
-import Animated, { useAnimatedStyle, useReducedMotion, useSharedValue, withTiming } from "react-native-reanimated";
+import Animated, { useSharedValue, withTiming } from "react-native-reanimated";
+import { useReducedMotion } from "@/components/motion/use-reduced-motion";
 
 import { ProgressSparkle } from "@/components/lesson/ProgressSparkle";
 import { EASE_OUT } from "@/components/motion/motion";
 import { Icon } from "@/components/ui/icon";
+import { useFillStyle } from "@/components/ui/progress-fill";
 import { createStyles, radius, spacing, useTheme, withAlpha } from "@/theme";
 
 const useStyles = createStyles((theme) => ({
@@ -19,9 +21,9 @@ const useStyles = createStyles((theme) => ({
   back: { width: 40, height: 40, alignItems: "center", justifyContent: "center", marginLeft: -spacing.sm },
   barWrap: { flex: 1, height: 16 },
   bar: { position: "absolute", top: 0, bottom: 0, left: 0, right: 0, borderRadius: radius.full, backgroundColor: theme.colors.border, overflow: "hidden" },
-  fill: { height: "100%", borderRadius: radius.full, backgroundColor: theme.colors.primary },
+  fill: { width: "100%", height: "100%", borderRadius: radius.full, backgroundColor: theme.colors.primary },
   shine: { position: "absolute", top: 3, left: spacing.sm, right: spacing.sm, height: 4, borderRadius: radius.full, backgroundColor: withAlpha(theme.colors.onPrimary, 0.3) },
-  sparkAnchor: { position: "absolute", top: 0, bottom: 0, left: 0 },
+  sparkAnchor: { position: "absolute", top: 0, bottom: 0, left: 0, right: 0 },
 }));
 
 export function OnboardingBar({ progress, onBack }: { progress: number; onBack?: (() => void) | null }) {
@@ -47,7 +49,7 @@ export function OnboardingBar({ progress, onBack }: { progress: number; onBack?:
     }
   }, [progress, reduced, fill, pop]);
 
-  const fillStyle = useAnimatedStyle(() => ({ width: `${fill.get() * 100}%` }));
+  const fillStyle = useFillStyle(fill);
 
   return (
     <View style={styles.top}>

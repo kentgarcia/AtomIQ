@@ -7,7 +7,8 @@
 
 import { View } from "react-native";
 import { Text } from "@/components/ui/text";
-import Animated, { FadeInDown, useReducedMotion } from "react-native-reanimated";
+import Animated, { FadeInDown } from "react-native-reanimated";
+import { useReducedMotion } from "@/components/motion/use-reduced-motion";
 
 import { EASE_OUT } from "@/components/motion/motion";
 import { FooterRow } from "@/components/lesson/FooterRow";

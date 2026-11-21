@@ -15,12 +15,12 @@ import Animated, {
   FadeOut,
   cancelAnimation,
   useAnimatedStyle,
-  useReducedMotion,
   useSharedValue,
   withRepeat,
   withTiming,
   type SharedValue,
 } from "react-native-reanimated";
+import { useIdleStill, useReducedMotion } from "@/components/motion/use-reduced-motion";
 
 import { HeaderButton, ScreenHeader, useHeaderBorder } from "@/components/layout";
 import { duoShade } from "@/components/lesson/visual/duo-palette";
@@ -171,7 +171,7 @@ function AtomStage({
   const proton = duoShade("danger", theme.mode);
   const neutron = duoShade("neutral", theme.mode);
   const electron = duoShade("info", theme.mode);
-  const reduced = useReducedMotion();
+  const reduced = useIdleStill();
 
   // The shells turn on one slow clock
   const spinClock = useSharedValue(0);

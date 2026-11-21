@@ -27,7 +27,7 @@
       },
       "icon": "Atom",
       "tone": "accent",
-      "teacher_npc_id": "npc-ada"
+      "teacher_npc_id": "npc-hal"
     },
     {
       "id": "radioactivity",
@@ -52,7 +52,7 @@
       },
       "icon": "Radar",
       "tone": "warning",
-      "teacher_npc_id": "npc-hal"
+      "teacher_npc_id": "npc-ada"
     }
   ]
 }

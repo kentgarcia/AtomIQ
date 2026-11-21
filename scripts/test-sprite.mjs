@@ -40,6 +40,9 @@ test("a sheet lasts count / fps", () => {
 test("the chest sheets declare the frames that were baked", () => {
   const src = fs.readFileSync("components/quests/chest-sheets.ts", "utf8");
   const frames = [...src.matchAll(/frames:\s*(\d+)/g)].map((m) => Number(m[1]));
-  assert.deepEqual(frames, [38, 104]);
+  assert.deepEqual(frames, [38, 52]);
+  // The glow was thinned from 104 frames at 25 fps to 52 at 12.5 (RENDER_COST_SPEC A1): it must still last the same 4.16 s
+  const fps = [...src.matchAll(/fps:\s*([\d.]+)/g)].map((m) => Number(m[1]));
+  assert.equal(sheetDuration(frames[1], fps[1]), 4160);
   for (const f of ["assets/images/chest/chest-open.webp", "assets/images/chest/chest-loop.webp"]) assert.ok(fs.existsSync(f), f);
 });

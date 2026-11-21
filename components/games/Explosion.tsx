@@ -9,7 +9,8 @@
  */
 
 import { StyleSheet, View } from "react-native";
-import Animated, { useAnimatedStyle, useReducedMotion, type SharedValue } from "react-native-reanimated";
+import Animated, { useAnimatedStyle, type SharedValue } from "react-native-reanimated";
+import { useReducedMotion } from "@/components/motion/use-reduced-motion";
 import Svg, { Path } from "react-native-svg";
 
 import { Sparkle } from "@/components/lesson/Sparkle";

@@ -8,7 +8,8 @@
 
 import { ScrollView, View } from "react-native";
 import { Text } from "@/components/ui/text";
-import Animated, { FadeIn, useReducedMotion } from "react-native-reanimated";
+import Animated, { FadeIn } from "react-native-reanimated";
+import { useReducedMotion } from "@/components/motion/use-reduced-motion";
 
 import { PressableIconButton, useBottomInset } from "@/components/layout";
 import { Shrodi } from "@/components/mascot/Shrodi";

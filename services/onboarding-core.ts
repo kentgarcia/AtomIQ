@@ -8,9 +8,12 @@
  * live in component state and `serializeAnswers` is called once, at the very end.
  */
 
-export type OnboardingStep = "hello" | "why" | "level" | "how" | "goal" | "plan" | "taste" | "profile" | "welcome";
+import type { DeviceTier } from "@/services/device-profile-core";
+import type { MotionLevel } from "@/components/motion/motion-level-core";
 
-export const STEPS: readonly OnboardingStep[] = ["hello", "why", "level", "how", "goal", "plan", "taste", "profile", "welcome"];
+export type OnboardingStep = "hello" | "speed" | "why" | "level" | "how" | "goal" | "plan" | "taste" | "profile" | "welcome";
+
+export const STEPS: readonly OnboardingStep[] = ["hello", "speed", "why", "level", "how", "goal", "plan", "taste", "profile", "welcome"];
 
 export type Reason = "curious" | "school" | "career" | "news" | "fun";
 export type Level = "new" | "basics" | "solid";
@@ -89,7 +92,7 @@ export const BAR_STEPS: readonly OnboardingStep[] = ["why", "level", "how", "goa
  * first question and never full before the end. `plan` keeps the goal's fill; hello is 0, welcome 1.
  */
 export function stepProgress(step: OnboardingStep): number {
-  if (step === "hello") return 0;
+  if (step === "hello" || step === "speed") return 0;
   if (step === "welcome") return 1;
   const at = step === "plan" ? BAR_STEPS.indexOf("goal") : BAR_STEPS.indexOf(step);
   return (at + 1) / (BAR_STEPS.length + 1);
@@ -98,17 +101,23 @@ export function stepProgress(step: OnboardingStep): number {
 /** Whether the step shows the bar. */
 export const hasBar = (step: OnboardingStep): boolean => BAR_STEPS.includes(step);
 
-/** The step after `step`. The taste is stepped over when `skipTaste` (its questions could not be loaded). */
-export function nextStep(step: OnboardingStep, opts: { skipTaste?: boolean } = {}): OnboardingStep | null {
+/**
+ * The step after `step`. The taste is stepped over when `skipTaste` (its questions could not be loaded), and the speed page when
+ * `skipSpeed` (it is only for phones that were found slow: see `speedAdvice`).
+ */
+export function nextStep(step: OnboardingStep, opts: { skipTaste?: boolean; skipSpeed?: boolean } = {}): OnboardingStep | null {
   const next = STEPS[STEPS.indexOf(step) + 1] ?? null;
+  if (next === "speed" && opts.skipSpeed) return "why";
   return next === "taste" && opts.skipTaste ? "profile" : next;
 }
 
 /** Where Back goes, or null when there is nowhere to go back to (hello, the plan, welcome). */
-export function previousStep(step: OnboardingStep): OnboardingStep | null {
+export function previousStep(step: OnboardingStep, opts: { skipSpeed?: boolean } = {}): OnboardingStep | null {
   switch (step) {
-    case "why":
+    case "speed":
       return "hello";
+    case "why":
+      return opts.skipSpeed ? "hello" : "speed";
     case "level":
       return "why";
     case "how":
@@ -122,6 +131,21 @@ export function previousStep(step: OnboardingStep): OnboardingStep | null {
     default:
       return null;
   }
+}
+
+/* ---- the speed page (slow phones only) ---------------------------------------------------------- */
+
+/** The animation level this phone is advised to use: Reduced on a middling phone, Disabled on a weak one. */
+export type SpeedAdvice = Exclude<MotionLevel, "max">;
+
+/**
+ * Whether onboarding opens with the animation page, and what it recommends. Only for phones the device tier rates slow: a `high`
+ * tier (every iPhone, a strong Android) never sees it, a `mid` one is advised Reduced and a `low` one Disabled. A learner whose
+ * animation is already off (the system's reduce-motion, or a level chosen before) has nothing to choose, so it is skipped too.
+ */
+export function speedAdvice(tier: DeviceTier, animationOff: boolean): SpeedAdvice | null {
+  if (animationOff || tier === "high") return null;
+  return tier === "low" ? "off" : "reduced";
 }
 
 /** The state `canContinue` reads. */
@@ -280,3 +304,6 @@ export function parseAnswers(raw: unknown): StoredAnswers | null {
   const goalMinutes = typeof o.goalMinutes === "number" && GOAL_VALUES.includes(o.goalMinutes) ? (o.goalMinutes as GoalMinutes) : null;
   return { v: 1, reason, level, goalMinutes, at: typeof o.at === "number" && Number.isFinite(o.at) ? o.at : 0 };
 }
+
+/** The diagnostics switch forces the page on any phone: a phone rated `high` is advised Reduced, the others as `speedAdvice` says. */
+export const forcedSpeedAdvice = (tier: DeviceTier): SpeedAdvice => speedAdvice(tier === "high" ? "mid" : tier, false) ?? "reduced";

@@ -7,7 +7,8 @@
 
 import { useEffect, useState, type ReactNode } from "react";
 import type { StyleProp, ViewStyle } from "react-native";
-import Animated, { useAnimatedStyle, useReducedMotion } from "react-native-reanimated";
+import Animated, { useAnimatedStyle } from "react-native-reanimated";
+import { useReducedMotion } from "@/components/motion/use-reduced-motion";
 
 import { useDelayedClock } from "@/components/motion/use-delayed-clock";
 import { REVEAL, revealFrame } from "@/components/motion/reveal-core";

@@ -203,7 +203,7 @@ export const AVATAR_OPTIONS: { [K in keyof AvatarConfig]: readonly AvatarConfig[
   noseColor: ["natural", ...(Object.keys(NOSE_COLORS) as (keyof typeof NOSE_COLORS)[])],
   mouth: [...MOUTH_STYLES],
   ears: [...EAR_STYLES],
-  hairStyle: ["crop", "buzzcut", "classic", "messy", "sidepart", "curtain", "bowl", "spiky", "wavy", "undercut", "longer", "longstraight", "shortbob", "medium", "highpony", "lowpony", "twintails", "bigbun", "halfup", "longwavy", "curtainbangs", "curls", "bun", "bob", "wrap"],
+  hairStyle: ["crop", "buzzcut", "classic", "messy", "sidepart", "curtain", "bowl", "spiky", "wavy", "undercut", "longer", "longstraight", "shortbob", "medium", "highpony", "lowpony", "twintails", "bigbun", "halfup", "longwavy", "curtainbangs", "curls", "bun", "bob", "wrap", "fluffy", "cloud"],
   hairColor: Object.keys(HAIR_COLORS) as HairColorId[],
   facialHair: ["none", "moustache", "beard"],
   outfit: ["hoodie", "sweater", "coat", "vest", "shirt", ...EXTRA_OUTFITS],

@@ -234,6 +234,8 @@ export interface ThreadSummary {
   ended: boolean;
   archived: boolean;
   plays: number;
+  /** The node the thread opens at: how a story's thread is found from the story. */
+  entryNodeId: string;
 }
 
 /** One row of the Chats list per thread: the last line, when, and how many unread. Most recent first. */
@@ -254,6 +256,7 @@ export function summarizeThreads(threads: readonly ChatThread[], messages: reado
       ended: t.ended,
       archived: t.archived,
       plays: t.plays,
+      entryNodeId: t.entryNodeId,
     };
   });
   const when = (r: ThreadSummary) => r.lastAt ?? threads.find((t) => t.id === r.threadId)?.updatedAt ?? -1;
@@ -325,6 +328,110 @@ export function earnedStories(nodes: readonly ChatNode[], input: StoryInput, con
   }
   const rank = (u: Unlock) => TRIGGER_ORDER.indexOf(u.event.split(":")[0]);
   return out.sort((a, b) => rank(a) - rank(b));
+}
+
+// ---------------------------------------------------------------------------
+// a teacher's profile: every story they have, whether it is unlocked or not
+// ---------------------------------------------------------------------------
+
+/**
+ * Where a story stands: `locked` (the learner has not earned it), `ready` (earned, with no thread yet: tapping starts it),
+ * `new` (its thread has an unread message), `playing` (started, not finished) or `finished` (tapping replays it).
+ */
+export type StoryState = "locked" | "ready" | "new" | "playing" | "finished";
+
+export interface StoryEntry {
+  nodeId: string;
+  npcId: string;
+  title: string;
+  state: StoryState;
+  /** The words of what unlocks it (always there, so a profile can say what a story was for once it is open too). */
+  condition: string;
+  /** How far the learner is toward it, when that can be said ("2 of 3 lessons finished"); null when it is not a count. */
+  progress: string | null;
+  /** Its thread, once there is one. */
+  threadId: string | null;
+  /** The unlock key to give a new thread (`ready` only). */
+  event: string | null;
+  plays: number;
+  lastAt: number | null;
+}
+
+/** Names the unlock text needs: a unit by id, an app by id. */
+export interface StoryLabels {
+  unitTitleOf: (unitId: string) => string | undefined;
+  appNameOf: (appId: string) => string | undefined;
+}
+
+/** What a trigger asks of the learner, in the words of the lock a locked app wears (`unlockRequirement`), and how far they are. */
+export function storyCondition(trigger: string | null, input: StoryInput, labels: StoryLabels): { text: string; progress: string | null } {
+  const [kind, ...rest] = (trigger ?? "").split(":");
+  const arg = rest.join(":");
+  switch (kind) {
+    case "lessons_completed": {
+      const count = Number(arg);
+      return {
+        text: count === 1 ? "Finish your first lesson." : `Finish ${count} lessons.`,
+        progress: `${Math.min(input.lessonsCompleted, count)} of ${count} lessons finished`,
+      };
+    }
+    case "level_reached":
+      return { text: `Reach level ${arg}.`, progress: `You are level ${input.level}` };
+    case "unit_complete": {
+      const title = labels.unitTitleOf(arg);
+      return { text: title ? `Finish the unit "${title}".` : "Finish a certain unit.", progress: null };
+    }
+    case "app_installed": {
+      const name = labels.appNameOf(arg);
+      return { text: name ? `Get the ${name} app on your phone.` : "Get a new app on your phone.", progress: null };
+    }
+    case "welcome_back":
+      return { text: `Come back after ${WELCOME_BACK_MIN_DAYS} days or more away.`, progress: null };
+    default:
+      return { text: "Keep learning.", progress: null };
+  }
+}
+
+/**
+ * Every story one teacher has, in the order they were written, for the Chats tab of their profile. A story whose thread exists
+ * (matched by the node it opens at) is `new`, `playing` or `finished`; one without a thread is `ready` when the learner has
+ * earned it and the teacher is in Contacts, otherwise `locked`, and a teacher who is not in Contacts yet asks for a lesson of
+ * their unit first. Shrodi and every teacher use the same rules as `earnedStories`.
+ */
+export function storyList(
+  nodes: readonly ChatNode[],
+  npcId: string,
+  input: StoryInput,
+  inContacts: boolean,
+  threads: readonly ThreadSummary[],
+  labels: StoryLabels,
+  teachesUnitTitle?: string,
+): StoryEntry[] {
+  const out: StoryEntry[] = [];
+  const mine = nodes.filter((n) => n.npcId === npcId && n.kind === "unprompted").sort((a, b) => a.position - b.position);
+  for (const node of mine) {
+    const thread = threads.find((t) => t.npcId === npcId && t.entryNodeId === node.id) ?? null;
+    const { text, progress } = storyCondition(node.trigger, input, labels);
+    const event = earnedEvent(node.trigger, input);
+    let state: StoryState;
+    if (thread) state = thread.unread > 0 ? "new" : thread.ended ? "finished" : "playing";
+    else if (event && inContacts && !threads.some((t) => t.npcId === npcId && t.event === event)) state = "ready";
+    else state = "locked";
+    const waitsForTeacher = !inContacts && npcId !== CHAT_MASCOT_ID;
+    out.push({
+      nodeId: node.id,
+      npcId,
+      title: node.title ?? "A story",
+      state,
+      condition: state === "locked" && waitsForTeacher ? (teachesUnitTitle ? `Finish a lesson in "${teachesUnitTitle}" first.` : "Finish a lesson of their unit first.") : text,
+      progress: state === "locked" && waitsForTeacher ? null : progress,
+      threadId: thread?.threadId ?? null,
+      event: state === "ready" ? event : null,
+      plays: thread?.plays ?? 0,
+      lastAt: thread?.lastAt ?? null,
+    });
+  }
+  return out;
 }
 
 export const localDayKey = (ms: number): string => dayKeyFromLocalDate(new Date(ms));

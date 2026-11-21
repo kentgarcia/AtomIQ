@@ -35,7 +35,8 @@ import { recordActivity } from "@/services/activity-log";
 import { logDailyActivity, saveGameScore } from "@/services/database";
 import { toLocalIsoDate } from "@/services/utils";
 import { recordMissionEvent } from "@/services/missions";
-import { pinSfx, playSfx, warmSfxGroup } from "@/services/sfx";
+import { useSfxSet } from "@/components/motion/use-sfx-set";
+import { pinSfx, playSfx } from "@/services/sfx";
 import type { SfxCue } from "@/services/sfx-core";
 import { ReadAloudButton } from "@/components/ui/read-aloud-button";
 import { readAloud } from "@/services/media";
@@ -79,7 +80,6 @@ import Animated, {
   interpolate,
   runOnJS,
   useAnimatedStyle,
-  useReducedMotion,
   useSharedValue,
   withRepeat,
   withSequence,
@@ -87,6 +87,7 @@ import Animated, {
   withTiming,
   cancelAnimation,
 } from "react-native-reanimated";
+import { useReducedMotion } from "@/components/motion/use-reduced-motion";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { DURATION, EASE_OUT } from "@/theme/motion";
 
@@ -181,8 +182,8 @@ export default function MythBusterScreen() {
 
   const currentMyth = myths[currentIndex];
 
+  useSfxSet("mythbuster");
   useEffect(() => {
-    warmSfxGroup("game");
     pinSfx("reward.finish-jingle");
   }, []);
 

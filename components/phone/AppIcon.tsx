@@ -14,10 +14,10 @@ import { Pressable, View } from "react-native";
 import Animated, {
   useAnimatedProps,
   useAnimatedStyle,
-  useReducedMotion,
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
+import { useReducedMotion } from "@/components/motion/use-reduced-motion";
 import Svg, { Rect } from "react-native-svg";
 
 import { AppGlyph, hasGlyph } from "@/components/phone/AppGlyph";
@@ -33,7 +33,7 @@ import { Burst } from "@/components/motion/Burst";
 import { useDelayedClock } from "@/components/motion/use-delayed-clock";
 import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
-import type { Badge, PhoneApp } from "@/services/phone-core";
+import { sameIconView, type Badge, type PhoneApp } from "@/services/phone-core";
 import { playSfx } from "@/services/sfx";
 import { createStyles, fontFaces, useTheme, withAlpha } from "@/theme";
 import { EASE_OUT } from "@/theme/motion";
@@ -86,8 +86,11 @@ function AppIconBase({
   const clock = useDelayedClock(INSTALL_CLOCK, install?.delay ?? 0, !!install);
 
   const onDoneRef = useRef(install?.onDone);
+  // The newest press handler is what runs: the screen builds a new one on every render, and `sameIcon` below lets the icon skip those renders
+  const onPressRef = useRef(onPress);
   useEffect(() => {
     onDoneRef.current = install?.onDone;
+    onPressRef.current = onPress;
   });
   const installing = !!install;
   const delay = install?.delay ?? 0;
@@ -145,7 +148,7 @@ function AppIconBase({
   return (
     <View style={[styles.cell, { width: size + 20 }]}>
       <Pressable
-        onPress={onPress}
+        onPress={() => onPressRef.current()}
         onPressIn={() =>
           pressed.set(withTiming(1, { duration: 60, easing: EASE_OUT }))
         }
@@ -305,7 +308,13 @@ function AppIconBase({
   );
 }
 
-export const AppIcon = memo(AppIconBase);
+/**
+ * Two renders of an icon that look the same skip the render (`sameIconView`, tested). The press and install-done handlers are left out on
+ * purpose (new functions on every render of the Phone tab, which made every icon, with its SVG picture, re-render on each of the tab's
+ * several state changes per visit); the icon calls the newest through a ref instead.
+ */
+export const AppIcon = memo(AppIconBase, (a, b) => sameIconView(a, b));
+
 
 const useStyles = createStyles(() => ({
   cell: { alignItems: "center", gap: 8 },

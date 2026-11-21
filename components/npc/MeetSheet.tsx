@@ -18,6 +18,7 @@ import { createStyles, fontFaces, fontSizes, spacing, useTheme } from "@/theme";
 
 import { Npc as NpcView } from "./Npc";
 import { NpcCover } from "./NpcCover";
+import { coverColors } from "./npc-cover-art";
 import { SpeechBubble } from "./SpeechBubble";
 import { useNpcLine } from "./use-npc";
 
@@ -28,7 +29,8 @@ const BUST_WIDTH = Math.round((BUST * 200) / 252);
 const useStyles = createStyles((theme) => ({
   body: { gap: spacing.lg },
   cover: { height: COVER_HEIGHT, alignSelf: "stretch" },
-  bust: { position: "absolute", bottom: 0, alignSelf: "center", width: BUST_WIDTH, height: BUST, overflow: "hidden" },
+  // Not clipped: the outline (the dialog's own surface colour, so a light edge in light mode and a dark one in dark mode) reaches a few dp past the figure
+  bust: { position: "absolute", bottom: 0, alignSelf: "center", width: BUST_WIDTH, height: BUST },
   who: { alignItems: "center", gap: 2 },
   name: { ...fontFaces.black, fontSize: fontSizes["7xl"], lineHeight: 36, color: theme.colors.text, textAlign: "center" },
   title: { ...fontFaces.bold, fontSize: fontSizes.xl, color: theme.colors.primaryLight, textAlign: "center" },
@@ -46,9 +48,9 @@ export function MeetSheet({ npc, visible, lessons = [], locked = false, onClose 
   if (!npc) return null;
   const stage = (
     <View style={styles.cover}>
-      <NpcCover npcId={npc.id} outfit={npc.spec.outfit} height={COVER_HEIGHT} radius={20} />
+      <NpcCover npcId={npc.id} outfit={coverColors(npc.spec)} height={COVER_HEIGHT} radius={20} />
       <View style={styles.bust} pointerEvents="none">
-        <NpcView spec={npc.spec} pose={locked ? "idle" : "greet"} form="bust" size={BUST} muted={locked} />
+        <NpcView spec={npc.spec} pose={locked ? "idle" : "greet"} form="bust" size={BUST} muted={locked} outline={theme.colors.card} />
       </View>
     </View>
   );

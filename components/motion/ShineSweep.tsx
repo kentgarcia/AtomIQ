@@ -10,7 +10,8 @@
 
 import { useEffect, useState } from "react";
 import { View } from "react-native";
-import Animated, { Easing, cancelAnimation, useAnimatedStyle, useReducedMotion, useSharedValue, withDelay, withRepeat, withTiming } from "react-native-reanimated";
+import Animated, { Easing, cancelAnimation, useAnimatedStyle, useSharedValue, withDelay, withRepeat, withTiming } from "react-native-reanimated";
+import { useIdleStill } from "@/components/motion/use-reduced-motion";
 import { useIsFocused } from "expo-router";
 
 import { SHINE, shineFrame } from "@/components/motion/shine-core";
@@ -18,7 +19,7 @@ import { useTheme, withAlpha } from "@/theme";
 
 export function ShineSweep({ radius, enabled = true }: { radius: number; enabled?: boolean }) {
   const { theme } = useTheme();
-  const reduced = useReducedMotion();
+  const reduced = useIdleStill();
   const focused = useIsFocused();
   const live = enabled && !reduced && focused;
   const clock = useSharedValue(0);

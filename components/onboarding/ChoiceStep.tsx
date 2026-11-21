@@ -49,7 +49,7 @@ export function ChoicePage({ step, picked, direction, onPick }: { step: Question
           {PROMPTS[step].title}
         </Text>
       </Animated.View>
-      <ShrodiSays text={shrodiLine(step, picked)} mood={picked === null ? "think" : "happy"} arrive={{ direction, at: PAGE_FX.fox }} />
+      <ShrodiSays text={shrodiLine(step, picked)} still arrive={{ direction, at: PAGE_FX.fox }} />
       <View style={styles.options}>
         {choices.map((c, i) => (
           <Animated.View key={String(c.id)} entering={riseIn(direction, PAGE_FX.options + i * PAGE_FX.optionStep, 0.96)}>

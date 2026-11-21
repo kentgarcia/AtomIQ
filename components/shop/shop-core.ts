@@ -157,13 +157,13 @@ const SKINS: RawItem[] = AVATAR_OPTIONS.skin.map((id) => ({ id: `skin-${id}`, na
 /** The hair on the shelf: every style, in the base colour the learner has. What a starting design wears (a crop, a bun) is free. */
 const wornByStarters = new Set(STARTER_AVATARS.map((a) => a.config.hairStyle as string));
 /** What the shop calls a hair style, where the id alone would not read well. */
-const HAIR_NAMES: Record<string, string> = { buzzcut: "Buzz cut", classic: "Classic short", messy: "Messy", sidepart: "Side part", curtain: "Curtain", bowl: "Bowl cut", spiky: "Spiky", wavy: "Wavy", undercut: "Undercut", longer: "Longer", longstraight: "Long straight", shortbob: "Short bob", medium: "Medium", highpony: "High ponytail", lowpony: "Low ponytail", twintails: "Twin tails", bigbun: "Big bun", halfup: "Half up", longwavy: "Long wavy", curtainbangs: "Curtain bangs" };
+const HAIR_NAMES: Record<string, string> = { buzzcut: "Buzz cut", classic: "Classic short", messy: "Messy", sidepart: "Side part", curtain: "Curtain", bowl: "Bowl cut", spiky: "Spiky", wavy: "Wavy", undercut: "Undercut", longer: "Longer", longstraight: "Long straight", shortbob: "Short bob", medium: "Medium", highpony: "High ponytail", lowpony: "Low ponytail", twintails: "Twin tails", bigbun: "Big bun", halfup: "Half up", longwavy: "Long wavy", curtainbangs: "Curtain bangs", fluffy: "Fluffy pigtails", cloud: "Cloud puff" };
 const HAIR: RawItem[] = AVATAR_OPTIONS.hairStyle.map((id): RawItem => ({ id: `hair-style-${id}`, name: HAIR_NAMES[id] ?? titleCase(id), category: "hair", value: id, price: wornByStarters.has(id) ? 0 : HAIR_STYLE_PRICE, starter: wornByStarters.has(id) }));
 
 /** What one choice costs in the face and outfit tabs, in diamonds (what a starting design wears is free). */
 export const FACE_PRICES = scaleAll({ eyebrows: 15, eyes: 20, nose: 15, mouth: 15, ears: 20, headwear: 30, eyewear: 25, earwear: 20, outfit: 40 });
 /** Clothes cost more the more is going on: a plain top is the base price, a jacket or a jumper with a pattern more, a costume most. The five the teachers wear and the starting designs' are the base (or free). */
-export const OUTFIT_PRICES: Record<string, number> = scaleAll({ jacket: 60, overalls: 60, puffer: 60, scarf: 60, knit: 60, sailor: 80, hawaiian: 80, tuxedo: 80 });
+export const OUTFIT_PRICES: Record<string, number> = scaleAll({ jacket: 60, overalls: 60, puffer: 60, scarf: 60, knit: 60, labapron: 60, whitecoat: 60, sailor: 80, hawaiian: 80, tuxedo: 80 });
 type PricedCategory = keyof typeof FACE_PRICES;
 
 /** What the shop calls each choice of the face and outfit tabs, where the id alone would not read well. */
@@ -173,10 +173,10 @@ const NAMES: Record<PricedCategory, Record<string, string>> = {
   nose: { single: "Slim", double: "Classic", button: "Button", tiny: "Tiny", long: "Long", wide: "Wide", pointy: "Pointy", round: "Round", none: "No nose" },
   mouth: { smile: "Smile", smirk: "Smirk", wide: "Wide smile", small: "Small", toothy: "Toothy", cat: "Cat", neutral: "Neutral", open: "Open", tongue: "Tongue out" },
   ears: { round: "Round", small: "Small", big: "Big", pointed: "Pointed", elf: "Elf", none: "No ears" },
-  headwear: { none: "No hat", beanie: "Beanie", cap: "Baseball cap", headband: "Headband", bow: "Big bow", crown: "Crown", catears: "Cat ears", bunnyears: "Bunny ears", flowers: "Flower crown", wizard: "Wizard hat", party: "Party hat", graduation: "Graduation cap", hardhat: "Hard hat" },
+  headwear: { none: "No hat", beanie: "Beanie", cap: "Baseball cap", headband: "Headband", bow: "Big bow", crown: "Crown", catears: "Cat ears", bunnyears: "Bunny ears", flowers: "Flower crown", wizard: "Wizard hat", party: "Party hat", graduation: "Graduation cap", hardhat: "Hard hat", bows: "Pair of bows" },
   eyewear: { none: "No glasses", round: "Round glasses", square: "Square glasses", sunglasses: "Sunglasses", heart: "Heart glasses", star: "Star glasses", goggles: "Goggles", eyepatch: "Eyepatch", monocle: "Monocle", cateye: "Cat-eye glasses" },
   earwear: { none: "No earrings", stud: "Studs", hoop: "Hoops", pearl: "Pearls", star: "Stars", gem: "Gems", flower: "Flower", earmuffs: "Earmuffs", headphones: "Headphones" },
-  outfit: { hoodie: "Hoodie", sweater: "Sweater", coat: "Lab coat", vest: "Vest", shirt: "Shirt", turtleneck: "Turtleneck", striped: "Striped tee", overalls: "Overalls", cardigan: "Cardigan", jacket: "Zip jacket", polo: "Polo", sailor: "Sailor top", hawaiian: "Aloha shirt", puffer: "Puffer", tuxedo: "Tuxedo", knit: "Nordic knit", scarf: "Scarf sweater" },
+  outfit: { hoodie: "Hoodie", sweater: "Sweater", coat: "Lab coat", vest: "Vest", shirt: "Shirt", turtleneck: "Turtleneck", striped: "Striped tee", overalls: "Overalls", cardigan: "Cardigan", jacket: "Zip jacket", polo: "Polo", sailor: "Sailor top", hawaiian: "Aloha shirt", puffer: "Puffer", tuxedo: "Tuxedo", knit: "Nordic knit", scarf: "Scarf sweater", labapron: "Lab apron", whitecoat: "White coat" },
 };
 
 /** Every choice of a face or outfit tab, the ones the starting designs wear free. */

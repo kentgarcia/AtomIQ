@@ -10,7 +10,8 @@
 
 import React, { useCallback, useMemo, useRef, useState, type ReactNode } from "react";
 import { Modal, Pressable, View, useWindowDimensions, type StyleProp, type ViewStyle } from "react-native";
-import Animated, { FadeIn, FadeOut, useReducedMotion } from "react-native-reanimated";
+import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
+import { useReducedMotion } from "@/components/motion/use-reduced-motion";
 
 import { Text } from "@/components/ui/text";
 import { createStyles, fontFaces, useTheme } from "@/theme";

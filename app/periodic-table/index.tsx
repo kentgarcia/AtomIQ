@@ -10,7 +10,8 @@
 import { useRouter } from "expo-router";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { AccessibilityInfo, FlatList, Pressable, ScrollView, View } from "react-native";
-import Animated, { useReducedMotion } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
+import { useReducedMotion } from "@/components/motion/use-reduced-motion";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { ScreenHeader, useHeaderBorder } from "@/components/layout";

@@ -5,7 +5,8 @@
 
 import { useEffect, useRef, type ReactNode } from "react";
 import type { StyleProp, ViewStyle } from "react-native";
-import Animated, { Easing, cancelAnimation, useAnimatedStyle, useReducedMotion, useSharedValue, withTiming } from "react-native-reanimated";
+import Animated, { Easing, cancelAnimation, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
+import { useReducedMotion } from "@/components/motion/use-reduced-motion";
 
 import { SHAKE, shakeOffset } from "./cards/shake-core";
 

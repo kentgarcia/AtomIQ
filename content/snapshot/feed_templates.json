@@ -5,420 +5,92 @@
   ],
   "rows": [
     {
-      "id": "ft-ada-checkpoint-inside-the-atom",
+      "id": "ft-ada-checkpoint-radioactivity",
       "npc_id": "npc-ada",
       "poster_pool": [],
       "kind": "milestone",
       "trigger": "checkpoint_pass",
       "condition": {
-        "unitId": "inside-the-atom"
-      },
-      "text": "The {unit} checkpoint is passed. Protons, neutrons, electrons and isotopes: all there.",
-      "chip": "unit",
-      "reactors": [
-        "npc-hal"
-      ],
-      "weight": 1
-    },
-    {
-      "id": "ft-ada-lesson-atoms-are-everywhere-1",
-      "npc_id": "npc-ada",
-      "poster_pool": [],
-      "kind": "celebrate",
-      "trigger": "lesson_complete",
-      "condition": {
-        "unitId": "inside-the-atom",
-        "lessonId": "atoms-are-everywhere"
-      },
-      "text": "You finished “{lesson}”. Your hand, and the air around it, are made of atoms. They are far too small to see.",
-      "chip": "lesson",
-      "reactors": [],
-      "weight": 2
-    },
-    {
-      "id": "ft-ada-lesson-atoms-are-everywhere-2",
-      "npc_id": "npc-ada",
-      "poster_pool": [],
-      "kind": "celebrate",
-      "trigger": "lesson_complete",
-      "condition": {
-        "unitId": "inside-the-atom",
-        "lessonId": "atoms-are-everywhere"
-      },
-      "text": "Someone just zoomed in from a hand all the way down to a single atom. Welcome to the very small.",
-      "chip": "lesson",
-      "reactors": [],
-      "weight": 1
-    },
-    {
-      "id": "ft-ada-lesson-elements-and-the-periodic-table-1",
-      "npc_id": "npc-ada",
-      "poster_pool": [],
-      "kind": "celebrate",
-      "trigger": "lesson_complete",
-      "condition": {
-        "unitId": "inside-the-atom",
-        "lessonId": "elements-and-the-periodic-table"
-      },
-      "text": "You finished “{lesson}”. Six protons is always carbon. Seven is always nitrogen. Eight is always oxygen.",
-      "chip": "lesson",
-      "reactors": [],
-      "weight": 2
-    },
-    {
-      "id": "ft-ada-lesson-elements-and-the-periodic-table-2",
-      "npc_id": "npc-ada",
-      "poster_pool": [],
-      "kind": "celebrate",
-      "trigger": "lesson_complete",
-      "condition": {
-        "unitId": "inside-the-atom",
-        "lessonId": "elements-and-the-periodic-table"
-      },
-      "text": "Someone just turned carbon into nitrogen with one extra proton, in the atom builder. The protons decide the element.",
-      "chip": "lesson",
-      "reactors": [],
-      "weight": 1
-    },
-    {
-      "id": "ft-ada-lesson-isotopes-1",
-      "npc_id": "npc-ada",
-      "poster_pool": [],
-      "kind": "celebrate",
-      "trigger": "lesson_complete",
-      "condition": {
-        "unitId": "inside-the-atom",
-        "lessonId": "isotopes"
-      },
-      "text": "“{lesson}” is done. Carbon-12, carbon-13 and carbon-14 are all carbon, with different numbers of neutrons.",
-      "chip": "lesson",
-      "reactors": [],
-      "weight": 2
-    },
-    {
-      "id": "ft-ada-lesson-isotopes-2",
-      "npc_id": "npc-ada",
-      "poster_pool": [],
-      "kind": "celebrate",
-      "trigger": "lesson_complete",
-      "condition": {
-        "unitId": "inside-the-atom",
-        "lessonId": "isotopes",
-        "perfect": true
-      },
-      "text": "A perfect run through “{lesson}”. Same protons, different neutrons. And an isotope is not automatically radioactive.",
-      "chip": "lesson",
-      "reactors": [],
-      "weight": 1
-    },
-    {
-      "id": "ft-ada-lesson-protons-neutrons-electrons-1",
-      "npc_id": "npc-ada",
-      "poster_pool": [],
-      "kind": "celebrate",
-      "trigger": "lesson_complete",
-      "condition": {
-        "unitId": "inside-the-atom",
-        "lessonId": "protons-neutrons-electrons"
-      },
-      "text": "“{lesson}” is done. You met the proton, the neutron and the electron. Only one of the three is negative.",
-      "chip": "lesson",
-      "reactors": [],
-      "weight": 2
-    },
-    {
-      "id": "ft-ada-lesson-protons-neutrons-electrons-2",
-      "npc_id": "npc-ada",
-      "poster_pool": [],
-      "kind": "celebrate",
-      "trigger": "lesson_complete",
-      "condition": {
-        "unitId": "inside-the-atom",
-        "lessonId": "protons-neutrons-electrons",
-        "perfect": true
-      },
-      "text": "Someone just answered everything right in “{lesson}”. If an atom were a stadium, its nucleus would be a marble. They know it.",
-      "chip": "lesson",
-      "reactors": [],
-      "weight": 1
-    },
-    {
-      "id": "ft-ada-lesson-stable-and-unstable-nuclei-1",
-      "npc_id": "npc-ada",
-      "poster_pool": [],
-      "kind": "celebrate",
-      "trigger": "lesson_complete",
-      "condition": {
-        "unitId": "inside-the-atom",
-        "lessonId": "stable-and-unstable-nuclei"
-      },
-      "text": "You finished “{lesson}”. Some nuclei stay the same and some can change. Most of the atoms in you are stable.",
-      "chip": "lesson",
-      "reactors": [],
-      "weight": 2
-    },
-    {
-      "id": "ft-ada-lesson-stable-and-unstable-nuclei-2",
-      "npc_id": "npc-ada",
-      "poster_pool": [],
-      "kind": "celebrate",
-      "trigger": "lesson_complete",
-      "condition": {
-        "unitId": "inside-the-atom",
-        "lessonId": "stable-and-unstable-nuclei"
-      },
-      "text": "Someone just made unstable carbon-14 into a stable carbon atom by changing its neutrons. Worth a look.",
-      "chip": "lesson",
-      "reactors": [],
-      "weight": 1
-    },
-    {
-      "id": "ft-ada-tease-inside-the-atom",
-      "npc_id": "npc-ada",
-      "poster_pool": [],
-      "kind": "tease",
-      "trigger": "lesson_complete",
-      "condition": {
-        "unitId": "inside-the-atom",
-        "lessonId": "elements-and-the-periodic-table"
-      },
-      "text": "Three lessons in. Isotopes are next: the same element, with a different number of neutrons.",
-      "chip": "unit",
-      "reactors": [],
-      "weight": 1
-    },
-    {
-      "id": "ft-ada-testout-inside-the-atom",
-      "npc_id": "npc-ada",
-      "poster_pool": [],
-      "kind": "milestone",
-      "trigger": "testout_pass",
-      "condition": {
-        "unitId": "inside-the-atom"
-      },
-      "text": "You tested out of “{unit}”. You already knew your atoms. That is a fine place to start.",
-      "chip": "unit",
-      "reactors": [
-        "npc-hal"
-      ],
-      "weight": 1
-    },
-    {
-      "id": "ft-ada-unit-inside-the-atom-2",
-      "npc_id": "npc-ada",
-      "poster_pool": [],
-      "kind": "milestone",
-      "trigger": "unit_complete",
-      "condition": {
-        "unitId": "inside-the-atom"
-      },
-      "text": "You finished “{unit}”. You know what an atom is made of, what makes an element, and why some nuclei can change. Hal is next.",
-      "chip": "unit",
-      "reactors": [
-        "npc-hal"
-      ],
-      "weight": 2
-    },
-    {
-      "id": "ft-ada-unit-radioactivity-1",
-      "npc_id": "npc-ada",
-      "poster_pool": [],
-      "kind": "milestone",
-      "trigger": "unit_complete",
-      "condition": {
         "unitId": "radioactivity"
       },
-      "text": "Someone has finished “{unit}” with Hal. Nuclei change by themselves, a crowd follows a pattern, and radioactivity is natural. I am proud of them.",
+      "text": "the {unit} checkpoint is passed. take a little moment. you earned every bit of it~",
       "chip": "unit",
       "reactors": [
         "npc-hal"
       ],
-      "weight": 2
-    },
-    {
-      "id": "ft-chest-any",
-      "npc_id": null,
-      "poster_pool": [
-        "npc-ray",
-        "npc-sage"
-      ],
-      "kind": "celebrate",
-      "trigger": "chest_opened",
-      "condition": {},
-      "text": "Someone just opened a chest on Quests. Nice and steady.",
-      "chip": "quests",
-      "reactors": [],
       "weight": 1
     },
     {
-      "id": "ft-chest-daily",
-      "npc_id": null,
-      "poster_pool": [
-        "npc-tess",
-        "npc-kofi"
-      ],
+      "id": "ft-ada-chest-daily",
+      "npc_id": "npc-ada",
+      "poster_pool": [],
       "kind": "celebrate",
       "trigger": "chest_opened",
       "condition": {
         "period": "daily"
       },
-      "text": "A daily chest, opened. Small reward, steady habit.",
+      "text": "ooh a daily chest, opened. a tiny sparkle for a tiny habit. yay you~",
       "chip": "quests",
       "reactors": [],
       "weight": 1
     },
     {
-      "id": "ft-chest-weekly",
-      "npc_id": null,
-      "poster_pool": [
-        "npc-ada",
-        "npc-mina"
-      ],
+      "id": "ft-ada-chest-weekly",
+      "npc_id": "npc-ada",
+      "poster_pool": [],
       "kind": "celebrate",
       "trigger": "chest_opened",
       "condition": {
         "period": "weekly"
       },
-      "text": "The weekly chest is open. Every quest of the week is done. That was a lot of small steps.",
+      "text": "the weekly chest is open. every quest of the week, done. that's SO many little steps hehe~",
       "chip": "quests",
       "reactors": [],
       "weight": 1
     },
     {
-      "id": "ft-comeback-14",
-      "npc_id": null,
-      "poster_pool": [
-        "npc-ada",
-        "npc-hal",
-        "npc-sage"
-      ],
+      "id": "ft-ada-comeback-14",
+      "npc_id": "npc-ada",
+      "poster_pool": [],
       "kind": "nudge",
       "trigger": "comeback",
       "condition": {
         "minDays": 14
       },
-      "text": "Welcome back, {name}. The door was open the whole time. Let's find where you stopped.",
+      "text": "welcome back, {name}. the door was open the whole time and i kept the flask warm. let's find where you stopped",
       "chip": null,
       "reactors": [],
       "weight": 1
     },
     {
-      "id": "ft-comeback-3",
-      "npc_id": null,
-      "poster_pool": [
-        "npc-tess",
-        "npc-mina"
-      ],
-      "kind": "nudge",
-      "trigger": "comeback",
-      "condition": {
-        "minDays": 3
-      },
-      "text": "Welcome back, {name}. Pick up where you left off. The atoms waited.",
-      "chip": null,
-      "reactors": [],
-      "weight": 1
-    },
-    {
-      "id": "ft-comeback-3b",
-      "npc_id": null,
-      "poster_pool": [
-        "npc-ada",
-        "npc-kofi"
-      ],
-      "kind": "nudge",
-      "trigger": "comeback",
-      "condition": {
-        "minDays": 3
-      },
-      "text": "There you are, {name}. We saved your seat. Ready for one more lesson?",
-      "chip": null,
-      "reactors": [],
-      "weight": 1
-    },
-    {
-      "id": "ft-comeback-7",
-      "npc_id": null,
-      "poster_pool": [
-        "npc-hal",
-        "npc-sage"
-      ],
-      "kind": "nudge",
-      "trigger": "comeback",
-      "condition": {
-        "minDays": 7
-      },
-      "text": "It has been a while, {name}. No rush. One lesson is enough to start again.",
-      "chip": null,
-      "reactors": [],
-      "weight": 1
-    },
-    {
-      "id": "ft-comeback-7b",
-      "npc_id": null,
-      "poster_pool": [
-        "npc-mina",
-        "npc-ray"
-      ],
-      "kind": "nudge",
-      "trigger": "comeback",
-      "condition": {
-        "minDays": 7
-      },
-      "text": "{name}, you are back, and we missed you. Start small. One lesson is plenty.",
-      "chip": null,
-      "reactors": [],
-      "weight": 1
-    },
-    {
-      "id": "ft-first-lesson-1",
-      "npc_id": null,
-      "poster_pool": [
-        "npc-ada",
-        "npc-sage"
-      ],
-      "kind": "celebrate",
-      "trigger": "first_lesson",
-      "condition": {},
-      "text": "Someone just finished a very first lesson, “{lesson}”. Everyone starts somewhere.",
-      "chip": "lesson",
-      "reactors": [],
-      "weight": 1
-    },
-    {
-      "id": "ft-first-lesson-2",
-      "npc_id": null,
-      "poster_pool": [
-        "npc-ada",
-        "npc-kofi"
-      ],
-      "kind": "celebrate",
-      "trigger": "first_lesson",
-      "condition": {},
-      "text": "Your first lesson is done: “{lesson}”. That is one lesson closer to knowing what everything is made of.",
-      "chip": "lesson",
-      "reactors": [],
-      "weight": 1
-    },
-    {
-      "id": "ft-hal-checkpoint-radioactivity",
-      "npc_id": "npc-hal",
+      "id": "ft-ada-comeback-3",
+      "npc_id": "npc-ada",
       "poster_pool": [],
-      "kind": "milestone",
-      "trigger": "checkpoint_pass",
+      "kind": "nudge",
+      "trigger": "comeback",
       "condition": {
-        "unitId": "radioactivity"
+        "minDays": 3
       },
-      "text": "The {unit} checkpoint is passed. Take a moment. You earned it.",
-      "chip": "unit",
-      "reactors": [
-        "npc-ada"
-      ],
+      "text": "there you are, {name}. i saved your seat~ ready for one more tiny lesson?",
+      "chip": null,
+      "reactors": [],
       "weight": 1
     },
     {
-      "id": "ft-hal-lesson-alpha-beta-gamma-1",
-      "npc_id": "npc-hal",
+      "id": "ft-ada-first-lesson",
+      "npc_id": "npc-ada",
+      "poster_pool": [],
+      "kind": "celebrate",
+      "trigger": "first_lesson",
+      "condition": {},
+      "text": "your first lesson is done: “{lesson}”. hehe, i knew you could. every big thing starts tiny~",
+      "chip": "lesson",
+      "reactors": [],
+      "weight": 1
+    },
+    {
+      "id": "ft-ada-lesson-alpha-beta-gamma-1",
+      "npc_id": "npc-ada",
       "poster_pool": [],
       "kind": "celebrate",
       "trigger": "lesson_complete",
@@ -426,14 +98,14 @@
         "unitId": "radioactivity",
         "lessonId": "alpha-beta-gamma"
       },
-      "text": "“{lesson}” is done. Alpha is a chunk, beta is a fast electron, and gamma is not a particle at all.",
+      "text": "“{lesson}” is done. alpha is a chunk, beta is a fast electron, and gamma isn't a particle at all. three little surprises, hehe",
       "chip": "lesson",
       "reactors": [],
       "weight": 2
     },
     {
-      "id": "ft-hal-lesson-alpha-beta-gamma-2",
-      "npc_id": "npc-hal",
+      "id": "ft-ada-lesson-alpha-beta-gamma-2",
+      "npc_id": "npc-ada",
       "poster_pool": [],
       "kind": "celebrate",
       "trigger": "lesson_complete",
@@ -442,14 +114,14 @@
         "lessonId": "alpha-beta-gamma",
         "perfect": true
       },
-      "text": "A perfect score in “{lesson}”. Three kinds of radiation, and this learner can tell them apart.",
+      "text": "a perfect score in “{lesson}”. three kinds of radiation and this learner can tell them ALL apart. eee, so clever~",
       "chip": "lesson",
       "reactors": [],
       "weight": 1
     },
     {
-      "id": "ft-hal-lesson-decay-chains-1",
-      "npc_id": "npc-hal",
+      "id": "ft-ada-lesson-decay-chains-1",
+      "npc_id": "npc-ada",
       "poster_pool": [],
       "kind": "celebrate",
       "trigger": "lesson_complete",
@@ -457,14 +129,14 @@
         "unitId": "radioactivity",
         "lessonId": "decay-chains"
       },
-      "text": "“{lesson}” is done. One decay is not always the end. Each step makes a different nucleus.",
+      "text": "“{lesson}” is done. one decay isn't always the end. every step makes a different nucleus, like a tiny staircase",
       "chip": "lesson",
       "reactors": [],
       "weight": 2
     },
     {
-      "id": "ft-hal-lesson-decay-chains-2",
-      "npc_id": "npc-hal",
+      "id": "ft-ada-lesson-decay-chains-2",
+      "npc_id": "npc-ada",
       "poster_pool": [],
       "kind": "celebrate",
       "trigger": "lesson_complete",
@@ -472,14 +144,14 @@
         "unitId": "radioactivity",
         "lessonId": "decay-chains"
       },
-      "text": "Someone just followed a nucleus as it changed again and again until it was stable. Nothing simply vanishes.",
+      "text": "someone just followed a nucleus as it changed again and again until it was stable. nothing vanishes, it just keeps becoming",
       "chip": "lesson",
       "reactors": [],
       "weight": 1
     },
     {
-      "id": "ft-hal-lesson-half-life-1",
-      "npc_id": "npc-hal",
+      "id": "ft-ada-lesson-half-life-1",
+      "npc_id": "npc-ada",
       "poster_pool": [],
       "kind": "celebrate",
       "trigger": "lesson_complete",
@@ -487,14 +159,14 @@
         "unitId": "radioactivity",
         "lessonId": "half-life"
       },
-      "text": "You finished “{lesson}”. Half-life belongs to a whole crowd of atoms. It is not a timer inside each one.",
+      "text": "you finished “{lesson}”. half-life belongs to a whole crowd of atoms. it's not a little timer inside each one. hehe",
       "chip": "lesson",
       "reactors": [],
       "weight": 2
     },
     {
-      "id": "ft-hal-lesson-half-life-2",
-      "npc_id": "npc-hal",
+      "id": "ft-ada-lesson-half-life-2",
+      "npc_id": "npc-ada",
       "poster_pool": [],
       "kind": "celebrate",
       "trigger": "lesson_complete",
@@ -503,14 +175,14 @@
         "lessonId": "half-life",
         "perfect": true
       },
-      "text": "A perfect “{lesson}”. Start with 100 nuclei and after one half-life about 50 are left. Note the word about.",
+      "text": "a perfect “{lesson}”. start with 100 nuclei and after one half-life about 50 are left. note the word about. i love that word~",
       "chip": "lesson",
       "reactors": [],
       "weight": 1
     },
     {
-      "id": "ft-hal-lesson-radioactivity-is-natural-1",
-      "npc_id": "npc-hal",
+      "id": "ft-ada-lesson-radioactivity-is-natural-1",
+      "npc_id": "npc-ada",
       "poster_pool": [],
       "kind": "celebrate",
       "trigger": "lesson_complete",
@@ -518,14 +190,14 @@
         "unitId": "radioactivity",
         "lessonId": "radioactivity-is-natural"
       },
-      "text": "You finished “{lesson}”. It is in rocks, in the air, in food and in you, and it was here long before people.",
+      "text": "you finished “{lesson}”. it's in rocks, in the air, in food, in you, and it was here long before people. so old, so cute~",
       "chip": "lesson",
       "reactors": [],
       "weight": 2
     },
     {
-      "id": "ft-hal-lesson-radioactivity-is-natural-2",
-      "npc_id": "npc-hal",
+      "id": "ft-ada-lesson-radioactivity-is-natural-2",
+      "npc_id": "npc-ada",
       "poster_pool": [],
       "kind": "celebrate",
       "trigger": "lesson_complete",
@@ -533,14 +205,14 @@
         "unitId": "radioactivity",
         "lessonId": "radioactivity-is-natural"
       },
-      "text": "Someone just learned that a banana is a little bit radioactive. Radioactive does not automatically mean dangerous.",
+      "text": "someone just learned a banana is a little bit radioactive. radioactive doesn't automatically mean dangerous. banana fact of the day",
       "chip": "lesson",
       "reactors": [],
       "weight": 1
     },
     {
-      "id": "ft-hal-lesson-why-nuclei-decay-1",
-      "npc_id": "npc-hal",
+      "id": "ft-ada-lesson-why-nuclei-decay-1",
+      "npc_id": "npc-ada",
       "poster_pool": [],
       "kind": "celebrate",
       "trigger": "lesson_complete",
@@ -548,14 +220,14 @@
         "unitId": "radioactivity",
         "lessonId": "why-nuclei-decay"
       },
-      "text": "You finished “{lesson}”. An unstable nucleus can change all by itself, and nobody can say when.",
+      "text": "you finished “{lesson}”. an unstable nucleus can change all by itself, and nobody can say when. ooh, a little mystery~",
       "chip": "lesson",
       "reactors": [],
       "weight": 2
     },
     {
-      "id": "ft-hal-lesson-why-nuclei-decay-2",
-      "npc_id": "npc-hal",
+      "id": "ft-ada-lesson-why-nuclei-decay-2",
+      "npc_id": "npc-ada",
       "poster_pool": [],
       "kind": "celebrate",
       "trigger": "lesson_complete",
@@ -563,14 +235,54 @@
         "unitId": "radioactivity",
         "lessonId": "why-nuclei-decay"
       },
-      "text": "Someone just learned the parent and the daughter. One nucleus changes into another. Nothing simply vanishes.",
+      "text": "someone just learned the parent and the daughter. one nucleus turns into another. nothing just vanishes, it only becomes something new. so cute",
       "chip": "lesson",
       "reactors": [],
       "weight": 1
     },
     {
-      "id": "ft-hal-tease-radioactivity",
-      "npc_id": "npc-hal",
+      "id": "ft-ada-quests",
+      "npc_id": "npc-ada",
+      "poster_pool": [],
+      "kind": "celebrate",
+      "trigger": "daily_quests_done",
+      "condition": {},
+      "text": "all the daily quests are claimed. go open the chest, i think it's sparkly~",
+      "chip": "quests",
+      "reactors": [],
+      "weight": 1
+    },
+    {
+      "id": "ft-ada-rank-passed",
+      "npc_id": "npc-ada",
+      "poster_pool": [],
+      "kind": "celebrate",
+      "trigger": "rank_change",
+      "condition": {
+        "direction": "passed"
+      },
+      "text": "you passed {rival} in the weekly ranking. eep, so quick. keep going, friend~",
+      "chip": "ranks",
+      "reactors": [],
+      "weight": 1
+    },
+    {
+      "id": "ft-ada-rank-passed-by",
+      "npc_id": "npc-ada",
+      "poster_pool": [],
+      "kind": "nudge",
+      "trigger": "rank_change",
+      "condition": {
+        "direction": "passed_by"
+      },
+      "text": "oh no, {rival} passed you in the weekly ranking. just one more lesson and you could zoom ahead again",
+      "chip": "ranks",
+      "reactors": [],
+      "weight": 1
+    },
+    {
+      "id": "ft-ada-tease-radioactivity",
+      "npc_id": "npc-ada",
       "poster_pool": [],
       "kind": "tease",
       "trigger": "lesson_complete",
@@ -578,21 +290,69 @@
         "unitId": "radioactivity",
         "lessonId": "half-life"
       },
-      "text": "Half-life is done. Next you will follow a nucleus that changes again and again. One decay is not always the end.",
+      "text": "half-life is done, yay~ next you'll follow a nucleus that changes again and again. one decay isn't always the end",
       "chip": "unit",
       "reactors": [],
       "weight": 1
     },
     {
-      "id": "ft-hal-testout-radioactivity",
-      "npc_id": "npc-hal",
+      "id": "ft-ada-testout-radioactivity",
+      "npc_id": "npc-ada",
       "poster_pool": [],
       "kind": "milestone",
       "trigger": "testout_pass",
       "condition": {
         "unitId": "radioactivity"
       },
-      "text": "You tested out of “{unit}”. You knew this already, and now it is on your record. Good.",
+      "text": "you tested out of “{unit}”. you already knew all this and now it's on your record. so sparkly~",
+      "chip": "unit",
+      "reactors": [
+        "npc-hal"
+      ],
+      "weight": 1
+    },
+    {
+      "id": "ft-ada-unit-inside-the-atom-1",
+      "npc_id": "npc-ada",
+      "poster_pool": [],
+      "kind": "milestone",
+      "trigger": "unit_complete",
+      "condition": {
+        "unitId": "inside-the-atom"
+      },
+      "text": "someone just finished “{unit}” with Hal. they know what's inside an atom. now they can find out how a nucleus changes, and that part is mine. hehe~",
+      "chip": "unit",
+      "reactors": [
+        "npc-hal"
+      ],
+      "weight": 2
+    },
+    {
+      "id": "ft-ada-unit-radioactivity-2",
+      "npc_id": "npc-ada",
+      "poster_pool": [],
+      "kind": "milestone",
+      "trigger": "unit_complete",
+      "condition": {
+        "unitId": "radioactivity"
+      },
+      "text": "you finished “{unit}”. now you know why nuclei change, what comes out, and how a crowd follows a pattern. radioactivity is a natural part of the world",
+      "chip": "unit",
+      "reactors": [
+        "npc-hal"
+      ],
+      "weight": 2
+    },
+    {
+      "id": "ft-hal-checkpoint-inside-the-atom",
+      "npc_id": "npc-hal",
+      "poster_pool": [],
+      "kind": "milestone",
+      "trigger": "checkpoint_pass",
+      "condition": {
+        "unitId": "inside-the-atom"
+      },
+      "text": "The {unit} checkpoint is passed. Protons, neutrons, electrons and isotopes: all of it, in its place. I have put a small rock on this post to mark the occasion.",
       "chip": "unit",
       "reactors": [
         "npc-ada"
@@ -600,7 +360,298 @@
       "weight": 1
     },
     {
-      "id": "ft-hal-unit-inside-the-atom-1",
+      "id": "ft-hal-chest-daily",
+      "npc_id": "npc-hal",
+      "poster_pool": [],
+      "kind": "celebrate",
+      "trigger": "chest_opened",
+      "condition": {
+        "period": "daily"
+      },
+      "text": "A daily chest, opened. A small reward for a steady day. Steady days are how a pebble becomes a cliff. Slowly.",
+      "chip": "quests",
+      "reactors": [],
+      "weight": 1
+    },
+    {
+      "id": "ft-hal-chest-weekly",
+      "npc_id": "npc-hal",
+      "poster_pool": [],
+      "kind": "celebrate",
+      "trigger": "chest_opened",
+      "condition": {
+        "period": "weekly"
+      },
+      "text": "The weekly chest is open. Every quest of the week is done, one after another. I should like to shake your hand. I will do so in spirit.",
+      "chip": "quests",
+      "reactors": [],
+      "weight": 1
+    },
+    {
+      "id": "ft-hal-comeback-14",
+      "npc_id": "npc-hal",
+      "poster_pool": [],
+      "kind": "nudge",
+      "trigger": "comeback",
+      "condition": {
+        "minDays": 14
+      },
+      "text": "It has been a while, {name}. That is all right. The atoms waited, and so did I. I have sorted my rocks four times since. One lesson is a fine place to begin.",
+      "chip": null,
+      "reactors": [],
+      "weight": 1
+    },
+    {
+      "id": "ft-hal-comeback-3",
+      "npc_id": "npc-hal",
+      "poster_pool": [],
+      "kind": "nudge",
+      "trigger": "comeback",
+      "condition": {
+        "minDays": 3
+      },
+      "text": "Welcome back, {name}. Everything is where you left it, which is more than I can say for my samples. Shall we pick it up?",
+      "chip": null,
+      "reactors": [],
+      "weight": 1
+    },
+    {
+      "id": "ft-hal-first-lesson",
+      "npc_id": "npc-hal",
+      "poster_pool": [],
+      "kind": "celebrate",
+      "trigger": "first_lesson",
+      "condition": {},
+      "text": "Your first lesson is done: “{lesson}”. A good start. We will go slowly, and we will go exactly.",
+      "chip": "lesson",
+      "reactors": [],
+      "weight": 1
+    },
+    {
+      "id": "ft-hal-lesson-atoms-are-everywhere-1",
+      "npc_id": "npc-hal",
+      "poster_pool": [],
+      "kind": "celebrate",
+      "trigger": "lesson_complete",
+      "condition": {
+        "unitId": "inside-the-atom",
+        "lessonId": "atoms-are-everywhere"
+      },
+      "text": "You finished “{lesson}”. Your hand, and the air around it, are made of atoms. They are far too small to see. I have checked. Twice.",
+      "chip": "lesson",
+      "reactors": [],
+      "weight": 2
+    },
+    {
+      "id": "ft-hal-lesson-atoms-are-everywhere-2",
+      "npc_id": "npc-hal",
+      "poster_pool": [],
+      "kind": "celebrate",
+      "trigger": "lesson_complete",
+      "condition": {
+        "unitId": "inside-the-atom",
+        "lessonId": "atoms-are-everywhere"
+      },
+      "text": "Someone just zoomed in from a hand down to a single atom. Slowly, and all the way. That is the correct way to look at anything.",
+      "chip": "lesson",
+      "reactors": [],
+      "weight": 1
+    },
+    {
+      "id": "ft-hal-lesson-elements-and-the-periodic-table-1",
+      "npc_id": "npc-hal",
+      "poster_pool": [],
+      "kind": "celebrate",
+      "trigger": "lesson_complete",
+      "condition": {
+        "unitId": "inside-the-atom",
+        "lessonId": "elements-and-the-periodic-table"
+      },
+      "text": "You finished “{lesson}”. Six protons is always carbon. Seven is always nitrogen. Eight is always oxygen. It never varies. I find that restful.",
+      "chip": "lesson",
+      "reactors": [],
+      "weight": 2
+    },
+    {
+      "id": "ft-hal-lesson-elements-and-the-periodic-table-2",
+      "npc_id": "npc-hal",
+      "poster_pool": [],
+      "kind": "celebrate",
+      "trigger": "lesson_complete",
+      "condition": {
+        "unitId": "inside-the-atom",
+        "lessonId": "elements-and-the-periodic-table"
+      },
+      "text": "Someone just turned carbon into nitrogen with one extra proton, in the atom builder. The protons decide the element. Exactly so.",
+      "chip": "lesson",
+      "reactors": [],
+      "weight": 1
+    },
+    {
+      "id": "ft-hal-lesson-isotopes-1",
+      "npc_id": "npc-hal",
+      "poster_pool": [],
+      "kind": "celebrate",
+      "trigger": "lesson_complete",
+      "condition": {
+        "unitId": "inside-the-atom",
+        "lessonId": "isotopes"
+      },
+      "text": "“{lesson}” is done. Carbon-12, carbon-13 and carbon-14 are all carbon, with different numbers of neutrons. I have named three pebbles after them.",
+      "chip": "lesson",
+      "reactors": [],
+      "weight": 2
+    },
+    {
+      "id": "ft-hal-lesson-isotopes-2",
+      "npc_id": "npc-hal",
+      "poster_pool": [],
+      "kind": "celebrate",
+      "trigger": "lesson_complete",
+      "condition": {
+        "unitId": "inside-the-atom",
+        "lessonId": "isotopes",
+        "perfect": true
+      },
+      "text": "A perfect run through “{lesson}”. Same protons, different neutrons. And an isotope is not automatically radioactive. Well observed.",
+      "chip": "lesson",
+      "reactors": [],
+      "weight": 1
+    },
+    {
+      "id": "ft-hal-lesson-protons-neutrons-electrons-1",
+      "npc_id": "npc-hal",
+      "poster_pool": [],
+      "kind": "celebrate",
+      "trigger": "lesson_complete",
+      "condition": {
+        "unitId": "inside-the-atom",
+        "lessonId": "protons-neutrons-electrons"
+      },
+      "text": "“{lesson}” is done. You met the proton, the neutron and the electron. Only one of the three is negative. I find it helps to remember which.",
+      "chip": "lesson",
+      "reactors": [],
+      "weight": 2
+    },
+    {
+      "id": "ft-hal-lesson-protons-neutrons-electrons-2",
+      "npc_id": "npc-hal",
+      "poster_pool": [],
+      "kind": "celebrate",
+      "trigger": "lesson_complete",
+      "condition": {
+        "unitId": "inside-the-atom",
+        "lessonId": "protons-neutrons-electrons",
+        "perfect": true
+      },
+      "text": "Someone just answered everything right in “{lesson}”. If an atom were a stadium, its nucleus would be a marble. They know it exactly. I am moved.",
+      "chip": "lesson",
+      "reactors": [],
+      "weight": 1
+    },
+    {
+      "id": "ft-hal-lesson-stable-and-unstable-nuclei-1",
+      "npc_id": "npc-hal",
+      "poster_pool": [],
+      "kind": "celebrate",
+      "trigger": "lesson_complete",
+      "condition": {
+        "unitId": "inside-the-atom",
+        "lessonId": "stable-and-unstable-nuclei"
+      },
+      "text": "You finished “{lesson}”. Some nuclei stay the same and some can change. Most of the atoms in you are stable. I find that reassuring.",
+      "chip": "lesson",
+      "reactors": [],
+      "weight": 2
+    },
+    {
+      "id": "ft-hal-lesson-stable-and-unstable-nuclei-2",
+      "npc_id": "npc-hal",
+      "poster_pool": [],
+      "kind": "celebrate",
+      "trigger": "lesson_complete",
+      "condition": {
+        "unitId": "inside-the-atom",
+        "lessonId": "stable-and-unstable-nuclei"
+      },
+      "text": "Someone just made unstable carbon-14 into a stable carbon atom by changing its neutrons. I looked at it for some time.",
+      "chip": "lesson",
+      "reactors": [],
+      "weight": 1
+    },
+    {
+      "id": "ft-hal-quests",
+      "npc_id": "npc-hal",
+      "poster_pool": [],
+      "kind": "celebrate",
+      "trigger": "daily_quests_done",
+      "condition": {},
+      "text": "Every daily quest is claimed. A full day, done carefully. The chest is waiting. I will not open it for you. It would be rude.",
+      "chip": "quests",
+      "reactors": [],
+      "weight": 1
+    },
+    {
+      "id": "ft-hal-rank-passed",
+      "npc_id": "npc-hal",
+      "poster_pool": [],
+      "kind": "celebrate",
+      "trigger": "rank_change",
+      "condition": {
+        "direction": "passed"
+      },
+      "text": "You passed {rival} in the weekly ranking. Quietly done. I did not see it happen. I only saw that it had.",
+      "chip": "ranks",
+      "reactors": [],
+      "weight": 1
+    },
+    {
+      "id": "ft-hal-rank-passed-by",
+      "npc_id": "npc-hal",
+      "poster_pool": [],
+      "kind": "nudge",
+      "trigger": "rank_change",
+      "condition": {
+        "direction": "passed_by"
+      },
+      "text": "{rival} passed you in the weekly ranking. No need to hurry. A rock does not hurry, and yet there are mountains.",
+      "chip": "ranks",
+      "reactors": [],
+      "weight": 1
+    },
+    {
+      "id": "ft-hal-tease-inside-the-atom",
+      "npc_id": "npc-hal",
+      "poster_pool": [],
+      "kind": "tease",
+      "trigger": "lesson_complete",
+      "condition": {
+        "unitId": "inside-the-atom",
+        "lessonId": "elements-and-the-periodic-table"
+      },
+      "text": "Three lessons in. Isotopes are next: the same element, with a different number of neutrons. I will be sorting pebbles. Do not mind me.",
+      "chip": "unit",
+      "reactors": [],
+      "weight": 1
+    },
+    {
+      "id": "ft-hal-testout-inside-the-atom",
+      "npc_id": "npc-hal",
+      "poster_pool": [],
+      "kind": "milestone",
+      "trigger": "testout_pass",
+      "condition": {
+        "unitId": "inside-the-atom"
+      },
+      "text": "You tested out of “{unit}”. You already knew your atoms. That is a fine place to start, and I respect it. I will not make you sit my rock quiz.",
+      "chip": "unit",
+      "reactors": [
+        "npc-ada"
+      ],
+      "weight": 1
+    },
+    {
+      "id": "ft-hal-unit-inside-the-atom-2",
       "npc_id": "npc-hal",
       "poster_pool": [],
       "kind": "milestone",
@@ -608,7 +659,7 @@
       "condition": {
         "unitId": "inside-the-atom"
       },
-      "text": "Someone just finished “{unit}” with Ada. They know what is inside an atom. Now they can learn how a nucleus changes. That part is mine.",
+      "text": "You finished “{unit}”. You know what an atom is made of, what makes an element, and why some nuclei can change. Ada is next. She is a great deal. She is also very good.",
       "chip": "unit",
       "reactors": [
         "npc-ada"
@@ -616,7 +667,7 @@
       "weight": 2
     },
     {
-      "id": "ft-hal-unit-radioactivity-2",
+      "id": "ft-hal-unit-radioactivity-1",
       "npc_id": "npc-hal",
       "poster_pool": [],
       "kind": "milestone",
@@ -624,7 +675,7 @@
       "condition": {
         "unitId": "radioactivity"
       },
-      "text": "You finished “{unit}”. Now you know why nuclei change, what comes out, and how a crowd follows a pattern. Radioactivity is a natural part of the world.",
+      "text": "Someone has finished “{unit}” with Ada. Nuclei change by themselves, a crowd follows a pattern, and radioactivity is natural. I am quietly proud. She will be insufferable about it. Rightly.",
       "chip": "unit",
       "reactors": [
         "npc-ada"
@@ -632,88 +683,433 @@
       "weight": 2
     },
     {
-      "id": "ft-quests-1",
-      "npc_id": null,
-      "poster_pool": [
-        "npc-kofi",
-        "npc-tess"
-      ],
+      "id": "ft-kofi-chest-daily",
+      "npc_id": "npc-kofi",
+      "poster_pool": [],
       "kind": "celebrate",
-      "trigger": "daily_quests_done",
-      "condition": {},
-      "text": "Every daily quest is claimed. That was a full day's work, and the chest is waiting.",
+      "trigger": "chest_opened",
+      "condition": {
+        "period": "daily"
+      },
+      "text": "Daily chest, opened! Small reward, solid habit. That is how you build something.",
       "chip": "quests",
       "reactors": [],
       "weight": 1
     },
     {
-      "id": "ft-quests-2",
-      "npc_id": null,
-      "poster_pool": [
-        "npc-ray",
-        "npc-mina"
-      ],
+      "id": "ft-kofi-chest-weekly",
+      "npc_id": "npc-kofi",
+      "poster_pool": [],
       "kind": "celebrate",
-      "trigger": "daily_quests_done",
-      "condition": {},
-      "text": "All the daily quests are done. Go and open the chest.",
+      "trigger": "chest_opened",
+      "condition": {
+        "period": "weekly"
+      },
+      "text": "Weekly chest is open. Every quest of the week bolted into place, brick by brick. Solid work.",
       "chip": "quests",
       "reactors": [],
       "weight": 1
     },
     {
-      "id": "ft-rank-any",
-      "npc_id": null,
-      "poster_pool": [
-        "npc-ray",
-        "npc-mina",
-        "npc-kofi",
-        "npc-sage"
-      ],
+      "id": "ft-kofi-comeback-14",
+      "npc_id": "npc-kofi",
+      "poster_pool": [],
       "kind": "nudge",
-      "trigger": "rank_change",
-      "condition": {},
-      "text": "The weekly ranking moved: you and {rival} traded places. Take a look.",
-      "chip": "ranks",
+      "trigger": "comeback",
+      "condition": {
+        "minDays": 14
+      },
+      "text": "Long time, {name}. No problem. Every project has a pause. Let's restart with one good lesson.",
+      "chip": null,
       "reactors": [],
       "weight": 1
     },
     {
-      "id": "ft-rank-passed",
-      "npc_id": null,
-      "poster_pool": [
-        "npc-ada",
-        "npc-hal",
-        "npc-kofi",
-        "npc-sage",
-        "npc-tess"
-      ],
+      "id": "ft-kofi-comeback-3",
+      "npc_id": "npc-kofi",
+      "poster_pool": [],
+      "kind": "nudge",
+      "trigger": "comeback",
+      "condition": {
+        "minDays": 3
+      },
+      "text": "{name}, welcome back! Hard hat is on. Let's get back to work, one lesson at a time.",
+      "chip": null,
+      "reactors": [],
+      "weight": 1
+    },
+    {
+      "id": "ft-kofi-first-lesson",
+      "npc_id": "npc-kofi",
+      "poster_pool": [],
+      "kind": "celebrate",
+      "trigger": "first_lesson",
+      "condition": {},
+      "text": "First lesson done: “{lesson}”! That is the foundation poured. Now we build on it.",
+      "chip": "lesson",
+      "reactors": [],
+      "weight": 1
+    },
+    {
+      "id": "ft-kofi-quests",
+      "npc_id": "npc-kofi",
+      "poster_pool": [],
+      "kind": "celebrate",
+      "trigger": "daily_quests_done",
+      "condition": {},
+      "text": "Every daily quest is claimed! That is a full day's work. Open the chest, you earned it.",
+      "chip": "quests",
+      "reactors": [],
+      "weight": 1
+    },
+    {
+      "id": "ft-kofi-rank-passed",
+      "npc_id": "npc-kofi",
+      "poster_pool": [],
       "kind": "celebrate",
       "trigger": "rank_change",
       "condition": {
         "direction": "passed"
       },
-      "text": "You passed {rival} in the weekly ranking. Keep going.",
+      "text": "You passed {rival} in the weekly ranking! Nice push. Keep that engine running.",
       "chip": "ranks",
       "reactors": [],
       "weight": 1
     },
     {
-      "id": "ft-rank-passed-by",
-      "npc_id": null,
-      "poster_pool": [
-        "npc-ada",
-        "npc-hal",
-        "npc-kofi",
-        "npc-sage",
-        "npc-tess"
-      ],
+      "id": "ft-kofi-rank-passed-by",
+      "npc_id": "npc-kofi",
+      "poster_pool": [],
       "kind": "nudge",
       "trigger": "rank_change",
       "condition": {
         "direction": "passed_by"
       },
-      "text": "{rival} passed you in the weekly ranking. One more lesson could change that.",
+      "text": "{rival} passed you in the weekly ranking. Time to fire the engine back up. One lesson gets you moving.",
+      "chip": "ranks",
+      "reactors": [],
+      "weight": 1
+    },
+    {
+      "id": "ft-mina-chest-daily",
+      "npc_id": "npc-mina",
+      "poster_pool": [],
+      "kind": "celebrate",
+      "trigger": "chest_opened",
+      "condition": {
+        "period": "daily"
+      },
+      "text": "You opened the daily chest. A small reward, and a gentle reminder that small steps count.",
+      "chip": "quests",
+      "reactors": [],
+      "weight": 1
+    },
+    {
+      "id": "ft-mina-chest-weekly",
+      "npc_id": "npc-mina",
+      "poster_pool": [],
+      "kind": "celebrate",
+      "trigger": "chest_opened",
+      "condition": {
+        "period": "weekly"
+      },
+      "text": "The weekly chest is open. A whole week of quests, done at your own pace. That takes care and patience.",
+      "chip": "quests",
+      "reactors": [],
+      "weight": 1
+    },
+    {
+      "id": "ft-mina-comeback-14",
+      "npc_id": "npc-mina",
+      "poster_pool": [],
+      "kind": "nudge",
+      "trigger": "comeback",
+      "condition": {
+        "minDays": 14
+      },
+      "text": "Hello again, {name}. Life gets busy, and that is okay. One calm lesson is plenty to start.",
+      "chip": null,
+      "reactors": [],
+      "weight": 1
+    },
+    {
+      "id": "ft-mina-comeback-3",
+      "npc_id": "npc-mina",
+      "poster_pool": [],
+      "kind": "nudge",
+      "trigger": "comeback",
+      "condition": {
+        "minDays": 3
+      },
+      "text": "Welcome back, {name}. No pressure at all. Pick up wherever feels comfortable.",
+      "chip": null,
+      "reactors": [],
+      "weight": 1
+    },
+    {
+      "id": "ft-mina-first-lesson",
+      "npc_id": "npc-mina",
+      "poster_pool": [],
+      "kind": "celebrate",
+      "trigger": "first_lesson",
+      "condition": {},
+      "text": "Your first lesson is done: “{lesson}”. Well done. It is normal to feel a little unsure at the start, and you did it anyway.",
+      "chip": "lesson",
+      "reactors": [],
+      "weight": 1
+    },
+    {
+      "id": "ft-mina-quests",
+      "npc_id": "npc-mina",
+      "poster_pool": [],
+      "kind": "celebrate",
+      "trigger": "daily_quests_done",
+      "condition": {},
+      "text": "Every daily quest is claimed. You did well today. Take a breath, then open your chest.",
+      "chip": "quests",
+      "reactors": [],
+      "weight": 1
+    },
+    {
+      "id": "ft-mina-rank-passed",
+      "npc_id": "npc-mina",
+      "poster_pool": [],
+      "kind": "celebrate",
+      "trigger": "rank_change",
+      "condition": {
+        "direction": "passed"
+      },
+      "text": "You passed {rival} in the weekly ranking. Lovely. And remember, it is fine to go at your own speed.",
+      "chip": "ranks",
+      "reactors": [],
+      "weight": 1
+    },
+    {
+      "id": "ft-mina-rank-passed-by",
+      "npc_id": "npc-mina",
+      "poster_pool": [],
+      "kind": "nudge",
+      "trigger": "rank_change",
+      "condition": {
+        "direction": "passed_by"
+      },
+      "text": "{rival} passed you in the weekly ranking. That is okay. A ranking is only a snapshot. One lesson at a time.",
+      "chip": "ranks",
+      "reactors": [],
+      "weight": 1
+    },
+    {
+      "id": "ft-ray-chest-daily",
+      "npc_id": "npc-ray",
+      "poster_pool": [],
+      "kind": "celebrate",
+      "trigger": "chest_opened",
+      "condition": {
+        "period": "daily"
+      },
+      "text": "Daily chest opened. Small reward. Same time tomorrow.",
+      "chip": "quests",
+      "reactors": [],
+      "weight": 1
+    },
+    {
+      "id": "ft-ray-chest-weekly",
+      "npc_id": "npc-ray",
+      "poster_pool": [],
+      "kind": "celebrate",
+      "trigger": "chest_opened",
+      "condition": {
+        "period": "weekly"
+      },
+      "text": "Weekly chest open. Every quest of the week done. Checked off.",
+      "chip": "quests",
+      "reactors": [],
+      "weight": 1
+    },
+    {
+      "id": "ft-ray-comeback-14",
+      "npc_id": "npc-ray",
+      "poster_pool": [],
+      "kind": "nudge",
+      "trigger": "comeback",
+      "condition": {
+        "minDays": 14
+      },
+      "text": "Two weeks, {name}. Fine. Start with one lesson. Do not try to catch up all at once.",
+      "chip": null,
+      "reactors": [],
+      "weight": 1
+    },
+    {
+      "id": "ft-ray-comeback-3",
+      "npc_id": "npc-ray",
+      "poster_pool": [],
+      "kind": "nudge",
+      "trigger": "comeback",
+      "condition": {
+        "minDays": 3
+      },
+      "text": "{name}. You are back. Pick up where you stopped. One lesson is enough.",
+      "chip": null,
+      "reactors": [],
+      "weight": 1
+    },
+    {
+      "id": "ft-ray-first-lesson",
+      "npc_id": "npc-ray",
+      "poster_pool": [],
+      "kind": "celebrate",
+      "trigger": "first_lesson",
+      "condition": {},
+      "text": "First lesson done: “{lesson}”. Good. The next one is on the map.",
+      "chip": "lesson",
+      "reactors": [],
+      "weight": 1
+    },
+    {
+      "id": "ft-ray-quests",
+      "npc_id": "npc-ray",
+      "poster_pool": [],
+      "kind": "celebrate",
+      "trigger": "daily_quests_done",
+      "condition": {},
+      "text": "All daily quests done. Open the chest. That is the whole job for today.",
+      "chip": "quests",
+      "reactors": [],
+      "weight": 1
+    },
+    {
+      "id": "ft-ray-rank-passed",
+      "npc_id": "npc-ray",
+      "poster_pool": [],
+      "kind": "celebrate",
+      "trigger": "rank_change",
+      "condition": {
+        "direction": "passed"
+      },
+      "text": "You passed {rival} in the weekly ranking. Noted. Hold the spot.",
+      "chip": "ranks",
+      "reactors": [],
+      "weight": 1
+    },
+    {
+      "id": "ft-ray-rank-passed-by",
+      "npc_id": "npc-ray",
+      "poster_pool": [],
+      "kind": "nudge",
+      "trigger": "rank_change",
+      "condition": {
+        "direction": "passed_by"
+      },
+      "text": "{rival} passed you in the weekly ranking. One lesson fixes that. Go do it.",
+      "chip": "ranks",
+      "reactors": [],
+      "weight": 1
+    },
+    {
+      "id": "ft-sage-chest-daily",
+      "npc_id": "npc-sage",
+      "poster_pool": [],
+      "kind": "celebrate",
+      "trigger": "chest_opened",
+      "condition": {
+        "period": "daily"
+      },
+      "text": "A daily chest, opened. A small reward. Worth asking what small, steady habits add up to over a month.",
+      "chip": "quests",
+      "reactors": [],
+      "weight": 1
+    },
+    {
+      "id": "ft-sage-chest-weekly",
+      "npc_id": "npc-sage",
+      "poster_pool": [],
+      "kind": "celebrate",
+      "trigger": "chest_opened",
+      "condition": {
+        "period": "weekly"
+      },
+      "text": "The weekly chest is open. A week of quests, finished. Effort and patience both counted here.",
+      "chip": "quests",
+      "reactors": [],
+      "weight": 1
+    },
+    {
+      "id": "ft-sage-comeback-14",
+      "npc_id": "npc-sage",
+      "poster_pool": [],
+      "kind": "nudge",
+      "trigger": "comeback",
+      "condition": {
+        "minDays": 14
+      },
+      "text": "Welcome back, {name}. A pause is not a failure. When you are ready, one lesson is enough to see where you stand.",
+      "chip": null,
+      "reactors": [],
+      "weight": 1
+    },
+    {
+      "id": "ft-sage-comeback-3",
+      "npc_id": "npc-sage",
+      "poster_pool": [],
+      "kind": "nudge",
+      "trigger": "comeback",
+      "condition": {
+        "minDays": 3
+      },
+      "text": "Welcome back, {name}. Whenever you are ready, the lessons are where you left them.",
+      "chip": null,
+      "reactors": [],
+      "weight": 1
+    },
+    {
+      "id": "ft-sage-first-lesson",
+      "npc_id": "npc-sage",
+      "poster_pool": [],
+      "kind": "celebrate",
+      "trigger": "first_lesson",
+      "condition": {},
+      "text": "Your first lesson is done: “{lesson}”. A good beginning. What question did it leave you with?",
+      "chip": "lesson",
+      "reactors": [],
+      "weight": 1
+    },
+    {
+      "id": "ft-sage-quests",
+      "npc_id": "npc-sage",
+      "poster_pool": [],
+      "kind": "celebrate",
+      "trigger": "daily_quests_done",
+      "condition": {},
+      "text": "Every daily quest is claimed. A full day. Weigh it fairly: you did a lot, and the chest is waiting.",
+      "chip": "quests",
+      "reactors": [],
+      "weight": 1
+    },
+    {
+      "id": "ft-sage-rank-passed",
+      "npc_id": "npc-sage",
+      "poster_pool": [],
+      "kind": "celebrate",
+      "trigger": "rank_change",
+      "condition": {
+        "direction": "passed"
+      },
+      "text": "You passed {rival} in the weekly ranking. A fair result. It is also worth asking what you learned on the way.",
+      "chip": "ranks",
+      "reactors": [],
+      "weight": 1
+    },
+    {
+      "id": "ft-sage-rank-passed-by",
+      "npc_id": "npc-sage",
+      "poster_pool": [],
+      "kind": "nudge",
+      "trigger": "rank_change",
+      "condition": {
+        "direction": "passed_by"
+      },
+      "text": "{rival} passed you in the weekly ranking. On one hand, that stings a little. On the other, one lesson can change it.",
       "chip": "ranks",
       "reactors": [],
       "weight": 1
@@ -732,7 +1128,7 @@
       "text": "{days} days in a row. One hundred days! I did not think I would make it this far.",
       "chip": null,
       "reactors": [
-        "npc-ada"
+        "npc-hal"
       ],
       "weight": 1
     },
@@ -824,6 +1220,114 @@
       "reactors": [
         "npc-ray"
       ],
+      "weight": 1
+    },
+    {
+      "id": "ft-tess-chest-daily",
+      "npc_id": "npc-tess",
+      "poster_pool": [],
+      "kind": "celebrate",
+      "trigger": "chest_opened",
+      "condition": {
+        "period": "daily"
+      },
+      "text": "Ping. Daily chest opened. Small reward, tiny habit, big streak potential.",
+      "chip": "quests",
+      "reactors": [],
+      "weight": 1
+    },
+    {
+      "id": "ft-tess-chest-weekly",
+      "npc_id": "npc-tess",
+      "poster_pool": [],
+      "kind": "celebrate",
+      "trigger": "chest_opened",
+      "condition": {
+        "period": "weekly"
+      },
+      "text": "Weekly chest unlocked! Every quest of the week done. Gadget level: maxed out.",
+      "chip": "quests",
+      "reactors": [],
+      "weight": 1
+    },
+    {
+      "id": "ft-tess-comeback-14",
+      "npc_id": "npc-tess",
+      "poster_pool": [],
+      "kind": "nudge",
+      "trigger": "comeback",
+      "condition": {
+        "minDays": 14
+      },
+      "text": "Hey {name}, long time. Rebooting is easy: one lesson and you are right back in.",
+      "chip": null,
+      "reactors": [],
+      "weight": 1
+    },
+    {
+      "id": "ft-tess-comeback-3",
+      "npc_id": "npc-tess",
+      "poster_pool": [],
+      "kind": "nudge",
+      "trigger": "comeback",
+      "condition": {
+        "minDays": 3
+      },
+      "text": "Welcome back, {name}. Quick one: pick up where you stopped. I kept your place.",
+      "chip": null,
+      "reactors": [],
+      "weight": 1
+    },
+    {
+      "id": "ft-tess-first-lesson",
+      "npc_id": "npc-tess",
+      "poster_pool": [],
+      "kind": "celebrate",
+      "trigger": "first_lesson",
+      "condition": {},
+      "text": "First lesson done: “{lesson}”. Unlocked! Lots more shiny things ahead.",
+      "chip": "lesson",
+      "reactors": [],
+      "weight": 1
+    },
+    {
+      "id": "ft-tess-quests",
+      "npc_id": "npc-tess",
+      "poster_pool": [],
+      "kind": "celebrate",
+      "trigger": "daily_quests_done",
+      "condition": {},
+      "text": "All daily quests, claimed. Done and done. Go tap that chest.",
+      "chip": "quests",
+      "reactors": [],
+      "weight": 1
+    },
+    {
+      "id": "ft-tess-rank-passed",
+      "npc_id": "npc-tess",
+      "poster_pool": [],
+      "kind": "celebrate",
+      "trigger": "rank_change",
+      "condition": {
+        "direction": "passed"
+      },
+      "text": "Ooh, you passed {rival} in the weekly ranking. Zoom! Keep that speed.",
+      "chip": "ranks",
+      "reactors": [],
+      "weight": 1
+    },
+    {
+      "id": "ft-tess-rank-passed-by",
+      "npc_id": "npc-tess",
+      "poster_pool": [],
+      "kind": "nudge",
+      "trigger": "rank_change",
+      "condition": {
+        "direction": "passed_by"
+      },
+      "text": "{rival} just passed you in the weekly ranking. Quick fix: one lesson. Go, go.",
+      "chip": "ranks",
+      "reactors": [],
       "weight": 1
     }
   ]

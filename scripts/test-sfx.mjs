@@ -19,6 +19,11 @@ import {
   CUE_IDS,
   REACTION_RATE,
   SFX_FILES,
+  SFX_SETS,
+  WARMABLE_SETS,
+  cuesInNoSet,
+  filesOfCues,
+  filesOfSet,
   blipRate,
   createSfxScheduler,
   fileGroup,
@@ -28,6 +33,19 @@ import {
   poolSizeOf,
   shouldBlip,
 } from "../services/sfx-core.ts";
+
+import {
+  BUFFER_BUDGET_BYTES,
+  decodedBytes,
+  livePlayerCap,
+  pickBackend,
+  planBufferEvictions,
+  planEvictions,
+  planWarm,
+  retryAllowed,
+} from "../services/sfx-backend-core.ts";
+import { FAULT_OUTCOMES, createSfxDiag } from "../services/sfx-diag.ts";
+import { BUDGETS } from "../services/device-profile-core.ts";
 
 const prefs = (over = {}) => ({ ...DEFAULT_MEDIA_PREFERENCES, ...over });
 const env = (over = {}) => ({ ...DEFAULT_MEDIA_ENVIRONMENT, ...over });
@@ -234,5 +252,168 @@ describe("player pool", () => {
 
   it("frees a player once its time has passed", () => {
     assert.equal(pickSlot([slot({ rewound: true, busyUntil: 1000 })], 1, 1000), 0);
+  });
+});
+
+describe("sets", () => {
+  it("lists every cue in at least one set, so a new cue is a decision", () => {
+    assert.deepEqual(cuesInNoSet(), [], "add the cue to a set in SFX_SETS (or to on-demand to never warm it)");
+  });
+
+  it("every set names real cues, and the warmable ones are small enough to warm together", () => {
+    for (const [name, cues] of Object.entries(SFX_SETS)) {
+      for (const cue of cues) assert.ok(cue in CUES, `${name} lists unknown cue ${cue}`);
+    }
+    // A set larger than the lowest tier's player cap could never be warmed whole on a low-end phone
+    for (const name of WARMABLE_SETS) {
+      assert.ok(filesOfSet(name).length <= BUDGETS.low.playerCap, `${name} has ${filesOfSet(name).length} files, more than the low tier's ${BUDGETS.low.playerCap} players`);
+    }
+  });
+
+  it("filesOfCues lists each file once, in order", () => {
+    assert.deepEqual(filesOfCues(["reward.pop", "lesson.star", "reward.appear", "ui.press"]), ["reward/pop", "ui/press"]);
+  });
+
+  it("the core set holds the sounds every screen plays", () => {
+    for (const cue of ["ui.press", "lesson.answer-correct", "lesson.answer-wrong", "reward.pop", "reward.coin"]) assert.ok(SFX_SETS.core.includes(cue), cue);
+  });
+});
+
+describe("which engine", () => {
+  it("is audio-api on Android when its module loads, and nothing else", () => {
+    assert.equal(pickBackend({ os: "android", moduleLoaded: true }).id, "audio-api");
+    assert.equal(pickBackend({ os: "android", moduleLoaded: false }).id, "expo-audio", "Expo Go on Android");
+    assert.equal(pickBackend({ os: "ios", moduleLoaded: true }).id, "expo-audio", "never an iPhone");
+    assert.equal(pickBackend({ os: "ios", moduleLoaded: false }).id, "expo-audio");
+    assert.equal(pickBackend({ os: "web", moduleLoaded: false }).id, "expo-audio");
+  });
+
+  it("an override can force expo-audio anywhere, and audio-api only where it can run", () => {
+    assert.equal(pickBackend({ os: "android", moduleLoaded: true, override: "expo-audio" }).id, "expo-audio");
+    assert.equal(pickBackend({ os: "android", moduleLoaded: true, override: "audio-api" }).id, "audio-api");
+    const ios = pickBackend({ os: "ios", moduleLoaded: true, override: "audio-api" });
+    assert.equal(ios.id, "expo-audio");
+    assert.match(ios.reason, /refused/);
+    assert.equal(pickBackend({ os: "android", moduleLoaded: false, override: "audio-api" }).id, "expo-audio");
+  });
+
+  it("ignores an override it does not know", () => {
+    assert.equal(pickBackend({ os: "android", moduleLoaded: true, override: "wat" }).id, "audio-api");
+    assert.equal(pickBackend({ os: "ios", moduleLoaded: false, override: "" }).id, "expo-audio");
+  });
+
+  it("always says why", () => {
+    for (const input of [{ os: "android", moduleLoaded: true }, { os: "ios", moduleLoaded: false }, { os: "android", moduleLoaded: false }]) {
+      assert.ok(pickBackend(input).reason.length > 0);
+    }
+  });
+});
+
+describe("the player cap (expo-audio engine)", () => {
+  const entry = (file, over = {}) => ({ file, players: 1, busy: false, pinned: false, released: false, ...over });
+
+  it("takes nothing while there is room", () => {
+    assert.deepEqual(planEvictions([entry("ui/press"), entry("ui/tab")], 4, 1), []);
+  });
+
+  it("takes the least recent first (entries are least recent first)", () => {
+    const entries = [entry("ui/press"), entry("ui/tab"), entry("ui/select")];
+    assert.deepEqual(planEvictions(entries, 3, 1), ["ui/press"]);
+    assert.deepEqual(planEvictions(entries, 3, 2), ["ui/press", "ui/tab"]);
+  });
+
+  it("takes files whose screen was left before older ones", () => {
+    const entries = [entry("ui/press"), entry("ui/tab", { released: true }), entry("ui/select")];
+    assert.deepEqual(planEvictions(entries, 3, 1), ["ui/tab"]);
+  });
+
+  it("never takes a pinned or a sounding file, even if that leaves the cap over", () => {
+    const entries = [entry("ui/press", { pinned: true }), entry("ui/tab", { busy: true })];
+    assert.deepEqual(planEvictions(entries, 2, 1), []);
+  });
+
+  it("counts every player of a file, not just the file", () => {
+    assert.deepEqual(planEvictions([entry("ui/press", { players: 3 }), entry("ui/tab")], 4, 1), ["ui/press"]);
+  });
+
+  it("warms only files without a player, and no more than fit", () => {
+    const have = [entry("ui/press"), entry("ui/tab")];
+    assert.deepEqual(planWarm(["ui/press", "ui/select", "ui/cancel"], have, 4), ["ui/select", "ui/cancel"]);
+    assert.deepEqual(planWarm(["ui/press", "ui/select", "ui/cancel"], have, 3), ["ui/select", "ui/cancel"], "ui/tab is not in the set and can go");
+    assert.deepEqual(planWarm(["ui/select", "ui/cancel", "ui/lock"], [entry("ui/press", { pinned: true }), entry("ui/tab", { busy: true })], 3), ["ui/select"]);
+  });
+
+  it("never evicts its own files to make room for the rest of the set", () => {
+    // Everything alive is in the set, and the cap is full: nothing new is made
+    assert.deepEqual(planWarm(["ui/press", "ui/tab", "ui/select"], [entry("ui/press"), entry("ui/tab")], 2), []);
+  });
+
+  it("android's cap is lower than iOS's", () => {
+    assert.ok(livePlayerCap("android") < livePlayerCap("ios"));
+    assert.ok(livePlayerCap("android") >= 12);
+  });
+
+  it("retries a lost play only for what the learner is waiting on", () => {
+    for (const c of ["feedback", "tap", "reward", "panel"]) assert.equal(retryAllowed(c), true, c);
+    for (const c of ["stinger", "voice"]) assert.equal(retryAllowed(c), false, c);
+  });
+});
+
+describe("the buffer budget (audio-api engine)", () => {
+  const entry = (file, over = {}) => ({ file, bytes: decodedBytes(file), busy: false, pinned: false, released: false, ...over });
+
+  it("the whole catalog fits the budget with room to spare", () => {
+    const all = Object.keys(SFX_FILES).reduce((sum, f) => sum + decodedBytes(f), 0);
+    assert.ok(all < BUFFER_BUDGET_BYTES * 0.75, `${(all / 1048576).toFixed(1)} MB of ${(BUFFER_BUDGET_BYTES / 1048576).toFixed(0)}`);
+  });
+
+  it("a mono 44.1 kHz float buffer is 4 bytes a sample", () => {
+    assert.equal(decodedBytes("ui/press"), Math.ceil(0.053 * 44100) * 4);
+  });
+
+  it("drops nothing while there is room, then released, then least recent; never pinned or sounding", () => {
+    const entries = [entry("ui/shop-open"), entry("game/over", { released: true }), entry("lesson/complete", { pinned: true }), entry("game/count-1", { busy: true })];
+    const total = entries.reduce((s, e) => s + e.bytes, 0);
+    assert.deepEqual(planBufferEvictions(entries, total + 1000, 500), []);
+    assert.deepEqual(planBufferEvictions(entries, total, decodedBytes("ui/press")), ["game/over"]);
+    assert.deepEqual(planBufferEvictions(entries, total, total), ["game/over", "ui/shop-open"], "pinned and sounding stay, even if that is not enough");
+  });
+});
+
+describe("the outcome log", () => {
+  it("counts every outcome and keeps the last entries oldest first", () => {
+    const diag = createSfxDiag(3);
+    diag.record("ui.press", "played");
+    diag.record("ui.press", "skip-gap");
+    diag.record("lesson.bubble", "late", { ms: 120 });
+    diag.record("lesson.bubble", "lost", { detail: "load-timeout" });
+    assert.equal(diag.counts().played, 1);
+    assert.equal(diag.counts()["skip-gap"], 1);
+    assert.deepEqual(diag.entries().map((e) => e.outcome), ["skip-gap", "late", "lost"], "the oldest fell off the ring");
+    assert.equal(diag.entries()[1].ms, 120);
+    assert.equal(diag.counts().played, 1, "counters are not a ring");
+  });
+
+  it("tells faults from by-design silence", () => {
+    const diag = createSfxDiag();
+    for (const o of ["gate", "skip-gap", "skip-burst", "skip-duck", "late", "played", "evicted"]) diag.record("x", o);
+    assert.equal(diag.faults(), 0);
+    diag.record("x", "lost");
+    diag.record("x", "error", { detail: "boom" });
+    assert.equal(diag.faults(), 2);
+    assert.deepEqual([...FAULT_OUTCOMES].sort(), ["error", "lost"]);
+  });
+
+  it("keeps a table per cue and resets", () => {
+    const diag = createSfxDiag();
+    diag.record("ui.press", "played");
+    diag.record("ui.press", "played");
+    diag.record("ui.tab", "skip-burst");
+    assert.equal(diag.perCue().get("ui.press").played, 2);
+    assert.equal(diag.perCue().get("ui.tab")["skip-burst"], 1);
+    diag.reset();
+    assert.equal(diag.entries().length, 0);
+    assert.equal(diag.counts().played, 0);
+    assert.equal(diag.perCue().size, 0);
   });
 });

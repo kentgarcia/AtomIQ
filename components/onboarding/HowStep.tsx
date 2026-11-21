@@ -49,7 +49,7 @@ export function HowPage({ reason, direction }: { reason: Reason | null; directio
           Here is how AtomIQ gets you there
         </Text>
       </Animated.View>
-      <ShrodiSays text="Four things make it stick." mood="happy" arrive={{ direction, at: PAGE_FX.fox }} />
+      <ShrodiSays text="Four things make it stick." still arrive={{ direction, at: PAGE_FX.fox }} />
       <View style={styles.list}>
         {rowsFor(reason).map((row, i) => (
           <View key={row.id} style={styles.row}>

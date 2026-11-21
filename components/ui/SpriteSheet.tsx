@@ -29,10 +29,12 @@ export interface SpriteSheetProps {
   loop?: boolean;
   /** Called once when a non-looping run reaches its last frame. */
   onEnd?: () => void;
+  /** Called when the sheet's picture has been decoded (a sheet is big, so the first frames may not be there before it). */
+  onLoad?: () => void;
   style?: StyleProp<ViewStyle>;
 }
 
-export function SpriteSheet({ sheet, size, playing = false, loop = false, onEnd, style }: SpriteSheetProps) {
+export function SpriteSheet({ sheet, size, playing = false, loop = false, onEnd, onLoad, style }: SpriteSheetProps) {
   const { source, cols, frames, fps } = sheet;
   const rows = Math.ceil(frames / cols);
   const duration = sheetDuration(frames, fps);
@@ -54,7 +56,7 @@ export function SpriteSheet({ sheet, size, playing = false, loop = false, onEnd,
   return (
     <View style={[{ width: size, height: size, overflow: "hidden" }, style]} pointerEvents="none">
       <Animated.View style={[{ width: cols * size, height: rows * size }, moved]}>
-        <Image source={source} style={{ width: cols * size, height: rows * size }} contentFit="fill" />
+        <Image source={source} style={{ width: cols * size, height: rows * size }} contentFit="fill" onLoad={onLoad} />
       </Animated.View>
     </View>
   );

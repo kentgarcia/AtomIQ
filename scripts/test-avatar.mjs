@@ -357,8 +357,10 @@ test("the extra clothes each draw differently, keep the teachers' five untouched
     assert.ok(!seen.has(sig), `${kind} differs from the others`);
     seen.add(sig);
   }
-  // The five teachers' outfits are still what they were: a teacher spec with each kind draws
-  for (const n of NPC_ROSTER) assert.ok(["sweater", "hoodie", "coat", "vest", "shirt"].includes(n.spec.outfit.kind), n.id);
+  // The five teachers' outfits are still what they were: a teacher spec with each kind draws (Ada's apron is a teacher's own and not on offer)
+  // (a teacher may also wear one of the extra outfits the shop sells, like Hal's white coat)
+  for (const n of NPC_ROSTER) assert.ok(["sweater", "hoodie", "coat", "vest", "shirt", "apron", ...EXTRA_OUTFITS].includes(n.spec.outfit.kind), n.id);
+  assert.ok(!AVATAR_OPTIONS.outfit.includes("apron"), "the shop does not sell a teacher's own outfit");
   // An old avatar with an outfit this app does not know reads as the default hoodie
   assert.equal(normalizeAvatar('avatar:v1:{"outfit":"spacesuit"}').outfit, "hoodie");
 });

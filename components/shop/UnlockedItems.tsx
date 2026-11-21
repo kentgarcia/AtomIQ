@@ -7,7 +7,7 @@
  */
 
 import { View } from "react-native";
-import { useReducedMotion } from "react-native-reanimated";
+import { useReducedMotion } from "@/components/motion/use-reduced-motion";
 
 import { Avatar } from "@/components/avatar/Avatar";
 import { avatarBackground, serializeAvatar, type AvatarConfig } from "@/components/avatar/avatar-core";

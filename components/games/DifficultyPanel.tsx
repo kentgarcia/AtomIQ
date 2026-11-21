@@ -6,7 +6,8 @@
 
 import { StackCard } from "@/components/games/StackCard";
 import { useTabBarInset } from "@/components/layout";
-import { unitPalette } from "@/components/path/unit-theme";
+import { unitPalette, teacherPalette } from "@/components/path/unit-theme";
+import { useUnitBrands } from "@/components/npc/use-unit-brands";
 import { Icon } from "@/components/ui/icon";
 import { ModalDialog } from "@/components/ui/modal-dialog";
 import { Text } from "@/components/ui/text";
@@ -43,6 +44,7 @@ export function DifficultyPanel({
 
     // Quick Play asks for a unit (its theme): the units and how many statements each has
     const [units, setUnits] = useState<Unit[]>([]);
+    const brands = useUnitBrands();
     const [deckSizes, setDeckSizes] = useState<Record<string, number>>({});
     const [themeOpen, setThemeOpen] = useState(false);
     useEffect(() => {
@@ -141,7 +143,8 @@ export function DifficultyPanel({
                     {units.map((unit, i) => {
                         const count = deckSizes[unit.id] ?? 0;
                         const ready = count > 0;
-                        const face = unitPalette(theme.colors, unit.position, isDark).face;
+                        const brand = brands.get(unit.position);
+                        const face = brand ? teacherPalette(brand, theme.colors.lessonHeaderText, isDark).face : unitPalette(theme.colors, unit.position, isDark).face;
                         return (
                             <Pressable
                                 key={unit.id}

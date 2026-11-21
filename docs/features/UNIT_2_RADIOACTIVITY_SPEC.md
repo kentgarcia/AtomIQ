@@ -6,7 +6,7 @@
 **Date:** 2026-11-17
 **Owner:** AtomIQ product, content and engineering
 **Applies to:** `scripts/content-migration/curriculum/unit-2.mjs` (new authoring source) and `scenes.mjs`, `content/curriculum/types.ts`, `scripts/lib/curriculum-rules.mjs`, `components/lesson/cards/` (new simulations), `components/lesson/visual/object-art.ts`, `scripts/content-migration/` (sync and glossary scripts), `components/npc/npc-roster.ts` (Hal's lines)
-**Builds on:** `docs/features/LESSON_RESTRUCTURE_SPEC.md` (§4 unit map, §6 cards and limits, §12 Unit 1 as the model), `docs/features/NPC_TEACHERS_SPEC.md` (Hal teaches this unit), `docs/critical/MEDIA_POLICY.md`, `components/motion/MOTION.md`
+**Builds on:** `docs/features/LESSON_RESTRUCTURE_SPEC.md` (§4 unit map, §6 cards and limits, §12 Unit 1 as the model), `docs/features/NPC_TEACHERS_SPEC.md` (Ada teaches this unit: Hal until 2026-11-22), `docs/critical/MEDIA_POLICY.md`, `components/motion/MOTION.md`
 
 ## 1. Goal
 
@@ -53,7 +53,7 @@ Design principle for every lesson: **predict, see, interact, explain, debunk, re
 | L4 Decay chains | `decay-chains` | The new nucleus can be unstable too and decay again. | "One decay can start a whole chain." |
 | L5 Radioactivity is natural | `radioactivity-is-natural` | Radioactivity and radiation exist in rocks, air, food, bodies and space, not only in nuclear facilities. | "It's part of the world, and radioactive doesn't automatically mean dangerous." |
 
-Path (same shape as Unit 1): L1 → L2 → L3 → practice → L4 → L5 → checkpoint. Unit id `radioactivity`, position 2, teacher `npc-hal` (older, patient, tells stories; pocket watch for half-life), icon and tone to be chosen with the unit's art. Path node ids `u2-n1` to `u2-n7`.
+Path (same shape as Unit 1): L1 → L2 → L3 → practice → L4 → L5 → checkpoint. Unit id `radioactivity`, position 2, teacher `npc-ada` (she took the unit over from Hal on 2026-11-22; Hal's old brief was older and patient, with a pocket watch for half-life), icon and tone to be chosen with the unit's art. Path node ids `u2-n1` to `u2-n7`.
 
 ## 3. What Unit 1 already teaches (one home per idea)
 
@@ -139,7 +139,7 @@ Cards are listed in order. `(deeper)` is optional and unscored. "Item" cards are
 
 ### L1. Why do nuclei decay? (`why-nuclei-decay`)
 
-Misconceptions: a person must make it decay (#10); the exact moment can be predicted. Teacher: Hal.
+Misconceptions: a person must make it decay (#10); the exact moment can be predicted. Teacher: Ada.
 
 1. `predict`: "An unstable nucleus is left alone for a very long time. What happens?" Options: it stays the same for ever; it can change by itself; someone has to trigger it; it disappears at once. Unscored.
 2. `explain`: stable and unstable in the simplest words. Stable: can stay as it is. Unstable: can change into another state. **Radioactive** means an unstable nucleus can undergo radioactive decay. Figure: a stable and an unstable nucleus side by side.
@@ -177,7 +177,7 @@ Scored items: `u2-particle-or-wave` (cards 8, 10, 12 second half), `u2-recognise
 
 ### L3. Half-life (`half-life`)
 
-The signature lesson of the unit. Misconceptions: #4, #5, #6, #11. Teacher Hal's pocket watch is the motif, but the watch must not suggest a timer inside each atom: it ticks for the **group**.
+The signature lesson of the unit. Misconceptions: #4, #5, #6, #11. The pocket watch (Hal's, in the first draft) is the motif, but the watch must not suggest a timer inside each atom: it ticks for the **group**.
 
 1. `predict`: "100 radioactive nuclei. After one half-life, what happens?" A: one disappears. B: every atom becomes half as radioactive. C: about half of the nuclei have decayed. D: the sample becomes completely safe. Unscored, correct C.
 2. **Simulation `decay-wait`, mode `half-life`**: 100 nuclei in a 10-by-10 grid, a **Wait one half-life** button and a live count. Pressing it: about half of the remaining nuclei change. Goal: three presses. The learner sees roughly 100, 50, 25, 12.
@@ -226,7 +226,7 @@ The emotional payoff of the unit. Misconceptions: #1, #2, #3, #9 (tease), #8 (pl
 3. `explain`: air. Radioactive materials in the ground can produce **radon**, a radioactive gas that can get into buildings. One sentence; no health numbers.
 4. `explain`: food and the body. Potassium-40 is in food and in you. This is a widening of Unit 1's banana card, not a repeat: lead with "your body contains a little" and link to a food-to-body figure.
 5. `explain`: space. Earth is exposed to cosmic radiation all the time. Figure: rays arriving at the top of the atmosphere.
-6. `story` (Hal): "A discovery that wasn't supposed to happen." Becquerel and a uranium mineral fogging a wrapped photographic plate with no sunlight. Takeaway: radioactivity was discovered as a property of natural matter. Core, but not a fact to memorise. Move of the Unit 1 card; see §10.
+6. `story` (Ada): "A discovery that wasn't supposed to happen." Becquerel and a uranium mineral fogging a wrapped photographic plate with no sunlight. Takeaway: radioactivity was discovered as a property of natural matter. Core, but not a fact to memorise. Move of the Unit 1 card; see §10.
 7. `sort` or `order`: "Which came first, the natural phenomenon or its discovery?" or a small timeline; scored under `u2-natural-sources`. Do not re-ask "Humans invented radioactivity." as a myth item.
 8. `choice`: "If something is radioactive, is it automatically dangerous?" Not necessarily. Then `explain`: it depends on the type and amount of radiation, how much exposure there is and how it reaches the body. No dose calculation. Scored under `u2-not-always-dangerous` with one more item.
 9. `explain`: the teaser. "Later, you'll learn why being exposed to radiation is not the same as becoming radioactive." Unscored, no objective.
@@ -286,7 +286,7 @@ Specific values to confirm before they appear anywhere: the half-lives used as e
 1. **Unit 1 L5 card `c12` (Becquerel story, `deeper`)** moves to Unit 2 L5 as a Core story. Remove it from `unit-1.mjs`, keep `becquerelPlate` and `ref-becquerel-1896` (re-used by Unit 2), and re-run `unit-1-concept-pass.mjs`. Until then, both lessons would carry the same story. This is a published-content decision for the owner: nothing is published yet, so no shipped id is retired.
 2. **`LESSON_RESTRUCTURE_SPEC.md` §4.1, Unit 2 row**: lesson names updated to match this spec (done with this spec).
 3. **Glossary**: add encyclopedia entries for `parent-nuclide`, `daughter-nuclide` (or one combined "parent and daughter" entry), `alpha-decay`, `beta-decay`, `gamma-radiation`, `decay-chain`, `potassium-40`. Already present and linkable: `radioactivity`, `radiation`, `decay`, `radionuclide`, `half-life`, `alpha-particle`, `beta-particle`, `gamma-ray`, `radon`, `cosmic-radiation`, `background-radiation`, `ionizing-radiation`, `henri-becquerel`, `marie-curie`. Entries are beginner difficulty, with sources as in §9, added by a repeatable script as `add-unit-1-glossary.mjs` does.
-4. **NPC lines**: Hal's `lesson_intro` line for each lesson and his story-card voice, in `npc-roster.ts` and the `npc_lines` table (his `meet`, `sign_off` and `tease` lines may already exist: check before adding).
+4. **NPC lines**: Ada's `lesson_intro` line for each lesson and her story-card voice, in `npc-roster.ts` and the `npc_lines` table (her `meet`, `sign_off` and `tease` lines may already exist: check before adding).
 5. **Authoring tooling**: `curriculum-cutover.mjs` is destructive (it wipes `teacher_npc_id`), as found for Unit 1. Unit 2 uses an idempotent sync script modelled on `unit-1-concept-pass.mjs`, generalised so it takes a unit source path.
 6. **Validator**: `curriculum-rules.mjs` gains rules for the three new sim types (like the existing `atom-builder` and `scale-zoom` branches) and tests in `scripts/test-curriculum-content.mjs`.
 
@@ -295,7 +295,7 @@ Specific values to confirm before they appear anywhere: the half-lives used as e
 1. **Content skeleton**: `unit-2.mjs` with objectives, references, lesson outlines and items; sync script; glossary script; Unit 1 change (§10.1). Run `validate:content`.
 2. **Figures**: the static teaching figures in `scenes.mjs` and any new object art; render a contact sheet with the helper used for Unit 1 and check overlaps.
 3. **Sims in this order**: `decay-wait` (unblocks L1 and L3), `radiation-id` (L2), `decay-chain` (L4). Each with its core, tests, validator rule and component.
-4. **Hal**: lines and story voice; confirm the lesson preview and story cards pick him up.
+4. **Ada**: lines and story voice; confirm the lesson preview and story cards pick him up.
 5. **Device pass**: all five lessons on a release-like Android build, with reduced motion on and off.
 6. **Publish** only after references are verified and a person has read each card for accuracy.
 

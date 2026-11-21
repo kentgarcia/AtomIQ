@@ -17,13 +17,15 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { BackHandler, Platform, ScrollView, View, type LayoutChangeEvent, type NativeScrollEvent, type NativeSyntheticEvent, type ScrollViewInstance } from "react-native";
 import { Text } from "@/components/ui/text";
-import Animated, { FadeIn, FadeInDown, useAnimatedStyle, useReducedMotion, useSharedValue, withTiming } from "react-native-reanimated";
+import Animated, { FadeIn, FadeInDown, useSharedValue, withTiming } from "react-native-reanimated";
+import { useReducedMotion } from "@/components/motion/use-reduced-motion";
 
 import { SideTail } from "@/components/npc/SpeechBubble";
 import { EASE_OUT } from "@/components/motion/motion";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Icon } from "@/components/ui/icon";
+import { useFillStyle } from "@/components/ui/progress-fill";
 import { PressableIconButton, useBottomInset } from "@/components/layout";
 import { ProgressSparkle } from "@/components/lesson/ProgressSparkle";
 import { CascadeProvider } from "@/components/motion/cascade-context";
@@ -81,9 +83,9 @@ const useStyles = createStyles((theme) => ({
   top: { flexDirection: "row", alignItems: "center", gap: spacing.sm, paddingBottom: spacing.sm },
   barWrap: { flex: 1, height: 16 },
   bar: { position: "absolute", top: 0, bottom: 0, left: 0, right: 0, borderRadius: radius.full, backgroundColor: theme.colors.border, overflow: "hidden" },
-  barFill: { height: "100%", borderRadius: radius.full, backgroundColor: theme.colors.primary },
+  barFill: { width: "100%", height: "100%", borderRadius: radius.full, backgroundColor: theme.colors.primary },
   // Sparkles sit outside the clipped bar, on a box that grows with the fill.
-  sparkAnchor: { position: "absolute", top: 0, bottom: 0, left: 0 },
+  sparkAnchor: { position: "absolute", top: 0, bottom: 0, left: 0, right: 0 },
   barDone: { backgroundColor: theme.colors.success },
   // A thin lighter strip along the top of the fill (flat, no gradient): a little shine.
   barShine: { position: "absolute", top: 3, left: spacing.sm, right: spacing.sm, height: 4, borderRadius: radius.full, backgroundColor: withAlpha(theme.colors.onPrimary, 0.3) },
@@ -609,7 +611,7 @@ function Header({ progress, onPress, styles, frame, topInset, kind, replay, labe
       pop.value = withTiming(1, { duration: 700, easing: EASE_OUT });
     }
   }, [progress, reduced, fill, pop]);
-  const fillStyle = useAnimatedStyle(() => ({ width: `${fill.value * 100}%` }));
+  const fillStyle = useFillStyle(fill);
   // Replaying the mistakes names itself; otherwise the kind of run does (a lesson shows nothing)
   const chip = replay ? REPLAY_CHIP : (RUN_CHIPS[kind] ?? null);
   return (

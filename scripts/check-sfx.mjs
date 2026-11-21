@@ -64,7 +64,7 @@ function* walk(dir, match) {
   }
 }
 
-const { SFX_FILES } = await import(pathToFileURL(path.join(ROOT, "services", "sfx-core.ts")).href);
+const { SFX_FILES, MIN_SFX_MS } = await import(pathToFileURL(path.join(ROOT, "services", "sfx-core.ts")).href);
 const rel = (p) => path.relative(ROOT, p).split(path.sep).join("/");
 
 // Catalog <-> disk
@@ -94,6 +94,7 @@ for (const [file, ms] of Object.entries(SFX_FILES)) {
   if (wav.channels !== 1) fail(`${file}.wav: must be mono (got ${wav.channels} channels)`);
   if (wav.rate !== 44100) fail(`${file}.wav: must be 44.1 kHz (got ${wav.rate})`);
   for (const chunk of wav.extra) if (chunk.size > 1024) fail(`${file}.wav: "${chunk.id}" chunk is ${chunk.size} bytes (cover art or tags?)`);
+  if (wav.ms < MIN_SFX_MS) fail(`${file}.wav: is ${wav.ms} ms, under ${MIN_SFX_MS} ms: audio-api cannot decode a file that short (run node scripts/pad-short-sfx.mjs --apply)`);
   if (Math.abs(wav.ms - ms) > 15) fail(`${file}.wav: is ${wav.ms} ms but SFX_FILES says ${ms} ms`);
 }
 
@@ -117,13 +118,18 @@ for (const full of walk(path.join(SFX_DIR, "audition"), /\.(wav|mp3|ogg|m4a)$/i)
 
 // Source rules
 const allowedRequire = new Set(["services/sfx.ts", "components/dev/sfx-lab-sources.ts"]);
-const allowedAudio = new Set(["services/sfx.ts", "services/sfx-core.ts", "services/media.ts", "services/media-core.ts", "components/dev/sfx-lab-player.ts"]);
+const allowedAudio = new Set(["services/sfx-backend-expo-audio.ts", "services/media.ts", "services/media-core.ts", "components/dev/sfx-lab-player.ts"]);
+// The audio-api engine: Android only, one file, loaded through a guarded require (docs/features/PERFORMANCE_AND_SOUND_SPEC.md §12.1)
+const allowedAudioApi = new Set(["services/sfx-backend-audio-api.ts"]);
 for (const full of walk(ROOT, SOURCE_EXT)) {
   const r = rel(full);
   const text = fs.readFileSync(full, "utf8").replace(/\/\*[\s\S]*?\*\//g, "").replace(/(^|[^:])\/\/.*$/gm, "$1");
   if (/kent-sfx/.test(text)) fail(`${r}: refers to the unused SFX library (kent-sfx)`);
   if (/assets\/sfx\//.test(text) && !allowedRequire.has(r)) fail(`${r}: requires an effect file; call playSfx("group.name") instead`);
-  if (/from\s+["']expo-audio["']/.test(text) && !allowedAudio.has(r)) fail(`${r}: imports expo-audio; effects go through services/sfx.ts`);
+  if (/from\s+["']expo-audio["']/.test(text) && !allowedAudio.has(r)) fail(`${r}: imports expo-audio; effects go through services/sfx.ts and its engines (services/sfx-backend-expo-audio.ts)`);
+  if (/(from\s+|require\(\s*|import\(\s*)["']react-native-audio-api["']/.test(text) && !allowedAudioApi.has(r)) fail(`${r}: imports react-native-audio-api; only services/sfx-backend-audio-api.ts may, through its guarded require`);
+  if (r === "services/sfx-backend-audio-api.ts" && /^\s*import\s+(?!type\b)[^;]*from\s+["']react-native-audio-api["']/m.test(text)) fail(`${r}: a plain import of react-native-audio-api would load its native module in Expo Go; use the guarded require in loadAudioApi and \`import type\` only`);
+  if (/^services\/(sfx-core|sfx-backend-core|sfx-diag)\.ts$/.test(r) && /from\s+["'](expo-audio|react-native|react-native-audio-api)["']/.test(text)) fail(`${r}: must stay framework-free (node --test runs it)`);
 }
 
 if (problems.length) {

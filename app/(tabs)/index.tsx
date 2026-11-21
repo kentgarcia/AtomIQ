@@ -1,10 +1,14 @@
-import { BetaNoticeModal } from "@/components/ui/beta-notice-modal";
+import { PERF_PROBE_ON } from "@/components/dev/perf-flag";
+import { useRenderTimer } from "@/components/dev/render-timer";
+import { useSfxSet } from "@/components/motion/use-sfx-set";
+import { EventButton } from "@/components/events/EventButton";
+import { Shrodi } from "@/components/mascot/Shrodi";
 import { ModalButton } from "@/components/ui/modal-card";
 import { ModalDialog } from "@/components/ui/modal-dialog";
 import { TopRowHeader, useTabBarInset } from "@/components/layout";
 import { Text } from "@/components/ui/text";
 import { Icon } from "@/components/ui/icon";
-import { BETA_FEEDBACK_FORM_URL, BETA_NOTICE_ID } from "@/constants/beta";
+import { BETA_NOTICE_ID } from "@/constants/beta";
 import { toneColor } from "@/components/lesson/visual/colors";
 import { UnitTeacher } from "@/components/npc/UnitTeacher";
 import type { Reference } from "@/content/curriculum/types";
@@ -12,7 +16,7 @@ import { useCurriculumPath, type CurriculumData } from "@/hooks/use-curriculum";
 import { unitRingProgress } from "@/services/lesson-progress-core";
 import type { PathState } from "@/services/path-core";
 import { openExternalUrl } from "@/services/open-url";
-import { getBetaNoticeSeen, setBetaNoticeSeen } from "@/services/storage";
+import { getBetaNoticeSeen } from "@/services/storage";
 import { useStreakCelebration } from "@/hooks/use-streak-celebration";
 import { useTheme, createStyles, withAlpha, fontFaces, useResponsiveLayout } from "@/theme";
 import { useFocusEffect, useIsFocused, useRouter } from "expo-router";
@@ -31,25 +35,27 @@ import {
     View,
 } from "react-native";
 import Animated, {
-    FadeIn,
-    FadeInDown,
-    FadeOut,
-    FadeOutDown,
-    LinearTransition,
-    useReducedMotion,
+  FadeIn,
+  FadeInDown,
+  FadeOut,
+  FadeOutDown,
+  LinearTransition,
 } from "react-native-reanimated";
+import { useReducedMotion } from "@/components/motion/use-reduced-motion";
 import { DURATION, EASE_OUT } from "@/theme/motion";
 import { LessonNode, type NodeStatus } from "@/components/path/LessonNode";
 import { NodeBubble } from "@/components/path/NodeBubble";
 import { LessonPreviewLayer } from "@/components/lesson/LessonPreviewLayer";
 import { useTutorialTarget } from "@/components/tutorial/use-tutorial-target";
-import { useTourOver, useTutorialBusy } from "@/hooks/use-tutorial";
+import { useTutorialBusy } from "@/hooks/use-tutorial";
 import { emitTutorial } from "@/services/tutorial";
 import { UnitDivider } from "@/components/path/UnitDivider";
 import { loadLessonPreview, type LessonPreviewData } from "@/services/lesson-preview";
-import { unitPalette, type UnitPalette } from "@/components/path/unit-theme";
+import { unitPalette, teacherPalette, type UnitPalette } from "@/components/path/unit-theme";
+import { useUnitBrands } from "@/components/npc/use-unit-brands";
 import { BUBBLE, bubbleHeight, chooseBubbleSide, type BubbleSide } from "@/components/path/node-bubble-core";
 import { NODE } from "@/components/path/node-geometry";
+import { nodeInWindow, windowBand } from "@/components/path/map-window-core";
 import { glyphForNode, type GlyphId } from "@/components/path/node-glyphs";
 
 const NODE_SIZE = NODE.box;
@@ -166,8 +172,12 @@ const DevAdminFab: typeof import("@/components/dev/DevAdminFab").DevAdminFab | n
 // Hidden for now: set SHOW_SFX_LAB to true to bring the button back.
 const SHOW_SFX_LAB = false;
 const SfxLabFab: typeof import("@/components/dev/SfxLabFab").SfxLabFab | null = __DEV__ && SHOW_SFX_LAB ? require("@/components/dev/SfxLabFab").SfxLabFab : null;
+// dev-perf: the button that opens the performance probe (components/dev/PerfProbe.tsx). Present in development builds and in a build made with EXPO_PUBLIC_PERF_PROBE=1 (the preview profile).
+const PerfFab: typeof import("@/components/dev/PerfFab").PerfFab | null = PERF_PROBE_ON ? require("@/components/dev/PerfFab").PerfFab : null;
 
 export default function HomeScreen() {
+  useRenderTimer("/");
+  useSfxSet("home");
   const router = useRouter();
   useStreakCelebration();
   const { data: curriculum, state: pathState, runProgress, loading, refresh } = useCurriculumPath();
@@ -191,42 +201,33 @@ export default function HomeScreen() {
   const [infoOpen, setInfoOpen] = useState(false);
   const [cardUnit, setCardUnit] = useState<CardUnit | null>(null);
   const [arrowDir, setArrowDir] = useState<"up" | "down" | null>(null);
-  const [betaNoticeVisible, setBetaNoticeVisible] = useState(false);
   // The unit whose references and resources are open in their modal
   const [refsUnitId, setRefsUnitId] = useState<string | null>(null);
 
-  /* Public-beta notice — shown once per notice id (see constants/beta.ts), and only once Shrodi's tour is over: a new learner
-     meets Shrodi first, and the notice would otherwise cover the tour's first beat */
-  const tourOver = useTourOver();
-  useEffect(() => {
-    if (!tourOver) return;
-    let cancelled = false;
-    void getBetaNoticeSeen().then((seenId) => {
-      if (!cancelled && seenId !== BETA_NOTICE_ID) {
-        setBetaNoticeVisible(true);
-      }
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, [tourOver]);
-
-  const dismissBetaNotice = useCallback(() => {
-    setBetaNoticeVisible(false);
-    void setBetaNoticeSeen(BETA_NOTICE_ID);
+  /* The beta button opens the beta page (it never opens by itself: a notice over the tour held it busy). Its "!" shows until that
+     page has been opened once for this round, so it is read again each time Home comes back in front. */
+  const [betaUnseen, setBetaUnseen] = useState(false);
+  useFocusEffect(
+    useCallback(() => {
+      let alive = true;
+      void getBetaNoticeSeen().then((seen) => alive && setBetaUnseen(seen !== BETA_NOTICE_ID));
+      return () => {
+        alive = false;
+      };
+    }, []),
+  );
+  // Shrodi on the button cheers when it is tapped, then settles back
+  const [betaMood, setBetaMood] = useState<"smile" | "cheer">("smile");
+  const betaMoodTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => () => {
+    if (betaMoodTimer.current) clearTimeout(betaMoodTimer.current);
   }, []);
-
-  const openBetaFeedback = useCallback(async () => {
-    const opened = await openExternalUrl(BETA_FEEDBACK_FORM_URL);
-    if (!opened) {
-      Alert.alert(
-        "Couldn't open the form",
-        "Please check your internet connection and try again.",
-      );
-      return;
-    }
-    dismissBetaNotice();
-  }, [dismissBetaNotice]);
+  const openBeta = useCallback(() => {
+    setBetaMood("cheer");
+    if (betaMoodTimer.current) clearTimeout(betaMoodTimer.current);
+    betaMoodTimer.current = setTimeout(() => setBetaMood("smile"), 900);
+    router.push("/beta");
+  }, [router]);
 
   useFocusEffect(
     useCallback(() => {
@@ -239,12 +240,16 @@ export default function HomeScreen() {
     () => buildPath(curriculum, pathState, c.textFaint, theme),
     [curriculum, pathState, c.textFaint, theme],
   );
-  // Each unit has its own colours (nodes, bubble, divider, the card on top)
+  // Each unit wears its teacher's colours (nodes, bubble, divider, the card on top); a unit with no teacher yet takes the next of the default set
+  const brands = useUnitBrands();
   const palettes = useMemo(() => {
     const map = new Map<string, UnitPalette>();
-    for (const u of units) map.set(u.id, unitPalette(c, u.position, isDark));
+    for (const u of units) {
+      const brand = brands.get(u.position);
+      map.set(u.id, brand ? teacherPalette(brand, c.lessonHeaderText, isDark) : unitPalette(c, u.position, isDark));
+    }
     return map;
-  }, [units, c, isDark]);
+  }, [units, c, isDark, brands]);
   const completedKey = pathState.currentNodeId ?? "done";
 
   // Finishing a lesson moves "next up" on, and the map announces it (docs/features/SFX_SPEC.md §6.2, and the duolingo-motion-style
@@ -330,11 +335,15 @@ export default function HomeScreen() {
 
   // Where the map is scrolled to, for placing the node bubble
   const scrollYRef = useRef(0);
+  // Which step of scrolling the map is at: only the nodes near the screen are drawn (components/path/map-window-core.ts)
+  const [mapBand, setMapBand] = useState(0);
 
   const handleScroll = useCallback(
     (e: { nativeEvent: { contentOffset: { y: number } } }) => {
       const scrollY = e.nativeEvent.contentOffset.y;
       scrollYRef.current = scrollY;
+      const band = windowBand(scrollY);
+      setMapBand((prev) => (prev === band ? prev : band));
       // The info panel is a peek, not a screen: dismiss it as soon as the
       // map moves so it never covers the path
       setInfoOpen(false);
@@ -393,10 +402,10 @@ export default function HomeScreen() {
       if (prevAutoScrollTarget.current === targetKey) return;
       prevAutoScrollTarget.current = targetKey;
       const timer = setTimeout(() => {
-        scrollViewRef.current?.scrollTo({
-          y: computeNodeScrollY(units, currentUnitIndex, currentRowIndex, viewportHeightRef.current, mapContentPad),
-          animated: false,
-        });
+        const y = computeNodeScrollY(units, currentUnitIndex, currentRowIndex, viewportHeightRef.current, mapContentPad);
+        // Draw the nodes around the target in the same render the jump happens in, so the map is never empty for a frame
+        setMapBand(windowBand(y));
+        scrollViewRef.current?.scrollTo({ y, animated: false });
       }, 100);
       return () => clearTimeout(timer);
     }
@@ -576,7 +585,16 @@ export default function HomeScreen() {
               ) : null}
 
               {/* Nodes */}
-              {unit.levels.map((node, i) => (
+              {unit.levels.map((node, i) => {
+                // Far from the screen a node is not drawn at all; the one the learner is on, the tapped one and a node changing state always are
+                const drawn =
+                  node.status === "current" ||
+                  node.id === selectedNodeId ||
+                  reveal?.completedId === node.id ||
+                  reveal?.unlockedId === node.id ||
+                  nodeInWindow(mapContentPad + unitTop + pathPoints[i].y, NODE.box, mapBand, windowHeight);
+                if (!drawn) return null;
+                return (
                 <LessonNode
                   key={node.id}
                   x={pathPoints[i].x}
@@ -601,7 +619,8 @@ export default function HomeScreen() {
                   }`}
                   onPress={() => selectNode(node, unitTop, pathPoints[i].y)}
                 />
-              ))}
+                );
+              })}
 
               {/* The speech bubble of the tapped node */}
               {unit.levels.map((node, i) =>
@@ -629,6 +648,19 @@ export default function HomeScreen() {
           );
         })}
       </ScrollView>
+
+      {/* The beta event button, just below the lesson card (which covers it while its info is open): opens the beta page; its "!" stays until that page has been opened */}
+      <EventButton
+        label="Beta"
+        accessibilityLabel="Open beta information and feedback"
+        badge={betaUnseen}
+        onPress={openBeta}
+        style={[styles.betaFab, { top: MAP_CARD_TOP + cardHeight + MAP_CARD_GAP - 6 }]}
+      >
+        <View style={styles.betaPicture}>
+          <Shrodi mood={betaMood} size={58} armless />
+        </View>
+      </EventButton>
 
       {/* Floating lesson card — sits over the map, which scrolls behind it */}
       <View style={styles.floatingCard} pointerEvents="box-none">
@@ -764,22 +796,12 @@ export default function HomeScreen() {
       </View>
       </View>
 
-      {/* Reopen the beta notice + feedback form */}
-      <TouchableOpacity
-        style={[styles.betaFab, { bottom: tabBarInset + 16 }]}
-        activeOpacity={0.85}
-        hitSlop={4}
-        onPress={() => setBetaNoticeVisible(true)}
-        accessibilityRole="button"
-        accessibilityLabel="Open beta information and feedback"
-      >
-        <Icon name="InfoCircle" size={20} color="#EA580C" variant="Bold" />
-      </TouchableOpacity>
-
       {/* dev-admin */}
       {DevAdminFab ? <DevAdminFab bottom={tabBarInset + 16} onChanged={refresh} /> : null}
       {/* dev-sfx */}
       {SfxLabFab ? <SfxLabFab bottom={tabBarInset + 16} /> : null}
+      {/* dev-perf */}
+      {PerfFab ? <PerfFab bottom={tabBarInset + 16} /> : null}
 
       {/* Floating "jump to current lesson" arrow */}
       {arrowDir && currentUnitIndex !== -1 && (
@@ -865,12 +887,6 @@ export default function HomeScreen() {
         ))}
       </ModalDialog>
 
-      {/* Public beta notice — shown on startup so testers know what to expect */}
-      <BetaNoticeModal
-        visible={betaNoticeVisible}
-        onDismiss={dismissBetaNotice}
-        onOpenFeedback={() => void openBetaFeedback()}
-      />
     </View>
   );
 }
@@ -1012,20 +1028,19 @@ const makeStyles = createStyles((theme) => {
       backgroundColor: c.onPrimary,
     },
     /* Floating "jump to current lesson" arrow */
-    /* Persistent beta / feedback shortcut (bottom-left, above the tab bar) */
+    /* Beta event button, just under the lesson card on the left */
     betaFab: {
       position: "absolute",
       left: 24,
-      width: 40,
-      height: 40,
-      borderRadius: 14,
+      zIndex: 80,
+    },
+    /* Shrodi's head stands out of the tile's top, its chin behind the band. Placed from the tile's top-left corner; 2 dp to the right because the art's centre is not the head's. */
+    betaPicture: {
+      position: "absolute",
+      left: 1.3,
+      right: -1.3,
+      top: -7,
       alignItems: "center",
-      justifyContent: "center",
-      backgroundColor: c.card,
-      borderWidth: 2,
-      borderColor: c.border,
-      borderBottomWidth: 4,
-      zIndex: 95,
     },
     nextBtn: {
       position: "absolute",

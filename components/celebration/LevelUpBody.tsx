@@ -18,7 +18,9 @@
 
 import { useEffect, useState, type ReactNode } from "react";
 import { View } from "react-native";
-import Animated, { useAnimatedStyle, useReducedMotion } from "react-native-reanimated";
+import Animated, { useAnimatedStyle, useDerivedValue } from "react-native-reanimated";
+import { useReducedMotion } from "@/components/motion/use-reduced-motion";
+import { useFillStyle } from "@/components/ui/progress-fill";
 import Svg, { Path } from "react-native-svg";
 
 import { DIALOG_SETTLE_MS, LEVEL_UNLOCKS, LEVEL_UP, LEVEL_UP_TOTAL, levelBar, levelRays, levelRaysLoop, levelUpButtonAt } from "@/components/celebration/celebration-core";
@@ -95,14 +97,17 @@ const useStyles = createStyles((theme) => {
     line: { alignItems: "center", gap: 8, alignSelf: "stretch" },
     sub: { fontSize: 15, ...fontFaces.bold, color: c.textSecondary, textAlign: "center" },
     track: { alignSelf: "stretch", height: BAR_HEIGHT, borderRadius: BAR_HEIGHT / 2, backgroundColor: c.surfaceSoft, borderWidth: 2, borderColor: c.border, overflow: "hidden" },
-    fill: { height: "100%", borderRadius: BAR_HEIGHT / 2, backgroundColor: c.gold },
+    fill: { width: "100%", height: "100%", borderRadius: BAR_HEIGHT / 2, backgroundColor: c.gold },
   };
 });
 
 /** The dialog's body needs the card's top padding raised so the burst is not clipped by the scrolling body. */
 export const LEVEL_UP_BODY_STYLE = { paddingTop: 16 } as const;
 
-export function LevelUpBody({ level, from, xpIntoLevel = 0, unlocked = [], look }: { level: number; /** The level before the first one gained (1 to 5: from 1); one level back when left out. */ from?: number; /** XP the learner has earned toward the next level, 0 to 99. */ xpIntoLevel?: number; /** The shop items these levels opened. */ unlocked?: readonly ShopItem[]; /** The avatar they are shown on. */ look?: AvatarConfig }) {
+/** A stable empty list: a fresh `[]` default would differ on every render and the render-time sync below would never settle. */
+const NO_ITEMS: readonly ShopItem[] = [];
+
+export function LevelUpBody({ level, from, xpIntoLevel = 0, unlocked = NO_ITEMS, look }: { level: number; /** The level before the first one gained (1 to 5: from 1); one level back when left out. */ from?: number; /** XP the learner has earned toward the next level, 0 to 99. */ xpIntoLevel?: number; /** The shop items these levels opened. */ unlocked?: readonly ShopItem[]; /** The avatar they are shown on. */ look?: AvatarConfig }) {
   const { theme } = useTheme();
   const styles = useStyles(theme);
   const c = theme.colors;
@@ -138,7 +143,8 @@ export function LevelUpBody({ level, from, xpIntoLevel = 0, unlocked = [], look 
     const f = levelRays(clock.get());
     return { opacity: f.opacity, transform: [{ rotate: `${f.rotate}deg` }, { scale: f.scale }] };
   });
-  const fillStyle = useAnimatedStyle(() => ({ width: `${levelBar(barClock.get()) * progress * 100}%` }));
+  const barFill = useDerivedValue(() => levelBar(barClock.get()) * progress);
+  const fillStyle = useFillStyle(barFill);
 
   return (
     <View style={styles.body}>

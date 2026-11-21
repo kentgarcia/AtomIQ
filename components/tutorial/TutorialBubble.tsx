@@ -1,15 +1,12 @@
 /**
- * Shrodi and his line for a beat (docs/features/TUTORIAL_SPEC.md §4.3): the fox beside a typing bubble (`ShrodiSays`, which
- * pops, types and plays the bubble's own sound), small progress dots for a chapter, and the one or two ways to move
- * on: "Got it" on a `look` beat, a quiet "Skip this step" when a `tap` beat has waited, and "Skip tour".
+ * Shrodi and his line for a beat (docs/features/TUTORIAL_SPEC.md §4.3): the still fox beside his bubble (`ShrodiSays` in its
+ * `still` form: no pop, no typing, the line is simply there), small progress dots for a chapter, and the one or two ways to
+ * move on: "Got it" on a `look` beat, a quiet "Skip this step" when a `tap` beat has waited, and "Skip tour". No animation.
  */
 
-import { useEffect } from "react";
 import { Pressable, View } from "react-native";
-import Animated, { useAnimatedStyle, useSharedValue, withTiming, Easing, type SharedValue } from "react-native-reanimated";
 
 import { ShrodiSays } from "@/components/onboarding/ShrodiSays";
-import { TUTORIAL_FX, nudgeX } from "@/components/tutorial/tutorial-fx-core";
 import { Button } from "@/components/ui/button";
 import { Text } from "@/components/ui/text";
 import type { TutorialMood } from "@/services/tutorial-core";
@@ -31,7 +28,6 @@ export interface TutorialBubbleProps {
   /** Progress through the chapter or intro (dots when `total` > 1). */
   index: number;
   total: number;
-  direction: SharedValue<number>;
   /** "Got it" (a `look` beat, or a fallback). */
   onGotIt?: () => void;
   /** A quiet "Skip this step" under a `tap` beat that has waited. */
@@ -39,25 +35,15 @@ export interface TutorialBubbleProps {
   /** "Skip tour" (chapters only), and whether the first tap has been made ("Sure?"). */
   onSkipTour?: () => void;
   confirmSkip: boolean;
-  /** Bumps on every tap of the dim: the bubble shakes. */
-  nudge: number;
   onMeasure: (height: number) => void;
 }
 
-export function TutorialBubble({ text, mood, index, total, direction, onGotIt, onSkipStep, onSkipTour, confirmSkip, nudge, onMeasure }: TutorialBubbleProps) {
+export function TutorialBubble({ text, mood, index, total, onGotIt, onSkipStep, onSkipTour, confirmSkip, onMeasure }: TutorialBubbleProps) {
   const { theme } = useTheme();
   const styles = useStyles(theme);
-  const shake = useSharedValue<number>(TUTORIAL_FX.nudgeMs);
-  useEffect(() => {
-    if (nudge === 0) return;
-    shake.set(0);
-    shake.set(withTiming(TUTORIAL_FX.nudgeMs, { duration: TUTORIAL_FX.nudgeMs, easing: Easing.linear }));
-  }, [nudge, shake]);
-  const shakeStyle = useAnimatedStyle(() => ({ transform: [{ translateX: nudgeX(shake.get()) }] }));
-
   return (
-    <Animated.View style={[styles.wrap, shakeStyle]} onLayout={(e) => onMeasure(e.nativeEvent.layout.height)}>
-      <ShrodiSays text={text} mood={mood} size={64} arrive={{ direction, at: TUTORIAL_FX.foxAt }} />
+    <View style={styles.wrap} onLayout={(e) => onMeasure(e.nativeEvent.layout.height)}>
+      <ShrodiSays text={text} mood={mood} size={64} still typing={false} />
       {total > 1 ? (
         <View style={styles.dots} accessibilityLabel={`Step ${index} of ${total}`} accessible>
           {Array.from({ length: total }, (_, i) => (
@@ -80,6 +66,6 @@ export function TutorialBubble({ text, mood, index, total, direction, onGotIt, o
           </Pressable>
         ) : null}
       </View>
-    </Animated.View>
+    </View>
   );
 }

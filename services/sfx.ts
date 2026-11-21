@@ -1,23 +1,29 @@
 /**
- * Sound effects runtime (docs/features/SFX_SPEC.md §7): the one place that requires an audio file or
- * touches expo-audio for effects. Screens call `playSfx("group.name")`; the catalog, gates
- * and scheduling rules are in `sfx-core.ts` and `media-core.ts`.
+ * Sound effects runtime (docs/features/SFX_SPEC.md §7, docs/features/PERFORMANCE_AND_SOUND_SPEC.md §4 and §12): the one
+ * place that requires an audio file. Screens call `playSfx("group.name")`; the catalog, gates and scheduling rules are in
+ * `sfx-core.ts` and `media-core.ts`, and HOW a sound is played is a backend (`sfx-backend-*.ts`): `react-native-audio-api`
+ * on Android when its native module loads, `expo-audio` everywhere else (`pickBackend`). This file decides whether a cue
+ * plays, records why not (`sfx-diag.ts`), and hands the play to the engine. It never imports an audio library.
  */
-import { createAudioPlayer, setAudioModeAsync, type AudioPlayer } from "expo-audio";
-import { Pressable, TouchableOpacity } from "react-native";
+import { Platform } from "react-native";
 import { canPlayCue } from "./media-core";
 import {
   CUES,
+  SFX_SETS,
   createSfxScheduler,
-  filesOfGroup,
-  pickSlot,
+  filesOfCues,
+  filesOfSet,
   poolSizeOf,
-  SFX_FILES,
   type PlayOptions,
   type SfxCue,
   type SfxFile,
-  type SfxGroup,
+  type SfxSetName,
 } from "./sfx-core";
+import { pickBackend, type BackendId, type SfxBackend } from "./sfx-backend-core";
+import { createAudioApiBackend, loadAudioApi } from "./sfx-backend-audio-api";
+import { createExpoAudioBackend } from "./sfx-backend-expo-audio";
+import { getMotionBudget } from "./device-profile";
+import { sfxDiag } from "./sfx-diag";
 import {
   areMediaPreferencesLoaded,
   ensureMediaPreferencesLoaded,
@@ -161,196 +167,106 @@ const SOURCES: Record<SfxFile, number> = {
   "game/timer-tick": require("../assets/sfx/game/timer-tick.wav"),
 };
 
-/** A native player is not free: keep at most this many alive, least recently used out first. */
-const MAX_LIVE_PLAYERS = 64;
-
-/** A play is reserved on its player for the file's length plus this, so two plays never share one player by accident. */
-const BUSY_MARGIN_MS = 40;
-
-interface Slot {
-  player: AudioPlayer;
-  /** Not played yet, so it is still at 0 and needs no seek. */
-  fresh: boolean;
-  /** Back at 0 after its last play (rewound in the background), so the next play needs no seek and no waiting. */
-  rewound: boolean;
-  /** Reserved until then (from the moment it is taken, before it has started): never given to a second play, never evicted. */
-  busyUntil: number;
-  /** Counts plays, so a late rewind knows it has been overtaken. */
-  gen: number;
-}
-
-/** Insertion order is recency order: a used file is re-inserted at the end. */
-const pools = new Map<SfxFile, Slot[]>();
 const scheduler = createSfxScheduler();
-let stingerPlayer: AudioPlayer | null = null;
-let audioModeConfigured = false;
-let handlersInstalled = false;
 
-const configureAudioMode = async () => {
-  if (audioModeConfigured) return;
-  try {
-    // Effects mix with other apps (no audio-focus steal on Android), play in silent mode (iOS),
-    // never record and never run in the background.
-    await setAudioModeAsync({
-      playsInSilentMode: true,
-      interruptionMode: "mixWithOthers",
-      allowsRecording: false,
-      shouldPlayInBackground: false,
-    });
-  } catch (error) {
-    console.warn("Unable to configure audio mode for SFX:", error);
-  } finally {
-    audioModeConfigured = true;
-  }
+/* ------------------------------------------------------------------ */
+/* The engine                                                          */
+/* ------------------------------------------------------------------ */
+
+let backend: SfxBackend | null = null;
+let pickReason = "";
+let configuring: Promise<void> | null = null;
+/** The stinger that is sounding, so a newer one can stop it. */
+let stingerFile: SfxFile | null = null;
+
+const makeExpoAudio = (): SfxBackend => createExpoAudioBackend(SOURCES, getMotionBudget().playerCap);
+
+/** Chosen once, on first use. `pickBackend` is the only place the platform split lives. */
+const getBackend = (): SfxBackend => {
+  if (backend) return backend;
+  const api = Platform.OS === "android" ? loadAudioApi() : null;
+  const pick = pickBackend({ os: Platform.OS, moduleLoaded: api !== null, override: process.env.EXPO_PUBLIC_SFX_BACKEND });
+  pickReason = pick.reason;
+  backend = pick.id === "audio-api" && api ? createAudioApiBackend(api, SOURCES) : makeExpoAudio();
+  return backend;
 };
 
-const removeSlot = (slot: Slot) => {
-  try {
-    slot.player.remove();
-  } catch {
-    // Ignore unload failures.
-  }
-};
-
-/** Files that are never evicted: the ones a screen needs at the end of a long stretch of other sounds. */
-const pinned = new Set<SfxFile>();
-
-/** Time-based, so judging a file costs no native call (a player's `playing` is one per slot). */
-const isBusy = (slots: Slot[], now: number): boolean => slots.some((s) => now < s.busyUntil);
-
-const evictIfNeeded = () => {
-  let live = 0;
-  for (const slots of pools.values()) live += slots.length;
-  if (live <= MAX_LIVE_PLAYERS) return;
-  const now = Date.now();
-  for (const [file, list] of [...pools]) {
-    if (live <= MAX_LIVE_PLAYERS) return;
-    // The least recently used file that is not reserved or sounding right now (cutting one off is worse than a spare player)
-    if (pinned.has(file) || isBusy(list, now)) continue;
-    list.forEach(removeSlot);
-    pools.delete(file);
-    live -= list.length;
-  }
-};
-
-const touch = (file: SfxFile, slots: Slot[]) => {
-  pools.delete(file);
-  pools.set(file, slots);
-};
-
-const createSlot = (file: SfxFile): Slot => ({ player: createAudioPlayer(SOURCES[file]), fresh: true, rewound: true, busyUntil: 0, gen: 0 });
-
-/** The player for the next play of `file`: a free one (already at 0 first), a new one, or the one that has been busy the longest. */
-const takeSlot = (file: SfxFile, now: number): Slot => {
-  const slots = pools.get(file) ?? [];
-  const size = poolSizeOf(file);
-  const pick = pickSlot(slots, size, now);
-  let created = false;
-  if (pick === "new") {
-    slots.push(createSlot(file));
-    created = true;
-  }
-  const slot = pick === "new" ? slots[slots.length - 1] : slots[pick];
-  touch(file, slots);
-  if (created || slots.length === 1) evictIfNeeded();
-  return slot;
-};
-
-/** Create the first player of each file that has none yet, a few per turn, so warming a group never stalls the screen it opens with. */
-const WARM_CHUNK = 3;
-const warmFiles = (files: readonly SfxFile[]): void => {
-  const todo = files.filter((f) => (pools.get(f) ?? []).length === 0);
-  const step = () => {
-    for (const file of todo.splice(0, WARM_CHUNK)) {
-      try {
-        if ((pools.get(file) ?? []).length === 0) {
-          touch(file, [createSlot(file)]);
-          evictIfNeeded();
-        }
-      } catch (error) {
-        console.warn(`Unable to preload ${file} SFX:`, error);
-      }
-    }
-    if (todo.length > 0) setTimeout(step, 16);
-  };
-  step();
-};
-
-/** Create the first player of the files these cues use, so the first step or jump of a level is not the load. */
-export const warmSfxCues = (cues: readonly SfxCue[]): void => {
-  warmFiles([...new Set(cues.map((c) => CUES[c].file))]);
-};
-
-/** Create the first player of every file in a group, so the first play is not the load. */
-export const warmSfxGroup = (group: SfxGroup): void => {
-  warmFiles(filesOfGroup(group));
-};
-
-/**
- * A player made just now (its file was evicted from the pool, or never warmed) has not loaded its
- * source yet, and `play()` on it can be silently dropped. Wait for it to load, but never longer than
- * `timeoutMs`, so a cue is late at worst rather than lost.
- */
-const whenLoaded = (player: AudioPlayer, timeoutMs = 1500): Promise<void> =>
-  new Promise((resolve) => {
+/** Start the engine once. If the audio-api engine cannot start, the app switches to expo-audio instead of going silent. */
+const ensureConfigured = (): Promise<void> => {
+  if (configuring) return configuring;
+  configuring = (async () => {
+    const engine = getBackend();
     try {
-      if (player.isLoaded) {
-        resolve();
-        return;
+      await engine.configure();
+    } catch (error) {
+      if (engine.id === "audio-api") {
+        console.warn("The audio-api engine could not start; using expo-audio:", error);
+        pickReason = "audio-api failed to start";
+        void engine.unload().catch(() => {});
+        backend = makeExpoAudio();
+        await backend.configure();
+      } else {
+        console.warn("Unable to configure audio for SFX:", error);
       }
-      let done = false;
-      let timer: ReturnType<typeof setTimeout> | undefined;
-      const sub = player.addListener("playbackStatusUpdate", (status) => {
-        if (status.isLoaded) finish();
-      });
-      function finish() {
-        if (done) return;
-        done = true;
-        if (timer) clearTimeout(timer);
-        try {
-          sub.remove();
-        } catch {
-          // The player may already be gone.
-        }
-        resolve();
-      }
-      timer = setTimeout(finish, timeoutMs);
-    } catch {
-      resolve();
     }
-  });
+  })();
+  return configuring;
+};
+
+/** For the perf probe: which engine runs, why, and how much it holds. */
+export const getSfxEngineInfo = (): { backend: BackendId; reason: string; live: number } => {
+  const engine = getBackend();
+  return { backend: engine.id, reason: pickReason, live: engine.liveCount() };
+};
+
+/* ------------------------------------------------------------------ */
+/* Warming                                                             */
+/* ------------------------------------------------------------------ */
+
+/** Get a screen's sounds ready (a few per turn, so warming never stalls the screen it opens with). */
+export const warmSfxSet = (name: SfxSetName): void => {
+  try {
+    getBackend().warm(filesOfSet(name));
+  } catch (error) {
+    console.warn(`Unable to warm the ${name} SFX set:`, error);
+  }
+};
+
+/** A screen was left: its sounds may be let go when room is needed (not at once: the next screen may use them). */
+export const releaseSfxSet = (name: SfxSetName): void => {
+  // `core` is never released; a file another warm set also lists stays with that set until it is released too.
+  if (name === "core") return;
+  try {
+    getBackend().release(filesOfSet(name));
+  } catch {
+    // Nothing to release.
+  }
+};
+
+/** Get the files of these cues ready, for a screen whose list depends on its data (the Atom Maze's ground). */
+export const warmSfxCues = (cues: readonly SfxCue[]): void => {
+  try {
+    getBackend().warm(filesOfCues(cues));
+  } catch (error) {
+    console.warn("Unable to warm SFX cues:", error);
+  }
+};
 
 /**
- * Load a cue's file now and keep it loaded (never evicted) until the app closes. For a cue that
- * comes at the end of a long stretch of other sounds, such as the finish jingle after a lesson or a
- * game, when a least-recently-used file would otherwise have been unloaded by then.
+ * Load a cue's file now and keep it (never let go) until the app closes. For a cue that comes at the end of a long
+ * stretch of other sounds, such as the finish jingle after a lesson or a game.
  */
 export const pinSfx = (cueId: SfxCue): void => {
-  const file = CUES[cueId].file;
-  pinned.add(file);
-  warmFiles([file]);
+  try {
+    getBackend().pin(CUES[cueId].file);
+  } catch (error) {
+    console.warn(`Unable to pin ${cueId} SFX:`, error);
+  }
 };
 
-/** After a play has ended, put its player back at 0 in the background, so the next play starts at once instead of waiting for a seek. */
-const rewindLater = (slot: Slot, file: SfxFile, rate: number) => {
-  const gen = slot.gen;
-  const after = Math.ceil(SFX_FILES[file] / Math.max(rate, 0.25)) + BUSY_MARGIN_MS + 20;
-  setTimeout(() => {
-    if (slot.gen !== gen) return;
-    try {
-      // A finished player still wants to play (its play flag stays on), so a bare seek back to 0 would start it again: pause first.
-      slot.player.pause();
-      void slot.player
-        .seekTo(0)
-        .then(() => {
-          if (slot.gen === gen) slot.rewound = true;
-        })
-        .catch(() => {});
-    } catch {
-      // The player may already be gone.
-    }
-  }, after);
-};
+/* ------------------------------------------------------------------ */
+/* Playing                                                             */
+/* ------------------------------------------------------------------ */
 
 /** Play one cue. Never throws; safe to call with `void`. */
 export const playSfx = async (cueId: SfxCue, options?: PlayOptions): Promise<void> => {
@@ -369,46 +285,39 @@ export const playSfx = async (cueId: SfxCue, options?: PlayOptions): Promise<voi
         readAloudStatus === "speaking" || readAloudStatus === "loading",
       )
     ) {
+      sfxDiag.record(cueId, "gate");
       return;
     }
 
-    const now = Date.now();
-    const plan = scheduler.plan(cueId, now, options);
-    if (!plan.play) return;
-
-    if (!audioModeConfigured) await configureAudioMode();
-    if (plan.stopStinger && stingerPlayer) {
-      try {
-        stingerPlayer.pause();
-      } catch {
-        // The old stinger may already be gone.
-      }
+    const plan = scheduler.plan(cueId, Date.now(), options);
+    if (!plan.play) {
+      sfxDiag.record(cueId, plan.reason === "gap" ? "skip-gap" : plan.reason === "burst" ? "skip-burst" : "skip-duck");
+      return;
     }
 
-    // Reserve the player before anything yields: a second play of this file in the same tick goes to another one.
-    const slot = takeSlot(def.file, now);
-    const { player } = slot;
-    slot.gen += 1;
-    slot.busyUntil = now + Math.ceil(SFX_FILES[def.file] / Math.max(plan.rate, 0.25)) + BUSY_MARGIN_MS;
-    if (!player.isLoaded) await whenLoaded(player);
-    player.volume = plan.volume;
-    // A higher rate is a higher pitch only when pitch correction is off (§7.5).
-    const correct = plan.rate === 1;
-    if (player.shouldCorrectPitch !== correct) player.shouldCorrectPitch = correct;
-    player.setPlaybackRate(plan.rate);
-    if (!slot.fresh && !slot.rewound) {
-      try {
-        await player.seekTo(0);
-      } catch {
-        // Seek can fail before the source finishes loading; play anyway.
-      }
+    if (!configuring) await ensureConfigured();
+    else await configuring;
+    const engine = getBackend();
+    if (plan.stopStinger && stingerFile) engine.stop(stingerFile);
+    if (def.category === "stinger") stingerFile = def.file;
+
+    const result = await engine.play({
+      cue: cueId,
+      file: def.file,
+      volume: plan.volume,
+      rate: plan.rate,
+      pool: poolSizeOf(def.file),
+      category: def.category,
+    });
+    if (result.outcome === "late") sfxDiag.record(cueId, "late", { ms: result.ms });
+    else if (result.outcome === "played") sfxDiag.record(cueId, "played");
+    else if (result.outcome === "lost") sfxDiag.record(cueId, "lost", { detail: result.reason });
+    else {
+      sfxDiag.record(cueId, "error", { detail: result.message });
+      console.warn(`Unable to play ${cueId} SFX:`, result.message);
     }
-    slot.fresh = false;
-    slot.rewound = false;
-    if (def.category === "stinger") stingerPlayer = player;
-    player.play();
-    rewindLater(slot, def.file, plan.rate);
   } catch (error) {
+    sfxDiag.record(cueId, "error", { detail: error instanceof Error ? error.message : String(error) });
     console.warn(`Unable to play ${cueId} SFX:`, error);
   }
 };
@@ -430,18 +339,10 @@ export const playSfxSequence = (steps: readonly { cue: SfxCue; at: number; optio
 
 /** Stop a cue that is still playing (a long one when its screen is left). Quietly does nothing if it is not. */
 export const stopSfx = (cueId: SfxCue): void => {
-  const file = CUES[cueId].file;
-  const now = Date.now();
-  for (const slot of pools.get(file) ?? []) {
-    if (now >= slot.busyUntil) continue;
-    try {
-      slot.player.pause();
-    } catch {
-      // The player may already be gone.
-    }
-    slot.rewound = false;
-    slot.busyUntil = 0;
-    slot.gen += 1;
+  try {
+    getBackend().stop(CUES[cueId].file);
+  } catch {
+    // Nothing to stop.
   }
 };
 
@@ -450,39 +351,29 @@ export const setSfxPathname = (pathname: string): void => {
   setMediaPathname(pathname);
 };
 
+/**
+ * Start the engine and, once the first screen has drawn, get the sounds every screen needs ready. Warming does not
+ * happen in the root effect: it would land while the splash is hiding and the first screen's entrance is running,
+ * on the thread that draws.
+ */
 export const initializeSfx = async (): Promise<void> => {
-  await configureAudioMode();
-  warmSfxGroup("ui");
-  warmSfxGroup("lesson");
+  await ensureConfigured();
+  // InteractionManager is gone from React Native: one frame to let the first screen draw, then a pause
+  requestAnimationFrame(() => {
+    setTimeout(() => warmSfxSet("core"), 400);
+  });
   await ensureMediaPreferencesLoaded();
 };
 
-/** Every Pressable and TouchableOpacity clicks on press-in; the route policy decides where it is heard. */
-export const installGlobalUiSfxHandlers = (): void => {
-  if (handlersInstalled) return;
-
-  const touchableOpacityAny = TouchableOpacity as any;
-  touchableOpacityAny.defaultProps = touchableOpacityAny.defaultProps || {};
-  const originalTouchableOnPressIn = touchableOpacityAny.defaultProps.onPressIn;
-  touchableOpacityAny.defaultProps.onPressIn = (event: unknown) => {
-    void playSfx("ui.press");
-    originalTouchableOnPressIn?.(event);
-  };
-
-  const pressableAny = Pressable as any;
-  pressableAny.defaultProps = pressableAny.defaultProps || {};
-  const originalPressableOnPressIn = pressableAny.defaultProps.onPressIn;
-  pressableAny.defaultProps.onPressIn = (event: unknown) => {
-    void playSfx("ui.press");
-    originalPressableOnPressIn?.(event);
-  };
-
-  handlersInstalled = true;
-};
-
 export const unloadSfx = async (): Promise<void> => {
-  for (const slots of pools.values()) slots.forEach(removeSlot);
-  pools.clear();
-  stingerPlayer = null;
+  const old = backend;
+  backend = null;
+  configuring = null;
+  stingerFile = null;
   scheduler.reset();
+  await old?.unload();
 };
+
+// Re-exported so a caller never needs sfx-core for a set name
+export { SFX_SETS };
+export type { SfxSetName };
