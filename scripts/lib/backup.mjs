@@ -10,7 +10,7 @@ import path from "node:path";
 import { DatabaseSync } from "node:sqlite";
 
 import { makePaths } from "./content-paths.mjs";
-import { diffDatabases, listContentTables } from "./content-tables.mjs";
+import { contentHash, diffDatabases, listContentTables } from "./content-tables.mjs";
 
 export const BACKUP_REASONS = ["auto-daily", "pre-publish", "pre-restore", "pre-script", "manual"];
 
@@ -73,6 +73,26 @@ function mirrorBackup(file) {
   } catch (err) {
     console.warn(`[backup] Could not copy to ATOMIQ_BACKUP_DIR: ${err.message}`);
   }
+}
+
+/**
+ * A restore point for the current master, unless the newest backup already holds exactly this
+ * content (a re-run, or edits that changed nothing, then costs no extra file).
+ * @returns {{ file: string, created: boolean }}
+ */
+export function backupUnlessIdentical(paths, reason, label) {
+  const newest = listBackups(paths)[0];
+  if (newest) {
+    const a = new DatabaseSync(paths.master, { readOnly: true });
+    const b = new DatabaseSync(newest.file, { readOnly: true });
+    try {
+      if (contentHash(a) === contentHash(b)) return { file: newest.file, created: false };
+    } finally {
+      a.close();
+      b.close();
+    }
+  }
+  return { file: createBackup(paths, reason, label), created: true };
 }
 
 /** @returns {Array<{ file: string, name: string, path: string, reason: string, label: string|null, createdAt: string, size: number }>} newest first */

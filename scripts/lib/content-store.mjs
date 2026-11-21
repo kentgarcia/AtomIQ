@@ -141,6 +141,19 @@ function insertRow(db, table, row) {
     .get(...cols.map((c) => row[c]));
 }
 
+/** JSON in, SQLite out: objects and arrays become JSON text, booleans 0/1 (the same shape Studio's save path stores). */
+export function dehydrateValues(values, jsonCols = new Set()) {
+  const out = {};
+  for (const [k, v] of Object.entries(values ?? {})) {
+    if (v === undefined) continue;
+    if (v !== null && typeof v === "object") out[k] = JSON.stringify(v);
+    else if (jsonCols.has(k) && typeof v !== "string") out[k] = JSON.stringify(v);
+    else if (typeof v === "boolean") out[k] = v ? 1 : 0;
+    else out[k] = v;
+  }
+  return out;
+}
+
 // ---------------------------------------------------------------------------
 // History database
 // ---------------------------------------------------------------------------
@@ -256,6 +269,14 @@ export function createStore({ db, history, paths }) {
 
   function shippedIds(table) {
     return SHIPPED_ID_TABLES.includes(table) ? new Set(readShipped(paths)[table] ?? []) : new Set();
+  }
+
+  /** Append a retired shipped id (and why) to content/retired-ids.json so validation accepts its absence. */
+  function recordRetired(table, id, reason) {
+    const retired = readRetired(paths);
+    retired[table] = { ...(retired[table] ?? {}), [id]: `${reason.trim()} (${new Date().toISOString().slice(0, 10)})` };
+    fs.mkdirSync(path.dirname(paths.retiredIds), { recursive: true });
+    fs.writeFileSync(paths.retiredIds, `${JSON.stringify(retired, null, 2)}\n`);
   }
 
   /**
@@ -401,12 +422,7 @@ export function createStore({ db, history, paths }) {
           return [ref];
         },
       });
-      if (isTopLevel && shippedIds(table).has(id)) {
-        const retired = readRetired(paths);
-        retired[table] = { ...(retired[table] ?? {}), [id]: `${retireReason.trim()} (${new Date().toISOString().slice(0, 10)})` };
-        fs.mkdirSync(path.dirname(paths.retiredIds), { recursive: true });
-        fs.writeFileSync(paths.retiredIds, `${JSON.stringify(retired, null, 2)}\n`);
-      }
+      if (isTopLevel && shippedIds(table).has(id)) recordRetired(table, id, retireReason);
       return { ok: true };
     },
 
@@ -525,6 +541,199 @@ export function createStore({ db, history, paths }) {
         },
       });
       return { ok: true };
+    },
+
+    /**
+     * Apply many edits as ONE transaction with ONE validation pass and one history entry per entity
+     * touched: all of it commits or none of it does. This is the path for bulk work (an agent's
+     * edits, a rewrite of many rows); a call per row would re-validate the whole database each time.
+     *
+     * Operations (JSON, so a patch file can hold them). `pk` is a string or an array for a
+     * composite key; `where` is column equality; `expect` asserts how many rows match.
+     *   { op: "update",  table, pk | where, set: { col: value }, expect? }
+     *   { op: "replace", table, column, find, with, where?, expect? }   text find and replace in one column
+     *   { op: "insert",  table, values: { col: value } }
+     *   { op: "delete",  table, pk | where, retire?, expect? }          `retire` is needed for a shipped id
+     * An update, replace or delete that matches nothing is an error unless `optional: true`, so a
+     * typo cannot pass as a no-op. Later operations see the rows earlier ones inserted.
+     *
+     * @returns {{ changes: Array<{ op: string, table: string, pk: string[], fields?: Record<string, [unknown, unknown]>, values?: object, row?: object }>, warnings: object[], skipped: number }}
+     */
+    applyBatch({ ops, source }) {
+      if (!Array.isArray(ops) || ops.length === 0) throw new StoreError("A batch needs at least one operation");
+      const OPS = ["update", "replace", "insert", "delete"];
+      const changes = [];
+      const retiring = [];
+      let skipped = 0;
+
+      const keyOf = (table, row) => tableInfo(db, table).pkCols.map((c) => String(row[c]));
+      const columnsOf = (table) => new Set(tableInfo(db, table).cols.map((c) => c.name));
+      const needColumns = (table, names) => {
+        const known = columnsOf(table);
+        for (const n of names) if (!known.has(n)) throw new StoreError(`${table} has no column "${n}"`);
+      };
+      const asKey = (table, pk) => {
+        const { pkCols } = tableInfo(db, table);
+        const parts = Array.isArray(pk) ? pk.map(String) : [String(pk)];
+        if (parts.length !== pkCols.length) throw new StoreError(`${table} has a ${pkCols.length}-part key (${pkCols.join(", ")})`);
+        return parts;
+      };
+
+      /** Rows an operation points at right now (possibly none). */
+      const targets = (op) => {
+        if (typeof op.table !== "string") throw new StoreError("Missing table");
+        const { pkCols } = tableInfo(db, op.table);
+        if (op.pk != null) {
+          const { where, params } = whereFor(pkCols, asKey(op.table, op.pk));
+          const row = db.prepare(`SELECT * FROM ${ident(op.table)} WHERE ${where}`).get(...params);
+          return row ? [row] : [];
+        }
+        const cond = dehydrateValues(op.where ?? {});
+        const keys = Object.keys(cond);
+        needColumns(op.table, keys);
+        if (!keys.length && op.op !== "replace") throw new StoreError(`${op.op} needs "pk" or "where"`);
+        const clause = keys.length ? ` WHERE ${keys.map((k) => `${ident(k)} IS ?`).join(" AND ")}` : "";
+        return db.prepare(`SELECT * FROM ${ident(op.table)}${clause}`).all(...keys.map((k) => cond[k]));
+      };
+
+      // Refs of the rows that exist before anything runs, so history can show before and after.
+      const beforeRefs = [];
+      for (const op of ops) {
+        if (!OPS.includes(op?.op) || op.op === "insert") continue;
+        try {
+          for (const row of targets(op)) beforeRefs.push(entityRefFor(db, op.table, row));
+        } catch {
+          /* reported properly when the operation runs */
+        }
+      }
+
+      const writeRow = (table, row, values) => {
+        const { pkCols, cols } = tableInfo(db, table);
+        const fields = {};
+        for (const [c, v] of Object.entries(values)) if (!Object.is(row[c], v)) fields[c] = [row[c], v];
+        const sets = Object.keys(fields);
+        if (!sets.length) {
+          skipped++;
+          return null;
+        }
+        for (const c of pkCols) {
+          if (c in fields && shippedIds(table).has(String(row[c]))) {
+            throw new StoreError(`Cannot rename ${table} id "${row[c]}": it has shipped. Create a new id and retire the old one.`, 409);
+          }
+        }
+        const { where, params } = whereFor(pkCols, keyOf(table, row));
+        const stamp = !("updated_at" in values) && cols.some((c) => c.name === "updated_at");
+        db.prepare(
+          `UPDATE ${ident(table)} SET ${sets.map((c) => `${ident(c)} = ?`).join(", ")}${stamp ? ", updated_at = strftime('%s', 'now')" : ""} WHERE ${where}`,
+        ).run(...sets.map((c) => values[c]), ...params);
+        const newKey = pkCols.map((c) => (c in values ? String(values[c]) : String(row[c])));
+        const next = whereFor(pkCols, newKey);
+        const updated = db.prepare(`SELECT * FROM ${ident(table)} WHERE ${next.where}`).get(...next.params);
+        changes.push({ op: "update", table, pk: newKey, fields });
+        return updated;
+      };
+
+      const expectCount = (op, found) => {
+        if (op.expect != null && op.expect !== found) throw new StoreError(`expected ${op.expect} row(s) but ${found} matched`);
+        if (op.expect == null && found === 0 && !op.optional) throw new StoreError("matched no rows (add optional: true if that is fine)");
+      };
+
+      const run = (op) => {
+        if (!OPS.includes(op?.op)) throw new StoreError(`Unknown operation "${op?.op}" (use ${OPS.join(", ")})`);
+        const { jsonCols } = tableInfo(db, op.table ?? "");
+        if (op.op === "insert") {
+          needColumns(op.table, Object.keys(op.values ?? {}));
+          const stored = insertRow(db, op.table, dehydrateValues(op.values, jsonCols));
+          changes.push({ op: "insert", table: op.table, pk: keyOf(op.table, stored), values: op.values });
+          return [entityRefFor(db, op.table, stored)];
+        }
+        if (op.op === "update") {
+          needColumns(op.table, Object.keys(op.set ?? {}));
+          if (!Object.keys(op.set ?? {}).length) throw new StoreError("update needs a non-empty set");
+          const rows = targets(op);
+          expectCount(op, rows.length);
+          const values = dehydrateValues(op.set, jsonCols);
+          const refs = [];
+          for (const row of rows) {
+            const updated = writeRow(op.table, row, values);
+            if (updated) refs.push(entityRefFor(db, op.table, updated));
+          }
+          return refs;
+        }
+        if (op.op === "replace") {
+          needColumns(op.table, [op.column]);
+          if (typeof op.find !== "string" || !op.find || typeof op.with !== "string") throw new StoreError('replace needs a non-empty "find" and a "with" string');
+          // Inside a JSON column both sides are compared as they are stored (escaped).
+          const esc = jsonCols.has(op.column) ? (t) => JSON.stringify(t).slice(1, -1) : (t) => t;
+          const [find, to] = [esc(op.find), esc(op.with)];
+          const rows = targets(op).filter((r) => typeof r[op.column] === "string" && r[op.column].includes(find));
+          expectCount(op, rows.length);
+          const refs = [];
+          for (const row of rows) {
+            const updated = writeRow(op.table, row, { [op.column]: row[op.column].split(find).join(to) });
+            if (updated) refs.push(entityRefFor(db, op.table, updated));
+          }
+          return refs;
+        }
+        // delete
+        const rows = targets(op);
+        expectCount(op, rows.length);
+        const refs = [];
+        for (const row of rows) {
+          const ref = entityRefFor(db, op.table, row);
+          const topLevel = ref.table === op.table && !PARENT_OF[op.table];
+          const shipped = topLevel && shippedIds(op.table).has(ref.pk[0]);
+          if (shipped && !op.retire?.trim()) {
+            throw new StoreError(`"${ref.pk[0]}" has shipped to users. Deleting it retires the id: add "retire": "<reason>".`, 409, { needsReason: true, table: op.table, id: ref.pk[0] });
+          }
+          const { where, params } = whereFor(tableInfo(db, op.table).pkCols, keyOf(op.table, row));
+          db.prepare(`DELETE FROM ${ident(op.table)} WHERE ${where}`).run(...params);
+          if (shipped) retiring.push([op.table, ref.pk[0], op.retire]);
+          changes.push({ op: "delete", table: op.table, pk: keyOf(op.table, row), row });
+          refs.push(ref);
+        }
+        return refs;
+      };
+
+      // Some rules look across rows (a chat thread is the nodes that point at each other: a deleted node
+      // breaks the ones that point at it, an unreachable node is blamed on the orphan). Those findings land
+      // on rows the batch never touched, so the per-entity check would let them through. Any error that is
+      // new anywhere in the database fails the batch.
+      const findingKey = (f) => `${f.table}|${f.id}|${f.rule}`;
+      // A shipped id deleted in this batch is retired in the file only after the commit, so count it as retired here.
+      const fullErrors = () => {
+        const retired = structuredClone(readRetired(paths));
+        for (const [table, id, reason] of retiring) retired[table] = { ...(retired[table] ?? {}), [id]: reason };
+        return validateDatabase(db, { shipped: readShipped(paths), retired }).errors;
+      };
+      const knownErrors = new Set(fullErrors().map(findingKey));
+
+      const out = transact({
+        source,
+        action: "write",
+        beforeRefs,
+        work: () => {
+          const refs = new Map();
+          for (const [i, op] of ops.entries()) {
+            try {
+              for (const ref of run(op)) refs.set(`${ref.table}@${refKey(ref)}`, ref);
+            } catch (err) {
+              const label = `op ${i + 1} (${op?.op} ${op?.table ?? "?"})`;
+              if (err instanceof StoreError) throw Object.assign(new StoreError(`${label}: ${err.message}`, err.status), { ...err, message: `${label}: ${err.message}` });
+              if (/constraint failed/i.test(String(err?.message))) throw new StoreError(`${label}: the database rejected this: ${err.message}`, 422);
+              throw err;
+            }
+          }
+          const touched = [...refs.values()];
+          const elsewhere = fullErrors().filter((f) => !knownErrors.has(findingKey(f)) && !touched.some((ref) => findingBelongsTo(f, ref)));
+          if (elsewhere.length) {
+            throw new StoreError(`This change breaks ${elsewhere.length} thing(s) outside the rows it edits`, 422, { errors: elsewhere, warnings: [] });
+          }
+          return touched;
+        },
+      });
+      for (const [table, id, reason] of retiring) recordRetired(table, id, reason);
+      return { changes, warnings: out.warnings, skipped };
     },
 
     validateEntity,

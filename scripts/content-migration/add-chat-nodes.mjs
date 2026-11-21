@@ -60,21 +60,23 @@ const node = (id, npc, kind, pose, text, replies = [], trigger = null, title = n
 // on a callback to an earlier chat.
 const HAL = [
   // ---- free chat -------------------------------------------------------------------------------------------------------------------
-  node("chat-hal-greeting", "npc-hal", "greeting", "greet", "Ah. Hello.\n\nI was in the middle of weighing a rock, but it will keep. Rocks are good at that.\n\nWhat can I do for you?", [
-    reply("what are you up to?", "chat-hal-upto"),
-    reply("what should I do next?", "chat-hal-next"),
-    reply("quiz me", "chat-hal-quiz"),
-    reply("can you remind me of something?", "chat-hal-remind"),
-    reply("what's in your satchel?", "chat-hal-satchel"),
-    reply("ok bye", "chat-hal-bye"),
+  // Hal does not offer a menu, he reads out a list: four things and a fifth, numbered, and the learner answers with a number. The
+  // spokes that used to hang off the greeting (what he is doing, the satchel) now sit behind "four", with his rocks.
+  node("chat-hal-greeting", "npc-hal", "greeting", "greet", "Ah. Hello.\n\nI was in the middle of weighing a rock, but it will keep. Rocks are good at that.\n\nI can do four things. One: tell you what is next. Two: remind you of something. Three: ask you a question. Four: tell you about a rock.\n\nOr five. Nothing. Nothing is underrated.", [
+    reply("one, please", "chat-hal-next"),
+    reply("two, please", "chat-hal-remind"),
+    reply("three, please", "chat-hal-quiz"),
+    reply("four, please", "chat-hal-rocks"),
+    reply("five", "chat-hal-nothing"),
+    reply("goodbye, Hal", "chat-hal-bye"),
   ]),
-  node("chat-hal-menu", "npc-hal", "reply", "idle", "Hm. Yes?\n\nTake your time. I am not going anywhere, and neither is the rock.", [
-    reply("what are you up to?", "chat-hal-upto"),
-    reply("what should I do next?", "chat-hal-next"),
-    reply("quiz me", "chat-hal-quiz"),
-    reply("can you remind me of something?", "chat-hal-remind"),
-    reply("what's in your satchel?", "chat-hal-satchel"),
-    reply("ok bye", "chat-hal-bye"),
+  node("chat-hal-menu", "npc-hal", "reply", "idle", "Hm. Yes?\n\nThe list, then. One: what is next. Two: a reminder. Three: a question. Four: a rock. Five: nothing.\n\nTake your time. I am not going anywhere, and neither is the rock.", [
+    reply("one, please", "chat-hal-next"),
+    reply("two, please", "chat-hal-remind"),
+    reply("three, please", "chat-hal-quiz"),
+    reply("four, please", "chat-hal-rocks"),
+    reply("five", "chat-hal-nothing"),
+    reply("goodbye, Hal", "chat-hal-bye"),
   ]),
   node("chat-hal-next", "npc-hal", "reply", "point", "There is a next lesson waiting on your map.\n\nI would go now, while you are still warm. Warm is the right temperature for learning. I read that somewhere. Possibly I wrote it.", [
     reply("Take me there", null, { screen: "next-lesson" }),
@@ -87,6 +89,8 @@ const HAL = [
   node("chat-hal-remind", "npc-hal", "reply", "think", "Certainly. I keep my notes in order, as it happens.\n\nWhich page?", [
     reply("the nucleus", "chat-hal-nucleus"),
     reply("isotopes", "chat-hal-isotope"),
+    reply("what makes an element?", "chat-hal-element"),
+    reply("electrons", "chat-hal-electron"),
     reply("never mind", "chat-hal-menu"),
   ]),
   node("chat-hal-nucleus", "npc-hal", "reply", "explain", "The nucleus.\n\nThe tiny core of an atom. The protons and the neutrons live in it, and so does nearly all of the atom's mass.\n\nSmall. Dense. Rather like a good paperweight.", [
@@ -242,24 +246,65 @@ const HAL = [
     reply("A quick round first", null, { screen: "mythbuster", id: "inside-the-atom" }),
     reply("not today, sorry", "chat-hal-bye"),
   ]),
+
+  // ---- free chat, continued: the list's "four" and "five", and two more pages in his notes. Kept at the end of the list so that the
+  // stories above keep their positions. ---------------------------------------------------------------------------------------------
+  node("chat-hal-rocks", "npc-hal", "reply", "think", "Four. Excellent. I was hoping for four.\n\nI have a great many rocks, and most of them have names. Ask after one. Or ask about the satchel, or what I am doing at this moment.", [
+    reply("Reginald?", "chat-hal-reginald"),
+    reply("Doris?", "chat-hal-doris"),
+    reply("Tuesday?", "chat-hal-tuesday"),
+    reply("what's in your satchel?", "chat-hal-satchel"),
+    reply("what are you up to?", "chat-hal-upto"),
+    reply("never mind", "chat-hal-menu"),
+  ]),
+  node("chat-hal-reginald", "npc-hal", "reply", "proud", "Reginald.\n\nGrey, rounded, with one pale stripe. I carried him four miles this morning. He did not complain once.\n\nHe has never interrupted me. I cannot say the same for the pigeon.", [
+    reply("what about Doris?", "chat-hal-doris"),
+    reply("back to the list", "chat-hal-menu"),
+  ]),
+  node("chat-hal-doris", "npc-hal", "reply", "explain", "Doris is the rock I was weighing when you wrote.\n\nTwo hundred and fourteen grams. I have weighed her eleven times today, and she has been two hundred and fourteen grams every time.\n\nI find that deeply reassuring.", [
+    reply("and Tuesday?", "chat-hal-tuesday"),
+    reply("back to the list", "chat-hal-menu"),
+  ]),
+  node("chat-hal-tuesday", "npc-hal", "reply", "greet", "Tuesday.\n\nI believe I said there would be no questions about Tuesday.\n\nVery well. One. Tuesday is flat. A flat rock skips beautifully across water, and I have never once dared to skip it.", [
+    react("haha", "chat-hal-menu"),
+    react("love", "chat-hal-menu"),
+  ]),
+  node("chat-hal-nothing", "npc-hal", "reply", "idle", "Five. A bold choice.\n\nVery well. We will do nothing, together.\n\nTen seconds. Still doing it. Twenty. I am enjoying this more than I expected.\n\nThank you. That was restful. Thirty-one seconds. I counted.", [
+    reply("that was weirdly nice", "chat-hal-menu"),
+    reply("again?", "chat-hal-nothing2"),
+  ]),
+  node("chat-hal-nothing2", "npc-hal", "reply", "proud", "Again. Certainly.\n\nI will not count this time. Counting would be doing something.\n\nForty seconds. I counted. I am sorry. I could not help it.", [
+    react("haha", "chat-hal-menu"),
+    react("love", "chat-hal-menu"),
+  ]),
+  node("chat-hal-element", "npc-hal", "reply", "explain", "What makes an element.\n\nThe number of protons. Six protons is always carbon. Seven is always nitrogen. Eight is always oxygen.\n\nThe neutrons and the electrons do not decide it. Only the protons. I find that tidy. My rocks have names too, but theirs are less reliable.", [
+    reply("Open it in AtomDex", null, { screen: "entry", id: "atomic-number" }),
+    reply("thanks, back", "chat-hal-menu"),
+  ]),
+  node("chat-hal-electron", "npc-hal", "reply", "explain", "The electron.\n\nIt carries a negative charge, and it lives outside the nucleus.\n\nIt is not a tiny planet, whatever the old pictures show. It is somewhere in a fuzzy region around the nucleus, a cloud. I find that restful. Not everything needs an address.", [
+    reply("Open it in AtomDex", null, { screen: "entry", id: "electron" }),
+    reply("thanks, back", "chat-hal-menu"),
+  ]),
 ];
 
 const ADA = [
   // ---- free chat -------------------------------------------------------------------------------------------------------------------
-  node("chat-ada-greeting", "npc-ada", "greeting", "cheer", "heyyy. it's ada\n\nsorry sorry, my flask just made The Noise. ok it stopped. i think~ hi hi\n\nwhat's up?", [
-    reply("what are you doing?", "chat-ada-upto"),
-    reply("what should i do next?", "chat-ada-next"),
-    reply("quiz me", "chat-ada-quiz"),
-    reply("can you remind me of something?", "chat-ada-remind"),
-    reply("what's in your flask?", "chat-ada-flask"),
+  // Ada does not offer a menu, she checks in: how are you today? What she does next depends on the answer (a good day is for a
+  // quiz, a tired one for something tiny or nothing, a stuck one for the thing that is stuck, chaos for chaos). Small talk sits
+  // behind "just here to chat". Hal's free chat is a numbered list; neither looks like the other.
+  node("chat-ada-greeting", "npc-ada", "greeting", "cheer", "heyyy. it's ada\n\nsorry sorry, my flask just made The Noise. ok it stopped. i think~ hi hi\n\nok before anything. how are we doing today? be honest. i can take it. (i can't always take it)", [
+    reply("honestly pretty good", "chat-ada-mood-great"),
+    reply("kinda tired", "chat-ada-mood-tired"),
+    reply("stuck on something", "chat-ada-mood-stuck"),
+    reply("chaotic. send help", "chat-ada-mood-chaos"),
+    reply("just here to chat", "chat-ada-talk"),
     reply("i have to go", "chat-ada-bye"),
   ]),
   node("chat-ada-menu", "npc-ada", "reply", "idle", "ooh ok. what else?\n\ni've got time. a little. i have a snack appointment at 3", [
-    reply("what are you doing?", "chat-ada-upto"),
     reply("what should i do next?", "chat-ada-next"),
     reply("quiz me", "chat-ada-quiz"),
     reply("can you remind me of something?", "chat-ada-remind"),
-    reply("what's in your flask?", "chat-ada-flask"),
+    reply("let's just chat", "chat-ada-talk"),
     reply("i have to go", "chat-ada-bye"),
   ]),
   node("chat-ada-next", "npc-ada", "reply", "point", "your next lesson is waiting on the map\n\nwant me to take you there? i'll pretend i didn't see you procrastinate hehe~", [
@@ -273,6 +318,8 @@ const ADA = [
   node("chat-ada-remind", "npc-ada", "reply", "think", "ofc~ which one?\n\ni'll try not to ramble. (i will ramble)", [
     reply("half-life", "chat-ada-half-life"),
     reply("decay", "chat-ada-decay"),
+    reply("alpha, beta, gamma", "chat-ada-abg"),
+    reply("natural radioactivity", "chat-ada-natural"),
     reply("nvm", "chat-ada-menu"),
   ]),
   node("chat-ada-half-life", "npc-ada", "reply", "explain", "ok ok half-life\n\nit's how long it takes for half of the atoms in a sample to decay. half of the CROWD, not one atom. one atom is a mystery, a crowd is a pattern\n\nlike popcorn~ (don't quote me on popcorn)", [
@@ -457,6 +504,66 @@ const ADA = [
     reply("Take me there", null, { screen: "next-lesson" }),
     reply("A quick round first", null, { screen: "mythbuster", id: "radioactivity" }),
     reply("not today", "chat-ada-bye"),
+  ]),
+
+  // ---- free chat, continued: the check-in's answers, small talk, and two more things to be reminded of. Kept at the end of the list
+  // so that the stories above keep their positions. ------------------------------------------------------------------------------------
+  node("chat-ada-mood-great", "npc-ada", "reply", "cheer", "ooh yay. good days are rare and precious. like a flask that glows on purpose\n\nok so you're warm. warm is the best time to do a thing. what thing", [
+    reply("quiz me", "chat-ada-quiz"),
+    reply("the next lesson", "chat-ada-next"),
+    reply("tell me something fun", "chat-ada-secret"),
+  ]),
+  node("chat-ada-mood-tired", "npc-ada", "reply", "sorry", "aww. ok. tired is allowed. tired is real and i respect it\n\nwe can do one tiny thing, or no thing. no thing counts. i've decided", [
+    reply("one tiny thing", "chat-ada-remind"),
+    reply("can we just talk", "chat-ada-talk"),
+    reply("i'll rest. bye", "chat-ada-bye"),
+  ]),
+  node("chat-ada-mood-stuck", "npc-ada", "reply", "think", "ooh. stuck. ok stuck is actually good news. it means your brain found the edge of something\n\nwhat's it about", [
+    reply("decay", "chat-ada-decay"),
+    reply("half-life", "chat-ada-half-life"),
+    reply("alpha, beta, gamma", "chat-ada-abg"),
+    reply("honestly all of it", "chat-ada-remind"),
+  ]),
+  node("chat-ada-mood-chaos", "npc-ada", "reply", "cheer", "same. SAME. the flask is humming, one bow is green and i have three snacks and no plan\n\nok. chaos buddies. what do we do with it", [
+    reply("who's making the noise?", "chat-ada-flask"),
+    reply("calm me down", "chat-ada-calm"),
+    reply("let's learn something", "chat-ada-remind"),
+  ]),
+  node("chat-ada-calm", "npc-ada", "reply", "idle", "ok. in through the nose. out through the mouth\n\nbe a calm little nucleus. stable. steady. not going anywhere. i love stable nuclei. i'm not one. i love them though\n\nbetter?", [
+    reply("yeah, a bit", "chat-ada-menu"),
+    reply("one tiny thing", "chat-ada-remind"),
+  ]),
+  node("chat-ada-talk", "npc-ada", "reply", "greet", "ooh ok, chatting. my favourite\n\npick a thing. or don't. we can just exist for a bit hehe", [
+    reply("what are you doing?", "chat-ada-upto"),
+    reply("what's in your flask?", "chat-ada-flask"),
+    reply("tell me a secret", "chat-ada-secret"),
+    reply("what's Hal like?", "chat-ada-hal"),
+    reply("what's the snack appointment?", "chat-ada-snack"),
+    reply("ok something else", "chat-ada-menu"),
+  ]),
+  node("chat-ada-secret", "npc-ada", "reply", "proud", "ok come closer. (you can't. it's a phone) (i'm leaning in anyway)\n\ni talk to gary. he's my beaker. he doesn't answer but he's a really good listener\n\nwhen i'm stuck i explain it to him out loud and it just. fixes itself. somehow~\n\nyou should try it. pick something. explain it to a mug", [
+    react("love", "chat-ada-talk"),
+    react("haha", "chat-ada-talk"),
+  ]),
+  node("chat-ada-hal", "npc-ada", "reply", "cheer", "hal?? ok hal is the calmest person i know. he names rocks. there's one called tuesday and i respect it so much\n\nhe says i'm loud. i say he's a great listener. we're a team~", [
+    reply("what's tuesday?", "chat-ada-tuesday"),
+    reply("you two are funny", "chat-ada-talk"),
+  ]),
+  node("chat-ada-tuesday", "npc-ada", "reply", "sorry", "a flat rock. that's all i know. that's ALL he'll say\n\ni asked him one question and he looked at me for eleven seconds and then said 'no.' very gently\n\ni love him. i don't understand him. i love him", [
+    react("haha", "chat-ada-talk"),
+    react("love", "chat-ada-talk"),
+  ]),
+  node("chat-ada-snack", "npc-ada", "reply", "cheer", "my snack appointment?? it's at 3. every day. it's the most important meeting i have\n\ni pack a surprise and forget what it is, so at 3 it's a GIFT. from past me. past me is so nice\n\nokay what's yours. don't answer. i just want you to think about it", [
+    reply("ok now i'm hungry", "chat-ada-talk"),
+    reply("past you is a legend", "chat-ada-talk"),
+  ]),
+  node("chat-ada-abg", "npc-ada", "reply", "explain", "ok the three. alpha, beta, gamma\n\nalpha is a chunk: 2 protons and 2 neutrons stuck together. beta is a fast electron, way lighter. gamma is just extra energy leaving, no chunk at all\n\nchunk. zoomer. leftover energy. that's how i remember them", [
+    reply("Open it in AtomDex", null, { screen: "entry", id: "alpha-particle" }),
+    reply("ok thanks", "chat-ada-menu"),
+  ]),
+  node("chat-ada-natural", "npc-ada", "reply", "explain", "ok this one's my favourite. radioactivity is natural\n\nrocks and soil, the air, space, even you. it was all here way before people~\n\nand 'radioactive' doesn't automatically mean 'dangerous'. it depends on what kind, how much, and how it reaches you", [
+    reply("Open it in AtomDex", null, { screen: "entry", id: "background-radiation" }),
+    reply("ok thanks", "chat-ada-menu"),
   ]),
 ];
 
