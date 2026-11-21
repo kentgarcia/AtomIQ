@@ -11,6 +11,7 @@ import { checkScene } from "../../content/visual-blocks.ts";
 import { FORBIDDEN_NAMES } from "../../components/npc/npc-palette.ts";
 import { NPC_POSES } from "../../components/npc/npc-art.ts";
 import { isArtId } from "../../components/lesson/visual/object-art.ts";
+import { expandFigure } from "../../components/lesson/visual/figures/index.ts";
 import { bubblesFor } from "../../components/lesson/conversation-core.ts";
 import { ITEM_TYPES, NON_CHOICE_ITEM_TYPES, SIM_TYPES, TEACH_TYPES } from "../../content/curriculum/types.ts";
 import { checkDecayWaitData } from "../../content/curriculum/decay-wait-core.ts";
@@ -196,11 +197,15 @@ export function validateCurriculum(db, { strictReview = false } = {}) {
     for (const f of ["prompt", "statement", "explanation"]) checkText("items", id, f, d[f], { allowBlank: item.type === "fill" && f === "prompt" });
     // A figure on a question (a reminder strip, a table to read) is held to the same rules as a teaching card's.
     if (d.figure !== undefined) {
-      if (!isRec(d.figure) || !isStr(d.figure.altText) || d.figure.altText.trim().length < 20) e("figure.altText", "a figure needs alt text (at least 20 characters)");
-      const figErrs = [];
-      checkScene(d.figure?.scene, "scene", figErrs);
-      for (const m of figErrs) e("figure.scene", m);
-      for (const sh of d.figure?.scene?.shapes ?? []) if (sh?.t === "art" && !isArtId(sh.id)) e("figure.scene", `"${String(sh.id)}" is not a picture in the lesson object art`);
+      const { figure: fig, problem } = expandFigure(d.figure);
+      if (problem) e("figure", problem);
+      else {
+        if (!isRec(fig) || !isStr(fig.altText) || fig.altText.trim().length < 20) e("figure.altText", "a figure needs alt text (at least 20 characters)");
+        const figErrs = [];
+        checkScene(fig?.scene, "scene", figErrs);
+        for (const m of figErrs) e("figure.scene", m);
+        for (const sh of fig?.scene?.shapes ?? []) if (sh?.t === "art" && !isArtId(sh.id)) e("figure.scene", `"${String(sh.id)}" is not a picture in the lesson object art`);
+      }
     }
     const ids = (list, field) => {
       if (!Array.isArray(list) || !list.every((x) => isRec(x) && isStr(x.id))) return e(field, "must be a list of objects with an id"), false;
@@ -384,11 +389,15 @@ export function validateCurriculum(db, { strictReview = false } = {}) {
         for (const f of ["title", "body", "tag"]) checkText("lesson_cards", cid, `data.${f}`, d[f]);
         if (!d.figure && !d.visual) ce("data.figure", "card-figure", "every teaching card needs a figure");
         if (d.figure) {
-          if (!isStr(d.figure.altText) || d.figure.altText.trim().length < 20) ce("data.figure.altText", "card-figure", "alt text is required (at least 20 characters)");
-          const errs = [];
-          checkScene(d.figure.scene, "scene", errs);
-          for (const m of errs) ce("data.figure.scene", "card-figure", m);
-          for (const sh of d.figure.scene?.shapes ?? []) if (sh?.t === "art" && !isArtId(sh.id)) ce("data.figure.scene", "card-figure", `"${String(sh.id)}" is not a picture in the lesson object art`);
+          const { figure: fig, problem } = expandFigure(d.figure);
+          if (problem) ce("data.figure", "card-figure-ref", problem);
+          else {
+            if (!isStr(fig.altText) || fig.altText.trim().length < 20) ce("data.figure.altText", "card-figure", "alt text is required (at least 20 characters)");
+            const errs = [];
+            checkScene(fig.scene, "scene", errs);
+            for (const m of errs) ce("data.figure.scene", "card-figure", m);
+            for (const sh of fig.scene?.shapes ?? []) if (sh?.t === "art" && !isArtId(sh.id)) ce("data.figure.scene", "card-figure", `"${String(sh.id)}" is not a picture in the lesson object art`);
+          }
         }
         if (d.figureAt !== undefined) {
           const bubbles = isStr(d.body) ? bubblesFor(d.body, 3).length : 0;

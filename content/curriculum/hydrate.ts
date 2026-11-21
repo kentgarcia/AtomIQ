@@ -5,6 +5,7 @@
  * services/content-db.ts and the Node tests share one implementation.
  */
 
+import { withDrawnFigure } from "../../components/lesson/visual/figures/index.ts";
 import type {
   CardKind,
   CardTier,
@@ -184,7 +185,7 @@ export function mapItem(row: ItemRow): Item {
     id: row.id,
     objectiveId: row.objective_id,
     type: row.type as ItemType,
-    data: asRecord(row.data),
+    data: withDrawnFigure(asRecord(row.data)),
     difficulty: Math.min(3, Math.max(1, row.difficulty)) as 1 | 2 | 3,
     surfaces: asArray(row.surfaces) as ItemSurface[],
     referenceIds: asArray(row.reference_ids),
@@ -216,7 +217,7 @@ export function mapCard(row: LessonCardRow): LessonCard {
     tier: row.tier as CardTier,
     ...(row.item_id ? { itemId: row.item_id } : {}),
     scored: row.scored === 1,
-    data: asRecord(row.data),
+    data: withDrawnFigure(asRecord(row.data)),
   };
 }
 

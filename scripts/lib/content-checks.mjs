@@ -25,8 +25,8 @@ export const CHECKS_BY_TABLE = {
   objectives: ["test:content"],
   lessons: ["test:content"],
   path_nodes: ["test:content"],
-  items: ["test:content"],
-  lesson_cards: ["test:content"],
+  items: ["test:content", "test:figures"],
+  lesson_cards: ["test:content", "test:figures"],
   content_references: ["test:content"],
 };
 
