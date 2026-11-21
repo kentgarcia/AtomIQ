@@ -1,0 +1,27 @@
+format 1
+adapter encyclopedia 1
+category: science
+
+entry ionizing-radiation
+term: Ionizing Radiation
+difficulty: intermediate
+image: ../../assets/images/terms/Ionizing Radiation.webp
+related_terms: radiation
+related_terms: alpha-particle
+related_terms: beta-particle
+related_terms: gamma-ray
+related_terms: x-ray
+quick_facts: Threshold ~10 eV per interaction
+quick_facts: Particle forms: alpha, beta, neutrons · EM forms: X-ray, gamma
+quick_facts: Damages DNA directly and via water-derived free radicals
+quick_facts: Non-ionizing means safe-ish: UV, light, radio can't break bonds
+quick_facts: Basis of medical imaging, sterilization, and cancer therapy
+
+sources:
+    {"organization":"IAEA","title":"Radiation Protection","url":"https://www.iaea.org/topics/radiation-protection"}
+
+definition:
+    Radiation carrying enough energy — roughly above 10 electron-volts — to strip electrons from atoms or molecules, leaving charged ions behind. It covers particle radiations (alpha, beta, neutrons) and high-frequency electromagnetic waves (X-rays, gamma rays); visible light and radio fall below the line. In living tissue it damages DNA both directly and indirectly through reactive fragments of water molecules, which is why exposure limits, shielding, and monitoring exist everywhere it's used.
+
+debunking_snippet:
+    “All radiation is dangerous.” Only ionizing radiation breaks chemical bonds. Your Wi-Fi, microwave, and heat lamp are non-ionizing — they lack the energy to rip electrons off atoms.

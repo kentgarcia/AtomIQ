@@ -1,0 +1,26 @@
+format 1
+adapter encyclopedia 1
+category: people
+
+entry otto-hahn
+term: Otto Hahn
+difficulty: intermediate
+image: /assets/images/people/Otto_Hahn.webp
+related_terms: nuclear-fission
+related_terms: lise-meitner
+related_terms: ernest-rutherford
+related_terms: decay
+quick_facts: Proved nuclear fission with Strassmann (Dec 1938)
+quick_facts: Nobel Prize in Chemistry 1944 (presented 1945)
+quick_facts: Discovered protactinium and dozens of radioisotopes with Meitner
+quick_facts: 'Father of nuclear chemistry'
+quick_facts: His exclusion of Meitner remains a famous scientific injustice
+
+sources:
+    {"organization":"Nobel Prize","title":"Otto Hahn Biography","url":"https://www.nobelprize.org/prizes/chemistry/1944/hahn/biographical/"}
+
+definition:
+    German radiochemist (1879–1968) whose careful chemistry proved nuclear fission: in December 1938 he and Fritz Strassmann found barium — half an atom's worth of weight — inside neutron-bombarded uranium, a result so strange Hahn hesitated to publish. The discovery earned him the 1944 Nobel Prize in Chemistry (awarded in 1945). With Lise Meitner he had spent three decades discovering isotopes including protactinium, but she was barred by Nazi law from co-authorship and later from sharing credit — a controversy that shadows his legacy.
+
+debunking_snippet:
+    “Hahn invented the atomic bomb.” He identified barium atoms in a beaker — brilliant, purely scientific work done before the war, and he refused to work on German weapons research.

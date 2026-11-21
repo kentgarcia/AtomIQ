@@ -1,0 +1,28 @@
+format 1
+adapter encyclopedia 1
+category: science
+
+entry radioactivity
+term: Radioactivity
+related_terms: radiation
+related_terms: decay
+related_terms: radionuclide
+related_terms: background-radiation
+related_terms: henri-becquerel
+related_terms: isotope
+related_terms: nuclear-stability
+quick_facts: It comes from an unstable nucleus
+quick_facts: It happens on its own, without anyone starting it
+quick_facts: Natural sources: rocks, air, food, space and the human body
+quick_facts: Henri Becquerel discovered it in 1896
+quick_facts: People can make radioactive atoms, but most radioactivity is natural
+
+sources:
+    {"organization":"IAEA","title":"What is Radiation?","url":"https://www.iaea.org/topics/radiation"}
+    {"organization":"OpenStax","title":"University Physics Volume 3: Radioactive Decay","url":"https://openstax.org/books/university-physics-volume-3/pages/10-3-radioactive-decay"}
+
+definition:
+    What happens when an unstable nucleus changes into a steadier one and gives off radiation. It happens by itself, and heating a material or changing it chemically hardly affects it. Radioactivity is natural: it is found in rocks, in the air, in food, in space and in your own body. Henri Becquerel discovered it in 1896 in a uranium mineral.
+
+debunking_snippet:
+    “Radioactivity is something humans created.” It is as old as the Earth. People only learned to find it, measure it and use it.

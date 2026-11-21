@@ -1,0 +1,23 @@
+format 1
+adapter encyclopedia 1
+category: science
+
+entry binding-energy
+term: Binding Energy
+difficulty: advanced
+image: ../../assets/images/terms/binding energy.webp
+related_terms: nuclear-fission
+related_terms: nuclear-fusion
+related_terms: mass-defect
+related_terms: chain-reaction
+quick_facts: Energy required to disassemble a nucleus completely
+quick_facts: Explained by mass defect via E = mc²
+quick_facts: Nickel-62 holds the record binding energy per nucleon; iron-56 is the classic reference
+quick_facts: Fission and fusion both release energy by moving toward the iron peak
+quick_facts: Determines which nuclei are stable vs. radioactive
+
+sources:
+    {"organization":"HyperPhysics","title":"Nuclear Binding Energy","url":"http://hyperphysics.phy-astr.gsu.edu/hbase/NucEne/nucbin.html"}
+
+definition:
+    The energy needed to pull a nucleus apart into its separate protons and neutrons — equivalently, the energy released when those nucleons bind together. It comes from the mass converted to energy described by E = mc²: a bound nucleus weighs less than the sum of its parts (the mass defect). Binding energy per nucleon peaks near iron-56 (with nickel-62 holding the precise record), which is why energy is released by splitting heavy nuclei (fission) and fusing light ones (fusion) — both move toward the iron peak.

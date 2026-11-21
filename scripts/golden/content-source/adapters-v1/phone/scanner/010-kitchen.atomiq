@@ -1,0 +1,27 @@
+format 1
+adapter scanner 1
+scene: kitchen
+
+target scan-demo-water
+name: A glass of water
+object: water
+references: ref-a
+references: ref-b
+blurb: Every drop is the same.
+fun_fact: Always two to one.
+
+composition:
+    {"symbol":"H","note":"two atoms in each molecule"}
+    {"symbol":"O"}
+
+target scan-demo-salt
+name: Salt
+object: salt
+atomdex: ion
+references: ref-a
+blurb: A shake of salt.
+fun_fact: Joined as ions.
+
+composition:
+    {"symbol":"Na"}
+    {"symbol":"Cl"}

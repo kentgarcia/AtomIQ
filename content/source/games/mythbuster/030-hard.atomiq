@@ -1,0 +1,703 @@
+format 1
+adapter mythbuster 1
+difficulty: hard
+
+question mb-hard-q1
+
+question:
+    Why does nuclear fission release energy?
+
+answer: 1
+options: Electron transfer
+options: Mass defect
+options: Chemical reaction
+options: Heat expansion
+
+explanation:
+    The fission products have slightly less total mass than the original nucleus. That missing mass (the mass defect) is converted into energy, as described by E = mc².
+
+question mb-hard-q2
+
+question:
+    What is the relationship between mass defect and binding energy?
+
+answer: 0
+options: Directly proportional
+options: Inversely proportional
+options: Unrelated
+options: Equal always
+
+explanation:
+    Binding energy is the energy equivalent of the mass defect (E = mc²), so a larger mass defect means a larger binding energy. The two are directly proportional.
+
+question mb-hard-q3
+
+question:
+    Why are fast neutrons less effective in sustaining fission?
+
+answer: 1
+options: Too slow
+options: Less interaction probability
+options: Too heavy
+options: No energy
+
+explanation:
+    Fast neutrons are less likely to interact with uranium-235 nuclei than slow (thermal) neutrons, so fewer of them cause new fissions. This is why most reactors slow neutrons down with a moderator.
+
+question mb-hard-q4
+
+question:
+    What happens to the reaction if a moderator is removed from a reactor?
+
+answer: 1
+options: Reaction increases
+options: Reaction decreases
+options: No change
+options: Explosion
+
+explanation:
+    Without a moderator, neutrons stay fast and are less likely to cause fission in uranium-235, so the chain reaction weakens and the reaction decreases.
+
+question mb-hard-q5
+
+question:
+    Why is uranium-235 fissile?
+
+answer: 1
+options: Stable nucleus
+options: Easily splits with neutrons
+options: High electrons
+options: Low energy
+
+explanation:
+    A fissile nucleus can be split by slow neutrons. Uranium-235 easily absorbs a neutron and splits, releasing energy and more neutrons that can keep a chain reaction going.
+
+question mb-hard-q6
+
+question:
+    What is critical mass?
+
+answer: 0
+options: Minimum mass for sustained reaction
+options: Maximum safe mass
+options: Total fuel
+options: Reactor size
+
+explanation:
+    Critical mass is the smallest amount of fissile material that can sustain a chain reaction on its own. Below it, too many neutrons escape or are lost.
+
+question mb-hard-q7
+
+question:
+    What happens to the chain reaction when a reactor is subcritical?
+
+answer: 1
+options: Increasing reaction
+options: Decreasing reaction
+options: Constant reaction
+options: Explosion
+
+explanation:
+    In a subcritical condition each fission causes, on average, fewer than one further fission, so the chain reaction dies away and the reaction decreases.
+
+question mb-hard-q8
+
+question:
+    Why is fusion difficult to achieve?
+
+answer: 1
+options: Low temperature
+options: Coulomb repulsion
+options: Weak force
+options: Low energy
+
+explanation:
+    Atomic nuclei are positively charged and repel each other (Coulomb repulsion). Fusion needs extreme temperature and pressure to push nuclei close enough for the nuclear force to take over.
+
+question mb-hard-q9
+
+question:
+    What is the main advantage of fusion over fission?
+
+answer: 2
+options: More waste
+options: Less energy
+options: Less radioactive waste
+options: More danger
+
+explanation:
+    Fusion produces much less long-lived radioactive waste than fission, because its main product, helium, is not radioactive.
+
+question mb-hard-q10
+
+question:
+    What does high LET (linear energy transfer) radiation imply?
+
+answer: 1
+options: Low damage
+options: High energy deposition
+options: Low penetration
+options: No effect
+
+explanation:
+    LET (linear energy transfer) is how much energy radiation deposits per distance traveled. High-LET radiation, such as alpha particles, deposits a lot of energy along a short path, which can damage nearby cells more.
+
+question mb-hard-q11
+
+question:
+    Which radiation has the highest linear energy transfer (LET)?
+
+answer: 2
+options: Gamma
+options: Beta
+options: Alpha
+options: X-ray
+
+explanation:
+    Alpha particles are heavy and carry a double positive charge, so they deposit their energy over a very short distance. That gives them the highest LET of these options.
+
+question mb-hard-q12
+
+question:
+    Why is alpha radiation dangerous internally?
+
+answer: 1
+options: High penetration
+options: High ionization
+options: Low energy
+options: No interaction
+
+explanation:
+    Alpha particles cannot get through skin, but if an alpha emitter is inhaled or swallowed, its strong ionization damages nearby cells directly.
+
+question mb-hard-q13
+
+question:
+    What is a stochastic effect of radiation?
+
+answer: 1
+options: Severity depends on dose
+options: Probability depends on dose
+options: No effect
+options: Immediate effect
+
+explanation:
+    Stochastic effects, such as cancer risk, happen by chance. A higher dose raises the probability of the effect, not how severe it is.
+
+question mb-hard-q14
+
+question:
+    What is a deterministic effect of radiation?
+
+answer: 1
+options: Random
+options: Threshold-based
+options: No threshold
+options: Rare
+
+explanation:
+    Deterministic effects, such as skin burns, only occur above a threshold dose, and they get more severe as the dose rises.
+
+question mb-hard-q15
+
+question:
+    What is the function of boron in reactors?
+
+answer: 1
+options: Fuel
+options: Absorb neutrons
+options: Coolant
+options: Moderator
+
+explanation:
+    Boron absorbs neutrons very well, so it is used in control rods and, dissolved in the coolant of some reactors, to help control the chain reaction.
+
+question mb-hard-q16
+
+question:
+    What is neutron flux?
+
+answer: 1
+options: Energy level
+options: Number of neutrons per area
+options: Temperature
+options: Pressure
+
+explanation:
+    Neutron flux is the number of neutrons passing through a given area each second. It shows how intense the neutron population is inside the reactor core.
+
+question mb-hard-q17
+
+question:
+    Why is shielding thickness important?
+
+answer: 1
+options: Cost only
+options: Reduces exposure exponentially
+options: Aesthetic
+options: No effect
+
+explanation:
+    Each layer of shielding removes a fraction of the radiation, so the intensity falls exponentially as the shield gets thicker.
+
+question mb-hard-q18
+
+question:
+    What does the radioactive decay constant describe?
+
+answer: 0
+options: Rate of decay
+options: Energy level
+options: Mass
+options: Temperature
+
+explanation:
+    The decay constant is the probability per unit time that a nucleus will decay. A larger value means faster decay and a shorter half-life.
+
+question mb-hard-q19
+
+question:
+    What is secular equilibrium?
+
+answer: 0
+options: Parent = daughter activity
+options: No decay
+options: Fast decay
+options: Equal mass
+
+explanation:
+    In secular equilibrium a very long-lived parent decays so slowly that its short-lived daughter settles at the same activity as the parent.
+
+question mb-hard-q20
+
+question:
+    Why is plutonium-239 used in reactors?
+
+answer: 1
+options: Stable
+options: Fissile
+options: Low energy
+options: Cheap
+
+explanation:
+    Plutonium-239 is fissile: it splits when it absorbs neutrons. It forms inside reactors from uranium-238 and contributes to the energy a reactor produces.
+
+question mb-hard-q21
+
+question:
+    What is neutron capture?
+
+answer: 1
+options: Neutron loss
+options: Neutron absorption
+options: Electron gain
+options: Proton loss
+
+explanation:
+    In neutron capture a nucleus absorbs a neutron and becomes a heavier isotope. This is how control rods absorb neutrons and how some radioisotopes are made.
+
+question mb-hard-q22
+
+question:
+    What is bremsstrahlung radiation?
+
+answer: 1
+options: Nuclear radiation
+options: Deceleration radiation
+options: Fusion radiation
+options: Thermal radiation
+
+explanation:
+    Bremsstrahlung is German for "braking radiation": X-rays emitted when fast charged particles, such as electrons, slow down near atomic nuclei.
+
+question mb-hard-q23
+
+question:
+    What does the inverse square law say about radiation intensity?
+
+answer: 1
+options: Intensity ∝ distance
+options: Intensity ∝ 1/d²
+options: Intensity constant
+options: No relation
+
+explanation:
+    Intensity falls with the square of the distance (1/d²). Doubling the distance from a source cuts the intensity to one quarter.
+
+question mb-hard-q24
+
+question:
+    Why are control rods inserted during shutdown?
+
+answer: 1
+options: Increase energy
+options: Absorb neutrons
+options: Produce neutrons
+options: Heat reactor
+
+explanation:
+    Inserting control rods absorbs neutrons, which stops the chain reaction and shuts the reactor down.
+
+question mb-hard-q25
+
+question:
+    What is a reactor scram?
+
+answer: 1
+options: Normal operation
+options: Emergency shutdown
+options: Fuel loading
+options: Cooling
+
+explanation:
+    A scram is an emergency shutdown in which the control rods are inserted quickly to stop the chain reaction.
+
+question mb-hard-q26
+
+question:
+    If a radioactive isotope has a half-life of 5 years, what fraction of it remains after 15 years?
+
+answer: 2
+options: 1/2
+options: 1/4
+options: 1/8
+options: 1/16
+
+explanation:
+    15 years is three half-lives (15 ÷ 5 = 3). Each half-life halves the amount: 1/2, then 1/4, then 1/8.
+
+question mb-hard-q27
+
+question:
+    What increases the probability of fission?
+
+answer: 1
+options: Fast neutrons
+options: Thermal neutrons
+options: No neutrons
+options: Electrons
+
+explanation:
+    Slow (thermal) neutrons are much more likely to be captured by uranium-235 and cause fission than fast neutrons.
+
+question mb-hard-q28
+
+question:
+    What is shielding effectiveness based on?
+
+answer: 1
+options: Color
+options: Density and thickness
+options: Shape
+options: Temperature
+
+explanation:
+    Dense, thick materials have more atoms in the way to absorb or scatter radiation, so density and thickness decide how well a shield works. Color and shape do not matter.
+
+question mb-hard-q29
+
+question:
+    Why is water used as coolant?
+
+answer: 1
+options: Cheap only
+options: High heat capacity
+options: Radioactive
+options: Light
+
+explanation:
+    Water absorbs a lot of heat per kilogram (high heat capacity), is cheap and plentiful, and in many reactors also acts as the moderator.
+
+question mb-hard-q30
+
+question:
+    What is the main risk in a reactor meltdown?
+
+answer: 1
+options: Heat loss
+options: Core damage
+options: Cooling increase
+options: No reaction
+
+explanation:
+    In a meltdown the fuel overheats and the reactor core is damaged. The main risk is that radioactive material could escape if the other barriers also fail.
+
+question mb-hard-q31
+
+question:
+    What is neutron moderation?
+
+answer: 1
+options: Speed increase
+options: Speed reduction
+options: Absorption
+options: Emission
+
+explanation:
+    Neutron moderation slows fast neutrons down, using materials such as water or graphite, so they are more likely to cause fission.
+
+question mb-hard-q32
+
+question:
+    What does the radiation weighting factor represent?
+
+answer: 1
+options: Energy
+options: Biological impact
+options: Mass
+options: Density
+
+explanation:
+    The radiation weighting factor adjusts absorbed dose for how biologically damaging each type of radiation is. For the same energy, alpha particles get a higher factor than gamma rays.
+
+question mb-hard-q33
+
+question:
+    What is effective dose measured in?
+
+answer: 1
+options: Gray
+options: Sievert
+options: Becquerel
+options: Joule
+
+explanation:
+    Effective dose measures the overall biological risk from radiation and is given in sieverts (Sv). The gray (Gy) measures absorbed energy, and the becquerel (Bq) counts decays per second.
+
+question mb-hard-q34
+
+question:
+    What is linear energy transfer?
+
+answer: 1
+options: Distance traveled
+options: Energy per distance
+options: Time
+options: Speed
+
+explanation:
+    Linear energy transfer is the amount of energy radiation deposits per unit of distance it travels through a material.
+
+question mb-hard-q35
+
+question:
+    Why is gamma radiation highly penetrating?
+
+answer: 1
+options: Charged
+options: No mass or charge
+options: Heavy
+options: Slow
+
+explanation:
+    Gamma rays are photons with no mass and no electric charge, so they interact only rarely with matter and can travel far through materials.
+
+question mb-hard-q36
+
+question:
+    What is a decay series?
+
+answer: 1
+options: Single decay
+options: Multiple successive decays
+options: No decay
+options: Instant decay
+
+explanation:
+    A decay series (or decay chain) is a sequence of successive decays in which each radioactive product decays again until a stable isotope is reached.
+
+question mb-hard-q37
+
+question:
+    Which method is commonly used to produce radioisotopes?
+
+answer: 1
+options: Cooling
+options: Neutron activation
+options: Heating
+options: Pressure
+
+explanation:
+    In neutron activation, stable atoms are placed in a stream of neutrons (often in a research reactor), absorb neutrons, and become radioactive isotopes.
+
+question mb-hard-q38
+
+question:
+    What is a nuclear cross-section?
+
+answer: 1
+options: Size of nucleus
+options: Probability of interaction
+options: Mass
+options: Energy
+
+explanation:
+    A nuclear cross-section measures the probability that a particular interaction, such as neutron capture or fission, will happen.
+
+question mb-hard-q39
+
+question:
+    What distinguishes a fast reactor from most other reactors?
+
+answer: 1
+options: It reduces the number of neutrons
+options: It uses fast neutrons to sustain the chain reaction
+options: It stops fission reactions
+options: It reduces energy output
+
+explanation:
+    Fast reactors have no moderator, so fast neutrons sustain the chain reaction. This lets them use uranium more efficiently and potentially consume some long-lived waste.
+
+question mb-hard-q40
+
+question:
+    What is a breeder reactor?
+
+answer: 1
+options: Produces less fuel
+options: Produces more fissile material
+options: Stops reaction
+options: No fuel
+
+explanation:
+    A breeder reactor produces more fissile material, such as plutonium-239, than it consumes by converting non-fissile uranium-238.
+
+question mb-hard-q41
+
+question:
+    What is spent fuel?
+
+answer: 1
+options: New fuel
+options: Used nuclear fuel
+options: No energy
+options: Fresh uranium
+
+explanation:
+    Spent fuel is nuclear fuel that has been used in a reactor. It is still radioactive and hot, so it is cooled and stored carefully.
+
+question mb-hard-q42
+
+question:
+    What is vitrification?
+
+answer: 1
+options: Cooling
+options: Converting waste to glass
+options: Burning waste
+options: Washing waste
+
+explanation:
+    Vitrification mixes high-level radioactive waste into molten glass, which hardens into a durable solid that locks the radioactive material inside.
+
+question mb-hard-q43
+
+question:
+    What is nuclear proliferation?
+
+answer: 1
+options: Energy production
+options: Spread of nuclear weapons
+options: Reactor building
+options: Waste disposal
+
+explanation:
+    Nuclear proliferation is the spread of nuclear weapons to more countries. Treaties such as the NPT and IAEA safeguards aim to prevent it.
+
+question mb-hard-q44
+
+question:
+    What is dose rate?
+
+answer: 1
+options: Total dose
+options: Dose per time
+options: Energy
+options: Mass
+
+explanation:
+    Dose rate is how much dose is received per unit of time, for example microsieverts per hour. A given dose delivered slowly is generally less harmful than the same dose delivered all at once.
+
+question mb-hard-q45
+
+question:
+    What is shielding design based on?
+
+answer: 1
+options: Color
+options: Radiation type and energy
+options: Shape
+options: Cost only
+
+explanation:
+    The right shield depends on the type and energy of the radiation: paper stops alpha, plastic or aluminum stops beta, and dense lead or concrete is needed for gamma rays.
+
+question mb-hard-q46
+
+question:
+    In radiation shielding, what is attenuation?
+
+answer: 1
+options: Increase radiation
+options: Decrease intensity
+options: No change
+options: Reflection
+
+explanation:
+    Attenuation is the reduction in radiation intensity as it passes through a material.
+
+question mb-hard-q47
+
+question:
+    How does radioactive contamination differ from radiation exposure?
+
+answer: 1
+options: They are the same thing
+options: Contamination is radioactive material; exposure is energy received
+options: Contamination is energy received; exposure is radioactive material
+options: There is no difference
+
+explanation:
+    Contamination means radioactive material is on or in something, such as skin or a surface. Exposure means receiving radiation. You can be exposed without being contaminated, for example during a medical X-ray.
+
+question mb-hard-q48
+
+question:
+    What is neutron economy?
+
+answer: 1
+options: Cost of neutrons
+options: Balance of neutron production and loss
+options: Temperature
+options: Pressure
+
+explanation:
+    Neutron economy is the balance between neutrons produced by fission and neutrons lost to absorption or escape. A reactor stays critical only while that balance holds.
+
+question mb-hard-q49
+
+question:
+    How do prompt neutrons differ from delayed neutrons?
+
+answer: 0
+options: When they are emitted after fission
+options: Their electric charge
+options: Their mass
+options: Which element they come from
+
+explanation:
+    Prompt neutrons are released almost instantly during fission, while delayed neutrons are emitted seconds to minutes later by decaying fission products. The delayed ones make reactors much easier to control.
+
+question mb-hard-q50
+
+question:
+    What is the biggest challenge in nuclear waste management?
+
+answer: 1
+options: Color
+options: Long half-life
+options: Weight
+options: Shape
+
+explanation:
+    Some radioactive isotopes in waste have very long half-lives, so they stay radioactive for thousands of years and must be isolated for a very long time.

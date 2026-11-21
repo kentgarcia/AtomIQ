@@ -12,6 +12,25 @@ Text that a person writes lives here as `.atomiq` files. `npm run content:sync` 
 
 Never edit a table that is listed here with `content:edit` or Studio: the sync would report drift. Delete a shipped id only with `--retire "<reason>"`.
 
+## What is here
+
+| Folder | Table(s) | One file is | Order |
+|---|---|---|---|
+| `chat/<npc>/NNN-<root>.atomiq` | `chat_nodes` | a story (the free chat is `010-`) | file `NNN`, then the nodes in the file |
+| `characters/NNN-<npc>.atomiq` | `npcs`, `npc_lines` | a teacher and their voice lines | file `NNN` |
+| `feed/<npc>.atomiq`, `feed/shared.atomiq` | `feed_templates` | a poster's posts | by kind, then id |
+| `blog/<unit>/NNN-<blog>.atomiq` | `blog_*` | a piece with its comments and sources | file `NNN` |
+| `reference/sources/<kind>.atomiq` | `content_references` | the sources of one kind | by id |
+| `reference/encyclopedia/<category>/<id>.atomiq` | `encyclopedia_entries` | one AtomDex entry | by id |
+| `reference/myths/<category>.atomiq` | `myths` | the myths of one category | by id |
+| `games/mythbuster/NNN-<difficulty>.atomiq` | `mythbuster_questions` | one difficulty | the order in the file |
+| `units/<unit>/statements.atomiq` | `unit_statements` | a unit's myth-or-fact statements | the order in the file |
+| `phone/scanner/NNN-<scene>.atomiq` | `scan_targets`, `scan_target_references` | one scene | the order in the file |
+| `phone/safety/NNN-<section>.atomiq` | `safety_cards`, `safety_card_references` | one section | the order in the file |
+| `phone/map/sites.atomiq` | `map_sites`, `map_site_references` | all sites | the order in the file |
+
+A source that other things cite (`reference/sources`) and an AtomDex entry are written once and named by id elsewhere (`references: ref-x`, `entry: marie-curie`). Lists are repeated lines (`tags: radiation`, `steps: ...`), a block of JSON lines is `sources:` or `composition:`, and a long text is an indented block under its key. Lessons, items and cards are not files yet (phase 5).
+
 ## Chat (`chat/<npc-id>/NNN-<root-id>.atomiq`, one file per story, the free chat is `010-`)
 
 ```

@@ -1,0 +1,26 @@
+format 1
+adapter encyclopedia 1
+category: safety
+
+entry meltdown
+term: Meltdown
+difficulty: intermediate
+image: ../../assets/images/terms/meltdown.webp
+related_terms: containment-building
+related_terms: defense-in-depth
+related_terms: control-rods
+related_terms: spent-fuel
+quick_facts: Loss of cooling — not loss of control — drives most meltdown risk
+quick_facts: Cladding fails ~1,200 °C; fuel melts near 2,800 °C
+quick_facts: Zirconium + steam makes the hydrogen behind Fukushima's blasts
+quick_facts: TMI's partial meltdown killed no one; containment held
+quick_facts: Modern designs add passive cooling that works unpowered
+
+sources:
+    {"organization":"World Nuclear","title":"Safety of Nuclear Power Reactors","url":"https://world-nuclear.org/information-library/safety-and-security/safety-of-plants"}
+
+definition:
+    A severe accident in which reactor fuel overheats after cooling is lost and begins to melt. The sequence runs fast: if water flow stops, temperatures climb within seconds-to-minutes, zirconium cladding reacts with steam above ~1,200 °C producing hydrogen, and the ceramic fuel itself doesn't liquefy until near 2,800 °C. It has happened three times commercially — Three Mile Island (1979, half the core, zero deaths, fully contained), Chernobyl (1986, no full containment), Fukushima (2011, hydrogen explosions).
+
+debunking_snippet:
+    “A meltdown means thousands die instantly.” The worst-case isn't automatic: TMI's core half-melted and harmed no one — because containment did its job. Consequences depend entirely on barriers, not just the melting itself.

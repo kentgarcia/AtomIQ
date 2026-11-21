@@ -1,0 +1,21 @@
+format 1
+adapter encyclopedia 1
+category: science
+
+entry electric-force
+term: Electric Force
+related_terms: proton
+related_terms: electron
+related_terms: strong-force
+related_terms: atom
+quick_facts: Like charges push apart and opposite charges pull together
+quick_facts: It keeps electrons around the nucleus
+quick_facts: It pushes the protons in a nucleus apart
+quick_facts: Between particles it is far stronger than gravity
+quick_facts: It is also called the Coulomb force
+
+sources:
+    {"organization":"OpenStax","title":"University Physics Volume 2: Electric Charge","url":"https://openstax.org/books/university-physics-volume-2/pages/5-1-electric-charge"}
+
+definition:
+    The force between electric charges. Opposite charges pull together and like charges push apart. In an atom it pulls the electrons toward the nucleus. Inside the nucleus it pushes the positive protons away from each other, and the strong force has to hold them together.

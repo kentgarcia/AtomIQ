@@ -1,0 +1,25 @@
+format 1
+adapter encyclopedia 1
+category: technology
+
+entry geiger-counter
+term: Geiger Counter
+image: ../../assets/images/terms/geiger counter.webp
+related_terms: radiation
+related_terms: dosimeter
+related_terms: dose-rate
+related_terms: ionizing-radiation
+quick_facts: Counts ionization pulses from a gas-filled tube
+quick_facts: Geiger–Müller design dates to 1928
+quick_facts: Detects alpha (thin window), beta, and gamma
+quick_facts: Reports counts — not energy or full dose by itself
+quick_facts: Cheap, rugged, and instantly readable
+
+sources:
+    {"organization":"EPA","title":"Radiation Detection and Measurement","url":"https://www.epa.gov/radiation"}
+
+definition:
+    A portable radiation detector built around a gas-filled tube: when ionizing radiation passes through, it triggers a brief electrical avalanche counted as one click or blip. Invented by Hans Geiger in 1908 and refined with Walther Müller in 1928 into the rugged Geiger–Müller tube used everywhere from power plants to prospecting. With the right window it detects alpha, beta, and gamma radiation — though it only counts events, never telling you their energy.
+
+debunking_snippet:
+    “If the clicking stops, it's safe.” Dangerous trap: in extreme fields a Geiger tube saturates and goes quiet while radiation is at its worst. Silence is not safety.

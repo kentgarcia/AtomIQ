@@ -1,0 +1,25 @@
+format 1
+adapter encyclopedia 1
+category: science
+
+entry cosmic-radiation
+term: Cosmic Radiation
+image: ../../assets/images/terms/radiation.webp
+related_terms: background-radiation
+related_terms: ionizing-radiation
+related_terms: radiation
+related_terms: exposure
+quick_facts: Origins: supernovae across the galaxy, plus solar storms
+quick_facts: At ground level we're hit mainly by secondary shower particles
+quick_facts: Dose roughly doubles every 2 km of altitude
+quick_facts: Airline crews get the highest occupational doses in civilian work
+quick_facts: Earth's atmosphere and magnetic field are our shields
+
+sources:
+    {"organization":"NASA","title":"Space Radiation Analysis Group","url":"https://srag.jsc.nasa.gov/"}
+
+definition:
+    High-energy particles — mostly protons and atomic nuclei — arriving from outside the solar system (galactic cosmic rays, born in supernovae) plus bursts of solar particles from the Sun. When they smash into the atmosphere they trigger showers of secondary particles; those secondaries, not the originals, account for nearly all cosmic dose at ground level. Exposure roughly doubles every 2,000 meters of altitude, which is why airline crews receive among the highest occupational doses of any profession.
+
+debunking_snippet:
+    “Cosmic radiation is just sunlight.” It isn't light at all — it's charged particles, mostly from far beyond the solar system, moving at nearly light speed.

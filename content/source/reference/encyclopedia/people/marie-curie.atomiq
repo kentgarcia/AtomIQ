@@ -1,0 +1,25 @@
+format 1
+adapter encyclopedia 1
+category: people
+
+entry marie-curie
+term: Marie Curie
+image: /assets/images/people/curie, marie.webp
+related_terms: pierre-curie
+related_terms: henri-becquerel
+related_terms: irene-joliot-curie
+related_terms: decay
+quick_facts: Coined the term 'radioactivity'
+quick_facts: Discovered polonium and radium (1898)
+quick_facts: Nobel Prizes in two sciences: Physics (1903), Chemistry (1911)
+quick_facts: Her notebooks are still radioactive — kept in lead-lined boxes
+quick_facts: Died of aplastic anemia from decades of unprotected work
+
+sources:
+    {"organization":"Nobel Prize","title":"Marie Curie Biography","url":"https://www.nobelprize.org/prizes/physics/1903/marie-curie/biographical/"}
+
+definition:
+    Polish-French physicist and chemist (1867–1934), pioneer of radioactivity — a word she herself coined. She discovered polonium and radium in 1898, shared the 1903 Nobel Prize in Physics with Pierre Curie and Henri Becquerel, and won the 1911 Nobel Prize in Chemistry alone — making her the first woman Nobel laureate, the only person to win Nobels in two different sciences, and mother of another laureate, Irène. She worked with vials of radium on her desk and died of aplastic anemia almost certainly caused by her exposure.
+
+debunking_snippet:
+    “Curie's own notes are dangerous.” True, literally: her century-old notebooks carry radium contamination and can only be viewed with signed waivers — a stark reminder that radiation safety was learned at great cost.

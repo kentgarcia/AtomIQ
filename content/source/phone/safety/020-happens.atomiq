@@ -1,0 +1,61 @@
+format 1
+adapter safety 1
+section: happens
+
+card safety-get-inside-stay-inside-stay-tuned
+title: Get inside, stay inside, stay tuned
+icon: Home2
+references: ref-cdc-radiation-emergencies-safety
+references: ref-ready-nuclear-explosion
+summary: The official first steps in a radiation emergency.
+steps: Get inside the nearest building as soon as you can.
+steps: Stay inside, away from the walls and roof, until officials say it is safe. It usually lasts at least 24 hours.
+steps: Stay tuned to TV, radio or social media for updates. A battery or hand-crank radio helps.
+steps: Do not leave your shelter until officials or emergency responders say it is safe.
+
+card safety-good-shelter
+title: What makes a good shelter
+icon: Buildings2
+entry: shielding
+references: ref-cdc-radiation-emergencies-safety
+references: ref-ready-nuclear-explosion
+summary: More walls between you and the outdoors means more protection.
+steps: Put as many walls as you can between yourself and the outdoors, and move away from windows.
+steps: The safest buildings have brick or concrete walls.
+steps: Underground parking garages and subways can also provide good shelter.
+steps: The best spot is a basement or the center of a large building. Cars offer poor protection.
+steps: Close windows and doors, and turn off fans and air conditioners that pull in outside air.
+
+card safety-dont-go-out-to-look
+title: Why not go out to look
+icon: Warning2
+references: ref-cdc-radiation-emergencies-safety
+references: ref-ready-nuclear-explosion
+summary: Staying put protects you more than going out to see or to travel.
+steps: Radioactive materials weaken over time, which is why officials ask people to stay in for at least 24 hours.
+steps: Do not go outside to get loved ones from schools, daycares or hospitals. They have plans to keep people safe.
+steps: Do not go back to an evacuated area until local authorities say it is safe.
+steps: Leave shelter early only for an immediate hazard such as a fire or gas leak, or if officials say so.
+
+card safety-if-you-were-outside
+title: If you were outside
+icon: Drop
+references: ref-cdc-radiation-emergencies-safety
+references: ref-ready-nuclear-explosion
+references: ref-ready-radiation
+summary: Officials say to get inside, take off outer clothing and wash.
+steps: As soon as you are inside, remove your outer layer of clothing. It can remove up to 90% of radioactive material.
+steps: Take clothes off carefully, so you do not shake loose any radioactive dust.
+steps: Wash with soap and water or take a shower. Put on clean clothes.
+steps: Do not use household cleaning wipes on skin. Hand sanitizer does not protect against radioactive material.
+steps: Unsealed foods from outside may be contaminated with radioactive material.
+
+card safety-potassium-iodide
+title: Potassium iodide (KI)
+icon: Health
+references: ref-cdc-potassium-iodide
+summary: Take it only if officials say so. It protects the thyroid only.
+steps: Do not take KI unless public health or emergency officials or a healthcare provider tell you to.
+steps: KI protects only the thyroid. It does not protect other parts of the body.
+steps: It protects only against radioactive iodine, not other types of radioactive materials.
+steps: Table salt or iodine-rich foods are not a substitute for KI.

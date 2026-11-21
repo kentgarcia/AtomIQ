@@ -1,0 +1,27 @@
+format 1
+adapter encyclopedia 1
+category: people
+
+entry lise-meitner
+term: Lise Meitner
+difficulty: advanced
+image: /assets/images/people/Lise_Meitner.webp
+related_terms: otto-hahn
+related_terms: otto-frisch
+related_terms: nuclear-fission
+related_terms: ernest-rutherford
+related_terms: binding-energy
+quick_facts: Gave fission its theoretical explanation (Dec 1938)
+quick_facts: Coined the term 'fission' with her nephew Otto Frisch
+quick_facts: Fled Nazi Germany in July 1938 after 30 years in Berlin
+quick_facts: Excluded from the 1944 Nobel Prize given to Hahn alone
+quick_facts: Element 109, meitnerium, honors her
+
+sources:
+    {"organization":"Atomic Heritage Foundation","title":"Lise Meitner","url":"https://www.atomicheritage.org/profile/lise-meitner"}
+
+definition:
+    Austrian-Swedish physicist (1878–1968) who explained nuclear fission. After fleeing Nazi Germany in July 1938, she received a letter from her longtime collaborator Otto Hahn describing baffling results: neutron-bombarded uranium seemed to produce barium. Walking a winter forest with her nephew Otto Frisch over Christmas, she worked out the physics — the nucleus had split — and Frisch named it 'fission' after biology. The 1944 Chemistry Nobel went to Hahn alone; Meitner's exclusion is science's most cited injustice. She refused to work on weapons: 'I will have nothing to do with a bomb!'
+
+debunking_snippet:
+    “She was called the mother of the bomb because she built it.” She did the opposite — when invited to Los Alamos she answered: 'I will have nothing to do with a bomb.' Her contribution was understanding, not weaponry.

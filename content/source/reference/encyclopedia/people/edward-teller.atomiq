@@ -1,0 +1,26 @@
+format 1
+adapter encyclopedia 1
+category: people
+
+entry edward-teller
+term: Edward Teller
+difficulty: advanced
+image: /assets/images/people/Edward Teller.webp
+related_terms: nuclear-fusion
+related_terms: stanislaw-ulam
+related_terms: j-robert-oppenheimer
+related_terms: ernest-lawrence
+quick_facts: 'Father of the hydrogen bomb' — Ulam–Teller design, tested 1952
+quick_facts: Worked on the Manhattan Project's fission bombs
+quick_facts: Co-founded Lawrence Livermore National Laboratory (1952)
+quick_facts: Testified against Oppenheimer in 1954, dividing scientists
+quick_facts: Lifelong advocate of nuclear deterrence and testing
+
+sources:
+    {"organization":"Britannica","title":"Edward Teller","url":"https://www.britannica.com/biography/Edward-Teller"}
+
+definition:
+    Hungarian-American theoretical physicist (1908–2003), known as the 'father of the hydrogen bomb'. After fleeing Nazi Germany and working on the Manhattan Project's fission weapons, he drove the 1951 Ulam–Teller staged-compression idea that made thermonuclear weapons feasible — the Ivy Mike shot (1952) proved it. He co-founded Lawrence Livermore National Laboratory and championed nuclear weapons testing, rocket propulsion, and civil defense. His 1954 testimony that Robert Oppenheimer was a security risk split the scientific community and remains controversial.
+
+debunking_snippet:
+    “The hydrogen bomb was one man's invention.” It took many hands — Stanisław Ulam's compression scheme was as essential as Teller's vision; both names are on the key 1951 paper.

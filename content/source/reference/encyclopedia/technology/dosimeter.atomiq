@@ -1,0 +1,27 @@
+format 1
+adapter encyclopedia 1
+category: technology
+
+entry dosimeter
+term: Dosimeter
+difficulty: intermediate
+image: ../../assets/images/terms/dosimeter.webp
+related_terms: dose-rate
+related_terms: exposure
+related_terms: geiger-counter
+related_terms: absorbed-dose
+related_terms: ionizing-radiation
+quick_facts: Records cumulative personal radiation dose
+quick_facts: Passive types: film badge, TLD, OSL — read monthly or quarterly
+quick_facts: Electronic types show real-time dose and dose-rate with alarms
+quick_facts: Legally required for classified radiation workers
+quick_facts: Worn on the torso; special versions for fingers (ring badges)
+
+sources:
+    {"organization":"NRC","title":"Occupational Radiation Protection","url":"https://www.nrc.gov/about-nrc/radiation/protects-you/protection-principles.html"}
+
+definition:
+    A device worn by radiation workers to record the cumulative ionizing-radiation dose they receive. Passive types — film badges, thermoluminescent (TLD), and optically stimulated luminescent (OSL) dosimeters — are read out periodically, typically monthly. Direct-reading electronic dosimeters show live dose and dose-rate with alarms. Legal limits make them mandatory for classified workers in medicine, nuclear power, research, and industry.
+
+debunking_snippet:
+    “A Geiger counter and a dosimeter are the same thing.” They're not — a Geiger counter detects radiation instantly but forgets; a dosimeter remembers your accumulated dose over weeks and months.

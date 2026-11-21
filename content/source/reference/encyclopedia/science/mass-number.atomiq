@@ -1,0 +1,25 @@
+format 1
+adapter encyclopedia 1
+category: science
+
+entry mass-number
+term: Mass Number
+related_terms: isotope
+related_terms: atomic-number
+related_terms: proton
+related_terms: neutron
+related_terms: nucleus
+quick_facts: Mass number = protons + neutrons
+quick_facts: It is written after the name, as in uranium-235
+quick_facts: Neutrons = mass number minus atomic number
+quick_facts: Isotopes of one element have different mass numbers
+quick_facts: Electrons weigh so little that they are not counted
+
+sources:
+    {"organization":"OpenStax","title":"Chemistry 2e: Atomic Structure and Symbolism","url":"https://openstax.org/books/chemistry-2e/pages/2-3-atomic-structure-and-symbolism"}
+
+definition:
+    The total number of protons and neutrons in a nucleus. It is the number written after an element's name: carbon-14 has a mass number of 14. To find the neutrons, take away the protons. Carbon has 6 protons, so carbon-14 has 8 neutrons. The mass number is not the same as the atomic number, which counts only protons.
+
+debunking_snippet:
+    “The number in carbon-14 is the number of neutrons.” It counts protons and neutrons together. Carbon always has 6 protons, so carbon-14 has 8 neutrons.

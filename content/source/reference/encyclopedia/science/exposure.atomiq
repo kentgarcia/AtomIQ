@@ -1,0 +1,26 @@
+format 1
+adapter encyclopedia 1
+category: science
+
+entry exposure
+term: Radiation Exposure
+image: ../../assets/images/terms/exposure.webp
+related_terms: dose-rate
+related_terms: dosimeter
+related_terms: shielding
+related_terms: ionizing-radiation
+related_terms: radon
+quick_facts: External: sources outside your body
+quick_facts: Internal: breathed or eaten emitters — like radon
+quick_facts: Strict definition: ionization in air (the old roentgen)
+quick_facts: Reduce with time, distance, and shielding
+quick_facts: Everyone gets some every day — background is unavoidable
+
+sources:
+    {"organization":"EPA","title":"Radiation Protection Basics","url":"https://www.epa.gov/radiation"}
+
+definition:
+    Being subjected to radiation — externally (sources outside the body: X-ray machines, cosmic rays) or internally (inhaled or ingested emitters like radon or iodine-131). Strictly speaking, 'exposure' is also a precise legacy unit: the roentgen measured ionization produced in air by X-rays. In everyday safety talk it just means dose received, minimized by the golden trio: time (less of it), distance (more of it), shielding (more of it).
+
+debunking_snippet:
+    “Standing near a source means you're contaminated.” No — external exposure leaves nothing behind. Contamination means actual radioactive material ON or IN you; a sunburn isn't a tan made of sunshine.

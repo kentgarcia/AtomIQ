@@ -1,0 +1,22 @@
+format 1
+adapter encyclopedia 1
+category: science
+
+entry periodic-table
+term: Periodic Table
+related_terms: element
+related_terms: atomic-number
+related_terms: proton
+related_terms: isotope
+quick_facts: Elements are listed in order of atomic number
+quick_facts: The big number in a box is the atomic number: the number of protons
+quick_facts: The letters are a short symbol, such as C for carbon
+quick_facts: Elements in the same column behave alike
+quick_facts: Dmitri Mendeleev published an early version in 1869
+
+sources:
+    {"organization":"IUPAC","title":"Periodic Table of Elements","url":"https://iupac.org/what-we-do/periodic-table-of-elements/"}
+    {"organization":"OpenStax","title":"Chemistry 2e: The Periodic Table","url":"https://openstax.org/books/chemistry-2e/pages/2-5-the-periodic-table"}
+
+definition:
+    A chart of all the known elements, in order of atomic number. Each box shows an element's atomic number, its symbol and its name. To use it, start with the number of protons and find that box: it names the element. Elements in the same column behave in similar ways, which is where the name comes from.

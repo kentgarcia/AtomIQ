@@ -1,0 +1,26 @@
+format 1
+adapter encyclopedia 1
+category: environment
+
+entry spent-fuel
+term: Spent Nuclear Fuel
+difficulty: intermediate
+related_terms: radioactive-waste
+related_terms: fuel-rods
+related_terms: low-level-waste
+related_terms: plutonium-239
+related_terms: reactor-core
+quick_facts: Composition: ~93% uranium · ~5% fission products · ~1% plutonium
+quick_facts: Water pools first (≥5 years), then sealed dry casks
+quick_facts: Casks survive crashes, fires, and floods by design
+quick_facts: ~95% of its possible energy is still unused — recycling exists
+quick_facts: Finland's Onkalo is the first permanent deep repository
+
+sources:
+    {"organization":"World Nuclear","title":"Storage and Disposal of Spent Nuclear Fuel","url":"https://world-nuclear.org/information-library/nuclear-fuel-cycle/nuclear-wastes.aspx"}
+
+definition:
+    Fuel assemblies removed from a reactor after roughly 4–6 years, when fission products build up and efficiency drops. Far from empty, an assembly still holds about 93% uranium-238, ~1% plutonium, and ~5% split fragments — leaving most of its original energy unburned. Fresh out of the core it's fiercely radioactive and heat-generating, so it spends at least five years underwater, then decades in ventilated dry casks while nations debate deep repositories or recycling.
+
+debunking_snippet:
+    “Spent fuel is useless garbage.” It's mostly untouched uranium plus freshly made plutonium — countries like France reprocess it into new fuel rods rather than burying it.

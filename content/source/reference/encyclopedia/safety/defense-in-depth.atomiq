@@ -1,0 +1,25 @@
+format 1
+adapter encyclopedia 1
+category: safety
+
+entry defense-in-depth
+term: Defense-in-Depth
+difficulty: intermediate
+related_terms: containment-building
+related_terms: control-rods
+related_terms: nuclear-reactor
+related_terms: meltdown
+quick_facts: Multiple independent layers — no single point of failure
+quick_facts: Physical barriers: fuel pellet → cladding → reactor vessel → containment
+quick_facts: Five operational levels from prevention to emergency response
+quick_facts: Redundant + diverse safety systems that back each other up
+quick_facts: Codified in IAEA safety principles worldwide
+
+sources:
+    {"organization":"IAEA","title":"Safety Fundamentals","url":"https://www.iaea.org/topics/nuclear-safety-and-security"}
+
+definition:
+    The central safety philosophy of nuclear engineering: never rely on a single barrier or system, because everything can fail. Safety is layered five ways — prevent abnormal operation, control accidents within systems, contain severe damage, manage core melt, and plan emergency response — wrapped around a chain of physical barriers: the ceramic fuel pellet itself, the metal cladding around it, the steel reactor vessel, and finally the containment building. Any one layer can fail; no plausible scenario fails them all at once.
+
+debunking_snippet:
+    “Nuclear plants are safe only if nothing ever goes wrong.” The design assumes things WILL go wrong — equipment failures, operator errors, even floods — and layers backup after backup on top of each failure.

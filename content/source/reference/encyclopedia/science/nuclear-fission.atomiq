@@ -1,0 +1,24 @@
+format 1
+adapter encyclopedia 1
+category: science
+
+entry nuclear-fission
+term: Nuclear Fission
+difficulty: intermediate
+image: ../../assets/images/terms/fission.webp
+related_terms: chain-reaction
+related_terms: uranium-235
+related_terms: lise-meitner
+related_terms: mass-defect
+related_terms: spent-fuel
+quick_facts: ~200 MeV released per U-235 fission
+quick_facts: Typical split: one heavy fragment (~140 amu) + one lighter (~95 amu)
+quick_facts: Discovered 1938; explained early 1939
+quick_facts: Both fragments are radioactive — hence reactor waste
+quick_facts: Runs reactors today and could burn waste tomorrow
+
+sources:
+    {"organization":"World Nuclear","title":"Physics of Nuclear Energy","url":"https://world-nuclear.org/information-library/nuclear-fuel-cycle/introduction/physics-of-nuclear-energy.aspx"}
+
+definition:
+    The splitting of a heavy nucleus — uranium-235, plutonium-239 — into two unequal fragments plus 2–3 spare neutrons and about 200 million electron-volts of energy. Hahn and Strassmann spotted the barium evidence in late 1938; Meitner and Frisch explained it months later. Each released neutron can split another nucleus, enabling chain reactions that either simmer steadily in a reactor or multiply explosively in a weapon. The fragments themselves are intensely radioactive — which is where spent-fuel heat and waste come from.

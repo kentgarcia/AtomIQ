@@ -1,0 +1,27 @@
+format 1
+adapter encyclopedia 1
+category: science
+
+entry gamma-ray
+term: Gamma Ray (γ)
+image: ../../assets/images/terms/gamma rays.webp
+related_terms: alpha-particle
+related_terms: beta-particle
+related_terms: x-ray
+related_terms: decay
+related_terms: shielding
+related_myths: myths-facts-15
+quick_facts: High-energy photons: no mass, no charge, speed of light
+quick_facts: Emitted when a nucleus sheds leftover energy after decay
+quick_facts: Shielded by lead or concrete — never fully 'stopped', only attenuated
+quick_facts: Sterilizes ~40% of the world's single-use medical devices
+quick_facts: Cobalt-60 gamma beams treat cancer (teletherapy)
+
+sources:
+    {"organization":"EPA","title":"Radiation Basics","url":"https://www.epa.gov/radiation/radiation-basics"}
+
+definition:
+    The most penetrating form of radiation: a high-energy photon with no mass and no charge, traveling at the speed of light. Gamma rays pour out of unstable nuclei that still have excess energy after emitting an alpha or beta particle. They pass through the body easily, need centimeters of lead or meters of concrete for shielding, and ionize atoms along the way — which makes them both a hazard and a tool, from sterilizing medical equipment to treating tumors.
+
+debunking_snippet:
+    “Gamma rays make things radioactive.” At normal energies they don't — gamma irradiation adds energy, not radioactivity. That's exactly why food can be irradiated safely: nothing becomes radioactive; microbes are simply killed.

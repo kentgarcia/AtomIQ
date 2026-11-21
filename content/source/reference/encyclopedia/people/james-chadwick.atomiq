@@ -1,0 +1,24 @@
+format 1
+adapter encyclopedia 1
+category: people
+
+entry james-chadwick
+term: James Chadwick
+difficulty: intermediate
+image: /assets/images/people/chadwick.webp
+related_terms: neutron
+related_terms: nucleus
+related_terms: ernest-rutherford
+related_terms: chain-reaction
+related_terms: nuclear-fission
+quick_facts: Discovered the neutron (1932)
+quick_facts: Nobel Prize in Physics (1935)
+quick_facts: The neutron's zero charge is what makes fission chains possible
+quick_facts: Studied under, then worked alongside, Ernest Rutherford
+quick_facts: Headed the British Mission to the Manhattan Project
+
+sources:
+    {"organization":"Nobel Prize","title":"James Chadwick Biography","url":"https://www.nobelprize.org/prizes/physics/1935/chadwick/biographical/"}
+
+definition:
+    British physicist (1891–1974), student of Ernest Rutherford, who discovered the neutron in 1932 by showing that beryllium bombarded with alpha particles ejected an uncharged particle about as heavy as a proton. Because it carries no charge, the neutron slips straight into nuclei without fighting electrical repulsion — the missing key that made induced fission and chain reactions thinkable within months. The discovery earned him the 1935 Nobel Prize in Physics, and during World War II he headed the British Mission to the Manhattan Project.

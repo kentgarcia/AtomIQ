@@ -1,0 +1,25 @@
+format 1
+adapter encyclopedia 1
+category: people
+
+entry irene-joliot-curie
+term: Irène Joliot-Curie
+difficulty: intermediate
+related_terms: frederick-joliot-curie
+related_terms: marie-curie
+related_terms: pierre-curie
+related_terms: decay
+quick_facts: Co-discovered artificial radioactivity (1934)
+quick_facts: Nobel Prize in Chemistry (1935) — second woman so honored
+quick_facts: Daughter of Marie and Pierre Curie
+quick_facts: France's Undersecretary for Scientific Research (1936)
+quick_facts: Died of leukemia linked to early unshielded lab work
+
+sources:
+    {"organization":"Nobel Prize","title":"Irène Joliot-Curie Biography","url":"https://www.nobelprize.org/prizes/chemistry/1935/joliot-curie/biographical/"}
+
+definition:
+    French chemist and physicist (1897–1956), daughter of Marie and Pierre Curie and, with her husband Frédéric, discoverer of artificial radioactivity in 1934 — earning the 1935 Nobel Prize in Chemistry as only the second woman ever to win one. She served as Undersecretary of State for Scientific Research in post-war France and helped shape early French reactors. Like her mother, she died of a radiation-linked blood disease (leukemia), a consequence of working before protection standards existed.
+
+debunking_snippet:
+    “Radiation safety rules are bureaucratic overkill.” They were written in the blood of pioneers like Irène Joliot-Curie and her mother — brilliant scientists who handled sources bare-handed because nobody knew better yet.

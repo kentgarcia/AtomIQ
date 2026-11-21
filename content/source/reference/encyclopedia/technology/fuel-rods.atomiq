@@ -1,0 +1,25 @@
+format 1
+adapter encyclopedia 1
+category: technology
+
+entry fuel-rods
+term: Fuel Rods
+image: ../../assets/images/terms/fuel rods.webp
+related_terms: nuclear-reactor
+related_terms: uranium-235
+related_terms: reactor-core
+related_terms: defense-in-depth
+quick_facts: Ceramic uranium-dioxide pellets inside zircon-alloy tubes
+quick_facts: Pellets melt only around 2,800 °C and retain fission products
+quick_facts: Rods bundle into assemblies standing in the reactor core
+quick_facts: Cladding = second barrier of defense-in-depth
+quick_facts: Replaced roughly every 4–6 years as spent fuel
+
+sources:
+    {"organization":"World Nuclear","title":"Nuclear Fuel Cycle","url":"https://world-nuclear.org/information-library/nuclear-fuel-cycle.aspx"}
+
+definition:
+    Long sealed metal tubes — typically zirconium alloy — packed with ceramic pellets of enriched uranium dioxide, each about the size of a fingertip. The rods are bundled into fuel assemblies that stand inside the reactor core, where fission in the pellets generates heat. The ceramic pellet survives temperatures near 2,800 °C and traps most fission products inside it; the cladding tube around it is the second physical barrier in defense-in-depth, keeping radioactive material sealed away from the coolant.
+
+debunking_snippet:
+    “Nuclear fuel rods are glowing green bars.” Real fuel looks like plain gray ceramic pellets stacked in metal tubes — it isn't even noticeably radioactive before it goes into the reactor.

@@ -1,0 +1,23 @@
+format 1
+adapter encyclopedia 1
+category: people
+
+entry glenn-seaborg
+term: Glenn Seaborg
+difficulty: advanced
+image: /assets/images/people/Glenn Seaborg.webp
+related_terms: plutonium-239
+related_terms: glenn-seaborg-transuranium
+related_terms: ernest-lawrence
+related_terms: transmutation
+quick_facts: Co-discovered plutonium (1941)
+quick_facts: Nobel Prize in Chemistry (1951, with McMillan)
+quick_facts: Credited with 10 transuranium elements
+quick_facts: His actinide concept reshaped the periodic table
+quick_facts: Only person with an element named after them in their lifetime
+
+sources:
+    {"organization":"Nobel Prize","title":"Glenn Seaborg Biography","url":"https://www.nobelprize.org/prizes/chemistry/1951/seaborg/biographical/"}
+
+definition:
+    American chemist (1912–1999) who discovered plutonium in 1941 and went on to share in the identification of ten transuranium elements, work honored with the 1951 Nobel Prize in Chemistry (with Edwin McMillan). He proposed the actinide concept that reshaped the periodic table's bottom row, advised ten presidents — including chairing the AEC under Kennedy and Johnson — and remains the only person to have a chemical element (seaborgium) named after him while still alive.

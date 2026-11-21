@@ -1,0 +1,27 @@
+format 1
+adapter encyclopedia 1
+category: science
+
+entry absorbed-dose
+term: Absorbed Dose
+difficulty: intermediate
+image: ../../assets/images/terms/Absorbed dose.webp
+related_terms: gray
+related_terms: sievert
+related_terms: exposure
+related_terms: ionizing-radiation
+related_terms: dosimeter
+quick_facts: 1 Gy = 1 joule of energy per kilogram
+quick_facts: Applies to any material, not just living tissue
+quick_facts: Different from equivalent dose, which is measured in sieverts
+quick_facts: A short whole-body dose of ~5 Gy is often fatal without medical care
+quick_facts: Measured with dosimeters and ionization chambers
+
+sources:
+    {"organization":"IAEA","title":"Radiation Protection","url":"https://www.iaea.org/topics/radiation-protection"}
+
+definition:
+    The amount of radiation energy deposited in matter per unit mass, measured in gray (Gy) — where 1 Gy equals 1 joule of energy absorbed by 1 kilogram of material. It applies to any absorbing material, but in health physics it usually describes energy absorbed by body tissue. It differs from equivalent dose (measured in sieverts), which weights each radiation type by its biological effect.
+
+debunking_snippet:
+    Absorbed dose alone doesn't tell you the biological risk. A gray of alpha radiation causes far more tissue damage than a gray of X-rays — that's why equivalent dose (sieverts) exists.

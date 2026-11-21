@@ -1,0 +1,17 @@
+format 1
+adapter mythbuster 1
+difficulty: hard
+
+question mb-demo-hard-1
+
+question:
+    Hard one?
+
+answer: 3
+options: yes
+options: no
+options: maybe
+options: ask
+
+explanation:
+    Ask.

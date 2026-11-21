@@ -1,0 +1,23 @@
+format 1
+adapter encyclopedia 1
+category: technology
+
+entry uranium-hexafluoride
+term: Uranium Hexafluoride (UF₆)
+difficulty: advanced
+image: ../../assets/images/terms/Uranium Hexafluoride (UF₆).webp
+related_terms: enrichment
+related_terms: uranium-235
+related_terms: yellowcake
+related_terms: uranium-238
+quick_facts: Sublimes at 56 °C — the working gas of enrichment
+quick_facts: Only volatile uranium compound suitable for centrifuges
+quick_facts: Reacts violently with water → hydrofluoric acid
+quick_facts: Shipped internationally in thick-walled steel cylinders
+quick_facts: Fluorine comes back out unchanged — reused endlessly
+
+sources:
+    {"organization":"World Nuclear","title":"Conversion and Deconversion","url":"https://world-nuclear.org/information-library/nuclear-fuel-cycle/enrichment-and-conversion"}
+
+definition:
+    One uranium atom bonded to six fluorines — the compound that makes enrichment practical. It sublimes directly from solid to gas at just 56 °C under normal pressure, letting centrifuge cascades work on a gas whose molecules differ only by the whisper of mass between U-235 and U-238. The trade-off: UF₆ is ferociously reactive with moisture, breaking down into corrosive hydrofluoric acid, so it travels in rugged cylinders under strict handling rules.

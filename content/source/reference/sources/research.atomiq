@@ -1,0 +1,32 @@
+format 1
+adapter references 1
+kind: research
+
+source ref-becquerel-1896
+publisher: Comptes Rendus de l'Academie des Sciences
+title: Sur les radiations emises par phosphorescence
+authors: H. Becquerel
+year: 1896
+note: Discovery that uranium salts darken photographic plates.
+
+source ref-grs-oklo
+publisher: GRS (Gesellschaft fuer Anlagen- und Reaktorsicherheit)
+title: Oklo natural reactor
+url: https://www.grs.de/en/glossary/oklo-natural-reactor
+accessed: 2026-11-20
+note: Opened and read on 2026-11-20 to write the content; a person still has to confirm what it supports.
+
+source ref-mpic-fission
+publisher: Max Planck Institute for Chemistry
+title: The Discovery of Nuclear Fission
+url: https://www.mpic.de/4469988/die-entdeckung-der-kernspaltung
+accessed: 2026-11-20
+note: Opened and read on 2026-11-20 to write the content; a person still has to confirm what it supports.
+
+source ref-rutherford-1911
+publisher: Philosophical Magazine
+title: The scattering of alpha and beta particles by matter and the structure of the atom
+authors: E. Rutherford
+year: 1911
+url: https://doi.org/10.1080/14786440508637080
+note: Gold-foil interpretation: a small dense nucleus, and an atom that is mostly empty space.

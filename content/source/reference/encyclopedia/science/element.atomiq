@@ -1,0 +1,25 @@
+format 1
+adapter encyclopedia 1
+category: science
+
+entry element
+term: Element
+related_terms: atom
+related_terms: atomic-number
+related_terms: periodic-table
+related_terms: isotope
+related_terms: proton
+quick_facts: Every atom of an element has the same number of protons
+quick_facts: About 118 elements are known
+quick_facts: The periodic table lists them in order of atomic number
+quick_facts: Atoms of one element can differ in neutrons: those are isotopes
+quick_facts: Change the number of protons and you change the element
+
+sources:
+    {"organization":"OpenStax","title":"Chemistry 2e: The Periodic Table","url":"https://openstax.org/books/chemistry-2e/pages/2-5-the-periodic-table"}
+
+definition:
+    A pure substance made of only one kind of atom: every atom of an element has the same number of protons. Hydrogen, carbon, oxygen and gold are elements. About 118 elements are known, and the periodic table lists them in order of atomic number.
+
+debunking_snippet:
+    “Elements are made of different kinds of stuff.” Every atom is built from the same three particles. Only the number of protons is different.

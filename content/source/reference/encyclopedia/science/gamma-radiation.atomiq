@@ -1,0 +1,25 @@
+format 1
+adapter encyclopedia 1
+category: science
+
+entry gamma-radiation
+term: Gamma Radiation
+related_terms: gamma-ray
+related_terms: electromagnetic-radiation
+related_terms: decay
+related_terms: radioactivity
+related_terms: radiation
+quick_facts: It is electromagnetic radiation, not a particle
+quick_facts: It is like light, but far more energetic
+quick_facts: It carries away extra energy from the nucleus
+quick_facts: The nucleus keeps the same protons and neutrons
+quick_facts: It is not made of tiny pieces of the nucleus
+
+sources:
+    {"organization":"OpenStax","title":"University Physics Volume 3: Radioactive Decay","url":"https://openstax.org/books/university-physics-volume-3/pages/10-3-radioactive-decay"}
+
+definition:
+    High-energy electromagnetic radiation given off by a nucleus, usually right after an alpha or beta decay leaves it with extra energy. Gamma radiation is not a particle and is not made of pieces of the nucleus. It is like light, but far more energetic. Giving off gamma radiation changes neither the number of protons nor the number of neutrons.
+
+debunking_snippet:
+    “Gamma radiation is made of tiny pieces of the nucleus.” It is electromagnetic radiation, like light but far more energetic.

@@ -1,0 +1,22 @@
+format 1
+adapter encyclopedia 1
+category: science
+
+entry alpha-decay
+term: Alpha Decay
+related_terms: alpha-particle
+related_terms: decay
+related_terms: radioactivity
+related_terms: parent-nuclide
+related_terms: daughter-nuclide
+quick_facts: An alpha particle is 2 protons and 2 neutrons
+quick_facts: It is the nucleus of a helium atom
+quick_facts: The daughter has 2 fewer protons, so it is a different element
+quick_facts: It is common in very heavy nuclei
+quick_facts: Alpha is a particle, not electromagnetic radiation
+
+sources:
+    {"organization":"OpenStax","title":"University Physics Volume 3: Radioactive Decay","url":"https://openstax.org/books/university-physics-volume-3/pages/10-3-radioactive-decay"}
+
+definition:
+    A kind of radioactive decay in which a nucleus gives off an alpha particle: 2 protons and 2 neutrons stuck together, the nucleus of a helium atom. The nucleus that is left has 2 fewer protons and 2 fewer neutrons, so it is a different element. Alpha decay is common in very heavy nuclei such as uranium.

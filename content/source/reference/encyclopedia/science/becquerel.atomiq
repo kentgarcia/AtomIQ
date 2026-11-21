@@ -1,0 +1,27 @@
+format 1
+adapter encyclopedia 1
+category: science
+
+entry becquerel
+term: Becquerel (Bq)
+difficulty: intermediate
+image: ../../assets/images/terms/bq.webp
+related_terms: half-life
+related_terms: decay
+related_terms: henri-becquerel
+related_terms: radionuclide
+related_terms: marie-curie
+quick_facts: 1 Bq = exactly one nuclear decay per second
+quick_facts: Named after Henri Becquerel, discoverer of radioactivity (1896)
+quick_facts: Activity tells you how many decays occur — not how much energy or danger
+quick_facts: 1 curie (Ci) = 37 billion Bq
+quick_facts: Smoke detectors contain ~30 kBq americium-241
+
+sources:
+    {"organization":"BIPM","title":"SI Units – becquerel","url":"https://www.bipm.org/en/measurement-units"}
+
+definition:
+    The SI unit of radioactivity: one nuclear decay per second, named after French physicist Henri Becquerel, who discovered radioactivity in 1896. Because individual decays are rare events for large samples, real-world activities are often huge numbers — household smoke detectors hold about 30,000 Bq of americium-241. The older unit, the curie (Ci), equals 3.7×10¹⁰ Bq.
+
+debunking_snippet:
+    “High activity means high danger.” Not necessarily — becquerels count decays, but dose depends on energy, radiation type, distance, and whether the source gets inside your body.

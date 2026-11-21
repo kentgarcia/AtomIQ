@@ -1,0 +1,27 @@
+format 1
+adapter encyclopedia 1
+category: science
+
+entry nuclear-fusion
+term: Nuclear Fusion
+difficulty: advanced
+image: ../../assets/images/terms/fusion.webp
+related_terms: nuclear-fission
+related_terms: binding-energy
+related_terms: hans-bethe
+related_terms: mass-defect
+related_terms: tritium
+quick_facts: ~4× more energy per kg of fuel than fission
+quick_facts: Powers all stars — the Sun fuses 600 million tonnes of H every second
+quick_facts: Needs stellar temperatures: millions of degrees minimum
+quick_facts: D–T fusion: 17.6 MeV per reaction, mostly as a fast neutron
+quick_facts: Main 'waste' is short-lived activated metal, not millennia-old fuel
+
+sources:
+    {"organization":"ITER","title":"What is Fusion?","url":"https://www.iter.org/sci/whatisfusion"}
+
+definition:
+    Joining two light nuclei — usually hydrogen isotopes — into a heavier one, converting the mass difference to energy. Per kilogram of fuel, fusion releases roughly four times more energy than fission (though each single reaction carries less punch than one fission). It powers every star, including our Sun, whose core squeezes protons together at 15 million °C against their mutual repulsion. On Earth, magnetic bottles (tokamaks like ITER) and laser implosions chase net energy, with deuterium–tritium the easiest first target.
+
+debunking_snippet:
+    “Each fusion reaction out-energizes each fission.” Individually it doesn't — 17.6 MeV versus ~200 MeV per event. Fusion's advantage is per kilogram of fuel, thanks to light nuclei packing more binding-energy gain.

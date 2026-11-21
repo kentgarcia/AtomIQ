@@ -1,0 +1,27 @@
+format 1
+adapter encyclopedia 1
+category: science
+
+entry decay-chain
+term: Decay Chain
+related_terms: decay
+related_terms: parent-nuclide
+related_terms: daughter-nuclide
+related_terms: radon
+related_terms: radioactivity
+related_terms: half-life
+quick_facts: One unstable nucleus can start a whole chain
+quick_facts: Each step makes a different nucleus
+quick_facts: The chain ends at a stable nucleus
+quick_facts: The uranium-238 chain ends in stable lead-206
+quick_facts: The thorium-232 chain ends in stable lead-208
+
+sources:
+    {"organization":"OpenStax","title":"University Physics Volume 3: Radioactive Decay","url":"https://openstax.org/books/university-physics-volume-3/pages/10-3-radioactive-decay"}
+    {"organization":"U.S. Nuclear Regulatory Commission","title":"Natural decay series (candidate source: open and confirm before publish)","url":""}
+
+definition:
+    A sequence of radioactive decays in which one nucleus changes into another, which may decay again, and so on until a stable nucleus is reached. Every step makes a different nucleus. Nature has several long chains, for example the uranium-238 chain, which ends in stable lead-206, and the thorium-232 chain, which ends in stable lead-208. Radon is one link in the uranium chain.
+
+debunking_snippet:
+    “Every decay makes a stable atom.” Many decays only make another unstable nucleus, so the chain goes on.

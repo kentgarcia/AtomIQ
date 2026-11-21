@@ -1,0 +1,26 @@
+format 1
+adapter encyclopedia 1
+category: science
+
+entry strong-force
+term: Strong Force
+related_terms: nucleus
+related_terms: proton
+related_terms: neutron
+related_terms: electric-force
+related_terms: nuclear-stability
+related_terms: binding-energy
+quick_facts: It holds the nucleus together
+quick_facts: It is much stronger than the electric push between protons
+quick_facts: It only works over about the size of a nucleus
+quick_facts: Neutrons feel it too, but they have no charge, so they do not push
+quick_facts: It is one of the four basic forces of nature
+
+sources:
+    {"organization":"OpenStax","title":"University Physics Volume 3: Nuclear Binding Energy","url":"https://openstax.org/books/university-physics-volume-3/pages/10-2-nuclear-binding-energy"}
+
+definition:
+    The force that holds the protons and neutrons together inside a nucleus. It is much stronger than the electric push between protons, but it only works over a very short distance, about the size of a nucleus. In a stable nucleus the strong force wins over the push. If the balance is wrong, the nucleus is unstable.
+
+debunking_snippet:
+    “Neutrons are just glue.” Neutrons feel the strong force and have no charge, so they change the balance in a nucleus. But the balance depends on the whole mix of protons and neutrons, not on neutrons alone.

@@ -1,0 +1,50 @@
+format 1
+adapter safety 1
+section: basics
+
+card safety-time-distance-shielding
+title: Time, distance, shielding
+icon: Timer1
+entry: shielding
+references: ref-epa-protecting-yourself
+summary: Three ways to lower the dose from a radiation source.
+steps: Time: spending less time near a source reduces the dose from it.
+steps: Distance: the dose decreases dramatically as you move farther from the source.
+steps: Shielding: a proper barrier between you and a source greatly reduces or eliminates the dose.
+steps: Lead, concrete or water barriers protect from penetrating gamma rays.
+
+card safety-background-radiation
+title: Background radiation
+icon: Sun1
+entry: background-radiation
+references: ref-nrc-doses-daily-lives
+references: ref-who-ionizing-radiation
+summary: Radiation has always been part of the natural environment.
+steps: Radiation has always been all around us as part of our natural environment.
+steps: Most background exposure comes from radon in the air. Cosmic rays and the Earth add smaller shares.
+steps: Food and water carry some natural radioactive material, such as potassium-40.
+steps: Medical procedures account for nearly all human exposure to man-made radiation.
+
+card safety-what-is-a-dose
+title: What a dose is
+icon: Chart
+entry: absorbed-dose
+references: ref-epa-radiation-health-effects
+references: ref-who-ionizing-radiation
+summary: How much radiation the body takes in, and how fast, both matter.
+steps: Damage depends on the absorbed dose, measured in grays. The effective dose is in sieverts.
+steps: The dose rate matters too: it is how fast the dose is delivered.
+steps: Effects such as burns are more severe at higher doses and higher dose rates.
+steps: Low doses delivered slowly carry a lower risk, because the body is more likely to repair the damage.
+
+card safety-exposure-vs-contamination
+title: Exposure or contamination?
+icon: Drop
+entry: exposure
+references: ref-cdc-contamination-vs-exposure
+references: ref-hps-radioactive-contamination
+summary: Being exposed to radiation is not the same as having radioactive material on you.
+steps: Exposure is radiation reaching a person, like the beam of an x-ray.
+steps: Contamination is radioactive material on or inside the body.
+steps: A person exposed to radiation is not necessarily contaminated.
+steps: Radiation does not spread or get on people. Radioactive contamination is what can be spread.

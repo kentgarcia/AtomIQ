@@ -1,0 +1,23 @@
+format 1
+adapter encyclopedia 1
+category: science
+
+entry thermal-neutron
+term: Thermal Neutron
+difficulty: advanced
+image: ../../assets/images/terms/Thermal Neutron.webp
+related_terms: neutron
+related_terms: moderator
+related_terms: nuclear-fission
+related_terms: uranium-235
+quick_facts: ≈0.025 eV · ≈2.2 km/s — room temperature equilibrium
+quick_facts: U-235 fission cross-section: ~585 barns thermal vs ~1 barn fast
+quick_facts: Produced by bouncing fast neutrons off light nuclei
+quick_facts: The design target of every moderated reactor
+quick_facts: Cadmium and boron absorb them voraciously
+
+sources:
+    {"organization":"World Nuclear","title":"Physics of Nuclear Energy","url":"https://world-nuclear.org/information-library/nuclear-fuel-cycle/introduction/physics-of-nuclear-energy.aspx"}
+
+definition:
+    A neutron slowed to thermal equilibrium with its surroundings — about 0.025 eV of energy and a leisurely 2.2 km/s, versus a newborn fission neutron's 20,000 km/s. The slowdown matters enormously: uranium-235's capture cross-section balloons from about 1 barn at high speed to roughly 585 barns at thermal energies, which is why almost every power reactor carries a moderator to provide them. Uranium-238, meanwhile, prefers to swallow faster neutrons — the reason moderation and enrichment go hand in hand.

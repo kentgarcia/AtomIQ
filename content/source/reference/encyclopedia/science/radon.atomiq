@@ -1,0 +1,25 @@
+format 1
+adapter encyclopedia 1
+category: science
+
+entry radon
+term: Radon
+related_terms: background-radiation
+related_terms: decay
+related_terms: alpha-particle
+related_terms: exposure
+quick_facts: Noble gas from uranium decay in the ground
+quick_facts: #2 cause of lung cancer overall, #1 among non-smokers
+quick_facts: Pool in basements — heavier than air
+quick_facts: WHO action reference: ~300 Bq/m³ indoors
+quick_facts: Fixed cheaply with sub-slab depressurization vents
+
+sources:
+    {"organization":"EPA","title":"Radon","url":"https://www.epa.gov/radon"}
+    {"organization":"WHO","title":"Radon and Health","url":"https://www.who.int/news-room/fact-sheets/detail/radon-and-health"}
+
+definition:
+    A colorless, odorless radioactive gas seeping from trace uranium in soil, rock, and building materials — the heaviest gas and a noble one, so it drifts freely into basements and lower floors. Its short-lived daughter products stick in lungs and emit alpha particles there, making radon the leading cause of lung cancer among non-smokers and the single largest natural dose for most people. Cheap test kits and sub-slab ventilation fix problem buildings.
+
+debunking_snippet:
+    “Radon is only a problem in uranium mines.” It's everywhere — the average home holds some, and tightly sealed modern houses can concentrate it. Testing costs less than a pizza.

@@ -183,9 +183,9 @@ describe("checksFor", () => {
   });
 });
 
-describe("content:edit command (on a table the files do not own: myths)", () => {
-  const MYTH = "all-radiation-manmade";
-  const myth = () => query(fx.paths, "SELECT id, title FROM myths WHERE id = ?", MYTH)[0];
+describe("content:edit command (on a table the files do not own: units)", () => {
+  const MYTH = "inside-the-atom";
+  const myth = () => query(fx.paths, "SELECT id, title FROM units WHERE id = ?", MYTH)[0];
   const run = (...args) =>
     spawnSync(process.execPath, ["--no-warnings", new URL("./content-edit.mjs", import.meta.url).pathname, ...args], {
       env: { ...process.env, ATOMIQ_ROOT: fx.root },
@@ -194,10 +194,10 @@ describe("content:edit command (on a table the files do not own: myths)", () => 
   const patchFile = path.join(fx.root, "patch.json");
 
   it("a dry run reports the change and leaves the master alone", () => {
-    fs.writeFileSync(patchFile, JSON.stringify({ note: "cli test", ops: [{ op: "update", table: "myths", pk: MYTH, set: { title: "via cli" } }] }));
+    fs.writeFileSync(patchFile, JSON.stringify({ note: "cli test", ops: [{ op: "update", table: "units", pk: MYTH, set: { title: "via cli" } }] }));
     const r = run(patchFile);
     assert.equal(r.status, 0, r.stderr);
-    assert.match(r.stdout, /update myths\[all-radiation-manmade\]/);
+    assert.match(r.stdout, /update units\[inside-the-atom\]/);
     assert.match(r.stdout, /Dry run only/);
     assert.notEqual(myth().title, "via cli");
   });
@@ -213,7 +213,7 @@ describe("content:edit command (on a table the files do not own: myths)", () => 
   });
 
   it("a bad patch exits 1 and changes nothing", () => {
-    fs.writeFileSync(patchFile, JSON.stringify([{ op: "update", table: "myths", pk: MYTH, set: { no_such_column: 1 } }]));
+    fs.writeFileSync(patchFile, JSON.stringify([{ op: "update", table: "units", pk: MYTH, set: { no_such_column: 1 } }]));
     const r = run(patchFile, "--apply", "--no-verify");
     assert.equal(r.status, 1);
     assert.match(r.stderr, /Nothing was changed/);
@@ -241,9 +241,9 @@ describe("content:edit command (on a table the files do not own: myths)", () => 
   });
 
   it("get and sql read without writing", () => {
-    const g = run("get", "myths", "--pk", MYTH, "--cols", "id,title");
+    const g = run("get", "units", "--pk", MYTH, "--cols", "id,title");
     assert.equal(g.status, 0, g.stderr);
     assert.deepEqual(JSON.parse(g.stdout), [{ id: MYTH, title: "via cli" }]);
-    assert.notEqual(run("sql", "DELETE FROM myths").status, 0);
+    assert.notEqual(run("sql", "DELETE FROM units").status, 0);
   });
 });

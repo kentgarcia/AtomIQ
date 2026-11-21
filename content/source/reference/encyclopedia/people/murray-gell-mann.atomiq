@@ -1,0 +1,22 @@
+format 1
+adapter encyclopedia 1
+category: people
+
+entry murray-gell-mann
+term: Murray Gell-Mann
+difficulty: advanced
+related_terms: proton
+related_terms: neutron
+related_terms: electron
+related_terms: binding-energy
+quick_facts: Proposed the quark model (1964)
+quick_facts: Named 'quark' from James Joyce's Finnegans Wake
+quick_facts: Nobel Prize in Physics (1969)
+quick_facts: Earlier devised the 'eightfold way' classification of particles
+quick_facts: Also co-founded complexity science at Santa Fe Institute
+
+sources:
+    {"organization":"Nobel Prize","title":"Murray Gell-Mann Biography","url":"https://www.nobelprize.org/prizes/physics/1969/gell-mann/biographical/"}
+
+definition:
+    American theoretical physicist (1929–2019) who brought order to the particle zoo. His 1961 'eightfold way' sorted hadrons into families by symmetry, then in 1964 he proposed that protons and neutrons are built from three fractionally-charged constituents he named quarks — a word he lifted from Joyce's Finnegans Wake ('Three quarks for Muster Mark!'). The quark model earned him the 1969 Nobel Prize in Physics and remains the backbone of our picture of matter's deepest layer.

@@ -1,0 +1,24 @@
+format 1
+adapter encyclopedia 1
+category: technology
+
+entry reactor-core
+term: Reactor Core
+difficulty: intermediate
+image: ../../assets/images/terms/Reactor Core.webp
+related_terms: nuclear-reactor
+related_terms: fuel-rods
+related_terms: control-rods
+related_terms: moderator
+related_terms: chain-reaction
+quick_facts: Lattice of fuel assemblies + moderator + control rods
+quick_facts: Runs at exactly k = 1 — self-sustaining but steady
+quick_facts: Ceramic pellets reach service temperatures >500 °C
+quick_facts: Refueled in thirds every 12–24 months
+quick_facts: Wrapped in pressure vessel, shielding, containment
+
+sources:
+    {"organization":"World Nuclear","title":"Nuclear Power Reactors","url":"https://world-nuclear.org/information-library/nuclear-fuel-cycle/nuclear-power-reactors.aspx"}
+
+definition:
+    The heart of the reactor: a carefully engineered lattice of fuel assemblies, moderator, coolant channels, and control elements where the chain reaction lives. Geometry is everything — spacing determines how neutrons bounce between fuel and moderator, keeping the reaction exactly critical. Cores hold tonnes of ceramic fuel at hundreds of degrees, transfer megawatts of heat to the coolant, and shut themselves down when control rods drop in. Everything else in the plant exists to serve or protect it.

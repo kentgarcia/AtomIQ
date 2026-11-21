@@ -1,0 +1,25 @@
+format 1
+adapter encyclopedia 1
+category: science
+
+entry parent-nuclide
+term: Parent Nuclide
+related_terms: daughter-nuclide
+related_terms: decay
+related_terms: radioactivity
+related_terms: radionuclide
+related_terms: decay-chain
+quick_facts: The parent is the nucleus that decays
+quick_facts: It is unstable
+quick_facts: It changes into the daughter and gives off radiation
+quick_facts: It changes by itself
+quick_facts: In a decay chain, each daughter becomes the next parent
+
+sources:
+    {"organization":"OpenStax","title":"University Physics Volume 3: Radioactive Decay","url":"https://openstax.org/books/university-physics-volume-3/pages/10-3-radioactive-decay"}
+
+definition:
+    The nucleus that decays in a radioactive decay. It is unstable. When it changes, it turns into a different nucleus, called the daughter, and gives off radiation. Nobody has to start the change: the parent changes by itself, at a moment nobody can predict for one nucleus.
+
+debunking_snippet:
+    “A radioactive atom needs a person to make it decay.” The parent changes by itself. Nobody has to trigger it.

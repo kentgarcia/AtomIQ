@@ -1,0 +1,19 @@
+format 1
+adapter statements 1
+unit: demo-unit
+
+statement demo-unit-s01
+verdict: fact
+statement: Everything is made of atoms.
+
+explanation:
+    Even air is.
+
+statement demo-unit-s02
+verdict: myth
+statement: Atoms are mostly solid.
+
+explanation:
+    They are mostly empty space.
+
+    Very empty.

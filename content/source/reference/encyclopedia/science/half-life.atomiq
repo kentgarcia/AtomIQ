@@ -1,0 +1,26 @@
+format 1
+adapter encyclopedia 1
+category: science
+
+entry half-life
+term: Half-Life
+image: ../../assets/images/terms/Half-Life.webp
+related_terms: decay
+related_terms: isotope
+related_terms: becquerel
+related_terms: radionuclide
+related_terms: uranium-238
+quick_facts: Time for half of a sample's atoms to decay
+quick_facts: Exponential: 2 half-lives → ¼ left, 3 → ⅛
+quick_facts: Ranges from milliseconds (Po-212) to billions of years (U-238)
+quick_facts: Iodine-131: 8 days · Carbon-14: 5,700 years · U-238: 4.5 billion
+quick_facts: Unchanged by heat, cold, pressure, or chemistry
+
+sources:
+    {"organization":"EPA","title":"Radioactive Decay","url":"https://www.epa.gov/radiation/radioactive-decay"}
+
+definition:
+    The time it takes for half of the atoms in a radioactive sample to decay — and then half of what's left in the next interval, and so on. Decay is a pure exponential: after two half-lives a quarter survives, after three an eighth. Every isotope has its own fixed value, from fractions of a second (polonium-212) to billions of years (uranium-238). It cannot practically be altered by temperature, pressure, or chemistry — which makes half-life a dependable clock for dating everything from ancient wood to Earth's oldest rocks.
+
+debunking_snippet:
+    “After two half-lives it's all gone.” After two half-lives a quarter remains, and it keeps halving forever — never quite zero. That's why waste storage is measured in many half-lives.

@@ -21,12 +21,22 @@ import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { DatabaseSync } from "node:sqlite";
 
-import { backupBeforeScript } from "../lib/backup.mjs";
-import { validateMap } from "../lib/map-rules.mjs";
-import { validateSafety } from "../lib/safety-rules.mjs";
+import { backupBeforeScript } from "../../lib/backup.mjs";
+import { validateMap } from "../../lib/map-rules.mjs";
+import { validateSafety } from "../../lib/safety-rules.mjs";
+
+/**
+ * RETIRED (content source files). The rows this script writes (the Safety Guide cards and the Nuclear Map sites (and their references)) are written in content/source/phone/safety and content/source/phone/map and built with
+ * `npm run content:sync`; running this would overwrite them behind the files' back. Kept only as history.
+ * Do not run it. Edit the files (docs/features/CONTENT_SOURCE_SPEC.md).
+ */
+if (!process.argv.includes("--i-know-this-is-retired")) {
+  console.error("add-safety-and-map.mjs is retired: the Safety Guide cards and the Nuclear Map sites (and their references) live in content/source/phone/safety and content/source/phone/map and are built by `npm run content:sync`.");
+  process.exit(1);
+}
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
-const ROOT = path.resolve(HERE, "..", "..");
+const ROOT = path.resolve(HERE, "..", "..", "..");
 const args = process.argv.slice(2);
 const overwrite = args.includes("--overwrite");
 const dbArg = args.indexOf("--db");

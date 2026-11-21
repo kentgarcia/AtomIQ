@@ -1,0 +1,24 @@
+format 1
+adapter encyclopedia 1
+category: people
+
+entry enrico-fermi
+term: Enrico Fermi
+difficulty: intermediate
+image: /assets/images/people/fermi.webp
+related_terms: nuclear-reactor
+related_terms: chain-reaction
+related_terms: nuclear-fission
+related_terms: arthur-compton
+related_terms: leo-szilard
+quick_facts: Built Chicago Pile-1, the first reactor (Dec 2, 1942)
+quick_facts: Nobel Prize in Physics (1938) for slow-neutron work
+quick_facts: Left Italy in 1938 over anti-Jewish laws affecting his wife
+quick_facts: Element fermium, 'fermions', and Fermilab honor him
+quick_facts: Co-designed the pile with Leo Szilard on the team
+
+sources:
+    {"organization":"DOE","title":"Enrico Fermi","url":"https://www.energy.gov/science/doe-explainsscientists/enrico-fermi"}
+
+definition:
+    Italian-American physicist (1901–1954), arguably the last great physicist at home in both theory and experiment. He won the 1938 Nobel Prize for discovering nuclear reactions induced by slow neutrons, then — after fleeing fascist Italy's racial laws — directed the construction of Chicago Pile-1, the world's first self-sustaining chain reaction (December 2, 1942), under Arthur Compton's Met Lab. Fermions, fermium, Fermilab, and the Fermi paradox all carry his name.

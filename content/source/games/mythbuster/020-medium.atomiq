@@ -1,0 +1,703 @@
+format 1
+adapter mythbuster 1
+difficulty: medium
+
+question mb-medium-q1
+
+question:
+    Which subatomic particles determine the mass number of an atom?
+
+answer: 2
+options: Electron
+options: Proton
+options: Proton and neutron
+options: Neutron only
+
+explanation:
+    The mass number is the total number of protons and neutrons in the nucleus. Electrons are so light that they add almost no mass.
+
+question mb-medium-q2
+
+question:
+    What happens to an atom when it loses an electron?
+
+answer: 2
+options: Becomes neutral
+options: Becomes negatively charged
+options: Becomes positively charged
+options: Becomes unstable
+
+explanation:
+    Losing a negatively charged electron leaves more protons than electrons, so the atom becomes a positively charged ion.
+
+question mb-medium-q3
+
+question:
+    Which type of radiation has the lowest penetrating power?
+
+answer: 2
+options: Gamma
+options: Beta
+options: Alpha
+options: X-ray
+
+explanation:
+    Alpha particles are large and heavy, so even a sheet of paper or the outer layer of skin stops them.
+
+question mb-medium-q4
+
+question:
+    What is the main purpose of a moderator in a nuclear reactor?
+
+answer: 1
+options: Increase temperature
+options: Slow down neutrons
+options: Absorb radiation
+options: Produce energy
+
+explanation:
+    A moderator, such as water or graphite, slows neutrons down so they are more likely to cause fission.
+
+question mb-medium-q5
+
+question:
+    Which of the following is NOT ionizing radiation?
+
+answer: 3
+options: Alpha
+options: Beta
+options: Gamma
+options: Radio waves
+
+explanation:
+    Radio waves do not carry enough energy to knock electrons out of atoms, so they are non-ionizing. Alpha, beta and gamma radiation are ionizing.
+
+question mb-medium-q6
+
+question:
+    What is the mass number of an atom with 6 protons and 7 neutrons?
+
+answer: 2
+options: 6
+options: 7
+options: 13
+options: 1
+
+explanation:
+    The mass number is protons plus neutrons: 6 + 7 = 13.
+
+question mb-medium-q7
+
+question:
+    Which particle is responsible for chemical bonding?
+
+answer: 2
+options: Proton
+options: Neutron
+options: Electron
+options: Nucleus
+
+explanation:
+    Chemical bonds form when atoms share or transfer electrons, so electrons, especially the outer ones, are responsible for bonding.
+
+question mb-medium-q8
+
+question:
+    What is the main hazard of ionizing radiation?
+
+answer: 2
+options: Heat production
+options: Sound waves
+options: Cell damage
+options: Light emission
+
+explanation:
+    Ionizing radiation can damage cells and their DNA, which is the main health hazard at high doses.
+
+question mb-medium-q9
+
+question:
+    What happens during beta decay?
+
+answer: 1
+options: Proton becomes neutron
+options: Neutron becomes proton
+options: Nucleus splits
+options: Nucleus combines
+
+explanation:
+    In beta-minus decay a neutron turns into a proton and releases an electron (the beta particle), so the atomic number goes up by one.
+
+question mb-medium-q10
+
+question:
+    Which material is best for shielding beta radiation?
+
+answer: 1
+options: Paper
+options: Plastic
+options: Lead
+options: Concrete
+
+explanation:
+    Beta particles are stopped by light materials such as plastic or a thin sheet of aluminum. Paper is too thin, and dense materials like lead can produce secondary X-rays.
+
+question mb-medium-q11
+
+question:
+    What is the role of coolant in a reactor?
+
+answer: 1
+options: Absorb neutrons
+options: Transfer heat
+options: Block radiation
+options: Control reaction
+
+explanation:
+    Coolant carries heat away from the reactor core so the fuel does not overheat. That heat is then used to make steam.
+
+question mb-medium-q12
+
+question:
+    What does “stable nucleus” mean?
+
+answer: 1
+options: Always moving
+options: Does not decay
+options: Emits radiation
+options: Splits easily
+
+explanation:
+    A stable nucleus has a balanced mix of protons and neutrons, so it does not decay or emit radiation.
+
+question mb-medium-q13
+
+question:
+    What type of decay emits an electron?
+
+answer: 1
+options: Alpha
+options: Beta
+options: Gamma
+options: Fusion
+
+explanation:
+    Beta decay emits a high-speed electron, called a beta particle, from the nucleus.
+
+question mb-medium-q14
+
+question:
+    What is a radionuclide?
+
+answer: 1
+options: Stable atom
+options: Radioactive atom
+options: Neutral atom
+options: Molecule
+
+explanation:
+    A radionuclide is an unstable atom whose nucleus decays and emits radiation.
+
+question mb-medium-q15
+
+question:
+    What is the main use of iodine-131?
+
+answer: 1
+options: Industrial gauges
+options: Thyroid treatment
+options: Agriculture
+options: Food preservation
+
+explanation:
+    Iodine-131 is taken up by the thyroid gland, so doctors use it to treat thyroid conditions such as an overactive thyroid and thyroid cancer.
+
+question mb-medium-q16
+
+question:
+    Which factor reduces radiation exposure?
+
+answer: 2
+options: Less shielding
+options: Less distance
+options: Less time
+options: More exposure
+
+explanation:
+    Radiation protection relies on time, distance and shielding. Spending less time near a source lowers the dose, while less distance or less shielding would raise it.
+
+question mb-medium-q17
+
+question:
+    What is the function of control rods?
+
+answer: 1
+options: Speed up reaction
+options: Absorb neutrons
+options: Produce neutrons
+options: Emit radiation
+
+explanation:
+    Control rods contain neutron-absorbing materials such as boron or cadmium. Inserting them absorbs neutrons and slows the chain reaction.
+
+question mb-medium-q18
+
+question:
+    Which radiation is most dangerous internally?
+
+answer: 0
+options: Alpha
+options: Beta
+options: Gamma
+options: X-ray
+
+explanation:
+    Alpha particles are stopped by skin, but if an alpha emitter is swallowed or inhaled it deposits all its energy in nearby tissue, which makes it the most dangerous of these inside the body.
+
+question mb-medium-q19
+
+question:
+    What is nuclear binding energy?
+
+answer: 1
+options: Energy of electrons
+options: Energy holding nucleus together
+options: Heat energy
+options: Light energy
+
+explanation:
+    Nuclear binding energy is the energy that holds the protons and neutrons together in the nucleus.
+
+question mb-medium-q20
+
+question:
+    What is nuclear transmutation?
+
+answer: 2
+options: Splitting atom
+options: Combining atoms
+options: Changing one element to another
+options: Creating molecules
+
+explanation:
+    Transmutation is a nuclear change that turns one element into another by changing the number of protons, for example through radioactive decay or neutron capture.
+
+question mb-medium-q21
+
+question:
+    What is the main component of nuclear fuel rods?
+
+answer: 0
+options: Uranium pellets
+options: Steel rods
+options: Water
+options: Graphite
+
+explanation:
+    Reactor fuel rods are metal tubes filled with small ceramic pellets of uranium dioxide.
+
+question mb-medium-q22
+
+question:
+    What is the purpose of containment structures?
+
+answer: 1
+options: Generate energy
+options: Prevent radiation release
+options: Store fuel
+options: Increase reactions
+
+explanation:
+    A containment structure is a strong, sealed building around the reactor that is designed to stop radioactive material from escaping into the environment during an accident.
+
+question mb-medium-q23
+
+question:
+    What is a tracer in nuclear medicine?
+
+answer: 1
+options: Detector
+options: Radioactive substance used in diagnosis
+options: Shield
+options: Barrier
+
+explanation:
+    A tracer is a small amount of radioactive substance given to a patient. Detectors follow its radiation to show how organs are working.
+
+question mb-medium-q24
+
+question:
+    What is radioactive equilibrium?
+
+answer: 1
+options: No decay
+options: Equal decay rates
+options: Increasing radiation
+options: Stopping radiation
+
+explanation:
+    Radioactive equilibrium is reached when a radioactive parent and its daughter decay at the same rate, so the amount of daughter stays steady.
+
+question mb-medium-q25
+
+question:
+    What is the SI unit of absorbed dose?
+
+answer: 1
+options: Becquerel
+options: Gray
+options: Sievert
+options: Volt
+
+explanation:
+    The gray (Gy) measures absorbed dose, the energy absorbed per kilogram of material. The sievert measures biological effect, and the becquerel counts decays per second.
+
+question mb-medium-q26
+
+question:
+    If half-life is 10 years, how much remains after 20 years?
+
+answer: 0
+options: 1/4
+options: 1/2
+options: 3/4
+options: 1/8
+
+explanation:
+    20 years is two half-lives (20 ÷ 10 = 2). The sample halves twice, leaving 1/2 × 1/2 = 1/4.
+
+question mb-medium-q27
+
+question:
+    Which factor most affects radiation intensity?
+
+answer: 1
+options: Color
+options: Distance
+options: Shape
+options: Temperature
+
+explanation:
+    Radiation intensity falls quickly as you move away from a source (the inverse square law), so distance changes it the most. Color, shape and temperature have no effect.
+
+question mb-medium-q28
+
+question:
+    Why is lead used for shielding?
+
+answer: 1
+options: Lightweight
+options: Dense
+options: Cheap
+options: Flexible
+
+explanation:
+    Lead is very dense, so it packs many atoms into a small volume to absorb gamma rays and X-rays.
+
+question mb-medium-q29
+
+question:
+    What type of reaction is used in nuclear power plants?
+
+answer: 1
+options: Fusion
+options: Fission
+options: Combustion
+options: Chemical
+
+explanation:
+    Nuclear power plants use fission, splitting heavy nuclei such as uranium-235 to release heat. Fusion is not yet used commercially, and combustion and chemical reactions are not nuclear.
+
+question mb-medium-q30
+
+question:
+    What happens if control rods are removed completely?
+
+answer: 2
+options: Reaction stops
+options: Reaction slows
+options: Reaction increases rapidly
+options: Nothing happens
+
+explanation:
+    Control rods absorb neutrons. With them completely removed, more neutrons cause fission and the chain reaction can increase rapidly. That is why rods are withdrawn slowly and safety systems can insert them again quickly.
+
+question mb-medium-q31
+
+question:
+    What is the main energy source in nuclear fission?
+
+answer: 1
+options: Electron movement
+options: Mass conversion to energy
+options: Heat from fuel
+options: Light emission
+
+explanation:
+    A tiny amount of mass is lost in each fission and converted into energy (E = mc²), which is the main source of the energy released.
+
+question mb-medium-q32
+
+question:
+    Which radiation requires thick shielding?
+
+answer: 2
+options: Alpha
+options: Beta
+options: Gamma
+options: None
+
+explanation:
+    Gamma rays are very penetrating, so they need thick, dense shielding such as lead or concrete. Alpha and beta radiation are stopped by much thinner materials.
+
+question mb-medium-q33
+
+question:
+    What is the role of a Geiger counter?
+
+answer: 1
+options: Produce radiation
+options: Detect radiation
+options: Block radiation
+options: Reduce radiation
+
+explanation:
+    A Geiger counter detects ionizing radiation and clicks or shows a count rate when radiation passes through it.
+
+question mb-medium-q34
+
+question:
+    What happens during gamma decay?
+
+answer: 1
+options: Particle emission
+options: Energy release
+options: Electron gain
+options: Proton loss
+
+explanation:
+    In gamma decay the nucleus releases extra energy as a gamma ray, without changing its number of protons or neutrons.
+
+question mb-medium-q35
+
+question:
+    Why are neutrons important in fission?
+
+answer: 1
+options: They stop reaction
+options: They initiate reactions
+options: They absorb energy
+options: They reduce heat
+
+explanation:
+    A neutron strikes a uranium-235 nucleus and makes it split, which initiates fission. The split releases more neutrons that cause further fissions.
+
+question mb-medium-q36
+
+question:
+    What is the main use of cobalt-60?
+
+answer: 1
+options: Cooking
+options: Radiotherapy
+options: Lighting
+options: Cooling
+
+explanation:
+    Cobalt-60 emits strong gamma rays, which are used in radiotherapy to destroy cancer cells.
+
+question mb-medium-q37
+
+question:
+    What is a nuclear chain reaction?
+
+answer: 1
+options: Single reaction
+options: Repeated reactions
+options: No reaction
+options: Slow reaction
+
+explanation:
+    In a nuclear chain reaction, neutrons released by one fission cause further fissions, so the reactions repeat.
+
+question mb-medium-q38
+
+question:
+    Why is nuclear energy considered efficient?
+
+answer: 1
+options: Low output
+options: High energy density
+options: High cost
+options: Low safety
+
+explanation:
+    Nuclear fuel holds a huge amount of energy for its mass, so a small amount of fuel can produce a lot of electricity. This is called high energy density.
+
+question mb-medium-q39
+
+question:
+    What is radiation sickness caused by?
+
+answer: 1
+options: Low exposure
+options: High exposure
+options: No exposure
+options: Cold temperature
+
+explanation:
+    Radiation sickness (acute radiation syndrome) is caused by a high dose of radiation received in a short time, not by low exposure.
+
+question mb-medium-q40
+
+question:
+    What is the function of a dosimeter?
+
+answer: 1
+options: Measure temperature
+options: Measure radiation exposure
+options: Measure pressure
+options: Measure energy
+
+explanation:
+    A dosimeter measures how much radiation a person has been exposed to, which is why radiation workers wear one.
+
+question mb-medium-q41
+
+question:
+    What type of radiation is used in X-rays?
+
+answer: 2
+options: Alpha
+options: Beta
+options: Electromagnetic waves (like gamma rays)
+options: Neutron
+
+explanation:
+    X-rays are electromagnetic waves like gamma rays, but they are produced by machines instead of by atomic nuclei.
+
+question mb-medium-q42
+
+question:
+    What is neutron activation?
+
+answer: 1
+options: Neutron removal
+options: Neutron absorption
+options: Electron gain
+options: Proton loss
+
+explanation:
+    In neutron activation, a stable nucleus absorbs a neutron and becomes a radioactive isotope.
+
+question mb-medium-q43
+
+question:
+    What is radioactive dating used for?
+
+answer: 1
+options: Cooking
+options: Determining age of materials
+options: Producing energy
+options: Cleaning water
+
+explanation:
+    Radioactive dating measures how much of a radioactive isotope, such as carbon-14, is left in a sample to work out how old it is.
+
+question mb-medium-q44
+
+question:
+    Which isotope is used in carbon dating?
+
+answer: 2
+options: Carbon-12
+options: Carbon-13
+options: Carbon-14
+options: Carbon-16
+
+explanation:
+    Carbon-14 decays at a known rate (half-life about 5,730 years), so the amount left shows how long ago an organism died.
+
+question mb-medium-q45
+
+question:
+    What happens when shielding increases?
+
+answer: 1
+options: Exposure increases
+options: Exposure decreases
+options: No effect
+options: Reaction stops
+
+explanation:
+    More shielding absorbs more radiation, so exposure decreases.
+
+question mb-medium-q46
+
+question:
+    What is the purpose of nuclear safeguards?
+
+answer: 1
+options: Increase energy
+options: Prevent misuse
+options: Create weapons
+options: Reduce cost
+
+explanation:
+    Nuclear safeguards, such as IAEA inspections and material accounting, help make sure nuclear material and technology are not misused for weapons.
+
+question mb-medium-q47
+
+question:
+    What is the main hazard of nuclear waste?
+
+answer: 1
+options: Smell
+options: Radiation
+options: Color
+options: Weight
+
+explanation:
+    The main hazard of nuclear waste is its radiation, which is why it is shielded and isolated.
+
+question mb-medium-q48
+
+question:
+    Which of these factors changes a radioactive isotope's half-life?
+
+answer: 3
+options: Temperature
+options: Pressure
+options: Chemical state
+options: None of these
+
+explanation:
+    Half-life is a property of the nucleus. Ordinary changes in temperature, pressure or chemical state do not change it, so none of these factors affect it.
+
+question mb-medium-q49
+
+question:
+    What is induced radioactivity?
+
+answer: 1
+options: Natural radiation
+options: Artificially created radioactivity
+options: No radiation
+options: Weak radiation
+
+explanation:
+    Induced radioactivity is created by bombarding stable atoms with particles, such as neutrons, to make them radioactive. It is artificial, not natural.
+
+question mb-medium-q50
+
+question:
+    What is the main advantage of nuclear medicine?
+
+answer: 1
+options: High cost
+options: Precise diagnosis
+options: Slow process
+options: No effect
+
+explanation:
+    Nuclear medicine uses small amounts of radioactive tracers to show how organs work, which allows precise diagnosis of many conditions.

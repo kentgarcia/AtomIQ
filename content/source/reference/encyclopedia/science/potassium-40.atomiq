@@ -1,0 +1,25 @@
+format 1
+adapter encyclopedia 1
+category: science
+
+entry potassium-40
+term: Potassium-40
+related_terms: radioactivity
+related_terms: radionuclide
+related_terms: isotope
+related_terms: half-life
+related_terms: background-radiation
+quick_facts: It is a natural radioactive isotope of potassium
+quick_facts: A tiny share of all potassium is potassium-40
+quick_facts: It is in bananas and other foods
+quick_facts: Your own body contains a little
+quick_facts: Its half-life is over a billion years
+
+sources:
+    {"organization":"U.S. EPA","title":"Radionuclide Basics: Potassium-40 (candidate source: open and confirm before publish)","url":"https://www.epa.gov/radiation/radionuclide-basics-potassium-40"}
+
+definition:
+    A natural radioactive form of potassium. Only a tiny share of the potassium in nature is potassium-40, but because food and living things contain potassium, a little potassium-40 is in many foods, such as bananas, and in the human body. It has a very long half-life, over a billion years, which is one reason it is still around.
+
+debunking_snippet:
+    “Radioactive means dangerous, so bananas are a hazard.” Bananas hold a tiny natural amount, and that is normal. Radioactive does not automatically mean dangerous.

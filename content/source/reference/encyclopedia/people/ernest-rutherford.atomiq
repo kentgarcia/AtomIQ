@@ -1,0 +1,23 @@
+format 1
+adapter encyclopedia 1
+category: people
+
+entry ernest-rutherford
+term: Ernest Rutherford
+image: /assets/images/people/ernest rutherford.webp
+related_terms: nucleus
+related_terms: alpha-particle
+related_terms: beta-particle
+related_terms: proton
+related_terms: decay
+quick_facts: Discovered the atomic nucleus (gold foil, 1911)
+quick_facts: Nobel Prize in Chemistry (1908) for radioactivity
+quick_facts: Named alpha, beta, and gamma radiation
+quick_facts: First artificial nuclear reaction: nitrogen + alpha (1919)
+quick_facts: Coined the word 'proton'
+
+sources:
+    {"organization":"Nobel Prize","title":"Ernest Rutherford Biography","url":"https://www.nobelprize.org/prizes/chemistry/1908/rutherford/biographical/"}
+
+definition:
+    New Zealand-born British physicist (1871–1937), the father of nuclear physics. He identified alpha and beta radiation (and named gamma), won the 1908 Nobel Prize in Chemistry for radioactivity research, discovered the atomic nucleus with his 1911 gold-foil experiment, and in 1919 achieved the first artificial nuclear reaction — knocking protons out of nitrogen — which earned him credit as the first person to deliberately split the atom. He also named the proton.

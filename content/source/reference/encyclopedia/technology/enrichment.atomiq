@@ -1,0 +1,26 @@
+format 1
+adapter encyclopedia 1
+category: technology
+
+entry enrichment
+term: Uranium Enrichment
+difficulty: intermediate
+image: ../../assets/images/terms/Enrichment.webp
+related_terms: uranium-235
+related_terms: uranium-238
+related_terms: uranium-hexafluoride
+related_terms: critical-mass
+quick_facts: Natural U-235: only 0.72%
+quick_facts: Light-water reactor fuel: 3–5% enriched
+quick_facts: Weapons-grade: >90% — a long technical leap beyond reactor fuel
+quick_facts: Gas centrifuges replaced gaseous diffusion worldwide
+quick_facts: Effort measured in Separative Work Units (SWU)
+
+sources:
+    {"organization":"World Nuclear","title":"Uranium Enrichment","url":"https://world-nuclear.org/information-library/nuclear-fuel-cycle/enrichment-and-conversion"}
+
+definition:
+    Concentrating the fissile uranium-235 fraction above its stingy 0.7% natural abundance. Because isotopes share identical chemistry, separation exploits tiny mass differences: thousands of spinning gas centrifuges feed UF₆ through cascades, each stage nudging the ratio upward. Reactor fuel lands at 3–5%, research reactors may want 20%, and weapons-grade means >90%. The same machines serve both ends — which makes every centrifuge plant a proliferation question.
+
+debunking_snippet:
+    “Any country with enrichment can quickly build a bomb.” Reactor-grade (3–5%) to weapons-grade (>90%) is an enormous engineering, energy, and detection challenge — that gap is exactly what IAEA inspectors police.

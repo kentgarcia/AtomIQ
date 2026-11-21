@@ -1,0 +1,25 @@
+format 1
+adapter map 1
+
+site site-demo-paris
+name: Paris, the shed
+place: Paris, France
+kind: discovery
+year: 1898
+lat: 48.84
+lon: 2.35
+entry: marie-curie
+references: ref-a
+references: ref-b
+blurb: Where radium was announced.
+fact: They worked in an old shed.
+
+site site-demo-nowhere
+name: Nowhere
+place: Somewhere
+kind: natural
+year: 1.7 billion years ago
+lat: -1.5
+lon: 13
+blurb: A natural reactor.
+fact: It ran by itself.

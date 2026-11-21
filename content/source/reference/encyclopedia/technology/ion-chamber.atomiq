@@ -1,0 +1,26 @@
+format 1
+adapter encyclopedia 1
+category: technology
+
+entry ion-chamber
+term: Ion Chamber
+difficulty: advanced
+image: ../../assets/images/terms/ion chamber.webp
+related_terms: geiger-counter
+related_terms: dosimeter
+related_terms: dose-rate
+related_terms: absorbed-dose
+quick_facts: Current proportional to dose rate — unlike counting GM tubes
+quick_facts: The accuracy standard for radiotherapy beam calibration
+quick_facts: No avalanche: linear response across huge ranges
+quick_facts: Same principle as household smoke detectors
+quick_facts: Can measure energy deposited, not just count events
+
+sources:
+    {"organization":"IAEA","title":"Radiation Detection","url":"https://www.iaea.org/"}
+
+definition:
+    A gas-filled radiation detector operating below the Geiger avalanche regime: radiation ionizes the gas and the resulting tiny current — collected between two electrodes — flows in proportion to dose rate. That proportionality makes ion chambers the reference instruments for accurate dosimetry, from calibrating hospital radiotherapy beams to monitoring reactor buildings. The humble household smoke detector runs on the same principle: smoke disrupts a tiny ion chamber's current and triggers the alarm.
+
+debunking_snippet:
+    “Geiger counters are the most accurate radiation meters.” They're the loudest, not the most precise — ion chambers are what hospitals and regulators use when the number has to be right.

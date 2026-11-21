@@ -1,0 +1,27 @@
+format 1
+adapter scanner 1
+scene: treasure
+
+target scan-gold
+name: A gold bar
+object: gold
+atomdex: element
+references: ref-iupac-table
+references: ref-openstax-ap-elements
+blurb: Pure gold is just one kind of atom.
+fun_fact: Gold is an element, so it cannot be broken down into anything simpler. A bar of pure gold holds nothing but gold atoms.
+
+composition:
+    {"symbol":"Au","note":"the only element in pure gold"}
+
+target scan-diamond
+name: A diamond
+object: diamond
+references: ref-openstax-chem-10-5
+blurb: A crystal made of carbon atoms.
+
+fun_fact:
+    In a diamond, every carbon atom is bonded to its neighbours in one giant network. Chemists call that a covalent network solid.
+
+composition:
+    {"symbol":"C","note":"the only element in a diamond"}

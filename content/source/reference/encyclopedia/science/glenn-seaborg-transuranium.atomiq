@@ -1,0 +1,22 @@
+format 1
+adapter encyclopedia 1
+category: science
+
+entry glenn-seaborg-transuranium
+term: Transuranium Elements
+difficulty: advanced
+related_terms: glenn-seaborg
+related_terms: plutonium-239
+related_terms: transmutation
+related_terms: atomic-number
+quick_facts: All elements beyond Z = 92: neptunium → oganesson (118)
+quick_facts: Every one is radioactive
+quick_facts: Made by neutron bombardment followed by beta decay
+quick_facts: Named for scientists, places, and planets
+quick_facts: Trace amounts occur naturally — even Oklo's fossil reactor made some
+
+sources:
+    {"organization":"World Nuclear","title":"Transuranic Elements","url":"https://world-nuclear.org/information-library"}
+
+definition:
+    Elements heavier than uranium (Z > 93): neptunium through oganesson. All are radioactive, and none survive meaningfully from Earth's formation — they exist because stars, cosmic rays, reactors, and bombs keep making them. Seaborg's team synthesized plutonium and nine others between 1940 and 1974, and trace amounts arise naturally in ore bodies too (even the ancient Oklo reactor cooked up some plutonium). Their short lifetimes and rising instability with size mark chemistry's practical frontier.

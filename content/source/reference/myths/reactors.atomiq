@@ -1,0 +1,263 @@
+format 1
+adapter myths 1
+category: reactors
+
+myth myths-facts-21
+title: If something is radioactive, it is automatically dangerous
+difficulty: hard
+popularity: 7
+tags: mythbuster
+tags: nuclear
+tags: radiation
+tags: reactors
+tags: hard
+
+sources:
+    {"title":"Sources and Effects of Ionizing Radiation","url":"https://www.unscear.org/unscear/en/publications.html","author":"UNSCEAR","type":"official"}
+    {"title":"Radiation in Everyday Life","url":"https://www.iaea.org/topics/radiation-in-everyday-life","author":"IAEA","type":"official"}
+    {"title":"Safety of Nuclear Power Reactors","url":"https://www.world-nuclear.org/information-library/safety-and-security/safety-of-plants/safety-of-nuclear-power-reactors.aspx","author":"World Nuclear Association","type":"official"}
+
+statement:
+    If something is radioactive, it is automatically dangerous.
+
+reality:
+    Risk depends on dose, type, and exposure.
+
+explanation:
+    This statement is a common myth in nuclear science.
+
+    **Reality:** Risk depends on dose, type, and exposure.
+
+myth myths-facts-22
+title: Nuclear energy is outdated technology
+difficulty: hard
+popularity: 7
+tags: mythbuster
+tags: nuclear
+tags: radiation
+tags: reactors
+tags: hard
+
+sources:
+    {"title":"Sources and Effects of Ionizing Radiation","url":"https://www.unscear.org/unscear/en/publications.html","author":"UNSCEAR","type":"official"}
+    {"title":"Radiation in Everyday Life","url":"https://www.iaea.org/topics/radiation-in-everyday-life","author":"IAEA","type":"official"}
+    {"title":"Safety of Nuclear Power Reactors","url":"https://www.world-nuclear.org/information-library/safety-and-security/safety-of-plants/safety-of-nuclear-power-reactors.aspx","author":"World Nuclear Association","type":"official"}
+
+statement:
+    Nuclear energy is outdated technology.
+
+reality:
+    New technologies like SMRs are advancing.
+
+explanation:
+    This statement is a common myth in nuclear science.
+
+    **Reality:** New technologies like SMRs are advancing.
+
+myth myths-facts-23
+title: Radiation exposure is always detectable by humans
+difficulty: hard
+popularity: 7
+tags: mythbuster
+tags: nuclear
+tags: radiation
+tags: reactors
+tags: hard
+
+sources:
+    {"title":"Sources and Effects of Ionizing Radiation","url":"https://www.unscear.org/unscear/en/publications.html","author":"UNSCEAR","type":"official"}
+    {"title":"Radiation in Everyday Life","url":"https://www.iaea.org/topics/radiation-in-everyday-life","author":"IAEA","type":"official"}
+    {"title":"Safety of Nuclear Power Reactors","url":"https://www.world-nuclear.org/information-library/safety-and-security/safety-of-plants/safety-of-nuclear-power-reactors.aspx","author":"World Nuclear Association","type":"official"}
+
+statement:
+    Radiation exposure is always detectable by humans.
+
+reality:
+    Radiation is invisible and requires instruments.
+
+explanation:
+    This statement is a common myth in nuclear science.
+
+    **Reality:** Radiation is invisible and requires instruments.
+
+myth myths-facts-24
+title: Depleted uranium is useless waste
+difficulty: hard
+popularity: 7
+tags: mythbuster
+tags: nuclear
+tags: radiation
+tags: reactors
+tags: hard
+
+sources:
+    {"title":"Sources and Effects of Ionizing Radiation","url":"https://www.unscear.org/unscear/en/publications.html","author":"UNSCEAR","type":"official"}
+    {"title":"Radiation in Everyday Life","url":"https://www.iaea.org/topics/radiation-in-everyday-life","author":"IAEA","type":"official"}
+    {"title":"Safety of Nuclear Power Reactors","url":"https://www.world-nuclear.org/information-library/safety-and-security/safety-of-plants/safety-of-nuclear-power-reactors.aspx","author":"World Nuclear Association","type":"official"}
+
+statement:
+    Depleted uranium is useless waste.
+
+reality:
+    It has industrial and defense uses.
+
+explanation:
+    This statement is a common myth in nuclear science.
+
+    **Reality:** It has industrial and defense uses.
+
+myth myths-facts-25
+title: Fusion power is already widely used
+difficulty: hard
+popularity: 7
+tags: mythbuster
+tags: nuclear
+tags: radiation
+tags: reactors
+tags: hard
+
+sources:
+    {"title":"Sources and Effects of Ionizing Radiation","url":"https://www.unscear.org/unscear/en/publications.html","author":"UNSCEAR","type":"official"}
+    {"title":"Radiation in Everyday Life","url":"https://www.iaea.org/topics/radiation-in-everyday-life","author":"IAEA","type":"official"}
+    {"title":"Safety of Nuclear Power Reactors","url":"https://www.world-nuclear.org/information-library/safety-and-security/safety-of-plants/safety-of-nuclear-power-reactors.aspx","author":"World Nuclear Association","type":"official"}
+
+statement:
+    Fusion power is already widely used.
+
+reality:
+    It is still under development.
+
+explanation:
+    This statement is a common myth in nuclear science.
+
+    **Reality:** It is still under development.
+
+myth myths-facts-26
+title: Nuclear power plants emit greenhouse gases like coal plants
+difficulty: hard
+popularity: 7
+tags: mythbuster
+tags: nuclear
+tags: radiation
+tags: reactors
+tags: hard
+
+sources:
+    {"title":"Sources and Effects of Ionizing Radiation","url":"https://www.unscear.org/unscear/en/publications.html","author":"UNSCEAR","type":"official"}
+    {"title":"Radiation in Everyday Life","url":"https://www.iaea.org/topics/radiation-in-everyday-life","author":"IAEA","type":"official"}
+    {"title":"Safety of Nuclear Power Reactors","url":"https://www.world-nuclear.org/information-library/safety-and-security/safety-of-plants/safety-of-nuclear-power-reactors.aspx","author":"World Nuclear Association","type":"official"}
+
+statement:
+    Nuclear power plants emit greenhouse gases like coal plants.
+
+reality:
+    They have near-zero emissions during operation.
+
+explanation:
+    This statement is a common myth in nuclear science.
+
+    **Reality:** They have near-zero emissions during operation.
+
+myth myths-facts-27
+title: Radiation always accumulates in the body
+difficulty: hard
+popularity: 7
+tags: mythbuster
+tags: nuclear
+tags: radiation
+tags: reactors
+tags: hard
+
+sources:
+    {"title":"Sources and Effects of Ionizing Radiation","url":"https://www.unscear.org/unscear/en/publications.html","author":"UNSCEAR","type":"official"}
+    {"title":"Radiation in Everyday Life","url":"https://www.iaea.org/topics/radiation-in-everyday-life","author":"IAEA","type":"official"}
+    {"title":"Safety of Nuclear Power Reactors","url":"https://www.world-nuclear.org/information-library/safety-and-security/safety-of-plants/safety-of-nuclear-power-reactors.aspx","author":"World Nuclear Association","type":"official"}
+
+statement:
+    Radiation always accumulates in the body.
+
+reality:
+    Some radionuclides are naturally eliminated.
+
+explanation:
+    This statement is a common myth in nuclear science.
+
+    **Reality:** Some radionuclides are naturally eliminated.
+
+myth myths-facts-28
+title: All countries can easily build nuclear weapons
+difficulty: hard
+popularity: 7
+tags: mythbuster
+tags: nuclear
+tags: radiation
+tags: reactors
+tags: hard
+
+sources:
+    {"title":"Sources and Effects of Ionizing Radiation","url":"https://www.unscear.org/unscear/en/publications.html","author":"UNSCEAR","type":"official"}
+    {"title":"Radiation in Everyday Life","url":"https://www.iaea.org/topics/radiation-in-everyday-life","author":"IAEA","type":"official"}
+    {"title":"Safety of Nuclear Power Reactors","url":"https://www.world-nuclear.org/information-library/safety-and-security/safety-of-plants/safety-of-nuclear-power-reactors.aspx","author":"World Nuclear Association","type":"official"}
+
+statement:
+    All countries can easily build nuclear weapons.
+
+reality:
+    It requires advanced technology and strict regulation.
+
+explanation:
+    This statement is a common myth in nuclear science.
+
+    **Reality:** It requires advanced technology and strict regulation.
+
+myth myths-facts-29
+title: Radiation from medical procedures is extremely dangerous
+difficulty: hard
+popularity: 7
+tags: mythbuster
+tags: nuclear
+tags: radiation
+tags: reactors
+tags: hard
+
+sources:
+    {"title":"Sources and Effects of Ionizing Radiation","url":"https://www.unscear.org/unscear/en/publications.html","author":"UNSCEAR","type":"official"}
+    {"title":"Radiation in Everyday Life","url":"https://www.iaea.org/topics/radiation-in-everyday-life","author":"IAEA","type":"official"}
+    {"title":"Safety of Nuclear Power Reactors","url":"https://www.world-nuclear.org/information-library/safety-and-security/safety-of-plants/safety-of-nuclear-power-reactors.aspx","author":"World Nuclear Association","type":"official"}
+
+statement:
+    Radiation from medical procedures is extremely dangerous.
+
+reality:
+    Benefits outweigh the small risks.
+
+explanation:
+    This statement is a common myth in nuclear science.
+
+    **Reality:** Benefits outweigh the small risks.
+
+myth myths-facts-30
+title: Nuclear energy is the main source of radiation exposure
+difficulty: hard
+popularity: 7
+tags: mythbuster
+tags: nuclear
+tags: radiation
+tags: reactors
+tags: hard
+
+sources:
+    {"title":"Sources and Effects of Ionizing Radiation","url":"https://www.unscear.org/unscear/en/publications.html","author":"UNSCEAR","type":"official"}
+    {"title":"Radiation in Everyday Life","url":"https://www.iaea.org/topics/radiation-in-everyday-life","author":"IAEA","type":"official"}
+    {"title":"Safety of Nuclear Power Reactors","url":"https://www.world-nuclear.org/information-library/safety-and-security/safety-of-plants/safety-of-nuclear-power-reactors.aspx","author":"World Nuclear Association","type":"official"}
+
+statement:
+    Nuclear energy is the main source of radiation exposure.
+
+reality:
+    Natural background radiation is the main source.
+
+explanation:
+    This statement is a common myth in nuclear science.
+
+    **Reality:** Natural background radiation is the main source.

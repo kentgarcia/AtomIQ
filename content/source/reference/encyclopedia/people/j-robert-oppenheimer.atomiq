@@ -1,0 +1,27 @@
+format 1
+adapter encyclopedia 1
+category: people
+
+entry j-robert-oppenheimer
+term: J. Robert Oppenheimer
+difficulty: intermediate
+image: /assets/images/people/Oppenheimer.webp
+related_terms: edward-teller
+related_terms: arthur-compton
+related_terms: enrico-fermi
+related_terms: chain-reaction
+related_terms: leo-szilard
+quick_facts: Directed Los Alamos during the Manhattan Project
+quick_facts: 'Father of the atomic bomb' — Trinity test, July 16, 1945
+quick_facts: Opposed the crash program for the hydrogen bomb
+quick_facts: Security clearance revoked after the 1954 hearing
+quick_facts: Received the Fermi Award in 1963 as rehabilitation
+
+sources:
+    {"organization":"DOE","title":"J. Robert Oppenheimer","url":"https://www.energy.gov/management/office-management/operational-management/history/j-robert-oppenheimer"}
+
+definition:
+    American theoretical physicist (1904–1967), scientific director of the Los Alamos Laboratory where the Manhattan Project built the first atomic bombs — hence 'father of the atomic bomb'. After watching Trinity (1945) he recalled the Bhagavad Gita: 'Now I am become Death, the destroyer of worlds.' He later headed the Atomic Energy Commission's advisory committee and argued against a crash program for the hydrogen bomb — a stance, plus old associations, that cost him his security clearance in a sensational 1954 hearing. The government formally rehabilitated him with the Enrico Fermi Award in 1963.
+
+debunking_snippet:
+    “Oppenheimer invented the atomic bomb.” He didn't build or design it alone — he led and coordinated thousands of scientists. His genius was leadership and judgment as much as physics.

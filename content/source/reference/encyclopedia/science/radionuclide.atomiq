@@ -1,0 +1,24 @@
+format 1
+adapter encyclopedia 1
+category: science
+
+entry radionuclide
+term: Radionuclide
+difficulty: intermediate
+image: ../../assets/images/terms/radionuclide.webp
+related_terms: isotope
+related_terms: decay
+related_terms: half-life
+related_terms: tritium
+related_terms: becquerel
+quick_facts: Unstable nucleus → decays toward stability
+quick_facts: Natural ones: U-238, C-14, K-40 · Man-made: Tc-99m, Co-60
+quick_facts: Tc-99m: ~30 million medical scans yearly
+quick_facts: Each carries a unique, unchangeable half-life signature
+quick_facts: Identified by emitted energies like a fingerprint
+
+sources:
+    {"organization":"IAEA","title":"Radioisotopes in Medicine","url":"https://www.iaea.org/topics/radioisotopes"}
+
+definition:
+    An unstable isotope — a radioactive nuclide — that sheds excess energy by decaying until it reaches stability. Some are primordial leftovers from before Earth formed (uranium-238), some are continuously created by cosmic rays (carbon-14), and hundreds are manufactured in reactors and cyclotrons. Medicine leans on them heavily: technetium-99m lights up ~30 million diagnostic scans a year, iodine-131 treats thyroid disorders, cobalt-60 sterilizes equipment.

@@ -1,0 +1,24 @@
+format 1
+adapter encyclopedia 1
+category: science
+
+entry uranium-235
+term: Uranium-235
+difficulty: intermediate
+image: ../../assets/images/terms/Uranium-235.webp
+related_terms: uranium-238
+related_terms: nuclear-fission
+related_terms: enrichment
+related_terms: critical-mass
+related_terms: chain-reaction
+quick_facts: 0.72% of natural uranium
+quick_facts: Fissile with slow (thermal) neutrons
+quick_facts: ~200 MeV per split · 2–3 neutrons out
+quick_facts: Half-life: 704 million years
+quick_facts: Gabon's Oklo went critical naturally ~1.7 billion years ago
+
+sources:
+    {"organization":"World Nuclear","title":"Uranium and Nuclear Power","url":"https://world-nuclear.org/information-library"}
+
+definition:
+    The fissile star of natural uranium — just 0.72% of the metal, yet the only isotope found in nature that sustains chain reactions easily. Its nucleus deforms and splits when it captures a slow neutron, releasing ~200 MeV plus fresh neutrons. With a 704-million-year half-life it still accounts for nearly all of Earth's remaining U-235; the Oklo deposit in Gabon burned some naturally two billion years ago when concentrations ran higher.

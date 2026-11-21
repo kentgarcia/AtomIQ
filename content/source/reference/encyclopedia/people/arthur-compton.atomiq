@@ -1,0 +1,23 @@
+format 1
+adapter encyclopedia 1
+category: people
+
+entry arthur-compton
+term: Arthur Compton
+difficulty: advanced
+related_terms: gamma-ray
+related_terms: x-ray
+related_terms: chain-reaction
+related_terms: enrico-fermi
+related_terms: ionizing-radiation
+quick_facts: Discovered the Compton effect (1923)
+quick_facts: Shared the 1927 Nobel Prize in Physics with C.T.R. Wilson
+quick_facts: Directed the Met Lab, Chicago (1942–1945)
+quick_facts: Oversaw Chicago Pile-1 — the first controlled chain reaction
+quick_facts: Later chancellor of Washington University (1945–1953)
+
+sources:
+    {"organization":"Nobel Prize","title":"Arthur Compton Biography","url":"https://www.nobelprize.org/prizes/physics/1927/compton/biographical/"}
+
+definition:
+    American physicist (1892–1962) who discovered the Compton effect in 1923: X-rays scattering off electrons transfer energy like colliding particles, proving that light behaves as particles (photons) as well as waves. He shared the 1927 Nobel Prize in Physics. During World War II he directed the Manhattan Project's Metallurgical Laboratory at the University of Chicago, where Enrico Fermi's team achieved Chicago Pile-1, the world's first self-sustaining chain reaction.

@@ -1,0 +1,58 @@
+format 1
+adapter scanner 1
+scene: kitchen
+
+target scan-water
+name: A glass of water
+object: water
+references: ref-openstax-chem-2-4
+blurb: Every drop is made of the same tiny molecules.
+fun_fact: Water is always two hydrogen atoms for every oxygen atom, in a glass, a lake or a cloud.
+
+composition:
+    {"symbol":"H","note":"two atoms in each molecule"}
+    {"symbol":"O","note":"one atom in each molecule"}
+
+target scan-salt
+name: Table salt
+object: salt
+atomdex: ion
+references: ref-openstax-chem-2-4
+blurb: A shake of salt from the kitchen.
+fun_fact: Sodium and chlorine can react to form table salt. Joined together they are nothing like what they were on their own.
+
+composition:
+    {"symbol":"Na","note":"joined to chlorine as ions"}
+    {"symbol":"Cl","note":"joined to sodium as ions"}
+
+target scan-banana
+name: A banana
+object: banana
+atomdex: potassium-40
+references: ref-epa-radiation-sources
+references: ref-medlineplus-potassium
+blurb: Sweet, soft and a good source of potassium.
+
+fun_fact:
+    A tiny part of all natural potassium is radioactive potassium-40, so food with potassium holds a trace of it. So does your own body.
+
+composition:
+    {"symbol":"O"}
+    {"symbol":"C","note":"in sugars and starch"}
+    {"symbol":"H"}
+    {"symbol":"K","note":"a mineral found in many foods"}
+
+target scan-rice
+name: A grain of rice
+object: rice
+references: ref-openstax-ap-elements
+references: ref-openstax-bio-carbs
+blurb: Mostly starch, a long chain of sugar molecules.
+
+fun_fact:
+    Glucose, a sugar your body uses for fuel, is made of just carbon, hydrogen and oxygen. Starch is glucose joined in long chains.
+
+composition:
+    {"symbol":"O"}
+    {"symbol":"C","note":"in the sugar chains of starch"}
+    {"symbol":"H"}

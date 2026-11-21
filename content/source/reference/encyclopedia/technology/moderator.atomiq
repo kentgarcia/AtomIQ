@@ -1,0 +1,27 @@
+format 1
+adapter encyclopedia 1
+category: technology
+
+entry moderator
+term: Moderator
+difficulty: intermediate
+image: ../../assets/images/terms/Moderator.webp
+related_terms: nuclear-reactor
+related_terms: control-rods
+related_terms: heavy-water
+related_terms: thermal-neutron
+related_terms: neutron
+quick_facts: Slows neutrons from ~20,000 km/s to ~2 km/s
+quick_facts: Thermal neutrons split U-235 far more efficiently
+quick_facts: Light water, heavy water, and graphite are the classics
+quick_facts: Lose the moderator and most reactors simply stop — a safety feature
+quick_facts: Chernobyl's RBMK was the rare design that could run un-moderated
+
+sources:
+    {"organization":"World Nuclear","title":"Nuclear Power Reactors","url":"https://world-nuclear.org/information-library/nuclear-fuel-cycle/nuclear-power-reactors.aspx"}
+
+definition:
+    A material that slows the fast neutrons born from fission (speeds around 20,000 km/s) down to 'thermal' speeds of a couple of kilometers per second — the pace at which uranium-235 captures them billions of times more readily. Good moderators bounce neutrons without absorbing many: ordinary water (the most common), heavy water, and graphite. Water does double duty in most reactors, cooling the fuel while moderating the chain reaction.
+
+debunking_snippet:
+    “Reactors need everything to go right to stay running.” For most designs the opposite holds: lose the water moderator and the physics itself shuts the chain down — no operator required.

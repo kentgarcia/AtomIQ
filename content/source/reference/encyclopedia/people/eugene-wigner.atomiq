@@ -1,0 +1,23 @@
+format 1
+adapter encyclopedia 1
+category: people
+
+entry eugene-wigner
+term: Eugene Wigner
+difficulty: advanced
+image: /assets/images/people/wigner.webp
+related_terms: nuclear-reactor
+related_terms: alvin-weinberg
+related_terms: neutron
+related_terms: chain-reaction
+quick_facts: Nobel Prize in Physics (1963) for nuclear & symmetry theory
+quick_facts: Led the design of the Hanford production reactors
+quick_facts: Co-patented the pressurized water reactor with Weinberg
+quick_facts: Identified the Wigner effect: neutrons damaging graphite
+quick_facts: Brought group theory into the heart of quantum physics
+
+sources:
+    {"organization":"Nobel Prize","title":"Eugene Wigner Biography","url":"https://www.nobelprize.org/prizes/physics/1963/wigner/biographical/"}
+
+definition:
+    Hungarian-American theoretical physicist (1902–1995) who won the 1963 Nobel Prize in Physics for his work on the theory of the atomic nucleus and elementary particles, especially symmetry principles. A Manhattan Project veteran, he led the design team behind the Hanford plutonium-production reactors and co-invented the pressurized water reactor with Alvin Weinberg. He also described the 'Wigner effect' — neutron damage to graphite — and applied group theory so deeply to physics that colleagues called him 'the Silent Genius'.

@@ -1,0 +1,26 @@
+format 1
+adapter encyclopedia 1
+category: science
+
+entry beta-decay
+term: Beta Decay
+related_terms: beta-particle
+related_terms: decay
+related_terms: radioactivity
+related_terms: neutron
+related_terms: proton
+related_terms: electron
+quick_facts: A beta particle is a fast electron
+quick_facts: A neutron changes into a proton and an electron is emitted
+quick_facts: The electron was not orbiting the nucleus before
+quick_facts: A tiny antineutrino comes out too
+quick_facts: The number of protons goes up by one, so the element changes
+
+sources:
+    {"organization":"OpenStax","title":"University Physics Volume 3: Radioactive Decay","url":"https://openstax.org/books/university-physics-volume-3/pages/10-3-radioactive-decay"}
+
+definition:
+    A kind of radioactive decay in which a nucleus gives off a beta particle, a fast electron. In the usual kind, beta-minus decay, a neutron in the nucleus changes into a proton and an electron is emitted, along with a tiny particle called an antineutrino. The number of protons goes up by one, so the nucleus becomes a different element.
+
+debunking_snippet:
+    “The beta electron was one of the atom's orbiting electrons.” It is made in the decay itself, when a neutron changes into a proton.

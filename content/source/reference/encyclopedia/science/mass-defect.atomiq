@@ -1,0 +1,26 @@
+format 1
+adapter encyclopedia 1
+category: science
+
+entry mass-defect
+term: Mass Defect
+difficulty: advanced
+image: ../../assets/images/terms/Mass Defect.webp
+related_terms: binding-energy
+related_terms: nuclear-fission
+related_terms: nuclear-fusion
+related_terms: chain-reaction
+quick_facts: Nucleus weighs less than its separated parts
+quick_facts: Missing mass converted to binding energy via E = mc²
+quick_facts: Helium-4: ~0.7% mass loss = ~28 MeV
+quick_facts: Measured with mass spectrometers of extraordinary precision
+quick_facts: Predicts stability — and which reactions release energy
+
+sources:
+    {"organization":"HyperPhysics","title":"Mass Defect","url":"http://hyperphysics.phy-astr.gsu.edu/hbase/NucEne/nucbin.html"}
+
+definition:
+    The measured shortfall between a nucleus's actual mass and the added-up masses of its free protons and neutrons. That missing mass didn't vanish — it became binding energy via E = mc² when the nucleus formed. A helium-4 nucleus is about 0.7% lighter than its parts, worth roughly 28 MeV. The bigger the defect per nucleon, the tighter the nucleus is bound and the more stable it is — which is exactly why fission and fusion release energy as they climb toward iron.
+
+debunking_snippet:
+    “Mass is always conserved.” Not quite — mass-energy is. Every nuclear reaction that powers stars, reactors, and bombs trades a sliver of mass for enormous energy.

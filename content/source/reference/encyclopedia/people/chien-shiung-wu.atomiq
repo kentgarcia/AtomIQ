@@ -1,0 +1,22 @@
+format 1
+adapter encyclopedia 1
+category: people
+
+entry chien-shiung-wu
+term: Chien-Shiung Wu
+difficulty: advanced
+related_terms: beta-particle
+related_terms: decay
+related_terms: marie-curie
+related_terms: enrico-fermi
+quick_facts: Ran the decisive 1956 parity-violation experiment
+quick_facts: Lee & Yang won the Nobel; many argue Wu deserved it too
+quick_facts: Improved gaseous-diffusion uranium enrichment (Manhattan Project)
+quick_facts: Nicknamed the 'First Lady of Physics'
+quick_facts: Awarded the inaugural Wolf Prize in Physics (1978)
+
+sources:
+    {"organization":"APS","title":"Chien-Shiung Wu","url":"https://www.aps.org/programs/outreach/history/historicsites/wu.cfm"}
+
+definition:
+    Chinese-American experimental physicist (1912–1997), called the 'First Lady of Physics'. During the Manhattan Project she improved gaseous-diffusion uranium enrichment. Her crowning achievement came in 1956: the Wu experiment confirmed that mirror symmetry (parity) is violated in beta decay — a discovery so fundamental it won Tsung-Dao Lee and Chen-Ning Yang the 1957 Nobel Prize while Wu herself was overlooked.

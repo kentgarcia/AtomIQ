@@ -1,0 +1,22 @@
+format 1
+adapter encyclopedia 1
+category: people
+
+entry andrei-sakharov
+term: Andrei Sakharov
+difficulty: intermediate
+image: /assets/images/people/Andrei Sakhariv.webp
+related_terms: nuclear-fusion
+related_terms: atom
+related_terms: radiation
+quick_facts: Key designer of the Soviet hydrogen bomb (tested 1953)
+quick_facts: Awarded the 1975 Nobel Peace Prize
+quick_facts: Exiled to Gorky (1980–1986) for his dissent
+quick_facts: The EU's Sakharov Prize for Freedom of Thought honors him
+quick_facts: His ideas influenced Gorbachev's reforms of the late 1980s
+
+sources:
+    {"organization":"Nobel Prize","title":"Andrei Sakharov Biography","url":"https://www.nobelprize.org/prizes/peace/1975/sakharov/biographical/"}
+
+definition:
+    Soviet theoretical physicist (1921–1989), often called the father of the Soviet hydrogen bomb (first tested 1953). Horrified by the arms race he helped accelerate, he became the USSR's most prominent dissident, campaigning against nuclear testing and for human rights. He won the 1975 Nobel Peace Prize and was exiled to the closed city of Gorky from 1980 to 1986; the European Parliament's Sakharov Prize for Freedom of Thought is named in his honor.

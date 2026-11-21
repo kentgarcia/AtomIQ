@@ -1,0 +1,25 @@
+format 1
+adapter encyclopedia 1
+category: technology
+
+entry yellowcake
+term: Yellowcake
+difficulty: intermediate
+related_terms: enrichment
+related_terms: uranium-hexafluoride
+related_terms: fuel-rods
+related_terms: uranium-238
+quick_facts: Mostly U₃O₈ — 70–90% uranium by weight
+quick_facts: Color varies: yellow, khaki, brown, black
+quick_facts: Weakly radioactive — alpha emitters, handled with gloves
+quick_facts: Each drum holds roughly a tonne of uranium value
+quick_facts: Cannot detonate or power anything without conversion + enrichment
+
+sources:
+    {"organization":"World Nuclear","title":"Mining of Uranium","url":"https://world-nuclear.org/information-library/nuclear-fuel-cycle/mining-of-uranium"}
+
+definition:
+    Milled, concentrated uranium oxide — mostly U₃O₈ — named for its buttery color though modern versions run khaki to black. It's the checkpoint between mine and fuel cycle: leached from ore, precipitated, dried, packed into drums worth tens of thousands of dollars each. Chemically stable and only weakly radioactive, yellowcake still contains mostly uranium-238 — far from anything fissile until conversion and enrichment transform it.
+
+debunking_snippet:
+    “Yellowcake is a step toward building bombs.” As sold, it's overwhelmingly non-fissile U-238 — unusable in weapons without the entire industrial apparatus of conversion and enrichment on top.

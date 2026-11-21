@@ -1,0 +1,26 @@
+format 1
+adapter encyclopedia 1
+category: science
+
+entry proton
+term: Proton
+image: ../../assets/images/terms/proton.webp
+related_terms: neutron
+related_terms: electron
+related_terms: atomic-number
+related_terms: murray-gell-mann
+related_terms: ernest-rutherford
+quick_facts: +1 charge · ~1,836× electron mass
+quick_facts: Count defines the element (Z)
+quick_facts: Made of two up quarks + one down quark
+quick_facts: Named by Ernest Rutherford (1920)
+quick_facts: Experiments bound its lifetime beyond 10³⁴ years
+
+sources:
+    {"organization":"Britannica","title":"Proton","url":"https://www.britannica.com/science/proton-subatomic-particle"}
+
+definition:
+    The positively charged particle anchoring every atomic nucleus — +1 charge balancing each electron's −1, and about 1,836 times heavier than an electron. An atom's proton count is its identity card: one makes hydrogen, six carbon, ninety-two uranium. Protons aren't fundamental: each packs three quarks (two 'up', one 'down') bound by gluons, with most of the proton's mass arising from that binding energy. Ernest Rutherford named the proton in 1920 after proving it exists inside nuclei.
+
+debunking_snippet:
+    “Protons are tiny hard balls.” They're seething bags of quarks and gluons — most of a proton's mass comes from the energy of that internal motion, not the quarks themselves.

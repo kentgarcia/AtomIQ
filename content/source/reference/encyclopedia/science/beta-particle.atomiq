@@ -1,0 +1,26 @@
+format 1
+adapter encyclopedia 1
+category: science
+
+entry beta-particle
+term: Beta Particle (β)
+image: ../../assets/images/terms/beta particle.webp
+related_terms: alpha-particle
+related_terms: gamma-ray
+related_terms: decay
+related_terms: tritium
+related_terms: ionizing-radiation
+quick_facts: An electron (β⁻) or positron (β⁺) from the nucleus
+quick_facts: Stopped by a few mm of plastic or aluminum
+quick_facts: Can penetrate slightly beyond dead skin layers
+quick_facts: Positron emitters enable PET medical imaging
+quick_facts: Emitted across the whole periodic table — e.g. carbon-14, tritium
+
+sources:
+    {"organization":"EPA","title":"Radiation Basics","url":"https://www.epa.gov/radiation/radiation-basics"}
+
+definition:
+    A high-speed electron (β⁻) or positron (β⁺) thrown out of an unstable nucleus during beta decay — effectively a neutron converting into a proton (or vice versa) inside the nucleus. Beta particles are far more penetrating than alphas: they can slip through skin and paper but stop in a few millimeters of plastic or aluminum. Positron-emitting isotopes like carbon-11 and fluorine-18 power PET medical scans.
+
+debunking_snippet:
+    “Any metal shield makes beta radiation harmless.” Dense metals like lead can actually make things worse — betas striking them emit secondary X-rays (bremsstrahlung). Low-density plastic or acrylic is the right shield.

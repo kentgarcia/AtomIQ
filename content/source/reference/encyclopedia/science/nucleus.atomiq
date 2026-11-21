@@ -1,0 +1,23 @@
+format 1
+adapter encyclopedia 1
+category: science
+
+entry nucleus
+term: Atomic Nucleus
+image: ../../assets/images/terms/atom.webp
+related_terms: atom
+related_terms: proton
+related_terms: neutron
+related_terms: ernest-rutherford
+related_terms: decay
+quick_facts: Discovered by Ernest Rutherford (1911, gold-foil experiment)
+quick_facts: Diameter ~100,000 times smaller than the atom itself
+quick_facts: Holds over 99.9% of the atom's mass
+quick_facts: Protons and neutrons bound by the strong nuclear force
+quick_facts: Home of radioactive decay and all nuclear reactions
+
+sources:
+    {"organization":"Britannica","title":"Atomic Nucleus","url":"https://www.britannica.com/science/atomic-nucleus"}
+
+definition:
+    The positively charged core of an atom, made of protons and neutrons bound together by the strong nuclear force. It holds more than 99.9% of the atom's mass while spanning only about 1/100,000 of the atom's diameter — matter at this density would weigh hundreds of millions of tonnes per cubic centimeter. Ernest Rutherford discovered the nucleus in 1911 by firing alpha particles at gold foil and finding that a rare few bounced straight back.

@@ -1,0 +1,26 @@
+format 1
+adapter encyclopedia 1
+category: science
+
+entry roentgen
+term: Roentgen (R)
+difficulty: advanced
+related_terms: sievert
+related_terms: gray
+related_terms: exposure
+related_terms: x-ray
+related_terms: geiger-counter
+quick_facts: Measures ionization in air, not dose to people
+quick_facts: 1 R = 2.58×10⁻⁴ C/kg of air
+quick_facts: Honors Wilhelm Röntgen, first Physics Nobel (1901)
+quick_facts: Roughly comparable to a rem for early gamma exposures
+quick_facts: Still seen on vintage meters and in Chernobyl accounts
+
+sources:
+    {"organization":"BIPM","title":"SI Units","url":"https://www.bipm.org/en/measurement-units"}
+
+definition:
+    A legacy unit measuring radiation exposure — strictly, the ionization produced in dry air by X-rays or gamma rays: 1 R equals 2.58×10⁻⁴ coulombs of charge per kilogram of air. Named after Wilhelm Röntgen, discoverer of X-rays and winner of the first Nobel Prize in Physics (1901). It measures what radiation does to air, not to tissue, and has been superseded — though it lingers in old instruments, film badges, and disaster folklore.
+
+debunking_snippet:
+    “Roentgens and sieverts are interchangeable.” They measure different things: R counts ionization in air; sieverts weigh biological effect on tissue. Old meters read R — converting needs care and context.

@@ -1,0 +1,26 @@
+format 1
+adapter encyclopedia 1
+category: science
+
+entry background-radiation
+term: Background Radiation
+image: ../../assets/images/terms/background radiation.webp
+related_terms: radiation
+related_terms: radon
+related_terms: cosmic-radiation
+related_terms: exposure
+related_terms: sievert
+quick_facts: Everyone on Earth is exposed to it constantly
+quick_facts: ≈2.4 mSv per year worldwide from natural sources (UNSCEAR)
+quick_facts: Radon gas is the largest single natural contributor
+quick_facts: Flying raises your dose — more cosmic rays at altitude
+quick_facts: Varies strongly by location, altitude, and local geology
+
+sources:
+    {"organization":"UNSCEAR","title":"Sources and Effects of Ionizing Radiation","url":"https://www.unscear.org/"}
+
+definition:
+    The ionizing radiation present in the environment at all times: cosmic rays from space, radon gas seeping from soil and rock, naturally radioactive materials in the ground, food, and even our own bodies (potassium-40 and carbon-14), plus a small man-made share such as medical procedures and fallout. It varies widely by location — altitude increases the cosmic share, while some regions have uranium-rich soils.
+
+debunking_snippet:
+    “All radiation is man-made.” Natural background accounts for the majority of human exposure — life evolved with it.

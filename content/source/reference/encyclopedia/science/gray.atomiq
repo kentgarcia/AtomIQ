@@ -1,0 +1,23 @@
+format 1
+adapter encyclopedia 1
+category: science
+
+entry gray
+term: Gray (Gy)
+difficulty: intermediate
+image: ../../assets/images/terms/gray gy.webp
+related_terms: absorbed-dose
+related_terms: sievert
+related_terms: dose-rate
+related_terms: dosimeter
+quick_facts: 1 Gy = 1 joule per kilogram
+quick_facts: Adopted as an SI unit in 1975; replaces the rad (1 Gy = 100 rad)
+quick_facts: Named after dosimetry pioneer Louis Harold Gray
+quick_facts: Physical unit — biological risk needs sieverts
+quick_facts: Medical doses quoted in Gy: e.g., ~2 Gy per radiotherapy fraction
+
+sources:
+    {"organization":"BIPM","title":"SI Units – gray","url":"https://www.bipm.org/en/measurement-units"}
+
+definition:
+    The SI unit of absorbed radiation dose: 1 Gy means one joule of radiation energy deposited per kilogram of material, adopted in 1975 and named after British physicist Louis Harold Gray, a pioneer of radiation dosimetry. It replaced the older rad (1 Gy = 100 rad). Gray measures pure physical energy absorption — to gauge biological harm, sieverts weight each radiation type by its effectiveness.

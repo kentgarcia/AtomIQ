@@ -1,0 +1,24 @@
+format 1
+adapter encyclopedia 1
+category: science
+
+entry ion
+term: Ion
+related_terms: atom
+related_terms: electron
+related_terms: proton
+related_terms: ionizing-radiation
+quick_facts: An ion has a charge because its protons and electrons no longer match
+quick_facts: Losing electrons makes a positive ion
+quick_facts: Gaining electrons makes a negative ion
+quick_facts: The element stays the same: only electrons moved
+quick_facts: Ionizing radiation can knock electrons off atoms and make ions
+
+sources:
+    {"organization":"OpenStax","title":"Chemistry 2e: Molecular and Ionic Compounds","url":"https://openstax.org/books/chemistry-2e/pages/2-6-molecular-and-ionic-compounds"}
+
+definition:
+    An atom, or a group of atoms, that has gained or lost electrons, so it carries an electric charge. Losing an electron makes a positive ion and gaining one makes a negative ion. The element does not change, because the number of protons stays the same. Table salt is made of sodium ions and chloride ions.
+
+debunking_snippet:
+    “Gaining or losing electrons changes the element.” Protons decide the element, so an ion is still the same element.

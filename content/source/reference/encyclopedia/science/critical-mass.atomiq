@@ -1,0 +1,23 @@
+format 1
+adapter encyclopedia 1
+category: science
+
+entry critical-mass
+term: Critical Mass
+difficulty: intermediate
+image: ../../assets/images/terms/critical mass.webp
+related_terms: chain-reaction
+related_terms: nuclear-fission
+related_terms: uranium-235
+related_terms: plutonium-239
+quick_facts: Bare sphere: ≈52 kg U-235, ≈10 kg Pu-239
+quick_facts: Depends on shape, purity, density, and neutron reflection
+quick_facts: A tamper/reflector can cut the required mass several-fold
+quick_facts: Weapons achieve supercriticality via implosion or gun assembly
+quick_facts: Reactors arrange fuel to run exactly critical, no more
+
+sources:
+    {"organization":"NRC","title":"Glossary: Critical Mass","url":"https://www.nrc.gov/reading-rm/basic-ref/glossary.html"}
+
+definition:
+    The smallest amount of fissile material that can sustain a chain reaction, given a particular shape, density, purity, and surroundings. A bare sphere needs about 52 kg of weapons-grade uranium-235 or about 10 kg of plutonium-239; surrounding the core with a reflector that bounces neutrons back can cut those figures dramatically. Squeeze a subcritical mass into a supercritical one fast enough — by implosion or gun assembly — and you have a weapon; arrange it just right in a lattice and you have a steady reactor.

@@ -1,0 +1,26 @@
+format 1
+adapter encyclopedia 1
+category: technology
+
+entry linear-accelerator
+term: Linear Accelerator (LINAC)
+difficulty: advanced
+image: ../../assets/images/terms/linac.webp
+related_terms: cyclotron
+related_terms: x-ray
+related_terms: gamma-ray
+related_terms: john-cockcroft
+quick_facts: Accelerates particles in a straight line
+quick_facts: The workhorse machine of modern cancer radiotherapy
+quick_facts: Medical units: electrons at 6–25 MeV → therapeutic X-rays
+quick_facts: Also serves as the injector front-end for big research machines
+quick_facts: Microwave cavities give particles repeated energy kicks
+
+sources:
+    {"organization":"IAEA","title":"Radiotherapy","url":"https://www.iaea.org/topics/radiotherapy"}
+
+definition:
+    A particle accelerator that pushes charged particles down a straight tube using oscillating electromagnetic fields, adding a kick each segment. Medical LINACs accelerate electrons to millions of electron-volts and slam them into metal targets to produce precisely shaped X-ray beams for cancer radiotherapy — the machine behind most modern radiation oncology. In research, giant LINACs serve as injectors for synchrotrons and as precision probes of nuclear structure.
+
+debunking_snippet:
+    “Radiotherapy machines are experimental.” Modern LINACs deliver sub-millimeter-guided beams daily in thousands of hospitals — they're among the most precise routinely-used devices in medicine.

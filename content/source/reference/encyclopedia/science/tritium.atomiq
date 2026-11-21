@@ -1,0 +1,26 @@
+format 1
+adapter encyclopedia 1
+category: science
+
+entry tritium
+term: Tritium
+difficulty: intermediate
+image: ../../assets/images/terms/tritium.webp
+related_terms: isotope
+related_terms: heavy-water
+related_terms: radionuclide
+related_terms: nuclear-fusion
+quick_facts: Hydrogen +2 neutrons · half-life 12.3 years
+quick_facts: Weakest common beta emitter (~5.7 keV average)
+quick_facts: D–T is fusion's easiest reaction — ITER runs on it
+quick_facts: Boosts thermonuclear weapon yields
+quick_facts: Glows in exit signs and watch faces via phosphor excitation
+
+sources:
+    {"organization":"World Nuclear","title":"Tritium","url":"https://world-nuclear.org/information-library"}
+
+definition:
+    Hydrogen with two neutrons added (³H) — radioactive, with a 12.3-year half-life and a feeble beta particle that a sheet of paper stops. Nature makes only traces in the upper atmosphere, so commercial supplies come from heavy-water reactors and weapons programs. It's the fuel partner for deuterium in fusion experiments, boosts the yield of thermonuclear weapons, keeps watch dials glowing for decades, and serves as a biology tracer.
+
+debunking_snippet:
+    “Those glowing exit signs are radiation hazards.” Tritium's betas cannot escape the sealed glass tube — stand as close as you like for as long as you like; distance of millimeters protects you completely.

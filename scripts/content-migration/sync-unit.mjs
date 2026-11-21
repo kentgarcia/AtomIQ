@@ -77,6 +77,8 @@ try {
   }
 
   // --- references (before anything that points at them). verified and accessed are never touched ----
+  // NOTE: `content_references` is owned by content/source/reference/sources (until phase 5 retires this script). A source
+  // written here shows as drift on the next content:sync: run `npm run content:export -- references --force` afterwards.
   for (const r of unit.references) {
     const want = { kind: r.kind, publisher: r.publisher, title: r.title, authors: r.authors ?? "", year: r.year ?? "", url: r.url ?? "", note: r.note ?? "" };
     const row = get("SELECT * FROM content_references WHERE id = ?", r.id);

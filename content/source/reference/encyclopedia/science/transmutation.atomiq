@@ -1,0 +1,27 @@
+format 1
+adapter encyclopedia 1
+category: science
+
+entry transmutation
+term: Nuclear Transmutation
+difficulty: advanced
+image: ../../assets/images/terms/Transmutation.webp
+related_terms: decay
+related_terms: nuclear-fission
+related_terms: isotope
+related_terms: ernest-rutherford
+related_terms: glenn-seaborg
+quick_facts: Alchemy's goal, achieved via nuclear physics (Rutherford, 1919)
+quick_facts: Decay chains are nature's own slow transmutation
+quick_facts: Elements beyond iron were born in stars and supernovae
+quick_facts: Reactors transmute U-238 into plutonium-239 routinely
+quick_facts: Proposed as a way to shrink long-lived nuclear waste
+
+sources:
+    {"organization":"IAEA","title":"Nuclear Transmutation","url":"https://www.iaea.org/"}
+
+definition:
+    Changing one element into another by altering the number of protons in its nucleus — through radioactive decay or deliberate bombardment. Rutherford achieved the first artificial transmutation in 1919 (nitrogen into oxygen), fulfilling the alchemists' dream by physics rather than philosophy. Every element heavier than iron was forged by transmutation inside stars or supernovae, reactors breed plutonium from uranium-238 by it, and proposed 'partitioning and transmutation' schemes would blast long-lived waste isotopes into shorter-lived ones.
+
+debunking_snippet:
+    “Chemistry can change one element into another.” No chemical process can — chemistry only rearranges electrons. Changing elements requires changing the nucleus itself.

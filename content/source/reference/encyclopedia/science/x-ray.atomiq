@@ -1,0 +1,25 @@
+format 1
+adapter encyclopedia 1
+category: science
+
+entry x-ray
+term: X-ray
+image: ../../assets/images/terms/X-ray.webp
+related_terms: gamma-ray
+related_terms: ionizing-radiation
+related_terms: linear-accelerator
+related_terms: roentgen
+quick_facts: Discovered by Röntgen (1895) — first Nobel in Physics
+quick_facts: Born from electron interactions, unlike nuclear gamma rays
+quick_facts: Softer than most gammas but the ranges overlap
+quick_facts: CT scans stack hundreds of X-ray slices
+quick_facts: Lead aprons attenuate scattered rays during imaging
+
+sources:
+    {"organization":"Nobel Prize","title":"Wilhelm Röntgen Biography","url":"https://www.nobelprize.org/prizes/physics/1901/rontgen/biographical/"}
+
+definition:
+    Electromagnetic radiation born when fast electrons slam into matter — decelerating violently (bremsstrahlung) or knocking inner-shell electrons loose. Wilhelm Röntgen discovered them accidentally in 1895 and photographed his wife's hand within weeks, launching medical imaging and winning the first Nobel Prize in Physics (1901). Energies overlap with gamma rays; the difference is origin — X-rays come from electron processes, gammas from nuclei. Hospitals fire LINAC-built beams through patients millions of times daily.
+
+debunking_snippet:
+    “X-rays make you radioactive afterward.” Impossible — X-rays pass through and vanish at light speed. Only neutron bombardment activates materials, and hospital X-rays aren't neutrons.

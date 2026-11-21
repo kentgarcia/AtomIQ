@@ -1,0 +1,23 @@
+format 1
+adapter encyclopedia 1
+category: people
+
+entry frederick-joliot-curie
+term: Frédéric Joliot-Curie
+difficulty: advanced
+related_terms: irene-joliot-curie
+related_terms: marie-curie
+related_terms: alpha-particle
+related_terms: decay
+related_terms: radionuclide
+quick_facts: Created the first artificial radioactivity (1934)
+quick_facts: Shared the 1935 Nobel Prize in Chemistry with Irène
+quick_facts: Their trick: alpha-bombard aluminum → radioactive phosphorus-30
+quick_facts: Founded France's CEA after World War II
+quick_facts: Trained in the lab of Marie Curie — whom he married into
+
+sources:
+    {"organization":"Nobel Prize","title":"Frédéric Joliot-Curie Biography","url":"https://www.nobelprize.org/prizes/chemistry/1935/joliot-fred/biographical/"}
+
+definition:
+    French physicist (1900–1958) who ran the laboratory alongside his wife — and fellow Nobel laureate — Irène Joliot-Curie, daughter of Marie and Pierre Curie. In 1934 the couple bombarded aluminum with alpha particles and produced phosphorus-30: the first artificially created radioactive material. It opened the door to making radioisotopes on demand for medicine and research, and earned both of them the 1935 Nobel Prize in Chemistry. Frédéric later founded France's Atomic Energy Commission (CEA) and filed some of the earliest nuclear-reactor patent concepts.

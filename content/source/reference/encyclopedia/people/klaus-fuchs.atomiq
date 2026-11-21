@@ -1,0 +1,21 @@
+format 1
+adapter encyclopedia 1
+category: people
+
+entry klaus-fuchs
+term: Klaus Fuchs
+difficulty: advanced
+related_terms: j-robert-oppenheimer
+related_terms: edward-teller
+related_terms: nuclear-fission
+quick_facts: Manhattan Project physicist — worked on the implosion bomb
+quick_facts: Passed fission-bomb designs and early H-bomb ideas to the USSR
+quick_facts: Caught via decrypted Soviet cables (VENONA)
+quick_facts: Arrested 1950; served 14 years
+quick_facts: His espionage accelerated the first Soviet bomb by years
+
+sources:
+    {"organization":"Atomic Heritage Foundation","title":"Klaus Fuchs","url":"https://www.atomicheritage.org/profile/klaus-fuchs"}
+
+definition:
+    German-born theoretical physicist (1911–1988), a Communist who fled the Nazis for Britain — then became the most valuable Soviet spy inside the American bomb project. At Los Alamos he worked on the implosion calculations for Fat Man; at a now-famous 1947 meeting in London he handed Moscow not only full fission-bomb designs but sketches of early hydrogen-bomb thinking. Arrested in 1950 through decrypted Soviet cables (the VENONA effort) and confessed, he served 14 years in prison, then moved to East Germany to direct a physics institute.

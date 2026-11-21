@@ -1,0 +1,73 @@
+format 1
+adapter statements 1
+unit: inside-the-atom
+
+statement inside-the-atom-s01
+verdict: fact
+statement: Everything you can touch, and the air around you, is made of atoms.
+
+explanation:
+    Solids, liquids and gases are all made of atoms. Even air is.
+
+statement inside-the-atom-s02
+verdict: myth
+statement: Light and heat are made of atoms, just like a rock is.
+
+explanation:
+    Light and heat are not matter. They are not made of atoms.
+
+statement inside-the-atom-s03
+verdict: fact
+statement: Every atom has a tiny centre called the nucleus, with electrons around it.
+
+explanation:
+    The nucleus sits in the middle and the electrons are around it.
+
+statement inside-the-atom-s04
+verdict: myth
+statement: Neutrons have a negative charge.
+
+explanation:
+    Neutrons have no charge. Electrons are the negative ones.
+
+statement inside-the-atom-s05
+verdict: fact
+statement: Protons are positive, electrons are negative, and neutrons have no charge.
+
+explanation:
+    These three charges are what each particle of an atom is like.
+
+statement inside-the-atom-s06
+verdict: myth
+statement: If an atom gains a neutron, it becomes a different element.
+
+explanation:
+    The number of protons decides the element. A different number of neutrons only makes a different isotope.
+
+statement inside-the-atom-s07
+verdict: fact
+statement: The number of protons in an atom tells you which element it is.
+
+explanation:
+    Every carbon atom has 6 protons and every oxygen atom has 8.
+
+statement inside-the-atom-s08
+verdict: myth
+statement: An isotope is always radioactive.
+
+explanation:
+    Many isotopes are perfectly stable. An isotope is not automatically radioactive.
+
+statement inside-the-atom-s09
+verdict: fact
+statement: Isotopes of one element have the same number of protons but different numbers of neutrons.
+
+explanation:
+    Same protons means same element. Different neutrons means a different isotope.
+
+statement inside-the-atom-s10
+verdict: myth
+statement: Every nucleus is unstable and will change one day.
+
+explanation:
+    Some nuclei stay the same for ever. Only unstable ones can change.

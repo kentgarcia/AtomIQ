@@ -1,0 +1,32 @@
+format 1
+adapter mythbuster 1
+difficulty: easy
+
+question mb-demo-easy-1
+
+question:
+    What is the smallest unit of matter?
+
+answer: 1
+options: Molecule
+options: Atom
+options: Cell
+options: Proton
+
+explanation:
+    An atom is.
+
+question mb-demo-easy-2
+
+question:
+    Which is longer?
+
+    Think about it.
+
+points: 10
+answer: 0
+options: a
+options: b
+
+explanation:
+    a is.

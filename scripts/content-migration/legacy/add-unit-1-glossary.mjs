@@ -14,9 +14,19 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { DatabaseSync } from "node:sqlite";
 
-import { backupBeforeScript } from "../lib/backup.mjs";
+import { backupBeforeScript } from "../../lib/backup.mjs";
 
-const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
+/**
+ * RETIRED (content source files). The rows this script writes (the unit 1 AtomDex entries) are written in content/source/reference/encyclopedia and built with
+ * `npm run content:sync`; running this would overwrite them behind the files' back. Kept only as history.
+ * Do not run it. Edit the files (docs/features/CONTENT_SOURCE_SPEC.md).
+ */
+if (!process.argv.includes("--i-know-this-is-retired")) {
+  console.error("add-unit-1-glossary.mjs is retired: the unit 1 AtomDex entries live in content/source/reference/encyclopedia and are built by `npm run content:sync`.");
+  process.exit(1);
+}
+
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..", "..");
 const argv = process.argv.slice(2);
 const dryRun = argv.includes("--dry-run");
 const dbArg = argv.indexOf("--db");

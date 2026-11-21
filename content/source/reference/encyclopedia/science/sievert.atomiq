@@ -1,0 +1,28 @@
+format 1
+adapter encyclopedia 1
+category: science
+
+entry sievert
+term: Sievert (Sv)
+difficulty: intermediate
+image: ../../assets/images/terms/Sievert.webp
+related_terms: gray
+related_terms: absorbed-dose
+related_terms: exposure
+related_terms: dose-rate
+related_terms: background-radiation
+quick_facts: Weighted for biology: gray × radiation factor × tissue factor
+quick_facts: Alphas weighted 20× more damaging than gammas per gray
+quick_facts: Flight NYC→London: ~40 μSv · CT scan: ~7 mSv
+quick_facts: Natural background: ~2.4 mSv/year average
+quick_facts: Occupational limit: 20 mSv/year averaged over five years
+
+sources:
+    {"organization":"ICRP","title":"Dose Quantities","url":"https://www.icrp.org/"}
+    {"organization":"BIPM","title":"SI Units – sievert","url":"https://www.bipm.org/en/measurement-units"}
+
+definition:
+    The SI unit of dose in terms of biological effect, named after Swedish radiological-health pioneer Rolf Sievert. It starts from absorbed dose (grays) and applies two weightings: radiation type (alphas count 20× harder than gammas) and tissue sensitivity. Context makes it tangible: a transatlantic flight adds ~40 μSv, a chest X-ray ~0.1 mSv, a CT scan ~7 mSv, against ~2.4 mSv of natural background per year.
+
+debunking_snippet:
+    “A sievert of any radiation feels the same.” The whole point of sieverts is that it doesn't — the same absorbed gray becomes twenty times riskier when it comes from alpha emitters inside your lungs.

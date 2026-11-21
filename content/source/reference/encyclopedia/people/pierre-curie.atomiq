@@ -1,0 +1,25 @@
+format 1
+adapter encyclopedia 1
+category: people
+
+entry pierre-curie
+term: Pierre Curie
+image: /assets/images/people/curie, pierre.webp
+related_terms: marie-curie
+related_terms: henri-becquerel
+related_terms: decay
+related_terms: irene-joliot-curie
+quick_facts: Nobel Prize in Physics (1903), shared with Marie and Becquerel
+quick_facts: Co-discovered piezoelectricity with his brother Jacques
+quick_facts: The Curie temperature marks loss of permanent magnetism
+quick_facts: Built the precision instruments behind Marie's measurements
+quick_facts: Died in a street accident in Paris (1906), not from radiation
+
+sources:
+    {"organization":"Nobel Prize","title":"Pierre Curie Biography","url":"https://www.nobelprize.org/prizes/physics/1903/pierre-curie/biographical/"}
+
+definition:
+    French physicist (1859–1906) who shared the 1903 Nobel Prize in Physics with Marie Curie and Henri Becquerel for radioactivity research. As a young man he and his brother Jacques discovered piezoelectricity — the crystal effect now found in quartz watches and ultrasound probes — and built the electrometer Marie used to measure ray intensity. His studies of magnetism gave science the 'Curie temperature', above which materials lose their magnetism. He died in 1906 when a horse-drawn wagon crushed his skull on a Paris street.
+
+debunking_snippet:
+    “Pierre Curie died of radiation exposure.” No — he was killed instantly by a horse-drawn cart on the rue Dauphine. Radiation took Marie decades later; Pierre simply ran out of luck on a rainy afternoon.

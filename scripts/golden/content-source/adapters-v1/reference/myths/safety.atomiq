@@ -1,0 +1,40 @@
+format 1
+adapter myths 1
+category: safety
+
+myth demo-myth
+title: A demo myth
+difficulty: medium
+popularity: 7
+image: https://example.org/i.jpg
+tags: radiation
+tags: natural
+related_facts: fact-a
+related_lessons: half-life
+
+sources:
+    {"title":"T","url":"https://example.org/b","author":"IAEA","type":"official"}
+
+statement:
+    Radiation is new.
+
+reality:
+    It is as old as the universe.
+
+explanation:
+    A long answer.
+
+    - one
+    - two
+
+myth demo-plain-myth
+title: Plain
+sources:
+
+statement:
+    Short.
+
+reality:
+    Shorter.
+
+explanation:

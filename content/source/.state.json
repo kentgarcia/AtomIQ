@@ -5,8 +5,19 @@
     "blog_posts": "17c938794cc15a32",
     "blog_references": "dbdf154117df14cc",
     "chat_nodes": "c93ebb5008abd7c0",
+    "content_references": "ac2e021563231f42",
+    "encyclopedia_entries": "fb6309166d78a678",
     "feed_templates": "d50c6a83d9fe4eba",
+    "map_site_references": "b004f268bc855d02",
+    "map_sites": "f73dad4e0c538e0f",
+    "mythbuster_questions": "f8a3860fb870fc55",
+    "myths": "800b022737e8ab0a",
     "npc_lines": "6d14f9f02e3f69b5",
-    "npcs": "835d588883a4f2ca"
+    "npcs": "835d588883a4f2ca",
+    "safety_card_references": "6d4491791a739ab2",
+    "safety_cards": "2620b171d4609864",
+    "scan_target_references": "40f09fbac04e1679",
+    "scan_targets": "e73ad32cc38c1cc0",
+    "unit_statements": "8169736b09442774"
   }
 }

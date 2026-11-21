@@ -1,0 +1,26 @@
+format 1
+adapter encyclopedia 1
+category: technology
+
+entry heavy-water
+term: Heavy Water
+difficulty: intermediate
+image: ../../assets/images/terms/heavy water.webp
+related_terms: moderator
+related_terms: nuclear-reactor
+related_terms: tritium
+related_terms: isotope
+quick_facts: D₂O: hydrogen replaced by deuterium (one extra neutron each)
+quick_facts: ~10% denser than ordinary water
+quick_facts: Absorbs far fewer neutrons than light water
+quick_facts: Lets CANDU reactors use natural, un-enriched uranium
+quick_facts: Costly: thousands of liters per reactor tonne of moderator
+
+sources:
+    {"organization":"World Nuclear","title":"Heavy Water Reactors","url":"https://world-nuclear.org/information-library/nuclear-fuel-cycle.aspx"}
+
+definition:
+    Water whose hydrogen atoms are swapped for deuterium — hydrogen carrying an extra neutron (D₂O). Chemically almost identical to ordinary water but about 10% denser, it is prized as a reactor moderator because it barely absorbs neutrons at all. That neutron economy lets CANDU reactors run on natural, non-enriched uranium — trading expensive enrichment for expensive D₂O production.
+
+debunking_snippet:
+    “Heavy water is radioactive.” It isn't — deuterium is stable. A sip is harmless (you drink trace amounts daily); it would only matter if it were most of your water for weeks.

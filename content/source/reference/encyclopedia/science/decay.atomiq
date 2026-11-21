@@ -1,0 +1,26 @@
+format 1
+adapter encyclopedia 1
+category: science
+
+entry decay
+term: Radioactive Decay
+image: ../../assets/images/terms/Decay.webp
+related_terms: half-life
+related_terms: radionuclide
+related_terms: alpha-particle
+related_terms: beta-particle
+related_terms: transmutation
+quick_facts: Random per atom, precisely predictable per sample
+quick_facts: Main modes: alpha, beta (β⁻/β⁺), gamma, spontaneous fission
+quick_facts: U-238 chain: 14 decays over 4.5 billion years → lead-206
+quick_facts: Nothing humans do speeds it up meaningfully
+quick_facts: Each step changes the element — transmutation in action
+
+sources:
+    {"organization":"EPA","title":"Radioactive Decay","url":"https://www.epa.gov/radiation/radioactive-decay"}
+
+definition:
+    The spontaneous transformation of an unstable nucleus into a more stable configuration by emitting radiation — an alpha particle, beta electron or positron, gamma ray, or occasionally a whole neutron or split. Quantum mechanics makes each atom's timing unknowable yet the crowd's behavior perfectly predictable: exponential halving governed by half-life. Decay chains can run many steps — uranium-238 takes 14 transformations over billions of years before settling as stable lead-206.
+
+debunking_snippet:
+    “We could neutralize waste if we heated or zapped it.” Decay rates are set inside the nucleus and shrug off temperature, pressure, chemistry, and ordinary radiation — only nuclear reactions change them.

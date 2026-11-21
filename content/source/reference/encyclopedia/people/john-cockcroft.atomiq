@@ -1,0 +1,22 @@
+format 1
+adapter encyclopedia 1
+category: people
+
+entry john-cockcroft
+term: John Cockcroft
+difficulty: advanced
+related_terms: ernest-walton
+related_terms: transmutation
+related_terms: proton
+related_terms: gamma-ray
+quick_facts: First artificial nuclear splitting with Walton (1932)
+quick_facts: Nobel Prize in Physics (1951)
+quick_facts: Founding director of the Harwell research establishment
+quick_facts: Cockcroft–Walton multipliers still inject modern accelerators
+quick_facts: His 'folly' chimney filters saved lives in the 1957 Windscale fire
+
+sources:
+    {"organization":"Nobel Prize","title":"John Cockcroft Biography","url":"https://www.nobelprize.org/prizes/physics/1951/cockcroft/biographical/"}
+
+definition:
+    British physicist (1897–1967) who, with Ernest Walton, built the voltage-multiplier accelerator that achieved the first deliberate splitting of atoms in 1932 — lithium struck by protons broke into two helium nuclei. The work shared the 1951 Nobel Prize in Physics. He went on to found and direct Britain's Harwell nuclear research establishment, contributed to the British atomic bomb, and famously insisted — against critics who called it 'Cockcroft's folly' — on installing filters in the Windscale pile chimneys. When the 1957 fire broke out, those filters caught much of the fallout and likely saved many lives.

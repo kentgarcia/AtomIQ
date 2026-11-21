@@ -1,0 +1,22 @@
+format 1
+adapter encyclopedia 1
+category: science
+
+entry electron-cloud
+term: Electron Cloud
+related_terms: electron
+related_terms: atom
+related_terms: nucleus
+quick_facts: It replaces the old picture of electrons as tiny planets
+quick_facts: Darker parts show where an electron is more likely to be
+quick_facts: The cloud is about 100,000 times wider than the nucleus
+quick_facts: Each shape of cloud is called an orbital
+
+sources:
+    {"organization":"Britannica","title":"Electron","url":"https://www.britannica.com/science/electron"}
+
+definition:
+    A picture of where the electrons of an atom are found. Instead of racing around the nucleus on neat rings, the electrons are somewhere in a fuzzy region around it. The cloud is darker where an electron is more likely to be. The cloud is huge compared with the nucleus, so most of an atom is empty space.
+
+debunking_snippet:
+    “Electrons circle the nucleus like planets.” They have no fixed path. The cloud shows where they are likely to be.

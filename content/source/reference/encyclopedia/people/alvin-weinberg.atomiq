@@ -1,0 +1,22 @@
+format 1
+adapter encyclopedia 1
+category: people
+
+entry alvin-weinberg
+term: Alvin Weinberg
+difficulty: advanced
+related_terms: nuclear-reactor
+related_terms: reactor-core
+related_terms: chain-reaction
+related_terms: zero-power-reactor
+quick_facts: Co-invented the pressurized water reactor (PWR)
+quick_facts: Led ORNL's Molten Salt Reactor Experiment (first criticality 1965)
+quick_facts: Directed Oak Ridge National Laboratory, 1955–1973
+quick_facts: Advocated 'inherent safety' long before it was industry standard
+quick_facts: Dismissed in 1973 after opposing the fast-breeder program
+
+sources:
+    {"organization":"ORNL","title":"Alvin Weinberg & the MSRE","url":"https://www.ornl.gov/blog/time-warp-molten-salt-reactor-experiment-alvin-weinbergs-magnum-opus"}
+
+definition:
+    American nuclear physicist (1915–2006) who co-invented the pressurized water reactor — the design used today in most naval vessels and about two-thirds of the world's power reactors — and later championed molten salt reactors at Oak Ridge National Laboratory (ORNL), leading its Molten Salt Reactor Experiment. He directed ORNL from 1955 to 1973 and became an early advocate of nuclear safety culture, arguing reactors should be inherently safe, not just engineered to be safe. He was dismissed in 1973 after clashing with Washington over reactor priorities.

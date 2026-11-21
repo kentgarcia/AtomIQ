@@ -1,0 +1,26 @@
+format 1
+adapter encyclopedia 1
+category: safety
+
+entry shielding
+term: Radiation Shielding
+image: ../../assets/images/terms/radiation.webp
+related_terms: defense-in-depth
+related_terms: containment-building
+related_terms: hot-cell
+related_terms: gamma-ray
+related_terms: neutron
+quick_facts: Alpha: paper · Beta: plastic · Gamma: dense metal/concrete
+quick_facts: Gammas are attenuated, never fully blocked
+quick_facts: Neutrons want hydrogen-rich shields + boron capture
+quick_facts: Time–distance–shielding: three levers, one goal
+quick_facts: Wrong shield (lead on betas) creates secondary X-rays
+
+sources:
+    {"organization":"EPA","title":"Radiation Protection Basics","url":"https://www.epa.gov/radiation"}
+
+definition:
+    Material placed between you and a radiation source to cut intensity. Each radiation type needs its own answer: alphas stop in paper or skin, betas in a few millimeters of plastic, gamma rays are only ever attenuated — halved by each layer of dense lead or concrete — while fast neutrons need hydrogen-rich material like water or polyethylene to slow down, plus boron to capture them. Pick the wrong shield and it can backfire: lead around betas manufactures X-rays.
+
+debunking_snippet:
+    “Lead stops everything.” Lead is useless against alpha (paper beats it), can worsen beta fields via secondary X-rays, and merely thins gamma beams — shielding is matched to the radiation, not bought off the shelf.

@@ -8,7 +8,9 @@
 import { FRIENDLY_ADAPTERS } from "./registry.mjs";
 
 /** Names of the owned adapters, in the order they sync. */
-export const OWNED_ADAPTERS = ["chat", "characters", "feed", "blog"];
+// Parents before children: a table another adapter points at (references, encyclopedia) comes first, because a sync
+// inserts in this order and deletes in the reverse (see `orderOps` in sync.mjs).
+export const OWNED_ADAPTERS = ["references", "encyclopedia", "characters", "chat", "feed", "blog", "myths", "mythbuster", "statements", "scanner", "safety", "map"];
 
 export function ownedAdapters() {
   return OWNED_ADAPTERS.map((n) => {

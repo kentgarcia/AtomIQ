@@ -1,0 +1,10 @@
+format 1
+adapter safety 1
+section: myths
+
+card safety-demo-myth
+title: A myth
+icon: Danger
+references: ref-a
+summary: Not true.
+steps: Say so.

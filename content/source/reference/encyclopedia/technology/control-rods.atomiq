@@ -1,0 +1,26 @@
+format 1
+adapter encyclopedia 1
+category: technology
+
+entry control-rods
+term: Control Rods
+image: ../../assets/images/terms/control rod.webp
+related_terms: nuclear-reactor
+related_terms: moderator
+related_terms: defense-in-depth
+related_terms: chain-reaction
+related_terms: reactor-core
+quick_facts: Made of neutron absorbers: boron, cadmium, hafnium
+quick_facts: Inserted deeper → less power; withdrawn → more power
+quick_facts: SCRAM: full insertion in seconds stops the chain reaction
+quick_facts: Designed to fail safe — gravity drops them on power loss
+quick_facts: Absorb neutrons without themselves becoming dangerously unstable
+
+sources:
+    {"organization":"NEA","title":"Nuclear Safety","url":"https://www.oecd-nea.org/jcms/pl_13561/nuclear-safety"}
+
+definition:
+    Neutron-absorbing rods — boron carbide, cadmium, silver-indium-cadmium, or hafnium — moved in and out of a reactor core to regulate the chain reaction. Inserted deeper, they soak up more neutrons and power falls; withdrawn, power rises. On an emergency shutdown (scram) they slam fully in within seconds, stopping the fission chain. Because they rely on gravity or hydraulics rather than electronics, they fail safe.
+
+debunking_snippet:
+    “Turning off a reactor is like switching off a light.” Control rods stop the fission chain almost instantly — but radioactive decay heat keeps the fuel hot for days, which is why cooling continues long after shutdown.

@@ -1,0 +1,10 @@
+format 1
+adapter references 1
+kind: textbook
+
+source ref-demo-book
+publisher: OpenStax
+title: Chemistry 2e
+authors: Flowers, Theopold
+accessed: 2026-01-12
+note: Chapter 2.

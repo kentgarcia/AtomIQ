@@ -1,0 +1,22 @@
+format 1
+adapter encyclopedia 1
+category: people
+
+entry igor-kurchatov
+term: Igor Kurchatov
+difficulty: advanced
+related_terms: nuclear-reactor
+related_terms: chain-reaction
+related_terms: andrei-sakharov
+related_terms: edward-teller
+quick_facts: Directed the Soviet atomic project (RDS-1 tested 1949)
+quick_facts: Delivered Obninsk (1954): first grid-connected nuclear power plant
+quick_facts: 'Father of Soviet atomic energy'
+quick_facts: Late-career advocate against atmospheric testing
+quick_facts: The Kurchatov Institute is named after him
+
+sources:
+    {"organization":"Kurchatov Institute","title":"Igor Kurchatov","url":"http://www.nrcki.ru/en/"}
+
+definition:
+    Soviet physicist (1903–1960) who directed the Soviet atomic bomb project — the effort that detonated the USSR's first device, RDS-1, in 1949 and ended America's nuclear monopoly. His institute also delivered Obninsk (1954), the world's first nuclear power plant connected to an electricity grid, years before Britain's Calder Hall. Late in life he publicly urged an end to atmospheric weapons testing, and the Kurchatov Institute — Russia's leading nuclear research center — carries his name.

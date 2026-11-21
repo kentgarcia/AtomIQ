@@ -1,0 +1,26 @@
+format 1
+adapter encyclopedia 1
+category: environment
+
+entry radioactive-waste
+term: Radioactive Waste
+difficulty: intermediate
+related_terms: low-level-waste
+related_terms: spent-fuel
+related_terms: vitrification
+related_terms: half-life
+related_terms: shielding
+quick_facts: Four classes: VLLW → LLW → ILW → HLW
+quick_facts: Volume is remarkably small — a country's lifetime HLW fits one facility
+quick_facts: ~95% of spent fuel's energy is still unused
+quick_facts: Finland built the world's first permanent deep repository (Onkalo)
+quick_facts: Managed under IAEA cradle-to-grave rules worldwide
+
+sources:
+    {"organization":"World Nuclear","title":"Radioactive Waste Management","url":"https://world-nuclear.org/information-library/nuclear-fuel-cycle/nuclear-wastes.aspx"}
+
+definition:
+    Leftover materials carrying radioactive contamination or activation, sorted into classes by activity and lifetime: very-low-level (soil, rubble), low-level (gloves, filters — most of the volume), intermediate (reactor components), and high-level (spent fuel and reprocessing residues — most of the radioactivity, in a tiny package). High-level waste is hot and long-lived, managed by decades of on-site cooling followed by either deep geological disposal or recycling, since roughly 95% of spent fuel's potential energy remains unused.
+
+debunking_snippet:
+    “Nuclear waste stays lethal for millions of years.” The intensely radioactive isotopes burn out fastest — within centuries waste converges toward the radioactivity of the original uranium ore it came from.

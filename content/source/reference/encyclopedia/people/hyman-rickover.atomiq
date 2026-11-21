@@ -1,0 +1,22 @@
+format 1
+adapter encyclopedia 1
+category: people
+
+entry hyman-rickover
+term: Hyman Rickover
+difficulty: advanced
+related_terms: nuclear-reactor
+related_terms: alvin-weinberg
+related_terms: eugene-wigner
+related_terms: reactor-core
+quick_facts: 'Father of the Nuclear Navy'
+quick_facts: USS Nautilus: first nuclear submarine (1954), reached North Pole 1958
+quick_facts: 63 years of service — longest in U.S. Navy history
+quick_facts: His safety program has run reactors without major release since the 1950s
+quick_facts: Shippingport (1957): first U.S. full-scale civilian nuclear plant
+
+sources:
+    {"organization":"Naval History and Heritage Command","title":"Hyman G. Rickover","url":"https://www.history.navy.mil"}
+
+definition:
+    U.S. Navy admiral (1900–1986), the 'Father of the Nuclear Navy'. He drove the development of compact pressurized-water propulsion — building on the PWR concept from Weinberg and Wigner — culminating in USS Nautilus (1954), the first nuclear submarine, which sailed under the North Pole in 1958. His obsessive engineering culture, personal interviews of every officer candidate, and insistence on rigorous training shaped naval nuclear safety into one of the safest industries anywhere. He served 63 years — the longest of any U.S. naval officer — and his team later launched the first full-size civilian PWR power plant at Shippingport.

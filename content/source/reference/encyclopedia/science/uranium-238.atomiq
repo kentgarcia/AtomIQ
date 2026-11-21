@@ -1,0 +1,24 @@
+format 1
+adapter encyclopedia 1
+category: science
+
+entry uranium-238
+term: Uranium-238
+difficulty: intermediate
+image: ../../assets/images/terms/Uranium-238.webp
+related_terms: uranium-235
+related_terms: plutonium-239
+related_terms: spent-fuel
+related_terms: decay
+related_terms: half-life
+quick_facts: 99.28% of natural uranium · half-life 4.47 billion years
+quick_facts: Fertile: becomes fissile Pu-239 after capturing a neutron
+quick_facts: Fast neutrons can split it — adding extra energy in reactors
+quick_facts: Depleted uranium: tank armor and radiation shielding
+quick_facts: Dating rocks by U-238 → lead-206 decay chains
+
+sources:
+    {"organization":"World Nuclear","title":"Uranium and Nuclear Power","url":"https://world-nuclear.org/information-library"}
+
+definition:
+    Ninety-nine point three percent of natural uranium and the quiet majority of every fuel rod. It won't sustain chain reactions itself — thermal neutrons bounce off it — but fast neutrons occasionally split it, and captured neutrons transform it into plutonium-239 inside any running reactor. Its 4.47-billion-year half-life sets Earth's uranium clock, and its depleted form (left over after enrichment) balances tanks and shields gamma rays.

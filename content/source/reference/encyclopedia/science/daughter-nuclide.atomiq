@@ -1,0 +1,25 @@
+format 1
+adapter encyclopedia 1
+category: science
+
+entry daughter-nuclide
+term: Daughter Nuclide
+related_terms: parent-nuclide
+related_terms: decay
+related_terms: decay-chain
+related_terms: radioactivity
+related_terms: radionuclide
+quick_facts: The daughter is the nucleus the parent becomes
+quick_facts: It is a different nucleus, so nothing simply vanishes
+quick_facts: It can be stable or unstable
+quick_facts: An unstable daughter decays again
+quick_facts: A chain ends at a stable daughter
+
+sources:
+    {"organization":"OpenStax","title":"University Physics Volume 3: Radioactive Decay","url":"https://openstax.org/books/university-physics-volume-3/pages/10-3-radioactive-decay"}
+
+definition:
+    The nucleus that is left after a radioactive decay. It is a different nucleus from the parent. The daughter can be stable, and then the changing stops, or it can be unstable too, and then it decays again. A run of decays like this is a decay chain.
+
+debunking_snippet:
+    “Every decay makes a stable atom.” The daughter can be unstable too, and then it decays again.

@@ -1,0 +1,23 @@
+format 1
+adapter encyclopedia 1
+category: technology
+
+entry cyclotron
+term: Cyclotron
+difficulty: advanced
+image: ../../assets/images/terms/Cyclotron.webp
+related_terms: isotope
+related_terms: ernest-lawrence
+related_terms: linear-accelerator
+related_terms: radionuclide
+quick_facts: Invented by Ernest O. Lawrence (1930)
+quick_facts: Accelerates particles in a spiral using electric + magnetic fields
+quick_facts: Makes PET isotopes like fluorine-18 in hospitals
+quick_facts: Compact next to kilometer-long linear accelerators
+quick_facts: Lawrence won the 1939 Nobel Prize for it
+
+sources:
+    {"organization":"IAEA","title":"Cyclotrons for Radionuclide Production","url":"https://www.iaea.org/topics/cyclotrons"}
+
+definition:
+    A compact circular particle accelerator invented by Ernest O. Lawrence in 1930. Electric fields kick charged particles faster with each pass while a magnetic field bends them into a widening spiral until they exit at high energy. Cyclotrons are workhorses of nuclear medicine: hospital-based machines bombard targets to make short-lived positron emitters such as fluorine-18 for PET scans. (Technetium-99m, the most-used diagnostic isotope, comes mainly from reactors instead.) Lawrence won the 1939 Nobel Prize in Physics for the cyclotron.

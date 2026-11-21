@@ -1,0 +1,16 @@
+format 1
+adapter myths 1
+category: waste
+
+myth demo-other
+title: Other category
+sources:
+
+statement:
+    A.
+
+reality:
+    B.
+
+explanation:
+    C.

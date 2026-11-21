@@ -1,0 +1,21 @@
+format 1
+adapter encyclopedia 1
+category: science
+
+entry watt
+term: Watt (W)
+related_terms: reactor-core
+related_terms: nuclear-reactor
+related_terms: binding-energy
+related_terms: mass-defect
+quick_facts: 1 W = 1 joule per second
+quick_facts: Named after James Watt (honored 1889, formalized in SI)
+quick_facts: Plants quote MWt (heat) and MWe (electricity)
+quick_facts: Typical large unit: ~3,000 MWt → ~1,000 MWe
+quick_facts: ~33% efficiency set by steam-cycle thermodynamics
+
+sources:
+    {"organization":"BIPM","title":"SI Units – watt","url":"https://www.bipm.org/en/measurement-units"}
+
+definition:
+    The SI unit of power — one joule per second — named for Scottish engineer James Watt, whose steam engines powered the first industrial revolution. Nuclear plants are rated two ways that matter: thermal megawatts describe heat from the core (a typical large unit: ~3,000 MWt), while electrical megawatts describe what reaches the grid (~1,000 MWe) — the gap being thermodynamic efficiency. A single large reactor thus powers around a million homes continuously, day and night.

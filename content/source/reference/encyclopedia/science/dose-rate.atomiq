@@ -1,0 +1,27 @@
+format 1
+adapter encyclopedia 1
+category: science
+
+entry dose-rate
+term: Dose Rate
+difficulty: intermediate
+image: ../../assets/images/terms/Dose Rate.webp
+related_terms: absorbed-dose
+related_terms: sievert
+related_terms: exposure
+related_terms: background-radiation
+related_terms: dosimeter
+quick_facts: Dose per unit time: μSv/h, mSv/yr
+quick_facts: Natural background ≈ 0.27 μSv/h averaged globally
+quick_facts: Same total dose is safer when spread out — the body repairs damage
+quick_facts: Drives occupational limits: 20 mSv/yr averaged over 5 years
+quick_facts: What survey meters and area monitors actually display
+
+sources:
+    {"organization":"IAEA","title":"Radiation Protection","url":"https://www.iaea.org/topics/radiation-protection"}
+
+definition:
+    How fast radiation dose accumulates — e.g. microsieverts per hour (μsv/h) or millisieverts per year (mSv/yr). Rate matters biologically: the body can repair low-intensity damage over hours and days, so the same total dose spread over a year is far less harmful than delivered all at once. Natural background averages roughly 0.27 μSv/h worldwide; regulatory limits for nuclear workers (20 mSv/yr averaged) are built entirely around dose-rate thinking.
+
+debunking_snippet:
+    “A hot reading means immediate danger.” Not without the time dimension — 10 μSv/h for an hour-long visit is trivial; the same spot for a full year is a different story.

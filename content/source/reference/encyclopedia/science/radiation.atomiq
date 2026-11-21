@@ -1,0 +1,25 @@
+format 1
+adapter encyclopedia 1
+category: science
+
+entry radiation
+term: Radiation
+image: ../../assets/images/terms/radiation.webp
+related_terms: ionizing-radiation
+related_terms: background-radiation
+related_terms: decay
+related_terms: x-ray
+quick_facts: Two families: waves (EM) and particles
+quick_facts: Ionizing vs non-ionizing is what matters for health
+quick_facts: Bananas are mildly radioactive from potassium-40
+quick_facts: Sunlight is radiation — so is Wi-Fi, at very different energies
+quick_facts: Background radiation predates humanity by eons
+
+sources:
+    {"organization":"IAEA","title":"What is Radiation?","url":"https://www.iaea.org/topics/radiation"}
+
+definition:
+    Energy traveling outward from its source — either as electromagnetic waves (radio, infrared, light, UV, X-rays, gamma) or fast particles (alpha, beta, neutrons). The dividing line that matters biologically is energy per quantum: ionizing radiation can tear electrons off atoms and break DNA; non-ionizing radiation mostly just heats things. Radiation is everywhere and always has been — sunlight, rocks, bananas, outer space.
+
+debunking_snippet:
+    “Any amount of radiation is unsafe.” Life evolved amid constant natural radiation — every second, thousands of natural particles pass through you harmlessly. Risk depends on dose, and small doses carry vanishingly small risk.

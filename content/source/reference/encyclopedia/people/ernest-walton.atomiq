@@ -1,0 +1,23 @@
+format 1
+adapter encyclopedia 1
+category: people
+
+entry ernest-walton
+term: Ernest Walton
+difficulty: advanced
+related_terms: john-cockcroft
+related_terms: proton
+related_terms: alpha-particle
+related_terms: binding-energy
+related_terms: cyclotron
+quick_facts: Split lithium with protons — first artificial atom-splitting (1932)
+quick_facts: Shared the 1951 Nobel Prize in Physics with Cockcroft
+quick_facts: Cockcroft–Walton generator: still used to inject accelerators
+quick_facts: First laboratory test of E = mc² in nuclear reactions
+quick_facts: Ireland's only physics Nobel laureate
+
+sources:
+    {"organization":"Nobel Prize","title":"Ernest Walton Biography","url":"https://www.nobelprize.org/prizes/physics/1951/walton/biographical/"}
+
+definition:
+    Irish physicist (1903–1995) who, with John Cockcroft, built the first particle accelerator able to disintegrate atomic nuclei. In 1932 at Cambridge they fired protons at lithium and watched it split into two helium nuclei — the first deliberate splitting of the atom by artificially accelerated particles, and the first direct confirmation of E = mc² on a nuclear scale. The two shared the 1951 Nobel Prize in Physics; their Cockcroft–Walton voltage multiplier still serves as the front end of modern accelerators.

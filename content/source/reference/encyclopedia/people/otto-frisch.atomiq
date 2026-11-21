@@ -1,0 +1,23 @@
+format 1
+adapter encyclopedia 1
+category: people
+
+entry otto-frisch
+term: Otto Frisch
+difficulty: advanced
+related_terms: lise-meitner
+related_terms: nuclear-fission
+related_terms: critical-mass
+related_terms: niels-bohr
+related_terms: james-chadwick
+quick_facts: Explained fission with Lise Meitner (Dec 1938)
+quick_facts: Borrowed the word 'fission' from cell biology
+quick_facts: Experimentally confirmed fission within weeks
+quick_facts: Frisch–Peierls memo (1940): first serious bomb feasibility study
+quick_facts: Worked at Los Alamos as part of the British Mission
+
+sources:
+    {"organization":"APS","title":"Otto Robert Frisch","url":"https://www.aps.org/programs/outreach/history/historicsites/frisch.cfm"}
+
+definition:
+    Austrian-British physicist (1904–1979), Lise Meitner's nephew and her partner in the Christmas 1938 forest walk where they worked out that Hahn's barium meant the nucleus had split — Frisch borrowed 'fission' from biology for the name. Weeks later he confirmed it experimentally with recoil bursts from neutron-blasted uranium. In 1940 his memorandum with Rudolf Peierls estimated a critical mass of pure U-235 at roughly kilograms, not tons — the calculation that first made atomic bombs seem buildable. He joined the British Mission at Los Alamos afterward.

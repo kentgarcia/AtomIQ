@@ -1,0 +1,26 @@
+format 1
+adapter encyclopedia 1
+category: technology
+
+entry scintillation-detector
+term: Scintillation Detector
+difficulty: advanced
+image: ../../assets/images/terms/scintillation detector.webp
+related_terms: geiger-counter
+related_terms: dosimeter
+related_terms: gamma-ray
+related_terms: radionuclide
+quick_facts: Radiation in → light flash → amplified pulse
+quick_facts: Measures energy, not just counts — identifies isotopes
+quick_facts: NaI(Tl) crystals and plastics are classic scintillators
+quick_facts: Inside every PET scanner
+quick_facts: Used to sniff out smuggled nuclear material at borders
+
+sources:
+    {"organization":"IAEA","title":"Radiation Detection","url":"https://www.iaea.org/"}
+
+definition:
+    A radiation detector that turns invisible energy into visible light: incoming radiation makes a scintillator crystal or plastic flash, and a photomultiplier tube amplifies each flicker into a measurable electrical pulse. Unlike Geiger counters, which only count events, the pulse height carries the particle's energy — letting scintillators identify exactly which isotope they're looking at from its spectral fingerprint. They power airport portal monitors, PET scanners, and physics discoveries from neutrino telescopes to dark-matter searches.
+
+debunking_snippet:
+    “All radiation detectors are basically Geiger counters.” Geiger-Müller tubes count clicks but stay blind to energy — scintillators read spectra and can name the isotope standing in front of them.

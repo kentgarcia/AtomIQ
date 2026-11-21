@@ -1,0 +1,23 @@
+format 1
+adapter encyclopedia 1
+category: people
+
+entry henri-becquerel
+term: Henri Becquerel
+image: /assets/images/people/becquerel, henri.webp
+related_terms: becquerel
+related_terms: marie-curie
+related_terms: pierre-curie
+related_terms: decay
+related_terms: uranium-235
+quick_facts: Discovered radioactivity in 1896 — via a cloudy-week accident
+quick_facts: Uranium salts fogged plates with no sunlight needed
+quick_facts: Shared the 1903 Nobel Prize in Physics with the Curies
+quick_facts: The becquerel (Bq) unit honors him
+quick_facts: Came from a family dynasty of physicists — son and grandson too
+
+sources:
+    {"organization":"Nobel Prize","title":"Henri Becquerel Biography","url":"https://www.nobelprize.org/prizes/physics/1903/becquerel/biographical/"}
+
+definition:
+    French physicist (1852–1908) who discovered radioactivity by accident in 1896: investigating whether uranium salts glow after sunlight exposure, he found they fogged a photographic plate even in a drawer on a cloudy week — the uranium emitted penetrating rays all by itself. Marie and Pierre Curie chased down the phenomenon and coined 'radioactivity'; all three shared the 1903 Nobel Prize in Physics, and the SI activity unit bears his name.

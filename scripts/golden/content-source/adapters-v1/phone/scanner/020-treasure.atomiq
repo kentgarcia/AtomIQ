@@ -1,0 +1,12 @@
+format 1
+adapter scanner 1
+scene: treasure
+
+target scan-demo-gold
+name: Gold
+object: gold
+blurb: Shiny.
+fun_fact: Made in stars.
+
+composition:
+    {"symbol":"Au"}

@@ -1,0 +1,49 @@
+format 1
+adapter scanner 1
+scene: body
+
+target scan-hand
+name: Your hand
+object: hand
+atomdex: element
+references: ref-openstax-ap-elements
+blurb: Your body is made of the same elements as everything else.
+fun_fact: Oxygen, carbon, hydrogen and nitrogen are the four most abundant elements in the human body.
+
+composition:
+    {"symbol":"O"}
+    {"symbol":"C"}
+    {"symbol":"H"}
+    {"symbol":"N"}
+
+target scan-hair
+name: A strand of hair
+object: hair
+references: ref-openstax-ap-hair
+references: ref-openstax-ap-organic
+blurb: Hair is a filament of keratin, a protein.
+
+fun_fact:
+    Every protein contains nitrogen, and many contain sulfur, together with carbon, hydrogen and oxygen. Keratin is a protein.
+
+composition:
+    {"symbol":"C"}
+    {"symbol":"O"}
+    {"symbol":"N","note":"in every protein"}
+    {"symbol":"H"}
+    {"symbol":"S","note":"found in many proteins"}
+
+target scan-red-blood-cell
+name: A red blood cell
+object: rbc
+references: ref-openstax-ap-erythrocytes
+references: ref-openstax-ap-organic
+blurb: A cell that carries oxygen around your body.
+fun_fact: Hemoglobin, the molecule that carries oxygen in your blood, is made of proteins and iron.
+
+composition:
+    {"symbol":"O","note":"the gas it carries"}
+    {"symbol":"C"}
+    {"symbol":"H"}
+    {"symbol":"N"}
+    {"symbol":"Fe","note":"in hemoglobin"}

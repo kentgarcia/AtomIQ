@@ -1,0 +1,27 @@
+format 1
+adapter encyclopedia 1
+category: people
+
+entry niels-bohr
+term: Niels Bohr
+difficulty: intermediate
+image: /assets/images/people/bohr, niels.webp
+related_terms: atom
+related_terms: electron
+related_terms: nucleus
+related_terms: lise-meitner
+related_terms: j-robert-oppenheimer
+quick_facts: Bohr model of the atom (1913)
+quick_facts: Nobel Prize in Physics (1922)
+quick_facts: Founded his Copenhagen institute in 1921
+quick_facts: His droplet model explained how fission happens
+quick_facts: Escaped Denmark by fishing boat in 1943
+
+sources:
+    {"organization":"Nobel Prize","title":"Niels Bohr Biography","url":"https://www.nobelprize.org/prizes/physics/1922/bohr/biographical/"}
+
+definition:
+    Danish physicist (1885–1962) who in 1913 gave the atom its first workable quantum picture — electrons in fixed orbits jumping between energy levels — earning the 1922 Nobel Prize in Physics. His Copenhagen institute became the crossroads of quantum physics, and his liquid-droplet model of the nucleus was exactly what Lise Meitner used to explain fission in 1938. After fleeing occupied Denmark in 1943 he consulted on the Manhattan Project and later championed openness between nations about nuclear matters.
+
+debunking_snippet:
+    “Bohr's planetary atom is still the accepted model.” It was a stepping stone — replaced within a decade by full quantum mechanics and orbitals, though it remains the perfect first sketch.

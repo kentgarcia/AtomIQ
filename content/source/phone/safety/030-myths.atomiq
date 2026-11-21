@@ -1,0 +1,61 @@
+format 1
+adapter safety 1
+section: myths
+
+card safety-myth-exposed-radioactive
+title: Myth: exposure makes you radioactive
+icon: CloseCircle
+entry: exposure
+references: ref-cdc-contamination-vs-exposure
+references: ref-nrc-radiation-faq
+summary: Being exposed to radiation does not make a person radioactive.
+steps: Myth: a person who was exposed to radiation is now radioactive.
+steps: What is true: being exposed to radiation does not make one radioactive.
+steps: What is true: an x-ray exposes a person to radiation, but does not contaminate them.
+steps: Radioactive material on the skin or clothes is the concern. It is washed off.
+
+card safety-myth-ki-all-radiation
+title: Myth: KI pills block all radiation
+icon: CloseCircle
+references: ref-cdc-potassium-iodide
+summary: Potassium iodide protects one organ from one kind of radioactive material.
+steps: Myth: potassium iodide pills protect you from radiation in general.
+steps: What is true: KI protects only the thyroid and only against radioactive iodine.
+steps: What is true: it cannot reverse damage already done, and may not give 100% protection.
+steps: Take KI only if officials or a healthcare provider tell you to.
+
+card safety-myth-microwave-radiation
+title: Myth: microwaves are nuclear radiation
+icon: Wifi
+entry: ionizing-radiation
+references: ref-epa-radiation-basics
+references: ref-nrc-radiation-faq
+summary: Microwaves and radio waves are non-ionizing. Nuclear radiation is ionizing.
+steps: Myth: microwave radiation is the same kind of radiation as nuclear radiation.
+steps: What is true: radio waves, visible light and microwaves are non-ionizing radiation.
+steps: What is true: ionizing radiation has enough energy to knock electrons out of atoms, which can damage tissue and DNA.
+steps: Microwaves make electrons vibrate to make heat. They cannot remove electrons from atoms.
+
+card safety-myth-plant-explodes
+title: Myth: a plant can blow up like a bomb
+icon: Flash
+entry: nuclear-reactor
+references: ref-cdc-nuclear-blast-faq
+references: ref-nrc-radiation-faq
+summary: A reactor does not explode like a nuclear weapon, but an accident can release radiation.
+steps: Myth: a nuclear power plant can explode like a nuclear bomb.
+steps: What is true: a power plant would not explode like a nuclear weapon.
+steps: What is true: its fuel is arranged so energy is produced steadily, not all at once.
+steps: A serious accident could still release radiation into the air, and officials would monitor it.
+
+card safety-myth-instantly-deadly
+title: Myth: any radiation is deadly
+icon: CloseCircle
+entry: absorbed-dose
+references: ref-epa-radiation-health-effects
+references: ref-who-ionizing-radiation
+summary: What matters is the dose and how fast it arrives.
+steps: Myth: any amount of radiation is instantly deadly.
+steps: What is true: acute radiation syndrome needs a very high dose delivered over a short time.
+steps: What is true: environmental levels do not cause immediate effects. Cancer risk rises with dose.
+steps: Low doses delivered slowly carry a substantially lower risk, as the body can repair damage.

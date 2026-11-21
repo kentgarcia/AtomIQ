@@ -1,0 +1,24 @@
+format 1
+adapter encyclopedia 1
+category: science
+
+entry electromagnetic-radiation
+term: Electromagnetic Radiation
+related_terms: gamma-ray
+related_terms: radiation
+related_terms: gamma-radiation
+related_terms: ionizing-radiation
+quick_facts: Light is electromagnetic radiation
+quick_facts: Gamma rays are electromagnetic radiation too
+quick_facts: It is energy, not matter
+quick_facts: Different kinds carry different amounts of energy
+quick_facts: Alpha and beta are particles, not electromagnetic radiation
+
+sources:
+    {"organization":"OpenStax","title":"University Physics Volume 2: Electromagnetic Waves","url":"https://openstax.org/books/university-physics-volume-2/pages/16-introduction"}
+
+definition:
+    Energy that travels as waves of electric and magnetic fields. It is not made of matter. Radio waves, microwaves, infrared, visible light, ultraviolet, X-rays and gamma rays are all electromagnetic radiation. They differ in how much energy they carry. Gamma rays carry far more energy than visible light.
+
+debunking_snippet:
+    “Radiation always means nuclear radiation.” Light is radiation too. Only some radiation comes from nuclei.

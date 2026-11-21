@@ -88,6 +88,26 @@ export function buildOps(db, adapter, diffs, { retire, shipped }) {
   return ops;
 }
 
+/**
+ * One batch from several adapters. Each adapter's own operations are in four phases (park positions, delete, insert,
+ * update); across adapters the phases are merged so a foreign key never points at a row that is not there yet: parks
+ * first, then deletes with the LAST adapter first (a card goes before the source it cites), then inserts with the
+ * FIRST adapter first (the source before the card), then updates. `OWNED_ADAPTERS` lists parents before children.
+ * @param {object[][]} perAdapter the operations of each adapter, in owned order
+ */
+export function orderOps(perAdapter) {
+  const park = (o) => o.op === "update" && Object.keys(o.set).length === 1 && "position" in o.set && o.set.position < 0;
+  const of = (list, fn) => list.filter(fn);
+  const forward = (fn) => perAdapter.flatMap((ops) => of(ops, fn));
+  const backward = (fn) => [...perAdapter].reverse().flatMap((ops) => of(ops, fn));
+  return [
+    ...forward(park),
+    ...backward((o) => o.op === "delete"),
+    ...forward((o) => o.op === "insert"),
+    ...forward((o) => o.op === "update" && !park(o)),
+  ];
+}
+
 /** Parse the files of an adapter into rows. Throws SourceError (with file:line) on the first problem. */
 export function loadDesired(paths, adapter) {
   const files = readSourceFiles(paths.sourceDir, adapter.owns);
@@ -109,6 +129,7 @@ export function planSync({ paths, names, retire }) {
   try {
     const shipped = readShipped(paths);
     const state = readState(paths.sourceDir);
+    const opsByAdapter = [];
     const plan = { adapters: [], ops: [], drift: [], warnings: [], shippedDeletes: [], tables: new Set(), diffs: {}, desiredRows: {}, files: 0 };
     for (const adapter of adapters) {
       const { files, rows } = loadDesired(paths, adapter);
@@ -134,9 +155,10 @@ export function planSync({ paths, names, retire }) {
         if (op.op === "delete" && "retire" in op && !op.retire?.trim()) plan.shippedDeletes.push(`${op.table} ${[op.pk].flat().join(" ")}`);
         if (op.op !== "update" || !("position" in op.set) || op.set.position >= 0) plan.tables.add(op.table);
       }
-      plan.ops.push(...ops);
+      opsByAdapter.push(ops);
       plan.adapters.push(adapter.name);
     }
+    plan.ops = orderOps(opsByAdapter);
     for (const rel of strayFiles(paths.sourceDir)) plan.warnings.push(`${rel}: not a .atomiq file (only .atomiq, README.md and .state.json belong in content/source)`);
     return plan;
   } finally {

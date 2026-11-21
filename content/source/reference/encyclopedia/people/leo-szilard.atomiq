@@ -1,0 +1,26 @@
+format 1
+adapter encyclopedia 1
+category: people
+
+entry leo-szilard
+term: Leo Szilard
+difficulty: advanced
+image: /assets/images/people/leo szilard.webp
+related_terms: chain-reaction
+related_terms: enrico-fermi
+related_terms: critical-mass
+related_terms: j-robert-oppenheimer
+quick_facts: Conceived the chain reaction at a London crosswalk (1933)
+quick_facts: Co-patented the nuclear reactor with Fermi
+quick_facts: Drafted the Einstein–Szilard letter to Roosevelt (1939)
+quick_facts: Circulated a 1945 petition against bombing Japanese cities
+quick_facts: Switched careers to biology after the war
+
+sources:
+    {"organization":"APS","title":"Leo Szilard","url":"https://www.aps.org/programs/outreach/history/historicsites/szilard.cfm"}
+
+definition:
+    Hungarian-American physicist (1898–1964) who dreamed up the nuclear chain reaction while crossing a London street in September 1933 — the day after Rutherford dismissed atomic energy as 'moonshine'. He kept the idea secret under a patent, co-invented the reactor concept with Enrico Fermi, and in August 1939 drafted the Einstein–Szilard letter that warned President Roosevelt of possible German bombs and launched what became the Manhattan Project. Horrified by the results, he organized the 1945 scientists' petition against bombing Japanese cities and spent his later years on arms control and molecular biology.
+
+debunking_snippet:
+    “The Einstein letter was Einstein's idea.” It was Szilard's from start to finish — Einstein only signed, having barely heard of chain reactions before that morning.

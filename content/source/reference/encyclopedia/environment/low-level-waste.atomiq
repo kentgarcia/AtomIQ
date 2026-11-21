@@ -1,0 +1,26 @@
+format 1
+adapter encyclopedia 1
+category: environment
+
+entry low-level-waste
+term: Low-Level Waste (LLW)
+difficulty: intermediate
+image: ../../assets/images/terms/llw.webp
+related_terms: radioactive-waste
+related_terms: spent-fuel
+related_terms: shielding
+related_terms: half-life
+quick_facts: ~90% of radioactive waste volume, ~1% of its radioactivity
+quick_facts: Includes hospital, laboratory, and industrial items
+quick_facts: Often decays to background within hours or years
+quick_facts: Disposed in engineered near-surface facilities
+quick_facts: Segregated and tracked from cradle to grave
+
+sources:
+    {"organization":"World Nuclear","title":"Radioactive Waste Management","url":"https://world-nuclear.org/information-library/nuclear-fuel-cycle/nuclear-wastes.aspx"}
+
+definition:
+    The everyday side of radioactive waste: gloves, gowns, filters, tools, labware, and smoke-detector sources — lightly contaminated items from hospitals, research labs, industry, and power plants. It makes up roughly 90% of radioactive waste by volume but only about 1% of its total radioactivity. Most of it decays to background within hours to years and goes into engineered near-surface disposal cells with monitored caps and drains.
+
+debunking_snippet:
+    “All nuclear waste is glowing drums destined for deep mountains.” The overwhelming majority by volume is low-level waste — contaminated paper, plastic, and filters — safely buried a few meters underground.

@@ -1,0 +1,27 @@
+format 1
+adapter encyclopedia 1
+category: science
+
+entry chain-reaction
+term: Chain Reaction
+difficulty: intermediate
+image: ../../assets/images/terms/chain reaction.webp
+related_terms: nuclear-fission
+related_terms: critical-mass
+related_terms: nuclear-reactor
+related_terms: control-rods
+related_terms: neutron
+quick_facts: Each fission releases 2–3 neutrons
+quick_facts: Critical (k = 1): steady power · supercritical: exponential growth
+quick_facts: Delayed neutrons give reactors their controllability
+quick_facts: Control rods tune the chain by absorbing neutrons
+quick_facts: Requires enough fissile material and the right neutron energy
+
+sources:
+    {"organization":"World Nuclear","title":"Physics of Nuclear Energy","url":"https://world-nuclear.org/information-library/nuclear-fuel-cycle/introduction/physics-of-nuclear-energy.aspx"}
+
+definition:
+    A self-sustaining series of nuclear fission events: each fission splits a heavy nucleus and releases 2–3 fresh neutrons, which can go on to split further nuclei. If exactly one fission per generation goes on to cause another (k = 1), the chain is critical and steady — that's a reactor. More than one (k > 1) grows exponentially — that's a bomb or a supercritical accident. Reactors stay controllable thanks to delayed neutrons, which act as a slow-moving fraction of the chain.
+
+debunking_snippet:
+    “A reactor can explode like an atomic bomb.” It can't — reactor fuel is far too dilute in fissile material (a few % U-235 vs >90% for weapons). Chernobyl's explosion was steam and chemical energy, never a nuclear blast.

@@ -1,0 +1,26 @@
+format 1
+adapter encyclopedia 1
+category: science
+
+entry nuclear-stability
+term: Nuclear Stability
+related_terms: nucleus
+related_terms: strong-force
+related_terms: electric-force
+related_terms: radioactivity
+related_terms: radionuclide
+related_terms: isotope
+quick_facts: Stable: the nucleus stays as it is
+quick_facts: Unstable: the nucleus will change and give off radiation
+quick_facts: It depends on the mix of protons and neutrons
+quick_facts: Carbon-12 and carbon-13 are stable, but carbon-14 is not
+quick_facts: Most atoms around us are stable
+
+sources:
+    {"organization":"OpenStax","title":"University Physics Volume 3: Nuclear Binding Energy","url":"https://openstax.org/books/university-physics-volume-3/pages/10-2-nuclear-binding-energy"}
+
+definition:
+    Whether a nucleus stays as it is or will change one day. A nucleus is stable when the strong force that holds it together balances the electric push between its protons. Stability depends on the mix of protons and neutrons: each element has only a few neutron counts that give a stable nucleus. Most atoms around us are stable. The others are unstable, which means radioactive.
+
+debunking_snippet:
+    “More neutrons always make a nucleus safer.” Too many neutrons can unbalance a nucleus too, as in carbon-14.

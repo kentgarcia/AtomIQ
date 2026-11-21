@@ -1,0 +1,23 @@
+format 1
+adapter encyclopedia 1
+category: science
+
+entry yield
+term: Nuclear Yield
+difficulty: advanced
+image: ../../assets/images/terms/Yield.webp
+related_terms: chain-reaction
+related_terms: critical-mass
+related_terms: edward-teller
+related_terms: nuclear-fusion
+quick_facts: Measured in TNT equivalents: kt, Mt
+quick_facts: Hiroshima: ~15 kt · largest ever tested: 50 Mt (Tsar Bomba)
+quick_facts: Fission primary ignites the fusion secondary in modern weapons
+quick_facts: Airbursts maximize blast; ground bursts maximize fallout
+quick_facts: 1 kt = 4.184 × 10¹² joules
+
+sources:
+    {"organization":"CTBTO","title":"Nuclear Testing","url":"https://www.ctbto.org/"}
+
+definition:
+    The explosive energy of a nuclear weapon, quoted in tons or megatons of TNT equivalent (1 kiloton = 4.184 trillion joules). Hiroshima's Little Boy delivered about 15 kilotons from a single fission stage; modern thermonuclear warheads reach hundreds of kilotons to megatons by wrapping a fission trigger around fusion fuel. Yield splits between blast, thermal pulse, prompt radiation, and fallout — whose severity depends on burst height and design choices.

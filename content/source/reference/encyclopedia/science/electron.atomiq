@@ -1,0 +1,25 @@
+format 1
+adapter encyclopedia 1
+category: science
+
+entry electron
+term: Electron
+image: ../../assets/images/terms/electron.webp
+related_terms: atom
+related_terms: proton
+related_terms: neutron
+related_terms: beta-particle
+quick_facts: Discovered by J.J. Thomson (1897)
+quick_facts: Charge: −1 · mass only 1/1836 of a proton
+quick_facts: Occupy orbitals — probability clouds, not orbits
+quick_facts: Their arrangement determines an element's chemistry
+quick_facts: A free electron emitted from a nucleus is beta radiation
+
+sources:
+    {"organization":"Britannica","title":"Electron","url":"https://www.britannica.com/science/electron"}
+
+definition:
+    A fundamental subatomic particle carrying the smallest unit of negative electric charge, discovered by J.J. Thomson in 1897. Electrons aren't little balls circling the nucleus like planets — they exist as probability clouds (orbitals) whose shapes define chemistry. With just 1/1836 of a proton's mass, they're easily knocked loose, which is what electricity, chemical bonds, and beta radiation are all about.
+
+debunking_snippet:
+    “Electrons spin around the nucleus like planets around the Sun.” That's a 100-year-old classroom picture. Quantum mechanics replaced it with orbitals: smeared-out probability clouds where an electron has no definite path.

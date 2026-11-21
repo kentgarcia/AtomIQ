@@ -1,0 +1,26 @@
+format 1
+adapter encyclopedia 1
+category: science
+
+entry alpha-particle
+term: Alpha Particle (α)
+image: ../../assets/images/terms/alpha particle.webp
+related_terms: beta-particle
+related_terms: gamma-ray
+related_terms: decay
+related_terms: radon
+related_terms: ionizing-radiation
+quick_facts: Identical to a helium-4 nucleus: 2 protons + 2 neutrons
+quick_facts: Stopped by a sheet of paper, skin, or a few centimeters of air
+quick_facts: Cause dense ionization along their very short path
+quick_facts: Most dangerous when inhaled or swallowed — e.g. radon gas in lungs
+quick_facts: Emitted by heavy elements like uranium, radium, and radon
+
+sources:
+    {"organization":"EPA","title":"Radiation Basics","url":"https://www.epa.gov/radiation/radiation-basics"}
+
+definition:
+    A heavy, positively charged particle made of 2 protons and 2 neutrons — identical to a helium-4 nucleus — emitted by heavy, unstable nuclei such as uranium, radium, and radon during alpha decay. Alpha particles barely penetrate matter: paper or the outer layer of skin stops them. But they ionize intensely along their short path, making them among the most damaging radiations when alpha emitters are inhaled or ingested.
+
+debunking_snippet:
+    “Alpha radiation is harmless because it can't get through skin.” Outside the body, mostly true — but one alpha particle inside the lungs tears through countless cells. That's why inhaled radon is a leading cause of lung cancer among non-smokers.

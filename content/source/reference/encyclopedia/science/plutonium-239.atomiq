@@ -1,0 +1,26 @@
+format 1
+adapter encyclopedia 1
+category: science
+
+entry plutonium-239
+term: Plutonium-239
+difficulty: advanced
+related_terms: nuclear-fission
+related_terms: uranium-238
+related_terms: spent-fuel
+related_terms: glenn-seaborg
+related_terms: critical-mass
+quick_facts: Bred from uranium-238 inside every uranium-fueled reactor
+quick_facts: Half-life: 24,100 years
+quick_facts: Bare critical mass: only about 10 kg
+quick_facts: Recycled with uranium into MOX fuel rods
+quick_facts: Discovered by Seaborg's team in 1941
+
+sources:
+    {"organization":"World Nuclear","title":"Plutonium","url":"https://world-nuclear.org/information-library/nuclear-fuel-cycle/fuel-recycling/plutonium"}
+
+definition:
+    A man-made fissile metal: reactors breed it when uranium-238 captures a neutron and decays twice through neptunium. With a 24,100-year half-life and a bare critical mass near 10 kg, it powers both warheads and recycled reactor fuel (MOX). Chemically unlike anything natural — warm to the touch from its own decay heat — it was discovered by Glenn Seaborg's team in 1941 and sits at the center of both energy policy and non-proliferation politics.
+
+debunking_snippet:
+    “Plutonium is the most toxic substance known.” Folklore. It's radiologically hazardous if inhaled and chemically like other heavy metals — but botulinum toxin and ricin are vastly more poisonous gram-for-gram.

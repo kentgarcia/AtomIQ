@@ -1,0 +1,299 @@
+format 1
+adapter references 1
+kind: official
+
+source ref-aip-curie-separations
+publisher: American Institute of Physics, History of Physics
+title: Marie Curie and the Science of Radioactivity: Making repeated separations
+url: https://history.aip.org/exhibits/curie/resbr2.htm
+accessed: 2026-11-20
+note: Opened and read on 2026-11-20 to write the content; a person still has to confirm what it supports.
+
+source ref-aip-rutherford-alpha
+publisher: American Institute of Physics, History of Physics
+title: Rutherford, Nuclear Physicist: Alpha Particles and the Atom
+url: https://history.aip.org/exhibits/rutherford/sections/alpha-particles-atom.html
+accessed: 2026-11-20
+note: Opened and read on 2026-11-20 to write the content; a person still has to confirm what it supports.
+
+source ref-background-radiation
+publisher: IAEA and UNSCEAR
+title: Background radiation explainers (IAEA, UNSCEAR)
+
+note:
+    Candidate. Natural radionuclides, cosmic radiation and radon. The spec also lists INIS record 111v8-1e515. Open each, record titles and URLs, then mark verified.
+
+source ref-cdc-contamination-vs-exposure
+publisher: U.S. Centers for Disease Control and Prevention
+title: Radiation Contamination Versus Exposure
+url: https://www.cdc.gov/radiation-emergencies/infographic/contamination-versus-exposure.html
+accessed: 2026-11-20
+note: Opened and read on 2026-11-20 to write the content; a person still has to confirm what it supports.
+
+source ref-cdc-nuclear-blast-faq
+publisher: U.S. Centers for Disease Control and Prevention
+title: Nuclear Blasts: Frequently Asked Questions
+url: https://www.cdc.gov/radiation-emergencies/about/nuclear-blast-faq.html
+accessed: 2026-11-20
+note: Opened and read on 2026-11-20 to write the content; a person still has to confirm what it supports.
+
+source ref-cdc-potassium-iodide
+publisher: U.S. Centers for Disease Control and Prevention
+title: Potassium Iodide (KI)
+url: https://www.cdc.gov/radiation-emergencies/treatment/potassium-iodide.html
+accessed: 2026-11-20
+note: Opened and read on 2026-11-20 to write the content; a person still has to confirm what it supports.
+
+source ref-cdc-radiation-emergencies-safety
+publisher: U.S. Centers for Disease Control and Prevention
+title: Radiation Emergencies: Safety (get inside, stay inside, stay tuned)
+url: https://www.cdc.gov/radiation-emergencies/safety/index.html
+accessed: 2026-11-20
+note: Opened and read on 2026-11-20 to write the content; a person still has to confirm what it supports.
+
+source ref-cern-about
+publisher: CERN
+title: About CERN
+url: https://home.cern/about
+accessed: 2026-11-20
+note: Opened and read on 2026-11-20 to write the content; a person still has to confirm what it supports.
+
+source ref-epa-protecting-yourself
+publisher: U.S. Environmental Protection Agency
+title: Protecting Yourself from Radiation
+url: https://www.epa.gov/radiation/protecting-yourself-radiation
+accessed: 2026-11-20
+note: Opened and read on 2026-11-20 to write the content; a person still has to confirm what it supports.
+
+source ref-epa-radiation-basics
+publisher: U.S. Environmental Protection Agency
+title: Radiation Basics
+url: https://www.epa.gov/radiation/radiation-basics
+accessed: 2026-11-20
+note: Opened and read on 2026-11-20 to write the content; a person still has to confirm what it supports.
+
+source ref-epa-radiation-health-effects
+publisher: U.S. Environmental Protection Agency
+title: Radiation Health Effects
+url: https://www.epa.gov/radiation/radiation-health-effects
+accessed: 2026-11-20
+note: Opened and read on 2026-11-20 to write the content; a person still has to confirm what it supports.
+
+source ref-epa-radiation-sources
+publisher: U.S. Environmental Protection Agency
+title: Radiation Sources and Doses
+url: https://www.epa.gov/radiation/radiation-sources-and-doses
+accessed: 2026-11-20
+note: Opened and read on 2026-11-20 to write the scanner results; a person still has to confirm what it supports.
+
+source ref-gov-uk-calder-hall
+publisher: UK Government (Nuclear Decommissioning Authority)
+title: Calder Hall: Decommissioning the world's first commercial nuclear power station
+url: https://www.gov.uk/government/case-studies/calder-hall-decommissioning-the-worlds-first-commercial-nuclear-power-station
+accessed: 2026-11-20
+note: Opened and read on 2026-11-20 to write the content; a person still has to confirm what it supports.
+
+source ref-hiroshima-museum
+publisher: Hiroshima Peace Memorial Museum
+title: Hiroshima Peace Memorial Museum
+url: https://hpmmuseum.jp/?lang=eng
+accessed: 2026-11-20
+note: Opened and read on 2026-11-20 to write the content; a person still has to confirm what it supports.
+
+source ref-hiroshima-pref-bombing
+publisher: Hiroshima Prefecture
+title: The Atomic Bombing & Reconstruction of Hiroshima
+url: https://www.pref.hiroshima.lg.jp/site/hiroshimaforpeace-en/reconstruction-atomic-bombing.html
+accessed: 2026-11-20
+note: Opened and read on 2026-11-20 to write the content; a person still has to confirm what it supports.
+
+source ref-hps-radioactive-contamination
+publisher: Health Physics Society
+title: What Is Radioactive Contamination?
+url: https://hps.org/ate_faq/radcontamination/
+accessed: 2026-11-20
+note: Opened and read on 2026-11-20 to write the content; a person still has to confirm what it supports.
+
+source ref-iaea-decay
+publisher: IAEA
+title: IAEA material on radioactive decay and half-life
+
+note:
+    Candidate. Definition of radioactive decay and half-life; alpha as two protons and two neutrons. The spec names IAEA-TECDOC-1363 (te_1363_web.pdf) but that came from a search summary: open it, confirm it covers radioactive decay, record the exact title and URL, then mark verified.
+
+source ref-iaea-glossary
+publisher: IAEA
+title: IAEA Nuclear Safety and Security Glossary
+
+note:
+    Candidate. Definitions of beta-minus, gamma and radionuclide. Open the glossary, record the entries used and the URL, then mark verified.
+
+source ref-iaea-isotopes
+publisher: IAEA
+title: Explainer on isotopes (stable and radioactive)
+note: Candidate. Open the IAEA page, record its exact title and URL, then mark verified.
+
+source ref-iaea-radiation-types
+publisher: IAEA
+title: IAEA material on alpha, beta and gamma radiation
+
+note:
+    Candidate. Particulate versus electromagnetic radiation. Open the page, record its exact title and URL, then mark verified.
+
+source ref-iter-home
+publisher: ITER Organization
+title: ITER
+url: https://www.iter.org/
+accessed: 2026-11-20
+note: Opened and read on 2026-11-20 to write the content; a person still has to confirm what it supports.
+
+source ref-iupac-table
+publisher: IUPAC
+title: Periodic Table of the Elements
+url: https://iupac.org/what-we-do/periodic-table-of-elements/
+note: Element names and atomic numbers.
+
+source ref-medlineplus-potassium
+publisher: MedlinePlus, U.S. National Library of Medicine
+title: Potassium in diet
+url: https://medlineplus.gov/ency/article/002413.htm
+accessed: 2026-11-20
+note: Opened and read on 2026-11-20 to write the scanner results; a person still has to confirm what it supports.
+
+source ref-nagasaki-museum
+publisher: Nagasaki Atomic Bomb Museum
+title: Nagasaki Atomic Bomb Museum
+url: https://nagasakipeace.jp/en/visit/abm
+accessed: 2026-11-20
+note: Opened and read on 2026-11-20 to write the content; a person still has to confirm what it supports.
+
+source ref-nasa-sun-facts
+publisher: NASA
+title: Sun Facts
+url: https://science.nasa.gov/sun/facts/
+accessed: 2026-11-20
+note: Opened and read on 2026-11-20 to write the scanner results; a person still has to confirm what it supports.
+
+source ref-noaa-atmosphere
+publisher: NOAA National Weather Service
+title: JetStream: The Atmosphere
+url: https://www.noaa.gov/jetstream/atmosphere
+accessed: 2026-11-20
+note: Opened and read on 2026-11-20 to write the scanner results; a person still has to confirm what it supports.
+
+source ref-nps-mapr-hanford
+publisher: U.S. National Park Service
+title: Hanford, Washington (Manhattan Project National Historical Park)
+url: https://www.nps.gov/mapr/learn/historyculture/hanford-places.htm
+accessed: 2026-11-20
+note: Opened and read on 2026-11-20 to write the content; a person still has to confirm what it supports.
+
+source ref-nps-mapr-losalamos
+publisher: U.S. National Park Service
+title: Los Alamos, New Mexico (Manhattan Project National Historical Park)
+url: https://www.nps.gov/mapr/learn/historyculture/losalamos-places.htm
+accessed: 2026-11-20
+note: Opened and read on 2026-11-20 to write the content; a person still has to confirm what it supports.
+
+source ref-nps-mapr-oakridge
+publisher: U.S. National Park Service
+title: Oak Ridge, Tennessee (Manhattan Project National Historical Park)
+url: https://www.nps.gov/mapr/learn/historyculture/oakridge-places.htm
+accessed: 2026-11-20
+note: Opened and read on 2026-11-20 to write the content; a person still has to confirm what it supports.
+
+source ref-nps-mapr-trinity
+publisher: U.S. National Park Service
+title: Trinity Site
+url: https://www.nps.gov/mapr/learn/historyculture/trinity.htm
+accessed: 2026-11-20
+note: Opened and read on 2026-11-20 to write the content; a person still has to confirm what it supports.
+
+source ref-nrc-decay-series
+publisher: U.S. Nuclear Regulatory Commission
+title: NRC material on natural decay series and natural radionuclides
+
+note:
+    Candidate. The spec names NUREG/SR-1501 (number from a search summary). Check that the uranium-238 series ends in lead-206, the thorium-232 series in lead-208, and that potassium-40 is a natural radionuclide.
+
+source ref-nrc-doses-daily-lives
+publisher: U.S. Nuclear Regulatory Commission
+title: Doses in Our Daily Lives
+url: https://www.nrc.gov/about-nrc/radiation/around-us/doses-daily-lives.html
+accessed: 2026-11-20
+note: Opened and read on 2026-11-20 to write the content; a person still has to confirm what it supports.
+
+source ref-nrc-radiation-faq
+publisher: U.S. Nuclear Regulatory Commission
+title: Frequently Asked Questions (FAQ) About Radiation Protection
+url: https://www.nrc.gov/about-nrc/radiation/related-info/faq
+accessed: 2026-11-20
+note: Opened and read on 2026-11-20 to write the content; a person still has to confirm what it supports.
+
+source ref-nrc-tmi
+publisher: U.S. Nuclear Regulatory Commission
+title: Backgrounder on the Three Mile Island Accident
+url: https://www.nrc.gov/reading-rm/doc-collections/fact-sheets/3mile-isle.html
+accessed: 2026-11-20
+note: Opened and read on 2026-11-20 to write the content; a person still has to confirm what it supports.
+
+source ref-osti-cp1
+publisher: U.S. Department of Energy, OSTI (Manhattan Project history)
+title: CP-1 goes critical
+url: https://www.osti.gov/opennet/manhattan-project-history/Events/1942-1944_pu/cp-1_critical.htm
+accessed: 2026-11-20
+note: Opened and read on 2026-11-20 to write the content; a person still has to confirm what it supports.
+
+source ref-potassium-40
+publisher: To be identified
+title: Source for natural radioactive potassium-40 in food and the body
+note: Candidate. A regulator or health-physics society page; open and record before marking verified.
+
+source ref-ready-nuclear-explosion
+publisher: Ready.gov (FEMA)
+title: Nuclear Explosion
+url: https://www.ready.gov/nuclear-explosion
+accessed: 2026-11-20
+note: Opened and read on 2026-11-20 to write the content; a person still has to confirm what it supports.
+
+source ref-ready-radiation
+publisher: Ready.gov (FEMA)
+title: Radiation Emergencies
+url: https://www.ready.gov/radiation
+accessed: 2026-11-20
+note: Opened and read on 2026-11-20 to write the content; a person still has to confirm what it supports.
+
+source ref-who-ionizing-radiation
+publisher: World Health Organization
+title: Ionizing radiation and health effects
+url: https://www.who.int/news-room/fact-sheets/detail/ionizing-radiation-and-health-effects
+accessed: 2026-11-20
+note: Opened and read on 2026-11-20 to write the content; a person still has to confirm what it supports.
+
+source ref-wna-chernobyl
+publisher: World Nuclear Association
+title: Chernobyl Accident 1986
+url: https://world-nuclear.org/information-library/safety-and-security/safety-of-plants/chernobyl-accident
+accessed: 2026-11-20
+note: Opened and read on 2026-11-20 to write the content; a person still has to confirm what it supports.
+
+source ref-wna-fukushima
+publisher: World Nuclear Association
+title: Fukushima Daiichi Accident
+url: https://world-nuclear.org/information-library/safety-and-security/safety-of-plants/fukushima-daiichi-accident
+accessed: 2026-11-20
+note: Opened and read on 2026-11-20 to write the content; a person still has to confirm what it supports.
+
+source ref-wna-radwaste
+publisher: World Nuclear Association
+title: Radioactive Waste Management
+url: https://world-nuclear.org/information-library/nuclear-fuel-cycle/nuclear-wastes/radioactive-waste-management
+accessed: 2026-11-20
+note: Opened and read on 2026-11-20 to write the content; a person still has to confirm what it supports.
+
+source ref-wna-russia
+publisher: World Nuclear Association
+title: Nuclear Power in Russia
+url: https://world-nuclear.org/information-library/country-profiles/countries-o-s/russia-nuclear-power
+accessed: 2026-11-20
+note: Opened and read on 2026-11-20 to write the content; a person still has to confirm what it supports.

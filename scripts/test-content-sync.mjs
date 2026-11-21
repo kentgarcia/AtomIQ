@@ -120,6 +120,32 @@ describe("content:sync", () => {
     assert.equal(node(fx, "chat-ada-banana-extra"), undefined);
   });
 
+  it("a source and the card that cites it arrive in one sync, and leave in one sync (foreign keys across adapters)", async () => {
+    const refs = "reference/sources/official.atomiq";
+    const cards = "phone/safety/010-basics.atomiq";
+    const refText = read(fx, refs);
+    const cardText = read(fx, cards);
+    const cardCount = () => query(fx.paths, "SELECT count(*) n FROM safety_cards")[0].n;
+    const cites = () => query(fx.paths, "SELECT count(*) n FROM safety_card_references WHERE reference_id = 'ref-sync-test'")[0].n;
+    const before = cardCount();
+    write(fx, refs, `${refText}\nsource ref-sync-test\npublisher: Test\ntitle: A source added with its card\n`);
+    write(fx, cards, `${cardText}\ncard safety-sync-test\ntitle: A card\nicon: Sun1\nreferences: ref-sync-test\nsummary: Added in one sync.\nsteps: One line.\n`);
+    const dry = await sync(fx);
+    assert.equal(dry.code, 0, dry.text);
+    const r = await sync(fx, { apply: true });
+    assert.equal(r.code, 0, r.text);
+    assert.equal(cardCount(), before + 1);
+    assert.equal(cites(), 1);
+    // and out again, both at once: the link and the card go before the source
+    write(fx, refs, refText);
+    write(fx, cards, cardText);
+    const r2 = await sync(fx, { apply: true });
+    assert.equal(r2.code, 0, r2.text);
+    assert.equal(cardCount(), before);
+    assert.equal(cites(), 0);
+    assert.equal(query(fx.paths, "SELECT count(*) n FROM content_references WHERE id = 'ref-sync-test'")[0].n, 0);
+  });
+
   it("reordering stories is renaming files, and changes only positions", async () => {
     const dir = "chat/npc-ada";
     const a = path.join(fx.paths.sourceDir, dir, "030-chat-ada-up-banana.atomiq");
@@ -234,7 +260,7 @@ describe("ownership guard (T7)", () => {
   });
 
   it("content:edit still works on a table that is not owned", () => {
-    const r = edit([{ op: "update", table: "myths", pk: "all-radiation-manmade", set: { title: "All Radiation is Man-Made" } }]);
+    const r = edit([{ op: "update", table: "units", pk: "inside-the-atom", set: { title: "Inside the Atom" } }]);
     assert.equal(r.status, 0, r.stderr);
   });
 });

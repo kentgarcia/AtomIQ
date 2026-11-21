@@ -1,0 +1,24 @@
+format 1
+adapter encyclopedia 1
+category: people
+
+entry demo-curie
+term: Marie Curie
+difficulty: intermediate
+image: /assets/images/people/curie.webp
+related_terms: radium
+related_terms: polonium
+related_myths: demo-myth
+quick_facts: Two Nobel prizes
+quick_facts: Coined radioactivity
+
+sources:
+    {"organization":"Nobel Prize","title":"Biography","url":"https://example.org/a"}
+
+definition:
+    A physicist.
+
+    She found two elements.
+
+debunking_snippet:
+    She did not die at once.

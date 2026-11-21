@@ -1,0 +1,22 @@
+format 1
+adapter encyclopedia 1
+category: safety
+
+entry containment-building
+term: Containment Building
+related_terms: nuclear-reactor
+related_terms: defense-in-depth
+related_terms: meltdown
+related_terms: shielding
+related_terms: reactor-core
+quick_facts: Final barrier between the reactor and the public
+quick_facts: Reinforced concrete ~1 m thick with a steel liner
+quick_facts: Designed against quakes, impacts, and internal pressure
+quick_facts: Held firm at Three Mile Island (1979)
+quick_facts: One layer of the defense-in-depth strategy
+
+sources:
+    {"organization":"IAEA","title":"Safety Standards","url":"https://www.iaea.org/topics/safety-standards"}
+
+definition:
+    The massive reinforced-concrete dome or box — typically about a meter thick with a steel liner — that encloses a reactor's primary system. It is the final barrier in the defense-in-depth strategy: built to hold steam pressure from a loss-of-coolant accident, withstand earthquakes and external impacts, and keep radioactive material sealed inside even during severe core damage. Containment did its job at Three Mile Island (1979); at Fukushima (2011) it largely contained the meltdowns despite hydrogen explosions damaging the buildings.

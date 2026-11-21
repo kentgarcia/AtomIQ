@@ -1,0 +1,26 @@
+format 1
+adapter encyclopedia 1
+category: technology
+
+entry zero-power-reactor
+term: Zero Power Reactor
+difficulty: advanced
+image: ../../assets/images/terms/Zero Power Reactor.webp
+related_terms: nuclear-reactor
+related_terms: critical-mass
+related_terms: chain-reaction
+related_terms: moderator
+quick_facts: Operates at watts to microwatts — effectively zero power
+quick_facts: No meaningful heat → minimal cooling or shielding needed
+quick_facts: Used for teaching, lattice tests, and criticality measurements
+quick_facts: Students operate controls directly under supervision
+quick_facts: Proves designs before full-power construction begins
+
+sources:
+    {"organization":"IAEA","title":"Research Reactors","url":"https://www.iaea.org/topics/research-reactors"}
+
+definition:
+    A research reactor deliberately run at microscopic power — watts to microwatts, sometimes dubbed 'zero-power'. At those levels the core barely warms, so no cooling systems, big shielding, or containment dome are required; universities and labs use them to teach reactor physics hands-on, test lattice configurations, and measure criticality safely. Students can pull rods themselves and watch reactivity respond in real time — impossible at full power.
+
+debunking_snippet:
+    “All reactors are industrial monsters.” Zero-power reactors fit in gymnasiums, hum along at flashlight-battery heating levels, and have trained generations of nuclear engineers safely.

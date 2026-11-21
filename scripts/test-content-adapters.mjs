@@ -40,11 +40,15 @@ describe("adapter registry", () => {
     assert.equal(ownedTables().size, [...seen.keys()].filter((t) => ownedAdapters().some((a) => a.tables.has(t))).length);
   });
 
-  it("every adapter has a directory that its files are under", () => {
+  it("every adapter owns the files it writes, and no file belongs to two adapters", () => {
     for (const a of adapters) {
       assert.ok(a.dir, `${a.name} has no dir`);
-      assert.ok(a.owns(`${a.dir}/x/y.atomiq`));
-      assert.ok(!a.owns(`${a.dir}x/y.atomiq`) && !a.owns(`other/y.atomiq`));
+      assert.ok(!a.owns("other/y.atomiq"));
+      for (const rel of renderFiles(a, ADAPTER_SAMPLES[a.name]).keys()) {
+        assert.ok(rel.startsWith(`${a.dir}/`), `${a.name} writes ${rel} outside ${a.dir}/`);
+        const owners = adapters.filter((x) => x.owns(rel)).map((x) => x.name);
+        assert.deepEqual(owners, [a.name], `${rel} is owned by ${owners.join(" and ")}`);
+      }
     }
   });
 });
@@ -166,6 +170,78 @@ describe("T4: bad input is refused", () => {
     fails(() => readFiles(characters, new Map([["characters/010-npc-x.atomiq", c]])), /invalid JSON/, 10);
     const orphan = "format 1\nadapter characters 1\n\nline line-x\nkind: meet\n\n    hi\n";
     fails(() => readFiles(characters, new Map([["characters/010-x.atomiq", orphan]])), /must come after a npc record/, 4);
+  });
+});
+
+describe("T4: bad input is refused (reference, game and phone data)", () => {
+  const A = (n) => FRIENDLY_ADAPTERS.get(n);
+  const header = (adapter, scope) => `format 1\nadapter ${adapter} 1\n${scope}\n\n`;
+  const fails = (fn, re, line) => {
+    try {
+      fn();
+    } catch (e) {
+      assert.match(e.message, re);
+      if (line != null) assert.equal(e.line, line);
+      return;
+    }
+    assert.fail(`expected an error matching ${re}`);
+  };
+
+  it("a list item must fit on one line, and a block attribute cannot be a list item", () => {
+    const entry = { id: "e1", term: "T", definition: "d", category: "science", related_terms: [], quick_facts: ["two\nlines"], sources: [], image: null, debunking_snippet: null, related_myths: [], difficulty: "beginner" };
+    fails(() => renderFiles(A("encyclopedia"), { encyclopedia_entries: [entry] }), /quick_facts item[\s\S]*one line/);
+  });
+
+  it("numbers and JSON are checked with the line", () => {
+    const m = header("mythbuster", "difficulty: easy") + "question mb-x\n\nquestion:\n    q\n\nanswer: two\noptions: a\n\nexplanation:\n    e\n";
+    fails(() => readFiles(A("mythbuster"), new Map([["games/mythbuster/010-easy.atomiq", m]])), /not an integer/, 10);
+    const s = header("scanner", "scene: kitchen") + "target scan-x\nname: N\nobject: water\nblurb: b\nfun_fact: f\n\ncomposition:\n    {broken\n";
+    fails(() => readFiles(A("scanner"), new Map([["phone/scanner/010-kitchen.atomiq", s]])), /invalid JSON/, 11);
+    const mp = "format 1\nadapter map 1\n\nsite site-x\nname: N\nplace: P\nkind: history\nyear: 1900\nlat: north\nlon: 2\nblurb: b\nfact: f\n";
+    fails(() => readFiles(A("map"), new Map([["phone/map/sites.atomiq", mp]])), /not a number/, 9);
+  });
+
+  it("an unknown attribute or a missing required one is an error, never a guess", () => {
+    const r = header("references", "kind: official") + "source ref-x\npublisher: P\ntitle: T\ncolour: red\n";
+    fails(() => readFiles(A("references"), new Map([["reference/sources/official.atomiq", r]])), /unknown attribute "colour"/, 8);
+    const noTitle = header("references", "kind: official") + "source ref-x\npublisher: P\n";
+    fails(() => readFiles(A("references"), new Map([["reference/sources/official.atomiq", noTitle]])), /title/);
+    const dup = header("statements", "unit: u") + "statement s1\nverdict: fact\nstatement: a\nexplanation:\n    e\n\nstatement s1\nverdict: myth\nstatement: b\nexplanation:\n    e\n";
+    fails(() => readFiles(A("statements"), new Map([["units/u/statements.atomiq", dup]])), /is defined twice/);
+  });
+
+  it("a scope that the file does not say is an error (a card needs its section)", () => {
+    const text = "format 1\nadapter safety 1\n\ncard c1\ntitle: T\nicon: Sun1\nsummary: s\n";
+    fails(() => readFiles(A("safety"), new Map([["phone/safety/010-basics.atomiq", text]])), /section/);
+  });
+
+  it("each adapter owns only its own directory", () => {
+    const own = (n, rel) => A(n).owns(rel);
+    assert.ok(own("statements", "units/inside-the-atom/statements.atomiq") && !own("statements", "units/inside-the-atom/lessons.atomiq"));
+    assert.ok(own("encyclopedia", "reference/encyclopedia/people/x.atomiq") && !own("encyclopedia", "reference/encyclopedia/x.atomiq"));
+    assert.ok(own("references", "reference/sources/official.atomiq") && !own("references", "reference/myths/safety.atomiq"));
+  });
+});
+
+describe("a sync across adapters keeps foreign keys valid", () => {
+  it("orderOps: parks, then deletes last adapter first, then inserts first adapter first, then updates", async () => {
+    const { orderOps } = await import("./lib/content-source/sync.mjs");
+    const refs = [{ op: "insert", table: "content_references", values: { id: "r" } }, { op: "delete", table: "content_references", pk: "old" }];
+    const cards = [
+      { op: "update", table: "safety_cards", pk: "a", set: { position: -1 } },
+      { op: "delete", table: "safety_card_references", pk: ["old-card", "old"] },
+      { op: "insert", table: "safety_card_references", values: { card_id: "c", reference_id: "r" } },
+      { op: "update", table: "safety_cards", pk: "a", set: { position: 0 } },
+    ];
+    const order = orderOps([refs, cards]).map((o) => `${o.op}:${o.table}`);
+    assert.deepEqual(order, [
+      "update:safety_cards",
+      "delete:safety_card_references",
+      "delete:content_references",
+      "insert:content_references",
+      "insert:safety_card_references",
+      "update:safety_cards",
+    ]);
   });
 });
 

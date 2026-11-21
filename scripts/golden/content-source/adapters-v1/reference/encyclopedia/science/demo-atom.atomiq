@@ -1,0 +1,10 @@
+format 1
+adapter encyclopedia 1
+category: science
+
+entry demo-atom
+term: Atom
+sources:
+
+definition:
+    The smallest unit of an element.

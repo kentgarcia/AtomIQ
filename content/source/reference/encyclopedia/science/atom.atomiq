@@ -1,0 +1,26 @@
+format 1
+adapter encyclopedia 1
+category: science
+
+entry atom
+term: Atom
+image: ../../assets/images/terms/atom.webp
+related_terms: nucleus
+related_terms: proton
+related_terms: neutron
+related_terms: electron
+related_terms: atomic-number
+quick_facts: Building block of all ordinary matter
+quick_facts: Over 99.9% of an atom's mass is packed into its nucleus
+quick_facts: Electrons occupy probability clouds (orbitals), not fixed orbits
+quick_facts: About 10 million atoms lined up span just 1 millimeter
+quick_facts: Number of protons fixes which element it is
+
+sources:
+    {"organization":"Britannica","title":"Atom","url":"https://www.britannica.com/science/atom"}
+
+definition:
+    The smallest unit of ordinary matter that keeps the identity of a chemical element. Every atom has a tiny, dense nucleus of protons and neutrons surrounded by electrons bound to it electromagnetically. Atoms are overwhelmingly empty space — nearly all the mass sits in the nucleus, yet the electron cloud spans roughly 100,000 times farther out.
+
+debunking_snippet:
+    “Atoms are tiny solid balls.” They're almost entirely empty space — the solid feel of matter comes from electromagnetic forces between electron clouds, not hard surfaces actually touching.

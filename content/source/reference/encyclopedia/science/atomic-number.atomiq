@@ -1,0 +1,23 @@
+format 1
+adapter encyclopedia 1
+category: science
+
+entry atomic-number
+term: Atomic Number
+image: ../../assets/images/terms/atomic number.webp
+related_terms: proton
+related_terms: atom
+related_terms: isotope
+related_terms: z-number
+related_terms: nucleus
+quick_facts: Symbol: Z
+quick_facts: Defines an atom's chemical element — unique per element
+quick_facts: Equals proton count (and electron count when neutral)
+quick_facts: Carbon: Z = 6 · Uranium: Z = 92
+quick_facts: Changing Z requires a nuclear reaction — this is transmutation
+
+sources:
+    {"organization":"IUPAC","title":"Periodic Table of Elements","url":"https://iupac.org/what-we-do/periodic-table-of-elements/"}
+
+definition:
+    The number of protons in an atom's nucleus, symbolized Z. It uniquely defines a chemical element — every carbon atom has Z = 6, every uranium atom Z = 92 — and fixes the element's place in the periodic table. In a neutral atom it also equals the number of orbiting electrons, which is what governs chemistry.

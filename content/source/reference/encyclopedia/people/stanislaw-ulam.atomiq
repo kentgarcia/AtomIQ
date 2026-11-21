@@ -1,0 +1,25 @@
+format 1
+adapter encyclopedia 1
+category: people
+
+entry stanislaw-ulam
+term: Stanislaw Ulam
+difficulty: advanced
+related_terms: edward-teller
+related_terms: nuclear-fusion
+related_terms: j-robert-oppenheimer
+related_terms: yield
+quick_facts: Idea man behind the Teller–Ulam H-bomb design (1951)
+quick_facts: Co-invented the Monte Carlo method with von Neumann
+quick_facts: Manhattan Project mathematician at Los Alamos
+quick_facts: Designed Project Orion's nuclear-pulse propulsion concept
+quick_facts: Survived leukemia thanks to one of the first chemotherapy successes
+
+sources:
+    {"organization":"Atomic Heritage Foundation","title":"Stanislaw Ulam","url":"https://www.atomicheritage.org/profile/stanislaw-ulam"}
+
+definition:
+    Polish-American mathematician (1909–1984) who cracked the hydrogen bomb's central problem. In 1951 he proposed using radiation from a fission explosion itself to compress and ignite fusion fuel — the 'radiation implosion' insight that became the Teller–Ulam design behind every thermonuclear weapon since. A Manhattan Project veteran, he also co-invented the Monte Carlo method with John von Neumann over playing cards, pioneered early computing applications, and sketched nuclear-pulse propulsion for Project Orion.
+
+debunking_snippet:
+    “Teller alone invented the hydrogen bomb.” The breakthrough — compressing fusion fuel with X-rays from a fission trigger — came from Ulam's calculations; Teller ran with it. Both names belong on the design.

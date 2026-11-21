@@ -1,0 +1,703 @@
+format 1
+adapter mythbuster 1
+difficulty: easy
+
+question mb-easy-q1
+
+question:
+    What is the smallest unit of matter?
+
+answer: 1
+options: Molecule
+options: Atom
+options: Cell
+options: Proton
+
+explanation:
+    An atom is the smallest unit of matter that retains chemical properties.
+
+question mb-easy-q2
+
+question:
+    What is found at the center of an atom?
+
+answer: 1
+options: Electron
+options: Nucleus
+options: Shell
+options: Orbit
+
+explanation:
+    The nucleus is at the center of the atom and contains protons and neutrons.
+
+question mb-easy-q3
+
+question:
+    Which particles are positively charged?
+
+answer: 2
+options: Electrons
+options: Neutrons
+options: Protons
+options: Photons
+
+explanation:
+    Protons carry a positive electric charge.
+
+question mb-easy-q4
+
+question:
+    Which particles have no charge?
+
+answer: 2
+options: Electrons
+options: Protons
+options: Neutrons
+options: Ions
+
+explanation:
+    Neutrons are electrically neutral particles.
+
+question mb-easy-q5
+
+question:
+    What do electrons do in an atom?
+
+answer: 1
+options: Stay in the nucleus
+options: Orbit the nucleus
+options: Combine with neutrons
+options: Form protons
+
+explanation:
+    Electrons move around the nucleus in electron clouds/energy levels.
+
+question mb-easy-q6
+
+question:
+    What determines the identity of an element?
+
+answer: 1
+options: Number of neutrons
+options: Number of protons
+options: Number of electrons
+options: Size of atom
+
+explanation:
+    An element is defined by its number of protons.
+
+question mb-easy-q7
+
+question:
+    What is the atomic number?
+
+answer: 1
+options: Number of neutrons
+options: Number of protons
+options: Number of electrons
+options: Total particles
+
+explanation:
+    Atomic number equals the number of protons in the nucleus.
+
+question mb-easy-q8
+
+question:
+    What is an isotope?
+
+answer: 0
+options: Atoms containing same number of protons, different number of neutrons
+options: Atoms containing same number of neutrons, different number of protons
+options: Atoms containing same number of electrons, different atoms
+options: Different atoms entirely
+
+explanation:
+    Isotopes are atoms of the same element with different neutron counts.
+
+question mb-easy-q9
+
+question:
+    What is radiation?
+
+answer: 1
+options: Solid matter
+options: Energy in motion
+options: Liquid substance
+options: Gas particle
+
+explanation:
+    Radiation is energy traveling through space or a medium.
+
+question mb-easy-q10
+
+question:
+    Which is a source of natural radiation?
+
+answer: 1
+options: Television
+options: Sun
+options: Refrigerator
+options: Phone
+
+explanation:
+    The sun is a natural source of radiation.
+
+question mb-easy-q11
+
+question:
+    What type of radiation is a helium nucleus?
+
+answer: 2
+options: Beta
+options: Gamma
+options: Alpha
+options: X-ray
+
+explanation:
+    Alpha radiation consists of helium nuclei.
+
+question mb-easy-q12
+
+question:
+    Which radiation can penetrate deeply?
+
+answer: 2
+options: Alpha
+options: Beta
+options: Gamma
+options: None
+
+explanation:
+    Gamma rays are highly penetrating electromagnetic radiation.
+
+question mb-easy-q13
+
+question:
+    Which radiation is stopped by paper?
+
+answer: 0
+options: Alpha
+options: Beta
+options: Gamma
+options: X-ray
+
+explanation:
+    Alpha particles are easily stopped by paper or skin.
+
+question mb-easy-q14
+
+question:
+    What is half-life?
+
+answer: 1
+options: Time to double energy
+options: Time for half to decay
+options: Time to disappear
+options: Time to grow
+
+explanation:
+    Half-life is the time required for half of a radioactive sample to decay.
+
+question mb-easy-q15
+
+question:
+    What is radioactive decay?
+
+answer: 1
+options: Growth of atoms
+options: Breaking of nucleus
+options: Formation of molecules
+options: Movement of electrons
+
+explanation:
+    Radioactive decay is when an unstable nucleus changes and emits radiation.
+
+question mb-easy-q16
+
+question:
+    What happens during nuclear fission?
+
+answer: 0
+options: Nucleus splits
+options: Nucleus combines
+options: Electrons move
+options: Atoms disappear
+
+explanation:
+    Fission is the splitting of a heavy nucleus into smaller nuclei.
+
+question mb-easy-q17
+
+question:
+    What happens during nuclear fusion?
+
+answer: 1
+options: Atoms break apart
+options: Nuclei combine
+options: Electrons merge
+options: Protons vanish
+
+explanation:
+    Fusion combines light nuclei to form a heavier nucleus.
+
+question mb-easy-q18
+
+question:
+    What is used as fuel in many nuclear reactors?
+
+answer: 1
+options: Coal
+options: Uranium
+options: Oil
+options: Wood
+
+explanation:
+    Many reactors use uranium as fuel.
+
+question mb-easy-q19
+
+question:
+    Which process powers the Sun?
+
+answer: 2
+options: Fission
+options: Combustion
+options: Fusion
+options: Radiation
+
+explanation:
+    The Sun is powered by nuclear fusion.
+
+question mb-easy-q20
+
+question:
+    What is a nuclear reactor used for?
+
+answer: 1
+options: Cooking food
+options: Producing electricity
+options: Storing water
+options: Making plastic
+
+explanation:
+    Nuclear reactors are commonly used to generate electricity.
+
+question mb-easy-q21
+
+question:
+    What controls the reaction in a nuclear reactor?
+
+answer: 1
+options: Fuel rods
+options: Control rods
+options: Water
+options: Turbines
+
+explanation:
+    Control rods absorb neutrons and regulate the chain reaction.
+
+question mb-easy-q22
+
+question:
+    What is a common radiation detector?
+
+answer: 1
+options: Thermometer
+options: Geiger counter
+options: Barometer
+options: Microscope
+
+explanation:
+    A Geiger counter detects and measures ionizing radiation.
+
+question mb-easy-q23
+
+question:
+    Which is a medical use of radiation?
+
+answer: 1
+options: Cooking
+options: Cancer treatment
+options: Cleaning water
+options: Making clothes
+
+explanation:
+    Radiation is used in medicine for cancer treatment (radiotherapy).
+
+question mb-easy-q24
+
+question:
+    In radiation safety, what is shielding?
+
+answer: 1
+options: Producing radiation
+options: Blocking radiation
+options: Measuring radiation
+options: Creating atoms
+
+explanation:
+    Shielding means using material to reduce radiation exposure.
+
+question mb-easy-q25
+
+question:
+    Which material can block gamma rays?
+
+answer: 2
+options: Paper
+options: Plastic
+options: Lead
+options: Cloth
+
+explanation:
+    Dense materials like lead are used to shield gamma rays.
+
+question mb-easy-q26
+
+question:
+    What is nuclear waste?
+
+answer: 1
+options: Food waste
+options: Radioactive material
+options: Plastic waste
+options: Water waste
+
+explanation:
+    Nuclear waste contains radioactive material from nuclear processes.
+
+question mb-easy-q27
+
+question:
+    What is the unit of radioactivity?
+
+answer: 1
+options: Meter
+options: Becquerel
+options: Liter
+options: Volt
+
+explanation:
+    The becquerel (Bq) is the SI unit of radioactivity.
+
+question mb-easy-q28
+
+question:
+    What is ionizing radiation?
+
+answer: 1
+options: Weak radiation
+options: Radiation that removes electrons
+options: Radiation that cools
+options: Radiation that heats
+
+explanation:
+    Ionizing radiation has enough energy to remove electrons from atoms.
+
+question mb-easy-q29
+
+question:
+    In radiation safety, what is contamination?
+
+answer: 1
+options: Clean surface
+options: Presence of radioactive material
+options: Absence of radiation
+options: Heat exposure
+
+explanation:
+    Contamination means radioactive material is present where it should not be.
+
+question mb-easy-q30
+
+question:
+    In radiation safety, what is radiation exposure?
+
+answer: 0
+options: Contact with radiation
+options: Eating food
+options: Drinking water
+options: Sleeping
+
+explanation:
+    Exposure means being subjected to radiation.
+
+question mb-easy-q31
+
+question:
+    What does the ALARA principle mean in radiation safety?
+
+answer: 2
+options: Use more radiation
+options: Avoid all energy
+options: As low as reasonably achievable
+options: Always large radiation
+
+explanation:
+    ALARA means keeping radiation doses As Low As Reasonably Achievable.
+
+question mb-easy-q32
+
+question:
+    What protects workers from radiation?
+
+answer: 3
+options: Distance
+options: Shielding
+options: Time
+options: All of these
+
+explanation:
+    Time, distance, and shielding are all core radiation protection principles.
+
+question mb-easy-q33
+
+question:
+    What is a radioactive source?
+
+answer: 1
+options: Light bulb
+options: Material emitting radiation
+options: Plastic
+options: Wood
+
+explanation:
+    A radioactive source is material that emits radiation.
+
+question mb-easy-q34
+
+question:
+    What is background radiation?
+
+answer: 1
+options: Artificial radiation
+options: Natural radiation in environment
+options: Dangerous radiation
+options: Controlled radiation
+
+explanation:
+    Background radiation is naturally present in our environment.
+
+question mb-easy-q35
+
+question:
+    Which industry uses radiation gauges?
+
+answer: 3
+options: Agriculture
+options: Mining
+options: Medicine
+options: All of these
+
+explanation:
+    Radiation gauges are used across many industries, including all listed options.
+
+question mb-easy-q36
+
+question:
+    What is radiotherapy used for?
+
+answer: 1
+options: Cooking
+options: Treating cancer
+options: Lighting
+options: Cooling
+
+explanation:
+    Radiotherapy uses radiation to treat cancer.
+
+question mb-easy-q37
+
+question:
+    What is radiography used for?
+
+answer: 0
+options: Imaging inside objects
+options: Cooking food
+options: Cleaning air
+options: Making metals
+
+explanation:
+    Radiography is used to image internal structures.
+
+question mb-easy-q38
+
+question:
+    What does sterilization using radiation do?
+
+answer: 1
+options: Making food dirty
+options: Killing bacteria
+options: Heating food
+options: Cooling food
+
+explanation:
+    Radiation sterilization is used to kill microorganisms.
+
+question mb-easy-q39
+
+question:
+    What is a gamma ray?
+
+answer: 1
+options: Particle
+options: Wave of energy
+options: Solid
+options: Liquid
+
+explanation:
+    Gamma rays are high-energy electromagnetic waves.
+
+question mb-easy-q40
+
+question:
+    What happens to unstable nuclei?
+
+answer: 1
+options: Stay same
+options: Decay
+options: Grow
+options: Multiply
+
+explanation:
+    Unstable nuclei decay over time and emit radiation.
+
+question mb-easy-q41
+
+question:
+    What is nuclear energy?
+
+answer: 1
+options: Energy from electrons
+options: Energy from nucleus
+options: Energy from heat
+options: Energy from wind
+
+explanation:
+    Nuclear energy comes from processes in the atomic nucleus.
+
+question mb-easy-q42
+
+question:
+    Which element is commonly used in smoke detectors?
+
+answer: 2
+options: Oxygen
+options: Carbon
+options: Americium
+options: Iron
+
+explanation:
+    Americium-241 is commonly used in ionization smoke detectors.
+
+question mb-easy-q43
+
+question:
+    What is a nuclear chain reaction?
+
+answer: 1
+options: Single reaction
+options: Series of reactions
+options: No reaction
+options: Slow reaction
+
+explanation:
+    A chain reaction is a self-sustaining series of reactions.
+
+question mb-easy-q44
+
+question:
+    What is a controlled chain reaction?
+
+answer: 1
+options: Dangerous reaction
+options: Managed reaction
+options: Explosive reaction
+options: No reaction
+
+explanation:
+    A controlled chain reaction is carefully regulated, such as in a reactor.
+
+question mb-easy-q45
+
+question:
+    What is an uncontrolled chain reaction?
+
+answer: 1
+options: Safe reaction
+options: Explosion
+options: Slow reaction
+options: Cold reaction
+
+explanation:
+    An uncontrolled chain reaction can release energy explosively.
+
+question mb-easy-q46
+
+question:
+    What is nuclear technology?
+
+answer: 1
+options: Study of plants
+options: Use of nuclear science
+options: Study of animals
+options: Use of electricity only
+
+explanation:
+    Nuclear technology is the practical use of nuclear science.
+
+question mb-easy-q47
+
+question:
+    What is a benefit of nuclear energy?
+
+answer: 1
+options: High pollution
+options: Low carbon emission
+options: No energy
+options: No cost
+
+explanation:
+    Nuclear power produces low carbon emissions during operation.
+
+question mb-easy-q48
+
+question:
+    What is a risk of high radiation exposure?
+
+answer: 1
+options: Improves health always
+options: Can damage cells
+options: Makes water
+options: Creates oxygen
+
+explanation:
+    High or prolonged radiation exposure can damage living cells.
+
+question mb-easy-q49
+
+question:
+    What is a dosimeter?
+
+answer: 1
+options: Measures weight
+options: Measures radiation dose
+options: Measures speed
+options: Measures temperature
+
+explanation:
+    A dosimeter measures accumulated radiation dose.
+
+question mb-easy-q50
+
+question:
+    What is nuclear safety?
+
+answer: 1
+options: Ignoring radiation
+options: Protecting people from radiation
+options: Increasing exposure
+options: Avoiding electricity
+
+explanation:
+    Nuclear safety means protecting people and the environment from radiation risks.

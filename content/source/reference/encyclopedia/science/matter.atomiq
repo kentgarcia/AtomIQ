@@ -1,0 +1,23 @@
+format 1
+adapter encyclopedia 1
+category: science
+
+entry matter
+term: Matter
+related_terms: atom
+related_terms: element
+related_terms: proton
+quick_facts: Matter has mass and takes up space
+quick_facts: Solids, liquids and gases are all matter
+quick_facts: Air is matter: a pumped-up ball weighs more than a flat one
+quick_facts: Light and heat are energy, not matter
+quick_facts: All matter is made of atoms
+
+sources:
+    {"organization":"OpenStax","title":"Chemistry 2e: Phases and Classification of Matter","url":"https://openstax.org/books/chemistry-2e/pages/1-2-phases-and-classification-of-matter"}
+
+definition:
+    Anything that has mass and takes up space. Solids, liquids and gases are all matter, and so is air. All matter is made of atoms. Light and heat are not matter: they are forms of energy. Sound is not matter either, but a wave that travels through matter.
+
+debunking_snippet:
+    “Air is nothing.” Air is matter. It is made of atoms joined in tiny groups, it has mass, and it takes up space.

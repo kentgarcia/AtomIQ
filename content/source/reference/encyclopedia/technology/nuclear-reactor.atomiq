@@ -1,0 +1,27 @@
+format 1
+adapter encyclopedia 1
+category: technology
+
+entry nuclear-reactor
+term: Nuclear Reactor
+difficulty: intermediate
+image: ../../assets/images/terms/nuclear reactor.webp
+related_terms: nuclear-fission
+related_terms: control-rods
+related_terms: containment-building
+related_terms: moderator
+related_terms: defense-in-depth
+quick_facts: ≈440 power reactors worldwide — ~10% of global electricity
+quick_facts: Fuel: 3–5% enriched uranium — far below weapons grade
+quick_facts: Control rods, moderator, and coolant keep k exactly 1
+quick_facts: Also built for ships, research, and medical isotopes
+quick_facts: Life-cycle carbon comparable to wind power
+
+sources:
+    {"organization":"IAEA","title":"Nuclear Power Reactors","url":"https://www.iaea.org/topics/nuclear-power-reactors"}
+
+definition:
+    A machine holding a nuclear chain reaction at exactly critical — steady — power. Fuel assemblies of enriched uranium sit in a lattice with moderator and coolant while control rods trim reactivity; heat from fission boils water or gas to spin turbines. Around 440 power reactors supply roughly a tenth of world electricity with near-zero carbon, and specialized designs produce medical isotopes, research beams, and naval propulsion. Physics itself leans safe: most designs shut down if cooling or moderation is lost.
+
+debunking_snippet:
+    “A reactor can detonate like an atomic bomb.” Physically impossible — bomb fuel is >90% enriched and assembled supercritically in microseconds; reactor fuel is dilute ceramic that can't sustain that.

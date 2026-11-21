@@ -1,0 +1,22 @@
+format 1
+adapter encyclopedia 1
+category: people
+
+entry hans-bethe
+term: Hans Bethe
+difficulty: advanced
+related_terms: nuclear-fusion
+related_terms: nuclear-fission
+related_terms: edward-teller
+related_terms: binding-energy
+quick_facts: Explained how stars fuse hydrogen and shine (1939)
+quick_facts: Nobel Prize in Physics (1967)
+quick_facts: Headed the Theory Division at Los Alamos
+quick_facts: Developed both the p-p chain and CNO cycle models
+quick_facts: Later a prominent advocate of arms-control treaties
+
+sources:
+    {"organization":"Nobel Prize","title":"Hans Bethe Biography","url":"https://www.nobelprize.org/prizes/physics/1967/bethe/biographical/"}
+
+definition:
+    German-American physicist (1906–2005) who worked out how stars shine: in 1939 he described the proton–proton chain and CNO cycle that fuse hydrogen into helium in stellar cores, earning the 1967 Nobel Prize in Physics. During the Manhattan Project he headed the Theoretical Division at Los Alamos, and later became a measured voice for arms control — opposing the race for more exotic weapons while contributing to their underlying physics.

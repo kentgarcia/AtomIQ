@@ -1,0 +1,24 @@
+format 1
+adapter encyclopedia 1
+category: technology
+
+entry hot-cell
+term: Hot Cell
+difficulty: advanced
+image: ../../assets/images/terms/hot cell.webp
+related_terms: shielding
+related_terms: spent-fuel
+related_terms: vitrification
+related_terms: dosimeter
+related_terms: dose-rate
+quick_facts: Shielded rooms for highly radioactive work
+quick_facts: Master-slave manipulator arms reach through walls
+quick_facts: Lead-glass viewing windows up to ~1 m thick
+quick_facts: Used for spent-fuel research, isotope processing, reprocessing R&D
+quick_facts: Air pressure kept negative so nothing leaks outward
+
+sources:
+    {"organization":"IAEA","title":"Nuclear Fuel Cycle Facilities","url":"https://www.iaea.org/"}
+
+definition:
+    A heavily shielded room for hands-off handling of intensely radioactive materials. Workers stay outside lead, steel, or thick concrete walls and manipulate equipment through master-slave mechanical arms while watching through lead-glass windows — dense panes up to a meter thick that still let light through. Hot cells are where spent fuel is examined, medical isotopes are processed, and vitrified waste is packed; nothing inside needs a human body anywhere near it.

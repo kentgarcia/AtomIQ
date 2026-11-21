@@ -1,0 +1,19 @@
+format 1
+adapter safety 1
+section: basics
+
+card safety-demo-tds
+title: Time, distance, shielding
+icon: Timer1
+entry: shielding
+references: ref-a
+references: ref-b
+summary: Three ways to lower the dose.
+steps: Time: less is better.
+steps: Distance: farther is better.
+
+card safety-demo-bg
+title: Background
+icon: Sun1
+summary: It is everywhere.
+steps: Radon is most of it.

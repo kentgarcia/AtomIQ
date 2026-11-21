@@ -1,0 +1,26 @@
+format 1
+adapter encyclopedia 1
+category: science
+
+entry isotope
+term: Isotope
+image: ../../assets/images/terms/isotope.webp
+related_terms: atom
+related_terms: atomic-number
+related_terms: decay
+related_terms: radionuclide
+related_terms: half-life
+quick_facts: Same protons, different neutrons — same element, different mass
+quick_facts: Name coined by Frederick Soddy (1913): 'same place' in Greek
+quick_facts: Stable examples: carbon-12 · radioactive: carbon-14
+quick_facts: Uranium-235 fissions easily; uranium-238 barely does
+quick_facts: Radioisotopes power medicine, dating, and tracing
+
+sources:
+    {"organization":"Britannica","title":"Isotope","url":"https://www.britannica.com/science/isotope"}
+
+definition:
+    One of the variants of a chemical element: same number of protons, different numbers of neutrons, so the same chemistry but a different mass. Chemist Frederick Soddy coined the name in 1913 — Greek for 'same place', since isotopes occupy the same spot on the periodic table. Every element has them; some are stable forever (carbon-12), others radioactive and decaying at fixed rates (carbon-14). Which isotope you have determines everything about its nuclear behavior while changing nothing about its chemistry.
+
+debunking_snippet:
+    “'Isotope' just means radioactive.” No — every element has several isotopes, and the majority are perfectly stable. Radioactive ones are called radionuclides.

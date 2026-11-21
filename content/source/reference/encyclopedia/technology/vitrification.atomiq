@@ -1,0 +1,26 @@
+format 1
+adapter encyclopedia 1
+category: technology
+
+entry vitrification
+term: Vitrification
+difficulty: advanced
+image: ../../assets/images/terms/Vitrification.webp
+related_terms: radioactive-waste
+related_terms: hot-cell
+related_terms: low-level-waste
+related_terms: spent-fuel
+quick_facts: Waste dissolved into borosilicate glass at >1,000 °C
+quick_facts: Glass logs resist leaching across geological timescales
+quick_facts: France (La Hague) vitrifying industrially since 1978
+quick_facts: Hanford's plant addresses Cold War-era tank waste
+quick_facts: Canisters designed to cool for decades before disposal
+
+sources:
+    {"organization":"World Nuclear","title":"Synthetic Rock & Vitrification","url":"https://world-nuclear.org/information-library/nuclear-fuel-cycle/nuclear-wastes.aspx"}
+
+definition:
+    Locking high-level liquid waste inside glass — literally. Waste is calcined into powder, melted together with borosilicate glass formers at over 1,000 °C, and poured into stainless steel canisters where it solidifies into chemically inert logs. Glass resists leaching for many thousands of years, packs the waste densely, and tolerates radiation damage gracefully. France has run industrial-scale vitrification at La Hague since 1978; Hanford's massive treatment plant is finally doing the same for America's Cold War tank waste.
+
+debunking_snippet:
+    “Waste is stored in leaky barrels.” High-level liquid waste is the dangerous legacy — and vitrification turns it into solid glass that geologists expect to outlast human civilization.

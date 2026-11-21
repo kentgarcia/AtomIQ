@@ -1,0 +1,26 @@
+format 1
+adapter encyclopedia 1
+category: science
+
+entry neutron
+term: Neutron
+image: ../../assets/images/terms/neutron.webp
+related_terms: proton
+related_terms: nucleus
+related_terms: james-chadwick
+related_terms: thermal-neutron
+related_terms: chain-reaction
+quick_facts: Zero charge · mass 0.14% above the proton's
+quick_facts: James Chadwick discovered it (1932)
+quick_facts: Free neutrons decay in ~15 minutes
+quick_facts: Only slow ('thermal') neutrons efficiently split U-235
+quick_facts: Neutrons damage crystal lattices — the 'Wigner effect'
+
+sources:
+    {"organization":"Britannica","title":"Neutron","url":"https://www.britannica.com/science/neutron"}
+
+definition:
+    The neutral particle sharing the atomic nucleus with protons — almost exactly as heavy (1.67×10⁻²⁷ kg), just 0.14% heavier, and carrying no electric charge. That neutrality is its superpower: it slips through electron clouds and into nuclei without electrical resistance, which makes it both the trigger of fission chains and a deep-penetrating probe of matter. Freed from a nucleus a neutron survives about 15 minutes before decaying into a proton, an electron, and an antineutrino.
+
+debunking_snippet:
+    “Neutrons are dangerous because they're charged.” The opposite — their danger comes from having no charge at all: nothing repels them, so they penetrate deeply and can even turn stable atoms radioactive.

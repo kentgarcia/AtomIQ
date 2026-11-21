@@ -1,0 +1,22 @@
+format 1
+adapter encyclopedia 1
+category: science
+
+entry z-number
+term: Z-Number
+image: ../../assets/images/terms/Z-number.webp
+related_terms: atomic-number
+related_terms: proton
+related_terms: atom
+related_terms: transmutation
+quick_facts: Z = German 'Zahl', meaning number
+quick_facts: Counts protons — fixes the element
+quick_facts: Conserved across every nuclear reaction
+quick_facts: Beta-minus decay raises Z by one; alpha lowers it by two
+quick_facts: Carbon: Z = 6 · Uranium: Z = 92
+
+sources:
+    {"organization":"IUPAC","title":"Periodic Table of Elements","url":"https://iupac.org/what-we-do/periodic-table-of-elements/"}
+
+definition:
+    Shorthand for atomic number — Z stands for the German 'Zahl' (number), dating to pre-WWI physics papers written in German. Physically it counts protons and thereby fixes an atom's place in the periodic table: hydrogen Z = 1, carbon Z = 6, uranium Z = 92. In nuclear formulas Z tracks charge balance through reactions — sum the Z's before and after any decay or collision and the totals must match.

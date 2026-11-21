@@ -22,10 +22,20 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { DatabaseSync } from "node:sqlite";
 
-import { backupBeforeScript } from "../lib/backup.mjs";
-import { validateScanData } from "../lib/scan-rules.mjs";
+import { backupBeforeScript } from "../../lib/backup.mjs";
+import { validateScanData } from "../../lib/scan-rules.mjs";
 
-const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
+/**
+ * RETIRED (content source files). The rows this script writes (the Atom Scanner targets (scan_targets and their references)) are written in content/source/phone/scanner and built with
+ * `npm run content:sync`; running this would overwrite them behind the files' back. Kept only as history.
+ * Do not run it. Edit the files (docs/features/CONTENT_SOURCE_SPEC.md).
+ */
+if (!process.argv.includes("--i-know-this-is-retired")) {
+  console.error("add-scan-targets.mjs is retired: the Atom Scanner targets (scan_targets and their references) live in content/source/phone/scanner and are built by `npm run content:sync`.");
+  process.exit(1);
+}
+
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..", "..");
 const args = process.argv.slice(2);
 const dryRun = args.includes("--dry-run");
 const overwrite = args.includes("--overwrite");
