@@ -11,6 +11,9 @@
  *   - blog_posts: author, reactors, and the name in the text of the blocks
  * A few voice lines are rewritten by hand (VOICE) because they spoke as the other person ("My pocket watch ticks...").
  *
+ * ONE-OFF, ALREADY APPLIED (2026-11-22). Its chat_nodes part now belongs to the source files (content/source/chat): do not run it again,
+ * it would write the chat in the database behind the files' back (content:sync would then report drift).
+ *
  * Takes a backup first. Does not publish; the release step does.
  *
  *   node --no-warnings scripts/content-migration/swap-unit-teachers.mjs [--dry-run] [--db path]

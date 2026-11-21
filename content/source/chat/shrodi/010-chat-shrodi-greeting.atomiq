@@ -1,0 +1,124 @@
+format 1
+adapter chat 1
+npc: shrodi
+
+node chat-shrodi-greeting
+kind: greeting
+pose: greet
+title: Chat
+
+    Hi, I'm Shrodi, your guide in AtomIQ!
+
+    Ask me what to learn next, how something works, or for a quick quiz.
+
+reply: What should I do next? -> chat-shrodi-next
+reply: Explain something -> chat-shrodi-explain
+reply: Quiz me -> chat-shrodi-quiz
+reply: Show me around -> chat-shrodi-around
+reply: Bye for now -> chat-shrodi-bye
+
+node chat-shrodi-menu
+kind: reply
+pose: idle
+
+    What else can I help with?
+
+reply: What should I do next? -> chat-shrodi-next
+reply: Explain something -> chat-shrodi-explain
+reply: Quiz me -> chat-shrodi-quiz
+reply: Show me around -> chat-shrodi-around
+reply: Bye for now -> chat-shrodi-bye
+
+node chat-shrodi-next
+kind: reply
+pose: point
+
+    Your next lesson is waiting on the map.
+
+    Shall I take you there?
+
+link: Take me there => next-lesson
+reply: Maybe later -> chat-shrodi-menu
+
+node chat-shrodi-explain
+kind: reply
+pose: explain
+
+    Sure! Pick something and I'll show you where to read about it.
+
+reply: The atom -> chat-shrodi-atom
+reply: Isotopes -> chat-shrodi-isotope
+reply: Radioactive decay -> chat-shrodi-decay
+reply: Half-life -> chat-shrodi-half-life
+reply: Something else -> chat-shrodi-menu
+
+node chat-shrodi-atom
+kind: reply
+pose: explain
+
+    Everything is made of atoms.
+
+    At the middle of each is a tiny nucleus of protons and neutrons, with electrons far outside it.
+
+link: Open the nucleus in AtomDex => entry nucleus
+reply: Back -> chat-shrodi-explain
+
+node chat-shrodi-isotope
+kind: reply
+pose: explain
+
+    Isotopes are atoms of one element with different numbers of neutrons.
+
+    Same protons, so the same element. A different mass.
+
+link: Open isotopes in AtomDex => entry isotope
+reply: Back -> chat-shrodi-explain
+
+node chat-shrodi-decay
+kind: reply
+pose: explain
+
+    Some nuclei are unstable, so they change on their own and give off radiation.
+
+    That change is called decay.
+
+link: Open decay in AtomDex => entry decay
+reply: Back -> chat-shrodi-explain
+
+node chat-shrodi-half-life
+kind: reply
+pose: explain
+
+    A half-life is how long it takes for half of a radioactive sample to decay.
+
+    It can be a fraction of a second or billions of years.
+
+link: Open half-life in AtomDex => entry half-life
+reply: Back -> chat-shrodi-explain
+
+node chat-shrodi-quiz
+kind: reply
+pose: cheer
+
+    Ready for a quick round? Myth Buster is a fast one.
+
+link: Start the round => mythbuster
+reply: Not now -> chat-shrodi-menu
+
+node chat-shrodi-around
+kind: reply
+pose: point
+
+    This is your phone.
+
+    Chats is where your teachers write to you, AtomDex is the encyclopedia, and new apps arrive as you learn.
+
+link: Open AtomDex => app atomdex
+link: Open Field Notes => app field-notes
+reply: Back -> chat-shrodi-menu
+
+node chat-shrodi-bye
+kind: sign_off
+pose: proud
+
+    Any time. I'm right here in your phone.

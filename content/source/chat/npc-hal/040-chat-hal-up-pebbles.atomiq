@@ -1,0 +1,78 @@
+format 1
+adapter chat 1
+npc: npc-hal
+
+node chat-hal-up-pebbles
+kind: unprompted
+pose: think
+trigger: lessons_completed:4
+title: Twelve, Thirteen, Fourteen
+
+    I have a confession.
+
+    Three pebbles in my satchel have been renamed. They are now called Twelve, Thirteen and Fourteen.
+
+    I believe you finished the isotopes lesson recently. You will see why.
+
+reply: carbon-12, 13 and 14?? -> chat-hal-pebbles-carbon
+reply: that's so nerdy -> chat-hal-pebbles-nerdy
+
+node chat-hal-pebbles-nerdy
+kind: reply
+pose: proud
+
+    Yes. It is the highest compliment I know.
+
+    But there is a point to it. Look at them. All three pebbles look the same to me. Same shape. Same colour. And one of them, I cannot say which, is slightly heavier.
+
+reply: so they're like isotopes -> chat-hal-pebbles-carbon
+reply: which one is the heavy one -> chat-hal-pebbles-heavy
+
+node chat-hal-pebbles-carbon
+kind: reply
+pose: explain
+
+    Exactly so. Carbon-12, carbon-13, carbon-14.
+
+    All three are carbon. Six protons each. The protons make it carbon, and the protons do not change.
+
+    What changes is the neutrons. Six, seven, eight. That is the entire difference between my pebbles.
+
+reply: and 14 is the unstable one, right? -> chat-hal-pebbles-unstable
+reply: ok but which pebble is which lol -> chat-hal-pebbles-heavy
+
+node chat-hal-pebbles-heavy
+kind: reply
+pose: sorry
+
+    I do not know.
+
+    I put them in a bag together on Monday and I have lost the labels.
+
+    This is why I do not recommend naming things Twelve, Thirteen and Fourteen. They do not answer to their names. Neither does Tuesday.
+
+reply: oh Hal -> chat-hal-pebbles-unstable
+reply: ok but what about the real atoms -> chat-hal-pebbles-unstable
+
+node chat-hal-pebbles-unstable
+kind: reply
+pose: explain
+
+    Ah. Fourteen. Yes.
+
+    It is the unstable one. An unstable nucleus can change, and when it does it gives off radiation.
+
+    But note this, because it matters: isotope does not mean radioactive. Carbon-12 and carbon-13 are perfectly stable. Only some isotopes change.
+
+react: think -> chat-hal-pebbles-end
+react: clap -> chat-hal-pebbles-end
+
+node chat-hal-pebbles-end
+kind: sign_off
+pose: idle
+
+    That is all I wished to say.
+
+    I am going to sit with three pebbles and a very long afternoon. If I ever sort them correctly I shall let you know.
+
+    It may take a while.

@@ -26,6 +26,7 @@ export function makePaths(root = process.env.ATOMIQ_ROOT || REPO_ROOT, opts = {}
     ledger: path.join(content, "releases.json"),
     shippedIds: path.join(content, "shipped-ids.json"),
     retiredIds: path.join(content, "retired-ids.json"),
+    sourceDir: path.join(content, "source"),
     backupDir: path.join(content, "backups"),
     historyDb: path.join(content, "database", "studio-history.db"),
     studioLock: path.join(content, "database", ".studio.lock"),

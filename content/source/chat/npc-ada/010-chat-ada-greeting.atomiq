@@ -1,0 +1,318 @@
+format 1
+adapter chat 1
+npc: npc-ada
+
+node chat-ada-greeting
+kind: greeting
+pose: cheer
+title: Chat
+
+    heyyy. it's ada
+
+    sorry sorry, my flask just made The Noise. ok it stopped. i think~ hi hi
+
+    ok before anything. how are we doing today? be honest. i can take it. (i can't always take it)
+
+reply: honestly pretty good -> chat-ada-mood-great
+reply: kinda tired -> chat-ada-mood-tired
+reply: stuck on something -> chat-ada-mood-stuck
+reply: chaotic. send help -> chat-ada-mood-chaos
+reply: just here to chat -> chat-ada-talk
+reply: i have to go -> chat-ada-bye
+
+node chat-ada-menu
+kind: reply
+pose: idle
+
+    ooh ok. what else?
+
+    i've got time. a little. i have a snack appointment at 3
+
+reply: what should i do next? -> chat-ada-next
+reply: quiz me -> chat-ada-quiz
+reply: can you remind me of something? -> chat-ada-remind
+reply: let's just chat -> chat-ada-talk
+reply: i have to go -> chat-ada-bye
+
+node chat-ada-next
+kind: reply
+pose: point
+
+    your next lesson is waiting on the map
+
+    want me to take you there? i'll pretend i didn't see you procrastinate hehe~
+
+link: Take me there => next-lesson
+reply: maybe later -> chat-ada-menu
+
+node chat-ada-quiz
+kind: reply
+pose: explain
+
+    a lil round of myth buster?? on radioactivity??
+
+    yes yes yes. i love these. no pressure. ok a little pressure. a cute amount~
+
+link: Start the round => mythbuster radioactivity
+reply: not now -> chat-ada-menu
+
+node chat-ada-remind
+kind: reply
+pose: think
+
+    ofc~ which one?
+
+    i'll try not to ramble. (i will ramble)
+
+reply: half-life -> chat-ada-half-life
+reply: decay -> chat-ada-decay
+reply: alpha, beta, gamma -> chat-ada-abg
+reply: natural radioactivity -> chat-ada-natural
+reply: nvm -> chat-ada-menu
+
+node chat-ada-half-life
+kind: reply
+pose: explain
+
+    ok ok half-life
+
+    it's how long it takes for half of the atoms in a sample to decay. half of the CROWD, not one atom. one atom is a mystery, a crowd is a pattern
+
+    like popcorn~ (don't quote me on popcorn)
+
+link: Open it in AtomDex => entry half-life
+reply: ok thanks -> chat-ada-menu
+
+node chat-ada-decay
+kind: reply
+pose: explain
+
+    decay. ok so
+
+    an unstable nucleus changes all by itself into a steadier one, and gives off radiation while it does
+
+    it's like a nucleus tidying its room. except the room is, uh, itself
+
+link: Open it in AtomDex => entry decay
+reply: ok thanks -> chat-ada-menu
+
+node chat-ada-upto
+kind: reply
+pose: cheer
+
+    ahh you asked
+
+    so i'm trying to make a flask glow on purpose, instead of by accident
+
+    so far: 0 glows. 3 small explosions. 1 very sad bow~
+
+reply: explosions?! -> chat-ada-boom
+reply: is your bow ok -> chat-ada-bow
+reply: ok lol anyway -> chat-ada-menu
+
+node chat-ada-boom
+kind: reply
+pose: sorry
+
+    tiny ones. like. poof. nobody's hurt (the bow's feelings are hurt)
+
+    i always wear goggles, don't worry. safety first, glitter second~
+
+reply: the bow has feelings?? -> chat-ada-bow
+reply: ok good, safety first -> chat-ada-menu
+
+node chat-ada-bow
+kind: reply
+pose: sorry
+
+    my left bow. it fell in the flask. eep. it's fine. it's pink and also slightly green now
+
+    i'm calling it 'a look'~
+
+react: love -> chat-ada-menu
+react: haha -> chat-ada-menu
+
+node chat-ada-flask
+kind: reply
+pose: greet
+
+    ooh she's called Sparkle. she's glowy and a little moody~
+
+    i'm not telling you what's inside. it's a secret. ok it's mostly water and hope
+
+reply: SPARKLE?? love her -> chat-ada-menu
+reply: is it safe tho -> chat-ada-safe
+
+node chat-ada-safe
+kind: reply
+pose: proud
+
+    yes yes. i promise. i have goggles and a very serious lab coat
+
+    the apron is tan. it looks like a sandwich. i love it
+
+reply: ok cute -> chat-ada-menu
+reply: i have to go -> chat-ada-bye
+
+node chat-ada-bye
+kind: sign_off
+pose: greet
+
+    aww ok bye bye
+
+    come back soon?? i'll be here. probably with something bubbling~
+
+node chat-ada-mood-great
+kind: reply
+pose: cheer
+
+    ooh yay. good days are rare and precious. like a flask that glows on purpose
+
+    ok so you're warm. warm is the best time to do a thing. what thing
+
+reply: quiz me -> chat-ada-quiz
+reply: the next lesson -> chat-ada-next
+reply: tell me something fun -> chat-ada-secret
+
+node chat-ada-mood-tired
+kind: reply
+pose: sorry
+
+    aww. ok. tired is allowed. tired is real and i respect it
+
+    we can do one tiny thing, or no thing. no thing counts. i've decided
+
+reply: one tiny thing -> chat-ada-remind
+reply: can we just talk -> chat-ada-talk
+reply: i'll rest. bye -> chat-ada-bye
+
+node chat-ada-mood-stuck
+kind: reply
+pose: think
+
+    ooh. stuck. ok stuck is actually good news. it means your brain found the edge of something
+
+    what's it about
+
+reply: decay -> chat-ada-decay
+reply: half-life -> chat-ada-half-life
+reply: alpha, beta, gamma -> chat-ada-abg
+reply: honestly all of it -> chat-ada-remind
+
+node chat-ada-mood-chaos
+kind: reply
+pose: cheer
+
+    same. SAME. the flask is humming, one bow is green and i have three snacks and no plan
+
+    ok. chaos buddies. what do we do with it
+
+reply: who's making the noise? -> chat-ada-flask
+reply: calm me down -> chat-ada-calm
+reply: let's learn something -> chat-ada-remind
+
+node chat-ada-calm
+kind: reply
+pose: idle
+
+    ok. in through the nose. out through the mouth
+
+    be a calm little nucleus. stable. steady. not going anywhere. i love stable nuclei. i'm not one. i love them though
+
+    better?
+
+reply: yeah, a bit -> chat-ada-menu
+reply: one tiny thing -> chat-ada-remind
+
+node chat-ada-talk
+kind: reply
+pose: greet
+
+    ooh ok, chatting. my favourite
+
+    pick a thing. or don't. we can just exist for a bit hehe
+
+reply: what are you doing? -> chat-ada-upto
+reply: what's in your flask? -> chat-ada-flask
+reply: tell me a secret -> chat-ada-secret
+reply: what's Hal like? -> chat-ada-hal
+reply: what's the snack appointment? -> chat-ada-snack
+reply: ok something else -> chat-ada-menu
+
+node chat-ada-secret
+kind: reply
+pose: proud
+
+    ok come closer. (you can't. it's a phone) (i'm leaning in anyway)
+
+    i talk to gary. he's my beaker. he doesn't answer but he's a really good listener
+
+    when i'm stuck i explain it to him out loud and it just. fixes itself. somehow~
+
+    you should try it. pick something. explain it to a mug
+
+react: love -> chat-ada-talk
+react: haha -> chat-ada-talk
+
+node chat-ada-hal
+kind: reply
+pose: cheer
+
+    hal?? ok hal is the calmest person i know. he names rocks. there's one called tuesday and i respect it so much
+
+    he says i'm loud. i say he's a great listener. we're a team~
+
+reply: what's tuesday? -> chat-ada-tuesday
+reply: you two are funny -> chat-ada-talk
+
+node chat-ada-tuesday
+kind: reply
+pose: sorry
+
+    a flat rock. that's all i know. that's ALL he'll say
+
+    i asked him one question and he looked at me for eleven seconds and then said 'no.' very gently
+
+    i love him. i don't understand him. i love him
+
+react: haha -> chat-ada-talk
+react: love -> chat-ada-talk
+
+node chat-ada-snack
+kind: reply
+pose: cheer
+
+    my snack appointment?? it's at 3. every day. it's the most important meeting i have
+
+    i pack a surprise and forget what it is, so at 3 it's a GIFT. from past me. past me is so nice
+
+    okay what's yours. don't answer. i just want you to think about it
+
+reply: ok now i'm hungry -> chat-ada-talk
+reply: past you is a legend -> chat-ada-talk
+
+node chat-ada-abg
+kind: reply
+pose: explain
+
+    ok the three. alpha, beta, gamma
+
+    alpha is a chunk: 2 protons and 2 neutrons stuck together. beta is a fast electron, way lighter. gamma is just extra energy leaving, no chunk at all
+
+    chunk. zoomer. leftover energy. that's how i remember them
+
+link: Open it in AtomDex => entry alpha-particle
+reply: ok thanks -> chat-ada-menu
+
+node chat-ada-natural
+kind: reply
+pose: explain
+
+    ok this one's my favourite. radioactivity is natural
+
+    rocks and soil, the air, space, even you. it was all here way before people~
+
+    and 'radioactive' doesn't automatically mean 'dangerous'. it depends on what kind, how much, and how it reaches you
+
+link: Open it in AtomDex => entry background-radiation
+reply: ok thanks -> chat-ada-menu

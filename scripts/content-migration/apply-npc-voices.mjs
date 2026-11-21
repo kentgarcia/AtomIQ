@@ -6,7 +6,7 @@
  *   1. Feed: the shared posts that any of several teachers could post (one text for all) are removed and replaced by one template per
  *      character and moment (`ft-<npc>-chest-daily`, `ft-ray-rank-passed`...); every seeded feed template and blog piece (and its comments)
  *      is reset to the text in feed-content.mjs, so Hal's and Ada's unit posts and blog pieces now sound like them.
- *   2. Chat: Hal's and Ada's chats are removed and written again from add-chat-nodes.mjs (only theirs: Shrodi's tour chat is left alone).
+ *   2. Chat is NOT touched any more: it lives in content/source/chat and is built with `npm run content:sync`.
  *   3. Lesson lines (`npc_lines`: meet, sign_off, tease, shown with lessons) are set to the one plain tone every teacher shares.
  *
  * It overwrites those seeded rows, so an edit made in Content Studio to one of them is replaced. Takes a backup first. Does not publish.
@@ -15,7 +15,6 @@
  */
 
 import path from "node:path";
-import { execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { DatabaseSync } from "node:sqlite";
 
@@ -73,12 +72,4 @@ try {
   db.close();
 }
 
-// Hal's and Ada's chats are written afresh: the nodes an older version had (and no longer has) must not linger
-{
-  const chat = new DatabaseSync(dbPath);
-  const gone = Number(chat.prepare("DELETE FROM chat_nodes WHERE npc_id IN ('npc-hal', 'npc-ada')").run().changes);
-  chat.close();
-  console.log(`chat: ${gone} old nodes of Hal and Ada removed, the new ones follow.`);
-}
-execFileSync(process.execPath, ["--no-warnings", path.join(ROOT, "scripts/content-migration/add-chat-nodes.mjs"), "--overwrite", "--npc", "npc-hal,npc-ada", "--db", dbPath], { stdio: "inherit" });
 console.log("Voices applied (a draft: publish from Content Studio or `npm run release:content -- --publish`).");

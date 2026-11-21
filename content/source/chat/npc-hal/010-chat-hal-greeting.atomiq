@@ -1,0 +1,294 @@
+format 1
+adapter chat 1
+npc: npc-hal
+
+node chat-hal-greeting
+kind: greeting
+pose: greet
+title: Chat
+
+    Ah. Hello.
+
+    I was in the middle of weighing a rock, but it will keep. Rocks are good at that.
+
+    I can do four things. One: tell you what is next. Two: remind you of something. Three: ask you a question. Four: tell you about a rock.
+
+    Or five. Nothing. Nothing is underrated.
+
+reply: one, please -> chat-hal-next
+reply: two, please -> chat-hal-remind
+reply: three, please -> chat-hal-quiz
+reply: four, please -> chat-hal-rocks
+reply: five -> chat-hal-nothing
+reply: goodbye, Hal -> chat-hal-bye
+
+node chat-hal-menu
+kind: reply
+pose: idle
+
+    Hm. Yes?
+
+    The list, then. One: what is next. Two: a reminder. Three: a question. Four: a rock. Five: nothing.
+
+    Take your time. I am not going anywhere, and neither is the rock.
+
+reply: one, please -> chat-hal-next
+reply: two, please -> chat-hal-remind
+reply: three, please -> chat-hal-quiz
+reply: four, please -> chat-hal-rocks
+reply: five -> chat-hal-nothing
+reply: goodbye, Hal -> chat-hal-bye
+
+node chat-hal-next
+kind: reply
+pose: point
+
+    There is a next lesson waiting on your map.
+
+    I would go now, while you are still warm. Warm is the right temperature for learning. I read that somewhere. Possibly I wrote it.
+
+link: Take me there => next-lesson
+reply: later, maybe -> chat-hal-menu
+
+node chat-hal-quiz
+kind: reply
+pose: explain
+
+    A round of Myth Buster. On atoms.
+
+    I will not say it is easy. I will say it is fair.
+
+link: Start the round => mythbuster inside-the-atom
+reply: not right now -> chat-hal-menu
+
+node chat-hal-remind
+kind: reply
+pose: think
+
+    Certainly. I keep my notes in order, as it happens.
+
+    Which page?
+
+reply: the nucleus -> chat-hal-nucleus
+reply: isotopes -> chat-hal-isotope
+reply: what makes an element? -> chat-hal-element
+reply: electrons -> chat-hal-electron
+reply: never mind -> chat-hal-menu
+
+node chat-hal-nucleus
+kind: reply
+pose: explain
+
+    The nucleus.
+
+    The tiny core of an atom. The protons and the neutrons live in it, and so does nearly all of the atom's mass.
+
+    Small. Dense. Rather like a good paperweight.
+
+link: Open it in AtomDex => entry nucleus
+reply: thanks, back -> chat-hal-menu
+
+node chat-hal-isotope
+kind: reply
+pose: explain
+
+    Isotopes.
+
+    Atoms of one element with different numbers of neutrons. The protons stay the same, so the element stays the same.
+
+    Same name, different weight. I have a cousin like that.
+
+link: Open it in AtomDex => entry isotope
+reply: thanks, back -> chat-hal-menu
+
+node chat-hal-upto
+kind: reply
+pose: think
+
+    At this moment?
+
+    I am sorting samples by weight. Then I will sort them by colour. Then I will discover that the colour order disagrees with the weight order, and I will begin again.
+
+    It is going very well.
+
+reply: that sounds exhausting -> chat-hal-upto2
+reply: ok anyway -> chat-hal-menu
+
+node chat-hal-upto2
+kind: reply
+pose: explain
+
+    Exhausting is not the word I would choose. Satisfying, perhaps.
+
+    Slowly, a rock becomes a rock you know. You should try it with anything. A button. A leaf.
+
+    Look at one thing for ten whole minutes.
+
+reply: ten whole minutes?? -> chat-hal-minutes
+reply: maybe later lol -> chat-hal-menu
+
+node chat-hal-minutes
+kind: reply
+pose: proud
+
+    Ten minutes.
+
+    For the first three, nothing happens. At minute four you notice a scratch. By minute seven the scratch has a story.
+
+    I do not recommend doing it before a meeting.
+
+reply: ok that's actually kind of cool -> chat-hal-menu
+reply: you're a strange person, Hal -> chat-hal-strange
+
+node chat-hal-strange
+kind: reply
+pose: greet
+
+    Yes. Thank you.
+
+    I have been told so by several people and one pigeon.
+
+react: haha -> chat-hal-menu
+react: love -> chat-hal-menu
+
+node chat-hal-satchel
+kind: reply
+pose: greet
+
+    The satchel.
+
+    Two pencils, one of them not sharp. A magnifying glass with a crack I prefer not to discuss. A sandwich, sometimes. And my samples, each wrapped, each named.
+
+    This morning I carried a rock called Reginald four miles. He is not heavy. I simply felt I should.
+
+reply: you NAMED your rocks?? -> chat-hal-named
+reply: ok anyway -> chat-hal-menu
+
+node chat-hal-named
+kind: reply
+pose: proud
+
+    Of course. A sample with a name is a sample you do not lose.
+
+    Reginald. Doris. A flat one called Tuesday.
+
+    I will not be taking questions about Tuesday.
+
+sticker: nerd -> chat-hal-menu
+sticker: star -> chat-hal-menu
+
+node chat-hal-bye
+kind: sign_off
+pose: proud
+
+    Of course. Goodbye, then.
+
+    Go gently. Come back when you are curious. I will be here, probably holding a rock.
+
+node chat-hal-rocks
+kind: reply
+pose: think
+
+    Four. Excellent. I was hoping for four.
+
+    I have a great many rocks, and most of them have names. Ask after one. Or ask about the satchel, or what I am doing at this moment.
+
+reply: Reginald? -> chat-hal-reginald
+reply: Doris? -> chat-hal-doris
+reply: Tuesday? -> chat-hal-tuesday
+reply: what's in your satchel? -> chat-hal-satchel
+reply: what are you up to? -> chat-hal-upto
+reply: never mind -> chat-hal-menu
+
+node chat-hal-reginald
+kind: reply
+pose: proud
+
+    Reginald.
+
+    Grey, rounded, with one pale stripe. I carried him four miles this morning. He did not complain once.
+
+    He has never interrupted me. I cannot say the same for the pigeon.
+
+reply: what about Doris? -> chat-hal-doris
+reply: back to the list -> chat-hal-menu
+
+node chat-hal-doris
+kind: reply
+pose: explain
+
+    Doris is the rock I was weighing when you wrote.
+
+    Two hundred and fourteen grams. I have weighed her eleven times today, and she has been two hundred and fourteen grams every time.
+
+    I find that deeply reassuring.
+
+reply: and Tuesday? -> chat-hal-tuesday
+reply: back to the list -> chat-hal-menu
+
+node chat-hal-tuesday
+kind: reply
+pose: greet
+
+    Tuesday.
+
+    I believe I said there would be no questions about Tuesday.
+
+    Very well. One. Tuesday is flat. A flat rock skips beautifully across water, and I have never once dared to skip it.
+
+react: haha -> chat-hal-menu
+react: love -> chat-hal-menu
+
+node chat-hal-nothing
+kind: reply
+pose: idle
+
+    Five. A bold choice.
+
+    Very well. We will do nothing, together.
+
+    Ten seconds. Still doing it. Twenty. I am enjoying this more than I expected.
+
+    Thank you. That was restful. Thirty-one seconds. I counted.
+
+reply: that was weirdly nice -> chat-hal-menu
+reply: again? -> chat-hal-nothing2
+
+node chat-hal-nothing2
+kind: reply
+pose: proud
+
+    Again. Certainly.
+
+    I will not count this time. Counting would be doing something.
+
+    Forty seconds. I counted. I am sorry. I could not help it.
+
+react: haha -> chat-hal-menu
+react: love -> chat-hal-menu
+
+node chat-hal-element
+kind: reply
+pose: explain
+
+    What makes an element.
+
+    The number of protons. Six protons is always carbon. Seven is always nitrogen. Eight is always oxygen.
+
+    The neutrons and the electrons do not decide it. Only the protons. I find that tidy. My rocks have names too, but theirs are less reliable.
+
+link: Open it in AtomDex => entry atomic-number
+reply: thanks, back -> chat-hal-menu
+
+node chat-hal-electron
+kind: reply
+pose: explain
+
+    The electron.
+
+    It carries a negative charge, and it lives outside the nucleus.
+
+    It is not a tiny planet, whatever the old pictures show. It is somewhere in a fuzzy region around the nucleus, a cloud. I find that restful. Not everything needs an address.
+
+link: Open it in AtomDex => entry electron
+reply: thanks, back -> chat-hal-menu

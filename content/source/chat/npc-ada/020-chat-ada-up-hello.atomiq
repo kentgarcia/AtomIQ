@@ -1,0 +1,122 @@
+format 1
+adapter chat 1
+npc: npc-ada
+
+node chat-ada-up-hello
+kind: unprompted
+pose: cheer
+trigger: lessons_completed:6
+title: hi hi hi. it's ada
+
+    HELLO
+
+    (sorry. i've been waiting to say that forever. i saw you finished a lesson in my unit and i dropped a flask)
+
+    i'm ada. i teach the atoms that change. hehe. you'll see~
+
+reply: hi ada -> chat-ada-hello-q
+reply: you dropped a flask? -> chat-ada-hello-flask
+reply: Hal told me about you -> chat-ada-hello-hal
+
+node chat-ada-hello-flask
+kind: reply
+pose: sorry
+
+    ok so. it was sparkle. my flask. she slipped. she's fine. she's glass but she's brave
+
+    anyway. hi
+
+reply: aww poor sparkle -> chat-ada-hello-q
+reply: ok hi ada -> chat-ada-hello-q
+
+node chat-ada-hello-hal
+kind: reply
+pose: cheer
+
+    HAL TOLD YOU ABOUT ME??
+
+    what did he say. no wait. don't tell me. he said i'm loud. he always says i'm loud
+
+    he's right. but he says it fondly. i think. it's hard to tell with hal
+
+reply: he said you're 'a great deal' -> chat-ada-hello-q
+reply: he said you're the best at it -> chat-ada-hello-q
+
+node chat-ada-hello-q
+kind: reply
+pose: point
+
+    ok anyway
+
+    question. i have ONE unstable nucleus. just one. sitting there
+
+    can you tell me the exact second it will change?
+
+reply: no way to know -> chat-ada-hello-right
+reply: yes, with math -> chat-ada-hello-wrong
+reply: is this a trick question -> chat-ada-hello-trick
+
+node chat-ada-hello-right
+kind: reply
+pose: cheer
+
+    YES. you got it, nobody can say when
+
+    the nucleus is just sitting there. then one day, poof. it changes. nobody pushes it. nobody knows when
+
+reply: so nothing is predictable? -> chat-ada-hello-crowd
+reply: that's kinda spooky -> chat-ada-hello-spooky
+
+node chat-ada-hello-wrong
+kind: reply
+pose: idle
+
+    ooh so close, hehe. it's a super common guess
+
+    but nope. for one nucleus, nobody can say when. not with math, not with a bigger computer, not with my fanciest flask
+
+reply: huh. so what CAN we know? -> chat-ada-hello-crowd
+reply: that's kinda spooky -> chat-ada-hello-spooky
+
+node chat-ada-hello-trick
+kind: reply
+pose: greet
+
+    it's not a trick. it's a tiny trick. ok it's a trick
+
+    the answer is: you can't. nobody can say when one nucleus will change
+
+reply: ok so what CAN we know? -> chat-ada-hello-crowd
+reply: that's kinda spooky -> chat-ada-hello-spooky
+
+node chat-ada-hello-spooky
+kind: reply
+pose: think
+
+    a little. but i like it. it's like every atom has a secret clock and it won't tell anyone
+
+    (not a REAL clock. don't put that in your notes. there's no timer inside)
+
+reply: ok but what about a crowd? -> chat-ada-hello-crowd
+reply: ok i get it, thanks ada -> chat-ada-hello-end
+
+node chat-ada-hello-crowd
+kind: reply
+pose: cheer
+
+    ooh. here's the magic part
+
+    one nucleus? mystery. a CROWD of them? pattern
+
+    like if i roll one die, no idea. but roll it 600 times and about 100 of them are sixes. same energy
+
+react: wow -> chat-ada-hello-end
+react: haha -> chat-ada-hello-end
+
+node chat-ada-hello-end
+kind: sign_off
+pose: greet
+
+    ok i have to go. sparkle's doing the noise again
+
+    it was SO nice to meet you. come say hi any time. i'll be here. probably covered in glitter~

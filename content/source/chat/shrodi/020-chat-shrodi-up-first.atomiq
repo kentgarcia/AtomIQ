@@ -1,0 +1,93 @@
+format 1
+adapter chat 1
+npc: shrodi
+
+node chat-shrodi-up-first
+kind: unprompted
+pose: cheer
+trigger: lessons_completed:1
+title: Your first lesson!
+
+    You finished your first lesson!
+
+    That is how every scientist starts: one question at a time.
+
+    Want a quick tour of AtomIQ? It takes about a minute.
+
+reply: Show me around -> chat-shrodi-tour-map
+reply: What should I do next? -> chat-shrodi-next
+reply: Thanks, Shrodi -> chat-shrodi-bye
+
+node chat-shrodi-tour-map
+kind: reply
+pose: point
+
+    Home is your map. Each circle is a lesson.
+
+    [[pic:tour-map]]
+
+    Finish one and the next circle opens. After a few lessons a new unit begins, with a new teacher.
+
+reply: Next -> chat-shrodi-tour-quests
+reply: Skip the rest -> chat-shrodi-tour-end
+
+node chat-shrodi-tour-quests
+kind: reply
+pose: point
+
+    Quests are small goals for the day and the week.
+
+    [[pic:tour-quests]]
+
+    Finish them to claim XP, then open the chest for diamonds.
+
+reply: Next -> chat-shrodi-tour-games
+reply: Skip the rest -> chat-shrodi-tour-end
+
+node chat-shrodi-tour-games
+kind: reply
+pose: cheer
+
+    Games is where you practise. In Atom Maze you run and jump, and answer questions to beat enemies.
+
+    [[pic:tour-games]]
+
+    Myth Buster is a quick round of fact or myth.
+
+reply: Next -> chat-shrodi-tour-profile
+reply: Skip the rest -> chat-shrodi-tour-end
+
+node chat-shrodi-tour-profile
+kind: reply
+pose: explain
+
+    Profile is your explorer passport: your level, your badges and your streak.
+
+    [[pic:tour-profile]]
+
+    After your second lesson the Shop opens: spend diamonds on hair, outfits and more.
+
+reply: Next -> chat-shrodi-tour-phone
+reply: Skip the rest -> chat-shrodi-tour-end
+
+node chat-shrodi-tour-phone
+kind: reply
+pose: point
+
+    And this is your phone. Teachers write to you in Chats, AtomDex is the encyclopedia, and new apps arrive as you learn.
+
+    [[pic:tour-phone]]
+
+    There is a lot to find. Take your time.
+
+link: Open AtomDex => app atomdex
+reply: Got it -> chat-shrodi-tour-end
+reply: Tell me again -> chat-shrodi-tour-map
+
+node chat-shrodi-tour-end
+kind: sign_off
+pose: proud
+
+    That is the tour. Now it is your turn to explore.
+
+    I am right here in your phone if you need me.

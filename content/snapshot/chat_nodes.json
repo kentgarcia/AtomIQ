@@ -5,6 +5,29 @@
   ],
   "rows": [
     {
+      "id": "chat-ada-abg",
+      "npc_id": "npc-ada",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "ok the three. alpha, beta, gamma\n\nalpha is a chunk: 2 protons and 2 neutrons stuck together. beta is a fast electron, way lighter. gamma is just extra energy leaving, no chunk at all\n\nchunk. zoomer. leftover energy. that's how i remember them",
+      "pose": "explain",
+      "replies": [
+        {
+          "label": "Open it in AtomDex",
+          "action": {
+            "screen": "entry",
+            "id": "alpha-particle"
+          }
+        },
+        {
+          "label": "ok thanks",
+          "next": "chat-ada-menu"
+        }
+      ],
+      "position": 23
+    },
+    {
       "id": "chat-ada-back-beaker",
       "npc_id": "npc-ada",
       "kind": "reply",
@@ -22,7 +45,7 @@
           "next": "chat-ada-back-ready"
         }
       ],
-      "position": 46
+      "position": 58
     },
     {
       "id": "chat-ada-back-hi",
@@ -42,7 +65,7 @@
           "next": "chat-ada-back-ready"
         }
       ],
-      "position": 47
+      "position": 59
     },
     {
       "id": "chat-ada-back-miss",
@@ -62,7 +85,7 @@
           "next": "chat-ada-back-beaker"
         }
       ],
-      "position": 45
+      "position": 57
     },
     {
       "id": "chat-ada-back-ready",
@@ -91,7 +114,7 @@
           "next": "chat-ada-bye"
         }
       ],
-      "position": 49
+      "position": 61
     },
     {
       "id": "chat-ada-back-sorry",
@@ -111,7 +134,7 @@
           "next": "chat-ada-back-ready"
         }
       ],
-      "position": 48
+      "position": 60
     },
     {
       "id": "chat-ada-banana-end",
@@ -122,7 +145,7 @@
       "text": "ok ok back to my banana\n\nnow you have a fun fact for the fruit stand hehe. go tell someone. watch their face~",
       "pose": "greet",
       "replies": [],
-      "position": 28
+      "position": 40
     },
     {
       "id": "chat-ada-banana-me",
@@ -143,7 +166,7 @@
           "type": "emoji"
         }
       ],
-      "position": 27
+      "position": 39
     },
     {
       "id": "chat-ada-banana-no",
@@ -163,7 +186,7 @@
           "next": "chat-ada-banana-me"
         }
       ],
-      "position": 25
+      "position": 37
     },
     {
       "id": "chat-ada-banana-safe",
@@ -183,7 +206,7 @@
           "next": "chat-ada-banana-end"
         }
       ],
-      "position": 26
+      "position": 38
     },
     {
       "id": "chat-ada-banana-what",
@@ -203,7 +226,7 @@
           "next": "chat-ada-banana-safe"
         }
       ],
-      "position": 24
+      "position": 36
     },
     {
       "id": "chat-ada-boom",
@@ -259,6 +282,26 @@
       "position": 12
     },
     {
+      "id": "chat-ada-calm",
+      "npc_id": "npc-ada",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "ok. in through the nose. out through the mouth\n\nbe a calm little nucleus. stable. steady. not going anywhere. i love stable nuclei. i'm not one. i love them though\n\nbetter?",
+      "pose": "idle",
+      "replies": [
+        {
+          "label": "yeah, a bit",
+          "next": "chat-ada-menu"
+        },
+        {
+          "label": "one tiny thing",
+          "next": "chat-ada-remind"
+        }
+      ],
+      "position": 17
+    },
+    {
       "id": "chat-ada-decay",
       "npc_id": "npc-ada",
       "kind": "reply",
@@ -307,28 +350,28 @@
       "kind": "greeting",
       "trigger": null,
       "title": "Chat",
-      "text": "heyyy. it's ada\n\nsorry sorry, my flask just made The Noise. ok it stopped. i think~ hi hi\n\nwhat's up?",
+      "text": "heyyy. it's ada\n\nsorry sorry, my flask just made The Noise. ok it stopped. i think~ hi hi\n\nok before anything. how are we doing today? be honest. i can take it. (i can't always take it)",
       "pose": "cheer",
       "replies": [
         {
-          "label": "what are you doing?",
-          "next": "chat-ada-upto"
+          "label": "honestly pretty good",
+          "next": "chat-ada-mood-great"
         },
         {
-          "label": "what should i do next?",
-          "next": "chat-ada-next"
+          "label": "kinda tired",
+          "next": "chat-ada-mood-tired"
         },
         {
-          "label": "quiz me",
-          "next": "chat-ada-quiz"
+          "label": "stuck on something",
+          "next": "chat-ada-mood-stuck"
         },
         {
-          "label": "can you remind me of something?",
-          "next": "chat-ada-remind"
+          "label": "chaotic. send help",
+          "next": "chat-ada-mood-chaos"
         },
         {
-          "label": "what's in your flask?",
-          "next": "chat-ada-flask"
+          "label": "just here to chat",
+          "next": "chat-ada-talk"
         },
         {
           "label": "i have to go",
@@ -357,7 +400,7 @@
           "next": "chat-ada-gummy-end"
         }
       ],
-      "position": 37
+      "position": 49
     },
     {
       "id": "chat-ada-gummy-50",
@@ -377,7 +420,7 @@
           "next": "chat-ada-gummy-t2"
         }
       ],
-      "position": 33
+      "position": 45
     },
     {
       "id": "chat-ada-gummy-about",
@@ -397,7 +440,7 @@
           "next": "chat-ada-gummy-t2"
         }
       ],
-      "position": 34
+      "position": 46
     },
     {
       "id": "chat-ada-gummy-end",
@@ -408,7 +451,7 @@
       "text": "ok i have 25 gummy bears left and a stomachache\n\nthank you for helping with the science. i owe you one. (an imaginary bear)",
       "pose": "greet",
       "replies": [],
-      "position": 38
+      "position": 50
     },
     {
       "id": "chat-ada-gummy-hint",
@@ -428,7 +471,7 @@
           "next": "chat-ada-gummy-25"
         }
       ],
-      "position": 36
+      "position": 48
     },
     {
       "id": "chat-ada-gummy-lol",
@@ -448,7 +491,7 @@
           "next": "chat-ada-gummy-about"
         }
       ],
-      "position": 32
+      "position": 44
     },
     {
       "id": "chat-ada-gummy-q",
@@ -472,7 +515,7 @@
           "next": "chat-ada-gummy-lol"
         }
       ],
-      "position": 31
+      "position": 43
     },
     {
       "id": "chat-ada-gummy-share",
@@ -492,7 +535,7 @@
           "next": "chat-ada-gummy-q"
         }
       ],
-      "position": 30
+      "position": 42
     },
     {
       "id": "chat-ada-gummy-t2",
@@ -512,7 +555,27 @@
           "next": "chat-ada-gummy-hint"
         }
       ],
-      "position": 35
+      "position": 47
+    },
+    {
+      "id": "chat-ada-hal",
+      "npc_id": "npc-ada",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "hal?? ok hal is the calmest person i know. he names rocks. there's one called tuesday and i respect it so much\n\nhe says i'm loud. i say he's a great listener. we're a team~",
+      "pose": "cheer",
+      "replies": [
+        {
+          "label": "what's tuesday?",
+          "next": "chat-ada-tuesday"
+        },
+        {
+          "label": "you two are funny",
+          "next": "chat-ada-talk"
+        }
+      ],
+      "position": 20
     },
     {
       "id": "chat-ada-half-life",
@@ -557,7 +620,7 @@
           "next": "chat-ada-hello-end"
         }
       ],
-      "position": 21
+      "position": 33
     },
     {
       "id": "chat-ada-hello-end",
@@ -568,7 +631,7 @@
       "text": "ok i have to go. sparkle's doing the noise again\n\nit was SO nice to meet you. come say hi any time. i'll be here. probably covered in glitter~",
       "pose": "greet",
       "replies": [],
-      "position": 22
+      "position": 34
     },
     {
       "id": "chat-ada-hello-flask",
@@ -588,7 +651,7 @@
           "next": "chat-ada-hello-q"
         }
       ],
-      "position": 14
+      "position": 26
     },
     {
       "id": "chat-ada-hello-hal",
@@ -608,7 +671,7 @@
           "next": "chat-ada-hello-q"
         }
       ],
-      "position": 15
+      "position": 27
     },
     {
       "id": "chat-ada-hello-q",
@@ -632,7 +695,7 @@
           "next": "chat-ada-hello-trick"
         }
       ],
-      "position": 16
+      "position": 28
     },
     {
       "id": "chat-ada-hello-right",
@@ -652,7 +715,7 @@
           "next": "chat-ada-hello-spooky"
         }
       ],
-      "position": 17
+      "position": 29
     },
     {
       "id": "chat-ada-hello-spooky",
@@ -672,7 +735,7 @@
           "next": "chat-ada-hello-end"
         }
       ],
-      "position": 20
+      "position": 32
     },
     {
       "id": "chat-ada-hello-trick",
@@ -692,7 +755,7 @@
           "next": "chat-ada-hello-spooky"
         }
       ],
-      "position": 19
+      "position": 31
     },
     {
       "id": "chat-ada-hello-wrong",
@@ -712,7 +775,7 @@
           "next": "chat-ada-hello-spooky"
         }
       ],
-      "position": 18
+      "position": 30
     },
     {
       "id": "chat-ada-menu",
@@ -723,10 +786,6 @@
       "text": "ooh ok. what else?\n\ni've got time. a little. i have a snack appointment at 3",
       "pose": "idle",
       "replies": [
-        {
-          "label": "what are you doing?",
-          "next": "chat-ada-upto"
-        },
         {
           "label": "what should i do next?",
           "next": "chat-ada-next"
@@ -740,8 +799,8 @@
           "next": "chat-ada-remind"
         },
         {
-          "label": "what's in your flask?",
-          "next": "chat-ada-flask"
+          "label": "let's just chat",
+          "next": "chat-ada-talk"
         },
         {
           "label": "i have to go",
@@ -749,6 +808,129 @@
         }
       ],
       "position": 1
+    },
+    {
+      "id": "chat-ada-mood-chaos",
+      "npc_id": "npc-ada",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "same. SAME. the flask is humming, one bow is green and i have three snacks and no plan\n\nok. chaos buddies. what do we do with it",
+      "pose": "cheer",
+      "replies": [
+        {
+          "label": "who's making the noise?",
+          "next": "chat-ada-flask"
+        },
+        {
+          "label": "calm me down",
+          "next": "chat-ada-calm"
+        },
+        {
+          "label": "let's learn something",
+          "next": "chat-ada-remind"
+        }
+      ],
+      "position": 16
+    },
+    {
+      "id": "chat-ada-mood-great",
+      "npc_id": "npc-ada",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "ooh yay. good days are rare and precious. like a flask that glows on purpose\n\nok so you're warm. warm is the best time to do a thing. what thing",
+      "pose": "cheer",
+      "replies": [
+        {
+          "label": "quiz me",
+          "next": "chat-ada-quiz"
+        },
+        {
+          "label": "the next lesson",
+          "next": "chat-ada-next"
+        },
+        {
+          "label": "tell me something fun",
+          "next": "chat-ada-secret"
+        }
+      ],
+      "position": 13
+    },
+    {
+      "id": "chat-ada-mood-stuck",
+      "npc_id": "npc-ada",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "ooh. stuck. ok stuck is actually good news. it means your brain found the edge of something\n\nwhat's it about",
+      "pose": "think",
+      "replies": [
+        {
+          "label": "decay",
+          "next": "chat-ada-decay"
+        },
+        {
+          "label": "half-life",
+          "next": "chat-ada-half-life"
+        },
+        {
+          "label": "alpha, beta, gamma",
+          "next": "chat-ada-abg"
+        },
+        {
+          "label": "honestly all of it",
+          "next": "chat-ada-remind"
+        }
+      ],
+      "position": 15
+    },
+    {
+      "id": "chat-ada-mood-tired",
+      "npc_id": "npc-ada",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "aww. ok. tired is allowed. tired is real and i respect it\n\nwe can do one tiny thing, or no thing. no thing counts. i've decided",
+      "pose": "sorry",
+      "replies": [
+        {
+          "label": "one tiny thing",
+          "next": "chat-ada-remind"
+        },
+        {
+          "label": "can we just talk",
+          "next": "chat-ada-talk"
+        },
+        {
+          "label": "i'll rest. bye",
+          "next": "chat-ada-bye"
+        }
+      ],
+      "position": 14
+    },
+    {
+      "id": "chat-ada-natural",
+      "npc_id": "npc-ada",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "ok this one's my favourite. radioactivity is natural\n\nrocks and soil, the air, space, even you. it was all here way before people~\n\nand 'radioactive' doesn't automatically mean 'dangerous'. it depends on what kind, how much, and how it reaches you",
+      "pose": "explain",
+      "replies": [
+        {
+          "label": "Open it in AtomDex",
+          "action": {
+            "screen": "entry",
+            "id": "background-radiation"
+          }
+        },
+        {
+          "label": "ok thanks",
+          "next": "chat-ada-menu"
+        }
+      ],
+      "position": 24
     },
     {
       "id": "chat-ada-next",
@@ -813,6 +995,14 @@
           "next": "chat-ada-decay"
         },
         {
+          "label": "alpha, beta, gamma",
+          "next": "chat-ada-abg"
+        },
+        {
+          "label": "natural radioactivity",
+          "next": "chat-ada-natural"
+        },
+        {
           "label": "nvm",
           "next": "chat-ada-menu"
         }
@@ -840,6 +1030,106 @@
       "position": 11
     },
     {
+      "id": "chat-ada-secret",
+      "npc_id": "npc-ada",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "ok come closer. (you can't. it's a phone) (i'm leaning in anyway)\n\ni talk to gary. he's my beaker. he doesn't answer but he's a really good listener\n\nwhen i'm stuck i explain it to him out loud and it just. fixes itself. somehow~\n\nyou should try it. pick something. explain it to a mug",
+      "pose": "proud",
+      "replies": [
+        {
+          "label": "love",
+          "type": "react",
+          "next": "chat-ada-talk"
+        },
+        {
+          "label": "haha",
+          "type": "react",
+          "next": "chat-ada-talk"
+        }
+      ],
+      "position": 19
+    },
+    {
+      "id": "chat-ada-snack",
+      "npc_id": "npc-ada",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "my snack appointment?? it's at 3. every day. it's the most important meeting i have\n\ni pack a surprise and forget what it is, so at 3 it's a GIFT. from past me. past me is so nice\n\nokay what's yours. don't answer. i just want you to think about it",
+      "pose": "cheer",
+      "replies": [
+        {
+          "label": "ok now i'm hungry",
+          "next": "chat-ada-talk"
+        },
+        {
+          "label": "past you is a legend",
+          "next": "chat-ada-talk"
+        }
+      ],
+      "position": 22
+    },
+    {
+      "id": "chat-ada-talk",
+      "npc_id": "npc-ada",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "ooh ok, chatting. my favourite\n\npick a thing. or don't. we can just exist for a bit hehe",
+      "pose": "greet",
+      "replies": [
+        {
+          "label": "what are you doing?",
+          "next": "chat-ada-upto"
+        },
+        {
+          "label": "what's in your flask?",
+          "next": "chat-ada-flask"
+        },
+        {
+          "label": "tell me a secret",
+          "next": "chat-ada-secret"
+        },
+        {
+          "label": "what's Hal like?",
+          "next": "chat-ada-hal"
+        },
+        {
+          "label": "what's the snack appointment?",
+          "next": "chat-ada-snack"
+        },
+        {
+          "label": "ok something else",
+          "next": "chat-ada-menu"
+        }
+      ],
+      "position": 18
+    },
+    {
+      "id": "chat-ada-tuesday",
+      "npc_id": "npc-ada",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "a flat rock. that's all i know. that's ALL he'll say\n\ni asked him one question and he looked at me for eleven seconds and then said 'no.' very gently\n\ni love him. i don't understand him. i love him",
+      "pose": "sorry",
+      "replies": [
+        {
+          "label": "haha",
+          "type": "react",
+          "next": "chat-ada-talk"
+        },
+        {
+          "label": "love",
+          "type": "react",
+          "next": "chat-ada-talk"
+        }
+      ],
+      "position": 21
+    },
+    {
       "id": "chat-ada-unit-cry",
       "npc_id": "npc-ada",
       "kind": "reply",
@@ -857,7 +1147,7 @@
           "next": "chat-ada-unit-fav"
         }
       ],
-      "position": 40
+      "position": 52
     },
     {
       "id": "chat-ada-unit-end",
@@ -868,7 +1158,7 @@
       "text": "ok i have to go lie on the lab floor and feel things\n\ncome back any time. i mean it. even just to say hi\n\nbye bye, scientist~",
       "pose": "greet",
       "replies": [],
-      "position": 43
+      "position": 55
     },
     {
       "id": "chat-ada-unit-fav",
@@ -888,7 +1178,7 @@
           "next": "chat-ada-unit-end"
         }
       ],
-      "position": 41
+      "position": 53
     },
     {
       "id": "chat-ada-unit-thanks",
@@ -910,7 +1200,7 @@
           "next": "chat-ada-unit-end"
         }
       ],
-      "position": 42
+      "position": 54
     },
     {
       "id": "chat-ada-up-banana",
@@ -934,7 +1224,7 @@
           "next": "chat-ada-banana-safe"
         }
       ],
-      "position": 23
+      "position": 35
     },
     {
       "id": "chat-ada-up-gummy",
@@ -954,7 +1244,7 @@
           "next": "chat-ada-gummy-share"
         }
       ],
-      "position": 29
+      "position": 41
     },
     {
       "id": "chat-ada-up-hello",
@@ -978,7 +1268,7 @@
           "next": "chat-ada-hello-hal"
         }
       ],
-      "position": 13
+      "position": 25
     },
     {
       "id": "chat-ada-up-unit",
@@ -1002,7 +1292,7 @@
           "next": "chat-ada-unit-fav"
         }
       ],
-      "position": 39
+      "position": 51
     },
     {
       "id": "chat-ada-up-welcome-back",
@@ -1026,7 +1316,7 @@
           "next": "chat-ada-back-sorry"
         }
       ],
-      "position": 44
+      "position": 56
     },
     {
       "id": "chat-ada-upto",
@@ -1070,7 +1360,7 @@
           "next": "chat-hal-back-ready"
         }
       ],
-      "position": 40
+      "position": 48
     },
     {
       "id": "chat-hal-back-miss",
@@ -1090,7 +1380,7 @@
           "next": "chat-hal-back-ready"
         }
       ],
-      "position": 39
+      "position": 47
     },
     {
       "id": "chat-hal-back-ready",
@@ -1119,7 +1409,7 @@
           "next": "chat-hal-bye"
         }
       ],
-      "position": 42
+      "position": 50
     },
     {
       "id": "chat-hal-back-rocks",
@@ -1139,7 +1429,7 @@
           "next": "chat-hal-back-ready"
         }
       ],
-      "position": 41
+      "position": 49
     },
     {
       "id": "chat-hal-bye",
@@ -1153,36 +1443,102 @@
       "position": 13
     },
     {
+      "id": "chat-hal-doris",
+      "npc_id": "npc-hal",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "Doris is the rock I was weighing when you wrote.\n\nTwo hundred and fourteen grams. I have weighed her eleven times today, and she has been two hundred and fourteen grams every time.\n\nI find that deeply reassuring.",
+      "pose": "explain",
+      "replies": [
+        {
+          "label": "and Tuesday?",
+          "next": "chat-hal-tuesday"
+        },
+        {
+          "label": "back to the list",
+          "next": "chat-hal-menu"
+        }
+      ],
+      "position": 16
+    },
+    {
+      "id": "chat-hal-electron",
+      "npc_id": "npc-hal",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "The electron.\n\nIt carries a negative charge, and it lives outside the nucleus.\n\nIt is not a tiny planet, whatever the old pictures show. It is somewhere in a fuzzy region around the nucleus, a cloud. I find that restful. Not everything needs an address.",
+      "pose": "explain",
+      "replies": [
+        {
+          "label": "Open it in AtomDex",
+          "action": {
+            "screen": "entry",
+            "id": "electron"
+          }
+        },
+        {
+          "label": "thanks, back",
+          "next": "chat-hal-menu"
+        }
+      ],
+      "position": 21
+    },
+    {
+      "id": "chat-hal-element",
+      "npc_id": "npc-hal",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "What makes an element.\n\nThe number of protons. Six protons is always carbon. Seven is always nitrogen. Eight is always oxygen.\n\nThe neutrons and the electrons do not decide it. Only the protons. I find that tidy. My rocks have names too, but theirs are less reliable.",
+      "pose": "explain",
+      "replies": [
+        {
+          "label": "Open it in AtomDex",
+          "action": {
+            "screen": "entry",
+            "id": "atomic-number"
+          }
+        },
+        {
+          "label": "thanks, back",
+          "next": "chat-hal-menu"
+        }
+      ],
+      "position": 20
+    },
+    {
       "id": "chat-hal-greeting",
       "npc_id": "npc-hal",
       "kind": "greeting",
       "trigger": null,
       "title": "Chat",
-      "text": "Ah. Hello.\n\nI was in the middle of weighing a rock, but it will keep. Rocks are good at that.\n\nWhat can I do for you?",
+      "text": "Ah. Hello.\n\nI was in the middle of weighing a rock, but it will keep. Rocks are good at that.\n\nI can do four things. One: tell you what is next. Two: remind you of something. Three: ask you a question. Four: tell you about a rock.\n\nOr five. Nothing. Nothing is underrated.",
       "pose": "greet",
       "replies": [
         {
-          "label": "what are you up to?",
-          "next": "chat-hal-upto"
-        },
-        {
-          "label": "what should I do next?",
+          "label": "one, please",
           "next": "chat-hal-next"
         },
         {
-          "label": "quiz me",
-          "next": "chat-hal-quiz"
-        },
-        {
-          "label": "can you remind me of something?",
+          "label": "two, please",
           "next": "chat-hal-remind"
         },
         {
-          "label": "what's in your satchel?",
-          "next": "chat-hal-satchel"
+          "label": "three, please",
+          "next": "chat-hal-quiz"
         },
         {
-          "label": "ok bye",
+          "label": "four, please",
+          "next": "chat-hal-rocks"
+        },
+        {
+          "label": "five",
+          "next": "chat-hal-nothing"
+        },
+        {
+          "label": "goodbye, Hal",
           "next": "chat-hal-bye"
         }
       ],
@@ -1208,7 +1564,7 @@
           "next": "chat-hal-hello-end"
         }
       ],
-      "position": 18
+      "position": 26
     },
     {
       "id": "chat-hal-hello-end",
@@ -1219,7 +1575,7 @@
       "text": "That is all for today.\n\nI must go and put a rock back where it lives.\n\nSlowly, then. Until the next lesson.",
       "pose": "greet",
       "replies": [],
-      "position": 19
+      "position": 27
     },
     {
       "id": "chat-hal-hello-fingers",
@@ -1239,7 +1595,7 @@
           "next": "chat-hal-hello-ball"
         }
       ],
-      "position": 16
+      "position": 24
     },
     {
       "id": "chat-hal-hello-thanks",
@@ -1259,7 +1615,7 @@
           "next": "chat-hal-hello-ball"
         }
       ],
-      "position": 15
+      "position": 23
     },
     {
       "id": "chat-hal-hello-who",
@@ -1279,7 +1635,7 @@
           "next": "chat-hal-hello-end"
         }
       ],
-      "position": 17
+      "position": 25
     },
     {
       "id": "chat-hal-isotope",
@@ -1310,31 +1666,31 @@
       "kind": "reply",
       "trigger": null,
       "title": null,
-      "text": "Hm. Yes?\n\nTake your time. I am not going anywhere, and neither is the rock.",
+      "text": "Hm. Yes?\n\nThe list, then. One: what is next. Two: a reminder. Three: a question. Four: a rock. Five: nothing.\n\nTake your time. I am not going anywhere, and neither is the rock.",
       "pose": "idle",
       "replies": [
         {
-          "label": "what are you up to?",
-          "next": "chat-hal-upto"
-        },
-        {
-          "label": "what should I do next?",
+          "label": "one, please",
           "next": "chat-hal-next"
         },
         {
-          "label": "quiz me",
-          "next": "chat-hal-quiz"
-        },
-        {
-          "label": "can you remind me of something?",
+          "label": "two, please",
           "next": "chat-hal-remind"
         },
         {
-          "label": "what's in your satchel?",
-          "next": "chat-hal-satchel"
+          "label": "three, please",
+          "next": "chat-hal-quiz"
         },
         {
-          "label": "ok bye",
+          "label": "four, please",
+          "next": "chat-hal-rocks"
+        },
+        {
+          "label": "five",
+          "next": "chat-hal-nothing"
+        },
+        {
+          "label": "goodbye, Hal",
           "next": "chat-hal-bye"
         }
       ],
@@ -1405,6 +1761,48 @@
       "position": 2
     },
     {
+      "id": "chat-hal-nothing",
+      "npc_id": "npc-hal",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "Five. A bold choice.\n\nVery well. We will do nothing, together.\n\nTen seconds. Still doing it. Twenty. I am enjoying this more than I expected.\n\nThank you. That was restful. Thirty-one seconds. I counted.",
+      "pose": "idle",
+      "replies": [
+        {
+          "label": "that was weirdly nice",
+          "next": "chat-hal-menu"
+        },
+        {
+          "label": "again?",
+          "next": "chat-hal-nothing2"
+        }
+      ],
+      "position": 18
+    },
+    {
+      "id": "chat-hal-nothing2",
+      "npc_id": "npc-hal",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "Again. Certainly.\n\nI will not count this time. Counting would be doing something.\n\nForty seconds. I counted. I am sorry. I could not help it.",
+      "pose": "proud",
+      "replies": [
+        {
+          "label": "haha",
+          "type": "react",
+          "next": "chat-hal-menu"
+        },
+        {
+          "label": "love",
+          "type": "react",
+          "next": "chat-hal-menu"
+        }
+      ],
+      "position": 19
+    },
+    {
       "id": "chat-hal-nucleus",
       "npc_id": "npc-hal",
       "kind": "reply",
@@ -1445,7 +1843,7 @@
           "next": "chat-hal-pebbles-heavy"
         }
       ],
-      "position": 29
+      "position": 37
     },
     {
       "id": "chat-hal-pebbles-end",
@@ -1456,7 +1854,7 @@
       "text": "That is all I wished to say.\n\nI am going to sit with three pebbles and a very long afternoon. If I ever sort them correctly I shall let you know.\n\nIt may take a while.",
       "pose": "idle",
       "replies": [],
-      "position": 32
+      "position": 40
     },
     {
       "id": "chat-hal-pebbles-heavy",
@@ -1476,7 +1874,7 @@
           "next": "chat-hal-pebbles-unstable"
         }
       ],
-      "position": 30
+      "position": 38
     },
     {
       "id": "chat-hal-pebbles-nerdy",
@@ -1496,7 +1894,7 @@
           "next": "chat-hal-pebbles-heavy"
         }
       ],
-      "position": 28
+      "position": 36
     },
     {
       "id": "chat-hal-pebbles-unstable",
@@ -1518,7 +1916,7 @@
           "next": "chat-hal-pebbles-end"
         }
       ],
-      "position": 31
+      "position": 39
     },
     {
       "id": "chat-hal-quiz",
@@ -1544,6 +1942,26 @@
       "position": 3
     },
     {
+      "id": "chat-hal-reginald",
+      "npc_id": "npc-hal",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "Reginald.\n\nGrey, rounded, with one pale stripe. I carried him four miles this morning. He did not complain once.\n\nHe has never interrupted me. I cannot say the same for the pigeon.",
+      "pose": "proud",
+      "replies": [
+        {
+          "label": "what about Doris?",
+          "next": "chat-hal-doris"
+        },
+        {
+          "label": "back to the list",
+          "next": "chat-hal-menu"
+        }
+      ],
+      "position": 15
+    },
+    {
       "id": "chat-hal-remind",
       "npc_id": "npc-hal",
       "kind": "reply",
@@ -1561,11 +1979,55 @@
           "next": "chat-hal-isotope"
         },
         {
+          "label": "what makes an element?",
+          "next": "chat-hal-element"
+        },
+        {
+          "label": "electrons",
+          "next": "chat-hal-electron"
+        },
+        {
           "label": "never mind",
           "next": "chat-hal-menu"
         }
       ],
       "position": 4
+    },
+    {
+      "id": "chat-hal-rocks",
+      "npc_id": "npc-hal",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "Four. Excellent. I was hoping for four.\n\nI have a great many rocks, and most of them have names. Ask after one. Or ask about the satchel, or what I am doing at this moment.",
+      "pose": "think",
+      "replies": [
+        {
+          "label": "Reginald?",
+          "next": "chat-hal-reginald"
+        },
+        {
+          "label": "Doris?",
+          "next": "chat-hal-doris"
+        },
+        {
+          "label": "Tuesday?",
+          "next": "chat-hal-tuesday"
+        },
+        {
+          "label": "what's in your satchel?",
+          "next": "chat-hal-satchel"
+        },
+        {
+          "label": "what are you up to?",
+          "next": "chat-hal-upto"
+        },
+        {
+          "label": "never mind",
+          "next": "chat-hal-menu"
+        }
+      ],
+      "position": 14
     },
     {
       "id": "chat-hal-satchel",
@@ -1605,7 +2067,7 @@
           "next": "chat-hal-stadium-empty"
         }
       ],
-      "position": 24
+      "position": 32
     },
     {
       "id": "chat-hal-stadium-empty",
@@ -1627,7 +2089,7 @@
           "next": "chat-hal-stadium-end"
         }
       ],
-      "position": 25
+      "position": 33
     },
     {
       "id": "chat-hal-stadium-end",
@@ -1638,7 +2100,7 @@
       "text": "Someone is crossing the grass. I believe it is a groundskeeper.\n\nI will go. Slowly, but I will go.\n\nI am leaving the marble where it is. Think of it as yours.",
       "pose": "greet",
       "replies": [],
-      "position": 26
+      "position": 34
     },
     {
       "id": "chat-hal-stadium-go",
@@ -1662,7 +2124,7 @@
           "next": "chat-hal-stadium-empty"
         }
       ],
-      "position": 22
+      "position": 30
     },
     {
       "id": "chat-hal-stadium-small",
@@ -1682,7 +2144,7 @@
           "next": "chat-hal-stadium-empty"
         }
       ],
-      "position": 23
+      "position": 31
     },
     {
       "id": "chat-hal-stadium-why",
@@ -1702,7 +2164,7 @@
           "next": "chat-hal-stadium-go"
         }
       ],
-      "position": 21
+      "position": 29
     },
     {
       "id": "chat-hal-strange",
@@ -1725,6 +2187,28 @@
         }
       ],
       "position": 10
+    },
+    {
+      "id": "chat-hal-tuesday",
+      "npc_id": "npc-hal",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "Tuesday.\n\nI believe I said there would be no questions about Tuesday.\n\nVery well. One. Tuesday is flat. A flat rock skips beautifully across water, and I have never once dared to skip it.",
+      "pose": "greet",
+      "replies": [
+        {
+          "label": "haha",
+          "type": "react",
+          "next": "chat-hal-menu"
+        },
+        {
+          "label": "love",
+          "type": "react",
+          "next": "chat-hal-menu"
+        }
+      ],
+      "position": 17
     },
     {
       "id": "chat-hal-unit-ada",
@@ -1750,7 +2234,7 @@
           "next": "chat-hal-unit-end"
         }
       ],
-      "position": 36
+      "position": 44
     },
     {
       "id": "chat-hal-unit-end",
@@ -1761,7 +2245,7 @@
       "text": "Good. Go on.\n\nI will be here. The rocks keep me company. I think it was a good unit. I would do it again, slowly.",
       "pose": "proud",
       "replies": [],
-      "position": 37
+      "position": 45
     },
     {
       "id": "chat-hal-unit-rock",
@@ -1781,7 +2265,7 @@
           "next": "chat-hal-unit-ada"
         }
       ],
-      "position": 34
+      "position": 42
     },
     {
       "id": "chat-hal-unit-thanks",
@@ -1801,7 +2285,7 @@
           "next": "chat-hal-unit-ada"
         }
       ],
-      "position": 35
+      "position": 43
     },
     {
       "id": "chat-hal-up-hello",
@@ -1825,7 +2309,7 @@
           "next": "chat-hal-hello-who"
         }
       ],
-      "position": 14
+      "position": 22
     },
     {
       "id": "chat-hal-up-pebbles",
@@ -1845,7 +2329,7 @@
           "next": "chat-hal-pebbles-nerdy"
         }
       ],
-      "position": 27
+      "position": 35
     },
     {
       "id": "chat-hal-up-stadium",
@@ -1865,7 +2349,7 @@
           "next": "chat-hal-stadium-why"
         }
       ],
-      "position": 20
+      "position": 28
     },
     {
       "id": "chat-hal-up-unit",
@@ -1889,7 +2373,7 @@
           "next": "chat-hal-unit-ada"
         }
       ],
-      "position": 33
+      "position": 41
     },
     {
       "id": "chat-hal-up-welcome-back",
@@ -1913,7 +2397,7 @@
           "next": "chat-hal-back-rocks"
         }
       ],
-      "position": 38
+      "position": 46
     },
     {
       "id": "chat-hal-upto",

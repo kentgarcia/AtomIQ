@@ -1,6 +1,6 @@
 # Content source files: text is the master, the database is built from it
 
-**Status:** spec, not built (2026-11-22). Nothing in this document exists in code yet.
+**Status (2026-11-22):** phases 1 and 2 are built (core, default adapter, export, sync, format, migrate, chat owned by files); later phases are marked in section 14. Where this text and the code differ, the code and its tests win and this text is fixed.
 **Decided by the owner:** files are the source of truth for authored prose; the SQLite content DB stays what the app ships and reads; Content Studio is only a viewer (the owner does not use it to edit); the `verified` flag is not something the owner will maintain; **lessons, items and cards will be migrated too, in a later phase** (they began as TypeScript files, which were easy to handle, only with very long lines because they describe pages, not plain data); **translations will be one file per language that maps the id of a text to its translation** (section 11); the file extension is **`.atomiq`**.
 **Reads with:** `docs/critical/CONTENT_SQLITE_AND_STUDIO_SPEC.md` (the DB, releases, shipped ids), `docs/features/NPC_VOICE_SPEC.md` (the chat words), `scripts/lib/content-store.mjs` (`applyBatch`, the write path this spec reuses).
 
@@ -32,7 +32,7 @@ The survey is of the real master DB (131 chat nodes, 92 feed templates, 115 ency
 
 | Phase | Tables (rows) | Fit | Notes |
 |---|---|---|---|
-| 1 | *none owned yet*: core + default adapter, round trip proven on **all 28 tables** | n/a | no behaviour change; the gate for everything after |
+| 1 | *none owned yet*: core + default adapter, round trip proven on **all 27 content tables** (`content_meta` is a build artifact and never owned) | n/a | no behaviour change; the gate for everything after |
 | 2 | `chat_nodes` (131) | ideal: prose + a reply graph | the first friendly adapter; Hal, Ada, Shrodi |
 | 3 | `npcs` (7), `npc_lines` (16), `feed_templates` (92), `blog_posts` (4) + `blog_comments` (4) + `blog_references` (9) | prose + attributes; blog has typed blocks | bios currently also live in `components/npc/npc-roster.ts` (seed and fallback), see section 13 |
 | 4 | `unit_statements` (20), `scan_targets` (12), `safety_cards` (14), `map_sites` (18) and their `*_references`, `myths` (37), `mythbuster_questions` (150), `encyclopedia_entries` (115), `content_references` (58) | prose plus arrays and small objects | |
@@ -102,7 +102,7 @@ Records are separated by one blank line. Order of records in a file, and of file
 | `int`, `num` | `key: 48.84` | number |
 | `id` | `key: some-id` | string; `[A-Za-z0-9][A-Za-z0-9._/-]*` (no `:` and no `#`, so ids can sit inside a translation key, section 11.1) |
 | `json` | `key: {"a":1}` on one line when it is 100 characters or fewer, otherwise `key:` + a block of pretty JSON (2-space indent, 4-space base) | any JSON value; compared **structurally**, never as text |
-| `list` | one `- item` child line per string, in order | array of strings |
+| `list` | one `key: item` line per string, in order (a list is never null: no lines means `[]`) | array of strings |
 | `jsonl` | `key:` + one JSON value per indented line | array of values |
 
 A **null** column is written by leaving the attribute out. An **empty string** is written as `key:` with nothing after it. A NOT NULL column that is absent takes its schema default or is an error. Link tables (`blog_references`, `scan_target_references`, ...) are not records: they are written as a `list` attribute on their parent (`references: ref-a, ref-b`, or one `ref:` child per link when the link has data such as `supports`), and are rebuilt on sync.
@@ -365,7 +365,7 @@ npm scripts follow the existing `content:*`, `check:*` and `test:*` names: `cont
 2. Derive the desired rows (positions from order, scope and defaults applied).
 3. Read the DB rows of the owned tables and diff by primary key: **insert**, **update** (structural compare; JSON whitespace and timestamps are ignored, as the project already does for content hashes), **delete**, and **moved** (only `position` differs).
 4. **Drift check** against `content/source/.state.json` (committed, section 8.1). If the DB rows changed since the last sync or export, stop and say how many rows differ; `--force` overwrites the DB from the files after the dry run has listed everything that would change.
-5. Turn the diff into one `applyBatch` call across all owned tables (one transaction, one validation pass, the "no new error anywhere in the database" check, history source `sync`). Inserts first, then updates, then deletes. Nothing is written if anything fails.
+5. Turn the diff into one `applyBatch` call across all owned tables (one transaction, one validation pass, the "no new error anywhere in the database" check, history source `sync`). Order inside the batch: positions that are about to change are first parked at temporary negative values (only for tables with a UNIQUE position), then deletes (children before parents), inserts (parents before children), updates. Nothing is written if anything fails.
 6. After commit: refresh `.state.json`, then run, in parallel, the test scripts that read the touched tables (the `checksFor` map).
 
 It is a **dry run by default**: it prints every insert/update/delete with before and after, the moved count, warnings and the validation result. Deleting a **shipped id** needs `--retire "<reason>"`, exactly like `content:edit` and Studio today (the ledger is unchanged). Deletes are listed first and prominently; git is the undo.
@@ -436,7 +436,6 @@ locale: es
 chat_nodes/chat-hal-greeting#title: Charla
 chat_nodes/chat-ada-hello-q#replies[0].label: hola ada
 chat_nodes/chat-ada-hello-q#text:
-
     ok, pregunta. tengo UN núcleo inestable. solo uno. ahí sentado
 
     ¿puedes decirme el segundo exacto en que cambiará?
@@ -487,7 +486,7 @@ Decided: the extension is `.atomiq`; lessons are migrated later (phase 5), with 
 | Phase | Deliverable | Done when |
 |---|---|---|
 | 0 | this spec accepted | the owner agrees, or changes it |
-| 1 | core parser and writer, default adapter, `content:export`, T1 to T4, T6, T8, T9 | **all 28 tables round-trip**; no table is owned; no existing behaviour changed |
+| 1 | core parser and writer, default adapter, `content:export`, T1 to T4, T6, T8, T9 | **all 27 content tables round-trip**; no table is owned; no existing behaviour changed |
 | 2 | chat adapter, `SOURCE_OWNED_TABLES`, `content:sync` (+ `--check`), drift state, ownership guard, `content:edit` guard, legacy chat scripts retired, publish gate, docs | a Hal story edited as a file reaches the DB through one sync with its tests; T5, T7 pass; the old seeds cannot run |
 | 3 | npc, feed, blog adapters, retire their seeds | same, per adapter, with no change to chat |
 | 4 | the remaining tables | same |

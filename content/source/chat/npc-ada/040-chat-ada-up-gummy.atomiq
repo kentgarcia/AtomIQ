@@ -1,0 +1,113 @@
+format 1
+adapter chat 1
+npc: npc-ada
+
+node chat-ada-up-gummy
+kind: unprompted
+pose: cheer
+trigger: lessons_completed:8
+title: gummy bear half-life
+
+    ok i need your help with something very serious
+
+    i have 100 gummy bears. a whole bag. and i have a rule
+
+    every tick, i eat HALF of the ones that are left. only half. it's science~
+
+reply: ok i'm in -> chat-ada-gummy-q
+reply: can i have some? -> chat-ada-gummy-share
+
+node chat-ada-gummy-share
+kind: reply
+pose: sorry
+
+    no. they're for science. ... ok fine. one. i'm giving you one. imaginary. it's very good
+
+    ok now. serious. ready?
+
+reply: ready -> chat-ada-gummy-q
+reply: i can taste it -> chat-ada-gummy-q
+
+node chat-ada-gummy-q
+kind: reply
+pose: point
+
+    tick one. i eat half
+
+    how many bears are left?
+
+reply: 50 -> chat-ada-gummy-50
+reply: about 50 -> chat-ada-gummy-about
+reply: none, you ate them all lol -> chat-ada-gummy-lol
+
+node chat-ada-gummy-lol
+kind: reply
+pose: sorry
+
+    nooo i can't eat them ALL. that's the whole point
+
+    every tick i only eat half. there's always some left. ok try again. how many after one tick?
+
+reply: 50 -> chat-ada-gummy-50
+reply: about 50 -> chat-ada-gummy-about
+
+node chat-ada-gummy-50
+kind: reply
+pose: proud
+
+    50. yes. and with bears it's exactly 50
+
+    with real atoms it'd be about 50. a crowd follows a pattern but nobody gets exactly half. write that down~
+
+reply: ok tick two -> chat-ada-gummy-t2
+reply: 'about' is a great word -> chat-ada-gummy-t2
+
+node chat-ada-gummy-about
+kind: reply
+pose: cheer
+
+    ooh you said ABOUT. i could cry
+
+    with bears it's exactly 50. with real atoms it's only about 50. that little word is the whole trick
+
+reply: ok tick two -> chat-ada-gummy-t2
+reply: i'm a genius -> chat-ada-gummy-t2
+
+node chat-ada-gummy-t2
+kind: reply
+pose: point
+
+    tick two. half of the 50 that are left
+
+    how many bears now?
+
+reply: 25 -> chat-ada-gummy-25
+reply: idk, 20? -> chat-ada-gummy-hint
+
+node chat-ada-gummy-hint
+kind: reply
+pose: think
+
+    so close. half of 50. 50, split in two
+
+reply: 25 -> chat-ada-gummy-25
+reply: ohh 25 -> chat-ada-gummy-25
+
+node chat-ada-gummy-25
+kind: reply
+pose: cheer
+
+    25. yes. 100, then 50, then 25. every tick, half of what's left
+
+    that's a half-life. the time it takes for half to go. and then half of THAT. and then half of that again
+
+react: wow -> chat-ada-gummy-end
+react: clap -> chat-ada-gummy-end
+
+node chat-ada-gummy-end
+kind: sign_off
+pose: greet
+
+    ok i have 25 gummy bears left and a stomachache
+
+    thank you for helping with the science. i owe you one. (an imaginary bear)

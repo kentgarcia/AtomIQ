@@ -1,0 +1,32 @@
+format 1
+adapter sample 1
+owner: ada
+
+item item-one
+kind: story
+count: 3
+ratio: 0.5
+meta: {"a":1,"b":[1,2]}
+tags: x
+tags: y z
+choice: hi there -> item-two
+choice: bye
+
+    First bubble
+
+    Second bubble, with a colon: and a - dash
+
+    [[pic:tour-home]]
+
+    # not a comment
+    node item-two
+    reply: not a reply
+
+references: ref-a
+references: ref-b
+
+item item-two
+kind: reply
+count: 0
+
+      indented start and curly quotes: “hello” ‘x’

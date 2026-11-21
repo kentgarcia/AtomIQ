@@ -12,7 +12,7 @@
  *
  * Checked with the same rules as validate:content before anything is written; takes a backup first. Does not publish.
  *
- *   node --no-warnings scripts/content-migration/update-shrodi-tour-chat.mjs [--dry-run] [--overwrite] [--db path]
+ *   node --no-warnings scripts/content-migration/legacy/update-shrodi-tour-chat.mjs [--dry-run] [--overwrite] [--db path]
  */
 
 import fs from "node:fs";
@@ -21,11 +21,22 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { DatabaseSync } from "node:sqlite";
 
-import { backupBeforeScript } from "../lib/backup.mjs";
-import { validateChat } from "../lib/chat-rules.mjs";
-import { CHAT_MASCOT_ID } from "../lib/chat-vocab.mjs";
+import { backupBeforeScript } from "../../lib/backup.mjs";
+import { validateChat } from "../../lib/chat-rules.mjs";
+import { CHAT_MASCOT_ID } from "../../lib/chat-vocab.mjs";
 
-const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
+/**
+ * RETIRED (content source files, phase 2). Chat is now written in the .atomiq files under content/source/chat and built with
+ * `npm run content:sync`; this script would overwrite those words in the database and is kept only as history.
+ * Do not run it. Edit the files (docs/features/CONTENT_SOURCE_SPEC.md, docs/features/NPC_VOICE_SPEC.md).
+ */
+if (!process.argv.includes("--i-know-this-is-retired")) {
+  console.error("update-shrodi-tour-chat.mjs is retired: chat lives in content/source/chat and is built by `npm run content:sync`.");
+  process.exit(1);
+}
+
+
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..", "..");
 const args = process.argv.slice(2);
 const dryRun = args.includes("--dry-run");
 const overwrite = args.includes("--overwrite");

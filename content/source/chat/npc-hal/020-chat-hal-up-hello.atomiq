@@ -1,0 +1,81 @@
+format 1
+adapter chat 1
+npc: npc-hal
+
+node chat-hal-up-hello
+kind: unprompted
+pose: greet
+trigger: lessons_completed:1
+title: A small hello
+
+    Hello. This is Hal.
+
+    I am told this is how one begins a message to a person. Forgive me if I do it wrong. I type with two fingers, and slowly.
+
+    I saw that you finished your first lesson. I wanted to say: well done. Truly. Most people never look closely at the air. You did.
+
+reply: thanks, Hal -> chat-hal-hello-thanks
+reply: you typed all that with two fingers?? -> chat-hal-hello-fingers
+reply: who are you again? -> chat-hal-hello-who
+
+node chat-hal-hello-thanks
+kind: reply
+pose: proud
+
+    You are welcome.
+
+    I think it was the right thing to say. I rehearsed it.
+
+    Twice. In the garden.
+
+reply: aw, that's sweet -> chat-hal-hello-end
+reply: tell me something about atoms -> chat-hal-hello-ball
+
+node chat-hal-hello-fingers
+kind: reply
+pose: think
+
+    Eleven minutes. I counted.
+
+    The longest word was 'forgive'. It fought me.
+
+    I could use the other eight fingers. I am afraid they would start having opinions.
+
+reply: hahaha ok Hal -> chat-hal-hello-end
+reply: ok so tell me something about atoms -> chat-hal-hello-ball
+
+node chat-hal-hello-who
+kind: reply
+pose: explain
+
+    Fair. Fair.
+
+    I am Hal. I teach the atom: what is inside it, and why that matters. I keep rocks. I hold few opinions, but I have several about air.
+
+    Air, for instance, is matter. It can be weighed. A pumped-up ball is heavier than a flat one. Try it.
+
+reply: no way, air weighs something? -> chat-hal-hello-ball
+reply: ok cool -> chat-hal-hello-end
+
+node chat-hal-hello-ball
+kind: reply
+pose: proud
+
+    Yes. Really.
+
+    The air inside is made of atoms, and atoms are matter, and matter has mass. It is not much. But it is not nothing.
+
+    That is your whole first lesson, in one ball. You had it already. You only needed a ball.
+
+react: wow -> chat-hal-hello-end
+react: clap -> chat-hal-hello-end
+
+node chat-hal-hello-end
+kind: sign_off
+pose: greet
+
+    That is all for today.
+
+    I must go and put a rock back where it lives.
+
+    Slowly, then. Until the next lesson.

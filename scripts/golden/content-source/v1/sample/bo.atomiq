@@ -1,0 +1,11 @@
+format 1
+adapter sample 1
+owner: bo
+
+item item-three
+kind: story
+count: -2
+ratio: 1e+21
+meta: []
+
+    x

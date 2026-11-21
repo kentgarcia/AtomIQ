@@ -31,6 +31,13 @@ const lib = (name) => import(pathToFileURL(path.join(__dirname, "lib", name)).hr
   const { syncContent } = await lib("releases.mjs");
   const paths = makePaths(path.resolve(__dirname, ".."));
   syncContent(paths, (m) => console.log(`[sync-content] ${m}`));
+  // Files own some tables (content/source): say so, never fail a start or an install over it.
+  try {
+    const { checkSync } = await lib("content-source/sync.mjs");
+    checkSync({ paths, log: (m) => console.log(`[sync-content] ${m}`), err: (m) => console.warn(`[sync-content] warning: ${m}`) });
+  } catch (e) {
+    console.warn(`[sync-content] warning: could not compare the source files with the database: ${e.message}`);
+  }
 })().catch((err) => {
   console.error(`[sync-content] ${err.message}`);
   process.exit(1);

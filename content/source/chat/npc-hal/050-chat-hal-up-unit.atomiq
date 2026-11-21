@@ -1,0 +1,63 @@
+format 1
+adapter chat 1
+npc: npc-hal
+
+node chat-hal-up-unit
+kind: unprompted
+pose: proud
+trigger: unit_complete:inside-the-atom
+title: Inside the Atom: done
+
+    You finished the unit.
+
+    I was not sure how to say what I wanted to say, so I wrote it on a rock. Then I could not carry the rock. So here is the short version.
+
+    You can say what is inside an atom, and why the number of protons matters so much. That is a real thing to be able to say.
+
+reply: thank you, Hal. really -> chat-hal-unit-thanks
+reply: wait, you wrote it on a ROCK -> chat-hal-unit-rock
+reply: so what's next? -> chat-hal-unit-ada
+
+node chat-hal-unit-rock
+kind: reply
+pose: greet
+
+    A large one. I named it Gerald.
+
+    It said 'Well done' on one side and, on the other, 'Sorry about the rock.'
+
+reply: that's the best thing ever -> chat-hal-unit-thanks
+reply: ok but what's next -> chat-hal-unit-ada
+
+node chat-hal-unit-thanks
+kind: reply
+pose: proud
+
+    You are welcome. And thank you for being a patient learner. I am a patient teacher. It is a good match.
+
+    Now. I should warn you about something.
+
+reply: uh oh -> chat-hal-unit-ada
+reply: what is it -> chat-hal-unit-ada
+
+node chat-hal-unit-ada
+kind: reply
+pose: point
+
+    The next unit is Ada's. Radioactivity. Atoms that change.
+
+    She is... a great deal. She says 'hehe' aloud. She has named her flask. She has never once whispered.
+
+    She is also the best at what she does, and she will be kind to you. Go and meet her.
+
+link: Take me there => next-lesson
+reply: ok I'm ready -> chat-hal-unit-end
+reply: she sounds amazing -> chat-hal-unit-end
+
+node chat-hal-unit-end
+kind: sign_off
+pose: proud
+
+    Good. Go on.
+
+    I will be here. The rocks keep me company. I think it was a good unit. I would do it again, slowly.

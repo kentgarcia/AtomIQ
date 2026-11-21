@@ -112,7 +112,7 @@ const CONTENT_DB_PREV_NAME = "content.prev.db";
  * The same value is stamped into the bundled database's `content_meta` table,
  * so a device always compares the version of the data it actually holds.
  */
-export const CONTENT_DB_VERSION = "0.0.0+draft.741dda";
+export const CONTENT_DB_VERSION = "0.0.0+draft.876a04";
 
 /**
  * Shape of the content this build's repository reads (columns, step types,

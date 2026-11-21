@@ -1,0 +1,71 @@
+format 1
+adapter chat 1
+npc: npc-ada
+
+node chat-ada-up-welcome-back
+kind: unprompted
+pose: cheer
+trigger: welcome_back
+title: welcome back
+
+    YOU'RE BACK
+
+    it's been so quiet. sparkle was sad. i talked to a beaker. it wasn't the same
+
+    hi hi hi hi~
+
+reply: aw, did you miss me? -> chat-ada-back-miss
+reply: lol hi ada -> chat-ada-back-hi
+reply: sorry i was away -> chat-ada-back-sorry
+
+node chat-ada-back-miss
+kind: reply
+pose: sorry
+
+    sooo much. the beaker is a bad listener
+
+    it just sits there. it does not say 'oh no' or 'wait really'. you say 'oh no' so nicely
+
+reply: aw ada -> chat-ada-back-ready
+reply: the beaker has a name? -> chat-ada-back-beaker
+
+node chat-ada-back-beaker
+kind: reply
+pose: greet
+
+    his name is Gary. he's very tall and he doesn't say much. i love him. don't tell sparkle~
+
+reply: hahaha ok -> chat-ada-back-ready
+reply: hi Gary -> chat-ada-back-ready
+
+node chat-ada-back-hi
+kind: reply
+pose: cheer
+
+    hiii. you're here you're here
+
+    everything's right where you left it. the atoms waited. i told them to. they were very good
+
+reply: ok, let's go -> chat-ada-back-ready
+reply: need a warm-up first -> chat-ada-back-ready
+
+node chat-ada-back-sorry
+kind: reply
+pose: proud
+
+    no no no don't be sorry. life happens
+
+    you're here now, that's the only thing that counts. and i saved your seat~ (it's a stool. it's wobbly. but it's yours)
+
+reply: thanks ada -> chat-ada-back-ready
+reply: ok let's go -> chat-ada-back-ready
+
+node chat-ada-back-ready
+kind: reply
+pose: point
+
+    so~ wanna pick up where you stopped?
+
+link: Take me there => next-lesson
+link: A quick round first => mythbuster radioactivity
+reply: not today -> chat-ada-bye

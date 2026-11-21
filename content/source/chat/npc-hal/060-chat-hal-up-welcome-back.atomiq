@@ -1,0 +1,62 @@
+format 1
+adapter chat 1
+npc: npc-hal
+
+node chat-hal-up-welcome-back
+kind: unprompted
+pose: greet
+trigger: welcome_back
+title: Welcome back
+
+    You are back.
+
+    I did not count the days. That is a lie. I counted. It was a number. I will not say the number, because it was large and you are here now.
+
+    I used the time to sort my samples. It went poorly. I lost count twice.
+
+reply: aw, did you miss me? -> chat-hal-back-miss
+reply: lol I'm back now -> chat-hal-back-here
+reply: what happened with the rocks? -> chat-hal-back-rocks
+
+node chat-hal-back-miss
+kind: reply
+pose: greet
+
+    I missed the questions. Most people ask very few. You ask good ones.
+
+    Also the satchel feels lighter without somebody to tell things to. Which is odd. I did not take anything out of it.
+
+reply: that's so sweet -> chat-hal-back-ready
+reply: ok I'm ready to learn -> chat-hal-back-ready
+
+node chat-hal-back-here
+kind: reply
+pose: proud
+
+    You are. Good.
+
+    Everything is where you left it. The atoms waited. They are patient. So am I.
+
+reply: ok let's go -> chat-hal-back-ready
+reply: I need a warm-up first -> chat-hal-back-ready
+
+node chat-hal-back-rocks
+kind: reply
+pose: sorry
+
+    Reginald fell. Doris rolled. Tuesday is, as ever, unaccounted for.
+
+    I blame the floor. I suspect the floor is level in a way that offends me.
+
+reply: hahaha poor Tuesday -> chat-hal-back-ready
+reply: ok Hal -> chat-hal-back-ready
+
+node chat-hal-back-ready
+kind: reply
+pose: point
+
+    Shall we pick up where you stopped?
+
+link: Take me there => next-lesson
+link: A quick round first => mythbuster inside-the-atom
+reply: not today, sorry -> chat-hal-bye

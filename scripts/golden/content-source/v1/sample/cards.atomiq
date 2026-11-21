@@ -1,0 +1,47 @@
+format 1
+adapter sample 1
+
+card half-life c01
+title: Why?
+
+summary:
+    A short summary.
+
+    With a second paragraph.
+
+data:
+    {
+      "type": "choice",
+      "options": [
+        "alpha",
+        "beta",
+        "gamma"
+      ],
+      "answer": 1,
+      "scene": {
+        "height": 40,
+        "shapes": [
+          {
+            "t": "circle",
+            "x": 10,
+            "y": 20,
+            "r": 4
+          },
+          {
+            "t": "text",
+            "x": 5,
+            "y": 5,
+            "text": "hi"
+          }
+        ]
+      }
+    }
+
+log:
+    {"a":1}
+    {"b":"two"}
+
+card half-life c02
+summary:
+data: {}
+level: 2

@@ -25,17 +25,16 @@
  * Flags: --apply, --no-verify (skip the tests), --full (print every change), --note "text".
  * Edits stay drafts until published. Exit code 1 on a validation failure or a failed test.
  */
-import { spawn } from "node:child_process";
 import fs from "node:fs";
-import os from "node:os";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
-import { DatabaseSync } from "node:sqlite";
 
 import { backupUnlessIdentical, studioIsRunning } from "./lib/backup.mjs";
 import { checksFor } from "./lib/content-checks.mjs";
 import { makePaths } from "./lib/content-paths.mjs";
-import { createStore, openHistory, StoreError } from "./lib/content-store.mjs";
+import { applyBatchToMaster, dryRunBatch, printFailure, printReport, short, verifyChecks } from "./lib/content-batch-run.mjs";
+import { StoreError } from "./lib/content-store.mjs";
+import { ownedTables } from "./lib/content-source/owned.mjs";
 import { hydrateRow, ident, listContentTables, openDb, tableInfo } from "./lib/content-tables.mjs";
 
 const paths = makePaths();
@@ -49,12 +48,6 @@ const options = (name) => argv.flatMap((a, i) => (a === name ? [argv[i + 1]] : [
 const fail = (message, code = 1) => {
   console.error(message);
   process.exit(code);
-};
-
-const short = (v, n = 70) => {
-  const t = typeof v === "string" ? v : JSON.stringify(v);
-  const flat = String(t ?? "null").replace(/\s+/g, " ");
-  return JSON.stringify(flat.length > n ? `${flat.slice(0, n - 1)}…` : flat);
 };
 
 // ---------------------------------------------------------------------------
@@ -187,97 +180,23 @@ async function loadPatch(file) {
   return { ops, note: (Array.isArray(value) ? null : value.note) ?? null };
 }
 
-/** Run the batch against `db` (a throwaway copy or the real master). */
-function runOn(db, historyFile, batchPaths, ops) {
-  const history = openHistory(historyFile);
-  try {
-    return createStore({ db, history, paths: batchPaths }).applyBatch({ ops, source: "cli" });
-  } finally {
-    history.close();
-  }
-}
-
-/** The whole patch on a copy of the master: nothing real is touched. */
-function dryRun(ops) {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "atomiq-edit-"));
-  try {
-    const master = path.join(dir, "content.db");
-    const src = new DatabaseSync(paths.master, { readOnly: true });
-    try {
-      src.exec(`VACUUM INTO '${master.replace(/'/g, "''")}'`);
-    } finally {
-      src.close();
-    }
-    const retiredIds = path.join(dir, "retired-ids.json");
-    if (fs.existsSync(paths.retiredIds)) fs.copyFileSync(paths.retiredIds, retiredIds);
-    const db = openDb(master);
-    try {
-      return runOn(db, path.join(dir, "history.db"), { ...paths, master, retiredIds }, ops);
-    } finally {
-      db.close();
-    }
-  } finally {
-    fs.rmSync(dir, { recursive: true, force: true });
-  }
-}
-
-function printFailure(err) {
-  console.error(`✗ ${err.message}`);
-  for (const e of err.errors ?? []) console.error(`  - ${e.table} ${e.id} :: ${e.field} :: ${e.message}`);
-}
-
-function printReport(result) {
-  const lines = result.changes.map((c) => {
-    const where = `${c.table}[${c.pk.join(",")}]`;
-    if (c.op === "update") {
-      const f = Object.entries(c.fields).map(([k, [b, a]]) => `${k}: ${short(b)} → ${short(a)}`);
-      return `  update ${where}  ${f.join("; ")}`;
-    }
-    if (c.op === "insert") return `  insert ${where}  ${Object.keys(c.values).length} field(s)`;
-    return `  delete ${where}`;
-  });
-  const shown = flag("--full") ? lines : lines.slice(0, 40);
-  console.log(shown.join("\n"));
-  if (shown.length < lines.length) console.log(`  … ${lines.length - shown.length} more (--full shows all)`);
-  const tables = [...new Set(result.changes.map((c) => c.table))];
-  console.log(`${result.changes.length} change(s) in ${tables.join(", ") || "no tables"}${result.skipped ? `; ${result.skipped} row(s) already had these values` : ""}`);
-  for (const w of result.warnings.slice(0, 10)) console.log(`  warning: ${w.table} ${w.id} :: ${w.field} :: ${w.message}`);
-  if (result.warnings.length > 10) console.log(`  … ${result.warnings.length - 10} more warning(s)`);
-}
-
-/** Run the test scripts that read the touched tables, all at once. */
-async function verify(scripts) {
-  if (!scripts.length) return true;
-  console.log(`Checking: ${scripts.join(", ")}`);
-  const runs = scripts.map(
-    (name) =>
-      new Promise((resolve) => {
-        const t0 = Date.now();
-        const child = spawn("npm", ["run", "-s", name], { cwd: paths.root, stdio: ["ignore", "pipe", "pipe"] });
-        let out = "";
-        child.stdout.on("data", (d) => (out += d));
-        child.stderr.on("data", (d) => (out += d));
-        child.on("close", (code) => resolve({ name, ok: code === 0, out, secs: (Date.now() - t0) / 1000 }));
-      }),
-  );
-  let ok = true;
-  for (const r of await Promise.all(runs)) {
-    console.log(`  ${r.ok ? "✓" : "✗"} ${r.name} (${r.secs.toFixed(1)}s)`);
-    if (!r.ok) {
-      ok = false;
-      console.log(r.out.trim().split("\n").slice(-25).join("\n"));
-    }
-  }
-  return ok;
-}
-
 async function patchCommand(file) {
   const { ops, note: fileNote } = await loadPatch(file);
   const note = option("--note") ?? fileNote ?? path.basename(file, path.extname(file));
 
+  // A table that source files own is edited in the files and built with content:sync; a direct write would drift the DB.
+  const owned = ownedTables();
+  const hit = ops.map((o) => o?.table).find((t) => owned.has(t));
+  if (hit) {
+    const { adapter, dir } = owned.get(hit);
+    fail(
+      `${hit} is owned by the source files (adapter "${adapter}"): edit content/source/${dir}/**/*.atomiq and run \`npm run content:sync\` (a dry run), then \`--apply\`.\nThe patch was not applied. See docs/features/CONTENT_SOURCE_SPEC.md.`,
+    );
+  }
+
   let preview;
   try {
-    preview = dryRun(ops);
+    preview = dryRunBatch(paths, ops, "cli");
   } catch (err) {
     if (err instanceof StoreError) {
       printFailure(err);
@@ -286,7 +205,7 @@ async function patchCommand(file) {
     }
     throw err;
   }
-  printReport(preview);
+  printReport(preview, { full: flag("--full") });
   if (!preview.changes.length) return console.log("Nothing to change: the database already matches this patch.");
   if (!flag("--apply")) return console.log("Dry run only. Add --apply to write it.");
 
@@ -294,18 +213,11 @@ async function patchCommand(file) {
   const backup = backupUnlessIdentical(paths, "pre-script", `edit-${note}`);
   console.log(backup.created ? `Backup: ${path.relative(paths.root, backup.file)}` : "Backup: the newest one already holds this exact content.");
 
-  const db = openDb(paths.master);
-  db.exec("PRAGMA busy_timeout = 5000");
-  let result;
-  try {
-    result = runOn(db, paths.historyDb, paths, ops);
-  } finally {
-    db.close();
-  }
+  const result = applyBatchToMaster(paths, ops, "cli");
   console.log(`Applied ${result.changes.length} change(s) (a draft: publish from Studio or \`npm run release:content -- --publish\`).`);
 
   if (flag("--no-verify")) return;
-  const ok = await verify(checksFor(new Set(result.changes.map((c) => c.table))));
+  const ok = await verifyChecks(paths, checksFor(new Set(result.changes.map((c) => c.table))));
   if (!ok) {
     console.error(`The edit is applied but a check failed. To undo it: restore ${path.relative(paths.root, backup.file)} from Studio > Backups, or revert the rows in Studio's history.`);
     process.exit(1);

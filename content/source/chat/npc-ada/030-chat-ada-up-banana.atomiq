@@ -1,0 +1,73 @@
+format 1
+adapter chat 1
+npc: npc-ada
+
+node chat-ada-up-banana
+kind: unprompted
+pose: think
+trigger: level_reached:4
+title: i'm eating a banana
+
+    ok so i'm eating a banana right now
+
+    and i just realised something that is going to ruin it for you in a good way
+
+    it's radioactive. a little. the banana. the one in my hand. hehe~
+
+reply: WHAT -> chat-ada-banana-what
+reply: lol ada no -> chat-ada-banana-no
+reply: ok but is it safe to eat -> chat-ada-banana-safe
+
+node chat-ada-banana-what
+kind: reply
+pose: cheer
+
+    yes. well. a tiny bit. a very tiny bit
+
+    bananas have potassium. and a teeny part of ALL potassium is a radioactive kind called potassium-40
+
+    it's in bananas, in nuts, in the soil. and in you~
+
+reply: wait, in ME? -> chat-ada-banana-me
+reply: is it safe?? -> chat-ada-banana-safe
+
+node chat-ada-banana-no
+kind: reply
+pose: proud
+
+    ada yes. it's real. i'd never lie about bananas
+
+    it's the potassium. a tiny share of potassium is potassium-40, which is unstable. so. banana. slightly radioactive. hehe
+
+reply: ok but is it safe? -> chat-ada-banana-safe
+reply: wait, is that in ME? -> chat-ada-banana-me
+
+node chat-ada-banana-safe
+kind: reply
+pose: proud
+
+    completely safe. the amount is soooo small it doesn't matter
+
+    your own body has the same kind of atom and you're fine. i've been eating bananas this whole time and look at me. i'm fine (the glow is the flask)
+
+reply: in ME? -> chat-ada-banana-me
+reply: ok going to eat a banana now -> chat-ada-banana-end
+
+node chat-ada-banana-me
+kind: reply
+pose: cheer
+
+    yes. everybody has some. a few potassium-40 atoms in you decay every single second
+
+    it's ok. it decays super slowly. its half-life is more than a billion years, which is why it's still around
+
+sticker: mind-blown -> chat-ada-banana-end
+sticker: banana
+
+node chat-ada-banana-end
+kind: sign_off
+pose: greet
+
+    ok ok back to my banana
+
+    now you have a fun fact for the fruit stand hehe. go tell someone. watch their face~

@@ -17,6 +17,7 @@
  * (everything else still applies). The release entry records that it was used.
  */
 import { makePaths } from "./lib/content-paths.mjs";
+import { checkSync } from "./lib/content-source/sync.mjs";
 import {
   BUMPS,
   PublishError,
@@ -65,6 +66,13 @@ try {
     if (bump && !BUMPS.includes(bump)) fail(`--bump must be one of: ${BUMPS.join(", ")}`);
     // --json (used by Content Studio): "LOG <text>" lines, then one "RESULT <json>" line.
     const asJson = flag("--json");
+    // The source files are the master of what they own: publishing a database that differs from them would ship words
+    // nobody can find in git. (Only the test suite sets ATOMIQ_SKIP_CHECKS.)
+    if (process.env.ATOMIQ_SKIP_CHECKS !== "1") {
+      const lines = [];
+      const code = checkSync({ paths, log: (m) => lines.push(m), err: (m) => lines.push(m) });
+      if (code !== 0) fail(`Cannot publish: the source files (content/source) and the database differ.\n${lines.join("\n")}`);
+    }
     const { release, commands } = publishRelease(paths, {
       bump,
       notes: option("--notes") ?? "",

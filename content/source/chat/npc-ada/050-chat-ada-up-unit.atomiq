@@ -1,0 +1,66 @@
+format 1
+adapter chat 1
+npc: npc-ada
+
+node chat-ada-up-unit
+kind: unprompted
+pose: cheer
+trigger: unit_complete:radioactivity
+title: Radioactivity: done
+
+    YOU. DID. IT
+
+    i'm not crying. i'm a little crying. it's the flask fumes
+
+    you finished my whole unit. you know why nuclei change, what comes out, and how a crowd follows a pattern. i'm so proud i could pop~
+
+reply: thank you ada -> chat-ada-unit-thanks
+reply: you're crying?? -> chat-ada-unit-cry
+reply: what was your favourite part? -> chat-ada-unit-fav
+
+node chat-ada-unit-cry
+kind: reply
+pose: sorry
+
+    NO. ok yes. a little
+
+    i just really love when someone gets it. you just. get it. it's my favourite feeling in the whole world
+
+reply: aww, come here -> chat-ada-unit-thanks
+reply: ok but what's your favourite part? -> chat-ada-unit-fav
+
+node chat-ada-unit-fav
+kind: reply
+pose: cheer
+
+    ooh ooh ooh. favourite favourite
+
+    it's the banana. every time. nobody expects it. you tell someone a banana is radioactive and their face goes, like, ?????
+
+    and it's completely normal. radioactivity was here long before people. i love that. a little bit of old magic~
+
+reply: i love the banana too -> chat-ada-unit-thanks
+reply: old magic, ok poet -> chat-ada-unit-end
+
+node chat-ada-unit-thanks
+kind: reply
+pose: proud
+
+    you're SO welcome
+
+    and thank YOU for being so curious. you asked the best questions. i kept a list. it's on my fridge. it's very long
+
+    hal's going to be so smug that he taught you first, hehe
+
+sticker: party -> chat-ada-unit-end
+sticker: star -> chat-ada-unit-end
+
+node chat-ada-unit-end
+kind: sign_off
+pose: greet
+
+    ok i have to go lie on the lab floor and feel things
+
+    come back any time. i mean it. even just to say hi
+
+    bye bye, scientist~

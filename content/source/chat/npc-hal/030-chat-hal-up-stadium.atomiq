@@ -1,0 +1,92 @@
+format 1
+adapter chat 1
+npc: npc-hal
+
+node chat-hal-up-stadium
+kind: unprompted
+pose: explain
+trigger: lessons_completed:3
+title: A marble in a stadium
+
+    I am sitting in a football stadium.
+
+    Empty. Very quiet. Someone left a gate open and I took it as an invitation.
+
+    I have brought a marble. I am placing it on the centre spot. There. Now I would like to tell you something.
+
+reply: ...okay? -> chat-hal-stadium-go
+reply: Hal, why are you in a stadium -> chat-hal-stadium-why
+
+node chat-hal-stadium-why
+kind: reply
+pose: think
+
+    A fair question. It is for the lesson. Mostly.
+
+    Also the grass is very good.
+
+    May I continue?
+
+reply: yes please -> chat-hal-stadium-go
+reply: you're so weird lol -> chat-hal-stadium-go
+
+node chat-hal-stadium-go
+kind: reply
+pose: explain
+
+    Good.
+
+    Imagine this stadium is an atom. All of it. The stands, the grass, the sky above.
+
+    The marble I have just set down is the nucleus.
+
+    That is its whole size.
+
+reply: wait, THAT small? -> chat-hal-stadium-small
+reply: where are the electrons -> chat-hal-stadium-electrons
+reply: so what's in the rest of it -> chat-hal-stadium-empty
+
+node chat-hal-stadium-small
+kind: reply
+pose: proud
+
+    That small. I measured the marble twice. I did not measure the stadium. It was too much.
+
+    Almost all of the atom's mass is in that marble. The electrons are far lighter than it is.
+
+reply: so where are the electrons? -> chat-hal-stadium-electrons
+reply: so the rest is... nothing? -> chat-hal-stadium-empty
+
+node chat-hal-stadium-electrons
+kind: reply
+pose: point
+
+    Out near the seats. Far out.
+
+    They are tiny and fast, and they keep their distance from the middle. At this moment I can see none of them, which is accurate to the science and also a little lonely.
+
+reply: so what's between them and the marble? -> chat-hal-stadium-empty
+reply: that's a lot of space -> chat-hal-stadium-empty
+
+node chat-hal-stadium-empty
+kind: reply
+pose: proud
+
+    Empty space.
+
+    Mostly empty space. I have stood in the middle for some time and I can confirm it is a great deal of nothing.
+
+    Things still feel solid, because the electrons in them push back on the electrons in your hand. A great deal of nothing, politely declining to be walked through.
+
+sticker: mind-blown -> chat-hal-stadium-end
+sticker: nerd -> chat-hal-stadium-end
+
+node chat-hal-stadium-end
+kind: sign_off
+pose: greet
+
+    Someone is crossing the grass. I believe it is a groundskeeper.
+
+    I will go. Slowly, but I will go.
+
+    I am leaving the marble where it is. Think of it as yours.
