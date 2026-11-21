@@ -118,8 +118,6 @@ function AppContent() {
         <Stack.Screen name="periodic-table" options={{ headerShown: false }} />
         <Stack.Screen name="achievements" options={{ headerShown: false }} />
         <Stack.Screen name="shop" options={{ headerShown: false }} />
-        {/* dev-sfx: development-only sound effects lab (components/dev/SfxLab.tsx) */}
-        <Stack.Screen name="dev-sfx" options={{ headerShown: false }} />
         {/* dev-perf: the performance probe (components/dev/PerfProbe.tsx), redirects home when it is not in the build */}
         <Stack.Screen name="dev-perf" options={{ headerShown: false }} />
         <Stack.Screen

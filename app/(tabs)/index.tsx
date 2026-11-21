@@ -168,10 +168,6 @@ const getNodeX = (globalIndex: number, width: number) =>
 
 // dev-admin: development-only controls (components/dev); Metro drops this in a release build. Remove with the folder.
 const DevAdminFab: typeof import("@/components/dev/DevAdminFab").DevAdminFab | null = __DEV__ ? require("@/components/dev/DevAdminFab").DevAdminFab : null;
-// dev-sfx: the button beside it that opens the sound effects lab (components/dev/SfxLab.tsx); also development only.
-// Hidden for now: set SHOW_SFX_LAB to true to bring the button back.
-const SHOW_SFX_LAB = false;
-const SfxLabFab: typeof import("@/components/dev/SfxLabFab").SfxLabFab | null = __DEV__ && SHOW_SFX_LAB ? require("@/components/dev/SfxLabFab").SfxLabFab : null;
 // dev-perf: the button that opens the performance probe (components/dev/PerfProbe.tsx). Present in development builds and in a build made with EXPO_PUBLIC_PERF_PROBE=1 (the preview profile).
 const PerfFab: typeof import("@/components/dev/PerfFab").PerfFab | null = PERF_PROBE_ON ? require("@/components/dev/PerfFab").PerfFab : null;
 
@@ -798,8 +794,6 @@ export default function HomeScreen() {
 
       {/* dev-admin */}
       {DevAdminFab ? <DevAdminFab bottom={tabBarInset + 16} onChanged={refresh} /> : null}
-      {/* dev-sfx */}
-      {SfxLabFab ? <SfxLabFab bottom={tabBarInset + 16} /> : null}
       {/* dev-perf */}
       {PerfFab ? <PerfFab bottom={tabBarInset + 16} /> : null}
 

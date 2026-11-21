@@ -6,8 +6,6 @@
  *    (a cover image sneaking back in), or its length differs from the catalog's `ms`;
  *  - source outside services/sfx.ts requires assets/sfx, anything imports the unused library
  *    (kent-sfx), or expo-audio is imported outside services/sfx.ts and services/media.ts;
- *  - the development SFX lab's files (assets/sfx/audition/) are not 16-bit mono 44.1 kHz WAVs, or are
- *    required outside components/dev/sfx-lab-sources.ts (they have no cues: they are not in the catalog).
  *
  * Run: npm run check:sfx        (option for tests: --root <dir>)
  */
@@ -72,7 +70,6 @@ const onDisk = new Set();
 for (const full of walk(SFX_DIR, /\.(wav|mp3|ogg|m4a)$/i)) {
   const r = rel(full).replace(/^assets\/sfx\//, "");
   if (r.startsWith("kent-sfx/")) continue; // the unused library stays out of the bundle
-  if (r.startsWith("audition/")) continue; // the dev lab's candidates: no cues, checked separately below
   onDisk.add(r.replace(/\.[^.]+$/, ""));
   if (!r.endsWith(".wav")) fail(`assets/sfx/${r}: only .wav is bundled (one format, iOS-safe)`);
 }
@@ -98,27 +95,9 @@ for (const [file, ms] of Object.entries(SFX_FILES)) {
   if (Math.abs(wav.ms - ms) > 15) fail(`${file}.wav: is ${wav.ms} ms but SFX_FILES says ${ms} ms`);
 }
 
-// The dev lab's candidates: the same format, but no cues
-for (const full of walk(path.join(SFX_DIR, "audition"), /\.(wav|mp3|ogg|m4a)$/i)) {
-  const r = rel(full);
-  if (!r.endsWith(".wav")) {
-    fail(`${r}: only .wav is bundled (one format, iOS-safe)`);
-    continue;
-  }
-  let wav;
-  try {
-    wav = readWav(fs.readFileSync(full));
-  } catch (error) {
-    fail(`${r}: ${error.message}`);
-    continue;
-  }
-  if (wav.format !== 1 || wav.bits !== 16 || wav.channels !== 1 || wav.rate !== 44100) fail(`${r}: must be 16-bit PCM, mono, 44.1 kHz (run node scripts/prepare-audition-sfx.mjs)`);
-  for (const chunk of wav.extra) if (chunk.size > 1024) fail(`${r}: "${chunk.id}" chunk is ${chunk.size} bytes (cover art or tags?)`);
-}
-
 // Source rules
-const allowedRequire = new Set(["services/sfx.ts", "components/dev/sfx-lab-sources.ts"]);
-const allowedAudio = new Set(["services/sfx-backend-expo-audio.ts", "services/media.ts", "services/media-core.ts", "components/dev/sfx-lab-player.ts"]);
+const allowedRequire = new Set(["services/sfx.ts"]);
+const allowedAudio = new Set(["services/sfx-backend-expo-audio.ts", "services/media.ts", "services/media-core.ts"]);
 // The audio-api engine: Android only, one file, loaded through a guarded require (docs/features/PERFORMANCE_AND_SOUND_SPEC.md §12.1)
 const allowedAudioApi = new Set(["services/sfx-backend-audio-api.ts"]);
 for (const full of walk(ROOT, SOURCE_EXT)) {

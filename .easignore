@@ -1,0 +1,47 @@
+# EAS uses this file INSTEAD of .gitignore for the upload, so everything in .gitignore is repeated here.
+
+# dependencies and build output
+node_modules/
+.expo/
+dist/
+web-build/
+expo-env.d.ts
+.kotlin/
+/ios
+/android
+app-example
+*.tsbuildinfo
+.metro-health-check*
+
+# signing secrets and local env (EAS uses its own remote credentials)
+*.jks
+*.keystore
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.pem
+credentials.json
+credentials/
+.env
+.env*.local
+
+# local-only state and tooling
+.git
+.DS_Store
+.claude/
+.opencode/
+.openidea/
+.vscode/
+content/backups/
+content/database/studio-history.db
+content/database/.studio.lock
+content/database/*.bak-*
+*.db-shm
+*.db-wal
+assets/sfx/kent-sfx/
+
+# not part of the app (never required by app code)
+tools/platformer-art/
+tools/publisher/
+docs/

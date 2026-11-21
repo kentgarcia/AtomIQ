@@ -90,10 +90,6 @@ export const getRouteMediaPolicy = (
   if (matches(route, "/lab")) {
     return { surface: "lab", uiClicks: false, gameSfx: true, music: false };
   }
-  if (matches(route, "/dev-sfx")) {
-    // The development SFX lab: its own taps stay silent so they do not sound over the candidates.
-    return { surface: "other", uiClicks: false, gameSfx: false, music: false };
-  }
   if (matches(route, "/phone") || matches(route, "/phone-apps")) {
     return { surface: "phone", uiClicks: true, gameSfx: false, music: false };
   }

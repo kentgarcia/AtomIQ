@@ -287,7 +287,6 @@ describe("route media policy", () => {
     ["/lesson/atomic-basics-1", "lesson", true, true, false],
     ["/quiz/atomic-basics", "quiz", false, true, false],
     ["/(tabs)/phone", "phone", true, false, false],
-    ["/dev-sfx", "other", false, false, false],
     ["/phone", "phone", true, false, false],
     ["/phone-apps/chats", "phone", true, false, false],
     ["/phone-apps/shrodi", "phone", true, false, false],

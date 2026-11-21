@@ -368,7 +368,7 @@ export function screenOfPath(pathname: string | null | undefined): ScreenId | nu
 /** Routes where the tour never draws: a lesson run, practice, a game level, onboarding, the dev screens. */
 export function isQuietPath(pathname: string | null | undefined): boolean {
   const p = normalizePath(pathname);
-  return /^\/(lesson|practice|quiz|mythbuster|onboarding|dev-sfx|explorer\/platformer)(\/|$)/.test(p);
+  return /^\/(lesson|practice|quiz|mythbuster|onboarding|explorer\/platformer)(\/|$)/.test(p);
 }
 
 interface NodeLike {

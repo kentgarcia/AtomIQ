@@ -34,7 +34,7 @@ import { EASE_OUT } from "@/theme/motion";
 
 const TAB_ICONS = {
   map: require("@/assets/images/icons/map.png"),
-  discovery: require("@/assets/images/icons/community.png"),
+  discovery: require("@/assets/images/icons/feed.png"),
   quests: require("@/assets/images/icons/chest.png"),
   phone: require("@/assets/images/icons/phone.png"),
   games: require("@/assets/images/icons/games.png"),
