@@ -55,25 +55,25 @@ Shrodi (the guide) is his own plain, friendly voice and is not part of this tabl
 
 | Surface | Source | What it holds |
 |---|---|---|
-| Feed, unit posts | `scripts/content-migration/feed-content.mjs`, `UNITS` | the lesson, checkpoint, tease, unit and test-out posts of a unit's teacher (and the neighbour's unit post) |
-| Feed, shared posts | the same file, `VOICES` and `SHARED_SHAPES` | per character: a daily and a weekly chest, passing and being passed in the ranking, a first lesson, coming back after 3 and after 14 days, the daily quests done. The streak posts are the learner's own voice |
-| Blog | the same file, `BLOGS` | the author's title, hook and paragraphs; each comment is by the commenter, in their voice |
+| Feed, unit posts | `content/source/feed/<npc-id>.atomiq`, the `lesson`, `checkpoint`, `tease`, `unit` and `testout` posts | the lesson, checkpoint, tease, unit and test-out posts of a unit's teacher (and the neighbour's unit post) |
+| Feed, shared posts | the same files, and `content/source/feed/shared.atomiq` for a post with no poster | per character: a daily and a weekly chest, passing and being passed in the ranking, a first lesson, coming back after 3 and after 14 days, the daily quests done. The streak posts are the learner's own voice |
+| Blog | `content/source/blog/<unit>/NNN-<blog-id>.atomiq` | the author's title, hook and paragraphs; each comment is by the commenter, in their voice |
 | Chat | `content/source/chat/<npc-id>/NNN-<root-id>.atomiq`, one file per story, the free chat first (`010-`) | greeting, menu, free-chat answers and small talk, five story threads each (first message, a lesson-count story or two, a level or lesson story, the end of the unit, welcome back) |
-| Lessons | `components/npc/npc-roster.ts` `NPC_LINES` and the `npc_lines` table | the plain shared tone |
+| Lessons | `content/source/characters/NNN-<npc-id>.atomiq` (the `line` records), mirrored by `NPC_LINES` in `components/npc/npc-roster.ts` | the plain shared tone |
 
 Chat is written in the source files (`docs/features/CONTENT_SOURCE_SPEC.md`): edit the `.atomiq` file of the story, then `npm run content:sync` (a dry run that lists every change and runs the validators), then `npm run content:sync -- --apply` (backup, one transaction, then `test:chats` and `test:voice`). A node is a `node <id>` record with `kind:`, `pose:`, optional `trigger:` and `title:`, the words as an indented body (a blank line starts a new bubble) and its replies as `reply:` / `link:` / `react:` / `sticker:` lines, each `label -> next-node` (see `content/source/README.md`). A node's `position` is not written: it is the node's place in the teacher's files, so a new story is a new file with the next `NNN-` prefix and no existing node moves. `npm run content:edit` refuses `chat_nodes` (the files own it) and the old seed scripts are retired to `scripts/content-migration/legacy/`; `content:sync` stops with a "drift" message if someone changed the database behind the files' back.
 
-`node --no-warnings scripts/content-migration/apply-npc-voices.mjs` still applies the feed templates, blog pieces and lesson lines to the master DB (backup first, a draft until published); it no longer touches chat.
+Feed, blog, bios and lesson lines are files too now (`apply-npc-voices.mjs` and the other voice seeds are retired in `scripts/content-migration/legacy/`): edit the `.atomiq` file, then `npm run content:sync` (dry run) and `npm run content:sync -- --apply`.
 
 ## Adding a character's voice (a new unit)
 
-1. Add their row to `VOICES` in `feed-content.mjs` (all eight moments), their unit's posts to `UNITS`, and a `TONE` line to `scripts/test-npc-voice.mjs`.
+1. Add their file `content/source/characters/NNN-<npc-id>.atomiq` (the `npc` record and its lines) and `content/source/feed/<npc-id>.atomiq` (all eight shared moments and their unit's posts), the same entry in `components/npc/npc-roster.ts` (`test:source-adapters` checks they agree), and a `TONE` line in `scripts/test-npc-voice.mjs`.
 2. Write their chat as files in `content/source/chat/<npc-id>/` (a free chat first: a greeting, a menu, a next, a quiz, a remind and a sign-off; then a unit-complete and a welcome-back story, and one story of their own that begins with something only they would say), then `npm run content:sync`.
-3. Write the unit's blog pieces in their voice.
+3. Write the unit's blog pieces in their voice in `content/source/blog/<unit>/`.
 4. `npm run test:voice`, `npm run validate:content`.
 
 `test:voice` checks that every character has a post for every shared moment, that no two posters share words, that the calm ones never shout and the lively ones do, that Ada keeps her giggle, that lessons stay plain, and that each unit's posts and blogs are spoken by the unit's teacher.
 
 ## Bios
 
-A teacher's bio (on their profile and the meet-your-teacher card) is written as them, in the first person, in their own tone: Hal formal ("I am Hal..."), Ada lowercase with a single `~`, Ray blunt, Mina calm, Kofi and Tess upbeat, Sage measured. The calm characters use no "!". The words are in `components/npc/npc-roster.ts` and `set-npc-bios.mjs` writes them to the `npcs` rows; `test:voice` checks them.
+A teacher's bio (on their profile and the meet-your-teacher card) is written as them, in the first person, in their own tone: Hal formal ("I am Hal..."), Ada lowercase with a single `~`, Ray blunt, Mina calm, Kofi and Tess upbeat, Sage measured. The calm characters use no "!". The words are in `content/source/characters/` (and mirrored in `components/npc/npc-roster.ts`); `test:voice` checks them.

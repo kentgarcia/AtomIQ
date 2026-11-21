@@ -13,7 +13,7 @@
  * Takes a backup first. Does not publish or run sync-content; the release step does. Sources are
  * existing `content_references` rows; none is marked verified here (a person has to open each one).
  *
- *   node --no-warnings scripts/content-migration/feed-content.mjs [--dry-run] [--overwrite] [--db path]
+ *   node --no-warnings scripts/content-migration/legacy/feed-content.mjs [--dry-run] [--overwrite] [--db path]
  */
 
 import fs from "node:fs";
@@ -21,11 +21,22 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { DatabaseSync } from "node:sqlite";
 
-import { backupBeforeScript } from "../lib/backup.mjs";
-import { BLOG_LIMITS, LEARNER_POSTER, blogWordCount, readingMinutes } from "../lib/feed-vocab.mjs";
-import { validateFeed } from "../lib/feed-rules.mjs";
+import { backupBeforeScript } from "../../lib/backup.mjs";
+import { BLOG_LIMITS, LEARNER_POSTER, blogWordCount, readingMinutes } from "../../lib/feed-vocab.mjs";
+import { validateFeed } from "../../lib/feed-rules.mjs";
 
-const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
+/**
+ * RETIRED (content source files). The rows this script writes (feed and blog) are written in content/source and built with
+ * `npm run content:sync`; running this would overwrite them behind the files' back. Kept only as history.
+ * Do not run it. Edit the files (docs/features/CONTENT_SOURCE_SPEC.md).
+ */
+if (!process.argv.includes("--i-know-this-is-retired")) {
+  console.error("feed-content.mjs is retired: feed and blog live in content/source and are built by `npm run content:sync`.");
+  process.exit(1);
+}
+
+
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..", "..");
 
 // ---------------------------------------------------------------------------
 // The seed content

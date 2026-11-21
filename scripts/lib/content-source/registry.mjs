@@ -5,9 +5,12 @@
 import { listContentTables } from "../content-tables.mjs";
 import { makeDefaultAdapter } from "./adapters/default.mjs";
 import { chatAdapter } from "./adapters/chat.mjs";
+import { charactersAdapter } from "./adapters/characters.mjs";
+import { feedAdapter } from "./adapters/feed.mjs";
+import { blogAdapter } from "./adapters/blog.mjs";
 
 /** Friendly adapters, by name. Filled in by the adapter modules below (phase 2 onward). */
-export const FRIENDLY_ADAPTERS = new Map([[chatAdapter.name, chatAdapter]]);
+export const FRIENDLY_ADAPTERS = new Map([chatAdapter, charactersAdapter, feedAdapter, blogAdapter].map((a) => [a.name, a]));
 
 export function adapterNames() {
   return ["default", ...FRIENDLY_ADAPTERS.keys()];

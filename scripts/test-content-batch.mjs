@@ -174,7 +174,7 @@ describe("backupUnlessIdentical", () => {
 describe("checksFor", () => {
   it("names a gate for every table that has one and only those", () => {
     assert.deepEqual(checksFor(["chat_nodes"]).sort(), ["test:chats", "test:voice"]);
-    assert.deepEqual(checksFor(["npcs", "npc_lines"]), ["test:voice"]);
+    assert.deepEqual(checksFor(["npcs", "npc_lines"]).sort(), ["test:npc", "test:voice"]);
     assert.deepEqual(checksFor(["content_translations"]), []);
   });
   it("only names scripts that exist in package.json", () => {
@@ -183,7 +183,9 @@ describe("checksFor", () => {
   });
 });
 
-describe("content:edit command", () => {
+describe("content:edit command (on a table the files do not own: myths)", () => {
+  const MYTH = "all-radiation-manmade";
+  const myth = () => query(fx.paths, "SELECT id, title FROM myths WHERE id = ?", MYTH)[0];
   const run = (...args) =>
     spawnSync(process.execPath, ["--no-warnings", new URL("./content-edit.mjs", import.meta.url).pathname, ...args], {
       env: { ...process.env, ATOMIQ_ROOT: fx.root },
@@ -192,30 +194,30 @@ describe("content:edit command", () => {
   const patchFile = path.join(fx.root, "patch.json");
 
   it("a dry run reports the change and leaves the master alone", () => {
-    fs.writeFileSync(patchFile, JSON.stringify({ note: "cli test", ops: [{ op: "update", table: "npc_lines", pk: "line-batch-new", set: { text: "via cli" } }] }));
+    fs.writeFileSync(patchFile, JSON.stringify({ note: "cli test", ops: [{ op: "update", table: "myths", pk: MYTH, set: { title: "via cli" } }] }));
     const r = run(patchFile);
     assert.equal(r.status, 0, r.stderr);
-    assert.match(r.stdout, /update npc_lines\[line-batch-new\]/);
+    assert.match(r.stdout, /update myths\[all-radiation-manmade\]/);
     assert.match(r.stdout, /Dry run only/);
-    assert.notEqual(line("line-batch-new").text, "via cli");
+    assert.notEqual(myth().title, "via cli");
   });
 
   it("--apply writes it, and a second run says there is nothing to do", () => {
     const r = run(patchFile, "--apply", "--no-verify");
     assert.equal(r.status, 0, r.stderr);
     assert.match(r.stdout, /Applied 1 change/);
-    assert.equal(line("line-batch-new").text, "via cli");
+    assert.equal(myth().title, "via cli");
     const again = run(patchFile, "--apply", "--no-verify");
     assert.equal(again.status, 0, again.stderr);
     assert.match(again.stdout, /Nothing to change/);
   });
 
   it("a bad patch exits 1 and changes nothing", () => {
-    fs.writeFileSync(patchFile, JSON.stringify([{ op: "update", table: "npc_lines", pk: "line-batch-new", set: { npc_id: "npc-nobody" } }]));
+    fs.writeFileSync(patchFile, JSON.stringify([{ op: "update", table: "myths", pk: MYTH, set: { no_such_column: 1 } }]));
     const r = run(patchFile, "--apply", "--no-verify");
     assert.equal(r.status, 1);
     assert.match(r.stderr, /Nothing was changed/);
-    assert.equal(line("line-batch-new").text, "via cli");
+    assert.equal(myth().title, "via cli");
   });
 
   it("thread lists a teacher's stories and fetches one by id, trigger or title", () => {
@@ -239,9 +241,9 @@ describe("content:edit command", () => {
   });
 
   it("get and sql read without writing", () => {
-    const g = run("get", "npc_lines", "--pk", "line-batch-new", "--cols", "id,text");
+    const g = run("get", "myths", "--pk", MYTH, "--cols", "id,title");
     assert.equal(g.status, 0, g.stderr);
-    assert.deepEqual(JSON.parse(g.stdout), [{ id: "line-batch-new", text: "via cli" }]);
-    assert.notEqual(run("sql", "DELETE FROM npc_lines").status, 0);
+    assert.deepEqual(JSON.parse(g.stdout), [{ id: MYTH, title: "via cli" }]);
+    assert.notEqual(run("sql", "DELETE FROM myths").status, 0);
   });
 });

@@ -4,16 +4,27 @@
  * profile and on the meet-your-teacher card. The words live in components/npc/npc-roster.ts (the seed and the fallback), and this
  * writes them to the `npcs` rows of the master DB. Idempotent. Takes a backup first. Does not publish; the release step does.
  *
- *   node --no-warnings scripts/content-migration/set-npc-bios.mjs [--dry-run] [--db path]
+ *   node --no-warnings scripts/content-migration/legacy/set-npc-bios.mjs [--dry-run] [--db path]
  */
 
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { DatabaseSync } from "node:sqlite";
 
-import { backupBeforeScript } from "../lib/backup.mjs";
+import { backupBeforeScript } from "../../lib/backup.mjs";
 
-const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
+/**
+ * RETIRED (content source files). The rows this script writes (characters) are written in content/source and built with
+ * `npm run content:sync`; running this would overwrite them behind the files' back. Kept only as history.
+ * Do not run it. Edit the files (docs/features/CONTENT_SOURCE_SPEC.md).
+ */
+if (!process.argv.includes("--i-know-this-is-retired")) {
+  console.error("set-npc-bios.mjs is retired: characters live in content/source and are built by `npm run content:sync`.");
+  process.exit(1);
+}
+
+
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..", "..");
 const args = process.argv.slice(2);
 const dryRun = args.includes("--dry-run");
 const dbArg = args.indexOf("--db");

@@ -9,9 +9,11 @@
  *   records: [{
  *     keyword, table, id: [col...],       a record header is `keyword <id parts>`
  *     scope?: [col...],                   columns that come from the file scope (not written per record)
+ *     scopeOptional?: [col...],           scope columns that may be null (a file with no such header line)
  *     parent?: { keyword, map: { childCol: parentCol } },   a sub-record takes columns from the nearest parent above it
  *     fields: [Field],                    attributes in canonical order
  *     links?: [{ key, table, fk, target }],  link-table rows written as `key: id` lines on the parent
+ *     linksBefore?: col                     write the links just before this field (default: after the last)
  *     position?: { col, scope: [col...], base }   derived from file and record order, never written
  *   }],
  *   layout(rowsByTable) -> [{ path, scope: { col: value }, items: [{ keyword, row }] }]
@@ -102,11 +104,16 @@ export function encodeRecord(adapter, spec, row, linksByKey = {}) {
     const ids = spec.id.map((c) => String(row[c]));
     for (const id of ids) if (!ID_PATTERN.test(id)) throw new Error(`id "${id}" is not a valid id (letters, digits and . _ / - only)`);
     const entries = [];
-    for (const f of spec.fields) entries.push(...encodeField(f, row[f.col], row));
-    for (const l of spec.links ?? []) {
-      const targets = linksByKey[l.key] ?? [];
-      entries.push(...encodeValue({ col: l.key, type: "list" }, targets));
+    let linked = false;
+    const pushLinks = () => {
+      linked = true;
+      for (const l of spec.links ?? []) entries.push(...encodeValue({ col: l.key, type: "list" }, linksByKey[l.key] ?? []));
+    };
+    for (const f of spec.fields) {
+      if (spec.linksBefore === f.col) pushLinks();
+      entries.push(...encodeField(f, row[f.col], row));
     }
+    if (!linked) pushLinks();
     // A body after a block attribute would be read back as more of that block, so the two cannot share a record.
     if (entries.some((e) => e.key === null) && entries.some((e) => e.key !== null && e.lines)) {
       const long = entries.find((e) => e.key !== null && e.lines);
@@ -218,7 +225,7 @@ export function decodeFile(adapter, ast, acc) {
     const row = {};
     spec.id.forEach((c, i) => (row[c] = rec.ids[i]));
     for (const c of spec.scope ?? []) {
-      if (scopeRow[c] == null) throw new SourceError(`${owner} needs "${c}" in the file header`, { file, line: rec.line });
+      if (scopeRow[c] == null && !spec.scopeOptional?.includes(c)) throw new SourceError(`${owner} needs "${c}" in the file header`, { file, line: rec.line });
       row[c] = scopeRow[c];
     }
     if (spec.parent) {

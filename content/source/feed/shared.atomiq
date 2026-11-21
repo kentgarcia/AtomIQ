@@ -1,0 +1,66 @@
+format 1
+adapter feed 1
+
+post ft-streak-100
+kind: milestone
+trigger: streak
+condition: {"days":100}
+pool: learner
+reactors: npc-hal
+
+text:
+    {days} days in a row. One hundred days! I did not think I would make it this far.
+
+post ft-streak-14
+kind: milestone
+trigger: streak
+chip: quests
+condition: {"days":14}
+pool: learner
+reactors: npc-mina
+
+text:
+    {days} days in a row. Two weeks of learning something every single day.
+
+post ft-streak-3
+kind: milestone
+trigger: streak
+chip: quests
+condition: {"days":3}
+pool: learner
+reactors: npc-tess
+
+text:
+    {days} days in a row. A habit is starting, and I want to see it through.
+
+post ft-streak-30
+kind: milestone
+trigger: streak
+condition: {"days":30}
+pool: learner
+reactors: npc-sage
+
+text:
+    {days} days. A whole month of showing up for atoms. I am proud of that.
+
+post ft-streak-60
+kind: milestone
+trigger: streak
+chip: quests
+condition: {"days":60}
+pool: learner
+reactors: npc-kofi
+
+text:
+    {days} days in a row. Two months of steady learning, one day at a time.
+
+post ft-streak-7
+kind: milestone
+trigger: streak
+chip: quests
+condition: {"days":7}
+pool: learner
+reactors: npc-ray
+
+text:
+    A full week: {days} days in a row. I keep showing up for atoms.

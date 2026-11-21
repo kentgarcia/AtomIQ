@@ -1,0 +1,38 @@
+format 1
+adapter characters 1
+
+npc npc-sage
+name: Sage
+title: Safety and society teacher
+field: safety-waste-society
+
+bio:
+    I'm Sage. I teach how nuclear power is kept safe, what happens to waste, and the choices a society makes. I like to look at both sides before I decide. I'll show you both, and then it's your call.
+
+spec:
+    {
+      "skin": {
+        "base": "#E0B48A",
+        "shade": "#CB9A6D",
+        "feature": "#B07F52"
+      },
+      "head": "tombstone",
+      "headWidth": 100,
+      "eyes": "pill",
+      "nose": "single",
+      "hair": {
+        "style": "bob",
+        "color": "#3B2A24",
+        "shade": "#2B1E1A"
+      },
+      "outfit": {
+        "kind": "sweater",
+        "color": "#FF7878",
+        "shade": "#FF4B4B"
+      },
+      "accent": {
+        "kind": "notebook",
+        "color": "#2B70C9",
+        "shade": "#1453A3"
+      }
+    }

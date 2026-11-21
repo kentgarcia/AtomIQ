@@ -1,0 +1,53 @@
+format 1
+adapter blog 1
+unit: radioactivity
+
+post blog-nobody-knows-when
+author: npc-ada
+lesson: why-nuclei-decay
+title: nobody knows when
+hook: one unstable nucleus is a surprise. a whole crowd of them follows a pattern. isn't that neat?
+cover: radiation
+read: 1
+unlock: {"trigger":"lesson_complete","lessonId":"why-nuclei-decay"}
+reactors: npc-hal
+references: ref-iaea-decay
+references: ref-openstax-up3-ch10
+
+p:
+    ok so take one unstable nucleus. leave it alone. it has a chance of changing, and nobody can say when. eep, so mysterious~
+
+p:
+    nobody pushes it. the nucleus that changes is the parent. the nucleus it becomes is the daughter. the change gives off radiation
+
+quote:
+    a half-life ticks for a crowd of atoms, never for one
+
+h: think of a die
+
+p:
+    roll a die once and you can't say if it will show a six. roll it 600 times and you can say that about 100 of the rolls will. hehe
+
+p:
+    a nucleus is like that. one is a surprise. a big group follows a pattern, and in the half-life lesson you'll see the pattern for yourself. it's so pretty~
+
+figure: radiation
+caption: The radiation sign, used to mark a source of radiation.
+
+fact:
+    Heating, cooling and chemistry hardly change how fast an unstable nucleus changes. In a flame or in ice, it is still unstable.
+
+list:
+    One nucleus: you can't say when
+    A big group: it follows a pattern
+
+p:
+    so when someone asks you when an atom will change, you can say: you can't know. a crowd of them, though, you can know. hehe, tiny mystery solved~
+
+next: see what comes out of a decay => lesson alpha-beta-gamma
+
+comment bc-nobody-knows-when-ray
+author: npc-ray
+chip: {"lessonId":"half-life"}
+
+    Plain words: a group follows a pattern even though one nucleus does not. You will see exactly how in the half-life lesson.

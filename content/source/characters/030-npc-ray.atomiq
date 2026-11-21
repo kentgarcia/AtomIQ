@@ -1,0 +1,39 @@
+format 1
+adapter characters 1
+
+npc npc-ray
+name: Ray
+title: Radiation teacher
+field: radiation-and-matter
+
+bio:
+    I'm Ray. I teach what radiation does when it meets things, and how to stop it. I'll tell you straight: no hype, no scare, just what the numbers say. Ask me anything. You'll get a short answer.
+
+spec:
+    {
+      "skin": {
+        "base": "#7A4A33",
+        "shade": "#633A27",
+        "feature": "#4D2C1D"
+      },
+      "head": "tombstone",
+      "headWidth": 98,
+      "eyes": "glasses-square",
+      "nose": "double",
+      "hair": {
+        "style": "crop",
+        "color": "#2E2622",
+        "shade": "#211B18"
+      },
+      "outfit": {
+        "kind": "hoodie",
+        "color": "#CE82FF",
+        "shade": "#9069CD",
+        "collar": "#FFFFFF"
+      },
+      "accent": {
+        "kind": "clipboard",
+        "color": "#FF9600",
+        "shade": "#CD7900"
+      }
+    }

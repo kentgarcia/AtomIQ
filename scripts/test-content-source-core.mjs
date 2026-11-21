@@ -204,7 +204,7 @@ test("T6: derived positions follow file order, then record order", () => {
 
 // --- T8 ----------------------------------------------------------------------------------------------------------------------------------------------
 test("T8: every golden file ever committed is still read by the current code", () => {
-  const versions = fs.readdirSync(GOLDEN, { withFileTypes: true }).filter((d) => d.isDirectory());
+  const versions = fs.readdirSync(GOLDEN, { withFileTypes: true }).filter((d) => d.isDirectory() && /^v\d+$/.test(d.name)); // adapters-v1 is read by test-content-adapters.mjs
   assert.ok(versions.length >= 1);
   for (const v of versions) {
     const dir = path.join(GOLDEN, v.name);

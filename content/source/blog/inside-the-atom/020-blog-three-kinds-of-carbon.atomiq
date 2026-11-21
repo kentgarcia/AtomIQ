@@ -1,0 +1,54 @@
+format 1
+adapter blog 1
+unit: inside-the-atom
+
+post blog-three-kinds-of-carbon
+author: npc-hal
+lesson: isotopes
+title: Three kinds of carbon
+hook: Carbon-12, carbon-13 and carbon-14 are all carbon. One of them is not like the others. Let us see which.
+cover: diamond
+read: 2
+unlock: {"trigger":"unit_complete","unitId":"inside-the-atom"}
+reactors: npc-ada
+references: ref-iaea-isotopes
+references: ref-openstax-chem-ch2
+
+p:
+    Here is a puzzle. Three atoms are all carbon, yet they are not the same. How can that be? Let us count.
+
+p:
+    Count the protons. Every carbon atom has 6, and that number is what makes it carbon. Change it and you get a different element.
+
+h: The neutrons are the difference
+
+p:
+    The number after the name is the mass number: protons plus neutrons. Carbon has 6 protons, so carbon-14 has 14 - 6 = 8 neutrons. I checked the subtraction. Twice.
+
+list:
+    Carbon-12: 6 protons, 6 neutrons, stable
+    Carbon-13: 6 protons, 7 neutrons, stable
+    Carbon-14: 6 protons, 8 neutrons, unstable
+
+p:
+    These versions of one element are called isotopes. Most of the atoms around you are stable isotopes.
+
+quote:
+    Isotope does not mean radioactive. It only means a different number of neutrons.
+
+fact:
+    Carbon-14 is the unstable one. An unstable nucleus can change, and when it does it gives off radiation. That is called radioactivity.
+
+p:
+    Even so, nothing here is strange or new. Unstable atoms are in rocks, in the air and in food, and they were here long before us. The rocks have been very patient about it.
+
+p:
+    Which brings a question. What exactly comes out when a nucleus changes? Ada knows. She tells it brightly. Please be prepared.
+
+next: Meet Ada and radioactivity => unit radioactivity
+
+comment bc-three-kinds-of-carbon-mina
+author: npc-mina
+chip: {"lessonId":"stable-and-unstable-nuclei"}
+
+    Calm note: unstable does not mean dangerous. Your own body holds a little natural potassium-40, and that is normal.

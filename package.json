@@ -41,6 +41,7 @@
     "check:source": "node --no-warnings scripts/content-sync.mjs --check",
     "test:source": "node --no-warnings --test scripts/test-content-source-core.mjs",
     "test:source-sync": "node --no-warnings --test scripts/test-content-sync.mjs",
+    "test:source-adapters": "node --no-warnings --test scripts/test-content-adapters.mjs",
     "test:maze": "node --no-warnings --test scripts/test-atom-maze-progression.mjs",
     "sync-content": "node scripts/sync-content.js",
     "postinstall": "node scripts/sync-content.js",

@@ -1,0 +1,39 @@
+format 1
+adapter characters 1
+
+npc npc-kofi
+name: Kofi
+title: Nuclear energy teacher
+field: nuclear-energy
+
+bio:
+    I'm Kofi, an engineer. I teach where nuclear energy comes from and how a reactor uses it. I like to see how things work, so we'll build the picture piece by piece. The hard hat is optional. Mine isn't!
+
+spec:
+    {
+      "skin": {
+        "base": "#F5B092",
+        "shade": "#E8946F",
+        "feature": "#D97856"
+      },
+      "head": "tombstone",
+      "headWidth": 104,
+      "eyes": "dots",
+      "nose": "double",
+      "hair": {
+        "style": "crop",
+        "color": "#3B2A24",
+        "shade": "#2B1E1A"
+      },
+      "facialHair": "beard",
+      "outfit": {
+        "kind": "shirt",
+        "color": "#FF9600",
+        "shade": "#CD7900"
+      },
+      "accent": {
+        "kind": "hardhat",
+        "color": "#FFC800",
+        "shade": "#E7A601"
+      }
+    }

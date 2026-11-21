@@ -8,7 +8,7 @@
 import { FRIENDLY_ADAPTERS } from "./registry.mjs";
 
 /** Names of the owned adapters, in the order they sync. */
-export const OWNED_ADAPTERS = ["chat"];
+export const OWNED_ADAPTERS = ["chat", "characters", "feed", "blog"];
 
 export function ownedAdapters() {
   return OWNED_ADAPTERS.map((n) => {

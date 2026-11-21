@@ -1,0 +1,53 @@
+format 1
+adapter blog 1
+unit: radioactivity
+
+post blog-the-banana-on-your-counter
+author: npc-ada
+lesson: radioactivity-is-natural
+title: the banana on your counter
+hook: a banana is a little bit radioactive. so are you. that's normal, and here's why
+cover: banana
+read: 1
+unlock: {"trigger":"unit_complete","unitId":"radioactivity"}
+reactors: npc-hal
+reactors: npc-mina
+references: ref-background-radiation
+references: ref-becquerel-1896
+references: ref-potassium-40
+
+p:
+    ok here's something nobody expects. the banana on your counter is a little bit radioactive. surprise~
+
+p:
+    it holds potassium, and a tiny share of that potassium is potassium-40, which is unstable. you carry some too, in your own body
+
+h: it was here first
+
+p:
+    radioactivity wasn't invented. it was here long before people were. you can find it in four places
+
+list:
+    Rocks and soil: uranium and thorium
+    The air: radon, a radioactive gas from the ground
+    Food and your body: potassium-40
+    Space: cosmic radiation, all the time
+
+figure: banana
+caption: A banana holds a little natural potassium-40.
+
+quote:
+    radioactivity was always here. we only learned to see it
+
+fact:
+    In 1896 Henri Becquerel left a uranium mineral on a wrapped photographic plate. The plate fogged, even with no sunlight. Radioactivity was found in a natural mineral, long before anyone made nuclear technology.
+
+h: is it dangerous?
+
+p:
+    radioactive doesn't automatically mean dangerous. what matters is the type of radiation, how much there is, and how it reaches the body.
+
+p:
+    a banana and your own body are radioactive, and that's normal. later you'll learn why being exposed to radiation isn't the same as becoming radioactive.
+
+next: find where radioactivity hides around you => lesson radioactivity-is-natural

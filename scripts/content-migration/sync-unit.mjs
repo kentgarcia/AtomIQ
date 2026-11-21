@@ -223,12 +223,15 @@ try {
   const teacher = NPC_ROSTER.find((n) => n.unitId === u.id);
   if (teacher && has("npcs") && has("npc_lines")) {
     if (!get("SELECT 1 AS x FROM npcs WHERE id = ?", teacher.id)) {
-      throw new Error(`teacher ${teacher.id} is not in the npcs table: run add-npcs.mjs first`);
+      throw new Error(`teacher ${teacher.id} is not in the npcs table: the characters are files now: run `npm run content:sync` first`);
     }
     if (get("SELECT teacher_npc_id AS t FROM units WHERE id = ?", u.id).t !== teacher.id) {
       note("edit", `teacher of unit ${u.id}: ${teacher.id}`);
       run(`UPDATE units SET teacher_npc_id = ?, updated_at=${now} WHERE id = ?`, teacher.id, u.id);
     }
+    // NOTE: `npc_lines` is owned by content/source/characters (until phase 5 retires this script). A line inserted here
+    // shows as drift on the next content:sync: run `npm run content:export -- characters --force` afterwards, and add the
+    // same line to the file for good.
     const lessonSet = new Set(lessonIds);
     for (const l of NPC_LINES.filter((x) => x.npcId === teacher.id && (!x.lessonId || lessonSet.has(x.lessonId)))) {
       const row = get("SELECT * FROM npc_lines WHERE id = ?", l.id);

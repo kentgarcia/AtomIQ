@@ -1,0 +1,96 @@
+format 1
+adapter characters 1
+
+npc npc-hal
+name: Hal
+title: Atom teacher
+field: atoms
+
+bio:
+    I am Hal. I teach what is inside the atom, slowly and exactly, because small things deserve it. I keep rocks on my desk and I have named every one. Reginald is in charge.
+
+spec:
+    {
+      "skin": {
+        "base": "#FFCBA3",
+        "shade": "#F5B585",
+        "feature": "#E99B5F"
+      },
+      "head": "capsule",
+      "headWidth": 106,
+      "eyes": "pill",
+      "nose": "button",
+      "hair": {
+        "style": "cloud",
+        "color": "#FFB100",
+        "shade": "#E7A601"
+      },
+      "outfit": {
+        "kind": "whitecoat",
+        "color": "#2B70C9",
+        "shade": "#1453A3",
+        "collar": "#D2E4E8"
+      },
+      "accent": {
+        "kind": "sample",
+        "color": "#E5A259",
+        "shade": "#A56644"
+      },
+      "cover": {
+        "color": "#FFC800",
+        "shade": "#E7A601"
+      }
+    }
+
+line line-hal-meet
+kind: meet
+pose: greet
+
+    Hi, I'm Hal. Let's find out what everything is made of.
+
+line line-hal-sign-off
+kind: sign_off
+pose: proud
+
+    Well done. Now you know what is inside an atom, and why that matters.
+
+line line-hal-tease
+kind: tease
+pose: idle
+
+    Finish my unit first, and I'll show you the rest.
+
+line line-hal-intro-atoms-are-everywhere
+kind: lesson_intro
+pose: greet
+lesson: atoms-are-everywhere
+
+    Today you'll see what everything around you is made of, and how small an atom really is.
+
+line line-hal-intro-elements-and-the-periodic-table
+kind: lesson_intro
+pose: point
+lesson: elements-and-the-periodic-table
+
+    The number of protons tells you which element an atom is. Let's build some.
+
+line line-hal-intro-isotopes
+kind: lesson_intro
+pose: explain
+lesson: isotopes
+
+    Atoms of one element can differ a little. You'll learn what isotopes are.
+
+line line-hal-intro-protons-neutrons-electrons
+kind: lesson_intro
+pose: explain
+lesson: protons-neutrons-electrons
+
+    We'll open up an atom and meet its three particles. You'll learn what each one does.
+
+line line-hal-intro-stable-and-unstable-nuclei
+kind: lesson_intro
+pose: think
+lesson: stable-and-unstable-nuclei
+
+    Some nuclei stay the same and some can change. You'll see why that matters.

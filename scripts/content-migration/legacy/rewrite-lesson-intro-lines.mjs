@@ -5,16 +5,27 @@
  * that is not in the lesson. Each row is checked against its old text first (idempotent, never
  * clobbers a later edit). Draft edit of the master db; publish to ship.
  *
- *   node --no-warnings scripts/content-migration/rewrite-lesson-intro-lines.mjs [--dry-run]
+ *   node --no-warnings scripts/content-migration/legacy/rewrite-lesson-intro-lines.mjs [--dry-run]
  */
 
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { DatabaseSync } from "node:sqlite";
 
-import { backupBeforeScript } from "../lib/backup.mjs";
+import { backupBeforeScript } from "../../lib/backup.mjs";
 
-const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
+/**
+ * RETIRED (content source files). The rows this script writes (characters) are written in content/source and built with
+ * `npm run content:sync`; running this would overwrite them behind the files' back. Kept only as history.
+ * Do not run it. Edit the files (docs/features/CONTENT_SOURCE_SPEC.md).
+ */
+if (!process.argv.includes("--i-know-this-is-retired")) {
+  console.error("rewrite-lesson-intro-lines.mjs is retired: characters live in content/source and are built by `npm run content:sync`.");
+  process.exit(1);
+}
+
+
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..", "..");
 const dbPath = path.join(ROOT, "content/database/content.db");
 const dryRun = process.argv.includes("--dry-run");
 

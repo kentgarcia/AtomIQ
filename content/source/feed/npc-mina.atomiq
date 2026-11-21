@@ -1,0 +1,71 @@
+format 1
+adapter feed 1
+npc: npc-mina
+
+post ft-mina-chest-daily
+kind: celebrate
+trigger: chest_opened
+chip: quests
+condition: {"period":"daily"}
+
+text:
+    You opened the daily chest. A small reward, and a gentle reminder that small steps count.
+
+post ft-mina-chest-weekly
+kind: celebrate
+trigger: chest_opened
+chip: quests
+condition: {"period":"weekly"}
+
+text:
+    The weekly chest is open. A whole week of quests, done at your own pace. That takes care and patience.
+
+post ft-mina-first-lesson
+kind: celebrate
+trigger: first_lesson
+chip: lesson
+
+text:
+    Your first lesson is done: “{lesson}”. Well done. It is normal to feel a little unsure at the start, and you did it anyway.
+
+post ft-mina-quests
+kind: celebrate
+trigger: daily_quests_done
+chip: quests
+
+text:
+    Every daily quest is claimed. You did well today. Take a breath, then open your chest.
+
+post ft-mina-rank-passed
+kind: celebrate
+trigger: rank_change
+chip: ranks
+condition: {"direction":"passed"}
+
+text:
+    You passed {rival} in the weekly ranking. Lovely. And remember, it is fine to go at your own speed.
+
+post ft-mina-comeback-14
+kind: nudge
+trigger: comeback
+condition: {"minDays":14}
+
+text:
+    Hello again, {name}. Life gets busy, and that is okay. One calm lesson is plenty to start.
+
+post ft-mina-comeback-3
+kind: nudge
+trigger: comeback
+condition: {"minDays":3}
+
+text:
+    Welcome back, {name}. No pressure at all. Pick up wherever feels comfortable.
+
+post ft-mina-rank-passed-by
+kind: nudge
+trigger: rank_change
+chip: ranks
+condition: {"direction":"passed_by"}
+
+text:
+    {rival} passed you in the weekly ranking. That is okay. A ranking is only a snapshot. One lesson at a time.

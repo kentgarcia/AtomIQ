@@ -1,0 +1,71 @@
+format 1
+adapter feed 1
+npc: npc-sage
+
+post ft-sage-chest-daily
+kind: celebrate
+trigger: chest_opened
+chip: quests
+condition: {"period":"daily"}
+
+text:
+    A daily chest, opened. A small reward. Worth asking what small, steady habits add up to over a month.
+
+post ft-sage-chest-weekly
+kind: celebrate
+trigger: chest_opened
+chip: quests
+condition: {"period":"weekly"}
+
+text:
+    The weekly chest is open. A week of quests, finished. Effort and patience both counted here.
+
+post ft-sage-first-lesson
+kind: celebrate
+trigger: first_lesson
+chip: lesson
+
+text:
+    Your first lesson is done: “{lesson}”. A good beginning. What question did it leave you with?
+
+post ft-sage-quests
+kind: celebrate
+trigger: daily_quests_done
+chip: quests
+
+text:
+    Every daily quest is claimed. A full day. Weigh it fairly: you did a lot, and the chest is waiting.
+
+post ft-sage-rank-passed
+kind: celebrate
+trigger: rank_change
+chip: ranks
+condition: {"direction":"passed"}
+
+text:
+    You passed {rival} in the weekly ranking. A fair result. It is also worth asking what you learned on the way.
+
+post ft-sage-comeback-14
+kind: nudge
+trigger: comeback
+condition: {"minDays":14}
+
+text:
+    Welcome back, {name}. A pause is not a failure. When you are ready, one lesson is enough to see where you stand.
+
+post ft-sage-comeback-3
+kind: nudge
+trigger: comeback
+condition: {"minDays":3}
+
+text:
+    Welcome back, {name}. Whenever you are ready, the lessons are where you left them.
+
+post ft-sage-rank-passed-by
+kind: nudge
+trigger: rank_change
+chip: ranks
+condition: {"direction":"passed_by"}
+
+text:
+    {rival} passed you in the weekly ranking. On one hand, that stings a little. On the other, one lesson can change it.

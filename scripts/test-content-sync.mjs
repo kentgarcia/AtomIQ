@@ -17,6 +17,7 @@ import { chatAdapter } from "./lib/content-source/adapters/chat.mjs";
 import { readRowsByTable } from "./lib/content-source/adapters/default.mjs";
 import { renderFiles } from "./lib/content-source/pipeline.mjs";
 import { writeSourceFiles } from "./lib/content-source/files.mjs";
+import { ownedAdapters } from "./lib/content-source/owned.mjs";
 import { writeState } from "./lib/content-source/state.mjs";
 import { checkSync, runSync } from "./lib/content-source/sync.mjs";
 import { canonicalizeText } from "./lib/content-source/pipeline.mjs";
@@ -40,9 +41,13 @@ const check = (fx) => {
 async function exported() {
   const fx = makeFixture();
   const db = openDb(fx.paths.master, { readOnly: true });
-  const rows = readRowsByTable(db, ["chat_nodes"]);
+  const rows = {};
+  for (const a of ownedAdapters()) {
+    const r = readRowsByTable(db, [...a.tables]);
+    Object.assign(rows, r);
+    writeSourceFiles(fx.paths.sourceDir, renderFiles(a, r));
+  }
   db.close();
-  writeSourceFiles(fx.paths.sourceDir, renderFiles(chatAdapter, rows));
   writeState(fx.paths.sourceDir, rows);
   return fx;
 }
@@ -229,7 +234,7 @@ describe("ownership guard (T7)", () => {
   });
 
   it("content:edit still works on a table that is not owned", () => {
-    const r = edit([{ op: "update", table: "npcs", pk: "npc-ada", set: { title: "Radioactivity teacher" } }]);
+    const r = edit([{ op: "update", table: "myths", pk: "all-radiation-manmade", set: { title: "All Radiation is Man-Made" } }]);
     assert.equal(r.status, 0, r.stderr);
   });
 });

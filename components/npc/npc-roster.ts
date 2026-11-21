@@ -1,8 +1,9 @@
 /**
  * The cast: seed data and fallback for the `npcs` and `npc_lines` tables (docs/features/NPC_TEACHERS_SPEC.md §5).
  *
- * The content database is the source of truth once seeded (`scripts/content-migration/add-npcs.mjs`
- * writes these rows). This file is what the seed script reads, what tests check, and what the app
+ * The master of these words is `content/source/characters/*.atomiq` (built into the database by
+ * `npm run content:sync`; `npm run test:source-adapters` fails when this file says something else).
+ * This file is what tests check, what the shop and screens read without a database, and what the app
  * falls back to when a bundled database predates the NPC tables, so a teacher is never missing.
  * Pure data with no imports beyond types and the palette.
  */

@@ -1,0 +1,24 @@
+format 1
+adapter feed 1
+npc: npc-demo
+
+post ft-demo-lesson-1
+kind: celebrate
+trigger: lesson_complete
+chip: lesson
+weight: 2
+condition: {"unitId":"radioactivity","lessonId":"half-life"}
+reactors: npc-ada
+reactors: npc-hal
+
+text:
+    You finished “{lesson}”.
+
+    Well done.
+
+post ft-demo-plain
+kind: nudge
+trigger: comeback
+
+text:
+    Come back soon.

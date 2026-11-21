@@ -1,0 +1,38 @@
+format 1
+adapter characters 1
+
+npc npc-tess
+name: Tess
+title: Nuclear technology teacher
+field: nuclear-technology
+
+bio:
+    I'm Tess! I teach how nuclear tools help in hospitals, farms and factories. I love a good gadget. Short lessons, quick answers, and you can be on to the next one before I finish this sentence!
+
+spec:
+    {
+      "skin": {
+        "base": "#FFCBA3",
+        "shade": "#F5B585",
+        "feature": "#E99B5F"
+      },
+      "head": "capsule",
+      "headWidth": 96,
+      "eyes": "round",
+      "nose": "single",
+      "hair": {
+        "style": "wrap",
+        "color": "#FFB2B2",
+        "shade": "#F5A4A4"
+      },
+      "outfit": {
+        "kind": "shirt",
+        "color": "#1899D6",
+        "shade": "#2B70C9"
+      },
+      "accent": {
+        "kind": "vial",
+        "color": "#7AF0F2",
+        "shade": "#84D8FF"
+      }
+    }

@@ -138,7 +138,7 @@ A post may speak to the learner ("You finished *What is an atom?*") or about the
 
 ## 6. Content (values only, edited in Studio)
 
-Added between `feed` markers in `schema.sql`, seeded by `scripts/content-migration/feed-content.mjs`, like `npcs`.
+Added between `feed` markers in `schema.sql`, now owned by the text files in `content/source/feed/` and `content/source/blog/` (`docs/features/CONTENT_SOURCE_SPEC.md`); the seed `feed-content.mjs` is retired.
 
 ```sql
 CREATE TABLE IF NOT EXISTS feed_templates (
@@ -239,7 +239,7 @@ A new `blog_read` kind in `activity-core.ts` (`weight: 1`, `maxPerId: 1`, `maxPe
 
 ## 9. Content authoring
 
-Templates and blog pieces are authored in Content Studio (new panels: Feed templates by trigger and NPC; Blog with a live reader preview, a word-count and reading-time readout and its comments) and seeded from `scripts/content-migration/feed-content.mjs`. Voice per NPC follows their `bio`. Initial set: feed ≈ 70 templates (per unit: 3 `lesson_complete`, 1 `checkpoint_pass`, 2 `unit_complete`, 1 `tease`; shared: 3 each for `streak`, `chest_opened`, `rank_change`; 2 each for `first_lesson`, `comeback`, `daily_quests_done`), in both voices (§5.3); blog: 2 pieces per unit (14), each with 0 to 3 informational comments, the first two written first so the format can be judged.
+Templates and blog pieces are authored in Content Studio (new panels: Feed templates by trigger and NPC; Blog with a live reader preview, a word-count and reading-time readout and its comments) and now written as the files in `content/source/feed/` and `content/source/blog/` (Studio is a viewer). Voice per NPC follows their `bio`. Initial set: feed ≈ 70 templates (per unit: 3 `lesson_complete`, 1 `checkpoint_pass`, 2 `unit_complete`, 1 `tease`; shared: 3 each for `streak`, `chest_opened`, `rank_change`; 2 each for `first_lesson`, `comeback`, `daily_quests_done`), in both voices (§5.3); blog: 2 pieces per unit (14), each with 0 to 3 informational comments, the first two written first so the format can be judged.
 
 ## 10. Open decisions
 

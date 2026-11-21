@@ -1,0 +1,27 @@
+format 1
+adapter characters 1
+
+npc npc-demo
+name: Demo
+title: Demo teacher
+field: demos
+
+bio:
+    I am Demo. I teach by example.
+
+    Ask me anything.
+
+spec: {"skin":{"base":"#FFD9C2"},"head":"tombstone","outfit":{"kind":"apron"}}
+
+line line-demo-meet
+kind: meet
+pose: greet
+
+    Hi, I'm Demo.
+
+line line-demo-intro-half-life
+kind: lesson_intro
+pose: explain
+lesson: half-life
+
+    Today: how long things last.

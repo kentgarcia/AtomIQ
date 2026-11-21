@@ -4,8 +4,8 @@
  * so they are not listed. Tables that are not here only need that validation.
  */
 export const CHECKS_BY_TABLE = {
-  npcs: ["test:voice"],
-  npc_lines: ["test:voice"],
+  npcs: ["test:voice", "test:npc"],
+  npc_lines: ["test:voice", "test:npc"],
   chat_nodes: ["test:chats", "test:voice"],
   feed_templates: ["test:feed", "test:voice"],
   blog_posts: ["test:feed", "test:voice"],

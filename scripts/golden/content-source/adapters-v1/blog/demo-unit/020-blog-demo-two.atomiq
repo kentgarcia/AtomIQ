@@ -1,0 +1,13 @@
+format 1
+adapter blog 1
+unit: demo-unit
+
+post blog-demo-two
+author: npc-demo
+title: Second
+hook: Plain.
+cover: atom
+read: 1
+
+p:
+    Only this.

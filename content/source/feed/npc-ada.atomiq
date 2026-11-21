@@ -1,0 +1,217 @@
+format 1
+adapter feed 1
+npc: npc-ada
+
+post ft-ada-chest-daily
+kind: celebrate
+trigger: chest_opened
+chip: quests
+condition: {"period":"daily"}
+
+text:
+    ooh a daily chest, opened. a tiny sparkle for a tiny habit. yay you~
+
+post ft-ada-chest-weekly
+kind: celebrate
+trigger: chest_opened
+chip: quests
+condition: {"period":"weekly"}
+
+text:
+    the weekly chest is open. every quest of the week, done. that's SO many little steps hehe~
+
+post ft-ada-first-lesson
+kind: celebrate
+trigger: first_lesson
+chip: lesson
+
+text:
+    your first lesson is done: “{lesson}”. hehe, i knew you could. every big thing starts tiny~
+
+post ft-ada-lesson-alpha-beta-gamma-1
+kind: celebrate
+trigger: lesson_complete
+chip: lesson
+weight: 2
+condition: {"unitId":"radioactivity","lessonId":"alpha-beta-gamma"}
+
+text:
+    “{lesson}” is done. alpha is a chunk, beta is a fast electron, and gamma isn't a particle at all. three little surprises, hehe
+
+post ft-ada-lesson-alpha-beta-gamma-2
+kind: celebrate
+trigger: lesson_complete
+chip: lesson
+condition: {"unitId":"radioactivity","lessonId":"alpha-beta-gamma","perfect":true}
+
+text:
+    a perfect score in “{lesson}”. three kinds of radiation and this learner can tell them ALL apart. eee, so clever~
+
+post ft-ada-lesson-decay-chains-1
+kind: celebrate
+trigger: lesson_complete
+chip: lesson
+weight: 2
+condition: {"unitId":"radioactivity","lessonId":"decay-chains"}
+
+text:
+    “{lesson}” is done. one decay isn't always the end. every step makes a different nucleus, like a tiny staircase
+
+post ft-ada-lesson-decay-chains-2
+kind: celebrate
+trigger: lesson_complete
+chip: lesson
+condition: {"unitId":"radioactivity","lessonId":"decay-chains"}
+
+text:
+    someone just followed a nucleus as it changed again and again until it was stable. nothing vanishes, it just keeps becoming
+
+post ft-ada-lesson-half-life-1
+kind: celebrate
+trigger: lesson_complete
+chip: lesson
+weight: 2
+condition: {"unitId":"radioactivity","lessonId":"half-life"}
+
+text:
+    you finished “{lesson}”. half-life belongs to a whole crowd of atoms. it's not a little timer inside each one. hehe
+
+post ft-ada-lesson-half-life-2
+kind: celebrate
+trigger: lesson_complete
+chip: lesson
+condition: {"unitId":"radioactivity","lessonId":"half-life","perfect":true}
+
+text:
+    a perfect “{lesson}”. start with 100 nuclei and after one half-life about 50 are left. note the word about. i love that word~
+
+post ft-ada-lesson-radioactivity-is-natural-1
+kind: celebrate
+trigger: lesson_complete
+chip: lesson
+weight: 2
+condition: {"unitId":"radioactivity","lessonId":"radioactivity-is-natural"}
+
+text:
+    you finished “{lesson}”. it's in rocks, in the air, in food, in you, and it was here long before people. so old, so cute~
+
+post ft-ada-lesson-radioactivity-is-natural-2
+kind: celebrate
+trigger: lesson_complete
+chip: lesson
+condition: {"unitId":"radioactivity","lessonId":"radioactivity-is-natural"}
+
+text:
+    someone just learned a banana is a little bit radioactive. radioactive doesn't automatically mean dangerous. banana fact of the day
+
+post ft-ada-lesson-why-nuclei-decay-1
+kind: celebrate
+trigger: lesson_complete
+chip: lesson
+weight: 2
+condition: {"unitId":"radioactivity","lessonId":"why-nuclei-decay"}
+
+text:
+    you finished “{lesson}”. an unstable nucleus can change all by itself, and nobody can say when. ooh, a little mystery~
+
+post ft-ada-lesson-why-nuclei-decay-2
+kind: celebrate
+trigger: lesson_complete
+chip: lesson
+condition: {"unitId":"radioactivity","lessonId":"why-nuclei-decay"}
+
+text:
+    someone just learned the parent and the daughter. one nucleus turns into another. nothing just vanishes, it only becomes something new. so cute
+
+post ft-ada-quests
+kind: celebrate
+trigger: daily_quests_done
+chip: quests
+
+text:
+    all the daily quests are claimed. go open the chest, i think it's sparkly~
+
+post ft-ada-rank-passed
+kind: celebrate
+trigger: rank_change
+chip: ranks
+condition: {"direction":"passed"}
+
+text:
+    you passed {rival} in the weekly ranking. eep, so quick. keep going, friend~
+
+post ft-ada-checkpoint-radioactivity
+kind: milestone
+trigger: checkpoint_pass
+chip: unit
+condition: {"unitId":"radioactivity"}
+reactors: npc-hal
+
+text:
+    the {unit} checkpoint is passed. take a little moment. you earned every bit of it~
+
+post ft-ada-testout-radioactivity
+kind: milestone
+trigger: testout_pass
+chip: unit
+condition: {"unitId":"radioactivity"}
+reactors: npc-hal
+
+text:
+    you tested out of “{unit}”. you already knew all this and now it's on your record. so sparkly~
+
+post ft-ada-unit-inside-the-atom-1
+kind: milestone
+trigger: unit_complete
+chip: unit
+weight: 2
+condition: {"unitId":"inside-the-atom"}
+reactors: npc-hal
+
+text:
+    someone just finished “{unit}” with Hal. they know what's inside an atom. now they can find out how a nucleus changes, and that part is mine. hehe~
+
+post ft-ada-unit-radioactivity-2
+kind: milestone
+trigger: unit_complete
+chip: unit
+weight: 2
+condition: {"unitId":"radioactivity"}
+reactors: npc-hal
+
+text:
+    you finished “{unit}”. now you know why nuclei change, what comes out, and how a crowd follows a pattern. radioactivity is a natural part of the world
+
+post ft-ada-comeback-14
+kind: nudge
+trigger: comeback
+condition: {"minDays":14}
+
+text:
+    welcome back, {name}. the door was open the whole time and i kept the flask warm. let's find where you stopped
+
+post ft-ada-comeback-3
+kind: nudge
+trigger: comeback
+condition: {"minDays":3}
+
+text:
+    there you are, {name}. i saved your seat~ ready for one more tiny lesson?
+
+post ft-ada-rank-passed-by
+kind: nudge
+trigger: rank_change
+chip: ranks
+condition: {"direction":"passed_by"}
+
+text:
+    oh no, {rival} passed you in the weekly ranking. just one more lesson and you could zoom ahead again
+
+post ft-ada-tease-radioactivity
+kind: tease
+trigger: lesson_complete
+chip: unit
+condition: {"unitId":"radioactivity","lessonId":"half-life"}
+
+text:
+    half-life is done, yay~ next you'll follow a nucleus that changes again and again. one decay isn't always the end

@@ -1,0 +1,39 @@
+format 1
+adapter characters 1
+
+npc npc-mina
+name: Mina
+title: Radiation and health teacher
+field: radiation-and-the-body
+
+bio:
+    I'm Mina. I teach what radiation does to the body, and how big a dose really is. A lot of people worry about it, and that's fair. I'll go through it with you, one calm step at a time, until it makes sense.
+
+spec:
+    {
+      "skin": {
+        "base": "#A56644",
+        "shade": "#8E5236",
+        "feature": "#753F28"
+      },
+      "head": "tombstone",
+      "headWidth": 100,
+      "eyes": "pill",
+      "nose": "single",
+      "hair": {
+        "style": "bun",
+        "color": "#2E2622",
+        "shade": "#211B18"
+      },
+      "outfit": {
+        "kind": "coat",
+        "color": "#58CC02",
+        "shade": "#58A700",
+        "collar": "#FFFFFF"
+      },
+      "accent": {
+        "kind": "stethoscope",
+        "color": "#1899D6",
+        "shade": "#1453A3"
+      }
+    }

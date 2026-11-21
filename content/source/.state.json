@@ -1,6 +1,12 @@
 {
   "version": 1,
   "tables": {
-    "chat_nodes": "c93ebb5008abd7c0"
+    "blog_comments": "92aacab770bc2da9",
+    "blog_posts": "17c938794cc15a32",
+    "blog_references": "dbdf154117df14cc",
+    "chat_nodes": "c93ebb5008abd7c0",
+    "feed_templates": "d50c6a83d9fe4eba",
+    "npc_lines": "6d14f9f02e3f69b5",
+    "npcs": "835d588883a4f2ca"
   }
 }

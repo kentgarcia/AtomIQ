@@ -1,0 +1,14 @@
+format 1
+adapter chat 1
+npc: npc-demo
+
+node chat-demo-up-hello
+kind: unprompted
+pose: cheer
+trigger: lessons_completed:3
+title: hello again
+
+    Three lessons. Nice.
+
+reply: thanks -> chat-demo-bye
+sticker: nerd -> chat-demo-bye

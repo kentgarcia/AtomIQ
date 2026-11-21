@@ -1,0 +1,50 @@
+format 1
+adapter blog 1
+unit: demo-unit
+
+post blog-demo
+author: npc-demo
+lesson: half-life
+title: A demo post
+hook: It shows every kind of block.
+cover: atom
+read: 2
+unlock: {"trigger":"unit_complete","unitId":"demo-unit"}
+reactors: npc-ada
+references: ref-a
+references: ref-b
+h: A heading
+
+p:
+    A paragraph.
+
+    With two parts.
+
+quote:
+    A quote.
+
+fact:
+    A fact.
+
+figure: atom
+caption: A picture.
+figure: orbit
+
+list:
+    one
+    two: with a colon
+    three
+
+next: Try it => lesson half-life
+next: Meet Ada => unit radioactivity
+
+comment bc-demo-ray
+author: npc-ray
+chip: {"entryId":"atom"}
+
+    Plain words.
+
+comment bc-demo-ada
+author: npc-ada
+
+    ooh~

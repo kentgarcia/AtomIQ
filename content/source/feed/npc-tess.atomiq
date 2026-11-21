@@ -1,0 +1,71 @@
+format 1
+adapter feed 1
+npc: npc-tess
+
+post ft-tess-chest-daily
+kind: celebrate
+trigger: chest_opened
+chip: quests
+condition: {"period":"daily"}
+
+text:
+    Ping. Daily chest opened. Small reward, tiny habit, big streak potential.
+
+post ft-tess-chest-weekly
+kind: celebrate
+trigger: chest_opened
+chip: quests
+condition: {"period":"weekly"}
+
+text:
+    Weekly chest unlocked! Every quest of the week done. Gadget level: maxed out.
+
+post ft-tess-first-lesson
+kind: celebrate
+trigger: first_lesson
+chip: lesson
+
+text:
+    First lesson done: “{lesson}”. Unlocked! Lots more shiny things ahead.
+
+post ft-tess-quests
+kind: celebrate
+trigger: daily_quests_done
+chip: quests
+
+text:
+    All daily quests, claimed. Done and done. Go tap that chest.
+
+post ft-tess-rank-passed
+kind: celebrate
+trigger: rank_change
+chip: ranks
+condition: {"direction":"passed"}
+
+text:
+    Ooh, you passed {rival} in the weekly ranking. Zoom! Keep that speed.
+
+post ft-tess-comeback-14
+kind: nudge
+trigger: comeback
+condition: {"minDays":14}
+
+text:
+    Hey {name}, long time. Rebooting is easy: one lesson and you are right back in.
+
+post ft-tess-comeback-3
+kind: nudge
+trigger: comeback
+condition: {"minDays":3}
+
+text:
+    Welcome back, {name}. Quick one: pick up where you stopped. I kept your place.
+
+post ft-tess-rank-passed-by
+kind: nudge
+trigger: rank_change
+chip: ranks
+condition: {"direction":"passed_by"}
+
+text:
+    {rival} just passed you in the weekly ranking. Quick fix: one lesson. Go, go.

@@ -1,0 +1,93 @@
+format 1
+adapter characters 1
+
+npc npc-ada
+name: Ada
+title: Radioactivity teacher
+field: radioactivity
+
+bio:
+    hi, i'm ada. i teach why some atoms change and how long it takes, which is my favourite thing in the whole world. i carry a flask called sparkle, and one of my bows is, um, slightly green now~
+
+spec:
+    {
+      "skin": {
+        "base": "#FFD9C2",
+        "shade": "#F8C2A4",
+        "feature": "#EBA17E"
+      },
+      "head": "tombstone",
+      "headWidth": 102,
+      "eyes": "sparkle",
+      "nose": "single",
+      "blush": "#F5A4A4",
+      "hair": {
+        "style": "pigtailbows",
+        "color": "#7C3F25",
+        "shade": "#64311D"
+      },
+      "outfit": {
+        "kind": "apron",
+        "color": "#FFAADE",
+        "shade": "#F58BC7",
+        "collar": "#FFCE8E"
+      },
+      "accent": {
+        "kind": "flask",
+        "color": "#CE82FF",
+        "shade": "#9069CD"
+      }
+    }
+
+line line-ada-meet
+kind: meet
+pose: greet
+
+    Hi, I'm Ada. Let's find out why some atoms change, and how long it takes.
+
+line line-ada-sign-off
+kind: sign_off
+pose: proud
+
+    Well done. Radioactivity is a natural part of the world, and now you know how it works.
+
+line line-ada-tease
+kind: tease
+pose: idle
+
+    Finish my unit first. There is more to learn about what radiation does.
+
+line line-ada-intro-alpha-beta-gamma
+kind: lesson_intro
+pose: point
+lesson: alpha-beta-gamma
+
+    When a nucleus changes, something comes out. Let's meet the three things it can be.
+
+line line-ada-intro-decay-chains
+kind: lesson_intro
+pose: explain
+lesson: decay-chains
+
+    One change is not always the end. Let's follow a nucleus all the way down.
+
+line line-ada-intro-half-life
+kind: lesson_intro
+pose: think
+lesson: half-life
+
+    A half-life ticks for a whole crowd of atoms, not for one. Let's see how.
+
+line line-ada-intro-radioactivity-is-natural
+kind: lesson_intro
+pose: greet
+lesson: radioactivity-is-natural
+
+    Here is something nobody expects: radioactivity was always here. Let's find where.
+
+line line-ada-intro-why-nuclei-decay
+kind: lesson_intro
+pose: explain
+lesson: why-nuclei-decay
+
+    Some nuclei change all by themselves, and nobody can say when. Let's find out why.

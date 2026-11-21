@@ -1,0 +1,71 @@
+format 1
+adapter feed 1
+npc: npc-ray
+
+post ft-ray-chest-daily
+kind: celebrate
+trigger: chest_opened
+chip: quests
+condition: {"period":"daily"}
+
+text:
+    Daily chest opened. Small reward. Same time tomorrow.
+
+post ft-ray-chest-weekly
+kind: celebrate
+trigger: chest_opened
+chip: quests
+condition: {"period":"weekly"}
+
+text:
+    Weekly chest open. Every quest of the week done. Checked off.
+
+post ft-ray-first-lesson
+kind: celebrate
+trigger: first_lesson
+chip: lesson
+
+text:
+    First lesson done: “{lesson}”. Good. The next one is on the map.
+
+post ft-ray-quests
+kind: celebrate
+trigger: daily_quests_done
+chip: quests
+
+text:
+    All daily quests done. Open the chest. That is the whole job for today.
+
+post ft-ray-rank-passed
+kind: celebrate
+trigger: rank_change
+chip: ranks
+condition: {"direction":"passed"}
+
+text:
+    You passed {rival} in the weekly ranking. Noted. Hold the spot.
+
+post ft-ray-comeback-14
+kind: nudge
+trigger: comeback
+condition: {"minDays":14}
+
+text:
+    Two weeks, {name}. Fine. Start with one lesson. Do not try to catch up all at once.
+
+post ft-ray-comeback-3
+kind: nudge
+trigger: comeback
+condition: {"minDays":3}
+
+text:
+    {name}. You are back. Pick up where you stopped. One lesson is enough.
+
+post ft-ray-rank-passed-by
+kind: nudge
+trigger: rank_change
+chip: ranks
+condition: {"direction":"passed_by"}
+
+text:
+    {rival} passed you in the weekly ranking. One lesson fixes that. Go do it.

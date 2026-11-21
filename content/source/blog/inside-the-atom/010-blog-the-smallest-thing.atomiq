@@ -1,0 +1,59 @@
+format 1
+adapter blog 1
+unit: inside-the-atom
+
+post blog-the-smallest-thing
+author: npc-hal
+lesson: atoms-are-everywhere
+title: The smallest thing you will ever meet
+hook: You have never seen one, yet you are made of them. Let us look at how small they really are.
+cover: atom
+read: 2
+references: ref-openstax-chem-ch1
+references: ref-openstax-chem-ch2
+
+p:
+    Look at your hand. Now look at the air around it. Both are matter, and all matter is made of atoms.
+
+p:
+    Yes, even the air, which gives every impression of being nothing. That is why a pumped-up ball is heavier than a flat one: the air inside it is matter too. I have weighed several balls to be certain. The neighbours have asked me to stop.
+
+quote:
+    Small things are best looked at slowly. I still look at them every day.
+
+h: How small is small?
+
+p:
+    Take a skin cell. You need a microscope to see it. A virus is about 300 times smaller than that cell. And an atom is about 300 times smaller again.
+
+figure: atom
+caption: An atom: far too small to see, even with an ordinary microscope.
+
+list:
+    Your hand: about 10 cm
+    A skin cell: about 0.03 mm
+    A virus: about 100 nm
+    An atom: a few tenths of a nm
+
+fact:
+    About 2,400 years ago the Greek thinker Democritus imagined cutting something in half again and again, until he reached a piece that could not be cut. He called it atomos. Seeing atoms took far longer.
+
+p:
+    Light and heat are different. They are energy, not matter, so they are not made of atoms.
+
+p:
+    So the next time you pick something up, remember that you are holding a huge crowd of atoms you can never see. Take a moment with that. I will wait.
+
+next: Zoom in on an atom yourself => lesson atoms-are-everywhere
+
+comment bc-the-smallest-thing-ray
+author: npc-ray
+chip: {"entryId":"atom"}
+
+    Plain words: matter is anything that has mass and takes up space. Light and heat do not, so they are not matter.
+
+comment bc-the-smallest-thing-ada
+author: npc-ada
+chip: {"lessonId":"why-nuclei-decay"}
+
+    ooh, tiny. and inside one, the nucleus can change all by itself. that's what my lessons are about~

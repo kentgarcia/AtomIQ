@@ -1,0 +1,11 @@
+format 1
+adapter feed 1
+
+post ft-shared-streak
+kind: milestone
+trigger: streak
+condition: {"days":7}
+pool: learner
+
+text:
+    Seven days in a row.

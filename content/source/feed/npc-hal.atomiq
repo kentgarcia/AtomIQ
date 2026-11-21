@@ -1,0 +1,217 @@
+format 1
+adapter feed 1
+npc: npc-hal
+
+post ft-hal-chest-daily
+kind: celebrate
+trigger: chest_opened
+chip: quests
+condition: {"period":"daily"}
+
+text:
+    A daily chest, opened. A small reward for a steady day. Steady days are how a pebble becomes a cliff. Slowly.
+
+post ft-hal-chest-weekly
+kind: celebrate
+trigger: chest_opened
+chip: quests
+condition: {"period":"weekly"}
+
+text:
+    The weekly chest is open. Every quest of the week is done, one after another. I should like to shake your hand. I will do so in spirit.
+
+post ft-hal-first-lesson
+kind: celebrate
+trigger: first_lesson
+chip: lesson
+
+text:
+    Your first lesson is done: “{lesson}”. A good start. We will go slowly, and we will go exactly.
+
+post ft-hal-lesson-atoms-are-everywhere-1
+kind: celebrate
+trigger: lesson_complete
+chip: lesson
+weight: 2
+condition: {"unitId":"inside-the-atom","lessonId":"atoms-are-everywhere"}
+
+text:
+    You finished “{lesson}”. Your hand, and the air around it, are made of atoms. They are far too small to see. I have checked. Twice.
+
+post ft-hal-lesson-atoms-are-everywhere-2
+kind: celebrate
+trigger: lesson_complete
+chip: lesson
+condition: {"unitId":"inside-the-atom","lessonId":"atoms-are-everywhere"}
+
+text:
+    Someone just zoomed in from a hand down to a single atom. Slowly, and all the way. That is the correct way to look at anything.
+
+post ft-hal-lesson-elements-and-the-periodic-table-1
+kind: celebrate
+trigger: lesson_complete
+chip: lesson
+weight: 2
+condition: {"unitId":"inside-the-atom","lessonId":"elements-and-the-periodic-table"}
+
+text:
+    You finished “{lesson}”. Six protons is always carbon. Seven is always nitrogen. Eight is always oxygen. It never varies. I find that restful.
+
+post ft-hal-lesson-elements-and-the-periodic-table-2
+kind: celebrate
+trigger: lesson_complete
+chip: lesson
+condition: {"unitId":"inside-the-atom","lessonId":"elements-and-the-periodic-table"}
+
+text:
+    Someone just turned carbon into nitrogen with one extra proton, in the atom builder. The protons decide the element. Exactly so.
+
+post ft-hal-lesson-isotopes-1
+kind: celebrate
+trigger: lesson_complete
+chip: lesson
+weight: 2
+condition: {"unitId":"inside-the-atom","lessonId":"isotopes"}
+
+text:
+    “{lesson}” is done. Carbon-12, carbon-13 and carbon-14 are all carbon, with different numbers of neutrons. I have named three pebbles after them.
+
+post ft-hal-lesson-isotopes-2
+kind: celebrate
+trigger: lesson_complete
+chip: lesson
+condition: {"unitId":"inside-the-atom","lessonId":"isotopes","perfect":true}
+
+text:
+    A perfect run through “{lesson}”. Same protons, different neutrons. And an isotope is not automatically radioactive. Well observed.
+
+post ft-hal-lesson-protons-neutrons-electrons-1
+kind: celebrate
+trigger: lesson_complete
+chip: lesson
+weight: 2
+condition: {"unitId":"inside-the-atom","lessonId":"protons-neutrons-electrons"}
+
+text:
+    “{lesson}” is done. You met the proton, the neutron and the electron. Only one of the three is negative. I find it helps to remember which.
+
+post ft-hal-lesson-protons-neutrons-electrons-2
+kind: celebrate
+trigger: lesson_complete
+chip: lesson
+condition: {"unitId":"inside-the-atom","lessonId":"protons-neutrons-electrons","perfect":true}
+
+text:
+    Someone just answered everything right in “{lesson}”. If an atom were a stadium, its nucleus would be a marble. They know it exactly. I am moved.
+
+post ft-hal-lesson-stable-and-unstable-nuclei-1
+kind: celebrate
+trigger: lesson_complete
+chip: lesson
+weight: 2
+condition: {"unitId":"inside-the-atom","lessonId":"stable-and-unstable-nuclei"}
+
+text:
+    You finished “{lesson}”. Some nuclei stay the same and some can change. Most of the atoms in you are stable. I find that reassuring.
+
+post ft-hal-lesson-stable-and-unstable-nuclei-2
+kind: celebrate
+trigger: lesson_complete
+chip: lesson
+condition: {"unitId":"inside-the-atom","lessonId":"stable-and-unstable-nuclei"}
+
+text:
+    Someone just made unstable carbon-14 into a stable carbon atom by changing its neutrons. I looked at it for some time.
+
+post ft-hal-quests
+kind: celebrate
+trigger: daily_quests_done
+chip: quests
+
+text:
+    Every daily quest is claimed. A full day, done carefully. The chest is waiting. I will not open it for you. It would be rude.
+
+post ft-hal-rank-passed
+kind: celebrate
+trigger: rank_change
+chip: ranks
+condition: {"direction":"passed"}
+
+text:
+    You passed {rival} in the weekly ranking. Quietly done. I did not see it happen. I only saw that it had.
+
+post ft-hal-checkpoint-inside-the-atom
+kind: milestone
+trigger: checkpoint_pass
+chip: unit
+condition: {"unitId":"inside-the-atom"}
+reactors: npc-ada
+
+text:
+    The {unit} checkpoint is passed. Protons, neutrons, electrons and isotopes: all of it, in its place. I have put a small rock on this post to mark the occasion.
+
+post ft-hal-testout-inside-the-atom
+kind: milestone
+trigger: testout_pass
+chip: unit
+condition: {"unitId":"inside-the-atom"}
+reactors: npc-ada
+
+text:
+    You tested out of “{unit}”. You already knew your atoms. That is a fine place to start, and I respect it. I will not make you sit my rock quiz.
+
+post ft-hal-unit-inside-the-atom-2
+kind: milestone
+trigger: unit_complete
+chip: unit
+weight: 2
+condition: {"unitId":"inside-the-atom"}
+reactors: npc-ada
+
+text:
+    You finished “{unit}”. You know what an atom is made of, what makes an element, and why some nuclei can change. Ada is next. She is a great deal. She is also very good.
+
+post ft-hal-unit-radioactivity-1
+kind: milestone
+trigger: unit_complete
+chip: unit
+weight: 2
+condition: {"unitId":"radioactivity"}
+reactors: npc-ada
+
+text:
+    Someone has finished “{unit}” with Ada. Nuclei change by themselves, a crowd follows a pattern, and radioactivity is natural. I am quietly proud. She will be insufferable about it. Rightly.
+
+post ft-hal-comeback-14
+kind: nudge
+trigger: comeback
+condition: {"minDays":14}
+
+text:
+    It has been a while, {name}. That is all right. The atoms waited, and so did I. I have sorted my rocks four times since. One lesson is a fine place to begin.
+
+post ft-hal-comeback-3
+kind: nudge
+trigger: comeback
+condition: {"minDays":3}
+
+text:
+    Welcome back, {name}. Everything is where you left it, which is more than I can say for my samples. Shall we pick it up?
+
+post ft-hal-rank-passed-by
+kind: nudge
+trigger: rank_change
+chip: ranks
+condition: {"direction":"passed_by"}
+
+text:
+    {rival} passed you in the weekly ranking. No need to hurry. A rock does not hurry, and yet there are mountains.
+
+post ft-hal-tease-inside-the-atom
+kind: tease
+trigger: lesson_complete
+chip: unit
+condition: {"unitId":"inside-the-atom","lessonId":"elements-and-the-periodic-table"}
+
+text:
+    Three lessons in. Isotopes are next: the same element, with a different number of neutrons. I will be sorting pebbles. Do not mind me.

@@ -1,6 +1,6 @@
 # Content source files: text is the master, the database is built from it
 
-**Status (2026-11-22):** phases 1 and 2 are built (core, default adapter, export, sync, format, migrate, chat owned by files); later phases are marked in section 14. Where this text and the code differ, the code and its tests win and this text is fixed.
+**Status (2026-11-22):** phases 1 to 3 are built (core, default adapter, export, sync, format, migrate; chat, characters, feed and blog owned by files, their seeds retired; `test:source-adapters`); later phases are marked in section 14. Where this text and the code differ, the code and its tests win and this text is fixed.
 **Decided by the owner:** files are the source of truth for authored prose; the SQLite content DB stays what the app ships and reads; Content Studio is only a viewer (the owner does not use it to edit); the `verified` flag is not something the owner will maintain; **lessons, items and cards will be migrated too, in a later phase** (they began as TypeScript files, which were easy to handle, only with very long lines because they describe pages, not plain data); **translations will be one file per language that maps the id of a text to its translation** (section 11); the file extension is **`.atomiq`**.
 **Reads with:** `docs/critical/CONTENT_SQLITE_AND_STUDIO_SPEC.md` (the DB, releases, shipped ids), `docs/features/NPC_VOICE_SPEC.md` (the chat words), `scripts/lib/content-store.mjs` (`applyBatch`, the write path this spec reuses).
 
@@ -488,7 +488,7 @@ Decided: the extension is `.atomiq`; lessons are migrated later (phase 5), with 
 | 0 | this spec accepted | the owner agrees, or changes it |
 | 1 | core parser and writer, default adapter, `content:export`, T1 to T4, T6, T8, T9 | **all 27 content tables round-trip**; no table is owned; no existing behaviour changed |
 | 2 | chat adapter, `SOURCE_OWNED_TABLES`, `content:sync` (+ `--check`), drift state, ownership guard, `content:edit` guard, legacy chat scripts retired, publish gate, docs | a Hal story edited as a file reaches the DB through one sync with its tests; T5, T7 pass; the old seeds cannot run |
-| 3 | npc, feed, blog adapters, retire their seeds | same, per adapter, with no change to chat |
+| 3 | npc, feed, blog adapters, retire their seeds (**built**) | same, per adapter, with no change to chat; a test fails when `npc-roster.ts` and the characters' files differ |
 | 4 | the remaining tables | same |
 | 5 | its own spec first (the figure library and `ref` conversion from 3.1, interaction types, retiring `unit-N.mjs`, `scenes.mjs` and `sync-unit.mjs`), then the lesson adapters | a unit written as `.atomiq` files syncs to the same rows the `unit-N.mjs` sync produced (row-for-row), tests included |
 | 6 | the `i18n` adapter and the runtime lookup with base-text fallback (own spec) | one language file reaches `content_translations` and a screen shows it, with fallback |

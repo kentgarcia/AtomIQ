@@ -1,0 +1,35 @@
+format 1
+adapter chat 1
+npc: npc-demo
+
+node chat-demo-greeting
+kind: greeting
+pose: greet
+title: Chat with Demo
+
+    Hello there.
+
+    What would you like to talk about?
+
+reply: the lesson -> chat-demo-lesson
+reply: something else -> chat-demo-bye
+reply: Open the atom -> chat-demo-bye => entry atom
+link: See my progress => app
+
+node chat-demo-lesson
+kind: reply
+pose: explain
+
+    A lesson is a short story. (Not a long one.)
+
+react: love -> chat-demo-bye
+sticker: nerd -> chat-demo-bye
+
+node chat-demo-bye
+kind: sign_off
+pose: proud
+
+    Bye for now.
+
+react: love
+sticker: nerd

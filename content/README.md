@@ -37,9 +37,8 @@ Discover is a feed in which the NPC cast posts about what the learner did
 text per trigger, with placeholders), `blog_posts` (the short pieces, written in
 blocks), `blog_comments` (NPC comments, authored with the piece) and
 `blog_references` (a piece's sources). Seed rows live in
-`scripts/content-migration/feed-content.mjs` (it adds only missing rows, so
-Studio edits survive; `--overwrite` resets them); edit them afterwards in Studio
-(Feed group). The trigger keys, their condition fields and placeholders and the
+`content/source/feed/` and `content/source/blog/` (text files, built into the
+database by `npm run content:sync`; the old seed `feed-content.mjs` is retired). The trigger keys, their condition fields and placeholders and the
 block types are in `scripts/lib/feed-vocab.mjs`; the rules in
 `scripts/lib/feed-rules.mjs` run in `validate:content` and on every Studio
 save. A piece needs a verified source before publish, like a lesson.
