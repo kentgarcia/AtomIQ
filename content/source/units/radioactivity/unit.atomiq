@@ -1,0 +1,35 @@
+format 1
+adapter curriculum 1
+
+unit radioactivity
+position: 2
+title: Radioactivity
+subtitle: How unstable nuclei change
+icon: Radar
+tone: warning
+teacher: npc-ada
+
+goal:
+    Explain in your own words that radioactivity is a natural process in which an unstable nucleus changes into a more stable state and releases radiation.
+
+summary:
+    Radioactivity is a natural process in which an unstable nucleus changes into a more stable state and releases radiation. It happens by itself, and you cannot predict when one particular nucleus will change. What comes out can be alpha particles, beta particles or gamma rays: three different things. A big group of nuclei follows a pattern called half-life. A new nucleus can be unstable too, which makes a decay chain. Radioactivity is found in rocks, air, food, the body and space, and radioactive does not automatically mean dangerous.
+
+terms: radioactivity
+terms: decay
+terms: alpha-particle
+terms: beta-particle
+terms: gamma-ray
+terms: half-life
+terms: decay-chain
+terms: radon
+terms: background-radiation
+
+description:
+    Find out why some nuclei change all by themselves. See what comes out, why nobody can say when one nucleus will change, how a big group follows a pattern, and why radioactivity is a natural part of the world.
+
+source ref-openstax-up3-ch10
+
+source ref-iaea-decay
+
+source ref-iaea-glossary

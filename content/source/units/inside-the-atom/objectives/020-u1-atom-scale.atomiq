@@ -1,0 +1,97 @@
+format 1
+adapter curriculum 1
+unit: inside-the-atom
+
+objective u1-atom-scale
+statement: Know that atoms are far too small to see, even with an ordinary microscope.
+misconception: A good microscope can show an atom.
+
+item u1-l1-order-sizes
+type: order
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-openstax-chem-ch2
+
+prompt:
+    Put these in order from smallest to biggest.
+
+items:
+    {"id":"atom","label":"An atom","art":"atom"}
+    {"id":"virus","label":"A virus","art":"virus"}
+    {"id":"cell","label":"A skin cell","art":"cell"}
+    {"id":"hand","label":"A hand","art":"hand"}
+
+explanation:
+    An atom is the smallest. A virus is bigger, a skin cell is bigger still, and a hand is the biggest.
+
+item u1-l1-tom-microscope
+type: true_or_myth
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-openstax-chem-ch2
+
+statement:
+    Atoms are too small to be seen with an ordinary microscope.
+
+answer: true
+
+explanation:
+    True. An ordinary microscope uses light, and light waves are too big to show something as small as an atom. Special instruments can, but a classroom microscope cannot.
+
+item u1-l1-tom-see-atoms
+type: true_or_myth
+surfaces: practice
+surfaces: checkpoint
+surfaces: review
+references: ref-openstax-chem-ch2
+
+statement:
+    With a good ordinary microscope you can see a single atom.
+
+answer: myth
+
+explanation:
+    Myth. Atoms are far too small. Even the best ordinary microscope cannot show one.
+
+item u1-x-order-cell
+type: choice
+surfaces: practice
+surfaces: checkpoint
+surfaces: review
+references: ref-openstax-chem-ch2
+
+prompt:
+    Which of these is the smallest?
+
+options:
+    {"id":"atom","label":"An atom","art":"atom"}
+    {"id":"virus","label":"A virus","note":"A virus is much bigger than an atom.","art":"virus"}
+    {"id":"cell","label":"A skin cell","note":"A skin cell is far bigger than an atom.","art":"cell"}
+    {"id":"hand","label":"A hand","note":"A hand is the biggest of these.","art":"hand"}
+
+answer: atom
+
+explanation:
+    An atom is far smaller than a virus, a cell or a hand.
+
+item u1-x-see-atom
+type: choice
+surfaces: practice
+surfaces: checkpoint
+surfaces: review
+references: ref-openstax-chem-ch2
+
+prompt:
+    Why can't you see atoms with an ordinary microscope?
+
+options:
+    {"id":"small","label":"They are far too small"}
+    {"id":"few","label":"There are not enough of them","note":"There are enormous numbers of atoms in everything."}
+    {"id":"energy","label":"They are made of energy","note":"Atoms are matter, not energy."}
+
+answer: small
+
+explanation:
+    Atoms are far too small for an ordinary microscope to show.

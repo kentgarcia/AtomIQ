@@ -1,0 +1,86 @@
+format 1
+adapter curriculum 1
+unit: radioactivity
+
+objective u2-not-always-dangerous
+
+statement:
+    Know that radioactive does not automatically mean dangerous; it depends on the type, the amount and how it reaches the body.
+
+misconception: Radioactive means automatically dangerous.
+
+item u2-l5-choice-dangerous
+type: choice
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-background-radiation
+
+prompt:
+    If something is radioactive, is it automatically dangerous?
+
+options:
+    {"id":"not","label":"Not necessarily"}
+    {"id":"always","label":"Yes: anything radioactive is dangerous","note":"Bananas and your body are radioactive. It depends on the type, the amount and how it reaches the body."}
+    {"id":"never","label":"No: radioactive things are always harmless","note":"Some radioactive things can be harmful. It depends."}
+
+answer: not
+
+explanation:
+    Radioactive does not automatically mean dangerous. It depends on the type of radiation, the amount and how it reaches the body.
+
+item u2-l5-choice-decides
+type: choice
+difficulty: 2
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-background-radiation
+
+prompt:
+    What helps decide whether radiation matters?
+
+options:
+    {"id":"three","label":"The type, the amount and how it reaches the body"}
+    {"id":"only-radioactive","label":"Only whether the material is radioactive","note":"That is not enough. It depends on more than that."}
+    {"id":"only-old","label":"Only how old the material is","note":"Age alone does not decide it."}
+
+answer: three
+
+explanation:
+    The type of radiation, how much there is and how it reaches the body all matter. Radioactive alone does not tell you.
+
+item u2-x-banana-says
+type: choice
+surfaces: practice
+surfaces: checkpoint
+surfaces: review
+references: ref-background-radiation
+
+prompt:
+    A banana holds a little radioactive potassium. What does that tell you?
+
+options:
+    {"id":"not","label":"Radioactive does not automatically mean dangerous"}
+    {"id":"hazard","label":"Bananas are a nuclear hazard","note":"A tiny natural amount is normal."}
+    {"id":"made","label":"Bananas were made by people","note":"Potassium-40 is natural."}
+
+answer: not
+
+explanation:
+    Bananas are a little radioactive, and that is normal. Radioactive does not automatically mean dangerous.
+
+item u2-x-tom-dangerous
+type: true_or_myth
+surfaces: practice
+surfaces: checkpoint
+surfaces: review
+references: ref-background-radiation
+
+statement:
+    Anything radioactive is automatically dangerous.
+
+answer: myth
+
+explanation:
+    Myth. It depends on the type of radiation, the amount and how it reaches the body.

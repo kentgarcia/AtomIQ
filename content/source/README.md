@@ -25,11 +25,15 @@ Never edit a table that is listed here with `content:edit` or Studio: the sync w
 | `reference/myths/<category>.atomiq` | `myths` | the myths of one category | by id |
 | `games/mythbuster/NNN-<difficulty>.atomiq` | `mythbuster_questions` | one difficulty | the order in the file |
 | `units/<unit>/statements.atomiq` | `unit_statements` | a unit's myth-or-fact statements | the order in the file |
+| `units/<unit>/unit.atomiq` | `units`, `unit_references` | the unit and the sources it cites | `position:` |
+| `units/<unit>/path.atomiq` | `path_nodes` | the map nodes of a unit | the order in the file |
+| `units/<unit>/objectives/NNN-<objective>.atomiq` | `objectives`, `items` | an objective and its question bank | file `NNN`; items by id |
+| `units/<unit>/lessons/NNN-<lesson>.atomiq` | `lessons`, `lesson_references`, `lesson_cards` | a lesson, its sources (`cite`) and cards | file `NNN`; cards in file order |
 | `phone/scanner/NNN-<scene>.atomiq` | `scan_targets`, `scan_target_references` | one scene | the order in the file |
 | `phone/safety/NNN-<section>.atomiq` | `safety_cards`, `safety_card_references` | one section | the order in the file |
 | `phone/map/sites.atomiq` | `map_sites`, `map_site_references` | all sites | the order in the file |
 
-A source that other things cite (`reference/sources`) and an AtomDex entry are written once and named by id elsewhere (`references: ref-x`, `entry: marie-curie`). Lists are repeated lines (`tags: radiation`, `steps: ...`), a block of JSON lines is `sources:` or `composition:`, and a long text is an indented block under its key. Lessons, items and cards are not files yet (phase 5).
+A source that other things cite (`reference/sources`) and an AtomDex entry are written once and named by id elsewhere (`references: ref-x`, `entry: marie-curie`). Lists are repeated lines (`tags: radiation`, `steps: ...`), a block of JSON lines is `sources:` or `composition:`, and a long text is an indented block under its key. A figure in a card is an id from the figure library (`figure: half-life-bars`, optional `figure_args:` as JSON); an unknown id is a validation error.
 
 ## Chat (`chat/<npc-id>/NNN-<root-id>.atomiq`, one file per story, the free chat is `010-`)
 

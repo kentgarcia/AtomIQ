@@ -1,0 +1,81 @@
+format 1
+adapter curriculum 1
+unit: demo-unit
+
+lesson demo-lesson
+title: A demo lesson
+minutes: 4
+xp: 40
+teaches: d-obj-1
+teaches: d-obj-2
+
+description:
+    What it covers.
+
+cite ref-a
+supports: Matter has mass.
+
+cite ref-b
+
+card c01
+kind: teach
+type: explain
+scored: 0
+title: A title
+figure: atom-model
+figure_args: [2,2,2]
+caption: An atom.
+figure_at: 1
+
+body:
+    First bubble.
+
+    Second bubble.
+
+card c02
+kind: item
+type: item
+item: d-l1-choice
+
+card c03
+kind: item
+type: item
+tier: deeper
+item: d-l1-tom
+scored: 0
+connected: true
+
+card c04
+kind: teach
+type: story
+tier: deeper
+scored: 0
+title: A story
+speaker: npc-demo
+tag: 1911
+figure_scene: {"height":30,"shapes":[]}
+alt: An empty picture used as a test.
+figure_at: 0
+
+body:
+    Long ago.
+
+card c05
+kind: teach
+type: reveal
+scored: 0
+title: Answer
+predicts: c01
+figure: half-life-bars
+alt: My own alt text for the bars.
+
+body:
+    Here it is.
+
+card c06
+kind: sim
+type: atom-builder
+scored: 0
+task: Build helium.
+hint: Add particles.
+config: {"mode":"build","goal":{"protons":2,"neutrons":2,"electrons":2},"objectives":["d-obj-1"]}

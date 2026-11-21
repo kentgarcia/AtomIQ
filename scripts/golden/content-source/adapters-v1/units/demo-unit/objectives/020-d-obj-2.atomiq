@@ -1,0 +1,40 @@
+format 1
+adapter curriculum 1
+unit: demo-unit
+
+objective d-obj-2
+statement: Know the second thing.
+
+item d-l1-hotspot
+type: hotspot
+surfaces: lesson
+
+prompt:
+    Tap it.
+
+scene: {"height":40,"shapes":[{"t":"circle","x":50,"y":20,"r":5,"tone":"danger","fill":"solid"}]}
+
+targets:
+    {"id":"n","label":"The nucleus","x":50,"y":20,"r":6}
+
+answer: n
+animate_on_correct: true
+
+explanation:
+    That one.
+
+item d-l1-sort
+type: sort
+surfaces: practice
+
+prompt:
+    Sort.
+
+buckets:
+    {"id":"x","label":"X","icon":"AqAtom"}
+
+items:
+    {"id":"i","label":"I","bucket":"x"}
+
+explanation:
+    Sorted.

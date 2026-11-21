@@ -1,0 +1,104 @@
+format 1
+adapter curriculum 1
+unit: inside-the-atom
+
+objective u1-change-protons
+statement: Know that changing the number of protons changes the element.
+misconception: An atom stays the same element when it gains or loses a proton.
+
+item u1-l3-choice-gain-two
+type: choice
+difficulty: 2
+surfaces: practice
+surfaces: checkpoint
+surfaces: review
+references: ref-openstax-chem-ch2
+
+prompt:
+    A carbon atom gains 2 protons. What is it now?
+
+figure: elements-by-protons
+
+options:
+    {"id":"oxygen","label":"Oxygen"}
+    {"id":"carbon","label":"Still carbon","note":"Carbon has 6 protons. With 8 it is a different element."}
+    {"id":"nitrogen","label":"Nitrogen","note":"Nitrogen has 7 protons. That is only one more."}
+
+answer: oxygen
+
+explanation:
+    6 protons plus 2 is 8 protons, and 8 protons is oxygen.
+
+item u1-l3-choice-lose-proton
+type: choice
+difficulty: 2
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-openstax-chem-ch2
+
+prompt:
+    An oxygen atom has 8 protons. It loses one proton. What is it now?
+
+figure: elements-by-protons
+
+options:
+    {"id":"nitrogen","label":"Nitrogen"}
+    {"id":"oxygen","label":"Still oxygen","note":"Oxygen has 8 protons. With 7, the atom is a different element."}
+    {"id":"carbon","label":"Carbon","note":"Carbon has 6 protons. That would mean losing two."}
+
+answer: nitrogen
+
+explanation:
+    8 protons take away 1 is 7 protons, and 7 protons is nitrogen.
+
+item u1-l3-tom-gain-proton
+type: true_or_myth
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-openstax-chem-ch2
+
+statement:
+    A carbon atom that gains one proton is still carbon.
+
+answer: myth
+
+explanation:
+    Myth. Carbon has 6 protons. With one more it has 7, and 7 protons is nitrogen. Change the protons and you change the element.
+
+item u1-x-proton-change
+type: choice
+difficulty: 2
+surfaces: practice
+surfaces: checkpoint
+surfaces: review
+references: ref-openstax-chem-ch2
+
+prompt:
+    A nitrogen atom has 7 protons. It gains one proton. What happens?
+
+options:
+    {"id":"oxygen","label":"It becomes oxygen, a different element"}
+    {"id":"nitrogen","label":"It is still nitrogen, just heavier","note":"The protons decide the element, so adding one changes the element."}
+    {"id":"carbon","label":"It becomes carbon","note":"Carbon has fewer protons, not more."}
+
+answer: oxygen
+
+explanation:
+    7 protons plus 1 is 8 protons, and 8 protons is oxygen.
+
+item u1-x-true-change-protons
+type: true_or_myth
+surfaces: practice
+surfaces: checkpoint
+surfaces: review
+references: ref-openstax-chem-ch2
+
+statement:
+    If you change the number of protons in an atom, it becomes a different element.
+
+answer: true
+
+explanation:
+    True. The number of protons tells you the element, so changing it changes the element.

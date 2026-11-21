@@ -1,0 +1,31 @@
+format 1
+adapter curriculum 1
+unit: radioactivity
+
+node u2-n1
+kind: lesson
+lesson: why-nuclei-decay
+
+node u2-n2
+kind: lesson
+lesson: alpha-beta-gamma
+
+node u2-n3
+kind: lesson
+lesson: half-life
+
+node u2-n4
+kind: practice
+config: {"questionCount":8,"earlierShare":0}
+
+node u2-n5
+kind: lesson
+lesson: decay-chains
+
+node u2-n6
+kind: lesson
+lesson: radioactivity-is-natural
+
+node u2-n7
+kind: checkpoint
+config: {"questionCount":12,"earlierShare":0.15,"passMark":0.8}

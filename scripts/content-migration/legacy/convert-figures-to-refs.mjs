@@ -15,10 +15,21 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { openDb } from "../lib/content-tables.mjs";
-import { makePaths } from "../lib/content-paths.mjs";
-import { sameScene as same, sceneHash } from "../lib/figure-hash.mjs";
-import { FIGURES, resolveFigure } from "../../components/lesson/visual/figures/index.ts";
+import { openDb } from "../../lib/content-tables.mjs";
+import { makePaths } from "../../lib/content-paths.mjs";
+import { sameScene as same, sceneHash } from "../../lib/figure-hash.mjs";
+import { FIGURES, resolveFigure } from "../../../components/lesson/visual/figures/index.ts";
+
+/**
+ * RETIRED (content source files, phase 5): its conversion of stored figures to ids ran once (phase 5); the figures are ids in content/source and a library in components/lesson/visual/figures.
+ * Running this would overwrite them behind the files' back. Kept only as history. Do not run it. Edit the files
+ * (docs/features/CONTENT_SOURCE_SPEC.md, docs/features/CONTENT_SOURCE_PHASE5_SPEC.md).
+ */
+if (!process.argv.includes("--i-know-this-is-retired")) {
+  console.error("convert-figures-to-refs.mjs is retired: the curriculum lives in content/source/units and is built by `npm run content:sync`.");
+  process.exit(1);
+}
+
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const out = process.argv[2];

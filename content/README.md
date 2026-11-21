@@ -22,9 +22,9 @@ interactive cards point at items in a shared bank that also feeds practice,
 review and games. The database stores values only. Every interaction is a
 hardcoded component in `components/lesson/cards/`.
 
-Authoring source for a unit is `scripts/content-migration/curriculum/unit-N.mjs`
-(Unit 1 is the pilot). `node scripts/content-migration/curriculum-cutover.mjs
-[--dry-run]` loads those files into the master db (backing it up first), and the
+Authoring source for a unit is the folder `content/source/units/<unit>/` (`.atomiq`
+text files: `unit.atomiq`, `path.atomiq`, `objectives/`, `lessons/`), built into the master db with
+`npm run content:sync` (the old `unit-N.mjs` modules are retired), and the
 rules in `scripts/lib/curriculum-rules.mjs` run inside `validate:content` and on
 every Studio save. References must be verified by a person before publish
 (unverified ones are warnings in a draft and errors at the publish gate). The

@@ -1,0 +1,140 @@
+format 1
+adapter curriculum 1
+unit: inside-the-atom
+
+lesson atoms-are-everywhere
+title: Atoms are everywhere
+minutes: 4
+xp: 40
+teaches: u1-matter-is-atoms
+teaches: u1-atom-scale
+
+description:
+    Everything you can touch, and the air around you, is made of atoms. You will see what counts as matter and what does not. Then you will feel how small an atom is.
+
+cite ref-openstax-chem-ch1
+supports: Matter has mass and takes up space; air is matter.
+
+cite ref-openstax-chem-ch2
+supports: Matter is made of atoms; atoms are too small to see.
+
+card c02
+kind: teach
+type: explain
+scored: 0
+title: What is everything made of?
+figure: matter-vs-energy
+figure_at: 1
+
+body:
+    Your hand, your phone and an apple are all [[matter]]. All matter is made of [[atom|atoms]]. Light and heat are different. They are energy, not matter.
+
+card c03
+kind: item
+type: item
+item: u1-l1-sort-matter
+
+card c12
+kind: teach
+type: explain
+scored: 0
+title: Air is matter too
+figure: air-balloons
+figure_at: 2
+
+body:
+    Air feels like nothing, but it is matter too. It is made of atoms. That is why a pumped-up ball weighs more than a flat one.
+
+card c13
+kind: item
+type: item
+item: u1-l1-tom-air-empty
+connected: true
+
+card c06
+kind: teach
+type: explain
+scored: 0
+title: Far too small to see
+figure: zoom-chain
+figure_at: 2
+
+body:
+    Atoms are far too small to see, even with an ordinary microscope. You can zoom in on a skin cell. An atom is much, much smaller.
+
+card c05
+kind: sim
+type: scale-zoom
+scored: 0
+task: Zoom in from your hand down to a single atom. Tap each stop.
+
+config:
+    {
+      "stops": [
+        {
+          "id": "hand",
+          "label": "A hand",
+          "meters": 0.1,
+          "sizeLabel": "about 10 cm",
+          "note": "You can see and hold this.",
+          "icon": "Pointer",
+          "art": "hand"
+        },
+        {
+          "id": "cell",
+          "label": "A skin cell",
+          "meters": 0.00003,
+          "sizeLabel": "about 0.03 mm",
+          "note": "Too small to see without a microscope.",
+          "icon": "Microscope",
+          "art": "cell"
+        },
+        {
+          "id": "virus",
+          "label": "A virus",
+          "meters": 1e-7,
+          "sizeLabel": "about 100 nm",
+          "note": "About 300 times smaller than the cell. It takes a strong microscope to see one.",
+          "icon": "Health",
+          "art": "virus"
+        },
+        {
+          "id": "atom",
+          "label": "An atom",
+          "meters": 3e-10,
+          "sizeLabel": "a few tenths of a nm",
+          "note": "About 300 times smaller again than a virus.",
+          "icon": "Atom",
+          "art": "atom"
+        }
+      ]
+    }
+
+card c07
+kind: item
+type: item
+item: u1-l1-order-sizes
+
+card c08
+kind: item
+type: item
+item: u1-l1-tom-microscope
+
+card c10
+kind: item
+type: item
+item: u1-l1-choice-made-of
+
+card c09
+kind: teach
+type: story
+tier: deeper
+scored: 0
+title: An idea before the proof
+speaker: npc-hal
+tag: Ancient Greece
+figure: halving
+figure_at: 2
+
+body:
+    About 2,400 years ago the Greek thinker Democritus asked what would happen if you kept cutting something in half. He imagined a smallest piece that could not be cut, and called it atomos. Seeing atoms took far longer.

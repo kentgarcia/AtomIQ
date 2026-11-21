@@ -9,7 +9,7 @@ import { checksFor } from "../content-checks.mjs";
 import { backupUnlessIdentical } from "../backup.mjs";
 import { applyBatchToMaster, dryRunBatch, printFailure, short, verifyChecks } from "../content-batch-run.mjs";
 import { StoreError } from "../content-store.mjs";
-import { SHIPPED_ID_TABLES, TIMESTAMP_COLS, openDb, tableInfo } from "../content-tables.mjs";
+import { SHIPPED_ID_TABLES, TIMESTAMP_COLS, listContentTables, openDb, tableInfo } from "../content-tables.mjs";
 import { readShipped } from "../releases.mjs";
 import { readRowsByTable } from "./adapters/default.mjs";
 import { sameValue } from "./core/values.mjs";
@@ -89,21 +89,46 @@ export function buildOps(db, adapter, diffs, { retire, shipped }) {
 }
 
 /**
- * One batch from several adapters. Each adapter's own operations are in four phases (park positions, delete, insert,
- * update); across adapters the phases are merged so a foreign key never points at a row that is not there yet: parks
- * first, then deletes with the LAST adapter first (a card goes before the source it cites), then inserts with the
- * FIRST adapter first (the source before the card), then updates. `OWNED_ADAPTERS` lists parents before children.
- * @param {object[][]} perAdapter the operations of each adapter, in owned order
+ * Rank of every content table by its foreign keys: a table that others point at gets a lower rank, so inserting in rank
+ * order and deleting in reverse order never leaves a key pointing at a row that is not there. Tables of two adapters can
+ * point at each other (npcs <- units, lessons <- npc_lines), which is why the order is by table, not by adapter.
+ * @param {import("node:sqlite").DatabaseSync} db
+ * @returns {Map<string, number>}
  */
-export function orderOps(perAdapter) {
+export function tableRanks(db) {
+  const tables = listContentTables(db);
+  const parents = new Map(tables.map((t) => [t, new Set(db.prepare(`PRAGMA foreign_key_list("${t}")`).all().map((f) => f.table).filter((p) => p !== t && tables.includes(p)))]));
+  const rank = new Map();
+  const left = new Set(tables);
+  for (let level = 0; left.size; level++) {
+    const ready = [...left].filter((t) => [...parents.get(t)].every((p) => rank.has(p)));
+    if (!ready.length) throw new Error(`foreign keys form a cycle between ${[...left].join(", ")}`);
+    for (const t of ready) {
+      rank.set(t, level);
+      left.delete(t);
+    }
+  }
+  return rank;
+}
+
+/**
+ * One batch from several adapters. Each adapter's own operations are in four phases (park positions, delete, insert,
+ * update); across adapters the phases are merged: parks first, then deletes (a table that others point at last), then
+ * inserts (that table first), then updates. `rank` is `tableRanks`; without it the adapters' own order is used, parents
+ * listed first (`OWNED_ADAPTERS`).
+ * @param {object[][]} perAdapter the operations of each adapter, in owned order
+ * @param {Map<string, number>} [rank]
+ */
+export function orderOps(perAdapter, rank = null) {
   const park = (o) => o.op === "update" && Object.keys(o.set).length === 1 && "position" in o.set && o.set.position < 0;
-  const of = (list, fn) => list.filter(fn);
-  const forward = (fn) => perAdapter.flatMap((ops) => of(ops, fn));
-  const backward = (fn) => [...perAdapter].reverse().flatMap((ops) => of(ops, fn));
+  const r = (o) => rank?.get(o.table) ?? 0;
+  const forward = (fn) => perAdapter.flatMap((ops) => ops.filter(fn));
+  const backward = (fn) => [...perAdapter].reverse().flatMap((ops) => ops.filter(fn));
+  const byRank = (list, dir) => (rank ? list.map((o, i) => [o, i]).sort((a, b) => dir * (r(a[0]) - r(b[0])) || a[1] - b[1]).map(([o]) => o) : list);
   return [
     ...forward(park),
-    ...backward((o) => o.op === "delete"),
-    ...forward((o) => o.op === "insert"),
+    ...byRank(backward((o) => o.op === "delete"), -1),
+    ...byRank(forward((o) => o.op === "insert"), 1),
     ...forward((o) => o.op === "update" && !park(o)),
   ];
 }
@@ -158,7 +183,7 @@ export function planSync({ paths, names, retire }) {
       opsByAdapter.push(ops);
       plan.adapters.push(adapter.name);
     }
-    plan.ops = orderOps(opsByAdapter);
+    plan.ops = orderOps(opsByAdapter, tableRanks(db));
     for (const rel of strayFiles(paths.sourceDir)) plan.warnings.push(`${rel}: not a .atomiq file (only .atomiq, README.md and .state.json belong in content/source)`);
     return plan;
   } finally {

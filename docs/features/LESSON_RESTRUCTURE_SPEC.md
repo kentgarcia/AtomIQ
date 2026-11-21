@@ -425,7 +425,7 @@ Facts and figures below are the intended content. Each number is confirmed again
 
 ### 12.1 Objectives
 
-Unit 1 is deliberately simple: **one core idea per lesson**, in short plain sentences. Anything harder is an optional "Go deeper" card (tier `deeper`) that is never required and never scored. The authoring source is `scripts/content-migration/curriculum/unit-1.mjs`; `unit-1-concept-pass.mjs` copies it onto the master db.
+Unit 1 is deliberately simple: **one core idea per lesson**, in short plain sentences. Anything harder is an optional "Go deeper" card (tier `deeper`) that is never required and never scored. The authoring source is now `content/source/units/inside-the-atom/` (`.atomiq` files built with `npm run content:sync`); the former `unit-1.mjs` module and the scripts around it are retired in `scripts/content-migration/legacy/`.
 
 | Lesson | The one idea | Goal |
 |---|---|---|

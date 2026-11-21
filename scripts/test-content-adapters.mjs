@@ -223,6 +223,49 @@ describe("T4: bad input is refused (reference, game and phone data)", () => {
   });
 });
 
+describe("T4: bad input is refused (lessons)", () => {
+  const A = FRIENDLY_ADAPTERS.get("curriculum");
+  const fails = (fn, re, line) => {
+    try {
+      fn();
+    } catch (e) {
+      assert.match(e.message, re);
+      if (line != null) assert.equal(e.line, line);
+      return;
+    }
+    assert.fail(`expected an error matching ${re}`);
+  };
+  const base = JSON.parse(JSON.stringify(ADAPTER_SAMPLES.curriculum));
+  const withCard = (data, over = {}) => ({ ...base, lesson_cards: [{ ...base.lesson_cards[0], data, ...over }] });
+  const withItem = (data) => ({ ...base, items: [{ ...base.items[0], data }] });
+
+  it("a data key the format has no place for is an error, not a silent loss", () => {
+    fails(() => renderFiles(A, withCard({ title: "t", body: "b", sparkle: true })), /"sparkle", which the lesson format cannot write for a teach explain/);
+    fails(() => renderFiles(A, withItem({ prompt: "p", explanation: "e", colour: "red" })), /"colour", which the lesson format cannot write/);
+    // a sim keeps anything it has in its config instead
+    const sim = renderFiles(A, withCard({ task: "t", mode: "x", anything: [1] }, { kind: "sim", type: "atom-builder" }));
+    assert.match([...sim.values()].find((t) => t.includes("lesson demo-lesson")), /config: \{"mode":"x","anything":\[1\]\}/);
+  });
+
+  it("a figure has a ref or a scene, and nothing else the format cannot write", () => {
+    fails(() => renderFiles(A, withCard({ body: "b", figure: { ref: "x", scene: { height: 1, shapes: [] } } })), /a ref or a scene, never both/);
+    fails(() => renderFiles(A, withCard({ body: "b", figure: { altText: "only words that are long enough" } })), /a ref or a scene, never both and never neither/);
+    fails(() => renderFiles(A, withCard({ body: "b", figure: { ref: "x", colour: 1 } })), /"colour", which the lesson format cannot write/);
+  });
+
+  it("reading: an unknown attribute, a duplicate card in one lesson and a missing unit header all stop with the line", () => {
+    const head = "format 1\nadapter curriculum 1\nunit: u\n\nlesson l1\ntitle: T\nminutes: 3\n\n";
+    const read = (text, rel = "units/u/lessons/010-l1.atomiq") => readFiles(A, new Map([[rel, text]]));
+    fails(() => read(`${head}card c01\nkind: teach\ntype: explain\nsparkle: 1\n`), /unknown attribute "sparkle"/, 12);
+    fails(() => read(`${head}card c01\nkind: teach\ntype: explain\n\nbody:\n    b\n\ncard c01\nkind: teach\ntype: explain\n\nbody:\n    b\n`), /is defined twice/);
+    fails(() => read(head.replace("unit: u\n", "")), /needs "unit_id" in the file header/, 4);
+    fails(() => read(`${head}card c01\nkind: teach\ntype: explain\nfigure_at: soon\n`), /not an integer/, 12);
+    // the same card id in two lessons is fine
+    const two = `${head}card c01\nkind: teach\ntype: explain\n\nbody:\n    b\n\nlesson l2\ntitle: T2\nminutes: 3\n\ncard c01\nkind: teach\ntype: explain\n\nbody:\n    b\n`;
+    assert.equal(read(two).rows.lesson_cards.length, 2);
+  });
+});
+
 describe("a sync across adapters keeps foreign keys valid", () => {
   it("orderOps: parks, then deletes last adapter first, then inserts first adapter first, then updates", async () => {
     const { orderOps } = await import("./lib/content-source/sync.mjs");
@@ -242,6 +285,23 @@ describe("a sync across adapters keeps foreign keys valid", () => {
       "insert:safety_card_references",
       "update:safety_cards",
     ]);
+  });
+});
+
+describe("table ranks", { skip: !haveMaster }, () => {
+  it("a table that others point at ranks before them, even across adapters (npcs, units, lessons, npc_lines)", async () => {
+    const { tableRanks, orderOps } = await import("./lib/content-source/sync.mjs");
+    const db = openDb(paths.master, { readOnly: true });
+    const rank = tableRanks(db);
+    db.close();
+    const r = (t) => rank.get(t);
+    assert.ok(r("npcs") < r("units") && r("units") < r("lessons") && r("lessons") < r("npc_lines"));
+    assert.ok(r("content_references") < r("lesson_references") && r("items") < r("lesson_cards") && r("blog_posts") < r("blog_comments"));
+    const order = orderOps(
+      [[{ op: "insert", table: "npc_lines", values: {} }, { op: "delete", table: "npcs", pk: "n" }], [{ op: "insert", table: "lessons", values: {} }, { op: "delete", table: "npc_lines", pk: "l" }]],
+      rank,
+    ).map((o) => `${o.op}:${o.table}`);
+    assert.deepEqual(order, ["delete:npc_lines", "delete:npcs", "insert:lessons", "insert:npc_lines"]);
   });
 });
 

@@ -1,0 +1,118 @@
+format 1
+adapter curriculum 1
+unit: inside-the-atom
+
+objective u1-stable-unstable
+statement: Know that some combinations of protons and neutrons make a stable nucleus and others make an unstable one.
+misconception: Every atom stays the same for ever.
+
+item u1-l5-predict-stable
+type: predict
+surfaces: lesson
+
+prompt:
+    Does every atom stay exactly the same for ever?
+
+input: choice
+
+options:
+    {"id":"yes","label":"Yes, every atom stays the same"}
+    {"id":"no","label":"No, some atoms can change"}
+
+answer: no
+
+explanation:
+    Your guess is not scored. Find out in the next cards.
+
+item u1-l5-sort-stable
+type: sort
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-iaea-isotopes
+
+prompt:
+    Which of these atoms are stable? Sort each one.
+
+buckets:
+    {"id":"stable","label":"Stable","icon":"AqStable"}
+    {"id":"unstable","label":"Unstable","icon":"AqUnstable"}
+
+items:
+    {"id":"c12","label":"Carbon-12","bucket":"stable"}
+    {"id":"c14","label":"Carbon-14","bucket":"unstable"}
+    {"id":"o16","label":"Oxygen-16","bucket":"stable"}
+    {"id":"u238","label":"Uranium-238","bucket":"unstable"}
+
+explanation:
+    Carbon-12 and oxygen-16 are stable. Carbon-14 and uranium-238 are unstable, which means radioactive.
+
+item u1-l5-tom-all-stable
+type: true_or_myth
+surfaces: practice
+surfaces: checkpoint
+surfaces: review
+references: ref-iaea-isotopes
+
+statement:
+    Every atom stays the same for ever.
+
+answer: myth
+
+explanation:
+    Myth. Most atoms around us do stay the same, but an unstable nucleus can change.
+
+item u1-l5-tom-body-stable
+type: true_or_myth
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-potassium-40
+
+statement:
+    Most of the atoms in your body are stable.
+
+answer: true
+
+explanation:
+    True. Almost all of your atoms are stable. A tiny number are naturally unstable, such as potassium-40.
+
+item u1-x-stable-meaning
+type: choice
+surfaces: practice
+surfaces: checkpoint
+surfaces: review
+references: ref-iaea-isotopes
+
+prompt:
+    What does it mean for a nucleus to be stable?
+
+options:
+    {"id":"stays","label":"It stays the same"}
+    {"id":"changes","label":"It is likely to change","note":"That describes an unstable nucleus."}
+    {"id":"gone","label":"It has no protons","note":"Every nucleus has protons."}
+
+answer: stays
+
+explanation:
+    A stable nucleus stays the same. An unstable nucleus can change.
+
+item u1-x-unstable-which
+type: choice
+surfaces: practice
+surfaces: checkpoint
+surfaces: review
+references: ref-iaea-isotopes
+
+prompt:
+    Which of these atoms is unstable?
+
+options:
+    {"id":"c14","label":"Carbon-14"}
+    {"id":"c12","label":"Carbon-12","note":"Carbon-12 is stable."}
+    {"id":"o16","label":"Oxygen-16","note":"Oxygen-16 is stable."}
+
+answer: c14
+
+explanation:
+    Carbon-14 is unstable, which means radioactive.

@@ -1,0 +1,160 @@
+format 1
+adapter curriculum 1
+unit: radioactivity
+
+lesson alpha-beta-gamma
+title: Alpha, beta and gamma
+minutes: 5
+xp: 50
+teaches: u2-particle-or-wave
+teaches: u2-recognise-radiation
+relies_on: u2-parent-daughter
+
+description:
+    When a nucleus changes, something comes out. You will meet the three kinds, alpha, beta and gamma, and learn that they are three different things.
+
+cite ref-iaea-radiation-types
+supports: Alpha and beta are particles; gamma is electromagnetic radiation.
+
+cite ref-iaea-glossary
+supports: Definitions of beta-minus and gamma.
+
+cite ref-iaea-decay
+supports: Alpha as two protons and two neutrons.
+
+card c01
+kind: item
+type: item
+item: u2-l2-predict-release
+scored: 0
+
+card c02
+kind: teach
+type: explain
+scored: 0
+title: Three things can come out
+figure: three-kinds
+figure_at: 1
+
+body:
+    When a nucleus changes, it can release [[alpha-particle|alpha]] particles, [[beta-particle|beta]] particles or [[gamma-ray|gamma]] rays. They are three different things. Alpha and beta are particles. Gamma is not.
+
+card c03
+kind: teach
+type: explain
+scored: 0
+title: Alpha: a chunk
+figure: alpha-figure
+figure_at: 1
+
+body:
+    An alpha particle is made of 2 protons and 2 neutrons stuck together. It is the nucleus of a helium atom, with no electrons. It is a big, chunky particle.
+
+card c04
+kind: item
+type: item
+item: u2-l2-choice-alpha
+connected: true
+
+card c05
+kind: teach
+type: explain
+scored: 0
+title: Beta: a fast electron
+figure: beta-figure
+figure_at: 2
+
+body:
+    A beta particle is a fast-moving particle released in some decays. In the basic picture, it is a fast electron. It is far lighter than an alpha particle.
+
+card c06
+kind: teach
+type: explain
+scored: 0
+title: Gamma: not a particle
+figure: gamma-figure
+figure_at: 2
+
+body:
+    Gamma radiation is not a particle. It is [[electromagnetic-radiation|electromagnetic radiation]], like light but far more energetic. Light is electromagnetic radiation too.
+
+card c07
+kind: item
+type: item
+item: u2-l2-match-kinds
+
+card c08
+kind: sim
+type: radiation-id
+scored: 0
+task: Read each clue and pick the kind of radiation. Then watch it leave.
+hint: Think about what each kind is made of.
+
+config:
+    {
+      "cases": [
+        {
+          "id": "one",
+          "answer": "alpha",
+          "clue": "A chunk of 2 protons and 2 neutrons leaves the nucleus."
+        },
+        {
+          "id": "two",
+          "answer": "beta",
+          "clue": "A fast electron leaves the nucleus."
+        },
+        {
+          "id": "three",
+          "answer": "gamma",
+          "clue": "High-energy electromagnetic radiation leaves the nucleus."
+        }
+      ],
+      "goal": {
+        "all": true
+      },
+      "objectives": [
+        "u2-recognise-radiation"
+      ]
+    }
+
+card c09
+kind: item
+type: item
+item: u2-l2-tom-same
+
+card c10
+kind: item
+type: item
+item: u2-l2-tom-pieces
+
+card c11
+kind: item
+type: item
+item: u2-l2-tom-light
+
+card c12
+kind: item
+type: item
+item: u2-l2-sort-kind
+
+card c13
+kind: item
+type: item
+item: u2-l2-choice-electron
+
+card c14
+kind: item
+type: item
+item: u2-l2-choice-gamma-element
+
+card c15
+kind: teach
+type: explain
+tier: deeper
+scored: 0
+title: Go deeper: what changes
+figure: what-changes
+figure_at: 1
+
+body:
+    Alpha and beta change the make-up of the nucleus, so a different nucleus is left. In beta decay a neutron changes into a proton and an electron is emitted, along with a tiny particle left out here. Gamma releases extra energy and changes neither the protons nor the neutrons.

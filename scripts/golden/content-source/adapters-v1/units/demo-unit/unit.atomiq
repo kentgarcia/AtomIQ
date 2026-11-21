@@ -1,0 +1,27 @@
+format 1
+adapter curriculum 1
+
+unit demo-unit
+position: 2
+title: A demo unit
+subtitle: Shows everything
+icon: Atom
+tone: accent
+teacher: npc-demo
+goal: Know the demo.
+
+summary:
+    A summary of the unit.
+
+terms: atom
+terms: matter
+guidebook_extra: {"note":{"extra":1}}
+
+description:
+    A longer description.
+
+    Two paragraphs.
+
+source ref-a
+
+source ref-b

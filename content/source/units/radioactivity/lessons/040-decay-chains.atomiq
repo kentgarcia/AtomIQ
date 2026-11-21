@@ -1,0 +1,143 @@
+format 1
+adapter curriculum 1
+unit: radioactivity
+
+lesson decay-chains
+title: Decay chains
+minutes: 4
+xp: 50
+teaches: u2-decay-chain
+teaches: u2-decay-changes-not-vanishes
+relies_on: u2-parent-daughter
+
+description:
+    One decay is not always the end. You will follow a nucleus that changes again and again, and see that every change makes a different nucleus and nothing simply vanishes.
+
+cite ref-iaea-decay
+supports: A daughter nuclide can be radioactive and decay in turn.
+
+cite ref-nrc-decay-series
+supports: Uranium-238 and thorium-232 decay series (optional card).
+
+card c01
+kind: item
+type: item
+item: u2-l4-predict-daughter
+scored: 0
+
+card c02
+kind: teach
+type: explain
+scored: 0
+title: Not always finished
+figure: daughter-unstable
+figure_at: 1
+
+body:
+    A nucleus decays into a daughter. The daughter can be unstable too. Then it decays again. The parent is the nucleus that decays. The daughter is the nucleus it becomes. Not every daughter is the end.
+
+card c03
+kind: sim
+type: decay-chain
+scored: 0
+task: Tap the unstable nucleus to make it change. Keep going until it is stable.
+hint: If the app says it isn't finished yet, tap again.
+
+config:
+    {
+      "nodes": [
+        {
+          "id": "parent",
+          "label": "Parent",
+          "state": "unstable"
+        },
+        {
+          "id": "daughter",
+          "label": "Daughter",
+          "state": "unstable"
+        },
+        {
+          "id": "next",
+          "label": "Next generation",
+          "state": "unstable"
+        },
+        {
+          "id": "stable",
+          "label": "Stable",
+          "state": "stable"
+        }
+      ],
+      "goal": {
+        "reach": "stable"
+      },
+      "objectives": [
+        "u2-decay-chain"
+      ]
+    }
+
+card c04
+kind: teach
+type: reveal
+scored: 0
+title: A decay chain
+predicts: c01
+figure: chain-figure
+figure_at: 2
+
+body:
+    A daughter can be unstable too. A [[decay-chain|decay chain]] is a sequence of radioactive decays in which one nucleus changes into another, which may decay again. It ends at a stable nucleus.
+
+card c05
+kind: item
+type: item
+item: u2-l4-tom-stable
+connected: true
+
+card c06
+kind: item
+type: item
+item: u2-l4-tom-vanish
+
+card c07
+kind: item
+type: item
+item: u2-l4-tom-different
+
+card c08
+kind: item
+type: item
+item: u2-l4-order-chain
+
+card c09
+kind: item
+type: item
+item: u2-l4-choice-next
+
+card c10
+kind: teach
+type: explain
+scored: 0
+title: A whole chain
+figure: chain-zoom-out
+figure_at: 1
+
+body:
+    Zoom out. One unstable nucleus can be the start of a whole chain of decays. Each step makes a new nucleus. The chain stops only when a stable nucleus is reached.
+
+card c11
+kind: item
+type: item
+item: u2-l4-choice-finished
+connected: true
+
+card c12
+kind: teach
+type: explain
+tier: deeper
+scored: 0
+title: Go deeper: real chains
+figure: real-chains
+figure_at: 2
+
+body:
+    Real decay chains exist in nature. The uranium-238 chain ends in stable lead-206. The thorium-232 chain ends in stable lead-208. Some steps can branch in more than one way. There is nothing to memorise.

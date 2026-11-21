@@ -1,0 +1,139 @@
+format 1
+adapter curriculum 1
+unit: inside-the-atom
+
+lesson protons-neutrons-electrons
+title: Meet the atom
+minutes: 4
+xp: 50
+teaches: u1-particles
+teaches: u1-nucleus
+relies_on: u1-matter-is-atoms
+
+description:
+    Every atom has a tiny centre called the nucleus, with electrons around it. You will meet the three particles of an atom and see which are positive, which are negative and which have no charge.
+
+cite ref-openstax-chem-ch2
+supports: The three particles, their charges and positions.
+
+cite ref-openstax-up3-ch10
+supports: The nucleus is tiny and holds almost all of the mass.
+
+cite ref-rutherford-1911
+supports: The gold-foil experiment (optional story).
+
+card c01
+kind: item
+type: item
+item: u1-l2-predict-stadium
+scored: 0
+
+card c02
+kind: teach
+type: explain
+scored: 0
+title: A tiny centre
+figure: atom-model
+figure_args: [2,2,2]
+figure_at: 1
+
+body:
+    Every atom has a tiny centre called the [[nucleus]], with [[electron|electrons]] around it. Almost all of an atom's mass is packed into its tiny nucleus.
+
+card c03
+kind: item
+type: item
+item: u1-l2-hotspot-nucleus
+
+card c04
+kind: teach
+type: explain
+scored: 0
+title: Three particles
+figure: particle-cards
+figure_at: 0
+
+body:
+    The nucleus holds [[proton|protons]], which are positive, and [[neutron|neutrons]], which have no charge. Electrons are negative and are outside the nucleus.
+
+card c05
+kind: item
+type: item
+item: u1-l2-match-particles
+
+card c06
+kind: sim
+type: atom-builder
+scored: 0
+task: Build a helium atom: 2 protons, 2 neutrons and 2 electrons.
+hint: Add particles with the plus buttons. Helium has two of each.
+
+config:
+    {
+      "mode": "build",
+      "goal": {
+        "protons": 2,
+        "neutrons": 2,
+        "electrons": 2
+      },
+      "maxProtons": 6,
+      "maxNeutrons": 6,
+      "objectives": [
+        "u1-particles"
+      ]
+    }
+
+card c07
+kind: teach
+type: reveal
+scored: 0
+title: The stadium, answered
+predicts: c01
+figure: stadium-marble
+figure_at: 0
+
+body:
+    If an atom were a football stadium, its nucleus would be a marble in the middle. The electrons would be far out, and the rest is mostly empty space.
+
+card c08
+kind: item
+type: item
+item: u1-l2-tom-solid
+connected: true
+
+card c09
+kind: item
+type: item
+item: u1-l2-choice-mass
+
+card c10
+kind: item
+type: item
+item: u1-l2-sort-location
+
+card c11
+kind: teach
+type: story
+tier: deeper
+scored: 0
+title: How do we know?
+speaker: npc-hal
+tag: Go deeper
+figure: gold-foil
+caption: Simplified and not to scale.
+figure_at: 1
+
+body:
+    [[ernest-rutherford|Ernest Rutherford]]'s team fired tiny particles at thin gold foil. Most went straight through, so atoms must be mostly empty. A few bounced straight back, so each atom must have a tiny, heavy centre.
+
+card c12
+kind: teach
+type: explain
+tier: deeper
+scored: 0
+title: Not tiny planets
+figure: electron-cloud
+figure_at: 1
+
+body:
+    Pictures often show electrons on neat rings, like planets. A better picture is an [[electron-cloud|electron cloud]]: the electrons are somewhere in a fuzzy region around the nucleus.

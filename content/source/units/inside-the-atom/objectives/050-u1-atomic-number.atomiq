@@ -1,0 +1,103 @@
+format 1
+adapter curriculum 1
+unit: inside-the-atom
+
+objective u1-atomic-number
+statement: Know that the number of protons tells you which element an atom is.
+misconception: Elements are made of different kinds of stuff.
+
+item u1-l3-choice-gold-oxygen
+type: choice
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-openstax-chem-ch2
+
+prompt:
+    What makes an atom of gold different from an atom of oxygen?
+
+options:
+    {"id":"protons","label":"They have different numbers of protons"}
+    {"id":"stuff","label":"They are made of different kinds of stuff","note":"Every atom is built from the same three particles. Only the numbers are different."}
+    {"id":"solid","label":"Gold atoms are solid and oxygen atoms are hollow","note":"Atoms of every element are mostly empty space."}
+
+answer: protons
+
+explanation:
+    Gold atoms have 79 protons and oxygen atoms have 8. The particles are the same kinds. The number of protons is what is different.
+
+item u1-l3-fill-six
+type: fill
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-openstax-chem-ch2
+
+prompt:
+    An atom with 6 protons is always ___.
+
+mode: bank
+
+bank:
+    {"id":"carbon","label":"carbon"}
+    {"id":"nitrogen","label":"nitrogen"}
+    {"id":"oxygen","label":"oxygen"}
+
+answer: carbon
+
+explanation:
+    6 protons is always carbon. 7 is always nitrogen, and 8 is always oxygen.
+
+item u1-l3-predict-gold-oxygen
+type: predict
+surfaces: lesson
+
+prompt:
+    What is the real difference between an atom of gold and an atom of oxygen?
+
+input: choice
+
+options:
+    {"id":"protons","label":"They have different numbers of protons"}
+    {"id":"stuff","label":"They are made of different kinds of stuff"}
+    {"id":"size","label":"Gold atoms are solid balls and oxygen atoms are hollow"}
+
+answer: protons
+
+explanation:
+    Your guess is not scored. Find out as you build.
+
+item u1-x-oxygen-protons
+type: choice
+surfaces: practice
+surfaces: checkpoint
+surfaces: review
+references: ref-iupac-table
+
+prompt:
+    How many protons does every oxygen atom have?
+
+options:
+    {"id":"8","label":"8"}
+    {"id":"6","label":"6","note":"6 protons would make it carbon."}
+    {"id":"7","label":"7","note":"7 protons would make it nitrogen."}
+
+answer: 8
+
+explanation:
+    Every oxygen atom has 8 protons.
+
+item u1-x-same-element
+type: true_or_myth
+surfaces: practice
+surfaces: checkpoint
+surfaces: review
+references: ref-openstax-chem-ch2
+
+statement:
+    Two atoms with different numbers of protons can be the same element.
+
+answer: myth
+
+explanation:
+    Myth. The number of protons tells you the element. Different numbers of protons mean different elements.

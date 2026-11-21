@@ -10,7 +10,8 @@ import { DatabaseSync } from "node:sqlite";
 
 import { evaluateItem } from "../content/curriculum/evaluate.ts";
 import { validateCurriculum, wordCount, plainText } from "./lib/curriculum-rules.mjs";
-import { curriculumDdl, insertUnit, loadUnitModules, npcsDdl, seedNpcs } from "./lib/curriculum-load.mjs";
+import { expandFigure } from "../components/lesson/visual/figures/index.ts";
+import { curriculumDdl, insertRows, loadSourceRows, npcsDdl, seedNpcs } from "./lib/curriculum-load.mjs";
 
 // Every [[term|shown]] marker and guidebook term id in Unit 1 must be an encyclopedia entry (the real ones live in the master db).
 const TERMS = [
@@ -22,9 +23,9 @@ const TERMS = [
   "parent-nuclide", "daughter-nuclide", "electromagnetic-radiation", "decay-chain", "potassium-40", "alpha-decay", "beta-decay", "gamma-radiation",
 ];
 
-let modules;
-before(async () => {
-  modules = await loadUnitModules();
+let sourceRows;
+before(() => {
+  sourceRows = loadSourceRows();
 });
 
 function build() {
@@ -34,7 +35,7 @@ function build() {
   db.exec("CREATE TABLE myths (id TEXT PRIMARY KEY, related_lessons TEXT NOT NULL DEFAULT '[]')");
   for (const t of TERMS) db.prepare("INSERT INTO encyclopedia_entries (id) VALUES (?)").run(t);
   db.exec(curriculumDdl());
-  for (const mod of modules) insertUnit(db, mod);
+  insertRows(db, sourceRows, { skip: ["teacher_npc_id"] });
   return db;
 }
 
@@ -64,7 +65,7 @@ describe("Unit 1 content", () => {
     for (const c of db.prepare("SELECT * FROM lesson_cards WHERE kind = 'teach'").all()) {
       const d = JSON.parse(c.data);
       assert.ok(wordCount(d.body) <= 60, `${c.lesson_id}/${c.id} has ${wordCount(d.body)} words`);
-      assert.ok(d.figure?.scene?.shapes?.length, `${c.lesson_id}/${c.id} has no figure`);
+      assert.ok(expandFigure(d.figure).figure?.scene?.shapes?.length, `${c.lesson_id}/${c.id} has no figure`);
     }
   });
 
@@ -170,6 +171,7 @@ describe("curriculum rules reject broken content", () => {
   const withData = (db, lessonId, cardId, fn) => {
     const row = db.prepare("SELECT data FROM lesson_cards WHERE lesson_id = ? AND id = ?").get(lessonId, cardId);
     const data = JSON.parse(row.data);
+    if (data.figure) data.figure = expandFigure(data.figure).figure; // a figure stored as an id is drawn so a test can break its shapes
     fn(data);
     db.prepare("UPDATE lesson_cards SET data = ? WHERE lesson_id = ? AND id = ?").run(JSON.stringify(data), lessonId, cardId);
     return db;
@@ -194,6 +196,7 @@ describe("curriculum rules reject broken content", () => {
     const edit = (fn) => {
       const db = build();
       const d = JSON.parse(db.prepare("SELECT data FROM items WHERE id = 'u1-l3-choice-lose-proton'").get().data);
+      d.figure = expandFigure(d.figure).figure;
       fn(d);
       db.prepare("UPDATE items SET data = ? WHERE id = 'u1-l3-choice-lose-proton'").run(JSON.stringify(d));
       return db;
@@ -561,6 +564,7 @@ describe("curriculum rules reject broken Unit 2 simulations", () => {
     const db = build();
     const row = db.prepare("SELECT data FROM lesson_cards WHERE lesson_id = ? AND id = ?").get(lessonId, cardId);
     const data = JSON.parse(row.data);
+    if (data.figure) data.figure = expandFigure(data.figure).figure; // a figure stored as an id is drawn so a test can break its shapes
     fn(data);
     db.prepare("UPDATE lesson_cards SET data = ? WHERE lesson_id = ? AND id = ?").run(JSON.stringify(data), lessonId, cardId);
     return db;

@@ -1,0 +1,88 @@
+format 1
+adapter curriculum 1
+unit: radioactivity
+
+objective u2-parent-daughter
+statement: Name the nucleus that decays (parent) and the nucleus it becomes (daughter).
+
+item u2-l1-fill-parent
+type: fill
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-iaea-decay
+
+prompt:
+    The nucleus that decays is the ___.
+
+mode: bank
+
+bank:
+    {"id":"parent","label":"parent"}
+    {"id":"daughter","label":"daughter"}
+    {"id":"radiation","label":"radiation"}
+
+answer: parent
+
+explanation:
+    The nucleus that decays is the parent. The nucleus it becomes is the daughter.
+
+item u2-l1-match-names
+type: match
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-iaea-decay
+
+prompt:
+    Match each name to what it means.
+
+pairs:
+    {"id":"parent","left":"Parent","right":"The nucleus that decays"}
+    {"id":"daughter","left":"Daughter","right":"The nucleus it becomes"}
+    {"id":"radiation","left":"Radiation","right":"What comes out when it changes"}
+
+explanation:
+    The parent is the nucleus that decays. The daughter is the nucleus it becomes. Radiation is what comes out.
+
+item u2-x-daughter-name
+type: choice
+surfaces: practice
+surfaces: checkpoint
+surfaces: review
+references: ref-iaea-decay
+
+prompt:
+    A nucleus decays into a new nucleus. What is the new nucleus called?
+
+options:
+    {"id":"daughter","label":"The daughter"}
+    {"id":"parent","label":"The parent","note":"The parent is the nucleus that decays."}
+    {"id":"radiation","label":"The radiation","note":"Radiation is what comes out, not the new nucleus."}
+
+answer: daughter
+
+explanation:
+    The new nucleus is the daughter. The one that decayed is the parent.
+
+item u2-x-fill-daughter
+type: fill
+surfaces: practice
+surfaces: checkpoint
+surfaces: review
+references: ref-iaea-decay
+
+prompt:
+    The parent decays, and the nucleus it becomes is the ___.
+
+mode: bank
+
+bank:
+    {"id":"daughter","label":"daughter"}
+    {"id":"parent","label":"parent"}
+    {"id":"stable","label":"stable one"}
+
+answer: daughter
+
+explanation:
+    The nucleus that decays is the parent, and the nucleus it becomes is the daughter.

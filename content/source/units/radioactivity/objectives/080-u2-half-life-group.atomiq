@@ -1,0 +1,95 @@
+format 1
+adapter curriculum 1
+unit: radioactivity
+
+objective u2-half-life-group
+statement: Know that half-life describes a group, not a timer in each nucleus.
+misconception: A radioactive atom waits exactly one half-life before it decays.
+
+item u2-l3-choice-buster
+type: choice
+difficulty: 2
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-iaea-decay
+
+prompt:
+    Which statement about half-life is true?
+
+options:
+    {"id":"group","label":"It describes how a group of nuclei decreases over time"}
+    {"id":"timer","label":"It is a timer that runs inside each atom","note":"Half-life describes a group, not a timer in each atom."}
+    {"id":"gone","label":"After one half-life the radioactivity is completely gone","note":"About half of the nuclei are still unstable."}
+    {"id":"forever","label":"A radioactive material stays radioactive for ever","note":"Each radioactive material fades. Some do it fast and some very slowly."}
+
+answer: group
+
+explanation:
+    Half-life describes how quickly a group of radioactive nuclei decreases. It is not a timer in each atom, and the radioactivity fades without being gone after one half-life.
+
+item u2-l3-tom-crowd
+type: true_or_myth
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-iaea-decay
+
+statement:
+    In a large group of nuclei, you can predict that about half will change in one half-life.
+
+answer: true
+
+explanation:
+    True. One nucleus is unpredictable, but a large group follows a pattern.
+
+item u2-l3-tom-timer
+type: true_or_myth
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-iaea-decay
+
+statement:
+    A radioactive atom always waits exactly one half-life before it decays.
+
+answer: myth
+
+explanation:
+    Myth. Half-life describes a group, not a timer in each atom. One nucleus might change soon or much later. Only the group follows the pattern.
+
+item u2-x-tom-exact-one
+type: true_or_myth
+surfaces: practice
+surfaces: checkpoint
+surfaces: review
+references: ref-iaea-decay
+
+statement:
+    Half-life tells you exactly when one particular nucleus will decay.
+
+answer: myth
+
+explanation:
+    Myth. Half-life describes a group. It cannot tell you when one nucleus will decay.
+
+item u2-x-why-group
+type: choice
+difficulty: 2
+surfaces: practice
+surfaces: checkpoint
+surfaces: review
+references: ref-iaea-decay
+
+prompt:
+    Why can half-life describe a group but not one nucleus?
+
+options:
+    {"id":"pattern","label":"Each nucleus changes at a random moment, but a big group follows a pattern"}
+    {"id":"timer","label":"Each nucleus has its own timer that is set to one half-life","note":"Half-life is not a timer in each atom."}
+    {"id":"fewer","label":"A group has fewer nuclei, so it is easier to predict","note":"A larger group follows the pattern better, not a smaller one."}
+
+answer: pattern
+
+explanation:
+    One nucleus is random, but a large group follows a pattern. That pattern is what half-life describes.

@@ -5,7 +5,7 @@
  * Replaces the old lessons / lesson_steps / quizzes / quiz_questions with the v2
  * curriculum tables and loads the authored units. Repeatable: units already
  * authored are rewritten from the source files, so run it again after editing
- * scripts/content-migration/curriculum/unit-*.mjs.
+ * scripts/content-migration/legacy/curriculum/unit-*.mjs.
  *
  *   node scripts/content-migration/curriculum-cutover.mjs [--db <path>] [--dry-run]
  *
@@ -23,13 +23,25 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { DatabaseSync } from "node:sqlite";
 
-import { backupBeforeScript } from "../lib/backup.mjs";
-import { validateDatabase } from "../lib/content-validate.mjs";
-import { curriculumDdl, insertUnit, loadUnitModules } from "../lib/curriculum-load.mjs";
+import { backupBeforeScript } from "../../lib/backup.mjs";
+import { validateDatabase } from "../../lib/content-validate.mjs";
+import { curriculumDdl } from "../../lib/curriculum-load.mjs";
+// (insertUnit and loadUnitModules are gone from curriculum-load.mjs: the unit modules are retired, this script cannot run any more.)
+
+/**
+ * RETIRED (content source files, phase 5): the lesson tables (units, objectives, lessons, path nodes, items, cards and their sources) are written in content/source/units and built with `npm run content:sync`; the authoring modules unit-N.mjs are retired too.
+ * Running this would overwrite them behind the files' back. Kept only as history. Do not run it. Edit the files
+ * (docs/features/CONTENT_SOURCE_SPEC.md, docs/features/CONTENT_SOURCE_PHASE5_SPEC.md).
+ */
+if (!process.argv.includes("--i-know-this-is-retired")) {
+  console.error("curriculum-cutover.mjs is retired: the curriculum lives in content/source/units and is built by `npm run content:sync`.");
+  process.exit(1);
+}
+
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
-const REPO = path.resolve(HERE, "..", "..");
-const LEGACY_DIR = path.join(HERE, "legacy");
+const REPO = path.resolve(HERE, "..", "..", "..");
+const LEGACY_DIR = HERE;
 
 const argv = process.argv.slice(2);
 const dryRun = argv.includes("--dry-run");

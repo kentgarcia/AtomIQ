@@ -1,6 +1,6 @@
 # Content source files, phase 5: lessons, items, cards and the figure library
 
-Status (2026-11-22): steps A to C are built (spec, figure library, conversion of the 49 figures); D and E are next. Specified here before any code, as `CONTENT_SOURCE_SPEC.md` section 14 asks. The main spec's rules still hold (section 10: nothing here changes a file or an adapter of an earlier phase). Where this text and the code differ later, the code and its tests win and this text is fixed.
+Status (2026-11-22): all steps are built (spec, figure library, conversion of the 49 figures, the `curriculum` adapter, retirement of the modules and scripts). Two details differ from the sketches below: a lesson's sources are `cite <ref-id>` records (`source <ref-id>` under a unit), and cross-adapter order comes from the foreign-key graph of the database (`tableRanks` in `sync.mjs`), which also resolves the `npcs`/`units` cycle. Specified here before any code, as `CONTENT_SOURCE_SPEC.md` section 14 asks. The main spec's rules still hold (section 10: nothing here changes a file or an adapter of an earlier phase). Where this text and the code differ later, the code and its tests win and this text is fixed.
 
 ## 1. What phase 5 moves, and what it retires
 

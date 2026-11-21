@@ -1,0 +1,152 @@
+format 1
+adapter curriculum 1
+unit: inside-the-atom
+
+objective u1-isotope-definition
+
+statement:
+    Know that atoms of one element have the same protons but can have different neutrons, and that these are called isotopes.
+
+misconception: Atoms of one element are all identical.
+
+item u1-l4-choice-pair
+type: choice
+difficulty: 2
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-openstax-chem-ch2
+
+prompt:
+    Atom X has 17 protons and 18 neutrons. Atom Y has 17 protons and 20 neutrons. What are X and Y?
+
+options:
+    {"id":"iso","label":"Isotopes of the same element"}
+    {"id":"diff","label":"Two different elements","note":"They have the same number of protons, so they are the same element."}
+    {"id":"same","label":"Exactly the same kind of atom","note":"Their neutrons are different, so they are different isotopes."}
+
+answer: iso
+
+explanation:
+    Same protons (17) means the same element. Different neutrons (18 and 20) mean different isotopes.
+
+item u1-l4-choice-share
+type: choice
+surfaces: practice
+surfaces: checkpoint
+surfaces: review
+references: ref-iaea-isotopes
+
+prompt:
+    What do isotopes of the same element share?
+
+options:
+    {"id":"protons","label":"The same number of protons"}
+    {"id":"neutrons","label":"The same number of neutrons","note":"Different neutrons are exactly what makes them different isotopes."}
+    {"id":"nothing","label":"Nothing: they are different elements","note":"Isotopes of one element are the same element."}
+
+answer: protons
+
+explanation:
+    Isotopes of an element all have the same number of protons, which is why they are the same element. They have different numbers of neutrons.
+
+item u1-l4-predict-carbon-mass
+type: predict
+surfaces: lesson
+
+prompt:
+    Two atoms are both carbon. Can one be heavier than the other?
+
+input: choice
+
+options:
+    {"id":"yes","label":"Yes, they can have different weights"}
+    {"id":"no","label":"No, all carbon atoms are identical"}
+
+answer: yes
+
+explanation:
+    Your guess is not scored. Build a heavier carbon atom in the next card.
+
+item u1-l4-sort-carbon
+type: sort
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-openstax-chem-ch2
+
+prompt:
+    Carbon always has 6 protons. Which of these atoms are carbon? Sort each one.
+
+buckets:
+    {"id":"carbon","label":"Carbon","icon":"AqCarbon"}
+    {"id":"other","label":"Not carbon","icon":"AqCarbonOff"}
+
+items:
+    {"id":"a","label":"6 protons, 6 neutrons","bucket":"carbon"}
+    {"id":"b","label":"6 protons, 8 neutrons","bucket":"carbon"}
+    {"id":"c","label":"7 protons, 7 neutrons","bucket":"other"}
+    {"id":"d","label":"8 protons, 8 neutrons","bucket":"other"}
+
+explanation:
+    Only the protons decide the element. Any atom with 6 protons is carbon, whatever its neutrons. The two carbon atoms with different neutrons are isotopes of carbon.
+
+item u1-l4-sort-pairs
+type: sort
+difficulty: 2
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-openstax-chem-ch2
+
+prompt:
+    Each card shows two atoms. Are they isotopes of one element, or different elements?
+
+figure: isotope-rule-banner
+
+buckets:
+    {"id":"iso","label":"Isotopes of one element","icon":"AqSameElement"}
+    {"id":"diff","label":"Different elements","icon":"AqDiffElement"}
+
+items:
+    {"id":"a","label":"6 protons, 6 neutrons and 6 protons, 8 neutrons","bucket":"iso"}
+    {"id":"b","label":"6 protons, 6 neutrons and 7 protons, 6 neutrons","bucket":"diff"}
+    {"id":"c","label":"1 proton, 0 neutrons and 1 proton, 1 neutron","bucket":"iso"}
+    {"id":"d","label":"8 protons, 8 neutrons and 7 protons, 8 neutrons","bucket":"diff"}
+
+explanation:
+    Check the protons first. Same protons means the same element, so different neutrons make isotopes. Different protons means different elements.
+
+item u1-x-isotope-neutrons
+type: true_or_myth
+surfaces: practice
+surfaces: checkpoint
+surfaces: review
+references: ref-openstax-chem-ch2
+
+statement:
+    Isotopes of one element have different numbers of neutrons.
+
+answer: true
+
+explanation:
+    True. That is what makes them different isotopes of the same element.
+
+item u1-x-isotopes-of
+type: choice
+surfaces: practice
+surfaces: checkpoint
+surfaces: review
+references: ref-openstax-chem-ch2
+
+prompt:
+    What are carbon-12 and carbon-14?
+
+options:
+    {"id":"iso","label":"Isotopes of the same element"}
+    {"id":"diff","label":"Two different elements","note":"Both have 6 protons, so both are carbon."}
+
+answer: iso
+
+explanation:
+    They are isotopes of carbon: the same number of protons, different numbers of neutrons.

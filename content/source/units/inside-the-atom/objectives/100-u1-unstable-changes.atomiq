@@ -1,0 +1,104 @@
+format 1
+adapter curriculum 1
+unit: inside-the-atom
+
+objective u1-unstable-changes
+statement: Know that an unstable nucleus can change and give off radiation, and that this happens naturally.
+misconception: Radioactivity is something people create, and anything nuclear is dangerous.
+
+item u1-l5-choice-unstable-does
+type: choice
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-openstax-up3-ch10
+
+prompt:
+    An atom has an unstable nucleus. What can happen to it?
+
+options:
+    {"id":"change","label":"The nucleus can change and give off radiation"}
+    {"id":"same","label":"Nothing: it stays exactly as it is for ever","note":"Unstable means it can change."}
+    {"id":"vanish","label":"The whole atom disappears","note":"The nucleus changes into a different nucleus. Nothing vanishes."}
+
+answer: change
+
+explanation:
+    An unstable nucleus can change and give off radiation. That is radioactivity.
+
+item u1-l5-sort-source
+type: sort
+difficulty: 2
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-potassium-40
+references: ref-iaea-isotopes
+
+prompt:
+    Where do these radioactive atoms come from? Sort each one.
+
+buckets:
+    {"id":"nature","label":"Found in nature","icon":"AqLeaf"}
+    {"id":"people","label":"Made by people","icon":"AqFlask"}
+
+items:
+    {"id":"k40","label":"Potassium-40 in a banana","bucket":"nature"}
+    {"id":"u","label":"Uranium in a rock","bucket":"nature"}
+    {"id":"c14","label":"Carbon-14 made high in the air","bucket":"nature"}
+    {"id":"hosp","label":"An isotope made in a reactor for a hospital","bucket":"people"}
+
+explanation:
+    People can make radioactive atoms, but most radioactivity around us is natural: in rocks, in the air, in food and even in you.
+
+item u1-l5-tom-human-made
+type: true_or_myth
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-potassium-40
+
+statement:
+    Radioactive atoms only exist because people made them.
+
+answer: myth
+
+explanation:
+    Myth. Radioactive atoms occur in nature. Potassium-40 is in bananas and in your own body, and carbon-14 is made high in the air.
+
+item u1-x-potassium
+type: true_or_myth
+difficulty: 2
+surfaces: practice
+surfaces: checkpoint
+surfaces: review
+references: ref-potassium-40
+
+statement:
+    A banana contains a tiny amount of natural radioactive potassium.
+
+answer: true
+
+explanation:
+    True. A small share of the potassium in a banana is potassium-40, which is radioactive.
+
+item u1-x-rock-natural
+type: choice
+difficulty: 2
+surfaces: practice
+surfaces: checkpoint
+surfaces: review
+references: ref-becquerel-1896
+references: ref-iaea-isotopes
+
+prompt:
+    A rock from the ground gives off a little radiation. How can that be?
+
+options:
+    {"id":"natural","label":"Some atoms in it are naturally unstable"}
+    {"id":"people","label":"Someone must have made it radioactive","note":"Radioactivity is natural. Many rocks contain unstable atoms."}
+
+answer: natural
+
+explanation:
+    Some atoms in the rock, such as uranium, are naturally unstable, so it gives off a little radiation.

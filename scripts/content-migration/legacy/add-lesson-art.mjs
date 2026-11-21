@@ -15,12 +15,23 @@ import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { DatabaseSync } from "node:sqlite";
 
-import { backupBeforeScript } from "../lib/backup.mjs";
+import { backupBeforeScript } from "../../lib/backup.mjs";
 
-const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
+/**
+ * RETIRED (content source files, phase 5): the lesson tables (units, objectives, lessons, path nodes, items, cards and their sources) are written in content/source/units and built with `npm run content:sync`; the authoring modules unit-N.mjs are retired too.
+ * Running this would overwrite them behind the files' back. Kept only as history. Do not run it. Edit the files
+ * (docs/features/CONTENT_SOURCE_SPEC.md, docs/features/CONTENT_SOURCE_PHASE5_SPEC.md).
+ */
+if (!process.argv.includes("--i-know-this-is-retired")) {
+  console.error("add-lesson-art.mjs is retired: the curriculum lives in content/source/units and is built by `npm run content:sync`.");
+  process.exit(1);
+}
+
+
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..", "..");
 const dbPath = path.join(ROOT, "content/database/content.db");
 const dryRun = process.argv.includes("--dry-run");
-const { zoomChain, matterVsEnergy } = await import(pathToFileURL(path.join(ROOT, "scripts/content-migration/curriculum/scenes.mjs")).href);
+const { zoomChain, matterVsEnergy } = await import(pathToFileURL(path.join(ROOT, "scripts/content-migration/legacy/curriculum/scenes.mjs")).href);
 const { isArtId } = await import(pathToFileURL(path.join(ROOT, "components/lesson/visual/object-art.ts")).href);
 
 /** item id -> { list: where the entries are, art: entry id -> art id } */

@@ -247,7 +247,8 @@ export function decodeFile(adapter, ast, acc) {
     }
     Object.assign(row, decodeFields(file, spec.fields, groups, owner, rec.line));
     const lineMeta = { file, line: rec.line };
-    const pkId = `${spec.table}|${spec.id.map((c) => row[c]).join("~")}`;
+    // a child record is unique within its parent (card c01 exists in every lesson), so the parent's columns are part of its key
+    const pkId = `${spec.table}|${[...spec.id, ...Object.keys(spec.parent?.map ?? {})].map((c) => row[c]).join("~")}`;
     if (acc.where.has(pkId)) {
       const was = acc.where.get(pkId);
       throw new SourceError(`${owner} is defined twice (first at ${was.file}:${was.line})`, { file, line: rec.line });

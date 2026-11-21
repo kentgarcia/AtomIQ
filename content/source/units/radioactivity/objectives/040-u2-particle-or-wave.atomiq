@@ -1,0 +1,131 @@
+format 1
+adapter curriculum 1
+unit: radioactivity
+
+objective u2-particle-or-wave
+statement: Know that alpha and beta are particles and gamma is electromagnetic radiation, so the three are different.
+misconception: Alpha, beta and gamma are the same thing, and gamma is made of tiny pieces of the nucleus.
+
+item u2-l2-choice-gamma-element
+type: choice
+difficulty: 2
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-iaea-radiation-types
+
+prompt:
+    A gamma ray leaves a nucleus. Does the nucleus turn into a different element?
+
+options:
+    {"id":"no","label":"No: a gamma ray is not a particle, so no protons leave"}
+    {"id":"yes-protons","label":"Yes: it loses protons","note":"Gamma is electromagnetic radiation. No protons or neutrons leave."}
+    {"id":"yes-always","label":"Yes: every decay changes the element","note":"Gamma carries energy away and does not change the number of protons."}
+
+answer: no
+
+explanation:
+    No. Gamma is electromagnetic radiation, not a particle, so no protons or neutrons leave. The nucleus stays the same element.
+
+item u2-l2-sort-kind
+type: sort
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-iaea-radiation-types
+
+prompt:
+    Is it a particle, or electromagnetic radiation? Sort each one.
+
+buckets:
+    {"id":"particle","label":"A particle","icon":"AqParticle"}
+    {"id":"em","label":"Electromagnetic radiation","icon":"AqWave"}
+
+items:
+    {"id":"alpha","label":"Alpha","bucket":"particle"}
+    {"id":"beta","label":"Beta","bucket":"particle"}
+    {"id":"gamma","label":"Gamma","bucket":"em"}
+    {"id":"light","label":"Visible light","bucket":"em"}
+
+explanation:
+    Alpha and beta are particles. Gamma and visible light are electromagnetic radiation, and gamma carries far more energy.
+
+item u2-l2-tom-light
+type: true_or_myth
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-iaea-radiation-types
+
+statement:
+    Visible light is electromagnetic radiation, just like gamma rays.
+
+answer: true
+
+explanation:
+    True. Light and gamma rays are both electromagnetic radiation. Gamma rays carry far more energy.
+
+item u2-l2-tom-pieces
+type: true_or_myth
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-iaea-radiation-types
+
+statement:
+    Gamma radiation is made of tiny pieces of the nucleus.
+
+answer: myth
+
+explanation:
+    Myth. Gamma is electromagnetic radiation, like light but far more energetic. It is not made of pieces of the nucleus.
+
+item u2-l2-tom-same
+type: true_or_myth
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-iaea-radiation-types
+
+statement:
+    Alpha, beta and gamma are three versions of the same thing.
+
+answer: myth
+
+explanation:
+    Myth. Alpha and beta are different particles, and gamma is electromagnetic radiation, not a particle. They are three different things.
+
+item u2-x-not-particle
+type: choice
+surfaces: practice
+surfaces: checkpoint
+surfaces: review
+references: ref-iaea-radiation-types
+
+prompt:
+    Which of these is not a particle?
+
+options:
+    {"id":"gamma","label":"Gamma radiation"}
+    {"id":"alpha","label":"An alpha particle","note":"Alpha is a particle."}
+    {"id":"beta","label":"A beta particle","note":"Beta is a particle."}
+
+answer: gamma
+
+explanation:
+    Gamma radiation is electromagnetic radiation, not a particle.
+
+item u2-x-tom-particles
+type: true_or_myth
+surfaces: practice
+surfaces: checkpoint
+surfaces: review
+references: ref-iaea-radiation-types
+
+statement:
+    Alpha and beta are particles.
+
+answer: true
+
+explanation:
+    True. Alpha is 2 protons and 2 neutrons and beta is a fast electron. Gamma is the one that is not a particle.

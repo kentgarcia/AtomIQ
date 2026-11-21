@@ -1,6 +1,6 @@
 # Content source files: text is the master, the database is built from it
 
-**Status (2026-11-22):** phases 1 to 4 are built (core, default adapter, export, sync, format, migrate; chat, characters, feed, blog, references, the AtomDex, myths, Myth Buster, unit statements and the phone's scanner, safety and map data owned by files, their seeds retired; `test:source-adapters`; a sync orders operations across adapters, `orderOps`); later phases are marked in section 14. Where this text and the code differ, the code and its tests win and this text is fixed.
+**Status (2026-11-22):** phases 1 to 5 are built (core, default adapter, export, sync, format, migrate; chat, characters, feed, blog, references, the AtomDex, myths, Myth Buster, unit statements, the phone's scanner, safety and map data, and (phase 5) the curriculum, units, objectives, lessons, path nodes, items, cards and their sources, owned by files, their seeds and the `unit-N.mjs` modules retired, figures drawn from an id by `components/lesson/visual/figures/`; `test:source-adapters`; a sync orders operations across adapters, `orderOps`); later phases are marked in section 14. Where this text and the code differ, the code and its tests win and this text is fixed.
 **Decided by the owner:** files are the source of truth for authored prose; the SQLite content DB stays what the app ships and reads; Content Studio is only a viewer (the owner does not use it to edit); the `verified` flag is not something the owner will maintain; **lessons, items and cards will be migrated too, in a later phase** (they began as TypeScript files, which were easy to handle, only with very long lines because they describe pages, not plain data); **translations will be one file per language that maps the id of a text to its translation** (section 11); the file extension is **`.atomiq`**.
 **Reads with:** `docs/critical/CONTENT_SQLITE_AND_STUDIO_SPEC.md` (the DB, releases, shipped ids), `docs/features/NPC_VOICE_SPEC.md` (the chat words), `scripts/lib/content-store.mjs` (`applyBatch`, the write path this spec reuses).
 
@@ -36,7 +36,7 @@ The survey is of the real master DB (131 chat nodes, 92 feed templates, 115 ency
 | 2 | `chat_nodes` (131) | ideal: prose + a reply graph | the first friendly adapter; Hal, Ada, Shrodi |
 | 3 | `npcs` (7), `npc_lines` (16), `feed_templates` (92), `blog_posts` (4) + `blog_comments` (4) + `blog_references` (9) | prose + attributes; blog has typed blocks | bios currently also live in `components/npc/npc-roster.ts` (seed and fallback), see section 13 |
 | 4 | `unit_statements` (20), `scan_targets` (12), `safety_cards` (14), `map_sites` (18) and their `*_references`, `myths` (37), `mythbuster_questions` (150), `encyclopedia_entries` (115), `content_references` (58) | prose plus arrays and small objects | |
-| 5 (committed) | `units`, `objectives`, `lessons`, `path_nodes`, `items`, `lesson_cards`, `unit_references`, `lesson_references` | prose, interaction data and **figures by id**; see 3.1 | today's master is `scripts/content-migration/curriculum/unit-N.mjs` + `scenes.mjs`, synced by `sync-unit.mjs`; those are retired when this phase lands. Needs its own spec first |
+| 5 (built) | `units`, `objectives`, `lessons`, `path_nodes`, `items`, `lesson_cards`, `unit_references`, `lesson_references` | prose, interaction data and **figures by id**; see 3.1 | today's master is `scripts/content-migration/curriculum/unit-N.mjs` + `scenes.mjs`, synced by `sync-unit.mjs`; those are retired when this phase lands. Needs its own spec first |
 | 6 | translations (section 11) | a flat id -> text file per language | its own small spec; changes nothing before it |
 | never | `content_meta`, the user-state DB | runtime or build facts | |
 
@@ -52,7 +52,7 @@ Lessons began as TypeScript files and are long because each card describes a *pa
    - **Proved before converted.** A test resolves every `ref` and compares it with the shapes in the master today; the conversion of a card is allowed only when they are equal. No figure changes appearance by being converted.
    - **Content and code now ship together.** A new figure is a code change and an app build, where an inline scene was a content change. That is the price; the content DB is bundled with the app and swapped at start, so a DB can only reference figures that the same build has, and the unknown-ref guard covers the rest.
    - **The DB gets small.** About 128 KB of coordinates becomes a few hundred bytes of refs. The `checkScene` validator keeps checking inline scenes and also checks the resolved scene of a `ref`.
-   - **`scenes.mjs` is retired** with `unit-N.mjs` and `sync-unit.mjs` (its generators move into the library, tests move with them). Until phase 5 it stays the authoring source, and a figure is edited there and synced, never with `content:edit`.
+   - **`scenes.mjs` is retired** with `unit-N.mjs` and `sync-unit.mjs` (its generators move into the library, tests move with them). It was retired in phase 5 (`scripts/content-migration/legacy/curriculum/`); a figure is a library function and a `figure: <id>` line in a lesson file.
 
 2. **Many interaction shapes in `data` JSON** (choice, order, match, sort, hotspot, builders, decay chain ...): typed per card or item `type`, with the existing `curriculum-rules.mjs` validators. A per-type layout is a refinement of the default adapter (a `json` block is always the lossless fallback).
 
@@ -251,7 +251,7 @@ content/source/
 ├─ blog/                              phase 3
 │  └─ inside-the-atom/
 │     └─ 010-blog-the-smallest-thing.atomiq   the post, its comments, its sources
-├─ units/                             phase 4 (statements), phase 5 (the rest)
+├─ units/                             phase 4 (statements), phase 5 (unit.atomiq, path.atomiq, objectives/, lessons/)
 │  └─ inside-the-atom/
 │     ├─ unit.atomiq                  the unit and its sources
 │     ├─ statements.atomiq            the true-or-false statements

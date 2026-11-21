@@ -1,0 +1,129 @@
+format 1
+adapter curriculum 1
+unit: inside-the-atom
+
+lesson stable-and-unstable-nuclei
+title: Stable and unstable nuclei
+minutes: 4
+xp: 50
+teaches: u1-stable-unstable
+teaches: u1-unstable-changes
+relies_on: u1-nucleus
+relies_on: u1-isotope-definition
+
+description:
+    Some nuclei stay the same for ever. Others are unstable and can change. You will see the difference, learn what radioactivity is, and find out that it is a natural thing.
+
+cite ref-openstax-up3-ch10
+supports: Nuclear stability and radioactivity.
+
+cite ref-iaea-isotopes
+supports: Stable and unstable isotopes.
+
+cite ref-potassium-40
+supports: Natural unstable isotopes in food and the body.
+
+card c01
+kind: item
+type: item
+item: u1-l5-predict-stable
+scored: 0
+
+card c02
+kind: teach
+type: explain
+scored: 0
+title: Stable and unstable
+figure: stable-vs-unstable
+figure_at: 1
+
+body:
+    Some combinations of protons and neutrons make a stable nucleus. It stays the same. Others make an unstable nucleus, which can change. Most atoms around you, and in you, are stable.
+
+card c03
+kind: sim
+type: atom-builder
+scored: 0
+task: Carbon-14 is unstable. Change the neutrons until the carbon atom is stable.
+hint: Stable carbon has 6 or 7 neutrons. Tap - until the badge says Stable.
+
+config:
+    {
+      "mode": "stability",
+      "goal": {
+        "stable": true
+      },
+      "start": {
+        "protons": 6,
+        "neutrons": 8,
+        "electrons": 6
+      },
+      "lock": {
+        "protons": true,
+        "electrons": true
+      },
+      "maxNeutrons": 12,
+      "objectives": [
+        "u1-stable-unstable"
+      ]
+    }
+
+card c04
+kind: item
+type: item
+item: u1-l5-sort-stable
+
+card c05
+kind: teach
+type: explain
+scored: 0
+title: Unstable nuclei can change
+figure: decay-figure
+figure_at: 1
+
+body:
+    An unstable nucleus can change. When it does, it gives off [[radiation]]. This is called [[radioactivity]]. An atom that does this is radioactive.
+
+card c06
+kind: teach
+type: explain
+scored: 0
+title: Radioactivity is natural
+figure: natural-sources
+figure_at: 1
+
+body:
+    Nobody had to invent radioactivity. Unstable atoms are in rocks, in the air and in food. Bananas and your own body hold a little natural potassium-40.
+
+card c07
+kind: item
+type: item
+item: u1-l5-tom-human-made
+connected: true
+
+card c08
+kind: item
+type: item
+item: u1-l5-tom-body-stable
+
+card c09
+kind: item
+type: item
+item: u1-l5-choice-unstable-does
+
+card c10
+kind: item
+type: item
+item: u1-l5-sort-source
+
+card c11
+kind: teach
+type: explain
+tier: deeper
+scored: 0
+title: Go deeper: what holds a nucleus together
+figure: force-balance
+figure_at: 1
+
+body:
+    Protons are all positive, so they push each other apart. A very strong force inside the nucleus, the [[strong-force|strong force]], helps hold it together. Some nuclei hold together well. Others do not.

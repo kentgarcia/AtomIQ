@@ -1,0 +1,18 @@
+format 1
+adapter curriculum 1
+unit: demo-unit
+
+lesson other-lesson
+title: Another
+minutes: 3
+relies_on: d-obj-1
+description:
+
+card c01
+kind: teach
+type: explain
+scored: 0
+figure: zoom-chain
+
+body:
+    Same card id, another lesson.

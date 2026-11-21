@@ -1,0 +1,35 @@
+format 1
+adapter curriculum 1
+
+unit inside-the-atom
+position: 1
+title: Inside the Atom
+subtitle: What everything is made of
+icon: Atom
+tone: accent
+teacher: npc-hal
+
+goal:
+    Describe what an atom is made of, tell elements and isotopes apart, and explain in plain words why some nuclei can change.
+
+summary:
+    Everything you can touch, and the air too, is made of atoms. Atoms are far too small to see. An atom has a tiny nucleus of protons and neutrons, with electrons around it. The number of protons tells you the element. Atoms of one element can have different numbers of neutrons: those are isotopes, and most are not radioactive. Some nuclei are stable. An unstable nucleus can change and give off radiation, and this happens in nature too.
+
+terms: atom
+terms: matter
+terms: proton
+terms: neutron
+terms: electron
+terms: nucleus
+terms: element
+terms: isotope
+terms: radioactivity
+
+description:
+    Start with the smallest pieces of matter. See what atoms are made of, what makes one element different from another, and why some nuclei stay the same while others change.
+
+source ref-openstax-chem-ch2
+
+source ref-openstax-up3-ch10
+
+source ref-iaea-isotopes

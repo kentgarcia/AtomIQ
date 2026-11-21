@@ -1,0 +1,136 @@
+format 1
+adapter curriculum 1
+unit: radioactivity
+
+lesson half-life
+title: Half-life
+minutes: 6
+xp: 60
+teaches: u2-half-life-meaning
+teaches: u2-half-life-pattern
+teaches: u2-half-life-group
+relies_on: u2-random-single
+
+description:
+    How fast does a group of radioactive nuclei fade? You will look at 100 unstable nuclei, find the pattern, and see why half-life is about a crowd and not a timer inside each atom.
+
+cite ref-iaea-decay
+supports: Definition of half-life.
+
+cite ref-openstax-up3-ch10
+supports: Half-life and exponential decay; half-lives vary enormously.
+
+cite ref-iaea-glossary
+supports: Radionuclide and half-life examples (candidates to verify).
+
+card c01
+kind: item
+type: item
+item: u2-l3-predict-hundred
+scored: 0
+
+card c03
+kind: teach
+type: reveal
+scored: 0
+title: About half have changed
+predicts: c01
+figure: half-life-grid
+figure_at: 1
+
+body:
+    After one half-life, about half of the nuclei have decayed. The rest were not cut in half. The time it takes for a group to fall to about half is its [[half-life]].
+
+card c04
+kind: item
+type: item
+item: u2-l3-choice-meaning
+connected: true
+
+card c05
+kind: item
+type: item
+item: u2-l3-fill-pattern
+
+card c06
+kind: teach
+type: explain
+scored: 0
+title: The numbers are a pattern
+figure: half-life-bars
+figure_at: 1
+
+body:
+    Start with 100. After one half-life, about 50 are left. After two, about 25. Then about 12, then about 6. It says about every time, because each count is a pattern and not an exact number.
+
+card c16
+kind: item
+type: item
+item: u2-l3-match-halves
+
+card c07
+kind: item
+type: item
+item: u2-l3-tom-gone
+
+card c08
+kind: teach
+type: explain
+scored: 0
+title: A group, not a timer
+figure: group-not-timer
+figure_at: 1
+
+body:
+    Remember the first lesson: you cannot say when one nucleus will change. A big group is different, because it follows a pattern. Half-life describes the whole group. It is not a timer inside each atom.
+
+card c09
+kind: item
+type: item
+item: u2-l3-tom-timer
+connected: true
+
+card c10
+kind: item
+type: item
+item: u2-l3-tom-crowd
+
+card c11
+kind: item
+type: item
+item: u2-l3-choice-left
+
+card c12
+kind: teach
+type: explain
+scored: 0
+title: Some fade fast, some very slowly
+figure: half-life-ladder
+caption: The bars are not to scale: each step is far bigger than it looks.
+figure_at: 2
+
+body:
+    Half-lives are very different. Some are a fraction of a second. Others are billions of years. So some radioactive materials fade quickly and others take a very long time. You do not need to memorise these.
+
+card c13
+kind: item
+type: item
+item: u2-l3-choice-eighty
+connected: true
+
+card c14
+kind: item
+type: item
+item: u2-l3-choice-buster
+
+card c15
+kind: teach
+type: explain
+tier: deeper
+scored: 0
+title: Go deeper: the decay curve
+figure: decay-curve
+figure_at: 1
+
+body:
+    Plot the nuclei left against time and you get a curve that halves every half-life. It gets close to zero without a sharp end. This is called exponential decay. Each material has its own decay constant, a number for how fast it decays.

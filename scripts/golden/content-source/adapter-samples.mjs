@@ -93,4 +93,40 @@ export const ADAPTER_SAMPLES = {
     ],
     map_site_references: [{ site_id: "site-demo-paris", reference_id: "ref-a" }, { site_id: "site-demo-paris", reference_id: "ref-b" }],
   },
+  curriculum: {
+    units: [
+      { id: "demo-unit", position: 2, title: "A demo unit", subtitle: "Shows everything", description: "A longer description.\n\nTwo paragraphs.", goal: "Know the demo.", guidebook: { summary: "A summary of the unit.", termIds: ["atom", "matter"], note: { extra: 1 } }, icon: "Atom", tone: "accent", teacher_npc_id: "npc-demo" },
+      { id: "plain-unit", position: 1, title: "Plain", subtitle: "", description: "", goal: "", guidebook: {}, icon: "", tone: "primary", teacher_npc_id: null },
+    ],
+    unit_references: [{ unit_id: "demo-unit", reference_id: "ref-a", position: 0 }, { unit_id: "demo-unit", reference_id: "ref-b", position: 1 }],
+    path_nodes: [
+      { id: "d-n1", unit_id: "demo-unit", position: 0, kind: "lesson", lesson_id: "demo-lesson", config: {} },
+      { id: "d-n2", unit_id: "demo-unit", position: 1, kind: "practice", lesson_id: null, config: { questionCount: 8, earlierShare: 0 } },
+    ],
+    objectives: [
+      { id: "d-obj-1", unit_id: "demo-unit", position: 0, statement: "Know the first thing.", misconception: "The first thing is false." },
+      { id: "d-obj-2", unit_id: "demo-unit", position: 1, statement: "Know the second thing.", misconception: null },
+    ],
+    items: [
+      { id: "d-l1-choice", objective_id: "d-obj-1", type: "choice", data: { prompt: "Which is made of atoms?", options: [{ id: "a", label: "Air", art: "air" }, { id: "b", label: "Light", note: "Energy, not matter." }], answer: "a", explanation: "Air is matter." }, difficulty: 2, surfaces: ["lesson", "practice"], reference_ids: ["ref-a"] },
+      { id: "d-l1-figure", objective_id: "d-obj-1", type: "choice", data: { prompt: "Read the picture.", figure: { ref: "half-life-bars", caption: "Bars." }, options: [{ id: "a", label: "Half" }, { id: "b", label: "All" }], answer: "a", explanation: "Half." }, difficulty: 1, surfaces: ["lesson", "practice", "checkpoint"], reference_ids: [] },
+      { id: "d-l1-tom", objective_id: "d-obj-1", type: "true_or_myth", data: { statement: "Atoms are small.", answer: "true", explanation: "True." }, difficulty: 1, surfaces: ["lesson"], reference_ids: ["ref-a", "ref-b"] },
+      { id: "d-l1-hotspot", objective_id: "d-obj-2", type: "hotspot", data: { prompt: "Tap it.", scene: { height: 40, shapes: [{ t: "circle", x: 50, y: 20, r: 5, tone: "danger", fill: "solid" }] }, targets: [{ id: "n", label: "The nucleus", x: 50, y: 20, r: 6 }], answer: "n", explanation: "That one.", animateOnCorrect: true }, difficulty: 1, surfaces: ["lesson"], reference_ids: [] },
+      { id: "d-l1-sort", objective_id: "d-obj-2", type: "sort", data: { prompt: "Sort.", buckets: [{ id: "x", label: "X", icon: "AqAtom" }], items: [{ id: "i", label: "I", bucket: "x" }], explanation: "Sorted." }, difficulty: 1, surfaces: ["practice"], reference_ids: [] },
+    ],
+    lessons: [
+      { id: "demo-lesson", unit_id: "demo-unit", title: "A demo lesson", description: "What it covers.", estimated_minutes: 4, xp_reward: 40, teaches: ["d-obj-1", "d-obj-2"], relies_on: [] },
+      { id: "other-lesson", unit_id: "demo-unit", title: "Another", description: "", estimated_minutes: 3, xp_reward: 0, teaches: [], relies_on: ["d-obj-1"] },
+    ],
+    lesson_references: [{ lesson_id: "demo-lesson", reference_id: "ref-a", supports: "Matter has mass.", position: 0 }, { lesson_id: "demo-lesson", reference_id: "ref-b", supports: "", position: 1 }],
+    lesson_cards: [
+      { lesson_id: "demo-lesson", id: "c01", position: 0, kind: "teach", type: "explain", tier: "core", item_id: null, scored: 0, data: { title: "A title", body: "First bubble.\n\nSecond bubble.", figure: { ref: "atom-model", args: [2, 2, 2], caption: "An atom." }, figureAt: 1 } },
+      { lesson_id: "demo-lesson", id: "c02", position: 1, kind: "item", type: "item", tier: "core", item_id: "d-l1-choice", scored: 1, data: {} },
+      { lesson_id: "demo-lesson", id: "c03", position: 2, kind: "item", type: "item", tier: "deeper", item_id: "d-l1-tom", scored: 0, data: { connected: true } },
+      { lesson_id: "demo-lesson", id: "c04", position: 3, kind: "teach", type: "story", tier: "deeper", item_id: null, scored: 0, data: { speaker: "npc-demo", tag: "1911", title: "A story", body: "Long ago.", figure: { scene: { height: 30, shapes: [] }, altText: "An empty picture used as a test." }, figureAt: 0 } },
+      { lesson_id: "demo-lesson", id: "c05", position: 4, kind: "teach", type: "reveal", tier: "core", item_id: null, scored: 0, data: { predictCardId: "c01", title: "Answer", body: "Here it is.", figure: { ref: "half-life-bars", altText: "My own alt text for the bars." } } },
+      { lesson_id: "demo-lesson", id: "c06", position: 5, kind: "sim", type: "atom-builder", tier: "core", item_id: null, scored: 0, data: { task: "Build helium.", hint: "Add particles.", mode: "build", goal: { protons: 2, neutrons: 2, electrons: 2 }, objectives: ["d-obj-1"] } },
+      { lesson_id: "other-lesson", id: "c01", position: 0, kind: "teach", type: "explain", tier: "core", item_id: null, scored: 0, data: { body: "Same card id, another lesson.", figure: { ref: "zoom-chain" } } },
+    ],
+  },
 };

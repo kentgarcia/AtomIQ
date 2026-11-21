@@ -19,7 +19,7 @@ import { renderFiles } from "./lib/content-source/pipeline.mjs";
 import { writeSourceFiles } from "./lib/content-source/files.mjs";
 import { ownedAdapters } from "./lib/content-source/owned.mjs";
 import { writeState } from "./lib/content-source/state.mjs";
-import { checkSync, runSync } from "./lib/content-source/sync.mjs";
+import { checkSync, planSync, runSync } from "./lib/content-source/sync.mjs";
 import { canonicalizeText } from "./lib/content-source/pipeline.mjs";
 import { migrateAdapter, renumberFolder } from "./lib/content-source/migrate.mjs";
 import { parseSource } from "./lib/content-source/core/parse.mjs";
@@ -146,6 +146,50 @@ describe("content:sync", () => {
     assert.equal(query(fx.paths, "SELECT count(*) n FROM content_references WHERE id = 'ref-sync-test'")[0].n, 0);
   });
 
+  it("an edit to a lesson card and to a question lands, and the card keeps its figure id", async () => {
+    const lessonFile = "units/inside-the-atom/lessons/010-atoms-are-everywhere.atomiq";
+    const objFile = "units/inside-the-atom/objectives/010-u1-matter-is-atoms.atomiq";
+    const lessonText = read(fx, lessonFile);
+    const objText = read(fx, objFile);
+    const card = () => query(fx.paths, "SELECT data FROM lesson_cards WHERE lesson_id = 'atoms-are-everywhere' AND id = 'c02'")[0].data;
+    const item = () => JSON.parse(query(fx.paths, "SELECT data FROM items WHERE id = 'u1-l1-choice-made-of'")[0].data);
+    assert.match(card(), /"figure":\{"ref":"matter-vs-energy"\}/);
+    write(fx, lessonFile, lessonText.replace("title: What is everything made of?", "title: What is it all made of?"));
+    write(fx, objFile, objText.replace("Which of these is made of atoms?", "Which one of these is made of atoms?"));
+    const dry = await sync(fx);
+    assert.match(dry.text, /lesson_cards: 0 to add, 1 to change/);
+    assert.match(dry.text, /items: 0 to add, 1 to change/);
+    const r = await sync(fx, { apply: true });
+    assert.equal(r.code, 0, r.text);
+    assert.match(card(), /"title":"What is it all made of\?"/);
+    assert.match(card(), /"figure":\{"ref":"matter-vs-energy"\}/);
+    assert.equal(item().prompt, "Which one of these is made of atoms?");
+    assert.equal(item().options.length, 4);
+    write(fx, lessonFile, lessonText);
+    write(fx, objFile, objText);
+    assert.equal((await sync(fx, { apply: true })).code, 0);
+    assert.equal(check(fx).code, 0);
+  });
+
+  it("a new lesson and the voice line that names it are planned in foreign-key order, whichever adapter owns them", () => {
+    const lessonFile = "units/inside-the-atom/lessons/060-sync-test-lesson.atomiq";
+    const charFile = "characters/010-npc-hal.atomiq";
+    const charText = read(fx, charFile);
+    write(fx, lessonFile, "format 1\nadapter curriculum 1\nunit: inside-the-atom\n\nlesson sync-test-lesson\ntitle: A lesson added by a test\nminutes: 3\n\ncard c01\nkind: teach\ntype: explain\ntitle: A card\nfigure: half-life-bars\n\nbody:\n    Added in one sync.\n");
+    write(fx, charFile, `${charText}\nline line-hal-sync-test\nkind: lesson_intro\npose: explain\nlesson: sync-test-lesson\n\n    Added together with the lesson it introduces.\n`);
+    try {
+      const plan = planSync({ paths: fx.paths });
+      const at = (op, table) => plan.ops.findIndex((o) => o.op === op && o.table === table);
+      assert.ok(at("insert", "lessons") >= 0 && at("insert", "npc_lines") >= 0 && at("insert", "lesson_cards") >= 0);
+      assert.ok(at("insert", "lessons") < at("insert", "npc_lines"), "the lesson before the line that names it");
+      assert.ok(at("insert", "lessons") < at("insert", "lesson_cards"));
+    } finally {
+      fs.rmSync(file(fx, lessonFile));
+      write(fx, charFile, charText);
+    }
+    assert.equal(check(fx).code, 0, "the fixture is back in sync");
+  });
+
   it("reordering stories is renaming files, and changes only positions", async () => {
     const dir = "chat/npc-ada";
     const a = path.join(fx.paths.sourceDir, dir, "030-chat-ada-up-banana.atomiq");
@@ -260,7 +304,9 @@ describe("ownership guard (T7)", () => {
   });
 
   it("content:edit still works on a table that is not owned", () => {
-    const r = edit([{ op: "update", table: "units", pk: "inside-the-atom", set: { title: "Inside the Atom" } }]);
+    sql(fx.paths, "CREATE TABLE scratch_notes (id TEXT PRIMARY KEY, title TEXT NOT NULL DEFAULT '')");
+    sql(fx.paths, "INSERT INTO scratch_notes (id, title) VALUES ('n1', 'one')");
+    const r = edit([{ op: "update", table: "scratch_notes", pk: "n1", set: { title: "two" } }]);
     assert.equal(r.status, 0, r.stderr);
   });
 });

@@ -2,7 +2,7 @@
 /**
  * Repeatable content migration: copy one authored unit onto the master database.
  *
- * The authoring source (scripts/content-migration/curriculum/unit-N.mjs and scenes.mjs) is the one
+ * The authoring source (scripts/content-migration/legacy/curriculum/unit-N.mjs and scenes.mjs) is the one
  * place a unit's content is written. This script is modelled on unit-1-concept-pass.mjs and
  * generalised so it takes a unit source path and also creates what is missing (the unit, its
  * lessons and its path nodes), which the cutover script does destructively for every unit.
@@ -24,9 +24,20 @@ import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { DatabaseSync } from "node:sqlite";
 
-import { backupBeforeScript } from "../lib/backup.mjs";
+import { backupBeforeScript } from "../../lib/backup.mjs";
 
-const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
+/**
+ * RETIRED (content source files, phase 5): the lesson tables (units, objectives, lessons, path nodes, items, cards and their sources) are written in content/source/units and built with `npm run content:sync`; the authoring modules unit-N.mjs are retired too.
+ * Running this would overwrite them behind the files' back. Kept only as history. Do not run it. Edit the files
+ * (docs/features/CONTENT_SOURCE_SPEC.md, docs/features/CONTENT_SOURCE_PHASE5_SPEC.md).
+ */
+if (!process.argv.includes("--i-know-this-is-retired")) {
+  console.error("sync-unit.mjs is retired: the curriculum lives in content/source/units and is built by `npm run content:sync`.");
+  process.exit(1);
+}
+
+
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..", "..");
 const CURRICULUM_DIR = path.join(ROOT, "scripts/content-migration/curriculum");
 const argv = process.argv.slice(2);
 const dryRun = argv.includes("--dry-run");
@@ -225,7 +236,7 @@ try {
   const teacher = NPC_ROSTER.find((n) => n.unitId === u.id);
   if (teacher && has("npcs") && has("npc_lines")) {
     if (!get("SELECT 1 AS x FROM npcs WHERE id = ?", teacher.id)) {
-      throw new Error(`teacher ${teacher.id} is not in the npcs table: the characters are files now: run `npm run content:sync` first`);
+      throw new Error(`teacher ${teacher.id} is not in the npcs table: the characters are files now: run \`npm run content:sync\` first`);
     }
     if (get("SELECT teacher_npc_id AS t FROM units WHERE id = ?", u.id).t !== teacher.id) {
       note("edit", `teacher of unit ${u.id}: ${teacher.id}`);

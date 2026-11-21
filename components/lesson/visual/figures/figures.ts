@@ -1,4 +1,4 @@
-// @ts-nocheck -- ported unchanged from scripts/content-migration/curriculum/scenes.mjs (the authoring helpers). The
+// @ts-nocheck -- ported unchanged from the retired scripts/content-migration/legacy/curriculum/scenes.mjs (the authoring helpers). The
 // output of every function is pinned against the shapes that shipped by `npm run test:figures`, which is the check that
 // matters for pure drawing data; typing 70 drawings would add noise, not safety. shapes.ts is fully typed.
 /**

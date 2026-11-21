@@ -1,0 +1,146 @@
+format 1
+adapter curriculum 1
+unit: inside-the-atom
+
+objective u1-matter-is-atoms
+statement: Know that ordinary matter, including air, is made of atoms, and that light and heat are not.
+misconception: Air is nothing, so only solid things are made of atoms.
+
+item u1-l1-choice-made-of
+type: choice
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-openstax-chem-ch1
+
+prompt:
+    Which of these is made of atoms?
+
+options:
+    {"id":"light","label":"The light from a lamp","note":"Light is energy, not matter.","art":"lamp"}
+    {"id":"shadow","label":"A shadow","note":"A shadow is just a place where light is blocked.","art":"shadow"}
+    {"id":"air","label":"The air in a room","art":"air"}
+    {"id":"sound","label":"A sound","note":"Sound is a wave moving through matter. It is not matter itself.","art":"sound"}
+
+answer: air
+
+explanation:
+    Air is matter, so it is made of atoms. Light, shadows and sounds are not matter.
+
+item u1-l1-fill-air
+type: fill
+surfaces: practice
+surfaces: checkpoint
+surfaces: review
+references: ref-openstax-chem-ch1
+
+prompt:
+    A pumped-up ball weighs more than a flat one because air is made of ___.
+
+mode: bank
+
+bank:
+    {"id":"atoms","label":"atoms"}
+    {"id":"nothing","label":"nothing"}
+    {"id":"energy","label":"energy"}
+
+answer: atoms
+
+explanation:
+    Air is matter, and atoms have weight. More air inside the ball means more atoms, so it weighs more.
+
+item u1-l1-sort-matter
+type: sort
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-openstax-chem-ch1
+
+prompt:
+    Which of these are made of atoms? Sort each one.
+
+buckets:
+    {"id":"atoms","label":"Made of atoms","icon":"AqAtom"}
+    {"id":"not","label":"Not made of atoms","icon":"AqAtomOff"}
+
+items:
+    {"id":"phone","label":"Your phone","bucket":"atoms","art":"phone"}
+    {"id":"apple","label":"An apple","bucket":"atoms","art":"apple"}
+    {"id":"light","label":"Light","bucket":"not","art":"sun"}
+    {"id":"heat","label":"Heat","bucket":"not","art":"flame"}
+
+explanation:
+    Phones and apples are matter, and all matter is made of atoms. Light and heat are energy, not matter.
+
+item u1-l1-tom-air-empty
+type: true_or_myth
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-openstax-chem-ch1
+
+statement:
+    A bottle with only air in it is empty.
+
+answer: myth
+
+explanation:
+    Myth. Air is matter, so the bottle is full of atoms. Only a vacuum, where the air has been pumped out, comes close to empty.
+
+item u1-x-balloon-weight
+type: choice
+difficulty: 2
+surfaces: practice
+surfaces: checkpoint
+surfaces: review
+references: ref-openstax-chem-ch1
+
+prompt:
+    You pump air into a flat ball and it gets heavier. What does that tell you?
+
+options:
+    {"id":"matter","label":"Air is matter, so it has weight"}
+    {"id":"nothing","label":"Air is nothing, so the ball only looks heavier","note":"If air were nothing, adding it could not change the weight."}
+    {"id":"energy","label":"Air is energy, not matter","note":"Energy such as light and heat is not made of atoms. Air is."}
+
+answer: matter
+
+explanation:
+    The ball gets heavier because air is made of atoms, and atoms have weight.
+
+item u1-x-not-atoms
+type: choice
+difficulty: 2
+surfaces: practice
+surfaces: checkpoint
+surfaces: review
+references: ref-openstax-chem-ch1
+
+prompt:
+    Which of these is NOT made of atoms?
+
+options:
+    {"id":"wood","label":"The wood in a campfire","note":"Wood is matter, so it is made of atoms."}
+    {"id":"air","label":"The air around the fire","note":"Air is matter, so it is made of atoms."}
+    {"id":"ash","label":"The ash left behind","note":"Ash is matter, so it is made of atoms."}
+    {"id":"heat","label":"The heat you feel from the fire"}
+
+answer: heat
+
+explanation:
+    Heat is energy, not matter, so it is not made of atoms. The wood, the air and the ash are all matter.
+
+item u1-x-water-atoms
+type: true_or_myth
+surfaces: practice
+surfaces: checkpoint
+surfaces: review
+references: ref-openstax-chem-ch1
+
+statement:
+    A glass of water is made of atoms.
+
+answer: true
+
+explanation:
+    True. Water is matter, and all matter is made of atoms.

@@ -1,0 +1,72 @@
+format 1
+adapter curriculum 1
+unit: radioactivity
+
+objective u2-decay-changes-not-vanishes
+statement: Know that a decay changes a nucleus into a different one; nothing simply vanishes.
+misconception: Decay means the atom disappears.
+
+item u2-l4-tom-different
+type: true_or_myth
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-iaea-decay
+
+statement:
+    When a nucleus decays, it changes into a different nucleus.
+
+answer: true
+
+explanation:
+    True. The parent changes into a daughter, which is a different nucleus.
+
+item u2-l4-tom-vanish
+type: true_or_myth
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-iaea-decay
+
+statement:
+    Radioactive decay means the atom just disappears.
+
+answer: myth
+
+explanation:
+    Myth. The nucleus changes into a different nucleus. Nothing simply vanishes.
+
+item u2-x-still-there
+type: true_or_myth
+surfaces: practice
+surfaces: checkpoint
+surfaces: review
+references: ref-iaea-decay
+
+statement:
+    After a decay there is still a nucleus. It is a different one.
+
+answer: true
+
+explanation:
+    True. A decay changes a nucleus into a different nucleus.
+
+item u2-x-what-happened
+type: choice
+surfaces: practice
+surfaces: checkpoint
+surfaces: review
+references: ref-iaea-decay
+
+prompt:
+    A nucleus decays. What has happened to it?
+
+options:
+    {"id":"changed","label":"It has changed into a different nucleus"}
+    {"id":"vanished","label":"It has vanished","note":"Nothing simply vanishes."}
+    {"id":"halved","label":"It has been cut in half","note":"A decay does not cut a nucleus in half."}
+
+answer: changed
+
+explanation:
+    The nucleus changed into a different nucleus. Nothing simply vanishes.

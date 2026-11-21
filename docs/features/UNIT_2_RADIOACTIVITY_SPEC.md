@@ -5,6 +5,8 @@
 **Status:** Draft for review. Nothing here is built or authored yet.
 **Date:** 2026-11-17
 **Owner:** AtomIQ product, content and engineering
+**Status (2026-11-22):** the authoring modules named here (`unit-2.mjs`, `scenes.mjs`, `sync-unit.mjs`, `curriculum-cutover.mjs`) are retired in `scripts/content-migration/legacy/`; the unit is the files in `content/source/units/radioactivity/`, built with `npm run content:sync`. The text below is the history of how it was authored.
+
 **Applies to:** `scripts/content-migration/curriculum/unit-2.mjs` (new authoring source) and `scenes.mjs`, `content/curriculum/types.ts`, `scripts/lib/curriculum-rules.mjs`, `components/lesson/cards/` (new simulations), `components/lesson/visual/object-art.ts`, `scripts/content-migration/` (sync and glossary scripts), `components/npc/npc-roster.ts` (Hal's lines)
 **Builds on:** `docs/features/LESSON_RESTRUCTURE_SPEC.md` (§4 unit map, §6 cards and limits, §12 Unit 1 as the model), `docs/features/NPC_TEACHERS_SPEC.md` (Ada teaches this unit: Hal until 2026-11-22), `docs/critical/MEDIA_POLICY.md`, `components/motion/MOTION.md`
 

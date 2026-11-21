@@ -15,7 +15,7 @@ import { backupUnlessIdentical, listBackups } from "./lib/backup.mjs";
 import { checksFor } from "./lib/content-checks.mjs";
 import { createStore, openHistory, StoreError } from "./lib/content-store.mjs";
 import { listContentTables, openDb } from "./lib/content-tables.mjs";
-import { makeFixture, query } from "./lib/test-fixture.mjs";
+import { makeFixture, query, sql } from "./lib/test-fixture.mjs";
 
 const fx = makeFixture();
 let db;
@@ -183,21 +183,25 @@ describe("checksFor", () => {
   });
 });
 
-describe("content:edit command (on a table the files do not own: units)", () => {
-  const MYTH = "inside-the-atom";
-  const myth = () => query(fx.paths, "SELECT id, title FROM units WHERE id = ?", MYTH)[0];
+describe("content:edit command (on a table the files do not own: a scratch table)", () => {
+  const MYTH = "n1";
+  const myth = () => query(fx.paths, "SELECT id, title FROM scratch_notes WHERE id = ?", MYTH)[0];
   const run = (...args) =>
     spawnSync(process.execPath, ["--no-warnings", new URL("./content-edit.mjs", import.meta.url).pathname, ...args], {
       env: { ...process.env, ATOMIQ_ROOT: fx.root },
       encoding: "utf8",
     });
   const patchFile = path.join(fx.root, "patch.json");
+  before(() => {
+    sql(fx.paths, "CREATE TABLE scratch_notes (id TEXT PRIMARY KEY, title TEXT NOT NULL DEFAULT '')");
+    sql(fx.paths, "INSERT INTO scratch_notes (id, title) VALUES ('n1', 'one')");
+  });
 
   it("a dry run reports the change and leaves the master alone", () => {
-    fs.writeFileSync(patchFile, JSON.stringify({ note: "cli test", ops: [{ op: "update", table: "units", pk: MYTH, set: { title: "via cli" } }] }));
+    fs.writeFileSync(patchFile, JSON.stringify({ note: "cli test", ops: [{ op: "update", table: "scratch_notes", pk: MYTH, set: { title: "via cli" } }] }));
     const r = run(patchFile);
     assert.equal(r.status, 0, r.stderr);
-    assert.match(r.stdout, /update units\[inside-the-atom\]/);
+    assert.match(r.stdout, /update scratch_notes\[n1\]/);
     assert.match(r.stdout, /Dry run only/);
     assert.notEqual(myth().title, "via cli");
   });
@@ -213,7 +217,7 @@ describe("content:edit command (on a table the files do not own: units)", () => 
   });
 
   it("a bad patch exits 1 and changes nothing", () => {
-    fs.writeFileSync(patchFile, JSON.stringify([{ op: "update", table: "units", pk: MYTH, set: { no_such_column: 1 } }]));
+    fs.writeFileSync(patchFile, JSON.stringify([{ op: "update", table: "scratch_notes", pk: MYTH, set: { no_such_column: 1 } }]));
     const r = run(patchFile, "--apply", "--no-verify");
     assert.equal(r.status, 1);
     assert.match(r.stderr, /Nothing was changed/);
@@ -241,9 +245,9 @@ describe("content:edit command (on a table the files do not own: units)", () => 
   });
 
   it("get and sql read without writing", () => {
-    const g = run("get", "units", "--pk", MYTH, "--cols", "id,title");
+    const g = run("get", "scratch_notes", "--pk", MYTH, "--cols", "id,title");
     assert.equal(g.status, 0, g.stderr);
     assert.deepEqual(JSON.parse(g.stdout), [{ id: MYTH, title: "via cli" }]);
-    assert.notEqual(run("sql", "DELETE FROM units").status, 0);
+    assert.notEqual(run("sql", "DELETE FROM scratch_notes").status, 0);
   });
 });

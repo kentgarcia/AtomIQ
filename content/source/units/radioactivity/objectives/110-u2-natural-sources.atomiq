@@ -1,0 +1,165 @@
+format 1
+adapter curriculum 1
+unit: radioactivity
+
+objective u2-natural-sources
+statement: Name natural places radioactivity and radiation come from: rocks and soil, radon in air, food and the body, space.
+misconception: Radioactivity is something humans created, and it only exists in nuclear facilities.
+
+item u2-l5-choice-radon
+type: choice
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-background-radiation
+
+prompt:
+    Where does radon come from?
+
+options:
+    {"id":"ground","label":"From radioactive materials in the ground"}
+    {"id":"plants","label":"Only from nuclear power plants","note":"Radon is made naturally in the ground. It is in the air everywhere."}
+    {"id":"people","label":"From a gas that people make and sell","note":"Radon is natural. It comes from decay in rocks and soil."}
+
+answer: ground
+
+explanation:
+    Radioactive materials in the ground, such as uranium and thorium, produce radon. It is natural.
+
+item u2-l5-choice-space
+type: choice
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-background-radiation
+
+prompt:
+    Which of these arrives on Earth from space?
+
+options:
+    {"id":"cosmic","label":"Cosmic radiation"}
+    {"id":"radon","label":"Radon gas","note":"Radon comes from the ground."}
+    {"id":"k40","label":"Potassium-40 in food","note":"Potassium-40 is in food and in the body."}
+
+answer: cosmic
+
+explanation:
+    Cosmic radiation arrives from space all the time.
+
+item u2-l5-order-first
+type: order
+difficulty: 2
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-becquerel-1896
+references: ref-iaea-decay
+
+prompt:
+    Put these in order, from first to last.
+
+items:
+    {"id":"nature","label":"Radioactive materials are in the ground"}
+    {"id":"found","label":"Becquerel notices a fogged photographic plate"}
+    {"id":"made","label":"People learn to make radioactive materials"}
+
+explanation:
+    Radioactivity was in nature first. Becquerel found it in 1896, and only later did people learn to make radioactive materials.
+
+item u2-l5-predict-where
+type: predict
+surfaces: lesson
+
+prompt:
+    Which of these can have radioactive material in it?
+
+input: choice
+
+options:
+    {"id":"plant","label":"A nuclear power plant"}
+    {"id":"hospital","label":"A hospital"}
+    {"id":"rocks","label":"Rocks and food"}
+    {"id":"body","label":"Your own body"}
+    {"id":"all","label":"All of these"}
+
+answer: all
+
+explanation:
+    Your guess is not scored. The answer comes later in the lesson.
+
+item u2-l5-sort-world
+type: sort
+difficulty: 2
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-background-radiation
+
+prompt:
+    Which kind is it? Natural radioactivity, cosmic radiation, or made by people? Sort each one.
+
+buckets:
+    {"id":"natural","label":"Natural radioactivity","icon":"AqMountain"}
+    {"id":"cosmic","label":"Cosmic radiation","icon":"AqCosmic"}
+    {"id":"people","label":"Made by people","icon":"AqFlask"}
+
+items:
+    {"id":"banana","label":"A banana","bucket":"natural"}
+    {"id":"rock","label":"A rock","bucket":"natural"}
+    {"id":"body","label":"The human body","bucket":"natural"}
+    {"id":"plane","label":"An airplane at high altitude","bucket":"cosmic"}
+    {"id":"reactor","label":"A nuclear reactor","bucket":"people"}
+    {"id":"hospital","label":"A hospital radiation source","bucket":"people"}
+
+explanation:
+    A banana, a rock and your body hold natural radioactivity. High up, an airplane gets more cosmic radiation. Reactors and hospital sources are made by people. Radiation is part of the world, not only inside nuclear facilities.
+
+item u2-l5-tom-facilities
+type: true_or_myth
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-background-radiation
+
+statement:
+    Radioactive materials are only found in nuclear facilities.
+
+answer: myth
+
+explanation:
+    Myth. Radioactive materials are in rocks, soil, air, food and your own body. Nuclear facilities are only one place.
+
+item u2-x-natural-source
+type: choice
+surfaces: practice
+surfaces: checkpoint
+surfaces: review
+references: ref-background-radiation
+
+prompt:
+    Which of these is a natural source of radioactivity?
+
+options:
+    {"id":"k40","label":"Potassium-40 in food"}
+    {"id":"reactor","label":"A radioactive source made in a reactor","note":"That one is made by people."}
+    {"id":"nowhere","label":"Nothing: it only comes from nuclear plants","note":"Radioactivity is in rocks, air, food, bodies and space."}
+
+answer: k40
+
+explanation:
+    Potassium-40 is a natural radioactive material found in food and in the body.
+
+item u2-x-tom-radon
+type: true_or_myth
+surfaces: practice
+surfaces: checkpoint
+surfaces: review
+references: ref-background-radiation
+
+statement:
+    Radon is a radioactive gas that comes from the ground.
+
+answer: true
+
+explanation:
+    True. Radioactive materials in the ground produce radon, a natural radioactive gas.

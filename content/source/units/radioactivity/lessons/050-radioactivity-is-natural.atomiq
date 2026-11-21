@@ -1,0 +1,162 @@
+format 1
+adapter curriculum 1
+unit: radioactivity
+
+lesson radioactivity-is-natural
+title: Radioactivity is natural
+minutes: 5
+xp: 50
+teaches: u2-natural-sources
+teaches: u2-not-always-dangerous
+relies_on: u1-unstable-changes
+relies_on: u2-decay-chain
+
+description:
+    Radioactivity was here long before people. You will find it in rocks, air, food, your own body and space, hear how it was discovered, and see why radioactive does not automatically mean dangerous.
+
+cite ref-background-radiation
+supports: Natural radionuclides, cosmic radiation and radon.
+
+cite ref-becquerel-1896
+supports: The discovery of radioactivity in a natural mineral.
+
+cite ref-potassium-40
+supports: Potassium-40 in food and the body.
+
+cite ref-nrc-decay-series
+supports: Natural decay series and natural radionuclides (optional card).
+
+card c01
+kind: item
+type: item
+item: u2-l5-predict-where
+scored: 0
+
+card c02
+kind: teach
+type: explain
+scored: 0
+title: Rocks and soil
+figure: rocks-soil
+figure_at: 1
+
+body:
+    Rocks and soil contain some natural radioactive materials, such as uranium and thorium. This is why the ground gives off a little radiation. It has been this way since long before people.
+
+card c03
+kind: teach
+type: explain
+scored: 0
+title: In the air
+figure: radon-house
+figure_at: 1
+
+body:
+    Radioactive materials in the ground can produce [[radon]], a radioactive gas. Radon is in the air outside, and it can get into buildings.
+
+card c04
+kind: item
+type: item
+item: u2-l5-choice-radon
+connected: true
+
+card c05
+kind: teach
+type: explain
+scored: 0
+title: Food and your body
+figure: food-body
+figure_at: 1
+
+body:
+    Your body contains a little natural radioactive potassium, called [[potassium-40|potassium-40]]. So do many foods, such as bananas. It is a tiny share of all your potassium.
+
+card c06
+kind: teach
+type: explain
+scored: 0
+title: From space
+figure: cosmic-rays
+figure_at: 1
+
+body:
+    Earth is hit by [[cosmic-radiation|cosmic radiation]] from space all the time. It is one more part of the [[background-radiation|radiation around us]].
+
+card c07
+kind: item
+type: item
+item: u2-l5-choice-space
+connected: true
+
+card c08
+kind: item
+type: item
+item: u2-l5-tom-facilities
+
+card c09
+kind: teach
+type: story
+scored: 0
+title: A discovery that wasn't supposed to happen
+speaker: npc-ada
+tag: 1896
+figure: becquerel-plate
+figure_at: 1
+
+body:
+    [[henri-becquerel|Henri Becquerel]] left a uranium mineral on a wrapped photographic plate and found it fogged, even with no sunlight. Radioactivity was found in a natural mineral, long before people made any nuclear technology.
+
+card c10
+kind: item
+type: item
+item: u2-l5-order-first
+
+card c11
+kind: item
+type: item
+item: u2-l5-choice-dangerous
+
+card c12
+kind: teach
+type: explain
+scored: 0
+title: It depends
+figure: not-always-dangerous
+figure_at: 1
+
+body:
+    Radioactive does not automatically mean dangerous. What matters is the type of radiation, how much there is, and how it reaches the body. A banana and your own body are radioactive, and that is normal.
+
+card c13
+kind: item
+type: item
+item: u2-l5-choice-decides
+connected: true
+
+card c14
+kind: teach
+type: explain
+scored: 0
+title: A question for later
+figure: exposed-later
+figure_at: 1
+
+body:
+    Later, you'll learn why being exposed to radiation is not the same as becoming radioactive.
+
+card c15
+kind: item
+type: item
+item: u2-l5-sort-world
+
+card c16
+kind: teach
+type: explain
+tier: deeper
+scored: 0
+title: Go deeper: radon and chains
+figure: radon-chain
+figure_at: 1
+
+body:
+    Radon is one link in a natural decay chain that starts with uranium in rock. Potassium-40 is another natural radionuclide, found in food and the body. Natural chains like these were running long before people existed.

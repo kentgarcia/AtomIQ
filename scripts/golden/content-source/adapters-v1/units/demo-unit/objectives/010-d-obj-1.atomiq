@@ -1,0 +1,61 @@
+format 1
+adapter curriculum 1
+unit: demo-unit
+
+objective d-obj-1
+statement: Know the first thing.
+misconception: The first thing is false.
+
+item d-l1-choice
+type: choice
+difficulty: 2
+surfaces: lesson
+surfaces: practice
+references: ref-a
+
+prompt:
+    Which is made of atoms?
+
+options:
+    {"id":"a","label":"Air","art":"air"}
+    {"id":"b","label":"Light","note":"Energy, not matter."}
+
+answer: a
+
+explanation:
+    Air is matter.
+
+item d-l1-figure
+type: choice
+surfaces: lesson
+surfaces: practice
+surfaces: checkpoint
+
+prompt:
+    Read the picture.
+
+figure: half-life-bars
+caption: Bars.
+
+options:
+    {"id":"a","label":"Half"}
+    {"id":"b","label":"All"}
+
+answer: a
+
+explanation:
+    Half.
+
+item d-l1-tom
+type: true_or_myth
+surfaces: lesson
+references: ref-a
+references: ref-b
+
+statement:
+    Atoms are small.
+
+answer: true
+
+explanation:
+    True.

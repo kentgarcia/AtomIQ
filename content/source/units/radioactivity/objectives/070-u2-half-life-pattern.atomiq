@@ -1,0 +1,127 @@
+format 1
+adapter curriculum 1
+unit: radioactivity
+
+objective u2-half-life-pattern
+statement: Read the pattern 100, 50, 25, 12 and know that radioactivity fades but is not gone after one half-life.
+misconception: After one half-life the radioactivity is gone, and radioactive material stays radioactive for ever.
+
+item u2-l3-choice-eighty
+type: choice
+difficulty: 2
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-iaea-decay
+
+prompt:
+    A sample starts with 80 nuclei. After two half-lives, about how many have not changed?
+
+options:
+    {"id":"10","label":"About 10","note":"Two half-lives is two halvings: 80, 40, 20."}
+    {"id":"20","label":"About 20"}
+    {"id":"40","label":"About 40","note":"About 40 are left after one half-life, not two."}
+    {"id":"60","label":"About 60","note":"That is far more than half of 80 after even one half-life."}
+
+answer: 20
+
+explanation:
+    80 becomes about 40 after one half-life and about 20 after two.
+
+item u2-l3-fill-pattern
+type: fill
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-iaea-decay
+
+prompt:
+    The pattern is 100, 50, 25, and then about ___.
+
+mode: bank
+
+bank:
+    {"id":"12","label":"12"}
+    {"id":"20","label":"20"}
+    {"id":"0","label":"0"}
+
+answer: 12
+
+explanation:
+    Each half-life takes about half of what is left. Half of 25 is about 12.
+
+item u2-l3-match-halves
+type: match
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-iaea-decay
+
+prompt:
+    Start with 100 nuclei. Match the number of half-lives to about how many are left.
+
+pairs:
+    {"id":"one","left":"1 half-life","right":"About 50"}
+    {"id":"two","left":"2 half-lives","right":"About 25"}
+    {"id":"three","left":"3 half-lives","right":"About 12"}
+
+explanation:
+    Each half-life takes about half of what is left: about 50, then about 25, then about 12.
+
+item u2-l3-tom-gone
+type: true_or_myth
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-iaea-decay
+
+statement:
+    After one half-life, the radioactivity is gone.
+
+answer: myth
+
+explanation:
+    Myth. After one half-life, about half of the nuclei are still unstable. 100 becomes about 50, then about 25, and so on. It fades, but it is not gone after one half-life.
+
+item u2-x-hundred-left
+type: choice
+surfaces: practice
+surfaces: checkpoint
+surfaces: review
+references: ref-iaea-decay
+
+prompt:
+    A sample has 100 nuclei. After one half-life, about how many have not yet changed?
+
+options:
+    {"id":"10","label":"About 10"}
+    {"id":"25","label":"About 25","note":"That would be after two half-lives."}
+    {"id":"50","label":"About 50"}
+    {"id":"90","label":"About 90","note":"That is too few to have changed."}
+
+answer: 50
+
+explanation:
+    After one half-life, about half of the 100 nuclei are left: about 50.
+
+item u2-x-three-half-lives
+type: choice
+difficulty: 2
+surfaces: practice
+surfaces: checkpoint
+surfaces: review
+references: ref-iaea-decay
+
+prompt:
+    After three half-lives, about how much of the original group is left?
+
+options:
+    {"id":"half","label":"About a half","note":"That is after one half-life."}
+    {"id":"quarter","label":"About a quarter","note":"That is after two half-lives."}
+    {"id":"eighth","label":"About an eighth"}
+    {"id":"none","label":"None of it","note":"It keeps halving but is not gone."}
+
+answer: eighth
+
+explanation:
+    Each half-life halves what is left: a half, then a quarter, then about an eighth.

@@ -1,0 +1,142 @@
+format 1
+adapter curriculum 1
+unit: radioactivity
+
+objective u2-decay-chain
+statement: Know that a daughter can be unstable and decay again, until a stable nucleus is reached (a decay chain).
+misconception: Every decay makes a stable atom.
+
+item u2-l4-choice-finished
+type: choice
+difficulty: 2
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-iaea-decay
+
+prompt:
+    A sample has a nucleus whose daughter is also unstable. After the first decay, is the sample finished changing?
+
+options:
+    {"id":"no","label":"No: the daughter can decay too"}
+    {"id":"yes-stable","label":"Yes: a decay always ends in a stable nucleus","note":"The daughter is unstable, so it can decay again."}
+    {"id":"yes-gone","label":"Yes: the atom has disappeared","note":"Nothing vanishes. The nucleus changed into another nucleus."}
+
+answer: no
+
+explanation:
+    No. The daughter is unstable, so the sample can keep changing along the chain.
+
+item u2-l4-choice-next
+type: choice
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-iaea-decay
+
+prompt:
+    A chain goes Parent, then Daughter. What comes next if the daughter is unstable?
+
+options:
+    {"id":"next","label":"The next generation, another nucleus"}
+    {"id":"stable","label":"Always a stable nucleus","note":"The next nucleus can be unstable too. The chain only ends at a stable one."}
+    {"id":"parent","label":"The parent again","note":"A decay does not run backwards."}
+
+answer: next
+
+explanation:
+    An unstable daughter decays again into the next generation. The chain goes on until a stable nucleus is reached.
+
+item u2-l4-order-chain
+type: order
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-iaea-decay
+
+prompt:
+    Put the chain in order, from the start to the end.
+
+items:
+    {"id":"parent","label":"Parent"}
+    {"id":"daughter","label":"Daughter"}
+    {"id":"next","label":"Next generation"}
+    {"id":"stable","label":"Stable"}
+
+explanation:
+    A chain starts with the parent, goes through the daughter and the next generation, and ends at a stable nucleus.
+
+item u2-l4-predict-daughter
+type: predict
+surfaces: lesson
+
+prompt:
+    A nucleus decays into a daughter. Is the daughter always stable?
+
+input: choice
+
+options:
+    {"id":"yes","label":"Yes, every time"}
+    {"id":"no","label":"No, sometimes it can be unstable too"}
+
+answer: no
+
+explanation:
+    Your guess is not scored. The answer comes later in the lesson.
+
+item u2-l4-tom-stable
+type: true_or_myth
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-iaea-decay
+
+statement:
+    Every radioactive decay immediately creates a stable atom.
+
+answer: myth
+
+explanation:
+    Myth. The daughter can be unstable too, and then it decays again. A chain only ends at a stable nucleus.
+
+item u2-x-chain-end
+type: choice
+surfaces: practice
+surfaces: checkpoint
+surfaces: review
+references: ref-iaea-decay
+
+prompt:
+    What ends a decay chain?
+
+options:
+    {"id":"stable","label":"A stable nucleus"}
+    {"id":"first","label":"The first decay","note":"A daughter can be unstable and decay again."}
+    {"id":"radiation","label":"The radiation running out","note":"The chain ends only when the nucleus is stable."}
+
+answer: stable
+
+explanation:
+    A decay chain ends when a stable nucleus is reached.
+
+item u2-x-fill-chain
+type: fill
+surfaces: practice
+surfaces: checkpoint
+surfaces: review
+references: ref-iaea-decay
+
+prompt:
+    A sequence of decays in which one nucleus changes into another is called a decay ___.
+
+mode: bank
+
+bank:
+    {"id":"chain","label":"chain"}
+    {"id":"stop","label":"stop"}
+    {"id":"clock","label":"clock"}
+
+answer: chain
+
+explanation:
+    It is called a decay chain.

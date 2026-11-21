@@ -1,0 +1,129 @@
+format 1
+adapter curriculum 1
+unit: radioactivity
+
+objective u2-recognise-radiation
+
+statement:
+    Say what each one is: alpha is 2 protons and 2 neutrons, beta is a fast electron, gamma is high-energy electromagnetic radiation.
+
+misconception: The electron of a beta particle was orbiting the nucleus.
+
+item u2-l2-choice-alpha
+type: choice
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-iaea-radiation-types
+
+prompt:
+    Which kind of radiation is made of 2 protons and 2 neutrons?
+
+options:
+    {"id":"alpha","label":"Alpha"}
+    {"id":"beta","label":"Beta","note":"A beta particle is a fast electron."}
+    {"id":"gamma","label":"Gamma","note":"Gamma is electromagnetic radiation. It is not made of protons and neutrons."}
+
+answer: alpha
+
+explanation:
+    An alpha particle is 2 protons and 2 neutrons stuck together, the nucleus of a helium atom.
+
+item u2-l2-choice-electron
+type: choice
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-iaea-radiation-types
+
+prompt:
+    A fast electron is released from a nucleus. What is this radiation called?
+
+options:
+    {"id":"beta","label":"Beta"}
+    {"id":"alpha","label":"Alpha","note":"Alpha is 2 protons and 2 neutrons, not an electron."}
+    {"id":"gamma","label":"Gamma","note":"Gamma is electromagnetic radiation, not a particle."}
+
+answer: beta
+
+explanation:
+    A fast electron released from a nucleus is a beta particle.
+
+item u2-l2-match-kinds
+type: match
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-iaea-radiation-types
+
+prompt:
+    Match each kind of radiation to what it is.
+
+pairs:
+    {"id":"alpha","left":"Alpha","right":"2 protons and 2 neutrons"}
+    {"id":"beta","left":"Beta","right":"A fast electron"}
+    {"id":"gamma","left":"Gamma","right":"High-energy electromagnetic radiation"}
+
+explanation:
+    Alpha is 2 protons and 2 neutrons. Beta is a fast electron. Gamma is high-energy electromagnetic radiation.
+
+item u2-l2-predict-release
+type: predict
+surfaces: lesson
+
+prompt:
+    When a radioactive nucleus changes, what can it release?
+
+input: choice
+
+options:
+    {"id":"particle","label":"Only a particle"}
+    {"id":"energy","label":"Only energy"}
+    {"id":"both","label":"A particle, energy, or both"}
+    {"id":"nothing","label":"Nothing at all"}
+
+answer: both
+
+explanation:
+    Your guess is not scored. The answer comes later in the lesson.
+
+item u2-x-em-burst
+type: choice
+surfaces: practice
+surfaces: checkpoint
+surfaces: review
+references: ref-iaea-radiation-types
+
+prompt:
+    A burst of high-energy electromagnetic radiation leaves a nucleus. What is it?
+
+options:
+    {"id":"gamma","label":"Gamma"}
+    {"id":"alpha","label":"Alpha","note":"Alpha is a particle of 2 protons and 2 neutrons."}
+    {"id":"beta","label":"Beta","note":"Beta is a fast electron."}
+
+answer: gamma
+
+explanation:
+    High-energy electromagnetic radiation from a nucleus is gamma radiation.
+
+item u2-x-helium-nucleus
+type: choice
+difficulty: 2
+surfaces: practice
+surfaces: checkpoint
+surfaces: review
+references: ref-iaea-radiation-types
+
+prompt:
+    Which kind of radiation is the same as the nucleus of a helium atom?
+
+options:
+    {"id":"alpha","label":"Alpha"}
+    {"id":"beta","label":"Beta","note":"Beta is a fast electron."}
+    {"id":"gamma","label":"Gamma","note":"Gamma is electromagnetic radiation."}
+
+answer: alpha
+
+explanation:
+    An alpha particle, 2 protons and 2 neutrons, is the nucleus of a helium atom.

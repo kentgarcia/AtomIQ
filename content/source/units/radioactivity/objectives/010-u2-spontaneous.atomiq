@@ -1,0 +1,484 @@
+format 1
+adapter curriculum 1
+unit: radioactivity
+
+objective u2-spontaneous
+statement: Know that an unstable nucleus changes by itself: nobody has to trigger it.
+misconception: Decay can be switched on and off, or a person has to make an atom decay.
+
+item u2-l1-choice-why
+type: choice
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-iaea-decay
+
+prompt:
+    Why can a radioactive nucleus change even when nobody does anything to it?
+
+options:
+    {"id":"unstable","label":"It is unstable, so it can change on its own"}
+    {"id":"trigger","label":"Someone must trigger it","note":"Nobody has to trigger it. Unstable nuclei change by themselves."}
+    {"id":"heat","label":"It needs heat first","note":"Heating and cooling hardly affect radioactive decay."}
+    {"id":"used","label":"It is being used up","note":"Nothing is used up. The nucleus changes into another nucleus."}
+
+answer: unstable
+
+explanation:
+    An unstable nucleus can change on its own. That is what radioactive means.
+
+item u2-l1-hotspot-change
+type: hotspot
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-iaea-decay
+
+prompt:
+    Which nucleus can change by itself? Tap it.
+
+scene:
+    {
+      "height": 54,
+      "shapes": [
+        {
+          "t": "circle",
+          "x": 21.46,
+          "y": 24,
+          "r": 2.3,
+          "tone": "danger",
+          "fill": "solid"
+        },
+        {
+          "t": "circle",
+          "x": 18.13,
+          "y": 25.71,
+          "r": 2.3,
+          "tone": "neutral",
+          "fill": "solid"
+        },
+        {
+          "t": "circle",
+          "x": 20.29,
+          "y": 20.74,
+          "r": 2.3,
+          "tone": "danger",
+          "fill": "solid"
+        },
+        {
+          "t": "circle",
+          "x": 22.36,
+          "y": 27.07,
+          "r": 2.3,
+          "tone": "neutral",
+          "fill": "solid"
+        },
+        {
+          "t": "circle",
+          "x": 15.68,
+          "y": 23.24,
+          "r": 2.3,
+          "tone": "danger",
+          "fill": "solid"
+        },
+        {
+          "t": "circle",
+          "x": 24.1,
+          "y": 21.39,
+          "r": 2.3,
+          "tone": "neutral",
+          "fill": "solid"
+        },
+        {
+          "t": "circle",
+          "x": 18.63,
+          "y": 29.1,
+          "r": 2.3,
+          "tone": "danger",
+          "fill": "solid"
+        },
+        {
+          "t": "circle",
+          "x": 17.39,
+          "y": 18.97,
+          "r": 2.3,
+          "tone": "neutral",
+          "fill": "solid"
+        },
+        {
+          "t": "circle",
+          "x": 25.67,
+          "y": 26.07,
+          "r": 2.3,
+          "tone": "danger",
+          "fill": "solid"
+        },
+        {
+          "t": "circle",
+          "x": 14.1,
+          "y": 26.43,
+          "r": 2.3,
+          "tone": "neutral",
+          "fill": "solid"
+        },
+        {
+          "t": "circle",
+          "x": 22.84,
+          "y": 17.92,
+          "r": 2.3,
+          "tone": "danger",
+          "fill": "solid"
+        },
+        {
+          "t": "circle",
+          "x": 22.1,
+          "y": 30.7,
+          "r": 2.3,
+          "tone": "neutral",
+          "fill": "solid"
+        },
+        {
+          "t": "text",
+          "x": 20,
+          "y": 46,
+          "text": "carbon-12",
+          "size": 4.8
+        },
+        {
+          "t": "circle",
+          "x": 51.46,
+          "y": 24,
+          "r": 2.3,
+          "tone": "danger",
+          "fill": "solid"
+        },
+        {
+          "t": "circle",
+          "x": 48.13,
+          "y": 25.71,
+          "r": 2.3,
+          "tone": "neutral",
+          "fill": "solid"
+        },
+        {
+          "t": "circle",
+          "x": 50.29,
+          "y": 20.74,
+          "r": 2.3,
+          "tone": "danger",
+          "fill": "solid"
+        },
+        {
+          "t": "circle",
+          "x": 52.36,
+          "y": 27.07,
+          "r": 2.3,
+          "tone": "neutral",
+          "fill": "solid"
+        },
+        {
+          "t": "circle",
+          "x": 45.68,
+          "y": 23.24,
+          "r": 2.3,
+          "tone": "danger",
+          "fill": "solid"
+        },
+        {
+          "t": "circle",
+          "x": 54.1,
+          "y": 21.39,
+          "r": 2.3,
+          "tone": "neutral",
+          "fill": "solid"
+        },
+        {
+          "t": "circle",
+          "x": 48.63,
+          "y": 29.1,
+          "r": 2.3,
+          "tone": "danger",
+          "fill": "solid"
+        },
+        {
+          "t": "circle",
+          "x": 47.39,
+          "y": 18.97,
+          "r": 2.3,
+          "tone": "neutral",
+          "fill": "solid"
+        },
+        {
+          "t": "circle",
+          "x": 55.67,
+          "y": 26.07,
+          "r": 2.3,
+          "tone": "danger",
+          "fill": "solid"
+        },
+        {
+          "t": "circle",
+          "x": 44.1,
+          "y": 26.43,
+          "r": 2.3,
+          "tone": "neutral",
+          "fill": "solid"
+        },
+        {
+          "t": "circle",
+          "x": 52.84,
+          "y": 17.92,
+          "r": 2.3,
+          "tone": "danger",
+          "fill": "solid"
+        },
+        {
+          "t": "circle",
+          "x": 52.1,
+          "y": 30.7,
+          "r": 2.3,
+          "tone": "neutral",
+          "fill": "solid"
+        },
+        {
+          "t": "circle",
+          "x": 43.67,
+          "y": 20.33,
+          "r": 2.3,
+          "tone": "neutral",
+          "fill": "solid"
+        },
+        {
+          "t": "circle",
+          "x": 57.43,
+          "y": 22.37,
+          "r": 2.3,
+          "tone": "neutral",
+          "fill": "solid"
+        },
+        {
+          "t": "text",
+          "x": 50,
+          "y": 46,
+          "text": "carbon-14",
+          "size": 4.8
+        },
+        {
+          "t": "circle",
+          "x": 81.46,
+          "y": 24,
+          "r": 2.3,
+          "tone": "danger",
+          "fill": "solid"
+        },
+        {
+          "t": "circle",
+          "x": 78.13,
+          "y": 25.71,
+          "r": 2.3,
+          "tone": "neutral",
+          "fill": "solid"
+        },
+        {
+          "t": "circle",
+          "x": 80.29,
+          "y": 20.74,
+          "r": 2.3,
+          "tone": "danger",
+          "fill": "solid"
+        },
+        {
+          "t": "circle",
+          "x": 82.36,
+          "y": 27.07,
+          "r": 2.3,
+          "tone": "neutral",
+          "fill": "solid"
+        },
+        {
+          "t": "circle",
+          "x": 75.68,
+          "y": 23.24,
+          "r": 2.3,
+          "tone": "danger",
+          "fill": "solid"
+        },
+        {
+          "t": "circle",
+          "x": 84.1,
+          "y": 21.39,
+          "r": 2.3,
+          "tone": "neutral",
+          "fill": "solid"
+        },
+        {
+          "t": "circle",
+          "x": 78.63,
+          "y": 29.1,
+          "r": 2.3,
+          "tone": "danger",
+          "fill": "solid"
+        },
+        {
+          "t": "circle",
+          "x": 77.39,
+          "y": 18.97,
+          "r": 2.3,
+          "tone": "neutral",
+          "fill": "solid"
+        },
+        {
+          "t": "circle",
+          "x": 85.67,
+          "y": 26.07,
+          "r": 2.3,
+          "tone": "danger",
+          "fill": "solid"
+        },
+        {
+          "t": "circle",
+          "x": 74.1,
+          "y": 26.43,
+          "r": 2.3,
+          "tone": "neutral",
+          "fill": "solid"
+        },
+        {
+          "t": "circle",
+          "x": 82.84,
+          "y": 17.92,
+          "r": 2.3,
+          "tone": "danger",
+          "fill": "solid"
+        },
+        {
+          "t": "circle",
+          "x": 82.1,
+          "y": 30.7,
+          "r": 2.3,
+          "tone": "neutral",
+          "fill": "solid"
+        },
+        {
+          "t": "circle",
+          "x": 73.67,
+          "y": 20.33,
+          "r": 2.3,
+          "tone": "danger",
+          "fill": "solid"
+        },
+        {
+          "t": "circle",
+          "x": 87.43,
+          "y": 22.37,
+          "r": 2.3,
+          "tone": "neutral",
+          "fill": "solid"
+        },
+        {
+          "t": "circle",
+          "x": 75.47,
+          "y": 30.45,
+          "r": 2.3,
+          "tone": "danger",
+          "fill": "solid"
+        },
+        {
+          "t": "circle",
+          "x": 78.95,
+          "y": 15.92,
+          "r": 2.3,
+          "tone": "neutral",
+          "fill": "solid"
+        },
+        {
+          "t": "text",
+          "x": 80,
+          "y": 46,
+          "text": "oxygen-16",
+          "size": 4.8
+        }
+      ]
+    }
+
+targets:
+    {"id":"c12","label":"Carbon-12 nucleus","x":20,"y":24,"r":13}
+    {"id":"c14","label":"Carbon-14 nucleus","x":50,"y":24,"r":13}
+    {"id":"o16","label":"Oxygen-16 nucleus","x":80,"y":24,"r":13}
+
+answer: c14
+animate_on_correct: true
+
+explanation:
+    Carbon-14 is unstable, so it can change by itself. Carbon-12 and oxygen-16 are stable and stay as they are.
+
+item u2-l1-predict-alone
+type: predict
+surfaces: lesson
+
+prompt:
+    An unstable nucleus is left alone for a very long time. What happens?
+
+input: choice
+
+options:
+    {"id":"same","label":"It stays the same for ever"}
+    {"id":"itself","label":"It can change by itself"}
+    {"id":"trigger","label":"Someone has to trigger it"}
+    {"id":"gone","label":"It disappears at once"}
+
+answer: itself
+
+explanation:
+    Your guess is not scored. The answer comes later in the lesson.
+
+item u2-l1-tom-person
+type: true_or_myth
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-iaea-decay
+
+statement:
+    A radioactive atom needs a person to make it decay.
+
+answer: myth
+
+explanation:
+    Myth. Nobody has to make an unstable nucleus change. It changes by itself.
+
+item u2-x-rock-alone
+type: choice
+difficulty: 2
+surfaces: practice
+surfaces: checkpoint
+surfaces: review
+references: ref-iaea-decay
+
+prompt:
+    A rock contains unstable nuclei. Nobody touches it. What happens to those nuclei?
+
+options:
+    {"id":"some","label":"Some change on their own, now and then"}
+    {"id":"wait","label":"Nothing: they wait for someone to trigger them","note":"Unstable nuclei do not need a trigger."}
+    {"id":"all","label":"They all change at the same moment","note":"Each nucleus changes at its own random moment."}
+
+answer: some
+
+explanation:
+    Unstable nuclei change by themselves. Some change now and then, and nobody can say which one is next.
+
+item u2-x-tom-by-itself
+type: true_or_myth
+surfaces: practice
+surfaces: checkpoint
+surfaces: review
+references: ref-iaea-decay
+
+statement:
+    An unstable nucleus changes by itself, without anyone starting it.
+
+answer: true
+
+explanation:
+    True. Radioactive decay is spontaneous: nobody has to trigger it.

@@ -1,0 +1,78 @@
+format 1
+adapter curriculum 1
+unit: radioactivity
+
+objective u2-random-single
+statement: Know that you cannot predict when one particular nucleus will decay, although a large group follows a pattern.
+misconception: If you watch a nucleus closely you can tell when it will change.
+
+item u2-l1-choice-next
+type: choice
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-iaea-decay
+
+prompt:
+    Look at a group of unstable nuclei. Could you tell in advance which one will change next?
+
+options:
+    {"id":"no","label":"No: it is random for each nucleus"}
+    {"id":"first","label":"Yes: the one at the front always goes first","note":"Position does not matter. Each unstable nucleus has the same chance."}
+    {"id":"oldest","label":"Yes: the oldest one goes first","note":"A nucleus does not get older or due. It has the same chance every time."}
+
+answer: no
+
+explanation:
+    No. When one particular nucleus changes cannot be predicted. Each unstable nucleus has the same chance, so you cannot call the next one.
+
+item u2-l1-tom-chance
+type: true_or_myth
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-iaea-decay
+
+statement:
+    You can say how likely a nucleus is to change, but not exactly when it will.
+
+answer: true
+
+explanation:
+    True. An unstable nucleus has a chance of changing, but when one particular nucleus changes cannot be predicted.
+
+item u2-x-tom-exact
+type: true_or_myth
+surfaces: practice
+surfaces: checkpoint
+surfaces: review
+references: ref-iaea-decay
+
+statement:
+    If you watch one unstable nucleus closely, you can tell the exact second it will change.
+
+answer: myth
+
+explanation:
+    Myth. When one particular nucleus changes cannot be predicted.
+
+item u2-x-two-nuclei
+type: choice
+difficulty: 2
+surfaces: practice
+surfaces: checkpoint
+surfaces: review
+references: ref-iaea-decay
+
+prompt:
+    In a sample, one nucleus changed today. What can you say about another unstable nucleus in the same sample?
+
+options:
+    {"id":"unknown","label":"It could change today, tomorrow or much later: you cannot tell"}
+    {"id":"tomorrow","label":"It will change tomorrow","note":"Nothing fixes the moment for one nucleus."}
+    {"id":"together","label":"It changes at the same moment as the first","note":"Each nucleus changes at its own random moment."}
+
+answer: unknown
+
+explanation:
+    You cannot say when another particular nucleus will change. Only a large group follows a pattern.

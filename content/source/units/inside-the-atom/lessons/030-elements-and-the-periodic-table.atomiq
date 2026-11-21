@@ -1,0 +1,136 @@
+format 1
+adapter curriculum 1
+unit: inside-the-atom
+
+lesson elements-and-the-periodic-table
+title: Elements
+minutes: 4
+xp: 50
+teaches: u1-atomic-number
+teaches: u1-change-protons
+relies_on: u1-particles
+
+description:
+    One number tells you which element an atom is: how many protons it has. You will build atoms and watch what happens to the element when you change that number.
+
+cite ref-openstax-chem-ch2
+supports: The number of protons decides the element.
+
+cite ref-iupac-table
+supports: Element names and atomic numbers (optional card).
+
+card c01
+kind: item
+type: item
+item: u1-l3-predict-gold-oxygen
+scored: 0
+
+card c02
+kind: teach
+type: explain
+scored: 0
+title: Protons tell you the element
+figure: elements-by-protons
+figure_at: 1
+
+body:
+    The number of [[proton|protons]] tells you which [[element]] an atom is. An atom with 6 protons is always carbon. 7 protons is always nitrogen. 8 protons is always oxygen.
+
+card c03
+kind: sim
+type: atom-builder
+scored: 0
+task: This atom has 6 protons, so it is carbon. Add one proton and watch the element.
+hint: Tap + once. 7 protons is nitrogen.
+
+config:
+    {
+      "mode": "element",
+      "goal": {
+        "protons": 7
+      },
+      "start": {
+        "protons": 6,
+        "neutrons": 6,
+        "electrons": 6
+      },
+      "lock": {
+        "neutrons": true,
+        "electrons": true
+      },
+      "maxProtons": 10,
+      "objectives": [
+        "u1-change-protons"
+      ]
+    }
+
+card c04
+kind: item
+type: item
+item: u1-l3-fill-six
+
+card c05
+kind: teach
+type: explain
+scored: 0
+title: Change the protons, change the element
+figure: change-protons
+figure_at: 1
+
+body:
+    Add a proton and you get a different element. 6 protons is carbon, 7 is nitrogen and 8 is oxygen. The neutrons and electrons do not decide the element. The protons do.
+
+card c06
+kind: sim
+type: atom-builder
+scored: 0
+task: Now this atom has 7 protons: nitrogen. Add one more to turn it into oxygen.
+hint: Tap + once. 8 protons is oxygen.
+
+config:
+    {
+      "mode": "element",
+      "goal": {
+        "protons": 8
+      },
+      "start": {
+        "protons": 7,
+        "neutrons": 7,
+        "electrons": 7
+      },
+      "lock": {
+        "neutrons": true,
+        "electrons": true
+      },
+      "maxProtons": 10,
+      "objectives": [
+        "u1-change-protons"
+      ]
+    }
+
+card c07
+kind: item
+type: item
+item: u1-l3-tom-gain-proton
+
+card c08
+kind: item
+type: item
+item: u1-l3-choice-lose-proton
+
+card c09
+kind: item
+type: item
+item: u1-l3-choice-gold-oxygen
+
+card c10
+kind: teach
+type: explain
+tier: deeper
+scored: 0
+title: Go deeper: the periodic table
+figure: table-cell
+figure_at: 1
+
+body:
+    The [[periodic-table|periodic table]] lists every element in order of its number of protons. Each box shows that number, a short symbol and the name. You do not need to memorise it.

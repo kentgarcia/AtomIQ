@@ -1,0 +1,135 @@
+format 1
+adapter curriculum 1
+unit: inside-the-atom
+
+objective u1-nucleus
+
+statement:
+    Know that the tiny nucleus at the centre holds almost all of an atom's mass, and that the rest of the atom is mostly empty space.
+
+misconception: An atom is a solid ball.
+
+item u1-l2-choice-mass
+type: choice
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-openstax-up3-ch10
+
+prompt:
+    Where is almost all of an atom's mass?
+
+options:
+    {"id":"nucleus","label":"In the tiny nucleus"}
+    {"id":"electrons","label":"In the electrons","note":"Electrons are very light. Almost all of the mass is in the nucleus."}
+    {"id":"even","label":"Spread evenly through the atom","note":"The mass is not spread out. It is packed into the nucleus."}
+
+answer: nucleus
+
+explanation:
+    Almost all of an atom's mass is packed into its tiny nucleus.
+
+item u1-l2-predict-stadium
+type: predict
+surfaces: lesson
+
+prompt:
+    Imagine an atom blown up to the size of a football stadium. How big would its nucleus be?
+
+input: choice
+
+options:
+    {"id":"marble","label":"A marble in the middle","art":"marble"}
+    {"id":"car","label":"A car in the middle","art":"car"}
+    {"id":"pitch","label":"The whole pitch","art":"stadium"}
+    {"id":"grass","label":"A blade of grass","art":"grass"}
+
+answer: marble
+
+explanation:
+    Your guess is not scored. The answer comes later in the lesson.
+
+item u1-l2-tom-solid
+type: true_or_myth
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-openstax-up3-ch10
+
+statement:
+    An atom is a solid ball, packed full of stuff.
+
+answer: myth
+
+explanation:
+    Myth. An atom is mostly empty space. The nucleus is a tiny speck in the middle, and the electrons are far from it.
+
+item u1-l2-tom-volume
+type: true_or_myth
+surfaces: practice
+surfaces: checkpoint
+surfaces: review
+references: ref-openstax-up3-ch10
+
+statement:
+    The nucleus takes up most of the space in an atom.
+
+answer: myth
+
+explanation:
+    Myth. The nucleus is a tiny speck at the centre. Most of the atom is empty space around it.
+
+item u1-x-electrons-inside
+type: true_or_myth
+surfaces: practice
+surfaces: checkpoint
+surfaces: review
+references: ref-openstax-chem-ch2
+
+statement:
+    The electrons of an atom are packed inside the nucleus.
+
+answer: myth
+
+explanation:
+    Myth. The nucleus holds the protons and neutrons. Electrons are outside it.
+
+item u1-x-empty-space
+type: choice
+surfaces: practice
+surfaces: checkpoint
+surfaces: review
+references: ref-openstax-up3-ch10
+
+prompt:
+    If you could shrink down and look inside an atom, what would you mostly see?
+
+options:
+    {"id":"empty","label":"Empty space"}
+    {"id":"solid","label":"Solid stuff packed tightly","note":"An atom is mostly empty space."}
+    {"id":"electrons","label":"A crowd of electrons","note":"An atom has only a few electrons, and they are far apart."}
+
+answer: empty
+
+explanation:
+    Most of an atom is empty space. The nucleus is a tiny speck, and the electrons are far from it.
+
+item u1-x-nucleus-size
+type: choice
+surfaces: practice
+surfaces: checkpoint
+surfaces: review
+references: ref-openstax-up3-ch10
+
+prompt:
+    Compared with the whole atom, how big is the nucleus?
+
+options:
+    {"id":"tiny","label":"Tiny: a speck at the centre"}
+    {"id":"half","label":"About half the width of the atom","note":"The nucleus is much, much smaller than that."}
+    {"id":"same","label":"About the same size as the atom","note":"The atom is far bigger than its nucleus."}
+
+answer: tiny
+
+explanation:
+    The nucleus is a tiny speck at the centre of the atom.

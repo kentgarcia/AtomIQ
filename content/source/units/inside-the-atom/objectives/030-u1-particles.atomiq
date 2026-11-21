@@ -1,0 +1,176 @@
+format 1
+adapter curriculum 1
+unit: inside-the-atom
+
+objective u1-particles
+statement: Name the three particles of an atom and say whether each is positive, negative or has no charge.
+misconception: Every atom is made of its own kind of stuff.
+
+item u1-l2-hotspot-nucleus
+type: hotspot
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-openstax-chem-ch2
+
+prompt:
+    Tap the nucleus of the atom.
+
+scene:
+    {
+      "height": 76,
+      "shapes": [
+        {
+          "t": "circle",
+          "x": 50,
+          "y": 38,
+          "r": 19,
+          "fill": "none"
+        },
+        {
+          "t": "circle",
+          "x": 50,
+          "y": 19,
+          "r": 2,
+          "tone": "info",
+          "fill": "solid",
+          "motion": {
+            "kind": "orbit",
+            "cx": 50,
+            "cy": 38,
+            "period": 6000
+          }
+        },
+        {
+          "t": "circle",
+          "x": 50,
+          "y": 57,
+          "r": 2,
+          "tone": "info",
+          "fill": "solid",
+          "motion": {
+            "kind": "orbit",
+            "cx": 50,
+            "cy": 38,
+            "period": 6000
+          }
+        },
+        {
+          "t": "circle",
+          "x": 51.53,
+          "y": 38,
+          "r": 2.4,
+          "tone": "danger",
+          "fill": "solid"
+        },
+        {
+          "t": "circle",
+          "x": 48.05,
+          "y": 39.79,
+          "r": 2.4,
+          "tone": "neutral",
+          "fill": "solid"
+        },
+        {
+          "t": "circle",
+          "x": 50.3,
+          "y": 34.6,
+          "r": 2.4,
+          "tone": "danger",
+          "fill": "solid"
+        },
+        {
+          "t": "circle",
+          "x": 52.46,
+          "y": 41.21,
+          "r": 2.4,
+          "tone": "neutral",
+          "fill": "solid"
+        }
+      ]
+    }
+
+targets:
+    {"id":"nucleus","label":"The centre of the atom","x":50,"y":38,"r":9}
+    {"id":"electron-a","label":"An electron on the ring","x":50,"y":19,"r":7}
+    {"id":"electron-b","label":"An electron on the ring","x":50,"y":57,"r":7}
+
+answer: nucleus
+
+explanation:
+    The nucleus is the tiny centre of the atom. Protons and neutrons are in it. The electrons are outside.
+
+item u1-l2-match-particles
+type: match
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-openstax-chem-ch2
+
+prompt:
+    Match each particle to its charge.
+
+pairs:
+    {"id":"proton","left":"Proton","right":"Positive"}
+    {"id":"neutron","left":"Neutron","right":"No charge"}
+    {"id":"electron","left":"Electron","right":"Negative"}
+
+explanation:
+    Protons are positive, neutrons have no charge and electrons are negative.
+
+item u1-l2-sort-location
+type: sort
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-openstax-chem-ch2
+
+prompt:
+    Where is each particle? Sort them.
+
+buckets:
+    {"id":"in","label":"In the nucleus","icon":"AqNucleus"}
+    {"id":"out","label":"Outside the nucleus","icon":"AqOrbit"}
+
+items:
+    {"id":"proton","label":"Proton","bucket":"in"}
+    {"id":"neutron","label":"Neutron","bucket":"in"}
+    {"id":"electron","label":"Electron","bucket":"out"}
+
+explanation:
+    Protons and neutrons are in the nucleus. Electrons are outside it.
+
+item u1-x-negative
+type: choice
+surfaces: practice
+surfaces: checkpoint
+surfaces: review
+references: ref-openstax-chem-ch2
+
+prompt:
+    Which particle has a negative electric charge?
+
+options:
+    {"id":"electron","label":"The electron"}
+    {"id":"proton","label":"The proton","note":"Protons are positive."}
+    {"id":"neutron","label":"The neutron","note":"Neutrons have no charge."}
+
+answer: electron
+
+explanation:
+    Electrons are negative. Protons are positive and neutrons have no charge.
+
+item u1-x-neutron-charge
+type: true_or_myth
+surfaces: practice
+surfaces: checkpoint
+surfaces: review
+references: ref-openstax-chem-ch2
+
+statement:
+    Neutrons have no electric charge.
+
+answer: true
+
+explanation:
+    True. That is why they are called neutrons.

@@ -8,16 +8,24 @@
     "content_references": "ac2e021563231f42",
     "encyclopedia_entries": "fb6309166d78a678",
     "feed_templates": "d50c6a83d9fe4eba",
+    "items": "1f965a7b6e432108",
+    "lesson_cards": "216063acc24b361f",
+    "lesson_references": "6d6e86dc505d6414",
+    "lessons": "57aa106efc2cedb8",
     "map_site_references": "b004f268bc855d02",
     "map_sites": "f73dad4e0c538e0f",
     "mythbuster_questions": "f8a3860fb870fc55",
     "myths": "800b022737e8ab0a",
     "npc_lines": "6d14f9f02e3f69b5",
     "npcs": "835d588883a4f2ca",
+    "objectives": "a89ed9204507c679",
+    "path_nodes": "8f887b598be3d554",
     "safety_card_references": "6d4491791a739ab2",
     "safety_cards": "2620b171d4609864",
     "scan_target_references": "40f09fbac04e1679",
     "scan_targets": "e73ad32cc38c1cc0",
-    "unit_statements": "8169736b09442774"
+    "unit_references": "7075373f4a2f3839",
+    "unit_statements": "8169736b09442774",
+    "units": "2c975d6c4ed5d45b"
   }
 }

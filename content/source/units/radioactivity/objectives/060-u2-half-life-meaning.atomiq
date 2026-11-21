@@ -1,0 +1,110 @@
+format 1
+adapter curriculum 1
+unit: radioactivity
+
+objective u2-half-life-meaning
+statement: Know that half-life is the time for about half of a large group of radioactive nuclei to decay.
+misconception: A radioactive atom is half gone after one half-life.
+
+item u2-l3-choice-left
+type: choice
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-iaea-decay
+
+prompt:
+    A sample has gone through one half-life. Which statement is true?
+
+options:
+    {"id":"about","label":"About half of the nuclei have decayed, and the rest were not cut in half"}
+    {"id":"each","label":"Every nucleus has lost half of itself","note":"Nuclei are not cut in half. About half of them have decayed and the others have not changed."}
+    {"id":"weaker","label":"Every nucleus is now half as radioactive","note":"Each nucleus is either still unstable or has already changed."}
+
+answer: about
+
+explanation:
+    About half of the nuclei have decayed. The rest were not cut in half.
+
+item u2-l3-choice-meaning
+type: choice
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-iaea-decay
+
+prompt:
+    What does half-life mean?
+
+options:
+    {"id":"group","label":"The time for about half of a large group of nuclei to decay"}
+    {"id":"one","label":"The time for one atom to decay","note":"Half-life describes a group, not one atom."}
+    {"id":"half","label":"The time for each atom to lose half of itself","note":"Atoms are not cut in half. About half of the nuclei have decayed."}
+    {"id":"gone","label":"The time until the sample is no longer radioactive","note":"Some radioactivity is still there after one half-life."}
+
+answer: group
+
+explanation:
+    Half-life is the time for about half of a large group of radioactive nuclei to decay.
+
+item u2-l3-predict-hundred
+type: predict
+surfaces: lesson
+
+prompt:
+    There are 100 radioactive nuclei. After one half-life, what happens?
+
+input: choice
+
+options:
+    {"id":"one","label":"One nucleus disappears"}
+    {"id":"half","label":"Every atom becomes half as radioactive"}
+    {"id":"about-half","label":"About half of the nuclei have decayed"}
+    {"id":"gone","label":"All the radioactivity is gone"}
+
+answer: about-half
+
+explanation:
+    Your guess is not scored. The answer comes later in the lesson.
+
+item u2-x-fill-half
+type: fill
+surfaces: practice
+surfaces: checkpoint
+surfaces: review
+references: ref-iaea-decay
+
+prompt:
+    Half-life is the time for about ___ of a large group of nuclei to decay.
+
+mode: bank
+
+bank:
+    {"id":"half","label":"half"}
+    {"id":"all","label":"all"}
+    {"id":"tenth","label":"a tenth"}
+
+answer: half
+
+explanation:
+    Half-life is the time for about half of a large group of radioactive nuclei to decay.
+
+item u2-x-half-best
+type: choice
+surfaces: practice
+surfaces: checkpoint
+surfaces: review
+references: ref-iaea-decay
+
+prompt:
+    Which describes half-life best?
+
+options:
+    {"id":"fall","label":"The time for a group to fall to about half"}
+    {"id":"atom","label":"The time one atom takes to be cut in half","note":"Atoms are not cut in half."}
+    {"id":"end","label":"The time until nothing is radioactive","note":"Some radioactivity is left after one half-life."}
+
+answer: fall
+
+explanation:
+    Half-life is the time it takes for a group of radioactive nuclei to fall to about half.
