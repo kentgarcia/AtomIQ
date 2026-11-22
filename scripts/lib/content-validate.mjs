@@ -16,6 +16,7 @@ import {
 } from "./content-rules.mjs";
 import { validateCurriculum } from "./curriculum-rules.mjs";
 import { validateChat } from "./chat-rules.mjs";
+import { validateI18n } from "./i18n-rules.mjs";
 import { validateScan } from "./scan-rules.mjs";
 import { validateSafety } from "./safety-rules.mjs";
 import { validateMap } from "./map-rules.mjs";
@@ -269,6 +270,11 @@ export function validateDatabase(db, { strictReview = false, shipped = {}, retir
   const chat = validateChat(db);
   for (const [surface, n] of Object.entries(chat.checked)) checked.set(surface, (checked.get(surface) ?? 0) + n);
   findings.push(...chat.findings);
+
+  // Translations (docs/features/CONTENT_SOURCE_I18N_SPEC.md): each names a real record and field and keeps the placeholders.
+  const i18n = validateI18n(db);
+  for (const [surface, n] of Object.entries(i18n.checked)) checked.set(surface, (checked.get(surface) ?? 0) + n);
+  findings.push(...i18n.findings);
 
   // -------------------------------------------------------------------------
   // Atom Scanner (docs/features/PHONE_SPEC.md §8): targets, their elements and their sources.

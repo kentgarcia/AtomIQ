@@ -69,6 +69,7 @@ function decodeReply(e) {
 const replies = {
   col: "replies",
   type: "custom",
+  translatable: true, // the label of a text reply (a sticker or reaction label is a picture id: i18n-core wordLeaves)
   keys: REPLY_KEYS,
   default: [],
   omitDefault: true,

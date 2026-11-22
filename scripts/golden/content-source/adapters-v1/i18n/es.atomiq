@@ -1,0 +1,21 @@
+format 1
+adapter i18n 1
+locale: es
+
+entry chat_nodes chat-demo-greeting
+replies[0].label: la lección
+replies[2].label: Abre el átomo
+replies[10].label: diez
+
+text:
+    Hola.
+
+    ¿De qué quieres hablar?
+
+title: Charla con Demo
+
+entry lesson_cards demo-lesson/c01
+data.title: Vida media
+
+entry mythbuster_questions mb-easy-q1
+options[1]: Protón

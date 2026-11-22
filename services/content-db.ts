@@ -55,6 +55,7 @@ import {
   type UnitRow,
 } from "@/content/curriculum/hydrate";
 
+import { BASE_LOCALE, applyTranslation, localeChain, pickFields } from "@/content/i18n/i18n-core";
 import type { Npc, NpcLine } from "@/content/npcs/types";
 import type {
   Item,
@@ -1421,6 +1422,65 @@ export class ContentRepository {
       [difficulty],
     );
     return rows.map(mapEncyclopediaEntryRow);
+  }
+
+  // -------------------------------------------------------------------------
+  // Translations (docs/features/CONTENT_SOURCE_I18N_SPEC.md)
+  // -------------------------------------------------------------------------
+
+  /** Languages that have at least one translated text in this content database (never the base language). */
+  async getTranslationLocales(): Promise<string[]> {
+    try {
+      const db = await getReadyContentDb();
+      const rows = await db.getAllAsync<{ locale: string }>("SELECT DISTINCT locale FROM content_translations ORDER BY locale ASC");
+      return rows.map((r) => r.locale);
+    } catch {
+      return []; // an older bundled database without the table reads as "no translations"
+    }
+  }
+
+  /**
+   * The translated texts of one table for a language, by record id (`lesson/card` for a card). The first language of the chain
+   * (`pt-BR`, then `pt`) that has an entry for a record wins for that whole record; a record with none is missing from the map, which
+   * means "read the base text".
+   */
+  async getTranslations(locale: string, entity: string): Promise<Map<string, Record<string, string>>> {
+    const out = new Map<string, Record<string, string>>();
+    if (!locale || locale === BASE_LOCALE) return out;
+    const chain = localeChain(locale, await this.getTranslationLocales());
+    if (chain.length === 0) return out;
+    const db = await getReadyContentDb();
+    const rows = await db.getAllAsync<{ locale: string; entity_id: string; fields: string }>(
+      `SELECT locale, entity_id, fields FROM content_translations WHERE entity = ? AND locale IN (${chain.map(() => "?").join(", ")})`,
+      [entity, ...chain],
+    );
+    const by = new Map<string, Map<string, Record<string, string>>>();
+    for (const r of rows) {
+      let fields: Record<string, string> | undefined;
+      try {
+        fields = JSON.parse(r.fields) as Record<string, string>;
+      } catch {
+        continue; // unreadable entry: that record reads in the base language
+      }
+      if (!by.has(r.entity_id)) by.set(r.entity_id, new Map());
+      by.get(r.entity_id)!.set(r.locale, fields);
+    }
+    for (const [id, perLocale] of by) {
+      const picked = pickFields(chain, (l) => perLocale.get(l));
+      if (picked) out.set(id, { ...picked });
+    }
+    return out;
+  }
+
+  /**
+   * Rows of one table in the learner's language: the base rows with their translated texts laid over them. `locale` is the base
+   * language (or omitted) for no change at all, and no database read. Pass hydrated rows, with JSON columns already parsed.
+   */
+  async translate<T extends Record<string, unknown>>(entity: string, rows: T[], idOf: (row: T) => string, locale: string = BASE_LOCALE): Promise<T[]> {
+    if (!locale || locale === BASE_LOCALE || rows.length === 0) return rows;
+    const entries = await this.getTranslations(locale, entity);
+    if (entries.size === 0) return rows;
+    return rows.map((row) => applyTranslation(row, entries.get(idOf(row))));
   }
 
   /** Number of encyclopedia entries seeded — handy for integrity checks on launch. */

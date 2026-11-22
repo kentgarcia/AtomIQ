@@ -1,0 +1,6 @@
+format 1
+adapter i18n 1
+locale: pt-BR
+
+entry myths myth-demo
+title: Mito

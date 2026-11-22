@@ -83,7 +83,7 @@ function decodeBlocks(entries) {
   return blocks;
 }
 
-const blocks = { col: "blocks", type: "custom", keys: BLOCK_KEYS, encode: encodeBlocks, decode: decodeBlocks };
+const blocks = { col: "blocks", type: "custom", translatable: true, keys: BLOCK_KEYS, encode: encodeBlocks, decode: decodeBlocks };
 
 export const blogAdapter = defineAdapter({
   name: "blog",

@@ -175,7 +175,8 @@ describe("checksFor", () => {
   it("names a gate for every table that has one and only those", () => {
     assert.deepEqual(checksFor(["chat_nodes"]).sort(), ["test:chats", "test:voice"]);
     assert.deepEqual(checksFor(["npcs", "npc_lines"]).sort(), ["test:npc", "test:voice"]);
-    assert.deepEqual(checksFor(["content_translations"]), []);
+    assert.deepEqual(checksFor(["content_translations"]), ["test:i18n"]);
+    assert.deepEqual(checksFor(["shop_items_none"]), []);
   });
   it("only names scripts that exist in package.json", () => {
     const scripts = JSON.parse(fs.readFileSync(new URL("../package.json", import.meta.url), "utf8")).scripts;

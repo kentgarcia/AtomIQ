@@ -25,6 +25,7 @@ Never edit a table that is listed here with `content:edit` or Studio: the sync w
 | `reference/myths/<category>.atomiq` | `myths` | the myths of one category | by id |
 | `games/mythbuster/NNN-<difficulty>.atomiq` | `mythbuster_questions` | one difficulty | the order in the file |
 | `units/<unit>/statements.atomiq` | `unit_statements` | a unit's myth-or-fact statements | the order in the file |
+| `i18n/<locale>.atomiq` | `content_translations` | one language: the translated fields of records, by entity and id | by entity, then id |
 | `units/<unit>/unit.atomiq` | `units`, `unit_references` | the unit and the sources it cites | `position:` |
 | `units/<unit>/path.atomiq` | `path_nodes` | the map nodes of a unit | the order in the file |
 | `units/<unit>/objectives/NNN-<objective>.atomiq` | `objectives`, `items` | an objective and its question bank | file `NNN`; items by id |

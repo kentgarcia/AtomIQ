@@ -129,4 +129,12 @@ export const ADAPTER_SAMPLES = {
       { lesson_id: "other-lesson", id: "c01", position: 0, kind: "teach", type: "explain", tier: "core", item_id: null, scored: 0, data: { body: "Same card id, another lesson.", figure: { ref: "zoom-chain" } } },
     ],
   },
+  i18n: {
+    content_translations: [
+      { locale: "es", entity: "chat_nodes", entity_id: "chat-demo-greeting", fields: { title: "Charla con Demo", text: "Hola.\n\n¿De qué quieres hablar?", "replies[0].label": "la lección", "replies[2].label": "Abre el átomo", "replies[10].label": "diez" } },
+      { locale: "es", entity: "lesson_cards", entity_id: "demo-lesson/c01", fields: { "data.title": "Vida media" } },
+      { locale: "es", entity: "mythbuster_questions", entity_id: "mb-easy-q1", fields: { "options[1]": "Protón" } },
+      { locale: "pt-BR", entity: "myths", entity_id: "myth-demo", fields: { title: "Mito" } },
+    ],
+  },
 };

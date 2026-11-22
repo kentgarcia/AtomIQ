@@ -21,13 +21,15 @@
  *
  * Field: { col, key?, type: text|prose|int|num|id|json|list|jsonl|custom, body?, nullable?, default?,
  *          omitDefault?, translatable? } ; custom: { keys: [...], encode(value, row) -> Entry[], decode(entries) -> value }
+ *   A custom field with `open: true` (at most one a record, `keys` may be empty) also takes every attribute key the record's
+ *   other fields do not name: the translation files, whose keys are field paths, are written that way.
  */
 import { SourceError } from "../core/errors.mjs";
 import { decodeValue, encodeValue, sameValue } from "../core/values.mjs";
 import { ID_PATTERN } from "../core/parse.mjs";
 
 const keyOf = (f) => f.key ?? f.col;
-const keysOf = (f) => (f.type === "custom" ? f.keys : [keyOf(f)]);
+const keysOf = (f) => (f.type === "custom" ? (f.keys ?? []) : [keyOf(f)]);
 
 /** Validate an adapter definition once, up front: a bad adapter is a programming error, not a data error. */
 export function defineAdapter(spec) {
@@ -47,8 +49,10 @@ export function defineAdapter(spec) {
         seen.add(k);
       }
       if (f.type === "list" && f.nullable) problems.push(`${r.keyword}.${f.col}: a list cannot be nullable (absent means empty)`);
-      if (f.type === "custom" && (!f.keys?.length || !f.encode || !f.decode)) problems.push(`${r.keyword}.${f.col}: a custom field needs keys, encode and decode`);
+      if (f.open && f.type !== "custom") problems.push(`${r.keyword}.${f.col}: only a custom field can be open`);
+      if (f.type === "custom" && ((!f.keys?.length && !f.open) || !f.encode || !f.decode)) problems.push(`${r.keyword}.${f.col}: a custom field needs keys, encode and decode`);
     }
+    if (r.fields.filter((f) => f.open).length > 1) problems.push(`${r.keyword}: more than one open field`);
     if (bodies > 1) problems.push(`${r.keyword}: more than one body field`);
     if (bodies && blocks) problems.push(`${r.keyword}: a body and a prose or jsonl attribute would read back as one block (use a body OR block attributes)`);
     if (r.parent && !spec.records.some((x) => x.keyword === r.parent.keyword)) problems.push(`${r.keyword}: unknown parent ${r.parent.keyword}`);
@@ -171,13 +175,16 @@ function groupEntries(rec) {
 }
 
 function decodeFields(file, fields, byKey, owner, line = null) {
+  const open = fields.find((f) => f.open);
   const known = new Set(fields.flatMap((f) => (f.body ? [null] : keysOf(f))));
   for (const [k, es] of byKey) {
-    if (!known.has(k)) throw new SourceError(k === null ? `${owner} has a body but its adapter has none` : `unknown attribute "${k}" in ${owner}`, { file, line: es[0].line });
+    if (!known.has(k) && !(open && k !== null)) throw new SourceError(k === null ? `${owner} has a body but its adapter has none` : `unknown attribute "${k}" in ${owner}`, { file, line: es[0].line });
   }
   const row = {};
   for (const f of fields) {
-    const es = f.body ? (byKey.get(null) ?? []) : keysOf(f).flatMap((k) => byKey.get(k) ?? []);
+    const es = f.open
+      ? [...byKey].filter(([k]) => k !== null && !known.has(k)).flatMap(([, v]) => v)
+      : f.body ? (byKey.get(null) ?? []) : keysOf(f).flatMap((k) => byKey.get(k) ?? []);
     let got;
     try {
       if (f.type === "custom") got = es.length ? { value: f.decode(es.sort((a, b) => a.line - b.line)) } : { absent: true };

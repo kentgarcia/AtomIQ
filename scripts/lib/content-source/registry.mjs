@@ -17,10 +17,11 @@ import { scannerAdapter } from "./adapters/scanner.mjs";
 import { safetyAdapter } from "./adapters/safety.mjs";
 import { mapAdapter } from "./adapters/map.mjs";
 import { curriculumAdapter } from "./adapters/curriculum.mjs";
+import { i18nAdapter } from "./adapters/i18n.mjs";
 
 /** Friendly adapters, by name. Filled in by the adapter modules below (phase 2 onward). */
 export const FRIENDLY_ADAPTERS = new Map(
-  [chatAdapter, charactersAdapter, feedAdapter, blogAdapter, referencesAdapter, encyclopediaAdapter, mythsAdapter, mythbusterAdapter, statementsAdapter, scannerAdapter, safetyAdapter, mapAdapter, curriculumAdapter].map((a) => [a.name, a]),
+  [chatAdapter, charactersAdapter, feedAdapter, blogAdapter, referencesAdapter, encyclopediaAdapter, mythsAdapter, mythbusterAdapter, statementsAdapter, scannerAdapter, safetyAdapter, mapAdapter, curriculumAdapter, i18nAdapter].map((a) => [a.name, a]),
 );
 
 export function adapterNames() {

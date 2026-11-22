@@ -1,6 +1,6 @@
 # Content source files: text is the master, the database is built from it
 
-**Status (2026-11-22):** phases 1 to 5 are built (core, default adapter, export, sync, format, migrate; chat, characters, feed, blog, references, the AtomDex, myths, Myth Buster, unit statements, the phone's scanner, safety and map data, and (phase 5) the curriculum, units, objectives, lessons, path nodes, items, cards and their sources, owned by files, their seeds and the `unit-N.mjs` modules retired, figures drawn from an id by `components/lesson/visual/figures/`; `test:source-adapters`; a sync orders operations across adapters, `orderOps`); later phases are marked in section 14. Where this text and the code differ, the code and its tests win and this text is fixed.
+**Status (2026-11-22):** phases 1 to 6 are built (core, default adapter, export, sync, format, migrate; chat, characters, feed, blog, references, the AtomDex, myths, Myth Buster, unit statements, the phone's scanner, safety and map data, and (phase 5) the curriculum, units, objectives, lessons, path nodes, items, cards and their sources, owned by files, their seeds and the `unit-N.mjs` modules retired, figures drawn from an id by `components/lesson/visual/figures/`; `test:source-adapters`; a sync orders operations across adapters, `orderOps`); later phases are marked in section 14. Where this text and the code differ, the code and its tests win and this text is fixed.
 **Decided by the owner:** files are the source of truth for authored prose; the SQLite content DB stays what the app ships and reads; Content Studio is only a viewer (the owner does not use it to edit); the `verified` flag is not something the owner will maintain; **lessons, items and cards will be migrated too, in a later phase** (they began as TypeScript files, which were easy to handle, only with very long lines because they describe pages, not plain data); **translations will be one file per language that maps the id of a text to its translation** (section 11); the file extension is **`.atomiq`**.
 **Reads with:** `docs/critical/CONTENT_SQLITE_AND_STUDIO_SPEC.md` (the DB, releases, shipped ids), `docs/features/NPC_VOICE_SPEC.md` (the chat words), `scripts/lib/content-store.mjs` (`applyBatch`, the write path this spec reuses).
 
@@ -37,7 +37,7 @@ The survey is of the real master DB (131 chat nodes, 92 feed templates, 115 ency
 | 3 | `npcs` (7), `npc_lines` (16), `feed_templates` (92), `blog_posts` (4) + `blog_comments` (4) + `blog_references` (9) | prose + attributes; blog has typed blocks | bios currently also live in `components/npc/npc-roster.ts` (seed and fallback), see section 13 |
 | 4 | `unit_statements` (20), `scan_targets` (12), `safety_cards` (14), `map_sites` (18) and their `*_references`, `myths` (37), `mythbuster_questions` (150), `encyclopedia_entries` (115), `content_references` (58) | prose plus arrays and small objects | |
 | 5 (built) | `units`, `objectives`, `lessons`, `path_nodes`, `items`, `lesson_cards`, `unit_references`, `lesson_references` | prose, interaction data and **figures by id**; see 3.1 | today's master is `scripts/content-migration/curriculum/unit-N.mjs` + `scenes.mjs`, synced by `sync-unit.mjs`; those are retired when this phase lands. Needs its own spec first |
-| 6 | translations (section 11) | a flat id -> text file per language | its own small spec; changes nothing before it |
+| 6 (built) | translations (section 11) | a file per language: record id -> translated fields | `docs/features/CONTENT_SOURCE_I18N_SPEC.md`; changes nothing before it |
 | never | `content_meta`, the user-state DB | runtime or build facts | |
 
 ### 3.1 What lessons need that the earlier phases do not (known now, designed in phase 5)
@@ -425,6 +425,8 @@ encyclopedia_entries/half-life#definition
 - the field path is a path into the row: a column name, then `.name` and `[index]` for JSON columns. It maps one to one onto `content_translations.fields`.
 
 ### 11.2 The file
+
+> Built in phase 6 (`CONTENT_SOURCE_I18N_SPEC.md`) as one `entry <entity> <entity id>` record per translated row, whose attributes are the field paths; the flat `<entity>/<id>#<path>` lines below say the same thing and are kept as the design note.
 
 One file per language, `content/source/i18n/<locale>.atomiq`, written in the same core format as everything else (an adapter `i18n`, scope `locale: es`, then one entry per text; a multi-line text is an indented prose block, exactly like the base files):
 
