@@ -1,6 +1,6 @@
 # Legal framework: Privacy Policy and Terms of Service
 
-Text: `content/legal/privacy.ts`, `content/legal/terms.ts`. Shared facts (version, date, contact address, governing law): `constants/legal.ts`. Screen: `components/settings/LegalDocument.tsx`. Guard: `npm run test:legal`.
+Text: `content/legal/privacy.ts`, `content/legal/terms.ts`. Shared facts (version, date, contact address, governing law): `constants/legal.ts`. Screen: `components/settings/LegalDocument.tsx`. Guard: `npm run test:legal`. Public web copy of the Privacy Policy: see "The public privacy page" below (a change here must be repeated there).
 
 This is a drafting framework, not legal advice. Have a lawyer or the team's data protection officer read both documents before release.
 
@@ -41,9 +41,22 @@ If you change one of these, change the text, bump `LEGAL_VERSION`, and move `LEG
 2. Confirm who the controller is. The text names "the MythSmashers by the DOST-PNRI, developed by Kent Garcia" (the credit in Settings). If a legal entity should be named, edit Privacy §1 and Terms §1.
 3. Confirm the governing law (`LEGAL_GOVERNING_LAW`, now the Philippines) and the age wording (18 is the age of majority in the Philippines).
 4. Ask whether the app has to be registered or notified under the Data Privacy Act (it handles almost no personal data and keeps it on the device, but the DOST-PNRI's data protection officer should decide).
-5. Host both documents at a public URL (Play requires a policy URL, not only an in-app screen) and link it in the Console. Keep the hosted text the same as the app's.
+5. The Privacy Policy is hosted at a public URL (done 2026-11-23: https://kentgarcia.github.io/atomiq-privacy-policy/, linked in Play Console > App content). Play requires a policy URL, not only an in-app screen. Keep the hosted text the same as the app's (next section). The Terms are not hosted; host them the same way if a store asks for a link.
 6. Decide the audience. If children under 13 are a target, complete Play's Families declarations; the text already avoids collecting personal information from them.
 8. Check the Android backup setting. The policy says a device backup service "may" copy app data. If you disable backup in `app.json`, say so in Privacy §6.
+
+## The public privacy page (keep it the same as the app)
+
+Play requires a public, login-free HTTPS web page, so the Privacy Policy is also published at **https://kentgarcia.github.io/atomiq-privacy-policy/** (GitHub Pages; repo `kentgarcia/atomiq-privacy-policy`, local copy `../atomiq-privacy-policy`, branch `main`, served from the root). The page is generated from this repo's `content/legal/privacy.ts` and `constants/legal.ts` (and `app.json` for the app name and package), never edited by hand.
+
+**Rule: whenever the app's Privacy Policy changes, change the public page in the same piece of work.** That means any edit to `content/legal/privacy.ts`, to `LEGAL_VERSION`, `LEGAL_LAST_UPDATED` or `LEGAL_CONTACT_EMAIL` in `constants/legal.ts`, or to the Android package or app name. The same goes for anything that makes a statement in the policy untrue (a new SDK, permission, network call or stored data type): fix the text first, then republish. Steps:
+
+1. Change the text and bump `LEGAL_VERSION` / move `LEGAL_LAST_UPDATED` here; `npm run test:legal` must pass.
+2. In the page repo: `node scripts/build.mjs ../AtomIQ`, then `git add -A && git commit -m "privacy policy vX.Y" && git push`. Pages redeploys in about a minute.
+3. Open the URL and confirm the new version number and date show. Update the Play Console Data safety form if the facts changed (section below).
+4. Do this BEFORE the app update that carries the new text reaches the store, so the store page never states an older policy than the app.
+
+An agent that edits the policy text and does not republish the page has not finished the task. The summary table at the top of the page (data collected, third parties, permissions, deletion) is written in `scripts/build.mjs` in the page repo; if one of those facts changes, edit it there too.
 
 ## Play Data safety answers (matches the policy)
 

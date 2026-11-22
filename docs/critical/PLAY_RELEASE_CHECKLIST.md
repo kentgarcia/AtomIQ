@@ -33,3 +33,4 @@
 ## 5. Rollout
 - [ ] Staged rollout 10% → 50% → 100%; hold 48 h crash-free at 10% before widening.
 - [ ] Release notes written; store listing (descriptions, screenshots, feature graphic, policy URL) up to date.
+- [ ] Public privacy page shows the same version and date as `LEGAL_VERSION` / `LEGAL_LAST_UPDATED` (https://kentgarcia.github.io/atomiq-privacy-policy/; if they differ, republish per `docs/critical/LEGAL_FRAMEWORK.md`, "The public privacy page").
