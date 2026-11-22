@@ -1,0 +1,1923 @@
+/* Google Play Store visual assets — Duolingo-inspired vibrant flat style for AtomIQ.
+   Concatenated with slides.css during <foreignObject> PNG export. */
+
+.gp-bg-art {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  color: #ffffff;
+  pointer-events: none;
+}
+
+.gp-dia {
+  width: 24px;
+  height: 24px;
+  vertical-align: -5px;
+  margin: 0 3px;
+}
+
+/* ========================================================================== */
+/* 1. FEATURE GRAPHIC (1024 x 500 px)                                         */
+/* ========================================================================== */
+
+.slide.gp-feature {
+  width: 1024px;
+  height: 500px;
+  position: relative;
+  overflow: hidden;
+  font-family: "Intern", system-ui, sans-serif;
+  color: #fff;
+}
+
+.gp-f-gold {
+  background: linear-gradient(135deg, #ffc82c 0%, #fabf24 52%, #f59300 100%);
+}
+
+.gp-f-split {
+  background: linear-gradient(135deg, #fabf24 0%, #f59a0c 58%, #f07d00 100%);
+}
+
+.gp-f-halo {
+  position: absolute;
+  right: -18px;
+  top: 20px;
+  width: 470px;
+  height: 470px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.24);
+}
+
+.gp-f-left {
+  position: absolute;
+  left: 60px;
+  top: 66px;
+  width: 560px;
+  z-index: 3;
+}
+
+.gp-f-left-narrow {
+  width: 470px;
+  top: 84px;
+}
+
+.gp-f-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.gp-f-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 15px;
+  border: 3px solid #ffffff;
+  box-shadow: 0 5px 0 rgba(168, 98, 0, 0.34);
+  display: block;
+}
+
+.gp-f-brand span {
+  font-size: 34px;
+  font-weight: 900;
+  letter-spacing: -0.8px;
+  color: #ffffff;
+  text-shadow: 0 4px 0 #c77b00;
+}
+
+.gp-feature h2 {
+  margin: 0;
+  font-size: 80px;
+  line-height: 0.98;
+  font-weight: 900;
+  letter-spacing: -2.2px;
+  color: #ffffff;
+  text-shadow: 0 7px 0 #c77b00;
+}
+
+.gp-f-left-narrow h2 {
+  font-size: 66px;
+}
+
+.gp-f-sub {
+  margin: 22px 0 0;
+  font-size: 26px;
+  line-height: 1.28;
+  font-weight: 800;
+  color: #ffffff;
+  text-shadow: 0 3px 0 rgba(168, 98, 0, 0.42);
+}
+
+.gp-f-right {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 470px;
+  z-index: 2;
+}
+
+.gp-f-mascot {
+  position: absolute;
+  right: 32px;
+  bottom: -26px;
+  height: 468px;
+  width: auto;
+  z-index: 3;
+}
+
+.gp-f-float {
+  position: absolute;
+  left: -34px;
+  bottom: 42px;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 13px 20px 13px 15px;
+  border-radius: 22px;
+  background: #ffffff;
+  box-shadow: 0 7px 0 rgba(168, 98, 0, 0.32);
+  color: #3a2a00;
+}
+
+.gp-f-check {
+  width: 42px;
+  height: 42px;
+  flex: none;
+  display: block;
+}
+
+.gp-f-check svg {
+  width: 42px;
+  height: 42px;
+  display: block;
+}
+
+.gp-f-float b {
+  display: block;
+  font-size: 20px;
+  line-height: 1.1;
+  font-weight: 900;
+  color: #46a302;
+}
+
+.gp-f-float small {
+  display: block;
+  margin-top: 2px;
+  font-size: 15px;
+  font-weight: 800;
+  color: #7c6630;
+}
+
+/* Feature Graphic Variant 2: App Showcase */
+.gp-f-cardwrap {
+  position: absolute;
+  right: 40px;
+  top: 44px;
+  width: 430px;
+  height: 420px;
+  z-index: 3;
+}
+
+.gp-f-miniui {
+  position: absolute;
+  left: 0;
+  top: 14px;
+  width: 334px;
+  padding: 20px;
+  border-radius: 34px;
+  background: #ffffff;
+  box-shadow: 0 0 0 8px rgba(255, 255, 255, 0.3), 0 18px 0 rgba(160, 88, 0, 0.25);
+  transform: rotate(-3deg);
+  color: #3c3c3c;
+}
+
+.gp-f-miniunit {
+  padding: 16px 18px;
+  border-radius: 20px;
+  background: #fabf24;
+  box-shadow: 0 5px 0 #d9981a;
+  color: #ffffff;
+}
+
+.gp-f-miniunit small {
+  display: block;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.8px;
+  opacity: 0.86;
+}
+
+.gp-f-miniunit b {
+  display: block;
+  margin-top: 2px;
+  font-size: 24px;
+  font-weight: 900;
+}
+
+.gp-f-minipath {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 26px 8px 20px;
+}
+
+.gp-f-puck {
+  width: 72px;
+  height: 72px;
+}
+
+.gp-f-puck-main {
+  width: 88px;
+  height: 88px;
+  transform: translateY(-6px);
+}
+
+.gp-f-puck svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.gp-f-minibtn {
+  height: 54px;
+  border-radius: 16px;
+  background: #58cc02;
+  box-shadow: 0 5px 0 #46a302;
+  color: #ffffff;
+  font-size: 19px;
+  font-weight: 900;
+  letter-spacing: 1px;
+  text-align: center;
+  line-height: 54px;
+}
+
+.gp-f-peek {
+  position: absolute;
+  right: -24px;
+  bottom: -44px;
+  height: 310px;
+  width: auto;
+  z-index: 4;
+}
+
+/* ========================================================================== */
+/* 2. APP ICON (512 x 512 px, full-bleed)                                     */
+/* ========================================================================== */
+
+.slide.gp-icon-slide {
+  width: 512px;
+  height: 512px;
+  position: relative;
+  overflow: hidden;
+  background: #fda539;
+}
+
+.slide.gp-icon-slide img {
+  width: 512px;
+  height: 512px;
+  display: block;
+}
+
+/* ========================================================================== */
+/* 3. PHONE & TABLET SCREENSHOT SHELL (1080 x 1920 / 1440 x 2560)             */
+/* ========================================================================== */
+
+.slide.gp-root {
+  position: relative;
+  overflow: hidden;
+  font-family: "Intern", system-ui, sans-serif;
+}
+
+.slide.gp-root-1080 {
+  width: 1080px;
+  height: 1920px;
+}
+
+.slide.gp-root-t10 {
+  width: 1440px;
+  height: 2560px;
+}
+
+.gp-scale-t10 {
+  width: 1080px;
+  height: 1920px;
+  transform: scale(1.3333333);
+  transform-origin: 0 0;
+}
+
+.gp-shot {
+  position: relative;
+  width: 1080px;
+  height: 1920px;
+  overflow: hidden;
+  color: #ffffff;
+}
+
+/* Vibrant Duolingo-inspired slide palettes */
+.gp-t-gold {
+  --bg1: #ffc82c;
+  --bg2: #f59e0b;
+  --arch: #e89600;
+  --shadow: #c77c00;
+  background: linear-gradient(180deg, var(--bg1) 0%, var(--bg2) 100%);
+}
+
+.gp-t-blue {
+  --bg1: #24b8ff;
+  --bg2: #1298dc;
+  --arch: #0d86c4;
+  --shadow: #0e7bb5;
+  background: linear-gradient(180deg, var(--bg1) 0%, var(--bg2) 100%);
+}
+
+.gp-t-green {
+  --bg1: #62d608;
+  --bg2: #46a800;
+  --arch: #3c9200;
+  --shadow: #388800;
+  background: linear-gradient(180deg, var(--bg1) 0%, var(--bg2) 100%);
+}
+
+.gp-t-purple {
+  --bg1: #b87dff;
+  --bg2: #8a56d6;
+  --arch: #7842c7;
+  --shadow: #6232ab;
+  background: linear-gradient(180deg, var(--bg1) 0%, var(--bg2) 100%);
+}
+
+.gp-t-coral {
+  --bg1: #ff8a3d;
+  --bg2: #f25c2a;
+  --arch: #d94a1b;
+  --shadow: #c44016;
+  background: linear-gradient(180deg, var(--bg1) 0%, var(--bg2) 100%);
+}
+
+.gp-t-teal {
+  --bg1: #22d3c5;
+  --bg2: #0ea59c;
+  --arch: #0b8e86;
+  --shadow: #087a73;
+  background: linear-gradient(180deg, var(--bg1) 0%, var(--bg2) 100%);
+}
+
+/* Optional curved darker header arch (Duolingo Ref 2 signature!) */
+.gp-arch {
+  position: absolute;
+  left: -90px;
+  right: -90px;
+  top: -120px;
+  height: 556px;
+  border-radius: 0 0 50% 50% / 0 0 120px 120px;
+  background: var(--arch);
+  opacity: 0.42;
+  box-shadow: 0 18px 0 rgba(0, 0, 0, 0.08);
+}
+
+/* Headline area */
+.gp-head {
+  position: absolute;
+  left: 64px;
+  right: 64px;
+  top: 96px;
+  text-align: center;
+  z-index: 3;
+}
+
+.gp-head h2 {
+  margin: 0;
+  font-size: 100px;
+  line-height: 1.02;
+  font-weight: 900;
+  letter-spacing: -2.4px;
+  color: #ffffff;
+  text-shadow: 0 8px 0 var(--shadow);
+}
+
+.gp-sub {
+  margin-top: 20px;
+  font-size: 40px;
+  line-height: 1.2;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: #ffffff;
+  text-shadow: 0 4px 0 var(--shadow);
+}
+
+/* Frameless rounded white app screen card (wide & crisp like Duolingo Play Store!) */
+.gp-device-wrap {
+  position: absolute;
+  left: 76px;
+  right: 76px;
+  top: 458px;
+  bottom: 0;
+  z-index: 2;
+}
+
+.gp-is-tablet .gp-device-wrap {
+  left: 52px;
+  right: 52px;
+  top: 444px;
+}
+
+.gp-device-card {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 66px 66px 0 0;
+  background: #ffffff;
+  overflow: hidden;
+  box-shadow:
+    0 0 0 14px rgba(255, 255, 255, 0.28),
+    0 24px 64px rgba(0, 0, 0, 0.22);
+}
+
+.gp-is-tablet .gp-device-card {
+  border-radius: 44px 44px 0 0;
+  box-shadow:
+    0 0 0 18px rgba(255, 255, 255, 0.34),
+    0 24px 64px rgba(0, 0, 0, 0.22);
+}
+
+.gp-ui {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: #ffffff;
+  color: #3c3c3c;
+  overflow: hidden;
+}
+
+/* Mascot peeking playfully over the card corner (Duolingo Ref 2!) */
+.gp-peek {
+  position: absolute;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.gp-peek-br {
+  right: -12px;
+  bottom: -24px;
+  height: 440px;
+  width: auto;
+}
+
+.gp-peek-geiger {
+  right: -18px;
+  bottom: -14px;
+  height: 350px;
+  width: auto;
+}
+
+.gp-peek-exp {
+  right: -16px;
+  bottom: -20px;
+  height: 360px;
+  width: auto;
+}
+
+/* ========================================================================== */
+/* SCREEN 1: HOME LESSON MAP                                                  */
+/* ========================================================================== */
+
+.gp-ui-map {
+  padding: 36px 36px 0;
+}
+
+.gp-unit-banner {
+  border-radius: 34px;
+  background: #fabf24;
+  box-shadow: 0 11px 0 #d9981a;
+  min-height: 214px;
+  padding: 54px 34px;
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  color: #ffffff;
+}
+
+.gp-unit-txt {
+  flex: 1;
+  min-width: 0;
+}
+
+.gp-unit-txt small {
+  display: block;
+  font-size: 26px;
+  font-weight: 900;
+  letter-spacing: 1.3px;
+  color: rgba(255, 255, 255, 0.86);
+}
+
+.gp-unit-txt b {
+  display: block;
+  margin-top: 8px;
+  font-size: 44px;
+  line-height: 1.12;
+  font-weight: 900;
+}
+
+.gp-unit-info {
+  flex: none;
+  width: 80px;
+  height: 80px;
+  border-radius: 24px;
+  background: #ffffff;
+  box-shadow: 0 6px 0 #d9981a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gp-unit-info svg {
+  width: 44px;
+  height: 44px;
+  fill: #fabf24;
+}
+
+.gp-path-stage {
+  position: relative;
+  margin-top: 32px;
+  height: 1120px;
+}
+
+.gp-pnode {
+  position: absolute;
+  width: 152px;
+  height: 152px;
+  margin-left: -76px;
+}
+
+.gp-pnode svg {
+  width: 152px;
+  height: 152px;
+  overflow: visible;
+}
+
+.gp-start-bub {
+  position: absolute;
+  left: 50%;
+  top: 368px;
+  width: 470px;
+  margin-left: -235px;
+  border-radius: 32px;
+  background: #fabf24;
+  box-shadow: 0 11px 0 #d9981a;
+  padding: 24px 28px 26px;
+  color: #ffffff;
+  text-align: center;
+}
+
+.gp-start-bub::before {
+  content: "";
+  position: absolute;
+  left: 62%;
+  top: -15px;
+  width: 34px;
+  height: 34px;
+  margin-left: -17px;
+  background: #fabf24;
+  border-radius: 7px;
+  transform: rotate(45deg);
+}
+
+.gp-start-bub b {
+  position: relative;
+  display: block;
+  font-size: 36px;
+  font-weight: 900;
+}
+
+.gp-start-bub small {
+  position: relative;
+  display: block;
+  margin-top: 4px;
+  font-size: 24px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.gp-start-cta {
+  position: relative;
+  display: block;
+  margin-top: 18px;
+  height: 74px;
+  line-height: 74px;
+  border-radius: 22px;
+  background: #feefc8;
+  box-shadow: 0 7px 0 #e2be68;
+  color: #7a5a0e;
+  font-size: 30px;
+  font-weight: 900;
+  letter-spacing: 1.8px;
+}
+
+.gp-unit-div {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 966px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  font-size: 24px;
+  font-weight: 900;
+  letter-spacing: 1.5px;
+  color: #9069cd;
+}
+
+.gp-unit-div::before,
+.gp-unit-div::after {
+  content: "";
+  flex: 1;
+  border-top: 5px dotted #d7c7f0;
+}
+
+/* ========================================================================== */
+/* SCREEN 2: BITE-SIZED VISUAL LESSONS                                        */
+/* ========================================================================== */
+
+.gp-ui-lesson {
+  padding: 42px 44px 286px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.gp-les-top {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.gp-les-x {
+  width: 44px;
+  height: 44px;
+  flex: none;
+}
+
+.gp-les-x svg {
+  width: 44px;
+  height: 44px;
+}
+
+.gp-les-barwrap {
+  flex: 1;
+  position: relative;
+  padding-top: 26px;
+}
+
+.gp-les-streak {
+  position: absolute;
+  left: 8px;
+  top: -4px;
+  font-size: 21px;
+  font-weight: 900;
+  letter-spacing: 1.2px;
+  color: #ff9600;
+}
+
+.gp-streak-coral {
+  color: #f25c2a;
+}
+
+.gp-les-track {
+  height: 28px;
+  border-radius: 14px;
+  background: #e8e8e8;
+  overflow: hidden;
+}
+
+.gp-les-track i {
+  position: relative;
+  display: block;
+  width: 68%;
+  height: 100%;
+  border-radius: 14px;
+  background: #ff9600;
+}
+
+.gp-les-track i::after {
+  content: "";
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  top: 5px;
+  height: 7px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.34);
+}
+
+.gp-les-hearts {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 32px;
+  font-weight: 900;
+  color: #ff4b4b;
+}
+
+.gp-les-hearts svg {
+  width: 40px;
+  height: 40px;
+}
+
+.gp-les-ttl {
+  margin: 0;
+  font-size: 50px;
+  line-height: 1.1;
+  font-weight: 900;
+  color: #3c3c3c;
+}
+
+.gp-les-row {
+  display: flex;
+  align-items: center;
+  gap: 26px;
+}
+
+.gp-les-bust {
+  width: 164px;
+  height: 204px;
+  flex: none;
+  display: block;
+}
+
+.gp-les-bub {
+  position: relative;
+  flex: 1;
+  padding: 30px 32px;
+  border-radius: 30px;
+  background: #ffffff;
+  border: 4px solid #e5e5e5;
+  box-shadow: 0 8px 0 #d8d8d8;
+  font-size: 33px;
+  line-height: 1.32;
+  font-weight: 700;
+  color: #3c3c3c;
+}
+
+.gp-les-bub::before {
+  content: "";
+  position: absolute;
+  left: -14px;
+  top: 50%;
+  width: 24px;
+  height: 24px;
+  margin-top: -12px;
+  background: #ffffff;
+  border-left: 4px solid #e5e5e5;
+  border-bottom: 4px solid #e5e5e5;
+  border-bottom-left-radius: 5px;
+  transform: rotate(45deg);
+}
+
+.gp-les-bub u {
+  text-decoration: underline dotted #1cb0f6;
+  text-decoration-thickness: 5px;
+  text-underline-offset: 6px;
+  font-weight: 900;
+}
+
+.gp-les-fig {
+  display: flex;
+  padding: 32px 20px;
+  border-radius: 30px;
+  background: #f8fbff;
+  border: 4px solid #d6edfb;
+  box-shadow: 0 8px 0 #cce6f8;
+}
+
+.gp-les-col {
+  flex: 1;
+  text-align: center;
+}
+
+.gp-les-col + .gp-les-col {
+  border-left: 4px dashed #cde3f2;
+}
+
+.gp-les-col h4 {
+  margin: 0 0 18px;
+  font-size: 24px;
+  font-weight: 900;
+  letter-spacing: 0.9px;
+  color: #1899d6;
+}
+
+.gp-les-objs {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+}
+
+.gp-les-objs img {
+  width: 112px;
+  height: 112px;
+}
+
+.gp-les-col small {
+  display: block;
+  margin-top: 14px;
+  font-size: 25px;
+  font-weight: 700;
+  color: #6b7b86;
+}
+
+.gp-les-q {
+  font-size: 35px;
+  font-weight: 900;
+  color: #3c3c3c;
+}
+
+.gp-les-opts {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.gp-les-opt,
+.gp-mz-opt {
+  height: 98px;
+  padding: 0 30px;
+  border-radius: 26px;
+  border: 4px solid #e5e5e5;
+  border-bottom-width: 9px;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 33px;
+  font-weight: 800;
+  color: #3c3c3c;
+}
+
+.gp-opt-good {
+  background: #d7ffb8 !important;
+  border-color: #58cc02 !important;
+  color: #46a302 !important;
+}
+
+.gp-opt-good b {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #58cc02;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  font-weight: 900;
+}
+
+/* Iconic Duolingo Green Success Footer */
+.gp-good-foot {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #d7ffb8;
+  padding: 32px 40px 44px;
+}
+
+.gp-good-foot-tight {
+  padding: 26px 40px 38px;
+}
+
+.gp-good-head b {
+  display: block;
+  font-size: 40px;
+  line-height: 1.08;
+  font-weight: 900;
+  color: #46a302;
+}
+
+.gp-good-head small {
+  display: block;
+  margin-top: 6px;
+  font-size: 26px;
+  line-height: 1.25;
+  font-weight: 700;
+  color: #3f8a05;
+}
+
+.gp-good-btn {
+  margin-top: 22px;
+  height: 94px;
+  line-height: 94px;
+  border-radius: 26px;
+  background: #58cc02;
+  box-shadow: 0 9px 0 #46a302;
+  color: #ffffff;
+  text-align: center;
+  font-size: 34px;
+  font-weight: 900;
+  letter-spacing: 1.4px;
+}
+
+/* ========================================================================== */
+/* SCREEN 3: ATOM MAZE PLATFORMER BATTLE                                      */
+/* ========================================================================== */
+
+.gp-mz-world {
+  position: relative;
+  height: 620px;
+  background: #8fd3f4;
+  overflow: hidden;
+}
+
+.gp-mz-sky {
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 440px;
+  background: #bfe9fb;
+}
+
+.gp-mz-bg {
+  position: absolute;
+  display: block;
+}
+
+.gp-mz-tl {
+  position: absolute;
+  width: 136px;
+  height: 136px;
+  display: block;
+}
+
+.gp-mz-hud {
+  position: absolute;
+  left: 36px;
+  right: 36px;
+  top: 34px;
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  z-index: 3;
+}
+
+.gp-mz-bar {
+  position: relative;
+  flex: 1;
+  height: 30px;
+  border-radius: 15px;
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.gp-mz-bar i {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  border-radius: 15px;
+  background: #fabf24;
+}
+
+.gp-mz-bar img {
+  position: absolute;
+  right: -10px;
+  top: -22px;
+  width: 70px;
+  height: 70px;
+}
+
+.gp-mz-pause {
+  display: flex;
+  gap: 9px;
+}
+
+.gp-mz-pause b {
+  width: 12px;
+  height: 38px;
+  border-radius: 5px;
+  background: #ffffff;
+}
+
+.gp-mz-hearts {
+  position: absolute;
+  left: 32px;
+  top: 90px;
+  display: flex;
+  gap: 6px;
+  z-index: 3;
+}
+
+.gp-mz-hearts img {
+  width: 64px;
+  height: 64px;
+}
+
+.gp-mz-coins {
+  position: absolute;
+  left: 32px;
+  top: 162px;
+  display: flex;
+  align-items: center;
+  z-index: 3;
+}
+
+.gp-mz-coins img {
+  width: 52px;
+  height: 52px;
+}
+
+.gp-mz-coins img.x {
+  width: 34px;
+  height: 34px;
+  margin: 0 4px;
+}
+
+.gp-mz-hero {
+  position: absolute;
+  left: 56px;
+  top: 210px;
+  width: 280px;
+  height: 280px;
+  z-index: 3;
+}
+
+.gp-mz-foe {
+  position: absolute;
+  right: 92px;
+  top: 332px;
+  width: 146px;
+  height: 146px;
+  transform: rotate(12deg);
+  z-index: 3;
+}
+
+.gp-burst {
+  position: absolute;
+  left: 390px;
+  top: 256px;
+  width: 210px;
+  height: 210px;
+  z-index: 2;
+}
+
+.gp-mz-panel {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 616px;
+  bottom: 0;
+  background: #ffffff;
+  border-top: 6px solid #e5e5e5;
+  padding: 30px 40px 0;
+}
+
+.gp-mz-phead {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 24px;
+  font-weight: 900;
+  letter-spacing: 1.4px;
+  color: #8a8a8a;
+}
+
+.gp-mz-pips {
+  display: flex;
+  gap: 8px;
+}
+
+.gp-mz-pips i {
+  width: 44px;
+  height: 16px;
+  border-radius: 8px;
+  background: #58cc02;
+}
+
+.gp-mz-pips i.off {
+  background: #e5e5e5;
+}
+
+.gp-mz-q {
+  margin: 18px 0 24px;
+  font-size: 38px;
+  line-height: 1.2;
+  font-weight: 900;
+  color: #3c3c3c;
+}
+
+.gp-mz-opt {
+  margin-bottom: 16px;
+}
+
+/* ========================================================================== */
+/* SCREEN 4: YOUR OWN SCIENCE PHONE                                           */
+/* ========================================================================== */
+
+.gp-ui-phone {
+  background: #ffe8bd;
+  padding: 40px 44px 0;
+}
+
+.gp-ph-wall i {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.36);
+}
+
+.gp-ph-notif {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 22px 24px;
+  border-radius: 32px;
+  background: #ffffff;
+  box-shadow: 0 10px 0 rgba(145, 92, 0, 0.16);
+}
+
+.gp-ph-av {
+  width: 92px;
+  height: 92px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #e8dafc;
+  border: 4px solid #9069cd;
+  flex: none;
+}
+
+.gp-ph-av img {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.gp-ph-ntxt {
+  flex: 1;
+  min-width: 0;
+}
+
+.gp-ph-nhead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.gp-ph-nhead b {
+  font-size: 27px;
+  font-weight: 900;
+  color: #3a2a00;
+}
+
+.gp-ph-nhead small {
+  font-size: 21px;
+  font-weight: 700;
+  color: #9a8556;
+}
+
+.gp-ph-ntxt p {
+  margin: 6px 0 0;
+  font-size: 26px;
+  line-height: 1.26;
+  font-weight: 700;
+  color: #5a4822;
+}
+
+.gp-ph-nobj {
+  width: 78px;
+  height: 78px;
+  flex: none;
+}
+
+.gp-ph-grid {
+  position: relative;
+  z-index: 2;
+  margin-top: 46px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  row-gap: 38px;
+  column-gap: 24px;
+}
+
+.gp-ph-app {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.gp-ph-app img {
+  width: 158px;
+  height: 166px;
+  display: block;
+}
+
+.gp-ph-app span {
+  font-size: 26px;
+  font-weight: 900;
+  color: #3a2a00;
+  white-space: nowrap;
+}
+
+.gp-ph-dock {
+  position: absolute;
+  left: 44px;
+  right: 44px;
+  bottom: 36px;
+  z-index: 2;
+  padding: 20px 28px;
+  border-radius: 38px;
+  background: rgba(255, 255, 255, 0.62);
+  display: flex;
+  justify-content: space-between;
+}
+
+.gp-ph-dock img {
+  width: 112px;
+  height: 118px;
+  display: block;
+}
+
+/* ========================================================================== */
+/* SCREEN 5: MYTH BUSTER                                                      */
+/* ========================================================================== */
+
+.gp-ui-myth {
+  padding: 42px 44px 286px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.gp-mb-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.gp-mb-headrow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.gp-mb-badge {
+  color: #e04e18;
+  font-size: 28px;
+  font-weight: 900;
+  letter-spacing: 1.8px;
+}
+
+.gp-mb-step {
+  font-size: 26px;
+  font-weight: 800;
+  color: #9b8a78;
+}
+
+.gp-mb-card {
+  padding: 46px 38px;
+  border-radius: 36px;
+  background: #ffffff;
+  border: 4px solid #f0e2d6;
+  border-bottom-width: 11px;
+  display: flex;
+  align-items: center;
+  gap: 30px;
+}
+
+.gp-mb-who {
+  width: 184px;
+  height: 230px;
+  flex: none;
+  display: block;
+}
+
+.gp-mb-card h3 {
+  margin: 0;
+  font-size: 50px;
+  line-height: 1.16;
+  font-weight: 900;
+  color: #3a2a00;
+}
+
+.gp-mb-btns {
+  display: flex;
+  gap: 24px;
+}
+
+.gp-mb-btn {
+  flex: 1;
+  height: 142px;
+  border-radius: 30px;
+  border: 4px solid #e5e5e5;
+  border-bottom-width: 12px;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  font-size: 44px;
+  font-weight: 900;
+  color: #3c3c3c;
+}
+
+.gp-mb-picked {
+  background: #d7ffb8;
+  border-color: #58cc02;
+  color: #46a302;
+}
+
+.gp-mb-picked b {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: #58cc02;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+}
+
+.gp-mb-modes {
+  border-radius: 32px;
+  border: 4px solid #f0e4d8;
+  border-bottom-width: 10px;
+  background: #fffcf8;
+  padding: 8px 30px;
+}
+
+.gp-mb-mrow {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  padding: 22px 0;
+}
+
+.gp-mb-mrow + .gp-mb-mrow {
+  border-top: 4px dotted #ebd9c6;
+}
+
+.gp-mb-mic {
+  flex: none;
+  width: 72px;
+  height: 72px;
+  border-radius: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gp-mb-mic svg {
+  width: 40px;
+  height: 40px;
+}
+
+.gp-mb-mrow b {
+  display: block;
+  font-size: 32px;
+  font-weight: 900;
+  color: #3a2a00;
+}
+
+.gp-mb-mrow small {
+  display: block;
+  margin-top: 3px;
+  font-size: 23px;
+  font-weight: 700;
+  color: #8a6d52;
+}
+
+/* ========================================================================== */
+/* SCREEN 6: QUESTS & REAL AVATAR SHOP                                        */
+/* ========================================================================== */
+
+.gp-ui-rewards {
+  padding: 28px 34px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.gp-rw-quests {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.gp-rw-chest {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 16px 22px;
+  border-radius: 26px;
+  background: #fff9eb;
+  border: 4px solid #f4e4b0;
+  border-bottom-width: 8px;
+}
+
+.gp-rw-cimg {
+  width: 92px;
+  height: 92px;
+  flex: none;
+}
+
+.gp-rw-ctxt {
+  flex: 1;
+  min-width: 0;
+}
+
+.gp-rw-ctxt b {
+  display: block;
+  font-size: 32px;
+  font-weight: 900;
+  color: #3a2a00;
+}
+
+.gp-rw-ctxt small {
+  display: block;
+  margin-top: 3px;
+  font-size: 21px;
+  font-weight: 700;
+  color: #8a6d1d;
+}
+
+.gp-rw-pill {
+  flex: none;
+  padding: 10px 20px;
+  border-radius: 999px;
+  background: #fff0c2;
+  font-size: 29px;
+  font-weight: 900;
+  color: #3a2a00;
+}
+
+.gp-rw-pill .gp-dia {
+  width: 28px;
+  height: 28px;
+  vertical-align: -5px;
+}
+
+.gp-rw-qrow {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 16px 22px;
+  border-radius: 24px;
+  border: 4px solid #ececec;
+  border-bottom-width: 8px;
+  background: #ffffff;
+}
+
+.gp-rw-qinfo {
+  flex: 1;
+}
+
+.gp-rw-qinfo b {
+  display: block;
+  font-size: 28px;
+  font-weight: 900;
+  color: #3c3c3c;
+  margin-bottom: 8px;
+}
+
+.gp-rw-bar {
+  position: relative;
+  height: 30px;
+  border-radius: 15px;
+  background: #ece3cc;
+  overflow: hidden;
+}
+
+.gp-rw-bar i {
+  position: absolute;
+  inset: 0;
+  background: #fabf24;
+  border-radius: 15px;
+}
+
+.gp-rw-bar span {
+  position: relative;
+  display: block;
+  text-align: center;
+  line-height: 30px;
+  font-size: 19px;
+  font-weight: 900;
+  color: #ffffff;
+  text-shadow: 0 2px 0 #d9981a;
+}
+
+.gp-rw-claim {
+  flex: none;
+  padding: 0 26px;
+  height: 62px;
+  line-height: 62px;
+  border-radius: 18px;
+  background: #58cc02;
+  box-shadow: 0 6px 0 #46a302;
+  color: #ffffff;
+  font-size: 24px;
+  font-weight: 900;
+  letter-spacing: 0.8px;
+}
+
+/* Authentic Avatar Shop preview (matches in-app Shop screen) */
+.gp-shop-frame {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  border-radius: 34px 34px 0 0;
+  overflow: hidden;
+  border: 4px solid #e6eef5;
+  border-bottom: 0;
+  background: #e5f5ff;
+}
+
+.gp-shop-stage {
+  position: relative;
+  height: 486px;
+  background: #e5f5ff;
+  overflow: hidden;
+}
+
+/* Red & white scalloped awning */
+.gp-awning {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  width: 100%;
+  height: 66px;
+}
+
+.gp-awning i {
+  flex: 1;
+  display: block;
+  height: 60px;
+  border-radius: 0 0 42px 42px;
+}
+
+.gp-awning i.r {
+  background: #ff4b4b;
+  box-shadow: 0 7px 0 #d93333;
+}
+
+.gp-awning i.w {
+  background: #ffffff;
+  box-shadow: 0 7px 0 #dfe6ee;
+}
+
+.gp-shop-top {
+  position: absolute;
+  left: 24px;
+  right: 24px;
+  top: 84px;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.gp-shop-btn {
+  width: 66px;
+  height: 66px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 3px solid #e2ebf2;
+  box-shadow: 0 4px 0 #d5e2ec;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gp-shop-btn svg {
+  width: 30px;
+  height: 30px;
+}
+
+.gp-shop-bal {
+  height: 66px;
+  padding: 0 24px;
+  border-radius: 999px;
+  background: #ffffff;
+  border: 3px solid #e2ebf2;
+  box-shadow: 0 4px 0 #d5e2ec;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 30px;
+  font-weight: 900;
+  color: #1cb0f6;
+}
+
+.gp-shop-bal .gp-dia {
+  width: 32px;
+  height: 32px;
+  margin: 0;
+  vertical-align: 0;
+}
+
+.gp-shop-owned {
+  position: absolute;
+  right: 24px;
+  top: 164px;
+  z-index: 3;
+  width: 66px;
+  height: 66px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 3px solid #e2ebf2;
+  box-shadow: 0 4px 0 #d5e2ec;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gp-shop-owned svg {
+  width: 34px;
+  height: 34px;
+}
+
+/* Left color swatch column */
+.gp-swatches {
+  position: absolute;
+  left: 26px;
+  top: 168px;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.gp-sw {
+  position: relative;
+  width: 60px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gp-sw svg {
+  width: 58px;
+  height: 44px;
+  display: block;
+}
+
+.gp-sw.on svg path {
+  stroke: #e06e26;
+  stroke-width: 3.2;
+}
+
+.gp-sw-ok {
+  position: absolute;
+  right: -4px;
+  top: -4px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #e06e26;
+  border: 3px solid #ffffff;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gp-sw-dn {
+  position: absolute;
+  left: 50%;
+  bottom: -8px;
+  width: 30px;
+  height: 30px;
+  margin-left: -15px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 2.5px solid #d5e2ec;
+  color: #3c3c3c;
+  font-size: 18px;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Hero avatar standing cleanly on the drawer edge */
+.gp-shop-hero {
+  position: absolute;
+  left: 50%;
+  bottom: -14px;
+  height: 350px;
+  width: auto;
+  transform: translateX(-50%);
+  z-index: 2;
+}
+
+/* Floating Buy button on bottom-right of stage */
+.gp-shop-buy {
+  position: absolute;
+  right: 24px;
+  bottom: 18px;
+  z-index: 4;
+  padding: 5px;
+  border-radius: 24px;
+  background: #ffffff;
+  box-shadow: 0 6px 14px rgba(24, 96, 148, 0.16);
+}
+
+.gp-shop-buy span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 62px;
+  padding: 0 26px;
+  border-radius: 19px;
+  background: #fabf24;
+  box-shadow: 0 5px 0 #d9981a;
+  color: #ffffff;
+  font-size: 27px;
+  font-weight: 900;
+  text-shadow: 0 2px 0 #d9981a;
+}
+
+.gp-shop-buy .gp-dia {
+  width: 28px;
+  height: 28px;
+  margin: 0;
+  vertical-align: 0;
+}
+
+/* White rounded bottom drawer */
+.gp-shop-panel {
+  flex: 1;
+  background: #ffffff;
+  border-radius: 36px 36px 0 0;
+  padding: 22px 24px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  margin-top: -10px;
+  position: relative;
+  z-index: 3;
+}
+
+.gp-cat-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-radius: 22px;
+  background: #f4f4f4;
+}
+
+.gp-cat-bar span {
+  width: 92px;
+  height: 70px;
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #6b6b6b;
+}
+
+.gp-cat-bar span svg {
+  width: 40px;
+  height: 40px;
+}
+
+.gp-cat-bar span.on {
+  background: #ffffff;
+  border: 3.5px solid #e06e26;
+  color: #e06e26;
+  box-shadow: 0 4px 0 rgba(224, 110, 38, 0.18);
+}
+
+.gp-shelf {
+  flex: 1;
+  display: flex;
+  border-radius: 28px 28px 0 0;
+  border: 3.5px dashed #e0e0e0;
+  border-bottom: 0;
+  overflow: hidden;
+  background: #ffffff;
+}
+
+.gp-sub-rail {
+  width: 112px;
+  flex: none;
+  background: #f6f6f6;
+  padding: 18px 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+}
+
+.gp-sub-rail span {
+  width: 82px;
+  height: 68px;
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #6b6b6b;
+}
+
+.gp-sub-rail span svg {
+  width: 38px;
+  height: 38px;
+}
+
+.gp-sub-rail span.on {
+  background: #ffffff;
+  border: 3.5px solid #e06e26;
+  color: #e06e26;
+}
+
+.gp-rw-tiles {
+  flex: 1;
+  padding: 18px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  align-content: start;
+}
+
+.gp-stile {
+  position: relative;
+  height: 196px;
+  border-radius: 24px;
+  border: 3.5px solid #eef2f6;
+  background: #ffffff;
+  padding: 10px 10px 44px;
+  overflow: hidden;
+}
+
+.gp-stile.on {
+  border: 4px solid #58cc02;
+}
+
+.gp-stile.try {
+  border: 4px solid #e06e26;
+}
+
+.gp-stile-pic {
+  width: 100%;
+  height: 100%;
+  border-radius: 16px;
+  background: #e9f6ff;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.gp-stile-pic img {
+  width: 122px;
+  height: 122px;
+  display: block;
+}
+
+.gp-tick {
+  position: absolute;
+  right: 12px;
+  top: 12px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #58cc02;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  font-weight: 900;
+}
+
+.gp-tfoot {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 10px;
+  text-align: center;
+  font-size: 23px;
+  font-weight: 900;
+  color: #3c3c3c;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.gp-tfoot .gp-dia {
+  width: 24px;
+  height: 24px;
+  margin: 0;
+  vertical-align: 0;
+}
+
+.gp-tfoot.ok {
+  color: #46a302;
+}

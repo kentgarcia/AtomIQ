@@ -30,7 +30,6 @@ The policy says only what the app does. `test:legal` checks the ones that can be
 | Display name defaults to "Scientist"; no email asked | `app/onboarding.tsx` |
 | Outside links: IAEA, UNSCEAR, WNA, EPA, Britannica, Nobel Prize, OpenStax | `content.db` (`myths.sources`, `encyclopedia_entries.sources`, `content_references.url`) |
 | Unsplash pictures in Myth Buster and explorer journeys | `myths.image`, `content/explorer/journeys/*` |
-| Beta Feedback is a Google Forms page | `constants/beta.ts` |
 | Read Aloud uses the device speech engine | `services/media.ts` (`expo-speech`) |
 | The feed, rivals and ranking are fictional and local | `docs/features/NPC_FEED_SPEC.md` |
 
@@ -38,19 +37,18 @@ If you change one of these, change the text, bump `LEGAL_VERSION`, and move `LEG
 
 ## Before release
 
-1. Set `LEGAL_CONTACT_EMAIL` in `constants/legal.ts` to a monitored address. Play requires a contact, and until it is set the documents point to the Beta Feedback form and the store page.
+1. `LEGAL_CONTACT_EMAIL` in `constants/legal.ts` is atomiq.officialph@gmail.com (set 2026-11-22; the in-app Beta Feedback form was removed). Make sure the inbox is monitored: Play requires a contact.
 2. Confirm who the controller is. The text names "the MythSmashers by the DOST-PNRI, developed by Kent Garcia" (the credit in Settings). If a legal entity should be named, edit Privacy §1 and Terms §1.
 3. Confirm the governing law (`LEGAL_GOVERNING_LAW`, now the Philippines) and the age wording (18 is the age of majority in the Philippines).
 4. Ask whether the app has to be registered or notified under the Data Privacy Act (it handles almost no personal data and keeps it on the device, but the DOST-PNRI's data protection officer should decide).
 5. Host both documents at a public URL (Play requires a policy URL, not only an in-app screen) and link it in the Console. Keep the hosted text the same as the app's.
 6. Decide the audience. If children under 13 are a target, complete Play's Families declarations; the text already avoids collecting personal information from them.
-7. Replace the Google Forms feedback form's own privacy note with a line that matches Privacy §8 (what is asked, who sees it).
 8. Check the Android backup setting. The policy says a device backup service "may" copy app data. If you disable backup in `app.json`, say so in Privacy §6.
 
 ## Play Data safety answers (matches the policy)
 
 - Does the app collect or share user data? Collected on the device only; **not** collected by the developer, **not** shared.
-- Data types: none collected by the developer. (The feedback form is run through Google Forms; declare it if Play asks about forms you link to.)
+- Data types: none collected by the developer.
 - Is data encrypted in transit? Not applicable, nothing is sent. Outside links use HTTPS.
 - Can users request deletion? Yes: Settings > Delete Account (in the app), or uninstall.
 - Families / children: designed not to collect personal information.

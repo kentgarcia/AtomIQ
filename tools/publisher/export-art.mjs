@@ -104,5 +104,11 @@ for (const hair of ["crop", "spiky", "bigbun", "longwavy", "twintails", "highpon
   const spec = avatarSpec({ ...DEFAULT_AVATAR, hairStyle: hair });
   write(`hair-${hair}.svg`, spec, "avatar");
 }
+// Eyewear shop showcase (matches the in-app Avatar Shop screen: yellow glasses on the default avatar).
+write("shop-hero.svg", avatarSpec({ ...DEFAULT_AVATAR, eyewear: "round", eyewearColor: "yellow" }), "bust");
+for (const eye of ["none", "round", "square", "sunglasses", "heart", "star"]) {
+  const spec = avatarSpec({ ...DEFAULT_AVATAR, eyewear: eye, eyewearColor: "yellow" });
+  write(`eye-${eye}.svg`, spec, "avatar");
+}
 write("avatar-default.svg", avatarSpec(DEFAULT_AVATAR), "avatar");
 write("avatar-bun.svg", avatarSpec(BUN_AVATAR), "avatar");

@@ -5,15 +5,24 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>AtomIQ Publisher</title>
   <link rel="stylesheet" href="slides.css" />
+  <link rel="stylesheet" href="play-slides.css" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <header class="bar">
-    <h1>AtomIQ Publisher</h1>
-    <nav id="tabs" class="tabs"></nav>
-    <div class="actions">
-      <button type="button" class="ghost" id="download-all">Download all</button>
-      <button type="button" class="primary" id="download">Download PNG</button>
+    <div class="bar-top">
+      <h1>AtomIQ Publisher</h1>
+      <nav id="packs" class="packs" aria-label="Asset packs"></nav>
+      <div class="actions">
+        <button type="button" class="ghost" id="download-svg" hidden>Download SVG</button>
+        <button type="button" class="ghost" id="download-play-zip">Download Play ZIP</button>
+        <button type="button" class="ghost" id="download-all">Download pack</button>
+        <button type="button" class="primary" id="download">Download PNG</button>
+      </div>
+    </div>
+    <div class="bar-sub">
+      <nav id="tabs" class="tabs" aria-label="Slides"></nav>
+      <div id="meta" class="meta"></div>
     </div>
   </header>
   <main class="stage" id="stage">

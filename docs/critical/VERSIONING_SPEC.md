@@ -1,6 +1,6 @@
 # Versioning spec
 
-Status: **proposed, nothing built yet.** Written after the first EAS `preview` APK, when every build turned out to carry the same numbers.
+Status: **built 2026-11-22 except the steps that need a person** (section 6): the EAS config, `check:version`, the Settings line and its test are in; seeding the remote build counter, publishing content `1.0.0` (needs every source verified) and the two Play docs' older text are not. Written after the first EAS `preview` APK, when every build turned out to carry the same numbers.
 
 ## 1. The problem
 
@@ -116,6 +116,9 @@ Play release (`production`):
 - `GOOGLE_PLAY_LAUNCH_SPEC.md` still names Expo SDK 54; the project is on SDK 58.
 
 ## 6. Work to do (in order)
+
+Done: 1 (config; the counter still has to be seeded once with `npx eas-cli build:version:set -p android`), 2 (`services/build-info-core.ts`, `test:build-info`; no tap-to-copy because `expo-clipboard` is not installed), 3 (`check:version`, in `eas-build-post-install`), 5 (the Play checklist, CLAUDE.md). Open: 4.
+
 
 1. Set `appVersionSource: "remote"` and `autoIncrement`; seed the counter; remove `versionCode` from `app.json`.
 2. Settings: show app version, build number and content version (`test` for the formatting helper, kept in a framework-free `*-core.ts` like the rest).

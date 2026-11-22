@@ -1,9 +1,15 @@
 # AtomIQ — Play Release Checklist (run every release)
 
-## 1. Version bump (P0-3)
-- [ ] `app.json > expo.version`: bump semver for user-visible releases (e.g. `1.0.0` → `1.0.1`).
-- [ ] `app.json > expo.android.versionCode`: **+1 integer, never reuse** — not even for a rejected binary. Play rejects reused versionCodes.
-- [ ] `node scripts/sync-content.js` run so `CONTENT_DB_VERSION` matches the bundled DB (content changes auto-bump it).
+## 0. Content must be releasable (first release, then every content change)
+- [ ] Every source is checked by a person: `content_references`, `scan_target_references`, `safety_card_references`, `map_site_references` all `verified = 1` (safety and health cards first). The publish gate fails on an unverified source.
+- [ ] `npm run validate:content` passes, then `npm run release:content -- --publish --notes "…"` (the first publish creates `1.0.0` and starts `shipped-ids.json`, which is what stops a shipped id being renamed or deleted without a reason). Commit the content files together (CLAUDE.md lists them).
+- [ ] `npm run check:content-published` passes. Rules for later content changes: `docs/critical/CONTENT_AND_USER_DATA_RULES.md`.
+
+## 1. Version bump (P0-3, `docs/critical/VERSIONING_SPEC.md`)
+- [ ] `app.json > expo.version`: bump semver for user-visible releases (e.g. `1.0.0` → `1.0.1`), and the same in `package.json`. `npm run check:version` must pass (it also fails if `expo.android.versionCode` comes back).
+- [ ] Build number: **EAS owns it** (`appVersionSource: remote`, `autoIncrement` on `preview` and `production`). Do not edit it by hand. Once, before the first build under this rule, set the counter higher than any versionCode ever uploaded to Play: `npx eas-cli build:version:set -p android` (nothing uploaded yet: start at 1).
+- [ ] `npm run sync-content` run so `CONTENT_DB_VERSION` matches the bundled DB.
+- [ ] Commit, build, then tag `v<version>+<build number>` on the commit that was built.
 
 ## 2. Signing (P0-4, one-time + verify each release)
 - [ ] Play App Signing enabled on first upload (recommended default).
