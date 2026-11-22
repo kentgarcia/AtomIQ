@@ -1,0 +1,138 @@
+[
+ {
+  "id": "ref-aip-curie-separations",
+  "status": "ok",
+  "fetch": {"url": "https://history.aip.org/exhibits/curie/resbr2.htm", "finalUrl": "https://history.aip.org/exhibits/curie/resbr2.htm", "httpResult": "200, real content (read through the WebFetch tool)", "pageTitle": "Marie Curie - Research Breakthroughs (1897-1904)", "pagePublisher": "American Institute of Physics (footer: (c) 2000 - American Institute of Physics)"},
+  "identity": "close",
+  "proposedUrl": null,
+  "proposedTitle": null,
+  "citations": [
+   {"where": "map site \"Paris, the Curies' shed\" (1898)", "verdict": "supports", "quote": "the Curies moved their lab to an abandoned shed across the school courtyard.", "comment": "Same page also says: \"In July 1898 the Curies published their conclusion: the bismuth fraction contained a new element.\"; \"They named it \"polonium\" in honor of the country of Marie's birth.\"; \"A second publication, in December 1898, explained their discovery in the barium fraction\"; \"The shed, formerly a medical school dissecting room, was poorly outfitted and ventilated.\" Every part of the claim is covered. Page says 'abandoned shed', the card says 'old shed' (fine)."}
+  ],
+  "problems": ["Row title ('Marie Curie and the Science of Radioactivity: Making repeated separations') is not the page's own title ('Marie Curie - Research Breakthroughs (1897-1904)'); the row title looks like exhibit name plus a section name."],
+  "suggestedFix": "Optional: set title to the page's own title, 'Marie Curie - Research Breakthroughs (1897-1904)' (AIP History of Physics exhibit 'Marie Curie and the Science of Radioactivity')."
+ },
+ {
+  "id": "ref-aip-rutherford-alpha",
+  "status": "problem",
+  "fetch": {"url": "https://history.aip.org/exhibits/rutherford/sections/alpha-particles-atom.html", "finalUrl": "https://history.aip.org/exhibits/rutherford/sections/alpha-particles-atom.html", "httpResult": "200, real content (read through the WebFetch tool)", "pageTitle": "Rutherford's Nuclear World: The Story of the Discovery of the Nucleus (section: Alpha Particles and the Atom)", "pagePublisher": "American Institute of Physics, Center for History of Physics (c) 2011"},
+  "identity": "close",
+  "proposedUrl": null,
+  "proposedTitle": null,
+  "citations": [
+   {"where": "map site \"Manchester\" (1911)", "verdict": "partial", "quote": "most of the mass of, say, an atom of gold and most of its charge were concentrated in a very small central body.", "comment": "Core claim (1911 conclusion, mass and charge in a very small central body) is supported. Also on the page: \"Geiger and Marsden began with small-angle dispersion and tried various thicknesses of foils.\" and \"Ernest Rutherford discovered the nucleus of the atom in 1911.\" The fetched text did not state 'Manchester' for this section, and says \"at this point in 1911, Rutherford did not call this a 'nucleus.'\", so 'later called the nucleus' is consistent but the page does not say who named it or when. Manchester is not confirmed by this page."}
+  ],
+  "problems": ["Row title ('Rutherford, Nuclear Physicist: Alpha Particles and the Atom') does not match the page ('Rutherford's Nuclear World: The Story of the Discovery of the Nucleus', section 'Alpha Particles and the Atom').", "'Manchester' and 'later called the nucleus' are not stated verbatim on this page."],
+  "suggestedFix": "Correct the title to the exhibit's real title; if the Manchester location matters, cite a page that says so (a person should check the exhibit's neighbouring section pages)."
+ },
+ {
+  "id": "ref-cdc-contamination-vs-exposure",
+  "status": "problem",
+  "fetch": {"url": "https://www.cdc.gov/radiation-emergencies/infographic/contamination-versus-exposure.html", "finalUrl": "https://www.cdc.gov/radiation-emergencies/infographic/contamination-versus-exposure.html", "httpResult": "200, real content (read through the WebFetch tool); page dated April 17, 2024", "pageTitle": "Radiation Contamination Versus Exposure | Radiation Emergencies | CDC", "pagePublisher": "Centers for Disease Control and Prevention (National Center for Environmental Health)"},
+  "identity": "exact",
+  "proposedUrl": null,
+  "proposedTitle": null,
+  "citations": [
+   {"where": "safety card \"Exposure or contamination?\"", "verdict": "partial", "quote": "A person exposed to radiation is not necessarily contaminated with radioactive material.", "comment": "Also supported: \"For a person to be contaminated, radioactive material must be on or inside of his or her body.\" Exposure is described only as \"When a person is exposed to certain types of radiation, the energy may penetrate the body.\" (no x-ray 'beam' wording). The step 'Radiation does not spread or get on people. Radioactive contamination is what can be spread.' was NOT found on this page."},
+   {"where": "safety card \"Myth: exposure makes you radioactive\"", "verdict": "partial", "quote": "When a person has an x-ray, he or she is exposed to radiation but is not contaminated.", "comment": "The x-ray step is supported. The page does not say outright that exposure does not make a person radioactive (it says an exposed person is 'not necessarily contaminated'), and it gives no washing or decontamination advice, so 'Radioactive material on the skin or clothes is the concern. It is washed off.' is not supported here (it is on CDC's self-decontaminate page, which this row does not cite)."}
+  ],
+  "problems": ["Step 'Radiation does not spread or get on people...' not on page.", "'Does not make one radioactive' not stated in so many words; 'washed off' not on page."],
+  "suggestedFix": "Soften the unsupported steps or add a reference for them (e.g. CDC 'How to Self-Decontaminate after a Radiation Emergency' for washing off)."
+ },
+ {
+  "id": "ref-cdc-nuclear-blast-faq",
+  "status": "problem",
+  "fetch": {"url": "https://www.cdc.gov/radiation-emergencies/about/nuclear-blast-faq.html", "finalUrl": "https://www.cdc.gov/radiation-emergencies/about/nuclear-blast-faq.html", "httpResult": "200, real content (read through the WebFetch tool)", "pageTitle": "Nuclear Blasts: Frequently Asked Questions | Radiation Emergencies | CDC", "pagePublisher": "Centers for Disease Control and Prevention (National Center for Environmental Health)"},
+  "identity": "exact",
+  "proposedUrl": null,
+  "proposedTitle": null,
+  "citations": [
+   {"where": "safety card \"Myth: a plant can blow up like a bomb\"", "verdict": "partial", "quote": "would not explode like a nuclear weapon", "comment": "Fragment of the page's sentence about a nuclear power plant. The page also says a serious event 'could result in a release of radioactive material into the air' (in the context of an airplane crash into a plant). The step 'its fuel is arranged so energy is produced steadily, not all at once' is NOT on this page, and 'officials would monitor it' was not found."}
+  ],
+  "problems": ["Fuel-arrangement / steady energy explanation not on the page.", "'Officials would monitor it' not found."],
+  "suggestedFix": "Keep the first two steps; remove or separately source the fuel/steady-energy step (e.g. NRC or IAEA page)."
+ },
+ {
+  "id": "ref-cdc-potassium-iodide",
+  "status": "ok",
+  "fetch": {"url": "https://www.cdc.gov/radiation-emergencies/treatment/potassium-iodide.html", "finalUrl": "https://www.cdc.gov/radiation-emergencies/treatment/potassium-iodide.html", "httpResult": "200, real content (read through the WebFetch tool)", "pageTitle": "Potassium Iodide (KI) | Radiation Emergencies | CDC", "pagePublisher": "Centers for Disease Control and Prevention (National Center for Environmental Health)"},
+  "identity": "exact",
+  "proposedUrl": null,
+  "proposedTitle": null,
+  "citations": [
+   {"where": "safety card \"Potassium iodide (KI)\"", "verdict": "supports", "quote": "Do not take KI unless you are instructed by public health or emergency response officials or a healthcare provider.", "comment": "All four steps found: \"KI protects only the thyroid.\" / \"KI does not protect other parts of the body.\"; \"KI protects only against radioactive iodine and does not protect against other types of radioactive materials.\"; \"Do not use table salt or foods that contain iodine as a substitute for KI.\""},
+   {"where": "safety card \"Myth: KI pills block all radiation\"", "verdict": "supports", "quote": "KI is not a treatment and cannot reverse damage already done to the thyroid.", "comment": "Also: \"KI may not give a person 100% thyroid protection from radioactive iodine.\" plus the thyroid-only and radioactive-iodine-only quotes above and the 'only if instructed' sentence. Numbers match (100%)."}
+  ],
+  "problems": [],
+  "suggestedFix": null
+ },
+ {
+  "id": "ref-cdc-radiation-emergencies-safety",
+  "status": "problem",
+  "fetch": {"url": "https://www.cdc.gov/radiation-emergencies/safety/index.html", "finalUrl": "https://www.cdc.gov/radiation-emergencies/safety/index.html", "httpResult": "200, real content (read through the WebFetch tool); page dated January 31, 2025. Subpages /response/get-inside.html, /response/stay-inside.html and /prevention/self-decontaminate.html also fetched to see where claims live.", "pageTitle": "Preparing for a Radiation Emergency | Radiation Emergencies | CDC", "pagePublisher": "Centers for Disease Control and Prevention (National Center for Environmental Health)"},
+  "identity": "different",
+  "proposedUrl": null,
+  "proposedTitle": null,
+  "citations": [
+   {"where": "safety card \"Get inside, stay inside, stay tuned\"", "verdict": "supports", "quote": "You should not leave your building or place of shelter until officials or emergency responders have said it is safe,", "comment": "Also on the page: \"get inside the closest building as soon as you can.\"; \"staying inside for at least 24 hours can protect you and your family until it is safe to leave the area.\" (stay-inside subpage has the same sentence); \"A battery-powered or hand crank emergency radio\"; TV, radio and social media named. Wording is slightly different from the card ('usually lasts at least 24 hours') but the content matches."},
+   {"where": "safety card \"What makes a good shelter\"", "verdict": "partial", "quote": "Once inside, go to the basement or the middle of the building.", "comment": "Supported: basement/middle; \"Cars do not provide good protection from radioactive material:\"; get-inside subpage: \"Brick or concrete multi-story building or basement are best, but being inside any building is safer than being outside.\" and \"Stay as far away from the walls and roof of the building as you can.\"; stay-inside subpage: \"Close and lock all windows and doors.\" and \"Turn off fans, air conditioners, and forced-air heating units that bring air in from the outside, if possible.\" NOT found on any fetched page: underground parking garages and subways as good shelter; 'move away from windows'; 'as many walls as you can'. 'Safest buildings' is stronger than 'best' on the subpage."},
+   {"where": "safety card \"Why not go out to look\"", "verdict": "partial", "quote": "Going outside to get loved ones could expose you and them to dangerous levels of radiation.", "comment": "Also: \"Because radioactive materials become weaker over time,\" (sentence truncated in the fetch result). NOT found: do not go back to an evacuated area until authorities say it is safe; leave early only for an immediate hazard such as a fire or gas leak (closest: 'unless you have a life-threatening condition or if the building is unstable'); schools, daycares and hospitals are not named in the text read."},
+   {"where": "safety card \"If you were outside\"", "verdict": "partial", "quote": "Even just removing your outer layer of clothing can remove up to 90% of radioactive material.", "comment": "90% matches. Self-decontaminate subpage: \"Be very careful in removing your clothing to prevent inhaling radioactive dust released from shaking.\"; \"Use soap and plenty of water.\"; \"Take a warm shower and gently wash yourself with lots of soap.\" NOT found: do not use household cleaning wipes on skin; hand sanitizer does not protect against radioactive material; unsealed foods from outside may be contaminated (not on the pages read; the stay-tuned subpage was not checked)."}
+  ],
+  "problems": ["Row title ('Radiation Emergencies: Safety (get inside, stay inside, stay tuned)') is not the page title ('Preparing for a Radiation Emergency'); the card claims live mostly on subpages.", "Not found on any page read: underground garages/subways, move away from windows, return to evacuated area, leave early for fire or gas leak, household wipes, hand sanitizer, unsealed foods.", "Safety/health card text, so unsupported steps need a source or removal before publishing."],
+  "suggestedFix": "Split into references for the CDC subpages that actually carry the claims (Get Inside, Stay Inside, Stay Tuned, How to Self-Decontaminate) and correct the title; find sources for or drop the unsupported steps (a person should check CDC's 'Stay Tuned' and 'Main Dangers' pages and the 'what to do' page, which were not fetched)."
+ },
+ {
+  "id": "ref-cern-about",
+  "status": "ok",
+  "fetch": {"url": "https://home.cern/about", "finalUrl": "https://home.cern/about", "httpResult": "200, real content (read through the WebFetch tool)", "pageTitle": "About – Home | CERN", "pagePublisher": "CERN (footer (c) 1954-2026 CERN)"},
+  "identity": "close",
+  "proposedUrl": null,
+  "proposedTitle": null,
+  "citations": [
+   {"where": "map site \"CERN\" (1954)", "verdict": "supports", "quote": "Founded in 1954, the CERN laboratory sits astride the Franco-Swiss border near Geneva.", "comment": "Also: \"The Large Hadron Collider (LHC) is the world's largest and most powerful particle accelerator.\" and physicists use instruments \"to study the basic constituents of matter – fundamental particles.\" All parts of the claim are stated."}
+  ],
+  "problems": [],
+  "suggestedFix": null
+ },
+ {
+  "id": "ref-epa-protecting-yourself",
+  "status": "ok",
+  "fetch": {"url": "https://www.epa.gov/radiation/protecting-yourself-radiation", "finalUrl": "https://www.epa.gov/radiation/protecting-yourself-radiation", "httpResult": "200, real content (read through the WebFetch tool)", "pageTitle": "Protecting Yourself from Radiation", "pagePublisher": "U.S. Environmental Protection Agency"},
+  "identity": "exact",
+  "proposedUrl": null,
+  "proposedTitle": null,
+  "citations": [
+   {"where": "safety card \"Time, distance, shielding\"", "verdict": "supports", "quote": "Placing the proper shield between you and a radiation source will greatly reduce or eliminate the dose you receive.", "comment": "All four steps found: \"limiting or minimizing the exposure time reduces the dose from the radiation source.\"; \"The dose of radiation decreases dramatically as you increase your distance from the source.\"; \"Barriers of lead, concrete or water provide protection from penetrating gamma rays.\""}
+  ],
+  "problems": [],
+  "suggestedFix": null
+ },
+ {
+  "id": "ref-epa-radiation-basics",
+  "status": "problem",
+  "fetch": {"url": "https://www.epa.gov/radiation/radiation-basics", "finalUrl": "https://www.epa.gov/radiation/radiation-basics", "httpResult": "200, real content (read through the WebFetch tool)", "pageTitle": "Radiation Basics | US EPA", "pagePublisher": "U.S. Environmental Protection Agency"},
+  "identity": "exact",
+  "proposedUrl": null,
+  "proposedTitle": null,
+  "citations": [
+   {"where": "safety card \"Myth: microwaves are nuclear radiation\"", "verdict": "partial", "quote": "Ionizing radiation has so much energy it can knock electrons out of atoms, a process known as ionization.", "comment": "Also supported: \"Examples of this kind of radiation are radio waves, visible light and microwaves.\" (non-ionizing) and \"Ionizing radiation can affect the atoms in living things, so it poses a health risk by damaging tissue and DNA in genes.\" NOT supported: 'Microwaves make electrons vibrate to make heat.' The page says only that non-ionizing radiation can \"move atoms in a molecule around or cause them to vibrate\" and does not mention microwave heating or electrons. The card's wording is also physically loose (microwave ovens heat by rotating water molecules, not by vibrating electrons)."}
+  ],
+  "problems": ["Last step 'Microwaves make electrons vibrate to make heat. They cannot remove electrons from atoms.' is not on the page and the mechanism wording is questionable."],
+  "suggestedFix": "Reword the last step to what the page says (non-ionizing radiation moves or vibrates atoms in molecules and lacks the energy to remove electrons) or cite a source on microwave heating."
+ },
+ {
+  "id": "ref-epa-radiation-health-effects",
+  "status": "problem",
+  "fetch": {"url": "https://www.epa.gov/radiation/radiation-health-effects", "finalUrl": "https://www.epa.gov/radiation/radiation-health-effects", "httpResult": "200, real content (read through the WebFetch tool; fetched twice, second time a keyword search of the full text)", "pageTitle": "Radiation Health Effects | US EPA", "pagePublisher": "U.S. Environmental Protection Agency"},
+  "identity": "exact",
+  "proposedUrl": null,
+  "proposedTitle": null,
+  "citations": [
+   {"where": "safety card \"What a dose is\"", "verdict": "partial", "quote": "A gray is the international unit used to measure absorbed dose (the amount of radiation absorbed by an object or person).", "comment": "Grays and sieverts as units are on the page. NOT stated: 'damage depends on the absorbed dose', 'dose rate ... how fast the dose is delivered' (the word 'slowly' does not occur at all, 'rate' only appears for metabolism of radionuclides), 'burns more severe at higher doses and dose rates' (page only says very high levels 'can cause acute health effects such as skin burns and acute radiation syndrome'), and 'low doses delivered slowly carry a lower risk'. Related: \"the lower the dose, the lower the risk\"."},
+   {"where": "safety card \"Myth: any radiation is deadly\"", "verdict": "partial", "quote": "Exposure to low levels of radiation encountered in the environment does not cause immediate health effects.", "comment": "Supported: \"It takes a very high radiation exposure to cause acute radiation syndrome\" (more than 0.75 gray in a short time span, minutes to hours); \"the higher the dose, the greater the risk.\" Only loosely supported: repair ('the cells in our bodies are extremely efficient at repairing this damage.'). NOT stated: 'low doses delivered slowly carry a substantially lower risk' and 'any radiation instantly deadly' as a myth framing."}
+  ],
+  "problems": ["Dose-rate content (dose rate, slow delivery lowering risk, burns worse at higher rate) is not on the page.", "Cards are health claims, so these need a source that states them (e.g. an EPA, NRC or NCRP/UNSCEAR page on dose and dose rate)."],
+  "suggestedFix": "Keep the claims about units, acute radiation syndrome needing a very high dose, no immediate effects at environmental levels and risk rising with dose; reword or separately source the dose-rate and slow-delivery steps."
+ }
+]

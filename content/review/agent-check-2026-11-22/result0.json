@@ -1,0 +1,174 @@
+[
+ {
+  "id": "ref-background-radiation",
+  "status": "blocked",
+  "fetch": {
+   "url": "https://inis.iaea.org/records/qdhwg-w7v78",
+   "finalUrl": "https://inis.iaea.org/records/qdhwg-w7v78",
+   "httpResult": "200 (catalogue record, abstract only). Full-text hosts blocked: www.iaea.org and www-pub.iaea.org returned HTTP 402, www.unscear.org returned HTTP 403.",
+   "pageTitle": "Exposures to natural radiation sources. Annex B",
+   "pagePublisher": "United Nations (UNSCEAR 1982 report annex), catalogued by IAEA INIS"
+  },
+  "identity": "close",
+  "proposedUrl": "https://inis.iaea.org/records/qdhwg-w7v78",
+  "proposedTitle": "Exposures to natural radiation sources. Annex B",
+  "citations": [
+   {
+    "where": "lesson radioactivity-is-natural: Natural radionuclides, cosmic radiation and radon.",
+    "verdict": "partial",
+    "quote": null,
+    "comment": "Only the INIS catalogue abstract (UNSCEAR 1982, Annex B) was fetched: it covers cosmic rays, terrestrial sources, internal natural radionuclides and a brief review of radon isotopes. The fetch tool summarised the page, so no verbatim quote is offered. Topic matches but this is an abstract of a 1982 annex, not the current UNSCEAR/IAEA explainer. Full text of UNSCEAR (403) and IAEA pages (402) was blocked."
+   },
+   {
+    "where": "blog \"the banana on your counter\" (potassium-40 in bananas and in the body; radioactivity is natural; Becquerel 1896; radioactive does not mean dangerous)",
+    "verdict": "topic-only",
+    "quote": null,
+    "comment": "Abstract does not mention potassium-40, bananas, the body or Becquerel. A second INIS record named in the row's note (https://inis.iaea.org/records/111v8-1e515, 'Becquerel and natural origin radioactivity', Societe Francaise de Radioprotection, 2011) was fetched and its abstract covers uranium-238, thorium-232 and potassium-40 with decay products, cosmic rays and radon; it is hosted by INIS but authored by the SFRP, not IAEA or UNSCEAR, and also abstract-only. Banana and in-body K-40 claims and the safety framing were not checked against any full text."
+   }
+  ],
+  "problems": [
+   "No page from IAEA or UNSCEAR with full text could be fetched (IAEA 402, UNSCEAR 403); only catalogue abstracts were read.",
+   "Row title 'Background radiation explainers (IAEA, UNSCEAR)' names two publishers and no single document; the row's INIS id 111v8-1e515 is real but its author is SFRP (France), 2011, not IAEA or UNSCEAR.",
+   "Search snippets (not fetched pages) point to UNSCEAR 2013 Annex B and 2024 Annex B (https://www.unscear.org/unscear/uploads/documents/publications/UNSCEAR_2013_Annex-B.pdf) as stronger candidates; unverified because blocked."
+  ],
+  "suggestedFix": "Pick one document. Best candidate to re-check by hand: UNSCEAR 2013 Annex B (natural-radiation exposure, radon the largest contributor) or the UNSCEAR 2024 Annex B; retitle the row to that document, and add a separate source for banana potassium-40 if the blog keeps that claim."
+ },
+ {
+  "id": "ref-becquerel-1896",
+  "status": "problem",
+  "fetch": {
+   "url": "https://www.academie-sciences.fr/pdf/dossiers/Becquerel/Becquerel_pdf/CR1896_p420.pdf",
+   "finalUrl": "https://www.academie-sciences.fr/pdf/dossiers/Becquerel/Becquerel_pdf/CR1896_p420.pdf",
+   "httpResult": "200, 3-page PDF of the printed Comptes rendus pages 420-421, scanned images with no text layer; read by viewing rendered page images. Index page https://www.academie-sciences.fr/pdf/dossiers/Becquerel/Becquerel_pubd1.htm also fetched.",
+   "pageTitle": "Sur les radiations émises par phosphorescence (Note de M. Henri Becquerel), Comptes rendus T.122 (1896) 420-421",
+   "pagePublisher": "Académie des sciences (Paris), dossier on Henri Becquerel; original journal Comptes rendus hebdomadaires des séances de l'Académie des sciences"
+  },
+  "identity": "exact",
+  "proposedUrl": "https://www.academie-sciences.fr/pdf/dossiers/Becquerel/Becquerel_pdf/CR1896_p420.pdf",
+  "proposedTitle": "Sur les radiations émises par phosphorescence",
+  "citations": [
+   {
+    "where": "lesson radioactivity-is-natural: The discovery of radioactivity in a natural mineral.",
+    "verdict": "partial",
+    "quote": "On enveloppe une plaque photographique Lumière, au gélatino-bromure, avec deux feuilles de papier noir très épais",
+    "comment": "Quote transcribed by eye from the scanned page 421 (no text layer). The 24 Feb 1896 note reports that a uranium potassium double sulfate (crystals he possessed), exposed to the Sun, blackens a wrapped plate. It does not claim a new natural radioactivity, and the material is a crystalline salt, not described as a mineral. It is the first of Becquerel's notes, not the discovery of radioactivity as such."
+   },
+   {
+    "where": "blog \"the banana on your counter\" (Becquerel 1896: uranium mineral on a wrapped plate, plate fogged even with no sunlight)",
+    "verdict": "not-supported",
+    "quote": null,
+    "comment": "The cited note (pp. 420-421) has the salt exposed to the Sun for several hours; the 'no sunlight' result is NOT in it. It is in the next note, 2 March 1896, 'Sur les radiations invisibles émises par les corps phosphorescents', Comptes rendus 122 pp. 501-503 (https://www.academie-sciences.fr/pdf/dossiers/Becquerel/Becquerel_pdf/CR1896_p501.pdf, fetched and read as page images), p. 502: 'mais à l'abri des radiations incidentes et maintenues à l'obscurité produisent encore les mêmes impressions photographiques.' That note supports the claim; it also uses the same potassium uranyl sulfate salt, so 'uranium mineral' is a simplification. The 'natural mineral, long before nuclear technology' framing is the app's own and is not in either note."
+   }
+  ],
+  "problems": [
+   "Row cites the 24 Feb note, but the 'plate fogged with no sunlight' claim in the blog comes from the 2 March 1896 note (pp. 501-503).",
+   "Becquerel used a crystalline uranium potassium sulfate salt, not a natural mineral; 'uranium mineral' overstates the source.",
+   "Row title omits accents ('emises'); the printed title is 'émises'."
+  ],
+  "suggestedFix": "Add the 2 March 1896 note (Sur les radiations invisibles émises par les corps phosphorescents, C. R. 122, 501-503) as a second source for the 'no sunlight' sentence, and word the lesson as 'a uranium salt' or 'a uranium compound' rather than 'natural mineral'. Set URL to the Académie PDF for the 24 Feb note."
+ },
+ {
+  "id": "ref-iaea-decay",
+  "status": "problem",
+  "fetch": {
+   "url": "https://nucleus.iaea.org/sites/nuclear-instrumentation/Shared%20Documents/Basic%20Nuclear%20Physics/Basic%20Nuclear%20Physics%20Lecture.pdf",
+   "finalUrl": "https://nucleus.iaea.org/sites/nuclear-instrumentation/Shared%20Documents/Basic%20Nuclear%20Physics/Basic%20Nuclear%20Physics%20Lecture.pdf",
+   "httpResult": "200, PDF (text extracted locally with pdftotext from the bytes WebFetch saved). IAEA-TECDOC-1363 (www-pub.iaea.org/MTCD/Publications/PDF/te_1363_web.pdf) returned HTTP 402, not read.",
+   "pageTitle": "Part A - Basic Nuclear Physics (PDF metadata title 'Part A'; author Carey B Wissel; slide text, 2003)",
+   "pagePublisher": "Hosted on the IAEA Nuclear Instrumentation site (nucleus.iaea.org); the document itself names no publisher"
+  },
+  "identity": "different",
+  "proposedUrl": "https://nucleus.iaea.org/sites/nuclear-instrumentation/Shared%20Documents/Basic%20Nuclear%20Physics/Basic%20Nuclear%20Physics%20Lecture.pdf",
+  "proposedTitle": "Part A - Basic Nuclear Physics",
+  "citations": [
+   {
+    "where": "lesson why-nuclei-decay: Radioactive decay is spontaneous; parent and daughter nuclides.",
+    "verdict": "partial",
+    "quote": "the nucleus or atom changes to a new element or a daughter element.",
+    "comment": "Daughter nucleus is used. The words 'spontaneous' and 'parent' do not appear in the text."
+   },
+   {
+    "where": "lesson alpha-beta-gamma: Alpha as two protons and two neutrons.",
+    "verdict": "supports",
+    "quote": "Alpha particles are heavy charged particles consisting of two neutrons and two protons, or the nucleus of the helium-4 atom.",
+    "comment": "Slide 12."
+   },
+   {
+    "where": "lesson half-life: Definition of half-life.",
+    "verdict": "supports",
+    "quote": "The half life is defined as the period of time that it takes for one half of the radioactive nuclei to decay",
+    "comment": "Slide 24."
+   },
+   {
+    "where": "lesson decay-chains: A daughter nucleus can be radioactive and decay in turn.",
+    "verdict": "supports",
+    "quote": "Alpha decay is frequently followed by one or more beta minus decays.",
+    "comment": "Slide 12; slide 20 walks U-238 to Th-234 to Pa-234 to U-234 as a worked chain."
+   },
+   {
+    "where": "unit radioactivity (topic-level)",
+    "verdict": "supports",
+    "quote": null,
+    "comment": "Whole lecture section is on radioactive decay, alpha, beta, gamma, activity and half-life."
+   },
+   {
+    "where": "blog \"nobody knows when\" (parent/daughter; chance of changing and nobody can say when; half-life for a crowd not one atom; heating, cooling and chemistry hardly change the rate)",
+    "verdict": "partial",
+    "quote": "λ is the decay constant, or probability per unit time that a nucleus will decay.",
+    "comment": "Supports only the chance-per-time idea. Nothing in the text about heat, cold or chemistry not changing the rate, nor the die-roll analogy or 'a half-life for a crowd'. That temperature-independence claim is not supported by this document."
+   }
+  ],
+  "problems": [
+   "IAEA-TECDOC-1363 named in the row note is, per search-result title, 'Guidelines for radioelement mapping using gamma ray spectrometry data' - a geophysics survey guide, not a source on decay or half-life (page itself blocked, HTTP 402; title from a search result, not a fetched page). Do not use it.",
+   "The replacement found is a 2003 training lecture by one author, hosted on an IAEA site, not an IAEA publication; the row's 'IAEA' publisher is only loosely true.",
+   "Spontaneity of decay, 'parent' term and the heat/chemistry-independence claim are not in the proposed document."
+  ],
+  "suggestedFix": "Drop TECDOC-1363. Either cite the IAEA-hosted lecture as 'IAEA nuclear instrumentation training material (C. B. Wissel), Part A - Basic Nuclear Physics', or choose a true IAEA publication that states decay is spontaneous (e.g. the IAEA nuclear medicine physics handbook, STI/PUB/1617, found only as a search result and not fetched). Add a separate source for the temperature-independence claim."
+ },
+ {
+  "id": "ref-iaea-glossary",
+  "status": "blocked",
+  "fetch": {
+   "url": "https://inis.iaea.org/records/qreee-f8p73",
+   "finalUrl": "https://inis.iaea.org/records/qreee-f8p73",
+   "httpResult": "200 (INIS catalogue record, abstract only). Glossary PDF and iaea.org page (www-pub.iaea.org/MTCD/Publications/PDF/IAEA-NSS-GLOweb.pdf, www.iaea.org/resources/publications/iaea-nuclear-safety-and-security-glossary, and the 2016 edition PDF) all returned HTTP 402. Online portal https://nucleus-apps.iaea.org/nss-oui/ loaded but contains no definitions.",
+   "pageTitle": "IAEA Nuclear Safety and Security Glossary. Terminology Used in Nuclear Safety, Nuclear Security, Radiation Protection and Emergency Preparedness and Response. 2022 (Interim) Edition",
+   "pagePublisher": "IAEA, Vienna (2022)"
+  },
+  "identity": "close",
+  "proposedUrl": "https://inis.iaea.org/records/qreee-f8p73",
+  "proposedTitle": "IAEA Nuclear Safety and Security Glossary. Terminology Used in Nuclear Safety, Nuclear Security, Radiation Protection and Emergency Preparedness and Response. 2022 (Interim) Edition",
+  "citations": [
+   {
+    "where": "lesson why-nuclei-decay: Radionuclide; what radioactive means.",
+    "verdict": "not-checked (blocked)",
+    "quote": null,
+    "comment": "Glossary text could not be fetched. A search-result snippet (not a fetched page) says IAEA glossaries EXCLUDE basic radiation and nuclear physics terms such as alpha particle, decay, fission and radionuclide as assumed knowledge, which would mean no such entry exists. Unverified."
+   },
+   {
+    "where": "lesson alpha-beta-gamma: Definitions of beta-minus and gamma.",
+    "verdict": "not-checked (blocked)",
+    "quote": null,
+    "comment": "Same: blocked, and the exclusion of basic physics terms (per a search snippet only) makes these entries doubtful."
+   },
+   {
+    "where": "lesson half-life: Radionuclide and half-life examples (candidates to verify).",
+    "verdict": "not-checked (blocked)",
+    "quote": null,
+    "comment": "Blocked; a glossary is unlikely to give worked half-life examples."
+   },
+   {
+    "where": "unit radioactivity (topic-level)",
+    "verdict": "topic-only",
+    "quote": null,
+    "comment": "The INIS abstract says the glossary covers terminology used in IAEA safety standards and nuclear security guidance; the topic is only loosely related."
+   }
+  ],
+  "problems": [
+   "Glossary full text unreachable (HTTP 402 on all IAEA hosts tried); entries for radionuclide, beta-minus and gamma could not be checked.",
+   "Search snippet (unfetched) says the glossary excludes basic nuclear physics terms including radionuclide and decay; if true, the row's claimed definitions are not in it.",
+   "Real edition is '2022 (Interim) Edition', the row has no year."
+  ],
+  "suggestedFix": "A person should open the glossary PDF in a browser and search for 'radionuclide', 'beta' and 'gamma'. If absent, replace with a source that defines them (the IAEA-hosted lecture proposed for ref-iaea-decay covers beta-minus and gamma rays)."
+ }
+]

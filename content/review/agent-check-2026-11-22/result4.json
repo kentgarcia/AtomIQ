@@ -1,0 +1,134 @@
+[
+ {
+  "id": "ref-nagasaki-museum",
+  "status": "ok",
+  "fetch": {"url": "https://nagasakipeace.jp/en/visit/abm", "finalUrl": "https://nagasakipeace.jp/en/visit/abm", "httpResult": "200, real content", "pageTitle": "Nagasaki Atomic Bomb Museum | Visit | English | NAGASAKI PEACE", "pagePublisher": "Nagasaki City (official website of Nagasaki City)"},
+  "identity": "close",
+  "proposedUrl": null,
+  "proposedTitle": null,
+  "citations": [
+   {"where": "map site \"Nagasaki\" (1945)", "verdict": "partial", "quote": "At 11:02 a.m. on August 9, 1945, the explosion of an atomic bomb devastated Nagasaki.", "comment": "Time and date match. Page says the bomb 'devastated' the city; it does not say 'over'. The museum 'keeps that memory alive and teaches young people about peace' is not stated as such: page says 'We also consider it our duty to ensure that the experience is not forgotten but passed on intact to future generations.' and discusses how to inform young people about the horror of war and the importance of peace. Quotes came through WebFetch's text extraction."}
+  ],
+  "problems": ["Publisher on the page is Nagasaki City (city-run site), the row says Nagasaki Atomic Bomb Museum", "'teaches young people about peace' is only implied (page discusses informing young people), not a plain statement", "'exploded over Nagasaki' is not the page's wording"],
+  "suggestedFix": "Optional: set publisher to 'Nagasaki City' and soften the museum sentence to match 'passed on to future generations'."
+ },
+ {
+  "id": "ref-nasa-sun-facts",
+  "status": "ok",
+  "fetch": {"url": "https://science.nasa.gov/sun/facts/", "finalUrl": "https://science.nasa.gov/sun/facts/", "httpResult": "200, real content", "pageTitle": "Sun: Facts", "pagePublisher": "NASA (NASA Science)"},
+  "identity": "close",
+  "proposedUrl": null,
+  "proposedTitle": null,
+  "citations": [
+   {"where": "scan target \"The Sun\"", "verdict": "supports", "quote": "Nuclear reactions here – where hydrogen is fused to form helium – power the Sun’s heat and light.", "comment": "Core fusion claim and H/He composition notes supported. Page also calls the Sun 'a hot glowing ball of hydrogen and helium'. Page does not literally say 'nearest star' (it calls it 'our solar system's only star' and names Alpha Centauri as the nearest stellar neighbour); that is common knowledge and true but not stated here. Quote via WebFetch extraction."}
+  ],
+  "problems": ["'our nearest star' not stated on the page"],
+  "suggestedFix": null
+ },
+ {
+  "id": "ref-noaa-atmosphere",
+  "status": "ok",
+  "fetch": {"url": "https://www.noaa.gov/jetstream/atmosphere", "finalUrl": "https://www.noaa.gov/jetstream/atmosphere", "httpResult": "200, real content", "pageTitle": "The Atmosphere", "pagePublisher": "NOAA (JetStream education site)"},
+  "identity": "close",
+  "proposedUrl": null,
+  "proposedTitle": null,
+  "citations": [
+   {"where": "scan target \"Air\"", "verdict": "supports", "quote": "Nitrogen dilutes oxygen and prevents rapid burning at the Earth's surface.", "comment": "Page lists dry-air shares: nitrogen 78.084%, oxygen 20.946%, argon 0.934%, carbon dioxide 0.042%, so N most common, O, Ar and CO2 (C) all supported. The page does not mention atoms or molecules, so 'made of atoms and molecules' is not backed by it (general knowledge). Argon being a noble gas is not checked on the page. Quote via WebFetch extraction."}
+  ],
+  "problems": ["Page does not say air is made of atoms and molecules", "'Ar: a noble gas' not confirmed on page", "Publisher on page is NOAA; row says NOAA National Weather Service (JetStream is an NWS site, so acceptable)"],
+  "suggestedFix": null
+ },
+ {
+  "id": "ref-nps-mapr-hanford",
+  "status": "ok",
+  "fetch": {"url": "https://www.nps.gov/mapr/learn/historyculture/hanford-places.htm", "finalUrl": "https://www.nps.gov/mapr/learn/historyculture/hanford-places.htm", "httpResult": "200, real content", "pageTitle": "Hanford Places - Manhattan Project National Historical Park", "pagePublisher": "U.S. National Park Service"},
+  "identity": "close",
+  "proposedUrl": null,
+  "proposedTitle": null,
+  "citations": [
+   {"where": "map site \"Hanford\" (1940s)", "verdict": "supports", "quote": "Workers at the Hanford Site constructed and operated the world's first nuclear production reactors", "comment": "Page also says the plutonium was used in the Trinity Test, that Hanford Engineer Works produced plutonium for the Manhattan Project, and places it along the Columbia River in Washington state. Quote via WebFetch extraction."}
+  ],
+  "problems": ["Row title says 'Hanford, Washington (...)', page title is 'Hanford Places - Manhattan Project National Historical Park'"],
+  "suggestedFix": "Set the title to the page's real title: 'Hanford Places - Manhattan Project National Historical Park'."
+ },
+ {
+  "id": "ref-nps-mapr-losalamos",
+  "status": "problem",
+  "fetch": {"url": "https://www.nps.gov/mapr/learn/historyculture/losalamos-places.htm", "finalUrl": "https://www.nps.gov/mapr/learn/historyculture/losalamos-places.htm", "httpResult": "200, real content", "pageTitle": "Los Alamos places - Manhattan Project National Historical Park", "pagePublisher": "U.S. National Park Service"},
+  "identity": "close",
+  "proposedUrl": null,
+  "proposedTitle": null,
+  "citations": [
+   {"where": "map site \"Los Alamos\" (1940s)", "verdict": "partial", "quote": "J. Robert Oppenheimer, Norris Bradbury, Richard Feynman, Hans Bethe, and many more luminaries.", "comment": "Named scientists supported. Secret laboratory in New Mexico supported ('Manhattan Project administrators found an ideal location for the secret laboratory'). The page never says 'mesa' (searched for it explicitly, twice, via extraction) and does not say 'World War II' (it says 'During the Manhattan Project'). 'Project leaders chose a mesa' is therefore not on this page. Quote via WebFetch extraction."}
+  ],
+  "problems": ["'mesa' does not appear on the page", "'World War II' not used on the page", "Row title 'Los Alamos, New Mexico (...)' differs from page title 'Los Alamos places - ...'"],
+  "suggestedFix": "Reword to 'Project leaders chose Los Alamos, New Mexico, for a secret laboratory', or cite a source that mentions the mesa; fix title to the page's."
+ },
+ {
+  "id": "ref-nps-mapr-oakridge",
+  "status": "ok",
+  "fetch": {"url": "https://www.nps.gov/mapr/learn/historyculture/oakridge-places.htm", "finalUrl": "https://www.nps.gov/mapr/learn/historyculture/oakridge-places.htm", "httpResult": "200, real content", "pageTitle": "Oak Ridge Places - Manhattan Project National Historical Park", "pagePublisher": "U.S. National Park Service"},
+  "identity": "close",
+  "proposedUrl": null,
+  "proposedTitle": null,
+  "citations": [
+   {"where": "map site \"Oak Ridge\" (1942)", "verdict": "supports", "quote": "The facilities in Oak Ridge produced enriched uranium for use in the world's first atomic bomb, Little Boy.", "comment": "Also: top-secret program 'beginning in 1942' and 'the headquarters for the project after relocating from New York City'. All parts of the claim found. Quotes via WebFetch extraction."}
+  ],
+  "problems": ["Row title 'Oak Ridge, Tennessee (...)' differs from page title 'Oak Ridge Places - ...'"],
+  "suggestedFix": "Set the title to the page's real title."
+ },
+ {
+  "id": "ref-nps-mapr-trinity",
+  "status": "ok",
+  "fetch": {"url": "https://www.nps.gov/mapr/learn/historyculture/trinity.htm", "finalUrl": "https://www.nps.gov/mapr/learn/historyculture/trinity.htm", "httpResult": "200, real content", "pageTitle": "Trinity - Manhattan Project National Historical Park (U.S. National Park Service)", "pagePublisher": "U.S. National Park Service"},
+  "identity": "close",
+  "proposedTitle": null,
+  "proposedUrl": null,
+  "citations": [
+   {"where": "map site \"Trinity Site\" (1945)", "verdict": "supports", "quote": "the detonation of the world's first atomic test device, codenamed the \"Gadget\" at the Alamogordo Gun Range.", "comment": "5:30 am on July 16, 1945 matches. Page says 'atomic test device' (claim says 'nuclear', same meaning). Exposure: page says the test 'exposed local people who lived near or downwind from the blast to dangerous levels of radiation', 'leading to long lasting impacts on residents' health.' Quotes via WebFetch extraction."}
+  ],
+  "problems": ["Row title 'Trinity Site' vs page title 'Trinity - Manhattan Project National Historical Park'"],
+  "suggestedFix": null
+ },
+ {
+  "id": "ref-nrc-doses-daily-lives",
+  "status": "blocked",
+  "fetch": {"url": "https://www.nrc.gov/about-nrc/radiation/around-us/doses-daily-lives.html", "finalUrl": null, "httpResult": "403 Forbidden (two attempts; also 403 on the newer URL https://www.nrc.gov/facilities-safety/radiation-protection/radiation-all-around-us/doses-in-our-daily-lives)", "pageTitle": null, "pagePublisher": null},
+  "identity": "close",
+  "proposedUrl": null,
+  "proposedTitle": null,
+  "citations": [
+   {"where": "safety card \"Background radiation\"", "verdict": "not-checked (blocked)", "quote": null, "comment": "Page not fetched. A WebSearch result (snippet only, NOT a fetched page) lists a page titled 'Doses in Our Daily Lives' at the newer URL above and describes radon as most of background exposure, medical as nearly all man-made exposure, and potassium-40 from food and water; this is not verification."}
+  ],
+  "problems": ["Blocked by 403; claims unchecked", "The stored URL may be outdated: search shows the page now at /facilities-safety/radiation-protection/radiation-all-around-us/doses-in-our-daily-lives (not fetched successfully)"],
+  "suggestedFix": "A person should open the page in a browser to verify the four steps, and check whether the URL has moved."
+ },
+ {
+  "id": "ref-nrc-radiation-faq",
+  "status": "problem",
+  "fetch": {"url": "https://www.nrc.gov/about-nrc/radiation/related-info/faq", "finalUrl": "https://www.nrc.gov/about-nrc/radiation/related-info/faq", "httpResult": "200, real content", "pageTitle": "Frequently Asked Questions (FAQ) About Radiation Protection", "pagePublisher": "U.S. Nuclear Regulatory Commission"},
+  "identity": "exact",
+  "proposedUrl": null,
+  "proposedTitle": null,
+  "citations": [
+   {"where": "safety card \"Myth: exposure makes you radioactive\"", "verdict": "partial", "quote": "being exposed to radiation does not make one radioactive, except in very specific circumstances.", "comment": "Page hedges with 'except in very specific circumstances'; the card states it flatly. The extraction found nothing on x-rays not contaminating a person, nor on washing material off skin or clothes (not found, but extraction may be lossy)."},
+   {"where": "safety card \"Myth: microwaves are nuclear radiation\"", "verdict": "partial", "quote": "The type of radiation that actually has sufficient energy to remove electrons from atoms is called ionizing radiation.", "comment": "Also 'Microwave radiation is non-ionizing radiation.' supported. Page lists radio and television waves among familiar radiation but was not seen calling radio waves non-ionizing; 'microwaves make electrons vibrate to make heat' and 'damage tissue and DNA' not seen."},
+   {"where": "safety card \"Myth: a plant can blow up like a bomb\"", "verdict": "partial", "quote": "The material in a reactor is distributed in such a way that it does not release energy instantaneously.", "comment": "Also 'Even a nuclear reactor does not explode.' and 'a controlled reaction that sustains energy production'. The final step (a serious accident could still release radiation and officials would monitor it) was not seen on this page."}
+  ],
+  "problems": ["Card 1 drops the page's 'except in very specific circumstances' caveat", "x-ray / washed-off step not found on page", "radio waves non-ionizing, microwave heating mechanism and accident-release step not found on page", "Quotes and absences come from WebFetch's text extraction; recheck in a browser"],
+  "suggestedFix": "Add the caveat to card 1 or cite an additional source for the x-ray and decontamination steps; cite another source for the accident-release and radio-wave statements, or have a person confirm they appear on the page."
+ },
+ {
+  "id": "ref-nrc-tmi",
+  "status": "blocked",
+  "fetch": {"url": "https://www.nrc.gov/reading-rm/doc-collections/fact-sheets/3mile-isle.html", "finalUrl": null, "httpResult": "403 Forbidden", "pageTitle": null, "pagePublisher": null},
+  "identity": "exact",
+  "proposedUrl": null,
+  "proposedTitle": null,
+  "citations": [
+   {"where": "map site \"Three Mile Island\" (1979)", "verdict": "not-checked (blocked)", "quote": null, "comment": "Page not fetched. A WebSearch result (snippet only, NOT a fetched page) lists 'Backgrounder on the Three Mile Island Accident' at this URL and describes a partial meltdown on March 28, 1979, a stuck-open relief valve with instruments showing it closed, no detectable health effects, and changes in training and oversight; this is not verification."}
+  ],
+  "problems": ["Blocked by 403; claims unchecked"],
+  "suggestedFix": "A person should open the page in a browser and confirm 'Unit 2', the stuck-open valve and the no-detectable-health-effects wording."
+ }
+]

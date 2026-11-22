@@ -1,0 +1,170 @@
+[
+ {
+  "id": "ref-openstax-up3-ch10",
+  "status": "problem",
+  "fetch": {"url": "https://openstax.org/books/university-physics-volume-3/pages/10-introduction", "finalUrl": "https://openstax.org/books/university-physics-volume-3/pages/10-introduction", "httpResult": "200, real content", "pageTitle": "Ch. 10 Introduction - University Physics Volume 3 | OpenStax", "pagePublisher": "OpenStax (Rice University)"},
+  "identity": "close",
+  "proposedUrl": null,
+  "proposedTitle": null,
+  "citations": [
+   {"where": "lesson protons-neutrons-electrons", "verdict": "topic-only", "quote": null, "comment": "The cited chapter-introduction page only says the nucleus is at the centre and has protons and neutrons ('The nucleus lies at the center of an atom, and consists of protons and neutrons.'). The claim (tiny, nearly all the mass) IS stated on section page 10.1 (pages/10-1-properties-of-nuclei, fetched): 'the nucleus containing nearly all of the mass of the atom in a tiny region of space' (quote from 10.1, not from the cited URL)."},
+   {"where": "lesson stable-and-unstable-nuclei", "verdict": "topic-only", "quote": null, "comment": "Intro page has no stability text. Section 10.1 (fetched) has 'The number of neutrons is generally greater than the number of protons for Z>15.' and a nuclide-chart caption separating stable and unstable nuclei, so the topic is covered in 10.1, not at the cited URL."},
+   {"where": "lesson why-nuclei-decay", "verdict": "topic-only", "quote": null, "comment": "Neither the intro nor section 10.3 (fetched) says that decay of a single nucleus is random while many nuclei are regular. 10.3 only treats decay in aggregate ('The decay rate is proportional to the number of original (undecayed) nuclei N in a substance.')."},
+   {"where": "lesson half-life", "verdict": "topic-only", "quote": null, "comment": "Not on the intro page. Section 10.3 (fetched) defines half-life ('is defined as the time for half of the original nuclei to decay') and exponential decay, but does NOT state that half-lives vary enormously (it only points to a nuclide chart)."},
+   {"where": "unit inside-the-atom (topic-level)", "verdict": "topic-only", "quote": null, "comment": "Chapter is on nuclear physics; fine at topic level."},
+   {"where": "unit radioactivity (topic-level)", "verdict": "topic-only", "quote": null, "comment": "Chapter 10.3 is on radioactive decay; fine at topic level."},
+   {"where": "blog \"nobody knows when\"", "verdict": "topic-only", "quote": null, "comment": "Parent/daughter, per-nucleus randomness versus a regular crowd, and heat/cold not changing the rate are not stated in the fetched 10.1 or 10.3. Section 10.3 only says Becquerel's radiation 'does not vary with changes in temperature or pressure' (as evidence of nuclear origin), not a decay-rate statement about nuclei. Page is on topic but does not state the claim; the randomness claim needs another source."}
+  ],
+  "problems": [
+   "Cited URL is the chapter introduction, which contains none of the specific claims.",
+   "Claims about nucleus size/mass are in section 10.1 and half-life/exponential decay in section 10.3, so the reference should point at those section pages.",
+   "No fetched OpenStax page states that decay of a single nucleus is random, nor that half-lives vary enormously.",
+   "Year 2016 not checked on page."
+  ],
+  "suggestedFix": "Cite sections 10.1 (properties of nuclei) and 10.3 (radioactive decay) instead of the introduction; use a different source for single-nucleus randomness and the wide range of half-lives, or soften those lesson claims."
+ },
+ {
+  "id": "ref-osti-cp1",
+  "status": "ok",
+  "fetch": {"url": "https://www.osti.gov/opennet/manhattan-project-history/Events/1942-1944_pu/cp-1_critical.htm", "finalUrl": "https://www.osti.gov/opennet/manhattan-project-history/Events/1942-1944_pu/cp-1_critical.htm", "httpResult": "200, real content", "pageTitle": "Manhattan Project: CP-1 Goes Critical, Met Lab, December 2, 1942", "pagePublisher": "Not named on the page text; links and credits point to the U.S. Department of Energy History Program (Manhattan Project history pages hosted on osti.gov)"},
+  "identity": "close",
+  "proposedUrl": null,
+  "proposedTitle": null,
+  "citations": [
+   {"where": "map site \"Chicago Pile-1\" (1942)", "verdict": "supports", "quote": "On December 2, 1942, after a series of frustrating delays, CP-1 first achieved a self-sustaining fission chain reaction.", "comment": "Location: page says 'In an abandoned squash court under the west grandstand of the University of Chicago's Stagg Field' (quote cut off by fetch tool, but that is the exact opening text). Fermi's lead: 'Fermi ordered the electrically-operated control rods removed.' Claim says 'former squash court under the stands'; page says 'abandoned' and 'west grandstand', consistent."}
+  ],
+  "problems": [
+   "Page title is longer than the row title ('Manhattan Project: CP-1 Goes Critical, Met Lab, December 2, 1942' vs 'CP-1 goes critical').",
+   "Publisher not stated on the page text itself; attribution to DOE is inferred from links/credits."
+  ],
+  "suggestedFix": "Optionally update title to the page's full title and year to 1942."
+ },
+ {
+  "id": "ref-ready-nuclear-explosion",
+  "status": "problem",
+  "fetch": {"url": "https://www.ready.gov/nuclear-explosion", "finalUrl": "unknown (the fetch tool reported the page content only; no redirect shown, but the content served is the page titled 'Radiation Emergencies')", "httpResult": "200, real content, but it is the Radiation Emergencies page", "pageTitle": "Radiation Emergencies | Ready.gov (H1: Radiation Emergencies), last updated 01/07/2025", "pagePublisher": "Ready.gov, official site of the U.S. Department of Homeland Security (FEMA)"},
+  "identity": "different",
+  "proposedUrl": null,
+  "proposedTitle": null,
+  "citations": [
+   {"where": "safety card \"Get inside, stay inside, stay tuned\"", "verdict": "partial", "quote": "The best way to stay safe in any radiation emergency is to get inside, stay inside and stay tuned.", "comment": "Also 'Sheltering usually lasts at least 24 hours.' and 'Have a battery-powered or hand crank radio, which will continue to work if other forms of communication fail.' Not on the page: 'away from the walls and roof' and the 'TV, radio or social media' list (TV and social media absent). 'Do not leave shelter until officials say it is safe' matches the idea of being 'informed by authorities that it is safe to leave'."},
+   {"where": "safety card \"What makes a good shelter\"", "verdict": "partial", "quote": "The safest buildings have brick or concrete walls.", "comment": "Also supported: 'Put as many walls between you and the outside to protect you from the radiation outside.' and 'Underground parking garages and subways can also provide good shelter.' and the basement or center of a large building. 'Cars offer poor protection' appears only as an image description ('inside a car is also marked as not safe'), not in prose. The fan/air-conditioner step is supported by 'turn off fans, air conditioners, and forced-air heating units that bring air in from the outside.'"},
+   {"where": "safety card \"Why not go out to look\"", "verdict": "partial", "quote": "Radiation levels decrease rapidly, becoming significantly less dangerous, during the first 24 hours.", "comment": "Quote is the closest wording; the page does not state generally that 'radioactive materials weaken over time'. The step about not going to get loved ones from schools, daycares or hospitals is NOT on the page. Supported: do not return until told safe by local authorities; leave shelter only if 'threatened by an immediate hazard' such as fire or gas leak."},
+   {"where": "safety card \"If you were outside\"", "verdict": "supports", "quote": "Removing your outer layer of clothing can remove up to 90% of radioactive material.", "comment": "Also found: 'Be very careful in removing your clothing to prevent radioactive dust from shaking loose.'; 'Do not use household cleaning wipes on your skin. Hand sanitizer does not protect against radioactive material.'; 'Unsealed foods from outside may be contaminated with radioactive material.' 'Put on clean clothes' was not specifically checked."}
+  ],
+  "problems": [
+   "URL /nuclear-explosion serves a page titled 'Radiation Emergencies', not 'Nuclear Explosion' (title mismatch; the URL appears to redirect or alias to /radiation).",
+   "Duplicate of ref-ready-radiation in content terms.",
+   "Card 'Why not go out to look': the schools/daycares/hospitals step is not on the page.",
+   "Card 'Get inside': 'away from the walls and roof' and 'TV ... or social media' not on the page.",
+   "Card 'good shelter': 'Cars offer poor protection' only in an image description, not in text."
+  ],
+  "suggestedFix": "Retitle to 'Radiation Emergencies' or drop this row in favour of ref-ready-radiation; reword the unsupported steps (schools/daycares/hospitals, walls and roof, TV and social media, cars) or find a source that states them."
+ },
+ {
+  "id": "ref-ready-radiation",
+  "status": "ok",
+  "fetch": {"url": "https://www.ready.gov/radiation", "finalUrl": "https://www.ready.gov/radiation", "httpResult": "200, real content", "pageTitle": "Radiation Emergencies | Ready.gov", "pagePublisher": "Ready.gov, official site of the U.S. Department of Homeland Security (FEMA), last updated 01/07/2025"},
+  "identity": "exact",
+  "proposedUrl": null,
+  "proposedTitle": null,
+  "citations": [
+   {"where": "safety card \"If you were outside\"", "verdict": "supports", "quote": "Removing your outer layer of clothing can remove up to 90% of radioactive material.", "comment": "Also: 'Be very careful in removing your clothing to prevent radioactive dust from shaking loose.'; 'take a shower or wash with soap and water to remove any radioactive particles from skin or hair that was not covered.'; 'Do not use household cleaning wipes on your skin. Hand sanitizer does not protect against radioactive material.'; 'Unsealed foods from outside may be contaminated with radioactive material.' 'Put on clean clothes' not specifically checked. Number 90% matches. Page uses 'Radiation Emergencies' publisher site stated as DHS, row says FEMA (FEMA is a DHS component; acceptable)."}
+  ],
+  "problems": [],
+  "suggestedFix": null
+ },
+ {
+  "id": "ref-rutherford-1911",
+  "status": "blocked",
+  "fetch": {"url": "https://doi.org/10.1080/14786440508637080", "finalUrl": "https://www.tandfonline.com/doi/full/10.1080/14786440508637080 (DOI redirect 302; cross-host)", "httpResult": "DOI 302 to Taylor & Francis; tandfonline returned 403 Forbidden (blocked, not worked around)", "pageTitle": null, "pagePublisher": "Taylor & Francis (Philosophical Magazine), per redirect target"},
+  "identity": "close",
+  "proposedUrl": null,
+  "proposedTitle": null,
+  "citations": [
+   {"where": "lesson protons-neutrons-electrons: gold-foil experiment (optional story)", "verdict": "not-checked (blocked)", "quote": null, "comment": "Publisher page blocked (403). A WebSearch result (search snippet, NOT a fetched page) gave the citation as E. Rutherford, 'The scattering of alpha and beta particles by matter and the structure of the atom', Philosophical Magazine, vol. 21 (1911), pp. 669-688, issue 125, DOI 10.1080/14786440508637080, which agrees with the row, and describes it as the paper where Rutherford explains the experiments that led to the planetary (nuclear) atom."}
+  ],
+  "problems": [
+   "Could not fetch the publisher page (HTTP 403); identity inferred only from the DOI redirect target and a search snippet.",
+   "Row title says 'alpha and beta' and the paper's title uses Greek letters; not an actual mismatch."
+  ],
+  "suggestedFix": "A person should open the DOI in a browser to confirm title and abstract. The DOI itself resolves to Taylor & Francis."
+ },
+ {
+  "id": "ref-who-ionizing-radiation",
+  "status": "problem",
+  "fetch": {"url": "https://www.who.int/news-room/fact-sheets/detail/ionizing-radiation-and-health-effects", "finalUrl": "https://www.who.int/news-room/fact-sheets/detail/ionizing-radiation-and-health-effects", "httpResult": "200, real content (fact sheet dated 27 July 2023 per the page)", "pageTitle": "Ionizing radiation and health effects", "pagePublisher": "World Health Organization"},
+  "identity": "exact",
+  "proposedUrl": null,
+  "proposedTitle": null,
+  "citations": [
+   {"where": "safety card \"Background radiation\"", "verdict": "partial", "quote": "Radon, a naturally-occurring gas, emanates from rock and soil and is the main source of natural radiation.", "comment": "Also supported: 'People are also exposed to natural radiation from cosmic rays, particularly at high altitude.' and 'Medical use of radiation accounts for 98 % of the population dose contribution from all human-made sources' (matches 'nearly all'). NOT on the page: 'always been all around us', potassium-40 (food and water are mentioned only as 'inhale and ingest radionuclides from air, food and water'). Also 'Earth' as a source is worded as soil and rock."},
+   {"where": "safety card \"What a dose is\"", "verdict": "partial", "quote": "the absorbed dose which is expressed in a unit called the gray (Gy).", "comment": "Also: 'The sievert (Sv) is the unit of effective dose that takes into account the type of radiation'; 'These effects are more severe at higher doses and higher dose rates.' Dose rate is described as the speed at which a dose is delivered (microsieverts or millisieverts per time unit). Low-dose line: 'the risk is substantially low because there is a greater likelihood of repairing the damage.' Wording of the card is looser than the page but the substance matches."},
+   {"where": "safety card \"Myth: any radiation is deadly\"", "verdict": "partial", "quote": "the dose threshold for acute radiation syndrome is about 1 Sv (1000 mSv).", "comment": "Acute radiation syndrome needing a very high dose is supported ('acute radiation syndrome can occur when doses of radiation exceed very high levels'); cancer risk rises with dose is supported ('Effects of this type will not always occur, but their likelihood is proportional to the radiation dose.'); low doses delivered slowly lower risk supported. NOT stated: that 'environmental levels do not cause immediate effects', and the page also says cancer risk may increase even at 50-100 mSv, which the card does not mention. The 'short time' framing is not verified verbatim."}
+  ],
+  "problems": [
+   "Background card: 'always been all around us' and potassium-40 are not on the page.",
+   "Myth card: 'environmental levels do not cause immediate effects' is not stated on the page.",
+   "Fetch tool summarises pages; quotes were returned by the tool and match its extracted text, but longer sentences were not all checked verbatim."
+  ],
+  "suggestedFix": "Reword the background card (drop 'always' and potassium-40 or add a source such as UNSCEAR/IAEA for them) and the environmental-levels line, or add a second source that states them."
+ },
+ {
+  "id": "ref-wna-chernobyl",
+  "status": "ok",
+  "fetch": {"url": "https://world-nuclear.org/information-library/safety-and-security/safety-of-plants/chernobyl-accident", "finalUrl": "https://world-nuclear.org/information-library/safety-and-security/safety-of-plants/chernobyl-accident", "httpResult": "200, real content", "pageTitle": "Chernobyl Accident 1986 - World Nuclear Association", "pagePublisher": "World Nuclear Association"},
+  "identity": "exact",
+  "proposedUrl": null,
+  "proposedTitle": null,
+  "citations": [
+   {"where": "map site \"Chernobyl\" (1986)", "verdict": "supports", "quote": "...causing a steam explosion and releasing fission products to the atmosphere.", "comment": "Date: 'preceded the attempted test early on 26 April' (the full date '26 April 1986' not verbatim in one sentence; title says 1986). Turbine test at reactor 4: 'On 25 April, prior to a routine shutdown, the reactor crew at Chernobyl 4 began preparing for a test...' (page text on purpose: 'a test to determine how long turbines would spin and supply power'). Destroyed: 'The accident destroyed the Chernobyl 4 reactor.' Cause: 'was the product of a flawed Soviet reactor design coupled with serious mistakes made by the plant operators'. Page also says a second explosion followed, of disputed character; the card only mentions one steam explosion (simplification)."}
+  ],
+  "problems": [],
+  "suggestedFix": null
+ },
+ {
+  "id": "ref-wna-fukushima",
+  "status": "ok",
+  "fetch": {"url": "https://world-nuclear.org/information-library/safety-and-security/safety-of-plants/fukushima-daiichi-accident", "finalUrl": "https://world-nuclear.org/information-library/safety-and-security/safety-of-plants/fukushima-daiichi-accident", "httpResult": "200, real content (first 100000 of about 120000 characters read)", "pageTitle": "Fukushima Daiichi Accident - World Nuclear Association", "pagePublisher": "World Nuclear Association"},
+  "identity": "exact",
+  "proposedUrl": null,
+  "proposedTitle": null,
+  "citations": [
+   {"where": "map site \"Fukushima Daiichi\" (2011)", "verdict": "partial", "quote": "the operating units 1-3 were automatically shut down in response to it, as designed", "comment": "Also: 'The Great East Japan Earthquake of magnitude 9.0 at 2.46 pm on Friday 11 March 2011'; 'the entire site was flooded by the 15-metre tsunami'; 'There was a station blackout, and the reactors were isolated from their ultimate heat sink.'; 'the reactor cores in units 1-3 overheated, the nuclear fuel melted'. The explicit phrase 'could not remove decay heat' was not found verbatim in the part read; the closest is the heat-sink / station-blackout sentence. Substance of the card is supported."}
+  ],
+  "problems": [
+   "Explicit 'decay heat could not be removed' wording not found verbatim (substance covered by station blackout and loss of ultimate heat sink).",
+   "Last ~20,000 characters of the page were not read."
+  ],
+  "suggestedFix": null
+ },
+ {
+  "id": "ref-wna-radwaste",
+  "status": "problem",
+  "fetch": {"url": "https://world-nuclear.org/information-library/nuclear-fuel-cycle/nuclear-wastes/radioactive-waste-management", "finalUrl": "https://world-nuclear.org/information-library/nuclear-fuel-cycle/nuclear-wastes/radioactive-waste-management", "httpResult": "200, real content (page updated 22 November 2025 per the page)", "pageTitle": "Radioactive Waste Management - World Nuclear Association", "pagePublisher": "World Nuclear Association"},
+  "identity": "exact",
+  "proposedUrl": null,
+  "proposedTitle": null,
+  "citations": [
+   {"where": "map site \"Oklo\" (2 billion yrs)", "verdict": "partial", "quote": "The most significant case occurred almost 2 billion years ago at Oklo", "comment": "Same section: 'several spontaneous nuclear reactors operated within a rich vein of uranium ore'. Page places Oklo in Gabon, West Africa. NOT found: that natural water slowed the neutrons so the chain reaction could sustain itself (the page mentions water only for shielding and cooling spent fuel). 'About two billion years' vs 'almost 2 billion' is a fair match. The reference is a waste-management page with Oklo only as a side example in 'Natural precedents for geological disposal'."}
+  ],
+  "problems": [
+   "Oklo is a side example on a waste-management page; the mechanism claim (water moderating neutrons) is not on the page.",
+   "Better source would be a dedicated Oklo / natural nuclear reactor page, which was not looked up."
+  ],
+  "suggestedFix": "Cite a dedicated Oklo natural-reactor source (check it states water as moderator) or remove the moderator claim from the map site text."
+ },
+ {
+  "id": "ref-wna-russia",
+  "status": "ok",
+  "fetch": {"url": "https://world-nuclear.org/information-library/country-profiles/countries-o-s/russia-nuclear-power", "finalUrl": "https://world-nuclear.org/information-library/country-profiles/countries-o-s/russia-nuclear-power", "httpResult": "200, real content", "pageTitle": "Nuclear Power in Russia - World Nuclear Association", "pagePublisher": "World Nuclear Association"},
+  "identity": "exact",
+  "proposedUrl": null,
+  "proposedTitle": null,
+  "citations": [
+   {"where": "map site \"Obninsk\" (1954)", "verdict": "supports", "quote": "Russia's first nuclear power plant, and the first in the world to produce electricity in 1954, was the 5 MWe Obninsk reactor.", "comment": "Numbers (5 MWe, 1954) match."}
+  ],
+  "problems": [],
+  "suggestedFix": null
+ }
+]

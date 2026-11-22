@@ -1,0 +1,143 @@
+[
+ {
+  "id": "ref-openstax-ap-elements",
+  "status": "problem",
+  "fetch": {"url": "https://openstax.org/books/anatomy-and-physiology-2e/pages/2-1-elements-and-atoms-the-building-blocks-of-matter", "finalUrl": "https://openstax.org/books/anatomy-and-physiology-2e/pages/2-1-elements-and-atoms-the-building-blocks-of-matter", "httpResult": "200, real content", "pageTitle": "2.1 Elements and Atoms: The Building Blocks of Matter - Anatomy and Physiology 2e | OpenStax", "pagePublisher": "OpenStax (Rice University)"},
+  "identity": "exact",
+  "proposedUrl": null,
+  "proposedTitle": null,
+  "citations": [
+    {"where": "scan target \"A grain of rice\"", "verdict": "partial", "quote": "In glucose, there are always six carbon and six oxygen units for every twelve hydrogen units.", "comment": "Supports glucose being C, H and O only. The page does not mention rice or starch, nor that starch is glucose joined in chains."},
+    {"where": "scan target \"Your hand\"", "verdict": "partial", "quote": "beginning with the most abundant: oxygen (O), carbon (C), hydrogen (H), and nitrogen (N).", "comment": "Lists the four in order of abundance. The page does not use the words 'four most abundant' in that sentence, and I did not find a sentence saying only four make up most of the body, but the claim is a fair reading of the list and Figure 2.2. Reviewer should look at the figure/table."},
+    {"where": "scan target \"A gold bar\"", "verdict": "partial", "quote": "cannot be created or broken down by ordinary chemical means.", "comment": "Supports the definition of an element (cannot be broken down). Gold is not mentioned on the page, so 'gold is an element' and 'a bar holds only gold atoms' rest on general knowledge, not on this source."}
+  ],
+  "problems": ["Cited for rice/starch and gold claims, neither of which the page mentions", "Quote for the four-most-abundant claim is a list, not an explicit 'four most abundant' statement"],
+  "suggestedFix": "Keep for the human-body elements and the element definition. Back the rice claim with Biology 2e 3.2 (already cited) and the gold claim with a periodic-table or element source; drop this row from the rice and gold targets."
+ },
+ {
+  "id": "ref-openstax-ap-erythrocytes",
+  "status": "ok",
+  "fetch": {"url": "https://openstax.org/books/anatomy-and-physiology-2e/pages/18-3-erythrocytes", "finalUrl": "https://openstax.org/books/anatomy-and-physiology-2e/pages/18-3-erythrocytes", "httpResult": "200, real content", "pageTitle": "18.3 Erythrocytes - Anatomy and Physiology 2e | OpenStax", "pagePublisher": "OpenStax (Rice University)"},
+  "identity": "exact",
+  "proposedUrl": null,
+  "proposedTitle": null,
+  "citations": [
+    {"where": "scan target \"A red blood cell\"", "verdict": "supports", "quote": "Hemoglobin is a large molecule made up of proteins and iron.", "comment": "Also: 'In the lungs, hemoglobin picks up oxygen, which binds to the iron ions, forming oxyhemoglobin.' Covers oxygen carriage and iron. The C/H/N composition chips are not stated here but follow from protein (see the organic compounds page)."}
+  ],
+  "problems": [],
+  "suggestedFix": null
+ },
+ {
+  "id": "ref-openstax-ap-hair",
+  "status": "problem",
+  "fetch": {"url": "https://openstax.org/books/anatomy-and-physiology-2e/pages/5-2-accessory-structures-of-the-skin", "finalUrl": "https://openstax.org/books/anatomy-and-physiology-2e/pages/5-2-accessory-structures-of-the-skin", "httpResult": "200, real content", "pageTitle": "5.2 Accessory Structures of the Skin - Anatomy and Physiology 2e | OpenStax", "pagePublisher": "OpenStax (Rice University)"},
+  "identity": "exact",
+  "proposedUrl": null,
+  "proposedTitle": null,
+  "citations": [
+    {"where": "scan target \"A strand of hair\"", "verdict": "partial", "quote": "Hair is a keratinous filament growing out of the epidermis.", "comment": "Supports hair being a keratin filament (also: 'The external hair is completely dead and composed entirely of keratin.'). The page does not say keratin is a protein and does not mention nitrogen or sulfur; those claims depend on the organic compounds page."}
+  ],
+  "problems": ["Page does not state keratin is a protein, nor that proteins contain nitrogen or sulfur"],
+  "suggestedFix": "Fine as the hair/keratin source, but the protein and N/S parts are carried by ref-openstax-ap-organic; make the citation note say so."
+ },
+ {
+  "id": "ref-openstax-ap-organic",
+  "status": "ok",
+  "fetch": {"url": "https://openstax.org/books/anatomy-and-physiology-2e/pages/2-5-organic-compounds-essential-to-human-functioning", "finalUrl": "https://openstax.org/books/anatomy-and-physiology-2e/pages/2-5-organic-compounds-essential-to-human-functioning", "httpResult": "200, real content", "pageTitle": "2.5 Organic Compounds Essential to Human Functioning - Anatomy and Physiology 2e | OpenStax", "pagePublisher": "OpenStax (Rice University)"},
+  "identity": "exact",
+  "proposedUrl": null,
+  "proposedTitle": null,
+  "citations": [
+    {"where": "scan target \"A strand of hair\"", "verdict": "supports", "quote": "all proteins also contain nitrogen (N), and many contain sulfur (S)", "comment": "Quote is a fragment as extracted; also says 'in addition to carbon, hydrogen, and oxygen'. The page names the keratin in the epidermis as a protein example, so keratin is a protein is supported; hair itself is covered by the 5.2 page."},
+    {"where": "scan target \"A red blood cell\"", "verdict": "supports", "quote": "hemoglobin, a protein in red blood cells which transports oxygen to body tissues", "comment": "Hemoglobin is a protein that carries oxygen; proteins contain C, H, O, N. Iron is covered by the erythrocytes page."}
+  ],
+  "problems": [],
+  "suggestedFix": null
+ },
+ {
+  "id": "ref-openstax-bio-carbs",
+  "status": "problem",
+  "fetch": {"url": "https://openstax.org/books/biology-2e/pages/3-2-carbohydrates", "finalUrl": "https://openstax.org/books/biology-2e/pages/3-2-carbohydrates", "httpResult": "200, real content", "pageTitle": "3.2 Carbohydrates - Biology 2e | OpenStax", "pagePublisher": "OpenStax (Rice University)"},
+  "identity": "exact",
+  "proposedUrl": null,
+  "proposedTitle": null,
+  "citations": [
+    {"where": "scan target \"A grain of rice\"", "verdict": "partial", "quote": "The chemical formula for glucose is C6H12O6.", "comment": "Supports glucose being carbon, hydrogen and oxygen only, and glucose as an energy source ('In humans, glucose is an important source of energy.'). Starch as glucose polymers appears on the page, but the fetch tool's wording for that sentence was inconsistent between two requests, so I do not give a verbatim quote for it; a person should read the Starch section. Rice is only mentioned in passing as an ancient crop."}
+  ],
+  "problems": ["Starch-is-glucose-chains sentence could not be quoted reliably; confirm by reading the page", "Does not say rice is mostly starch"],
+  "suggestedFix": "Acceptable for glucose and starch; a person should confirm the starch sentence. 'Mostly starch' for rice is not in this source."
+ },
+ {
+  "id": "ref-openstax-bio-photosynthesis",
+  "status": "problem",
+  "fetch": {"url": "https://openstax.org/books/biology-2e/pages/8-1-overview-of-photosynthesis", "finalUrl": "https://openstax.org/books/biology-2e/pages/8-1-overview-of-photosynthesis", "httpResult": "200, real content", "pageTitle": "8.1 Overview of Photosynthesis - Biology 2e | OpenStax", "pagePublisher": "OpenStax (Rice University)"},
+  "identity": "exact",
+  "proposedUrl": null,
+  "proposedTitle": null,
+  "citations": [
+    {"where": "scan target \"A blade of grass\"", "verdict": "partial", "quote": "Photosynthesis uses solar energy, carbon dioxide, and water to produce energy-storing carbohydrates.", "comment": "Supports plants making sugar/carbohydrate from sunlight, carbon dioxide and water; the equation description gives six CO2 and six water making one sugar and six oxygen. The page did not state that the carbon in a plant comes from the air in so many words (it describes stomata gas exchange), so that sentence is inference. 'Grass' is not named."}
+  ],
+  "problems": ["'Much of the carbon was once part of the air' is an inference, not stated"],
+  "suggestedFix": "Keep; soften the scan text or accept the inference (carbon enters as CO2 from the air)."
+ },
+ {
+  "id": "ref-openstax-chem-10-5",
+  "status": "ok",
+  "fetch": {"url": "https://openstax.org/books/chemistry-2e/pages/10-5-the-solid-state-of-matter", "finalUrl": "https://openstax.org/books/chemistry-2e/pages/10-5-the-solid-state-of-matter", "httpResult": "200, real content", "pageTitle": "10.5 The Solid State of Matter - Chemistry 2e | OpenStax", "pagePublisher": "OpenStax (Rice University)"},
+  "identity": "exact",
+  "proposedUrl": null,
+  "proposedTitle": null,
+  "citations": [
+    {"where": "scan target \"A diamond\"", "verdict": "supports", "quote": "Diamond is extremely hard because of the strong bonding between carbon atoms in all directions.", "comment": "Also: 'The atoms in these solids are held together by a network of covalent bonds'. Network solid and diamond-as-carbon are covered. The exact phrase 'covalent network solid' was not quoted by me but the section is on covalent network solids."}
+  ],
+  "problems": [],
+  "suggestedFix": null
+ },
+ {
+  "id": "ref-openstax-chem-2-4",
+  "status": "problem",
+  "fetch": {"url": "https://openstax.org/books/chemistry-2e/pages/2-4-chemical-formulas", "finalUrl": "https://openstax.org/books/chemistry-2e/pages/2-4-chemical-formulas", "httpResult": "200, real content", "pageTitle": "2.4 Chemical Formulas - Chemistry 2e | OpenStax", "pagePublisher": "OpenStax (Rice University)"},
+  "identity": "exact",
+  "proposedUrl": null,
+  "proposedTitle": null,
+  "citations": [
+    {"where": "scan target \"A glass of water\"", "verdict": "topic-only", "quote": null, "comment": "Only sentence on water: 'For example, hydrogen and oxygen can react to form water, and sodium and chlorine can react to form table salt.' The fetch found no H2O and no statement of two hydrogen atoms per oxygen atom. The 2:1 ratio claim is not shown by this fetch; may be in figures/examples the text extraction missed, so a person should check."},
+    {"where": "scan target \"Table salt\"", "verdict": "partial", "quote": "sodium and chlorine can react to form table salt", "comment": "Supports the reaction. 'Joined as ions' and 'nothing like what they were on their own' are not stated in this section (ions appear only in passing); section 2.6 Ionic and Molecular Compounds would fit better."}
+  ],
+  "problems": ["Water 2:1 ratio not found on the page", "Ionic bonding / property change claims not found"],
+  "suggestedFix": "Keep for the salt reaction. For the water ratio and the ions, add or switch to Chemistry 2e 2.6 (Ionic and Molecular Compounds) and verify a sentence about H2O."
+ },
+ {
+  "id": "ref-openstax-chem-ch1",
+  "status": "problem",
+  "fetch": {"url": "https://openstax.org/books/chemistry-2e/pages/1-2-phases-and-classification-of-matter", "finalUrl": "https://openstax.org/books/chemistry-2e/pages/1-2-phases-and-classification-of-matter", "httpResult": "200, real content", "pageTitle": "1.2 Phases and Classification of Matter - Chemistry 2e | OpenStax", "pagePublisher": "OpenStax (Rice University)"},
+  "identity": "exact",
+  "proposedUrl": null,
+  "proposedTitle": null,
+  "citations": [
+    {"where": "lesson atoms-are-everywhere", "verdict": "supports", "quote": "Gases are also matter", "comment": "Page defines matter as 'anything that occupies space and has mass.' Fragment quotes as extracted by the fetch tool; both are short phrases from the page."},
+    {"where": "blog \"The smallest thing you will ever meet\"", "verdict": "partial", "quote": "Gases are also matter", "comment": "Supports only that air is matter (the balloon example is on the page). Not supported by this page: all matter is made of atoms (only 'An atom is the smallest particle of an element'), the heavier pumped-up ball, a virus being 300 times smaller than a skin cell, an atom 300 times smaller again, Democritus and atomos 2,400 years ago, and light and heat not being matter. Those need other sources."}
+  ],
+  "problems": ["Blog cites this page for many numeric and historical claims (300x, 2,400 years, Democritus) that it does not contain", "Light and heat as energy not matter not found here"],
+  "suggestedFix": "Keep for the matter definition and air. Add sources for cell/virus/atom size ratios, Democritus, and light/heat being energy, or soften the blog."
+ },
+ {
+  "id": "ref-openstax-chem-ch2",
+  "status": "problem",
+  "fetch": {"url": "https://openstax.org/books/chemistry-2e/pages/2-introduction", "finalUrl": "https://openstax.org/books/chemistry-2e/pages/2-introduction", "httpResult": "200, real content (chapter introduction page only)", "pageTitle": "Ch. 2 Introduction - Chemistry 2e | OpenStax", "pagePublisher": "OpenStax (Rice University)"},
+  "identity": "close",
+  "proposedUrl": null,
+  "proposedTitle": null,
+  "citations": [
+    {"where": "lesson isotopes", "verdict": "topic-only", "quote": null, "comment": "The intro page is about mass-spec breath analysis and lists the chapter outline; no isotope definition. Section 2.3 Atomic Structure and Symbolism is the right page."},
+    {"where": "lesson atoms-are-everywhere", "verdict": "topic-only", "quote": null, "comment": "Intro page does not state atoms are too small to see. Section 2.1/2.2 would."},
+    {"where": "lesson protons-neutrons-electrons", "verdict": "topic-only", "quote": null, "comment": "No particles, charges or positions on the intro page; section 2.3."},
+    {"where": "lesson elements-and-the-periodic-table", "verdict": "topic-only", "quote": null, "comment": "No atomic number or periodic table text on the intro page; sections 2.3 and 2.5."},
+    {"where": "unit inside-the-atom (topic-level)", "verdict": "topic-only", "quote": null, "comment": "The chapter as a whole (outline: atomic theory, atomic structure, periodic table) covers the topic, but the intro page is only the entry."},
+    {"where": "blog \"The smallest thing you will ever meet\"", "verdict": "not-supported", "quote": null, "comment": "Nothing on the page backs the size ratios, Democritus, or light/heat claims."},
+    {"where": "blog \"Three kinds of carbon\"", "verdict": "not-supported", "quote": null, "comment": "The intro page has no isotope, mass number, carbon-14 or radioactivity text. Mass number and isotopes are in section 2.3; carbon-14 instability and radiation are not in chapter 2 at all (nuclear chemistry chapter 21)."}
+  ],
+  "problems": ["Cited URL is the chapter introduction, which contains no atomic structure content", "Title in row says 'chapter 2: Atoms, Molecules, and Ions'; page title is 'Ch. 2 Introduction' (same chapter, fine)", "Specific lesson and blog claims need section pages"],
+  "suggestedFix": "Replace with section links: 2.1 Early Ideas in Atomic Theory, 2.3 Atomic Structure and Symbolism (isotopes, mass number, particles), 2.5 The Periodic Table; for carbon-14 radioactivity cite the nuclear chemistry chapter."
+ }
+]

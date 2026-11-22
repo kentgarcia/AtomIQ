@@ -1,0 +1,271 @@
+[
+ {
+  "id": "ref-epa-radiation-sources",
+  "status": "ok",
+  "fetch": {
+   "url": "https://www.epa.gov/radiation/radiation-sources-and-doses",
+   "finalUrl": "https://www.epa.gov/radiation/radiation-sources-and-doses",
+   "httpResult": "200 (content loaded; read through WebFetch summariser)",
+   "pageTitle": "Radiation Sources and Doses | US EPA",
+   "pagePublisher": "U.S. Environmental Protection Agency"
+  },
+  "identity": "exact",
+  "proposedUrl": null,
+  "proposedTitle": null,
+  "citations": [
+   {
+    "where": "scan target \"A banana\": Sweet, soft and a good source of potassium. A tiny part of all nat",
+    "verdict": "partial",
+    "quote": "Potassium-40 is found in the food, soil, and water we ingest.",
+    "comment": "Also: 'Traces of radioactive materials can be found in the body, mainly naturally occurring potassium-40.' Page does not say a tiny share of all natural potassium is K-40, and does not mention bananas."
+   }
+  ],
+  "problems": [
+   "Claim 'a tiny part of all natural potassium is radioactive' (the proportion) is not stated; only K-40 in food and the body is supported"
+  ],
+  "suggestedFix": "Keep as source for K-40 in food and body; add a source for the isotope fraction (about 0.01 percent) or reword."
+ },
+ {
+  "id": "ref-gov-uk-calder-hall",
+  "status": "ok",
+  "fetch": {
+   "url": "https://www.gov.uk/government/case-studies/calder-hall-decommissioning-the-worlds-first-commercial-nuclear-power-station",
+   "finalUrl": "https://www.gov.uk/government/case-studies/calder-hall-decommissioning-the-worlds-first-commercial-nuclear-power-station",
+   "httpResult": "200 (content loaded; read through WebFetch summariser)",
+   "pageTitle": "Calder Hall: Decommissioning the world's first commercial nuclear power station",
+   "pagePublisher": "Sellafield Ltd, on GOV.UK"
+  },
+  "identity": "close",
+  "proposedUrl": null,
+  "proposedTitle": null,
+  "citations": [
+   {
+    "where": "map site \"Calder Hall, Sellafield\" (1956): Queen Elizabeth II formally opened Calder Hall ",
+    "verdict": "supports",
+    "quote": "Calder Hall opened on the 17 October 1956 by Her Majesty the Queen, Elizabeth II.",
+    "comment": "Also 'Calder Hall helped establish the UK's civil nuclear industry.' 'World's first commercial nuclear power station' is in the page title/intro, not as a stand-alone body sentence."
+   }
+  ],
+  "problems": [
+   "Page is credited to Sellafield Ltd on GOV.UK; row names 'Nuclear Decommissioning Authority' as publisher (not seen on the fetched text)"
+  ],
+  "suggestedFix": "Optionally change publisher to 'UK Government (Sellafield Ltd)'."
+ },
+ {
+  "id": "ref-grs-oklo",
+  "status": "ok",
+  "fetch": {
+   "url": "https://www.grs.de/en/glossary/oklo-natural-reactor",
+   "finalUrl": "https://www.grs.de/en/glossary/oklo-natural-reactor",
+   "httpResult": "200 (content loaded; read through WebFetch summariser)",
+   "pageTitle": "Oklo natural reactor",
+   "pagePublisher": "Gesellschaft fuer Anlagen- und Reaktorsicherheit (GRS) gGmbH"
+  },
+  "identity": "exact",
+  "proposedUrl": null,
+  "proposedTitle": null,
+  "citations": [
+   {
+    "where": "map site \"Oklo\" (2 billion yrs): In a uranium deposit in what is now Gabon, fission began ",
+    "verdict": "partial",
+    "quote": "About two billion years ago, in a uranium deposit in what is now Gabon, nuclear fission with a chain reaction started",
+    "comment": "Page says natural water 'acted as a moderator' (tool paraphrase, no exact short quote kept). It does not spell out that water slows neutrons, nor that it needed no human help; body text does not name 'Oklo' (title only)."
+   }
+  ],
+  "problems": [
+   "'Water slowed the neutrons' is an inference from 'moderator'; 'no human help' not stated"
+  ],
+  "suggestedFix": "Acceptable for the date, place and moderator; wording of the neutron explanation rests on general physics."
+ },
+ {
+  "id": "ref-hiroshima-museum",
+  "status": "ok",
+  "fetch": {
+   "url": "https://hpmmuseum.jp/?lang=eng",
+   "finalUrl": "https://hpmmuseum.jp/?lang=eng",
+   "httpResult": "200 (content loaded; read through WebFetch summariser)",
+   "pageTitle": "Hiroshima Peace Memorial Museum (page header; HTML title not shown)",
+   "pagePublisher": "Hiroshima Peace Memorial Museum"
+  },
+  "identity": "exact",
+  "proposedUrl": null,
+  "proposedTitle": null,
+  "citations": [
+   {
+    "where": "map site \"Hiroshima\" (1945): An atomic bomb destroyed the city on 6 August 1945. Hiroshima",
+    "verdict": "partial",
+    "quote": "spreads the message of “No More Hiroshimas.”",
+    "comment": "Home page only. It does not state 6 August 1945 (only a 1945 photo caption and 'Aug. 5 and 6' opening notice) and does not mention reconstruction or 'peace memorial city'. Those parts are carried by the Prefecture page."
+   }
+  ],
+  "problems": [
+   "Home page supports only the 'No More Hiroshimas' part of the claim"
+  ],
+  "suggestedFix": "Cite together with ref-hiroshima-pref-bombing; do not rely on this page for the date or the peace memorial city."
+ },
+ {
+  "id": "ref-hiroshima-pref-bombing",
+  "status": "problem",
+  "fetch": {
+   "url": "https://www.pref.hiroshima.lg.jp/site/hiroshimaforpeace-en/reconstruction-atomic-bombing.html",
+   "finalUrl": "https://www.pref.hiroshima.lg.jp/site/hiroshimaforpeace-en/reconstruction-atomic-bombing.html",
+   "httpResult": "200 (content loaded; read through WebFetch summariser)",
+   "pageTitle": "The Path from the Atomic Bombing to Reconstruction of Hiroshima - Hiroshima for Global Peace | Hiroshima Prefectural Office",
+   "pagePublisher": "Hiroshima Prefecture (Hiroshima for Global Peace / HOPe)"
+  },
+  "identity": "different",
+  "proposedUrl": null,
+  "proposedTitle": null,
+  "citations": [
+   {
+    "where": "map site \"Hiroshima\" (1945): An atomic bomb destroyed the city on 6 August 1945. Hiroshima",
+    "verdict": "partial",
+    "quote": "Hiroshima is to be a peace memorial city symbolizing the human ideal of the sincere pursuit of genuine and lasting peace.",
+    "comment": "Page has the heading 'August 6, 1945–8:15 am:' and 'The atomic bombing completely destroyed the city'. Museum is only mentioned as 'today's main building of the Hiroshima Peace Memorial Museum'; the phrase 'No More Hiroshimas' does not appear."
+   }
+  ],
+  "problems": [
+   "Title in row ('The Atomic Bombing & Reconstruction of Hiroshima') differs from page title ('The Path from the Atomic Bombing to Reconstruction of Hiroshima')",
+   "'No More Hiroshimas' not on this page"
+  ],
+  "suggestedFix": "Correct the title to the page's real title; keep as the source for date, destruction and peace memorial city."
+ },
+ {
+  "id": "ref-hps-radioactive-contamination",
+  "status": "problem",
+  "fetch": {
+   "url": "https://hps.org/ate_faq/radcontamination/",
+   "finalUrl": "https://hps.org/ate_faq/radcontamination/",
+   "httpResult": "200 (content loaded; read through WebFetch summariser)",
+   "pageTitle": "What Is Radioactive Contamination? - HPS",
+   "pagePublisher": "Health Physics Society"
+  },
+  "identity": "exact",
+  "proposedUrl": null,
+  "proposedTitle": null,
+  "citations": [
+   {
+    "where": "safety card \"Exposure or contamination?\": Being exposed to radiation is not the same as ha",
+    "verdict": "partial",
+    "quote": "radiation does not spread or get “on” or “in” people",
+    "comment": "Also 'it is radioactive contamination that can be spread.' and 'A person is externally contaminated if radioactive material is on the skin or clothing.' Not found: exposure defined as radiation reaching a person (x-ray beam example) and 'exposed is not necessarily contaminated' stated as such."
+   }
+  ],
+  "problems": [
+   "Two of four steps (exposure definition with x-ray; 'exposed is not necessarily contaminated') are not stated on this page",
+   "Safety content: needs a second source for the exposure definition"
+  ],
+  "suggestedFix": "Add a source defining exposure (e.g. CDC or EPA radiation glossary) or trim those two steps."
+ },
+ {
+  "id": "ref-iter-home",
+  "status": "ok",
+  "fetch": {
+   "url": "https://www.iter.org/",
+   "finalUrl": "https://www.iter.org/",
+   "httpResult": "200 (content loaded; read through WebFetch summariser)",
+   "pageTitle": "ITER - the way to new energy (page heading 'Fusion energy'; HTML title not shown)",
+   "pagePublisher": "ITER Organization"
+  },
+  "identity": "close",
+  "proposedUrl": null,
+  "proposedTitle": null,
+  "citations": [
+   {
+    "where": "map site \"ITER\" (Under way): ITER is building the world's largest tokamak in southern Fran",
+    "verdict": "supports",
+    "quote": "The goal of ITER is to achieve fusion power production at power plant scale,",
+    "comment": "Members: 'China, the European Union, India, Japan, Korea, Russia and the United States are' participating. 'world's largest tokamak' and 'southern France' appear in a navigation blurb: 'Follow the construction in southern France of the world's largest tokamak.'"
+   }
+  ],
+  "problems": [
+   "Home page can change; 'largest tokamak' and 'southern France' come from a nav blurb"
+  ],
+  "suggestedFix": "Consider pointing at a stable ITER page (e.g. /about) if the home page changes."
+ },
+ {
+  "id": "ref-iupac-table",
+  "status": "problem",
+  "fetch": {
+   "url": "https://iupac.org/what-we-do/periodic-table-of-elements/",
+   "finalUrl": "https://iupac.org/what-we-do/periodic-table-of-elements/",
+   "httpResult": "200 (content loaded; read through WebFetch summariser)",
+   "pageTitle": "Periodic Table of Elements - IUPAC | International Union of Pure and Applied Chemistry",
+   "pagePublisher": "IUPAC"
+  },
+  "identity": "exact",
+  "proposedUrl": null,
+  "proposedTitle": null,
+  "citations": [
+   {
+    "where": "lesson elements-and-the-periodic-table: Element names and atomic numbers (optional card).",
+    "verdict": "topic-only",
+    "quote": null,
+    "comment": "Page presents the 2022 table with PDF download links and discusses elements 113-118 and Group 3. No sentence states the table lists names and atomic numbers (the linked PDF would, but was not fetched)."
+   },
+   {
+    "where": "scan target \"A gold bar\": Pure gold is just one kind of atom. Gold is an element, so it ca",
+    "verdict": "not-supported",
+    "quote": null,
+    "comment": "Gold is not mentioned on the page and no sentence says an element cannot be broken down into anything simpler."
+   }
+  ],
+  "problems": [
+   "Scan target 'A gold bar' claim (element cannot be broken down; pure gold holds only gold atoms) is not on this page",
+   "Lesson claim only topic-level"
+  ],
+  "suggestedFix": "Keep for names and atomic numbers (the PDF table); for the gold bar use a source defining 'chemical element' (e.g. IUPAC Gold Book entry), found and fetched by a person."
+ },
+ {
+  "id": "ref-medlineplus-potassium",
+  "status": "ok",
+  "fetch": {
+   "url": "https://medlineplus.gov/ency/article/002413.htm",
+   "finalUrl": "https://medlineplus.gov/ency/article/002413.htm",
+   "httpResult": "200 (content loaded; read through WebFetch summariser)",
+   "pageTitle": "Potassium in diet: MedlinePlus Medical Encyclopedia",
+   "pagePublisher": "MedlinePlus, U.S. National Library of Medicine (content by A.D.A.M., Inc.)"
+  },
+  "identity": "close",
+  "proposedUrl": null,
+  "proposedTitle": null,
+  "citations": [
+   {
+    "where": "scan target \"A banana\": Sweet, soft and a good source of potassium. A tiny part of all nat",
+    "verdict": "partial",
+    "quote": "Fruits that contain significant amounts of potassium include citrus fruits, cantaloupe, bananas, kiwi, prunes, and apricots.",
+    "comment": "Also 'Although many foods contain potassium, vegetables and fruit are the richest sources.' Radioactive potassium-40 is not mentioned (EPA row covers that)."
+   }
+  ],
+  "problems": [
+   "Supports only the potassium-in-food half of the banana claim"
+  ],
+  "suggestedFix": null
+ },
+ {
+  "id": "ref-mpic-fission",
+  "status": "ok",
+  "fetch": {
+   "url": "https://www.mpic.de/4469988/die-entdeckung-der-kernspaltung",
+   "finalUrl": "https://www.mpic.de/4469988/die-entdeckung-der-kernspaltung",
+   "httpResult": "200 (content loaded; read through WebFetch summariser)",
+   "pageTitle": "The Discovery of Nuclear Fission | Max Planck Institute for Chemistry",
+   "pagePublisher": "Max Planck Institute for Chemistry (Max-Planck-Gesellschaft)"
+  },
+  "identity": "exact",
+  "proposedUrl": null,
+  "proposedTitle": null,
+  "citations": [
+   {
+    "where": "map site \"Berlin-Dahlem\" (1938): At the Kaiser Wilhelm Institute for Chemistry, Otto Hahn ",
+    "verdict": "partial",
+    "quote": "In January 1939, Lise Meitner and her nephew Otto Frisch provided the explanation.",
+    "comment": "Also 'Nuclear fission was discovered at the Kaiser Wilhelm Institute for Chemistry in December 1938.' and Hahn and Straßmann: 'fission products such as barium were also created'. 'Berlin-Dahlem' appears only in photo credits, not as the institute's location; the page text fetched was English though the URL slug is German (a Deutsch link exists)."
+   }
+  ],
+  "problems": [
+   "'Berlin-Dahlem' location not stated in body text; URL slug is German but content fetched was English"
+  ],
+  "suggestedFix": "Optionally use the English version URL if the slug is only the German path."
+ }
+]

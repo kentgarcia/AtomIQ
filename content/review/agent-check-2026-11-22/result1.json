@@ -1,0 +1,75 @@
+[
+ {
+  "id": "ref-iaea-isotopes",
+  "status": "problem",
+  "fetch": {"url": "https://www.iaea.org/newscenter/news/what-are-isotopes", "finalUrl": null, "httpResult": "402 Payment Required (iaea.org: What are Isotopes?, /topics/nuclear-science/isotopes and /isotopes/stable-isotopes all blocked; not worked around). Fetched instead: INIS-IAEA record https://inis.iaea.org/records/kqqyp-b3850 (loaded real content)", "pageTitle": "Seven Things to Know about Radioisotopes", "pagePublisher": "International Atomic Energy Agency (IAEA), IAEA Bulletin vol. 55 no. 4, pp. 8-9, December 2014 (author Sasha Henriques); record hosted on INIS"},
+  "identity": "close",
+  "proposedUrl": "https://inis.iaea.org/records/kqqyp-b3850",
+  "proposedTitle": "Seven Things to Know about Radioisotopes",
+  "citations": [
+   {"where": "lesson isotopes: Isotopes can be stable or radioactive.", "verdict": "supports", "quote": "a stable carbon atom has six protons and six neutrons.", "comment": "Same record also says its unstable (and therefore radioactive) isotope carbon-14 has six protons and eight neutrons: stable and radioactive isotopes of one element. Quotes come from WebFetch's extraction of the record, not a raw page copy; it also refused to reproduce the full description (length limit)."},
+   {"where": "lesson stable-and-unstable-nuclei: Stable and unstable isotopes.", "verdict": "supports", "quote": "Radioisotopes are atomic elements that do not have the correct proton to neutron ratio to remain stable.", "comment": "Supports stable vs unstable nuclei via proton:neutron ratio."},
+   {"where": "unit inside-the-atom (topic-level)", "verdict": "topic-only", "quote": null, "comment": "Topic-level only; page is on nuclear stability and isotopes of carbon."},
+   {"where": "blog \"Three kinds of carbon\"", "verdict": "partial", "quote": "Whereas its unstable (and therefore radioactive) isotope carbon-14, has six protons and eight neutrons.", "comment": "Supports: carbon-14 unstable, 6 protons, 8 neutrons, radiation from change. Does NOT state: the definition of isotope (page never defines the term), that most surrounding atoms are stable, that unstable atoms are in rocks, air and food (page says nothing on natural occurrence), or that 'isotope does not mean radioactive'."}
+  ],
+  "problems": [
+   "Row has no URL; the IAEA 'What are Isotopes?' explainer (what the row title describes) could not be opened: iaea.org returns HTTP 402 to automated fetches, so its content is unverified.",
+   "Proposed page is a 2014 IAEA Bulletin item about radioisotopes, hosted as an INIS record, not an isotope explainer; row title 'Explainer on isotopes (stable and radioactive)' only loosely matches.",
+   "Does not define isotopes, say most atoms are stable, or say unstable atoms occur naturally (rocks, air, food), all used in the blog."
+  ],
+  "suggestedFix": "Set url to https://inis.iaea.org/records/kqqyp-b3850, retitle 'Seven Things to Know about Radioisotopes' (IAEA Bulletin, Dec 2014). Narrow the claims it backs to stable vs unstable carbon isotopes. For the isotope definition, natural occurrence and 'most atoms are stable', add a second source or have a human open iaea.org/newscenter/news/what-are-isotopes in a browser."
+ },
+ {
+  "id": "ref-iaea-radiation-types",
+  "status": "ok",
+  "fetch": {"url": "https://nucleus.iaea.org/sites/graphiteknowledgebase/wiki/Guide_to_Graphite/Fundamentals%20of%20Nuclear%20Power.aspx", "finalUrl": "https://nucleus.iaea.org/sites/graphiteknowledgebase/wiki/Guide_to_Graphite/Fundamentals%20of%20Nuclear%20Power.aspx", "httpResult": "200, real content (iaea.org pages 'What is Radiation?' and www-pub.iaea.org PDFs returned 402 and were not worked around)", "pageTitle": "Fundamentals of Nuclear Power (Open Knowledge Wiki, Nuclear Graphite Knowledge Base)", "pagePublisher": "International Atomic Energy Agency (IAEA), Vienna"},
+  "identity": "different",
+  "proposedUrl": "https://nucleus.iaea.org/sites/graphiteknowledgebase/wiki/Guide_to_Graphite/Fundamentals%20of%20Nuclear%20Power.aspx",
+  "proposedTitle": "Fundamentals of Nuclear Power",
+  "citations": [
+   {"where": "lesson alpha-beta-gamma: Alpha and beta are particles; gamma is electromagnetic radiation.", "verdict": "supports", "quote": "gamma-radiation is a form of electro-magnetic radiation.", "comment": "Same page: 'Beta-radiation comprises of high speed electrons that originate from the nucleus of an atom.' and 'Alpha-radiation consists of two neutrons and two protons i.e. helium nuclei.'; it calls neutrons 'a forth type of particulate radiation', so alpha and beta are treated as particles. Quotes from WebFetch's extraction, not a raw page copy. Page is a nuclear-graphite wiki chapter, not a dedicated radiation explainer."}
+  ],
+  "problems": [
+   "Row title 'IAEA material on alpha, beta and gamma radiation' is generic; best fetchable IAEA page is a chapter of a graphite knowledge-base wiki, a weaker source than IAEA 'What is Radiation?' (iaea.org/newscenter/news/what-is-radiation), which returned 402 and is unverified.",
+   "Wording 'two neutrons and two protons' and 'forth' (typo) on the page; do not copy its phrasing."
+  ],
+  "suggestedFix": "Use the proposed URL and title now. A human could replace it with IAEA 'What is Radiation?' after opening it in a browser."
+ },
+ {
+  "id": "ref-nrc-decay-series",
+  "status": "ok",
+  "fetch": {"url": "https://www.nrc.gov/sites/default/files/doc_library/cdn/legacy/reading-rm/doc-collections/nuregs/staff/sr1501/sr1501.pdf", "finalUrl": "https://www.nrc.gov/sites/default/files/doc_library/cdn/legacy/reading-rm/doc-collections/nuregs/staff/sr1501/sr1501.pdf", "httpResult": "200 application/pdf (879.8 KB); WebFetch could not read it, so I read the saved PDF with local pdftotext (text layer present); quotes below were checked verbatim against that text", "pageTitle": "NUREG-1501, Background as a Residual Radioactivity Criterion for Decommissioning (Appendix A to the Generic Environmental Impact Statement in Support of Rulemaking on Radiological Criteria for Decommissioning of NRC-Licensed Nuclear Facilities), Draft Report for Comment, published August 1994", "pagePublisher": "U.S. Nuclear Regulatory Commission, Office of Nuclear Regulatory Research"},
+  "identity": "different",
+  "proposedUrl": "https://www.nrc.gov/sites/default/files/doc_library/cdn/legacy/reading-rm/doc-collections/nuregs/staff/sr1501/sr1501.pdf",
+  "proposedTitle": "NUREG-1501: Background as a Residual Radioactivity Criterion for Decommissioning (Appendix A to the Generic Environmental Impact Statement in Support of Rulemaking on Radiological Criteria for Decommissioning of NRC-Licensed Nuclear Facilities), Draft Report for Comment",
+  "citations": [
+   {"where": "lesson decay-chains: Uranium-238 and thorium-232 decay series (optional card).", "verdict": "supports", "quote": "uranium-238 and thorium-232, which both decay in a long chain (or series) of various radionuclides", "comment": "Table 2.1 'Principal Natural Radionuclide Decay Series' lists the U-238 chain ending 'Lead-206 stable' and the Th-232 chain ending 'Lead-208 stable' (table rows, quoted exactly: 'Lead-206 stable', 'Lead-208 stable'). Ends in lead-206 / lead-208 is therefore shown by the table, not stated in prose. Half-lives listed: U-238 4.47 billion years, Th-232 14.1 billion years."},
+   {"where": "lesson radioactivity-is-natural: Natural decay series and natural radionuclides (optional card).", "verdict": "supports", "quote": "Virtually all materials found in nature have some degree of natural radioactivity.", "comment": "Also lists potassium-40 as a natural radionuclide (Table 2.1: 'Potassium-40 1.28 billion years beta, gamma'; text: 'potassium-40 and rubidium-87, which have much simpler decay schemes')."}
+  ],
+  "problems": [
+   "Row says 'NUREG/SR-1501'; the document is NUREG-1501 (the 'sr1501' is only the NRC folder name). The number came from a search summary, but it holds up.",
+   "The document is a 'Draft Report for Comment' (Aug 1994) on decommissioning criteria, not a teaching explainer; the decay chains are in a table.",
+   "The row title 'NRC material on natural decay series and natural radionuclides' does not match the real title."
+  ],
+  "suggestedFix": "Set url to the NRC PDF and title to 'NUREG-1501, Background as a Residual Radioactivity Criterion for Decommissioning (draft report for comment, 1994)'; cite Table 2.1 and section 2.2.1. Mark it as a draft."
+ },
+ {
+  "id": "ref-potassium-40",
+  "status": "ok",
+  "fetch": {"url": "https://www.nrc.gov/facilities-safety/radiation-protection/radiation-all-around-us/doses-in-our-daily-lives", "finalUrl": "https://www.nrc.gov/facilities-safety/radiation-protection/radiation-all-around-us/doses-in-our-daily-lives", "httpResult": "200, real content", "pageTitle": "Doses in Our Daily Lives | Nuclear Regulatory Commission", "pagePublisher": "U.S. Nuclear Regulatory Commission (NRC)"},
+  "identity": "different",
+  "proposedUrl": "https://www.nrc.gov/facilities-safety/radiation-protection/radiation-all-around-us/doses-in-our-daily-lives",
+  "proposedTitle": "Doses in Our Daily Lives",
+  "citations": [
+   {"where": "lesson stable-and-unstable-nuclei: Natural unstable isotopes in food and the body.", "verdict": "supports", "quote": "All organic matter (both plant and animal) contains some small amount of radiation from radioactive potassium-40 (40K)", "comment": "Quote from WebFetch's extraction, not a raw page copy. Page also says the average person receives about 30 millirem a year internally from such materials."},
+   {"where": "lesson radioactivity-is-natural: Potassium-40 in food and the body.", "verdict": "supports", "quote": "All organic matter (both plant and animal) contains some small amount of radiation from radioactive potassium-40 (40K)", "comment": "Food table lists bananas at 3,520 pCi/kg of potassium-40 (table values, not a prose sentence). NUREG-1501 (fetched, other row) adds 'the body maintains a fairly constant amount of this element, and the radioactive form, potassium-40, will not build up to higher levels'."},
+   {"where": "blog \"the banana on your counter\"", "verdict": "partial", "quote": "All organic matter (both plant and animal) contains some small amount of radiation from radioactive potassium-40 (40K)", "comment": "Supports: bananas and the body contain radioactive K-40. NRC page does not give the 'tiny share of potassium' figure (Health Physics Society does: 'natural abundance of 0.0117 percent of potassium', at https://hps.org/ate_faq/faqradbods/, titled 'Are Our Bodies Radioactive | Radionuclides in the human body', fetched). Not covered: 'radioactive does not mean dangerous', exposure vs becoming radioactive, and the 1896 Becquerel account (needs its own source)."}
+  ],
+  "problems": [
+   "Publisher was 'To be identified'; NRC page proposed. It lists bananas (3,520 pCi/kg K-40) in a table but has no sentence about bananas.",
+   "HPS page (https://hps.org/ate_faq/faqradbods/) is a good second source for the body and K-40 abundance but does not mention bananas.",
+   "The blog's Becquerel 1896 claim and its 'not dangerous' reasoning are not backed by this row's source. I found no Becquerel row in group1.json (the 1896 paper is only mentioned in this blog text), so I did not look for its DOI or archive page. A search did show the 1896 Comptes rendus items, e.g. academie-sciences.fr/pdf/dossiers/Becquerel/, but those are search results, not fetched."
+  ],
+  "suggestedFix": "Set publisher 'U.S. Nuclear Regulatory Commission', title 'Doses in Our Daily Lives', url as proposed; optionally add the HPS 'Are Our Bodies Radioactive' page as a second reference for the body and the 0.0117 percent abundance."
+ }
+]
