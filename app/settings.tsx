@@ -10,11 +10,10 @@ import { useModalOrigin } from "@/components/ui/grow-modal";
 import { Button } from "@/components/ui/button";
 import { ModalButton, ModalSecondaryButton } from "@/components/ui/modal-card";
 import { ModalDialog } from "@/components/ui/modal-dialog";
-import { BETA_FEEDBACK_FORM_URL } from "@/constants/beta";
-import { openExternalUrl } from "@/services/open-url";
 import {useTheme, createStyles, fontFaces, useResponsiveLayout, withAlpha} from "@/theme";
 import { deleteAccountData, getUserProfile } from "@/services/database";
 import {
+  CONTENT_DB_VERSION,
   contentRepository,
   getContentDbStatus,
   loadPreviewContent,
@@ -40,6 +39,7 @@ import { useMediaPreferences } from "@/hooks/use-read-aloud";
 import { useStorage } from "@/services/StorageContext";
 import { replayIntros, replayTour, resetTutorial } from "@/services/tutorial";
 import Constants from "expo-constants";
+import { appVersionLabel, contentVersionLabel } from "@/services/build-info-core";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 import React, { useEffect, useMemo, useState } from "react";
@@ -56,8 +56,12 @@ import { Text } from "@/components/ui/text";
 import Animated from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-const APP_VERSION =
-  Constants.expoConfig?.version ?? Constants.nativeAppVersion ?? "1.0.0";
+// App version and the build number EAS keeps (docs/critical/VERSIONING_SPEC.md 3.5); never an invented number
+const APP_VERSION = appVersionLabel({
+  appVersion: Constants.expoConfig?.version ?? Constants.nativeAppVersion,
+  buildNumber: Constants.nativeBuildVersion,
+});
+const CONTENT_VERSION = contentVersionLabel(CONTENT_DB_VERSION);
 
 export default function SettingsScreen() {
   const router = useRouter();
@@ -303,16 +307,6 @@ export default function SettingsScreen() {
     router.replace("/onboarding");
   };
 
-  const handleBetaFeedback = async () => {
-    const opened = await openExternalUrl(BETA_FEEDBACK_FORM_URL);
-    if (!opened) {
-      Alert.alert(
-        "Couldn't open the form",
-        "Please check your internet connection and try again.",
-      );
-    }
-  };
-
   const handlePrivacyPolicy = () => {
     router.push("/privacy-policy");
   };
@@ -392,7 +386,6 @@ export default function SettingsScreen() {
 
         <Animated.View entering={settle(250)}>
           <SettingsCard title="About">
-            <SettingsRow icon="Message" color="#EA580C" label="Beta Feedback" arrow hint="Opens the feedback form" onPress={() => void handleBetaFeedback()} />
             <SettingsRow
               icon="InfoCircle"
               color="#3B82F6"
@@ -462,6 +455,7 @@ export default function SettingsScreen() {
             <Icon name="Crown1" size={13} color={theme.colors.primaryDark} variant="Bold" />
             <Text style={styles.versionBadgeText}>Version {APP_VERSION}</Text>
           </View>
+          <Text style={[styles.modalSubtitle, { marginBottom: 8 }]}>Content {CONTENT_VERSION}</Text>
           <Text style={styles.modalSubtitle}>
             Learn nuclear science one atom at a time.
           </Text>

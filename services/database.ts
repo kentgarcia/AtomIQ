@@ -1,6 +1,7 @@
 import * as SQLite from "expo-sqlite";
 import { initExplorerStorage } from "./explorer-storage";
 import { LOCAL_FIRST_SCHEMA } from "./local-first/schema";
+import { migrateUserDb } from "./user-db-migrations-core";
 
 // Database instance
 let db: SQLite.SQLiteDatabase | null = null;
@@ -161,6 +162,9 @@ const ensureIdentityProfileColumns = async (
 export const initDatabase = async () => {
   try {
     db = await SQLite.openDatabaseAsync("atomiq.db");
+
+    // A database with no profile table is a brand new install: it is made from the newest schema below, so no migration runs on it
+    const hadProfileTable = (await db.getFirstAsync<{ name: string }>("SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'user_profile'")) !== null;
 
     // Create tables
     await db.execAsync(`
@@ -396,6 +400,11 @@ export const initDatabase = async () => {
     // Re-run safeguards after schema bootstrap for databases upgrading from older layouts.
     await ensureIdentityProfileColumns(db);
     await dropLevelsUnitForeignKey(db);
+
+    // Numbered migrations (services/user-db-migrations-core.ts): every change to a table that already shipped goes there.
+    // Never throws and never stops the app: a failed one is logged and tried again on the next start.
+    const migration = await migrateUserDb(db, { fresh: !hadProfileTable, log: (message) => console.log(`Migration: ${message}`) });
+    if (migration.failed) console.warn("Migration failed:", migration.failed);
 
     // Initialize explorer storage
     await initExplorerStorage();

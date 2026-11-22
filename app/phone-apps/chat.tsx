@@ -14,15 +14,13 @@ import { coverColors } from "@/components/npc/npc-cover-art";
 import { chatPalette } from "@/components/phone/chat-palette";
 import { ChatButton, ChatFrame, ChatTitle } from "@/components/phone/ChatFrame";
 import { speakerFor } from "@/components/phone/ChatHead";
-import { ChatPaletteProvider, LinkButton, MeBubble, NpcBubble, ReactButton, ReplyPill, StickerBubble, StickerButton, TypingBubble } from "@/components/phone/ChatBubble";
+import { ChatPaletteProvider, LinkButton, MeBubble, NpcBubble, ReactButton, ReplayButton, ReplyPill, StickerBubble, StickerButton, SystemLine, TypingBubble } from "@/components/phone/ChatBubble";
 import { settle } from "@/components/motion/settle";
-import { Button } from "@/components/ui/button";
 import { useCast } from "@/components/feed/use-cast";
 import { Shrodi } from "@/components/mascot/Shrodi";
 import { SHRODI_COLORS } from "@/components/mascot/shrodi-art";
-import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
-import { CHAT_MASCOT_ID, isLinkReply, linkInfo, pillsOf, reactionsOf, replyTypeOf, type ChatMessage } from "@/services/chat-core";
+import { CHAT_MASCOT_ID, isLinkReply, linkInfo, pillsOf, reactionsOf, replyTypeOf, systemOf, type ChatMessage } from "@/services/chat-core";
 import { openThread, restartThread, routeForAction, sendReply, subscribeChats, type ThreadView } from "@/services/chats";
 import { playSfx } from "@/services/sfx";
 import { emitTutorial } from "@/services/tutorial";
@@ -36,7 +34,9 @@ import { useReducedMotion } from "@/components/motion/use-reduced-motion";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 /** How long the typing dots show before a bubble: a beat, longer for a longer bubble (never a wait). */
-const typingMs = (text: string) => Math.min(450 + text.length * 14, 1600);
+const typingMs = (text: string) => (systemOf(text) ? SYSTEM_BEAT_MS : Math.min(450 + text.length * 14, 1600));
+/** A system line has no typing dots: the thread just pauses a beat, then the note appears. */
+const SYSTEM_BEAT_MS = 800;
 
 export default function ChatThreadScreen() {
   const { theme } = useTheme();
@@ -94,8 +94,9 @@ export default function ChatThreadScreen() {
     const timer = setTimeout(
       () => {
         setQueue((q) => q.slice(1));
-        void playSfx("chat.incoming");
-        if (next) AccessibilityInfo.announceForAccessibility?.(next.text);
+        // a system line has no sound of its own: it is a quiet note, not a message arriving
+        if (!next || !systemOf(next.text)) void playSfx("chat.incoming");
+        if (next) AccessibilityInfo.announceForAccessibility?.(systemOf(next.text) ?? next.text);
       },
       typingMs(next?.text ?? ""),
     );
@@ -103,11 +104,13 @@ export default function ChatThreadScreen() {
   }, [queue, view]);
 
   const typing = queue.length > 0;
-  // The typing dots show before each waiting bubble: one soft sound as each beat begins
+  // The typing dots show before each waiting bubble (not before a system line, which only pauses): one soft sound as each beat begins
   const waitingFor = queue[0];
+  const waitingText = waitingFor !== undefined ? view?.messages.find((m) => m.id === waitingFor)?.text : undefined;
+  const dots = typing && !(waitingText !== undefined && systemOf(waitingText));
   useEffect(() => {
-    if (waitingFor !== undefined) void playSfx("chat.typing");
-  }, [waitingFor]);
+    if (waitingFor !== undefined && !(waitingText !== undefined && systemOf(waitingText))) void playSfx("chat.typing");
+  }, [waitingFor, waitingText]);
   const shown: ChatMessage[] = useMemo(() => (view ? view.messages.filter((m) => !queue.includes(m.id)) : []), [view, queue]);
   const reactions = useMemo(() => reactionsOf(shown), [shown]);
   const current = view?.current ?? null;
@@ -178,7 +181,7 @@ export default function ChatThreadScreen() {
   const back = () => (router.canGoBack() ? router.back() : router.replace("/phone-apps/chats"));
   const left = <ChatButton icon="ArrowLeft2" label="Back to Chats" onPress={back} />;
   // The subtitle: how many letters the teacher has written in this thread
-  const sent = shown.filter((m) => m.sender !== "me").length;
+  const sent = shown.filter((m) => m.sender !== "me" && !systemOf(m.text)).length;
 
   if (!threadId || state === "missing") {
     return (
@@ -215,15 +218,20 @@ export default function ChatThreadScreen() {
         ) : null}
         {bubbles.map((m, i) => {
           const fresh = freshFrom !== null && (view?.messages.indexOf(m) ?? 0) >= freshFrom;
+          const line = m.sender === "me" ? null : systemOf(m.text);
+          if (line) return <SystemLine key={m.id} text={line} fresh={fresh} />;
           const isMe = m.sender === "me";
-          const first = i === 0 || (bubbles[i - 1].sender === "me") !== isMe;
+          // a system line cuts a run in two: the speaker's name and picture show again on either side of it
+          const prev = i > 0 && !systemOf(bubbles[i - 1].text) ? bubbles[i - 1] : null;
+          const next = i < bubbles.length - 1 ? (systemOf(bubbles[i + 1].text) ? "break" : bubbles[i + 1]) : null;
+          const first = !prev || (prev.sender === "me") !== isMe;
           // the typing bubble that may follow is the teacher's
-          const nextIsMe = i < bubbles.length - 1 ? bubbles[i + 1].sender === "me" : typing ? false : null;
+          const nextIsMe = next === "break" ? null : next ? next.sender === "me" : dots ? false : null;
           const last = nextIsMe === null || nextIsMe !== isMe;
           if (isMe) return m.kind === "emoji" ? <StickerBubble key={m.id} id={m.text} fresh={fresh} last={last} /> : <MeBubble key={m.id} text={m.text} fresh={fresh} first={first} last={last} />;
           return <NpcBubble key={m.id} speaker={speaker} text={m.text} fresh={fresh} first={first} last={last} reaction={reactions.get(m.id)} />;
         })}
-        {typing ? <TypingBubble speaker={speaker} /> : null}
+        {dots ? <TypingBubble speaker={speaker} /> : null}
 
         {/* The replies sit under the last message, centered; tapping one puts them away and sends it */}
         {replies.length > 0 ? (
@@ -269,9 +277,11 @@ export default function ChatThreadScreen() {
               <View style={styles.rule} />
             </View>
             <Text style={styles.endNote}>No more replies.</Text>
-            <View style={styles.endButton}>
-              <Button label={story ? "Replay story" : "Start again"} variant="guide" size="default" fullWidth={false} onPress={() => void onReplay()} renderIcon={(color) => <Icon name="Refresh2" size={18} color={color} variant="Bold" />} />
-            </View>
+            {view?.canReplay === false ? null : (
+              <View style={styles.endButton}>
+                <ReplayButton label={story ? "Replay story" : "Start again"} onPress={() => void onReplay()} />
+              </View>
+            )}
           </Animated.View>
         ) : null}
       </ScrollView>

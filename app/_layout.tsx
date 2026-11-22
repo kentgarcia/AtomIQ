@@ -106,7 +106,6 @@ function AppContent() {
         <Stack.Screen name="ranks" options={{ headerShown: false }} />
         <Stack.Screen name="daily-facts" options={{ headerShown: false }} />
         <Stack.Screen name="settings" options={{ headerShown: false }} />
-        <Stack.Screen name="beta" options={{ headerShown: false }} />
         <Stack.Screen name="privacy-policy" options={{ headerShown: false }} />
         <Stack.Screen name="terms-of-service" options={{ headerShown: false }} />
         <Stack.Screen name="streak" options={{ headerShown: false }} />

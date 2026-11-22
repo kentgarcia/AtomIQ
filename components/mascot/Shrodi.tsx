@@ -122,9 +122,17 @@ export const Shrodi = memo(function Shrodi({ mood = "idle", size = 160, live = t
   const origin = (p: { x: number; y: number }) => `${(p.x - vb.x) * scale}px ${(p.y - vb.y) * scale}px`;
 
   // Whole-layer moves are native view transforms (no animated SVG transform strings).
-  const bodyStyle = useAnimatedStyle(() => ({
-    transform: [{ translateY: frame.value.bob * scale }, { rotate: `${frame.value.lean}deg` }],
-  }));
+  const bodyStyle = useAnimatedStyle(() => {
+    const s = frame.value.squash;
+    return {
+      transform: [
+        { translateY: frame.value.bob * scale },
+        { rotate: `${frame.value.lean}deg` },
+        { scaleX: 1 - s },
+        { scaleY: 1 + s },
+      ],
+    };
+  });
   const headStyle = useAnimatedStyle(() => ({
     transform: [{ rotate: `${frame.value.tilt}deg` }, { scale: HEAD_SCALE }],
   }));

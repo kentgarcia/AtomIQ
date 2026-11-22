@@ -12,7 +12,6 @@
     },
     "android": {
       "package": "com.dostpnri.atomiq",
-      "versionCode": 1,
       "softwareKeyboardLayoutMode": "resize",
       "adaptiveIcon": {
         "backgroundColor": "#FDA539",

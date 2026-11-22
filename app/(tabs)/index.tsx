@@ -1,14 +1,11 @@
 import { PERF_PROBE_ON } from "@/components/dev/perf-flag";
 import { useRenderTimer } from "@/components/dev/render-timer";
 import { useSfxSet } from "@/components/motion/use-sfx-set";
-import { EventButton } from "@/components/events/EventButton";
-import { Shrodi } from "@/components/mascot/Shrodi";
 import { ModalButton } from "@/components/ui/modal-card";
 import { ModalDialog } from "@/components/ui/modal-dialog";
 import { TopRowHeader, useTabBarInset } from "@/components/layout";
 import { Text } from "@/components/ui/text";
 import { Icon } from "@/components/ui/icon";
-import { BETA_NOTICE_ID } from "@/constants/beta";
 import { toneColor } from "@/components/lesson/visual/colors";
 import { UnitTeacher } from "@/components/npc/UnitTeacher";
 import type { Reference } from "@/content/curriculum/types";
@@ -16,7 +13,6 @@ import { useCurriculumPath, type CurriculumData } from "@/hooks/use-curriculum";
 import { unitRingProgress } from "@/services/lesson-progress-core";
 import type { PathState } from "@/services/path-core";
 import { openExternalUrl } from "@/services/open-url";
-import { getBetaNoticeSeen } from "@/services/storage";
 import { useStreakCelebration } from "@/hooks/use-streak-celebration";
 import { useTheme, createStyles, withAlpha, fontFaces, useResponsiveLayout } from "@/theme";
 import { useFocusEffect, useIsFocused, useRouter } from "expo-router";
@@ -199,31 +195,6 @@ export default function HomeScreen() {
   const [arrowDir, setArrowDir] = useState<"up" | "down" | null>(null);
   // The unit whose references and resources are open in their modal
   const [refsUnitId, setRefsUnitId] = useState<string | null>(null);
-
-  /* The beta button opens the beta page (it never opens by itself: a notice over the tour held it busy). Its "!" shows until that
-     page has been opened once for this round, so it is read again each time Home comes back in front. */
-  const [betaUnseen, setBetaUnseen] = useState(false);
-  useFocusEffect(
-    useCallback(() => {
-      let alive = true;
-      void getBetaNoticeSeen().then((seen) => alive && setBetaUnseen(seen !== BETA_NOTICE_ID));
-      return () => {
-        alive = false;
-      };
-    }, []),
-  );
-  // Shrodi on the button cheers when it is tapped, then settles back
-  const [betaMood, setBetaMood] = useState<"smile" | "cheer">("smile");
-  const betaMoodTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  useEffect(() => () => {
-    if (betaMoodTimer.current) clearTimeout(betaMoodTimer.current);
-  }, []);
-  const openBeta = useCallback(() => {
-    setBetaMood("cheer");
-    if (betaMoodTimer.current) clearTimeout(betaMoodTimer.current);
-    betaMoodTimer.current = setTimeout(() => setBetaMood("smile"), 900);
-    router.push("/beta");
-  }, [router]);
 
   useFocusEffect(
     useCallback(() => {
@@ -645,19 +616,6 @@ export default function HomeScreen() {
         })}
       </ScrollView>
 
-      {/* The beta event button, just below the lesson card (which covers it while its info is open): opens the beta page; its "!" stays until that page has been opened */}
-      <EventButton
-        label="Beta"
-        accessibilityLabel="Open beta information and feedback"
-        badge={betaUnseen}
-        onPress={openBeta}
-        style={[styles.betaFab, { top: MAP_CARD_TOP + cardHeight + MAP_CARD_GAP - 6 }]}
-      >
-        <View style={styles.betaPicture}>
-          <Shrodi mood={betaMood} size={58} armless />
-        </View>
-      </EventButton>
-
       {/* Floating lesson card — sits over the map, which scrolls behind it */}
       <View style={styles.floatingCard} pointerEvents="box-none">
         <View
@@ -1022,20 +980,6 @@ const makeStyles = createStyles((theme) => {
       backgroundColor: c.onPrimary,
     },
     /* Floating "jump to current lesson" arrow */
-    /* Beta event button, just under the lesson card on the left */
-    betaFab: {
-      position: "absolute",
-      left: 24,
-      zIndex: 80,
-    },
-    /* Shrodi's head stands out of the tile's top, its chin behind the band. Placed from the tile's top-left corner; 2 dp to the right because the art's centre is not the head's. */
-    betaPicture: {
-      position: "absolute",
-      left: 1.3,
-      right: -1.3,
-      top: -7,
-      alignItems: "center",
-    },
     nextBtn: {
       position: "absolute",
       right: 24,

@@ -1,0 +1,292 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+  width="512"
+  height="512"
+  viewBox="0 0 512 512"
+  id="atomiq-icon-layered"
+>
+  <title>AtomIQ App Icon — Editable Layers</title>
+  <defs>
+    <!-- Soft gradients matching the original icon finish; easily editable in Inkscape/Figma -->
+    <linearGradient id="irisGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#482C62" />
+      <stop offset="62%" stop-color="#5E3F7F" />
+      <stop offset="100%" stop-color="#7B5AA0" />
+    </linearGradient>
+    <linearGradient id="irisGlow" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#9A78C4" stop-opacity="0.15" />
+      <stop offset="100%" stop-color="#AE92CF" stop-opacity="0.92" />
+    </linearGradient>
+    <linearGradient id="pawGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FF8412" />
+      <stop offset="100%" stop-color="#F06802" />
+    </linearGradient>
+    <clipPath id="lensLeftClip">
+      <circle cx="117" cy="182" r="108" />
+    </clipPath>
+    <clipPath id="lensRightClip">
+      <circle cx="395" cy="182" r="108" />
+    </clipPath>
+    <clipPath id="mouthClip">
+      <path d="M 210 301 C 228 303 246 296 256 282 C 266 296 284 303 302 301 C 308 360 294 416 256 416 C 218 416 204 360 210 301 Z" />
+    </clipPath>
+    <clipPath id="irisLeftClip">
+      <ellipse cx="131" cy="183" rx="66" ry="73" />
+    </clipPath>
+    <clipPath id="irisRightClip">
+      <ellipse cx="381" cy="183" rx="66" ry="73" />
+    </clipPath>
+  </defs>
+
+  <!-- LAYER 1: Background / Forehead Fur -->
+  <g id="layer-background" inkscape:groupmode="layer" inkscape:label="1. Background (Forehead)">
+    <rect id="bg-fill" x="0" y="0" width="512" height="512" fill="#FDA539" />
+  </g>
+
+  <!-- LAYER 2: Neck & Lab Coat Shoulders -->
+  <g id="layer-lab-coat" inkscape:groupmode="layer" inkscape:label="2. Lab Coat &amp; Neck">
+    <!-- Orange neck fur -->
+    <path id="neck-fur" d="M 184 468 L 328 468 L 306 516 L 206 516 Z" fill="#F17F03" />
+    <ellipse id="neck-highlight" cx="256" cy="512" rx="30" ry="11" fill="#FDA942" />
+    <!-- Left coat collar & shoulder -->
+    <path
+      id="coat-left"
+      d="M -8 456 L 188 470 L 218 518 L -8 518 Z"
+      fill="#EAF3FC"
+      stroke="#A2AEBC"
+      stroke-width="6"
+      stroke-linejoin="round"
+    />
+    <!-- Right coat collar & shoulder -->
+    <path
+      id="coat-right"
+      d="M 520 456 L 324 470 L 294 518 L 520 518 Z"
+      fill="#EAF3FC"
+      stroke="#A2AEBC"
+      stroke-width="6"
+      stroke-linejoin="round"
+    />
+  </g>
+
+  <!-- LAYER 3: White Muzzle, Cheeks & Chin Rim -->
+  <g id="layer-muzzle" inkscape:groupmode="layer" inkscape:label="3. Muzzle &amp; Chin">
+    <!-- Warm orange chin rim behind white muzzle (matches lower head contour) -->
+    <ellipse id="chin-rim" cx="256" cy="336" rx="344" ry="138" fill="#FA8921" />
+    <!-- Crisp white oval cheeks & muzzle fur (matches original icon & Shrodi head_white_inner) -->
+    <ellipse id="muzzle-white" cx="256" cy="327" rx="330" ry="129" fill="#FFFFFF" />
+    <!-- Subtle peach chin shadow below mouth -->
+    <path
+      id="chin-shadow"
+      d="M 224 432 Q 256 446 288 432 Q 256 456 224 432 Z"
+      fill="#F9DBC0"
+    />
+  </g>
+
+  <!-- LAYER 4: Eyes (Sclera, Upper Fur Rim, Starry Purple Irises) -->
+  <g id="layer-eyes" inkscape:groupmode="layer" inkscape:label="4. Eyes">
+    <!-- Left Eye -->
+    <g id="eye-left" clip-path="url(#lensLeftClip)">
+      <circle cx="117" cy="182" r="108" fill="#FFFFFF" />
+      <!-- Upper-outer orange forehead fur peeking inside lens -->
+      <path
+        d="M 0 60 L 240 60 L 240 132 Q 170 86 112 88 Q 52 92 26 164 Q 14 196 18 232 L 0 232 Z"
+        fill="#FDA539"
+      />
+      <path
+        d="M 22 224 Q 14 166 44 120 Q 78 84 124 84 Q 178 84 222 128"
+        fill="none"
+        stroke="#FCD297"
+        stroke-width="10"
+        stroke-linecap="round"
+      />
+      <!-- Purple Iris -->
+      <ellipse cx="131" cy="183" rx="68" ry="75" fill="url(#irisGrad)" stroke="#8260A8" stroke-width="5" />
+      <g clip-path="url(#irisLeftClip)">
+        <!-- Smooth lower lavender crescent -->
+        <path
+          d="M 72 204 Q 131 246 190 204 C 194 242 164 264 131 264 C 98 264 68 242 72 204 Z"
+          fill="url(#irisGlow)"
+        />
+      </g>
+      <!-- Specular white oval + small dot -->
+      <ellipse cx="103" cy="150" rx="23" ry="30" transform="rotate(14 103 150)" fill="#FFFFFF" />
+      <circle cx="89" cy="212" r="10.5" fill="#FFFFFF" />
+      <!-- 4-point Golden Star Sparkle -->
+      <path
+        d="M 164 162 Q 167 183 186 187 Q 167 191 164 212 Q 161 191 142 187 Q 161 183 164 162 Z"
+        fill="#FCE065"
+        stroke="#CFA028"
+        stroke-width="1.5"
+        stroke-linejoin="round"
+      />
+    </g>
+
+    <!-- Right Eye -->
+    <g id="eye-right" clip-path="url(#lensRightClip)">
+      <circle cx="395" cy="182" r="108" fill="#FFFFFF" />
+      <!-- Upper-outer orange forehead fur peeking inside lens -->
+      <path
+        d="M 272 60 L 512 60 L 512 232 L 494 232 Q 498 196 486 164 Q 460 92 400 88 Q 342 86 272 132 Z"
+        fill="#FDA539"
+      />
+      <path
+        d="M 490 224 Q 498 166 468 120 Q 434 84 388 84 Q 334 84 290 128"
+        fill="none"
+        stroke="#FCD297"
+        stroke-width="10"
+        stroke-linecap="round"
+      />
+      <!-- Purple Iris -->
+      <ellipse cx="381" cy="183" rx="68" ry="75" fill="url(#irisGrad)" stroke="#8260A8" stroke-width="5" />
+      <g clip-path="url(#irisRightClip)">
+        <!-- Smooth lower lavender crescent -->
+        <path
+          d="M 322 204 Q 381 246 440 204 C 444 242 414 264 381 264 C 348 264 318 242 322 204 Z"
+          fill="url(#irisGlow)"
+        />
+      </g>
+      <!-- Specular white oval + small dot -->
+      <ellipse cx="353" cy="150" rx="23" ry="30" transform="rotate(14 353 150)" fill="#FFFFFF" />
+      <circle cx="339" cy="212" r="10.5" fill="#FFFFFF" />
+      <!-- 4-point Golden Star Sparkle -->
+      <path
+        d="M 414 162 Q 417 183 436 187 Q 417 191 414 212 Q 411 191 392 187 Q 411 183 414 162 Z"
+        fill="#FCE065"
+        stroke="#CFA028"
+        stroke-width="1.5"
+        stroke-linejoin="round"
+      />
+    </g>
+  </g>
+
+  <!-- LAYER 5: Round Glasses Frame -->
+  <g id="layer-glasses" inkscape:groupmode="layer" inkscape:label="5. Glasses">
+    <path
+      id="glasses-bridge"
+      d="M 228 179 Q 256 167 284 179"
+      fill="none"
+      stroke="#313231"
+      stroke-width="16.5"
+      stroke-linecap="butt"
+    />
+    <circle id="glasses-left" cx="117" cy="182" r="115" fill="none" stroke="#313231" stroke-width="16.5" />
+    <circle id="glasses-right" cx="395" cy="182" r="115" fill="none" stroke="#313231" stroke-width="16.5" />
+  </g>
+
+  <!-- LAYER 6: Nose, Smile & Open Mouth -->
+  <g id="layer-nose-mouth" inkscape:groupmode="layer" inkscape:label="6. Nose &amp; Mouth">
+    <!-- Open Mouth Interior -->
+    <path
+      id="mouth-interior"
+      d="M 210 301 C 228 303 246 296 256 282 C 266 296 284 303 302 301 C 308 360 294 416 256 416 C 218 416 204 360 210 301 Z"
+      fill="#98211D"
+    />
+    <!-- Pink Tongue -->
+    <g id="mouth-tongue" clip-path="url(#mouthClip)">
+      <ellipse cx="256" cy="396" rx="44" ry="44" fill="#EB8287" />
+    </g>
+    <!-- Single Closed Mouth Outline (zero overlapping open ends) -->
+    <path
+      id="mouth-outline"
+      d="M 210 301 C 228 303 246 296 256 282 C 266 296 284 303 302 301 C 308 360 294 416 256 416 C 218 416 204 360 210 301 Z"
+      fill="none"
+      stroke="#BA3A0E"
+      stroke-width="8.5"
+      stroke-linejoin="round"
+    />
+    <!-- Upturned Smile Corners (join cleanly into closed mouth outline) -->
+    <path
+      id="smile-corner-left"
+      d="M 196 290 C 200 297 205 300 210 301"
+      fill="none"
+      stroke="#BA3A0E"
+      stroke-width="8.5"
+      stroke-linecap="round"
+    />
+    <path
+      id="smile-corner-right"
+      d="M 316 290 C 312 297 307 300 302 301"
+      fill="none"
+      stroke="#BA3A0E"
+      stroke-width="8.5"
+      stroke-linecap="round"
+    />
+    <!-- Philtrum (stops cleanly inside top lip cusp without protruding into mouth) -->
+    <path
+      id="philtrum"
+      d="M 256 244 L 256 280"
+      fill="none"
+      stroke="#BA3A0E"
+      stroke-width="8.5"
+      stroke-linecap="butt"
+    />
+    <!-- Nose -->
+    <path
+      id="nose-body"
+      d="M 227 224 C 225 212 238 206 256 206 C 274 206 287 212 285 224 C 283 238 269 250 256 250 C 243 250 229 238 227 224 Z"
+      fill="#D44014"
+    />
+    <ellipse id="nose-highlight" cx="256" cy="216" rx="16" ry="5.5" fill="#EC8665" opacity="0.85" />
+  </g>
+
+  <!-- LAYER 7: Happy Raised Paws & Lab Coat Cuffs -->
+  <g id="layer-paws" inkscape:groupmode="layer" inkscape:label="7. Paws &amp; Cuffs">
+    <!-- Left Paw -->
+    <g id="paw-left">
+      <path
+        d="M -14 342 C 14 316 58 318 88 346 C 122 378 142 436 128 486 C 118 504 48 504 -14 472 Z"
+        fill="url(#pawGrad)"
+        stroke="#C2430A"
+        stroke-width="8"
+        stroke-linejoin="round"
+      />
+      <!-- Toe crease lines -->
+      <path
+        d="M 18 334 C 0 352 -6 376 -2 400 M 64 338 C 46 356 42 382 48 408"
+        fill="none"
+        stroke="#C2430A"
+        stroke-width="7"
+        stroke-linecap="round"
+      />
+      <!-- Lab coat cuff under left paw -->
+      <path
+        d="M -14 446 Q 56 494 142 488 L 136 518 L -14 518 Z"
+        fill="#EAF3FC"
+        stroke="#A2AEBC"
+        stroke-width="7"
+        stroke-linejoin="round"
+      />
+      <path d="M 138 502 L 160 506" fill="none" stroke="#A2AEBC" stroke-width="7" stroke-linecap="round" />
+    </g>
+
+    <!-- Right Paw (mirrored) -->
+    <g id="paw-right">
+      <path
+        d="M 526 342 C 498 316 454 318 424 346 C 390 378 370 436 384 486 C 394 504 464 504 526 472 Z"
+        fill="url(#pawGrad)"
+        stroke="#C2430A"
+        stroke-width="8"
+        stroke-linejoin="round"
+      />
+      <!-- Toe crease lines -->
+      <path
+        d="M 494 334 C 512 352 518 376 514 400 M 448 338 C 466 356 470 382 464 408"
+        fill="none"
+        stroke="#C2430A"
+        stroke-width="7"
+        stroke-linecap="round"
+      />
+      <!-- Lab coat cuff under right paw -->
+      <path
+        d="M 526 446 Q 456 494 370 488 L 376 518 L 526 518 Z"
+        fill="#EAF3FC"
+        stroke="#A2AEBC"
+        stroke-width="7"
+        stroke-linejoin="round"
+      />
+      <path d="M 374 502 L 352 506" fill="none" stroke="#A2AEBC" stroke-width="7" stroke-linecap="round" />
+    </g>
+  </g>
+</svg>

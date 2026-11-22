@@ -75,6 +75,17 @@ export function pictureOf(text: string): string | null {
   return m && tourArt(m[1]) ? m[1] : null;
 }
 
+/**
+ * A part of a node's text that is only `[[sys:<line>]]` is a system line: a small grey note in the middle of the thread
+ * ("Ada got disconnected."), said by nobody. Returns the line when the whole part is such a marker, otherwise null, so a
+ * mistyped one is shown as the plain text it is and the content rules catch it before it ships. Mirrors `CHAT_SYSTEM_RE` in
+ * `scripts/lib/chat-vocab.mjs`.
+ */
+export function systemOf(text: string): string | null {
+  const m = /^\[\[sys:\s*([^\[\]\s][^\[\]]*)\]\]$/.exec(text.trim());
+  return m ? m[1].trim() : null;
+}
+
 /** Shrodi, the mascot, chats like a teacher (his nodes carry this npc id) but is not in the cast of teachers. Mirrors `CHAT_MASCOT_ID` in `scripts/lib/chat-vocab.mjs`. */
 export const CHAT_MASCOT_ID = "shrodi";
 
@@ -137,6 +148,12 @@ export function pillsOf(node: ChatNode | null): ChatReply[] {
 /** A thread is over when the teacher's last node is a sign-off or has no replies (the learner can replay it). */
 export const isEnded = (node: ChatNode | null): boolean => node !== null && (node.kind === "sign_off" || node.replies.length === 0);
 
+/**
+ * A reply that goes nowhere: it names no page and its `next` is missing (a node edited or retired after the thread began).
+ * The story ends there instead of leaving the learner on a message that answers nothing.
+ */
+export const storyEnds = (step: ReplyStep): boolean => step.next === null && step.action === null;
+
 // ---------------------------------------------------------------------------
 // threads and messages
 // ---------------------------------------------------------------------------
@@ -189,6 +206,27 @@ export function currentNode(nodes: readonly ChatNode[], messages: readonly ChatM
   return null;
 }
 
+/**
+ * Whether a thread that is not marked ended can no longer go on, because content changed after it began: the teacher's last
+ * node is gone (its id was retired or renamed), or it has replies and none of them leads anywhere. A thread like that is ended
+ * (its messages stay, they are stored text) so the screen shows its ending instead of a blank place under the last bubble.
+ */
+export function isStuck(nodes: readonly ChatNode[], thread: Pick<ChatThread, "ended">, messages: readonly ChatMessage[]): boolean {
+  if (thread.ended) return false;
+  const lastSaid = [...messages].reverse().find((m) => m.sender !== "me" && m.nodeId);
+  if (!lastSaid) return false;
+  const node = nodes.find((n) => n.id === lastSaid.nodeId) ?? null;
+  if (!node) return true;
+  if (isEnded(node)) return false;
+  return node.replies.every((_, i) => {
+    const step = replyStep(nodes, node, i);
+    return !step || storyEnds(step);
+  });
+}
+
+/** Whether a thread can be played again: the node it opens at still exists. */
+export const canReplay = (nodes: readonly ChatNode[], thread: Pick<ChatThread, "entryNodeId">): boolean => nodes.some((n) => n.id === thread.entryNodeId);
+
 /** The reactions on each message of a thread: message id -> the learner's reaction (the latest one wins). */
 export function reactionsOf(messages: readonly ChatMessage[]): Map<string, string> {
   const out = new Map<string, string>();
@@ -200,6 +238,8 @@ export function reactionsOf(messages: readonly ChatMessage[]): Map<string, strin
 export function lastLine(message: ChatMessage): string {
   if (message.kind === "react") return `You reacted: ${chatArtName(message.text)}`;
   if (message.kind === "emoji") return `You sent a sticker: ${chatArtName(message.text)}`;
+  const system = systemOf(message.text);
+  if (system) return system;
   const picture = pictureOf(message.text);
   if (picture) return `Sent a picture: ${tourArtName(picture)}`;
   return message.text;

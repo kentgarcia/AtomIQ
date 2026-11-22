@@ -60,6 +60,15 @@ export const CHAT_STICKERS = ["mind-blown", "party", "atom", "banana", "radiatio
 export const CHAT_PICTURES = ["tour-map", "tour-quests", "tour-games", "tour-profile", "tour-phone"];
 export const CHAT_PICTURE_RE = /^\[\[pic:([a-z0-9-]+)\]\]$/;
 
+/**
+ * A part of a node's text that is only `[[sys:<line>]]` is a system line, not a bubble: a small grey note in the middle of the
+ * thread, like a messenger's "Ada got disconnected." It belongs to nobody and never types. It is a rare joke, so it is rationed:
+ * a short line, never the only part of a node (the teacher still says something), and a few per teacher in all.
+ */
+export const CHAT_SYSTEM_RE = /^\[\[sys:\s*([^\[\]\s][^\[\]]*)\]\]$/;
+export const CHAT_SYSTEM_MAX_LENGTH = 50;
+export const CHAT_SYSTEM_MAX_PER_TEACHER = 3;
+
 /** A story's subject line fits the list row. */
 export const CHAT_TITLE_MAX = 40;
 

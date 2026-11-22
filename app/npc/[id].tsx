@@ -4,6 +4,7 @@ import { PostCard } from "@/components/feed/PostCard";
 import { useCast } from "@/components/feed/use-cast";
 import { ScreenHeader, useHeaderBorder } from "@/components/layout";
 import { Shrodi } from "@/components/mascot/Shrodi";
+import { chatPalette } from "@/components/phone/chat-palette";
 import { ChatHead, speakerFor } from "@/components/phone/ChatHead";
 import { SHRODI_COLORS } from "@/components/mascot/shrodi-art";
 import { NpcCover } from "@/components/npc/NpcCover";
@@ -382,6 +383,14 @@ export default function NpcProfileScreen() {
     );
   }
 
+  // The Message button wears the teacher's colours (their cover's readable face, its lip and the text on it); Shrodi has the app's blue fur
+  const messageColors = (() => {
+    const outfit = isShrodi ? { color: SHRODI_COLORS.fur, shade: SHRODI_COLORS.furShade } : npc ? coverColors(npc.spec) : null;
+    if (!outfit) return undefined;
+    const p = chatPalette(outfit);
+    return { face: p.face, lip: p.lip, label: p.faceOn };
+  })();
+
   const header = (
     <Animated.View entering={settle(0)}>
       <NpcCover
@@ -435,6 +444,7 @@ export default function NpcProfileScreen() {
             label="Message"
             size="compact"
             fullWidth={false}
+            colors={messageColors}
             onPress={() =>
               void messageTeacher(npcId ?? "").then(
                 (id) =>

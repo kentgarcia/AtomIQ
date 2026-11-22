@@ -54,6 +54,7 @@ const STICKER = 104;
 const PICTURE = 232;
 const ROUND = 18;
 const SQUARE = 6;
+const LIP = 5;
 
 /**
  * `entering` for a letter the learner just sent: it comes up from where the replies were, a little small, and settles at full size
@@ -152,6 +153,21 @@ export const StickerBubble = memo(function StickerBubble({ id, fresh = false, la
   );
 });
 
+/**
+ * A system line: a small grey note in the middle of the thread ("Ada got disconnected."), said by nobody. A soft highlighted
+ * pill, no picture beside it and no tail; it eases in like a letter and is simply there with reduced motion.
+ */
+export const SystemLine = memo(function SystemLine({ text, fresh = false }: { text: string; fresh?: boolean }) {
+  const styles = useStyles(useTheme().theme);
+  return (
+    <Animated.View entering={fresh ? settle(0) : undefined} style={styles.systemRow} accessible accessibilityRole="text" accessibilityLabel={text}>
+      <View style={styles.systemPill}>
+        <Text style={styles.systemText}>{text}</Text>
+      </View>
+    </Animated.View>
+  );
+});
+
 /** Three dots that rise one after another, while a teacher "types". Still with reduced motion. */
 export const TypingBubble = memo(function TypingBubble({ speaker }: { speaker: ChatSpeaker | null | undefined }) {
   const styles = useStyles(useTheme().theme);
@@ -202,19 +218,50 @@ export const LinkButton = memo(function LinkButton({ label, icon, caption, onPre
   const styles = useStyles(useTheme().theme);
   const look = useLook();
   return (
-    <Pressable onPress={onPress} accessibilityRole="link" accessibilityLabel={`${label}. ${caption}.`} style={({ pressed }) => [styles.link, { backgroundColor: look.linkFace, borderColor: look.shade }, pressed && styles.linkPressed]}>
-      <View style={styles.linkIcon} accessible={false}>
-        <Icon name={icon} size={22} color={look.shade} variant="Bold" />
-      </View>
-      <View style={styles.linkCopy}>
-        <Text style={[styles.linkLabel, { color: look.linkOn }]} numberOfLines={2}>
-          {label}
-        </Text>
-        <Text style={[styles.linkCaption, { color: withAlpha(look.linkOn, 0.92) }]} numberOfLines={1}>
-          {caption}
-        </Text>
-      </View>
-      <Icon name="ArrowRight2" size={20} color={look.linkOn} variant="Linear" />
+    <Pressable onPress={onPress} accessibilityRole="link" accessibilityLabel={`${label}. ${caption}.`} style={styles.linkWrap}>
+      {({ pressed }) => (
+        <>
+          {/* The lip is its own rounded layer under the face; pressed, the face sinks onto it and the height stays the same */}
+          <View style={[styles.linkLip, { backgroundColor: look.shade }]} />
+          <View style={[styles.link, { backgroundColor: look.linkFace, transform: [{ translateY: pressed ? LIP : 0 }] }]}>
+            <View style={styles.linkIcon} accessible={false}>
+              <Icon name={icon} size={22} color={look.shade} variant="Bold" />
+            </View>
+            <View style={styles.linkCopy}>
+              <Text style={[styles.linkLabel, { color: look.linkOn }]} numberOfLines={2}>
+                {label}
+              </Text>
+              <Text style={[styles.linkCaption, { color: withAlpha(look.linkOn, 0.92) }]} numberOfLines={1}>
+                {caption}
+              </Text>
+            </View>
+            <Icon name="ArrowRight2" size={20} color={look.linkOn} variant="Linear" />
+          </View>
+        </>
+      )}
+    </Pressable>
+  );
+});
+
+/**
+ * The Replay story / Start again button under an ended thread: a chunky face on a lip like the link button, in the teacher's
+ * colours (their cover's readable face, its lip and the text that reads on it), the app's blue when there is no palette.
+ */
+export const ReplayButton = memo(function ReplayButton({ label, onPress }: { label: string; onPress: () => void }) {
+  const styles = useStyles(useTheme().theme);
+  const look = useLook();
+  return (
+    <Pressable onPress={onPress} accessibilityRole="button" accessibilityLabel={label} style={styles.replay}>
+      {({ pressed }) => (
+        <>
+          {/* The lip is its own layer, the same rounded shape as the face, exactly where the face lands when pressed (like the app's Button) */}
+          <View style={[styles.replayLip, { backgroundColor: look.shade }]} />
+          <View style={[styles.replayFace, { backgroundColor: look.linkFace, transform: [{ translateY: pressed ? LIP : 0 }] }]}>
+            <Icon name="Refresh2" size={20} color={look.linkOn} variant="Bold" />
+            <Text style={[styles.replayText, { color: look.linkOn }]}>{label}</Text>
+          </View>
+        </>
+      )}
     </Pressable>
   );
 });
@@ -258,18 +305,26 @@ const useStyles = createStyles((theme) => {
     stickerButton: { width: 68, height: 68, borderRadius: 20, borderWidth: 2, borderBottomWidth: 5, borderColor: c.borderStrong, alignItems: "center", justifyContent: "center", backgroundColor: c.card },
     reactButton: { width: 56, height: 56, borderRadius: 28, borderWidth: 2, borderBottomWidth: 5, borderColor: c.borderStrong, alignItems: "center", justifyContent: "center", backgroundColor: c.card },
     lipPressed: { borderBottomWidth: 2, marginTop: 3 },
+    systemRow: { alignItems: "center", marginTop: 4, marginBottom: 18, paddingHorizontal: 24 },
+    systemPill: { borderRadius: 12, paddingVertical: 5, paddingHorizontal: 12, backgroundColor: c.field },
+    systemText: { fontSize: 13, lineHeight: 18, textAlign: "center", ...fontFaces.semibold, color: c.textMuted },
     meRow: { alignItems: "flex-end", paddingLeft: 56 },
     meBubble: { backgroundColor: c.guideLip, borderRadius: ROUND, paddingVertical: 10, paddingHorizontal: 14 },
     meTail: { borderBottomRightRadius: SQUARE },
     meText: { fontSize: 16, lineHeight: 22, ...fontFaces.medium, color: c.lessonHeaderText },
     typing: { flexDirection: "row", alignItems: "center", gap: 5, paddingVertical: 17 },
     dot: { width: 8, height: 8, borderRadius: 4, backgroundColor: c.textMuted },
-    link: { alignSelf: "stretch", flexDirection: "row", alignItems: "center", gap: 12, paddingVertical: 10, paddingLeft: 12, paddingRight: 14, borderRadius: 18, borderBottomWidth: 5, borderColor: c.guideLip, backgroundColor: c.guide },
-    linkPressed: { borderBottomWidth: 2, marginTop: 3 },
+    linkWrap: { alignSelf: "stretch", paddingBottom: LIP },
+    linkLip: { position: "absolute", top: LIP, left: 0, right: 0, bottom: 0, borderRadius: 18 },
+    link: { flexDirection: "row", alignItems: "center", gap: 12, paddingVertical: 10, paddingLeft: 12, paddingRight: 14, borderRadius: 18 },
     linkIcon: { width: 40, height: 40, borderRadius: 12, alignItems: "center", justifyContent: "center", backgroundColor: c.card },
     linkCopy: { flex: 1, gap: 1 },
     linkLabel: { fontSize: 16, lineHeight: 21, ...fontFaces.heavy, color: c.onPrimary },
     linkCaption: { fontSize: 12, lineHeight: 16, ...fontFaces.semibold, color: withAlpha(c.onPrimary, 0.8) },
+    replay: { paddingBottom: LIP },
+    replayLip: { position: "absolute", top: LIP, left: 0, right: 0, bottom: 0, borderRadius: 16 },
+    replayFace: { minHeight: 46, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8, paddingHorizontal: 22, borderRadius: 16 },
+    replayText: { fontSize: 16, lineHeight: 21, ...fontFaces.heavy },
     pill: { minHeight: 50, alignItems: "center", justifyContent: "center", paddingTop: 8, paddingBottom: 6, paddingHorizontal: 20, borderRadius: 16, borderWidth: 2, borderBottomWidth: 5, borderColor: c.guide, backgroundColor: c.card },
     pillPressed: { borderBottomWidth: 2, marginTop: 3, backgroundColor: c.surfaceSoft },
     pillText: { flexShrink: 1, fontSize: 16, lineHeight: 21, textAlign: "center", ...fontFaces.heavy, color: c.guideLip },

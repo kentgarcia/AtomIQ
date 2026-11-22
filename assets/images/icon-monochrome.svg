@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+  width="512"
+  height="512"
+  viewBox="0 0 512 512"
+  id="atomiq-icon-monochrome"
+>
+  <title>AtomIQ Android Monochrome Adaptive Icon</title>
+  <!-- Centered inside Android's 66% adaptive safe zone (338x338 inside 512x512) -->
+  <g
+    id="layer-monochrome"
+    inkscape:groupmode="layer"
+    inkscape:label="Monochrome Silhouette"
+    transform="translate(88 94) scale(0.656)"
+  >
+    <!-- Round Glasses Frames & Bridge -->
+    <path
+      d="M 228 179 Q 256 167 284 179"
+      fill="none"
+      stroke="#000000"
+      stroke-width="20"
+      stroke-linecap="butt"
+    />
+    <circle cx="117" cy="182" r="114" fill="none" stroke="#000000" stroke-width="20" />
+    <circle cx="395" cy="182" r="114" fill="none" stroke="#000000" stroke-width="20" />
+
+    <!-- Starry Eyes (solid iris with specular & 4-point star cutouts via evenodd) -->
+    <path
+      fill="#000000"
+      fill-rule="evenodd"
+      d="
+        M 131 112 A 64 70 0 1 0 131 252 A 64 70 0 1 0 131 112 Z
+        M 103 125 A 21 27 0 1 1 103 179 A 21 27 0 1 1 103 125 Z
+        M 89 201 A 11 11 0 1 1 89 223 A 11 11 0 1 1 89 201 Z
+        M 164 160 Q 167 182 187 186 Q 167 190 164 212 Q 161 190 141 186 Q 161 182 164 160 Z
+      "
+    />
+    <path
+      fill="#000000"
+      fill-rule="evenodd"
+      d="
+        M 381 112 A 64 70 0 1 0 381 252 A 64 70 0 1 0 381 112 Z
+        M 353 125 A 21 27 0 1 1 353 179 A 21 27 0 1 1 353 125 Z
+        M 339 201 A 11 11 0 1 1 339 223 A 11 11 0 1 1 339 201 Z
+        M 414 160 Q 417 182 437 186 Q 417 190 414 212 Q 411 190 391 186 Q 411 182 414 160 Z
+      "
+    />
+
+    <!-- Nose -->
+    <path
+      d="M 226 224 C 224 211 238 205 256 205 C 274 205 288 211 286 224 C 284 239 269 251 256 251 C 243 251 228 239 226 224 Z"
+      fill="#000000"
+    />
+
+    <!-- Philtrum, Smile & Open Mouth -->
+    <path
+      d="M 256 244 L 256 280"
+      fill="none"
+      stroke="#000000"
+      stroke-width="11"
+      stroke-linecap="butt"
+    />
+    <path
+      d="M 210 301 C 228 303 246 296 256 282 C 266 296 284 303 302 301 C 308 360 294 416 256 416 C 218 416 204 360 210 301 Z"
+      fill="none"
+      stroke="#000000"
+      stroke-width="11"
+      stroke-linejoin="round"
+    />
+    <path
+      d="M 194 289 C 199 297 204 300 210 301 M 318 289 C 313 297 308 300 302 301"
+      fill="none"
+      stroke="#000000"
+      stroke-width="11"
+      stroke-linecap="round"
+    />
+    <!-- Tongue hint -->
+    <path
+      d="M 224 388 Q 256 360 288 388"
+      fill="none"
+      stroke="#000000"
+      stroke-width="10"
+      stroke-linecap="round"
+    />
+
+    <!-- Happy Raised Paws Outline -->
+    <path
+      d="M 26 422 C 22 368 48 332 82 344 C 114 356 128 398 118 440"
+      fill="none"
+      stroke="#000000"
+      stroke-width="11"
+      stroke-linecap="round"
+    />
+    <path
+      d="M 62 346 C 52 364 48 384 52 404"
+      fill="none"
+      stroke="#000000"
+      stroke-width="9"
+      stroke-linecap="round"
+    />
+    <path
+      d="M 486 422 C 490 368 464 332 430 344 C 398 356 384 398 394 440"
+      fill="none"
+      stroke="#000000"
+      stroke-width="11"
+      stroke-linecap="round"
+    />
+    <path
+      d="M 450 346 C 460 364 464 384 460 404"
+      fill="none"
+      stroke="#000000"
+      stroke-width="9"
+      stroke-linecap="round"
+    />
+  </g>
+</svg>

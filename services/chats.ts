@@ -10,7 +10,10 @@ import { contentRepository } from "@/services/content-db";
 import { getDatabase } from "@/services/database";
 import {
   createChatStore,
+  canReplay,
   currentNode,
+  isStuck,
+  storyEnds,
   earnedStories,
   greetingOf,
   CHAT_MASCOT_ID,
@@ -124,9 +127,11 @@ export interface ThreadView {
   current: ChatNode | null;
   /** The teacher's messages that just arrived (unread when opened, or added by a reply or a replay): the screen plays them one by one. */
   fresh: string[];
+  /** The node the thread opens at still exists, so Replay works (a retired story keeps its history but cannot be played again). */
+  canReplay: boolean;
 }
 
-const viewOf = (thread: ChatThread, nodes: ChatNode[], messages: ChatMessage[], fresh: string[] = []): ThreadView => ({ thread, nodes, messages, current: currentNode(nodes, messages), fresh });
+const viewOf = (thread: ChatThread, nodes: ChatNode[], messages: ChatMessage[], fresh: string[] = []): ThreadView => ({ thread, nodes, messages, current: currentNode(nodes, messages), fresh, canReplay: canReplay(nodes, thread) });
 
 /** Say a node: one message per bubble of its text (a blank line starts a bubble), a millisecond apart so they keep their order. Returns their ids. */
 async function sayNode(threadId: string, npcId: string, node: ChatNode, at: number, read: boolean): Promise<string[]> {
@@ -309,7 +314,14 @@ export async function openThread(threadId: string): Promise<ThreadView | null> {
     // What arrived since the learner last looked is played one bubble at a time
     const fresh = await store.unreadIds(threadId);
     if ((await store.markRead(threadId, Date.now())) > 0) notifyChats();
-    return viewOf(thread, nodes, await store.list(threadId), fresh);
+    const messages = await store.list(threadId);
+    // Content that changed after the thread began (a node retired or renamed) must not leave it stuck on a message that answers nothing
+    if (isStuck(nodes, thread, messages)) {
+      await store.setEnded(threadId, true, Date.now());
+      notifyChats();
+      return viewOf((await store.getThread(threadId)) ?? { ...thread, ended: true }, nodes, messages, fresh);
+    }
+    return viewOf(thread, nodes, messages, fresh);
   } catch (error) {
     console.warn("[chats] open", error);
     return null;
@@ -357,7 +369,7 @@ export async function sendReply(threadId: string, index: number): Promise<ReplyR
     }
     let added: string[] = [];
     if (step.next) added = await sayNode(threadId, thread.npcId, step.next, now + 1, true);
-    else if (step.ends) await store.setEnded(threadId, true, now + 1);
+    else if (storyEnds(step)) await store.setEnded(threadId, true, now + 1);
     const fresh = (await store.getThread(threadId)) ?? thread;
     return { view: viewOf(fresh, nodes, await store.list(threadId), added), action: step.action, answered: step.next !== null, sent: sent.id };
   } catch (error) {

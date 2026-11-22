@@ -68,3 +68,8 @@ assets/sfx/kent-sfx/
 .claude/
 .opencode/
 .vscode/
+
+# Promo video tooling (Remotion isolated workspace & renders)
+tools/promo-video/node_modules/
+tools/promo-video/out/
+tools/promo-video/public/

@@ -49,7 +49,9 @@ test("a bullet is a whole line that starts with a bullet and a space", () => {
 
 test("no placeholders or leftovers", () => {
   for (const [name, sections, highlights] of docs) {
-    const all = `${text(sections)}\n${highlights.join("\n")}`;
+    let all = `${text(sections)}\n${highlights.join("\n")}`;
+    // The real contact address may be a Gmail one; only an unknown @gmail address is a placeholder
+    if (legal.LEGAL_CONTACT_EMAIL) all = all.split(legal.LEGAL_CONTACT_EMAIL).join("");
     assert.ok(!/TODO|FIXME|XXX|lorem|\[[A-Z ]{3,}\]|example\.com|@gmail/i.test(all), `${name}: placeholder text`);
   }
 });
@@ -78,7 +80,6 @@ test("privacy: covers what a data-protection regime and the app stores ask for",
     "erased or blocked",
     "kept until you remove it",
     "Unsplash",
-    "Google Forms",
   ]) {
     assert.ok(all.toLowerCase().includes(needle.toLowerCase()), `privacy policy never mentions "${needle}"`);
   }
@@ -128,5 +129,5 @@ test("the contact line works with and without an address", () => {
   const line = legal.contactLine("privacy");
   assert.ok(line.length > 40);
   if (legal.LEGAL_CONTACT_EMAIL) assert.ok(line.includes(legal.LEGAL_CONTACT_EMAIL));
-  else assert.ok(line.includes("Beta Feedback"));
+  else assert.ok(line.includes("app store"));
 });

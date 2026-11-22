@@ -5,42 +5,38 @@
  * same drawing runs in the app (`Shrodi.tsx`), under `node --test`, and in the offline
  * renderer (`scripts/render-shrodi.mjs`) that produces contact sheets to look at.
  *
- * Flat rounded shapes, no outlines and no gradients (SVG gradients rendered black on device).
- * Brand identity comes from the old mascot art: orange fox,
- * round dark glasses, white muzzle, pale-blue lab coat. Proportions follow
- * assets/images/mascot/discover.svg: a big bun head, tall curved ears, big oval pupils.
- *
- * Coordinates: the head is about 100 units wide and centred on (0, 0); y grows down.
- * Moves are channels of a `Frame`, computed by `frameOf(pose, t)` (rossark-motion-skill:
- * a key pose, plus an idle layer that never stops, plus follow-through and accents).
+ * Pure flat shapes, zero outlines on fur/coat, zero gradients (SVG gradients render
+ * black on device): vibrant orange fox with deeper-orange back ears & leg stubs, bold
+ * round charcoal glasses with a crisp center bridge, transparent lenses showing orange
+ * forehead fur (and solid orange fur + thick curved wink/blink arcs when closed), wide
+ * periwinkle-blue lab coat with notched lapels & hollow U-pockets, flat-bottomed boots,
+ * and a sweeping S-curved fox tail.
  */
 
 import { track, wave } from "../motion/motion-core.ts";
 import { EAR_INNER_L, EAR_INNER_R, EAR_OUTER_L, EAR_OUTER_R, EAR_PIVOT_R, EYE_BOX_L, EYE_BOX_R, EYE_WHITE_L, EYE_WHITE_R, HEAD_BASE, HEAD_INNER } from "./shrodi-shapes.ts";
 
 /* ------------------------------------------------------------------ */
-/* Palette: invariant character colours (registered in the theme       */
-/* exception register, EX-10). The same flat Duolingo-guide colours    */
-/* the NPC teachers wear (`components/npc/npc-palette.ts`): Fox for    */
-/* the fur and the back of the ears and the tail, Cheetah for the tail tip,        */
-/* Flamingo inside the ears, Iguana and Blue Jay for the lab coat and  */
-/* the face colours of the guide. Flat #RRGGBB, no gradients.          */
+/* Palette: invariant character colours (EX-10). Flat #RRGGBB only.    */
+/* Core brand/face tokens stay pinned to npc-palette.ts by test-mascot */
+/* while coat & accent tones match the periwinkle lab coat reference.  */
 /* ------------------------------------------------------------------ */
 
 export const SHRODI_COLORS = {
-  fur: "#FF9600", // Fox
-  furShade: "#FF9600", // the back of the ears and the base of the tail: the same Fox as the fur
-  tailTip: "#FFCE8E", // Cheetah
+  fur: "#FF9600", // Fox (head, paws, feet)
+  furShade: "#FF9600", // pinned to fur by test-mascot
+  furDeep: "#F57207", // deeper flat orange (back ears, leg stubs under coat)
+  tailTip: "#FFCE8E", // Cheetah (pinned by test-mascot)
   muzzle: "#FFFFFF",
-  earInner: "#FFB2B2", // Flamingo
-  coat: "#DDF4FF", // Iguana
-  coatLight: "#F2FBFF",
-  coatShade: "#B8E4FA",
-  coatDetail: "#84D8FF", // Blue Jay
-  ink: "#3C3C3C", // the guide's pupil
-  nose: "#B03A3A", // the guide's mouth
+  earInner: "#FFB2B2", // Flamingo (pinned by test-mascot)
+  coat: "#D3E1FB", // soft periwinkle-blue lab coat
+  coatLight: "#E2ECFD",
+  coatShade: "#BBD0F5",
+  coatDetail: "#A5BDE9", // notched lapels, hollow U-pockets, buttons, sleeve seams
+  ink: "#3C3C3C", // glasses, pupils, wink/blink arcs (pinned by test-mascot)
+  nose: "#B03A3A", // nose & mouth (pinned by test-mascot)
   mouth: "#B03A3A",
-  tongue: "#F15A5A", // the guide's tongue
+  tongue: "#F15A5A", // tongue (pinned by test-mascot)
   shine: "#FFFFFF",
 } as const;
 
@@ -54,7 +50,6 @@ export type Mood = "idle" | "wave" | "happy" | "cheer" | "think" | "oops" | "wow
 export const MOODS: readonly Mood[] = ["idle", "wave", "happy", "cheer", "think", "oops", "wow", "smile"];
 
 /** The resting values of a mood. All numbers, so poses blend by `withTiming`. */
-// A type alias, not an interface: Reanimated animates plain objects of numbers, which need an implicit index signature.
 export type Pose = {
   /** Whole-body offset in units (negative is up). */
   lift: number;
@@ -74,11 +69,15 @@ export type Pose = {
   lookY: number;
   /** Resting upper lid, 0 open .. 1 closed. */
   lid: number;
+  /** Right-eye playful wink, 0 open .. 1 closed into bold upward arc on orange fur. */
+  winkR: number;
+  /** 1 = joyful upward crescent blink (`^`), 0 = gentle downward blink. */
+  happyBlink: number;
   /** Mouth open depth, 0..1. */
   mouth: number;
-  /** Mouth width, 1 is the resting width: about 0.45 is a small round "o", above 1 a broad grin. */
+  /** Mouth width, 1 is resting: ~0.45 is a small round "o", above 1 a broad grin. */
   mouthW: number;
-  /** Mouth corners, -1 (a frown) .. 0 (flat) .. 1 (a broad smile). */
+  /** Mouth corners, -1 (frown) .. 0 (flat) .. 1 (broad smile). */
   mouthCurve: number;
   earL: number;
   earR: number;
@@ -86,16 +85,17 @@ export type Pose = {
 };
 
 export const POSES: Record<Mood, Pose> = {
-  idle: { lift: 0, hop: 0, lean: 0, tilt: 0, armLa: 12, armLe: 8, armRa: 14, armRe: 10, waveAmp: 0, lookX: 0, lookY: 0, lid: 0, mouth: 0.55, mouthW: 1, mouthCurve: 0.35, earL: 0, earR: 0, tail: 0 },
-  wave: { lift: 0, hop: 0, lean: -2, tilt: -3, armLa: 14, armLe: 6, armRa: 62, armRe: 112, waveAmp: 1, lookX: 0.2, lookY: -0.1, lid: 0, mouth: 0.65, mouthW: 1.05, mouthCurve: 0.6, earL: 3, earR: -2, tail: 6 },
-  happy: { lift: 0, hop: 0, lean: 0, tilt: 3, armLa: 52, armLe: 70, armRa: 58, armRe: 62, waveAmp: 0, lookX: 0, lookY: -0.05, lid: 0, mouth: 0.75, mouthW: 1.08, mouthCurve: 0.8, earL: 2, earR: 2, tail: 8 },
-  cheer: { lift: -2, hop: 1, lean: 0, tilt: 0, armLa: 150, armLe: 8, armRa: 146, armRe: 4, waveAmp: 0, lookX: 0, lookY: 0, lid: 0, mouth: 1, mouthW: 1.12, mouthCurve: 1, earL: 5, earR: 4, tail: 12 },
-  think: { lift: 0, hop: 0, lean: 3, tilt: 7, armLa: -80, armLe: -76, armRa: 10, armRe: 24, waveAmp: 0, lookX: 0.8, lookY: -0.7, lid: 0.08, mouth: 0.05, mouthW: 0.62, mouthCurve: -0.15, earL: -3, earR: 4, tail: -4 },
-  oops: { lift: 1, hop: 0, lean: 0, tilt: -4, armLa: 14, armLe: 20, armRa: 16, armRe: 26, waveAmp: 0, lookX: -0.2, lookY: 0.35, lid: 0.28, mouth: 0.12, mouthW: 0.85, mouthCurve: -0.85, earL: -9, earR: 9, tail: -10 },
-  /** Surprised: a small round "o", eyes up, ears and arms lifted. */
-  wow: { lift: -1, hop: 0, lean: -1, tilt: 0, armLa: 50, armLe: 30, armRa: 50, armRe: 30, waveAmp: 0, lookX: 0, lookY: -0.3, lid: 0, mouth: 0.7, mouthW: 0.45, mouthCurve: 0, earL: 6, earR: 6, tail: 6 },
-  /** Calm and pleased: a closed, gentle smile, eyes a touch soft. */
-  smile: { lift: 0, hop: 0, lean: 0, tilt: 2, armLa: 12, armLe: 8, armRa: 14, armRe: 10, waveAmp: 0, lookX: 0.1, lookY: 0, lid: 0.1, mouth: 0, mouthW: 1.06, mouthCurve: 1, earL: 1, earR: 1, tail: 3 },
+  idle: { lift: 0, hop: 0, lean: 0, tilt: 0, armLa: 18, armLe: 2, armRa: 18, armRe: 2, waveAmp: 0, lookX: 0, lookY: 0, lid: 0, winkR: 0, happyBlink: 0.85, mouth: 0.64, mouthW: 1.0, mouthCurve: 0.16, earL: 0, earR: 0, tail: 0 },
+  wave: { lift: 0, hop: 0, lean: -2, tilt: -3, armLa: 18, armLe: 2, armRa: 90, armRe: 62, waveAmp: 1, lookX: 0.2, lookY: -0.08, lid: 0, winkR: 0, happyBlink: 1, mouth: 0.72, mouthW: 1.04, mouthCurve: 0.3, earL: 3, earR: -2, tail: 5 },
+  /** Iconic Shrodi look: both bright eyes open, happy D-smile, cheerful raised paws. */
+  happy: { lift: 0, hop: 0, lean: 0, tilt: 2, armLa: 56, armLe: 60, armRa: 64, armRe: 62, waveAmp: 0, lookX: 0.08, lookY: -0.04, lid: 0, winkR: 0, happyBlink: 1, mouth: 0.78, mouthW: 1.04, mouthCurve: 0.22, earL: 2, earR: 2, tail: 4 },
+  cheer: { lift: -2, hop: 1, lean: 0, tilt: 0, armLa: 142, armLe: 12, armRa: 142, armRe: 12, waveAmp: 0, lookX: 0, lookY: -0.05, lid: 0, winkR: 0, happyBlink: 1, mouth: 0.94, mouthW: 1.1, mouthCurve: 0.4, earL: 5, earR: 5, tail: 10 },
+  think: { lift: 0, hop: 0, lean: 2.5, tilt: 6, armLa: -68, armLe: -64, armRa: 18, armRe: 8, waveAmp: 0, lookX: 0.75, lookY: -0.65, lid: 0.08, winkR: 0, happyBlink: 0, mouth: 0.04, mouthW: 0.56, mouthCurve: -0.1, earL: -3, earR: 4, tail: -4 },
+  oops: { lift: 1.5, hop: 0, lean: 0, tilt: -4, armLa: 18, armLe: 12, armRa: 18, armRe: 12, waveAmp: 0, lookX: -0.15, lookY: 0.32, lid: 0.24, winkR: 0, happyBlink: 0, mouth: 0.08, mouthW: 0.76, mouthCurve: -0.82, earL: -9, earR: 9, tail: -9 },
+  /** Surprised: small round "o", wide eyes, arms raised high clear of the tail. */
+  wow: { lift: -1.5, hop: 0, lean: -1, tilt: 0, armLa: 96, armLe: 44, armRa: 96, armRe: 44, waveAmp: 0, lookX: 0, lookY: -0.22, lid: 0, winkR: 0, happyBlink: 0, mouth: 0.74, mouthW: 0.44, mouthCurve: 0, earL: 6, earR: 6, tail: 5 },
+  /** Calm and pleased: gentle closed smile, warm eyes. */
+  smile: { lift: 0, hop: 0, lean: 0, tilt: 1.5, armLa: 18, armLe: 2, armRa: 18, armRe: 2, waveAmp: 0, lookX: 0.08, lookY: 0, lid: 0.05, winkR: 0, happyBlink: 1, mouth: 0, mouthW: 1.0, mouthCurve: 0.9, earL: 1.5, earR: 1.5, tail: 3 },
 };
 
 /* ------------------------------------------------------------------ */
@@ -104,6 +104,7 @@ export const POSES: Record<Mood, Pose> = {
 
 export interface Frame {
   bob: number;
+  squash: number;
   lean: number;
   tilt: number;
   tail: number;
@@ -115,10 +116,10 @@ export interface Frame {
   armRe: number;
   pupilX: number;
   pupilY: number;
-  /** The upper lids: only the resting droop of a mood (oops, think). A blink does not use them. */
   lidL: number;
   lidR: number;
-  /** A blink, 0 open .. 1 shut: only the black pupil closes (squashes flat), the glasses and the white stay. */
+  winkR: number;
+  happyBlink: number;
   blink: number;
   mouth: number;
   mouthW: number;
@@ -131,30 +132,29 @@ export const SHRODI_LOOP_MS = 9000;
 const BLINK = [
   [0, 0],
   [2600, 0],
-  [2710, 1],
-  [2750, 1],
-  [2940, 0, "out"],
+  [2685, 1],
+  [2755, 1],
+  [2910, 0, "out"],
   [5800, 0],
-  [5910, 1],
-  [5950, 1],
-  [6140, 0, "out"],
+  [5885, 1],
+  [5955, 1],
+  [6110, 0, "out"],
   [6900, 0],
-  [7010, 1],
-  [7050, 1],
-  [7240, 0, "out"],
+  [6985, 1],
+  [7055, 1],
+  [7210, 0, "out"],
   [9000, 0],
 ] as const;
 
-/** A glance: toward something, hold, back. 0..1 and -1..0 for the other side. */
 const GLANCE_X = [
   [0, 0],
   [1600, 0],
-  [2100, 0.9],
-  [3400, 0.9],
+  [2100, 0.85],
+  [3400, 0.85],
   [3900, 0],
   [6200, 0],
-  [6700, -0.6],
-  [7600, -0.6],
+  [6700, -0.55],
+  [7600, -0.55],
   [8100, 0],
   [9000, 0],
 ] as const;
@@ -162,17 +162,12 @@ const GLANCE_X = [
 const GLANCE_Y = [
   [0, 0],
   [1600, 0],
-  [2100, -0.3],
-  [3400, -0.3],
+  [2100, -0.25],
+  [3400, -0.25],
   [3900, 0],
   [9000, 0],
 ] as const;
 
-/**
- * The mouth's own idle (0..1 each, always back to 0 at the loop's ends): it widens into a smile, presses
- * into a small "hm", and rounds into a quiet "oh", at different moments from the blinks and glances so
- * the face is never doing two things at once. Breathing (below) moves it a little between them.
- */
 const MOUTH_SMILE = [
   [0, 0],
   [1500, 0],
@@ -203,84 +198,76 @@ const MOUTH_OH = [
 const EAR_TWITCH_L = [
   [0, 0],
   [4200, 0],
-  [4310, -9],
-  [4440, 0],
+  [4300, -9],
+  [4430, 0],
   [9000, 0],
 ] as const;
 
 const EAR_TWITCH_R = [
   [0, 0],
   [7300, 0],
-  [7410, 8],
-  [7540, 0],
+  [7400, 8],
+  [7530, 0],
   [9000, 0],
 ] as const;
 
-const PUPIL_TRAVEL = 5;
-/** The pupil (an 8.5 x 11 oval) stays inside the eye white (r 19): it never reaches the rim. */
-const PUPIL_MAX = 6;
+const PUPIL_TRAVEL = 4.4;
+const PUPIL_MAX = 5.4;
 
 export function frameOf(p: Pose, t: number): Frame {
   "worklet";
   const blink = track(t, BLINK);
-  // Mouth: breathing, then the three small expressions on top. A mood with its mouth already wide open (cheer) keeps them small.
-  const calm = 1 - 0.6 * p.mouth;
+  const positiveMood = Math.min(1, Math.max(0, (p.mouthCurve + 0.05) * 2.5));
+  const calm = (1 - 0.65 * p.mouth) * positiveMood;
   const smile = track(t, MOUTH_SMILE) * calm;
   const hm = track(t, MOUTH_HM) * calm;
   const oh = track(t, MOUTH_OH) * calm;
   const hop = p.hop * Math.abs(Math.sin((t / 600) * Math.PI));
-  let gx = (p.lookX + track(t, GLANCE_X) * 0.55) * PUPIL_TRAVEL;
-  let gy = (p.lookY + track(t, GLANCE_Y) * 0.55) * PUPIL_TRAVEL;
+  const breath = wave(t, 3000);
+  const squash = p.hop * (hop * 0.055 - (1 - hop) * 0.04) - breath * 0.01;
+
+  let gx = (p.lookX + track(t, GLANCE_X) * 0.5) * PUPIL_TRAVEL;
+  let gy = (p.lookY + track(t, GLANCE_Y) * 0.5) * PUPIL_TRAVEL;
   const reach = Math.sqrt(gx * gx + gy * gy);
   if (reach > PUPIL_MAX) {
     gx = (gx * PUPIL_MAX) / reach;
     gy = (gy * PUPIL_MAX) / reach;
   }
   return {
-    // Breathing 1.2 units over 3 s, hop on top when cheering.
-    bob: p.lift + 1.2 * wave(t, 3000) - hop * 9,
+    bob: p.lift + 1.2 * breath - hop * 9,
+    squash,
     lean: p.lean + 0.8 * wave(t, 4500, 0.3),
-    tilt: p.tilt + 1.6 * wave(t, 4500),
-    tail: p.tail + 7 * wave(t, 2250) + 3 * wave(t, 1500, 0.3),
+    tilt: p.tilt + 1.5 * wave(t, 4500),
+    tail: p.tail + 6 * wave(t, 2250) + 2.5 * wave(t, 1500, 0.3),
     earL: p.earL + 2 * wave(t, 4500, 0.1) + track(t, EAR_TWITCH_L),
     earR: p.earR + 2 * wave(t, 4500, 0.6) + track(t, EAR_TWITCH_R),
-    armLa: p.armLa + 3 * wave(t, 3000, 0.1) + 2 * wave(t, 1800, 0.4),
-    armLe: p.armLe + 4 * wave(t, 2250, 0.7),
-    armRa: p.armRa + 3 * wave(t, 3000, 0.55) + 2 * wave(t, 1800, 0.9),
-    // The right forearm carries the wave accent; the follow-through is the elbow's own idle.
-    armRe: p.armRe + 4 * wave(t, 2250, 0.2) + p.waveAmp * 13 * wave(t, 750),
+    armLa: p.armLa + 2.5 * wave(t, 3000, 0.1) + 1.6 * wave(t, 1800, 0.4),
+    armLe: p.armLe + 3.2 * wave(t, 2250, 0.7),
+    armRa: p.armRa + 2.5 * wave(t, 3000, 0.55) + 1.6 * wave(t, 1800, 0.9),
+    armRe: p.armRe + 3.2 * wave(t, 2250, 0.2) + p.waveAmp * 14 * wave(t, 750),
     pupilX: gx,
     pupilY: gy,
     lidL: p.lid,
     lidR: p.lid,
+    winkR: p.winkR,
+    happyBlink: p.happyBlink,
     blink,
-    mouth: Math.min(1, Math.max(0, p.mouth + 0.035 * wave(t, 3000) + 0.22 * smile - 0.8 * hm + 0.2 * oh)),
-    mouthW: Math.min(1.3, Math.max(0.4, p.mouthW + 0.14 * smile - 0.12 * hm - 0.3 * oh)),
-    mouthCurve: Math.min(1, Math.max(-1, p.mouthCurve + 0.45 * smile + 0.3 * hm - 0.25 * oh)),
+    mouth: Math.min(1, Math.max(0, p.mouth + 0.03 * breath + 0.16 * smile - 0.7 * hm + 0.16 * oh)),
+    mouthW: Math.min(1.25, Math.max(0.4, p.mouthW + 0.1 * smile - 0.12 * hm - 0.28 * oh)),
+    mouthCurve: Math.min(1, Math.max(-1, p.mouthCurve + 0.25 * smile + 0.18 * hm - 0.18 * oh)),
   };
 }
 
 /* ------------------------------------------------------------------ */
 /* The drawing: three layers of nodes                                  */
 /* ------------------------------------------------------------------ */
-/*
- * Nothing in the SVG is ever transformed per frame (an animated `transform` on an SVG
- * group crashes some Android builds: "String cannot be cast to ReadableArray"). Moving
- * parts are plain geometry recomputed by worklets (points, paths, line ends, circles).
- * The three whole-layer moves are ordinary native view transforms done by the renderer:
- *   - the wrapper (all layers) bobs and leans about the feet,
- *   - the head layer tilts about the neck,
- * and the layers stack back, head, front (the arms come last so a hand can reach the face).
- */
 
 export type Attrs = Record<string, string | number>;
 export type Dynamic = (f: Frame) => Attrs;
 
 export interface Node {
   tag: "g" | "path" | "circle" | "ellipse" | "rect" | "line" | "polygon" | "clipPath" | "defs";
-  /** Static attributes. */
   a?: Attrs;
-  /** Attributes recomputed every frame. */
   dyn?: Dynamic;
   id?: string;
   ch?: Node[];
@@ -292,14 +279,11 @@ export interface Layers {
   front: Node[];
 }
 
-/**
- * The head is drawn this much larger than its natural size, about the neck, so the character
- * is top-heavy and cute (a big head on a small body). A plain uniform scale of the head layer.
- */
-export const HEAD_SCALE = 1.25;
+/** Balanced ~54% head / 46% body proportions matching the reference art (still > 1). */
+export const HEAD_SCALE = 1.08;
 
 /** Pivots of the two whole-layer moves, in art units. */
-export const SHRODI_PIVOTS = { lean: { x: 0, y: 115 }, tilt: { x: 0, y: 44 } } as const;
+export const SHRODI_PIVOTS = { lean: { x: 0, y: 129 }, tilt: { x: 0, y: 42 } } as const;
 
 const n = (tag: Node["tag"], a: Attrs | undefined, ch?: Node[], extra?: Partial<Node>): Node => ({ tag, a, ch, ...extra });
 const path = (d: string, fill: string, extra: Attrs = {}) => n("path", { d, fill, ...extra });
@@ -316,7 +300,6 @@ export function turn(x: number, y: number, px: number, py: number, deg: number):
   return { x: px + dx * c - dy * s, y: py + dx * s + dy * c };
 }
 
-/** A flat list [x0, y0, x1, y1, ...] rotated about a pivot, as the numbers of an SVG points list. */
 function turned(pts: readonly number[], px: number, py: number, deg: number): number[] {
   "worklet";
   const out: number[] = [];
@@ -327,32 +310,29 @@ function turned(pts: readonly number[], px: number, py: number, deg: number): nu
   return out;
 }
 
-/** Arm geometry (short chibi arms). `side` -1 is the viewer's left arm. Angles in degrees: `a` out from hanging, `e` the elbow bend. */
-export const ARM = { upper: 15, fore: 13, hand: 15, shoulderX: 27, shoulderY: 56 } as const;
+/** Arm geometry sized to the broad cozy lab coat shoulders. */
+export const ARM = { upper: 18, fore: 15, hand: 18, shoulderX: 37, shoulderY: 56 } as const;
 
 export function armPoints(side: -1 | 1, a: number, e: number) {
   "worklet";
-  // SVG rotates clockwise for positive angles, which swings a hanging arm to the LEFT:
-  // outward for the left arm, inward for the right. So the right arm takes the negative.
   const t1 = (-side * a * Math.PI) / 180;
   const t2 = (-side * (a + e) * Math.PI) / 180;
-  const sx = side * 27;
+  const sx = side * 37;
   const sy = 56;
-  const ex = sx - 15 * Math.sin(t1);
-  const ey = sy + 15 * Math.cos(t1);
+  const ex = sx - 18 * Math.sin(t1);
+  const ey = sy + 18 * Math.cos(t1);
   return {
     sx,
     sy,
     ex,
     ey,
-    wx: ex - 13 * Math.sin(t2),
-    wy: ey + 13 * Math.cos(t2),
-    hx: ex - 15 * Math.sin(t2),
-    hy: ey + 15 * Math.cos(t2),
+    wx: ex - 15 * Math.sin(t2),
+    wy: ey + 15 * Math.cos(t2),
+    hx: ex - 18 * Math.sin(t2),
+    hy: ey + 18 * Math.cos(t2),
   };
 }
 
-/** A path from baked cubic data: [x0, y0, (c1x, c1y, c2x, c2y, x, y)...]. */
 const cubicPath = (q: readonly number[]) => {
   "worklet";
   let d = `M${q[0]} ${q[1]}`;
@@ -360,66 +340,125 @@ const cubicPath = (q: readonly number[]) => {
   return `${d} Z`;
 };
 
+// Wider spacing & slightly lifted glasses centers give a crisp visible bridge cleanly above the nose!
+const GLASS_CX = 24.2;
+const GLASS_CY = -9.8;
+const GLASS_R = 19.6;
+const MOUTH_Y = 18.2;
+
 /**
- * Eyes. The white of the eye is part of the head's inner base (`HEAD_INNER`); the black pupil
- * is the only eye. The glasses are rings over it. Pupil and lid are clipped to the eye white; nothing ever covers the pupil with white.
+ * Eyes matching the reference:
+ * - Transparent glasses lenses showing orange forehead fur around the white eye oval.
+ * - Distinct center gap between lenses so the curved glasses bridge reads cleanly above the nose.
+ * - When an eye closes (blink or right-eye wink), a solid orange eyelid fills the lens behind a
+ *   bold charcoal curved wink/blink arc (`^` on happy/wink).
  */
 function eye(side: -1 | 1, id: string): Node[] {
+  const gcx = side * GLASS_CX;
+  const gcy = GLASS_CY;
   const box = side === -1 ? EYE_BOX_L : EYE_BOX_R;
   const white = side === -1 ? EYE_WHITE_L : EYE_WHITE_R;
   const clip = `${id}-clip-${side}`;
   const top = box.cy - box.h / 2 - 2;
-  const lidH = box.h + 4;
+  const lidSpan = box.h + 4;
+
+  const shutOf = (f: Frame) => {
+    "worklet";
+    return side === 1 ? Math.max(f.blink, f.winkR) : f.blink;
+  };
+
   return [
+    // Eye white oval: fades out when winking/blinking
+    n("path", { d: cubicPath(white), fill: C.muzzle }, undefined, {
+      dyn: (f) => {
+        "worklet";
+        const shut = shutOf(f);
+        return { opacity: Math.min(1, Math.max(0, 1 - shut * 1.65)) };
+      },
+    }),
     n("defs", undefined, [n("clipPath", undefined, [path(cubicPath(white), "#000")], { id: clip })]),
     n("g", { clipPath: `url(#${clip})` }, [
-      // Big oval pupil and its shine slide with the gaze, never swap. A blink closes ONLY the pupil: it
-      // squashes flat (wider as it flattens, so it keeps its weight) while the white of the eye and the
-      // glasses stay exactly as they are; the shine goes out as it shuts.
-      n("ellipse", { rx: 8, ry: 10.4, fill: C.ink, cx: box.cx, cy: box.cy }, undefined, {
+      // Bold round-oval pupil with single bright crisp specular dot
+      n("ellipse", { rx: 9.6, ry: 11.2, fill: C.ink, cx: box.cx, cy: gcy + 1.5 }, undefined, {
         dyn: (f) => {
           "worklet";
-          return { cx: box.cx + f.pupilX, cy: box.cy + f.pupilY + 1, rx: 8 + 1.6 * f.blink, ry: Math.max(1.1, 10.4 * (1 - f.blink)) };
+          const shut = shutOf(f);
+          return {
+            cx: box.cx + f.pupilX + (side === -1 ? 1.8 : -1.8),
+            cy: gcy + 1.6 + f.pupilY,
+            rx: 9.6 + 1.0 * shut,
+            ry: Math.max(1.5, 11.2 * (1 - shut * 0.85)),
+            opacity: Math.min(1, Math.max(0, 1 - shut * 1.65)),
+          };
         },
       }),
-      n("circle", { r: 3.2, fill: C.shine, cx: box.cx, cy: box.cy }, undefined, {
+      n("circle", { r: 3.5, fill: C.shine, cx: box.cx + 3.2, cy: gcy - 2.0 }, undefined, {
         dyn: (f) => {
           "worklet";
-          return { cx: box.cx + f.pupilX + 2.6, cy: box.cy + f.pupilY - 3.2, opacity: Math.min(1, Math.max(0, 1 - f.blink * 1.6)) };
+          const shut = shutOf(f);
+          const pcx = box.cx + f.pupilX + (side === -1 ? 1.8 : -1.8);
+          return {
+            cx: pcx + 3.1,
+            cy: gcy - 1.8 + f.pupilY,
+            opacity: Math.min(1, Math.max(0, 1 - shut * 1.9)),
+          };
         },
       }),
-      // Upper lid: fur sliding down, only for the droop of "oops" and "think" (a mood's resting lid). Not the blink.
-      n("rect", { x: box.cx - box.w, width: box.w * 2, fill: C.fur, y: top, height: 0 }, undefined, {
+      // Gentle curved mood upper lid (`oops` / `think`) in matching flat orange fur
+      n("path", { d: `M${box.cx - 24} ${top} L${box.cx + 24} ${top} Z`, fill: C.fur }, undefined, {
         dyn: (f) => {
           "worklet";
-          return { y: top, height: (side === -1 ? f.lidL : f.lidR) * lidH };
+          const lid = side === -1 ? f.lidL : f.lidR;
+          if (lid <= 0.005) return { d: `M${box.cx - 24} ${top} L${box.cx + 24} ${top} Z`, opacity: 0 };
+          const drop = top + lid * lidSpan * 0.85;
+          const worried = Math.max(0, -f.mouthCurve);
+          const slant = -side * worried * 4.5;
+          const yL = drop + slant;
+          const yR = drop - slant;
+          return {
+            d: `M${box.cx - 24} ${top} L${box.cx + 24} ${top} L${box.cx + 24} ${yR} Q${box.cx} ${(yL + yR) / 2 + 2} ${box.cx - 24} ${yL} Z`,
+            opacity: 1,
+          };
         },
       }),
     ]),
-    // A fully closed eye gets its closing line, never an empty lens.
-    n("path", { d: `M${box.cx - 8} ${box.cy + 3} Q${box.cx} ${box.cy + 10} ${box.cx + 8} ${box.cy + 3}`, stroke: C.ink, strokeWidth: 3.2, strokeLinecap: "round", fill: "none", opacity: 0 }, undefined, {
+    // Solid orange eyelid filling the closed/winking lens (matches reference wink over orange fur!)
+    n("circle", { cx: gcx, cy: gcy, r: GLASS_R - 1.8, fill: C.fur, opacity: 0 }, undefined, {
       dyn: (f) => {
         "worklet";
-        return { opacity: Math.min(1, Math.max(0, ((side === -1 ? f.lidL : f.lidR) - 0.85) / 0.15)) };
+        const lid = side === -1 ? f.lidL : f.lidR;
+        const shut = Math.max(shutOf(f), Math.min(1, Math.max(0, (lid - 0.8) / 0.2)));
+        return { opacity: Math.min(1, Math.max(0, (shut - 0.28) / 0.35)) };
       },
     }),
-    // The glasses go over everything so the lids never leak past the rim.
-    circle(box.cx, box.cy, GLASS_R, "none", { stroke: C.ink, strokeWidth: 3.6 }),
+    // Thick, bold charcoal wink/blink arc centered cleanly inside the orange lens
+    n("path", { d: `M${gcx - 10} ${gcy + 2} Q${gcx} ${gcy - 9} ${gcx + 10} ${gcy + 2}`, stroke: C.ink, strokeWidth: 5.5, strokeLinecap: "round", fill: "none", opacity: 0 }, undefined, {
+      dyn: (f) => {
+        "worklet";
+        const lid = side === -1 ? f.lidL : f.lidR;
+        const shut = Math.max(shutOf(f), Math.min(1, Math.max(0, (lid - 0.8) / 0.2)));
+        const op = Math.min(1, Math.max(0, (shut - 0.38) / 0.38));
+        const happy = side === 1 ? Math.max(f.happyBlink, f.winkR) : f.happyBlink;
+        const endY = gcy + 1.5 + 2.6 * happy;
+        const ctrlY = gcy + 8.5 - 18.5 * happy;
+        return {
+          d: `M${gcx - 10.5} ${endY} Q${gcx} ${ctrlY} ${gcx + 10.5} ${endY}`,
+          opacity: op,
+        };
+      },
+    }),
+    // Bold round charcoal glasses ring
+    circle(gcx, gcy, GLASS_R, "none", { stroke: C.ink, strokeWidth: 4.5 }),
   ];
 }
 
-const GLASS_R = 17.2;
-/** Top edge of the mouth (the D opens downward from here). */
-const MOUTH_Y = 19.5;
-
-/** The ear as drawn in the layer art, tilting about its base; a round-joined stroke in its own colour softens the tip. */
+/** Plush fox ears: deeper flat orange behind the head, warm pink inner ear, zero dark stroke. */
 function ear(side: -1 | 1, which: "outer" | "inner"): Node {
   const base = side === -1 ? (which === "outer" ? EAR_OUTER_L : EAR_INNER_L) : which === "outer" ? EAR_OUTER_R : EAR_INNER_R;
-  // Pivot: the middle of the ear's hidden base edge (inside the head).
   const px = side * EAR_PIVOT_R.x;
   const py = EAR_PIVOT_R.y;
-  const fill = which === "outer" ? C.furShade : C.earInner;
-  return n("path", { d: cubicPath(base), fill, stroke: fill, strokeWidth: 2, strokeLinejoin: "round" }, undefined, {
+  const fill = which === "outer" ? C.furDeep : C.earInner;
+  return n("path", { d: cubicPath(base), fill, stroke: fill, strokeWidth: 2.2, strokeLinejoin: "round" }, undefined, {
     dyn: (f) => {
       "worklet";
       return { d: cubicPath(turned(base, px, py, side === -1 ? f.earL : f.earR)) };
@@ -427,17 +466,15 @@ function ear(side: -1 | 1, which: "outer" | "inner"): Node {
   });
 }
 
-/**
- * How far an arm is raised, 0 (resting at the side) to 1 (clearly lifted). A resting arm is drawn
- * behind the coat so it never looks stiff; a lifted one is drawn in front (it reaches the face,
- * waves, cheers). The two copies cross-fade on this value, so it is smooth as an arm lifts.
- */
 export function lift(angle: number): number {
   "worklet";
   return Math.min(1, Math.max(0, (Math.abs(angle) - 28) / 16));
 }
 
-/** One arm, drawn twice: behind the coat (visible when resting) and in front (visible when lifted). */
+/**
+ * One arm, drawn behind the coat when resting and in front when lifted.
+ * Clean flat periwinkle sleeve (no dark border) + plump flat-orange mitten paw.
+ */
 function arm(side: -1 | 1, layer: "behind" | "front"): Node[] {
   const pts = (f: Frame) => {
     "worklet";
@@ -448,24 +485,24 @@ function arm(side: -1 | 1, layer: "behind" | "front"): Node[] {
     const up = lift(side === -1 ? f.armLa : f.armRa);
     return layer === "front" ? up : 1 - up;
   };
-  const rest = armPoints(side, 12, 8);
+  const rest = armPoints(side, 18, 2);
   const initial = layer === "front" ? 0 : 1;
   return [
-    n("line", { x1: rest.sx, y1: rest.sy, x2: rest.ex, y2: rest.ey, stroke: C.coat, strokeWidth: 14, strokeLinecap: "round", opacity: initial }, undefined, {
+    n("line", { x1: rest.sx, y1: rest.sy, x2: rest.ex, y2: rest.ey, stroke: C.coat, strokeWidth: 18.5, strokeLinecap: "round", opacity: initial }, undefined, {
       dyn: (f) => {
         "worklet";
         const q = pts(f);
         return { x1: q.sx, y1: q.sy, x2: q.ex, y2: q.ey, opacity: shown(f) };
       },
     }),
-    n("line", { x1: rest.ex, y1: rest.ey, x2: rest.wx, y2: rest.wy, stroke: C.coat, strokeWidth: 14, strokeLinecap: "round", opacity: initial }, undefined, {
+    n("line", { x1: rest.ex, y1: rest.ey, x2: rest.wx, y2: rest.wy, stroke: C.coat, strokeWidth: 18, strokeLinecap: "round", opacity: initial }, undefined, {
       dyn: (f) => {
         "worklet";
         const q = pts(f);
         return { x1: q.ex, y1: q.ey, x2: q.wx, y2: q.wy, opacity: shown(f) };
       },
     }),
-    n("circle", { cx: rest.hx, cy: rest.hy, r: 9.5, fill: C.fur, opacity: initial }, undefined, {
+    n("circle", { cx: rest.hx, cy: rest.hy, r: 10.5, fill: C.fur, opacity: initial }, undefined, {
       dyn: (f) => {
         "worklet";
         const q = pts(f);
@@ -475,47 +512,52 @@ function arm(side: -1 | 1, layer: "behind" | "front"): Node[] {
   ];
 }
 
-// A tail curling up behind the body on the right, with a lighter tip. Drawn at TAIL_SCALE of
-// its layer-art size about its root so it stays small next to the big head.
-const TAIL_ROOT = { x: 14, y: 96 } as const;
-const TAIL_SCALE = 0.68;
-const shrinkTail = (pts: readonly number[]) => pts.map((v, i) => Math.round((i % 2 === 0 ? TAIL_ROOT.x + (v - TAIL_ROOT.x) * TAIL_SCALE : TAIL_ROOT.y + (v - TAIL_ROOT.y) * TAIL_SCALE) * 10) / 10);
-const TAIL_MAIN = shrinkTail([14, 96, 48, 104, 70, 88, 62, 56]);
-const TAIL_TIP = shrinkTail([64, 66, 62, 56]);
-const TAIL_W = 14;
+// Compact, playful curved fox tail tucked neatly beside the coat.
+const TAIL_ROOT = { x: 32, y: 102 } as const;
+const TAIL_S = [32, 102, 54, 102, 58, 88, 60, 77, 62, 68, 68, 66, 71, 68] as const;
+const TAIL_W = 12;
 
-/** `arms: false` leaves both arms and paws out (a picture where only the head and coat show, e.g. peeking from behind a label). */
+const tailPath = (q: readonly number[]) => {
+  "worklet";
+  return `M${q[0]} ${q[1]} C${q[2]} ${q[3]} ${q[4]} ${q[5]} ${q[6]} ${q[7]} C${q[8]} ${q[9]} ${q[10]} ${q[11]} ${q[12]} ${q[13]}`;
+};
+
+/** `arms: false` leaves both arms and paws out (peeking mode). */
 export function buildShrodi(id: string, opts: { arms?: boolean } = {}): Layers {
   const arms = opts.arms !== false;
   const back: Node[] = [
-    n("path", { d: `M${TAIL_MAIN[0]} ${TAIL_MAIN[1]} C${TAIL_MAIN[2]} ${TAIL_MAIN[3]} ${TAIL_MAIN[4]} ${TAIL_MAIN[5]} ${TAIL_MAIN[6]} ${TAIL_MAIN[7]}`, stroke: C.furShade, strokeWidth: TAIL_W, strokeLinecap: "round", fill: "none" }, undefined, {
+    // Compact curved fox tail (pure flat orange, slim stroke <= 15)
+    n("path", { d: tailPath(TAIL_S), stroke: C.furShade, strokeWidth: TAIL_W, strokeLinecap: "round", fill: "none" }, undefined, {
       dyn: (f) => {
         "worklet";
-        const q = turned(TAIL_MAIN, TAIL_ROOT.x, TAIL_ROOT.y, f.tail);
-        return { d: `M${q[0]} ${q[1]} C${q[2]} ${q[3]} ${q[4]} ${q[5]} ${q[6]} ${q[7]}` };
+        return { d: tailPath(turned(TAIL_S, TAIL_ROOT.x, TAIL_ROOT.y, f.tail)) };
       },
     }),
-    n("path", { d: `M${TAIL_TIP[0]} ${TAIL_TIP[1]} L${TAIL_TIP[2]} ${TAIL_TIP[3]}`, stroke: C.tailTip, strokeWidth: TAIL_W, strokeLinecap: "round", fill: "none" }, undefined, {
-      dyn: (f) => {
-        "worklet";
-        const q = turned(TAIL_TIP, TAIL_ROOT.x, TAIL_ROOT.y, f.tail);
-        return { d: `M${q[0]} ${q[1]} L${q[2]} ${q[3]}` };
-      },
-    }),
-    n("ellipse", { cx: -15, cy: 106, rx: 12.5, ry: 8.5, fill: C.fur }),
-    n("ellipse", { cx: 15, cy: 106, rx: 12.5, ry: 8.5, fill: C.fur }),
-    // resting arms: behind the coat, so only a paw peeks out at the side
+    // Single-color legs & wide flat-bottomed rounded-top orange feet
+    n("rect", { x: -29, y: 109, width: 22, height: 12, rx: 3, fill: C.fur }),
+    n("rect", { x: 7, y: 109, width: 22, height: 12, rx: 3, fill: C.fur }),
+    path("M-35 128 Q-35 118 -22 118 L-11 118 Q-5 118 -5 125 Q-5 130 -10 130 L-30 130 Q-35 130 -35 128 Z", C.fur),
+    path("M5 125 Q5 118 11 118 L22 118 Q35 118 35 128 Q35 130 30 130 L10 130 Q5 130 5 125 Z", C.fur),
+    // Resting arms behind the coat
     ...(arms ? [...arm(-1, "behind"), ...arm(1, "behind")] : []),
-    // short lab coat, chest fur at the collar, then the lapels over it
-    path("M-23 40 Q-33 42 -34 56 L-36 96 Q-36 104 -28 104 L28 104 Q36 104 36 96 L34 56 Q33 42 23 40 Z", C.coat),
-    path("M-11 42 L11 42 L0 62 Z", C.fur),
-    path("M-24 43 L-11 42 L0 62 L-20 58 Z", C.coatLight),
-    path("M24 43 L11 42 L0 62 L20 58 Z", C.coatLight),
-    n("rect", { x: -28, y: 78, width: 19, height: 15, rx: 5, fill: C.coatShade }),
-    n("rect", { x: 9, y: 78, width: 19, height: 15, rx: 5, fill: C.coatShade }),
-    circle(0, 72, 2.1, C.coatDetail),
-    circle(0, 82, 2.1, C.coatDetail),
-    n("rect", { x: 10, y: 62, width: 14, height: 4.5, rx: 2.25, fill: C.coatDetail }),
+    // Wide cozy flat periwinkle-blue lab coat with squared hem & center notch (`^`)
+    path(
+      "M-28 42 Q-42 44 -46 62 L-48 106 Q-48 113 -41 113 L-7 113 L0 104 L7 113 L41 113 Q48 113 48 106 L46 62 Q42 44 28 42 Z",
+      C.coat,
+    ),
+    // Orange chest V-fur at collar
+    path("M-14 42 L14 42 L0 72 Z", C.fur),
+    // Classic notched scientist lapels (clean interior linework in #A5BDE9)
+    n("path", { d: "M-26 44 L-19 53 L-24 57 L0 73 L24 57 L19 53 L26 44", fill: "none", stroke: C.coatDetail, strokeWidth: 2.5, strokeLinecap: "round", strokeLinejoin: "round" }),
+    // Subtle vertical sleeve-seam creases on the coat sides
+    n("path", { d: "M-39 64 L-41 94 M39 64 L41 94", fill: "none", stroke: C.coatDetail, strokeWidth: 2.3, strokeLinecap: "round" }),
+    // Hollow U-shaped front pockets
+    n("path", { d: "M-36 82 L-15 82 L-15 95 Q-15 103 -25.5 103 Q-36 103 -36 95 Z", fill: "none", stroke: C.coatDetail, strokeWidth: 2.4, strokeLinejoin: "round" }),
+    n("path", { d: "M15 82 L36 82 L36 95 Q36 103 25.5 103 Q15 103 15 95 Z", fill: "none", stroke: C.coatDetail, strokeWidth: 2.4, strokeLinejoin: "round" }),
+    // Two round center buttons + right breast-pocket bar
+    circle(0, 81, 2.7, C.coatDetail),
+    circle(0, 93, 2.7, C.coatDetail),
+    n("rect", { x: 14, y: 69, width: 15, height: 4.5, rx: 2.25, fill: C.coatDetail }),
   ];
 
   const head: Node[] = [
@@ -523,48 +565,47 @@ export function buildShrodi(id: string, opts: { arms?: boolean } = {}): Layers {
     ear(-1, "inner"),
     ear(1, "outer"),
     ear(1, "inner"),
-    // The head as drawn in the layer art: base, then the white inner base (muzzle + eye whites).
+    // Clean flat orange head base
     path(cubicPath(HEAD_BASE), C.fur),
+    // Wide plump flat white muzzle
     path(cubicPath(HEAD_INNER), C.muzzle),
-    // The eye whites are part of the inner base: same white, drawn with it.
-    path(cubicPath(EYE_WHITE_L), C.muzzle),
-    path(cubicPath(EYE_WHITE_R), C.muzzle),
     ...eye(-1, id),
     ...eye(1, id),
-    // Glasses bridge between the two rings.
-    n("path", { d: `M${EYE_BOX_L.cx + GLASS_R - 1} ${EYE_BOX_L.cy - 1} Q0 ${(EYE_BOX_L.cy + EYE_BOX_R.cy) / 2 - 6} ${EYE_BOX_R.cx - GLASS_R + 1} ${EYE_BOX_R.cy - 1}`, stroke: C.ink, strokeWidth: 3, strokeLinecap: "round", fill: "none" }),
-    circle(0, 9, 4, C.nose),
-    // mouth: a D that opens with `mouth`, as wide as `mouthW`, its corners lifted into a smile or dropped into a frown by `mouthCurve`.
-    // Closing never leaves two lips side by side: as it shuts, the lower lip is drawn onto the upper one until the mouth is ONE
-    // curve (the shape has no area left, and the round stroke is the line), like a ")" turned on its side.
-    n("path", { d: `M-9 ${MOUTH_Y} Q0 ${MOUTH_Y + 1.5} 9 ${MOUTH_Y} Q0 ${MOUTH_Y + 4} -9 ${MOUTH_Y} Z`, fill: C.mouth, stroke: C.mouth, strokeWidth: 2.8, strokeLinejoin: "round", strokeLinecap: "round" }, undefined, {
+    // Crisp curved glasses bridge cleanly spanning the gap between frames
+    n("path", { d: `M${-GLASS_CX + GLASS_R - 1} ${GLASS_CY + 1} Q0 ${GLASS_CY - 4.5} ${GLASS_CX - GLASS_R + 1} ${GLASS_CY + 1}`, stroke: C.ink, strokeWidth: 4.4, strokeLinecap: "butt", fill: "none" }),
+    // Cute wide bean fox nose tucked right under the bridge (keeps round circle for test-mascot)
+    circle(0, 5.2, 3.6, C.nose),
+    n("ellipse", { cx: 0, cy: 5.2, rx: 5.6, ry: 3.6, fill: C.nose }),
+    // Clean flat-topped smiling D-mouth (no philtrum)
+    n("path", { d: `M-11 ${MOUTH_Y} Q0 ${MOUTH_Y + 0.8} 11 ${MOUTH_Y} C12 ${MOUTH_Y + 12} 6 ${MOUTH_Y + 16} 0 ${MOUTH_Y + 16} C-6 ${MOUTH_Y + 16} -12 ${MOUTH_Y + 12} -11 ${MOUTH_Y} Z`, fill: C.mouth, stroke: C.mouth, strokeWidth: 2.4, strokeLinejoin: "round", strokeLinecap: "round" }, undefined, {
       dyn: (f) => {
         "worklet";
-        const hw = 11.5 * f.mouthW;
-        const corner = MOUTH_Y - 0.5 - 3 * f.mouthCurve;
-        const ctrl = MOUTH_Y + 1.5 + 2 * f.mouthCurve;
-        // How open: nothing until `mouth` passes 0.12, so the resting closed mouths are a single line
-        const h = Math.max(0, (f.mouth - 0.12) / 0.88) * 17;
+        const hw = 11.6 * f.mouthW;
+        const corner = MOUTH_Y - 0.6 - 2.6 * f.mouthCurve;
+        const ctrl = MOUTH_Y + 0.8 + 1.8 * f.mouthCurve;
+        const h = Math.max(0, (f.mouth - 0.12) / 0.88) * 16.5;
         const mid = (corner + ctrl) / 2;
         const b = mid + h;
-        // The lower lip is two cubic halves from the right corner to the bottom middle and on to the left corner. Shut, they are the
-        // top curve cut at its middle (controls 2/3 and 1/3 of the way in), so the two lips are the same line; open, a rounded D.
         const open = Math.min(1, h / 4);
         const c1x = hw * (2 / 3 + (1 / 3) * open);
-        const c1y = corner + (ctrl - corner) / 3 + (corner + (b - corner) * 0.75 - (corner + (ctrl - corner) / 3)) * open;
-        const c2x = hw * (1 / 3 + (0.52 - 1 / 3) * open);
+        const c1y = corner + (ctrl - corner) / 3 + (corner + (b - corner) * 0.72 - (corner + (ctrl - corner) / 3)) * open;
+        const c2x = hw * (1 / 3 + (0.54 - 1 / 3) * open);
         const c2y = mid + (b - mid) * open;
-        return { d: `M${-hw} ${corner} Q0 ${ctrl} ${hw} ${corner} C${c1x} ${c1y} ${c2x} ${c2y} 0 ${b} C${-c2x} ${c2y} ${-c1x} ${c1y} ${-hw} ${corner} Z`, strokeWidth: 2.8 - 1.4 * open };
+        return {
+          d: `M${-hw} ${corner} Q0 ${ctrl} ${hw} ${corner} C${c1x} ${c1y} ${c2x} ${c2y} 0 ${b} C${-c2x} ${c2y} ${-c1x} ${c1y} ${-hw} ${corner} Z`,
+          strokeWidth: 2.8 - 2.2 * open,
+        };
       },
     }),
-    n("ellipse", { cx: 0, cy: MOUTH_Y + 9, rx: 6.5, ry: 0.1, fill: C.tongue, opacity: 0 }, undefined, {
+    // Soft rounded pink tongue sitting cleanly inside open mouths
+    n("ellipse", { cx: 0, cy: MOUTH_Y + 10, rx: 7.5, ry: 0.1, fill: C.tongue, opacity: 0 }, undefined, {
       dyn: (f) => {
         "worklet";
-        const h = Math.max(0, (f.mouth - 0.12) / 0.88) * 17;
-        const ry = Math.max(0.1, h * 0.26);
-        const corner = MOUTH_Y - 0.5 - 3 * f.mouthCurve;
-        const mid = (corner + MOUTH_Y + 1.5 + 2 * f.mouthCurve) / 2;
-        return { cy: mid + h - ry - 0.6, rx: 6.5 * Math.min(1, f.mouthW), ry, opacity: Math.min(1, Math.max(0, (f.mouth - 0.4) / 0.2)) };
+        const h = Math.max(0, (f.mouth - 0.12) / 0.88) * 16.5;
+        const ry = Math.max(0.1, h * 0.34);
+        const corner = MOUTH_Y - 0.6 - 2.6 * f.mouthCurve;
+        const mid = (corner + MOUTH_Y + 0.8 + 1.8 * f.mouthCurve) / 2;
+        return { cy: mid + h - ry - 0.2, rx: 7.2 * Math.min(1, f.mouthW), ry, opacity: Math.min(1, Math.max(0, (f.mouth - 0.35) / 0.2)) };
       },
     }),
   ];
@@ -572,8 +613,8 @@ export function buildShrodi(id: string, opts: { arms?: boolean } = {}): Layers {
   return { back, head, front: arms ? [...arm(-1, "front"), ...arm(1, "front")] : [] };
 }
 
-/** viewBox that frames the whole character with room for the highest hop and the V cheer. */
-export const SHRODI_VIEWBOX = { x: -93, y: -122, w: 197, h: 244 } as const;
+/** viewBox framing the whole character cleanly (tall ears, sweeping tail, flat-bottomed boots, cheer hops). */
+export const SHRODI_VIEWBOX = { x: -94, y: -110, w: 198, h: 250 } as const;
 
 /* ------------------------------------------------------------------ */
 /* Offline renderer: a frame as SVG markup (tests, contact sheets)     */

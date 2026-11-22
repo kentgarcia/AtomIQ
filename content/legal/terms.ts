@@ -44,7 +44,7 @@ export const TERMS_SECTIONS: readonly LegalSection[] = [
   {
     title: "3. Beta Versions",
     body:
-      "The App may be offered as a beta or test version. It can contain mistakes, features can change or be removed, and progress might be reset when a problem has to be fixed. Please do not depend on it for anything important. We welcome feedback through Beta Feedback in Settings.",
+      "The App may be offered as a beta or test version. It can contain mistakes, features can change or be removed, and progress might be reset when a problem has to be fixed. Please do not depend on it for anything important. We welcome feedback through the contact details in Section 22.",
   },
   {
     title: "4. Who May Use AtomIQ",
@@ -75,7 +75,7 @@ export const TERMS_SECTIONS: readonly LegalSection[] = [
     title: "7. Content Accuracy and Sources",
     body:
       "We work to keep the content accurate and up to date. Nuclear science is complex and keeps developing, and we simplify it to teach it, so the content is provided “as is” without a guarantee that it is complete, current or correct. Always check important facts against primary sources.\n" +
-      "Many entries cite outside sources, which we credit where shown. We do not control those sites or their content and are not responsible for them. If you find an error, please tell us through Beta Feedback.",
+      "Many entries cite outside sources, which we credit where shown. We do not control those sites or their content and are not responsible for them. If you find an error, please tell us through the contact details at the end of these Terms.",
   },
   {
     title: "8. Your Profile, Progress and Data",
@@ -119,7 +119,7 @@ export const TERMS_SECTIONS: readonly LegalSection[] = [
   {
     title: "14. Third-Party Services and Links",
     body:
-      "The App links to or relies on services we do not run, such as your device's speech engine and browser, the app store you downloaded it from, Google Forms for feedback and the websites behind source links. They have their own terms and privacy policies, and we are not responsible for them. The app store's own terms apply to your download of the App.",
+      "The App links to or relies on services we do not run, such as your device's speech engine and browser, the app store you downloaded it from, the websites behind source links. They have their own terms and privacy policies, and we are not responsible for them. The app store's own terms apply to your download of the App.",
   },
   {
     title: "15. Updates, Changes and Availability",

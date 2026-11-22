@@ -115,6 +115,11 @@ export interface ButtonProps {
      * pressed (the duolingo-motion-style skill, tier A idle). Quiet, stops off screen and with reduced motion.
      */
     shine?: boolean;
+    /**
+     * Paint this one button in colours of its own (a teacher's, on their profile) instead of its variant's: the face, its lip and
+     * the label on it, which the caller has checked read at 4.5:1 (`chatPalette`). Ignored while disabled, which stays grey.
+     */
+    colors?: { face: string; lip: string; label: string };
     /** The sound of the press: `ui.press` unless this button has a sound of its own (a cue id) or none (`null`). */
     pressSfx?: SfxCue | null;
     accessibilityLabel?: string;
@@ -134,6 +139,7 @@ export function Button({
     wrap = false,
     stretch = false,
     shine = false,
+    colors,
     pressSfx = "ui.press",
     accessibilityLabel,
     testID,
@@ -142,7 +148,9 @@ export function Button({
     const { theme } = useTheme();
     const c = theme.colors;
 
-    const palette = disabled
+    const palette = colors && !disabled
+        ? { face: colors.face, lip: colors.lip, label: colors.label, border: colors.face, shadow: colors.lip }
+        : disabled
         ? { face: c.disabled, lip: c.borderStrong, label: c.disabledText, border: c.disabled, shadow: undefined }
         : variant === "secondary"
           ? { face: c.surface, lip: c.borderStrong, label: c.primaryLight, border: c.border, shadow: undefined }

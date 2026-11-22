@@ -215,6 +215,40 @@ test("the current node is the teacher's last message", () => {
   assert.equal(core.currentNode(nodes, [msg({ nodeId: "gone" })]), null);
 });
 
+test("a thread whose node was retired is stuck and gets ended; a healthy one is left alone", () => {
+  const t = { ended: false };
+  const healthy = [msg({ id: "1", nodeId: "npc-ada-g", at: 1 })];
+  assert.equal(core.isStuck(nodes, t, healthy), false);
+  assert.equal(core.isStuck(nodes, t, []), false, "nothing said yet: nothing to heal");
+  assert.equal(core.isStuck(nodes, t, [msg({ id: "1", nodeId: "retired-node", at: 1 })]), true);
+  assert.equal(core.isStuck(nodes, { ended: true }, [msg({ id: "1", nodeId: "retired-node", at: 1 })]), false, "already ended");
+  // the learner's own message after the teacher's does not hide it
+  assert.equal(core.isStuck(nodes, t, [msg({ id: "1", nodeId: "retired-node", at: 1 }), msg({ id: "2", sender: "me", text: "Hi", at: 2 })]), true);
+  // a sign-off is a normal ending, not a stuck thread
+  assert.equal(core.isStuck(nodes, t, [msg({ id: "1", nodeId: "npc-ada-bye", at: 1 })]), false);
+});
+
+test("a node whose every reply points at a missing node is stuck; one working reply or a link is enough", () => {
+  const g = core.greetingOf(nodes, "npc-ada");
+  const say = [msg({ id: "1", nodeId: "x", at: 1 })];
+  const dead = [{ ...g, id: "x", replies: [{ label: "a", next: "gone-1" }, { label: "b", next: "gone-2" }] }];
+  assert.equal(core.isStuck([...nodes, ...dead], { ended: false }, say), true);
+  const oneWorks = [{ ...g, id: "x", replies: [{ label: "a", next: "gone-1" }, { label: "b", next: "npc-ada-a" }] }];
+  assert.equal(core.isStuck([...nodes, ...oneWorks], { ended: false }, say), false);
+  const link = [{ ...g, id: "x", replies: [{ label: "a", next: "gone-1" }, { label: "b", action: { screen: "next-lesson" } }] }];
+  assert.equal(core.isStuck([...nodes, ...link], { ended: false }, say), false);
+});
+
+test("a tapped reply that leads nowhere ends the story; replay needs the entry node", () => {
+  const g = core.greetingOf(nodes, "npc-ada");
+  const broken = { ...g, replies: [{ label: "x", next: "gone" }, { label: "y", next: "npc-ada-a" }, { label: "z", action: { screen: "next-lesson" } }] };
+  assert.equal(core.storyEnds(core.replyStep(nodes, broken, 0)), true);
+  assert.equal(core.storyEnds(core.replyStep(nodes, broken, 1)), false);
+  assert.equal(core.storyEnds(core.replyStep(nodes, broken, 2)), false, "an action opens a page");
+  assert.equal(core.canReplay(nodes, { entryNodeId: "npc-ada-g" }), true);
+  assert.equal(core.canReplay(nodes, { entryNodeId: "retired-node" }), false);
+});
+
 // ---- threads, the list and replies ---------------------------------------------------------
 
 const thread = (over = {}) => ({ id: "t1", npcId: "npc-ada", entryNodeId: "npc-ada-g", title: "Chat", origin: "free", event: null, ended: false, plays: 1, createdAt: 1, updatedAt: 1, ...over });
@@ -430,6 +464,33 @@ test("the content rules read picture markers: a good one passes, a typo, an unkn
   assert.deepEqual(bad("Hello.\n\n[[pic:nope]]"), ["chat-picture-id"]);
   assert.deepEqual(bad("Hello.\n\n[[pic: tour-map]]"), ["chat-picture-marker"]);
   assert.deepEqual(bad("[[pic:tour-map]]\n\nHello."), ["chat-picture-first"]);
+});
+
+test("system lines: read whole, shown as their text in the list, and rationed by the content rules", async () => {
+  const vocab = await import(pathToFileURL(path.resolve("scripts/lib/chat-vocab.mjs")).href);
+  assert.equal(core.systemOf("[[sys:Ada got disconnected.]]"), "Ada got disconnected.");
+  assert.equal(core.systemOf("  [[sys:Ada is back.]]  "), "Ada is back.");
+  assert.equal(core.systemOf("[[sys:]]"), null, "an empty line is plain text");
+  assert.equal(core.systemOf("Ada [[sys:got disconnected.]]"), null, "a marker inside a sentence is plain text");
+  assert.equal(core.systemOf("[[pic:tour-map]]"), null);
+  // the app and the content rules read the same marker
+  for (const text of ["[[sys:Ada got disconnected.]]", "[[sys:a]]", "[[sys:]]", "[[sys:a [b] c]]", "hi [[sys:x]]"]) {
+    assert.equal(vocab.CHAT_SYSTEM_RE.test(text), core.systemOf(text) !== null, text);
+  }
+  const msg = { id: "m", threadId: "t", nodeId: "n", sender: "npc:npc-ada", text: "[[sys:Ada got disconnected.]]", kind: "text", targetId: null, at: 1, read: true };
+  assert.equal(core.lastLine(msg), "Ada got disconnected.");
+
+  const sys = (text) => goodNodes().map((x) => (x.id === "npc-ada-a" ? { ...x, text } : x));
+  const bad = (text) => errors(sys(text)).filter((r) => r.startsWith("chat-system"));
+  assert.deepEqual(bad("Hello.\n\n[[sys:Ada got disconnected.]]\n\n[[sys:Ada is back.]]\n\nSorry."), []);
+  assert.deepEqual(bad("Hello.\n\n[[sys: ]]"), ["chat-system-marker"]);
+  assert.deepEqual(bad("Hello.\n\nAda [[sys:got disconnected.]]"), ["chat-system-marker"]);
+  assert.deepEqual(bad("[[sys:Ada got disconnected.]]"), ["chat-system-only"]);
+  // rare on purpose: a long line, and more than a few for one teacher, are warned about
+  const warnings = (nodes) => validateChatData(world(nodes)).findings.filter((f) => f.severity === "warning").map((f) => f.rule);
+  assert.ok(warnings(sys(`Hello.\n\n[[sys:${"x".repeat(60)}]]`)).includes("chat-system-length"));
+  const many = "Hello.\n\n" + Array.from({ length: 4 }, (_, i) => `[[sys:Line ${i}.]]`).join("\n\n");
+  assert.ok(warnings(sys(many)).includes("chat-system-overuse"));
 });
 
 test("the reactions and stickers are drawn, named, and the content vocabulary lists the same ids", async () => {

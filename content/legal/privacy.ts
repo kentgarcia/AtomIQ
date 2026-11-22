@@ -21,7 +21,7 @@ export const PRIVACY_HIGHLIGHTS: readonly string[] = [
   "No account, email or phone number. You only pick a display name.",
   "Your progress stays on your device. We run no server that receives it.",
   "No ads, no analytics, no tracking, and we never sell information.",
-  "The internet is used only when you open a source link, a picture loads, or you send feedback.",
+  "The internet is used only when you open a source link, a picture loads, or you contact us outside the app.",
   "Settings > Delete Account erases everything the app stores about you.",
 ];
 
@@ -97,7 +97,6 @@ export const PRIVACY_SECTIONS: readonly LegalSection[] = [
       "Lessons, games, labs, the AtomDex, the periodic table and your progress all work offline. The app asks for internet access only for these things, and other sites and services follow their own privacy policies:\n" +
       "• Source links: when you open a reference (for example IAEA, UNSCEAR, World Nuclear Association, EPA, Britannica, the Nobel Prize or OpenStax) it opens in your browser. That website can see your IP address and device details, as with any website. We add nothing from your profile.\n" +
       "• Pictures: a few pictures in Myth Buster and the explorer journeys are loaded from the Unsplash image service when shown. Unsplash receives your IP address and basic device details to deliver them.\n" +
-      "• Beta Feedback: the form in Settings opens a Google Forms page. What you type is sent to us and processed by Google under Google's privacy policy. Please do not put sensitive personal information in it. We use responses only to fix and improve the app.\n" +
       "• Developer credit: the link in the App Version dialog opens a LinkedIn page in your browser.\n" +
       "• Read Aloud: it uses the speech engine installed on your device. Depending on your device settings, some engines (for example Google text-to-speech) may process text online. We do not control that and AtomIQ does not send the text anywhere.\n" +
       "• App store: Google Play or the Apple App Store may give us totals such as installs and crashes. These are anonymous and come under their policies; we receive no personal information from them.\n" +
@@ -114,7 +113,7 @@ export const PRIVACY_SECTIONS: readonly LegalSection[] = [
     body:
       "AtomIQ is meant for learners, including children, and is designed to work without personal information: no account, no contact details, no ads, no tracking and no outside service collecting data. The only thing it asks for is a display name, and we encourage children to use a nickname instead of their real name.\n" +
       "We do not knowingly collect personal information from children. Since your progress never reaches us, there is nothing for us to collect or share.\n" +
-      "Parents, guardians and teachers can see everything the app stores in Profile and Settings, and can erase it with Settings > Delete Account. The only places where a child could share more are links to outside websites and the feedback form, so we ask adults to supervise those. If you believe a child sent personal information through the feedback form, contact us and we will delete it.",
+      "Parents, guardians and teachers can see everything the app stores in Profile and Settings, and can erase it with Settings > Delete Account. The only places where a child could share more are links to outside websites and any message sent to us, so we ask adults to supervise those. If you believe a child sent us personal information, contact us and we will delete it.",
   },
   {
     title: "11. Your Rights and Choices",
@@ -127,7 +126,7 @@ export const PRIVACY_SECTIONS: readonly LegalSection[] = [
       "• receive a copy of it in a usable form, where it applies;\n" +
       "• claim damages for a violation of your rights;\n" +
       "• complain to the National Privacy Commission of the Philippines (privacy.gov.ph).\n" +
-      "Because your information lives only on your device, most of these you can do yourself: see and change your name, avatar, notes and preferences in Profile, Field Notes and Settings, and erase everything with Settings > Delete Account. We have no copy to send you, and the app does not currently export your data to a file. For anything we do hold, such as a feedback-form response, contact us (Section 15) and we will help.",
+      "Because your information lives only on your device, most of these you can do yourself: see and change your name, avatar, notes and preferences in Profile, Field Notes and Settings, and erase everything with Settings > Delete Account. We have no copy to send you, and the app does not currently export your data to a file. For anything we do hold, such as a message you sent us, contact us (Section 15) and we will help.",
   },
   {
     title: "12. Security",

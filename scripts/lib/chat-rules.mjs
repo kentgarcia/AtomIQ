@@ -18,7 +18,7 @@
 import { PHONE_APPS } from "../../services/phone-core.ts";
 import { NPC_POSES } from "../../components/npc/npc-art.ts";
 import { hasExclamationRun } from "./feed-rules.mjs";
-import { CHAT_ACTIONS, CHAT_KINDS, CHAT_MASCOT_ID, CHAT_LIMITS, CHAT_PICTURES, CHAT_PICTURE_RE, CHAT_MIN_BODY_NODES, CHAT_REACTIONS, CHAT_REPLY_TYPES, CHAT_STICKERS, CHAT_TITLE_MAX, CHAT_TRIGGER_KINDS, hasBraces, parseTrigger } from "./chat-vocab.mjs";
+import { CHAT_ACTIONS, CHAT_KINDS, CHAT_MASCOT_ID, CHAT_LIMITS, CHAT_PICTURES, CHAT_PICTURE_RE, CHAT_MIN_BODY_NODES, CHAT_REACTIONS, CHAT_REPLY_TYPES, CHAT_STICKERS, CHAT_SYSTEM_MAX_LENGTH, CHAT_SYSTEM_MAX_PER_TEACHER, CHAT_SYSTEM_RE, CHAT_TITLE_MAX, CHAT_TRIGGER_KINDS, hasBraces, parseTrigger } from "./chat-vocab.mjs";
 
 const isRec = (v) => typeof v === "object" && v !== null && !Array.isArray(v);
 const isStr = (v) => typeof v === "string" && v.trim().length > 0;
@@ -85,6 +85,14 @@ export function validateChatData(data) {
         else if (!CHAT_PICTURES.includes(m[1])) add(row, "text", "chat-picture-id", "error", `no picture "${m[1]}": use one of ${CHAT_PICTURES.join(", ")}`);
         else if (i === 0) add(row, "text", "chat-picture-first", "error", "a picture follows a bubble of text, it does not open the message");
       });
+      // A system line is a part of its own, written exactly [[sys:line]], and a node still has something the teacher says
+      const systemParts = parts.filter((p) => p.includes("[[sys:"));
+      for (const p of systemParts) {
+        const m = CHAT_SYSTEM_RE.exec(p);
+        if (!m) add(row, "text", "chat-system-marker", "error", `a system line is a part of its own, written exactly [[sys:line]] (found: ${p.slice(0, 40)})`);
+        else if (m[1].trim().length > CHAT_SYSTEM_MAX_LENGTH) add(row, "text", "chat-system-length", "warning", `a system line is ${CHAT_SYSTEM_MAX_LENGTH} characters or fewer`);
+      }
+      if (systemParts.length > 0 && systemParts.length === parts.length) add(row, "text", "chat-system-only", "error", "a message needs a bubble the teacher says, not only system lines");
       if (parts.length > CHAT_LIMITS.parts) add(row, "text", "chat-text-parts", "warning", `a message is at most ${CHAT_LIMITS.parts} bubbles (this is ${parts.length}); split it across nodes`);
       const longest = Math.max(...parts.map((p) => p.length));
       if (longest > CHAT_LIMITS.text) add(row, "text", "chat-text-length", "warning", `a bubble fits ${CHAT_LIMITS.text} characters or fewer (the longest here is ${longest}); a blank line starts a new bubble`);
@@ -184,6 +192,10 @@ export function validateChatData(data) {
       for (const reply of Array.isArray(node?.replies) ? node.replies : []) if (isRec(reply) && reply.next && nodes.has(reply.next)) queue.push(reply.next);
     }
     for (const r of rows) if (!reached.has(r.id)) add(r, "id", "chat-unreachable", "error", "no reply leads here, so nobody can read it");
+
+    // System lines are a rare joke: only a few per teacher
+    const systemLines = rows.reduce((n, r) => n + String(r.text ?? "").split(/\n\s*\n/).filter((p) => CHAT_SYSTEM_RE.test(p.trim())).length, 0);
+    if (systemLines > CHAT_SYSTEM_MAX_PER_TEACHER) add(first, "text", "chat-system-overuse", "warning", `teacher "${npcId}" has ${systemLines} system lines; keep them rare (${CHAT_SYSTEM_MAX_PER_TEACHER} at most)`);
 
     // One unprompted message per trigger per teacher
     const triggers = new Map();

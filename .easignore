@@ -45,3 +45,10 @@ assets/sfx/kent-sfx/
 tools/platformer-art/
 tools/publisher/
 docs/
+tools/promo-video/
+tools/studio/
+
+# documentation and review notes: not part of the app
+README.md
+CLAUDE.md
+content/review/
