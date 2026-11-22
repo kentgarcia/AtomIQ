@@ -37,6 +37,7 @@ export const STORAGE_KEYS = {
   PHONE_WALLPAPER: '@atomiq:phone_wallpaper',
   /** The animation level ("max" | "reduced" | "off"); unset until the learner chooses (components/motion/motion-level-core.ts). */
   MOTION_LEVEL: '@atomiq:motion_level',
+  CONTENT_LOCALE: '@atomiq:content_locale',
   /** Crash bookkeeping (services/crash-guard-core.ts): was the app in front when the last session ended? */
   CRASH_GUARD: '@atomiq:crash_guard',
   /** Diagnostics: show onboarding's animation page on any phone (the perf probe's switch). Absent or false: only slow phones. */

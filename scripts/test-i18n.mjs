@@ -10,7 +10,7 @@ import path from "node:path";
 import { describe, it } from "node:test";
 
 import {
-  BASE_LOCALE, applyTranslation, formatPath, getAt, localeChain, parsePath, pickFields, placeholdersOf, samePlaceholders, setAt, wordLeaves,
+  BASE_LOCALE, applyTranslation, formatPath, getAt, localeChain, normalizeLocale, parsePath, pickFields, placeholdersOf, samePlaceholders, setAt, wordLeaves,
 } from "../content/i18n/i18n-core.ts";
 import { i18nAdapter } from "./lib/content-source/adapters/i18n.mjs";
 import { readFiles, renderFiles } from "./lib/content-source/pipeline.mjs";
@@ -93,6 +93,12 @@ describe("runtime lookup", () => {
     assert.deepEqual(localeChain("fr", ["es"]), []);
     assert.deepEqual(localeChain(BASE_LOCALE, [BASE_LOCALE, "es"]), [], "the base language needs no translation");
     assert.deepEqual(localeChain(null, ["es"]), []);
+  });
+
+  it("a saved language code is kept only when it is well formed", () => {
+    assert.equal(normalizeLocale(" pt-BR "), "pt-BR");
+    assert.equal(normalizeLocale("es"), "es");
+    for (const bad of ["", "Spanish", "e", "es_MX", null, undefined, 5]) assert.equal(normalizeLocale(bad), null);
   });
 
   it("the first language with an entry wins, whole, and none means the base row", () => {

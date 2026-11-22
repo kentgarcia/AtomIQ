@@ -56,6 +56,7 @@ import {
 } from "@/content/curriculum/hydrate";
 
 import { BASE_LOCALE, applyTranslation, localeChain, pickFields } from "@/content/i18n/i18n-core";
+import { getContentLocale } from "@/services/content-locale";
 import type { Npc, NpcLine } from "@/content/npcs/types";
 import type {
   Item,
@@ -1277,7 +1278,7 @@ export class ContentRepository {
       "SELECT * FROM mythbuster_questions WHERE difficulty = ? ORDER BY position ASC, id ASC",
       [difficulty],
     );
-    return rows.map(mapMythBusterQuestionRow);
+    return this.translate("mythbuster_questions", rows.map(mapMythBusterQuestionRow), (q) => q.id);
   }
 
   /** Every question across all mythbuster difficulty pools. */
@@ -1286,7 +1287,7 @@ export class ContentRepository {
     const rows = await db.getAllAsync<MythBusterQuestionRow>(
       "SELECT * FROM mythbuster_questions ORDER BY difficulty ASC, position ASC, id ASC",
     );
-    return rows.map(mapMythBusterQuestionRow);
+    return this.translate("mythbuster_questions", rows.map(mapMythBusterQuestionRow), (q) => q.id);
   }
 
   // -------------------------------------------------------------------------
@@ -1473,10 +1474,10 @@ export class ContentRepository {
   }
 
   /**
-   * Rows of one table in the learner's language: the base rows with their translated texts laid over them. `locale` is the base
-   * language (or omitted) for no change at all, and no database read. Pass hydrated rows, with JSON columns already parsed.
+   * Rows of one table in the learner's language: the base rows with their translated texts laid over them. `locale` defaults to the learner's content language; the base
+   * language is no change at all and no database read. Pass hydrated rows, with JSON columns already parsed.
    */
-  async translate<T extends Record<string, unknown>>(entity: string, rows: T[], idOf: (row: T) => string, locale: string = BASE_LOCALE): Promise<T[]> {
+  async translate<T extends object>(entity: string, rows: T[], idOf: (row: T) => string, locale: string = getContentLocale()): Promise<T[]> {
     if (!locale || locale === BASE_LOCALE || rows.length === 0) return rows;
     const entries = await this.getTranslations(locale, entity);
     if (entries.size === 0) return rows;

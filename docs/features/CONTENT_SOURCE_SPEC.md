@@ -37,7 +37,7 @@ The survey is of the real master DB (131 chat nodes, 92 feed templates, 115 ency
 | 3 | `npcs` (7), `npc_lines` (16), `feed_templates` (92), `blog_posts` (4) + `blog_comments` (4) + `blog_references` (9) | prose + attributes; blog has typed blocks | bios currently also live in `components/npc/npc-roster.ts` (seed and fallback), see section 13 |
 | 4 | `unit_statements` (20), `scan_targets` (12), `safety_cards` (14), `map_sites` (18) and their `*_references`, `myths` (37), `mythbuster_questions` (150), `encyclopedia_entries` (115), `content_references` (58) | prose plus arrays and small objects | |
 | 5 (built) | `units`, `objectives`, `lessons`, `path_nodes`, `items`, `lesson_cards`, `unit_references`, `lesson_references` | prose, interaction data and **figures by id**; see 3.1 | today's master is `scripts/content-migration/curriculum/unit-N.mjs` + `scenes.mjs`, synced by `sync-unit.mjs`; those are retired when this phase lands. Needs its own spec first |
-| 6 (built) | translations (section 11) | a file per language: record id -> translated fields | `docs/features/CONTENT_SOURCE_I18N_SPEC.md`; changes nothing before it |
+| 6 (**built**) | translations (section 11) | a file per language: record id -> translated fields | `docs/features/CONTENT_SOURCE_I18N_SPEC.md`; changes nothing before it |
 | never | `content_meta`, the user-state DB | runtime or build facts | |
 
 ### 3.1 What lessons need that the earlier phases do not (known now, designed in phase 5)
@@ -479,7 +479,9 @@ What this spec commits to now is only: ids are explicit and stable on every reco
 | 4 | Make Studio read-only for owned tables | not needed while you do not use it for editing |
 | 5 | The `verified` flag on sources | an ordinary field in phase 4; first publish uses `--allow-unreviewed` |
 | 6 | Reply and list children are addressed by index in translation keys | acceptable until it hurts; then optional child ids by migration (11.3) |
-| 7 | Lesson figures are stored as expanded shapes (46 of 124 cards, 89% of the table) | decided: a figure is an id plus args drawn by a library in the app, inline shapes kept for one-offs (3.1); built and converted in phase 5, proved equal to today's shapes first. Until then edit figures in `curriculum/unit-N.mjs` and sync, never with `content:edit` |
+| 7 | Lesson figures are stored as expanded shapes (46 of 124 cards, 89% of the table) | **settled in phase 5**: a figure is an id plus args drawn by a library in the app, inline shapes kept for one-offs (3.1); converted and proved equal to the old shapes |
+
+**State of these items (2026-11-22, after phase 6):** 1 accepted and done (the first sync showed the moves). 2 settled: `npc-roster.ts` stays a second copy and `test:source-adapters` fails when it and the characters' files differ. 3 left as it is. 4 not needed. 5 the owner does not maintain `verified`; it is an ordinary field and the publish gate's rule is unchanged. 6 still acceptable (list positions in translation keys). 7 settled in phase 5.
 
 Decided: the extension is `.atomiq`; lessons are migrated later (phase 5), with figures as ids; translations are one file per language mapping text id to text (section 11).
 
@@ -491,8 +493,8 @@ Decided: the extension is `.atomiq`; lessons are migrated later (phase 5), with 
 | 1 | core parser and writer, default adapter, `content:export`, T1 to T4, T6, T8, T9 | **all 27 content tables round-trip**; no table is owned; no existing behaviour changed |
 | 2 | chat adapter, `SOURCE_OWNED_TABLES`, `content:sync` (+ `--check`), drift state, ownership guard, `content:edit` guard, legacy chat scripts retired, publish gate, docs | a Hal story edited as a file reaches the DB through one sync with its tests; T5, T7 pass; the old seeds cannot run |
 | 3 | npc, feed, blog adapters, retire their seeds (**built**) | same, per adapter, with no change to chat; a test fails when `npc-roster.ts` and the characters' files differ |
-| 4 | the remaining prose tables (**built**: eight adapters, 169 files in all; `unit_references` and `lesson_references` wait for phase 5 with the lesson tables) | same |
-| 5 | its own spec first (the figure library and `ref` conversion from 3.1, interaction types, retiring `unit-N.mjs`, `scenes.mjs` and `sync-unit.mjs`), then the lesson adapters | a unit written as `.atomiq` files syncs to the same rows the `unit-N.mjs` sync produced (row-for-row), tests included |
+| 4 | the remaining prose tables (**built**: eight adapters; `unit_references` and `lesson_references` came with the lesson tables in phase 5) | same |
+| 5 (**built**) | its own spec (`CONTENT_SOURCE_PHASE5_SPEC.md`): the figure library and `ref` conversion from 3.1, the `curriculum` adapter, `unit-N.mjs`, `scenes.mjs` and `sync-unit.mjs` retired | a unit written as `.atomiq` files syncs to the same rows the `unit-N.mjs` sync produced, and the app draws every figure from its id |
 | 6 | the `i18n` adapter and the runtime lookup with base-text fallback (own spec) | one language file reaches `content_translations` and a screen shows it, with fallback |
 
 A phase is not started until the previous one is done, and **no phase may change a file or an adapter of an earlier phase except through section 10.**

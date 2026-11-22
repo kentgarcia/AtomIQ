@@ -20,6 +20,7 @@ import { useAppFonts } from "@/hooks/use-app-fonts";
 import { StorageProvider } from "@/services/StorageContext";
 import { installMediaLifecycle, setMediaPathname } from "@/services/media";
 import { initializeSfx, unloadSfx } from "@/services/sfx";
+import { initContentLocale } from "@/services/content-locale";
 import { initMotionLevel, useMotionLevel } from "@/services/motion-level";
 import { initCrashGuard } from "@/services/crash-guard";
 import { CrashPrompt } from "@/components/crash/CrashPrompt";
@@ -69,6 +70,7 @@ function AppContent() {
   const motionLevel = useMotionLevel();
   useEffect(() => {
     void initMotionLevel();
+    void initContentLocale();
     // Did the app die last time? (a flag kept while it is in front; the prompt below offers a lighter animation level)
     void initCrashGuard();
   }, []);

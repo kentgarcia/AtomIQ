@@ -26,6 +26,13 @@ export const WORD_KEYS: ReadonlySet<string> = new Set([
   "summary", "description", "question", "blurb", "fact", "tag", "reason", "heading",
 ]);
 
+/** A saved or typed language code as a locale (`pt_br` -> `pt-BR` is not guessed: only a well formed code is kept), else null. */
+export function normalizeLocale(value: unknown): string | null {
+  if (typeof value !== "string") return null;
+  const v = value.trim();
+  return LOCALE_RE.test(v) ? v : null;
+}
+
 /** `a.b[0].c` -> ["a", "b", 0, "c"]; null for a path that is not well formed. */
 export function parsePath(path: string): PathSegment[] | null {
   if (!path) return null;
@@ -130,7 +137,7 @@ export function samePlaceholders(base: string, translated: string): boolean {
  *
  * `columns` are JSON-looking values already parsed (a `data` object, a `replies` array); pass the row as the app hydrates it.
  */
-export function applyTranslation<T extends Record<string, unknown>>(row: T, fields: Readonly<Record<string, string>> | null | undefined): T {
+export function applyTranslation<T extends object>(row: T, fields: Readonly<Record<string, string>> | null | undefined): T {
   if (!fields) return row;
   let out = row;
   for (const [path, text] of Object.entries(fields)) {

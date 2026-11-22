@@ -9,10 +9,12 @@ Status (2026-11-22): built. The model is the owner's (main spec section 11): **a
 | the rules (paths, what is words, placeholders, language chain, laying a translation over a row) | `content/i18n/i18n-core.ts` (framework-free, used by the app, the tooling and the tests) |
 | the file form | adapter `i18n` (`scripts/lib/content-source/adapters/i18n.mjs`): `content/source/i18n/<locale>.atomiq` -> `content_translations` |
 | validation | `scripts/lib/i18n-rules.mjs`, run by `validateDatabase`: `validate:content`, `content:sync` and the publish gate |
-| runtime lookup | `contentRepository.getTranslationLocales()`, `getTranslations(locale, entity)`, `translate(entity, rows, idOf, locale)` in `services/content-db.ts` |
+| runtime lookup | `contentRepository.getTranslationLocales()`, `getTranslations(locale, entity)`, `translate(entity, rows, idOf, locale?)` in `services/content-db.ts` (the locale defaults to the learner's) |
+| the learner's language | `services/content-locale.ts` (`getContentLocale`, `setContentLocale`, `useContentLocale`; saved as `STORAGE_KEYS.CONTENT_LOCALE`, loaded by `app/_layout.tsx`; the base language until chosen) |
+| first adopter | the Myth Buster question banks (`getMythBusterQuizQuestionsByDifficulty`, `getAllMythBusterQuizQuestions`): question, options (grading is by index) and explanation |
 | tests | `npm run test:i18n`; the adapter also runs in `test:source-adapters` (goldens in `scripts/golden/content-source/adapters-v1/i18n/`) |
 
-No language ships yet and the app has no language setting: with no file the table is empty, `translate` returns the rows it was given, and nothing in the app changes. A screen adopts translation by passing its hydrated rows through `translate` with the learner's locale, one query at a time.
+No language ships yet and nothing in the app lets the learner pick one: with no file the table is empty, the language is the base language, `translate` returns the rows it was given with no database read, and nothing in the app changes. Another screen adopts translation by passing its hydrated rows through `translate`, one query at a time; check first that its grading or logic does not compare translated text (the Myth Buster banks grade by index, which is why they went first).
 
 ## 2. The file
 
@@ -65,4 +67,4 @@ Because they run inside `validateDatabase`, a translation that fell behind its b
 - **List positions** (`replies[0]`, `options[1]`) move if the base reorders or inserts. If that hurts, the additive fix is stable ids on those children, added by one `content:migrate` run (main spec 11.3).
 - **Staleness** (a hash of the base text next to an entry, to see that a base text changed after it was translated) is optional and additive; not built.
 - **Per-language voice rules** (`test:voice` is English), length limits, and a translator's checklist belong with the first language.
-- **The learner's language setting** and the interface strings that live in code (not in the database) are separate pieces of work; this phase is the content side only.
+- **A picker for the language** (Settings, listing `getTranslationLocales()`, shown only when a language exists) and the interface strings that live in code (not in the database) are separate pieces of work; this phase is the content side only.
