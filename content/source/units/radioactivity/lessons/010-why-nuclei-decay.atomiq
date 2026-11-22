@@ -15,14 +15,17 @@ relies_on: u1-unstable-changes
 description:
     Some nuclei change all by themselves, and nobody can say when. You will meet the parent and the daughter, and find out why this is a natural process.
 
-cite ref-iaea-decay
-supports: Radioactive decay is spontaneous; parent and daughter nuclides.
+cite ref-openstax-chem-21-3
+supports: Radioactive decay is the spontaneous change of an unstable parent nuclide into a daughter nuclide.
 
-cite ref-iaea-glossary
-supports: Radionuclide; what radioactive means.
+cite ref-epa-radioactive-decay
+supports: A radionuclide is a radioactive (unstable) form of an element.
 
-cite ref-openstax-up3-ch10
-supports: Radioactive decay is random for one nucleus and regular for many.
+cite ref-openstax-up3-10-3
+supports: The radiation does not change with chemical state, temperature or pressure.
+
+cite ref-wikipedia-radioactive-decay
+supports: Decay is random for a single atom; it is impossible to predict when one will decay.
 
 card c01
 kind: item

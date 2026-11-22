@@ -14,14 +14,14 @@ relies_on: u2-random-single
 description:
     How fast does a group of radioactive nuclei fade? You will look at 100 unstable nuclei, find the pattern, and see why half-life is about a crowd and not a timer inside each atom.
 
-cite ref-iaea-decay
-supports: Definition of half-life.
+cite ref-epa-radioactive-decay
+supports: Half-life is the time for half of the radioactive atoms to decay; it ranges from seconds to billions of years.
 
-cite ref-openstax-up3-ch10
-supports: Half-life and exponential decay; half-lives vary enormously.
+cite ref-openstax-up3-10-3
+supports: Half-life and the exponential decay curve.
 
-cite ref-iaea-glossary
-supports: Radionuclide and half-life examples (candidates to verify).
+cite ref-openstax-chem-21-3
+supports: Each radioactive nuclide has a characteristic, constant half-life.
 
 card c01
 kind: item

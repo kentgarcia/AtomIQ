@@ -11,7 +11,7 @@ type: choice
 surfaces: lesson
 surfaces: practice
 surfaces: review
-references: ref-background-radiation
+references: ref-epa-radiation-sources
 
 prompt:
     Where does radon come from?
@@ -31,7 +31,7 @@ type: choice
 surfaces: lesson
 surfaces: practice
 surfaces: review
-references: ref-background-radiation
+references: ref-epa-radiation-sources
 
 prompt:
     Which of these arrives on Earth from space?
@@ -52,8 +52,8 @@ difficulty: 2
 surfaces: lesson
 surfaces: practice
 surfaces: review
-references: ref-becquerel-1896
-references: ref-iaea-decay
+references: ref-openstax-up3-10-3
+references: ref-openstax-chem-21-3
 
 prompt:
     Put these in order, from first to last.
@@ -93,7 +93,7 @@ difficulty: 2
 surfaces: lesson
 surfaces: practice
 surfaces: review
-references: ref-background-radiation
+references: ref-epa-radiation-sources
 
 prompt:
     Which kind is it? Natural radioactivity, cosmic radiation, or made by people? Sort each one.
@@ -119,7 +119,7 @@ type: true_or_myth
 surfaces: lesson
 surfaces: practice
 surfaces: review
-references: ref-background-radiation
+references: ref-epa-radiation-sources
 
 statement:
     Radioactive materials are only found in nuclear facilities.
@@ -134,7 +134,7 @@ type: choice
 surfaces: practice
 surfaces: checkpoint
 surfaces: review
-references: ref-background-radiation
+references: ref-epa-radiation-sources
 
 prompt:
     Which of these is a natural source of radioactivity?
@@ -154,7 +154,7 @@ type: true_or_myth
 surfaces: practice
 surfaces: checkpoint
 surfaces: review
-references: ref-background-radiation
+references: ref-epa-radiation-sources
 
 statement:
     Radon is a radioactive gas that comes from the ground.

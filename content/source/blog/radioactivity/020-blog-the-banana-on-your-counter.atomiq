@@ -12,9 +12,13 @@ read: 1
 unlock: {"trigger":"unit_complete","unitId":"radioactivity"}
 reactors: npc-hal
 reactors: npc-mina
-references: ref-background-radiation
-references: ref-becquerel-1896
-references: ref-potassium-40
+references: ref-epa-radiation-sources
+references: ref-epa-radioactive-decay
+references: ref-hps-natural-radioactivity
+references: ref-hps-radioactive-contamination
+references: ref-medlineplus-potassium
+references: ref-openstax-up3-10-3
+references: ref-who-ionizing-radiation
 
 p:
     ok here's something nobody expects. the banana on your counter is a little bit radioactive. surprise~
@@ -40,7 +44,7 @@ quote:
     radioactivity was always here. we only learned to see it
 
 fact:
-    In 1896 Henri Becquerel left a uranium mineral on a wrapped photographic plate. The plate fogged, even with no sunlight. Radioactivity was found in a natural mineral, long before anyone made nuclear technology.
+    In 1896 Henri Becquerel found that a uranium-rich rock gives off invisible rays that darken a photographic plate, even inside an enclosed container. Radioactivity was found in a natural material, long before anyone built nuclear technology.
 
 h: is it dangerous?
 

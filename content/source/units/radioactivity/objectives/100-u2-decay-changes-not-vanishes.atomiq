@@ -11,7 +11,7 @@ type: true_or_myth
 surfaces: lesson
 surfaces: practice
 surfaces: review
-references: ref-iaea-decay
+references: ref-openstax-chem-21-3
 
 statement:
     When a nucleus decays, it changes into a different nucleus.
@@ -26,7 +26,7 @@ type: true_or_myth
 surfaces: lesson
 surfaces: practice
 surfaces: review
-references: ref-iaea-decay
+references: ref-openstax-chem-21-3
 
 statement:
     Radioactive decay means the atom just disappears.
@@ -41,7 +41,7 @@ type: true_or_myth
 surfaces: practice
 surfaces: checkpoint
 surfaces: review
-references: ref-iaea-decay
+references: ref-openstax-chem-21-3
 
 statement:
     After a decay there is still a nucleus. It is a different one.
@@ -56,7 +56,7 @@ type: choice
 surfaces: practice
 surfaces: checkpoint
 surfaces: review
-references: ref-iaea-decay
+references: ref-openstax-chem-21-3
 
 prompt:
     A nucleus decays. What has happened to it?

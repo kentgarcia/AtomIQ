@@ -12,7 +12,7 @@ difficulty: 2
 surfaces: lesson
 surfaces: practice
 surfaces: review
-references: ref-iaea-radiation-types
+references: ref-epa-radioactive-decay
 
 prompt:
     A gamma ray leaves a nucleus. Does the nucleus turn into a different element?
@@ -32,7 +32,7 @@ type: sort
 surfaces: lesson
 surfaces: practice
 surfaces: review
-references: ref-iaea-radiation-types
+references: ref-epa-radioactive-decay
 
 prompt:
     Is it a particle, or electromagnetic radiation? Sort each one.
@@ -55,7 +55,7 @@ type: true_or_myth
 surfaces: lesson
 surfaces: practice
 surfaces: review
-references: ref-iaea-radiation-types
+references: ref-epa-radioactive-decay
 
 statement:
     Visible light is electromagnetic radiation, just like gamma rays.
@@ -70,7 +70,7 @@ type: true_or_myth
 surfaces: lesson
 surfaces: practice
 surfaces: review
-references: ref-iaea-radiation-types
+references: ref-epa-radioactive-decay
 
 statement:
     Gamma radiation is made of tiny pieces of the nucleus.
@@ -85,7 +85,7 @@ type: true_or_myth
 surfaces: lesson
 surfaces: practice
 surfaces: review
-references: ref-iaea-radiation-types
+references: ref-epa-radioactive-decay
 
 statement:
     Alpha, beta and gamma are three versions of the same thing.
@@ -100,7 +100,7 @@ type: choice
 surfaces: practice
 surfaces: checkpoint
 surfaces: review
-references: ref-iaea-radiation-types
+references: ref-epa-radioactive-decay
 
 prompt:
     Which of these is not a particle?
@@ -120,7 +120,7 @@ type: true_or_myth
 surfaces: practice
 surfaces: checkpoint
 surfaces: review
-references: ref-iaea-radiation-types
+references: ref-epa-radioactive-decay
 
 statement:
     Alpha and beta are particles.

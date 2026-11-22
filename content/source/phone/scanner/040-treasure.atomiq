@@ -6,10 +6,11 @@ target scan-gold
 name: A gold bar
 object: gold
 atomdex: element
-references: ref-iupac-table
 references: ref-openstax-ap-elements
 blurb: Pure gold is just one kind of atom.
-fun_fact: Gold is an element, so it cannot be broken down into anything simpler. A bar of pure gold holds nothing but gold atoms.
+
+fun_fact:
+    Gold is an element, and an element cannot be broken down by ordinary chemical means. A bar of pure gold holds nothing but gold atoms.
 
 composition:
     {"symbol":"Au","note":"the only element in pure gold"}

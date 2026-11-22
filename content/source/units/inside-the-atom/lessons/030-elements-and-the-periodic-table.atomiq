@@ -14,10 +14,10 @@ description:
     One number tells you which element an atom is: how many protons it has. You will build atoms and watch what happens to the element when you change that number.
 
 cite ref-openstax-chem-ch2
-supports: The number of protons decides the element.
+supports: The number of protons (the atomic number) defines the element.
 
 cite ref-iupac-table
-supports: Element names and atomic numbers (optional card).
+supports: IUPAC publishes the periodic table of the elements (optional card).
 
 card c01
 kind: item

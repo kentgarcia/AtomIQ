@@ -11,7 +11,7 @@ type: choice
 surfaces: lesson
 surfaces: practice
 surfaces: review
-references: ref-iaea-decay
+references: ref-openstax-chem-21-3
 
 prompt:
     Why can a radioactive nucleus change even when nobody does anything to it?
@@ -32,7 +32,7 @@ type: hotspot
 surfaces: lesson
 surfaces: practice
 surfaces: review
-references: ref-iaea-decay
+references: ref-openstax-chem-21-3
 
 prompt:
     Which nucleus can change by itself? Tap it.
@@ -437,7 +437,7 @@ type: true_or_myth
 surfaces: lesson
 surfaces: practice
 surfaces: review
-references: ref-iaea-decay
+references: ref-openstax-chem-21-3
 
 statement:
     A radioactive atom needs a person to make it decay.
@@ -453,7 +453,7 @@ difficulty: 2
 surfaces: practice
 surfaces: checkpoint
 surfaces: review
-references: ref-iaea-decay
+references: ref-openstax-chem-21-3
 
 prompt:
     A rock contains unstable nuclei. Nobody touches it. What happens to those nuclei?
@@ -473,7 +473,7 @@ type: true_or_myth
 surfaces: practice
 surfaces: checkpoint
 surfaces: review
-references: ref-iaea-decay
+references: ref-openstax-chem-21-3
 
 statement:
     An unstable nucleus changes by itself, without anyone starting it.

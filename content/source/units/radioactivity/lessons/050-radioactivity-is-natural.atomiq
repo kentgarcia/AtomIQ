@@ -14,17 +14,17 @@ relies_on: u2-decay-chain
 description:
     Radioactivity was here long before people. You will find it in rocks, air, food, your own body and space, hear how it was discovered, and see why radioactive does not automatically mean dangerous.
 
-cite ref-background-radiation
-supports: Natural radionuclides, cosmic radiation and radon.
+cite ref-epa-radiation-sources
+supports: Natural background radiation: radon, cosmic radiation and radioactive minerals in the ground and the body.
 
-cite ref-becquerel-1896
-supports: The discovery of radioactivity in a natural mineral.
+cite ref-openstax-up3-10-3
+supports: Becquerel found in 1896 that a uranium-rich rock darkens a photographic plate.
 
-cite ref-potassium-40
-supports: Potassium-40 in food and the body.
+cite ref-hps-natural-radioactivity
+supports: Potassium-40 in the human body.
 
-cite ref-nrc-decay-series
-supports: Natural decay series and natural radionuclides (optional card).
+cite ref-epa-radioactive-decay
+supports: Uranium and thorium decay chains in nature (optional card).
 
 card c01
 kind: item

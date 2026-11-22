@@ -51,6 +51,8 @@ describe("Unit 1 content", () => {
 
   it("blocks publish while references are unverified (strictReview)", () => {
     const db = build();
+    // The shipped content has every source verified; un-verify one to see the gate close.
+    db.exec("UPDATE content_references SET verified = 0 WHERE id = (SELECT reference_id FROM lesson_references LIMIT 1)");
     assert.ok(rules(db, { strictReview: true }).has("reference-unverified"));
   });
 
@@ -530,7 +532,10 @@ describe("Unit 2 content", () => {
     assert.equal(stories[0].lesson_id, "radioactivity-is-natural");
     assert.equal(stories[0].tier, "core");
     assert.equal(JSON.parse(stories[0].data).speaker, "npc-ada");
-    assert.ok(db.prepare("SELECT 1 FROM content_references WHERE id = 'ref-becquerel-1896'").get(), "the reference is kept");
+    assert.ok(
+      db.prepare("SELECT 1 FROM lesson_references WHERE lesson_id = 'radioactivity-is-natural' AND reference_id = 'ref-openstax-up3-10-3'").get(),
+      "the lesson cites the textbook page that tells the Becquerel story",
+    );
   });
 
   it("every item is answerable, and a hotspot that animates names its answer", () => {

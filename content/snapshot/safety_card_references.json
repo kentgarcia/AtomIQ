@@ -7,7 +7,7 @@
   "rows": [
     {
       "card_id": "safety-background-radiation",
-      "reference_id": "ref-nrc-doses-daily-lives"
+      "reference_id": "ref-epa-radiation-sources"
     },
     {
       "card_id": "safety-background-radiation",
@@ -15,15 +15,7 @@
     },
     {
       "card_id": "safety-dont-go-out-to-look",
-      "reference_id": "ref-cdc-radiation-emergencies-safety"
-    },
-    {
-      "card_id": "safety-dont-go-out-to-look",
-      "reference_id": "ref-ready-nuclear-explosion"
-    },
-    {
-      "card_id": "safety-exposure-vs-contamination",
-      "reference_id": "ref-cdc-contamination-vs-exposure"
+      "reference_id": "ref-ready-radiation"
     },
     {
       "card_id": "safety-exposure-vs-contamination",
@@ -31,27 +23,11 @@
     },
     {
       "card_id": "safety-get-inside-stay-inside-stay-tuned",
-      "reference_id": "ref-cdc-radiation-emergencies-safety"
-    },
-    {
-      "card_id": "safety-get-inside-stay-inside-stay-tuned",
-      "reference_id": "ref-ready-nuclear-explosion"
+      "reference_id": "ref-ready-radiation"
     },
     {
       "card_id": "safety-good-shelter",
-      "reference_id": "ref-cdc-radiation-emergencies-safety"
-    },
-    {
-      "card_id": "safety-good-shelter",
-      "reference_id": "ref-ready-nuclear-explosion"
-    },
-    {
-      "card_id": "safety-if-you-were-outside",
-      "reference_id": "ref-cdc-radiation-emergencies-safety"
-    },
-    {
-      "card_id": "safety-if-you-were-outside",
-      "reference_id": "ref-ready-nuclear-explosion"
+      "reference_id": "ref-ready-radiation"
     },
     {
       "card_id": "safety-if-you-were-outside",
@@ -59,11 +35,7 @@
     },
     {
       "card_id": "safety-myth-exposed-radioactive",
-      "reference_id": "ref-cdc-contamination-vs-exposure"
-    },
-    {
-      "card_id": "safety-myth-exposed-radioactive",
-      "reference_id": "ref-nrc-radiation-faq"
+      "reference_id": "ref-hps-radioactive-contamination"
     },
     {
       "card_id": "safety-myth-instantly-deadly",
@@ -82,16 +54,12 @@
       "reference_id": "ref-epa-radiation-basics"
     },
     {
-      "card_id": "safety-myth-microwave-radiation",
-      "reference_id": "ref-nrc-radiation-faq"
+      "card_id": "safety-myth-plant-explodes",
+      "reference_id": "ref-wna-chernobyl"
     },
     {
       "card_id": "safety-myth-plant-explodes",
-      "reference_id": "ref-cdc-nuclear-blast-faq"
-    },
-    {
-      "card_id": "safety-myth-plant-explodes",
-      "reference_id": "ref-nrc-radiation-faq"
+      "reference_id": "ref-wna-reactor-safety"
     },
     {
       "card_id": "safety-potassium-iodide",

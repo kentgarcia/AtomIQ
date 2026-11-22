@@ -11,7 +11,7 @@ type: choice
 surfaces: lesson
 surfaces: practice
 surfaces: review
-references: ref-openstax-up3-ch10
+references: ref-openstax-up3-10-3
 
 prompt:
     An atom has an unstable nucleus. What can happen to it?
@@ -32,8 +32,8 @@ difficulty: 2
 surfaces: lesson
 surfaces: practice
 surfaces: review
-references: ref-potassium-40
-references: ref-iaea-isotopes
+references: ref-hps-natural-radioactivity
+references: ref-epa-radioactive-decay
 
 prompt:
     Where do these radioactive atoms come from? Sort each one.
@@ -56,7 +56,7 @@ type: true_or_myth
 surfaces: lesson
 surfaces: practice
 surfaces: review
-references: ref-potassium-40
+references: ref-hps-natural-radioactivity
 
 statement:
     Radioactive atoms only exist because people made them.
@@ -72,7 +72,7 @@ difficulty: 2
 surfaces: practice
 surfaces: checkpoint
 surfaces: review
-references: ref-potassium-40
+references: ref-hps-natural-radioactivity
 
 statement:
     A banana contains a tiny amount of natural radioactive potassium.
@@ -88,8 +88,8 @@ difficulty: 2
 surfaces: practice
 surfaces: checkpoint
 surfaces: review
-references: ref-becquerel-1896
-references: ref-iaea-isotopes
+references: ref-openstax-up3-10-3
+references: ref-epa-radioactive-decay
 
 prompt:
     A rock from the ground gives off a little radiation. How can that be?

@@ -17,22 +17,22 @@
     },
     {
       "unit_id": "inside-the-atom",
-      "reference_id": "ref-iaea-isotopes",
+      "reference_id": "ref-epa-radioactive-decay",
       "position": 2
     },
     {
       "unit_id": "radioactivity",
-      "reference_id": "ref-openstax-up3-ch10",
+      "reference_id": "ref-openstax-up3-10-3",
       "position": 0
     },
     {
       "unit_id": "radioactivity",
-      "reference_id": "ref-iaea-decay",
+      "reference_id": "ref-openstax-chem-21-3",
       "position": 1
     },
     {
       "unit_id": "radioactivity",
-      "reference_id": "ref-iaea-glossary",
+      "reference_id": "ref-epa-radioactive-decay",
       "position": 2
     }
   ]

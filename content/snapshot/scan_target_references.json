@@ -7,11 +7,15 @@
   "rows": [
     {
       "target_id": "scan-air",
-      "reference_id": "ref-noaa-atmosphere"
+      "reference_id": "ref-nasa-earth-facts"
     },
     {
       "target_id": "scan-banana",
       "reference_id": "ref-epa-radiation-sources"
+    },
+    {
+      "target_id": "scan-banana",
+      "reference_id": "ref-hps-natural-radioactivity"
     },
     {
       "target_id": "scan-banana",
@@ -20,10 +24,6 @@
     {
       "target_id": "scan-diamond",
       "reference_id": "ref-openstax-chem-10-5"
-    },
-    {
-      "target_id": "scan-gold",
-      "reference_id": "ref-iupac-table"
     },
     {
       "target_id": "scan-gold",
@@ -52,10 +52,6 @@
     {
       "target_id": "scan-red-blood-cell",
       "reference_id": "ref-openstax-ap-organic"
-    },
-    {
-      "target_id": "scan-rice",
-      "reference_id": "ref-openstax-ap-elements"
     },
     {
       "target_id": "scan-rice",

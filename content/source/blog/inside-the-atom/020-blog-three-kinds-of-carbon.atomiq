@@ -11,8 +11,10 @@ cover: diamond
 read: 2
 unlock: {"trigger":"unit_complete","unitId":"inside-the-atom"}
 reactors: npc-ada
-references: ref-iaea-isotopes
+references: ref-epa-radiation-sources
+references: ref-epa-radioactive-decay
 references: ref-openstax-chem-ch2
+references: ref-openstax-up3-ch10
 
 p:
     Here is a puzzle. Three atoms are all carbon, yet they are not the same. How can that be? Let us count.

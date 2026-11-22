@@ -8,7 +8,8 @@ lesson: atoms-are-everywhere
 title: The smallest thing you will ever meet
 hook: You have never seen one, yet you are made of them. Let us look at how small they really are.
 cover: atom
-read: 2
+read: 1
+references: ref-openstax-chem-2-1
 references: ref-openstax-chem-ch1
 references: ref-openstax-chem-ch2
 
@@ -16,7 +17,7 @@ p:
     Look at your hand. Now look at the air around it. Both are matter, and all matter is made of atoms.
 
 p:
-    Yes, even the air, which gives every impression of being nothing. That is why a pumped-up ball is heavier than a flat one: the air inside it is matter too. I have weighed several balls to be certain. The neighbours have asked me to stop.
+    Yes, even the air, which gives every impression of being nothing. That is why you can pump up a ball: the air inside it takes up space, because air is matter too. I have weighed several balls to be certain. The neighbours have asked me to stop.
 
 quote:
     Small things are best looked at slowly. I still look at them every day.
@@ -24,22 +25,17 @@ quote:
 h: How small is small?
 
 p:
-    Take a skin cell. You need a microscope to see it. A virus is about 300 times smaller than that cell. And an atom is about 300 times smaller again.
+    An atom is about 10^-10 m across, one ten-billionth of a metre. The nucleus in its middle is about 100,000 times smaller still.
 
 figure: atom
-caption: An atom: far too small to see, even with an ordinary microscope.
+caption: An atom: far too small to see.
 
 list:
-    Your hand: about 10 cm
-    A skin cell: about 0.03 mm
-    A virus: about 100 nm
-    An atom: a few tenths of a nm
+    An atom: about 10^-10 m across
+    Its nucleus: about 100,000 times smaller
 
 fact:
-    About 2,400 years ago the Greek thinker Democritus imagined cutting something in half again and again, until he reached a piece that could not be cut. He called it atomos. Seeing atoms took far longer.
-
-p:
-    Light and heat are different. They are energy, not matter, so they are not made of atoms.
+    In the fifth century BC the Greek thinkers Leucippus and Democritus argued that all matter was made of small pieces they called atomos, a word for "indivisible". Seeing atoms took far longer.
 
 p:
     So the next time you pick something up, remember that you are holding a huge crowd of atoms you can never see. Take a moment with that. I will wait.
@@ -50,7 +46,7 @@ comment bc-the-smallest-thing-ray
 author: npc-ray
 chip: {"entryId":"atom"}
 
-    Plain words: matter is anything that has mass and takes up space. Light and heat do not, so they are not matter.
+    Plain words: matter is anything that has mass and takes up space.
 
 comment bc-the-smallest-thing-ada
 author: npc-ada

@@ -7,23 +7,47 @@
   "rows": [
     {
       "blog_id": "blog-nobody-knows-when",
-      "reference_id": "ref-iaea-decay"
+      "reference_id": "ref-openstax-chem-21-3"
     },
     {
       "blog_id": "blog-nobody-knows-when",
-      "reference_id": "ref-openstax-up3-ch10"
+      "reference_id": "ref-openstax-up3-10-3"
+    },
+    {
+      "blog_id": "blog-nobody-knows-when",
+      "reference_id": "ref-wikipedia-radioactive-decay"
     },
     {
       "blog_id": "blog-the-banana-on-your-counter",
-      "reference_id": "ref-background-radiation"
+      "reference_id": "ref-epa-radiation-sources"
     },
     {
       "blog_id": "blog-the-banana-on-your-counter",
-      "reference_id": "ref-becquerel-1896"
+      "reference_id": "ref-epa-radioactive-decay"
     },
     {
       "blog_id": "blog-the-banana-on-your-counter",
-      "reference_id": "ref-potassium-40"
+      "reference_id": "ref-hps-natural-radioactivity"
+    },
+    {
+      "blog_id": "blog-the-banana-on-your-counter",
+      "reference_id": "ref-hps-radioactive-contamination"
+    },
+    {
+      "blog_id": "blog-the-banana-on-your-counter",
+      "reference_id": "ref-medlineplus-potassium"
+    },
+    {
+      "blog_id": "blog-the-banana-on-your-counter",
+      "reference_id": "ref-openstax-up3-10-3"
+    },
+    {
+      "blog_id": "blog-the-banana-on-your-counter",
+      "reference_id": "ref-who-ionizing-radiation"
+    },
+    {
+      "blog_id": "blog-the-smallest-thing",
+      "reference_id": "ref-openstax-chem-2-1"
     },
     {
       "blog_id": "blog-the-smallest-thing",
@@ -35,11 +59,19 @@
     },
     {
       "blog_id": "blog-three-kinds-of-carbon",
-      "reference_id": "ref-iaea-isotopes"
+      "reference_id": "ref-epa-radiation-sources"
+    },
+    {
+      "blog_id": "blog-three-kinds-of-carbon",
+      "reference_id": "ref-epa-radioactive-decay"
     },
     {
       "blog_id": "blog-three-kinds-of-carbon",
       "reference_id": "ref-openstax-chem-ch2"
+    },
+    {
+      "blog_id": "blog-three-kinds-of-carbon",
+      "reference_id": "ref-openstax-up3-ch10"
     }
   ]
 }

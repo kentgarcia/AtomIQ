@@ -69,7 +69,7 @@ references: ref-nps-mapr-losalamos
 blurb: The secret wartime laboratory of the Manhattan Project.
 
 fact:
-    Project leaders chose a mesa in New Mexico for a secret laboratory. Scientists such as J. Robert Oppenheimer, Hans Bethe and Richard Feynman worked there during World War II.
+    Manhattan Project administrators found an ideal location in Los Alamos, New Mexico, for a secret laboratory. Scientists such as J. Robert Oppenheimer, Hans Bethe and Richard Feynman worked there during the Manhattan Project.
 
 site site-oak-ridge
 name: Oak Ridge
@@ -124,7 +124,7 @@ references: ref-hiroshima-pref-bombing
 blurb: Bombed on 6 August 1945, now a city of remembrance and peace.
 
 fact:
-    An atomic bomb destroyed the city on 6 August 1945. Hiroshima was rebuilt as a "peace memorial city", and its Peace Memorial Museum shares the message "No More Hiroshimas".
+    An atomic bomb was dropped on Hiroshima on 6 August 1945. The city was rebuilt under the 1949 Hiroshima Peace Memorial City Construction Law, and its Peace Memorial Museum shares the message "No More Hiroshimas".
 
 site site-nagasaki
 name: Nagasaki
@@ -137,7 +137,7 @@ references: ref-nagasaki-museum
 blurb: Bombed on 9 August 1945, and a voice for peace ever since.
 
 fact:
-    An atomic bomb exploded over Nagasaki at 11:02 a.m. on 9 August 1945. The city's Atomic Bomb Museum keeps that memory alive and teaches young people about peace.
+    At 11:02 a.m. on 9 August 1945 the explosion of an atomic bomb devastated Nagasaki. The city's Atomic Bomb Museum says the experience must be passed on to future generations.
 
 site site-obninsk
 name: Obninsk
@@ -205,7 +205,7 @@ references: ref-wna-fukushima
 blurb: A plant hit by an earthquake and tsunami in March 2011.
 
 fact:
-    After the 9.0 earthquake on 11 March 2011, a tsunami flooded the plant and cut off power and cooling. The reactors had shut down as designed but could not remove decay heat, and their cores overheated.
+    After the 9.0 earthquake on 11 March 2011, a tsunami flooded the plant and disabled most of its backup generators and the heat exchangers that carry reactor and decay heat to the sea. The three reactors lost proper cooling and water circulation.
 
 site site-cern
 name: CERN
@@ -247,4 +247,4 @@ references: ref-wna-radwaste
 blurb: Natural nuclear reactors that ran about two billion years ago.
 
 fact:
-    In a uranium deposit in what is now Gabon, fission began about two billion years ago. Natural water slowed the neutrons so the chain reaction could sustain itself, with no human help.
+    In a uranium deposit in what is now Gabon, fission began about two billion years ago. Natural water served as a moderator, there was no neutron-absorbing material such as cadmium or lead, and the chain reaction sustained itself.

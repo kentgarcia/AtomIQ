@@ -11,7 +11,7 @@ type: true_or_myth
 surfaces: lesson
 surfaces: practice
 surfaces: review
-references: ref-iaea-isotopes
+references: ref-epa-radioactive-decay
 
 statement:
     All isotopes are radioactive.
@@ -26,7 +26,7 @@ type: true_or_myth
 surfaces: lesson
 surfaces: practice
 surfaces: review
-references: ref-iaea-isotopes
+references: ref-epa-radioactive-decay
 
 statement:
     Carbon-13 is an isotope of carbon, and it is not radioactive.
@@ -41,7 +41,7 @@ type: choice
 surfaces: practice
 surfaces: checkpoint
 surfaces: review
-references: ref-iaea-isotopes
+references: ref-epa-radioactive-decay
 
 prompt:
     Which statement about isotopes is true?
@@ -61,7 +61,7 @@ type: true_or_myth
 surfaces: practice
 surfaces: checkpoint
 surfaces: review
-references: ref-iaea-isotopes
+references: ref-epa-radioactive-decay
 
 statement:
     Carbon-12 is an isotope, and it is stable.

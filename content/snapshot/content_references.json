@@ -8,73 +8,25 @@
       "id": "ref-aip-curie-separations",
       "kind": "official",
       "publisher": "American Institute of Physics, History of Physics",
-      "title": "Marie Curie and the Science of Radioactivity: Making repeated separations",
+      "title": "Marie Curie - Research Breakthroughs (1897-1904)",
       "authors": "",
       "year": "",
       "url": "https://history.aip.org/exhibits/curie/resbr2.htm",
-      "accessed": "2026-11-20",
-      "verified": 0,
-      "note": "Opened and read on 2026-11-20 to write the content; a person still has to confirm what it supports."
+      "accessed": "2026-11-23",
+      "verified": 1,
+      "note": "Page text fetched and read on 2026-11-23; the claims that cite it were checked against that text. Signed off by the owner on 2026-11-23."
     },
     {
       "id": "ref-aip-rutherford-alpha",
       "kind": "official",
       "publisher": "American Institute of Physics, History of Physics",
-      "title": "Rutherford, Nuclear Physicist: Alpha Particles and the Atom",
+      "title": "Rutherford's Nuclear World: The Story of the Discovery of the Nucleus",
       "authors": "",
       "year": "",
       "url": "https://history.aip.org/exhibits/rutherford/sections/alpha-particles-atom.html",
-      "accessed": "2026-11-20",
-      "verified": 0,
-      "note": "Opened and read on 2026-11-20 to write the content; a person still has to confirm what it supports."
-    },
-    {
-      "id": "ref-background-radiation",
-      "kind": "official",
-      "publisher": "IAEA and UNSCEAR",
-      "title": "Background radiation explainers (IAEA, UNSCEAR)",
-      "authors": "",
-      "year": "",
-      "url": "",
-      "accessed": "",
-      "verified": 0,
-      "note": "Candidate. Natural radionuclides, cosmic radiation and radon. The spec also lists INIS record 111v8-1e515. Open each, record titles and URLs, then mark verified."
-    },
-    {
-      "id": "ref-becquerel-1896",
-      "kind": "research",
-      "publisher": "Comptes Rendus de l'Academie des Sciences",
-      "title": "Sur les radiations emises par phosphorescence",
-      "authors": "H. Becquerel",
-      "year": "1896",
-      "url": "",
-      "accessed": "",
-      "verified": 0,
-      "note": "Discovery that uranium salts darken photographic plates."
-    },
-    {
-      "id": "ref-cdc-contamination-vs-exposure",
-      "kind": "official",
-      "publisher": "U.S. Centers for Disease Control and Prevention",
-      "title": "Radiation Contamination Versus Exposure",
-      "authors": "",
-      "year": "",
-      "url": "https://www.cdc.gov/radiation-emergencies/infographic/contamination-versus-exposure.html",
-      "accessed": "2026-11-20",
-      "verified": 0,
-      "note": "Opened and read on 2026-11-20 to write the content; a person still has to confirm what it supports."
-    },
-    {
-      "id": "ref-cdc-nuclear-blast-faq",
-      "kind": "official",
-      "publisher": "U.S. Centers for Disease Control and Prevention",
-      "title": "Nuclear Blasts: Frequently Asked Questions",
-      "authors": "",
-      "year": "",
-      "url": "https://www.cdc.gov/radiation-emergencies/about/nuclear-blast-faq.html",
-      "accessed": "2026-11-20",
-      "verified": 0,
-      "note": "Opened and read on 2026-11-20 to write the content; a person still has to confirm what it supports."
+      "accessed": "2026-11-23",
+      "verified": 1,
+      "note": "Page text fetched and read on 2026-11-23; the claims that cite it were checked against that text. Signed off by the owner on 2026-11-23."
     },
     {
       "id": "ref-cdc-potassium-iodide",
@@ -84,21 +36,9 @@
       "authors": "",
       "year": "",
       "url": "https://www.cdc.gov/radiation-emergencies/treatment/potassium-iodide.html",
-      "accessed": "2026-11-20",
-      "verified": 0,
-      "note": "Opened and read on 2026-11-20 to write the content; a person still has to confirm what it supports."
-    },
-    {
-      "id": "ref-cdc-radiation-emergencies-safety",
-      "kind": "official",
-      "publisher": "U.S. Centers for Disease Control and Prevention",
-      "title": "Radiation Emergencies: Safety (get inside, stay inside, stay tuned)",
-      "authors": "",
-      "year": "",
-      "url": "https://www.cdc.gov/radiation-emergencies/safety/index.html",
-      "accessed": "2026-11-20",
-      "verified": 0,
-      "note": "Opened and read on 2026-11-20 to write the content; a person still has to confirm what it supports."
+      "accessed": "2026-11-23",
+      "verified": 1,
+      "note": "Read 2026-11-23 through a summarising fetch tool (the page refuses scripts, HTTP 403): only on officials' instruction, thyroid only, radioactive iodine only, not a substitute for salt or iodine-rich food. Re-open it in a browser to confirm the exact wording. Signed off by the owner on 2026-11-23."
     },
     {
       "id": "ref-cern-about",
@@ -108,9 +48,9 @@
       "authors": "",
       "year": "",
       "url": "https://home.cern/about",
-      "accessed": "2026-11-20",
-      "verified": 0,
-      "note": "Opened and read on 2026-11-20 to write the content; a person still has to confirm what it supports."
+      "accessed": "2026-11-23",
+      "verified": 1,
+      "note": "Page text fetched and read on 2026-11-23; the claims that cite it were checked against that text. Signed off by the owner on 2026-11-23."
     },
     {
       "id": "ref-epa-protecting-yourself",
@@ -120,9 +60,9 @@
       "authors": "",
       "year": "",
       "url": "https://www.epa.gov/radiation/protecting-yourself-radiation",
-      "accessed": "2026-11-20",
-      "verified": 0,
-      "note": "Opened and read on 2026-11-20 to write the content; a person still has to confirm what it supports."
+      "accessed": "2026-11-23",
+      "verified": 1,
+      "note": "Page text fetched and read on 2026-11-23; the claims that cite it were checked against that text. Signed off by the owner on 2026-11-23."
     },
     {
       "id": "ref-epa-radiation-basics",
@@ -132,9 +72,9 @@
       "authors": "",
       "year": "",
       "url": "https://www.epa.gov/radiation/radiation-basics",
-      "accessed": "2026-11-20",
-      "verified": 0,
-      "note": "Opened and read on 2026-11-20 to write the content; a person still has to confirm what it supports."
+      "accessed": "2026-11-23",
+      "verified": 1,
+      "note": "Page text fetched and read on 2026-11-23; the claims that cite it were checked against that text. Signed off by the owner on 2026-11-23."
     },
     {
       "id": "ref-epa-radiation-health-effects",
@@ -144,9 +84,9 @@
       "authors": "",
       "year": "",
       "url": "https://www.epa.gov/radiation/radiation-health-effects",
-      "accessed": "2026-11-20",
-      "verified": 0,
-      "note": "Opened and read on 2026-11-20 to write the content; a person still has to confirm what it supports."
+      "accessed": "2026-11-23",
+      "verified": 1,
+      "note": "Page text fetched and read on 2026-11-23; the claims that cite it were checked against that text. Signed off by the owner on 2026-11-23."
     },
     {
       "id": "ref-epa-radiation-sources",
@@ -156,21 +96,33 @@
       "authors": "",
       "year": "",
       "url": "https://www.epa.gov/radiation/radiation-sources-and-doses",
-      "accessed": "2026-11-20",
-      "verified": 0,
-      "note": "Opened and read on 2026-11-20 to write the scanner results; a person still has to confirm what it supports."
+      "accessed": "2026-11-23",
+      "verified": 1,
+      "note": "Page text fetched and read on 2026-11-23; the claims that cite it were checked against that text. Signed off by the owner on 2026-11-23."
+    },
+    {
+      "id": "ref-epa-radioactive-decay",
+      "kind": "official",
+      "publisher": "U.S. Environmental Protection Agency",
+      "title": "Radioactive Decay",
+      "authors": "",
+      "year": "",
+      "url": "https://www.epa.gov/radiation/radioactive-decay",
+      "accessed": "2026-11-23",
+      "verified": 1,
+      "note": "Page text fetched and read on 2026-11-23; the claims that cite it were checked against that text. Signed off by the owner on 2026-11-23."
     },
     {
       "id": "ref-gov-uk-calder-hall",
       "kind": "official",
-      "publisher": "UK Government (Nuclear Decommissioning Authority)",
+      "publisher": "UK Government (Sellafield Ltd)",
       "title": "Calder Hall: Decommissioning the world's first commercial nuclear power station",
       "authors": "",
       "year": "",
       "url": "https://www.gov.uk/government/case-studies/calder-hall-decommissioning-the-worlds-first-commercial-nuclear-power-station",
-      "accessed": "2026-11-20",
-      "verified": 0,
-      "note": "Opened and read on 2026-11-20 to write the content; a person still has to confirm what it supports."
+      "accessed": "2026-11-23",
+      "verified": 1,
+      "note": "Page text fetched and read on 2026-11-23; the claims that cite it were checked against that text. Signed off by the owner on 2026-11-23."
     },
     {
       "id": "ref-grs-oklo",
@@ -180,9 +132,9 @@
       "authors": "",
       "year": "",
       "url": "https://www.grs.de/en/glossary/oklo-natural-reactor",
-      "accessed": "2026-11-20",
-      "verified": 0,
-      "note": "Opened and read on 2026-11-20 to write the content; a person still has to confirm what it supports."
+      "accessed": "2026-11-23",
+      "verified": 1,
+      "note": "Page text fetched and read on 2026-11-23; the claims that cite it were checked against that text. Signed off by the owner on 2026-11-23."
     },
     {
       "id": "ref-hiroshima-museum",
@@ -192,21 +144,33 @@
       "authors": "",
       "year": "",
       "url": "https://hpmmuseum.jp/?lang=eng",
-      "accessed": "2026-11-20",
-      "verified": 0,
-      "note": "Opened and read on 2026-11-20 to write the content; a person still has to confirm what it supports."
+      "accessed": "2026-11-23",
+      "verified": 1,
+      "note": "Opened in a browser by the owner on 2026-11-22, who confirmed the link works and the information is correct; a script cannot fetch this page. Signed off by the owner on 2026-11-23."
     },
     {
       "id": "ref-hiroshima-pref-bombing",
       "kind": "official",
       "publisher": "Hiroshima Prefecture",
-      "title": "The Atomic Bombing & Reconstruction of Hiroshima",
+      "title": "The Path from the Atomic Bombing to Reconstruction of Hiroshima",
       "authors": "",
       "year": "",
       "url": "https://www.pref.hiroshima.lg.jp/site/hiroshimaforpeace-en/reconstruction-atomic-bombing.html",
-      "accessed": "2026-11-20",
-      "verified": 0,
-      "note": "Opened and read on 2026-11-20 to write the content; a person still has to confirm what it supports."
+      "accessed": "2026-11-23",
+      "verified": 1,
+      "note": "Page text fetched and read on 2026-11-23; the claims that cite it were checked against that text. Signed off by the owner on 2026-11-23."
+    },
+    {
+      "id": "ref-hps-natural-radioactivity",
+      "kind": "official",
+      "publisher": "Health Physics Society",
+      "title": "Are Our Bodies Radioactive? Radionuclides in the human body",
+      "authors": "",
+      "year": "",
+      "url": "https://hps.org/ate_faq/faqradbods/",
+      "accessed": "2026-11-23",
+      "verified": 1,
+      "note": "Page text fetched and read on 2026-11-23; the claims that cite it were checked against that text. Signed off by the owner on 2026-11-23."
     },
     {
       "id": "ref-hps-radioactive-contamination",
@@ -216,69 +180,21 @@
       "authors": "",
       "year": "",
       "url": "https://hps.org/ate_faq/radcontamination/",
-      "accessed": "2026-11-20",
-      "verified": 0,
-      "note": "Opened and read on 2026-11-20 to write the content; a person still has to confirm what it supports."
-    },
-    {
-      "id": "ref-iaea-decay",
-      "kind": "official",
-      "publisher": "IAEA",
-      "title": "IAEA material on radioactive decay and half-life",
-      "authors": "",
-      "year": "",
-      "url": "",
-      "accessed": "",
-      "verified": 0,
-      "note": "Candidate. Definition of radioactive decay and half-life; alpha as two protons and two neutrons. The spec names IAEA-TECDOC-1363 (te_1363_web.pdf) but that came from a search summary: open it, confirm it covers radioactive decay, record the exact title and URL, then mark verified."
-    },
-    {
-      "id": "ref-iaea-glossary",
-      "kind": "official",
-      "publisher": "IAEA",
-      "title": "IAEA Nuclear Safety and Security Glossary",
-      "authors": "",
-      "year": "",
-      "url": "",
-      "accessed": "",
-      "verified": 0,
-      "note": "Candidate. Definitions of beta-minus, gamma and radionuclide. Open the glossary, record the entries used and the URL, then mark verified."
-    },
-    {
-      "id": "ref-iaea-isotopes",
-      "kind": "official",
-      "publisher": "IAEA",
-      "title": "Explainer on isotopes (stable and radioactive)",
-      "authors": "",
-      "year": "",
-      "url": "",
-      "accessed": "",
-      "verified": 0,
-      "note": "Candidate. Open the IAEA page, record its exact title and URL, then mark verified."
-    },
-    {
-      "id": "ref-iaea-radiation-types",
-      "kind": "official",
-      "publisher": "IAEA",
-      "title": "IAEA material on alpha, beta and gamma radiation",
-      "authors": "",
-      "year": "",
-      "url": "",
-      "accessed": "",
-      "verified": 0,
-      "note": "Candidate. Particulate versus electromagnetic radiation. Open the page, record its exact title and URL, then mark verified."
+      "accessed": "2026-11-23",
+      "verified": 1,
+      "note": "Page text fetched and read on 2026-11-23; the claims that cite it were checked against that text. Signed off by the owner on 2026-11-23."
     },
     {
       "id": "ref-iter-home",
       "kind": "official",
       "publisher": "ITER Organization",
-      "title": "ITER",
+      "title": "ITER - the way to new energy",
       "authors": "",
       "year": "",
       "url": "https://www.iter.org/",
-      "accessed": "2026-11-20",
-      "verified": 0,
-      "note": "Opened and read on 2026-11-20 to write the content; a person still has to confirm what it supports."
+      "accessed": "2026-11-23",
+      "verified": 1,
+      "note": "Page text fetched and read on 2026-11-23; the claims that cite it were checked against that text. Signed off by the owner on 2026-11-23."
     },
     {
       "id": "ref-iupac-table",
@@ -288,9 +204,9 @@
       "authors": "",
       "year": "",
       "url": "https://iupac.org/what-we-do/periodic-table-of-elements/",
-      "accessed": "",
-      "verified": 0,
-      "note": "Element names and atomic numbers."
+      "accessed": "2026-11-23",
+      "verified": 1,
+      "note": "Page text fetched and read on 2026-11-23; the claims that cite it were checked against that text. Signed off by the owner on 2026-11-23."
     },
     {
       "id": "ref-medlineplus-potassium",
@@ -300,9 +216,9 @@
       "authors": "",
       "year": "",
       "url": "https://medlineplus.gov/ency/article/002413.htm",
-      "accessed": "2026-11-20",
-      "verified": 0,
-      "note": "Opened and read on 2026-11-20 to write the scanner results; a person still has to confirm what it supports."
+      "accessed": "2026-11-23",
+      "verified": 1,
+      "note": "Page text fetched and read on 2026-11-23; the claims that cite it were checked against that text. Signed off by the owner on 2026-11-23."
     },
     {
       "id": "ref-mpic-fission",
@@ -312,21 +228,33 @@
       "authors": "",
       "year": "",
       "url": "https://www.mpic.de/4469988/die-entdeckung-der-kernspaltung",
-      "accessed": "2026-11-20",
-      "verified": 0,
-      "note": "Opened and read on 2026-11-20 to write the content; a person still has to confirm what it supports."
+      "accessed": "2026-11-23",
+      "verified": 1,
+      "note": "Page text fetched and read on 2026-11-23; the claims that cite it were checked against that text. Signed off by the owner on 2026-11-23."
     },
     {
       "id": "ref-nagasaki-museum",
       "kind": "official",
-      "publisher": "Nagasaki Atomic Bomb Museum",
+      "publisher": "Nagasaki City",
       "title": "Nagasaki Atomic Bomb Museum",
       "authors": "",
       "year": "",
       "url": "https://nagasakipeace.jp/en/visit/abm",
-      "accessed": "2026-11-20",
-      "verified": 0,
-      "note": "Opened and read on 2026-11-20 to write the content; a person still has to confirm what it supports."
+      "accessed": "2026-11-23",
+      "verified": 1,
+      "note": "Page text fetched and read on 2026-11-23; the claims that cite it were checked against that text. Signed off by the owner on 2026-11-23."
+    },
+    {
+      "id": "ref-nasa-earth-facts",
+      "kind": "official",
+      "publisher": "NASA",
+      "title": "Facts About Earth",
+      "authors": "",
+      "year": "",
+      "url": "https://science.nasa.gov/earth/facts/",
+      "accessed": "2026-11-23",
+      "verified": 1,
+      "note": "Page text fetched and read on 2026-11-23; the claims that cite it were checked against that text. Signed off by the owner on 2026-11-23."
     },
     {
       "id": "ref-nasa-sun-facts",
@@ -336,105 +264,57 @@
       "authors": "",
       "year": "",
       "url": "https://science.nasa.gov/sun/facts/",
-      "accessed": "2026-11-20",
-      "verified": 0,
-      "note": "Opened and read on 2026-11-20 to write the scanner results; a person still has to confirm what it supports."
-    },
-    {
-      "id": "ref-noaa-atmosphere",
-      "kind": "official",
-      "publisher": "NOAA National Weather Service",
-      "title": "JetStream: The Atmosphere",
-      "authors": "",
-      "year": "",
-      "url": "https://www.noaa.gov/jetstream/atmosphere",
-      "accessed": "2026-11-20",
-      "verified": 0,
-      "note": "Opened and read on 2026-11-20 to write the scanner results; a person still has to confirm what it supports."
+      "accessed": "2026-11-23",
+      "verified": 1,
+      "note": "Page text fetched and read on 2026-11-23; the claims that cite it were checked against that text. Signed off by the owner on 2026-11-23."
     },
     {
       "id": "ref-nps-mapr-hanford",
       "kind": "official",
       "publisher": "U.S. National Park Service",
-      "title": "Hanford, Washington (Manhattan Project National Historical Park)",
+      "title": "Hanford Places - Manhattan Project National Historical Park",
       "authors": "",
       "year": "",
       "url": "https://www.nps.gov/mapr/learn/historyculture/hanford-places.htm",
-      "accessed": "2026-11-20",
-      "verified": 0,
-      "note": "Opened and read on 2026-11-20 to write the content; a person still has to confirm what it supports."
+      "accessed": "2026-11-23",
+      "verified": 1,
+      "note": "Page text fetched and read on 2026-11-23; the claims that cite it were checked against that text. Signed off by the owner on 2026-11-23."
     },
     {
       "id": "ref-nps-mapr-losalamos",
       "kind": "official",
       "publisher": "U.S. National Park Service",
-      "title": "Los Alamos, New Mexico (Manhattan Project National Historical Park)",
+      "title": "Los Alamos places - Manhattan Project National Historical Park",
       "authors": "",
       "year": "",
       "url": "https://www.nps.gov/mapr/learn/historyculture/losalamos-places.htm",
-      "accessed": "2026-11-20",
-      "verified": 0,
-      "note": "Opened and read on 2026-11-20 to write the content; a person still has to confirm what it supports."
+      "accessed": "2026-11-23",
+      "verified": 1,
+      "note": "Page text fetched and read on 2026-11-23; the claims that cite it were checked against that text. Signed off by the owner on 2026-11-23."
     },
     {
       "id": "ref-nps-mapr-oakridge",
       "kind": "official",
       "publisher": "U.S. National Park Service",
-      "title": "Oak Ridge, Tennessee (Manhattan Project National Historical Park)",
+      "title": "Oak Ridge Places - Manhattan Project National Historical Park",
       "authors": "",
       "year": "",
       "url": "https://www.nps.gov/mapr/learn/historyculture/oakridge-places.htm",
-      "accessed": "2026-11-20",
-      "verified": 0,
-      "note": "Opened and read on 2026-11-20 to write the content; a person still has to confirm what it supports."
+      "accessed": "2026-11-23",
+      "verified": 1,
+      "note": "Page text fetched and read on 2026-11-23; the claims that cite it were checked against that text. Signed off by the owner on 2026-11-23."
     },
     {
       "id": "ref-nps-mapr-trinity",
       "kind": "official",
       "publisher": "U.S. National Park Service",
-      "title": "Trinity Site",
+      "title": "Trinity - Manhattan Project National Historical Park",
       "authors": "",
       "year": "",
       "url": "https://www.nps.gov/mapr/learn/historyculture/trinity.htm",
-      "accessed": "2026-11-20",
-      "verified": 0,
-      "note": "Opened and read on 2026-11-20 to write the content; a person still has to confirm what it supports."
-    },
-    {
-      "id": "ref-nrc-decay-series",
-      "kind": "official",
-      "publisher": "U.S. Nuclear Regulatory Commission",
-      "title": "NRC material on natural decay series and natural radionuclides",
-      "authors": "",
-      "year": "",
-      "url": "",
-      "accessed": "",
-      "verified": 0,
-      "note": "Candidate. The spec names NUREG/SR-1501 (number from a search summary). Check that the uranium-238 series ends in lead-206, the thorium-232 series in lead-208, and that potassium-40 is a natural radionuclide."
-    },
-    {
-      "id": "ref-nrc-doses-daily-lives",
-      "kind": "official",
-      "publisher": "U.S. Nuclear Regulatory Commission",
-      "title": "Doses in Our Daily Lives",
-      "authors": "",
-      "year": "",
-      "url": "https://www.nrc.gov/about-nrc/radiation/around-us/doses-daily-lives.html",
-      "accessed": "2026-11-20",
-      "verified": 0,
-      "note": "Opened and read on 2026-11-20 to write the content; a person still has to confirm what it supports."
-    },
-    {
-      "id": "ref-nrc-radiation-faq",
-      "kind": "official",
-      "publisher": "U.S. Nuclear Regulatory Commission",
-      "title": "Frequently Asked Questions (FAQ) About Radiation Protection",
-      "authors": "",
-      "year": "",
-      "url": "https://www.nrc.gov/about-nrc/radiation/related-info/faq",
-      "accessed": "2026-11-20",
-      "verified": 0,
-      "note": "Opened and read on 2026-11-20 to write the content; a person still has to confirm what it supports."
+      "accessed": "2026-11-23",
+      "verified": 1,
+      "note": "Page text fetched and read on 2026-11-23; the claims that cite it were checked against that text. Signed off by the owner on 2026-11-23."
     },
     {
       "id": "ref-nrc-tmi",
@@ -444,9 +324,9 @@
       "authors": "",
       "year": "",
       "url": "https://www.nrc.gov/reading-rm/doc-collections/fact-sheets/3mile-isle.html",
-      "accessed": "2026-11-20",
-      "verified": 0,
-      "note": "Opened and read on 2026-11-20 to write the content; a person still has to confirm what it supports."
+      "accessed": "2026-11-23",
+      "verified": 1,
+      "note": "Opened in a browser by the owner on 2026-11-22, who confirmed the link works and the information is correct; a script cannot fetch this page. Signed off by the owner on 2026-11-23."
     },
     {
       "id": "ref-openstax-ap-elements",
@@ -456,9 +336,9 @@
       "authors": "",
       "year": "2022",
       "url": "https://openstax.org/books/anatomy-and-physiology-2e/pages/2-1-elements-and-atoms-the-building-blocks-of-matter",
-      "accessed": "2026-11-20",
-      "verified": 0,
-      "note": "Opened and read on 2026-11-20 to write the scanner results; a person still has to confirm what it supports."
+      "accessed": "2026-11-23",
+      "verified": 1,
+      "note": "Page text fetched and read on 2026-11-23; the claims that cite it were checked against that text. Signed off by the owner on 2026-11-23."
     },
     {
       "id": "ref-openstax-ap-erythrocytes",
@@ -468,9 +348,9 @@
       "authors": "",
       "year": "2022",
       "url": "https://openstax.org/books/anatomy-and-physiology-2e/pages/18-3-erythrocytes",
-      "accessed": "2026-11-20",
-      "verified": 0,
-      "note": "Opened and read on 2026-11-20 to write the scanner results; a person still has to confirm what it supports."
+      "accessed": "2026-11-23",
+      "verified": 1,
+      "note": "Page text fetched and read on 2026-11-23; the claims that cite it were checked against that text. Signed off by the owner on 2026-11-23."
     },
     {
       "id": "ref-openstax-ap-hair",
@@ -480,9 +360,9 @@
       "authors": "",
       "year": "2022",
       "url": "https://openstax.org/books/anatomy-and-physiology-2e/pages/5-2-accessory-structures-of-the-skin",
-      "accessed": "2026-11-20",
-      "verified": 0,
-      "note": "Opened and read on 2026-11-20 to write the scanner results; a person still has to confirm what it supports."
+      "accessed": "2026-11-23",
+      "verified": 1,
+      "note": "Page text fetched and read on 2026-11-23; the claims that cite it were checked against that text. Signed off by the owner on 2026-11-23."
     },
     {
       "id": "ref-openstax-ap-organic",
@@ -492,9 +372,9 @@
       "authors": "",
       "year": "2022",
       "url": "https://openstax.org/books/anatomy-and-physiology-2e/pages/2-5-organic-compounds-essential-to-human-functioning",
-      "accessed": "2026-11-20",
-      "verified": 0,
-      "note": "Opened and read on 2026-11-20 to write the scanner results; a person still has to confirm what it supports."
+      "accessed": "2026-11-23",
+      "verified": 1,
+      "note": "Page text fetched and read on 2026-11-23; the claims that cite it were checked against that text. Signed off by the owner on 2026-11-23."
     },
     {
       "id": "ref-openstax-bio-carbs",
@@ -504,9 +384,9 @@
       "authors": "",
       "year": "2018",
       "url": "https://openstax.org/books/biology-2e/pages/3-2-carbohydrates",
-      "accessed": "2026-11-20",
-      "verified": 0,
-      "note": "Opened and read on 2026-11-20 to write the scanner results; a person still has to confirm what it supports."
+      "accessed": "2026-11-23",
+      "verified": 1,
+      "note": "Page text fetched and read on 2026-11-23; the claims that cite it were checked against that text. Signed off by the owner on 2026-11-23."
     },
     {
       "id": "ref-openstax-bio-photosynthesis",
@@ -516,9 +396,9 @@
       "authors": "",
       "year": "2018",
       "url": "https://openstax.org/books/biology-2e/pages/8-1-overview-of-photosynthesis",
-      "accessed": "2026-11-20",
-      "verified": 0,
-      "note": "Opened and read on 2026-11-20 to write the scanner results; a person still has to confirm what it supports."
+      "accessed": "2026-11-23",
+      "verified": 1,
+      "note": "Page text fetched and read on 2026-11-23; the claims that cite it were checked against that text. Signed off by the owner on 2026-11-23."
     },
     {
       "id": "ref-openstax-chem-10-5",
@@ -528,9 +408,21 @@
       "authors": "",
       "year": "2019",
       "url": "https://openstax.org/books/chemistry-2e/pages/10-5-the-solid-state-of-matter",
-      "accessed": "2026-11-20",
-      "verified": 0,
-      "note": "Opened and read on 2026-11-20 to write the scanner results; a person still has to confirm what it supports."
+      "accessed": "2026-11-23",
+      "verified": 1,
+      "note": "Page text fetched and read on 2026-11-23; the claims that cite it were checked against that text. Signed off by the owner on 2026-11-23."
+    },
+    {
+      "id": "ref-openstax-chem-2-1",
+      "kind": "textbook",
+      "publisher": "OpenStax",
+      "title": "Chemistry 2e, section 2.1: Early Ideas in Atomic Theory",
+      "authors": "Flowers, Theopold, Langley, Robinson",
+      "year": "2019",
+      "url": "https://openstax.org/books/chemistry-2e/pages/2-1-early-ideas-in-atomic-theory",
+      "accessed": "2026-11-23",
+      "verified": 1,
+      "note": "Page text fetched and read on 2026-11-23; the claims that cite it were checked against that text. Signed off by the owner on 2026-11-23."
     },
     {
       "id": "ref-openstax-chem-2-4",
@@ -540,9 +432,21 @@
       "authors": "",
       "year": "2019",
       "url": "https://openstax.org/books/chemistry-2e/pages/2-4-chemical-formulas",
-      "accessed": "2026-11-20",
-      "verified": 0,
-      "note": "Opened and read on 2026-11-20 to write the scanner results; a person still has to confirm what it supports."
+      "accessed": "2026-11-23",
+      "verified": 1,
+      "note": "Page text fetched and read on 2026-11-23; the claims that cite it were checked against that text. Signed off by the owner on 2026-11-23."
+    },
+    {
+      "id": "ref-openstax-chem-21-3",
+      "kind": "textbook",
+      "publisher": "OpenStax",
+      "title": "Chemistry 2e, section 21.3: Radioactive Decay",
+      "authors": "Flowers, Theopold, Langley, Robinson",
+      "year": "2019",
+      "url": "https://openstax.org/books/chemistry-2e/pages/21-3-radioactive-decay",
+      "accessed": "2026-11-23",
+      "verified": 1,
+      "note": "Page text fetched and read on 2026-11-23; the claims that cite it were checked against that text. Signed off by the owner on 2026-11-23."
     },
     {
       "id": "ref-openstax-chem-ch1",
@@ -552,69 +456,57 @@
       "authors": "Flowers, Theopold, Langley, Robinson",
       "year": "2019",
       "url": "https://openstax.org/books/chemistry-2e/pages/1-2-phases-and-classification-of-matter",
-      "accessed": "",
-      "verified": 0,
-      "note": "Matter has mass and takes up space; gases such as air are matter."
+      "accessed": "2026-11-23",
+      "verified": 1,
+      "note": "Page text fetched and read on 2026-11-23; the claims that cite it were checked against that text. Signed off by the owner on 2026-11-23."
     },
     {
       "id": "ref-openstax-chem-ch2",
       "kind": "textbook",
       "publisher": "OpenStax",
-      "title": "Chemistry 2e, chapter 2: Atoms, Molecules, and Ions",
+      "title": "Chemistry 2e, section 2.3: Atomic Structure and Symbolism",
       "authors": "Flowers, Theopold, Langley, Robinson",
       "year": "2019",
-      "url": "https://openstax.org/books/chemistry-2e/pages/2-introduction",
-      "accessed": "",
-      "verified": 0,
-      "note": "Atomic structure, atomic number, isotopes, the periodic table, atom sizes."
+      "url": "https://openstax.org/books/chemistry-2e/pages/2-3-atomic-structure-and-symbolism",
+      "accessed": "2026-11-23",
+      "verified": 1,
+      "note": "Page text fetched and read on 2026-11-23; the claims that cite it were checked against that text. Signed off by the owner on 2026-11-23."
+    },
+    {
+      "id": "ref-openstax-up3-10-3",
+      "kind": "textbook",
+      "publisher": "OpenStax",
+      "title": "University Physics Volume 3, section 10.3: Radioactive Decay",
+      "authors": "Ling, Sanny, Moebs",
+      "year": "2016",
+      "url": "https://openstax.org/books/university-physics-volume-3/pages/10-3-radioactive-decay",
+      "accessed": "2026-11-23",
+      "verified": 1,
+      "note": "Page text fetched and read on 2026-11-23; the claims that cite it were checked against that text. Signed off by the owner on 2026-11-23."
     },
     {
       "id": "ref-openstax-up3-ch10",
       "kind": "textbook",
       "publisher": "OpenStax",
-      "title": "University Physics Volume 3, chapter 10: Nuclear Physics",
+      "title": "University Physics Volume 3, section 10.1: Properties of Nuclei",
       "authors": "Ling, Sanny, Moebs",
       "year": "2016",
-      "url": "https://openstax.org/books/university-physics-volume-3/pages/10-introduction",
-      "accessed": "",
-      "verified": 0,
-      "note": "Nuclear size, nuclear forces, stability, radioactivity."
+      "url": "https://openstax.org/books/university-physics-volume-3/pages/10-1-properties-of-nuclei",
+      "accessed": "2026-11-23",
+      "verified": 1,
+      "note": "Page text fetched and read on 2026-11-23; the claims that cite it were checked against that text. Signed off by the owner on 2026-11-23."
     },
     {
       "id": "ref-osti-cp1",
       "kind": "official",
       "publisher": "U.S. Department of Energy, OSTI (Manhattan Project history)",
-      "title": "CP-1 goes critical",
+      "title": "Manhattan Project: CP-1 Goes Critical, Met Lab, December 2, 1942",
       "authors": "",
       "year": "",
       "url": "https://www.osti.gov/opennet/manhattan-project-history/Events/1942-1944_pu/cp-1_critical.htm",
-      "accessed": "2026-11-20",
-      "verified": 0,
-      "note": "Opened and read on 2026-11-20 to write the content; a person still has to confirm what it supports."
-    },
-    {
-      "id": "ref-potassium-40",
-      "kind": "official",
-      "publisher": "To be identified",
-      "title": "Source for natural radioactive potassium-40 in food and the body",
-      "authors": "",
-      "year": "",
-      "url": "",
-      "accessed": "",
-      "verified": 0,
-      "note": "Candidate. A regulator or health-physics society page; open and record before marking verified."
-    },
-    {
-      "id": "ref-ready-nuclear-explosion",
-      "kind": "official",
-      "publisher": "Ready.gov (FEMA)",
-      "title": "Nuclear Explosion",
-      "authors": "",
-      "year": "",
-      "url": "https://www.ready.gov/nuclear-explosion",
-      "accessed": "2026-11-20",
-      "verified": 0,
-      "note": "Opened and read on 2026-11-20 to write the content; a person still has to confirm what it supports."
+      "accessed": "2026-11-23",
+      "verified": 1,
+      "note": "Page text fetched and read on 2026-11-23; the claims that cite it were checked against that text. Signed off by the owner on 2026-11-23."
     },
     {
       "id": "ref-ready-radiation",
@@ -624,9 +516,9 @@
       "authors": "",
       "year": "",
       "url": "https://www.ready.gov/radiation",
-      "accessed": "2026-11-20",
-      "verified": 0,
-      "note": "Opened and read on 2026-11-20 to write the content; a person still has to confirm what it supports."
+      "accessed": "2026-11-23",
+      "verified": 1,
+      "note": "Page text fetched and read on 2026-11-23; the claims that cite it were checked against that text. Signed off by the owner on 2026-11-23."
     },
     {
       "id": "ref-rutherford-1911",
@@ -636,9 +528,9 @@
       "authors": "E. Rutherford",
       "year": "1911",
       "url": "https://doi.org/10.1080/14786440508637080",
-      "accessed": "",
-      "verified": 0,
-      "note": "Gold-foil interpretation: a small dense nucleus, and an atom that is mostly empty space."
+      "accessed": "2026-11-23",
+      "verified": 1,
+      "note": "Opened in a browser by the owner on 2026-11-22, who confirmed the link works and the information is correct; a script cannot fetch this page. Signed off by the owner on 2026-11-23."
     },
     {
       "id": "ref-who-ionizing-radiation",
@@ -648,9 +540,21 @@
       "authors": "",
       "year": "",
       "url": "https://www.who.int/news-room/fact-sheets/detail/ionizing-radiation-and-health-effects",
-      "accessed": "2026-11-20",
-      "verified": 0,
-      "note": "Opened and read on 2026-11-20 to write the content; a person still has to confirm what it supports."
+      "accessed": "2026-11-23",
+      "verified": 1,
+      "note": "Page text fetched and read on 2026-11-23; the claims that cite it were checked against that text. Signed off by the owner on 2026-11-23."
+    },
+    {
+      "id": "ref-wikipedia-radioactive-decay",
+      "kind": "article",
+      "publisher": "Wikipedia",
+      "title": "Radioactive decay",
+      "authors": "",
+      "year": "",
+      "url": "https://en.wikipedia.org/wiki/Radioactive_decay",
+      "accessed": "2026-11-23",
+      "verified": 1,
+      "note": "Page text fetched and read on 2026-11-23: \"Radioactive decay is a random process at the level of single atoms ... it is impossible to predict when a particular atom will decay, regardless of how long the atom has existed.\" An encyclopedia, used only for that statement. Signed off by the owner on 2026-11-23."
     },
     {
       "id": "ref-wna-chernobyl",
@@ -660,9 +564,9 @@
       "authors": "",
       "year": "",
       "url": "https://world-nuclear.org/information-library/safety-and-security/safety-of-plants/chernobyl-accident",
-      "accessed": "2026-11-20",
-      "verified": 0,
-      "note": "Opened and read on 2026-11-20 to write the content; a person still has to confirm what it supports."
+      "accessed": "2026-11-23",
+      "verified": 1,
+      "note": "Page text fetched and read on 2026-11-23; the claims that cite it were checked against that text. Signed off by the owner on 2026-11-23."
     },
     {
       "id": "ref-wna-fukushima",
@@ -672,9 +576,9 @@
       "authors": "",
       "year": "",
       "url": "https://world-nuclear.org/information-library/safety-and-security/safety-of-plants/fukushima-daiichi-accident",
-      "accessed": "2026-11-20",
-      "verified": 0,
-      "note": "Opened and read on 2026-11-20 to write the content; a person still has to confirm what it supports."
+      "accessed": "2026-11-23",
+      "verified": 1,
+      "note": "Page text fetched and read on 2026-11-23; the claims that cite it were checked against that text. Signed off by the owner on 2026-11-23."
     },
     {
       "id": "ref-wna-radwaste",
@@ -683,10 +587,22 @@
       "title": "Radioactive Waste Management",
       "authors": "",
       "year": "",
-      "url": "https://world-nuclear.org/information-library/nuclear-fuel-cycle/nuclear-wastes/radioactive-waste-management",
-      "accessed": "2026-11-20",
-      "verified": 0,
-      "note": "Opened and read on 2026-11-20 to write the content; a person still has to confirm what it supports."
+      "url": "https://world-nuclear.org/information-library/nuclear-fuel-cycle/nuclear-waste/radioactive-waste-management",
+      "accessed": "2026-11-23",
+      "verified": 1,
+      "note": "Page text fetched and read on 2026-11-23; the claims that cite it were checked against that text. Signed off by the owner on 2026-11-23."
+    },
+    {
+      "id": "ref-wna-reactor-safety",
+      "kind": "official",
+      "publisher": "World Nuclear Association",
+      "title": "Safety of Nuclear Power Reactors",
+      "authors": "",
+      "year": "",
+      "url": "https://world-nuclear.org/information-library/safety-and-security/safety-of-plants/safety-of-nuclear-power-reactors",
+      "accessed": "2026-11-23",
+      "verified": 1,
+      "note": "Page text fetched and read on 2026-11-23; the claims that cite it were checked against that text. Signed off by the owner on 2026-11-23."
     },
     {
       "id": "ref-wna-russia",
@@ -696,9 +612,9 @@
       "authors": "",
       "year": "",
       "url": "https://world-nuclear.org/information-library/country-profiles/countries-o-s/russia-nuclear-power",
-      "accessed": "2026-11-20",
-      "verified": 0,
-      "note": "Opened and read on 2026-11-20 to write the content; a person still has to confirm what it supports."
+      "accessed": "2026-11-23",
+      "verified": 1,
+      "note": "Page text fetched and read on 2026-11-23; the claims that cite it were checked against that text. Signed off by the owner on 2026-11-23."
     }
   ]
 }

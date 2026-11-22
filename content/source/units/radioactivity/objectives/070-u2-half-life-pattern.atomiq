@@ -12,7 +12,7 @@ difficulty: 2
 surfaces: lesson
 surfaces: practice
 surfaces: review
-references: ref-iaea-decay
+references: ref-openstax-up3-10-3
 
 prompt:
     A sample starts with 80 nuclei. After two half-lives, about how many have not changed?
@@ -33,7 +33,7 @@ type: fill
 surfaces: lesson
 surfaces: practice
 surfaces: review
-references: ref-iaea-decay
+references: ref-openstax-up3-10-3
 
 prompt:
     The pattern is 100, 50, 25, and then about ___.
@@ -55,7 +55,7 @@ type: match
 surfaces: lesson
 surfaces: practice
 surfaces: review
-references: ref-iaea-decay
+references: ref-openstax-up3-10-3
 
 prompt:
     Start with 100 nuclei. Match the number of half-lives to about how many are left.
@@ -73,7 +73,7 @@ type: true_or_myth
 surfaces: lesson
 surfaces: practice
 surfaces: review
-references: ref-iaea-decay
+references: ref-openstax-up3-10-3
 
 statement:
     After one half-life, the radioactivity is gone.
@@ -88,7 +88,7 @@ type: choice
 surfaces: practice
 surfaces: checkpoint
 surfaces: review
-references: ref-iaea-decay
+references: ref-openstax-up3-10-3
 
 prompt:
     A sample has 100 nuclei. After one half-life, about how many have not yet changed?
@@ -110,7 +110,7 @@ difficulty: 2
 surfaces: practice
 surfaces: checkpoint
 surfaces: review
-references: ref-iaea-decay
+references: ref-openstax-up3-10-3
 
 prompt:
     After three half-lives, about how much of the original group is left?

@@ -12,7 +12,7 @@ difficulty: 2
 surfaces: lesson
 surfaces: practice
 surfaces: review
-references: ref-iaea-decay
+references: ref-openstax-chem-21-3
 
 prompt:
     A sample has a nucleus whose daughter is also unstable. After the first decay, is the sample finished changing?
@@ -32,7 +32,7 @@ type: choice
 surfaces: lesson
 surfaces: practice
 surfaces: review
-references: ref-iaea-decay
+references: ref-openstax-chem-21-3
 
 prompt:
     A chain goes Parent, then Daughter. What comes next if the daughter is unstable?
@@ -52,7 +52,7 @@ type: order
 surfaces: lesson
 surfaces: practice
 surfaces: review
-references: ref-iaea-decay
+references: ref-openstax-chem-21-3
 
 prompt:
     Put the chain in order, from the start to the end.
@@ -89,7 +89,7 @@ type: true_or_myth
 surfaces: lesson
 surfaces: practice
 surfaces: review
-references: ref-iaea-decay
+references: ref-openstax-chem-21-3
 
 statement:
     Every radioactive decay immediately creates a stable atom.
@@ -104,7 +104,7 @@ type: choice
 surfaces: practice
 surfaces: checkpoint
 surfaces: review
-references: ref-iaea-decay
+references: ref-openstax-chem-21-3
 
 prompt:
     What ends a decay chain?
@@ -124,7 +124,7 @@ type: fill
 surfaces: practice
 surfaces: checkpoint
 surfaces: review
-references: ref-iaea-decay
+references: ref-openstax-chem-21-3
 
 prompt:
     A sequence of decays in which one nucleus changes into another is called a decay ___.

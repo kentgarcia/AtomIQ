@@ -7,11 +7,11 @@ name: A glass of water
 object: water
 references: ref-openstax-chem-2-4
 blurb: Every drop is made of the same tiny molecules.
-fun_fact: Water is always two hydrogen atoms for every oxygen atom, in a glass, a lake or a cloud.
+fun_fact: Hydrogen and oxygen can react to form water, and it is the same water in a glass, a lake or a cloud.
 
 composition:
-    {"symbol":"H","note":"two atoms in each molecule"}
-    {"symbol":"O","note":"one atom in each molecule"}
+    {"symbol":"H","note":"joined with oxygen"}
+    {"symbol":"O","note":"joined with hydrogen"}
 
 target scan-salt
 name: Table salt
@@ -19,7 +19,7 @@ object: salt
 atomdex: ion
 references: ref-openstax-chem-2-4
 blurb: A shake of salt from the kitchen.
-fun_fact: Sodium and chlorine can react to form table salt. Joined together they are nothing like what they were on their own.
+fun_fact: Sodium and chlorine can react to form table salt.
 
 composition:
     {"symbol":"Na","note":"joined to chlorine as ions"}
@@ -30,6 +30,7 @@ name: A banana
 object: banana
 atomdex: potassium-40
 references: ref-epa-radiation-sources
+references: ref-hps-natural-radioactivity
 references: ref-medlineplus-potassium
 blurb: Sweet, soft and a good source of potassium.
 
@@ -45,12 +46,11 @@ composition:
 target scan-rice
 name: A grain of rice
 object: rice
-references: ref-openstax-ap-elements
 references: ref-openstax-bio-carbs
-blurb: Mostly starch, a long chain of sugar molecules.
+blurb: A grain: one of the foods that give you carbohydrates.
 
 fun_fact:
-    Glucose, a sugar your body uses for fuel, is made of just carbon, hydrogen and oxygen. Starch is glucose joined in long chains.
+    Glucose, a sugar your body uses for fuel, is made of just carbon, hydrogen and oxygen. Plants store glucose as starch, a chain of glucose molecules.
 
 composition:
     {"symbol":"O"}

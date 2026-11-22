@@ -29,7 +29,7 @@
       "blog_id": "blog-the-smallest-thing",
       "npc_id": "npc-ray",
       "position": 0,
-      "text": "Plain words: matter is anything that has mass and takes up space. Light and heat do not, so they are not matter.",
+      "text": "Plain words: matter is anything that has mass and takes up space.",
       "chip": {
         "entryId": "atom"
       }

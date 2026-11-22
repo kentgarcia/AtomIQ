@@ -8,22 +8,21 @@ icon: Timer1
 entry: shielding
 references: ref-epa-protecting-yourself
 summary: Three ways to lower the dose from a radiation source.
-steps: Time: spending less time near a source reduces the dose from it.
+steps: Time: limiting the time you are exposed reduces the dose from a source.
 steps: Distance: the dose decreases dramatically as you move farther from the source.
-steps: Shielding: a proper barrier between you and a source greatly reduces or eliminates the dose.
-steps: Lead, concrete or water barriers protect from penetrating gamma rays.
+steps: Shielding: barriers of lead, concrete or water protect against penetrating gamma rays.
 
 card safety-background-radiation
 title: Background radiation
 icon: Sun1
 entry: background-radiation
-references: ref-nrc-doses-daily-lives
+references: ref-epa-radiation-sources
 references: ref-who-ionizing-radiation
 summary: Radiation has always been part of the natural environment.
-steps: Radiation has always been all around us as part of our natural environment.
-steps: Most background exposure comes from radon in the air. Cosmic rays and the Earth add smaller shares.
+steps: Background radiation is radiation that is always in the environment. Most of it is natural.
+steps: Radon gas from rock and soil is the main natural source. Cosmic rays and minerals in the ground add more.
 steps: Food and water carry some natural radioactive material, such as potassium-40.
-steps: Medical procedures account for nearly all human exposure to man-made radiation.
+steps: The most common human-made source of radiation exposure is medical imaging, such as x-rays and CT scans.
 
 card safety-what-is-a-dose
 title: What a dose is
@@ -41,10 +40,10 @@ card safety-exposure-vs-contamination
 title: Exposure or contamination?
 icon: Drop
 entry: exposure
-references: ref-cdc-contamination-vs-exposure
 references: ref-hps-radioactive-contamination
-summary: Being exposed to radiation is not the same as having radioactive material on you.
-steps: Exposure is radiation reaching a person, like the beam of an x-ray.
-steps: Contamination is radioactive material on or inside the body.
-steps: A person exposed to radiation is not necessarily contaminated.
-steps: Radiation does not spread or get on people. Radioactive contamination is what can be spread.
+summary: Radioactive contamination can be on or inside a person. Radiation itself does not spread.
+steps: Contamination is radioactive material deposited on skin, clothing or anywhere it is not wanted.
+steps: External contamination: radioactive material on the skin or clothing.
+steps: Internal contamination: it is breathed in, swallowed or absorbed through wounds.
+steps: Radiation does not spread or get on or in people. Radioactive contamination is what can be spread.
+steps: A contaminated person receives radiation exposure until the radioactive material is removed.

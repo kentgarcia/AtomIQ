@@ -29,7 +29,7 @@ type: sort
 surfaces: lesson
 surfaces: practice
 surfaces: review
-references: ref-iaea-isotopes
+references: ref-epa-radioactive-decay
 
 prompt:
     Which of these atoms are stable? Sort each one.
@@ -52,7 +52,7 @@ type: true_or_myth
 surfaces: practice
 surfaces: checkpoint
 surfaces: review
-references: ref-iaea-isotopes
+references: ref-epa-radioactive-decay
 
 statement:
     Every atom stays the same for ever.
@@ -67,7 +67,7 @@ type: true_or_myth
 surfaces: lesson
 surfaces: practice
 surfaces: review
-references: ref-potassium-40
+references: ref-hps-natural-radioactivity
 
 statement:
     Most of the atoms in your body are stable.
@@ -82,7 +82,7 @@ type: choice
 surfaces: practice
 surfaces: checkpoint
 surfaces: review
-references: ref-iaea-isotopes
+references: ref-epa-radioactive-decay
 
 prompt:
     What does it mean for a nucleus to be stable?
@@ -102,7 +102,7 @@ type: choice
 surfaces: practice
 surfaces: checkpoint
 surfaces: review
-references: ref-iaea-isotopes
+references: ref-epa-radioactive-decay
 
 prompt:
     Which of these atoms is unstable?

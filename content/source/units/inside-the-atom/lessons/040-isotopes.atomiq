@@ -17,8 +17,8 @@ description:
 cite ref-openstax-chem-ch2
 supports: Isotope definition and mass number.
 
-cite ref-iaea-isotopes
-supports: Isotopes can be stable or radioactive.
+cite ref-epa-radioactive-decay
+supports: Some forms of an element are stable and others unstable.
 
 card c01
 kind: item

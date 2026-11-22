@@ -803,7 +803,7 @@
         "review"
       ],
       "reference_ids": [
-        "ref-iaea-isotopes"
+        "ref-epa-radioactive-decay"
       ]
     },
     {
@@ -955,7 +955,7 @@
         "review"
       ],
       "reference_ids": [
-        "ref-iaea-isotopes"
+        "ref-epa-radioactive-decay"
       ]
     },
     {
@@ -974,7 +974,7 @@
         "review"
       ],
       "reference_ids": [
-        "ref-iaea-isotopes"
+        "ref-epa-radioactive-decay"
       ]
     },
     {
@@ -1009,7 +1009,7 @@
         "review"
       ],
       "reference_ids": [
-        "ref-openstax-up3-ch10"
+        "ref-openstax-up3-10-3"
       ]
     },
     {
@@ -1087,8 +1087,8 @@
         "review"
       ],
       "reference_ids": [
-        "ref-potassium-40",
-        "ref-iaea-isotopes"
+        "ref-hps-natural-radioactivity",
+        "ref-epa-radioactive-decay"
       ]
     },
     {
@@ -1140,7 +1140,7 @@
         "review"
       ],
       "reference_ids": [
-        "ref-iaea-isotopes"
+        "ref-epa-radioactive-decay"
       ]
     },
     {
@@ -1159,7 +1159,7 @@
         "review"
       ],
       "reference_ids": [
-        "ref-iaea-isotopes"
+        "ref-epa-radioactive-decay"
       ]
     },
     {
@@ -1178,7 +1178,7 @@
         "review"
       ],
       "reference_ids": [
-        "ref-potassium-40"
+        "ref-hps-natural-radioactivity"
       ]
     },
     {
@@ -1197,7 +1197,7 @@
         "review"
       ],
       "reference_ids": [
-        "ref-potassium-40"
+        "ref-hps-natural-radioactivity"
       ]
     },
     {
@@ -1340,7 +1340,7 @@
         "review"
       ],
       "reference_ids": [
-        "ref-iaea-isotopes"
+        "ref-epa-radioactive-decay"
       ]
     },
     {
@@ -1359,7 +1359,7 @@
         "review"
       ],
       "reference_ids": [
-        "ref-iaea-isotopes"
+        "ref-epa-radioactive-decay"
       ]
     },
     {
@@ -1616,7 +1616,7 @@
         "review"
       ],
       "reference_ids": [
-        "ref-potassium-40"
+        "ref-hps-natural-radioactivity"
       ]
     },
     {
@@ -1681,8 +1681,8 @@
         "review"
       ],
       "reference_ids": [
-        "ref-becquerel-1896",
-        "ref-iaea-isotopes"
+        "ref-openstax-up3-10-3",
+        "ref-epa-radioactive-decay"
       ]
     },
     {
@@ -1771,7 +1771,7 @@
         "review"
       ],
       "reference_ids": [
-        "ref-iaea-isotopes"
+        "ref-epa-radioactive-decay"
       ]
     },
     {
@@ -1825,7 +1825,7 @@
         "review"
       ],
       "reference_ids": [
-        "ref-iaea-isotopes"
+        "ref-epa-radioactive-decay"
       ]
     },
     {
@@ -1879,7 +1879,7 @@
         "review"
       ],
       "reference_ids": [
-        "ref-iaea-decay"
+        "ref-wikipedia-radioactive-decay"
       ]
     },
     {
@@ -1919,7 +1919,7 @@
         "review"
       ],
       "reference_ids": [
-        "ref-iaea-decay"
+        "ref-openstax-chem-21-3"
       ]
     },
     {
@@ -1953,7 +1953,7 @@
         "review"
       ],
       "reference_ids": [
-        "ref-iaea-decay"
+        "ref-openstax-chem-21-3"
       ]
     },
     {
@@ -2358,7 +2358,7 @@
         "review"
       ],
       "reference_ids": [
-        "ref-iaea-decay"
+        "ref-openstax-chem-21-3"
       ]
     },
     {
@@ -2393,7 +2393,7 @@
         "review"
       ],
       "reference_ids": [
-        "ref-iaea-decay"
+        "ref-openstax-chem-21-3"
       ]
     },
     {
@@ -2446,7 +2446,7 @@
         "review"
       ],
       "reference_ids": [
-        "ref-iaea-decay"
+        "ref-wikipedia-radioactive-decay"
       ]
     },
     {
@@ -2465,7 +2465,7 @@
         "review"
       ],
       "reference_ids": [
-        "ref-iaea-decay"
+        "ref-openstax-chem-21-3"
       ]
     },
     {
@@ -2500,7 +2500,7 @@
         "review"
       ],
       "reference_ids": [
-        "ref-iaea-radiation-types"
+        "ref-epa-radioactive-decay"
       ]
     },
     {
@@ -2535,7 +2535,7 @@
         "review"
       ],
       "reference_ids": [
-        "ref-iaea-radiation-types"
+        "ref-epa-radioactive-decay"
       ]
     },
     {
@@ -2570,7 +2570,7 @@
         "review"
       ],
       "reference_ids": [
-        "ref-iaea-radiation-types"
+        "ref-epa-radioactive-decay"
       ]
     },
     {
@@ -2605,7 +2605,7 @@
         "review"
       ],
       "reference_ids": [
-        "ref-iaea-radiation-types"
+        "ref-epa-radioactive-decay"
       ]
     },
     {
@@ -2691,7 +2691,7 @@
         "review"
       ],
       "reference_ids": [
-        "ref-iaea-radiation-types"
+        "ref-epa-radioactive-decay"
       ]
     },
     {
@@ -2710,7 +2710,7 @@
         "review"
       ],
       "reference_ids": [
-        "ref-iaea-radiation-types"
+        "ref-epa-radioactive-decay"
       ]
     },
     {
@@ -2729,7 +2729,7 @@
         "review"
       ],
       "reference_ids": [
-        "ref-iaea-radiation-types"
+        "ref-epa-radioactive-decay"
       ]
     },
     {
@@ -2748,7 +2748,7 @@
         "review"
       ],
       "reference_ids": [
-        "ref-iaea-radiation-types"
+        "ref-epa-radioactive-decay"
       ]
     },
     {
@@ -2788,7 +2788,7 @@
         "review"
       ],
       "reference_ids": [
-        "ref-iaea-decay"
+        "ref-openstax-up3-10-3"
       ]
     },
     {
@@ -2828,7 +2828,7 @@
         "review"
       ],
       "reference_ids": [
-        "ref-iaea-decay"
+        "ref-openstax-up3-10-3"
       ]
     },
     {
@@ -2863,7 +2863,7 @@
         "review"
       ],
       "reference_ids": [
-        "ref-iaea-decay"
+        "ref-openstax-chem-21-3"
       ]
     },
     {
@@ -2903,7 +2903,7 @@
         "review"
       ],
       "reference_ids": [
-        "ref-iaea-decay"
+        "ref-openstax-chem-21-3"
       ]
     },
     {
@@ -2937,7 +2937,7 @@
         "review"
       ],
       "reference_ids": [
-        "ref-iaea-decay"
+        "ref-openstax-up3-10-3"
       ]
     },
     {
@@ -2972,7 +2972,7 @@
         "review"
       ],
       "reference_ids": [
-        "ref-iaea-decay"
+        "ref-openstax-up3-10-3"
       ]
     },
     {
@@ -3025,7 +3025,7 @@
         "review"
       ],
       "reference_ids": [
-        "ref-iaea-decay"
+        "ref-openstax-up3-10-3"
       ]
     },
     {
@@ -3044,7 +3044,7 @@
         "review"
       ],
       "reference_ids": [
-        "ref-iaea-decay"
+        "ref-openstax-up3-10-3"
       ]
     },
     {
@@ -3063,7 +3063,7 @@
         "review"
       ],
       "reference_ids": [
-        "ref-iaea-decay"
+        "ref-openstax-up3-10-3"
       ]
     },
     {
@@ -3098,7 +3098,7 @@
         "review"
       ],
       "reference_ids": [
-        "ref-iaea-decay"
+        "ref-openstax-chem-21-3"
       ]
     },
     {
@@ -3133,7 +3133,7 @@
         "review"
       ],
       "reference_ids": [
-        "ref-iaea-decay"
+        "ref-openstax-chem-21-3"
       ]
     },
     {
@@ -3169,7 +3169,7 @@
         "review"
       ],
       "reference_ids": [
-        "ref-iaea-decay"
+        "ref-openstax-chem-21-3"
       ]
     },
     {
@@ -3214,7 +3214,7 @@
         "review"
       ],
       "reference_ids": [
-        "ref-iaea-decay"
+        "ref-openstax-chem-21-3"
       ]
     },
     {
@@ -3233,7 +3233,7 @@
         "review"
       ],
       "reference_ids": [
-        "ref-iaea-decay"
+        "ref-openstax-chem-21-3"
       ]
     },
     {
@@ -3252,7 +3252,7 @@
         "review"
       ],
       "reference_ids": [
-        "ref-iaea-decay"
+        "ref-openstax-chem-21-3"
       ]
     },
     {
@@ -3287,7 +3287,7 @@
         "review"
       ],
       "reference_ids": [
-        "ref-background-radiation"
+        "ref-epa-radiation-sources"
       ]
     },
     {
@@ -3322,7 +3322,7 @@
         "review"
       ],
       "reference_ids": [
-        "ref-background-radiation"
+        "ref-epa-radiation-sources"
       ]
     },
     {
@@ -3357,7 +3357,7 @@
         "review"
       ],
       "reference_ids": [
-        "ref-background-radiation"
+        "ref-epa-radiation-sources"
       ]
     },
     {
@@ -3392,7 +3392,7 @@
         "review"
       ],
       "reference_ids": [
-        "ref-background-radiation"
+        "ref-epa-radiation-sources"
       ]
     },
     {
@@ -3424,8 +3424,8 @@
         "review"
       ],
       "reference_ids": [
-        "ref-becquerel-1896",
-        "ref-iaea-decay"
+        "ref-openstax-up3-10-3",
+        "ref-openstax-chem-21-3"
       ]
     },
     {
@@ -3530,7 +3530,7 @@
         "review"
       ],
       "reference_ids": [
-        "ref-background-radiation"
+        "ref-epa-radiation-sources"
       ]
     },
     {
@@ -3549,7 +3549,7 @@
         "review"
       ],
       "reference_ids": [
-        "ref-background-radiation"
+        "ref-epa-radiation-sources"
       ]
     },
     {
@@ -3584,7 +3584,7 @@
         "review"
       ],
       "reference_ids": [
-        "ref-background-radiation"
+        "ref-epa-radiation-sources"
       ]
     },
     {
@@ -3619,7 +3619,7 @@
         "review"
       ],
       "reference_ids": [
-        "ref-iaea-decay"
+        "ref-openstax-chem-21-3"
       ]
     },
     {
@@ -3654,7 +3654,7 @@
         "review"
       ],
       "reference_ids": [
-        "ref-iaea-decay"
+        "ref-openstax-chem-21-3"
       ]
     },
     {
@@ -3689,7 +3689,7 @@
         "review"
       ],
       "reference_ids": [
-        "ref-iaea-radiation-types"
+        "ref-epa-radioactive-decay"
       ]
     },
     {
@@ -3723,7 +3723,7 @@
         "review"
       ],
       "reference_ids": [
-        "ref-iaea-decay"
+        "ref-openstax-chem-21-3"
       ]
     },
     {
@@ -3757,7 +3757,7 @@
         "review"
       ],
       "reference_ids": [
-        "ref-iaea-decay"
+        "ref-openstax-chem-21-3"
       ]
     },
     {
@@ -3791,7 +3791,7 @@
         "review"
       ],
       "reference_ids": [
-        "ref-iaea-decay"
+        "ref-openstax-chem-21-3"
       ]
     },
     {
@@ -3826,7 +3826,7 @@
         "review"
       ],
       "reference_ids": [
-        "ref-iaea-decay"
+        "ref-openstax-chem-21-3"
       ]
     },
     {
@@ -3861,7 +3861,7 @@
         "review"
       ],
       "reference_ids": [
-        "ref-iaea-radiation-types"
+        "ref-epa-radioactive-decay"
       ]
     },
     {
@@ -3900,7 +3900,7 @@
         "review"
       ],
       "reference_ids": [
-        "ref-iaea-decay"
+        "ref-openstax-up3-10-3"
       ]
     },
     {
@@ -3935,7 +3935,7 @@
         "review"
       ],
       "reference_ids": [
-        "ref-background-radiation"
+        "ref-epa-radiation-sources"
       ]
     },
     {
@@ -3970,7 +3970,7 @@
         "review"
       ],
       "reference_ids": [
-        "ref-iaea-radiation-types"
+        "ref-epa-radioactive-decay"
       ]
     },
     {
@@ -4005,7 +4005,7 @@
         "review"
       ],
       "reference_ids": [
-        "ref-iaea-decay"
+        "ref-openstax-chem-21-3"
       ]
     },
     {
@@ -4024,7 +4024,7 @@
         "review"
       ],
       "reference_ids": [
-        "ref-iaea-decay"
+        "ref-openstax-chem-21-3"
       ]
     },
     {
@@ -4064,7 +4064,7 @@
         "review"
       ],
       "reference_ids": [
-        "ref-iaea-decay"
+        "ref-openstax-up3-10-3"
       ]
     },
     {
@@ -4083,7 +4083,7 @@
         "review"
       ],
       "reference_ids": [
-        "ref-iaea-decay"
+        "ref-openstax-chem-21-3"
       ]
     },
     {
@@ -4102,7 +4102,7 @@
         "review"
       ],
       "reference_ids": [
-        "ref-background-radiation"
+        "ref-epa-radiation-sources"
       ]
     },
     {
@@ -4121,7 +4121,7 @@
         "review"
       ],
       "reference_ids": [
-        "ref-iaea-decay"
+        "ref-wikipedia-radioactive-decay"
       ]
     },
     {
@@ -4140,7 +4140,7 @@
         "review"
       ],
       "reference_ids": [
-        "ref-iaea-decay"
+        "ref-openstax-up3-10-3"
       ]
     },
     {
@@ -4159,7 +4159,7 @@
         "review"
       ],
       "reference_ids": [
-        "ref-iaea-radiation-types"
+        "ref-epa-radioactive-decay"
       ]
     },
     {
@@ -4178,7 +4178,7 @@
         "review"
       ],
       "reference_ids": [
-        "ref-background-radiation"
+        "ref-epa-radiation-sources"
       ]
     },
     {
@@ -4213,7 +4213,7 @@
         "review"
       ],
       "reference_ids": [
-        "ref-iaea-decay"
+        "ref-wikipedia-radioactive-decay"
       ]
     },
     {
@@ -4248,7 +4248,7 @@
         "review"
       ],
       "reference_ids": [
-        "ref-iaea-decay"
+        "ref-openstax-chem-21-3"
       ]
     },
     {
@@ -4283,7 +4283,7 @@
         "review"
       ],
       "reference_ids": [
-        "ref-iaea-decay"
+        "ref-openstax-up3-10-3"
       ]
     }
   ]

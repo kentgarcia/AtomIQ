@@ -13,11 +13,11 @@ relies_on: u2-parent-daughter
 description:
     One decay is not always the end. You will follow a nucleus that changes again and again, and see that every change makes a different nucleus and nothing simply vanishes.
 
-cite ref-iaea-decay
-supports: A daughter nuclide can be radioactive and decay in turn.
+cite ref-openstax-chem-21-3
+supports: A daughter nuclide may be stable or may decay itself; uranium-238 reaches stable lead-206 in 14 steps.
 
-cite ref-nrc-decay-series
-supports: Uranium-238 and thorium-232 decay series (optional card).
+cite ref-epa-radioactive-decay
+supports: The uranium-238 and thorium-232 decay chains (optional card).
 
 card c01
 kind: item

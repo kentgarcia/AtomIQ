@@ -7,74 +7,68 @@
   "rows": [
     {
       "lesson_id": "alpha-beta-gamma",
-      "reference_id": "ref-iaea-radiation-types",
-      "supports": "Alpha and beta are particles; gamma is electromagnetic radiation.",
+      "reference_id": "ref-epa-radioactive-decay",
+      "supports": "Alpha particles are two protons and two neutrons; gamma rays are photons, weightless packets of energy.",
       "position": 0
     },
     {
       "lesson_id": "alpha-beta-gamma",
-      "reference_id": "ref-iaea-glossary",
-      "supports": "Definitions of beta-minus and gamma.",
+      "reference_id": "ref-openstax-chem-21-3",
+      "supports": "An alpha particle removes two protons and two neutrons from the parent nucleus.",
       "position": 1
-    },
-    {
-      "lesson_id": "alpha-beta-gamma",
-      "reference_id": "ref-iaea-decay",
-      "supports": "Alpha as two protons and two neutrons.",
-      "position": 2
     },
     {
       "lesson_id": "atoms-are-everywhere",
       "reference_id": "ref-openstax-chem-ch1",
-      "supports": "Matter has mass and takes up space; air is matter.",
+      "supports": "Matter is anything that occupies space and has mass; gases such as air are matter.",
       "position": 0
     },
     {
       "lesson_id": "atoms-are-everywhere",
       "reference_id": "ref-openstax-chem-ch2",
-      "supports": "Matter is made of atoms; atoms are too small to see.",
+      "supports": "Atoms are about 10^-10 m across; the nucleus is about 100,000 times smaller.",
       "position": 1
     },
     {
       "lesson_id": "decay-chains",
-      "reference_id": "ref-iaea-decay",
-      "supports": "A daughter nuclide can be radioactive and decay in turn.",
+      "reference_id": "ref-openstax-chem-21-3",
+      "supports": "A daughter nuclide may be stable or may decay itself; uranium-238 reaches stable lead-206 in 14 steps.",
       "position": 0
     },
     {
       "lesson_id": "decay-chains",
-      "reference_id": "ref-nrc-decay-series",
-      "supports": "Uranium-238 and thorium-232 decay series (optional card).",
+      "reference_id": "ref-epa-radioactive-decay",
+      "supports": "The uranium-238 and thorium-232 decay chains (optional card).",
       "position": 1
     },
     {
       "lesson_id": "elements-and-the-periodic-table",
       "reference_id": "ref-openstax-chem-ch2",
-      "supports": "The number of protons decides the element.",
+      "supports": "The number of protons (the atomic number) defines the element.",
       "position": 0
     },
     {
       "lesson_id": "elements-and-the-periodic-table",
       "reference_id": "ref-iupac-table",
-      "supports": "Element names and atomic numbers (optional card).",
+      "supports": "IUPAC publishes the periodic table of the elements (optional card).",
       "position": 1
     },
     {
       "lesson_id": "half-life",
-      "reference_id": "ref-iaea-decay",
-      "supports": "Definition of half-life.",
+      "reference_id": "ref-epa-radioactive-decay",
+      "supports": "Half-life is the time for half of the radioactive atoms to decay; it ranges from seconds to billions of years.",
       "position": 0
     },
     {
       "lesson_id": "half-life",
-      "reference_id": "ref-openstax-up3-ch10",
-      "supports": "Half-life and exponential decay; half-lives vary enormously.",
+      "reference_id": "ref-openstax-up3-10-3",
+      "supports": "Half-life and the exponential decay curve.",
       "position": 1
     },
     {
       "lesson_id": "half-life",
-      "reference_id": "ref-iaea-glossary",
-      "supports": "Radionuclide and half-life examples (candidates to verify).",
+      "reference_id": "ref-openstax-chem-21-3",
+      "supports": "Each radioactive nuclide has a characteristic, constant half-life.",
       "position": 2
     },
     {
@@ -85,20 +79,20 @@
     },
     {
       "lesson_id": "isotopes",
-      "reference_id": "ref-iaea-isotopes",
-      "supports": "Isotopes can be stable or radioactive.",
+      "reference_id": "ref-epa-radioactive-decay",
+      "supports": "Some forms of an element are stable and others unstable.",
       "position": 1
     },
     {
       "lesson_id": "protons-neutrons-electrons",
       "reference_id": "ref-openstax-chem-ch2",
-      "supports": "The three particles, their charges and positions.",
+      "supports": "The three particles and their charges; the nucleus holds the majority of the atom’s mass.",
       "position": 0
     },
     {
       "lesson_id": "protons-neutrons-electrons",
       "reference_id": "ref-openstax-up3-ch10",
-      "supports": "The nucleus is tiny and holds almost all of the mass.",
+      "supports": "The nucleus is an extremely small space at the center of an atom.",
       "position": 1
     },
     {
@@ -109,63 +103,69 @@
     },
     {
       "lesson_id": "radioactivity-is-natural",
-      "reference_id": "ref-background-radiation",
-      "supports": "Natural radionuclides, cosmic radiation and radon.",
+      "reference_id": "ref-epa-radiation-sources",
+      "supports": "Natural background radiation: radon, cosmic radiation and radioactive minerals in the ground and the body.",
       "position": 0
     },
     {
       "lesson_id": "radioactivity-is-natural",
-      "reference_id": "ref-becquerel-1896",
-      "supports": "The discovery of radioactivity in a natural mineral.",
+      "reference_id": "ref-openstax-up3-10-3",
+      "supports": "Becquerel found in 1896 that a uranium-rich rock darkens a photographic plate.",
       "position": 1
     },
     {
       "lesson_id": "radioactivity-is-natural",
-      "reference_id": "ref-potassium-40",
-      "supports": "Potassium-40 in food and the body.",
+      "reference_id": "ref-hps-natural-radioactivity",
+      "supports": "Potassium-40 in the human body.",
       "position": 2
     },
     {
       "lesson_id": "radioactivity-is-natural",
-      "reference_id": "ref-nrc-decay-series",
-      "supports": "Natural decay series and natural radionuclides (optional card).",
+      "reference_id": "ref-epa-radioactive-decay",
+      "supports": "Uranium and thorium decay chains in nature (optional card).",
       "position": 3
     },
     {
       "lesson_id": "stable-and-unstable-nuclei",
       "reference_id": "ref-openstax-up3-ch10",
-      "supports": "Nuclear stability and radioactivity.",
+      "supports": "Isotopes of carbon, hydrogen and other elements, stable or with a half-life.",
       "position": 0
     },
     {
       "lesson_id": "stable-and-unstable-nuclei",
-      "reference_id": "ref-iaea-isotopes",
-      "supports": "Stable and unstable isotopes.",
+      "reference_id": "ref-epa-radioactive-decay",
+      "supports": "Stable and unstable forms of an element; unstable forms are radioactive.",
       "position": 1
     },
     {
       "lesson_id": "stable-and-unstable-nuclei",
-      "reference_id": "ref-potassium-40",
-      "supports": "Natural unstable isotopes in food and the body.",
+      "reference_id": "ref-hps-natural-radioactivity",
+      "supports": "Natural potassium-40 in the human body.",
       "position": 2
     },
     {
       "lesson_id": "why-nuclei-decay",
-      "reference_id": "ref-iaea-decay",
-      "supports": "Radioactive decay is spontaneous; parent and daughter nuclides.",
+      "reference_id": "ref-openstax-chem-21-3",
+      "supports": "Radioactive decay is the spontaneous change of an unstable parent nuclide into a daughter nuclide.",
       "position": 0
     },
     {
       "lesson_id": "why-nuclei-decay",
-      "reference_id": "ref-iaea-glossary",
-      "supports": "Radionuclide; what radioactive means.",
+      "reference_id": "ref-epa-radioactive-decay",
+      "supports": "A radionuclide is a radioactive (unstable) form of an element.",
       "position": 1
     },
     {
       "lesson_id": "why-nuclei-decay",
-      "reference_id": "ref-openstax-up3-ch10",
-      "supports": "Radioactive decay is random for one nucleus and regular for many.",
+      "reference_id": "ref-openstax-up3-10-3",
+      "supports": "The radiation does not change with chemical state, temperature or pressure.",
       "position": 2
+    },
+    {
+      "lesson_id": "why-nuclei-decay",
+      "reference_id": "ref-wikipedia-radioactive-decay",
+      "supports": "Decay is random for a single atom; it is impossible to predict when one will decay.",
+      "position": 3
     }
   ]
 }

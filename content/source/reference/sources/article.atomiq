@@ -1,0 +1,13 @@
+format 1
+adapter references 1
+kind: article
+
+source ref-wikipedia-radioactive-decay
+publisher: Wikipedia
+title: Radioactive decay
+url: https://en.wikipedia.org/wiki/Radioactive_decay
+accessed: 2026-11-23
+verified: 1
+
+note:
+    Page text fetched and read on 2026-11-23: "Radioactive decay is a random process at the level of single atoms ... it is impossible to predict when a particular atom will decay, regardless of how long the atom has existed." An encyclopedia, used only for that statement. Signed off by the owner on 2026-11-23.

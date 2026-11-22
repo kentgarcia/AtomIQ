@@ -14,7 +14,7 @@ type: choice
 surfaces: lesson
 surfaces: practice
 surfaces: review
-references: ref-background-radiation
+references: ref-epa-radiation-sources
 
 prompt:
     If something is radioactive, is it automatically dangerous?
@@ -35,7 +35,7 @@ difficulty: 2
 surfaces: lesson
 surfaces: practice
 surfaces: review
-references: ref-background-radiation
+references: ref-epa-radiation-sources
 
 prompt:
     What helps decide whether radiation matters?
@@ -55,7 +55,7 @@ type: choice
 surfaces: practice
 surfaces: checkpoint
 surfaces: review
-references: ref-background-radiation
+references: ref-epa-radiation-sources
 
 prompt:
     A banana holds a little radioactive potassium. What does that tell you?
@@ -75,7 +75,7 @@ type: true_or_myth
 surfaces: practice
 surfaces: checkpoint
 surfaces: review
-references: ref-background-radiation
+references: ref-epa-radiation-sources
 
 statement:
     Anything radioactive is automatically dangerous.

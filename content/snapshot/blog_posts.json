@@ -50,7 +50,7 @@
         },
         {
           "t": "fact",
-          "text": "Heating, cooling and chemistry hardly change how fast an unstable nucleus changes. In a flame or in ice, it is still unstable."
+          "text": "Scientists noticed that the radiation does not change with the chemical state of the material, or with temperature or pressure. That is a clue that it comes from the nucleus, not from the electrons."
         },
         {
           "t": "list",
@@ -124,7 +124,7 @@
         },
         {
           "t": "fact",
-          "text": "In 1896 Henri Becquerel left a uranium mineral on a wrapped photographic plate. The plate fogged, even with no sunlight. Radioactivity was found in a natural mineral, long before anyone made nuclear technology."
+          "text": "In 1896 Henri Becquerel found that a uranium-rich rock gives off invisible rays that darken a photographic plate, even inside an enclosed container. Radioactivity was found in a natural material, long before anyone built nuclear technology."
         },
         {
           "t": "h",
@@ -158,7 +158,7 @@
       "title": "The smallest thing you will ever meet",
       "hook": "You have never seen one, yet you are made of them. Let us look at how small they really are.",
       "cover": "atom",
-      "read_min": 2,
+      "read_min": 1,
       "unlock": {
         "trigger": "none"
       },
@@ -169,7 +169,7 @@
         },
         {
           "t": "p",
-          "text": "Yes, even the air, which gives every impression of being nothing. That is why a pumped-up ball is heavier than a flat one: the air inside it is matter too. I have weighed several balls to be certain. The neighbours have asked me to stop."
+          "text": "Yes, even the air, which gives every impression of being nothing. That is why you can pump up a ball: the air inside it takes up space, because air is matter too. I have weighed several balls to be certain. The neighbours have asked me to stop."
         },
         {
           "t": "quote",
@@ -181,29 +181,23 @@
         },
         {
           "t": "p",
-          "text": "Take a skin cell. You need a microscope to see it. A virus is about 300 times smaller than that cell. And an atom is about 300 times smaller again."
+          "text": "An atom is about 10^-10 m across, one ten-billionth of a metre. The nucleus in its middle is about 100,000 times smaller still."
         },
         {
           "t": "figure",
           "ref": "atom",
-          "caption": "An atom: far too small to see, even with an ordinary microscope."
+          "caption": "An atom: far too small to see."
         },
         {
           "t": "list",
           "items": [
-            "Your hand: about 10 cm",
-            "A skin cell: about 0.03 mm",
-            "A virus: about 100 nm",
-            "An atom: a few tenths of a nm"
+            "An atom: about 10^-10 m across",
+            "Its nucleus: about 100,000 times smaller"
           ]
         },
         {
           "t": "fact",
-          "text": "About 2,400 years ago the Greek thinker Democritus imagined cutting something in half again and again, until he reached a piece that could not be cut. He called it atomos. Seeing atoms took far longer."
-        },
-        {
-          "t": "p",
-          "text": "Light and heat are different. They are energy, not matter, so they are not made of atoms."
+          "text": "In the fifth century BC the Greek thinkers Leucippus and Democritus argued that all matter was made of small pieces they called atomos, a word for \"indivisible\". Seeing atoms took far longer."
         },
         {
           "t": "p",

@@ -11,7 +11,7 @@ type: choice
 surfaces: lesson
 surfaces: practice
 surfaces: review
-references: ref-iaea-decay
+references: ref-wikipedia-radioactive-decay
 
 prompt:
     Look at a group of unstable nuclei. Could you tell in advance which one will change next?
@@ -31,7 +31,7 @@ type: true_or_myth
 surfaces: lesson
 surfaces: practice
 surfaces: review
-references: ref-iaea-decay
+references: ref-wikipedia-radioactive-decay
 
 statement:
     You can say how likely a nucleus is to change, but not exactly when it will.
@@ -46,7 +46,7 @@ type: true_or_myth
 surfaces: practice
 surfaces: checkpoint
 surfaces: review
-references: ref-iaea-decay
+references: ref-wikipedia-radioactive-decay
 
 statement:
     If you watch one unstable nucleus closely, you can tell the exact second it will change.
@@ -62,7 +62,7 @@ difficulty: 2
 surfaces: practice
 surfaces: checkpoint
 surfaces: review
-references: ref-iaea-decay
+references: ref-wikipedia-radioactive-decay
 
 prompt:
     In a sample, one nucleus changed today. What can you say about another unstable nucleus in the same sample?

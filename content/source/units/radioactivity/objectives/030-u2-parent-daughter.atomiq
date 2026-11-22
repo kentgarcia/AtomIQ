@@ -10,7 +10,7 @@ type: fill
 surfaces: lesson
 surfaces: practice
 surfaces: review
-references: ref-iaea-decay
+references: ref-openstax-chem-21-3
 
 prompt:
     The nucleus that decays is the ___.
@@ -32,7 +32,7 @@ type: match
 surfaces: lesson
 surfaces: practice
 surfaces: review
-references: ref-iaea-decay
+references: ref-openstax-chem-21-3
 
 prompt:
     Match each name to what it means.
@@ -50,7 +50,7 @@ type: choice
 surfaces: practice
 surfaces: checkpoint
 surfaces: review
-references: ref-iaea-decay
+references: ref-openstax-chem-21-3
 
 prompt:
     A nucleus decays into a new nucleus. What is the new nucleus called?
@@ -70,7 +70,7 @@ type: fill
 surfaces: practice
 surfaces: checkpoint
 surfaces: review
-references: ref-iaea-decay
+references: ref-openstax-chem-21-3
 
 prompt:
     The parent decays, and the nucleus it becomes is the ___.

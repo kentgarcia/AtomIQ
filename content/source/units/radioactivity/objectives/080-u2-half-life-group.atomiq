@@ -12,7 +12,7 @@ difficulty: 2
 surfaces: lesson
 surfaces: practice
 surfaces: review
-references: ref-iaea-decay
+references: ref-openstax-up3-10-3
 
 prompt:
     Which statement about half-life is true?
@@ -33,7 +33,7 @@ type: true_or_myth
 surfaces: lesson
 surfaces: practice
 surfaces: review
-references: ref-iaea-decay
+references: ref-openstax-up3-10-3
 
 statement:
     In a large group of nuclei, you can predict that about half will change in one half-life.
@@ -48,7 +48,7 @@ type: true_or_myth
 surfaces: lesson
 surfaces: practice
 surfaces: review
-references: ref-iaea-decay
+references: ref-openstax-up3-10-3
 
 statement:
     A radioactive atom always waits exactly one half-life before it decays.
@@ -63,7 +63,7 @@ type: true_or_myth
 surfaces: practice
 surfaces: checkpoint
 surfaces: review
-references: ref-iaea-decay
+references: ref-openstax-up3-10-3
 
 statement:
     Half-life tells you exactly when one particular nucleus will decay.
@@ -79,7 +79,7 @@ difficulty: 2
 surfaces: practice
 surfaces: checkpoint
 surfaces: review
-references: ref-iaea-decay
+references: ref-openstax-up3-10-3
 
 prompt:
     Why can half-life describe a group but not one nucleus?

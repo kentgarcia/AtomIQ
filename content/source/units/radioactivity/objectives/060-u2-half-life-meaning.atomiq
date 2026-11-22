@@ -11,7 +11,7 @@ type: choice
 surfaces: lesson
 surfaces: practice
 surfaces: review
-references: ref-iaea-decay
+references: ref-openstax-chem-21-3
 
 prompt:
     A sample has gone through one half-life. Which statement is true?
@@ -31,7 +31,7 @@ type: choice
 surfaces: lesson
 surfaces: practice
 surfaces: review
-references: ref-iaea-decay
+references: ref-openstax-chem-21-3
 
 prompt:
     What does half-life mean?
@@ -72,7 +72,7 @@ type: fill
 surfaces: practice
 surfaces: checkpoint
 surfaces: review
-references: ref-iaea-decay
+references: ref-openstax-chem-21-3
 
 prompt:
     Half-life is the time for about ___ of a large group of nuclei to decay.
@@ -94,7 +94,7 @@ type: choice
 surfaces: practice
 surfaces: checkpoint
 surfaces: review
-references: ref-iaea-decay
+references: ref-openstax-chem-21-3
 
 prompt:
     Which describes half-life best?

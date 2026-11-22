@@ -11,8 +11,9 @@ cover: radiation
 read: 1
 unlock: {"trigger":"lesson_complete","lessonId":"why-nuclei-decay"}
 reactors: npc-hal
-references: ref-iaea-decay
-references: ref-openstax-up3-ch10
+references: ref-openstax-chem-21-3
+references: ref-openstax-up3-10-3
+references: ref-wikipedia-radioactive-decay
 
 p:
     ok so take one unstable nucleus. leave it alone. it has a chance of changing, and nobody can say when. eep, so mysterious~
@@ -35,7 +36,7 @@ figure: radiation
 caption: The radiation sign, used to mark a source of radiation.
 
 fact:
-    Heating, cooling and chemistry hardly change how fast an unstable nucleus changes. In a flame or in ice, it is still unstable.
+    Scientists noticed that the radiation does not change with the chemical state of the material, or with temperature or pressure. That is a clue that it comes from the nucleus, not from the electrons.
 
 list:
     One nucleus: you can't say when

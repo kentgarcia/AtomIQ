@@ -15,13 +15,13 @@ description:
     Some nuclei stay the same for ever. Others are unstable and can change. You will see the difference, learn what radioactivity is, and find out that it is a natural thing.
 
 cite ref-openstax-up3-ch10
-supports: Nuclear stability and radioactivity.
+supports: Isotopes of carbon, hydrogen and other elements, stable or with a half-life.
 
-cite ref-iaea-isotopes
-supports: Stable and unstable isotopes.
+cite ref-epa-radioactive-decay
+supports: Stable and unstable forms of an element; unstable forms are radioactive.
 
-cite ref-potassium-40
-supports: Natural unstable isotopes in food and the body.
+cite ref-hps-natural-radioactivity
+supports: Natural potassium-40 in the human body.
 
 card c01
 kind: item

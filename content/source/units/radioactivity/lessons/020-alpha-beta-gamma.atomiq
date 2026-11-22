@@ -13,14 +13,11 @@ relies_on: u2-parent-daughter
 description:
     When a nucleus changes, something comes out. You will meet the three kinds, alpha, beta and gamma, and learn that they are three different things.
 
-cite ref-iaea-radiation-types
-supports: Alpha and beta are particles; gamma is electromagnetic radiation.
+cite ref-epa-radioactive-decay
+supports: Alpha particles are two protons and two neutrons; gamma rays are photons, weightless packets of energy.
 
-cite ref-iaea-glossary
-supports: Definitions of beta-minus and gamma.
-
-cite ref-iaea-decay
-supports: Alpha as two protons and two neutrons.
+cite ref-openstax-chem-21-3
+supports: An alpha particle removes two protons and two neutrons from the parent nucleus.
 
 card c01
 kind: item

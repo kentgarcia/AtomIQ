@@ -10,10 +10,10 @@
       "title": "Background radiation",
       "summary": "Radiation has always been part of the natural environment.",
       "steps": [
-        "Radiation has always been all around us as part of our natural environment.",
-        "Most background exposure comes from radon in the air. Cosmic rays and the Earth add smaller shares.",
+        "Background radiation is radiation that is always in the environment. Most of it is natural.",
+        "Radon gas from rock and soil is the main natural source. Cosmic rays and minerals in the ground add more.",
         "Food and water carry some natural radioactive material, such as potassium-40.",
-        "Medical procedures account for nearly all human exposure to man-made radiation."
+        "The most common human-made source of radiation exposure is medical imaging, such as x-rays and CT scans."
       ],
       "icon": "Sun1",
       "entry_id": "background-radiation",
@@ -25,10 +25,10 @@
       "title": "Why not go out to look",
       "summary": "Staying put protects you more than going out to see or to travel.",
       "steps": [
-        "Radioactive materials weaken over time, which is why officials ask people to stay in for at least 24 hours.",
-        "Do not go outside to get loved ones from schools, daycares or hospitals. They have plans to keep people safe.",
-        "Do not go back to an evacuated area until local authorities say it is safe.",
-        "Leave shelter early only for an immediate hazard such as a fire or gas leak, or if officials say so."
+        "Radiation levels decrease rapidly during the first 24 hours, becoming significantly less dangerous.",
+        "If officials advise you to evacuate, listen for information about routes, shelters and procedures.",
+        "If you have evacuated, do not return until local authorities say it is safe.",
+        "Leave early only for an immediate hazard such as a fire, gas leak or building collapse, or when officials say so."
       ],
       "icon": "Warning2",
       "entry_id": null,
@@ -38,12 +38,13 @@
       "id": "safety-exposure-vs-contamination",
       "section": "basics",
       "title": "Exposure or contamination?",
-      "summary": "Being exposed to radiation is not the same as having radioactive material on you.",
+      "summary": "Radioactive contamination can be on or inside a person. Radiation itself does not spread.",
       "steps": [
-        "Exposure is radiation reaching a person, like the beam of an x-ray.",
-        "Contamination is radioactive material on or inside the body.",
-        "A person exposed to radiation is not necessarily contaminated.",
-        "Radiation does not spread or get on people. Radioactive contamination is what can be spread."
+        "Contamination is radioactive material deposited on skin, clothing or anywhere it is not wanted.",
+        "External contamination: radioactive material on the skin or clothing.",
+        "Internal contamination: it is breathed in, swallowed or absorbed through wounds.",
+        "Radiation does not spread or get on or in people. Radioactive contamination is what can be spread.",
+        "A contaminated person receives radiation exposure until the radioactive material is removed."
       ],
       "icon": "Drop",
       "entry_id": "exposure",
@@ -55,10 +56,10 @@
       "title": "Get inside, stay inside, stay tuned",
       "summary": "The official first steps in a radiation emergency.",
       "steps": [
-        "Get inside the nearest building as soon as you can.",
-        "Stay inside, away from the walls and roof, until officials say it is safe. It usually lasts at least 24 hours.",
-        "Stay tuned to TV, radio or social media for updates. A battery or hand-crank radio helps.",
-        "Do not leave your shelter until officials or emergency responders say it is safe."
+        "Get inside: if warned of a radiation hazard, go straight into the nearest building and move away from windows.",
+        "Stay inside: sheltering usually lasts at least 24 hours.",
+        "Stay tuned: follow officials' instructions. A battery or hand-crank radio works if other communication fails.",
+        "Stay in the most protective spot for the first 24 hours unless a hazard threatens or officials say it is safe."
       ],
       "icon": "Home2",
       "entry_id": null,
@@ -70,11 +71,11 @@
       "title": "What makes a good shelter",
       "summary": "More walls between you and the outdoors means more protection.",
       "steps": [
-        "Put as many walls as you can between yourself and the outdoors, and move away from windows.",
+        "Put as many walls as you can between yourself and the outside, and move away from windows.",
         "The safest buildings have brick or concrete walls.",
         "Underground parking garages and subways can also provide good shelter.",
-        "The best spot is a basement or the center of a large building. Cars offer poor protection.",
-        "Close windows and doors, and turn off fans and air conditioners that pull in outside air."
+        "The best spot is a basement or the center of a large building.",
+        "Close windows and doors, and turn off fans, air conditioners and forced-air heating that bring in outside air."
       ],
       "icon": "Buildings2",
       "entry_id": "shielding",
@@ -86,11 +87,11 @@
       "title": "If you were outside",
       "summary": "Officials say to get inside, take off outer clothing and wash.",
       "steps": [
-        "As soon as you are inside, remove your outer layer of clothing. It can remove up to 90% of radioactive material.",
-        "Take clothes off carefully, so you do not shake loose any radioactive dust.",
-        "Wash with soap and water or take a shower. Put on clean clothes.",
+        "Remove your outer layer of clothing. It can remove up to 90% of radioactive material.",
+        "Take clothes off carefully, so you do not shake loose any radioactive dust. Avoid touching your eyes, nose and mouth.",
+        "Take a shower or wash with soap and water to remove radioactive particles from skin and hair.",
         "Do not use household cleaning wipes on skin. Hand sanitizer does not protect against radioactive material.",
-        "Unsealed foods from outside may be contaminated with radioactive material."
+        "Unsealed foods that were outside may be contaminated with radioactive material."
       ],
       "icon": "Drop",
       "entry_id": null,
@@ -103,9 +104,9 @@
       "summary": "Being exposed to radiation does not make a person radioactive.",
       "steps": [
         "Myth: a person who was exposed to radiation is now radioactive.",
-        "What is true: being exposed to radiation does not make one radioactive.",
-        "What is true: an x-ray exposes a person to radiation, but does not contaminate them.",
-        "Radioactive material on the skin or clothes is the concern. It is washed off."
+        "What is true: radiation does not spread or get on or in people.",
+        "What is true: contamination is what can be spread. A contaminated person is exposed until it is removed.",
+        "Radioactive material on skin or clothes, or inside the body, is the concern."
       ],
       "icon": "CloseCircle",
       "entry_id": "exposure",
@@ -118,9 +119,9 @@
       "summary": "What matters is the dose and how fast it arrives.",
       "steps": [
         "Myth: any amount of radiation is instantly deadly.",
-        "What is true: acute radiation syndrome needs a very high dose delivered over a short time.",
-        "What is true: environmental levels do not cause immediate effects. Cancer risk rises with dose.",
-        "Low doses delivered slowly carry a substantially lower risk, as the body can repair damage."
+        "What is true: acute effects such as burns or acute radiation syndrome need very high doses.",
+        "What is true: low environmental levels cause no immediate health effects. Cancer risk rises with dose.",
+        "A low dose, or one spread over a long time, carries a lower risk, because the body can repair damage."
       ],
       "icon": "CloseCircle",
       "entry_id": "absorbed-dose",
@@ -150,7 +151,7 @@
         "Myth: microwave radiation is the same kind of radiation as nuclear radiation.",
         "What is true: radio waves, visible light and microwaves are non-ionizing radiation.",
         "What is true: ionizing radiation has enough energy to knock electrons out of atoms, which can damage tissue and DNA.",
-        "Microwaves make electrons vibrate to make heat. They cannot remove electrons from atoms."
+        "Non-ionizing radiation can make molecules vibrate, but it cannot knock electrons out of atoms."
       ],
       "icon": "Wifi",
       "entry_id": "ionizing-radiation",
@@ -163,9 +164,9 @@
       "summary": "A reactor does not explode like a nuclear weapon, but an accident can release radiation.",
       "steps": [
         "Myth: a nuclear power plant can explode like a nuclear bomb.",
-        "What is true: a power plant would not explode like a nuclear weapon.",
-        "What is true: its fuel is arranged so energy is produced steadily, not all at once.",
-        "A serious accident could still release radiation into the air, and officials would monitor it."
+        "What is true: a commercial power reactor cannot explode like a nuclear bomb.",
+        "What is true: its fuel is not enriched beyond about 5%, and an explosive needs much higher enrichment.",
+        "A serious accident can still release radioactive material, as the Chernobyl accident did."
       ],
       "icon": "Flash",
       "entry_id": "nuclear-reactor",
@@ -192,10 +193,9 @@
       "title": "Time, distance, shielding",
       "summary": "Three ways to lower the dose from a radiation source.",
       "steps": [
-        "Time: spending less time near a source reduces the dose from it.",
+        "Time: limiting the time you are exposed reduces the dose from a source.",
         "Distance: the dose decreases dramatically as you move farther from the source.",
-        "Shielding: a proper barrier between you and a source greatly reduces or eliminates the dose.",
-        "Lead, concrete or water barriers protect from penetrating gamma rays."
+        "Shielding: barriers of lead, concrete or water protect against penetrating gamma rays."
       ],
       "icon": "Timer1",
       "entry_id": "shielding",

@@ -297,7 +297,7 @@ describe("feed templates and blog pieces (docs/features/NPC_FEED_SPEC.md §6)", 
     assert.equal(children.blog_comments.length, 2);
     assert.deepEqual(children.blog_comments.map((c) => c.position), [0, 1]);
     assert.equal(typeof children.blog_comments[0].chip, "object", "comment chips arrive parsed");
-    assert.deepEqual(children.blog_references.map((r) => r.reference_id), ["ref-openstax-chem-ch1", "ref-openstax-chem-ch2"]);
+    assert.deepEqual(children.blog_references.map((r) => r.reference_id), ["ref-openstax-chem-2-1", "ref-openstax-chem-ch1", "ref-openstax-chem-ch2"]);
   });
 
   it("saves a piece with its comments and sources atomically, and keeps sources when none are sent", async () => {
@@ -371,7 +371,7 @@ describe("feed templates and blog pieces (docs/features/NPC_FEED_SPEC.md §6)", 
     delete row.created_at;
     delete row.updated_at;
     const made = await call("POST", "/api/entities/blog_posts", {
-      body: { row, children: [{ id: "bc-test-piece-ray", npc_id: "npc-ray", text: "A comment on the test piece." }], links: [{ reference_id: "ref-potassium-40" }, { reference_id: "ref-potassium-40" }] },
+      body: { row, children: [{ id: "bc-test-piece-ray", npc_id: "npc-ray", text: "A comment on the test piece." }], links: [{ reference_id: "ref-hps-natural-radioactivity" }, { reference_id: "ref-hps-natural-radioactivity" }] },
     });
     assert.equal(made.status, 201, JSON.stringify(made.json));
     assert.equal(count("SELECT COUNT(*) n FROM blog_references WHERE blog_id = 'blog-test-piece'"), 1, "a source linked twice is stored once");

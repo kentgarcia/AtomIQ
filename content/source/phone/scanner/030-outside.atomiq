@@ -7,7 +7,7 @@ name: A blade of grass
 object: grass
 references: ref-openstax-bio-photosynthesis
 blurb: Grass makes its own food from sunlight, air and water.
-fun_fact: A plant builds sugar out of carbon dioxide and water. Much of the carbon in a blade of grass was once part of the air.
+fun_fact: A plant uses sunlight, carbon dioxide and water to make sugar. The carbon in that sugar comes from carbon dioxide.
 
 composition:
     {"symbol":"O","note":"from water and carbon dioxide"}
@@ -19,7 +19,7 @@ name: The Sun
 object: sun
 atomdex: nuclear-fusion
 references: ref-nasa-sun-facts
-blurb: A hot, glowing ball of gas: our nearest star.
+blurb: A hot, glowing ball of hydrogen and helium at the center of our solar system.
 fun_fact: In the Sun's core, hydrogen is fused into helium. Those nuclear reactions power its heat and light.
 
 composition:
@@ -29,9 +29,9 @@ composition:
 target scan-air
 name: Air
 object: air
-references: ref-noaa-atmosphere
-blurb: Invisible, but made of atoms and molecules.
-fun_fact: Most of the air is nitrogen, not oxygen. Nitrogen also dilutes oxygen, which slows burning.
+references: ref-nasa-earth-facts
+blurb: Invisible, but it is a mixture of gases.
+fun_fact: Near the surface, air is mostly nitrogen, with oxygen next. The rest includes argon, carbon dioxide and neon.
 
 composition:
     {"symbol":"N","note":"by far the most common gas"}

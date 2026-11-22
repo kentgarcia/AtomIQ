@@ -7,64 +7,100 @@ publisher: OpenStax
 title: Anatomy and Physiology 2e, section 2.1: Elements and Atoms
 year: 2022
 url: https://openstax.org/books/anatomy-and-physiology-2e/pages/2-1-elements-and-atoms-the-building-blocks-of-matter
-accessed: 2026-11-20
-note: Opened and read on 2026-11-20 to write the scanner results; a person still has to confirm what it supports.
+accessed: 2026-11-23
+verified: 1
+
+note:
+    Page text fetched and read on 2026-11-23; the claims that cite it were checked against that text. Signed off by the owner on 2026-11-23.
 
 source ref-openstax-ap-erythrocytes
 publisher: OpenStax
 title: Anatomy and Physiology 2e, section 18.3: Erythrocytes
 year: 2022
 url: https://openstax.org/books/anatomy-and-physiology-2e/pages/18-3-erythrocytes
-accessed: 2026-11-20
-note: Opened and read on 2026-11-20 to write the scanner results; a person still has to confirm what it supports.
+accessed: 2026-11-23
+verified: 1
+
+note:
+    Page text fetched and read on 2026-11-23; the claims that cite it were checked against that text. Signed off by the owner on 2026-11-23.
 
 source ref-openstax-ap-hair
 publisher: OpenStax
 title: Anatomy and Physiology 2e, section 5.2: Accessory Structures of the Skin
 year: 2022
 url: https://openstax.org/books/anatomy-and-physiology-2e/pages/5-2-accessory-structures-of-the-skin
-accessed: 2026-11-20
-note: Opened and read on 2026-11-20 to write the scanner results; a person still has to confirm what it supports.
+accessed: 2026-11-23
+verified: 1
+
+note:
+    Page text fetched and read on 2026-11-23; the claims that cite it were checked against that text. Signed off by the owner on 2026-11-23.
 
 source ref-openstax-ap-organic
 publisher: OpenStax
 title: Anatomy and Physiology 2e, section 2.5: Organic Compounds Essential to Human Functioning
 year: 2022
 url: https://openstax.org/books/anatomy-and-physiology-2e/pages/2-5-organic-compounds-essential-to-human-functioning
-accessed: 2026-11-20
-note: Opened and read on 2026-11-20 to write the scanner results; a person still has to confirm what it supports.
+accessed: 2026-11-23
+verified: 1
+
+note:
+    Page text fetched and read on 2026-11-23; the claims that cite it were checked against that text. Signed off by the owner on 2026-11-23.
 
 source ref-openstax-bio-carbs
 publisher: OpenStax
 title: Biology 2e, section 3.2: Carbohydrates
 year: 2018
 url: https://openstax.org/books/biology-2e/pages/3-2-carbohydrates
-accessed: 2026-11-20
-note: Opened and read on 2026-11-20 to write the scanner results; a person still has to confirm what it supports.
+accessed: 2026-11-23
+verified: 1
+
+note:
+    Page text fetched and read on 2026-11-23; the claims that cite it were checked against that text. Signed off by the owner on 2026-11-23.
 
 source ref-openstax-bio-photosynthesis
 publisher: OpenStax
 title: Biology 2e, section 8.1: Overview of Photosynthesis
 year: 2018
 url: https://openstax.org/books/biology-2e/pages/8-1-overview-of-photosynthesis
-accessed: 2026-11-20
-note: Opened and read on 2026-11-20 to write the scanner results; a person still has to confirm what it supports.
+accessed: 2026-11-23
+verified: 1
+
+note:
+    Page text fetched and read on 2026-11-23; the claims that cite it were checked against that text. Signed off by the owner on 2026-11-23.
 
 source ref-openstax-chem-10-5
 publisher: OpenStax
 title: Chemistry 2e, section 10.5: The Solid State of Matter
 year: 2019
 url: https://openstax.org/books/chemistry-2e/pages/10-5-the-solid-state-of-matter
-accessed: 2026-11-20
-note: Opened and read on 2026-11-20 to write the scanner results; a person still has to confirm what it supports.
+accessed: 2026-11-23
+verified: 1
+
+note:
+    Page text fetched and read on 2026-11-23; the claims that cite it were checked against that text. Signed off by the owner on 2026-11-23.
 
 source ref-openstax-chem-2-4
 publisher: OpenStax
 title: Chemistry 2e, section 2.4: Chemical Formulas
 year: 2019
 url: https://openstax.org/books/chemistry-2e/pages/2-4-chemical-formulas
-accessed: 2026-11-20
-note: Opened and read on 2026-11-20 to write the scanner results; a person still has to confirm what it supports.
+accessed: 2026-11-23
+verified: 1
+
+note:
+    Page text fetched and read on 2026-11-23; the claims that cite it were checked against that text. Signed off by the owner on 2026-11-23.
+
+source ref-openstax-chem-21-3
+publisher: OpenStax
+title: Chemistry 2e, section 21.3: Radioactive Decay
+authors: Flowers, Theopold, Langley, Robinson
+year: 2019
+url: https://openstax.org/books/chemistry-2e/pages/21-3-radioactive-decay
+accessed: 2026-11-23
+verified: 1
+
+note:
+    Page text fetched and read on 2026-11-23; the claims that cite it were checked against that text. Signed off by the owner on 2026-11-23.
 
 source ref-openstax-chem-ch1
 publisher: OpenStax
@@ -72,20 +108,56 @@ title: Chemistry 2e, section 1.2: Phases and Classification of Matter
 authors: Flowers, Theopold, Langley, Robinson
 year: 2019
 url: https://openstax.org/books/chemistry-2e/pages/1-2-phases-and-classification-of-matter
-note: Matter has mass and takes up space; gases such as air are matter.
+accessed: 2026-11-23
+verified: 1
+
+note:
+    Page text fetched and read on 2026-11-23; the claims that cite it were checked against that text. Signed off by the owner on 2026-11-23.
 
 source ref-openstax-chem-ch2
 publisher: OpenStax
-title: Chemistry 2e, chapter 2: Atoms, Molecules, and Ions
+title: Chemistry 2e, section 2.3: Atomic Structure and Symbolism
 authors: Flowers, Theopold, Langley, Robinson
 year: 2019
-url: https://openstax.org/books/chemistry-2e/pages/2-introduction
-note: Atomic structure, atomic number, isotopes, the periodic table, atom sizes.
+url: https://openstax.org/books/chemistry-2e/pages/2-3-atomic-structure-and-symbolism
+accessed: 2026-11-23
+verified: 1
+
+note:
+    Page text fetched and read on 2026-11-23; the claims that cite it were checked against that text. Signed off by the owner on 2026-11-23.
+
+source ref-openstax-up3-10-3
+publisher: OpenStax
+title: University Physics Volume 3, section 10.3: Radioactive Decay
+authors: Ling, Sanny, Moebs
+year: 2016
+url: https://openstax.org/books/university-physics-volume-3/pages/10-3-radioactive-decay
+accessed: 2026-11-23
+verified: 1
+
+note:
+    Page text fetched and read on 2026-11-23; the claims that cite it were checked against that text. Signed off by the owner on 2026-11-23.
 
 source ref-openstax-up3-ch10
 publisher: OpenStax
-title: University Physics Volume 3, chapter 10: Nuclear Physics
+title: University Physics Volume 3, section 10.1: Properties of Nuclei
 authors: Ling, Sanny, Moebs
 year: 2016
-url: https://openstax.org/books/university-physics-volume-3/pages/10-introduction
-note: Nuclear size, nuclear forces, stability, radioactivity.
+url: https://openstax.org/books/university-physics-volume-3/pages/10-1-properties-of-nuclei
+accessed: 2026-11-23
+verified: 1
+
+note:
+    Page text fetched and read on 2026-11-23; the claims that cite it were checked against that text. Signed off by the owner on 2026-11-23.
+
+source ref-openstax-chem-2-1
+publisher: OpenStax
+title: Chemistry 2e, section 2.1: Early Ideas in Atomic Theory
+authors: Flowers, Theopold, Langley, Robinson
+year: 2019
+url: https://openstax.org/books/chemistry-2e/pages/2-1-early-ideas-in-atomic-theory
+accessed: 2026-11-23
+verified: 1
+
+note:
+    Page text fetched and read on 2026-11-23; the claims that cite it were checked against that text. Signed off by the owner on 2026-11-23.

@@ -219,6 +219,8 @@ describe("publish", () => {
 
   it("enforces the review gate unless explicitly allowed", () => {
     const { paths } = fixture();
+    // The shipped content has every source verified, so un-verify one that a lesson cites.
+    sql(paths, "UPDATE content_references SET verified = 0 WHERE id = (SELECT reference_id FROM lesson_references LIMIT 1)");
     assert.throws(() => publishRelease(paths, { runChecks: noChecks, strictReview: true }), /reference-unverified|Validation failed/);
     assert.equal(readLedger(paths).releases.length, 0);
   });

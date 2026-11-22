@@ -9,7 +9,7 @@
       "name": "Air",
       "scene": "outside",
       "object": "air",
-      "blurb": "Invisible, but made of atoms and molecules.",
+      "blurb": "Invisible, but it is a mixture of gases.",
       "composition": [
         {
           "symbol": "N",
@@ -28,7 +28,7 @@
           "note": "in carbon dioxide"
         }
       ],
-      "fun_fact": "Most of the air is nitrogen, not oxygen. Nitrogen also dilutes oxygen, which slows burning.",
+      "fun_fact": "Near the surface, air is mostly nitrogen, with oxygen next. The rest includes argon, carbon dioxide and neon.",
       "atomdex_entry_id": null,
       "position": 2
     },
@@ -86,7 +86,7 @@
           "note": "the only element in pure gold"
         }
       ],
-      "fun_fact": "Gold is an element, so it cannot be broken down into anything simpler. A bar of pure gold holds nothing but gold atoms.",
+      "fun_fact": "Gold is an element, and an element cannot be broken down by ordinary chemical means. A bar of pure gold holds nothing but gold atoms.",
       "atomdex_entry_id": "element",
       "position": 0
     },
@@ -110,7 +110,7 @@
           "note": "from water"
         }
       ],
-      "fun_fact": "A plant builds sugar out of carbon dioxide and water. Much of the carbon in a blade of grass was once part of the air.",
+      "fun_fact": "A plant uses sunlight, carbon dioxide and water to make sugar. The carbon in that sugar comes from carbon dioxide.",
       "atomdex_entry_id": null,
       "position": 0
     },
@@ -201,7 +201,7 @@
       "name": "A grain of rice",
       "scene": "kitchen",
       "object": "rice",
-      "blurb": "Mostly starch, a long chain of sugar molecules.",
+      "blurb": "A grain: one of the foods that give you carbohydrates.",
       "composition": [
         {
           "symbol": "O"
@@ -214,7 +214,7 @@
           "symbol": "H"
         }
       ],
-      "fun_fact": "Glucose, a sugar your body uses for fuel, is made of just carbon, hydrogen and oxygen. Starch is glucose joined in long chains.",
+      "fun_fact": "Glucose, a sugar your body uses for fuel, is made of just carbon, hydrogen and oxygen. Plants store glucose as starch, a chain of glucose molecules.",
       "atomdex_entry_id": null,
       "position": 3
     },
@@ -234,7 +234,7 @@
           "note": "joined to sodium as ions"
         }
       ],
-      "fun_fact": "Sodium and chlorine can react to form table salt. Joined together they are nothing like what they were on their own.",
+      "fun_fact": "Sodium and chlorine can react to form table salt.",
       "atomdex_entry_id": "ion",
       "position": 1
     },
@@ -243,7 +243,7 @@
       "name": "The Sun",
       "scene": "outside",
       "object": "sun",
-      "blurb": "A hot, glowing ball of gas: our nearest star.",
+      "blurb": "A hot, glowing ball of hydrogen and helium at the center of our solar system.",
       "composition": [
         {
           "symbol": "H",
@@ -267,14 +267,14 @@
       "composition": [
         {
           "symbol": "H",
-          "note": "two atoms in each molecule"
+          "note": "joined with oxygen"
         },
         {
           "symbol": "O",
-          "note": "one atom in each molecule"
+          "note": "joined with hydrogen"
         }
       ],
-      "fun_fact": "Water is always two hydrogen atoms for every oxygen atom, in a glass, a lake or a cloud.",
+      "fun_fact": "Hydrogen and oxygen can react to form water, and it is the same water in a glass, a lake or a cloud.",
       "atomdex_entry_id": null,
       "position": 0
     }

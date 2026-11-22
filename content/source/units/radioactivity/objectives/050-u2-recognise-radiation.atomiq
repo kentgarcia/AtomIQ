@@ -14,7 +14,7 @@ type: choice
 surfaces: lesson
 surfaces: practice
 surfaces: review
-references: ref-iaea-radiation-types
+references: ref-epa-radioactive-decay
 
 prompt:
     Which kind of radiation is made of 2 protons and 2 neutrons?
@@ -34,7 +34,7 @@ type: choice
 surfaces: lesson
 surfaces: practice
 surfaces: review
-references: ref-iaea-radiation-types
+references: ref-epa-radioactive-decay
 
 prompt:
     A fast electron is released from a nucleus. What is this radiation called?
@@ -54,7 +54,7 @@ type: match
 surfaces: lesson
 surfaces: practice
 surfaces: review
-references: ref-iaea-radiation-types
+references: ref-epa-radioactive-decay
 
 prompt:
     Match each kind of radiation to what it is.
@@ -92,7 +92,7 @@ type: choice
 surfaces: practice
 surfaces: checkpoint
 surfaces: review
-references: ref-iaea-radiation-types
+references: ref-epa-radioactive-decay
 
 prompt:
     A burst of high-energy electromagnetic radiation leaves a nucleus. What is it?
@@ -113,7 +113,7 @@ difficulty: 2
 surfaces: practice
 surfaces: checkpoint
 surfaces: review
-references: ref-iaea-radiation-types
+references: ref-epa-radioactive-decay
 
 prompt:
     Which kind of radiation is the same as the nucleus of a helium atom?

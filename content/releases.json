@@ -1,0 +1,48 @@
+{
+  "releases": [
+    {
+      "version": "1.0.0",
+      "date": "2026-11-23",
+      "bump": "baseline",
+      "schemaVersion": 4,
+      "contentHash": "3f425a1ca667",
+      "summary": {
+        "added": {
+          "blog_comments": 4,
+          "blog_posts": 4,
+          "blog_references": 17,
+          "chat_nodes": 131,
+          "content_references": 51,
+          "encyclopedia_entries": 115,
+          "feed_templates": 92,
+          "items": 122,
+          "lesson_cards": 124,
+          "lesson_references": 27,
+          "lessons": 10,
+          "map_site_references": 20,
+          "map_sites": 18,
+          "mythbuster_questions": 150,
+          "myths": 37,
+          "npc_lines": 16,
+          "npcs": 7,
+          "objectives": 22,
+          "path_nodes": 14,
+          "safety_card_references": 18,
+          "safety_cards": 14,
+          "scan_target_references": 16,
+          "scan_targets": 12,
+          "unit_references": 6,
+          "unit_statements": 20,
+          "units": 2
+        },
+        "changed": {},
+        "retired": {}
+      },
+      "notes": "First public release: 2 units, 10 lessons, Myth Buster, AtomDex, Phone apps. Every source checked against its page.",
+      "update": {
+        "channel": "production",
+        "groupId": null
+      }
+    }
+  ]
+}
