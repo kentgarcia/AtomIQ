@@ -165,7 +165,7 @@ const getNodeX = (globalIndex: number, width: number) =>
 
 // dev-admin: development-only controls (components/dev); Metro drops this in a release build. Remove with the folder.
 const DevAdminFab: typeof import("@/components/dev/DevAdminFab").DevAdminFab | null = __DEV__ ? require("@/components/dev/DevAdminFab").DevAdminFab : null;
-// dev-perf: the button that opens the performance probe (components/dev/PerfProbe.tsx). Present in development builds and in a build made with EXPO_PUBLIC_PERF_PROBE=1 (the preview profile).
+// dev-perf: the button that opens the performance probe (components/dev/PerfProbe.tsx). Development builds only, like dev-admin.
 const PerfFab: typeof import("@/components/dev/PerfFab").PerfFab | null = PERF_PROBE_ON ? require("@/components/dev/PerfFab").PerfFab : null;
 
 export default function HomeScreen() {

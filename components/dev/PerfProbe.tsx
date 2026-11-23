@@ -2,7 +2,7 @@
  * The performance probe screen (docs/features/PERFORMANCE_AND_SOUND_SPEC.md §3.4): UI and JS frame numbers against the budget
  * table, the sound engine in use, why each cue was or was not heard, two sound scripts to run on the real engine, and a
  * plain-text report to share out of the phone. Opened from the button beside Dev admin on Home (route `/dev-perf`).
- * Present in development builds and in any build made with `EXPO_PUBLIC_PERF_PROBE=1` (the `preview` profile).
+ * Present in development builds only (see perf-flag.ts).
  *
  * How to use it on a device: docs/qa/PERF_AND_SOUND_PASS.md.
  */

@@ -1,0 +1,275 @@
+{
+  "model": "gemini-3.8-flash-tts",
+  "outputDir": "assets/voices",
+  "characters": [
+    {
+      "id": "shrodi",
+      "npcId": "shrodi",
+      "name": "Shrodi",
+      "role": "Mascot & Guide",
+      "displayName": "AtomIQ - Shrodi",
+      "gender": "male",
+      "languageCode": "en-US",
+      "voicePrompt": "A bright, friendly, youthful male voice in his early 20s with a crisp, buoyant animated-companion energy. Warm mid-high tenor, clear diction, playful curiosity, and upbeat warmth without sounding squeaky or childish.",
+      "defaultStyle": "bright, warm, upbeat, and companionable",
+      "lines": [
+        {
+          "id": "meet",
+          "text": "Hey! I'm Shrodi, your guide in AtomIQ. <short pause> Ready to see what's next on the map?",
+          "style": "warm, cheerful, and welcoming"
+        },
+        {
+          "id": "correct",
+          "text": "Spot on! <chuckle> You made that look easy.",
+          "style": "bright, celebratory, and encouraging"
+        },
+        {
+          "id": "wrong",
+          "text": "Ooh, close one! <short pause> No worries, let's take another look together.",
+          "style": "gentle, upbeat, and reassuring"
+        },
+        {
+          "id": "finish",
+          "text": "Boom! <short pause> Lesson cleared. Your streak is looking awesome.",
+          "style": "enthusiastic and celebratory"
+        },
+        {
+          "id": "quirk",
+          "text": "Wait... <short pause> did you hear my tail swish? No? Good. Very professional.",
+          "style": "playful, conspiratorial, and amused"
+        }
+      ]
+    },
+    {
+      "id": "hal",
+      "npcId": "npc-hal",
+      "name": "Hal",
+      "role": "Unit 1: Inside the Atom",
+      "displayName": "AtomIQ - Hal",
+      "gender": "male",
+      "languageCode": "en-GB",
+      "voicePrompt": "A smooth, unhurried young British man in his late 20s with a crisp, formal, deadpan baritone. Polite museum-curator enunciation, measured slow pace, flat dry humor, never hurried and never shouting.",
+      "defaultStyle": "calm, formal, slow, and completely deadpan",
+      "lines": [
+        {
+          "id": "meet",
+          "text": "Ah. <short pause> Hello. I am Hal. Take your time. I am not going anywhere, and neither is the rock.",
+          "style": "polite, unhurried, formal, and dryly deadpan"
+        },
+        {
+          "id": "intro",
+          "text": "Slowly, then. <short pause> Small things deserve exact attention.",
+          "style": "measured, calm, and exact"
+        },
+        {
+          "id": "sign-off",
+          "text": "Well done. <short pause> That was thorough. I am quietly impressed.",
+          "style": "understated, formal, and warmly approving"
+        },
+        {
+          "id": "quirk",
+          "text": "Hm. <short pause> Reginald disagrees with the scale. He weighs eleven grams. I checked twice.",
+          "style": "completely flat, serious, deadpan comedy"
+        }
+      ]
+    },
+    {
+      "id": "ada",
+      "npcId": "npc-ada",
+      "name": "Ada",
+      "role": "Unit 2: Radioactivity",
+      "displayName": "AtomIQ - Ada",
+      "gender": "female",
+      "languageCode": "en-US",
+      "voicePrompt": "A bright, airy, expressive young woman in her early 20s with a bubbly soprano voice and sparkling best-friend energy. Quick lively tempo, playful melodic pitch rises, breathy warmth, and effortless enthusiasm without sounding like baby talk.",
+      "defaultStyle": "bubbly, bright, playful, and enthusiastic",
+      "lines": [
+        {
+          "id": "meet",
+          "text": "Heyyy! It's Ada! <gasp> Sorry, sorry, Sparkle just made The Noise. <short pause> Okay, it stopped. I think. <giggle> Hi!",
+          "style": "bubbly, slightly flustered, fast-paced, and warm"
+        },
+        {
+          "id": "intro",
+          "text": "Ooh, you're gonna love this one! Radioactivity was always here, like, literally everywhere.",
+          "style": "excited, curious, and sparkling with energy"
+        },
+        {
+          "id": "sign-off",
+          "text": "<giggle> You crushed it! Okay, I have a snack appointment at three, so see you next time!",
+          "style": "playful, cheerful, upbeat, and breezy"
+        },
+        {
+          "id": "quirk",
+          "text": "<gasp> Eep! My left bow is green again. <short pause> Don't tell Hal, he'll say I'm loud.",
+          "style": "playfully startled, then conspiratorial and giggly"
+        }
+      ]
+    },
+    {
+      "id": "ray",
+      "npcId": "npc-ray",
+      "name": "Ray",
+      "role": "Unit 3: Radiation Meets Matter",
+      "displayName": "AtomIQ - Ray",
+      "gender": "male",
+      "languageCode": "en-US",
+      "voicePrompt": "A low, grounded American man in his late 30s with a steady bass-baritone and a touch of dry gravel. Practical field-supervisor delivery: clipped, economical, blunt, matter-of-fact, zero fluff and zero excitement.",
+      "defaultStyle": "blunt, dry, clipped, and matter-of-fact",
+      "lines": [
+        {
+          "id": "meet",
+          "text": "Ray. <short pause> Clipboard's out. Status?",
+          "style": "brief, clipped, no-nonsense, and dry"
+        },
+        {
+          "id": "intro",
+          "text": "Three kinds. Three different stoppers. <short pause> Paper, thin metal, thick lead. Learn which is which.",
+          "style": "direct, steady, and concise"
+        },
+        {
+          "id": "sign-off",
+          "text": "Unit done. Right unit, right question. <short pause> Noted. Good work.",
+          "style": "blunt, grounded, with quiet understated respect"
+        },
+        {
+          "id": "quirk",
+          "text": "Detector's clicking in an empty field. No, it's not broken. <short pause> Background is always there.",
+          "style": "dry, practical, completely unfazed"
+        }
+      ]
+    },
+    {
+      "id": "mina",
+      "npcId": "npc-mina",
+      "name": "Mina",
+      "role": "Unit 4: Radiation and the Body",
+      "displayName": "AtomIQ - Mina",
+      "gender": "female",
+      "languageCode": "en-US",
+      "voicePrompt": "A warm, velvety alto woman in her mid-30s with a gentle, unhurried bedside-clinician cadence. Soft clear consonants, calm steady pacing, deeply reassuring and empathetic without sounding patronizing.",
+      "defaultStyle": "warm, calm, unhurried, and deeply reassuring",
+      "lines": [
+        {
+          "id": "meet",
+          "text": "Hi, I'm Mina. <short pause> Take a breath. We'll go through this one calm step at a time.",
+          "style": "warm, gentle, and soothing"
+        },
+        {
+          "id": "intro",
+          "text": "A lot of people worry about radiation, and that's completely fair. <short pause> Let's look at the numbers together.",
+          "style": "empathetic, steady, and reassuring"
+        },
+        {
+          "id": "sign-off",
+          "text": "Well done. <short pause> You can read a scary headline calmly now, and that's no small thing.",
+          "style": "warm, proud, gentle, and encouraging"
+        },
+        {
+          "id": "quirk",
+          "text": "That's okay. <short pause> At your own pace is plenty.",
+          "style": "soft, comforting, and unhurried"
+        }
+      ]
+    },
+    {
+      "id": "kofi",
+      "npcId": "npc-kofi",
+      "name": "Kofi",
+      "role": "Unit 5: Energy from the Nucleus",
+      "displayName": "AtomIQ - Kofi",
+      "gender": "male",
+      "languageCode": "en-US",
+      "voicePrompt": "A rich, resonant, upbeat man in his early 30s with a hearty tenor-baritone voice and warm workshop-engineer charisma. Confident chest resonance, energetic rhythm, encouraging mentor vibe, and an easy genuine warmth.",
+      "defaultStyle": "energetic, hearty, upbeat, and confident",
+      "lines": [
+        {
+          "id": "meet",
+          "text": "Hard hat is on! <chuckle> I'm Kofi. Ready to see how a reactor actually works?",
+          "style": "hearty, welcoming, and enthusiastic"
+        },
+        {
+          "id": "intro",
+          "text": "We're building this picture piece by piece! Foundation first, then we fire up the engine.",
+          "style": "upbeat, rhythmic, and motivating"
+        },
+        {
+          "id": "sign-off",
+          "text": "Now that is solid work! <short pause> Foundation poured, structure standing.",
+          "style": "proud, hearty, and celebratory"
+        },
+        {
+          "id": "quirk",
+          "text": "The hard hat is optional for you. <chuckle> Mine? Never comes off.",
+          "style": "warm, amused, and jovial"
+        }
+      ]
+    },
+    {
+      "id": "tess",
+      "npcId": "npc-tess",
+      "name": "Tess",
+      "role": "Unit 6: Nuclear Technology at Work",
+      "displayName": "AtomIQ - Tess",
+      "gender": "female",
+      "languageCode": "en-US",
+      "voicePrompt": "A crisp, quick, punchy young woman in her mid-20s with a bright mezzo-soprano voice and excited gadget-tinkerer energy. Fast staccato phrasing, sharp clean diction, playful zippy delivery, upbeat and focused.",
+      "defaultStyle": "fast, crisp, punchy, and upbeat",
+      "lines": [
+        {
+          "id": "meet",
+          "text": "Ping! Hey, I'm Tess! Short lessons, quick answers, let's jump right in!",
+          "style": "snappy, fast-paced, bright, and energetic"
+        },
+        {
+          "id": "intro",
+          "text": "Quick one: hospitals, farms, factories. Nuclear tools are already doing half the heavy lifting.",
+          "style": "brisk, crisp, and engaging"
+        },
+        {
+          "id": "sign-off",
+          "text": "Unlocked! Done and done. <short pause> Lots more shiny gadgets ahead.",
+          "style": "punchy, upbeat, and triumphant"
+        },
+        {
+          "id": "quirk",
+          "text": "Zoom! Keep that speed. <short pause> Gadget level: maxed out.",
+          "style": "zippy, playful, and rapid-fire"
+        }
+      ]
+    },
+    {
+      "id": "sage",
+      "npcId": "npc-sage",
+      "name": "Sage",
+      "role": "Unit 7: Safety, Waste & Society",
+      "displayName": "AtomIQ - Sage",
+      "gender": "neutral",
+      "languageCode": "en-US",
+      "voicePrompt": "A smooth, warm, androgynous mid-range voice in their late 20s to early 30s with a thoughtful podcast-host cadence. Even measured pacing, calm curiosity, gentle upward inflection on questions, fair-minded and grounded.",
+      "defaultStyle": "thoughtful, calm, balanced, and conversational",
+      "lines": [
+        {
+          "id": "meet",
+          "text": "I'm Sage. <short pause> I like to look at both sides before I decide. I'll show you both, and then it's your call.",
+          "style": "calm, measured, welcoming, and reflective"
+        },
+        {
+          "id": "intro",
+          "text": "On one hand, the benefit is real. <short pause> On the other, the tradeoff matters too. Worth asking how we weigh both.",
+          "style": "balanced, thoughtful, and curious"
+        },
+        {
+          "id": "sign-off",
+          "text": "A fair result. <short pause> Now I'll leave you with one question: what does clean mean to you?",
+          "style": "reflective, calm, with a gentle inquisitive lift at the end"
+        },
+        {
+          "id": "quirk",
+          "text": "Two columns in the notebook. <short pause> If one side is blank, I haven't asked enough questions yet.",
+          "style": "quietly thoughtful with a subtle wry warmth"
+        }
+      ]
+    }
+  ]
+}
