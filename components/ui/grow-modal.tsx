@@ -1,6 +1,6 @@
 /**
  * GrowModal / GrowCard — a modal card that grows out of the control that
- * opened it and shrinks back into it on close (docs/features/CONTINUITY_SPEC.md, C10).
+ * opened it and shrinks back into it on close.
  *
  *   const opener = useModalOrigin();
  *   <Pressable ref={opener.anchor} onPress={() => opener.capture(() => setOpen(true))} />

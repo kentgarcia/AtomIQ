@@ -6,7 +6,7 @@
 **Applies to:** `app/(tabs)/_layout.tsx`, `components/layout/tab-bar-inset.tsx`, `theme/layout.ts`, `scripts/check-tab-bar-clearance.mjs`, and any screen that anchors a control above the tab bar
 
 > **Update: the bar is now docked.** It is fixed to the bottom edge, spans the full window width (the tabs themselves stop at `maxWidth` and stay centred on tablets), has a top border only, and its background continues under the system inset. Each tab is an icon with a label under it (active label in the active colour). There is no gap (`gap: 0`), no side margin (`horizontalMargin` is only the side system inset), no highlight square and no bottom fade. Sections below that describe a floating pill, a margin, a gap or the fade are historical; `theme/tab-bar-metrics.ts` and `test:tab-bar` are the current truth.
-**Extends:** `ANDROID_RESPONSIVE_UI_UX_SPEC.md` (§4.2, §6.1), `ANDROID_UI_UX_UAT_CHECKLIST.md`
+**Extends:** `ANDROID_RESPONSIVE_UI_UX_SPEC.md` (§4.2, §6.1)
 
 ## 1. Goal
 

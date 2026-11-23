@@ -212,7 +212,7 @@ Final colours are open (O2). The progress bar stays orange in all runs.
 - The wash uses `primarySurface` (dark `#3A2A20` tint) so dark lessons are warm, not black.
 - The stage uses `surfaceSoft`. Flat scene rims already switch to the bright fill in dark mode.
 - Shrodi's coat stays pale in dark mode (EX-10).
-- Verified per phase against `docs/qa/DARK_MODE_SMOKE_MATRIX.md`.
+- Verified per phase in light and dark on a device.
 
 ## 7. Motion, haptics and sound
 
@@ -276,7 +276,7 @@ Phases 1 to 3 can each ship alone.
 - **Atom motif data:** a `node --test` check that the scene data validates with `checkScene` (periods divide the loop, amounts within limits), as for figures.
 - **Theme exceptions:** any new invariant colour is registered (EX-11 onward) and `check:theme-colors` passes.
 - **Static checks:** no `expo-linear-gradient` or gradient element inside an SVG file under `components/lesson` or `components/mascot` (a small grep test), no animated SVG `transform`.
-- **Manual:** the smoke matrix in `docs/qa/DARK_MODE_SMOKE_MATRIX.md` extended with the lesson screens.
+- **Manual:** the lesson screens checked in light and dark on a device.
 
 ## 12. Success measures
 

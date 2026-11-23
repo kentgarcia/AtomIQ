@@ -164,7 +164,7 @@ Ordered so the app builds and looks coherent after every step.
 4. **Shared controls.** Update `page-header.tsx`, `pressable-icon-button.tsx`, the tab bar, `beta-notice-modal.tsx`, and the guide `Pill` so the lip, border, and selected states match section 6. Build or extend one shared button and one shared selectable-card component so screens stop re-implementing them.
 5. **Feature palettes.** Normalize maze, lab, onboarding, myth, and achievement backgrounds to the neutral scale, as in 5.2.
 6. **Guard the rules.** Extend `scripts/check-theme-colors.mjs` to fail on `pageGradient*` in screens and `creamTint`, `creamBorder`, or amber/indigo roles once the aliases are gone. Add a unit test that every primary/surface/text pairing in sections 4.1–4.3 meets its contrast target (extend `scripts/test-option-contrast.mjs` or `theme/contrast.ts`).
-7. **Docs.** Update `THEME_EXCEPTION_REGISTER.md` for indigo Guide artwork and any retained gradients. Update `DARK_MODE_COMPLIANCE_SPEC.md` section 2 to point at this spec for the color values. Refresh `DARK_MODE_SMOKE_MATRIX.md` for the new palette.
+7. **Docs.** Update `THEME_EXCEPTION_REGISTER.md` for indigo Guide artwork and any retained gradients. Update `DARK_MODE_COMPLIANCE_SPEC.md` section 2 to point at this spec for the color values.
 
 ## 8. Acceptance criteria
 

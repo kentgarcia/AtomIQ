@@ -1,6 +1,6 @@
 # AtomIQ — UI Icon Integrity Specification
 
-**Status:** Draft for implementation  
+**Status:** Implemented (`check:icons`, `test:icons`)  
 **Date:** 2026-11-11  
 **Owner:** AtomIQ engineering  
 **Applies to:** Iconsax-backed UI icons rendered through `components/ui/icon.tsx`, lesson content, lab experiences, and non-tab-bar UI

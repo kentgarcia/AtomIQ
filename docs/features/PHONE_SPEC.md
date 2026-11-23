@@ -288,7 +288,7 @@ Phases 1 to 4 are independent after phase 0 and can run in any order; the order 
 
 ## 13. Files, checks and risks
 
-**Retired or moved:** `app/(tabs)/chat.tsx` (to `phone.tsx`), `components/guide/GuideLandingCards.tsx`, `GuideTeachers.tsx` and `ProfileProgressCard.tsx` (after confirming nothing else uses them; `GuideBubble`, `Pill` and `ContentCard` move into the chat thread), `docs/completed/CHAT_UI_GUIDE.md` (marked superseded). **Kept:** `services/guide/*` as Shrodi's engine, unrenamed to keep the churn small.
+**Retired or moved:** `app/(tabs)/chat.tsx` (to `phone.tsx`), `components/guide/GuideLandingCards.tsx`, `GuideTeachers.tsx` and `ProfileProgressCard.tsx` (after confirming nothing else uses them; `GuideBubble`, `Pill` and `ContentCard` move into the chat thread), `docs/completed/CHAT_UI_GUIDE.md` (deleted 2026-11-23). **Kept:** `services/guide/*` as Shrodi's engine, unrenamed to keep the churn small.
 
 **Updated in the same commit as phase 0:** `theme/tab-bar-metrics.ts` and `_layout.tsx` (label, icon), `hooks/use-android-back.ts`, `services/media-core.ts` and `scripts/test-media-policy.mjs` (`/chat` to `/phone`), `scripts/check-tab-bar-clearance.mjs`, `components/onboarding/HowStep.tsx` (it names the Guide; reword to the phone), `docs/features/NPC_FEED_SPEC.md` (the two lines in §1), `CLAUDE.md` (the Guide section becomes Phone), the unit-card strings that mention "Guide".
 
