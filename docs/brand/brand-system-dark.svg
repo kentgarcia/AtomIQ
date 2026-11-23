@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="332" viewBox="0 0 1200 332" role="img" aria-label="AtomIQ Visual Brand System">
+  <rect x="0" y="0" width="1200" height="332" rx="24" fill="#1A262C" stroke="#3C4D57" stroke-width="2"/>
+  <text x="28" y="32" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="13.5" font-weight="900" fill="#8FA3AD" letter-spacing="1.2">VISUAL BRAND SYSTEM · PALETTE &amp; TACTILE ANATOMY</text>
+  <text x="1172" y="32" text-anchor="end" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="12" font-weight="700" fill="#667985">theme/tokens.ts</text>
+
+  
+    <g transform="translate(32, 50)">
+      <!-- Tactile swatch block with visible 6px lip -->
+      <rect x="0" y="8" width="176" height="74" rx="16" fill="#D9981A"/>
+      <rect x="0" y="0" width="176" height="74" rx="16" fill="#F9B71F" />
+      <text x="14" y="30" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="14" font-weight="900" fill="#FFFFFF">Button Yellow</text>
+      <text x="14" y="54" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="12" font-weight="700" fill="#FFFFFF" opacity="0.92">#F9B71F</text>
+      <!-- Below caption -->
+      <text x="4" y="102" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="12" font-weight="700" fill="#8FA3AD">Primary CTA &amp; icon</text>
+      <text x="4" y="119" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="11" font-weight="600" fill="#667985">lip #D9981A</text>
+    </g>
+
+    <g transform="translate(224, 50)">
+      <!-- Tactile swatch block with visible 6px lip -->
+      <rect x="0" y="8" width="176" height="74" rx="16" fill="#C2410C"/>
+      <rect x="0" y="0" width="176" height="74" rx="16" fill="#EA580C" />
+      <text x="14" y="30" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="14" font-weight="900" fill="#FFFFFF">Signal Orange</text>
+      <text x="14" y="54" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="12" font-weight="700" fill="#FFFFFF" opacity="0.92">#EA580C</text>
+      <!-- Below caption -->
+      <text x="4" y="102" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="12" font-weight="700" fill="#8FA3AD">Brand accent &amp; tabs</text>
+      <text x="4" y="119" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="11" font-weight="600" fill="#667985">lip #C2410C</text>
+    </g>
+
+    <g transform="translate(416, 50)">
+      <!-- Tactile swatch block with visible 6px lip -->
+      <rect x="0" y="8" width="176" height="74" rx="16" fill="#5F42A0"/>
+      <rect x="0" y="0" width="176" height="74" rx="16" fill="#7F5AC2" />
+      <text x="14" y="30" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="14" font-weight="900" fill="#FFFFFF">Map Purple</text>
+      <text x="14" y="54" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="12" font-weight="700" fill="#FFFFFF" opacity="0.92">#7F5AC2</text>
+      <!-- Below caption -->
+      <text x="4" y="102" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="12" font-weight="700" fill="#8FA3AD">Quests &amp; Phone OS</text>
+      <text x="4" y="119" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="11" font-weight="600" fill="#667985">lip #5F42A0</text>
+    </g>
+
+    <g transform="translate(608, 50)">
+      <!-- Tactile swatch block with visible 6px lip -->
+      <rect x="0" y="8" width="176" height="74" rx="16" fill="#1899D6"/>
+      <rect x="0" y="0" width="176" height="74" rx="16" fill="#1CB0F6" />
+      <text x="14" y="30" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="14" font-weight="900" fill="#FFFFFF">Guide Blue</text>
+      <text x="14" y="54" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="12" font-weight="700" fill="#FFFFFF" opacity="0.92">#1CB0F6</text>
+      <!-- Below caption -->
+      <text x="4" y="102" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="12" font-weight="700" fill="#8FA3AD">Lessons &amp; chats</text>
+      <text x="4" y="119" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="11" font-weight="600" fill="#667985">lip #1899D6</text>
+    </g>
+
+    <g transform="translate(800, 50)">
+      <!-- Tactile swatch block with visible 6px lip -->
+      <rect x="0" y="8" width="176" height="74" rx="16" fill="#46A302"/>
+      <rect x="0" y="0" width="176" height="74" rx="16" fill="#58CC02" />
+      <text x="14" y="30" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="14" font-weight="900" fill="#FFFFFF">Lab Green</text>
+      <text x="14" y="54" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="12" font-weight="700" fill="#FFFFFF" opacity="0.92">#58CC02</text>
+      <!-- Below caption -->
+      <text x="4" y="102" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="12" font-weight="700" fill="#8FA3AD">Success &amp; Atom Maze</text>
+      <text x="4" y="119" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="11" font-weight="600" fill="#667985">lip #46A302</text>
+    </g>
+
+    <g transform="translate(992, 50)">
+      <!-- Tactile swatch block with visible 6px lip -->
+      <rect x="0" y="8" width="176" height="74" rx="16" fill="#131F24"/>
+      <rect x="0" y="0" width="176" height="74" rx="16" fill="#1F2C33" stroke="#3C4D57" stroke-width="1.5"/>
+      <text x="14" y="30" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="14" font-weight="900" fill="#F1F7FB">Dark Canvas</text>
+      <text x="14" y="54" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="12" font-weight="700" fill="#F1F7FB" opacity="0.92">#131F24</text>
+      <!-- Below caption -->
+      <text x="4" y="102" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="12" font-weight="700" fill="#8FA3AD">Night mode slate</text>
+      <text x="4" y="119" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="11" font-weight="600" fill="#667985">lip #1F2C33</text>
+    </g>
+
+  <!-- Divider -->
+  <line x1="28" y1="186" x2="1172" y2="186" stroke="#3C4D57" stroke-width="1.5"/>
+
+  <!-- Bottom Row: Left = Face & Lip Anatomy, Right = Design Principles -->
+  <g transform="translate(28, 204)">
+    <text x="0" y="14" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="12" font-weight="900" fill="#8FA3AD" letter-spacing="1">FACE &amp; LIP INTERACTION</text>
+
+    <!-- Resting button -->
+    <g transform="translate(0, 28)">
+      <rect x="0" y="6" width="174" height="44" rx="14" fill="#D9981A"/>
+      <rect x="0" y="0" width="174" height="44" rx="14" fill="#F9B71F"/>
+      <text x="87" y="27" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="14" font-weight="900" fill="#FFFFFF">START LESSON</text>
+      <text x="87" y="68" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="11" font-weight="600" fill="#667985">resting · 4px lip</text>
+    </g>
+
+    <!-- Arrow -->
+    <g transform="translate(190, 50)">
+      <line x1="0" y1="0" x2="28" y2="0" stroke="#667985" stroke-width="2.8" stroke-linecap="round"/>
+      <polyline points="22,-5 29,0 22,5" fill="none" stroke="#667985" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+
+    <!-- Pressed button -->
+    <g transform="translate(234, 28)">
+      <rect x="0" y="6" width="174" height="44" rx="14" fill="#F9B71F"/>
+      <text x="87" y="33" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="14" font-weight="900" fill="#FFFFFF">START LESSON</text>
+      <text x="87" y="68" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="11" font-weight="600" fill="#667985">pressed · sinks 4px</text>
+    </g>
+  </g>
+
+  <!-- Right half: 4 Brand Pillar Pills -->
+  <g transform="translate(490, 204)">
+    <text x="0" y="14" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="12" font-weight="900" fill="#8FA3AD" letter-spacing="1">DESIGN RULES ENFORCED IN CI</text>
+
+    <g transform="translate(0, 28)">
+      <rect x="0" y="0" width="330" height="32" rx="10" fill="#1F2C33" stroke="#3C4D57" stroke-width="1.5"/>
+      <circle cx="16" cy="16" r="5" fill="#F9B71F"/>
+      <text x="29" y="20" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="12.5" font-weight="700" fill="#F1F7FB">Flat vector art — zero glossy gradients</text>
+
+      <rect x="344" y="0" width="336" height="32" rx="10" fill="#1F2C33" stroke="#3C4D57" stroke-width="1.5"/>
+      <circle cx="360" cy="16" r="5" fill="#1CB0F6"/>
+      <text x="373" y="20" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="12.5" font-weight="700" fill="#F1F7FB">Juicy under 300ms · reduced-motion ready</text>
+
+      <rect x="0" y="42" width="330" height="32" rx="10" fill="#1F2C33" stroke="#3C4D57" stroke-width="1.5"/>
+      <circle cx="16" cy="58" r="5" fill="#58CC02"/>
+      <text x="29" y="62" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="12.5" font-weight="700" fill="#F1F7FB">Calm, verified science before every publish</text>
+
+      <rect x="344" y="42" width="336" height="32" rx="10" fill="#1F2C33" stroke="#3C4D57" stroke-width="1.5"/>
+      <circle cx="360" cy="58" r="5" fill="#EA580C"/>
+      <text x="373" y="62" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="12.5" font-weight="700" fill="#F1F7FB">100% theme tokens · checked by CI gates</text>
+    </g>
+  </g>
+</svg>

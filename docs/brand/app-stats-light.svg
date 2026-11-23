@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="114" viewBox="0 0 1200 114" role="img" aria-label="AtomIQ Content and Engineering Metrics">
+  <rect x="0" y="0" width="1200" height="114" rx="22" fill="#F7F7F7" stroke="#E5E5E5" stroke-width="2"/>
+  
+    <g transform="translate(19, 14)">
+      <rect x="0" y="5" width="154" height="82" rx="16" fill="#E5E5E5"/>
+      <rect x="0" y="0" width="154" height="82" rx="16" fill="#FFFFFF" stroke="#E5E5E5" stroke-width="2"/>
+      <rect x="14" y="10" width="32" height="5" rx="2.5" fill="#F9B71F"/>
+      <text x="14" y="47" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="28" font-weight="900" fill="#3C3C3C" letter-spacing="-0.5">4</text>
+      <text x="14" y="69" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="12" font-weight="700" fill="#737373">Live Units</text>
+    </g>
+
+    <g transform="translate(187, 14)">
+      <rect x="0" y="5" width="154" height="82" rx="16" fill="#E5E5E5"/>
+      <rect x="0" y="0" width="154" height="82" rx="16" fill="#FFFFFF" stroke="#E5E5E5" stroke-width="2"/>
+      <rect x="14" y="10" width="32" height="5" rx="2.5" fill="#EA580C"/>
+      <text x="14" y="47" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="28" font-weight="900" fill="#3C3C3C" letter-spacing="-0.5">20</text>
+      <text x="14" y="69" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="12" font-weight="700" fill="#737373">Visual Lessons</text>
+    </g>
+
+    <g transform="translate(355, 14)">
+      <rect x="0" y="5" width="154" height="82" rx="16" fill="#E5E5E5"/>
+      <rect x="0" y="0" width="154" height="82" rx="16" fill="#FFFFFF" stroke="#E5E5E5" stroke-width="2"/>
+      <rect x="14" y="10" width="32" height="5" rx="2.5" fill="#1CB0F6"/>
+      <text x="14" y="47" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="28" font-weight="900" fill="#3C3C3C" letter-spacing="-0.5">245</text>
+      <text x="14" y="69" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="12" font-weight="700" fill="#737373">Practice Items</text>
+    </g>
+
+    <g transform="translate(523, 14)">
+      <rect x="0" y="5" width="154" height="82" rx="16" fill="#E5E5E5"/>
+      <rect x="0" y="0" width="154" height="82" rx="16" fill="#FFFFFF" stroke="#E5E5E5" stroke-width="2"/>
+      <rect x="14" y="10" width="32" height="5" rx="2.5" fill="#7F5AC2"/>
+      <text x="14" y="47" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="28" font-weight="900" fill="#3C3C3C" letter-spacing="-0.5">120</text>
+      <text x="14" y="69" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="12" font-weight="700" fill="#737373">AtomDex Terms</text>
+    </g>
+
+    <g transform="translate(691, 14)">
+      <rect x="0" y="5" width="154" height="82" rx="16" fill="#E5E5E5"/>
+      <rect x="0" y="0" width="154" height="82" rx="16" fill="#FFFFFF" stroke="#E5E5E5" stroke-width="2"/>
+      <rect x="14" y="10" width="32" height="5" rx="2.5" fill="#58CC02"/>
+      <text x="14" y="47" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="28" font-weight="900" fill="#3C3C3C" letter-spacing="-0.5">150</text>
+      <text x="14" y="69" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="12" font-weight="700" fill="#737373">MythBuster Qs</text>
+    </g>
+
+    <g transform="translate(859, 14)">
+      <rect x="0" y="5" width="154" height="82" rx="16" fill="#E5E5E5"/>
+      <rect x="0" y="0" width="154" height="82" rx="16" fill="#FFFFFF" stroke="#E5E5E5" stroke-width="2"/>
+      <rect x="14" y="10" width="32" height="5" rx="2.5" fill="#FF7878"/>
+      <text x="14" y="47" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="28" font-weight="900" fill="#3C3C3C" letter-spacing="-0.5">17</text>
+      <text x="14" y="69" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="12" font-weight="700" fill="#737373">Phone Apps</text>
+    </g>
+
+    <g transform="translate(1027, 14)">
+      <rect x="0" y="5" width="154" height="82" rx="16" fill="#E5E5E5"/>
+      <rect x="0" y="0" width="154" height="82" rx="16" fill="#FFFFFF" stroke="#E5E5E5" stroke-width="2"/>
+      <rect x="14" y="10" width="32" height="5" rx="2.5" fill="#00B8D4"/>
+      <text x="14" y="47" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="28" font-weight="900" fill="#3C3C3C" letter-spacing="-0.5">90</text>
+      <text x="14" y="69" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="12" font-weight="700" fill="#737373">Test Suites</text>
+    </g>
+</svg>

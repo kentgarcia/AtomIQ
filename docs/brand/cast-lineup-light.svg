@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="306" viewBox="0 0 1200 306" role="img" aria-label="Meet the AtomIQ Cast of Teachers">
+  <rect x="0" y="0" width="1200" height="306" rx="24" fill="#F7F7F7" stroke="#E5E5E5" stroke-width="2"/>
+  <text x="28" y="34" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="14" font-weight="900" fill="#737373" letter-spacing="1.2">THE FACULTY · 7 VOICED CHARACTERS · 4 LIVE UNITS</text>
+  <text x="1172" y="34" text-anchor="end" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="13" font-weight="700" fill="#9A9A9A">Guided by Shrodi</text>
+  
+    <g transform="translate(19, 54)">
+      <defs>
+        <clipPath id="npc_clip_light_hal">
+          <rect x="6" y="6" width="142" height="148" rx="16" ry="16"/>
+        </clipPath>
+      </defs>
+      <!-- Outer card lip & face -->
+      <rect x="0" y="5" width="154" height="236" rx="20" fill="#E5E5E5"/>
+      <rect x="0" y="0" width="154" height="236" rx="20" fill="#FFFFFF" stroke="#E5E5E5" stroke-width="2"/>
+
+      <!-- Colored teacher cover well with tactile lip -->
+      <rect x="6" y="10" width="142" height="148" rx="16" fill="#E7A601"/>
+      <rect x="6" y="6" width="142" height="148" rx="16" fill="#FFC800"/>
+      <!-- Subtle lighter circle behind portrait -->
+      <g clip-path="url(#npc_clip_light_hal)">
+        <circle cx="77" cy="100" r="54" fill="#FFFFFF" opacity="0.22"/>
+        <!-- Real AtomIQ flat-vector NPC bust -->
+        <g transform="translate(77, 102) scale(0.62)">
+          <path d="M-75 -47a19 19 0 1 0 38 0a19 19 0 1 0 -38 0Z" fill="#E7A601"/><path d="M-64 -69a22 22 0 1 0 44 0a22 22 0 1 0 -44 0Z" fill="#E7A601"/><path d="M-38 -81a22 22 0 1 0 44 0a22 22 0 1 0 -44 0Z" fill="#E7A601"/><path d="M-6 -83a22 22 0 1 0 44 0a22 22 0 1 0 -44 0Z" fill="#E7A601"/><path d="M22 -71a22 22 0 1 0 44 0a22 22 0 1 0 -44 0Z" fill="#E7A601"/><path d="M41 -47a19 19 0 1 0 38 0a19 19 0 1 0 -38 0Z" fill="#E7A601"/><path d="M-32 -63a34 34 0 1 0 68 0a34 34 0 1 0 -68 0Z" fill="#E7A601"/><path d="M-77 -52a19 19 0 1 0 38 0a19 19 0 1 0 -38 0Z" fill="#FFB100"/><path d="M-66 -74a22 22 0 1 0 44 0a22 22 0 1 0 -44 0Z" fill="#FFB100"/><path d="M-40 -86a22 22 0 1 0 44 0a22 22 0 1 0 -44 0Z" fill="#FFB100"/><path d="M-8 -88a22 22 0 1 0 44 0a22 22 0 1 0 -44 0Z" fill="#FFB100"/><path d="M20 -76a22 22 0 1 0 44 0a22 22 0 1 0 -44 0Z" fill="#FFB100"/><path d="M39 -52a19 19 0 1 0 38 0a19 19 0 1 0 -38 0Z" fill="#FFB100"/><path d="M-34 -68a34 34 0 1 0 68 0a34 34 0 1 0 -68 0Z" fill="#FFB100"/><path d="M-56 -15V-50C-60 -70 -34 -84 0 -84C34 -84 60 -70 56 -50V-15Z" fill="#FFB100"/><path d="M-8 40H8A6 6 0 0 1 14 46V74A6 6 0 0 1 8 80H-8A6 6 0 0 1 -14 74V46A6 6 0 0 1 -8 40Z" fill="#FFCBA3"/><path d="M-8 40H8A6 6 0 0 1 14 46V48A6 6 0 0 1 8 54H-8A6 6 0 0 1 -14 48V46A6 6 0 0 1 -8 40Z" fill="#E99B5F"/><path d="M-40.38 107.76H40.38Q64.38 107.76 50.38 88.56A72 72 0 0 0 -50.38 88.56Q-64.38 107.76 -40.38 107.76Z" fill="#D2E4E8"/><path d="M-30.34 71.11Q-34 64 -26 64L26 64Q34 64 30.34 71.11L3.66 122.89Q0 130 -3.66 122.89Z" fill="#2B70C9"/><path d="M-14 62H14A8 8 0 0 1 22 70V70A8 8 0 0 1 14 78H-14A8 8 0 0 1 -22 70V70A8 8 0 0 1 -14 62Z" fill="#1453A3"/><path d="M-48.66 89.72Q-52 86 -48.66 82.28L-37.34 69.72Q-34 66 -31.65 70.42L-2.35 125.58Q0 130 -5 130L-8 130Q-13 130 -16.29 126.24L-30.71 109.76Q-34 106 -37.34 102.28Z" fill="#C0D5DD"/><path d="M37.34 102.28Q34 106 30.71 109.76L16.29 126.24Q13 130 8 130L5 130Q0 130 2.35 125.58L31.65 70.42Q34 66 37.34 69.72L48.66 82.28Q52 86 48.66 89.72Z" fill="#C0D5DD"/><path d="M26 122H48A6 6 0 0 1 54 128V144A6 6 0 0 1 48 150H26A6 6 0 0 1 20 144V128A6 6 0 0 1 26 122Z" fill="#C0D5DD"/><path d="M30 108H30A3 3 0 0 1 33 111V123A3 3 0 0 1 30 126H30A3 3 0 0 1 27 123V111A3 3 0 0 1 30 108Z" fill="#FF4B4B"/><path d="M41 111H41A3 3 0 0 1 44 114V123A3 3 0 0 1 41 126H41A3 3 0 0 1 38 123V114A3 3 0 0 1 41 111Z" fill="#2B70C9"/><path d="M-53.35 93.98Q-53 90 -49.21 88.74L-44.79 87.26Q-41 86 -41.24 89.99L-46.76 180.01Q-47 184 -50.96 183.43L-57.04 182.57Q-61 182 -60.65 178.02Z" fill="#A56644"/><path d="M-83 172H-45A11 11 0 0 1 -34 183V215A11 11 0 0 1 -45 226H-83A11 11 0 0 1 -94 215V183A11 11 0 0 1 -83 172Z" fill="#A56644"/><path d="M-83 172H-45A11 11 0 0 1 -34 183V186A11 11 0 0 1 -45 197H-83A11 11 0 0 1 -94 186V183A11 11 0 0 1 -83 172Z" fill="#8E5236"/><path d="M-66.5 190H-61.5A3.5 3.5 0 0 1 -58 193.5V195.5A3.5 3.5 0 0 1 -61.5 199H-66.5A3.5 3.5 0 0 1 -70 195.5V193.5A3.5 3.5 0 0 1 -66.5 190Z" fill="#FFC800"/><path d="M-74.5 212a10.5 10.5 0 1 0 21 0a10.5 10.5 0 1 0 -21 0Z" fill="#FFC800"/><path d="M-67.82 205.38Q-68.2 204.73 -67.5 204.44L-66.87 204.18Q-66.17 203.89 -65.42 203.79L-64.75 203.7Q-64 203.6 -63.25 203.7L-62.58 203.79Q-61.83 203.89 -61.13 204.18L-60.5 204.44Q-59.8 204.73 -60.18 205.38L-62.41 209.25Q-62.74 209.82 -63.37 209.65L-63.37 209.65Q-64 209.48 -64.63 209.65L-64.63 209.65Q-65.26 209.82 -65.59 209.25Z" fill="#3C3C3C"/><path d="M-56.36 212Q-55.6 212 -55.7 212.75L-55.79 213.42Q-55.89 214.17 -56.18 214.87L-56.44 215.5Q-56.73 216.2 -57.19 216.8L-57.6 217.34Q-58.06 217.94 -58.66 218.4L-59.2 218.81Q-59.8 219.27 -60.18 218.62L-62.41 214.75Q-62.74 214.18 -62.28 213.72L-62.28 213.72Q-61.82 213.26 -61.65 212.63L-61.65 212.63Q-61.48 212 -60.83 212Z" fill="#3C3C3C"/><path d="M-67.82 218.62Q-68.2 219.27 -68.8 218.81L-69.34 218.4Q-69.94 217.94 -70.4 217.34L-70.81 216.8Q-71.27 216.2 -71.56 215.5L-71.82 214.87Q-72.11 214.17 -72.21 213.42L-72.3 212.75Q-72.4 212 -71.64 212L-67.17 212Q-66.52 212 -66.35 212.63L-66.35 212.63Q-66.18 213.26 -65.72 213.72L-65.72 213.72Q-65.26 214.18 -65.59 214.75Z" fill="#3C3C3C"/><path d="M-65.43 212a1.43 1.43 0 1 0 2.86 0a1.43 1.43 0 1 0 -2.86 0Z" fill="#3C3C3C"/><path d="M-64 2a11 11 0 1 0 22 0a11 11 0 1 0 -22 0Z" fill="#FFCBA3"/><path d="M42 2a11 11 0 1 0 22 0a11 11 0 1 0 -22 0Z" fill="#FFCBA3"/><path d="M0 -66H0A53 53 0 0 1 53 -13V3A53 53 0 0 1 0 56H0A53 53 0 0 1 -53 3V-13A53 53 0 0 1 0 -66Z" fill="#FFCBA3"/><path d="M-19.5 -28H-19.5A15 15 0 0 1 -4.5 -13V-3A15 15 0 0 1 -19.5 12H-19.5A15 15 0 0 1 -34.5 -3V-13A15 15 0 0 1 -19.5 -28Z" fill="#FFFFFF"/><path d="M-17 -21H-17A6.5 6.5 0 0 1 -10.5 -14.5V-7.5A6.5 6.5 0 0 1 -17 -1H-17A6.5 6.5 0 0 1 -23.5 -7.5V-14.5A6.5 6.5 0 0 1 -17 -21Z" fill="#3C3C3C"/><path d="M-22.66 -16.6a2.8 2.8 0 1 0 5.6 0a2.8 2.8 0 1 0 -5.6 0Z" fill="#FFFFFF"/><path d="M19.5 -28H19.5A15 15 0 0 1 34.5 -13V-3A15 15 0 0 1 19.5 12H19.5A15 15 0 0 1 4.5 -3V-13A15 15 0 0 1 19.5 -28Z" fill="#FFFFFF"/><path d="M17 -21H17A6.5 6.5 0 0 1 23.5 -14.5V-7.5A6.5 6.5 0 0 1 17 -1H17A6.5 6.5 0 0 1 10.5 -7.5V-14.5A6.5 6.5 0 0 1 17 -21Z" fill="#3C3C3C"/><path d="M11.34 -16.6a2.8 2.8 0 1 0 5.6 0a2.8 2.8 0 1 0 -5.6 0Z" fill="#FFFFFF"/><path d="M-6.5 6a7.5 7.5 0 1 0 15 0a7.5 7.5 0 1 0 -15 0Z" fill="#E99B5F"/><path d="M-8 28Q3 37 15 24" fill="none" stroke="#E99B5F" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><path d="M-56 -15V-50C-60 -70 -34 -84 0 -84C34 -84 60 -70 56 -50V-15ZM-46 -15V-30C-46 -34 -38 -37 -24 -39C-8 -41 6 -44 16 -54C22 -44 36 -38 46 -32V-15Z" fill="#FFB100" fill-rule="evenodd"/><path d="M-56 -15a5 5 0 1 0 10 0a5 5 0 1 0 -10 0Z" fill="#FFB100"/><path d="M46 -15a5 5 0 1 0 10 0a5 5 0 1 0 -10 0Z" fill="#FFB100"/>
+        </g>
+      </g>
+
+      <!-- Unit pill overlapping top-left -->
+      <rect x="12" y="12" width="56" height="22" rx="11" fill="#FFFFFF" opacity="0.92"/>
+      <text x="40" y="27" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="10.5" font-weight="800" fill="#5B3800">Unit 1</text>
+
+      <!-- Name & Topic -->
+      <text x="77" y="186" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="18" font-weight="900" fill="#3C3C3C">Hal</text>
+      <text x="77" y="208" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="12" font-weight="700" fill="#737373">Inside the Atom</text>
+      <!-- Tiny signature color bar -->
+      <rect x="59" y="219" width="36" height="5" rx="2.5" fill="#FFC800"/>
+    </g>
+
+    <g transform="translate(187, 54)">
+      <defs>
+        <clipPath id="npc_clip_light_ada">
+          <rect x="6" y="6" width="142" height="148" rx="16" ry="16"/>
+        </clipPath>
+      </defs>
+      <!-- Outer card lip & face -->
+      <rect x="0" y="5" width="154" height="236" rx="20" fill="#E5E5E5"/>
+      <rect x="0" y="0" width="154" height="236" rx="20" fill="#FFFFFF" stroke="#E5E5E5" stroke-width="2"/>
+
+      <!-- Colored teacher cover well with tactile lip -->
+      <rect x="6" y="10" width="142" height="148" rx="16" fill="#F58BC7"/>
+      <rect x="6" y="6" width="142" height="148" rx="16" fill="#FFAADE"/>
+      <!-- Subtle lighter circle behind portrait -->
+      <g clip-path="url(#npc_clip_light_ada)">
+        <circle cx="77" cy="100" r="54" fill="#FFFFFF" opacity="0.22"/>
+        <!-- Real AtomIQ flat-vector NPC bust -->
+        <g transform="translate(77, 102) scale(0.62)">
+          <path d="M-80 -15a28 28 0 1 0 56 0a28 28 0 1 0 -56 0Z" fill="#64311D"/><path d="M-87 -37a23 23 0 1 0 46 0a23 23 0 1 0 -46 0Z" fill="#64311D"/><path d="M-88 -1a23 23 0 1 0 46 0a23 23 0 1 0 -46 0Z" fill="#64311D"/><path d="M-86 35a23 23 0 1 0 46 0a23 23 0 1 0 -46 0Z" fill="#64311D"/><path d="M-72 61a16 16 0 1 0 32 0a16 16 0 1 0 -32 0Z" fill="#64311D"/><path d="M-78 -20a28 28 0 1 0 56 0a28 28 0 1 0 -56 0Z" fill="#7C3F25"/><path d="M-85 -42a23 23 0 1 0 46 0a23 23 0 1 0 -46 0Z" fill="#7C3F25"/><path d="M-86 -6a23 23 0 1 0 46 0a23 23 0 1 0 -46 0Z" fill="#7C3F25"/><path d="M-84 30a23 23 0 1 0 46 0a23 23 0 1 0 -46 0Z" fill="#7C3F25"/><path d="M-70 56a16 16 0 1 0 32 0a16 16 0 1 0 -32 0Z" fill="#7C3F25"/><path d="M24 -15a28 28 0 1 0 56 0a28 28 0 1 0 -56 0Z" fill="#64311D"/><path d="M41 -37a23 23 0 1 0 46 0a23 23 0 1 0 -46 0Z" fill="#64311D"/><path d="M42 -1a23 23 0 1 0 46 0a23 23 0 1 0 -46 0Z" fill="#64311D"/><path d="M40 35a23 23 0 1 0 46 0a23 23 0 1 0 -46 0Z" fill="#64311D"/><path d="M40 61a16 16 0 1 0 32 0a16 16 0 1 0 -32 0Z" fill="#64311D"/><path d="M22 -20a28 28 0 1 0 56 0a28 28 0 1 0 -56 0Z" fill="#7C3F25"/><path d="M39 -42a23 23 0 1 0 46 0a23 23 0 1 0 -46 0Z" fill="#7C3F25"/><path d="M40 -6a23 23 0 1 0 46 0a23 23 0 1 0 -46 0Z" fill="#7C3F25"/><path d="M38 30a23 23 0 1 0 46 0a23 23 0 1 0 -46 0Z" fill="#7C3F25"/><path d="M38 56a16 16 0 1 0 32 0a16 16 0 1 0 -32 0Z" fill="#7C3F25"/><path d="M-56 -15V-50C-60 -82 -34 -96 0 -96C34 -96 60 -82 56 -50V-15Z" fill="#7C3F25"/><path d="M-8 40H8A6 6 0 0 1 14 46V74A6 6 0 0 1 8 80H-8A6 6 0 0 1 -14 74V46A6 6 0 0 1 -8 40Z" fill="#FFD9C2"/><path d="M-8 40H8A6 6 0 0 1 14 46V48A6 6 0 0 1 8 54H-8A6 6 0 0 1 -14 48V46A6 6 0 0 1 -8 40Z" fill="#EBA17E"/><path d="M-40.38 107.76H40.38Q64.38 107.76 50.38 88.56A72 72 0 0 0 -50.38 88.56Q-64.38 107.76 -40.38 107.76Z" fill="#FFAADE"/><path d="M-39 100L-39 79.48A72 72 0 0 1 -24 72.12L-24 100Z" fill="#FFCE8E"/><path d="M24 100L24 72.12A72 72 0 0 1 39 79.48L39 100Z" fill="#FFCE8E"/><path d="M-25 90H25A14 14 0 0 1 39 104V246A14 14 0 0 1 25 260H-25A14 14 0 0 1 -39 246V104A14 14 0 0 1 -25 90Z" fill="#FFCE8E"/><path d="M-16 154H16A9 9 0 0 1 25 163V179A9 9 0 0 1 16 188H-16A9 9 0 0 1 -25 179V163A9 9 0 0 1 -16 154Z" fill="#E5A259"/><path d="M-33.68 86.16Q-37 80 -31.34 75.88L-20.66 68.12Q-15 64 -11.19 69.87L-5.19 79.09Q-2 84 -4 89.5L-4 89.5Q-6 95 -11.83 94.51L-23.02 93.58Q-30 93 -33.32 86.84Z" fill="#FFFFFF"/><path d="M33.32 86.84Q30 93 23.02 93.58L11.83 94.51Q6 95 4 89.5L4 89.5Q2 84 5.19 79.09L11.19 69.87Q15 64 20.66 68.12L31.34 75.88Q37 80 33.68 86.16Z" fill="#FFFFFF"/><path d="M-16 114a16 16 0 1 0 32 0a16 16 0 1 0 -32 0Z" fill="#CE82FF"/><path d="M-12.6 114a12.6 12.6 0 1 0 25.2 0a12.6 12.6 0 1 0 -25.2 0Z" fill="#FFFFFF"/><path d="M-5.1 105.17Q-5.6 104.3 -4.67 103.91L-3.83 103.57Q-2.9 103.18 -1.9 103.05L-1 102.93Q0 102.8 1 102.93L1.9 103.05Q2.9 103.18 3.83 103.57L4.67 103.91Q5.6 104.3 5.1 105.17L2.11 110.34Q1.68 111.09 0.84 110.87L0.84 110.87Q0 110.64 -0.84 110.87L-0.84 110.87Q-1.68 111.09 -2.11 110.34Z" fill="#9069CD"/><path d="M10.19 114Q11.2 114 11.07 115L10.95 115.9Q10.82 116.9 10.43 117.83L10.09 118.67Q9.7 119.6 9.09 120.4L8.53 121.12Q7.92 121.92 7.12 122.53L6.4 123.09Q5.6 123.7 5.1 122.83L2.11 117.66Q1.68 116.91 2.29 116.29L2.29 116.29Q2.91 115.68 3.13 114.84L3.13 114.84Q3.36 114 4.23 114Z" fill="#9069CD"/><path d="M-5.1 122.83Q-5.6 123.7 -6.4 123.09L-7.12 122.53Q-7.92 121.92 -8.53 121.12L-9.09 120.4Q-9.7 119.6 -10.09 118.67L-10.43 117.83Q-10.82 116.9 -10.95 115.9L-11.07 115Q-11.2 114 -10.19 114L-4.23 114Q-3.36 114 -3.13 114.84L-3.13 114.84Q-2.91 115.68 -2.29 116.29L-2.29 116.29Q-1.68 116.91 -2.11 117.66Z" fill="#9069CD"/><path d="M-1.9 114a1.9 1.9 0 1 0 3.81 0a1.9 1.9 0 1 0 -3.81 0Z" fill="#9069CD"/><path d="M-62 2a11 11 0 1 0 22 0a11 11 0 1 0 -22 0Z" fill="#FFD9C2"/><path d="M40 2a11 11 0 1 0 22 0a11 11 0 1 0 -22 0Z" fill="#FFD9C2"/><path d="M-51 -15A51 51 0 0 1 51 -15V30A26 26 0 0 1 25 56H-25A26 26 0 0 1 -51 30Z" fill="#FFD9C2"/><path d="M-37.5 -6a18 18 0 1 0 36 0a18 18 0 1 0 -36 0Z" fill="#FFFFFF"/><path d="M-27 -11a9.5 9.5 0 1 0 19 0a9.5 9.5 0 1 0 -19 0Z" fill="#3C3C3C"/><path d="M-22.7 -14a2.6 2.6 0 1 0 5.2 0a2.6 2.6 0 1 0 -5.2 0Z" fill="#FFFFFF"/><path d="M-15.4 -6.2a1.5 1.5 0 1 0 3 0a1.5 1.5 0 1 0 -3 0Z" fill="#FFFFFF"/><path d="M1.5 -6a18 18 0 1 0 36 0a18 18 0 1 0 -36 0Z" fill="#FFFFFF"/><path d="M8 -11a9.5 9.5 0 1 0 19 0a9.5 9.5 0 1 0 -19 0Z" fill="#3C3C3C"/><path d="M12.3 -14a2.6 2.6 0 1 0 5.2 0a2.6 2.6 0 1 0 -5.2 0Z" fill="#FFFFFF"/><path d="M19.6 -6.2a1.5 1.5 0 1 0 3 0a1.5 1.5 0 1 0 -3 0Z" fill="#FFFFFF"/><path d="M2 -13H2A4 4 0 0 1 6 -9V5A4 4 0 0 1 2 9H2A4 4 0 0 1 -2 5V-9A4 4 0 0 1 2 -13Z" fill="#EBA17E"/><path d="M-4.5 9a6.5 6.5 0 1 0 13 0a6.5 6.5 0 1 0 -13 0Z" fill="#EBA17E"/><path d="M-38.5 17.5H-31.5A6.5 6.5 0 0 1 -25 24V24A6.5 6.5 0 0 1 -31.5 30.5H-38.5A6.5 6.5 0 0 1 -45 24V24A6.5 6.5 0 0 1 -38.5 17.5Z" fill="#F5A4A4"/><path d="M31.5 17.5H38.5A6.5 6.5 0 0 1 45 24V24A6.5 6.5 0 0 1 38.5 30.5H31.5A6.5 6.5 0 0 1 25 24V24A6.5 6.5 0 0 1 31.5 17.5Z" fill="#F5A4A4"/><path d="M-8 28Q3 37 15 24" fill="none" stroke="#EBA17E" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><path d="M-56 -15V-50C-60 -82 -34 -96 0 -96C34 -96 60 -82 56 -50V-15ZM-46 -15V-30C-46 -38 -38 -40 -28 -44C-14 -49 -6 -54 0 -62C6 -54 14 -49 28 -44C38 -40 46 -38 46 -30V-15Z" fill="#7C3F25" fill-rule="evenodd"/><path d="M-56 -15a5 5 0 1 0 10 0a5 5 0 1 0 -10 0Z" fill="#7C3F25"/><path d="M46 -15a5 5 0 1 0 10 0a5 5 0 1 0 -10 0Z" fill="#7C3F25"/><path d="M42.88 -52.2Q52 -60 41.4 -65.63L26.96 -73.31Q16.36 -78.94 14.73 -67.05L14.06 -62.17Q12.7 -52.26 20.46 -45.95L20.46 -45.95Q28.22 -39.64 35.82 -46.15Z" fill="#CE82FF"/><path d="M63.71 -57.39Q52 -60 58.71 -69.95L67.86 -83.51Q74.58 -93.46 81.6 -83.72L84.48 -79.73Q90.33 -71.62 86.44 -62.4L86.44 -62.4Q82.56 -53.19 72.79 -55.37Z" fill="#CE82FF"/><path d="M43.5 -60a8.5 8.5 0 1 0 17 0a8.5 8.5 0 1 0 -17 0Z" fill="#9069CD"/><path d="M-63.71 -57.39Q-52 -60 -58.71 -69.95L-67.86 -83.51Q-74.58 -93.46 -81.6 -83.72L-84.48 -79.73Q-90.33 -71.62 -86.44 -62.4L-86.44 -62.4Q-82.56 -53.19 -72.79 -55.37Z" fill="#CE82FF"/><path d="M-42.88 -52.2Q-52 -60 -41.4 -65.63L-26.96 -73.31Q-16.36 -78.94 -14.73 -67.05L-14.06 -62.17Q-12.7 -52.26 -20.46 -45.95L-20.46 -45.95Q-28.22 -39.64 -35.82 -46.15Z" fill="#CE82FF"/><path d="M-60.5 -60a8.5 8.5 0 1 0 17 0a8.5 8.5 0 1 0 -17 0Z" fill="#9069CD"/>
+        </g>
+      </g>
+
+      <!-- Unit pill overlapping top-left -->
+      <rect x="12" y="12" width="56" height="22" rx="11" fill="#FFFFFF" opacity="0.92"/>
+      <text x="40" y="27" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="10.5" font-weight="800" fill="#6B1B49">Unit 2</text>
+
+      <!-- Name & Topic -->
+      <text x="77" y="186" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="18" font-weight="900" fill="#3C3C3C">Ada</text>
+      <text x="77" y="208" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="12" font-weight="700" fill="#737373">Radioactivity</text>
+      <!-- Tiny signature color bar -->
+      <rect x="59" y="219" width="36" height="5" rx="2.5" fill="#FFAADE"/>
+    </g>
+
+    <g transform="translate(355, 54)">
+      <defs>
+        <clipPath id="npc_clip_light_ray">
+          <rect x="6" y="6" width="142" height="148" rx="16" ry="16"/>
+        </clipPath>
+      </defs>
+      <!-- Outer card lip & face -->
+      <rect x="0" y="5" width="154" height="236" rx="20" fill="#E5E5E5"/>
+      <rect x="0" y="0" width="154" height="236" rx="20" fill="#FFFFFF" stroke="#E5E5E5" stroke-width="2"/>
+
+      <!-- Colored teacher cover well with tactile lip -->
+      <rect x="6" y="10" width="142" height="148" rx="16" fill="#9069CD"/>
+      <rect x="6" y="6" width="142" height="148" rx="16" fill="#CE82FF"/>
+      <!-- Subtle lighter circle behind portrait -->
+      <g clip-path="url(#npc_clip_light_ray)">
+        <circle cx="77" cy="100" r="54" fill="#FFFFFF" opacity="0.22"/>
+        <!-- Real AtomIQ flat-vector NPC bust -->
+        <g transform="translate(77, 102) scale(0.62)">
+          <path d="M-8 40H8A6 6 0 0 1 14 46V74A6 6 0 0 1 8 80H-8A6 6 0 0 1 -14 74V46A6 6 0 0 1 -8 40Z" fill="#7A4A33"/><path d="M-8 40H8A6 6 0 0 1 14 46V48A6 6 0 0 1 8 54H-8A6 6 0 0 1 -14 48V46A6 6 0 0 1 -8 40Z" fill="#4D2C1D"/><path d="M-24 63H24A11 11 0 0 1 35 74V74A11 11 0 0 1 24 85H-24A11 11 0 0 1 -35 74V74A11 11 0 0 1 -24 63Z" fill="#9069CD"/><path d="M-41.6 107.76H41.6Q65.6 107.76 51.19 88.56A74 74 0 0 0 -51.19 88.56Q-65.6 107.76 -41.6 107.76Z" fill="#CE82FF"/><path d="M-15 64H15A8 8 0 0 1 23 72V72A8 8 0 0 1 15 80H-15A8 8 0 0 1 -23 72V72A8 8 0 0 1 -15 64Z" fill="#9069CD"/><path d="M-9 82V108" fill="none" stroke="#FFFFFF" stroke-width="4.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M9 82V104" fill="none" stroke="#FFFFFF" stroke-width="4.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M-60 2a11 11 0 1 0 22 0a11 11 0 1 0 -22 0Z" fill="#7A4A33"/><path d="M38 2a11 11 0 1 0 22 0a11 11 0 1 0 -22 0Z" fill="#7A4A33"/><path d="M-49 -17A49 49 0 0 1 49 -17V30A26 26 0 0 1 23 56H-23A26 26 0 0 1 -49 30Z" fill="#7A4A33"/><path d="M-19.5 -28H-19.5A15 15 0 0 1 -4.5 -13V-3A15 15 0 0 1 -19.5 12H-19.5A15 15 0 0 1 -34.5 -3V-13A15 15 0 0 1 -19.5 -28Z" fill="#FFFFFF"/><path d="M-17 -21H-17A6.5 6.5 0 0 1 -10.5 -14.5V-7.5A6.5 6.5 0 0 1 -17 -1H-17A6.5 6.5 0 0 1 -23.5 -7.5V-14.5A6.5 6.5 0 0 1 -17 -21Z" fill="#3C3C3C"/><path d="M-22.66 -16.6a2.8 2.8 0 1 0 5.6 0a2.8 2.8 0 1 0 -5.6 0Z" fill="#FFFFFF"/><path d="M19.5 -28H19.5A15 15 0 0 1 34.5 -13V-3A15 15 0 0 1 19.5 12H19.5A15 15 0 0 1 4.5 -3V-13A15 15 0 0 1 19.5 -28Z" fill="#FFFFFF"/><path d="M17 -21H17A6.5 6.5 0 0 1 23.5 -14.5V-7.5A6.5 6.5 0 0 1 17 -1H17A6.5 6.5 0 0 1 10.5 -7.5V-14.5A6.5 6.5 0 0 1 17 -21Z" fill="#3C3C3C"/><path d="M11.34 -16.6a2.8 2.8 0 1 0 5.6 0a2.8 2.8 0 1 0 -5.6 0Z" fill="#FFFFFF"/><path d="M1 -14H1A5 5 0 0 1 6 -9V3A5 5 0 0 1 1 8H1A5 5 0 0 1 -4 3V-9A5 5 0 0 1 1 -14Z" fill="#4D2C1D"/><path d="M-2 4H4A5 5 0 0 1 9 9V9A5 5 0 0 1 4 14H-2A5 5 0 0 1 -7 9V9A5 5 0 0 1 -2 4Z" fill="#4D2C1D"/><path d="M-8 28Q3 37 15 24" fill="none" stroke="#4D2C1D" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><path d="M-55 -19A55 55 0 0 1 55 -19V-18A8 8 0 0 1 47 -10H-47A8 8 0 0 1 -55 -18ZM-39 -10V-24A18 18 0 0 1 -21 -42H21A18 18 0 0 1 39 -24V-10Z" fill="#2E2622" fill-rule="evenodd"/><path d="M-31.5 -35H-7.5A14 14 0 0 1 6.5 -21V5A14 14 0 0 1 -7.5 19H-31.5A14 14 0 0 1 -45.5 5V-21A14 14 0 0 1 -31.5 -35Z" fill="none" stroke="#3C3C3C" stroke-width="4.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M7.5 -35H31.5A14 14 0 0 1 45.5 -21V5A14 14 0 0 1 31.5 19H7.5A14 14 0 0 1 -6.5 5V-21A14 14 0 0 1 7.5 -35Z" fill="none" stroke="#3C3C3C" stroke-width="4.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M6.5 -14H-6.5" fill="none" stroke="#3C3C3C" stroke-width="4.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </g>
+      </g>
+
+      <!-- Unit pill overlapping top-left -->
+      <rect x="12" y="12" width="56" height="22" rx="11" fill="#FFFFFF" opacity="0.92"/>
+      <text x="40" y="27" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="10.5" font-weight="800" fill="#3A1666">Unit 3</text>
+
+      <!-- Name & Topic -->
+      <text x="77" y="186" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="18" font-weight="900" fill="#3C3C3C">Ray</text>
+      <text x="77" y="208" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="12" font-weight="700" fill="#737373">Radiation &amp; Matter</text>
+      <!-- Tiny signature color bar -->
+      <rect x="59" y="219" width="36" height="5" rx="2.5" fill="#CE82FF"/>
+    </g>
+
+    <g transform="translate(523, 54)">
+      <defs>
+        <clipPath id="npc_clip_light_mina">
+          <rect x="6" y="6" width="142" height="148" rx="16" ry="16"/>
+        </clipPath>
+      </defs>
+      <!-- Outer card lip & face -->
+      <rect x="0" y="5" width="154" height="236" rx="20" fill="#E5E5E5"/>
+      <rect x="0" y="0" width="154" height="236" rx="20" fill="#FFFFFF" stroke="#E5E5E5" stroke-width="2"/>
+
+      <!-- Colored teacher cover well with tactile lip -->
+      <rect x="6" y="10" width="142" height="148" rx="16" fill="#46A302"/>
+      <rect x="6" y="6" width="142" height="148" rx="16" fill="#58CC02"/>
+      <!-- Subtle lighter circle behind portrait -->
+      <g clip-path="url(#npc_clip_light_mina)">
+        <circle cx="77" cy="100" r="54" fill="#FFFFFF" opacity="0.22"/>
+        <!-- Real AtomIQ flat-vector NPC bust -->
+        <g transform="translate(77, 102) scale(0.62)">
+          <path d="M-8 40H8A6 6 0 0 1 14 46V74A6 6 0 0 1 8 80H-8A6 6 0 0 1 -14 74V46A6 6 0 0 1 -8 40Z" fill="#A56644"/><path d="M-8 40H8A6 6 0 0 1 14 46V48A6 6 0 0 1 8 54H-8A6 6 0 0 1 -14 48V46A6 6 0 0 1 -8 40Z" fill="#753F28"/><path d="M-40.38 107.76H40.38Q64.38 107.76 50.38 88.56A72 72 0 0 0 -50.38 88.56Q-64.38 107.76 -40.38 107.76Z" fill="#58CC02"/><path d="M-26.77 73.32Q-30 66 -22 66L22 66Q30 66 26.77 73.32L3.23 126.68Q0 134 -3.23 126.68Z" fill="#FFFFFF"/><path d="M-11 64H11A6 6 0 0 1 17 70V70A6 6 0 0 1 11 76H-11A6 6 0 0 1 -17 70V70A6 6 0 0 1 -11 64Z" fill="#58A700"/><path d="M-30 74Q-38 138 0 142Q38 138 30 74" fill="none" stroke="#1899D6" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/><path d="M-11 146a11 11 0 1 0 22 0a11 11 0 1 0 -22 0Z" fill="#1453A3"/><path d="M-61 2a11 11 0 1 0 22 0a11 11 0 1 0 -22 0Z" fill="#A56644"/><path d="M39 2a11 11 0 1 0 22 0a11 11 0 1 0 -22 0Z" fill="#A56644"/><path d="M-50 -16A50 50 0 0 1 50 -16V30A26 26 0 0 1 24 56H-24A26 26 0 0 1 -50 30Z" fill="#A56644"/><path d="M-19.5 -28H-19.5A15 15 0 0 1 -4.5 -13V-3A15 15 0 0 1 -19.5 12H-19.5A15 15 0 0 1 -34.5 -3V-13A15 15 0 0 1 -19.5 -28Z" fill="#FFFFFF"/><path d="M-17 -21H-17A6.5 6.5 0 0 1 -10.5 -14.5V-7.5A6.5 6.5 0 0 1 -17 -1H-17A6.5 6.5 0 0 1 -23.5 -7.5V-14.5A6.5 6.5 0 0 1 -17 -21Z" fill="#3C3C3C"/><path d="M-22.66 -16.6a2.8 2.8 0 1 0 5.6 0a2.8 2.8 0 1 0 -5.6 0Z" fill="#FFFFFF"/><path d="M19.5 -28H19.5A15 15 0 0 1 34.5 -13V-3A15 15 0 0 1 19.5 12H19.5A15 15 0 0 1 4.5 -3V-13A15 15 0 0 1 19.5 -28Z" fill="#FFFFFF"/><path d="M17 -21H17A6.5 6.5 0 0 1 23.5 -14.5V-7.5A6.5 6.5 0 0 1 17 -1H17A6.5 6.5 0 0 1 10.5 -7.5V-14.5A6.5 6.5 0 0 1 17 -21Z" fill="#3C3C3C"/><path d="M11.34 -16.6a2.8 2.8 0 1 0 5.6 0a2.8 2.8 0 1 0 -5.6 0Z" fill="#FFFFFF"/><path d="M2 -13H2A4 4 0 0 1 6 -9V5A4 4 0 0 1 2 9H2A4 4 0 0 1 -2 5V-9A4 4 0 0 1 2 -13Z" fill="#753F28"/><path d="M-4.5 9a6.5 6.5 0 1 0 13 0a6.5 6.5 0 1 0 -13 0Z" fill="#753F28"/><path d="M-8 28Q3 37 15 24" fill="none" stroke="#753F28" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><path d="M-22 -88a22 22 0 1 0 44 0a22 22 0 1 0 -44 0Z" fill="#211B18"/><path d="M-55 -19A55 55 0 0 1 55 -19V-18A8 8 0 0 1 47 -10H-47A8 8 0 0 1 -55 -18ZM-39 -10V-24A18 18 0 0 1 -21 -42H21A18 18 0 0 1 39 -24V-10Z" fill="#2E2622" fill-rule="evenodd"/>
+        </g>
+      </g>
+
+      <!-- Unit pill overlapping top-left -->
+      <rect x="12" y="12" width="56" height="22" rx="11" fill="#FFFFFF" opacity="0.92"/>
+      <text x="40" y="27" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="10.5" font-weight="800" fill="#194800">Unit 4</text>
+
+      <!-- Name & Topic -->
+      <text x="77" y="186" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="18" font-weight="900" fill="#3C3C3C">Mina</text>
+      <text x="77" y="208" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="12" font-weight="700" fill="#737373">Body &amp; Dose</text>
+      <!-- Tiny signature color bar -->
+      <rect x="59" y="219" width="36" height="5" rx="2.5" fill="#58CC02"/>
+    </g>
+
+    <g transform="translate(691, 54)">
+      <defs>
+        <clipPath id="npc_clip_light_kofi">
+          <rect x="6" y="6" width="142" height="148" rx="16" ry="16"/>
+        </clipPath>
+      </defs>
+      <!-- Outer card lip & face -->
+      <rect x="0" y="5" width="154" height="236" rx="20" fill="#E5E5E5"/>
+      <rect x="0" y="0" width="154" height="236" rx="20" fill="#FFFFFF" stroke="#E5E5E5" stroke-width="2"/>
+
+      <!-- Colored teacher cover well with tactile lip -->
+      <rect x="6" y="10" width="142" height="148" rx="16" fill="#CD7900"/>
+      <rect x="6" y="6" width="142" height="148" rx="16" fill="#FF9600"/>
+      <!-- Subtle lighter circle behind portrait -->
+      <g clip-path="url(#npc_clip_light_kofi)">
+        <circle cx="77" cy="100" r="54" fill="#FFFFFF" opacity="0.22"/>
+        <!-- Real AtomIQ flat-vector NPC bust -->
+        <g transform="translate(77, 102) scale(0.62)">
+          <path d="M-8 40H8A6 6 0 0 1 14 46V74A6 6 0 0 1 8 80H-8A6 6 0 0 1 -14 74V46A6 6 0 0 1 -8 40Z" fill="#F5B092"/><path d="M-8 40H8A6 6 0 0 1 14 46V48A6 6 0 0 1 8 54H-8A6 6 0 0 1 -14 48V46A6 6 0 0 1 -8 40Z" fill="#D97856"/><path d="M-40.38 107.76H40.38Q64.38 107.76 50.38 88.56A72 72 0 0 0 -50.38 88.56Q-64.38 107.76 -40.38 107.76Z" fill="#FF9600"/><path d="M-22.06 72.96Q-26 66 -18 66L18 66Q26 66 22.06 72.96L3.94 105.04Q0 112 -3.94 105.04Z" fill="#F5B092"/><path d="M-11 64H11A6 6 0 0 1 17 70V70A6 6 0 0 1 11 76H-11A6 6 0 0 1 -17 70V70A6 6 0 0 1 -11 64Z" fill="#CD7900"/><path d="M-63 2a11 11 0 1 0 22 0a11 11 0 1 0 -22 0Z" fill="#F5B092"/><path d="M41 2a11 11 0 1 0 22 0a11 11 0 1 0 -22 0Z" fill="#F5B092"/><path d="M-52 -14A52 52 0 0 1 52 -14V30A26 26 0 0 1 26 56H-26A26 26 0 0 1 -52 30Z" fill="#F5B092"/><path d="M-34 20H34A18 18 0 0 1 52 38V38A18 18 0 0 1 34 56H-34A18 18 0 0 1 -52 38V38A18 18 0 0 1 -34 20Z" fill="#3B2A24"/><path d="M-19.5 -17H-19.5A7 7 0 0 1 -12.5 -10V-2A7 7 0 0 1 -19.5 5H-19.5A7 7 0 0 1 -26.5 -2V-10A7 7 0 0 1 -19.5 -17Z" fill="#3C3C3C"/><path d="M-24.1 -12a2.6 2.6 0 1 0 5.2 0a2.6 2.6 0 1 0 -5.2 0Z" fill="#FFFFFF"/><path d="M19.5 -17H19.5A7 7 0 0 1 26.5 -10V-2A7 7 0 0 1 19.5 5H19.5A7 7 0 0 1 12.5 -2V-10A7 7 0 0 1 19.5 -17Z" fill="#3C3C3C"/><path d="M14.9 -12a2.6 2.6 0 1 0 5.2 0a2.6 2.6 0 1 0 -5.2 0Z" fill="#FFFFFF"/><path d="M1 -14H1A5 5 0 0 1 6 -9V3A5 5 0 0 1 1 8H1A5 5 0 0 1 -4 3V-9A5 5 0 0 1 1 -14Z" fill="#D97856"/><path d="M-2 4H4A5 5 0 0 1 9 9V9A5 5 0 0 1 4 14H-2A5 5 0 0 1 -7 9V9A5 5 0 0 1 -2 4Z" fill="#D97856"/><path d="M-8 28Q3 37 15 24" fill="none" stroke="#F5B092" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><path d="M-55 -19A55 55 0 0 1 55 -19V-18A8 8 0 0 1 47 -10H-47A8 8 0 0 1 -55 -18ZM-39 -10V-24A18 18 0 0 1 -21 -42H21A18 18 0 0 1 39 -24V-10Z" fill="#3B2A24" fill-rule="evenodd"/><path d="M-58 -59H58A7 7 0 0 1 65 -52V-52A7 7 0 0 1 58 -45H-58A7 7 0 0 1 -65 -52V-52A7 7 0 0 1 -58 -59Z" fill="#E7A601"/><path d="M-55.96 -50A56 56 0 0 1 55.96 -50Z" fill="#FFC800"/><path d="M-1 -104H1A8 8 0 0 1 9 -96V-66A8 8 0 0 1 1 -58H-1A8 8 0 0 1 -9 -66V-96A8 8 0 0 1 -1 -104Z" fill="#E7A601"/><path d="M23 -78a7 7 0 1 0 14 0a7 7 0 1 0 -14 0Z" fill="#FFFFFF"/>
+        </g>
+      </g>
+
+      <!-- Unit pill overlapping top-left -->
+      <rect x="12" y="12" width="86" height="22" rx="11" fill="#FFFFFF" opacity="0.92"/>
+      <text x="55" y="27" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="10.5" font-weight="800" fill="#5A2B00">Unit 5 · Soon</text>
+
+      <!-- Name & Topic -->
+      <text x="77" y="186" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="18" font-weight="900" fill="#3C3C3C">Kofi</text>
+      <text x="77" y="208" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="12" font-weight="700" fill="#737373">Nuclear Energy</text>
+      <!-- Tiny signature color bar -->
+      <rect x="59" y="219" width="36" height="5" rx="2.5" fill="#FF9600"/>
+    </g>
+
+    <g transform="translate(859, 54)">
+      <defs>
+        <clipPath id="npc_clip_light_tess">
+          <rect x="6" y="6" width="142" height="148" rx="16" ry="16"/>
+        </clipPath>
+      </defs>
+      <!-- Outer card lip & face -->
+      <rect x="0" y="5" width="154" height="236" rx="20" fill="#E5E5E5"/>
+      <rect x="0" y="0" width="154" height="236" rx="20" fill="#FFFFFF" stroke="#E5E5E5" stroke-width="2"/>
+
+      <!-- Colored teacher cover well with tactile lip -->
+      <rect x="6" y="10" width="142" height="148" rx="16" fill="#1899D6"/>
+      <rect x="6" y="6" width="142" height="148" rx="16" fill="#1CB0F6"/>
+      <!-- Subtle lighter circle behind portrait -->
+      <g clip-path="url(#npc_clip_light_tess)">
+        <circle cx="77" cy="100" r="54" fill="#FFFFFF" opacity="0.22"/>
+        <!-- Real AtomIQ flat-vector NPC bust -->
+        <g transform="translate(77, 102) scale(0.62)">
+          <path d="M-8 40H8A6 6 0 0 1 14 46V74A6 6 0 0 1 8 80H-8A6 6 0 0 1 -14 74V46A6 6 0 0 1 -8 40Z" fill="#FFCBA3"/><path d="M-8 40H8A6 6 0 0 1 14 46V48A6 6 0 0 1 8 54H-8A6 6 0 0 1 -14 48V46A6 6 0 0 1 -8 40Z" fill="#E99B5F"/><path d="M-40.38 107.76H40.38Q64.38 107.76 50.38 88.56A72 72 0 0 0 -50.38 88.56Q-64.38 107.76 -40.38 107.76Z" fill="#1899D6"/><path d="M-22.06 72.96Q-26 66 -18 66L18 66Q26 66 22.06 72.96L3.94 105.04Q0 112 -3.94 105.04Z" fill="#FFCBA3"/><path d="M-11 64H11A6 6 0 0 1 17 70V70A6 6 0 0 1 11 76H-11A6 6 0 0 1 -17 70V70A6 6 0 0 1 -11 64Z" fill="#2B70C9"/><path d="M0 -66H0A48 48 0 0 1 48 -18V8A48 48 0 0 1 0 56H0A48 48 0 0 1 -48 8V-18A48 48 0 0 1 0 -66Z" fill="#FFCBA3"/><path d="M-37.5 -6a18 18 0 1 0 36 0a18 18 0 1 0 -36 0Z" fill="#FFFFFF"/><path d="M-25.5 -11a8 8 0 1 0 16 0a8 8 0 1 0 -16 0Z" fill="#3C3C3C"/><path d="M-22.7 -14a2.6 2.6 0 1 0 5.2 0a2.6 2.6 0 1 0 -5.2 0Z" fill="#FFFFFF"/><path d="M1.5 -6a18 18 0 1 0 36 0a18 18 0 1 0 -36 0Z" fill="#FFFFFF"/><path d="M9.5 -11a8 8 0 1 0 16 0a8 8 0 1 0 -16 0Z" fill="#3C3C3C"/><path d="M12.3 -14a2.6 2.6 0 1 0 5.2 0a2.6 2.6 0 1 0 -5.2 0Z" fill="#FFFFFF"/><path d="M2 -13H2A4 4 0 0 1 6 -9V5A4 4 0 0 1 2 9H2A4 4 0 0 1 -2 5V-9A4 4 0 0 1 2 -13Z" fill="#E99B5F"/><path d="M-4.5 9a6.5 6.5 0 1 0 13 0a6.5 6.5 0 1 0 -13 0Z" fill="#E99B5F"/><path d="M-8 28Q3 37 15 24" fill="none" stroke="#E99B5F" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><path d="M24 -94H36A12 12 0 0 1 48 -82V-82A12 12 0 0 1 36 -70H24A12 12 0 0 1 12 -82V-82A12 12 0 0 1 24 -94Z" fill="#F5A4A4"/><path d="M-56 -20A56 56 0 0 1 56 -20V-18A8 8 0 0 1 48 -10H-48A8 8 0 0 1 -56 -18ZM-40 -10V-24A18 18 0 0 1 -22 -42H22A18 18 0 0 1 40 -24V-10Z" fill="#FFB2B2" fill-rule="evenodd"/>
+        </g>
+      </g>
+
+      <!-- Unit pill overlapping top-left -->
+      <rect x="12" y="12" width="86" height="22" rx="11" fill="#FFFFFF" opacity="0.92"/>
+      <text x="55" y="27" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="10.5" font-weight="800" fill="#073E5C">Unit 6 · Soon</text>
+
+      <!-- Name & Topic -->
+      <text x="77" y="186" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="18" font-weight="900" fill="#3C3C3C">Tess</text>
+      <text x="77" y="208" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="12" font-weight="700" fill="#737373">Nuclear Tech</text>
+      <!-- Tiny signature color bar -->
+      <rect x="59" y="219" width="36" height="5" rx="2.5" fill="#1CB0F6"/>
+    </g>
+
+    <g transform="translate(1027, 54)">
+      <defs>
+        <clipPath id="npc_clip_light_sage">
+          <rect x="6" y="6" width="142" height="148" rx="16" ry="16"/>
+        </clipPath>
+      </defs>
+      <!-- Outer card lip & face -->
+      <rect x="0" y="5" width="154" height="236" rx="20" fill="#E5E5E5"/>
+      <rect x="0" y="0" width="154" height="236" rx="20" fill="#FFFFFF" stroke="#E5E5E5" stroke-width="2"/>
+
+      <!-- Colored teacher cover well with tactile lip -->
+      <rect x="6" y="10" width="142" height="148" rx="16" fill="#FF4B4B"/>
+      <rect x="6" y="6" width="142" height="148" rx="16" fill="#FF7878"/>
+      <!-- Subtle lighter circle behind portrait -->
+      <g clip-path="url(#npc_clip_light_sage)">
+        <circle cx="77" cy="100" r="54" fill="#FFFFFF" opacity="0.22"/>
+        <!-- Real AtomIQ flat-vector NPC bust -->
+        <g transform="translate(77, 102) scale(0.62)">
+          <path d="M-64 -16A64 64 0 0 1 64 -16V46A20 20 0 0 1 44 66H-44A20 20 0 0 1 -64 46Z" fill="#3B2A24"/><path d="M-8 40H8A6 6 0 0 1 14 46V74A6 6 0 0 1 8 80H-8A6 6 0 0 1 -14 74V46A6 6 0 0 1 -8 40Z" fill="#E0B48A"/><path d="M-8 40H8A6 6 0 0 1 14 46V48A6 6 0 0 1 8 54H-8A6 6 0 0 1 -14 48V46A6 6 0 0 1 -8 40Z" fill="#B07F52"/><path d="M-40.38 107.76H40.38Q64.38 107.76 50.38 88.56A72 72 0 0 0 -50.38 88.56Q-64.38 107.76 -40.38 107.76Z" fill="#FF7878"/><path d="M-13 63H13A7 7 0 0 1 20 70V70A7 7 0 0 1 13 77H-13A7 7 0 0 1 -20 70V70A7 7 0 0 1 -13 63Z" fill="#FF4B4B"/><path d="M-50 -16A50 50 0 0 1 50 -16V30A26 26 0 0 1 24 56H-24A26 26 0 0 1 -50 30Z" fill="#E0B48A"/><path d="M-19.5 -28H-19.5A15 15 0 0 1 -4.5 -13V-3A15 15 0 0 1 -19.5 12H-19.5A15 15 0 0 1 -34.5 -3V-13A15 15 0 0 1 -19.5 -28Z" fill="#FFFFFF"/><path d="M-17 -21H-17A6.5 6.5 0 0 1 -10.5 -14.5V-7.5A6.5 6.5 0 0 1 -17 -1H-17A6.5 6.5 0 0 1 -23.5 -7.5V-14.5A6.5 6.5 0 0 1 -17 -21Z" fill="#3C3C3C"/><path d="M-22.66 -16.6a2.8 2.8 0 1 0 5.6 0a2.8 2.8 0 1 0 -5.6 0Z" fill="#FFFFFF"/><path d="M19.5 -28H19.5A15 15 0 0 1 34.5 -13V-3A15 15 0 0 1 19.5 12H19.5A15 15 0 0 1 4.5 -3V-13A15 15 0 0 1 19.5 -28Z" fill="#FFFFFF"/><path d="M17 -21H17A6.5 6.5 0 0 1 23.5 -14.5V-7.5A6.5 6.5 0 0 1 17 -1H17A6.5 6.5 0 0 1 10.5 -7.5V-14.5A6.5 6.5 0 0 1 17 -21Z" fill="#3C3C3C"/><path d="M11.34 -16.6a2.8 2.8 0 1 0 5.6 0a2.8 2.8 0 1 0 -5.6 0Z" fill="#FFFFFF"/><path d="M2 -13H2A4 4 0 0 1 6 -9V5A4 4 0 0 1 2 9H2A4 4 0 0 1 -2 5V-9A4 4 0 0 1 2 -13Z" fill="#B07F52"/><path d="M-4.5 9a6.5 6.5 0 1 0 13 0a6.5 6.5 0 1 0 -13 0Z" fill="#B07F52"/><path d="M-8 28Q3 37 15 24" fill="none" stroke="#B07F52" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><path d="M-54.22 -33A56 56 0 0 1 54.22 -33Z" fill="#3B2A24"/>
+        </g>
+      </g>
+
+      <!-- Unit pill overlapping top-left -->
+      <rect x="12" y="12" width="86" height="22" rx="11" fill="#FFFFFF" opacity="0.92"/>
+      <text x="55" y="27" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="10.5" font-weight="800" fill="#5C1111">Unit 7 · Soon</text>
+
+      <!-- Name & Topic -->
+      <text x="77" y="186" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="18" font-weight="900" fill="#3C3C3C">Sage</text>
+      <text x="77" y="208" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="12" font-weight="700" fill="#737373">Safety &amp; Society</text>
+      <!-- Tiny signature color bar -->
+      <rect x="59" y="219" width="36" height="5" rx="2.5" fill="#FF7878"/>
+    </g>
+</svg>

@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="206" viewBox="0 0 1200 206" role="img" aria-label="Offline-First Content Pipeline">
+  <rect x="0" y="0" width="1200" height="206" rx="24" fill="#F7F7F7" stroke="#E5E5E5" stroke-width="2"/>
+  <text x="28" y="32" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="13.5" font-weight="900" fill="#737373" letter-spacing="1.2">OFFLINE-FIRST CONTENT PIPELINE · SOURCE TO DEVICE</text>
+  <text x="1172" y="32" text-anchor="end" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="12.5" font-weight="700" fill="#9A9A9A">Zero network required at runtime</text>
+  
+    <g transform="translate(30, 54)">
+      <rect x="0" y="5" width="204" height="126" rx="16" fill="#E5E5E5"/>
+      <rect x="0" y="0" width="204" height="126" rx="16" fill="#FFFFFF" stroke="#E5E5E5" stroke-width="2"/>
+      <!-- Colored header strip -->
+      <rect x="0" y="0" width="204" height="38" rx="16" fill="#EA580C"/>
+      <rect x="0" y="22" width="204" height="16" fill="#EA580C"/>
+      <rect x="0" y="38" width="204" height="4" fill="#C2410C"/>
+      <text x="102" y="25" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="14" font-weight="900" fill="#FFFFFF">Author</text>
+      <!-- Body lines -->
+      <text x="102" y="76" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="10.2" font-weight="700" fill="#3C3C3C">content/source/*.atomiq</text>
+      <text x="102" y="100" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#737373">Content Studio (:8787)</text>
+    </g>
+    <g transform="translate(239, 122)">
+           <line x1="0" y1="0" x2="15" y2="0" stroke="#CFCFCF" stroke-width="3" stroke-linecap="round"/>
+           <polyline points="10,-5 17,0 10,5" fill="none" stroke="#CFCFCF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+         </g>
+
+    <g transform="translate(264, 54)">
+      <rect x="0" y="5" width="204" height="126" rx="16" fill="#E5E5E5"/>
+      <rect x="0" y="0" width="204" height="126" rx="16" fill="#FFFFFF" stroke="#E5E5E5" stroke-width="2"/>
+      <!-- Colored header strip -->
+      <rect x="0" y="0" width="204" height="38" rx="16" fill="#F9B71F"/>
+      <rect x="0" y="22" width="204" height="16" fill="#F9B71F"/>
+      <rect x="0" y="38" width="204" height="4" fill="#D9981A"/>
+      <text x="102" y="25" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="14" font-weight="900" fill="#FFFFFF">Validate &amp; Sync</text>
+      <!-- Body lines -->
+      <text x="102" y="76" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="10.2" font-weight="700" fill="#3C3C3C">npm run validate:content</text>
+      <text x="102" y="100" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#737373">npm run content:sync</text>
+    </g>
+    <g transform="translate(473, 122)">
+           <line x1="0" y1="0" x2="15" y2="0" stroke="#CFCFCF" stroke-width="3" stroke-linecap="round"/>
+           <polyline points="10,-5 17,0 10,5" fill="none" stroke="#CFCFCF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+         </g>
+
+    <g transform="translate(498, 54)">
+      <rect x="0" y="5" width="204" height="126" rx="16" fill="#E5E5E5"/>
+      <rect x="0" y="0" width="204" height="126" rx="16" fill="#FFFFFF" stroke="#E5E5E5" stroke-width="2"/>
+      <!-- Colored header strip -->
+      <rect x="0" y="0" width="204" height="38" rx="16" fill="#7F5AC2"/>
+      <rect x="0" y="22" width="204" height="16" fill="#7F5AC2"/>
+      <rect x="0" y="38" width="204" height="4" fill="#5F42A0"/>
+      <text x="102" y="25" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="14" font-weight="900" fill="#FFFFFF">Master SQLite</text>
+      <!-- Body lines -->
+      <text x="102" y="76" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="10.2" font-weight="700" fill="#3C3C3C">content/database/content.db</text>
+      <text x="102" y="100" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#737373">Draft + backup ledger</text>
+    </g>
+    <g transform="translate(707, 122)">
+           <line x1="0" y1="0" x2="15" y2="0" stroke="#CFCFCF" stroke-width="3" stroke-linecap="round"/>
+           <polyline points="10,-5 17,0 10,5" fill="none" stroke="#CFCFCF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+         </g>
+
+    <g transform="translate(732, 54)">
+      <rect x="0" y="5" width="204" height="126" rx="16" fill="#E5E5E5"/>
+      <rect x="0" y="0" width="204" height="126" rx="16" fill="#FFFFFF" stroke="#E5E5E5" stroke-width="2"/>
+      <!-- Colored header strip -->
+      <rect x="0" y="0" width="204" height="38" rx="16" fill="#1CB0F6"/>
+      <rect x="0" y="22" width="204" height="16" fill="#1CB0F6"/>
+      <rect x="0" y="38" width="204" height="4" fill="#1899D6"/>
+      <text x="102" y="25" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="14" font-weight="900" fill="#FFFFFF">Publish Release</text>
+      <!-- Body lines -->
+      <text x="102" y="76" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="10.2" font-weight="700" fill="#3C3C3C">releases.json + .db.gz</text>
+      <text x="102" y="100" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#737373">Verified citations gate</text>
+    </g>
+    <g transform="translate(941, 122)">
+           <line x1="0" y1="0" x2="15" y2="0" stroke="#CFCFCF" stroke-width="3" stroke-linecap="round"/>
+           <polyline points="10,-5 17,0 10,5" fill="none" stroke="#CFCFCF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+         </g>
+
+    <g transform="translate(966, 54)">
+      <rect x="0" y="5" width="204" height="126" rx="16" fill="#E5E5E5"/>
+      <rect x="0" y="0" width="204" height="126" rx="16" fill="#FFFFFF" stroke="#E5E5E5" stroke-width="2"/>
+      <!-- Colored header strip -->
+      <rect x="0" y="0" width="204" height="38" rx="16" fill="#58CC02"/>
+      <rect x="0" y="22" width="204" height="16" fill="#58CC02"/>
+      <rect x="0" y="38" width="204" height="4" fill="#46A302"/>
+      <text x="102" y="25" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="14" font-weight="900" fill="#FFFFFF">On-Device SQLite</text>
+      <!-- Body lines -->
+      <text x="102" y="76" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="10.2" font-weight="700" fill="#3C3C3C">assets/database/content.db</text>
+      <text x="102" y="100" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#737373">Atomic swap + rollback</text>
+    </g>
+    
+</svg>
