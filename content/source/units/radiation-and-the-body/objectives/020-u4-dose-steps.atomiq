@@ -1,0 +1,108 @@
+format 1
+adapter curriculum 1
+unit: radiation-and-the-body
+
+objective u4-dose-steps
+
+statement:
+    Know that doses come in very different sizes: a year near a nuclear power station is under 0.01 millisieverts, an average year about 6, a whole-body CT about 10, and about 1000 millisieverts (1 sievert) in a short time is where people start to become ill.
+
+misconception: A small dose and a dangerous dose are the same thing.
+
+item u4-l1-choice-ill
+type: choice
+surfaces: lesson
+surfaces: practice
+surfaces: checkpoint
+surfaces: review
+references: ref-who-ionizing-radiation
+
+prompt:
+    About how big a dose, received in a short time, is where people start to become ill?
+
+options:
+    {"id":"sv","label":"About 1000 millisieverts, which is 1 sievert"}
+    {"id":"six","label":"About 6 millisieverts","note":"That is an average year's dose. People receive it every year, and low levels do not cause immediate health effects."}
+    {"id":"tiny","label":"About 0.01 millisieverts","note":"That is less than a year near a nuclear power station adds."}
+
+answer: sv
+
+explanation:
+    The dose threshold for acute radiation syndrome is about 1 sievert, which is 1000 millisieverts, received in a short time. An everyday dose is thousands of times smaller.
+
+item u4-l1-fill-milli
+type: fill
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-who-ionizing-radiation
+
+prompt:
+    One sievert is ___ millisieverts.
+
+mode: bank
+
+bank:
+    {"id":"k","label":"1000"}
+    {"id":"h","label":"100"}
+    {"id":"t","label":"10"}
+
+answer: k
+
+explanation:
+    Milli means a thousandth, so 1 sievert is 1000 millisieverts. That is why everyday doses, which are tiny fractions of a sievert, are counted in millisieverts.
+
+item u4-l1-order-doses
+type: order
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-epa-radiation-sources
+
+prompt:
+    Put these doses in order, from the smallest to the biggest.
+
+items:
+    {"id":"plant","label":"A year of living near a nuclear power station (under 0.01 mSv)"}
+    {"id":"cosmic","label":"A year of cosmic rays at sea level (about 0.3 mSv)"}
+    {"id":"radon","label":"A year of radon in an average US home (about 2.3 mSv)"}
+    {"id":"ct","label":"One whole-body CT scan (about 10 mSv)"}
+
+explanation:
+    Under 0.01, then about 0.3, about 2.3 and about 10. A year near a nuclear power station is the smallest step, and one whole-body CT scan the biggest of these.
+
+item u4-x-ct-vs-ill
+type: choice
+difficulty: 2
+surfaces: practice
+surfaces: checkpoint
+surfaces: review
+references: ref-epa-radiation-sources
+references: ref-who-ionizing-radiation
+
+prompt:
+    A whole-body CT scan is about 10 millisieverts. How does that compare with about 1000, where people start to become ill?
+
+options:
+    {"id":"less","label":"About a hundred times smaller"}
+    {"id":"same","label":"About the same size","note":"Ten and a thousand are not the same size: 1000 is a hundred times 10."}
+    {"id":"more","label":"About a hundred times bigger","note":"It is the other way round: 1000 is the bigger dose."}
+
+answer: less
+
+explanation:
+    10 is a hundred times smaller than 1000, so a CT scan is a very different step on the scale.
+
+item u4-x-tom-plant-ct
+type: true_or_myth
+surfaces: practice
+surfaces: review
+references: ref-epa-radiation-sources
+
+statement:
+    A year of living near a nuclear power station gives a bigger dose than one whole-body CT scan.
+
+answer: myth
+
+explanation:
+    Myth. A year near a nuclear power station adds under 0.01 millisieverts. One whole-body CT scan is about 10.

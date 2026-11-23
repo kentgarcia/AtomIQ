@@ -21,14 +21,15 @@ spec:
       "eyes": "pill",
       "nose": "single",
       "hair": {
-        "style": "bob",
+        "style": "layeredbob",
         "color": "#3B2A24",
         "shade": "#2B1E1A"
       },
       "outfit": {
-        "kind": "sweater",
+        "kind": "scholar",
         "color": "#FF7878",
-        "shade": "#FF4B4B"
+        "shade": "#FF4B4B",
+        "collar": "#FFF5D3"
       },
       "accent": {
         "kind": "notebook",

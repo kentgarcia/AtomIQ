@@ -9,7 +9,7 @@ import test from "node:test";
 
 import { loadTs } from "./lib/ts-require.mjs";
 
-const { PRICE_SCALE, itemsUnlockedBetween, featuredUnlocks, OUTFIT_PRICES: OUTFITS, FACE_PRICES: FACES, TIER_LEVELS, MAX_UNLOCK_LEVEL, isOwned, isEquipped, itemStatus, buyBlock, PAINT_PRICE, PATTERN_PRICE, SKIN_PRICE, HAIR_STYLE_PRICE, SHOP_CATEGORIES, SHOP_TABS, tabById, isFree, SHOP_ITEMS, itemsIn, previewConfig, colorChoiceOf, colorOptions, withColor } = loadTs("components/shop/shop-core.ts");
+const { PRICE_SCALE, itemsUnlockedBetween, featuredUnlocks, OUTFIT_PRICES: OUTFITS, PREMIUM_PRICES, FACE_PRICES: FACES, TIER_LEVELS, MAX_UNLOCK_LEVEL, isOwned, isEquipped, itemStatus, buyBlock, PAINT_PRICE, PATTERN_PRICE, SKIN_PRICE, HAIR_STYLE_PRICE, SHOP_CATEGORIES, SHOP_TABS, tabById, isFree, SHOP_ITEMS, itemsIn, previewConfig, colorChoiceOf, colorOptions, withColor } = loadTs("components/shop/shop-core.ts");
 const { SCALLOP_DEPTH, awningHeight, awningStripes, stripeCount } = loadTs("components/shop/awning-core.ts");
 const { AVATAR_OPTIONS, DEFAULT_AVATAR } = loadTs("components/avatar/avatar-core.ts");
 
@@ -37,7 +37,7 @@ test("every tab has items (paints and patterns without the defaults)", () => {
   assert.deepEqual(paints.map((i) => i.value), AVATAR_OPTIONS.background.filter((id) => id !== DEFAULT_AVATAR.background));
   assert.deepEqual(patterns.map((i) => i.value), AVATAR_OPTIONS.pattern.filter((id) => id !== DEFAULT_AVATAR.pattern));
   assert.ok(paints.length >= 10 && patterns.length === AVATAR_OPTIONS.pattern.length - 1);
-  assert.ok(paints.every((i) => i.price === PAINT_PRICE) && patterns.every((i) => i.price === PATTERN_PRICE));
+  assert.ok(paints.every((i) => i.price === PAINT_PRICE) && patterns.every((i) => i.price === (PREMIUM_PRICES[i.id] ?? PATTERN_PRICE)));
   assert.ok(!paints.some((i) => i.value === DEFAULT_AVATAR.background), "the starting paint is not sold");
   assert.ok(!patterns.some((i) => i.value === "none"), "no pattern is not sold");
   for (const c of SHOP_CATEGORIES) assert.ok(itemsIn(c.id).length >= 5, `${c.id} has items`);
@@ -110,7 +110,7 @@ test("hair: every style, no colour items (colour is not sold); the starting desi
   assert.deepEqual(hair.map((i) => i.value), AVATAR_OPTIONS.hairStyle);
   assert.ok(hair.every((i) => !i.id.includes("color") && !("choice" in i)), "no colour items");
   const worn = new Set(STARTER_AVATARS.map((a) => a.config.hairStyle));
-  for (const i of hair) assert.equal(i.price, worn.has(i.value) ? 0 : HAIR_STYLE_PRICE, i.id);
+  for (const i of hair) assert.equal(i.price, worn.has(i.value) ? 0 : (PREMIUM_PRICES[i.id] ?? HAIR_STYLE_PRICE), i.id);
   assert.ok(hair.some(isFree) && hair.some((i) => !isFree(i)));
   // A style changes the style and leaves the colour the learner has
   const bun = hair.find((i) => i.value === "bun");
@@ -152,7 +152,7 @@ test("face and outfit tabs: every choice of the avatar is an item, what the star
     const items = itemsIn(cat);
     assert.deepEqual(items.map((i) => i.value), AVATAR_OPTIONS[choice], cat);
     const worn = new Set(STARTER_AVATARS.map((a) => a.config[choice]));
-    for (const i of items) assert.equal(i.price, worn.has(i.value) ? 0 : (cat === "outfit" ? OUTFIT_PRICES[i.value] : undefined) ?? FACE_PRICES[cat], i.id);
+    for (const i of items) assert.equal(i.price, worn.has(i.value) ? 0 : PREMIUM_PRICES[i.id] ?? (cat === "outfit" ? OUTFIT_PRICES[i.value] : undefined) ?? FACE_PRICES[cat], i.id);
     assert.ok(items.some(isFree) && items.some((i) => !isFree(i)), `${cat}: some free, some for sale`);
     // Trying one on changes that choice only
     const other = items.find((i) => i.value !== DEFAULT_AVATAR[choice]);
@@ -204,7 +204,7 @@ test("accessories and clothes: bare is free, the rest costs; colourable except b
   for (const [cat, choice, color] of [["headwear", "headwear", "headwearColor"], ["eyewear", "eyewear", "eyewearColor"], ["earwear", "earwear", "earwearColor"]]) {
     const items = itemsIn(cat);
     assert.equal(items[0].value, "none", `${cat}: bare first`);
-    assert.ok(isFree(items[0]) && items.slice(1).every((i) => i.price === FACE_PRICES[cat]), cat);
+    assert.ok(isFree(items[0]) && items.slice(1).every((i) => i.price === (PREMIUM_PRICES[i.id] ?? FACE_PRICES[cat])), cat);
     assert.equal(colorChoiceOf(items[0]), null, `${cat}: bare has nothing to colour`);
     assert.equal(colorChoiceOf(items[1]), color, cat);
     assert.deepEqual(colorOptions(color).map((o) => o.id), Object.keys(WEAR_COLORS));
@@ -295,7 +295,7 @@ test("prices are the base prices times 1.5, whole diamonds, and none ends in 3 o
   assert.equal(PRICE_SCALE, 1.5);
   assert.deepEqual([PAINT_PRICE, PATTERN_PRICE, HAIR_STYLE_PRICE], [30, 45, 40]);
   assert.deepEqual(FACES, { eyebrows: 25, eyes: 30, nose: 25, mouth: 25, ears: 30, headwear: 45, eyewear: 40, earwear: 30, outfit: 60 });
-  assert.deepEqual(Object.values(OUTFITS).sort((a, b) => a - b), [90, 90, 90, 90, 90, 90, 90, 120, 120, 120]);
+  assert.deepEqual(Object.values(OUTFITS).sort((a, b) => a - b), [90, 90, 90, 90, 90, 90, 90, 90, 90, 90, 90, 90, 120, 120, 120, 150, 150, 150, 150, 150]);
   // Every tier is a price on sale, so no price falls through to level 1
   for (const i of SHOP_ITEMS.filter((x) => x.price > 0)) assert.ok(TIER_LEVELS[i.price] !== undefined, `${i.id}: ${i.price} has a tier`);
   for (const i of SHOP_ITEMS) assert.ok(Number.isInteger(i.price) && ![3, 8].includes(i.price % 10), `${i.id}: ${i.price}`);

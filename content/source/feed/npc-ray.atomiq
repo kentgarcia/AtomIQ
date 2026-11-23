@@ -28,6 +28,101 @@ chip: lesson
 text:
     First lesson done: “{lesson}”. Good. The next one is on the map.
 
+post ft-ray-lesson-becquerel-gray-sievert-1
+kind: celebrate
+trigger: lesson_complete
+chip: lesson
+weight: 2
+condition: {"unitId":"radiation-meets-matter","lessonId":"becquerel-gray-sievert"}
+
+text:
+    “{lesson}” done. Becquerel counts decays. Gray is energy absorbed. Sievert is potential for harm.
+
+post ft-ray-lesson-becquerel-gray-sievert-2
+kind: celebrate
+trigger: lesson_complete
+chip: lesson
+condition: {"unitId":"radiation-meets-matter","lessonId":"becquerel-gray-sievert","perfect":true}
+
+text:
+    Perfect on “{lesson}”. Right unit, right question. Nothing mixed up.
+
+post ft-ray-lesson-detecting-radiation-1
+kind: celebrate
+trigger: lesson_complete
+chip: lesson
+weight: 2
+condition: {"unitId":"radiation-meets-matter","lessonId":"detecting-radiation"}
+
+text:
+    “{lesson}” done. Geiger counter, scintillation counter, dosimeter. Three tools, three jobs.
+
+post ft-ray-lesson-detecting-radiation-2
+kind: celebrate
+trigger: lesson_complete
+chip: lesson
+condition: {"unitId":"radiation-meets-matter","lessonId":"detecting-radiation"}
+
+text:
+    A working detector picks up a little radiation almost anywhere. Background is always there. Remember it.
+
+post ft-ray-lesson-ionizing-or-not-1
+kind: celebrate
+trigger: lesson_complete
+chip: lesson
+weight: 2
+condition: {"unitId":"radiation-meets-matter","lessonId":"ionizing-or-not"}
+
+text:
+    “{lesson}” done. Radio waves, light, X-rays: all radiation. Only some can knock electrons off atoms. Noted.
+
+post ft-ray-lesson-ionizing-or-not-2
+kind: celebrate
+trigger: lesson_complete
+chip: lesson
+condition: {"unitId":"radiation-meets-matter","lessonId":"ionizing-or-not"}
+
+text:
+    Sorted. Ionizing and non-ionizing are different things. Not all radiation is the same.
+
+post ft-ray-lesson-irradiated-or-contaminated-1
+kind: celebrate
+trigger: lesson_complete
+chip: lesson
+weight: 2
+condition: {"unitId":"radiation-meets-matter","lessonId":"irradiated-or-contaminated"}
+
+text:
+    “{lesson}” done. Exposure is not contamination. Radiation does not spread. The material does.
+
+post ft-ray-lesson-irradiated-or-contaminated-2
+kind: celebrate
+trigger: lesson_complete
+chip: lesson
+condition: {"unitId":"radiation-meets-matter","lessonId":"irradiated-or-contaminated"}
+
+text:
+    Standing near a source is not the same as having material on you. Good. Keep them apart.
+
+post ft-ray-lesson-what-stops-what-1
+kind: celebrate
+trigger: lesson_complete
+chip: lesson
+weight: 2
+condition: {"unitId":"radiation-meets-matter","lessonId":"what-stops-what"}
+
+text:
+    “{lesson}” done. Paper stops alpha. Thin metal stops beta. Gamma needs thick, dense material. Checked off.
+
+post ft-ray-lesson-what-stops-what-2
+kind: celebrate
+trigger: lesson_complete
+chip: lesson
+condition: {"unitId":"radiation-meets-matter","lessonId":"what-stops-what","perfect":true}
+
+text:
+    Perfect on “{lesson}”. Three kinds, three stoppers, no misses. Noted.
+
 post ft-ray-quests
 kind: celebrate
 trigger: daily_quests_done
@@ -44,6 +139,48 @@ condition: {"direction":"passed"}
 
 text:
     You passed {rival} in the weekly ranking. Noted. Hold the spot.
+
+post ft-ray-checkpoint-radiation-meets-matter
+kind: milestone
+trigger: checkpoint_pass
+chip: unit
+condition: {"unitId":"radiation-meets-matter"}
+reactors: npc-ada
+
+text:
+    The {unit} checkpoint is passed. Checked off.
+
+post ft-ray-testout-radiation-meets-matter
+kind: milestone
+trigger: testout_pass
+chip: unit
+condition: {"unitId":"radiation-meets-matter"}
+reactors: npc-ada
+
+text:
+    You tested out of “{unit}”. You already knew it. Now it is on the record.
+
+post ft-ray-unit-radiation-meets-matter-2
+kind: milestone
+trigger: unit_complete
+chip: unit
+weight: 2
+condition: {"unitId":"radiation-meets-matter"}
+reactors: npc-ada
+
+text:
+    You finished “{unit}”. You know what is ionizing, what stops what, and which unit answers which question. Good. Mina is next.
+
+post ft-ray-unit-radioactivity-1
+kind: milestone
+trigger: unit_complete
+chip: unit
+weight: 2
+condition: {"unitId":"radioactivity"}
+reactors: npc-ada
+
+text:
+    Someone just finished “{unit}” with Ada. They know why nuclei change. Now they find out what the radiation does to things. That part is mine.
 
 post ft-ray-comeback-14
 kind: nudge
@@ -69,3 +206,12 @@ condition: {"direction":"passed_by"}
 
 text:
     {rival} passed you in the weekly ranking. One lesson fixes that. Go do it.
+
+post ft-ray-tease-radiation-meets-matter
+kind: tease
+trigger: lesson_complete
+chip: unit
+condition: {"unitId":"radiation-meets-matter","lessonId":"detecting-radiation"}
+
+text:
+    Detecting is done. Next: units. Becquerel, gray, sievert. Three of them. Learn the difference.

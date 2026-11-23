@@ -1,0 +1,209 @@
+format 1
+adapter chat 1
+npc: npc-mina
+
+node chat-mina-greeting
+kind: greeting
+pose: greet
+title: Chat
+
+    Hi, I'm Mina.
+
+    How are you feeling about today's lesson?
+
+reply: I'm ready -> chat-mina-ready
+reply: a bit worried -> chat-mina-worry
+reply: remind me of something -> chat-mina-remind
+reply: just talking -> chat-mina-talk
+reply: I have to go -> chat-mina-bye
+
+node chat-mina-menu
+kind: reply
+pose: idle
+
+    Take your time.
+
+    What would help right now?
+
+reply: I'm ready -> chat-mina-ready
+reply: a bit worried -> chat-mina-worry
+reply: remind me of something -> chat-mina-remind
+reply: just talking -> chat-mina-talk
+reply: I have to go -> chat-mina-bye
+
+node chat-mina-ready
+kind: reply
+pose: proud
+
+    Good. One step at a time is plenty.
+
+    Your next lesson is on the map whenever you want it.
+
+link: Take me there => next-lesson
+reply: quiz me first -> chat-mina-quiz
+reply: later -> chat-mina-menu
+
+node chat-mina-quiz
+kind: reply
+pose: explain
+
+    A short round of Myth Buster on this unit.
+
+    It's a gentle way to warm up.
+
+link: Start the round => mythbuster radiation-and-the-body
+reply: not now -> chat-mina-menu
+
+node chat-mina-worry
+kind: reply
+pose: think
+
+    That's fair. A lot of people feel that way about radiation.
+
+    What is it that worries you?
+
+reply: it's everywhere -> chat-mina-w-everywhere
+reply: is any amount deadly? -> chat-mina-w-deadly
+reply: scary headlines -> chat-mina-w-headline
+reply: never mind -> chat-mina-menu
+
+node chat-mina-w-everywhere
+kind: reply
+pose: explain
+
+    It is around us all the time. That's true, and it's normal.
+
+    In the United States the average person gets about 6.2 millisieverts a year, and most of it is natural background radiation.
+
+link: Open it in AtomDex => entry background-radiation
+reply: thanks, that helps -> chat-mina-menu
+reply: where does it come from? -> chat-mina-w-where
+
+node chat-mina-w-where
+kind: reply
+pose: explain
+
+    Rocks and soil, space, and radon in the air all add to it.
+
+    Every one of those is part of an ordinary year.
+
+reply: ok, back -> chat-mina-menu
+reply: that's reassuring -> chat-mina-menu
+
+node chat-mina-w-deadly
+kind: reply
+pose: explain
+
+    No. Everyone gets small doses every day.
+
+    It takes a very large dose in a short time, about 1000 millisieverts, to make people ill.
+
+link: Open it in AtomDex => entry acute-radiation-syndrome
+reply: thanks, that helps -> chat-mina-menu
+reply: what about small doses? -> chat-mina-w-small
+
+node chat-mina-w-small
+kind: reply
+pose: idle
+
+    Low levels do not cause immediate health effects.
+
+    They can add a small increase in the risk of cancer over a lifetime. A small chance, not a certainty.
+
+reply: ok, back -> chat-mina-menu
+reply: so it's a small chance -> chat-mina-menu
+
+node chat-mina-w-headline
+kind: reply
+pose: point
+
+    A number in a headline needs three questions.
+
+    How big is the dose? How fast did it arrive? And how does it compare with doses you know?
+
+reply: that's a good list -> chat-mina-menu
+reply: I'll try that -> chat-mina-menu
+
+node chat-mina-remind
+kind: reply
+pose: explain
+
+    Which part would you like to go over?
+
+reply: the dose scale -> chat-mina-r-scale
+reply: cells and repair -> chat-mina-r-cells
+reply: time, distance, shielding -> chat-mina-r-three
+reply: never mind -> chat-mina-menu
+
+node chat-mina-r-scale
+kind: reply
+pose: explain
+
+    1 sievert is 1000 millisieverts.
+
+    An average year is about 6. A whole body CT is about 10. About 1000 in a short time is where people become ill.
+
+link: Open it in AtomDex => entry millisievert
+reply: thanks, back -> chat-mina-menu
+
+node chat-mina-r-cells
+kind: reply
+pose: explain
+
+    Ionizing radiation can damage the DNA in a cell.
+
+    Cells are extremely efficient at repairing that damage. If it is not repaired correctly, a cell may die or eventually become cancerous.
+
+link: Open it in AtomDex => entry dna
+reply: thanks, back -> chat-mina-menu
+
+node chat-mina-r-three
+kind: reply
+pose: explain
+
+    Less time near a source, more distance from it, and something in between.
+
+    Lead, concrete or water protect against gamma rays.
+
+link: Open it in AtomDex => entry shielding
+reply: thanks, back -> chat-mina-menu
+
+node chat-mina-talk
+kind: reply
+pose: greet
+
+    Of course. Ask me anything.
+
+reply: why the stethoscope? -> chat-mina-steth
+reply: how do you stay calm? -> chat-mina-calm
+reply: never mind -> chat-mina-menu
+
+node chat-mina-steth
+kind: reply
+pose: idle
+
+    It's a reminder.
+
+    Listening first, then explaining. That's the order I like.
+
+reply: I like that -> chat-mina-talk
+reply: that's thoughtful -> chat-mina-talk
+
+node chat-mina-calm
+kind: reply
+pose: proud
+
+    Numbers help. When I know how big something is, and how it compares, it stops feeling so large.
+
+    That's most of the unit, really.
+
+reply: that makes sense -> chat-mina-talk
+reply: I'll try it -> chat-mina-talk
+
+node chat-mina-bye
+kind: sign_off
+pose: greet
+
+    Of course. Go gently.
+
+    Come back with any question you like.

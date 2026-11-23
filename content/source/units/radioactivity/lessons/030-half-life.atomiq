@@ -23,34 +23,22 @@ supports: Half-life and the exponential decay curve.
 cite ref-openstax-chem-21-3
 supports: Each radioactive nuclide has a characteristic, constant half-life.
 
-card c01
-kind: item
-type: item
-item: u2-l3-predict-hundred
-scored: 0
-
 card c03
 kind: teach
-type: reveal
+type: explain
 scored: 0
 title: About half have changed
-predicts: c01
 figure: half-life-grid
 figure_at: 1
 
 body:
-    After one half-life, about half of the nuclei have decayed. The rest were not cut in half. The time it takes for a group to fall to about half is its [[half-life]].
+    Picture 100 radioactive nuclei in a box. Wait a while, and about half of them will have changed. The time that takes is called the [[half-life|half-life]]. Nothing was cut in half: about 50 nuclei changed, and about 50 did not.
 
 card c04
 kind: item
 type: item
 item: u2-l3-choice-meaning
 connected: true
-
-card c05
-kind: item
-type: item
-item: u2-l3-fill-pattern
 
 card c06
 kind: teach
@@ -61,17 +49,17 @@ figure: half-life-bars
 figure_at: 1
 
 body:
-    Start with 100. After one half-life, about 50 are left. After two, about 25. Then about 12, then about 6. It says about every time, because each count is a pattern and not an exact number.
+    Keep waiting and the pattern repeats. Start with 100. After one half-life about 50 are left, after two about 25, then about 12, then about 6. Each time, half of what is left changes. It says about because each count is a pattern and not an exact number.
 
-card c16
+card c05
 kind: item
 type: item
-item: u2-l3-match-halves
+item: u2-l3-fill-pattern
 
-card c07
+card c13
 kind: item
 type: item
-item: u2-l3-tom-gone
+item: u2-l3-choice-eighty
 
 card c08
 kind: teach
@@ -82,18 +70,13 @@ figure: group-not-timer
 figure_at: 1
 
 body:
-    Remember the first lesson: you cannot say when one nucleus will change. A big group is different, because it follows a pattern. Half-life describes the whole group. It is not a timer inside each atom.
+    Remember: you cannot say when one nucleus will change. A big group is different, because it follows a pattern. Half-life describes the whole group. It is not a timer inside each atom, so one nucleus might change in a moment or much later.
 
 card c09
 kind: item
 type: item
 item: u2-l3-tom-timer
 connected: true
-
-card c10
-kind: item
-type: item
-item: u2-l3-tom-crowd
 
 card c11
 kind: item
@@ -111,12 +94,6 @@ figure_at: 2
 
 body:
     Half-lives are very different. Some are a fraction of a second. Others are billions of years. So some radioactive materials fade quickly and others take a very long time. You do not need to memorise these.
-
-card c13
-kind: item
-type: item
-item: u2-l3-choice-eighty
-connected: true
 
 card c14
 kind: item

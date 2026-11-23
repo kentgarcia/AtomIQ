@@ -80,9 +80,10 @@ export const NPC_ROSTER: NpcRow[] = [
     position: 3,
     bio: "I'm Ray. I teach what radiation does when it meets things, and how to stop it. I'll tell you straight: no hype, no scare, just what the numbers say. Ask me anything. You'll get a short answer.",
     spec: {
-      skin: trio(CUSTOM.skinDeep), head: "tombstone", headWidth: 98, eyes: "glasses-square", nose: "double",
-      hair: { style: "crop", color: CUSTOM.hairBlack[0], shade: CUSTOM.hairBlack[1] },
-      outfit: { kind: "hoodie", color: O.beetle, shade: O.betta, collar: O.snow },
+      skin: trio(CUSTOM.skinDeep), head: "tombstone", headWidth: 98, eyes: "glasses-square", nose: "double", mouth: "smirk",
+      hair: { style: "flattop", color: CUSTOM.hairBlack[0], shade: CUSTOM.hairBlack[1] },
+      // A purple field hoodie with a chest dosimeter badge and a front kangaroo pocket; his clipboard and holstered counter are the accent
+      outfit: { kind: "fieldhoodie", color: O.beetle, shade: O.betta, collar: O.snow },
       accent: { kind: "clipboard", color: O.fox, shade: O.guineaPig },
     },
   },
@@ -95,9 +96,10 @@ export const NPC_ROSTER: NpcRow[] = [
     position: 4,
     bio: "I'm Mina. I teach what radiation does to the body, and how big a dose really is. A lot of people worry about it, and that's fair. I'll go through it with you, one calm step at a time, until it makes sense.",
     spec: {
-      skin: trio(CUSTOM.skinBrown), head: "tombstone", headWidth: 100, eyes: "pill", nose: "single",
-      hair: { style: "bun", color: CUSTOM.hairBlack[0], shade: CUSTOM.hairBlack[1] },
-      outfit: { kind: "coat", color: O.featherGreen, shade: O.treeFrog, collar: O.snow },
+      skin: trio(CUSTOM.skinBrown), head: "tombstone", headWidth: 100, eyes: "lashes", nose: "single", blush: O.crab,
+      hair: { style: "crownbun", color: CUSTOM.hairBlack[0], shade: CUSTOM.hairBlack[1] },
+      // A green clinician coat with a red heart lapel pin and a monthly dose badge over a white scrub top; her stethoscope and dose card are the accent
+      outfit: { kind: "clinician", color: O.featherGreen, shade: O.treeFrog, collar: O.snow },
       accent: { kind: "stethoscope", color: O.whale, shade: O.narwhal },
     },
   },
@@ -111,9 +113,10 @@ export const NPC_ROSTER: NpcRow[] = [
     bio: "I'm Kofi, an engineer. I teach where nuclear energy comes from and how a reactor uses it. I like to see how things work, so we'll build the picture piece by piece. The hard hat is optional. Mine isn't!",
     spec: {
       skin: trio(CUSTOM.skinGuideWarm), head: "tombstone", headWidth: 104, eyes: "dots", nose: "double",
-      hair: { style: "crop", color: CUSTOM.hairDark[0], shade: CUSTOM.hairDark[1] },
+      hair: { style: "workcrop", color: CUSTOM.hairDark[0], shade: CUSTOM.hairDark[1] },
       facialHair: "beard",
-      outfit: { kind: "shirt", color: O.fox, shade: O.guineaPig },
+      // An orange hi-vis engineer vest with reflective shoulder bands and a clearance badge over a blue work shirt; his hard hat, hip tool pouch and blueprint are the accent
+      outfit: { kind: "workvest", color: O.fox, shade: O.guineaPig, collar: O.humpback },
       accent: { kind: "hardhat", color: O.bee, shade: O.camel },
     },
   },
@@ -126,9 +129,10 @@ export const NPC_ROSTER: NpcRow[] = [
     position: 6,
     bio: "I'm Tess! I teach how nuclear tools help in hospitals, farms and factories. I love a good gadget. Short lessons, quick answers, and you can be on to the next one before I finish this sentence!",
     spec: {
-      skin: trio(CUSTOM.skinGuideLight), head: "capsule", headWidth: 96, eyes: "round", nose: "single",
-      hair: { style: "wrap", color: O.flamingo, shade: O.pig },
-      outfit: { kind: "shirt", color: O.whale, shade: O.humpback },
+      skin: trio(CUSTOM.skinTan), head: "capsule", headWidth: 96, eyes: "glasses-round", nose: "button",
+      hair: { style: "knotwrap", color: O.flamingo, shade: O.pig },
+      // A blue tech vest with a chest tracer-sensor module and clipped styluses over an Iguana collar; her glowing tracer vial and hip gadget pack are the accent
+      outfit: { kind: "techvest", color: O.whale, shade: O.humpback, collar: O.iguana },
       accent: { kind: "vial", color: O.moonJelly, shade: O.blueJay },
     },
   },
@@ -142,8 +146,9 @@ export const NPC_ROSTER: NpcRow[] = [
     bio: "I'm Sage. I teach how nuclear power is kept safe, what happens to waste, and the choices a society makes. I like to look at both sides before I decide. I'll show you both, and then it's your call.",
     spec: {
       skin: trio(CUSTOM.skinOlive), head: "tombstone", headWidth: 100, eyes: "pill", nose: "single",
-      hair: { style: "bob", color: CUSTOM.hairDark[0], shade: CUSTOM.hairDark[1] },
-      outfit: { kind: "sweater", color: O.crab, shade: O.cardinal },
+      hair: { style: "layeredbob", color: CUSTOM.hairDark[0], shade: CUSTOM.hairDark[1] },
+      // A coral shawl-collar cardigan with a golden leaf pin and a fountain pen over a collared shirt; their two-column notebook and folio bag are the accent
+      outfit: { kind: "scholar", color: O.crab, shade: O.cardinal, collar: O.canary },
       accent: { kind: "notebook", color: O.humpback, shade: O.narwhal },
     },
   },
@@ -170,4 +175,20 @@ export const NPC_LINES: NpcLineRow[] = [
   { id: "line-ada-intro-decay-chains", npcId: "npc-ada", kind: "lesson_intro", lessonId: "decay-chains", text: "One change is not always the end. Let's follow a nucleus all the way down.", pose: "explain" },
   { id: "line-ada-intro-radioactivity-is-natural", npcId: "npc-ada", kind: "lesson_intro", lessonId: "radioactivity-is-natural", text: "Here is something nobody expects: radioactivity was always here. Let's find where.", pose: "greet" },
   { id: "line-ada-tease", npcId: "npc-ada", kind: "tease", text: "Finish my unit first. There is more to learn about what radiation does.", pose: "idle" },
+  { id: "line-ray-meet", npcId: "npc-ray", kind: "meet", text: "I'm Ray. Radiation, what it does to things, what stops it. Short answers. Let's go.", pose: "greet" },
+  { id: "line-ray-sign-off", npcId: "npc-ray", kind: "sign_off", text: "Unit done. You can say what radiation does and what stops it. Noted. Good work.", pose: "proud" },
+  { id: "line-ray-tease", npcId: "npc-ray", kind: "tease", text: "Finish my unit first. After that: what radiation does to the body. That one is Mina's.", pose: "idle" },
+  { id: "line-ray-intro-ionizing-or-not", npcId: "npc-ray", kind: "lesson_intro", lessonId: "ionizing-or-not", text: "Not all radiation is the same. First job: sort out which kind can knock electrons off atoms.", pose: "point" },
+  { id: "line-ray-intro-what-stops-what", npcId: "npc-ray", kind: "lesson_intro", lessonId: "what-stops-what", text: "Three kinds, three different stoppers. Paper, thin metal, thick lead. Learn which is which.", pose: "explain" },
+  { id: "line-ray-intro-irradiated-or-contaminated", npcId: "npc-ray", kind: "lesson_intro", lessonId: "irradiated-or-contaminated", text: "Standing near a source is not the same as having material on you. Let's separate the two.", pose: "think" },
+  { id: "line-ray-intro-detecting-radiation", npcId: "npc-ray", kind: "lesson_intro", lessonId: "detecting-radiation", text: "Puzzle. A detector reads something in an empty field. Is it broken? Let's find out.", pose: "point" },
+  { id: "line-ray-intro-becquerel-gray-sievert", npcId: "npc-ray", kind: "lesson_intro", lessonId: "becquerel-gray-sievert", text: "Three units, three questions. Get the unit wrong and the number means nothing. Let's get them right.", pose: "explain" },
+  { id: "line-mina-meet", npcId: "npc-mina", kind: "meet", text: "I'm Mina. I teach what radiation does to the body. We'll go one calm step at a time.", pose: "greet" },
+  { id: "line-mina-sign-off", npcId: "npc-mina", kind: "sign_off", text: "Unit done. You can say how big a dose is, how the body copes, and what lowers it.", pose: "proud" },
+  { id: "line-mina-tease", npcId: "npc-mina", kind: "tease", text: "That's all of my lessons for now. More is on the way, and I'll be here when it arrives.", pose: "idle" },
+  { id: "line-mina-intro-the-dose-scale", npcId: "npc-mina", kind: "lesson_intro", lessonId: "the-dose-scale", text: "How big is a dose, really? You get a little every day, and that's fine. Let's use numbers.", pose: "explain" },
+  { id: "line-mina-intro-radiation-and-cells", npcId: "npc-mina", kind: "lesson_intro", lessonId: "radiation-and-cells", text: "Radiation can damage a cell. That's a real worry. The other half matters just as much. Let's see both.", pose: "think" },
+  { id: "line-mina-intro-dose-and-time", npcId: "npc-mina", kind: "lesson_intro", lessonId: "dose-and-time", text: "The same amount can mean different things, depending on how fast it arrives. Let's compare the two.", pose: "point" },
+  { id: "line-mina-intro-time-distance-shielding", npcId: "npc-mina", kind: "lesson_intro", lessonId: "time-distance-shielding", text: "A dose isn't fixed. There are three ways to lower it. We'll take them one at a time.", pose: "explain" },
+  { id: "line-mina-intro-risk-in-perspective", npcId: "npc-mina", kind: "lesson_intro", lessonId: "risk-in-perspective", text: "Last lesson. No new facts, just a calm way to read a scary number. Take your time with it.", pose: "idle" },
 ];

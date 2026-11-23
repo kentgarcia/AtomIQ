@@ -43,6 +43,87 @@
         "channel": "production",
         "groupId": null
       }
+    },
+    {
+      "version": "1.1.0",
+      "date": "2026-11-23",
+      "bump": "minor",
+      "schemaVersion": 4,
+      "contentHash": "c1c1a0a89d49",
+      "summary": {
+        "added": {
+          "blog_comments": 4,
+          "blog_posts": 4,
+          "blog_references": 8,
+          "chat_nodes": 101,
+          "content_references": 1,
+          "encyclopedia_entries": 5,
+          "feed_templates": 34,
+          "items": 123,
+          "lesson_cards": 119,
+          "lesson_references": 23,
+          "lessons": 10,
+          "npc_lines": 16,
+          "objectives": 20,
+          "path_nodes": 14,
+          "unit_references": 9,
+          "unit_statements": 20,
+          "units": 2
+        },
+        "changed": {
+          "chat_nodes": 2,
+          "items": 4,
+          "lesson_cards": 87,
+          "lessons": 2,
+          "npcs": 5
+        },
+        "retired": {
+          "lesson_cards": 26
+        }
+      },
+      "notes": "Units 3 and 4 (Radiation Meets Matter, Radiation and the Body), 10 new lessons with items, chats, feed posts and blog pieces, new AtomDex entries, unit statements and curriculum fixes",
+      "update": {
+        "channel": "production",
+        "groupId": null
+      }
+    },
+    {
+      "version": "1.1.1",
+      "date": "2026-11-23",
+      "bump": "patch",
+      "schemaVersion": 4,
+      "contentHash": "2bed0925de70",
+      "summary": {
+        "added": {},
+        "changed": {
+          "encyclopedia_entries": 3
+        },
+        "retired": {}
+      },
+      "notes": "AtomDex pictures for radioactive waste, watt and yellowcake",
+      "update": {
+        "channel": "production",
+        "groupId": null
+      }
+    },
+    {
+      "version": "1.1.2",
+      "date": "2026-11-23",
+      "bump": "patch",
+      "schemaVersion": 4,
+      "contentHash": "ed526f912845",
+      "summary": {
+        "added": {},
+        "changed": {
+          "lesson_cards": 9
+        },
+        "retired": {}
+      },
+      "notes": "Lesson glossary terms fixed: ten [[term]] markers now link to their AtomDex entries",
+      "update": {
+        "channel": "production",
+        "groupId": null
+      }
     }
   ]
 }

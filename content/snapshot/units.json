@@ -30,6 +30,57 @@
       "teacher_npc_id": "npc-hal"
     },
     {
+      "id": "radiation-and-the-body",
+      "position": 4,
+      "title": "Radiation and the Body",
+      "subtitle": "How much matters, and what you can do about it",
+      "description": "Find out what a dose is and how big an ordinary year of radiation adds up to. See how radiation can damage a cell and how cells repair themselves, why a large, fast dose differs from a small one spread over time, and how time, distance and shielding lower a dose. Then practise reading a frightening number calmly.",
+      "goal": "Say what a dose is and how big everyday doses are, how radiation can damage cells and how cells repair it, why a large fast dose differs from a small spread one, and how time, distance and shielding lower a dose.",
+      "guidebook": {
+        "summary": "Everyone gets a small dose of radiation all the time. The average in the United States is about 6.2 millisieverts a year, mostly natural background. Ionizing radiation can damage the DNA in cells, and cells are extremely efficient at repairing that damage. A very large dose in a short time, about 1000 millisieverts, makes people ill within hours. Low doses do not cause immediate effects but can add a small chance of cancer over a lifetime, and a dose that is low or spread over a long time carries less risk because repair is more likely. Spending less time near a source, standing farther from it and putting a shield between you and it all lower a dose. With a size, a speed and a comparison, a scary number becomes something you can judge.",
+        "termIds": [
+          "sievert",
+          "millisievert",
+          "absorbed-dose",
+          "dose-rate",
+          "background-radiation",
+          "dna",
+          "acute-radiation-syndrome",
+          "shielding"
+        ]
+      },
+      "icon": "Health",
+      "tone": "success",
+      "teacher_npc_id": "npc-mina"
+    },
+    {
+      "id": "radiation-meets-matter",
+      "position": 3,
+      "title": "Radiation Meets Matter",
+      "subtitle": "What radiation does to things, and how we tell",
+      "description": "Find out what separates radiation that can knock electrons off atoms from radiation that cannot. See what stops alpha, beta and gamma, why standing near a source is not the same as being contaminated, how instruments pick radiation up, and what the becquerel, the gray and the sievert each measure.",
+      "goal": "Say what ionizing radiation is, what stops each kind, why being exposed is not the same as being contaminated, and how radiation is detected and measured.",
+      "guidebook": {
+        "summary": "Radiation is energy. Ionizing radiation has enough energy to knock electrons out of atoms, and non-ionizing radiation, such as radio waves, microwaves and visible light, does not. Alpha particles are stopped by paper or skin, beta particles by a thin layer of metal, and gamma rays need thick, dense material to be reduced. Being exposed to radiation is not the same as being contaminated: contamination is radioactive material on or in something, and radiation itself does not spread. Instruments such as Geiger counters and dosimeters detect and measure radiation, and they always pick up some background. The becquerel, the gray and the sievert answer three different questions.",
+        "termIds": [
+          "ionizing-radiation",
+          "electromagnetic-radiation",
+          "x-ray",
+          "shielding",
+          "irradiation",
+          "radioactive-contamination",
+          "geiger-counter",
+          "dosimeter",
+          "becquerel",
+          "gray",
+          "sievert"
+        ]
+      },
+      "icon": "ShieldTick",
+      "tone": "info",
+      "teacher_npc_id": "npc-ray"
+    },
+    {
       "id": "radioactivity",
       "position": 2,
       "title": "Radioactivity",

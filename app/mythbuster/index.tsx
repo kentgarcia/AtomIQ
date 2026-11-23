@@ -13,6 +13,7 @@ import {
 } from "@/theme";
 import { MarkdownText } from "@/components/markdown-text";
 import { Icon } from "@/components/ui/icon";
+import { MythBusterStart } from "@/components/games/MythBusterStart";
 import { GAME_MODES, type ModeConfig } from "@/constants/mythbuster-modes";
 import { getAllMyths } from "@/content/myths";
 import { getUnitStatements } from "@/content/myths/unit-statements";
@@ -97,7 +98,7 @@ const SWIPE_THRESHOLD = width * 0.3;
 const TIME_UP_BEAT_MS = 700;
 
 // Shared screen backdrop mirrors the autumn cream → white page gradient used
-// across the home + games tabs (theme.colors.background).
+// across the home tab and the games (theme.colors.background).
 
 
 
@@ -129,6 +130,11 @@ export default function MythBusterScreen() {
   const styles = useMemo(() => makeStyles(theme), [theme]);
 
   const [gameState, setGameState] = useState<GameState>("intro");
+  // Opened with no mode (the phone app): ask which mode (and unit) before anything starts
+  const [pickerOpen, setPickerOpen] = useState(() => {
+    const param = Array.isArray(modeParam) ? modeParam[0] : modeParam;
+    return !GAME_MODES.some((m) => m.id === param);
+  });
   const [selectedMode, setSelectedMode] = useState<ModeConfig>(() => {
     const param = Array.isArray(modeParam) ? modeParam[0] : modeParam;
     return GAME_MODES.find((m) => m.id === param) ?? GAME_MODES[0];
@@ -333,18 +339,18 @@ export default function MythBusterScreen() {
     setCountStep(0);
     setPicked(null);
 
-    // The instructions live in the Games tab's header now: a level starts the game itself
     setGameState("playing");
   };
 
-  // Arrived from the Games tab difficulty panel → start the game directly
+  // Arrived with a mode (a link, a quest) → start the game directly; with none, the start screen asks
   const autoStartedRef = useRef(false);
   useEffect(() => {
     if (autoStartedRef.current) return;
     autoStartedRef.current = true;
     const param = Array.isArray(modeParam) ? modeParam[0] : modeParam;
     const unit = Array.isArray(unitParam) ? unitParam[0] : unitParam;
-    const mode = GAME_MODES.find((m) => m.id === param) ?? GAME_MODES[0];
+    const mode = GAME_MODES.find((m) => m.id === param);
+    if (!mode) return; // the selection dialog asks first
     void startMode(mode, unit);
   }, [modeParam, unitParam]);
 
@@ -616,7 +622,19 @@ export default function MythBusterScreen() {
 
   // Statements are loading: an empty page in the page colour until the game starts
   if (gameState === "intro") {
-    return <View style={[styles.fullScreen, { backgroundColor: theme.colors.background }]} />;
+    return (
+      <View style={[styles.fullScreen, { backgroundColor: theme.colors.background }]}>
+        {pickerOpen ? (
+          <MythBusterStart
+            onBack={() => router.back()}
+            onPick={(mode, unit) => {
+              setPickerOpen(false);
+              void startMode(mode, unit);
+            }}
+          />
+        ) : null}
+      </View>
+    );
   }
 
   if (gameState === "results") {
@@ -643,7 +661,7 @@ export default function MythBusterScreen() {
     return (
       <Animated.View entering={FadeIn.duration(200).easing(EASE_OUT)} style={[styles.fullScreen, { backgroundColor: theme.colors.mapBackground }]}>
         <SfxOnMount cue="reward.finish-jingle" />
-        <ScreenHeader title="Results" subtitle={selectedMode.title} onBack={resetGame} backLabel="Back to games" />
+        <ScreenHeader title="Results" subtitle={selectedMode.title} onBack={resetGame} backLabel="Back" />
 
         <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={[styles.resultsBody, frame, { paddingHorizontal: gutter + 4 }]}>
           {/* The mascot and the verdict */}
@@ -778,7 +796,7 @@ export default function MythBusterScreen() {
             onPress={() => startMode(selectedMode)}
             renderIcon={(color) => <Icon name="Refresh" size={20} color={color} variant="Bold" />}
           />
-          <Button label="Back to games" variant="secondary" onPress={() => router.back()} />
+          <Button label="Done" variant="secondary" onPress={() => router.back()} />
         </Reveal>
       </Animated.View>
     );

@@ -214,7 +214,7 @@ export function FigureView({ figure, maxWidth }: { figure: CardFigure; maxWidth?
     <View style={styles.figureWrap} onLayout={onLayout}>
       <FigureStage>
         <View accessible accessibilityRole="image" accessibilityLabel={figure.altText}>
-          {w > 0 ? <SceneSvg scene={figure.scene} width={w} plate={false} /> : null}
+          {w > 0 ? <SceneSvg scene={figure.scene} width={w} plate={false} exclusive /> : null}
         </View>
       </FigureStage>
       {figure.caption ? <Text style={styles.caption}>{figure.caption}</Text> : null}

@@ -18,7 +18,7 @@ import Animated, {
 } from "react-native-reanimated";
 import { useReducedMotion } from "@/components/motion/use-reduced-motion";
 
-import { ENEMY_KINDS, type BlockTile, type EnemyKind, type Level } from "./platformer-core";
+import { DOSE_RADIUS, ENEMY_KINDS, beamPhase, type BlockTile, type EnemyKind, type Level } from "./platformer-core";
 import {
   CHUNK_COLS,
   FRAME_HEAD,
@@ -26,6 +26,7 @@ import {
   HERO_DRAW,
   backdropStack,
   platformSlot,
+  doseSlot,
   springSlot,
   type BiomeName,
   type TerrainTheme,
@@ -101,6 +102,7 @@ function buildChunkItems(level: Level, index: number, underRows: number, theme: 
     for (let c = from; c < to; c++) {
       const i = r * level.cols + c;
       if (level.oneway[i] === 1) out.push({ key: `ow${c}_${r}`, source: (level.bridge[i] === 1 ? PROP_SPRITES.bridge : PROP_SPRITES.plank) as number, c, r, w: 1, h: 1, dy: 0 });
+      else if (level.lead[i] === 1) out.push({ key: `ld${c}_${r}`, source: PROP_SPRITES.lead as number, c, r, w: 1, h: 1, dy: 0, bleed: true });
       else if (level.conveyor[i] !== 0) out.push({ key: `cv${c}_${r}`, source: PROP_SPRITES.conveyor as number, c, r, w: 1, h: 1, dy: 0, bleed: true, flip: level.conveyor[i] < 0 });
     }
   }
@@ -341,6 +343,70 @@ function Saw({ c, r, tile, frame }: { c: number; r: number; tile: number; frame:
     </Animated.View>
   );
 }
+
+/** A radiation beam shines down from its emitter to the first solid tile; dark, then blinking, then on (`beamPhase`, the same cycle the rules use). */
+// theme-allow: the beam is level artwork, the same colour in light and dark
+const BEAM_COLOR = "#FFC800";
+function Beam({ c, r, endRow, tile, frame }: { c: number; r: number; endRow: number; tile: number; frame: SharedValue<number[]> }) {
+  const reduced = useReducedMotion();
+  const column = useAnimatedStyle(() => {
+    const t = stepped(frame.value[1] ?? 0, DECOR_FPS);
+    const phase = beamPhase(c, t);
+    // reduced motion: a warning does not blink, it is a steady half-light
+    const warn = reduced ? 0.3 : Math.floor(t * 8) % 2 === 0 ? 0.45 : 0.12;
+    return { opacity: phase === "on" ? 0.9 : phase === "warn" ? warn : 0 };
+  });
+  const length = Math.max(0, endRow - r - 1) * tile;
+  return (
+    <>
+      {length > 0 ? <Animated.View pointerEvents="none" style={[{ position: "absolute", left: c * tile + tile * 0.25, top: (r + 1) * tile - 1, width: tile * 0.5, height: length + 1, borderRadius: tile * 0.12, backgroundColor: BEAM_COLOR }, column]} /> : null}
+      <Image source={PROP_SPRITES.beamEmitter} pointerEvents="none" style={{ position: "absolute", left: c * tile, top: r * tile, width: tile + 1, height: tile + 1 }} fadeDuration={0} />
+    </>
+  );
+}
+const BeamM = memo(Beam);
+
+/** A dose source: its box, and a soft disc for the field round it (`DOSE_RADIUS`, the same disc the rules use). */
+// theme-allow: the field is level artwork, the same colour in light and dark
+const DOSE_COLOR = "#7ED957";
+function DoseSource({ c, r, tile, frame }: { c: number; r: number; tile: number; frame: SharedValue<number[]> }) {
+  const reduced = useReducedMotion();
+  const field = useAnimatedStyle(() => {
+    const t = stepped(frame.value[1] ?? 0, DECOR_FPS);
+    return { opacity: reduced ? 0.2 : 0.17 + 0.07 * (0.5 + 0.5 * Math.sin(t * 2.2)) };
+  });
+  const d = DOSE_RADIUS * 2 * tile;
+  return (
+    <>
+      <Animated.View pointerEvents="none" style={[{ position: "absolute", left: (c + 0.5) * tile - d / 2, top: (r + 0.5) * tile - d / 2, width: d, height: d, borderRadius: d / 2, backgroundColor: DOSE_COLOR }, field]} />
+      <Image source={PROP_SPRITES.beamEmitter} pointerEvents="none" style={{ position: "absolute", left: c * tile, top: r * tile, width: tile + 1, height: tile + 1 }} fadeDuration={0} />
+    </>
+  );
+}
+const DoseSourceM = memo(DoseSource);
+
+/** The dose meter over the hero's head: a small bar that fills while the hero stands in a field (one slot of the frame array; it only grows by a transform). */
+// theme-allow: the meter is game artwork, the same colour in light and dark
+const DOSE_TRACK = "#00000066";
+const DOSE_FILL = "#FFC800";
+function DoseMeter({ tile, slot, frame }: { tile: number; slot: number; frame: SharedValue<number[]> }) {
+  const w = Math.round(tile * 0.9);
+  const h = Math.max(4, Math.round(tile * 0.12));
+  const place = useAnimatedStyle(() => {
+    const dose = frame.value[slot] ?? 0;
+    return {
+      opacity: dose > 0.02 ? 1 : 0,
+      transform: [{ translateX: (frame.value[2] ?? 0) + (Math.round(HERO_DRAW * tile) - w) / 2 }, { translateY: (frame.value[3] ?? 0) + tile * 0.12 }],
+    };
+  });
+  const fill = useAnimatedStyle(() => ({ transform: [{ scaleX: Math.max(0.001, frame.value[slot] ?? 0) }] }));
+  return (
+    <Animated.View pointerEvents="none" style={[{ position: "absolute", left: 0, top: 0, width: w, height: h, borderRadius: h / 2, backgroundColor: DOSE_TRACK, overflow: "hidden" }, place]}>
+      <Animated.View style={[{ width: w, height: h, backgroundColor: DOSE_FILL, transformOrigin: "0% 50%" }, fill]} />
+    </Animated.View>
+  );
+}
+const DoseMeterM = memo(DoseMeter);
 
 /* ------------------------------------------------------------------ */
 /* Blocks, keys, springs, moving platforms                             */
@@ -687,11 +753,14 @@ export const PlatformerWorld = memo(function PlatformerWorld({ level, tile, view
         <Coins level={level} tile={tile} taken={coinTaken} from={chunks.from} to={chunks.to} frame={frame} />
         <Gems level={level} tile={tile} taken={gemTaken} from={chunks.from} to={chunks.to} frame={frame} />
         {level.saws.map((sw) => (sw.c < (chunks.from - 1) * CHUNK_COLS || sw.c >= (chunks.to + 2) * CHUNK_COLS ? null : <SawM key={`saw${sw.c}_${sw.r}`} c={sw.c} r={sw.r} tile={tile} frame={frame} />))}
+        {level.beams.map((b) => (b.c < (chunks.from - 1) * CHUNK_COLS || b.c >= (chunks.to + 2) * CHUNK_COLS ? null : <BeamM key={`beam${b.c}_${b.r}`} c={b.c} r={b.r} endRow={b.endRow} tile={tile} frame={frame} />))}
+        {level.doseSources.map((d) => (d.c < (chunks.from - 1) * CHUNK_COLS - 4 || d.c >= (chunks.to + 2) * CHUNK_COLS + 4 ? null : <DoseSourceM key={`dose${d.c}_${d.r}`} c={d.c} r={d.r} tile={tile} frame={frame} />))}
         <Keys level={level} tile={tile} taken={keyTaken} frame={frame} />
         {level.enemies.map((e, i) => (
           <Enemy key={i} kind={e.kind} index={i} tile={tile} alive={enemyAlive[i] ?? true} frame={frame} />
         ))}
         <HeroM tile={tile} frame={frame} />
+        {level.doseSources.length > 0 ? <DoseMeterM tile={tile} slot={doseSlot(level.enemies.length, level.platforms.length, level.springs.length)} frame={frame} /> : null}
         <WorldFx effects={effects} tile={tile} onDone={onEffectDone} />
         {emotes.map((m) => (
           <Emote key={m.id} emote={m} tile={tile} frame={frame} onDone={onEmoteDone} />

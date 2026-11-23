@@ -1,0 +1,51 @@
+format 1
+adapter chat 1
+npc: npc-mina
+
+node chat-mina-up-unit
+kind: unprompted
+pose: proud
+trigger: unit_complete:radiation-and-the-body
+title: Radiation and the Body: done
+
+    You've finished the unit.
+
+    You can say how big a dose is, how cells cope with damage, why a big fast dose is different from a small slow one, and how time, distance and shielding lower a dose.
+
+    That's a calm, solid understanding.
+
+reply: thanks Mina -> chat-mina-unit-thanks
+reply: what now? -> chat-mina-unit-now
+
+node chat-mina-unit-thanks
+kind: reply
+pose: greet
+
+    You're welcome. You did the work, and you did it patiently.
+
+    Next time a number sounds frightening, you'll know what to ask.
+
+reply: size, speed, comparison -> chat-mina-unit-now
+reply: I will -> chat-mina-unit-now
+
+node chat-mina-unit-now
+kind: reply
+pose: idle
+
+    Practise whenever you like. Replay a lesson, or try a round of Myth Buster.
+
+    More is on the way to the app, and I'll be here when it arrives.
+
+    The questions are there for you.
+
+link: A quick round => mythbuster radiation-and-the-body
+reply: a quick round -> chat-mina-unit-end
+reply: later -> chat-mina-unit-end
+
+node chat-mina-unit-end
+kind: sign_off
+pose: greet
+
+    Take care of yourself.
+
+    I'm here if you want to talk through anything.

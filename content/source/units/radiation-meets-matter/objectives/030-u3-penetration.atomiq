@@ -1,0 +1,183 @@
+format 1
+adapter curriculum 1
+unit: radiation-meets-matter
+
+objective u3-penetration
+
+statement:
+    Know that alpha particles are stopped by paper or skin, beta particles by a thin layer of metal, and that gamma rays are the most penetrating of the three.
+
+misconception: One kind of shield stops every kind of radiation.
+
+item u3-l2-choice-alpha
+type: choice
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-epa-radiation-basics
+references: ref-openstax-chem-21-6
+
+prompt:
+    What is enough to stop alpha particles?
+
+options:
+    {"id":"lead","label":"Several inches of lead","note":"That would stop them, but it is far more than they need. They are heavy and run out of energy very quickly."}
+    {"id":"paper","label":"A sheet or two of paper"}
+    {"id":"none","label":"Nothing can stop them","note":"Alpha particles are the easiest of the three to stop."}
+    {"id":"wall","label":"A thick concrete wall","note":"That is far more than they need. Paper or skin is enough."}
+
+answer: paper
+
+explanation:
+    An alpha particle is heavy, so it loses its energy over a very short distance. Paper, or the top layer of skin, is enough to stop it.
+
+item u3-l2-choice-beta
+type: choice
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-epa-radiation-basics
+references: ref-openstax-chem-21-6
+
+prompt:
+    What stops beta particles?
+
+options:
+    {"id":"paper","label":"A sheet of paper","note":"Beta particles are small and fast, and they pass through paper."}
+    {"id":"lead","label":"Several inches of lead","note":"They do not need anything like that. A thin layer of metal stops them."}
+    {"id":"none","label":"Nothing can stop them","note":"A thin layer of metal does."}
+    {"id":"metal","label":"A thin layer of metal, such as aluminum"}
+
+answer: metal
+
+explanation:
+    A beta particle is small and fast, so paper does not stop it. A thin layer of metal does.
+
+item u3-l2-match-stops
+type: match
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-epa-radiation-basics
+references: ref-openstax-chem-21-6
+
+prompt:
+    Match each kind of radiation to what stops it.
+
+pairs:
+    {"id":"alpha","left":"Alpha","right":"A sheet of paper"}
+    {"id":"beta","left":"Beta","right":"A thin layer of metal"}
+    {"id":"gamma","left":"Gamma","right":"Inches of lead or feet of concrete"}
+
+explanation:
+    Each step up needs something denser or thicker: paper for alpha, thin metal for beta, and several inches of lead or a few feet of concrete for gamma.
+
+item u3-l2-order-pen
+type: order
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-epa-radiation-basics
+references: ref-openstax-chem-21-6
+
+prompt:
+    Put them in order, from the easiest to stop to the hardest to stop.
+
+items:
+    {"id":"alpha","label":"Alpha particles (stopped by paper)"}
+    {"id":"beta","label":"Beta particles (stopped by thin metal)"}
+    {"id":"gamma","label":"Gamma rays (need thick lead or concrete)"}
+
+explanation:
+    Paper is enough for alpha, thin metal is needed for beta, and thick, dense material for gamma. The more it takes to stop it, the more penetrating the radiation is.
+
+item u3-l2-predict-paper
+type: predict
+surfaces: lesson
+references: ref-epa-radiation-basics
+
+prompt:
+    A sheet of paper is held in front of a stream of alpha particles. What do you think happens?
+
+input: choice
+
+options:
+    {"id":"stops","label":"The paper stops them"}
+    {"id":"through","label":"They go straight through"}
+    {"id":"burn","label":"The paper burns"}
+    {"id":"bounce","label":"They bounce back at full speed"}
+
+answer: stops
+
+explanation:
+    Your guess is not scored. Keep it in mind while we look at alpha, beta and gamma.
+
+item u3-l2-tom-skin
+type: true_or_myth
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-epa-radiation-basics
+
+statement:
+    The outer layer of your skin stops alpha particles.
+
+answer: true
+
+explanation:
+    True. Alpha particles cannot get through the outer layer of skin, for the same reason a sheet of paper stops them: they are heavy and lose their energy fast.
+
+item u3-x-most-penetrating
+type: choice
+surfaces: practice
+surfaces: checkpoint
+surfaces: review
+references: ref-epa-radiation-basics
+
+prompt:
+    Which of these is the most penetrating?
+
+options:
+    {"id":"alpha","label":"Alpha particles","note":"Alpha particles are the least penetrating. Paper stops them."}
+    {"id":"gamma","label":"Gamma rays"}
+    {"id":"beta","label":"Beta particles","note":"Beta particles go farther than alpha, but a thin layer of metal stops them. Gamma goes farther still."}
+
+answer: gamma
+
+explanation:
+    Gamma rays pass through skin and clothing and need thick, dense material to stop them. That makes them the most penetrating of the three.
+
+item u3-x-skin-alpha
+type: choice
+surfaces: practice
+surfaces: checkpoint
+surfaces: review
+references: ref-epa-radiation-basics
+
+prompt:
+    Why can alpha particles be stopped by the top layer of skin?
+
+options:
+    {"id":"heavy","label":"They are heavy and lose their energy over a very short distance"}
+    {"id":"slow","label":"They are the fastest radiation, so they stop on contact","note":"Alpha particles are not fast. Being heavy is what makes them stop quickly."}
+    {"id":"warm","label":"Skin is warm and absorbs radiation","note":"Warmth has nothing to do with it. It is about how heavy the particle is."}
+
+answer: heavy
+
+explanation:
+    An alpha particle is heavy, so it uses up its energy over a very short distance. That is why paper or the outer layer of skin is enough.
+
+item u3-x-tom-same-stop
+type: true_or_myth
+surfaces: practice
+surfaces: checkpoint
+surfaces: review
+references: ref-epa-radiation-basics
+
+statement:
+    The same shield stops alpha, beta and gamma equally well.
+
+answer: myth
+
+explanation:
+    Myth. They are stopped by very different things: paper for alpha, thin metal for beta, and thick, dense material for gamma. A shield has to suit the radiation.

@@ -2,12 +2,14 @@
 // Google Play Store packs export at exact required pixel dimensions (1x); Beta 1:1 slides export up to 4x.
 // The PNG is drawn via SVG <foreignObject> (with fonts and images inlined as data URIs). No dependencies.
 
+import { FB_PACKS } from "./fb-slides.js";
 import { PLAY_PACKS } from "./play-slides.js";
 import { SLIDES as BETA_SLIDES } from "./slides.js";
 import { buildZip } from "./zip.js";
 
 const PACKS = [
   ...PLAY_PACKS,
+  ...FB_PACKS,
   {
     id: "beta",
     name: "Beta Carousel",
@@ -112,12 +114,13 @@ async function toDataUrl(url) {
 }
 
 async function exportCss() {
-  const [baseCss, playCss, font] = await Promise.all([
+  const [baseCss, playCss, fbCss, font] = await Promise.all([
     fetch("slides.css", { cache: "no-store" }).then((r) => r.text()),
     fetch("play-slides.css", { cache: "no-store" }).then((r) => r.text()),
+    fetch("fb-slides.css", { cache: "no-store" }).then((r) => r.text()),
     toDataUrl("/app-assets/fonts/Intern-Variable.ttf"),
   ]);
-  const combined = `${baseCss}\n${playCss}`;
+  const combined = `${baseCss}\n${playCss}\n${fbCss}`;
   return combined.replace(/url\("\/app-assets\/fonts\/Intern-Variable\.ttf"\)/g, `url("${font}")`);
 }
 

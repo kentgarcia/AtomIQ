@@ -105,6 +105,8 @@ test("the next stop is found across worlds", () => {
   assert.deepEqual(m.nextStop(STORY_WORLDS, []), { worldIndex: 0, position: 0, globalIndex: 0 });
   assert.deepEqual(m.nextStop(STORY_WORLDS, ids.slice(0, 5).map((id) => rec(id, 1))), { worldIndex: 1, position: 0, globalIndex: 5 });
   assert.deepEqual(m.nextStop(STORY_WORLDS, ids.slice(0, 7).map((id) => rec(id, 1))), { worldIndex: 1, position: 2, globalIndex: 7 });
-  assert.deepEqual(m.nextStop(STORY_WORLDS, ids.map((id) => rec(id, 3))), { worldIndex: 2, position: 4, globalIndex: 14 }, "all done: the last");
+  assert.deepEqual(m.nextStop(STORY_WORLDS, ids.map((id) => rec(id, 3))), { worldIndex: 4, position: 4, globalIndex: 24 }, "all done: the last");
   assert.deepEqual(m.nextStop(STORY_WORLDS, ids.slice(0, 10).map((id) => rec(id, 1))), { worldIndex: 2, position: 0, globalIndex: 10 }, "Unit 2 opens after Unit 1's boss");
+  assert.deepEqual(m.nextStop(STORY_WORLDS, ids.slice(0, 15).map((id) => rec(id, 1))), { worldIndex: 3, position: 0, globalIndex: 15 }, "Unit 3 opens after Unit 2's boss");
+  assert.deepEqual(m.nextStop(STORY_WORLDS, ids.slice(0, 20).map((id) => rec(id, 1))), { worldIndex: 4, position: 0, globalIndex: 20 }, "Unit 4 opens after Unit 3's boss");
 });

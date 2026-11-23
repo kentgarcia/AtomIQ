@@ -6,6 +6,14 @@
   ],
   "rows": [
     {
+      "blog_id": "blog-exposed-is-not-contaminated",
+      "reference_id": "ref-hps-radioactive-contamination"
+    },
+    {
+      "blog_id": "blog-exposed-is-not-contaminated",
+      "reference_id": "ref-who-ionizing-radiation"
+    },
+    {
       "blog_id": "blog-nobody-knows-when",
       "reference_id": "ref-openstax-chem-21-3"
     },
@@ -16,6 +24,14 @@
     {
       "blog_id": "blog-nobody-knows-when",
       "reference_id": "ref-wikipedia-radioactive-decay"
+    },
+    {
+      "blog_id": "blog-reading-a-scary-number",
+      "reference_id": "ref-epa-radiation-health-effects"
+    },
+    {
+      "blog_id": "blog-reading-a-scary-number",
+      "reference_id": "ref-who-ionizing-radiation"
     },
     {
       "blog_id": "blog-the-banana-on-your-counter",
@@ -43,6 +59,22 @@
     },
     {
       "blog_id": "blog-the-banana-on-your-counter",
+      "reference_id": "ref-who-ionizing-radiation"
+    },
+    {
+      "blog_id": "blog-the-counter-always-clicks",
+      "reference_id": "ref-epa-radiation-basics"
+    },
+    {
+      "blog_id": "blog-the-counter-always-clicks",
+      "reference_id": "ref-who-ionizing-radiation"
+    },
+    {
+      "blog_id": "blog-the-dose-you-already-get",
+      "reference_id": "ref-epa-radiation-sources"
+    },
+    {
+      "blog_id": "blog-the-dose-you-already-get",
       "reference_id": "ref-who-ionizing-radiation"
     },
     {

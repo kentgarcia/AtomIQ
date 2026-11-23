@@ -268,10 +268,10 @@ describe("T4: bad input is refused (lessons)", () => {
 
 describe("a sync across adapters keeps foreign keys valid", () => {
   it("orderOps: parks, then deletes last adapter first, then inserts first adapter first, then updates", async () => {
-    const { orderOps } = await import("./lib/content-source/sync.mjs");
+    const { orderOps, PARK_BASE } = await import("./lib/content-source/sync.mjs");
     const refs = [{ op: "insert", table: "content_references", values: { id: "r" } }, { op: "delete", table: "content_references", pk: "old" }];
     const cards = [
-      { op: "update", table: "safety_cards", pk: "a", set: { position: -1 } },
+      { op: "update", table: "safety_cards", pk: "a", set: { position: PARK_BASE + 1 } },
       { op: "delete", table: "safety_card_references", pk: ["old-card", "old"] },
       { op: "insert", table: "safety_card_references", values: { card_id: "c", reference_id: "r" } },
       { op: "update", table: "safety_cards", pk: "a", set: { position: 0 } },

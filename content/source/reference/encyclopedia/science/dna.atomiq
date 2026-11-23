@@ -1,0 +1,20 @@
+format 1
+adapter encyclopedia 1
+category: science
+
+entry dna
+term: DNA
+related_terms: ionizing-radiation
+related_terms: absorbed-dose
+quick_facts: The genetic material inside living cells
+quick_facts: Ionizing radiation can damage it
+quick_facts: Cells are extremely efficient at repairing the damage
+
+sources:
+    {"organization":"U.S. Environmental Protection Agency","title":"Radiation Health Effects","url":"https://www.epa.gov/radiation/radiation-health-effects"}
+
+definition:
+    DNA is the genetic material in living cells. Ionizing radiation has enough energy to affect the atoms in living cells, and so it can damage DNA. Cells are extremely efficient at repairing this damage, but if it is not repaired correctly a cell may die or eventually become cancerous.
+
+debunking_snippet:
+    “Radiation damage to a cell can never be undone.” The cells in our bodies are extremely efficient at repairing this damage.

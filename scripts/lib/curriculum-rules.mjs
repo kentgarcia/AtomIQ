@@ -18,15 +18,30 @@ import { checkDecayWaitData } from "../../content/curriculum/decay-wait-core.ts"
 import { checkDecayChainData } from "../../content/curriculum/decay-chain-core.ts";
 import { checkRadiationIdData } from "../../content/curriculum/radiation-id-core.ts";
 
+/**
+ * The shape of a lesson is adaptive, not a template (2026-11-23): a lesson that explains a hard idea needs more
+ * teaching before it asks, a drill lesson needs less. So the numbers below are floors and ceilings that only catch
+ * a lesson that is plainly broken (no teaching, no practice, a wall of text). Anything inside them but outside the
+ * target is a warning, which the author may accept. A reading run is measured in WORDS, not cards, since a card can
+ * be one line or a paragraph.
+ */
 export const LIMITS = {
-  cardsMin: 8,
-  cardsMax: 16,
+  cardsMin: 5,
+  cardsMax: 26,
+  cardsTargetMin: 7,
+  cardsTargetMax: 18,
   wordsTarget: 60,
-  wordsHard: 80,
-  maxConsecutiveNonInteractive: 2,
-  minInteractiveShare: 0.5,
-  minNonChoice: 2,
-  objectivesMin: 2,
+  wordsHard: 100,
+  /** Words of teaching in a row, with no question between: warn past the first, error past the second. */
+  readingRunWarnWords: 150,
+  readingRunHardWords: 260,
+  minInteractiveShare: 0.2,
+  interactiveShareTarget: 0.4,
+  minNonChoice: 1,
+  /** A share of the teaching cards must carry a figure; not every bubble needs a picture. */
+  minFigureShare: 0.5,
+  objectivesMin: 1,
+  objectivesTarget: 2,
   objectivesMax: 4,
   minScoredPerObjective: 2,
   minItemsPerObjective: 4,
@@ -99,6 +114,9 @@ export function validateCurriculum(db, { strictReview = false } = {}) {
     for (const m of String(value).matchAll(TERM_RE)) {
       if (entryIds.size && !entryIds.has(m[1])) err(table, id, field, "glossary-term", `term marker "${m[1]}" is not an encyclopedia entry`, value);
     }
+    // Anything left that still looks like a marker is malformed ("[[radon]]" with no shown text) and would print its brackets.
+    const leftover = String(value).replace(TERM_RE, "");
+    if (/\[\[|\]\]/.test(leftover)) err(table, id, field, "glossary-term-format", "a term marker is written [[entry-id|shown text]]", value);
   };
 
   // -------------------------------------------------------------------------
@@ -332,6 +350,7 @@ export function validateCurriculum(db, { strictReview = false } = {}) {
     if (!unitIds.has(l.unit_id)) e("unit_id", "lesson-unit", "unit does not exist");
     if (l.estimated_minutes < LIMITS.minutesMin || l.estimated_minutes > LIMITS.minutesMax) w("estimated_minutes", "lesson-length", `${l.estimated_minutes} min is outside the ${LIMITS.minutesMin}-${LIMITS.minutesMax} minute target`);
     if (teaches.length < LIMITS.objectivesMin || teaches.length > LIMITS.objectivesMax) e("teaches", "lesson-objectives", `teaches ${teaches.length} objective(s); needs ${LIMITS.objectivesMin} to ${LIMITS.objectivesMax}`);
+    else if (teaches.length > LIMITS.objectivesTarget) w("teaches", "lesson-objectives", `teaches ${teaches.length} objectives; one or two topics are easier to learn`);
     if (!lessonRefs.some((r) => r.lesson_id === l.id)) e("references", "lesson-reference", "a lesson needs at least one reference");
 
     for (const o of reliesOn) {
@@ -344,26 +363,29 @@ export function validateCurriculum(db, { strictReview = false } = {}) {
 
     // Card count
     if (lc.length < LIMITS.cardsMin || lc.length > LIMITS.cardsMax) e("cards", "lesson-cards", `has ${lc.length} cards; needs ${LIMITS.cardsMin} to ${LIMITS.cardsMax}`);
+    else if (lc.length < LIMITS.cardsTargetMin || lc.length > LIMITS.cardsTargetMax) w("cards", "lesson-cards", `has ${lc.length} cards; ${LIMITS.cardsTargetMin} to ${LIMITS.cardsTargetMax} is the usual range`);
 
     const core = lc.filter((c) => c.tier === "core");
     const interactive = (c) => c.kind === "item" || c.kind === "sim";
-    if (core.length && core.filter(interactive).length / core.length < LIMITS.minInteractiveShare) {
-      e("cards", "lesson-interactive", `only ${core.filter(interactive).length} of ${core.length} core cards are interactive; at least half must be`);
-    }
-    let run = 0;
+    const shareDone = core.length ? core.filter(interactive).length / core.length : 1;
+    if (shareDone < LIMITS.minInteractiveShare) e("cards", "lesson-interactive", `only ${core.filter(interactive).length} of ${core.length} core cards are questions; a lesson needs real practice`);
+    else if (shareDone < LIMITS.interactiveShareTarget) w("cards", "lesson-interactive", `only ${core.filter(interactive).length} of ${core.length} core cards are questions; check that the lesson asks enough`);
+    // Teaching in a row, in words: a card can be a line or a paragraph, so the budget is what the learner reads before being asked
+    let runWords = 0;
+    let warned = false;
     for (const c of core) {
-      run = interactive(c) ? 0 : run + 1;
-      if (run > LIMITS.maxConsecutiveNonInteractive) {
-        e(`cards.${c.id}`, "lesson-reading-run", `more than ${LIMITS.maxConsecutiveNonInteractive} reading cards in a row`);
-        break;
-      }
+      if (interactive(c)) { runWords = 0; warned = false; continue; }
+      runWords += wordCount(c.data?.body ?? "");
+      if (runWords > LIMITS.readingRunHardWords) { e(`cards.${c.id}`, "lesson-reading-run", `${runWords} words of teaching in a row; ask something before this point`); break; }
+      if (runWords > LIMITS.readingRunWarnWords && !warned) { warned = true; w(`cards.${c.id}`, "lesson-reading-run", `${runWords} words of teaching in a row; consider a question here`); }
     }
+    const teachCards = lc.filter((c) => c.kind === "teach");
+    if (teachCards.length && teachCards.filter((c) => c.data?.figure || c.data?.visual).length / teachCards.length < LIMITS.minFigureShare) e("cards", "lesson-figures", `fewer than ${Math.round(LIMITS.minFigureShare * 100)}% of the teaching cards have a figure`);
 
     const itemOf = (c) => (c.item_id ? itemById.get(c.item_id) : undefined);
     const nonChoice = core.filter((c) => c.kind === "sim" || (c.kind === "item" && NON_CHOICE_ITEM_TYPES.includes(itemOf(c)?.type)));
-    if (nonChoice.length < LIMITS.minNonChoice) e("cards", "lesson-variety", `has ${nonChoice.length} non-choice interaction(s); needs at least ${LIMITS.minNonChoice}`);
-    // Opening with a prediction is the usual pattern, not a rule: a lesson may start by teaching.
-    if (!core.some((c) => c.kind === "item" && itemOf(c)?.type === "predict")) w("cards", "lesson-predict", "has no predict card; most lessons open with one");
+    if (nonChoice.length < LIMITS.minNonChoice) w("cards", "lesson-variety", `has ${nonChoice.length} non-choice interaction(s); most lessons have at least ${LIMITS.minNonChoice}`);
+    // A prediction is one way to open a lesson, not a rule: a lesson may start with a story, a puzzle or plain teaching.
 
     // Scored items per taught objective
     for (const o of teaches) {
@@ -384,10 +406,9 @@ export function validateCurriculum(db, { strictReview = false } = {}) {
         else {
           const words = wordCount(d.body);
           if (words > LIMITS.wordsHard) ce("data.body", "card-words", `${words} words; the limit is ${LIMITS.wordsHard}`);
-          else if (words > LIMITS.wordsTarget) warn("lesson_cards", cid, "data.body", "card-words", `${words} words; aim for ${LIMITS.wordsTarget} or fewer`);
+          else if (words > LIMITS.wordsTarget) warn("lesson_cards", cid, "data.body", "card-words", `${words} words; aim for ${LIMITS.wordsTarget} or fewer, or split it into two cards`);
         }
         for (const f of ["title", "body", "tag"]) checkText("lesson_cards", cid, `data.${f}`, d[f]);
-        if (!d.figure && !d.visual) ce("data.figure", "card-figure", "every teaching card needs a figure");
         if (d.figure) {
           const { figure: fig, problem } = expandFigure(d.figure);
           if (problem) ce("data.figure", "card-figure-ref", problem);

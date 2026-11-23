@@ -132,3 +132,16 @@ test("a bad list stops everything and says why, without throwing", async () => {
   assert.equal(version(db), 0);
   assert.ok(!columns(db, "notes").includes("pinned"));
 });
+
+test("the shipped migration adds chat_threads.reward_claimed to a phone that has threads, unclaimed, and a second start does nothing", async () => {
+  const db = open();
+  await db.execAsync("CREATE TABLE chat_threads (id TEXT PRIMARY KEY, title TEXT NOT NULL, origin TEXT NOT NULL DEFAULT 'free', plays INTEGER NOT NULL DEFAULT 1); INSERT INTO chat_threads (id, title, origin) VALUES ('t1', 'A story', 'event');");
+  const first = await core.migrateUserDb(db);
+  assert.equal(first.failed, null);
+  assert.ok(first.applied.includes("add chat_threads.reward_claimed"));
+  assert.ok(columns(db, "chat_threads").includes("reward_claimed"));
+  assert.equal(db.raw.prepare("SELECT reward_claimed FROM chat_threads WHERE id = 't1'").get().reward_claimed, 0);
+  assert.equal(version(db), core.latestUserDbVersion());
+  const second = await core.migrateUserDb(db);
+  assert.deepEqual(second.applied, []);
+});

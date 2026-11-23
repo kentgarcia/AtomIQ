@@ -1,0 +1,123 @@
+format 1
+adapter curriculum 1
+unit: radiation-meets-matter
+
+lesson what-stops-what
+title: What stops what
+minutes: 6
+xp: 50
+teaches: u3-penetration
+teaches: u3-gamma-shielding
+relies_on: u2-recognise-radiation
+relies_on: u3-ionizing-meaning
+
+description:
+    Alpha, beta and gamma travel very different distances through things. You will find out what stops each one, and why gamma rays need something thick and dense.
+
+cite ref-epa-radiation-basics
+
+supports:
+    Alpha particles cannot penetrate the outer layer of skin; beta particles are stopped by a thin layer of aluminum; several inches of lead or a few feet of concrete may be required to stop gamma rays.
+
+cite ref-openstax-chem-21-6
+
+supports:
+    A sheet or two of paper, or the top layer of skin cells, usually stops alpha particles; beta particles are stopped by a thin layer of metal; gamma radiation is very penetrating.
+
+cite ref-epa-protecting-yourself
+
+supports:
+    Barriers of lead, concrete or water protect from gamma rays and X-rays; dentists place a lead apron on patients having X-rays of their teeth.
+
+card c01
+kind: item
+type: item
+item: u3-l2-predict-paper
+scored: 0
+
+card c02
+kind: teach
+type: explain
+scored: 0
+title: Alpha: heavy, so it stops fast
+figure: alpha-paper
+figure_at: 2
+
+body:
+    An alpha particle is heavy. A heavy particle uses up its energy over a very short distance. So a sheet or two of paper, or the top layer of your skin, usually stops it.
+
+card c03
+kind: item
+type: item
+item: u3-l2-choice-alpha
+connected: true
+
+card c04
+kind: teach
+type: explain
+scored: 0
+title: Beta: small and fast
+figure: beta-metal
+figure_at: 2
+
+body:
+    A beta particle is small and fast. It goes farther through air than an alpha particle, and it passes through paper. A thin layer of metal, such as aluminum, stops it.
+
+card c05
+kind: item
+type: item
+item: u3-l2-choice-beta
+connected: true
+
+card c06
+kind: teach
+type: explain
+scored: 0
+title: Gamma: very penetrating
+
+body:
+    Gamma rays are pure energy, and they are very penetrating. They pass through skin and clothing. Paper and a thin layer of metal will not stop them.
+
+card c07
+kind: teach
+type: explain
+scored: 0
+title: What it takes to stop gamma
+figure: gamma-thick
+figure_at: 1
+
+body:
+    It takes several inches of a dense material like lead, or a few feet of concrete, to stop gamma rays. Thick and dense: that is what makes a good shield against them.
+
+card c08
+kind: item
+type: item
+item: u3-l2-tom-gamma-paper
+connected: true
+
+card c09
+kind: item
+type: item
+item: u3-l2-choice-gamma
+
+card c10
+kind: item
+type: item
+item: u3-l2-order-pen
+
+card c11
+kind: item
+type: item
+item: u3-l2-match-stops
+
+card c12
+kind: teach
+type: explain
+tier: deeper
+scored: 0
+title: Go deeper: shields at work
+figure: shields-in-use
+figure_at: 1
+
+body:
+    Barriers of lead, concrete or water protect against gamma rays and X-rays. That is why some radioactive materials are stored under water, or in concrete or lead-lined rooms, and why a dentist puts a lead apron on you.

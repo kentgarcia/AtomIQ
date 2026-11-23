@@ -26,6 +26,8 @@ const TYPES = {
   ".js": "text/javascript; charset=utf-8",
   ".json": "application/json",
   ".png": "image/png",
+  ".jpg": "image/jpeg",
+  ".jpeg": "image/jpeg",
   ".svg": "image/svg+xml",
   ".ttf": "font/ttf",
 };
@@ -44,11 +46,13 @@ watch(publicDir, { recursive: true }, () => {
   timer = setTimeout(() => listeners.forEach((res) => res.write("data: reload\n\n")), 80);
 });
 const RELOAD_JS = `
-let lost = false;
-const es = new EventSource("/__reload");
-es.onmessage = () => location.reload();
-es.onerror = () => { lost = true; };
-es.onopen = () => { if (lost) location.reload(); };
+if (!location.search.includes("noreload=1")) {
+  let lost = false;
+  const es = new EventSource("/__reload");
+  es.onmessage = () => location.reload();
+  es.onerror = () => { lost = true; };
+  es.onopen = () => { if (lost) location.reload(); };
+}
 `;
 
 const server = createServer(async (req, res) => {

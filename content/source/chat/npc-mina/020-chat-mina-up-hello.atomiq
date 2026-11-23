@@ -1,0 +1,71 @@
+format 1
+adapter chat 1
+npc: npc-mina
+
+node chat-mina-up-hello
+kind: unprompted
+pose: greet
+trigger: lessons_completed:16
+title: Hello, I'm Mina
+
+    Hello. I'm Mina.
+
+    I teach what radiation does to the body, and how big a dose really is.
+
+    You've finished my first lesson. Thank you for starting with me.
+
+reply: hi Mina -> chat-mina-hello-hi
+reply: Ray said you're calm -> chat-mina-hello-ray
+reply: is this unit scary? -> chat-mina-hello-scary
+
+node chat-mina-hello-hi
+kind: reply
+pose: idle
+
+    Hi. I'm glad you're here.
+
+    We'll go slowly and I'll only say what the sources say.
+
+reply: sounds good -> chat-mina-hello-end
+reply: what do you cover? -> chat-mina-hello-cover
+
+node chat-mina-hello-ray
+kind: reply
+pose: greet
+
+    Ray is kind. I'll take that as a compliment.
+
+    He taught you what radiation does to things. I'll take it from there, to the body.
+
+reply: ok -> chat-mina-hello-cover
+reply: I'd like to hear more -> chat-mina-hello-cover
+
+node chat-mina-hello-scary
+kind: reply
+pose: explain
+
+    It can feel that way at first. Most of the unit is about calming a worry down with numbers.
+
+    Everyone gets a small dose every day. You already saw that.
+
+reply: that helps -> chat-mina-hello-end
+reply: what else do you cover? -> chat-mina-hello-cover
+
+node chat-mina-hello-cover
+kind: reply
+pose: point
+
+    Cells and how they repair damage. Big doses and small ones. Time, distance and shielding.
+
+    And the last lesson is about reading a scary number calmly.
+
+reply: I'm in -> chat-mina-hello-end
+reply: sounds good -> chat-mina-hello-end
+
+node chat-mina-hello-end
+kind: sign_off
+pose: proud
+
+    Good. Message me any time you want to go over something.
+
+    Your next lesson is on the map.

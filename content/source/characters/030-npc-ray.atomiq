@@ -20,13 +20,14 @@ spec:
       "headWidth": 98,
       "eyes": "glasses-square",
       "nose": "double",
+      "mouth": "smirk",
       "hair": {
-        "style": "crop",
+        "style": "flattop",
         "color": "#2E2622",
         "shade": "#211B18"
       },
       "outfit": {
-        "kind": "hoodie",
+        "kind": "fieldhoodie",
         "color": "#CE82FF",
         "shade": "#9069CD",
         "collar": "#FFFFFF"
@@ -37,3 +38,56 @@ spec:
         "shade": "#CD7900"
       }
     }
+
+line line-ray-meet
+kind: meet
+pose: greet
+
+    I'm Ray. Radiation, what it does to things, what stops it. Short answers. Let's go.
+
+line line-ray-sign-off
+kind: sign_off
+pose: proud
+
+    Unit done. You can say what radiation does and what stops it. Noted. Good work.
+
+line line-ray-tease
+kind: tease
+pose: idle
+
+    Finish my unit first. After that: what radiation does to the body. That one is Mina's.
+
+line line-ray-intro-becquerel-gray-sievert
+kind: lesson_intro
+pose: explain
+lesson: becquerel-gray-sievert
+
+    Three units, three questions. Get the unit wrong and the number means nothing. Let's get them right.
+
+line line-ray-intro-detecting-radiation
+kind: lesson_intro
+pose: point
+lesson: detecting-radiation
+
+    Puzzle. A detector reads something in an empty field. Is it broken? Let's find out.
+
+line line-ray-intro-ionizing-or-not
+kind: lesson_intro
+pose: point
+lesson: ionizing-or-not
+
+    Not all radiation is the same. First job: sort out which kind can knock electrons off atoms.
+
+line line-ray-intro-irradiated-or-contaminated
+kind: lesson_intro
+pose: think
+lesson: irradiated-or-contaminated
+
+    Standing near a source is not the same as having material on you. Let's separate the two.
+
+line line-ray-intro-what-stops-what
+kind: lesson_intro
+pose: explain
+lesson: what-stops-what
+
+    Three kinds, three different stoppers. Paper, thin metal, thick lead. Learn which is which.

@@ -1,0 +1,39 @@
+format 1
+adapter curriculum 1
+
+unit radiation-meets-matter
+position: 3
+title: Radiation Meets Matter
+subtitle: What radiation does to things, and how we tell
+icon: ShieldTick
+tone: info
+teacher: npc-ray
+
+goal:
+    Say what ionizing radiation is, what stops each kind, why being exposed is not the same as being contaminated, and how radiation is detected and measured.
+
+summary:
+    Radiation is energy. Ionizing radiation has enough energy to knock electrons out of atoms, and non-ionizing radiation, such as radio waves, microwaves and visible light, does not. Alpha particles are stopped by paper or skin, beta particles by a thin layer of metal, and gamma rays need thick, dense material to be reduced. Being exposed to radiation is not the same as being contaminated: contamination is radioactive material on or in something, and radiation itself does not spread. Instruments such as Geiger counters and dosimeters detect and measure radiation, and they always pick up some background. The becquerel, the gray and the sievert answer three different questions.
+
+terms: ionizing-radiation
+terms: electromagnetic-radiation
+terms: x-ray
+terms: shielding
+terms: irradiation
+terms: radioactive-contamination
+terms: geiger-counter
+terms: dosimeter
+terms: becquerel
+terms: gray
+terms: sievert
+
+description:
+    Find out what separates radiation that can knock electrons off atoms from radiation that cannot. See what stops alpha, beta and gamma, why standing near a source is not the same as being contaminated, how instruments pick radiation up, and what the becquerel, the gray and the sievert each measure.
+
+source ref-epa-radiation-basics
+
+source ref-who-ionizing-radiation
+
+source ref-hps-radioactive-contamination
+
+source ref-openstax-chem-21-6

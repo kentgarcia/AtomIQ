@@ -9,11 +9,11 @@
 export type WearTone = "main" | "shade" | "white" | "swan" | "ink" | "gold" | "red" | "blue" | "green" | "pink";
 export type WearPiece = { d: string; tone: WearTone; evenOdd?: boolean } | { line: string; tone: WearTone; w: number };
 
-export const HEADWEAR_STYLES = ["none", "beanie", "cap", "headband", "bow", "crown", "catears", "bunnyears", "flowers", "wizard", "party", "graduation", "hardhat", "bows"] as const;
+export const HEADWEAR_STYLES = ["none", "beanie", "cap", "headband", "bow", "crown", "catears", "bunnyears", "flowers", "wizard", "party", "graduation", "hardhat", "bows", "trainercap", "ninjaband", "strawhat", "halo", "tiara"] as const;
 export type HeadwearStyle = (typeof HEADWEAR_STYLES)[number];
-export const EYEWEAR_STYLES = ["none", "round", "square", "sunglasses", "heart", "star", "goggles", "eyepatch", "monocle", "cateye"] as const;
+export const EYEWEAR_STYLES = ["none", "round", "square", "sunglasses", "heart", "star", "goggles", "eyepatch", "monocle", "cateye", "visor", "mask"] as const;
 export type EyewearStyle = (typeof EYEWEAR_STYLES)[number];
-export const EARWEAR_STYLES = ["none", "stud", "hoop", "pearl", "star", "gem", "flower", "earmuffs", "headphones"] as const;
+export const EARWEAR_STYLES = ["none", "stud", "hoop", "pearl", "star", "gem", "flower", "earmuffs", "headphones", "bolt", "kunai", "potara", "crescent"] as const;
 export type EarwearStyle = (typeof EARWEAR_STYLES)[number];
 
 // ── helpers ──────────────────────────────────────────────────────────────────
@@ -192,6 +192,47 @@ export const HEADWEAR: Record<Exclude<HeadwearStyle, "none">, WearPiece[]> = {
     const lobe = (s: -1 | 1) => fill(roundPoly([at(0, 0), at(s * 30, -27), at(s * 40, -2), at(s * 28, 14)], 12), "main");
     return [lobe(-1), lobe(1), fill(circle(...at(0, 0), 8.5), "shade")];
   }),
+  // Anime League Trainer Cap: colored crown with a white semicircular front panel, league emblem arc and curved visor
+  trainercap: [
+    fill("M-58 -48C-58 -80 -34 -99 0 -99C34 -99 58 -80 58 -48Z", "main"),
+    fill("M-38 -50C-38 -76 -22 -89 0 -89C22 -89 38 -76 38 -50Z", "white"),
+    line("M-16 -64A16 16 0 0 1 16 -64", "main", 4.4),
+    fill(circle(0, -62, 5.5), "main"),
+    fill(circle(0, -62, 2.4), "white"),
+    fill(circle(0, -99, 4), "white"),
+    fill("M-62 -52Q0 -36 62 -52L64 -43Q0 -25 -64 -43Z", "shade"),
+    fill("M-58 -52Q0 -38 58 -52L60 -46Q0 -31 -60 -46Z", "main"),
+    line("M-46 -48Q0 -37 46 -48", "white", 2.6),
+  ],
+  // Shinobi forehead protector (Naruto-inspired): cloth band with side ties, metal plate, rivets and spiral leaf crest
+  ninjaband: [
+    fill(roundPoly([[54, -52], [74, -44], [70, -34], [52, -44]], 3), "shade"),
+    fill(roundPoly([[52, -46], [70, -30], [62, -22], [48, -38]], 3), "main"),
+    fill("M-58 -63C-30 -71 30 -71 58 -63L59 -44C30 -52 -30 -52 -59 -44Z", "main"),
+    fill(rrect(-30, -64, 60, 17, 5), "swan"),
+    fill(rrect(-28, -62.5, 56, 14, 4), "white"),
+    fill(circle(-22, -55.5, 2), "ink"),
+    fill(circle(22, -55.5, 2), "ink"),
+    line("M-4 -55.5A4.5 4.5 0 1 1 5 -53L9 -55.5", "ink", 2.4),
+  ],
+  // Pirate straw hat (Luffy-inspired): wide golden straw brim and dome with a colored ribbon band
+  strawhat: [
+    fill("M-78 -48Q0 -36 78 -48L80 -40Q0 -26 -80 -40Z", "gold"),
+    fill("M-54 -48C-54 -80 -32 -98 0 -98C32 -98 54 -80 54 -48Z", "gold"),
+    fill("M-54 -60Q0 -52 54 -60L55 -48Q0 -40 -55 -48Z", "main"),
+    line("M-74 -44Q0 -32 74 -44", "shade", 2.6),
+  ],
+  // Otherworld fighter halo (Goku-inspired): glowing golden ring floating above the head
+  halo: [
+    line("M-28 -99A28 6.5 0 1 0 28 -99A28 6.5 0 1 0 -28 -99Z", "gold", 5.5),
+    line("M-18 -103.5Q0 -106 18 -103.5", "white", 2.4),
+  ],
+  // Moon guardian tiara (Sailor Moon-inspired): golden V-band across the forehead with a center jewel
+  tiara: [
+    fill(roundPoly([[-48, -54], [0, -39], [48, -54], [46, -46], [0, -30], [-46, -46]], 3), "gold"),
+    fill(roundPoly([[0, -47], [8, -37], [0, -27], [-8, -37]], 2), "main"),
+    fill(circle(-2, -39, 1.8), "white"),
+  ],
 };
 
 // ── eye accessories ──────────────────────────────────────────────────────────
@@ -223,6 +264,28 @@ export const EYEWEAR: Record<Exclude<EyewearStyle, "none">, WearPiece[]> = {
   eyepatch: [fill(rrect(3, -30, 40, 44, 15), "main"), line("M5 -26Q-20 -40 -52 -36", "main", 3.2), line("M40 -26Q48 -38 53 -34", "main", 3.2), line("M10 -18Q14 -22 20 -22", "white", 3)],
   monocle: [fill(ring(LX, -8, 22, 3.6), "main", true), line("M40 6Q56 24 47 56", "gold", 2.4)],
   cateye: [line(CATEYE, "main", 4.4), line(flipX(CATEYE), "main", 4.4), line("M-3 -8H3", "main", 4.4)],
+  // Anime battle visor / scouter: angular wrap-around frame with side tech mounts and a golden target reticle
+  visor: [
+    fill(rrect(-56, -20, 12, 22, 5), "shade"),
+    fill(rrect(44, -20, 12, 22, 5), "shade"),
+    fill(roundPoly([[-50, -28], [50, -28], [46, -20], [0, -16], [-46, -20]], 4), "main"),
+    line("M-48 -18L-44 6L-8 10L0 2L8 10L44 6L48 -18", "main", 4),
+    fill(ring(23, -8, 10, 2.4), "gold", true),
+    line("M-36 -18L-26 -8", "white", 3.4),
+    line("M-26 -18L-20 -12", "white", 3.4),
+  ],
+  // Phantom hero mask (Tuxedo Mask-inspired): winged domino frame around both eyes
+  mask: [
+    ...both((s) => [
+      fill(
+        roundPoly([[s * 2, -24], [s * 34, -30], [s * 54, -38], [s * 48, -4], [s * 36, 12], [s * 10, 10], [s * 2, 0]], 4) +
+          circle(s * LX, -8, 16.5),
+        "main",
+        true,
+      ),
+    ]),
+    fill(rrect(-5, -18, 10, 12, 3), "main"),
+  ],
 };
 
 // ── ear accessories ──────────────────────────────────────────────────────────
@@ -257,4 +320,53 @@ export const EARWEAR: Record<Exclude<EarwearStyle, "none">, WearPiece[]> = {
     line("M-57 -4C-65 -104 65 -104 57 -4", "shade", 6),
     ...both((s) => [fill(rrect(s * 58 - 10, -16, 20, 36, 10), "main"), fill(rrect(s * 58 - 5, -9, 10, 22, 5), "shade"), line(`M${s * 58 - 2} -10V-6`, "white", 2.4)]),
   ],
+  // Pikachu-inspired lightning bolt drop earrings
+  bolt: both((s) => {
+    const { x, y } = lobe(s);
+    return [
+      fill(circle(x, y, 3.2), "gold"),
+      fill(
+        roundPoly(
+          [
+            [x + s * 2, y + 2],
+            [x - s * 7, y + 14],
+            [x - s * 1, y + 14],
+            [x - s * 6, y + 27],
+            [x + s * 8, y + 12],
+            [x + s * 2, y + 12],
+          ],
+          1.2,
+        ),
+        "main",
+      ),
+    ];
+  }),
+  // Ninja kunai blade drop earrings
+  kunai: both((s) => {
+    const { x, y } = lobe(s);
+    return [
+      fill(ring(x, y + 2, 4, 1.8), "gold", true),
+      line(`M${x} ${y + 6}V${y + 11}`, "ink", 2.8),
+      fill(roundPoly([[x, y + 10], [x + 6.5, y + 17], [x, y + 29], [x - 6.5, y + 17]], 1.4), "main"),
+    ];
+  }),
+  // Potara fusion orb earrings (Dragon Ball-inspired)
+  potara: both((s) => {
+    const { x, y } = lobe(s);
+    return [
+      fill(circle(x, y, 3.5), "gold"),
+      line(`M${x} ${y + 2}V${y + 8}`, "gold", 2.4),
+      fill(circle(x, y + 8, 2.6), "gold"),
+      fill(circle(x, y + 16, 7.5), "main"),
+      fill(circle(x - 2.2, y + 13.5, 2.2), "white"),
+    ];
+  }),
+  // Moon guardian crescent earrings (Sailor Moon-inspired)
+  crescent: both((s) => {
+    const { x, y } = lobe(s);
+    return [
+      fill(circle(x, y, 3.2), "gold"),
+      fill(`M${f(x + s * 3)} ${y + 5}A8.5 8.5 0 1 0 ${f(x + s * 3)} ${y + 22}A6.5 6.5 0 1 1 ${f(x + s * 3)} ${y + 5}Z`, "main"),
+    ];
+  }),
 };

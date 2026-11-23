@@ -85,7 +85,7 @@ test("kind decides practice and checkpoint, topic decides lessons", () => {
 });
 
 test("every glyph id a node can get exists", () => {
-  for (const id of ["dumbbell", "trophy", "star", "atom", "nucleus", "table", "isotope", "burst", "trefoil", "rays", "clock", "chain", "mountain", "shield", "pulse", "bolt", "flask"]) {
+  for (const id of ["dumbbell", "trophy", "star", "atom", "nucleus", "table", "isotope", "burst", "trefoil", "rays", "clock", "chain", "mountain", "shield", "pulse", "bolt", "flask", "gauge", "cell", "hourglass", "distance", "scales"]) {
     assert.ok(id in GLYPHS, id);
   }
 });

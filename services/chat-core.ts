@@ -160,6 +160,9 @@ export const storyEnds = (step: ReplyStep): boolean => step.next === null && ste
 
 export type ThreadOrigin = "event" | "free";
 
+/** Diamonds a story pays the first time the learner opens it. A replay never pays again: the claim is kept on the thread. */
+export const STORY_REWARD_DIAMONDS = 5;
+
 /** One conversation on the phone: a free chat the learner started, or a story a trigger unlocked. */
 export interface ChatThread {
   id: string;
@@ -176,6 +179,8 @@ export interface ChatThread {
   archived: boolean;
   /** How many times it has been played (a replay adds one). */
   plays: number;
+  /** The story's one-time diamonds were paid (a free chat never pays). */
+  rewardClaimed: boolean;
   createdAt: number;
   updatedAt: number;
 }
@@ -274,6 +279,7 @@ export interface ThreadSummary {
   ended: boolean;
   archived: boolean;
   plays: number;
+  rewardClaimed: boolean;
   /** The node the thread opens at: how a story's thread is found from the story. */
   entryNodeId: string;
 }
@@ -296,6 +302,7 @@ export function summarizeThreads(threads: readonly ChatThread[], messages: reado
       ended: t.ended,
       archived: t.archived,
       plays: t.plays,
+      rewardClaimed: t.rewardClaimed,
       entryNodeId: t.entryNodeId,
     };
   });
@@ -394,6 +401,8 @@ export interface StoryEntry {
   /** The unlock key to give a new thread (`ready` only). */
   event: string | null;
   plays: number;
+  /** The diamonds for opening this story the first time were paid (false until then, and while it is locked). */
+  rewardClaimed: boolean;
   lastAt: number | null;
 }
 
@@ -468,6 +477,7 @@ export function storyList(
       threadId: thread?.threadId ?? null,
       event: state === "ready" ? event : null,
       plays: thread?.plays ?? 0,
+      rewardClaimed: thread?.rewardClaimed ?? false,
       lastAt: thread?.lastAt ?? null,
     });
   }
@@ -507,12 +517,13 @@ interface ThreadRow {
   ended: number;
   archived: number;
   plays: number;
+  reward_claimed: number;
   created_at: number;
   updated_at: number;
 }
 
 const MESSAGE_COLUMNS = 'id, thread_id, node_id, sender, text, kind, target_id, at, "read"';
-const THREAD_COLUMNS = "id, npc_id, entry_node_id, title, origin, event, ended, archived, plays, created_at, updated_at";
+const THREAD_COLUMNS = "id, npc_id, entry_node_id, title, origin, event, ended, archived, plays, reward_claimed, created_at, updated_at";
 
 const toMessage = (r: MessageRow): ChatMessage => ({
   id: r.id,
@@ -536,6 +547,7 @@ const toThread = (r: ThreadRow): ChatThread => ({
   ended: r.ended === 1,
   archived: r.archived === 1,
   plays: r.plays,
+  rewardClaimed: r.reward_claimed === 1,
   createdAt: r.created_at,
   updatedAt: r.updated_at,
 });
@@ -626,7 +638,7 @@ export function createChatStore(getDb: () => Promise<ChatDb> | ChatDb, newId: ()
       "INSERT INTO chat_threads (id, npc_id, entry_node_id, title, origin, event, ended, plays, created_at, updated_at, is_dirty) VALUES (?,?,?,?,?,?,0,1,?,?,1)",
       [id, thread.npcId, thread.entryNodeId, thread.title, thread.origin, thread.event ?? null, now, now],
     );
-    return { id, npcId: thread.npcId, entryNodeId: thread.entryNodeId, title: thread.title, origin: thread.origin, event: thread.event ?? null, ended: false, archived: false, plays: 1, createdAt: now, updatedAt: now };
+    return { id, npcId: thread.npcId, entryNodeId: thread.entryNodeId, title: thread.title, origin: thread.origin, event: thread.event ?? null, ended: false, archived: false, plays: 1, rewardClaimed: false, createdAt: now, updatedAt: now };
   }
 
   async function listThreads(): Promise<ChatThread[]> {
@@ -652,6 +664,21 @@ export function createChatStore(getDb: () => Promise<ChatDb> | ChatDb, newId: ()
     await db.runAsync("UPDATE chat_threads SET ended = ?, updated_at = ?, is_dirty = 1 WHERE id = ?", [ended ? 1 : 0, now, id]);
   }
 
+  /**
+   * Claim a story's one-time reward: true only for the call that flips the flag (a story thread, not yet claimed), so two screens
+   * asking together, a replay and a later open can never pay twice. `unclaimReward` puts it back if paying the diamonds failed.
+   */
+  async function claimReward(id: string, now: number): Promise<boolean> {
+    const db = await getDb();
+    const result = await db.runAsync("UPDATE chat_threads SET reward_claimed = 1, updated_at = ?, is_dirty = 1 WHERE id = ? AND origin = 'event' AND reward_claimed = 0 AND deleted_at IS NULL", [now, id]);
+    return result.changes > 0;
+  }
+
+  async function unclaimReward(id: string): Promise<void> {
+    const db = await getDb();
+    await db.runAsync("UPDATE chat_threads SET reward_claimed = 0 WHERE id = ?", [id]);
+  }
+
   /** Replay: the thread's messages are cleared, it counts one more play and is open again. Its unlock key stays, so the story is not unlocked a second time. */
   async function restart(id: string, now: number): Promise<void> {
     const db = await getDb();
@@ -659,5 +686,5 @@ export function createChatStore(getDb: () => Promise<ChatDb> | ChatDb, newId: ()
     await db.runAsync("UPDATE chat_threads SET ended = 0, plays = plays + 1, updated_at = ?, is_dirty = 1 WHERE id = ?", [now, id]);
   }
 
-  return { list, listAll, post, unreadIds, markRead, unreadCount, createThread, listThreads, getThread, setEnded, setArchived, restart };
+  return { list, listAll, post, unreadIds, markRead, unreadCount, createThread, listThreads, getThread, setEnded, setArchived, claimReward, unclaimReward, restart };
 }

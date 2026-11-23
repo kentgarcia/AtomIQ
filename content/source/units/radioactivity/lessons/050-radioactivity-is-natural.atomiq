@@ -26,11 +26,24 @@ supports: Potassium-40 in the human body.
 cite ref-epa-radioactive-decay
 supports: Uranium and thorium decay chains in nature (optional card).
 
-card c01
+card c09
+kind: teach
+type: story
+scored: 0
+title: A discovery that wasn't supposed to happen
+speaker: npc-ada
+tag: 1896
+figure: becquerel-plate
+figure_at: 1
+
+body:
+    [[henri-becquerel|Henri Becquerel]] left a uranium mineral on a wrapped photographic plate and found it fogged, even with no sunlight. Radioactivity was found in a natural mineral, long before people made any nuclear technology.
+
+card c08
 kind: item
 type: item
-item: u2-l5-predict-where
-scored: 0
+item: u2-l5-tom-facilities
+connected: true
 
 card c02
 kind: teach
@@ -52,7 +65,7 @@ figure: radon-house
 figure_at: 1
 
 body:
-    Radioactive materials in the ground can produce [[radon]], a radioactive gas. Radon is in the air outside, and it can get into buildings.
+    Radioactive materials in the ground can produce [[radon|radon]], a radioactive gas. Radon is in the air outside, and it can get into buildings.
 
 card c04
 kind: item
@@ -88,33 +101,10 @@ type: item
 item: u2-l5-choice-space
 connected: true
 
-card c08
-kind: item
-type: item
-item: u2-l5-tom-facilities
-
-card c09
-kind: teach
-type: story
-scored: 0
-title: A discovery that wasn't supposed to happen
-speaker: npc-ada
-tag: 1896
-figure: becquerel-plate
-figure_at: 1
-
-body:
-    [[henri-becquerel|Henri Becquerel]] left a uranium mineral on a wrapped photographic plate and found it fogged, even with no sunlight. Radioactivity was found in a natural mineral, long before people made any nuclear technology.
-
 card c10
 kind: item
 type: item
 item: u2-l5-order-first
-
-card c11
-kind: item
-type: item
-item: u2-l5-choice-dangerous
 
 card c12
 kind: teach
@@ -125,29 +115,18 @@ figure: not-always-dangerous
 figure_at: 1
 
 body:
-    Radioactive does not automatically mean dangerous. What matters is the type of radiation, how much there is, and how it reaches the body. A banana and your own body are radioactive, and that is normal.
+    Radioactive does not automatically mean dangerous. What matters is the type of radiation, how much there is, and how it reaches the body. A banana and your own body are radioactive, and that is normal. Later you will see why being exposed to radiation is not the same as becoming radioactive.
+
+card c11
+kind: item
+type: item
+item: u2-l5-choice-dangerous
+connected: true
 
 card c13
 kind: item
 type: item
 item: u2-l5-choice-decides
-connected: true
-
-card c14
-kind: teach
-type: explain
-scored: 0
-title: A question for later
-figure: exposed-later
-figure_at: 1
-
-body:
-    Later, you'll learn why being exposed to radiation is not the same as becoming radioactive.
-
-card c15
-kind: item
-type: item
-item: u2-l5-sort-world
 
 card c16
 kind: teach

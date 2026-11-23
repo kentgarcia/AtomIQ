@@ -1,5 +1,5 @@
 /**
- * The instructions of the Games tab, one set per game (framework-free data). The picker's "How to play" button opens
+ * The instructions of the games, one set per game (framework-free data). Kept from the retired Games tab, whose "How to play" button opened
  * them: it starts on the game whose levels are open, or on the overview, and the learner can switch to another set.
  */
 

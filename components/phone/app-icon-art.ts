@@ -80,6 +80,41 @@ function gear(
   return poly(pts, 2.5, fill);
 }
 
+/** A point (dx, dy) from a centre, turned `deg` degrees clockwise about it. */
+const turn = (cx: number, cy: number, deg: number, [dx, dy]: [number, number]): [number, number] => {
+  const a = (deg * Math.PI) / 180;
+  const r = (n: number) => Math.round(n * 100) / 100;
+  return [r(cx + dx * Math.cos(a) - dy * Math.sin(a)), r(cy + dx * Math.sin(a) + dy * Math.cos(a))];
+};
+
+/** A rounded card of w x h centred on (cx, cy), tilted `deg` degrees. */
+function card(cx: number, cy: number, w: number, h: number, deg: number, r: number, fill: string): ArtShape {
+  const [hw, hh] = [w / 2, h / 2];
+  return poly([turn(cx, cy, deg, [-hw, -hh]), turn(cx, cy, deg, [hw, -hh]), turn(cx, cy, deg, [hw, hh]), turn(cx, cy, deg, [-hw, hh])], r, fill);
+}
+
+/** A mark drawn on a tilted card: `pts` are offsets from the card's centre. */
+const mark = (cx: number, cy: number, deg: number, pts: [number, number][], stroke: string, width: number): ArtShape =>
+  line(pts.map((p, i) => `${i === 0 ? "M" : "L"}${turn(cx, cy, deg, p).join(" ")}`).join(""), stroke, width);
+
+/** A four-point sparkle of radius R, the glint every game icon carries. */
+const spark = (cx: number, cy: number, R: number, fill: string): ArtShape =>
+  path(`M${cx} ${cy - R}Q${cx} ${cy} ${cx + R} ${cy}Q${cx} ${cy} ${cx} ${cy + R}Q${cx} ${cy} ${cx - R} ${cy}Q${cx} ${cy} ${cx} ${cy - R}Z`, fill);
+
+/** A glossy ball: a darker one under it, the ball, and a pale glint on its upper left. */
+const ball = (cx: number, cy: number, r: number, face: string, shade: string): ArtShape[] => [
+  circle(cx, cy + r * 0.14, r, shade),
+  circle(cx, cy, r, face),
+  circle(cx - r * 0.36, cy - r * 0.38, r * 0.24, SNOW, 0.7),
+];
+
+/** An ellipse ring of radii (rx, ry) about (cx, cy), tilted `deg` degrees, as one closed path. */
+function ring(cx: number, cy: number, rx: number, ry: number, deg: number): string {
+  const [x1, y1] = turn(cx, cy, deg, [rx, 0]);
+  const [x2, y2] = turn(cx, cy, deg, [-rx, 0]);
+  return `M${x1} ${y1}A${rx} ${ry} ${deg} 1 0 ${x2} ${y2}A${rx} ${ry} ${deg} 1 0 ${x1} ${y1}Z`;
+}
+
 const SHIELD = "M50 8L87 22V50Q87 77 50 94Q13 77 13 50V22Z";
 
 export const APP_ICON_ART: Readonly<Record<string, readonly ArtShape[]>> = {
@@ -245,6 +280,78 @@ export const APP_ICON_ART: Readonly<Record<string, readonly ArtShape[]>> = {
     path("M50 90Q24 62 24 44A26 26 0 1 1 76 44Q76 62 50 90Z", RED[2]),
     path("M46 90Q20 62 20 44A26 26 0 1 1 72 44Q72 62 46 90Z", RED[1]),
     circle(46, 42, 10, SNOW),
+  ],
+
+  // ---- games: the same flat object style, bolder and more playful (tilted pieces, glossy balls, a glint) ----
+
+  // Myth Buster: two cards thrown down at an angle, FACT with a green tick on white, MYTH with a white cross on red, and a glint
+  mythbuster: [
+    card(69, 52, 40, 56, 15, 9, RED[2]),
+    card(69, 49, 40, 56, 15, 9, RED[1]),
+    mark(69, 49, 15, [[-8, -8], [8, 8]], SNOW, 8),
+    mark(69, 49, 15, [[8, -8], [-8, 8]], SNOW, 8),
+    card(35, 59, 42, 58, -11, 9, ANCHOVY[2]),
+    card(35, 56, 42, 58, -11, 9, SNOW),
+    mark(35, 56, -11, [[-11, 1], [-3, 10], [12, -10]], LEAF[1], 9),
+    spark(82, 16, 10, BEE[1]),
+    spark(15, 20, 6, SNOW),
+  ],
+
+  // Atom Maze: an atom hero (a yellow ball with a face, an orbit round him and an electron) standing on the platformer's grass, with coins
+  "atom-maze": [
+    line(ring(50, 52, 40, 14, -25), SNOW, 4.5),
+    circle(86.3, 35.1, 6.5, RED[1]),
+    rect(-4, 78, 108, 30, 0, LEAF[2]),
+    rect(-4, 78, 108, 8, 0, LEAF[1]),
+    rect(12, 92, 22, 8, 4, LEAF[1], 0.45),
+    rect(60, 94, 28, 8, 4, LEAF[1], 0.45),
+    ...ball(50, 54, 22, BEE[1], BEE[2]),
+    pill(40, 47, 6, 11, EEL[1]),
+    pill(54, 47, 6, 11, EEL[1]),
+    line("M43 62Q50 68 57 62", EEL[1], 3.5),
+    circle(18, 26, 8, BEE[2]),
+    circle(18, 25, 8, BEE[1]),
+    pill(16, 20, 3.4, 9, BEE[0]),
+    spark(82, 14, 7, SNOW),
+  ],
+
+  // Build an Atom: a nucleus of red and blue balls in two crossing orbits, with yellow electrons
+  "lab-build-atom": [
+    line(ring(50, 50, 43, 15, -32), SNOW, 4.5),
+    line(ring(50, 50, 43, 15, 32), SNOW, 4.5),
+    circle(85.5, 25.4, 7, BEE[1]),
+    circle(14.5, 74.6, 7, BEE[1]),
+    circle(85.5, 74.6, 7, BEE[1]),
+    ...ball(41, 45, 11.5, RED[1], RED[2]),
+    ...ball(60, 44, 11.5, SEA[0], SEA[2]),
+    ...ball(52, 60, 11.5, RED[1], RED[2]),
+    ...ball(37, 61, 10, SEA[0], SEA[2]),
+    spark(18, 20, 6, SNOW),
+  ],
+
+  // Decay Lab: a big white nucleus cracking open, an alpha particle flying off with a trail, a second one behind it
+  "lab-decay": [
+    ...ball(40, 62, 29, SNOW, ANCHOVY[2]),
+    line("M31 40L42 54L33 63L45 78", FACE, 5),
+    line("M60 38L76 24", SNOW, 5),
+    line("M66 50L84 40", SNOW, 4),
+    line("M58 28L68 16", SNOW, 3.5),
+    ...ball(80, 22, 10, BEE[1], BEE[2]),
+    ...ball(88, 52, 7, RED[1], RED[2]),
+    spark(84, 80, 8, SNOW),
+    spark(14, 24, 6, SNOW),
+  ],
+
+  // Radiation Shield: three yellow rays arriving from the left and stopping at a wall of lead, a green tick safe on the far side
+  "lab-shield": [
+    ...[26, 50, 74].flatMap((y) => [line(`M8 ${y}H42`, BEE[1], 7), line(`M34 ${y - 7}L43 ${y}L34 ${y + 7}`, BEE[1], 6), circle(49, y, 5, BEE[0])]),
+    rect(50, 12, 30, 80, 8, EEL[2]),
+    rect(50, 8, 30, 80, 8, EEL[0]),
+    line("M50 35H80M50 62H80M66 8V35M58 35V62M73 35V62M66 62V88", EEL[1], 3),
+    rect(53, 12, 5, 18, 2.5, SNOW, 0.4),
+    circle(90, 50, 9, LEAF[2]),
+    circle(90, 48.5, 9, LEAF[1]),
+    line("M85.5 48.5L89 52L95 44.5", SNOW, 3.5),
   ],
 };
 

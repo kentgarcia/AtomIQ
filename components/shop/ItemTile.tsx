@@ -98,12 +98,12 @@ export const ItemTile = memo(function ItemTile({
     >
       <View style={[styles.slot, status === "locked" && styles.dim]}>
         {item.category === "pattern" ? (
-          <View style={[styles.swatch, styles.patternSwatch]}>
-            <PatternLayer pattern={item.value} tile={104} />
+          <View style={[styles.swatch, { backgroundColor: avatarBackground(look) }]}>
+            <PatternLayer pattern={item.value} background={look.background} tile={76} />
           </View>
         ) : flat ? (
           <View style={[styles.swatch, { backgroundColor: avatarBackground(look) }]}>
-            <PatternLayer pattern={look.pattern} tile={48} />
+            <PatternLayer pattern={look.pattern} background={look.background} tile={76} />
           </View>
         ) : (
           <Avatar value={serializeAvatar(look)} size={64} radius={16} zoom={tileZoom(item.category)} />

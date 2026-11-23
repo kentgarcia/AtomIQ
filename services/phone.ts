@@ -48,6 +48,7 @@ export async function loadPhoneProgress(): Promise<PhoneProgress> {
     ]);
     return {
       lessonsCompleted: countCompletedLessons(nodes, state),
+      lessonsDone: nodes.filter((n) => n.kind === "lesson" && n.lessonId && state.nodes[n.id] === "completed").map((n) => n.lessonId as string),
       unitsCompleted: Object.entries(state.units)
         .filter(([, u]) => u.completed)
         .map(([id]) => id),

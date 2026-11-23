@@ -1,0 +1,22 @@
+format 1
+adapter encyclopedia 1
+category: science
+
+entry millisievert
+term: Millisievert
+related_terms: sievert
+related_terms: absorbed-dose
+related_terms: background-radiation
+quick_facts: One thousandth of a sievert
+quick_facts: 1 sievert is 1000 millisieverts
+quick_facts: The average yearly dose in the United States is about 6.2 millisieverts
+
+sources:
+    {"organization":"U.S. Environmental Protection Agency","title":"Radiation Sources and Doses","url":"https://www.epa.gov/radiation/radiation-sources-and-doses"}
+    {"organization":"World Health Organization","title":"Ionizing radiation and health effects","url":"https://www.who.int/news-room/fact-sheets/detail/ionizing-radiation-and-health-effects"}
+
+definition:
+    A millisievert (mSv) is one thousandth of a sievert, the unit used to count a radiation dose. Everyday doses are small, so they are usually given in millisieverts. The average person in the United States gets about 6.2 millisieverts a year, and most of it is natural background radiation.
+
+debunking_snippet:
+    “A radiation number is always frightening.” A number only means something with its unit and a comparison. About 6.2 millisieverts is an average year in the United States, and about 1000 in a short time is where illness starts.

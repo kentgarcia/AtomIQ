@@ -1,0 +1,31 @@
+format 1
+adapter curriculum 1
+unit: radiation-and-the-body
+
+node u4-n1
+kind: lesson
+lesson: the-dose-scale
+
+node u4-n2
+kind: lesson
+lesson: radiation-and-cells
+
+node u4-n3
+kind: lesson
+lesson: dose-and-time
+
+node u4-n4
+kind: practice
+config: {"questionCount":8,"earlierShare":0}
+
+node u4-n5
+kind: lesson
+lesson: time-distance-shielding
+
+node u4-n6
+kind: lesson
+lesson: risk-in-perspective
+
+node u4-n7
+kind: checkpoint
+config: {"questionCount":12,"earlierShare":0.15,"passMark":0.8}

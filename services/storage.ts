@@ -34,6 +34,7 @@ export const STORAGE_KEYS = {
   PHONE_INTRO_SEEN: '@atomiq:phone_intro_seen',
   PHONE_BADGES: '@atomiq:phone_badges',
   PHONE_WALLPAPER: '@atomiq:phone_wallpaper',
+  PHONE_LAYOUT: '@atomiq:phone_layout',
   /** The animation level ("max" | "reduced" | "off"); unset until the learner chooses (components/motion/motion-level-core.ts). */
   MOTION_LEVEL: '@atomiq:motion_level',
   CONTENT_LOCALE: '@atomiq:content_locale',
@@ -273,6 +274,32 @@ export const subscribePhoneWallpaper = (listener: PhoneWallpaperListener): (() =
   phoneWallpaperListeners.add(listener);
   return () => {
     phoneWallpaperListeners.delete(listener);
+  };
+};
+
+// How the learner arranged the phone's home screen (services/phone-layout-core.ts): the saved value is read back through `sanitizeLayout`
+type PhoneLayoutListener = (raw: unknown) => void;
+const phoneLayoutListeners = new Set<PhoneLayoutListener>();
+
+export const getPhoneLayout = async (): Promise<unknown> => (await getItem<unknown>(STORAGE_KEYS.PHONE_LAYOUT)) ?? null;
+
+/** Save the arrangement; `null` forgets it (the phone goes back to the progression order). */
+export const setPhoneLayout = async (raw: unknown): Promise<void> => {
+  if (raw === null) await removeItem(STORAGE_KEYS.PHONE_LAYOUT);
+  else await setItem(STORAGE_KEYS.PHONE_LAYOUT, raw);
+  phoneLayoutListeners.forEach((listener) => {
+    try {
+      listener(raw);
+    } catch {
+      // A listener's failure never undoes the arrangement.
+    }
+  });
+};
+
+export const subscribePhoneLayout = (listener: PhoneLayoutListener): (() => void) => {
+  phoneLayoutListeners.add(listener);
+  return () => {
+    phoneLayoutListeners.delete(listener);
   };
 };
 

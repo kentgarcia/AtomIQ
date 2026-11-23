@@ -63,6 +63,13 @@ const APP_VERSION = appVersionLabel({
 });
 const CONTENT_VERSION = contentVersionLabel(CONTENT_DB_VERSION);
 
+/** What a row's info button explains (the rows have no line of text under them). */
+const INFO = {
+  feedPosts: { title: "Feed posts", text: "The teachers post about your progress. Blog pieces still unlock when this is off." },
+  phoneBadges: { title: "App badges", text: "The counts and dots on the Phone tab and its apps." },
+  tips: { title: "Tips from Shrodi", text: "A short tour, and a hint the first time you open a screen." },
+} as const;
+
 export default function SettingsScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
@@ -70,6 +77,7 @@ export default function SettingsScreen() {
   const { theme, isDark, toggleTheme } = useTheme();
   // Sound effects + Read Aloud come from the one shared media preference store.
   const { soundEffects, readAloud: readAloudEnabled } = useMediaPreferences();
+  const [info, setInfo] = useState<{ title: string; text: string } | null>(null);
   const [haptics, setHaptics] = useState(true);
   const [feedPosts, setFeedPosts] = useState(true);
   const [phoneBadges, setPhoneBadges] = useState(true);
@@ -358,14 +366,14 @@ export default function SettingsScreen() {
               icon="Notification"
               color={theme.colors.primary}
               label="Feed posts"
-              note="NPCs post about your progress. Blog pieces still unlock when this is off."
+              onInfo={() => setInfo(INFO.feedPosts)}
               toggle={{ value: feedPosts, onChange: handleFeedPostsToggle }}
             />
             <SettingsRow
               icon="Mobile"
               color={theme.colors.sky}
               label="App badges"
-              note="The counts and dots on the Phone tab and its apps."
+              onInfo={() => setInfo(INFO.phoneBadges)}
               toggle={{ value: phoneBadges, onChange: handlePhoneBadgesToggle }}
             />
           </SettingsCard>
@@ -377,7 +385,7 @@ export default function SettingsScreen() {
               icon="Lamp"
               color={theme.colors.primary}
               label="Tips from Shrodi"
-              note="A short tour, and a hint the first time you open a screen."
+              onInfo={() => setInfo(INFO.tips)}
               toggle={{ value: tips, onChange: handleTipsToggle }}
             />
             <SettingsRow icon="Refresh" color={theme.colors.sky} label="Replay the tour" arrow hint="Shrodi shows you around again" onPress={() => setReplayAsk(true)} />
@@ -420,6 +428,16 @@ export default function SettingsScreen() {
 
       {/* App Version */}
       <MotionLevelDialog visible={motionAsk} onClose={() => setMotionAsk(false)} />
+
+      <ModalDialog
+        visible={info !== null}
+        onClose={() => setInfo(null)}
+        title={info?.title ?? ""}
+        dismissOnScrim
+        footer={<ModalButton label="Got it" onPress={() => setInfo(null)} />}
+      >
+        <Text style={{ color: theme.colors.textSecondary }}>{info?.text}</Text>
+      </ModalDialog>
 
       <ModalDialog
         visible={replayAsk}

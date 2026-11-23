@@ -46,7 +46,7 @@ export const Avatar = memo(function Avatar({ value, size = 44, radius, pose = "i
     return (
       <View style={[{ width: size, height: size }, style]} accessible={false} importantForAccessibility="no-hide-descendants">
         <View style={[StyleSheet.absoluteFill, { borderRadius: size / 2, overflow: "hidden", backgroundColor: avatarBackground(config) }]}>
-          <PatternLayer pattern={config.pattern} tile={Math.max(24, Math.round(size / 2.2))} />
+          <PatternLayer pattern={config.pattern} background={config.background} tile={Math.max(36, Math.round(size * 0.75))} />
         </View>
         <Npc spec={spec} form="pop" size={pop.height} pose={pose} live={live} style={{ position: "absolute", left: pop.left, top: pop.top }} />
       </View>
@@ -61,7 +61,7 @@ export const Avatar = memo(function Avatar({ value, size = 44, radius, pose = "i
       accessible={false}
       importantForAccessibility="no-hide-descendants"
     >
-      {bare ? null : <PatternLayer pattern={config.pattern} tile={Math.max(24, Math.round(size / 2.2))} />}
+      {bare ? null : <PatternLayer pattern={config.pattern} background={config.background} tile={Math.max(36, Math.round(size * 0.75))} />}
       <Npc spec={spec} form={zoom ?? "avatar"} size={height} pose={pose} live={live} />
     </View>
   );

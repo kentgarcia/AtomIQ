@@ -28,6 +28,146 @@ chip: lesson
 text:
     Your first lesson is done: “{lesson}”. Well done. It is normal to feel a little unsure at the start, and you did it anyway.
 
+post ft-mina-lesson-dose-and-time-1
+kind: celebrate
+trigger: lesson_complete
+chip: lesson
+weight: 2
+condition: {"unitId":"radiation-and-the-body","lessonId":"dose-and-time"}
+
+text:
+    “{lesson}” done. A big dose in a short time and a small one spread out are very different things.
+
+post ft-mina-lesson-dose-and-time-2
+kind: celebrate
+trigger: lesson_complete
+chip: lesson
+condition: {"unitId":"radiation-and-the-body","lessonId":"dose-and-time"}
+
+text:
+    You finished “{lesson}”. How fast a dose arrives matters as much as how big it is.
+
+post ft-mina-lesson-dose-and-time-3
+kind: celebrate
+trigger: lesson_complete
+chip: lesson
+condition: {"unitId":"radiation-and-the-body","lessonId":"dose-and-time","perfect":true}
+
+text:
+    Perfect on “{lesson}”. Size and speed, both kept straight.
+
+post ft-mina-lesson-radiation-and-cells-1
+kind: celebrate
+trigger: lesson_complete
+chip: lesson
+weight: 2
+condition: {"unitId":"radiation-and-the-body","lessonId":"radiation-and-cells"}
+
+text:
+    “{lesson}” done. Radiation can damage a cell, and cells are extremely good at repairing it. Both halves are true.
+
+post ft-mina-lesson-radiation-and-cells-2
+kind: celebrate
+trigger: lesson_complete
+chip: lesson
+condition: {"unitId":"radiation-and-the-body","lessonId":"radiation-and-cells"}
+
+text:
+    You finished “{lesson}”. That is the worry and the reassurance, side by side.
+
+post ft-mina-lesson-radiation-and-cells-3
+kind: celebrate
+trigger: lesson_complete
+chip: lesson
+condition: {"unitId":"radiation-and-the-body","lessonId":"radiation-and-cells","perfect":true}
+
+text:
+    Perfect on “{lesson}”. You kept both halves in mind. That is not easy.
+
+post ft-mina-lesson-risk-in-perspective-1
+kind: celebrate
+trigger: lesson_complete
+chip: lesson
+weight: 2
+condition: {"unitId":"radiation-and-the-body","lessonId":"risk-in-perspective"}
+
+text:
+    “{lesson}” done. Size, speed and comparison turn a scary number into something you can judge.
+
+post ft-mina-lesson-risk-in-perspective-2
+kind: celebrate
+trigger: lesson_complete
+chip: lesson
+condition: {"unitId":"radiation-and-the-body","lessonId":"risk-in-perspective"}
+
+text:
+    You finished “{lesson}”. You can read a frightening headline calmly now.
+
+post ft-mina-lesson-risk-in-perspective-3
+kind: celebrate
+trigger: lesson_complete
+chip: lesson
+condition: {"unitId":"radiation-and-the-body","lessonId":"risk-in-perspective","perfect":true}
+
+text:
+    Perfect on “{lesson}”. A calm head and the right questions.
+
+post ft-mina-lesson-the-dose-scale-1
+kind: celebrate
+trigger: lesson_complete
+chip: lesson
+weight: 2
+condition: {"unitId":"radiation-and-the-body","lessonId":"the-dose-scale"}
+
+text:
+    “{lesson}” done. A little radiation every day is normal, and now you can count it in millisieverts.
+
+post ft-mina-lesson-the-dose-scale-2
+kind: celebrate
+trigger: lesson_complete
+chip: lesson
+condition: {"unitId":"radiation-and-the-body","lessonId":"the-dose-scale"}
+
+text:
+    Another lesson on the scale, “{lesson}”. You can put an ordinary year, a scan and an illness in order now.
+
+post ft-mina-lesson-the-dose-scale-3
+kind: celebrate
+trigger: lesson_complete
+chip: lesson
+condition: {"unitId":"radiation-and-the-body","lessonId":"the-dose-scale","perfect":true}
+
+text:
+    Perfect on “{lesson}”. Careful counting, and not one number mixed up.
+
+post ft-mina-lesson-time-distance-shielding-1
+kind: celebrate
+trigger: lesson_complete
+chip: lesson
+weight: 2
+condition: {"unitId":"radiation-and-the-body","lessonId":"time-distance-shielding"}
+
+text:
+    “{lesson}” done. Less time, more distance, and something in between. Three ways anyone can lower a dose.
+
+post ft-mina-lesson-time-distance-shielding-2
+kind: celebrate
+trigger: lesson_complete
+chip: lesson
+condition: {"unitId":"radiation-and-the-body","lessonId":"time-distance-shielding"}
+
+text:
+    You finished “{lesson}”. A lead apron at the dentist is shielding. You will notice it now.
+
+post ft-mina-lesson-time-distance-shielding-3
+kind: celebrate
+trigger: lesson_complete
+chip: lesson
+condition: {"unitId":"radiation-and-the-body","lessonId":"time-distance-shielding","perfect":true}
+
+text:
+    Perfect on “{lesson}”. You picked the right way every time.
+
 post ft-mina-quests
 kind: celebrate
 trigger: daily_quests_done
@@ -44,6 +184,48 @@ condition: {"direction":"passed"}
 
 text:
     You passed {rival} in the weekly ranking. Lovely. And remember, it is fine to go at your own speed.
+
+post ft-mina-checkpoint-radiation-and-the-body
+kind: milestone
+trigger: checkpoint_pass
+chip: unit
+condition: {"unitId":"radiation-and-the-body"}
+reactors: npc-ray
+
+text:
+    The {unit} checkpoint is passed. You took it steadily, and it shows.
+
+post ft-mina-testout-radiation-and-the-body
+kind: milestone
+trigger: testout_pass
+chip: unit
+condition: {"unitId":"radiation-and-the-body"}
+reactors: npc-ray
+
+text:
+    You tested out of “{unit}”. You already understood it. That's a good place to start from.
+
+post ft-mina-unit-radiation-and-the-body-2
+kind: milestone
+trigger: unit_complete
+chip: unit
+weight: 2
+condition: {"unitId":"radiation-and-the-body"}
+reactors: npc-ray
+
+text:
+    You finished “{unit}”. You can say how big a dose is, how cells cope, and how to lower a dose. A calm, solid understanding.
+
+post ft-mina-unit-radiation-meets-matter-1
+kind: milestone
+trigger: unit_complete
+chip: unit
+weight: 2
+condition: {"unitId":"radiation-meets-matter"}
+reactors: npc-ray
+
+text:
+    Someone just finished “{unit}” with Ray. They know what radiation does to things. Now we talk about the body, calmly and slowly. That part is mine.
 
 post ft-mina-comeback-14
 kind: nudge

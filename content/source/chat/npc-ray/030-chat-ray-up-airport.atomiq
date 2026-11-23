@@ -1,0 +1,85 @@
+format 1
+adapter chat 1
+npc: npc-ray
+
+node chat-ray-up-airport
+kind: unprompted
+pose: explain
+trigger: lessons_completed:13
+title: Airport. Bag. X-ray.
+
+    I'm in the airport security line.
+
+    My bag is on the belt. It's going into the X-ray machine. Machine's making X-rays. Bag's getting scanned.
+
+    Someone behind me just asked if the bag will come out radioactive.
+
+reply: will it? -> chat-ray-airport-will
+reply: that person is wrong, right? -> chat-ray-airport-wrong
+
+node chat-ray-airport-will
+kind: reply
+pose: think
+
+    Think it through. You know this one.
+
+    An X-ray is radiation. Radiation is energy. It doesn't spread. Radioactive material does, if it's there.
+
+    Is there radioactive material in my bag?
+
+reply: no, so nothing to spread -> chat-ray-airport-right
+reply: yes, the X-rays leave some -> chat-ray-airport-miss
+
+node chat-ray-airport-wrong
+kind: reply
+pose: proud
+
+    I told them what I'd tell you. Don't mix up two different things.
+
+    Exposed: in the path of radiation. Contaminated: radioactive material on you or in you.
+
+    My bag's exposed. It isn't contaminated. Different things.
+
+reply: oh, I get it -> chat-ray-airport-end
+reply: so what would contamination be? -> chat-ray-airport-contam
+
+node chat-ray-airport-right
+kind: reply
+pose: proud
+
+    Right. No material, nothing to spread.
+
+    Exposure and contamination aren't the same. The bag is exposed to the X-rays for a moment. It isn't carrying anything.
+
+sticker: nerd -> chat-ray-airport-end
+sticker: star -> chat-ray-airport-end
+
+node chat-ray-airport-miss
+kind: reply
+pose: explain
+
+    Not quite. Radiation doesn't spread. Only the material does.
+
+    Radiation from a source can reach you. That's exposure. It isn't contamination.
+
+reply: ok, that makes sense -> chat-ray-airport-end
+reply: so what would contamination be? -> chat-ray-airport-contam
+
+node chat-ray-airport-contam
+kind: reply
+pose: point
+
+    Radioactive material on the bag. Dust on it. Or inside it.
+
+    Nothing like that here. Just a machine making X-rays and a bag passing through.
+
+sticker: nerd -> chat-ray-airport-end
+sticker: star -> chat-ray-airport-end
+
+node chat-ray-airport-end
+kind: sign_off
+pose: greet
+
+    Bag's through. Collecting it.
+
+    Short version: exposed isn't contaminated. Remember it.

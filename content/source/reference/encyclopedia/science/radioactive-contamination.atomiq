@@ -1,0 +1,25 @@
+format 1
+adapter encyclopedia 1
+category: science
+
+entry radioactive-contamination
+term: Radioactive Contamination
+related_terms: irradiation
+related_terms: exposure
+related_terms: radiation
+related_terms: ionizing-radiation
+quick_facts: Contamination is radioactive material on or in something
+quick_facts: Radiation itself does not spread; the material does
+quick_facts: Can be on skin or clothes, breathed in or swallowed, or spread about a place
+quick_facts: A contaminated person is exposed until the material is removed
+quick_facts: Material on skin or clothes can often be washed off
+
+sources:
+    {"organization":"Health Physics Society","title":"What Is Radioactive Contamination?","url":"https://hps.org/ate_faq/radcontamination/"}
+    {"organization":"World Health Organization","title":"Ionizing radiation and health effects","url":"https://www.who.int/news-room/fact-sheets/detail/ionizing-radiation-and-health-effects"}
+
+definition:
+    Radioactive material that has been deposited on materials, skin, clothing or any place where it is not wanted, or that has been breathed in, swallowed or absorbed through a wound. A person is externally contaminated if the material is on the skin or clothing, and internally contaminated if it is inside the body. The environment is contaminated if radioactive material is spread about or is unconfined. If radioactive material is not in a sealed source container, it might be spread onto other objects.
+
+debunking_snippet:
+    “Radiation spreads onto people.” Radiation does not get on or in people. It is radioactive contamination, the material itself, that can be spread.

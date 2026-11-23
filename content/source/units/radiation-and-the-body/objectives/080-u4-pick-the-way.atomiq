@@ -1,0 +1,108 @@
+format 1
+adapter curriculum 1
+unit: radiation-and-the-body
+
+objective u4-pick-the-way
+
+statement:
+    Pick which of time, distance or shielding a real situation uses, such as a lead apron at a dental X-ray, sources stored under water or in concrete, or a shelter with more walls.
+
+misconception: Time, distance and shielding are only ideas for experts, not things used in everyday life.
+
+item u4-l4-choice-store
+type: choice
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-epa-protecting-yourself
+
+prompt:
+    Some radioactive materials are stored under water, or in concrete or lead-lined rooms. Which way is that?
+
+options:
+    {"id":"shield","label":"Shielding: something sits between the material and people"}
+    {"id":"time","label":"Time: people only look at it for a moment","note":"The water, concrete and lead are barriers. That is shielding, not a limit on time."}
+    {"id":"dist","label":"Distance: the material is hidden far away","note":"The material can be close. What protects people is the water, concrete or lead in the way."}
+
+answer: shield
+
+explanation:
+    Water, concrete and lead are barriers between the material and people, which is shielding.
+
+item u4-l4-match-ways
+type: match
+surfaces: lesson
+surfaces: practice
+surfaces: checkpoint
+surfaces: review
+references: ref-epa-protecting-yourself
+
+prompt:
+    Match each situation to the way it lowers the dose.
+
+pairs:
+    {"id":"apron","left":"A lead apron at a dental X-ray","right":"Shielding"}
+    {"id":"step","left":"Stepping farther from a source","right":"Distance"}
+    {"id":"short","left":"Spending less time near a source","right":"Time"}
+
+explanation:
+    The apron is a shield between the X-rays and the patient. Stepping away adds distance, and a shorter visit means less time.
+
+item u4-x-choice-dentist
+type: choice
+surfaces: practice
+surfaces: checkpoint
+surfaces: review
+references: ref-epa-protecting-yourself
+
+prompt:
+    A dentist puts a lead apron on a patient for an X-ray of the teeth. Which way is that?
+
+options:
+    {"id":"shield","label":"Shielding"}
+    {"id":"time","label":"Time","note":"The apron does not shorten the X-ray. It is a barrier."}
+    {"id":"dist","label":"Distance","note":"The patient does not move away. A barrier is put in the way."}
+
+answer: shield
+
+explanation:
+    A lead apron is a barrier between the X-ray and the rest of the patient's body: shielding.
+
+item u4-x-choice-shelter
+type: choice
+surfaces: practice
+surfaces: checkpoint
+surfaces: review
+references: ref-epa-protecting-yourself
+
+prompt:
+    Why is a room with more walls between you and the outside a better shelter?
+
+options:
+    {"id":"walls","label":"More walls give more protection from the radiation outside"}
+    {"id":"warm","label":"Walls only keep the room warm","note":"More walls provide more protection from radiation, not just from the cold."}
+    {"id":"quiet","label":"Walls make the radiation quieter","note":"Radiation makes no sound. More walls simply give more protection."}
+
+answer: walls
+
+explanation:
+    More walls between you and the outside provide more protection, like more shielding.
+
+item u4-x-choice-step-back
+type: choice
+surfaces: practice
+surfaces: review
+references: ref-epa-protecting-yourself
+
+prompt:
+    A worker steps back from a source to a spot much farther away. Which way is that?
+
+options:
+    {"id":"dist","label":"Distance"}
+    {"id":"shield","label":"Shielding","note":"Nothing is placed between the worker and the source. The worker simply moves away."}
+    {"id":"time","label":"Time","note":"It is about where the worker stands, not how long."}
+
+answer: dist
+
+explanation:
+    Moving farther from the source lowers the dose: distance.

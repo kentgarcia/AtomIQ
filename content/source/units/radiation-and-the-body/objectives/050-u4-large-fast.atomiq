@@ -1,0 +1,120 @@
+format 1
+adapter curriculum 1
+unit: radiation-and-the-body
+
+objective u4-large-fast
+
+statement:
+    Know that a very large dose in a short time, about 1 sievert or more, makes people ill, with symptoms such as nausea and vomiting within hours, and that how fast a dose arrives (the dose rate) matters as well as how big it is.
+
+misconception: Only the total dose matters, not how fast it arrives.
+
+item u4-l3-choice-doserate
+type: choice
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-who-ionizing-radiation
+
+prompt:
+    What is dose rate?
+
+options:
+    {"id":"fast","label":"How fast a dose is received, for example in millisieverts per year"}
+    {"id":"total","label":"How big the dose is in total","note":"That is the dose itself. Dose rate is about speed: the same total can arrive fast or slowly."}
+    {"id":"far","label":"How far you are from the source","note":"Distance changes the dose, but dose rate is about how fast the dose arrives."}
+
+answer: fast
+
+explanation:
+    Dose rate is how fast a dose is received. It is measured in units such as microsieverts per hour or millisieverts per year.
+
+item u4-l3-choice-symptoms
+type: choice
+surfaces: lesson
+surfaces: practice
+surfaces: checkpoint
+surfaces: review
+references: ref-epa-radiation-health-effects
+
+prompt:
+    A person receives a very large dose in a short time. What can happen within hours?
+
+options:
+    {"id":"sick","label":"Symptoms such as nausea and vomiting"}
+    {"id":"none","label":"Nothing: effects always take years","note":"A very high dose in a short time can cause symptoms such as nausea and vomiting within hours."}
+    {"id":"glow","label":"The person becomes radioactive","note":"Exposure does not make a person radioactive. The symptoms come from the damage to the body."}
+
+answer: sick
+
+explanation:
+    A very high radiation exposure delivered over a short period can cause symptoms such as nausea and vomiting within hours.
+
+item u4-l3-predict-same-total
+type: predict
+surfaces: lesson
+references: ref-who-ionizing-radiation
+
+prompt:
+    Two people each receive the same total dose. One gets it all within minutes. The other gets it spread over a whole year. Who is more likely to become ill soon after?
+
+input: choice
+
+options:
+    {"id":"fast","label":"The one who got it within minutes"}
+    {"id":"slow","label":"The one who got it over a year"}
+    {"id":"same","label":"Both the same"}
+
+answer: fast
+
+explanation:
+    Your guess is not scored. The answer comes later in the lesson.
+
+item u4-l3-tom-no-immediate
+type: true_or_myth
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-epa-radiation-health-effects
+
+statement:
+    Exposure to the low levels of radiation found in the environment does not cause immediate health effects.
+
+answer: true
+
+explanation:
+    True. It takes a very large dose in a short time to make people ill within hours.
+
+item u4-x-choice-ars
+type: choice
+surfaces: practice
+surfaces: checkpoint
+surfaces: review
+references: ref-who-ionizing-radiation
+
+prompt:
+    About what dose is the threshold for acute radiation syndrome?
+
+options:
+    {"id":"sv","label":"About 1 sievert, which is 1000 millisieverts"}
+    {"id":"six","label":"About 6 millisieverts","note":"That is an average year's dose, which is far below the threshold."}
+    {"id":"small","label":"About 0.3 millisieverts","note":"That is a year of cosmic rays at sea level, far below the threshold."}
+
+answer: sv
+
+explanation:
+    The dose threshold for acute radiation syndrome is about 1 sievert, or 1000 millisieverts.
+
+item u4-x-tom-rate
+type: true_or_myth
+surfaces: practice
+surfaces: review
+references: ref-who-ionizing-radiation
+
+statement:
+    Effects of radiation are more severe at higher doses and at higher dose rates.
+
+answer: true
+
+explanation:
+    True. A bigger dose, or the same dose arriving faster, gives more severe effects.

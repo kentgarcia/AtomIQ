@@ -251,7 +251,7 @@ test("a tapped reply that leads nowhere ends the story; replay needs the entry n
 
 // ---- threads, the list and replies ---------------------------------------------------------
 
-const thread = (over = {}) => ({ id: "t1", npcId: "npc-ada", entryNodeId: "npc-ada-g", title: "Chat", origin: "free", event: null, ended: false, plays: 1, createdAt: 1, updatedAt: 1, ...over });
+const thread = (over = {}) => ({ id: "t1", npcId: "npc-ada", entryNodeId: "npc-ada-g", title: "Chat", origin: "free", event: null, ended: false, plays: 1, rewardClaimed: false, createdAt: 1, updatedAt: 1, ...over });
 
 test("a reply's type and whether it ends the story", () => {
   const withReplies = { ...nodes.find((x) => x.id === "npc-ada-d"), replies: [{ label: "clap", type: "react" }, { label: "party", type: "emoji" }, { label: "Bye", next: "npc-ada-bye" }] };
@@ -514,7 +514,7 @@ test("the reactions and stickers are drawn, named, and the content vocabulary li
 function memoryDb() {
   const db = new DatabaseSync(":memory:");
   db.exec(`CREATE TABLE chat_threads (id TEXT PRIMARY KEY, npc_id TEXT NOT NULL, entry_node_id TEXT NOT NULL, title TEXT NOT NULL, origin TEXT NOT NULL DEFAULT 'free', event TEXT,
-    ended INTEGER NOT NULL DEFAULT 0, archived INTEGER NOT NULL DEFAULT 0, plays INTEGER NOT NULL DEFAULT 1, created_at INTEGER NOT NULL DEFAULT 0, updated_at INTEGER NOT NULL DEFAULT 0, synced_at INTEGER,
+    ended INTEGER NOT NULL DEFAULT 0, archived INTEGER NOT NULL DEFAULT 0, plays INTEGER NOT NULL DEFAULT 1, reward_claimed INTEGER NOT NULL DEFAULT 0, created_at INTEGER NOT NULL DEFAULT 0, updated_at INTEGER NOT NULL DEFAULT 0, synced_at INTEGER,
     is_dirty INTEGER DEFAULT 1, deleted_at INTEGER, version INTEGER DEFAULT 1)`);
   db.exec(`CREATE TABLE chat_messages (id TEXT PRIMARY KEY, thread_id TEXT NOT NULL, node_id TEXT, sender TEXT NOT NULL, text TEXT NOT NULL, kind TEXT NOT NULL DEFAULT 'text', target_id TEXT,
     at INTEGER NOT NULL, "read" INTEGER NOT NULL DEFAULT 0, created_at INTEGER NOT NULL DEFAULT 0, updated_at INTEGER NOT NULL DEFAULT 0, synced_at INTEGER, is_dirty INTEGER DEFAULT 1,
@@ -539,7 +539,7 @@ test("threads are made, listed and found, and two with one teacher stay two", as
   const b = await s.createThread({ npcId: "npc-ada", entryNodeId: "g", title: "Chat", origin: "free" }, 20);
   const c = await s.createThread({ npcId: "npc-ada", entryNodeId: "up", title: "A story", origin: "event", event: "lessons_completed:3" }, 30);
   assert.deepEqual((await s.listThreads()).map((t) => t.id), [a.id, b.id, c.id]);
-  assert.deepEqual(await s.getThread(c.id), { id: c.id, npcId: "npc-ada", entryNodeId: "up", title: "A story", origin: "event", event: "lessons_completed:3", ended: false, archived: false, plays: 1, createdAt: 30, updatedAt: 30 });
+  assert.deepEqual(await s.getThread(c.id), { id: c.id, npcId: "npc-ada", entryNodeId: "up", title: "A story", origin: "event", event: "lessons_completed:3", ended: false, archived: false, plays: 1, rewardClaimed: false, createdAt: 30, updatedAt: 30 });
   assert.equal(await s.getThread("nope"), null);
 });
 
@@ -582,6 +582,43 @@ test("a story ends, and a replay clears it, counts a play and keeps its unlock k
   assert.equal(await s.unreadCount(), 0);
   // the unlock key is still on the thread, so the story does not unlock again
   assert.deepEqual(core.earnedStories(storyNodes, base({ lessonsCompleted: 3 }), ["npc-ada"], await s.listThreads()).map((u) => u.event), []);
+});
+
+test("a story pays its diamonds once: the first claim wins, a replay and a second claim do not, a free chat never pays", async () => {
+  assert.equal(core.STORY_REWARD_DIAMONDS, 5);
+  const s = store();
+  const story = await s.createThread({ npcId: "npc-ada", entryNodeId: "up", title: "A story", origin: "event", event: "lessons_completed:3" }, 1);
+  assert.equal((await s.getThread(story.id)).rewardClaimed, false);
+  assert.equal(await s.claimReward(story.id, 5), true);
+  assert.equal((await s.getThread(story.id)).rewardClaimed, true);
+  assert.equal(await s.claimReward(story.id, 6), false, "a second claim pays nothing");
+  // replaying keeps the claim
+  await s.setEnded(story.id, true, 7);
+  await s.restart(story.id, 8);
+  assert.equal((await s.getThread(story.id)).rewardClaimed, true);
+  assert.equal(await s.claimReward(story.id, 9), false, "a replay pays nothing");
+  // a free chat is not a story
+  const free = await s.createThread({ npcId: "npc-ada", entryNodeId: "g", title: "Chat", origin: "free" }, 1);
+  assert.equal(await s.claimReward(free.id, 5), false);
+  assert.equal((await s.getThread(free.id)).rewardClaimed, false);
+  // paying failed: the claim is put back so the next open tries again
+  const other = await s.createThread({ npcId: "npc-hal", entryNodeId: "up", title: "A story", origin: "event", event: "welcome_back:d" }, 1);
+  assert.equal(await s.claimReward(other.id, 5), true);
+  await s.unclaimReward(other.id);
+  assert.equal(await s.claimReward(other.id, 6), true);
+  assert.equal(await s.claimReward("nope", 6), false);
+});
+
+test("the profile's story list and the Chats list carry whether the diamonds were claimed", () => {
+  const threads = [
+    thread({ id: "a", origin: "event", event: "lessons_completed:3", entryNodeId: "npc-ada-up3", rewardClaimed: true }),
+    thread({ id: "c", origin: "event", event: "unit_complete:u1", entryNodeId: "npc-ada-up5" }),
+  ];
+  const got = Object.fromEntries(stories(base({ lessonsCompleted: 4, unitsCompleted: ["u1"] }), true, threads, []).map((e) => [e.nodeId, e.rewardClaimed]));
+  assert.equal(got["npc-ada-up3"], true);
+  assert.equal(got["npc-ada-up5"], false);
+  assert.equal(got["npc-ada-up4"], false, "a story with no thread has not paid");
+  assert.deepEqual(core.summarizeThreads(threads, []).map((t) => [t.threadId, t.rewardClaimed]).sort(), [["a", true], ["c", false]]);
 });
 
 test("a thread keeps its last 200 messages and another thread is not touched by the cap", async () => {

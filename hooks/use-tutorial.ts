@@ -23,7 +23,7 @@ export function useTutorialBusy(active: boolean, label = "unnamed"): void {
 }
 
 /** The tabs the tour can lock, in the order their flags are written into the key below. */
-const LOCKABLE: readonly TabName[] = ["index", "quests", "community", "phone", "awards", "profile"];
+const LOCKABLE: readonly TabName[] = ["index", "quests", "community", "phone", "profile"];
 
 const lockKey = (s: TutorialSnapshot): string => `${s.loaded ? 1 : 0}|${LOCKABLE.map((t) => (tabLocked(t, s.steps, s.progress, s.enabled) ? 1 : 0)).join("")}|${tabLockHint(s.progress)}`;
 

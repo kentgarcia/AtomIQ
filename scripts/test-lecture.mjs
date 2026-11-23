@@ -12,7 +12,7 @@ import { loadTs } from "./lib/ts-require.mjs";
 
 const { lectureSteps, continueDelay, CONTINUE_DELAY, pageStart, MAX_BUBBLES } = loadTs("components/lesson/lecture-core.ts");
 const { TYPE_CPS, TYPE_STEP, clipSegments, stepped, totalChars, typeDuration, visibleCount } = loadTs("components/lesson/typewriter-core.ts");
-const { splitTerms } = loadTs("content/curriculum/terms.ts");
+const { splitTerms, plainText } = loadTs("content/curriculum/terms.ts");
 
 const BODY = "One thing. Two things. Three things. Four things.";
 const kinds = (steps) => steps.map((s) => (s.kind === "figure" ? "F" : "b")).join("");
@@ -156,4 +156,13 @@ test("typing moves in whole steps and always reaches the end", () => {
   const seen = new Set();
   for (let t = 0; t <= typeDuration(90) + 100; t += 5) seen.add(stepped(visibleCount(t, 90), 90));
   assert.ok(seen.size <= 90 / TYPE_STEP + 1, `${seen.size} counts for 90 characters`);
+});
+
+test("a bare [[id]] marker still shows the id and links it, never its brackets", () => {
+  assert.deepEqual(splitTerms("It gives off [[radiation]] now."), [
+    { text: "It gives off " },
+    { text: "radiation", termId: "radiation" },
+    { text: " now." },
+  ]);
+  assert.equal(plainText("The [[half-life]] and [[atom|atoms]]."), "The half-life and atoms.");
 });

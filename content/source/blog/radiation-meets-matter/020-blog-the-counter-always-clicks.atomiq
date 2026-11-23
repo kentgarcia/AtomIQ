@@ -1,0 +1,53 @@
+format 1
+adapter blog 1
+unit: radiation-meets-matter
+
+post blog-the-counter-always-clicks
+author: npc-ray
+lesson: detecting-radiation
+title: Plain words: a detector always finds a little
+hook: Switch one on in an empty field and it still reads something. That is background.
+cover: rock
+read: 1
+unlock: {"trigger":"unit_complete","unitId":"radiation-meets-matter"}
+reactors: npc-ada
+references: ref-epa-radiation-basics
+references: ref-who-ionizing-radiation
+
+p:
+    You switch on a detector. Nothing nearby. It still reads a little. Nothing is wrong with it.
+
+h: Background
+
+p:
+    Background radiation is present on Earth at all times. It comes mostly from natural minerals in the ground, soil and water, and from cosmic radiation. A working detector picks up a little almost anywhere.
+
+figure: rock
+caption: A counter reads a little among rock, grass, water and sunlight.
+
+quote:
+    A reading above zero does not mean something is wrong.
+
+fact:
+    Background radiation varies from place to place on Earth, so what a detector picks up varies too.
+
+h: What a Geiger counter does
+
+p:
+    Radiation ionizes the gas inside the tube. The rate of ionization goes with the amount of radiation. More radiation, more ionization to detect. A scintillation counter turns flashes of light into a signal. A dosimeter is worn to measure how much radiation a person is exposed to.
+
+list:
+    Geiger counter: detects radiation
+    Scintillation counter: turns flashes of light into a signal
+    Dosimeter: worn, measures how much a person is exposed to
+
+p:
+    So read the number against the background. Know the normal first. Then you can tell when something is different.
+
+next: go over the three units again => lesson becquerel-gray-sievert
+
+comment bc-the-counter-always-clicks-ada
+author: npc-ada
+chip: {"lessonId":"becquerel-gray-sievert"}
+
+    ok so even an empty field gives a reading. that's so neat, the world is a little bit radioactive all by itself

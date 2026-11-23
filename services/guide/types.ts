@@ -70,7 +70,7 @@ export type GuideDestination =
   | { screen: "journey"; id: string } // /explorer/journey?id=${id}
   | { screen: "mythbuster" } // /mythbuster
   | { screen: "tab-discover" } // /(tabs)/community
-  | { screen: "tab-games" } // /(tabs)/awards
+  | { screen: "tab-games" } // the Games tab is gone: opens the Phone tab, where the games are apps
   | { screen: "tab-profile" } // /(tabs)/profile
   | { screen: "encyclopedia-list" }; // /encyclopedia
 

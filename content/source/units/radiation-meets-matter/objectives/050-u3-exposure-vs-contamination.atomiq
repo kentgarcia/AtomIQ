@@ -1,0 +1,137 @@
+format 1
+adapter curriculum 1
+unit: radiation-meets-matter
+
+objective u3-exposure-vs-contamination
+
+statement:
+    Know that being exposed to radiation from a source is different from being contaminated, which means radioactive material is on or in something.
+
+misconception: Standing near a radioactive source makes you radioactive.
+
+item u3-l3-choice-contaminated
+type: choice
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-hps-radioactive-contamination
+
+prompt:
+    Which of these is contamination?
+
+options:
+    {"id":"near","label":"Standing near a sealed source","note":"That is exposure: radiation reaches you, but no material gets on you."}
+    {"id":"xray","label":"Having a medical X-ray","note":"That is exposure to a source outside the body. No material gets on you."}
+    {"id":"dust","label":"Radioactive dust on your sleeve"}
+    {"id":"beam","label":"Standing in the path of an X-ray beam","note":"That is exposure. Contamination needs radioactive material to be on or in something."}
+
+answer: dust
+
+explanation:
+    Contamination means radioactive material is on or in something. Dust on a sleeve is material on your clothes. The other three are exposure to radiation from a source.
+
+item u3-l3-choice-internal
+type: choice
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-hps-radioactive-contamination
+
+prompt:
+    Someone breathes in radioactive dust. What is this called?
+
+options:
+    {"id":"expose","label":"Only exposure, because nothing touched them","note":"Material that is breathed in is inside the body, so it is contamination, not only exposure."}
+    {"id":"contam","label":"Contamination: radioactive material is in their body"}
+    {"id":"nothing","label":"Neither, because dust is not radiation","note":"The dust is radioactive material. When it is in the body, that is contamination."}
+
+answer: contam
+
+explanation:
+    Contamination can be material on skin or clothes, or material that is breathed in or swallowed. Breathed-in dust is radioactive material inside the body.
+
+item u3-l3-predict-near
+type: predict
+surfaces: lesson
+references: ref-hps-radioactive-contamination
+
+prompt:
+    You stand near a sealed radioactive source for a while, then walk away. What is on your clothes?
+
+input: choice
+
+options:
+    {"id":"nothing","label":"Nothing: no material got onto me"}
+    {"id":"dust","label":"Radioactive dust"}
+    {"id":"rays","label":"Radiation that stays stuck to the cloth"}
+    {"id":"glow","label":"A faint glow"}
+
+answer: nothing
+
+explanation:
+    Your guess is not scored. The lesson explains what stays and what does not.
+
+item u3-l3-tom-spread
+type: true_or_myth
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-hps-radioactive-contamination
+
+statement:
+    Radiation gets onto your clothes the way dust does.
+
+answer: myth
+
+explanation:
+    Myth. Radiation does not get on or in people. Radioactive material can, and it is the material that spreads, like dust or glitter.
+
+item u3-x-contaminated-means
+type: choice
+surfaces: practice
+surfaces: checkpoint
+surfaces: review
+references: ref-hps-radioactive-contamination
+
+prompt:
+    What does it mean for something to be contaminated?
+
+options:
+    {"id":"near","label":"It is standing near a radioactive source","note":"That would be exposure. Contamination needs material on or in the thing."}
+    {"id":"material","label":"Radioactive material is on it or in it, where it is not wanted"}
+    {"id":"glows","label":"It glows","note":"Contamination is about material being where it should not be, not about glowing."}
+
+answer: material
+
+explanation:
+    Contamination is radioactive material on or in something, where it is not wanted. Being near a source is exposure.
+
+item u3-x-tom-exposed-contaminated
+type: true_or_myth
+surfaces: practice
+surfaces: checkpoint
+surfaces: review
+references: ref-hps-radioactive-contamination
+
+statement:
+    A person can be exposed to radiation without being contaminated.
+
+answer: true
+
+explanation:
+    True. Standing in the path of radiation from a source, such as during a medical X-ray, exposes you. No radioactive material needs to get on you for that.
+
+item u3-x-tom-sealed
+type: true_or_myth
+surfaces: practice
+surfaces: checkpoint
+surfaces: review
+references: ref-hps-radioactive-contamination
+
+statement:
+    Material in a sealed source container can be spread onto other objects.
+
+answer: myth
+
+explanation:
+    Myth. Material in a sealed source stays in its container. It is material that is not sealed that might be spread onto other objects.

@@ -1,0 +1,53 @@
+format 1
+adapter blog 1
+unit: radiation-and-the-body
+
+post blog-the-dose-you-already-get
+author: npc-mina
+lesson: the-dose-scale
+title: Calm note: the dose you already get
+hook: You get a little radiation every day, and so does everyone else. Here is how much.
+cover: dial
+read: 1
+unlock: {"trigger":"lesson_complete","lessonId":"the-dose-scale"}
+reactors: npc-ray
+references: ref-epa-radiation-sources
+references: ref-who-ionizing-radiation
+
+p:
+    If radiation worries you a little, that is fine. A lot of people feel that way. Let's start with something steady: you are already getting a small dose, every day, and so is everyone you know.
+
+h: How it is counted
+
+p:
+    A dose is counted in sieverts. Everyday doses are tiny, so they are usually given in millisieverts. One sievert is 1000 millisieverts.
+
+h: An ordinary year
+
+p:
+    In the United States the average person gets about 6.2 millisieverts a year. Most of it is natural background radiation.
+
+figure: dial
+caption: A dial with its needle resting in the low zone, and the everyday sources round it: sun, rock, grass and water.
+
+quote:
+    Most of our average yearly dose comes from natural background radiation.
+
+fact:
+    A whole body CT scan is about 10 millisieverts. About 1000 millisieverts in a short time is where people start to become ill.
+
+list:
+    Living near a nuclear power station for a year: under 0.01 millisieverts
+    Cosmic radiation at sea level for a year: about 0.3 millisieverts
+    Radon in an average home for a year: about 2.3 millisieverts
+
+p:
+    A number only means something when you put it next to the ones you know. That is all a scale is for.
+
+next: put doses in order => lesson the-dose-scale
+
+comment bc-the-dose-you-already-get-ray
+author: npc-ray
+chip: {"lessonId":"the-dose-scale"}
+
+    The numbers are the point. No scare, no hype. Good piece.

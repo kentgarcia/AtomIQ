@@ -1,0 +1,109 @@
+format 1
+adapter curriculum 1
+unit: radiation-and-the-body
+
+objective u4-three-questions
+
+statement:
+    Know three questions to ask about any dose in a headline: how big it is in millisieverts, how fast it arrived, and how it compares with doses you know.
+
+misconception: A scary headline about radiation tells you how big the dose is.
+
+item u4-l5-choice-compare
+type: choice
+surfaces: lesson
+surfaces: practice
+surfaces: checkpoint
+surfaces: review
+references: ref-epa-radiation-sources
+references: ref-who-ionizing-radiation
+
+prompt:
+    A report says a scan gave a dose of about 10 millisieverts. How does that compare with an average year, about 6, and with about 1000?
+
+options:
+    {"id":"mid","label":"A little more than an average year, and about a hundred times less than 1000"}
+    {"id":"huge","label":"Far more than 1000, so a scan is dangerous","note":"10 is far less than 1000. About 1000 in a short time is where illness starts."}
+    {"id":"tiny","label":"Far less than an average year","note":"10 is a little more than the average year's 6, not far less."}
+
+answer: mid
+
+explanation:
+    10 is a little more than an average year's 6, and about a hundred times less than the 1000 where people start to become ill.
+
+item u4-l5-choice-fast
+type: choice
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-who-ionizing-radiation
+
+prompt:
+    Two people each receive 10 millisieverts. One got it in a few minutes, the other over a whole year. Which question tells them apart?
+
+options:
+    {"id":"rate","label":"How fast did the dose arrive?"}
+    {"id":"size","label":"How big was the dose?","note":"Both received the same size, 10 millisieverts. The question that tells them apart is about speed."}
+    {"id":"nat","label":"Is the radiation natural?","note":"That is a different question and does not tell these two apart."}
+
+answer: rate
+
+explanation:
+    The size is the same, so the difference is the dose rate: how fast the dose arrived.
+
+item u4-l5-choice-first
+type: choice
+surfaces: lesson
+surfaces: practice
+surfaces: checkpoint
+surfaces: review
+references: ref-epa-radiation-sources
+references: ref-who-ionizing-radiation
+
+prompt:
+    A headline says 'Radiation found in the air!' and gives no numbers. What should you ask first?
+
+options:
+    {"id":"dose","label":"How big is the dose, and how does it compare with an ordinary year?"}
+    {"id":"any","label":"Nothing: if radiation is found, it is dangerous","note":"Radiation is around us all the time. What matters is the size and the speed of the dose."}
+    {"id":"nat","label":"Only whether the radiation is natural or made by people","note":"Natural or not, the dose is what matters. Most of the average yearly dose is natural."}
+
+answer: dose
+
+explanation:
+    With no number, a headline cannot tell you much. Ask how big the dose is, and compare it with doses you know, like an average year.
+
+item u4-l5-match-questions
+type: match
+surfaces: lesson
+surfaces: practice
+surfaces: checkpoint
+surfaces: review
+references: ref-epa-radiation-sources
+references: ref-who-ionizing-radiation
+
+prompt:
+    Match each question to what it asks about a dose.
+
+pairs:
+    {"id":"big","left":"How big?","right":"The amount, in millisieverts"}
+    {"id":"fast","left":"How fast?","right":"All at once, or over time"}
+    {"id":"cmp","left":"Compared with what?","right":"Doses you already know, like an average year"}
+
+explanation:
+    Size, speed and comparison are the three things that turn a bare number into something you can judge.
+
+item u4-x-tom-number
+type: true_or_myth
+surfaces: practice
+surfaces: checkpoint
+surfaces: review
+references: ref-epa-radiation-sources
+
+statement:
+    A radiation number with no unit and nothing to compare it with tells you whether a dose is large.
+
+answer: myth
+
+explanation:
+    Myth. Without a unit and a comparison, such as an average year of about 6 millisieverts, a number cannot tell you whether a dose is large.

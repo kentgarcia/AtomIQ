@@ -1,0 +1,139 @@
+format 1
+adapter curriculum 1
+unit: radiation-meets-matter
+
+objective u3-gamma-shielding
+
+statement:
+    Know that gamma rays pass through thin barriers and need thick, dense material such as lead or concrete, and that the right shield depends on the kind of radiation.
+
+misconception: Anything solid is a good shield against all radiation.
+
+item u3-l2-choice-apron
+type: choice
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-epa-protecting-yourself
+
+prompt:
+    Why does a dentist put a lead apron on you for an X-ray?
+
+options:
+    {"id":"stop","label":"Lead is a barrier that protects against X-rays"}
+    {"id":"warm","label":"It keeps you warm during the visit","note":"The apron is there as a barrier against X-rays."}
+    {"id":"clean","label":"It keeps dust off your clothes","note":"The apron is there as a barrier against X-rays, not against dust."}
+
+answer: stop
+
+explanation:
+    Lead is a dense material, so it works as a barrier against X-rays, the same way it does against gamma rays.
+
+item u3-l2-choice-gamma
+type: choice
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-epa-radiation-basics
+references: ref-openstax-chem-21-6
+
+prompt:
+    What makes a good shield against gamma rays?
+
+options:
+    {"id":"thick","label":"A thick layer of a dense material, such as lead or concrete"}
+    {"id":"paper","label":"A sheet of paper","note":"Gamma rays pass straight through paper."}
+    {"id":"cloth","label":"Ordinary clothing","note":"Gamma rays pass through clothing. They need something thick and dense."}
+    {"id":"thin","label":"A thin sheet of metal","note":"A thin layer of metal stops beta particles, but gamma rays go through it."}
+
+answer: thick
+
+explanation:
+    Gamma rays are very penetrating, so the shield has to be both thick and dense. Several inches of lead or a few feet of concrete will do it.
+
+item u3-l2-fill-gamma
+type: fill
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-epa-radiation-basics
+
+prompt:
+    To stop gamma rays you need a thick layer of a ___ material, such as lead.
+
+mode: bank
+
+bank:
+    {"id":"dense","label":"dense"}
+    {"id":"light","label":"light"}
+    {"id":"clear","label":"clear"}
+
+answer: dense
+
+explanation:
+    Dense material has a lot of matter packed into it, and that is what a gamma ray has to get through. Lead and concrete are dense.
+
+item u3-l2-tom-gamma-paper
+type: true_or_myth
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-epa-radiation-basics
+
+statement:
+    A sheet of paper stops gamma rays.
+
+answer: myth
+
+explanation:
+    Myth. Gamma rays pass through paper, and through skin and clothing too. It takes several inches of lead or a few feet of concrete to stop them.
+
+item u3-l2-tom-thin-metal
+type: true_or_myth
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-epa-radiation-basics
+
+statement:
+    A thin layer of metal is enough to stop gamma rays.
+
+answer: myth
+
+explanation:
+    Myth. A thin layer of metal stops beta particles, but gamma rays pass through it. They need several inches of lead or a few feet of concrete.
+
+item u3-x-gamma-barrier
+type: choice
+surfaces: practice
+surfaces: checkpoint
+surfaces: review
+references: ref-epa-protecting-yourself
+
+prompt:
+    Which of these is used as a barrier against gamma rays?
+
+options:
+    {"id":"paper","label":"A stack of paper","note":"Gamma rays go through paper. It is not dense or thick enough."}
+    {"id":"concrete","label":"A thick concrete wall"}
+    {"id":"foil","label":"A sheet of aluminum foil","note":"A thin layer of metal stops beta particles, but not gamma rays."}
+
+answer: concrete
+
+explanation:
+    Concrete is dense, and a thick wall of it protects against gamma rays. Lead and water are used in the same way.
+
+item u3-x-tom-shield-materials
+type: true_or_myth
+surfaces: practice
+surfaces: checkpoint
+surfaces: review
+references: ref-epa-protecting-yourself
+
+statement:
+    Some radioactive materials are stored under water or in lead-lined rooms.
+
+answer: true
+
+explanation:
+    True. Water, concrete and lead are barriers that protect against gamma rays and X-rays, so they are used to store and shield radioactive materials.

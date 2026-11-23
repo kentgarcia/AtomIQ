@@ -1,0 +1,68 @@
+format 1
+adapter chat 1
+npc: npc-mina
+
+node chat-mina-up-welcome-back
+kind: unprompted
+pose: greet
+trigger: welcome_back
+title: Welcome back
+
+    Welcome back.
+
+    There's no rush. Your place is kept right where you left it.
+
+reply: thanks Mina -> chat-mina-back-thanks
+reply: did you miss me? -> chat-mina-back-miss
+reply: what have you been doing? -> chat-mina-back-up
+
+node chat-mina-back-thanks
+kind: reply
+pose: proud
+
+    You're welcome. Coming back is the hard part, and you did it.
+
+    One small step is enough for today.
+
+reply: ok, let's go -> chat-mina-back-ready
+reply: a warm-up first -> chat-mina-back-ready
+
+node chat-mina-back-miss
+kind: reply
+pose: greet
+
+    I did, a little. It's nice to see you.
+
+    No pressure at all.
+
+reply: ha, ok -> chat-mina-back-ready
+reply: aw -> chat-mina-back-ready
+
+node chat-mina-back-up
+kind: reply
+pose: idle
+
+    Reading about how cells repair themselves. It never gets less interesting.
+
+    Mostly that, and a lot of tea.
+
+reply: good for you -> chat-mina-back-ready
+reply: lol -> chat-mina-back-ready
+
+node chat-mina-back-ready
+kind: reply
+pose: point
+
+    Ready when you are.
+
+link: Take me there => next-lesson
+link: A quick round first => mythbuster radiation-and-the-body
+reply: not today, sorry -> chat-mina-back-bye
+
+node chat-mina-back-bye
+kind: sign_off
+pose: greet
+
+    That's fine. Rest is part of learning.
+
+    I'll be here.

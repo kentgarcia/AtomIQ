@@ -1,0 +1,93 @@
+format 1
+adapter chat 1
+npc: npc-mina
+
+node chat-mina-up-worry
+kind: unprompted
+pose: think
+trigger: lessons_completed:17
+title: A message from a friend
+
+    A friend sent me a message.
+
+    It says: radiation damages DNA, so any radiation at all is dangerous.
+
+    I want to answer kindly. Can you help me?
+
+reply: that's half right -> chat-mina-worry-half
+reply: it's true -> chat-mina-worry-true
+reply: what would you say? -> chat-mina-worry-say
+
+node chat-mina-worry-half
+kind: reply
+pose: proud
+
+    Yes, that's the half my friend has. Ionizing radiation can damage the DNA in a cell.
+
+    What is the other half?
+
+reply: cells repair damage -> chat-mina-worry-repair
+reply: it never really matters -> chat-mina-worry-matter
+
+node chat-mina-worry-true
+kind: reply
+pose: explain
+
+    Part of it is true. Radiation can damage DNA.
+
+    But everyone gets small doses every day and is not ill. So something else must be going on.
+
+reply: repair? -> chat-mina-worry-repair
+reply: I'm not sure -> chat-mina-worry-say
+
+node chat-mina-worry-say
+kind: reply
+pose: explain
+
+    I'd say: yes, radiation can damage DNA. And cells are extremely efficient at repairing that damage.
+
+    So a small everyday dose does not make anyone ill.
+
+reply: that's kind and clear -> chat-mina-worry-end
+reply: what if the damage isn't repaired? -> chat-mina-worry-not
+
+node chat-mina-worry-repair
+kind: reply
+pose: proud
+
+    Yes. Cells are extremely efficient at repairing damage, and they do it all the time.
+
+    That's the missing half.
+
+reply: tell your friend that -> chat-mina-worry-end
+reply: what if it isn't repaired? -> chat-mina-worry-not
+
+node chat-mina-worry-matter
+kind: reply
+pose: think
+
+    It does matter. If damage is not repaired correctly, a cell may die or eventually become cancerous.
+
+    That's why repair, and the size of a dose, matter.
+
+reply: ok, so repair is the other half -> chat-mina-worry-repair
+reply: I see -> chat-mina-worry-repair
+
+node chat-mina-worry-not
+kind: reply
+pose: idle
+
+    Then a cell may die or eventually become cancerous. That's real, and it's why the size of a dose matters.
+
+    A small dose, or one spread over time, gives repair more of a chance.
+
+reply: got it -> chat-mina-worry-end
+reply: thanks -> chat-mina-worry-end
+
+node chat-mina-worry-end
+kind: sign_off
+pose: greet
+
+    I'll send my friend that. Thank you.
+
+    Both halves, said kindly.

@@ -23,6 +23,7 @@ import {
   replyStep,
   replyTypeOf,
   splitParts,
+  STORY_REWARD_DIAMONDS,
   storyList,
   summarizeThreads,
   WELCOME_BACK_MIN_DAYS,
@@ -37,6 +38,7 @@ import {
 import { daysBetween, isDayKey } from "@/services/activity-core";
 import { loadPathSnapshot } from "@/services/path-snapshot";
 import { PHONE_APPS, type PhoneProgress, type SeenApp } from "@/services/phone-core";
+import { addDiamonds } from "@/services/wallet";
 import { getChatLastOpen, getChatReturned, setChatLastOpen, setChatReturned } from "@/services/storage";
 
 const newId = () => `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
@@ -325,6 +327,28 @@ export async function openThread(threadId: string): Promise<ThreadView | null> {
   } catch (error) {
     console.warn("[chats] open", error);
     return null;
+  }
+}
+
+/**
+ * Pay a story's diamonds the first time its thread is opened: the claim is a flag on the thread, flipped by one UPDATE, so a replay,
+ * a second open and two screens asking together all pay once. Free chats pay nothing. Returns the diamonds paid now (0 when there is
+ * nothing to pay). Never rejects: if paying fails the flag is put back, so the next open tries again.
+ */
+export async function claimStoryReward(threadId: string): Promise<number> {
+  try {
+    if (!(await store.claimReward(threadId, Date.now()))) return 0;
+    try {
+      await addDiamonds(STORY_REWARD_DIAMONDS);
+    } catch (error) {
+      await store.unclaimReward(threadId);
+      throw error;
+    }
+    notifyChats();
+    return STORY_REWARD_DIAMONDS;
+  } catch (error) {
+    console.warn("[chats] claim reward", error);
+    return 0;
   }
 }
 

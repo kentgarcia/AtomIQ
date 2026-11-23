@@ -4,7 +4,7 @@ unit: radioactivity
 
 lesson decay-chains
 title: Decay chains
-minutes: 4
+minutes: 5
 xp: 50
 teaches: u2-decay-chain
 teaches: u2-decay-changes-not-vanishes
@@ -19,12 +19,6 @@ supports: A daughter nuclide may be stable or may decay itself; uranium-238 reac
 cite ref-epa-radioactive-decay
 supports: The uranium-238 and thorium-232 decay chains (optional card).
 
-card c01
-kind: item
-type: item
-item: u2-l4-predict-daughter
-scored: 0
-
 card c02
 kind: teach
 type: explain
@@ -34,7 +28,7 @@ figure: daughter-unstable
 figure_at: 1
 
 body:
-    A nucleus decays into a daughter. The daughter can be unstable too. Then it decays again. The parent is the nucleus that decays. The daughter is the nucleus it becomes. Not every daughter is the end.
+    A nucleus decays into a daughter. But the daughter does not have to be stable. If it is unstable too, it decays again, and then again. So one decay is not always the end.
 
 card c03
 kind: sim
@@ -77,58 +71,46 @@ config:
 
 card c04
 kind: teach
-type: reveal
+type: explain
 scored: 0
 title: A decay chain
-predicts: c01
 figure: chain-figure
 figure_at: 2
 
 body:
-    A daughter can be unstable too. A [[decay-chain|decay chain]] is a sequence of radioactive decays in which one nucleus changes into another, which may decay again. It ends at a stable nucleus.
-
-card c05
-kind: item
-type: item
-item: u2-l4-tom-stable
-connected: true
-
-card c06
-kind: item
-type: item
-item: u2-l4-tom-vanish
-
-card c07
-kind: item
-type: item
-item: u2-l4-tom-different
+    A [[decay-chain|decay chain]] is a sequence of radioactive decays: one nucleus changes into another, which may decay again. It ends only when a stable nucleus is reached, because a stable nucleus has nothing left to change into.
 
 card c08
 kind: item
 type: item
 item: u2-l4-order-chain
 
-card c09
+card c11
 kind: item
 type: item
-item: u2-l4-choice-next
+item: u2-l4-choice-finished
 
 card c10
 kind: teach
 type: explain
 scored: 0
-title: A whole chain
+title: Nothing vanishes
 figure: chain-zoom-out
 figure_at: 1
 
 body:
-    Zoom out. One unstable nucleus can be the start of a whole chain of decays. Each step makes a new nucleus. The chain stops only when a stable nucleus is reached.
+    Look at what each step does. A decay does not make an atom disappear. It changes the nucleus into a different nucleus, and that different nucleus is what is left behind. One unstable nucleus can start a whole chain of these changes.
 
-card c11
+card c06
 kind: item
 type: item
-item: u2-l4-choice-finished
+item: u2-l4-tom-vanish
 connected: true
+
+card c07
+kind: item
+type: item
+item: u2-l4-tom-different
 
 card c12
 kind: teach

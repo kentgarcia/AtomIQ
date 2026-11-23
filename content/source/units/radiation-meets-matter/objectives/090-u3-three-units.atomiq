@@ -1,0 +1,155 @@
+format 1
+adapter curriculum 1
+unit: radiation-meets-matter
+
+objective u3-three-units
+
+statement:
+    Match the becquerel, the gray and the sievert to what each measures: how active a source is, how much energy is absorbed, and the potential for harm.
+
+misconception: The becquerel, the gray and the sievert all measure the same thing.
+
+item u3-l5-choice-gray
+type: choice
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-openstax-chem-21-6
+
+prompt:
+    What does the gray measure?
+
+options:
+    {"id":"active","label":"How active a source is","note":"That is the becquerel. The gray is about what was absorbed."}
+    {"id":"energy","label":"The energy absorbed, per kilogram"}
+    {"id":"harm","label":"The potential for harm","note":"That is the sievert. The gray counts energy only."}
+
+answer: energy
+
+explanation:
+    One gray is one joule of energy absorbed by each kilogram. It is about how much energy went in, like the water in the bucket.
+
+item u3-l5-choice-sv
+type: choice
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-openstax-chem-21-6
+
+prompt:
+    What does the sievert take into account that the gray does not?
+
+options:
+    {"id":"type","label":"The type of radiation and how sensitive the tissue is"}
+    {"id":"decays","label":"How many decays happen each second","note":"That is what the becquerel counts."}
+    {"id":"distance","label":"How far away the source is","note":"The sievert does not count distance. It adds the type of radiation and the tissue to the energy absorbed."}
+
+answer: type
+
+explanation:
+    The sievert starts from the energy absorbed and then accounts for the type of radiation and the sensitivity of the tissue. That is why it describes potential for harm.
+
+item u3-l5-fill-bq
+type: fill
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-openstax-chem-21-6
+
+prompt:
+    A source of 20 becquerels has ___ decays every second.
+
+mode: bank
+
+bank:
+    {"id":"two","label":"2"}
+    {"id":"twenty","label":"20"}
+    {"id":"two-hundred","label":"200"}
+
+answer: twenty
+
+explanation:
+    One becquerel is one decay per second, so 20 becquerels is 20 decays every second.
+
+item u3-l5-match-units
+type: match
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-openstax-chem-21-6
+
+prompt:
+    Match each unit to the question it answers.
+
+pairs:
+    {"id":"bq","left":"Becquerel","right":"How active is the source?"}
+    {"id":"gy","left":"Gray","right":"How much energy was absorbed?"}
+    {"id":"sv","left":"Sievert","right":"How much harm could it do?"}
+
+explanation:
+    The becquerel is about the source, the gray about the energy absorbed, and the sievert about the potential for harm.
+
+item u3-l5-tom-per-second
+type: true_or_myth
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-openstax-chem-21-6
+
+statement:
+    One becquerel is one decay per second.
+
+answer: true
+
+explanation:
+    True. A source with a big number of becquerels has many nuclei decaying each second.
+
+item u3-l5-tom-same
+type: true_or_myth
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-who-ionizing-radiation
+
+statement:
+    The becquerel, the gray and the sievert all measure the same thing.
+
+answer: myth
+
+explanation:
+    Myth. The becquerel measures how active a source is, the gray measures energy absorbed and the sievert describes potential for harm. They answer three different questions.
+
+item u3-x-tom-one-joule
+type: true_or_myth
+surfaces: practice
+surfaces: checkpoint
+surfaces: review
+references: ref-openstax-chem-21-6
+
+statement:
+    One gray is one joule of energy absorbed per kilogram.
+
+answer: true
+
+explanation:
+    True. That is the definition of the gray. It counts energy absorbed, however it got there.
+
+item u3-x-which-decays
+type: choice
+surfaces: practice
+surfaces: checkpoint
+surfaces: review
+references: ref-openstax-chem-21-6
+
+prompt:
+    Which unit is one decay per second?
+
+options:
+    {"id":"gy","label":"The gray","note":"The gray is one joule absorbed per kilogram."}
+    {"id":"bq","label":"The becquerel"}
+    {"id":"sv","label":"The sievert","note":"The sievert describes potential for harm."}
+
+answer: bq
+
+explanation:
+    The becquerel is one decay per second. It measures the activity of a source.

@@ -1,6 +1,6 @@
 /**
- * Lab router. The three experiments are chosen from the Games tab (`/lab?exp=...`); a bare `/lab`
- * goes back to the game picker. Each lab is its own screen in `components/lab/`.
+ * Lab router. The three experiments are opened from the phone (`/lab?exp=...`, one app per lab); a bare `/lab`
+ * goes back to the phone. Each lab is its own screen in `components/lab/`.
  */
 
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -25,12 +25,12 @@ export default function LabScreen() {
   const handleGameBack = useCallback(() => {
     impactLight();
     if (router.canGoBack()) router.back();
-    else router.replace("/(tabs)/awards");
+    else router.replace("/(tabs)/phone");
   }, [router]);
 
   useEffect(() => {
     if (exp && LABS.includes(exp)) return;
-    const t = setTimeout(() => router.replace("/(tabs)/awards"), 0);
+    const t = setTimeout(() => router.replace("/(tabs)/phone"), 0);
     return () => clearTimeout(t);
   }, [exp, router]);
 
@@ -40,7 +40,7 @@ export default function LabScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: theme.colors.mapBackground, justifyContent: "center", alignItems: "center" }}>
-      <Text style={{ ...fontFaces.heavy, color: theme.colors.text }}>Redirecting to Games…</Text>
+      <Text style={{ ...fontFaces.heavy, color: theme.colors.text }}>Redirecting to the phone…</Text>
     </View>
   );
 }

@@ -12,7 +12,7 @@
  */
 
 /** Number of tabs the bar renders (keep in sync with `app/(tabs)/_layout.tsx`). */
-export const TAB_BAR_TAB_COUNT = 6;
+export const TAB_BAR_TAB_COUNT = 5;
 
 export const TAB_BAR_CONSTANTS = {
     /** Minimum Android touch target (dp) — every tab hit area must keep this width. */

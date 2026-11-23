@@ -241,7 +241,7 @@ export default function ShopScreen() {
     <View style={[styles.root, { backgroundColor: avatarBackground(look) }]}>
       {mounted ? (
         <>
-      <PatternLayer pattern={look.pattern} tile={120} />
+      <PatternLayer pattern={look.pattern} background={look.background} tile={110} />
       <View style={styles.top} onLayout={(e: LayoutChangeEvent) => setTopHeight(e.nativeEvent.layout.height)}>
         {/* Trying something on: the avatar squashes and pops as the new look appears; putting it down does not */}
         <PopWhen trigger={`${trying?.id ?? ""}|${landed}`} active={trying !== null} intensity={0.45} sparkleColor={theme.colors.lessonHeader} style={{ marginBottom: -previewExtra }}>

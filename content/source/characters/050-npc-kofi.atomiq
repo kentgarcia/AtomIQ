@@ -21,15 +21,16 @@ spec:
       "eyes": "dots",
       "nose": "double",
       "hair": {
-        "style": "crop",
+        "style": "workcrop",
         "color": "#3B2A24",
         "shade": "#2B1E1A"
       },
       "facialHair": "beard",
       "outfit": {
-        "kind": "shirt",
+        "kind": "workvest",
         "color": "#FF9600",
-        "shade": "#CD7900"
+        "shade": "#CD7900",
+        "collar": "#2B70C9"
       },
       "accent": {
         "kind": "hardhat",

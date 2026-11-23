@@ -1,0 +1,108 @@
+format 1
+adapter curriculum 1
+unit: radiation-and-the-body
+
+objective u4-three-ways
+
+statement:
+    Know the three ways to lower a dose: spend less time near the source, stay farther from it, or put a shield between you and it.
+
+misconception: Nothing can be done to lower a dose.
+
+item u4-l4-choice-distance
+type: choice
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-epa-protecting-yourself
+
+prompt:
+    You move farther away from a source. What happens to the dose?
+
+options:
+    {"id":"down","label":"It decreases, and not just a little"}
+    {"id":"same","label":"No change, because radiation is everywhere","note":"Radiation from a source gets weaker with distance. The dose decreases dramatically as you move away."}
+    {"id":"up","label":"It goes up","note":"Moving away lowers the dose."}
+
+answer: down
+
+explanation:
+    The dose of radiation decreases dramatically as you increase your distance from the source.
+
+item u4-l4-choice-time
+type: choice
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-epa-protecting-yourself
+
+prompt:
+    A worker spends less time near a source. What happens to the dose from that source?
+
+options:
+    {"id":"less","label":"It goes down: less time means less dose"}
+    {"id":"same","label":"It stays the same","note":"Limiting the time you are exposed reduces the dose from the source."}
+    {"id":"more","label":"It goes up","note":"It is the other way round. Spending less time near a source lowers the dose."}
+
+answer: less
+
+explanation:
+    Limiting the time you are exposed reduces the dose from the radiation source.
+
+item u4-l4-fill-three
+type: fill
+surfaces: lesson
+surfaces: practice
+surfaces: checkpoint
+surfaces: review
+references: ref-epa-protecting-yourself
+
+prompt:
+    The three ways to lower a dose are time, distance and ___.
+
+mode: bank
+
+bank:
+    {"id":"s","label":"shielding"}
+    {"id":"c","label":"cooling"}
+    {"id":"w","label":"weighing"}
+
+answer: s
+
+explanation:
+    Shielding means putting something, such as lead, concrete or water, between you and the source.
+
+item u4-l4-tom-nothing
+type: true_or_myth
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-epa-protecting-yourself
+
+statement:
+    There is nothing a person can do to lower a dose from a source.
+
+answer: myth
+
+explanation:
+    Myth. People lower a dose with less time near the source, more distance from it, and shielding between themselves and it.
+
+item u4-x-choice-material
+type: choice
+surfaces: practice
+surfaces: checkpoint
+surfaces: review
+references: ref-epa-protecting-yourself
+
+prompt:
+    Which of these can shield against penetrating gamma rays?
+
+options:
+    {"id":"good","label":"Lead, concrete or water"}
+    {"id":"paper","label":"A sheet of paper","note":"Paper stops alpha particles, but gamma rays pass through it. They need thick, dense material."}
+    {"id":"skin","label":"The top layer of skin","note":"Skin stops alpha particles. Gamma rays are very penetrating."}
+
+answer: good
+
+explanation:
+    Barriers of lead, concrete or water protect against penetrating gamma rays.

@@ -4,7 +4,7 @@ unit: inside-the-atom
 
 lesson atoms-are-everywhere
 title: Atoms are everywhere
-minutes: 4
+minutes: 5
 xp: 40
 teaches: u1-matter-is-atoms
 teaches: u1-atom-scale
@@ -22,17 +22,18 @@ card c02
 kind: teach
 type: explain
 scored: 0
-title: What is everything made of?
+title: Look around you
 figure: matter-vs-energy
 figure_at: 1
 
 body:
-    Your hand, your phone and an apple are all [[matter]]. All matter is made of [[atom|atoms]]. Light and heat are different. They are energy, not matter.
+    Look at anything near you, like a cup, a phone or your own hand. All of it is [[matter|matter]], and all matter is built from tiny pieces called [[atom|atoms]]. Light and heat are different: they are energy, and energy is not made of atoms. So for anything you meet, ask one question: is it matter, or is it energy?
 
 card c03
 kind: item
 type: item
-item: u1-l1-sort-matter
+item: u1-x-not-atoms
+connected: true
 
 card c12
 kind: teach
@@ -43,7 +44,7 @@ figure: air-balloons
 figure_at: 2
 
 body:
-    Air feels like nothing, but it is matter too. It is made of atoms. That is why a pumped-up ball weighs more than a flat one.
+    Air feels like nothing because you cannot see it, but it is matter too. You can show it: a pumped-up ball weighs more than a flat one. The only thing that changed is the air inside, so air must be made of atoms that have weight.
 
 card c13
 kind: item
@@ -60,7 +61,7 @@ figure: zoom-chain
 figure_at: 2
 
 body:
-    Atoms are far too small to see, even with an ordinary microscope. You can zoom in on a skin cell. An atom is much, much smaller.
+    So if everything is made of atoms, why can't we see them? Because they are extremely small. Zoom in on a skin cell and you are still far from an atom. An ordinary microscope uses light, and light is too coarse to show something that small.
 
 card c05
 kind: sim
@@ -119,11 +120,6 @@ card c08
 kind: item
 type: item
 item: u1-l1-tom-microscope
-
-card c10
-kind: item
-type: item
-item: u1-l1-choice-made-of
 
 card c09
 kind: teach

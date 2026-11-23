@@ -1,7 +1,7 @@
 {
   "name": "atomiq",
   "main": "expo-router/entry",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "scripts": {
     "start": "node scripts/sync-content.js && expo start",
     "android": "node scripts/sync-content.js && expo start --android",
@@ -42,6 +42,7 @@
     "test:source": "node --no-warnings --test scripts/test-content-source-core.mjs",
     "test:source-sync": "node --no-warnings --test scripts/test-content-sync.mjs",
     "test:figures": "node --no-warnings --test scripts/test-figures.mjs",
+    "test:figure-motion": "node --no-warnings --test scripts/test-figure-motion.mjs",
     "test:i18n": "node --no-warnings --test scripts/test-i18n.mjs",
     "test:source-adapters": "node --no-warnings --test scripts/test-content-adapters.mjs",
     "test:maze": "node --no-warnings --test scripts/test-atom-maze-progression.mjs",
@@ -106,6 +107,7 @@
     "test:voice": "node --no-warnings --test scripts/test-npc-voice.mjs",
     "test:daily-facts": "node --no-warnings --test scripts/test-daily-facts.mjs",
     "test:phone": "node --no-warnings --test scripts/test-phone.mjs",
+    "test:phone-layout": "node --no-warnings --test scripts/test-phone-layout.mjs",
     "test:tutorial": "node --no-warnings --test scripts/test-tutorial.mjs",
     "test:tutorial-fx": "node --no-warnings --test scripts/test-tutorial-fx.mjs",
     "check:tutorial": "node --no-warnings scripts/check-tutorial.mjs",

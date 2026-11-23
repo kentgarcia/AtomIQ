@@ -89,7 +89,7 @@ export default function WallpapersScreen() {
                   <View style={[styles.preview, { width: tileW, height: tileH, borderColor: on ? c.primary : c.border, backgroundColor: isIllustrated(choice) ? WALLPAPERS[choice].base : choice === OWN_WALLPAPER ? avatarBackground(look) : c.mapBackground }]}>
                     {choice === OWN_WALLPAPER ? (
                       <>
-                        <PatternLayer pattern={look.pattern} tile={64} />
+                        <PatternLayer pattern={look.pattern} background={look.background} tile={64} />
                         <GhostGrid width={tileW} color={withAlpha(SNOW, 0.55)} />
                         <View style={styles.me}>
                           <Avatar value={userProfile?.avatar_url} size={tileW * 0.34} radius={tileW * 0.17} />

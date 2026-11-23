@@ -17,7 +17,6 @@ export const WALK_STOPS: readonly WalkStop[] = [
   { name: "Phone", href: "/(tabs)/phone", kind: "tab" },
   { name: "Quests", href: "/(tabs)/quests", kind: "tab" },
   { name: "Profile", href: "/(tabs)/profile", kind: "tab" },
-  { name: "Games", href: "/(tabs)/awards", kind: "tab" },
   { name: "Shop", href: "/shop", kind: "push" },
   { name: "Encyclopedia", href: "/encyclopedia", kind: "push" },
   { name: "Chats", href: "/phone-apps/chats", kind: "push" },

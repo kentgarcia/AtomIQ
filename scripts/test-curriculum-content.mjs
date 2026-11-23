@@ -21,6 +21,10 @@ const TERMS = [
   // Unit 2
   "decay", "radionuclide", "alpha-particle", "beta-particle", "gamma-ray", "half-life", "radon", "cosmic-radiation", "ionizing-radiation", "marie-curie",
   "parent-nuclide", "daughter-nuclide", "electromagnetic-radiation", "decay-chain", "potassium-40", "alpha-decay", "beta-decay", "gamma-radiation",
+  // Unit 3
+  "x-ray", "shielding", "irradiation", "radioactive-contamination", "geiger-counter", "dosimeter", "becquerel", "gray", "sievert",
+  // Unit 4
+  "millisievert", "absorbed-dose", "dose-rate", "dna", "acute-radiation-syndrome",
 ];
 
 let sourceRows;
@@ -62,12 +66,12 @@ describe("Unit 1 content", () => {
     assert.deepEqual(errorsOf(db, { strictReview: true }).map((f) => `${f.id} ${f.rule}`), []);
   });
 
-  it("every teaching card is within the word limit and has a figure", () => {
+  it("every teaching card is within the word limit, and a figure that is given draws", () => {
     const db = build();
     for (const c of db.prepare("SELECT * FROM lesson_cards WHERE kind = 'teach'").all()) {
       const d = JSON.parse(c.data);
-      assert.ok(wordCount(d.body) <= 60, `${c.lesson_id}/${c.id} has ${wordCount(d.body)} words`);
-      assert.ok(expandFigure(d.figure).figure?.scene?.shapes?.length, `${c.lesson_id}/${c.id} has no figure`);
+      assert.ok(wordCount(d.body) <= 100, `${c.lesson_id}/${c.id} has ${wordCount(d.body)} words`);
+      if (d.figure) assert.ok(expandFigure(d.figure).figure?.scene?.shapes?.length, `${c.lesson_id}/${c.id} has a figure that does not draw`);
     }
   });
 
@@ -179,14 +183,20 @@ describe("curriculum rules reject broken content", () => {
     return db;
   };
 
-  it("a teaching card over 80 words", () => {
-    const db = withData(build(), "isotopes", "c02", (d) => (d.body = Array(85).fill("word").join(" ")));
+  it("a teaching card over 100 words", () => {
+    const db = withData(build(), "isotopes", "c02", (d) => (d.body = Array(105).fill("word").join(" ")));
     assert.ok(rules(db).has("card-words"));
   });
 
-  it("a teaching card without a figure", () => {
-    const db = withData(build(), "isotopes", "c02", (d) => delete d.figure);
-    assert.ok(rules(db).has("card-figure"));
+  it("a teaching card may have no figure, but a lesson where most have none is an error", () => {
+    assert.ok(!rules(withData(build(), "isotopes", "c02", (d) => delete d.figure)).has("lesson-figures"), "one card without a picture is fine");
+    const db = build();
+    for (const c of db.prepare("SELECT id, data FROM lesson_cards WHERE lesson_id = 'isotopes' AND kind = 'teach'").all()) {
+      const d = JSON.parse(c.data);
+      delete d.figure;
+      db.prepare("UPDATE lesson_cards SET data = ? WHERE lesson_id = 'isotopes' AND id = ?").run(JSON.stringify(d), c.id);
+    }
+    assert.ok(rules(db).has("lesson-figures"));
   });
 
   it("a figure with a shape outside the scene", () => {
@@ -214,19 +224,34 @@ describe("curriculum rules reject broken content", () => {
     assert.ok(rules(db).has("glossary-term"));
   });
 
-  it("more than two reading cards in a row", () => {
-    const db = build();
-    db.prepare("UPDATE lesson_cards SET kind = 'teach', type = 'explain', item_id = NULL, scored = 0, data = ? WHERE lesson_id = 'isotopes' AND id IN ('c04','c05','c06')").run(
-      JSON.stringify({ body: "Short text.", figure: { altText: "A figure that has enough alt text.", scene: { height: 30, shapes: [{ t: "circle", x: 50, y: 15, r: 5 }] } } }),
-    );
-    assert.ok(rules(db).has("lesson-reading-run"));
+  it("a term marker with no shown text would print its brackets", () => {
+    const bare = withData(build(), "isotopes", "c02", (d) => (d.body = "An [[isotope]] is one kind of atom."));
+    assert.ok(rules(bare).has("glossary-term-format"));
+    const stray = withData(build(), "isotopes", "c02", (d) => (d.body = "An [[isotope|isotope] is one kind of atom."));
+    assert.ok(rules(stray).has("glossary-term-format"));
+    const fine = withData(build(), "isotopes", "c02", (d) => (d.body = "An [[isotope|isotope]] is one kind of atom."));
+    assert.ok(!rules(fine).has("glossary-term-format"));
   });
 
-  it("a lesson with no prediction is only a warning", () => {
+  it("too many words of teaching in a row (counted in words, not cards)", () => {
+    const text = (n) => Array(n).fill("word").join(" ") + ".";
+    const run = (words) => {
+      const db = build();
+      db.prepare("UPDATE lesson_cards SET kind = 'teach', type = 'explain', item_id = NULL, scored = 0, data = ? WHERE lesson_id = 'isotopes' AND id IN ('c20','c09','c05')").run(
+        JSON.stringify({ body: text(words), figure: { altText: "A figure that has enough alt text.", scene: { height: 30, shapes: [{ t: "circle", x: 50, y: 15, r: 5 }] } } }),
+      );
+      return db;
+    };
+    assert.ok(!rules(run(10)).has("lesson-reading-run"), "three short cards in a row are fine now");
+    assert.ok(validateCurriculum(run(60)).findings.some((f) => f.rule === "lesson-reading-run" && f.severity === "warning"), "past the first budget it is a warning");
+    assert.ok(rules(run(95)).has("lesson-reading-run"), "past the second it is an error");
+  });
+
+  it("a lesson with no prediction is fine: it may open with a story, a puzzle or teaching", () => {
     const db = build();
     db.prepare("DELETE FROM lesson_cards WHERE lesson_id = 'isotopes' AND id = 'c01'").run();
     assert.ok(!rules(db).has("lesson-predict"));
-    assert.ok(validateCurriculum(db).findings.some((f) => f.severity === "warning" && f.rule === "lesson-predict"));
+    assert.ok(!validateCurriculum(db).findings.some((f) => f.rule === "lesson-predict"));
   });
 
   it("an objective taught by no lesson, and one taught by two", () => {
@@ -263,7 +288,7 @@ describe("curriculum rules reject broken content", () => {
   });
 
   it("an item that is not in any lesson-compatible surface but is used by a lesson card", () => {
-    const db = mutate("UPDATE items SET surfaces = '[\"practice\"]' WHERE id = 'u1-l4-sort-carbon'");
+    const db = mutate("UPDATE items SET surfaces = '[\"practice\"]' WHERE id = 'u1-l4-choice-pair'");
     assert.ok(rules(db).has("card-item"));
   });
 
@@ -312,7 +337,7 @@ describe("lecture flow fields (figureAt, connected)", () => {
   });
 
   it("warns when a connected activity has no lecture right before it", () => {
-    const db = withData(build(), "alpha-beta-gamma", "c01", (d) => (d.connected = true));
+    const db = withData(build(), "alpha-beta-gamma", "c07", (d) => (d.connected = true));
     assert.ok(validateCurriculum(db).findings.some((f) => f.rule === "card-connected" && f.severity === "warning"));
   });
 });
@@ -456,11 +481,10 @@ describe("Unit 2 content", () => {
     assert.equal(cp.questionCount, 12);
   });
 
-  it("every lesson has a predict card, a sim or non-choice interaction pair, and a deeper card that is never scored", () => {
+  it("a deeper card is never scored (a lesson no longer has to open with a prediction)", () => {
     const db = build();
     for (const l of lessonsOf(db)) {
       const cs = cardsOf(db, l.id);
-      assert.ok(cs.some((c) => c.kind === "item" && db.prepare("SELECT type FROM items WHERE id = ?").get(c.item_id).type === "predict"), `${l.id}: no predict card`);
       for (const c of cs.filter((x) => x.tier === "deeper")) assert.equal(c.scored, 0, `${l.id}/${c.id}: a deeper card is never scored`);
     }
   });
@@ -518,10 +542,10 @@ describe("Unit 2 content", () => {
 
   it("Unit 2 never teaches a Unit 3 or Unit 4 idea as new: the teasers are unscored and say 'later'", () => {
     const db = build();
-    const tease = cardsOf(db, "radioactivity-is-natural").find((c) => c.id === "c14");
+    const tease = cardsOf(db, "radioactivity-is-natural").find((c) => c.id === "c12");
     assert.match(tease.data.body, /Later/);
     assert.equal(tease.scored, 0);
-    const other = textOf(allCards(db).filter((c) => !(c.lesson_id === "radioactivity-is-natural" && c.id === "c14")).map((c) => c.data));
+    const other = textOf(allCards(db).filter((c) => !(c.lesson_id === "radioactivity-is-natural" && c.id === "c12")).map((c) => c.data));
     assert.doesNotMatch(other, /irradiated|contaminat|non-ionizing|dose|shield|sievert|detector|geiger/i);
   });
 

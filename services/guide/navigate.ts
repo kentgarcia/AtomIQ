@@ -34,7 +34,7 @@ export const navigateDestination = (
       router.push("/(tabs)/community");
       break;
     case "tab-games":
-      router.push("/(tabs)/awards");
+      router.push("/(tabs)/phone");
       break;
     case "tab-profile":
       router.push("/(tabs)/profile");

@@ -1,0 +1,114 @@
+format 1
+adapter curriculum 1
+unit: radiation-and-the-body
+
+lesson risk-in-perspective
+title: Risk in perspective
+minutes: 6
+xp: 50
+teaches: u4-three-questions
+teaches: u4-read-a-number
+relies_on: u4-everyone-dose
+relies_on: u4-small-spread
+
+description:
+    You will learn three questions to ask about any radiation number, then use them on headlines that sound frightening.
+
+cite ref-epa-radiation-sources
+supports: The average yearly dose is about 6.2 millisieverts and a whole body CT is about 10 millisieverts.
+
+cite ref-who-ionizing-radiation
+
+supports:
+    Acute radiation syndrome starts at about 1 sievert (1000 millisieverts); a low dose, or one spread over time, carries less risk.
+
+cite ref-epa-radiation-health-effects
+supports: Low levels do not cause immediate health effects but can add a small increase in the risk of cancer over a lifetime.
+
+card c01
+kind: teach
+type: explain
+scored: 0
+title: Three questions
+figure: headline-questions
+figure_at: 1
+
+body:
+    A headline about radiation is only useful with three questions. How big is the dose, in millisieverts? How fast did it arrive? And how does it compare with doses you already know?
+
+card c02
+kind: item
+type: item
+item: u4-l5-choice-first
+connected: true
+
+card c03
+kind: item
+type: item
+item: u4-l5-choice-fast
+
+card c04
+kind: teach
+type: explain
+scored: 0
+title: Put it on the scale
+figure: dose-ladder
+figure_at: 1
+
+body:
+    Compare a number with the doses you know. An average year is about 6 millisieverts. A whole body CT is about 10. Acute illness starts at about 1000, in a short time.
+
+card c05
+kind: item
+type: item
+item: u4-l5-choice-compare
+connected: true
+
+card c06
+kind: item
+type: item
+item: u4-l5-choice-scan
+
+card c06b
+kind: item
+type: item
+item: u4-l5-match-questions
+
+card c07
+kind: teach
+type: explain
+scored: 0
+title: Two wrong answers
+figure: two-myths
+figure_at: 1
+
+body:
+    One wrong answer says any dose is deadly. The other says radiation is harmless. Both are wrong. A very large dose in a short time makes people ill, and low doses add a small chance of cancer over a lifetime. Size and speed decide.
+
+card c08
+kind: item
+type: item
+item: u4-l5-tom-any-deadly
+connected: true
+
+card c09
+kind: item
+type: item
+item: u4-l5-tom-large-ill
+
+card c10
+kind: item
+type: item
+item: u4-l5-choice-calm
+
+card c11
+kind: teach
+type: explain
+tier: deeper
+scored: 0
+title: Go deeper: a number to remember
+figure: dose-ladder
+figure_at: 1
+
+body:
+    About 1000 millisieverts in a short time is where illness starts. An average year is about 6. That is a gap of well over a hundred times.

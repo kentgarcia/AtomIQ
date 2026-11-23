@@ -30,6 +30,18 @@
       "position": 1
     },
     {
+      "lesson_id": "becquerel-gray-sievert",
+      "reference_id": "ref-openstax-chem-21-6",
+      "supports": "The becquerel is one disintegration per second; the gray is one joule of energy absorbed per kilogram of tissue; the sievert takes into account both the energy and the biological effects of the type of radiation, and measures tissue damage.",
+      "position": 0
+    },
+    {
+      "lesson_id": "becquerel-gray-sievert",
+      "reference_id": "ref-who-ionizing-radiation",
+      "supports": "The becquerel measures activity, the gray measures absorbed dose and the sievert measures the biological effect of radiation.",
+      "position": 1
+    },
+    {
       "lesson_id": "decay-chains",
       "reference_id": "ref-openstax-chem-21-3",
       "supports": "A daughter nuclide may be stable or may decay itself; uranium-238 reaches stable lead-206 in 14 steps.",
@@ -39,6 +51,36 @@
       "lesson_id": "decay-chains",
       "reference_id": "ref-epa-radioactive-decay",
       "supports": "The uranium-238 and thorium-232 decay chains (optional card).",
+      "position": 1
+    },
+    {
+      "lesson_id": "detecting-radiation",
+      "reference_id": "ref-openstax-chem-21-6",
+      "supports": "A Geiger counter detects the ionization of the gas in its tube; a scintillation counter uses a material that emits light when ionizing radiation excites it; dosimeters measure ionizing radiation and are often used to determine personal radiation exposure (the page's picture shows one worn on the chest).",
+      "position": 0
+    },
+    {
+      "lesson_id": "detecting-radiation",
+      "reference_id": "ref-epa-radiation-basics",
+      "supports": "Radiation is present all around us; background radiation comes mostly from natural minerals in the ground, soil and water, and from cosmic radiation.",
+      "position": 1
+    },
+    {
+      "lesson_id": "detecting-radiation",
+      "reference_id": "ref-who-ionizing-radiation",
+      "supports": "Humans are exposed to natural radiation sources every day, and the level varies from place to place.",
+      "position": 2
+    },
+    {
+      "lesson_id": "dose-and-time",
+      "reference_id": "ref-who-ionizing-radiation",
+      "supports": "The threshold for acute radiation syndrome is about 1 sievert; effects are more severe at higher doses and dose rates; a low dose or one spread over a long time carries less risk because repair is more likely.",
+      "position": 0
+    },
+    {
+      "lesson_id": "dose-and-time",
+      "reference_id": "ref-epa-radiation-health-effects",
+      "supports": "A very high exposure over a short time can cause nausea and vomiting within hours; low levels can add a small increase in the risk of cancer over a lifetime; about 99 percent of people given 100 millisieverts would not get cancer as a result.",
       "position": 1
     },
     {
@@ -72,6 +114,36 @@
       "position": 2
     },
     {
+      "lesson_id": "ionizing-or-not",
+      "reference_id": "ref-epa-radiation-basics",
+      "supports": "Ionizing radiation has enough energy to remove electrons from atoms; non-ionizing radiation does not. Radio waves, visible light and microwaves are non-ionizing; alpha, beta, gamma and X-rays are ionizing.",
+      "position": 0
+    },
+    {
+      "lesson_id": "ionizing-or-not",
+      "reference_id": "ref-openstax-chem-21-6",
+      "supports": "Ionizing radiation is energetic enough to knock electrons out of molecules: high-energy ultraviolet, X-rays, gamma rays and particles such as alpha and beta. Lower-frequency, lower-energy electromagnetic radiation is nonionizing.",
+      "position": 1
+    },
+    {
+      "lesson_id": "ionizing-or-not",
+      "reference_id": "ref-who-ionizing-radiation",
+      "supports": "Ionizing radiation is radiation with enough energy to remove electrons from atoms, a process called ionization.",
+      "position": 2
+    },
+    {
+      "lesson_id": "irradiated-or-contaminated",
+      "reference_id": "ref-hps-radioactive-contamination",
+      "supports": "Radiation does not get on or in people; radioactive contamination can be spread. A contaminated person is exposed until the radioactive material is removed.",
+      "position": 0
+    },
+    {
+      "lesson_id": "irradiated-or-contaminated",
+      "reference_id": "ref-who-ionizing-radiation",
+      "supports": "External irradiation stops when the source is shielded or the person moves outside the radiation field; material on skin or clothes can often be washed off; internal exposure stops when the radionuclide leaves the body.",
+      "position": 1
+    },
+    {
       "lesson_id": "isotopes",
       "reference_id": "ref-openstax-chem-ch2",
       "supports": "Isotope definition and mass number.",
@@ -102,6 +174,18 @@
       "position": 2
     },
     {
+      "lesson_id": "radiation-and-cells",
+      "reference_id": "ref-epa-radiation-health-effects",
+      "supports": "Ionizing radiation can damage the DNA in cells; cells are extremely efficient at repairing it; damage not repaired correctly can kill a cell or eventually make it cancerous.",
+      "position": 0
+    },
+    {
+      "lesson_id": "radiation-and-cells",
+      "reference_id": "ref-hps-radioactive-contamination",
+      "supports": "A person who was exposed to radiation is not radioactive.",
+      "position": 1
+    },
+    {
       "lesson_id": "radioactivity-is-natural",
       "reference_id": "ref-epa-radiation-sources",
       "supports": "Natural background radiation: radon, cosmic radiation and radioactive minerals in the ground and the body.",
@@ -126,6 +210,24 @@
       "position": 3
     },
     {
+      "lesson_id": "risk-in-perspective",
+      "reference_id": "ref-epa-radiation-sources",
+      "supports": "The average yearly dose is about 6.2 millisieverts and a whole body CT is about 10 millisieverts.",
+      "position": 0
+    },
+    {
+      "lesson_id": "risk-in-perspective",
+      "reference_id": "ref-who-ionizing-radiation",
+      "supports": "Acute radiation syndrome starts at about 1 sievert (1000 millisieverts); a low dose, or one spread over time, carries less risk.",
+      "position": 1
+    },
+    {
+      "lesson_id": "risk-in-perspective",
+      "reference_id": "ref-epa-radiation-health-effects",
+      "supports": "Low levels do not cause immediate health effects but can add a small increase in the risk of cancer over a lifetime.",
+      "position": 2
+    },
+    {
       "lesson_id": "stable-and-unstable-nuclei",
       "reference_id": "ref-openstax-up3-ch10",
       "supports": "Isotopes of carbon, hydrogen and other elements, stable or with a half-life.",
@@ -141,6 +243,42 @@
       "lesson_id": "stable-and-unstable-nuclei",
       "reference_id": "ref-hps-natural-radioactivity",
       "supports": "Natural potassium-40 in the human body.",
+      "position": 2
+    },
+    {
+      "lesson_id": "the-dose-scale",
+      "reference_id": "ref-epa-radiation-sources",
+      "supports": "The average yearly dose is about 6.2 millisieverts, most of it from natural background radiation; a whole body CT is about 10 millisieverts.",
+      "position": 0
+    },
+    {
+      "lesson_id": "the-dose-scale",
+      "reference_id": "ref-who-ionizing-radiation",
+      "supports": "The dose threshold for acute radiation syndrome is about 1 sievert (1000 millisieverts).",
+      "position": 1
+    },
+    {
+      "lesson_id": "time-distance-shielding",
+      "reference_id": "ref-epa-protecting-yourself",
+      "supports": "Limiting time, increasing distance and shielding all reduce a dose; barriers of lead, concrete or water protect from gamma rays; dentists place a lead apron on patients; more walls give more protection.",
+      "position": 0
+    },
+    {
+      "lesson_id": "what-stops-what",
+      "reference_id": "ref-epa-radiation-basics",
+      "supports": "Alpha particles cannot penetrate the outer layer of skin; beta particles are stopped by a thin layer of aluminum; several inches of lead or a few feet of concrete may be required to stop gamma rays.",
+      "position": 0
+    },
+    {
+      "lesson_id": "what-stops-what",
+      "reference_id": "ref-openstax-chem-21-6",
+      "supports": "A sheet or two of paper, or the top layer of skin cells, usually stops alpha particles; beta particles are stopped by a thin layer of metal; gamma radiation is very penetrating.",
+      "position": 1
+    },
+    {
+      "lesson_id": "what-stops-what",
+      "reference_id": "ref-epa-protecting-yourself",
+      "supports": "Barriers of lead, concrete or water protect from gamma rays and X-rays; dentists place a lead apron on patients having X-rays of their teeth.",
       "position": 2
     },
     {

@@ -171,7 +171,7 @@ export function PassportCard({
     >
       <Card padding={0} faceStyle={styles.face}>
         <View style={[styles.banner, { backgroundColor: banner }]}>
-          <PatternLayer pattern={look.pattern} tile={96} />
+          <PatternLayer pattern={look.pattern} background={look.background} tile={96} />
           <Pressable onPress={onEdit} accessibilityRole="button" accessibilityLabel="Edit profile">
             <Avatar value={avatar} size={HERO} bare live />
           </Pressable>

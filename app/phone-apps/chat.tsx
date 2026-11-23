@@ -14,14 +14,14 @@ import { coverColors } from "@/components/npc/npc-cover-art";
 import { chatPalette } from "@/components/phone/chat-palette";
 import { ChatButton, ChatFrame, ChatTitle } from "@/components/phone/ChatFrame";
 import { speakerFor } from "@/components/phone/ChatHead";
-import { ChatPaletteProvider, LinkButton, MeBubble, NpcBubble, ReactButton, ReplayButton, ReplyPill, StickerBubble, StickerButton, SystemLine, TypingBubble } from "@/components/phone/ChatBubble";
+import { ChatPaletteProvider, LinkButton, MeBubble, NpcBubble, ReactButton, ReplayButton, ReplyPill, RewardLine, StickerBubble, StickerButton, SystemLine, TypingBubble } from "@/components/phone/ChatBubble";
 import { settle } from "@/components/motion/settle";
 import { useCast } from "@/components/feed/use-cast";
 import { Shrodi } from "@/components/mascot/Shrodi";
 import { SHRODI_COLORS } from "@/components/mascot/shrodi-art";
 import { Text } from "@/components/ui/text";
 import { CHAT_MASCOT_ID, isLinkReply, linkInfo, pillsOf, reactionsOf, replyTypeOf, systemOf, type ChatMessage } from "@/services/chat-core";
-import { openThread, restartThread, routeForAction, sendReply, subscribeChats, type ThreadView } from "@/services/chats";
+import { claimStoryReward, openThread, restartThread, routeForAction, sendReply, subscribeChats, type ThreadView } from "@/services/chats";
 import { playSfx } from "@/services/sfx";
 import { emitTutorial } from "@/services/tutorial";
 import { TOUR_STORY_EVENT } from "@/services/tutorial-core";
@@ -80,6 +80,21 @@ export default function ChatThreadScreen() {
     void load();
     return subscribeChats(() => void load());
   }, [load]);
+
+  // A story pays its diamonds the first time it is opened, once: the claim is kept on the thread, so a replay never pays again
+  const [reward, setReward] = useState<number | null>(null);
+  const unclaimed = view?.thread.origin === "event" && view.thread.rewardClaimed === false;
+  // Paying notifies the chats, which reloads the thread as claimed: this guard (not an effect cleanup) keeps one claim per screen
+  const claimTried = useRef<string | null>(null);
+  useEffect(() => {
+    if (!unclaimed || !threadId || claimTried.current === threadId) return;
+    claimTried.current = threadId;
+    void claimStoryReward(threadId).then((paid) => {
+      if (paid <= 0) return;
+      setReward(paid);
+      void playSfx("reward.coin");
+    });
+  }, [unclaimed, threadId]);
 
   // Shrodi's first story is the tour's last stop, however the learner got here (the list, Contacts, a link)
   const tourStory = view?.thread.npcId === CHAT_MASCOT_ID && view.thread.event === TOUR_STORY_EVENT;
@@ -216,6 +231,7 @@ export default function ChatThreadScreen() {
             <Text style={styles.subjectText}>{view.thread.title}</Text>
           </View>
         ) : null}
+        {reward ? <RewardLine diamonds={reward} /> : null}
         {bubbles.map((m, i) => {
           const fresh = freshFrom !== null && (view?.messages.indexOf(m) ?? 0) >= freshFrom;
           const line = m.sender === "me" ? null : systemOf(m.text);

@@ -79,7 +79,7 @@ test("there are no screen intros: Quests, Profile, Shop, Games and the Atom Maze
   assert.equal(core.pickBeat(steps(), onboarded, "quests", true).beat.id, "first-lesson.node", "the chapters still lead");
   assert.equal(core.pickBeat(doneAll("first-lesson"), lesson1, "quests", true).beat.id, "feed.tab", "an unstarted chapter still leads");
   const toured = doneAll("first-lesson", "feed", "phone");
-  for (const screen of ["home", "quests", "profile", "shop", "games", "story-map"]) assert.equal(core.pickBeat(toured, lesson1, screen, true), null, screen);
+  for (const screen of ["home", "quests", "profile", "shop", "story-map"]) assert.equal(core.pickBeat(toured, lesson1, screen, true), null, screen);
 });
 
 test("resume steps back from a transient beat to the last stable one", () => {
@@ -172,7 +172,7 @@ test("routes are read the way the app reads them: groups dropped, the tab roots 
   const screens = {
     "/": "home", "": "home", "/index": "home", "/(tabs)": "home", "/(tabs)/index": "home", "/(tabs)/": "home",
     "/community": "feed", "/(tabs)/community": "feed", "/phone": "phone", "/(tabs)/phone": "phone",
-    "/quests": "quests", "/profile": "profile", "/awards": "games", "/(tabs)/awards": "games",
+    "/quests": "quests", "/profile": "profile",
     "/shop": "shop", "/explorer/story": "story-map", "/phone-apps/chats": "chats",
   };
   for (const [path, screen] of Object.entries(screens)) assert.equal(core.screenOfPath(path), screen, path);
@@ -207,7 +207,7 @@ test("a transient beat steps back: if the bubble is gone the tour returns to the
 test("the tabs open one by one: only Home at first, the Feed with its chapter, the Phone with its chapter, all at the end", () => {
   const locked = (tab, st, progress) => core.tabLocked(tab, st, progress, true);
   // before lesson 1 is finished
-  for (const tab of ["quests", "community", "phone", "awards", "profile"]) assert.equal(locked(tab, steps(), onboarded), true, tab);
+  for (const tab of ["quests", "community", "phone", "profile"]) assert.equal(locked(tab, steps(), onboarded), true, tab);
   assert.equal(locked("index", steps(), onboarded), false);
   // lesson 1 finished: the Feed chapter's turn
   assert.equal(locked("community", steps(), lesson1), false);
@@ -215,16 +215,16 @@ test("the tabs open one by one: only Home at first, the Feed with its chapter, t
   // the Feed chapter finished: the Phone chapter's turn
   const afterFeed = doneAll("first-lesson", "feed");
   assert.equal(locked("phone", afterFeed, lesson1), false);
-  for (const tab of ["quests", "awards", "profile"]) assert.equal(locked(tab, afterFeed, lesson1), true, tab);
+  for (const tab of ["quests", "profile"]) assert.equal(locked(tab, afterFeed, lesson1), true, tab);
   // the whole tour played: everything opens
   const played = doneAll("first-lesson", "feed", "phone");
-  for (const tab of ["quests", "community", "phone", "awards", "profile"]) assert.equal(locked(tab, played, lesson1), false, tab);
+  for (const tab of ["quests", "community", "phone", "profile"]) assert.equal(locked(tab, played, lesson1), false, tab);
   assert.equal(core.freeRowDue(played, lesson1), true);
   assert.equal(core.freeRowDue(steps(...played, core.MARK_FREE), lesson1), false);
 });
 
 test("nothing is locked for a skipped tour, an existing learner, Tips off, a replay, or before onboarding", () => {
-  const all = ["quests", "community", "phone", "awards", "profile"];
+  const all = ["quests", "community", "phone", "profile"];
   const skipped = steps(...core.skipTourRows(steps()).map((r) => [r, "skipped"]));
   const legacy = steps(...core.legacyRows(steps(), { onboardingDone: true, lessonsCompleted: 3, firstLessonDone: true }).map((r) => [r, "skipped"]));
   for (const tab of all) {
@@ -247,7 +247,7 @@ test("a beat added to a chapter later does not reopen it for a learner who skipp
 });
 
 test("no beat lights anything on Quests, Profile, the Shop, Games or the Atom Maze map, and the lock hints stay", () => {
-  const off = ["quests", "profile", "shop", "games", "story-map"];
+  const off = ["quests", "profile", "shop", "story-map"];
   assert.ok(!core.allBeats().some((b) => off.includes(b.screen)));
   assert.equal(core.pickBeat(doneAll("first-lesson", "feed", "phone"), lesson1, "shop", true), null);
   assert.equal(core.tabLockHint(onboarded), "Complete your first lesson to unlock this tab.");

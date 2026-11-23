@@ -1,0 +1,100 @@
+format 1
+adapter curriculum 1
+unit: radiation-and-the-body
+
+objective u4-cell-repair
+
+statement:
+    Know that cells are very good at repairing radiation damage, and that damage which is not repaired correctly can kill a cell or eventually make it cancerous.
+
+misconception: Radiation damage can never be repaired.
+
+item u4-l2-choice-not-repaired
+type: choice
+surfaces: lesson
+surfaces: practice
+surfaces: checkpoint
+surfaces: review
+references: ref-epa-radiation-health-effects
+
+prompt:
+    What can happen if the damage is not repaired correctly?
+
+options:
+    {"id":"die","label":"The cell may die or eventually become cancerous"}
+    {"id":"fine","label":"Nothing: damage is always harmless","note":"If damage is not repaired correctly, a cell may die or eventually become cancerous."}
+    {"id":"radio","label":"The person becomes radioactive","note":"Exposure does not make a person radioactive. The risk is to the cell itself."}
+
+answer: die
+
+explanation:
+    If damage is not repaired correctly, a cell may die or eventually become cancerous. That is why repair matters.
+
+item u4-l2-choice-puzzle
+type: choice
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-epa-radiation-health-effects
+
+prompt:
+    Radiation can damage DNA, yet the small doses of everyday life cause no immediate illness. Which is part of the answer?
+
+options:
+    {"id":"repair","label":"Cells are very good at repairing damage, and everyday doses are small"}
+    {"id":"miss","label":"Everyday radiation never reaches any cell","note":"Everyone is exposed to ionizing radiation every day, so some does reach cells."}
+    {"id":"harm","label":"The damage is harmless, so repair is not needed","note":"Repair matters, because damage that is not repaired correctly can lead to a dead or cancerous cell."}
+
+answer: repair
+
+explanation:
+    The cells in our bodies are extremely efficient at repairing damage, and low levels of radiation do not cause immediate health effects.
+
+item u4-l2-match-ideas
+type: match
+surfaces: lesson
+surfaces: practice
+surfaces: checkpoint
+surfaces: review
+references: ref-epa-radiation-health-effects
+
+prompt:
+    Match each idea to what it says about a cell.
+
+pairs:
+    {"id":"dam","left":"Radiation hits the DNA","right":"The cell is damaged"}
+    {"id":"rep","left":"Cells are extremely efficient at repair","right":"Most damage is put right"}
+    {"id":"not","left":"Damage is not repaired correctly","right":"The cell may die or become cancerous"}
+
+explanation:
+    Damage comes first, repair usually follows, and only damage that is not repaired correctly causes lasting harm.
+
+item u4-l2-tom-repair-efficient
+type: true_or_myth
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-epa-radiation-health-effects
+
+statement:
+    The cells in our bodies are extremely efficient at repairing radiation damage.
+
+answer: true
+
+explanation:
+    True. Cells repair this kind of damage all the time, which is why a small everyday dose does not make anyone ill.
+
+item u4-x-tom-repair-true
+type: true_or_myth
+surfaces: practice
+surfaces: checkpoint
+surfaces: review
+references: ref-epa-radiation-health-effects
+
+statement:
+    The cells in our bodies are very good at repairing damage from radiation.
+
+answer: true
+
+explanation:
+    True. The cells in our bodies are extremely efficient at repairing this damage.

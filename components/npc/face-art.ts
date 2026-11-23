@@ -10,13 +10,13 @@
 export type FaceTone = "skin" | "nose" | "feature" | "stroke" | "mouth" | "teeth" | "tongue" | "brow";
 export type FacePiece = { d: string; tone: FaceTone } | { line: string; tone: FaceTone; w?: number };
 
-export const NOSE_STYLES = ["single", "double", "button", "tiny", "long", "wide", "pointy", "round", "none"] as const;
+export const NOSE_STYLES = ["single", "double", "button", "tiny", "long", "wide", "pointy", "round", "anime", "none"] as const;
 export type NoseStyle = (typeof NOSE_STYLES)[number];
 
-export const BROW_STYLES = ["none", "straight", "arched", "thick", "thin", "angled", "worried", "high", "bushy"] as const;
+export const BROW_STYLES = ["none", "straight", "arched", "thick", "thin", "angled", "worried", "high", "bushy", "hero", "saiyan"] as const;
 export type BrowStyle = (typeof BROW_STYLES)[number];
 
-export const MOUTH_STYLES = ["smile", "smirk", "wide", "small", "toothy", "cat", "neutral", "open", "tongue"] as const;
+export const MOUTH_STYLES = ["smile", "smirk", "wide", "small", "toothy", "cat", "neutral", "open", "tongue", "trainer", "whiskers", "scargrin"] as const;
 export type MouthStyle = (typeof MOUTH_STYLES)[number];
 
 export const EAR_STYLES = ["round", "small", "big", "pointed", "elf", "none"] as const;
@@ -54,12 +54,20 @@ const line = (d: string, tone: FaceTone, w?: number): FacePiece => (w === undefi
 // ── noses (the two older ones are drawn in npc-art.ts) ───────────────────────
 
 export const NOSES: Partial<Record<NoseStyle, FacePiece[]>> = {
-  button: [fill(circle(1, 6, 7.5), "nose")],
-  tiny: [fill(circle(1, 6, 4.5), "nose")],
-  long: [fill(pill(1, -2, 9, 32), "nose"), fill(rrect(-7, 10, 16, 10, 5), "nose")],
-  wide: [fill(rrect(-10, 4, 22, 11, 5.5), "nose"), fill(pill(1, -3, 8, 16), "nose")],
-  pointy: [fill("M1 -12Q4 -12 11 12Q12 16 8 16H-6Q-10 16 -9 12Q-2 -12 1 -12Z", "nose")],
-  round: [fill(circle(1, 5, 10), "nose")],
+  // Cute horizontal oval button nose
+  button: [fill(pill(1, 6, 14.5, 10.5), "nose")],
+  // Petite vertical mini-capsule nose
+  tiny: [fill(pill(1, 5, 8.5, 12.5), "nose")],
+  // Sculpted bridge with a right-facing rounded tip
+  long: [fill(pill(1, -1, 9, 23), "nose"), fill(pill(3.5, 8, 12.5, 9), "nose")],
+  // Soft rounded bulb nose: short bridge with a wide plush base
+  wide: [fill(pill(1, 1, 9.5, 19), "nose"), fill(pill(1, 7.5, 17.5, 11), "nose")],
+  // Crisp L-hook upturned nose with rounded corners
+  pointy: [fill(roundPoly([[0, -7], [5, -7], [8.5, 8], [6.5, 12.5], [-5.5, 12.5], [-5.5, 7.5], [0.5, 7.5]], 2.4), "nose")],
+  // Cute round ball nose
+  round: [fill(circle(1, 6.5, 7.2), "nose")],
+  // Sharp anime triangular nose shadow wedge
+  anime: [fill(roundPoly([[1, -3], [8.5, 9], [0, 12], [-2, 8]], 1.8), "nose")],
   /** No nose at all. */
   none: [],
 };
@@ -76,6 +84,8 @@ const BROWS: Record<Exclude<BrowStyle, "none">, { from: [number, number]; bend?:
   worried: { from: [8, -39], to: [32, -31], w: 5 },
   high: { from: [8, -39], bend: [20, -45], to: [32, -39], w: 5 },
   bushy: { from: [7, -33], bend: [20, -43], to: [33, -33], w: 8.5 },
+  hero: { from: [7, -29], bend: [19, -35], to: [34, -41], w: 6.5 },
+  saiyan: { from: [6, -27], bend: [16, -31], to: [35, -43], w: 8 },
 };
 
 export function browPieces(style: BrowStyle): FacePiece[] {
@@ -90,15 +100,64 @@ export function browPieces(style: BrowStyle): FacePiece[] {
 // ── mouths (the resting smile; the other expressions keep their own) ─────────
 
 export const MOUTHS: Record<MouthStyle, FacePiece[]> = {
-  smile: [line("M-8 28Q3 37 15 24", "stroke")],
-  smirk: [line("M-8 30Q3 33 9 29Q13 26 16 21", "stroke")],
-  wide: [line("M-15 25Q3 41 21 21", "stroke")],
-  small: [line("M-3 29Q3 34 9 28", "stroke")],
-  toothy: [fill("M-12 24Q3 35 17 23Q17 37 3 38Q-11 37 -12 24Z", "mouth"), fill("M-10.5 25.5Q3 34 15.5 24.5L15 29Q3 37 -10 30Z", "teeth")],
-  cat: [line("M-13 27Q-6 35 1 28Q8 35 15 27", "stroke")],
-  neutral: [line("M-6 30H12", "stroke")],
-  open: [fill("M-9 25Q3 29 15 24Q15 37 3 37Q-8 37 -9 25Z", "mouth"), fill(circle(3, 34.5, 4.5), "tongue")],
-  tongue: [fill(rrect(-1, 30, 10, 12, 5), "tongue"), line("M-8 29Q3 38 15 26", "stroke")],
+  // Warm, balanced everyday smile with a slight upward lilt on the right
+  smile: [line("M-10 27.5Q1 36.5 13 25.5", "stroke")],
+  // Confident asymmetric smirk with a corner cheek crease
+  smirk: [line("M-9 29.5Q3 32.5 14 23.5", "stroke"), line("M12.5 20.5Q16.5 22 16 26", "stroke", 3.4)],
+  // Broad beaming smile with happy corner dimples
+  wide: [
+    line("M-15 25.5Q1 39.5 17 24.5", "stroke"),
+    line("M-17.5 22.5Q-15 25.5 -13.5 28.5", "stroke", 3.4),
+    line("M15.5 27.5Q17 24.5 19.5 21.5", "stroke", 3.4),
+  ],
+  // Sweet petite pocket smile centered under the nose
+  small: [line("M-5.5 28.5Q1 34 7.5 27.5", "stroke")],
+  // Bright D-shaped toothy grin with upper teeth band and warm tongue
+  toothy: [
+    fill("M-14 24Q1 26 16 23.5Q15.5 39 1 39Q-13.5 39 -14 24Z", "mouth"),
+    fill("M-12.6 24.2Q1 26 14.6 23.7Q14 31 1 31.2Q-12 31 -12.6 24.2Z", "teeth"),
+    fill("M-7.5 36.8Q1 32 9.5 36.8Q5.5 39 1 39Q-3.5 39 -7.5 36.8Z", "tongue"),
+  ],
+  // Playful :3 cat smile with two rounded lobes meeting at a center peak
+  cat: [line("M-12 27.5Q-5.5 35.5 1 27.5Q7.5 35.5 14 27.5", "stroke")],
+  // Calm, centered resting expression
+  neutral: [line("M-8 29.5Q1 30.5 10 29.5", "stroke")],
+  // Cheerful open D-mouth with a tongue nestled cleanly inside the lower curve
+  open: [
+    fill("M-11.5 24.5Q1 26.5 13.5 24Q13.5 39 1 39Q-11.5 39 -11.5 24.5Z", "mouth"),
+    fill("M-7.5 36.2Q1 30.5 9.5 36.2Q5.5 39 1 39Q-3.5 39 -7.5 36.2Z", "tongue"),
+  ],
+  // Cheeky smile with a tilted rounded tongue peeking out from the lip line
+  tongue: [
+    fill("M0 30.2L10.5 28.2L11.6 35.2A5.3 5.3 0 0 1 1.2 37.2Z", "tongue"),
+    line("M-11 27.5Q1 36 14 25", "stroke"),
+  ],
+  // Anime trainer grin: confident open hero smile with iconic Z-shaped lightning-bolt cheek marks
+  trainer: [
+    line("M-43 13L-33 11L-39 18L-29 16", "stroke", 2.4),
+    line("M43 13L33 11L39 18L29 16", "stroke", 2.4),
+    fill("M-15 23.5L16 22.5Q15.5 39.5 1 39.5Q-14 39.5 -15 23.5Z", "mouth"),
+    fill("M-13.5 23.8L14.5 22.9Q14 30.2 1 30.5Q-12.5 30.2 -13.5 23.8Z", "teeth"),
+    fill("M-8 36.8Q1 31.5 10 36.8Q5.8 39.5 1 39.5Q-3.8 39.5 -8 36.8Z", "tongue"),
+  ],
+  // Shinobi fox whiskers (Naruto-inspired): three whisker marks on each cheek with a confident toothy smirk
+  whiskers: [
+    line("M-44 8L-30 10", "stroke", 2.4),
+    line("M-45 14L-30 15", "stroke", 2.4),
+    line("M-43 20L-30 20", "stroke", 2.4),
+    line("M44 8L30 10", "stroke", 2.4),
+    line("M45 14L30 15", "stroke", 2.4),
+    line("M43 20L30 20", "stroke", 2.4),
+    fill("M-14 25L17 22Q16 38 1 38Q-13 38 -14 25Z", "teeth"),
+  ],
+  // Pirate captain grin (Luffy-inspired): huge beaming two-row toothy grin with the stitched scar under the left eye
+  scargrin: [
+    line("M-33 12Q-23 15 -14 12", "stroke", 2.4),
+    line("M-28 9.5L-27 15.5", "stroke", 2.4),
+    line("M-20 10L-19 16", "stroke", 2.4),
+    fill("M-18 23Q1 25 20 22.5Q19 40 1 40Q-17 40 -18 23Z", "teeth"),
+    line("M-15 31.5Q1 33 17 31", "stroke", 2.4),
+  ],
 };
 
 // ── ears ─────────────────────────────────────────────────────────────────────

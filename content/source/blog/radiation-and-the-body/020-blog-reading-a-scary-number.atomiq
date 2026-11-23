@@ -1,0 +1,52 @@
+format 1
+adapter blog 1
+unit: radiation-and-the-body
+
+post blog-reading-a-scary-number
+author: npc-mina
+lesson: risk-in-perspective
+title: Calm note: reading a scary number
+hook: A frightening headline is only a number. Three questions make it something you can judge.
+cover: headline
+read: 1
+unlock: {"trigger":"lesson_complete","lessonId":"risk-in-perspective"}
+reactors: npc-ray
+references: ref-epa-radiation-health-effects
+references: ref-who-ionizing-radiation
+
+p:
+    You read a headline about radiation, and your stomach drops. That is a normal reaction. Here is what I do next. I slow down and ask three questions.
+
+h: Three questions
+
+list:
+    How big is the dose, in millisieverts?
+    How fast did it arrive?
+    How does it compare with doses I already know?
+
+figure: headline
+caption: A page with a headline, and a lens held over its number.
+h: Two answers that are both wrong
+
+p:
+    One says any dose of radiation is deadly. The other says radiation is harmless. Neither is right.
+
+quote:
+    Size and speed decide what a dose does.
+
+fact:
+    A very large dose in a short time can make people ill, with symptoms such as nausea and vomiting within hours. Low levels do not cause immediate health effects, but they can add a small increase in the risk of cancer over a lifetime.
+
+p:
+    Cells are extremely efficient at repairing radiation damage. If a dose is low, or spread over a long time, the risk is lower because repair is more likely.
+
+p:
+    So next time, take a breath and ask the three questions. A number with a size, a speed and something to compare it with is much easier to hold.
+
+next: try it on a headline => lesson risk-in-perspective
+
+comment bc-reading-a-scary-number-ray
+author: npc-ray
+chip: {"lessonId":"risk-in-perspective"}
+
+    Size, speed, comparison. Short list. Easy to remember.

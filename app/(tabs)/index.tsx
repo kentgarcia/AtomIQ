@@ -5,6 +5,7 @@ import { ModalButton } from "@/components/ui/modal-card";
 import { ModalDialog } from "@/components/ui/modal-dialog";
 import { TopRowHeader, useTabBarInset } from "@/components/layout";
 import { Text } from "@/components/ui/text";
+import { Card } from "@/components/ui/card";
 import { Icon } from "@/components/ui/icon";
 import { toneColor } from "@/components/lesson/visual/colors";
 import { UnitTeacher } from "@/components/npc/UnitTeacher";
@@ -360,23 +361,48 @@ export default function HomeScreen() {
     });
   }, [units, currentUnitIndex, currentRowIndex, mapContentPad]);
 
-  // Scroll to the current node when the target actually changes (initial
-  // load, or progress gained on refocus) — never on unrelated re-renders
+  // The map always opens on the current node: on first load, every time the tab comes back to the front (the learner may have
+  // scrolled away, or left for a lesson, a tab or a phone app), and when progress moves it on. Never on unrelated re-renders.
+  // A jump waits for the map to be laid out: it runs 100 ms after the change, and again when the content's size is first known
+  // (`onContentSizeChange`) if that came later, so a slow first layout cannot leave the map at the top.
   const prevAutoScrollTarget = useRef<string>("");
+  const jumpPending = useRef(false);
+  const jumpToCurrent = useCallback(() => {
+    if (currentUnitIndex === -1) return;
+    const y = computeNodeScrollY(units, currentUnitIndex, currentRowIndex, viewportHeightRef.current, mapContentPad);
+    // Draw the nodes around the target in the same render the jump happens in, so the map is never empty for a frame
+    setMapBand(windowBand(y));
+    scrollViewRef.current?.scrollTo({ y, animated: false });
+  }, [units, currentUnitIndex, currentRowIndex, mapContentPad]);
+  // The timer must outlive a re-render (a refresh on focus rebuilds `units` within its 100 ms, and the target key stops a second
+  // arming), so it is not cancelled by the effect's cleanup and it calls the latest `jumpToCurrent`.
+  const jumpRef = useRef(jumpToCurrent);
+  const jumpTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(() => {
+    jumpRef.current = jumpToCurrent;
+  }, [jumpToCurrent]);
+  useEffect(() => () => {
+    if (jumpTimer.current) clearTimeout(jumpTimer.current);
+  }, []);
+  useEffect(() => {
+    if (!focused) {
+      // Leaving the tab forgets the last jump, so coming back jumps again
+      prevAutoScrollTarget.current = "";
+      return;
+    }
     if (!loading && currentUnitIndex !== -1) {
       const targetKey = `${completedKey}|${currentUnitIndex}|${currentRowIndex}`;
       if (prevAutoScrollTarget.current === targetKey) return;
       prevAutoScrollTarget.current = targetKey;
-      const timer = setTimeout(() => {
-        const y = computeNodeScrollY(units, currentUnitIndex, currentRowIndex, viewportHeightRef.current, mapContentPad);
-        // Draw the nodes around the target in the same render the jump happens in, so the map is never empty for a frame
-        setMapBand(windowBand(y));
-        scrollViewRef.current?.scrollTo({ y, animated: false });
+      jumpPending.current = true;
+      if (jumpTimer.current) clearTimeout(jumpTimer.current);
+      jumpTimer.current = setTimeout(() => {
+        jumpTimer.current = null;
+        jumpPending.current = false;
+        jumpRef.current();
       }, 100);
-      return () => clearTimeout(timer);
     }
-  }, [loading, units, completedKey, currentUnitIndex, currentRowIndex, mapContentPad]);
+  }, [focused, loading, completedKey, currentUnitIndex, currentRowIndex]);
 
   // Tapping a node opens a bubble with its title and status; the bubble's button opens it
   const [selected, setSelected] = useState<{ id: string; side: BubbleSide } | null>(null);
@@ -508,6 +534,13 @@ export default function HomeScreen() {
         onLayout={(e) => {
           viewportHeightRef.current = e.nativeEvent.layout.height;
         }}
+        onContentSizeChange={() => {
+          // A jump that came due before the map had its size is made as soon as it has it
+          if (jumpPending.current) {
+            jumpPending.current = false;
+            jumpToCurrent();
+          }
+        }}
         onScroll={handleScroll}
         onScrollBeginDrag={dismissBubble}
         scrollEventThrottle={16}
@@ -614,6 +647,18 @@ export default function HomeScreen() {
             </View>
           );
         })}
+
+        {/* The end of the path: every lesson is done, and there is more to do meanwhile (never a date or a unit title) */}
+        {units.length > 0 && units.every((u) => u.levels.every((l) => l.status === "completed")) ? (
+          <View style={styles.endCard}>
+            <Card tone="soft" gap={6}>
+              <Text style={styles.endCardTitle}>You have finished every lesson for now</Text>
+              <Text style={styles.endCardBody}>
+                More units are on the way. Meanwhile, keep your skills sharp with a review, a round of Myth Buster or a level of the Atom Maze.
+              </Text>
+            </Card>
+          </View>
+        ) : null}
       </ScrollView>
 
       {/* Floating lesson card — sits over the map, which scrolls behind it */}
@@ -945,6 +990,21 @@ const makeStyles = createStyles((theme) => {
       textTransform: "uppercase",
       letterSpacing: 0.8,
       marginBottom: 5,
+    },
+    endCard: {
+      paddingHorizontal: 24,
+      paddingTop: 8,
+    },
+    endCardTitle: {
+      fontSize: 16,
+      ...fontFaces.heavy,
+      color: c.text,
+    },
+    endCardBody: {
+      fontSize: 13,
+      ...fontFaces.regular,
+      color: c.textSecondary,
+      lineHeight: 20,
     },
     infoBody: {
       fontSize: 13,

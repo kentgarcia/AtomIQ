@@ -21,7 +21,13 @@ import { hashRows, readState, writeState } from "./state.mjs";
 
 const pkOf = (row, pkCols) => pkCols.map((c) => String(row[c])).join("\u0000");
 
-/** Tables whose UNIQUE index includes `position`: a reorder passes through temporary negative values. */
+/**
+ * A row that is about to change place waits at a position far above any real one (never a negative number: several tables
+ * have `CHECK (position >= 0)`, which a parked row must still satisfy).
+ */
+export const PARK_BASE = 1_000_000_000;
+
+/** Tables whose UNIQUE index includes `position`: a reorder passes through temporary parked values. */
 function uniquePositionTables(db, tables) {
   const out = new Set();
   for (const t of tables) {
@@ -66,8 +72,8 @@ export function buildOps(db, adapter, diffs, { retire, shipped }) {
     if (!unique.has(t)) continue;
     const d = diffs[t];
     let n = 0;
-    for (const u of d.updates) if ("position" in u.set) ops.push({ op: "update", table: t, pk: pk(u.was, d.pkCols), set: { position: -(++n) } });
-    for (const r of d.deletes) ops.push({ op: "update", table: t, pk: pk(r, d.pkCols), set: { position: -(++n) } });
+    for (const u of d.updates) if ("position" in u.set) ops.push({ op: "update", table: t, pk: pk(u.was, d.pkCols), set: { position: PARK_BASE + ++n } });
+    for (const r of d.deletes) ops.push({ op: "update", table: t, pk: pk(r, d.pkCols), set: { position: PARK_BASE + ++n } });
   }
   // 2) deletes, children before parents
   for (const t of [...adapter.tableOrder].reverse()) {
@@ -120,7 +126,7 @@ export function tableRanks(db) {
  * @param {Map<string, number>} [rank]
  */
 export function orderOps(perAdapter, rank = null) {
-  const park = (o) => o.op === "update" && Object.keys(o.set).length === 1 && "position" in o.set && o.set.position < 0;
+  const park = (o) => o.op === "update" && Object.keys(o.set).length === 1 && "position" in o.set && o.set.position >= PARK_BASE;
   const r = (o) => rank?.get(o.table) ?? 0;
   const forward = (fn) => perAdapter.flatMap((ops) => ops.filter(fn));
   const backward = (fn) => [...perAdapter].reverse().flatMap((ops) => ops.filter(fn));
@@ -178,7 +184,7 @@ export function planSync({ paths, names, retire }) {
       const ops = buildOps(db, adapter, diffs, { retire: retire ?? "", shipped });
       for (const op of ops) {
         if (op.op === "delete" && "retire" in op && !op.retire?.trim()) plan.shippedDeletes.push(`${op.table} ${[op.pk].flat().join(" ")}`);
-        if (op.op !== "update" || !("position" in op.set) || op.set.position >= 0) plan.tables.add(op.table);
+        if (op.op !== "update" || !("position" in op.set) || op.set.position < PARK_BASE) plan.tables.add(op.table);
       }
       opsByAdapter.push(ops);
       plan.adapters.push(adapter.name);

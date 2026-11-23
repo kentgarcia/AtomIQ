@@ -1,0 +1,93 @@
+format 1
+adapter chat 1
+npc: npc-ray
+
+node chat-ray-up-counter
+kind: unprompted
+pose: think
+trigger: lessons_completed:14
+title: The counter reads something
+
+    I'm in my kitchen.
+
+    No source here. Hand-held counter's on the table. It shows a reading.
+
+    Not zero. A small number.
+
+reply: is it broken? -> chat-ray-cnt-broken
+reply: is there a hidden source? -> chat-ray-cnt-hidden
+reply: it's background, right? -> chat-ray-cnt-bg
+
+node chat-ray-cnt-broken
+kind: reply
+pose: sorry
+
+    No. I checked it. Twice.
+
+    A working detector picks up radiation. A little is always around. So a small reading is expected.
+
+reply: so what is it picking up? -> chat-ray-cnt-what
+reply: ok, not broken -> chat-ray-cnt-end
+
+node chat-ray-cnt-hidden
+kind: reply
+pose: explain
+
+    No hidden source. I looked.
+
+    Background radiation is present on Earth at all times. Mostly natural minerals in the ground, soil and water. Plus cosmic radiation from space.
+
+reply: even in a kitchen? -> chat-ray-cnt-what
+reply: ok -> chat-ray-cnt-end
+
+node chat-ray-cnt-bg
+kind: reply
+pose: proud
+
+    Right. Noted.
+
+    Always there. Varies from place to place on Earth. So the reading varies too.
+
+reply: so zero is wrong? -> chat-ray-cnt-zero
+reply: cool -> chat-ray-cnt-end
+
+node chat-ray-cnt-what
+kind: reply
+pose: point
+
+    Minerals in the ground. Cosmic radiation. A little from the food and from me.
+
+    That's the short list. Nothing here is a source anyone would call a source.
+
+reply: so why use a counter at all? -> chat-ray-cnt-use
+reply: good to know -> chat-ray-cnt-end
+
+node chat-ray-cnt-zero
+kind: reply
+pose: explain
+
+    In an ordinary room, a working detector shouldn't read exactly zero.
+
+    If it does, check the batteries.
+
+reply: ha, noted -> chat-ray-cnt-end
+reply: good tip -> chat-ray-cnt-end
+
+node chat-ray-cnt-use
+kind: reply
+pose: think
+
+    To tell the usual level from something higher.
+
+    You need to know the normal reading before you can say a reading is unusual. Measure the background first. Then compare.
+
+react: clap -> chat-ray-cnt-end
+react: think -> chat-ray-cnt-end
+
+node chat-ray-cnt-end
+kind: sign_off
+pose: greet
+
+    Counter's staying on the table. Small number, small mystery.
+
+    Checked off.

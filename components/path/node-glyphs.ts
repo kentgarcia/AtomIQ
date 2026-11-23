@@ -241,6 +241,53 @@ export const GLYPHS = {
   star: {
     shapes: [{ d: "M24 5.5L29.6 17.7L42.8 19.3L33 28.4L35.6 41.5L24 34.9L12.4 41.5L15 28.4L5.2 19.3L18.4 17.7Z", sw: 3.2, fill: true }],
   },
+  /** Unit 4, the dose scale: a dial with its needle part way round. */
+  gauge: {
+    shapes: [
+      { d: "M6.5 34A17.5 17.5 0 0 1 41.5 34", sw: 4 },
+      { d: "M24 34L33.4 21.4", sw: 3.6 },
+      dot(24, 34, 4),
+      { d: "M6 41H42", sw: 3 },
+    ],
+  },
+  /** Unit 4, radiation and cells: a cell with its nucleus. */
+  cell: {
+    shapes: [
+      { d: ellipse(24, 24, 19.2, 15.6, -12), sw: 2.8 },
+      dot(21.4, 22.4, 6.2),
+      dot(33.6, 30.4, 2.6),
+      dot(13.4, 31.4, 2.2),
+    ],
+  },
+  /** Unit 4, all at once or over time: an hourglass with sand in the lower half. */
+  hourglass: {
+    shapes: [
+      { d: "M11 6H37M11 42H37", sw: 3.6 },
+      { d: "M14.4 6C14.4 17.6 22 19.6 24 24C22 28.4 14.4 30.4 14.4 42M33.6 6C33.6 17.6 26 19.6 24 24C26 28.4 33.6 30.4 33.6 42", sw: 3 },
+      { d: "M17.4 41C18 35.4 21.6 33.6 24 31.2C26.4 33.6 30 35.4 30.6 41Z" },
+    ],
+  },
+  /** Unit 4, time, distance, shielding: a source, a wall, and an arrow going away. */
+  distance: {
+    shapes: [
+      dot(8.4, 24, 5),
+      { d: rrect(19.5, 10, 5.6, 28, 2.4) },
+      { d: "M30 24H42" , sw: 3.2 },
+      { d: "M37 18.4L42.6 24L37 29.6", sw: 3.2 },
+    ],
+  },
+  /** Unit 4, risk in perspective: a balance. */
+  scales: {
+    shapes: [
+      { d: "M24 8V38", sw: 3 },
+      { d: rrect(14, 38, 20, 4.4, 2.2) },
+      { d: "M8 13.4H40", sw: 3.2 },
+      { d: "M8 13.4L3.6 27M8 13.4L12.4 27", sw: 1.8 },
+      { d: "M40 13.4L35.6 27M40 13.4L44.4 27", sw: 1.8 },
+      { d: "M2.8 27H13.2C13.2 32.4 2.8 32.4 2.8 27Z" },
+      { d: "M34.8 27H45.2C45.2 32.4 34.8 32.4 34.8 27Z" },
+    ],
+  },
   /** A guidebook. */
   book: {
     shapes: [
@@ -266,6 +313,18 @@ export interface GlyphNode {
 
 /** The topic words of a lesson, first match wins. Order matters: specific before general. */
 const TOPIC_RULES: readonly (readonly [RegExp, GlyphId])[] = [
+  // Unit 4, Radiation and the Body (each lesson has its own picture, and these come first)
+  [/dose-scale/, "gauge"],
+  [/radiation-and-cells/, "cell"],
+  [/dose-and-time/, "hourglass"],
+  [/time-distance/, "distance"],
+  [/risk-in-perspective/, "scales"],
+  // Unit 3, Radiation Meets Matter (before the general rules below, which would give most of it a trefoil; each lesson has its own picture)
+  [/ioniz/, "bolt"],
+  [/stops|shielding/, "shield"],
+  [/irradiat|contaminat|exposed/, "flask"],
+  [/detect|geiger|counter/, "pulse"],
+  [/becquerel|sievert|gray/, "book"],
   [/isotop/, "isotope"],
   [/periodic|element/, "table"],
   [/proton|neutron|electron|particle/, "nucleus"],

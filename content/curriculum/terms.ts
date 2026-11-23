@@ -6,7 +6,9 @@
 
 export type TextSegment = { text: string; termId?: undefined } | { text: string; termId: string };
 
-const TERM_RE = /\[\[([a-z0-9-]+)\|([^\]]+)\]\]/g;
+// A marker is [[id|shown]]. A bare [[id]] still works (the id is shown), so a slip in the text never prints its brackets;
+// the content rules make it an error all the same.
+const TERM_RE = /\[\[([a-z0-9-]+)(?:\|([^\]]+))?\]\]/g;
 
 export function splitTerms(input: string): TextSegment[] {
   const out: TextSegment[] = [];
@@ -14,7 +16,7 @@ export function splitTerms(input: string): TextSegment[] {
   for (const m of input.matchAll(TERM_RE)) {
     const index = m.index ?? 0;
     if (index > last) out.push({ text: input.slice(last, index) });
-    out.push({ text: m[2], termId: m[1] });
+    out.push({ text: m[2] ?? m[1], termId: m[1] });
     last = index + m[0].length;
   }
   if (last < input.length) out.push({ text: input.slice(last) });
@@ -23,5 +25,5 @@ export function splitTerms(input: string): TextSegment[] {
 
 /** The text a screen reader or Read Aloud should speak: markers resolved to their shown text. */
 export function plainText(input: string): string {
-  return input.replace(TERM_RE, "$2");
+  return input.replace(TERM_RE, (_m, id: string, shown?: string) => shown ?? id);
 }

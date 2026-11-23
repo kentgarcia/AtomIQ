@@ -157,6 +157,146 @@
       "position": 0,
       "statement": "Know that an unstable nucleus changes by itself: nobody has to trigger it.",
       "misconception": "Decay can be switched on and off, or a person has to make an atom decay."
+    },
+    {
+      "id": "u3-background-reading",
+      "unit_id": "radiation-meets-matter",
+      "position": 7,
+      "statement": "Know that a radiation detector picks up some radiation almost anywhere, because background radiation is always present.",
+      "misconception": "A detector that picks up radiation must be right next to a dangerous source."
+    },
+    {
+      "id": "u3-detectors",
+      "unit_id": "radiation-meets-matter",
+      "position": 6,
+      "statement": "Know that radiation is detected and measured with instruments: a Geiger counter detects ionization in a gas, a scintillation counter detects flashes of light, and a dosimeter is worn to measure a person's exposure.",
+      "misconception": "We can see or feel ionizing radiation without an instrument."
+    },
+    {
+      "id": "u3-exposure-ends",
+      "unit_id": "radiation-meets-matter",
+      "position": 5,
+      "statement": "Know that exposure to a source outside you ends when the source is shielded or you move away, and that a contaminated person is exposed until the radioactive material is removed.",
+      "misconception": "Exposure to radiation lasts after you leave the source."
+    },
+    {
+      "id": "u3-exposure-vs-contamination",
+      "unit_id": "radiation-meets-matter",
+      "position": 4,
+      "statement": "Know that being exposed to radiation from a source is different from being contaminated, which means radioactive material is on or in something.",
+      "misconception": "Standing near a radioactive source makes you radioactive."
+    },
+    {
+      "id": "u3-gamma-shielding",
+      "unit_id": "radiation-meets-matter",
+      "position": 3,
+      "statement": "Know that gamma rays pass through thin barriers and need thick, dense material such as lead or concrete, and that the right shield depends on the kind of radiation.",
+      "misconception": "Anything solid is a good shield against all radiation."
+    },
+    {
+      "id": "u3-ionizing-meaning",
+      "unit_id": "radiation-meets-matter",
+      "position": 0,
+      "statement": "Know that ionizing radiation has enough energy to knock electrons out of atoms, and that weaker radiation does not.",
+      "misconception": "All radiation is the same."
+    },
+    {
+      "id": "u3-penetration",
+      "unit_id": "radiation-meets-matter",
+      "position": 2,
+      "statement": "Know that alpha particles are stopped by paper or skin, beta particles by a thin layer of metal, and that gamma rays are the most penetrating of the three.",
+      "misconception": "One kind of shield stops every kind of radiation."
+    },
+    {
+      "id": "u3-sort-radiation",
+      "unit_id": "radiation-meets-matter",
+      "position": 1,
+      "statement": "Tell which common kinds of radiation are ionizing (alpha, beta, gamma and X-rays) and which are not (radio waves, microwaves and visible light).",
+      "misconception": "If something is called radiation, it must be dangerous."
+    },
+    {
+      "id": "u3-three-units",
+      "unit_id": "radiation-meets-matter",
+      "position": 8,
+      "statement": "Match the becquerel, the gray and the sievert to what each measures: how active a source is, how much energy is absorbed, and the potential for harm.",
+      "misconception": "The becquerel, the gray and the sievert all measure the same thing."
+    },
+    {
+      "id": "u3-unit-not-dose",
+      "unit_id": "radiation-meets-matter",
+      "position": 9,
+      "statement": "Know that a large number of becquerels does not by itself tell you how much energy a body absorbs or how much harm it could do, because those have their own units.",
+      "misconception": "A source with a large becquerel number is automatically harmful to anyone near it."
+    },
+    {
+      "id": "u4-cell-damage",
+      "unit_id": "radiation-and-the-body",
+      "position": 2,
+      "statement": "Know that ionizing radiation has enough energy to damage the molecules in a cell, including its DNA, and that being exposed to radiation does not make a person radioactive.",
+      "misconception": "Radiation that passes through a body leaves the person radioactive."
+    },
+    {
+      "id": "u4-cell-repair",
+      "unit_id": "radiation-and-the-body",
+      "position": 3,
+      "statement": "Know that cells are very good at repairing radiation damage, and that damage which is not repaired correctly can kill a cell or eventually make it cancerous.",
+      "misconception": "Radiation damage can never be repaired."
+    },
+    {
+      "id": "u4-dose-steps",
+      "unit_id": "radiation-and-the-body",
+      "position": 1,
+      "statement": "Know that doses come in very different sizes: a year near a nuclear power station is under 0.01 millisieverts, an average year about 6, a whole-body CT about 10, and about 1000 millisieverts (1 sievert) in a short time is where people start to become ill.",
+      "misconception": "A small dose and a dangerous dose are the same thing."
+    },
+    {
+      "id": "u4-everyone-dose",
+      "unit_id": "radiation-and-the-body",
+      "position": 0,
+      "statement": "Know that everyone gets a small dose of radiation every day, mostly from natural sources, and that the average yearly dose in the US is about 6 millisieverts.",
+      "misconception": "Only people who work with radiation get a dose."
+    },
+    {
+      "id": "u4-large-fast",
+      "unit_id": "radiation-and-the-body",
+      "position": 4,
+      "statement": "Know that a very large dose in a short time, about 1 sievert or more, makes people ill, with symptoms such as nausea and vomiting within hours, and that how fast a dose arrives (the dose rate) matters as well as how big it is.",
+      "misconception": "Only the total dose matters, not how fast it arrives."
+    },
+    {
+      "id": "u4-pick-the-way",
+      "unit_id": "radiation-and-the-body",
+      "position": 7,
+      "statement": "Pick which of time, distance or shielding a real situation uses, such as a lead apron at a dental X-ray, sources stored under water or in concrete, or a shelter with more walls.",
+      "misconception": "Time, distance and shielding are only ideas for experts, not things used in everyday life."
+    },
+    {
+      "id": "u4-read-a-number",
+      "unit_id": "radiation-and-the-body",
+      "position": 9,
+      "statement": "Know that both 'any dose of radiation is deadly' and 'radiation is harmless' are wrong: the size and the speed of the dose decide what happens.",
+      "misconception": "Any dose of radiation is deadly."
+    },
+    {
+      "id": "u4-small-spread",
+      "unit_id": "radiation-and-the-body",
+      "position": 5,
+      "statement": "Know that low doses do not cause immediate illness but can add a small chance of cancer over a lifetime, and that a dose that is low or spread over a long time carries less risk, because repair is more likely.",
+      "misconception": "A small dose every day is the same as one large dose."
+    },
+    {
+      "id": "u4-three-questions",
+      "unit_id": "radiation-and-the-body",
+      "position": 8,
+      "statement": "Know three questions to ask about any dose in a headline: how big it is in millisieverts, how fast it arrived, and how it compares with doses you know.",
+      "misconception": "A scary headline about radiation tells you how big the dose is."
+    },
+    {
+      "id": "u4-three-ways",
+      "unit_id": "radiation-and-the-body",
+      "position": 6,
+      "statement": "Know the three ways to lower a dose: spend less time near the source, stay farther from it, or put a shield between you and it.",
+      "misconception": "Nothing can be done to lower a dose."
     }
   ]
 }

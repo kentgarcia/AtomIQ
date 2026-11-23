@@ -37,7 +37,6 @@ const TAB_ICONS = {
   discovery: require("@/assets/images/icons/feed.png"),
   quests: require("@/assets/images/icons/chest.png"),
   phone: require("@/assets/images/icons/phone.png"),
-  games: require("@/assets/images/icons/games.png"),
   profile: require("@/assets/images/icons/profile.png"),
 };
 
@@ -178,7 +177,7 @@ const TabButton = ({
 };
 
 /** The tabs' names, for the dialog a locked tab opens. */
-const TAB_LABELS: Record<string, string> = { index: "Home", quests: "Quests", community: "Feed", phone: "Phone", awards: "Games", profile: "Profile" };
+const TAB_LABELS: Record<string, string> = { index: "Home", quests: "Quests", community: "Feed", phone: "Phone", profile: "Profile" };
 
 function ModernTabBar({ state, emitter, navigateToTab }: BottomTabBarProps) {
   // Hooks must run before any early return (rules of hooks)
@@ -232,9 +231,8 @@ function ModernTabBar({ state, emitter, navigateToTab }: BottomTabBarProps) {
   const tabs = [
     { name: "index", icon: TAB_ICONS.map, label: "Home" },
     { name: "quests", icon: TAB_ICONS.quests, label: "Quests" },
-    { name: "community", icon: TAB_ICONS.discovery, label: "Feed" },
     { name: "phone", icon: TAB_ICONS.phone, label: "Phone" },
-    { name: "awards", icon: TAB_ICONS.games, label: "Games" },
+    { name: "community", icon: TAB_ICONS.discovery, label: "Feed" },
     { name: "profile", icon: TAB_ICONS.profile, label: "Profile" },
   ] as const;
   // The metrics resolver sizes tabs for TAB_BAR_TAB_COUNT; keep them in sync.
@@ -357,21 +355,15 @@ export default function TabLayout() {
           }}
         />
         <Tabs.Screen
-          name="community"
-          options={{
-            title: "Feed",
-          }}
-        />
-        <Tabs.Screen
           name="phone"
           options={{
             title: "Phone",
           }}
         />
         <Tabs.Screen
-          name="awards"
+          name="community"
           options={{
-            title: "Games",
+            title: "Feed",
           }}
         />
         <Tabs.Screen

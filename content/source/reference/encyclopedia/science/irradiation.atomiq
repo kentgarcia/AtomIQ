@@ -1,0 +1,24 @@
+format 1
+adapter encyclopedia 1
+category: science
+
+entry irradiation
+term: Irradiation
+related_terms: radioactive-contamination
+related_terms: exposure
+related_terms: ionizing-radiation
+related_terms: shielding
+quick_facts: Being in the path of radiation from a source
+quick_facts: A medical X-ray is irradiation from a source outside the body
+quick_facts: External irradiation stops when the source is shielded or you move away
+quick_facts: It is not the same as contamination
+
+sources:
+    {"organization":"World Health Organization","title":"Ionizing radiation and health effects","url":"https://www.who.int/news-room/fact-sheets/detail/ionizing-radiation-and-health-effects"}
+    {"organization":"Health Physics Society","title":"What Is Radioactive Contamination?","url":"https://hps.org/ate_faq/radcontamination/"}
+
+definition:
+    Exposure to radiation that comes from a source outside the body, such as the X-rays of a medical exposure. External irradiation stops when the radiation source is shielded or when the person moves outside the radiation field. It is different from contamination, which means radioactive material is on or in the person.
+
+debunking_snippet:
+    “Being near radiation means you are contaminated.” Irradiation is being in the path of radiation. Contamination is radioactive material on or in you. They are not the same thing.

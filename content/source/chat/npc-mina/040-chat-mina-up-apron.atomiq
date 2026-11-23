@@ -1,0 +1,94 @@
+format 1
+adapter chat 1
+npc: npc-mina
+
+node chat-mina-up-apron
+kind: unprompted
+pose: explain
+trigger: lessons_completed:19
+title: At the dentist
+
+    I'm at the dentist.
+
+    They've just put a heavy lead apron over me for an X-ray of my teeth.
+
+sticker: nerd -> chat-mina-apron-nerd
+sticker: star -> chat-mina-apron-star
+sticker: radiation -> chat-mina-apron-rad
+
+node chat-mina-apron-nerd
+kind: reply
+pose: proud
+
+    I knew you'd have a name for it.
+
+    Time, distance or shielding?
+
+reply: shielding -> chat-mina-apron-shield
+reply: distance -> chat-mina-apron-dist
+reply: time -> chat-mina-apron-time
+
+node chat-mina-apron-star
+kind: reply
+pose: greet
+
+    Thank you. It's a good moment to practise.
+
+    The apron is one of the three ways. Which one?
+
+reply: shielding -> chat-mina-apron-shield
+reply: distance -> chat-mina-apron-dist
+reply: time -> chat-mina-apron-time
+
+node chat-mina-apron-rad
+kind: reply
+pose: idle
+
+    Yes, an X-ray is radiation. A short, controlled amount.
+
+    The apron is one of the three ways to lower a dose. Which one?
+
+reply: shielding -> chat-mina-apron-shield
+reply: distance -> chat-mina-apron-dist
+reply: time -> chat-mina-apron-time
+
+node chat-mina-apron-shield
+kind: reply
+pose: proud
+
+    Shielding. The apron is lead, and it sits between the X-ray and the rest of me.
+
+    Dentists place a lead apron on patients having X-rays of their teeth.
+
+react: clap -> chat-mina-apron-end
+react: like -> chat-mina-apron-end
+
+node chat-mina-apron-dist
+kind: reply
+pose: explain
+
+    Not quite. I haven't moved, and the machine hasn't either. Distance is about stepping away from the source.
+
+    A barrier in the way is a different one.
+
+reply: oh, shielding -> chat-mina-apron-shield
+reply: so which one? -> chat-mina-apron-shield
+
+node chat-mina-apron-time
+kind: reply
+pose: explain
+
+    Not quite. Less time lowers a dose, but the apron doesn't make the X-ray shorter.
+
+    It's a barrier. That's the third way.
+
+reply: shielding -> chat-mina-apron-shield
+reply: oh, I see -> chat-mina-apron-shield
+
+node chat-mina-apron-end
+kind: sign_off
+pose: greet
+
+    The apron is on, the X-ray is done.
+
+    Lead between me and the source. That's shielding.

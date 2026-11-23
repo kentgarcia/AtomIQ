@@ -1,0 +1,62 @@
+format 1
+adapter chat 1
+npc: npc-ray
+
+node chat-ray-up-welcome-back
+kind: unprompted
+pose: greet
+trigger: welcome_back
+title: Welcome back
+
+    You're back.
+
+    I kept your place on the clipboard. It's the line with the star.
+
+    No lecture. You're here now. That's what counts.
+
+reply: thanks Ray -> chat-ray-back-thanks
+reply: did you miss me? -> chat-ray-back-miss
+reply: what have you been up to? -> chat-ray-back-up
+
+node chat-ray-back-thanks
+kind: reply
+pose: proud
+
+    Noted.
+
+    Pick up where you stopped. One lesson. That's the plan.
+
+reply: ok, let's go -> chat-ray-back-ready
+reply: warm-up first -> chat-ray-back-ready
+
+node chat-ray-back-miss
+kind: reply
+pose: sorry
+
+    A little. The clipboard was quiet.
+
+    I won't say more than that. It would break rule one. No hype.
+
+reply: ha, ok -> chat-ray-back-ready
+reply: aw -> chat-ray-back-ready
+
+node chat-ray-back-up
+kind: reply
+pose: think
+
+    Checking readings. Kitchen, roof, parking lot. Small numbers. Always a small number.
+
+    Lunch, mostly. I'm improving.
+
+reply: good for you -> chat-ray-back-ready
+reply: lol -> chat-ray-back-ready
+
+node chat-ray-back-ready
+kind: reply
+pose: point
+
+    Ready?
+
+link: Take me there => next-lesson
+link: A quick round first => mythbuster radiation-meets-matter
+reply: not today, sorry -> chat-ray-bye

@@ -413,7 +413,7 @@ test("the world is deterministic", () => {
 /* ---------------------------- the real level --------------------------- */
 
 test("every level parses, is rectangular and has one start and one flag", () => {
-  assert.equal(LEVELS.length, 15, "the tutorial's five and five for each of the first two units");
+  assert.equal(LEVELS.length, 25, "the tutorial's five and five for each of the four units");
   LEVELS.forEach((def, n) => {
     const l = parseLevel(def);
     assert.ok(l.cols >= 60, `${def.id} is long enough`);
@@ -463,6 +463,81 @@ test("half-life hollow: the islands halve (16, 8, 4, 2 tiles) and so do their co
   assert.deepEqual(coins, [8, 4, 2, 1]);
 });
 
+test("radiation beams: dark, then a warning, then on; a row of beams side by side keeps time together, and the next zone is half a cycle apart", () => {
+  const seq = [];
+  for (let t = 0; t < core.BEAM_PERIOD; t += 0.05) seq.push(core.beamPhase(0, t));
+  assert.equal(seq[0], "off");
+  assert.deepEqual([...new Set(seq)], ["off", "warn", "on"], "off, warn, on, in that order");
+  const secs = (phase) => seq.filter((p) => p === phase).length * 0.05;
+  assert.ok(Math.abs(secs("on") - core.BEAM_ON) < 0.1 && Math.abs(secs("warn") - core.BEAM_WARN) < 0.1);
+  assert.ok(secs("off") >= 1, "the dark is long enough to cross a three tile beam");
+  for (let t = 0; t < 7; t += 0.1) {
+    assert.equal(core.beamPhase(0, t), core.beamPhase(core.BEAM_ZONE - 1, t), "one zone, one clock");
+    assert.equal(core.beamPhase(0, t + core.BEAM_PERIOD / 2), core.beamPhase(core.BEAM_ZONE, t), "the next zone is half a cycle later");
+  }
+});
+
+test("dose sources: the field is a disc, lead on the line shields, and the meter fills, costs a heart when full and drains outside", () => {
+  const rows = ["...........", "...........", "...........", "...........", "P.D.HH....F", "###########"];
+  const l = parseLevel({ id: "dose-test", title: "t", rows });
+  assert.equal(l.doseSources.length, 1);
+  assert.deepEqual(l.doseSources[0], { c: 2, r: 4 });
+  const src = l.doseSources[0];
+  assert.ok(core.inDoseField(l, src, 2.5, 4.5), "in the middle of the field");
+  assert.ok(!core.inDoseField(l, src, 2.5 + core.DOSE_RADIUS + 0.2, 4.5), "outside the disc");
+  assert.ok(!core.inDoseField(l, src, 6.0, 4.5), "behind lead: the line passes through lead blocks");
+  // Standing in the field fills the meter at 1 / DOSE_FILL_TIME a second; a full meter costs one heart and starts again
+  const w = createWorld(l);
+  w.hero.x = 1.2; w.hero.y = 3; w.hero.onGround = true;
+  for (let t = 0; t < core.DOSE_FILL_TIME / 2; t += 1 / 60) core.stepWorld(w, NONE, 1 / 60);
+  assert.ok(w.dose > 0.45 && w.dose < 0.6, `half full after half the time (${w.dose})`);
+  assert.equal(w.hearts, core.MAX_HEARTS);
+  for (let t = 0; t < core.DOSE_FILL_TIME / 2 + 0.2; t += 1 / 60) core.stepWorld(w, NONE, 1 / 60);
+  assert.equal(w.hearts, core.MAX_HEARTS - 1, "a full meter costs a heart");
+  assert.ok(w.dose < 0.3, "and starts again");
+  // Out of the field it drains
+  const v = createWorld(l);
+  v.hero.x = 8; v.hero.y = 3; v.hero.onGround = true; v.dose = 1 - 1e-9;
+  for (let t = 0; t < core.DOSE_DRAIN_TIME + 0.1; t += 1 / 60) core.stepWorld(v, NONE, 1 / 60);
+  assert.equal(v.dose, 0);
+  assert.equal(v.hearts, core.MAX_HEARTS);
+});
+
+test("dose sources: crossing a field at running speed never fills the meter, and no level places an enemy inside a field", () => {
+  assert.ok((2 * core.DOSE_RADIUS) / core.RUN_SPEED < core.DOSE_FILL_TIME * 0.7, "a quick crossing is well inside the time to fill");
+  for (const def of LEVELS) {
+    const l = parseLevel(def);
+    for (const e of l.enemies) {
+      for (const src of l.doseSources) {
+        const d = Math.hypot(e.x + 0.35 - (src.c + 0.5), e.y + 0.25 - (src.r + 0.5));
+        assert.ok(d > core.DOSE_RADIUS, `${def.id}: a ${e.kind} stands in a dose field`);
+      }
+    }
+  }
+});
+
+test("radiation beams: a beam ends at the first solid tile, lead stops it, and only a beam that is on costs a heart", () => {
+  const l = parseLevel({ id: "beam-test", title: "t", rows: ["..V..V....", "..........", "..H.......", "..........", "P........F", "##########"] });
+  assert.equal(l.beams.length, 2);
+  const lead = l.beams.find((b) => b.c === 2);
+  const open = l.beams.find((b) => b.c === 5);
+  assert.equal(lead.endRow, 2, "a lead block above the hero stops the beam");
+  assert.equal(open.endRow, 5, "an open beam runs down to the ground");
+  assert.equal(l.lead.filter((v) => v === 1).length, 1);
+  assert.ok(isSolid(l, 2, 2), "lead is solid");
+  const hit = (c, t) => {
+    const w = createWorld(l);
+    w.hero.x = c + 0.15; w.hero.y = 4; w.hero.onGround = true; w.t = t;
+    core.stepWorld(w, NONE, 1 / 60);
+    return w.hearts;
+  };
+  const onT = core.BEAM_PERIOD - core.BEAM_ON / 2;
+  assert.equal(core.beamPhase(5, onT), "on");
+  assert.equal(hit(5, onT), core.MAX_HEARTS - 1, "in a beam that is on");
+  assert.equal(hit(5, 0), core.MAX_HEARTS, "in a beam that is dark");
+  assert.equal(hit(2, onT), core.MAX_HEARTS, "under a lead roof the beam never reaches the hero");
+});
+
 test("level: everything stands on something, and nothing is buried in the ground", () => {
   for (const def of LEVELS) {
     const l = parseLevel(def);
@@ -489,12 +564,16 @@ test("unit levels: each adds at most ONE new mechanic, explained by the first si
     lava: l.water.some((v) => v === 2),
     bridge: l.bridge.some((v) => v === 1),
     gemBlocks: l.blocks.some((b) => b.kind === "gem"),
+    beams: l.beams.length > 0,
+    lead: l.lead.some((v) => v === 1),
+    dose: l.doseSources.length > 0,
+    shelter: l.doseSources.length > 0 && l.lead.some((v) => v === 1),
   });
   const seen = new Set();
   LEVELS.slice(0, 5).forEach((def) => Object.entries(kinds(parseLevel(def))).forEach(([k, v]) => v && seen.add(k)));
   assert.equal(seen.size, 0, "the tutorial has none of these");
-  const introduced = ["gems", "belts", "saws", "lava", null, "bridge", "gemBlocks", null, null, null];
-  const signIcon = { gems: "gem", belts: "belt", saws: "saw", lava: "lava", bridge: "bridge", gemBlocks: "gem" };
+  const introduced = ["gems", "belts", "saws", "lava", null, "bridge", "gemBlocks", null, null, null, "beams", "lead", null, null, null, "dose", "shelter", null, null, null];
+  const signIcon = { gems: "gem", belts: "belt", saws: "saw", lava: "lava", bridge: "bridge", gemBlocks: "gem", beams: "beam", lead: "lead", dose: "dose", shelter: "lead" };
   LEVELS.slice(5).forEach((def, i) => {
     const n = i % 5;
     const l = parseLevel(def);
@@ -513,10 +592,12 @@ test("unit levels: each adds at most ONE new mechanic, explained by the first si
     assert.ok(l.signs.every((sg) => sg.icon !== "sign"), `${def.id}: every sign shows a picture`);
   });
   assert.equal(seen.has("bridge") && seen.has("gemBlocks"), true, "unit 2 brings the bridge and the gem block");
+  assert.equal(seen.has("beams") && seen.has("lead"), true, "unit 3 brings the radiation beam and the lead block (two new things, one a level)");
+  assert.equal(seen.has("dose") && seen.has("shelter"), true, "unit 4 brings the dose source and the lead shelter (two new things, one a level)");
 });
 
 test("signs name the thing they talk about: the icon is one the game can draw, and never a plain signpost in the story levels", () => {
-  const known = ["sign", "move", "jump", "coin", "gem", "enemy", "boss", "checkpoint", "door", "spring", "plank", "bridge", "belt", "saw", "lava", "water", "key", "lock", "block", "heart", "brick", "spikes", "platform", "lift", "lesson", "tip"];
+  const known = ["sign", "move", "jump", "coin", "gem", "enemy", "boss", "checkpoint", "door", "spring", "plank", "bridge", "belt", "saw", "lava", "water", "key", "lock", "block", "heart", "brick", "spikes", "platform", "lift", "beam", "lead", "dose", "lesson", "tip"];
   for (const def of LEVELS) {
     const l = parseLevel(def);
     for (const sg of l.signs) {
@@ -598,7 +679,7 @@ test("level: a spring beside a pit throws the hero over it (run at it, hold righ
 test("level: the ground has no step above 2 tiles and no gap wider than 4 tiles, unless a spring or a platform helps", () => {
   for (const def of LEVELS) {
     const l = parseLevel(def);
-    const wall = (c, r) => "#<>_".includes(def.rows[r][c]);
+    const wall = (c, r) => "#<>_H".includes(def.rows[r][c]);
     const top = [];
     for (let c = 0; c < l.cols; c++) {
       let t = l.rows;
@@ -1145,7 +1226,8 @@ test("a sign is active while the hero stands near it, announced when it changes"
 });
 
 test("frame slots for platforms and springs sit after the enemies", () => {
-  assert.equal(view.frameLength(3, 2, 4), view.FRAME_HEAD + 3 * view.FRAME_PER_ENEMY + 2 * view.FRAME_PER_PLATFORM + 4);
+  assert.equal(view.frameLength(3, 2, 4), view.FRAME_HEAD + 3 * view.FRAME_PER_ENEMY + 2 * view.FRAME_PER_PLATFORM + 4 + 1, "the dose meter is the last slot");
+  assert.equal(view.doseSlot(3, 2, 4), view.frameLength(3, 2, 4) - 1);
   assert.equal(view.platformSlot(3, 1), view.FRAME_HEAD + 3 * view.FRAME_PER_ENEMY + view.FRAME_PER_PLATFORM);
   const w = createWorld(arena(["..........", "..........", "..M.......", "..........", "P.u......F", ground(10), ground(10)]));
   const out = view.fillFrame(w, 0, 40, new Array(view.frameLength(0, 1, 1)).fill(0));
@@ -1346,7 +1428,7 @@ const { STORY_LEVELS, STORY_WORLDS } = loadTs("components/platformer/story-level
 const { GLYPH_IDS } = loadTs("components/path/node-glyphs.ts");
 
 test("story: the levels line up with their level files and each has a theme, a unit and a pool", () => {
-  assert.deepEqual(STORY_LEVELS.map((l) => l.number), [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]);
+  assert.deepEqual(STORY_LEVELS.map((l) => l.number), Array.from({ length: 25 }, (_, i) => i + 1));
   assert.deepEqual(STORY_LEVELS.map((l) => l.def.id), LEVELS.map((d) => d.id));
   for (const l of STORY_LEVELS) {
     assert.ok(["grass", "sand", "stone", "purple", "snow"].includes(l.theme));
@@ -1357,10 +1439,10 @@ test("story: the levels line up with their level files and each has a theme, a u
   }
 });
 
-test("story: the worlds are the tutorial, Unit 1 and Unit 2, five levels each, in order, and a unit keeps one biome", () => {
-  assert.deepEqual(STORY_WORLDS.map((w) => w.id), ["tutorial", "inside-the-atom", "radioactivity"]);
-  assert.deepEqual(STORY_WORLDS.map((w) => w.kind), ["tutorial", "unit", "unit"]);
-  assert.deepEqual(STORY_WORLDS.map((w) => w.paletteIndex), [3, 1, 2], "unit N wears colour N, as on the lesson map");
+test("story: the worlds are the tutorial and Units 1 to 4, five levels each, in order, and a unit keeps one biome", () => {
+  assert.deepEqual(STORY_WORLDS.map((w) => w.id), ["tutorial", "inside-the-atom", "radioactivity", "radiation-meets-matter", "radiation-and-the-body"]);
+  assert.deepEqual(STORY_WORLDS.map((w) => w.kind), ["tutorial", "unit", "unit", "unit", "unit"]);
+  assert.deepEqual(STORY_WORLDS.map((w) => w.paletteIndex), [3, 1, 2, 3, 4], "unit N wears colour N, as on the lesson map");
   assert.deepEqual(STORY_WORLDS.flatMap((w) => w.levelIds), STORY_LEVELS.map((l) => l.id), "worlds list every level once, in order");
   for (const w of STORY_WORLDS) {
     assert.equal(w.levelIds.length, 5);

@@ -1,0 +1,62 @@
+format 1
+adapter chat 1
+npc: npc-ray
+
+node chat-ray-up-unit
+kind: unprompted
+pose: proud
+trigger: unit_complete:radiation-meets-matter
+title: Radiation Meets Matter: done
+
+    Unit done.
+
+    You can say what's ionizing and what isn't. What stops alpha, beta and gamma. Exposed versus contaminated. How radiation is detected. Which unit answers which question.
+
+    That's the whole list. Every item checked off.
+
+reply: thanks Ray -> chat-ray-unit-thanks
+reply: what's next? -> chat-ray-unit-mina
+
+node chat-ray-unit-thanks
+kind: reply
+pose: greet
+
+    You're welcome. You did the work.
+
+    Short note on the clipboard: good learner. Asked good questions. Underlined twice.
+
+reply: aw, underlined twice -> chat-ray-unit-mina
+reply: what's next? -> chat-ray-unit-mina
+
+node chat-ray-unit-mina
+kind: reply
+pose: point
+
+    Mina's next. Radiation and the body.
+
+    She's calm. She takes it one step at a time. She'll tell you what the sources say about dose and risk. At your own pace.
+
+    Good teacher. Go and meet her.
+
+link: Take me there => next-lesson
+reply: ok, I'm ready -> chat-ray-unit-end
+reply: any advice? -> chat-ray-unit-advice
+
+node chat-ray-unit-advice
+kind: reply
+pose: explain
+
+    One. Ask what the number is for, every time. A number with no unit and no source isn't information.
+
+    Two. Eat lunch.
+
+react: haha -> chat-ray-unit-end
+react: like -> chat-ray-unit-end
+
+node chat-ray-unit-end
+kind: sign_off
+pose: proud
+
+    Good. Go.
+
+    The clipboard stays here. Item added: you.

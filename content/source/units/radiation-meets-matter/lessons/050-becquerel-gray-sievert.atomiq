@@ -1,0 +1,123 @@
+format 1
+adapter curriculum 1
+unit: radiation-meets-matter
+
+lesson becquerel-gray-sievert
+title: Becquerel, gray and sievert
+minutes: 6
+xp: 50
+teaches: u3-three-units
+teaches: u3-unit-not-dose
+relies_on: u3-detectors
+
+description:
+    Three units answer three different questions about radiation. You will learn what the becquerel, the gray and the sievert each measure, and why a big number in one tells you nothing about the others.
+
+cite ref-openstax-chem-21-6
+
+supports:
+    The becquerel is one disintegration per second; the gray is one joule of energy absorbed per kilogram of tissue; the sievert takes into account both the energy and the biological effects of the type of radiation, and measures tissue damage.
+
+cite ref-who-ionizing-radiation
+
+supports:
+    The becquerel measures activity, the gray measures absorbed dose and the sievert measures the biological effect of radiation.
+
+card c01
+kind: teach
+type: explain
+scored: 0
+title: Three questions, three units
+figure: three-questions
+figure_at: 1
+
+body:
+    Picture a cloud, a bucket and a garden. The cloud drops rain. The bucket catches some. The garden may or may not be harmed by it. Radiation has three questions like that, and each one has its own unit.
+
+card c02
+kind: teach
+type: explain
+scored: 0
+title: Becquerel: how active the source is
+figure: becquerel-figure
+figure_at: 1
+
+body:
+    The [[becquerel|becquerel]] tells you how active a source is. One becquerel is one decay per second. So a source of 20 becquerels has 20 nuclei decaying every second.
+
+card c03
+kind: item
+type: item
+item: u3-l5-fill-bq
+connected: true
+
+card c04
+kind: teach
+type: explain
+scored: 0
+title: A big number is about the source
+
+body:
+    A becquerel counts what the source is doing, like the cloud counting its drops. It does not say how much radiation reached you, or what it did. Those have their own units.
+
+card c05
+kind: item
+type: item
+item: u3-l5-tom-bq-dose
+connected: true
+
+card c06
+kind: teach
+type: explain
+scored: 0
+title: Gray: energy absorbed
+figure: gray-figure
+figure_at: 1
+
+body:
+    The [[gray|gray]] measures energy absorbed, like the water in the bucket. One gray is one joule of energy absorbed by each kilogram. It does not say what kind of radiation the energy came from.
+
+card c07
+kind: item
+type: item
+item: u3-l5-choice-gray
+connected: true
+
+card c08
+kind: teach
+type: explain
+scored: 0
+title: Sievert: potential for harm
+figure: sievert-figure
+figure_at: 1
+
+body:
+    The [[sievert|sievert]] measures the potential for harm, like what the rain does to the garden. It counts the energy absorbed, and also the type of radiation and how sensitive the tissue is.
+
+card c09
+kind: item
+type: item
+item: u3-l5-choice-sv
+connected: true
+
+card c10
+kind: item
+type: item
+item: u3-l5-match-units
+
+card c11
+kind: item
+type: item
+item: u3-l5-choice-big-bq
+
+card c12
+kind: teach
+type: explain
+tier: deeper
+scored: 0
+title: Go deeper: older units
+figure: older-units
+figure_at: 1
+
+body:
+    Older names are still used. The curie measures activity like the becquerel, the rad measures absorbed dose like the gray, and the rem measures biological effect like the sievert. 100 rem is one sievert.

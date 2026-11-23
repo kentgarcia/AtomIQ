@@ -19,6 +19,8 @@ export type PhoneUnlock =
   | { kind: "start" }
   | { kind: "lessons"; count: number }
   | { kind: "unit"; unitId: string }
+  /** A single lesson finished: an app that belongs to what that lesson teaches (Build an Atom with "Meet the atom"). */
+  | { kind: "lesson"; lessonId: string }
   | { kind: "level"; level: number }
   | { kind: "owns-shop-item" }
   /** Reserved: never installs (the Nuclear Map). */
@@ -39,7 +41,12 @@ export type PhoneAppId =
   | "library"
   | "camera"
   | "safety"
-  | "map";
+  | "map"
+  | "mythbuster"
+  | "atom-maze"
+  | "lab-build-atom"
+  | "lab-decay"
+  | "lab-shield";
 
 export interface PhoneApp {
   id: PhoneAppId;
@@ -49,24 +56,37 @@ export interface PhoneApp {
   color: PhoneColorRole;
   /** The route the icon pushes. */
   route: string;
+  /** Apps of one group start in one folder on the home screen (the games). */
+  group?: "games";
   /** `planned` apps are never returned: they are in the catalog so the numbers are in one table. */
   status: "live" | "planned";
   unlock: PhoneUnlock;
 }
 
-/** The catalog, in grid order. Starting unlocks are a first draft to tune in playtest (§6). */
+/**
+ * The catalog, in PROGRESSION order: the order the apps arrive as the learner learns, which is also the order of the home screen until
+ * the learner arranges it themselves (`phone-layout-core.ts`). The starting apps are five (the hand-over), and every app after them
+ * arrives with the lesson, unit or level it belongs to: a game with what it practises, a tool with the moment it becomes useful.
+ * The lesson ids are the ones in `content/source/units/*`; first draft to tune in playtest (§6).
+ */
 export const PHONE_APPS: readonly PhoneApp[] = [
   { id: "chats", name: "Chats", icon: "Message", color: "blue", route: "/phone-apps/chats", status: "live", unlock: { kind: "start" } },
   { id: "contacts", name: "Contacts", icon: "Profile2User", color: "green", route: "/phone-apps/contacts", status: "live", unlock: { kind: "start" } },
   { id: "atomdex", name: "AtomDex", icon: "Book", color: "purple", route: "/encyclopedia", status: "live", unlock: { kind: "start" } },
   { id: "daily-fact", name: "Daily Fact", icon: "Lamp", color: "yellow", route: "/daily-facts", status: "live", unlock: { kind: "start" } },
   { id: "settings", name: "Settings", icon: "Setting", color: "grey", route: "/settings", status: "live", unlock: { kind: "start" } },
+  // The games: Atom Maze with the first lesson (its first levels replay it), each lab with the lesson that teaches what it shows
+  { id: "atom-maze", name: "Atom Maze", icon: "Grid9", color: "blue", route: "/explorer/story", group: "games", status: "live", unlock: { kind: "lesson", lessonId: "atoms-are-everywhere" } },
   { id: "shop", name: "Shop", icon: "Shop", color: "orange", route: "/shop", status: "live", unlock: { kind: "lessons", count: 2 } },
-  { id: "field-notes", name: "Field Notes", icon: "Note", color: "green", route: "/phone-apps/field-notes", status: "live", unlock: { kind: "lessons", count: 2 } },
+  { id: "lab-build-atom", name: "Build an Atom", icon: "AqAtom", color: "green", route: "/lab?exp=build-atom", group: "games", status: "live", unlock: { kind: "lesson", lessonId: "protons-neutrons-electrons" } },
+  { id: "field-notes", name: "Field Notes", icon: "Note", color: "green", route: "/phone-apps/field-notes", status: "live", unlock: { kind: "lessons", count: 3 } },
+  { id: "mythbuster", name: "Myth Buster", icon: "Judge", color: "purple", route: "/mythbuster", group: "games", status: "live", unlock: { kind: "lesson", lessonId: "isotopes" } },
   { id: "scanner", name: "Atom Scanner", icon: "Scan", color: "cyan", route: "/phone-apps/scanner", status: "live", unlock: { kind: "unit", unitId: "inside-the-atom" } },
   { id: "library", name: "Reference Library", icon: "Book1", color: "purple", route: "/phone-apps/library", status: "live", unlock: { kind: "level", level: 3 } },
   { id: "camera", name: "Camera", icon: "Camera", color: "coral", route: "/phone-apps/camera", status: "live", unlock: { kind: "owns-shop-item" } },
+  { id: "lab-decay", name: "Decay Lab", icon: "AqUnstable", color: "orange", route: "/lab?exp=decay-lab", group: "games", status: "live", unlock: { kind: "lesson", lessonId: "half-life" } },
   { id: "safety", name: "Safety Guide", icon: "ShieldTick", color: "red", route: "/phone-apps/safety", status: "live", unlock: { kind: "unit", unitId: "radioactivity" } },
+  { id: "lab-shield", name: "Radiation Shield", icon: "ShieldTick", color: "cyan", route: "/lab?exp=radiation-shield", group: "games", status: "live", unlock: { kind: "lesson", lessonId: "what-stops-what" } },
   { id: "map", name: "Nuclear Map", icon: "Map", color: "blue", route: "/phone-apps/map", status: "live", unlock: { kind: "level", level: 5 } },
 ];
 
@@ -75,6 +95,8 @@ export interface PhoneProgress {
   lessonsCompleted: number;
   /** Ids of the units the learner has finished. */
   unitsCompleted: readonly string[];
+  /** Ids of the lessons the learner has finished. */
+  lessonsDone: readonly string[];
   /** The learner's level (a level is 100 XP). */
   level: number;
   /** Shop items owned that are not a starting design's. */
@@ -88,7 +110,7 @@ export interface PhoneSignals {
   unreadChats: number;
 }
 
-export const NO_PROGRESS: PhoneProgress = { lessonsCompleted: 0, unitsCompleted: [], level: 1, shopItemsOwned: 0 };
+export const NO_PROGRESS: PhoneProgress = { lessonsCompleted: 0, unitsCompleted: [], lessonsDone: [], level: 1, shopItemsOwned: 0 };
 
 export function isUnlocked(unlock: PhoneUnlock, p: PhoneProgress): boolean {
   switch (unlock.kind) {
@@ -98,6 +120,8 @@ export function isUnlocked(unlock: PhoneUnlock, p: PhoneProgress): boolean {
       return p.lessonsCompleted >= unlock.count;
     case "unit":
       return p.unitsCompleted.includes(unlock.unitId);
+    case "lesson":
+      return (p.lessonsDone ?? []).includes(unlock.lessonId);
     case "level":
       return p.level >= unlock.level;
     case "owns-shop-item":
@@ -128,6 +152,7 @@ export function unlockRequirement(
   unlock: PhoneUnlock,
   p: PhoneProgress,
   unitTitleOf: (unitId: string) => string | undefined = () => undefined,
+  lessonTitleOf: (lessonId: string) => string | undefined = () => undefined,
 ): UnlockRequirement {
   switch (unlock.kind) {
     case "start":
@@ -139,6 +164,10 @@ export function unlockRequirement(
     case "unit": {
       const title = unitTitleOf(unlock.unitId);
       return { text: title ? `Finish the unit "${title}".` : "Finish a certain unit.", progress: null };
+    }
+    case "lesson": {
+      const title = lessonTitleOf(unlock.lessonId);
+      return { text: title ? `Finish the lesson "${title}".` : "Finish a certain lesson.", progress: null };
     }
     case "level":
       return { text: `Reach level ${unlock.level}.`, progress: `You are level ${p.level}` };
@@ -216,6 +245,15 @@ export function pagesOf<T>(items: readonly T[], perPage: number = APPS_PER_PAGE)
   const pages: T[][] = [];
   for (let i = 0; i < items.length; i += perPage) pages.push(items.slice(i, i + perPage));
   return pages.length > 0 ? pages : [[]];
+}
+
+/**
+ * How many rows of icons a page holds for the room it has: as many as fit (`rowHeight` is an icon, its name and the gap under it),
+ * never fewer than three and never more than six, so a tall phone shows more icons on a page and a short one scrolls to the next.
+ */
+export function gridRows(availableHeight: number, rowHeight: number, min = 3, max = 6): number {
+  if (!(rowHeight > 0) || !Number.isFinite(availableHeight)) return min;
+  return Math.max(min, Math.min(max, Math.floor(availableHeight / rowHeight)));
 }
 
 /** Grid columns for the window: three on a narrow window, four otherwise. */

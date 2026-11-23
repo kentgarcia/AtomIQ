@@ -99,6 +99,7 @@ explanation:
 
 item u1-x-unstable-which
 type: choice
+surfaces: lesson
 surfaces: practice
 surfaces: checkpoint
 surfaces: review

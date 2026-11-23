@@ -9,7 +9,7 @@
  */
 
 /** Where a beat shows. The layer shows a beat only on its own screen. */
-export type ScreenId = "home" | "feed" | "phone" | "chats" | "quests" | "profile" | "shop" | "games" | "story-map";
+export type ScreenId = "home" | "feed" | "phone" | "chats" | "quests" | "profile" | "shop" | "story-map";
 
 /** Which layer draws a beat: the one in the root layout, or the one inside the lesson preview's modal. */
 export type TutorialHost = "root" | "preview";
@@ -269,7 +269,7 @@ export function replayChapterRows(steps: Steps): string[] {
 /* ---- the tabs ------------------------------------------------------------------------------------ */
 
 /** The tab routes of `app/(tabs)`. Home is never locked. */
-export type TabName = "index" | "quests" | "community" | "phone" | "awards" | "profile";
+export type TabName = "index" | "quests" | "community" | "phone" | "profile";
 
 /**
  * Every tab is open once the tour is over: finished, skipped, or an existing learner. Tips off opens them too (a switched-off
@@ -354,8 +354,6 @@ export function screenOfPath(pathname: string | null | undefined): ScreenId | nu
       return "quests";
     case "/profile":
       return "profile";
-    case "/awards":
-      return "games";
     case "/shop":
       return "shop";
     case "/explorer/story":

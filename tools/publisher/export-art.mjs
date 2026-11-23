@@ -25,12 +25,38 @@ function write(name, spec, form, pose = "idle") {
   console.log("wrote", name);
 }
 
+function partToSilhouetteSvg(part, color) {
+  if ("stroke" in part) return `<path d="${part.d}" fill="none" stroke="${color}" stroke-width="${part.sw}" stroke-linecap="round" stroke-linejoin="round"/>`;
+  return `<path d="${part.d}" fill="${color}"${part.evenOdd ? ' fill-rule="evenodd"' : ""}/>`;
+}
+
+function writeSilhouette(name, spec, form, pose = "idle", color = "#17112b") {
+  const vb = NPC_VIEWBOX[form];
+  const body = treeParts(buildNpc(spec, pose, form)).map((part) => partToSilhouetteSvg(part, color)).join("");
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${vb.w}" height="${vb.h}" viewBox="${vb.x} ${vb.y} ${vb.w} ${vb.h}">${body}</svg>`;
+  fs.writeFileSync(path.join(out, name), svg);
+  console.log("wrote", name);
+}
+
+const SILHOUETTE_SPECS = {
+  "npc-kofi": { pose: "proud", color: "#0F1746" },
+  "npc-tess": { pose: "idle", color: "#25347A" },
+  "npc-sage": { pose: "think", color: "#25347A" },
+};
+
 for (const n of NPC_ROSTER) {
   write(`${n.id}-hero-cheer.svg`, n.spec, "hero", "cheer");
   write(`${n.id}-hero-proud.svg`, n.spec, "hero", "proud");
+  write(`${n.id}-hero-explain.svg`, n.spec, "hero", "explain");
+  write(`${n.id}-hero-greet.svg`, n.spec, "hero", "greet");
   write(`${n.id}-bust.svg`, n.spec, "bust");
   write(`${n.id}-head.svg`, n.spec, "avatar");
+  if (SILHOUETTE_SPECS[n.id]) {
+    const { pose, color } = SILHOUETTE_SPECS[n.id];
+    writeSilhouette(`${n.id}-silhouette.svg`, n.spec, "hero", pose, color);
+  }
 }
+
 // Lesson object pictures (100 x 100), as on the lesson cards.
 const { OBJECT_ART } = await load("components/lesson/visual/object-art.ts");
 const f = (n) => Math.round(n * 100) / 100;

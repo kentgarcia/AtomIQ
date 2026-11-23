@@ -1,0 +1,75 @@
+format 1
+adapter statements 1
+unit: radiation-meets-matter
+
+statement radiation-meets-matter-s01
+verdict: myth
+statement: All radiation is the same.
+
+explanation:
+    Radiation comes in many kinds. Some can knock electrons out of atoms and some cannot.
+
+statement radiation-meets-matter-s02
+verdict: fact
+
+statement:
+    Radio waves, microwaves and visible light are radiation, but they do not have enough energy to knock electrons out of atoms.
+
+explanation:
+    They are non-ionizing. Ionizing radiation has enough energy to knock electrons out of atoms.
+
+statement radiation-meets-matter-s03
+verdict: myth
+statement: A sheet of paper stops gamma rays.
+
+explanation:
+    Paper stops alpha particles. Gamma rays pass through it and need thick, dense material to be reduced.
+
+statement radiation-meets-matter-s04
+verdict: fact
+statement: Alpha particles cannot get through the outer layer of your skin.
+
+explanation:
+    Alpha particles are heavy and use up their energy over a very short distance.
+
+statement radiation-meets-matter-s05
+verdict: myth
+statement: Radiation can spread onto you and stay on your skin.
+
+explanation:
+    Radiation does not get on or in people. Radioactive contamination, the material itself, is what can spread.
+
+statement radiation-meets-matter-s06
+verdict: fact
+statement: Being near a source of radiation is not the same as being contaminated.
+
+explanation:
+    Exposure stops when the source is shielded or you move away. Contamination means radioactive material is on or in you.
+
+statement radiation-meets-matter-s07
+verdict: myth
+statement: A Geiger counter that clicks must be next to a radioactive source.
+
+explanation:
+    Background radiation is always around, so a counter picks up some even with no source nearby.
+
+statement radiation-meets-matter-s08
+verdict: fact
+statement: A dosimeter is used to find out how much radiation a person has been exposed to.
+
+explanation:
+    Dosimeters are worn to measure personal exposure.
+
+statement radiation-meets-matter-s09
+verdict: myth
+statement: The becquerel, the gray and the sievert all measure the same thing.
+
+explanation:
+    The becquerel counts decays, the gray measures energy absorbed, and the sievert measures potential for harm.
+
+statement radiation-meets-matter-s10
+verdict: fact
+statement: One becquerel is one decay per second.
+
+explanation:
+    The becquerel measures how active a source is.

@@ -10,13 +10,14 @@ import { SHRODI_COLORS } from "@/components/mascot/shrodi-art";
 import { NpcCover } from "@/components/npc/NpcCover";
 import { coverColors } from "@/components/npc/npc-cover-art";
 import { settle } from "@/components/motion/settle";
+import { Image } from "expo-image";
 import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
 import { useStories } from "@/hooks/use-chats";
 import { useFeed } from "@/hooks/use-feed";
 import { usePullRefresh } from "@/hooks/use-pull-refresh";
-import { CHAT_MASCOT_ID, type StoryEntry } from "@/services/chat-core";
+import { CHAT_MASCOT_ID, STORY_REWARD_DIAMONDS, type StoryEntry } from "@/services/chat-core";
 import { contentRepository } from "@/services/content-db";
 import { noteDateLabel } from "@/services/field-notes";
 import { impactLight } from "@/services/haptics";
@@ -56,6 +57,35 @@ const SHRODI_BIO =
   "Hi, I'm Shrodi, a fox scientist and your guide in AtomIQ. I point you to your next lesson, explain things when you are stuck, and cheer you on all the way.";
 
 type Tab = "posts" | "chats";
+
+const DIAMOND_ICON = require("@/assets/images/icons/diamond.png");
+
+/**
+ * The story's diamonds on the right of its row: a bright diamond with the amount while they are still to be had (locked
+ * stories too, as the prize), a dimmed one with a green tick once they were claimed. Only the first open pays; a replay never does.
+ */
+function RewardMark({ claimed }: { claimed: boolean }) {
+  const { theme } = useTheme();
+  const c = theme.colors;
+  return (
+    <View
+      accessible
+      accessibilityRole="image"
+      accessibilityLabel={claimed ? `${STORY_REWARD_DIAMONDS} diamonds claimed` : `${STORY_REWARD_DIAMONDS} diamonds when you open it the first time`}
+      style={{ alignItems: "center", justifyContent: "center", minWidth: 34 }}
+    >
+      <View>
+        <Image source={DIAMOND_ICON} style={{ width: 26, height: 26, opacity: claimed ? 0.35 : 1 }} contentFit="contain" />
+        {claimed ? (
+          <View style={{ position: "absolute", right: -6, bottom: -4, width: 16, height: 16, borderRadius: 8, backgroundColor: c.success, alignItems: "center", justifyContent: "center" }}>
+            <Icon name="TickCircle" size={12} color={c.onPrimary} variant="Bold" />
+          </View>
+        ) : null}
+      </View>
+      {claimed ? null : <Text style={{ fontSize: 11, lineHeight: 14, ...fontFaces.heavy, color: c.textSecondary }}>{`+${STORY_REWARD_DIAMONDS}`}</Text>}
+    </View>
+  );
+}
 
 /** What a story row says under its title, and the icon it wears, by where the story stands. */
 function storyLook(story: StoryEntry, now: number): { icon: string; status: string; hint: string | null } {
@@ -156,6 +186,7 @@ function StoryRow({
           </Text>
         ) : null}
       </View>
+      <RewardMark claimed={story.rewardClaimed} />
       {locked ? null : <Icon name="ArrowRight2" size={18} color={c.textFaint} variant="Bold" />}
     </Pressable>
   );

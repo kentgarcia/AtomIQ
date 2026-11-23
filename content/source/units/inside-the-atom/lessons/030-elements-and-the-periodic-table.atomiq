@@ -19,22 +19,16 @@ supports: The number of protons (the atomic number) defines the element.
 cite ref-iupac-table
 supports: IUPAC publishes the periodic table of the elements (optional card).
 
-card c01
-kind: item
-type: item
-item: u1-l3-predict-gold-oxygen
-scored: 0
-
 card c02
 kind: teach
 type: explain
 scored: 0
-title: Protons tell you the element
+title: What makes gold gold?
 figure: elements-by-protons
 figure_at: 1
 
 body:
-    The number of [[proton|protons]] tells you which [[element]] an atom is. An atom with 6 protons is always carbon. 7 protons is always nitrogen. 8 protons is always oxygen.
+    Gold, oxygen and carbon are very different, yet their atoms are built from the same three particles. What differs is the number of [[proton|protons]], and that tells you which [[element|element]] it is. 6 protons is always carbon, 7 is always nitrogen and 8 is always oxygen. Like a name tag, the protons say which element it is.
 
 card c03
 kind: sim
@@ -78,7 +72,7 @@ figure: change-protons
 figure_at: 1
 
 body:
-    Add a proton and you get a different element. 6 protons is carbon, 7 is nitrogen and 8 is oxygen. The neutrons and electrons do not decide the element. The protons do.
+    So what happens if the number changes? Add a proton to carbon and you get nitrogen, which is a different element. The neutrons and electrons do not decide the element. Only the protons do.
 
 card c06
 kind: sim

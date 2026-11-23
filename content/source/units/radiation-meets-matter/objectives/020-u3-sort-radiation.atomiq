@@ -1,0 +1,126 @@
+format 1
+adapter curriculum 1
+unit: radiation-meets-matter
+
+objective u3-sort-radiation
+
+statement:
+    Tell which common kinds of radiation are ionizing (alpha, beta, gamma and X-rays) and which are not (radio waves, microwaves and visible light).
+
+misconception: If something is called radiation, it must be dangerous.
+
+item u3-l1-choice-xray
+type: choice
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-epa-radiation-basics
+
+prompt:
+    Which of these is ionizing?
+
+options:
+    {"id":"radio","label":"Radio waves","note":"Radio waves do not have enough energy to remove electrons."}
+    {"id":"xray","label":"X-rays"}
+    {"id":"micro","label":"Microwaves","note":"Microwaves do not have enough energy to remove electrons."}
+    {"id":"light","label":"Visible light","note":"Visible light does not have enough energy to remove electrons."}
+
+answer: xray
+
+explanation:
+    X-rays are ionizing. Radio waves, microwaves and visible light are all on the other side of the line.
+
+item u3-l1-sort-ionizing
+type: sort
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-epa-radiation-basics
+references: ref-openstax-chem-21-6
+
+prompt:
+    Can it knock electrons out of atoms? Put each one in its group.
+
+buckets:
+    {"id":"ionizing","label":"Ionizing","icon":"AqAtomOff"}
+    {"id":"non","label":"Not ionizing","icon":"AqAtom"}
+
+items:
+    {"id":"xray","label":"X-rays","bucket":"ionizing"}
+    {"id":"radio","label":"Radio waves","bucket":"non"}
+    {"id":"gamma","label":"Gamma rays","bucket":"ionizing"}
+    {"id":"light","label":"Visible light","bucket":"non"}
+
+explanation:
+    X-rays and gamma rays are ionizing. Radio waves and visible light are not. The ionizing ones carry enough energy to remove electrons.
+
+item u3-l1-tom-light
+type: true_or_myth
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-epa-radiation-basics
+references: ref-openstax-chem-21-6
+
+statement:
+    Visible light is a kind of radiation.
+
+answer: true
+
+explanation:
+    True. Visible light is radiation too. It is non-ionizing, because it cannot knock electrons out of atoms.
+
+item u3-x-not-ionizing
+type: choice
+surfaces: practice
+surfaces: checkpoint
+surfaces: review
+references: ref-epa-radiation-basics
+
+prompt:
+    Which of these is not ionizing?
+
+options:
+    {"id":"beta","label":"Beta particles","note":"Beta particles are ionizing."}
+    {"id":"gamma","label":"Gamma rays","note":"Gamma rays are ionizing."}
+    {"id":"micro","label":"Microwaves"}
+
+answer: micro
+
+explanation:
+    Microwaves are non-ionizing. Beta particles and gamma rays have enough energy to remove electrons from atoms.
+
+item u3-x-pair
+type: choice
+surfaces: practice
+surfaces: checkpoint
+surfaces: review
+references: ref-epa-radiation-basics
+
+prompt:
+    Which pair is made up of radiation that is not ionizing?
+
+options:
+    {"id":"mix","label":"Radio waves and gamma rays","note":"Gamma rays are ionizing, so this pair has one of each."}
+    {"id":"pair","label":"Visible light and radio waves"}
+    {"id":"ab","label":"Alpha particles and beta particles","note":"Both of these are ionizing."}
+
+answer: pair
+
+explanation:
+    Visible light and radio waves are both non-ionizing. The other pairs include at least one kind that can knock electrons out of atoms.
+
+item u3-x-tom-xray-gamma
+type: true_or_myth
+surfaces: practice
+surfaces: checkpoint
+surfaces: review
+references: ref-epa-radiation-basics
+
+statement:
+    X-rays and gamma rays are both ionizing.
+
+answer: true
+
+explanation:
+    True. Both are high-energy waves with enough energy to knock electrons out of atoms.

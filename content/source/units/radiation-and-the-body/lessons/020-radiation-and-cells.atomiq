@@ -1,0 +1,101 @@
+format 1
+adapter curriculum 1
+unit: radiation-and-the-body
+
+lesson radiation-and-cells
+title: Radiation and your cells
+minutes: 5
+xp: 50
+teaches: u4-cell-damage
+teaches: u4-cell-repair
+relies_on: u3-exposure-vs-contamination
+
+description:
+    Radiation can damage the DNA in a cell, yet an everyday dose does not make anyone ill. You will see why, and what repair has to do with it.
+
+cite ref-epa-radiation-health-effects
+
+supports:
+    Ionizing radiation can damage the DNA in cells; cells are extremely efficient at repairing it; damage not repaired correctly can kill a cell or eventually make it cancerous.
+
+cite ref-hps-radioactive-contamination
+supports: A person who was exposed to radiation is not radioactive.
+
+card c01
+kind: teach
+type: explain
+scored: 0
+title: A puzzle
+
+body:
+    Ionizing radiation carries enough energy to affect the atoms in living cells. That means it can damage a cell's [[dna|DNA]], its genetic material. Yet you get a small dose every day and you are not ill. Why not?
+
+card c02
+kind: teach
+type: explain
+scored: 0
+title: What radiation can do to a cell
+figure: radiation-hits-cell
+figure_at: 1
+
+body:
+    When ionizing radiation passes through a cell, it can hit the atoms inside it. If it hits the DNA, the DNA is damaged. The cell has to deal with that damage.
+
+card c03
+kind: item
+type: item
+item: u4-l2-choice-damage
+
+card c04
+kind: item
+type: item
+item: u4-l2-tom-radio
+
+card c05
+kind: teach
+type: explain
+scored: 0
+title: Cells repair themselves
+figure: cell-repair
+figure_at: 1
+
+body:
+    The answer to the puzzle is repair. Cells are extremely efficient at repairing this kind of damage, and they do it all the time. A small amount of damage is usually put right.
+
+card c06
+kind: item
+type: item
+item: u4-l2-tom-repair-efficient
+connected: true
+
+card c07
+kind: item
+type: item
+item: u4-l2-choice-not-repaired
+
+card c07b
+kind: item
+type: item
+item: u4-l2-match-ideas
+
+card c08
+kind: item
+type: item
+item: u4-l2-choice-puzzle
+
+card c09
+kind: teach
+type: explain
+scored: 0
+title: Exposed is not radioactive
+figure: passes-through
+figure_at: 1
+
+body:
+    Being exposed to radiation is not the same as carrying a radioactive source. A person who was exposed is not radioactive. Radiation does not get on or in people.
+
+card c10
+kind: item
+type: item
+item: u4-l2-choice-exposed
+connected: true

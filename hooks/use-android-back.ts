@@ -23,7 +23,6 @@ const TAB_ROOTS = new Set([
   "/",
   "/community",
   "/phone",
-  "/awards",
   "/profile",
   "/onboarding",
 ]);

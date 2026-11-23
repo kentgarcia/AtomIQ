@@ -154,14 +154,14 @@ describe("content:sync", () => {
     const card = () => query(fx.paths, "SELECT data FROM lesson_cards WHERE lesson_id = 'atoms-are-everywhere' AND id = 'c02'")[0].data;
     const item = () => JSON.parse(query(fx.paths, "SELECT data FROM items WHERE id = 'u1-l1-choice-made-of'")[0].data);
     assert.match(card(), /"figure":\{"ref":"matter-vs-energy"\}/);
-    write(fx, lessonFile, lessonText.replace("title: What is everything made of?", "title: What is it all made of?"));
+    write(fx, lessonFile, lessonText.replace("title: Look around you", "title: Look around, then think"));
     write(fx, objFile, objText.replace("Which of these is made of atoms?", "Which one of these is made of atoms?"));
     const dry = await sync(fx);
     assert.match(dry.text, /lesson_cards: 0 to add, 1 to change/);
     assert.match(dry.text, /items: 0 to add, 1 to change/);
     const r = await sync(fx, { apply: true });
     assert.equal(r.code, 0, r.text);
-    assert.match(card(), /"title":"What is it all made of\?"/);
+    assert.match(card(), /"title":"Look around, then think"/);
     assert.match(card(), /"figure":\{"ref":"matter-vs-energy"\}/);
     assert.equal(item().prompt, "Which one of these is made of atoms?");
     assert.equal(item().options.length, 4);

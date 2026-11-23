@@ -129,6 +129,132 @@
         "earlierShare": 0.15,
         "passMark": 0.8
       }
+    },
+    {
+      "id": "u3-n1",
+      "unit_id": "radiation-meets-matter",
+      "position": 0,
+      "kind": "lesson",
+      "lesson_id": "ionizing-or-not",
+      "config": {}
+    },
+    {
+      "id": "u3-n2",
+      "unit_id": "radiation-meets-matter",
+      "position": 1,
+      "kind": "lesson",
+      "lesson_id": "what-stops-what",
+      "config": {}
+    },
+    {
+      "id": "u3-n3",
+      "unit_id": "radiation-meets-matter",
+      "position": 2,
+      "kind": "lesson",
+      "lesson_id": "irradiated-or-contaminated",
+      "config": {}
+    },
+    {
+      "id": "u3-n4",
+      "unit_id": "radiation-meets-matter",
+      "position": 3,
+      "kind": "practice",
+      "lesson_id": null,
+      "config": {
+        "questionCount": 8,
+        "earlierShare": 0
+      }
+    },
+    {
+      "id": "u3-n5",
+      "unit_id": "radiation-meets-matter",
+      "position": 4,
+      "kind": "lesson",
+      "lesson_id": "detecting-radiation",
+      "config": {}
+    },
+    {
+      "id": "u3-n6",
+      "unit_id": "radiation-meets-matter",
+      "position": 5,
+      "kind": "lesson",
+      "lesson_id": "becquerel-gray-sievert",
+      "config": {}
+    },
+    {
+      "id": "u3-n7",
+      "unit_id": "radiation-meets-matter",
+      "position": 6,
+      "kind": "checkpoint",
+      "lesson_id": null,
+      "config": {
+        "questionCount": 12,
+        "earlierShare": 0.15,
+        "passMark": 0.8
+      }
+    },
+    {
+      "id": "u4-n1",
+      "unit_id": "radiation-and-the-body",
+      "position": 0,
+      "kind": "lesson",
+      "lesson_id": "the-dose-scale",
+      "config": {}
+    },
+    {
+      "id": "u4-n2",
+      "unit_id": "radiation-and-the-body",
+      "position": 1,
+      "kind": "lesson",
+      "lesson_id": "radiation-and-cells",
+      "config": {}
+    },
+    {
+      "id": "u4-n3",
+      "unit_id": "radiation-and-the-body",
+      "position": 2,
+      "kind": "lesson",
+      "lesson_id": "dose-and-time",
+      "config": {}
+    },
+    {
+      "id": "u4-n4",
+      "unit_id": "radiation-and-the-body",
+      "position": 3,
+      "kind": "practice",
+      "lesson_id": null,
+      "config": {
+        "questionCount": 8,
+        "earlierShare": 0
+      }
+    },
+    {
+      "id": "u4-n5",
+      "unit_id": "radiation-and-the-body",
+      "position": 4,
+      "kind": "lesson",
+      "lesson_id": "time-distance-shielding",
+      "config": {}
+    },
+    {
+      "id": "u4-n6",
+      "unit_id": "radiation-and-the-body",
+      "position": 5,
+      "kind": "lesson",
+      "lesson_id": "risk-in-perspective",
+      "config": {}
+    },
+    {
+      "id": "u4-n7",
+      "unit_id": "radiation-and-the-body",
+      "position": 6,
+      "kind": "checkpoint",
+      "lesson_id": null,
+      "config": {
+        "questionCount": 12,
+        "earlierShare": 0.15,
+        "passMark": 0.8
+      }
     }
   ]
 }

@@ -66,16 +66,19 @@ export const GLYPHS = {
   ],
   halflife: [r(12, 12, 8.5, 2), p("M12 3.5A8.5 8.5 0 0 1 12 20.5Z")],
 
-  // Ray: practical; shielding, rays
+  // Ray: practical; shielding, rays, clipboard and hand-held counter
   shield: [p("M12 2.8L19.5 5.5V11.5C19.5 16.2 16.2 19.6 12 21.2C7.8 19.6 4.5 16.2 4.5 11.5V5.5Z")],
   rays: [l("M3 6H12M9.5 3.5L12 6L9.5 8.5", 2), l("M3 12H12M9.5 9.5L12 12L9.5 14.5", 2), l("M3 18H12M9.5 15.5L12 18L9.5 20.5", 2), l("M18.5 3V21", 3.2)],
+  clipboard: [l(rounded(5.5, 4.5, 13, 16.5, 2.5), 2.1), p(rounded(9, 2.5, 6, 3.6, 1.5)), l("M8.8 10.5H15.2M8.8 14H15.2M8.8 17.5H13", 2)],
+  counter: [l(rounded(6, 7, 12, 14, 2.8), 2.1), l("M9 12.5L12.5 9.8", 2), c(12, 17, 1.8), l("M9.5 7V3.5M14.5 7V5", 2.1)],
   zigzag: [l("M2.5 12L6 6L10 18L14 6L18 18L21.5 12", 2)],
   glasses: [l("M3 10H10.5V15.5H3Z M13.5 10H21V15.5H13.5Z M10.5 12H13.5", 1.9)],
   layers: [l("M6 7V17", 3.4), l("M12 5V19", 3.4), l("M18 3V21", 3.4)],
   crosshair: [r(12, 12, 7.5, 2), c(12, 12, 2.2), l("M12 1.8V5M12 19V22.2M1.8 12H5M19 12H22.2", 2)],
 
-  // Mina: warm and calm; the body, dose
+  // Mina: warm and calm; the body, dose, stethoscope
   heart: [p("M12 20.5C5 15.5 3 11.5 3 8.5A4.8 4.8 0 0 1 12 6.5A4.8 4.8 0 0 1 21 8.5C21 11.5 19 15.5 12 20.5Z")],
+  stethoscope: [l("M7 4.5V9.5A5 5 0 0 0 17 9.5V4.5", 2.1), l("M12 14.5V17.5A3.5 3.5 0 0 0 19 17.5V15", 2.1), c(19, 13.5, 2.4), c(7, 4.2, 1.4), c(17, 4.2, 1.4)],
   drop: [p("M12 3C15 8 18 11 18 15A6 6 0 0 1 6 15C6 11 9 8 12 3Z")],
   cross: [l("M12 5V19M5 12H19", 4.4)],
   calm: [l("M2.5 9Q5.5 3.5 8.5 9T14.5 9T20.5 9", 2.2), l("M3.5 16Q6.5 10.5 9.5 16T15.5 16T21.5 16", 2.2)],
@@ -94,15 +97,17 @@ export const GLYPHS = {
   wrench: [l("M4.5 19.5L13 11", 3.6), r(16.2, 7.8, 4.2, 2.4)],
   gauge: [l("M3.5 17A8.5 8.5 0 0 1 20.5 17", 2.4), l("M12 17L16 10.5", 2.4), c(12, 17, 2)],
 
-  // Tess: quick; gadgets, hospitals, farms, factories
+  // Tess: quick; gadgets, hospitals, farms, factories, glowing tracer vial
+  vial: [l(rounded(8, 5.5, 8, 15, 3), 2.1), p(rounded(9, 12.5, 6, 7, 2)), l("M9 3.2H15", 2.4), c(18.8, 7.5, 1.4), c(5.2, 10.5, 1.2)],
   sprout: [l("M12 21V11", 2.2), p("M12 12C12 7 8 5 4 5C4 10 7 12 12 12Z"), p("M12 14C12 9.5 15.5 7.5 20 7.5C20 12 17 14 12 14Z")],
   factory: [p("M3 21V11L9.5 15V11L16 15V4H20V21Z")],
   chip: [l("M7.5 7.5H16.5V16.5H7.5Z", 2.2), l("M10 3.5V7.5M14 3.5V7.5M10 16.5V20.5M14 16.5V20.5M3.5 10H7.5M3.5 14H7.5M16.5 10H20.5M16.5 14H20.5", 2), c(12, 12, 1.8)],
   hospital: [l(rounded(4, 4, 16, 16, 2.5), 2.1), l("M12 8V16M8 12H16", 2.2)],
   phone: [l(rounded(7, 3, 10, 18, 2.5), 2.1), c(12, 17.4, 1.2)],
 
-  // Sage: weighs both sides; safety and society
+  // Sage: weighs both sides; safety and society, notebook and pen
   scale: [l("M12 4V20M6.5 20H17.5M5 7H19", 2.1), l("M5 7L2.8 13.5H7.2Z M19 7L16.8 13.5H21.2Z", 1.8)],
+  notebook: [l(rounded(5.5, 3.5, 13, 17, 2.5), 2.1), l("M9 3.5V20.5M12 9H15.5M12 13H15.5", 2)],
   leaf: [p("M5 19C5 10 10 4.5 20 4C20 14 15 19.5 6 19.5Z")],
   drum: [l(rounded(5.5, 3.5, 13, 17, 3.5), 2), l("M5.8 9H18.2M5.8 15H18.2", 1.8)],
   people: [c(8.5, 8, 3.2), c(16, 9.5, 2.6), p("M2.5 20C2.5 15 5 13 8.5 13S14.5 15 14.5 20Z"), p("M14.5 20C14.5 16.5 15.5 14.8 17.5 14.5C20 14.5 21.5 16 21.5 20Z")],
@@ -117,11 +122,11 @@ export const NPC_COVER_GLYPHS: Record<string, readonly GlyphId[]> = {
   // The first two teach each other's unit now (2026-11-22), so each keeps the pictures that are theirs (Ada's flask, bow and sparkle, Hal's tube and rock) and takes their unit's for the rest
   "npc-hal": ["atom", "tube", "nucleus", "rock", "orbit", "question"],
   "npc-ada": ["trefoil", "flask", "decay", "sparkle", "bow", "halflife"],
-  "npc-ray": ["shield", "rays", "glasses", "zigzag", "layers", "crosshair"],
-  "npc-mina": ["heart", "drop", "calm", "cross", "cell", "pulse"],
+  "npc-ray": ["shield", "clipboard", "rays", "counter", "layers", "crosshair"],
+  "npc-mina": ["heart", "stethoscope", "calm", "cross", "cell", "pulse"],
   "npc-kofi": ["gear", "tower", "bolt", "steam", "wrench", "gauge"],
-  "npc-tess": ["sprout", "chip", "factory", "sparkle", "hospital", "phone"],
-  "npc-sage": ["scale", "leaf", "people", "drum", "check", "loop"],
+  "npc-tess": ["vial", "sprout", "chip", "factory", "hospital", "phone"],
+  "npc-sage": ["scale", "notebook", "leaf", "people", "drum", "loop"],
   // Shrodi, the guide (not a row of npcs): his glasses, a spark of an idea and the atom he starts everyone on
   shrodi: ["glasses", "atom", "sparkle", "question", "bolt", "orbit"],
 };

@@ -439,7 +439,7 @@ CREATE INDEX IF NOT EXISTS idx_field_notes_source ON field_notes(source_type, so
 -- message (what earned it), so it is never sent twice.
 -- Chat threads (docs/features/PHONE_SPEC.md section 5.2): a free chat the learner started, or a story a trigger unlocked ('event' is
 -- its unlock key, so the story is never unlocked twice, and a replay keeps it). 'ended' is set when a reply with nowhere to go
--- (a sticker, a reaction) closed the story; 'archived' puts it away from the Chats list (a swipe); 'plays' counts replays. On the device only; wiped by Delete Account.
+-- (a sticker, a reaction) closed the story; 'archived' puts it away from the Chats list (a swipe); 'plays' counts replays; 'reward_claimed' is set once the story's diamonds were paid (the first open, never a replay). On the device only; wiped by Delete Account.
 CREATE TABLE IF NOT EXISTS chat_threads (
   id TEXT PRIMARY KEY,
   npc_id TEXT NOT NULL,
@@ -450,6 +450,7 @@ CREATE TABLE IF NOT EXISTS chat_threads (
   ended INTEGER NOT NULL DEFAULT 0,
   archived INTEGER NOT NULL DEFAULT 0,
   plays INTEGER NOT NULL DEFAULT 1,
+  reward_claimed INTEGER NOT NULL DEFAULT 0,
   created_at INTEGER NOT NULL DEFAULT 0,
   updated_at INTEGER NOT NULL DEFAULT 0,
   synced_at INTEGER,

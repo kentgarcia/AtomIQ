@@ -20,7 +20,8 @@ export type HairPiece = { d: string; tone: HairTone; evenOdd?: boolean; under?: 
 
 export type ExtraHairStyle =
   | "buzzcut" | "classic" | "messy" | "sidepart" | "curtain" | "bowl" | "spiky" | "wavy" | "longer" | "undercut"
-  | "longstraight" | "shortbob" | "medium" | "highpony" | "lowpony" | "twintails" | "bigbun" | "halfup" | "longwavy" | "curtainbangs" | "fluffy" | "cloud";
+  | "longstraight" | "shortbob" | "medium" | "highpony" | "lowpony" | "twintails" | "bigbun" | "halfup" | "longwavy" | "curtainbangs" | "fluffy" | "cloud" | "flattop" | "crownbun" | "knotwrap" | "workcrop" | "layeredbob"
+  | "trainer" | "shinobi" | "pirate" | "saiyan" | "odango";
 
 const f = (n: number) => Math.round(n * 100) / 100;
 
@@ -180,7 +181,8 @@ export const HAIR_SHAPES: Record<ExtraHairStyle, { back?: HairPiece[]; front: Ha
         `M-40 ${OUT.curtain.B}V-26C-40 -42 -16 -54 0 -54C16 -54 40 -42 40 -26V${OUT.curtain.B}Z`,
       ),
       ...OUT.curtain.tips(),
-      line("M0 -96V-72"),
+      line("M-14 -64Q-6 -56 0 -54", 3.4),
+      line("M14 -64Q6 -56 0 -54", 3.4),
     ],
     sideBottom: SIDE_END,
   },
@@ -222,22 +224,29 @@ export const HAIR_SHAPES: Record<ExtraHairStyle, { back?: HairPiece[]; front: Ha
     sideBottom: SIDE_END,
   },
 
-  // Down to the jaw with scalloped ends, a centre parting and locks that frame the face
+  // Feathered mid-length wolf cut: tousled top, side-swept fringe and winged collar-length flicks at the jaw
   longer: {
-    back: [fill("M-66 -50C-72 -92 -34 -104 0 -104C34 -104 72 -92 66 -50V14C66 30 58 38 46 38H-46C-58 38 -66 30 -66 14Z")],
+    back: [
+      fill(
+        soft(
+          [
+            [-58, -36], [-66, -12], [-72, 10], [-60, 14], [-68, 36], [-50, 42], [-42, 34],
+            [42, 34], [50, 42], [68, 36], [60, 14], [72, 10], [66, -12], [58, -36],
+          ],
+          6,
+        ),
+        "shade",
+      ),
+    ],
     front: [
       cap(
-        `M-57 ${OUT.longer.B}V-50C-62 -84 -34 -98 0 -98C34 -98 62 -84 57 -50V${OUT.longer.B}Z`,
-        `M-40 ${OUT.longer.B}V-26C-40 -42 -16 -54 0 -54C16 -54 40 -42 40 -26V${OUT.longer.B}Z`,
+        `M-57 ${OUT.longer.B}V-50C-60 -82 -34 -95 0 -95C34 -95 60 -82 57 -50V${OUT.longer.B}Z`,
+        `M-42 ${OUT.longer.B}V-30C-42 -40 -26 -45 -6 -48C10 -50 22 -44 42 -32V${OUT.longer.B}Z`,
       ),
       ...OUT.longer.tips(),
-      // Two locks that frame the face, ending in soft curls
-      fill("M-64 -14C-68 6 -66 22 -58 32A9 9 0 0 0 -44 28C-48 14 -46 -2 -48 -14Z"),
-      fill("M64 -14C68 6 66 22 58 32A9 9 0 0 1 44 28C48 14 46 -2 48 -14Z"),
-      line("M0 -96V-72"),
+      line("M-18 -78Q0 -86 20 -76", 3.4),
     ],
-    sideBottom: 34,
-    ears: false,
+    sideBottom: SIDE_END,
   },
 
   // A big swept top over shaved sides
@@ -282,62 +291,99 @@ export const HAIR_SHAPES: Record<ExtraHairStyle, { back?: HairPiece[]; front: Ha
     sideBottom: SIDE_END,
   },
 
-  // A tail high on the head that rises and falls behind the right shoulder, in a hair tie
+  // A bouncy high ponytail puff rising from the top crown with a soft flared tail behind
   highpony: {
-    back: [fill("M4 -84C-2 -104 14 -112 34 -110C70 -106 96 -70 98 -20C100 22 92 52 82 64C74 70 66 58 70 40C76 6 74 -40 52 -62C44 -70 30 -78 22 -82Z")],
+    back: [
+      fill(disc(24, -88, 22), "shade"),
+      fill(disc(44, -76, 20), "shade"),
+      fill(disc(58, -54, 18), "shade"),
+      fill(disc(62, -30, 14), "shade"),
+      fill(disc(22, -90, 22)),
+      fill(disc(42, -78, 20)),
+      fill(disc(56, -56, 18)),
+      fill(disc(60, -32, 14)),
+    ],
     front: [
-      cap(bell(56, OUT.hair.B, -88), arch(46, OUT.hair.B, -58)),
+      cap(
+        bell(56, OUT.hair.B, -88),
+        `M-46 ${OUT.hair.B}V-30C-46 -40 -26 -46 0 -52C22 -56 40 -44 46 -32V${OUT.hair.B}Z`,
+      ),
       ...OUT.hair.tips(),
-      fill(band(26, -86, 24, 9, -28), "tie"),
-      line("M-49 -22C-53 -8 -49 6 -45 12", 3.5),
+      fill(band(18, -86, 22, 10, -28), "tie"),
     ],
     sideBottom: SIDE_END,
   },
 
-  // Pulled back into a tail that rests low at the right of the neck
+  // A braided side tail draped over the right shoulder, tied at the end
   lowpony: {
-    back: [fill("M44 4C60 0 82 20 88 50C92 74 72 86 66 74C62 62 60 44 46 36Z"), fill(band(55, 21, 12, 24, 22), "tie")],
-    front: [cap(bell(56, OUT.hair.B, -88), arch(46, OUT.hair.B, -60)), ...OUT.hair.tips(), line("M-49 -22C-55 -6 -53 12 -45 24", 3.5)],
+    back: [
+      fill(disc(50, 12, 17), "shade"),
+      fill(disc(58, 32, 15.5), "shade"),
+      fill(disc(63, 51, 14), "shade"),
+      fill(disc(66, 72, 11), "shade"),
+      fill(disc(48, 10, 17)),
+      fill(disc(56, 30, 15.5)),
+      fill(disc(61, 49, 14)),
+      fill(disc(64, 70, 11)),
+      fill(band(63, 61, 16, 7, -14), "tie"),
+    ],
+    front: [
+      cap(
+        bell(56, OUT.hair.B, -88),
+        `M-46 ${OUT.hair.B}V-30C-46 -40 -26 -44 -6 -49C10 -53 20 -58 26 -62C32 -50 40 -40 46 -30V${OUT.hair.B}Z`,
+      ),
+      ...OUT.hair.tips(),
+    ],
     sideBottom: SIDE_END,
   },
 
-  // Two tails, one each side, each in a tie
+  // Twin braided pigtails with top and bottom ties
   twintails: {
-    back: [fill(TAIL), fill(mirror(TAIL))],
+    back: ([-1, 1] as const).flatMap((s) => [
+      fill(disc(s * 60, -28, 16), "shade"),
+      fill(disc(s * 66, -6, 15), "shade"),
+      fill(disc(s * 68, 16, 14), "shade"),
+      fill(disc(s * 66, 38, 11.5), "shade"),
+      fill(disc(s * 58, -30, 16)),
+      fill(disc(s * 64, -8, 15)),
+      fill(disc(s * 66, 14, 14)),
+      fill(disc(s * 64, 36, 11.5)),
+      fill(band(s * 65, 26, 15, 6.5, s * 12), "tie"),
+    ]),
     front: [
-      cap(bell(56, OUT.hair.B, -88), arch(46, OUT.hair.B, -56)),
-      ...OUT.hair.tips(),
-      fill(band(61, -18, 9, 22, 18), "tie"),
-      fill(band(-61, -18, 9, 22, -18), "tie"),
+      ...PIGTAIL_HEAD,
+      fill(band(54, -44, 10, 20, 28), "tie"),
+      fill(band(-54, -44, 10, 20, -28), "tie"),
     ],
     sideBottom: SIDE_END,
   },
 
-  // A big round bun on top and a loose lock each side
+  // A full two-tone top bun with a wrap band and soft curtain bangs
   bigbun: {
+    back: [fill(disc(0, -96, 24), "shade"), fill(disc(0, -92, 22))],
     front: [
-      fill(disc(0, -92, 19)),
-      cap(bell(56, OUT.hair.B, -85), arch(46, OUT.hair.B, -54)),
+      cap(bell(56, OUT.hair.B, -83), arch(46, OUT.hair.B, -54)),
       ...OUT.hair.tips(),
-      fill(soft([[-17, -80], [17, -80], [17, -73], [-17, -73]], 3.5), "shade"),
-      line("M-50 -22C-54 -6 -51 14 -45 26", 3.5),
-      line("M50 -22C54 -6 51 14 45 26", 3.5),
+      fill(soft([[-18, -83], [18, -83], [16, -75], [-16, -75]], 3.5), "tie"),
     ],
     sideBottom: SIDE_END,
   },
 
-  // Long waves down the back with a small knot on top
+  // Half-up double space buns with long waves down the back
   halfup: {
     back: [
-      fill("M-70 122C-84 96 -66 70 -70 44C-74 20 -66 6 -69 -36C-69 -80 -40 -96 0 -96C40 -96 69 -80 69 -36C66 6 74 20 70 44C66 70 84 96 70 122Z"),
+      fill("M-70 122C-84 96 -66 70 -70 44C-74 20 -66 6 -68 -36C-68 -64 -40 -82 0 -82C40 -82 68 -64 68 -36C66 6 74 20 70 44C66 70 84 96 70 122Z"),
       fill(BEHIND, "shade"),
+      fill(disc(-45, -84, 21), "shade"),
+      fill(disc(45, -84, 21), "shade"),
+      fill(disc(-43, -82, 19.5)),
+      fill(disc(43, -82, 19.5)),
     ],
     front: [
-      fill(disc(0, -90, 13)),
-      fill("M-3 -100C-4 -108 2 -112 8 -108C4 -108 4 -103 5 -100Z"),
       cap(bell(56, OUT.hair.B, -86), arch(46, OUT.hair.B, -58)),
       ...OUT.hair.tips(),
-      fill(soft([[-13, -84], [13, -84], [13, -78], [-13, -78]], 3), "shade"),
+      fill(band(-38, -70, 22, 8, -36), "tie"),
+      fill(band(38, -70, 22, 8, 36), "tie"),
     ],
     sideBottom: SIDE_END,
   },
@@ -377,6 +423,270 @@ export const HAIR_SHAPES: Record<ExtraHairStyle, { back?: HairPiece[]; front: Ha
     front: [
       cap(bell(56, OUT.hair.B, -84), `M-46 ${OUT.hair.B}V-30C-46 -34 -38 -37 -24 -39C-8 -41 6 -44 16 -54C22 -44 36 -38 46 -32V${OUT.hair.B}Z`),
       ...OUT.hair.tips(),
+    ],
+    sideBottom: SIDE_END,
+  },
+
+  // Ray's flat-top fade: a sculpted flat-crowned high top with shaved sides and a crisp razor part
+  flattop: {
+    front: [
+      cap(
+        `M-56 ${OUT.hair.B}V-68C-56 -84 -46 -90 -24 -91H24C46 -90 56 -84 56 -68V${OUT.hair.B}Z`,
+        hairline(46, OUT.hair.B),
+      ),
+      ...OUT.hair.tips("shade"),
+      pad(-56, -46, -46, OUT.hair.B),
+      pad(46, 56, -46, OUT.hair.B),
+      line("M-35 -84L-27 -50", 3.4),
+    ],
+    sideBottom: SIDE_END,
+  },
+
+  // Mina's braided bun: a full double-layered top bun held by a wrap band, with a soft centre-parted fringe and cheek locks
+  crownbun: {
+    back: [fill(disc(0, -93, 24), "shade")],
+    front: [
+      fill(disc(0, -89, 22)),
+      fill(soft([[-20, -78], [20, -78], [18, -70], [-18, -70]], 4), "tie"),
+      cap(
+        bell(56, OUT.hair.B, -84),
+        `M-46 ${OUT.hair.B}V-30C-46 -40 -30 -44 -14 -49C-5 -52 0 -58 0 -62C0 -58 5 -52 14 -49C30 -44 46 -40 46 -30V${OUT.hair.B}Z`,
+      ),
+      ...OUT.hair.tips(),
+      fill("M-56 -14C-60 2 -57 16 -49 22C-47 12 -46 0 -46 -14Z"),
+      fill("M56 -14C60 2 57 16 49 22C47 12 46 0 46 -14Z"),
+    ],
+    sideBottom: SIDE_END,
+  },
+
+  // Tess's knotted head wrap: a pleated wrap with a contrasting headband trim and a two-lobed top knot
+  knotwrap: {
+    front: [
+      fill(soft([[4, -84], [24, -104], [38, -88], [20, -76]], 8), "shade"),
+      fill(soft([[14, -82], [38, -100], [48, -82], [26, -72]], 8)),
+      fill(disc(18, -84, 8.5), "shade"),
+      cap(
+        bell(57, OUT.classic.B, -88),
+        `M-44 ${OUT.classic.B}V-32C-44 -42 -24 -50 0 -50C24 -50 44 -42 44 -32V${OUT.classic.B}Z`,
+      ),
+      ...OUT.classic.tips(),
+      fill("M-56 -38C-26 -54 26 -54 56 -38L57 -30C26 -46 -26 -46 -57 -30Z", "tie"),
+      line("M-38 -66Q0 -80 38 -66", 3.4),
+    ],
+    sideBottom: SIDE_END,
+  },
+
+  // Kofi's textured crop: a sturdy scalloped crop with full sideburns that frame the temples
+  workcrop: {
+    front: [
+      cap(
+        `M-57 ${OUT.classic.B}V-48C-59 -76 -36 -88 0 -88C36 -88 59 -76 57 -48V${OUT.classic.B}Z`,
+        `M-44 ${OUT.classic.B}V-30C-44 -40 -28 -45 0 -45C28 -45 44 -40 44 -30V${OUT.classic.B}Z`,
+      ),
+      ...OUT.classic.tips(),
+      line("M-26 -72Q0 -80 26 -72", 3.4),
+    ],
+    sideBottom: SIDE_END,
+  },
+
+  // Sage's layered bob: a full jaw-length bob with a side-swept fringe, soft face-framing locks and a hair clip on the temple
+  layeredbob: {
+    back: [
+      fill("M-66 48C-70 22 -67 -10 -67 -38C-67 -82 -38 -96 0 -96C38 -96 67 -82 67 -38C67 -10 70 22 66 48C63 62 56 66 44 66H-44C-56 66 -63 62 -66 48Z"),
+      fill(BEHIND, "shade"),
+    ],
+    front: [
+      cap(
+        bell(57, OUT.classic.B, -91),
+        `M-44 ${OUT.classic.B}V-28C-44 -38 -26 -42 -6 -48C8 -52 18 -57 24 -64C28 -52 38 -42 44 -32V${OUT.classic.B}Z`,
+      ),
+      ...OUT.classic.tips(),
+      fill("M-57 -14C-63 10 -60 36 -48 52C-44 36 -45 10 -44 -14Z"),
+      fill("M57 -14C63 10 60 36 48 52C44 36 45 10 44 -14Z"),
+      fill(band(-44, -36, 18, 7, -18), "tie"),
+      line("M24 -88V-64", 3.4),
+    ],
+    sideBottom: SIDE_END,
+  },
+
+  // Anime trainer spikes: wild horizontal side-flares that jut out under a cap and a jagged V-fringe
+  trainer: {
+    back: [
+      fill(
+        soft(
+          [
+            [-50, -32], [-78, -24], [-58, -10], [-76, 6], [-52, 12], [-64, 28], [-44, 24],
+            [44, 24], [64, 28], [52, 12], [76, 6], [58, -10], [78, -24], [50, -32],
+          ],
+          3.5,
+        ),
+        "shade",
+      ),
+    ],
+    front: [
+      cap(
+        soft(
+          [
+            [-57, -16.5], [-57, -38], [-80, -34], [-60, -54], [-78, -70], [-54, -74], [-64, -100],
+            [-34, -84], [-20, -108], [-4, -86], [18, -110], [28, -84], [60, -100], [54, -74],
+            [78, -70], [60, -54], [80, -34], [57, -38], [57, -16.5],
+          ],
+          4,
+          [0, 18],
+        ),
+        soft(
+          [
+            [-44, -16.5], [-44, -32], [-33, -46], [-22, -33], [-8, -50], [2, -32],
+            [16, -49], [27, -34], [37, -44], [44, -32], [44, -16.5],
+          ],
+          2.5,
+          [0, 10],
+        ),
+      ),
+      ...sides(57, 44).tips(),
+    ],
+    sideBottom: SIDE_END,
+  },
+
+  // Shinobi spikes (Naruto-inspired): swept-up golden anime spikes with a spiky crown and framed temple locks
+  shinobi: {
+    back: [
+      fill(
+        soft(
+          [
+            [-52, -26], [-72, -16], [-56, -2], [-68, 14], [-46, 14],
+            [46, 14], [68, 14], [56, -2], [72, -16], [52, -26],
+          ],
+          3.5,
+        ),
+        "shade",
+      ),
+    ],
+    front: [
+      cap(
+        soft(
+          [
+            [-57, -16.5], [-57, -46], [-74, -56], [-56, -68], [-70, -88], [-46, -84],
+            [-48, -106], [-26, -88], [-16, -110], [-2, -90], [14, -110], [26, -88],
+            [48, -106], [46, -84], [70, -88], [56, -68], [74, -56], [57, -46], [57, -16.5],
+          ],
+          4,
+          [0, 18],
+        ),
+        soft(
+          [
+            [-44, -16.5], [-44, -30], [-36, -44], [-26, -33], [-14, -47], [-4, -34],
+            [6, -47], [18, -34], [28, -45], [37, -33], [44, -30], [44, -16.5],
+          ],
+          2.5,
+          [0, 11],
+        ),
+      ),
+      ...sides(57, 44).tips(),
+    ],
+    sideBottom: SIDE_END,
+  },
+
+  // Straw-hat captain shag (Luffy-inspired): tousled, choppy dark anime locks with jagged bangs across the brow
+  pirate: {
+    back: [
+      fill(
+        soft(
+          [
+            [-52, -20], [-68, -4], [-54, 10], [-64, 26], [-44, 22],
+            [44, 22], [64, 26], [54, 10], [68, -4], [52, -20],
+          ],
+          4,
+        ),
+        "shade",
+      ),
+    ],
+    front: [
+      cap(
+        soft(
+          [
+            [-56, -16], [-56, -48], [-68, -60], [-54, -70], [-62, -90], [-40, -86],
+            [-32, -102], [-14, -92], [2, -104], [18, -92], [36, -100], [42, -84],
+            [62, -88], [54, -68], [68, -58], [56, -48], [56, -16],
+          ],
+          5,
+          [0, 16],
+        ),
+        soft(
+          [
+            [-44, -16], [-44, -31], [-34, -44], [-25, -31], [-12, -48], [-2, -31],
+            [10, -47], [20, -32], [32, -44], [44, -31], [44, -16],
+          ],
+          2.5,
+          [0, 10],
+        ),
+      ),
+      ...sides(56, 44).tips(),
+    ],
+    sideBottom: SIDE_END,
+  },
+
+  // Saiyan fighter spikes (Goku-inspired): huge asymmetric gravity-defying side & crown spikes with hanging V-bangs
+  saiyan: {
+    back: [
+      fill(
+        soft(
+          [
+            [-50, -38], [-86, -34], [-60, -14], [-84, 8], [-48, 14],
+            [48, 14], [82, 6], [58, -14], [84, -36], [50, -38],
+          ],
+          3.5,
+        ),
+        "shade",
+      ),
+    ],
+    front: [
+      cap(
+        soft(
+          [
+            [-57, -16.5], [-57, -42], [-86, -54], [-58, -68], [-82, -92], [-46, -86],
+            [-52, -109], [-20, -88], [4, -110], [22, -86], [58, -108], [48, -82],
+            [82, -88], [58, -64], [84, -48], [57, -42], [57, -16.5],
+          ],
+          3.5,
+          [0, 16],
+        ),
+        soft(
+          [
+            [-44, -16.5], [-44, -32], [-30, -48], [-18, -31], [-4, -52], [6, -31],
+            [20, -50], [32, -33], [44, -32], [44, -16.5],
+          ],
+          2.2,
+          [0, 9],
+        ),
+      ),
+      ...sides(57, 44).tips(),
+    ],
+    sideBottom: SIDE_END,
+  },
+
+  // Moon guardian odango (Sailor Moon-inspired): high twin odango buns with long flowing twin tails and crescent bangs
+  odango: {
+    back: [
+      // Long flowing twin tails sweeping down past the shoulders
+      fill("M-58 -52C-78 -20 -84 44 -76 118C-64 118 -56 86 -58 34C-60 -6 -54 -34 -46 -52Z", "shade"),
+      fill("M58 -52C78 -20 84 44 76 118C64 118 56 86 58 34C60 -6 54 -34 46 -52Z", "shade"),
+      fill("M-55 -52C-73 -18 -78 44 -70 116C-60 116 -52 84 -54 34Z"),
+      fill("M55 -52C73 -18 78 44 70 116C60 116 52 84 54 34Z"),
+      // High twin odango buns
+      fill(disc(-48, -84, 20), "shade"),
+      fill(disc(48, -84, 20), "shade"),
+      fill(disc(-46, -82, 18.5)),
+      fill(disc(46, -82, 18.5)),
+    ],
+    front: [
+      cap(
+        bell(56, OUT.hair.B, -88),
+        `M-46 ${OUT.hair.B}V-30C-46 -40 -32 -42 -16 -48C-6 -52 -2 -58 0 -64C2 -58 6 -52 16 -48C32 -42 46 -40 46 -30V${OUT.hair.B}Z`,
+      ),
+      ...OUT.hair.tips(),
+      fill(band(-39, -70, 20, 8, -36), "tie"),
+      fill(band(39, -70, 20, 8, 36), "tie"),
     ],
     sideBottom: SIDE_END,
   },

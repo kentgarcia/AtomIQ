@@ -96,15 +96,16 @@
         "eyes": "dots",
         "nose": "double",
         "hair": {
-          "style": "crop",
+          "style": "workcrop",
           "color": "#3B2A24",
           "shade": "#2B1E1A"
         },
         "facialHair": "beard",
         "outfit": {
-          "kind": "shirt",
+          "kind": "workvest",
           "color": "#FF9600",
-          "shade": "#CD7900"
+          "shade": "#CD7900",
+          "collar": "#2B70C9"
         },
         "accent": {
           "kind": "hardhat",
@@ -128,15 +129,16 @@
         },
         "head": "tombstone",
         "headWidth": 100,
-        "eyes": "pill",
+        "eyes": "lashes",
         "nose": "single",
+        "blush": "#FF7878",
         "hair": {
-          "style": "bun",
+          "style": "crownbun",
           "color": "#2E2622",
           "shade": "#211B18"
         },
         "outfit": {
-          "kind": "coat",
+          "kind": "clinician",
           "color": "#58CC02",
           "shade": "#58A700",
           "collar": "#FFFFFF"
@@ -165,13 +167,14 @@
         "headWidth": 98,
         "eyes": "glasses-square",
         "nose": "double",
+        "mouth": "smirk",
         "hair": {
-          "style": "crop",
+          "style": "flattop",
           "color": "#2E2622",
           "shade": "#211B18"
         },
         "outfit": {
-          "kind": "hoodie",
+          "kind": "fieldhoodie",
           "color": "#CE82FF",
           "shade": "#9069CD",
           "collar": "#FFFFFF"
@@ -201,14 +204,15 @@
         "eyes": "pill",
         "nose": "single",
         "hair": {
-          "style": "bob",
+          "style": "layeredbob",
           "color": "#3B2A24",
           "shade": "#2B1E1A"
         },
         "outfit": {
-          "kind": "sweater",
+          "kind": "scholar",
           "color": "#FF7878",
-          "shade": "#FF4B4B"
+          "shade": "#FF4B4B",
+          "collar": "#FFF5D3"
         },
         "accent": {
           "kind": "notebook",
@@ -226,23 +230,24 @@
       "bio": "I'm Tess! I teach how nuclear tools help in hospitals, farms and factories. I love a good gadget. Short lessons, quick answers, and you can be on to the next one before I finish this sentence!",
       "spec": {
         "skin": {
-          "base": "#FFCBA3",
-          "shade": "#F5B585",
-          "feature": "#E99B5F"
+          "base": "#D9A066",
+          "shade": "#C4854F",
+          "feature": "#A8683A"
         },
         "head": "capsule",
         "headWidth": 96,
-        "eyes": "round",
-        "nose": "single",
+        "eyes": "glasses-round",
+        "nose": "button",
         "hair": {
-          "style": "wrap",
+          "style": "knotwrap",
           "color": "#FFB2B2",
           "shade": "#F5A4A4"
         },
         "outfit": {
-          "kind": "shirt",
+          "kind": "techvest",
           "color": "#1899D6",
-          "shade": "#2B70C9"
+          "shade": "#2B70C9",
+          "collar": "#DDF4FF"
         },
         "accent": {
           "kind": "vial",

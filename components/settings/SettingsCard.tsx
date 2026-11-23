@@ -2,7 +2,8 @@
  * SettingsCard / SettingsRow — the Settings screen's list: a flat section (no card face, border or lip, but the
  * card's inner side spacing) with a bold title, and rows split by dashed lines. A row is a colourful round
  * icon, a bold label, and on the right one of: a value (muted text), a round arrow button, a
- * toggle, or nothing. A row with `onPress` is a button; a toggle row is a switch.
+ * toggle, or nothing. A row with `onPress` is a button; a toggle row is a switch. A row has no line of explanation under
+ * its label: where it needs one, `onInfo` adds a small round info button beside the label that the screen answers with a dialog.
  */
 
 import React from "react";
@@ -35,8 +36,8 @@ export interface SettingsRowProps {
   /** Colour of the icon and its round tint. */
   color: string;
   label: string;
-  /** A line of explanation under the label. */
-  note?: string;
+  /** An info button beside the label (for a row that needs explaining); the screen opens the explanation. */
+  onInfo?: () => void;
   /** Right side, muted text (e.g. the version). */
   value?: string;
   /** Right side, a round arrow button (the row must have `onPress`). */
@@ -54,7 +55,7 @@ export interface SettingsRowProps {
   anchor?: React.Ref<HostInstance>;
 }
 
-export function SettingsRow({ icon, color, label, note, value, arrow, toggle, onPress, busy, destructive, disabled, hint, anchor }: SettingsRowProps) {
+export function SettingsRow({ icon, color, label, onInfo, value, arrow, toggle, onPress, busy, destructive, disabled, hint, anchor }: SettingsRowProps) {
   const { theme } = useTheme();
   const styles = makeStyles(theme);
   const c = theme.colors;
@@ -69,7 +70,17 @@ export function SettingsRow({ icon, color, label, note, value, arrow, toggle, on
         <Text style={[styles.label, destructive && { color: c.error }]} numberOfLines={2}>
           {label}
         </Text>
-        {note ? <Text style={styles.note}>{note}</Text> : null}
+        {onInfo ? (
+          <Pressable
+            onPress={onInfo}
+            hitSlop={10}
+            accessibilityRole="button"
+            accessibilityLabel={`About ${label}`}
+            style={({ pressed }) => [styles.info, pressed && styles.rowPressed]}
+          >
+            <Icon name="InfoCircle" size={20} color={c.textMuted} variant="Bold" />
+          </Pressable>
+        ) : null}
       </View>
       {value ? (
         <Text style={styles.value} numberOfLines={1}>
@@ -115,9 +126,9 @@ const makeStyles = createStyles((theme) => {
     row: { flexDirection: "row", alignItems: "center", gap: 12, minHeight: 60, paddingVertical: 10 },
     rowPressed: { opacity: 0.6 },
     icon: { width: 36, height: 36, borderRadius: 18, alignItems: "center", justifyContent: "center" },
-    labelBox: { flex: 1, gap: 2 },
-    label: { fontSize: 16, ...fontFaces.heavy, color: c.text },
-    note: { fontSize: 13, lineHeight: 18, ...fontFaces.medium, color: c.textMuted },
+    labelBox: { flex: 1, flexDirection: "row", alignItems: "center", gap: 8 },
+    info: { width: 24, height: 24, alignItems: "center", justifyContent: "center" },
+    label: { flexShrink: 1, fontSize: 16, ...fontFaces.heavy, color: c.text },
     value: { flexShrink: 1, maxWidth: "45%", fontSize: 15, ...fontFaces.medium, color: c.textMuted },
     arrow: { width: 28, height: 28, borderRadius: 14, alignItems: "center", justifyContent: "center" },
   };

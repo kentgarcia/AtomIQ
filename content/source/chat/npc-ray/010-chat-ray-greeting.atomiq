@@ -1,0 +1,220 @@
+format 1
+adapter chat 1
+npc: npc-ray
+
+node chat-ray-greeting
+kind: greeting
+pose: greet
+title: Chat
+
+    Ray.
+
+    Clipboard's out. Status?
+
+reply: on track -> chat-ray-ontrack
+reply: behind -> chat-ray-behind
+reply: stuck -> chat-ray-stuck
+reply: just talking -> chat-ray-talk
+reply: gotta go -> chat-ray-bye
+
+node chat-ray-menu
+kind: reply
+pose: idle
+
+    Again. Status?
+
+    On track, behind, stuck, talking or leaving. Pick one.
+
+reply: on track -> chat-ray-ontrack
+reply: behind -> chat-ray-behind
+reply: stuck -> chat-ray-stuck
+reply: just talking -> chat-ray-talk
+reply: gotta go -> chat-ray-bye
+
+node chat-ray-ontrack
+kind: reply
+pose: proud
+
+    Good. Noted.
+
+    Next job is on the map. Go do it.
+
+link: Take me there => next-lesson
+reply: quiz me first -> chat-ray-quiz
+reply: later -> chat-ray-menu
+
+node chat-ray-behind
+kind: reply
+pose: point
+
+    Fine. Behind is a position. Not a verdict.
+
+    Plan: one lesson. That's all. Then we recount.
+
+link: Take me there => next-lesson
+reply: ok, one lesson -> chat-ray-bye
+reply: what if I'm too tired -> chat-ray-tired
+
+node chat-ray-tired
+kind: reply
+pose: think
+
+    Then do a short thing. A quiz. Five minutes.
+
+    A short thing counts. Checked off is checked off.
+
+link: A quick round => mythbuster radiation-meets-matter
+reply: ok, fair -> chat-ray-menu
+
+node chat-ray-quiz
+kind: reply
+pose: explain
+
+    A round of Myth Buster. Radiation and matter.
+
+    Fair questions. Short. Go.
+
+link: Start the round => mythbuster radiation-meets-matter
+reply: not now -> chat-ray-menu
+
+node chat-ray-stuck
+kind: reply
+pose: think
+
+    Stuck where? Name it. I'll give you the short version.
+
+reply: what stops what -> chat-ray-r-stops
+reply: exposed or contaminated -> chat-ray-r-contam
+reply: ionizing or not -> chat-ray-r-ion
+reply: the units -> chat-ray-r-units
+reply: never mind -> chat-ray-menu
+
+node chat-ray-r-stops
+kind: reply
+pose: explain
+
+    Alpha: paper, or the outer layer of skin.
+
+    Beta: a thin layer of metal.
+
+    Gamma: several inches of lead, or a few feet of concrete.
+
+    Three kinds. Three different stoppers.
+
+link: Open it in AtomDex => entry shielding
+reply: thanks, back -> chat-ray-menu
+
+node chat-ray-r-contam
+kind: reply
+pose: explain
+
+    Exposed: you're in the path of radiation from a source.
+
+    Contaminated: radioactive material is on you or in you.
+
+    Radiation doesn't spread. The material does.
+
+link: Open it in AtomDex => entry radioactive-contamination
+reply: thanks, back -> chat-ray-menu
+
+node chat-ray-r-ion
+kind: reply
+pose: explain
+
+    Ionizing: enough energy to knock electrons out of atoms. X-rays, gamma rays, alpha and beta.
+
+    Non-ionizing: radio waves, microwaves, visible light.
+
+link: Open it in AtomDex => entry ionizing-radiation
+reply: thanks, back -> chat-ray-menu
+
+node chat-ray-r-units
+kind: reply
+pose: explain
+
+    Becquerel: decays per second of a source.
+
+    Gray: energy absorbed per kilogram.
+
+    Sievert: potential for harm.
+
+    Different questions. Don't swap them.
+
+link: Open it in AtomDex => entry sievert
+reply: thanks, back -> chat-ray-menu
+
+node chat-ray-talk
+kind: reply
+pose: greet
+
+    Fine. Ask. Short answers only.
+
+reply: what's on the clipboard? -> chat-ray-clip
+reply: what's the counter doing? -> chat-ray-counter
+reply: why the hoodie? -> chat-ray-hoodie
+reply: never mind -> chat-ray-menu
+
+node chat-ray-clip
+kind: reply
+pose: point
+
+    A checklist.
+
+    One: no hype. Two: no scare. Three: say what the sources say. Four: lunch.
+
+    Four gets skipped. I'm working on it.
+
+reply: lunch matters -> chat-ray-clip-lunch
+reply: that's a good list -> chat-ray-talk
+
+node chat-ray-clip-lunch
+kind: reply
+pose: proud
+
+    Noted. Item four moves up to item two.
+
+    Don't tell anyone.
+
+react: haha -> chat-ray-talk
+react: like -> chat-ray-talk
+
+node chat-ray-counter
+kind: reply
+pose: think
+
+    Hand-held. Goes everywhere I go.
+
+    It reads something wherever I take it. Kitchen. Roof. Parking lot. That's normal. Background. Lesson four.
+
+reply: so it's never zero? -> chat-ray-counter-zero
+reply: ok -> chat-ray-talk
+
+node chat-ray-counter-zero
+kind: reply
+pose: explain
+
+    A working detector picks up a little almost anywhere. Background radiation is always there.
+
+    Check the lesson if you want the full version.
+
+reply: got it -> chat-ray-talk
+reply: back to the list -> chat-ray-menu
+
+node chat-ray-hoodie
+kind: reply
+pose: greet
+
+    Purple. Warm. Pockets.
+
+    The clipboard doesn't fit in the pocket. I've tried. We don't discuss it.
+
+sticker: nerd -> chat-ray-talk
+sticker: star -> chat-ray-talk
+
+node chat-ray-bye
+kind: sign_off
+pose: proud
+
+    Noted. Go.
+
+    Come back with a question. Short answer guaranteed.

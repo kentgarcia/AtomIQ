@@ -1,0 +1,91 @@
+format 1
+adapter chat 1
+npc: npc-ray
+
+node chat-ray-up-hello
+kind: unprompted
+pose: greet
+trigger: lessons_completed:11
+title: Ray. Radiation. Hello.
+
+    Ray.
+
+    I teach what radiation does when it meets things. And what stops it.
+
+    You've finished my first lesson. Noted.
+
+reply: hi Ray -> chat-ray-hello-hi
+reply: Ada said you're serious -> chat-ray-hello-ada
+reply: what's with the clipboard? -> chat-ray-hello-clip
+
+node chat-ray-hello-hi
+kind: reply
+pose: idle
+
+    Hi. Short and good.
+
+    Here's how this goes. I'll tell you what the sources say. No hype. No scare. If I don't know, I say so.
+
+reply: that sounds good -> chat-ray-hello-deal
+reply: you don't do hype at all? -> chat-ray-hello-hype
+
+node chat-ray-hello-ada
+kind: reply
+pose: think
+
+    Ada says a lot of things. Most of them in lower case.
+
+    She's right about this one. I'm serious. About the work. Not about everything. I have a hoodie.
+
+reply: lol the hoodie -> chat-ray-hello-deal
+reply: ok, serious is fine -> chat-ray-hello-deal
+
+node chat-ray-hello-clip
+kind: reply
+pose: point
+
+    A checklist. Every lesson, one item.
+
+    Today's item: ionizing or not. Checked off. You did that one.
+
+reply: what's next on the list? -> chat-ray-hello-deal
+reply: do you ever cross something out? -> chat-ray-hello-cross
+
+node chat-ray-hello-hype
+kind: reply
+pose: proud
+
+    None. Hype is a way of saying a thing is bigger than it is.
+
+    Radiation is what it is. We measure it. We say the number. That's the job.
+
+reply: ok I like that -> chat-ray-hello-deal
+reply: what if a thing is actually big? -> chat-ray-hello-big
+
+node chat-ray-hello-big
+kind: reply
+pose: explain
+
+    Then you say the number and the unit. If it's big, the number is big. No adjectives needed.
+
+reply: fair enough -> chat-ray-hello-deal
+reply: ok, noted -> chat-ray-hello-deal
+
+node chat-ray-hello-cross
+kind: reply
+pose: sorry
+
+    Once. I wrote lunch at the top. Crossed it out. Wrote it again.
+
+    Lunch was not a good week.
+
+reply: poor Ray -> chat-ray-hello-deal
+reply: lunch is important -> chat-ray-hello-deal
+
+node chat-ray-hello-deal
+kind: sign_off
+pose: point
+
+    Good. Next lessons: what stops what, and exposed or contaminated.
+
+    Go do them. I'll be here with the clipboard.

@@ -45,14 +45,14 @@ function Picture({ item, base }: { item: ShopItem; base: AvatarConfig }) {
   if (item.category === "paint") {
     return (
       <View style={[styles.tile, { backgroundColor: avatarBackground(look) }]}>
-        <PatternLayer pattern={base.pattern} tile={30} />
+        <PatternLayer pattern={base.pattern} background={look.background} tile={60} />
       </View>
     );
   }
   if (item.category === "pattern") {
     return (
-      <View style={[styles.tile, styles.pattern]}>
-        <PatternLayer pattern={item.value} tile={70} />
+      <View style={[styles.tile, { backgroundColor: avatarBackground(look) }]}>
+        <PatternLayer pattern={item.value} background={look.background} tile={60} />
       </View>
     );
   }

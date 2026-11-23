@@ -1,0 +1,126 @@
+format 1
+adapter curriculum 1
+unit: radiation-meets-matter
+
+lesson irradiated-or-contaminated
+title: Exposed or contaminated
+minutes: 6
+xp: 50
+teaches: u3-exposure-vs-contamination
+teaches: u3-exposure-ends
+relies_on: u3-ionizing-meaning
+
+description:
+    Standing near a source of radiation is not the same as having radioactive material on you. You will find out the difference, and when each one ends.
+
+cite ref-hps-radioactive-contamination
+
+supports:
+    Radiation does not get on or in people; radioactive contamination can be spread. A contaminated person is exposed until the radioactive material is removed.
+
+cite ref-who-ionizing-radiation
+
+supports:
+    External irradiation stops when the source is shielded or the person moves outside the radiation field; material on skin or clothes can often be washed off; internal exposure stops when the radionuclide leaves the body.
+
+card c01
+kind: teach
+type: explain
+scored: 0
+title: A torch and a pot of glitter
+
+body:
+    Shine a torch at someone and the light reaches them. Switch it off, or step out of the beam, and it stops. Now tip a pot of glitter onto their sleeve. The glitter stays, even after they walk away. Radiation can act like the torch. Radioactive material can act like the glitter.
+
+card c02
+kind: teach
+type: explain
+scored: 0
+title: Exposed: in the path
+figure: exposure-figure
+figure_at: 1
+
+body:
+    You are exposed when you are in the path of radiation from a source. A medical X-ray is a source outside the body. When the radiation stops reaching you, the exposure is over.
+
+card c03
+kind: item
+type: item
+item: u3-l3-choice-stops
+connected: true
+
+card c04
+kind: item
+type: item
+item: u3-l3-predict-near
+scored: 0
+
+card c05
+kind: teach
+type: explain
+scored: 0
+title: Contaminated: material on or in
+figure: contamination-figure
+figure_at: 2
+
+body:
+    [[radioactive-contamination|Contamination]] is radioactive material on or in something, where it is not wanted. It can be on skin or clothes, breathed in or swallowed, or spread about a place.
+
+card c06
+kind: teach
+type: explain
+scored: 0
+title: The glitter is the problem
+
+body:
+    Radiation does not get on or in people. It is the material that spreads. That is how a person can be exposed to a source without being contaminated.
+
+card c07
+kind: item
+type: item
+item: u3-l3-tom-spread
+connected: true
+
+card c08
+kind: item
+type: item
+item: u3-l3-choice-contaminated
+
+card c09
+kind: teach
+type: explain
+scored: 0
+title: When does it end?
+figure: exposure-ends
+figure_at: 1
+
+body:
+    Near a source, the exposure ends when you move away or the source is shielded. If radioactive material is on you, you are exposed until it is removed, and material on skin or clothes can often be washed off. If it is inside you, you are exposed until it leaves the body.
+
+card c10
+kind: item
+type: item
+item: u3-l3-match-ends
+connected: true
+
+card c11
+kind: item
+type: item
+item: u3-l3-choice-continues
+
+card c12
+kind: teach
+type: explain
+scored: 0
+title: Sealed or not
+figure: sealed-source
+figure_at: 1
+
+body:
+    Radioactive material in a sealed source stays in its container. Material that is not sealed might be spread onto other objects.
+
+card c13
+kind: item
+type: item
+item: u3-l3-tom-sealed
+connected: true

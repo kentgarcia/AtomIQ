@@ -1,0 +1,22 @@
+format 1
+adapter encyclopedia 1
+category: safety
+
+entry acute-radiation-syndrome
+term: Acute radiation syndrome
+related_terms: sievert
+related_terms: dose-rate
+related_terms: absorbed-dose
+quick_facts: Needs a very large dose in a short time
+quick_facts: The threshold is about 1 sievert, or 1000 millisieverts
+quick_facts: Symptoms such as nausea and vomiting can start within hours
+
+sources:
+    {"organization":"U.S. Environmental Protection Agency","title":"Radiation Health Effects","url":"https://www.epa.gov/radiation/radiation-health-effects"}
+    {"organization":"World Health Organization","title":"Ionizing radiation and health effects","url":"https://www.who.int/news-room/fact-sheets/detail/ionizing-radiation-and-health-effects"}
+
+definition:
+    Acute radiation syndrome is the illness caused by a very high radiation exposure delivered over a short period of time. The dose threshold is about 1 sievert (1000 millisieverts). It can cause symptoms such as nausea and vomiting within hours. The everyday doses people receive are far below it.
+
+debunking_snippet:
+    “Any radiation exposure leads to radiation sickness.” Exposure to the low levels of radiation in the environment does not cause immediate health effects. Acute radiation syndrome needs about 1000 millisieverts in a short time.

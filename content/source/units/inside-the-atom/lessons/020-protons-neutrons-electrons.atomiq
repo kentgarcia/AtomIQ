@@ -22,29 +22,6 @@ supports: The nucleus is an extremely small space at the center of an atom.
 cite ref-rutherford-1911
 supports: The gold-foil experiment (optional story).
 
-card c01
-kind: item
-type: item
-item: u1-l2-predict-stadium
-scored: 0
-
-card c02
-kind: teach
-type: explain
-scored: 0
-title: A tiny centre
-figure: atom-model
-figure_args: [2,2,2]
-figure_at: 1
-
-body:
-    Every atom has a tiny centre called the [[nucleus]], with [[electron|electrons]] around it. Almost all of an atom's mass is packed into its tiny nucleus.
-
-card c03
-kind: item
-type: item
-item: u1-l2-hotspot-nucleus
-
 card c04
 kind: teach
 type: explain
@@ -54,12 +31,13 @@ figure: particle-cards
 figure_at: 0
 
 body:
-    The nucleus holds [[proton|protons]], which are positive, and [[neutron|neutrons]], which have no charge. Electrons are negative and are outside the nucleus.
+    Every atom is built from just three kinds of particle. [[proton|Protons]] are positive, [[electron|electrons]] are negative, and [[neutron|neutrons]] have no charge, which is how they got their name. Different elements are made from the same three particles, only in different numbers.
 
 card c05
 kind: item
 type: item
 item: u1-l2-match-particles
+connected: true
 
 card c06
 kind: sim
@@ -83,6 +61,24 @@ config:
       ]
     }
 
+card c02
+kind: teach
+type: explain
+scored: 0
+title: A tiny centre
+figure: atom-model
+figure_args: [2,2,2]
+figure_at: 1
+
+body:
+    The protons and neutrons are packed together in a tiny centre called the [[nucleus|nucleus]]. The electrons are outside it, and that leaves a lot of room between them. So the nucleus is only a speck, and the atom is mostly empty space.
+
+card c01
+kind: item
+type: item
+item: u1-l2-predict-stadium
+scored: 0
+
 card c07
 kind: teach
 type: reveal
@@ -93,23 +89,23 @@ figure: stadium-marble
 figure_at: 0
 
 body:
-    If an atom were a football stadium, its nucleus would be a marble in the middle. The electrons would be far out, and the rest is mostly empty space.
+    If an atom were a football stadium, its nucleus would be a marble in the middle. The electrons would be far out, and the rest is mostly empty space. The marble is tiny, but it holds the protons and neutrons, so almost all of the atom's mass is packed into it.
+
+card c03
+kind: item
+type: item
+item: u1-l2-hotspot-nucleus
+connected: true
 
 card c08
 kind: item
 type: item
 item: u1-l2-tom-solid
-connected: true
 
 card c09
 kind: item
 type: item
 item: u1-l2-choice-mass
-
-card c10
-kind: item
-type: item
-item: u1-l2-sort-location
 
 card c11
 kind: teach

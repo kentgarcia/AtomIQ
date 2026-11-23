@@ -18,15 +18,16 @@ spec:
       },
       "head": "tombstone",
       "headWidth": 100,
-      "eyes": "pill",
+      "eyes": "lashes",
       "nose": "single",
+      "blush": "#FF7878",
       "hair": {
-        "style": "bun",
+        "style": "crownbun",
         "color": "#2E2622",
         "shade": "#211B18"
       },
       "outfit": {
-        "kind": "coat",
+        "kind": "clinician",
         "color": "#58CC02",
         "shade": "#58A700",
         "collar": "#FFFFFF"
@@ -37,3 +38,56 @@ spec:
         "shade": "#1453A3"
       }
     }
+
+line line-mina-meet
+kind: meet
+pose: greet
+
+    I'm Mina. I teach what radiation does to the body. We'll go one calm step at a time.
+
+line line-mina-sign-off
+kind: sign_off
+pose: proud
+
+    Unit done. You can say how big a dose is, how the body copes, and what lowers it.
+
+line line-mina-tease
+kind: tease
+pose: idle
+
+    That's all of my lessons for now. More is on the way, and I'll be here when it arrives.
+
+line line-mina-intro-dose-and-time
+kind: lesson_intro
+pose: point
+lesson: dose-and-time
+
+    The same amount can mean different things, depending on how fast it arrives. Let's compare the two.
+
+line line-mina-intro-radiation-and-cells
+kind: lesson_intro
+pose: think
+lesson: radiation-and-cells
+
+    Radiation can damage a cell. That's a real worry. The other half matters just as much. Let's see both.
+
+line line-mina-intro-risk-in-perspective
+kind: lesson_intro
+pose: idle
+lesson: risk-in-perspective
+
+    Last lesson. No new facts, just a calm way to read a scary number. Take your time with it.
+
+line line-mina-intro-the-dose-scale
+kind: lesson_intro
+pose: explain
+lesson: the-dose-scale
+
+    How big is a dose, really? You get a little every day, and that's fine. Let's use numbers.
+
+line line-mina-intro-time-distance-shielding
+kind: lesson_intro
+pose: explain
+lesson: time-distance-shielding
+
+    A dose isn't fixed. There are three ways to lower it. We'll take them one at a time.

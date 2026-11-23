@@ -1,0 +1,112 @@
+format 1
+adapter curriculum 1
+unit: radiation-meets-matter
+
+objective u3-background-reading
+statement: Know that a radiation detector picks up some radiation almost anywhere, because background radiation is always present.
+misconception: A detector that picks up radiation must be right next to a dangerous source.
+
+item u3-l4-choice-background
+type: choice
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-epa-radiation-basics
+
+prompt:
+    Why does a working detector read a little in an empty field?
+
+options:
+    {"id":"broken","label":"It is broken","note":"A working detector reads a little almost anywhere, because background radiation is always present."}
+    {"id":"bg","label":"Background radiation is always present on Earth"}
+    {"id":"leak","label":"There is a hidden source close by","note":"No source is needed. Background radiation comes from natural minerals in the ground, soil and water, and from cosmic radiation."}
+
+answer: bg
+
+explanation:
+    Background radiation is present on Earth at all times. It comes from natural minerals and from cosmic radiation, so a working detector picks up a little almost anywhere.
+
+item u3-l4-choice-sources
+type: choice
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-epa-radiation-basics
+
+prompt:
+    Where does background radiation mostly come from?
+
+options:
+    {"id":"phones","label":"Phones and radios","note":"Background radiation is natural. It comes mostly from minerals in the ground, soil and water, and from cosmic radiation."}
+    {"id":"nat","label":"Natural minerals in the ground, soil and water, and cosmic radiation"}
+    {"id":"plants","label":"Power plants only","note":"It is present everywhere on Earth, and comes mostly from natural sources."}
+
+answer: nat
+
+explanation:
+    Background radiation is mostly natural: minerals in the ground, soil and water, and cosmic radiation from space.
+
+item u3-l4-tom-source
+type: true_or_myth
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-epa-radiation-basics
+
+statement:
+    Cosmic radiation is part of background radiation.
+
+answer: true
+
+explanation:
+    True. Along with natural minerals in the ground, soil and water, cosmic radiation is one of the main sources of background radiation.
+
+item u3-l4-tom-zero
+type: true_or_myth
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-epa-radiation-basics
+
+statement:
+    A detector that reads above zero must be right next to a dangerous source.
+
+answer: myth
+
+explanation:
+    Myth. A working detector picks up background radiation almost anywhere. A small reading is normal, and it varies from place to place.
+
+item u3-x-background-reading
+type: choice
+surfaces: practice
+surfaces: checkpoint
+surfaces: review
+references: ref-epa-radiation-basics
+
+prompt:
+    A detector reads a few counts in two different places, and the numbers are not the same. What is the most likely reason?
+
+options:
+    {"id":"vary","label":"Background radiation varies from place to place"}
+    {"id":"broken","label":"One of the detectors is broken","note":"Nothing needs to be broken. Background radiation varies from place to place, so readings differ."}
+    {"id":"nonsense","label":"Detectors only ever give random numbers","note":"A working detector reflects the radiation that is there, and that varies by place."}
+
+answer: vary
+
+explanation:
+    Background radiation is not the same everywhere on Earth, so a working detector gives different readings in different places.
+
+item u3-x-tom-background-natural
+type: true_or_myth
+surfaces: practice
+surfaces: checkpoint
+surfaces: review
+references: ref-epa-radiation-basics
+
+statement:
+    Background radiation is present on Earth at all times.
+
+answer: true
+
+explanation:
+    True. It comes mostly from natural sources, so it is always there, and a detector picks up a little of it almost anywhere.

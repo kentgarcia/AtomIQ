@@ -1155,7 +1155,7 @@
       "kind": "sign_off",
       "trigger": null,
       "title": null,
-      "text": "ok i have to go lie on the lab floor and feel things\n\ncome back any time. i mean it. even just to say hi\n\nbye bye, scientist~",
+      "text": "ok i have to go lie on the lab floor and feel things\n\ncome back any time. i mean it. even just to say hi\n\nray's next. he teaches what radiation does when it meets things. he says \"noted\" a lot. that means he likes you\n\nbye bye, scientist~",
       "pose": "greet",
       "replies": [],
       "position": 55
@@ -2440,6 +2440,2165 @@
       "position": 8
     },
     {
+      "id": "chat-mina-apron-dist",
+      "npc_id": "npc-mina",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "Not quite. I haven't moved, and the machine hasn't either. Distance is about stepping away from the source.\n\nA barrier in the way is a different one.",
+      "pose": "explain",
+      "replies": [
+        {
+          "label": "oh, shielding",
+          "next": "chat-mina-apron-shield"
+        },
+        {
+          "label": "so which one?",
+          "next": "chat-mina-apron-shield"
+        }
+      ],
+      "position": 37
+    },
+    {
+      "id": "chat-mina-apron-end",
+      "npc_id": "npc-mina",
+      "kind": "sign_off",
+      "trigger": null,
+      "title": null,
+      "text": "The apron is on, the X-ray is done.\n\nLead between me and the source. That's shielding.",
+      "pose": "greet",
+      "replies": [],
+      "position": 39
+    },
+    {
+      "id": "chat-mina-apron-nerd",
+      "npc_id": "npc-mina",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "I knew you'd have a name for it.\n\nTime, distance or shielding?",
+      "pose": "proud",
+      "replies": [
+        {
+          "label": "shielding",
+          "next": "chat-mina-apron-shield"
+        },
+        {
+          "label": "distance",
+          "next": "chat-mina-apron-dist"
+        },
+        {
+          "label": "time",
+          "next": "chat-mina-apron-time"
+        }
+      ],
+      "position": 33
+    },
+    {
+      "id": "chat-mina-apron-rad",
+      "npc_id": "npc-mina",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "Yes, an X-ray is radiation. A short, controlled amount.\n\nThe apron is one of the three ways to lower a dose. Which one?",
+      "pose": "idle",
+      "replies": [
+        {
+          "label": "shielding",
+          "next": "chat-mina-apron-shield"
+        },
+        {
+          "label": "distance",
+          "next": "chat-mina-apron-dist"
+        },
+        {
+          "label": "time",
+          "next": "chat-mina-apron-time"
+        }
+      ],
+      "position": 35
+    },
+    {
+      "id": "chat-mina-apron-shield",
+      "npc_id": "npc-mina",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "Shielding. The apron is lead, and it sits between the X-ray and the rest of me.\n\nDentists place a lead apron on patients having X-rays of their teeth.",
+      "pose": "proud",
+      "replies": [
+        {
+          "label": "clap",
+          "next": "chat-mina-apron-end",
+          "type": "react"
+        },
+        {
+          "label": "like",
+          "next": "chat-mina-apron-end",
+          "type": "react"
+        }
+      ],
+      "position": 36
+    },
+    {
+      "id": "chat-mina-apron-star",
+      "npc_id": "npc-mina",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "Thank you. It's a good moment to practise.\n\nThe apron is one of the three ways. Which one?",
+      "pose": "greet",
+      "replies": [
+        {
+          "label": "shielding",
+          "next": "chat-mina-apron-shield"
+        },
+        {
+          "label": "distance",
+          "next": "chat-mina-apron-dist"
+        },
+        {
+          "label": "time",
+          "next": "chat-mina-apron-time"
+        }
+      ],
+      "position": 34
+    },
+    {
+      "id": "chat-mina-apron-time",
+      "npc_id": "npc-mina",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "Not quite. Less time lowers a dose, but the apron doesn't make the X-ray shorter.\n\nIt's a barrier. That's the third way.",
+      "pose": "explain",
+      "replies": [
+        {
+          "label": "shielding",
+          "next": "chat-mina-apron-shield"
+        },
+        {
+          "label": "oh, I see",
+          "next": "chat-mina-apron-shield"
+        }
+      ],
+      "position": 38
+    },
+    {
+      "id": "chat-mina-back-bye",
+      "npc_id": "npc-mina",
+      "kind": "sign_off",
+      "trigger": null,
+      "title": null,
+      "text": "That's fine. Rest is part of learning.\n\nI'll be here.",
+      "pose": "greet",
+      "replies": [],
+      "position": 49
+    },
+    {
+      "id": "chat-mina-back-miss",
+      "npc_id": "npc-mina",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "I did, a little. It's nice to see you.\n\nNo pressure at all.",
+      "pose": "greet",
+      "replies": [
+        {
+          "label": "ha, ok",
+          "next": "chat-mina-back-ready"
+        },
+        {
+          "label": "aw",
+          "next": "chat-mina-back-ready"
+        }
+      ],
+      "position": 46
+    },
+    {
+      "id": "chat-mina-back-ready",
+      "npc_id": "npc-mina",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "Ready when you are.",
+      "pose": "point",
+      "replies": [
+        {
+          "label": "Take me there",
+          "action": {
+            "screen": "next-lesson"
+          }
+        },
+        {
+          "label": "A quick round first",
+          "action": {
+            "screen": "mythbuster",
+            "id": "radiation-and-the-body"
+          }
+        },
+        {
+          "label": "not today, sorry",
+          "next": "chat-mina-back-bye"
+        }
+      ],
+      "position": 48
+    },
+    {
+      "id": "chat-mina-back-thanks",
+      "npc_id": "npc-mina",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "You're welcome. Coming back is the hard part, and you did it.\n\nOne small step is enough for today.",
+      "pose": "proud",
+      "replies": [
+        {
+          "label": "ok, let's go",
+          "next": "chat-mina-back-ready"
+        },
+        {
+          "label": "a warm-up first",
+          "next": "chat-mina-back-ready"
+        }
+      ],
+      "position": 45
+    },
+    {
+      "id": "chat-mina-back-up",
+      "npc_id": "npc-mina",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "Reading about how cells repair themselves. It never gets less interesting.\n\nMostly that, and a lot of tea.",
+      "pose": "idle",
+      "replies": [
+        {
+          "label": "good for you",
+          "next": "chat-mina-back-ready"
+        },
+        {
+          "label": "lol",
+          "next": "chat-mina-back-ready"
+        }
+      ],
+      "position": 47
+    },
+    {
+      "id": "chat-mina-bye",
+      "npc_id": "npc-mina",
+      "kind": "sign_off",
+      "trigger": null,
+      "title": null,
+      "text": "Of course. Go gently.\n\nCome back with any question you like.",
+      "pose": "greet",
+      "replies": [],
+      "position": 17
+    },
+    {
+      "id": "chat-mina-calm",
+      "npc_id": "npc-mina",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "Numbers help. When I know how big something is, and how it compares, it stops feeling so large.\n\nThat's most of the unit, really.",
+      "pose": "proud",
+      "replies": [
+        {
+          "label": "that makes sense",
+          "next": "chat-mina-talk"
+        },
+        {
+          "label": "I'll try it",
+          "next": "chat-mina-talk"
+        }
+      ],
+      "position": 16
+    },
+    {
+      "id": "chat-mina-greeting",
+      "npc_id": "npc-mina",
+      "kind": "greeting",
+      "trigger": null,
+      "title": "Chat",
+      "text": "Hi, I'm Mina.\n\nHow are you feeling about today's lesson?",
+      "pose": "greet",
+      "replies": [
+        {
+          "label": "I'm ready",
+          "next": "chat-mina-ready"
+        },
+        {
+          "label": "a bit worried",
+          "next": "chat-mina-worry"
+        },
+        {
+          "label": "remind me of something",
+          "next": "chat-mina-remind"
+        },
+        {
+          "label": "just talking",
+          "next": "chat-mina-talk"
+        },
+        {
+          "label": "I have to go",
+          "next": "chat-mina-bye"
+        }
+      ],
+      "position": 0
+    },
+    {
+      "id": "chat-mina-hello-cover",
+      "npc_id": "npc-mina",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "Cells and how they repair damage. Big doses and small ones. Time, distance and shielding.\n\nAnd the last lesson is about reading a scary number calmly.",
+      "pose": "point",
+      "replies": [
+        {
+          "label": "I'm in",
+          "next": "chat-mina-hello-end"
+        },
+        {
+          "label": "sounds good",
+          "next": "chat-mina-hello-end"
+        }
+      ],
+      "position": 22
+    },
+    {
+      "id": "chat-mina-hello-end",
+      "npc_id": "npc-mina",
+      "kind": "sign_off",
+      "trigger": null,
+      "title": null,
+      "text": "Good. Message me any time you want to go over something.\n\nYour next lesson is on the map.",
+      "pose": "proud",
+      "replies": [],
+      "position": 23
+    },
+    {
+      "id": "chat-mina-hello-hi",
+      "npc_id": "npc-mina",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "Hi. I'm glad you're here.\n\nWe'll go slowly and I'll only say what the sources say.",
+      "pose": "idle",
+      "replies": [
+        {
+          "label": "sounds good",
+          "next": "chat-mina-hello-end"
+        },
+        {
+          "label": "what do you cover?",
+          "next": "chat-mina-hello-cover"
+        }
+      ],
+      "position": 19
+    },
+    {
+      "id": "chat-mina-hello-ray",
+      "npc_id": "npc-mina",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "Ray is kind. I'll take that as a compliment.\n\nHe taught you what radiation does to things. I'll take it from there, to the body.",
+      "pose": "greet",
+      "replies": [
+        {
+          "label": "ok",
+          "next": "chat-mina-hello-cover"
+        },
+        {
+          "label": "I'd like to hear more",
+          "next": "chat-mina-hello-cover"
+        }
+      ],
+      "position": 20
+    },
+    {
+      "id": "chat-mina-hello-scary",
+      "npc_id": "npc-mina",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "It can feel that way at first. Most of the unit is about calming a worry down with numbers.\n\nEveryone gets a small dose every day. You already saw that.",
+      "pose": "explain",
+      "replies": [
+        {
+          "label": "that helps",
+          "next": "chat-mina-hello-end"
+        },
+        {
+          "label": "what else do you cover?",
+          "next": "chat-mina-hello-cover"
+        }
+      ],
+      "position": 21
+    },
+    {
+      "id": "chat-mina-menu",
+      "npc_id": "npc-mina",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "Take your time.\n\nWhat would help right now?",
+      "pose": "idle",
+      "replies": [
+        {
+          "label": "I'm ready",
+          "next": "chat-mina-ready"
+        },
+        {
+          "label": "a bit worried",
+          "next": "chat-mina-worry"
+        },
+        {
+          "label": "remind me of something",
+          "next": "chat-mina-remind"
+        },
+        {
+          "label": "just talking",
+          "next": "chat-mina-talk"
+        },
+        {
+          "label": "I have to go",
+          "next": "chat-mina-bye"
+        }
+      ],
+      "position": 1
+    },
+    {
+      "id": "chat-mina-quiz",
+      "npc_id": "npc-mina",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "A short round of Myth Buster on this unit.\n\nIt's a gentle way to warm up.",
+      "pose": "explain",
+      "replies": [
+        {
+          "label": "Start the round",
+          "action": {
+            "screen": "mythbuster",
+            "id": "radiation-and-the-body"
+          }
+        },
+        {
+          "label": "not now",
+          "next": "chat-mina-menu"
+        }
+      ],
+      "position": 3
+    },
+    {
+      "id": "chat-mina-r-cells",
+      "npc_id": "npc-mina",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "Ionizing radiation can damage the DNA in a cell.\n\nCells are extremely efficient at repairing that damage. If it is not repaired correctly, a cell may die or eventually become cancerous.",
+      "pose": "explain",
+      "replies": [
+        {
+          "label": "Open it in AtomDex",
+          "action": {
+            "screen": "entry",
+            "id": "dna"
+          }
+        },
+        {
+          "label": "thanks, back",
+          "next": "chat-mina-menu"
+        }
+      ],
+      "position": 12
+    },
+    {
+      "id": "chat-mina-r-scale",
+      "npc_id": "npc-mina",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "1 sievert is 1000 millisieverts.\n\nAn average year is about 6. A whole body CT is about 10. About 1000 in a short time is where people become ill.",
+      "pose": "explain",
+      "replies": [
+        {
+          "label": "Open it in AtomDex",
+          "action": {
+            "screen": "entry",
+            "id": "millisievert"
+          }
+        },
+        {
+          "label": "thanks, back",
+          "next": "chat-mina-menu"
+        }
+      ],
+      "position": 11
+    },
+    {
+      "id": "chat-mina-r-three",
+      "npc_id": "npc-mina",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "Less time near a source, more distance from it, and something in between.\n\nLead, concrete or water protect against gamma rays.",
+      "pose": "explain",
+      "replies": [
+        {
+          "label": "Open it in AtomDex",
+          "action": {
+            "screen": "entry",
+            "id": "shielding"
+          }
+        },
+        {
+          "label": "thanks, back",
+          "next": "chat-mina-menu"
+        }
+      ],
+      "position": 13
+    },
+    {
+      "id": "chat-mina-ready",
+      "npc_id": "npc-mina",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "Good. One step at a time is plenty.\n\nYour next lesson is on the map whenever you want it.",
+      "pose": "proud",
+      "replies": [
+        {
+          "label": "Take me there",
+          "action": {
+            "screen": "next-lesson"
+          }
+        },
+        {
+          "label": "quiz me first",
+          "next": "chat-mina-quiz"
+        },
+        {
+          "label": "later",
+          "next": "chat-mina-menu"
+        }
+      ],
+      "position": 2
+    },
+    {
+      "id": "chat-mina-remind",
+      "npc_id": "npc-mina",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "Which part would you like to go over?",
+      "pose": "explain",
+      "replies": [
+        {
+          "label": "the dose scale",
+          "next": "chat-mina-r-scale"
+        },
+        {
+          "label": "cells and repair",
+          "next": "chat-mina-r-cells"
+        },
+        {
+          "label": "time, distance, shielding",
+          "next": "chat-mina-r-three"
+        },
+        {
+          "label": "never mind",
+          "next": "chat-mina-menu"
+        }
+      ],
+      "position": 10
+    },
+    {
+      "id": "chat-mina-steth",
+      "npc_id": "npc-mina",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "It's a reminder.\n\nListening first, then explaining. That's the order I like.",
+      "pose": "idle",
+      "replies": [
+        {
+          "label": "I like that",
+          "next": "chat-mina-talk"
+        },
+        {
+          "label": "that's thoughtful",
+          "next": "chat-mina-talk"
+        }
+      ],
+      "position": 15
+    },
+    {
+      "id": "chat-mina-talk",
+      "npc_id": "npc-mina",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "Of course. Ask me anything.",
+      "pose": "greet",
+      "replies": [
+        {
+          "label": "why the stethoscope?",
+          "next": "chat-mina-steth"
+        },
+        {
+          "label": "how do you stay calm?",
+          "next": "chat-mina-calm"
+        },
+        {
+          "label": "never mind",
+          "next": "chat-mina-menu"
+        }
+      ],
+      "position": 14
+    },
+    {
+      "id": "chat-mina-unit-end",
+      "npc_id": "npc-mina",
+      "kind": "sign_off",
+      "trigger": null,
+      "title": null,
+      "text": "Take care of yourself.\n\nI'm here if you want to talk through anything.",
+      "pose": "greet",
+      "replies": [],
+      "position": 43
+    },
+    {
+      "id": "chat-mina-unit-now",
+      "npc_id": "npc-mina",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "Practise whenever you like. Replay a lesson, or try a round of Myth Buster.\n\nMore is on the way to the app, and I'll be here when it arrives.\n\nThe questions are there for you.",
+      "pose": "idle",
+      "replies": [
+        {
+          "label": "A quick round",
+          "action": {
+            "screen": "mythbuster",
+            "id": "radiation-and-the-body"
+          }
+        },
+        {
+          "label": "a quick round",
+          "next": "chat-mina-unit-end"
+        },
+        {
+          "label": "later",
+          "next": "chat-mina-unit-end"
+        }
+      ],
+      "position": 42
+    },
+    {
+      "id": "chat-mina-unit-thanks",
+      "npc_id": "npc-mina",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "You're welcome. You did the work, and you did it patiently.\n\nNext time a number sounds frightening, you'll know what to ask.",
+      "pose": "greet",
+      "replies": [
+        {
+          "label": "size, speed, comparison",
+          "next": "chat-mina-unit-now"
+        },
+        {
+          "label": "I will",
+          "next": "chat-mina-unit-now"
+        }
+      ],
+      "position": 41
+    },
+    {
+      "id": "chat-mina-up-apron",
+      "npc_id": "npc-mina",
+      "kind": "unprompted",
+      "trigger": "lessons_completed:19",
+      "title": "At the dentist",
+      "text": "I'm at the dentist.\n\nThey've just put a heavy lead apron over me for an X-ray of my teeth.",
+      "pose": "explain",
+      "replies": [
+        {
+          "label": "nerd",
+          "next": "chat-mina-apron-nerd",
+          "type": "emoji"
+        },
+        {
+          "label": "star",
+          "next": "chat-mina-apron-star",
+          "type": "emoji"
+        },
+        {
+          "label": "radiation",
+          "next": "chat-mina-apron-rad",
+          "type": "emoji"
+        }
+      ],
+      "position": 32
+    },
+    {
+      "id": "chat-mina-up-hello",
+      "npc_id": "npc-mina",
+      "kind": "unprompted",
+      "trigger": "lessons_completed:16",
+      "title": "Hello, I'm Mina",
+      "text": "Hello. I'm Mina.\n\nI teach what radiation does to the body, and how big a dose really is.\n\nYou've finished my first lesson. Thank you for starting with me.",
+      "pose": "greet",
+      "replies": [
+        {
+          "label": "hi Mina",
+          "next": "chat-mina-hello-hi"
+        },
+        {
+          "label": "Ray said you're calm",
+          "next": "chat-mina-hello-ray"
+        },
+        {
+          "label": "is this unit scary?",
+          "next": "chat-mina-hello-scary"
+        }
+      ],
+      "position": 18
+    },
+    {
+      "id": "chat-mina-up-unit",
+      "npc_id": "npc-mina",
+      "kind": "unprompted",
+      "trigger": "unit_complete:radiation-and-the-body",
+      "title": "Radiation and the Body: done",
+      "text": "You've finished the unit.\n\nYou can say how big a dose is, how cells cope with damage, why a big fast dose is different from a small slow one, and how time, distance and shielding lower a dose.\n\nThat's a calm, solid understanding.",
+      "pose": "proud",
+      "replies": [
+        {
+          "label": "thanks Mina",
+          "next": "chat-mina-unit-thanks"
+        },
+        {
+          "label": "what now?",
+          "next": "chat-mina-unit-now"
+        }
+      ],
+      "position": 40
+    },
+    {
+      "id": "chat-mina-up-welcome-back",
+      "npc_id": "npc-mina",
+      "kind": "unprompted",
+      "trigger": "welcome_back",
+      "title": "Welcome back",
+      "text": "Welcome back.\n\nThere's no rush. Your place is kept right where you left it.",
+      "pose": "greet",
+      "replies": [
+        {
+          "label": "thanks Mina",
+          "next": "chat-mina-back-thanks"
+        },
+        {
+          "label": "did you miss me?",
+          "next": "chat-mina-back-miss"
+        },
+        {
+          "label": "what have you been doing?",
+          "next": "chat-mina-back-up"
+        }
+      ],
+      "position": 44
+    },
+    {
+      "id": "chat-mina-up-worry",
+      "npc_id": "npc-mina",
+      "kind": "unprompted",
+      "trigger": "lessons_completed:17",
+      "title": "A message from a friend",
+      "text": "A friend sent me a message.\n\nIt says: radiation damages DNA, so any radiation at all is dangerous.\n\nI want to answer kindly. Can you help me?",
+      "pose": "think",
+      "replies": [
+        {
+          "label": "that's half right",
+          "next": "chat-mina-worry-half"
+        },
+        {
+          "label": "it's true",
+          "next": "chat-mina-worry-true"
+        },
+        {
+          "label": "what would you say?",
+          "next": "chat-mina-worry-say"
+        }
+      ],
+      "position": 24
+    },
+    {
+      "id": "chat-mina-w-deadly",
+      "npc_id": "npc-mina",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "No. Everyone gets small doses every day.\n\nIt takes a very large dose in a short time, about 1000 millisieverts, to make people ill.",
+      "pose": "explain",
+      "replies": [
+        {
+          "label": "Open it in AtomDex",
+          "action": {
+            "screen": "entry",
+            "id": "acute-radiation-syndrome"
+          }
+        },
+        {
+          "label": "thanks, that helps",
+          "next": "chat-mina-menu"
+        },
+        {
+          "label": "what about small doses?",
+          "next": "chat-mina-w-small"
+        }
+      ],
+      "position": 7
+    },
+    {
+      "id": "chat-mina-w-everywhere",
+      "npc_id": "npc-mina",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "It is around us all the time. That's true, and it's normal.\n\nIn the United States the average person gets about 6.2 millisieverts a year, and most of it is natural background radiation.",
+      "pose": "explain",
+      "replies": [
+        {
+          "label": "Open it in AtomDex",
+          "action": {
+            "screen": "entry",
+            "id": "background-radiation"
+          }
+        },
+        {
+          "label": "thanks, that helps",
+          "next": "chat-mina-menu"
+        },
+        {
+          "label": "where does it come from?",
+          "next": "chat-mina-w-where"
+        }
+      ],
+      "position": 5
+    },
+    {
+      "id": "chat-mina-w-headline",
+      "npc_id": "npc-mina",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "A number in a headline needs three questions.\n\nHow big is the dose? How fast did it arrive? And how does it compare with doses you know?",
+      "pose": "point",
+      "replies": [
+        {
+          "label": "that's a good list",
+          "next": "chat-mina-menu"
+        },
+        {
+          "label": "I'll try that",
+          "next": "chat-mina-menu"
+        }
+      ],
+      "position": 9
+    },
+    {
+      "id": "chat-mina-w-small",
+      "npc_id": "npc-mina",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "Low levels do not cause immediate health effects.\n\nThey can add a small increase in the risk of cancer over a lifetime. A small chance, not a certainty.",
+      "pose": "idle",
+      "replies": [
+        {
+          "label": "ok, back",
+          "next": "chat-mina-menu"
+        },
+        {
+          "label": "so it's a small chance",
+          "next": "chat-mina-menu"
+        }
+      ],
+      "position": 8
+    },
+    {
+      "id": "chat-mina-w-where",
+      "npc_id": "npc-mina",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "Rocks and soil, space, and radon in the air all add to it.\n\nEvery one of those is part of an ordinary year.",
+      "pose": "explain",
+      "replies": [
+        {
+          "label": "ok, back",
+          "next": "chat-mina-menu"
+        },
+        {
+          "label": "that's reassuring",
+          "next": "chat-mina-menu"
+        }
+      ],
+      "position": 6
+    },
+    {
+      "id": "chat-mina-worry",
+      "npc_id": "npc-mina",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "That's fair. A lot of people feel that way about radiation.\n\nWhat is it that worries you?",
+      "pose": "think",
+      "replies": [
+        {
+          "label": "it's everywhere",
+          "next": "chat-mina-w-everywhere"
+        },
+        {
+          "label": "is any amount deadly?",
+          "next": "chat-mina-w-deadly"
+        },
+        {
+          "label": "scary headlines",
+          "next": "chat-mina-w-headline"
+        },
+        {
+          "label": "never mind",
+          "next": "chat-mina-menu"
+        }
+      ],
+      "position": 4
+    },
+    {
+      "id": "chat-mina-worry-end",
+      "npc_id": "npc-mina",
+      "kind": "sign_off",
+      "trigger": null,
+      "title": null,
+      "text": "I'll send my friend that. Thank you.\n\nBoth halves, said kindly.",
+      "pose": "greet",
+      "replies": [],
+      "position": 31
+    },
+    {
+      "id": "chat-mina-worry-half",
+      "npc_id": "npc-mina",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "Yes, that's the half my friend has. Ionizing radiation can damage the DNA in a cell.\n\nWhat is the other half?",
+      "pose": "proud",
+      "replies": [
+        {
+          "label": "cells repair damage",
+          "next": "chat-mina-worry-repair"
+        },
+        {
+          "label": "it never really matters",
+          "next": "chat-mina-worry-matter"
+        }
+      ],
+      "position": 25
+    },
+    {
+      "id": "chat-mina-worry-matter",
+      "npc_id": "npc-mina",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "It does matter. If damage is not repaired correctly, a cell may die or eventually become cancerous.\n\nThat's why repair, and the size of a dose, matter.",
+      "pose": "think",
+      "replies": [
+        {
+          "label": "ok, so repair is the other half",
+          "next": "chat-mina-worry-repair"
+        },
+        {
+          "label": "I see",
+          "next": "chat-mina-worry-repair"
+        }
+      ],
+      "position": 29
+    },
+    {
+      "id": "chat-mina-worry-not",
+      "npc_id": "npc-mina",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "Then a cell may die or eventually become cancerous. That's real, and it's why the size of a dose matters.\n\nA small dose, or one spread over time, gives repair more of a chance.",
+      "pose": "idle",
+      "replies": [
+        {
+          "label": "got it",
+          "next": "chat-mina-worry-end"
+        },
+        {
+          "label": "thanks",
+          "next": "chat-mina-worry-end"
+        }
+      ],
+      "position": 30
+    },
+    {
+      "id": "chat-mina-worry-repair",
+      "npc_id": "npc-mina",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "Yes. Cells are extremely efficient at repairing damage, and they do it all the time.\n\nThat's the missing half.",
+      "pose": "proud",
+      "replies": [
+        {
+          "label": "tell your friend that",
+          "next": "chat-mina-worry-end"
+        },
+        {
+          "label": "what if it isn't repaired?",
+          "next": "chat-mina-worry-not"
+        }
+      ],
+      "position": 28
+    },
+    {
+      "id": "chat-mina-worry-say",
+      "npc_id": "npc-mina",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "I'd say: yes, radiation can damage DNA. And cells are extremely efficient at repairing that damage.\n\nSo a small everyday dose does not make anyone ill.",
+      "pose": "explain",
+      "replies": [
+        {
+          "label": "that's kind and clear",
+          "next": "chat-mina-worry-end"
+        },
+        {
+          "label": "what if the damage isn't repaired?",
+          "next": "chat-mina-worry-not"
+        }
+      ],
+      "position": 27
+    },
+    {
+      "id": "chat-mina-worry-true",
+      "npc_id": "npc-mina",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "Part of it is true. Radiation can damage DNA.\n\nBut everyone gets small doses every day and is not ill. So something else must be going on.",
+      "pose": "explain",
+      "replies": [
+        {
+          "label": "repair?",
+          "next": "chat-mina-worry-repair"
+        },
+        {
+          "label": "I'm not sure",
+          "next": "chat-mina-worry-say"
+        }
+      ],
+      "position": 26
+    },
+    {
+      "id": "chat-ray-airport-contam",
+      "npc_id": "npc-ray",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "Radioactive material on the bag. Dust on it. Or inside it.\n\nNothing like that here. Just a machine making X-rays and a bag passing through.",
+      "pose": "point",
+      "replies": [
+        {
+          "label": "nerd",
+          "next": "chat-ray-airport-end",
+          "type": "emoji"
+        },
+        {
+          "label": "star",
+          "next": "chat-ray-airport-end",
+          "type": "emoji"
+        }
+      ],
+      "position": 31
+    },
+    {
+      "id": "chat-ray-airport-end",
+      "npc_id": "npc-ray",
+      "kind": "sign_off",
+      "trigger": null,
+      "title": null,
+      "text": "Bag's through. Collecting it.\n\nShort version: exposed isn't contaminated. Remember it.",
+      "pose": "greet",
+      "replies": [],
+      "position": 32
+    },
+    {
+      "id": "chat-ray-airport-miss",
+      "npc_id": "npc-ray",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "Not quite. Radiation doesn't spread. Only the material does.\n\nRadiation from a source can reach you. That's exposure. It isn't contamination.",
+      "pose": "explain",
+      "replies": [
+        {
+          "label": "ok, that makes sense",
+          "next": "chat-ray-airport-end"
+        },
+        {
+          "label": "so what would contamination be?",
+          "next": "chat-ray-airport-contam"
+        }
+      ],
+      "position": 30
+    },
+    {
+      "id": "chat-ray-airport-right",
+      "npc_id": "npc-ray",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "Right. No material, nothing to spread.\n\nExposure and contamination aren't the same. The bag is exposed to the X-rays for a moment. It isn't carrying anything.",
+      "pose": "proud",
+      "replies": [
+        {
+          "label": "nerd",
+          "next": "chat-ray-airport-end",
+          "type": "emoji"
+        },
+        {
+          "label": "star",
+          "next": "chat-ray-airport-end",
+          "type": "emoji"
+        }
+      ],
+      "position": 29
+    },
+    {
+      "id": "chat-ray-airport-will",
+      "npc_id": "npc-ray",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "Think it through. You know this one.\n\nAn X-ray is radiation. Radiation is energy. It doesn't spread. Radioactive material does, if it's there.\n\nIs there radioactive material in my bag?",
+      "pose": "think",
+      "replies": [
+        {
+          "label": "no, so nothing to spread",
+          "next": "chat-ray-airport-right"
+        },
+        {
+          "label": "yes, the X-rays leave some",
+          "next": "chat-ray-airport-miss"
+        }
+      ],
+      "position": 27
+    },
+    {
+      "id": "chat-ray-airport-wrong",
+      "npc_id": "npc-ray",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "I told them what I'd tell you. Don't mix up two different things.\n\nExposed: in the path of radiation. Contaminated: radioactive material on you or in you.\n\nMy bag's exposed. It isn't contaminated. Different things.",
+      "pose": "proud",
+      "replies": [
+        {
+          "label": "oh, I get it",
+          "next": "chat-ray-airport-end"
+        },
+        {
+          "label": "so what would contamination be?",
+          "next": "chat-ray-airport-contam"
+        }
+      ],
+      "position": 28
+    },
+    {
+      "id": "chat-ray-back-miss",
+      "npc_id": "npc-ray",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "A little. The clipboard was quiet.\n\nI won't say more than that. It would break rule one. No hype.",
+      "pose": "sorry",
+      "replies": [
+        {
+          "label": "ha, ok",
+          "next": "chat-ray-back-ready"
+        },
+        {
+          "label": "aw",
+          "next": "chat-ray-back-ready"
+        }
+      ],
+      "position": 48
+    },
+    {
+      "id": "chat-ray-back-ready",
+      "npc_id": "npc-ray",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "Ready?",
+      "pose": "point",
+      "replies": [
+        {
+          "label": "Take me there",
+          "action": {
+            "screen": "next-lesson"
+          }
+        },
+        {
+          "label": "A quick round first",
+          "action": {
+            "screen": "mythbuster",
+            "id": "radiation-meets-matter"
+          }
+        },
+        {
+          "label": "not today, sorry",
+          "next": "chat-ray-bye"
+        }
+      ],
+      "position": 50
+    },
+    {
+      "id": "chat-ray-back-thanks",
+      "npc_id": "npc-ray",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "Noted.\n\nPick up where you stopped. One lesson. That's the plan.",
+      "pose": "proud",
+      "replies": [
+        {
+          "label": "ok, let's go",
+          "next": "chat-ray-back-ready"
+        },
+        {
+          "label": "warm-up first",
+          "next": "chat-ray-back-ready"
+        }
+      ],
+      "position": 47
+    },
+    {
+      "id": "chat-ray-back-up",
+      "npc_id": "npc-ray",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "Checking readings. Kitchen, roof, parking lot. Small numbers. Always a small number.\n\nLunch, mostly. I'm improving.",
+      "pose": "think",
+      "replies": [
+        {
+          "label": "good for you",
+          "next": "chat-ray-back-ready"
+        },
+        {
+          "label": "lol",
+          "next": "chat-ray-back-ready"
+        }
+      ],
+      "position": 49
+    },
+    {
+      "id": "chat-ray-behind",
+      "npc_id": "npc-ray",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "Fine. Behind is a position. Not a verdict.\n\nPlan: one lesson. That's all. Then we recount.",
+      "pose": "point",
+      "replies": [
+        {
+          "label": "Take me there",
+          "action": {
+            "screen": "next-lesson"
+          }
+        },
+        {
+          "label": "ok, one lesson",
+          "next": "chat-ray-bye"
+        },
+        {
+          "label": "what if I'm too tired",
+          "next": "chat-ray-tired"
+        }
+      ],
+      "position": 3
+    },
+    {
+      "id": "chat-ray-bye",
+      "npc_id": "npc-ray",
+      "kind": "sign_off",
+      "trigger": null,
+      "title": null,
+      "text": "Noted. Go.\n\nCome back with a question. Short answer guaranteed.",
+      "pose": "proud",
+      "replies": [],
+      "position": 17
+    },
+    {
+      "id": "chat-ray-clip",
+      "npc_id": "npc-ray",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "A checklist.\n\nOne: no hype. Two: no scare. Three: say what the sources say. Four: lunch.\n\nFour gets skipped. I'm working on it.",
+      "pose": "point",
+      "replies": [
+        {
+          "label": "lunch matters",
+          "next": "chat-ray-clip-lunch"
+        },
+        {
+          "label": "that's a good list",
+          "next": "chat-ray-talk"
+        }
+      ],
+      "position": 12
+    },
+    {
+      "id": "chat-ray-clip-lunch",
+      "npc_id": "npc-ray",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "Noted. Item four moves up to item two.\n\nDon't tell anyone.",
+      "pose": "proud",
+      "replies": [
+        {
+          "label": "haha",
+          "next": "chat-ray-talk",
+          "type": "react"
+        },
+        {
+          "label": "like",
+          "next": "chat-ray-talk",
+          "type": "react"
+        }
+      ],
+      "position": 13
+    },
+    {
+      "id": "chat-ray-cnt-bg",
+      "npc_id": "npc-ray",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "Right. Noted.\n\nAlways there. Varies from place to place on Earth. So the reading varies too.",
+      "pose": "proud",
+      "replies": [
+        {
+          "label": "so zero is wrong?",
+          "next": "chat-ray-cnt-zero"
+        },
+        {
+          "label": "cool",
+          "next": "chat-ray-cnt-end"
+        }
+      ],
+      "position": 36
+    },
+    {
+      "id": "chat-ray-cnt-broken",
+      "npc_id": "npc-ray",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "No. I checked it. Twice.\n\nA working detector picks up radiation. A little is always around. So a small reading is expected.",
+      "pose": "sorry",
+      "replies": [
+        {
+          "label": "so what is it picking up?",
+          "next": "chat-ray-cnt-what"
+        },
+        {
+          "label": "ok, not broken",
+          "next": "chat-ray-cnt-end"
+        }
+      ],
+      "position": 34
+    },
+    {
+      "id": "chat-ray-cnt-end",
+      "npc_id": "npc-ray",
+      "kind": "sign_off",
+      "trigger": null,
+      "title": null,
+      "text": "Counter's staying on the table. Small number, small mystery.\n\nChecked off.",
+      "pose": "greet",
+      "replies": [],
+      "position": 40
+    },
+    {
+      "id": "chat-ray-cnt-hidden",
+      "npc_id": "npc-ray",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "No hidden source. I looked.\n\nBackground radiation is present on Earth at all times. Mostly natural minerals in the ground, soil and water. Plus cosmic radiation from space.",
+      "pose": "explain",
+      "replies": [
+        {
+          "label": "even in a kitchen?",
+          "next": "chat-ray-cnt-what"
+        },
+        {
+          "label": "ok",
+          "next": "chat-ray-cnt-end"
+        }
+      ],
+      "position": 35
+    },
+    {
+      "id": "chat-ray-cnt-use",
+      "npc_id": "npc-ray",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "To tell the usual level from something higher.\n\nYou need to know the normal reading before you can say a reading is unusual. Measure the background first. Then compare.",
+      "pose": "think",
+      "replies": [
+        {
+          "label": "clap",
+          "next": "chat-ray-cnt-end",
+          "type": "react"
+        },
+        {
+          "label": "think",
+          "next": "chat-ray-cnt-end",
+          "type": "react"
+        }
+      ],
+      "position": 39
+    },
+    {
+      "id": "chat-ray-cnt-what",
+      "npc_id": "npc-ray",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "Minerals in the ground. Cosmic radiation. A little from the food and from me.\n\nThat's the short list. Nothing here is a source anyone would call a source.",
+      "pose": "point",
+      "replies": [
+        {
+          "label": "so why use a counter at all?",
+          "next": "chat-ray-cnt-use"
+        },
+        {
+          "label": "good to know",
+          "next": "chat-ray-cnt-end"
+        }
+      ],
+      "position": 37
+    },
+    {
+      "id": "chat-ray-cnt-zero",
+      "npc_id": "npc-ray",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "In an ordinary room, a working detector shouldn't read exactly zero.\n\nIf it does, check the batteries.",
+      "pose": "explain",
+      "replies": [
+        {
+          "label": "ha, noted",
+          "next": "chat-ray-cnt-end"
+        },
+        {
+          "label": "good tip",
+          "next": "chat-ray-cnt-end"
+        }
+      ],
+      "position": 38
+    },
+    {
+      "id": "chat-ray-counter",
+      "npc_id": "npc-ray",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "Hand-held. Goes everywhere I go.\n\nIt reads something wherever I take it. Kitchen. Roof. Parking lot. That's normal. Background. Lesson four.",
+      "pose": "think",
+      "replies": [
+        {
+          "label": "so it's never zero?",
+          "next": "chat-ray-counter-zero"
+        },
+        {
+          "label": "ok",
+          "next": "chat-ray-talk"
+        }
+      ],
+      "position": 14
+    },
+    {
+      "id": "chat-ray-counter-zero",
+      "npc_id": "npc-ray",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "A working detector picks up a little almost anywhere. Background radiation is always there.\n\nCheck the lesson if you want the full version.",
+      "pose": "explain",
+      "replies": [
+        {
+          "label": "got it",
+          "next": "chat-ray-talk"
+        },
+        {
+          "label": "back to the list",
+          "next": "chat-ray-menu"
+        }
+      ],
+      "position": 15
+    },
+    {
+      "id": "chat-ray-greeting",
+      "npc_id": "npc-ray",
+      "kind": "greeting",
+      "trigger": null,
+      "title": "Chat",
+      "text": "Ray.\n\nClipboard's out. Status?",
+      "pose": "greet",
+      "replies": [
+        {
+          "label": "on track",
+          "next": "chat-ray-ontrack"
+        },
+        {
+          "label": "behind",
+          "next": "chat-ray-behind"
+        },
+        {
+          "label": "stuck",
+          "next": "chat-ray-stuck"
+        },
+        {
+          "label": "just talking",
+          "next": "chat-ray-talk"
+        },
+        {
+          "label": "gotta go",
+          "next": "chat-ray-bye"
+        }
+      ],
+      "position": 0
+    },
+    {
+      "id": "chat-ray-hello-ada",
+      "npc_id": "npc-ray",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "Ada says a lot of things. Most of them in lower case.\n\nShe's right about this one. I'm serious. About the work. Not about everything. I have a hoodie.",
+      "pose": "think",
+      "replies": [
+        {
+          "label": "lol the hoodie",
+          "next": "chat-ray-hello-deal"
+        },
+        {
+          "label": "ok, serious is fine",
+          "next": "chat-ray-hello-deal"
+        }
+      ],
+      "position": 20
+    },
+    {
+      "id": "chat-ray-hello-big",
+      "npc_id": "npc-ray",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "Then you say the number and the unit. If it's big, the number is big. No adjectives needed.",
+      "pose": "explain",
+      "replies": [
+        {
+          "label": "fair enough",
+          "next": "chat-ray-hello-deal"
+        },
+        {
+          "label": "ok, noted",
+          "next": "chat-ray-hello-deal"
+        }
+      ],
+      "position": 23
+    },
+    {
+      "id": "chat-ray-hello-clip",
+      "npc_id": "npc-ray",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "A checklist. Every lesson, one item.\n\nToday's item: ionizing or not. Checked off. You did that one.",
+      "pose": "point",
+      "replies": [
+        {
+          "label": "what's next on the list?",
+          "next": "chat-ray-hello-deal"
+        },
+        {
+          "label": "do you ever cross something out?",
+          "next": "chat-ray-hello-cross"
+        }
+      ],
+      "position": 21
+    },
+    {
+      "id": "chat-ray-hello-cross",
+      "npc_id": "npc-ray",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "Once. I wrote lunch at the top. Crossed it out. Wrote it again.\n\nLunch was not a good week.",
+      "pose": "sorry",
+      "replies": [
+        {
+          "label": "poor Ray",
+          "next": "chat-ray-hello-deal"
+        },
+        {
+          "label": "lunch is important",
+          "next": "chat-ray-hello-deal"
+        }
+      ],
+      "position": 24
+    },
+    {
+      "id": "chat-ray-hello-deal",
+      "npc_id": "npc-ray",
+      "kind": "sign_off",
+      "trigger": null,
+      "title": null,
+      "text": "Good. Next lessons: what stops what, and exposed or contaminated.\n\nGo do them. I'll be here with the clipboard.",
+      "pose": "point",
+      "replies": [],
+      "position": 25
+    },
+    {
+      "id": "chat-ray-hello-hi",
+      "npc_id": "npc-ray",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "Hi. Short and good.\n\nHere's how this goes. I'll tell you what the sources say. No hype. No scare. If I don't know, I say so.",
+      "pose": "idle",
+      "replies": [
+        {
+          "label": "that sounds good",
+          "next": "chat-ray-hello-deal"
+        },
+        {
+          "label": "you don't do hype at all?",
+          "next": "chat-ray-hello-hype"
+        }
+      ],
+      "position": 19
+    },
+    {
+      "id": "chat-ray-hello-hype",
+      "npc_id": "npc-ray",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "None. Hype is a way of saying a thing is bigger than it is.\n\nRadiation is what it is. We measure it. We say the number. That's the job.",
+      "pose": "proud",
+      "replies": [
+        {
+          "label": "ok I like that",
+          "next": "chat-ray-hello-deal"
+        },
+        {
+          "label": "what if a thing is actually big?",
+          "next": "chat-ray-hello-big"
+        }
+      ],
+      "position": 22
+    },
+    {
+      "id": "chat-ray-hoodie",
+      "npc_id": "npc-ray",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "Purple. Warm. Pockets.\n\nThe clipboard doesn't fit in the pocket. I've tried. We don't discuss it.",
+      "pose": "greet",
+      "replies": [
+        {
+          "label": "nerd",
+          "next": "chat-ray-talk",
+          "type": "emoji"
+        },
+        {
+          "label": "star",
+          "next": "chat-ray-talk",
+          "type": "emoji"
+        }
+      ],
+      "position": 16
+    },
+    {
+      "id": "chat-ray-menu",
+      "npc_id": "npc-ray",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "Again. Status?\n\nOn track, behind, stuck, talking or leaving. Pick one.",
+      "pose": "idle",
+      "replies": [
+        {
+          "label": "on track",
+          "next": "chat-ray-ontrack"
+        },
+        {
+          "label": "behind",
+          "next": "chat-ray-behind"
+        },
+        {
+          "label": "stuck",
+          "next": "chat-ray-stuck"
+        },
+        {
+          "label": "just talking",
+          "next": "chat-ray-talk"
+        },
+        {
+          "label": "gotta go",
+          "next": "chat-ray-bye"
+        }
+      ],
+      "position": 1
+    },
+    {
+      "id": "chat-ray-ontrack",
+      "npc_id": "npc-ray",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "Good. Noted.\n\nNext job is on the map. Go do it.",
+      "pose": "proud",
+      "replies": [
+        {
+          "label": "Take me there",
+          "action": {
+            "screen": "next-lesson"
+          }
+        },
+        {
+          "label": "quiz me first",
+          "next": "chat-ray-quiz"
+        },
+        {
+          "label": "later",
+          "next": "chat-ray-menu"
+        }
+      ],
+      "position": 2
+    },
+    {
+      "id": "chat-ray-quiz",
+      "npc_id": "npc-ray",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "A round of Myth Buster. Radiation and matter.\n\nFair questions. Short. Go.",
+      "pose": "explain",
+      "replies": [
+        {
+          "label": "Start the round",
+          "action": {
+            "screen": "mythbuster",
+            "id": "radiation-meets-matter"
+          }
+        },
+        {
+          "label": "not now",
+          "next": "chat-ray-menu"
+        }
+      ],
+      "position": 5
+    },
+    {
+      "id": "chat-ray-r-contam",
+      "npc_id": "npc-ray",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "Exposed: you're in the path of radiation from a source.\n\nContaminated: radioactive material is on you or in you.\n\nRadiation doesn't spread. The material does.",
+      "pose": "explain",
+      "replies": [
+        {
+          "label": "Open it in AtomDex",
+          "action": {
+            "screen": "entry",
+            "id": "radioactive-contamination"
+          }
+        },
+        {
+          "label": "thanks, back",
+          "next": "chat-ray-menu"
+        }
+      ],
+      "position": 8
+    },
+    {
+      "id": "chat-ray-r-ion",
+      "npc_id": "npc-ray",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "Ionizing: enough energy to knock electrons out of atoms. X-rays, gamma rays, alpha and beta.\n\nNon-ionizing: radio waves, microwaves, visible light.",
+      "pose": "explain",
+      "replies": [
+        {
+          "label": "Open it in AtomDex",
+          "action": {
+            "screen": "entry",
+            "id": "ionizing-radiation"
+          }
+        },
+        {
+          "label": "thanks, back",
+          "next": "chat-ray-menu"
+        }
+      ],
+      "position": 9
+    },
+    {
+      "id": "chat-ray-r-stops",
+      "npc_id": "npc-ray",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "Alpha: paper, or the outer layer of skin.\n\nBeta: a thin layer of metal.\n\nGamma: several inches of lead, or a few feet of concrete.\n\nThree kinds. Three different stoppers.",
+      "pose": "explain",
+      "replies": [
+        {
+          "label": "Open it in AtomDex",
+          "action": {
+            "screen": "entry",
+            "id": "shielding"
+          }
+        },
+        {
+          "label": "thanks, back",
+          "next": "chat-ray-menu"
+        }
+      ],
+      "position": 7
+    },
+    {
+      "id": "chat-ray-r-units",
+      "npc_id": "npc-ray",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "Becquerel: decays per second of a source.\n\nGray: energy absorbed per kilogram.\n\nSievert: potential for harm.\n\nDifferent questions. Don't swap them.",
+      "pose": "explain",
+      "replies": [
+        {
+          "label": "Open it in AtomDex",
+          "action": {
+            "screen": "entry",
+            "id": "sievert"
+          }
+        },
+        {
+          "label": "thanks, back",
+          "next": "chat-ray-menu"
+        }
+      ],
+      "position": 10
+    },
+    {
+      "id": "chat-ray-stuck",
+      "npc_id": "npc-ray",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "Stuck where? Name it. I'll give you the short version.",
+      "pose": "think",
+      "replies": [
+        {
+          "label": "what stops what",
+          "next": "chat-ray-r-stops"
+        },
+        {
+          "label": "exposed or contaminated",
+          "next": "chat-ray-r-contam"
+        },
+        {
+          "label": "ionizing or not",
+          "next": "chat-ray-r-ion"
+        },
+        {
+          "label": "the units",
+          "next": "chat-ray-r-units"
+        },
+        {
+          "label": "never mind",
+          "next": "chat-ray-menu"
+        }
+      ],
+      "position": 6
+    },
+    {
+      "id": "chat-ray-talk",
+      "npc_id": "npc-ray",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "Fine. Ask. Short answers only.",
+      "pose": "greet",
+      "replies": [
+        {
+          "label": "what's on the clipboard?",
+          "next": "chat-ray-clip"
+        },
+        {
+          "label": "what's the counter doing?",
+          "next": "chat-ray-counter"
+        },
+        {
+          "label": "why the hoodie?",
+          "next": "chat-ray-hoodie"
+        },
+        {
+          "label": "never mind",
+          "next": "chat-ray-menu"
+        }
+      ],
+      "position": 11
+    },
+    {
+      "id": "chat-ray-tired",
+      "npc_id": "npc-ray",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "Then do a short thing. A quiz. Five minutes.\n\nA short thing counts. Checked off is checked off.",
+      "pose": "think",
+      "replies": [
+        {
+          "label": "A quick round",
+          "action": {
+            "screen": "mythbuster",
+            "id": "radiation-meets-matter"
+          }
+        },
+        {
+          "label": "ok, fair",
+          "next": "chat-ray-menu"
+        }
+      ],
+      "position": 4
+    },
+    {
+      "id": "chat-ray-unit-advice",
+      "npc_id": "npc-ray",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "One. Ask what the number is for, every time. A number with no unit and no source isn't information.\n\nTwo. Eat lunch.",
+      "pose": "explain",
+      "replies": [
+        {
+          "label": "haha",
+          "next": "chat-ray-unit-end",
+          "type": "react"
+        },
+        {
+          "label": "like",
+          "next": "chat-ray-unit-end",
+          "type": "react"
+        }
+      ],
+      "position": 44
+    },
+    {
+      "id": "chat-ray-unit-end",
+      "npc_id": "npc-ray",
+      "kind": "sign_off",
+      "trigger": null,
+      "title": null,
+      "text": "Good. Go.\n\nThe clipboard stays here. Item added: you.",
+      "pose": "proud",
+      "replies": [],
+      "position": 45
+    },
+    {
+      "id": "chat-ray-unit-mina",
+      "npc_id": "npc-ray",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "Mina's next. Radiation and the body.\n\nShe's calm. She takes it one step at a time. She'll tell you what the sources say about dose and risk. At your own pace.\n\nGood teacher. Go and meet her.",
+      "pose": "point",
+      "replies": [
+        {
+          "label": "Take me there",
+          "action": {
+            "screen": "next-lesson"
+          }
+        },
+        {
+          "label": "ok, I'm ready",
+          "next": "chat-ray-unit-end"
+        },
+        {
+          "label": "any advice?",
+          "next": "chat-ray-unit-advice"
+        }
+      ],
+      "position": 43
+    },
+    {
+      "id": "chat-ray-unit-thanks",
+      "npc_id": "npc-ray",
+      "kind": "reply",
+      "trigger": null,
+      "title": null,
+      "text": "You're welcome. You did the work.\n\nShort note on the clipboard: good learner. Asked good questions. Underlined twice.",
+      "pose": "greet",
+      "replies": [
+        {
+          "label": "aw, underlined twice",
+          "next": "chat-ray-unit-mina"
+        },
+        {
+          "label": "what's next?",
+          "next": "chat-ray-unit-mina"
+        }
+      ],
+      "position": 42
+    },
+    {
+      "id": "chat-ray-up-airport",
+      "npc_id": "npc-ray",
+      "kind": "unprompted",
+      "trigger": "lessons_completed:13",
+      "title": "Airport. Bag. X-ray.",
+      "text": "I'm in the airport security line.\n\nMy bag is on the belt. It's going into the X-ray machine. Machine's making X-rays. Bag's getting scanned.\n\nSomeone behind me just asked if the bag will come out radioactive.",
+      "pose": "explain",
+      "replies": [
+        {
+          "label": "will it?",
+          "next": "chat-ray-airport-will"
+        },
+        {
+          "label": "that person is wrong, right?",
+          "next": "chat-ray-airport-wrong"
+        }
+      ],
+      "position": 26
+    },
+    {
+      "id": "chat-ray-up-counter",
+      "npc_id": "npc-ray",
+      "kind": "unprompted",
+      "trigger": "lessons_completed:14",
+      "title": "The counter reads something",
+      "text": "I'm in my kitchen.\n\nNo source here. Hand-held counter's on the table. It shows a reading.\n\nNot zero. A small number.",
+      "pose": "think",
+      "replies": [
+        {
+          "label": "is it broken?",
+          "next": "chat-ray-cnt-broken"
+        },
+        {
+          "label": "is there a hidden source?",
+          "next": "chat-ray-cnt-hidden"
+        },
+        {
+          "label": "it's background, right?",
+          "next": "chat-ray-cnt-bg"
+        }
+      ],
+      "position": 33
+    },
+    {
+      "id": "chat-ray-up-hello",
+      "npc_id": "npc-ray",
+      "kind": "unprompted",
+      "trigger": "lessons_completed:11",
+      "title": "Ray. Radiation. Hello.",
+      "text": "Ray.\n\nI teach what radiation does when it meets things. And what stops it.\n\nYou've finished my first lesson. Noted.",
+      "pose": "greet",
+      "replies": [
+        {
+          "label": "hi Ray",
+          "next": "chat-ray-hello-hi"
+        },
+        {
+          "label": "Ada said you're serious",
+          "next": "chat-ray-hello-ada"
+        },
+        {
+          "label": "what's with the clipboard?",
+          "next": "chat-ray-hello-clip"
+        }
+      ],
+      "position": 18
+    },
+    {
+      "id": "chat-ray-up-unit",
+      "npc_id": "npc-ray",
+      "kind": "unprompted",
+      "trigger": "unit_complete:radiation-meets-matter",
+      "title": "Radiation Meets Matter: done",
+      "text": "Unit done.\n\nYou can say what's ionizing and what isn't. What stops alpha, beta and gamma. Exposed versus contaminated. How radiation is detected. Which unit answers which question.\n\nThat's the whole list. Every item checked off.",
+      "pose": "proud",
+      "replies": [
+        {
+          "label": "thanks Ray",
+          "next": "chat-ray-unit-thanks"
+        },
+        {
+          "label": "what's next?",
+          "next": "chat-ray-unit-mina"
+        }
+      ],
+      "position": 41
+    },
+    {
+      "id": "chat-ray-up-welcome-back",
+      "npc_id": "npc-ray",
+      "kind": "unprompted",
+      "trigger": "welcome_back",
+      "title": "Welcome back",
+      "text": "You're back.\n\nI kept your place on the clipboard. It's the line with the star.\n\nNo lecture. You're here now. That's what counts.",
+      "pose": "greet",
+      "replies": [
+        {
+          "label": "thanks Ray",
+          "next": "chat-ray-back-thanks"
+        },
+        {
+          "label": "did you miss me?",
+          "next": "chat-ray-back-miss"
+        },
+        {
+          "label": "what have you been up to?",
+          "next": "chat-ray-back-up"
+        }
+      ],
+      "position": 46
+    },
+    {
       "id": "chat-shrodi-around",
       "npc_id": "shrodi",
       "kind": "reply",
@@ -2729,7 +4888,7 @@
       "kind": "reply",
       "trigger": null,
       "title": null,
-      "text": "Games is where you practise. In Atom Maze you run and jump, and answer questions to beat enemies.\n\n[[pic:tour-games]]\n\nMyth Buster is a quick round of fact or myth.",
+      "text": "Games live on your phone, as apps that arrive as you learn. In Atom Maze you run and jump, and answer questions to beat enemies.\n\n[[pic:tour-games]]\n\nMyth Buster is a quick round of fact or myth.",
       "pose": "cheer",
       "replies": [
         {

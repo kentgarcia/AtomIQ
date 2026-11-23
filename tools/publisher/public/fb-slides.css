@@ -1,0 +1,68 @@
+/* Facebook promotional landscape post — flat Duolingo-style illustration with minimal vector overlays.
+   Canvas: 1376 x 768 (1:1 native illustration pixels, 2x supersampled overlays). */
+
+.slide.fb-illus {
+  width: 1376px;
+  height: 768px;
+  position: relative;
+  overflow: hidden;
+  font-family: "Intern", system-ui, sans-serif;
+  background: #ddf4ff;
+}
+
+.fb-artwork {
+  position: absolute;
+  inset: 0;
+  width: 1376px;
+  height: 768px;
+  object-fit: cover;
+  display: block;
+  z-index: 0;
+}
+
+/* ---------- Top-left AtomIQ brand lockup ---------- */
+
+.fb-brand-lockup {
+  position: absolute;
+  left: 42px;
+  top: 34px;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.fb-app-icon {
+  width: 72px;
+  height: 72px;
+  border-radius: 20px;
+  border: 4px solid #ffffff;
+  box-shadow: 0 6px 0 rgba(168, 98, 0, 0.3);
+  display: block;
+}
+
+.fb-wordmark {
+  font-size: 52px;
+  line-height: 1;
+  font-weight: 900;
+  letter-spacing: -1.4px;
+  color: #3a2a00;
+  -webkit-text-stroke: 8px #ffffff;
+  paint-order: stroke fill;
+  text-shadow: 0 5px 0 rgba(168, 98, 0, 0.24);
+}
+
+/* ---------- Standard Google Play badge (135:40 ratio) ---------- */
+
+.fb-store-wrap {
+  position: absolute;
+  right: 28px;
+  bottom: 24px;
+  z-index: 4;
+}
+
+.fb-gp-badge {
+  width: 243px;
+  height: 72px;
+  display: block;
+}

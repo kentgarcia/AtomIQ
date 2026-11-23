@@ -1135,3 +1135,796 @@ export function radonChain() {
   };
 }
 
+
+// ---------------------------------------------------------------------------
+// Unit 3, Radiation Meets Matter (docs/features/FOUR_UNIT_RELEASE_SPEC.md). Every figure here is original drawing data.
+// ---------------------------------------------------------------------------
+
+/** U3 L1: radiation is energy, given off by many things. */
+export function radiationIsEnergy() {
+  const item = (x, id, label, size = 4.8) => [art(id, x, 14, 15), text(x, 28, label, size)];
+  return {
+    scene: {
+      height: 52,
+      shapes: [
+        ...item(14, "sun", "Sun"),
+        ...item(38, "lamp", "Lamp"),
+        ...item(62, "phone", "Phone"),
+        ...item(86, "radiation", "Unstable atoms", 3.8),
+        text(50, 41, "all give off radiation:", 4.6),
+        text(50, 47.5, "energy as waves or particles", 4.6),
+      ],
+    },
+    altText: "A sun, a lamp, a phone and the radiation sign for unstable atoms in a row. The caption says all of them give off radiation, which is energy as waves or particles.",
+  };
+}
+
+/** U3 L1: ionization, an electron knocked out of an atom. */
+export function electronKnockedOut() {
+  return {
+    scene: {
+      height: 58,
+      shapes: [
+        ...atom(18, 24, 2, 2, 2, { base: 12, particle: 2, electronSize: 1.8 }),
+        text(18, 44, "an atom", 4.6),
+        ...wave(33, 50, 24, "warning", { amp: 2.4, steps: 8, width: 1 }),
+        arrow(50, 24, 56, 24, "warning", 1),
+        text(43, 13, "ionizing", 4.4),
+        text(43, 18, "radiation", 4.4),
+        ...atom(72, 26, 2, 2, 1, { base: 12, particle: 2, electronSize: 1.8 }),
+        circle(93, 9, 2, "info"),
+        arrow(82, 17, 90, 11, "info", 0.9),
+        text(76, 44, "electron knocked out", 4.2),
+        text(50, 54, "this is called ionization", 5),
+      ],
+    },
+    altText: "An atom with two electrons on the left, an arrow of ionizing radiation pointing at it, and the atom on the right with only one electron left while the other flies away. The caption calls this ionization.",
+  };
+}
+
+/** U3 L1: the line between radiation that cannot and radiation that can knock electrons out of atoms. */
+export function energyLine() {
+  const box = (x, a, b, tone) => [rect(x, 17, 17, 15, tone, "soft", 2), text(x + 8.5, b ? 23.5 : 25, a, 3.6), ...(b ? [text(x + 8.5, 28.8, b, 3.6)] : [])];
+  return {
+    scene: {
+      height: 56,
+      shapes: [
+        text(50, 6, "energy rises", 4.4),
+        arrow(6, 11, 94, 11, "warning", 0.8),
+        ...box(2, "Radio", "waves", "neutral"),
+        ...box(21, "Micro-", "waves", "neutral"),
+        ...box(40, "Visible", "light", "neutral"),
+        line(60, 15, 60, 35, undefined, { dash: true, width: 0.8 }),
+        ...box(64, "X-rays", null, "warning"),
+        ...box(83, "Gamma", "rays", "warning"),
+        text(30, 41, "non-ionizing", 5),
+        text(30, 47, "cannot remove electrons", 3.4),
+        text(80, 41, "ionizing", 5),
+        text(80, 47, "can remove electrons", 3.4),
+      ],
+    },
+    altText: "Five boxes in a row with an arrow above showing that energy rises from left to right: radio waves, microwaves and visible light on the left are non-ionizing and cannot remove electrons from atoms. A dashed line separates them from X-rays and gamma rays on the right, which are ionizing.",
+  };
+}
+
+/** U3 L1: radiation comes from unstable atoms and from machines. */
+export function atomsAndMachines() {
+  return {
+    scene: {
+      height: 62,
+      shapes: [
+        text(25, 7, "From atoms", 5.2),
+        ...tremble(nucleus(25, 26, 5, 5, 2.2)),
+        arrow(37, 26, 46, 26, "warning", 0.9),
+        text(25, 47, "an unstable atom gives off", 3.8),
+        text(25, 53, "alpha, beta and gamma", 3.8),
+        line(50, 4, 50, 58, undefined, { dash: true, width: 0.7 }),
+        text(75, 7, "From machines", 5.2),
+        rect(58, 18, 18, 16, "neutral", "soft", 2),
+        text(67, 27, "X-ray", 3.8),
+        ...wave(78, 96, 26, "warning", { amp: 2.2, steps: 7, width: 1 }),
+        text(75, 47, "an X-ray machine makes", 3.8),
+        text(75, 53, "X-rays with electricity", 3.8),
+      ],
+    },
+    altText: "Two panels. On the left, an unstable atom gives off alpha, beta and gamma radiation. On the right, an X-ray machine makes X-rays using electricity. Radiation does not only come from the nucleus.",
+  };
+}
+
+/** U3 L1 (deeper): ultraviolet sits at the line. */
+export function ultravioletBorder() {
+  return {
+    scene: {
+      height: 50,
+      shapes: [
+        rect(2, 10, 28, 16, "neutral", "soft", 2),
+        text(16, 19.5, "Visible light", 4),
+        rect(34, 10, 32, 16, "accent", "soft", 2),
+        text(50, 19.5, "Ultraviolet", 4.4),
+        rect(70, 10, 28, 16, "warning", "soft", 2),
+        text(84, 19.5, "X-rays", 4.4),
+        line(63, 7, 63, 29, undefined, { dash: true, width: 0.8 }),
+        text(50, 38, "high-energy ultraviolet is ionizing", 4.2),
+        text(50, 45, "visible light is not", 4.2),
+      ],
+    },
+    altText: "Three boxes in a row: visible light, ultraviolet and X-rays, with a dashed line inside the ultraviolet box. The captions say high-energy ultraviolet is ionizing and visible light is not.",
+  };
+}
+
+/** U3 L2: a sheet of paper stops an alpha particle. */
+export function alphaPaper() {
+  return {
+    scene: {
+      height: 52,
+      shapes: [
+        ...nucleus(14, 22, 2, 2, 2.4),
+        text(14, 38, "alpha", 5),
+        arrow(25, 22, 45, 22, "danger", 1.1),
+        rect(47, 8, 3, 28, "neutral", "solid", 1),
+        text(48.5, 44, "paper or skin", 4.4),
+        text(78, 20, "stopped", 5.4),
+        text(78, 27, "in a very short distance", 3.6),
+      ],
+    },
+    altText: "An alpha particle, a chunk of two protons and two neutrons, travels toward a sheet of paper and is stopped by it. The label says paper or the outer layer of skin stops it.",
+  };
+}
+
+/** U3 L2: beta passes paper and is stopped by a thin layer of metal. */
+export function betaMetal() {
+  return {
+    scene: {
+      height: 56,
+      shapes: [
+        circle(10, 18, 2.4, "info"),
+        text(10, 30, "beta", 5),
+        arrow(15, 18, 35, 18, "info", 1.1),
+        rect(37, 6, 2.5, 26, "neutral", "solid", 1),
+        text(38, 39, "paper", 4.4),
+        arrow(42, 18, 61, 18, "info", 1.1),
+        rect(63, 6, 4, 26, "neutral", "solid", 1),
+        text(65, 39, "thin metal", 4.4),
+        text(88, 16, "stopped", 5.2),
+        text(50, 50, "goes through paper, stopped by thin metal", 4.4),
+      ],
+    },
+    altText: "A beta particle travels through a sheet of paper and is then stopped by a thin sheet of metal. The caption says it goes through paper and is stopped by thin metal.",
+  };
+}
+
+/** U3 L2: gamma passes thin barriers and is cut down by thick, dense material. */
+export function gammaThick() {
+  return {
+    scene: {
+      height: 66,
+      shapes: [
+        ...wave(2, 30, 18, "warning", { amp: 3, steps: 10, width: 1.1 }),
+        text(16, 30, "gamma", 5),
+        rect(33, 6, 2.5, 26, "neutral", "solid", 1),
+        text(32, 39, "paper", 3.8),
+        ...wave(36, 46, 18, "warning", { amp: 3, steps: 4, width: 1.1 }),
+        rect(48, 6, 3, 26, "neutral", "solid", 1),
+        text(51, 39, "metal", 3.8),
+        ...wave(52, 64, 18, "warning", { amp: 3, steps: 5, width: 1.1 }),
+        rect(66, 4, 12, 30, "neutral", "solid", 1.5),
+        text(72, 39, "thick lead", 3.8),
+        ...wave(80, 98, 18, "warning", { amp: 0.9, steps: 8, width: 0.7 }),
+        text(89, 28, "far less", 3.8),
+        text(50, 53, "passes thin barriers", 4.6),
+        text(50, 60, "thick, dense material is needed", 4.6),
+      ],
+    },
+    altText: "A gamma ray, drawn as a wavy line, passes through a sheet of paper and a thin sheet of metal, then meets a thick block of lead after which only a much smaller wave comes out. The caption says it passes thin barriers and thick, dense material is needed.",
+  };
+}
+
+/** U3 L2 (deeper): where shields are used. */
+export function shieldsInUse() {
+  const box = (x, a, b) => [rect(x, 6, 30, 22, "accent", "soft", 2), text(x + 15, 15, a, 4.4), text(x + 15, 22, b, 3.4)];
+  return {
+    scene: {
+      height: 52,
+      shapes: [
+        ...box(1.5, "Lead apron", "at the dentist"),
+        ...box(35, "Concrete", "lead-lined rooms"),
+        ...box(68.5, "Water", "storage pools"),
+        text(50, 39, "barriers of lead, concrete or water", 4.4),
+        text(50, 46, "protect against gamma rays and X-rays", 4.4),
+      ],
+    },
+    altText: "Three boxes: a lead apron at the dentist, concrete or lead-lined rooms, and water storage pools. The captions say barriers of lead, concrete or water protect against gamma rays and X-rays.",
+  };
+}
+
+/** U3 L3: exposure, radiation from a source reaches a person. */
+export function exposureFigure() {
+  return {
+    scene: {
+      height: 62,
+      shapes: [
+        rect(4, 14, 24, 22, "warning", "soft", 2),
+        art("radiation", 16, 25, 12),
+        text(16, 43, "sealed source", 4.2),
+        line(30, 20, 66, 18, "warning", { dash: true, width: 0.9 }),
+        line(30, 25, 66, 25, "warning", { dash: true, width: 0.9 }),
+        line(30, 30, 66, 32, "warning", { dash: true, width: 0.9 }),
+        circle(80, 18, 5.5, "neutral", "soft"),
+        rect(71, 25, 18, 18, "neutral", "soft", 4),
+        text(80, 50, "a person", 4.2),
+        text(50, 57, "exposed: the radiation reaches you", 4.6),
+      ],
+    },
+    altText: "A radioactive source sealed in a box on the left, with dashed lines running to a person on the right. The caption says exposed means the radiation reaches you.",
+  };
+}
+
+/** U3 L3: contamination, radioactive material on or in something. */
+export function contaminationFigure() {
+  const dots = (cx, cy) => [
+    circle(cx - 11, cy - 6, 1.5, "warning"),
+    circle(cx + 11, cy - 3, 1.5, "warning"),
+    circle(cx - 8, cy + 9, 1.5, "warning"),
+    circle(cx + 9, cy + 10, 1.5, "warning"),
+    circle(cx + 1, cy - 12, 1.5, "warning"),
+  ];
+  return {
+    scene: {
+      height: 60,
+      shapes: [
+        art("hand", 26, 22, 24),
+        ...dots(26, 22),
+        text(26, 42, "on skin or clothes", 4.2),
+        line(50, 6, 50, 46, undefined, { dash: true, width: 0.7 }),
+        art("air", 74, 22, 22),
+        ...dots(74, 22),
+        text(74, 42, "breathed in", 4.2),
+        text(50, 54, "contamination: the radioactive material itself", 4.4),
+      ],
+    },
+    altText: "A hand with small specks of radioactive material on it, and a puff of air with specks in it. The captions say the material can be on skin or clothes, or breathed in, and that contamination means the radioactive material itself.",
+  };
+}
+
+/** U3 L3: when does exposure end? */
+export function exposureEnds() {
+  const row = (y, a, b) => [text(21, y, a, 4.6), arrow(41, y - 1.5, 53, y - 1.5, "warning", 0.9), text(76, y, b, 4.2)];
+  return {
+    scene: {
+      height: 62,
+      shapes: [
+        text(21, 7, "Situation", 4.4),
+        text(76, 7, "It ends when", 4.4),
+        line(4, 11, 96, 11, undefined, { width: 0.5 }),
+        ...row(21, "Near a source", "move away or shield"),
+        ...row(35, "Dust on skin", "the dust is removed"),
+        ...row(49, "Inside the body", "it leaves the body"),
+      ],
+    },
+    altText: "A three-row table. Near a source: exposure ends when you move away or shield it. Dust on skin: it ends when the dust is removed. Inside the body: it ends when the material leaves the body.",
+  };
+}
+
+/** U3 L3 (deeper): a sealed source stays put, material that is not sealed might spread. */
+export function sealedSource() {
+  return {
+    scene: {
+      height: 52,
+      shapes: [
+        rect(10, 10, 28, 20, "neutral", "soft", 2),
+        circle(24, 20, 2, "warning"),
+        text(24, 38, "sealed", 5),
+        text(24, 45, "stays in its container", 3.6),
+        line(50, 5, 50, 48, undefined, { dash: true, width: 0.7 }),
+        circle(64, 18, 1.6, "warning"),
+        circle(72, 24, 1.6, "warning"),
+        circle(80, 16, 1.6, "warning"),
+        circle(86, 27, 1.6, "warning"),
+        circle(70, 31, 1.6, "warning"),
+        circle(90, 19, 1.6, "warning"),
+        text(76, 38, "not sealed", 5),
+        text(76, 45, "might be spread about", 3.6),
+      ],
+    },
+    altText: "Two panels. On the left, radioactive material sealed in a container stays in it. On the right, material that is not sealed is scattered about as specks, because it might be spread.",
+  };
+}
+
+/** U3 L4: three instruments. */
+export function instrumentsRow() {
+  const card = (x, a, b, sub) => [rect(x, 6, 30, 34, "accent", "soft", 2), text(x + 15, b ? 16 : 19, a, 4.4), ...(b ? [text(x + 15, 22, b, 4.4)] : []), text(x + 15, 33, sub, 3.4)];
+  return {
+    scene: {
+      height: 56,
+      shapes: [
+        ...card(1.5, "Geiger", "counter", "ionized gas"),
+        ...card(35, "Scintillation", "counter", "flashes of light"),
+        ...card(68.5, "Dosimeter", "", "worn by a person"),
+        text(50, 50, "three ways to detect or measure radiation", 4.2),
+      ],
+    },
+    altText: "Three cards: a Geiger counter that uses ionized gas, a scintillation counter that uses flashes of light, and a dosimeter that is worn by a person. The caption says they are three ways to detect or measure radiation.",
+  };
+}
+
+/** U3 L4: radiation ionizes the gas in a Geiger tube. */
+export function geigerTube() {
+  return {
+    scene: {
+      height: 58,
+      shapes: [
+        ...wave(3, 22, 20, "warning", { amp: 2.6, steps: 8, width: 1 }),
+        text(13, 31, "radiation", 4.2),
+        arrow(24, 20, 34, 20, "warning", 1),
+        rect(36, 12, 34, 16, "neutral", "soft", 8),
+        circle(46, 20, 1.6, "info"),
+        circle(53, 17, 1.6, "info"),
+        circle(58, 23, 1.6, "info"),
+        circle(64, 19, 1.6, "info"),
+        text(53, 36, "gas in the tube is ionized", 3.8),
+        arrow(72, 20, 79, 20, "info", 1),
+        rect(81, 11, 16, 18, "accent", "soft", 2),
+        text(89, 21, "count", 4.2),
+        text(50, 50, "more radiation, more ionization", 4.8),
+      ],
+    },
+    altText: "Radiation, drawn as a wave, enters a tube of gas where it ionizes the gas, shown as specks. A signal goes on to a counter box. The caption says more radiation means more ionization.",
+  };
+}
+
+/** U3 L4: a detector always finds a little background. */
+export function alwaysSomething() {
+  return {
+    scene: {
+      height: 64,
+      shapes: [
+        art("sun", 16, 12, 12),
+        text(16, 24, "cosmic rays", 3.8),
+        arrow(24, 16, 40, 25, "warning", 0.9),
+        rect(40, 22, 22, 16, "neutral", "soft", 2),
+        text(51, 31.5, "detector", 4.2),
+        arrow(51, 49, 51, 40, "warning", 0.9),
+        rect(8, 50, 84, 6, "neutral", "soft", 1),
+        text(51, 62, "minerals in the ground", 3.8),
+        text(82, 25, "a small", 4.2),
+        text(82, 31, "reading", 4.2),
+      ],
+    },
+    altText: "A detector in the middle with an arrow coming in from cosmic rays above and another arrow coming up from minerals in the ground. A caption on the right says it shows a small reading, because background radiation is always present.",
+  };
+}
+
+/** U3 L4 (deeper): more radiation, more ionization, more counts. */
+export function moreRadiationMoreCounts() {
+  const ticks = (x, n) => Array.from({ length: n }, (_, i) => line(x + i * 3.2, 20, x + i * 3.2, 30, "info", { width: 1 }));
+  return {
+    scene: {
+      height: 50,
+      shapes: [
+        text(24, 8, "a little radiation", 4.4),
+        ...ticks(14, 4),
+        text(24, 38, "a few counts", 4.4),
+        line(50, 5, 50, 44, undefined, { dash: true, width: 0.7 }),
+        text(76, 8, "more radiation", 4.4),
+        ...ticks(54, 13),
+        text(76, 38, "many counts", 4.4),
+      ],
+    },
+    altText: "Two panels of tick marks. A little radiation gives a few tick marks, which are counts. More radiation gives many more tick marks.",
+  };
+}
+
+/** U3 L5: three units, three questions. */
+export function threeQuestions() {
+  const card = (x, name, sym, q1, q2) => [rect(x, 6, 31, 38, "accent", "soft", 2), text(x + 15.5, 14, name, 4.8), text(x + 15.5, 24, sym, 7), text(x + 15.5, 33, q1, 3.4), text(x + 15.5, 38, q2, 3.4)];
+  return {
+    scene: {
+      height: 58,
+      shapes: [
+        ...card(1, "Becquerel", "Bq", "How active", "is the source?"),
+        ...card(34.5, "Gray", "Gy", "How much energy", "was absorbed?"),
+        ...card(68, "Sievert", "Sv", "How much harm", "could it do?"),
+        text(50, 52, "three units, three questions", 5),
+      ],
+    },
+    altText: "Three cards. The becquerel asks how active the source is, the gray asks how much energy was absorbed, and the sievert asks how much harm it could do. The caption says three units, three questions.",
+  };
+}
+
+/** U3 L5: one becquerel is one decay per second. */
+export function becquerelFigure() {
+  return {
+    scene: {
+      height: 50,
+      shapes: [
+        ...crowd(26, 8, 5, 3, 7, 2.2, (i) => (i === 7 ? { tone: "warning", fill: "none" } : { tone: "neutral" })),
+        text(26, 31, "a source", 4.4),
+        arrow(46, 16, 62, 16, "warning", 1),
+        text(80, 14, "1 decay", 5),
+        text(80, 21, "in 1 second", 4.4),
+        text(50, 43, "1 becquerel = 1 decay per second", 5),
+      ],
+    },
+    altText: "A grid of nuclei labelled a source, with one of them shown as decayed, and an arrow to the words 1 decay in 1 second. The caption says one becquerel is one decay per second.",
+  };
+}
+
+/** U3 L5: one gray is one joule absorbed per kilogram. */
+export function grayFigure() {
+  return {
+    scene: {
+      height: 50,
+      shapes: [
+        line(6, 12, 46, 12, "warning", { dash: true, width: 0.9, arrow: true }),
+        line(6, 20, 46, 20, "warning", { dash: true, width: 0.9, arrow: true }),
+        line(6, 28, 46, 28, "warning", { dash: true, width: 0.9, arrow: true }),
+        rect(50, 6, 28, 28, "neutral", "soft", 3),
+        text(64, 18, "1", 7),
+        text(64, 28, "kilogram", 4),
+        text(90, 18, "energy", 4.2),
+        text(90, 24, "absorbed", 4.2),
+        text(50, 43, "1 gray = 1 joule of energy per kilogram", 4.6),
+      ],
+    },
+    altText: "Rays arrive at a block labelled one kilogram, with the words energy absorbed beside it. The caption says one gray is one joule of energy absorbed per kilogram.",
+  };
+}
+
+/** U3 L5: the sievert counts the kind of radiation and the kind of tissue. */
+export function sievertFigure() {
+  return {
+    scene: {
+      height: 58,
+      shapes: [
+        rect(2, 6, 38, 14, "accent", "soft", 2),
+        text(21, 14.5, "type of radiation", 4.2),
+        rect(2, 26, 38, 14, "accent", "soft", 2),
+        text(21, 34.5, "tissue sensitivity", 4.2),
+        arrow(42, 13, 58, 22, "warning", 0.9),
+        arrow(42, 33, 58, 25, "warning", 0.9),
+        rect(60, 12, 38, 20, "warning", "soft", 2),
+        text(79, 21, "Sievert", 5.4),
+        text(79, 27.5, "potential for harm", 3.4),
+        text(50, 52, "it counts both, not only the energy", 4.4),
+      ],
+    },
+    altText: "Two boxes, type of radiation and tissue sensitivity, with arrows pointing to a box labelled sievert, potential for harm. The caption says it counts both, not only the energy.",
+  };
+}
+
+/** U3 L5 (deeper): the older names for the same three quantities. */
+export function olderUnits() {
+  const row = (y, a, b) => [text(24, y, a, 4.6), arrow(44, y - 1.5, 54, y - 1.5, undefined, 0.8), text(76, y, b, 4.6)];
+  return {
+    scene: {
+      height: 56,
+      shapes: [
+        text(24, 7, "Now", 4.4),
+        text(76, 7, "Older unit", 4.4),
+        line(4, 11, 96, 11, undefined, { width: 0.5 }),
+        ...row(21, "becquerel (Bq)", "curie (Ci)"),
+        ...row(32, "gray (Gy)", "rad"),
+        ...row(43, "sievert (Sv)", "rem"),
+        text(50, 52, "100 rem = 1 sievert, 100 rad = 1 gray", 3.8),
+      ],
+    },
+    altText: "A table with the becquerel matched to the older curie, the gray to the older rad, and the sievert to the older rem. A caption says 100 rem is one sievert and 100 rad is one gray.",
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Unit 4, Radiation and the Body (docs/features/UNIT_4_RADIATION_AND_THE_BODY_SPEC.md). Every number drawn here is in that
+// spec's table of facts. Original drawing data.
+// ---------------------------------------------------------------------------
+
+/** U4 L1: the unit a dose is counted in. */
+export function millisievertFigure() {
+  return {
+    scene: {
+      height: 44,
+      shapes: [
+        rect(3, 6, 38, 20, "accent", "soft", 2),
+        text(22, 14, "1 sievert", 5),
+        text(22, 21, "(Sv)", 4),
+        text(50, 19, "=", 8),
+        rect(59, 6, 38, 20, "info", "soft", 2),
+        text(78, 13, "1000", 5.2),
+        text(78, 19, "millisieverts", 3.6),
+        text(78, 23.5, "(mSv)", 3.2),
+        text(50, 38, "everyday doses: millisieverts", 4.4),
+      ],
+    },
+    altText: "A box saying 1 sievert equals a box saying 1000 millisieverts. The caption says everyday doses are counted in millisieverts.",
+  };
+}
+
+/** U4 L1: where a year's dose comes from, bars to scale. */
+export function aYearOfDose() {
+  const row = (y, label, mSv, tone) => [text(50, y, label, 4), rect(10, y + 3, Math.max(mSv * 30, 3), 6, tone, "soft", 2)];
+  return {
+    scene: {
+      height: 60,
+      shapes: [
+        ...row(8, "Radon in an average US home: about 2.3", 2.28, "warning"),
+        ...row(24, "Cosmic rays at sea level: about 0.3", 0.3, "info"),
+        ...row(40, "Rocks and soil: about 0.21", 0.21, "accent"),
+        text(50, 56, "millisieverts in a year (bars to scale)", 3.8),
+      ],
+    },
+    altText: "Three bars for the dose in one year, drawn to scale: radon in an average US home about 2.3 millisieverts, cosmic rays at sea level about 0.3, and rocks and soil about 0.21.",
+  };
+}
+
+/** U4 L1: doses from tiny to the level where illness starts. */
+export function doseLadder() {
+  const row = (y, value, label, tone) => [rect(2, y, 24, 8.5, tone, "soft", 2), text(14, y + 6, value, 4.8), text(63, y + 6, label, 3.6)];
+  return {
+    scene: {
+      height: 86,
+      shapes: [
+        text(50, 6, "millisieverts (mSv)", 4),
+        ...row(11, "1000", "illness starts, in a short time", "danger"),
+        ...row(22, "10", "one whole-body CT scan", "warning"),
+        ...row(33, "6.2", "an average year in the US", "accent"),
+        ...row(44, "2.3", "a year of radon, average US home", "info"),
+        ...row(55, "0.3", "a year of cosmic rays, sea level", "info"),
+        ...row(66, "<0.01", "a year near a nuclear power station", "neutral"),
+        text(50, 82, "the steps are not to scale", 3.6),
+      ],
+    },
+    altText: "A ladder of doses in millisieverts, from the biggest at the top: 1000, where illness starts in a short time; 10, one whole-body CT scan; 6.2, an average year in the US; 2.3, a year of radon in an average US home; 0.3, a year of cosmic rays at sea level; and under 0.01, a year near a nuclear power station. The steps are not to scale.",
+  };
+}
+
+/** U4 L2: ionizing radiation reaching the DNA in a cell. */
+export function radiationHitsCell() {
+  return {
+    scene: {
+      height: 56,
+      shapes: [
+        circle(52, 28, 20, "info", "soft"),
+        circle(52, 28, 8, "accent", "soft"),
+        ...wave(44, 60, 28, "accent", { amp: 1.8, steps: 8, width: 0.8 }),
+        ...wave(2, 22, 28, "warning", { amp: 2.4, steps: 8, width: 1 }),
+        arrow(22, 28, 34, 28, "warning", 1),
+        text(14, 18, "ionizing", 3.8),
+        text(14, 22.5, "radiation", 3.8),
+        circle(52, 28, 2, "danger"),
+        text(52, 52, "a cell", 4.2),
+        text(86, 24, "can damage", 4.2),
+        text(86, 30, "its DNA", 4.2),
+      ],
+    },
+    altText: "Ionizing radiation, drawn as a zigzag with an arrow, travels into a cell and hits the DNA strand inside its nucleus. The caption says it can damage its DNA.",
+  };
+}
+
+/** U4 L2: the cell repairs damage; damage not repaired correctly can go wrong. */
+export function cellRepair() {
+  return {
+    scene: {
+      height: 62,
+      shapes: [
+        circle(14, 18, 9, "info", "soft"),
+        circle(14, 18, 2, "danger"),
+        arrow(26, 18, 62, 18, "info", 1),
+        text(44, 12, "extremely efficient repair", 3.8),
+        circle(78, 18, 9, "info", "soft"),
+        text(78, 34, "repaired", 4),
+        text(14, 34, "damaged", 4),
+        line(4, 40, 96, 40, undefined, { dash: true, width: 0.6 }),
+        circle(14, 51, 6, "info", "soft"),
+        circle(14, 51, 1.6, "danger"),
+        arrow(23, 51, 36, 51, "warning", 1),
+        rect(38, 43, 60, 16, "warning", "soft", 2),
+        text(68, 49, "not repaired correctly:", 3.6),
+        text(68, 55, "may die or become cancerous", 3.6),
+      ],
+    },
+    altText: "Top row: a damaged cell, an arrow labelled extremely efficient repair, and a repaired cell. Bottom row, below a dashed line: a damaged cell, an arrow, and a box saying that if the damage is not repaired correctly the cell may die or eventually become cancerous.",
+  };
+}
+
+/** U4 L2: radiation passes through a person and does not stay. */
+export function passesThrough() {
+  return {
+    scene: {
+      height: 50,
+      shapes: [
+        circle(50, 12, 5.5, "neutral", "soft"),
+        rect(41, 19, 18, 22, "neutral", "soft", 3),
+        ...wave(2, 26, 28, "warning", { amp: 2.2, steps: 8, width: 1 }),
+        arrow(26, 28, 38, 28, "warning", 1),
+        ...wave(62, 80, 28, "warning", { amp: 2.2, steps: 6, width: 1 }),
+        arrow(80, 28, 96, 28, "warning", 1),
+        text(50, 47, "exposed, but not radioactive", 4.2),
+      ],
+    },
+    altText: "A person in the middle. Radiation arrives from the left, passes through, and leaves on the right. The caption says exposed, but not radioactive.",
+  };
+}
+
+/** U4 L3: one total dose, delivered at two different speeds. */
+export function fastOrSlow() {
+  const bars = [];
+  for (let i = 0; i < 8; i++) bars.push(rect(54 + i * 5, 34, 3, 12, "info", "soft", 1));
+  return {
+    scene: {
+      height: 64,
+      shapes: [
+        text(22, 8, "a few minutes", 4.4),
+        rect(14, 14, 16, 32, "danger", "soft", 2),
+        line(50, 6, 50, 52, undefined, { dash: true, width: 0.6 }),
+        text(76, 8, "over years", 4.4),
+        ...bars,
+        text(50, 59, "same total dose, different dose rate", 4.2),
+      ],
+    },
+    altText: "Two ways to receive the same total dose. On the left, one tall bar for a few minutes. On the right, many small bars spread over years. The caption says same total dose, different dose rate.",
+  };
+}
+
+/** U4 L3: a very large dose, fast. */
+export function bigFastDose() {
+  return {
+    scene: {
+      height: 62,
+      shapes: [
+        rect(8, 8, 18, 46, "danger", "soft", 2),
+        text(17, 4.5, "1000", 4),
+        text(66, 14, "about 1000 mSv, fast:", 4.6),
+        text(66, 21, "the threshold for", 3.8),
+        text(66, 26, "acute radiation syndrome", 3.8),
+        text(66, 37, "nausea and vomiting", 4),
+        text(66, 42, "can begin within hours", 4),
+        text(66, 52, "skin redness, hair loss, burns", 3.6),
+      ],
+    },
+    altText: "A tall bar labelled 1000 and, beside it, the words about 1000 millisieverts, fast: the threshold for acute radiation syndrome. Nausea and vomiting can begin within hours, and skin redness, hair loss and burns can follow high doses.",
+  };
+}
+
+/** U4 L3: a low dose spread over time leaves time to repair. */
+export function smallSpreadDose() {
+  const shapes = [text(50, 8, "a low dose, or one spread over time", 4.4)];
+  for (let i = 0; i < 8; i++) {
+    shapes.push(rect(11 + i * 11, 20, 5, 10, "info", "soft", 1));
+    shapes.push(circle(13.5 + i * 11, 41, 2.2, "accent"));
+  }
+  shapes.push(text(50, 55, "time to repair in between", 4.2));
+  return {
+    scene: { height: 62, shapes },
+    altText: "A row of small dose bars spread out in time, with a small repair dot under each. The caption says a low dose, or one spread over time, leaves time to repair in between.",
+  };
+}
+
+/** U4 L4: the three ways to lower a dose. */
+export function threeWays() {
+  const box = (x, tone, title, sub) => [rect(x, 8, 28, 28, tone, "soft", 2), text(x + 14, 20, title, 4.8), text(x + 14, 28, sub, 3.4)];
+  return {
+    scene: {
+      height: 50,
+      shapes: [
+        ...box(3, "info", "Time", "less time near it"),
+        ...box(36, "accent", "Distance", "farther from it"),
+        ...box(69, "warning", "Shielding", "something between"),
+        text(50, 46, "three ways to lower a dose", 4.4),
+      ],
+    },
+    altText: "Three boxes in a row: time, less time near the source; distance, farther from the source; shielding, something between you and the source. The caption says these are three ways to lower a dose.",
+  };
+}
+
+/** U4 L4: less time, less dose. */
+export function lessTime() {
+  return {
+    scene: {
+      height: 48,
+      shapes: [
+        text(14, 13, "long visit", 4),
+        rect(30, 8, 62, 8, "danger", "soft", 2),
+        text(14, 29, "short visit", 4),
+        rect(30, 24, 24, 8, "info", "soft", 2),
+        text(50, 44, "same source: less time, less dose", 4.2),
+      ],
+    },
+    altText: "Two bars for time spent near the same source: a long bar for a long visit and a short bar for a short visit. The caption says less time means less dose.",
+  };
+}
+
+/** U4 L4: farther away, less dose. */
+export function moreDistance() {
+  return {
+    scene: {
+      height: 52,
+      shapes: [
+        circle(8, 28, 5, "warning"),
+        text(8, 40, "source", 3.4),
+        circle(36, 28, 5, "neutral", "soft"),
+        arrow(14, 28, 30, 28, "danger", 1.4),
+        text(36, 12, "close:", 4),
+        text(36, 17, "more dose", 4),
+        circle(86, 28, 5, "neutral", "soft"),
+        arrow(14, 34, 80, 34, "warning", 0.5),
+        text(86, 12, "far:", 4),
+        text(86, 17, "less dose", 4),
+        text(50, 48, "the dose drops as distance grows", 4),
+      ],
+    },
+    altText: "A radiation source on the left. A person standing close to it receives a lot, shown by a thick arrow. A person standing far away receives much less, shown by a thin arrow. The caption says the dose drops as distance grows.",
+  };
+}
+
+/** U4 L4: a barrier between you and a source. */
+export function somethingBetween() {
+  return {
+    scene: {
+      height: 52,
+      shapes: [
+        circle(8, 28, 5, "warning"),
+        arrow(14, 28, 42, 28, "danger", 1.2),
+        rect(46, 10, 6, 34, "neutral", "solid", 1),
+        text(49, 6, "lead, concrete or water", 3.6),
+        circle(86, 28, 5, "neutral", "soft"),
+        text(86, 40, "much less", 3.6),
+        text(50, 49, "a shield between you and the source", 4),
+      ],
+    },
+    altText: "A radiation source on the left sends an arrow toward a person on the right, but a wall of lead, concrete or water stands in between, so the person receives much less. The caption says a shield between you and the source.",
+  };
+}
+
+/** U4 L4: the three ways in real life. */
+export function realUses() {
+  const row = (y, tone, label) => [rect(4, y, 10, 10, tone, "soft", 2), text(58, y + 7, label, 3.6)];
+  return {
+    scene: {
+      height: 52,
+      shapes: [
+        ...row(4, "warning", "a lead apron at a dental X-ray"),
+        ...row(20, "accent", "sources stored under water or in concrete"),
+        ...row(36, "info", "a shelter: more walls, more protection"),
+      ],
+    },
+    altText: "Three real uses of shielding. A lead apron on a patient at a dental X-ray, radioactive sources stored under water or in concrete, and a shelter where more walls give more protection.",
+  };
+}
+
+/** U4 L5: three questions to ask about a dose. */
+export function headlineQuestions() {
+  const row = (y, title, sub) => [rect(3, y, 94, 15, "accent", "soft", 2), text(50, y + 7, title, 4.8), text(50, y + 12.2, sub, 3.4)];
+  return {
+    scene: {
+      height: 60,
+      shapes: [
+        ...row(3, "1. How big?", "the amount, in millisieverts"),
+        ...row(22, "2. How fast?", "all at once, or over time"),
+        ...row(41, "3. Compared with what?", "an average year, a CT scan, 1000"),
+      ],
+    },
+    altText: "Three questions to ask about any dose in a headline: how big, the amount in millisieverts; how fast, all at once or over time; and compared with what, an average year, a CT scan or 1000.",
+  };
+}
+
+/** U4 L5: two sayings that are both wrong. */
+export function twoMyths() {
+  return {
+    scene: {
+      height: 56,
+      shapes: [
+        rect(3, 6, 45, 22, "danger", "soft", 2),
+        text(25.5, 15, "Any dose", 4.4),
+        text(25.5, 21.5, "is deadly", 4.4),
+        text(25.5, 34, "wrong: we all get", 3.2),
+        text(25.5, 38.5, "small doses daily", 3.2),
+        rect(52, 6, 45, 22, "warning", "soft", 2),
+        text(74.5, 15, "Radiation is", 4.4),
+        text(74.5, 21.5, "harmless", 4.4),
+        text(74.5, 34, "wrong: a very large", 3.2),
+        text(74.5, 38.5, "fast dose makes people ill", 3.2),
+        text(50, 51, "the size and speed of the dose decide", 4),
+      ],
+    },
+    altText: "Two boxes. Any dose is deadly: wrong, we all get small doses daily. Radiation is harmless: wrong, a very large fast dose makes people ill. The caption says the size and speed of the dose decide.",
+  };
+}

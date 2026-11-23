@@ -218,6 +218,8 @@ export const PROP_SPRITES = {
   gemRed: require("../../assets/images/platformer/props/gem_red.png"),
   gemYellow: require("../../assets/images/platformer/props/gem_yellow.png"),
   saw: require("../../assets/images/platformer/props/saw.png"),
+  lead: require("../../assets/images/platformer/props/lead.png"),
+  beamEmitter: require("../../assets/images/platformer/props/beam_emitter.png"),
   conveyor: require("../../assets/images/platformer/props/conveyor.png"),
   blockGem: require("../../assets/images/platformer/props/block_strong_coin.png"),
   blockGemEmpty: require("../../assets/images/platformer/props/block_strong_empty.png"),

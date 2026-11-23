@@ -791,6 +791,22 @@
       "weight": 1
     },
     {
+      "id": "ft-mina-checkpoint-radiation-and-the-body",
+      "npc_id": "npc-mina",
+      "poster_pool": [],
+      "kind": "milestone",
+      "trigger": "checkpoint_pass",
+      "condition": {
+        "unitId": "radiation-and-the-body"
+      },
+      "text": "The {unit} checkpoint is passed. You took it steadily, and it shows.",
+      "chip": "unit",
+      "reactors": [
+        "npc-ray"
+      ],
+      "weight": 1
+    },
+    {
       "id": "ft-mina-chest-daily",
       "npc_id": "npc-mina",
       "poster_pool": [],
@@ -859,6 +875,236 @@
       "weight": 1
     },
     {
+      "id": "ft-mina-lesson-dose-and-time-1",
+      "npc_id": "npc-mina",
+      "poster_pool": [],
+      "kind": "celebrate",
+      "trigger": "lesson_complete",
+      "condition": {
+        "unitId": "radiation-and-the-body",
+        "lessonId": "dose-and-time"
+      },
+      "text": "“{lesson}” done. A big dose in a short time and a small one spread out are very different things.",
+      "chip": "lesson",
+      "reactors": [],
+      "weight": 2
+    },
+    {
+      "id": "ft-mina-lesson-dose-and-time-2",
+      "npc_id": "npc-mina",
+      "poster_pool": [],
+      "kind": "celebrate",
+      "trigger": "lesson_complete",
+      "condition": {
+        "unitId": "radiation-and-the-body",
+        "lessonId": "dose-and-time"
+      },
+      "text": "You finished “{lesson}”. How fast a dose arrives matters as much as how big it is.",
+      "chip": "lesson",
+      "reactors": [],
+      "weight": 1
+    },
+    {
+      "id": "ft-mina-lesson-dose-and-time-3",
+      "npc_id": "npc-mina",
+      "poster_pool": [],
+      "kind": "celebrate",
+      "trigger": "lesson_complete",
+      "condition": {
+        "unitId": "radiation-and-the-body",
+        "lessonId": "dose-and-time",
+        "perfect": true
+      },
+      "text": "Perfect on “{lesson}”. Size and speed, both kept straight.",
+      "chip": "lesson",
+      "reactors": [],
+      "weight": 1
+    },
+    {
+      "id": "ft-mina-lesson-radiation-and-cells-1",
+      "npc_id": "npc-mina",
+      "poster_pool": [],
+      "kind": "celebrate",
+      "trigger": "lesson_complete",
+      "condition": {
+        "unitId": "radiation-and-the-body",
+        "lessonId": "radiation-and-cells"
+      },
+      "text": "“{lesson}” done. Radiation can damage a cell, and cells are extremely good at repairing it. Both halves are true.",
+      "chip": "lesson",
+      "reactors": [],
+      "weight": 2
+    },
+    {
+      "id": "ft-mina-lesson-radiation-and-cells-2",
+      "npc_id": "npc-mina",
+      "poster_pool": [],
+      "kind": "celebrate",
+      "trigger": "lesson_complete",
+      "condition": {
+        "unitId": "radiation-and-the-body",
+        "lessonId": "radiation-and-cells"
+      },
+      "text": "You finished “{lesson}”. That is the worry and the reassurance, side by side.",
+      "chip": "lesson",
+      "reactors": [],
+      "weight": 1
+    },
+    {
+      "id": "ft-mina-lesson-radiation-and-cells-3",
+      "npc_id": "npc-mina",
+      "poster_pool": [],
+      "kind": "celebrate",
+      "trigger": "lesson_complete",
+      "condition": {
+        "unitId": "radiation-and-the-body",
+        "lessonId": "radiation-and-cells",
+        "perfect": true
+      },
+      "text": "Perfect on “{lesson}”. You kept both halves in mind. That is not easy.",
+      "chip": "lesson",
+      "reactors": [],
+      "weight": 1
+    },
+    {
+      "id": "ft-mina-lesson-risk-in-perspective-1",
+      "npc_id": "npc-mina",
+      "poster_pool": [],
+      "kind": "celebrate",
+      "trigger": "lesson_complete",
+      "condition": {
+        "unitId": "radiation-and-the-body",
+        "lessonId": "risk-in-perspective"
+      },
+      "text": "“{lesson}” done. Size, speed and comparison turn a scary number into something you can judge.",
+      "chip": "lesson",
+      "reactors": [],
+      "weight": 2
+    },
+    {
+      "id": "ft-mina-lesson-risk-in-perspective-2",
+      "npc_id": "npc-mina",
+      "poster_pool": [],
+      "kind": "celebrate",
+      "trigger": "lesson_complete",
+      "condition": {
+        "unitId": "radiation-and-the-body",
+        "lessonId": "risk-in-perspective"
+      },
+      "text": "You finished “{lesson}”. You can read a frightening headline calmly now.",
+      "chip": "lesson",
+      "reactors": [],
+      "weight": 1
+    },
+    {
+      "id": "ft-mina-lesson-risk-in-perspective-3",
+      "npc_id": "npc-mina",
+      "poster_pool": [],
+      "kind": "celebrate",
+      "trigger": "lesson_complete",
+      "condition": {
+        "unitId": "radiation-and-the-body",
+        "lessonId": "risk-in-perspective",
+        "perfect": true
+      },
+      "text": "Perfect on “{lesson}”. A calm head and the right questions.",
+      "chip": "lesson",
+      "reactors": [],
+      "weight": 1
+    },
+    {
+      "id": "ft-mina-lesson-the-dose-scale-1",
+      "npc_id": "npc-mina",
+      "poster_pool": [],
+      "kind": "celebrate",
+      "trigger": "lesson_complete",
+      "condition": {
+        "unitId": "radiation-and-the-body",
+        "lessonId": "the-dose-scale"
+      },
+      "text": "“{lesson}” done. A little radiation every day is normal, and now you can count it in millisieverts.",
+      "chip": "lesson",
+      "reactors": [],
+      "weight": 2
+    },
+    {
+      "id": "ft-mina-lesson-the-dose-scale-2",
+      "npc_id": "npc-mina",
+      "poster_pool": [],
+      "kind": "celebrate",
+      "trigger": "lesson_complete",
+      "condition": {
+        "unitId": "radiation-and-the-body",
+        "lessonId": "the-dose-scale"
+      },
+      "text": "Another lesson on the scale, “{lesson}”. You can put an ordinary year, a scan and an illness in order now.",
+      "chip": "lesson",
+      "reactors": [],
+      "weight": 1
+    },
+    {
+      "id": "ft-mina-lesson-the-dose-scale-3",
+      "npc_id": "npc-mina",
+      "poster_pool": [],
+      "kind": "celebrate",
+      "trigger": "lesson_complete",
+      "condition": {
+        "unitId": "radiation-and-the-body",
+        "lessonId": "the-dose-scale",
+        "perfect": true
+      },
+      "text": "Perfect on “{lesson}”. Careful counting, and not one number mixed up.",
+      "chip": "lesson",
+      "reactors": [],
+      "weight": 1
+    },
+    {
+      "id": "ft-mina-lesson-time-distance-shielding-1",
+      "npc_id": "npc-mina",
+      "poster_pool": [],
+      "kind": "celebrate",
+      "trigger": "lesson_complete",
+      "condition": {
+        "unitId": "radiation-and-the-body",
+        "lessonId": "time-distance-shielding"
+      },
+      "text": "“{lesson}” done. Less time, more distance, and something in between. Three ways anyone can lower a dose.",
+      "chip": "lesson",
+      "reactors": [],
+      "weight": 2
+    },
+    {
+      "id": "ft-mina-lesson-time-distance-shielding-2",
+      "npc_id": "npc-mina",
+      "poster_pool": [],
+      "kind": "celebrate",
+      "trigger": "lesson_complete",
+      "condition": {
+        "unitId": "radiation-and-the-body",
+        "lessonId": "time-distance-shielding"
+      },
+      "text": "You finished “{lesson}”. A lead apron at the dentist is shielding. You will notice it now.",
+      "chip": "lesson",
+      "reactors": [],
+      "weight": 1
+    },
+    {
+      "id": "ft-mina-lesson-time-distance-shielding-3",
+      "npc_id": "npc-mina",
+      "poster_pool": [],
+      "kind": "celebrate",
+      "trigger": "lesson_complete",
+      "condition": {
+        "unitId": "radiation-and-the-body",
+        "lessonId": "time-distance-shielding",
+        "perfect": true
+      },
+      "text": "Perfect on “{lesson}”. You picked the right way every time.",
+      "chip": "lesson",
+      "reactors": [],
+      "weight": 1
+    },
+    {
       "id": "ft-mina-quests",
       "npc_id": "npc-mina",
       "poster_pool": [],
@@ -896,6 +1142,70 @@
       "text": "{rival} passed you in the weekly ranking. That is okay. A ranking is only a snapshot. One lesson at a time.",
       "chip": "ranks",
       "reactors": [],
+      "weight": 1
+    },
+    {
+      "id": "ft-mina-testout-radiation-and-the-body",
+      "npc_id": "npc-mina",
+      "poster_pool": [],
+      "kind": "milestone",
+      "trigger": "testout_pass",
+      "condition": {
+        "unitId": "radiation-and-the-body"
+      },
+      "text": "You tested out of “{unit}”. You already understood it. That's a good place to start from.",
+      "chip": "unit",
+      "reactors": [
+        "npc-ray"
+      ],
+      "weight": 1
+    },
+    {
+      "id": "ft-mina-unit-radiation-and-the-body-2",
+      "npc_id": "npc-mina",
+      "poster_pool": [],
+      "kind": "milestone",
+      "trigger": "unit_complete",
+      "condition": {
+        "unitId": "radiation-and-the-body"
+      },
+      "text": "You finished “{unit}”. You can say how big a dose is, how cells cope, and how to lower a dose. A calm, solid understanding.",
+      "chip": "unit",
+      "reactors": [
+        "npc-ray"
+      ],
+      "weight": 2
+    },
+    {
+      "id": "ft-mina-unit-radiation-meets-matter-1",
+      "npc_id": "npc-mina",
+      "poster_pool": [],
+      "kind": "milestone",
+      "trigger": "unit_complete",
+      "condition": {
+        "unitId": "radiation-meets-matter"
+      },
+      "text": "Someone just finished “{unit}” with Ray. They know what radiation does to things. Now we talk about the body, calmly and slowly. That part is mine.",
+      "chip": "unit",
+      "reactors": [
+        "npc-ray"
+      ],
+      "weight": 2
+    },
+    {
+      "id": "ft-ray-checkpoint-radiation-meets-matter",
+      "npc_id": "npc-ray",
+      "poster_pool": [],
+      "kind": "milestone",
+      "trigger": "checkpoint_pass",
+      "condition": {
+        "unitId": "radiation-meets-matter"
+      },
+      "text": "The {unit} checkpoint is passed. Checked off.",
+      "chip": "unit",
+      "reactors": [
+        "npc-ada"
+      ],
       "weight": 1
     },
     {
@@ -967,6 +1277,158 @@
       "weight": 1
     },
     {
+      "id": "ft-ray-lesson-becquerel-gray-sievert-1",
+      "npc_id": "npc-ray",
+      "poster_pool": [],
+      "kind": "celebrate",
+      "trigger": "lesson_complete",
+      "condition": {
+        "unitId": "radiation-meets-matter",
+        "lessonId": "becquerel-gray-sievert"
+      },
+      "text": "“{lesson}” done. Becquerel counts decays. Gray is energy absorbed. Sievert is potential for harm.",
+      "chip": "lesson",
+      "reactors": [],
+      "weight": 2
+    },
+    {
+      "id": "ft-ray-lesson-becquerel-gray-sievert-2",
+      "npc_id": "npc-ray",
+      "poster_pool": [],
+      "kind": "celebrate",
+      "trigger": "lesson_complete",
+      "condition": {
+        "unitId": "radiation-meets-matter",
+        "lessonId": "becquerel-gray-sievert",
+        "perfect": true
+      },
+      "text": "Perfect on “{lesson}”. Right unit, right question. Nothing mixed up.",
+      "chip": "lesson",
+      "reactors": [],
+      "weight": 1
+    },
+    {
+      "id": "ft-ray-lesson-detecting-radiation-1",
+      "npc_id": "npc-ray",
+      "poster_pool": [],
+      "kind": "celebrate",
+      "trigger": "lesson_complete",
+      "condition": {
+        "unitId": "radiation-meets-matter",
+        "lessonId": "detecting-radiation"
+      },
+      "text": "“{lesson}” done. Geiger counter, scintillation counter, dosimeter. Three tools, three jobs.",
+      "chip": "lesson",
+      "reactors": [],
+      "weight": 2
+    },
+    {
+      "id": "ft-ray-lesson-detecting-radiation-2",
+      "npc_id": "npc-ray",
+      "poster_pool": [],
+      "kind": "celebrate",
+      "trigger": "lesson_complete",
+      "condition": {
+        "unitId": "radiation-meets-matter",
+        "lessonId": "detecting-radiation"
+      },
+      "text": "A working detector picks up a little radiation almost anywhere. Background is always there. Remember it.",
+      "chip": "lesson",
+      "reactors": [],
+      "weight": 1
+    },
+    {
+      "id": "ft-ray-lesson-ionizing-or-not-1",
+      "npc_id": "npc-ray",
+      "poster_pool": [],
+      "kind": "celebrate",
+      "trigger": "lesson_complete",
+      "condition": {
+        "unitId": "radiation-meets-matter",
+        "lessonId": "ionizing-or-not"
+      },
+      "text": "“{lesson}” done. Radio waves, light, X-rays: all radiation. Only some can knock electrons off atoms. Noted.",
+      "chip": "lesson",
+      "reactors": [],
+      "weight": 2
+    },
+    {
+      "id": "ft-ray-lesson-ionizing-or-not-2",
+      "npc_id": "npc-ray",
+      "poster_pool": [],
+      "kind": "celebrate",
+      "trigger": "lesson_complete",
+      "condition": {
+        "unitId": "radiation-meets-matter",
+        "lessonId": "ionizing-or-not"
+      },
+      "text": "Sorted. Ionizing and non-ionizing are different things. Not all radiation is the same.",
+      "chip": "lesson",
+      "reactors": [],
+      "weight": 1
+    },
+    {
+      "id": "ft-ray-lesson-irradiated-or-contaminated-1",
+      "npc_id": "npc-ray",
+      "poster_pool": [],
+      "kind": "celebrate",
+      "trigger": "lesson_complete",
+      "condition": {
+        "unitId": "radiation-meets-matter",
+        "lessonId": "irradiated-or-contaminated"
+      },
+      "text": "“{lesson}” done. Exposure is not contamination. Radiation does not spread. The material does.",
+      "chip": "lesson",
+      "reactors": [],
+      "weight": 2
+    },
+    {
+      "id": "ft-ray-lesson-irradiated-or-contaminated-2",
+      "npc_id": "npc-ray",
+      "poster_pool": [],
+      "kind": "celebrate",
+      "trigger": "lesson_complete",
+      "condition": {
+        "unitId": "radiation-meets-matter",
+        "lessonId": "irradiated-or-contaminated"
+      },
+      "text": "Standing near a source is not the same as having material on you. Good. Keep them apart.",
+      "chip": "lesson",
+      "reactors": [],
+      "weight": 1
+    },
+    {
+      "id": "ft-ray-lesson-what-stops-what-1",
+      "npc_id": "npc-ray",
+      "poster_pool": [],
+      "kind": "celebrate",
+      "trigger": "lesson_complete",
+      "condition": {
+        "unitId": "radiation-meets-matter",
+        "lessonId": "what-stops-what"
+      },
+      "text": "“{lesson}” done. Paper stops alpha. Thin metal stops beta. Gamma needs thick, dense material. Checked off.",
+      "chip": "lesson",
+      "reactors": [],
+      "weight": 2
+    },
+    {
+      "id": "ft-ray-lesson-what-stops-what-2",
+      "npc_id": "npc-ray",
+      "poster_pool": [],
+      "kind": "celebrate",
+      "trigger": "lesson_complete",
+      "condition": {
+        "unitId": "radiation-meets-matter",
+        "lessonId": "what-stops-what",
+        "perfect": true
+      },
+      "text": "Perfect on “{lesson}”. Three kinds, three stoppers, no misses. Noted.",
+      "chip": "lesson",
+      "reactors": [],
+      "weight": 1
+    },
+    {
       "id": "ft-ray-quests",
       "npc_id": "npc-ray",
       "poster_pool": [],
@@ -1005,6 +1467,69 @@
       "chip": "ranks",
       "reactors": [],
       "weight": 1
+    },
+    {
+      "id": "ft-ray-tease-radiation-meets-matter",
+      "npc_id": "npc-ray",
+      "poster_pool": [],
+      "kind": "tease",
+      "trigger": "lesson_complete",
+      "condition": {
+        "unitId": "radiation-meets-matter",
+        "lessonId": "detecting-radiation"
+      },
+      "text": "Detecting is done. Next: units. Becquerel, gray, sievert. Three of them. Learn the difference.",
+      "chip": "unit",
+      "reactors": [],
+      "weight": 1
+    },
+    {
+      "id": "ft-ray-testout-radiation-meets-matter",
+      "npc_id": "npc-ray",
+      "poster_pool": [],
+      "kind": "milestone",
+      "trigger": "testout_pass",
+      "condition": {
+        "unitId": "radiation-meets-matter"
+      },
+      "text": "You tested out of “{unit}”. You already knew it. Now it is on the record.",
+      "chip": "unit",
+      "reactors": [
+        "npc-ada"
+      ],
+      "weight": 1
+    },
+    {
+      "id": "ft-ray-unit-radiation-meets-matter-2",
+      "npc_id": "npc-ray",
+      "poster_pool": [],
+      "kind": "milestone",
+      "trigger": "unit_complete",
+      "condition": {
+        "unitId": "radiation-meets-matter"
+      },
+      "text": "You finished “{unit}”. You know what is ionizing, what stops what, and which unit answers which question. Good. Mina is next.",
+      "chip": "unit",
+      "reactors": [
+        "npc-ada"
+      ],
+      "weight": 2
+    },
+    {
+      "id": "ft-ray-unit-radioactivity-1",
+      "npc_id": "npc-ray",
+      "poster_pool": [],
+      "kind": "milestone",
+      "trigger": "unit_complete",
+      "condition": {
+        "unitId": "radioactivity"
+      },
+      "text": "Someone just finished “{unit}” with Ada. They know why nuclei change. Now they find out what the radiation does to things. That part is mine.",
+      "chip": "unit",
+      "reactors": [
+        "npc-ada"
+      ],
+      "weight": 2
     },
     {
       "id": "ft-sage-chest-daily",

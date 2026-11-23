@@ -19,12 +19,6 @@ supports: Alpha particles are two protons and two neutrons; gamma rays are photo
 cite ref-openstax-chem-21-3
 supports: An alpha particle removes two protons and two neutrons from the parent nucleus.
 
-card c01
-kind: item
-type: item
-item: u2-l2-predict-release
-scored: 0
-
 card c02
 kind: teach
 type: explain
@@ -34,7 +28,7 @@ figure: three-kinds
 figure_at: 1
 
 body:
-    When a nucleus changes, it can release [[alpha-particle|alpha]] particles, [[beta-particle|beta]] particles or [[gamma-ray|gamma]] rays. They are three different things. Alpha and beta are particles. Gamma is not.
+    When a nucleus changes, it can release [[alpha-particle|alpha]] particles, [[beta-particle|beta]] particles or [[gamma-ray|gamma]] rays. Watch the names: they are three different things, not three sizes of one thing. Alpha and beta are particles, and gamma is not.
 
 card c03
 kind: teach
@@ -45,7 +39,7 @@ figure: alpha-figure
 figure_at: 1
 
 body:
-    An alpha particle is made of 2 protons and 2 neutrons stuck together. It is the nucleus of a helium atom, with no electrons. It is a big, chunky particle.
+    An alpha particle is a chunk: 2 protons and 2 neutrons stuck together. That is exactly the nucleus of a helium atom, with no electrons. It is a big, heavy particle.
 
 card c04
 kind: item
@@ -62,7 +56,7 @@ figure: beta-figure
 figure_at: 2
 
 body:
-    A beta particle is a fast-moving particle released in some decays. In the basic picture, it is a fast electron. It is far lighter than an alpha particle.
+    A beta particle is a fast-moving particle. In the basic picture it is a fast electron. It is far lighter than an alpha particle, which is a whole chunk of the nucleus.
 
 card c06
 kind: teach
@@ -73,7 +67,18 @@ figure: gamma-figure
 figure_at: 2
 
 body:
-    Gamma radiation is not a particle. It is [[electromagnetic-radiation|electromagnetic radiation]], like light but far more energetic. Light is electromagnetic radiation too.
+    Gamma is not a particle at all. It is [[electromagnetic-radiation|electromagnetic radiation]], like light but far more energetic. Light is electromagnetic radiation too, so light and gamma belong to the same family.
+
+card c11
+kind: item
+type: item
+item: u2-l2-tom-light
+connected: true
+
+card c10
+kind: item
+type: item
+item: u2-l2-tom-pieces
 
 card c07
 kind: item
@@ -113,36 +118,6 @@ config:
         "u2-recognise-radiation"
       ]
     }
-
-card c09
-kind: item
-type: item
-item: u2-l2-tom-same
-
-card c10
-kind: item
-type: item
-item: u2-l2-tom-pieces
-
-card c11
-kind: item
-type: item
-item: u2-l2-tom-light
-
-card c12
-kind: item
-type: item
-item: u2-l2-sort-kind
-
-card c13
-kind: item
-type: item
-item: u2-l2-choice-electron
-
-card c14
-kind: item
-type: item
-item: u2-l2-choice-gamma-element
 
 card c15
 kind: teach

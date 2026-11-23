@@ -147,6 +147,150 @@
       "journey_id": null,
       "text": "Finish my unit first, and I'll show you the rest.",
       "pose": "idle"
+    },
+    {
+      "id": "line-mina-intro-dose-and-time",
+      "npc_id": "npc-mina",
+      "kind": "lesson_intro",
+      "lesson_id": "dose-and-time",
+      "journey_id": null,
+      "text": "The same amount can mean different things, depending on how fast it arrives. Let's compare the two.",
+      "pose": "point"
+    },
+    {
+      "id": "line-mina-intro-radiation-and-cells",
+      "npc_id": "npc-mina",
+      "kind": "lesson_intro",
+      "lesson_id": "radiation-and-cells",
+      "journey_id": null,
+      "text": "Radiation can damage a cell. That's a real worry. The other half matters just as much. Let's see both.",
+      "pose": "think"
+    },
+    {
+      "id": "line-mina-intro-risk-in-perspective",
+      "npc_id": "npc-mina",
+      "kind": "lesson_intro",
+      "lesson_id": "risk-in-perspective",
+      "journey_id": null,
+      "text": "Last lesson. No new facts, just a calm way to read a scary number. Take your time with it.",
+      "pose": "idle"
+    },
+    {
+      "id": "line-mina-intro-the-dose-scale",
+      "npc_id": "npc-mina",
+      "kind": "lesson_intro",
+      "lesson_id": "the-dose-scale",
+      "journey_id": null,
+      "text": "How big is a dose, really? You get a little every day, and that's fine. Let's use numbers.",
+      "pose": "explain"
+    },
+    {
+      "id": "line-mina-intro-time-distance-shielding",
+      "npc_id": "npc-mina",
+      "kind": "lesson_intro",
+      "lesson_id": "time-distance-shielding",
+      "journey_id": null,
+      "text": "A dose isn't fixed. There are three ways to lower it. We'll take them one at a time.",
+      "pose": "explain"
+    },
+    {
+      "id": "line-mina-meet",
+      "npc_id": "npc-mina",
+      "kind": "meet",
+      "lesson_id": null,
+      "journey_id": null,
+      "text": "I'm Mina. I teach what radiation does to the body. We'll go one calm step at a time.",
+      "pose": "greet"
+    },
+    {
+      "id": "line-mina-sign-off",
+      "npc_id": "npc-mina",
+      "kind": "sign_off",
+      "lesson_id": null,
+      "journey_id": null,
+      "text": "Unit done. You can say how big a dose is, how the body copes, and what lowers it.",
+      "pose": "proud"
+    },
+    {
+      "id": "line-mina-tease",
+      "npc_id": "npc-mina",
+      "kind": "tease",
+      "lesson_id": null,
+      "journey_id": null,
+      "text": "That's all of my lessons for now. More is on the way, and I'll be here when it arrives.",
+      "pose": "idle"
+    },
+    {
+      "id": "line-ray-intro-becquerel-gray-sievert",
+      "npc_id": "npc-ray",
+      "kind": "lesson_intro",
+      "lesson_id": "becquerel-gray-sievert",
+      "journey_id": null,
+      "text": "Three units, three questions. Get the unit wrong and the number means nothing. Let's get them right.",
+      "pose": "explain"
+    },
+    {
+      "id": "line-ray-intro-detecting-radiation",
+      "npc_id": "npc-ray",
+      "kind": "lesson_intro",
+      "lesson_id": "detecting-radiation",
+      "journey_id": null,
+      "text": "Puzzle. A detector reads something in an empty field. Is it broken? Let's find out.",
+      "pose": "point"
+    },
+    {
+      "id": "line-ray-intro-ionizing-or-not",
+      "npc_id": "npc-ray",
+      "kind": "lesson_intro",
+      "lesson_id": "ionizing-or-not",
+      "journey_id": null,
+      "text": "Not all radiation is the same. First job: sort out which kind can knock electrons off atoms.",
+      "pose": "point"
+    },
+    {
+      "id": "line-ray-intro-irradiated-or-contaminated",
+      "npc_id": "npc-ray",
+      "kind": "lesson_intro",
+      "lesson_id": "irradiated-or-contaminated",
+      "journey_id": null,
+      "text": "Standing near a source is not the same as having material on you. Let's separate the two.",
+      "pose": "think"
+    },
+    {
+      "id": "line-ray-intro-what-stops-what",
+      "npc_id": "npc-ray",
+      "kind": "lesson_intro",
+      "lesson_id": "what-stops-what",
+      "journey_id": null,
+      "text": "Three kinds, three different stoppers. Paper, thin metal, thick lead. Learn which is which.",
+      "pose": "explain"
+    },
+    {
+      "id": "line-ray-meet",
+      "npc_id": "npc-ray",
+      "kind": "meet",
+      "lesson_id": null,
+      "journey_id": null,
+      "text": "I'm Ray. Radiation, what it does to things, what stops it. Short answers. Let's go.",
+      "pose": "greet"
+    },
+    {
+      "id": "line-ray-sign-off",
+      "npc_id": "npc-ray",
+      "kind": "sign_off",
+      "lesson_id": null,
+      "journey_id": null,
+      "text": "Unit done. You can say what radiation does and what stops it. Noted. Good work.",
+      "pose": "proud"
+    },
+    {
+      "id": "line-ray-tease",
+      "npc_id": "npc-ray",
+      "kind": "tease",
+      "lesson_id": null,
+      "journey_id": null,
+      "text": "Finish my unit first. After that: what radiation does to the body. That one is Mina's.",
+      "pose": "idle"
     }
   ]
 }

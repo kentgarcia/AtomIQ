@@ -62,6 +62,12 @@ export const PLAYER_SIZE = { w: 0.7, h: 1 } as const;
  *   k  key                                       u  spring (bounces the hero about six tiles up)
  *   M  moving platform, three tiles wide, slides sideways (its left end is the letter)
  *   W  moving platform, three tiles wide, slides up and down
+ *   H  lead block: solid, and stops a radiation beam above it, so the ground under it is a shelter
+ *   V  radiation beam: a pulsing ray that shines straight down from this tile until the first solid tile (the
+ *      ground, a bridge's end, a lead block). While it is on it costs a heart; it blinks first, then goes dark.
+ *   D  dose source: a glowing box with a field round it (`DOSE_RADIUS` tiles). While the hero stands in the field a dose meter
+ *      fills; when it is full it costs a heart and starts again, and out of the field it drains. Crossing quickly (time) or
+ *      keeping away (distance) is safe, and a lead block between the source and the hero (shielding) puts the hero out of the field.
  *   1 to 9  a readable sign: its words are `signs[n - 1]`, shown while the hero stands near it. A sign is a picture of what it
  *           is about (`SignIcon`: the arrow buttons, a spring, a gem...), so an entry of `signs` is a string (the plain
  *           sign) or `{ text, icon }`
@@ -83,7 +89,7 @@ export interface LevelDef {
 export type SignIcon =
   | "sign" | "move" | "jump" | "coin" | "gem" | "enemy" | "boss" | "checkpoint" | "door" | "spring" | "plank" | "bridge"
   | "belt" | "saw" | "lava" | "water" | "key" | "lock" | "block" | "heart" | "brick" | "spikes" | "platform" | "lift"
-  | "lesson" | "tip";
+  | "beam" | "lead" | "dose" | "lesson" | "tip";
 export interface SignDef {
   text: string;
   icon: SignIcon;
@@ -199,6 +205,40 @@ export const PLATFORM_SWING = { x: { range: 3, speed: 2 }, y: { range: 2.5, spee
 /** The top of a platform sits this far below the top of its tile. */
 const PLATFORM_DROP = 0.3;
 
+/** A radiation beam: the tile it shines from, and the first solid row below it (`endRow`; the beam fills the rows between). */
+export interface BeamTile {
+  c: number;
+  r: number;
+  endRow: number;
+}
+
+/** A beam repeats every `BEAM_PERIOD` seconds: dark, then a blinking warning, then on. Columns share the cycle in zones of `BEAM_ZONE` (a row of beams side by side keeps time together), and neighbouring zones are half a cycle apart. */
+export const BEAM_ZONE = 6;
+export const BEAM_PERIOD = 3.2;
+export const BEAM_WARN = 0.6;
+export const BEAM_ON = 1.2;
+export type BeamPhase = "off" | "warn" | "on";
+
+/** A dose source: its tile. The field is a disc of `DOSE_RADIUS` tiles round the middle of the tile. */
+export interface DoseTile {
+  c: number;
+  r: number;
+}
+export const DOSE_RADIUS = 3.6;
+/** Seconds standing in a field for the meter to fill, and seconds out of it for a full meter to drain. */
+export const DOSE_FILL_TIME = 2.4;
+export const DOSE_DRAIN_TIME = 1.2;
+
+/** Where a beam in column `c` is in its cycle at world time `t`: off for the first stretch, warning, then on. */
+export function beamPhase(c: number, t: number): BeamPhase {
+  'worklet';
+  const x = (((t + (Math.floor(c / BEAM_ZONE) % 2) * (BEAM_PERIOD / 2)) % BEAM_PERIOD) + BEAM_PERIOD) % BEAM_PERIOD;
+  const offUntil = BEAM_PERIOD - BEAM_WARN - BEAM_ON;
+  if (x < offUntil) return "off";
+  if (x < offUntil + BEAM_WARN) return "warn";
+  return "on";
+}
+
 export interface Level {
   id: string;
   title: string;
@@ -234,6 +274,11 @@ export interface Level {
   platforms: PlatformDef[];
   signs: SignTile[];
   scenery: SceneryTile[];
+  /** Row-major: 1 where a lead block is (the tile is solid). */
+  lead: Uint8Array;
+  beams: BeamTile[];
+  /** Dose sources: a field round each of them fills the hero's dose meter. */
+  doseSources: DoseTile[];
 }
 
 export const parseLevel = (def: LevelDef): Level => {
@@ -251,6 +296,9 @@ export const parseLevel = (def: LevelDef): Level => {
   const oneway = new Uint8Array(rows * cols);
   const bridge = new Uint8Array(rows * cols);
   const conveyor = new Int8Array(rows * cols);
+  const lead = new Uint8Array(rows * cols);
+  const beamTiles: { c: number; r: number }[] = [];
+  const doseSources: DoseTile[] = [];
   const blocks: BlockTile[] = [];
   const blockAt = new Int16Array(rows * cols);
   const keys: Point[] = [];
@@ -267,6 +315,11 @@ export const parseLevel = (def: LevelDef): Level => {
       const ch = line[c];
       const i = r * cols + c;
       if (ch === "#") solid[i] = 1;
+      else if (ch === "H") {
+        solid[i] = 1;
+        lead[i] = 1;
+      } else if (ch === "V") beamTiles.push({ c, r });
+      else if (ch === "D") doseSources.push({ c, r });
       else if (ch === "~") water[i] = 1;
       else if (ch === "%") water[i] = 2;
       else if (ch === "$") gems.push({ x: c + 0.5, y: r + 0.5 });
@@ -334,7 +387,13 @@ export const parseLevel = (def: LevelDef): Level => {
   if (!start) throw new Error(`${def.id}: no start (P)`);
   if (!goal) throw new Error(`${def.id}: no goal (F)`);
   checkpoints.sort((a, b) => a.x - b.x);
-  return { id: def.id, title: def.title, cols, rows, solid, water, start, goal, checkpoints: [start, ...checkpoints], coins, gems, spikes, saws, enemies, decor, oneway, bridge, conveyor, blocks, blockAt, keys, springs, platforms, signs, scenery };
+  // A beam shines down to the first solid tile under it (a lead block, a belt, a block or the ground): that is what a shelter is
+  const beams: BeamTile[] = beamTiles.map(({ c, r }) => {
+    let endRow = r + 1;
+    while (endRow < rows && solid[endRow * cols + c] !== 1) endRow++;
+    return { c, r, endRow };
+  });
+  return { id: def.id, title: def.title, cols, rows, solid, water, start, goal, checkpoints: [start, ...checkpoints], coins, gems, spikes, saws, enemies, decor, oneway, bridge, conveyor, blocks, blockAt, keys, springs, platforms, signs, scenery, lead, beams, doseSources };
 };
 
 export const isSolid = (level: Level, c: number, r: number): boolean => {
@@ -438,6 +497,8 @@ export interface World {
   battleEnemy: number | null;
   /** The flag was touched while a boss still stood, and the learner has been told. */
   flagLockedTold: boolean;
+  /** The dose meter, 0 to 1: it fills while the hero is in the field of a dose source and drains outside. */
+  dose: number;
   stats: Stats;
 }
 
@@ -521,6 +582,7 @@ export const createWorld = (source: Level): World => {
   status: "playing",
   battleEnemy: null,
   flagLockedTold: false,
+  dose: 0,
   stats: { coins: 0, defeated: 0, correct: 0, wrong: 0, falls: 0, time: 0 },
   };
 };
@@ -549,7 +611,28 @@ const loseHeart = (world: World, events: WorldEvent[], reason: "spikes" | "fall"
 const respawn = (world: World): void => {
   const at = world.level.checkpoints[world.checkpoint];
   world.hero = { ...makeHero(at), facing: world.hero.facing, invulnerable: INVULNERABLE_TIME, blink: true };
+  world.dose = 0;
 };
+
+/**
+ * Is the hero in the field of this dose source? Inside the disc, and no lead block on the straight line between the middle of the
+ * source and the middle of the hero: lead is the shield.
+ */
+export function inDoseField(level: Level, source: DoseTile, hx: number, hy: number): boolean {
+  const sx = source.c + 0.5;
+  const sy = source.r + 0.5;
+  const dx = hx - sx;
+  const dy = hy - sy;
+  const dist = Math.hypot(dx, dy);
+  if (dist > DOSE_RADIUS) return false;
+  const steps = Math.ceil(dist / 0.25);
+  for (let k = 1; k < steps; k++) {
+    const c = Math.floor(sx + (dx * k) / steps);
+    const r = Math.floor(sy + (dy * k) / steps);
+    if (c >= 0 && c < level.cols && r >= 0 && r < level.rows && level.lead[r * level.cols + c] === 1) return false;
+  }
+  return true;
+}
 
 /** Push the hero away from a point and up, and give a moment of grace. */
 const knockBack = (hero: Hero, fromX: number): void => {
@@ -886,6 +969,22 @@ export const stepWorld = (world: World, input: Input, dt: number = STEP): WorldE
     }
   }
 
+  // Dose sources: the meter fills in a field and drains outside it; a full meter costs a heart (never during a moment of grace)
+  if (level.doseSources.length > 0) {
+    const cx = hero.x + hero.w / 2;
+    const cy = hero.y + hero.h / 2;
+    const exposed = level.doseSources.some((src) => inDoseField(level, src, cx, cy));
+    world.dose = Math.min(1, Math.max(0, world.dose + (exposed ? dt / DOSE_FILL_TIME : -dt / DOSE_DRAIN_TIME)));
+    if (world.dose >= 1 && hero.invulnerable === 0) {
+      world.dose = 0;
+      hero.invulnerable = INVULNERABLE_TIME;
+      hero.blink = true;
+      hero.hurtT = HURT_TIME;
+      loseHeart(world, events, "spikes");
+      return events;
+    }
+  }
+
   // Spikes and saws
   if (hero.invulnerable === 0) {
     for (const s of level.spikes) {
@@ -898,6 +997,14 @@ export const stepWorld = (world: World, input: Input, dt: number = STEP): WorldE
     for (const s of level.saws) {
       if (overlaps(hero.x, hero.y, hero.w, hero.h, s.c + 0.14, s.r + 0.14, 0.72, 0.72)) {
         knockBack(hero, s.c + 0.5);
+        loseHeart(world, events, "spikes");
+        return events;
+      }
+    }
+    for (const b of level.beams) {
+      if (b.endRow <= b.r + 1 || beamPhase(b.c, world.t) !== "on") continue;
+      if (overlaps(hero.x, hero.y, hero.w, hero.h, b.c + 0.22, b.r + 1, 0.56, b.endRow - b.r - 1)) {
+        knockBack(hero, b.c + 0.5);
         loseHeart(world, events, "spikes");
         return events;
       }

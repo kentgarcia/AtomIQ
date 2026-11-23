@@ -798,6 +798,7 @@
       },
       "difficulty": 1,
       "surfaces": [
+        "lesson",
         "practice",
         "checkpoint",
         "review"
@@ -1478,6 +1479,7 @@
       },
       "difficulty": 2,
       "surfaces": [
+        "lesson",
         "practice",
         "checkpoint",
         "review"
@@ -1820,6 +1822,7 @@
       },
       "difficulty": 1,
       "surfaces": [
+        "lesson",
         "practice",
         "checkpoint",
         "review"
@@ -2456,7 +2459,7 @@
       "data": {
         "statement": "A radioactive atom needs a person to make it decay.",
         "answer": "myth",
-        "explanation": "Myth. Nobody has to make an unstable nucleus change. It changes by itself."
+        "explanation": "Myth. Nobody has to make an unstable nucleus change. The instability is already inside it, so it changes by itself."
       },
       "difficulty": 1,
       "surfaces": [
@@ -4284,6 +4287,3726 @@
       ],
       "reference_ids": [
         "ref-openstax-up3-10-3"
+      ]
+    },
+    {
+      "id": "u3-l1-choice-ionizing",
+      "objective_id": "u3-ionizing-meaning",
+      "type": "choice",
+      "data": {
+        "prompt": "What makes radiation ionizing?",
+        "options": [
+          {
+            "id": "sun",
+            "label": "It comes from the sun",
+            "note": "Where radiation comes from does not decide it. What matters is how much energy it has."
+          },
+          {
+            "id": "energy",
+            "label": "It has enough energy to knock electrons out of atoms"
+          },
+          {
+            "id": "bright",
+            "label": "It is very bright",
+            "note": "Brightness has nothing to do with it. Visible light is bright and is not ionizing."
+          },
+          {
+            "id": "particles",
+            "label": "It is made of particles",
+            "note": "Some ionizing radiation is waves, such as gamma rays and X-rays, so it is not about particles."
+          }
+        ],
+        "answer": "energy",
+        "explanation": "Ionizing means it has enough energy to knock an electron out of an atom. The word describes what the radiation can do, not where it came from or what it is made of."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-epa-radiation-basics",
+        "ref-openstax-chem-21-6"
+      ]
+    },
+    {
+      "id": "u3-l1-choice-xray",
+      "objective_id": "u3-sort-radiation",
+      "type": "choice",
+      "data": {
+        "prompt": "Which of these is ionizing?",
+        "options": [
+          {
+            "id": "radio",
+            "label": "Radio waves",
+            "note": "Radio waves do not have enough energy to remove electrons."
+          },
+          {
+            "id": "xray",
+            "label": "X-rays"
+          },
+          {
+            "id": "micro",
+            "label": "Microwaves",
+            "note": "Microwaves do not have enough energy to remove electrons."
+          },
+          {
+            "id": "light",
+            "label": "Visible light",
+            "note": "Visible light does not have enough energy to remove electrons."
+          }
+        ],
+        "answer": "xray",
+        "explanation": "X-rays are ionizing. Radio waves, microwaves and visible light are all on the other side of the line."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-epa-radiation-basics"
+      ]
+    },
+    {
+      "id": "u3-l1-fill-ionizing",
+      "objective_id": "u3-ionizing-meaning",
+      "type": "fill",
+      "data": {
+        "prompt": "Radiation with enough energy to knock electrons out of atoms is called ___ radiation.",
+        "mode": "bank",
+        "bank": [
+          {
+            "id": "ionizing",
+            "label": "ionizing"
+          },
+          {
+            "id": "visible",
+            "label": "visible"
+          },
+          {
+            "id": "radio",
+            "label": "radio"
+          }
+        ],
+        "answer": "ionizing",
+        "explanation": "The knocking out of an electron is ionization, so radiation that can do it is ionizing radiation."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-epa-radiation-basics"
+      ]
+    },
+    {
+      "id": "u3-l1-sort-ionizing",
+      "objective_id": "u3-sort-radiation",
+      "type": "sort",
+      "data": {
+        "prompt": "Can it knock electrons out of atoms? Put each one in its group.",
+        "buckets": [
+          {
+            "id": "ionizing",
+            "label": "Ionizing",
+            "icon": "AqAtomOff"
+          },
+          {
+            "id": "non",
+            "label": "Not ionizing",
+            "icon": "AqAtom"
+          }
+        ],
+        "items": [
+          {
+            "id": "xray",
+            "label": "X-rays",
+            "bucket": "ionizing"
+          },
+          {
+            "id": "radio",
+            "label": "Radio waves",
+            "bucket": "non"
+          },
+          {
+            "id": "gamma",
+            "label": "Gamma rays",
+            "bucket": "ionizing"
+          },
+          {
+            "id": "light",
+            "label": "Visible light",
+            "bucket": "non"
+          }
+        ],
+        "explanation": "X-rays and gamma rays are ionizing. Radio waves and visible light are not. The ionizing ones carry enough energy to remove electrons."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-epa-radiation-basics",
+        "ref-openstax-chem-21-6"
+      ]
+    },
+    {
+      "id": "u3-l1-tom-ionization",
+      "objective_id": "u3-ionizing-meaning",
+      "type": "true_or_myth",
+      "data": {
+        "statement": "Knocking an electron out of an atom is called ionization.",
+        "answer": "true",
+        "explanation": "True. Ionization is the removal of an electron from an atom, and ionizing radiation is radiation that has the energy to do it."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-epa-radiation-basics"
+      ]
+    },
+    {
+      "id": "u3-l1-tom-light",
+      "objective_id": "u3-sort-radiation",
+      "type": "true_or_myth",
+      "data": {
+        "statement": "Visible light is a kind of radiation.",
+        "answer": "true",
+        "explanation": "True. Visible light is radiation too. It is non-ionizing, because it cannot knock electrons out of atoms."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-epa-radiation-basics",
+        "ref-openstax-chem-21-6"
+      ]
+    },
+    {
+      "id": "u3-l1-tom-same",
+      "objective_id": "u3-ionizing-meaning",
+      "type": "true_or_myth",
+      "data": {
+        "statement": "All radiation is the same.",
+        "answer": "myth",
+        "explanation": "Myth. Radiation comes in many kinds, and they differ in energy. Ionizing radiation can knock electrons out of atoms. Radio waves, microwaves and visible light cannot."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-epa-radiation-basics"
+      ]
+    },
+    {
+      "id": "u3-l2-choice-alpha",
+      "objective_id": "u3-penetration",
+      "type": "choice",
+      "data": {
+        "prompt": "What is enough to stop alpha particles?",
+        "options": [
+          {
+            "id": "lead",
+            "label": "Several inches of lead",
+            "note": "That would stop them, but it is far more than they need. They are heavy and run out of energy very quickly."
+          },
+          {
+            "id": "paper",
+            "label": "A sheet or two of paper"
+          },
+          {
+            "id": "none",
+            "label": "Nothing can stop them",
+            "note": "Alpha particles are the easiest of the three to stop."
+          },
+          {
+            "id": "wall",
+            "label": "A thick concrete wall",
+            "note": "That is far more than they need. Paper or skin is enough."
+          }
+        ],
+        "answer": "paper",
+        "explanation": "An alpha particle is heavy, so it loses its energy over a very short distance. Paper, or the top layer of skin, is enough to stop it."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-epa-radiation-basics",
+        "ref-openstax-chem-21-6"
+      ]
+    },
+    {
+      "id": "u3-l2-choice-apron",
+      "objective_id": "u3-gamma-shielding",
+      "type": "choice",
+      "data": {
+        "prompt": "Why does a dentist put a lead apron on you for an X-ray?",
+        "options": [
+          {
+            "id": "stop",
+            "label": "Lead is a barrier that protects against X-rays"
+          },
+          {
+            "id": "warm",
+            "label": "It keeps you warm during the visit",
+            "note": "The apron is there as a barrier against X-rays."
+          },
+          {
+            "id": "clean",
+            "label": "It keeps dust off your clothes",
+            "note": "The apron is there as a barrier against X-rays, not against dust."
+          }
+        ],
+        "answer": "stop",
+        "explanation": "Lead is a dense material, so it works as a barrier against X-rays, the same way it does against gamma rays."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-epa-protecting-yourself"
+      ]
+    },
+    {
+      "id": "u3-l2-choice-beta",
+      "objective_id": "u3-penetration",
+      "type": "choice",
+      "data": {
+        "prompt": "What stops beta particles?",
+        "options": [
+          {
+            "id": "paper",
+            "label": "A sheet of paper",
+            "note": "Beta particles are small and fast, and they pass through paper."
+          },
+          {
+            "id": "lead",
+            "label": "Several inches of lead",
+            "note": "They do not need anything like that. A thin layer of metal stops them."
+          },
+          {
+            "id": "none",
+            "label": "Nothing can stop them",
+            "note": "A thin layer of metal does."
+          },
+          {
+            "id": "metal",
+            "label": "A thin layer of metal, such as aluminum"
+          }
+        ],
+        "answer": "metal",
+        "explanation": "A beta particle is small and fast, so paper does not stop it. A thin layer of metal does."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-epa-radiation-basics",
+        "ref-openstax-chem-21-6"
+      ]
+    },
+    {
+      "id": "u3-l2-choice-gamma",
+      "objective_id": "u3-gamma-shielding",
+      "type": "choice",
+      "data": {
+        "prompt": "What makes a good shield against gamma rays?",
+        "options": [
+          {
+            "id": "thick",
+            "label": "A thick layer of a dense material, such as lead or concrete"
+          },
+          {
+            "id": "paper",
+            "label": "A sheet of paper",
+            "note": "Gamma rays pass straight through paper."
+          },
+          {
+            "id": "cloth",
+            "label": "Ordinary clothing",
+            "note": "Gamma rays pass through clothing. They need something thick and dense."
+          },
+          {
+            "id": "thin",
+            "label": "A thin sheet of metal",
+            "note": "A thin layer of metal stops beta particles, but gamma rays go through it."
+          }
+        ],
+        "answer": "thick",
+        "explanation": "Gamma rays are very penetrating, so the shield has to be both thick and dense. Several inches of lead or a few feet of concrete will do it."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-epa-radiation-basics",
+        "ref-openstax-chem-21-6"
+      ]
+    },
+    {
+      "id": "u3-l2-fill-gamma",
+      "objective_id": "u3-gamma-shielding",
+      "type": "fill",
+      "data": {
+        "prompt": "To stop gamma rays you need a thick layer of a ___ material, such as lead.",
+        "mode": "bank",
+        "bank": [
+          {
+            "id": "dense",
+            "label": "dense"
+          },
+          {
+            "id": "light",
+            "label": "light"
+          },
+          {
+            "id": "clear",
+            "label": "clear"
+          }
+        ],
+        "answer": "dense",
+        "explanation": "Dense material has a lot of matter packed into it, and that is what a gamma ray has to get through. Lead and concrete are dense."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-epa-radiation-basics"
+      ]
+    },
+    {
+      "id": "u3-l2-match-stops",
+      "objective_id": "u3-penetration",
+      "type": "match",
+      "data": {
+        "prompt": "Match each kind of radiation to what stops it.",
+        "pairs": [
+          {
+            "id": "alpha",
+            "left": "Alpha",
+            "right": "A sheet of paper"
+          },
+          {
+            "id": "beta",
+            "left": "Beta",
+            "right": "A thin layer of metal"
+          },
+          {
+            "id": "gamma",
+            "left": "Gamma",
+            "right": "Inches of lead or feet of concrete"
+          }
+        ],
+        "explanation": "Each step up needs something denser or thicker: paper for alpha, thin metal for beta, and several inches of lead or a few feet of concrete for gamma."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-epa-radiation-basics",
+        "ref-openstax-chem-21-6"
+      ]
+    },
+    {
+      "id": "u3-l2-order-pen",
+      "objective_id": "u3-penetration",
+      "type": "order",
+      "data": {
+        "prompt": "Put them in order, from the easiest to stop to the hardest to stop.",
+        "items": [
+          {
+            "id": "alpha",
+            "label": "Alpha particles (stopped by paper)"
+          },
+          {
+            "id": "beta",
+            "label": "Beta particles (stopped by thin metal)"
+          },
+          {
+            "id": "gamma",
+            "label": "Gamma rays (need thick lead or concrete)"
+          }
+        ],
+        "explanation": "Paper is enough for alpha, thin metal is needed for beta, and thick, dense material for gamma. The more it takes to stop it, the more penetrating the radiation is."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-epa-radiation-basics",
+        "ref-openstax-chem-21-6"
+      ]
+    },
+    {
+      "id": "u3-l2-predict-paper",
+      "objective_id": "u3-penetration",
+      "type": "predict",
+      "data": {
+        "prompt": "A sheet of paper is held in front of a stream of alpha particles. What do you think happens?",
+        "input": "choice",
+        "options": [
+          {
+            "id": "stops",
+            "label": "The paper stops them"
+          },
+          {
+            "id": "through",
+            "label": "They go straight through"
+          },
+          {
+            "id": "burn",
+            "label": "The paper burns"
+          },
+          {
+            "id": "bounce",
+            "label": "They bounce back at full speed"
+          }
+        ],
+        "answer": "stops",
+        "explanation": "Your guess is not scored. Keep it in mind while we look at alpha, beta and gamma."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson"
+      ],
+      "reference_ids": [
+        "ref-epa-radiation-basics"
+      ]
+    },
+    {
+      "id": "u3-l2-tom-gamma-paper",
+      "objective_id": "u3-gamma-shielding",
+      "type": "true_or_myth",
+      "data": {
+        "statement": "A sheet of paper stops gamma rays.",
+        "answer": "myth",
+        "explanation": "Myth. Gamma rays pass through paper, and through skin and clothing too. It takes several inches of lead or a few feet of concrete to stop them."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-epa-radiation-basics"
+      ]
+    },
+    {
+      "id": "u3-l2-tom-skin",
+      "objective_id": "u3-penetration",
+      "type": "true_or_myth",
+      "data": {
+        "statement": "The outer layer of your skin stops alpha particles.",
+        "answer": "true",
+        "explanation": "True. Alpha particles cannot get through the outer layer of skin, for the same reason a sheet of paper stops them: they are heavy and lose their energy fast."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-epa-radiation-basics"
+      ]
+    },
+    {
+      "id": "u3-l2-tom-thin-metal",
+      "objective_id": "u3-gamma-shielding",
+      "type": "true_or_myth",
+      "data": {
+        "statement": "A thin layer of metal is enough to stop gamma rays.",
+        "answer": "myth",
+        "explanation": "Myth. A thin layer of metal stops beta particles, but gamma rays pass through it. They need several inches of lead or a few feet of concrete."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-epa-radiation-basics"
+      ]
+    },
+    {
+      "id": "u3-l3-choice-contaminated",
+      "objective_id": "u3-exposure-vs-contamination",
+      "type": "choice",
+      "data": {
+        "prompt": "Which of these is contamination?",
+        "options": [
+          {
+            "id": "near",
+            "label": "Standing near a sealed source",
+            "note": "That is exposure: radiation reaches you, but no material gets on you."
+          },
+          {
+            "id": "xray",
+            "label": "Having a medical X-ray",
+            "note": "That is exposure to a source outside the body. No material gets on you."
+          },
+          {
+            "id": "dust",
+            "label": "Radioactive dust on your sleeve"
+          },
+          {
+            "id": "beam",
+            "label": "Standing in the path of an X-ray beam",
+            "note": "That is exposure. Contamination needs radioactive material to be on or in something."
+          }
+        ],
+        "answer": "dust",
+        "explanation": "Contamination means radioactive material is on or in something. Dust on a sleeve is material on your clothes. The other three are exposure to radiation from a source."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-hps-radioactive-contamination"
+      ]
+    },
+    {
+      "id": "u3-l3-choice-continues",
+      "objective_id": "u3-exposure-ends",
+      "type": "choice",
+      "data": {
+        "prompt": "Radioactive dust is on someone's jacket. They walk out of the room. Are they still exposed?",
+        "options": [
+          {
+            "id": "no",
+            "label": "No, they left the radiation behind",
+            "note": "The dust is on the jacket, so it came with them. Leaving the room does not remove it."
+          },
+          {
+            "id": "yes",
+            "label": "Yes, until the dust is removed"
+          },
+          {
+            "id": "never",
+            "label": "No, dust cannot give off radiation",
+            "note": "Radioactive dust does give off radiation. The material is the source."
+          }
+        ],
+        "answer": "yes",
+        "explanation": "A contaminated person is exposed until the radioactive material is removed. The dust goes wherever the jacket goes, so walking away does not end it."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-hps-radioactive-contamination"
+      ]
+    },
+    {
+      "id": "u3-l3-choice-internal",
+      "objective_id": "u3-exposure-vs-contamination",
+      "type": "choice",
+      "data": {
+        "prompt": "Someone breathes in radioactive dust. What is this called?",
+        "options": [
+          {
+            "id": "expose",
+            "label": "Only exposure, because nothing touched them",
+            "note": "Material that is breathed in is inside the body, so it is contamination, not only exposure."
+          },
+          {
+            "id": "contam",
+            "label": "Contamination: radioactive material is in their body"
+          },
+          {
+            "id": "nothing",
+            "label": "Neither, because dust is not radiation",
+            "note": "The dust is radioactive material. When it is in the body, that is contamination."
+          }
+        ],
+        "answer": "contam",
+        "explanation": "Contamination can be material on skin or clothes, or material that is breathed in or swallowed. Breathed-in dust is radioactive material inside the body."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-hps-radioactive-contamination"
+      ]
+    },
+    {
+      "id": "u3-l3-choice-stops",
+      "objective_id": "u3-exposure-ends",
+      "type": "choice",
+      "data": {
+        "prompt": "You step out of the path of an X-ray beam. What happens to your exposure?",
+        "options": [
+          {
+            "id": "cont",
+            "label": "It carries on, because the radiation is stuck to you",
+            "note": "Radiation does not stick to people. Once it stops reaching you, the exposure is over."
+          },
+          {
+            "id": "ends",
+            "label": "It ends, because the radiation no longer reaches you"
+          },
+          {
+            "id": "half",
+            "label": "It drops to half, then fades",
+            "note": "Exposure to a source outside you stops when the radiation stops reaching you."
+          }
+        ],
+        "answer": "ends",
+        "explanation": "Exposure to a source outside you lasts only while the radiation reaches you. Move out of its path, or put a shield in the way, and it is over."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-who-ionizing-radiation"
+      ]
+    },
+    {
+      "id": "u3-l3-fill-removed",
+      "objective_id": "u3-exposure-ends",
+      "type": "fill",
+      "data": {
+        "prompt": "A contaminated person is exposed until the radioactive material is ___.",
+        "mode": "bank",
+        "bank": [
+          {
+            "id": "removed",
+            "label": "removed"
+          },
+          {
+            "id": "seen",
+            "label": "seen"
+          },
+          {
+            "id": "counted",
+            "label": "counted"
+          }
+        ],
+        "answer": "removed",
+        "explanation": "The material is the source. While it stays on or in the person, they stay exposed, so what ends it is taking the material away."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-hps-radioactive-contamination"
+      ]
+    },
+    {
+      "id": "u3-l3-match-ends",
+      "objective_id": "u3-exposure-ends",
+      "type": "match",
+      "data": {
+        "prompt": "When does the exposure end in each case?",
+        "pairs": [
+          {
+            "id": "near",
+            "left": "You stand near a source",
+            "right": "When you move away or it is shielded"
+          },
+          {
+            "id": "skin",
+            "left": "Radioactive dust is on your skin",
+            "right": "When the dust is removed"
+          },
+          {
+            "id": "inside",
+            "left": "Radioactive material is inside the body",
+            "right": "When it leaves the body"
+          }
+        ],
+        "explanation": "The exposure lasts as long as the radiation reaches you. With a source outside you, that ends when you move away or shield it. With material on you it ends when the material is removed, and with material inside you when it leaves the body."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-who-ionizing-radiation",
+        "ref-hps-radioactive-contamination"
+      ]
+    },
+    {
+      "id": "u3-l3-predict-near",
+      "objective_id": "u3-exposure-vs-contamination",
+      "type": "predict",
+      "data": {
+        "prompt": "You stand near a sealed radioactive source for a while, then walk away. What is on your clothes?",
+        "input": "choice",
+        "options": [
+          {
+            "id": "nothing",
+            "label": "Nothing: no material got onto me"
+          },
+          {
+            "id": "dust",
+            "label": "Radioactive dust"
+          },
+          {
+            "id": "rays",
+            "label": "Radiation that stays stuck to the cloth"
+          },
+          {
+            "id": "glow",
+            "label": "A faint glow"
+          }
+        ],
+        "answer": "nothing",
+        "explanation": "Your guess is not scored. The lesson explains what stays and what does not."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson"
+      ],
+      "reference_ids": [
+        "ref-hps-radioactive-contamination"
+      ]
+    },
+    {
+      "id": "u3-l3-tom-sealed",
+      "objective_id": "u3-exposure-ends",
+      "type": "true_or_myth",
+      "data": {
+        "statement": "Radioactive material in a sealed container stays in the container.",
+        "answer": "true",
+        "explanation": "True. A sealed source keeps its material inside. Material that is not sealed is the kind that might be spread onto other objects."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-hps-radioactive-contamination"
+      ]
+    },
+    {
+      "id": "u3-l3-tom-spread",
+      "objective_id": "u3-exposure-vs-contamination",
+      "type": "true_or_myth",
+      "data": {
+        "statement": "Radiation gets onto your clothes the way dust does.",
+        "answer": "myth",
+        "explanation": "Myth. Radiation does not get on or in people. Radioactive material can, and it is the material that spreads, like dust or glitter."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-hps-radioactive-contamination"
+      ]
+    },
+    {
+      "id": "u3-l3-tom-washing",
+      "objective_id": "u3-exposure-ends",
+      "type": "true_or_myth",
+      "data": {
+        "statement": "Radioactive material on skin or clothes can often be washed off.",
+        "answer": "true",
+        "explanation": "True. Material on skin or clothes can often be washed off. Once it is gone, that exposure ends."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-who-ionizing-radiation"
+      ]
+    },
+    {
+      "id": "u3-l4-choice-background",
+      "objective_id": "u3-background-reading",
+      "type": "choice",
+      "data": {
+        "prompt": "Why does a working detector read a little in an empty field?",
+        "options": [
+          {
+            "id": "broken",
+            "label": "It is broken",
+            "note": "A working detector reads a little almost anywhere, because background radiation is always present."
+          },
+          {
+            "id": "bg",
+            "label": "Background radiation is always present on Earth"
+          },
+          {
+            "id": "leak",
+            "label": "There is a hidden source close by",
+            "note": "No source is needed. Background radiation comes from natural minerals in the ground, soil and water, and from cosmic radiation."
+          }
+        ],
+        "answer": "bg",
+        "explanation": "Background radiation is present on Earth at all times. It comes from natural minerals and from cosmic radiation, so a working detector picks up a little almost anywhere."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-epa-radiation-basics"
+      ]
+    },
+    {
+      "id": "u3-l4-choice-geiger",
+      "objective_id": "u3-detectors",
+      "type": "choice",
+      "data": {
+        "prompt": "What does a Geiger counter detect?",
+        "options": [
+          {
+            "id": "light",
+            "label": "Flashes of light",
+            "note": "That is how a scintillation counter works. A Geiger counter looks for ionization in a gas."
+          },
+          {
+            "id": "gas",
+            "label": "Ionization of the gas in its tube"
+          },
+          {
+            "id": "heat",
+            "label": "Heat from the radiation",
+            "note": "A Geiger counter does not use heat. It detects ionization of a gas."
+          },
+          {
+            "id": "sound",
+            "label": "Sound waves",
+            "note": "A Geiger counter does not use sound. It detects ionization of a gas."
+          }
+        ],
+        "answer": "gas",
+        "explanation": "Radiation ionizes the gas inside the tube, and the counter detects that. A scintillation counter is the one that uses flashes of light."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-openstax-chem-21-6"
+      ]
+    },
+    {
+      "id": "u3-l4-choice-sources",
+      "objective_id": "u3-background-reading",
+      "type": "choice",
+      "data": {
+        "prompt": "Where does background radiation mostly come from?",
+        "options": [
+          {
+            "id": "phones",
+            "label": "Phones and radios",
+            "note": "Background radiation is natural. It comes mostly from minerals in the ground, soil and water, and from cosmic radiation."
+          },
+          {
+            "id": "nat",
+            "label": "Natural minerals in the ground, soil and water, and cosmic radiation"
+          },
+          {
+            "id": "plants",
+            "label": "Power plants only",
+            "note": "It is present everywhere on Earth, and comes mostly from natural sources."
+          }
+        ],
+        "answer": "nat",
+        "explanation": "Background radiation is mostly natural: minerals in the ground, soil and water, and cosmic radiation from space."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-epa-radiation-basics"
+      ]
+    },
+    {
+      "id": "u3-l4-choice-worn",
+      "objective_id": "u3-detectors",
+      "type": "choice",
+      "data": {
+        "prompt": "Which instrument is worn by a person to measure their exposure?",
+        "options": [
+          {
+            "id": "dosi",
+            "label": "A dosimeter"
+          },
+          {
+            "id": "geiger",
+            "label": "A Geiger counter",
+            "note": "A Geiger counter detects ionization of a gas. It is not what a person wears to measure their own exposure."
+          },
+          {
+            "id": "scint",
+            "label": "A scintillation counter",
+            "note": "A scintillation counter turns flashes of light into a signal. The worn one is the dosimeter."
+          }
+        ],
+        "answer": "dosi",
+        "explanation": "A dosimeter is the instrument worn by a person to measure how much radiation they are exposed to."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-openstax-chem-21-6"
+      ]
+    },
+    {
+      "id": "u3-l4-fill-ionizes",
+      "objective_id": "u3-detectors",
+      "type": "fill",
+      "data": {
+        "prompt": "In a Geiger counter, radiation ___ the gas inside the tube.",
+        "mode": "bank",
+        "bank": [
+          {
+            "id": "ionizes",
+            "label": "ionizes"
+          },
+          {
+            "id": "freezes",
+            "label": "freezes"
+          },
+          {
+            "id": "colours",
+            "label": "colours"
+          }
+        ],
+        "answer": "ionizes",
+        "explanation": "The radiation ionizes the gas, and the counter detects that ionization. It is what turns radiation into a count."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-openstax-chem-21-6"
+      ]
+    },
+    {
+      "id": "u3-l4-match-instruments",
+      "objective_id": "u3-detectors",
+      "type": "match",
+      "data": {
+        "prompt": "Match each instrument to how it works or what it is for.",
+        "pairs": [
+          {
+            "id": "geiger",
+            "left": "Geiger counter",
+            "right": "Radiation ionizes the gas in a tube"
+          },
+          {
+            "id": "scint",
+            "left": "Scintillation counter",
+            "right": "A material gives off flashes of light"
+          },
+          {
+            "id": "dose",
+            "left": "Dosimeter",
+            "right": "Worn to measure a person's exposure"
+          }
+        ],
+        "explanation": "A Geiger counter detects ionization of a gas. A scintillation counter turns flashes of light into a signal. A dosimeter is worn, so it measures one person's exposure."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-openstax-chem-21-6"
+      ]
+    },
+    {
+      "id": "u3-l4-order-geiger",
+      "objective_id": "u3-detectors",
+      "type": "order",
+      "data": {
+        "prompt": "Put the steps inside a Geiger counter in order.",
+        "items": [
+          {
+            "id": "enter",
+            "label": "Radiation passes through the tube"
+          },
+          {
+            "id": "ionize",
+            "label": "It ionizes the gas inside"
+          },
+          {
+            "id": "count",
+            "label": "The counter detects the ionization"
+          }
+        ],
+        "explanation": "The radiation goes through the gas first and ionizes it. The counter detects that ionization, and that is what gives a count."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-openstax-chem-21-6"
+      ]
+    },
+    {
+      "id": "u3-l4-predict-room",
+      "objective_id": "u3-detectors",
+      "type": "predict",
+      "data": {
+        "prompt": "The detector reads a small amount in an empty field. What do you think is going on?",
+        "input": "choice",
+        "options": [
+          {
+            "id": "broken",
+            "label": "It is broken"
+          },
+          {
+            "id": "always",
+            "label": "There is always a little radiation around"
+          },
+          {
+            "id": "leak",
+            "label": "Something dangerous is leaking nearby"
+          },
+          {
+            "id": "battery",
+            "label": "The battery is low"
+          }
+        ],
+        "answer": "always",
+        "explanation": "Your guess is not scored. The next card explains it."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson"
+      ],
+      "reference_ids": [
+        "ref-epa-radiation-basics"
+      ]
+    },
+    {
+      "id": "u3-l4-tom-dosimeter",
+      "objective_id": "u3-detectors",
+      "type": "true_or_myth",
+      "data": {
+        "statement": "A dosimeter is worn to measure how much radiation a person is exposed to.",
+        "answer": "true",
+        "explanation": "True. That is what a dosimeter is for. It stays with the person, so it measures their own exposure."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-openstax-chem-21-6"
+      ]
+    },
+    {
+      "id": "u3-l4-tom-source",
+      "objective_id": "u3-background-reading",
+      "type": "true_or_myth",
+      "data": {
+        "statement": "Cosmic radiation is part of background radiation.",
+        "answer": "true",
+        "explanation": "True. Along with natural minerals in the ground, soil and water, cosmic radiation is one of the main sources of background radiation."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-epa-radiation-basics"
+      ]
+    },
+    {
+      "id": "u3-l4-tom-zero",
+      "objective_id": "u3-background-reading",
+      "type": "true_or_myth",
+      "data": {
+        "statement": "A detector that reads above zero must be right next to a dangerous source.",
+        "answer": "myth",
+        "explanation": "Myth. A working detector picks up background radiation almost anywhere. A small reading is normal, and it varies from place to place."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-epa-radiation-basics"
+      ]
+    },
+    {
+      "id": "u3-l5-choice-big-bq",
+      "objective_id": "u3-unit-not-dose",
+      "type": "choice",
+      "data": {
+        "prompt": "A source has a large number of becquerels. What can you say for sure?",
+        "options": [
+          {
+            "id": "harm",
+            "label": "Anyone nearby will be harmed",
+            "note": "The becquerel does not say that. Harm is described by the sievert, and it depends on the radiation and the tissue."
+          },
+          {
+            "id": "many",
+            "label": "Many of its nuclei decay each second"
+          },
+          {
+            "id": "dose",
+            "label": "A person nearby will absorb a large dose",
+            "note": "Energy absorbed is measured in grays. The becquerel only describes the source."
+          }
+        ],
+        "answer": "many",
+        "explanation": "A large number of becquerels means the source is very active, with many decays each second. It does not tell you the energy absorbed or the harm."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-who-ionizing-radiation"
+      ]
+    },
+    {
+      "id": "u3-l5-choice-gray",
+      "objective_id": "u3-three-units",
+      "type": "choice",
+      "data": {
+        "prompt": "What does the gray measure?",
+        "options": [
+          {
+            "id": "active",
+            "label": "How active a source is",
+            "note": "That is the becquerel. The gray is about what was absorbed."
+          },
+          {
+            "id": "energy",
+            "label": "The energy absorbed, per kilogram"
+          },
+          {
+            "id": "harm",
+            "label": "The potential for harm",
+            "note": "That is the sievert. The gray counts energy only."
+          }
+        ],
+        "answer": "energy",
+        "explanation": "One gray is one joule of energy absorbed by each kilogram. It is about how much energy went in, like the water in the bucket."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-openstax-chem-21-6"
+      ]
+    },
+    {
+      "id": "u3-l5-choice-sv",
+      "objective_id": "u3-three-units",
+      "type": "choice",
+      "data": {
+        "prompt": "What does the sievert take into account that the gray does not?",
+        "options": [
+          {
+            "id": "type",
+            "label": "The type of radiation and how sensitive the tissue is"
+          },
+          {
+            "id": "decays",
+            "label": "How many decays happen each second",
+            "note": "That is what the becquerel counts."
+          },
+          {
+            "id": "distance",
+            "label": "How far away the source is",
+            "note": "The sievert does not count distance. It adds the type of radiation and the tissue to the energy absorbed."
+          }
+        ],
+        "answer": "type",
+        "explanation": "The sievert starts from the energy absorbed and then accounts for the type of radiation and the sensitivity of the tissue. That is why it describes potential for harm."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-openstax-chem-21-6"
+      ]
+    },
+    {
+      "id": "u3-l5-fill-bq",
+      "objective_id": "u3-three-units",
+      "type": "fill",
+      "data": {
+        "prompt": "A source of 20 becquerels has ___ decays every second.",
+        "mode": "bank",
+        "bank": [
+          {
+            "id": "two",
+            "label": "2"
+          },
+          {
+            "id": "twenty",
+            "label": "20"
+          },
+          {
+            "id": "two-hundred",
+            "label": "200"
+          }
+        ],
+        "answer": "twenty",
+        "explanation": "One becquerel is one decay per second, so 20 becquerels is 20 decays every second."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-openstax-chem-21-6"
+      ]
+    },
+    {
+      "id": "u3-l5-match-units",
+      "objective_id": "u3-three-units",
+      "type": "match",
+      "data": {
+        "prompt": "Match each unit to the question it answers.",
+        "pairs": [
+          {
+            "id": "bq",
+            "left": "Becquerel",
+            "right": "How active is the source?"
+          },
+          {
+            "id": "gy",
+            "left": "Gray",
+            "right": "How much energy was absorbed?"
+          },
+          {
+            "id": "sv",
+            "left": "Sievert",
+            "right": "How much harm could it do?"
+          }
+        ],
+        "explanation": "The becquerel is about the source, the gray about the energy absorbed, and the sievert about the potential for harm."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-openstax-chem-21-6"
+      ]
+    },
+    {
+      "id": "u3-l5-tom-bq-dose",
+      "objective_id": "u3-unit-not-dose",
+      "type": "true_or_myth",
+      "data": {
+        "statement": "The number of becquerels tells you how much energy a person absorbed.",
+        "answer": "myth",
+        "explanation": "Myth. A becquerel counts decays in the source, like drops leaving a cloud. How much energy a person absorbs is measured in grays."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-who-ionizing-radiation"
+      ]
+    },
+    {
+      "id": "u3-l5-tom-per-second",
+      "objective_id": "u3-three-units",
+      "type": "true_or_myth",
+      "data": {
+        "statement": "One becquerel is one decay per second.",
+        "answer": "true",
+        "explanation": "True. A source with a big number of becquerels has many nuclei decaying each second."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-openstax-chem-21-6"
+      ]
+    },
+    {
+      "id": "u3-l5-tom-same",
+      "objective_id": "u3-three-units",
+      "type": "true_or_myth",
+      "data": {
+        "statement": "The becquerel, the gray and the sievert all measure the same thing.",
+        "answer": "myth",
+        "explanation": "Myth. The becquerel measures how active a source is, the gray measures energy absorbed and the sievert describes potential for harm. They answer three different questions."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-who-ionizing-radiation"
+      ]
+    },
+    {
+      "id": "u3-x-background-reading",
+      "objective_id": "u3-background-reading",
+      "type": "choice",
+      "data": {
+        "prompt": "A detector reads a few counts in two different places, and the numbers are not the same. What is the most likely reason?",
+        "options": [
+          {
+            "id": "vary",
+            "label": "Background radiation varies from place to place"
+          },
+          {
+            "id": "broken",
+            "label": "One of the detectors is broken",
+            "note": "Nothing needs to be broken. Background radiation varies from place to place, so readings differ."
+          },
+          {
+            "id": "nonsense",
+            "label": "Detectors only ever give random numbers",
+            "note": "A working detector reflects the radiation that is there, and that varies by place."
+          }
+        ],
+        "answer": "vary",
+        "explanation": "Background radiation is not the same everywhere on Earth, so a working detector gives different readings in different places."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "practice",
+        "checkpoint",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-epa-radiation-basics"
+      ]
+    },
+    {
+      "id": "u3-x-bq-dose",
+      "objective_id": "u3-unit-not-dose",
+      "type": "choice",
+      "data": {
+        "prompt": "Which unit would you use to describe the energy absorbed by a body?",
+        "options": [
+          {
+            "id": "bq",
+            "label": "The becquerel",
+            "note": "The becquerel describes how active a source is, not what a body absorbed."
+          },
+          {
+            "id": "gy",
+            "label": "The gray"
+          },
+          {
+            "id": "curie",
+            "label": "The curie",
+            "note": "The curie is an older unit of activity, like the becquerel."
+          }
+        ],
+        "answer": "gy",
+        "explanation": "The gray measures energy absorbed per kilogram. Activity of a source is measured in becquerels."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "practice",
+        "checkpoint",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-who-ionizing-radiation"
+      ]
+    },
+    {
+      "id": "u3-x-contaminated-means",
+      "objective_id": "u3-exposure-vs-contamination",
+      "type": "choice",
+      "data": {
+        "prompt": "What does it mean for something to be contaminated?",
+        "options": [
+          {
+            "id": "near",
+            "label": "It is standing near a radioactive source",
+            "note": "That would be exposure. Contamination needs material on or in the thing."
+          },
+          {
+            "id": "material",
+            "label": "Radioactive material is on it or in it, where it is not wanted"
+          },
+          {
+            "id": "glows",
+            "label": "It glows",
+            "note": "Contamination is about material being where it should not be, not about glowing."
+          }
+        ],
+        "answer": "material",
+        "explanation": "Contamination is radioactive material on or in something, where it is not wanted. Being near a source is exposure."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "practice",
+        "checkpoint",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-hps-radioactive-contamination"
+      ]
+    },
+    {
+      "id": "u3-x-gamma-barrier",
+      "objective_id": "u3-gamma-shielding",
+      "type": "choice",
+      "data": {
+        "prompt": "Which of these is used as a barrier against gamma rays?",
+        "options": [
+          {
+            "id": "paper",
+            "label": "A stack of paper",
+            "note": "Gamma rays go through paper. It is not dense or thick enough."
+          },
+          {
+            "id": "concrete",
+            "label": "A thick concrete wall"
+          },
+          {
+            "id": "foil",
+            "label": "A sheet of aluminum foil",
+            "note": "A thin layer of metal stops beta particles, but not gamma rays."
+          }
+        ],
+        "answer": "concrete",
+        "explanation": "Concrete is dense, and a thick wall of it protects against gamma rays. Lead and water are used in the same way."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "practice",
+        "checkpoint",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-epa-protecting-yourself"
+      ]
+    },
+    {
+      "id": "u3-x-ionizing-def",
+      "objective_id": "u3-ionizing-meaning",
+      "type": "choice",
+      "data": {
+        "prompt": "Ionizing radiation can do what to an atom?",
+        "options": [
+          {
+            "id": "grow",
+            "label": "Make it bigger",
+            "note": "Ionizing radiation does not change the size of an atom. What it can do is remove an electron."
+          },
+          {
+            "id": "freeze",
+            "label": "Freeze it in place",
+            "note": "It does not freeze atoms. The effect is on the electrons."
+          },
+          {
+            "id": "knock",
+            "label": "Knock an electron out of it"
+          }
+        ],
+        "answer": "knock",
+        "explanation": "Knocking an electron out is what ionizing means. The atom is left with one electron fewer."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "practice",
+        "checkpoint",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-epa-radiation-basics"
+      ]
+    },
+    {
+      "id": "u3-x-most-penetrating",
+      "objective_id": "u3-penetration",
+      "type": "choice",
+      "data": {
+        "prompt": "Which of these is the most penetrating?",
+        "options": [
+          {
+            "id": "alpha",
+            "label": "Alpha particles",
+            "note": "Alpha particles are the least penetrating. Paper stops them."
+          },
+          {
+            "id": "gamma",
+            "label": "Gamma rays"
+          },
+          {
+            "id": "beta",
+            "label": "Beta particles",
+            "note": "Beta particles go farther than alpha, but a thin layer of metal stops them. Gamma goes farther still."
+          }
+        ],
+        "answer": "gamma",
+        "explanation": "Gamma rays pass through skin and clothing and need thick, dense material to stop them. That makes them the most penetrating of the three."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "practice",
+        "checkpoint",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-epa-radiation-basics"
+      ]
+    },
+    {
+      "id": "u3-x-moving-away",
+      "objective_id": "u3-exposure-ends",
+      "type": "choice",
+      "data": {
+        "prompt": "How does exposure to a source outside the body end?",
+        "options": [
+          {
+            "id": "away",
+            "label": "The source is shielded, or the person moves out of its path"
+          },
+          {
+            "id": "wash",
+            "label": "The person washes their hands",
+            "note": "Washing helps with material on the skin. A source outside the body is stopped by distance or a shield."
+          },
+          {
+            "id": "wait",
+            "label": "It ends after a few days no matter what",
+            "note": "It ends when the radiation stops reaching the person."
+          }
+        ],
+        "answer": "away",
+        "explanation": "Outside exposure lasts while the radiation reaches you. Shielding the source or moving out of its path stops it."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "practice",
+        "checkpoint",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-who-ionizing-radiation"
+      ]
+    },
+    {
+      "id": "u3-x-not-ionizing",
+      "objective_id": "u3-sort-radiation",
+      "type": "choice",
+      "data": {
+        "prompt": "Which of these is not ionizing?",
+        "options": [
+          {
+            "id": "beta",
+            "label": "Beta particles",
+            "note": "Beta particles are ionizing."
+          },
+          {
+            "id": "gamma",
+            "label": "Gamma rays",
+            "note": "Gamma rays are ionizing."
+          },
+          {
+            "id": "micro",
+            "label": "Microwaves"
+          }
+        ],
+        "answer": "micro",
+        "explanation": "Microwaves are non-ionizing. Beta particles and gamma rays have enough energy to remove electrons from atoms."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "practice",
+        "checkpoint",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-epa-radiation-basics"
+      ]
+    },
+    {
+      "id": "u3-x-pair",
+      "objective_id": "u3-sort-radiation",
+      "type": "choice",
+      "data": {
+        "prompt": "Which pair is made up of radiation that is not ionizing?",
+        "options": [
+          {
+            "id": "mix",
+            "label": "Radio waves and gamma rays",
+            "note": "Gamma rays are ionizing, so this pair has one of each."
+          },
+          {
+            "id": "pair",
+            "label": "Visible light and radio waves"
+          },
+          {
+            "id": "ab",
+            "label": "Alpha particles and beta particles",
+            "note": "Both of these are ionizing."
+          }
+        ],
+        "answer": "pair",
+        "explanation": "Visible light and radio waves are both non-ionizing. The other pairs include at least one kind that can knock electrons out of atoms."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "practice",
+        "checkpoint",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-epa-radiation-basics"
+      ]
+    },
+    {
+      "id": "u3-x-scintillator",
+      "objective_id": "u3-detectors",
+      "type": "choice",
+      "data": {
+        "prompt": "A scintillation counter turns what into a signal?",
+        "options": [
+          {
+            "id": "flash",
+            "label": "Flashes of light"
+          },
+          {
+            "id": "gas",
+            "label": "Ionized gas",
+            "note": "That is the Geiger counter. A scintillation counter uses flashes of light."
+          },
+          {
+            "id": "heat",
+            "label": "Heat",
+            "note": "A scintillation counter uses flashes of light, not heat."
+          }
+        ],
+        "answer": "flash",
+        "explanation": "Radiation makes a scintillating material give off flashes of light, and the counter turns those flashes into a signal."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "practice",
+        "checkpoint",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-openstax-chem-21-6"
+      ]
+    },
+    {
+      "id": "u3-x-skin-alpha",
+      "objective_id": "u3-penetration",
+      "type": "choice",
+      "data": {
+        "prompt": "Why can alpha particles be stopped by the top layer of skin?",
+        "options": [
+          {
+            "id": "heavy",
+            "label": "They are heavy and lose their energy over a very short distance"
+          },
+          {
+            "id": "slow",
+            "label": "They are the fastest radiation, so they stop on contact",
+            "note": "Alpha particles are not fast. Being heavy is what makes them stop quickly."
+          },
+          {
+            "id": "warm",
+            "label": "Skin is warm and absorbs radiation",
+            "note": "Warmth has nothing to do with it. It is about how heavy the particle is."
+          }
+        ],
+        "answer": "heavy",
+        "explanation": "An alpha particle is heavy, so it uses up its energy over a very short distance. That is why paper or the outer layer of skin is enough."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "practice",
+        "checkpoint",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-epa-radiation-basics"
+      ]
+    },
+    {
+      "id": "u3-x-sv-for",
+      "objective_id": "u3-unit-not-dose",
+      "type": "choice",
+      "data": {
+        "prompt": "Which unit describes the potential for harm from radiation?",
+        "options": [
+          {
+            "id": "bq",
+            "label": "The becquerel",
+            "note": "The becquerel counts decays in a source."
+          },
+          {
+            "id": "gy",
+            "label": "The gray",
+            "note": "The gray counts energy absorbed. It does not account for the type of radiation or the tissue."
+          },
+          {
+            "id": "sv",
+            "label": "The sievert"
+          }
+        ],
+        "answer": "sv",
+        "explanation": "The sievert describes potential for harm because it counts the type of radiation and the sensitivity of the tissue as well as the energy absorbed."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-openstax-chem-21-6"
+      ]
+    },
+    {
+      "id": "u3-x-tom-background-natural",
+      "objective_id": "u3-background-reading",
+      "type": "true_or_myth",
+      "data": {
+        "statement": "Background radiation is present on Earth at all times.",
+        "answer": "true",
+        "explanation": "True. It comes mostly from natural sources, so it is always there, and a detector picks up a little of it almost anywhere."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "practice",
+        "checkpoint",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-epa-radiation-basics"
+      ]
+    },
+    {
+      "id": "u3-x-tom-exposed-contaminated",
+      "objective_id": "u3-exposure-vs-contamination",
+      "type": "true_or_myth",
+      "data": {
+        "statement": "A person can be exposed to radiation without being contaminated.",
+        "answer": "true",
+        "explanation": "True. Standing in the path of radiation from a source, such as during a medical X-ray, exposes you. No radioactive material needs to get on you for that."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "practice",
+        "checkpoint",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-hps-radioactive-contamination"
+      ]
+    },
+    {
+      "id": "u3-x-tom-instruments",
+      "objective_id": "u3-detectors",
+      "type": "true_or_myth",
+      "data": {
+        "statement": "People use instruments to detect and measure radiation.",
+        "answer": "true",
+        "explanation": "True. Instruments such as Geiger counters, scintillation counters and dosimeters are used to detect and measure ionizing radiation."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "practice",
+        "checkpoint",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-openstax-chem-21-6"
+      ]
+    },
+    {
+      "id": "u3-x-tom-keep-radiation",
+      "objective_id": "u3-exposure-ends",
+      "type": "true_or_myth",
+      "data": {
+        "statement": "After you leave a source, you carry its radiation around with you.",
+        "answer": "myth",
+        "explanation": "Myth. Radiation does not get on or in people, so you do not carry it away. You only carry radioactive material if some got on you."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "practice",
+        "checkpoint",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-hps-radioactive-contamination"
+      ]
+    },
+    {
+      "id": "u3-x-tom-one-joule",
+      "objective_id": "u3-three-units",
+      "type": "true_or_myth",
+      "data": {
+        "statement": "One gray is one joule of energy absorbed per kilogram.",
+        "answer": "true",
+        "explanation": "True. That is the definition of the gray. It counts energy absorbed, however it got there."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "practice",
+        "checkpoint",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-openstax-chem-21-6"
+      ]
+    },
+    {
+      "id": "u3-x-tom-same-stop",
+      "objective_id": "u3-penetration",
+      "type": "true_or_myth",
+      "data": {
+        "statement": "The same shield stops alpha, beta and gamma equally well.",
+        "answer": "myth",
+        "explanation": "Myth. They are stopped by very different things: paper for alpha, thin metal for beta, and thick, dense material for gamma. A shield has to suit the radiation."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "practice",
+        "checkpoint",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-epa-radiation-basics"
+      ]
+    },
+    {
+      "id": "u3-x-tom-sealed",
+      "objective_id": "u3-exposure-vs-contamination",
+      "type": "true_or_myth",
+      "data": {
+        "statement": "Material in a sealed source container can be spread onto other objects.",
+        "answer": "myth",
+        "explanation": "Myth. Material in a sealed source stays in its container. It is material that is not sealed that might be spread onto other objects."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "practice",
+        "checkpoint",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-hps-radioactive-contamination"
+      ]
+    },
+    {
+      "id": "u3-x-tom-shield-materials",
+      "objective_id": "u3-gamma-shielding",
+      "type": "true_or_myth",
+      "data": {
+        "statement": "Some radioactive materials are stored under water or in lead-lined rooms.",
+        "answer": "true",
+        "explanation": "True. Water, concrete and lead are barriers that protect against gamma rays and X-rays, so they are used to store and shield radioactive materials."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "practice",
+        "checkpoint",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-epa-protecting-yourself"
+      ]
+    },
+    {
+      "id": "u3-x-tom-sv-harm",
+      "objective_id": "u3-unit-not-dose",
+      "type": "true_or_myth",
+      "data": {
+        "statement": "The sievert takes the type of radiation into account.",
+        "answer": "true",
+        "explanation": "True. It counts the type of radiation and how sensitive the tissue is, as well as the energy absorbed."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "practice",
+        "checkpoint",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-openstax-chem-21-6"
+      ]
+    },
+    {
+      "id": "u3-x-tom-xray-gamma",
+      "objective_id": "u3-sort-radiation",
+      "type": "true_or_myth",
+      "data": {
+        "statement": "X-rays and gamma rays are both ionizing.",
+        "answer": "true",
+        "explanation": "True. Both are high-energy waves with enough energy to knock electrons out of atoms."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "practice",
+        "checkpoint",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-epa-radiation-basics"
+      ]
+    },
+    {
+      "id": "u3-x-weaker",
+      "objective_id": "u3-ionizing-meaning",
+      "type": "choice",
+      "data": {
+        "prompt": "Radio waves do not have enough energy to ionize. What can they do to atoms?",
+        "options": [
+          {
+            "id": "vibrate",
+            "label": "Make them move or vibrate, but not remove electrons"
+          },
+          {
+            "id": "nothing",
+            "label": "Nothing at all",
+            "note": "Non-ionizing radiation can still make atoms move or vibrate. It just cannot remove electrons."
+          },
+          {
+            "id": "remove",
+            "label": "Remove electrons, but slowly",
+            "note": "Weaker radiation cannot remove electrons at all. Ionizing needs a certain amount of energy."
+          }
+        ],
+        "answer": "vibrate",
+        "explanation": "Weaker, non-ionizing radiation can make atoms move or vibrate. What it cannot do is take an electron away, and that is the line between the two groups."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "practice",
+        "checkpoint",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-epa-radiation-basics",
+        "ref-openstax-chem-21-6"
+      ]
+    },
+    {
+      "id": "u3-x-which-cannot",
+      "objective_id": "u3-ionizing-meaning",
+      "type": "choice",
+      "data": {
+        "prompt": "Which of these cannot knock an electron out of an atom?",
+        "options": [
+          {
+            "id": "gamma",
+            "label": "Gamma rays",
+            "note": "Gamma rays are ionizing. They can knock electrons out."
+          },
+          {
+            "id": "light",
+            "label": "Visible light"
+          },
+          {
+            "id": "alpha",
+            "label": "Alpha particles",
+            "note": "Alpha particles are ionizing. They can knock electrons out."
+          },
+          {
+            "id": "xray",
+            "label": "X-rays",
+            "note": "X-rays are ionizing. They can knock electrons out."
+          }
+        ],
+        "answer": "light",
+        "explanation": "Visible light is radiation, but it does not have enough energy to remove electrons. Gamma rays, X-rays and alpha particles do."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "practice",
+        "checkpoint",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-epa-radiation-basics"
+      ]
+    },
+    {
+      "id": "u3-x-which-decays",
+      "objective_id": "u3-three-units",
+      "type": "choice",
+      "data": {
+        "prompt": "Which unit is one decay per second?",
+        "options": [
+          {
+            "id": "gy",
+            "label": "The gray",
+            "note": "The gray is one joule absorbed per kilogram."
+          },
+          {
+            "id": "bq",
+            "label": "The becquerel"
+          },
+          {
+            "id": "sv",
+            "label": "The sievert",
+            "note": "The sievert describes potential for harm."
+          }
+        ],
+        "answer": "bq",
+        "explanation": "The becquerel is one decay per second. It measures the activity of a source."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "practice",
+        "checkpoint",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-openstax-chem-21-6"
+      ]
+    },
+    {
+      "id": "u4-l1-choice-average",
+      "objective_id": "u4-everyone-dose",
+      "type": "choice",
+      "data": {
+        "prompt": "About how big is the average yearly dose of a person in the US?",
+        "options": [
+          {
+            "id": "six",
+            "label": "About 6 millisieverts"
+          },
+          {
+            "id": "tiny",
+            "label": "About 0.01 millisieverts",
+            "note": "That is under what a year of living near a nuclear power station adds. An average year is far bigger, because natural sources are always there."
+          },
+          {
+            "id": "big",
+            "label": "About 1000 millisieverts",
+            "note": "About 1000 in a short time is where illness starts. An average year is far, far below that."
+          }
+        ],
+        "answer": "six",
+        "explanation": "The average person in the US gets about 6 millisieverts a year. The EPA's figure is 6.2, and most of it is natural background radiation."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "checkpoint",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-epa-radiation-sources"
+      ]
+    },
+    {
+      "id": "u4-l1-choice-ill",
+      "objective_id": "u4-dose-steps",
+      "type": "choice",
+      "data": {
+        "prompt": "About how big a dose, received in a short time, is where people start to become ill?",
+        "options": [
+          {
+            "id": "sv",
+            "label": "About 1000 millisieverts, which is 1 sievert"
+          },
+          {
+            "id": "six",
+            "label": "About 6 millisieverts",
+            "note": "That is an average year's dose. People receive it every year, and low levels do not cause immediate health effects."
+          },
+          {
+            "id": "tiny",
+            "label": "About 0.01 millisieverts",
+            "note": "That is less than a year near a nuclear power station adds."
+          }
+        ],
+        "answer": "sv",
+        "explanation": "The dose threshold for acute radiation syndrome is about 1 sievert, which is 1000 millisieverts, received in a short time. An everyday dose is thousands of times smaller."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "checkpoint",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-who-ionizing-radiation"
+      ]
+    },
+    {
+      "id": "u4-l1-fill-milli",
+      "objective_id": "u4-dose-steps",
+      "type": "fill",
+      "data": {
+        "prompt": "One sievert is ___ millisieverts.",
+        "mode": "bank",
+        "bank": [
+          {
+            "id": "k",
+            "label": "1000"
+          },
+          {
+            "id": "h",
+            "label": "100"
+          },
+          {
+            "id": "t",
+            "label": "10"
+          }
+        ],
+        "answer": "k",
+        "explanation": "Milli means a thousandth, so 1 sievert is 1000 millisieverts. That is why everyday doses, which are tiny fractions of a sievert, are counted in millisieverts."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-who-ionizing-radiation"
+      ]
+    },
+    {
+      "id": "u4-l1-order-doses",
+      "objective_id": "u4-dose-steps",
+      "type": "order",
+      "data": {
+        "prompt": "Put these doses in order, from the smallest to the biggest.",
+        "items": [
+          {
+            "id": "plant",
+            "label": "A year of living near a nuclear power station (under 0.01 mSv)"
+          },
+          {
+            "id": "cosmic",
+            "label": "A year of cosmic rays at sea level (about 0.3 mSv)"
+          },
+          {
+            "id": "radon",
+            "label": "A year of radon in an average US home (about 2.3 mSv)"
+          },
+          {
+            "id": "ct",
+            "label": "One whole-body CT scan (about 10 mSv)"
+          }
+        ],
+        "explanation": "Under 0.01, then about 0.3, about 2.3 and about 10. A year near a nuclear power station is the smallest step, and one whole-body CT scan the biggest of these."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-epa-radiation-sources"
+      ]
+    },
+    {
+      "id": "u4-l1-tom-workers",
+      "objective_id": "u4-everyone-dose",
+      "type": "true_or_myth",
+      "data": {
+        "statement": "Only people who work with radiation get a dose.",
+        "answer": "myth",
+        "explanation": "Myth. Everyone gets a dose every day, from the ground, from space and from radon in the air. Most of the average yearly dose is natural background radiation."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-epa-radiation-sources"
+      ]
+    },
+    {
+      "id": "u4-l2-choice-damage",
+      "objective_id": "u4-cell-damage",
+      "type": "choice",
+      "data": {
+        "prompt": "What can ionizing radiation damage in a living cell?",
+        "options": [
+          {
+            "id": "dna",
+            "label": "The atoms and molecules in it, including its DNA"
+          },
+          {
+            "id": "none",
+            "label": "Nothing: it passes through without touching any atom",
+            "note": "Ionizing radiation has enough energy to affect the atoms in living cells and so damage their DNA."
+          },
+          {
+            "id": "wall",
+            "label": "Only the outer wall of the cell",
+            "note": "It can affect atoms inside the cell too, including the genetic material, DNA."
+          }
+        ],
+        "answer": "dna",
+        "explanation": "Ionizing radiation has enough energy to affect the atoms in living cells, and so it can damage their genetic material, DNA."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "checkpoint",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-epa-radiation-health-effects"
+      ]
+    },
+    {
+      "id": "u4-l2-choice-exposed",
+      "objective_id": "u4-cell-damage",
+      "type": "choice",
+      "data": {
+        "prompt": "A person has an X-ray. Afterwards, is the person radioactive?",
+        "options": [
+          {
+            "id": "no",
+            "label": "No: the radiation passed through, and exposure does not make a person radioactive"
+          },
+          {
+            "id": "hours",
+            "label": "Yes, for a few hours",
+            "note": "Radiation does not get on or in a person. Only radioactive material on or in a person is the concern."
+          },
+          {
+            "id": "bones",
+            "label": "Yes, but only in the bones",
+            "note": "Exposure does not make any part of a person radioactive."
+          }
+        ],
+        "answer": "no",
+        "explanation": "No. Radiation does not get on or in people. Being exposed to it, as in an X-ray, does not make a person radioactive."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-hps-radioactive-contamination"
+      ]
+    },
+    {
+      "id": "u4-l2-choice-not-repaired",
+      "objective_id": "u4-cell-repair",
+      "type": "choice",
+      "data": {
+        "prompt": "What can happen if the damage is not repaired correctly?",
+        "options": [
+          {
+            "id": "die",
+            "label": "The cell may die or eventually become cancerous"
+          },
+          {
+            "id": "fine",
+            "label": "Nothing: damage is always harmless",
+            "note": "If damage is not repaired correctly, a cell may die or eventually become cancerous."
+          },
+          {
+            "id": "radio",
+            "label": "The person becomes radioactive",
+            "note": "Exposure does not make a person radioactive. The risk is to the cell itself."
+          }
+        ],
+        "answer": "die",
+        "explanation": "If damage is not repaired correctly, a cell may die or eventually become cancerous. That is why repair matters."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "checkpoint",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-epa-radiation-health-effects"
+      ]
+    },
+    {
+      "id": "u4-l2-choice-puzzle",
+      "objective_id": "u4-cell-repair",
+      "type": "choice",
+      "data": {
+        "prompt": "Radiation can damage DNA, yet the small doses of everyday life cause no immediate illness. Which is part of the answer?",
+        "options": [
+          {
+            "id": "repair",
+            "label": "Cells are very good at repairing damage, and everyday doses are small"
+          },
+          {
+            "id": "miss",
+            "label": "Everyday radiation never reaches any cell",
+            "note": "Everyone is exposed to ionizing radiation every day, so some does reach cells."
+          },
+          {
+            "id": "harm",
+            "label": "The damage is harmless, so repair is not needed",
+            "note": "Repair matters, because damage that is not repaired correctly can lead to a dead or cancerous cell."
+          }
+        ],
+        "answer": "repair",
+        "explanation": "The cells in our bodies are extremely efficient at repairing damage, and low levels of radiation do not cause immediate health effects."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-epa-radiation-health-effects"
+      ]
+    },
+    {
+      "id": "u4-l2-match-ideas",
+      "objective_id": "u4-cell-repair",
+      "type": "match",
+      "data": {
+        "prompt": "Match each idea to what it says about a cell.",
+        "pairs": [
+          {
+            "id": "dam",
+            "left": "Radiation hits the DNA",
+            "right": "The cell is damaged"
+          },
+          {
+            "id": "rep",
+            "left": "Cells are extremely efficient at repair",
+            "right": "Most damage is put right"
+          },
+          {
+            "id": "not",
+            "left": "Damage is not repaired correctly",
+            "right": "The cell may die or become cancerous"
+          }
+        ],
+        "explanation": "Damage comes first, repair usually follows, and only damage that is not repaired correctly causes lasting harm."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "checkpoint",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-epa-radiation-health-effects"
+      ]
+    },
+    {
+      "id": "u4-l2-tom-radio",
+      "objective_id": "u4-cell-damage",
+      "type": "true_or_myth",
+      "data": {
+        "statement": "Radio waves can damage DNA by knocking electrons out of atoms, just as X-rays can.",
+        "answer": "myth",
+        "explanation": "Myth. Radio waves are non-ionizing, so they cannot knock electrons out of atoms. X-rays are ionizing, and they can."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-epa-radiation-basics"
+      ]
+    },
+    {
+      "id": "u4-l2-tom-repair-efficient",
+      "objective_id": "u4-cell-repair",
+      "type": "true_or_myth",
+      "data": {
+        "statement": "The cells in our bodies are extremely efficient at repairing radiation damage.",
+        "answer": "true",
+        "explanation": "True. Cells repair this kind of damage all the time, which is why a small everyday dose does not make anyone ill."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-epa-radiation-health-effects"
+      ]
+    },
+    {
+      "id": "u4-l3-choice-doserate",
+      "objective_id": "u4-large-fast",
+      "type": "choice",
+      "data": {
+        "prompt": "What is dose rate?",
+        "options": [
+          {
+            "id": "fast",
+            "label": "How fast a dose is received, for example in millisieverts per year"
+          },
+          {
+            "id": "total",
+            "label": "How big the dose is in total",
+            "note": "That is the dose itself. Dose rate is about speed: the same total can arrive fast or slowly."
+          },
+          {
+            "id": "far",
+            "label": "How far you are from the source",
+            "note": "Distance changes the dose, but dose rate is about how fast the dose arrives."
+          }
+        ],
+        "answer": "fast",
+        "explanation": "Dose rate is how fast a dose is received. It is measured in units such as microsieverts per hour or millisieverts per year."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-who-ionizing-radiation"
+      ]
+    },
+    {
+      "id": "u4-l3-choice-low",
+      "objective_id": "u4-small-spread",
+      "type": "choice",
+      "data": {
+        "prompt": "What can a low dose of radiation do?",
+        "options": [
+          {
+            "id": "small",
+            "label": "Add a small increase in the chance of cancer over a lifetime"
+          },
+          {
+            "id": "sick",
+            "label": "Make a person ill within hours",
+            "note": "Immediate illness needs a very large dose in a short time. Low levels do not cause immediate health effects."
+          },
+          {
+            "id": "zero",
+            "label": "Nothing at all, at any dose",
+            "note": "Low levels can cause a small increase in the risk of cancer over a lifetime."
+          }
+        ],
+        "answer": "small",
+        "explanation": "Low levels do not cause immediate health effects, but they can add a small increase in the risk of cancer over a lifetime."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "checkpoint",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-epa-radiation-health-effects"
+      ]
+    },
+    {
+      "id": "u4-l3-choice-spread",
+      "objective_id": "u4-small-spread",
+      "type": "choice",
+      "data": {
+        "prompt": "Why does a dose spread over a long time carry less risk?",
+        "options": [
+          {
+            "id": "repair",
+            "label": "The body has a greater chance of repairing the damage in between"
+          },
+          {
+            "id": "weak",
+            "label": "The radiation gets weaker as time goes by",
+            "note": "The reason given is repair, not the radiation getting weaker."
+          },
+          {
+            "id": "none",
+            "label": "Slow radiation does not touch cells",
+            "note": "It still reaches cells. The difference is that there is more time for repair."
+          }
+        ],
+        "answer": "repair",
+        "explanation": "If a dose is low, or delivered over a long time, the risk is lower because there is a greater likelihood of repairing the damage."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-who-ionizing-radiation"
+      ]
+    },
+    {
+      "id": "u4-l3-choice-symptoms",
+      "objective_id": "u4-large-fast",
+      "type": "choice",
+      "data": {
+        "prompt": "A person receives a very large dose in a short time. What can happen within hours?",
+        "options": [
+          {
+            "id": "sick",
+            "label": "Symptoms such as nausea and vomiting"
+          },
+          {
+            "id": "none",
+            "label": "Nothing: effects always take years",
+            "note": "A very high dose in a short time can cause symptoms such as nausea and vomiting within hours."
+          },
+          {
+            "id": "glow",
+            "label": "The person becomes radioactive",
+            "note": "Exposure does not make a person radioactive. The symptoms come from the damage to the body."
+          }
+        ],
+        "answer": "sick",
+        "explanation": "A very high radiation exposure delivered over a short period can cause symptoms such as nausea and vomiting within hours."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "checkpoint",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-epa-radiation-health-effects"
+      ]
+    },
+    {
+      "id": "u4-l3-fill-low",
+      "objective_id": "u4-small-spread",
+      "type": "fill",
+      "data": {
+        "prompt": "A dose that is low, or spread over a long time, carries ___ risk.",
+        "mode": "bank",
+        "bank": [
+          {
+            "id": "less",
+            "label": "less"
+          },
+          {
+            "id": "more",
+            "label": "more"
+          },
+          {
+            "id": "same",
+            "label": "the same"
+          }
+        ],
+        "answer": "less",
+        "explanation": "Repair is more likely when a dose is low or spread out, so the risk is lower."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-who-ionizing-radiation"
+      ]
+    },
+    {
+      "id": "u4-l3-predict-same-total",
+      "objective_id": "u4-large-fast",
+      "type": "predict",
+      "data": {
+        "prompt": "Two people each receive the same total dose. One gets it all within minutes. The other gets it spread over a whole year. Who is more likely to become ill soon after?",
+        "input": "choice",
+        "options": [
+          {
+            "id": "fast",
+            "label": "The one who got it within minutes"
+          },
+          {
+            "id": "slow",
+            "label": "The one who got it over a year"
+          },
+          {
+            "id": "same",
+            "label": "Both the same"
+          }
+        ],
+        "answer": "fast",
+        "explanation": "Your guess is not scored. The answer comes later in the lesson."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson"
+      ],
+      "reference_ids": [
+        "ref-who-ionizing-radiation"
+      ]
+    },
+    {
+      "id": "u4-l3-tom-no-immediate",
+      "objective_id": "u4-large-fast",
+      "type": "true_or_myth",
+      "data": {
+        "statement": "Exposure to the low levels of radiation found in the environment does not cause immediate health effects.",
+        "answer": "true",
+        "explanation": "True. It takes a very large dose in a short time to make people ill within hours."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-epa-radiation-health-effects"
+      ]
+    },
+    {
+      "id": "u4-l3-tom-same",
+      "objective_id": "u4-small-spread",
+      "type": "true_or_myth",
+      "data": {
+        "statement": "A small dose every day is the same as one large dose.",
+        "answer": "myth",
+        "explanation": "Myth. Dose rate matters. A low dose, or one spread over a long time, carries less risk because repair is more likely."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-who-ionizing-radiation"
+      ]
+    },
+    {
+      "id": "u4-l4-choice-distance",
+      "objective_id": "u4-three-ways",
+      "type": "choice",
+      "data": {
+        "prompt": "You move farther away from a source. What happens to the dose?",
+        "options": [
+          {
+            "id": "down",
+            "label": "It decreases, and not just a little"
+          },
+          {
+            "id": "same",
+            "label": "No change, because radiation is everywhere",
+            "note": "Radiation from a source gets weaker with distance. The dose decreases dramatically as you move away."
+          },
+          {
+            "id": "up",
+            "label": "It goes up",
+            "note": "Moving away lowers the dose."
+          }
+        ],
+        "answer": "down",
+        "explanation": "The dose of radiation decreases dramatically as you increase your distance from the source."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-epa-protecting-yourself"
+      ]
+    },
+    {
+      "id": "u4-l4-choice-store",
+      "objective_id": "u4-pick-the-way",
+      "type": "choice",
+      "data": {
+        "prompt": "Some radioactive materials are stored under water, or in concrete or lead-lined rooms. Which way is that?",
+        "options": [
+          {
+            "id": "shield",
+            "label": "Shielding: something sits between the material and people"
+          },
+          {
+            "id": "time",
+            "label": "Time: people only look at it for a moment",
+            "note": "The water, concrete and lead are barriers. That is shielding, not a limit on time."
+          },
+          {
+            "id": "dist",
+            "label": "Distance: the material is hidden far away",
+            "note": "The material can be close. What protects people is the water, concrete or lead in the way."
+          }
+        ],
+        "answer": "shield",
+        "explanation": "Water, concrete and lead are barriers between the material and people, which is shielding."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-epa-protecting-yourself"
+      ]
+    },
+    {
+      "id": "u4-l4-choice-time",
+      "objective_id": "u4-three-ways",
+      "type": "choice",
+      "data": {
+        "prompt": "A worker spends less time near a source. What happens to the dose from that source?",
+        "options": [
+          {
+            "id": "less",
+            "label": "It goes down: less time means less dose"
+          },
+          {
+            "id": "same",
+            "label": "It stays the same",
+            "note": "Limiting the time you are exposed reduces the dose from the source."
+          },
+          {
+            "id": "more",
+            "label": "It goes up",
+            "note": "It is the other way round. Spending less time near a source lowers the dose."
+          }
+        ],
+        "answer": "less",
+        "explanation": "Limiting the time you are exposed reduces the dose from the radiation source."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-epa-protecting-yourself"
+      ]
+    },
+    {
+      "id": "u4-l4-fill-three",
+      "objective_id": "u4-three-ways",
+      "type": "fill",
+      "data": {
+        "prompt": "The three ways to lower a dose are time, distance and ___.",
+        "mode": "bank",
+        "bank": [
+          {
+            "id": "s",
+            "label": "shielding"
+          },
+          {
+            "id": "c",
+            "label": "cooling"
+          },
+          {
+            "id": "w",
+            "label": "weighing"
+          }
+        ],
+        "answer": "s",
+        "explanation": "Shielding means putting something, such as lead, concrete or water, between you and the source."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "checkpoint",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-epa-protecting-yourself"
+      ]
+    },
+    {
+      "id": "u4-l4-match-ways",
+      "objective_id": "u4-pick-the-way",
+      "type": "match",
+      "data": {
+        "prompt": "Match each situation to the way it lowers the dose.",
+        "pairs": [
+          {
+            "id": "apron",
+            "left": "A lead apron at a dental X-ray",
+            "right": "Shielding"
+          },
+          {
+            "id": "step",
+            "left": "Stepping farther from a source",
+            "right": "Distance"
+          },
+          {
+            "id": "short",
+            "left": "Spending less time near a source",
+            "right": "Time"
+          }
+        ],
+        "explanation": "The apron is a shield between the X-rays and the patient. Stepping away adds distance, and a shorter visit means less time."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "checkpoint",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-epa-protecting-yourself"
+      ]
+    },
+    {
+      "id": "u4-l4-tom-nothing",
+      "objective_id": "u4-three-ways",
+      "type": "true_or_myth",
+      "data": {
+        "statement": "There is nothing a person can do to lower a dose from a source.",
+        "answer": "myth",
+        "explanation": "Myth. People lower a dose with less time near the source, more distance from it, and shielding between themselves and it."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-epa-protecting-yourself"
+      ]
+    },
+    {
+      "id": "u4-l5-choice-calm",
+      "objective_id": "u4-read-a-number",
+      "type": "choice",
+      "data": {
+        "prompt": "A friend says: 'Bananas are radioactive, so eating one must make me ill.' What is a calm answer?",
+        "options": [
+          {
+            "id": "calm",
+            "label": "A banana holds a little natural radioactive potassium, and everyone gets small doses daily: the size of the dose matters"
+          },
+          {
+            "id": "right",
+            "label": "You are right: radioactive always means dangerous",
+            "note": "Radioactive does not automatically mean dangerous. The size and the speed of the dose matter."
+          },
+          {
+            "id": "no",
+            "label": "Bananas are not radioactive at all",
+            "note": "A banana does hold a little natural radioactive potassium, potassium-40."
+          }
+        ],
+        "answer": "calm",
+        "explanation": "A banana does hold a little potassium-40, and everyone gets small natural doses every day. It is the size and the speed of a dose that matter."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-epa-radiation-sources",
+        "ref-who-ionizing-radiation"
+      ]
+    },
+    {
+      "id": "u4-l5-choice-compare",
+      "objective_id": "u4-three-questions",
+      "type": "choice",
+      "data": {
+        "prompt": "A report says a scan gave a dose of about 10 millisieverts. How does that compare with an average year, about 6, and with about 1000?",
+        "options": [
+          {
+            "id": "mid",
+            "label": "A little more than an average year, and about a hundred times less than 1000"
+          },
+          {
+            "id": "huge",
+            "label": "Far more than 1000, so a scan is dangerous",
+            "note": "10 is far less than 1000. About 1000 in a short time is where illness starts."
+          },
+          {
+            "id": "tiny",
+            "label": "Far less than an average year",
+            "note": "10 is a little more than the average year's 6, not far less."
+          }
+        ],
+        "answer": "mid",
+        "explanation": "10 is a little more than an average year's 6, and about a hundred times less than the 1000 where people start to become ill."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "checkpoint",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-epa-radiation-sources",
+        "ref-who-ionizing-radiation"
+      ]
+    },
+    {
+      "id": "u4-l5-choice-fast",
+      "objective_id": "u4-three-questions",
+      "type": "choice",
+      "data": {
+        "prompt": "Two people each receive 10 millisieverts. One got it in a few minutes, the other over a whole year. Which question tells them apart?",
+        "options": [
+          {
+            "id": "rate",
+            "label": "How fast did the dose arrive?"
+          },
+          {
+            "id": "size",
+            "label": "How big was the dose?",
+            "note": "Both received the same size, 10 millisieverts. The question that tells them apart is about speed."
+          },
+          {
+            "id": "nat",
+            "label": "Is the radiation natural?",
+            "note": "That is a different question and does not tell these two apart."
+          }
+        ],
+        "answer": "rate",
+        "explanation": "The size is the same, so the difference is the dose rate: how fast the dose arrived."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-who-ionizing-radiation"
+      ]
+    },
+    {
+      "id": "u4-l5-choice-first",
+      "objective_id": "u4-three-questions",
+      "type": "choice",
+      "data": {
+        "prompt": "A headline says 'Radiation found in the air!' and gives no numbers. What should you ask first?",
+        "options": [
+          {
+            "id": "dose",
+            "label": "How big is the dose, and how does it compare with an ordinary year?"
+          },
+          {
+            "id": "any",
+            "label": "Nothing: if radiation is found, it is dangerous",
+            "note": "Radiation is around us all the time. What matters is the size and the speed of the dose."
+          },
+          {
+            "id": "nat",
+            "label": "Only whether the radiation is natural or made by people",
+            "note": "Natural or not, the dose is what matters. Most of the average yearly dose is natural."
+          }
+        ],
+        "answer": "dose",
+        "explanation": "With no number, a headline cannot tell you much. Ask how big the dose is, and compare it with doses you know, like an average year."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "checkpoint",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-epa-radiation-sources",
+        "ref-who-ionizing-radiation"
+      ]
+    },
+    {
+      "id": "u4-l5-choice-scan",
+      "objective_id": "u4-read-a-number",
+      "type": "choice",
+      "data": {
+        "prompt": "Is a whole-body CT scan, about 10 millisieverts, the same kind of dose as one of about 1000 millisieverts received in a short time?",
+        "options": [
+          {
+            "id": "no",
+            "label": "No: it is about a hundred times smaller, and size and speed both matter"
+          },
+          {
+            "id": "yes",
+            "label": "Yes: radiation is radiation",
+            "note": "A dose a hundred times bigger, arriving in a short time, is a very different step on the scale."
+          },
+          {
+            "id": "ill",
+            "label": "Yes: both make people ill within hours",
+            "note": "Immediate illness is for a very large dose in a short time, about 1000 millisieverts, not 10."
+          }
+        ],
+        "answer": "no",
+        "explanation": "10 millisieverts is about a hundred times smaller than 1000. How big a dose is, and how fast it arrives, decide what it does."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "checkpoint",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-epa-radiation-sources",
+        "ref-who-ionizing-radiation"
+      ]
+    },
+    {
+      "id": "u4-l5-match-questions",
+      "objective_id": "u4-three-questions",
+      "type": "match",
+      "data": {
+        "prompt": "Match each question to what it asks about a dose.",
+        "pairs": [
+          {
+            "id": "big",
+            "left": "How big?",
+            "right": "The amount, in millisieverts"
+          },
+          {
+            "id": "fast",
+            "left": "How fast?",
+            "right": "All at once, or over time"
+          },
+          {
+            "id": "cmp",
+            "left": "Compared with what?",
+            "right": "Doses you already know, like an average year"
+          }
+        ],
+        "explanation": "Size, speed and comparison are the three things that turn a bare number into something you can judge."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "checkpoint",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-epa-radiation-sources",
+        "ref-who-ionizing-radiation"
+      ]
+    },
+    {
+      "id": "u4-l5-tom-any-deadly",
+      "objective_id": "u4-read-a-number",
+      "type": "true_or_myth",
+      "data": {
+        "statement": "Any dose of radiation, however small, is deadly.",
+        "answer": "myth",
+        "explanation": "Myth. Everyone gets small doses every day. It takes a very large dose in a short time, about 1000 millisieverts, to make people ill. Low doses add a small chance of cancer over a lifetime."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "checkpoint",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-who-ionizing-radiation",
+        "ref-epa-radiation-health-effects"
+      ]
+    },
+    {
+      "id": "u4-l5-tom-large-ill",
+      "objective_id": "u4-read-a-number",
+      "type": "true_or_myth",
+      "data": {
+        "statement": "A very large dose in a short time can make people ill.",
+        "answer": "true",
+        "explanation": "True. About 1000 millisieverts in a short time is the threshold for acute radiation syndrome. How big a dose is, and how fast it arrives, decide what it does."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "lesson",
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-who-ionizing-radiation",
+        "ref-epa-radiation-health-effects"
+      ]
+    },
+    {
+      "id": "u4-x-choice-ars",
+      "objective_id": "u4-large-fast",
+      "type": "choice",
+      "data": {
+        "prompt": "About what dose is the threshold for acute radiation syndrome?",
+        "options": [
+          {
+            "id": "sv",
+            "label": "About 1 sievert, which is 1000 millisieverts"
+          },
+          {
+            "id": "six",
+            "label": "About 6 millisieverts",
+            "note": "That is an average year's dose, which is far below the threshold."
+          },
+          {
+            "id": "small",
+            "label": "About 0.3 millisieverts",
+            "note": "That is a year of cosmic rays at sea level, far below the threshold."
+          }
+        ],
+        "answer": "sv",
+        "explanation": "The dose threshold for acute radiation syndrome is about 1 sievert, or 1000 millisieverts."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "practice",
+        "checkpoint",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-who-ionizing-radiation"
+      ]
+    },
+    {
+      "id": "u4-x-choice-dentist",
+      "objective_id": "u4-pick-the-way",
+      "type": "choice",
+      "data": {
+        "prompt": "A dentist puts a lead apron on a patient for an X-ray of the teeth. Which way is that?",
+        "options": [
+          {
+            "id": "shield",
+            "label": "Shielding"
+          },
+          {
+            "id": "time",
+            "label": "Time",
+            "note": "The apron does not shorten the X-ray. It is a barrier."
+          },
+          {
+            "id": "dist",
+            "label": "Distance",
+            "note": "The patient does not move away. A barrier is put in the way."
+          }
+        ],
+        "answer": "shield",
+        "explanation": "A lead apron is a barrier between the X-ray and the rest of the patient's body: shielding."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "practice",
+        "checkpoint",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-epa-protecting-yourself"
+      ]
+    },
+    {
+      "id": "u4-x-choice-material",
+      "objective_id": "u4-three-ways",
+      "type": "choice",
+      "data": {
+        "prompt": "Which of these can shield against penetrating gamma rays?",
+        "options": [
+          {
+            "id": "good",
+            "label": "Lead, concrete or water"
+          },
+          {
+            "id": "paper",
+            "label": "A sheet of paper",
+            "note": "Paper stops alpha particles, but gamma rays pass through it. They need thick, dense material."
+          },
+          {
+            "id": "skin",
+            "label": "The top layer of skin",
+            "note": "Skin stops alpha particles. Gamma rays are very penetrating."
+          }
+        ],
+        "answer": "good",
+        "explanation": "Barriers of lead, concrete or water protect against penetrating gamma rays."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "practice",
+        "checkpoint",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-epa-protecting-yourself"
+      ]
+    },
+    {
+      "id": "u4-x-choice-shelter",
+      "objective_id": "u4-pick-the-way",
+      "type": "choice",
+      "data": {
+        "prompt": "Why is a room with more walls between you and the outside a better shelter?",
+        "options": [
+          {
+            "id": "walls",
+            "label": "More walls give more protection from the radiation outside"
+          },
+          {
+            "id": "warm",
+            "label": "Walls only keep the room warm",
+            "note": "More walls provide more protection from radiation, not just from the cold."
+          },
+          {
+            "id": "quiet",
+            "label": "Walls make the radiation quieter",
+            "note": "Radiation makes no sound. More walls simply give more protection."
+          }
+        ],
+        "answer": "walls",
+        "explanation": "More walls between you and the outside provide more protection, like more shielding."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "practice",
+        "checkpoint",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-epa-protecting-yourself"
+      ]
+    },
+    {
+      "id": "u4-x-choice-step-back",
+      "objective_id": "u4-pick-the-way",
+      "type": "choice",
+      "data": {
+        "prompt": "A worker steps back from a source to a spot much farther away. Which way is that?",
+        "options": [
+          {
+            "id": "dist",
+            "label": "Distance"
+          },
+          {
+            "id": "shield",
+            "label": "Shielding",
+            "note": "Nothing is placed between the worker and the source. The worker simply moves away."
+          },
+          {
+            "id": "time",
+            "label": "Time",
+            "note": "It is about where the worker stands, not how long."
+          }
+        ],
+        "answer": "dist",
+        "explanation": "Moving farther from the source lowers the dose: distance."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-epa-protecting-yourself"
+      ]
+    },
+    {
+      "id": "u4-x-ct-vs-ill",
+      "objective_id": "u4-dose-steps",
+      "type": "choice",
+      "data": {
+        "prompt": "A whole-body CT scan is about 10 millisieverts. How does that compare with about 1000, where people start to become ill?",
+        "options": [
+          {
+            "id": "less",
+            "label": "About a hundred times smaller"
+          },
+          {
+            "id": "same",
+            "label": "About the same size",
+            "note": "Ten and a thousand are not the same size: 1000 is a hundred times 10."
+          },
+          {
+            "id": "more",
+            "label": "About a hundred times bigger",
+            "note": "It is the other way round: 1000 is the bigger dose."
+          }
+        ],
+        "answer": "less",
+        "explanation": "10 is a hundred times smaller than 1000, so a CT scan is a very different step on the scale."
+      },
+      "difficulty": 2,
+      "surfaces": [
+        "practice",
+        "checkpoint",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-epa-radiation-sources",
+        "ref-who-ionizing-radiation"
+      ]
+    },
+    {
+      "id": "u4-x-everyone-dose",
+      "objective_id": "u4-everyone-dose",
+      "type": "true_or_myth",
+      "data": {
+        "statement": "Everyone gets a small dose of radiation every day.",
+        "answer": "true",
+        "explanation": "True. The ground, space and radon in the air each add a little, every day, to everyone."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "practice",
+        "checkpoint",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-epa-radiation-sources"
+      ]
+    },
+    {
+      "id": "u4-x-natural-most",
+      "objective_id": "u4-everyone-dose",
+      "type": "choice",
+      "data": {
+        "prompt": "Where does most of the average yearly dose come from?",
+        "options": [
+          {
+            "id": "nature",
+            "label": "Natural background radiation"
+          },
+          {
+            "id": "plants",
+            "label": "Nuclear power stations",
+            "note": "A year of living near a nuclear power station adds less than 0.01 millisieverts, a tiny share."
+          },
+          {
+            "id": "phones",
+            "label": "Mobile phones",
+            "note": "Phones use radio waves, which are non-ionizing. Most of the yearly dose is natural background radiation."
+          }
+        ],
+        "answer": "nature",
+        "explanation": "Most of the average yearly dose is natural background radiation: radon, rocks and soil, and cosmic rays."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "practice",
+        "checkpoint",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-epa-radiation-sources"
+      ]
+    },
+    {
+      "id": "u4-x-radon-biggest",
+      "objective_id": "u4-everyone-dose",
+      "type": "choice",
+      "data": {
+        "prompt": "Of these three, which adds the most to a person's dose in a year?",
+        "options": [
+          {
+            "id": "radon",
+            "label": "Radon in an average US home, about 2.3 millisieverts"
+          },
+          {
+            "id": "cosmic",
+            "label": "Cosmic rays at sea level, about 0.3 millisieverts",
+            "note": "That adds about 0.3, which is less than radon's 2.3."
+          },
+          {
+            "id": "plant",
+            "label": "Living near a nuclear power station, under 0.01 millisieverts",
+            "note": "That adds under 0.01, the smallest of the three."
+          }
+        ],
+        "answer": "radon",
+        "explanation": "Radon in an average US home adds about 2.3 millisieverts a year, cosmic rays at sea level about 0.3, and living near a nuclear power station under 0.01."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-epa-radiation-sources"
+      ]
+    },
+    {
+      "id": "u4-x-tom-dna",
+      "objective_id": "u4-cell-damage",
+      "type": "true_or_myth",
+      "data": {
+        "statement": "Ionizing radiation can damage the DNA in a cell.",
+        "answer": "true",
+        "explanation": "True. It has enough energy to affect the atoms in living cells, and so it can damage their genetic material, DNA."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "practice",
+        "checkpoint",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-epa-radiation-health-effects"
+      ]
+    },
+    {
+      "id": "u4-x-tom-hundred",
+      "objective_id": "u4-small-spread",
+      "type": "true_or_myth",
+      "data": {
+        "statement": "About 99 in 100 people given a one-time dose of 100 millisieverts would not get cancer as a result.",
+        "answer": "true",
+        "explanation": "True. The EPA says about 99 percent would not, and that at this dose extra cancers caused by radiation would be extremely difficult to identify."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "practice",
+        "checkpoint",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-epa-radiation-health-effects"
+      ]
+    },
+    {
+      "id": "u4-x-tom-number",
+      "objective_id": "u4-three-questions",
+      "type": "true_or_myth",
+      "data": {
+        "statement": "A radiation number with no unit and nothing to compare it with tells you whether a dose is large.",
+        "answer": "myth",
+        "explanation": "Myth. Without a unit and a comparison, such as an average year of about 6 millisieverts, a number cannot tell you whether a dose is large."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "practice",
+        "checkpoint",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-epa-radiation-sources"
+      ]
+    },
+    {
+      "id": "u4-x-tom-plant-ct",
+      "objective_id": "u4-dose-steps",
+      "type": "true_or_myth",
+      "data": {
+        "statement": "A year of living near a nuclear power station gives a bigger dose than one whole-body CT scan.",
+        "answer": "myth",
+        "explanation": "Myth. A year near a nuclear power station adds under 0.01 millisieverts. One whole-body CT scan is about 10."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-epa-radiation-sources"
+      ]
+    },
+    {
+      "id": "u4-x-tom-rate",
+      "objective_id": "u4-large-fast",
+      "type": "true_or_myth",
+      "data": {
+        "statement": "Effects of radiation are more severe at higher doses and at higher dose rates.",
+        "answer": "true",
+        "explanation": "True. A bigger dose, or the same dose arriving faster, gives more severe effects."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "practice",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-who-ionizing-radiation"
+      ]
+    },
+    {
+      "id": "u4-x-tom-repair-true",
+      "objective_id": "u4-cell-repair",
+      "type": "true_or_myth",
+      "data": {
+        "statement": "The cells in our bodies are very good at repairing damage from radiation.",
+        "answer": "true",
+        "explanation": "True. The cells in our bodies are extremely efficient at repairing this damage."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "practice",
+        "checkpoint",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-epa-radiation-health-effects"
+      ]
+    },
+    {
+      "id": "u4-x-tom-small-risk",
+      "objective_id": "u4-read-a-number",
+      "type": "true_or_myth",
+      "data": {
+        "statement": "A low dose can add a small increase in the risk of cancer, but it is not a certainty.",
+        "answer": "true",
+        "explanation": "True. Low levels can cause a small increase in the risk of cancer over a lifetime. That is a small chance, not a certainty."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "practice",
+        "checkpoint",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-epa-radiation-health-effects"
+      ]
+    },
+    {
+      "id": "u4-x-why-damage",
+      "objective_id": "u4-cell-damage",
+      "type": "choice",
+      "data": {
+        "prompt": "Why can ionizing radiation damage a cell?",
+        "options": [
+          {
+            "id": "energy",
+            "label": "It has enough energy to affect the atoms in the cell"
+          },
+          {
+            "id": "radioactive",
+            "label": "It makes the cell radioactive",
+            "note": "Exposure does not make anything radioactive. The damage comes from what the radiation does to atoms."
+          },
+          {
+            "id": "size",
+            "label": "It is much bigger than a cell",
+            "note": "Size is not the reason. Ionizing radiation has enough energy to affect atoms."
+          }
+        ],
+        "answer": "energy",
+        "explanation": "Ionizing radiation has enough energy to affect the atoms in living cells, and that is how it damages their DNA."
+      },
+      "difficulty": 1,
+      "surfaces": [
+        "practice",
+        "checkpoint",
+        "review"
+      ],
+      "reference_ids": [
+        "ref-epa-radiation-health-effects"
       ]
     }
   ]

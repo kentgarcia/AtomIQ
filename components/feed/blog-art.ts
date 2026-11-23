@@ -272,6 +272,158 @@ const carbonScene = (): BlogShape[] => {
   return out;
 };
 
+// ── scene: exposed is not contaminated (cover id "hand") ───────────────────────
+const exposureScene = (): BlogShape[] => {
+  const dots: BlogShape[] = [];
+  for (const [x, y] of [[138, 52], [153, 46], [160, 62], [146, 70], [170, 56]]) dots.push(circle(x, y, 3.2, RED[1]), circle(x - 1, y - 1, 1.2, RED[0]));
+  return [
+    rect(0, 0, SCENE_W, SCENE_H, 0, ANCHOVY[0]),
+    circle(100, 60, 58, ANCHOVY[1]),
+    sparkle(100, 14, 5, SNOW),
+    sparkle(100, 106, 4.5, SNOW),
+    sparkle(10, 8, 4, SNOW),
+    sparkle(190, 112, 4, SNOW),
+
+    // Left: outside the radiation's path or in it. A source, three lines, a hand
+    rect(8, 14, 88, 92, 16, ANCHOVY[2]),
+    rect(6, 12, 88, 92, 16, SNOW),
+    circle(26, 38, 17, GLASS[1]),
+    centred("radiation", 26, 38, 26),
+    line("M44 30L66 34", BEE[1], 3),
+    line("M45 40L68 46", BEE[1], 3),
+    line("M44 50L66 58", BEE[1], 3),
+    centred("hand", 66, 76, 38),
+    pill(18, 92, 60, 4, GLASS[1]),
+
+    // Right: material on the skin, and water taking it off
+    rect(106, 14, 88, 92, 16, ANCHOVY[2]),
+    rect(104, 12, 88, 92, 16, SNOW),
+    centred("hand", 150, 62, 54),
+    ...dots,
+    centred("water", 176, 28, 22),
+    line("M170 40Q166 48 170 54", GLASS[2], 3),
+    pill(116, 92, 60, 4, GLASS[1]),
+  ];
+};
+
+// ── scene: a counter always finds a little (cover id "rock") ─────────────────────
+const backgroundScene = (): BlogShape[] => [
+  rect(0, 0, SCENE_W, SCENE_H, 0, GLASS[0]),
+  circle(172, 22, 40, GLASS[1]),
+  centred("sun", 170, 24, 24),
+
+  // The ground, with a few of the things the natural radiation comes from
+  rect(0, 84, SCENE_W, 36, 0, LEAF[1]),
+  rect(0, 100, SCENE_W, 20, 0, LEAF[2]),
+  pill(14, 108, 30, 4, LEAF[1]),
+  pill(120, 110, 36, 4, LEAF[1]),
+  centred("rock", 24, 72, 34),
+  centred("grass", 160, 74, 28),
+  centred("water", 190, 76, 18),
+
+  // The counter, with a probe lying on the ground
+  line("M108 56V50Q124 43 140 50V56", EEL[2], 4.2),
+  rect(100, 55, 38, 34, 10, EEL[2]),
+  rect(96, 53, 38, 34, 10, EEL[1]),
+  circle(115, 68, 11, SNOW),
+  circle(115, 68, 8.5, ANCHOVY[0]),
+  line("M115 71L120 62", RED[1], 2.8),
+  circle(115, 71, 2.6, EEL[1]),
+  circle(106, 81, 2.6, BEE[1]),
+  circle(115, 81, 2.6, LEAF[1]),
+  pill(104, 58, 4, 8, SNOW, 0.7),
+  line("M134 74Q150 72 154 84", EEL[1], 3.2),
+
+  // Only a few counts: small sparks, not many
+  sparkle(70, 40, 6, BEE[1]),
+  sparkle(52, 56, 4.5, BEE[0]),
+  sparkle(84, 22, 4.5, SNOW),
+  line("M88 66Q83 72 88 78", EEL[1], 3),
+  line("M82 62Q76 70 82 80", EEL[1], 3),
+
+  // A few clouds and tufts to fill the sky and the lawn
+  pill(18, 18, 34, 10, SNOW, 0.8),
+  pill(30, 12, 22, 10, SNOW, 0.8),
+  pill(60, 98, 4, 10, LEAF[0]),
+  pill(66, 98, 4, 14, LEAF[0]),
+  pill(150, 100, 4, 10, LEAF[0]),
+  pill(156, 100, 4, 14, LEAF[0]),
+  sparkle(130, 30, 4, SNOW),
+];
+
+// ── scene: the dose you already get (cover id "dial") ─────────────────────────────
+const doseDialScene = (): BlogShape[] => [
+  rect(0, 0, SCENE_W, SCENE_H, 0, LEAF[0]),
+  circle(100, 70, 64, LEAF[1]),
+  ...plate(100, 62, 52),
+  // The dial: a low zone, a middle one and a high one, the needle resting in the low one
+  line("M56 78A44 44 0 0 1 80 40", LEAF[1], 9),
+  line("M84 38A44 44 0 0 1 116 38", BEE[1], 9),
+  line("M120 40A44 44 0 0 1 144 78", RED[1], 9),
+  line("M100 78L76 52", EEL[2], 4.4),
+  circle(100, 78, 7, EEL[1]),
+  circle(99, 77, 2.6, SNOW),
+  pill(54, 90, 92, 5, ANCHOVY[1]),
+  // Ticks along the dial
+  line("M60 66L65 68", EEL[1], 2.6),
+  line("M72 50L76 54", EEL[1], 2.6),
+  line("M100 34V40", EEL[1], 2.6),
+  line("M128 50L124 54", EEL[1], 2.6),
+  line("M140 66L135 68", EEL[1], 2.6),
+  // The everyday sources round it: sun, rock, grass and water
+  rect(0, 104, SCENE_W, 16, 0, LEAF[2]),
+  centred("sun", 24, 54, 26),
+  centred("rock", 176, 58, 28),
+  centred("grass", 24, 96, 24),
+  centred("water", 176, 96, 20),
+  pill(8, 20, 30, 9, SNOW, 0.8),
+  pill(158, 14, 28, 9, SNOW, 0.8),
+  pill(70, 108, 4, 8, LEAF[0]),
+  pill(76, 108, 4, 11, LEAF[0]),
+  pill(120, 108, 4, 8, LEAF[0]),
+  sparkle(24, 24, 6, SNOW),
+  sparkle(178, 30, 5, SNOW),
+  sparkle(170, 100, 4, SNOW),
+  sparkle(30, 98, 4.5, SNOW),
+];
+
+// ── scene: reading a scary number (cover id "headline") ────────────────────────────
+const headlineScene = (): BlogShape[] => [
+  rect(0, 0, SCENE_W, SCENE_H, 0, ANCHOVY[0]),
+  circle(100, 62, 58, ANCHOVY[1]),
+  // A page with a big title and lines of text
+  rect(28, 14, 112, 94, 12, ANCHOVY[2]),
+  rect(26, 12, 112, 94, 12, SNOW),
+  pill(38, 24, 68, 10, RED[1]),
+  pill(38, 42, 90, 5, ANCHOVY[1]),
+  pill(38, 53, 80, 5, ANCHOVY[1]),
+  pill(38, 64, 88, 5, ANCHOVY[1]),
+  pill(38, 75, 56, 5, ANCHOVY[1]),
+  pill(38, 86, 70, 5, ANCHOVY[1]),
+  pill(38, 97, 40, 5, ANCHOVY[1]),
+  rect(104, 22, 24, 18, 4, GLASS[1]),
+  centred("radiation", 116, 31, 14),
+  // Round the page
+  pill(150, 14, 34, 9, SNOW, 0.8),
+  pill(8, 54, 12, 5, ANCHOVY[2]),
+  pill(8, 64, 8, 5, ANCHOVY[2]),
+  pill(8, 74, 12, 5, ANCHOVY[2]),
+  circle(172, 36, 4, BEE[1]),
+  circle(14, 30, 3, GLASS[1]),
+  pill(46, 108, 4, 8, LEAF[1]),
+  pill(150, 108, 4, 8, LEAF[1]),
+  sparkle(64, 112, 4, SNOW),
+  sparkle(120, 8, 4, SNOW),
+  // A lens over the number, with the calm green of a right answer
+  circle(138, 76, 26, GLASS[1], 0.55),
+  line(`${ring(138, 76, 22)}`, EEL[1], 5),
+  line("M155 94L172 111", EEL[1], 7),
+  circle(138, 76, 7, LEAF[1]),
+  sparkle(176, 28, 5.5, SNOW),
+  sparkle(14, 100, 4.5, SNOW),
+  sparkle(186, 70, 4, SNOW),
+];
+
 export interface BlogScene {
   shapes: BlogShape[];
   /** The middle of the part kept when a square crop is taken (a card's small cover), in scene units. */
@@ -284,6 +436,10 @@ export const BLOG_SCENES = {
   atom: { shapes: atomScene(), focusX: 130, name: "a hand, a cell and a virus, each smaller than the one before, leading to a large atom" },
   radiation: { shapes: radiationScene(), focusX: 100, name: "the radiation sign between a single die and a crowd of nuclei" },
   banana: { shapes: bananaScene(), focusX: 85, name: "a bunch of bananas and a Geiger counter on a kitchen counter" },
+  hand: { shapes: exposureScene(), focusX: 100, name: "a hand in the path of radiation on the left, and a hand with specks being rinsed on the right" },
+  rock: { shapes: backgroundScene(), focusX: 115, name: "a radiation counter standing among a rock, grass and water under the sun" },
+  dial: { shapes: doseDialScene(), focusX: 100, name: "a dial with a green, a yellow and a red zone and its needle resting in the green" },
+  headline: { shapes: headlineScene(), focusX: 100, name: "a page with a headline and a magnifying lens held over a number" },
   diamond: { shapes: carbonScene(), focusX: 100, name: "three carbon atoms with six, seven and eight neutrons" },
 } satisfies Record<string, BlogScene>;
 

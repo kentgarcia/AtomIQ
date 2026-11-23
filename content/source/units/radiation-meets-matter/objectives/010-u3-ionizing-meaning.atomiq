@@ -1,0 +1,143 @@
+format 1
+adapter curriculum 1
+unit: radiation-meets-matter
+
+objective u3-ionizing-meaning
+statement: Know that ionizing radiation has enough energy to knock electrons out of atoms, and that weaker radiation does not.
+misconception: All radiation is the same.
+
+item u3-l1-choice-ionizing
+type: choice
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-epa-radiation-basics
+references: ref-openstax-chem-21-6
+
+prompt:
+    What makes radiation ionizing?
+
+options:
+    {"id":"sun","label":"It comes from the sun","note":"Where radiation comes from does not decide it. What matters is how much energy it has."}
+    {"id":"energy","label":"It has enough energy to knock electrons out of atoms"}
+    {"id":"bright","label":"It is very bright","note":"Brightness has nothing to do with it. Visible light is bright and is not ionizing."}
+    {"id":"particles","label":"It is made of particles","note":"Some ionizing radiation is waves, such as gamma rays and X-rays, so it is not about particles."}
+
+answer: energy
+
+explanation:
+    Ionizing means it has enough energy to knock an electron out of an atom. The word describes what the radiation can do, not where it came from or what it is made of.
+
+item u3-l1-fill-ionizing
+type: fill
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-epa-radiation-basics
+
+prompt:
+    Radiation with enough energy to knock electrons out of atoms is called ___ radiation.
+
+mode: bank
+
+bank:
+    {"id":"ionizing","label":"ionizing"}
+    {"id":"visible","label":"visible"}
+    {"id":"radio","label":"radio"}
+
+answer: ionizing
+
+explanation:
+    The knocking out of an electron is ionization, so radiation that can do it is ionizing radiation.
+
+item u3-l1-tom-ionization
+type: true_or_myth
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-epa-radiation-basics
+
+statement:
+    Knocking an electron out of an atom is called ionization.
+
+answer: true
+
+explanation:
+    True. Ionization is the removal of an electron from an atom, and ionizing radiation is radiation that has the energy to do it.
+
+item u3-l1-tom-same
+type: true_or_myth
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-epa-radiation-basics
+
+statement:
+    All radiation is the same.
+
+answer: myth
+
+explanation:
+    Myth. Radiation comes in many kinds, and they differ in energy. Ionizing radiation can knock electrons out of atoms. Radio waves, microwaves and visible light cannot.
+
+item u3-x-ionizing-def
+type: choice
+surfaces: practice
+surfaces: checkpoint
+surfaces: review
+references: ref-epa-radiation-basics
+
+prompt:
+    Ionizing radiation can do what to an atom?
+
+options:
+    {"id":"grow","label":"Make it bigger","note":"Ionizing radiation does not change the size of an atom. What it can do is remove an electron."}
+    {"id":"freeze","label":"Freeze it in place","note":"It does not freeze atoms. The effect is on the electrons."}
+    {"id":"knock","label":"Knock an electron out of it"}
+
+answer: knock
+
+explanation:
+    Knocking an electron out is what ionizing means. The atom is left with one electron fewer.
+
+item u3-x-weaker
+type: choice
+surfaces: practice
+surfaces: checkpoint
+surfaces: review
+references: ref-epa-radiation-basics
+references: ref-openstax-chem-21-6
+
+prompt:
+    Radio waves do not have enough energy to ionize. What can they do to atoms?
+
+options:
+    {"id":"vibrate","label":"Make them move or vibrate, but not remove electrons"}
+    {"id":"nothing","label":"Nothing at all","note":"Non-ionizing radiation can still make atoms move or vibrate. It just cannot remove electrons."}
+    {"id":"remove","label":"Remove electrons, but slowly","note":"Weaker radiation cannot remove electrons at all. Ionizing needs a certain amount of energy."}
+
+answer: vibrate
+
+explanation:
+    Weaker, non-ionizing radiation can make atoms move or vibrate. What it cannot do is take an electron away, and that is the line between the two groups.
+
+item u3-x-which-cannot
+type: choice
+surfaces: practice
+surfaces: checkpoint
+surfaces: review
+references: ref-epa-radiation-basics
+
+prompt:
+    Which of these cannot knock an electron out of an atom?
+
+options:
+    {"id":"gamma","label":"Gamma rays","note":"Gamma rays are ionizing. They can knock electrons out."}
+    {"id":"light","label":"Visible light"}
+    {"id":"alpha","label":"Alpha particles","note":"Alpha particles are ionizing. They can knock electrons out."}
+    {"id":"xray","label":"X-rays","note":"X-rays are ionizing. They can knock electrons out."}
+
+answer: light
+
+explanation:
+    Visible light is radiation, but it does not have enough energy to remove electrons. Gamma rays, X-rays and alpha particles do.

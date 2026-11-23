@@ -130,9 +130,42 @@ export const HAIR_STYLE_PRICE = scaled(25);
  * and each further group of three on the same shelf waits one level more, so a long shelf opens up gradually as the
  * learner levels up (a level is 100 XP). New items go at the END of a shelf: the level follows the position.
  */
-export const TIER_LEVELS: Record<number, number> = Object.fromEntries(Object.entries({ 15: 2, 20: 3, 25: 4, 30: 5, 40: 6, 60: 8, 80: 10 }).map(([price, level]) => [scaled(Number(price)), level]));
+export const TIER_LEVELS: Record<number, number> = Object.fromEntries(Object.entries({ 15: 2, 20: 3, 25: 4, 30: 5, 40: 6, 50: 7, 60: 8, 80: 10, 100: 12 }).map(([price, level]) => [scaled(Number(price)), level]));
 export const MAX_UNLOCK_LEVEL = 15;
 const ITEMS_PER_LEVEL = 3;
+
+/** Higher prices for special inspired collection items (keyed by item id). */
+export const PREMIUM_PRICES: Record<string, number> = scaleAll({
+  "hair-style-trainer": 60,
+  "hair-style-shinobi": 60,
+  "hair-style-pirate": 60,
+  "hair-style-saiyan": 60,
+  "hair-style-odango": 60,
+  "eyebrows-hero": 40,
+  "eyebrows-saiyan": 40,
+  "eyes-anime": 50,
+  "eyes-power": 50,
+  "nose-anime": 40,
+  "mouth-trainer": 50,
+  "mouth-whiskers": 50,
+  "mouth-scargrin": 50,
+  "headwear-trainercap": 80,
+  "headwear-ninjaband": 80,
+  "headwear-strawhat": 80,
+  "headwear-halo": 80,
+  "headwear-tiara": 80,
+  "eyewear-visor": 60,
+  "eyewear-mask": 60,
+  "earwear-bolt": 50,
+  "earwear-kunai": 50,
+  "earwear-potara": 50,
+  "earwear-crescent": 50,
+  "pattern-trainer": 60,
+  "pattern-shinobi": 60,
+  "pattern-pirate": 60,
+  "pattern-fighter": 60,
+  "pattern-guardian": 60,
+});
 
 /** A price of zero is free: the tile says "Free" instead of showing diamonds. */
 export const isFree = (item: Pick<ShopItem, "price">): boolean => item.price === 0;
@@ -148,7 +181,7 @@ const PAINTS: RawItem[] = AVATAR_OPTIONS.background
 /** Every pattern but "none", named as `pattern-art.ts` names it. */
 const PATTERNS: RawItem[] = AVATAR_OPTIONS.pattern
   .filter((id) => id !== DEFAULT_AVATAR.pattern)
-  .map((id) => ({ id: `pattern-${id}`, name: patternDef(id)?.name ?? id, category: "pattern", value: id, price: PATTERN_PRICE }));
+  .map((id) => ({ id: `pattern-${id}`, name: patternDef(id)?.name ?? id, category: "pattern", value: id, price: PREMIUM_PRICES[`pattern-${id}`] ?? PATTERN_PRICE }));
 
 /** Every skin tone, the one the learner starts with included (it is free, so trying one on and coming back costs nothing). */
 const wornSkins = new Set(STARTER_AVATARS.map((a) => a.config.skin as string));
@@ -157,26 +190,26 @@ const SKINS: RawItem[] = AVATAR_OPTIONS.skin.map((id) => ({ id: `skin-${id}`, na
 /** The hair on the shelf: every style, in the base colour the learner has. What a starting design wears (a crop, a bun) is free. */
 const wornByStarters = new Set(STARTER_AVATARS.map((a) => a.config.hairStyle as string));
 /** What the shop calls a hair style, where the id alone would not read well. */
-const HAIR_NAMES: Record<string, string> = { buzzcut: "Buzz cut", classic: "Classic short", messy: "Messy", sidepart: "Side part", curtain: "Curtain", bowl: "Bowl cut", spiky: "Spiky", wavy: "Wavy", undercut: "Undercut", longer: "Longer", longstraight: "Long straight", shortbob: "Short bob", medium: "Medium", highpony: "High ponytail", lowpony: "Low ponytail", twintails: "Twin tails", bigbun: "Big bun", halfup: "Half up", longwavy: "Long wavy", curtainbangs: "Curtain bangs", fluffy: "Fluffy pigtails", cloud: "Cloud puff" };
-const HAIR: RawItem[] = AVATAR_OPTIONS.hairStyle.map((id): RawItem => ({ id: `hair-style-${id}`, name: HAIR_NAMES[id] ?? titleCase(id), category: "hair", value: id, price: wornByStarters.has(id) ? 0 : HAIR_STYLE_PRICE, starter: wornByStarters.has(id) }));
+const HAIR_NAMES: Record<string, string> = { buzzcut: "Buzz cut", classic: "Classic short", messy: "Messy", sidepart: "Side part", curtain: "Curtain", bowl: "Bowl cut", spiky: "Spiky", wavy: "Wavy", undercut: "Undercut", longer: "Wolf cut", longstraight: "Long straight", shortbob: "Short bob", medium: "Medium", highpony: "High ponytail", lowpony: "Side braid", twintails: "Twin braids", bigbun: "Big bun", halfup: "Space buns", longwavy: "Long wavy", curtainbangs: "Curtain bangs", fluffy: "Fluffy pigtails", cloud: "Cloud puff", flattop: "Flat-top fade", crownbun: "Braided bun", knotwrap: "Knotted wrap", workcrop: "Textured crop", layeredbob: "Layered bob", trainer: "Trainer spikes", shinobi: "Shinobi spikes", pirate: "Captain shag", saiyan: "Fighter spikes", odango: "Moon odango" };
+const HAIR: RawItem[] = AVATAR_OPTIONS.hairStyle.map((id): RawItem => ({ id: `hair-style-${id}`, name: HAIR_NAMES[id] ?? titleCase(id), category: "hair", value: id, price: wornByStarters.has(id) ? 0 : (PREMIUM_PRICES[`hair-style-${id}`] ?? HAIR_STYLE_PRICE), starter: wornByStarters.has(id) }));
 
 /** What one choice costs in the face and outfit tabs, in diamonds (what a starting design wears is free). */
 export const FACE_PRICES = scaleAll({ eyebrows: 15, eyes: 20, nose: 15, mouth: 15, ears: 20, headwear: 30, eyewear: 25, earwear: 20, outfit: 40 });
 /** Clothes cost more the more is going on: a plain top is the base price, a jacket or a jumper with a pattern more, a costume most. The five the teachers wear and the starting designs' are the base (or free). */
-export const OUTFIT_PRICES: Record<string, number> = scaleAll({ jacket: 60, overalls: 60, puffer: 60, scarf: 60, knit: 60, labapron: 60, whitecoat: 60, sailor: 80, hawaiian: 80, tuxedo: 80 });
+export const OUTFIT_PRICES: Record<string, number> = scaleAll({ jacket: 60, overalls: 60, puffer: 60, scarf: 60, knit: 60, labapron: 60, whitecoat: 60, fieldhoodie: 60, clinician: 60, techvest: 60, workvest: 60, scholar: 60, sailor: 80, hawaiian: 80, tuxedo: 80, trainervest: 100, shinobijacket: 100, captainvest: 100, martialgi: 100, guardian: 100 });
 type PricedCategory = keyof typeof FACE_PRICES;
 
 /** What the shop calls each choice of the face and outfit tabs, where the id alone would not read well. */
 const NAMES: Record<PricedCategory, Record<string, string>> = {
-  eyebrows: { none: "No brows", straight: "Straight", arched: "Arched", thick: "Thick", thin: "Thin", angled: "Angled", worried: "Worried", high: "Raised", bushy: "Bushy" },
-  eyes: { pill: "Classic", round: "Round", dots: "Dots", wide: "Wide", sparkle: "Sparkle", lashes: "Lashes", sleepy: "Sleepy", arches: "Happy arches" },
-  nose: { single: "Slim", double: "Classic", button: "Button", tiny: "Tiny", long: "Long", wide: "Wide", pointy: "Pointy", round: "Round", none: "No nose" },
-  mouth: { smile: "Smile", smirk: "Smirk", wide: "Wide smile", small: "Small", toothy: "Toothy", cat: "Cat", neutral: "Neutral", open: "Open", tongue: "Tongue out" },
+  eyebrows: { none: "No brows", straight: "Straight", arched: "Arched", thick: "Thick", thin: "Thin", angled: "Angled", worried: "Worried", high: "Raised", bushy: "Bushy", hero: "Heroic", saiyan: "Fighter brows" },
+  eyes: { pill: "Classic", round: "Round", dots: "Dots", wide: "Wide", sparkle: "Sparkle", lashes: "Lashes", sleepy: "Sleepy", arches: "Happy arches", anime: "Anime hero", power: "Power aura" },
+  nose: { single: "Slim", double: "Classic", button: "Button", tiny: "Petite", long: "Slender", wide: "Soft broad", pointy: "Upturned", round: "Soft drop", anime: "Anime wedge", none: "No nose" },
+  mouth: { smile: "Smile", smirk: "Smirk", wide: "Wide smile", small: "Small", toothy: "Toothy", cat: "Cat", neutral: "Neutral", open: "Open", tongue: "Tongue out", trainer: "Lightning grin", whiskers: "Fox whiskers", scargrin: "Captain grin" },
   ears: { round: "Round", small: "Small", big: "Big", pointed: "Pointed", elf: "Elf", none: "No ears" },
-  headwear: { none: "No hat", beanie: "Beanie", cap: "Baseball cap", headband: "Headband", bow: "Big bow", crown: "Crown", catears: "Cat ears", bunnyears: "Bunny ears", flowers: "Flower crown", wizard: "Wizard hat", party: "Party hat", graduation: "Graduation cap", hardhat: "Hard hat", bows: "Pair of bows" },
-  eyewear: { none: "No glasses", round: "Round glasses", square: "Square glasses", sunglasses: "Sunglasses", heart: "Heart glasses", star: "Star glasses", goggles: "Goggles", eyepatch: "Eyepatch", monocle: "Monocle", cateye: "Cat-eye glasses" },
-  earwear: { none: "No earrings", stud: "Studs", hoop: "Hoops", pearl: "Pearls", star: "Stars", gem: "Gems", flower: "Flower", earmuffs: "Earmuffs", headphones: "Headphones" },
-  outfit: { hoodie: "Hoodie", sweater: "Sweater", coat: "Lab coat", vest: "Vest", shirt: "Shirt", turtleneck: "Turtleneck", striped: "Striped tee", overalls: "Overalls", cardigan: "Cardigan", jacket: "Zip jacket", polo: "Polo", sailor: "Sailor top", hawaiian: "Aloha shirt", puffer: "Puffer", tuxedo: "Tuxedo", knit: "Nordic knit", scarf: "Scarf sweater", labapron: "Lab apron", whitecoat: "White coat" },
+  headwear: { none: "No hat", beanie: "Beanie", cap: "Baseball cap", headband: "Headband", bow: "Big bow", crown: "Crown", catears: "Cat ears", bunnyears: "Bunny ears", flowers: "Flower crown", wizard: "Wizard hat", party: "Party hat", graduation: "Graduation cap", hardhat: "Hard hat", bows: "Pair of bows", trainercap: "Trainer cap", ninjaband: "Shinobi headband", strawhat: "Straw hat", halo: "Fighter halo", tiara: "Moon tiara" },
+  eyewear: { none: "No glasses", round: "Round glasses", square: "Square glasses", sunglasses: "Sunglasses", heart: "Heart glasses", star: "Star glasses", goggles: "Goggles", eyepatch: "Eyepatch", monocle: "Monocle", cateye: "Cat-eye glasses", visor: "Battle visor", mask: "Tuxedo mask" },
+  earwear: { none: "No earrings", stud: "Studs", hoop: "Hoops", pearl: "Pearls", star: "Stars", gem: "Gems", flower: "Flower", earmuffs: "Earmuffs", headphones: "Headphones", bolt: "Thunder bolts", kunai: "Kunai drops", potara: "Fusion orbs", crescent: "Crescent moons" },
+  outfit: { hoodie: "Hoodie", sweater: "Sweater", coat: "Varsity jacket", vest: "Sweater vest", shirt: "Henley shirt", turtleneck: "Turtleneck", striped: "Striped tee", overalls: "Overalls", cardigan: "Cardigan", jacket: "Zip jacket", polo: "Polo", sailor: "Sailor top", hawaiian: "Aloha shirt", puffer: "Puffer", tuxedo: "Tuxedo", knit: "Nordic knit", scarf: "Scarf sweater", labapron: "Lab apron", whitecoat: "White coat", fieldhoodie: "Field hoodie", clinician: "Clinician coat", techvest: "Tech vest", workvest: "Hi-vis vest", scholar: "Scholar cardigan", trainervest: "Trainer jacket", shinobijacket: "Shinobi tracksuit", captainvest: "Captain vest", martialgi: "Fighter gi", guardian: "Guardian sailor" },
 };
 
 /** Every choice of a face or outfit tab, the ones the starting designs wear free. */
@@ -184,7 +217,7 @@ function choiceItems(category: PricedCategory): RawItem[] {
   const { choice } = SHOP_CATEGORIES.find((c) => c.id === category) ?? SHOP_CATEGORIES[0];
   if (!choice) return [];
   const worn = new Set(STARTER_AVATARS.map((a) => a.config[choice] as string));
-  return (AVATAR_OPTIONS[choice] as readonly string[]).map((id) => ({ id: `${category}-${id}`, name: NAMES[category][id] ?? titleCase(id), category, value: id, price: worn.has(id) ? 0 : (category === "outfit" ? OUTFIT_PRICES[id] : undefined) ?? FACE_PRICES[category], starter: worn.has(id) }));
+  return (AVATAR_OPTIONS[choice] as readonly string[]).map((id) => ({ id: `${category}-${id}`, name: NAMES[category][id] ?? titleCase(id), category, value: id, price: worn.has(id) ? 0 : PREMIUM_PRICES[`${category}-${id}`] ?? (category === "outfit" ? OUTFIT_PRICES[id] : undefined) ?? FACE_PRICES[category], starter: worn.has(id) }));
 }
 
 /** Gives each item its level: free ones 1, paid ones by tier plus their place among the paid items of the shelf. */

@@ -8,7 +8,7 @@ const HEX = /^#[0-9A-F]{6}$/;
 
 describe("blog illustrations", () => {
   it("has a scene for every id the blog content covers and figures use", () => {
-    for (const id of ["atom", "radiation", "banana", "diamond"]) assert.ok(isBlogSceneId(id), id);
+    for (const id of ["atom", "radiation", "banana", "diamond", "hand", "rock", "dial", "headline"]) assert.ok(isBlogSceneId(id), id);
     assert.ok(!isBlogSceneId("unicorn"));
     assert.ok(!isBlogSceneId("toString"));
     assert.ok(!isBlogSceneId(undefined));

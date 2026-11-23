@@ -19,7 +19,26 @@ test("apps install from progress the app already tracks", () => {
   assert.ok(!ids(core.unlockedApps(one)).includes("field-notes"));
   const two = { ...NO_PROGRESS, lessonsCompleted: 2 };
   assert.ok(ids(core.unlockedApps(two)).includes("shop"));
-  assert.ok(ids(core.unlockedApps(two)).includes("field-notes"));
+  assert.ok(!ids(core.unlockedApps(two)).includes("field-notes"), "Field Notes waits for the third lesson");
+  assert.ok(ids(core.unlockedApps({ ...NO_PROGRESS, lessonsCompleted: 3 })).includes("field-notes"));
+});
+
+test("a game arrives with the lesson that teaches what it shows", () => {
+  const withLesson = (lessonId) => ids(core.unlockedApps({ ...NO_PROGRESS, lessonsCompleted: 1, lessonsDone: [lessonId] }));
+  assert.ok(withLesson("atoms-are-everywhere").includes("atom-maze"));
+  assert.ok(!withLesson("atoms-are-everywhere").includes("lab-build-atom"));
+  assert.ok(withLesson("protons-neutrons-electrons").includes("lab-build-atom"), "Build an Atom comes with 'Meet the atom'");
+  assert.ok(withLesson("isotopes").includes("mythbuster"));
+  assert.ok(withLesson("half-life").includes("lab-decay"));
+  assert.ok(withLesson("what-stops-what").includes("lab-shield"));
+  // a lesson id the learner has not finished unlocks nothing, whatever the count
+  assert.ok(!ids(core.unlockedApps({ ...NO_PROGRESS, lessonsCompleted: 30 })).includes("lab-build-atom"));
+});
+
+test("the catalog is in progression order: every app after the five starters waits for something, and the five come first", () => {
+  assert.deepEqual(PHONE_APPS.slice(0, 5).map((a) => a.unlock.kind), ["start", "start", "start", "start", "start"]);
+  assert.ok(PHONE_APPS.slice(5).every((a) => a.unlock.kind !== "start"));
+  assert.deepEqual(PHONE_APPS.filter((a) => a.group === "games").map((a) => a.id), ["atom-maze", "lab-build-atom", "mythbuster", "lab-decay", "lab-shield"]);
 });
 
 test("planned apps are never returned, whatever the progress", () => {
@@ -78,7 +97,7 @@ test("an app's unit unlock names a unit that exists", async () => {
 
 test("new apps are the unlocked ones not yet seen", () => {
   const unlocked = core.unlockedApps({ ...NO_PROGRESS, lessonsCompleted: 2 });
-  assert.deepEqual(ids(core.newApps(unlocked, new Set(["chats", "contacts"]))), ["atomdex", "daily-fact", "settings", "shop", "field-notes"]);
+  assert.deepEqual(ids(core.newApps(unlocked, new Set(["chats", "contacts"]))), ["atomdex", "daily-fact", "settings", "shop"]);
   assert.deepEqual(core.newApps(unlocked, new Set(ids(unlocked))), []);
 });
 
@@ -156,8 +175,8 @@ test("an installed app is new until it is opened, and a starter is opened from t
 
 test("locked apps are the live ones the learner does not have, and each says what it needs", () => {
   const lockedIds = (p) => ids(core.lockedApps(p));
-  assert.deepEqual(lockedIds(NO_PROGRESS), ["shop", "field-notes", "scanner", "library", "camera", "safety", "map"]);
-  const all = { lessonsCompleted: 9, unitsCompleted: ["inside-the-atom", "radioactivity"], level: 9, shopItemsOwned: 1 };
+  assert.deepEqual(lockedIds(NO_PROGRESS), ["atom-maze", "shop", "lab-build-atom", "field-notes", "mythbuster", "scanner", "library", "camera", "lab-decay", "safety", "lab-shield", "map"]);
+  const all = { lessonsCompleted: 9, unitsCompleted: ["inside-the-atom", "radioactivity"], lessonsDone: ["atoms-are-everywhere", "protons-neutrons-electrons", "isotopes", "half-life", "what-stops-what"], level: 9, shopItemsOwned: 1 };
   assert.deepEqual(lockedIds(all), []);
   // every app is either unlocked or locked, never both
   for (const p of [NO_PROGRESS, all]) assert.equal(core.unlockedApps(p).length + core.lockedApps(p).length, PHONE_APPS.length);
@@ -167,6 +186,8 @@ test("locked apps are the live ones the learner does not have, and each says wha
   assert.equal(core.unlockRequirement({ kind: "lessons", count: 2 }, { ...NO_PROGRESS, lessonsCompleted: 1 }, title).progress, "1 of 2 lessons finished");
   assert.equal(core.unlockRequirement({ kind: "unit", unitId: "radioactivity" }, NO_PROGRESS, title).text, 'Finish the unit "Radioactivity".');
   assert.deepEqual(core.unlockRequirement({ kind: "level", level: 5 }, { ...NO_PROGRESS, level: 2 }, title), { text: "Reach level 5.", progress: "You are level 2" });
+  assert.equal(core.unlockRequirement({ kind: "lesson", lessonId: "half-life" }, NO_PROGRESS, title, (id) => (id === "half-life" ? "Half-life" : undefined)).text, 'Finish the lesson "Half-life".');
+  assert.equal(core.unlockRequirement({ kind: "lesson", lessonId: "x" }, NO_PROGRESS, title).text, "Finish a certain lesson.");
   assert.equal(core.unlockRequirement({ kind: "owns-shop-item" }, NO_PROGRESS, title).text, "Get any item from the Shop.");
 });
 
@@ -189,4 +210,25 @@ test("sameIconView: an icon skips a render that only brings new handlers, and re
   assert.equal(core.sameIconView({ ...base, install: installing }, { ...base, install: { delay: 400, newDot: true } }), false);
   assert.equal(core.sameIconView({ ...base, install: installing }, { ...base, install: { delay: 200, newDot: false } }), false);
   assert.equal(core.sameIconView(base, { ...base, install: installing }), false, "the install moment starts or ends");
+});
+
+test("every live app has a picture of its own, and the games are apps that open their game", async () => {
+  const art = await import(pathToFileURL(path.resolve("components/phone/app-icon-art.ts")).href);
+  for (const app of PHONE_APPS.filter((a) => a.status === "live")) assert.ok(art.appIconArt(app.id), `${app.id} has icon art`);
+  const games = { mythbuster: "/mythbuster", "atom-maze": "/explorer/story", "lab-build-atom": "/lab?exp=build-atom", "lab-decay": "/lab?exp=decay-lab", "lab-shield": "/lab?exp=radiation-shield" };
+  for (const [id, route] of Object.entries(games)) {
+    const app = PHONE_APPS.find((a) => a.id === id);
+    assert.ok(app && app.route.startsWith(route), `${id} opens ${route}`);
+    assert.notEqual(app.unlock.kind, "start", `${id} is not one of the five starting apps`);
+  }
+});
+
+test("a page holds as many rows as the screen has room for, between three and six", () => {
+  assert.equal(core.gridRows(300, 100), 3);
+  assert.equal(core.gridRows(520, 100), 5);
+  assert.equal(core.gridRows(900, 100), 6);
+  assert.equal(core.gridRows(100, 0), 3);
+  assert.equal(core.gridRows(Number.NaN, 100), 3);
+  // five rows of four: the seventeen apps fit one page on a tall phone
+  assert.equal(core.pagesOf(Array.from({ length: 17 }, (_, i) => i), 4 * core.gridRows(520, 100)).length, 1);
 });

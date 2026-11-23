@@ -1,0 +1,96 @@
+format 1
+adapter curriculum 1
+unit: radiation-and-the-body
+
+lesson the-dose-scale
+title: The dose scale
+minutes: 5
+xp: 50
+teaches: u4-everyone-dose
+teaches: u4-dose-steps
+relies_on: u2-not-always-dangerous
+relies_on: u3-three-units
+
+description:
+    Radioactive does not always mean dangerous. You will learn how doses are counted, what an ordinary year adds up to, and where a scan or an illness sits on the scale.
+
+cite ref-epa-radiation-sources
+
+supports:
+    The average yearly dose is about 6.2 millisieverts, most of it from natural background radiation; a whole body CT is about 10 millisieverts.
+
+cite ref-who-ionizing-radiation
+supports: The dose threshold for acute radiation syndrome is about 1 sievert (1000 millisieverts).
+
+card c01
+kind: teach
+type: explain
+scored: 0
+title: How a dose is counted
+figure: millisievert-figure
+figure_at: 1
+
+body:
+    Radiation is all around us, so the question is always how much. A dose measures how much radiation a body has taken in, and it is counted in [[sievert|sieverts]]. Everyday doses are tiny, so they are given in millisieverts: 1 sievert is 1000 [[millisievert|millisieverts]].
+
+card c02
+kind: item
+type: item
+item: u4-l1-fill-milli
+connected: true
+
+card c03
+kind: teach
+type: explain
+scored: 0
+title: A little, every day
+figure: a-year-of-dose
+figure_at: 1
+
+body:
+    Everyone gets a small dose all the time. In the United States the average is about 6.2 millisieverts a year, and most of it is natural [[background-radiation|background radiation]]. Rocks, soil, space and [[radon|radon]] in the air all add to it.
+
+card c04
+kind: item
+type: item
+item: u4-l1-tom-workers
+connected: true
+
+card c05
+kind: item
+type: item
+item: u4-l1-choice-average
+
+card c06
+kind: teach
+type: explain
+scored: 0
+title: From tiny to huge
+figure: dose-ladder
+figure_at: 1
+
+body:
+    Put some doses in a line. Living beside a nuclear power station for a year adds under 0.01 millisieverts. A year of cosmic rays at sea level is about 0.3, and radon in an average home about 2.3. One whole body CT is about 10. About 1000 in a short time is where people start to become ill.
+
+card c07
+kind: item
+type: item
+item: u4-l1-order-doses
+connected: true
+
+card c08
+kind: item
+type: item
+item: u4-l1-choice-ill
+
+card c09
+kind: teach
+type: explain
+tier: deeper
+scored: 0
+title: Go deeper: where you live
+figure: a-year-of-dose
+figure_at: 1
+
+body:
+    Altitude changes the dose. Living in Denver, about 5,280 feet up, adds about 0.8 millisieverts a year from cosmic radiation, compared with about 0.3 at sea level. Where you live changes your yearly dose a little.

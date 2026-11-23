@@ -12,23 +12,24 @@ bio:
 spec:
     {
       "skin": {
-        "base": "#FFCBA3",
-        "shade": "#F5B585",
-        "feature": "#E99B5F"
+        "base": "#D9A066",
+        "shade": "#C4854F",
+        "feature": "#A8683A"
       },
       "head": "capsule",
       "headWidth": 96,
-      "eyes": "round",
-      "nose": "single",
+      "eyes": "glasses-round",
+      "nose": "button",
       "hair": {
-        "style": "wrap",
+        "style": "knotwrap",
         "color": "#FFB2B2",
         "shade": "#F5A4A4"
       },
       "outfit": {
-        "kind": "shirt",
+        "kind": "techvest",
         "color": "#1899D6",
-        "shade": "#2B70C9"
+        "shade": "#2B70C9",
+        "collar": "#DDF4FF"
       },
       "accent": {
         "kind": "vial",

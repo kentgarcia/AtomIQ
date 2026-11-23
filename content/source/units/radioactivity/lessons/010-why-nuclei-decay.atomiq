@@ -33,49 +33,50 @@ type: item
 item: u2-l1-predict-alone
 scored: 0
 
-card c02
+card c06
 kind: teach
-type: explain
+type: reveal
 scored: 0
-title: Stable and unstable
+title: Left alone, it still changes
+predicts: c01
 figure: simple-stable-unstable
 figure_at: 1
 
 body:
-    A stable nucleus can stay as it is. An unstable nucleus can change into another state. A nucleus that can change like this is called [[radioactivity|radioactive]].
-
-card c03
-kind: teach
-type: explain
-scored: 0
-title: It changes by itself
-figure: parent-daughter
-figure_at: 1
-
-body:
-    An unstable nucleus can change all by itself. Nobody has to push it. The nucleus that changes is the [[parent-nuclide|parent]]. The nucleus it becomes is the [[daughter-nuclide|daughter]]. The change gives off [[radiation]].
+    An unstable nucleus can change all by itself, even when nobody does anything to it, because the instability is already inside it. It does not vanish. It turns into a different nucleus and gives off [[radiation|radiation]].
 
 card c04
 kind: item
 type: item
 item: u2-l1-hotspot-change
+connected: true
 
 card c05
 kind: item
 type: item
 item: u2-l1-tom-person
 
-card c06
+card c03
 kind: teach
-type: reveal
+type: explain
 scored: 0
-title: Left alone, it can still change
-predicts: c01
+title: Parent and daughter
 figure: parent-daughter
 figure_at: 1
 
 body:
-    An unstable nucleus can change all by itself, even when nobody does anything to it. It does not vanish. It turns into a different nucleus and gives off radiation.
+    Scientists give the two nuclei names. The nucleus that changes is the [[parent-nuclide|parent]]. The nucleus it becomes is the [[daughter-nuclide|daughter]]. The change gives off radiation, and that radiation is what comes out.
+
+card c11
+kind: item
+type: item
+item: u2-l1-fill-parent
+connected: true
+
+card c12
+kind: item
+type: item
+item: u2-l1-match-names
 
 card c07
 kind: teach
@@ -86,7 +87,7 @@ figure: random-one
 figure_at: 2
 
 body:
-    You can know that a nucleus has a chance of changing. You cannot say when. Look at one nucleus and its moment is a surprise. A whole group is different, and you will see how in a later lesson.
+    You can say that a nucleus has a chance of changing. You cannot say when. Watch one nucleus and its moment is a surprise, and no nucleus ever gets 'due'. A whole group is different, and the next lessons show how.
 
 card c09
 kind: item
@@ -99,21 +100,6 @@ kind: item
 type: item
 item: u2-l1-tom-chance
 
-card c11
-kind: item
-type: item
-item: u2-l1-fill-parent
-
-card c12
-kind: item
-type: item
-item: u2-l1-match-names
-
-card c13
-kind: item
-type: item
-item: u2-l1-choice-why
-
 card c14
 kind: teach
 type: explain
@@ -124,4 +110,4 @@ figure: flame-and-ice
 figure_at: 1
 
 body:
-    An unstable nucleus is called a [[radionuclide]]. When it changes, a different nuclide can result, and energy leaves as particles or electromagnetic radiation. Heating, cooling and chemistry hardly change how fast this happens. In a flame or in ice, it is still unstable.
+    An unstable nucleus is called a [[radionuclide|radionuclide]]. When it changes, a different nuclide can result, and energy leaves as particles or electromagnetic radiation. Heating, cooling and chemistry hardly change how fast this happens. In a flame or in ice, it is still unstable.

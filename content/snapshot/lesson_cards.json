@@ -7,19 +7,8 @@
   "rows": [
     {
       "lesson_id": "alpha-beta-gamma",
-      "id": "c01",
-      "position": 0,
-      "kind": "item",
-      "type": "item",
-      "tier": "core",
-      "item_id": "u2-l2-predict-release",
-      "scored": 0,
-      "data": {}
-    },
-    {
-      "lesson_id": "alpha-beta-gamma",
       "id": "c02",
-      "position": 1,
+      "position": 0,
       "kind": "teach",
       "type": "explain",
       "tier": "core",
@@ -27,17 +16,17 @@
       "scored": 0,
       "data": {
         "title": "Three things can come out",
-        "body": "When a nucleus changes, it can release [[alpha-particle|alpha]] particles, [[beta-particle|beta]] particles or [[gamma-ray|gamma]] rays. They are three different things. Alpha and beta are particles. Gamma is not.",
+        "figureAt": 1,
+        "body": "When a nucleus changes, it can release [[alpha-particle|alpha]] particles, [[beta-particle|beta]] particles or [[gamma-ray|gamma]] rays. Watch the names: they are three different things, not three sizes of one thing. Alpha and beta are particles, and gamma is not.",
         "figure": {
           "ref": "three-kinds"
-        },
-        "figureAt": 1
+        }
       }
     },
     {
       "lesson_id": "alpha-beta-gamma",
       "id": "c03",
-      "position": 2,
+      "position": 1,
       "kind": "teach",
       "type": "explain",
       "tier": "core",
@@ -45,17 +34,17 @@
       "scored": 0,
       "data": {
         "title": "Alpha: a chunk",
-        "body": "An alpha particle is made of 2 protons and 2 neutrons stuck together. It is the nucleus of a helium atom, with no electrons. It is a big, chunky particle.",
+        "figureAt": 1,
+        "body": "An alpha particle is a chunk: 2 protons and 2 neutrons stuck together. That is exactly the nucleus of a helium atom, with no electrons. It is a big, heavy particle.",
         "figure": {
           "ref": "alpha-figure"
-        },
-        "figureAt": 1
+        }
       }
     },
     {
       "lesson_id": "alpha-beta-gamma",
       "id": "c04",
-      "position": 3,
+      "position": 2,
       "kind": "item",
       "type": "item",
       "tier": "core",
@@ -68,7 +57,7 @@
     {
       "lesson_id": "alpha-beta-gamma",
       "id": "c05",
-      "position": 4,
+      "position": 3,
       "kind": "teach",
       "type": "explain",
       "tier": "core",
@@ -76,17 +65,17 @@
       "scored": 0,
       "data": {
         "title": "Beta: a fast electron",
-        "body": "A beta particle is a fast-moving particle released in some decays. In the basic picture, it is a fast electron. It is far lighter than an alpha particle.",
+        "figureAt": 2,
+        "body": "A beta particle is a fast-moving particle. In the basic picture it is a fast electron. It is far lighter than an alpha particle, which is a whole chunk of the nucleus.",
         "figure": {
           "ref": "beta-figure"
-        },
-        "figureAt": 2
+        }
       }
     },
     {
       "lesson_id": "alpha-beta-gamma",
       "id": "c06",
-      "position": 5,
+      "position": 4,
       "kind": "teach",
       "type": "explain",
       "tier": "core",
@@ -94,17 +83,41 @@
       "scored": 0,
       "data": {
         "title": "Gamma: not a particle",
-        "body": "Gamma radiation is not a particle. It is [[electromagnetic-radiation|electromagnetic radiation]], like light but far more energetic. Light is electromagnetic radiation too.",
+        "figureAt": 2,
+        "body": "Gamma is not a particle at all. It is [[electromagnetic-radiation|electromagnetic radiation]], like light but far more energetic. Light is electromagnetic radiation too, so light and gamma belong to the same family.",
         "figure": {
           "ref": "gamma-figure"
-        },
-        "figureAt": 2
+        }
       }
     },
     {
       "lesson_id": "alpha-beta-gamma",
-      "id": "c07",
+      "id": "c11",
+      "position": 5,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u2-l2-tom-light",
+      "scored": 1,
+      "data": {
+        "connected": true
+      }
+    },
+    {
+      "lesson_id": "alpha-beta-gamma",
+      "id": "c10",
       "position": 6,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u2-l2-tom-pieces",
+      "scored": 1,
+      "data": {}
+    },
+    {
+      "lesson_id": "alpha-beta-gamma",
+      "id": "c07",
+      "position": 7,
       "kind": "item",
       "type": "item",
       "tier": "core",
@@ -115,7 +128,7 @@
     {
       "lesson_id": "alpha-beta-gamma",
       "id": "c08",
-      "position": 7,
+      "position": 8,
       "kind": "sim",
       "type": "radiation-id",
       "tier": "core",
@@ -151,74 +164,8 @@
     },
     {
       "lesson_id": "alpha-beta-gamma",
-      "id": "c09",
-      "position": 8,
-      "kind": "item",
-      "type": "item",
-      "tier": "core",
-      "item_id": "u2-l2-tom-same",
-      "scored": 1,
-      "data": {}
-    },
-    {
-      "lesson_id": "alpha-beta-gamma",
-      "id": "c10",
-      "position": 9,
-      "kind": "item",
-      "type": "item",
-      "tier": "core",
-      "item_id": "u2-l2-tom-pieces",
-      "scored": 1,
-      "data": {}
-    },
-    {
-      "lesson_id": "alpha-beta-gamma",
-      "id": "c11",
-      "position": 10,
-      "kind": "item",
-      "type": "item",
-      "tier": "core",
-      "item_id": "u2-l2-tom-light",
-      "scored": 1,
-      "data": {}
-    },
-    {
-      "lesson_id": "alpha-beta-gamma",
-      "id": "c12",
-      "position": 11,
-      "kind": "item",
-      "type": "item",
-      "tier": "core",
-      "item_id": "u2-l2-sort-kind",
-      "scored": 1,
-      "data": {}
-    },
-    {
-      "lesson_id": "alpha-beta-gamma",
-      "id": "c13",
-      "position": 12,
-      "kind": "item",
-      "type": "item",
-      "tier": "core",
-      "item_id": "u2-l2-choice-electron",
-      "scored": 1,
-      "data": {}
-    },
-    {
-      "lesson_id": "alpha-beta-gamma",
-      "id": "c14",
-      "position": 13,
-      "kind": "item",
-      "type": "item",
-      "tier": "core",
-      "item_id": "u2-l2-choice-gamma-element",
-      "scored": 1,
-      "data": {}
-    },
-    {
-      "lesson_id": "alpha-beta-gamma",
       "id": "c15",
-      "position": 14,
+      "position": 9,
       "kind": "teach",
       "type": "explain",
       "tier": "deeper",
@@ -243,12 +190,12 @@
       "item_id": null,
       "scored": 0,
       "data": {
-        "title": "What is everything made of?",
-        "body": "Your hand, your phone and an apple are all [[matter]]. All matter is made of [[atom|atoms]]. Light and heat are different. They are energy, not matter.",
+        "title": "Look around you",
+        "figureAt": 1,
+        "body": "Look at anything near you, like a cup, a phone or your own hand. All of it is [[matter|matter]], and all matter is built from tiny pieces called [[atom|atoms]]. Light and heat are different: they are energy, and energy is not made of atoms. So for anything you meet, ask one question: is it matter, or is it energy?",
         "figure": {
           "ref": "matter-vs-energy"
-        },
-        "figureAt": 1
+        }
       }
     },
     {
@@ -258,9 +205,11 @@
       "kind": "item",
       "type": "item",
       "tier": "core",
-      "item_id": "u1-l1-sort-matter",
+      "item_id": "u1-x-not-atoms",
       "scored": 1,
-      "data": {}
+      "data": {
+        "connected": true
+      }
     },
     {
       "lesson_id": "atoms-are-everywhere",
@@ -273,11 +222,11 @@
       "scored": 0,
       "data": {
         "title": "Air is matter too",
-        "body": "Air feels like nothing, but it is matter too. It is made of atoms. That is why a pumped-up ball weighs more than a flat one.",
+        "figureAt": 2,
+        "body": "Air feels like nothing because you cannot see it, but it is matter too. You can show it: a pumped-up ball weighs more than a flat one. The only thing that changed is the air inside, so air must be made of atoms that have weight.",
         "figure": {
           "ref": "air-balloons"
-        },
-        "figureAt": 2
+        }
       }
     },
     {
@@ -304,11 +253,11 @@
       "scored": 0,
       "data": {
         "title": "Far too small to see",
-        "body": "Atoms are far too small to see, even with an ordinary microscope. You can zoom in on a skin cell. An atom is much, much smaller.",
+        "figureAt": 2,
+        "body": "So if everything is made of atoms, why can't we see them? Because they are extremely small. Zoom in on a skin cell and you are still far from an atom. An ordinary microscope uses light, and light is too coarse to show something that small.",
         "figure": {
           "ref": "zoom-chain"
-        },
-        "figureAt": 2
+        }
       }
     },
     {
@@ -386,19 +335,8 @@
     },
     {
       "lesson_id": "atoms-are-everywhere",
-      "id": "c10",
-      "position": 8,
-      "kind": "item",
-      "type": "item",
-      "tier": "core",
-      "item_id": "u1-l1-choice-made-of",
-      "scored": 1,
-      "data": {}
-    },
-    {
-      "lesson_id": "atoms-are-everywhere",
       "id": "c09",
-      "position": 9,
+      "position": 8,
       "kind": "teach",
       "type": "story",
       "tier": "deeper",
@@ -416,18 +354,25 @@
       }
     },
     {
-      "lesson_id": "decay-chains",
+      "lesson_id": "becquerel-gray-sievert",
       "id": "c01",
       "position": 0,
-      "kind": "item",
-      "type": "item",
+      "kind": "teach",
+      "type": "explain",
       "tier": "core",
-      "item_id": "u2-l4-predict-daughter",
+      "item_id": null,
       "scored": 0,
-      "data": {}
+      "data": {
+        "title": "Three questions, three units",
+        "figureAt": 1,
+        "body": "Picture a cloud, a bucket and a garden. The cloud drops rain. The bucket catches some. The garden may or may not be harmed by it. Radiation has three questions like that, and each one has its own unit.",
+        "figure": {
+          "ref": "three-questions"
+        }
+      }
     },
     {
-      "lesson_id": "decay-chains",
+      "lesson_id": "becquerel-gray-sievert",
       "id": "c02",
       "position": 1,
       "kind": "teach",
@@ -436,18 +381,178 @@
       "item_id": null,
       "scored": 0,
       "data": {
+        "title": "Becquerel: how active the source is",
+        "figureAt": 1,
+        "body": "The [[becquerel|becquerel]] tells you how active a source is. One becquerel is one decay per second. So a source of 20 becquerels has 20 nuclei decaying every second.",
+        "figure": {
+          "ref": "becquerel-figure"
+        }
+      }
+    },
+    {
+      "lesson_id": "becquerel-gray-sievert",
+      "id": "c03",
+      "position": 2,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u3-l5-fill-bq",
+      "scored": 1,
+      "data": {
+        "connected": true
+      }
+    },
+    {
+      "lesson_id": "becquerel-gray-sievert",
+      "id": "c04",
+      "position": 3,
+      "kind": "teach",
+      "type": "explain",
+      "tier": "core",
+      "item_id": null,
+      "scored": 0,
+      "data": {
+        "title": "A big number is about the source",
+        "body": "A becquerel counts what the source is doing, like the cloud counting its drops. It does not say how much radiation reached you, or what it did. Those have their own units."
+      }
+    },
+    {
+      "lesson_id": "becquerel-gray-sievert",
+      "id": "c05",
+      "position": 4,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u3-l5-tom-bq-dose",
+      "scored": 1,
+      "data": {
+        "connected": true
+      }
+    },
+    {
+      "lesson_id": "becquerel-gray-sievert",
+      "id": "c06",
+      "position": 5,
+      "kind": "teach",
+      "type": "explain",
+      "tier": "core",
+      "item_id": null,
+      "scored": 0,
+      "data": {
+        "title": "Gray: energy absorbed",
+        "figureAt": 1,
+        "body": "The [[gray|gray]] measures energy absorbed, like the water in the bucket. One gray is one joule of energy absorbed by each kilogram. It does not say what kind of radiation the energy came from.",
+        "figure": {
+          "ref": "gray-figure"
+        }
+      }
+    },
+    {
+      "lesson_id": "becquerel-gray-sievert",
+      "id": "c07",
+      "position": 6,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u3-l5-choice-gray",
+      "scored": 1,
+      "data": {
+        "connected": true
+      }
+    },
+    {
+      "lesson_id": "becquerel-gray-sievert",
+      "id": "c08",
+      "position": 7,
+      "kind": "teach",
+      "type": "explain",
+      "tier": "core",
+      "item_id": null,
+      "scored": 0,
+      "data": {
+        "title": "Sievert: potential for harm",
+        "figureAt": 1,
+        "body": "The [[sievert|sievert]] measures the potential for harm, like what the rain does to the garden. It counts the energy absorbed, and also the type of radiation and how sensitive the tissue is.",
+        "figure": {
+          "ref": "sievert-figure"
+        }
+      }
+    },
+    {
+      "lesson_id": "becquerel-gray-sievert",
+      "id": "c09",
+      "position": 8,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u3-l5-choice-sv",
+      "scored": 1,
+      "data": {
+        "connected": true
+      }
+    },
+    {
+      "lesson_id": "becquerel-gray-sievert",
+      "id": "c10",
+      "position": 9,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u3-l5-match-units",
+      "scored": 1,
+      "data": {}
+    },
+    {
+      "lesson_id": "becquerel-gray-sievert",
+      "id": "c11",
+      "position": 10,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u3-l5-choice-big-bq",
+      "scored": 1,
+      "data": {}
+    },
+    {
+      "lesson_id": "becquerel-gray-sievert",
+      "id": "c12",
+      "position": 11,
+      "kind": "teach",
+      "type": "explain",
+      "tier": "deeper",
+      "item_id": null,
+      "scored": 0,
+      "data": {
+        "title": "Go deeper: older units",
+        "figureAt": 1,
+        "body": "Older names are still used. The curie measures activity like the becquerel, the rad measures absorbed dose like the gray, and the rem measures biological effect like the sievert. 100 rem is one sievert.",
+        "figure": {
+          "ref": "older-units"
+        }
+      }
+    },
+    {
+      "lesson_id": "decay-chains",
+      "id": "c02",
+      "position": 0,
+      "kind": "teach",
+      "type": "explain",
+      "tier": "core",
+      "item_id": null,
+      "scored": 0,
+      "data": {
         "title": "Not always finished",
-        "body": "A nucleus decays into a daughter. The daughter can be unstable too. Then it decays again. The parent is the nucleus that decays. The daughter is the nucleus it becomes. Not every daughter is the end.",
+        "figureAt": 1,
+        "body": "A nucleus decays into a daughter. But the daughter does not have to be stable. If it is unstable too, it decays again, and then again. So one decay is not always the end.",
         "figure": {
           "ref": "daughter-unstable"
-        },
-        "figureAt": 1
+        }
       }
     },
     {
       "lesson_id": "decay-chains",
       "id": "c03",
-      "position": 2,
+      "position": 1,
       "kind": "sim",
       "type": "decay-chain",
       "tier": "core",
@@ -489,61 +594,25 @@
     {
       "lesson_id": "decay-chains",
       "id": "c04",
-      "position": 3,
+      "position": 2,
       "kind": "teach",
-      "type": "reveal",
+      "type": "explain",
       "tier": "core",
       "item_id": null,
       "scored": 0,
       "data": {
-        "predictCardId": "c01",
         "title": "A decay chain",
-        "body": "A daughter can be unstable too. A [[decay-chain|decay chain]] is a sequence of radioactive decays in which one nucleus changes into another, which may decay again. It ends at a stable nucleus.",
+        "figureAt": 2,
+        "body": "A [[decay-chain|decay chain]] is a sequence of radioactive decays: one nucleus changes into another, which may decay again. It ends only when a stable nucleus is reached, because a stable nucleus has nothing left to change into.",
         "figure": {
           "ref": "chain-figure"
-        },
-        "figureAt": 2
+        }
       }
-    },
-    {
-      "lesson_id": "decay-chains",
-      "id": "c05",
-      "position": 4,
-      "kind": "item",
-      "type": "item",
-      "tier": "core",
-      "item_id": "u2-l4-tom-stable",
-      "scored": 1,
-      "data": {
-        "connected": true
-      }
-    },
-    {
-      "lesson_id": "decay-chains",
-      "id": "c06",
-      "position": 5,
-      "kind": "item",
-      "type": "item",
-      "tier": "core",
-      "item_id": "u2-l4-tom-vanish",
-      "scored": 1,
-      "data": {}
-    },
-    {
-      "lesson_id": "decay-chains",
-      "id": "c07",
-      "position": 6,
-      "kind": "item",
-      "type": "item",
-      "tier": "core",
-      "item_id": "u2-l4-tom-different",
-      "scored": 1,
-      "data": {}
     },
     {
       "lesson_id": "decay-chains",
       "id": "c08",
-      "position": 7,
+      "position": 3,
       "kind": "item",
       "type": "item",
       "tier": "core",
@@ -553,41 +622,41 @@
     },
     {
       "lesson_id": "decay-chains",
-      "id": "c09",
-      "position": 8,
+      "id": "c11",
+      "position": 4,
       "kind": "item",
       "type": "item",
       "tier": "core",
-      "item_id": "u2-l4-choice-next",
+      "item_id": "u2-l4-choice-finished",
       "scored": 1,
       "data": {}
     },
     {
       "lesson_id": "decay-chains",
       "id": "c10",
-      "position": 9,
+      "position": 5,
       "kind": "teach",
       "type": "explain",
       "tier": "core",
       "item_id": null,
       "scored": 0,
       "data": {
-        "title": "A whole chain",
-        "body": "Zoom out. One unstable nucleus can be the start of a whole chain of decays. Each step makes a new nucleus. The chain stops only when a stable nucleus is reached.",
+        "title": "Nothing vanishes",
+        "figureAt": 1,
+        "body": "Look at what each step does. A decay does not make an atom disappear. It changes the nucleus into a different nucleus, and that different nucleus is what is left behind. One unstable nucleus can start a whole chain of these changes.",
         "figure": {
           "ref": "chain-zoom-out"
-        },
-        "figureAt": 1
+        }
       }
     },
     {
       "lesson_id": "decay-chains",
-      "id": "c11",
-      "position": 10,
+      "id": "c06",
+      "position": 6,
       "kind": "item",
       "type": "item",
       "tier": "core",
-      "item_id": "u2-l4-choice-finished",
+      "item_id": "u2-l4-tom-vanish",
       "scored": 1,
       "data": {
         "connected": true
@@ -595,8 +664,19 @@
     },
     {
       "lesson_id": "decay-chains",
+      "id": "c07",
+      "position": 7,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u2-l4-tom-different",
+      "scored": 1,
+      "data": {}
+    },
+    {
+      "lesson_id": "decay-chains",
       "id": "c12",
-      "position": 11,
+      "position": 8,
       "kind": "teach",
       "type": "explain",
       "tier": "deeper",
@@ -612,18 +692,189 @@
       }
     },
     {
-      "lesson_id": "elements-and-the-periodic-table",
+      "lesson_id": "detecting-radiation",
+      "id": "c01",
+      "position": 0,
+      "kind": "teach",
+      "type": "explain",
+      "tier": "core",
+      "item_id": null,
+      "scored": 0,
+      "data": {
+        "title": "A puzzle in an empty field",
+        "body": "Here is a puzzle. You switch on a radiation detector in an empty field. Nothing radioactive is anywhere near. The detector still shows a small reading. Is it broken?"
+      }
+    },
+    {
+      "lesson_id": "detecting-radiation",
+      "id": "c02",
+      "position": 1,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u3-l4-predict-room",
+      "scored": 0,
+      "data": {}
+    },
+    {
+      "lesson_id": "detecting-radiation",
+      "id": "c03",
+      "position": 2,
+      "kind": "teach",
+      "type": "explain",
+      "tier": "core",
+      "item_id": null,
+      "scored": 0,
+      "data": {
+        "title": "Background radiation",
+        "figureAt": 2,
+        "body": "[[background-radiation|Background radiation]] is present on Earth at all times. It comes mostly from natural minerals in the ground, soil and water, and from cosmic radiation. So a working detector picks up a little almost anywhere.",
+        "figure": {
+          "ref": "always-something"
+        }
+      }
+    },
+    {
+      "lesson_id": "detecting-radiation",
+      "id": "c04",
+      "position": 3,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u3-l4-choice-background",
+      "scored": 1,
+      "data": {
+        "connected": true
+      }
+    },
+    {
+      "lesson_id": "detecting-radiation",
+      "id": "c05",
+      "position": 4,
+      "kind": "teach",
+      "type": "explain",
+      "tier": "core",
+      "item_id": null,
+      "scored": 0,
+      "data": {
+        "title": "Inside a Geiger counter",
+        "figureAt": 2,
+        "body": "A [[geiger-counter|Geiger counter]] has a tube of gas. When radiation passes through, it ionizes the gas. The counter detects that ionization.",
+        "figure": {
+          "ref": "geiger-tube"
+        }
+      }
+    },
+    {
+      "lesson_id": "detecting-radiation",
+      "id": "c06",
+      "position": 5,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u3-l4-order-geiger",
+      "scored": 1,
+      "data": {
+        "connected": true
+      }
+    },
+    {
+      "lesson_id": "detecting-radiation",
+      "id": "c07",
+      "position": 6,
+      "kind": "teach",
+      "type": "explain",
+      "tier": "core",
+      "item_id": null,
+      "scored": 0,
+      "data": {
+        "title": "More radiation, more counts",
+        "figureAt": 1,
+        "body": "The rate of ionization goes with the amount of radiation. A little radiation gives a few counts, and more radiation gives many more. Background radiation varies from place to place, so the reading does too.",
+        "figure": {
+          "ref": "more-radiation-more-counts"
+        }
+      }
+    },
+    {
+      "lesson_id": "detecting-radiation",
+      "id": "c08",
+      "position": 7,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u3-l4-tom-zero",
+      "scored": 1,
+      "data": {
+        "connected": true
+      }
+    },
+    {
+      "lesson_id": "detecting-radiation",
+      "id": "c09",
+      "position": 8,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u3-l4-choice-geiger",
+      "scored": 1,
+      "data": {}
+    },
+    {
+      "lesson_id": "detecting-radiation",
+      "id": "c10",
+      "position": 9,
+      "kind": "teach",
+      "type": "explain",
+      "tier": "core",
+      "item_id": null,
+      "scored": 0,
+      "data": {
+        "title": "Three instruments",
+        "figureAt": 1,
+        "body": "A Geiger counter detects ionization in a gas. A scintillation counter turns flashes of light into a signal. A dosimeter is worn by a person to measure how much radiation they are exposed to.",
+        "figure": {
+          "ref": "instruments-row"
+        }
+      }
+    },
+    {
+      "lesson_id": "detecting-radiation",
+      "id": "c11",
+      "position": 10,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u3-l4-match-instruments",
+      "scored": 1,
+      "data": {
+        "connected": true
+      }
+    },
+    {
+      "lesson_id": "detecting-radiation",
+      "id": "c12",
+      "position": 11,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u3-l4-tom-dosimeter",
+      "scored": 1,
+      "data": {}
+    },
+    {
+      "lesson_id": "dose-and-time",
       "id": "c01",
       "position": 0,
       "kind": "item",
       "type": "item",
       "tier": "core",
-      "item_id": "u1-l3-predict-gold-oxygen",
+      "item_id": "u4-l3-predict-same-total",
       "scored": 0,
       "data": {}
     },
     {
-      "lesson_id": "elements-and-the-periodic-table",
+      "lesson_id": "dose-and-time",
       "id": "c02",
       "position": 1,
       "kind": "teach",
@@ -632,18 +883,192 @@
       "item_id": null,
       "scored": 0,
       "data": {
-        "title": "Protons tell you the element",
-        "body": "The number of [[proton|protons]] tells you which [[element]] an atom is. An atom with 6 protons is always carbon. 7 protons is always nitrogen. 8 protons is always oxygen.",
+        "title": "Fast or slow",
+        "figureAt": 1,
+        "body": "How fast a dose arrives is called the [[dose-rate|dose rate]]. It is given in units such as microsieverts per hour or millisieverts per year. The same amount can arrive in minutes or over many years.",
+        "figure": {
+          "ref": "fast-or-slow"
+        }
+      }
+    },
+    {
+      "lesson_id": "dose-and-time",
+      "id": "c03",
+      "position": 2,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u4-l3-choice-doserate",
+      "scored": 1,
+      "data": {
+        "connected": true
+      }
+    },
+    {
+      "lesson_id": "dose-and-time",
+      "id": "c04",
+      "position": 3,
+      "kind": "teach",
+      "type": "reveal",
+      "tier": "core",
+      "item_id": null,
+      "scored": 0,
+      "data": {
+        "title": "Your guess, answered",
+        "predictCardId": "c01",
+        "figureAt": 1,
+        "body": "A very high dose in a short time is the dangerous case. The same total spread over a long time is much less risky, because the cells have time to repair damage in between. Effects are more severe at higher doses and higher dose rates.",
+        "figure": {
+          "ref": "big-fast-dose"
+        }
+      }
+    },
+    {
+      "lesson_id": "dose-and-time",
+      "id": "c05",
+      "position": 4,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u4-l3-tom-no-immediate",
+      "scored": 1,
+      "data": {
+        "connected": true
+      }
+    },
+    {
+      "lesson_id": "dose-and-time",
+      "id": "c06",
+      "position": 5,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u4-l3-choice-symptoms",
+      "scored": 1,
+      "data": {}
+    },
+    {
+      "lesson_id": "dose-and-time",
+      "id": "c07",
+      "position": 6,
+      "kind": "teach",
+      "type": "explain",
+      "tier": "core",
+      "item_id": null,
+      "scored": 0,
+      "data": {
+        "title": "A big dose, quickly",
+        "figureAt": 1,
+        "body": "About 1 sievert, or 1000 millisieverts, in a short time is the threshold for [[acute-radiation-syndrome|acute radiation syndrome]]. Within hours it can cause symptoms such as nausea and vomiting. High doses can also cause skin redness, hair loss and burns.",
+        "figure": {
+          "ref": "big-fast-dose"
+        }
+      }
+    },
+    {
+      "lesson_id": "dose-and-time",
+      "id": "c08",
+      "position": 7,
+      "kind": "teach",
+      "type": "explain",
+      "tier": "core",
+      "item_id": null,
+      "scored": 0,
+      "data": {
+        "title": "Small doses, spread out",
+        "figureAt": 1,
+        "body": "Low levels of radiation do not cause immediate health effects. They can add a small increase in the risk of cancer over a lifetime. If a dose is low or spread over a long time, the risk is lower, because repair is more likely.",
+        "figure": {
+          "ref": "small-spread-dose"
+        }
+      }
+    },
+    {
+      "lesson_id": "dose-and-time",
+      "id": "c09",
+      "position": 8,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u4-l3-choice-low",
+      "scored": 1,
+      "data": {
+        "connected": true
+      }
+    },
+    {
+      "lesson_id": "dose-and-time",
+      "id": "c10",
+      "position": 9,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u4-l3-choice-spread",
+      "scored": 1,
+      "data": {}
+    },
+    {
+      "lesson_id": "dose-and-time",
+      "id": "c10b",
+      "position": 10,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u4-l3-fill-low",
+      "scored": 1,
+      "data": {}
+    },
+    {
+      "lesson_id": "dose-and-time",
+      "id": "c11",
+      "position": 11,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u4-l3-tom-same",
+      "scored": 1,
+      "data": {}
+    },
+    {
+      "lesson_id": "dose-and-time",
+      "id": "c12",
+      "position": 12,
+      "kind": "teach",
+      "type": "explain",
+      "tier": "deeper",
+      "item_id": null,
+      "scored": 0,
+      "data": {
+        "title": "Go deeper: a one-time 100",
+        "figureAt": 1,
+        "body": "About 99 in 100 people given a one-time dose of 100 millisieverts would not get cancer as a result. At that dose, extra cancers caused by radiation would be extremely difficult to identify.",
+        "figure": {
+          "ref": "small-spread-dose"
+        }
+      }
+    },
+    {
+      "lesson_id": "elements-and-the-periodic-table",
+      "id": "c02",
+      "position": 0,
+      "kind": "teach",
+      "type": "explain",
+      "tier": "core",
+      "item_id": null,
+      "scored": 0,
+      "data": {
+        "title": "What makes gold gold?",
+        "figureAt": 1,
+        "body": "Gold, oxygen and carbon are very different, yet their atoms are built from the same three particles. What differs is the number of [[proton|protons]], and that tells you which [[element|element]] it is. 6 protons is always carbon, 7 is always nitrogen and 8 is always oxygen. Like a name tag, the protons say which element it is.",
         "figure": {
           "ref": "elements-by-protons"
-        },
-        "figureAt": 1
+        }
       }
     },
     {
       "lesson_id": "elements-and-the-periodic-table",
       "id": "c03",
-      "position": 2,
+      "position": 1,
       "kind": "sim",
       "type": "atom-builder",
       "tier": "core",
@@ -674,7 +1099,7 @@
     {
       "lesson_id": "elements-and-the-periodic-table",
       "id": "c04",
-      "position": 3,
+      "position": 2,
       "kind": "item",
       "type": "item",
       "tier": "core",
@@ -685,7 +1110,7 @@
     {
       "lesson_id": "elements-and-the-periodic-table",
       "id": "c05",
-      "position": 4,
+      "position": 3,
       "kind": "teach",
       "type": "explain",
       "tier": "core",
@@ -693,17 +1118,17 @@
       "scored": 0,
       "data": {
         "title": "Change the protons, change the element",
-        "body": "Add a proton and you get a different element. 6 protons is carbon, 7 is nitrogen and 8 is oxygen. The neutrons and electrons do not decide the element. The protons do.",
+        "figureAt": 1,
+        "body": "So what happens if the number changes? Add a proton to carbon and you get nitrogen, which is a different element. The neutrons and electrons do not decide the element. Only the protons do.",
         "figure": {
           "ref": "change-protons"
-        },
-        "figureAt": 1
+        }
       }
     },
     {
       "lesson_id": "elements-and-the-periodic-table",
       "id": "c06",
-      "position": 5,
+      "position": 4,
       "kind": "sim",
       "type": "atom-builder",
       "tier": "core",
@@ -734,7 +1159,7 @@
     {
       "lesson_id": "elements-and-the-periodic-table",
       "id": "c07",
-      "position": 6,
+      "position": 5,
       "kind": "item",
       "type": "item",
       "tier": "core",
@@ -745,7 +1170,7 @@
     {
       "lesson_id": "elements-and-the-periodic-table",
       "id": "c08",
-      "position": 7,
+      "position": 6,
       "kind": "item",
       "type": "item",
       "tier": "core",
@@ -756,7 +1181,7 @@
     {
       "lesson_id": "elements-and-the-periodic-table",
       "id": "c09",
-      "position": 8,
+      "position": 7,
       "kind": "item",
       "type": "item",
       "tier": "core",
@@ -767,7 +1192,7 @@
     {
       "lesson_id": "elements-and-the-periodic-table",
       "id": "c10",
-      "position": 9,
+      "position": 8,
       "kind": "teach",
       "type": "explain",
       "tier": "deeper",
@@ -784,38 +1209,26 @@
     },
     {
       "lesson_id": "half-life",
-      "id": "c01",
-      "position": 0,
-      "kind": "item",
-      "type": "item",
-      "tier": "core",
-      "item_id": "u2-l3-predict-hundred",
-      "scored": 0,
-      "data": {}
-    },
-    {
-      "lesson_id": "half-life",
       "id": "c03",
-      "position": 1,
+      "position": 0,
       "kind": "teach",
-      "type": "reveal",
+      "type": "explain",
       "tier": "core",
       "item_id": null,
       "scored": 0,
       "data": {
-        "predictCardId": "c01",
         "title": "About half have changed",
-        "body": "After one half-life, about half of the nuclei have decayed. The rest were not cut in half. The time it takes for a group to fall to about half is its [[half-life]].",
+        "figureAt": 1,
+        "body": "Picture 100 radioactive nuclei in a box. Wait a while, and about half of them will have changed. The time that takes is called the [[half-life|half-life]]. Nothing was cut in half: about 50 nuclei changed, and about 50 did not.",
         "figure": {
           "ref": "half-life-grid"
-        },
-        "figureAt": 1
+        }
       }
     },
     {
       "lesson_id": "half-life",
       "id": "c04",
-      "position": 2,
+      "position": 1,
       "kind": "item",
       "type": "item",
       "tier": "core",
@@ -823,6 +1236,24 @@
       "scored": 1,
       "data": {
         "connected": true
+      }
+    },
+    {
+      "lesson_id": "half-life",
+      "id": "c06",
+      "position": 2,
+      "kind": "teach",
+      "type": "explain",
+      "tier": "core",
+      "item_id": null,
+      "scored": 0,
+      "data": {
+        "title": "The numbers are a pattern",
+        "figureAt": 1,
+        "body": "Keep waiting and the pattern repeats. Start with 100. After one half-life about 50 are left, after two about 25, then about 12, then about 6. Each time, half of what is left changes. It says about because each count is a pattern and not an exact number.",
+        "figure": {
+          "ref": "half-life-bars"
+        }
       }
     },
     {
@@ -838,48 +1269,19 @@
     },
     {
       "lesson_id": "half-life",
-      "id": "c06",
+      "id": "c13",
       "position": 4,
-      "kind": "teach",
-      "type": "explain",
-      "tier": "core",
-      "item_id": null,
-      "scored": 0,
-      "data": {
-        "title": "The numbers are a pattern",
-        "body": "Start with 100. After one half-life, about 50 are left. After two, about 25. Then about 12, then about 6. It says about every time, because each count is a pattern and not an exact number.",
-        "figure": {
-          "ref": "half-life-bars"
-        },
-        "figureAt": 1
-      }
-    },
-    {
-      "lesson_id": "half-life",
-      "id": "c16",
-      "position": 5,
       "kind": "item",
       "type": "item",
       "tier": "core",
-      "item_id": "u2-l3-match-halves",
-      "scored": 1,
-      "data": {}
-    },
-    {
-      "lesson_id": "half-life",
-      "id": "c07",
-      "position": 6,
-      "kind": "item",
-      "type": "item",
-      "tier": "core",
-      "item_id": "u2-l3-tom-gone",
+      "item_id": "u2-l3-choice-eighty",
       "scored": 1,
       "data": {}
     },
     {
       "lesson_id": "half-life",
       "id": "c08",
-      "position": 7,
+      "position": 5,
       "kind": "teach",
       "type": "explain",
       "tier": "core",
@@ -887,17 +1289,17 @@
       "scored": 0,
       "data": {
         "title": "A group, not a timer",
-        "body": "Remember the first lesson: you cannot say when one nucleus will change. A big group is different, because it follows a pattern. Half-life describes the whole group. It is not a timer inside each atom.",
+        "figureAt": 1,
+        "body": "Remember: you cannot say when one nucleus will change. A big group is different, because it follows a pattern. Half-life describes the whole group. It is not a timer inside each atom, so one nucleus might change in a moment or much later.",
         "figure": {
           "ref": "group-not-timer"
-        },
-        "figureAt": 1
+        }
       }
     },
     {
       "lesson_id": "half-life",
       "id": "c09",
-      "position": 8,
+      "position": 6,
       "kind": "item",
       "type": "item",
       "tier": "core",
@@ -909,19 +1311,8 @@
     },
     {
       "lesson_id": "half-life",
-      "id": "c10",
-      "position": 9,
-      "kind": "item",
-      "type": "item",
-      "tier": "core",
-      "item_id": "u2-l3-tom-crowd",
-      "scored": 1,
-      "data": {}
-    },
-    {
-      "lesson_id": "half-life",
       "id": "c11",
-      "position": 10,
+      "position": 7,
       "kind": "item",
       "type": "item",
       "tier": "core",
@@ -932,7 +1323,7 @@
     {
       "lesson_id": "half-life",
       "id": "c12",
-      "position": 11,
+      "position": 8,
       "kind": "teach",
       "type": "explain",
       "tier": "core",
@@ -940,31 +1331,18 @@
       "scored": 0,
       "data": {
         "title": "Some fade fast, some very slowly",
+        "figureAt": 2,
         "body": "Half-lives are very different. Some are a fraction of a second. Others are billions of years. So some radioactive materials fade quickly and others take a very long time. You do not need to memorise these.",
         "figure": {
           "ref": "half-life-ladder",
           "caption": "The bars are not to scale: each step is far bigger than it looks."
-        },
-        "figureAt": 2
-      }
-    },
-    {
-      "lesson_id": "half-life",
-      "id": "c13",
-      "position": 12,
-      "kind": "item",
-      "type": "item",
-      "tier": "core",
-      "item_id": "u2-l3-choice-eighty",
-      "scored": 1,
-      "data": {
-        "connected": true
+        }
       }
     },
     {
       "lesson_id": "half-life",
       "id": "c14",
-      "position": 13,
+      "position": 9,
       "kind": "item",
       "type": "item",
       "tier": "core",
@@ -975,7 +1353,7 @@
     {
       "lesson_id": "half-life",
       "id": "c15",
-      "position": 14,
+      "position": 10,
       "kind": "teach",
       "type": "explain",
       "tier": "deeper",
@@ -991,18 +1369,25 @@
       }
     },
     {
-      "lesson_id": "isotopes",
+      "lesson_id": "ionizing-or-not",
       "id": "c01",
       "position": 0,
-      "kind": "item",
-      "type": "item",
+      "kind": "teach",
+      "type": "explain",
       "tier": "core",
-      "item_id": "u1-l4-predict-carbon-mass",
+      "item_id": null,
       "scored": 0,
-      "data": {}
+      "data": {
+        "title": "Radiation is energy on the move",
+        "figureAt": 1,
+        "body": "Radiation is energy that travels. It can travel as waves, or as tiny particles. Sunlight is radiation, and so are radio waves and gamma rays.",
+        "figure": {
+          "ref": "radiation-is-energy"
+        }
+      }
     },
     {
-      "lesson_id": "isotopes",
+      "lesson_id": "ionizing-or-not",
       "id": "c02",
       "position": 1,
       "kind": "teach",
@@ -1011,18 +1396,344 @@
       "item_id": null,
       "scored": 0,
       "data": {
-        "title": "Same element, different neutrons",
-        "body": "Atoms of the same element always have the same number of protons. They can have different numbers of neutrons. These are called [[isotope|isotopes]]. Carbon-12 and carbon-14 are both carbon.",
+        "title": "Energy can hit an atom",
+        "figureAt": 2,
+        "body": "Think of a ball rolling into a marble. A fast ball can knock the marble away. Some radiation hits an atom a bit like that, and knocks an electron right out of it.",
+        "figure": {
+          "ref": "electron-knocked-out"
+        }
+      }
+    },
+    {
+      "lesson_id": "ionizing-or-not",
+      "id": "c03",
+      "position": 2,
+      "kind": "teach",
+      "type": "explain",
+      "tier": "core",
+      "item_id": null,
+      "scored": 0,
+      "data": {
+        "title": "That is ionization",
+        "body": "Knocking an electron out of an atom is called ionization. Radiation with enough energy to do it is called [[ionizing-radiation|ionizing radiation]]. Weaker radiation can make atoms move or vibrate, but it cannot take an electron away."
+      }
+    },
+    {
+      "lesson_id": "ionizing-or-not",
+      "id": "c04",
+      "position": 3,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u3-l1-choice-ionizing",
+      "scored": 1,
+      "data": {
+        "connected": true
+      }
+    },
+    {
+      "lesson_id": "ionizing-or-not",
+      "id": "c05",
+      "position": 4,
+      "kind": "teach",
+      "type": "explain",
+      "tier": "core",
+      "item_id": null,
+      "scored": 0,
+      "data": {
+        "title": "Four ionizing kinds",
+        "figureAt": 1,
+        "body": "Alpha particles, beta particles, gamma rays and [[x-ray|X-rays]] are all ionizing. Alpha and beta are particles. Gamma rays and X-rays are waves of energy.",
+        "figure": {
+          "ref": "energy-line"
+        }
+      }
+    },
+    {
+      "lesson_id": "ionizing-or-not",
+      "id": "c06",
+      "position": 5,
+      "kind": "teach",
+      "type": "explain",
+      "tier": "core",
+      "item_id": null,
+      "scored": 0,
+      "data": {
+        "title": "Three that are not",
+        "body": "Visible light, microwaves and radio waves are not ionizing. They do not have enough energy to remove electrons from atoms. They are still radiation, so the word radiation alone does not tell you which kind you have."
+      }
+    },
+    {
+      "lesson_id": "ionizing-or-not",
+      "id": "c07",
+      "position": 6,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u3-l1-tom-light",
+      "scored": 1,
+      "data": {
+        "connected": true
+      }
+    },
+    {
+      "lesson_id": "ionizing-or-not",
+      "id": "c08",
+      "position": 7,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u3-l1-sort-ionizing",
+      "scored": 1,
+      "data": {}
+    },
+    {
+      "lesson_id": "ionizing-or-not",
+      "id": "c09",
+      "position": 8,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u3-l1-choice-xray",
+      "scored": 1,
+      "data": {}
+    },
+    {
+      "lesson_id": "ionizing-or-not",
+      "id": "c10",
+      "position": 9,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u3-l1-tom-same",
+      "scored": 1,
+      "data": {}
+    },
+    {
+      "lesson_id": "ionizing-or-not",
+      "id": "c11",
+      "position": 10,
+      "kind": "teach",
+      "type": "explain",
+      "tier": "deeper",
+      "item_id": null,
+      "scored": 0,
+      "data": {
+        "title": "Go deeper: the line is not sharp",
+        "figureAt": 1,
+        "body": "Ultraviolet light sits close to the line between the two groups. High-energy ultraviolet is ionizing, and lower-energy ultraviolet is not. Visible light is on the safe side of it.",
+        "figure": {
+          "ref": "ultraviolet-border"
+        }
+      }
+    },
+    {
+      "lesson_id": "irradiated-or-contaminated",
+      "id": "c01",
+      "position": 0,
+      "kind": "teach",
+      "type": "explain",
+      "tier": "core",
+      "item_id": null,
+      "scored": 0,
+      "data": {
+        "title": "A torch and a pot of glitter",
+        "body": "Shine a torch at someone and the light reaches them. Switch it off, or step out of the beam, and it stops. Now tip a pot of glitter onto their sleeve. The glitter stays, even after they walk away. Radiation can act like the torch. Radioactive material can act like the glitter."
+      }
+    },
+    {
+      "lesson_id": "irradiated-or-contaminated",
+      "id": "c02",
+      "position": 1,
+      "kind": "teach",
+      "type": "explain",
+      "tier": "core",
+      "item_id": null,
+      "scored": 0,
+      "data": {
+        "title": "Exposed: in the path",
+        "figureAt": 1,
+        "body": "You are exposed when you are in the path of radiation from a source. A medical X-ray is a source outside the body. When the radiation stops reaching you, the exposure is over.",
+        "figure": {
+          "ref": "exposure-figure"
+        }
+      }
+    },
+    {
+      "lesson_id": "irradiated-or-contaminated",
+      "id": "c03",
+      "position": 2,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u3-l3-choice-stops",
+      "scored": 1,
+      "data": {
+        "connected": true
+      }
+    },
+    {
+      "lesson_id": "irradiated-or-contaminated",
+      "id": "c04",
+      "position": 3,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u3-l3-predict-near",
+      "scored": 0,
+      "data": {}
+    },
+    {
+      "lesson_id": "irradiated-or-contaminated",
+      "id": "c05",
+      "position": 4,
+      "kind": "teach",
+      "type": "explain",
+      "tier": "core",
+      "item_id": null,
+      "scored": 0,
+      "data": {
+        "title": "Contaminated: material on or in",
+        "figureAt": 2,
+        "body": "[[radioactive-contamination|Contamination]] is radioactive material on or in something, where it is not wanted. It can be on skin or clothes, breathed in or swallowed, or spread about a place.",
+        "figure": {
+          "ref": "contamination-figure"
+        }
+      }
+    },
+    {
+      "lesson_id": "irradiated-or-contaminated",
+      "id": "c06",
+      "position": 5,
+      "kind": "teach",
+      "type": "explain",
+      "tier": "core",
+      "item_id": null,
+      "scored": 0,
+      "data": {
+        "title": "The glitter is the problem",
+        "body": "Radiation does not get on or in people. It is the material that spreads. That is how a person can be exposed to a source without being contaminated."
+      }
+    },
+    {
+      "lesson_id": "irradiated-or-contaminated",
+      "id": "c07",
+      "position": 6,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u3-l3-tom-spread",
+      "scored": 1,
+      "data": {
+        "connected": true
+      }
+    },
+    {
+      "lesson_id": "irradiated-or-contaminated",
+      "id": "c08",
+      "position": 7,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u3-l3-choice-contaminated",
+      "scored": 1,
+      "data": {}
+    },
+    {
+      "lesson_id": "irradiated-or-contaminated",
+      "id": "c09",
+      "position": 8,
+      "kind": "teach",
+      "type": "explain",
+      "tier": "core",
+      "item_id": null,
+      "scored": 0,
+      "data": {
+        "title": "When does it end?",
+        "figureAt": 1,
+        "body": "Near a source, the exposure ends when you move away or the source is shielded. If radioactive material is on you, you are exposed until it is removed, and material on skin or clothes can often be washed off. If it is inside you, you are exposed until it leaves the body.",
+        "figure": {
+          "ref": "exposure-ends"
+        }
+      }
+    },
+    {
+      "lesson_id": "irradiated-or-contaminated",
+      "id": "c10",
+      "position": 9,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u3-l3-match-ends",
+      "scored": 1,
+      "data": {
+        "connected": true
+      }
+    },
+    {
+      "lesson_id": "irradiated-or-contaminated",
+      "id": "c11",
+      "position": 10,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u3-l3-choice-continues",
+      "scored": 1,
+      "data": {}
+    },
+    {
+      "lesson_id": "irradiated-or-contaminated",
+      "id": "c12",
+      "position": 11,
+      "kind": "teach",
+      "type": "explain",
+      "tier": "core",
+      "item_id": null,
+      "scored": 0,
+      "data": {
+        "title": "Sealed or not",
+        "figureAt": 1,
+        "body": "Radioactive material in a sealed source stays in its container. Material that is not sealed might be spread onto other objects.",
+        "figure": {
+          "ref": "sealed-source"
+        }
+      }
+    },
+    {
+      "lesson_id": "irradiated-or-contaminated",
+      "id": "c13",
+      "position": 12,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u3-l3-tom-sealed",
+      "scored": 1,
+      "data": {
+        "connected": true
+      }
+    },
+    {
+      "lesson_id": "isotopes",
+      "id": "c02",
+      "position": 0,
+      "kind": "teach",
+      "type": "explain",
+      "tier": "core",
+      "item_id": null,
+      "scored": 0,
+      "data": {
+        "title": "Two carbons, two weights",
+        "figureAt": 2,
+        "body": "Here is a puzzle. Two atoms are both carbon, but one is heavier. How? Carbon atoms always have 6 protons, but the number of neutrons can differ: carbon-12 has 6 and carbon-14 has 8. The protons decide the element, so both are carbon. These versions of one element are called [[isotope|isotopes]].",
         "figure": {
           "ref": "isotope-pair"
-        },
-        "figureAt": 1
+        }
       }
     },
     {
       "lesson_id": "isotopes",
       "id": "c03",
-      "position": 2,
+      "position": 1,
       "kind": "sim",
       "type": "atom-builder",
       "tier": "core",
@@ -1052,12 +1763,23 @@
     },
     {
       "lesson_id": "isotopes",
-      "id": "c04",
+      "id": "c20",
+      "position": 2,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u1-l4-choice-share",
+      "scored": 1,
+      "data": {}
+    },
+    {
+      "lesson_id": "isotopes",
+      "id": "c09",
       "position": 3,
       "kind": "item",
       "type": "item",
       "tier": "core",
-      "item_id": "u1-l4-sort-carbon",
+      "item_id": "u1-l4-choice-pair",
       "scored": 1,
       "data": {}
     },
@@ -1072,11 +1794,11 @@
       "scored": 0,
       "data": {
         "title": "Isotope does not mean radioactive",
-        "body": "An isotope is just a version of an element. It does not mean the atom is [[radioactivity|radioactive]]. Carbon-12 and carbon-13 are stable. Carbon-14 is not. Most of the atoms around you are stable isotopes.",
+        "figureAt": 2,
+        "body": "Many people hear 'isotope' and think 'radioactive', but isotope only means a version of an element. Carbon-12 and carbon-13 are stable, and most of the atoms around you are stable isotopes. Carbon-14 is one of the few that is not.",
         "figure": {
           "ref": "isotope-stability"
-        },
-        "figureAt": 2
+        }
       }
     },
     {
@@ -1105,30 +1827,8 @@
     },
     {
       "lesson_id": "isotopes",
-      "id": "c08",
-      "position": 7,
-      "kind": "item",
-      "type": "item",
-      "tier": "core",
-      "item_id": "u1-l4-sort-pairs",
-      "scored": 1,
-      "data": {}
-    },
-    {
-      "lesson_id": "isotopes",
-      "id": "c09",
-      "position": 8,
-      "kind": "item",
-      "type": "item",
-      "tier": "core",
-      "item_id": "u1-l4-choice-pair",
-      "scored": 1,
-      "data": {}
-    },
-    {
-      "lesson_id": "isotopes",
       "id": "c10",
-      "position": 9,
+      "position": 7,
       "kind": "teach",
       "type": "explain",
       "tier": "deeper",
@@ -1145,53 +1845,8 @@
     },
     {
       "lesson_id": "protons-neutrons-electrons",
-      "id": "c01",
-      "position": 0,
-      "kind": "item",
-      "type": "item",
-      "tier": "core",
-      "item_id": "u1-l2-predict-stadium",
-      "scored": 0,
-      "data": {}
-    },
-    {
-      "lesson_id": "protons-neutrons-electrons",
-      "id": "c02",
-      "position": 1,
-      "kind": "teach",
-      "type": "explain",
-      "tier": "core",
-      "item_id": null,
-      "scored": 0,
-      "data": {
-        "title": "A tiny centre",
-        "body": "Every atom has a tiny centre called the [[nucleus]], with [[electron|electrons]] around it. Almost all of an atom's mass is packed into its tiny nucleus.",
-        "figure": {
-          "ref": "atom-model",
-          "args": [
-            2,
-            2,
-            2
-          ]
-        },
-        "figureAt": 1
-      }
-    },
-    {
-      "lesson_id": "protons-neutrons-electrons",
-      "id": "c03",
-      "position": 2,
-      "kind": "item",
-      "type": "item",
-      "tier": "core",
-      "item_id": "u1-l2-hotspot-nucleus",
-      "scored": 1,
-      "data": {}
-    },
-    {
-      "lesson_id": "protons-neutrons-electrons",
       "id": "c04",
-      "position": 3,
+      "position": 0,
       "kind": "teach",
       "type": "explain",
       "tier": "core",
@@ -1199,28 +1854,30 @@
       "scored": 0,
       "data": {
         "title": "Three particles",
-        "body": "The nucleus holds [[proton|protons]], which are positive, and [[neutron|neutrons]], which have no charge. Electrons are negative and are outside the nucleus.",
+        "figureAt": 0,
+        "body": "Every atom is built from just three kinds of particle. [[proton|Protons]] are positive, [[electron|electrons]] are negative, and [[neutron|neutrons]] have no charge, which is how they got their name. Different elements are made from the same three particles, only in different numbers.",
         "figure": {
           "ref": "particle-cards"
-        },
-        "figureAt": 0
+        }
       }
     },
     {
       "lesson_id": "protons-neutrons-electrons",
       "id": "c05",
-      "position": 4,
+      "position": 1,
       "kind": "item",
       "type": "item",
       "tier": "core",
       "item_id": "u1-l2-match-particles",
       "scored": 1,
-      "data": {}
+      "data": {
+        "connected": true
+      }
     },
     {
       "lesson_id": "protons-neutrons-electrons",
       "id": "c06",
-      "position": 5,
+      "position": 2,
       "kind": "sim",
       "type": "atom-builder",
       "tier": "core",
@@ -1244,21 +1901,68 @@
     },
     {
       "lesson_id": "protons-neutrons-electrons",
+      "id": "c02",
+      "position": 3,
+      "kind": "teach",
+      "type": "explain",
+      "tier": "core",
+      "item_id": null,
+      "scored": 0,
+      "data": {
+        "title": "A tiny centre",
+        "figureAt": 1,
+        "body": "The protons and neutrons are packed together in a tiny centre called the [[nucleus|nucleus]]. The electrons are outside it, and that leaves a lot of room between them. So the nucleus is only a speck, and the atom is mostly empty space.",
+        "figure": {
+          "ref": "atom-model",
+          "args": [
+            2,
+            2,
+            2
+          ]
+        }
+      }
+    },
+    {
+      "lesson_id": "protons-neutrons-electrons",
+      "id": "c01",
+      "position": 4,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u1-l2-predict-stadium",
+      "scored": 0,
+      "data": {}
+    },
+    {
+      "lesson_id": "protons-neutrons-electrons",
       "id": "c07",
-      "position": 6,
+      "position": 5,
       "kind": "teach",
       "type": "reveal",
       "tier": "core",
       "item_id": null,
       "scored": 0,
       "data": {
-        "predictCardId": "c01",
         "title": "The stadium, answered",
-        "body": "If an atom were a football stadium, its nucleus would be a marble in the middle. The electrons would be far out, and the rest is mostly empty space.",
+        "predictCardId": "c01",
+        "figureAt": 0,
+        "body": "If an atom were a football stadium, its nucleus would be a marble in the middle. The electrons would be far out, and the rest is mostly empty space. The marble is tiny, but it holds the protons and neutrons, so almost all of the atom's mass is packed into it.",
         "figure": {
           "ref": "stadium-marble"
-        },
-        "figureAt": 0
+        }
+      }
+    },
+    {
+      "lesson_id": "protons-neutrons-electrons",
+      "id": "c03",
+      "position": 6,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u1-l2-hotspot-nucleus",
+      "scored": 1,
+      "data": {
+        "connected": true
       }
     },
     {
@@ -1270,9 +1974,7 @@
       "tier": "core",
       "item_id": "u1-l2-tom-solid",
       "scored": 1,
-      "data": {
-        "connected": true
-      }
+      "data": {}
     },
     {
       "lesson_id": "protons-neutrons-electrons",
@@ -1287,19 +1989,8 @@
     },
     {
       "lesson_id": "protons-neutrons-electrons",
-      "id": "c10",
-      "position": 9,
-      "kind": "item",
-      "type": "item",
-      "tier": "core",
-      "item_id": "u1-l2-sort-location",
-      "scored": 1,
-      "data": {}
-    },
-    {
-      "lesson_id": "protons-neutrons-electrons",
       "id": "c11",
-      "position": 10,
+      "position": 9,
       "kind": "teach",
       "type": "story",
       "tier": "deeper",
@@ -1320,7 +2011,7 @@
     {
       "lesson_id": "protons-neutrons-electrons",
       "id": "c12",
-      "position": 11,
+      "position": 10,
       "kind": "teach",
       "type": "explain",
       "tier": "deeper",
@@ -1336,18 +2027,21 @@
       }
     },
     {
-      "lesson_id": "radioactivity-is-natural",
+      "lesson_id": "radiation-and-cells",
       "id": "c01",
       "position": 0,
-      "kind": "item",
-      "type": "item",
+      "kind": "teach",
+      "type": "explain",
       "tier": "core",
-      "item_id": "u2-l5-predict-where",
+      "item_id": null,
       "scored": 0,
-      "data": {}
+      "data": {
+        "title": "A puzzle",
+        "body": "Ionizing radiation carries enough energy to affect the atoms in living cells. That means it can damage a cell's [[dna|DNA]], its genetic material. Yet you get a small dose every day and you are not ill. Why not?"
+      }
     },
     {
-      "lesson_id": "radioactivity-is-natural",
+      "lesson_id": "radiation-and-cells",
       "id": "c02",
       "position": 1,
       "kind": "teach",
@@ -1356,47 +2050,38 @@
       "item_id": null,
       "scored": 0,
       "data": {
-        "title": "Rocks and soil",
-        "body": "Rocks and soil contain some natural radioactive materials, such as uranium and thorium. This is why the ground gives off a little radiation. It has been this way since long before people.",
+        "title": "What radiation can do to a cell",
+        "figureAt": 1,
+        "body": "When ionizing radiation passes through a cell, it can hit the atoms inside it. If it hits the DNA, the DNA is damaged. The cell has to deal with that damage.",
         "figure": {
-          "ref": "rocks-soil"
-        },
-        "figureAt": 1
+          "ref": "radiation-hits-cell"
+        }
       }
     },
     {
-      "lesson_id": "radioactivity-is-natural",
+      "lesson_id": "radiation-and-cells",
       "id": "c03",
       "position": 2,
-      "kind": "teach",
-      "type": "explain",
+      "kind": "item",
+      "type": "item",
       "tier": "core",
-      "item_id": null,
-      "scored": 0,
-      "data": {
-        "title": "In the air",
-        "body": "Radioactive materials in the ground can produce [[radon]], a radioactive gas. Radon is in the air outside, and it can get into buildings.",
-        "figure": {
-          "ref": "radon-house"
-        },
-        "figureAt": 1
-      }
+      "item_id": "u4-l2-choice-damage",
+      "scored": 1,
+      "data": {}
     },
     {
-      "lesson_id": "radioactivity-is-natural",
+      "lesson_id": "radiation-and-cells",
       "id": "c04",
       "position": 3,
       "kind": "item",
       "type": "item",
       "tier": "core",
-      "item_id": "u2-l5-choice-radon",
+      "item_id": "u4-l2-tom-radio",
       "scored": 1,
-      "data": {
-        "connected": true
-      }
+      "data": {}
     },
     {
-      "lesson_id": "radioactivity-is-natural",
+      "lesson_id": "radiation-and-cells",
       "id": "c05",
       "position": 4,
       "kind": "teach",
@@ -1405,40 +2090,86 @@
       "item_id": null,
       "scored": 0,
       "data": {
-        "title": "Food and your body",
-        "body": "Your body contains a little natural radioactive potassium, called [[potassium-40|potassium-40]]. So do many foods, such as bananas. It is a tiny share of all your potassium.",
+        "title": "Cells repair themselves",
+        "figureAt": 1,
+        "body": "The answer to the puzzle is repair. Cells are extremely efficient at repairing this kind of damage, and they do it all the time. A small amount of damage is usually put right.",
         "figure": {
-          "ref": "food-body"
-        },
-        "figureAt": 1
+          "ref": "cell-repair"
+        }
       }
     },
     {
-      "lesson_id": "radioactivity-is-natural",
+      "lesson_id": "radiation-and-cells",
       "id": "c06",
       "position": 5,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u4-l2-tom-repair-efficient",
+      "scored": 1,
+      "data": {
+        "connected": true
+      }
+    },
+    {
+      "lesson_id": "radiation-and-cells",
+      "id": "c07",
+      "position": 6,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u4-l2-choice-not-repaired",
+      "scored": 1,
+      "data": {}
+    },
+    {
+      "lesson_id": "radiation-and-cells",
+      "id": "c07b",
+      "position": 7,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u4-l2-match-ideas",
+      "scored": 1,
+      "data": {}
+    },
+    {
+      "lesson_id": "radiation-and-cells",
+      "id": "c08",
+      "position": 8,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u4-l2-choice-puzzle",
+      "scored": 1,
+      "data": {}
+    },
+    {
+      "lesson_id": "radiation-and-cells",
+      "id": "c09",
+      "position": 9,
       "kind": "teach",
       "type": "explain",
       "tier": "core",
       "item_id": null,
       "scored": 0,
       "data": {
-        "title": "From space",
-        "body": "Earth is hit by [[cosmic-radiation|cosmic radiation]] from space all the time. It is one more part of the [[background-radiation|radiation around us]].",
+        "title": "Exposed is not radioactive",
+        "figureAt": 1,
+        "body": "Being exposed to radiation is not the same as carrying a radioactive source. A person who was exposed is not radioactive. Radiation does not get on or in people.",
         "figure": {
-          "ref": "cosmic-rays"
-        },
-        "figureAt": 1
+          "ref": "passes-through"
+        }
       }
     },
     {
-      "lesson_id": "radioactivity-is-natural",
-      "id": "c07",
-      "position": 6,
+      "lesson_id": "radiation-and-cells",
+      "id": "c10",
+      "position": 10,
       "kind": "item",
       "type": "item",
       "tier": "core",
-      "item_id": "u2-l5-choice-space",
+      "item_id": "u4-l2-choice-exposed",
       "scored": 1,
       "data": {
         "connected": true
@@ -1446,19 +2177,8 @@
     },
     {
       "lesson_id": "radioactivity-is-natural",
-      "id": "c08",
-      "position": 7,
-      "kind": "item",
-      "type": "item",
-      "tier": "core",
-      "item_id": "u2-l5-tom-facilities",
-      "scored": 1,
-      "data": {}
-    },
-    {
-      "lesson_id": "radioactivity-is-natural",
       "id": "c09",
-      "position": 8,
+      "position": 0,
       "kind": "teach",
       "type": "story",
       "tier": "core",
@@ -1477,14 +2197,143 @@
     },
     {
       "lesson_id": "radioactivity-is-natural",
+      "id": "c08",
+      "position": 1,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u2-l5-tom-facilities",
+      "scored": 1,
+      "data": {
+        "connected": true
+      }
+    },
+    {
+      "lesson_id": "radioactivity-is-natural",
+      "id": "c02",
+      "position": 2,
+      "kind": "teach",
+      "type": "explain",
+      "tier": "core",
+      "item_id": null,
+      "scored": 0,
+      "data": {
+        "title": "Rocks and soil",
+        "body": "Rocks and soil contain some natural radioactive materials, such as uranium and thorium. This is why the ground gives off a little radiation. It has been this way since long before people.",
+        "figure": {
+          "ref": "rocks-soil"
+        },
+        "figureAt": 1
+      }
+    },
+    {
+      "lesson_id": "radioactivity-is-natural",
+      "id": "c03",
+      "position": 3,
+      "kind": "teach",
+      "type": "explain",
+      "tier": "core",
+      "item_id": null,
+      "scored": 0,
+      "data": {
+        "title": "In the air",
+        "figureAt": 1,
+        "body": "Radioactive materials in the ground can produce [[radon|radon]], a radioactive gas. Radon is in the air outside, and it can get into buildings.",
+        "figure": {
+          "ref": "radon-house"
+        }
+      }
+    },
+    {
+      "lesson_id": "radioactivity-is-natural",
+      "id": "c04",
+      "position": 4,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u2-l5-choice-radon",
+      "scored": 1,
+      "data": {
+        "connected": true
+      }
+    },
+    {
+      "lesson_id": "radioactivity-is-natural",
+      "id": "c05",
+      "position": 5,
+      "kind": "teach",
+      "type": "explain",
+      "tier": "core",
+      "item_id": null,
+      "scored": 0,
+      "data": {
+        "title": "Food and your body",
+        "body": "Your body contains a little natural radioactive potassium, called [[potassium-40|potassium-40]]. So do many foods, such as bananas. It is a tiny share of all your potassium.",
+        "figure": {
+          "ref": "food-body"
+        },
+        "figureAt": 1
+      }
+    },
+    {
+      "lesson_id": "radioactivity-is-natural",
+      "id": "c06",
+      "position": 6,
+      "kind": "teach",
+      "type": "explain",
+      "tier": "core",
+      "item_id": null,
+      "scored": 0,
+      "data": {
+        "title": "From space",
+        "body": "Earth is hit by [[cosmic-radiation|cosmic radiation]] from space all the time. It is one more part of the [[background-radiation|radiation around us]].",
+        "figure": {
+          "ref": "cosmic-rays"
+        },
+        "figureAt": 1
+      }
+    },
+    {
+      "lesson_id": "radioactivity-is-natural",
+      "id": "c07",
+      "position": 7,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u2-l5-choice-space",
+      "scored": 1,
+      "data": {
+        "connected": true
+      }
+    },
+    {
+      "lesson_id": "radioactivity-is-natural",
       "id": "c10",
-      "position": 9,
+      "position": 8,
       "kind": "item",
       "type": "item",
       "tier": "core",
       "item_id": "u2-l5-order-first",
       "scored": 1,
       "data": {}
+    },
+    {
+      "lesson_id": "radioactivity-is-natural",
+      "id": "c12",
+      "position": 9,
+      "kind": "teach",
+      "type": "explain",
+      "tier": "core",
+      "item_id": null,
+      "scored": 0,
+      "data": {
+        "title": "It depends",
+        "figureAt": 1,
+        "body": "Radioactive does not automatically mean dangerous. What matters is the type of radiation, how much there is, and how it reaches the body. A banana and your own body are radioactive, and that is normal. Later you will see why being exposed to radiation is not the same as becoming radioactive.",
+        "figure": {
+          "ref": "not-always-dangerous"
+        }
+      }
     },
     {
       "lesson_id": "radioactivity-is-natural",
@@ -1495,72 +2344,25 @@
       "tier": "core",
       "item_id": "u2-l5-choice-dangerous",
       "scored": 1,
-      "data": {}
-    },
-    {
-      "lesson_id": "radioactivity-is-natural",
-      "id": "c12",
-      "position": 11,
-      "kind": "teach",
-      "type": "explain",
-      "tier": "core",
-      "item_id": null,
-      "scored": 0,
-      "data": {
-        "title": "It depends",
-        "body": "Radioactive does not automatically mean dangerous. What matters is the type of radiation, how much there is, and how it reaches the body. A banana and your own body are radioactive, and that is normal.",
-        "figure": {
-          "ref": "not-always-dangerous"
-        },
-        "figureAt": 1
-      }
-    },
-    {
-      "lesson_id": "radioactivity-is-natural",
-      "id": "c13",
-      "position": 12,
-      "kind": "item",
-      "type": "item",
-      "tier": "core",
-      "item_id": "u2-l5-choice-decides",
-      "scored": 1,
       "data": {
         "connected": true
       }
     },
     {
       "lesson_id": "radioactivity-is-natural",
-      "id": "c14",
-      "position": 13,
-      "kind": "teach",
-      "type": "explain",
-      "tier": "core",
-      "item_id": null,
-      "scored": 0,
-      "data": {
-        "title": "A question for later",
-        "body": "Later, you'll learn why being exposed to radiation is not the same as becoming radioactive.",
-        "figure": {
-          "ref": "exposed-later"
-        },
-        "figureAt": 1
-      }
-    },
-    {
-      "lesson_id": "radioactivity-is-natural",
-      "id": "c15",
-      "position": 14,
+      "id": "c13",
+      "position": 11,
       "kind": "item",
       "type": "item",
       "tier": "core",
-      "item_id": "u2-l5-sort-world",
+      "item_id": "u2-l5-choice-decides",
       "scored": 1,
       "data": {}
     },
     {
       "lesson_id": "radioactivity-is-natural",
       "id": "c16",
-      "position": 15,
+      "position": 12,
       "kind": "teach",
       "type": "explain",
       "tier": "deeper",
@@ -1576,20 +2378,175 @@
       }
     },
     {
-      "lesson_id": "stable-and-unstable-nuclei",
+      "lesson_id": "risk-in-perspective",
       "id": "c01",
       "position": 0,
+      "kind": "teach",
+      "type": "explain",
+      "tier": "core",
+      "item_id": null,
+      "scored": 0,
+      "data": {
+        "title": "Three questions",
+        "figureAt": 1,
+        "body": "A headline about radiation is only useful with three questions. How big is the dose, in millisieverts? How fast did it arrive? And how does it compare with doses you already know?",
+        "figure": {
+          "ref": "headline-questions"
+        }
+      }
+    },
+    {
+      "lesson_id": "risk-in-perspective",
+      "id": "c02",
+      "position": 1,
       "kind": "item",
       "type": "item",
       "tier": "core",
-      "item_id": "u1-l5-predict-stable",
-      "scored": 0,
+      "item_id": "u4-l5-choice-first",
+      "scored": 1,
+      "data": {
+        "connected": true
+      }
+    },
+    {
+      "lesson_id": "risk-in-perspective",
+      "id": "c03",
+      "position": 2,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u4-l5-choice-fast",
+      "scored": 1,
       "data": {}
+    },
+    {
+      "lesson_id": "risk-in-perspective",
+      "id": "c04",
+      "position": 3,
+      "kind": "teach",
+      "type": "explain",
+      "tier": "core",
+      "item_id": null,
+      "scored": 0,
+      "data": {
+        "title": "Put it on the scale",
+        "figureAt": 1,
+        "body": "Compare a number with the doses you know. An average year is about 6 millisieverts. A whole body CT is about 10. Acute illness starts at about 1000, in a short time.",
+        "figure": {
+          "ref": "dose-ladder"
+        }
+      }
+    },
+    {
+      "lesson_id": "risk-in-perspective",
+      "id": "c05",
+      "position": 4,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u4-l5-choice-compare",
+      "scored": 1,
+      "data": {
+        "connected": true
+      }
+    },
+    {
+      "lesson_id": "risk-in-perspective",
+      "id": "c06",
+      "position": 5,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u4-l5-choice-scan",
+      "scored": 1,
+      "data": {}
+    },
+    {
+      "lesson_id": "risk-in-perspective",
+      "id": "c06b",
+      "position": 6,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u4-l5-match-questions",
+      "scored": 1,
+      "data": {}
+    },
+    {
+      "lesson_id": "risk-in-perspective",
+      "id": "c07",
+      "position": 7,
+      "kind": "teach",
+      "type": "explain",
+      "tier": "core",
+      "item_id": null,
+      "scored": 0,
+      "data": {
+        "title": "Two wrong answers",
+        "figureAt": 1,
+        "body": "One wrong answer says any dose is deadly. The other says radiation is harmless. Both are wrong. A very large dose in a short time makes people ill, and low doses add a small chance of cancer over a lifetime. Size and speed decide.",
+        "figure": {
+          "ref": "two-myths"
+        }
+      }
+    },
+    {
+      "lesson_id": "risk-in-perspective",
+      "id": "c08",
+      "position": 8,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u4-l5-tom-any-deadly",
+      "scored": 1,
+      "data": {
+        "connected": true
+      }
+    },
+    {
+      "lesson_id": "risk-in-perspective",
+      "id": "c09",
+      "position": 9,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u4-l5-tom-large-ill",
+      "scored": 1,
+      "data": {}
+    },
+    {
+      "lesson_id": "risk-in-perspective",
+      "id": "c10",
+      "position": 10,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u4-l5-choice-calm",
+      "scored": 1,
+      "data": {}
+    },
+    {
+      "lesson_id": "risk-in-perspective",
+      "id": "c11",
+      "position": 11,
+      "kind": "teach",
+      "type": "explain",
+      "tier": "deeper",
+      "item_id": null,
+      "scored": 0,
+      "data": {
+        "title": "Go deeper: a number to remember",
+        "figureAt": 1,
+        "body": "About 1000 millisieverts in a short time is where illness starts. An average year is about 6. That is a gap of well over a hundred times.",
+        "figure": {
+          "ref": "dose-ladder"
+        }
+      }
     },
     {
       "lesson_id": "stable-and-unstable-nuclei",
       "id": "c02",
-      "position": 1,
+      "position": 0,
       "kind": "teach",
       "type": "explain",
       "tier": "core",
@@ -1597,17 +2554,17 @@
       "scored": 0,
       "data": {
         "title": "Stable and unstable",
-        "body": "Some combinations of protons and neutrons make a stable nucleus. It stays the same. Others make an unstable nucleus, which can change. Most atoms around you, and in you, are stable.",
+        "figureAt": 2,
+        "body": "Does an atom stay the same for ever? Most do. Some combinations of protons and neutrons make a stable nucleus, which stays as it is. Other combinations make an unstable nucleus, which can change. Most of the atoms around you, and in you, are stable.",
         "figure": {
           "ref": "stable-vs-unstable"
-        },
-        "figureAt": 1
+        }
       }
     },
     {
       "lesson_id": "stable-and-unstable-nuclei",
       "id": "c03",
-      "position": 2,
+      "position": 1,
       "kind": "sim",
       "type": "atom-builder",
       "tier": "core",
@@ -1637,19 +2594,19 @@
     },
     {
       "lesson_id": "stable-and-unstable-nuclei",
-      "id": "c04",
-      "position": 3,
+      "id": "c21",
+      "position": 2,
       "kind": "item",
       "type": "item",
       "tier": "core",
-      "item_id": "u1-l5-sort-stable",
+      "item_id": "u1-x-unstable-which",
       "scored": 1,
       "data": {}
     },
     {
       "lesson_id": "stable-and-unstable-nuclei",
       "id": "c05",
-      "position": 4,
+      "position": 3,
       "kind": "teach",
       "type": "explain",
       "tier": "core",
@@ -1657,11 +2614,24 @@
       "scored": 0,
       "data": {
         "title": "Unstable nuclei can change",
-        "body": "An unstable nucleus can change. When it does, it gives off [[radiation]]. This is called [[radioactivity]]. An atom that does this is radioactive.",
+        "figureAt": 2,
+        "body": "An unstable nucleus can change into a different nucleus. When it does, it gives off [[radiation|radiation]]. This is called [[radioactivity|radioactivity]], and an atom that does it is radioactive. It happens because the nucleus is unstable, not because anyone makes it happen.",
         "figure": {
           "ref": "decay-figure"
-        },
-        "figureAt": 1
+        }
+      }
+    },
+    {
+      "lesson_id": "stable-and-unstable-nuclei",
+      "id": "c09",
+      "position": 4,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u1-l5-choice-unstable-does",
+      "scored": 1,
+      "data": {
+        "connected": true
       }
     },
     {
@@ -1675,11 +2645,11 @@
       "scored": 0,
       "data": {
         "title": "Radioactivity is natural",
-        "body": "Nobody had to invent radioactivity. Unstable atoms are in rocks, in the air and in food. Bananas and your own body hold a little natural potassium-40.",
+        "figureAt": 2,
+        "body": "Nobody had to invent radioactivity. Unstable atoms are in rocks, in the air and in food. A banana and your own body hold a little natural potassium-40. People can make radioactive atoms too, but most of the radioactivity around us is natural.",
         "figure": {
           "ref": "natural-sources"
-        },
-        "figureAt": 1
+        }
       }
     },
     {
@@ -1708,30 +2678,22 @@
     },
     {
       "lesson_id": "stable-and-unstable-nuclei",
-      "id": "c09",
+      "id": "c22",
       "position": 8,
-      "kind": "item",
-      "type": "item",
+      "kind": "teach",
+      "type": "explain",
       "tier": "core",
-      "item_id": "u1-l5-choice-unstable-does",
-      "scored": 1,
-      "data": {}
-    },
-    {
-      "lesson_id": "stable-and-unstable-nuclei",
-      "id": "c10",
-      "position": 9,
-      "kind": "item",
-      "type": "item",
-      "tier": "core",
-      "item_id": "u1-l5-sort-source",
-      "scored": 1,
-      "data": {}
+      "item_id": null,
+      "scored": 0,
+      "data": {
+        "title": "What comes next",
+        "body": "So now you know that some nuclei can change all by themselves. In the next unit you will find out what comes out when one does, and how fast it happens."
+      }
     },
     {
       "lesson_id": "stable-and-unstable-nuclei",
       "id": "c11",
-      "position": 10,
+      "position": 9,
       "kind": "teach",
       "type": "explain",
       "tier": "deeper",
@@ -1747,6 +2709,470 @@
       }
     },
     {
+      "lesson_id": "the-dose-scale",
+      "id": "c01",
+      "position": 0,
+      "kind": "teach",
+      "type": "explain",
+      "tier": "core",
+      "item_id": null,
+      "scored": 0,
+      "data": {
+        "title": "How a dose is counted",
+        "figureAt": 1,
+        "body": "Radiation is all around us, so the question is always how much. A dose measures how much radiation a body has taken in, and it is counted in [[sievert|sieverts]]. Everyday doses are tiny, so they are given in millisieverts: 1 sievert is 1000 [[millisievert|millisieverts]].",
+        "figure": {
+          "ref": "millisievert-figure"
+        }
+      }
+    },
+    {
+      "lesson_id": "the-dose-scale",
+      "id": "c02",
+      "position": 1,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u4-l1-fill-milli",
+      "scored": 1,
+      "data": {
+        "connected": true
+      }
+    },
+    {
+      "lesson_id": "the-dose-scale",
+      "id": "c03",
+      "position": 2,
+      "kind": "teach",
+      "type": "explain",
+      "tier": "core",
+      "item_id": null,
+      "scored": 0,
+      "data": {
+        "title": "A little, every day",
+        "figureAt": 1,
+        "body": "Everyone gets a small dose all the time. In the United States the average is about 6.2 millisieverts a year, and most of it is natural [[background-radiation|background radiation]]. Rocks, soil, space and [[radon|radon]] in the air all add to it.",
+        "figure": {
+          "ref": "a-year-of-dose"
+        }
+      }
+    },
+    {
+      "lesson_id": "the-dose-scale",
+      "id": "c04",
+      "position": 3,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u4-l1-tom-workers",
+      "scored": 1,
+      "data": {
+        "connected": true
+      }
+    },
+    {
+      "lesson_id": "the-dose-scale",
+      "id": "c05",
+      "position": 4,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u4-l1-choice-average",
+      "scored": 1,
+      "data": {}
+    },
+    {
+      "lesson_id": "the-dose-scale",
+      "id": "c06",
+      "position": 5,
+      "kind": "teach",
+      "type": "explain",
+      "tier": "core",
+      "item_id": null,
+      "scored": 0,
+      "data": {
+        "title": "From tiny to huge",
+        "figureAt": 1,
+        "body": "Put some doses in a line. Living beside a nuclear power station for a year adds under 0.01 millisieverts. A year of cosmic rays at sea level is about 0.3, and radon in an average home about 2.3. One whole body CT is about 10. About 1000 in a short time is where people start to become ill.",
+        "figure": {
+          "ref": "dose-ladder"
+        }
+      }
+    },
+    {
+      "lesson_id": "the-dose-scale",
+      "id": "c07",
+      "position": 6,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u4-l1-order-doses",
+      "scored": 1,
+      "data": {
+        "connected": true
+      }
+    },
+    {
+      "lesson_id": "the-dose-scale",
+      "id": "c08",
+      "position": 7,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u4-l1-choice-ill",
+      "scored": 1,
+      "data": {}
+    },
+    {
+      "lesson_id": "the-dose-scale",
+      "id": "c09",
+      "position": 8,
+      "kind": "teach",
+      "type": "explain",
+      "tier": "deeper",
+      "item_id": null,
+      "scored": 0,
+      "data": {
+        "title": "Go deeper: where you live",
+        "figureAt": 1,
+        "body": "Altitude changes the dose. Living in Denver, about 5,280 feet up, adds about 0.8 millisieverts a year from cosmic radiation, compared with about 0.3 at sea level. Where you live changes your yearly dose a little.",
+        "figure": {
+          "ref": "a-year-of-dose"
+        }
+      }
+    },
+    {
+      "lesson_id": "time-distance-shielding",
+      "id": "c01",
+      "position": 0,
+      "kind": "teach",
+      "type": "explain",
+      "tier": "core",
+      "item_id": null,
+      "scored": 0,
+      "data": {
+        "title": "You can lower a dose",
+        "figureAt": 1,
+        "body": "A dose is not fixed. There are three ways to lower it: spend less time near the source, stay farther from it, or put a shield between you and it. Time, distance and shielding.",
+        "figure": {
+          "ref": "three-ways"
+        }
+      }
+    },
+    {
+      "lesson_id": "time-distance-shielding",
+      "id": "c02",
+      "position": 1,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u4-l4-tom-nothing",
+      "scored": 1,
+      "data": {
+        "connected": true
+      }
+    },
+    {
+      "lesson_id": "time-distance-shielding",
+      "id": "c03",
+      "position": 2,
+      "kind": "teach",
+      "type": "explain",
+      "tier": "core",
+      "item_id": null,
+      "scored": 0,
+      "data": {
+        "title": "Less time",
+        "figureAt": 1,
+        "body": "Limiting the time you are exposed reduces the dose from the source. A shorter visit near a source means a smaller dose.",
+        "figure": {
+          "ref": "less-time"
+        }
+      }
+    },
+    {
+      "lesson_id": "time-distance-shielding",
+      "id": "c04",
+      "position": 3,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u4-l4-choice-time",
+      "scored": 1,
+      "data": {
+        "connected": true
+      }
+    },
+    {
+      "lesson_id": "time-distance-shielding",
+      "id": "c05",
+      "position": 4,
+      "kind": "teach",
+      "type": "explain",
+      "tier": "core",
+      "item_id": null,
+      "scored": 0,
+      "data": {
+        "title": "More distance",
+        "figureAt": 1,
+        "body": "The dose decreases dramatically as you increase your distance from the source. Stepping farther away lowers it a lot.",
+        "figure": {
+          "ref": "more-distance"
+        }
+      }
+    },
+    {
+      "lesson_id": "time-distance-shielding",
+      "id": "c06",
+      "position": 5,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u4-l4-choice-distance",
+      "scored": 1,
+      "data": {
+        "connected": true
+      }
+    },
+    {
+      "lesson_id": "time-distance-shielding",
+      "id": "c07",
+      "position": 6,
+      "kind": "teach",
+      "type": "explain",
+      "tier": "core",
+      "item_id": null,
+      "scored": 0,
+      "data": {
+        "title": "Something in between",
+        "figureAt": 1,
+        "body": "Shielding means putting material between you and the source. Barriers of lead, concrete or water protect from penetrating gamma rays, and a good shield can greatly reduce or remove the dose.",
+        "figure": {
+          "ref": "something-between"
+        }
+      }
+    },
+    {
+      "lesson_id": "time-distance-shielding",
+      "id": "c08",
+      "position": 7,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u4-l4-fill-three",
+      "scored": 1,
+      "data": {}
+    },
+    {
+      "lesson_id": "time-distance-shielding",
+      "id": "c09",
+      "position": 8,
+      "kind": "teach",
+      "type": "explain",
+      "tier": "core",
+      "item_id": null,
+      "scored": 0,
+      "data": {
+        "title": "Where you see them",
+        "figureAt": 1,
+        "body": "Dentists place a lead apron on patients having X-rays of their teeth. Radioactive materials are stored under water, in concrete, or in lead-lined rooms. In a shelter, more walls give more protection.",
+        "figure": {
+          "ref": "real-uses"
+        }
+      }
+    },
+    {
+      "lesson_id": "time-distance-shielding",
+      "id": "c10",
+      "position": 9,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u4-l4-match-ways",
+      "scored": 1,
+      "data": {}
+    },
+    {
+      "lesson_id": "time-distance-shielding",
+      "id": "c11",
+      "position": 10,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u4-l4-choice-store",
+      "scored": 1,
+      "data": {}
+    },
+    {
+      "lesson_id": "what-stops-what",
+      "id": "c01",
+      "position": 0,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u3-l2-predict-paper",
+      "scored": 0,
+      "data": {}
+    },
+    {
+      "lesson_id": "what-stops-what",
+      "id": "c02",
+      "position": 1,
+      "kind": "teach",
+      "type": "explain",
+      "tier": "core",
+      "item_id": null,
+      "scored": 0,
+      "data": {
+        "title": "Alpha: heavy, so it stops fast",
+        "figureAt": 2,
+        "body": "An alpha particle is heavy. A heavy particle uses up its energy over a very short distance. So a sheet or two of paper, or the top layer of your skin, usually stops it.",
+        "figure": {
+          "ref": "alpha-paper"
+        }
+      }
+    },
+    {
+      "lesson_id": "what-stops-what",
+      "id": "c03",
+      "position": 2,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u3-l2-choice-alpha",
+      "scored": 1,
+      "data": {
+        "connected": true
+      }
+    },
+    {
+      "lesson_id": "what-stops-what",
+      "id": "c04",
+      "position": 3,
+      "kind": "teach",
+      "type": "explain",
+      "tier": "core",
+      "item_id": null,
+      "scored": 0,
+      "data": {
+        "title": "Beta: small and fast",
+        "figureAt": 2,
+        "body": "A beta particle is small and fast. It goes farther through air than an alpha particle, and it passes through paper. A thin layer of metal, such as aluminum, stops it.",
+        "figure": {
+          "ref": "beta-metal"
+        }
+      }
+    },
+    {
+      "lesson_id": "what-stops-what",
+      "id": "c05",
+      "position": 4,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u3-l2-choice-beta",
+      "scored": 1,
+      "data": {
+        "connected": true
+      }
+    },
+    {
+      "lesson_id": "what-stops-what",
+      "id": "c06",
+      "position": 5,
+      "kind": "teach",
+      "type": "explain",
+      "tier": "core",
+      "item_id": null,
+      "scored": 0,
+      "data": {
+        "title": "Gamma: very penetrating",
+        "body": "Gamma rays are pure energy, and they are very penetrating. They pass through skin and clothing. Paper and a thin layer of metal will not stop them."
+      }
+    },
+    {
+      "lesson_id": "what-stops-what",
+      "id": "c07",
+      "position": 6,
+      "kind": "teach",
+      "type": "explain",
+      "tier": "core",
+      "item_id": null,
+      "scored": 0,
+      "data": {
+        "title": "What it takes to stop gamma",
+        "figureAt": 1,
+        "body": "It takes several inches of a dense material like lead, or a few feet of concrete, to stop gamma rays. Thick and dense: that is what makes a good shield against them.",
+        "figure": {
+          "ref": "gamma-thick"
+        }
+      }
+    },
+    {
+      "lesson_id": "what-stops-what",
+      "id": "c08",
+      "position": 7,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u3-l2-tom-gamma-paper",
+      "scored": 1,
+      "data": {
+        "connected": true
+      }
+    },
+    {
+      "lesson_id": "what-stops-what",
+      "id": "c09",
+      "position": 8,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u3-l2-choice-gamma",
+      "scored": 1,
+      "data": {}
+    },
+    {
+      "lesson_id": "what-stops-what",
+      "id": "c10",
+      "position": 9,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u3-l2-order-pen",
+      "scored": 1,
+      "data": {}
+    },
+    {
+      "lesson_id": "what-stops-what",
+      "id": "c11",
+      "position": 10,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u3-l2-match-stops",
+      "scored": 1,
+      "data": {}
+    },
+    {
+      "lesson_id": "what-stops-what",
+      "id": "c12",
+      "position": 11,
+      "kind": "teach",
+      "type": "explain",
+      "tier": "deeper",
+      "item_id": null,
+      "scored": 0,
+      "data": {
+        "title": "Go deeper: shields at work",
+        "figureAt": 1,
+        "body": "Barriers of lead, concrete or water protect against gamma rays and X-rays. That is why some radioactive materials are stored under water, or in concrete or lead-lined rooms, and why a dentist puts a lead apron on you.",
+        "figure": {
+          "ref": "shields-in-use"
+        }
+      }
+    },
+    {
       "lesson_id": "why-nuclei-decay",
       "id": "c01",
       "position": 0,
@@ -1759,55 +3185,40 @@
     },
     {
       "lesson_id": "why-nuclei-decay",
-      "id": "c02",
+      "id": "c06",
       "position": 1,
       "kind": "teach",
-      "type": "explain",
+      "type": "reveal",
       "tier": "core",
       "item_id": null,
       "scored": 0,
       "data": {
-        "title": "Stable and unstable",
-        "body": "A stable nucleus can stay as it is. An unstable nucleus can change into another state. A nucleus that can change like this is called [[radioactivity|radioactive]].",
+        "title": "Left alone, it still changes",
+        "predictCardId": "c01",
+        "figureAt": 1,
+        "body": "An unstable nucleus can change all by itself, even when nobody does anything to it, because the instability is already inside it. It does not vanish. It turns into a different nucleus and gives off [[radiation|radiation]].",
         "figure": {
           "ref": "simple-stable-unstable"
-        },
-        "figureAt": 1
-      }
-    },
-    {
-      "lesson_id": "why-nuclei-decay",
-      "id": "c03",
-      "position": 2,
-      "kind": "teach",
-      "type": "explain",
-      "tier": "core",
-      "item_id": null,
-      "scored": 0,
-      "data": {
-        "title": "It changes by itself",
-        "body": "An unstable nucleus can change all by itself. Nobody has to push it. The nucleus that changes is the [[parent-nuclide|parent]]. The nucleus it becomes is the [[daughter-nuclide|daughter]]. The change gives off [[radiation]].",
-        "figure": {
-          "ref": "parent-daughter"
-        },
-        "figureAt": 1
+        }
       }
     },
     {
       "lesson_id": "why-nuclei-decay",
       "id": "c04",
-      "position": 3,
+      "position": 2,
       "kind": "item",
       "type": "item",
       "tier": "core",
       "item_id": "u2-l1-hotspot-change",
       "scored": 1,
-      "data": {}
+      "data": {
+        "connected": true
+      }
     },
     {
       "lesson_id": "why-nuclei-decay",
       "id": "c05",
-      "position": 4,
+      "position": 3,
       "kind": "item",
       "type": "item",
       "tier": "core",
@@ -1817,27 +3228,50 @@
     },
     {
       "lesson_id": "why-nuclei-decay",
-      "id": "c06",
-      "position": 5,
+      "id": "c03",
+      "position": 4,
       "kind": "teach",
-      "type": "reveal",
+      "type": "explain",
       "tier": "core",
       "item_id": null,
       "scored": 0,
       "data": {
-        "predictCardId": "c01",
-        "title": "Left alone, it can still change",
-        "body": "An unstable nucleus can change all by itself, even when nobody does anything to it. It does not vanish. It turns into a different nucleus and gives off radiation.",
+        "title": "Parent and daughter",
+        "figureAt": 1,
+        "body": "Scientists give the two nuclei names. The nucleus that changes is the [[parent-nuclide|parent]]. The nucleus it becomes is the [[daughter-nuclide|daughter]]. The change gives off radiation, and that radiation is what comes out.",
         "figure": {
           "ref": "parent-daughter"
-        },
-        "figureAt": 1
+        }
       }
     },
     {
       "lesson_id": "why-nuclei-decay",
-      "id": "c07",
+      "id": "c11",
+      "position": 5,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u2-l1-fill-parent",
+      "scored": 1,
+      "data": {
+        "connected": true
+      }
+    },
+    {
+      "lesson_id": "why-nuclei-decay",
+      "id": "c12",
       "position": 6,
+      "kind": "item",
+      "type": "item",
+      "tier": "core",
+      "item_id": "u2-l1-match-names",
+      "scored": 1,
+      "data": {}
+    },
+    {
+      "lesson_id": "why-nuclei-decay",
+      "id": "c07",
+      "position": 7,
       "kind": "teach",
       "type": "explain",
       "tier": "core",
@@ -1845,17 +3279,17 @@
       "scored": 0,
       "data": {
         "title": "Random for one, regular for many",
-        "body": "You can know that a nucleus has a chance of changing. You cannot say when. Look at one nucleus and its moment is a surprise. A whole group is different, and you will see how in a later lesson.",
+        "figureAt": 2,
+        "body": "You can say that a nucleus has a chance of changing. You cannot say when. Watch one nucleus and its moment is a surprise, and no nucleus ever gets 'due'. A whole group is different, and the next lessons show how.",
         "figure": {
           "ref": "random-one"
-        },
-        "figureAt": 2
+        }
       }
     },
     {
       "lesson_id": "why-nuclei-decay",
       "id": "c09",
-      "position": 7,
+      "position": 8,
       "kind": "item",
       "type": "item",
       "tier": "core",
@@ -1868,7 +3302,7 @@
     {
       "lesson_id": "why-nuclei-decay",
       "id": "c10",
-      "position": 8,
+      "position": 9,
       "kind": "item",
       "type": "item",
       "tier": "core",
@@ -1878,41 +3312,8 @@
     },
     {
       "lesson_id": "why-nuclei-decay",
-      "id": "c11",
-      "position": 9,
-      "kind": "item",
-      "type": "item",
-      "tier": "core",
-      "item_id": "u2-l1-fill-parent",
-      "scored": 1,
-      "data": {}
-    },
-    {
-      "lesson_id": "why-nuclei-decay",
-      "id": "c12",
-      "position": 10,
-      "kind": "item",
-      "type": "item",
-      "tier": "core",
-      "item_id": "u2-l1-match-names",
-      "scored": 1,
-      "data": {}
-    },
-    {
-      "lesson_id": "why-nuclei-decay",
-      "id": "c13",
-      "position": 11,
-      "kind": "item",
-      "type": "item",
-      "tier": "core",
-      "item_id": "u2-l1-choice-why",
-      "scored": 1,
-      "data": {}
-    },
-    {
-      "lesson_id": "why-nuclei-decay",
       "id": "c14",
-      "position": 12,
+      "position": 10,
       "kind": "teach",
       "type": "explain",
       "tier": "deeper",
@@ -1920,11 +3321,11 @@
       "scored": 0,
       "data": {
         "title": "Go deeper: what can change it?",
-        "body": "An unstable nucleus is called a [[radionuclide]]. When it changes, a different nuclide can result, and energy leaves as particles or electromagnetic radiation. Heating, cooling and chemistry hardly change how fast this happens. In a flame or in ice, it is still unstable.",
+        "figureAt": 1,
+        "body": "An unstable nucleus is called a [[radionuclide|radionuclide]]. When it changes, a different nuclide can result, and energy leaves as particles or electromagnetic radiation. Heating, cooling and chemistry hardly change how fast this happens. In a flame or in ice, it is still unstable.",
         "figure": {
           "ref": "flame-and-ice"
-        },
-        "figureAt": 1
+        }
       }
     }
   ]

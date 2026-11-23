@@ -1,0 +1,125 @@
+format 1
+adapter curriculum 1
+unit: radiation-and-the-body
+
+lesson dose-and-time
+title: All at once or over time
+minutes: 5
+xp: 50
+teaches: u4-large-fast
+teaches: u4-small-spread
+relies_on: u4-cell-repair
+
+description:
+    The same amount of radiation can mean very different things depending on how fast it arrives. You will compare a big, fast dose with a small one spread over time.
+
+cite ref-who-ionizing-radiation
+
+supports:
+    The threshold for acute radiation syndrome is about 1 sievert; effects are more severe at higher doses and dose rates; a low dose or one spread over a long time carries less risk because repair is more likely.
+
+cite ref-epa-radiation-health-effects
+
+supports:
+    A very high exposure over a short time can cause nausea and vomiting within hours; low levels can add a small increase in the risk of cancer over a lifetime; about 99 percent of people given 100 millisieverts would not get cancer as a result.
+
+card c01
+kind: item
+type: item
+item: u4-l3-predict-same-total
+scored: 0
+
+card c02
+kind: teach
+type: explain
+scored: 0
+title: Fast or slow
+figure: fast-or-slow
+figure_at: 1
+
+body:
+    How fast a dose arrives is called the [[dose-rate|dose rate]]. It is given in units such as microsieverts per hour or millisieverts per year. The same amount can arrive in minutes or over many years.
+
+card c03
+kind: item
+type: item
+item: u4-l3-choice-doserate
+connected: true
+
+card c04
+kind: teach
+type: reveal
+scored: 0
+title: Your guess, answered
+predicts: c01
+figure: big-fast-dose
+figure_at: 1
+
+body:
+    A very high dose in a short time is the dangerous case. The same total spread over a long time is much less risky, because the cells have time to repair damage in between. Effects are more severe at higher doses and higher dose rates.
+
+card c05
+kind: item
+type: item
+item: u4-l3-tom-no-immediate
+connected: true
+
+card c06
+kind: item
+type: item
+item: u4-l3-choice-symptoms
+
+card c07
+kind: teach
+type: explain
+scored: 0
+title: A big dose, quickly
+figure: big-fast-dose
+figure_at: 1
+
+body:
+    About 1 sievert, or 1000 millisieverts, in a short time is the threshold for [[acute-radiation-syndrome|acute radiation syndrome]]. Within hours it can cause symptoms such as nausea and vomiting. High doses can also cause skin redness, hair loss and burns.
+
+card c08
+kind: teach
+type: explain
+scored: 0
+title: Small doses, spread out
+figure: small-spread-dose
+figure_at: 1
+
+body:
+    Low levels of radiation do not cause immediate health effects. They can add a small increase in the risk of cancer over a lifetime. If a dose is low or spread over a long time, the risk is lower, because repair is more likely.
+
+card c09
+kind: item
+type: item
+item: u4-l3-choice-low
+connected: true
+
+card c10
+kind: item
+type: item
+item: u4-l3-choice-spread
+
+card c10b
+kind: item
+type: item
+item: u4-l3-fill-low
+
+card c11
+kind: item
+type: item
+item: u4-l3-tom-same
+
+card c12
+kind: teach
+type: explain
+tier: deeper
+scored: 0
+title: Go deeper: a one-time 100
+figure: small-spread-dose
+figure_at: 1
+
+body:
+    About 99 in 100 people given a one-time dose of 100 millisieverts would not get cancer as a result. At that dose, extra cancers caused by radiation would be extremely difficult to identify.

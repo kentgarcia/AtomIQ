@@ -50,6 +50,8 @@ export interface AppIconProps {
   /** The accessibility label, badge included. */
   label: string;
   onPress: () => void;
+  /** A long press (the phone starts arranging its home screen with it). */
+  onLongPress?: () => void;
   /** Not on the phone yet: a grey tile with a lock, no picture and no badge. Pressing it explains how to get it. */
   locked?: boolean;
   /** Play the install moment, `delay` ms from mount. Keep it set for the whole visit: it plays once. */
@@ -66,6 +68,7 @@ function AppIconBase({
   badge,
   label,
   onPress,
+  onLongPress,
   locked = false,
   install,
 }: AppIconProps) {
@@ -88,9 +91,11 @@ function AppIconBase({
   const onDoneRef = useRef(install?.onDone);
   // The newest press handler is what runs: the screen builds a new one on every render, and `sameIcon` below lets the icon skip those renders
   const onPressRef = useRef(onPress);
+  const onLongPressRef = useRef(onLongPress);
   useEffect(() => {
     onDoneRef.current = install?.onDone;
     onPressRef.current = onPress;
+    onLongPressRef.current = onLongPress;
   });
   const installing = !!install;
   const delay = install?.delay ?? 0;
@@ -149,6 +154,8 @@ function AppIconBase({
     <View style={[styles.cell, { width: size + 20 }]}>
       <Pressable
         onPress={() => onPressRef.current()}
+        onLongPress={() => onLongPressRef.current?.()}
+        delayLongPress={350}
         onPressIn={() =>
           pressed.set(withTiming(1, { duration: 60, easing: EASE_OUT }))
         }

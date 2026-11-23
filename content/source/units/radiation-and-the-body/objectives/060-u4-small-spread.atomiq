@@ -1,0 +1,103 @@
+format 1
+adapter curriculum 1
+unit: radiation-and-the-body
+
+objective u4-small-spread
+
+statement:
+    Know that low doses do not cause immediate illness but can add a small chance of cancer over a lifetime, and that a dose that is low or spread over a long time carries less risk, because repair is more likely.
+
+misconception: A small dose every day is the same as one large dose.
+
+item u4-l3-choice-low
+type: choice
+surfaces: lesson
+surfaces: practice
+surfaces: checkpoint
+surfaces: review
+references: ref-epa-radiation-health-effects
+
+prompt:
+    What can a low dose of radiation do?
+
+options:
+    {"id":"small","label":"Add a small increase in the chance of cancer over a lifetime"}
+    {"id":"sick","label":"Make a person ill within hours","note":"Immediate illness needs a very large dose in a short time. Low levels do not cause immediate health effects."}
+    {"id":"zero","label":"Nothing at all, at any dose","note":"Low levels can cause a small increase in the risk of cancer over a lifetime."}
+
+answer: small
+
+explanation:
+    Low levels do not cause immediate health effects, but they can add a small increase in the risk of cancer over a lifetime.
+
+item u4-l3-choice-spread
+type: choice
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-who-ionizing-radiation
+
+prompt:
+    Why does a dose spread over a long time carry less risk?
+
+options:
+    {"id":"repair","label":"The body has a greater chance of repairing the damage in between"}
+    {"id":"weak","label":"The radiation gets weaker as time goes by","note":"The reason given is repair, not the radiation getting weaker."}
+    {"id":"none","label":"Slow radiation does not touch cells","note":"It still reaches cells. The difference is that there is more time for repair."}
+
+answer: repair
+
+explanation:
+    If a dose is low, or delivered over a long time, the risk is lower because there is a greater likelihood of repairing the damage.
+
+item u4-l3-fill-low
+type: fill
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-who-ionizing-radiation
+
+prompt:
+    A dose that is low, or spread over a long time, carries ___ risk.
+
+mode: bank
+
+bank:
+    {"id":"less","label":"less"}
+    {"id":"more","label":"more"}
+    {"id":"same","label":"the same"}
+
+answer: less
+
+explanation:
+    Repair is more likely when a dose is low or spread out, so the risk is lower.
+
+item u4-l3-tom-same
+type: true_or_myth
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-who-ionizing-radiation
+
+statement:
+    A small dose every day is the same as one large dose.
+
+answer: myth
+
+explanation:
+    Myth. Dose rate matters. A low dose, or one spread over a long time, carries less risk because repair is more likely.
+
+item u4-x-tom-hundred
+type: true_or_myth
+surfaces: practice
+surfaces: checkpoint
+surfaces: review
+references: ref-epa-radiation-health-effects
+
+statement:
+    About 99 in 100 people given a one-time dose of 100 millisieverts would not get cancer as a result.
+
+answer: true
+
+explanation:
+    True. The EPA says about 99 percent would not, and that at this dose extra cancers caused by radiation would be extremely difficult to identify.

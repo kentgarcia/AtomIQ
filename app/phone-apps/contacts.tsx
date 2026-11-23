@@ -124,7 +124,7 @@ export default function ContactsScreen() {
         <Animated.View entering={settle(0)}>
           <FilledCard onPress={() => router.push("/(tabs)/profile")} accessibilityLabel={`${myName}, my card. Opens your profile.`}>
             <View style={[styles.myRow, { backgroundColor: avatarBackground(look) }]}>
-              <PatternLayer pattern={look.pattern} tile={96} />
+              <PatternLayer pattern={look.pattern} background={look.background} tile={96} />
               <Fade color={c.field} />
               <View style={styles.myFace}>
                 <Avatar value={userProfile?.avatar_url} size={MY_FACE - 8} radius={(MY_FACE - 8) / 2} />

@@ -23,22 +23,16 @@ supports: Stable and unstable forms of an element; unstable forms are radioactiv
 cite ref-hps-natural-radioactivity
 supports: Natural potassium-40 in the human body.
 
-card c01
-kind: item
-type: item
-item: u1-l5-predict-stable
-scored: 0
-
 card c02
 kind: teach
 type: explain
 scored: 0
 title: Stable and unstable
 figure: stable-vs-unstable
-figure_at: 1
+figure_at: 2
 
 body:
-    Some combinations of protons and neutrons make a stable nucleus. It stays the same. Others make an unstable nucleus, which can change. Most atoms around you, and in you, are stable.
+    Does an atom stay the same for ever? Most do. Some combinations of protons and neutrons make a stable nucleus, which stays as it is. Other combinations make an unstable nucleus, which can change. Most of the atoms around you, and in you, are stable.
 
 card c03
 kind: sim
@@ -68,10 +62,10 @@ config:
       ]
     }
 
-card c04
+card c21
 kind: item
 type: item
-item: u1-l5-sort-stable
+item: u1-x-unstable-which
 
 card c05
 kind: teach
@@ -79,10 +73,16 @@ type: explain
 scored: 0
 title: Unstable nuclei can change
 figure: decay-figure
-figure_at: 1
+figure_at: 2
 
 body:
-    An unstable nucleus can change. When it does, it gives off [[radiation]]. This is called [[radioactivity]]. An atom that does this is radioactive.
+    An unstable nucleus can change into a different nucleus. When it does, it gives off [[radiation|radiation]]. This is called [[radioactivity|radioactivity]], and an atom that does it is radioactive. It happens because the nucleus is unstable, not because anyone makes it happen.
+
+card c09
+kind: item
+type: item
+item: u1-l5-choice-unstable-does
+connected: true
 
 card c06
 kind: teach
@@ -90,10 +90,10 @@ type: explain
 scored: 0
 title: Radioactivity is natural
 figure: natural-sources
-figure_at: 1
+figure_at: 2
 
 body:
-    Nobody had to invent radioactivity. Unstable atoms are in rocks, in the air and in food. Bananas and your own body hold a little natural potassium-40.
+    Nobody had to invent radioactivity. Unstable atoms are in rocks, in the air and in food. A banana and your own body hold a little natural potassium-40. People can make radioactive atoms too, but most of the radioactivity around us is natural.
 
 card c07
 kind: item
@@ -106,15 +106,14 @@ kind: item
 type: item
 item: u1-l5-tom-body-stable
 
-card c09
-kind: item
-type: item
-item: u1-l5-choice-unstable-does
+card c22
+kind: teach
+type: explain
+scored: 0
+title: What comes next
 
-card c10
-kind: item
-type: item
-item: u1-l5-sort-source
+body:
+    So now you know that some nuclei can change all by themselves. In the next unit you will find out what comes out when one does, and how fast it happens.
 
 card c11
 kind: teach

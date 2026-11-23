@@ -449,6 +449,18 @@
       "note": "Page text fetched and read on 2026-11-23; the claims that cite it were checked against that text. Signed off by the owner on 2026-11-23."
     },
     {
+      "id": "ref-openstax-chem-21-6",
+      "kind": "textbook",
+      "publisher": "OpenStax",
+      "title": "Chemistry 2e, section 21.6: Biological Effects of Radiation",
+      "authors": "Flowers, Theopold, Langley, Robinson",
+      "year": "2019",
+      "url": "https://openstax.org/books/chemistry-2e/pages/21-6-biological-effects-of-radiation",
+      "accessed": "2026-11-23",
+      "verified": 1,
+      "note": "Page text fetched and read in full on 2026-11-23 (HTTP 200, title \"21.6 Biological Effects of Radiation\", Chemistry 2e, OpenStax, 14 Feb 2019) and the four \"supports\" statements of the Unit 3 lessons checked against it, quote by quote. Checked by the agent on the owner's instruction (the owner delegated this check and does not sign it by hand). Where the page is narrower than the lesson wording: it says molecules, not atoms; alpha is stopped \"usually\"; the scintillator \"emits light (luminesces)\", the word \"flashes\" is the lesson's own; a dosimeter is \"often used to determine personal radiation exposure\" and is shown worn on the chest only in a picture; the sievert is the unit for tissue damage that takes into account the energy and the biological effects. The supports statements now say what the page says."
+    },
+    {
       "id": "ref-openstax-chem-ch1",
       "kind": "textbook",
       "publisher": "OpenStax",

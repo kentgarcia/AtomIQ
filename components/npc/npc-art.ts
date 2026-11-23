@@ -26,11 +26,16 @@ import { EARWEAR, EYEWEAR, HEADWEAR, type WearPiece, type WearTone } from "./wea
 import { shapedHair, type ExtraHairStyle, type HairPiece, type TeacherHairStyle } from "./hair-art.ts";
 import { APRON_PIECES, APRON_PUFFS, type ApronTone } from "./lab-apron-art.ts";
 import { SATCHEL_PIECES, samplePieces, type SatchelTone } from "./hal-art.ts";
+import { HARDHAT_PIECES, TOOL_BELT_PIECES, blueprintPieces, type BlueprintTone, type HardhatTone, type ToolBeltTone } from "./kofi-art.ts";
+import { STETHOSCOPE_PIECES, doseCardPieces, type DoseCardTone, type StethoscopeTone } from "./mina-art.ts";
+import { COUNTER_PIECES, clipboardPieces, type ClipboardTone, type CounterTone } from "./ray-art.ts";
+import { FOLIO_BAG_PIECES, notebookPieces, type FolioBagTone, type NotebookTone } from "./sage-art.ts";
+import { GADGET_PACK_PIECES, vialPieces, type GadgetPackTone, type VialTone } from "./tess-art.ts";
 import { CUSTOM, FACE, MUTE_CLOTHES_STEP, MUTE_DARK, MUTE_LIGHT, MUTE_SEPARATION, OFFICIAL } from "./npc-palette.ts";
 
 // ── spec ─────────────────────────────────────────────────────────────────────
 
-export type EyeStyle = "pill" | "round" | "glasses-round" | "glasses-square" | "dots" | "wide" | "sparkle" | "lashes" | "sleepy" | "arches";
+export type EyeStyle = "pill" | "round" | "glasses-round" | "glasses-square" | "dots" | "wide" | "sparkle" | "lashes" | "sleepy" | "arches" | "anime" | "power";
 export type HairStyle = "bob" | "curls" | "crop" | "bun" | "wrap" | ExtraHairStyle | TeacherHairStyle;
 /** `apron` is Ada's lab outfit (a teacher's own: the shop does not sell it). */
 export type OutfitKind = "sweater" | "hoodie" | "coat" | "vest" | "shirt" | "apron" | ExtraOutfit;
@@ -357,10 +362,25 @@ function eyeParts(side: -1 | 1, e: Expression, p: Pal, style: EyeStyle, happy: b
     out.push(fillOf(pill(px, top + EYE.ph / 2, EYE.pw, EYE.ph), p.pupil));
     out.push(fillOf(circle(px - EYE.pw * 0.22, top + EYE.shine + 1.6, EYE.shine), p.eyeWhite));
     if (style === "lashes") {
-      for (const [x1, y1, x2, y2] of [[13, -14, 22, -19], [15, -7, 24.5, -9], [13, -21, 18.5, -29]] as const) out.push(lineOf(`M${f(cx + side * x1)} ${cy + y1}L${f(cx + side * x2)} ${cy + y2}`, p.feature, 3));
+      for (const [x1, y1, x2, y2] of [[13, -14, 22, -19], [15, -7, 24.5, -9], [13, -21, 18.5, -29]] as const) out.push(lineOf(`M${f(cx + side * x1)} ${cy + y1}L${f(cx + side * x2)} ${cy + y2}`, p.feature, 3.4));
     }
     if (style === "sleepy") {
       out.push(fillOf(`M${cx - 18} ${cy - 22}H${cx + 18}V${cy - 3}H${cx - 18}Z`, p.skin), lineOf(`M${cx - 15} ${cy - 3}H${cx + 15}`, p.feature, FEATURE_W));
+    }
+    if (style === "anime") {
+      out.push(
+        fillOf(pill(px, top + EYE.ph / 2, EYE.pw + 2, EYE.ph + 2), p.pupil),
+        fillOf(circle(px - 3, top + 4.8, 3.6), p.eyeWhite),
+        fillOf(circle(px + 3, top + 13.5, 1.8), p.eyeWhite),
+        lineOf(`M${f(cx - 14)} ${cy - 18}Q${cx} ${cy - 22} ${f(cx + 14)} ${cy - 18}`, p.feature, 4),
+      );
+    }
+    if (style === "power") {
+      out.push(
+        fillOf(`M${cx - 18} ${cy - 22}H${cx + 18}V${cy - 12}L${cx - side * 18} ${cy - 18}Z`, p.skin),
+        lineOf(`M${f(cx + side * 15)} ${cy - 19}L${f(cx - side * 15)} ${cy - 12}`, p.feature, 4),
+        fillOf(circle(px, top + 7, 3.2), p.eyeWhite),
+      );
     }
   }
   const cut: { lid?: [number, number]; cheek?: [number, number] } = { ...(e.eyes === "worried" ? CUTS.worried : {}), ...(happy ? { cheek: [10, 15] as [number, number] } : {}) };
@@ -423,8 +443,8 @@ function noseParts(spec: NpcSpec, p: Pal): Part[] {
   const own = NOSES[spec.nose];
   if (own) return own.map((piece) => facePart(piece, p, p.feature, { brow: p.hairShade, nose: color }));
   return spec.nose === "single"
-    ? [fillOf(pill(2, -2, 8, 22), color), fillOf(circle(2, 9, 6.5), color)]
-    : [fillOf(pill(1, -3, 10, 22), color), fillOf(rrect(-7, 4, 16, 10, 5), color)];
+    ? [fillOf(pill(1.5, 2, 8.5, 19), color)]
+    : [fillOf(pill(1, 1, 8.5, 19), color), fillOf(pill(-1, 7.5, 13, 8.5), color)];
 }
 
 function headPath(spec: NpcSpec): string {
@@ -447,7 +467,14 @@ function faceParts(spec: NpcSpec, e: Expression, p: Pal): Part[] {
   const style: EyeStyle = glasses ? "pill" : spec.eyes;
   const happy = e.mouth === "grin" && e.eyes === "open";
   const noseX = spec.nose === "single" ? 2 : 1;
-  if (spec.facialHair === "beard") out.push(fillOf(rrect(-spec.headWidth / 2, 20, spec.headWidth, 36, 26), p.hair));
+  if (spec.facialHair === "beard") {
+    const w = spec.headWidth;
+    out.push(
+      fillOf(rrect(-w / 2, 2, 11, 36, 5.5), p.hair),
+      fillOf(rrect(w / 2 - 11, 2, 11, 36, 5.5), p.hair),
+      fillOf(rrect(-w / 2, 18, w, 38, 26), p.hair),
+    );
+  }
   out.push(...eyeParts(-1, e, p, style, happy, noseX), ...eyeParts(1, e, p, style, happy, noseX), ...noseParts(spec, p));
   // After the eyes: their happy-cheek cut (skin over the bottom of the eye) reaches this far and would cover part of the cheeks
   if (spec.blush) for (const side of [-1, 1] as const) out.push(fillOf(pill(side * 35, 24, 20, 13), spec.muted ? muteColor(spec.blush) : spec.blush));
@@ -488,6 +515,11 @@ const hairPiece = (piece: HairPiece, p: Pal): Part => {
   return "line" in piece ? lineOf(piece.line, color, piece.w) : fillOf(piece.d, color, piece.evenOdd);
 };
 
+const CROP_OUTER = "M-56 -15.5V-50C-58 -76 -38 -88 -8 -89L-1 -96C18 -95 40 -88 51 -73C56 -65 56 -56 56 -50V-15.5Z";
+const CROP_INNER = "M-45 -15.5V-32C-38 -43 -18 -51 6 -48C26 -45 39 -40 45 -32V-15.5Z";
+const BUN_OUTER = "M-56 -15.5V-48C-56 -78 -34 -86 0 -86C34 -86 56 -78 56 -48V-15.5Z";
+const BUN_INNER = "M-45 -15.5V-29C-45 -37 -34 -41 -22 -45C-10 -49 -4 -54 0 -60C4 -54 10 -49 22 -45C34 -41 45 -37 45 -29V-15.5Z";
+
 function hairBack(spec: NpcSpec, p: Pal): Part[] {
   const style = spec.hair.style;
   const shape = shapedHair(style);
@@ -496,7 +528,18 @@ function hairBack(spec: NpcSpec, p: Pal): Part[] {
     const unders = shape.front.flatMap((piece): Part[] => ("under" in piece && piece.under ? [fillOf(piece.under, hairTone(piece.tone, p))] : []));
     return [...(shape.back ?? []).map((piece) => hairPiece(piece, p)), ...unders];
   }
-  return style === "bob" ? [fillOf(tomb(0, -80, 128, 146, 20), p.hair)] : [];
+  if (style === "bob") return [fillOf(tomb(0, -80, 128, 146, 20), p.hair)];
+  if (style === "bun") {
+    return [
+      fillOf(pill(-48, 12, 14, 38), p.hairShade),
+      fillOf(pill(48, 12, 14, 38), p.hairShade),
+      fillOf(circle(0, -95, 24), p.hairShade),
+      fillOf(circle(-1, -92, 21.5), p.hair),
+      fillOf(BUN_OUTER, p.hair),
+    ];
+  }
+  if (style === "crop" || style === "curls") return [fillOf(CROP_OUTER, style === "curls" ? p.hairShade : p.hair)];
+  return [];
 }
 
 /** The fringe: an outer cap (top, height) with the face cut out of it. Its sides end at the top of the ear. */
@@ -514,35 +557,53 @@ export function hairSideBottom(style: HairStyle): number {
 function hairFront(spec: NpcSpec, p: Pal): Part[] {
   const shaped = shapedHair(spec.hair.style);
   if (shaped) return shaped.front.map((piece) => hairPiece(piece, p));
-  const base = fillOf(tomb(0, HAIR_BASE.top, 110, HAIR_BASE.height, 8) + topRound(-39, -42, 78, 32, 18), p.hair, true);
+  const tips = (color: string) => [fillOf(circle(-50.5, -15.5, 5.5), color), fillOf(circle(50.5, -15.5, 5.5), color)];
   switch (spec.hair.style) {
     case "bob":
       return [fillOf(tomb(0, -75, 112, 42, 0), p.hair)];
     case "curls":
-      return [...CURLS.map(([x, y, r]) => fillOf(circle(x, y, r), p.hair)), fillOf(tomb(0, HAIR_BASE.top, 110, HAIR_BASE.height, 8) + topRound(-39, -42, 78, 32, 18), p.hairShade, true)];
+      return [
+        ...CURLS.map(([x, y, r]) => fillOf(circle(x, y, r), p.hair)),
+        fillOf(CROP_OUTER + CROP_INNER, p.hairShade, true),
+        ...tips(p.hairShade),
+      ];
     case "bun":
-      return [fillOf(circle(0, -88, 22), p.hairShade), base];
+      return [
+        fillOf(BUN_OUTER + BUN_INNER, p.hair, true),
+        ...tips(p.hair),
+        fillOf(pill(0, -81, 30, 8.5), p.top),
+        lineOf("M-14 -67Q-6 -61 0 -60", p.hairShade, 3.4),
+        lineOf("M14 -67Q6 -61 0 -60", p.hairShade, 3.4),
+      ];
     case "wrap":
       // A head wrap: a cap in the wrap colour, with a knot on top.
       return [fillOf(rrect(12, -94, 36, 24, 12), p.hairShade), fillOf(tomb(0, HAIR_WRAP.top, 112, HAIR_WRAP.height, 8) + topRound(-40, -42, 80, 32, 18), p.hair, true)];
     default:
-      return [base];
+      return [
+        fillOf(CROP_OUTER + CROP_INNER, p.hair, true),
+        ...tips(p.hair),
+        lineOf("M-23 -78Q-17 -64 -11 -49", p.hairShade, 3.4),
+      ];
   }
 }
 
 function glassesParts(spec: NpcSpec, p: Pal): Part[] {
   if (spec.eyes === "glasses-round") {
     return [
-      lineOf(circle(-EYE.x, EYE.y, 26), p.glasses, 4.6),
-      lineOf(circle(EYE.x, EYE.y, 26), p.glasses, 4.6),
-      lineOf(`M${-EYE.x + 26} ${EYE.y}H${EYE.x - 26}`, p.glasses, 4.6),
+      lineOf(circle(-23.5, EYE.y, 21.5), p.glasses, 4.6),
+      lineOf(circle(23.5, EYE.y, 21.5), p.glasses, 4.6),
+      lineOf("M-2 -10H2", p.glasses, 4.6),
+      lineOf("M-45 -10L-51 -9", p.glasses, 4.6),
+      lineOf("M45 -10L51 -9", p.glasses, 4.6),
     ];
   }
   if (spec.eyes === "glasses-square") {
     return [
-      lineOf(rrect(-EYE.x - 26, EYE.y - 27, 52, 54, 14), p.glasses, 4.6),
-      lineOf(rrect(EYE.x - 26, EYE.y - 27, 52, 54, 14), p.glasses, 4.6),
-      lineOf(`M${-EYE.x + 26} ${EYE.y - 6}H${EYE.x - 26}`, p.glasses, 4.6),
+      lineOf(rrect(-45, EYE.y - 23, 43, 46, 12), p.glasses, 4.6),
+      lineOf(rrect(2, EYE.y - 23, 43, 46, 12), p.glasses, 4.6),
+      lineOf("M-2 -14H2", p.glasses, 4.6),
+      lineOf("M-45 -12L-52 -10", p.glasses, 4.6),
+      lineOf("M45 -12L52 -10", p.glasses, 4.6),
     ];
   }
   return [];
@@ -563,12 +624,14 @@ function wearParts(table: Record<string, WearPiece[]>, wear: WearSpec | undefine
 
 function hatParts(spec: NpcSpec, p: Pal): Part[] {
   if (spec.accent.kind !== "hardhat") return [];
-  return [
-    fillOf(pill(0, -52, 130, 14), p.accentShade),
-    fillOf(tomb(0, -104, 112, 54, 0), p.accent),
-    fillOf(rrect(-9, -104, 18, 46, 8), p.accentShade),
-    fillOf(circle(30, -78, 7), p.eyeWhite),
-  ];
+  const fixed: Record<HardhatTone, string> = {
+    dome: p.accent,
+    brim: p.accentShade,
+    white: p.eyeWhite,
+    core: spec.muted ? muteColor(OFFICIAL.macaw) : OFFICIAL.macaw,
+    bolt: p.accent,
+  };
+  return HARDHAT_PIECES.map((piece) => fillOf(piece.d, fixed[piece.tone]));
 }
 
 // ── body ─────────────────────────────────────────────────────────────────────
@@ -582,6 +645,69 @@ function satchelParts(spec: NpcSpec): Part[] {
   if (spec.accent.kind !== "sample") return [];
   const fixed: Record<SatchelTone, string> = { strap: OFFICIAL.grizzly, bag: OFFICIAL.grizzly, bagShade: CUSTOM.skinBrown[1], badge: OFFICIAL.bee, ink: FACE.pupil };
   return SATCHEL_PIECES.map((piece) => fillOf(piece.d, spec.muted ? muteColor(fixed[piece.tone]) : fixed[piece.tone]));
+}
+
+/** Mina's clinician stethoscope draped round the neck: the diaphragm chestpiece on the right chest, the binaural earpieces on the left. */
+function stethoscopeParts(spec: NpcSpec, p: Pal): Part[] {
+  if (spec.accent.kind !== "stethoscope") return [];
+  const colorOf = (tone: StethoscopeTone): string => (tone === "tube" ? p.accent : tone === "chestRim" ? p.accentShade : p.eyeWhite);
+  return STETHOSCOPE_PIECES.map((piece): Part => ("line" in piece ? lineOf(piece.line, colorOf(piece.tone), piece.w) : fillOf(piece.d, colorOf(piece.tone))));
+}
+
+/** Sage's policy research folio bag: the cross-body strap over their right shoulder and the hip folio with tabs and a balance-scale emblem. */
+function folioBagParts(spec: NpcSpec, p: Pal): Part[] {
+  if (spec.accent.kind !== "notebook") return [];
+  const fixed: Record<FolioBagTone, string> = {
+    strap: p.accentShade,
+    bag: p.accent,
+    bagShade: p.accentShade,
+    white: FACE.eyeWhite,
+    gold: OFFICIAL.bee,
+    leaf: OFFICIAL.featherGreen,
+  };
+  return FOLIO_BAG_PIECES.map((piece) => fillOf(piece.d, spec.muted && piece.tone !== "white" ? muteColor(fixed[piece.tone]) : fixed[piece.tone]));
+}
+
+/** Kofi's engineer tool pouch: the cross-body strap over his right shoulder and the hip pouch with a wrench and power bolt. */
+function toolBeltParts(spec: NpcSpec, p: Pal): Part[] {
+  if (spec.accent.kind !== "hardhat") return [];
+  const fixed: Record<ToolBeltTone, string> = {
+    strap: OFFICIAL.narwhal,
+    pouch: OFFICIAL.narwhal,
+    pouchTop: OFFICIAL.humpback,
+    metal: OFFICIAL.anchovy,
+    bolt: p.accent,
+  };
+  return TOOL_BELT_PIECES.map((piece) => fillOf(piece.d, spec.muted ? muteColor(fixed[piece.tone]) : fixed[piece.tone]));
+}
+
+/** Tess's portable field gadget pack: the cross-body strap over her right shoulder and the scanner pack with antenna at her hip. */
+function gadgetPackParts(spec: NpcSpec, p: Pal): Part[] {
+  if (spec.accent.kind !== "vial") return [];
+  const fixed: Record<GadgetPackTone, string> = {
+    strap: OFFICIAL.narwhal,
+    pack: OFFICIAL.narwhal,
+    packTop: p.topShade,
+    screen: p.accent,
+    led: OFFICIAL.bee,
+    white: FACE.eyeWhite,
+  };
+  return GADGET_PACK_PIECES.map((piece) => fillOf(piece.d, spec.muted && piece.tone !== "white" ? muteColor(fixed[piece.tone]) : fixed[piece.tone]));
+}
+
+/** Ray's hand-held radiation counter: the utility strap over his right shoulder and the holstered counter with its probe at his hip. */
+function counterParts(spec: NpcSpec): Part[] {
+  if (spec.accent.kind !== "clipboard") return [];
+  const fixed: Record<CounterTone, string> = {
+    strap: OFFICIAL.butterfly,
+    probeTip: OFFICIAL.fox,
+    counter: OFFICIAL.bee,
+    counterShade: OFFICIAL.fox,
+    white: FACE.eyeWhite,
+    needle: OFFICIAL.cardinal,
+    ink: FACE.pupil,
+  };
+  return COUNTER_PIECES.map((piece) => fillOf(piece.d, spec.muted && piece.tone !== "white" ? muteColor(fixed[piece.tone]) : fixed[piece.tone]));
 }
 
 /** A cool, slightly darker step of a colour: the lapels and pockets of a pale coat (white goes to a pale blue, never grey). */
@@ -614,31 +740,71 @@ function torsoParts(spec: NpcSpec, p: Pal, bottom: number = TORSO.bottom, bust =
         case "tanShade": return OFFICIAL.monkey;
         case "violet": return OFFICIAL.beetle;
         case "violetShade": return OFFICIAL.betta;
+        case "ink": return FACE.pupil;
+        case "blue": return OFFICIAL.humpback;
       }
     };
-    for (const piece of EXTRA_OUTFIT_ART[spec.outfit.kind].pieces) out.push("line" in piece ? lineOf(piece.line, outfitColor(piece.tone), piece.w) : fillOf(piece.d, outfitColor(piece.tone), piece.evenOdd));
-    out.push(...satchelParts(spec));
+    for (const piece of EXTRA_OUTFIT_ART[spec.outfit.kind].pieces) {
+      const raw = outfitColor(piece.tone);
+      const color = spec.muted && piece.tone !== "white" ? muteColor(raw) : raw;
+      out.push("line" in piece ? lineOf(piece.line, color, piece.w) : fillOf(piece.d, color, piece.evenOdd));
+    }
+    out.push(...satchelParts(spec), ...counterParts(spec), ...stethoscopeParts(spec, p), ...gadgetPackParts(spec, p), ...toolBeltParts(spec, p), ...folioBagParts(spec, p));
     return out;
   }
   switch (spec.outfit.kind) {
     case "sweater":
-      out.push(body(TORSO.width, p.top), fillOf(pill(0, 70, 40, 14), p.topShade));
+      out.push(
+        body(TORSO.width, p.top),
+        fillOf(pill(0, 71, 48, 17), p.topShade),
+        ...[-14, -7, 0, 7, 14].map((x) => lineOf(`M${x} 66V76`, p.top, 2.4)),
+        fillOf(pill(0, 66, 34, 9), p.collar),
+        lineOf("M-38 92V145", p.topShade, 3.4),
+        lineOf("M38 92V145", p.topShade, 3.4),
+      );
       break;
     case "hoodie":
       out.push(
-        fillOf(pill(0, 74, 70, 22), p.topShade),
+        fillOf(pill(0, 73, 76, 24), p.topShade),
         body(148, p.top),
-        fillOf(pill(0, 72, 46, 16), p.topShade),
-        lineOf("M-9 82V108", p.collar, 4.6),
-        lineOf("M9 82V104", p.collar, 4.6),
+        fillOf(rtri([-13, 73], [13, 73], [0, 91], 3), p.topShade),
+        fillOf(pill(0, 71, 48, 16), p.topShade),
+        fillOf(rrect(-36, 122, 72, 34, 10), p.topShade),
+        fillOf(rrect(-30, 126, 60, 26, 7), p.top),
+        lineOf("M-11 79V101", p.collar, 4.6),
+        lineOf("M11 79V97", p.collar, 4.6),
+        fillOf(circle(-11, 102, 3.4), p.topShade),
+        fillOf(circle(11, 98, 3.4), p.topShade),
       );
       break;
     case "coat":
-      // An open coat over a shirt: the inner shirt is a V, and the coat edges are the lapels.
-      out.push(body(TORSO.width, p.top), fillOf(rtri([-30, top - 2], [30, top - 2], [0, 134], 8), p.collar), fillOf(pill(0, 70, 34, 12), p.topShade));
+      // A varsity jacket: striped rib-knit collar, contrast snap-button placket, angled welt pockets and a golden chest patch.
+      out.push(
+        body(TORSO.width, p.top),
+        fillOf(pill(0, 70, 50, 18), p.topShade),
+        fillOf(pill(0, 69, 38, 8), p.collar),
+        fillOf(rrect(-7, 77, 14, bottom - 77, 4), p.topShade),
+        ...[90, 108, 126, 144].map((y) => fillOf(circle(0, y, 3.2), p.eyeWhite)),
+        fillOf(rrect(18, 92, 24, 24, 6), spec.muted ? muteColor(OFFICIAL.bee) : OFFICIAL.bee),
+        fillOf(circle(30, 104, 6), p.topShade),
+        fillOf(circle(30, 104, 2.5), p.eyeWhite),
+        lineOf("M-40 124L-26 142", p.collar, 4),
+        lineOf("M40 124L26 142", p.collar, 4),
+      );
       break;
     case "vest":
-      out.push(body(TORSO.width, p.top), fillOf(rtri([-30, top - 2], [30, top - 2], [0, 122], 8), p.collar), fillOf(pill(0, 70, 34, 12), p.collar));
+      // A preppy argyle sweater vest over a collared shirt: V-neck shirt inset, white collar flaps, ribbed V-trim and chest diamonds.
+      out.push(
+        body(TORSO.width, p.top),
+        fillOf(rtri([-30, top - 2], [30, top - 2], [0, 124], 8), p.collar),
+        lineOf("M-28 70L0 120L28 70", p.topShade, 7),
+        fillOf(rtri([-26, 66], [-4, 71], [-14, 90], 4), p.eyeWhite),
+        fillOf(rtri([26, 66], [4, 71], [14, 90], 4), p.eyeWhite),
+        fillOf(circle(0, 86, 2.4), p.eyeWhite),
+        fillOf(circle(0, 100, 2.4), p.eyeWhite),
+        ...[-34, 0, 34].map((x) => fillOf(`M${x} 126L${x + 11} 138L${x} 150L${x - 11} 138Z`, p.topShade)),
+        ...[-17, 17].map((x) => fillOf(`M${x} 131L${x + 7} 138L${x} 145L${x - 7} 138Z`, p.eyeWhite)),
+      );
       break;
     case "apron": {
       // Ada's lab outfit: puffed shoulders behind the arms' sleeves, then the apron, collar and badge over a shirt in the outfit colour
@@ -659,14 +825,19 @@ function torsoParts(spec: NpcSpec, p: Pal, bottom: number = TORSO.bottom, bust =
       break;
     }
     case "shirt":
-      // A V-neck shirt (work shirt, scrubs): the V shows skin.
-      out.push(body(TORSO.width, p.top), fillOf(rtri([-26, top - 2], [26, top - 2], [0, 112], 8), p.skin), fillOf(pill(0, 70, 34, 12), p.topShade));
+      // A Henley shirt: contrast ringer neckband, 3-button placket and a stitched chest pocket with white welt trim.
+      out.push(
+        body(TORSO.width, p.top),
+        fillOf(rrect(-7, 74, 14, 46, 5), p.topShade),
+        fillOf(pill(0, 70, 48, 16), p.eyeWhite),
+        fillOf(pill(0, 67, 32, 10), p.skin),
+        ...[85, 97, 109].map((y) => fillOf(circle(0, y, 2.6), p.eyeWhite)),
+        fillOf(rrect(18, 102, 28, 28, 6), p.topShade),
+        fillOf(rrect(18, 102, 28, 7, 3), p.eyeWhite),
+      );
       break;
   }
-  if (spec.accent.kind === "stethoscope") {
-    out.push(lineOf("M-30 74Q-38 138 0 142Q38 138 30 74", p.accent, 7), fillOf(circle(0, 146, 11), p.accentShade));
-  }
-  out.push(...satchelParts(spec));
+  out.push(...satchelParts(spec), ...counterParts(spec), ...stethoscopeParts(spec, p), ...gadgetPackParts(spec, p), ...toolBeltParts(spec, p), ...folioBagParts(spec, p));
   // The watch is on the wrist, and the bust has no arms
   if (spec.accent.kind === "watch" && !bust) {
     out.push(lineOf("M-26 96Q-14 126 26 122", p.accentShade, 3.4), fillOf(circle(30, 124, 12), p.accent), fillOf(circle(30, 124, 7.5), p.eyeWhite), lineOf("M30 124V119M30 124L34 126", p.pupil, 2.4));
@@ -737,23 +908,32 @@ function armParts(a: ArmSpec, p: Pal, only?: "sleeve" | "hand"): Part[] {
 
 // ── held props ───────────────────────────────────────────────────────────────
 
-function heldProp(kind: PropKind, hx: number, hy: number, p: Pal): Part[] {
+function heldProp(kind: PropKind, hx: number, hy: number, p: Pal, muted = false): Part[] {
   switch (kind) {
     case "marble":
       return [fillOf(circle(hx, hy - 34, 19), p.accentShade), fillOf(circle(hx, hy - 36, 19), p.accent), fillOf(circle(hx - 7, hy - 43, 4.5), p.eyeWhite)];
-    case "clipboard":
+    case "clipboard": {
+      const toneOf = (tone: ClipboardTone): string => {
+        switch (tone) {
+          case "board": return p.accent;
+          case "boardShade": return p.accentShade;
+          case "paper": return p.eyeWhite;
+          case "clip": return p.pupil;
+          case "check": return p.top === OFFICIAL.featherGreen ? OFFICIAL.macaw : p.pupil;
+          case "rule": return p.topShade;
+          case "star": return p.accent;
+          case "penCap": return p.mouth;
+        }
+      };
+      return clipboardPieces(hx, hy).map((piece) => fillOf(piece.d, toneOf(piece.tone)));
+    }
+    case "vial": {
+      const toneOf = (tone: VialTone): string => (tone === "glass" ? OFFICIAL.iguana : tone === "liquid" ? p.accent : tone === "cap" ? p.topShade : tone === "capTop" ? p.accentShade : p.eyeWhite);
       return [
-        fillOf(rrect(hx - 26, hy - 66, 52, 68, 8), p.accentShade),
-        fillOf(rrect(hx - 22, hy - 62, 44, 60, 5), p.eyeWhite),
-        fillOf(pill(hx, hy - 64, 24, 11), p.accent),
-        lineOf(`M${hx - 13} ${hy - 44}H${hx + 13}M${hx - 13} ${hy - 32}H${hx + 13}M${hx - 13} ${hy - 20}H${hx + 4}`, p.accent, 4),
+        ...vialPieces(hx, hy).map((piece) => fillOf(piece.d, toneOf(piece.tone))),
+        lineOf(`M${hx - 22} ${hy - 54}L${hx - 29} ${hy - 60}M${hx + 22} ${hy - 54}L${hx + 29} ${hy - 60}M${hx + 24} ${hy - 38}H${hx + 32}`, p.accent, 4),
       ];
-    case "vial":
-      return [
-        fillOf(rrect(hx - 11, hy - 58, 22, 52, 11), p.eyeWhite),
-        fillOf(rrect(hx - 11, hy - 32, 22, 26, 11), p.accent),
-        fillOf(pill(hx, hy - 61, 18, 9), p.accentShade),
-      ];
+    }
     case "flask": {
       // A round-bottomed flask with a glowing green liquid, sat on the raised hand: glass, liquid, a pale shine and a few sparks
       const y = hy - 18;
@@ -774,12 +954,44 @@ function heldProp(kind: PropKind, hx: number, hy: number, p: Pal): Part[] {
         ...samplePieces(hx, hy).map((piece) => fillOf(piece.d, piece.tone === "main" ? p.accent : p.accentShade)),
         lineOf(`M${hx - 24} ${hy - 62}L${hx - 30} ${hy - 70}M${hx + 24} ${hy - 62}L${hx + 30} ${hy - 70}M${hx} ${hy - 68}V${hy - 77}`, OFFICIAL.bee, 4),
       ];
-    case "notebook":
-      return [
-        fillOf(rrect(hx - 25, hy - 62, 50, 64, 8), p.accentShade),
-        fillOf(rrect(hx - 20, hy - 62, 45, 64, 8), p.accent),
-        fillOf(rrect(hx - 8, hy - 50, 24, 12, 6), p.eyeWhite),
-      ];
+    case "notebook": {
+      const gold = muted ? muteColor(OFFICIAL.bee) : OFFICIAL.bee;
+      const leaf = muted ? muteColor(OFFICIAL.featherGreen) : OFFICIAL.featherGreen;
+      const toneOf = (tone: NotebookTone): string => {
+        switch (tone) {
+          case "cover": return p.accent;
+          case "coverShade": return p.accentShade;
+          case "white": return p.eyeWhite;
+          case "gold": return gold;
+          case "leaf": return leaf;
+          case "coral": return p.top;
+          case "rule": return p.accentShade;
+        }
+      };
+      return notebookPieces(hx, hy).map((piece) => fillOf(piece.d, toneOf(piece.tone)));
+    }
+    case "stethoscope": {
+      const toneOf = (tone: DoseCardTone): string => {
+        switch (tone) {
+          case "frame": return p.accent;
+          case "frameShade": return p.accentShade;
+          case "paper": return p.eyeWhite;
+          case "heart": return p.tongue;
+          case "low": return p.top;
+          case "mid": return p.accent;
+          case "high": return p.accentShade;
+          case "rule": return p.topShade;
+        }
+      };
+      return doseCardPieces(hx, hy).map((piece) => fillOf(piece.d, toneOf(piece.tone)));
+    }
+    case "hardhat": {
+      const bp = muted ? muteColor(OFFICIAL.humpback) : OFFICIAL.humpback;
+      const bpShade = muted ? muteColor(OFFICIAL.narwhal) : OFFICIAL.narwhal;
+      const bpRoll = muted ? muteColor(OFFICIAL.blueJay) : OFFICIAL.blueJay;
+      const toneOf = (tone: BlueprintTone): string => (tone === "bp" ? bp : tone === "bpShade" ? bpShade : tone === "bpRoll" ? bpRoll : tone === "bolt" ? p.accent : p.eyeWhite);
+      return blueprintPieces(hx, hy).map((piece) => fillOf(piece.d, toneOf(piece.tone)));
+    }
     default:
       return [];
   }
@@ -857,7 +1069,7 @@ export function buildNpc(spec: NpcSpec, pose: PoseId = "idle", form: NpcForm = "
   const bust = form === "bust";
   // The bust is the head and a strip of shirt: no arms, and the shirt ends in rounded corners at the bottom of the crop
   const arms = bust ? [] : def.arms;
-  const holdsProp = def.holds && ["marble", "clipboard", "vial", "notebook", "flask", "sample"].includes(spec.accent.kind);
+  const holdsProp = def.holds && ["marble", "clipboard", "vial", "notebook", "flask", "sample", "stethoscope", "hardhat"].includes(spec.accent.kind);
   const handArm = arms.find((a) => a.handOver);
   const back: Part[] = [
     ...hairBack(spec, p),
@@ -867,7 +1079,7 @@ export function buildNpc(spec: NpcSpec, pose: PoseId = "idle", form: NpcForm = "
   ];
   const front: Part[] = [
     ...arms.filter((a) => a.front).flatMap((a) => armParts(a, p, a.handOver ? "sleeve" : undefined)),
-    ...(holdsProp && handArm ? heldProp(spec.accent.kind, handArm.to[0], handArm.to[1], p) : []),
+    ...(holdsProp && handArm ? heldProp(spec.accent.kind, handArm.to[0], handArm.to[1], p, Boolean(spec.muted)) : []),
     ...arms.filter((a) => a.front && a.handOver).flatMap((a) => armParts(a, p, "hand")),
   ];
   return {

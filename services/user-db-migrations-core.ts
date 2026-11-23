@@ -50,7 +50,17 @@ export interface Migration {
 }
 
 /** Every migration after the baseline, oldest first. Add new ones at the END. */
-export const MIGRATIONS: readonly Migration[] = [];
+export const MIGRATIONS: readonly Migration[] = [
+  {
+    version: 2,
+    name: "add chat_threads.reward_claimed",
+    async up(db) {
+      // A story pays its diamonds once, the first time it is opened; a thread that already exists has not paid yet
+      const columns = await db.getAllAsync<{ name: string }>("PRAGMA table_info(chat_threads)");
+      if (!columns.some((c) => c.name === "reward_claimed")) await db.execAsync("ALTER TABLE chat_threads ADD COLUMN reward_claimed INTEGER NOT NULL DEFAULT 0;");
+    },
+  },
+];
 
 /** The version a database made by this build has. */
 export const latestUserDbVersion = (migrations: readonly Migration[] = MIGRATIONS): number =>

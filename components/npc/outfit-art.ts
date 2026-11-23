@@ -10,11 +10,16 @@
  */
 
 import { APRON_PIECES, APRON_PUFFS, type ApronTone } from "./lab-apron-art.ts";
+import { WORK_VEST_PIECES } from "./kofi-art.ts";
+import { CLINICIAN_PIECES } from "./mina-art.ts";
+import { FIELD_HOODIE_PIECES } from "./ray-art.ts";
+import { SCHOLAR_PIECES } from "./sage-art.ts";
+import { TECH_VEST_PIECES } from "./tess-art.ts";
 
-export type OutfitTone = "main" | "shade" | "collar" | "skin" | "white" | "swan" | "gold" | "red" | "pink" | "collarShade" | "tan" | "tanShade" | "violet" | "violetShade";
+export type OutfitTone = "main" | "shade" | "collar" | "skin" | "white" | "swan" | "gold" | "red" | "pink" | "collarShade" | "tan" | "tanShade" | "violet" | "violetShade" | "ink" | "blue";
 export type OutfitPiece = { d: string; tone: OutfitTone; evenOdd?: boolean } | { line: string; tone: OutfitTone; w: number };
 
-export const EXTRA_OUTFITS = ["turtleneck", "striped", "overalls", "cardigan", "jacket", "polo", "sailor", "hawaiian", "puffer", "tuxedo", "knit", "scarf", "labapron", "whitecoat"] as const;
+export const EXTRA_OUTFITS = ["turtleneck", "striped", "overalls", "cardigan", "jacket", "polo", "sailor", "hawaiian", "puffer", "tuxedo", "knit", "scarf", "labapron", "whitecoat", "fieldhoodie", "clinician", "techvest", "workvest", "scholar", "trainervest", "shinobijacket", "captainvest", "martialgi", "guardian"] as const;
 export type ExtraOutfit = (typeof EXTRA_OUTFITS)[number];
 
 export interface OutfitArt {
@@ -235,6 +240,92 @@ export const EXTRA_OUTFIT_ART: Record<ExtraOutfit, OutfitArt> = {
   // Ada's lab outfit: a shirt in the learner's colour with puffed shoulders and a white round collar, under a tan apron with a violet radiation badge
   labapron: {
     pieces: [...APRON_PUFFS, ...APRON_PIECES].map((piece): OutfitPiece => ({ d: piece.d, tone: APRON_TONES[piece.tone] })),
+  },
+  // Ray's field hoodie: a sculpted hood with drawstrings and gold toggles, a half-zip placket, a clip-on chest dosimeter badge and a front kangaroo pocket
+  fieldhoodie: {
+    pieces: FIELD_HOODIE_PIECES.map((piece): OutfitPiece => ({ d: piece.d, tone: piece.tone })),
+  },
+  // Mina's clinician coat: notched lapels over a V-neck scrub top, a red heart lapel pin, a clip-on monthly dose badge and a lower pocket
+  clinician: {
+    pieces: CLINICIAN_PIECES.map((piece): OutfitPiece => ({ d: piece.d, tone: piece.tone })),
+  },
+  // Tess's tech vest: standing collar, center zip with gold pull, chest tracer-sensor module, clipped styluses and lower utility pocket
+  techvest: {
+    pieces: TECH_VEST_PIECES.map((piece): OutfitPiece => ({ d: piece.d, tone: piece.tone })),
+  },
+  // Kofi's hi-vis engineer vest: V-neck inner work shirt, reflective shoulder and waist bands, zip placket, clearance badge and pocket
+  workvest: {
+    pieces: WORK_VEST_PIECES.map((piece): OutfitPiece => ({ d: piece.d, tone: piece.tone })),
+  },
+  // Sage's scholarly cardigan: collared shirt inset, tie tab, shawl lapels, golden leaf pin, chest pocket with fountain pen and buttons
+  scholar: {
+    pieces: SCHOLAR_PIECES.map((piece): OutfitPiece => ({ d: piece.d, tone: piece.tone })),
+  },
+  // Anime League Trainer Jacket: dark inner tee, white shoulder stripe and standing collar, gold front zip and gold-flapped pockets
+  trainervest: {
+    pieces: [
+      fill(band(82, 90), "white"),
+      fill(roundPoly([[-28, 64], [28, 64], [0, 114]], 6), "ink"),
+      ...pair([[-38, 72], [-18, 62], [-4, 88], [-22, 95]], 5, "white"),
+      line("M0 92V250", "gold", 3.6),
+      fill(circle(0, 100, 4.5), "gold"),
+      fill(circle(0, 100, 1.8), "shade"),
+      fill(rrect(-46, 104, 26, 20, 5), "shade"),
+      fill(rrect(20, 104, 26, 20, 5), "shade"),
+      fill(rrect(-46, 104, 26, 6, 3), "gold"),
+      fill(rrect(20, 104, 26, 6, 3), "gold"),
+    ],
+  },
+  // Shinobi tracksuit (Naruto-inspired): dark shoulder yoke, tall white zip collar, center zip track and spiral crest badge
+  shinobijacket: {
+    pieces: [
+      fill(band(72, 106), "ink"),
+      fill(rrect(-32, 58, 64, 28, 12), "white"),
+      fill(rrect(-28, 62, 56, 20, 9), "swan"),
+      line("M0 60V250", "swan", 3.6),
+      fill(circle(0, 88, 4), "gold"),
+      fill(circle(32, 126, 12), "white"),
+      fill(circle(32, 126, 8.5), "red"),
+      fill(circle(32, 126, 4.5), "white"),
+      fill(circle(32, 126, 2), "red"),
+    ],
+  },
+  // Pirate captain vest (Luffy-inspired): open front vest with a bare V-chest, gold round buttons and stitched buttonholes
+  captainvest: {
+    pieces: [
+      fill(roundPoly([[-24, 64], [24, 64], [8, 155], [-8, 155]], 6), "skin"),
+      ...pair([[-30, 68], [-20, 64], [-6, 155], [-16, 155]], 4, "shade"),
+      ...[88, 110, 132].map((y) => fill(circle(-21, y, 4.8), "gold")),
+      ...[88, 110, 132].map((y) => line(`M17 ${y}H25`, "shade", 3.2)),
+    ],
+  },
+  // Martial fighter gi (Goku-inspired): crossover gi lapels over a deep blue undershirt with a master emblem crest on the chest
+  martialgi: {
+    pieces: [
+      fill(roundPoly([[-38, 66], [38, 66], [0, 134]], 8), "blue"),
+      fill(roundPoly([[-22, 64], [22, 64], [0, 98]], 6), "skin"),
+      ...pair([[-46, 74], [-34, 65], [0, 134], [-14, 134]], 5, "shade"),
+      fill(circle(32, 122, 13.5), "white"),
+      fill(circle(32, 122, 11), "ink"),
+      fill(circle(32, 122, 8.5), "white"),
+      line("M27 119H37M32 116V128M27 125H37", "ink", 2.4),
+    ],
+  },
+  // Moon guardian sailor suit (Sailor Moon-inspired): striped sailor collar, bare V-neck, big ribbon bow and golden crescent brooch
+  guardian: {
+    body: "collar",
+    pieces: [
+      ...pair([[-56, 82], [-18, 63], [-2, 102], [-10, 115], [-48, 110]], 6, "main"),
+      line("M-46 99L-12 107", "white", 3),
+      line("M46 99L12 107", "white", 3),
+      fill(roundPoly([[0, 100], [-24, 86], [-22, 114]], 5), "red"),
+      fill(roundPoly([[0, 100], [24, 86], [22, 114]], 5), "red"),
+      fill(roundPoly([[-4, 102], [-16, 136], [-5, 132]], 3), "red"),
+      fill(roundPoly([[4, 102], [16, 136], [5, 132]], 3), "red"),
+      fill(circle(0, 100, 8), "gold"),
+      fill(circle(0, 100, 4.5), "red"),
+      fill(circle(-1.5, 98.5, 1.5), "white"),
+    ],
   },
 };
 

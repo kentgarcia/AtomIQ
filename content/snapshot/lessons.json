@@ -24,7 +24,7 @@
       "unit_id": "inside-the-atom",
       "title": "Atoms are everywhere",
       "description": "Everything you can touch, and the air around you, is made of atoms. You will see what counts as matter and what does not. Then you will feel how small an atom is.",
-      "estimated_minutes": 4,
+      "estimated_minutes": 5,
       "xp_reward": 40,
       "teaches": [
         "u1-matter-is-atoms",
@@ -33,11 +33,26 @@
       "relies_on": []
     },
     {
+      "id": "becquerel-gray-sievert",
+      "unit_id": "radiation-meets-matter",
+      "title": "Becquerel, gray and sievert",
+      "description": "Three units answer three different questions about radiation. You will learn what the becquerel, the gray and the sievert each measure, and why a big number in one tells you nothing about the others.",
+      "estimated_minutes": 6,
+      "xp_reward": 50,
+      "teaches": [
+        "u3-three-units",
+        "u3-unit-not-dose"
+      ],
+      "relies_on": [
+        "u3-detectors"
+      ]
+    },
+    {
       "id": "decay-chains",
       "unit_id": "radioactivity",
       "title": "Decay chains",
       "description": "One decay is not always the end. You will follow a nucleus that changes again and again, and see that every change makes a different nucleus and nothing simply vanishes.",
-      "estimated_minutes": 4,
+      "estimated_minutes": 5,
       "xp_reward": 50,
       "teaches": [
         "u2-decay-chain",
@@ -45,6 +60,36 @@
       ],
       "relies_on": [
         "u2-parent-daughter"
+      ]
+    },
+    {
+      "id": "detecting-radiation",
+      "unit_id": "radiation-meets-matter",
+      "title": "Detecting radiation",
+      "description": "Radiation is detected and measured with instruments. You will find out why a detector reads something almost anywhere, and how a Geiger counter works.",
+      "estimated_minutes": 6,
+      "xp_reward": 50,
+      "teaches": [
+        "u3-detectors",
+        "u3-background-reading"
+      ],
+      "relies_on": [
+        "u3-ionizing-meaning"
+      ]
+    },
+    {
+      "id": "dose-and-time",
+      "unit_id": "radiation-and-the-body",
+      "title": "All at once or over time",
+      "description": "The same amount of radiation can mean very different things depending on how fast it arrives. You will compare a big, fast dose with a small one spread over time.",
+      "estimated_minutes": 5,
+      "xp_reward": 50,
+      "teaches": [
+        "u4-large-fast",
+        "u4-small-spread"
+      ],
+      "relies_on": [
+        "u4-cell-repair"
       ]
     },
     {
@@ -79,6 +124,36 @@
       ]
     },
     {
+      "id": "ionizing-or-not",
+      "unit_id": "radiation-meets-matter",
+      "title": "Ionizing or not",
+      "description": "Radiation can knock electrons out of atoms, or it can fall short. You will find out what ionizing means, and which common kinds of radiation are on which side.",
+      "estimated_minutes": 5,
+      "xp_reward": 50,
+      "teaches": [
+        "u3-ionizing-meaning",
+        "u3-sort-radiation"
+      ],
+      "relies_on": [
+        "u2-recognise-radiation"
+      ]
+    },
+    {
+      "id": "irradiated-or-contaminated",
+      "unit_id": "radiation-meets-matter",
+      "title": "Exposed or contaminated",
+      "description": "Standing near a source of radiation is not the same as having radioactive material on you. You will find out the difference, and when each one ends.",
+      "estimated_minutes": 6,
+      "xp_reward": 50,
+      "teaches": [
+        "u3-exposure-vs-contamination",
+        "u3-exposure-ends"
+      ],
+      "relies_on": [
+        "u3-ionizing-meaning"
+      ]
+    },
+    {
       "id": "isotopes",
       "unit_id": "inside-the-atom",
       "title": "Isotopes",
@@ -110,6 +185,21 @@
       ]
     },
     {
+      "id": "radiation-and-cells",
+      "unit_id": "radiation-and-the-body",
+      "title": "Radiation and your cells",
+      "description": "Radiation can damage the DNA in a cell, yet an everyday dose does not make anyone ill. You will see why, and what repair has to do with it.",
+      "estimated_minutes": 5,
+      "xp_reward": 50,
+      "teaches": [
+        "u4-cell-damage",
+        "u4-cell-repair"
+      ],
+      "relies_on": [
+        "u3-exposure-vs-contamination"
+      ]
+    },
+    {
       "id": "radioactivity-is-natural",
       "unit_id": "radioactivity",
       "title": "Radioactivity is natural",
@@ -126,6 +216,22 @@
       ]
     },
     {
+      "id": "risk-in-perspective",
+      "unit_id": "radiation-and-the-body",
+      "title": "Risk in perspective",
+      "description": "You will learn three questions to ask about any radiation number, then use them on headlines that sound frightening.",
+      "estimated_minutes": 6,
+      "xp_reward": 50,
+      "teaches": [
+        "u4-three-questions",
+        "u4-read-a-number"
+      ],
+      "relies_on": [
+        "u4-everyone-dose",
+        "u4-small-spread"
+      ]
+    },
+    {
       "id": "stable-and-unstable-nuclei",
       "unit_id": "inside-the-atom",
       "title": "Stable and unstable nuclei",
@@ -139,6 +245,54 @@
       "relies_on": [
         "u1-nucleus",
         "u1-isotope-definition"
+      ]
+    },
+    {
+      "id": "the-dose-scale",
+      "unit_id": "radiation-and-the-body",
+      "title": "The dose scale",
+      "description": "Radioactive does not always mean dangerous. You will learn how doses are counted, what an ordinary year adds up to, and where a scan or an illness sits on the scale.",
+      "estimated_minutes": 5,
+      "xp_reward": 50,
+      "teaches": [
+        "u4-everyone-dose",
+        "u4-dose-steps"
+      ],
+      "relies_on": [
+        "u2-not-always-dangerous",
+        "u3-three-units"
+      ]
+    },
+    {
+      "id": "time-distance-shielding",
+      "unit_id": "radiation-and-the-body",
+      "title": "Time, distance, shielding",
+      "description": "There are three ways to lower a dose. You will meet each one, then spot which one a real situation is using.",
+      "estimated_minutes": 6,
+      "xp_reward": 50,
+      "teaches": [
+        "u4-three-ways",
+        "u4-pick-the-way"
+      ],
+      "relies_on": [
+        "u4-small-spread",
+        "u3-gamma-shielding"
+      ]
+    },
+    {
+      "id": "what-stops-what",
+      "unit_id": "radiation-meets-matter",
+      "title": "What stops what",
+      "description": "Alpha, beta and gamma travel very different distances through things. You will find out what stops each one, and why gamma rays need something thick and dense.",
+      "estimated_minutes": 6,
+      "xp_reward": 50,
+      "teaches": [
+        "u3-penetration",
+        "u3-gamma-shielding"
+      ],
+      "relies_on": [
+        "u2-recognise-radiation",
+        "u3-ionizing-meaning"
       ]
     },
     {

@@ -36,6 +36,38 @@
       "difficulty": "intermediate"
     },
     {
+      "id": "acute-radiation-syndrome",
+      "term": "Acute radiation syndrome",
+      "definition": "Acute radiation syndrome is the illness caused by a very high radiation exposure delivered over a short period of time. The dose threshold is about 1 sievert (1000 millisieverts). It can cause symptoms such as nausea and vomiting within hours. The everyday doses people receive are far below it.",
+      "category": "safety",
+      "related_terms": [
+        "sievert",
+        "dose-rate",
+        "absorbed-dose"
+      ],
+      "quick_facts": [
+        "Needs a very large dose in a short time",
+        "The threshold is about 1 sievert, or 1000 millisieverts",
+        "Symptoms such as nausea and vomiting can start within hours"
+      ],
+      "sources": [
+        {
+          "organization": "U.S. Environmental Protection Agency",
+          "title": "Radiation Health Effects",
+          "url": "https://www.epa.gov/radiation/radiation-health-effects"
+        },
+        {
+          "organization": "World Health Organization",
+          "title": "Ionizing radiation and health effects",
+          "url": "https://www.who.int/news-room/fact-sheets/detail/ionizing-radiation-and-health-effects"
+        }
+      ],
+      "image": null,
+      "debunking_snippet": "“Any radiation exposure leads to radiation sickness.” Exposure to the low levels of radiation in the environment does not cause immediate health effects. Acute radiation syndrome needs about 1000 millisieverts in a short time.",
+      "related_myths": [],
+      "difficulty": "beginner"
+    },
+    {
       "id": "alpha-decay",
       "term": "Alpha Decay",
       "definition": "A kind of radioactive decay in which a nucleus gives off an alpha particle: 2 protons and 2 neutrons stuck together, the nucleus of a helium atom. The nucleus that is left has 2 fewer protons and 2 fewer neutrons, so it is a different element. Alpha decay is common in very heavy nuclei such as uranium.",
@@ -745,6 +777,32 @@
       "debunking_snippet": "“Nuclear plants are safe only if nothing ever goes wrong.” The design assumes things WILL go wrong — equipment failures, operator errors, even floods — and layers backup after backup on top of each failure.",
       "related_myths": [],
       "difficulty": "intermediate"
+    },
+    {
+      "id": "dna",
+      "term": "DNA",
+      "definition": "DNA is the genetic material in living cells. Ionizing radiation has enough energy to affect the atoms in living cells, and so it can damage DNA. Cells are extremely efficient at repairing this damage, but if it is not repaired correctly a cell may die or eventually become cancerous.",
+      "category": "science",
+      "related_terms": [
+        "ionizing-radiation",
+        "absorbed-dose"
+      ],
+      "quick_facts": [
+        "The genetic material inside living cells",
+        "Ionizing radiation can damage it",
+        "Cells are extremely efficient at repairing the damage"
+      ],
+      "sources": [
+        {
+          "organization": "U.S. Environmental Protection Agency",
+          "title": "Radiation Health Effects",
+          "url": "https://www.epa.gov/radiation/radiation-health-effects"
+        }
+      ],
+      "image": null,
+      "debunking_snippet": "“Radiation damage to a cell can never be undone.” The cells in our bodies are extremely efficient at repairing this damage.",
+      "related_myths": [],
+      "difficulty": "beginner"
     },
     {
       "id": "dose-rate",
@@ -1781,6 +1839,40 @@
       "difficulty": "intermediate"
     },
     {
+      "id": "irradiation",
+      "term": "Irradiation",
+      "definition": "Exposure to radiation that comes from a source outside the body, such as the X-rays of a medical exposure. External irradiation stops when the radiation source is shielded or when the person moves outside the radiation field. It is different from contamination, which means radioactive material is on or in the person.",
+      "category": "science",
+      "related_terms": [
+        "radioactive-contamination",
+        "exposure",
+        "ionizing-radiation",
+        "shielding"
+      ],
+      "quick_facts": [
+        "Being in the path of radiation from a source",
+        "A medical X-ray is irradiation from a source outside the body",
+        "External irradiation stops when the source is shielded or you move away",
+        "It is not the same as contamination"
+      ],
+      "sources": [
+        {
+          "organization": "World Health Organization",
+          "title": "Ionizing radiation and health effects",
+          "url": "https://www.who.int/news-room/fact-sheets/detail/ionizing-radiation-and-health-effects"
+        },
+        {
+          "organization": "Health Physics Society",
+          "title": "What Is Radioactive Contamination?",
+          "url": "https://hps.org/ate_faq/radcontamination/"
+        }
+      ],
+      "image": null,
+      "debunking_snippet": "“Being near radiation means you are contaminated.” Irradiation is being in the path of radiation. Contamination is radioactive material on or in you. They are not the same thing.",
+      "related_myths": [],
+      "difficulty": "beginner"
+    },
+    {
       "id": "isotope",
       "term": "Isotope",
       "definition": "One of the variants of a chemical element: same number of protons, different numbers of neutrons, so the same chemistry but a different mass. Chemist Frederick Soddy coined the name in 1913 — Greek for 'same place', since isotopes occupy the same spot on the periodic table. Every element has them; some are stable forever (carbon-12), others radioactive and decaying at fixed rates (carbon-14). Which isotope you have determines everything about its nuclear behavior while changing nothing about its chemistry.",
@@ -2202,6 +2294,38 @@
       "debunking_snippet": "“A meltdown means thousands die instantly.” The worst-case isn't automatic: TMI's core half-melted and harmed no one — because containment did its job. Consequences depend entirely on barriers, not just the melting itself.",
       "related_myths": [],
       "difficulty": "intermediate"
+    },
+    {
+      "id": "millisievert",
+      "term": "Millisievert",
+      "definition": "A millisievert (mSv) is one thousandth of a sievert, the unit used to count a radiation dose. Everyday doses are small, so they are usually given in millisieverts. The average person in the United States gets about 6.2 millisieverts a year, and most of it is natural background radiation.",
+      "category": "science",
+      "related_terms": [
+        "sievert",
+        "absorbed-dose",
+        "background-radiation"
+      ],
+      "quick_facts": [
+        "One thousandth of a sievert",
+        "1 sievert is 1000 millisieverts",
+        "The average yearly dose in the United States is about 6.2 millisieverts"
+      ],
+      "sources": [
+        {
+          "organization": "U.S. Environmental Protection Agency",
+          "title": "Radiation Sources and Doses",
+          "url": "https://www.epa.gov/radiation/radiation-sources-and-doses"
+        },
+        {
+          "organization": "World Health Organization",
+          "title": "Ionizing radiation and health effects",
+          "url": "https://www.who.int/news-room/fact-sheets/detail/ionizing-radiation-and-health-effects"
+        }
+      ],
+      "image": null,
+      "debunking_snippet": "“A radiation number is always frightening.” A number only means something with its unit and a comparison. About 6.2 millisieverts is an average year in the United States, and about 1000 in a short time is where illness starts.",
+      "related_myths": [],
+      "difficulty": "beginner"
     },
     {
       "id": "moderator",
@@ -2763,6 +2887,41 @@
       "difficulty": "beginner"
     },
     {
+      "id": "radioactive-contamination",
+      "term": "Radioactive Contamination",
+      "definition": "Radioactive material that has been deposited on materials, skin, clothing or any place where it is not wanted, or that has been breathed in, swallowed or absorbed through a wound. A person is externally contaminated if the material is on the skin or clothing, and internally contaminated if it is inside the body. The environment is contaminated if radioactive material is spread about or is unconfined. If radioactive material is not in a sealed source container, it might be spread onto other objects.",
+      "category": "science",
+      "related_terms": [
+        "irradiation",
+        "exposure",
+        "radiation",
+        "ionizing-radiation"
+      ],
+      "quick_facts": [
+        "Contamination is radioactive material on or in something",
+        "Radiation itself does not spread; the material does",
+        "Can be on skin or clothes, breathed in or swallowed, or spread about a place",
+        "A contaminated person is exposed until the material is removed",
+        "Material on skin or clothes can often be washed off"
+      ],
+      "sources": [
+        {
+          "organization": "Health Physics Society",
+          "title": "What Is Radioactive Contamination?",
+          "url": "https://hps.org/ate_faq/radcontamination/"
+        },
+        {
+          "organization": "World Health Organization",
+          "title": "Ionizing radiation and health effects",
+          "url": "https://www.who.int/news-room/fact-sheets/detail/ionizing-radiation-and-health-effects"
+        }
+      ],
+      "image": null,
+      "debunking_snippet": "“Radiation spreads onto people.” Radiation does not get on or in people. It is radioactive contamination, the material itself, that can be spread.",
+      "related_myths": [],
+      "difficulty": "beginner"
+    },
+    {
       "id": "radioactive-waste",
       "term": "Radioactive Waste",
       "definition": "Leftover materials carrying radioactive contamination or activation, sorted into classes by activity and lifetime: very-low-level (soil, rubble), low-level (gloves, filters — most of the volume), intermediate (reactor components), and high-level (spent fuel and reprocessing residues — most of the radioactivity, in a tiny package). High-level waste is hot and long-lived, managed by decades of on-site cooling followed by either deep geological disposal or recycling, since roughly 95% of spent fuel's potential energy remains unused.",
@@ -2788,7 +2947,7 @@
           "url": "https://world-nuclear.org/information-library/nuclear-fuel-cycle/nuclear-wastes.aspx"
         }
       ],
-      "image": null,
+      "image": "../../assets/images/terms/Waste (Radioactive).webp",
       "debunking_snippet": "“Nuclear waste stays lethal for millions of years.” The intensely radioactive isotopes burn out fastest — within centuries waste converges toward the radioactivity of the original uranium ore it came from.",
       "related_myths": [],
       "difficulty": "intermediate"
@@ -3387,7 +3546,7 @@
           "url": "https://www.bipm.org/en/measurement-units"
         }
       ],
-      "image": null,
+      "image": "../../assets/images/terms/Watt (W) – Unit of power..webp",
       "debunking_snippet": null,
       "related_myths": [],
       "difficulty": "beginner"
@@ -3447,7 +3606,7 @@
           "url": "https://world-nuclear.org/information-library/nuclear-fuel-cycle/mining-of-uranium"
         }
       ],
-      "image": null,
+      "image": "../../assets/images/terms/yellow cake.webp",
       "debunking_snippet": "“Yellowcake is a step toward building bombs.” As sold, it's overwhelmingly non-fissile U-238 — unusable in weapons without the entire industrial apparatus of conversion and enrichment on top.",
       "related_myths": [],
       "difficulty": "intermediate"

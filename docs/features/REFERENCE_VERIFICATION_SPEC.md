@@ -20,7 +20,9 @@ Why now: the first public release is blocked by the publish gate because every o
 
 ## 2. Non-negotiables
 
-1. **An agent never sets `verified: 1`.** The flag means a person confirmed what the source supports. Agents prepare evidence; the owner (or a named human reviewer) signs off through the ledger in section 5.5. A flag flipped in a file without a ledger entry is an error (`check:review`).
+1. **`verified: 1` means someone read the page and checked each claim against it.** Original rule: only a person sets it, through the ledger in section 5.5 (a flag flipped in a file without a ledger entry is an error in `check:review`, once that exists).
+
+   **Owner decision, 2026-11-23: the owner delegated the checking and the sign-off to the agent** ("you do that"; the owner does not verify, check or sign by hand). So until the ledger tooling exists, an agent may set `verified: 1` and `accessed:` on a source in `content/source/reference/sources/` only after it has (a) fetched the page and read its text in full, (b) matched the title and publisher to the row, and (c) checked every "supports" statement against quotes from that page, rewording the statement to what the page really says. The row's `note` records this ("Checked by the agent on the owner's instruction", the date, and where the page is narrower than the lesson wording). Limits that stay: a page a script cannot read (`blocked`) is not verified by an agent; a claim of tier A (section 3: safety cards, dose and protective-action statements) needs a T1 source that states it in a quote, and anything weaker is reported in the hand-off rather than waved through; an agent never claims in a note that the owner signed something the owner did not. Later tooling (the ledger, `check:review`) takes the agent's name as the reviewer.
 2. **Evidence is quoted and machine-checked.** Every "this source supports that claim" comes with a verbatim quote (25 words or fewer) from the fetched page text. A script re-checks that the quote is in the page. A quote that is not there makes the whole finding invalid. This is the guard against an agent inventing support.
 3. **Never invent a URL, title or quote.** A candidate source is only proposed after it was fetched and its title and publisher matched the row. A name from memory or a search summary is a lead, not a source.
 4. **Checkers do not edit content.** Findings are written to `content/review/` as proposals. Fixing text goes through the normal paths (`content/source/**.atomiq` plus `npm run content:sync` for owned tables, `npm run content:edit` for the rest). Fixes are a separate change from the report that found them.
@@ -239,9 +241,9 @@ Order: 1, then 2 and 5 and 6 in parallel, then 3, 4, 7, 8 in parallel, then 9, t
 
 | # | Question | Default if not answered |
 | --- | --- | --- |
-| 1 | Is an agent's quoted evidence plus a one-time human bulk sign enough for `verified`, or do you want to open every source yourself? | Bulk sign for tier B and C; you personally decide tier A |
+| 1 | Is an agent's quoted evidence plus a one-time human bulk sign enough for `verified`, or do you want to open every source yourself? | **Answered 2026-11-23: the agent checks and signs everything, the owner signs nothing by hand** (see non-negotiable 1 for the limits) |
 | 2 | Inline sources: check in place (a) or migrate to `content_references` (b)? | (a) |
-| 3 | Who are the reviewers allowed to sign (`reviewers.json`)? | you only |
+| 3 | Who are the reviewers allowed to sign (`reviewers.json`)? | the agent, on the owner's standing instruction (2026-11-23) |
 | 4 | Is the World Nuclear Association (industry body) acceptable as T3 for history and plant facts, never for safety? | yes, as T3 |
 | 5 | Should a source that cannot be fetched by a script (blocked) be accepted on your manual check alone? | yes, `blocked` plus your sign-off |
 | 6 | Keep checking monthly after launch (`check:references-live`), or only before each content release? | before each content release |

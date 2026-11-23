@@ -39,8 +39,8 @@ export type TileArt =
  */
 export const groundArt = (level: Level, c: number, r: number): TileArt | null => {
   if (!isSolid(level, c, r) || c < 0 || c >= level.cols) return null;
-  // A block (coin, heart, brick, lock) has its own picture
-  if (r >= 0 && r < level.rows && (level.blockAt[r * level.cols + c] !== 0 || level.conveyor[r * level.cols + c] !== 0)) return null;
+  // A block (coin, heart, brick, lock), a belt or a lead block has its own picture
+  if (r >= 0 && r < level.rows && (level.blockAt[r * level.cols + c] !== 0 || level.conveyor[r * level.cols + c] !== 0 || level.lead[r * level.cols + c] !== 0)) return null;
   // The level's own ends are walls that are not drawn, so a tile at the end is not an open side
   const left = c === 0 || isSolid(level, c - 1, r);
   const right = c === level.cols - 1 || isSolid(level, c + 1, r);
@@ -157,7 +157,9 @@ export const HERO_DRAW = 1.5;
 export const FRAME_PER_PLATFORM = 2;
 export const platformSlot = (enemies: number, i: number): number => FRAME_HEAD + enemies * FRAME_PER_ENEMY + i * FRAME_PER_PLATFORM;
 export const springSlot = (enemies: number, platforms: number, i: number): number => FRAME_HEAD + enemies * FRAME_PER_ENEMY + platforms * FRAME_PER_PLATFORM + i;
-export const frameLength = (enemies: number, platforms: number = 0, springs: number = 0): number => FRAME_HEAD + enemies * FRAME_PER_ENEMY + platforms * FRAME_PER_PLATFORM + springs;
+/** The last slot: the dose meter, 0 to 1 (a level with dose sources shows it over the hero). */
+export const doseSlot = (enemies: number, platforms: number = 0, springs: number = 0): number => FRAME_HEAD + enemies * FRAME_PER_ENEMY + platforms * FRAME_PER_PLATFORM + springs;
+export const frameLength = (enemies: number, platforms: number = 0, springs: number = 0): number => doseSlot(enemies, platforms, springs) + 1;
 
 /**
  * Write what the renderer needs, in pixels, into `out` (see the indexes below), and return it:
@@ -165,7 +167,7 @@ export const frameLength = (enemies: number, platforms: number = 0, springs: num
  *   2 hero left     3 hero top    4 hero frame in the sprite sheet (hero-anim-core)   5 flip (1 or -1)   6 hero opacity
  *   7 hero scale x   8 hero scale y (about the feet)   9 hero flash (0..1, red)
  *   then per enemy: left, top, step (0 or 1), flip (1 or -1), scale x, scale y, flash (0..1, white)
- *   then per moving platform: left, top (px); then per spring: 1 while its extended pose shows
+ *   then per moving platform: left, top (px); then per spring: 1 while its extended pose shows; then the dose meter (0 to 1)
  * In a battle `fx` (the pose to show and which enemy it is) makes the two face each other and moves, squashes and flashes them (battle-fx-core.ts).
  */
 /** Enemies and platforms this many tiles beyond the view are not moved: nobody sees them, and every number that changes is a native view update. */
@@ -224,5 +226,6 @@ export const fillFrame = (world: World, camPx: number, tile: number, out: number
   world.springT.forEach((t, i) => {
     out[springSlot(world.enemies.length, world.platforms.length, i)] = t > 0 ? 1 : 0;
   });
+  out[doseSlot(world.enemies.length, world.platforms.length, world.springT.length)] = world.dose;
   return out;
 };

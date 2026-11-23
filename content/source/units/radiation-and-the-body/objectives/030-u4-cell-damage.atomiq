@@ -1,0 +1,101 @@
+format 1
+adapter curriculum 1
+unit: radiation-and-the-body
+
+objective u4-cell-damage
+
+statement:
+    Know that ionizing radiation has enough energy to damage the molecules in a cell, including its DNA, and that being exposed to radiation does not make a person radioactive.
+
+misconception: Radiation that passes through a body leaves the person radioactive.
+
+item u4-l2-choice-damage
+type: choice
+surfaces: lesson
+surfaces: practice
+surfaces: checkpoint
+surfaces: review
+references: ref-epa-radiation-health-effects
+
+prompt:
+    What can ionizing radiation damage in a living cell?
+
+options:
+    {"id":"dna","label":"The atoms and molecules in it, including its DNA"}
+    {"id":"none","label":"Nothing: it passes through without touching any atom","note":"Ionizing radiation has enough energy to affect the atoms in living cells and so damage their DNA."}
+    {"id":"wall","label":"Only the outer wall of the cell","note":"It can affect atoms inside the cell too, including the genetic material, DNA."}
+
+answer: dna
+
+explanation:
+    Ionizing radiation has enough energy to affect the atoms in living cells, and so it can damage their genetic material, DNA.
+
+item u4-l2-choice-exposed
+type: choice
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-hps-radioactive-contamination
+
+prompt:
+    A person has an X-ray. Afterwards, is the person radioactive?
+
+options:
+    {"id":"no","label":"No: the radiation passed through, and exposure does not make a person radioactive"}
+    {"id":"hours","label":"Yes, for a few hours","note":"Radiation does not get on or in a person. Only radioactive material on or in a person is the concern."}
+    {"id":"bones","label":"Yes, but only in the bones","note":"Exposure does not make any part of a person radioactive."}
+
+answer: no
+
+explanation:
+    No. Radiation does not get on or in people. Being exposed to it, as in an X-ray, does not make a person radioactive.
+
+item u4-l2-tom-radio
+type: true_or_myth
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-epa-radiation-basics
+
+statement:
+    Radio waves can damage DNA by knocking electrons out of atoms, just as X-rays can.
+
+answer: myth
+
+explanation:
+    Myth. Radio waves are non-ionizing, so they cannot knock electrons out of atoms. X-rays are ionizing, and they can.
+
+item u4-x-tom-dna
+type: true_or_myth
+surfaces: practice
+surfaces: checkpoint
+surfaces: review
+references: ref-epa-radiation-health-effects
+
+statement:
+    Ionizing radiation can damage the DNA in a cell.
+
+answer: true
+
+explanation:
+    True. It has enough energy to affect the atoms in living cells, and so it can damage their genetic material, DNA.
+
+item u4-x-why-damage
+type: choice
+surfaces: practice
+surfaces: checkpoint
+surfaces: review
+references: ref-epa-radiation-health-effects
+
+prompt:
+    Why can ionizing radiation damage a cell?
+
+options:
+    {"id":"energy","label":"It has enough energy to affect the atoms in the cell"}
+    {"id":"radioactive","label":"It makes the cell radioactive","note":"Exposure does not make anything radioactive. The damage comes from what the radiation does to atoms."}
+    {"id":"size","label":"It is much bigger than a cell","note":"Size is not the reason. Ionizing radiation has enough energy to affect atoms."}
+
+answer: energy
+
+explanation:
+    Ionizing radiation has enough energy to affect the atoms in living cells, and that is how it damages their DNA.

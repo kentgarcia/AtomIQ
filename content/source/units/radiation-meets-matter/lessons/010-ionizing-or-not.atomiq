@@ -1,0 +1,117 @@
+format 1
+adapter curriculum 1
+unit: radiation-meets-matter
+
+lesson ionizing-or-not
+title: Ionizing or not
+minutes: 5
+xp: 50
+teaches: u3-ionizing-meaning
+teaches: u3-sort-radiation
+relies_on: u2-recognise-radiation
+
+description:
+    Radiation can knock electrons out of atoms, or it can fall short. You will find out what ionizing means, and which common kinds of radiation are on which side.
+
+cite ref-epa-radiation-basics
+
+supports:
+    Ionizing radiation has enough energy to remove electrons from atoms; non-ionizing radiation does not. Radio waves, visible light and microwaves are non-ionizing; alpha, beta, gamma and X-rays are ionizing.
+
+cite ref-openstax-chem-21-6
+
+supports:
+    Ionizing radiation is energetic enough to knock electrons out of molecules: high-energy ultraviolet, X-rays, gamma rays and particles such as alpha and beta. Lower-frequency, lower-energy electromagnetic radiation is nonionizing.
+
+cite ref-who-ionizing-radiation
+supports: Ionizing radiation is radiation with enough energy to remove electrons from atoms, a process called ionization.
+
+card c01
+kind: teach
+type: explain
+scored: 0
+title: Radiation is energy on the move
+figure: radiation-is-energy
+figure_at: 1
+
+body:
+    Radiation is energy that travels. It can travel as waves, or as tiny particles. Sunlight is radiation, and so are radio waves and gamma rays.
+
+card c02
+kind: teach
+type: explain
+scored: 0
+title: Energy can hit an atom
+figure: electron-knocked-out
+figure_at: 2
+
+body:
+    Think of a ball rolling into a marble. A fast ball can knock the marble away. Some radiation hits an atom a bit like that, and knocks an electron right out of it.
+
+card c03
+kind: teach
+type: explain
+scored: 0
+title: That is ionization
+
+body:
+    Knocking an electron out of an atom is called ionization. Radiation with enough energy to do it is called [[ionizing-radiation|ionizing radiation]]. Weaker radiation can make atoms move or vibrate, but it cannot take an electron away.
+
+card c04
+kind: item
+type: item
+item: u3-l1-choice-ionizing
+connected: true
+
+card c05
+kind: teach
+type: explain
+scored: 0
+title: Four ionizing kinds
+figure: energy-line
+figure_at: 1
+
+body:
+    Alpha particles, beta particles, gamma rays and [[x-ray|X-rays]] are all ionizing. Alpha and beta are particles. Gamma rays and X-rays are waves of energy.
+
+card c06
+kind: teach
+type: explain
+scored: 0
+title: Three that are not
+
+body:
+    Visible light, microwaves and radio waves are not ionizing. They do not have enough energy to remove electrons from atoms. They are still radiation, so the word radiation alone does not tell you which kind you have.
+
+card c07
+kind: item
+type: item
+item: u3-l1-tom-light
+connected: true
+
+card c08
+kind: item
+type: item
+item: u3-l1-sort-ionizing
+
+card c09
+kind: item
+type: item
+item: u3-l1-choice-xray
+
+card c10
+kind: item
+type: item
+item: u3-l1-tom-same
+
+card c11
+kind: teach
+type: explain
+tier: deeper
+scored: 0
+title: Go deeper: the line is not sharp
+figure: ultraviolet-border
+figure_at: 1
+
+body:
+    Ultraviolet light sits close to the line between the two groups. High-energy ultraviolet is ionizing, and lower-energy ultraviolet is not. Visible light is on the safe side of it.

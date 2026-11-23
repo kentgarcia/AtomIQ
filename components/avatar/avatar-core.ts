@@ -104,7 +104,7 @@ export const OUTFIT_COLORS = {
   purple: { color: O.beetle, shade: O.betta },
   orange: { color: O.fox, shade: O.guineaPig },
   yellow: { color: O.bee, shade: O.camel },
-  pink: { color: O.starfish, shade: O.beetle },
+  pink: { color: O.starfish, shade: CUSTOM.skinBubblegum[1] },
   red: { color: O.crab, shade: O.cardinal },
   teal: { color: O.featherGreen, shade: O.treeFrog },
 } as const;
@@ -119,28 +119,55 @@ export const WEAR_COLORS = {
   blue: { color: O.macaw, shade: O.whale },
   navy: { color: O.humpback, shade: O.narwhal },
   purple: { color: O.beetle, shade: O.betta },
-  pink: { color: O.starfish, shade: O.beetle },
+  pink: { color: O.starfish, shade: CUSTOM.skinBubblegum[1] },
   white: { color: O.snow, shade: O.swan },
   grey: { color: O.hare, shade: O.wolf },
   black: { color: O.eel, shade: FACE.pupil },
 } as const;
 
-/** The paints for the picture behind the head: light and fixed, so the figure reads on any page. `sky` is the one everyone starts with. */
-export const BACKGROUNDS = {
-  sky: O.iguana,
-  mint: O.seaSponge,
-  sun: O.canary,
-  blush: O.walkingFish,
-  ice: O.beluga,
-  peach: O.cheetah,
-  rose: O.flamingo,
-  lime: O.turtle,
-  butter: O.duck,
-  bubblegum: O.starfish,
-  aqua: O.moonJelly,
-  azure: O.blueJay,
-  stone: O.anchovy,
+/**
+ * The paints for the picture behind the head: rich Duolingo palette colours paired with their one-step-darker
+ * shades, matching the teachers' profile covers (`npc-cover-art.ts`). `sky` is the one everyone starts with.
+ */
+export const BACKGROUND_COLORS = {
+  sky: { color: O.macaw, shade: O.whale },
+  sun: { color: O.bee, shade: O.camel },
+  bubblegum: { color: O.starfish, shade: CUSTOM.skinBubblegum[1] },
+  violet: { color: O.beetle, shade: O.betta },
+  mint: { color: O.featherGreen, shade: O.treeFrog },
+  amber: { color: O.fox, shade: O.guineaPig },
+  azure: { color: O.whale, shade: O.humpback },
+  rose: { color: O.crab, shade: O.cardinal },
+  blush: { color: O.flamingo, shade: O.crab },
+  lime: { color: O.maskGreen, shade: O.featherGreen },
+  aqua: { color: O.moonJelly, shade: CUSTOM.skinAqua[1] },
+  peach: { color: O.lion, shade: O.fox },
+  butter: { color: O.duck, shade: O.bee },
+  ice: { color: O.blueJay, shade: O.macaw },
+  berry: { color: O.cardinal, shade: O.fireAnt },
+  plum: { color: O.betta, shade: O.butterfly },
+  indigo: { color: O.humpback, shade: O.narwhal },
 } as const;
+
+export const BACKGROUNDS: { readonly [K in keyof typeof BACKGROUND_COLORS]: (typeof BACKGROUND_COLORS)[K]["color"] } = {
+  sky: BACKGROUND_COLORS.sky.color,
+  sun: BACKGROUND_COLORS.sun.color,
+  bubblegum: BACKGROUND_COLORS.bubblegum.color,
+  violet: BACKGROUND_COLORS.violet.color,
+  mint: BACKGROUND_COLORS.mint.color,
+  amber: BACKGROUND_COLORS.amber.color,
+  azure: BACKGROUND_COLORS.azure.color,
+  rose: BACKGROUND_COLORS.rose.color,
+  blush: BACKGROUND_COLORS.blush.color,
+  lime: BACKGROUND_COLORS.lime.color,
+  aqua: BACKGROUND_COLORS.aqua.color,
+  peach: BACKGROUND_COLORS.peach.color,
+  butter: BACKGROUND_COLORS.butter.color,
+  ice: BACKGROUND_COLORS.ice.color,
+  berry: BACKGROUND_COLORS.berry.color,
+  plum: BACKGROUND_COLORS.plum.color,
+  indigo: BACKGROUND_COLORS.indigo.color,
+};
 
 /** The patterns (`PATTERN_DEFS` in `pattern-art.ts`): ids are words, `atomlab`, `polka`... */
 export { PATTERN_COUNT, PATTERN_IDS };
@@ -195,7 +222,7 @@ export const AVATAR_OPTIONS: { [K in keyof AvatarConfig]: readonly AvatarConfig[
   skin: Object.keys(SKIN_TONES) as SkinId[],
   head: ["tombstone", "capsule"],
   // No glasses: the teachers wear them, an avatar does not
-  eyes: ["pill", "round", "dots", "wide", "sparkle", "lashes", "sleepy", "arches"],
+  eyes: ["pill", "round", "dots", "wide", "sparkle", "lashes", "sleepy", "arches", "anime", "power"],
   eyebrows: [...BROW_STYLES],
   browColor: ["natural", ...(Object.keys(HAIR_COLORS) as HairColorId[])],
   pupilColor: Object.keys(PUPIL_COLORS) as PupilColorId[],
@@ -203,7 +230,7 @@ export const AVATAR_OPTIONS: { [K in keyof AvatarConfig]: readonly AvatarConfig[
   noseColor: ["natural", ...(Object.keys(NOSE_COLORS) as (keyof typeof NOSE_COLORS)[])],
   mouth: [...MOUTH_STYLES],
   ears: [...EAR_STYLES],
-  hairStyle: ["crop", "buzzcut", "classic", "messy", "sidepart", "curtain", "bowl", "spiky", "wavy", "undercut", "longer", "longstraight", "shortbob", "medium", "highpony", "lowpony", "twintails", "bigbun", "halfup", "longwavy", "curtainbangs", "curls", "bun", "bob", "wrap", "fluffy", "cloud"],
+  hairStyle: ["crop", "buzzcut", "classic", "messy", "sidepart", "curtain", "bowl", "spiky", "wavy", "undercut", "longer", "longstraight", "shortbob", "medium", "highpony", "lowpony", "twintails", "bigbun", "halfup", "longwavy", "curtainbangs", "curls", "bun", "fluffy", "cloud", "flattop", "crownbun", "knotwrap", "workcrop", "layeredbob", "trainer", "shinobi", "pirate", "saiyan", "odango"],
   hairColor: Object.keys(HAIR_COLORS) as HairColorId[],
   facialHair: ["none", "moustache", "beard"],
   outfit: ["hoodie", "sweater", "coat", "vest", "shirt", ...EXTRA_OUTFITS],
@@ -245,10 +272,10 @@ export const DEFAULT_AVATAR: AvatarConfig = {
   pattern: "none",
 };
 
-/** The second starting design: hair in a bun, round eyes, a single nose, a pink sweater on a blush paint. */
+/** The second starting design: hair in a bun, eyelash eyes, a single nose, a pink sweater on a blush paint. */
 export const BUN_AVATAR: AvatarConfig = {
   ...DEFAULT_AVATAR,
-  eyes: "round",
+  eyes: "lashes",
   nose: "single",
   hairStyle: "bun",
   hairColor: "dark",
@@ -331,3 +358,5 @@ export function avatarSpec(config: AvatarConfig): NpcSpec {
 }
 
 export const avatarBackground = (config: AvatarConfig): string => BACKGROUNDS[config.background];
+export const backgroundColors = (id: BackgroundId = DEFAULT_AVATAR.background): { color: string; shade: string } => BACKGROUND_COLORS[id] ?? BACKGROUND_COLORS.sky;
+export const avatarBackgroundColors = (config: AvatarConfig): { color: string; shade: string } => backgroundColors(config.background);

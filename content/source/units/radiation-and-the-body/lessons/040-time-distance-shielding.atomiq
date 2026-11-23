@@ -1,0 +1,108 @@
+format 1
+adapter curriculum 1
+unit: radiation-and-the-body
+
+lesson time-distance-shielding
+title: Time, distance, shielding
+minutes: 6
+xp: 50
+teaches: u4-three-ways
+teaches: u4-pick-the-way
+relies_on: u4-small-spread
+relies_on: u3-gamma-shielding
+
+description:
+    There are three ways to lower a dose. You will meet each one, then spot which one a real situation is using.
+
+cite ref-epa-protecting-yourself
+
+supports:
+    Limiting time, increasing distance and shielding all reduce a dose; barriers of lead, concrete or water protect from gamma rays; dentists place a lead apron on patients; more walls give more protection.
+
+card c01
+kind: teach
+type: explain
+scored: 0
+title: You can lower a dose
+figure: three-ways
+figure_at: 1
+
+body:
+    A dose is not fixed. There are three ways to lower it: spend less time near the source, stay farther from it, or put a shield between you and it. Time, distance and shielding.
+
+card c02
+kind: item
+type: item
+item: u4-l4-tom-nothing
+connected: true
+
+card c03
+kind: teach
+type: explain
+scored: 0
+title: Less time
+figure: less-time
+figure_at: 1
+
+body:
+    Limiting the time you are exposed reduces the dose from the source. A shorter visit near a source means a smaller dose.
+
+card c04
+kind: item
+type: item
+item: u4-l4-choice-time
+connected: true
+
+card c05
+kind: teach
+type: explain
+scored: 0
+title: More distance
+figure: more-distance
+figure_at: 1
+
+body:
+    The dose decreases dramatically as you increase your distance from the source. Stepping farther away lowers it a lot.
+
+card c06
+kind: item
+type: item
+item: u4-l4-choice-distance
+connected: true
+
+card c07
+kind: teach
+type: explain
+scored: 0
+title: Something in between
+figure: something-between
+figure_at: 1
+
+body:
+    Shielding means putting material between you and the source. Barriers of lead, concrete or water protect from penetrating gamma rays, and a good shield can greatly reduce or remove the dose.
+
+card c08
+kind: item
+type: item
+item: u4-l4-fill-three
+
+card c09
+kind: teach
+type: explain
+scored: 0
+title: Where you see them
+figure: real-uses
+figure_at: 1
+
+body:
+    Dentists place a lead apron on patients having X-rays of their teeth. Radioactive materials are stored under water, in concrete, or in lead-lined rooms. In a shelter, more walls give more protection.
+
+card c10
+kind: item
+type: item
+item: u4-l4-match-ways
+
+card c11
+kind: item
+type: item
+item: u4-l4-choice-store

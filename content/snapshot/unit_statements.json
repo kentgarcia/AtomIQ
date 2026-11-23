@@ -85,6 +85,166 @@
       "explanation": "Some nuclei stay the same for ever. Only unstable ones can change."
     },
     {
+      "id": "radiation-and-the-body-s01",
+      "unit_id": "radiation-and-the-body",
+      "position": 0,
+      "statement": "Any dose of radiation is deadly.",
+      "verdict": "myth",
+      "explanation": "Everyone gets small doses every day. It takes a very large dose in a short time, about 1000 millisieverts, to make people ill."
+    },
+    {
+      "id": "radiation-and-the-body-s02",
+      "unit_id": "radiation-and-the-body",
+      "position": 1,
+      "statement": "The average person in the United States gets about 6 millisieverts of radiation a year, and most of it is natural.",
+      "verdict": "fact",
+      "explanation": "The average is about 6.2 millisieverts a year, and most of it comes from natural background radiation."
+    },
+    {
+      "id": "radiation-and-the-body-s03",
+      "unit_id": "radiation-and-the-body",
+      "position": 2,
+      "statement": "Cells in your body are extremely efficient at repairing radiation damage.",
+      "verdict": "fact",
+      "explanation": "Ionizing radiation can damage the DNA in cells, and cells repair most of that damage."
+    },
+    {
+      "id": "radiation-and-the-body-s04",
+      "unit_id": "radiation-and-the-body",
+      "position": 3,
+      "statement": "Radiation is harmless at every dose.",
+      "verdict": "myth",
+      "explanation": "A very large dose in a short time makes people ill, and low doses can add a small chance of cancer over a lifetime."
+    },
+    {
+      "id": "radiation-and-the-body-s05",
+      "unit_id": "radiation-and-the-body",
+      "position": 4,
+      "statement": "A very large dose of radiation in a short time can cause nausea and vomiting within hours.",
+      "verdict": "fact",
+      "explanation": "About 1000 millisieverts in a short time is the threshold for acute radiation syndrome."
+    },
+    {
+      "id": "radiation-and-the-body-s06",
+      "unit_id": "radiation-and-the-body",
+      "position": 5,
+      "statement": "A small dose every day is the same as one large dose.",
+      "verdict": "myth",
+      "explanation": "Dose rate matters. A low dose, or one spread over a long time, carries less risk because repair is more likely."
+    },
+    {
+      "id": "radiation-and-the-body-s07",
+      "unit_id": "radiation-and-the-body",
+      "position": 6,
+      "statement": "Spending less time near a source lowers the dose from it.",
+      "verdict": "fact",
+      "explanation": "Limiting the time you are exposed reduces the dose from the radiation source."
+    },
+    {
+      "id": "radiation-and-the-body-s08",
+      "unit_id": "radiation-and-the-body",
+      "position": 7,
+      "statement": "The dose from a source decreases dramatically as you move away from it.",
+      "verdict": "fact",
+      "explanation": "Increasing your distance from a source is one of the three ways to lower a dose."
+    },
+    {
+      "id": "radiation-and-the-body-s09",
+      "unit_id": "radiation-and-the-body",
+      "position": 8,
+      "statement": "Barriers of lead, concrete or water protect against penetrating gamma rays.",
+      "verdict": "fact",
+      "explanation": "Shielding puts material between you and the source, and it can greatly reduce the dose."
+    },
+    {
+      "id": "radiation-and-the-body-s10",
+      "unit_id": "radiation-and-the-body",
+      "position": 9,
+      "statement": "A person who was exposed to radiation is radioactive.",
+      "verdict": "myth",
+      "explanation": "Exposure is not contamination. Radiation does not get on or in people."
+    },
+    {
+      "id": "radiation-meets-matter-s01",
+      "unit_id": "radiation-meets-matter",
+      "position": 0,
+      "statement": "All radiation is the same.",
+      "verdict": "myth",
+      "explanation": "Radiation comes in many kinds. Some can knock electrons out of atoms and some cannot."
+    },
+    {
+      "id": "radiation-meets-matter-s02",
+      "unit_id": "radiation-meets-matter",
+      "position": 1,
+      "statement": "Radio waves, microwaves and visible light are radiation, but they do not have enough energy to knock electrons out of atoms.",
+      "verdict": "fact",
+      "explanation": "They are non-ionizing. Ionizing radiation has enough energy to knock electrons out of atoms."
+    },
+    {
+      "id": "radiation-meets-matter-s03",
+      "unit_id": "radiation-meets-matter",
+      "position": 2,
+      "statement": "A sheet of paper stops gamma rays.",
+      "verdict": "myth",
+      "explanation": "Paper stops alpha particles. Gamma rays pass through it and need thick, dense material to be reduced."
+    },
+    {
+      "id": "radiation-meets-matter-s04",
+      "unit_id": "radiation-meets-matter",
+      "position": 3,
+      "statement": "Alpha particles cannot get through the outer layer of your skin.",
+      "verdict": "fact",
+      "explanation": "Alpha particles are heavy and use up their energy over a very short distance."
+    },
+    {
+      "id": "radiation-meets-matter-s05",
+      "unit_id": "radiation-meets-matter",
+      "position": 4,
+      "statement": "Radiation can spread onto you and stay on your skin.",
+      "verdict": "myth",
+      "explanation": "Radiation does not get on or in people. Radioactive contamination, the material itself, is what can spread."
+    },
+    {
+      "id": "radiation-meets-matter-s06",
+      "unit_id": "radiation-meets-matter",
+      "position": 5,
+      "statement": "Being near a source of radiation is not the same as being contaminated.",
+      "verdict": "fact",
+      "explanation": "Exposure stops when the source is shielded or you move away. Contamination means radioactive material is on or in you."
+    },
+    {
+      "id": "radiation-meets-matter-s07",
+      "unit_id": "radiation-meets-matter",
+      "position": 6,
+      "statement": "A Geiger counter that clicks must be next to a radioactive source.",
+      "verdict": "myth",
+      "explanation": "Background radiation is always around, so a counter picks up some even with no source nearby."
+    },
+    {
+      "id": "radiation-meets-matter-s08",
+      "unit_id": "radiation-meets-matter",
+      "position": 7,
+      "statement": "A dosimeter is used to find out how much radiation a person has been exposed to.",
+      "verdict": "fact",
+      "explanation": "Dosimeters are worn to measure personal exposure."
+    },
+    {
+      "id": "radiation-meets-matter-s09",
+      "unit_id": "radiation-meets-matter",
+      "position": 8,
+      "statement": "The becquerel, the gray and the sievert all measure the same thing.",
+      "verdict": "myth",
+      "explanation": "The becquerel counts decays, the gray measures energy absorbed, and the sievert measures potential for harm."
+    },
+    {
+      "id": "radiation-meets-matter-s10",
+      "unit_id": "radiation-meets-matter",
+      "position": 9,
+      "statement": "One becquerel is one decay per second.",
+      "verdict": "fact",
+      "explanation": "The becquerel measures how active a source is."
+    },
+    {
       "id": "radioactivity-s01",
       "unit_id": "radioactivity",
       "position": 0,

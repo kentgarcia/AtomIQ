@@ -5,6 +5,7 @@ category: environment
 entry radioactive-waste
 term: Radioactive Waste
 difficulty: intermediate
+image: ../../assets/images/terms/Waste (Radioactive).webp
 related_terms: low-level-waste
 related_terms: spent-fuel
 related_terms: vitrification

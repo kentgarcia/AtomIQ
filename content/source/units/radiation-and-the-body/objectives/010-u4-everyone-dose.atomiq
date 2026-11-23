@@ -1,0 +1,100 @@
+format 1
+adapter curriculum 1
+unit: radiation-and-the-body
+
+objective u4-everyone-dose
+
+statement:
+    Know that everyone gets a small dose of radiation every day, mostly from natural sources, and that the average yearly dose in the US is about 6 millisieverts.
+
+misconception: Only people who work with radiation get a dose.
+
+item u4-l1-choice-average
+type: choice
+surfaces: lesson
+surfaces: practice
+surfaces: checkpoint
+surfaces: review
+references: ref-epa-radiation-sources
+
+prompt:
+    About how big is the average yearly dose of a person in the US?
+
+options:
+    {"id":"six","label":"About 6 millisieverts"}
+    {"id":"tiny","label":"About 0.01 millisieverts","note":"That is under what a year of living near a nuclear power station adds. An average year is far bigger, because natural sources are always there."}
+    {"id":"big","label":"About 1000 millisieverts","note":"About 1000 in a short time is where illness starts. An average year is far, far below that."}
+
+answer: six
+
+explanation:
+    The average person in the US gets about 6 millisieverts a year. The EPA's figure is 6.2, and most of it is natural background radiation.
+
+item u4-l1-tom-workers
+type: true_or_myth
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-epa-radiation-sources
+
+statement:
+    Only people who work with radiation get a dose.
+
+answer: myth
+
+explanation:
+    Myth. Everyone gets a dose every day, from the ground, from space and from radon in the air. Most of the average yearly dose is natural background radiation.
+
+item u4-x-everyone-dose
+type: true_or_myth
+surfaces: practice
+surfaces: checkpoint
+surfaces: review
+references: ref-epa-radiation-sources
+
+statement:
+    Everyone gets a small dose of radiation every day.
+
+answer: true
+
+explanation:
+    True. The ground, space and radon in the air each add a little, every day, to everyone.
+
+item u4-x-natural-most
+type: choice
+surfaces: practice
+surfaces: checkpoint
+surfaces: review
+references: ref-epa-radiation-sources
+
+prompt:
+    Where does most of the average yearly dose come from?
+
+options:
+    {"id":"nature","label":"Natural background radiation"}
+    {"id":"plants","label":"Nuclear power stations","note":"A year of living near a nuclear power station adds less than 0.01 millisieverts, a tiny share."}
+    {"id":"phones","label":"Mobile phones","note":"Phones use radio waves, which are non-ionizing. Most of the yearly dose is natural background radiation."}
+
+answer: nature
+
+explanation:
+    Most of the average yearly dose is natural background radiation: radon, rocks and soil, and cosmic rays.
+
+item u4-x-radon-biggest
+type: choice
+surfaces: practice
+surfaces: review
+references: ref-epa-radiation-sources
+
+prompt:
+    Of these three, which adds the most to a person's dose in a year?
+
+options:
+    {"id":"radon","label":"Radon in an average US home, about 2.3 millisieverts"}
+    {"id":"cosmic","label":"Cosmic rays at sea level, about 0.3 millisieverts","note":"That adds about 0.3, which is less than radon's 2.3."}
+    {"id":"plant","label":"Living near a nuclear power station, under 0.01 millisieverts","note":"That adds under 0.01, the smallest of the three."}
+
+answer: radon
+
+explanation:
+    Radon in an average US home adds about 2.3 millisieverts a year, cosmic rays at sea level about 0.3, and living near a nuclear power station under 0.01.

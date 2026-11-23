@@ -19,11 +19,14 @@ import { chatArtName } from "@/components/phone/chat-art";
 import { tourArtName } from "@/components/phone/tour-art";
 import { TourArt } from "@/components/phone/TourArt";
 import { pictureOf } from "@/services/chat-core";
+import { Image } from "expo-image";
 import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
 import { createStyles, fontFaces, useTheme, withAlpha } from "@/theme";
 import type { ChatPalette } from "@/components/phone/chat-palette";
 import { EASE_OUT } from "@/theme/motion";
+
+const DIAMOND_ICON = require("@/assets/images/icons/diamond.png");
 
 /**
  * The colours of the conversation (the teacher's cover, `chat-palette.ts`). Without one the pieces wear the app's own blue.
@@ -168,6 +171,20 @@ export const SystemLine = memo(function SystemLine({ text, fresh = false }: { te
   );
 });
 
+/** The story's one-time diamonds, said as a system line with the diamond beside the amount ("+5 diamonds"). Eases in like a letter. */
+export const RewardLine = memo(function RewardLine({ diamonds }: { diamonds: number }) {
+  const styles = useStyles(useTheme().theme);
+  const label = `You got ${diamonds} ${diamonds === 1 ? "diamond" : "diamonds"} for this story`;
+  return (
+    <Animated.View entering={settle(0)} style={styles.systemRow} accessible accessibilityRole="text" accessibilityLabel={label}>
+      <View style={[styles.systemPill, styles.rewardPill]}>
+        <Image source={DIAMOND_ICON} style={styles.rewardIcon} contentFit="contain" />
+        <Text style={styles.systemText}>{`+${diamonds} ${diamonds === 1 ? "diamond" : "diamonds"}`}</Text>
+      </View>
+    </Animated.View>
+  );
+});
+
 /** Three dots that rise one after another, while a teacher "types". Still with reduced motion. */
 export const TypingBubble = memo(function TypingBubble({ speaker }: { speaker: ChatSpeaker | null | undefined }) {
   const styles = useStyles(useTheme().theme);
@@ -307,6 +324,8 @@ const useStyles = createStyles((theme) => {
     lipPressed: { borderBottomWidth: 2, marginTop: 3 },
     systemRow: { alignItems: "center", marginTop: 4, marginBottom: 18, paddingHorizontal: 24 },
     systemPill: { borderRadius: 12, paddingVertical: 5, paddingHorizontal: 12, backgroundColor: c.field },
+    rewardPill: { flexDirection: "row", alignItems: "center", gap: 6 },
+    rewardIcon: { width: 18, height: 18 },
     systemText: { fontSize: 13, lineHeight: 18, textAlign: "center", ...fontFaces.semibold, color: c.textMuted },
     meRow: { alignItems: "flex-end", paddingLeft: 56 },
     meBubble: { backgroundColor: c.guideLip, borderRadius: ROUND, paddingVertical: 10, paddingHorizontal: 14 },

@@ -20,22 +20,16 @@ supports: Isotope definition and mass number.
 cite ref-epa-radioactive-decay
 supports: Some forms of an element are stable and others unstable.
 
-card c01
-kind: item
-type: item
-item: u1-l4-predict-carbon-mass
-scored: 0
-
 card c02
 kind: teach
 type: explain
 scored: 0
-title: Same element, different neutrons
+title: Two carbons, two weights
 figure: isotope-pair
-figure_at: 1
+figure_at: 2
 
 body:
-    Atoms of the same element always have the same number of protons. They can have different numbers of neutrons. These are called [[isotope|isotopes]]. Carbon-12 and carbon-14 are both carbon.
+    Here is a puzzle. Two atoms are both carbon, but one is heavier. How? Carbon atoms always have 6 protons, but the number of neutrons can differ: carbon-12 has 6 and carbon-14 has 8. The protons decide the element, so both are carbon. These versions of one element are called [[isotope|isotopes]].
 
 card c03
 kind: sim
@@ -65,10 +59,15 @@ config:
       ]
     }
 
-card c04
+card c20
 kind: item
 type: item
-item: u1-l4-sort-carbon
+item: u1-l4-choice-share
+
+card c09
+kind: item
+type: item
+item: u1-l4-choice-pair
 
 card c05
 kind: teach
@@ -79,7 +78,7 @@ figure: isotope-stability
 figure_at: 2
 
 body:
-    An isotope is just a version of an element. It does not mean the atom is [[radioactivity|radioactive]]. Carbon-12 and carbon-13 are stable. Carbon-14 is not. Most of the atoms around you are stable isotopes.
+    Many people hear 'isotope' and think 'radioactive', but isotope only means a version of an element. Carbon-12 and carbon-13 are stable, and most of the atoms around you are stable isotopes. Carbon-14 is one of the few that is not.
 
 card c06
 kind: item
@@ -91,16 +90,6 @@ card c07
 kind: item
 type: item
 item: u1-l4-tom-c13-stable
-
-card c08
-kind: item
-type: item
-item: u1-l4-sort-pairs
-
-card c09
-kind: item
-type: item
-item: u1-l4-choice-pair
 
 card c10
 kind: teach

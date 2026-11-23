@@ -1,0 +1,120 @@
+format 1
+adapter curriculum 1
+unit: radiation-meets-matter
+
+lesson detecting-radiation
+title: Detecting radiation
+minutes: 6
+xp: 50
+teaches: u3-detectors
+teaches: u3-background-reading
+relies_on: u3-ionizing-meaning
+
+description:
+    Radiation is detected and measured with instruments. You will find out why a detector reads something almost anywhere, and how a Geiger counter works.
+
+cite ref-openstax-chem-21-6
+
+supports:
+    A Geiger counter detects the ionization of the gas in its tube; a scintillation counter uses a material that emits light when ionizing radiation excites it; dosimeters measure ionizing radiation and are often used to determine personal radiation exposure (the page's picture shows one worn on the chest).
+
+cite ref-epa-radiation-basics
+
+supports:
+    Radiation is present all around us; background radiation comes mostly from natural minerals in the ground, soil and water, and from cosmic radiation.
+
+cite ref-who-ionizing-radiation
+supports: Humans are exposed to natural radiation sources every day, and the level varies from place to place.
+
+card c01
+kind: teach
+type: explain
+scored: 0
+title: A puzzle in an empty field
+
+body:
+    Here is a puzzle. You switch on a radiation detector in an empty field. Nothing radioactive is anywhere near. The detector still shows a small reading. Is it broken?
+
+card c02
+kind: item
+type: item
+item: u3-l4-predict-room
+scored: 0
+
+card c03
+kind: teach
+type: explain
+scored: 0
+title: Background radiation
+figure: always-something
+figure_at: 2
+
+body:
+    [[background-radiation|Background radiation]] is present on Earth at all times. It comes mostly from natural minerals in the ground, soil and water, and from cosmic radiation. So a working detector picks up a little almost anywhere.
+
+card c04
+kind: item
+type: item
+item: u3-l4-choice-background
+connected: true
+
+card c05
+kind: teach
+type: explain
+scored: 0
+title: Inside a Geiger counter
+figure: geiger-tube
+figure_at: 2
+
+body:
+    A [[geiger-counter|Geiger counter]] has a tube of gas. When radiation passes through, it ionizes the gas. The counter detects that ionization.
+
+card c06
+kind: item
+type: item
+item: u3-l4-order-geiger
+connected: true
+
+card c07
+kind: teach
+type: explain
+scored: 0
+title: More radiation, more counts
+figure: more-radiation-more-counts
+figure_at: 1
+
+body:
+    The rate of ionization goes with the amount of radiation. A little radiation gives a few counts, and more radiation gives many more. Background radiation varies from place to place, so the reading does too.
+
+card c08
+kind: item
+type: item
+item: u3-l4-tom-zero
+connected: true
+
+card c09
+kind: item
+type: item
+item: u3-l4-choice-geiger
+
+card c10
+kind: teach
+type: explain
+scored: 0
+title: Three instruments
+figure: instruments-row
+figure_at: 1
+
+body:
+    A Geiger counter detects ionization in a gas. A scintillation counter turns flashes of light into a signal. A dosimeter is worn by a person to measure how much radiation they are exposed to.
+
+card c11
+kind: item
+type: item
+item: u3-l4-match-instruments
+connected: true
+
+card c12
+kind: item
+type: item
+item: u3-l4-tom-dosimeter

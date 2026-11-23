@@ -1,9 +1,10 @@
 import { useIsFocused } from "expo-router";
-import { memo, useMemo } from "react";
+import { memo, useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import { View } from "react-native";
 import { Text } from "@/components/ui/text";
-import Animated, { useAnimatedProps, type SharedValue } from "react-native-reanimated";
-import { useReducedMotion } from "@/components/motion/use-reduced-motion";
+import Animated, { useAnimatedProps, useFrameCallback, useSharedValue, type SharedValue } from "react-native-reanimated";
+import { useIdleStill } from "@/components/motion/use-reduced-motion";
+import { useMotionBudget } from "@/components/motion/use-motion-budget";
 import Svg, {
   Circle,
   G,
@@ -21,10 +22,11 @@ import type {
   VisualScene,
 } from "@/content/types";
 import { SCENE_LOOP_MS, SCENE_MOTION_LIMITS } from "@/content/visual-blocks";
-import { useLoopClock, wave, loop } from "@/components/motion/motion";
+import { wave, loop } from "@/components/motion/motion";
 import { createStyles, useTheme, withAlpha, type Theme } from "@/theme";
 
 import { duoShade, lipFor } from "./duo-palette";
+import { advanceFigureClock, createFigureRegistry, figureQuantumMs } from "./figure-motion-core";
 import { ArtShapes } from "./ObjectArt";
 import { isArtId } from "./object-art";
 
@@ -47,6 +49,49 @@ interface SceneSvgProps {
   animate?: boolean;
   /** Draw the rounded plate behind the figure (default). Off when a card already frames it. */
   plate?: boolean;
+  /** On a page of several figures only the newest moving one plays; the others hold their pose (figure-motion-core.ts). */
+  exclusive?: boolean;
+}
+
+const figureRegistry = createFigureRegistry();
+
+/**
+ * The figure's clock, in steps of the device budget (`figureQuantumMs`). It holds its time while the figure is paused (the screen is
+ * behind another, or a newer figure took over) so nothing snaps, and returns to 0, the authored drawing, when idle motion is off
+ * (animation level, the system's reduced motion, or a phone whose budget has none).
+ */
+function useFigureClock(wantsMotion: boolean, exclusive: boolean): SharedValue<number> {
+  const still = useIdleStill();
+  const focused = useIsFocused();
+  const { idleFps } = useMotionBudget();
+  const quantum = figureQuantumMs(idleFps);
+  const frozen = still || quantum <= 0;
+
+  // Only a figure that can move takes part in "newest plays"; a still one never holds another back.
+  const [token] = useState(() => ({}));
+  const takesPart = exclusive && wantsMotion;
+  useEffect(() => (takesPart ? figureRegistry.join(token) : undefined), [takesPart, token]);
+  const newest = useSyncExternalStore(figureRegistry.subscribe, () => figureRegistry.isNewest(token));
+
+  const running = wantsMotion && !frozen && focused && (!takesPart || newest);
+  const clock = useSharedValue(0);
+  const carry = useSharedValue(0);
+  const ticker = useFrameCallback((info) => {
+    "worklet";
+    const [t, rest] = advanceFigureClock(clock.value, carry.value, info.timeSincePreviousFrame ?? 0, quantum, SCENE_LOOP_MS);
+    carry.value = rest;
+    if (t !== clock.value) clock.value = t;
+  }, false);
+  const { setActive } = ticker;
+  useEffect(() => {
+    if (frozen) {
+      clock.value = 0;
+      carry.value = 0;
+    }
+    setActive(running);
+    return () => setActive(false);
+  }, [running, frozen, clock, carry, setActive]);
+  return clock;
 }
 
 type Solid = Extract<SceneShape, { t: "rect" | "circle" }>;
@@ -258,16 +303,12 @@ export const SceneSvg = memo(function SceneSvg({
   hideText,
   animate = true,
   plate = true,
+  exclusive = false,
 }: SceneSvgProps) {
   const { theme } = useTheme();
   const height = (width * scene.height) / SCENE_WIDTH;
-  // One clock per figure. Frozen at 0 (the authored drawing) with reduced motion,
-  // when the screen is not in front, or when no shape has motion.
-  const reduced = useReducedMotion();
-  const focused = useIsFocused();
   const hasMotion = useMemo(() => scene.shapes.some((sh) => !!motionOf(sh)), [scene]);
-  const live = animate && hasMotion && focused && !reduced;
-  const clock = useLoopClock(SCENE_LOOP_MS, live);
+  const clock = useFigureClock(animate && hasMotion, exclusive);
   return (
     <Svg
       width={width}

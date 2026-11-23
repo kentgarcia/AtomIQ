@@ -1,0 +1,180 @@
+format 1
+adapter curriculum 1
+unit: radiation-meets-matter
+
+objective u3-detectors
+
+statement:
+    Know that radiation is detected and measured with instruments: a Geiger counter detects ionization in a gas, a scintillation counter detects flashes of light, and a dosimeter is worn to measure a person's exposure.
+
+misconception: We can see or feel ionizing radiation without an instrument.
+
+item u3-l4-choice-geiger
+type: choice
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-openstax-chem-21-6
+
+prompt:
+    What does a Geiger counter detect?
+
+options:
+    {"id":"light","label":"Flashes of light","note":"That is how a scintillation counter works. A Geiger counter looks for ionization in a gas."}
+    {"id":"gas","label":"Ionization of the gas in its tube"}
+    {"id":"heat","label":"Heat from the radiation","note":"A Geiger counter does not use heat. It detects ionization of a gas."}
+    {"id":"sound","label":"Sound waves","note":"A Geiger counter does not use sound. It detects ionization of a gas."}
+
+answer: gas
+
+explanation:
+    Radiation ionizes the gas inside the tube, and the counter detects that. A scintillation counter is the one that uses flashes of light.
+
+item u3-l4-choice-worn
+type: choice
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-openstax-chem-21-6
+
+prompt:
+    Which instrument is worn by a person to measure their exposure?
+
+options:
+    {"id":"dosi","label":"A dosimeter"}
+    {"id":"geiger","label":"A Geiger counter","note":"A Geiger counter detects ionization of a gas. It is not what a person wears to measure their own exposure."}
+    {"id":"scint","label":"A scintillation counter","note":"A scintillation counter turns flashes of light into a signal. The worn one is the dosimeter."}
+
+answer: dosi
+
+explanation:
+    A dosimeter is the instrument worn by a person to measure how much radiation they are exposed to.
+
+item u3-l4-fill-ionizes
+type: fill
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-openstax-chem-21-6
+
+prompt:
+    In a Geiger counter, radiation ___ the gas inside the tube.
+
+mode: bank
+
+bank:
+    {"id":"ionizes","label":"ionizes"}
+    {"id":"freezes","label":"freezes"}
+    {"id":"colours","label":"colours"}
+
+answer: ionizes
+
+explanation:
+    The radiation ionizes the gas, and the counter detects that ionization. It is what turns radiation into a count.
+
+item u3-l4-match-instruments
+type: match
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-openstax-chem-21-6
+
+prompt:
+    Match each instrument to how it works or what it is for.
+
+pairs:
+    {"id":"geiger","left":"Geiger counter","right":"Radiation ionizes the gas in a tube"}
+    {"id":"scint","left":"Scintillation counter","right":"A material gives off flashes of light"}
+    {"id":"dose","left":"Dosimeter","right":"Worn to measure a person's exposure"}
+
+explanation:
+    A Geiger counter detects ionization of a gas. A scintillation counter turns flashes of light into a signal. A dosimeter is worn, so it measures one person's exposure.
+
+item u3-l4-order-geiger
+type: order
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-openstax-chem-21-6
+
+prompt:
+    Put the steps inside a Geiger counter in order.
+
+items:
+    {"id":"enter","label":"Radiation passes through the tube"}
+    {"id":"ionize","label":"It ionizes the gas inside"}
+    {"id":"count","label":"The counter detects the ionization"}
+
+explanation:
+    The radiation goes through the gas first and ionizes it. The counter detects that ionization, and that is what gives a count.
+
+item u3-l4-predict-room
+type: predict
+surfaces: lesson
+references: ref-epa-radiation-basics
+
+prompt:
+    The detector reads a small amount in an empty field. What do you think is going on?
+
+input: choice
+
+options:
+    {"id":"broken","label":"It is broken"}
+    {"id":"always","label":"There is always a little radiation around"}
+    {"id":"leak","label":"Something dangerous is leaking nearby"}
+    {"id":"battery","label":"The battery is low"}
+
+answer: always
+
+explanation:
+    Your guess is not scored. The next card explains it.
+
+item u3-l4-tom-dosimeter
+type: true_or_myth
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-openstax-chem-21-6
+
+statement:
+    A dosimeter is worn to measure how much radiation a person is exposed to.
+
+answer: true
+
+explanation:
+    True. That is what a dosimeter is for. It stays with the person, so it measures their own exposure.
+
+item u3-x-scintillator
+type: choice
+surfaces: practice
+surfaces: checkpoint
+surfaces: review
+references: ref-openstax-chem-21-6
+
+prompt:
+    A scintillation counter turns what into a signal?
+
+options:
+    {"id":"flash","label":"Flashes of light"}
+    {"id":"gas","label":"Ionized gas","note":"That is the Geiger counter. A scintillation counter uses flashes of light."}
+    {"id":"heat","label":"Heat","note":"A scintillation counter uses flashes of light, not heat."}
+
+answer: flash
+
+explanation:
+    Radiation makes a scintillating material give off flashes of light, and the counter turns those flashes into a signal.
+
+item u3-x-tom-instruments
+type: true_or_myth
+surfaces: practice
+surfaces: checkpoint
+surfaces: review
+references: ref-openstax-chem-21-6
+
+statement:
+    People use instruments to detect and measure radiation.
+
+answer: true
+
+explanation:
+    True. Instruments such as Geiger counters, scintillation counters and dosimeters are used to detect and measure ionizing radiation.

@@ -5,6 +5,16 @@
   ],
   "rows": [
     {
+      "id": "bc-exposed-is-not-contaminated-mina",
+      "blog_id": "blog-exposed-is-not-contaminated",
+      "npc_id": "npc-mina",
+      "position": 0,
+      "text": "Good to know the two are different. Once you can tell them apart, it is much less worrying.",
+      "chip": {
+        "lessonId": "detecting-radiation"
+      }
+    },
+    {
       "id": "bc-nobody-knows-when-ray",
       "blog_id": "blog-nobody-knows-when",
       "npc_id": "npc-ray",
@@ -12,6 +22,36 @@
       "text": "Plain words: a group follows a pattern even though one nucleus does not. You will see exactly how in the half-life lesson.",
       "chip": {
         "lessonId": "half-life"
+      }
+    },
+    {
+      "id": "bc-reading-a-scary-number-ray",
+      "blog_id": "blog-reading-a-scary-number",
+      "npc_id": "npc-ray",
+      "position": 0,
+      "text": "Size, speed, comparison. Short list. Easy to remember.",
+      "chip": {
+        "lessonId": "risk-in-perspective"
+      }
+    },
+    {
+      "id": "bc-the-counter-always-clicks-ada",
+      "blog_id": "blog-the-counter-always-clicks",
+      "npc_id": "npc-ada",
+      "position": 0,
+      "text": "ok so even an empty field gives a reading. that's so neat, the world is a little bit radioactive all by itself",
+      "chip": {
+        "lessonId": "becquerel-gray-sievert"
+      }
+    },
+    {
+      "id": "bc-the-dose-you-already-get-ray",
+      "blog_id": "blog-the-dose-you-already-get",
+      "npc_id": "npc-ray",
+      "position": 0,
+      "text": "The numbers are the point. No scare, no hype. Good piece.",
+      "chip": {
+        "lessonId": "the-dose-scale"
       }
     },
     {

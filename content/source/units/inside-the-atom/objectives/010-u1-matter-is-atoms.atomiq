@@ -111,6 +111,7 @@ explanation:
 item u1-x-not-atoms
 type: choice
 difficulty: 2
+surfaces: lesson
 surfaces: practice
 surfaces: checkpoint
 surfaces: review

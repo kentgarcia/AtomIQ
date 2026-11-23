@@ -1,0 +1,55 @@
+format 1
+adapter blog 1
+unit: radiation-meets-matter
+
+post blog-exposed-is-not-contaminated
+author: npc-ray
+lesson: irradiated-or-contaminated
+title: Plain words: exposed is not contaminated
+hook: Two words people mix up. They mean different things. One ends when you step away.
+cover: hand
+read: 1
+unlock: {"trigger":"lesson_complete","lessonId":"irradiated-or-contaminated"}
+reactors: npc-mina
+references: ref-hps-radioactive-contamination
+references: ref-who-ionizing-radiation
+
+p:
+    Two words get swapped all the time. Exposed. Contaminated. They are not the same thing.
+
+h: Exposed
+
+p:
+    You are exposed when you are in the path of radiation from a source. A medical X-ray is a source outside the body. When the radiation stops reaching you, the exposure is over.
+
+h: Contaminated
+
+p:
+    Contamination is radioactive material on or in something, where it is not wanted. On skin or clothes. Breathed in. Swallowed. Spread about a place.
+
+quote:
+    Radiation does not get on or in people. The material is what spreads.
+
+figure: hand
+caption: Left: a hand in the path of radiation. Right: material on a hand, being rinsed off.
+
+fact:
+    Material on skin or clothes can often be washed off. Exposure to a source outside you ends when the source is shielded or you move away.
+
+list:
+    Exposed: in the path of radiation from a source
+    Contaminated: radioactive material is on or in you
+
+p:
+    A sealed source keeps its material inside its container. Material that is not sealed might be spread onto other things. That is the part to watch.
+
+p:
+    Say it right. Exposed to radiation. Contaminated with material. Different problem, different fix.
+
+next: see how it is detected => lesson detecting-radiation
+
+comment bc-exposed-is-not-contaminated-mina
+author: npc-mina
+chip: {"lessonId":"detecting-radiation"}
+
+    Good to know the two are different. Once you can tell them apart, it is much less worrying.

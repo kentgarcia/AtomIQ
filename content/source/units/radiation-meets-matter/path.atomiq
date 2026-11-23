@@ -1,0 +1,31 @@
+format 1
+adapter curriculum 1
+unit: radiation-meets-matter
+
+node u3-n1
+kind: lesson
+lesson: ionizing-or-not
+
+node u3-n2
+kind: lesson
+lesson: what-stops-what
+
+node u3-n3
+kind: lesson
+lesson: irradiated-or-contaminated
+
+node u3-n4
+kind: practice
+config: {"questionCount":8,"earlierShare":0}
+
+node u3-n5
+kind: lesson
+lesson: detecting-radiation
+
+node u3-n6
+kind: lesson
+lesson: becquerel-gray-sievert
+
+node u3-n7
+kind: checkpoint
+config: {"questionCount":12,"earlierShare":0.15,"passMark":0.8}

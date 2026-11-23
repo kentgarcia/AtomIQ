@@ -11,6 +11,10 @@
  */
 
 import { isArtId } from "../../components/lesson/visual/object-art.ts";
+import { isBlogSceneId } from "../../components/feed/blog-art.ts";
+
+/** A blog cover or figure is a blog scene, or a lesson object picture (the fallback). */
+const isBlogPicture = (id) => isBlogSceneId(id) || isArtId(id);
 import { checkPlaceholders } from "./content-rules.mjs";
 import {
   BLOCK_TYPES,
@@ -222,7 +226,7 @@ export function validateFeedData(data, { strictReview = false } = {}) {
     for (const f of checkPlaceholders(hook, "hook")) err(B, id, "hook", "placeholder", f.message, hook);
 
     // cover
-    if (!isArtId(p.cover)) err(B, id, "cover", "blog-cover", `cover "${p.cover}" is not a picture in the lesson object art`);
+    if (!isBlogPicture(p.cover)) err(B, id, "cover", "blog-cover", `cover "${p.cover}" is not a picture in the lesson object art`);
 
     // unlock
     const unlock = p.unlock;
@@ -263,7 +267,7 @@ export function validateFeedData(data, { strictReview = false } = {}) {
             need("text");
             break;
           case "figure":
-            if (!isArtId(b.ref)) err(B, id, where, "blog-blocks", `figure ref "${b.ref}" is not a picture in the lesson object art`);
+            if (!isBlogPicture(b.ref)) err(B, id, where, "blog-blocks", `figure ref "${b.ref}" is not a picture in the lesson object art`);
             need("caption");
             break;
           case "list":

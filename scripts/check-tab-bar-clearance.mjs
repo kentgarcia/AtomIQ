@@ -33,8 +33,6 @@ const TAB_SCREENS = {
   "app/(tabs)/phone.tsx": /paddingBottom:\s*tabBarInset\s*\+\s*(\d+)/,
   "app/(tabs)/profile.tsx": /paddingBottom:\s*tabBarInset\s*\+\s*(\d+)/,
   "app/(tabs)/quests.tsx": /paddingBottom:\s*tabBarInset\s*\+\s*(\d+)/,
-  "components/games/PickAGame.tsx": /bottomReserve\s*=\s*tabBarInset\s*\+\s*(\d+)/,
-  "components/games/DifficultyPanel.tsx": /paddingBottom:\s*tabBarInset\s*\+\s*(\d+)/,
 };
 for (const [file, pattern] of Object.entries(TAB_SCREENS)) {
   const src = read(file);

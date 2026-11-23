@@ -1,0 +1,38 @@
+format 1
+adapter curriculum 1
+
+unit radiation-and-the-body
+position: 4
+title: Radiation and the Body
+subtitle: How much matters, and what you can do about it
+icon: Health
+tone: success
+teacher: npc-mina
+
+goal:
+    Say what a dose is and how big everyday doses are, how radiation can damage cells and how cells repair it, why a large fast dose differs from a small spread one, and how time, distance and shielding lower a dose.
+
+summary:
+    Everyone gets a small dose of radiation all the time. The average in the United States is about 6.2 millisieverts a year, mostly natural background. Ionizing radiation can damage the DNA in cells, and cells are extremely efficient at repairing that damage. A very large dose in a short time, about 1000 millisieverts, makes people ill within hours. Low doses do not cause immediate effects but can add a small chance of cancer over a lifetime, and a dose that is low or spread over a long time carries less risk because repair is more likely. Spending less time near a source, standing farther from it and putting a shield between you and it all lower a dose. With a size, a speed and a comparison, a scary number becomes something you can judge.
+
+terms: sievert
+terms: millisievert
+terms: absorbed-dose
+terms: dose-rate
+terms: background-radiation
+terms: dna
+terms: acute-radiation-syndrome
+terms: shielding
+
+description:
+    Find out what a dose is and how big an ordinary year of radiation adds up to. See how radiation can damage a cell and how cells repair themselves, why a large, fast dose differs from a small one spread over time, and how time, distance and shielding lower a dose. Then practise reading a frightening number calmly.
+
+source ref-epa-radiation-sources
+
+source ref-epa-radiation-health-effects
+
+source ref-who-ionizing-radiation
+
+source ref-epa-protecting-yourself
+
+source ref-hps-radioactive-contamination

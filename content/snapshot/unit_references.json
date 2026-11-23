@@ -21,6 +21,51 @@
       "position": 2
     },
     {
+      "unit_id": "radiation-and-the-body",
+      "reference_id": "ref-epa-radiation-sources",
+      "position": 0
+    },
+    {
+      "unit_id": "radiation-and-the-body",
+      "reference_id": "ref-epa-radiation-health-effects",
+      "position": 1
+    },
+    {
+      "unit_id": "radiation-and-the-body",
+      "reference_id": "ref-who-ionizing-radiation",
+      "position": 2
+    },
+    {
+      "unit_id": "radiation-and-the-body",
+      "reference_id": "ref-epa-protecting-yourself",
+      "position": 3
+    },
+    {
+      "unit_id": "radiation-and-the-body",
+      "reference_id": "ref-hps-radioactive-contamination",
+      "position": 4
+    },
+    {
+      "unit_id": "radiation-meets-matter",
+      "reference_id": "ref-epa-radiation-basics",
+      "position": 0
+    },
+    {
+      "unit_id": "radiation-meets-matter",
+      "reference_id": "ref-who-ionizing-radiation",
+      "position": 1
+    },
+    {
+      "unit_id": "radiation-meets-matter",
+      "reference_id": "ref-hps-radioactive-contamination",
+      "position": 2
+    },
+    {
+      "unit_id": "radiation-meets-matter",
+      "reference_id": "ref-openstax-chem-21-6",
+      "position": 3
+    },
+    {
       "unit_id": "radioactivity",
       "reference_id": "ref-openstax-up3-10-3",
       "position": 0

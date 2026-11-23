@@ -1,0 +1,156 @@
+format 1
+adapter curriculum 1
+unit: radiation-meets-matter
+
+objective u3-exposure-ends
+
+statement:
+    Know that exposure to a source outside you ends when the source is shielded or you move away, and that a contaminated person is exposed until the radioactive material is removed.
+
+misconception: Exposure to radiation lasts after you leave the source.
+
+item u3-l3-choice-continues
+type: choice
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-hps-radioactive-contamination
+
+prompt:
+    Radioactive dust is on someone's jacket. They walk out of the room. Are they still exposed?
+
+options:
+    {"id":"no","label":"No, they left the radiation behind","note":"The dust is on the jacket, so it came with them. Leaving the room does not remove it."}
+    {"id":"yes","label":"Yes, until the dust is removed"}
+    {"id":"never","label":"No, dust cannot give off radiation","note":"Radioactive dust does give off radiation. The material is the source."}
+
+answer: yes
+
+explanation:
+    A contaminated person is exposed until the radioactive material is removed. The dust goes wherever the jacket goes, so walking away does not end it.
+
+item u3-l3-choice-stops
+type: choice
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-who-ionizing-radiation
+
+prompt:
+    You step out of the path of an X-ray beam. What happens to your exposure?
+
+options:
+    {"id":"cont","label":"It carries on, because the radiation is stuck to you","note":"Radiation does not stick to people. Once it stops reaching you, the exposure is over."}
+    {"id":"ends","label":"It ends, because the radiation no longer reaches you"}
+    {"id":"half","label":"It drops to half, then fades","note":"Exposure to a source outside you stops when the radiation stops reaching you."}
+
+answer: ends
+
+explanation:
+    Exposure to a source outside you lasts only while the radiation reaches you. Move out of its path, or put a shield in the way, and it is over.
+
+item u3-l3-fill-removed
+type: fill
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-hps-radioactive-contamination
+
+prompt:
+    A contaminated person is exposed until the radioactive material is ___.
+
+mode: bank
+
+bank:
+    {"id":"removed","label":"removed"}
+    {"id":"seen","label":"seen"}
+    {"id":"counted","label":"counted"}
+
+answer: removed
+
+explanation:
+    The material is the source. While it stays on or in the person, they stay exposed, so what ends it is taking the material away.
+
+item u3-l3-match-ends
+type: match
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-who-ionizing-radiation
+references: ref-hps-radioactive-contamination
+
+prompt:
+    When does the exposure end in each case?
+
+pairs:
+    {"id":"near","left":"You stand near a source","right":"When you move away or it is shielded"}
+    {"id":"skin","left":"Radioactive dust is on your skin","right":"When the dust is removed"}
+    {"id":"inside","left":"Radioactive material is inside the body","right":"When it leaves the body"}
+
+explanation:
+    The exposure lasts as long as the radiation reaches you. With a source outside you, that ends when you move away or shield it. With material on you it ends when the material is removed, and with material inside you when it leaves the body.
+
+item u3-l3-tom-sealed
+type: true_or_myth
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-hps-radioactive-contamination
+
+statement:
+    Radioactive material in a sealed container stays in the container.
+
+answer: true
+
+explanation:
+    True. A sealed source keeps its material inside. Material that is not sealed is the kind that might be spread onto other objects.
+
+item u3-l3-tom-washing
+type: true_or_myth
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-who-ionizing-radiation
+
+statement:
+    Radioactive material on skin or clothes can often be washed off.
+
+answer: true
+
+explanation:
+    True. Material on skin or clothes can often be washed off. Once it is gone, that exposure ends.
+
+item u3-x-moving-away
+type: choice
+surfaces: practice
+surfaces: checkpoint
+surfaces: review
+references: ref-who-ionizing-radiation
+
+prompt:
+    How does exposure to a source outside the body end?
+
+options:
+    {"id":"away","label":"The source is shielded, or the person moves out of its path"}
+    {"id":"wash","label":"The person washes their hands","note":"Washing helps with material on the skin. A source outside the body is stopped by distance or a shield."}
+    {"id":"wait","label":"It ends after a few days no matter what","note":"It ends when the radiation stops reaching the person."}
+
+answer: away
+
+explanation:
+    Outside exposure lasts while the radiation reaches you. Shielding the source or moving out of its path stops it.
+
+item u3-x-tom-keep-radiation
+type: true_or_myth
+surfaces: practice
+surfaces: checkpoint
+surfaces: review
+references: ref-hps-radioactive-contamination
+
+statement:
+    After you leave a source, you carry its radiation around with you.
+
+answer: myth
+
+explanation:
+    Myth. Radiation does not get on or in people, so you do not carry it away. You only carry radioactive material if some got on you.

@@ -61,6 +61,9 @@ export const SIGN_PARTS: Readonly<Record<Exclude<SignIcon, "lesson" | "tip">, Pa
   heart: single(PROP_SPRITES.blockHeart, 0.85),
   brick: single(PROP_SPRITES.brick, 0.85),
   spikes: single(PROP_SPRITES.spikes, 0.9),
+  beam: single(PROP_SPRITES.beamEmitter, 0.9),
+  dose: single(PROP_SPRITES.beamEmitter, 0.9),
+  lead: single(PROP_SPRITES.lead, 0.85),
   platform: platform(0),
   lift: [...platform(0), { source: CONTROL_SPRITES.arrow, w: 0.34, h: 0.34, x: 0.33, up: 0.5, rotate: -90 }],
 };

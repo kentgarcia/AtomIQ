@@ -1,0 +1,101 @@
+format 1
+adapter curriculum 1
+unit: radiation-and-the-body
+
+objective u4-read-a-number
+
+statement:
+    Know that both 'any dose of radiation is deadly' and 'radiation is harmless' are wrong: the size and the speed of the dose decide what happens.
+
+misconception: Any dose of radiation is deadly.
+
+item u4-l5-choice-calm
+type: choice
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-epa-radiation-sources
+references: ref-who-ionizing-radiation
+
+prompt:
+    A friend says: 'Bananas are radioactive, so eating one must make me ill.' What is a calm answer?
+
+options:
+    {"id":"calm","label":"A banana holds a little natural radioactive potassium, and everyone gets small doses daily: the size of the dose matters"}
+    {"id":"right","label":"You are right: radioactive always means dangerous","note":"Radioactive does not automatically mean dangerous. The size and the speed of the dose matter."}
+    {"id":"no","label":"Bananas are not radioactive at all","note":"A banana does hold a little natural radioactive potassium, potassium-40."}
+
+answer: calm
+
+explanation:
+    A banana does hold a little potassium-40, and everyone gets small natural doses every day. It is the size and the speed of a dose that matter.
+
+item u4-l5-choice-scan
+type: choice
+surfaces: lesson
+surfaces: practice
+surfaces: checkpoint
+surfaces: review
+references: ref-epa-radiation-sources
+references: ref-who-ionizing-radiation
+
+prompt:
+    Is a whole-body CT scan, about 10 millisieverts, the same kind of dose as one of about 1000 millisieverts received in a short time?
+
+options:
+    {"id":"no","label":"No: it is about a hundred times smaller, and size and speed both matter"}
+    {"id":"yes","label":"Yes: radiation is radiation","note":"A dose a hundred times bigger, arriving in a short time, is a very different step on the scale."}
+    {"id":"ill","label":"Yes: both make people ill within hours","note":"Immediate illness is for a very large dose in a short time, about 1000 millisieverts, not 10."}
+
+answer: no
+
+explanation:
+    10 millisieverts is about a hundred times smaller than 1000. How big a dose is, and how fast it arrives, decide what it does.
+
+item u4-l5-tom-any-deadly
+type: true_or_myth
+surfaces: lesson
+surfaces: practice
+surfaces: checkpoint
+surfaces: review
+references: ref-who-ionizing-radiation
+references: ref-epa-radiation-health-effects
+
+statement:
+    Any dose of radiation, however small, is deadly.
+
+answer: myth
+
+explanation:
+    Myth. Everyone gets small doses every day. It takes a very large dose in a short time, about 1000 millisieverts, to make people ill. Low doses add a small chance of cancer over a lifetime.
+
+item u4-l5-tom-large-ill
+type: true_or_myth
+surfaces: lesson
+surfaces: practice
+surfaces: review
+references: ref-who-ionizing-radiation
+references: ref-epa-radiation-health-effects
+
+statement:
+    A very large dose in a short time can make people ill.
+
+answer: true
+
+explanation:
+    True. About 1000 millisieverts in a short time is the threshold for acute radiation syndrome. How big a dose is, and how fast it arrives, decide what it does.
+
+item u4-x-tom-small-risk
+type: true_or_myth
+surfaces: practice
+surfaces: checkpoint
+surfaces: review
+references: ref-epa-radiation-health-effects
+
+statement:
+    A low dose can add a small increase in the risk of cancer, but it is not a certainty.
+
+answer: true
+
+explanation:
+    True. Low levels can cause a small increase in the risk of cancer over a lifetime. That is a small chance, not a certainty.

@@ -244,9 +244,9 @@ describe("feed templates and blog pieces (docs/features/NPC_FEED_SPEC.md §6)", 
 
   it("has the seeded templates and pieces, and the problems list counts them", async () => {
     assert.ok(count("SELECT COUNT(*) n FROM feed_templates") >= 40);
-    assert.equal(count("SELECT COUNT(*) n FROM blog_posts"), 4);
+    assert.equal(count("SELECT COUNT(*) n FROM blog_posts"), 8);
     const problems = (await call("GET", "/api/problems")).json;
-    assert.ok(problems.checked.feed_templates >= 40 && problems.checked.blog_posts === 4 && problems.checked.blog_comments === 4);
+    assert.ok(problems.checked.feed_templates >= 40 && problems.checked.blog_posts === 8 && problems.checked.blog_comments === 8);
     assert.equal(problems.errors.filter((e) => /^(feed|blog)/.test(e.rule)).length, 0);
   });
 
@@ -457,7 +457,7 @@ describe("reading", () => {
   });
 
   it("finds where an item is used", async () => {
-    const used = await call("GET", "/api/used-by?table=items&id=u1-l1-sort-matter");
+    const used = await call("GET", "/api/used-by?table=items&id=u1-l1-tom-microscope");
     assert.equal(used.status, 200);
     assert.ok(used.json.usages.some((u) => u.table === "lesson_cards" && u.columns.includes("item_id")), JSON.stringify(used.json));
   });

@@ -5,6 +5,79 @@
   ],
   "rows": [
     {
+      "id": "blog-exposed-is-not-contaminated",
+      "npc_id": "npc-ray",
+      "unit_id": "radiation-meets-matter",
+      "lesson_id": "irradiated-or-contaminated",
+      "position": 0,
+      "title": "Plain words: exposed is not contaminated",
+      "hook": "Two words people mix up. They mean different things. One ends when you step away.",
+      "cover": "hand",
+      "read_min": 1,
+      "unlock": {
+        "trigger": "lesson_complete",
+        "lessonId": "irradiated-or-contaminated"
+      },
+      "blocks": [
+        {
+          "t": "p",
+          "text": "Two words get swapped all the time. Exposed. Contaminated. They are not the same thing."
+        },
+        {
+          "t": "h",
+          "text": "Exposed"
+        },
+        {
+          "t": "p",
+          "text": "You are exposed when you are in the path of radiation from a source. A medical X-ray is a source outside the body. When the radiation stops reaching you, the exposure is over."
+        },
+        {
+          "t": "h",
+          "text": "Contaminated"
+        },
+        {
+          "t": "p",
+          "text": "Contamination is radioactive material on or in something, where it is not wanted. On skin or clothes. Breathed in. Swallowed. Spread about a place."
+        },
+        {
+          "t": "quote",
+          "text": "Radiation does not get on or in people. The material is what spreads."
+        },
+        {
+          "t": "figure",
+          "ref": "hand",
+          "caption": "Left: a hand in the path of radiation. Right: material on a hand, being rinsed off."
+        },
+        {
+          "t": "fact",
+          "text": "Material on skin or clothes can often be washed off. Exposure to a source outside you ends when the source is shielded or you move away."
+        },
+        {
+          "t": "list",
+          "items": [
+            "Exposed: in the path of radiation from a source",
+            "Contaminated: radioactive material is on or in you"
+          ]
+        },
+        {
+          "t": "p",
+          "text": "A sealed source keeps its material inside its container. Material that is not sealed might be spread onto other things. That is the part to watch."
+        },
+        {
+          "t": "p",
+          "text": "Say it right. Exposed to radiation. Contaminated with material. Different problem, different fix."
+        },
+        {
+          "t": "next",
+          "label": "see how it is detected",
+          "lessonId": "detecting-radiation"
+        }
+      ],
+      "reactors": [
+        "npc-mina"
+      ]
+    },
+    {
       "id": "blog-nobody-knows-when",
       "npc_id": "npc-ada",
       "unit_id": "radioactivity",
@@ -71,6 +144,76 @@
       ],
       "reactors": [
         "npc-hal"
+      ]
+    },
+    {
+      "id": "blog-reading-a-scary-number",
+      "npc_id": "npc-mina",
+      "unit_id": "radiation-and-the-body",
+      "lesson_id": "risk-in-perspective",
+      "position": 1,
+      "title": "Calm note: reading a scary number",
+      "hook": "A frightening headline is only a number. Three questions make it something you can judge.",
+      "cover": "headline",
+      "read_min": 1,
+      "unlock": {
+        "trigger": "lesson_complete",
+        "lessonId": "risk-in-perspective"
+      },
+      "blocks": [
+        {
+          "t": "p",
+          "text": "You read a headline about radiation, and your stomach drops. That is a normal reaction. Here is what I do next. I slow down and ask three questions."
+        },
+        {
+          "t": "h",
+          "text": "Three questions"
+        },
+        {
+          "t": "list",
+          "items": [
+            "How big is the dose, in millisieverts?",
+            "How fast did it arrive?",
+            "How does it compare with doses I already know?"
+          ]
+        },
+        {
+          "t": "figure",
+          "ref": "headline",
+          "caption": "A page with a headline, and a lens held over its number."
+        },
+        {
+          "t": "h",
+          "text": "Two answers that are both wrong"
+        },
+        {
+          "t": "p",
+          "text": "One says any dose of radiation is deadly. The other says radiation is harmless. Neither is right."
+        },
+        {
+          "t": "quote",
+          "text": "Size and speed decide what a dose does."
+        },
+        {
+          "t": "fact",
+          "text": "A very large dose in a short time can make people ill, with symptoms such as nausea and vomiting within hours. Low levels do not cause immediate health effects, but they can add a small increase in the risk of cancer over a lifetime."
+        },
+        {
+          "t": "p",
+          "text": "Cells are extremely efficient at repairing radiation damage. If a dose is low, or spread over a long time, the risk is lower because repair is more likely."
+        },
+        {
+          "t": "p",
+          "text": "So next time, take a breath and ask the three questions. A number with a size, a speed and something to compare it with is much easier to hold."
+        },
+        {
+          "t": "next",
+          "label": "try it on a headline",
+          "lessonId": "risk-in-perspective"
+        }
+      ],
+      "reactors": [
+        "npc-ray"
       ]
     },
     {
@@ -147,6 +290,146 @@
       "reactors": [
         "npc-hal",
         "npc-mina"
+      ]
+    },
+    {
+      "id": "blog-the-counter-always-clicks",
+      "npc_id": "npc-ray",
+      "unit_id": "radiation-meets-matter",
+      "lesson_id": "detecting-radiation",
+      "position": 1,
+      "title": "Plain words: a detector always finds a little",
+      "hook": "Switch one on in an empty field and it still reads something. That is background.",
+      "cover": "rock",
+      "read_min": 1,
+      "unlock": {
+        "trigger": "unit_complete",
+        "unitId": "radiation-meets-matter"
+      },
+      "blocks": [
+        {
+          "t": "p",
+          "text": "You switch on a detector. Nothing nearby. It still reads a little. Nothing is wrong with it."
+        },
+        {
+          "t": "h",
+          "text": "Background"
+        },
+        {
+          "t": "p",
+          "text": "Background radiation is present on Earth at all times. It comes mostly from natural minerals in the ground, soil and water, and from cosmic radiation. A working detector picks up a little almost anywhere."
+        },
+        {
+          "t": "figure",
+          "ref": "rock",
+          "caption": "A counter reads a little among rock, grass, water and sunlight."
+        },
+        {
+          "t": "quote",
+          "text": "A reading above zero does not mean something is wrong."
+        },
+        {
+          "t": "fact",
+          "text": "Background radiation varies from place to place on Earth, so what a detector picks up varies too."
+        },
+        {
+          "t": "h",
+          "text": "What a Geiger counter does"
+        },
+        {
+          "t": "p",
+          "text": "Radiation ionizes the gas inside the tube. The rate of ionization goes with the amount of radiation. More radiation, more ionization to detect. A scintillation counter turns flashes of light into a signal. A dosimeter is worn to measure how much radiation a person is exposed to."
+        },
+        {
+          "t": "list",
+          "items": [
+            "Geiger counter: detects radiation",
+            "Scintillation counter: turns flashes of light into a signal",
+            "Dosimeter: worn, measures how much a person is exposed to"
+          ]
+        },
+        {
+          "t": "p",
+          "text": "So read the number against the background. Know the normal first. Then you can tell when something is different."
+        },
+        {
+          "t": "next",
+          "label": "go over the three units again",
+          "lessonId": "becquerel-gray-sievert"
+        }
+      ],
+      "reactors": [
+        "npc-ada"
+      ]
+    },
+    {
+      "id": "blog-the-dose-you-already-get",
+      "npc_id": "npc-mina",
+      "unit_id": "radiation-and-the-body",
+      "lesson_id": "the-dose-scale",
+      "position": 0,
+      "title": "Calm note: the dose you already get",
+      "hook": "You get a little radiation every day, and so does everyone else. Here is how much.",
+      "cover": "dial",
+      "read_min": 1,
+      "unlock": {
+        "trigger": "lesson_complete",
+        "lessonId": "the-dose-scale"
+      },
+      "blocks": [
+        {
+          "t": "p",
+          "text": "If radiation worries you a little, that is fine. A lot of people feel that way. Let's start with something steady: you are already getting a small dose, every day, and so is everyone you know."
+        },
+        {
+          "t": "h",
+          "text": "How it is counted"
+        },
+        {
+          "t": "p",
+          "text": "A dose is counted in sieverts. Everyday doses are tiny, so they are usually given in millisieverts. One sievert is 1000 millisieverts."
+        },
+        {
+          "t": "h",
+          "text": "An ordinary year"
+        },
+        {
+          "t": "p",
+          "text": "In the United States the average person gets about 6.2 millisieverts a year. Most of it is natural background radiation."
+        },
+        {
+          "t": "figure",
+          "ref": "dial",
+          "caption": "A dial with its needle resting in the low zone, and the everyday sources round it: sun, rock, grass and water."
+        },
+        {
+          "t": "quote",
+          "text": "Most of our average yearly dose comes from natural background radiation."
+        },
+        {
+          "t": "fact",
+          "text": "A whole body CT scan is about 10 millisieverts. About 1000 millisieverts in a short time is where people start to become ill."
+        },
+        {
+          "t": "list",
+          "items": [
+            "Living near a nuclear power station for a year: under 0.01 millisieverts",
+            "Cosmic radiation at sea level for a year: about 0.3 millisieverts",
+            "Radon in an average home for a year: about 2.3 millisieverts"
+          ]
+        },
+        {
+          "t": "p",
+          "text": "A number only means something when you put it next to the ones you know. That is all a scale is for."
+        },
+        {
+          "t": "next",
+          "label": "put doses in order",
+          "lessonId": "the-dose-scale"
+        }
+      ],
+      "reactors": [
+        "npc-ray"
       ]
     },
     {
